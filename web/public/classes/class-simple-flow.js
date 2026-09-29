@@ -118,23 +118,11 @@
     hero.appendChild(steps);
   }
 
-  function ensureRegisterButton() {
-    var form = document.getElementById("leadCaptureForm");
-    if (!form) return;
-    var actions = form.querySelector(".lead-actions");
-    if (!actions) return;
-    var register = document.getElementById("leadRegisterNow");
-    if (!register) {
-      register = document.createElement("a");
-      register.id = "leadRegisterNow";
-      register.className = "button lead-register-now";
-      register.textContent = "Register right away";
-      var whatsapp = actions.querySelector(".lead-whatsapp");
-      if (whatsapp) actions.insertBefore(register, whatsapp);
-      else actions.appendChild(register);
-    }
-    var nextHref = signupUrl(selectedSlug());
-    if (register.getAttribute("href") !== nextHref) register.setAttribute("href", nextHref);
+  function removeDuplicateRegisterButtons() {
+    ["leadRegisterNow", "leadRegisterDirect"].forEach(function (id) {
+      var node = document.getElementById(id);
+      if (node) node.remove();
+    });
   }
 
   function removeTechnicalCopy() {
@@ -183,7 +171,7 @@
     if (submit && !submit.disabled) setText(submit, "Save and view class brochure");
 
     removeTechnicalCopy();
-    ensureRegisterButton();
+    removeDuplicateRegisterButtons();
     simplifyStatusCopy();
   }
 
@@ -218,12 +206,23 @@
     var leadCard = document.getElementById("leadCaptureCard");
     if (leadCard) leadCard.remove();
     var slug = selectedSlug();
-    document.querySelectorAll("a[href^='/signup'],a[href^='/classes/?class']").forEach(function (link) {
-      var href = signupUrl(slug);
-      if (link.getAttribute("href") !== href) link.setAttribute("href", href);
-      setText(link, "Register Now");
-      link.removeAttribute("target");
-      link.removeAttribute("rel");
+    var primaryRegister = document.getElementById("mainSignupCta");
+    if (primaryRegister) {
+      primaryRegister.setAttribute("href", signupUrl(slug));
+      setText(primaryRegister, "Register Now");
+      primaryRegister.removeAttribute("target");
+      primaryRegister.removeAttribute("rel");
+    }
+
+    document.querySelectorAll("#leadRegisterNow,#leadRegisterDirect,.lead-register-now").forEach(function (link) {
+      link.remove();
+    });
+    document.querySelectorAll("a[href^='/signup']").forEach(function (link) {
+      if (link === primaryRegister) return;
+      if (link.closest && link.closest("#brochureMobileCta")) return;
+      link.style.display = "none";
+      link.setAttribute("aria-hidden", "true");
+      link.setAttribute("tabindex", "-1");
     });
     prioritizeSelectedClass();
   }
@@ -273,7 +272,7 @@
     installDetailGuard();
   });
   document.addEventListener("change", function (event) {
-    if (event.target && event.target.id === "leadClass") ensureRegisterButton();
+    if (event.target && event.target.id === "leadClass") removeDuplicateRegisterButtons();
   });
   [100, 350, 800, 1500, 2500, 5000].forEach(function (delay) { window.setTimeout(run, delay); });
 })();
