@@ -60,6 +60,7 @@ describe("public class brochure experience", () => {
     const faq = publicClassFile("brochure-faq.js");
     const reviews = publicClassFile("brochure-footer-reviews.js");
     const hero = publicClassFile("class-hero-banner.js");
+    const download = publicClassFile("brochure-download.js");
 
     expect(enhancements).toContain("brochureMobileCta");
     expect(enhancements).toContain("getCoursePolicy");
@@ -68,5 +69,10 @@ describe("public class brochure experience", () => {
     expect(reviews).toContain("positionReviewsCard");
     expect(hero).toContain("classHeroBannerStyles");
     expect(hero).not.toContain('id="simpleClassFlowStyles"');
+    expect(download).toContain("getCoursePolicy");
+    expect(download).toContain("fullAccessMonths");
+    expect(download).toContain("installmentAccessMonths");
+    expect(download).toContain("isSelfLearning");
+    expect(download).not.toContain("Includes six months of Falowen access");
   });
 });
