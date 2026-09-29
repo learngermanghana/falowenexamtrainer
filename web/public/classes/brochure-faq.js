@@ -100,7 +100,8 @@
   }
 
   function addFaqSection() {
-    if (document.getElementById("faq-section")) return;
+    const existing = document.getElementById("faq-section");
+    if (existing) existing.remove();
     const agreement = document.getElementById("payment-agreement-section") || document.getElementById("agreementCard");
     const anchor = agreement || document.querySelector(".page > section:last-of-type") || document.querySelector(".page");
     if (!anchor) return;
