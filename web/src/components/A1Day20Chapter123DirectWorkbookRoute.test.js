@@ -5,6 +5,7 @@ import {
   A1_DAY20_CHAPTER123_LESSON_ROUTE,
   A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE,
   A1_DAY20_CHAPTER123_WORKBOOK_ROUTE,
+  shouldOpenA1Day20Workbook,
 } from "../data/a1Day20LetterWritingRoutes";
 import inAppWorkbookRoutes from "../data/inAppWorkbookRoutes.json";
 
@@ -45,5 +46,22 @@ describe("A1 Day 20 Chapter 12.3 direct workbook route", () => {
     );
     expect(routeSource).toContain("A1_DAY20_CHAPTER123_WORKBOOK_ROUTE");
     expect(routeSource).toContain("<A1Day20LetterWritingWorkbookPage />");
+  });
+
+  test("keeps the dedicated workbook mounted while its shared tabs change the view", () => {
+    expect(shouldOpenA1Day20Workbook("?view=workbook&radio=done")).toBe(true);
+    expect(
+      shouldOpenA1Day20Workbook("?view=grammar&workbookTab=grammar&radio=done"),
+    ).toBe(true);
+    expect(
+      shouldOpenA1Day20Workbook("?view=teil-1&workbookTab=teil-1&radio=done"),
+    ).toBe(true);
+    expect(
+      shouldOpenA1Day20Workbook("?view=submit&workbookTab=submit&radio=done"),
+    ).toBe(true);
+  });
+
+  test("still sends a bare legacy workbook URL through the lesson hub", () => {
+    expect(shouldOpenA1Day20Workbook("?radio=done")).toBe(false);
   });
 });
