@@ -25,6 +25,31 @@ describe("public class brochure experience", () => {
     );
   });
 
+  test("brochure, signup billing, and live class API agree on A1 fee and A2 duration", () => {
+    const levelFees = fs.readFileSync(path.resolve(__dirname, "../data/levelFees.js"), "utf8");
+    const publicClasses = fs.readFileSync(
+      path.resolve(__dirname, "../../../functions/functionz/routes/publicClasses.js"),
+      "utf8",
+    );
+
+    expect(levelFees).toContain("A1: 2800");
+    expect(publicClasses).toContain("A1: 2800");
+    expect(publicClasses).toContain("A2: 90");
+    expect(publicClasses).toContain("data.tuitionGhs || TUITION[level]");
+    expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
+  });
+
+  test("student reviews prefer the visible lead card before the hidden class grid", () => {
+    const reviews = publicClassFile("brochure-footer-reviews.js");
+    const leadIndex = reviews.indexOf('const leadCard = document.getElementById("leadCaptureCard")');
+    const anchorIndex = reviews.indexOf("const anchor =");
+    const preferredLeadIndex = reviews.indexOf("leadCard\n      || classSummary");
+
+    expect(leadIndex).toBeGreaterThan(-1);
+    expect(anchorIndex).toBeGreaterThan(leadIndex);
+    expect(preferredLeadIndex).toBeGreaterThan(anchorIndex);
+  });
+
   test("brochure schedule titles come from generated canonical curriculum, not a manual lesson table", () => {
     const source = publicClassFile("brochure.js");
 
