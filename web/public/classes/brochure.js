@@ -410,11 +410,15 @@ function updateMeta(course, shareUrl) {
   const fee = formatMoney(course.tuitionGhs);
   const classLabel = course.availability === "always"
     ? `${course.level} German self-learning`
-    : `${course.level} German class – ${course.title}`;
+    : course.availability === "enquiry"
+      ? `${course.level} upcoming German class`
+      : `${course.level} German class – ${course.title}`;
   const title = `${classLabel} | Fees & Schedule | Falowen`;
   const description = course.availability === "always"
     ? `${course.title}: view the course fee, learning mode, Falowen access and registration details.`
-    : `${course.title} starts ${formatDate(course.startDate)}. View the ${fee} fee, class times, learning mode, schedule and registration details.`;
+    : course.availability === "enquiry"
+      ? `${course.title}: the next live-class date will be announced. View the ${fee} fee, learning mode and registration details.`
+      : `${course.title} starts ${formatDate(course.startDate)}. View the ${fee} fee, class times, learning mode, schedule and registration details.`;
 
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
@@ -637,7 +641,7 @@ function render() {
   const firstPayment = Math.min(course.tuitionGhs || 0, brochureData.payment.minimumInstallmentGhs);
   const balance = Math.max((course.tuitionGhs || 0) - firstPayment, 0);
   const shareUrl = getClassShareUrl(course);
-  const classScheduleUrl = course.scheduleUrl || course.docUrl || shareUrl;
+  const classScheduleUrl = course.scheduleUrl || course.docUrl || "";
 
   updateHeroText();
   renderTabs(sourceList);
@@ -682,9 +686,11 @@ function render() {
   setHref("payLink", paymentLink);
   setHref("payHero", "/signup/");
   setHref("shareLink", shareUrl);
-  setHref("scheduleLink", classScheduleUrl);
   const scheduleLink = document.getElementById("scheduleLink");
-  if (scheduleLink) scheduleLink.style.display = classScheduleUrl ? "inline-flex" : "none";
+  if (scheduleLink) {
+    scheduleLink.href = classScheduleUrl || "#";
+    scheduleLink.style.display = classScheduleUrl ? "inline-flex" : "none";
+  }
   setHref("whatsappLink", `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title}. ${getCourseStartLabel(course)}.`)}`);
 
   setHtml("meetingRows", course.meetingDays?.length
@@ -694,7 +700,7 @@ function render() {
       : `<tr><td colspan="3">The next live-class schedule will be announced.</td></tr>`);
 
   const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };
-  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl}`;
+  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl || "To be announced"}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
