@@ -77,6 +77,24 @@ p { line-height: 1.65; }
   font-weight: 800;
 }
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.hero-placement-action {
+  display: inline-flex;
+  align-items: center;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: none;
+  padding: 8px 2px;
+}
+.catalog-status-notice {
+  margin-top: 16px;
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #78350f;
+  display: grid;
+  gap: 8px;
+}
+.catalog-status-notice p { margin: 0; color: #92400e; }
 .button {
   display: inline-flex;
   align-items: center;
