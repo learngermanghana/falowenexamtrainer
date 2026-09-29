@@ -81,7 +81,14 @@ const makeInitialCloudState = (docId = "") => ({
   remoteSource: "",
 });
 
-const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = false, onLockedChange = null }) => {
+const VerifiedCloudDraftSubmissionPage = ({
+  submissionContext = null,
+  compact = false,
+  onLockedChange = null,
+  allowIncompleteSubmission = false,
+  onSubmissionVerified = null,
+  onSubmissionError = null,
+}) => {
   const { user, studentProfile } = useAuth();
   const { showToast } = useToast();
   const textareaRef = useRef(null);
@@ -649,7 +656,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
       return;
     }
     const submissionWordCount = submissionText ? submissionText.split(/\s+/).filter(Boolean).length : 0;
-    if (submissionText.length < MIN_SUBMISSION_CHARACTERS) {
+    if (!allowIncompleteSubmission && submissionText.length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
         error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
@@ -657,7 +664,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
       });
       return;
     }
-    if (submissionWordCount < MIN_SUBMISSION_WORDS) {
+    if (!allowIncompleteSubmission && submissionWordCount < MIN_SUBMISSION_WORDS) {
       setStatus({
         loading: false,
         error: `Please type at least ${MIN_SUBMISSION_WORDS} words before submitting. You currently have ${submissionWordCount} word${submissionWordCount === 1 ? "" : "s"}.`,
@@ -824,6 +831,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
         error: "",
         success: `Submission saved and verified at /${submissionPath}.`,
       });
+      onSubmissionVerified?.();
       triggerInteractionFeedback({
         sound: "success",
         toastMessage: "Assignment submitted and verified.",
@@ -851,6 +859,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
         error: `Could not save your submission. ${exactError}`,
         success: "",
       });
+      onSubmissionError?.(exactError);
     }
   };
 
@@ -1138,7 +1147,7 @@ const VerifiedCloudDraftSubmissionPage = ({ submissionContext = null, compact = 
                 opacity: 1,
                 visibility: "visible",
               }}
-              disabled={!ready || status.loading || !hasMinimumWords}
+              disabled={!ready || status.loading || (!allowIncompleteSubmission && !hasMinimumWords)}
             >
               {finalSubmissionState.state === "saving" ? "Submitting…" : "Submit Assignment"}
             </button>

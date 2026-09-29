@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AssignmentSubmissionDebugPanel from "./AssignmentSubmissionDebugPanel";
 import VerifiedCloudDraftSubmissionPage from "./VerifiedCloudDraftSubmissionPage";
 import { useA1TutorWorkbookDraft } from "./A1TutorWorkbookDraftContext";
+import { useA1TimedMockExam } from "./A1TimedMockExam";
 import { validateA1TutorDraftSubmissionSections } from "../data/a1TutorDraftProfiles";
 import { styles } from "../styles";
 
@@ -114,6 +115,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
   const location = useLocation();
   const navigate = useNavigate();
   const draftContext = useA1TutorWorkbookDraft();
+  const timedMockExam = useA1TimedMockExam();
   const submitRootRef = useRef(null);
   const autoResolveInFlightRef = useRef(false);
   const lastContextNavigationRef = useRef("");
@@ -429,6 +431,9 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
           <VerifiedCloudDraftSubmissionPage
             compact
             onLockedChange={setSubmissionLocked}
+            allowIncompleteSubmission={timedMockExam.timedAutoSubmit}
+            onSubmissionVerified={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionVerified : null}
+            onSubmissionError={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionError : null}
             submissionContext={{
               level: "A1",
               day: assignment.day,
