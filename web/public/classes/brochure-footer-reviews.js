@@ -64,11 +64,11 @@
 
   function positionReviewsCard(card) {
     if (!card) return;
-    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
     const leadCard = document.getElementById("leadCaptureCard");
+    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
     const anchor =
-      classSummary
-      || leadCard
+      leadCard
+      || classSummary
       || document.getElementById("payment-agreement-section")
       || document.getElementById("agreementCard")
       || document.querySelector(".page > section:last-of-type")
