@@ -59,6 +59,9 @@ export default function A1TimedMockExam({ assignment, children = null }) {
   const [status, setStatus] = useState("");
   const [agreed, setAgreed] = useState(false);
   const autoSubmitStartedRef = useRef(false);
+  const timedAutoSubmit = new URLSearchParams(location.search || "").get("timedAutoSubmit") === "1";
+
+  if (timedAutoSubmit && session) autoSubmitStartedRef.current = true;
 
   const clearSession = useCallback(() => {
     window.localStorage.removeItem(buildA1MockExamStorageKey(assignmentKey));
@@ -71,7 +74,6 @@ export default function A1TimedMockExam({ assignment, children = null }) {
   const openSubmitAndSend = useCallback(() => {
     if (autoSubmitStartedRef.current) return;
     autoSubmitStartedRef.current = true;
-    window.localStorage.removeItem(buildA1MockExamStorageKey(assignmentKey));
     setStatus("Time is up. Submitting your saved answers now…");
 
     const search = new URLSearchParams(location.search || "");
@@ -96,26 +98,34 @@ export default function A1TimedMockExam({ assignment, children = null }) {
   }, [durationSeconds, enabled, openSubmitAndSend, session]);
 
   useEffect(() => {
-    if (!enabled || !autoSubmitStartedRef.current || new URLSearchParams(location.search).get("workbookTab") !== "submit") return undefined;
+    if (!enabled || !timedAutoSubmit || !session || new URLSearchParams(location.search).get("workbookTab") !== "submit") return undefined;
     let attempts = 0;
     const timer = window.setInterval(() => {
       attempts += 1;
       const form = document.querySelector('[data-a1-built-in-submission] form');
       const submitButton = form?.querySelector('button[type="submit"]');
-      if (form && submitButton && !submitButton.disabled) {
+      if (form && submitButton) {
         form.setAttribute("data-a1-timed-auto-submit", "true");
         window.clearInterval(timer);
-        form.requestSubmit(submitButton);
-        setStatus("Time is up. Your saved answers were submitted automatically.");
-        setSession(null);
+        form.requestSubmit();
       } else if (attempts >= 80) {
         window.clearInterval(timer);
         setStatus("Time is up. We could not reach the submission form. Your answers are saved—open Review & Submit to send them.");
-        setSession(null);
       }
     }, 150);
     return () => window.clearInterval(timer);
-  }, [enabled, location.search]);
+  }, [enabled, location.search, session, timedAutoSubmit]);
+
+  const handleSubmissionVerified = useCallback(() => {
+    window.localStorage.removeItem(buildA1MockExamStorageKey(assignmentKey));
+    setStatus("Time is up. Your saved answers were submitted automatically.");
+    setSession(null);
+    autoSubmitStartedRef.current = false;
+  }, [assignmentKey]);
+
+  const handleSubmissionError = useCallback(() => {
+    setStatus("Time is up, but automatic submission failed. Your timed session and answers are preserved; try submitting again.");
+  }, []);
 
   if (!enabled) return children;
 
@@ -133,7 +143,13 @@ export default function A1TimedMockExam({ assignment, children = null }) {
   const assignmentLocked = !session && !autoSubmitStartedRef.current;
 
   return (
-    <A1TimedMockExamContext.Provider value={{ enabled: true, assignmentLocked }}>
+    <A1TimedMockExamContext.Provider value={{
+      enabled: true,
+      assignmentLocked,
+      timedAutoSubmit,
+      onSubmissionVerified: handleSubmissionVerified,
+      onSubmissionError: handleSubmissionError,
+    }}>
       <section
         data-a1-timed-mock-exam={assignmentKey}
         data-assignment-locked={assignmentLocked ? "true" : "false"}

@@ -5,6 +5,7 @@ import A1TimedMockExam, {
   buildA1MockExamStorageKey,
   formatA1MockExamTime,
   getA1MockExamDurationSeconds,
+  useA1TimedMockExam,
 } from "./A1TimedMockExam";
 import { A1SharedWorkbookTabBar } from "./A1SharedAssignmentWorkbookLayout";
 
@@ -72,5 +73,58 @@ describe("A1 timed mock exam", () => {
       <MemoryRouter><A1TimedMockExam assignment={{ assignmentKey: "A1-12.2" }} /></MemoryRouter>,
     );
     expect(screen.queryByText(/Timed mock exam/)).not.toBeInTheDocument();
+  });
+
+  test("restores an expired auto-submit and submits even when the minimum-word button is disabled", () => {
+    window.localStorage.setItem(
+      buildA1MockExamStorageKey("A1-12.3"),
+      JSON.stringify({ endsAt: Date.now() - 1000 }),
+    );
+    const handleSubmit = jest.fn((event) => event.preventDefault());
+
+    render(
+      <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
+        <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
+          <div data-a1-built-in-submission>
+            <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+          </div>
+        </A1TimedMockExam>
+      </MemoryRouter>,
+    );
+
+    jest.advanceTimersByTime(200);
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+    expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).not.toBeNull();
+  });
+
+  test("only clears the persisted timed session after verified submission", () => {
+    const storageKey = buildA1MockExamStorageKey("A1-12.3");
+    window.localStorage.setItem(storageKey, JSON.stringify({ endsAt: Date.now() - 1000 }));
+
+    const SubmissionResultControls = () => {
+      const timedExam = useA1TimedMockExam();
+      return (
+        <>
+          <button type="button" onClick={timedExam.onSubmissionError}>Fail submission</button>
+          <button type="button" onClick={timedExam.onSubmissionVerified}>Verify submission</button>
+        </>
+      );
+    };
+
+    render(
+      <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
+        <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
+          <SubmissionResultControls />
+        </A1TimedMockExam>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Fail submission" }));
+    expect(window.localStorage.getItem(storageKey)).not.toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("automatic submission failed");
+
+    fireEvent.click(screen.getByRole("button", { name: "Verify submission" }));
+    expect(window.localStorage.getItem(storageKey)).toBeNull();
+    expect(screen.getByRole("status")).toHaveTextContent("submitted automatically");
   });
 });
