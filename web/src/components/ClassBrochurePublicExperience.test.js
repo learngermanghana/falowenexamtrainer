@@ -80,10 +80,12 @@ describe("public class brochure experience", () => {
   test("lead capture shows class details below the form fields without another register button", () => {
     const source = publicClassFile("class-leads.js");
     const formGridIndex = source.indexOf('class="lead-form-grid"');
-    const decisionSummaryIndex = source.indexOf('${buildDecisionSummary(selected, data)}', formGridIndex);
+    const formEndIndex = source.indexOf("</form>", formGridIndex);
+    const decisionSummaryIndex = source.indexOf('${buildDecisionSummary(selected, data)}', formEndIndex);
 
     expect(formGridIndex).toBeGreaterThan(-1);
-    expect(decisionSummaryIndex).toBeGreaterThan(formGridIndex);
+    expect(formEndIndex).toBeGreaterThan(formGridIndex);
+    expect(decisionSummaryIndex).toBeGreaterThan(formEndIndex);
     expect(source).toContain("leadDecisionSummary");
     expect(source).toContain("leadDecisionFee");
     expect(source).toContain("leadDecisionTimes");
@@ -105,6 +107,8 @@ describe("public class brochure experience", () => {
     expect(brochure).toContain('availability: "enquiry"');
     expect(brochure).toContain("buildFallbackClassList");
     expect(brochure).toContain("missingLiveLevelChoices");
+    expect(brochure).toContain("Next class date to be announced");
+    expect(brochure).toContain('Class schedule: ${classScheduleUrl || "To be announced"}');
     expect(filter).toContain('course.availability === "enquiry"');
     expect(filter).not.toContain('sourceIsLive || course.availability === "always"');
   });
