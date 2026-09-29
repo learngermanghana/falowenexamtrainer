@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useCallback, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import SharedTimedAssignment from "./SharedTimedAssignment";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -87,6 +88,7 @@ const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap:
 
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
   const [activeTab, setActiveTab] = useState("sprechen");
@@ -107,6 +109,15 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const hoerenQuestions = listeningConfig?.questions || [];
   const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
   const assignmentKey = `A2-${chapter}`;
+  const handleTimedExpiry = useCallback(() => {
+    setActiveTab("submit");
+    const search = new URLSearchParams(location.search || "");
+    search.set("view", "submit");
+    navigate(
+      { pathname: location.pathname, search: `?${search.toString()}`, hash: location.hash },
+      { replace: true, state: location.state },
+    );
+  }, [location.hash, location.pathname, location.search, location.state, navigate]);
   const resolvedWorkbookId = workbookId || `A2Day${day}Workbook`;
   const submissionContext = {
     level: "A2",
@@ -122,50 +133,62 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     listeningConfig?.task || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor.",
   );
 
-  return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-    <div style={card}>
-      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
-      <p style={{ ...styles.subtitle, margin: 0 }}>{showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below."} The tabs stay visible at the top of the workbook.</p>
-      <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
-          activeTab={visibleActiveTab}
-          onChange={setActiveTab}
-          tabs={visibleTabs}
-          ariaLabel={`A2 Day ${day} workbook sections`}
-          renderLegacyGrammarPanel={false}
-        /></div>
-    </div>
-    {showWorkbookGuidance && visibleActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
+  return (
+    <SharedTimedAssignment
+      assignmentKey={assignmentKey}
+      level="A2"
+      onTimeExpired={handleTimedExpiry}
+    >
+      {({ isTabLocked }) => {
+        const displayedActiveTab = isTabLocked(visibleActiveTab) ? "grammar" : visibleActiveTab;
+        return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+          <div style={card}>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+            <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
+            <p style={{ ...styles.subtitle, margin: 0 }}>{showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below."} The tabs stay visible at the top of the workbook.</p>
+            <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
+                activeTab={visibleActiveTab}
+                onChange={setActiveTab}
+                tabs={visibleTabs}
+                isTabLocked={isTabLocked}
+                ariaLabel={`A2 Day ${day} workbook sections`}
+                renderLegacyGrammarPanel={false}
+              /></div>
+          </div>
+          {showWorkbookGuidance && visibleActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
 
-    {visibleActiveTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={day} /></div>}
+          {visibleActiveTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={day} /></div>}
 
-    {visibleActiveTab === "sprechen" && <div style={card}>
-      <HeroImage type="sprechen" alt="Students speaking together during German class" />
-      <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
-      {mindMapOnlySpeaking ? null : <A2SecondStageSpeakingUpgrade day={day} />}
-      {sprechenContent ? sprechenContent : <><SpeakingMindMap config={getA2SpeakingMindMap(day)} />{!mindMapOnlySpeaking && showSpeakingTaskCard ? <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly><p style={{ margin: 0 }}>Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.</p><ul style={listSpacing}><li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li><li>Speak clearly for 30–60 seconds.</li><li>This part is practice only; submit required final answers in the Submit tab.</li></ul></WorkbookTaskCard> : null}</>}
-      <SpeakingPracticeTimerCard />
-      <CourseInlinePracticePanel type="speaking" />
-      <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
-    </div>}
+          {visibleActiveTab === "sprechen" && <div style={card}>
+            <HeroImage type="sprechen" alt="Students speaking together during German class" />
+            <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
+            {mindMapOnlySpeaking ? null : <A2SecondStageSpeakingUpgrade day={day} />}
+            {sprechenContent ? sprechenContent : <><SpeakingMindMap config={getA2SpeakingMindMap(day)} />{!mindMapOnlySpeaking && showSpeakingTaskCard ? <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly><p style={{ margin: 0 }}>Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.</p><ul style={listSpacing}><li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li><li>Speak clearly for 30–60 seconds.</li><li>This part is practice only; submit required final answers in the Submit tab.</li></ul></WorkbookTaskCard> : null}</>}
+            <SpeakingPracticeTimerCard />
+            <CourseInlinePracticePanel type="speaking" />
+            <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
+          </div>}
 
-    {visibleActiveTab === "schreiben" && <div style={card}>
-      <HeroImage type="schreiben" alt="Learner writing a German workbook answer" />
-      <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
-      <A2SecondStageWritingUpgrade day={day} />
-      {canonicalWritingTask ? <A2GoetheWritingTaskCard day={day} /> : (schreibenContent ? schreibenContent : <WorkbookTaskCard eyebrow="Writing task" title="Write your final text"><p style={{ margin: 0, lineHeight: 1.7 }}>{schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}</p></WorkbookTaskCard>)}
-      <CourseInlinePracticePanel type="writing" title="A2 writing workspace" description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting." writingContext={{ level: "A2", courseLevel: "A2", day, lessonId: `A2-day-${day}`, workbookId: resolvedWorkbookId, writingTaskId: `${resolvedWorkbookId}-teil-2-writing`, taskTitle: writingTaskTitle, draftPlaceholder: schreibenPlaceholder }} />
-      <WorkbookSubmissionReminder />
-      <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
-    </div>}
+          {visibleActiveTab === "schreiben" && <div style={card}>
+            <HeroImage type="schreiben" alt="Learner writing a German workbook answer" />
+            <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
+            <A2SecondStageWritingUpgrade day={day} />
+            {canonicalWritingTask ? <A2GoetheWritingTaskCard day={day} /> : (schreibenContent ? schreibenContent : <WorkbookTaskCard eyebrow="Writing task" title="Write your final text"><p style={{ margin: 0, lineHeight: 1.7 }}>{schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}</p></WorkbookTaskCard>)}
+            <CourseInlinePracticePanel type="writing" title="A2 writing workspace" description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting." writingContext={{ level: "A2", courseLevel: "A2", day, lessonId: `A2-day-${day}`, workbookId: resolvedWorkbookId, writingTaskId: `${resolvedWorkbookId}-teil-2-writing`, taskTitle: writingTaskTitle, draftPlaceholder: schreibenPlaceholder }} />
+            <WorkbookSubmissionReminder />
+            <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
+          </div>}
 
-    {visibleActiveTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
+          {visibleActiveTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-    {showHoeren && visibleActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
+          {showHoeren && visibleActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
-    {visibleActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
-    {visibleActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
-  </div>;
+          {visibleActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
+          {visibleActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
+        </div>;
+      }}
+    </SharedTimedAssignment>
+  );
 };
 
 export default A2StandardTabbedWorkbookPage;

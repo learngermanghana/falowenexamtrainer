@@ -74,12 +74,13 @@ export const getWorkbookTabsForLevel = (level) => {
   return A2_B1_WORKBOOK_TABS;
 };
 
-const TabButton = ({ active, onClick, label, description }) => (
+const TabButton = ({ active, onClick, label, description, disabled = false, locked = false }) => (
   <button
     type="button"
     role="tab"
-    aria-label={[label, description].filter(Boolean).join(" · ")}
+    aria-label={`${[label, description].filter(Boolean).join(" · ")}${locked ? " · locked until timed mock starts" : ""}`}
     aria-selected={active}
+    disabled={disabled}
     onClick={onClick}
     style={{
       ...styles.secondaryButton,
@@ -103,9 +104,9 @@ const TabButton = ({ active, onClick, label, description }) => (
         : "0 8px 18px rgba(15, 23, 42, 0.08)",
       fontWeight: 900,
       lineHeight: 1.15,
-      opacity: 1,
+      opacity: disabled ? 0.5 : 1,
       visibility: "visible",
-      cursor: "pointer",
+      cursor: disabled ? "not-allowed" : "pointer",
       transform: active ? "translateY(-1px)" : "none",
     }}
   >
@@ -149,6 +150,7 @@ export const WorkbookTabNav = ({
   tabs = STANDARD_WORKBOOK_TABS,
   ariaLabel = "Workbook sections",
   renderLegacyGrammarPanel = true,
+  isTabLocked = () => false,
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -167,10 +169,12 @@ export const WorkbookTabNav = ({
     if (!legacyGrammarContext || !requestedView) return;
     if (requestedView === "radio" || requestedView === "workbook") return;
     if (!effectiveKeys.has(requestedView)) return;
+    if (isTabLocked(requestedView)) return;
     if (requestedView !== activeTab) onChange?.(requestedView);
-  }, [activeTab, effectiveKeys, legacyGrammarContext, onChange, requestedView]);
+  }, [activeTab, effectiveKeys, isTabLocked, legacyGrammarContext, onChange, requestedView]);
 
   const selectTab = (key) => {
+    if (isTabLocked(key)) return;
     onChange?.(key);
     if (!legacyGrammarContext) return;
     const search = replaceLessonView(location.search, key);
@@ -220,15 +224,20 @@ export const WorkbookTabNav = ({
             visibility: "visible",
           }}
         >
-          {effectiveTabs.map((tab) => (
-            <TabButton
-              key={tab.key}
-              active={tab.key === activeTab}
-              onClick={() => selectTab(tab.key)}
-              label={tab.label}
-              description={tab.description}
-            />
-          ))}
+          {effectiveTabs.map((tab) => {
+            const locked = isTabLocked(tab.key);
+            return (
+              <TabButton
+                key={tab.key}
+                active={tab.key === activeTab}
+                onClick={() => selectTab(tab.key)}
+                label={tab.label}
+                description={tab.description}
+                disabled={locked}
+                locked={locked}
+              />
+            );
+          })}
         </div>
 
         <div style={{ display: "grid", gap: 6 }}>
