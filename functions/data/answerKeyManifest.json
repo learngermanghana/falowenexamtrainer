@@ -408,10 +408,10 @@
       },
       "teil4": {
         "Answer1": "B) Ins Kino gehen",
-        "Answer2": "A) Weil sie spannende Geschichten liebt",
+        "Answer2": "A) Sie liebt spannende Geschichten",
         "Answer3": "A) Tennis",
-        "Answer4": "B) Es war sonnig und warm",
-        "Answer5": "C) Einen Spaziergang Machen"
+        "Answer4": "B) Sonnig und warm",
+        "Answer5": "C) Spaziergang"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1bENY4-5AG9hrgaDKqyNpTwKT02i58wGva6tVRn-hhbE/gviz/tq?tqx=out:html&sheet=Key",
@@ -430,7 +430,7 @@
       },
       "teil4": {
         "Answer1": "B) Weil er in Deutschland arbeiten möchte.",
-        "Answer2": "C) Sprachkurse, Online-Apps und das Üben mit Freunden.",
+        "Answer2": "C) Sprachkurse, Apps und Freunde",
         "Answer3": "A) Jeden Tag eine Stunde."
       }
     },
@@ -582,8 +582,8 @@
       },
       "teil4": {
         "Answer1": "B) Griechenland",
-        "Answer2": "A) Eine woche",
-        "Answer3": "B) Der strand von",
+        "Answer2": "A) Eine Woche",
+        "Answer3": "B) Der Strand von Elafonissi",
         "Answer4": "B) Eine Bootstour",
         "Answer5": "A) Nach Kreta zu reisen"
       }
@@ -625,11 +625,11 @@
         "Answer5": "C) Die S8 fährt erst ab 08:30 Uhr."
       },
       "teil4": {
-        "Answer1": "B) in die Berge",
-        "Answer2": "B) Ein Mittel..",
-        "Answer3": "C) 60 Euro",
-        "Answer4": "C) Führerschein und Personalausweis",
-        "Answer5": "B) Das Auto auf mögliche"
+        "Answer1": "B) In die Berge",
+        "Answer2": "B) Ein mittelgroßes Auto",
+        "Answer3": "B) 50 Euro",
+        "Answer4": "C) Führerschein und Kreditkarte",
+        "Answer5": "B) Das Auto auf mögliche Schäden"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/16aS6UmVL-kQqcje1f3rDeqobEnkoNsxUwCNE_iBokI4/gviz/tq?tqx=out:html&sheet=Key",
@@ -647,11 +647,11 @@
         "Answer5": "B) Anzeige B"
       },
       "teil4": {
-        "Answer1": "B) um 6 Uhr",
-        "Answer2": "C) Beginnt die Visite",
-        "Answer3": "B) um 9 Uhr",
-        "Answer4": "B) fuhrt wichtige",
-        "Answer5": "C) Vor 18 Uhr"
+        "Answer1": "B) Um 6:00 Uhr",
+        "Answer2": "C) Beginnt die Visite auf der Station",
+        "Answer3": "B) Um 9:00 Uhr",
+        "Answer4": "B) Führt wichtige Telefonate",
+        "Answer5": "C) Vor 18:00 Uhr"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1z8wEWz-HJxm1DUvr0a7OE5md3Gj4OR5ZJ3SpJNI-hyQ/gviz/tq?tqx=out:html&sheet=Key",
@@ -689,7 +689,8 @@
         "Answer3": "B) Im Online-System",
         "Answer4": "A) Am ersten Tag vor 9:00 Uhr",
         "Answer5": "B) Frau König"
-      }
+      },
+      "teil4": {}
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1wKcE29sav7yHsSc9SSOwrbmtq15MF33LbVAeDaz4CAw/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1wKcE29sav7yHsSc9SSOwrbmtq15MF33LbVAeDaz4CAw/edit",
@@ -900,7 +901,8 @@
         "Answer3": "B) Um 12:30 Uhr",
         "Answer4": "B) Sie geht ins Fitnessstudio.",
         "Answer5": "C) Um 22:30 Uhr"
-      }
+      },
+      "teil4": {}
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1nOtlOXVblDt1RQ8JOLpBBLQfjmnxJ9YF6ylhZo4u6kY/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1nOtlOXVblDt1RQ8JOLpBBLQfjmnxJ9YF6ylhZo4u6kY/edit",
@@ -1123,11 +1125,16 @@
         "Answer12": "E) Anzeige E"
       },
       "teil4": {
-        "Answer1": "B) In vielen Fertiggerichten und Softdrinks",
-        "Answer2": "B) Er gibt uns kurzzeitig Energie",
-        "Answer3": "A) Man fühlt sich energielos und müde",
-        "Answer4": "A) Erhöhtes Risiko für Übergewicht und Diabetes Typ 2",
-        "Answer5": "B) Den Zuckerkonsum zu reduzieren und mehr frische Lebensmittel zu essen"
+        "Answer1": "F) Veranstaltung uber gesunde Ernahrung und Zuckerreduktion",
+        "Answer2": "B) Werbung fur ein neues Diat – Programm",
+        "Answer3": "C) Angebot fur zuckerfreie SuBigkeiten",
+        "Answer4": "D) Eroffnung eines neuen Restuarants mit gesunden Gerichten",
+        "Answer5": "E) Rabbatt auf Schokolade im Onlne-Shop",
+        "Answer6": "B) In vielen Fertiggerichten und Softdrinks",
+        "Answer7": "B) Er gibt uns Kurzzeitig Energie",
+        "Answer8": "A) Man fuhlt sich energielos und mude",
+        "Answer9": "A) Erhohtes Risiko fur Ubergewicht und Diabetes Typ 2",
+        "Answer10": "B) Den Zuckerkonsum zu reduzieren und mehr frische Lebensmittel zu essen"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1COQA_nlpRTk-FTLD5fL3HkWoVAvUh0XVrpc4TLE3i-w/gviz/tq?tqx=out:html&sheet=Key",
@@ -1406,11 +1413,7 @@
         "Answer2": "A) ein ganzes Dorf von modernen Energien leben kann.",
         "Answer3": "C) muss die Bevölkerung dafür sein."
       },
-      "teil4": {
-        "Answer1": "B) es ein neues Tourismus-Angebot gibt.",
-        "Answer2": "B) muss man nicht sportlich sein.",
-        "Answer3": "C) mehr Velo-Touristen in die Region kommen."
-      }
+      "teil4": {}
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1jIci1aX6N68DhttbtTg1yLF2ighuNIyYNTtSLz_OEjc/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1jIci1aX6N68DhttbtTg1yLF2ighuNIyYNTtSLz_OEjc/edit",
@@ -1460,11 +1463,9 @@
         "Answer5": "C) Stadtrundfahrten"
       },
       "teil4": {
-        "Answer1": "D) im Supermarkt",
-        "Answer2": "B) Name, Alter, Wohnort",
-        "Answer3": "D) Zeugnisse und Anschreiben",
-        "Answer4": "A) Man lernt den Arbeitgeber kennen.",
-        "Answer5": "C) Man kann sich bei der nächsten offenen Stelle bewerben."
+        "Answer1": "D) Zeugnisse und Anschreiben",
+        "Answer2": "A) Man lernt den Arbeitgeber kennen.",
+        "Answer3": "C) Man kann sich bei der nächsten offenen Stelle bewerben."
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1b4CY4c1YK-QrIKmmq6NX60cdmWJ6u0X6C-qcyoFjbBU/gviz/tq?tqx=out:html&sheet=Key",
