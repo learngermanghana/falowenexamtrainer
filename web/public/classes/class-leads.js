@@ -597,7 +597,13 @@
       ? Promise.resolve(window.FalowenClassBrochureData)
       : typeof window.FalowenLoadClassCatalog === "function"
         ? window.FalowenLoadClassCatalog()
-        : fetch("/classes/classes-data.json", { cache: "no-store" }).then((response) => response.json());
+        : fetch("/classes/classes-data.json", { cache: "no-store" })
+          .then((response) => response.json())
+          .then((data) => ({
+            ...data,
+            catalogSource: "fallback",
+            classes: (data.classes || []).filter((course) => course.availability === "always"),
+          }));
 
     catalogPromise
       .then((data) => {
