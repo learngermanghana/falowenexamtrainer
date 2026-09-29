@@ -104,6 +104,56 @@
     return `${start} · ${end}`;
   }
 
+  function getCourseFee(course, data) {
+    const explicit = Number(course?.tuitionGhs);
+    if (Number.isFinite(explicit) && explicit > 0) return explicit;
+    const level = String(course?.level || "").trim().toUpperCase();
+    return Number(data?.classDefaults?.tuitionGhsByLevel?.[level] || 0);
+  }
+
+  function formatMoney(amount) {
+    const value = Number(amount || 0);
+    return value > 0 ? `GHS ${value.toLocaleString("en-GH")}` : "Fee on request";
+  }
+
+  function getCourseMode(course, data) {
+    if (course?.availability === "always") {
+      return course?.format || data?.classDefaults?.selfLearningFormat || "Online self-learning";
+    }
+    return course?.format || data?.classDefaults?.format || "Hybrid: in person, online, or recorded lessons";
+  }
+
+  function buildDecisionSummary(course, data) {
+    if (!course) return "";
+    const fee = formatMoney(getCourseFee(course, data));
+    const start = course?.availability === "always" ? "Start anytime" : formatDate(course?.startDate);
+    const meetingTimes = getMeetingTimes(course);
+    const location = getCourseLocation(course);
+    const mode = getCourseMode(course, data);
+    return `
+      <div class="lead-decision-summary" id="leadDecisionSummary">
+        <div class="lead-decision-heading">
+          <div>
+            <span class="lead-decision-eyebrow">Selected class</span>
+            <strong id="leadDecisionTitle">${getCourseTitle(course)}</strong>
+          </div>
+          <span class="lead-decision-fee" id="leadDecisionFee">${fee}</span>
+        </div>
+        <div class="lead-decision-grid">
+          <div><span>Start</span><strong id="leadDecisionStart">${start}</strong></div>
+          <div><span>Meeting times</span><strong id="leadDecisionTimes">${meetingTimes}</strong></div>
+          <div><span>Venue</span><strong id="leadDecisionLocation">${location}</strong></div>
+          <div><span>Mode</span><strong id="leadDecisionMode">${mode}</strong></div>
+        </div>
+        <div class="lead-decision-actions">
+          <a class="button primary" id="leadRegisterDirect" href="/signup/?class=${encodeURIComponent(getCourseSlug(course))}">Register for this class</a>
+          <a class="button" id="leadScheduleDirect" href="${course?.scheduleUrl || "#"}" target="_blank" rel="noreferrer">View full schedule</a>
+        </div>
+        <a class="lead-placement-link" href="/placement-test">Not sure of your level? Take the free placement test.</a>
+      </div>
+    `;
+  }
+
   function getClassSummary(course) {
     return `${getCourseTitle(course)} · Cohort: ${getCourseCohortName(course)} · Venue: ${getCourseLocation(course)} · ${getCourseDateRange(course)} · ${getMeetingTimes(course)}`;
   }
@@ -180,6 +230,17 @@
       body.lead-gate-active .hero-actions { display: none !important; }
       .lead-capture-card { margin-top: 14px; display: grid; gap: 14px; border-color: #bfdbfe; background: linear-gradient(180deg, #ffffff, #eff6ff); }
       .lead-capture-card h2 { margin: 0; font-size: clamp(23px, 7vw, 34px); letter-spacing: -0.035em; }
+      .lead-decision-summary { display: grid; gap: 12px; border: 1px solid #93c5fd; background: #eff6ff; border-radius: 14px; padding: 14px; }
+      .lead-decision-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+      .lead-decision-heading strong { display: block; margin-top: 3px; color: #0f172a; font-size: 18px; }
+      .lead-decision-eyebrow { color: #1d4ed8; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+      .lead-decision-fee { white-space: nowrap; color: #065f46; font-size: 17px; font-weight: 900; }
+      .lead-decision-grid { display: grid; gap: 8px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .lead-decision-grid > div { display: grid; gap: 3px; border-radius: 10px; background: #ffffff; padding: 9px 10px; }
+      .lead-decision-grid span { color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+      .lead-decision-grid strong { color: #1e293b; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+      .lead-decision-actions { display: grid; gap: 8px; }
+      .lead-placement-link { width: fit-content; color: #1d4ed8; font-size: 13px; font-weight: 850; text-decoration: none; }
       .lead-capture-card p { margin: 0; color: #334155; line-height: 1.6; font-size: 14px; }
       .lead-capture-form { display: grid; gap: 10px; }
       .lead-field { display: grid; gap: 5px; }
@@ -206,6 +267,7 @@
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
         .lead-actions { grid-template-columns: 1fr 1fr; }
+        .lead-decision-actions { grid-template-columns: 1.4fr 1fr; }
       }
     `;
     document.head.appendChild(style);
@@ -252,9 +314,10 @@
     card.id = "leadCaptureCard";
     card.className = "card lead-capture-card";
     card.innerHTML = `
+      ${buildDecisionSummary(selected, data)}
       <div>
-        <h2>Fill the form to continue</h2>
-        <p>Class names such as Berlin, Leipzig or Stuttgart are cohort names only. The in-person venue is shown separately below.</p>
+        <h2>Save your details for this class</h2>
+        <p>You can review the class information above before sharing your details. Class names such as Berlin, Leipzig or Stuttgart are cohort names only; the actual in-person venue is shown separately.</p>
       </div>
       <form class="lead-capture-form" id="leadCaptureForm" novalidate>
         <div class="lead-form-grid">
@@ -315,6 +378,14 @@
     const form = card.querySelector("#leadCaptureForm");
     const select = card.querySelector("#leadClass");
     const selectedSummary = card.querySelector("#leadSelectedClassSummary");
+    const decisionTitle = card.querySelector("#leadDecisionTitle");
+    const decisionFee = card.querySelector("#leadDecisionFee");
+    const decisionStart = card.querySelector("#leadDecisionStart");
+    const decisionTimes = card.querySelector("#leadDecisionTimes");
+    const decisionLocation = card.querySelector("#leadDecisionLocation");
+    const decisionMode = card.querySelector("#leadDecisionMode");
+    const directRegister = card.querySelector("#leadRegisterDirect");
+    const directSchedule = card.querySelector("#leadScheduleDirect");
     const nameInput = card.querySelector("#leadName");
     const emailInput = card.querySelector("#leadEmail");
     const phoneInput = card.querySelector("#leadPhone");
@@ -337,6 +408,18 @@
       const url = buildClassUrl(course);
       if (openLink && url) openLink.href = url;
       if (selectedSummary) selectedSummary.textContent = getClassSummary(course);
+      if (decisionTitle) decisionTitle.textContent = getCourseTitle(course);
+      if (decisionFee) decisionFee.textContent = formatMoney(getCourseFee(course, data));
+      if (decisionStart) decisionStart.textContent = course?.availability === "always" ? "Start anytime" : formatDate(course?.startDate);
+      if (decisionTimes) decisionTimes.textContent = getMeetingTimes(course);
+      if (decisionLocation) decisionLocation.textContent = getCourseLocation(course);
+      if (decisionMode) decisionMode.textContent = getCourseMode(course, data);
+      if (directRegister) directRegister.href = `/signup/?class=${encodeURIComponent(getCourseSlug(course))}`;
+      if (directSchedule) {
+        const scheduleUrl = course?.scheduleUrl || course?.docUrl || "";
+        directSchedule.href = scheduleUrl || url;
+        directSchedule.textContent = scheduleUrl ? "View full schedule" : "View full class details";
+      }
       writeDebug({ step: "syncSelectedClassInfo", selectedValue: select.value, url, classCount: classes.length, endDate: course?.endDate || "", location: getCourseLocation(course) });
     }
 
@@ -510,10 +593,16 @@
     else document.body.classList.remove("lead-gate-active");
     if (isExactClassPage()) document.body.classList.remove("lead-gate-active");
 
-    fetch("/classes/classes-data.json")
-      .then((response) => response.json())
+    const catalogPromise = window.FalowenClassBrochureData
+      ? Promise.resolve(window.FalowenClassBrochureData)
+      : typeof window.FalowenLoadClassCatalog === "function"
+        ? window.FalowenLoadClassCatalog()
+        : fetch("/classes/classes-data.json", { cache: "no-store" }).then((response) => response.json());
+
+    catalogPromise
       .then((data) => {
-        writeDebug({ step: "dataLoaded", classCount: data?.classes?.length || 0, requestedSlug: getRequestedSlug(), openMode: isOpenMode() });
+        window.FalowenClassBrochureData = window.FalowenClassBrochureData || data;
+        writeDebug({ step: "dataLoaded", classCount: data?.classes?.length || 0, requestedSlug: getRequestedSlug(), openMode: isOpenMode(), catalogSource: data?.catalogSource || "static" });
         renderLeadCard(data);
         const lead = getLastLead();
         if (lead) updateSignupLinksWithLead(lead);
