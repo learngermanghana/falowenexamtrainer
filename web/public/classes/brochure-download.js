@@ -366,6 +366,7 @@
       #downloadBrochureButton[aria-busy="true"] { opacity: .72; cursor: wait; }
       #falowenPdfBrochure { position: fixed; left: -10000px; top: 0; width: 794px; z-index: -1; font-family: Inter, Arial, sans-serif; color: #0f172a; }
       .pdf-page { width: 794px; height: 1123px; overflow: hidden; background: #ffffff; padding: 42px 46px 34px; display: flex; flex-direction: column; gap: 22px; position: relative; }
+      .pdf-page-one { gap: 15px; }
       .pdf-page * { box-sizing: border-box; }
       .pdf-page h1, .pdf-page h2, .pdf-page p { margin: 0; }
       .pdf-brand-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
