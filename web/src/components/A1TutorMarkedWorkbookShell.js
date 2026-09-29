@@ -10,6 +10,7 @@ import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
 import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
 import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
+import A1TimedMockExam from "./A1TimedMockExam";
 import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1TutorDraftProfile } from "../data/a1TutorDraftProfiles";
 import { styles } from "../styles";
@@ -279,7 +280,9 @@ const A1TutorMarkedWorkbookShell = ({
       <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />
 
       <A1TutorWorkbookDraftProvider assignment={assignment}>
-        {sharedLayout}
+        <A1TimedMockExam assignment={assignment}>
+          {sharedLayout}
+        </A1TimedMockExam>
       </A1TutorWorkbookDraftProvider>
     </div>
   );
