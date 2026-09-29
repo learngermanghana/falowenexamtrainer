@@ -22,10 +22,21 @@
   }
 
   function getSignupUrl() {
+    const course = window.currentBrochureCourse || {};
+    const level = String(course.level || "").trim().toUpperCase();
+    if (course.availability === "enquiry" && /^(A1|A2|B1)$/.test(level)) {
+      return `/signup/?level=${encodeURIComponent(level)}&enquiry=1`;
+    }
+
     const className = getCurrentClassName();
-    if (!className) return "/signup/";
-    const slug = slugify(className);
-    return `/signup/?class=${encodeURIComponent(slug)}&className=${encodeURIComponent(className)}`;
+    if (!className) return level ? `/signup/?level=${encodeURIComponent(level)}` : "/signup/";
+    const slug = course.slug || slugify(className);
+    const params = new URLSearchParams({
+      class: slug,
+      className,
+    });
+    if (level) params.set("level", level);
+    return `/signup/?${params.toString()}`;
   }
 
   function getFeeParts() {
