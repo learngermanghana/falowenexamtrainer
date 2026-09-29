@@ -77,19 +77,46 @@ describe("public class brochure experience", () => {
     expect(source).toContain('new CustomEvent("falowen:brochure-rendered"');
   });
 
-  test("lead capture shows decision-critical class details before contact fields", () => {
+  test("lead capture shows class details below the form fields without another register button", () => {
     const source = publicClassFile("class-leads.js");
+    const formGridIndex = source.indexOf('class="lead-form-grid"');
+    const decisionSummaryIndex = source.indexOf('${buildDecisionSummary(selected, data)}', formGridIndex);
 
+    expect(formGridIndex).toBeGreaterThan(-1);
+    expect(decisionSummaryIndex).toBeGreaterThan(formGridIndex);
     expect(source).toContain("leadDecisionSummary");
     expect(source).toContain("leadDecisionFee");
     expect(source).toContain("leadDecisionTimes");
     expect(source).toContain("leadDecisionLocation");
-    expect(source).toContain("Register for this class");
     expect(source).toContain("lead-track-record");
     expect(source).toContain("High exam pass rate");
     expect(source).toContain("Established");
     expect(source).toContain("Not sure of your level? Take the free placement test.");
+    expect(source).not.toContain('id="leadRegisterDirect"');
+    expect(source).not.toContain("Register for this class");
     expect(source).toContain("FalowenLoadClassCatalog");
+  });
+
+  test("fallback catalogue keeps A1, A2 and B1 available instead of collapsing to B2 and C1", () => {
+    const brochure = publicClassFile("brochure.js");
+    const filter = publicClassFile("active-class-filter.js");
+
+    expect(brochure).toContain('const liveLevels = ["A1", "A2", "B1"]');
+    expect(brochure).toContain('availability: "enquiry"');
+    expect(brochure).toContain("buildFallbackClassList");
+    expect(brochure).toContain("missingLiveLevelChoices");
+    expect(filter).toContain('course.availability === "enquiry"');
+    expect(filter).not.toContain('sourceIsLive || course.availability === "always"');
+  });
+
+  test("brochure keeps one primary registration CTA", () => {
+    const flow = publicClassFile("class-simple-flow.js");
+    const enhancements = publicClassFile("brochure-enhancements.js");
+
+    expect(flow).toContain("removeDuplicateRegisterButtons");
+    expect(flow).not.toContain("Register right away");
+    expect(enhancements).not.toContain('id="heroRegisterCta"');
+    expect(enhancements).toContain("removeStickyMobileRegisterBar");
   });
 
   test("mobile registration, policy copy, and student proof are maintained by brochure enhancements", () => {
@@ -99,7 +126,7 @@ describe("public class brochure experience", () => {
     const hero = publicClassFile("class-hero-banner.js");
     const download = publicClassFile("brochure-download.js");
 
-    expect(enhancements).toContain("brochureMobileCta");
+    expect(enhancements).toContain("removeStickyMobileRegisterBar");
     expect(enhancements).toContain("getCoursePolicy");
     expect(enhancements).toContain("What happens after you register?");
     expect(enhancements).toContain("academyTrackRecordCard");
