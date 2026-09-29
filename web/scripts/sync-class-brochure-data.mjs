@@ -7,6 +7,7 @@ const __dirname = path.dirname(__filename);
 const webRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(webRoot, "..");
 const classCatalogPath = path.join(webRoot, "src", "data", "classCatalog.js");
+const academyProfilePath = path.join(webRoot, "src", "data", "publicAcademyProfile.json");
 const curriculumPath = path.join(repoRoot, "shared", "curriculumCanonical.json");
 const outputPath = path.join(webRoot, "public", "classes", "classes-data.json");
 
@@ -16,6 +17,7 @@ const source = fs
 
 const classCatalog = new Function(`${source}\nreturn classCatalog;`)();
 
+const academyProfile = JSON.parse(fs.readFileSync(academyProfilePath, "utf8"));
 const curriculum = JSON.parse(fs.readFileSync(curriculumPath, "utf8"));
 
 const curriculumByLevel = curriculum.reduce((acc, entry) => {
@@ -120,6 +122,7 @@ const data = {
     },
   },
   curriculumByLevel,
+  academyProfile,
   coursePolicy: {
     courseDurationWeeks: 10,
     fullPaymentAccessMonths: 6,
