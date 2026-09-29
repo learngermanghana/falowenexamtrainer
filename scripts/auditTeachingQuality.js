@@ -308,9 +308,19 @@ function quickAudit() {
 
   const c2AlignmentPath = path.join(dataRoot, "c2LessonContentAlignment.js");
   const c2RuntimeSource = fs.existsSync(c2AlignmentPath) ? fs.readFileSync(c2AlignmentPath, "utf8") : "";
-  const c2RuntimeDays = new Set(
-    Array.from(c2RuntimeSource.matchAll(/^\s{2}(\d+):\s*\[\[/gm)).map((match) => Number(match[1]))
-  );
+  const legacyC2RuntimeDays = Array.from(
+    c2RuntimeSource.matchAll(/^\s{2}(\d+):\s*\[\[/gm)
+  ).map((match) => Number(match[1]));
+  const generatedC2DayCountMatch =
+    c2RuntimeSource.includes("C2_CANONICAL_MASTERY") &&
+    c2RuntimeSource.includes("Object.fromEntries(DAYS.map")
+      ? c2RuntimeSource.match(/const\s+DAYS\s*=\s*Array\.from\(\{\s*length:\s*(\d+)/)
+      : null;
+  const generatedC2DayCount = Number(generatedC2DayCountMatch?.[1] || 0);
+  const generatedC2RuntimeDays = generatedC2DayCount > 0
+    ? Array.from({ length: generatedC2DayCount }, (_, index) => index + 1)
+    : [];
+  const c2RuntimeDays = new Set([...legacyC2RuntimeDays, ...generatedC2RuntimeDays]);
   const c2Row = rows.find((row) => row.level === "C2");
   if (c2Row && c2Row.lessons === 0 && c2RuntimeDays.size) {
     c2Row.lessons = c2RuntimeDays.size;

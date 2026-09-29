@@ -29,11 +29,51 @@
   }
 
   function getFeeParts() {
+    const course = window.currentBrochureCourse || {};
+    const fullAmount = Number(course.tuitionGhs || 0);
+    const minimumInstallment = Number(window.FalowenClassBrochureData?.payment?.minimumInstallmentGhs || 2000);
+    if (fullAmount > 0) {
+      const firstAmount = Math.min(fullAmount, minimumInstallment);
+      const balanceAmount = Math.max(fullAmount - firstAmount, 0);
+      const money = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
+      return {
+        full: money(fullAmount),
+        first: money(firstAmount),
+        balance: money(balanceAmount),
+      };
+    }
+
     const rows = Array.from(document.querySelectorAll("#stats .stat"));
+    const paymentText = document.getElementById("paymentSummary")?.textContent || "";
+    const amounts = paymentText.match(/GHS\s*[\d,]+/g) || [];
     return {
-      full: rows[0]?.querySelector("b")?.textContent?.trim() || "GHS 2,800",
-      first: (rows[1]?.querySelector("b")?.textContent || "GHS 2,000").replace(/\s*first payment/i, "").trim(),
-      balance: (rows[2]?.querySelector("b")?.textContent || "GHS 800").replace(/\s*after 1 month/i, "").trim(),
+      full: rows[0]?.querySelector("b")?.textContent?.trim() || amounts[0] || "GHS 2,800",
+      first: amounts[1] || "GHS 2,000",
+      balance: amounts[2] || "GHS 800",
+    };
+  }
+
+  function getCoursePolicy() {
+    return {
+      courseDurationWeeks: 10,
+      fullPaymentAccessMonths: 6,
+      installmentAccessMonths: 1,
+      extensionGhsPerMonth: 1000,
+      learningModes: ["In person", "Online", "Recorded lessons"],
+      ...(window.FalowenClassBrochureData?.coursePolicy || {}),
+    };
+  }
+
+  function getAcademyProfile() {
+    return {
+      academyName: "Learn Language Education Academy",
+      formerName: "Learn German Ghana",
+      establishedYear: 2022,
+      germanLevels: "A1–C2",
+      examPassHeadline: "High exam pass rate",
+      examPassDescription: "Our students have maintained a high pass rate in German language examinations.",
+      overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
+      ...(window.FalowenClassBrochureData?.academyProfile || {}),
     };
   }
 
@@ -80,6 +120,46 @@
       .schedule-simple-card { display: grid; gap: 10px; }
       .schedule-simple-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
       #scheduleList { display: none !important; }
+      .hero-placement-action { display: inline-flex; align-items: center; color: #1d4ed8; font-size: 13px; font-weight: 850; text-decoration: none; padding: 8px 2px; }
+      .brochure-mobile-cta { display: none; }
+      .catalog-status-notice { border-color: #fde68a; background: #fffbeb; color: #78350f; gap: 8px; }
+      .catalog-status-notice p { margin: 0; color: #92400e; }
+      .academy-track-record-card { display: grid; gap: 12px; border-color: #bfdbfe; background: #ffffff; }
+      .academy-track-record-card h2 { margin: 0; font-size: 21px; color: #0f172a; }
+      .academy-track-record-card > p { margin: 0; color: #475569; font-size: 14px; line-height: 1.55; }
+      .academy-track-record-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+      .academy-track-record-stat { border: 1px solid #dbeafe; background: #eff6ff; border-radius: 12px; padding: 11px; display: grid; gap: 4px; }
+      .academy-track-record-stat span { color: #64748b; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
+      .academy-track-record-stat strong { color: #0f172a; font-size: 16px; line-height: 1.35; }
+      .academy-track-record-scope { color: #64748b !important; font-size: 12px !important; }
+      @media (max-width: 620px) {
+        .academy-track-record-grid { grid-template-columns: 1fr; }
+      }
+      @media (max-width: 760px) {
+        body.has-mobile-brochure-cta { padding-bottom: 86px; }
+        .brochure-mobile-cta {
+          position: fixed;
+          left: 8px;
+          right: 8px;
+          bottom: max(8px, env(safe-area-inset-bottom));
+          z-index: 80;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 8px;
+          align-items: center;
+          border: 1px solid #cbd5e1;
+          border-radius: 16px;
+          background: rgba(255,255,255,.97);
+          box-shadow: 0 14px 36px rgba(15,23,42,.18);
+          padding: 9px;
+          backdrop-filter: blur(10px);
+        }
+        .brochure-mobile-cta-copy { min-width: 0; display: grid; gap: 2px; }
+        .brochure-mobile-cta-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: #0f172a; }
+        .brochure-mobile-cta-copy span { font-size: 11px; color: #64748b; }
+        .brochure-mobile-cta-actions { display: flex; gap: 6px; }
+        .brochure-mobile-cta .button { width: auto; min-height: 42px; padding: 9px 11px; border-radius: 11px; font-size: 12px; }
+      }
       .session-row { display: none !important; }
       .schedule-preview-button { display: none !important; }
       .agreement-card { gap: 10px; }
@@ -129,18 +209,26 @@
     const text = hero.querySelector("p");
     const actions = hero.querySelector(".hero-actions");
 
-    if (title) title.textContent = "Welcome to Falowen German Community";
+    if (title) title.textContent = "Choose your German class";
     if (text && hero.dataset.heroTextReady !== "true") {
-      text.textContent = "Join a supportive German learning community that has helped students in Ghana and beyond learn step by step with live classes, recordings, assignments, and app support.";
+      text.textContent = "Check the fee, start date, meeting times and learning mode first. Register when the class fits your schedule.";
       const trust = document.createElement("div");
       trust.className = "hero-trust";
-      trust.innerHTML = "<span>Live class</span><span>Recordings</span><span>App support</span>";
+      const isSelfLearning = window.currentBrochureCourse?.availability === "always";
+      trust.innerHTML = isSelfLearning
+        ? "<span>Self-learning</span><span>Flexible study</span><span>Falowen app</span>"
+        : "<span>Live class</span><span>Recordings</span><span>Falowen app</span>";
       text.insertAdjacentElement("afterend", trust);
       hero.dataset.heroTextReady = "true";
     }
 
-    if (actions && actions.dataset.signupOnly !== "true") {
-      actions.innerHTML = `<a class="button primary" href="${getSignupUrl()}">Sign up</a>`;
+    if (actions) {
+      const scheduleHref = document.getElementById("scheduleLink")?.getAttribute("href") || "";
+      actions.innerHTML = `
+        <a id="heroRegisterCta" class="button primary" href="${getSignupUrl()}">Register for this class</a>
+        <a id="heroScheduleCta" class="button" href="${scheduleHref || "#class-schedule-section"}" ${scheduleHref ? 'target="_blank" rel="noreferrer"' : ""}>View full schedule</a>
+        <a class="hero-placement-action" href="/placement-test">Not sure of your level? Take the free placement test.</a>
+      `;
       actions.dataset.signupOnly = "true";
     }
   }
@@ -194,9 +282,10 @@
     const stats = document.getElementById("stats");
     if (!stats) return;
     const { full, first, balance } = getFeeParts();
+    const policy = getCoursePolicy();
     stats.innerHTML = `
-      <div class="stat"><span>Recommended full payment</span><b>${full}</b></div>
-      <div class="stat"><span>Access with full payment</span><b>6 months</b></div>
+      <div class="stat"><span>Full course fee</span><b>${full}</b></div>
+      <div class="stat"><span>Access with full payment</span><b>${policy.fullPaymentAccessMonths} months</b></div>
       <div class="stat"><span>Installment starter</span><b>${first}</b></div>
     `;
 
@@ -211,12 +300,12 @@
       <h3>Payment options</h3>
       <div class="payment-option-grid">
         <div class="payment-option recommended">
-          <strong>Best option: Pay full ${full}</strong>
-          <p>You get 6 months Falowen access. This helps if your class ends but you still need time to prepare for exams or revise before your exam date.</p>
+          <strong>Pay full ${full}</strong>
+          <p>Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access, including revision time after the live class ends.</p>
         </div>
         <div class="payment-option">
           <strong>Installment: Start with ${first}</strong>
-          <p>This gives only 1 month access. The balance of ${balance} must be paid after one month, otherwise access and the contract can be terminated.</p>
+          <p>The starter payment gives ${policy.installmentAccessMonths} month of access. The remaining balance of ${balance} is due after one month.</p>
         </div>
       </div>
     `;
@@ -245,28 +334,79 @@
 
   function addHybridModeCard() {
     const scheduleCta = document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
-    if (!scheduleCta || document.getElementById("classModeCard")) return;
+    if (!scheduleCta) return;
 
-    const card = document.createElement("div");
-    card.id = "classModeCard";
-    card.className = "class-mode-card";
-    card.innerHTML = "<h3>Class mode</h3><p>This class is hybrid. You can join in person, join online, or follow the recorded lessons when needed.</p>";
-    scheduleCta.insertAdjacentElement("afterend", card);
+    let card = document.getElementById("classModeCard");
+    if (!card) {
+      card = document.createElement("div");
+      card.id = "classModeCard";
+      card.className = "class-mode-card";
+      scheduleCta.insertAdjacentElement("afterend", card);
+    }
+
+    const isSelfLearning = window.currentBrochureCourse?.availability === "always";
+    const modes = getCoursePolicy().learningModes || ["In person", "Online", "Recorded lessons"];
+    card.innerHTML = isSelfLearning
+      ? "<h3>Learning mode</h3><p>Self-learning: study independently in Falowen with flexible practice and available tutor support.</p>"
+      : `<h3>Class mode</h3><p>This class is flexible: ${modes.join(", ")}. Choose the suitable mode for each session.</p>`;
+  }
+
+  function addTrackRecordCard() {
+    const profile = getAcademyProfile();
+    let card = document.getElementById("academyTrackRecordCard");
+    if (!card) {
+      card = document.createElement("section");
+      card.id = "academyTrackRecordCard";
+      card.className = "card academy-track-record-card";
+    }
+
+    card.innerHTML = `
+      <h2>Our track record</h2>
+      <p>${profile.overview}</p>
+      <div class="academy-track-record-grid">
+        <div class="academy-track-record-stat">
+          <span>Established</span>
+          <strong>${profile.establishedYear}</strong>
+        </div>
+        <div class="academy-track-record-stat">
+          <span>Exam performance</span>
+          <strong>${profile.examPassHeadline}</strong>
+        </div>
+        <div class="academy-track-record-stat">
+          <span>German learning</span>
+          <strong>${profile.germanLevels}</strong>
+        </div>
+      </div>
+      <p class="academy-track-record-scope">Our exam track record covers German language examinations generally and is not limited to one exam provider.</p>
+    `;
+
+    const leadCard = document.getElementById("leadCaptureCard");
+    if (leadCard) {
+      card.remove();
+      return;
+    }
+
+    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
+    const anchorNode = classSummary || document.querySelector(".page");
+    if (!anchorNode || anchorNode === card) return;
+    if (anchorNode.nextElementSibling !== card) anchorNode.insertAdjacentElement("afterend", card);
   }
 
   function addAfterSignupCard() {
     const anchor = document.getElementById("classModeCard") || document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
     if (!anchor || document.getElementById("afterSignupCard")) return;
+    const policy = getCoursePolicy();
     const card = document.createElement("div");
     card.id = "afterSignupCard";
     card.className = "after-signup-card";
     card.innerHTML = `
-      <h3>After signup</h3>
+      <h3>What happens after you register?</h3>
       <ol>
-        <li>Create your Falowen account.</li>
-        <li>Choose this class under Upcoming Classes.</li>
-        <li>Pay the full fee for 6 months access, or start with installment for 1 month access.</li>
-        <li>Join in person, online, or use recordings.</li>
+        <li>Create or sign in to your Falowen account.</li>
+        <li>Choose this class and complete your payment.</li>
+        <li>Your class and learning materials appear in Campus after access is activated.</li>
+        <li>Falowen sends class and learning reminders as your course progresses.</li>
+        <li>Join in person, online, or use recorded lessons. Full payment keeps Falowen access for ${policy.fullPaymentAccessMonths} months.</li>
       </ol>
     `;
     anchor.insertAdjacentElement("afterend", card);
@@ -317,17 +457,60 @@
     const list = document.getElementById("agreementList");
     if (!list || list.dataset.paymentUpdated === "true") return;
     const { full, first, balance } = getFeeParts();
+    const policy = getCoursePolicy();
     const items = Array.from(list.querySelectorAll("li"));
     if (items[0]) {
-      items[0].innerHTML = `<strong>Payment Amount:</strong> The full course fee is ${full}. Full payment is recommended because it gives the student 6 months access to Falowen, including access after the live class ends.`;
+      items[0].innerHTML = `<strong>Payment Amount:</strong> The full course fee is ${full}. Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access.`;
     }
     if (items[1]) {
-      items[1].innerHTML = `<strong>Payment Schedule:</strong> The student may pay the full fee of ${full}, or start with ${first}. The ${first} installment gives only 1 month access. The remaining balance of ${balance} must be paid after one month; otherwise access may be revoked and the contract may be terminated.`;
+      items[1].innerHTML = `<strong>Payment Schedule:</strong> The student may pay the full fee of ${full}, or start with ${first}. The starter payment gives ${policy.installmentAccessMonths} month of access. The remaining balance of ${balance} is due after one month; otherwise access may be revoked.`;
+    }
+    if (items[2]) {
+      items[2].innerHTML = `<strong>Learning Mode & Attendance Rights:</strong> Available learning modes are ${(policy.learningModes || []).join(", ")}. The student may choose the suitable mode for each scheduled session.`;
     }
     if (items[3]) {
-      items[3].innerHTML = `<strong>Class Duration & Contract Term:</strong> Full payment gives a 6-month Falowen access period from enrollment. This access continues after the scheduled class ends, helping students revise and prepare when their exam date is later than the class end date.`;
+      items[3].innerHTML = `<strong>Class Duration & Contract Term:</strong> The taught course is approximately ${policy.courseDurationWeeks} weeks. Full payment gives a ${policy.fullPaymentAccessMonths}-month Falowen access period from enrollment, including revision time after scheduled classes end.`;
+    }
+    if (items[4]) {
+      items[4].innerHTML = `<strong>Post-Contract Access:</strong> After ${policy.fullPaymentAccessMonths} months, continued access can be extended at GHS ${Number(policy.extensionGhsPerMonth || 0).toLocaleString("en-GH")} per month or by enrolling in a new class at the current fee.`;
+    }
+    if (items[8] && policy.refundPolicy) {
+      items[8].innerHTML = `<strong>Refunds:</strong> ${policy.refundPolicy}`;
     }
     list.dataset.paymentUpdated = "true";
+  }
+
+  function addStickyMobileCta() {
+    const courseTitle =
+      document.getElementById("classTitle")?.textContent?.trim()
+      || document.getElementById("leadDecisionTitle")?.textContent?.trim()
+      || "Falowen German class";
+    if (!courseTitle || /loading|no class/i.test(courseTitle)) return;
+
+    let bar = document.getElementById("brochureMobileCta");
+    if (!bar) {
+      bar = document.createElement("aside");
+      bar.id = "brochureMobileCta";
+      bar.className = "brochure-mobile-cta hide-print";
+      bar.setAttribute("aria-label", "Class registration actions");
+      document.body.appendChild(bar);
+    }
+
+    const signupHref = getSignupUrl();
+    const whatsappHref =
+      document.getElementById("whatsappLink")?.getAttribute("href")
+      || "https://wa.me/233241113054?text=" + encodeURIComponent("Hello Falowen, I would like more information about your German classes.");
+    bar.innerHTML = `
+      <div class="brochure-mobile-cta-copy">
+        <strong>${courseTitle}</strong>
+        <span>Ready when the schedule works for you.</span>
+      </div>
+      <div class="brochure-mobile-cta-actions">
+        <a class="button primary" href="${signupHref}">Register</a>
+        <a class="button" href="${whatsappHref}" target="_blank" rel="noreferrer">WhatsApp</a>
+      </div>
+    `;
+    document.body.classList.add("has-mobile-brochure-cta");
   }
 
   function enhanceAgreement() {
@@ -375,14 +558,17 @@
     addMainSignupButton();
     addClassScheduleButton();
     addHybridModeCard();
+    addTrackRecordCard();
     addAfterSignupCard();
     enhanceWhoFor();
     simplifyScheduleCard();
     tagSections();
     enhanceAgreement();
     applySignupLinks();
+    addStickyMobileCta();
   }
 
   window.addEventListener("load", runEnhancements);
+  window.addEventListener("falowen:brochure-rendered", runEnhancements);
   [100, 350, 800, 1500].forEach((delay) => setTimeout(runEnhancements, delay));
 })();

@@ -4,152 +4,8 @@ const LIVE_CATALOG_ENDPOINTS = [
   "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog",
 ];
 let brochureData = null;
+let brochureDataPromise = null;
 let selectedClassId = null;
-
-const COURSE_TITLES_BY_LEVEL = {
-  A1: {
-    1: "Greetings and Asking About Well-being",
-    2: "German Alphabet + Personal Pronouns and Verb Conjugation",
-    3: "Pronouns and Identity Expressions in German + Introducing Yourself",
-    4: "Numbers and Addresses",
-    5: "Introducing Yourself and Articles",
-    6: "Family and Hobbies",
-    7: "Asking About Prices and Preferences",
-    8: "Countries and Languages",
-    9: "Nominative and Accusative Cases",
-    10: "Objects, Colors and Possessive Articles + Asking for and Giving Directions",
-    11: "Understanding Time",
-    12: "The 24 Hour Clock and Dates",
-    13: "Revision: Numbers, Time and Prices",
-    14: "Modal Verbs",
-    15: "Imperatives",
-    16: "Food and Negation + Food and Daily Life",
-    17: "Instructions and Directions",
-    18: "Two-way Prepositions + Directions and Movement",
-    19: "Goethe A1 Speaking Practice",
-    20: "Introduction to Letter Writing",
-    21: "Weather + Weather Speaking Practice",
-    22: "Health and Body Parts + Health Speaking Practice",
-    23: "Dative and Accusative Verbs",
-    24: "Schreiben & Sprechen",
-  },
-  A2: {
-    1: "Small Talk",
-    2: "Personen beschreiben",
-    3: "Dinge und Personen vergleichen",
-    4: "Wo möchten wir uns treffen?",
-    5: "Was machst du in deiner Freizeit?",
-    6: "Möbel und Räume kennenlernen",
-    7: "Eine Wohnung suchen",
-    8: "Rezepte und Essen",
-    9: "Urlaub",
-    10: "Tourismus und traditionelle Feste",
-    11: "Unterwegs: Verkehrsmittel vergleichen",
-    12: "Mein Traumberuf",
-    13: "Ein Vorstellungsgespräch",
-    14: "Beruf und Karriere",
-    15: "Mein Lieblingssport",
-    16: "Hobbys und Interessen",
-    17: "Einladung und Vorschläge",
-    18: "Die Bank anrufen",
-    19: "Einkaufen? Wo und wie?",
-    20: "Feste und Traditionen",
-    21: "In der Stadt orientieren",
-    22: "Wie war dein Wochenende?",
-    23: "Wie kommst du zur Schule oder zur Arbeit?",
-    24: "Einen Urlaub planen",
-    25: "Tagesablauf",
-    26: "Gefühle beschreiben",
-    27: "Digitale Kommunikation",
-    28: "Über die Zukunft sprechen",
-  },
-  B1: {
-    1: "Der Besichtigungstermin",
-    2: "Leben in der Stadt oder auf dem Land",
-    3: "Fast Food vs Hausmannskost",
-    4: "Alles für die Gesundheit",
-    5: "Work-Life-Balance im modernen Arbeitsumfeld",
-    6: "Digitale Auszeit und Selbstfürsorge",
-    7: "Teamspiele und kooperative Aktivitäten",
-    8: "Abenteuer in der Natur",
-    9: "Eine Filmkritik schreiben",
-    10: "Traditionelles vs digitales Lernen",
-    11: "Medien und Arbeiten im Homeoffice",
-    12: "Prüfungsangst und Stressbewältigung",
-    13: "Wie lernt man am besten?",
-    14: "Wege zum Wunschberuf",
-    15: "Das Vorstellungsgespräch",
-    16: "Wie wird man …? Ausbildung und Qualifikation",
-    17: "Lebensformen heute – Familie und Wohngemeinschaft",
-    18: "Was ist dir in einer Beziehung wichtig?",
-    19: "Erstes Date – typische Situationen",
-    20: "Konsum und Nachhaltigkeit",
-    21: "Online einkaufen – Rechte und Risiken",
-    22: "Reiseprobleme und Lösungen",
-    23: "Umweltfreundlich im Alltag",
-    24: "Klimafreundlich leben",
-  },
-  B2: {
-    1: "Persönliche Identität und Selbstverständnis",
-    2: "Beziehungen und Kommunikation",
-    3: "Öffentliches vs. privates Leben",
-    4: "Beruf und Karriere",
-    5: "Bildung und Lernen",
-    6: "Migration und Integration",
-    7: "Gesellschaftliche Vielfalt",
-    8: "Politik und Engagement",
-    9: "Technologie und Digitalisierung",
-    10: "Umwelt und Nachhaltigkeit",
-    11: "Gesundheit und Wohlbefinden",
-    12: "Konsum und Medien",
-    13: "Reisen und Mobilität",
-    14: "Wohnen und Zusammenleben",
-    15: "Kunst und Kultur",
-    16: "Wissenschaft und Forschung",
-    17: "Feste und Traditionen",
-    18: "Freizeit und Hobbys",
-    19: "Ernährung und Esskultur",
-    20: "Mode und Lebensstil",
-    21: "Werte und Normen",
-    22: "Sprache und Kommunikation",
-    23: "Innovation und Zukunft",
-    24: "Gesellschaftliche Herausforderungen",
-    25: "Globalisierung und internationale Beziehungen",
-    26: "Kreatives Schreiben und Projekte",
-    27: "Prüfungstraining und Wiederholung",
-    28: "Abschlusspräsentation und Feedback",
-  },
-  C1: {
-    1: "Ziele und Lernweg",
-    2: "Kultur und Identität",
-    3: "Medien und Informationskompetenz",
-    4: "Beziehungen und Teamarbeit",
-    5: "Berufliche Entwicklung",
-    6: "Gesundheit und Lebensstil",
-    7: "Reisen und Nachhaltigkeit",
-    8: "Wohnen und Stadtentwicklung",
-    9: "Konsum und Werbung",
-    10: "Integration und Gesellschaft",
-    11: "Engagement und Ehrenamt",
-    12: "Freizeit und Kultur",
-    13: "Mehrsprachigkeit",
-    14: "Innovation und Zukunft",
-    15: "Bildung und lebenslanges Lernen",
-    16: "Technologie im Alltag",
-    17: "Umwelt und Verantwortung",
-    18: "Gesellschaft und Zusammenhalt",
-    19: "Arbeit der Zukunft",
-    20: "Digitale Gesundheit",
-    21: "Migration und Teilhabe",
-    22: "Politik und Mitbestimmung",
-    23: "Freizeit und Work-Life-Balance",
-    24: "Mobilität und Infrastruktur",
-    25: "Wissenschaft und Forschung",
-    26: "Nachhaltiger Konsum",
-    27: "Digitalisierung und Verwaltung",
-    28: "Demografischer Wandel und Generationengerechtigkeit",
-  },
-};
 
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
 const formatDate = (iso) => {
@@ -357,6 +213,11 @@ async function loadBrochureData() {
   }
 }
 
+function loadBrochureDataOnce() {
+  if (!brochureDataPromise) brochureDataPromise = loadBrochureData();
+  return brochureDataPromise;
+}
+
 function getRequestedSlug() {
   const url = new URL(window.location.href);
   const querySlug = url.searchParams.get("class") || url.searchParams.get("slug");
@@ -405,7 +266,10 @@ function getCourseList() {
 }
 
 function getCurriculumTitle(level, lessonDay) {
-  return COURSE_TITLES_BY_LEVEL[level]?.[lessonDay] || "";
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  return brochureData?.curriculumByLevel?.[normalizedLevel]?.[String(lessonDay)]
+    || brochureData?.curriculumByLevel?.[normalizedLevel]?.[lessonDay]
+    || "";
 }
 
 function getSessionLabel(course, sessionIndex) {
@@ -464,15 +328,22 @@ function renderTabs(courseList) {
 function updateHeroText() {
   const heroTitle = document.querySelector(".hero h1");
   const heroText = document.querySelector(".hero p");
-  if (heroTitle) heroTitle.textContent = "Welcome to our German learning community.";
+  if (heroTitle) heroTitle.textContent = "Choose your German class";
   if (heroText) {
-    heroText.textContent = "You are welcome to join Falowen, where we have helped many students in Ghana and beyond build German step by step, prepare for exams, and stay consistent with live classes, recordings, assignments, and app support.";
+    heroText.textContent = "Check the class fee, start date, meeting times and learning mode first. Register when the class fits your schedule, or take the placement test if you are unsure of your level.";
   }
 }
 
 function updateMeta(course, shareUrl) {
-  const title = `${course.title} | Falowen Classes`;
-  const description = `${course.title} starts ${formatDate(course.startDate)}. View fee, meeting times, generated schedule, class schedule link, and payment agreement.`;
+  const fee = formatMoney(course.tuitionGhs);
+  const classLabel = course.availability === "always"
+    ? `${course.level} German self-learning`
+    : `${course.level} German class – ${course.title}`;
+  const title = `${classLabel} | Fees & Schedule | Falowen`;
+  const description = course.availability === "always"
+    ? `${course.title}: view the course fee, learning mode, Falowen access and registration details.`
+    : `${course.title} starts ${formatDate(course.startDate)}. View the ${fee} fee, class times, learning mode, schedule and registration details.`;
+
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) metaDescription.setAttribute("content", description);
@@ -482,6 +353,74 @@ function updateMeta(course, shareUrl) {
   if (ogDescription) ogDescription.setAttribute("content", description);
   const canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.setAttribute("href", shareUrl);
+
+  let structured = document.getElementById("falowenCourseStructuredData");
+  if (!structured) {
+    structured = document.createElement("script");
+    structured.id = "falowenCourseStructuredData";
+    structured.type = "application/ld+json";
+    document.head.appendChild(structured);
+  }
+  const courseInstance = course.availability === "always"
+    ? {
+        "@type": "CourseInstance",
+        courseMode: "online",
+      }
+    : {
+        "@type": "CourseInstance",
+        courseMode: "hybrid",
+        startDate: course.startDate || undefined,
+        endDate: course.endDate || undefined,
+        location: {
+          "@type": "Place",
+          name: course.location || "Learn Language Education Academy",
+        },
+      };
+  structured.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description,
+    provider: {
+      "@type": "Organization",
+      name: "Learn Language Education Academy",
+      alternateName: brochureData?.academyProfile?.formerName || "Learn German Ghana",
+      foundingDate: String(brochureData?.academyProfile?.establishedYear || 2022),
+      url: "https://www.falowen.app",
+    },
+    educationalLevel: course.level,
+    hasCourseInstance: courseInstance,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "GHS",
+      price: Number(course.tuitionGhs || 0),
+      url: shareUrl,
+      availability: "https://schema.org/InStock",
+    },
+  });
+}
+
+function renderCatalogStatus() {
+  const existing = document.getElementById("catalogStatusNotice");
+  if (brochureData?.catalogSource !== "fallback") {
+    existing?.remove();
+    return;
+  }
+
+  const notice = existing || document.createElement("section");
+  notice.id = "catalogStatusNotice";
+  notice.className = "card catalog-status-notice";
+  notice.setAttribute("role", "status");
+  notice.innerHTML = `
+    <strong>Live class schedule temporarily unavailable</strong>
+    <p>Falowen is not showing saved historical live-class dates. Always-open programmes remain available while the live class service reconnects.</p>
+    <a class="button" href="https://wa.me/233241113054" target="_blank" rel="noreferrer">Ask about the next live class</a>
+  `;
+
+  if (!existing) {
+    const tabsCard = document.getElementById("classTabs")?.closest(".card");
+    (tabsCard || document.querySelector(".hero"))?.insertAdjacentElement("afterend", notice);
+  }
 }
 
 function hideClassInformationBox() {
@@ -559,18 +498,34 @@ function renderAgreement(course, firstPayment, balance) {
   const list = document.getElementById("agreementList");
   if (!intro || !list) return;
 
+  const policy = {
+    courseDurationWeeks: 10,
+    fullPaymentAccessMonths: 6,
+    installmentAccessMonths: 1,
+    extensionGhsPerMonth: 1000,
+    learningModes: ["In person", "Online", "Recorded lessons"],
+    certificateType: "Certificate of Completion",
+    officialCertificateNote:
+      "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+    paymentIssueContact: "info@falowen.app",
+    refundPolicy:
+      "Once payment is confirmed and learning access is granted, fees are non-refundable except where required by law.",
+    ...(brochureData?.coursePolicy || {}),
+  };
+  const learningModes = (policy.learningModes || []).join(", ");
+
   intro.textContent = `This Payment Agreement is entered into on ${today} for ${course.title} students of Learn Language Education Academy and Felix Asadu (“Teacher”).`;
   const terms = [
-    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}. The fee is the same regardless of learning mode: online, in person, self-learning, or recorded lectures.`,
-    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. Minimum first installment is ${formatMoney(firstPayment)}.`,
-    `<strong>Learning Mode & Attendance Rights:</strong> For each scheduled class session, the student may join in person, online, or via recorded lecture, and is responsible for choosing and attending in their preferred way each time.`,
-    `<strong>Class Duration & Contract Term:</strong> This class runs from ${formatDate(course.startDate)} to ${formatDate(course.endDate)}. The service provides a 6-month contract period from enrollment, during which the student has access to Falowen, even after the scheduled class sessions end.`,
-    `<strong>Post-Contract Access:</strong> After 6 months, continued access requires either an extension at GHS 1,000 per month or enrollment in a new class at the then-current fee.`,
+    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}.`,
+    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. The starter installment gives ${policy.installmentAccessMonths} month of access until the balance is due.`,
+    `<strong>Learning Mode & Attendance Rights:</strong> Available learning modes are ${learningModes}. The student may choose the suitable mode for each scheduled session.`,
+    `<strong>Class Duration & Contract Term:</strong> The taught course is approximately ${policy.courseDurationWeeks} weeks. Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access from enrollment, including revision time after the scheduled classes end.`,
+    `<strong>Post-Contract Access:</strong> After ${policy.fullPaymentAccessMonths} months, continued access can be extended at GHS ${Number(policy.extensionGhsPerMonth || 0).toLocaleString("en-GH")} per month or by enrolling in a new class at the current fee.`,
     `<strong>Attendance:</strong> Attendance is recorded for each session in My Results & Resources.`,
-    `<strong>Certification:</strong> Certificates are issued upon successful completion and assignment submission. This is a Certificate of Completion, not a Goethe-Institut certificate. Where official language certification is required, the student must sit the exam at Goethe-Institut or another recognized provider.`,
-    `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms. No refund will be made.`,
-    `<strong>Refunds:</strong> Once payment is confirmed and access is granted, no refunds will be provided except where required by law.`,
-    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes. If you have payment issues, contact info@falowen.app or use WhatsApp support.`,
+    `<strong>Certification:</strong> Falowen issues a ${policy.certificateType} upon successful completion and required assignment submission. ${policy.officialCertificateNote}`,
+    `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms.`,
+    `<strong>Refunds:</strong> ${policy.refundPolicy}`,
+    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes. If you have payment issues, contact ${policy.paymentIssueContact} or use WhatsApp support.`,
     `<strong>Class Level & Start Date:</strong> Level, dates, and fees are shown on this page and may vary by cohort. Confirm your class details before paying. By making any payment, you acknowledge and agree to these terms.`,
   ];
   list.innerHTML = terms.map((term) => `<li>${term}</li>`).join("");
@@ -615,6 +570,7 @@ function render() {
   updateHeroText();
   renderTabs(sourceList);
   updateMeta(course, shareUrl);
+  renderCatalogStatus();
   hideClassInformationBox();
   ensurePaymentButtons();
   ensureClassLayout();
@@ -645,7 +601,8 @@ function render() {
     ["Balance after installment", `${formatMoney(balance)} after 1 month`],
   ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join(""));
   setHtml("highlights", (course.highlights || []).map((item) => `<li>${item}</li>`).join(""));
-  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due one month after the first payment.`);
+  const installmentAccessMonths = Number(brochureData?.coursePolicy?.installmentAccessMonths || 1);
+  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}.`);
   setHref("payLink", paymentLink);
   setHref("payHero", "/signup/");
   setHref("shareLink", shareUrl);
@@ -658,7 +615,7 @@ function render() {
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>Hybrid: in person or online</td></tr>`).join("")
     : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`);
 
-  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after 1 month\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
+  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };\n  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
@@ -666,11 +623,16 @@ function render() {
   setText("scheduleHint", schedule.length
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
     : "This track is self-learning, so there is no fixed live class schedule.");
+  window.currentBrochureCourse = course;
   writeBrochureDebug({ step: "render:complete", renderedClassId: course.id, renderedSlug: course.slug, scheduleCount: schedule.length, hasPaymentLink: Boolean(paymentLink), hasScheduleUrl: Boolean(classScheduleUrl) });
 
   setHtml("scheduleList", schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
     : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`);
+
+  window.dispatchEvent(new CustomEvent("falowen:brochure-rendered", {
+    detail: { course, shareUrl, classScheduleUrl, paymentLink },
+  }));
 }
 
 async function copyBrochureText() {
@@ -683,8 +645,9 @@ async function copyBrochureText() {
 }
 
 window.addEventListener("popstate", () => render());
+window.FalowenLoadClassCatalog = loadBrochureDataOnce;
 
-loadBrochureData()
+loadBrochureDataOnce()
   .then((data) => {
     brochureData = data;
     window.FalowenClassBrochureData = data;

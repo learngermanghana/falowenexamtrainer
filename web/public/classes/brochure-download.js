@@ -41,6 +41,32 @@
     });
   }
 
+  function getCoursePolicy() {
+    return {
+      courseDurationWeeks: 10,
+      fullPaymentAccessMonths: 6,
+      installmentAccessMonths: 1,
+      learningModes: ["In person", "Online", "Recorded lessons"],
+      certificateType: "Certificate of Completion",
+      officialCertificateNote:
+        "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+      ...(window.FalowenClassBrochureData?.coursePolicy || {}),
+    };
+  }
+
+  function getAcademyProfile() {
+    return {
+      academyName: "Learn Language Education Academy",
+      formerName: "Learn German Ghana",
+      establishedYear: 2022,
+      germanLevels: "A1–C2",
+      examPassHeadline: "High exam pass rate",
+      examPassDescription: "Our students have maintained a high pass rate in German language examinations.",
+      overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
+      ...(window.FalowenClassBrochureData?.academyProfile || {}),
+    };
+  }
+
   function getFeeData() {
     const rows = Array.from(document.querySelectorAll("#stats .stat"));
     const full = rows[0]?.querySelector("b")?.textContent?.trim() || "GHS 0";
@@ -107,6 +133,9 @@
       || document.querySelector("a[href^='/signup']")?.href
       || `${window.location.origin}/signup/`;
     const { full, installment, balance } = getFeeData();
+    const course = window.currentBrochureCourse || {};
+    const policy = getCoursePolicy();
+    const academyProfile = getAcademyProfile();
     return {
       blueTitle,
       level,
@@ -120,17 +149,30 @@
       full,
       installment,
       balance,
+      policy,
+      academyProfile,
+      isSelfLearning: course.availability === "always",
       meetings: getMeetingRows(),
       reviews: getReviews(),
     };
   }
 
-  function benefitCards(level) {
+  function benefitCards(level, isSelfLearning = false) {
     const examLabel = level === "A1" ? "A1 exam preparation" : `${level} exam-style preparation`;
+    if (isSelfLearning) {
+      return [
+        ["Flexible study", "Work through Falowen lessons and practice on your own schedule."],
+        ["Tutor support", "Use available tutor support when you need guidance."],
+        ["Falowen practice", "Grammar, vocabulary, speaking and writing support."],
+        ["Progress tracking", "Results and learning progress in one place."],
+        ["Structured course", "Follow the level curriculum instead of studying random topics."],
+        ["Exam readiness", `${examLabel} and revision support.`],
+      ];
+    }
     return [
       ["Live lessons", "Structured teaching with clear weekly targets."],
       ["Tutor feedback", "Assignments are reviewed so you know what to improve."],
-      ["Recorded lectures", "Catch up when you cannot attend a live session."],
+      ["Recorded lessons", "Catch up when you cannot attend a live session."],
       ["Falowen practice", "Grammar, vocabulary, speaking and writing support."],
       ["Progress tracking", "Results, attendance and learning progress in one place."],
       ["Exam readiness", `${examLabel} and revision support.`],
@@ -159,12 +201,30 @@
   }
 
   function buildBrochure(data) {
-    const benefits = benefitCards(data.level)
+    const policy = data.policy || getCoursePolicy();
+    const academyProfile = data.academyProfile || getAcademyProfile();
+    const modes = policy.learningModes || ["In person", "Online", "Recorded lessons"];
+    const isSelfLearning = Boolean(data.isSelfLearning);
+    const courseDuration = Number(policy.courseDurationWeeks || 10);
+    const fullAccessMonths = Number(policy.fullPaymentAccessMonths || 6);
+    const installmentAccessMonths = Number(policy.installmentAccessMonths || 1);
+    const heroKicker = isSelfLearning ? "FLEXIBLE GERMAN SELF-LEARNING" : "LIVE GERMAN PROGRAM · ACCRA + ONLINE";
+    const heroTitle = isSelfLearning
+      ? `Build your German independently with Falowen support`
+      : `Build your German in ${courseDuration} structured weeks`;
+    const heroBody = isSelfLearning
+      ? `Structured Falowen practice, tutor support and flexible study access for your next German goal.`
+      : `Live teaching, tutor feedback, recorded lessons and ${fullAccessMonths} months of Falowen access with full payment.`;
+    const classDescription = isSelfLearning
+      ? `This programme is self-learning and can be started after registration and access activation.`
+      : `${data.classTitle} is the cohort name. Classes take place in ${data.location} and online.`;
+    const meetingSubtitle = isSelfLearning ? "Study on your own schedule" : "Join in Awoshie or online";
+    const benefits = benefitCards(data.level, isSelfLearning)
       .map(([title, description]) => `
         <div class="pdf-benefit"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(description)}</span></div>
       `).join("");
     const meetings = data.meetings.length
-      ? data.meetings.map((meeting) => `<tr><td>${escapeHtml(meeting.day)}</td><td>${escapeHtml(meeting.time)}</td><td>Hybrid</td></tr>`).join("")
+      ? data.meetings.map((meeting) => `<tr><td>${escapeHtml(meeting.day)}</td><td>${escapeHtml(meeting.time)}</td><td>${escapeHtml(isSelfLearning ? "Self-learning" : "Hybrid")}</td></tr>`).join("")
       : '<tr><td colspan="3">Self-learning - no fixed meeting time.</td></tr>';
     const meta = data.meta.slice(0, 4).map((item) => `<span>${escapeHtml(item)}</span>`).join("");
 
@@ -179,18 +239,31 @@
         </header>
 
         <div class="pdf-hero">
-          <div class="pdf-kicker">LIVE GERMAN PROGRAM · ACCRA + ONLINE</div>
-          <h1>Start speaking German confidently in 10 weeks</h1>
-          <p>Live classes, tutor feedback, recorded lectures and six months of Falowen practice to help you learn consistently and prepare for your next goal.</p>
+          <div class="pdf-kicker">${escapeHtml(heroKicker)}</div>
+          <h1>${escapeHtml(heroTitle)}</h1>
+          <p>${escapeHtml(heroBody)}</p>
         </div>
 
         <section class="pdf-class-card">
           <div>
             <div class="pdf-small-label">YOUR SELECTED CLASS</div>
             <h2>${escapeHtml(data.classTitle)}</h2>
-            <p>${escapeHtml(data.classTitle)} is the cohort name. Classes take place in ${escapeHtml(data.location)} and online.</p>
+            <p>${escapeHtml(classDescription)}</p>
           </div>
           <div class="pdf-meta-row">${meta}</div>
+        </section>
+
+        <section class="pdf-track-record">
+          <div class="pdf-track-record-intro">
+            <div class="pdf-small-label">OUR TRACK RECORD</div>
+            <p>${escapeHtml(academyProfile.overview)}</p>
+          </div>
+          <div class="pdf-track-record-grid">
+            <div><span>Established</span><strong>${escapeHtml(academyProfile.establishedYear)}</strong></div>
+            <div><span>Exam performance</span><strong>${escapeHtml(academyProfile.examPassHeadline)}</strong></div>
+            <div><span>German learning</span><strong>${escapeHtml(academyProfile.germanLevels)}</strong></div>
+          </div>
+          <small>German language examinations generally · not limited to one exam provider</small>
         </section>
 
         <section>
@@ -203,13 +276,13 @@
             <span class="pdf-price-tag">BEST VALUE</span>
             <strong>Full course fee</strong>
             <div class="pdf-price">${escapeHtml(data.full)}</div>
-            <p>Includes six months of Falowen access for lessons, revision and exam preparation.</p>
+            <p>Includes ${fullAccessMonths} months of Falowen access for lessons, revision and exam preparation.</p>
           </div>
           <div class="pdf-price-card">
             <span class="pdf-price-tag neutral">INSTALLMENT PLAN</span>
             <strong>Start with</strong>
             <div class="pdf-price">${escapeHtml(data.installment)}</div>
-            <p>Activates one month of access. Pay ${escapeHtml(data.balance)} before the month ends to keep access active.</p>
+            <p>Activates ${installmentAccessMonths} month of access. Pay ${escapeHtml(data.balance)} before the first access period ends to keep access active.</p>
           </div>
         </section>
 
@@ -234,7 +307,7 @@
 
         <div class="pdf-page-two-grid">
           <section class="pdf-panel">
-            <div class="pdf-section-title"><span>Meeting times</span><small>Join in Awoshie or online</small></div>
+            <div class="pdf-section-title"><span>Meeting times</span><small>${escapeHtml(meetingSubtitle)}</small></div>
             <table class="pdf-table"><thead><tr><th>Day</th><th>Time</th><th>Mode</th></tr></thead><tbody>${meetings}</tbody></table>
           </section>
 
@@ -249,16 +322,16 @@
               <li><b>1</b><span>Create your Falowen account.</span></li>
               <li><b>2</b><span>Choose ${escapeHtml(data.classTitle)} under Upcoming Classes.</span></li>
               <li><b>3</b><span>Pay the full course fee or begin with the installment plan.</span></li>
-              <li><b>4</b><span>Join in person, online, or use the recorded lesson when needed.</span></li>
+              <li><b>4</b><span>${escapeHtml(isSelfLearning ? "Start studying in Falowen and follow your own schedule." : `Choose a learning mode for each session: ${modes.join(", ")}.`)}</span></li>
             </ol>
           </section>
 
           <section class="pdf-panel pdf-faq-panel">
             <div class="pdf-section-title"><span>Essential questions</span></div>
             <div class="pdf-faq-grid">
-              <div><strong>Do all learning modes cost the same?</strong><span>Yes. The class fee covers in-person, online and recorded participation.</span></div>
-              <div><strong>Will I receive a certificate?</strong><span>A completion certificate is issued after the course requirements and assignments are completed.</span></div>
-              <div><strong>Is it a Goethe certificate?</strong><span>No. Official Goethe certification requires a separate exam with an approved provider.</span></div>
+              <div><strong>What learning modes are available?</strong><span>${escapeHtml(isSelfLearning ? "This programme is self-learning." : modes.join(", "))}</span></div>
+              <div><strong>Will I receive a certificate?</strong><span>${escapeHtml(`A ${policy.certificateType || "Certificate of Completion"} is issued after the course requirements and assignments are completed.`)}</span></div>
+              <div><strong>Is it an official exam certificate?</strong><span>${escapeHtml(policy.officialCertificateNote || "Official language certification requires a separate exam with a recognized provider.")}</span></div>
               <div><strong>Where are my results and documents?</strong><span>Receipts, results and attendance records are available in My Results &amp; Resources.</span></div>
             </div>
           </section>
@@ -293,6 +366,7 @@
       #downloadBrochureButton[aria-busy="true"] { opacity: .72; cursor: wait; }
       #falowenPdfBrochure { position: fixed; left: -10000px; top: 0; width: 794px; z-index: -1; font-family: Inter, Arial, sans-serif; color: #0f172a; }
       .pdf-page { width: 794px; height: 1123px; overflow: hidden; background: #ffffff; padding: 42px 46px 34px; display: flex; flex-direction: column; gap: 22px; position: relative; }
+      .pdf-page-one { gap: 15px; }
       .pdf-page * { box-sizing: border-box; }
       .pdf-page h1, .pdf-page h2, .pdf-page p { margin: 0; }
       .pdf-brand-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
@@ -310,6 +384,14 @@
       .pdf-class-card { border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 18px; padding: 18px 20px; display: grid; gap: 12px; }
       .pdf-class-card h2 { font-size: 24px; margin-top: 4px; }
       .pdf-class-card p { color: #334155; font-size: 12px; line-height: 1.5; margin-top: 5px; }
+      .pdf-track-record { border: 1px solid #bfdbfe; border-radius: 16px; background: #ffffff; padding: 13px 15px; display: grid; gap: 9px; }
+      .pdf-track-record-intro { display: grid; gap: 4px; }
+      .pdf-track-record-intro p { color: #475569; font-size: 9.5px; line-height: 1.45; }
+      .pdf-track-record-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .pdf-track-record-grid > div { border-radius: 10px; background: #eff6ff; border: 1px solid #dbeafe; padding: 8px 9px; display: grid; gap: 3px; }
+      .pdf-track-record-grid span { color: #64748b; font-size: 7.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+      .pdf-track-record-grid strong { color: #0f172a; font-size: 10.5px; line-height: 1.3; }
+      .pdf-track-record > small { color: #64748b; font-size: 7.5px; }
       .pdf-meta-row { display: flex; flex-wrap: wrap; gap: 7px; }
       .pdf-meta-row span { border-radius: 999px; background: #ffffff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 7px 9px; font-size: 10px; font-weight: 800; }
       .pdf-section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 11px; }
@@ -401,7 +483,8 @@
     }
     if (options[1]) {
       const paragraph = options[1].querySelector("p");
-      if (paragraph) paragraph.textContent = `This activates one month of Falowen access. Pay ${fee.balance} before the end of the first month to keep your course and platform access active.`;
+      const months = Number(getCoursePolicy().installmentAccessMonths || 1);
+      if (paragraph) paragraph.textContent = `This activates ${months} month of Falowen access. Pay ${fee.balance} before that access period ends to keep your course and platform access active.`;
     }
   }
 
@@ -480,5 +563,6 @@
 
   window.downloadClassBrochure = downloadBrochure;
   window.addEventListener("load", run);
+  window.addEventListener("falowen:brochure-rendered", run);
   [100, 350, 800, 1500, 2600].forEach((delay) => setTimeout(run, delay));
 })();

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
+import academyProfile from "../data/publicAcademyProfile.json";
 
 const COPY = {
   en: {
@@ -28,6 +29,13 @@ const COPY = {
       { title: "Join your class", text: "Choose a live class or self-learning option." },
       { title: "Learn in Falowen", text: "Open lessons, submit assignments, and track progress." },
     ],
+    trackRecordTitle: "Our track record",
+    trackRecordIntro: "Learn Language Education Academy has supported German learners since {{year}} with structured teaching, tutor-marked assignments and exam preparation.",
+    trackEstablished: "Established",
+    trackPass: "Exam performance",
+    trackPassValue: "High exam pass rate",
+    trackLevels: "German learning",
+    trackExamScope: "Across German language examinations, not limited to one exam provider.",
     levelsTitle: "German A1–C2 courses and exam preparation",
     exploreTitle: "Useful links",
     resources: [
@@ -43,7 +51,7 @@ const COPY = {
     contact: "Need help? Chat with us on WhatsApp",
     metaTitle: "Falowen | Learn German A1–C2 Online & French Courses",
     metaDescription:
-      "Learn German A1–C2 online with Falowen plus French courses, structured lessons, tutor feedback, listening, writing, speaking, progress tracking and exam preparation.",
+      "Learn German A1–C2 with Falowen from Learn Language Education Academy, established in 2022, with structured lessons, tutor feedback, exam preparation and a high exam pass rate.",
   },
   de: {
     languageLabel: "Sprache",
@@ -69,6 +77,13 @@ const COPY = {
       { title: "Kurs beitreten", text: "Wähle einen Live-Kurs oder eine Selbstlernoption." },
       { title: "Mit Falowen lernen", text: "Öffne Lektionen, reiche Aufgaben ein und verfolge deinen Fortschritt." },
     ],
+    trackRecordTitle: "Unsere Erfahrung",
+    trackRecordIntro: "Die Learn Language Education Academy unterstützt Deutschlernende seit {{year}} mit strukturiertem Unterricht, korrigierten Aufgaben und Prüfungsvorbereitung.",
+    trackEstablished: "Gegründet",
+    trackPass: "Prüfungsergebnisse",
+    trackPassValue: "Hohe Bestehensquote",
+    trackLevels: "Deutsch lernen",
+    trackExamScope: "Bei Deutschprüfungen verschiedener Anbieter, nicht nur bei einem Prüfungsanbieter.",
     levelsTitle: "Deutschkurse A1–C2 und Prüfungsvorbereitung",
     exploreTitle: "Nützliche Links",
     resources: [
@@ -84,7 +99,7 @@ const COPY = {
     contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
     metaTitle: "Falowen | Deutsch A1–C2 online lernen & Französischkurse",
     metaDescription:
-      "Lerne Deutsch und Französisch mit strukturierten Lektionen, Tutor-Feedback, Aufgaben, Fortschrittsanzeige und Prüfungsvorbereitung.",
+      "Lerne Deutsch A1–C2 mit Falowen von der Learn Language Education Academy, gegründet 2022, mit strukturierten Lektionen, Tutor-Feedback, Prüfungsvorbereitung und hoher Bestehensquote.",
   },
   fr: {
     languageLabel: "Langue",
@@ -110,6 +125,13 @@ const COPY = {
       { title: "Rejoignez votre cours", text: "Choisissez un cours en direct ou une option d'auto-apprentissage." },
       { title: "Apprenez avec Falowen", text: "Ouvrez les leçons, envoyez les devoirs et suivez vos progrès." },
     ],
+    trackRecordTitle: "Notre parcours",
+    trackRecordIntro: "Learn Language Education Academy accompagne les apprenants d’allemand depuis {{year}} avec des cours structurés, des devoirs corrigés et une préparation aux examens.",
+    trackEstablished: "Créée en",
+    trackPass: "Résultats aux examens",
+    trackPassValue: "Taux de réussite élevé",
+    trackLevels: "Allemand",
+    trackExamScope: "Pour les examens d’allemand de différents organismes, sans se limiter à un seul prestataire.",
     levelsTitle: "Cours d’allemand A1–C2 et préparation aux examens",
     exploreTitle: "Liens utiles",
     resources: [
@@ -125,7 +147,7 @@ const COPY = {
     contact: "Besoin d'aide ? Écrivez-nous sur WhatsApp",
     metaTitle: "Falowen | Cours d'allemand et de français",
     metaDescription:
-      "Apprenez l'allemand et le français avec des leçons structurées, des devoirs, des commentaires, le suivi des progrès et la préparation aux examens.",
+      "Apprenez l’allemand A1–C2 avec Falowen de Learn Language Education Academy, créée en 2022, avec des cours structurés, des retours de tuteur, une préparation aux examens et un taux de réussite élevé.",
   },
 };
 
@@ -247,6 +269,20 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         .falowen-home-visual-card span { font-size: 12px; color: #64748b; font-weight: 700; }
         .falowen-home-visual-card strong { font-size: 15px; }
         .falowen-benefits, .falowen-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+        .falowen-track-record {
+          background: #fff; border: 1px solid #bfdbfe; border-radius: 20px; padding: 20px;
+          display: grid; gap: 14px; box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+        }
+        .falowen-track-record h2 { margin: 0; font-size: 22px; }
+        .falowen-track-record > p { margin: 0; color: #475569; line-height: 1.6; font-size: 14px; }
+        .falowen-track-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+        .falowen-track-stat {
+          border: 1px solid #dbeafe; border-radius: 14px; background: #eff6ff; padding: 13px;
+          display: grid; gap: 4px;
+        }
+        .falowen-track-stat span { color: #475569; font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
+        .falowen-track-stat strong { color: #0f172a; font-size: 17px; line-height: 1.35; }
+        .falowen-track-scope { color: #64748b !important; font-size: 12px !important; }
         .falowen-info-card {
           background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px;
           display: grid; gap: 7px; box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
@@ -284,7 +320,7 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           .falowen-home-copy h1 { font-size: 38px; }
           .falowen-home-copy > p { font-size: 15px; }
           .falowen-home-visual { display: none; }
-          .falowen-benefits, .falowen-steps { grid-template-columns: 1fr; }
+          .falowen-benefits, .falowen-steps, .falowen-track-stats { grid-template-columns: 1fr; }
           .falowen-section { padding: 18px; }
           .falowen-final-cta { padding: 20px; }
           .falowen-mobile-actions {
@@ -378,6 +414,26 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="falowen-track-record" aria-labelledby="falowen-track-record-title">
+          <h2 id="falowen-track-record-title">{copy.trackRecordTitle}</h2>
+          <p>{copy.trackRecordIntro.replace("{{year}}", String(academyProfile.establishedYear))}</p>
+          <div className="falowen-track-stats">
+            <div className="falowen-track-stat">
+              <span>{copy.trackEstablished}</span>
+              <strong>{academyProfile.establishedYear}</strong>
+            </div>
+            <div className="falowen-track-stat">
+              <span>{copy.trackPass}</span>
+              <strong>{interfaceLanguage === "en" ? academyProfile.examPassHeadline : copy.trackPassValue}</strong>
+            </div>
+            <div className="falowen-track-stat">
+              <span>{copy.trackLevels}</span>
+              <strong>{academyProfile.germanLevels}</strong>
+            </div>
+          </div>
+          <p className="falowen-track-scope">{copy.trackExamScope}</p>
         </section>
 
         <section className="falowen-benefits" aria-label={copy.howTitle}>

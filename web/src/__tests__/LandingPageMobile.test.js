@@ -54,6 +54,17 @@ describe("Falowen public homepage on mobile", () => {
     );
   });
 
+  it("shows the academy track record without limiting exam performance to Goethe", () => {
+    render(<LandingHost />);
+
+    expect(screen.getByRole("heading", { name: "Our track record" })).toBeInTheDocument();
+    expect(screen.getByText("2022")).toBeInTheDocument();
+    expect(screen.getByText("High exam pass rate")).toBeInTheDocument();
+    expect(screen.getByText("A1–C2")).toBeInTheDocument();
+    expect(screen.getByText(/not limited to one exam provider/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Goethe pass rate/i)).not.toBeInTheDocument();
+  });
+
   it("does not show the removed Falowen Radio promotion", () => {
     render(<LandingHost />);
 

@@ -110,9 +110,25 @@
     return true;
   }
 
+  function loadCatalog() {
+    if (window.FalowenClassBrochureData) return Promise.resolve(window.FalowenClassBrochureData);
+    if (typeof window.FalowenLoadClassCatalog === "function") {
+      return window.FalowenLoadClassCatalog().then((data) => {
+        window.FalowenClassBrochureData = window.FalowenClassBrochureData || data;
+        return data;
+      });
+    }
+    return fetch("/classes/classes-data.json", { cache: "no-store" })
+          .then((response) => response.json())
+          .then((data) => ({
+            ...data,
+            catalogSource: "fallback",
+            classes: (data.classes || []).filter((course) => course.availability === "always"),
+          }));
+  }
+
   function init() {
-    fetch("/classes/classes-data.json", { cache: "no-store" })
-      .then((response) => response.json())
+    loadCatalog()
       .then((data) => {
         if (applyActiveClassFilter(data)) return;
         const timer = setInterval(() => {

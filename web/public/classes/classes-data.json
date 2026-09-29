@@ -39,7 +39,7 @@
     },
     "sessionMinutesByLevel": {
       "A1": 60,
-      "A2": 60,
+      "A2": 90,
       "B1": 90,
       "B2": 60,
       "C1": 60
@@ -71,6 +71,169 @@
         "Professional-level writing and speaking"
       ]
     }
+  },
+  "curriculumByLevel": {
+    "A1": {
+      "1": "Greetings and Asking About Well-being",
+      "2": "German Alphabet + Personal Pronouns and Verb Conjugation",
+      "3": "Personal Information, Articles, Adjectives and W-Questions + Personal Pronouns and Verb Conjugation",
+      "4": "Numbers",
+      "5": "Introducing Yourself and Articles",
+      "6": "Family and Hobbies",
+      "7": "Asking About Prices",
+      "8": "Countries and Languages",
+      "9": "German Cases",
+      "10": "Objects and Colors",
+      "11": "Understanding Time",
+      "12": "24 Hour Clock",
+      "13": "Revision",
+      "14": "Modal Verbs",
+      "15": "Introduction to Speaking Exams",
+      "16": "Negation + Food",
+      "17": "Instructions",
+      "18": "Two Case Prepositions + Dative Prepositions",
+      "19": "Goethe A1 Speaking Confidence Lab",
+      "20": "Introduction to Letter Writing 12.3",
+      "21": "Weather",
+      "22": "Health",
+      "23": "Dative and Accusative Verbs",
+      "24": "Conjunctions"
+    },
+    "A2": {
+      "1": "Small Talk 1.1 (Exercise)",
+      "2": "Personen beschreiben 1.2 (Exercise)",
+      "3": "Dinge und Personen vergleichen 1.3",
+      "4": "Wo möchten wir uns treffen? 2.4",
+      "5": "Was machst du in deiner Freizeit? 2.5",
+      "6": "Möbel und Räume kennenlernen 3.6",
+      "7": "Eine Wohnung suchen (Übung) 3.7",
+      "8": "Rezepte und Essen (Exercise) 3.8",
+      "9": "Urlaub 4.9",
+      "10": "Tourismus und Traditionelle Feste 4.10",
+      "11": "Unterwegs: Verkehrsmittel vergleichen 4.11",
+      "12": "Mein Traumberuf (Übung) 5.12",
+      "13": "Ein Vorstellungsgespräch (Exercise) 5.13",
+      "14": "Beruf und Karriere (Exercise) 5.14",
+      "15": "Mein Lieblingssport 6.15",
+      "16": "Wohlbefinden und Entspannung 6.16",
+      "17": "In die Apotheke gehen 6.17 (Exercise)",
+      "18": "Die Bank anrufen 7.18",
+      "19": "Einkaufen? Wo und wie? (Exercise) 7.19",
+      "20": "Typische Reklamationssituationen üben 7.20",
+      "21": "Ein Wochenende planen 8.21",
+      "22": "Die Woche Planung 8.22",
+      "23": "Wie kommst du zur Schule / zur Arbeit? 9.23",
+      "24": "Einen Urlaub planen 9.24",
+      "25": "Tagesablauf (Exercise) 9.25",
+      "26": "Gefühle in verschiedenen Situationen beschreiben 10.26",
+      "27": "Digitale Kommunikation 10.27",
+      "28": "Über die Zukunft sprechen 10.28"
+    },
+    "B1": {
+      "1": "Traumwelten (Übung) 1.1",
+      "2": "Freunde fürs Leben (Übung) 1.2",
+      "3": "Erfolgsgeschichten (Übung) 1.3",
+      "4": "Wohnung suchen (Übung) 2.4",
+      "5": "Der Besichtigungstermin (Übung) 2.5",
+      "6": "Leben in der Stadt oder auf dem Land? 2.6",
+      "7": "Fast Food vs. Hausmannskost 3.7",
+      "8": "Alles für die Gesundheit 3.8",
+      "9": "Work-Life-Balance im modernen Arbeitsumfeld 3.9",
+      "10": "Digitale Auszeit und Selbstfürsorge 4.10",
+      "11": "Teamspiele und Kooperative Aktivitäten 4.11",
+      "12": "Abenteuer in der Natur 4.12",
+      "13": "Eigene Filmkritik schreiben 4.13",
+      "14": "Traditionelles vs. digitales Lernen 5.14",
+      "15": "Medien und Arbeiten im Homeoffice 5.15",
+      "16": "Prüfungsangst und Stressbewältigung 5.16",
+      "17": "Wie lernt man am besten? 5.17",
+      "18": "Wege zum Wunschberuf 6.18",
+      "19": "Das Vorstellungsgespräch 6.19",
+      "20": "Wie wird man …? (Ausbildung und Qu) 6.20",
+      "21": "Lebensformen heute – Familie, Wohnge 7.21",
+      "22": "Was ist dir in einer Beziehung wichtig? 7.22",
+      "23": "Erstes Date – Typische Situationen 7.23",
+      "24": "Konsum und Nachhaltigkeit 8.24",
+      "25": "Online einkaufen – Rechte und Risiken 8.25",
+      "26": "Reiseprobleme und Lösungen 9.26",
+      "27": "Umweltfreundlich im Alltag 10.27",
+      "28": "Klimafreundlich leben 10.28"
+    },
+    "B2": {
+      "1": "Persönliche Identität und Selbstverständnis",
+      "2": "Beziehungen und Kommunikation",
+      "3": "Öffentliches vs. Privates Leben",
+      "4": "Beruf und Karriere",
+      "5": "Bildung und Lernen",
+      "6": "Migration und Integration",
+      "7": "Gesellschaftliche Vielfalt",
+      "8": "Politik und Engagement",
+      "9": "Technologie und Digitalisierung",
+      "10": "Umwelt und Nachhaltigkeit",
+      "11": "Gesundheit und Wohlbefinden",
+      "12": "Konsum und Medien",
+      "13": "Reisen und Mobilität",
+      "14": "Wohnen und Zusammenleben",
+      "15": "Kunst und Kultur",
+      "16": "Wissenschaft und Forschung",
+      "17": "Feste und Traditionen",
+      "18": "Freizeit und Hobbys",
+      "19": "Ernährung und Esskultur",
+      "20": "Mode und Lebensstil",
+      "21": "Werte und Normen",
+      "22": "Sprache und Kommunikation",
+      "23": "Innovation und Zukunft",
+      "24": "Gesellschaftliche Herausforderungen",
+      "25": "Globalisierung und internationale Beziehungen",
+      "26": "Kreatives Schreiben & Projekte",
+      "27": "Prüfungstraining & Wiederholung",
+      "28": "Abschlusspräsentation & Feedback"
+    },
+    "C1": {
+      "1": "Ziele und Lernweg",
+      "2": "Kultur und Identität",
+      "3": "Medien und Informationskompetenz",
+      "4": "Beziehungen und Teamarbeit",
+      "5": "Berufliche Entwicklung",
+      "6": "Gesundheit und Lebensstil",
+      "7": "Reisen und Nachhaltigkeit",
+      "8": "Wohnen und Stadtentwicklung",
+      "9": "Konsum und Werbung",
+      "10": "Integration und Gesellschaft",
+      "11": "Engagement und Ehrenamt",
+      "12": "Freizeit und Kultur",
+      "13": "Mehrsprachigkeit",
+      "14": "Innovation und Zukunft",
+      "15": "Bildung und lebenslanges Lernen",
+      "16": "Technologie im Alltag",
+      "17": "Umwelt und Verantwortung",
+      "18": "Gesellschaft und Zusammenhalt",
+      "19": "Arbeit der Zukunft",
+      "20": "Digitale Gesundheit",
+      "21": "Migration und Teilhabe",
+      "22": "Politik und Mitbestimmung",
+      "23": "Freizeit und Work-Life-Balance",
+      "24": "Mobilität und Infrastruktur",
+      "25": "Wissenschaft und Forschung",
+      "26": "Nachhaltiger Konsum",
+      "27": "Digitalisierung und Verwaltung",
+      "28": "Demografischer Wandel und Generationengerechtigkeit"
+    }
+  },
+  "coursePolicy": {
+    "courseDurationWeeks": 10,
+    "fullPaymentAccessMonths": 6,
+    "installmentAccessMonths": 1,
+    "extensionGhsPerMonth": 1000,
+    "learningModes": [
+      "In person",
+      "Online",
+      "Recorded lessons"
+    ],
+    "certificateType": "Certificate of Completion",
+    "officialCertificateNote": "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+    "paymentIssueContact": "info@falowen.app",
+    "refundPolicy": "Once payment is confirmed and learning access is granted, fees are non-refundable except where required by law."
   },
   "classes": [
     {
@@ -287,27 +450,27 @@
     {
       "level": "A1",
       "city": "Bonn",
-      "startDate": "2026-07-08",
+      "startDate": "2026-07-15",
       "orientationDate": "2026-07-07",
-      "endDate": "2026-09-01",
+      "endDate": "2026-09-10",
       "meetingDays": [
-        {
-          "day": "Monday",
-          "startTime": "11:00",
-          "endTime": "12:00"
-        },
-        {
-          "day": "Tuesday",
-          "startTime": "11:00",
-          "endTime": "12:00"
-        },
         {
           "day": "Wednesday",
           "startTime": "11:00",
           "endTime": "12:00"
+        },
+        {
+          "day": "Thursday",
+          "startTime": "11:00",
+          "endTime": "12:00"
+        },
+        {
+          "day": "Friday",
+          "startTime": "11:00",
+          "endTime": "12:00"
         }
       ],
-      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-07-08&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-07-15&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D"
     },
     {
       "level": "A2",
@@ -359,5 +522,15 @@
       "availability": "always",
       "title": "C1 Self-learning"
     }
-  ]
+  ],
+  "academyProfile": {
+    "academyName": "Learn Language Education Academy",
+    "formerName": "Learn German Ghana",
+    "establishedYear": 2022,
+    "germanLevels": "A1–C2",
+    "examPerformance": "high",
+    "examPassHeadline": "High exam pass rate",
+    "examPassDescription": "Our students have maintained a high pass rate in German language examinations.",
+    "overview": "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation."
+  }
 }

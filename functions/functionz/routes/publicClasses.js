@@ -1,8 +1,8 @@
 const admin = require("firebase-admin");
 
-const TUITION = { A1: 3000, A2: 3000, B1: 3000, B2: 3000, C1: 3000 };
+const TUITION = { A1: 2800, A2: 3000, B1: 3000, B2: 3000, C1: 3000 };
 const SESSIONS = { A1: 24, A2: 28, B1: 28, B2: 28, C1: 28 };
-const MINUTES = { A1: 60, A2: 60, B1: 90, B2: 60, C1: 60 };
+const MINUTES = { A1: 60, A2: 90, B1: 90, B2: 60, C1: 60 };
 const HIGHLIGHTS = {
   A1: ["Beginner German foundation", "Live class plus assignment support", "Falowen app access"],
   A2: ["Everyday German communication", "Speaking, writing, listening, and reading practice", "Falowen app support"],
@@ -106,7 +106,7 @@ function publicClass(snapshot) {
     endDate,
     totalSessions: Number(data.generatedSessionCount || data.totalSessions || SESSIONS[level] || 24),
     sessionMinutes: Number(data.sessionMinutes || firstRuleDuration || MINUTES[level] || 60),
-    tuitionGhs: Number(level === "A1" ? TUITION.A1 : data.tuitionGhs || TUITION[level] || 3000),
+    tuitionGhs: Number(data.tuitionGhs || TUITION[level] || 3000),
     meetingDays: meetings,
     scheduleUrl: scheduleUrl(data, level, startDate, meetings),
     highlights: Array.isArray(data.highlights) && data.highlights.length ? data.highlights : HIGHLIGHTS[level] || [],
