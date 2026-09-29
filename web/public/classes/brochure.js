@@ -237,13 +237,23 @@ async function loadBrochureData() {
       .map((course) => expandBrochureClass(course, defaults))
       .filter(isBrochureClassOpen);
     const liveTokens = new Set(liveClasses.flatMap((course) => [course.id, course.slug, course.title].filter(Boolean)));
-    writeBrochureDebug({ step: "liveClassesExpanded", openClassCount: liveClasses.length, selfLearningCount: staticSelfLearning.length });
+    const liveLevels = new Set(liveClasses.map((course) => course.level));
+    const missingLiveLevelChoices = fallbackClasses.filter(
+      (course) => course.availability !== "always" && !liveLevels.has(course.level),
+    );
+    writeBrochureDebug({
+      step: "liveClassesExpanded",
+      openClassCount: liveClasses.length,
+      fallbackLiveLevelCount: missingLiveLevelChoices.length,
+      selfLearningCount: staticSelfLearning.length,
+    });
     return {
       ...staticData,
       catalogSource: "firestore",
       catalogGeneratedAt: liveData.generatedAt || "",
       classes: [
         ...liveClasses,
+        ...missingLiveLevelChoices,
         ...staticSelfLearning.filter((course) => ![course.id, course.slug, course.title].some((token) => liveTokens.has(token))),
       ],
     };
