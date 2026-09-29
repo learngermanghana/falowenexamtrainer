@@ -7,7 +7,7 @@ import {
   getTimedAssignmentDurationSeconds,
 } from "../data/timedAssignmentConfig";
 
-const ATTEMPT_COLLECTION = "timedAssignmentAttempts";
+const ATTEMPT_COLLECTION = "submissionLocks";
 
 const TimedAssignmentContext = createContext({
   enabled: false,
@@ -110,7 +110,7 @@ export default function SharedTimedAssignment({
   const durationSeconds = getTimedAssignmentDurationSeconds(assignmentKey);
   const currentUser = auth?.currentUser || null;
   const attemptDocId = currentUser?.uid
-    ? `${normalizeKeyPart(currentUser.uid)}__${normalizeKeyPart(assignmentKey)}`
+    ? `timed__${normalizeKeyPart(currentUser.uid)}__${normalizeKeyPart(assignmentKey)}`
     : "";
   const attemptRef = useMemo(
     () => (enabled && db && attemptDocId ? doc(db, ATTEMPT_COLLECTION, attemptDocId) : null),
@@ -189,7 +189,15 @@ export default function SharedTimedAssignment({
           writeLocalSession(assignmentKey, normalizedLevel, null);
         }
 
-        if (["expired", "submitted"].includes(nextState)) {
+        if (nextState === "expired") {
+          const shouldRecoverExpiry = !expiryHandledRef.current;
+          expiryHandledRef.current = true;
+          if (shouldRecoverExpiry && config?.autoSubmit) {
+            window.setTimeout(() => {
+              expiryCallbackRef.current?.({ assignmentKey, config });
+            }, 0);
+          }
+        } else if (nextState === "submitted") {
           expiryHandledRef.current = true;
         }
       },
@@ -216,6 +224,7 @@ export default function SharedTimedAssignment({
     enabled,
     localSession,
     normalizedLevel,
+    config,
   ]);
 
   const markExpired = useCallback(() => {
@@ -294,6 +303,7 @@ export default function SharedTimedAssignment({
         await setDoc(attemptRef, {
           studentId: currentUser.uid,
           studentEmail: currentUser.email || "",
+          timerRecord: true,
           assignmentKey: String(assignmentKey || "").trim().toUpperCase(),
           level: normalizedLevel,
           status: "active",
@@ -390,6 +400,7 @@ export default function SharedTimedAssignment({
     attemptState,
     cloudState,
     config,
+    assignmentKey,
     expired,
     isTabLocked,
     onSubmissionVerified,
@@ -409,6 +420,7 @@ export default function SharedTimedAssignment({
     attemptState,
     cloudState,
     config,
+    assignmentKey,
     enabled,
     expired,
     isTabLocked,
@@ -439,6 +451,7 @@ export function TimedAssignmentPanel() {
 
   const {
     config,
+    assignmentKey,
     attemptState,
     cloudState,
     secondsLeft,
@@ -458,7 +471,7 @@ export function TimedAssignmentPanel() {
 
   return (
     <section
-      data-timed-assignment={config.level}
+      data-timed-assignment={assignmentKey || config.level}
       data-a1-timed-mock-exam={config.level === "A1" ? "true" : undefined}
       data-assignment-locked={!active ? "true" : "false"}
       data-timed-assignment-state={attemptState}

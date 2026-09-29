@@ -2190,7 +2190,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }
 
     timedAutoSubmitStartedRef.current = true;
-    let cancelled = false;
 
     const submitSavedTimedWork = async () => {
       setStatus({ loading: true, error: "", success: "" });
@@ -2200,7 +2199,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         if (!draftSaved.ok) throw new Error("The latest draft could not be saved.");
 
         const saved = await persistSubmission({ statusLabel: "submitted" });
-        if (cancelled) return;
 
         if (!saved.ok && saved.reason === "locked") {
           setStatus({ loading: false, error: "", success: "Timed assignment was already submitted." });
@@ -2229,7 +2227,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
         timedAssignment.onSubmissionVerified?.();
       } catch (error) {
-        if (cancelled) return;
         console.error("Timed automatic submission failed", error);
         const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
         setStatus({ loading: false, error: message, success: "" });
@@ -2238,9 +2235,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     };
 
     submitSavedTimedWork();
-    return () => {
-      cancelled = true;
-    };
+    return undefined;
   }, [
     autosaveStatus.state,
     form.assignmentTitle,
