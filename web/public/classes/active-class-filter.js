@@ -118,7 +118,13 @@
         return data;
       });
     }
-    return fetch("/classes/classes-data.json", { cache: "no-store" }).then((response) => response.json());
+    return fetch("/classes/classes-data.json", { cache: "no-store" })
+          .then((response) => response.json())
+          .then((data) => ({
+            ...data,
+            catalogSource: "fallback",
+            classes: (data.classes || []).filter((course) => course.availability === "always"),
+          }));
   }
 
   function init() {
