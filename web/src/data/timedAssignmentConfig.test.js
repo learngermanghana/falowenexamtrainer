@@ -14,6 +14,7 @@ describe("shared timed assignment configuration", () => {
   test("enables graded late A2 assignment work without timing self-check-only days", () => {
     expect(getTimedAssignmentDurationSeconds("A2-10.27")).toBe(45 * 60);
     expect(getTimedAssignmentDurationSeconds("A2-10.28")).toBe(45 * 60);
+    expect(getTimedAssignmentConfig("A2-10.27")?.autoSubmit).toBe(true);
     expect(getTimedAssignmentConfig("A2-9.24")).toBeNull();
     expect(getTimedAssignmentConfig("A2-10.26")).toBeNull();
   });
@@ -22,6 +23,7 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("B1-6.18")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-6.19")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(55 * 60);
+    expect(getTimedAssignmentConfig("B1-6.18")?.autoSubmit).toBe(true);
     expect(getTimedAssignmentConfig("B1-8.24")).toBeNull();
   });
 

@@ -7,6 +7,7 @@ import A1TimedMockExam, {
   getA1MockExamDurationSeconds,
   useA1TimedMockExam,
 } from "./A1TimedMockExam";
+import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { A1SharedWorkbookTabBar } from "./A1SharedAssignmentWorkbookLayout";
 
 describe("A1 timed mock exam", () => {
@@ -32,7 +33,7 @@ describe("A1 timed mock exam", () => {
   test("starts a persistent 30-minute mock for Day 20", () => {
     render(
       <MemoryRouter initialEntries={["/workbook"]}>
-        <Routes><Route path="/workbook" element={<A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }} />} /></Routes>
+        <Routes><Route path="/workbook" element={<A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}><TimedAssignmentPanel /></A1TimedMockExam>} /></Routes>
       </MemoryRouter>,
     );
 

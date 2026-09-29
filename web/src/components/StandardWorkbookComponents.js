@@ -6,6 +6,7 @@ import { getC2DayTabs } from "../data/c2SkillCycle";
 import { getB2DayTabs } from "../data/b2SkillCycle";
 import { A2B1GrammarNotesTab } from "./A2B1WorkbookGrammarNotes";
 import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
+import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import {
   filterA2B1WorkbookTabsByProfile,
   getA2B1WorkbookSectionProfile,
@@ -239,6 +240,8 @@ export const WorkbookTabNav = ({
             );
           })}
         </div>
+
+        <TimedAssignmentPanel />
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>

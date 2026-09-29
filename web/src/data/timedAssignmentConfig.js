@@ -29,7 +29,7 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
     timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
     preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: false,
+    autoSubmit: true,
   }),
   "A2-10.28": Object.freeze({
     level: "A2",
@@ -37,7 +37,7 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
     timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
     preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: false,
+    autoSubmit: true,
   }),
   "B1-6.18": Object.freeze({
     level: "B1",
@@ -45,7 +45,7 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
     timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
     preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: false,
+    autoSubmit: true,
   }),
   "B1-6.19": Object.freeze({
     level: "B1",
@@ -53,7 +53,7 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
     timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
     preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: false,
+    autoSubmit: true,
   }),
   "B1-7.22": Object.freeze({
     level: "B1",
@@ -61,7 +61,7 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the submitted Teil 4 reading task",
     timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
     preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: false,
+    autoSubmit: true,
   }),
 });
 

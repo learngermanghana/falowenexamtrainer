@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
+import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
 import { useA1TimedMockExam } from "./A1TimedMockExam";
@@ -220,7 +221,7 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   );
 };
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, assignmentLocked = false }) => {
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, assignmentLocked = false, isTabLocked = null }) => {
   const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
   const activeTabDefinition = tabs[activeIndex] || null;
@@ -246,7 +247,9 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         }}
       >
         {tabs.map((tab) => {
-          const locked = assignmentLocked && !["overview", "assignment", "grammar"].includes(tab.key);
+          const locked = typeof isTabLocked === "function"
+            ? isTabLocked(tab.key)
+            : assignmentLocked && !["overview", "assignment", "grammar"].includes(tab.key);
           return (
             <button
               key={tab.key}
@@ -262,6 +265,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
             </button>
           );
         })}
+        <TimedAssignmentPanel />
       </nav>
 
       <div
@@ -341,19 +345,19 @@ export default function A1SharedAssignmentWorkbookLayout({
     : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
-  const { assignmentLocked } = useA1TimedMockExam();
+  const { assignmentLocked, isTabLocked } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
   const activeTabAllowedWhileLocked = ["overview", "assignment", "grammar"].includes(activeTab);
-  const visibleActiveTab = assignmentLocked && !activeTabAllowedWhileLocked
+  const visibleActiveTab = isTabLocked(activeTab) && !activeTabAllowedWhileLocked
     ? (hasGrammar ? "grammar" : overviewTab)
     : activeTab;
   const layoutRef = useRef(null);
   const pendingViewportTabRef = useRef("");
 
   useEffect(() => {
-    if (!assignmentLocked || ["overview", "assignment", "grammar"].includes(activeTab)) return;
+    if (!isTabLocked(activeTab) || ["overview", "assignment", "grammar"].includes(activeTab)) return;
     openTab(hasGrammar ? "grammar" : overviewTab);
-  }, [activeTab, assignmentLocked, hasGrammar, openTab, overviewTab]);
+  }, [activeTab, hasGrammar, isTabLocked, openTab, overviewTab]);
 
   const openTabFromSectionAction = useCallback((key) => {
     pendingViewportTabRef.current = key;
@@ -376,6 +380,7 @@ export default function A1SharedAssignmentWorkbookLayout({
         onSelect={openTab}
         hasGrammar={hasGrammar}
         assignmentLocked={assignmentLocked}
+        isTabLocked={isTabLocked}
       />
 
       <div data-workbook-content>

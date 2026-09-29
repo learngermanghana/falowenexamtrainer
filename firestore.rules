@@ -104,6 +104,38 @@ service cloud.firestore {
       allow delete: if isStaff();
     }
 
+    // Timed assignment attempts are one-use student records.
+    // Students may create their own attempt and move it forward only.
+    // Staff may delete an attempt to explicitly reset it.
+    match /timedAssignmentAttempts/{attemptId} {
+      allow create: if ownsStudentIncoming()
+        && request.resource.data.status == 'active'
+        && request.resource.data.startedAt == request.time
+        && request.resource.data.durationSeconds is int
+        && request.resource.data.durationSeconds > 0
+        && request.resource.data.durationSeconds <= 7200;
+
+      allow read: if ownsStudentResource() || isStaff();
+
+      allow update: if isStaff() || (
+        ownsStudentResource()
+        && ownsStudentIncoming()
+        && ownershipFieldsUnchanged()
+        && request.resource.data.assignmentKey == resource.data.assignmentKey
+        && request.resource.data.level == resource.data.level
+        && request.resource.data.durationSeconds == resource.data.durationSeconds
+        && request.resource.data.startedAt == resource.data.startedAt
+        && request.resource.data.clientStartedAt == resource.data.clientStartedAt
+        && (
+          (resource.data.status == 'active' && request.resource.data.status in ['active', 'expired', 'submitted'])
+          || (resource.data.status == 'expired' && request.resource.data.status in ['expired', 'submitted'])
+          || (resource.data.status == 'submitted' && request.resource.data.status == 'submitted')
+        )
+      );
+
+      allow delete: if isStaff();
+    }
+
     // Shared, canonical A1-C1 course progress snapshot.
     // Students own their own snapshot; staff can read it for Admin/email/reporting.
     match /courseCompletionSnapshots/{snapshotId} {

@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
+import { useTimedAssignment } from "./SharedTimedAssignment";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
@@ -606,6 +607,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const location = useLocation();
   const { showToast } = useToast();
   const { user, studentProfile } = useAuth();
+  const timedAssignment = useTimedAssignment();
   const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
 
@@ -874,6 +876,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
   const [recentSubmissions, setRecentSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
+  const [timedAutoSubmitCheck, setTimedAutoSubmitCheck] = useState(0);
   const [cooldownNow, setCooldownNow] = useState(() => Date.now());
 
   const [lockedChapters, setLockedChapters] = useState(new Set());
@@ -933,6 +937,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const lastAssignmentRef = useRef("");
   const autosaveTimerRef = useRef(null);
+  const timedAutoSubmitStartedRef = useRef(false);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
   const submissionTextRef = useRef(null);
   const resubmissionTextRef = useRef(null);
@@ -1291,9 +1296,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         setLockedChapters(new Set());
         setLockInfoByChapterKey({});
         setDraftsByAssignment({});
+        setSubmissionDataLoaded(true);
         return;
       }
 
+      setSubmissionDataLoaded(false);
       setSubmissionsLoading(true);
       try {
         // Recent submissions
@@ -1398,6 +1405,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         setStatus((prev) => ({ ...prev, error: "Could not load your previous submissions." }));
       } finally {
         setSubmissionsLoading(false);
+        setSubmissionDataLoaded(true);
       }
     };
 
@@ -2106,6 +2114,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         vibratePattern: [70, 40, 100],
       });
       setBadgeRefreshToken((prev) => prev + 1);
+      if (timedAssignment?.enabled) timedAssignment.onSubmissionVerified?.();
 
       // Clear editor after submission (preview remains available below)
       setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
@@ -2130,6 +2139,126 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       setStatus({ loading: false, error: "Could not save your submission.", success: "" });
     }
   };
+
+  useEffect(() => {
+    const timedAutoSubmit = Boolean(
+      timedAssignment?.enabled &&
+      timedAssignment?.timedAutoSubmit &&
+      isWorkbookSubmissionContext
+    );
+
+    if (!timedAutoSubmit) {
+      timedAutoSubmitStartedRef.current = false;
+      setTimedAutoSubmitCheck(0);
+      return undefined;
+    }
+
+    if (
+      timedAutoSubmitStartedRef.current ||
+      !submissionDataLoaded ||
+      submissionsLoading ||
+      status.loading ||
+      !form.assignmentTitle ||
+      isOrientationDay
+    ) {
+      return undefined;
+    }
+
+    if (isSelectedLocked) {
+      timedAutoSubmitStartedRef.current = true;
+      timedAssignment.onSubmissionVerified?.();
+      return undefined;
+    }
+
+    if (autosaveStatus.state === "saving" || (hasDraftForSelection && !form.submissionText.trim())) {
+      const timer = window.setTimeout(() => setTimedAutoSubmitCheck((value) => value + 1), 150);
+      return () => window.clearTimeout(timer);
+    }
+
+    const submissionText = form.submissionText.trim();
+    if (!submissionText) {
+      if (timedAutoSubmitCheck < 40) {
+        const timer = window.setTimeout(() => setTimedAutoSubmitCheck((value) => value + 1), 150);
+        return () => window.clearTimeout(timer);
+      }
+
+      timedAutoSubmitStartedRef.current = true;
+      const message = "Time is up. Falowen could not find a saved answer to submit automatically.";
+      setStatus({ loading: false, error: message, success: "" });
+      timedAssignment.onSubmissionError?.(message);
+      return undefined;
+    }
+
+    timedAutoSubmitStartedRef.current = true;
+    let cancelled = false;
+
+    const submitSavedTimedWork = async () => {
+      setStatus({ loading: true, error: "", success: "" });
+
+      try {
+        const draftSaved = await persistSubmission({ statusLabel: "draft" });
+        if (!draftSaved.ok) throw new Error("The latest draft could not be saved.");
+
+        const saved = await persistSubmission({ statusLabel: "submitted" });
+        if (cancelled) return;
+
+        if (!saved.ok && saved.reason === "locked") {
+          setStatus({ loading: false, error: "", success: "Timed assignment was already submitted." });
+          timedAssignment.onSubmissionVerified?.();
+          return;
+        }
+
+        if (!saved.ok) throw new Error("The timed assignment could not be submitted.");
+
+        setStatus({
+          loading: false,
+          error: "",
+          success: "Time is up. Falowen submitted your latest saved answers automatically.",
+        });
+        triggerInteractionFeedback({
+          sound: "success",
+          toastMessage: "Timed assignment submitted automatically.",
+          toastVariant: "success",
+          showToast,
+          notificationTitle: "Timed assignment submitted",
+          notificationBody: "Falowen submitted your latest saved answers when the timer reached 00:00.",
+          notificationTag: `timed-assignment-${selectedCanonicalAssignmentKey || selectedAssignmentId || "submission"}`,
+          vibratePattern: [70, 40, 100],
+        });
+        setBadgeRefreshToken((prev) => prev + 1);
+        setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
+        timedAssignment.onSubmissionVerified?.();
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Timed automatic submission failed", error);
+        const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
+        setStatus({ loading: false, error: message, success: "" });
+        timedAssignment.onSubmissionError?.(message);
+      }
+    };
+
+    submitSavedTimedWork();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    autosaveStatus.state,
+    form.assignmentTitle,
+    form.submissionText,
+    hasDraftForSelection,
+    isOrientationDay,
+    isSelectedLocked,
+    isWorkbookSubmissionContext,
+    persistSubmission,
+    selectedAssignmentId,
+    selectedCanonicalAssignmentKey,
+    showToast,
+    status.loading,
+    submissionDataLoaded,
+    submissionsLoading,
+    timedAssignment,
+    timedAutoSubmitCheck,
+  ]);
 
   const handleSaveDraft = async () => {
     setStatus({ loading: true, error: "", success: "" });
