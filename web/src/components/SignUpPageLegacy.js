@@ -28,6 +28,26 @@ import {
 
 const MIN_INITIAL_PAYMENT = 2000;
 
+const ENQUIRY_LEVELS = new Set(["A1", "A2", "B1"]);
+
+const signupQueryContext = () => {
+  if (typeof window === "undefined") return { level: "", enquiry: false };
+  const params = new URLSearchParams(window.location.search);
+  const requestedClass = String(params.get("class") || "").trim().toLowerCase();
+  const slugMatch = requestedClass.match(/^(a1|a2|b1)-(?:next|upcoming)-live-class$/);
+  const queryLevel = String(params.get("level") || "").trim().toUpperCase();
+  const level = ENQUIRY_LEVELS.has(queryLevel)
+    ? queryLevel
+    : slugMatch
+      ? slugMatch[1].toUpperCase()
+      : "";
+  const enquiry = params.get("enquiry") === "1" || Boolean(slugMatch);
+  return { level, enquiry };
+};
+
+const enquiryClassName = (level) =>
+  ENQUIRY_LEVELS.has(level) ? `${level} Upcoming live class` : "";
+
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
   if (!details) return className;
@@ -91,7 +111,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [showPasswords, setShowPasswords] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("A1");
+  const requestedSignup = useMemo(() => signupQueryContext(), []);
+  const [selectedLevel, setSelectedLevel] = useState(
+    requestedSignup.level || "A1"
+  );
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");
@@ -149,8 +172,25 @@ const SignUpPage = ({ onLogin, onBack }) => {
           isSelfLearning: details.isSelfLearning || details.availability === "always",
         };
       });
-    return publicClassesLoaded ? [...liveOptions, ...fallbackOptions] : fallbackOptions;
-  }, [now, publicClasses, publicClassesLoaded]);
+    const baseOptions = publicClassesLoaded ? [...liveOptions, ...fallbackOptions] : fallbackOptions;
+    const hasRequestedLevel = requestedSignup.level
+      ? baseOptions.some((option) => option.level === requestedSignup.level)
+      : false;
+    const enquiryOptions =
+      requestedSignup.enquiry && requestedSignup.level && !hasRequestedLevel
+        ? [{
+            value: enquiryClassName(requestedSignup.level),
+            label: `${requestedSignup.level} Upcoming live class — date to be announced`,
+            source: "enquiry",
+            level: requestedSignup.level,
+            startDate: "",
+            schedule: [],
+            learningMode: "",
+            isSelfLearning: false,
+          }]
+        : [];
+    return [...baseOptions, ...enquiryOptions];
+  }, [now, publicClasses, publicClassesLoaded, requestedSignup]);
 
   const filteredClassOptions = useMemo(
     () => classOptions.filter((option) => option.level === selectedLevel),
@@ -173,6 +213,31 @@ const SignUpPage = ({ onLogin, onBack }) => {
     const requestedName = requested ? findPublicClassName(publicClasses, requested) : "";
     if (requestedName) setSelectedClass(requestedName);
   }, [publicClasses, publicClassesLoaded, selectedClass]);
+
+  useEffect(() => {
+    if (!requestedSignup.enquiry || !requestedSignup.level) return;
+    if (selectedLevel !== requestedSignup.level) {
+      setSelectedLevel(requestedSignup.level);
+      return;
+    }
+
+    const selectedStillAvailable = filteredClassOptions.some(
+      (option) => option.value === selectedClass
+    );
+    if (selectedStillAvailable) return;
+
+    const preferred =
+      filteredClassOptions.find((option) => option.source === "firestore") ||
+      filteredClassOptions.find((option) => option.source === "static") ||
+      filteredClassOptions.find((option) => option.source === "enquiry");
+
+    if (preferred?.value) setSelectedClass(preferred.value);
+  }, [
+    filteredClassOptions,
+    requestedSignup,
+    selectedClass,
+    selectedLevel,
+  ]);
 
   const tuitionFeeForLevel = useMemo(
     () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }).tuitionFee,
