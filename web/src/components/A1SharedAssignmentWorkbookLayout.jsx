@@ -5,6 +5,7 @@ import { getA1CourseLessonNeighbors } from "../data/a1CanonicalLessonCatalog";
 import { styles } from "../styles";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
+import { useA1TimedMockExam } from "./A1TimedMockExam";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
   <section data-workbook-section={sectionKey}>{children}</section>
@@ -219,7 +220,7 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   );
 };
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false }) => {
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, assignmentLocked = false }) => {
   const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
   const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
   const activeTabDefinition = tabs[activeIndex] || null;
@@ -244,18 +245,23 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === tab.key}
-            onClick={() => onSelect(tab.key)}
-            style={tabButtonStyle(activeTab === tab.key, tab.submit)}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const locked = assignmentLocked && !["overview", "assignment", "grammar"].includes(tab.key);
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
+              aria-label={locked ? `${tab.label} (locked until timed mock starts)` : tab.label}
+              disabled={locked}
+              onClick={() => onSelect(tab.key)}
+              style={{ ...tabButtonStyle(activeTab === tab.key, tab.submit), cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.52 : 1 }}
+            >
+              {locked ? `🔒 ${tab.label}` : tab.label}
+            </button>
+          );
+        })}
       </nav>
 
       <div
@@ -335,9 +341,19 @@ export default function A1SharedAssignmentWorkbookLayout({
     : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
   const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
+  const { assignmentLocked } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
+  const activeTabAllowedWhileLocked = ["overview", "assignment", "grammar"].includes(activeTab);
+  const visibleActiveTab = assignmentLocked && !activeTabAllowedWhileLocked
+    ? (hasGrammar ? "grammar" : overviewTab)
+    : activeTab;
   const layoutRef = useRef(null);
   const pendingViewportTabRef = useRef("");
+
+  useEffect(() => {
+    if (!assignmentLocked || ["overview", "assignment", "grammar"].includes(activeTab)) return;
+    openTab(hasGrammar ? "grammar" : overviewTab);
+  }, [activeTab, assignmentLocked, hasGrammar, openTab, overviewTab]);
 
   const openTabFromSectionAction = useCallback((key) => {
     pendingViewportTabRef.current = key;
@@ -356,20 +372,21 @@ export default function A1SharedAssignmentWorkbookLayout({
       <A1SharedWorkbookTabBar
         assignment={assignment}
         sections={availableSections}
-        activeTab={activeTab}
+        activeTab={visibleActiveTab}
         onSelect={openTab}
         hasGrammar={hasGrammar}
+        assignmentLocked={assignmentLocked}
       />
 
       <div data-workbook-content>
-        <div data-workbook-panel={overviewTab} hidden={activeTab !== overviewTab}>{overview}</div>
+        <div data-workbook-panel={overviewTab} hidden={visibleActiveTab !== overviewTab}>{overview}</div>
         {hasGrammar ? (
-          <div data-workbook-panel="grammar" hidden={activeTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
+          <div data-workbook-panel="grammar" hidden={visibleActiveTab !== "grammar"} data-workbook-grammar={assignment.assignmentKey}>
             {grammar}
           </div>
         ) : null}
         {isCombinedDay1 ? (
-          <div data-workbook-panel="teil-2" hidden={activeTab !== "teil-2"} data-workbook-combined-section="reading-questions">
+          <div data-workbook-panel="teil-2" hidden={visibleActiveTab !== "teil-2"} data-workbook-combined-section="reading-questions">
             {sectionElements}
             <A1WorkbookSectionAction
               sections={availableSections}
@@ -382,7 +399,7 @@ export default function A1SharedAssignmentWorkbookLayout({
             <div
               key={element.props.sectionKey}
               data-workbook-panel={element.props.sectionKey}
-              hidden={activeTab !== element.props.sectionKey}
+              hidden={visibleActiveTab !== element.props.sectionKey}
             >
               {element}
               <A1WorkbookSectionAction
@@ -395,7 +412,7 @@ export default function A1SharedAssignmentWorkbookLayout({
         )}
         <div
           data-workbook-panel="submit"
-          hidden={activeTab !== "submit"}
+          hidden={visibleActiveTab !== "submit"}
           data-workbook-submission={assignment.assignmentKey}
         >
           {renderSubmission?.(assignment)}

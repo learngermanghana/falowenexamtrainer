@@ -233,6 +233,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
 
   const handleSubmissionCapture = async (event) => {
     const root = submitRootRef.current;
+    const timedAutoSubmit = event.target?.getAttribute?.("data-a1-timed-auto-submit") === "true";
     const visibleSubmissionText = root?.querySelector("textarea")?.value || "";
     const completeness = validateA1CanonicalSubmissionCompleteness({
       assignmentKey,
@@ -240,7 +241,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     });
     setSubmissionGuardMessage("");
 
-    if (!completeness.ok) {
+    if (!completeness.ok && !timedAutoSubmit) {
       event.preventDefault();
       event.stopPropagation();
       event.nativeEvent?.stopImmediatePropagation?.();
