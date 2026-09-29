@@ -141,14 +141,61 @@ function expandBrochureClass(rawClass = {}, defaults = {}) {
 
 function isBrochureClassOpen(course) {
   if (!course || course.publicVisible === false || course.registrationOpen === false) return false;
-  if (course.availability === "always") return true;
+  if (course.availability === "always" || course.availability === "enquiry") return true;
   if (!course.startDate) return false;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const start = new Date(`${course.startDate}T00:00:00`);
   const end = course.endDate ? new Date(`${course.endDate}T23:59:59`) : null;
   if (course.status === "active" && (!end || end >= today)) return true;
+  if (start <= today && end && end >= today) return true;
   return start >= today;
+}
+
+function buildFallbackClassList(staticData, defaults) {
+  const expanded = (staticData.classes || []).map((course) => expandBrochureClass(course, defaults));
+  const selfLearning = expanded.filter((course) => course.availability === "always");
+  const openLive = expanded.filter(
+    (course) => course.availability !== "always" && isBrochureClassOpen(course),
+  );
+  const liveLevels = ["A1", "A2", "B1"];
+  const liveByLevel = new Map(
+    liveLevels.map((level) => [
+      level,
+      openLive
+        .filter((course) => course.level === level)
+        .sort((a, b) => String(a.startDate || "9999-12-31").localeCompare(String(b.startDate || "9999-12-31"))),
+    ]),
+  );
+
+  const liveChoices = liveLevels.flatMap((level) => {
+    const existing = liveByLevel.get(level) || [];
+    if (existing.length) return existing;
+    return [
+      expandBrochureClass(
+        {
+          id: `${level.toLowerCase()}-next-live-class`,
+          slug: `${level.toLowerCase()}-next-live-class`,
+          title: `${level} Upcoming live class`,
+          level,
+          availability: "enquiry",
+          status: "enquiry",
+          city: "Accra",
+          startDate: "",
+          endDate: "",
+          meetingDays: [],
+          tuitionGhs: defaults.tuitionGhsByLevel?.[level],
+          location: defaults.location,
+          format: defaults.format,
+          registrationOpen: true,
+          publicVisible: true,
+        },
+        defaults,
+      ),
+    ];
+  });
+
+  return [...liveChoices, ...selfLearning];
 }
 
 async function fetchJsonNoCache(url) {
@@ -180,9 +227,8 @@ async function loadBrochureData() {
   const staticData = await fetchJsonNoCache("/classes/classes-data.json");
   writeBrochureDebug({ step: "staticDataLoaded", classCount: staticData?.classes?.length || 0, hasDefaults: Boolean(staticData?.classDefaults) });
   const defaults = staticData.classDefaults || {};
-  const staticSelfLearning = (staticData.classes || [])
-    .map((course) => expandBrochureClass(course, defaults))
-    .filter((course) => course.availability === "always");
+  const fallbackClasses = buildFallbackClassList(staticData, defaults);
+  const staticSelfLearning = fallbackClasses.filter((course) => course.availability === "always");
 
   try {
     const liveData = await fetchLiveClassCatalog();
@@ -203,12 +249,16 @@ async function loadBrochureData() {
     };
   } catch (error) {
     console.warn("Live Falowen class catalogue unavailable", error);
-    writeBrochureDebug({ step: "liveDataError", message: error?.message || String(error), fallbackSelfLearningCount: staticSelfLearning.length });
+    writeBrochureDebug({
+      step: "liveDataError",
+      message: error?.message || String(error),
+      fallbackClassCount: fallbackClasses.length,
+    });
     return {
       ...staticData,
       catalogSource: "fallback",
       catalogError: String(error?.message || error || "Live class API unavailable"),
-      classes: staticSelfLearning,
+      classes: fallbackClasses,
     };
   }
 }
@@ -244,20 +294,32 @@ function buildPaystackLink(course) {
 }
 
 function getUpcomingClasses() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const levelOrder = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
   return brochureData.classes
-    .filter((course) => course.availability === "always" || course.startDate)
-    .filter((course) => {
-      if (course.availability === "always") return true;
-      const start = new Date(`${course.startDate}T00:00:00`);
-      return start >= today;
-    })
+    .filter(isBrochureClassOpen)
     .sort((a, b) => {
+      const levelDiff = (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99);
+      if (levelDiff) return levelDiff;
       if (a.availability === "always" && b.availability !== "always") return 1;
       if (b.availability === "always" && a.availability !== "always") return -1;
-      return String(a.startDate || "9999").localeCompare(String(b.startDate || "9999"));
+      if (a.availability === "enquiry" && b.availability !== "enquiry") return 1;
+      if (b.availability === "enquiry" && a.availability !== "enquiry") return -1;
+      return String(a.startDate || "9999-12-31").localeCompare(String(b.startDate || "9999-12-31"));
     });
+}
+
+function getCourseStartLabel(course) {
+  if (course?.availability === "always") return "Start anytime";
+  if (course?.availability === "enquiry") return "Next class date to be announced";
+  return formatDate(course?.startDate);
+}
+
+function getCourseMeetingLabel(course) {
+  if (course?.availability === "always") return "Self-learning";
+  if (course?.availability === "enquiry") return "Schedule to be announced";
+  return course?.meetingDays?.length
+    ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
+    : "Schedule to be announced";
 }
 
 function getCourseList() {
@@ -413,7 +475,7 @@ function renderCatalogStatus() {
   notice.setAttribute("role", "status");
   notice.innerHTML = `
     <strong>Live class schedule temporarily unavailable</strong>
-    <p>Falowen is not showing saved historical live-class dates. Always-open programmes remain available while the live class service reconnects.</p>
+    <p>The live class service is reconnecting. A1–B1 remain available for enquiry, and any still-active saved class dates are kept visible without showing expired classes.</p>
     <a class="button" href="https://wa.me/233241113054" target="_blank" rel="noreferrer">Ask about the next live class</a>
   `;
 
@@ -577,20 +639,24 @@ function render() {
   renderAgreement(course, firstPayment, balance);
 
   setHtml("selectionNotice", courses.length
-    ? `<span>Next available class:</span><br><strong>${courses[0].title} starts ${formatDate(courses[0].startDate)}</strong>`
+    ? `<span>Available class:</span><br><strong>${courses[0].title} · ${getCourseStartLabel(courses[0])}</strong>`
     : "Available class options are shown below.");
 
   setText("blueClassTitle", `${course.language} ${course.level}`);
   setHtml("blueClassMeta", [
     `📍 ${course.city}`,
-    `📅 Starts ${formatDate(course.startDate)}`,
+    `📅 ${getCourseStartLabel(course)}`,
     course.endDate ? `🏁 Ends ${formatDate(course.endDate)}` : "",
   ].filter(Boolean).map((item) => `<span>${item}</span>`).join(""));
 
   setHtml("classPills", [
     `${course.language} ${course.level}`,
     course.city,
-    course.availability === "always" ? "Always open" : `Starts ${formatDate(course.startDate)}`,
+    course.availability === "always"
+      ? "Always open"
+      : course.availability === "enquiry"
+        ? "Next class date to be announced"
+        : `Starts ${formatDate(course.startDate)}`,
     course.endDate ? `Ends ${formatDate(course.endDate)}` : "",
   ].filter(Boolean).map((text) => `<span class="pill">${text}</span>`).join(""));
   setText("classTitle", course.title);
@@ -609,26 +675,32 @@ function render() {
   setHref("scheduleLink", classScheduleUrl);
   const scheduleLink = document.getElementById("scheduleLink");
   if (scheduleLink) scheduleLink.style.display = classScheduleUrl ? "inline-flex" : "none";
-  setHref("whatsappLink", `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title} starting ${formatDate(course.startDate)}.`)}`);
+  setHref("whatsappLink", `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title}. ${getCourseStartLabel(course)}.`)}`);
 
   setHtml("meetingRows", course.meetingDays?.length
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>Hybrid: in person or online</td></tr>`).join("")
-    : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`);
+    : course.availability === "always"
+      ? `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`
+      : `<tr><td colspan="3">The next live-class schedule will be announced.</td></tr>`);
 
-  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };\n  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
+  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };\n  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
 
   setText("scheduleHint", schedule.length
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
-    : "This track is self-learning, so there is no fixed live class schedule.");
+    : course.availability === "always"
+      ? "This track is self-learning, so there is no fixed live class schedule."
+      : "The next live-class schedule will be announced.");
   window.currentBrochureCourse = course;
   writeBrochureDebug({ step: "render:complete", renderedClassId: course.id, renderedSlug: course.slug, scheduleCount: schedule.length, hasPaymentLink: Boolean(paymentLink), hasScheduleUrl: Boolean(classScheduleUrl) });
 
   setHtml("scheduleList", schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
-    : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`);
+    : course.availability === "always"
+      ? `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`
+      : `<div class="session-row"><div class="session-num">•</div><div><div class="session-title">Next live class</div><div class="session-meta">The date and meeting times will be published when the next class is confirmed.</div></div></div>`);
 
   window.dispatchEvent(new CustomEvent("falowen:brochure-rendered", {
     detail: { course, shareUrl, classScheduleUrl, paymentLink },
