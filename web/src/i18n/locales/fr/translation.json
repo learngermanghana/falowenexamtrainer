@@ -1203,6 +1203,8 @@
     "objectiveReviewTitle": "Vérifiez vos réponses objectives",
     "objectiveReviewHelp": "Ouvrez l’exercice original pour comparer les réponses aux questions et revoir vos erreurs.",
     "feedbackTitle": "Feedback",
+    "showDetails": "Afficher le feedback et les détails",
+    "hideDetails": "Masquer le feedback et les détails",
     "empty": {
       "title": "Pas encore de résultats",
       "description": "Essayez une autre recherche ou terminez un examen pour voir des résultats ici.",
