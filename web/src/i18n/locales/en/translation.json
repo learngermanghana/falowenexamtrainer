@@ -1302,7 +1302,9 @@
     "bestScoreMet": "Best score {{score}} (≥ {{mark}})",
     "bestScoreNeeded": "Best score {{score}} (< {{mark}})",
     "belowPassMark": "Below pass mark ({{mark}})",
-    "openObjective": "Open objective",
+    "openObjective": "Review & cross-check objective answers",
+    "objectiveReviewTitle": "Cross-check your objective answers",
+    "objectiveReviewHelp": "Open the original exercise to compare these answers with the questions and review any mistakes.",
     "feedbackTitle": "Feedback",
     "empty": {
       "title": "No results yet",
