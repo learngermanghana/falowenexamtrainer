@@ -5,7 +5,9 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const webRoot = path.resolve(__dirname, "..");
+const repoRoot = path.resolve(webRoot, "..");
 const classCatalogPath = path.join(webRoot, "src", "data", "classCatalog.js");
+const curriculumPath = path.join(repoRoot, "shared", "curriculumCanonical.json");
 const outputPath = path.join(webRoot, "public", "classes", "classes-data.json");
 
 const source = fs
@@ -13,6 +15,26 @@ const source = fs
   .replace(/export\s+const\s+/g, "const ");
 
 const classCatalog = new Function(`${source}\nreturn classCatalog;`)();
+
+const curriculum = JSON.parse(fs.readFileSync(curriculumPath, "utf8"));
+
+const curriculumByLevel = curriculum.reduce((acc, entry) => {
+  const level = String(entry?.level || "").trim().toUpperCase();
+  const day = Number(entry?.day);
+  const title = String(entry?.title || "").trim();
+  if (!level || !Number.isFinite(day) || day <= 0 || !title) return acc;
+  if (!acc[level]) acc[level] = {};
+  const existing = Array.isArray(acc[level][day]) ? acc[level][day] : [];
+  if (!existing.includes(title)) existing.push(title);
+  acc[level][day] = existing;
+  return acc;
+}, {});
+
+Object.keys(curriculumByLevel).forEach((level) => {
+  Object.keys(curriculumByLevel[level]).forEach((day) => {
+    curriculumByLevel[level][day] = curriculumByLevel[level][day].join(" + ");
+  });
+});
 
 const LEVEL_PATTERN = /\b(A1|A2|B1|B2|C1|C2)\b/i;
 const CITY_PATTERN = /^\s*(A1|A2|B1|B2|C1|C2)\s+(.+?)\s+Klasse\s*$/i;
@@ -86,9 +108,9 @@ const data = {
     selfLearningFormat: "Self-learning with AI assistant and tutor support by email",
     selfLearningLocation: "Online",
     scheduleBaseUrl: "https://admin.falowen.app/course-schedule/public",
-    tuitionGhsByLevel: { A1: 3000, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
+    tuitionGhsByLevel: { A1: 2800, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
     totalSessionsByLevel: { A1: 24, A2: 28, B1: 28, B2: 28, C1: 28 },
-    sessionMinutesByLevel: { A1: 60, A2: 60, B1: 90, B2: 60, C1: 60 },
+    sessionMinutesByLevel: { A1: 60, A2: 90, B1: 90, B2: 60, C1: 60 },
     highlightsByLevel: {
       A1: ["Beginner German foundation", "Live class plus assignment support", "Falowen app access"],
       A2: ["Everyday German communication", "Speaking, writing, listening, and reading practice", "Falowen app support"],
@@ -96,6 +118,20 @@ const data = {
       B2: ["Flexible higher-level German", "AI-supported practice", "Tutor support by email"],
       C1: ["Advanced German communication", "Independent practice with support", "Professional-level writing and speaking"],
     },
+  },
+  curriculumByLevel,
+  coursePolicy: {
+    courseDurationWeeks: 10,
+    fullPaymentAccessMonths: 6,
+    installmentAccessMonths: 1,
+    extensionGhsPerMonth: 1000,
+    learningModes: ["In person", "Online", "Recorded lessons"],
+    certificateType: "Certificate of Completion",
+    officialCertificateNote:
+      "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+    paymentIssueContact: "info@falowen.app",
+    refundPolicy:
+      "Once payment is confirmed and learning access is granted, fees are non-refundable except where required by law.",
   },
   classes,
 };
