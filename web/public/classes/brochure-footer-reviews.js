@@ -64,10 +64,12 @@
 
   function positionReviewsCard(card) {
     if (!card) return;
+    const trackRecord = document.getElementById("academyTrackRecordCard");
     const leadCard = document.getElementById("leadCaptureCard");
     const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
     const anchor =
-      leadCard
+      trackRecord
+      || leadCard
       || classSummary
       || document.getElementById("payment-agreement-section")
       || document.getElementById("agreementCard")
