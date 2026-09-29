@@ -58,9 +58,9 @@
     const paymentText = document.getElementById("paymentSummary")?.textContent || "";
     const amounts = paymentText.match(/GHS\s*[\d,]+/g) || [];
     return {
-      full: rows[0]?.querySelector("b")?.textContent?.trim() || amounts[0] || "GHS 2,800",
+      full: rows[0]?.querySelector("b")?.textContent?.trim() || amounts[0] || "GHS 3,000",
       first: amounts[1] || "GHS 2,000",
-      balance: amounts[2] || "GHS 800",
+      balance: amounts[2] || "GHS 1,000",
     };
   }
 

@@ -110,7 +110,7 @@ const data = {
     selfLearningFormat: "Self-learning with AI assistant and tutor support by email",
     selfLearningLocation: "Online",
     scheduleBaseUrl: "https://admin.falowen.app/course-schedule/public",
-    tuitionGhsByLevel: { A1: 2800, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
+    tuitionGhsByLevel: { A1: 3000, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
     totalSessionsByLevel: { A1: 24, A2: 28, B1: 28, B2: 28, C1: 28 },
     sessionMinutesByLevel: { A1: 60, A2: 90, B1: 90, B2: 60, C1: 60 },
     highlightsByLevel: {
