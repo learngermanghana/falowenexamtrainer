@@ -268,6 +268,7 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
 
 const FeedbackDetailCard = ({ item, statusVariant }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const breakdownRows = getScoreBreakdownRows(item);
   const wrongObjectiveRows = getWrongObjectiveRows(item);
   const hasStructuredFeedback = hasStructuredResultFeedback(item);
@@ -359,6 +360,30 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
                 : "No questions need review"}
             </span>
           </div>
+          {item.link ? (
+            <div
+              style={{
+                marginTop: 2,
+                borderTop: "1px solid #bfdbfe",
+                paddingTop: 10,
+                display: "grid",
+                gap: 7,
+              }}
+            >
+              <strong>{t("resultHistory.objectiveReviewTitle")}</strong>
+              <p style={{ ...styles.helperText, margin: 0, color: "#334155" }}>
+                {t("resultHistory.objectiveReviewHelp")}
+              </p>
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}
+              >
+                {t("resultHistory.openObjective")}
+              </a>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
@@ -813,13 +838,27 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 ) : null}
               </div>
 
-              {item.link ? (
-                <div style={{ marginTop: 12 }}>
+              {item.link && !Number(item.objectiveTotal || 0) ? (
+                <div
+                  style={{
+                    marginTop: 12,
+                    border: "1px solid #dbeafe",
+                    borderRadius: 12,
+                    background: "#eff6ff",
+                    padding: 12,
+                    display: "grid",
+                    gap: 7,
+                  }}
+                >
+                  <strong>{t("resultHistory.objectiveReviewTitle")}</strong>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#334155" }}>
+                    {t("resultHistory.objectiveReviewHelp")}
+                  </p>
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+                    style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}
                   >
                     {t("resultHistory.openObjective")}
                   </a>
