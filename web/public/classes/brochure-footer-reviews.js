@@ -62,11 +62,27 @@
     return "★★★★★".slice(0, safeRating);
   }
 
+  function positionReviewsCard(card) {
+    if (!card) return;
+    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
+    const leadCard = document.getElementById("leadCaptureCard");
+    const anchor =
+      classSummary
+      || leadCard
+      || document.getElementById("payment-agreement-section")
+      || document.getElementById("agreementCard")
+      || document.querySelector(".page > section:last-of-type")
+      || document.querySelector(".page");
+    if (!anchor || anchor === card) return;
+    if (anchor.nextElementSibling !== card) anchor.insertAdjacentElement("afterend", card);
+  }
+
   function addReviewsCard() {
-    if (document.getElementById("studentReviewsCard")) return;
-    const agreement = document.getElementById("payment-agreement-section") || document.getElementById("agreementCard");
-    const anchor = agreement || document.querySelector(".page > section:last-of-type") || document.querySelector(".page");
-    if (!anchor) return;
+    const existing = document.getElementById("studentReviewsCard");
+    if (existing) {
+      positionReviewsCard(existing);
+      return;
+    }
 
     const card = document.createElement("section");
     card.id = "studentReviewsCard";
@@ -78,7 +94,7 @@
         <p class="student-review-empty">Loading student reviews…</p>
       </div>
     `;
-    anchor.insertAdjacentElement("afterend", card);
+    positionReviewsCard(card);
 
     fetch(REVIEWS_JSON_URL, { cache: "no-store" })
       .then((response) => {
@@ -154,5 +170,6 @@
   }
 
   window.addEventListener("load", run);
+  window.addEventListener("falowen:brochure-rendered", run);
   [300, 900, 1600].forEach((delay) => setTimeout(run, delay));
 })();
