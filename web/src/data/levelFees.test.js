@@ -2,9 +2,9 @@ import { computeTuitionStatus, getNextLevel, paystackLinkForLevel } from "./leve
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
-    const summary = computeTuitionStatus({ level: "A1", paidAmount: 2800 });
+    const summary = computeTuitionStatus({ level: "A1", paidAmount: 3000 });
 
-    expect(summary.tuitionFee).toBe(2800);
+    expect(summary.tuitionFee).toBe(3000);
     expect(summary.balanceDue).toBe(0);
     expect(summary.statusLabel).toBe("Paid");
     const checkoutUrl = new URL(summary.paystackLink);
@@ -17,8 +17,8 @@ describe("computeTuitionStatus", () => {
   it("uses the current A1 fee when nothing has been paid", () => {
     const summary = computeTuitionStatus({ level: "A1", paidAmount: 0 });
 
-    expect(summary.tuitionFee).toBe(2800);
-    expect(summary.balanceDue).toBe(2800);
+    expect(summary.tuitionFee).toBe(3000);
+    expect(summary.balanceDue).toBe(3000);
     expect(summary.statusLabel).toBe("Pending");
   });
 

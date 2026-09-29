@@ -8,7 +8,7 @@ describe("public class brochure experience", () => {
   test("generated brochure data owns canonical curriculum and shared policy", () => {
     const data = JSON.parse(publicClassFile("classes-data.json"));
 
-    expect(data.classDefaults.tuitionGhsByLevel.A1).toBe(2800);
+    expect(data.classDefaults.tuitionGhsByLevel.A1).toBe(3000);
     expect(data.classDefaults.tuitionGhsByLevel.A2).toBe(3000);
     expect(data.classDefaults.sessionMinutesByLevel.A1).toBe(60);
     expect(data.classDefaults.sessionMinutesByLevel.A2).toBe(90);
@@ -39,8 +39,8 @@ describe("public class brochure experience", () => {
       "utf8",
     );
 
-    expect(levelFees).toContain("A1: 2800");
-    expect(publicClasses).toContain("A1: 2800");
+    expect(levelFees).toContain("A1: 3000");
+    expect(publicClasses).toContain("A1: 3000");
     expect(publicClasses).toContain("A2: 90");
     expect(publicClasses).toContain("data.tuitionGhs || TUITION[level]");
     expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
