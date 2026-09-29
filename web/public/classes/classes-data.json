@@ -522,5 +522,15 @@
       "availability": "always",
       "title": "C1 Self-learning"
     }
-  ]
+  ],
+  "academyProfile": {
+    "academyName": "Learn Language Education Academy",
+    "formerName": "Learn German Ghana",
+    "establishedYear": 2022,
+    "germanLevels": "A1–C2",
+    "examPerformance": "high",
+    "examPassHeadline": "High exam pass rate",
+    "examPassDescription": "Our students have maintained a high pass rate in German language examinations.",
+    "overview": "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation."
+  }
 }
