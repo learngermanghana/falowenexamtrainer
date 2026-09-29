@@ -51,7 +51,7 @@ const COPY = {
     contact: "Need help? Chat with us on WhatsApp",
     metaTitle: "Falowen | Learn German A1–C2 Online & French Courses",
     metaDescription:
-      "Learn German A1–C2 online with Falowen plus French courses, structured lessons, tutor feedback, listening, writing, speaking, progress tracking and exam preparation.",
+      "Learn German A1–C2 with Falowen from Learn Language Education Academy, established in 2022, with structured lessons, tutor feedback, exam preparation and a high exam pass rate.",
   },
   de: {
     languageLabel: "Sprache",
@@ -99,7 +99,7 @@ const COPY = {
     contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
     metaTitle: "Falowen | Deutsch A1–C2 online lernen & Französischkurse",
     metaDescription:
-      "Lerne Deutsch und Französisch mit strukturierten Lektionen, Tutor-Feedback, Aufgaben, Fortschrittsanzeige und Prüfungsvorbereitung.",
+      "Lerne Deutsch A1–C2 mit Falowen von der Learn Language Education Academy, gegründet 2022, mit strukturierten Lektionen, Tutor-Feedback, Prüfungsvorbereitung und hoher Bestehensquote.",
   },
   fr: {
     languageLabel: "Langue",
@@ -147,7 +147,7 @@ const COPY = {
     contact: "Besoin d'aide ? Écrivez-nous sur WhatsApp",
     metaTitle: "Falowen | Cours d'allemand et de français",
     metaDescription:
-      "Apprenez l'allemand et le français avec des leçons structurées, des devoirs, des commentaires, le suivi des progrès et la préparation aux examens.",
+      "Apprenez l’allemand A1–C2 avec Falowen de Learn Language Education Academy, créée en 2022, avec des cours structurés, des retours de tuteur, une préparation aux examens et un taux de réussite élevé.",
   },
 };
 
