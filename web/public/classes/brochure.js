@@ -599,7 +599,8 @@ function render() {
     ["Balance after installment", `${formatMoney(balance)} after 1 month`],
   ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join(""));
   setHtml("highlights", (course.highlights || []).map((item) => `<li>${item}</li>`).join(""));
-  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due one month after the first payment.`);
+  const installmentAccessMonths = Number(brochureData?.coursePolicy?.installmentAccessMonths || 1);
+  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}.`);
   setHref("payLink", paymentLink);
   setHref("payHero", "/signup/");
   setHref("shareLink", shareUrl);
@@ -612,7 +613,7 @@ function render() {
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>Hybrid: in person or online</td></tr>`).join("")
     : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`);
 
-  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after 1 month\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
+  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
@@ -621,14 +622,15 @@ function render() {
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
     : "This track is self-learning, so there is no fixed live class schedule.");
   window.currentBrochureCourse = course;
-  window.dispatchEvent(new CustomEvent("falowen:brochure-rendered", {
-    detail: { course, shareUrl, classScheduleUrl, paymentLink },
-  }));
   writeBrochureDebug({ step: "render:complete", renderedClassId: course.id, renderedSlug: course.slug, scheduleCount: schedule.length, hasPaymentLink: Boolean(paymentLink), hasScheduleUrl: Boolean(classScheduleUrl) });
 
   setHtml("scheduleList", schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
     : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`);
+
+  window.dispatchEvent(new CustomEvent("falowen:brochure-rendered", {
+    detail: { course, shareUrl, classScheduleUrl, paymentLink },
+  }));
 }
 
 async function copyBrochureText() {
