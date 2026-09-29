@@ -381,8 +381,13 @@
     `;
 
     const leadCard = document.getElementById("leadCaptureCard");
+    if (leadCard) {
+      card.remove();
+      return;
+    }
+
     const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
-    const anchorNode = leadCard || classSummary || document.querySelector(".page");
+    const anchorNode = classSummary || document.querySelector(".page");
     if (!anchorNode || anchorNode === card) return;
     if (anchorNode.nextElementSibling !== card) anchorNode.insertAdjacentElement("afterend", card);
   }
