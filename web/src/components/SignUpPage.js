@@ -210,15 +210,18 @@ const restoreDraft = (form, draft) => {
 };
 
 const classNameFromQuery = () => {
-  const requested = new URLSearchParams(window.location.search).get("class");
+  const params = new URLSearchParams(window.location.search);
+  const requested = params.get("class");
   if (!requested) return "";
   const token = slugify(requested);
-  return (
-    Object.keys(classCatalog).find((name) => {
-      const details = classCatalog[name] || {};
-      return slugify(name) === token || slugify(details.slug) === token;
-    }) || ""
-  );
+  const matchedClass = Object.keys(classCatalog).find((name) => {
+    const details = classCatalog[name] || {};
+    return slugify(name) === token || slugify(details.slug) === token;
+  });
+  if (matchedClass) return matchedClass;
+
+  const enquiryMatch = token.match(/^(a1|a2|b1)-(?:next|upcoming)-live-class$/);
+  return enquiryMatch ? `${enquiryMatch[1].toUpperCase()} Upcoming live class` : "";
 };
 
 const ResumePanel = ({ draft }) => {

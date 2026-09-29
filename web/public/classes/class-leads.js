@@ -92,16 +92,25 @@
   }
 
   function getMeetingTimes(course) {
+    if (course?.availability === "always") return "Self-learning";
+    if (course?.availability === "enquiry") return "Schedule to be announced";
     return Array.isArray(course?.meetingDays) && course.meetingDays.length
       ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
-      : "Self-learning";
+      : "Schedule to be announced";
+  }
+
+  function getCourseStartLabel(course) {
+    if (course?.availability === "always") return "Start anytime";
+    if (course?.availability === "enquiry") return "Next class date to be announced";
+    return course?.startDate ? formatDate(course.startDate) : "Date to be announced";
   }
 
   function getCourseDateRange(course) {
     if (course?.availability === "always") return "Always open";
-    const start = course?.startDate ? `Starts ${formatDate(course.startDate)}` : "Start date not set";
-    const end = course?.endDate ? `Ends ${formatDate(course.endDate)}` : "End date not set";
-    return `${start} · ${end}`;
+    if (course?.availability === "enquiry") return "Next class date to be announced";
+    const start = course?.startDate ? `Starts ${formatDate(course.startDate)}` : "Start date to be announced";
+    const end = course?.endDate ? `Ends ${formatDate(course.endDate)}` : "";
+    return [start, end].filter(Boolean).join(" · ");
   }
 
   function getCourseFee(course, data) {
@@ -135,7 +144,7 @@
   function buildDecisionSummary(course, data) {
     if (!course) return "";
     const fee = formatMoney(getCourseFee(course, data));
-    const start = course?.availability === "always" ? "Start anytime" : formatDate(course?.startDate);
+    const start = getCourseStartLabel(course);
     const meetingTimes = getMeetingTimes(course);
     const location = getCourseLocation(course);
     const mode = getCourseMode(course, data);
@@ -162,8 +171,14 @@
         </div>
         <p class="lead-track-record-note">German language examinations generally · not limited to one exam provider.</p>
         <div class="lead-decision-actions">
-          <a class="button primary" id="leadRegisterDirect" href="/signup/?class=${encodeURIComponent(getCourseSlug(course))}">Register for this class</a>
-          <a class="button" id="leadScheduleDirect" href="${course?.scheduleUrl || "#"}" target="_blank" rel="noreferrer">View full schedule</a>
+          <a
+            class="button"
+            id="leadScheduleDirect"
+            href="${course?.scheduleUrl || "#"}"
+            target="_blank"
+            rel="noreferrer"
+            style="${course?.scheduleUrl ? "" : "display:none"}"
+          >View full schedule</a>
         </div>
         <a class="lead-placement-link" href="/placement-test">Not sure of your level? Take the free placement test.</a>
       </div>
@@ -334,10 +349,9 @@
     card.id = "leadCaptureCard";
     card.className = "card lead-capture-card";
     card.innerHTML = `
-      ${buildDecisionSummary(selected, data)}
       <div>
-        <h2>Save your details for this class</h2>
-        <p>You can review the class information above before sharing your details. Class names such as Berlin, Leipzig or Stuttgart are cohort names only; the actual in-person venue is shown separately.</p>
+        <h2>Enter your details to continue</h2>
+        <p>Fill in your details and choose your German level or class. The selected class information appears directly below the form fields.</p>
       </div>
       <form class="lead-capture-form" id="leadCaptureForm" novalidate>
         <div class="lead-form-grid">
@@ -386,6 +400,7 @@
           <pre id="leadDebugOutput">[]</pre>
         </details>
       </form>
+      ${buildDecisionSummary(selected, data)}
     `;
     hero.insertAdjacentElement("afterend", card);
 
@@ -404,7 +419,6 @@
     const decisionTimes = card.querySelector("#leadDecisionTimes");
     const decisionLocation = card.querySelector("#leadDecisionLocation");
     const decisionMode = card.querySelector("#leadDecisionMode");
-    const directRegister = card.querySelector("#leadRegisterDirect");
     const directSchedule = card.querySelector("#leadScheduleDirect");
     const nameInput = card.querySelector("#leadName");
     const emailInput = card.querySelector("#leadEmail");
@@ -430,15 +444,15 @@
       if (selectedSummary) selectedSummary.textContent = getClassSummary(course);
       if (decisionTitle) decisionTitle.textContent = getCourseTitle(course);
       if (decisionFee) decisionFee.textContent = formatMoney(getCourseFee(course, data));
-      if (decisionStart) decisionStart.textContent = course?.availability === "always" ? "Start anytime" : formatDate(course?.startDate);
+      if (decisionStart) decisionStart.textContent = getCourseStartLabel(course);
       if (decisionTimes) decisionTimes.textContent = getMeetingTimes(course);
       if (decisionLocation) decisionLocation.textContent = getCourseLocation(course);
       if (decisionMode) decisionMode.textContent = getCourseMode(course, data);
-      if (directRegister) directRegister.href = `/signup/?class=${encodeURIComponent(getCourseSlug(course))}`;
       if (directSchedule) {
         const scheduleUrl = course?.scheduleUrl || course?.docUrl || "";
-        directSchedule.href = scheduleUrl || url;
-        directSchedule.textContent = scheduleUrl ? "View full schedule" : "View full class details";
+        directSchedule.href = scheduleUrl || "#";
+        directSchedule.textContent = "View full schedule";
+        directSchedule.style.display = scheduleUrl ? "inline-flex" : "none";
       }
       writeDebug({ step: "syncSelectedClassInfo", selectedValue: select.value, url, classCount: classes.length, endDate: course?.endDate || "", location: getCourseLocation(course) });
     }
@@ -622,7 +636,7 @@
           .then((data) => ({
             ...data,
             catalogSource: "fallback",
-            classes: (data.classes || []).filter((course) => course.availability === "always"),
+            classes: data.classes || [],
           }));
 
     catalogPromise
