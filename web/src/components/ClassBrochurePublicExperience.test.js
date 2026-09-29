@@ -15,6 +15,13 @@ describe("public class brochure experience", () => {
     expect(data.classDefaults.sessionMinutesByLevel.B1).toBe(90);
     expect(data.curriculumByLevel.A2["16"]).toContain("Wohlbefinden und Entspannung");
     expect(data.curriculumByLevel.B1["1"]).toContain("Traumwelten");
+    expect(data.academyProfile).toEqual(
+      expect.objectContaining({
+        establishedYear: 2022,
+        germanLevels: "A1–C2",
+        examPassHeadline: "High exam pass rate",
+      }),
+    );
     expect(data.coursePolicy).toEqual(
       expect.objectContaining({
         courseDurationWeeks: 10,
@@ -39,15 +46,17 @@ describe("public class brochure experience", () => {
     expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
   });
 
-  test("student reviews prefer the visible lead card before the hidden class grid", () => {
+  test("student reviews follow the visible academy track record and lead card", () => {
     const reviews = publicClassFile("brochure-footer-reviews.js");
+    const trackIndex = reviews.indexOf('const trackRecord = document.getElementById("academyTrackRecordCard")');
     const leadIndex = reviews.indexOf('const leadCard = document.getElementById("leadCaptureCard")');
     const anchorIndex = reviews.indexOf("const anchor =");
-    const preferredLeadIndex = reviews.indexOf("leadCard\n      || classSummary");
+    const preferredTrackIndex = reviews.indexOf("trackRecord\n      || leadCard");
 
-    expect(leadIndex).toBeGreaterThan(-1);
+    expect(trackIndex).toBeGreaterThan(-1);
+    expect(leadIndex).toBeGreaterThan(trackIndex);
     expect(anchorIndex).toBeGreaterThan(leadIndex);
-    expect(preferredLeadIndex).toBeGreaterThan(anchorIndex);
+    expect(preferredTrackIndex).toBeGreaterThan(anchorIndex);
   });
 
   test("brochure schedule titles come from generated canonical curriculum, not a manual lesson table", () => {
@@ -90,6 +99,9 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("brochureMobileCta");
     expect(enhancements).toContain("getCoursePolicy");
     expect(enhancements).toContain("What happens after you register?");
+    expect(enhancements).toContain("academyTrackRecordCard");
+    expect(enhancements).toContain("High exam pass rate");
+    expect(enhancements).toContain("Established");
     expect(faq).toContain("window.FalowenClassBrochureData?.coursePolicy");
     expect(reviews).toContain("positionReviewsCard");
     expect(hero).toContain("classHeroBannerStyles");
@@ -98,6 +110,9 @@ describe("public class brochure experience", () => {
     expect(download).toContain("fullAccessMonths");
     expect(download).toContain("installmentAccessMonths");
     expect(download).toContain("isSelfLearning");
+    expect(download).toContain("pdf-track-record");
+    expect(download).toContain("academyProfile");
+    expect(download).toContain("High exam pass rate");
     expect(download).not.toContain("Includes six months of Falowen access");
   });
 });
