@@ -54,6 +54,19 @@
     };
   }
 
+  function getAcademyProfile() {
+    return {
+      academyName: "Learn Language Education Academy",
+      formerName: "Learn German Ghana",
+      establishedYear: 2022,
+      germanLevels: "A1–C2",
+      examPassHeadline: "High exam pass rate",
+      examPassDescription: "Our students have maintained a high pass rate in German language examinations.",
+      overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
+      ...(window.FalowenClassBrochureData?.academyProfile || {}),
+    };
+  }
+
   function getFeeData() {
     const rows = Array.from(document.querySelectorAll("#stats .stat"));
     const full = rows[0]?.querySelector("b")?.textContent?.trim() || "GHS 0";
@@ -122,6 +135,7 @@
     const { full, installment, balance } = getFeeData();
     const course = window.currentBrochureCourse || {};
     const policy = getCoursePolicy();
+    const academyProfile = getAcademyProfile();
     return {
       blueTitle,
       level,
@@ -136,6 +150,7 @@
       installment,
       balance,
       policy,
+      academyProfile,
       isSelfLearning: course.availability === "always",
       meetings: getMeetingRows(),
       reviews: getReviews(),
@@ -187,6 +202,7 @@
 
   function buildBrochure(data) {
     const policy = data.policy || getCoursePolicy();
+    const academyProfile = data.academyProfile || getAcademyProfile();
     const modes = policy.learningModes || ["In person", "Online", "Recorded lessons"];
     const isSelfLearning = Boolean(data.isSelfLearning);
     const courseDuration = Number(policy.courseDurationWeeks || 10);
@@ -235,6 +251,19 @@
             <p>${escapeHtml(classDescription)}</p>
           </div>
           <div class="pdf-meta-row">${meta}</div>
+        </section>
+
+        <section class="pdf-track-record">
+          <div class="pdf-track-record-intro">
+            <div class="pdf-small-label">OUR TRACK RECORD</div>
+            <p>${escapeHtml(academyProfile.overview)}</p>
+          </div>
+          <div class="pdf-track-record-grid">
+            <div><span>Established</span><strong>${escapeHtml(academyProfile.establishedYear)}</strong></div>
+            <div><span>Exam performance</span><strong>${escapeHtml(academyProfile.examPassHeadline)}</strong></div>
+            <div><span>German learning</span><strong>${escapeHtml(academyProfile.germanLevels)}</strong></div>
+          </div>
+          <small>German language examinations generally · not limited to one exam provider</small>
         </section>
 
         <section>
@@ -354,6 +383,14 @@
       .pdf-class-card { border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 18px; padding: 18px 20px; display: grid; gap: 12px; }
       .pdf-class-card h2 { font-size: 24px; margin-top: 4px; }
       .pdf-class-card p { color: #334155; font-size: 12px; line-height: 1.5; margin-top: 5px; }
+      .pdf-track-record { border: 1px solid #bfdbfe; border-radius: 16px; background: #ffffff; padding: 13px 15px; display: grid; gap: 9px; }
+      .pdf-track-record-intro { display: grid; gap: 4px; }
+      .pdf-track-record-intro p { color: #475569; font-size: 9.5px; line-height: 1.45; }
+      .pdf-track-record-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+      .pdf-track-record-grid > div { border-radius: 10px; background: #eff6ff; border: 1px solid #dbeafe; padding: 8px 9px; display: grid; gap: 3px; }
+      .pdf-track-record-grid span { color: #64748b; font-size: 7.5px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+      .pdf-track-record-grid strong { color: #0f172a; font-size: 10.5px; line-height: 1.3; }
+      .pdf-track-record > small { color: #64748b; font-size: 7.5px; }
       .pdf-meta-row { display: flex; flex-wrap: wrap; gap: 7px; }
       .pdf-meta-row span { border-radius: 999px; background: #ffffff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 7px 9px; font-size: 10px; font-weight: 800; }
       .pdf-section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 11px; }
