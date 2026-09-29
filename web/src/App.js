@@ -46,6 +46,8 @@ import DirectionsImperativePage from "./components/DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
 import DativeArticlesMitBeiZuPage from "./components/DativeArticlesMitBeiZuPage";
 import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
+import A1Day20GoetheWritingGrammarPage from "./components/A1Day20GoetheWritingGrammarPage";
+import A1Day20LetterWritingWorkbookPage from "./components/A1Day20LetterWritingWorkbookPage";
 import WeatherPerfektLetterPage from "./components/WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./components/HealthBodyPartsPage";
 import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
@@ -766,10 +768,13 @@ const AppShell = ({
             path="/campus/course/a1-12-2-dative-articles-mit-bei-zu"
             element={<DativeArticlesMitBeiZuPage />}
           />
-          <Route path="/campus/course/letter-writing-intro-12-3" element={<LetterWritingIntroPage />} />
+          <Route
+            path="/campus/course/letter-writing-intro-12-3"
+            element={<A1Day20GoetheWritingGrammarPage />}
+          />
           <Route
             path="/campus/course/letter-writing-intro-german-a1-day-12-3"
-            element={<LetterWritingIntroPage />}
+            element={<A1Day20LetterWritingWorkbookPage />}
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
