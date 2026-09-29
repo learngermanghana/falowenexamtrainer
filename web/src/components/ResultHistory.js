@@ -828,6 +828,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
           const isExpanded = expandedResultKeys.has(item.key);
+          const detailsId = `result-details-${String(item.key).replace(/[^a-zA-Z0-9_-]+/g, "-")}`;
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
           const studentMeta = [item.name, item.studentcode].filter(Boolean).join(" · ");
           const statusVariant =
@@ -915,7 +916,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 <button
                   type="button"
                   aria-expanded={isExpanded}
-                  aria-controls={`result-details-${item.key}`}
+                  aria-controls={detailsId}
                   style={{ ...styles.secondaryButton, width: "fit-content" }}
                   onClick={() => toggleResultDetails(item.key)}
                 >
@@ -924,7 +925,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               </div>
 
               {isExpanded ? (
-                <div id={`result-details-${item.key}`}>
+                <div id={detailsId}>
               {item.link && !Number(item.objectiveTotal || 0) ? (
                 <div
                   style={{
