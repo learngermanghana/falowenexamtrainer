@@ -29,11 +29,27 @@
   }
 
   function getFeeParts() {
+    const course = window.currentBrochureCourse || {};
+    const fullAmount = Number(course.tuitionGhs || 0);
+    const minimumInstallment = Number(window.FalowenClassBrochureData?.payment?.minimumInstallmentGhs || 2000);
+    if (fullAmount > 0) {
+      const firstAmount = Math.min(fullAmount, minimumInstallment);
+      const balanceAmount = Math.max(fullAmount - firstAmount, 0);
+      const money = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
+      return {
+        full: money(fullAmount),
+        first: money(firstAmount),
+        balance: money(balanceAmount),
+      };
+    }
+
     const rows = Array.from(document.querySelectorAll("#stats .stat"));
+    const paymentText = document.getElementById("paymentSummary")?.textContent || "";
+    const amounts = paymentText.match(/GHS\s*[\d,]+/g) || [];
     return {
-      full: rows[0]?.querySelector("b")?.textContent?.trim() || "GHS 2,800",
-      first: (rows[1]?.querySelector("b")?.textContent || "GHS 2,000").replace(/\s*first payment/i, "").trim(),
-      balance: (rows[2]?.querySelector("b")?.textContent || "GHS 800").replace(/\s*after 1 month/i, "").trim(),
+      full: rows[0]?.querySelector("b")?.textContent?.trim() || amounts[0] || "GHS 2,800",
+      first: amounts[1] || "GHS 2,000",
+      balance: amounts[2] || "GHS 800",
     };
   }
 
@@ -174,7 +190,10 @@
       text.textContent = "Check the fee, start date, meeting times and learning mode first. Register when the class fits your schedule.";
       const trust = document.createElement("div");
       trust.className = "hero-trust";
-      trust.innerHTML = "<span>Live class</span><span>Recordings</span><span>Falowen app</span>";
+      const isSelfLearning = window.currentBrochureCourse?.availability === "always";
+      trust.innerHTML = isSelfLearning
+        ? "<span>Self-learning</span><span>Flexible study</span><span>Falowen app</span>"
+        : "<span>Live class</span><span>Recordings</span><span>Falowen app</span>";
       text.insertAdjacentElement("afterend", trust);
       hero.dataset.heroTextReady = "true";
     }
@@ -291,14 +310,21 @@
 
   function addHybridModeCard() {
     const scheduleCta = document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
-    if (!scheduleCta || document.getElementById("classModeCard")) return;
+    if (!scheduleCta) return;
 
-    const card = document.createElement("div");
-    card.id = "classModeCard";
-    card.className = "class-mode-card";
+    let card = document.getElementById("classModeCard");
+    if (!card) {
+      card = document.createElement("div");
+      card.id = "classModeCard";
+      card.className = "class-mode-card";
+      scheduleCta.insertAdjacentElement("afterend", card);
+    }
+
+    const isSelfLearning = window.currentBrochureCourse?.availability === "always";
     const modes = getCoursePolicy().learningModes || ["In person", "Online", "Recorded lessons"];
-    card.innerHTML = `<h3>Class mode</h3><p>This class is flexible: ${modes.join(", ")}. Choose the suitable mode for each session.</p>`;
-    scheduleCta.insertAdjacentElement("afterend", card);
+    card.innerHTML = isSelfLearning
+      ? "<h3>Learning mode</h3><p>Self-learning: study independently in Falowen with flexible practice and available tutor support.</p>"
+      : `<h3>Class mode</h3><p>This class is flexible: ${modes.join(", ")}. Choose the suitable mode for each session.</p>`;
   }
 
   function addAfterSignupCard() {
