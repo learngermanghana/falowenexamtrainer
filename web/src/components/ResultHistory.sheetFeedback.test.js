@@ -42,8 +42,18 @@ describe("Sheet result feedback presentation", () => {
     expect(source).toContain("Questions to review");
     expect(source).toContain("No answer");
     expect(source).toContain("Correct answer");
-    expect(source).toContain(">Incorrect</td>");
+    expect(source).toContain(">Incorrect</span>");
     expect(source).toContain("Teil ${match[1]} – Question ${match[2]}");
     expect(source).not.toContain(">Wrong objective answers<");
+  });
+
+  test("objective cross-check action is prominent and explains what students should do", () => {
+    const source = fs.readFileSync(path.resolve(__dirname, "ResultHistory.js"), "utf8");
+
+    expect(source).toContain('t("resultHistory.objectiveReviewTitle")');
+    expect(source).toContain('t("resultHistory.objectiveReviewHelp")');
+    expect(source).toContain('t("resultHistory.openObjective")');
+    expect(source).toContain("...styles.primaryButton");
+    expect(source).toContain("item.link && !Number(item.objectiveTotal || 0)");
   });
 });
