@@ -4,6 +4,7 @@ const LIVE_CATALOG_ENDPOINTS = [
   "https://europe-west1-falowen-examiner-trainer.cloudfunctions.net/publicClassesCatalog",
 ];
 let brochureData = null;
+let brochureDataPromise = null;
 let selectedClassId = null;
 
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
@@ -210,6 +211,11 @@ async function loadBrochureData() {
       classes: staticSelfLearning,
     };
   }
+}
+
+function loadBrochureDataOnce() {
+  if (!brochureDataPromise) brochureDataPromise = loadBrochureData();
+  return brochureDataPromise;
 }
 
 function getRequestedSlug() {
@@ -635,9 +641,9 @@ async function copyBrochureText() {
 }
 
 window.addEventListener("popstate", () => render());
-window.FalowenLoadClassCatalog = loadBrochureData;
+window.FalowenLoadClassCatalog = loadBrochureDataOnce;
 
-loadBrochureData()
+loadBrochureDataOnce()
   .then((data) => {
     brochureData = data;
     window.FalowenClassBrochureData = data;
