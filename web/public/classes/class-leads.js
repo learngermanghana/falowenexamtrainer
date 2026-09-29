@@ -123,6 +123,15 @@
     return course?.format || data?.classDefaults?.format || "Hybrid: in person, online, or recorded lessons";
   }
 
+  function getAcademyProfile(data) {
+    return {
+      establishedYear: 2022,
+      germanLevels: "A1–C2",
+      examPassHeadline: "High exam pass rate",
+      ...(data?.academyProfile || {}),
+    };
+  }
+
   function buildDecisionSummary(course, data) {
     if (!course) return "";
     const fee = formatMoney(getCourseFee(course, data));
@@ -130,6 +139,7 @@
     const meetingTimes = getMeetingTimes(course);
     const location = getCourseLocation(course);
     const mode = getCourseMode(course, data);
+    const profile = getAcademyProfile(data);
     return `
       <div class="lead-decision-summary" id="leadDecisionSummary">
         <div class="lead-decision-heading">
@@ -145,6 +155,12 @@
           <div><span>Venue</span><strong id="leadDecisionLocation">${location}</strong></div>
           <div><span>Mode</span><strong id="leadDecisionMode">${mode}</strong></div>
         </div>
+        <div class="lead-track-record" aria-label="Academy track record">
+          <div><span>Established</span><strong>${profile.establishedYear}</strong></div>
+          <div><span>Exam performance</span><strong>${profile.examPassHeadline}</strong></div>
+          <div><span>German learning</span><strong>${profile.germanLevels}</strong></div>
+        </div>
+        <p class="lead-track-record-note">German language examinations generally · not limited to one exam provider.</p>
         <div class="lead-decision-actions">
           <a class="button primary" id="leadRegisterDirect" href="/signup/?class=${encodeURIComponent(getCourseSlug(course))}">Register for this class</a>
           <a class="button" id="leadScheduleDirect" href="${course?.scheduleUrl || "#"}" target="_blank" rel="noreferrer">View full schedule</a>
@@ -234,6 +250,11 @@
       .lead-decision-grid > div { display: grid; gap: 3px; border-radius: 10px; background: #ffffff; padding: 9px 10px; }
       .lead-decision-grid span { color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
       .lead-decision-grid strong { color: #1e293b; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+      .lead-track-record { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+      .lead-track-record > div { border: 1px solid #bfdbfe; border-radius: 10px; background: #ffffff; padding: 9px; display: grid; gap: 3px; }
+      .lead-track-record span { color: #64748b; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; }
+      .lead-track-record strong { color: #0f172a; font-size: 12px; line-height: 1.35; }
+      .lead-track-record-note { margin: -3px 0 0; color: #64748b; font-size: 11px; line-height: 1.45; }
       .lead-decision-actions { display: grid; gap: 8px; }
       .lead-placement-link { width: fit-content; color: #1d4ed8; font-size: 13px; font-weight: 850; text-decoration: none; }
       .lead-capture-card p { margin: 0; color: #334155; line-height: 1.6; font-size: 14px; }
@@ -258,11 +279,15 @@
       .lead-debug { display: none; border: 1px dashed #93c5fd; border-radius: 12px; padding: 8px 10px; background: #eff6ff; color: #1e3a8a; font-size: 12px; }
       .lead-debug.active { display: block; }
       .lead-debug pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
+      @media (max-width: 560px) {
+        .lead-track-record { grid-template-columns: 1fr; }
+      }
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
         .lead-actions { grid-template-columns: 1fr 1fr; }
         .lead-decision-actions { grid-template-columns: 1.4fr 1fr; }
+        .lead-track-record { grid-template-columns: repeat(3, minmax(0, 1fr)); }
       }
     `;
     document.head.appendChild(style);
