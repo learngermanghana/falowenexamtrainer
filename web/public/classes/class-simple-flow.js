@@ -55,7 +55,12 @@
   }
 
   function signupUrl(slug) {
-    return slug ? "/signup/?class=" + encodeURIComponent(slug) : "/signup/";
+    var token = cleanSlug(slug || "");
+    var enquiryMatch = token.match(/^(a1|a2|b1)-(?:next|upcoming)-live-class$/);
+    if (enquiryMatch) {
+      return "/signup/?level=" + encodeURIComponent(enquiryMatch[1].toUpperCase()) + "&enquiry=1";
+    }
+    return token ? "/signup/?class=" + encodeURIComponent(token) : "/signup/";
   }
 
   function setText(element, value) {
