@@ -693,7 +693,8 @@ function render() {
       ? `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`
       : `<tr><td colspan="3">The next live-class schedule will be announced.</td></tr>`);
 
-  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };\n  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl}`;
+  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };
+  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
