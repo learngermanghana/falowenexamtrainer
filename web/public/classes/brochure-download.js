@@ -142,12 +142,22 @@
     };
   }
 
-  function benefitCards(level) {
+  function benefitCards(level, isSelfLearning = false) {
     const examLabel = level === "A1" ? "A1 exam preparation" : `${level} exam-style preparation`;
+    if (isSelfLearning) {
+      return [
+        ["Flexible study", "Work through Falowen lessons and practice on your own schedule."],
+        ["Tutor support", "Use available tutor support when you need guidance."],
+        ["Falowen practice", "Grammar, vocabulary, speaking and writing support."],
+        ["Progress tracking", "Results and learning progress in one place."],
+        ["Structured course", "Follow the level curriculum instead of studying random topics."],
+        ["Exam readiness", `${examLabel} and revision support.`],
+      ];
+    }
     return [
       ["Live lessons", "Structured teaching with clear weekly targets."],
       ["Tutor feedback", "Assignments are reviewed so you know what to improve."],
-      ["Recorded lectures", "Catch up when you cannot attend a live session."],
+      ["Recorded lessons", "Catch up when you cannot attend a live session."],
       ["Falowen practice", "Grammar, vocabulary, speaking and writing support."],
       ["Progress tracking", "Results, attendance and learning progress in one place."],
       ["Exam readiness", `${examLabel} and revision support.`],
@@ -193,7 +203,7 @@
       ? `This programme is self-learning and can be started after registration and access activation.`
       : `${data.classTitle} is the cohort name. Classes take place in ${data.location} and online.`;
     const meetingSubtitle = isSelfLearning ? "Study on your own schedule" : "Join in Awoshie or online";
-    const benefits = benefitCards(data.level)
+    const benefits = benefitCards(data.level, isSelfLearning)
       .map(([title, description]) => `
         <div class="pdf-benefit"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(description)}</span></div>
       `).join("");
