@@ -490,18 +490,34 @@ function renderAgreement(course, firstPayment, balance) {
   const list = document.getElementById("agreementList");
   if (!intro || !list) return;
 
+  const policy = {
+    courseDurationWeeks: 10,
+    fullPaymentAccessMonths: 6,
+    installmentAccessMonths: 1,
+    extensionGhsPerMonth: 1000,
+    learningModes: ["In person", "Online", "Recorded lessons"],
+    certificateType: "Certificate of Completion",
+    officialCertificateNote:
+      "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+    paymentIssueContact: "info@falowen.app",
+    refundPolicy:
+      "Once payment is confirmed and learning access is granted, fees are non-refundable except where required by law.",
+    ...(brochureData?.coursePolicy || {}),
+  };
+  const learningModes = (policy.learningModes || []).join(", ");
+
   intro.textContent = `This Payment Agreement is entered into on ${today} for ${course.title} students of Learn Language Education Academy and Felix Asadu (“Teacher”).`;
   const terms = [
-    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}. The fee is the same regardless of learning mode: online, in person, self-learning, or recorded lectures.`,
-    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. Minimum first installment is ${formatMoney(firstPayment)}.`,
-    `<strong>Learning Mode & Attendance Rights:</strong> For each scheduled class session, the student may join in person, online, or via recorded lecture, and is responsible for choosing and attending in their preferred way each time.`,
-    `<strong>Class Duration & Contract Term:</strong> This class runs from ${formatDate(course.startDate)} to ${formatDate(course.endDate)}. The service provides a 6-month contract period from enrollment, during which the student has access to Falowen, even after the scheduled class sessions end.`,
-    `<strong>Post-Contract Access:</strong> After 6 months, continued access requires either an extension at GHS 1,000 per month or enrollment in a new class at the then-current fee.`,
+    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}.`,
+    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. The starter installment gives ${policy.installmentAccessMonths} month of access until the balance is due.`,
+    `<strong>Learning Mode & Attendance Rights:</strong> Available learning modes are ${learningModes}. The student may choose the suitable mode for each scheduled session.`,
+    `<strong>Class Duration & Contract Term:</strong> The taught course is approximately ${policy.courseDurationWeeks} weeks. Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access from enrollment, including revision time after the scheduled classes end.`,
+    `<strong>Post-Contract Access:</strong> After ${policy.fullPaymentAccessMonths} months, continued access can be extended at GHS ${Number(policy.extensionGhsPerMonth || 0).toLocaleString("en-GH")} per month or by enrolling in a new class at the current fee.`,
     `<strong>Attendance:</strong> Attendance is recorded for each session in My Results & Resources.`,
-    `<strong>Certification:</strong> Certificates are issued upon successful completion and assignment submission. This is a Certificate of Completion, not a Goethe-Institut certificate. Where official language certification is required, the student must sit the exam at Goethe-Institut or another recognized provider.`,
-    `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms. No refund will be made.`,
-    `<strong>Refunds:</strong> Once payment is confirmed and access is granted, no refunds will be provided except where required by law.`,
-    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes. If you have payment issues, contact info@falowen.app or use WhatsApp support.`,
+    `<strong>Certification:</strong> Falowen issues a ${policy.certificateType} upon successful completion and required assignment submission. ${policy.officialCertificateNote}`,
+    `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms.`,
+    `<strong>Refunds:</strong> ${policy.refundPolicy}`,
+    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes. If you have payment issues, contact ${policy.paymentIssueContact} or use WhatsApp support.`,
     `<strong>Class Level & Start Date:</strong> Level, dates, and fees are shown on this page and may vary by cohort. Confirm your class details before paying. By making any payment, you acknowledge and agree to these terms.`,
   ];
   list.innerHTML = terms.map((term) => `<li>${term}</li>`).join("");
