@@ -2,8 +2,9 @@ import { computeTuitionStatus, getNextLevel, paystackLinkForLevel } from "./leve
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
-    const summary = computeTuitionStatus({ level: "A1", paidAmount: 3000 });
+    const summary = computeTuitionStatus({ level: "A1", paidAmount: 2800 });
 
+    expect(summary.tuitionFee).toBe(2800);
     expect(summary.balanceDue).toBe(0);
     expect(summary.statusLabel).toBe("Paid");
     const checkoutUrl = new URL(summary.paystackLink);
@@ -11,6 +12,14 @@ describe("computeTuitionStatus", () => {
     expect(checkoutUrl.origin + checkoutUrl.pathname).toBe(paystackLinkForLevel("A1"));
     expect(checkoutUrl.searchParams.get("amount")).toBeNull();
     expect(checkoutUrl.searchParams.get("redirect_url")).toBe("https://www.falowen.app/payment-complete");
+  });
+
+  it("uses the current A1 fee when nothing has been paid", () => {
+    const summary = computeTuitionStatus({ level: "A1", paidAmount: 0 });
+
+    expect(summary.tuitionFee).toBe(2800);
+    expect(summary.balanceDue).toBe(2800);
+    expect(summary.statusLabel).toBe("Pending");
   });
 
   it("returns partial when some amount is paid but balance remains", () => {
