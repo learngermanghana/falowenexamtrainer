@@ -14,7 +14,7 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
-const hasFinalResultFeedbackPresentation = [
+const hasLegacyFinalResultFeedbackPresentation = [
   "hasStructuredResultFeedback",
   "getImproveLessonDestination",
   'data-result-recovery="true"',
@@ -22,6 +22,18 @@ const hasFinalResultFeedbackPresentation = [
   "Your previous submission stays in Falowen",
   "recoveryFromResults: true",
 ].every((marker) => source.includes(marker));
+
+const hasModernResultFeedbackPresentation = [
+  "hasStructuredResultFeedback",
+  "buildResultResubmitTarget",
+  "CURRICULUM_ENTRIES",
+  "getConfiguredInAppWorkbookResourceRoute",
+  't("resultHistory.objectiveReviewTitle")',
+  "expandedResultKeys",
+].every((marker) => source.includes(marker));
+
+const hasFinalResultFeedbackPresentation =
+  hasLegacyFinalResultFeedbackPresentation || hasModernResultFeedbackPresentation;
 
 if (!hasFinalResultFeedbackPresentation) {
 replaceOnce(
@@ -290,7 +302,7 @@ if (source.includes("Improve and resubmit") || source.includes("/campus/course?s
 
 
 } else {
-  console.log("Results feedback presentation already has the final recovery structure; legacy rewrite skipped.");
+  console.log("Results feedback presentation already uses the current structured feedback and exact resubmission flow; legacy rewrite skipped.");
 }
 
 fs.writeFileSync(resultHistoryPath, source, "utf8");
