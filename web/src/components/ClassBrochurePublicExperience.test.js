@@ -123,6 +123,17 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("removeStickyMobileRegisterBar");
   });
 
+  test("synthetic enquiry classes hand signup a supported level instead of an unresolved class slug", () => {
+    const flow = publicClassFile("class-simple-flow.js");
+    const enhancements = publicClassFile("brochure-enhancements.js");
+
+    expect(flow).toContain('(?:next|upcoming)-live-class');
+    expect(flow).toContain('"&enquiry=1"');
+    expect(enhancements).toContain('course.availability === "enquiry"');
+    expect(enhancements).toContain('&enquiry=1');
+    expect(enhancements).toContain('params.set("level", level)');
+  });
+
   test("mobile registration, policy copy, and student proof are maintained by brochure enhancements", () => {
     const enhancements = publicClassFile("brochure-enhancements.js");
     const faq = publicClassFile("brochure-faq.js");
