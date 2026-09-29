@@ -12,6 +12,19 @@ describe("signup class cards and payment start choice", () => {
     expect(source).toContain("Recommended for you");
   });
 
+  test("keeps brochure enquiry levels selectable when no concrete class is returned", () => {
+    const legacy = read("SignUpPageLegacy.js");
+    const wrapper = read("SignUpPage.js");
+
+    expect(legacy).toContain("signupQueryContext");
+    expect(legacy).toContain('params.get("enquiry") === "1"');
+    expect(legacy).toContain("Upcoming live class — date to be announced");
+    expect(legacy).toContain('option.source === "firestore"');
+    expect(legacy).toContain('option.source === "enquiry"');
+    expect(wrapper).toContain('(?:next|upcoming)-live-class');
+    expect(wrapper).toContain("Upcoming live class");
+  });
+
   test("offers trial, full payment and part payment as distinct start choices", () => {
     const source = read("SignUpPageLegacy.js");
     expect(source).toContain('value: "trial"');
