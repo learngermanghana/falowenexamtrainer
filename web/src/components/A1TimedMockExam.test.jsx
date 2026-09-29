@@ -86,7 +86,9 @@ describe("A1 timed mock exam", () => {
       <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
         <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
           <div data-a1-built-in-submission>
-            <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="true">
+              <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+            </div>
           </div>
         </A1TimedMockExam>
       </MemoryRouter>,
@@ -95,6 +97,34 @@ describe("A1 timed mock exam", () => {
     jest.advanceTimersByTime(200);
     expect(handleSubmit).toHaveBeenCalledTimes(1);
     expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).not.toBeNull();
+  });
+
+  test("waits for the cloud draft check before auto-submitting", () => {
+    window.localStorage.setItem(
+      buildA1MockExamStorageKey("A1-12.3"),
+      JSON.stringify({ endsAt: Date.now() - 1000 }),
+    );
+    const handleSubmit = jest.fn((event) => event.preventDefault());
+
+    render(
+      <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
+        <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
+          <div data-a1-built-in-submission>
+            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="false">
+              <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+            </div>
+          </div>
+        </A1TimedMockExam>
+      </MemoryRouter>,
+    );
+
+    jest.advanceTimersByTime(200);
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    document.querySelector('[data-cloud-draft-persistence="react-owned"]')
+      .setAttribute("data-draft-submit-ready", "true");
+    jest.advanceTimersByTime(200);
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
   test("only clears the persisted timed session after verified submission", () => {
