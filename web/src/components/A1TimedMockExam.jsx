@@ -104,7 +104,10 @@ export default function A1TimedMockExam({ assignment, children = null }) {
       attempts += 1;
       const form = document.querySelector('[data-a1-built-in-submission] form');
       const submitButton = form?.querySelector('button[type="submit"]');
-      if (form && submitButton) {
+      const cloudDraftRoot = form?.closest('[data-a1-built-in-submission]')
+        ?.querySelector('[data-cloud-draft-persistence="react-owned"]');
+      const cloudDraftReady = cloudDraftRoot?.getAttribute("data-draft-submit-ready") === "true";
+      if (form && submitButton && (!submitButton.disabled || cloudDraftReady)) {
         form.setAttribute("data-a1-timed-auto-submit", "true");
         window.clearInterval(timer);
         form.requestSubmit();

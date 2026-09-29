@@ -894,6 +894,7 @@ const VerifiedCloudDraftSubmissionPage = ({
     "data-draft-last-saved-at": cloudState.savedAt ? cloudState.savedAt.toISOString() : "",
     "data-draft-local-dirty": cloudState.localDirty ? "true" : "false",
     "data-draft-conflict": pendingRemoteDraft ? "true" : "false",
+    "data-draft-submit-ready": ready && !status.loading ? "true" : "false",
     "data-draft-remote-updated-at": cloudState.remoteUpdatedAt || "",
     "data-draft-remote-source": cloudState.remoteSource || "",
     "data-final-submission-state": finalSubmissionState.state,
