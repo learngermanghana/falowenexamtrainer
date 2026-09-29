@@ -1,51 +1,74 @@
 (function () {
-  const FAQS = [
-    {
-      question: "How do I enroll and get access to Falowen?",
-      answer:
-        "Go to www.falowen.app, click Sign up and create an account. Then open Upcoming Classes, choose your class, and pay. After payment, you get automatic access and the school will contact you in the app.",
-    },
-    {
-      question: "Do online, in-person, self-learning, or recorded lectures cost the same?",
-      answer:
-        "Yes. The fee is the same for all learning modes. For each session, you may join in person, online, or via recorded lecture. You decide each time. Class duration is 10 weeks, about 3 months. Full payment gives 6 months total access to Falowen from enrollment. After 6 months, you can extend at GHS 1,000 per month or enroll in a new 10-week class.",
-    },
-    {
-      question: "Can I continue learning to B1 or B2 if I did not write the A1 or A2 exam?",
-      answer:
-        "Yes. You can keep learning until you reach the level you need for your goal. For example, if your target is B1 or B2, you can study step by step until you are ready for that level before registering for the official exam. You do not have to stop learning just because you have not written the A1 or A2 exam yet. Our courses are structured to help you build from one level to the next and keep your knowledge updated, even while you are waiting for your preferred exam date.",
-    },
-    {
-      question: "Do I receive a certificate upon completion?",
-      answer:
-        "Yes. Certificates are awarded when you successfully complete the course and have submitted all required assignments.",
-    },
-    {
-      question: "Does the Falowen certificate replace a Goethe certificate?",
-      answer:
-        "No. Falowen issues a Certificate of Completion. It is not an official Goethe-Institut certificate and does not replace embassy, school, university, or employer requirements. When official language certification is required, you must write the exam with Goethe-Institut or another recognized exam provider.",
-    },
-    {
-      question: "Where can I download my receipts, letter of enrollment, results, and attendance?",
-      answer:
-        "All official documents are available in your account under My Results & Resources. Please download and keep your own copies.",
-    },
-    {
-      question: "How will I receive my assignment results?",
-      answer:
-        "You will receive an email for each assignment. If you opt in, you may also receive Telegram notifications.",
-    },
-    {
-      question: "Do I get weekly progress summaries?",
-      answer:
-        "Yes. We send weekly summaries that include your average score and learning streaks.",
-    },
-    {
-      question: "What if I have payment or access issues?",
-      answer:
-        "Please check your email, including spam or junk, and your Falowen account. If the issue continues, contact info@falowen.app or chat on WhatsApp using the link on this page.",
-    },
-  ];
+  const DEFAULT_POLICY = {
+    courseDurationWeeks: 10,
+    fullPaymentAccessMonths: 6,
+    installmentAccessMonths: 1,
+    extensionGhsPerMonth: 1000,
+    learningModes: ["In person", "Online", "Recorded lessons"],
+    certificateType: "Certificate of Completion",
+    officialCertificateNote:
+      "Falowen completion certificates do not replace Goethe-Institut or another recognized official language certificate when an official certificate is required.",
+  };
+
+  function getPolicy() {
+    return { ...DEFAULT_POLICY, ...(window.FalowenClassBrochureData?.coursePolicy || {}) };
+  }
+
+  function getFaqs() {
+    const policy = getPolicy();
+    const modes = (policy.learningModes || DEFAULT_POLICY.learningModes).join(", ");
+    return [
+      {
+        question: "How do I enroll and get access to Falowen?",
+        answer:
+          "Go to www.falowen.app, click Sign up and create an account. Then open Upcoming Classes, choose your class, and pay. After payment, your learning access is activated and the class appears in Campus.",
+      },
+      {
+        question: "What learning modes are available and how long is the course?",
+        answer:
+          `Available learning modes are ${modes}. The taught course is approximately ${policy.courseDurationWeeks} weeks. Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access from enrollment, while the starter installment gives ${policy.installmentAccessMonths} month of access until the balance is due.`,
+      },
+      {
+        question: "Can I continue learning to B1 or B2 if I did not write the A1 or A2 exam?",
+        answer:
+          "Yes. You can keep learning until you reach the level you need for your goal. You do not have to stop learning because you have not written an earlier official exam yet.",
+      },
+      {
+        question: "Do I receive a certificate upon completion?",
+        answer:
+          `Yes. Falowen awards a ${policy.certificateType} when you successfully complete the course and required assignments.`,
+      },
+      {
+        question: "Does the Falowen certificate replace a Goethe certificate?",
+        answer: policy.officialCertificateNote,
+      },
+      {
+        question: "What happens after my Falowen access period ends?",
+        answer:
+          `After ${policy.fullPaymentAccessMonths} months, you can extend access at GHS ${Number(policy.extensionGhsPerMonth || 0).toLocaleString("en-GH")} per month or enroll in a new class at the current fee.`,
+      },
+      {
+        question: "Where can I download my receipts, letter of enrollment, results, and attendance?",
+        answer:
+          "All official documents are available in your account under My Results & Resources. Please download and keep your own copies.",
+      },
+      {
+        question: "How will I receive my assignment results?",
+        answer:
+          "You will receive an email for each assignment. Your marked work and feedback are also available in Falowen.",
+      },
+      {
+        question: "Do I get weekly progress summaries?",
+        answer:
+          "Yes. Falowen sends weekly progress summaries with your learning activity and performance information.",
+      },
+      {
+        question: "What if I have payment or access issues?",
+        answer:
+          "Please check your email, including spam or junk, and your Falowen account. If the issue continues, contact info@falowen.app or use the WhatsApp link on this page.",
+      },
+    ];
+  }
 
   function injectStyles() {
     if (document.getElementById("brochureFaqStyles")) return;
@@ -89,7 +112,7 @@
       <h2>Frequently Asked Questions</h2>
       <p class="faq-intro">Quick answers about enrollment, access, learning mode, exams, documents, and support.</p>
       <div class="faq-list">
-        ${FAQS.map((faq, index) => `
+        ${getFaqs().map((faq, index) => `
           <div class="faq-item">
             <button class="faq-question" type="button" aria-expanded="${index === 0 ? "true" : "false"}" aria-controls="faq-answer-${index}">
               <span>${faq.question}</span>
@@ -121,5 +144,6 @@
   }
 
   window.addEventListener("load", run);
+  window.addEventListener("falowen:brochure-rendered", run);
   [300, 900, 1600].forEach((delay) => setTimeout(run, delay));
 })();
