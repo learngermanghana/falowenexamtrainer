@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE } from "../data/a1Day20LetterWritingRoutes";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
+import "./A1Day20LetterWritingWorkbookPage.css";
 
 const sectionStyle = {
   ...styles.card,
@@ -102,7 +103,7 @@ const WorkbookOverview = () => (
 );
 
 const InformalLetterSection = () => (
-  <section style={questionCardStyle} data-a1-letter-task="informal">
+  <section className="a1-day20-letter-task" style={questionCardStyle} data-a1-letter-task="informal">
     <span style={{ ...eyebrowStyle, background: "#dcfce7", color: "#166534" }}>
       Letter 1 · Informal
     </span>
@@ -131,6 +132,13 @@ const InformalLetterSection = () => (
         Anrede, einen Gruß und Ihren Namen.
       </p>
     </InfoBox>
+    <div className="a1-day20-write-here" data-a1-day20-write-here="teil-1">
+      <div className="a1-day20-write-here__prompt">
+        <strong>Write Teil 1 here</strong>
+        <span>Answer the four points above, then ask Falowen to mark your draft.</span>
+      </div>
+      <InformalLetterPractice />
+    </div>
     <InfoBox title="Use">
       <BulletList
         items={[
@@ -144,12 +152,11 @@ const InformalLetterSection = () => (
         ]}
       />
     </InfoBox>
-    <InformalLetterPractice />
   </section>
 );
 
 const FormalLetterSection = () => (
-  <section style={questionCardStyle} data-a1-letter-task="formal">
+  <section className="a1-day20-letter-task" style={questionCardStyle} data-a1-letter-task="formal">
     <span style={{ ...eyebrowStyle, background: "#ffedd5", color: "#9a3412" }}>
       Letter 2 · Formal
     </span>
@@ -178,6 +185,13 @@ const FormalLetterSection = () => (
         Anrede, einen formellen Gruß und Ihren vollständigen Namen.
       </p>
     </InfoBox>
+    <div className="a1-day20-write-here" data-a1-day20-write-here="teil-2">
+      <div className="a1-day20-write-here__prompt">
+        <strong>Write Teil 2 here</strong>
+        <span>Answer the four points above, then ask Falowen to mark your draft.</span>
+      </div>
+      <FormalLetterPractice />
+    </div>
     <InfoBox title="Use">
       <BulletList
         items={[
@@ -193,7 +207,6 @@ const FormalLetterSection = () => (
         ]}
       />
     </InfoBox>
-    <FormalLetterPractice />
   </section>
 );
 

@@ -1,0 +1,62 @@
+.a1-day20-write-here {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.a1-day20-write-here__prompt {
+  align-items: flex-start;
+  background: #ecfdf5;
+  border: 1px solid #86efac;
+  border-radius: 14px;
+  color: #14532d;
+  display: grid;
+  gap: 3px;
+  line-height: 1.5;
+  padding: 12px 14px;
+}
+
+.a1-day20-write-here__prompt strong {
+  font-size: 1rem;
+}
+
+.a1-day20-write-here > [data-a1-course-book-letter-practice="true"] {
+  min-width: 0;
+}
+
+.a1-day20-write-here textarea {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .a1-day20-letter-task {
+    border-radius: 14px !important;
+    gap: 12px !important;
+    padding: 12px !important;
+  }
+
+  .a1-day20-letter-task > div,
+  .a1-day20-write-here,
+  .a1-day20-write-here > [data-a1-course-book-letter-practice="true"] {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .a1-day20-write-here > [data-a1-course-book-letter-practice="true"] {
+    border-radius: 14px !important;
+    padding: 12px !important;
+  }
+
+  .a1-day20-write-here textarea {
+    font-size: 16px;
+    min-height: 250px;
+  }
+
+  .a1-day20-write-here button {
+    min-height: 44px;
+  }
+}

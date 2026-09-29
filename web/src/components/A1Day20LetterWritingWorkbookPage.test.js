@@ -6,6 +6,13 @@ jest.mock("./A1CanonicalSubmissionPanel", () => ({ assignment }) => (
   <div data-testid="canonical-submit">Submit {assignment.assignmentKey}</div>
 ));
 
+jest.mock("./A1TutorDraftSectionCapture", () => () => null);
+jest.mock("./A1TimedMockExam", () => ({
+  __esModule: true,
+  default: ({ children }) => children,
+  useA1TimedMockExam: () => ({ assignmentLocked: false }),
+}));
+
 jest.mock("./A1CourseBookLetterPracticePanel", () => ({
   title,
   taskId,
@@ -49,7 +56,7 @@ describe("A1 Day 20 letter-writing workbook", () => {
     const overviewTab = screen.getByRole("tab", { name: "Overview" });
     const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Informal letter/i });
     const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · Formal letter/i });
-    const submitTab = screen.getByRole("tab", { name: "Submit Assignment" });
+    const submitTab = screen.getByRole("tab", { name: "Review & Submit" });
 
     expect(grammarTab).toHaveAttribute("aria-selected", "true");
     expect(overviewTab).toHaveAttribute("aria-selected", "false");
@@ -106,5 +113,16 @@ describe("A1 Day 20 letter-writing workbook", () => {
     );
     expect(informal.getAttribute("data-task-context")).toContain("informal");
     expect(formal.getAttribute("data-task-context")).toContain("formal email");
+
+    const teilOne = document.querySelector('[data-a1-letter-task="informal"]');
+    const teilTwo = document.querySelector('[data-a1-letter-task="formal"]');
+    expect(teilOne.querySelector('[data-a1-day20-write-here="teil-1"]')).toContainElement(informal);
+    expect(teilTwo.querySelector('[data-a1-day20-write-here="teil-2"]')).toContainElement(formal);
+    expect(screen.getByText("Write Teil 1 here")).toBeInTheDocument();
+    expect(screen.getByText("Write Teil 2 here")).toBeInTheDocument();
+
+    const teilOneTask = Array.from(teilOne.children).find((child) => child.textContent.includes("Aufgabe"));
+    const teilOneWriter = teilOne.querySelector('[data-a1-day20-write-here="teil-1"]');
+    expect(teilOneTask.compareDocumentPosition(teilOneWriter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
