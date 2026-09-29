@@ -12,87 +12,58 @@ const GrammarContent = () => (
     <header style={card}>
       <h1 style={{ ...styles.title, margin: 0 }}>A2 Day 24 · Einen Urlaub planen</h1>
       <p style={{ ...styles.subtitle, margin: 0 }}>
-        Grammar: <strong>Reiseziele</strong>, <strong>Verkehrsmittel</strong>, <strong>Unterkunft</strong>, <strong>möchte + Infinitiv</strong> und <strong>weil</strong>.
+        Grammar: <strong>wenn</strong>, <strong>falls</strong>, <strong>weil</strong> und <strong>um … zu</strong>.
       </p>
       <p style={paragraph}>
-        <strong>Learning goal:</strong> Plan a holiday in connected sentences: say where you are going, how you are travelling,
-        where you are staying and why you chose the plan.
+        <strong>Learning goal:</strong> Connect holiday plans clearly: describe a condition, a less certain possibility,
+        a reason and a purpose.
       </p>
     </header>
 
     <section style={card}>
-      <h2 style={{ margin: 0 }}>1. Wohin? · nach, in + Akkusativ, an + Akkusativ</h2>
+      <h2 style={{ margin: 0 }}>1. wenn · when / if</h2>
       <p style={paragraph}>
-        The preposition changes with the type of destination. For movement toward a destination, ask <strong>Wohin?</strong>
+        Use <strong>wenn</strong> for a condition or for something that can happen now or in the future.
+        In the <strong>wenn</strong>-clause, the conjugated verb goes to the end.
       </p>
       <ul style={list}>
-        <li><strong>nach</strong> + city/country without an article: Wir fahren <strong>nach Berlin</strong>. / Ich fliege <strong>nach Deutschland</strong>.</li>
-        <li><strong>in + Akkusativ</strong> + country/place with an article: Wir fahren <strong>in die Schweiz</strong>. / Sie fliegt <strong>in die Türkei</strong>.</li>
-        <li><strong>an + Akkusativ</strong> + coast/water destination: Wir fahren <strong>an die Ostsee</strong>. / Ich möchte <strong>ans Meer</strong> fahren.</li>
+        <li>Wir fahren ans Meer, <strong>wenn das Wetter schön ist</strong>.</li>
+        <li><strong>Wenn wir genug Geld haben</strong>, buchen wir ein Hotel.</li>
+        <li><strong>Wenn ich Urlaub habe</strong>, reise ich gern.</li>
       </ul>
       <p style={paragraph}>
-        <strong>Remember:</strong> <em>an das</em> becomes <strong>ans</strong>. Do not say <em>nach Schweiz</em>; say <strong>in die Schweiz</strong>.
+        <strong>Word order:</strong> wenn + subject + rest + <strong>verb at the end</strong>.
+        If the wenn-clause comes first, the main-clause verb comes directly after the comma:
+        <strong> Wenn das Wetter schön ist, fahren wir ans Meer.</strong>
       </p>
     </section>
 
     <section style={card}>
-      <h2 style={{ margin: 0 }}>2. Verkehrsmittel · mit + Dativ</h2>
+      <h2 style={{ margin: 0 }}>2. falls · if / in case</h2>
       <p style={paragraph}>
-        Use <strong>mit + Dativ</strong> to say how you travel.
+        Use <strong>falls</strong> when the condition is possible but less certain. It is useful when making a Plan B.
+        The conjugated verb also goes to the end.
       </p>
       <ul style={list}>
-        <li>Wir fahren <strong>mit dem Zug</strong>.</li>
-        <li>Ich fahre <strong>mit dem Bus</strong> zum Flughafen.</li>
-        <li>Sie fährt <strong>mit der Bahn</strong>.</li>
-        <li>Wir reisen <strong>mit dem Auto</strong>.</li>
-        <li>Ich fliege <strong>mit dem Flugzeug</strong>.</li>
-      </ul>
-      <p style={paragraph}><strong>Fixed expression:</strong> <strong>zu Fuß</strong>, not <em>mit Fuß</em>.</p>
-    </section>
-
-    <section style={card}>
-      <h2 style={{ margin: 0 }}>3. Wohin? vs. Wo? · ins Hotel / im Hotel</h2>
-      <p style={paragraph}>
-        When there is movement toward a place, use <strong>Akkusativ</strong>. When you are already at the place, use <strong>Dativ</strong>.
-      </p>
-      <ul style={list}>
-        <li><strong>Wohin?</strong> Wir gehen <strong>ins Hotel</strong>. <span style={{ opacity: 0.8 }}>(in das Hotel)</span></li>
-        <li><strong>Wo?</strong> Wir übernachten <strong>im Hotel</strong>. <span style={{ opacity: 0.8 }}>(in dem Hotel)</span></li>
-        <li>Wir wohnen <strong>in einer Ferienwohnung</strong>.</li>
-        <li>Sie übernachten <strong>in einer Pension</strong>.</li>
+        <li><strong>Falls es regnet</strong>, bleiben wir im Hotel.</li>
+        <li><strong>Falls der Flug zu teuer ist</strong>, fahren wir mit dem Zug.</li>
+        <li>Wir nehmen eine Jacke mit, <strong>falls es kalt wird</strong>.</li>
       </ul>
       <p style={paragraph}>
-        <strong>Memory rule:</strong> destination/movement = <strong>Wohin? + Akkusativ</strong>; location = <strong>Wo? + Dativ</strong>.
+        <strong>wenn</strong> = a normal or expected condition. <strong>falls</strong> = a possibility you are less sure about.
       </p>
     </section>
 
     <section style={card}>
-      <h2 style={{ margin: 0 }}>4. möchte + Infinitiv</h2>
+      <h2 style={{ margin: 0 }}>3. weil · give a reason</h2>
       <p style={paragraph}>
-        Use <strong>möchte / möchten</strong> for wishes and plans. The second verb goes to the end in the infinitive.
+        Use <strong>weil</strong> to explain <strong>why</strong> you choose a destination, hotel, transport option or activity.
+        The conjugated verb goes to the end.
       </p>
       <ul style={list}>
-        <li>Ich <strong>möchte</strong> im Juli nach Hamburg <strong>fahren</strong>.</li>
-        <li>Wir <strong>möchten</strong> ein Hotel <strong>buchen</strong>.</li>
-        <li>Ich <strong>möchte</strong> am Meer <strong>schwimmen</strong>.</li>
-        <li>Wir <strong>möchten</strong> die Altstadt <strong>besuchen</strong>.</li>
-      </ul>
-      <p style={paragraph}>
-        <strong>Wrong:</strong> Ich möchte fahre nach Berlin. <br />
-        <strong>Correct:</strong> Ich möchte nach Berlin <strong>fahren</strong>.
-      </p>
-    </section>
-
-    <section style={card}>
-      <h2 style={{ margin: 0 }}>5. Give a reason with weil</h2>
-      <p style={paragraph}>
-        Use <strong>weil</strong> to explain why you choose a destination, transport option or accommodation.
-        In the <strong>weil</strong>-clause, the conjugated verb goes to the end.
-      </p>
-      <ul style={list}>
+        <li>Wir fahren nach München, <strong>weil wir die Stadt sehen möchten</strong>.</li>
+        <li>Ich buche dieses Hotel, <strong>weil es günstig ist</strong>.</li>
         <li>Wir fahren mit dem Zug, <strong>weil er bequem ist</strong>.</li>
-        <li>Ich buche das Hotel, <strong>weil es günstig ist</strong>.</li>
-        <li>Wir fahren ans Meer, <strong>weil wir dort schwimmen möchten</strong>.</li>
         <li>Ich reise im August, <strong>weil ich dann Urlaub habe</strong>.</li>
       </ul>
       <p style={paragraph}>
@@ -101,46 +72,110 @@ const GrammarContent = () => (
     </section>
 
     <section style={card}>
-      <h2 style={{ margin: 0 }}>6. Put the plan together</h2>
+      <h2 style={{ margin: 0 }}>4. um … zu · express a purpose</h2>
       <p style={paragraph}>
-        <strong>Example:</strong> Im August möchten wir <strong>in die Schweiz fahren</strong>. Wir reisen <strong>mit dem Zug</strong>.
-        Wir möchten <strong>in einem kleinen Hotel übernachten</strong>. Dort möchten wir wandern und die Stadt besuchen.
-        Wir wählen dieses Reiseziel, <strong>weil die Landschaft sehr schön ist</strong>.
+        Use <strong>um … zu</strong> to explain <strong>what the purpose of an action is</strong>.
+        Usually, the person doing both actions is the same.
+      </p>
+      <ul style={list}>
+        <li>Wir fahren nach Berlin, <strong>um die Stadt zu besichtigen</strong>.</li>
+        <li>Ich fahre ans Meer, <strong>um mich zu entspannen</strong>.</li>
+        <li>Wir buchen ein Hotel, <strong>um dort drei Nächte zu bleiben</strong>.</li>
+        <li>Ich spare Geld, <strong>um im Sommer nach Österreich zu reisen</strong>.</li>
+      </ul>
+      <p style={paragraph}>
+        <strong>Structure:</strong> main clause + <strong>um</strong> + rest + <strong>zu + infinitive</strong>.
+        Do not add a second subject after <strong>um</strong>.
+      </p>
+    </section>
+
+    <section style={card}>
+      <h2 style={{ margin: 0 }}>5. Which connector do you need?</h2>
+      <ul style={list}>
+        <li><strong>wenn</strong> → normal condition: <em>Wenn das Wetter gut ist, gehen wir wandern.</em></li>
+        <li><strong>falls</strong> → less certain condition / Plan B: <em>Falls es regnet, besuchen wir ein Museum.</em></li>
+        <li><strong>weil</strong> → reason: <em>Wir fahren nach Wien, weil die Stadt interessant ist.</em></li>
+        <li><strong>um … zu</strong> → purpose: <em>Wir fahren nach Wien, um die Stadt zu besichtigen.</em></li>
+      </ul>
+    </section>
+
+    <section style={card}>
+      <h2 style={{ margin: 0 }}>6. Put the holiday plan together</h2>
+      <p style={paragraph}>
+        <strong>Example:</strong> Im August fahren wir nach Österreich, <strong>weil wir die Berge mögen</strong>.
+        <strong>Wenn das Wetter schön ist</strong>, gehen wir wandern.
+        <strong>Falls es regnet</strong>, besuchen wir ein Museum.
+        Wir nehmen eine Kamera mit, <strong>um viele Fotos zu machen</strong>.
       </p>
       <p style={paragraph}>
-        A strong A2 answer connects <strong>time + destination + transport + accommodation + activity + reason</strong> instead of writing unrelated sentences.
+        A strong A2 answer does more than list plans. It connects ideas with a <strong>condition</strong>,
+        a <strong>Plan B</strong>, a <strong>reason</strong> and a <strong>purpose</strong>.
       </p>
     </section>
 
     <A2MiniLearningBlock
       title="Knowledge Test · Urlaub planen"
-      english="Choose the correct destination preposition, transport case, location form and word order before you write your own holiday plan."
-      rule="Use nach for cities/countries without an article, in/an + accusative for destinations, mit + dative for transport, dative for a fixed location, the infinitive at the end after möchte, and the conjugated verb at the end after weil."
+      english="Choose the connector that matches the meaning: normal condition, less-certain condition, reason or purpose."
+      rule="wenn, falls and weil introduce subordinate clauses, so the conjugated verb goes to the end. Use um … zu + infinitive to express purpose when the subject is the same."
       examples={[
-        "Wir fahren nach Berlin.",
-        "Wir fahren in die Schweiz.",
-        "Ich möchte ans Meer fahren.",
-        "Wir reisen mit dem Zug.",
-        "Wir übernachten im Hotel.",
-        "Ich buche das Hotel, weil es günstig ist.",
+        "Wenn das Wetter schön ist, fahren wir ans Meer.",
+        "Falls es regnet, bleiben wir im Hotel.",
+        "Wir fahren nach Wien, weil die Stadt interessant ist.",
+        "Wir fahren nach Wien, um die Stadt zu besichtigen.",
       ]}
-      commonMistake="Do not mix destination and location: Wir gehen ins Hotel (Wohin?), but wir übernachten im Hotel (Wo?)."
+      commonMistake="Do not use weil for purpose. Reason: Ich fahre nach Berlin, weil ich die Stadt mag. Purpose: Ich fahre nach Berlin, um die Stadt zu besichtigen."
       questions={[
-        { stem: "Im Sommer fahren wir ___ Berlin.", options: ["nach", "in die", "an"], answer: 0, explanation: "Cities use nach." },
-        { stem: "Nächstes Jahr fahren wir ___ Schweiz.", options: ["nach", "in die", "zu der"], answer: 1, explanation: "die Schweiz has an article, so use in + accusative: in die Schweiz." },
-        { stem: "Wir reisen ___ Zug.", options: ["mit der", "mit dem", "mit den"], answer: 1, explanation: "mit takes dative: der Zug → dem Zug." },
-        { stem: "Wir sind schon angekommen. Jetzt übernachten wir ___.", options: ["ins Hotel", "im Hotel", "nach Hotel"], answer: 1, explanation: "Wo? A fixed location uses dative: im Hotel." },
-        { stem: "Which sentence is correct?", options: ["Ich möchte besuche Wien.", "Ich möchte Wien besuchen.", "Ich Wien möchte besuchen."], answer: 1, explanation: "After möchte, the infinitive goes to the end." },
-        { stem: "Which weil-clause is correct?", options: ["weil das Hotel ist günstig", "weil ist das Hotel günstig", "weil das Hotel günstig ist"], answer: 2, explanation: "In a weil-clause, the conjugated verb goes to the end." },
+        {
+          stem: "___ das Wetter schön ist, gehen wir wandern.",
+          options: ["Wenn", "Weil", "Um"],
+          answer: 0,
+          explanation: "This is a normal condition, so use wenn.",
+        },
+        {
+          stem: "___ es regnet, besuchen wir ein Museum.",
+          options: ["Falls", "Weil", "Um"],
+          answer: 0,
+          explanation: "This is a possible Plan B, so falls is appropriate.",
+        },
+        {
+          stem: "Wir buchen dieses Hotel, ___ es günstig ist.",
+          options: ["wenn", "weil", "um"],
+          answer: 1,
+          explanation: "The sentence gives a reason, so use weil.",
+        },
+        {
+          stem: "Wir fahren nach Berlin, ___ die Stadt zu besichtigen.",
+          options: ["weil", "falls", "um"],
+          answer: 2,
+          explanation: "The sentence expresses purpose: um … zu + infinitive.",
+        },
+        {
+          stem: "Which sentence has the correct word order?",
+          options: [
+            "Wenn das Wetter ist schön, fahren wir ans Meer.",
+            "Wenn das Wetter schön ist, fahren wir ans Meer.",
+            "Wenn ist das Wetter schön, fahren wir ans Meer.",
+          ],
+          answer: 1,
+          explanation: "In a wenn-clause, the conjugated verb goes to the end.",
+        },
+        {
+          stem: "Which sentence correctly expresses purpose?",
+          options: [
+            "Ich spare Geld, weil im Sommer zu reisen.",
+            "Ich spare Geld, um im Sommer zu reisen.",
+            "Ich spare Geld, falls im Sommer zu reisen.",
+          ],
+          answer: 1,
+          explanation: "Use um … zu + infinitive to express purpose.",
+        },
       ]}
-      outputPrompt="Plane einen Urlaub in 6 Sätzen. Nenne Zeitraum, Reiseziel, Verkehrsmittel, Unterkunft, eine Aktivität und einen Grund mit weil."
+      outputPrompt="Plane einen Urlaub in 4–6 Sätzen. Benutze mindestens einmal wenn, falls, weil und um … zu."
       starters={[
-        "Im ... möchte ich ...",
-        "Ich fahre/fliege nach/in/an ...",
-        "Ich reise mit ...",
-        "Ich übernachte ...",
-        "Dort möchte ich ...",
-        "Ich wähle dieses Ziel, weil ...",
+        "Wir fahren nach ..., weil ...",
+        "Wenn ..., ...",
+        "Falls ..., ...",
+        "Wir ..., um ... zu ...",
       ]}
     />
   </div>
