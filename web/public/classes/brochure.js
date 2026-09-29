@@ -384,6 +384,8 @@ function updateMeta(course, shareUrl) {
     provider: {
       "@type": "Organization",
       name: "Learn Language Education Academy",
+      alternateName: brochureData?.academyProfile?.formerName || "Learn German Ghana",
+      foundingDate: String(brochureData?.academyProfile?.establishedYear || 2022),
       url: "https://www.falowen.app",
     },
     educationalLevel: course.level,
@@ -613,7 +615,7 @@ function render() {
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>Hybrid: in person or online</td></tr>`).join("")
     : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`);
 
-  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
+  const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };\n  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
