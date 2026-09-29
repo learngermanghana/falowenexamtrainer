@@ -6,151 +6,6 @@ const LIVE_CATALOG_ENDPOINTS = [
 let brochureData = null;
 let selectedClassId = null;
 
-const COURSE_TITLES_BY_LEVEL = {
-  A1: {
-    1: "Greetings and Asking About Well-being",
-    2: "German Alphabet + Personal Pronouns and Verb Conjugation",
-    3: "Pronouns and Identity Expressions in German + Introducing Yourself",
-    4: "Numbers and Addresses",
-    5: "Introducing Yourself and Articles",
-    6: "Family and Hobbies",
-    7: "Asking About Prices and Preferences",
-    8: "Countries and Languages",
-    9: "Nominative and Accusative Cases",
-    10: "Objects, Colors and Possessive Articles + Asking for and Giving Directions",
-    11: "Understanding Time",
-    12: "The 24 Hour Clock and Dates",
-    13: "Revision: Numbers, Time and Prices",
-    14: "Modal Verbs",
-    15: "Imperatives",
-    16: "Food and Negation + Food and Daily Life",
-    17: "Instructions and Directions",
-    18: "Two-way Prepositions + Directions and Movement",
-    19: "Goethe A1 Speaking Practice",
-    20: "Introduction to Letter Writing",
-    21: "Weather + Weather Speaking Practice",
-    22: "Health and Body Parts + Health Speaking Practice",
-    23: "Dative and Accusative Verbs",
-    24: "Schreiben & Sprechen",
-  },
-  A2: {
-    1: "Small Talk",
-    2: "Personen beschreiben",
-    3: "Dinge und Personen vergleichen",
-    4: "Wo möchten wir uns treffen?",
-    5: "Was machst du in deiner Freizeit?",
-    6: "Möbel und Räume kennenlernen",
-    7: "Eine Wohnung suchen",
-    8: "Rezepte und Essen",
-    9: "Urlaub",
-    10: "Tourismus und traditionelle Feste",
-    11: "Unterwegs: Verkehrsmittel vergleichen",
-    12: "Mein Traumberuf",
-    13: "Ein Vorstellungsgespräch",
-    14: "Beruf und Karriere",
-    15: "Mein Lieblingssport",
-    16: "Hobbys und Interessen",
-    17: "Einladung und Vorschläge",
-    18: "Die Bank anrufen",
-    19: "Einkaufen? Wo und wie?",
-    20: "Feste und Traditionen",
-    21: "In der Stadt orientieren",
-    22: "Wie war dein Wochenende?",
-    23: "Wie kommst du zur Schule oder zur Arbeit?",
-    24: "Einen Urlaub planen",
-    25: "Tagesablauf",
-    26: "Gefühle beschreiben",
-    27: "Digitale Kommunikation",
-    28: "Über die Zukunft sprechen",
-  },
-  B1: {
-    1: "Der Besichtigungstermin",
-    2: "Leben in der Stadt oder auf dem Land",
-    3: "Fast Food vs Hausmannskost",
-    4: "Alles für die Gesundheit",
-    5: "Work-Life-Balance im modernen Arbeitsumfeld",
-    6: "Digitale Auszeit und Selbstfürsorge",
-    7: "Teamspiele und kooperative Aktivitäten",
-    8: "Abenteuer in der Natur",
-    9: "Eine Filmkritik schreiben",
-    10: "Traditionelles vs digitales Lernen",
-    11: "Medien und Arbeiten im Homeoffice",
-    12: "Prüfungsangst und Stressbewältigung",
-    13: "Wie lernt man am besten?",
-    14: "Wege zum Wunschberuf",
-    15: "Das Vorstellungsgespräch",
-    16: "Wie wird man …? Ausbildung und Qualifikation",
-    17: "Lebensformen heute – Familie und Wohngemeinschaft",
-    18: "Was ist dir in einer Beziehung wichtig?",
-    19: "Erstes Date – typische Situationen",
-    20: "Konsum und Nachhaltigkeit",
-    21: "Online einkaufen – Rechte und Risiken",
-    22: "Reiseprobleme und Lösungen",
-    23: "Umweltfreundlich im Alltag",
-    24: "Klimafreundlich leben",
-  },
-  B2: {
-    1: "Persönliche Identität und Selbstverständnis",
-    2: "Beziehungen und Kommunikation",
-    3: "Öffentliches vs. privates Leben",
-    4: "Beruf und Karriere",
-    5: "Bildung und Lernen",
-    6: "Migration und Integration",
-    7: "Gesellschaftliche Vielfalt",
-    8: "Politik und Engagement",
-    9: "Technologie und Digitalisierung",
-    10: "Umwelt und Nachhaltigkeit",
-    11: "Gesundheit und Wohlbefinden",
-    12: "Konsum und Medien",
-    13: "Reisen und Mobilität",
-    14: "Wohnen und Zusammenleben",
-    15: "Kunst und Kultur",
-    16: "Wissenschaft und Forschung",
-    17: "Feste und Traditionen",
-    18: "Freizeit und Hobbys",
-    19: "Ernährung und Esskultur",
-    20: "Mode und Lebensstil",
-    21: "Werte und Normen",
-    22: "Sprache und Kommunikation",
-    23: "Innovation und Zukunft",
-    24: "Gesellschaftliche Herausforderungen",
-    25: "Globalisierung und internationale Beziehungen",
-    26: "Kreatives Schreiben und Projekte",
-    27: "Prüfungstraining und Wiederholung",
-    28: "Abschlusspräsentation und Feedback",
-  },
-  C1: {
-    1: "Ziele und Lernweg",
-    2: "Kultur und Identität",
-    3: "Medien und Informationskompetenz",
-    4: "Beziehungen und Teamarbeit",
-    5: "Berufliche Entwicklung",
-    6: "Gesundheit und Lebensstil",
-    7: "Reisen und Nachhaltigkeit",
-    8: "Wohnen und Stadtentwicklung",
-    9: "Konsum und Werbung",
-    10: "Integration und Gesellschaft",
-    11: "Engagement und Ehrenamt",
-    12: "Freizeit und Kultur",
-    13: "Mehrsprachigkeit",
-    14: "Innovation und Zukunft",
-    15: "Bildung und lebenslanges Lernen",
-    16: "Technologie im Alltag",
-    17: "Umwelt und Verantwortung",
-    18: "Gesellschaft und Zusammenhalt",
-    19: "Arbeit der Zukunft",
-    20: "Digitale Gesundheit",
-    21: "Migration und Teilhabe",
-    22: "Politik und Mitbestimmung",
-    23: "Freizeit und Work-Life-Balance",
-    24: "Mobilität und Infrastruktur",
-    25: "Wissenschaft und Forschung",
-    26: "Nachhaltiger Konsum",
-    27: "Digitalisierung und Verwaltung",
-    28: "Demografischer Wandel und Generationengerechtigkeit",
-  },
-};
-
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
 const formatDate = (iso) => {
   if (!iso) return "Always open";
@@ -405,7 +260,10 @@ function getCourseList() {
 }
 
 function getCurriculumTitle(level, lessonDay) {
-  return COURSE_TITLES_BY_LEVEL[level]?.[lessonDay] || "";
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  return brochureData?.curriculumByLevel?.[normalizedLevel]?.[String(lessonDay)]
+    || brochureData?.curriculumByLevel?.[normalizedLevel]?.[lessonDay]
+    || "";
 }
 
 function getSessionLabel(course, sessionIndex) {
@@ -464,15 +322,22 @@ function renderTabs(courseList) {
 function updateHeroText() {
   const heroTitle = document.querySelector(".hero h1");
   const heroText = document.querySelector(".hero p");
-  if (heroTitle) heroTitle.textContent = "Welcome to our German learning community.";
+  if (heroTitle) heroTitle.textContent = "Choose your German class";
   if (heroText) {
-    heroText.textContent = "You are welcome to join Falowen, where we have helped many students in Ghana and beyond build German step by step, prepare for exams, and stay consistent with live classes, recordings, assignments, and app support.";
+    heroText.textContent = "Check the class fee, start date, meeting times and learning mode first. Register when the class fits your schedule, or take the placement test if you are unsure of your level.";
   }
 }
 
 function updateMeta(course, shareUrl) {
-  const title = `${course.title} | Falowen Classes`;
-  const description = `${course.title} starts ${formatDate(course.startDate)}. View fee, meeting times, generated schedule, class schedule link, and payment agreement.`;
+  const fee = formatMoney(course.tuitionGhs);
+  const classLabel = course.availability === "always"
+    ? `${course.level} German self-learning`
+    : `${course.level} German class – ${course.title}`;
+  const title = `${classLabel} | Fees & Schedule | Falowen`;
+  const description = course.availability === "always"
+    ? `${course.title}: view the course fee, learning mode, Falowen access and registration details.`
+    : `${course.title} starts ${formatDate(course.startDate)}. View the ${fee} fee, class times, learning mode, schedule and registration details.`;
+
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) metaDescription.setAttribute("content", description);
@@ -482,6 +347,72 @@ function updateMeta(course, shareUrl) {
   if (ogDescription) ogDescription.setAttribute("content", description);
   const canonical = document.querySelector('link[rel="canonical"]');
   if (canonical) canonical.setAttribute("href", shareUrl);
+
+  let structured = document.getElementById("falowenCourseStructuredData");
+  if (!structured) {
+    structured = document.createElement("script");
+    structured.id = "falowenCourseStructuredData";
+    structured.type = "application/ld+json";
+    document.head.appendChild(structured);
+  }
+  const courseInstance = course.availability === "always"
+    ? {
+        "@type": "CourseInstance",
+        courseMode: "online",
+      }
+    : {
+        "@type": "CourseInstance",
+        courseMode: "hybrid",
+        startDate: course.startDate || undefined,
+        endDate: course.endDate || undefined,
+        location: {
+          "@type": "Place",
+          name: course.location || "Learn Language Education Academy",
+        },
+      };
+  structured.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: course.title,
+    description,
+    provider: {
+      "@type": "Organization",
+      name: "Learn Language Education Academy",
+      url: "https://www.falowen.app",
+    },
+    educationalLevel: course.level,
+    hasCourseInstance: courseInstance,
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "GHS",
+      price: Number(course.tuitionGhs || 0),
+      url: shareUrl,
+      availability: "https://schema.org/InStock",
+    },
+  });
+}
+
+function renderCatalogStatus() {
+  const existing = document.getElementById("catalogStatusNotice");
+  if (brochureData?.catalogSource !== "fallback") {
+    existing?.remove();
+    return;
+  }
+
+  const notice = existing || document.createElement("section");
+  notice.id = "catalogStatusNotice";
+  notice.className = "card catalog-status-notice";
+  notice.setAttribute("role", "status");
+  notice.innerHTML = `
+    <strong>Live class schedule temporarily unavailable</strong>
+    <p>Falowen is not showing saved historical live-class dates. Always-open programmes remain available while the live class service reconnects.</p>
+    <a class="button" href="https://wa.me/233241113054" target="_blank" rel="noreferrer">Ask about the next live class</a>
+  `;
+
+  if (!existing) {
+    const tabsCard = document.getElementById("classTabs")?.closest(".card");
+    (tabsCard || document.querySelector(".hero"))?.insertAdjacentElement("afterend", notice);
+  }
 }
 
 function hideClassInformationBox() {
@@ -615,6 +546,7 @@ function render() {
   updateHeroText();
   renderTabs(sourceList);
   updateMeta(course, shareUrl);
+  renderCatalogStatus();
   hideClassInformationBox();
   ensurePaymentButtons();
   ensureClassLayout();
@@ -666,6 +598,10 @@ function render() {
   setText("scheduleHint", schedule.length
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
     : "This track is self-learning, so there is no fixed live class schedule.");
+  window.currentBrochureCourse = course;
+  window.dispatchEvent(new CustomEvent("falowen:brochure-rendered", {
+    detail: { course, shareUrl, classScheduleUrl, paymentLink },
+  }));
   writeBrochureDebug({ step: "render:complete", renderedClassId: course.id, renderedSlug: course.slug, scheduleCount: schedule.length, hasPaymentLink: Boolean(paymentLink), hasScheduleUrl: Boolean(classScheduleUrl) });
 
   setHtml("scheduleList", schedule.length
@@ -683,6 +619,7 @@ async function copyBrochureText() {
 }
 
 window.addEventListener("popstate", () => render());
+window.FalowenLoadClassCatalog = loadBrochureData;
 
 loadBrochureData()
   .then((data) => {
