@@ -85,6 +85,9 @@ describe("public class brochure experience", () => {
     expect(source).toContain("leadDecisionTimes");
     expect(source).toContain("leadDecisionLocation");
     expect(source).toContain("Register for this class");
+    expect(source).toContain("lead-track-record");
+    expect(source).toContain("High exam pass rate");
+    expect(source).toContain("Established");
     expect(source).toContain("Not sure of your level? Take the free placement test.");
     expect(source).toContain("FalowenLoadClassCatalog");
   });
