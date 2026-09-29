@@ -10,13 +10,14 @@
 
   function isCourseOpen(course) {
     if (!course) return false;
-    if (course.availability === "always") return true;
+    if (course.availability === "always" || course.availability === "enquiry") return true;
     if (!course.startDate) return false;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const start = new Date(`${course.startDate}T00:00:00`);
     const end = course.endDate ? new Date(`${course.endDate}T23:59:59`) : null;
     if (course.status === "active" && (!end || end >= today)) return true;
+    if (start <= today && end && end >= today) return true;
     return start >= today;
   }
 
@@ -43,6 +44,7 @@
 
   function classLabel(course) {
     if (course.availability === "always") return `${course.title} · Always open · Self-learning`;
+    if (course.availability === "enquiry") return `${course.title} · Next class date to be announced`;
     const times = Array.isArray(course.meetingDays) && course.meetingDays.length
       ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
       : "Schedule pending";
@@ -50,13 +52,16 @@
   }
 
   function getActiveClasses(data) {
-    const sourceIsLive = data.catalogSource === "firestore";
+    const levelOrder = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
     return (data.classes || [])
-      .filter((course) => sourceIsLive || course.availability === "always")
       .filter(isCourseOpen)
       .sort((a, b) => {
+        const levelDiff = (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99);
+        if (levelDiff) return levelDiff;
         if (a.availability === "always" && b.availability !== "always") return 1;
         if (b.availability === "always" && a.availability !== "always") return -1;
+        if (a.availability === "enquiry" && b.availability !== "enquiry") return 1;
+        if (b.availability === "enquiry" && a.availability !== "enquiry") return -1;
         return String(a.startDate || "9999-12-31").localeCompare(String(b.startDate || "9999-12-31"));
       });
   }
@@ -97,8 +102,8 @@
 
     if (help) help.textContent = sourceIsLive
       ? "Class dates and times are synchronized from Falowen Admin."
-      : "Live class dates are temporarily unavailable. Only always-open self-learning is shown.";
-    if (status && !sourceIsLive) status.textContent = "Live class dates are temporarily unavailable, so old saved dates have been hidden.";
+      : "Live class dates are reconnecting. A1–B1 remain available for enquiry and expired saved classes stay hidden.";
+    if (status && !sourceIsLive) status.textContent = "Live class dates are reconnecting. You can still choose A1, A2 or B1 and save your enquiry.";
 
     if (!requestedIsActive && activeClasses[0]) {
       const nextUrl = `/classes/${activeClasses[0].slug}/`;
@@ -123,7 +128,7 @@
           .then((data) => ({
             ...data,
             catalogSource: "fallback",
-            classes: (data.classes || []).filter((course) => course.availability === "always"),
+            classes: data.classes || [],
           }));
   }
 
