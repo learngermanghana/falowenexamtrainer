@@ -408,10 +408,10 @@
       },
       "teil4": {
         "Answer1": "B) Ins Kino gehen",
-        "Answer2": "A) Sie liebt spannende Geschichten",
+        "Answer2": "A) Weil sie spannende Geschichten liebt",
         "Answer3": "A) Tennis",
-        "Answer4": "B) Sonnig und warm",
-        "Answer5": "C) Spaziergang"
+        "Answer4": "B) Es war sonnig und warm",
+        "Answer5": "C) Einen Spaziergang Machen"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1bENY4-5AG9hrgaDKqyNpTwKT02i58wGva6tVRn-hhbE/gviz/tq?tqx=out:html&sheet=Key",
@@ -430,7 +430,7 @@
       },
       "teil4": {
         "Answer1": "B) Weil er in Deutschland arbeiten möchte.",
-        "Answer2": "C) Sprachkurse, Apps und Freunde",
+        "Answer2": "C) Sprachkurse, Online-Apps und das Üben mit Freunden.",
         "Answer3": "A) Jeden Tag eine Stunde."
       }
     },
@@ -582,8 +582,8 @@
       },
       "teil4": {
         "Answer1": "B) Griechenland",
-        "Answer2": "A) Eine Woche",
-        "Answer3": "B) Der Strand von Elafonissi",
+        "Answer2": "A) Eine woche",
+        "Answer3": "B) Der strand von",
         "Answer4": "B) Eine Bootstour",
         "Answer5": "A) Nach Kreta zu reisen"
       }
@@ -625,11 +625,11 @@
         "Answer5": "C) Die S8 fährt erst ab 08:30 Uhr."
       },
       "teil4": {
-        "Answer1": "B) In die Berge",
-        "Answer2": "B) Ein mittelgroßes Auto",
-        "Answer3": "B) 50 Euro",
-        "Answer4": "C) Führerschein und Kreditkarte",
-        "Answer5": "B) Das Auto auf mögliche Schäden"
+        "Answer1": "B) in die Berge",
+        "Answer2": "B) Ein Mittel..",
+        "Answer3": "C) 60 Euro",
+        "Answer4": "C) Führerschein und Personalausweis",
+        "Answer5": "B) Das Auto auf mögliche"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/16aS6UmVL-kQqcje1f3rDeqobEnkoNsxUwCNE_iBokI4/gviz/tq?tqx=out:html&sheet=Key",
@@ -647,11 +647,11 @@
         "Answer5": "B) Anzeige B"
       },
       "teil4": {
-        "Answer1": "B) Um 6:00 Uhr",
-        "Answer2": "C) Beginnt die Visite auf der Station",
-        "Answer3": "B) Um 9:00 Uhr",
-        "Answer4": "B) Führt wichtige Telefonate",
-        "Answer5": "C) Vor 18:00 Uhr"
+        "Answer1": "B) um 6 Uhr",
+        "Answer2": "C) Beginnt die Visite",
+        "Answer3": "B) um 9 Uhr",
+        "Answer4": "B) fuhrt wichtige",
+        "Answer5": "C) Vor 18 Uhr"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1z8wEWz-HJxm1DUvr0a7OE5md3Gj4OR5ZJ3SpJNI-hyQ/gviz/tq?tqx=out:html&sheet=Key",
@@ -689,8 +689,7 @@
         "Answer3": "B) Im Online-System",
         "Answer4": "A) Am ersten Tag vor 9:00 Uhr",
         "Answer5": "B) Frau König"
-      },
-      "teil4": {}
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1wKcE29sav7yHsSc9SSOwrbmtq15MF33LbVAeDaz4CAw/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1wKcE29sav7yHsSc9SSOwrbmtq15MF33LbVAeDaz4CAw/edit",
@@ -901,8 +900,7 @@
         "Answer3": "B) Um 12:30 Uhr",
         "Answer4": "B) Sie geht ins Fitnessstudio.",
         "Answer5": "C) Um 22:30 Uhr"
-      },
-      "teil4": {}
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1nOtlOXVblDt1RQ8JOLpBBLQfjmnxJ9YF6ylhZo4u6kY/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1nOtlOXVblDt1RQ8JOLpBBLQfjmnxJ9YF6ylhZo4u6kY/edit",
@@ -1042,12 +1040,10 @@
     "answers": {
       "teil3": {
         "Answer1": "B) Wegen des Mangels an bezahlbarem Wohnraum",
-        "Answer2": "A) Hohe Nachfrage nach Wahnungen",
+        "Answer2": "A) Hohe Nachfrage nach Wohnungen",
         "Answer3": "B) Um sie als Ferienwohnungen oder Luxusapartments zu nutzen",
-        "Answer4": "B) Einfuhrung der Mietpreisbremse und Neubauprogramme",
-        "Answer5": "A) Wegen der Nahe zu Schulen und Kindergarten",
-        "Answer6": "A) Geduld und Flexibilitat",
-        "Answer7": "B) Sie erfordert Zeit und Geduld"
+        "Answer4": "B) Mietpreisbremse und Neubauprogramme",
+        "Answer5": "A) Geduld und Flexibilität"
       },
       "teil4": {
         "Answer1": "B) 950 Euro",
@@ -1090,11 +1086,11 @@
     "answers": {
       "teil3": {
         "Answer1": "B) Einfamilienhaus",
-        "Answer2": "C) Balance zwischen Privatspare und Gemeinschaftsgefuhl",
-        "Answer3": "B) Weil sie gunstig sind",
-        "Answer4": "B) Ein Haus, das mit Solaranlagen ausgestattet ist",
+        "Answer2": "C) Balance zwischen Privatsphäre und Gemeinschaftsgefühl",
+        "Answer3": "B) Weil sie günstig sind",
+        "Answer4": "B) Ein energieeffizientes Haus, oft mit umweltfreundlicher Technik",
         "Answer5": "B) Sie spielt eine wichtige Rolle",
-        "Answer6": "B) Kurze Wege zu Geschaften und Restaurants",
+        "Answer6": "B) Kurze Wege zu Geschäften und Restaurants",
         "Answer7": "C) WG"
       },
       "teil4": {
@@ -1113,25 +1109,25 @@
   "B1 3.7 Fast Food vs. Hausmannskost": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Sie konnen zu Ubergewicht und Diabetes fuhren",
-        "Answer2": "B) Sie konnen positive Gefuhle auslosen",
-        "Answer3": "B) Zucker schadet den Zahnen",
-        "Answer4": "B) Sie konnen langfristig gesundheitliche Probleme verursachen",
-        "Answer5": "B) Karies und Ubergewicht",
-        "Answer6": "C) Man sollte den Zukerkonsum reduzieren und auf eine ausgewogene Ernahrung achten",
-        "Answer7": "A) Durch korperliche Aktivitat und Entspannungstechniken"
+        "Answer1": "A) Sie können zu Übergewicht und Diabetes führen.",
+        "Answer2": "B) Sie können positive Gefühle auslösen.",
+        "Answer3": "B) Zucker schadet den Zähnen.",
+        "Answer4": "B) Sie können langfristig gesundheitliche Probleme verursachen.",
+        "Answer5": "B) Karies und Übergewicht",
+        "Answer6": "C) Man sollte den Zuckerkonsum reduzieren und auf eine ausgewogene Ernährung achten.",
+        "Answer7": "A) Durch körperliche Aktivität und Entspannungstechniken.",
+        "Answer8": "F) Anzeige F",
+        "Answer9": "B) Anzeige B",
+        "Answer10": "C) Anzeige C",
+        "Answer11": "D) Anzeige D",
+        "Answer12": "E) Anzeige E"
       },
       "teil4": {
-        "Answer1": "F) Veranstaltung uber gesunde Ernahrung und Zuckerreduktion",
-        "Answer2": "B) Werbung fur ein neues Diat – Programm",
-        "Answer3": "C) Angebot fur zuckerfreie SuBigkeiten",
-        "Answer4": "D) Eroffnung eines neuen Restuarants mit gesunden Gerichten",
-        "Answer5": "E) Rabbatt auf Schokolade im Onlne-Shop",
-        "Answer6": "B) In vielen Fertiggerichten und Softdrinks",
-        "Answer7": "B) Er gibt uns Kurzzeitig Energie",
-        "Answer8": "A) Man fuhlt sich energielos und mude",
-        "Answer9": "A) Erhohtes Risiko fur Ubergewicht und Diabetes Typ 2",
-        "Answer10": "B) Den Zuckerkonsum zu reduzieren und mehr frische Lebensmittel zu essen"
+        "Answer1": "B) In vielen Fertiggerichten und Softdrinks",
+        "Answer2": "B) Er gibt uns kurzzeitig Energie",
+        "Answer3": "A) Man fühlt sich energielos und müde",
+        "Answer4": "A) Erhöhtes Risiko für Übergewicht und Diabetes Typ 2",
+        "Answer5": "B) Den Zuckerkonsum zu reduzieren und mehr frische Lebensmittel zu essen"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1COQA_nlpRTk-FTLD5fL3HkWoVAvUh0XVrpc4TLE3i-w/gviz/tq?tqx=out:html&sheet=Key",
@@ -1168,11 +1164,11 @@
       "teil3": {
         "Answer1": "B) Zeitdruck und hohe Erwartungen",
         "Answer2": "C) Herzprobleme und Bluthochdruck",
-        "Answer3": "A) RegelmaBige Bewegung",
-        "Answer4": "B) Sie liefert dem korper die notigen Nahrstoffe",
-        "Answer5": "C) Den Korper und Geist zu entspannen",
-        "Answer6": "B) Sie tragen zum Wohlbefinden bei",
-        "Answer7": "B) Auf die Signale des korpers horen fruhzeitig MaBnahmen ergreifen"
+        "Answer3": "A) Regelmäßige Bewegung",
+        "Answer4": "B) Sie liefert dem Körper die nötigen Nährstoffe.",
+        "Answer5": "C) Die Entspannung von Körper und Geist",
+        "Answer6": "B) Sie tragen zum Wohlbefinden bei.",
+        "Answer7": "B) Auf die Signale des Körpers hören und frühzeitig Maßnahmen ergreifen"
       },
       "teil4": {
         "Answer1": "B) Realistische Ziele setzen",
@@ -1190,13 +1186,13 @@
   "B1 4.10 Digitale Auszeit und Selbstfürsorge": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Die Wichtigkeit von Zeit fur sich",
-        "Answer2": "B) Menschen, die regelmaBig Pausen Machen, sind weniger gestresst und produktiver",
-        "Answer3": "B) Einsamkeit und Isolation",
-        "Answer4": "A) Sie hiflt, das Risiko von Herz-Kreislauf-Erkrankungen zu senken",
-        "Answer5": "B) Man fuhit sich oft gelangweilt und prokrastiniert",
-        "Answer6": "C) Man sollte eine ausgewogene Balance zwischen Zeit fur sich und sozialen Kontakten finden",
-        "Answer7": "B) Indem man Aktivitaten plant, die einem SpaB machen und guttun"
+        "Answer1": "B) Sie kontrollierte das Gerät sehr häufig.",
+        "Answer2": "C) Sie informierte Familie und Kollegen.",
+        "Answer3": "A) Unruhig, weil sie Nachrichten verpassen könnte.",
+        "Answer4": "C) Das Gespräch war länger und persönlicher.",
+        "Answer5": "B) Sie wollte eine Adresse nachsehen und Musik hören.",
+        "Answer6": "B) Sie sind praktisch, und eine vollständige Trennung ist nicht immer realistisch.",
+        "Answer7": "C) Ein bewussterer Umgang mit Technik"
       },
       "teil4": {
         "Answer1": "C) Stress und Uberarbeitung",
@@ -1215,11 +1211,11 @@
     "answers": {
       "teil3": {
         "Answer1": "C) Spiele im Freien",
-        "Answer2": "B) Sie fordern strategisches Denken",
-        "Answer3": "C) Es kann zu Sucht fuhren",
-        "Answer4": "B) Soziale Fahigkeiten",
-        "Answer5": "B) Verlust der sozialen Fahigkeiten",
-        "Answer6": "C) Eine Balance zwischen digitalem und traditionellem Spielen finden",
+        "Answer2": "B) Sie fördern strategisches Denken.",
+        "Answer3": "C) Es kann zu Sucht führen.",
+        "Answer4": "B) Soziale Fähigkeiten",
+        "Answer5": "A) Verlust echter sozialer Interaktion und Bewegung",
+        "Answer6": "C) Eine Balance zwischen digitalen und traditionellen Spielen finden",
         "Answer7": "A) Minecraft"
       },
       "teil4": {
@@ -1238,13 +1234,13 @@
   "B1 4.12 Abenteuer in der Natur": {
     "answers": {
       "teil3": {
-        "Answer1": "A",
-        "Answer2": "B",
-        "Answer3": "B",
-        "Answer4": "B",
-        "Answer5": "B",
-        "Answer6": "B",
-        "Answer7": "B"
+        "Answer1": "a) Der Nervenkitzel des Unbekannten.",
+        "Answer2": "b) Um den Alltag zu durchbrechen.",
+        "Answer3": "b) Risiken und Herausforderungen.",
+        "Answer4": "b) Durch alltägliche Veränderungen.",
+        "Answer5": "b) Finanzielle Unsicherheiten.",
+        "Answer6": "b) Unvergessliche Erlebnisse.",
+        "Answer7": "b) Sie suchen den Nervenkitzel im Alltag."
       },
       "teil4": {
         "Answer1": "A",
@@ -1262,13 +1258,13 @@
   "B1 4.13 Eigene Filmkritik schreiben": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Ein mysterioser Mod",
-        "Answer2": "C) Er ist ein Ermittler",
-        "Answer3": "C) Eine nachtliche Verfolgung",
-        "Answer4": "D) Eine unerwartete Figur",
-        "Answer5": "C) Spannungssteigernd",
-        "Answer6": "B) Die Dialoge waren klischeehaft",
-        "Answer7": "A) Ja"
+        "Answer1": "a) Ein mysteriöser Mord.",
+        "Answer2": "c) Er ist ein Ermittler.",
+        "Answer3": "c) Eine nächtliche Verfolgung.",
+        "Answer4": "d) Eine unerwartete Figur.",
+        "Answer5": "c) Spannungssteigernd.",
+        "Answer6": "b) Die Dialoge waren klischeehaft.",
+        "Answer7": "a) Ja."
       },
       "teil4": {
         "Answer1": "B) Spannung",
@@ -1286,13 +1282,13 @@
   "B1 5.14 Traditionelles vs. digitales Lernen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Der Arbeitsmarkt verandert sich schnell",
-        "Answer2": "A) Es ist billiger als formelles Lernen",
-        "Answer3": "B) ESUMMER30s halt den Deist jung und aktiv",
-        "Answer4": "A) Die Kosten fur Kurse",
-        "Answer5": "A) Technologie macht Lernen einfacher und zuganglicher",
-        "Answer6": "B) Kreativitat und Anpassungsfahigkeit",
-        "Answer7": "C) Die richtige Einstellung und Disziplin"
+        "Answer1": "b) Der Arbeitsmarkt verändert sich schnell.",
+        "Answer2": "a) Es ist billiger als formelles Lernen.",
+        "Answer3": "b) Es hält den Geist jung und aktiv.",
+        "Answer4": "a) Die Kosten für Kurse.",
+        "Answer5": "a) Technologie macht Lernen einfacher und zugänglicher.",
+        "Answer6": "b) Kreativität und Anpassungsfähigkeit.",
+        "Answer7": "c) Die richtige Einstellung und Disziplin."
       },
       "teil4": {
         "Answer1": "A) Sie mochte in ihrem Beruf vorankommen",
@@ -1310,13 +1306,13 @@
   "B1 5.15 Medien und Arbeiten im Homeoffice": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Sie ermoglicht eine bessere Kommunikation und flexible Arbeiten",
-        "Answer2": "C) Stress und Soziale Isolation",
-        "Answer3": "B) Als leicht gefahrdet",
-        "Answer4": "A) Die altere Generation",
-        "Answer5": "B) Die Kontrolle uber den technologischen Fortschritt",
-        "Answer6": "B) Bessere digitale Bilding",
-        "Answer7": "A) Uberwaltigt"
+        "Answer1": "b) Sie ermöglicht eine bessere Kommunikation und flexibles Arbeiten.",
+        "Answer2": "c) Stress und soziale Isolation.",
+        "Answer3": "b) Als leicht gefährdet.",
+        "Answer4": "a) Die ältere Generation.",
+        "Answer5": "b) Die Kontrolle über den technologischen Fortschritt.",
+        "Answer6": "b) Bessere digitale Bildung.",
+        "Answer7": "a) Überwältigt."
       },
       "teil4": {
         "Answer1": "C) Flexibilitat durch Homeoffice",
@@ -1334,13 +1330,13 @@
   "B1 5.16 Prüfungsangst und Stressbewältigung": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Prufungen fordern das Kurzzeitgedachtnis",
-        "Answer2": "C) Schriftliche, mundliche und praktische Prufungen",
-        "Answer3": "B) Prufungsstress",
-        "Answer4": "B) Projekte und Hausarbeiten",
-        "Answer5": "B) Mundliche Prufungen",
-        "Answer6": "B) Enstspannungstechniken und gute Vorbereitung",
-        "Answer7": "B) Sie sind fairer und individueller"
+        "Answer1": "b) Prüfungen fördern das Kurzzeitgedächtnis.",
+        "Answer2": "c) Schriftliche, mündliche und praktische Prüfungen.",
+        "Answer3": "b) Prüfungsstress.",
+        "Answer4": "b) Projekte und Hausarbeiten.",
+        "Answer5": "b) Mündliche Prüfungen.",
+        "Answer6": "b) Entspannungstechniken und gute Vorbereitung.",
+        "Answer7": "b) Sie sind fairer und individueller."
       },
       "teil4": {
         "Answer1": "B) RegelmaBiges Lernen und Pausen machen",
@@ -1358,13 +1354,13 @@
   "B1 5.17 Wie lernt man am besten?": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Aktives Arbeiten mit dem lernstoff, z.B. durch Zusammenfassungen",
-        "Answer2": "C) Sachlaf hilft, das Gelernte zu speichern",
-        "Answer3": "B) RegelmaBige Pausen",
-        "Answer4": "B) Das regelmaBige Wiederholen des Lernstoffs",
-        "Answer5": "A) Durch aktives Lernen und Wiederholung",
-        "Answer6": "C) Spaced repetition",
-        "Answer7": "B) Sei bringen Struktur in den Lernprozess"
+        "Answer1": "b) Aktives Arbeiten mit dem Lernstoff, z.B. durch Zusammenfassungen.",
+        "Answer2": "c) Schlaf hilft, das Gelernte zu speichern.",
+        "Answer3": "b) Regelmäßige Pausen.",
+        "Answer4": "b) Das regelmäßige Wiederholen des Lernstoffs.",
+        "Answer5": "a) Durch aktives Lernen und Wiederholung.",
+        "Answer6": "c) Spaced repetition.",
+        "Answer7": "b) Sie bringen Struktur in den Lernprozess."
       },
       "teil4": {
         "Answer1": "A) Der Lernstof wird in Kleinere Abschnitte aufgeteilt",
@@ -1382,13 +1378,13 @@
   "B1 6.18 Wege zum Wunschberuf": {
     "answers": {
       "teil3": {
-        "Answer1": "C) Leidenschaft und Vernunft",
-        "Answer2": "B) Flexibilitat und Weiterbildung",
-        "Answer3": "C) Eine Mischung aus Leidenschaft und Vernunft finden",
-        "Answer4": "B) Der Traumberuf ist nicht immer gefragt",
-        "Answer5": "C) Die realen Bedingungen auf dem Arbeitsmarkt",
-        "Answer6": "C) Sie sind nur kurzfristig gefragt",
-        "Answer7": "A) Durch Flexibilitat und Bereitschaft zur Weiterbildung"
+        "Answer1": "c) Leidenschaft und Vernunft.",
+        "Answer2": "b) Flexibilität und Weiterbildung.",
+        "Answer3": "c) Eine Mischung aus Leidenschaft und Vernunft finden.",
+        "Answer4": "b) Der Traumberuf ist nicht immer gefragt.",
+        "Answer5": "c) Die realen Bedingungen auf dem Arbeitsmarkt.",
+        "Answer6": "c) Sie sind nur kurzfristig gefragt.",
+        "Answer7": "a) Durch Flexibilität und Bereitschaft zur Weiterbildung."
       },
       "teil4": {
         "Answer1": "B) SpaB an der Arbeit",
@@ -1406,14 +1402,15 @@
   "B1 6.19 Das Vorstellungsgespräch": {
     "answers": {
       "teil3": {
-        "Answer1": "B) die umweltfreundliche Stromproduktion in Feldheim",
-        "Answer2": "a) ein ganzes Dorf von modernen Energien leben kann",
-        "Answer3": "C) muss die Bevölkerung dafür sein",
-        "Answer4": "B) es ein neues Tourismus-Angebot gibt",
-        "Answer5": "B) muss man nicht sportlich sein",
-        "Answer6": "C) mehr Velo-Touristen in die Region kommen"
+        "Answer1": "B) die umweltfreundliche Stromproduktion in Feldheim.",
+        "Answer2": "A) ein ganzes Dorf von modernen Energien leben kann.",
+        "Answer3": "C) muss die Bevölkerung dafür sein."
       },
-      "teil4": {}
+      "teil4": {
+        "Answer1": "B) es ein neues Tourismus-Angebot gibt.",
+        "Answer2": "B) muss man nicht sportlich sein.",
+        "Answer3": "C) mehr Velo-Touristen in die Region kommen."
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1jIci1aX6N68DhttbtTg1yLF2ighuNIyYNTtSLz_OEjc/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1jIci1aX6N68DhttbtTg1yLF2ighuNIyYNTtSLz_OEjc/edit",
@@ -1440,11 +1437,11 @@
   "B1 7.21 Lebensformen heute ? Familie, Wohnge": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Sie wollte Auslandserfahrung sammeln",
-        "Answer2": "B) Sie wollte Auslandserfahrung sammeln",
+        "Answer1": "B) Sie wollte Auslandserfahrung sammeln.",
+        "Answer2": "A) Niederlande",
         "Answer3": "D) Ja, zwei Söhne.",
-        "Answer4": "D) Ja, fünf Geschwister",
-        "Answer5": "C) Weil ihre Eltern dort wohnen"
+        "Answer4": "D) Ja, fünf Geschwister.",
+        "Answer5": "C) Weil ihre Eltern dort wohnen."
       },
       "teil4": {}
     },
@@ -1460,14 +1457,14 @@
         "Answer2": "B) Alexanderplatz",
         "Answer3": "D) Eine Einkaufsstraße",
         "Answer4": "D) in einem Hotel",
-        "Answer5": "C) Stadtrundfahrten",
-        "Answer6": "D) im Supermarkt",
-        "Answer7": "B) Name, Alter, Wohnort"
+        "Answer5": "C) Stadtrundfahrten"
       },
       "teil4": {
-        "Answer1": "D) Zeugnisse und Anschreiben",
-        "Answer2": "A) Man lernt den Arbeitgeber kennen.",
-        "Answer3": "C) Man kann sich bei der nächsten offenen Stelle bewerben."
+        "Answer1": "D) im Supermarkt",
+        "Answer2": "B) Name, Alter, Wohnort",
+        "Answer3": "D) Zeugnisse und Anschreiben",
+        "Answer4": "A) Man lernt den Arbeitgeber kennen.",
+        "Answer5": "C) Man kann sich bei der nächsten offenen Stelle bewerben."
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1b4CY4c1YK-QrIKmmq6NX60cdmWJ6u0X6C-qcyoFjbBU/gviz/tq?tqx=out:html&sheet=Key",
@@ -1481,7 +1478,7 @@
         "Answer1": "C) Elizabeth Magie Phillips",
         "Answer2": "B) The Landlord’s Game",
         "Answer3": "B) Wie unfair Monopole sind",
-        "Answer4": "C) Er gab es als seine eigene Idee aus",
+        "Answer4": "C) Er gab es als seine eigene Idee aus.",
         "Answer5": "D) So gut wie nichts",
         "Answer6": "B) Weil Parker Brothers es verkaufte",
         "Answer7": "B) Mary Pilon"
@@ -1496,11 +1493,13 @@
   "B1 8.24 Konsum und Nachhaltigkeit": {
     "answers": {
       "teil3": {
-        "Answer1": "False",
-        "Answer2": "True",
-        "Answer3": "False",
-        "Answer4": "False",
-        "Answer5": "True"
+        "Answer1": "B) Falsch",
+        "Answer2": "A) Richtig",
+        "Answer3": "B) Falsch",
+        "Answer4": "B) Falsch",
+        "Answer5": "A) Richtig",
+        "Answer6": "B) Falsch",
+        "Answer7": "A) Richtig"
       },
       "teil4": {}
     },
@@ -1512,12 +1511,12 @@
   "B1 8.25 Online einkaufen ? Rechte und Risiken": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Sie ist selbstständig und verdient mehr",
-        "Answer2": "C) Weil der Service und die Beratung gut sind",
-        "Answer3": "B) Sie trennt Müll und spart Energie",
-        "Answer4": "c) Die Familie stellt die Heizung auf 18 Grad und schaltet Geräte aus",
+        "Answer1": "B) Sie ist selbstständig und verdient mehr.",
+        "Answer2": "C) Weil Service und Beratung gut sind.",
+        "Answer3": "B) Sie trennt Müll und spart Energie.",
+        "Answer4": "C) Licht und elektrische Geräte werden ausgeschaltet.",
         "Answer5": "B) Beratung zu Konsum, Verträgen und Ernährung",
-        "Answer6": "c) Durch den Staat und Kundenzahlungen",
+        "Answer6": "C) Durch staatliche Unterstützung und teilweise Kundenzahlungen",
         "Answer7": "B) Broschüren mit Informationen"
       },
       "teil4": {}
@@ -1531,11 +1530,12 @@
     "answers": {
       "teil3": {
         "Answer1": "B) Mecklenburg-Vorpommern",
-        "Answer2": "B) Rügen und Usedom",
-        "Answer3": "B) Städte wie Berlin, Hamburg, Köln und München",
-        "Answer4": "B) Das Oktoberfest",
-        "Answer5": "B) Neuschwanstein, Herrenchiemsee und Linderhof",
-        "Answer6": "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"
+        "Answer2": "A) Die Zugspitze",
+        "Answer3": "A) Rügen und Usedom",
+        "Answer4": "B) Städte wie Berlin, Hamburg, Köln und München",
+        "Answer5": "B) Das Oktoberfest",
+        "Answer6": "A) Neuschwanstein, Herrenchiemsee und Linderhof",
+        "Answer7": "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"
       },
       "teil4": {}
     },
@@ -1548,12 +1548,12 @@
     "answers": {
       "teil3": {
         "Answer1": "C) Papier, Glas und Plastik",
-        "Answer2": "A) Durch den Einsatz energieeffizienter Gerate",
-        "Answer3": "A) Durch den Einsatz energieeffizienter Gerate",
-        "Answer4": "A) Fahrrader und offentliche Verkehrsmittel",
+        "Answer2": "A) Durch den Einsatz energieeffizienter Geräte",
+        "Answer3": "B) Solar- und Windkraft",
+        "Answer4": "A) Fahrräder und öffentliche Verkehrsmittel",
         "Answer5": "B) Weil die Fleischproduktion ressourcenintensiv ist",
         "Answer6": "C) Umweltfreundlich einkaufen",
-        "Answer7": "C) Umweltfreundlich einkaufen"
+        "Answer7": "B) Bei jedem Einzelnen"
       },
       "teil4": {
         "Answer1": "B) Stoffbeutel",
@@ -1571,13 +1571,13 @@
   "B1 10.28 Klimafreundlich leben": {
     "answers": {
       "teil3": {
-        "Answer1": "B",
-        "Answer2": "B",
-        "Answer3": "B",
-        "Answer4": "B",
-        "Answer5": "A",
-        "Answer6": "B",
-        "Answer7": "B"
+        "Answer1": "B) Weil es in vielen Teilen der Welt knapp ist.",
+        "Answer2": "B) Für die Landwirtschaft und die Industrie.",
+        "Answer3": "B) Wassersparende Geräte benutzen.",
+        "Answer4": "B) Weil es das Trinkwasser verschmutzt.",
+        "Answer5": "A) Gesetze und Verordnungen erlassen.",
+        "Answer6": "B) Um die Bedeutung des Wassersparens zu verstehen.",
+        "Answer7": "B) Wasser ist eine kostbare Ressource, die geschützt werden muss."
       },
       "teil4": {
         "Answer1": "B",
