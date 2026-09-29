@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
+import { CURRICULUM_ENTRIES } from "../data/curriculumManifest";
+import { getConfiguredInAppWorkbookResourceRoute, normalizeFalowenCourseRoute } from "../data/inAppWorkbookRoutes";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { EmptyState, InfoBox, PillBadge, SectionHeader, SkeletonRow } from "./ui";
 
@@ -28,6 +31,56 @@ const toNumericScore = (value) => {
 };
 
 const getAssignmentKey = (entry) => safeLower(entry.assignmentId || entry.assignment_id || entry.assignmentKey);
+
+const GENERAL_RESUBMIT_TARGET = "/campus/course?submitWork=1";
+
+const appendSubmissionParams = (route, { level, assignmentKey }) => {
+  const parsed = new URL(route, "https://www.falowen.app");
+  parsed.searchParams.set("view", "submit");
+  parsed.searchParams.set("assignmentKey", assignmentKey);
+  parsed.searchParams.set("assignmentId", assignmentKey);
+  parsed.searchParams.set("level", level);
+  if (level === "A1") parsed.searchParams.set("workbookTab", "submit");
+  if (level === "A1" || level === "A2") parsed.searchParams.set("radio", "done");
+  return `${parsed.pathname}?${parsed.searchParams.toString()}${parsed.hash || ""}`;
+};
+
+export const buildResultResubmitTarget = (item = {}) => {
+  const level = String(item.level || "").trim().toUpperCase();
+  if (["B2", "C1"].includes(level)) return "/campus/writing";
+  if (!["A1", "A2", "B1"].includes(level)) return GENERAL_RESUBMIT_TARGET;
+
+  const assignmentKey = resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: item.assignmentKey || item.assignmentId || item.assignment_id,
+    assignmentTitle: item.assignment,
+  });
+  if (!assignmentKey) return GENERAL_RESUBMIT_TARGET;
+
+  const curriculumEntry = CURRICULUM_ENTRIES.find((entry) => {
+    if (String(entry?.level || "").trim().toUpperCase() !== level) return false;
+    const candidates = [
+      entry?.canonicalAssignmentId,
+      entry?.assignmentId,
+      entry?.assignment_id,
+      entry?.id,
+    ]
+      .map((value) => String(value || "").trim().toUpperCase())
+      .filter(Boolean);
+    return candidates.includes(assignmentKey);
+  });
+  if (!curriculumEntry) return GENERAL_RESUBMIT_TARGET;
+
+  const workbookRoute =
+    getConfiguredInAppWorkbookResourceRoute({
+      level,
+      day: curriculumEntry.day,
+      chapter: curriculumEntry.chapter,
+    }) || normalizeFalowenCourseRoute(curriculumEntry.workbookRoute || curriculumEntry.workbook_link);
+
+  if (!workbookRoute) return GENERAL_RESUBMIT_TARGET;
+  return appendSubmissionParams(workbookRoute, { level, assignmentKey });
+};
 
 const asPercent = (value) => {
   const numeric = Number(value);
@@ -273,7 +326,7 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const wrongObjectiveRows = getWrongObjectiveRows(item);
   const hasStructuredFeedback = hasStructuredResultFeedback(item);
   const correctionPoints = hasStructuredFeedback ? getCorrectionPoints(item) : [];
-  const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/course?submitWork=1";
+  const resubmitTarget = buildResultResubmitTarget(item);
   const passed = item.numericScore >= PASS_MARK;
   const objectiveTotal = Number(item.objectiveTotal || 0);
   const objectiveCorrect = Number(item.objectiveCorrect || 0);
@@ -483,6 +536,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState("ALL");
   const [minScore, setMinScore] = useState("");
+  const [expandedResultKeys, setExpandedResultKeys] = useState(() => new Set());
 
   useEffect(() => {
     if (!sheetCsvUrl) return;
@@ -608,6 +662,24 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       (a, b) => (b.createdMs || 0) - (a.createdMs || 0) || b.position - a.position
     );
   }, [activeResults, t]);
+
+  const newestResultKey = normalized[0]?.key || "";
+  useEffect(() => {
+    if (!newestResultKey) {
+      setExpandedResultKeys(new Set());
+      return;
+    }
+    setExpandedResultKeys(new Set([newestResultKey]));
+  }, [newestResultKey]);
+
+  const toggleResultDetails = (key) => {
+    setExpandedResultKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
 
   const availableLevels = useMemo(() => {
     const set = new Set();
@@ -755,6 +827,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
+          const isExpanded = expandedResultKeys.has(item.key);
+          const detailsId = `result-details-${String(item.key).replace(/[^a-zA-Z0-9_-]+/g, "-")}`;
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
           const studentMeta = [item.name, item.studentcode].filter(Boolean).join(" · ");
           const statusVariant =
@@ -838,6 +912,20 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 ) : null}
               </div>
 
+              <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-start" }}>
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
+                  aria-controls={detailsId}
+                  style={{ ...styles.secondaryButton, width: "fit-content" }}
+                  onClick={() => toggleResultDetails(item.key)}
+                >
+                  {isExpanded ? t("resultHistory.hideDetails") : t("resultHistory.showDetails")}
+                </button>
+              </div>
+
+              {isExpanded ? (
+                <div id={detailsId}>
               {item.link && !Number(item.objectiveTotal || 0) ? (
                 <div
                   style={{
@@ -870,6 +958,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               <div style={{ marginTop: 12 }}>
                 <TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />
               </div>
+                </div>
+              ) : null}
             </article>
           );
         })}

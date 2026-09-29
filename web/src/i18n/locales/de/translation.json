@@ -1200,6 +1200,8 @@
     "objectiveReviewTitle": "Objektive Antworten überprüfen",
     "objectiveReviewHelp": "Öffne die ursprüngliche Übung, vergleiche die Antworten mit den Fragen und wiederhole deine Fehler.",
     "feedbackTitle": "Feedback",
+    "showDetails": "Feedback und Details anzeigen",
+    "hideDetails": "Feedback und Details ausblenden",
     "empty": {
       "title": "Noch keine Ergebnisse",
       "description": "Versuche eine andere Suche oder schließe eine Prüfung ab, um Ergebnisse zu sehen.",

@@ -1306,6 +1306,8 @@
     "objectiveReviewTitle": "Cross-check your objective answers",
     "objectiveReviewHelp": "Open the original exercise to compare these answers with the questions and review any mistakes.",
     "feedbackTitle": "Feedback",
+    "showDetails": "View feedback & details",
+    "hideDetails": "Hide feedback & details",
     "empty": {
       "title": "No results yet",
       "description": "Try another search or complete an exam to see results here.",
