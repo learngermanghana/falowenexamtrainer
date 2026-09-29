@@ -383,7 +383,6 @@
             <div class="lead-inline-error" id="leadClassError"></div>
           </div>
         </div>
-        ${buildDecisionSummary(selected, data)}
         <label class="lead-consent" for="leadConsent">
           <input id="leadConsent" name="consent" type="checkbox" />
           <span>I agree to be contacted by Falowen via WhatsApp, phone, or email about this class enquiry. Read our <a href="/privacy" target="_blank" rel="noreferrer">privacy policy</a>.</span>
@@ -401,6 +400,7 @@
           <pre id="leadDebugOutput">[]</pre>
         </details>
       </form>
+      ${buildDecisionSummary(selected, data)}
     `;
     hero.insertAdjacentElement("afterend", card);
 
