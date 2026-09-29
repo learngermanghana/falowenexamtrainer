@@ -15,7 +15,17 @@ import {
 } from "../utils/workbookSubmissionDraft";
 
 const OBJECTIVE_OPTION_RE = /^\s*([A-H])\s*[.)\-:]\s*/i;
+const ANZEIGE_OPTION_RE = /^\s*Anzeige\s+([A-H])\b/i;
 const QUESTION_NUMBER_RE = /^\s*(\d+)\s*[.)\-:]/;
+
+export const extractWorkbookObjectiveLetter = (value = "") => {
+  const text = String(value || "");
+  return String(
+    text.match(OBJECTIVE_OPTION_RE)?.[1]
+    || text.match(ANZEIGE_OPTION_RE)?.[1]
+    || "",
+  ).toUpperCase();
+};
 
 const panelStyle = {
   border: "1px solid #bfdbfe",
@@ -62,10 +72,10 @@ const findActiveSectionRoot = (root, activeTab) => {
   return heading.closest("section") || heading.parentElement;
 };
 
-const collectObjectiveGroups = (sectionRoot) => {
+export const collectObjectiveGroups = (sectionRoot) => {
   if (!sectionRoot) return [];
   const optionNodes = Array.from(sectionRoot.querySelectorAll("span")).filter((node) =>
-    OBJECTIVE_OPTION_RE.test(String(node.textContent || "")),
+    Boolean(extractWorkbookObjectiveLetter(node.textContent)),
   );
   const grouped = [];
   const byParent = new Map();
@@ -81,14 +91,27 @@ const collectObjectiveGroups = (sectionRoot) => {
     byParent.get(parent).options.push(optionNode);
   });
 
+  const usedQuestionNumbers = new Set();
+  let nextQuestionNumber = 1;
+
   return grouped
     .filter((group) => group.options.length >= 2)
-    .map((group, index) => {
+    .map((group) => {
       const stem = String(group.parent.querySelector("strong")?.textContent || "").trim();
-      const explicitNumber = stem.match(QUESTION_NUMBER_RE)?.[1];
+      const explicitNumber = Number(stem.match(QUESTION_NUMBER_RE)?.[1] || 0);
+      let questionNumber = explicitNumber || nextQuestionNumber;
+
+      if (usedQuestionNumbers.has(questionNumber)) {
+        while (usedQuestionNumbers.has(nextQuestionNumber)) nextQuestionNumber += 1;
+        questionNumber = nextQuestionNumber;
+      }
+
+      usedQuestionNumbers.add(questionNumber);
+      nextQuestionNumber = Math.max(nextQuestionNumber, questionNumber + 1);
+
       return {
         ...group,
-        questionNumber: explicitNumber ? Number(explicitNumber) : index + 1,
+        questionNumber,
       };
     });
 };
@@ -190,8 +213,7 @@ export default function WorkbookSubmissionCaptureRuntime({ context = null, activ
 
       groups.forEach((group) => {
         group.options.forEach((optionNode) => {
-          const optionMatch = String(optionNode.textContent || "").match(OBJECTIVE_OPTION_RE);
-          const answer = String(optionMatch?.[1] || "").toUpperCase();
+          const answer = extractWorkbookObjectiveLetter(optionNode.textContent);
           if (!answer) return;
           const originalStyle = optionNode.getAttribute("style");
           const originalRole = optionNode.getAttribute("role");
@@ -218,8 +240,8 @@ export default function WorkbookSubmissionCaptureRuntime({ context = null, activ
             groups.forEach((otherGroup) => {
               if (otherGroup.questionNumber !== group.questionNumber) return;
               otherGroup.options.forEach((otherOption) => {
-                const otherAnswer = String(otherOption.textContent || "").match(OBJECTIVE_OPTION_RE)?.[1] || "";
-                applyOptionPresentation(otherOption, String(otherAnswer).toUpperCase() === answer);
+                const otherAnswer = extractWorkbookObjectiveLetter(otherOption.textContent);
+                applyOptionPresentation(otherOption, otherAnswer === answer);
               });
             });
           };
