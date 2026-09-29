@@ -182,12 +182,7 @@
   }
 
   function getLeadCtaCopy() {
-    const variants = ["Unlock class schedule", "See fees & timetable", "Continue to class details"];
-    const stored = Number(localStorage.getItem(CTA_VARIANT_KEY));
-    if (Number.isInteger(stored) && stored >= 0 && stored < variants.length) return variants[stored];
-    const chosen = Math.floor(Math.random() * variants.length);
-    localStorage.setItem(CTA_VARIANT_KEY, String(chosen));
-    return variants[chosen];
+    return "Save enquiry";
   }
 
   function saveStoredLead(lead) {
