@@ -88,9 +88,9 @@
   }
 
   function addStyles() {
-    if (document.getElementById("simpleClassFlowStyles")) return;
+    if (document.getElementById("classHeroBannerStyles")) return;
     var style = document.createElement("style");
-    style.id = "simpleClassFlowStyles";
+    style.id = "classHeroBannerStyles";
     style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .lead-small-actions{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}#studentReviewsCard{display:grid!important}#classBrochureFooter{display:grid!important}.brochure-footer{display:grid!important}.other-classes-card{margin-top:16px;display:grid;gap:12px}.other-classes-card h2{margin:0;font-size:20px}.other-classes-card p{margin:0;color:#475569;font-size:14px;line-height:1.55}.other-classes-grid{display:grid;gap:10px}.other-class-item{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:12px;display:grid;gap:8px}.other-class-item strong{color:#0f172a;font-size:15px}.other-class-meta{color:#475569;font-size:13px;line-height:1.45}.other-class-actions{display:grid;grid-template-columns:1fr;gap:8px}.other-class-actions a{min-height:40px;border-radius:12px;padding:10px 12px;font-size:13px}@media(min-width:760px){.other-classes-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.other-class-actions{grid-template-columns:1fr 1fr}}";
     document.head.appendChild(style);
   }
