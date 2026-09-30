@@ -1,21 +1,28 @@
-import fs from "fs";
-import path from "path";
+import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
+import {
+  STANDARD_WORKBOOK_TABS,
+  getWorkbookTabsWithLegacyGrammar,
+} from "./StandardWorkbookComponents";
 
-const read = (name) => fs.readFileSync(path.resolve(__dirname, name), "utf8");
-
-describe("A2 Day 25 reading-only navigation", () => {
-  test("the lesson source identifies Teil 4 as reading and not listening", () => {
-    const source = read("A2Day25TagesablaufWorkbookPage.js");
-
-    expect(source).toContain('{ key: "lesen2", label: "Teil 4 · Lesen" }');
-    expect(source).toContain("There is no Hören assignment in this workbook.");
+describe("A2 Day 25 canonical navigation", () => {
+  test("the canonical lesson profile has no Teil 4", () => {
+    const profile = getA2B1WorkbookSectionProfile("A2", 25);
+    expect(profile).toMatchObject({
+      listening: false,
+      part4: null,
+      part4Submission: "none",
+    });
   });
 
-  test("the shared legacy overlay preserves the second reading section", () => {
-    const source = read("A2LegacyStandardWorkbookNavigationImpl.js");
+  test("shared navigation therefore hides the old Hören/second-reading slot", () => {
+    const tabs = getWorkbookTabsWithLegacyGrammar({
+      tabs: STANDARD_WORKBOOK_TABS,
+      ariaLabel: "A2 Day 25 workbook sections",
+    }).tabs;
 
-    expect(source).toContain('{ key: "lesen2", label: "Teil 4", description: "Lesen" }');
-    expect(source).toContain('lesen2: "teil4"');
-    expect(source).toContain("config.day === 25 ? A2_DAY25_WORKBOOK_TABS : STANDARD_WORKBOOK_TABS");
+    expect(tabs.map((tab) => tab.key)).not.toContain("hoeren");
+    expect(tabs.map((tab) => tab.key)).toEqual(
+      expect.arrayContaining(["grammar", "sprechen", "lesen", "references", "submit"]),
+    );
   });
 });
