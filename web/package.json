@@ -64,7 +64,7 @@
     "pretest": "npm run sync:resubmission-review-gate && npm run sync:public-signup-recovery && npm run sync:a1-tutor-nav-safety && npm run sync:a1-day19-speaking-reliability && npm run sync:a1-day20-letter-guidance && npm run sync:a1-secondary-grammar && npm run sync:a2-legacy-portal-safety && npm run sync:a2-react-dom-safety && npm run sync:a2-fallback-workbook-safety && npm run sync:a2-late-native-ownership && npm run sync:coursebook-sections && npm run sync:a2-shared-regression-safety && npm run sync:workbook-submission-context && npm run sync:goethe-audio-feedback && npm run sync:course-goethe-free-chat && npm run sync:a1-self-learning-destinations && npm run sync:sheet-result-feedback && npm run sync:course-completion-progress && npm run sync:course-media && npm run sync:c1-opinion-template && npm run sync:a2-b1-mobile-actions && npm run sync:submission-word-feedback && npm run sync:compact-student-navigation && npm run generate:ai-course-map",
     "pretest:ci": "npm run sync:resubmission-review-gate && npm run sync:public-signup-recovery && npm run sync:a1-tutor-nav-safety && npm run sync:a1-day19-speaking-reliability && npm run sync:a1-day20-letter-guidance && npm run sync:a1-secondary-grammar && npm run sync:a2-legacy-portal-safety && npm run sync:a2-react-dom-safety && npm run sync:a2-fallback-workbook-safety && npm run sync:a2-late-native-ownership && npm run sync:coursebook-sections && npm run sync:a2-shared-regression-safety && npm run sync:workbook-submission-context && npm run sync:goethe-audio-feedback && npm run sync:course-goethe-free-chat && npm run sync:a1-self-learning-destinations && npm run sync:sheet-result-feedback && npm run sync:course-completion-progress && npm run sync:course-media && npm run sync:c1-opinion-template && npm run sync:a2-b1-mobile-actions && npm run sync:submission-word-feedback && npm run sync:compact-student-navigation && npm run generate:ai-course-map",
     "start": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "npm run gate:production && npm run generate:build-identity && vite build",
     "test": "jest",
     "test:ci": "jest --runInBand",
     "sync:a2-b1-mobile-actions": "node ../scripts/patchA2B1MobileFloatingActions.mjs",
@@ -73,6 +73,8 @@
     "audit:teaching:a1": "node ../scripts/auditTeachingQuality.js --mode=a1",
     "audit:teaching:all": "node ../scripts/auditTeachingQuality.js --mode=all",
     "audit:teaching:a2": "node ../scripts/auditTeachingQuality.js --mode=a2",
-    "generate:ai-course-map": "node ../scripts/generateFalowenCourseMap.mjs"
+    "generate:ai-course-map": "node ../scripts/generateFalowenCourseMap.mjs",
+    "gate:production": "jest --runInBand --runTestsByPath src/data/a2B1LessonProfile.test.js src/data/a2B1LessonProfileTimerIntegration.test.js src/data/a2B1LessonProfileBuildSafety.test.js src/components/A2B1WorkbookSectionProfile.test.js src/components/A2Day25BuildNavigation.test.js src/utils/structuredSubmissionTemplate.test.js src/data/productionDeploymentContract.test.js",
+    "generate:build-identity": "node ../scripts/writeBuildIdentity.mjs"
   }
 }
