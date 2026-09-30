@@ -17,7 +17,7 @@ import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import { getB1ListeningTask } from "../data/b1ListeningTasks";
 import { isB1WritingRequired } from "../data/b1WritingSchedule";
-import A2B1NoWritingReadingChallenge from "./A2B1NoWritingReadingChallenge";
+import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 
 const card = {
   ...styles.card,
@@ -498,7 +498,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                       </ReadingExamFrame>
                     )}
           
-                    <A2B1NoWritingReadingChallenge level="B1" day={config.day} />
+                    <A2B1ReadingQualityChallenge level="B1" day={config.day} />
                     <WorkbookSubmissionReminder />
                     <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
                   </section>
@@ -559,6 +559,10 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
           
                   </>
                 )}
+
+                {renderSections && displayedActiveTab === "lesen" ? (
+                  <A2B1ReadingQualityChallenge level="B1" day={config.day} />
+                ) : null}
           
                 {displayedActiveTab === "references" && (
                   <WorkbookReferenceAnswers
