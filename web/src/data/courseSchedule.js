@@ -120,7 +120,7 @@ const A2_SCHEDULE = [
     goal: "Arrange and discuss meeting places.",
     assignment: true,
     instruction: "Review the in-app grammar notes and complete all four workbook parts. Submit your final answers in the assignment area.",
-    grammar_topic: "Nominalization of Verbs",
+    grammar_topic: "Wo? oder Wohin? · Wechselpräpositionen (Dativ/Akkusativ)",
     video: "https://youtu.be/U14gkjld0ys",
     youtube_link: "https://youtu.be/U14gkjld0ys",
     grammarbook_link: "/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes",
