@@ -67,20 +67,29 @@ replaceOnce(
 );
 
 replaceOnce(
-  `            <p style={{ ...styles.helperText, margin: 0 }}>\n              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.\n            </p>`,
-  `            <p style={{ ...styles.helperText, margin: 0 }}>\n              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.\n            </p>\n            {structuredResubmissionEnabled ? (\n              <div\n                data-structured-resubmission-template="true"\n                style={{ border: "1px solid #bfdbfe", borderRadius: 10, padding: 10, background: "#eff6ff", color: "#1e3a8a" }}\n              >\n                Your previous answers are loaded below. Correct only the Teile that need improvement, keep every TEIL heading, and leave correct answers unchanged.\n                {structuredResubmissionDiff?.changedParts?.length\n                  ? \` Changed now: \${formatMissingStructuredParts(structuredResubmissionDiff.changedParts)}.\`\n                  : ""}\n              </div>\n            ) : previousResubmissionSeed?.text ? (\n              <InfoBox tone="warning">\n                This is an older submission that Falowen could not separate confidently. Your previous text is loaded unchanged, so use the legacy corrected-text format.\n              </InfoBox>\n            ) : null}`,
+  `            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+              Review your tutor feedback, correct the work, then submit the improved version below.
+            </p>`,
+  `            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+              Review your tutor feedback, correct the work, then submit the improved version below.
+            </p>
+            {structuredResubmissionEnabled ? (
+              <p data-structured-resubmission-template="true" style={{ ...styles.helperText, margin: 0 }}>
+                Your previous TEIL answers are loaded below. Keep the headings and correct only what needs improvement.
+              </p>
+            ) : null}`,
   "structured resubmission guidance",
 );
 
 replaceOnce(
-  `              <span style={styles.label}>Corrected text</span>`,
-  `              <span style={styles.label}>{structuredResubmissionEnabled ? "Corrected answers" : "Corrected text"}</span>`,
+  `              <span style={styles.label}>Corrected work</span>`,
+  `              <span style={styles.label}>{structuredResubmissionEnabled ? "Corrected answers" : "Corrected work"}</span>`,
   "resubmission field label",
 );
 
 replaceOnce(
-  `                placeholder="Paste your corrected letter/text here."`,
-  `                placeholder={structuredResubmissionEnabled ? "Your previous answers are loaded here." : "Paste your corrected letter/text here."}`,
+  `                placeholder="Paste or type your corrected work here."`,
+  `                placeholder={structuredResubmissionEnabled ? "Your previous answers are loaded here." : "Paste or type your corrected work here."}`,
   "structured resubmission placeholder",
 );
 
@@ -90,11 +99,6 @@ replaceOnce(
   "structured resubmission word count",
 );
 
-replaceOnce(
-  `            <p style={{ ...styles.helperText, margin: 0 }}>\n              Resubmissions must include clear edits. For full text: at least {MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and {MIN_RESUBMISSION_NEW_WORDS} new words. For short answer lists (1.a, 2.b...), change at least {MIN_OBJECTIVE_CHANGED_ANSWERS} answers.\n            </p>`,
-  `            <p style={{ ...styles.helperText, margin: 0 }}>\n              {structuredResubmissionEnabled\n                ? "Change only what needs correction. Falowen checks changes Teil by Teil, so one real correction is enough; correct Teile can remain unchanged."\n                : \`Resubmissions must include clear edits. For full text: at least \${MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and \${MIN_RESUBMISSION_NEW_WORDS} new words. For short answer lists (1.a, 2.b...), change at least \${MIN_OBJECTIVE_CHANGED_ANSWERS} answers.\`}\n            </p>`,
-  "structured resubmission edit guidance",
-);
 
 const requiredMarkers = [
   "resolveStructuredResubmissionSeed",
@@ -107,7 +111,7 @@ const requiredMarkers = [
   "previousStructuredSections: previousResubmissionSeed.sections || null",
   "changedSubmissionParts: structuredDiffForSubmit?.changedParts || []",
   'data-structured-resubmission-template="true"',
-  "Falowen checks changes Teil by Teil",
+  "Your previous TEIL answers are loaded below.",
 ];
 requiredMarkers.forEach((marker) => {
   if (!source.includes(marker)) throw new Error(`Structured resubmission marker missing: ${marker}`);
