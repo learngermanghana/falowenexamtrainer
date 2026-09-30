@@ -87,8 +87,17 @@ const writeLocalSession = (assignmentKey, level, session) => {
   } catch (_error) {}
 };
 
-const remainingSeconds = (session, durationSeconds, now = Date.now()) =>
-  session ? Math.max(0, Math.ceil((session.endsAt - now) / 1000)) : durationSeconds;
+export const getTimedAssignmentRemainingSeconds = (session, durationSeconds, now = Date.now()) => {
+  const configuredDuration = Math.max(0, Math.floor(Number(durationSeconds) || 0));
+  if (!session) return configuredDuration;
+
+  const rawRemaining = Math.max(0, Math.ceil((Number(session.endsAt || 0) - now) / 1000));
+  return configuredDuration > 0
+    ? Math.min(configuredDuration, rawRemaining)
+    : rawRemaining;
+};
+
+const remainingSeconds = getTimedAssignmentRemainingSeconds;
 
 const warningForSeconds = (secondsLeft) => {
   if (secondsLeft <= 60 && secondsLeft > 0) return { threshold: 60, label: "1 minute remaining" };
@@ -171,7 +180,11 @@ export default function SharedTimedAssignment({
           timestampToMillis(data.startedAt) ||
           Number(data.clientStartedAt) ||
           timestampToMillis(data.createdAt);
-        const persistedDuration = Math.max(1, Number(data.durationSeconds) || durationSeconds);
+        const persistedDurationRaw = Math.max(1, Number(data.durationSeconds) || durationSeconds);
+        const persistedDuration =
+          durationSeconds > 0
+            ? Math.min(durationSeconds, persistedDurationRaw)
+            : persistedDurationRaw;
         const endsAt = startedAt ? startedAt + (persistedDuration * 1000) : Number(data.endsAt) || 0;
         const nextSession = endsAt > 0 ? { startedAt, endsAt } : null;
 
