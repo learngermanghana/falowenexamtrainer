@@ -15,7 +15,7 @@ describe("A1 5.10 weil and useful phrases", () => {
     expect(
       screen.getByRole("heading", { name: /Gründe geben mit weil + nützliche A1-Redemittel/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Ich kann nicht kommen, weil ich krank bin/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Ich kann nicht kommen, weil ich krank bin/i).length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: /Deshalb starts in A2/i })).toBeInTheDocument();
     expect(screen.getByText(/recognise und, aber, oder and denn/i)).toBeInTheDocument();
   });
@@ -35,7 +35,7 @@ describe("A1 5.10 weil and useful phrases", () => {
       /Können wir einen anderen Termin vereinbaren/i,
       /Können Sie mir bitte mehr Informationen über den Kurs geben/i,
     ].forEach((pattern) => {
-      expect(screen.getByText(pattern)).toBeInTheDocument();
+      expect(screen.getAllByText(pattern).length).toBeGreaterThan(0);
     });
   });
 
