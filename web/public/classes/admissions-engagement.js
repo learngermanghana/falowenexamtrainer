@@ -43,7 +43,8 @@
       if (ref) url.searchParams.set("ref", ref);
       if (classSlug) url.searchParams.set("class", classSlug);
       url.searchParams.set("source", source || "class-brochure");
-      anchor.href = url.pathname + url.search + url.hash;
+      var nextHref = url.pathname + url.search + url.hash;
+      if (anchor.getAttribute("href") !== nextHref) anchor.setAttribute("href", nextHref);
     } catch (error) {}
   }
 
@@ -64,9 +65,9 @@
     ensureVisitorGuideLink();
 
     document.querySelectorAll('a[href*="/signup"], #payHero, #payLink').forEach(function (anchor) {
+      preserveContext(anchor, "class-brochure");
       if (anchor.dataset.admissionsRegistrationWired) return;
       anchor.dataset.admissionsRegistrationWired = "1";
-      preserveContext(anchor, "class-brochure");
       anchor.addEventListener("click", function () { track("registration_click"); });
     });
 
