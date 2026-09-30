@@ -40,7 +40,7 @@ const resolveA1Parts = ({ assignmentKey = "", chapter = "" } = {}) => {
 const resolveA2B1Parts = ({ level = "", day = 0 } = {}) => {
   const profile = getA2B1WorkbookSectionProfile(level, day);
   const parts = [
-    makePart(2, "Schreiben"),
+    ...(profile?.writing === false ? [] : [makePart(2, "Schreiben")]),
     makePart(3, "Lesen"),
   ];
 
