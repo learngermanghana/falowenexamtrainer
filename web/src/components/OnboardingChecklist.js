@@ -5,6 +5,7 @@ import { detectLevelKey } from "../lib/day0Workbook";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { getTrialLifecycleState } from "../lib/trialAccess";
 import { useToast } from "../context/ToastContext";
+import { useAuth } from "../context/AuthContext";
 
 const day0WorkbookByLevel = {
   A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
@@ -33,6 +34,7 @@ const StatusItem = ({ label, value }) => (
 const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { logout } = useAuth();
   const [savingAction, setSavingAction] = useState("");
 
   const level = detectLevelKey(studentProfile);
@@ -82,9 +84,19 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         style={{ display: "grid", gap: 18, maxWidth: 860, margin: "0 auto" }}
       >
         <div style={{ display: "grid", gap: 8 }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
-            Welcome to Falowen{level ? ` · ${level}` : ""}
-          </span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
+              Welcome to Falowen{level ? ` · ${level}` : ""}
+            </span>
+            <button
+              type="button"
+              style={styles.secondaryButton}
+              onClick={logout}
+              disabled={Boolean(savingAction)}
+            >
+              Sign out
+            </button>
+          </div>
           <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 40px)", lineHeight: 1.12 }}>
             Your learning account is ready
           </h1>
