@@ -6,6 +6,7 @@ import {
   getA2ListeningTask,
 } from "./a2ListeningTasks";
 import { getB1ListeningTask } from "./b1ListeningTasks";
+import { getA2ReadingTask } from "./a2ReadingTasks";
 import { getB1ReadingTask } from "./b1ReadingTasks";
 import { getTimedAssignmentConfig } from "./timedAssignmentConfig";
 
@@ -15,7 +16,7 @@ const SUPPORTED_LEVELS = new Set(["A2", "B1"]);
 
 const resolveAssignmentKey = (level, day) => {
   if (level === "A2") {
-    const chapter = String(getA2ListeningTask(day)?.chapter || "").trim();
+    const chapter = String(getA2ReadingTask(day)?.chapter || "").trim();
     return chapter ? `A2-${chapter}` : "";
   }
   if (level === "B1") {
