@@ -15,17 +15,31 @@ const cleanedLateWorkbooks = [
 ];
 
 describe("A2 Days 22-28 native workbook ownership", () => {
-  test("late A2 submission rules keep Day 25 as canonical listening", () => {
-    [22, 23, 24, 26, 27, 28].forEach((day) => {
+  test("late A2 submission rules follow the canonical lesson profile", () => {
+    for (const day of [22, 23]) {
       const profile = getA2B1WorkbookSectionProfile("A2", day);
-      expect(profile.part4).toBe("listening");
-      expect(profile.part4Submission).toBe("self-check");
-    });
+      expect(profile).toMatchObject({
+        listening: true,
+        part4: "listening",
+        part4Submission: "self-check",
+      });
+    }
+
+    for (const day of [24, 26, 27, 28]) {
+      const profile = getA2B1WorkbookSectionProfile("A2", day);
+      expect(profile).toMatchObject({
+        listening: true,
+        part4: "listening",
+        part4Submission: "submit",
+      });
+    }
 
     const day25 = getA2B1WorkbookSectionProfile("A2", 25);
-    expect(day25.listening).toBe(true);
-    expect(day25.part4).toBe("listening");
-    expect(day25.part4Submission).toBe("submit");
+    expect(day25).toMatchObject({
+      listening: false,
+      part4: null,
+      part4Submission: "none",
+    });
   });
 
   test("generated fallback guidance stands down for Days 22-28", () => {
