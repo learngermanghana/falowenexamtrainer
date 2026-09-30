@@ -98,6 +98,34 @@ const WeatherPerfektLetterPage = () => (
         </div>
       </Section>
 
+      <Section eyebrow="Time in letters" title="Seasons, months, days and clock times">
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
+          <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14, lineHeight: 1.7 }}>
+            <strong>im + season / month</strong>
+            <div>im Sommer</div>
+            <div>im Winter</div>
+            <div>im Frühling</div>
+            <div>im Herbst</div>
+            <div>im Januar / im Juli</div>
+          </div>
+          <div style={{ border: "1px solid #c7d2fe", background: "#eef2ff", borderRadius: 14, padding: 14, lineHeight: 1.7 }}>
+            <strong>am + day / date</strong>
+            <div>am Montag</div>
+            <div>am Samstag</div>
+            <div>am 12. Juli</div>
+          </div>
+          <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, lineHeight: 1.7 }}>
+            <strong>um + clock time</strong>
+            <div>um 8 Uhr</div>
+            <div>um 14:30 Uhr</div>
+          </div>
+        </div>
+        <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", borderRadius: 10, padding: 12, lineHeight: 1.7 }}>
+          <strong>Use them in letters:</strong><br />
+          Im Sommer ist es oft warm. Am Samstag kann ich nicht kommen. Können wir uns am Montag um 16 Uhr treffen?
+        </div>
+      </Section>
+
       <Section eyebrow="Understanding" title="Weather description vs. weather reason">
         <div style={{ display: "grid", gap: 10, lineHeight: 1.7 }}>
           <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14 }}>
