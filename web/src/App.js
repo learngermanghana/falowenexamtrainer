@@ -176,12 +176,14 @@ import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
 import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
+import PublicAdmissionsVisitorGuidePage from "./components/PublicAdmissionsVisitorGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { getTrialLifecycleState } from "./lib/trialAccess";
 import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 import { persistInterfaceLanguage } from "./i18n";
+import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
 
 const getTabStructure = (program, t) => {
   const isFrenchProgram = program === "french";
@@ -305,9 +307,21 @@ function App() {
 
   useEffect(() => {
     if (location.pathname.startsWith("/signup")) {
-      const program = new URLSearchParams(location.search).get("program");
+      const params = new URLSearchParams(location.search);
+      const program = params.get("program");
       if (["german", "french"].includes(program)) setSignupProgram(program);
       setAuthMode("signup");
+
+      const engagementRef = String(params.get("ref") || "").trim();
+      if (engagementRef) {
+        trackAdmissionsEngagement({
+          ref: engagementRef,
+          event: "registration_click",
+          classSlug: String(params.get("class") || "").trim(),
+          source: String(params.get("source") || "signup"),
+          path: location.pathname,
+        });
+      }
     } else if (location.pathname.startsWith("/login")) {
       setAuthMode("login");
     } else if (location.pathname.startsWith("/classes")) {
@@ -369,6 +383,10 @@ function App() {
     Boolean(studentProfile) &&
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
+
+  if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
+    return <PublicAdmissionsVisitorGuidePage />;
+  }
 
   if (!isFirebaseConfigured) {
     return (
@@ -461,7 +479,6 @@ function App() {
   if (location.pathname === "/learn-german-ghana/upcoming-classes") {
     return <PublicUpcomingClassesPage />;
   }
-
 
   if (!user) {
     if (authMode === "signup") {
