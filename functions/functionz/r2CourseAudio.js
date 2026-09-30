@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 const COURSE_LISTENING_DAYS = Object.freeze({
-  A2: new Set([26, 27, 28]),
+  A2: new Set([24, 26, 27, 28]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
