@@ -1,2 +1,2 @@
-Preview deploy trigger: 2026-09-30 21:10 GMT+1
-Purpose: verify canonical A2/B1 lesson profile after build-patch hardening.
+Production deploy trigger: 2026-09-30 20:07 GMT+0
+Purpose: publish canonical A2/B1 lesson profile system for tabs, submissions, grading and timer rules.
