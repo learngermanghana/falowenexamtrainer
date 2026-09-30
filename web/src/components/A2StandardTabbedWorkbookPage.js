@@ -85,6 +85,7 @@ const ListeningMedia = ({ url }) => {
 };
 
 const ProtectedA2ListeningAudio = ({ day, audioKey }) => {
+  const { idToken } = useAuth();
   const [signedUrl, setSignedUrl] = useState("");
   const [state, setState] = useState("loading");
   const [errorMessage, setErrorMessage] = useState("");
@@ -143,7 +144,6 @@ const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap:
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { idToken } = useAuth();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
   const [activeTab, setActiveTab] = useState("sprechen");
