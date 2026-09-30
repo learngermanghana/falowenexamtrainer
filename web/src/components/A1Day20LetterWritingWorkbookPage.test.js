@@ -82,6 +82,35 @@ describe("A1 Day 20 letter-writing workbook", () => {
     expect(screen.getByTestId("canonical-submit")).toHaveTextContent("A1-12.3");
   });
 
+  test("opens the existing Day 20 grammar lesson from the workbook grammar view", async () => {
+    const { container } = render(
+      <MemoryRouter
+        initialEntries={[
+          "/campus/course/letter-writing-intro-german-a1-day-12-3?view=grammar&radio=done&assignmentKey=A1-12.3&assignmentId=A1-12.3&level=A1",
+        ]}
+      >
+        <A1Day20LetterWritingWorkbookPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("tab", { name: "Grammar" })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    expect(
+      await screen.findByRole("heading", { name: "Goethe A1 Schreiben has two parts" }),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-a1-day20-goethe-writing-grammar="true"]'),
+    ).not.toBeNull();
+    expect(
+      screen.getByRole("heading", { name: "Formal Letter Structure" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Informal Letter Structure" }),
+    ).toBeInTheDocument();
+  });
+
   test("places two independently configured Mark My Letter tools below the tasks", () => {
     render(
       <MemoryRouter>

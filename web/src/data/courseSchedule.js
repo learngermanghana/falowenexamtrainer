@@ -1216,7 +1216,9 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/JtgoO2fmOpU",
         youtube_link: "https://youtu.be/JtgoO2fmOpU",
-        workbook_link: "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
+        grammarbook_link: "/campus/course/letter-writing-intro-12-3",
+        grammar_link: "/campus/course/letter-writing-intro-12-3",
+        workbook_link: "/campus/course/letter-writing-intro-german-a1-day-12-3",
         assignment: true,
       },
     },
