@@ -79,7 +79,7 @@ const TabButton = ({ active, onClick, label, description, disabled = false, lock
   <button
     type="button"
     role="tab"
-    aria-label={`${[label, description].filter(Boolean).join(" · ")}${locked ? " · locked until timed mock starts" : ""}`}
+    aria-label={`${[label, description].filter(Boolean).join(" · ")}${locked ? " · locked until timed work starts" : ""}`}
     aria-selected={active}
     disabled={disabled}
     onClick={onClick}
