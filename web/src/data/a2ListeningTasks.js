@@ -314,12 +314,55 @@ export const A2_LISTENING_TASKS = {
   28: {
     chapter: "10.28",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Beitrag zu Zukunftsplänen. Achten Sie auf Ziele, Zeitangaben und Gründe und beantworten Sie anschließend die Fragen.",
-    audioUrl: "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+    task: "Hören Sie den Beitrag zu Zukunftsplänen. Achten Sie auf Annas, Davids und Mariams berufliche und persönliche Ziele und beantworten Sie anschließend die fünf Fragen.",
+    audioKey: "a2/day-28/day-28.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Worum geht es im Beitrag?", options: ["A) Um Zukunftspläne und Ziele", "B) Nur um Essen", "C) Um eine Reklamation", "D) Nur um das Wetter"] },
-      { stem: "Welche Formulierung kann man für Zukunftspläne benutzen?", options: ["A) Ich möchte ...", "B) Gestern habe ich ...", "C) Bitte öffnen Sie ...", "D) Es tut mir leid ..."] },
-      { stem: "Was solltest du beim Sprechen über die Zukunft erklären?", options: ["A) Deine Ziele und Gründe", "B) Nur deinen Namen", "C) Nur das Datum", "D) Keine persönlichen Pläne"] },
+      {
+        stem: "Warum möchte Anna eine Weiterbildung im Bereich Tourismus machen?",
+        options: [
+          "A) Weil sie in eine andere Stadt ziehen möchte",
+          "B) Weil sie später mehr Verantwortung übernehmen möchte",
+          "C) Weil sie nicht mehr im Hotel arbeiten möchte",
+          "D) Weil sie Spanisch lernen möchte",
+        ],
+      },
+      {
+        stem: "Was ist Annas berufliches Ziel in ungefähr drei Jahren?",
+        options: [
+          "A) Eine Sprachschule eröffnen",
+          "B) In der Schweiz studieren",
+          "C) Hotelmanagerin werden",
+          "D) Verkäuferin werden",
+        ],
+      },
+      {
+        stem: "Warum möchte David nächstes Jahr einen Kurs in Webentwicklung beginnen?",
+        options: [
+          "A) Weil er seinen Beruf wechseln möchte und sich für Computer interessiert",
+          "B) Weil seine Freundin in einer IT-Firma arbeitet",
+          "C) Weil er nach Österreich ziehen möchte",
+          "D) Weil er Hotelmanager werden möchte",
+        ],
+      },
+      {
+        stem: "Wofür spart David jeden Monat Geld?",
+        options: [
+          "A) Für eine Reise nach Spanien",
+          "B) Für eine Hochzeit im nächsten Jahr",
+          "C) Für eine größere Wohnung, die er in zwei oder drei Jahren mieten möchte",
+          "D) Für ein eigenes Unternehmen",
+        ],
+      },
+      {
+        stem: "Was plant Mariam für nächstes Jahr?",
+        options: [
+          "A) Eine zweiwöchige Reise nach Spanien und ihr Spanisch zu verbessern",
+          "B) Eine Ausbildung im Tourismus",
+          "C) Mit ihrem Freund zusammenzuziehen",
+          "D) In der Schweiz zu arbeiten",
+        ],
+      },
     ],
   },
 };
