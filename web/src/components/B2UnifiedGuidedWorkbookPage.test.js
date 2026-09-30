@@ -37,7 +37,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(getB2DayTabs(4).map((tab) => tab.key)).not.toContain("finish");
   });
 
-  test("connects Days 2 and 6 to their real R2 audio while later Hören days stay pending", () => {
+  test("connects completed B2 Hören days to their real R2 audio while unfinished days stay pending", () => {
     expect(Object.keys(B2_LISTENING_PRACTICE).map(Number)).toEqual([2, 6, 10, 14, 18, 22, 26]);
 
     const day2 = B2_LISTENING_PRACTICE[2];
@@ -67,7 +67,19 @@ describe("B2 unified C2-style course structure", () => {
       });
     });
 
-    [10, 14, 18, 22, 26].forEach((day) => {
+    const day22 = B2_LISTENING_PRACTICE[22];
+    expect(day22.audioKey).toBe("b2/day-22/day-22/day-22.m4a");
+    expect(day22.audioUrl).toBeUndefined();
+    expect(Array.isArray(day22.transcript)).toBe(true);
+    expect(day22.transcript.length).toBeGreaterThanOrEqual(30);
+    expect(day22.vocabulary).toHaveLength(8);
+    expect(day22.questions).toHaveLength(5);
+    expect(day22.transcript.join(" ")).toContain("intellektuelle Fließband");
+    expect(day22.transcript.join(" ")).toContain("Mitarbeiter weiterbilden");
+    expect(day22.questions[0].options[day22.questions[0].answerIndex]).toContain("Automatisierung");
+    expect(day22.questions[4].options[day22.questions[4].answerIndex]).toContain("weiterbilden");
+
+    [10, 14, 18, 26].forEach((day) => {
       const practice = B2_LISTENING_PRACTICE[day];
       expect(practice.audioKey).toBe("");
       expect(practice.transcript).toBe("");
