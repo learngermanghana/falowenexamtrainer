@@ -79,12 +79,20 @@ describe("B2 unified C2-style course structure", () => {
     expect(day22.questions[0].options[day22.questions[0].answerIndex]).toContain("Automatisierung");
     expect(day22.questions[4].options[day22.questions[4].answerIndex]).toContain("weiterbilden");
 
-    [10, 14, 18, 26].forEach((day) => {
+    [2, 6, 10, 14, 18, 22].forEach((day) => {
       const practice = B2_LISTENING_PRACTICE[day];
-      expect(practice.audioKey).toBe("");
-      expect(practice.transcript).toBe("");
+      expect(practice.audioKey).toBeTruthy();
+      expect(Array.isArray(practice.transcript)).toBe(true);
+      expect(practice.transcript.length).toBeGreaterThan(0);
+      expect(practice.vocabulary).toHaveLength(8);
+      expect(practice.questions).toHaveLength(5);
       expect(practice.audioUrl).toBeUndefined();
     });
+
+    const pending = B2_LISTENING_PRACTICE[26];
+    expect(pending.audioKey).toBe("");
+    expect(pending.transcript).toBe("");
+    expect(pending.audioUrl).toBeUndefined();
   });
 
   test("provides full reading practice on all seven Lesen days", () => {
