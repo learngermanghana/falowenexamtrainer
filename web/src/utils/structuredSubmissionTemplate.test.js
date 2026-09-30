@@ -97,7 +97,7 @@ describe("structured submission templates", () => {
   });
 
   test("converts historical submissions only when canonical headings are complete and exact", () => {
-    const profile = getStructuredSubmissionProfile({ level: "B1", day: 9, assignmentKey: "B1-3.9" });
+    const profile = getStructuredSubmissionProfile({ level: "B1", day: 18, assignmentKey: "B1-6.18" });
     const safeHistorical = resolveStructuredResubmissionSeed({
       profile,
       submissionText: "Teil 2\nBrieftext\n\nTeil 3\n1. B\n2. C\n\nTeil 4\n1. A\n2. B",
