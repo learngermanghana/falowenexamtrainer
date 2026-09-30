@@ -22,9 +22,9 @@ import {
 } from "./A2SecondStageLearningUpgrade";
 import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
-import { isA2WritingRequired } from "../data/a2WritingSchedule";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
-import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
+import { getA2ListeningTask } from "../data/a2ListeningTasks";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 import { useAuth } from "../context/AuthContext";
 import fetchA2AudioPlaybackUrl from "../services/a2AudioService";
@@ -146,8 +146,10 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const location = useLocation();
   const navigate = useNavigate();
   const listeningConfig = getA2ListeningTask(day);
-  const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
-  const writingRequired = isA2WritingRequired(day);
+  const lessonProfile = getA2B1LessonProfile("A2", day);
+  const part4Profile = lessonProfile?.sections?.part4;
+  const showHoeren = Boolean(part4Profile?.visible);
+  const writingRequired = Boolean(lessonProfile?.sections?.writing?.visible);
   const [activeTab, setActiveTab] = useState("sprechen");
   const requestedView = normalizeA2B1SectionView(
     new URLSearchParams(location.search || "").get("view") || "",
@@ -162,15 +164,11 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
       : "";
   const visibleActiveTab = routeTab || activeTab;
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
-  const hoerenSelfCheck = listeningConfig?.mode === A2_LISTENING_MODES.SELF_CHECK;
+  const hoerenSelfCheck = part4Profile?.mode === "self-check";
   const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
-  const visibleTabs = tabs.filter((tab) => {
-    if (tab.key === "hoeren" && !showHoeren) return false;
-    if (tab.key === "schreiben" && !writingRequired) return false;
-    return true;
-  });
+  const visibleTabs = tabs.filter((tab) => lessonProfile?.tabs?.[tab.key] !== false);
   const assignmentKey = `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
     setActiveTab("submit");
@@ -188,6 +186,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     assignmentKey,
     canonicalAssignmentKey: assignmentKey,
     workbookId: resolvedWorkbookId,
+    lessonProfileVersion: lessonProfile?.version || null,
+    requiredSubmissionParts: lessonProfile?.requiredSubmissionParts?.map((part) => part.partId) || [],
   };
   const canonicalWritingTask = getA2GoetheWritingTask(day);
   const writingTaskTitle = canonicalWritingTask?.title || schreibenTask || `${title} · Teil 2 writing task`;
@@ -234,7 +234,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
           </div>}
 
-          {displayedActiveTab === "schreiben" && <div style={card}>
+          {writingRequired && displayedActiveTab === "schreiben" && <div style={card}>
             <HeroImage type="schreiben" alt="Learner writing a German workbook answer" />
             <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
             <A2SecondStageWritingUpgrade day={day} />
