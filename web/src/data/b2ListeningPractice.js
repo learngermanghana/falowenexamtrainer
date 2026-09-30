@@ -670,7 +670,7 @@ export const B2_LISTENING_PRACTICE = Object.freeze({
   },
   26: {
     title: "Migration, Integration und Sprache",
-    audioKey: "",
+    audioKey: "b2/day-26/day-26/day-26.m4a",
     vocabulary: Object.freeze([
       Object.freeze({ de: "die gesellschaftliche Teilhabe", en: "participation in society" }),
       Object.freeze({ de: "der strukturelle Zugang", en: "structural access / access to institutions and opportunities" }),
