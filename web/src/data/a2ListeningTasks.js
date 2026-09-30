@@ -280,10 +280,17 @@ export const A2_LISTENING_TASKS = {
   },
   24: {
     chapter: "9.24",
-    mode: A2_LISTENING_MODES.SELF_CHECK,
-    task: "Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe.",
-    audioUrl: "https://youtu.be/iPScKV6JWaA",
-    questions: [],
+    mode: A2_LISTENING_MODES.GRADED,
+    task: "Hören Sie den Beitrag über Urlaubsplanung. Achten Sie auf Reiseziel, Hotel, Anreise, Aktivitäten und Vorbereitung und beantworten Sie anschließend die fünf Fragen.",
+    audioKey: "a2/day-24/day-24.mp3",
+    audioUrl: "",
+    questions: [
+      { stem: "Für welches Reiseziel entscheiden sich Lisa und Daniel?", options: ["A) Österreich", "B) Italien", "C) Deutschland", "D) Spanien"] },
+      { stem: "Was ist ihnen beim Hotel wichtig?", options: ["A) Ein großes Schwimmbad und ein Fitnessstudio", "B) Gutes Frühstück, ein ruhiges Zimmer und die Nähe zum Strand", "C) Nur ein sehr niedriger Preis", "D) Ein Hotel direkt am Bahnhof"] },
+      { stem: "Warum entscheiden sie sich für den Zug?", options: ["A) Weil die Autofahrt sehr lang wäre", "B) Weil Flüge ausverkauft sind", "C) Weil sie kein Auto haben", "D) Weil das Hotel nur Zugreisende akzeptiert"] },
+      { stem: "Was möchten sie bei ihrem Tagesausflug machen?", options: ["A) Nur einkaufen", "B) Eine Kirche besichtigen, durch die Altstadt spazieren und in einem Restaurant essen", "C) Den ganzen Tag am Strand bleiben", "D) Eine Bergtour machen"] },
+      { stem: "Was kontrollieren Lisa und Daniel kurz vor der Reise noch einmal?", options: ["A) Nur die Packliste", "B) Die Abfahrtszeit, die Wettervorhersage und ihre Reservierung", "C) Nur die Hotelbewertungen", "D) Nur die Zugtickets"] },
+    ],
   },
   25: {
     chapter: "9.25",
