@@ -16,7 +16,7 @@ import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSour
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import { getB1ListeningTask } from "../data/b1ListeningTasks";
-import { isB1WritingRequired } from "../data/b1WritingSchedule";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 
 const card = {
@@ -274,15 +274,23 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
 
   const speaking = config.speaking || {};
   const { writing, reading } = resolveB1CanonicalAssignmentSections(config);
+  const lessonProfile = getA2B1LessonProfile("B1", config.day);
+  const part4Profile = lessonProfile?.sections?.part4;
   const canonicalListening = getB1ListeningTask(config.day);
   const listening = canonicalListening
     ? { ...(config.listening || {}), ...canonicalListening }
     : (config.listening || { status: "planned" });
   const embedUrl = getYouTubeEmbedUrl(listening);
-  const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
-  const writingRequired = isB1WritingRequired(config.day);
-  const workbookTabs = resolveB1WorkbookTabs(listening).filter((tab) => writingRequired || tab.key !== "schreiben");
-  const hasListeningTab = listening.status !== "unavailable";
+  const listeningRequiresSubmission = Boolean(part4Profile?.submitRequired);
+  const writingRequired = Boolean(lessonProfile?.sections?.writing?.visible);
+  const workbookTabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR
+    .filter((tab) => lessonProfile?.tabs?.[tab.key] !== false)
+    .map((tab) =>
+      tab.key === "hoeren" && part4Profile?.contentType === "reading"
+        ? { ...tab, description: "Lesen" }
+        : tab
+    );
+  const hasListeningTab = Boolean(part4Profile?.visible);
 
   return (
     <SharedTimedAssignment
@@ -328,7 +336,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                 )}
           
                 {renderSections && (displayedActiveTab !== "hoeren" || listening.mode === "reading-fallback") ? (
-                  React.createElement(renderSections, { displayedActiveTab, prepared, setPreparedFor, listening })
+                  React.createElement(renderSections, { displayedActiveTab, prepared, setPreparedFor, listening, lessonProfile })
                 ) : (
                   <>
                 {displayedActiveTab === "sprechen" && (
@@ -577,33 +585,11 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                     <h2 style={sectionTitle}>Submit workbook answers</h2>
                     <WorkbookTaskCard
                       eyebrow="Final step"
-                      title={config.submitTitle || (writingRequired
-                        ? (listeningRequiresSubmission ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3.")
-                        : (listeningRequiresSubmission ? "Submit Teil 3 and Teil 4." : "Submit Teil 3."))}
-                      submissionNote={
-                        config.submitNote ||
-                        (writingRequired
-                          ? (listeningRequiresSubmission
-                            ? "Teil 1 is group practice. Teil 4 is a listening assignment and must be submitted."
-                            : hasListeningTab
-                              ? "Teil 1 is group practice. Teil 4 is self-check for this lesson."
-                              : "Teil 1 is group practice. This lesson has no Teil 4 · Hören.")
-                          : (listeningRequiresSubmission
-                            ? "Teil 1 is group practice. Schreiben is not required today. Submit Lesen and Hören."
-                            : hasListeningTab
-                              ? "Teil 1 is group practice. Schreiben is not required today. Teil 4 is self-check."
-                              : "Teil 1 is group practice. Schreiben is not required today. This lesson has no Teil 4 · Hören."))
-                      }
+                      title={config.submitTitle || lessonProfile?.submission?.title || "Submit final answers."}
+                      submissionNote={config.submitNote || lessonProfile?.submission?.note || ""}
                     >
                       <p style={{ margin: 0 }}>
-                        {config.submitInstructions ||
-                          (writingRequired
-                            ? (listeningRequiresSubmission
-                              ? "Paste your final writing text, reading answers and listening answers into the form below."
-                              : "Paste your final writing text and reading answers into the form below.")
-                            : (listeningRequiresSubmission
-                              ? "Paste your final reading and listening answers into the form below."
-                              : "Paste your final reading answers into the form below."))}
+                        {config.submitInstructions || lessonProfile?.submission?.instructions || "Enter your final answers in the form below."}
                       </p>
                     </WorkbookTaskCard>
                     <div className="b1-standard-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
@@ -615,6 +601,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                           day: config.day,
                           assignmentKey: config.assignmentKey,
                           canonicalAssignmentKey: config.assignmentKey,
+                          lessonProfileVersion: lessonProfile?.version || null,
+                          requiredSubmissionParts: lessonProfile?.requiredSubmissionParts?.map((part) => part.partId) || [],
                         }}
                       />
                     </div>
