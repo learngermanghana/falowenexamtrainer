@@ -371,6 +371,10 @@ function App() {
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
+  if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
+    return <PublicAdmissionsVisitorGuidePage />;
+  }
+
   if (!isFirebaseConfigured) {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 12 }}>
@@ -462,11 +466,6 @@ function App() {
   if (location.pathname === "/learn-german-ghana/upcoming-classes") {
     return <PublicUpcomingClassesPage />;
   }
-
-  if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
-    return <PublicAdmissionsVisitorGuidePage />;
-  }
-
 
   if (!user) {
     if (authMode === "signup") {
