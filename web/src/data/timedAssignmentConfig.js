@@ -76,7 +76,7 @@ const A1_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     level: "A1",
     durationMinutes: 25,
     scope: "Teil 1 Lesen, Teil 2 Lesen and Teil 3 Hören",
-    timedTabs: ["teil-1", "teil-2"],
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
     preparationLabel: A1_PREP,
   }),
   "A1-12.3": timed({
