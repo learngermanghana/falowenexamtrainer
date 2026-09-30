@@ -275,6 +275,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
   const speaking = config.speaking || {};
   const { writing, reading } = resolveB1CanonicalAssignmentSections(config);
   const lessonProfile = getA2B1LessonProfile("B1", config.day);
+  const resolvedAssignmentKey = lessonProfile?.assignmentKey || config.assignmentKey;
   const part4Profile = lessonProfile?.sections?.part4;
   const canonicalListening = getB1ListeningTask(config.day);
   const listening = canonicalListening
@@ -294,8 +295,9 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
 
   return (
     <SharedTimedAssignment
-      assignmentKey={config.assignmentKey}
+      assignmentKey={resolvedAssignmentKey}
       level="B1"
+      configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
       {({ isTabLocked }) => {
@@ -599,8 +601,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                         submissionContext={{
                           level: "B1",
                           day: config.day,
-                          assignmentKey: config.assignmentKey,
-                          canonicalAssignmentKey: config.assignmentKey,
+                          assignmentKey: resolvedAssignmentKey,
+                          canonicalAssignmentKey: resolvedAssignmentKey,
                           lessonProfileVersion: lessonProfile?.version || null,
                           requiredSubmissionParts: lessonProfile?.requiredSubmissionParts?.map((part) => part.partId) || [],
                         }}
