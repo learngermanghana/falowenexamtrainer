@@ -12,6 +12,17 @@ const replaceOnce = (before, after, label) => {
   source = source.replace(before, after);
 };
 
+const replacePresentationOnce = (anchors, after, label) => {
+  if (source.includes(after)) return;
+  const candidates = Array.isArray(anchors) ? anchors : [anchors];
+  const anchor = candidates.find((candidate) => source.includes(candidate));
+  if (!anchor) {
+    console.warn(`Skipping optional ${label}: the presentation copy changed, but structured resubmission logic can still build.`);
+    return;
+  }
+  source = source.replace(anchor, after);
+};
+
 replaceOnce(
   `import {\n  buildStructuredSubmissionTemplate,\n  formatMissingStructuredParts,\n  getStructuredAnswerText,\n  getStructuredSubmissionProfile,\n  parseStructuredSubmissionText,\n} from "../utils/structuredSubmissionTemplate";`,
   `import {\n  buildStructuredSubmissionTemplate,\n  compareStructuredSubmissionSections,\n  formatMissingStructuredParts,\n  getStructuredAnswerText,\n  getStructuredSubmissionProfile,\n  parseStructuredSubmissionText,\n  resolveStructuredResubmissionSeed,\n} from "../utils/structuredSubmissionTemplate";`,
@@ -89,14 +100,20 @@ ${correctedWorkFieldAnchor}`);
   }
 }
 
-replaceOnce(
-  `              <span style={styles.label}>Corrected work</span>`,
+replacePresentationOnce(
+  [
+    `              <span style={styles.label}>Corrected work</span>`,
+    `              <span style={styles.label}>Corrected text</span>`,
+  ],
   `              <span style={styles.label}>{structuredResubmissionEnabled ? "Corrected answers" : "Corrected work"}</span>`,
   "resubmission field label",
 );
 
-replaceOnce(
-  `                placeholder="Paste or type your corrected work here."`,
+replacePresentationOnce(
+  [
+    `                placeholder="Paste or type your corrected work here."`,
+    `                placeholder="Paste your corrected letter/text here."`,
+  ],
   `                placeholder={structuredResubmissionEnabled ? "Your previous answers are loaded here." : "Paste or type your corrected work here."}`,
   "structured resubmission placeholder",
 );
