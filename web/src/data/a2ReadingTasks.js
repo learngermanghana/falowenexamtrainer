@@ -71,24 +71,29 @@ Omar: Ja. Ich reserviere einen Tisch für uns. Bis Samstag!`,
   },
   5: {
     chapter: "2.5",
-    format: "Freizeitprogramm",
-    title: "Samstag im Freizeitzentrum",
-    strategy: "Scanne zuerst Uhrzeiten, Preise und Orte. Danach liest du nur die passenden Angebote genauer.",
-    text: `Freizeitzentrum West – Samstag
+    format: "Anzeigen zuordnen",
+    title: "Was passt am Samstag?",
+    strategy: "Lies zuerst die Situation der Person. Vergleiche dann Zeit, Preis, Anmeldung und besondere Bedingungen. Nicht jedes passende Stichwort bedeutet automatisch die richtige Antwort.",
+    text: `A – Yoga am Morgen
+09:00–10:00 Uhr, Raum 2. Teilnahme: 6 Euro. Keine Anmeldung nötig. Bitte bequeme Kleidung mitbringen. Der Kurs ist auch für Anfänger geeignet.
 
-09:00–10:00 Yoga im Raum 2 – 6 Euro
-10:30–12:00 Fotokurs im Raum 5 – 12 Euro
-13:00–15:00 Fahrradtour – Treffpunkt vor dem Eingang – kostenlos
-15:30–17:00 Kochkurs „Schnelle Gerichte“ – Küche – 15 Euro
-18:00–20:00 Filmabend im Saal – 5 Euro
+B – Fotowalk in der Altstadt
+10:30–12:00 Uhr. Treffpunkt: Raum 5, danach gehen wir gemeinsam nach draußen. Teilnahme: 12 Euro. Eine eigene Kamera oder ein Handy mit guter Kamera ist nötig. Bei starkem Regen bleiben wir im Gebäude und üben Porträts.
 
-Für die Fahrradtour und den Kochkurs muss man sich vorher anmelden.`,
+C – Fahrradtour am Fluss
+13:00–15:00 Uhr. Treffpunkt vor dem Eingang. Teilnahme kostenlos. Anmeldung bis Freitagabend. Fahrräder können ohne Aufpreis ausgeliehen werden. Bei starkem Regen fällt die Tour aus.
+
+D – Kochkurs „Schnelle Gerichte“
+15:30–17:00 Uhr, Küche. Teilnahme: 15 Euro. Anmeldung erforderlich. Es gibt auch vegetarische Gerichte. Bitte kommen Sie zehn Minuten früher.
+
+E – Filmabend
+18:00–20:00 Uhr, Saal. Eintritt: 5 Euro. Keine Anmeldung. Getränke kann man vor Ort kaufen.`,
     questions: [
-      { stem: "Welche Aktivität ist kostenlos?", options: ["A) Yoga", "B) Fotokurs", "C) Fahrradtour", "D) Filmabend"] },
-      { stem: "Wo findet der Fotokurs statt?", options: ["A) Im Raum 2", "B) Im Raum 5", "C) In der Küche", "D) Im Saal"] },
-      { stem: "Was beginnt um 15:30 Uhr?", options: ["A) Der Filmabend", "B) Die Fahrradtour", "C) Der Kochkurs", "D) Yoga"] },
-      { stem: "Wofür muss man sich vorher anmelden?", options: ["A) Für Yoga und Filmabend", "B) Für Fotokurs und Yoga", "C) Für Fahrradtour und Kochkurs", "D) Nur für den Filmabend"] },
-      { stem: "Wie viel kostet der Filmabend?", options: ["A) 5 Euro", "B) 6 Euro", "C) 12 Euro", "D) 15 Euro"] },
+      { stem: "Mariam möchte am Nachmittag etwas Aktives machen. Sie hat kein eigenes Fahrrad und möchte möglichst nichts bezahlen. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Jonas fotografiert gern. Er hat eine gute Handykamera und möchte vormittags teilnehmen, auch wenn das Wetter schlecht wird. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Selina möchte Sport machen, aber höchstens 5 Euro ausgeben. Sie kann nur nach 12 Uhr. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot D", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Kwame möchte am Samstag zwischen 13 und 16 Uhr etwas machen. Er kann sich noch am Freitag anmelden und möchte keine zusätzliche Ausrüstung mitbringen. Welches Angebot passt?", options: ["A) Angebot B", "B) Angebot D", "C) Angebot C", "D) Angebot A"] },
+      { stem: "Anna ist Anfängerin, hat nur am frühen Morgen Zeit und möchte spontan ohne Anmeldung kommen. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
     ],
   },
   6: {
