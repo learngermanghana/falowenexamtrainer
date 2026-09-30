@@ -221,15 +221,15 @@ for (const day of expectedDays) {
   if (![A2_LISTENING_MODES.GRADED, A2_LISTENING_MODES.SELF_CHECK, A2_LISTENING_MODES.NONE].includes(mode)) {
     fail(label, `unsupported Hören mode: ${mode}`);
   } else if (mode === A2_LISTENING_MODES.NONE) {
-    if (listening.audioUrl || listening.questions?.length || listeningAnswers.length) {
+    if (listening.audioUrl || listening.audioKey || listening.questions?.length || listeningAnswers.length) {
       fail(label, "no-Hören day must have no audio, no questions and no submitted Teil 4 answers");
     }
   } else if (mode === A2_LISTENING_MODES.SELF_CHECK) {
-    if (!listening.audioUrl) fail(label, "self-check Hören requires an audio/video URL");
+    if (!listening.audioUrl && !listening.audioKey) fail(label, "self-check Hören requires an audio/video source");
     if (listening.questions?.length) fail(label, "self-check Hören must not carry Falowen graded questions");
     if (listeningAnswers.length) fail(label, "self-check Hören must not carry submitted Teil 4 answers");
   } else {
-    if (!listening.audioUrl) fail(label, "graded Hören requires an audio/video URL");
+    if (!listening.audioUrl && !listening.audioKey) fail(label, "graded Hören requires an audio/video source");
     if (!Array.isArray(listening.questions) || !listening.questions.length) {
       fail(label, "graded Hören requires canonical questions");
     } else {
