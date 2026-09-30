@@ -1,16 +1,24 @@
 import { A2_LISTENING_MODES, getA2ListeningTask } from "./a2ListeningTasks";
 
 describe("A2 listening tasks", () => {
-  test("Day 28 uses the protected R2 recording and five transcript-based graded questions", () => {
-    const task = getA2ListeningTask(28);
+  test.each([
+    [26, "10.26", "a2/day-26/day-26.mp3"],
+    [27, "10.27", "a2/day-27/day-27.mp3"],
+    [28, "10.28", "a2/day-28/day-28.mp3"],
+  ])("Day %i uses protected R2 audio with five graded transcript questions", (day, chapter, audioKey) => {
+    const task = getA2ListeningTask(day);
 
     expect(task).toMatchObject({
-      chapter: "10.28",
+      chapter,
       mode: A2_LISTENING_MODES.GRADED,
-      audioKey: "a2/day-28/day-28.mp3",
+      audioKey,
       audioUrl: "",
     });
     expect(task.questions).toHaveLength(5);
+  });
+
+  test("Day 28 keeps the approved future-plans question set", () => {
+    const task = getA2ListeningTask(28);
     expect(task.questions.map((item) => item.stem)).toEqual([
       "Warum möchte Anna eine Weiterbildung im Bereich Tourismus machen?",
       "Was ist Annas berufliches Ziel in ungefähr drei Jahren?",
