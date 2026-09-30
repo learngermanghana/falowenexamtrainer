@@ -1,67 +1,241 @@
+const freezeTabs = (tabs) => Object.freeze(tabs);
+
+const timed = ({
+  level,
+  durationMinutes,
+  scope,
+  timedTabs,
+  preparationLabel,
+  mode = "practice",
+  autoSubmit = true,
+}) => Object.freeze({
+  level,
+  durationMinutes,
+  scope,
+  timedTabs: freezeTabs(timedTabs),
+  preparationLabel,
+  mode,
+  autoSubmit,
+});
+
+const A1_PREP = "Grammar and reference material stay open before you start. Start the timer only when you have enough uninterrupted time.";
+const A2_B1_PREP = "Grammar, Teil 1 speaking practice and reference notes stay open before you start. Start the timer only when you have enough uninterrupted time.";
+
+export const TIMED_ASSIGNMENT_PHASES = Object.freeze({
+  A1: Object.freeze({
+    startDay: 16,
+    week: 4,
+    title: "Timed practice begins this week",
+    message: "From this week, every tutor-marked A1 assignment is timed. The purpose is to build time-management habits gradually before exam preparation. The clock starts only when you choose Start, so prepare first and begin when you have uninterrupted time.",
+  }),
+  A2: Object.freeze({
+    startDay: 21,
+    week: 5,
+    title: "Timed practice begins this week",
+    message: "From this week, every tutor-marked A2 assignment is timed. This helps you practise working independently, managing your time and finishing within realistic exam-style limits. Self-check Hören stays outside the timer; only submitted work is timed.",
+  }),
+  B1: Object.freeze({
+    startDay: 21,
+    week: 5,
+    title: "Timed practice begins this week",
+    message: "From this week, every tutor-marked B1 assignment is timed. The goal is stronger time management, independent work and exam readiness. Self-check or unavailable Hören is not timed; the clock applies to the work you actually submit.",
+  }),
+});
+
 export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
-  "A1-12.3": Object.freeze({
+  // A1 · Week 4 onward: every tutor-marked assignment is timed.
+  "A1-9": timed({
+    level: "A1",
+    durationMinutes: 20,
+    scope: "Teil 1 Lesen, Teil 2 Hören and Teil 3 Schreiben",
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    preparationLabel: A1_PREP,
+  }),
+  "A1-10": timed({
+    level: "A1",
+    durationMinutes: 20,
+    scope: "Teil 1 Lesen/Schreiben and Teil 2 Hören",
+    timedTabs: ["teil-1", "teil-2"],
+    preparationLabel: A1_PREP,
+  }),
+  "A1-11": timed({
+    level: "A1",
+    durationMinutes: 25,
+    scope: "the three tutor-marked Instructions sections",
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    preparationLabel: A1_PREP,
+  }),
+  "A1-12.1": timed({
+    level: "A1",
+    durationMinutes: 25,
+    scope: "Teil 1 Lesen, Teil 2 Lesen and Teil 3 Hören",
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    preparationLabel: A1_PREP,
+  }),
+  "A1-12.2": timed({
+    level: "A1",
+    durationMinutes: 25,
+    scope: "Teil 1 Lesen, Teil 2 Lesen and Teil 3 Hören",
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    preparationLabel: A1_PREP,
+  }),
+  "A1-12.3": timed({
     level: "A1",
     durationMinutes: 30,
     scope: "Two complete letters",
-    timedTabs: Object.freeze(["teil-1", "teil-2"]),
-    preparationLabel: "Grammar stays open for preparation.",
-    autoSubmit: true,
+    timedTabs: ["teil-1", "teil-2"],
+    preparationLabel: A1_PREP,
+    mode: "mock",
   }),
-  "A1-13": Object.freeze({
+  "A1-13": timed({
     level: "A1",
     durationMinutes: 35,
     scope: "9 reading answers and one letter",
-    timedTabs: Object.freeze(["teil-1", "teil-2", "teil-3"]),
-    preparationLabel: "Grammar stays open for preparation.",
-    autoSubmit: true,
+    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    preparationLabel: A1_PREP,
+    mode: "mock",
   }),
-  "A1-14.1": Object.freeze({
+  "A1-14.1": timed({
     level: "A1",
     durationMinutes: 35,
     scope: "5 reading answers, one letter and 10 vocabulary answers",
-    timedTabs: Object.freeze(["teil-1", "teil-2", "teil-3", "teil-4"]),
-    preparationLabel: "Grammar stays open for preparation.",
-    autoSubmit: true,
+    timedTabs: ["teil-1", "teil-2", "teil-3", "teil-4"],
+    preparationLabel: A1_PREP,
+    mode: "mock",
   }),
-  "A2-10.27": Object.freeze({
+
+  // A2 · Week 5 onward: every tutor-marked workbook is timed.
+  "A2-8.21": timed({
+    level: "A2",
+    durationMinutes: 40,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-8.22": timed({
+    level: "A2",
+    durationMinutes: 40,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-9.23": timed({
+    level: "A2",
+    durationMinutes: 40,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-9.24": timed({
+    level: "A2",
+    durationMinutes: 40,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-9.25": timed({
+    level: "A2",
+    durationMinutes: 45,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-10.26": timed({
+    level: "A2",
+    durationMinutes: 45,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "A2-10.27": timed({
     level: "A2",
     durationMinutes: 45,
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
-    timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
-    preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: true,
+    timedTabs: ["schreiben", "lesen", "hoeren"],
+    preparationLabel: A2_B1_PREP,
+    mode: "mock",
   }),
-  "A2-10.28": Object.freeze({
+  "A2-10.28": timed({
     level: "A2",
     durationMinutes: 45,
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
-    timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
-    preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: true,
+    timedTabs: ["schreiben", "lesen", "hoeren"],
+    preparationLabel: A2_B1_PREP,
+    mode: "mock",
   }),
-  "B1-6.18": Object.freeze({
+
+  // B1 · earlier checkpoints, followed by every tutor-marked workbook from Week 5.
+  "B1-6.18": timed({
     level: "B1",
     durationMinutes: 55,
     scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
-    timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
-    preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: true,
+    timedTabs: ["schreiben", "lesen", "hoeren"],
+    preparationLabel: A2_B1_PREP,
   }),
-  "B1-6.19": Object.freeze({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
-    timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
-    preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: true,
-  }),
-  "B1-7.22": Object.freeze({
+  "B1-6.19": timed({
     level: "B1",
     durationMinutes: 55,
     scope: "Teil 2 Schreiben, Teil 3 Lesen and the submitted Teil 4 reading task",
-    timedTabs: Object.freeze(["schreiben", "lesen", "hoeren"]),
-    preparationLabel: "Grammar, Teil 1 speaking practice and reference notes stay open before you start.",
-    autoSubmit: true,
+    timedTabs: ["schreiben", "lesen", "hoeren"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-7.21": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-7.22": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben, Teil 3 Lesen and the submitted Teil 4 reading task",
+    timedTabs: ["schreiben", "lesen", "hoeren"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-7.23": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-8.24": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-8.25": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-9.26": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+  }),
+  "B1-10.27": timed({
+    level: "B1",
+    durationMinutes: 55,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+    mode: "mock",
+  }),
+  "B1-10.28": timed({
+    level: "B1",
+    durationMinutes: 60,
+    scope: "Teil 2 Schreiben and Teil 3 Lesen",
+    timedTabs: ["schreiben", "lesen"],
+    preparationLabel: A2_B1_PREP,
+    mode: "mock",
   }),
 });
 
@@ -80,3 +254,6 @@ export const getTimedAssignmentKeysForLevel = (level = "") => {
     .filter(([, value]) => value.level === normalizedLevel)
     .map(([key]) => key);
 };
+
+export const getTimedAssignmentPhase = (level = "") =>
+  TIMED_ASSIGNMENT_PHASES[String(level || "").trim().toUpperCase()] || null;
