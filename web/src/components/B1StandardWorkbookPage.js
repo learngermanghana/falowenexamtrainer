@@ -16,6 +16,7 @@ import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSour
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import { getB1ListeningTask } from "../data/b1ListeningTasks";
+import { isB1WritingRequired } from "../data/b1WritingSchedule";
 
 const card = {
   ...styles.card,
@@ -278,7 +279,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
     : (config.listening || { status: "planned" });
   const embedUrl = getYouTubeEmbedUrl(listening);
   const listeningRequiresSubmission = Boolean(listening.submitRequired || config.submitListening);
-  const workbookTabs = resolveB1WorkbookTabs(listening);
+  const writingRequired = isB1WritingRequired(config.day);
+  const workbookTabs = resolveB1WorkbookTabs(listening).filter((tab) => writingRequired || tab.key !== "schreiben");
   const hasListeningTab = listening.status !== "unavailable";
 
   return (
@@ -298,9 +300,13 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </span>
                   <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 Workbook · {config.title}</h1>
                   <p style={{ ...styles.subtitle, margin: 0 }}>
-                    {config.subtitle || (hasListeningTab
-                      ? "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
-                      : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4 · Hören.")}
+                    {config.subtitle || (writingRequired
+                      ? (hasListeningTab
+                        ? "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
+                        : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4 · Hören.")
+                      : (hasListeningTab
+                        ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required for submission."
+                        : "Today: Sprechen in class, then Lesen. Schreiben is not required for submission."))}
                   </p>
                   <SectionImage image={config.heroImage} alt={config.heroAlt} />
                   <WorkbookTabNav
@@ -391,7 +397,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </section>
                 )}
           
-                {displayedActiveTab === "schreiben" && (
+                {writingRequired && displayedActiveTab === "schreiben" && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
                     <WorkbookTaskCard
@@ -565,21 +571,33 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                     <h2 style={sectionTitle}>Submit workbook answers</h2>
                     <WorkbookTaskCard
                       eyebrow="Final step"
-                      title={config.submitTitle || (listeningRequiresSubmission ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3.")}
+                      title={config.submitTitle || (writingRequired
+                        ? (listeningRequiresSubmission ? "Submit Teil 2, Teil 3 and Teil 4." : "Submit Teil 2 and Teil 3.")
+                        : (listeningRequiresSubmission ? "Submit Teil 3 and Teil 4." : "Submit Teil 3."))}
                       submissionNote={
                         config.submitNote ||
-                        (listeningRequiresSubmission
-                          ? "Teil 1 is group practice. Teil 4 is a listening assignment and must be submitted."
-                          : hasListeningTab
-                            ? "Teil 1 is group practice. Teil 4 is self-check for this lesson."
-                            : "Teil 1 is group practice. This lesson has no Teil 4 · Hören.")
+                        (writingRequired
+                          ? (listeningRequiresSubmission
+                            ? "Teil 1 is group practice. Teil 4 is a listening assignment and must be submitted."
+                            : hasListeningTab
+                              ? "Teil 1 is group practice. Teil 4 is self-check for this lesson."
+                              : "Teil 1 is group practice. This lesson has no Teil 4 · Hören.")
+                          : (listeningRequiresSubmission
+                            ? "Teil 1 is group practice. Schreiben is not required today. Submit Lesen and Hören."
+                            : hasListeningTab
+                              ? "Teil 1 is group practice. Schreiben is not required today. Teil 4 is self-check."
+                              : "Teil 1 is group practice. Schreiben is not required today. This lesson has no Teil 4 · Hören."))
                       }
                     >
                       <p style={{ margin: 0 }}>
                         {config.submitInstructions ||
-                          (listeningRequiresSubmission
-                            ? "Paste your final writing text, reading answers and listening answers into the form below."
-                            : "Paste your final writing text and reading answers into the form below.")}
+                          (writingRequired
+                            ? (listeningRequiresSubmission
+                              ? "Paste your final writing text, reading answers and listening answers into the form below."
+                              : "Paste your final writing text and reading answers into the form below.")
+                            : (listeningRequiresSubmission
+                              ? "Paste your final reading and listening answers into the form below."
+                              : "Paste your final reading answers into the form below."))}
                       </p>
                     </WorkbookTaskCard>
                     <div className="b1-standard-submission-page" style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 8, background: "#fff" }}>
