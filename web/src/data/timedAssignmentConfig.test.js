@@ -1,3 +1,4 @@
+import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import {
   getTimedAssignmentConfig,
   getTimedAssignmentDurationSeconds,
@@ -50,6 +51,19 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentConfig("B1-9.26")?.timedTabs).toEqual(["schreiben", "lesen"]);
     expect(getTimedAssignmentConfig("B1-10.27")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("B1-10.28")).toBe(60 * 60);
+  });
+
+  test.each(["A1", "A2", "B1"])("%s phase never announces an untimed tutor-marked assignment", (level) => {
+    const phase = getTimedAssignmentPhase(level);
+    const required = getCurriculumEntriesForLevel(level)
+      .filter((entry) => entry.assignment === true && Number(entry.assignmentDay || entry.day || 0) >= phase.startDay)
+      .map((entry) => entry.assignment_id || entry.assignmentId)
+      .filter(Boolean);
+
+    expect(required.length).toBeGreaterThan(0);
+    required.forEach((assignmentKey) => {
+      expect(getTimedAssignmentConfig(assignmentKey)).not.toBeNull();
+    });
   });
 
   test("all timed attempts keep automatic submission and ready-before-start guidance", () => {
