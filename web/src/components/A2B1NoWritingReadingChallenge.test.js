@@ -21,10 +21,9 @@ describe("no-writing reading challenge", () => {
     });
   });
 
-  test("is integrated into both A2 and B1 Lesen sections", () => {
-    const a2 = fs.readFileSync(path.resolve(process.cwd(), "src/components/A2ReadingTaskPanel.js"), "utf8");
-    const b1 = fs.readFileSync(path.resolve(process.cwd(), "src/components/B1StandardWorkbookPage.js"), "utf8");
-    expect(a2).toContain('A2B1NoWritingReadingChallenge level="A2"');
-    expect(b1).toContain('A2B1NoWritingReadingChallenge level="B1"');
+  test("the helper now derives no-writing days from the canonical lesson profile", () => {
+    const source = fs.readFileSync(path.resolve(process.cwd(), "src/components/A2B1NoWritingReadingChallenge.js"), "utf8");
+    expect(source).toContain("getA2B1LessonProfile");
+    expect(source).toContain("profile.sections.writing.visible");
   });
 });
