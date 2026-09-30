@@ -247,8 +247,8 @@ export const appendWritingTemplate = (currentText, template) => {
 
 export const normalizeWritingStarterText = (value = "") =>
   String(value || "")
-    .replace(/\\r\\n?/g, "\n")
-    .replace(/\\\\n/g, "\n")
+    .replace(/\r\n?/g, "\n")
+    .replace(/\\n/g, "\n")
     .trim();
 
 
