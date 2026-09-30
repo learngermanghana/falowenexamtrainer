@@ -200,7 +200,6 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     <SharedTimedAssignment
       assignmentKey={assignmentKey}
       level="A2"
-      configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
       {({ isTabLocked }) => {
