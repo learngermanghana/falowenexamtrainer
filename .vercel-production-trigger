@@ -1,2 +1,2 @@
-Production deploy trigger: 2026-09-30 18:29 GMT+1
-Purpose: fix structured resubmission build patch after compact UI changes.
+Production deploy trigger: 2026-09-30 18:56 GMT+1
+Purpose: deploy resilient structured resubmission patch.
