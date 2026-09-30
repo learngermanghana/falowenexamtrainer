@@ -8,6 +8,7 @@ import {
 import { getB1ListeningTask } from "./b1ListeningTasks";
 import { getA2ReadingTask } from "./a2ReadingTasks";
 import { getB1ReadingTask } from "./b1ReadingTasks";
+import { getA2B1TimedAssignmentPolicy } from "./a2B1TimedAssignmentPolicy";
 
 export const A2_B1_LESSON_PROFILE_VERSION = 1;
 
@@ -209,6 +210,39 @@ const buildSubmissionCopy = ({ sections, requiredSubmissionParts }) => {
   });
 };
 
+const TIMED_TAB_BY_SECTION = Object.freeze({
+  writing: "schreiben",
+  reading: "lesen",
+  part4: "hoeren",
+});
+
+const buildTimer = ({ assignmentKey, requiredSubmissionParts }) => {
+  const policy = getA2B1TimedAssignmentPolicy(assignmentKey);
+  if (!policy) return null;
+
+  const timedTabs = Object.freeze(
+    requiredSubmissionParts
+      .map((part) => TIMED_TAB_BY_SECTION[part.sectionKey])
+      .filter(Boolean),
+  );
+  const scopeParts = requiredSubmissionParts.map((part) => `Teil ${part.number} ${part.label}`);
+  const scope =
+    scopeParts.length === 0
+      ? "submitted workbook work"
+      : scopeParts.length === 1
+        ? scopeParts[0]
+        : scopeParts.length === 2
+          ? `${scopeParts[0]} and ${scopeParts[1]}`
+          : `${scopeParts.slice(0, -1).join(", ")} and ${scopeParts.at(-1)}`;
+
+  return Object.freeze({
+    ...policy,
+    timedTabs,
+    scope,
+    source: "lesson-profile",
+  });
+};
+
 export const getA2B1LessonProfile = (level, day) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const normalizedDay = Number(day);
@@ -255,6 +289,7 @@ export const getA2B1LessonProfile = (level, day) => {
 
   const requiredSubmissionParts = buildSubmissionParts(sections);
   const assignmentKey = resolveAssignmentKey(normalizedLevel, normalizedDay);
+  const timer = buildTimer({ assignmentKey, requiredSubmissionParts });
   const selfCheckParts = Object.freeze(
     Object.values(sections)
       .filter((section) => section?.visible && section?.mode === "self-check")
@@ -271,6 +306,7 @@ export const getA2B1LessonProfile = (level, day) => {
     level: normalizedLevel,
     day: normalizedDay,
     assignmentKey,
+    timer,
     sections,
     tabs: buildTabs(sections),
     requiredSubmissionParts,
