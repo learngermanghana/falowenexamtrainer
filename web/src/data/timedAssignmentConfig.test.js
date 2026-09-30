@@ -37,6 +37,7 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentConfig("A2-10.26")?.timedTabs).toEqual(["schreiben", "lesen"]);
     expect(getTimedAssignmentConfig("A2-10.27")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("A2-10.28")?.mode).toBe("mock");
+    expect(getTimedAssignmentDurationSeconds("A2-10.28")).toBe(45 * 60);
   });
 
   test("keeps B1 early checkpoints and times every tutor-marked workbook from Week 5", () => {
