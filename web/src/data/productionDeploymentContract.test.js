@@ -24,8 +24,8 @@ describe("production deployment contract", () => {
 
   test("production health workflow verifies the live SHA", () => {
     const workflow = fs.readFileSync(path.join(root, ".github/workflows/production-release.yml"), "utf8");
-    expect(workflow).toMatch(/branches:\s*\n\s*- main/);
-    expect(workflow).toContain("npm run build");
+    expect(workflow).toMatch(/branches:\s*\[main\]/);
+    expect(workflow).toContain("npm --prefix web run build");
     expect(workflow).toContain("VERCEL_PROJECT_ID");
     expect(workflow).toContain("vercel@latest deploy --prebuilt --prod");
     expect(workflow).toContain("/api/deployment-status");
