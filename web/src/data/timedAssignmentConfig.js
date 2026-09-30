@@ -1,4 +1,4 @@
-import { getA2B1LessonProfile } from "./a2B1LessonProfile";
+import { getA2B1LessonProfiles } from "./a2B1LessonProfile";
 
 const freezeTabs = (tabs) => Object.freeze(tabs);
 
@@ -21,7 +21,6 @@ const timed = ({
 });
 
 const A1_PREP = "Grammar and reference material stay open before you start. Start the timer only when you have enough uninterrupted time.";
-const A2_B1_PREP = "Grammar, Teil 1 speaking practice and reference notes stay open before you start. Start the timer only when you have enough uninterrupted time.";
 
 export const TIMED_ASSIGNMENT_PHASES = Object.freeze({
   A1: Object.freeze({
@@ -44,8 +43,7 @@ export const TIMED_ASSIGNMENT_PHASES = Object.freeze({
   }),
 });
 
-const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
-  // A1 · Week 4 onward: every tutor-marked assignment is timed.
+const A1_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   "A1-9": timed({
     level: "A1",
     durationMinutes: 20,
@@ -78,7 +76,7 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     level: "A1",
     durationMinutes: 25,
     scope: "Teil 1 Lesen, Teil 2 Lesen and Teil 3 Hören",
-    timedTabs: ["teil-1", "teil-2", "teil-3"],
+    timedTabs: ["teil-1", "teil-2"],
     preparationLabel: A1_PREP,
   }),
   "A1-12.3": timed({
@@ -105,189 +103,29 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     preparationLabel: A1_PREP,
     mode: "mock",
   }),
+});
 
-  // A2 · Week 5 onward: every tutor-marked workbook is timed.
-  "A2-8.21": timed({
-    level: "A2",
-    durationMinutes: 40,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-8.22": timed({
-    level: "A2",
-    durationMinutes: 40,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-9.23": timed({
-    level: "A2",
-    durationMinutes: 40,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-9.24": timed({
-    level: "A2",
-    durationMinutes: 40,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-9.25": timed({
-    level: "A2",
-    durationMinutes: 45,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-10.26": timed({
-    level: "A2",
-    durationMinutes: 45,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "A2-10.27": timed({
-    level: "A2",
-    durationMinutes: 45,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
-    timedTabs: ["schreiben", "lesen", "hoeren"],
-    preparationLabel: A2_B1_PREP,
-    mode: "mock",
-  }),
-  "A2-10.28": timed({
-    level: "A2",
-    durationMinutes: 45,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and the graded Teil 4 Hören",
-    timedTabs: ["schreiben", "lesen", "hoeren"],
-    preparationLabel: A2_B1_PREP,
-    mode: "mock",
-  }),
+const timedConfigFromProfiles = (level) =>
+  Object.fromEntries(
+    getA2B1LessonProfiles(level)
+      .filter((profile) => profile?.assignmentKey && profile?.timer)
+      .map((profile) => [
+        profile.assignmentKey,
+        Object.freeze({
+          ...profile.timer,
+          lessonProfileVersion: profile.version,
+        }),
+      ]),
+  );
 
-  // B1 · earlier checkpoints, followed by every tutor-marked workbook from Week 5.
-  "B1-6.18": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
-    timedTabs: ["schreiben", "lesen", "hoeren"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-6.19": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and the submitted Teil 4 reading task",
-    timedTabs: ["schreiben", "lesen", "hoeren"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-7.21": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-7.22": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben, Teil 3 Lesen and the submitted Teil 4 reading task",
-    timedTabs: ["schreiben", "lesen", "hoeren"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-7.23": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-8.24": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-8.25": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-9.26": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-  }),
-  "B1-10.27": timed({
-    level: "B1",
-    durationMinutes: 55,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-    mode: "mock",
-  }),
-  "B1-10.28": timed({
-    level: "B1",
-    durationMinutes: 60,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
-    preparationLabel: A2_B1_PREP,
-    mode: "mock",
-  }),
+export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
+  ...A1_TIMED_ASSIGNMENT_CONFIG,
+  ...timedConfigFromProfiles("A2"),
+  ...timedConfigFromProfiles("B1"),
 });
 
 const normalizeAssignmentKey = (assignmentKey = "") =>
   String(assignmentKey || "").trim().toUpperCase();
-
-const resolveAssignmentDay = (assignmentKey = "") => {
-  const normalized = normalizeAssignmentKey(assignmentKey);
-  const match = normalized.match(/(?:^|[.-])(\d{1,2})$/);
-  return match ? Number(match[1]) : 0;
-};
-
-const profileTimedTab = (part = {}) => {
-  if (part.sectionKey === "writing") return "schreiben";
-  if (part.sectionKey === "reading") return "lesen";
-  if (part.sectionKey === "part4") return "hoeren";
-  return "";
-};
-
-const joinTimedScope = (parts = []) => {
-  const labels = parts.map((part) => `Teil ${part.number} ${part.label}`);
-  if (labels.length <= 1) return labels[0] || "submitted workbook work";
-  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
-  return `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}`;
-};
-
-const alignTimedConfigWithLessonProfile = (assignmentKey, config) => {
-  if (!config || !["A2", "B1"].includes(config.level)) return config;
-  const day = resolveAssignmentDay(assignmentKey);
-  const profile = getA2B1LessonProfile(config.level, day);
-  if (!profile) return config;
-
-  const requiredParts = profile.requiredSubmissionParts || [];
-  const timedTabs = requiredParts.map(profileTimedTab).filter(Boolean);
-  return Object.freeze({
-    ...config,
-    scope: joinTimedScope(requiredParts),
-    timedTabs: freezeTabs(timedTabs),
-    lessonProfileVersion: profile.version,
-  });
-};
-
-export const TIMED_ASSIGNMENT_CONFIG = Object.freeze(
-  Object.fromEntries(
-    Object.entries(BASE_TIMED_ASSIGNMENT_CONFIG).map(([assignmentKey, config]) => [
-      assignmentKey,
-      alignTimedConfigWithLessonProfile(assignmentKey, config),
-    ]),
-  ),
-);
 
 export const getTimedAssignmentConfig = (assignmentKey = "") =>
   TIMED_ASSIGNMENT_CONFIG[normalizeAssignmentKey(assignmentKey)] || null;
