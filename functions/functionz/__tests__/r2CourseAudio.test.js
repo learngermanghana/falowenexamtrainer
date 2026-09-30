@@ -13,11 +13,12 @@ const {
 } = require("../r2CourseAudio");
 
 describe("A2/B2/C2 R2 course audio", () => {
-  test("accepts protected A2 Day 26–28 audio folders", () => {
+  test("accepts protected A2 Day 24 and Day 26–28 audio folders", () => {
     expect(
       validateA2AudioKey({ day: 28, key: "a2/day-28/day-28.mp3" }),
     ).toEqual({ day: 28, key: "a2/day-28/day-28.mp3" });
 
+    expect(validateA2AudioKey({ day: 24, key: "a2/day-24/day-24.mp3" })).toEqual({ day: 24, key: "a2/day-24/day-24.mp3" });
     expect(validateA2AudioKey({ day: 26, key: "a2/day-26/day-26.mp3" })).toEqual({ day: 26, key: "a2/day-26/day-26.mp3" });
     expect(validateA2AudioKey({ day: 27, key: "a2/day-27/day-27.mp3" })).toEqual({ day: 27, key: "a2/day-27/day-27.mp3" });
     expect(validateA2AudioKey({ day: 25, key: "a2/day-25/day-25.mp3" })).toBeNull();
