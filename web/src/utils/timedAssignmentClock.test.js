@@ -1,4 +1,7 @@
-import { getTimedAssignmentRemainingSeconds } from "./timedAssignmentClock";
+import {
+  getTimedAssignmentRemainingSeconds,
+  normalizeTimedAssignmentSession,
+} from "./timedAssignmentClock";
 
 describe("timed assignment clock", () => {
   test("never displays more time than the configured assignment duration", () => {
@@ -11,6 +14,35 @@ describe("timed assignment clock", () => {
     expect(
       getTimedAssignmentRemainingSeconds(staleCloudSession, 45 * 60, now),
     ).toBe(45 * 60);
+  });
+
+  test("hard-caps a stale resumed session's actual expiry, not only its display", () => {
+    const now = 1_000_000;
+    const staleSession = {
+      startedAt: now,
+      endsAt: now + (106 * 60 + 1) * 1000,
+    };
+
+    expect(
+      normalizeTimedAssignmentSession(staleSession, 45 * 60, now),
+    ).toEqual({
+      startedAt: now,
+      endsAt: now + 45 * 60 * 1000,
+    });
+  });
+
+  test("normalizes legacy sessions without startedAt to a one-time 45-minute maximum", () => {
+    const now = 1_000_000;
+    expect(
+      normalizeTimedAssignmentSession(
+        { endsAt: now + (106 * 60 + 1) * 1000 },
+        45 * 60,
+        now,
+      ),
+    ).toEqual({
+      startedAt: now,
+      endsAt: now + 45 * 60 * 1000,
+    });
   });
 
   test("continues counting down normally below the configured cap", () => {
