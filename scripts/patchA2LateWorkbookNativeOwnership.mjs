@@ -121,16 +121,13 @@ if (!courseTab.includes("A2_COURSE_BOOK_SECTIONS")) {
   courseTab = courseTab.replace(a1SectionResolver, a2SectionDefinitions);
 }
 
-const levelFlagsBefore = `  const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
-  const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
-  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";`;
-const levelFlagsAfter = `  const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
-  const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
-  const isA2CourseBook = normalizedSelectedCourseLevel === "A2";
-  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";`;
+const a1LevelFlag = '  const isA1CourseBook = normalizedSelectedCourseLevel === "A1";';
 if (!courseTab.includes("const isA2CourseBook =")) {
-  if (!courseTab.includes(levelFlagsBefore)) throw new Error("Could not find Course Book level flags.");
-  courseTab = courseTab.replace(levelFlagsBefore, levelFlagsAfter);
+  if (!courseTab.includes(a1LevelFlag)) throw new Error("Could not find A1 Course Book level flag.");
+  courseTab = courseTab.replace(
+    a1LevelFlag,
+    `${a1LevelFlag}\n  const isA2CourseBook = normalizedSelectedCourseLevel === "A2";`,
+  );
 }
 
 const groupingBefore = `  const groupedLessons = useMemo(() => {
