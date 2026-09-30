@@ -22,12 +22,12 @@ describe("A1 Day 21 weather grammar", () => {
     expect(source).not.toMatch(/give a weather reason with <strong>weil<\/strong>/i);
   });
 
-  test("keeps A1 sentence building and does not force a weil-clause", () => {
-    expect(source).toMatch(/leider · kann · ich · nicht · kommen/i);
-    expect(source).toMatch(/stark · es · regnet · sehr/i);
-    expect(source).toMatch(/mein · Bus · fährt · nicht/i);
-    expect(source).toMatch(/wir · uns · Sonntag · treffen · können/i);
-    expect(source).toMatch(/do <strong>not<\/strong> need an advanced sentence/i);
-    expect(source).toMatch(/Must you use a weil-clause/i);
+  test("ends the grammar page after the letter-form note", () => {
+    expect(source).toMatch(/Letter form is separate/i);
+    expect(source).toMatch(/fourth, fifth or sixth content point/i);
+    expect(source).not.toMatch(/Sentence building/i);
+    expect(source).not.toMatch(/A simple complete Day 13 email/i);
+    expect(source).not.toMatch(/Knowledge check/i);
+    expect(source).not.toMatch(/Must you use a weil-clause/i);
   });
 });
