@@ -57,7 +57,6 @@
     link.textContent = "About the school & how Falowen works";
     link.href = "/visitor-guide";
     preserveContext(link, "class-brochure");
-    link.addEventListener("click", function () { track("visitor_guide_open"); });
     host.appendChild(link);
   }
 
