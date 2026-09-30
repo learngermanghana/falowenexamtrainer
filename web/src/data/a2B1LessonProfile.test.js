@@ -86,6 +86,39 @@ describe("canonical A2/B1 lesson profiles", () => {
     }
   });
 
+  test("assignment identity and timer rules live in the canonical profile", () => {
+    expect(getA2B1LessonProfile("A2", 21)).toMatchObject({
+      assignmentKey: "A2-8.21",
+      timer: {
+        level: "A2",
+        durationMinutes: 40,
+        timedTabs: ["schreiben", "lesen"],
+      },
+    });
+    expect(getA2B1LessonProfile("A2", 25)).toMatchObject({
+      assignmentKey: "A2-9.25",
+      timer: {
+        durationMinutes: 45,
+        timedTabs: ["schreiben", "lesen"],
+      },
+    });
+    expect(getA2B1LessonProfile("B1", 22)).toMatchObject({
+      assignmentKey: "B1-7.22",
+      timer: {
+        durationMinutes: 55,
+        timedTabs: ["schreiben", "lesen", "hoeren"],
+      },
+    });
+    expect(getA2B1LessonProfile("B1", 28)).toMatchObject({
+      assignmentKey: "B1-10.28",
+      timer: {
+        durationMinutes: 60,
+        mode: "mock",
+      },
+    });
+    expect(getA2B1LessonProfile("A2", 15).timer).toBeNull();
+  });
+
   test("critical late-course profiles no longer drift from lesson data", () => {
     expect(getA2B1LessonProfile("A2", 21).sections.part4.mode).toBe("self-check");
     expect(getA2B1LessonProfile("A2", 24).sections.part4.mode).toBe("graded");
