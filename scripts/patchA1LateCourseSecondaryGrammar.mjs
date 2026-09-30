@@ -90,44 +90,38 @@ function keepDay23AtA1CaseScope() {
   write(file, source);
 }
 
-function patchDay24PerfektOnly() {
+function validateDay24WeilPhraseFocus() {
   const file = "web/src/components/ConjunctionNotesPage.js";
-  let source = read(file);
+  const source = read(file);
 
-  source = source.replace(
-    /\n\s*\{\n\s*title: "9\) Task",[\s\S]*?\n\s*\},\n\s*\{\n\s*title: "10\) Task",[\s\S]*?\n\s*\},/g,
-    "",
-  );
+  const requiredMarkers = [
+    "Gründe geben mit weil + nützliche A1-Redemittel",
+    "Leider muss ich den Termin absagen.",
+    "Ich möchte mich für den Deutschkurs anmelden.",
+    "Herzlichen Glückwunsch zum Geburtstag!",
+    "Wie viel kostet der Kurs?",
+    "Können wir einen anderen Termin vereinbaren?",
+    "Können Sie mir bitte mehr Informationen über den Kurs geben?",
+    "Deshalb starts in A2",
+  ];
 
-  const mixedMarker = '      <Section title="Final Grammar Check: Perfekt and Adjective Endings">';
-  const mixedStart = source.indexOf(mixedMarker);
-  if (mixedStart >= 0) {
-    const endMarker = "      </Section>";
-    const mixedEnd = source.indexOf(endMarker, mixedStart);
-    if (mixedEnd >= 0) source = `${source.slice(0, mixedStart)}${source.slice(mixedEnd + endMarker.length)}`;
+  const missing = requiredMarkers.filter((marker) => !source.includes(marker));
+  if (missing.length) {
+    throw new Error(`A1 Day 24 weil/useful-phrases lesson is missing: ${missing.join(", ")}`);
   }
 
-  source = insertBeforeOnce(
-    source,
-    "];\n\nconst examGuidance = [",
-    `  {\n    title: "7) Task",\n    prompt: "Write in Perfekt: Ich lerne Deutsch.",\n    hint: "Use haben + gelernt.",\n    answer: "Ich habe Deutsch gelernt.",\n  },\n  {\n    title: "8) Task",\n    prompt: "Write in Perfekt: Wir fahren nach Accra.",\n    hint: "fahren uses sein for movement to another place.",\n    answer: "Wir sind nach Accra gefahren.",\n  },\n`,
-    'title: "7) Task"',
-    "Day 24 Perfekt revision challenges",
-  );
-
-  source = insertBeforeOnce(
-    source,
-    '      <Section title="Final Revision: Sentence Formulation Check">',
-    `      <Section title="Final Grammar Check: Perfekt">\n        <p style={{ margin: 0, lineHeight: 1.7 }}>\n          Before you finish A1, make sure you can recognise and build a few common Perfekt sentences. Adjective declension belongs to A2 and is not part of this A1 final check.\n        </p>\n        <div style={{ border: "1px solid #c7d2fe", background: "#eef2ff", borderRadius: 14, padding: 14, display: "grid", gap: 7 }}>\n          <strong>haben/sein + Partizip II</strong>\n          <div>Ich <strong>habe</strong> Deutsch <strong>gelernt</strong>.</div>\n          <div>Wir <strong>sind</strong> nach Accra <strong>gefahren</strong>.</div>\n        </div>\n      </Section>\n\n`,
+  const staleMarkers = [
+    "Verb Position Colour Guide: denn, weil, deshalb",
     'Section title="Final Grammar Check: Perfekt"',
-    "Day 24 Perfekt-only final check",
-  );
+    "Final Grammar Check: Perfekt and Adjective Endings",
+    'title: "7) Task"',
+    'title: "8) Task"',
+  ];
 
-  if (/Adjective Endings|adjective endings|ein guter Kurs|einen guten Kurs|mit einem guten Kurs/i.test(source)) {
-    throw new Error("A1 Day 24 still contains adjective-declension revision after boundary cleanup.");
+  const stale = staleMarkers.filter((marker) => source.includes(marker));
+  if (stale.length) {
+    throw new Error(`A1 Day 24 still contains stale prebuild-injected material: ${stale.join(", ")}`);
   }
-
-  write(file, source);
 }
 
 function removeDuplicateDay24ScheduleVideo() {
@@ -148,7 +142,7 @@ function removeDuplicateDay24ScheduleVideo() {
 
 patchDay21Perfekt();
 keepDay23AtA1CaseScope();
-patchDay24PerfektOnly();
+validateDay24WeilPhraseFocus();
 removeDuplicateDay24ScheduleVideo();
 
-console.log("Applied A1 late-course grammar boundary and Day 24 media cleanup.");
+console.log("Applied A1 late-course grammar boundary, Day 24 weil/useful-phrases validation and media cleanup.");
