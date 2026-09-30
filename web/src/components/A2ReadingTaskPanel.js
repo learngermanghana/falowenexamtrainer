@@ -1,7 +1,7 @@
 import React from "react";
 import { getA2ReadingTask } from "../data/a2ReadingTasks";
 import ReadingExamFrame, { ReadingExamDocument, ReadingQuestionGrid, ReadingSourceCard, ReadingSourceGrid, getReadingExamVariant, readingSourceLabel, splitReadingSourceText } from "./ReadingExamLayout";
-import A2B1NoWritingReadingChallenge from "./A2B1NoWritingReadingChallenge";
+import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 
 const taskCard = {
   border: "1px solid #dbeafe",
@@ -71,7 +71,7 @@ const A2ReadingTaskPanel = ({ day }) => {
         ))}
       </ReadingQuestionGrid>
 
-      <A2B1NoWritingReadingChallenge level="A2" day={day} />
+      <A2B1ReadingQualityChallenge level="A2" day={day} />
     </div>
   );
 };
