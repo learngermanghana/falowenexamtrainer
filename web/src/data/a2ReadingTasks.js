@@ -502,7 +502,7 @@ Um 12:30 Uhr macht Anna Mittagspause. Meistens isst sie mit zwei Kolleginnen in 
     chapter: "10.26",
     format: "Alltagssituationen",
     title: "Ein Tag mit verschiedenen Gefühlen",
-    strategy: "Verbinde Auslöser, Gefühl und Reaktion. Achte besonders darauf, wie sich Samuels Stimmung im Laufe des Tages verändert."
+    strategy: "Verbinde Auslöser, Gefühl und Reaktion. Achte besonders darauf, wie sich Samuels Stimmung im Laufe des Tages verändert.",
     text: `Am Morgen ist Samuel nervös, weil er eine wichtige Präsentation bei der Arbeit hat. Kurz vor der Präsentation atmet er langsam ein und aus. Danach ist er sehr erleichtert, denn alles ist gut gelaufen.
 
 In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat ihre Prüfung bestanden. Samuel freut sich sehr für sie. Am Abend wartet er lange auf einen Bus, der nicht kommt. Deshalb ist er genervt. Zu Hause hört er Musik und wird wieder ruhiger.`,
@@ -518,7 +518,7 @@ In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat 
     chapter: "10.27",
     format: "Digitale Hinweise",
     title: "Sicher kommunizieren",
-    strategy: "Wende die Regeln auf konkrete Situationen an. Entscheide nicht nur nach einem Schlüsselwort, sondern prüfe, welche Empfehlung wirklich zur Situation passt."
+    strategy: "Wende die Regeln auf konkrete Situationen an. Entscheide nicht nur nach einem Schlüsselwort, sondern prüfe, welche Empfehlung wirklich zur Situation passt.",
     text: `Tipps für sichere digitale Kommunikation
 
 1. Verwende für wichtige Konten unterschiedliche Passwörter.
@@ -539,7 +539,7 @@ In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat 
     chapter: "10.28",
     format: "E-Mail über Zukunftspläne",
     title: "Meine Pläne für die nächsten Jahre",
-    strategy: "Ordne Kofis Pläne nach Zeit und Zweck. Unterscheide berufliche, sprachliche, private und Reiseziele."
+    strategy: "Ordne Kofis Pläne nach Zeit und Zweck. Unterscheide berufliche, sprachliche, private und Reiseziele.",
     text: `Hallo Sofia,
 
 du hast gefragt, was ich nach dem Deutschkurs machen möchte. Nächstes Jahr will ich zuerst die B1-Prüfung machen. Danach möchte ich mich für eine Ausbildung im Bereich Logistik bewerben. Wenn alles klappt, werde ich im Herbst mit der Ausbildung beginnen.
