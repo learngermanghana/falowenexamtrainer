@@ -487,6 +487,29 @@ export const aggregateUnresolvedTutorDiagnostics = (diagnostics = []) => {
   return [...grouped.values()];
 };
 
+const TimedPhaseNotice = ({ phase, level }) => {
+  if (!phase) return null;
+  return (
+    <div
+      data-timed-phase-intro={level}
+      style={{
+        border: "1px solid #f59e0b",
+        background: "#fffbeb",
+        borderRadius: 16,
+        padding: 14,
+        display: "grid",
+        gap: 6,
+      }}
+    >
+      <strong style={{ color: "#92400e" }}>{phase.title}</strong>
+      <p style={{ margin: 0, color: "#78350f", lineHeight: 1.6 }}>{phase.message}</p>
+      <p style={{ margin: 0, color: "#92400e", fontSize: 13, fontWeight: 700 }}>
+        You can open the lesson, review Grammar and preparation material first, and start the clock only when you are ready.
+      </p>
+    </div>
+  );
+};
+
 const courseBookStyles = {
   hero: {
     borderRadius: 24,
@@ -1235,24 +1258,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       </p>
                     </div>
                   ) : null}
-                  {timedPhase && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay) ? (
-                    <div
-                      data-timed-phase-intro={normalizedSelectedCourseLevel}
-                      style={{
-                        border: "1px solid #f59e0b",
-                        background: "#fffbeb",
-                        borderRadius: 16,
-                        padding: 14,
-                        display: "grid",
-                        gap: 6,
-                      }}
-                    >
-                      <strong style={{ color: "#92400e" }}>{timedPhase.title}</strong>
-                      <p style={{ margin: 0, color: "#78350f", lineHeight: 1.6 }}>{timedPhase.message}</p>
-                      <p style={{ margin: 0, color: "#92400e", fontSize: 13, fontWeight: 700 }}>
-                        You can open the lesson, review Grammar and preparation material first, and start the clock only when you are ready.
-                      </p>
-                    </div>
+                  {!isA1CourseBook && timedPhase && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay) ? (
+                    <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
                   ) : null}
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
@@ -1266,7 +1273,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
                     const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
-                      <article className="course-book-lesson-card" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
+                      <React.Fragment key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`}>
+                        {isA1CourseBook && timedPhase && Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay ? (
+                          <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
+                        ) : null}
+                      <article className="course-book-lesson-card" style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
                         <div style={courseBookStyles.lessonTop}>
                           <div style={courseBookStyles.lessonMain}>
                             <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
@@ -1366,6 +1377,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </p>
                         ) : null}
                       </article>
+                      </React.Fragment>
                     );
                   })}
                 </details>
