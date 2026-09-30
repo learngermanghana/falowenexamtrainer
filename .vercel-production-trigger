@@ -1,2 +1,2 @@
-Production deploy trigger: 2026-09-30 20:45 GMT+1
-Purpose: publish full A2/B1 reading quality audit and late-course Lesen upgrades.
+Preview deploy trigger: 2026-09-30 21:10 GMT+1
+Purpose: verify canonical A2/B1 lesson profile after build-patch hardening.
