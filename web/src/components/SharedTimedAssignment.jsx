@@ -6,7 +6,10 @@ import {
   getTimedAssignmentConfig,
   getTimedAssignmentDurationSeconds,
 } from "../data/timedAssignmentConfig";
-import { getTimedAssignmentRemainingSeconds } from "../utils/timedAssignmentClock";
+import {
+  getTimedAssignmentRemainingSeconds,
+  normalizeTimedAssignmentSession,
+} from "../utils/timedAssignmentClock";
 
 const ATTEMPT_COLLECTION = "submissionLocks";
 
@@ -63,12 +66,17 @@ export const formatTimedAssignmentTime = (seconds = 0) => {
   return `${String(minutes).padStart(2, "0")}:${String(safeSeconds % 60).padStart(2, "0")}`;
 };
 
-const readLocalSession = (assignmentKey, level) => {
+const readLocalSession = (assignmentKey, level, durationSeconds) => {
   if (typeof window === "undefined") return null;
   try {
-    const raw = window.localStorage.getItem(buildTimedAssignmentStorageKey(assignmentKey, level));
+    const storageKey = buildTimedAssignmentStorageKey(assignmentKey, level);
+    const raw = window.localStorage.getItem(storageKey);
     const value = JSON.parse(raw || "null");
-    return Number.isFinite(value?.endsAt) && value.endsAt > 0 ? value : null;
+    const normalized = normalizeTimedAssignmentSession(value, durationSeconds);
+    if (normalized) {
+      window.localStorage.setItem(storageKey, JSON.stringify(normalized));
+    }
+    return normalized;
   } catch (_error) {
     return null;
   }
@@ -117,8 +125,8 @@ export default function SharedTimedAssignment({
     [attemptDocId, enabled],
   );
   const localSession = useMemo(
-    () => (enabled ? readLocalSession(assignmentKey, normalizedLevel) : null),
-    [assignmentKey, enabled, normalizedLevel],
+    () => (enabled ? readLocalSession(assignmentKey, normalizedLevel, durationSeconds) : null),
+    [assignmentKey, durationSeconds, enabled, normalizedLevel],
   );
 
   const [session, setSession] = useState(localSession);
@@ -176,8 +184,13 @@ export default function SharedTimedAssignment({
           durationSeconds > 0
             ? Math.min(durationSeconds, persistedDurationRaw)
             : persistedDurationRaw;
-        const endsAt = startedAt ? startedAt + (persistedDuration * 1000) : Number(data.endsAt) || 0;
-        const nextSession = endsAt > 0 ? { startedAt, endsAt } : null;
+        const rawEndsAt = startedAt
+          ? startedAt + (persistedDuration * 1000)
+          : timestampToMillis(data.endsAt) || Number(data.endsAt) || 0;
+        const nextSession = normalizeTimedAssignmentSession(
+          rawEndsAt > 0 ? { startedAt, endsAt: rawEndsAt } : null,
+          durationSeconds,
+        );
 
         setAttemptState(nextState);
         setSession(nextSession);
