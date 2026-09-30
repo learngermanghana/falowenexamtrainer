@@ -1,6 +1,5 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import SharedTimedAssignment from "./SharedTimedAssignment";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -93,15 +92,10 @@ const QuestionList = ({ questions }) => (
 
 export default function B1Day22BeziehungWichtigWorkbookPageV2() {
   const [activeTab, setActiveTab] = useState("sprechen");
-  const handleTimedExpiry = useCallback(() => setActiveTab("submit"), []);
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const setPreparedFor = (key) => (event) => setPrepared((value) => ({ ...value, [key]: event.target.checked }));
 
   return (
-    <SharedTimedAssignment assignmentKey="B1-7.22" level="B1" onTimeExpired={handleTimedExpiry}>
-      {({ isTabLocked }) => {
-        const displayedActiveTab = isTabLocked(activeTab) ? "sprechen" : activeTab;
-        return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
@@ -117,17 +111,16 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
           style={tabImageStyle}
         />
         <WorkbookTabNav
-          activeTab={displayedActiveTab}
+          activeTab={activeTab}
           onChange={setActiveTab}
           tabs={STANDARD_WORKBOOK_TABS}
-          isTabLocked={isTabLocked}
           ariaLabel="B1 Day 22 relationship workbook sections"
         />
       </div>
 
       <A2B1WorkbookGuidance level="B1" />
 
-      {displayedActiveTab === "sprechen" && (
+      {activeTab === "sprechen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
           <WorkbookTaskCard
@@ -169,7 +162,7 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         </section>
       )}
 
-      {displayedActiveTab === "schreiben" && (
+      {activeTab === "schreiben" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
           <WorkbookTaskCard
@@ -206,7 +199,7 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         </section>
       )}
 
-      {displayedActiveTab === "lesen" && (
+      {activeTab === "lesen" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
@@ -230,7 +223,7 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         </section>
       )}
 
-      {displayedActiveTab === "hoeren" && (
+      {activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Lesen (Assignment)</h2>
           <WorkbookTaskCard
@@ -254,7 +247,7 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         </section>
       )}
 
-      {displayedActiveTab === "references" && (
+      {activeTab === "references" && (
         <WorkbookReferenceAnswers
           level="B1"
           lesson={{ title: "B1Day22BeziehungWichtig", level: "B1", day: 22, workbookId: "B1Day22BeziehungWichtig" }}
@@ -262,7 +255,7 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         />
       )}
 
-      {displayedActiveTab === "submit" && (
+      {activeTab === "submit" && (
         <section style={card}>
           <h2 style={sectionTitle}>Submit workbook answers</h2>
           <WorkbookTaskCard
@@ -289,8 +282,5 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
         </section>
       )}
     </div>
-        );
-      }}
-    </SharedTimedAssignment>
   );
 }
