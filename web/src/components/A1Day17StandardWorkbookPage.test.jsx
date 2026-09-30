@@ -13,6 +13,16 @@ jest.mock("./VerifiedCloudDraftSubmissionPage", () => () => (
 // retaining jsdom mutation observers while still exercising the real tab layout.
 jest.mock("./A1TutorDraftSectionCapture", () => () => null);
 
+jest.mock("./A1TimedMockExam", () => ({
+  __esModule: true,
+  default: ({ children }) => children,
+  useA1TimedMockExam: () => ({
+    enabled: false,
+    assignmentLocked: false,
+    isTabLocked: () => false,
+  }),
+}));
+
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {

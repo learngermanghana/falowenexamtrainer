@@ -319,7 +319,13 @@ if (!source.includes("data-course-week-goal")) {
   if (!source.includes(lessonMapMarker)) throw new Error("Missing lesson map for weekly goals");
   source = source.replace(lessonMapMarker, lessonMapReplacement);
 
-  const articleMarker = "                      <article className=\"course-book-lesson-card\" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>";
+  const articleMarkerWithKey = "                      <article className=\"course-book-lesson-card\" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>";
+  const articleMarkerWithoutKey = "                      <article className=\"course-book-lesson-card\" style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>";
+  const articleMarker = source.includes(articleMarkerWithKey)
+    ? articleMarkerWithKey
+    : source.includes(articleMarkerWithoutKey)
+      ? articleMarkerWithoutKey
+      : "";
   const goalPanel = `${articleMarker}
                         {beginsVisibleWeek && weekOutcomeItems.length ? (
                           <section
@@ -337,7 +343,7 @@ if (!source.includes("data-course-week-goal")) {
                           </section>
                         ) : null}`;
 
-  if (!source.includes(articleMarker)) throw new Error("Missing lesson article for weekly goals");
+  if (!articleMarker) throw new Error("Missing lesson article for weekly goals");
   source = source.replace(articleMarker, goalPanel);
 }
 
