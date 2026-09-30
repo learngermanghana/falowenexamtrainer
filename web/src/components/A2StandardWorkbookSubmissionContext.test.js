@@ -7,7 +7,7 @@ describe("A2 standard workbook submission context", () => {
   test("passes canonical assignment data through submissionContext", () => {
     const shell = read("A2StandardTabbedWorkbookPage.js");
 
-    expect(shell).toContain('const assignmentKey = `A2-${chapter}`');
+    expect(shell).toContain('const assignmentKey = lessonProfile?.assignmentKey || `A2-${chapter}`;');
     expect(shell).toContain('level: "A2"');
     expect(shell).toContain("day,");
     expect(shell).toContain("assignmentKey,");
