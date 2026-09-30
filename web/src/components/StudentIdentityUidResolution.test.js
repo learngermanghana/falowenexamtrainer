@@ -11,6 +11,8 @@ describe("Firebase UID student identity recovery", () => {
     expect(source).toContain('where("uid", "==", user.uid)');
     expect(source).toContain("fetchStudentProfileByUid(credential.user.uid)");
     expect(source).toContain("authEmail: normalizedEmail");
+    expect(source).toContain("profileFromCode.authEmail || profileFromCode.loginEmail || profileFromCode.email");
+    expect(source).toContain("diagnostic?.profile?.authEmail || diagnostic?.profile?.loginEmail");
 
     const googleStart = source.indexOf("const loginWithGoogle");
     const googleEnd = source.indexOf("const refreshUser", googleStart);
