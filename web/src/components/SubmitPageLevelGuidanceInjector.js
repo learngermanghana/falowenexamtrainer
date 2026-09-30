@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
-import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 
 const GUIDANCE_ID = "falowen-submit-level-guidance";
 const CHECKLIST_NAME = "falowen-submit-completion-check";
@@ -161,21 +161,15 @@ export const getRequiredChecklist = (level, assignmentKey) => {
       assignmentId: normalizedKey,
     });
     const day = Number(entry?.assignmentDay || entry?.day || 0);
-    const profile = getA2B1WorkbookSectionProfile(normalizedLevel, day);
-    const checklist = [];
-    if (profile?.writing !== false) {
-      checklist.push({ id: "teil-2", label: "I included my final answer for Teil 2 · Schreiben.", kind: "answer" });
-    }
-    if (profile?.reading !== false) {
-      checklist.push({ id: "teil-3", label: "I included all answers for Teil 3 · Lesen.", kind: "answer" });
-    }
-    if (profile?.part4 && profile?.part4Submission === "submit") {
-      checklist.push({
-        id: "teil-4",
-        label: `I included all answers for Teil 4 · ${profile.part4 === "reading" ? "Lesen" : "Hören"}.`,
-        kind: "answer",
-      });
-    }
+    const profile = getA2B1LessonProfile(normalizedLevel, day);
+    const checklist = (profile?.requiredSubmissionParts || []).map((part) => ({
+      id: `teil-${part.number}`,
+      label:
+        part.label === "Schreiben"
+          ? `I included my final answer for Teil ${part.number} · ${part.label}.`
+          : `I included all answers for Teil ${part.number} · ${part.label}.`,
+      kind: "answer",
+    }));
     if (checklist.length) return checklist;
   }
 
