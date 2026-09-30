@@ -1,4 +1,6 @@
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
+import { isA2WritingRequired } from "../data/a2WritingSchedule";
+import { isB1WritingRequired } from "../data/b1WritingSchedule";
 
 export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
   grammar: false,
@@ -41,9 +43,17 @@ export const getA2B1WorkbookSectionProfile = (level, day) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const normalizedDay = Number(day);
 
+  const writingRequired =
+    normalizedLevel === "A2"
+      ? isA2WritingRequired(normalizedDay)
+      : normalizedLevel === "B1"
+        ? isB1WritingRequired(normalizedDay)
+        : A2_B1_DEFAULT_SECTION_PROFILE.writing;
+
   return {
     ...A2_B1_DEFAULT_SECTION_PROFILE,
     grammar: hasA2B1GrammarNotes(normalizedLevel, normalizedDay),
+    writing: writingRequired,
     ...(A2_B1_SECTION_OVERRIDES[normalizedLevel]?.[normalizedDay] || {}),
   };
 };
