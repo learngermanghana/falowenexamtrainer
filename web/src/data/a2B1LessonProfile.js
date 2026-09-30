@@ -6,10 +6,23 @@ import {
   getA2ListeningTask,
 } from "./a2ListeningTasks";
 import { getB1ListeningTask } from "./b1ListeningTasks";
+import { getB1ReadingTask } from "./b1ReadingTasks";
+import { getTimedAssignmentConfig } from "./timedAssignmentConfig";
 
 export const A2_B1_LESSON_PROFILE_VERSION = 1;
 
 const SUPPORTED_LEVELS = new Set(["A2", "B1"]);
+
+const resolveAssignmentKey = (level, day) => {
+  if (level === "A2") {
+    const chapter = String(getA2ListeningTask(day)?.chapter || "").trim();
+    return chapter ? `A2-${chapter}` : "";
+  }
+  if (level === "B1") {
+    return String(getB1ReadingTask(day)?.assignmentKey || "").trim().toUpperCase();
+  }
+  return "";
+};
 
 const freezeSection = (value) => Object.freeze({ ...value });
 
@@ -241,6 +254,8 @@ export const getA2B1LessonProfile = (level, day) => {
   });
 
   const requiredSubmissionParts = buildSubmissionParts(sections);
+  const assignmentKey = resolveAssignmentKey(normalizedLevel, normalizedDay);
+  const timer = assignmentKey ? getTimedAssignmentConfig(assignmentKey) : null;
   const selfCheckParts = Object.freeze(
     Object.values(sections)
       .filter((section) => section?.visible && section?.mode === "self-check")
@@ -256,6 +271,8 @@ export const getA2B1LessonProfile = (level, day) => {
     version: A2_B1_LESSON_PROFILE_VERSION,
     level: normalizedLevel,
     day: normalizedDay,
+    assignmentKey,
+    timer,
     sections,
     tabs: buildTabs(sections),
     requiredSubmissionParts,
