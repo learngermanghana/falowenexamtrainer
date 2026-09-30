@@ -19,7 +19,7 @@ jest.mock("./A1TimedMockExam", () => ({
   useA1TimedMockExam: () => ({
     enabled: false,
     assignmentLocked: false,
-    isSectionLocked: () => false,
+    isTabLocked: () => false,
   }),
 }));
 
