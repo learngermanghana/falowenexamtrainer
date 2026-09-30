@@ -691,6 +691,12 @@ export const AuthProvider = ({ children }) => {
       try {
         loginDiagnostic = await fetchLoginDiagnostic(cleanedIdentifier);
         throwIfDiagnosticBlocksLogin(loginDiagnostic);
+        if (isEmailLogin) {
+          const linkedAuthEmail = String(
+            loginDiagnostic?.profile?.authEmail || loginDiagnostic?.profile?.loginEmail || ""
+          ).trim().toLowerCase();
+          if (linkedAuthEmail) normalizedEmail = linkedAuthEmail;
+        }
       } catch (error) {
         if (error instanceof LoginDiagnosticError) {
           throw error;
@@ -719,10 +725,13 @@ export const AuthProvider = ({ children }) => {
             { code: "auth/user-not-found" }
           );
         }
-        if (!profileFromCode.email) {
-          throw new Error("We couldn't find an email for this student code. Please contact support.");
+        const linkedAuthEmail = String(
+          profileFromCode.authEmail || profileFromCode.loginEmail || profileFromCode.email || ""
+        ).trim();
+        if (!linkedAuthEmail) {
+          throw new Error("We couldn't find a sign-in email for this student code. Please contact support.");
         }
-        normalizedEmail = profileFromCode.email.trim().toLowerCase();
+        normalizedEmail = linkedAuthEmail.toLowerCase();
       }
 
       const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
@@ -953,7 +962,17 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Please enter your email address to reset the password.");
     }
     const normalizedEmail = email.trim().toLowerCase();
-    await sendPasswordResetEmail(auth, normalizedEmail, getActionCodeSettings());
+    let resetEmail = normalizedEmail;
+    try {
+      const diagnostic = await fetchLoginDiagnostic(normalizedEmail);
+      const linkedAuthEmail = String(
+        diagnostic?.profile?.authEmail || diagnostic?.profile?.loginEmail || ""
+      ).trim().toLowerCase();
+      if (linkedAuthEmail) resetEmail = linkedAuthEmail;
+    } catch (error) {
+      console.warn("Password reset identity lookup failed", error);
+    }
+    await sendPasswordResetEmail(auth, resetEmail, getActionCodeSettings());
   }, []);
 
   const logout = useCallback(
