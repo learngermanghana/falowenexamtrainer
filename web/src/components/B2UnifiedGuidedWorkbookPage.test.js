@@ -79,7 +79,7 @@ describe("B2 unified C2-style course structure", () => {
     expect(day22.questions[0].options[day22.questions[0].answerIndex]).toContain("Automatisierung");
     expect(day22.questions[4].options[day22.questions[4].answerIndex]).toContain("weiterbilden");
 
-    [2, 6, 10, 14, 18, 22].forEach((day) => {
+    [2, 6, 10, 14, 18, 22, 26].forEach((day) => {
       const practice = B2_LISTENING_PRACTICE[day];
       expect(practice.audioKey).toBeTruthy();
       expect(Array.isArray(practice.transcript)).toBe(true);
@@ -90,7 +90,7 @@ describe("B2 unified C2-style course structure", () => {
     });
 
     const day26 = B2_LISTENING_PRACTICE[26];
-    expect(day26.audioKey).toBe("");
+    expect(day26.audioKey).toBe("b2/day-26/day-26/day-26.m4a");
     expect(day26.audioUrl).toBeUndefined();
     expect(Array.isArray(day26.transcript)).toBe(true);
     expect(day26.transcript.length).toBeGreaterThanOrEqual(30);
