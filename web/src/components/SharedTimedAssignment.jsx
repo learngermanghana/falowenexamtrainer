@@ -116,7 +116,9 @@ export default function SharedTimedAssignment({
   const config = configOverride || getTimedAssignmentConfig(assignmentKey);
   const enabled = Boolean(config);
   const normalizedLevel = String(level || config?.level || "").toUpperCase();
-  const durationSeconds = getTimedAssignmentDurationSeconds(assignmentKey);
+  const durationSeconds = config?.durationMinutes
+    ? Math.max(1, Number(config.durationMinutes)) * 60
+    : getTimedAssignmentDurationSeconds(assignmentKey);
   const currentUser = auth?.currentUser || null;
   const attemptDocId = currentUser?.uid
     ? `timed__${normalizeKeyPart(currentUser.uid)}__${normalizeKeyPart(assignmentKey)}`
