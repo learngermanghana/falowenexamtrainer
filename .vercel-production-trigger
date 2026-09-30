@@ -1,2 +1,2 @@
-Production deploy trigger: 2026-09-30 18:24 GMT+1
-Purpose: strengthen A2/B1 Lesen on no-writing days.
+Production deploy trigger: 2026-09-30 18:29 GMT+1
+Purpose: fix structured resubmission build patch after compact UI changes.
