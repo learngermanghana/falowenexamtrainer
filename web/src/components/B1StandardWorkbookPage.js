@@ -297,7 +297,6 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
     <SharedTimedAssignment
       assignmentKey={resolvedAssignmentKey}
       level="B1"
-      configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
       {({ isTabLocked }) => {
