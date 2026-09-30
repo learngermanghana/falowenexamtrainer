@@ -1,7 +1,7 @@
 import fs from "fs";
 
 describe("lesson profile timer integration", () => {
-  test("A2 and B1 workbook shells use canonical assignment identity and the shared timer resolver", () => {
+  test("the lesson profile owns final A2/B1 timer rules without a circular dependency", () => {
     const a2 = fs.readFileSync("src/components/A2StandardTabbedWorkbookPage.js", "utf8");
     const b1 = fs.readFileSync("src/components/B1StandardWorkbookPage.js", "utf8");
     const timed = fs.readFileSync("src/components/SharedTimedAssignment.jsx", "utf8");
@@ -16,9 +16,10 @@ describe("lesson profile timer integration", () => {
     expect(timed).toMatch(/const config = getTimedAssignmentConfig\(assignmentKey\)/);
     expect(timed).not.toMatch(/configOverride/);
 
+    expect(profile).toMatch(/from "\.\/a2B1TimedAssignmentPolicy"/);
     expect(profile).not.toMatch(/from "\.\/timedAssignmentConfig"/);
-    expect(profile).not.toMatch(/timer,/);
+    expect(profile).toMatch(/const timer = buildTimer/);
     expect(timedConfig).toMatch(/from "\.\/a2B1LessonProfile"/);
-    expect(timedConfig).toMatch(/alignTimedConfigWithLessonProfile/);
+    expect(timedConfig).toMatch(/timedConfigFromProfiles/);
   });
 });
