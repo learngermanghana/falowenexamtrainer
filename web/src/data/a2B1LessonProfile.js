@@ -189,6 +189,9 @@ const buildSubmissionCopy = ({ sections, requiredSubmissionParts }) => {
   return Object.freeze({
     requiredLabel,
     title: requiredLabel ? `Submit ${requiredLabel}.` : "No written submission is required.",
+    instructions: requiredLabel
+      ? `Enter your final answers for ${requiredLabel} in the submission form below.`
+      : "No written answers are required for this lesson.",
     note: notes.join(" "),
   });
 };
