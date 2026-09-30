@@ -468,6 +468,9 @@ export function TimedAssignmentPanel() {
   const used = ["expired", "submitted"].includes(attemptState);
   const checking = cloudState === "loading";
   const cloudError = cloudState === "error";
+  const isMock = config.mode === "mock";
+  const timedLabel = isMock ? "Timed mock exam" : "Timed practice";
+  const activityNoun = isMock ? "mock" : "practice";
 
   return (
     <section
@@ -490,7 +493,7 @@ export function TimedAssignmentPanel() {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 3 }}>
           <strong style={{ color: urgent ? "#9f1239" : "#1e3a8a" }}>
-            Timed assignment · {config.durationMinutes} minutes
+            {timedLabel} · {config.durationMinutes} minutes
           </strong>
           <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{config.scope}</span>
         </div>
@@ -512,7 +515,7 @@ export function TimedAssignmentPanel() {
       {active ? (
         <div style={{ display: "grid", gap: 4 }}>
           <span style={{ color: urgent ? "#9f1239" : "#1e40af", fontWeight: 800 }}>
-            {warningMessage || "Mock in progress. The clock continues when you change sections or devices."}
+            {warningMessage || `${isMock ? "Mock" : "Timed practice"} in progress. The clock continues when you change sections or devices.`}
           </span>
           <span style={{ color: "#475569", fontSize: 12 }}>
             Warnings appear at 10, 5 and 1 minute. At 00:00 Falowen submits the latest saved work automatically.
@@ -522,7 +525,7 @@ export function TimedAssignmentPanel() {
         <div style={{ display: "grid", gap: 8 }}>
           <p style={{ margin: 0, color: "#78350f", lineHeight: 1.5 }}>
             <strong>{config.preparationLabel || "Preparation sections stay open."}</strong>{" "}
-            Timed assignment sections stay locked until you start. This is one attempt; after it expires, only a teacher can reset it.
+            Timed sections stay locked until you start. Choose a time when you can work without interruption. This is one timed attempt; if a genuine interruption happens, a teacher can reset it.
           </p>
           <label style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "#78350f", fontWeight: 800 }}>
             <input
@@ -539,7 +542,7 @@ export function TimedAssignmentPanel() {
             onClick={start}
             style={{ ...styles.primaryButton, width: "fit-content", minHeight: 42 }}
           >
-            {checking ? "Checking attempt…" : startBusy ? "Starting…" : `Start ${config.durationMinutes}-minute attempt`}
+            {checking ? "Checking attempt…" : startBusy ? "Starting…" : `Start ${config.durationMinutes}-minute ${activityNoun}`}
           </button>
         </div>
       ) : attemptState === "expired" ? (

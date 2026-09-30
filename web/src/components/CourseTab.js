@@ -22,6 +22,7 @@ import { useLessonProgress } from "../hooks/useLessonProgress";
 import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
 import { getC2SkillLabel } from "../data/c2SkillCycle";
 import { getB2SkillLabel } from "../data/b2SkillCycle";
+import { getTimedAssignmentConfig, getTimedAssignmentPhase } from "../data/timedAssignmentConfig";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -486,6 +487,29 @@ export const aggregateUnresolvedTutorDiagnostics = (diagnostics = []) => {
   return [...grouped.values()];
 };
 
+const TimedPhaseNotice = ({ phase, level }) => {
+  if (!phase) return null;
+  return (
+    <div
+      data-timed-phase-intro={level}
+      style={{
+        border: "1px solid #f59e0b",
+        background: "#fffbeb",
+        borderRadius: 16,
+        padding: 14,
+        display: "grid",
+        gap: 6,
+      }}
+    >
+      <strong style={{ color: "#92400e" }}>{phase.title}</strong>
+      <p style={{ margin: 0, color: "#78350f", lineHeight: 1.6 }}>{phase.message}</p>
+      <p style={{ margin: 0, color: "#92400e", fontSize: 13, fontWeight: 700 }}>
+        You can open the lesson, review Grammar and preparation material first, and start the clock only when you are ready.
+      </p>
+    </div>
+  );
+};
+
 const courseBookStyles = {
   hero: {
     borderRadius: 24,
@@ -752,6 +776,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           status,
           statusInfo,
           scoreBadge,
+          timedConfig: getTimedAssignmentConfig(entryAssignmentKey),
           statusMeta: ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted,
         };
       }),
@@ -759,6 +784,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
 
   const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
+  const timedPhase = getTimedAssignmentPhase(normalizedSelectedCourseLevel);
   const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
   const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";
   const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);
@@ -1232,6 +1258,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       </p>
                     </div>
                   ) : null}
+                  {!isA1CourseBook && timedPhase && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay) ? (
+                    <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
+                  ) : null}
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
@@ -1244,7 +1273,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
                     const instruction = formatCourseBookInstruction(entry.instruction);
                     return (
-                      <article className="course-book-lesson-card" key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
+                      <React.Fragment key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`}>
+                        {isA1CourseBook && timedPhase && Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay ? (
+                          <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
+                        ) : null}
+                      <article className="course-book-lesson-card" style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
                         <div style={courseBookStyles.lessonTop}>
                           <div style={courseBookStyles.lessonMain}>
                             <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
@@ -1257,6 +1290,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
                                 {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
                                 {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
+                                {entry.timedConfig ? (
+                                  <span
+                                    data-timed-coursebook-chip={entry.assignmentKey}
+                                    style={{ ...courseBookStyles.chip, background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" }}
+                                  >
+                                    {entry.timedConfig.mode === "mock" ? "Timed mock" : "Timed practice"} · {entry.timedConfig.durationMinutes} min
+                                  </span>
+                                ) : null}
                               </div>
                               {!entry.isTutorMarked ? (
                                 isC2CourseBook ? (() => {
@@ -1336,6 +1377,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </p>
                         ) : null}
                       </article>
+                      </React.Fragment>
                     );
                   })}
                 </details>

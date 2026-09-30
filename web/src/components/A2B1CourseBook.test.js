@@ -88,6 +88,9 @@ describe("A2 and B1 course books", () => {
     expect(courseTabSource).toContain('className="course-book-mobile-actions"');
     expect(courseTabSource).toContain('className="course-book-submit-sheet"');
     expect(courseTabSource).toContain('className="course-book-week"');
+    expect(courseTabSource).toContain("data-timed-phase-intro");
+    expect(courseTabSource).toContain("data-timed-coursebook-chip");
+    expect(courseTabSource).toContain("start the clock only when you are ready");
     expect(responsiveCss).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
     expect(responsiveCss).toContain("overflow-x: auto");
     expect(responsiveCss).toContain("max-height: 88dvh");
