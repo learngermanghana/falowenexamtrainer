@@ -312,14 +312,14 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                     {config.subtitle || (writingRequired
                       ? (hasListeningTab
                         ? "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
-                        : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4 · Hören.")
+                        : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4.")
                       : (hasListeningTab
-                        ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required for submission."
-                        : "Today: Sprechen in class, then Lesen. Schreiben is not required for submission."))}
+                        ? `Today: Sprechen in class, then Teil 3 · Lesen and Teil 4 · ${part4Profile?.label || "Hören"}. Schreiben is not required for submission.`
+                        : "Today: Sprechen in class, then Teil 3 · Lesen. Schreiben is not required for submission."))}
                   </p>
                   <SectionImage image={config.heroImage} alt={config.heroAlt} />
                   <WorkbookTabNav
-                    displayedActiveTab={displayedActiveTab}
+                    activeTab={displayedActiveTab}
                     onChange={setActiveTab}
                     tabs={workbookTabs}
                     isTabLocked={isTabLocked}
