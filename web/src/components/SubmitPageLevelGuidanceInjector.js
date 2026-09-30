@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 
 const GUIDANCE_ID = "falowen-submit-level-guidance";
 const CHECKLIST_NAME = "falowen-submit-completion-check";
@@ -151,7 +153,33 @@ export const getRequiredChecklist = (level, assignmentKey) => {
   const normalizedLevel = normalizeLevel(level) || "A1";
   const normalizedKey = normalizeAssignmentKey(assignmentKey);
   const a1Checklist = normalizedLevel === "A1" ? buildA1AssignmentChecklist(normalizedKey) : null;
-  return a1Checklist || getCopyForLevel(normalizedLevel).checklist;
+  if (a1Checklist) return a1Checklist;
+
+  if (["A2", "B1"].includes(normalizedLevel)) {
+    const entry = getAssignmentDictionaryEntry({
+      level: normalizedLevel,
+      assignmentId: normalizedKey,
+    });
+    const day = Number(entry?.assignmentDay || entry?.day || 0);
+    const profile = getA2B1WorkbookSectionProfile(normalizedLevel, day);
+    const checklist = [];
+    if (profile?.writing !== false) {
+      checklist.push({ id: "teil-2", label: "I included my final answer for Teil 2 · Schreiben.", kind: "answer" });
+    }
+    if (profile?.reading !== false) {
+      checklist.push({ id: "teil-3", label: "I included all answers for Teil 3 · Lesen.", kind: "answer" });
+    }
+    if (profile?.part4 && profile?.part4Submission === "submit") {
+      checklist.push({
+        id: "teil-4",
+        label: `I included all answers for Teil 4 · ${profile.part4 === "reading" ? "Lesen" : "Hören"}.`,
+        kind: "answer",
+      });
+    }
+    if (checklist.length) return checklist;
+  }
+
+  return getCopyForLevel(normalizedLevel).checklist;
 };
 
 const findSubmissionForm = ({ pathname = "", search = "", root = document } = {}) => {
