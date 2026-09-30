@@ -2953,45 +2953,28 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       {/* ✅ Resubmission (PER ASSIGNMENT) */}
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{resubmissionBadgeLabel}</span>
+          <h3 style={{ margin: 0 }}>Resubmit this assignment</h3>
+          <span style={styles.badge}>
+            {canShowResubmissionForm
+              ? resubmissionLimitReached
+                ? "No tries left"
+                : `${remainingResubmissions} resubmission${remainingResubmissions === 1 ? "" : "s"} left`
+              : resubmissionBadgeLabel}
+          </span>
         </div>
 
         {canShowResubmissionForm ? (
-          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-            <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#f9fafb" }}>
-              <strong>{isGerman ? "Überprüft" : "Reviewed"}</strong>
-            </div>
-            <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: "#ecfdf5" }}>
-              <strong>{isGerman ? "Wiedereinreichung freigeschaltet" : "Resubmission unlocked"}</strong>
-            </div>
-          </div>
-        ) : null}
-
-        {canShowResubmissionForm ? (
           <>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.
-            </p>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              {resubmissionLimitReached
-                ? `Submission limit reached: ${Math.max(selectedSubmissionAttemptCount, MAX_TOTAL_SUBMISSION_ATTEMPTS)}/${MAX_TOTAL_SUBMISSION_ATTEMPTS} total attempts used.`
-                : `Resubmissions left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
-            </p>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              First submission is #1, followed by two resubmissions (#2 and #3). After 3 total submissions, further resubmission is blocked so your teacher can mark and save the final attempt.
+            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+              Review your tutor feedback, correct the work, then submit the improved version below.
             </p>
             {resubmissionLimitReached ? (
               <InfoBox tone="warning">
                 Submission is blocked because this work already has {MAX_TOTAL_SUBMISSION_ATTEMPTS} total submissions. Your teacher will mark and save the final submitted attempt.
               </InfoBox>
             ) : null}
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              If your score is below {PASS_THRESHOLD_SCORE}%, read the tutor comments, apply every fix, then scroll down and submit your improved version.
-            </p>
-
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Corrected text</span>
+              <span style={styles.label}>Corrected work</span>
               <textarea
                 ref={resubmissionTextRef}
                 value={resubmissionText}
@@ -3004,13 +2987,10 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 spellCheck={false}
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 160 }}
-                placeholder="Paste your corrected letter/text here."
+                placeholder="Paste or type your corrected work here."
                 disabled={resubmissionLimitReached}
               />
               <WordProgress value={resubmissionText} minimumWords={DEFAULT_ASSIGNMENT_SUBMISSION_WORDS} />
-              <span style={styles.helperText}>
-                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
-              </span>
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
                 {GERMAN_SPECIAL_CHARACTERS.map((character) => (
@@ -3028,7 +3008,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </label>
 
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>What did you improve in this submission? *</span>
+              <span style={styles.label}>What did you improve? *</span>
               <textarea
                 ref={resubmissionImprovementRef}
                 value={resubmissionImprovement}
@@ -3039,26 +3019,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 autoCapitalize="sentences"
                 autoCorrect="off"
                 spellCheck={false}
-                style={{ ...styles.textArea, minHeight: 120 }}
-                placeholder="Example: I fixed verb placement in Nebensätze, corrected article endings, and rewrote the opening paragraph to match the prompt."
+                style={{ ...styles.textArea, minHeight: 88 }}
+                placeholder="Example: I corrected the verb order and fixed the answers from the tutor feedback."
                 disabled={resubmissionLimitReached}
               />
-              <WordProgress value={resubmissionImprovement} minimumWords={MIN_RESUBMISSION_IMPROVEMENT_WORDS} />
-              <span style={styles.helperText}>Add at least {MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS} characters.</span>
-              <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-                {GERMAN_SPECIAL_CHARACTERS.map((character) => (
-                  <button
-                    key={character}
-                    type="button"
-                    style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
-                    onClick={() => insertImprovementCharacter(character)}
-                    disabled={resubmissionLimitReached}
-                  >
-                    {character}
-                  </button>
-                ))}
-              </div>
+              <span style={styles.helperText}>Briefly describe the changes you made.</span>
             </label>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -3083,12 +3048,6 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             {resubmissionStatus.error ? <InfoBox tone="error">{resubmissionStatus.error}</InfoBox> : null}
             {resubmissionStatus.success ? <InfoBox tone="success">{resubmissionStatus.success}</InfoBox> : null}
 
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Tip: if your text is mostly the same, explain clearly which objective you still need help with.
-            </p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Resubmissions must include clear edits. For full text: at least {MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and {MIN_RESUBMISSION_NEW_WORDS} new words. For short answer lists (1.a, 2.b...), change at least {MIN_OBJECTIVE_CHANGED_ANSWERS} answers.
-            </p>
             {submissionCooldownRemainingMs > 0 ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#b45309" }}>
                 You can resubmit in {submissionCooldownLabel}.
@@ -3119,11 +3078,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         )}
       </div>
 
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <h3 style={{ margin: 0 }}>Recent submissions</h3>
+      <details style={{ ...styles.card }}>
+        <summary style={{ cursor: "pointer", fontWeight: 800, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+          <span>Recent submissions</span>
           {submissionsLoading ? <span style={styles.helperText}>Loading ...</span> : null}
-        </div>
+        </summary>
+        <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
 
         {recentSubmissions.length === 0 && !submissionsLoading ? (
           <p style={{ ...styles.helperText, margin: 0 }}>{uiText.ctaFirstSubmission}</p>
@@ -3180,7 +3140,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </div>
           ))}
         </div>
-      </div>
+        </div>
+      </details>
     </div>
   );
 };
