@@ -581,7 +581,7 @@ const lessonCatalog = Object.freeze([
     "title": "Wo möchten wir uns treffen? 2.4",
     "assignmentId": "A2-2.4",
     "assignmentType": "Lesen & Hören",
-    "grammarPage": "https://drive.google.com/file/d/14qE_XJr3mTNr6PF5aa0aCqauh9ngYTJ8/view?usp=sharing",
+    "grammarPage": "/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook",
     "submissionRequired": true,
     "progressionEligible": true,
