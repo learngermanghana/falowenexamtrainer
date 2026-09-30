@@ -277,23 +277,31 @@ Für Fragen zu Weiterbildung sprechen Sie mit Frau König aus der Personalabteil
   },
   15: {
     chapter: "6.15",
-    format: "Sportangebote",
-    title: "Sportverein Nord",
-    strategy: "Suche nach Wochentag, Uhrzeit, Alter und Preis. Bei Angeboten reichen oft einzelne Schlüsselwörter.",
-    text: `Sportverein Nord – neue Kurse
+    format: "Sportangebote zuordnen",
+    title: "Welcher Sportkurs passt?",
+    strategy: "Vergleiche mehrere Bedingungen gleichzeitig: Trainingszeit, Preis, Erfahrung, Anmeldung und besondere Hinweise. Ein einzelnes passendes Wort reicht nicht.",
+    text: `SPORTVEREIN NORD – KURSE IM FRÜHLING
 
-Laufgruppe: Dienstag 18:00 Uhr, Treffpunkt Stadion, kostenlos.
-Schwimmen: Mittwoch 19:00 Uhr, Hallenbad, 25 Euro pro Monat.
-Badminton: Freitag 17:30 Uhr, Sporthalle 2, 20 Euro pro Monat.
-Familienfitness: Samstag 10:00 Uhr, für Erwachsene mit Kindern ab 6 Jahren, 8 Euro pro Termin.
+A – Laufgruppe
+Dienstag und Donnerstag, 18:00–19:00 Uhr. Treffpunkt am Stadion. Teilnahme kostenlos. Geeignet für Anfänger und Fortgeschrittene. Keine Anmeldung nötig.
 
-Für Schwimmen und Badminton ist eine Anmeldung nötig.`,
+B – Schwimmen
+Mittwoch, 19:00–20:00 Uhr, Hallenbad. 25 Euro pro Monat. Sicheres Schwimmen ist Voraussetzung. Anmeldung bis zum Monatsende.
+
+C – Badminton
+Freitag, 17:30–19:00 Uhr, Sporthalle 2. 20 Euro pro Monat. Schläger können kostenlos ausgeliehen werden. Anfänger sind willkommen. Anmeldung erforderlich.
+
+D – Familienfitness
+Samstag, 10:00–11:00 Uhr. Für Erwachsene mit Kindern ab 6 Jahren. 8 Euro pro Termin. Anmeldung nicht nötig.
+
+E – Fitnesskurs „Rücken & Bewegung“
+Montag, 18:30–19:30 Uhr. 30 Euro pro Monat. Besonders geeignet für Personen, die nach einer längeren Pause wieder mit Sport beginnen möchten. Anmeldung erforderlich.`,
     questions: [
-      { stem: "Welche Aktivität ist kostenlos?", options: ["A) Laufgruppe", "B) Schwimmen", "C) Badminton", "D) Familienfitness"] },
-      { stem: "Wo findet Schwimmen statt?", options: ["A) Im Stadion", "B) Im Hallenbad", "C) In Sporthalle 2", "D) Im Park"] },
-      { stem: "Wann beginnt Badminton?", options: ["A) Dienstag um 18:00 Uhr", "B) Mittwoch um 19:00 Uhr", "C) Freitag um 17:30 Uhr", "D) Samstag um 10:00 Uhr"] },
-      { stem: "Für wen ist Familienfitness gedacht?", options: ["A) Nur für Kinder", "B) Für Erwachsene mit Kindern ab 6 Jahren", "C) Nur für Senioren", "D) Nur für Vereinsmitglieder"] },
-      { stem: "Für welche Kurse muss man sich anmelden?", options: ["A) Laufgruppe und Familienfitness", "B) Schwimmen und Badminton", "C) Nur Laufgruppe", "D) Für alle Kurse"] },
+      { stem: "Nora arbeitet bis 17 Uhr und möchte nach der Arbeit Sport machen. Sie hat lange keinen Sport gemacht und möchte langsam wieder anfangen. Welcher Kurs passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Sam möchte am Freitag trainieren. Er hat keinen eigenen Schläger und hat noch nie Badminton gespielt. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Mina möchte mit ihrer achtjährigen Tochter am Wochenende gemeinsam Sport machen und spontan kommen. Welches Angebot passt?", options: ["A) Angebot B", "B) Angebot C", "C) Angebot D", "D) Angebot E"] },
+      { stem: "David kann nur mittwochs abends. Er kann gut schwimmen und möchte einen regelmäßigen Monatskurs. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Leonie möchte möglichst nichts bezahlen, zweimal pro Woche trainieren und sich nicht vorher anmelden. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot D", "D) Angebot E"] },
     ],
   },
   16: {
