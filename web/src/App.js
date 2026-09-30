@@ -176,6 +176,7 @@ import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
 import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
+import PublicAdmissionsVisitorGuidePage from "./components/PublicAdmissionsVisitorGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
@@ -460,6 +461,10 @@ function App() {
 
   if (location.pathname === "/learn-german-ghana/upcoming-classes") {
     return <PublicUpcomingClassesPage />;
+  }
+
+  if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
+    return <PublicAdmissionsVisitorGuidePage />;
   }
 
 
