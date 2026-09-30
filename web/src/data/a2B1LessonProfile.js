@@ -8,7 +8,7 @@ import {
 import { getB1ListeningTask } from "./b1ListeningTasks";
 import { getA2ReadingTask } from "./a2ReadingTasks";
 import { getB1ReadingTask } from "./b1ReadingTasks";
-import { getTimedAssignmentConfig } from "./timedAssignmentConfig";
+import { getA2B1TimedAssignmentPolicy } from "./a2B1TimedAssignmentPolicy";
 
 export const A2_B1_LESSON_PROFILE_VERSION = 1;
 
@@ -217,7 +217,7 @@ const TIMED_TAB_BY_SECTION = Object.freeze({
 });
 
 const buildCanonicalTimer = ({ assignmentKey, requiredSubmissionParts }) => {
-  const raw = assignmentKey ? getTimedAssignmentConfig(assignmentKey) : null;
+  const raw = assignmentKey ? getA2B1TimedAssignmentPolicy(assignmentKey) : null;
   if (!raw) return null;
 
   const timedTabs = Object.freeze(
