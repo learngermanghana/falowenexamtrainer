@@ -24,9 +24,7 @@ export default function A2B1ReadingQualityChallenge({ level, day }) {
   const audit = getReadingQualityAudit(level, day);
   if (!audit?.needsDepthCheck) return null;
 
-  const label = audit.status === "legacy-review"
-    ? "Reading audit · Legacy lesson"
-    : "Reading upgrade";
+  const label = "Reading upgrade";
   const intro = audit.level === "A2"
     ? "The basic questions check comprehension. Complete this short second pass so you also practise evidence, inference and distractor control at the right A2 stage."
     : "The basic questions check comprehension. Complete this second pass to practise B1 evidence, paraphrasing, inference and distractor control.";
