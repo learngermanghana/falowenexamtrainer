@@ -22,6 +22,7 @@ import {
 } from "./A2SecondStageLearningUpgrade";
 import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
+import { isA2WritingRequired } from "../data/a2WritingSchedule";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
 import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
@@ -146,6 +147,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const navigate = useNavigate();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
+  const writingRequired = isA2WritingRequired(day);
   const [activeTab, setActiveTab] = useState("sprechen");
   const requestedView = normalizeA2B1SectionView(
     new URLSearchParams(location.search || "").get("view") || "",
@@ -154,7 +156,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     requestedView &&
     requestedView !== "radio" &&
     requestedView !== "workbook" &&
-    (requestedView !== "hoeren" || showHoeren)
+    (requestedView !== "hoeren" || showHoeren) &&
+    (requestedView !== "schreiben" || writingRequired)
       ? requestedView
       : "";
   const visibleActiveTab = routeTab || activeTab;
@@ -163,7 +166,11 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
-  const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
+  const visibleTabs = tabs.filter((tab) => {
+    if (tab.key === "hoeren" && !showHoeren) return false;
+    if (tab.key === "schreiben" && !writingRequired) return false;
+    return true;
+  });
   const assignmentKey = `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
     setActiveTab("submit");
@@ -201,7 +208,9 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
           <div style={card}>
             <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
             <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
-            <p style={{ ...styles.subtitle, margin: 0 }}>{showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below."} The tabs stay visible at the top of the workbook.</p>
+            <p style={{ ...styles.subtitle, margin: 0 }}>{writingRequired
+              ? (showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below.")
+              : (showHoeren ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required." : "Today: Sprechen in class, then Lesen. Schreiben is not required.")} The tabs stay visible at the top of the workbook.</p>
             <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
                 activeTab={displayedActiveTab}
                 onChange={setActiveTab}
