@@ -99,16 +99,22 @@ describe("canonical A2/B1 lesson profiles", () => {
       assignmentKey: "A2-9.25",
       timer: {
         durationMinutes: 45,
-        timedTabs: ["schreiben", "lesen"],
+        timedTabs: ["lesen"],
+        source: "lesson-profile",
       },
     });
     expect(getA2B1LessonProfile("B1", 22)).toMatchObject({
       assignmentKey: "B1-7.22",
       timer: {
         durationMinutes: 55,
-        timedTabs: ["schreiben", "lesen", "hoeren"],
+        timedTabs: ["lesen", "hoeren"],
+        source: "lesson-profile",
       },
     });
+    expect(getA2B1LessonProfile("A2", 24).timer.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+    expect(getA2B1LessonProfile("A2", 27).timer.timedTabs).toEqual(["lesen", "hoeren"]);
+    expect(getA2B1LessonProfile("B1", 25).timer.timedTabs).toEqual(["lesen"]);
+
     expect(getA2B1LessonProfile("B1", 28)).toMatchObject({
       assignmentKey: "B1-10.28",
       timer: {
