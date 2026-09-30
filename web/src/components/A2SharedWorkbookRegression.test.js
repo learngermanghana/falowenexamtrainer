@@ -24,13 +24,13 @@ const cleanedLateA2Days = [day20, day21, day22, day23, day24, day25, day26, day2
 describe("shared A2 workbook regression", () => {
   it("keeps the shared workbook shell complete", () => {
     expect(standardShell).toContain("A2_B1_WORKBOOK_TABS_WITH_GRAMMAR");
-    expect(standardShell).toContain('visibleActiveTab === "grammar"');
-    expect(standardShell).toContain('visibleActiveTab === "sprechen"');
-    expect(standardShell).toContain('visibleActiveTab === "schreiben"');
-    expect(standardShell).toContain('visibleActiveTab === "lesen"');
-    expect(standardShell).toContain('visibleActiveTab === "hoeren"');
-    expect(standardShell).toContain('visibleActiveTab === "references"');
-    expect(standardShell).toContain('visibleActiveTab === "submit"');
+    expect(standardShell).toContain('displayedActiveTab === "grammar"');
+    expect(standardShell).toContain('displayedActiveTab === "sprechen"');
+    expect(standardShell).toContain('displayedActiveTab === "schreiben"');
+    expect(standardShell).toContain('displayedActiveTab === "lesen"');
+    expect(standardShell).toContain('displayedActiveTab === "hoeren"');
+    expect(standardShell).toContain('displayedActiveTab === "references"');
+    expect(standardShell).toContain('displayedActiveTab === "submit"');
     expect(standardShell).toContain("SpeakingMindMap");
     expect(standardShell).toContain("SpeakingPracticeTimerCard");
     expect(standardShell).toContain("WorkbookReferenceAnswers");
@@ -137,7 +137,8 @@ describe("shared A2 workbook regression", () => {
     expect(day28).toContain('chapter="10.28"');
     expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
     expect(day28).toContain("A2Days26To28LearningUpgrade");
-    expect(A2_LISTENING_TASKS[28].audioUrl).toContain("Teuu287XY_M");
+    expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
+    expect(A2_LISTENING_TASKS[28].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(day28).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
   });
