@@ -62,3 +62,17 @@ test("signup records direct tracked registration visits", () => {
   assert.match(app, /params\.get\("ref"\)/);
   assert.match(app, /params\.get\("class"\)/);
 });
+
+
+test("shared visitor-guide links preserve class and lead context without authentication", () => {
+  const app = read("web/src/App.js");
+  const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
+  const engagement = read("web/src/services/admissionsEngagementService.js");
+
+  assert.match(app, /location\.pathname === "\/visitor-guide"/);
+  assert.match(page, /params\.get\("class"\)/);
+  assert.match(page, /resolveAdmissionsRef\(search\)/);
+  assert.match(page, /selectedClass.*requestedSlug/s);
+  assert.match(engagement, /params\.get\("ref"\)/);
+  assert.match(page, /visitor_guide_open/);
+});
