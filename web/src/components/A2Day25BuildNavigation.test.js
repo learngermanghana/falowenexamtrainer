@@ -5,22 +5,21 @@ import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 describe("A2 Day 25 build-time workbook navigation", () => {
-  test("Day 25 now owns the shared native workbook shell", () => {
+  test("Day 25 owns the shared native workbook shell", () => {
     const source = read("A2Day25TagesablaufWorkbookPage.js");
 
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain("day={25}");
     expect(source).toContain('chapter="9.25"');
-    expect(source).toContain("m7nP2qE9gNg");
     expect(source).not.toContain("There is no Hören assignment in this workbook");
   });
 
-  test("Day 25 exposes Teil 4 as Hören and submits it canonically", () => {
+  test("Day 25 profile hides Teil 4 because the canonical listening registry has none", () => {
     const profile = getA2B1WorkbookSectionProfile("A2", 25);
 
-    expect(profile.listening).toBe(true);
-    expect(profile.part4).toBe("listening");
-    expect(profile.part4Submission).toBe("submit");
+    expect(profile.listening).toBe(false);
+    expect(profile.part4).toBeNull();
+    expect(profile.part4Submission).toBe("none");
   });
 
   test("late native ownership disables fallback navigation during normal build and test flows", () => {

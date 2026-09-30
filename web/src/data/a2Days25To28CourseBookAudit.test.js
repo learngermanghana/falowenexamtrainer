@@ -35,8 +35,9 @@ describe("A2 Course Book final audit · Days 25–28", () => {
   test("keeps Day 26 fully focused on feelings", () => {
     const source = readComponent("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
     expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
-    expect(A2_LISTENING_TASKS[26].audioUrl).toContain("JEJZypJfrD8");
-    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
+    expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(source).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
   });
 

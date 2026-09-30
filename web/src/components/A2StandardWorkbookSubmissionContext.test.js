@@ -13,6 +13,8 @@ describe("A2 standard workbook submission context", () => {
     expect(shell).toContain("assignmentKey,");
     expect(shell).toContain("canonicalAssignmentKey: assignmentKey");
     expect(shell).toContain("workbookId: resolvedWorkbookId");
+    expect(shell).toContain("lessonProfileVersion: lessonProfile?.version || null");
+    expect(shell).toContain("requiredSubmissionParts: lessonProfile?.requiredSubmissionParts?.map");
     expect(shell).toContain("<ContextualAssignmentSubmissionPage submissionContext={submissionContext} />");
   });
 

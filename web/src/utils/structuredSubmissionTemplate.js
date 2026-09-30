@@ -1,5 +1,5 @@
 import { getA1Assignment, getA1AssignmentByChapter } from "../data/a1AssignmentRegistry";
-import { getA2B1WorkbookSectionProfile } from "../components/a2B1WorkbookSectionProfile";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 
 export const STRUCTURED_SUBMISSION_VERSION = 1;
 
@@ -38,17 +38,10 @@ const resolveA1Parts = ({ assignmentKey = "", chapter = "" } = {}) => {
 };
 
 const resolveA2B1Parts = ({ level = "", day = 0 } = {}) => {
-  const profile = getA2B1WorkbookSectionProfile(level, day);
-  const parts = [
-    ...(profile?.writing === false ? [] : [makePart(2, "Schreiben")]),
-    makePart(3, "Lesen"),
-  ];
-
-  if (profile?.part4 && profile?.part4Submission === "submit") {
-    parts.push(makePart(4, profile.part4 === "reading" ? "Lesen" : "Hören"));
-  }
-
-  return parts;
+  const profile = getA2B1LessonProfile(level, day);
+  return (profile?.requiredSubmissionParts || []).map((part) =>
+    makePart(part.number, part.label),
+  );
 };
 
 export const getStructuredSubmissionProfile = ({ level = "", day = 0, chapter = "", assignmentKey = "" } = {}) => {

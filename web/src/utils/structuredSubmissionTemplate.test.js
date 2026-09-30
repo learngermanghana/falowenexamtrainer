@@ -26,20 +26,24 @@ describe("structured submission templates", () => {
       .toEqual(["teil1", "teil2", "teil3"]);
   });
 
-  test("A2 and B1 default to Teil 2, Teil 3 and submitted Teil 4", () => {
+  test("A2/B1 structured parts follow the canonical lesson submission profile", () => {
     expect(getStructuredSubmissionProfile({ level: "A2", day: 15, assignmentKey: "A2-6.15" }).parts.map((part) => part.partId))
       .toEqual(["teil2", "teil3", "teil4"]);
     expect(getStructuredSubmissionProfile({ level: "B1", day: 9, assignmentKey: "B1-3.9" }).parts.map((part) => part.partId))
-      .toEqual(["teil2", "teil3", "teil4"]);
+      .toEqual(["teil2", "teil3"]);
+    expect(getStructuredSubmissionProfile({ level: "B1", day: 22, assignmentKey: "B1-7.22" }).parts.map((part) => [part.partId, part.label]))
+      .toEqual([["teil3", "Lesen"], ["teil4", "Lesen"]]);
   });
 
-  test("A2 omits Teil 4 when it is absent or self-check only", () => {
+  test("A2 omits writing or Teil 4 exactly when the lesson profile says so", () => {
     expect(getStructuredSubmissionProfile({ level: "A2", day: 14, assignmentKey: "A2-5.14" }).parts.map((part) => part.partId))
-      .toEqual(["teil2", "teil3"]);
+      .toEqual(["teil3"]);
     expect(getStructuredSubmissionProfile({ level: "A2", day: 22, assignmentKey: "A2-8.22" }).parts.map((part) => part.partId))
       .toEqual(["teil2", "teil3"]);
-    expect(getStructuredSubmissionProfile({ level: "A2", day: 25, assignmentKey: "A2-9.25" }).parts.map((part) => part.partId))
+    expect(getStructuredSubmissionProfile({ level: "A2", day: 24, assignmentKey: "A2-9.24" }).parts.map((part) => part.partId))
       .toEqual(["teil2", "teil3", "teil4"]);
+    expect(getStructuredSubmissionProfile({ level: "A2", day: 25, assignmentKey: "A2-9.25" }).parts.map((part) => part.partId))
+      .toEqual(["teil3"]);
   });
 
   test("builds one textarea template and parses answers under the protected headings", () => {

@@ -9,7 +9,7 @@ const source = fs.readFileSync(targetPath, "utf8");
 const requiredMarkers = [
   'uses the standard workbook shell throughout cleaned Days 20–28',
   'keeps Day 21 weekend-focused while preserving its historical Teil 2 prompt',
-  'keeps Day 25 aligned with canonical Lesen & Hören',
+  'keeps Day 25 aligned with canonical Lesen and no Teil 4',
   'keeps Day 28 future-focused with standard Grammar and Submit ownership',
 ];
 

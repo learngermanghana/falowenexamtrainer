@@ -1,3 +1,5 @@
+import { getA2B1LessonProfile } from "./a2B1LessonProfile";
+
 const freezeTabs = (tabs) => Object.freeze(tabs);
 
 const timed = ({
@@ -42,7 +44,7 @@ export const TIMED_ASSIGNMENT_PHASES = Object.freeze({
   }),
 });
 
-export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
+const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   // A1 · Week 4 onward: every tutor-marked assignment is timed.
   "A1-9": timed({
     level: "A1",
@@ -241,6 +243,51 @@ export const TIMED_ASSIGNMENT_CONFIG = Object.freeze({
 
 const normalizeAssignmentKey = (assignmentKey = "") =>
   String(assignmentKey || "").trim().toUpperCase();
+
+const resolveAssignmentDay = (assignmentKey = "") => {
+  const normalized = normalizeAssignmentKey(assignmentKey);
+  const match = normalized.match(/(?:^|[.-])(\d{1,2})$/);
+  return match ? Number(match[1]) : 0;
+};
+
+const profileTimedTab = (part = {}) => {
+  if (part.sectionKey === "writing") return "schreiben";
+  if (part.sectionKey === "reading") return "lesen";
+  if (part.sectionKey === "part4") return "hoeren";
+  return "";
+};
+
+const joinTimedScope = (parts = []) => {
+  const labels = parts.map((part) => `Teil ${part.number} ${part.label}`);
+  if (labels.length <= 1) return labels[0] || "submitted workbook work";
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}`;
+};
+
+const alignTimedConfigWithLessonProfile = (assignmentKey, config) => {
+  if (!config || !["A2", "B1"].includes(config.level)) return config;
+  const day = resolveAssignmentDay(assignmentKey);
+  const profile = getA2B1LessonProfile(config.level, day);
+  if (!profile) return config;
+
+  const requiredParts = profile.requiredSubmissionParts || [];
+  const timedTabs = requiredParts.map(profileTimedTab).filter(Boolean);
+  return Object.freeze({
+    ...config,
+    scope: joinTimedScope(requiredParts),
+    timedTabs: freezeTabs(timedTabs),
+    lessonProfileVersion: profile.version,
+  });
+};
+
+export const TIMED_ASSIGNMENT_CONFIG = Object.freeze(
+  Object.fromEntries(
+    Object.entries(BASE_TIMED_ASSIGNMENT_CONFIG).map(([assignmentKey, config]) => [
+      assignmentKey,
+      alignTimedConfigWithLessonProfile(assignmentKey, config),
+    ]),
+  ),
+);
 
 export const getTimedAssignmentConfig = (assignmentKey = "") =>
   TIMED_ASSIGNMENT_CONFIG[normalizeAssignmentKey(assignmentKey)] || null;

@@ -36,17 +36,25 @@ const simpleWorkspace = `export default function B1WritingWorkspace({ writingCon
 }
 `;
 
-const writingFunctionStart = writingSource.indexOf("export default function B1WritingWorkspace");
-if (writingFunctionStart < 0) {
-  throw new Error("Could not find B1WritingWorkspace export for A2/B1 writing cleanup.");
-}
+if (
+  writingSource.includes("normalizeWritingStarterText") &&
+  writingSource.includes("starterTaskRef") &&
+  writingSource.includes("The starter text is already inside the writing box")
+) {
+  console.log("A2/B1 writing workspace already preserves editable starter text; destructive legacy rewrite skipped.");
+} else {
+  const writingFunctionStart = writingSource.indexOf("export default function B1WritingWorkspace");
+  if (writingFunctionStart < 0) {
+    throw new Error("Could not find B1WritingWorkspace export for A2/B1 writing cleanup.");
+  }
 
-let nextWritingSource = `${writingSource.slice(0, writingFunctionStart)}${simpleWorkspace}`;
-nextWritingSource = nextWritingSource.replace(
-  'import React, { useMemo, useState } from "react";',
-  'import React, { useState } from "react";',
-);
-fs.writeFileSync(writingPath, nextWritingSource);
+  let nextWritingSource = `${writingSource.slice(0, writingFunctionStart)}${simpleWorkspace}`;
+  nextWritingSource = nextWritingSource.replace(
+    'import React, { useMemo, useState } from "react";',
+    'import React, { useState } from "react";',
+  );
+  fs.writeFileSync(writingPath, nextWritingSource);
+}
 
 let navSource = fs.readFileSync(navPath, "utf8");
 navSource = navSource.replace(

@@ -96,21 +96,19 @@ analyserMarkers.forEach((marker) => {
 });
 fs.writeFileSync(analyserPath, analyser, "utf8");
 
-const profilePath = path.join(root, "web/src/components/a2B1WorkbookSectionProfile.js");
-let profile = fs.readFileSync(profilePath, "utf8");
-if (!profile.includes('21: Object.freeze({ listening: false, part4: null, part4Submission: "none" })')) {
-  profile = replaceOnce(
-    profile,
-    `  B1: Object.freeze({}),`,
-    `  B1: Object.freeze({\n    21: Object.freeze({ listening: false, part4: null, part4Submission: "none" }),\n  }),`,
-    "B1 Day 21 no-Teil-4 profile",
-  );
-}
-if (!profile.includes('21: Object.freeze({ listening: false, part4: null, part4Submission: "none" })')) {
-  throw new Error("B1 Day 21 still requires a nonexistent Teil 4.");
-}
-fs.writeFileSync(profilePath, profile, "utf8");
+const lessonProfilePath = path.join(root, "web/src/data/a2B1LessonProfile.js");
+const lessonProfileSource = fs.readFileSync(lessonProfilePath, "utf8");
+const canonicalProfileMarkers = [
+  'task.status === "unavailable"',
+  'task.mode === "reading-fallback"',
+  "Boolean(task.submitRequired)",
+];
+canonicalProfileMarkers.forEach((marker) => {
+  if (!lessonProfileSource.includes(marker)) {
+    throw new Error(`Canonical A2/B1 lesson profile marker missing: ${marker}`);
+  }
+});
 
 console.log(
-  "A2/B1 workbook answers now map into Submit: Teil 2 autosaves, Teil 3/4 options are clickable, stale analysis cannot replace newer text, and B1 Day 21 no longer requires Teil 4.",
+  "A2/B1 workbook answers now map into Submit: Teil 2 autosaves, Teil 3/4 options are clickable, stale analysis cannot replace newer text, and canonical lesson profiles own Teil 4 submission semantics.",
 );

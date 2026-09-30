@@ -1,6 +1,5 @@
 import React from "react";
-import { isA2WritingRequired } from "../data/a2WritingSchedule";
-import { isB1WritingRequired } from "../data/b1WritingSchedule";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 
 const shell = {
   border: "2px solid #c7d2fe",
@@ -57,10 +56,8 @@ const challenges = {
 };
 
 export const isNoWritingReadingChallengeDay = (level, day) => {
-  const normalizedLevel = String(level || "").toUpperCase();
-  if (normalizedLevel === "A2") return !isA2WritingRequired(day);
-  if (normalizedLevel === "B1") return !isB1WritingRequired(day);
-  return false;
+  const profile = getA2B1LessonProfile(level, day);
+  return Boolean(profile && !profile.sections.writing.visible);
 };
 
 export default function A2B1NoWritingReadingChallenge({ level, day }) {

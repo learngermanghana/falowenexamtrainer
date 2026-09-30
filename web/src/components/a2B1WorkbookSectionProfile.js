@@ -1,6 +1,4 @@
-import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
-import { isA2WritingRequired } from "../data/a2WritingSchedule";
-import { isB1WritingRequired } from "../data/b1WritingSchedule";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 
 export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
   grammar: false,
@@ -14,21 +12,6 @@ export const A2_B1_DEFAULT_SECTION_PROFILE = Object.freeze({
   submit: true,
 });
 
-const A2_B1_SECTION_OVERRIDES = Object.freeze({
-  A2: Object.freeze({
-    14: Object.freeze({ listening: false, part4: null, part4Submission: "none" }),
-    22: Object.freeze({ part4Submission: "self-check" }),
-    23: Object.freeze({ part4Submission: "self-check" }),
-    24: Object.freeze({ part4Submission: "self-check" }),
-    26: Object.freeze({ part4Submission: "self-check" }),
-    27: Object.freeze({ part4Submission: "self-check" }),
-    28: Object.freeze({ part4Submission: "self-check" }),
-  }),
-  B1: Object.freeze({
-    21: Object.freeze({ listening: false, part4: null, part4Submission: "none" }),
-  }),
-});
-
 const TAB_TO_SECTION = Object.freeze({
   grammar: "grammar",
   sprechen: "speaking",
@@ -40,21 +23,27 @@ const TAB_TO_SECTION = Object.freeze({
 });
 
 export const getA2B1WorkbookSectionProfile = (level, day) => {
-  const normalizedLevel = String(level || "").toUpperCase();
-  const normalizedDay = Number(day);
+  const lesson = getA2B1LessonProfile(level, day);
+  if (!lesson) return { ...A2_B1_DEFAULT_SECTION_PROFILE };
 
-  const writingRequired =
-    normalizedLevel === "A2"
-      ? isA2WritingRequired(normalizedDay)
-      : normalizedLevel === "B1"
-        ? isB1WritingRequired(normalizedDay)
-        : A2_B1_DEFAULT_SECTION_PROFILE.writing;
-
+  const part4 = lesson.sections.part4;
   return {
-    ...A2_B1_DEFAULT_SECTION_PROFILE,
-    grammar: hasA2B1GrammarNotes(normalizedLevel, normalizedDay),
-    writing: writingRequired,
-    ...(A2_B1_SECTION_OVERRIDES[normalizedLevel]?.[normalizedDay] || {}),
+    grammar: lesson.sections.grammar.visible,
+    speaking: lesson.sections.speaking.visible,
+    writing: lesson.sections.writing.visible,
+    reading: lesson.sections.reading.visible,
+    listening: Boolean(part4.visible && part4.contentType === "listening"),
+    part4: part4.visible ? part4.contentType : null,
+    part4Submission: !part4.visible
+      ? "none"
+      : part4.submitRequired
+        ? "submit"
+        : part4.mode === "self-check"
+          ? "self-check"
+          : "none",
+    references: lesson.sections.references.visible,
+    submit: lesson.sections.submit.visible,
+    lessonProfileVersion: lesson.version,
   };
 };
 
@@ -71,6 +60,5 @@ export const filterA2B1WorkbookTabsByProfile = (tabs = [], profile = {}) =>
   }, []);
 
 export const __TESTING__ = {
-  overrides: A2_B1_SECTION_OVERRIDES,
   tabToSection: TAB_TO_SECTION,
 };
