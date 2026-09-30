@@ -102,11 +102,13 @@ describe("shared A2 workbook regression", () => {
   it("keeps Day 24 focused on vacation planning", () => {
     expect(day24).toContain('chapter="9.24"');
     expect(A2_READING_TASKS[24].title).toBe("Welches Angebot passt?");
-    expect(A2_LISTENING_TASKS[24].audioUrl).toContain("iPScKV6JWaA");
+    expect(A2_LISTENING_TASKS[24].audioKey).toBe("a2/day-24/day-24.mp3");
+    expect(A2_LISTENING_TASKS[24].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[24].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(day24).not.toMatch(/Park-Café|Kindergeburtstag|Weinhaus/i);
   });
 
-  it("keeps Day 25 aligned with canonical Lesen & Hören", () => {
+  it("keeps Day 25 aligned with canonical Lesen and no Teil 4", () => {
     expect(day25).toContain('chapter="9.25"');
     expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
     expect(A2_LISTENING_TASKS[25].mode).toBe(A2_LISTENING_MODES.NONE);
@@ -117,8 +119,9 @@ describe("shared A2 workbook regression", () => {
   it("keeps Day 26 focused on feelings", () => {
     expect(day26).toContain('chapter="10.26"');
     expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
-    expect(A2_LISTENING_TASKS[26].audioUrl).toContain("JEJZypJfrD8");
-    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
+    expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(day26).toContain("A2Days26To28LearningUpgrade");
     expect(day26).toContain("SpeakingMindMap");
     expect(day26).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
@@ -129,7 +132,8 @@ describe("shared A2 workbook regression", () => {
     expect(day27).toContain("Digitale Kommunikation");
     expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
     expect(day27).toContain("A2Days26To28LearningUpgrade");
-    expect(A2_LISTENING_TASKS[27].audioUrl).toContain("JEJZypJfrD8");
+    expect(A2_LISTENING_TASKS[27].audioKey).toBe("a2/day-27/day-27.mp3");
+    expect(A2_LISTENING_TASKS[27].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[27].mode).toBe(A2_LISTENING_MODES.GRADED);
   });
 
