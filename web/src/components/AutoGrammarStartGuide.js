@@ -54,6 +54,7 @@ const resolveGrammarMatch = (pathname, search) => {
   const requestedView = new URLSearchParams(search || "").get("view");
 
   if (requestedView === "workbook") return null;
+  if (/workbook$/i.test(normalizedPathname)) return null;
 
   const lessonMatch = normalizedPathname.match(/^\/campus\/course\/lesson\/(A1|A2|B1|B2|C1|C2)\/(\d+)$/i);
   if (lessonMatch) {
