@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 describe("A1 Day 21 weather grammar", () => {
-  const pagePath = path.resolve(__dirname, "../components/WeatherPerfektLetterPage.js");
+  const pagePath = path.resolve(process.cwd(), "src/components/WeatherPerfektLetterPage.js");
   const source = fs.readFileSync(pagePath, "utf8");
 
   test("uses the three-point weather-letter progression", () => {
