@@ -21,6 +21,14 @@ export default function A2StarterConjunctionsPage() {
         </p>
       </header>
 
+      <section style={{ ...card, border: "1px solid #86efac", background: "#f0fdf4" }}>
+        <strong style={{ color: "#166534" }}>New at A2: deshalb</strong>
+        <p style={paragraph}>
+          At A1, Falowen focused your productive reason sentences on <strong>weil</strong>. At A2, you now add
+          <strong> deshalb</strong> to show a result and learn its different word order.
+        </p>
+      </section>
+
       <section style={card}>
         <h2 style={{ margin: 0 }}>1. First understand the meaning: reason or result?</h2>
         <p style={paragraph}>

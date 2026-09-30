@@ -502,7 +502,7 @@ const lessonCatalog = Object.freeze([
     "sequence": 29,
     "day": 24,
     "chapter": "5.10",
-    "title": "Conjunctions",
+    "title": "Reasons with weil and Useful A1 Phrases",
     "assignmentId": "A1-5.10",
     "assignmentType": "Schreiben & Sprechen",
     "kind": "schreiben_sprechen",
