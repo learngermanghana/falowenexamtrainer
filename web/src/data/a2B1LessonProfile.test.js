@@ -86,43 +86,12 @@ describe("canonical A2/B1 lesson profiles", () => {
     }
   });
 
-  test("assignment identity and timer rules live in the canonical profile", () => {
-    expect(getA2B1LessonProfile("A2", 21)).toMatchObject({
-      assignmentKey: "A2-8.21",
-      timer: {
-        level: "A2",
-        durationMinutes: 40,
-        timedTabs: ["schreiben", "lesen"],
-      },
-    });
-    expect(getA2B1LessonProfile("A2", 25)).toMatchObject({
-      assignmentKey: "A2-9.25",
-      timer: {
-        durationMinutes: 45,
-        timedTabs: ["lesen"],
-        source: "lesson-profile",
-      },
-    });
-    expect(getA2B1LessonProfile("B1", 22)).toMatchObject({
-      assignmentKey: "B1-7.22",
-      timer: {
-        durationMinutes: 55,
-        timedTabs: ["lesen", "hoeren"],
-        source: "lesson-profile",
-      },
-    });
-    expect(getA2B1LessonProfile("A2", 24).timer.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
-    expect(getA2B1LessonProfile("A2", 27).timer.timedTabs).toEqual(["lesen", "hoeren"]);
-    expect(getA2B1LessonProfile("B1", 25).timer.timedTabs).toEqual(["lesen"]);
-
-    expect(getA2B1LessonProfile("B1", 28)).toMatchObject({
-      assignmentKey: "B1-10.28",
-      timer: {
-        durationMinutes: 60,
-        mode: "mock",
-      },
-    });
-    expect(getA2B1LessonProfile("A2", 15).timer).toBeNull();
+  test("assignment identity is resolved from the canonical lesson registries", () => {
+    expect(getA2B1LessonProfile("A2", 21).assignmentKey).toBe("A2-8.21");
+    expect(getA2B1LessonProfile("A2", 25).assignmentKey).toBe("A2-9.25");
+    expect(getA2B1LessonProfile("B1", 22).assignmentKey).toBe("B1-7.22");
+    expect(getA2B1LessonProfile("B1", 28).assignmentKey).toBe("B1-10.28");
+    expect(getA2B1LessonProfile("A2", 15)).not.toHaveProperty("timer");
   });
 
   test("critical late-course profiles no longer drift from lesson data", () => {
