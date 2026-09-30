@@ -257,6 +257,26 @@ const fetchStudentProfileByEmail = async (email) => {
   return null;
 };
 
+const fetchStudentProfileByUid = async (uid) => {
+  const cleanedUid = String(uid || "").trim();
+  if (!cleanedUid) return null;
+
+  const directDoc = await getDoc(doc(db, "students", cleanedUid));
+  if (directDoc.exists()) {
+    return { id: directDoc.id, ...directDoc.data() };
+  }
+
+  const studentsRef = collection(db, "students");
+  const uidQuery = query(studentsRef, where("uid", "==", cleanedUid), limit(1));
+  const uidSnapshot = await getDocs(uidQuery);
+  if (!uidSnapshot.empty) {
+    const hit = uidSnapshot.docs[0];
+    return { id: hit.id, ...hit.data() };
+  }
+
+  return null;
+};
+
 const fetchStudentProfileByStudentCode = async (studentCode) => {
   if (!studentCode) return null;
   const cleanedCode = studentCode.trim();
@@ -507,6 +527,19 @@ export const AuthProvider = ({ children }) => {
           return;
         }
 
+        const uidQuery = query(
+          studentsRef,
+          where("uid", "==", user.uid),
+          limit(1)
+        );
+        const uidSnapshot = await getDocs(uidQuery);
+        if (cancelled) return;
+
+        if (!uidSnapshot.empty) {
+          unsubscribe = connectToDoc(uidSnapshot.docs[0].id);
+          return;
+        }
+
         const studentCodeQuery = query(
           studentsRef,
           where("studentCode", "==", user.uid),
@@ -588,6 +621,7 @@ export const AuthProvider = ({ children }) => {
         name: profile.name || profile.firstName || "",
         fullName: profile.name || profile.firstName || "",
         email: normalizedEmail,
+        authEmail: normalizedEmail,
         role: "student",
         studentCode: studentId,
         about: "",
@@ -695,7 +729,9 @@ export const AuthProvider = ({ children }) => {
         const token = await credential.user.getIdToken();
         setIdToken(token);
         const profile =
-          profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
+          profileOverride ||
+          (await fetchStudentProfileByUid(credential.user.uid)) ||
+          (await fetchStudentProfileByEmail(normalizedEmail));
         const accessBlockReason = getStudentAccessBlockReason(profile);
         if (accessBlockReason) {
           await signOut(auth).catch((error) => console.warn("Failed to sign out blocked login", error));
@@ -830,7 +866,9 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Google sign-in did not return an email address. Please try another account.");
     }
 
-    const existingProfile = await fetchStudentProfileByEmail(email);
+    const existingProfile =
+      (await fetchStudentProfileByUid(credential.user.uid)) ||
+      (await fetchStudentProfileByEmail(email));
     if (!existingProfile) {
       await signOut(auth);
       throw new Error("Only existing students in our records can use Google sign-in. Please contact support.");
@@ -863,7 +901,7 @@ export const AuthProvider = ({ children }) => {
       studentRef,
       {
         uid: credential.user.uid,
-        email,
+        authEmail: email,
         name: resolvedName || existingProfile.name || "",
         role: existingProfile.role || "student",
         updated_at: serverTimestamp(),
@@ -873,7 +911,12 @@ export const AuthProvider = ({ children }) => {
 
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    const mergedProfile = { ...existingProfile, uid: credential.user.uid, email, name: resolvedName || existingProfile.name || "" };
+    const mergedProfile = {
+      ...existingProfile,
+      uid: credential.user.uid,
+      authEmail: email,
+      name: resolvedName || existingProfile.name || "",
+    };
     setStudentProfile(mergedProfile);
     setMessagingToken(getMessagingTokenFromProfile(mergedProfile, deviceId));
     await logLoginSession({
