@@ -23,10 +23,21 @@ describe("production deployment contract", () => {
   });
 
   test("production health workflow verifies the live SHA", () => {
-    const workflow = fs.readFileSync(path.join(root, ".github/workflows/production-health.yml"), "utf8");
+    const workflow = fs.readFileSync(path.join(root, ".github/workflows/production-release.yml"), "utf8");
     expect(workflow).toMatch(/branches:\s*\n\s*- main/);
     expect(workflow).toContain("npm run build");
+    expect(workflow).toContain("VERCEL_PROJECT_ID");
+    expect(workflow).toContain("vercel@latest deploy --prebuilt --prod");
+    expect(workflow).toContain("/api/deployment-status");
     expect(workflow).toContain("checkProductionIdentity.mjs");
     expect(workflow).toContain("EXPECTED_SHA");
+  });
+
+  test("the production API reports the deployed Vercel SHA against main", () => {
+    const api = fs.readFileSync(path.join(root, "api/index.js"), "utf8");
+    expect(api).toContain("deployment-status");
+    expect(api).toContain("VERCEL_GIT_COMMIT_SHA");
+    expect(api).toContain("falowenexamtrainer");
+    expect(api).toContain("commits/main");
   });
 });
