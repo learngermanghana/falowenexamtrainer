@@ -1,8 +1,10 @@
 const {
+  validateA2AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   validateCourseAudioKey,
   getR2AudioConfig,
+  createA2AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
   getCourseMediaStaffEmails,
@@ -10,7 +12,16 @@ const {
   hasCourseMediaLevelAccess,
 } = require("../r2CourseAudio");
 
-describe("B2/C2 R2 course audio", () => {
+describe("A2/B2/C2 R2 course audio", () => {
+  test("accepts only the protected A2 Day 28 audio folder", () => {
+    expect(
+      validateA2AudioKey({ day: 28, key: "a2/day-28/day-28.mp3" }),
+    ).toEqual({ day: 28, key: "a2/day-28/day-28.mp3" });
+
+    expect(validateA2AudioKey({ day: 27, key: "a2/day-27/day-27.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 28, key: "b2/day-28/day-28.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
+  });
   test("accepts only audio objects inside the matching C2 listening day folder", () => {
     expect(
       validateC2AudioKey({ day: 2, key: "c2/day-02/listening.mp3" }),
@@ -111,7 +122,23 @@ describe("B2/C2 R2 course audio", () => {
     })).toBe(true);
   });
 
-  test("creates C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
+  test("creates A2, C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
+    const a2 = await createA2AudioSignedUrl({
+      day: 28,
+      key: "a2/day-28/day-28.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(a2.url).toContain("/a2/day-28/day-28.mp3");
+    expect(a2.url).toContain("X-Amz-Signature=");
+    expect(a2.level).toBe("A2");
+
     const result = await createC2AudioSignedUrl({
       day: 2,
       key: "c2/day-02/listening.mp3",
