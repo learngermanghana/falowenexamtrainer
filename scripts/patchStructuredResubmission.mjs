@@ -66,20 +66,28 @@ replaceOnce(
   "structured callable resubmission payload",
 );
 
-replaceOnce(
-  `            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+if (!source.includes('data-structured-resubmission-template="true"')) {
+  const compactGuidanceAnchor = `            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
               Review your tutor feedback, correct the work, then submit the improved version below.
-            </p>`,
-  `            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-              Review your tutor feedback, correct the work, then submit the improved version below.
-            </p>
-            {structuredResubmissionEnabled ? (
+            </p>`;
+  const correctedWorkFieldAnchor = `            <label style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>Corrected work</span>`;
+  const guidance = `            {structuredResubmissionEnabled ? (
               <p data-structured-resubmission-template="true" style={{ ...styles.helperText, margin: 0 }}>
                 Your previous TEIL answers are loaded below. Keep the headings and correct only what needs improvement.
               </p>
-            ) : null}`,
-  "structured resubmission guidance",
-);
+            ) : null}`;
+
+  if (source.includes(compactGuidanceAnchor)) {
+    source = source.replace(compactGuidanceAnchor, `${compactGuidanceAnchor}
+${guidance}`);
+  } else if (source.includes(correctedWorkFieldAnchor)) {
+    source = source.replace(correctedWorkFieldAnchor, `${guidance}
+${correctedWorkFieldAnchor}`);
+  } else {
+    throw new Error("Could not patch structured resubmission guidance: no compact guidance or corrected-work field anchor was found.");
+  }
+}
 
 replaceOnce(
   `              <span style={styles.label}>Corrected work</span>`,
