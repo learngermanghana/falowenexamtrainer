@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
@@ -25,6 +25,8 @@ import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
 import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
+import { useAuth } from "../context/AuthContext";
+import fetchA2AudioPlaybackUrl from "../services/a2AudioService";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -89,6 +91,7 @@ const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap:
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { idToken } = useAuth();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
   const [activeTab, setActiveTab] = useState("sprechen");
@@ -105,9 +108,50 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const visibleActiveTab = routeTab || activeTab;
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const hoerenSelfCheck = listeningConfig?.mode === A2_LISTENING_MODES.SELF_CHECK;
+  const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
+  const [signedHoerenAudioUrl, setSignedHoerenAudioUrl] = useState("");
+  const [hoerenAudioState, setHoerenAudioState] = useState(hoerenAudioKey ? "loading" : "idle");
+  const [hoerenAudioError, setHoerenAudioError] = useState("");
+  const [hoerenAudioRefreshNonce, setHoerenAudioRefreshNonce] = useState(0);
   const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!hoerenAudioKey) {
+      setSignedHoerenAudioUrl("");
+      setHoerenAudioState("idle");
+      setHoerenAudioError("");
+      return () => { cancelled = true; };
+    }
+
+    if (!idToken) {
+      setSignedHoerenAudioUrl("");
+      setHoerenAudioState("error");
+      setHoerenAudioError("Bitte melden Sie sich erneut an, um das Audio abzuspielen.");
+      return () => { cancelled = true; };
+    }
+
+    setHoerenAudioState("loading");
+    setHoerenAudioError("");
+    fetchA2AudioPlaybackUrl({ day, key: hoerenAudioKey, idToken })
+      .then(({ url }) => {
+        if (cancelled) return;
+        setSignedHoerenAudioUrl(url);
+        setHoerenAudioState("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setSignedHoerenAudioUrl("");
+        setHoerenAudioState("error");
+        setHoerenAudioError(error?.response?.data?.error || error?.message || "Das Audio konnte nicht geladen werden.");
+      });
+
+    return () => { cancelled = true; };
+  }, [day, hoerenAudioKey, hoerenAudioRefreshNonce, idToken]);
+
+  const resolvedHoerenAudioUrl = hoerenAudioKey ? signedHoerenAudioUrl : hoerenAudioUrl;
   const assignmentKey = `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
     setActiveTab("submit");
@@ -181,7 +225,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
           {displayedActiveTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-          {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
+          {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioState === "loading" ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a" }}><strong>Audio wird geladen …</strong> Falowen bereitet die geschützte Aufnahme vor.</div> : null}{resolvedHoerenAudioUrl ? (hoerenAudioKey ? <div style={{ display: "grid", gap: 8 }}><audio data-a2-r2-audio="true" controls preload="metadata" src={resolvedHoerenAudioUrl} style={{ width: "100%" }}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{ color: "#64748b", fontSize: 13 }}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div> : <ListeningMedia url={resolvedHoerenAudioUrl} />) : null}{hoerenAudioState === "error" ? <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 12, background: "#fff7f7", display: "grid", gap: 8 }}><strong>Audio momentan nicht verfügbar</strong><span>{hoerenAudioError}</span><div><button type="button" onClick={() => setHoerenAudioRefreshNonce((value) => value + 1)} style={styles.secondaryButton}>Audio erneut laden</button></div></div> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
           {displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
           {displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
