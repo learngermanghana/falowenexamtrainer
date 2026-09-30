@@ -169,7 +169,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
   const visibleTabs = tabs.filter((tab) => lessonProfile?.tabs?.[tab.key] !== false);
-  const assignmentKey = `A2-${chapter}`;
+  const assignmentKey = lessonProfile?.assignmentKey || `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
     setActiveTab("submit");
     const search = new URLSearchParams(location.search || "");
@@ -200,6 +200,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     <SharedTimedAssignment
       assignmentKey={assignmentKey}
       level="A2"
+      configOverride={lessonProfile?.timer || null}
       onTimeExpired={handleTimedExpiry}
     >
       {({ isTabLocked }) => {
