@@ -22,6 +22,16 @@ describe("A1 Day 21 weather grammar", () => {
     expect(source).not.toMatch(/give a weather reason with <strong>weil<\/strong>/i);
   });
 
+  test("teaches time expressions learners can use in letters", () => {
+    expect(source).toMatch(/im \+ season \/ month/i);
+    expect(source).toMatch(/im Sommer/i);
+    expect(source).toMatch(/im Januar/i);
+    expect(source).toMatch(/am \+ day \/ date/i);
+    expect(source).toMatch(/am Montag/i);
+    expect(source).toMatch(/um \+ clock time/i);
+    expect(source).toMatch(/um 16 Uhr/i);
+  });
+
   test("ends the grammar page after the letter-form note", () => {
     expect(source).toMatch(/Letter form is separate/i);
     expect(source).toMatch(/fourth, fifth or sixth content point/i);
