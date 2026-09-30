@@ -14,7 +14,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     3: [{ chapter: "1.3", topic: "A2 Day 3", tutor_lecture_video: "https://youtu.be/jNXAVhNCeak" }],
     4: [{ chapter: "2.4", topic: "Wo möchten wir uns treffen?", tutor_lecture_video: "https://youtu.be/pkSJnAPEKrM" }],
     5: [{ chapter: "2.5", topic: "A2 Day 5", tutor_lecture_video: "https://youtu.be/YktdQ4eyaRY" }],
-    6: [{ chapter: "3.6", topic: "Möbel und Räume kennenlernen", tutor_lecture_video: "https://youtu.be/lr00YnyH0GI" }],
+    6: [{ chapter: "3.6", topic: "Möbel und Räume kennenlernen", title: "Möbel und Räume · Teacher lecture video", tutor_lecture_video: "https://youtu.be/lr00YnyH0GI" }],
     7: [{ chapter: "3.7", tutor_lecture_video: "" }],
     8: [{ chapter: "3.8", topic: "Rezepte und Essen", tutor_lecture_video: "https://youtu.be/diUTkWdqT_0" }],
     9: [{ chapter: "4.9", topic: "Urlaub", tutor_lecture_video: "https://youtu.be/iKKyQRbuc-8" }],
@@ -166,7 +166,7 @@ export const getTeacherLectureVideoResources = (level, day) => {
       return {
         key: `${normalizedLevel.toLowerCase()}-day${dayNumber}-${chapter || index + 1}-teacher-lecture-video`,
         chapter: chapter || null,
-        title: chapter ? `Kapitel ${chapter} · Teacher lecture video` : "Teacher lecture video",
+        title: clean(entry.title) || (chapter ? `Kapitel ${chapter} · Teacher lecture video` : "Teacher lecture video"),
         description: `Recorded tutor lecture for ${topic}.`,
         url,
       };
