@@ -87,6 +87,22 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
+  test("Day 20 Chapter 12.3 uses the new teacher lecture only", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(20, "12.3");
+
+    expect(configuredVideo).toEqual(
+      expect.objectContaining({
+        chapter: "12.3",
+        topic: "Introduction to Letter Writing",
+        url: "https://youtu.be/mgfauvqhoCI",
+      })
+    );
+
+    const allUrls = A1_TEACHER_VIDEO_RESOURCES.map((video) => video.url);
+    expect(allUrls).not.toContain("https://youtu.be/NZW4rJsekH4");
+    expect(allUrls).not.toContain("https://youtu.be/JtgoO2fmOpU");
+  });
+
   test("Day 13 chapter 3.5 exposes only the latest teacher lecture", () => {
     const configuredVideos = getA1TeacherVideoResources(13, "3.5");
 
