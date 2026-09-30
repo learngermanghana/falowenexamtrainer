@@ -89,10 +89,25 @@ describe("B2 unified C2-style course structure", () => {
       expect(practice.audioUrl).toBeUndefined();
     });
 
-    const pending = B2_LISTENING_PRACTICE[26];
-    expect(pending.audioKey).toBe("");
-    expect(pending.transcript).toBe("");
-    expect(pending.audioUrl).toBeUndefined();
+    const day26 = B2_LISTENING_PRACTICE[26];
+    expect(day26.audioKey).toBe("");
+    expect(day26.audioUrl).toBeUndefined();
+    expect(Array.isArray(day26.transcript)).toBe(true);
+    expect(day26.transcript.length).toBeGreaterThanOrEqual(30);
+    expect(day26.vocabulary).toHaveLength(8);
+    expect(day26.questions).toHaveLength(5);
+    expect(day26.transcript.join(" ")).toContain("springende Punkt");
+    expect(day26.transcript.join(" ")).toContain("hochqualifizierte internationale Fachkräfte");
+    expect(day26.transcript.join(" ")).toContain("Obgleich gute Sprachkenntnisse");
+    expect(day26.transcript.join(" ")).not.toContain("hochqualifizierte Experts");
+    expect(day26.transcript.join(" ")).not.toContain("Vokabelen");
+    day26.questions.forEach((question) => {
+      expect(question.options).toHaveLength(4);
+      expect(Number.isInteger(question.answerIndex)).toBe(true);
+      expect(question.explanation.length).toBeGreaterThan(20);
+    });
+    expect(day26.questions[0].options[day26.questions[0].answerIndex]).toContain("strukturelle Bedingungen");
+    expect(day26.questions[4].options[day26.questions[4].answerIndex]).toContain("strukturellen Zugängen");
   });
 
   test("provides full reading practice on all seven Lesen days", () => {
