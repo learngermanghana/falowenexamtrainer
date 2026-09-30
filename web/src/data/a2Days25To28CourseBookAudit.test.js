@@ -50,7 +50,8 @@ describe("A2 Course Book final audit · Days 25–28", () => {
   test("moves Day 28 to the standard shell with future-focused reading and grammar", () => {
     const source = readComponent("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
     expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
-    expect(A2_LISTENING_TASKS[28].audioUrl).toContain("Teuu287XY_M");
+    expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
+    expect(A2_LISTENING_TASKS[28].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(source).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
 
