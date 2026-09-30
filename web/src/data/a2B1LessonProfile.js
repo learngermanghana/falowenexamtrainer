@@ -8,7 +8,6 @@ import {
 import { getB1ListeningTask } from "./b1ListeningTasks";
 import { getA2ReadingTask } from "./a2ReadingTasks";
 import { getB1ReadingTask } from "./b1ReadingTasks";
-import { getTimedAssignmentConfig } from "./timedAssignmentConfig";
 
 export const A2_B1_LESSON_PROFILE_VERSION = 1;
 
@@ -210,30 +209,6 @@ const buildSubmissionCopy = ({ sections, requiredSubmissionParts }) => {
   });
 };
 
-const TIMED_TAB_BY_SECTION = Object.freeze({
-  writing: "schreiben",
-  reading: "lesen",
-  part4: "hoeren",
-});
-
-const buildCanonicalTimer = ({ assignmentKey, requiredSubmissionParts }) => {
-  const raw = assignmentKey ? getTimedAssignmentConfig(assignmentKey) : null;
-  if (!raw) return null;
-
-  const timedTabs = Object.freeze(
-    requiredSubmissionParts
-      .map((part) => TIMED_TAB_BY_SECTION[part.sectionKey])
-      .filter(Boolean),
-  );
-
-  return Object.freeze({
-    ...raw,
-    timedTabs,
-    scope: joinPartLabels(requiredSubmissionParts) || raw.scope,
-    source: "lesson-profile",
-  });
-};
-
 export const getA2B1LessonProfile = (level, day) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const normalizedDay = Number(day);
@@ -280,7 +255,6 @@ export const getA2B1LessonProfile = (level, day) => {
 
   const requiredSubmissionParts = buildSubmissionParts(sections);
   const assignmentKey = resolveAssignmentKey(normalizedLevel, normalizedDay);
-  const timer = buildCanonicalTimer({ assignmentKey, requiredSubmissionParts });
   const selfCheckParts = Object.freeze(
     Object.values(sections)
       .filter((section) => section?.visible && section?.mode === "self-check")
@@ -297,7 +271,6 @@ export const getA2B1LessonProfile = (level, day) => {
     level: normalizedLevel,
     day: normalizedDay,
     assignmentKey,
-    timer,
     sections,
     tabs: buildTabs(sections),
     requiredSubmissionParts,
