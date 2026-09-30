@@ -2954,18 +2954,19 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmit this assignment</h3>
-          <span style={styles.badge}>{resubmissionBadgeLabel}</span>
+          <span style={styles.badge}>
+            {canShowResubmissionForm
+              ? resubmissionLimitReached
+                ? "No tries left"
+                : `${remainingResubmissions} resubmission${remainingResubmissions === 1 ? "" : "s"} left`
+              : resubmissionBadgeLabel}
+          </span>
         </div>
 
         {canShowResubmissionForm ? (
           <>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
               Review your tutor feedback, correct the work, then submit the improved version below.
-            </p>
-            <p style={{ ...styles.helperText, margin: "4px 0 0", fontWeight: 800 }}>
-              {resubmissionLimitReached
-                ? "No resubmissions left."
-                : `${remainingResubmissions} resubmission${remainingResubmissions === 1 ? "" : "s"} left.`}
             </p>
             {resubmissionLimitReached ? (
               <InfoBox tone="warning">
@@ -3138,6 +3139,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               ) : null}
             </div>
           ))}
+        </div>
         </div>
       </details>
     </div>
