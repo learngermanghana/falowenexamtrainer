@@ -6,6 +6,7 @@ import {
   getTimedAssignmentConfig,
   getTimedAssignmentDurationSeconds,
 } from "../data/timedAssignmentConfig";
+import { getTimedAssignmentRemainingSeconds } from "../utils/timedAssignmentClock";
 
 const ATTEMPT_COLLECTION = "submissionLocks";
 
@@ -87,8 +88,7 @@ const writeLocalSession = (assignmentKey, level, session) => {
   } catch (_error) {}
 };
 
-const remainingSeconds = (session, durationSeconds, now = Date.now()) =>
-  session ? Math.max(0, Math.ceil((session.endsAt - now) / 1000)) : durationSeconds;
+const remainingSeconds = getTimedAssignmentRemainingSeconds;
 
 const warningForSeconds = (secondsLeft) => {
   if (secondsLeft <= 60 && secondsLeft > 0) return { threshold: 60, label: "1 minute remaining" };
@@ -171,7 +171,11 @@ export default function SharedTimedAssignment({
           timestampToMillis(data.startedAt) ||
           Number(data.clientStartedAt) ||
           timestampToMillis(data.createdAt);
-        const persistedDuration = Math.max(1, Number(data.durationSeconds) || durationSeconds);
+        const persistedDurationRaw = Math.max(1, Number(data.durationSeconds) || durationSeconds);
+        const persistedDuration =
+          durationSeconds > 0
+            ? Math.min(durationSeconds, persistedDurationRaw)
+            : persistedDurationRaw;
         const endsAt = startedAt ? startedAt + (persistedDuration * 1000) : Number(data.endsAt) || 0;
         const nextSession = endsAt > 0 ? { startedAt, endsAt } : null;
 

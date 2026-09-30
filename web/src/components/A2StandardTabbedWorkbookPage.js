@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
@@ -25,6 +25,8 @@ import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
 import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
+import { useAuth } from "../context/AuthContext";
+import fetchA2AudioPlaybackUrl from "../services/a2AudioService";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -82,6 +84,58 @@ const ListeningMedia = ({ url }) => {
   return <a href={url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>Open listening audio</a>;
 };
 
+const ProtectedA2ListeningAudio = ({ day, audioKey }) => {
+  const [signedUrl, setSignedUrl] = useState("");
+  const [state, setState] = useState("loading");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [refreshNonce, setRefreshNonce] = useState(0);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!audioKey) {
+      setSignedUrl("");
+      setState("idle");
+      setErrorMessage("");
+      return () => { cancelled = true; };
+    }
+    if (!idToken) {
+      setSignedUrl("");
+      setState("error");
+      setErrorMessage("Bitte melden Sie sich erneut an, um das Audio abzuspielen.");
+      return () => { cancelled = true; };
+    }
+
+    setState("loading");
+    setErrorMessage("");
+    fetchA2AudioPlaybackUrl({ day, key: audioKey, idToken })
+      .then(({ url }) => {
+        if (cancelled) return;
+        setSignedUrl(url);
+        setState("ready");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setSignedUrl("");
+        setState("error");
+        setErrorMessage(error?.response?.data?.error || error?.message || "Das Audio konnte nicht geladen werden.");
+      });
+
+    return () => { cancelled = true; };
+  }, [audioKey, day, idToken, refreshNonce]);
+
+  if (state === "loading") {
+    return <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a" }}><strong>Audio wird geladen …</strong> Falowen bereitet die geschützte Aufnahme vor.</div>;
+  }
+
+  if (state === "error") {
+    return <div style={{ border: "1px solid #fecaca", borderRadius: 12, padding: 12, background: "#fff7f7", display: "grid", gap: 8 }}><strong>Audio momentan nicht verfügbar</strong><span>{errorMessage}</span><div><button type="button" onClick={() => setRefreshNonce((value) => value + 1)} style={styles.secondaryButton}>Audio erneut laden</button></div></div>;
+  }
+
+  if (!signedUrl) return null;
+
+  return <div style={{ display: "grid", gap: 8 }}><audio data-a2-r2-audio="true" controls preload="metadata" src={signedUrl} style={{ width: "100%" }}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{ color: "#64748b", fontSize: 13 }}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div>;
+};
+
 const PreparedCheckbox = ({ checked, onChange, label = "I prepared this part." }) => <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={checked} onChange={onChange} />{label}</label>;
 const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultImages.sprechen} alt={alt} loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />;
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
@@ -89,6 +143,7 @@ const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap:
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { idToken } = useAuth();
   const listeningConfig = getA2ListeningTask(day);
   const showHoeren = listeningConfig?.mode !== A2_LISTENING_MODES.NONE;
   const [activeTab, setActiveTab] = useState("sprechen");
@@ -105,6 +160,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const visibleActiveTab = routeTab || activeTab;
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const hoerenSelfCheck = listeningConfig?.mode === A2_LISTENING_MODES.SELF_CHECK;
+  const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
   const visibleTabs = showHoeren ? tabs : tabs.filter((tab) => tab.key !== "hoeren");
@@ -181,7 +237,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
           {displayedActiveTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
 
-          {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
+          {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioKey ? <ProtectedA2ListeningAudio day={day} audioKey={hoerenAudioKey} /> : hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
           {displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
           {displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
