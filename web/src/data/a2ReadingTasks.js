@@ -486,39 +486,39 @@ Angebot D – Berlin günstig
     chapter: "9.25",
     format: "Tagesablauf",
     title: "Annas Arbeitstag",
-    strategy: "Achte auf Uhrzeiten und Signalwörter wie zuerst, danach, später und abends.",
+    strategy: "Ordne Annas Tag chronologisch und verbinde Zeitangaben mit Gründen und Häufigkeit. Einige Antworten stehen nicht direkt neben dem passenden Signalwort.",
     text: `Anna steht werktags um 6:30 Uhr auf. Am Abend vorher legt sie ihre Kleidung bereit, damit sie morgens Zeit spart. Nach dem Frühstück fährt sie um 7:30 Uhr mit dem Bus zur Arbeit. Ihr Arbeitstag beginnt um 8 Uhr.
 
 Um 12:30 Uhr macht Anna Mittagspause. Meistens isst sie mit zwei Kolleginnen in der Kantine. Um 16:30 Uhr hat sie Feierabend. Zweimal pro Woche geht sie danach ins Fitnessstudio. An den anderen Tagen fährt sie direkt nach Hause. Abends kocht sie, ruft manchmal ihre Mutter an und liest noch etwas. Gegen 22:30 Uhr geht sie schlafen.`,
     questions: [
-      { stem: "Warum legt Anna ihre Kleidung am Abend vorher bereit?", options: ["A) Damit sie morgens Zeit spart.", "B) Weil sie morgens Sport macht.", "C) Damit sie später arbeitet.", "D) Weil sie die Kleidung wäscht."] },
-      { stem: "Wie fährt Anna zur Arbeit?", options: ["A) Mit dem Zug", "B) Mit dem Bus", "C) Mit dem Fahrrad", "D) Mit dem Auto"] },
-      { stem: "Wann macht Anna Mittagspause?", options: ["A) Um 8:00 Uhr", "B) Um 12:30 Uhr", "C) Um 16:30 Uhr", "D) Um 22:30 Uhr"] },
-      { stem: "Was macht Anna zweimal pro Woche nach der Arbeit?", options: ["A) Sie besucht ihre Mutter.", "B) Sie geht ins Fitnessstudio.", "C) Sie arbeitet länger.", "D) Sie geht einkaufen."] },
-      { stem: "Wann geht Anna ungefähr schlafen?", options: ["A) Um 20:00 Uhr", "B) Um 21:00 Uhr", "C) Um 22:30 Uhr", "D) Nach Mitternacht"] },
+      { stem: "Anna bereitet ihre Kleidung schon am Vorabend vor. Welches Ziel verfolgt sie damit?", options: ["A) Damit sie morgens Zeit spart.", "B) Weil sie morgens Sport macht.", "C) Damit sie später arbeitet.", "D) Weil sie die Kleidung wäscht."] },
+      { stem: "Welche Information passt zu Annas Weg zwischen Frühstück und Arbeitsbeginn?", options: ["A) Mit dem Zug", "B) Mit dem Bus", "C) Mit dem Fahrrad", "D) Mit dem Auto"] },
+      { stem: "Zwischen Arbeitsbeginn und Feierabend gibt es eine feste Pause. Wann findet sie statt?", options: ["A) Um 8:00 Uhr", "B) Um 12:30 Uhr", "C) Um 16:30 Uhr", "D) Um 22:30 Uhr"] },
+      { stem: "Welche Aktivität gehört nicht jeden Tag, sondern nur zweimal pro Woche zu Annas Nachmittag?", options: ["A) Sie besucht ihre Mutter.", "B) Sie geht ins Fitnessstudio.", "C) Sie arbeitet länger.", "D) Sie geht einkaufen."] },
+      { stem: "Welche Uhrzeit markiert ungefähr das Ende von Annas normalem Werktag?", options: ["A) Um 20:00 Uhr", "B) Um 21:00 Uhr", "C) Um 22:30 Uhr", "D) Nach Mitternacht"] },
     ],
   },
   26: {
     chapter: "10.26",
     format: "Alltagssituationen",
     title: "Ein Tag mit verschiedenen Gefühlen",
-    strategy: "Verbinde Situation und Gefühl. Achte darauf, warum sich die Person so fühlt.",
+    strategy: "Verbinde Auslöser, Gefühl und Reaktion. Achte besonders darauf, wie sich Samuels Stimmung im Laufe des Tages verändert."
     text: `Am Morgen ist Samuel nervös, weil er eine wichtige Präsentation bei der Arbeit hat. Kurz vor der Präsentation atmet er langsam ein und aus. Danach ist er sehr erleichtert, denn alles ist gut gelaufen.
 
 In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat ihre Prüfung bestanden. Samuel freut sich sehr für sie. Am Abend wartet er lange auf einen Bus, der nicht kommt. Deshalb ist er genervt. Zu Hause hört er Musik und wird wieder ruhiger.`,
     questions: [
-      { stem: "Warum ist Samuel am Morgen nervös?", options: ["A) Er hat eine wichtige Präsentation.", "B) Er wartet auf den Bus.", "C) Seine Schwester ruft an.", "D) Er hat Urlaub."] },
-      { stem: "Was macht Samuel kurz vor der Präsentation?", options: ["A) Er trinkt Kaffee.", "B) Er atmet langsam ein und aus.", "C) Er geht nach Hause.", "D) Er ruft seine Schwester an."] },
-      { stem: "Wie fühlt er sich nach der Präsentation?", options: ["A) Erleichtert", "B) Wütend", "C) Traurig", "D) Müde"] },
-      { stem: "Warum freut Samuel sich in der Mittagspause?", options: ["A) Er bekommt Geld.", "B) Seine Schwester hat eine Prüfung bestanden.", "C) Der Bus kommt.", "D) Er hat Feierabend."] },
-      { stem: "Was hilft Samuel am Abend, wieder ruhiger zu werden?", options: ["A) Sport", "B) Musik", "C) Arbeit", "D) Fernsehen im Büro"] },
+      { stem: "Welches Ereignis erklärt Samuels Nervosität am Morgen?", options: ["A) Er hat eine wichtige Präsentation.", "B) Er wartet auf den Bus.", "C) Seine Schwester ruft an.", "D) Er hat Urlaub."] },
+      { stem: "Welche Strategie benutzt Samuel unmittelbar vor der stressigen Situation?", options: ["A) Er trinkt Kaffee.", "B) Er atmet langsam ein und aus.", "C) Er geht nach Hause.", "D) Er ruft seine Schwester an."] },
+      { stem: "Welche Gefühlsveränderung passt dazu, dass die Präsentation gut gelaufen ist?", options: ["A) Erleichtert", "B) Wütend", "C) Traurig", "D) Müde"] },
+      { stem: "Welche Nachricht verändert Samuels Stimmung in der Mittagspause positiv?", options: ["A) Er bekommt Geld.", "B) Seine Schwester hat eine Prüfung bestanden.", "C) Der Bus kommt.", "D) Er hat Feierabend."] },
+      { stem: "Welche Handlung hilft Samuel, seine negative Stimmung am Abend wieder zu regulieren?", options: ["A) Sport", "B) Musik", "C) Arbeit", "D) Fernsehen im Büro"] },
     ],
   },
   27: {
     chapter: "10.27",
     format: "Digitale Hinweise",
     title: "Sicher kommunizieren",
-    strategy: "Lies bei digitalen Hinweisen genau, was erlaubt, empfohlen oder gefährlich ist.",
+    strategy: "Wende die Regeln auf konkrete Situationen an. Entscheide nicht nur nach einem Schlüsselwort, sondern prüfe, welche Empfehlung wirklich zur Situation passt."
     text: `Tipps für sichere digitale Kommunikation
 
 1. Verwende für wichtige Konten unterschiedliche Passwörter.
@@ -528,18 +528,18 @@ In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat 
 5. In Klassengruppen oder Arbeitschats: Schreibe persönliche Daten nur, wenn es wirklich nötig ist.
 6. Wenn eine Nachricht beleidigend oder bedrohend ist, antworte nicht sofort. Speichere die Nachricht und informiere eine verantwortliche Person.`,
     questions: [
-      { stem: "Was wird für wichtige Konten empfohlen?", options: ["A) Immer dasselbe Passwort", "B) Unterschiedliche Passwörter", "C) Gar kein Passwort", "D) Das Passwort im Chat speichern"] },
-      { stem: "Was soll man nie per Chat oder E-Mail teilen?", options: ["A) Einen Termin", "B) Ein Passwort", "C) Eine Begrüßung", "D) Einen Filmtipp"] },
-      { stem: "Was soll man bei unbekannten Links tun?", options: ["A) Sofort öffnen", "B) An alle weiterleiten", "C) Nicht öffnen, wenn man den Absender nicht kennt", "D) Das Passwort eingeben"] },
-      { stem: "Was sollte man bei Nachrichten von Banken prüfen?", options: ["A) Nur die Schriftfarbe", "B) Die Absenderadresse", "C) Das Wetter", "D) Den Akkustand"] },
-      { stem: "Was soll man bei einer beleidigenden Nachricht tun?", options: ["A) Sofort beleidigend antworten.", "B) Die Nachricht speichern und eine verantwortliche Person informieren.", "C) Das Passwort senden.", "D) Den Absender anrufen und bedrohen."] },
+      { stem: "Lena benutzt für E-Mail und Online-Banking dasselbe Passwort. Welche Empfehlung aus dem Text widerspricht diesem Verhalten?", options: ["A) Immer dasselbe Passwort", "B) Unterschiedliche Passwörter", "C) Gar kein Passwort", "D) Das Passwort im Chat speichern"] },
+      { stem: "Ein Klassenkamerad bittet dich im Chat um deine Zugangsdaten. Welche Information sollst du laut Text auf keinen Fall schicken?", options: ["A) Einen Termin", "B) Ein Passwort", "C) Eine Begrüßung", "D) Einen Filmtipp"] },
+      { stem: "Du bekommst einen Link von einer Person, die du nicht kennst. Welche Reaktion passt zu den Sicherheitstipps?", options: ["A) Sofort öffnen", "B) An alle weiterleiten", "C) Nicht öffnen, wenn man den Absender nicht kennt", "D) Das Passwort eingeben"] },
+      { stem: "Eine Nachricht sieht aus, als käme sie von einer Bank. Was solltest du prüfen, bevor du ihr vertraust?", options: ["A) Nur die Schriftfarbe", "B) Die Absenderadresse", "C) Das Wetter", "D) Den Akkustand"] },
+      { stem: "In einem Gruppenchat erhältst du eine beleidigende und bedrohliche Nachricht. Welche Reaktion entspricht dem Text?", options: ["A) Sofort beleidigend antworten.", "B) Die Nachricht speichern und eine verantwortliche Person informieren.", "C) Das Passwort senden.", "D) Den Absender anrufen und bedrohen."] },
     ],
   },
   28: {
     chapter: "10.28",
     format: "E-Mail über Zukunftspläne",
     title: "Meine Pläne für die nächsten Jahre",
-    strategy: "Achte auf Zeitangaben wie nächstes Jahr, danach und später. Sie zeigen die Reihenfolge der Pläne.",
+    strategy: "Ordne Kofis Pläne nach Zeit und Zweck. Unterscheide berufliche, sprachliche, private und Reiseziele."
     text: `Hallo Sofia,
 
 du hast gefragt, was ich nach dem Deutschkurs machen möchte. Nächstes Jahr will ich zuerst die B1-Prüfung machen. Danach möchte ich mich für eine Ausbildung im Bereich Logistik bewerben. Wenn alles klappt, werde ich im Herbst mit der Ausbildung beginnen.
@@ -549,11 +549,11 @@ Später möchte ich Berufserfahrung sammeln und vielleicht noch eine Weiterbildu
 Liebe Grüße
 Kofi`,
     questions: [
-      { stem: "Was möchte Kofi nächstes Jahr zuerst machen?", options: ["A) Die B1-Prüfung", "B) Eine Wohnung kaufen", "C) Nach Wien ziehen", "D) Eine Firma gründen"] },
-      { stem: "Wofür möchte er sich danach bewerben?", options: ["A) Für ein Studium", "B) Für eine Ausbildung in Logistik", "C) Für einen Sprachkurs in Wien", "D) Für einen Urlaub"] },
-      { stem: "Wann möchte Kofi mit der Ausbildung beginnen?", options: ["A) Im Frühling", "B) Im Sommer", "C) Im Herbst", "D) Im Winter"] },
-      { stem: "Warum möchte er weiter Deutsch lernen?", options: ["A) Weil er nur reisen möchte.", "B) Weil er im Beruf sicher sprechen und schreiben möchte.", "C) Weil seine Wohnung klein ist.", "D) Weil er keine Ausbildung machen will."] },
-      { stem: "Wen möchte Kofi in Wien besuchen?", options: ["A) Seinen Lehrer", "B) Seine Schwester", "C) Einen Kollegen", "D) Sofia"] },
+      { stem: "Kofi hat mehrere Pläne für das nächste Jahr. Welcher Schritt kommt vor der Bewerbung um eine Ausbildung?", options: ["A) Die B1-Prüfung", "B) Eine Wohnung kaufen", "C) Nach Wien ziehen", "D) Eine Firma gründen"] },
+      { stem: "Welcher berufliche Schritt folgt direkt auf die geplante Sprachprüfung?", options: ["A) Für ein Studium", "B) Für eine Ausbildung in Logistik", "C) Für einen Sprachkurs in Wien", "D) Für einen Urlaub"] },
+      { stem: "Wenn Kofis Bewerbung erfolgreich ist, in welcher Jahreszeit soll der nächste Schritt beginnen?", options: ["A) Im Frühling", "B) Im Sommer", "C) Im Herbst", "D) Im Winter"] },
+      { stem: "Welches Ziel erklärt, warum Kofi auch nach dem Kurs weiter Deutsch lernen möchte?", options: ["A) Weil er nur reisen möchte.", "B) Weil er im Beruf sicher sprechen und schreiben möchte.", "C) Weil seine Wohnung klein ist.", "D) Weil er keine Ausbildung machen will."] },
+      { stem: "Welcher Plan gehört zu Kofis privatem Reiseleben und nicht zu seiner beruflichen Entwicklung?", options: ["A) Seinen Lehrer", "B) Seine Schwester", "C) Einen Kollegen", "D) Sofia"] },
     ],
   },
 };
