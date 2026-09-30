@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
 import { styles } from "../styles";
 import B1InlineWritingAnalyser from "./B1InlineWritingAnalyser";
@@ -245,6 +245,13 @@ export const appendWritingTemplate = (currentText, template) => {
   return current ? `${current}\n\n${templateText}` : templateText;
 };
 
+export const normalizeWritingStarterText = (value = "") =>
+  String(value || "")
+    .replace(/\\r\\n?/g, "\n")
+    .replace(/\\\\n/g, "\n")
+    .trim();
+
+
 const B1Day4WritingCheatSheet = () => (
   <div
     data-testid="b1-day4-writing-cheat-sheet"
@@ -378,10 +385,28 @@ const B1WritingSupport = ({ onInsertTemplate, day }) => {
 };
 
 export default function B1WritingWorkspace({ writingContext = {} }) {
+  const starterTaskRef = useRef("");
+  const starterText = useMemo(
+    () => normalizeWritingStarterText(writingContext.draftPlaceholder || ""),
+    [writingContext.draftPlaceholder],
+  );
+  const taskIdentity = String(
+    writingContext.writingTaskId ||
+      writingContext.workbookId ||
+      [writingContext.level || writingContext.courseLevel, writingContext.day].filter(Boolean).join("-") ||
+      "course-writing",
+  );
   const [pointsDraft, setPointsDraft] = useState("");
-  const [germanDraft, setGermanDraft] = useState("");
+  const [germanDraft, setGermanDraft] = useState(() => starterText);
   const level = String(writingContext.level || writingContext.courseLevel || "B1").toUpperCase() === "A2" ? "A2" : "B1";
   const supportItems = resolveWritingSupportItems(writingContext, level);
+
+  useEffect(() => {
+    if (starterTaskRef.current === taskIdentity) return;
+    starterTaskRef.current = taskIdentity;
+    setPointsDraft("");
+    setGermanDraft(starterText);
+  }, [starterText, taskIdentity]);
 
   const planningPlaceholder = useMemo(() => {
     if (!supportItems.length) return "Write your short ideas in English or German here...";
@@ -433,12 +458,18 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           />
         ) : null}
 
+        {starterText ? (
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+            The starter text is already inside the writing box. Continue it, change it, or replace it with your own version.
+          </p>
+        ) : null}
+
         <textarea
           aria-label={`${level} German writing draft`}
           value={germanDraft}
           onChange={(event) => setGermanDraft(event.target.value)}
-          placeholder={writingContext.draftPlaceholder || "Write your complete German text here..."}
-          style={{ ...textareaStyle, minHeight: 260 }}
+          placeholder="Write your complete German text here..."
+          style={{ ...textareaStyle, minHeight: 260, whiteSpace: "pre-wrap" }}
         />
 
         <B1InlineWritingAnalyser
