@@ -33,9 +33,11 @@ describe("shared timed assignment configuration", () => {
       "A2-10.27",
       "A2-10.28",
     ]);
-    expect(getTimedAssignmentConfig("A2-9.24")?.timedTabs).toEqual(["schreiben", "lesen"]);
-    expect(getTimedAssignmentConfig("A2-10.26")?.timedTabs).toEqual(["schreiben", "lesen"]);
-    expect(getTimedAssignmentConfig("A2-10.27")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+    expect(getTimedAssignmentConfig("A2-9.23")?.timedTabs).toEqual(["lesen"]);
+    expect(getTimedAssignmentConfig("A2-9.24")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+    expect(getTimedAssignmentConfig("A2-9.25")?.timedTabs).toEqual(["lesen"]);
+    expect(getTimedAssignmentConfig("A2-10.26")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+    expect(getTimedAssignmentConfig("A2-10.27")?.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("A2-10.28")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("A2-10.28")).toBe(45 * 60);
   });
@@ -47,11 +49,30 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("B1-7.21")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.23")).toBe(55 * 60);
+    expect(getTimedAssignmentConfig("B1-7.22")?.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-8.24")?.timedTabs).toEqual(["schreiben", "lesen"]);
-    expect(getTimedAssignmentConfig("B1-8.25")?.timedTabs).toEqual(["schreiben", "lesen"]);
+    expect(getTimedAssignmentConfig("B1-8.25")?.timedTabs).toEqual(["lesen"]);
     expect(getTimedAssignmentConfig("B1-9.26")?.timedTabs).toEqual(["schreiben", "lesen"]);
     expect(getTimedAssignmentConfig("B1-10.27")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("B1-10.28")).toBe(60 * 60);
+  });
+
+  test("A2/B1 timer scope is generated from the same required submission parts", () => {
+    expect(getTimedAssignmentConfig("A2-9.25")).toMatchObject({
+      scope: "Teil 3 Lesen",
+      timedTabs: ["lesen"],
+      lessonProfileVersion: 1,
+    });
+    expect(getTimedAssignmentConfig("A2-10.26")).toMatchObject({
+      scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören",
+      timedTabs: ["schreiben", "lesen", "hoeren"],
+      lessonProfileVersion: 1,
+    });
+    expect(getTimedAssignmentConfig("B1-7.22")).toMatchObject({
+      scope: "Teil 3 Lesen and Teil 4 Lesen",
+      timedTabs: ["lesen", "hoeren"],
+      lessonProfileVersion: 1,
+    });
   });
 
   test.each(["A1", "A2", "B1"])("%s phase never announces an untimed tutor-marked assignment", (level) => {
