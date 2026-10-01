@@ -96,6 +96,16 @@ describe("A2 and B1 course books", () => {
     expect(responsiveCss).toContain("max-height: 88dvh");
   });
 
+  test("shows included content chips on every A2 and B1 Course Book day card", () => {
+    const source = fs.readFileSync(path.join(process.cwd(), "src/components/CourseTab.js"), "utf8");
+
+    expect(source).toContain("getA2B1WorkbookIncludedSectionLabels");
+    expect(source).toContain('className="course-book-included"');
+    expect(source).toContain("Included:");
+    expect(source).toContain("data-coursebook-included");
+    expect(source).toContain("Included in this day:");
+  });
+
   test("describes the four workbook parts plus Ref and Submit", () => {
     render(<A2B1WorkbookGuidance level="B1" />);
 
