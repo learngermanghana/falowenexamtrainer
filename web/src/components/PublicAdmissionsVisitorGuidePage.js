@@ -43,6 +43,13 @@ function formatLearningMode(course) {
   return "In person in Awoshie, live online, or recorded lesson catch-up when you cannot attend live.";
 }
 
+function formatAdmissionsUpdated(value) {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric", timeZone: "UTC" }).format(date);
+}
+
 const publicLinkCopy = {
   blog: { label: "Falowen Blog", description: "German-learning articles and study resources." },
   linkedin: { label: "LinkedIn", description: "School updates and professional background." },
@@ -128,6 +135,11 @@ const PublicAdmissionsVisitorGuidePage = () => {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#334155", fontWeight: 700 }}>
           <span>Established {academyProfile.establishedYear}</span><span>·</span><span>German {academyProfile.germanLevels}</span><span>·</span><span>{academyProfile.examPassHeadline}</span>
         </div>
+        {academyProfile.admissionsUpdatedAt ? (
+          <div style={{ color: "#64748b", fontSize: 12 }}>
+            Fees and admissions information updated {formatAdmissionsUpdated(academyProfile.admissionsUpdatedAt)}.
+          </div>
+        ) : null}
       </section>
 
       <section style={{ ...card, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
@@ -195,6 +207,8 @@ const PublicAdmissionsVisitorGuidePage = () => {
             <img
               src={academyProfile.classroomImage}
               alt="Learn Language Education Academy classroom in Awoshie"
+              loading="lazy"
+              decoding="async"
               onError={(event) => { event.currentTarget.closest("figure").style.display = "none"; }}
               style={{ width: "100%", height: "100%", minHeight: 220, maxHeight: 340, objectFit: "cover", borderRadius: 14, border: "1px solid #e2e8f0" }}
             />
@@ -247,12 +261,18 @@ const PublicAdmissionsVisitorGuidePage = () => {
                   src={member.image}
                   alt={`${member.name} · ${member.role}`}
                   loading="lazy"
+                  decoding="async"
                   style={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover", borderRadius: 10, background: "#f1f5f9" }}
                 />
               ) : null}
               <div>
                 <strong>{member.name}</strong>
-                <div style={{ marginTop: 3, color: "#1d4ed8", fontWeight: 800, fontSize: 13 }}>{member.role}</div>
+                {member.relationship ? (
+                  <div style={{ marginTop: 5, width: "fit-content", borderRadius: 999, padding: "3px 7px", background: "#f1f5f9", color: "#475569", fontSize: 10, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em" }}>
+                    {member.relationship}
+                  </div>
+                ) : null}
+                <div style={{ marginTop: 4, color: "#1d4ed8", fontWeight: 800, fontSize: 13 }}>{member.role}</div>
               </div>
               <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>{member.bio}</p>
             </article>
@@ -272,6 +292,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
                 src={item.image}
                 alt={item.title}
                 loading="lazy"
+                decoding="async"
                 style={{ width: "100%", aspectRatio: "16 / 10", objectFit: "cover", borderRadius: 12, border: "1px solid #e2e8f0" }}
               />
               <figcaption style={{ color: "#475569", fontSize: 13, lineHeight: 1.5 }}>
