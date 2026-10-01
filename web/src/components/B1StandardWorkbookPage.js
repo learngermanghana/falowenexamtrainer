@@ -260,7 +260,7 @@ export const resolveB1WorkbookTabs = (listening = {}) =>
     : A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
 export default function B1StandardWorkbookPage({ config, renderSections = null }) {
-  const [displayedActiveTab, setActiveTab] = useState("grammar");
+  const [activeTab, setActiveTab] = useState("grammar");
   const handleTimedExpiry = useCallback(() => setActiveTab("submit"), []);
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -301,7 +301,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
       onTimeExpired={handleTimedExpiry}
     >
       {({ isTabLocked }) => {
-        const displayedActiveTab = isTabLocked(displayedActiveTab) ? "grammar" : displayedActiveTab;
+        const resolvedActiveTab = isTabLocked(activeTab) ? "grammar" : activeTab;
         return (
               <div style={{ ...styles.container, display: "grid", gap: 16 }}>
                 <div style={card}>
@@ -321,7 +321,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </p>
                   <SectionImage image={config.heroImage} alt={config.heroAlt} />
                   <WorkbookTabNav
-                    activeTab={displayedActiveTab}
+                    activeTab={resolvedActiveTab}
                     onChange={setActiveTab}
                     tabs={workbookTabs}
                     isTabLocked={isTabLocked}
@@ -331,17 +331,17 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
           
                 <A2B1WorkbookGuidance level="B1" />
           
-                {displayedActiveTab === "grammar" && (
+                {resolvedActiveTab === "grammar" && (
                   <section style={card}>
                     <A2B1GrammarNotesTab level="B1" day={config.day} />
                   </section>
                 )}
           
-                {renderSections && (displayedActiveTab !== "hoeren" || listening.mode === "reading-fallback") ? (
-                  React.createElement(renderSections, { displayedActiveTab, prepared, setPreparedFor, listening, lessonProfile })
+                {renderSections && (resolvedActiveTab !== "hoeren" || listening.mode === "reading-fallback") ? (
+                  React.createElement(renderSections, { displayedActiveTab: resolvedActiveTab, prepared, setPreparedFor, listening, lessonProfile })
                 ) : (
                   <>
-                {displayedActiveTab === "sprechen" && (
+                {resolvedActiveTab === "sprechen" && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
                     <WorkbookTaskCard
@@ -408,7 +408,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </section>
                 )}
           
-                {writingRequired && displayedActiveTab === "schreiben" && (
+                {writingRequired && resolvedActiveTab === "schreiben" && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
                     <WorkbookTaskCard
@@ -463,7 +463,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </section>
                 )}
           
-                {displayedActiveTab === "lesen" && (
+                {resolvedActiveTab === "lesen" && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
                     <WorkbookTaskCard
@@ -514,7 +514,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </section>
                 )}
           
-                {displayedActiveTab === "hoeren" && hasListeningTab && (
+                {resolvedActiveTab === "hoeren" && hasListeningTab && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 4 · Hören ({listeningRequiresSubmission ? "Assignment" : "Self-check"})</h2>
                     <WorkbookTaskCard
@@ -570,11 +570,11 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   </>
                 )}
 
-                {renderSections && displayedActiveTab === "lesen" ? (
+                {renderSections && resolvedActiveTab === "lesen" ? (
                   <A2B1ReadingQualityChallenge level="B1" day={config.day} />
                 ) : null}
           
-                {displayedActiveTab === "references" && (
+                {resolvedActiveTab === "references" && (
                   <WorkbookReferenceAnswers
                     level="B1"
                     lesson={{ title: config.workbookId || `B1Day${config.day}`, level: "B1", day: config.day, workbookId: config.workbookId }}
@@ -582,7 +582,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   />
                 )}
           
-                {displayedActiveTab === "submit" && (
+                {resolvedActiveTab === "submit" && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Submit workbook answers</h2>
                     <WorkbookTaskCard
