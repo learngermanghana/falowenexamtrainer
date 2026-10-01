@@ -23,9 +23,9 @@ describe("A1 Day 21 Weather resources", () => {
 
     expect(resources.teacher).toEqual(
       expect.objectContaining({
-        sourceUrl: "https://youtu.be/ijEY8XVrsZs",
-        youtubeId: "ijEY8XVrsZs",
-        embedUrl: "https://www.youtube-nocookie.com/embed/ijEY8XVrsZs",
+        sourceUrl: "https://youtu.be/7m2fssEbTd8",
+        youtubeId: "7m2fssEbTd8",
+        embedUrl: "https://www.youtube-nocookie.com/embed/7m2fssEbTd8",
       }),
     );
     expect(resources.ai).toEqual(
@@ -46,7 +46,7 @@ describe("A1 Day 21 Weather resources", () => {
     const videoIds = resources.map((resource) => getYouTubeVideoId(resource.url)).filter(Boolean);
 
     expect(resources).toEqual(expect.arrayContaining([
-      expect.objectContaining({ kind: "teacher", url: "https://youtu.be/ijEY8XVrsZs" }),
+      expect.objectContaining({ kind: "teacher", url: "https://youtu.be/7m2fssEbTd8" }),
       expect.objectContaining({ kind: "ai", url: "https://youtu.be/fRYM7ojc0Yo" }),
     ]));
     expect(new Set(videoIds).size).toBe(videoIds.length);
