@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import { loadPublicClasses, slugifyPublicClass } from "../services/publicClassCatalogService";
 import { resolveAdmissionsRef, trackAdmissionsEngagement } from "../services/admissionsEngagementService";
+import academyProfile from "../data/publicAcademyProfile.json";
 
 const card = { ...styles.card, display: "grid", gap: 12, borderRadius: 16 };
 const action = {
@@ -58,7 +59,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
       structuredData: {
         "@context": "https://schema.org",
         "@type": "EducationalOrganization",
-        name: "Learn Language Education Academy",
+        name: academyProfile.academyName,
         url: "https://www.falowen.app/visitor-guide",
         description,
       },
@@ -105,13 +106,13 @@ const PublicAdmissionsVisitorGuidePage = () => {
         <div style={{ color: "#1d4ed8", fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase", fontSize: 12 }}>
           Admissions · School background
         </div>
-        <h1 style={{ margin: 0 }}>Learn Language Education Academy</h1>
+        <h1 style={{ margin: 0 }}>{academyProfile.academyName}</h1>
         <p style={{ margin: 0, lineHeight: 1.75, color: "#334155" }}>
-          Learn Language Education Academy combines structured German teaching with Falowen, our digital learning platform.
+          {academyProfile.academyName} combines structured German teaching with Falowen, our digital learning platform.{" "}
           Students receive guided lessons, tutor-marked work, progress tracking and preparation for German-language examinations.
         </p>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", color: "#334155", fontWeight: 700 }}>
-          <span>Established 2022</span><span>·</span><span>German A1–C2</span><span>·</span><span>High exam pass rate</span>
+          <span>Established {academyProfile.establishedYear}</span><span>·</span><span>German {academyProfile.germanLevels}</span><span>·</span><span>{academyProfile.examPassHeadline}</span>
         </div>
       </section>
 
@@ -190,6 +191,28 @@ const PublicAdmissionsVisitorGuidePage = () => {
           <li><strong>Assignments + feedback:</strong> complete required work, receive scores and use feedback to improve weak areas.</li>
           <li><strong>Completion + exam preparation:</strong> finish the course, review your progress and continue with focused examination preparation.</li>
         </ol>
+      </section>
+
+      <section style={{ ...card, overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.2fr) minmax(240px, .8fr)", gap: 16, alignItems: "stretch" }}>
+          <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
+            <div style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>Visit LLEA</div>
+            <h2 style={{ margin: 0 }}>Find the classroom without calling for directions</h2>
+            <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
+              In-person classes are held at our Awoshie learning space. Use the exact Google Maps location below for directions.
+            </p>
+            <strong>{academyProfile.locationLabel}</strong>
+            <a href={academyProfile.mapsUrl} target="_blank" rel="noreferrer" style={{ ...action, width: "fit-content", background: "#fff", color: "#1d4ed8" }}>
+              Open exact location in Google Maps
+            </a>
+          </div>
+          <img
+            src={academyProfile.classroomImage}
+            alt="Learn Language Education Academy classroom in Awoshie"
+            onError={(event) => { event.currentTarget.style.display = "none"; }}
+            style={{ width: "100%", height: "100%", minHeight: 220, objectFit: "cover", borderRadius: 14, border: "1px solid #e2e8f0" }}
+          />
+        </div>
       </section>
 
       <section style={card}>
