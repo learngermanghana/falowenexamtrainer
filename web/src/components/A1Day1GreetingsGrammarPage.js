@@ -158,6 +158,22 @@ const getKnowledgeQuestions = (sectionKey) => {
   return knowledgeQuestions.filter((question) => ids.has(question.id));
 };
 
+const knowledgeQuestionDisplayOrder = Object.freeze([
+  "q1",
+  "q5",
+  "q6",
+  "q4",
+  "q10",
+  "q2",
+  "q7",
+  "q3",
+  "q8",
+  "q9",
+]);
+
+const getKnowledgeQuestionNumber = (questionId) =>
+  knowledgeQuestionDisplayOrder.indexOf(questionId) + 1;
+
 const KnowledgeCheck = ({
   sectionKey,
   knowledgeAnswers,
@@ -186,7 +202,7 @@ const KnowledgeCheck = ({
         const selectedAnswer = knowledgeAnswers[question.id];
         const hasAnswered = Boolean(selectedAnswer);
         const isCorrect = selectedAnswer === question.answer;
-        const questionNumber = knowledgeQuestions.findIndex((item) => item.id === question.id) + 1;
+        const questionNumber = getKnowledgeQuestionNumber(question.id);
 
         return (
           <article
