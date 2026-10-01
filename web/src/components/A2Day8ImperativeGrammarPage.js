@@ -4,29 +4,30 @@ import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import { styles } from "../styles";
 
 const lesson = {
-  title: "Imperativ – Anweisungen geben",
-  english: "Use the imperative for instructions, recipes and requests. German has different imperative forms for du, ihr and polite Sie.",
-  rule: "du: usually verb stem (Schneid!). ihr: normal ihr-form without ihr (Schneidet!). Sie: infinitive + Sie (Schneiden Sie!). Add bitte to make an instruction friendlier.",
+  title: "Im Restaurant – höflich bestellen und nachfragen",
+  english: "Use polite chunks to order food, ask questions and react in a restaurant. At A2, accuracy and natural phrases are more useful than long explanations.",
+  rule: "Bestellen: Ich hätte gern ... / Ich möchte ... / Ich nehme ... . Nachfragen: Könnte ich bitte ...? / Haben Sie ...? / Was empfehlen Sie? Problem: Entschuldigung, ich habe ... bestellt. Bezahlen: Wir möchten bitte zahlen.",
   examples: [
-    "Schneid die Zwiebel!",
-    "Nehmt zwei Tomaten!",
-    "Geben Sie bitte etwas Salz dazu.",
-    "Warte bitte einen Moment!",
+    "Ich hätte gern die Gemüsesuppe und ein Mineralwasser.",
+    "Könnte ich bitte die Speisekarte bekommen?",
+    "Was empfehlen Sie heute?",
+    "Entschuldigung, ich habe den Salat ohne Käse bestellt.",
+    "Wir möchten bitte zahlen.",
   ],
-  commonMistake: "Do not keep the subject pronoun in the du/ihr imperative. Say Schneid die Zwiebel!, not Du schneid die Zwiebel!",
+  commonMistake: "Nicht zu direkt formulieren. Im Restaurant klingt „Gib mir Wasser!“ unhöflich. Besser: „Könnte ich bitte ein Wasser bekommen?“ oder „Ich hätte gern ein Wasser.“",
   questions: [
-    { stem: "du · schneiden", options: ["Schneid!", "Schneidet!", "Schneiden Sie!"], answer: 0, explanation: "du imperative: usually the verb stem." },
-    { stem: "ihr · nehmen", options: ["Nimm!", "Nehmt!", "Nehmen Sie!"], answer: 1, explanation: "ihr imperative uses the normal ihr verb form without ihr." },
-    { stem: "Sie · geben", options: ["Gib!", "Gebt!", "Geben Sie!"], answer: 2, explanation: "Formal imperative: infinitive + Sie." },
-    { stem: "Welche Bitte klingt höflich?", options: ["Geben Sie bitte die Karte.", "Du geben die Karte.", "Gibt die Karte Sie."], answer: 0, explanation: "Formal request uses Geben Sie and bitte." },
+    { stem: "Du möchtest eine Suppe bestellen.", options: ["Ich hätte gern die Tomatensuppe.", "Gib Tomatensuppe!", "Ich bin Tomatensuppe."], answer: 0, explanation: "Ich hätte gern ... is a natural polite ordering phrase." },
+    { stem: "Du möchtest die Speisekarte.", options: ["Könnte ich bitte die Speisekarte bekommen?", "Die Speisekarte bekommt.", "Ich Speisekarte."], answer: 0, explanation: "Könnte ich bitte ...? is a polite request." },
+    { stem: "Du willst nach einer Empfehlung fragen.", options: ["Was empfehlen Sie heute?", "Was Sie empfehlen heute?", "Was empfehle ich Sie?"], answer: 0, explanation: "In a direct question the conjugated verb comes before the subject: empfehlen Sie." },
+    { stem: "Du hast das falsche Getränk bekommen.", options: ["Entschuldigung, ich habe ein Wasser bestellt.", "Du falsch!", "Ich trinken nicht."], answer: 0, explanation: "Name the problem politely and clearly." },
   ],
-  outputPrompt: "Gib 4 kurze Anweisungen für ein Rezept oder eine Alltagssituation: eine du-, eine ihr- und zwei Sie-Formen.",
-  starters: ["Schneid ...!", "Nehmt ...!", "Geben Sie bitte ...!", "Warten Sie bitte ...!"],
+  outputPrompt: "Restaurant-Simulation: Bestelle ein Gericht und ein Getränk, stelle eine Frage, reagiere auf ein kleines Problem und bitte am Ende um die Rechnung.",
+  starters: ["Ich hätte gern ...", "Könnte ich bitte ...?", "Was empfehlen Sie ...?", "Entschuldigung, ich habe ... bestellt.", "Wir möchten bitte zahlen."],
 };
 
 const FocusedContent = () => <A2MiniLearningBlock {...lesson} />;
 
 export default function A2Day8ImperativeGrammarPage({ embedded = false }) {
   if (embedded) return <FocusedContent />;
-  return <main style={styles.pageWrap}><div style={{ ...styles.container, display: "grid", gap: 16 }}><AppBackButton label="Back" fallbackPath="/campus/course" /><h1 style={{ margin: 0 }}>A2 · Day 8 · Rezepte und Essen</h1><FocusedContent /></div></main>;
+  return <main style={styles.pageWrap}><div style={{ ...styles.container, display: "grid", gap: 16 }}><AppBackButton label="Back" fallbackPath="/campus/course" /><h1 style={{ margin: 0 }}>A2 · Day 8 · Im Restaurant</h1><FocusedContent /></div></main>;
 }
