@@ -1,7 +1,8 @@
 (function () {
   const HTML2CANVAS_URL = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
   const JSPDF_URL = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
-  const DEFAULT_LOCATION = "Ghana, Accra - Awoshie";
+  const QRCODE_URL = "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js";
+  const DEFAULT_LOCATION = "Awoshie, Accra, Ghana";
   const DEFAULT_WHATSAPP = "233205706589";
 
   const text = (selector, fallback = "") =>
@@ -63,6 +64,9 @@
       examPassHeadline: "High exam pass rate",
       examPassDescription: "Our students have maintained a high pass rate in German language examinations.",
       overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
+      locationLabel: DEFAULT_LOCATION,
+      mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
+      classroomImage: "/classes/llea-classroom.jpg",
       ...(window.FalowenClassBrochureData?.academyProfile || {}),
     };
   }
@@ -136,6 +140,8 @@
     const course = window.currentBrochureCourse || {};
     const policy = getCoursePolicy();
     const academyProfile = getAcademyProfile();
+    const mapsUrl = course.mapsUrl || academyProfile.mapsUrl || "";
+    const classroomImage = course.classroomImage || academyProfile.classroomImage || "";
     return {
       blueTitle,
       level,
@@ -151,6 +157,8 @@
       balance,
       policy,
       academyProfile,
+      mapsUrl,
+      classroomImage,
       isSelfLearning: course.availability === "always",
       meetings: getMeetingRows(),
       reviews: getReviews(),
@@ -208,6 +216,7 @@
     const courseDuration = Number(policy.courseDurationWeeks || 10);
     const fullAccessMonths = Number(policy.fullPaymentAccessMonths || 6);
     const installmentAccessMonths = Number(policy.installmentAccessMonths || 1);
+    const pageTotal = isSelfLearning ? 2 : 3;
     const heroKicker = isSelfLearning ? "FLEXIBLE GERMAN SELF-LEARNING" : "LIVE GERMAN PROGRAM · ACCRA + ONLINE";
     const heroTitle = isSelfLearning
       ? `Build your German independently with Falowen support`
@@ -296,7 +305,7 @@
           <div><strong>Flexible class mode</strong><span>${escapeHtml(data.mode)}</span></div>
         </div>
 
-        <footer class="pdf-page-footer"><span>Learn Language Education Academy</span><span>Page 1 of 2</span></footer>
+        <footer class="pdf-page-footer"><span>Learn Language Education Academy</span><span>Page 1 of ${pageTotal}</span></footer>
       </section>
 
       <section class="pdf-page pdf-page-two">
@@ -352,8 +361,49 @@
           </div>
         </section>
 
-        <footer class="pdf-page-footer"><span>Structured classes · Tutor support · Falowen practice</span><span>Page 2 of 2</span></footer>
+        <footer class="pdf-page-footer"><span>Structured classes · Tutor support · Falowen practice</span><span>Page 2 of ${pageTotal}</span></footer>
       </section>
+
+      ${isSelfLearning ? "" : `\n        <section class="pdf-page pdf-page-three">
+          <header class="pdf-brand-row compact">
+            <div class="pdf-brand"><img src="/falo.png" alt="" /><div><strong>Visit Learn Language Education Academy</strong><span>Awoshie · Accra</span></div></div>
+            <div class="pdf-level-badge">LLEA</div>
+          </header>
+
+          <div class="pdf-location-hero">
+            <div>
+              <div class="pdf-small-label">IN-PERSON CLASSROOM</div>
+              <h2>Know exactly where to go before your first class</h2>
+              <p>In-person lessons take place at our Awoshie learning space. Use the Google Maps location below for the exact route and entrance.</p>
+            </div>
+            <div class="pdf-location-address">
+              <span>Class location</span>
+              <strong>${escapeHtml(academyProfile.locationLabel || data.location || DEFAULT_LOCATION)}</strong>
+            </div>
+          </div>
+
+          <section class="pdf-classroom-photo">
+            ${data.classroomImage ? `<img class="pdf-classroom-image" src="${escapeHtml(data.classroomImage)}" alt="Learn Language Education Academy classroom" crossorigin="anonymous" />` : ""}
+            <div class="pdf-classroom-fallback">LLEA classroom photo</div>
+          </section>
+
+          <section class="pdf-map-panel">
+            <div>
+              <div class="pdf-section-title"><span>Open the exact location</span><small>Google Maps</small></div>
+              <p class="pdf-body-copy">Use this link before travelling to class. It opens the exact LLEA map location instead of a general Awoshie search.</p>
+              <div class="pdf-map-url">${escapeHtml(data.mapsUrl || academyProfile.mapsUrl || "")}</div>
+            </div>
+            <div id="pdfMapsQr" class="pdf-maps-qr"><span>Google Maps</span></div>
+          </section>
+
+          <section class="pdf-arrival-panel">
+            <div><strong>Before class</strong><span>Open the map link, check your route and plan to arrive early for in-person lessons.</span></div>
+            <div><strong>Hybrid option</strong><span>If needed, students can also join online according to the class arrangement.</span></div>
+            <div><strong>Need help?</strong><span>Contact the academy using the WhatsApp or email details in this brochure.</span></div>
+          </section>
+
+          <footer class="pdf-page-footer"><span>${escapeHtml(academyProfile.academyName || "Learn Language Education Academy")}</span><span>Page 3 of 3</span></footer>
+        </section>\n      `}
     `;
     return wrapper;
   }
@@ -446,6 +496,25 @@
       .pdf-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px 15px; }
       .pdf-contact-grid span { background: #ffffff; border-radius: 10px; padding: 8px 10px; }
       .pdf-contact-grid b { color: #1455f5; margin-right: 4px; }
+      .pdf-page-three { gap: 18px; }
+      .pdf-location-hero { border-radius: 22px; padding: 24px; background: #eff6ff; border: 1px solid #bfdbfe; display: grid; grid-template-columns: 1.4fr .6fr; gap: 18px; align-items: center; }
+      .pdf-location-hero h2 { font-size: 28px; line-height: 1.08; margin: 5px 0 8px; }
+      .pdf-location-hero p { color: #334155; font-size: 12px; line-height: 1.55; }
+      .pdf-location-address { border-radius: 14px; padding: 14px; background: #ffffff; display: grid; gap: 5px; }
+      .pdf-location-address span { color: #64748b; font-size: 9px; font-weight: 900; text-transform: uppercase; }
+      .pdf-location-address strong { font-size: 14px; line-height: 1.35; }
+      .pdf-classroom-photo { height: 390px; border-radius: 20px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; position: relative; }
+      .pdf-classroom-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .pdf-classroom-fallback { display: none; width: 100%; height: 100%; place-items: center; color: #64748b; font-size: 14px; font-weight: 800; }
+      .pdf-map-panel { display: grid; grid-template-columns: 1fr 150px; gap: 16px; align-items: center; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; }
+      .pdf-map-url { margin-top: 10px; border-radius: 10px; background: #f8fafc; padding: 10px; font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; color: #1d4ed8; font-weight: 800; }
+      .pdf-maps-qr { width: 150px; height: 150px; border: 1px solid #dbeafe; border-radius: 14px; background: #ffffff; display: grid; place-items: center; overflow: hidden; }
+      .pdf-maps-qr canvas { width: 138px !important; height: 138px !important; }
+      .pdf-maps-qr span { color: #64748b; font-size: 11px; font-weight: 800; }
+      .pdf-arrival-panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .pdf-arrival-panel > div { border-radius: 14px; background: #f8fafc; border: 1px solid #e2e8f0; padding: 13px; display: grid; gap: 5px; }
+      .pdf-arrival-panel strong { font-size: 11px; }
+      .pdf-arrival-panel span { color: #475569; font-size: 9.5px; line-height: 1.45; }
       body.falowen-brochure-print-fallback > *:not(#falowenPdfBrochure) { display: none !important; }
       @media print {
         body.falowen-brochure-print-fallback { margin: 0 !important; background: #ffffff !important; }
@@ -495,6 +564,45 @@
     button.textContent = label;
   }
 
+  async function prepareLocationPage(brochure, data) {
+    const locationPage = brochure.querySelector(".pdf-page-three");
+    const image = brochure.querySelector(".pdf-classroom-image");
+    let classroomImageReady = false;
+
+    if (image) {
+      classroomImageReady = await new Promise((resolve) => {
+        if (image.complete) {
+          resolve(Boolean(image.naturalWidth));
+          return;
+        }
+        image.addEventListener("load", () => resolve(true), { once: true });
+        image.addEventListener("error", () => resolve(false), { once: true });
+      });
+    }
+
+    if (locationPage && !classroomImageReady) {
+      locationPage.remove();
+      const pages = brochure.querySelectorAll(".pdf-page");
+      pages.forEach((page, index) => {
+        const pageNumber = page.querySelector(".pdf-page-footer span:last-child");
+        if (pageNumber) pageNumber.textContent = `Page ${index + 1} of ${pages.length}`;
+      });
+      return;
+    }
+
+    const qrTarget = brochure.querySelector("#pdfMapsQr");
+    if (qrTarget && data.mapsUrl) {
+      try {
+        await loadScript(QRCODE_URL, () => Boolean(window.QRCode?.toCanvas));
+        const canvas = document.createElement("canvas");
+        await window.QRCode.toCanvas(canvas, data.mapsUrl, { width: 138, margin: 1 });
+        qrTarget.replaceChildren(canvas);
+      } catch (error) {
+        console.warn("Could not generate Google Maps QR code", error);
+      }
+    }
+  }
+
   async function renderPdfPage(page) {
     return window.html2canvas(page, {
       scale: 2,
@@ -518,6 +626,7 @@
     document.body.appendChild(brochure);
 
     try {
+      await prepareLocationPage(brochure, data);
       await loadScript(HTML2CANVAS_URL, () => typeof window.html2canvas === "function");
       await loadScript(JSPDF_URL, () => Boolean(window.jspdf?.jsPDF));
       if (document.fonts?.ready) await document.fonts.ready;

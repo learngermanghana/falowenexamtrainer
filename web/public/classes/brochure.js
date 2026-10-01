@@ -124,6 +124,8 @@ function expandBrochureClass(rawClass = {}, defaults = {}) {
     level,
     city,
     location: rawClass.location || (isSelfLearning ? defaults.selfLearningLocation : defaults.location),
+    mapsUrl: rawClass.mapsUrl || (isSelfLearning ? "" : defaults.mapsUrl || ""),
+    classroomImage: rawClass.classroomImage || (isSelfLearning ? "" : defaults.classroomImage || ""),
     format: rawClass.format || (isSelfLearning ? defaults.selfLearningFormat : defaults.format),
     startDate: String(rawClass.startDate || "").slice(0, 10),
     orientationDate: String(rawClass.orientationDate || rawClass.startDate || "").slice(0, 10),
