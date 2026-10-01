@@ -1,5 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { auth, db, doc, onSnapshot, serverTimestamp, setDoc } from "../firebase";
+import { useAuth } from "../context/AuthContext";
+import { useLessonProgress } from "../hooks/useLessonProgress";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { styles } from "../styles";
 import {
@@ -10,6 +12,10 @@ import {
   getTimedAssignmentRemainingSeconds,
   normalizeTimedAssignmentSession,
 } from "../utils/timedAssignmentClock";
+import {
+  isTimedAssignmentReviewUnlocked,
+  isTimedAssignmentTabLocked,
+} from "../utils/timedAssignmentAccess";
 
 const ATTEMPT_COLLECTION = "submissionLocks";
 
@@ -28,6 +34,9 @@ const TimedAssignmentContext = createContext({
   timedAutoSubmit: false,
   status: "",
   warningMessage: "",
+  reviewUnlocked: false,
+  resultStatus: "",
+  resultLoading: false,
   agreed: false,
   setAgreed: () => {},
   start: () => {},
@@ -119,7 +128,18 @@ export default function SharedTimedAssignment({
   const durationSeconds = config?.durationMinutes
     ? Math.max(1, Number(config.durationMinutes)) * 60
     : getTimedAssignmentDurationSeconds(assignmentKey);
-  const currentUser = auth?.currentUser || null;
+  const { studentProfile, user: contextUser } = useAuth();
+  const currentUser = contextUser || auth?.currentUser || null;
+  const {
+    progressByAssignmentId,
+    loading: resultLoading,
+  } = useLessonProgress({
+    studentProfile: enabled ? studentProfile : null,
+    user: enabled ? currentUser : null,
+    level: enabled ? normalizedLevel : "",
+  });
+  const normalizedAssignmentKey = String(assignmentKey || "").trim().toUpperCase();
+  const assignmentProgress = progressByAssignmentId?.[normalizedAssignmentKey] || null;
   const attemptDocId = currentUser?.uid
     ? `timed__${normalizeKeyPart(currentUser.uid)}__${normalizeKeyPart(assignmentKey)}`
     : "";
@@ -140,6 +160,11 @@ export default function SharedTimedAssignment({
   const [warningMessage, setWarningMessage] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [startBusy, setStartBusy] = useState(false);
+  const reviewUnlocked = isTimedAssignmentReviewUnlocked({
+    attemptState,
+    progress: assignmentProgress,
+  });
+  const resultStatus = String(assignmentProgress?.status || "").trim().toLowerCase();
   const expiryHandledRef = useRef(false);
   const expiryCallbackRef = useRef(onTimeExpired);
   const warningThresholdsRef = useRef(new Set());
@@ -302,7 +327,7 @@ export default function SharedTimedAssignment({
   }, [attemptState, durationSeconds, enabled, markExpired, session]);
 
   const start = useCallback(async () => {
-    if (!enabled || !agreed || startBusy || attemptState !== "none") return;
+    if (!enabled || !agreed || startBusy || attemptState !== "none" || reviewUnlocked) return;
     if (attemptRef && cloudState !== "ready") {
       setStatus("Falowen is still checking whether this timed attempt was already used.");
       return;
@@ -363,6 +388,7 @@ export default function SharedTimedAssignment({
     durationSeconds,
     enabled,
     normalizedLevel,
+    reviewUnlocked,
     startBusy,
   ]);
 
@@ -397,22 +423,21 @@ export default function SharedTimedAssignment({
   }, []);
 
   const expired = attemptState === "expired" || (attemptState === "active" && secondsLeft <= 0);
-  const assignmentLocked = Boolean(enabled && attemptState !== "active");
+  const assignmentLocked = Boolean(enabled && attemptState !== "active" && !reviewUnlocked);
   const resolvedTimedAutoSubmit = Boolean(
     timedAutoSubmit ||
     (config?.autoSubmit && attemptState === "expired"),
   );
 
-  const isTabLocked = useCallback((tabKey = "") => {
-    if (!enabled) return false;
-    const normalizedTab = String(tabKey || "").trim().toLowerCase();
-    const isTimedWork = (config?.timedTabs || []).includes(normalizedTab);
-    const isSubmit = normalizedTab === "submit";
-
-    if (attemptState === "active" && secondsLeft > 0) return false;
-    if (attemptState === "expired" || attemptState === "submitted") return isTimedWork;
-    return isTimedWork || isSubmit;
-  }, [attemptState, config, enabled, secondsLeft]);
+  const isTabLocked = useCallback((tabKey = "") =>
+    isTimedAssignmentTabLocked({
+      enabled,
+      timedTabs: config?.timedTabs || [],
+      attemptState,
+      secondsLeft,
+      tabKey,
+      reviewUnlocked,
+    }), [attemptState, config, enabled, reviewUnlocked, secondsLeft]);
 
   const contextValue = useMemo(() => ({
     enabled,
@@ -430,6 +455,9 @@ export default function SharedTimedAssignment({
     timedAutoSubmit: resolvedTimedAutoSubmit,
     status,
     warningMessage,
+    reviewUnlocked,
+    resultStatus,
+    resultLoading,
     agreed,
     setAgreed,
     start,
@@ -447,6 +475,9 @@ export default function SharedTimedAssignment({
     onSubmissionError,
     onSubmissionVerified,
     resolvedTimedAutoSubmit,
+    resultLoading,
+    resultStatus,
+    reviewUnlocked,
     secondsLeft,
     session,
     start,
@@ -477,6 +508,9 @@ export function TimedAssignmentPanel() {
     secondsLeft,
     status,
     warningMessage,
+    reviewUnlocked,
+    resultStatus,
+    resultLoading,
     agreed,
     setAgreed,
     start,
@@ -486,6 +520,7 @@ export function TimedAssignmentPanel() {
   const active = attemptState === "active" && secondsLeft > 0;
   const urgent = active && secondsLeft <= 5 * 60;
   const used = ["expired", "submitted"].includes(attemptState);
+  const passedReview = Boolean(reviewUnlocked);
   const checking = cloudState === "loading";
   const cloudError = cloudState === "error";
   const isMock = config.mode === "mock";
@@ -496,15 +531,16 @@ export function TimedAssignmentPanel() {
     <section
       data-timed-assignment={assignmentKey || config.level}
       data-a1-timed-mock-exam={config.level === "A1" ? "true" : undefined}
-      data-assignment-locked={!active ? "true" : "false"}
+      data-assignment-locked={!active && !passedReview ? "true" : "false"}
+      data-timed-review-unlocked={passedReview ? "true" : "false"}
       data-timed-assignment-state={attemptState}
       style={{
         width: "100%",
         flex: "1 0 100%",
         boxSizing: "border-box",
-        border: `1px solid ${urgent ? "#fb7185" : active ? "#93c5fd" : used ? "#cbd5e1" : "#fbbf24"}`,
+        border: `1px solid ${urgent ? "#fb7185" : active ? "#93c5fd" : passedReview ? "#86efac" : used ? "#cbd5e1" : "#fbbf24"}`,
         borderRadius: 14,
-        background: urgent ? "#fff1f2" : active ? "#eff6ff" : used ? "#f8fafc" : "#fffbeb",
+        background: urgent ? "#fff1f2" : active ? "#eff6ff" : passedReview ? "#f0fdf4" : used ? "#f8fafc" : "#fffbeb",
         padding: 12,
         display: "grid",
         gap: 9,
@@ -541,6 +577,13 @@ export function TimedAssignmentPanel() {
             Warnings appear at 10, 5 and 1 minute. At 00:00 Falowen submits the latest saved work automatically.
           </span>
         </div>
+      ) : passedReview ? (
+        <div data-timed-review-mode="passed" style={{ display: "grid", gap: 4 }}>
+          <strong style={{ color: "#166534" }}>Passed · review unlocked</strong>
+          <span style={{ color: "#166534", lineHeight: 1.5 }}>
+            You can reopen the timed sections to cross-check your work. The timed attempt remains closed and the timer will not restart.
+          </span>
+        </div>
       ) : attemptState === "none" ? (
         <div style={{ display: "grid", gap: 8 }}>
           <p style={{ margin: 0, color: "#78350f", lineHeight: 1.5 }}>
@@ -570,8 +613,12 @@ export function TimedAssignmentPanel() {
           Time is up. This attempt cannot be restarted. Falowen is submitting the latest saved work; a teacher can reset the attempt if another try is required.
         </p>
       ) : attemptState === "submitted" ? (
-        <p style={{ margin: 0, color: "#166534", fontWeight: 800, lineHeight: 1.5 }}>
-          Timed attempt submitted. A teacher must reset the attempt before another timed try can begin.
+        <p style={{ margin: 0, color: resultStatus === "failed" ? "#9f1239" : "#475569", fontWeight: 800, lineHeight: 1.5 }}>
+          {resultStatus === "failed"
+            ? "This timed assignment has not passed. The timed sections stay locked until another attempt is reset and started."
+            : resultLoading
+              ? "Timed attempt submitted. Falowen is checking your latest result; timed sections stay locked until the assignment passes."
+              : "Timed attempt submitted. Timed sections stay locked while the result is pending. They reopen automatically after you pass."}
         </p>
       ) : (
         <p style={{ margin: 0, color: "#475569", fontWeight: 700 }}>
@@ -579,7 +626,7 @@ export function TimedAssignmentPanel() {
         </p>
       )}
 
-      {status ? <p role="status" style={{ margin: 0, color: "#9f1239", fontWeight: 800 }}>{status}</p> : null}
+      {status && !passedReview ? <p role="status" style={{ margin: 0, color: "#9f1239", fontWeight: 800 }}>{status}</p> : null}
     </section>
   );
 }
