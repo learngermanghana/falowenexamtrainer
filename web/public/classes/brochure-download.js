@@ -262,18 +262,6 @@
           <div class="pdf-meta-row">${meta}</div>
         </section>
 
-        <section class="pdf-track-record">
-          <div class="pdf-track-record-intro">
-            <div class="pdf-small-label">OUR TRACK RECORD</div>
-            <p>${escapeHtml(academyProfile.overview)}</p>
-          </div>
-          <div class="pdf-track-record-grid">
-            <div><span>Established</span><strong>${escapeHtml(academyProfile.establishedYear)}</strong></div>
-            <div><span>Exam performance</span><strong>${escapeHtml(academyProfile.examPassHeadline)}</strong></div>
-            <div><span>German learning</span><strong>${escapeHtml(academyProfile.germanLevels)}</strong></div>
-          </div>
-          <small>German language examinations generally · not limited to one exam provider</small>
-        </section>
 
         <section>
           <div class="pdf-section-title"><span>What your course includes</span><small>Everything students need in one structured programme</small></div>
@@ -300,10 +288,6 @@
           <div class="pdf-cta-url">www.falowen.app</div>
         </section>
 
-        <div class="pdf-two-cards">
-          <div><strong>Class location</strong><span>${escapeHtml(data.location)}</span></div>
-          <div><strong>Flexible class mode</strong><span>${escapeHtml(data.mode)}</span></div>
-        </div>
 
         <footer class="pdf-page-footer"><span>Learn Language Education Academy</span><span>Page 1 of ${pageTotal}</span></footer>
       </section>
@@ -434,7 +418,7 @@
       .pdf-hero p { max-width: 620px; font-size: 15px; line-height: 1.55; color: #e0e7ff; }
       .pdf-class-card { border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 18px; padding: 18px 20px; display: grid; gap: 12px; }
       .pdf-class-card h2 { font-size: 24px; margin-top: 4px; }
-      .pdf-class-card p { color: #334155; font-size: 12px; line-height: 1.5; margin-top: 5px; }
+      .pdf-class-card p { color: #334155; font-size: 13px; line-height: 1.55; margin-top: 5px; }
       .pdf-track-record { border: 1px solid #bfdbfe; border-radius: 16px; background: #ffffff; padding: 13px 15px; display: grid; gap: 9px; }
       .pdf-track-record-intro { display: grid; gap: 4px; }
       .pdf-track-record-intro p { color: #475569; font-size: 9.5px; line-height: 1.45; }
@@ -444,22 +428,22 @@
       .pdf-track-record-grid strong { color: #0f172a; font-size: 10.5px; line-height: 1.3; }
       .pdf-track-record > small { color: #64748b; font-size: 7.5px; }
       .pdf-meta-row { display: flex; flex-wrap: wrap; gap: 7px; }
-      .pdf-meta-row span { border-radius: 999px; background: #ffffff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 7px 9px; font-size: 10px; font-weight: 800; }
+      .pdf-meta-row span { border-radius: 999px; background: #ffffff; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 8px 10px; font-size: 11px; font-weight: 800; }
       .pdf-section-title { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 11px; }
       .pdf-section-title > span { font-size: 17px; font-weight: 900; }
       .pdf-section-title small { color: #64748b; font-size: 10px; }
       .pdf-benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
       .pdf-benefit { min-height: 76px; border: 1px solid #e2e8f0; border-radius: 14px; padding: 11px; display: grid; align-content: start; gap: 5px; background: #f8fafc; }
-      .pdf-benefit strong { font-size: 12px; }
-      .pdf-benefit span { color: #475569; font-size: 10px; line-height: 1.45; }
+      .pdf-benefit strong { font-size: 13px; }
+      .pdf-benefit span { color: #475569; font-size: 11px; line-height: 1.5; }
       .pdf-price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
       .pdf-price-card { border: 1px solid #e2e8f0; border-radius: 16px; padding: 15px; display: grid; gap: 6px; }
       .pdf-price-card.recommended { border: 2px solid #1455f5; background: #eff6ff; }
       .pdf-price-tag { width: fit-content; border-radius: 999px; background: #1455f5; color: #ffffff; padding: 5px 8px; font-size: 8px; font-weight: 900; letter-spacing: .06em; }
       .pdf-price-tag.neutral { background: #e2e8f0; color: #334155; }
-      .pdf-price-card > strong { font-size: 12px; }
+      .pdf-price-card > strong { font-size: 13px; }
       .pdf-price { font-size: 25px; font-weight: 950; letter-spacing: -.03em; }
-      .pdf-price-card p { color: #475569; font-size: 10px; line-height: 1.45; }
+      .pdf-price-card p { color: #475569; font-size: 11px; line-height: 1.5; }
       .pdf-cta { border-radius: 16px; padding: 16px 18px; background: #0f172a; color: #ffffff; display: flex; justify-content: space-between; align-items: center; gap: 20px; }
       .pdf-cta > div:first-child { display: grid; gap: 4px; }
       .pdf-cta strong { font-size: 15px; }
