@@ -34,19 +34,33 @@ describe("public class brochure experience", () => {
     );
   });
 
-  test("brochure, signup billing, and live class API agree on A1 fee and A2 duration", () => {
+  test("brochure, signup billing, visitor guide and live class API share the current admissions fee policy", () => {
     const levelFees = fs.readFileSync(path.resolve(__dirname, "../data/levelFees.js"), "utf8");
     const publicClasses = fs.readFileSync(
       path.resolve(__dirname, "../../../functions/functionz/routes/publicClasses.js"),
       "utf8",
     );
+    const catalog = fs.readFileSync(path.resolve(__dirname, "../services/publicClassCatalogService.js"), "utf8");
+    const sync = fs.readFileSync(path.resolve(__dirname, "../../scripts/sync-class-brochure-data.mjs"), "utf8");
+    const data = JSON.parse(publicClassFile("classes-data.json"));
 
-    expect(levelFees).toContain("A1: 3000");
-    expect(publicClasses).toContain("A1: 3000");
+    const levelFeeLiteral = levelFees.match(/export const LEVEL_FEES = (\{[\s\S]*?\n\});/)?.[1];
+    const publicFeeLiteral = publicClasses.match(/const TUITION = (\{[^\n]+\});/)?.[1];
+    expect(levelFeeLiteral).toBeTruthy();
+    expect(publicFeeLiteral).toBeTruthy();
+
+    const signupFees = Function(`return (${levelFeeLiteral});`)();
+    const apiFees = Function(`return (${publicFeeLiteral});`)();
+
+    expect(signupFees).toEqual({ A1: 3000, A2: 3000, B1: 3000, B2: 3000, C1: 3000 });
+    expect(apiFees).toEqual(signupFees);
+    expect(data.classDefaults.tuitionGhsByLevel).toEqual(signupFees);
+    expect(catalog).toContain('getTuitionFeeForLevel(level)');
+    expect(sync).toContain("canonical tuition settings");
+    expect(sync).toContain("tuitionGhsByLevel,");
     expect(publicClasses).toContain("A2: 90");
     expect(publicClasses).toContain("TUITION[level] || data.tuitionGhs");
     expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
-    expect(publicClasses).toContain('tuitionGhs: Number(TUITION[level]');
   });
 
   test("student reviews follow the visible academy track record and lead card", () => {
@@ -124,6 +138,13 @@ describe("public class brochure experience", () => {
     expect(flow).not.toContain("Register right away");
     expect(enhancements).not.toContain('id="heroRegisterCta"');
     expect(enhancements).toContain("removeStickyMobileRegisterBar");
+    expect(enhancements).toContain('id="mainSignupCta"');
+    expect(enhancements).toContain("Register for this class");
+    expect(enhancements).toContain("classDecisionSummary");
+    expect(enhancements).toContain("decisionScheduleCta");
+    expect(enhancements).toContain("Open Google Maps");
+    expect(enhancements).toContain("Falowen access with full payment");
+    expect(enhancements).not.toContain('id="heroRegisterCta"');
   });
 
   test("synthetic enquiry classes hand signup a supported level instead of an unresolved class slug", () => {
@@ -147,6 +168,14 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("removeStickyMobileRegisterBar");
     expect(enhancements).toContain("getCoursePolicy");
     expect(enhancements).toContain("What happens after you register?");
+    expect(enhancements).toContain("Advanced teaching slides");
+    expect(enhancements).toContain("Recorded teacher explanations");
+    expect(enhancements).toContain("Tutor-marked assignments");
+    expect(enhancements).toContain("Progress tracking");
+    expect(enhancements).toContain("Exam preparation");
+    expect(enhancements).toContain("More course & payment details");
+    expect(enhancements).toContain("Attend in person in Awoshie");
+    expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
     expect(enhancements).toContain("High exam pass rate");
     expect(enhancements).toContain("Established");
@@ -158,7 +187,10 @@ describe("public class brochure experience", () => {
     expect(download).toContain("fullAccessMonths");
     expect(download).toContain("installmentAccessMonths");
     expect(download).toContain("isSelfLearning");
-    expect(download).toContain("pdf-track-record");
+    expect(download).not.toContain('<section class="pdf-track-record">');
+    expect(download).toContain('class="pdf-page pdf-page-three"');
+    expect(download).toContain("pdf-location-hero");
+    expect(download).toContain("pdf-classroom-photo");
     expect(download).toContain("academyProfile");
     expect(download).toContain("High exam pass rate");
     expect(download).not.toContain("Includes six months of Falowen access");

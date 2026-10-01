@@ -36,6 +36,13 @@ function formatSchedule(course) {
   return rows.map((slot) => `${slot.day} ${slot.startTime || ""}${slot.endTime ? `–${slot.endTime}` : ""}`).join(" · ");
 }
 
+function formatLearningMode(course) {
+  if (course?.availability === "always" || course?.isSelfLearning) {
+    return "Self-learning in Falowen with flexible study and available tutor support.";
+  }
+  return "In person in Awoshie, live online, or recorded lesson catch-up when you cannot attend live.";
+}
+
 const PublicAdmissionsVisitorGuidePage = () => {
   const search = typeof window === "undefined" ? "" : window.location.search;
   const params = useMemo(() => new URLSearchParams(search), [search]);
@@ -128,7 +135,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
               <div><strong>Start date</strong><div>{formatDate(selectedClass.startDate)}</div></div>
               <div><strong>Course fee</strong><div>{formatFee(selectedClass)}</div></div>
-              <div><strong>Learning mode</strong><div>{selectedClass.format || "Hybrid learning with Falowen support"}</div></div>
+              <div><strong>Learning mode</strong><div>{formatLearningMode(selectedClass)}</div></div>
             </div>
             <div><strong>Schedule</strong><div style={{ marginTop: 4 }}>{formatSchedule(selectedClass)}</div></div>
           </>
@@ -164,6 +171,33 @@ const PublicAdmissionsVisitorGuidePage = () => {
         </div>
       </section>
 
+      <section style={{ ...card, overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, alignItems: "stretch" }}>
+          <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
+            <div style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>Visit LLEA</div>
+            <h2 style={{ margin: 0 }}>Find the classroom without calling for directions</h2>
+            <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
+              In-person classes are held at our Awoshie learning space. Use the exact Google Maps location below for directions.
+            </p>
+            <strong>{academyProfile.locationLabel}</strong>
+            <a href={academyProfile.mapsUrl} target="_blank" rel="noreferrer" style={{ ...action, width: "fit-content", background: "#fff", color: "#1d4ed8" }}>
+              Open exact location in Google Maps
+            </a>
+          </div>
+          <figure style={{ margin: 0, display: "grid", gap: 7 }}>
+            <img
+              src={academyProfile.classroomImage}
+              alt="Learn Language Education Academy classroom in Awoshie"
+              onError={(event) => { event.currentTarget.closest("figure").style.display = "none"; }}
+              style={{ width: "100%", height: "100%", minHeight: 220, maxHeight: 340, objectFit: "cover", borderRadius: 14, border: "1px solid #e2e8f0" }}
+            />
+            <figcaption style={{ color: "#64748b", fontSize: 12, fontWeight: 700 }}>
+              LLEA classroom · Awoshie, Accra
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
       <section style={card}>
         <h2 style={{ margin: 0 }}>Why students study with us</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
@@ -191,28 +225,6 @@ const PublicAdmissionsVisitorGuidePage = () => {
           <li><strong>Assignments + feedback:</strong> complete required work, receive scores and use feedback to improve weak areas.</li>
           <li><strong>Completion + exam preparation:</strong> finish the course, review your progress and continue with focused examination preparation.</li>
         </ol>
-      </section>
-
-      <section style={{ ...card, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, alignItems: "stretch" }}>
-          <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
-            <div style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>Visit LLEA</div>
-            <h2 style={{ margin: 0 }}>Find the classroom without calling for directions</h2>
-            <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
-              In-person classes are held at our Awoshie learning space. Use the exact Google Maps location below for directions.
-            </p>
-            <strong>{academyProfile.locationLabel}</strong>
-            <a href={academyProfile.mapsUrl} target="_blank" rel="noreferrer" style={{ ...action, width: "fit-content", background: "#fff", color: "#1d4ed8" }}>
-              Open exact location in Google Maps
-            </a>
-          </div>
-          <img
-            src={academyProfile.classroomImage}
-            alt="Learn Language Education Academy classroom in Awoshie"
-            onError={(event) => { event.currentTarget.style.display = "none"; }}
-            style={{ width: "100%", height: "100%", minHeight: 220, objectFit: "cover", borderRadius: 14, border: "1px solid #e2e8f0" }}
-          />
-        </div>
       </section>
 
       <section style={card}>
