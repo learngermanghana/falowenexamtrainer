@@ -187,7 +187,10 @@ describe("public class brochure experience", () => {
     expect(download).toContain("fullAccessMonths");
     expect(download).toContain("installmentAccessMonths");
     expect(download).toContain("isSelfLearning");
-    expect(download).toContain("pdf-track-record");
+    expect(download).not.toContain('<section class="pdf-track-record">');
+    expect(download).toContain('class="pdf-page pdf-page-three"');
+    expect(download).toContain("pdf-location-hero");
+    expect(download).toContain("pdf-classroom-photo");
     expect(download).toContain("academyProfile");
     expect(download).toContain("High exam pass rate");
     expect(download).not.toContain("Includes six months of Falowen access");
