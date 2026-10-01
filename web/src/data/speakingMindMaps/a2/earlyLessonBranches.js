@@ -337,5 +337,5 @@ export const earlyA2LessonBranchesByDay = {
       "Wir möchten bitte ...",
       "Wir möchten bitte zahlen. Können wir zusammen bezahlen?",
     ),
-
+  ],
 };
