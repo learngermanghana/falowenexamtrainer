@@ -194,7 +194,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
       </section>
 
       <section style={{ ...card, overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.2fr) minmax(240px, .8fr)", gap: 16, alignItems: "stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16, alignItems: "stretch" }}>
           <div style={{ display: "grid", gap: 10, alignContent: "center" }}>
             <div style={{ color: "#1d4ed8", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>Visit LLEA</div>
             <h2 style={{ margin: 0 }}>Find the classroom without calling for directions</h2>
