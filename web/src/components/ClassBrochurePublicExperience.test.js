@@ -69,17 +69,12 @@ describe("public class brochure experience", () => {
     expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
   });
 
-  test("student reviews follow the visible academy track record and lead card", () => {
+  test("student reviews sit after course and payment details", () => {
     const reviews = publicClassFile("brochure-footer-reviews.js");
-    const trackIndex = reviews.indexOf('const trackRecord = document.getElementById("academyTrackRecordCard")');
-    const leadIndex = reviews.indexOf('const leadCard = document.getElementById("leadCaptureCard")');
-    const anchorIndex = reviews.indexOf("const anchor =");
-    const preferredTrackIndex = reviews.indexOf("trackRecord\n      || leadCard");
 
-    expect(trackIndex).toBeGreaterThan(-1);
-    expect(leadIndex).toBeGreaterThan(trackIndex);
-    expect(anchorIndex).toBeGreaterThan(leadIndex);
-    expect(preferredTrackIndex).toBeGreaterThan(anchorIndex);
+    expect(reviews).toContain('const courseDetails = document.getElementById("courseDetailsDisclosure")');
+    expect(reviews).toContain('const agreement = document.getElementById("payment-agreement-section")');
+    expect(reviews).not.toContain('const trackRecord = document.getElementById("academyTrackRecordCard")');
   });
 
   test("brochure schedule titles come from generated canonical curriculum, not a manual lesson table", () => {
@@ -153,6 +148,21 @@ describe("public class brochure experience", () => {
     expect(enhancements).not.toContain('id="heroRegisterCta"');
   });
 
+  test("legacy brochure scripts do not override the cleaned detail hierarchy", () => {
+    const hero = publicClassFile("class-hero-banner.js");
+    const location = publicClassFile("class-location-details.js");
+    const download = publicClassFile("brochure-download-visible.js");
+    const faq = publicClassFile("brochure-faq.js");
+
+    expect(hero).toContain('link.textContent = "Register for this class"');
+    expect(hero).toContain('cta.textContent = "Register for this class"');
+    expect(hero).not.toContain('cta.textContent = "Register Now"');
+    expect(location).toContain('document.getElementById("classDecisionSummary")');
+    expect(download).toContain('document.querySelector(".decision-summary-actions")');
+    expect(download).toContain("grid-column: 1 / -1");
+    expect(faq).toContain('const academy = document.getElementById("academyTrackRecordCard")');
+  });
+
   test("synthetic enquiry classes hand signup a supported level instead of an unresolved class slug", () => {
     const flow = publicClassFile("class-simple-flow.js");
     const enhancements = publicClassFile("brochure-enhancements.js");
@@ -180,6 +190,12 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("Progress tracking");
     expect(enhancements).toContain("Exam preparation");
     expect(enhancements).toContain("More course & payment details");
+    expect(enhancements).toContain("function enforceBrochureOrder()");
+    expect(enhancements).toContain("Meeting times & class schedule");
+    expect(enhancements).toContain("mergeMeetingAndSchedule");
+    expect(enhancements).toContain("brochure-detail-clean");
+    expect(enhancements).toContain("document.getElementById(\"classLocationCard\")?.remove()");
+    expect(enhancements).not.toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("Attend in person in Awoshie");
     expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
