@@ -47,6 +47,24 @@ export const getA2B1WorkbookSectionProfile = (level, day) => {
   };
 };
 
+export const getA2B1WorkbookIncludedSectionLabels = (level, day) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
+  const normalizedDay = Number(day);
+  if (!["A2", "B1"].includes(normalizedLevel) || !Number.isInteger(normalizedDay) || normalizedDay < 1 || normalizedDay > 28) {
+    return [];
+  }
+
+  const profile = getA2B1WorkbookSectionProfile(normalizedLevel, normalizedDay);
+  const labels = [];
+  if (profile.grammar) labels.push("Grammar");
+  if (profile.speaking) labels.push("Sprechen");
+  if (profile.writing) labels.push("Schreiben");
+  if (profile.reading) labels.push("Lesen");
+  if (profile.part4 === "listening") labels.push("Hören");
+  if (profile.part4 === "reading" && !labels.includes("Lesen")) labels.push("Lesen");
+  return labels;
+};
+
 export const filterA2B1WorkbookTabsByProfile = (tabs = [], profile = {}) =>
   tabs.reduce((visibleTabs, tab) => {
     if (tab?.key === "hoeren" && profile.part4 === "reading" && profile.reading !== false) {

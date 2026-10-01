@@ -23,6 +23,7 @@ import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
 import { getC2SkillLabel } from "../data/c2SkillCycle";
 import { getB2SkillLabel } from "../data/b2SkillCycle";
 import { getTimedAssignmentConfig, getTimedAssignmentPhase } from "../data/timedAssignmentConfig";
+import { getA2B1WorkbookIncludedSectionLabels } from "./a2B1WorkbookSectionProfile";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -219,6 +220,9 @@ const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
 
 const getCourseBookEntryTitle = (entry = {}) =>
   String(entry.lessonTitle || entry.topic || entry.title || entry.chapter || `Day ${getCourseBookDisplayDay(entry)}`).trim();
+
+export const getA2B1CourseBookIncludedSections = (level, entry = {}) =>
+  getA2B1WorkbookIncludedSectionLabels(level, getCourseBookDisplayDay(entry));
 
 const formatCourseBookInstruction = (instruction = "") =>
   String(instruction || "")
@@ -550,6 +554,9 @@ const courseBookStyles = {
   dayBubble: { minWidth: 72, minHeight: 48, padding: "6px 8px", borderRadius: 16, background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8", display: "grid", placeItems: "center", flexShrink: 0, fontWeight: 900, lineHeight: 1.1, textAlign: "center", fontSize: 12 },
   lessonTitle: { margin: 0, fontSize: 17, lineHeight: 1.25, color: "#0f172a" },
   lessonMeta: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 },
+  includedRow: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 8 },
+  includedLabel: { color: "#64748b", fontSize: 12, fontWeight: 800 },
+  includedChip: { display: "inline-flex", alignItems: "center", borderRadius: 999, padding: "4px 8px", background: "#f8fafc", border: "1px solid #dbeafe", color: "#1e3a8a", fontSize: 11, fontWeight: 800 },
   chip: { display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 999, padding: "5px 9px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 700 },
   statusChip: { display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" },
   lessonActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
@@ -1263,6 +1270,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   ) : null}
                   {lessons.map((entry) => {
                     const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
+                    const includedSections = usesSharedA2B1Design
+                      ? getA2B1CourseBookIncludedSections(normalizedSelectedCourseLevel, entry)
+                      : [];
                     const practiceState = practiceProgress[entry.assignmentKey] || {};
                     const canonicalSelfLearningState = !isC2CourseBook && isSelfLearningLevel
                       ? courseCompletion?.states?.find((item) => Number(item.requirement?.day) === Number(entry.day)) || null
@@ -1299,6 +1309,19 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                   </span>
                                 ) : null}
                               </div>
+                              {includedSections.length ? (
+                                <div
+                                  className="course-book-included"
+                                  data-coursebook-included={includedSections.join("|")}
+                                  style={courseBookStyles.includedRow}
+                                  aria-label={`Included in this day: ${includedSections.join(", ")}`}
+                                >
+                                  <span style={courseBookStyles.includedLabel}>Included:</span>
+                                  {includedSections.map((section) => (
+                                    <span key={section} style={courseBookStyles.includedChip}>{section}</span>
+                                  ))}
+                                </div>
+                              ) : null}
                               {!entry.isTutorMarked ? (
                                 isC2CourseBook ? (() => {
                                   const dayProgress = c2ProgressByDay[Number(entry.day)] || {};

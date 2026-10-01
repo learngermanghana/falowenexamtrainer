@@ -2,7 +2,10 @@ import {
   STANDARD_WORKBOOK_TABS,
   getWorkbookTabsWithLegacyGrammar,
 } from "./StandardWorkbookComponents";
-import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
+import {
+  getA2B1WorkbookIncludedSectionLabels,
+  getA2B1WorkbookSectionProfile,
+} from "./a2B1WorkbookSectionProfile";
 
 const tabsFor = (ariaLabel) =>
   getWorkbookTabsWithLegacyGrammar({
@@ -70,6 +73,35 @@ describe("A2/B1 workbook section profiles", () => {
     expect(profile.part4).toBeNull();
     expect(profile.part4Submission).toBe("none");
     expect(tabs).not.toContain("hoeren");
+  });
+
+  test("shows the actual included skills for A2 and B1 Course Book day cards", () => {
+    expect(getA2B1WorkbookIncludedSectionLabels("A2", 7)).toEqual([
+      "Grammar",
+      "Sprechen",
+      "Schreiben",
+      "Lesen",
+      "Hören",
+    ]);
+
+    expect(getA2B1WorkbookIncludedSectionLabels("A2", 14)).toEqual([
+      "Grammar",
+      "Sprechen",
+      "Lesen",
+    ]);
+
+    expect(getA2B1WorkbookIncludedSectionLabels("B1", 22)).toEqual([
+      "Grammar",
+      "Sprechen",
+      "Lesen",
+    ]);
+
+    expect(getA2B1WorkbookIncludedSectionLabels("B1", 23)).toEqual([
+      "Grammar",
+      "Sprechen",
+      "Schreiben",
+      "Lesen",
+    ]);
   });
 
   test("unknown tabs are preserved so page-specific extensions remain safe", () => {
