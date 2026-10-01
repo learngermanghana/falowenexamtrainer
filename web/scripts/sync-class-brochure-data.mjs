@@ -8,6 +8,7 @@ const webRoot = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(webRoot, "..");
 const classCatalogPath = path.join(webRoot, "src", "data", "classCatalog.js");
 const academyProfilePath = path.join(webRoot, "src", "data", "publicAcademyProfile.json");
+const levelFeesPath = path.join(webRoot, "src", "data", "levelFees.js");
 const curriculumPath = path.join(repoRoot, "shared", "curriculumCanonical.json");
 const outputPath = path.join(webRoot, "public", "classes", "classes-data.json");
 
@@ -18,6 +19,14 @@ const source = fs
 const classCatalog = new Function(`${source}\nreturn classCatalog;`)();
 
 const academyProfile = JSON.parse(fs.readFileSync(academyProfilePath, "utf8"));
+const levelFeesSource = fs.readFileSync(levelFeesPath, "utf8");
+const levelFeesLiteral = levelFeesSource.match(/export const LEVEL_FEES = (\{[\s\S]*?\n\});/)?.[1];
+const minimumInstallmentMatch = levelFeesSource.match(/export const MIN_INSTALLMENT_GHS = (\d+);/);
+if (!levelFeesLiteral || !minimumInstallmentMatch) {
+  throw new Error("Could not read canonical tuition settings from src/data/levelFees.js");
+}
+const tuitionGhsByLevel = new Function(`return (${levelFeesLiteral});`)();
+const minimumInstallmentGhs = Number(minimumInstallmentMatch[1]);
 const curriculum = JSON.parse(fs.readFileSync(curriculumPath, "utf8"));
 
 const curriculumByLevel = curriculum.reduce((acc, entry) => {
@@ -94,7 +103,7 @@ const data = {
   },
   payment: {
     redirectUrl: "https://www.falowen.app/payment-complete",
-    minimumInstallmentGhs: 2000,
+    minimumInstallmentGhs,
     paystackBaseLinks: {
       A1: "https://paystack.shop/pay/yzz468-lbj",
       A2: "https://paystack.shop/pay/1navy7uihs",
@@ -112,7 +121,7 @@ const data = {
     selfLearningFormat: "Self-learning with AI assistant and tutor support by email",
     selfLearningLocation: "Online",
     scheduleBaseUrl: "https://admin.falowen.app/course-schedule/public",
-    tuitionGhsByLevel: { A1: 3000, A2: 3000, B1: 3000, B2: 3000, C1: 3000 },
+    tuitionGhsByLevel,
     totalSessionsByLevel: { A1: 24, A2: 28, B1: 28, B2: 28, C1: 28 },
     sessionMinutesByLevel: { A1: 60, A2: 90, B1: 90, B2: 60, C1: 60 },
     highlightsByLevel: {
