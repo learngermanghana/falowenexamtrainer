@@ -27,13 +27,17 @@ describe("Falowen class brochure download", () => {
     expect(source).toContain("new MutationObserver(scheduleEnsure)");
   });
 
-  test("generates a branded two-page PDF with a print fallback", () => {
+  test("generates a branded three-page live-class PDF with location support and a print fallback", () => {
     const source = publicClassFile("brochure-download.js");
 
     expect(source).toContain("html2canvas@1.4.1");
     expect(source).toContain("jspdf@2.5.2");
     expect(source).toContain('class="pdf-page pdf-page-one"');
     expect(source).toContain('class="pdf-page pdf-page-two"');
+    expect(source).toContain('class="pdf-page pdf-page-three"');
+    expect(source).toContain("qrcode@1.5.4");
+    expect(source).toContain("pdfMapsQr");
+    expect(source).toContain("classroomImage");
     expect(source).toContain("pdf.save(`${slugify(data.classTitle)}-falowen-brochure.pdf`)");
     expect(source).toContain("Full course fee");
     expect(source).toContain("Four simple steps");
