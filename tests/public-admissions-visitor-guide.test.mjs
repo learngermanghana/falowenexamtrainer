@@ -32,8 +32,10 @@ test("visitor guide explains school, selected class, learning flow and actions",
   assert.ok(page.indexOf("Visit LLEA") < page.indexOf("Why students study with us"));
   assert.match(page, /View class brochure/);
   assert.match(page, /Register now/);
-  assert.match(page, /Felix Asadu/);
-  assert.match(page, /Catherine Agbleze Etornam/);
+  assert.match(page, /academyProfile\.team/);
+  assert.match(page, /Teaching in practice/);
+  assert.match(page, /Useful links/);
+  assert.match(page, /publicLinkCopy/);
   assert.match(page, /visitor_guide_open/);
   assert.match(page, /brochure_open/);
   assert.match(page, /registration_click/);
@@ -81,4 +83,34 @@ test("shared visitor-guide links preserve class and lead context without authent
   assert.match(page, /selectedClass.*requestedSlug/s);
   assert.match(engagement, /params\.get\("ref"\)/);
   assert.match(page, /visitor_guide_open/);
+});
+
+test("shared academy profile contains the current team, teaching media and public links", () => {
+  const profile = JSON.parse(read("web/src/data/publicAcademyProfile.json"));
+
+  assert.equal(profile.classroomImage, "/classes/media/classroom.png");
+  assert.equal(profile.links.blog, "https://blog.falowen.app");
+  assert.equal(profile.links.linkedin, "https://www.linkedin.com/in/learngermanghana/");
+  assert.equal(profile.links.youtube, "https://www.youtube.com/@LLEAGhana");
+  assert.equal(profile.links.contractAgreement, "https://register.falowen.app/");
+
+  assert.deepEqual(profile.team.map((member) => member.name), [
+    "Felix Asadu",
+    "Catherine Agbleze Etornam",
+    "Sabina Michel",
+    "Hana",
+  ]);
+  assert.equal(profile.team.find((member) => member.name === "Catherine Agbleze Etornam")?.image, null);
+  assert.match(profile.team.find((member) => member.name === "Sabina Michel")?.role || "", /German Teacher/);
+  assert.match(profile.team.find((member) => member.name === "Hana")?.role || "", /Global Mobility Specialist/);
+  assert.equal(profile.teachingGallery.length, 2);
+
+  [
+    "web/public/classes/media/classroom.png",
+    "web/public/classes/media/felix-asadu.png",
+    "web/public/classes/media/felix-zoom.png",
+    "web/public/classes/media/sabina-michel.png",
+    "web/public/classes/media/sabina-teaching.png",
+    "web/public/classes/media/hana.webp",
+  ].forEach((relativePath) => assert.ok(fs.existsSync(path.join(root, relativePath))));
 });
