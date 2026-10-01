@@ -10,6 +10,7 @@ import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
+import LegalFooter from "./LegalFooter";
 import { persistInterfaceLanguage } from "../i18n";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
@@ -683,6 +684,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             {mode === "login" ? "Create account" : "Go to login"}
           </button>
         </div>
+        <LegalFooter compact />
       </div>
     </div>
   );
