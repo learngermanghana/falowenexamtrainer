@@ -26,7 +26,7 @@ describe("public class brochure experience", () => {
           blog: "https://blog.falowen.app",
           linkedin: "https://www.linkedin.com/in/learngermanghana/",
           youtube: "https://www.youtube.com/@LLEAGhana",
-          contractAgreement: "https://register.falowen.app/",
+          contractAgreement: "https://legal.falowen.app/",
         }),
       }),
     );
