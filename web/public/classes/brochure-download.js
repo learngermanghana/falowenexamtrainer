@@ -3,7 +3,7 @@
   const JSPDF_URL = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
   const QRCODE_URL = "https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js";
   const DEFAULT_LOCATION = "Awoshie, Accra, Ghana";
-  const DEFAULT_WHATSAPP = "233205706589";
+  const DEFAULT_WHATSAPP = "233241113054";
 
   const text = (selector, fallback = "") =>
     String(document.querySelector(selector)?.textContent || fallback).replace(/\s+/g, " ").trim();
@@ -400,7 +400,7 @@
           <section class="pdf-arrival-panel">
             <div><strong>Before class</strong><span>Open the map link, check your route and plan to arrive early for in-person lessons.</span></div>
             <div><strong>Hybrid option</strong><span>If needed, students can also join online according to the class arrangement.</span></div>
-            <div><strong>Need help?</strong><span>WhatsApp 233205706589 · info@falowen.app</span></div>
+            <div><strong>Need help?</strong><span>WhatsApp 233241113054 · info@falowen.app</span></div>
           </section>
 
           <footer class="pdf-page-footer"><span>${escapeHtml(academyProfile.academyName || "Learn Language Education Academy")}</span><span>Page 3 of 3</span></footer>
