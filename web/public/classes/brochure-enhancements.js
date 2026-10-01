@@ -203,7 +203,10 @@
       anchor.insertAdjacentElement("afterend", details);
     }
 
-    details.open = window.matchMedia("(min-width: 761px)").matches;
+    if (details.dataset.responsiveInitialised !== "true") {
+      details.open = window.matchMedia("(min-width: 761px)").matches;
+      details.dataset.responsiveInitialised = "true";
+    }
     const content = details.querySelector(".course-details-content");
     ["paymentGuidanceCard", "afterSignupCard", "whoForCard"].forEach((id) => {
       const node = document.getElementById(id);
