@@ -131,14 +131,16 @@
   }
 
   function addDecisionSummary() {
-    const hero = document.querySelector(".hero");
-    if (!hero) return;
+    const classHeaderCard = document.querySelector(".class-main-card") || document.getElementById("class-summary");
+    if (!classHeaderCard) return;
     let card = document.getElementById("classDecisionSummary");
     if (!card) {
       card = document.createElement("section");
       card.id = "classDecisionSummary";
       card.className = "card class-decision-summary";
-      hero.insertAdjacentElement("afterend", card);
+    }
+    if (classHeaderCard.nextElementSibling !== card) {
+      classHeaderCard.insertAdjacentElement("afterend", card);
     }
 
     const course = window.currentBrochureCourse || {};
@@ -174,14 +176,18 @@
   }
 
   function addCourseBenefits() {
+    const decisionSummary = document.getElementById("classDecisionSummary");
     const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
-    if (!classSummary) return;
+    const anchor = decisionSummary || classSummary;
+    if (!anchor) return;
     let card = document.getElementById("courseBenefitsCard");
     if (!card) {
       card = document.createElement("section");
       card.id = "courseBenefitsCard";
       card.className = "card course-benefits-card";
-      classSummary.insertAdjacentElement("afterend", card);
+    }
+    if (anchor.nextElementSibling !== card) {
+      anchor.insertAdjacentElement("afterend", card);
     }
     card.innerHTML = `
       <div>
@@ -245,6 +251,12 @@
       .class-blue-title { font-size: clamp(30px, 8vw, 38px); margin-bottom: 10px; }
       .class-body { padding: 18px; gap: 14px; }
       #classFormat, #classPills, #highlights, #payment { display: none !important; }
+      body.post-lead-class-detail .class-main-card .class-body { display: none !important; }
+      body.post-lead-class-detail .class-main-card { overflow: hidden; }
+      .meeting-schedule-actions { margin-top: 12px; display: grid; gap: 8px; }
+      .meeting-schedule-actions p { margin: 0; color: #475569; font-size: 13px; line-height: 1.5; }
+      .meeting-schedule-actions .button { width: 100%; }
+
       .class-tabs { padding-bottom: 4px; }
       .class-tab { padding: 8px 11px; font-size: 13px; }
       .notice { font-size: 14px; }
@@ -314,7 +326,7 @@
         .academy-school-reference-action { width: fit-content; }
       }
       @media (max-width: 760px) {
-        .intro-video, #brochureToc, .class-main-card { display: none !important; }
+        .intro-video, #brochureToc { display: none !important; }
         .class-decision-summary { margin-top: 10px; }
         .decision-summary-actions { grid-template-columns: 1fr; }
         .decision-secondary-action { justify-self: start; }
@@ -573,11 +585,9 @@
       return;
     }
 
-    const benefits = document.getElementById("courseBenefitsCard");
-    const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
-    const anchorNode = benefits || classSummary || document.querySelector(".page");
-    if (!anchorNode || anchorNode === card) return;
-    if (anchorNode.nextElementSibling !== card) anchorNode.insertAdjacentElement("afterend", card);
+    const page = document.querySelector(".page");
+    if (!page) return;
+    if (!card.isConnected) page.appendChild(card);
   }
 
   function addAfterSignupCard() {
@@ -625,20 +635,61 @@
     card.innerHTML = `<h3>Who this class is for</h3><p>${text}</p>`;
   }
 
-  function simplifyScheduleCard() {
-    const scheduleList = document.getElementById("scheduleList");
-    const card = scheduleList?.closest(".card");
+  function mergeMeetingAndSchedule() {
+    const meetingRows = document.getElementById("meetingRows");
+    const meetingCard = meetingRows?.closest(".card");
     const hiddenScheduleLink = document.getElementById("scheduleLink");
-    if (!card || !hiddenScheduleLink || card.dataset.simpleSchedule === "true") return;
+    if (!meetingCard) return;
 
-    const href = hiddenScheduleLink.getAttribute("href") || "#";
-    card.classList.add("schedule-simple-card");
-    card.innerHTML = `
-      <h2>Class schedule</h2>
-      <p>Open the full class schedule to see all lessons, dates, topics, start date, end date, and meeting times.</p>
-      <a class="button class-schedule-cta" href="${href}" target="_blank" rel="noreferrer">Open class schedule</a>
+    meetingCard.id = "meeting-times-section";
+    const heading = meetingCard.querySelector("h2");
+    if (heading) heading.textContent = "Meeting times & class schedule";
+
+    let actions = meetingCard.querySelector(".meeting-schedule-actions");
+    if (!actions) {
+      actions = document.createElement("div");
+      actions.className = "meeting-schedule-actions";
+      meetingCard.appendChild(actions);
+    }
+
+    const href = hiddenScheduleLink?.getAttribute("href") || "#";
+    actions.innerHTML = `
+      <p>These are the weekly meeting times. Open the full schedule for lesson dates, topics, holidays, start date and end date.</p>
+      <a class="button class-schedule-cta" href="${href}" ${href !== "#" ? 'target="_blank" rel="noreferrer"' : ""}>Open full class schedule</a>
     `;
-    card.dataset.simpleSchedule = "true";
+
+    const scheduleList = document.getElementById("scheduleList");
+    const scheduleCard = scheduleList?.closest(".card") || document.getElementById("class-schedule-section");
+    if (scheduleCard && scheduleCard !== meetingCard) {
+      const wrapper = scheduleCard.parentElement;
+      scheduleCard.remove();
+      if (wrapper?.classList?.contains("grid") && !wrapper.querySelector(".card")) wrapper.remove();
+    }
+  }
+
+  function enforceBrochureOrder() {
+    const page = document.querySelector(".page");
+    const classHeader = document.querySelector(".class-main-card") || document.getElementById("class-summary");
+    if (!page || !classHeader || !document.body.classList.contains("post-lead-class-detail")) return;
+
+    const decision = document.getElementById("classDecisionSummary");
+    const benefits = document.getElementById("courseBenefitsCard");
+    const meeting = document.getElementById("meeting-times-section");
+    const details = document.getElementById("courseDetailsDisclosure");
+    const agreement = document.getElementById("payment-agreement-section");
+    const reviews = document.getElementById("studentReviewsCard");
+    const academy = document.getElementById("academyTrackRecordCard");
+    const faq = document.getElementById("faq-section");
+    const footer = document.getElementById("classBrochureFooter");
+
+    const ordered = [decision, benefits, meeting, details, agreement, reviews, academy, faq, footer].filter(Boolean);
+    let anchor = classHeader;
+    ordered.forEach((node) => {
+      if (anchor.nextElementSibling !== node) anchor.insertAdjacentElement("afterend", node);
+      anchor = node;
+    });
+
+    document.getElementById("classLocationCard")?.remove();
   }
 
   function updateAgreementTerms() {
@@ -724,14 +775,15 @@
     addCourseBenefits();
     groupSecondaryCourseDetails();
     addTrackRecordCard();
-    simplifyScheduleCard();
+    mergeMeetingAndSchedule();
     tagSections();
     enhanceAgreement();
     applySignupLinks();
     removeStickyMobileRegisterBar();
+    enforceBrochureOrder();
   }
 
   window.addEventListener("load", runEnhancements);
   window.addEventListener("falowen:brochure-rendered", runEnhancements);
-  [100, 350, 800, 1500].forEach((delay) => setTimeout(runEnhancements, delay));
+  [100, 350, 800, 1500, 2400, 4200].forEach((delay) => setTimeout(runEnhancements, delay));
 })();
