@@ -37,7 +37,7 @@ describe("B2 media reset after the topic redesign", () => {
     });
   });
 
-  test("keeps only the B2 Day 0 onboarding video", () => {
+  test("keeps the B2 Day 0 onboarding video and the approved Day 28 AI video", () => {
     const day0 = getAdditionalLessonVideoResources("B2", 0);
     expect(day0[0]).toEqual(
       expect.objectContaining({
@@ -45,6 +45,15 @@ describe("B2 media reset after the topic redesign", () => {
         url: "https://youtu.be/AH2dPdqjfTo",
       }),
     );
+
+    const day28 = getAdditionalLessonVideoResources("B2", 28);
+    expect(day28).toEqual([
+      expect.objectContaining({
+        key: "b2-day28-chapter-6-3-ai-video",
+        chapter: "6.3",
+        url: "https://youtu.be/aJSSD0bohD0",
+      }),
+    ]);
   });
 
   test("active B2 media source files no longer contain retired topic-video identifiers", () => {
