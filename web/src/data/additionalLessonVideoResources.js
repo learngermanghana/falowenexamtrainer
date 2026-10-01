@@ -217,6 +217,16 @@ const ADDITIONAL_LESSON_VIDEO_RESOURCES = {
         url: "https://youtu.be/AH2dPdqjfTo",
       },
     ],
+    28: [
+      {
+        key: "b2-day28-chapter-6-3-ai-video",
+        chapter: "6.3",
+        title: "B2 Day 28 · Gesellschaft im Wandel – Prüfungstraining · AI video",
+        description:
+          "AI video lesson for the final B2 review and exam-training focus in Chapter 6.3.",
+        url: "https://youtu.be/aJSSD0bohD0",
+      },
+    ],
   },
   C1: {
     5: [
