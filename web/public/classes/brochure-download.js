@@ -385,6 +385,7 @@
           <section class="pdf-classroom-photo">
             ${data.classroomImage ? `<img class="pdf-classroom-image" src="${escapeHtml(data.classroomImage)}" alt="Learn Language Education Academy classroom" crossorigin="anonymous" />` : ""}
             <div class="pdf-classroom-fallback">LLEA classroom photo</div>
+                      <div class="pdf-classroom-caption">LLEA classroom · Awoshie, Accra</div>
           </section>
 
           <section class="pdf-map-panel">
@@ -506,6 +507,7 @@
       .pdf-classroom-photo { height: 390px; border-radius: 20px; overflow: hidden; background: #e2e8f0; border: 1px solid #cbd5e1; position: relative; }
       .pdf-classroom-image { width: 100%; height: 100%; object-fit: cover; display: block; }
       .pdf-classroom-fallback { display: none; width: 100%; height: 100%; place-items: center; color: #64748b; font-size: 14px; font-weight: 800; }
+      .pdf-classroom-caption { position: absolute; left: 14px; bottom: 14px; border-radius: 999px; padding: 7px 10px; background: rgba(15,23,42,.86); color: #ffffff; font-size: 9px; font-weight: 900; }
       .pdf-map-panel { display: grid; grid-template-columns: 1fr 150px; gap: 16px; align-items: center; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; }
       .pdf-map-url { margin-top: 10px; border-radius: 10px; background: #f8fafc; padding: 10px; font-size: 9px; line-height: 1.4; overflow-wrap: anywhere; color: #1d4ed8; font-weight: 800; }
       .pdf-maps-qr { width: 150px; height: 150px; border: 1px solid #dbeafe; border-radius: 14px; background: #ffffff; display: grid; place-items: center; overflow: hidden; }
