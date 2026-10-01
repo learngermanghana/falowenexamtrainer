@@ -143,6 +143,7 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("classDecisionSummary");
     expect(enhancements).toContain("decisionScheduleCta");
     expect(enhancements).toContain("Open Google Maps");
+    expect(enhancements).toContain("Falowen access with full payment");
     expect(enhancements).not.toContain('id="heroRegisterCta"');
   });
 
@@ -174,7 +175,7 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("Exam preparation");
     expect(enhancements).toContain("More course & payment details");
     expect(enhancements).toContain("Attend in person in Awoshie");
-    expect(enhancements).toContain(".intro-video, #brochureToc { display: none !important; }");
+    expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
     expect(enhancements).toContain("High exam pass rate");
     expect(enhancements).toContain("Established");
