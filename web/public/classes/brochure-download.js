@@ -565,28 +565,29 @@
   }
 
   async function prepareLocationPage(brochure, data) {
+    const locationPage = brochure.querySelector(".pdf-page-three");
     const image = brochure.querySelector(".pdf-classroom-image");
-    const fallback = brochure.querySelector(".pdf-classroom-fallback");
+    let classroomImageReady = false;
+
     if (image) {
-      await new Promise((resolve) => {
-        const finish = () => resolve();
+      classroomImageReady = await new Promise((resolve) => {
         if (image.complete) {
-          if (!image.naturalWidth) {
-            image.style.display = "none";
-            if (fallback) fallback.style.display = "grid";
-          }
-          finish();
+          resolve(Boolean(image.naturalWidth));
           return;
         }
-        image.addEventListener("load", finish, { once: true });
-        image.addEventListener("error", () => {
-          image.style.display = "none";
-          if (fallback) fallback.style.display = "grid";
-          finish();
-        }, { once: true });
+        image.addEventListener("load", () => resolve(true), { once: true });
+        image.addEventListener("error", () => resolve(false), { once: true });
       });
-    } else if (fallback) {
-      fallback.style.display = "grid";
+    }
+
+    if (locationPage && !classroomImageReady) {
+      locationPage.remove();
+      const pages = brochure.querySelectorAll(".pdf-page");
+      pages.forEach((page, index) => {
+        const pageNumber = page.querySelector(".pdf-page-footer span:last-child");
+        if (pageNumber) pageNumber.textContent = `Page ${index + 1} of ${pages.length}`;
+      });
+      return;
     }
 
     const qrTarget = brochure.querySelector("#pdfMapsQr");
