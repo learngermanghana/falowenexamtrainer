@@ -21,7 +21,13 @@ describe("public class brochure experience", () => {
         germanLevels: "A1–C2",
         examPassHeadline: "High exam pass rate",
         mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-        classroomImage: "/classes/llea-classroom.jpg",
+        classroomImage: "/classes/media/classroom.png",
+        links: expect.objectContaining({
+          blog: "https://blog.falowen.app",
+          linkedin: "https://www.linkedin.com/in/learngermanghana/",
+          youtube: "https://www.youtube.com/@LLEAGhana",
+          contractAgreement: "https://legal.falowen.app/",
+        }),
       }),
     );
     expect(data.coursePolicy).toEqual(
@@ -177,6 +183,8 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("Attend in person in Awoshie");
     expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
+    expect(enhancements).toContain("academy-trust-links");
+    expect(enhancements).toContain("Contract agreement");
     expect(enhancements).toContain("High exam pass rate");
     expect(enhancements).toContain("Established");
     expect(faq).toContain("window.FalowenClassBrochureData?.coursePolicy");
