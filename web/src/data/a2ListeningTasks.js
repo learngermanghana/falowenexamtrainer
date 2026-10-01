@@ -97,14 +97,14 @@ export const A2_LISTENING_TASKS = {
   8: {
     chapter: "3.8",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Sieh dir das eingebettete Video zum Thema Rezepte und Essen an. Achte auf den Tag, die Zutaten, den Ort und das Gericht. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/mYh4DRaaWSY",
+    task: "Höre den Dialog im Restaurant. Achte auf Personen, Getränke, Empfehlungen, vegetarische Optionen und die Vorspeise. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
+    audioUrl: "https://www.youtube.com/watch?v=dPnA5g9S2dA",
     questions: [
-      { stem: "Wann gehen die Personen einkaufen oder kochen zusammen?", options: ["a) Montag", "b) Samstag", "c) Mittwoch"] },
-      { stem: "Was kaufen sie?", options: ["a) Fleisch und Fisch", "b) Obst und Gemüse", "c) Brot und Käse"] },
-      { stem: "Welche Zutat wird im Hörtext genannt?", options: ["a) Reis", "b) Mozzarella", "c) Kartoffeln"] },
-      { stem: "Was machen sie danach?", options: ["a) Sie gehen ins Kino", "b) Sie gehen in ein Café", "c) Sie gehen in die Schule"] },
-      { stem: "Welches Gericht wird genannt?", options: ["a) Gemüselasagne", "b) Bratwurst mit Sauerkraut", "c) Fischsuppe"] },
+      { stem: "Für wie viele Personen ist der Tisch?", options: ["a) Für eine Person", "b) Für zwei Personen", "c) Für drei Personen"] },
+      { stem: "Was bestellt die Freundin zu trinken?", options: ["a) Ein Glas Wasser", "b) Eine Cola", "c) Einen Kaffee"] },
+      { stem: "Welches Gericht empfiehlt der Kellner?", options: ["a) Pizza Margherita", "b) Rindersteak mit Bratkartoffeln", "c) Kartoffelsuppe"] },
+      { stem: "Welche vegetarische Option wird genannt?", options: ["a) Gemüselasagne", "b) Fischfilet", "c) Rindersteak"] },
+      { stem: "Was bestellen sie als Vorspeise?", options: ["a) Einen Salat", "b) Knoblauchbrot", "c) Eine Suppe"] },
     ],
   },
   9: {
