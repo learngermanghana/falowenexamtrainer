@@ -102,8 +102,10 @@
   function addFaqSection() {
     const existing = document.getElementById("faq-section");
     if (existing) existing.remove();
+    const academy = document.getElementById("academyTrackRecordCard");
+    const reviews = document.getElementById("studentReviewsCard");
     const agreement = document.getElementById("payment-agreement-section") || document.getElementById("agreementCard");
-    const anchor = agreement || document.querySelector(".page > section:last-of-type") || document.querySelector(".page");
+    const anchor = academy || reviews || agreement || document.querySelector(".page > section:last-of-type") || document.querySelector(".page");
     if (!anchor) return;
 
     const section = document.createElement("section");

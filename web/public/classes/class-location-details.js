@@ -65,6 +65,10 @@
   }
 
   function addLocationCard() {
+    if (document.getElementById("classDecisionSummary")) {
+      document.getElementById("classLocationCard")?.remove();
+      return;
+    }
     const modeCard = document.getElementById("classModeCard");
     const scheduleButton = document.getElementById("classScheduleCta");
     const signupButton = document.getElementById("mainSignupCta");

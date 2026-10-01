@@ -8,9 +8,9 @@
     style.textContent = `
       #downloadBrochureButton.brochure-download-cta {
         width: 100%;
-        min-height: 50px;
-        grid-column: 1;
-        font-size: 17px;
+        min-height: 46px;
+        grid-column: 1 / -1;
+        font-size: 15px;
       }
     `;
     document.head.appendChild(style);
@@ -18,6 +18,7 @@
 
   function getPreferredAnchor() {
     return (
+      document.querySelector(".decision-summary-actions") ||
       document.getElementById("classScheduleCta") ||
       document.getElementById("mainSignupCta") ||
       document.querySelector(".class-main-card .class-body") ||
@@ -41,6 +42,13 @@
     button.className = "button amber brochure-download-cta";
     button.hidden = false;
     button.style.display = "inline-flex";
+
+    if (anchor.classList?.contains("decision-summary-actions")) {
+      if (button.parentElement !== anchor || anchor.lastElementChild !== button) {
+        anchor.appendChild(button);
+      }
+      return;
+    }
 
     if (anchor.id === "classScheduleCta" || anchor.id === "mainSignupCta") {
       if (anchor.nextElementSibling !== button) {
