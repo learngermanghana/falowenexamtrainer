@@ -23,7 +23,7 @@ import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
 import { getC2SkillLabel } from "../data/c2SkillCycle";
 import { getB2SkillLabel } from "../data/b2SkillCycle";
 import { getTimedAssignmentConfig, getTimedAssignmentPhase } from "../data/timedAssignmentConfig";
-import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
+import { getA2B1WorkbookIncludedSectionLabels } from "./a2B1WorkbookSectionProfile";
 import "./CourseTabResponsive.css";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -221,26 +221,8 @@ const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
 const getCourseBookEntryTitle = (entry = {}) =>
   String(entry.lessonTitle || entry.topic || entry.title || entry.chapter || `Day ${getCourseBookDisplayDay(entry)}`).trim();
 
-export const getA2B1CourseBookIncludedSections = (level, entry = {}) => {
-  const normalizedLevel = String(level || "").trim().toUpperCase();
-  const day = Number(getCourseBookDisplayDay(entry));
-
-  if (!["A2", "B1"].includes(normalizedLevel) || !Number.isInteger(day) || day < 1 || day > 28) {
-    return [];
-  }
-
-  const profile = getA2B1WorkbookSectionProfile(normalizedLevel, day);
-  const labels = [];
-
-  if (profile.grammar) labels.push("Grammar");
-  if (profile.speaking) labels.push("Sprechen");
-  if (profile.writing) labels.push("Schreiben");
-  if (profile.reading) labels.push("Lesen");
-  if (profile.part4 === "listening") labels.push("Hören");
-  if (profile.part4 === "reading" && !labels.includes("Lesen")) labels.push("Lesen");
-
-  return labels;
-};
+export const getA2B1CourseBookIncludedSections = (level, entry = {}) =>
+  getA2B1WorkbookIncludedSectionLabels(level, getCourseBookDisplayDay(entry));
 
 const formatCourseBookInstruction = (instruction = "") =>
   String(instruction || "")
