@@ -15,6 +15,7 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import LegalFooter from "./LegalFooter";
 import { detectLevelKey } from "../lib/day0Workbook";
 
 const day0WorkbookByLevel = {
@@ -439,6 +440,7 @@ const GeneralHome = ({
           />
           <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
         </section>
+        <LegalFooter />
       </div>
     );
   }
@@ -503,6 +505,7 @@ const GeneralHome = ({
           <YouTubeSubscribeButton />
         </PrimaryActionBar>
       </section>
+      <LegalFooter />
     </div>
   );
 };
