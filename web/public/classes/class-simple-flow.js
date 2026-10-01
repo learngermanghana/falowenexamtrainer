@@ -214,7 +214,7 @@
     var primaryRegister = document.getElementById("mainSignupCta");
     if (primaryRegister) {
       primaryRegister.setAttribute("href", signupUrl(slug));
-      setText(primaryRegister, "Register Now");
+      setText(primaryRegister, "Register for this class");
       primaryRegister.removeAttribute("target");
       primaryRegister.removeAttribute("rel");
     }
