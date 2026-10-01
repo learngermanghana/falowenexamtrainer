@@ -1,3 +1,5 @@
+import { getTuitionFeeForLevel } from "../data/levelFees";
+
 const DAY_NAMES = { sun: "Sunday", mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday", fri: "Friday", sat: "Saturday" };
 const LIVE_CLASS_ENDPOINTS = [
   "/api/public/classes",
@@ -49,7 +51,7 @@ function normalizeClass(course = {}, defaults = {}) {
     startDate: String(course.startDate || "").slice(0, 10),
     endDate: String(course.endDate || "").slice(0, 10),
     meetingDays,
-    tuitionGhs: Number(course.tuitionGhs || defaults.tuitionGhsByLevel?.[level] || 3000),
+    tuitionGhs: Number(getTuitionFeeForLevel(level) || course.tuitionGhs || defaults.tuitionGhsByLevel?.[level] || 3000),
     registrationOpen: course.registrationOpen !== false,
     publicVisible: course.publicVisible !== false,
   };
