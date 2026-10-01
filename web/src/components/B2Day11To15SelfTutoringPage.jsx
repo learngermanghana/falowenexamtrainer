@@ -114,7 +114,13 @@ export default function B2Day11To15SelfTutoringPage({ lesson, canonicalLesson = 
   const [progress, setProgress] = useState(() => { try { return { learnNotesDone:false, quizDone:false, speakDone:false, completed:false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; } catch { return { learnNotesDone:false, quizDone:false, speakDone:false, completed:false }; } });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
   if (!entered && radio) return <div style={{ ...styles.container, display:"grid", gap:18 }}><AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /><FalowenRadioTabContent level="B2" day={day} resource={radio} onContinue={() => setEntered(true)} /></div>;
-  const video = guidedLesson.videoResource || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
+  const requestedAiVideo = day === 15
+    ? {
+        title: "B2 Day 15 · Wohnraummangel, hohe Mieten und soziale Gerechtigkeit · AI video",
+        url: "https://youtu.be/yQL2NMhpSEI",
+      }
+    : null;
+  const video = guidedLesson.videoResource || requestedAiVideo || canonicalLesson?.resources?.aiVideo || canonicalLesson?.resources?.teacherVideo || null;
   const videoEmbed = embedUrl(video?.url);
   const workbookUrl = canonicalLesson?.resources?.workbook?.url || guidedLesson.resources?.workbook?.url || "";
   const finish = () => { const completedAt = new Date().toISOString(); setProgress((old) => ({ ...old, completed:true, completedAt })); showToast(`B2 Day ${day} completed. Your progress was saved.`, "success"); };
