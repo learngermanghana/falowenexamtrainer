@@ -26,7 +26,10 @@ test("visitor guide explains school, selected class, learning flow and actions",
   assert.match(page, /The people behind the school/);
   assert.match(page, /Visit LLEA/);
   assert.match(page, /Open exact location in Google Maps/);
+  assert.match(page, /LLEA classroom · Awoshie, Accra/);
+  assert.match(page, /In person in Awoshie, live online, or recorded lesson catch-up/);
   assert.match(page, /publicAcademyProfile\.json/);
+  assert.ok(page.indexOf("Visit LLEA") < page.indexOf("Why students study with us"));
   assert.match(page, /View class brochure/);
   assert.match(page, /Register now/);
   assert.match(page, /Felix Asadu/);
