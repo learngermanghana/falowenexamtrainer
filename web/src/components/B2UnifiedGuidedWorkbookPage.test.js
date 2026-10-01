@@ -7,6 +7,7 @@ import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
 import { B2_WRITE_DAYS, getB2WritingTask } from "../data/b2WritingTasks";
+import { getAdditionalLessonVideoResources } from "../data/additionalLessonVideoResources";
 
 const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
@@ -227,6 +228,17 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain('/campus/course/lesson/B2/${day + 1}?radio=done');
   });
 
+  test("uses the approved AI video on B2 Day 28 Chapter 6.3", () => {
+    expect(getAdditionalLessonVideoResources("B2", 28)).toEqual([
+      expect.objectContaining({
+        chapter: "6.3",
+        url: "https://youtu.be/aJSSD0bohD0",
+      }),
+    ]);
+    expect(page).toContain("grammarVideoEmbed");
+    expect(page).toContain("Open AI video on YouTube");
+  });
+
   test("keeps reading feedback, private Hören, cloud sync, automatic completion and the new Review design", () => {
     expect(page).toContain("getB2ReadingPractice");
     expect(page).toContain("Textverständnis");
@@ -242,6 +254,8 @@ describe("B2 unified C2-style course structure", () => {
     expect(page).toContain("useB2CloudDraftField");
     expect(page).not.toContain("B2KnowledgeChoicePractice");
     expect(page).toContain("Hörquelle wird ergänzt");
+    expect(page).toContain("getAdditionalLessonVideoResources");
+    expect(page).toContain('data-b2-grammar-video-status="ready"');
     expect(page).toContain('data-b2-grammar-video-status="missing"');
     expect(page).toContain("Grammar video not added yet");
     expect(page).toContain("Falowen zeigt bewusst kein altes oder themenfremdes Video.");
