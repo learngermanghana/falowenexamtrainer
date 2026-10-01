@@ -20,6 +20,8 @@ describe("public class brochure experience", () => {
         establishedYear: 2022,
         germanLevels: "A1–C2",
         examPassHeadline: "High exam pass rate",
+        mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
+        classroomImage: "/classes/llea-classroom.jpg",
       }),
     );
     expect(data.coursePolicy).toEqual(
@@ -42,8 +44,9 @@ describe("public class brochure experience", () => {
     expect(levelFees).toContain("A1: 3000");
     expect(publicClasses).toContain("A1: 3000");
     expect(publicClasses).toContain("A2: 90");
-    expect(publicClasses).toContain("data.tuitionGhs || TUITION[level]");
+    expect(publicClasses).toContain("TUITION[level] || data.tuitionGhs");
     expect(publicClasses).not.toContain('level === "A1" ? TUITION.A1');
+    expect(publicClasses).toContain('tuitionGhs: Number(TUITION[level]');
   });
 
   test("student reviews follow the visible academy track record and lead card", () => {
