@@ -130,20 +130,34 @@ Wohnung C: WG-Zimmer, 20 m², 430 Euro warm. Küche und Bad gemeinsam. Direkt an
   },
   8: {
     chapter: "3.8",
-    format: "Rezept",
-    title: "Nudeln mit Gemüse",
-    strategy: "Bei Rezepten sind Reihenfolge, Mengen und Imperativformen wichtig. Suche nach zuerst, dann und zum Schluss.",
-    text: `Nudeln mit Gemüse – für zwei Personen
+    format: "Speisekarte + Restaurantinfo",
+    title: "Restaurant Am Markt",
+    strategy: "Bei Restauranttexten sind Preis, Zutaten, Öffnungszeiten und besondere Hinweise wichtig. Suche gezielt nach Zahlen, Symbolen und Schlüsselwörtern wie vegetarisch, scharf oder inklusive.",
+    text: `Restaurant Am Markt
 
-Du brauchst: 200 g Nudeln, eine Paprika, eine kleine Zucchini, eine Zwiebel, zwei Tomaten, Öl, Salz und Pfeffer.
+MITTAGSMENÜ · 12:00–15:00 Uhr
 
-Koche zuerst die Nudeln in Salzwasser. Schneide in der Zwischenzeit das Gemüse klein. Gib etwas Öl in eine Pfanne und brate zuerst die Zwiebel. Dann kommen Paprika und Zucchini dazu. Nach fünf Minuten gibst du die Tomaten in die Pfanne. Mische zum Schluss die Nudeln mit dem Gemüse und würze alles mit Salz und Pfeffer.`,
+A – Tomatensuppe mit Brot ........ 6,50 €
+B – Gemüselasagne mit kleinem Salat ........ 12,90 €
+C – Hähnchen mit Reis und Gemüse ........ 14,50 €
+D – Fischfilet mit Kartoffeln ........ 16,00 €
+
+Getränke:
+Mineralwasser 0,5 l ........ 3,20 €
+Apfelschorle 0,4 l ........ 3,80 €
+
+Hinweise:
+Die Gemüselasagne ist vegetarisch. Die Tomatensuppe ist leicht scharf. Beim Mittagsmenü ist ein Kaffee nach dem Essen für 1,50 € erhältlich. Kartenzahlung ist ab 10 € möglich.
+
+Öffnungszeiten:
+Dienstag–Sonntag: 11:30–22:00 Uhr
+Montag: geschlossen.`,
     questions: [
-      { stem: "Für wie viele Personen ist das Rezept?", options: ["A) Für eine Person", "B) Für zwei Personen", "C) Für drei Personen", "D) Für vier Personen"] },
-      { stem: "Was soll man zuerst kochen?", options: ["A) Die Tomaten", "B) Die Nudeln", "C) Die Zwiebel", "D) Die Paprika"] },
-      { stem: "Welches Gemüse kommt zuerst in die Pfanne?", options: ["A) Die Zwiebel", "B) Die Tomaten", "C) Die Zucchini", "D) Die Paprika"] },
-      { stem: "Wann kommen die Tomaten in die Pfanne?", options: ["A) Sofort am Anfang", "B) Nach fünf Minuten", "C) Nach dem Essen", "D) Gleichzeitig mit den Nudeln ins Wasser"] },
-      { stem: "Was macht man ganz zum Schluss?", options: ["A) Man schneidet die Zwiebel.", "B) Man kauft Gemüse.", "C) Man mischt Nudeln und Gemüse und würzt.", "D) Man kocht Wasser."] },
+      { stem: "Welches Gericht ist vegetarisch?", options: ["A) Tomatensuppe", "B) Gemüselasagne", "C) Hähnchen mit Reis", "D) Fischfilet"] },
+      { stem: "Welches Gericht kostet 14,50 €?", options: ["A) Tomatensuppe", "B) Gemüselasagne", "C) Hähnchen mit Reis und Gemüse", "D) Fischfilet"] },
+      { stem: "Was steht über die Tomatensuppe?", options: ["A) Sie ist sehr süß.", "B) Sie ist leicht scharf.", "C) Sie ist vegetarisch und kalt.", "D) Sie kostet 12,90 €."] },
+      { stem: "Wann ist das Restaurant geschlossen?", options: ["A) Montag", "B) Dienstag", "C) Samstag", "D) Sonntag"] },
+      { stem: "Ab welchem Betrag kann man mit Karte zahlen?", options: ["A) Ab 3 €", "B) Ab 6,50 €", "C) Ab 10 €", "D) Nur ab 20 €"] },
     ],
   },
   9: {
