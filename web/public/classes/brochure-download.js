@@ -66,7 +66,7 @@
       overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
       locationLabel: DEFAULT_LOCATION,
       mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-      classroomImage: "/classes/media/classroom.png",
+      classroomImage: "/classes/llea-classroom.jpg",
       ...(window.FalowenClassBrochureData?.academyProfile || {}),
     };
   }
