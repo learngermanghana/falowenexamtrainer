@@ -197,7 +197,6 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("document.getElementById(\"classLocationCard\")?.remove()");
     expect(enhancements).not.toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("Attend in person in Awoshie");
-    expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
     expect(enhancements).toContain("academy-school-reference");
     expect(enhancements).toContain("academy-trust-links");
