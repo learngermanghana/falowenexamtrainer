@@ -251,8 +251,8 @@
       .class-blue-title { font-size: clamp(30px, 8vw, 38px); margin-bottom: 10px; }
       .class-body { padding: 18px; gap: 14px; }
       #classFormat, #classPills, #highlights, #payment { display: none !important; }
-      body.post-lead-class-detail .class-main-card .class-body { display: none !important; }
-      body.post-lead-class-detail .class-main-card { overflow: hidden; }
+      .brochure-detail-clean .class-main-card .class-body { display: none !important; }
+      .brochure-detail-clean .class-main-card { overflow: hidden; }
       .meeting-schedule-actions { margin-top: 12px; display: grid; gap: 8px; }
       .meeting-schedule-actions p { margin: 0; color: #475569; font-size: 13px; line-height: 1.5; }
       .meeting-schedule-actions .button { width: 100%; }
@@ -611,6 +611,10 @@
   }
 
   function simplifyClassInfo() {
+    const classMainCard = document.querySelector(".class-main-card");
+    if (classMainCard && !document.getElementById("leadCaptureCard")) {
+      document.body.classList.add("brochure-detail-clean");
+    }
     const highlights = document.getElementById("highlights")?.closest(".stack");
     if (highlights) highlights.style.display = "none";
     const payment = document.getElementById("payment");
@@ -670,7 +674,7 @@
   function enforceBrochureOrder() {
     const page = document.querySelector(".page");
     const classHeader = document.querySelector(".class-main-card") || document.getElementById("class-summary");
-    if (!page || !classHeader || !document.body.classList.contains("post-lead-class-detail")) return;
+    if (!page || !classHeader || !document.body.classList.contains("brochure-detail-clean")) return;
 
     const decision = document.getElementById("classDecisionSummary");
     const benefits = document.getElementById("courseBenefitsCard");
