@@ -400,7 +400,7 @@
           <section class="pdf-arrival-panel">
             <div><strong>Before class</strong><span>Open the map link, check your route and plan to arrive early for in-person lessons.</span></div>
             <div><strong>Hybrid option</strong><span>If needed, students can also join online according to the class arrangement.</span></div>
-            <div><strong>Need help?</strong><span>Contact the academy using the WhatsApp or email details in this brochure.</span></div>
+            <div><strong>Need help?</strong><span>WhatsApp 233205706589 · info@falowen.app</span></div>
           </section>
 
           <footer class="pdf-page-footer"><span>${escapeHtml(academyProfile.academyName || "Learn Language Education Academy")}</span><span>Page 3 of 3</span></footer>
