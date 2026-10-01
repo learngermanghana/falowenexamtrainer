@@ -43,6 +43,13 @@ function formatLearningMode(course) {
   return "In person in Awoshie, live online, or recorded lesson catch-up when you cannot attend live.";
 }
 
+const publicLinkCopy = {
+  blog: { label: "Falowen Blog", description: "German-learning articles and study resources." },
+  linkedin: { label: "LinkedIn", description: "School updates and professional background." },
+  youtube: { label: "LLEA YouTube", description: "Teacher explanations and German-learning videos." },
+  contractAgreement: { label: "Contract agreement", description: "Open the registration and contract agreement page." },
+};
+
 const PublicAdmissionsVisitorGuidePage = () => {
   const search = typeof window === "undefined" ? "" : window.location.search;
   const params = useMemo(() => new URLSearchParams(search), [search]);
@@ -229,21 +236,71 @@ const PublicAdmissionsVisitorGuidePage = () => {
 
       <section style={card}>
         <h2 style={{ margin: 0 }}>The people behind the school</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+          {(academyProfile.team || []).map((member) => (
+            <article
+              key={member.name}
+              style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14, display: "grid", gap: 10, alignContent: "start" }}
+            >
+              {member.image ? (
+                <img
+                  src={member.image}
+                  alt={`${member.name} · ${member.role}`}
+                  loading="lazy"
+                  style={{ width: "100%", aspectRatio: "4 / 3", objectFit: "cover", borderRadius: 10, background: "#f1f5f9" }}
+                />
+              ) : null}
+              <div>
+                <strong>{member.name}</strong>
+                <div style={{ marginTop: 3, color: "#1d4ed8", fontWeight: 800, fontSize: 13 }}>{member.role}</div>
+              </div>
+              <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>{member.bio}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section style={card}>
+        <h2 style={{ margin: 0 }}>Teaching in practice</h2>
+        <p style={{ margin: 0, lineHeight: 1.65, color: "#475569" }}>
+          A look at live online teaching and guided German instruction at LLEA.
+        </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 12 }}>
-          <article style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-            <strong>Felix Asadu · Founder & Director</strong>
-            <p style={{ margin: "8px 0 0", lineHeight: 1.65, color: "#475569" }}>
-              Founder of Learn Language Education Academy and founder/software developer of Falowen. He studied International Management at IUB in Germany,
-              holds a Goethe-Institut B2 German certificate and a TEFL certificate in Teaching English as a Foreign Language.
-            </p>
-          </article>
-          <article style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-            <strong>Catherine Agbleze Etornam · Academic Assistant</strong>
-            <p style={{ margin: "8px 0 0", lineHeight: 1.65, color: "#475569" }}>
-              University of Ghana graduate in Philosophy with Political Science and holder of a Goethe A2 German certificate.
-              She supports prospective and current students with enquiries, onboarding and academic guidance.
-            </p>
-          </article>
+          {(academyProfile.teachingGallery || []).map((item) => (
+            <figure key={item.title} style={{ margin: 0, display: "grid", gap: 7 }}>
+              <img
+                src={item.image}
+                alt={item.title}
+                loading="lazy"
+                style={{ width: "100%", aspectRatio: "16 / 10", objectFit: "cover", borderRadius: 12, border: "1px solid #e2e8f0" }}
+              />
+              <figcaption style={{ color: "#475569", fontSize: 13, lineHeight: 1.5 }}>
+                <strong style={{ color: "#0f172a" }}>{item.title}</strong> · {item.caption}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
+      <section style={card}>
+        <h2 style={{ margin: 0 }}>Useful links</h2>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          {Object.entries(publicLinkCopy).map(([key, meta]) => {
+            const href = academyProfile.links?.[key];
+            if (!href) return null;
+            return (
+              <a
+                key={key}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                title={meta.description}
+                style={{ ...action, minHeight: 40, padding: "8px 12px", background: "#fff", color: "#1d4ed8", fontSize: 13 }}
+              >
+                {meta.label}
+              </a>
+            );
+          })}
         </div>
       </section>
 
