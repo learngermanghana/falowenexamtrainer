@@ -88,7 +88,8 @@ test("shared visitor-guide links preserve class and lead context without authent
 test("shared academy profile contains the current team, teaching media and public links", () => {
   const profile = JSON.parse(read("web/src/data/publicAcademyProfile.json"));
 
-  assert.equal(profile.classroomImage, "/classes/media/classroom.png");
+  assert.equal(profile.classroomImage, "/classes/llea-classroom.jpg");
+  assert.equal(profile.admissionsUpdatedAt, "2026-10-01");
   assert.equal(profile.links.blog, "https://blog.falowen.app");
   assert.equal(profile.links.linkedin, "https://www.linkedin.com/in/learngermanghana/");
   assert.equal(profile.links.youtube, "https://www.youtube.com/@LLEAGhana");
@@ -96,16 +97,18 @@ test("shared academy profile contains the current team, teaching media and publi
 
   assert.deepEqual(profile.team.map((member) => member.name), [
     "Felix Asadu",
-    "Catherine Agbleze Etornam",
     "Sabina Michel",
+    "Catherine Agbleze Etornam",
     "Hana",
   ]);
   assert.equal(profile.team.find((member) => member.name === "Catherine Agbleze Etornam")?.image, null);
   assert.match(profile.team.find((member) => member.name === "Sabina Michel")?.role || "", /German Teacher/);
   assert.match(profile.team.find((member) => member.name === "Hana")?.role || "", /Global Mobility Specialist/);
+  assert.equal(profile.team.find((member) => member.name === "Hana")?.relationship, "Consulting agency partner");
   assert.equal(profile.teachingGallery.length, 2);
 
   [
+    "web/public/classes/llea-classroom.jpg",
     "web/public/classes/media/classroom.png",
     "web/public/classes/media/felix-asadu.png",
     "web/public/classes/media/felix-zoom.png",
@@ -113,4 +116,38 @@ test("shared academy profile contains the current team, teaching media and publi
     "web/public/classes/media/sabina-teaching.png",
     "web/public/classes/media/hana.webp",
   ].forEach((relativePath) => assert.ok(fs.existsSync(path.join(root, relativePath))));
+});
+
+
+test("admissions public links and media references stay valid", () => {
+  const profile = JSON.parse(read("web/src/data/publicAcademyProfile.json"));
+  const publicRoot = path.join(root, "web/public");
+
+  Object.entries(profile.links || {}).forEach(([key, href]) => {
+    assert.doesNotThrow(() => new URL(href), `${key} should be a valid URL`);
+    assert.equal(new URL(href).protocol, "https:", `${key} should use HTTPS`);
+  });
+
+  const media = [
+    profile.classroomImage,
+    ...(profile.team || []).map((member) => member.image).filter(Boolean),
+    ...(profile.teachingGallery || []).map((item) => item.image).filter(Boolean),
+  ];
+
+  media.forEach((asset) => {
+    assert.ok(asset.startsWith("/"), `${asset} should be a public-root path`);
+    assert.ok(fs.existsSync(path.join(publicRoot, asset.replace(/^\//, ""))), `${asset} should exist`);
+  });
+
+  const lightClassroom = fs.statSync(path.join(publicRoot, "classes/llea-classroom.jpg")).size;
+  const originalClassroom = fs.statSync(path.join(publicRoot, "classes/media/classroom.png")).size;
+  assert.ok(lightClassroom < originalClassroom, "public classroom image should use the lighter JPEG asset");
+});
+
+test("visitor guide lazy-loads below-the-fold admissions media", () => {
+  const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
+  assert.match(page, /loading="lazy"/);
+  assert.match(page, /decoding="async"/);
+  assert.match(page, /Fees and admissions information updated/);
+  assert.match(page, /member\.relationship/);
 });

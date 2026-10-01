@@ -72,7 +72,7 @@
       ]
     },
     "mapsUrl": "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-    "classroomImage": "/classes/media/classroom.png"
+    "classroomImage": "/classes/llea-classroom.jpg"
   },
   "curriculumByLevel": {
     "A1": {
@@ -536,7 +536,7 @@
     "overview": "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
     "locationLabel": "Awoshie, Accra, Ghana",
     "mapsUrl": "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-    "classroomImage": "/classes/media/classroom.png",
+    "classroomImage": "/classes/llea-classroom.jpg",
     "links": {
       "website": "https://www.falowen.app",
       "blog": "https://blog.falowen.app",
@@ -552,22 +552,23 @@
         "bio": "Founder of Learn Language Education Academy and founder/software developer of Falowen. He studied International Management at IUB in Germany, holds a Goethe-Institut B2 German certificate and a TEFL certificate in Teaching English as a Foreign Language."
       },
       {
-        "name": "Catherine Agbleze Etornam",
-        "role": "Academic Assistant",
-        "image": null,
-        "bio": "University of Ghana graduate in Philosophy with Political Science and holder of a Goethe A2 German certificate. She supports prospective and current students with enquiries, onboarding and academic guidance."
-      },
-      {
         "name": "Sabina Michel",
         "role": "German Teacher",
         "image": "/classes/media/sabina-michel.png",
         "bio": "Sabina is from Germany and visited Ghana in 2021, where she was inspired by the country's rich culture. She supports students with dynamic teaching, cultural insights and enthusiasm for the German language."
       },
       {
+        "name": "Catherine Agbleze Etornam",
+        "role": "Academic Assistant",
+        "image": null,
+        "bio": "University of Ghana graduate in Philosophy with Political Science and holder of a Goethe A2 German certificate. She supports prospective and current students with enquiries, onboarding and academic guidance."
+      },
+      {
         "name": "Hana",
         "role": "Consulting Agency Partner · Global Mobility Specialist & Education Advisor (Germany)",
         "image": "/classes/media/hana.webp",
-        "bio": "Hana works with our team as a consulting agency partner. Based in Germany, she supports students and families with global mobility guidance, education pathways, and practical travel planning support."
+        "bio": "Hana works with our team as a consulting agency partner. Based in Germany, she supports students and families with global mobility guidance, education pathways, and practical travel planning support.",
+        "relationship": "Consulting agency partner"
       }
     ],
     "teachingGallery": [
@@ -581,6 +582,7 @@
         "image": "/classes/media/sabina-teaching.png",
         "caption": "German teaching with cultural context and guided practice."
       }
-    ]
+    ],
+    "admissionsUpdatedAt": "2026-10-01"
   }
 }

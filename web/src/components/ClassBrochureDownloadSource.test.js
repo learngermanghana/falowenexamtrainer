@@ -41,9 +41,10 @@ describe("Falowen class brochure download", () => {
     expect(source).toContain("LLEA classroom · Awoshie, Accra");
     expect(source).toContain('const DEFAULT_WHATSAPP = "233241113054"');
     expect(source).not.toContain("233205706589");
-    const classroomImage = path.join(__dirname, "../../public/classes/media/classroom.png");
+    const classroomImage = path.join(__dirname, "../../public/classes/llea-classroom.jpg");
     expect(fs.existsSync(classroomImage)).toBe(true);
     expect(fs.statSync(classroomImage).size).toBeGreaterThan(50000);
+    expect(fs.statSync(classroomImage).size).toBeLessThan(200000);
     expect(source).toContain("pdf.save(`${slugify(data.classTitle)}-falowen-brochure.pdf`)");
     expect(source).toContain("Full course fee");
     expect(source).toContain("Four simple steps");

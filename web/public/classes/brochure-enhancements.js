@@ -86,15 +86,24 @@
       overview: "Learn Language Education Academy has supported German learners since 2022 with structured teaching, assignments and exam preparation.",
       locationLabel: "Awoshie, Accra, Ghana",
       mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-      classroomImage: "/classes/media/classroom.png",
+      classroomImage: "/classes/llea-classroom.jpg",
       links: {
         blog: "https://blog.falowen.app",
         linkedin: "https://www.linkedin.com/in/learngermanghana/",
         youtube: "https://www.youtube.com/@LLEAGhana",
-        contractAgreement: "https://register.falowen.app/",
+        contractAgreement: "https://legal.falowen.app/",
       },
       ...(window.FalowenClassBrochureData?.academyProfile || {}),
     };
+  }
+
+  function getVisitorGuideUrl() {
+    const course = window.currentBrochureCourse || {};
+    const classSlug = course.slug || slugify(getCurrentClassName());
+    const params = new URLSearchParams();
+    if (classSlug) params.set("class", classSlug);
+    params.set("source", "class-brochure");
+    return `/visitor-guide?${params.toString()}`;
   }
 
   function formatDecisionDate(value) {
@@ -267,15 +276,14 @@
       .brochure-mobile-cta { display: none; }
       .catalog-status-notice { border-color: #fde68a; background: #fffbeb; color: #78350f; gap: 8px; }
       .catalog-status-notice p { margin: 0; color: #92400e; }
-      .academy-track-record-card { display: grid; gap: 12px; border-color: #bfdbfe; background: #ffffff; }
-      .academy-track-record-card h2 { margin: 0; font-size: 21px; color: #0f172a; }
-      .academy-track-record-card > p { margin: 0; color: #475569; font-size: 14px; line-height: 1.55; }
-      .academy-track-record-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
-      .academy-track-record-stat { border: 1px solid #dbeafe; background: #eff6ff; border-radius: 12px; padding: 11px; display: grid; gap: 4px; }
-      .academy-track-record-stat span { color: #64748b; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
-      .academy-track-record-stat strong { color: #0f172a; font-size: 16px; line-height: 1.35; }
-      .academy-track-record-scope { color: #64748b !important; font-size: 12px !important; }
-      .academy-trust-links { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+      .academy-track-record-card { display: grid; gap: 10px; border-color: #e2e8f0; background: #ffffff; }
+      .academy-school-reference { grid-template-columns: minmax(0, 1fr) auto; align-items: center; }
+      .academy-school-reference > div:first-child { display: grid; gap: 4px; }
+      .academy-school-reference-label { color: #1d4ed8; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .06em; }
+      .academy-school-reference strong { color: #0f172a; font-size: 16px; }
+      .academy-school-reference p { margin: 0; color: #475569; font-size: 13px; line-height: 1.5; }
+      .academy-school-reference-action { border-radius: 10px; background: #eff6ff; color: #1d4ed8; padding: 9px 11px; font-size: 12px; font-weight: 900; text-decoration: none; white-space: nowrap; }
+      .academy-trust-links { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 12px; }
       .academy-trust-links a { color: #1d4ed8; font-size: 12px; font-weight: 850; text-decoration: none; }
       .academy-trust-links a:hover { text-decoration: underline; }
       .class-decision-summary { display: grid; gap: 14px; border: 1px solid #bfdbfe; background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%); }
@@ -302,7 +310,8 @@
       .course-details-content { border-top: 1px solid #e2e8f0; padding: 14px; display: grid; gap: 10px; }
 
       @media (max-width: 620px) {
-        .academy-track-record-grid { grid-template-columns: 1fr; }
+        .academy-school-reference { grid-template-columns: 1fr; }
+        .academy-school-reference-action { width: fit-content; }
       }
       @media (max-width: 760px) {
         .intro-video, #brochureToc, .class-main-card { display: none !important; }
@@ -540,32 +549,21 @@
     if (!card) {
       card = document.createElement("section");
       card.id = "academyTrackRecordCard";
-      card.className = "card academy-track-record-card";
+      card.className = "card academy-track-record-card academy-school-reference";
     }
 
     card.innerHTML = `
-      <h2>Our track record</h2>
-      <p>${profile.overview}</p>
-      <div class="academy-track-record-grid">
-        <div class="academy-track-record-stat">
-          <span>Established</span>
-          <strong>${profile.establishedYear}</strong>
-        </div>
-        <div class="academy-track-record-stat">
-          <span>Exam performance</span>
-          <strong>${profile.examPassHeadline}</strong>
-        </div>
-        <div class="academy-track-record-stat">
-          <span>German learning</span>
-          <strong>${profile.germanLevels}</strong>
-        </div>
+      <div>
+        <span class="academy-school-reference-label">About LLEA</span>
+        <strong>Want to know more about the school?</strong>
+        <p>See the classroom, meet the team and learn how LLEA and Falowen work together.</p>
       </div>
-      <p class="academy-track-record-scope">Our exam track record covers German language examinations generally and is not limited to one exam provider.</p>
+      <a class="academy-school-reference-action" href="${getVisitorGuideUrl()}">About the school & team</a>
       <div class="academy-trust-links">
         ${profile.links?.blog ? `<a href="${profile.links.blog}" target="_blank" rel="noreferrer">Blog</a>` : ""}
-        ${profile.links?.linkedin ? `<a href="${profile.links.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>` : ""}
         ${profile.links?.youtube ? `<a href="${profile.links.youtube}" target="_blank" rel="noreferrer">YouTube</a>` : ""}
-        ${profile.links?.contractAgreement ? `<a href="${profile.links.contractAgreement}" target="_blank" rel="noreferrer">Contract agreement</a>` : ""}
+        ${profile.links?.linkedin ? `<a href="${profile.links.linkedin}" target="_blank" rel="noreferrer">LinkedIn</a>` : ""}
+        ${profile.links?.contractAgreement ? `<a href="${profile.links.contractAgreement}" target="_blank" rel="noreferrer">Legal / Contract</a>` : ""}
       </div>
     `;
 

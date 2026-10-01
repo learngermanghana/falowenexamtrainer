@@ -21,7 +21,7 @@ describe("public class brochure experience", () => {
         germanLevels: "A1–C2",
         examPassHeadline: "High exam pass rate",
         mapsUrl: "https://maps.app.goo.gl/CPYX7uCj9YSELc1Q9",
-        classroomImage: "/classes/media/classroom.png",
+        classroomImage: "/classes/llea-classroom.jpg",
         links: expect.objectContaining({
           blog: "https://blog.falowen.app",
           linkedin: "https://www.linkedin.com/in/learngermanghana/",
@@ -183,10 +183,13 @@ describe("public class brochure experience", () => {
     expect(enhancements).toContain("Attend in person in Awoshie");
     expect(enhancements).toContain(".intro-video, #brochureToc, .class-main-card { display: none !important; }");
     expect(enhancements).toContain("academyTrackRecordCard");
+    expect(enhancements).toContain("academy-school-reference");
     expect(enhancements).toContain("academy-trust-links");
-    expect(enhancements).toContain("Contract agreement");
-    expect(enhancements).toContain("High exam pass rate");
-    expect(enhancements).toContain("Established");
+    expect(enhancements).toContain("About the school & team");
+    expect(enhancements).toContain("Legal / Contract");
+    expect(enhancements).not.toContain("<h2>Our track record</h2>");
+    expect(enhancements).not.toContain("academy-track-record-grid");
+    expect(enhancements).not.toContain("https://register.falowen.app/");
     expect(faq).toContain("window.FalowenClassBrochureData?.coursePolicy");
     expect(reviews).toContain("positionReviewsCard");
     expect(hero).toContain("classHeroBannerStyles");
