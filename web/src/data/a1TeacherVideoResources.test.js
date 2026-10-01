@@ -87,6 +87,21 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
+  test("Day 21 Chapter 13 uses the current Weather teacher lecture", () => {
+    const configuredVideo = getCanonicalA1TeacherVideoResource(21, "13");
+
+    expect(configuredVideo).toEqual(
+      expect.objectContaining({
+        chapter: "13",
+        topic: "Weather",
+        url: "https://youtu.be/7m2fssEbTd8",
+      })
+    );
+    expect(A1_TEACHER_VIDEO_RESOURCES.map((video) => video.url)).not.toContain(
+      "https://youtu.be/ijEY8XVrsZs",
+    );
+  });
+
   test("Day 20 Chapter 12.3 uses the new teacher lecture only", () => {
     const configuredVideo = getCanonicalA1TeacherVideoResource(20, "12.3");
 

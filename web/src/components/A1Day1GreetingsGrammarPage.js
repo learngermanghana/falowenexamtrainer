@@ -144,6 +144,103 @@ const knowledgeQuestions = [
   },
 ];
 
+const knowledgeQuestionIdsBySection = Object.freeze({
+  greetings: ["q1", "q5"],
+  titles: ["q6"],
+  goodbyes: ["q4", "q10"],
+  howAreYou: ["q2", "q7"],
+  responses: ["q3", "q8"],
+  andYou: ["q9"],
+});
+
+const getKnowledgeQuestions = (sectionKey) => {
+  const ids = new Set(knowledgeQuestionIdsBySection[sectionKey] || []);
+  return knowledgeQuestions.filter((question) => ids.has(question.id));
+};
+
+const KnowledgeCheck = ({
+  sectionKey,
+  knowledgeAnswers,
+  setKnowledgeAnswers,
+}) => {
+  const questions = getKnowledgeQuestions(sectionKey);
+  if (!questions.length) return null;
+
+  return (
+    <div
+      data-a1-day1-knowledge-section={sectionKey}
+      style={{
+        ...practiceBoxStyle,
+        background: "#f8fafc",
+        borderColor: "#cbd5e1",
+      }}
+    >
+      <strong>
+        Knowledge check · {questions.length} {questions.length === 1 ? "question" : "questions"}
+      </strong>
+      <span style={{ color: "#475569", fontSize: 13 }}>
+        Answer immediately after this grammar point.
+      </span>
+
+      {questions.map((question) => {
+        const selectedAnswer = knowledgeAnswers[question.id];
+        const hasAnswered = Boolean(selectedAnswer);
+        const isCorrect = selectedAnswer === question.answer;
+        const questionNumber = knowledgeQuestions.findIndex((item) => item.id === question.id) + 1;
+
+        return (
+          <article
+            key={question.id}
+            style={{
+              ...infoCardStyle,
+              display: "grid",
+              gap: 10,
+              borderColor: hasAnswered ? (isCorrect ? "#86efac" : "#fca5a5") : "#e2e8f0",
+              background: hasAnswered ? (isCorrect ? "#f0fdf4" : "#fff1f2") : "#ffffff",
+            }}
+          >
+            <strong style={{ fontSize: 15 }}>
+              {questionNumber}. {question.prompt}
+            </strong>
+            <div style={{ display: "grid", gap: 8 }}>
+              {question.options.map((option) => (
+                <label
+                  key={option}
+                  style={{
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name={question.id}
+                    value={option}
+                    checked={selectedAnswer === option}
+                    onChange={() =>
+                      setKnowledgeAnswers((prev) => ({ ...prev, [question.id]: option }))
+                    }
+                  />
+                  <span>{option}</span>
+                </label>
+              ))}
+            </div>
+
+            {hasAnswered ? (
+              <div style={{ fontWeight: 600, color: isCorrect ? "#15803d" : "#b91c1c" }}>
+                {isCorrect
+                  ? "Correct!"
+                  : `Wrong. Correct answer: ${question.answer}`}
+              </div>
+            ) : null}
+          </article>
+        );
+      })}
+    </div>
+  );
+};
+
 const A1Day1GreetingsGrammarPage = () => {
   const [knowledgeAnswers, setKnowledgeAnswers] = useState({});
   const isMobile =
@@ -183,6 +280,11 @@ const A1Day1GreetingsGrammarPage = () => {
           Learn simple German greetings, polite titles, goodbyes, and how to
           ask and answer “How are you?”
         </p>
+        <div style={{ ...infoCardStyle, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <strong>Knowledge test:</strong>
+          <span>10 questions are placed under the grammar section they test.</span>
+          <span><strong>Score: {knowledgeScore}/10</strong></span>
+        </div>
       </header>
 
       <section style={cardStyle}>
@@ -236,6 +338,12 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>Guten Tag, Frau Müller!</div>
           <div>Hallo, Anna!</div>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="greetings"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
       <section style={cardStyle}>
@@ -310,6 +418,12 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>Schmidt → Herr or Frau?</div>
           <div>Schneider → Herr or Frau?</div>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="titles"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
       <section style={cardStyle}>
@@ -373,6 +487,12 @@ const A1Day1GreetingsGrammarPage = () => {
             ä, write <strong>spaeter</strong>.
           </p>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="goodbyes"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
       <section style={cardStyle}>
@@ -441,6 +561,12 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>❌ guten nacht → ✅ <strong>Gute Nacht</strong></div>
           <div>❌ bis spater / bis später! (random capitalization) → ✅ <strong>Bis später.</strong></div>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="howAreYou"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
       <section style={cardStyle}>
@@ -484,6 +610,12 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>A: Wie geht’s?</div>
           <div>B: Gut, danke.</div>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="responses"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
       <section style={cardStyle}>
@@ -539,70 +671,14 @@ const A1Day1GreetingsGrammarPage = () => {
             Student B: <strong>Mir geht es gut, danke. Und Ihnen?</strong>
           </div>
         </div>
+
+        <KnowledgeCheck
+          sectionKey="andYou"
+          knowledgeAnswers={knowledgeAnswers}
+          setKnowledgeAnswers={setKnowledgeAnswers}
+        />
       </section>
 
-      <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>7. Knowledge test (instant feedback)</h2>
-        <p style={{ margin: 0 }}>
-          Click one answer for each question and check immediately if it is correct.
-          Score: {knowledgeScore}/{knowledgeQuestions.length}
-        </p>
-
-        {knowledgeQuestions.map((question, index) => {
-          const selectedAnswer = knowledgeAnswers[question.id];
-          const hasAnswered = Boolean(selectedAnswer);
-          const isCorrect = selectedAnswer === question.answer;
-
-          return (
-            <article
-              key={question.id}
-              style={{
-                ...infoCardStyle,
-                display: "grid",
-                gap: 10,
-                borderColor: hasAnswered ? (isCorrect ? "#86efac" : "#fca5a5") : "#e2e8f0",
-                background: hasAnswered ? (isCorrect ? "#f0fdf4" : "#fff1f2") : "#f8fafc",
-              }}
-            >
-              <strong style={{ fontSize: 15 }}>
-                {index + 1}. {question.prompt}
-              </strong>
-              <div style={{ display: "grid", gap: 8 }}>
-                {question.options.map((option) => (
-                  <label
-                    key={option}
-                    style={{
-                      display: "flex",
-                      gap: 8,
-                      alignItems: "center",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name={question.id}
-                      value={option}
-                      checked={selectedAnswer === option}
-                      onChange={() =>
-                        setKnowledgeAnswers((prev) => ({ ...prev, [question.id]: option }))
-                      }
-                    />
-                    <span>{option}</span>
-                  </label>
-                ))}
-              </div>
-
-              {hasAnswered ? (
-                <div style={{ fontWeight: 600, color: isCorrect ? "#15803d" : "#b91c1c" }}>
-                  {isCorrect
-                    ? "✅ Correct!"
-                    : `❌ Wrong. Correct answer: ${question.answer}`}
-                </div>
-              ) : null}
-            </article>
-          );
-        })}
-      </section>
     </main>
   );
 };
