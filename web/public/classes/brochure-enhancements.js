@@ -296,7 +296,7 @@
         .academy-track-record-grid { grid-template-columns: 1fr; }
       }
       @media (max-width: 760px) {
-        .intro-video, #brochureToc { display: none !important; }
+        .intro-video, #brochureToc, .class-main-card { display: none !important; }
         .class-decision-summary { margin-top: 10px; }
         .decision-summary-actions { grid-template-columns: 1fr; }
         .decision-secondary-action { justify-self: start; }
@@ -333,13 +333,8 @@
       .agreement-toggle { padding: 12px 14px; }
       .footer { display: none; }
       @media (min-width: 900px) {
-        .class-main-card .class-body { grid-template-columns: 1.05fr .95fr; align-items: start; }
-        #classTitle { grid-column: 1 / -1; }
-        #stats { grid-column: 1; }
-        #paymentGuidanceCard { grid-column: 2; grid-row: 2 / span 2; }
-        #mainSignupCta, #classScheduleCta { grid-column: 1; }
-        #classModeCard { grid-column: 1; }
-        #afterSignupCard, #whoForCard { grid-column: 1 / -1; }
+        .class-main-card .class-body { grid-template-columns: 1fr; align-items: start; }
+        #classTitle, #stats { grid-column: 1 / -1; }
         .payment-option-grid { grid-template-columns: 1fr 1fr; }
         .page > .card, .page > .grid, .page > section { max-width: none; }
       }
@@ -451,8 +446,7 @@
     const { full, first, balance } = getFeeParts();
     const policy = getCoursePolicy();
     stats.innerHTML = `
-      <div class="stat"><span>Full course fee</span><b>${full}</b></div>
-      <div class="stat"><span>Access with full payment</span><b>${policy.fullPaymentAccessMonths} months</b></div>
+      <div class="stat"><span>Falowen access with full payment</span><b>${policy.fullPaymentAccessMonths} months</b></div>
       <div class="stat"><span>Installment starter</span><b>${first}</b></div>
     `;
 
