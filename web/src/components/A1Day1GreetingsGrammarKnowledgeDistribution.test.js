@@ -20,6 +20,26 @@ describe("A1 Day 1 grammar knowledge checks", () => {
     }
   });
 
+  test("numbers questions in the order students actually see them", () => {
+    expect(source).toContain('const knowledgeQuestionDisplayOrder = Object.freeze([');
+    [
+      '"q1"',
+      '"q5"',
+      '"q6"',
+      '"q4"',
+      '"q10"',
+      '"q2"',
+      '"q7"',
+      '"q3"',
+      '"q8"',
+      '"q9"',
+    ].forEach((id) => expect(source).toContain(id));
+    expect(source).toContain("getKnowledgeQuestionNumber(question.id)");
+    expect(source).not.toContain(
+      "knowledgeQuestions.findIndex((item) => item.id === question.id) + 1",
+    );
+  });
+
   test("renders an inline check in each relevant grammar section", () => {
     [
       "greetings",
