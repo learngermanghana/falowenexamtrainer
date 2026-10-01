@@ -15,6 +15,7 @@ import { applyB2WritingTaskToLesson, getB2WritingTask } from "../data/b2WritingT
 import { getB2GrammarLesson } from "../data/b2GrammarLessons";
 import { getB2ListeningPractice, hasB2ListeningSource } from "../data/b2ListeningPractice";
 import { getB2ReadingPractice } from "../data/b2ReadingPractice";
+import { getAdditionalLessonVideoResources } from "../data/additionalLessonVideoResources";
 import { getB2DayTabs, getB2SkillFocus, getB2SkillLabel } from "../data/b2SkillCycle";
 import {
   getStandardLessonStorageKey,
@@ -30,6 +31,19 @@ import { useB2CloudDraftField } from "../utils/b2CloudDraftSync";
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
 const sub = { border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 };
 const Section = ({ title, children }) => <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>{title}</h2>{children}</section>;
+
+const toYoutubeEmbedUrl = (url = "") => {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    const videoId = host === "youtu.be"
+      ? parsed.pathname.replace(/^\//, "")
+      : parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
+    return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : "";
+  } catch {
+    return "";
+  }
+};
 
 const GrammarLessonContent = ({ day }) => {
   const grammar = getB2GrammarLesson(day);
@@ -341,6 +355,8 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
   }, [writingLesson, writingTask]);
   const skillFocus = getB2SkillFocus(day);
   const skillLabel = getB2SkillLabel(day);
+  const grammarVideo = getAdditionalLessonVideoResources("B2", day)[0] || null;
+  const grammarVideoEmbed = toYoutubeEmbedUrl(grammarVideo?.url);
   const listeningAvailable = hasB2ListeningSource(getB2ListeningPractice(day));
   const allowedViews = useMemo(() => new Set(getB2DayTabs(day).map(({ key }) => key)), [day]);
   const requestedView = useMemo(() => {
@@ -421,10 +437,32 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
       <B2TopicIntroduction day={day} />
       <Section title="Grammar / Learn">
         <GrammarLessonContent day={day} />
-        <div data-b2-grammar-video-status="missing" style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }}>
-          <strong>Grammar video not added yet</strong>
-          <span>Für diesen B2-Tag wurde noch kein passendes Grammatikvideo hinzugefügt. Falowen zeigt bewusst kein altes oder themenfremdes Video.</span>
-        </div>
+        {grammarVideo?.url ? (
+          <div data-b2-grammar-video-status="ready" style={{ ...sub, background: "#eff6ff", borderColor: "#bfdbfe" }}>
+            <strong>{grammarVideo.title || "AI video"}</strong>
+            {grammarVideo.description ? <span>{grammarVideo.description}</span> : null}
+            {grammarVideoEmbed ? (
+              <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#0f172a" }}>
+                <iframe
+                  title={grammarVideo.title || `B2 Day ${day} AI video`}
+                  src={grammarVideoEmbed}
+                  loading="lazy"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+                />
+              </div>
+            ) : null}
+            <a href={grammarVideo.url} target="_blank" rel="noreferrer" style={{ color: "#1d4ed8", fontWeight: 800, width: "fit-content" }}>
+              Open AI video on YouTube
+            </a>
+          </div>
+        ) : (
+          <div data-b2-grammar-video-status="missing" style={{ ...sub, background: "#fffbeb", borderColor: "#fde68a" }}>
+            <strong>Grammar video not added yet</strong>
+            <span>Für diesen B2-Tag wurde noch kein passendes Grammatikvideo hinzugefügt. Falowen zeigt bewusst kein altes oder themenfremdes Video.</span>
+          </div>
+        )}
         <label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700, lineHeight: 1.5 }}><input type="checkbox" checked={Boolean(progress.learnDone)} onChange={(event) => setProgress((old) => ({ ...old, learnDone: event.target.checked }))} style={{ marginTop: 4 }} />Ich habe das Thema und den Grammatikfokus verstanden.</label>
       </Section>
     </> : null}
