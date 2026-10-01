@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import SignUpPageLegacy from "./SignUpPageLegacy";
+import LegalFooter from "./LegalFooter";
 import { classCatalog } from "../data/classCatalog";
 import {
   followUpIso,
@@ -412,6 +413,7 @@ export default function SignUpPage(props) {
       <style>{MOBILE_INPUT_CSS}</style>
       <SignUpPageLegacy {...props} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} />, mount) : null}
+      <LegalFooter />
     </div>
   );
 }
