@@ -70,6 +70,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate bundle renderer auth guard
+        run: |
+          node --check scripts/course-material-bundles/renderLevelBundleV2.mjs
+          node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
+
       - name: Build and validate manifest
         env:
           LEVEL: ${{ matrix.level }}
