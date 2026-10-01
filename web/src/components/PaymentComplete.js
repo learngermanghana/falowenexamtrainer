@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import LegalFooter from "./LegalFooter";
 
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
@@ -42,6 +43,7 @@ const PaymentComplete = () => {
         <h2 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Payment submitted</h2>
         <p style={{ ...styles.helperText, marginBottom: 16 }}>{message}</p>
         <AppBackButton label="Open Account & Billing" fallbackPath="/campus/account?tab=billing" />
+        <LegalFooter compact />
       </div>
     </div>
   );
