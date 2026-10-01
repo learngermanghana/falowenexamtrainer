@@ -38,6 +38,10 @@ describe("Falowen class brochure download", () => {
     expect(source).toContain("qrcode@1.5.4");
     expect(source).toContain("pdfMapsQr");
     expect(source).toContain("classroomImage");
+    expect(source).toContain("LLEA classroom · Awoshie, Accra");
+    const classroomImage = path.join(__dirname, "../../public/classes/llea-classroom.jpg");
+    expect(fs.existsSync(classroomImage)).toBe(true);
+    expect(fs.statSync(classroomImage).size).toBeGreaterThan(50000);
     expect(source).toContain("pdf.save(`${slugify(data.classTitle)}-falowen-brochure.pdf`)");
     expect(source).toContain("Full course fee");
     expect(source).toContain("Four simple steps");
