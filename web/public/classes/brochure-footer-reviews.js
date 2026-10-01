@@ -64,15 +64,15 @@
 
   function positionReviewsCard(card) {
     if (!card) return;
-    const trackRecord = document.getElementById("academyTrackRecordCard");
+    const courseDetails = document.getElementById("courseDetailsDisclosure");
+    const agreement = document.getElementById("payment-agreement-section") || document.getElementById("agreementCard");
     const leadCard = document.getElementById("leadCaptureCard");
     const classSummary = document.querySelector(".class-main-card") || document.getElementById("class-summary");
     const anchor =
-      trackRecord
+      agreement
+      || courseDetails
       || leadCard
       || classSummary
-      || document.getElementById("payment-agreement-section")
-      || document.getElementById("agreementCard")
       || document.querySelector(".page > section:last-of-type")
       || document.querySelector(".page");
     if (!anchor || anchor === card) return;
