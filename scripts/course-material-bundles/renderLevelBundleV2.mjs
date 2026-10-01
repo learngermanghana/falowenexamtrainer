@@ -21,7 +21,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 6, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 7, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -87,6 +87,79 @@ const credentials = () => {
 const getLoginForm = (page) =>
   page.locator("form").filter({ hasText: /Email or student code/i }).first();
 
+const LOGIN_FAILURE_PATTERN =
+  /Password mismatch|could not find an account|cannot log in right now|permission denied|too many login attempts|could not connect to the internet|student account cannot log in/i;
+
+const waitForLoginCompletion = async (page) => {
+  await page.waitForFunction(
+    () => {
+      const bodyText = document.body?.innerText || "";
+      const forms = Array.from(document.querySelectorAll("form"));
+      const loginFormVisible = forms.some((form) => {
+        const text = form.innerText || "";
+        const style = window.getComputedStyle(form);
+        const rect = form.getBoundingClientRect();
+        return (
+          /Email or student code/i.test(text) &&
+          style.display !== "none" &&
+          style.visibility !== "hidden" &&
+          rect.width > 0 &&
+          rect.height > 0
+        );
+      });
+      const failed =
+        /Password mismatch|could not find an account|cannot log in right now|permission denied|too many login attempts|could not connect to the internet|student account cannot log in/i.test(
+          bodyText,
+        );
+      return failed || !loginFormVisible;
+    },
+    undefined,
+    { timeout: 30000 },
+  );
+
+  await waitForPage(page);
+
+  const authText = await getBodyText(page);
+  if (LOGIN_FAILURE_PATTERN.test(authText)) {
+    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
+  }
+
+  const loginForm = getLoginForm(page);
+  if (await loginForm.isVisible().catch(() => false)) {
+    throw new Error(
+      "Falowen PDF login did not complete: the login form is still visible after submitting credentials.",
+    );
+  }
+
+  // Do not interrupt Firebase while it is persisting the newly authenticated
+  // user to browser storage. The previous renderer navigated immediately after
+  // clicking Log in, which could reload the app before the auth session was
+  // durable and send the lesson back to the public landing page.
+  await page.waitForTimeout(1200);
+};
+
+const openLessonWithAuthHydration = async (page, lesson, targetUrl) => {
+  const delays = [0, 1200, 2500];
+  for (let attempt = 0; attempt < delays.length; attempt += 1) {
+    if (delays[attempt]) await page.waitForTimeout(delays[attempt]);
+    await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await waitForPage(page);
+
+    // Firebase can briefly show the auth-loading/public shell while restoring
+    // IndexedDB state after a hard navigation. Give the authenticated lesson a
+    // short window to replace that transient screen before deciding it failed.
+    for (let check = 0; check < 8; check += 1) {
+      if (await hasLessonContent(page, lesson)) return true;
+      if (!(await isPublicLanding(page))) break;
+      await page.waitForTimeout(500);
+    }
+
+    if (await hasLessonContent(page, lesson)) return true;
+  }
+
+  return false;
+};
+
 const openLogin = async (page) => {
   const loginUrl = `${baseUrl}/login/`;
   console.log(`Opening Falowen login directly: ${loginUrl}`);
@@ -119,38 +192,27 @@ const submitLogin = async (page) => {
   const submit = loginForm.getByRole("button", { name: /^Log in$/i }).first();
   if (!(await submit.count())) throw new Error("Falowen login submit button was not found.");
   await submit.click({ timeout: 10000 });
-
-  await page.waitForFunction(
-    () => !document.body?.innerText?.includes("Returning Falowen student"),
-    undefined,
-    { timeout: 25000 },
-  ).catch(() => {});
-  await waitForPage(page);
-
-  const authText = await getBodyText(page);
-  if (/Password mismatch|could not find an account|cannot log in right now|permission denied/i.test(authText)) {
-    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
-  }
+  await waitForLoginCompletion(page);
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
   const targetUrl = new URL(lesson.route, baseUrl).toString();
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForPage(page);
-  if (await hasLessonContent(page, lesson)) return;
+  const initiallyLoaded = await openLessonWithAuthHydration(page, lesson, targetUrl);
+  if (initiallyLoaded) return;
 
-  const loginFormAlreadyVisible = (await getLoginForm(page).count()) > 0;
+  const loginFormAlreadyVisible = await getLoginForm(page).isVisible().catch(() => false);
   if (!loginFormAlreadyVisible) {
     await openLogin(page);
   }
 
   await submitLogin(page);
-  await page.goto(targetUrl, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForPage(page);
-  if (!(await hasLessonContent(page, lesson))) {
-    const preview = (await getBodyText(page)).slice(0, 700);
-    throw new Error(`Login completed but Day ${lesson.day} still did not show the real lesson. Current URL: ${page.url()}. Preview: ${preview}`);
-  }
+
+  if (await openLessonWithAuthHydration(page, lesson, targetUrl)) return;
+
+  const preview = (await getBodyText(page)).slice(0, 700);
+  throw new Error(
+    `Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Current URL: ${page.url()}. Preview: ${preview}`,
+  );
 };
 
 const injectPrintMode = async (page) => {
