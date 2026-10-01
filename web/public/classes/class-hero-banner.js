@@ -148,14 +148,14 @@
     var slug = selectedSlug();
     document.querySelectorAll("a[href^='/signup'],a[href^='/classes/?class']").forEach(function (link) {
       link.href = signupUrl(slug);
-      link.textContent = "Register Now";
+      link.textContent = "Register for this class";
       link.removeAttribute("target");
       link.removeAttribute("rel");
     });
     var cta = document.getElementById("mainSignupCta");
     if (cta) {
       cta.href = signupUrl(slug);
-      cta.textContent = "Register Now";
+      cta.textContent = "Register for this class";
     }
   }
 
