@@ -92,7 +92,7 @@ test("shared academy profile contains the current team, teaching media and publi
   assert.equal(profile.links.blog, "https://blog.falowen.app");
   assert.equal(profile.links.linkedin, "https://www.linkedin.com/in/learngermanghana/");
   assert.equal(profile.links.youtube, "https://www.youtube.com/@LLEAGhana");
-  assert.equal(profile.links.contractAgreement, "https://register.falowen.app/");
+  assert.equal(profile.links.contractAgreement, "https://legal.falowen.app/");
 
   assert.deepEqual(profile.team.map((member) => member.name), [
     "Felix Asadu",
