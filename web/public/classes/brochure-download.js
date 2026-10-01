@@ -216,6 +216,7 @@
     const courseDuration = Number(policy.courseDurationWeeks || 10);
     const fullAccessMonths = Number(policy.fullPaymentAccessMonths || 6);
     const installmentAccessMonths = Number(policy.installmentAccessMonths || 1);
+    const pageTotal = isSelfLearning ? 2 : 3;
     const heroKicker = isSelfLearning ? "FLEXIBLE GERMAN SELF-LEARNING" : "LIVE GERMAN PROGRAM · ACCRA + ONLINE";
     const heroTitle = isSelfLearning
       ? `Build your German independently with Falowen support`
@@ -304,7 +305,7 @@
           <div><strong>Flexible class mode</strong><span>${escapeHtml(data.mode)}</span></div>
         </div>
 
-        <footer class="pdf-page-footer"><span>Learn Language Education Academy</span><span>Page 1 of 3</span></footer>
+        <footer class="pdf-page-footer"><span>Learn Language Education Academy</span><span>Page 1 of ${pageTotal}</span></footer>
       </section>
 
       <section class="pdf-page pdf-page-two">
@@ -360,49 +361,49 @@
           </div>
         </section>
 
-        <footer class="pdf-page-footer"><span>Structured classes · Tutor support · Falowen practice</span><span>Page 2 of 3</span></footer>
+        <footer class="pdf-page-footer"><span>Structured classes · Tutor support · Falowen practice</span><span>Page 2 of ${pageTotal}</span></footer>
       </section>
 
-      <section class="pdf-page pdf-page-three">
-        <header class="pdf-brand-row compact">
-          <div class="pdf-brand"><img src="/falo.png" alt="" /><div><strong>Visit Learn Language Education Academy</strong><span>Awoshie · Accra</span></div></div>
-          <div class="pdf-level-badge">LLEA</div>
-        </header>
+      ${isSelfLearning ? "" : `\n        <section class="pdf-page pdf-page-three">
+          <header class="pdf-brand-row compact">
+            <div class="pdf-brand"><img src="/falo.png" alt="" /><div><strong>Visit Learn Language Education Academy</strong><span>Awoshie · Accra</span></div></div>
+            <div class="pdf-level-badge">LLEA</div>
+          </header>
 
-        <div class="pdf-location-hero">
-          <div>
-            <div class="pdf-small-label">IN-PERSON CLASSROOM</div>
-            <h2>Know exactly where to go before your first class</h2>
-            <p>In-person lessons take place at our Awoshie learning space. Use the Google Maps location below for the exact route and entrance.</p>
+          <div class="pdf-location-hero">
+            <div>
+              <div class="pdf-small-label">IN-PERSON CLASSROOM</div>
+              <h2>Know exactly where to go before your first class</h2>
+              <p>In-person lessons take place at our Awoshie learning space. Use the Google Maps location below for the exact route and entrance.</p>
+            </div>
+            <div class="pdf-location-address">
+              <span>Class location</span>
+              <strong>${escapeHtml(academyProfile.locationLabel || data.location || DEFAULT_LOCATION)}</strong>
+            </div>
           </div>
-          <div class="pdf-location-address">
-            <span>Class location</span>
-            <strong>${escapeHtml(academyProfile.locationLabel || data.location || DEFAULT_LOCATION)}</strong>
-          </div>
-        </div>
 
-        <section class="pdf-classroom-photo">
-          ${data.classroomImage ? `<img class="pdf-classroom-image" src="${escapeHtml(data.classroomImage)}" alt="Learn Language Education Academy classroom" crossorigin="anonymous" />` : ""}
-          <div class="pdf-classroom-fallback">LLEA classroom photo</div>
-        </section>
+          <section class="pdf-classroom-photo">
+            ${data.classroomImage ? `<img class="pdf-classroom-image" src="${escapeHtml(data.classroomImage)}" alt="Learn Language Education Academy classroom" crossorigin="anonymous" />` : ""}
+            <div class="pdf-classroom-fallback">LLEA classroom photo</div>
+          </section>
 
-        <section class="pdf-map-panel">
-          <div>
-            <div class="pdf-section-title"><span>Open the exact location</span><small>Google Maps</small></div>
-            <p class="pdf-body-copy">Use this link before travelling to class. It opens the exact LLEA map location instead of a general Awoshie search.</p>
-            <div class="pdf-map-url">${escapeHtml(data.mapsUrl || academyProfile.mapsUrl || "")}</div>
-          </div>
-          <div id="pdfMapsQr" class="pdf-maps-qr"><span>Google Maps</span></div>
-        </section>
+          <section class="pdf-map-panel">
+            <div>
+              <div class="pdf-section-title"><span>Open the exact location</span><small>Google Maps</small></div>
+              <p class="pdf-body-copy">Use this link before travelling to class. It opens the exact LLEA map location instead of a general Awoshie search.</p>
+              <div class="pdf-map-url">${escapeHtml(data.mapsUrl || academyProfile.mapsUrl || "")}</div>
+            </div>
+            <div id="pdfMapsQr" class="pdf-maps-qr"><span>Google Maps</span></div>
+          </section>
 
-        <section class="pdf-arrival-panel">
-          <div><strong>Before class</strong><span>Open the map link, check your route and plan to arrive early for in-person lessons.</span></div>
-          <div><strong>Hybrid option</strong><span>If needed, students can also join online according to the class arrangement.</span></div>
-          <div><strong>Need help?</strong><span>Contact the academy using the WhatsApp or email details in this brochure.</span></div>
-        </section>
+          <section class="pdf-arrival-panel">
+            <div><strong>Before class</strong><span>Open the map link, check your route and plan to arrive early for in-person lessons.</span></div>
+            <div><strong>Hybrid option</strong><span>If needed, students can also join online according to the class arrangement.</span></div>
+            <div><strong>Need help?</strong><span>Contact the academy using the WhatsApp or email details in this brochure.</span></div>
+          </section>
 
-        <footer class="pdf-page-footer"><span>${escapeHtml(academyProfile.academyName || "Learn Language Education Academy")}</span><span>Page 3 of 3</span></footer>
-      </section>
+          <footer class="pdf-page-footer"><span>${escapeHtml(academyProfile.academyName || "Learn Language Education Academy")}</span><span>Page 3 of 3</span></footer>
+        </section>\n      `}
     `;
     return wrapper;
   }
