@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
+import { useAuth } from "../context/AuthContext";
+import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import { styles } from "../styles";
 
 const DAY21_ASSIGNMENT_KEY = "A1-13";
@@ -10,11 +12,42 @@ const DAY21_WORKBOOK_TABS = Object.freeze([
   { key: "teil-1", label: "Teil 1" },
   { key: "teil-2", label: "Teil 2" },
   { key: "teil-3", label: "Teil 3" },
+  { key: "teil-4", label: "Teil 4" },
   { key: "submit", label: "Submit", submit: true },
 ]);
 
 const headerImage =
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80";
+
+const DAY13_AUDIO_KEY = "a1/day-13/day-13.mp3";
+
+const DAY13_LISTENING_QUESTIONS = Object.freeze([
+  {
+    stem: "Wie ist das Wetter heute?",
+    options: ["A. Es ist warm und sonnig.", "B. Es ist kalt und es regnet.", "C. Es ist windig und warm."],
+  },
+  {
+    stem: "Wie ist das Wetter am Dienstag?",
+    options: ["A. Es ist sonnig und warm.", "B. Es regnet stark.", "C. Es ist kalt und windig."],
+  },
+  {
+    stem: "Wie warm ist es am Dienstag?",
+    options: ["A. 12 Grad", "B. 20 Grad", "C. 30 Grad"],
+  },
+  {
+    stem: "Wann gehen Anna und Tom in den Park?",
+    options: ["A. Dienstag um 15:30 Uhr", "B. Mittwoch um 10:00 Uhr", "C. Donnerstag um 19:00 Uhr"],
+  },
+  {
+    stem: "Wann hat Anna den Arzttermin?",
+    options: ["A. Dienstag um 15:30 Uhr", "B. Mittwoch um 10:00 Uhr", "C. Donnerstag um 19:00 Uhr"],
+  },
+  {
+    stem: "Wann essen Anna und Tom im Restaurant?",
+    options: ["A. Dienstag um 19:00 Uhr", "B. Mittwoch um 19:00 Uhr", "C. Donnerstag um 19:00 Uhr"],
+  },
+]);
+
 
 const card = {
   ...styles.card,
@@ -56,7 +89,7 @@ const WeatherOverview = () => (
         <h2 style={{ margin: 0 }}>A1 Day 21 · Kapitel 13 Assignment Overview</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Complete each section separately. Use Teil 1 for advertisements, Teil 2 for the message,
-          and Teil 3 for the final writing task. Open Submit only after all three parts are finished.
+          Teil 3 for the final writing task and Teil 4 for listening. Open Submit only after all four parts are finished.
         </p>
       </div>
     </div>
@@ -67,6 +100,7 @@ const WeatherOverview = () => (
         ["Teil 1 · Anzeigen", "Read two sets of advertisements and answer questions 1–6."],
         ["Teil 2 · Nachricht", "Read Felix’s message and answer questions 7–9."],
         ["Teil 3 · Schreiben", "Write the requested email using weather as the reason."],
+        ["Teil 4 · Hören", "Listen to Anna’s message and answer six multiple-choice questions."],
       ].map(([title, description]) => (
         <div key={title} style={questionBox}>
           <strong>{title}</strong>
@@ -214,6 +248,61 @@ const Teil3Content = () => (
   </section>
 );
 
+
+const Teil4Content = () => {
+  const { idToken } = useAuth();
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioError, setAudioError] = useState("");
+  const [loadingAudio, setLoadingAudio] = useState(false);
+
+  const loadAudio = async () => {
+    if (audioUrl || loadingAudio) return;
+    setLoadingAudio(true);
+    setAudioError("");
+    try {
+      const playback = await fetchA1AudioPlaybackUrl({
+        day: 13,
+        key: DAY13_AUDIO_KEY,
+        idToken,
+      });
+      setAudioUrl(playback.url);
+    } catch (error) {
+      setAudioError(error?.response?.data?.error || error?.message || "Audio could not be loaded.");
+    } finally {
+      setLoadingAudio(false);
+    }
+  };
+
+  return (
+    <section style={card} data-a1-day21-weather-teil="4">
+      <h2>Teil 4 · Hören</h2>
+      <div style={highlight}>
+        <p style={{ marginTop: 0 }}>
+          <b>Instruction:</b> Listen to Anna’s message twice. Choose A, B or C for each question.
+          Pay attention to the weather, days and appointment times.
+        </p>
+        {!audioUrl ? (
+          <button type="button" onClick={loadAudio} disabled={loadingAudio} style={{ justifySelf: "start" }}>
+            {loadingAudio ? "Audio wird geladen …" : "Hören starten"}
+          </button>
+        ) : (
+          <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }}>
+            Ihr Browser unterstützt dieses Audio nicht.
+          </audio>
+        )}
+        {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
+      </div>
+
+      {DAY13_LISTENING_QUESTIONS.map((item, index) => (
+        <div key={item.stem} style={questionBox}>
+          <b>{index + 1}. {item.stem}</b>
+          {item.options.map((option) => <div key={option}>{option}</div>)}
+        </div>
+      ))}
+    </section>
+  );
+};
+
 const resolveActiveTab = (search = "") => {
   const requested = new URLSearchParams(search || "").get("workbookTab") || "overview";
   return DAY21_WORKBOOK_TABS.some((tab) => tab.key === requested) ? requested : "overview";
@@ -225,15 +314,16 @@ const A1Day21WeatherWorkbookPage = () => (
     chapter="13"
     fallbackAssignmentKey={DAY21_ASSIGNMENT_KEY}
     title="A1 · Day 21 Workbook · Weather"
-    subtitle="Kapitel 13 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 35-minute controlled mock. Submit your own work first; use Mark My Letter later when review is unlocked."
+    subtitle="Kapitel 13 · Tutor-marked Lesen, Schreiben & Hören assignment"
+    assignmentIntro="Use Overview, then complete Teil 1, Teil 2, Teil 3 and Teil 4 independently inside the controlled mock. Submit your own work first; use Mark My Letter later when review is unlocked."
     submitTitle="Submit A1 · Day 21 · Kapitel 13"
-    submitDescription="Submit your reading answers and final writing task for tutor marking."
+    submitDescription="Submit your reading answers, final writing task and Teil 4 listening answers for tutor marking."
   >
     <WeatherOverview />
     <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>
     <WorkbookSection sectionKey="teil-2"><Teil2Content /></WorkbookSection>
     <WorkbookSection sectionKey="teil-3"><Teil3Content /></WorkbookSection>
+    <WorkbookSection sectionKey="teil-4"><Teil4Content /></WorkbookSection>
   </A1TutorMarkedWorkbookShell>
 );
 

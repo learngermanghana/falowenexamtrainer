@@ -154,13 +154,14 @@ const profiles = {
       "teil-1": section(choiceItems(6, ["A", "B"]), { label: "Anzeigen" }),
       "teil-2": section(choiceItems(3, ["A", "B"]), { label: "Nachricht" }),
       "teil-3": section([], { label: "Schreiben", embeddedWriting: true }),
+      "teil-4": section(choiceItems(6, ["A", "B", "C"]), { label: "Hören" }),
     },
   },
   "A1-14.1": {
     sections: {
       "teil-1": section(choiceItems(5, ["Anzeige A", "Anzeige B"]), { label: "Lesen" }),
       "teil-2": section([], { label: "Schreiben", embeddedWriting: true }),
-      "teil-3": section(shortItems(10, "Write the German word"), { label: "Wortschatz" }),
+      "teil-3": section(choiceItems(6, ["A", "B", "C"]), { label: "Hören" }),
     },
   },
 };

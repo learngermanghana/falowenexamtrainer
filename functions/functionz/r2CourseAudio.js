@@ -1,10 +1,12 @@
 const crypto = require("crypto");
 
 const COURSE_LISTENING_DAYS = Object.freeze({
+  A1: new Set([13, "14.1"]),
   A2: new Set([24, 26, 27, 28]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
+const A1_LISTENING_DAYS = COURSE_LISTENING_DAYS.A1;
 const A2_LISTENING_DAYS = COURSE_LISTENING_DAYS.A2;
 const C2_LISTENING_DAYS = COURSE_LISTENING_DAYS.C2;
 const B2_LISTENING_DAYS = COURSE_LISTENING_DAYS.B2;
@@ -67,13 +69,21 @@ const clampExpiry = (value) => {
 
 const normalizeDay = (level, value) => {
   const normalizedLevel = normalizeLevel(level);
-  const day = Number(value);
   const allowedDays = COURSE_LISTENING_DAYS[normalizedLevel];
+  const raw = clean(value);
+
+  if (normalizedLevel === "A1" && raw === "14.1" && allowedDays?.has("14.1")) {
+    return "14.1";
+  }
+
+  const day = Number(raw);
   return Number.isInteger(day) && allowedDays?.has(day) ? day : null;
 };
 
-const expectedPrefixForDay = (level, day) =>
-  `${normalizeLevel(level).toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
+const expectedPrefixForDay = (level, day) => {
+  const dayToken = String(day).replace(".", "-").padStart(2, "0");
+  return `${normalizeLevel(level).toLowerCase()}/day-${dayToken}/`;
+};
 
 const isAudioObjectKey = (key) =>
   /\.(?:mp3|m4a|aac|wav|ogg|webm)$/i.test(key);
@@ -90,6 +100,11 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   if (!isAudioObjectKey(normalizedKey)) return null;
 
   return { level: normalizedLevel, day: normalizedDay, key: normalizedKey };
+};
+
+const validateA1AudioKey = ({ day, key }) => {
+  const validated = validateCourseAudioKey({ level: "A1", day, key });
+  return validated ? { day: validated.day, key: validated.key } : null;
 };
 
 const validateA2AudioKey = ({ day, key }) => {
@@ -236,6 +251,9 @@ const createCourseAudioSignedUrl = async ({
   };
 };
 
+const createA1AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
+  createCourseAudioSignedUrl({ level: "A1", day, key, env, now });
+
 const createA2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "A2", day, key, env, now });
 
@@ -247,6 +265,7 @@ const createB2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() 
 
 module.exports = {
   COURSE_LISTENING_DAYS,
+  A1_LISTENING_DAYS,
   A2_LISTENING_DAYS,
   C2_LISTENING_DAYS,
   B2_LISTENING_DAYS,
@@ -256,11 +275,13 @@ module.exports = {
   hasCourseMediaStaffAccess,
   hasCourseMediaLevelAccess,
   validateCourseAudioKey,
+  validateA1AudioKey,
   validateA2AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   getR2AudioConfig,
   createCourseAudioSignedUrl,
+  createA1AudioSignedUrl,
   createA2AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,

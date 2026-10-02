@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
+import { useAuth } from "../context/AuthContext";
+import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import { styles } from "../styles";
 
 const DAY22_ASSIGNMENT_KEY = "A1-14.1";
@@ -133,30 +135,70 @@ const teil1Questions = [
   },
 ];
 
-const vocabItems = [
-  "a. Head – ___________",
-  "b. Arm – ___________",
-  "c. Leg – ___________",
-  "d. Eye – ___________",
-  "e. Nose – ___________",
-  "f. Ear – ___________",
-  "g. Mouth – ___________",
-  "h. Hand – ___________",
-  "i. Foot – ___________",
-  "j. Stomach / Belly – ___________",
-];
+const DAY14_AUDIO_KEY = "a1/day-14-1/day-14-1.mp3";
+
+const healthListeningQuestions = Object.freeze([
+  {
+    stem: "Welche Beschwerden hat Herr Braun?",
+    options: [
+      "A. Fieber, Kopfschmerzen und Halsschmerzen",
+      "B. Bauchschmerzen und Rückenschmerzen",
+      "C. Zahnschmerzen und Husten",
+    ],
+  },
+  {
+    stem: "Was soll Herr Braun machen?",
+    options: [
+      "A. Zur Arbeit gehen und Sport machen",
+      "B. Zu Hause bleiben und viel Tee trinken",
+      "C. Sofort ins Krankenhaus fahren",
+    ],
+  },
+  {
+    stem: "Wann ist der Termin bei Doktor Weber?",
+    options: [
+      "A. Am Freitag um 9:30 Uhr",
+      "B. Am Donnerstag um 9:30 Uhr",
+      "C. Am Freitag um 10:30 Uhr",
+    ],
+  },
+  {
+    stem: "Wo ist die Praxis?",
+    options: [
+      "A. Bahnhofstraße 12",
+      "B. Gartenstraße 20",
+      "C. Marktstraße 15",
+    ],
+  },
+  {
+    stem: "Was soll Herr Braun mitbringen?",
+    options: [
+      "A. Einen Reisepass",
+      "B. Seine Versichertenkarte",
+      "C. Eine Flasche Wasser",
+    ],
+  },
+  {
+    stem: "Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?",
+    options: [
+      "A. Die Praxis anrufen",
+      "B. Einfach am Montag kommen",
+      "C. Eine E-Mail an Doktor Weber schreiben",
+    ],
+  },
+]);
 
 const HealthOverview = () => (
   <section style={sectionStyle} data-a1-day22-health-overview="true">
     <div style={{ border: "1px solid #f59e0b", background: "#fffbeb", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
       <strong>Finish Strong · Final Independent Challenge · 30 minutes</strong>
       <p style={{ margin: "6px 0 0" }}>
-        Use what you know from the whole A1 course. Complete the reading, write the 35–50 word email and recall the body-part vocabulary without live writing feedback. Mark My Letter is locked while the timer is running.
+        Use what you know from the whole A1 course. Complete the reading, write the 35–50 word email and finish the listening task independently. Mark My Letter is locked while the timer is running.
       </p>
     </div>
     <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Complete Teil 1, write the Teil 2 E-Mail independently, finish Teil 3 vocabulary, then open Submit Assignment. Use Mark My Letter only when the timed work is later unlocked for review.
+      Complete Teil 1, write the Teil 2 E-Mail independently, finish Teil 3 Hören, then open Submit Assignment. Use Mark My Letter only when the timed work is later unlocked for review.
     </p>
   </section>
 );
@@ -251,30 +293,67 @@ const Teil2Content = () => (
       </section>
 );
 
-const Teil3Content = () => (
-      <section style={sectionStyle} data-a1-day22-health-teil="3">
-        <h2 style={{ margin: 0 }}>Teil 3 · Wortschatz: Translate into German</h2>
+const Teil3Content = () => {
+  const { idToken } = useAuth();
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioError, setAudioError] = useState("");
+  const [loadingAudio, setLoadingAudio] = useState(false);
+
+  const loadAudio = async () => {
+    if (audioUrl || loadingAudio) return;
+    setLoadingAudio(true);
+    setAudioError("");
+    try {
+      const playback = await fetchA1AudioPlaybackUrl({
+        day: "14.1",
+        key: DAY14_AUDIO_KEY,
+        idToken,
+      });
+      setAudioUrl(playback.url);
+    } catch (error) {
+      setAudioError(error?.response?.data?.error || error?.message || "Audio could not be loaded.");
+    } finally {
+      setLoadingAudio(false);
+    }
+  };
+
+  return (
+    <section style={sectionStyle} data-a1-day22-health-teil="3">
+      <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+      <div style={infoBoxStyle}>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Write the correct German word for each body part below.
+          <strong>Aufgabe:</strong> Hören Sie die Nachricht aus der Arztpraxis zweimal. Wählen Sie bei jeder Frage A, B oder C.
         </p>
-        <div style={questionBoxStyle}>
-          {vocabItems.map((item) => (
-            <span key={item} style={{ lineHeight: 1.7 }}>
-              {item}
-            </span>
-          ))}
+        {!audioUrl ? (
+          <button type="button" onClick={loadAudio} disabled={loadingAudio} style={{ justifySelf: "start" }}>
+            {loadingAudio ? "Audio wird geladen …" : "Hören starten"}
+          </button>
+        ) : (
+          <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }}>
+            Ihr Browser unterstützt dieses Audio nicht.
+          </audio>
+        )}
+        {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
+      </div>
+
+      {healthListeningQuestions.map((item, index) => (
+        <div key={item.stem} style={questionBoxStyle}>
+          <strong>{index + 1}. {item.stem}</strong>
+          {item.options.map((option) => <span key={option}>{option}</span>)}
         </div>
-      </section>
-);
+      ))}
+    </section>
+  );
+};
 
 const A1Day22HealthBodyPartsWorkbookPage = () => (
   <A1TutorMarkedWorkbookShell
     fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
     title="A1 · Day 22 Workbook · Health and Body Parts"
-    subtitle="Kapitel 14.1 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 30-minute final challenge. Submit your own work first; use Mark My Letter later when review is unlocked."
+    subtitle="Kapitel 14.1 · Tutor-marked Lesen, Schreiben & Hören assignment"
+    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 30-minute final challenge. Teil 3 is now a real listening task. Submit your own work first; use Mark My Letter later when review is unlocked."
     submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
-    submitDescription="Submit your reading answers, final writing task and vocabulary answers together for tutor marking."
+    submitDescription="Submit your reading answers, final writing task and listening answers together for tutor marking."
   >
     <HealthOverview />
     <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>

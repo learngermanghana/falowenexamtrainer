@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA2AudioKey, validateC2AudioKey, validateB2AudioKey, createA2AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA2AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA2AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -477,6 +477,27 @@ const getC2MediaAccessBlockReason = ({ authedUser, student }) => {
   return "";
 };
 
+const getA1MediaAccessBlockReason = ({ authedUser, student }) => {
+  if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
+
+  if (!student) return "student_profile_missing";
+
+  if (!hasCourseMediaLevelAccess({ student, requiredLevel: "A1" })) {
+    return "a1_not_assigned";
+  }
+
+  const status = String(student.status || "").trim().toLowerCase();
+  if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
+
+  const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
+  if (C2_MEDIA_BLOCKED_PAYMENT_STATUSES.has(paymentStatus)) return "payment_blocked";
+
+  const contractEnd = parseContractEnd(student.contractEnd);
+  if (contractEnd && contractEnd.getTime() <= Date.now()) return "contract_ended";
+
+  return "";
+};
+
 const getA2MediaAccessBlockReason = ({ authedUser, student }) => {
   if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
 
@@ -683,6 +704,55 @@ app.get("/metrics", (_req, res) => {
     metrics: snapshot,
     memory: process.memoryUsage(),
   });
+});
+
+app.get("/course-media/a1/audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const day = String(req.query?.day || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateA1AudioKey({ day, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid A1 audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getA1MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.a1.access_denied", {
+        reason: accessBlockReason,
+        day: validated.day,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "A1 audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createA1AudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("A1 R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "A1 audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_COURSE_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid A1 audio request" });
+    }
+    console.error("Failed to create A1 audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this A1 audio right now." });
+  }
 });
 
 app.get("/course-media/a2/audio-url", async (req, res) => {

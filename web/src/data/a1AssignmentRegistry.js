@@ -60,8 +60,8 @@ const records = [
   ["A1-12.1", 18, "12.1", "Two Case Prepositions", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook", "A1Day18Kapitel121WorkbookPage", ["Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort", "Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen", "Teil 3 · Hören"]],
   ["A1-12.2", 18, "12.2", "Dative Prepositions", "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook", "A1Day18Kapitel122WorkbookPage", ["Teil 1 · Lesen Sie den Aufsatz und schreiben Sie die richtige Antwort", "Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen", "Teil 3 · Hören"]],
   ["A1-12.3", 20, "12.3", "Introduction to Letter Writing", "/campus/course/letter-writing-intro-german-a1-day-12-3", "A1Day20LetterWritingWorkbookPage", ["Teil 1 · Informal letter: Birthday message", "Teil 2 · Formal letter: Enquiry to a language school"]],
-  ["A1-13", 21, "13", "Weather", "/campus/course/a1-day-21-weather-workbook", "A1Day21WeatherWorkbookPage", ["Teil 1 · Anzeigen", "Teil 2 · Nachricht", "Teil 3 · Schreiben"]],
-  ["A1-14.1", 22, "14.1", "Health", "/campus/course/a1-day-22-health-and-body-parts-workbook", "A1Day22HealthBodyPartsWorkbookPage", ["Teil 1 · Lesen: Anzeigen und Termine", "Teil 2 · Schreiben: E-Mail an Felix", "Teil 3 · Wortschatz: Translate into German"]],
+  ["A1-13", 21, "13", "Weather", "/campus/course/a1-day-21-weather-workbook", "A1Day21WeatherWorkbookPage", ["Teil 1 · Anzeigen", "Teil 2 · Nachricht", "Teil 3 · Schreiben", "Teil 4 · Hören"]],
+  ["A1-14.1", 22, "14.1", "Health", "/campus/course/a1-day-22-health-and-body-parts-workbook", "A1Day22HealthBodyPartsWorkbookPage", ["Teil 1 · Lesen: Anzeigen und Termine", "Teil 2 · Schreiben: E-Mail an Felix", "Teil 3 · Hören"]],
 ];
 
 const parseRoute = (route) => {
