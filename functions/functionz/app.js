@@ -711,7 +711,7 @@ app.get("/course-media/a1/audio-url", async (req, res) => {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
     if (!authedUser) return;
 
-    const day = Number(req.query?.day);
+    const day = String(req.query?.day || "").trim();
     const key = String(req.query?.key || "").trim();
     const validated = validateA1AudioKey({ day, key });
     if (!validated) {
