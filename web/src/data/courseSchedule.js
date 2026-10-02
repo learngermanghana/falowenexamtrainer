@@ -900,8 +900,8 @@ const RAW_COURSE_SCHEDULES = {
         },
         {
           chapter: "1.1",
-          video: "https://youtu.be/AjsnO1hxDs4",
-          youtube_link: "https://youtu.be/AjsnO1hxDs4",
+          video: "https://youtu.be/xyRogEAA9qM",
+          youtube_link: "https://youtu.be/xyRogEAA9qM",
           grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
           assignment: true,
           workbook_link: "/campus/course/a1-day-2-kapitel-1-1-workbook",
