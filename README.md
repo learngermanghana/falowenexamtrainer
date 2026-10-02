@@ -374,3 +374,4 @@ Falowen keeps an official public help source so learners, search engines and AI 
 - Discovery controls: `web/public/robots.txt` and `web/public/sitemap.xml`
 
 When signup, trial/payment, Course Book, submission, Results, Attendance, Exam File, Account or level-visibility rules change, update the public Markdown knowledge base and `PublicStudentGuidePage.js` together. Keep `src/data/falowenPublicHelpDiscovery.test.js` passing so the public route and machine-readable sources do not silently disappear.
+<!-- Vercel production redeploy requested 2026-10-02 -->
