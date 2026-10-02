@@ -7,8 +7,8 @@ const rendererPath = path.join(__dirname, "renderA1Bundle.mjs");
 let source = fs.readFileSync(rendererPath, "utf8");
 
 source = source.replace(
-  'rendererVersion: 8',
   'rendererVersion: 9',
+  'rendererVersion: 10',
 );
 
 const oldStable = `const waitForStablePage = async (page) => {\n  await page.waitForLoadState("domcontentloaded", { timeout: 30000 }).catch(() => {});\n  await page.locator("body").waitFor({ state: "visible", timeout: 15000 });\n  await page.waitForTimeout(1000);\n};`;
