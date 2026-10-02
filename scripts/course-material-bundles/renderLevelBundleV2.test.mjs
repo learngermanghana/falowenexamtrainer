@@ -22,6 +22,28 @@ test("course bundle renderer allows Firebase auth hydration after hard lesson na
   assert.match(source, /Authentication completed but Day/);
 });
 
-test("renderer version identifies the auth-persistence fix", () => {
-  assert.match(source, /rendererVersion: 7/);
+test("renderer version identifies the grammar-workbook bundle contract", () => {
+  assert.match(source, /rendererVersion: 8/);
+});
+
+test("A2 and B1 bundle renderer exposes only Grammar and one merged Workbook resource", () => {
+  assert.match(source, /const renderA2B1Lesson = async/);
+  assert.match(source, /const workbookTabSpecs = \[/);
+  assert.match(source, /return \[grammar, \{ tab: "workbook", file: workbookFile \}\];/);
+  assert.doesNotMatch(source, /\{ key: "ref", names: \["Ref"\] \}/);
+});
+
+test("A1 render plan contains only grammar and workbook targets", () => {
+  const plan = JSON.parse(
+    fs.readFileSync(path.join(__dirname, "a1RenderPlan.json"), "utf8"),
+  );
+  const kinds = new Set(
+    plan.lessons.flatMap((lesson) => lesson.targets.map((target) => target.kind)),
+  );
+  assert.deepEqual([...kinds].sort(), ["grammar", "workbook"]);
+  const externalTargets = plan.lessons
+    .flatMap((lesson) => lesson.targets)
+    .filter((target) => target.sourceType === "external-pdf");
+  assert.ok(externalTargets.length > 0);
+  assert.ok(externalTargets.every((target) => target.kind === "workbook"));
 });

@@ -17,7 +17,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 8, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 9, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -100,7 +100,7 @@ const injectPrintMode = async (page) => {
   ` });
 };
 
-const WORKBOOK_KINDS = new Set(["workbook", "practice", "combined"]);
+const WORKBOOK_KINDS = new Set(["workbook"]);
 const getInternalRenderUrl = (target) => {
   const url = new URL(target.url, baseUrl);
   if (WORKBOOK_KINDS.has(target.kind)) {
@@ -179,7 +179,7 @@ const addCoverAndContents = async (output) => {
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
   cover.drawText("FALOWEN", { x: 54, y: 755, size: 28, font: bold, color: rgb(0.08, 0.25, 0.65) });
-  cover.drawText("A1 Course Materials", { x: 54, y: 670, size: 30, font: bold });
+  cover.drawText("A1 Grammar Notes & Workbook", { x: 54, y: 670, size: 28, font: bold });
   cover.drawText("Grammar notes and workbook practice", { x: 54, y: 625, size: 15, font });
   cover.drawText("Generated for administration", { x: 54, y: 110, size: 11, font });
 
@@ -189,7 +189,17 @@ const addCoverAndContents = async (output) => {
   for (const lesson of plan.lessons) {
     const label = `Day ${lesson.day} · ${lesson.title}`;
     toc.drawText(label.slice(0, 82), { x: 58, y, size: 10.5, font });
-    y -= 19;
+    y -= 16;
+    const kinds = [...new Set((lesson.targets || []).map((target) => target.kind))];
+    const sectionLabel = [
+      kinds.includes("grammar") ? "Grammar" : "",
+      kinds.includes("workbook") ? "Workbook" : "",
+    ].filter(Boolean).join(" · ");
+    if (sectionLabel) {
+      toc.drawText(sectionLabel, { x: 76, y, size: 9.5, font });
+      y -= 16;
+    }
+    y -= 3;
     if (y < 70) {
       toc = output.addPage([595.28, 841.89]);
       toc.drawText("Contents continued", { x: 54, y: 810, size: 18, font: bold });
@@ -214,7 +224,7 @@ try {
     try {
       for (let index = 0; index < lesson.targets.length; index += 1) {
         const target = lesson.targets[index];
-        const result = target.kind === "external-pdf"
+        const result = target.sourceType === "external-pdf"
           ? await downloadExternalPdf(lesson, target, index)
           : await renderInternalTarget(page, lesson, target, index);
         outputs.push(result);
