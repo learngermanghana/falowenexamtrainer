@@ -18,7 +18,7 @@ export default function A2Day10PraeteritumGrammarPage() {
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
       <header style={card}>
-        <h1 style={{ ...styles.title, margin: 0 }}>A2 • 4.10 Tourismus und traditionelle Feste</h1>
+        <h1 style={{ ...styles.title, margin: 0 }}>A2 • 4.10 Eine Stadt entdecken und etwas erleben</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Grammar focus: Präteritum</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Das <strong>Präteritum</strong> ist eine Vergangenheitsform. Du benutzt nur <strong>eine konjugierte Verbform</strong>:
@@ -44,12 +44,12 @@ export default function A2Day10PraeteritumGrammarPage() {
             <tbody>
               <tr>
                 <td style={td}><strong>Perfekt</strong></td>
-                <td style={td}>Ich <strong>habe</strong> das Fest <strong>besucht</strong>.</td>
+                <td style={td}>Ich <strong>habe</strong> die Altstadt <strong>besucht</strong>.</td>
                 <td style={td}>Sehr häufig beim Sprechen über vergangene Handlungen.</td>
               </tr>
               <tr>
                 <td style={td}><strong>Präteritum</strong></td>
-                <td style={td}>Ich <strong>besuchte</strong> das Fest.</td>
+                <td style={td}>Ich <strong>besuchte</strong> die Altstadt.</td>
                 <td style={td}>Häufig in Geschichten, Berichten und schriftlichen Texten.</td>
               </tr>
             </tbody>
@@ -68,22 +68,22 @@ export default function A2Day10PraeteritumGrammarPage() {
           Bei regelmäßigen Verben nimmst du den Verbstamm und fügst <strong>-te</strong> plus die passende Personenendung an.
         </p>
         <div style={example}>
-          <strong>feiern → feierte</strong><br />
-          Ich feierte gestern mit meiner Familie.<br />
-          Wir feierten ein traditionelles Fest.
+          <strong>entdecken → entdeckte</strong><br />
+          Ich entdeckte gestern ein neues Viertel.<br />
+          Wir entdeckten einen kleinen Markt in der Altstadt.
         </div>
         <div style={tableWrap}>
           <table style={table}>
             <thead>
-              <tr><th style={th}>Person</th><th style={th}>feiern</th><th style={th}>besuchen</th></tr>
+              <tr><th style={th}>Person</th><th style={th}>entdecken</th><th style={th}>besuchen</th></tr>
             </thead>
             <tbody>
-              <tr><td style={td}>ich</td><td style={td}>feierte</td><td style={td}>besuchte</td></tr>
-              <tr><td style={td}>du</td><td style={td}>feiertest</td><td style={td}>besuchtest</td></tr>
-              <tr><td style={td}>er / sie / es</td><td style={td}>feierte</td><td style={td}>besuchte</td></tr>
-              <tr><td style={td}>wir</td><td style={td}>feierten</td><td style={td}>besuchten</td></tr>
-              <tr><td style={td}>ihr</td><td style={td}>feiertet</td><td style={td}>besuchtet</td></tr>
-              <tr><td style={td}>sie / Sie</td><td style={td}>feierten</td><td style={td}>besuchten</td></tr>
+              <tr><td style={td}>ich</td><td style={td}>entdeckte</td><td style={td}>besuchte</td></tr>
+              <tr><td style={td}>du</td><td style={td}>entdecktest</td><td style={td}>besuchtest</td></tr>
+              <tr><td style={td}>er / sie / es</td><td style={td}>entdeckte</td><td style={td}>besuchte</td></tr>
+              <tr><td style={td}>wir</td><td style={td}>entdeckten</td><td style={td}>besuchten</td></tr>
+              <tr><td style={td}>ihr</td><td style={td}>entdecktet</td><td style={td}>besuchtet</td></tr>
+              <tr><td style={td}>sie / Sie</td><td style={td}>entdeckten</td><td style={td}>besuchten</td></tr>
             </tbody>
           </table>
         </div>
@@ -106,10 +106,10 @@ export default function A2Day10PraeteritumGrammarPage() {
             </thead>
             <tbody>
               <tr><td style={td}>gehen</td><td style={td}><strong>ging</strong></td><td style={td}>Danach ging ich ins Restaurant.</td></tr>
-              <tr><td style={td}>fahren</td><td style={td}><strong>fuhr</strong></td><td style={td}>Wir fuhren nach München.</td></tr>
-              <tr><td style={td}>sehen</td><td style={td}><strong>sah</strong></td><td style={td}>Ich sah viele traditionelle Kleider.</td></tr>
-              <tr><td style={td}>kommen</td><td style={td}><strong>kam</strong></td><td style={td}>Viele Touristen kamen am Samstag.</td></tr>
-              <tr><td style={td}>finden</td><td style={td}><strong>fand</strong></td><td style={td}>Ich fand das Fest sehr interessant.</td></tr>
+              <tr><td style={td}>fahren</td><td style={td}><strong>fuhr</strong></td><td style={td}>Wir fuhren mit der Straßenbahn ins Zentrum.</td></tr>
+              <tr><td style={td}>sehen</td><td style={td}><strong>sah</strong></td><td style={td}>Ich sah ein altes Rathaus und einen schönen Park.</td></tr>
+              <tr><td style={td}>kommen</td><td style={td}><strong>kam</strong></td><td style={td}>Am Nachmittag kam meine Freundin dazu.</td></tr>
+              <tr><td style={td}>finden</td><td style={td}><strong>fand</strong></td><td style={td}>Ich fand das kleine Café sehr gemütlich.</td></tr>
             </tbody>
           </table>
         </div>
@@ -153,14 +153,14 @@ export default function A2Day10PraeteritumGrammarPage() {
           Das Präteritum hat normalerweise nur <strong>eine Verbform</strong>. Im Hauptsatz steht das konjugierte Verb wie gewohnt auf Position 2.
         </p>
         <ul style={list}>
-          <li><strong>Gestern besuchte</strong> ich den Weihnachtsmarkt.</li>
-          <li><strong>Am Abend ging</strong> ich mit Freunden essen.</li>
-          <li><strong>Das Fest war</strong> sehr voll.</li>
+          <li><strong>Gestern besuchte</strong> ich die Altstadt.</li>
+          <li><strong>Am Abend ging</strong> ich mit Freunden in ein kleines Café.</li>
+          <li><strong>Der Marktplatz war</strong> sehr voll.</li>
           <li><strong>Wir hatten</strong> trotzdem viel Spaß.</li>
         </ul>
         <div style={note}>
-          Vergleiche: <strong>Ich habe den Markt besucht.</strong> → Perfekt: Hilfsverb + Partizip II.<br />
-          <strong>Ich besuchte den Markt.</strong> → Präteritum: eine konjugierte Verbform.
+          Vergleiche: <strong>Ich habe die Altstadt besucht.</strong> → Perfekt: Hilfsverb + Partizip II.<br />
+          <strong>Ich besuchte die Altstadt.</strong> → Präteritum: eine konjugierte Verbform.
         </div>
       </section>
 
@@ -169,8 +169,8 @@ export default function A2Day10PraeteritumGrammarPage() {
         rule="Präteritum beschreibt Vergangenes mit einer konjugierten Verbform. Regelmäßige Verben bilden es meist mit -te; starke Verben haben eigene Formen. Für A2 sind besonders war und hatte wichtig."
         examples={[
           "Letztes Jahr war ich in München.",
-          "Wir hatten viel Zeit für das Fest.",
-          "Am Samstag besuchte ich einen Weihnachtsmarkt.",
+          "Wir hatten viel Zeit für die Stadt.",
+          "Am Samstag besuchte ich einen kleinen Markt.",
           "Danach ging ich mit Freunden ins Restaurant."
         ]}
         questions={[
@@ -178,14 +178,14 @@ export default function A2Day10PraeteritumGrammarPage() {
           { stem: "Was ist das Präteritum von haben? Wir ___ viel Zeit.", options: ["hatten", "haben", "gehabt"], answer: 0, explanation: "haben → wir hatten." },
           { stem: "Welcher Satz ist richtig?", options: ["Wir besuchten das Fest.", "Wir besuchteen das Fest."], answer: 0, explanation: "Regelmäßig: besuchen → besuchte; wir besuchten." },
           { stem: "Was ist das Präteritum von gehen?", options: ["ging", "gehte", "gegangen"], answer: 0, explanation: "gehen ist unregelmäßig: ging. Gegangen gehört zum Perfekt." },
-          { stem: "Welcher Satz ist Präteritum?", options: ["Ich habe das Fest gesehen.", "Ich sah das Fest.", "Ich sehe das Fest."], answer: 1, explanation: "sah ist die Präteritumform von sehen." }
+          { stem: "Welcher Satz ist Präteritum?", options: ["Ich habe die Altstadt gesehen.", "Ich sah die Altstadt.", "Ich sehe die Altstadt."], answer: 1, explanation: "sah ist die Präteritumform von sehen." }
         ]}
-        outputPrompt="Erzähle in 4–6 Sätzen von einem Fest oder einer Reise in der Vergangenheit. Benutze mindestens war oder hatte und eine weitere Präteritumform."
+        outputPrompt="Erzähle in 4–6 Sätzen von einem Tag, an dem du eine Stadt oder einen neuen Ort entdeckt hast. Benutze mindestens war oder hatte und eine weitere Präteritumform."
         starters={[
           "Letztes Jahr war ich ...",
           "Dort hatte ich ...",
-          "Am ersten Tag besuchte ich ...",
-          "Danach ging ich ...",
+          "Zuerst besuchte ich ...",
+          "Danach ging ich in / zu ...",
           "Zum Schluss fand ich ..."
         ]}
       />

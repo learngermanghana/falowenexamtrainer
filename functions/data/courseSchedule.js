@@ -189,10 +189,10 @@ const A2_SCHEDULE = [
   },
   {
     day: 10,
-    topic: "Tourismus und Traditionelle Feste 4.10",
+    topic: "Eine Stadt entdecken und etwas erleben 4.10",
     chapter: "4.10",
     assignment: true,
-    goal: "Learn about tourism and festivals.",
+    goal: "Explore a city, talk about places and activities, and describe past experiences.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
     grammar_topic: "Präteritum",
     video: "https://youtu.be/yOfTCQDn_JM",

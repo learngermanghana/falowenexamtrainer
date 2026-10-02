@@ -18,14 +18,14 @@ const sprechenContent = (
 );
 
 const schreibenContent = (
-  <WorkbookTaskCard eyebrow="Informelle Briefaufgabe" title="Einen Freund oder eine Freundin zu einem Fest einladen">
+  <WorkbookTaskCard eyebrow="Informelle Briefaufgabe" title="Mit einem Freund oder einer Freundin eine Stadt entdecken">
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Schreiben Sie einen Brief an einen Freund oder eine Freundin und laden Sie die Person zu einem Fest ein.
+      Schreiben Sie eine E-Mail an einen Freund oder eine Freundin. Sie möchten gemeinsam eine Stadt oder ein neues Viertel entdecken.
     </p>
     <ol style={listStyle}>
-      <li>Erzählen Sie von dem Fest und warum es besonders ist.</li>
-      <li>Laden Sie die Person ein und nennen Sie Datum und Ort.</li>
-      <li>Erklären Sie, was die Person mitbringen sollte oder was sie dort erwarten kann.</li>
+      <li>Sagen Sie, welchen Ort Sie gemeinsam entdecken möchten und warum.</li>
+      <li>Schlagen Sie zwei Aktivitäten oder Orte vor, zum Beispiel einen Markt, einen Park, ein Café oder eine Sehenswürdigkeit.</li>
+      <li>Nennen Sie einen konkreten Tag und Treffpunkt und fragen Sie, was die Person lieber machen möchte.</li>
     </ol>
     <p style={{ margin: 0, color: "#1d4ed8", fontWeight: 700 }}>
       Schreiben Sie ungefähr 60–80 Wörter und kopieren Sie Ihre fertige Antwort anschließend in den Submit-Tab.
@@ -40,14 +40,14 @@ export default function A2Day10TourismusTraditionelleFesteWorkbookPage() {
   return (
     <A2StandardTabbedWorkbookPage
       day={10}
-      title="Tourismus und traditionelle Feste"
+      title="Eine Stadt entdecken und etwas erleben"
       chapter="4.10"
       workbookId="A2Day10TourismusTraditionelleFeste"
-      topicPrompt="Sprich über Tourismus oder ein traditionelles Fest."
+      topicPrompt="Sprich über eine Stadt oder einen neuen Ort, den du gern entdecken möchtest."
       sprechenContent={sprechenContent}
-      schreibenTask="Schreiben Sie einen Brief und laden Sie einen Freund oder eine Freundin zu einem Fest ein."
+      schreibenTask="Schreiben Sie eine E-Mail und planen Sie mit einem Freund oder einer Freundin einen Entdeckungstag in der Stadt."
       schreibenContent={schreibenContent}
-      schreibenPlaceholder="Liebe/r ...\n\nich möchte dich zu ... einladen. Das Fest findet ... statt."
+      schreibenPlaceholder="Liebe/r ...\n\nich möchte mit dir ... entdecken. Wir könnten zuerst ... und danach ..."
       showWorkbookGuidance={false}
     />
   );

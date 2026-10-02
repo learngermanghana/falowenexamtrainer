@@ -44,10 +44,10 @@ const rows = [
     "Nennen Sie wichtige Reisedaten, zum Beispiel Datum, Anzahl der Personen oder Zimmerart.",
     "Fragen Sie nach dem Preis und nach zusätzlichen Leistungen, zum Beispiel Frühstück oder WLAN.",
   ]],
-  [10, "A2-4.10", "E-Mail an einen Freund / eine Freundin: Einladung zu einem Fest", "Sie möchten einen Freund oder eine Freundin zu einem Fest einladen. Schreiben Sie eine E-Mail.", [
-    "Erzählen Sie von dem Fest und erklären Sie, warum es besonders ist.",
-    "Laden Sie die Person ein und nennen Sie Datum und Ort.",
-    "Erklären Sie, was die Person mitbringen sollte oder was sie dort erwarten kann.",
+  [10, "A2-4.10", "E-Mail an einen Freund / eine Freundin: Gemeinsam die Stadt entdecken", "Sie möchten mit einem Freund oder einer Freundin einen Tag in einer Stadt oder in einem neuen Viertel verbringen. Schreiben Sie eine E-Mail.", [
+    "Sagen Sie, welchen Ort Sie gemeinsam entdecken möchten und warum.",
+    "Schlagen Sie zwei Aktivitäten oder Orte vor, zum Beispiel einen Markt, einen Park, ein Café oder eine Sehenswürdigkeit.",
+    "Nennen Sie einen konkreten Tag und Treffpunkt und fragen Sie, was die Person lieber machen möchte.",
   ]],
   [11, "A2-4.11", "E-Mail an eine Autovermietung", "Sie sind in Deutschland und möchten für das Wochenende ein Auto mieten. Schreiben Sie eine E-Mail an eine Autovermietung.", [
     "Fragen Sie, ob für das Wochenende noch ein Auto verfügbar ist.",

@@ -126,6 +126,19 @@ describe("A2 Course Book batch audit · Days 1–12", () => {
     expect(standardWorkbookSource).toContain("Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein.");
   });
 
+  test("keeps Day 10 on the friendly city-exploring topic without changing its route", () => {
+    const source = fs.readFileSync(
+      path.join(componentRoot, "A2Day10TourismusTraditionelleFesteWorkbookPage.js"),
+      "utf8",
+    );
+
+    expect(source).toContain('title="Eine Stadt entdecken und etwas erleben"');
+    expect(source).toContain("gemeinsam eine Stadt oder ein neues Viertel entdecken");
+    expect(source).not.toContain('title="Tourismus und traditionelle Feste"');
+    expect(A2_EARLY_COURSE_ALIGNMENT[10].title).toBe("Eine Stadt entdecken und etwas erleben 4.10");
+    expect(A2_EARLY_COURSE_ALIGNMENT[10].workbookRoute).toBe("/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook");
+  });
+
   test("keeps Day 12 on the shared workbook shell with the current listening video", () => {
     const source = fs.readFileSync(
       path.join(componentRoot, "A2Day12MeinTraumberufWorkbookPage.js"),
