@@ -102,7 +102,7 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
     durationMinutes: 30,
     scope: "5 reading answers, one independent 35–50 word letter and 10 body-part vocabulary answers",
     timedTabs: ["teil-1", "teil-2", "teil-3"],
-    preparationLabel: "Final independent challenge: use what you know from A1 without live writing feedback. Mark My Letter is unavailable while the timer is running and returns for review afterward.",
+    preparationLabel: "Final independent challenge: use what you know from A1 without live writing feedback. Mark My Letter is unavailable while the timer is running and becomes available again when the timed work is unlocked for review.",
     mode: "mock",
   }),
 
