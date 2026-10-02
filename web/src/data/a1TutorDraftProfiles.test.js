@@ -17,7 +17,7 @@ test("defines shared draft capture for every tutor-marked A1 assignment except p
   expect(getA1TutorDraftProfile("A1-3")).toBeNull();
 });
 
-test("models A1-14.1 Health as choice + existing letter + ten short vocabulary answers", () => {
+test("models A1-14.1 Health as reading + existing letter + six listening choices", () => {
   const health = getA1TutorDraftProfile("A1-14.1");
   expect(health.sections["teil-1"].items).toHaveLength(5);
   expect(health.sections["teil-1"].items[0]).toEqual(expect.objectContaining({
@@ -25,8 +25,9 @@ test("models A1-14.1 Health as choice + existing letter + ten short vocabulary a
     choices: ["Anzeige A", "Anzeige B"],
   }));
   expect(health.sections["teil-2"].embeddedWriting).toBe(true);
-  expect(health.sections["teil-3"].items).toHaveLength(10);
-  expect(health.sections["teil-3"].items.every(({ type }) => type === "short")).toBe(true);
+  expect(health.sections["teil-3"].items).toHaveLength(6);
+  expect(health.sections["teil-3"].items.every(({ type }) => type === "choice")).toBe(true);
+  expect(health.sections["teil-3"].items[0].choices).toEqual(["A", "B", "C"]);
 });
 
 test("supports mixed question types in one Teil", () => {
@@ -54,27 +55,27 @@ test("aligns A1-9 Negation to the three rendered assessed Teile", () => {
   expect(Object.keys(getA1TutorDraftProfile("A1-9").sections)).toEqual(["teil-1", "teil-2", "teil-3"]);
 });
 
-test("reports incomplete Health workbook until reading, letter and vocabulary are complete", () => {
+test("reports incomplete Health workbook until reading, letter and listening are complete", () => {
   const partial = {
     sections: {
       "teil-1": { answers: { 1: "Anzeige A", 2: "Anzeige B" } },
       "teil-2": { text: "Lieber Felix, ich bin krank und kann leider nicht kommen." },
-      "teil-3": { answers: { 1: "der Kopf" } },
+      "teil-3": { answers: { 1: "A" } },
     },
   };
   expect(getA1TutorDraftProgress({ assignmentKey: "A1-14.1", draft: partial })).toEqual(
-    expect.objectContaining({ complete: false, completed: 4, total: 16 }),
+    expect.objectContaining({ complete: false, completed: 4, total: 12 }),
   );
 
   const complete = {
     sections: {
       "teil-1": { answers: Object.fromEntries(Array.from({ length: 5 }, (_, i) => [i + 1, "Anzeige A"])) },
       "teil-2": { text: "Lieber Felix, ich bin krank und kann leider nicht kommen. Können wir uns nächste Woche treffen?" },
-      "teil-3": { answers: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [i + 1, `Wort ${i + 1}`])) },
+      "teil-3": { answers: Object.fromEntries(Array.from({ length: 6 }, (_, i) => [i + 1, "A"])) },
     },
   };
   expect(getA1TutorDraftProgress({ assignmentKey: "A1-14.1", draft: complete })).toEqual(
-    expect.objectContaining({ complete: true, completed: 16, total: 16 }),
+    expect.objectContaining({ complete: true, completed: 12, total: 12 }),
   );
 });
 
