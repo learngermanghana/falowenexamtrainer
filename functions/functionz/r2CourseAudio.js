@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 const COURSE_LISTENING_DAYS = Object.freeze({
-  A1: new Set([13]),
+  A1: new Set([13, "14.1"]),
   A2: new Set([24, 26, 27, 28]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
@@ -69,13 +69,21 @@ const clampExpiry = (value) => {
 
 const normalizeDay = (level, value) => {
   const normalizedLevel = normalizeLevel(level);
-  const day = Number(value);
   const allowedDays = COURSE_LISTENING_DAYS[normalizedLevel];
+  const raw = clean(value);
+
+  if (normalizedLevel === "A1" && raw === "14.1" && allowedDays?.has("14.1")) {
+    return "14.1";
+  }
+
+  const day = Number(raw);
   return Number.isInteger(day) && allowedDays?.has(day) ? day : null;
 };
 
-const expectedPrefixForDay = (level, day) =>
-  `${normalizeLevel(level).toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
+const expectedPrefixForDay = (level, day) => {
+  const dayToken = String(day).replace(".", "-").padStart(2, "0");
+  return `${normalizeLevel(level).toLowerCase()}/day-${dayToken}/`;
+};
 
 const isAudioObjectKey = (key) =>
   /\.(?:mp3|m4a|aac|wav|ogg|webm)$/i.test(key);
