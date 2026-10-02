@@ -226,7 +226,7 @@ const A1Day21WeatherWorkbookPage = () => (
     fallbackAssignmentKey={DAY21_ASSIGNMENT_KEY}
     title="A1 · Day 21 Workbook · Weather"
     subtitle="Kapitel 13 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit and send your final answers to your tutor."
+    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 35-minute controlled mock. Submit your own work first; use Mark My Letter later when review is unlocked."
     submitTitle="Submit A1 · Day 21 · Kapitel 13"
     submitDescription="Submit your reading answers and final writing task for tutor marking."
   >
