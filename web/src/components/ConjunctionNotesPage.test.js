@@ -1,45 +1,96 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ConjunctionNotesPage from "./ConjunctionNotesPage";
 import { alignA1CurriculumEntry } from "../data/a1RouteAlignment";
 
-describe("A1 5.10 weil and useful phrases", () => {
-  test("keeps weil as the productive A1 connector and moves deshalb to A2", () => {
+describe("A1 5.10 interactive weil workbook", () => {
+  const renderPage = () =>
     render(
       <MemoryRouter>
         <ConjunctionNotesPage />
       </MemoryRouter>,
     );
 
-    expect(
-      screen.getByRole("heading", { name: /Gründe geben mit weil + nützliche A1-Redemittel/i }),
-    ).toBeInTheDocument();
-    expect(screen.getAllByText(/Ich kann nicht kommen, weil ich krank bin/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole("heading", { name: /Deshalb starts in A2/i })).toBeInTheDocument();
-    expect(screen.getByText(/recognise und, aber, oder and denn/i)).toBeInTheDocument();
-  });
+  test("renders the complete interactive workbook progression", () => {
+    renderPage();
 
-  test("covers the practical A1 message phrases", () => {
-    render(
-      <MemoryRouter>
-        <ConjunctionNotesPage />
-      </MemoryRouter>,
-    );
+    expect(screen.getByText(/A1 · Kapitel 5.10 · Interactive Workbook/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Weil & nützliche A1-Redemittel/i })).toBeInTheDocument();
 
     [
-      /Leider muss ich den Termin absagen/i,
-      /Ich möchte mich für den Deutschkurs anmelden/i,
-      /Herzlichen Glückwunsch zum Geburtstag/i,
-      /Wie viel kostet der Kurs/i,
-      /Können wir einen anderen Termin vereinbaren/i,
-      /Können Sie mir bitte mehr Informationen über den Kurs geben/i,
+      /Learn the rule/i,
+      /Choose · Which sentence is correct/i,
+      /Build · Put the words in order/i,
+      /Match · Choose the reason that fits/i,
+      /Formal or informal/i,
+      /Repair the message/i,
+      /Apply · Build your own useful sentence/i,
+      /Recognise the other connectors/i,
+      /Final transfer challenge/i,
     ].forEach((pattern) => {
-      expect(screen.getAllByText(pattern).length).toBeGreaterThan(0);
+      expect(screen.getByRole("heading", { name: pattern })).toBeInTheDocument();
     });
   });
 
-  test("renames the Course Book lesson at runtime", () => {
+  test("keeps weil productive and other A1 connectors recognition-only", () => {
+    renderPage();
+
+    expect(screen.getAllByText(/weil ich krank bin/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Recognise und, aber, oder and denn/i)).toBeInTheDocument();
+    expect(screen.getByText(/deshalb starts properly in A2/i)).toBeInTheDocument();
+  });
+
+  test("gives immediate feedback for a weil word-order choice", () => {
+    renderPage();
+
+    fireEvent.click(screen.getByLabelText("weil ich krank bin"));
+    expect(screen.getAllByText("Correct.").length).toBeGreaterThan(0);
+  });
+
+  test("sentence builder requires the verb at the end", () => {
+    renderPage();
+
+    const buildSection = screen.getByTestId("sentence-builder");
+    fireEvent.click(withinButton(buildSection, "weil", 0));
+    fireEvent.click(withinButton(buildSection, "ich", 0));
+    fireEvent.click(withinButton(buildSection, "krank", 0));
+    fireEvent.click(withinButton(buildSection, "bin", 0));
+
+    expect(screen.getByText("Correct sentence.")).toBeInTheDocument();
+  });
+
+  test("repairs the broken weil clause and appointment sentence", () => {
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText("Repair weil word order"), {
+      target: { value: "Ich kann nicht kommen, weil ich krank bin." },
+    });
+    fireEvent.change(screen.getByLabelText("Repair appointment sentence"), {
+      target: { value: "Können wir uns am Mittwoch treffen?" },
+    });
+
+    expect(screen.getAllByText("Correct.").length).toBeGreaterThanOrEqual(2);
+  });
+
+  test("final transfer challenge checks the core message parts", () => {
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText("Final A1 transfer message"), {
+      target: {
+        value:
+          "Liebe Anna,\n\nich kann am Dienstag nicht kommen, weil ich arbeiten muss. Können wir uns am Mittwoch treffen?\n\nLiebe Grüße\nFelix",
+      },
+    });
+
+    expect(screen.getByText(/✓ Greeting/)).toBeInTheDocument();
+    expect(screen.getByText(/✓ One practical request\/question/)).toBeInTheDocument();
+    expect(screen.getByText(/✓ Reason with weil/)).toBeInTheDocument();
+    expect(screen.getByText(/✓ Verb appears at the end of the weil-clause/)).toBeInTheDocument();
+    expect(screen.getByText(/✓ Closing/)).toBeInTheDocument();
+  });
+
+  test("renames the Course Book lesson as an interactive workbook", () => {
     expect(
       alignA1CurriculumEntry({
         level: "A1",
@@ -50,9 +101,16 @@ describe("A1 5.10 weil and useful phrases", () => {
       }),
     ).toEqual(
       expect.objectContaining({
-        title: "Reasons with weil and Useful A1 Phrases",
-        topic: "Reasons with weil and Useful A1 Phrases",
+        title: "Weil & Useful A1 Phrases · Interactive Workbook",
+        topic: "Weil & Useful A1 Phrases · Interactive Workbook",
       }),
     );
   });
 });
+
+function withinButton(container, name, occurrence) {
+  const buttons = Array.from(container.querySelectorAll("button")).filter(
+    (button) => button.textContent === name && !button.disabled,
+  );
+  return buttons[occurrence] || buttons[0];
+}
