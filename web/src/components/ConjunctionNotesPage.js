@@ -145,7 +145,7 @@ function ChoiceExercise({ items, value, setValue, prefix }) {
 
 function SentenceBuilder({ item, index }) {
   const [selected, setSelected] = useState([]);
-  const answer = selected.join(" ");
+  const answer = selected.map((entry) => entry.text).join(" ");
   const isComplete = selected.length === item.tokens.length;
   const correct = isComplete && answer === item.answer;
 
