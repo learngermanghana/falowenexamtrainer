@@ -66,6 +66,7 @@ export const A2_EARLY_COURSE_ALIGNMENT = Object.freeze({
   }),
   10: Object.freeze({
     chapter: "4.10",
+    title: "Eine Stadt entdecken und etwas erleben 4.10",
     video: "https://youtu.be/yOfTCQDn_JM",
     grammarPage: "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
     workbookRoute: "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
