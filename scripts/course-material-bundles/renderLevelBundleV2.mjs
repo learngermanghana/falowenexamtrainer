@@ -21,7 +21,7 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 7, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 8, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
@@ -60,7 +60,7 @@ const hasLessonContent = async (page, lesson) => {
   // authenticated user to /login, where no login form is rendered.
   if (level === "A2" || level === "B1") {
     const workbookTabs = page.locator('[role="tab"], button').filter({
-      hasText: /^\s*(?:Grammar|Teil\s+[1-4]|Ref)(?:\s*[·:–—-].*)?\s*$/i,
+      hasText: /^\s*(?:Grammar|Teil\s+[1-4])(?:\s*[·:–—-].*)?\s*$/i,
     });
     if (await workbookTabs.count()) return true;
     return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
@@ -299,39 +299,63 @@ const clickWorkbookTab = async (page, names) => {
   return false;
 };
 
-const renderB1Lesson = async (page, lesson) => {
+const mergeRenderedSections = async (items, outputFile) => {
+  const output = await PDFDocument.create();
+  for (const item of items) {
+    const source = await PDFDocument.load(fs.readFileSync(item.file));
+    const pages = await output.copyPages(source, source.getPageIndices());
+    pages.forEach((page) => output.addPage(page));
+  }
+  fs.writeFileSync(outputFile, await output.save());
+  return outputFile;
+};
+
+const renderA2B1Lesson = async (page, lesson) => {
   await ensureAuthenticatedLesson(page, lesson);
-  const tabSpecs = [
-    { key: "grammar", names: ["Grammar"] },
+
+  const grammarClicked = await clickWorkbookTab(page, ["Grammar"]);
+  if (!grammarClicked) {
+    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available.`);
+  }
+  const grammar = await saveCurrentPagePdf(page, lesson, "grammar");
+
+  // The student workbook is tabbed in the live app, but the downloadable
+  // course PDF should expose a single Workbook section. Collect the available
+  // exercise tabs internally, exclude Ref/Submit, then merge them into one
+  // workbook PDF behind the lesson's Grammar section.
+  const workbookTabSpecs = [
     { key: "teil-1", names: ["Teil 1"] },
     { key: "teil-2", names: ["Teil 2"] },
     { key: "teil-3", names: ["Teil 3"] },
     { key: "teil-4", names: ["Teil 4"] },
-    { key: "ref", names: ["Ref"] },
   ];
-  const rendered = [];
-  for (const tabSpec of tabSpecs) {
+  const workbookParts = [];
+  for (const tabSpec of workbookTabSpecs) {
     const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
-      // Grammar is the default view on standard workbook pages. Some older
-      // deployments render it without a semantic tab, so print that view and
-      // gracefully skip only genuinely unavailable sections.
-      if (tabSpec.key === "grammar" && !rendered.length) {
-        rendered.push(await saveCurrentPagePdf(page, lesson, tabSpec.key));
-        continue;
-      }
-      console.warn(`${level} Day ${lesson.day}: skipping unavailable printable section ${tabSpec.names[0]}.`);
+      console.warn(`${level} Day ${lesson.day}: skipping unavailable workbook section ${tabSpec.names[0]}.`);
       continue;
     }
-    rendered.push(await saveCurrentPagePdf(page, lesson, tabSpec.key));
+    workbookParts.push(await saveCurrentPagePdf(page, lesson, `workbook-${tabSpec.key}`));
   }
-  if (!rendered.length) throw new Error(`No B1 workbook sections were rendered for Day ${lesson.day}.`);
-  return rendered;
+
+  if (!workbookParts.length) {
+    throw new Error(`No workbook exercises were rendered for ${level} Day ${lesson.day}.`);
+  }
+
+  const workbookFile = path.join(
+    renderDir,
+    `${String(lesson.day).padStart(2, "0")}-workbook.pdf`,
+  );
+  await mergeRenderedSections(workbookParts, workbookFile);
+  workbookParts.forEach(({ file }) => fs.rmSync(file, { force: true }));
+
+  return [grammar, { tab: "workbook", file: workbookFile }];
 };
 
 const renderLesson = async (page, lesson) => {
   if (level === "A1") return renderA1Lesson(page, lesson);
-  if (level === "A2" || level === "B1") return renderB1Lesson(page, lesson);
+  if (level === "A2" || level === "B1") return renderA2B1Lesson(page, lesson);
   if (level === "B2" || level === "C1" || level === "C2") return renderGuidedLesson(page, lesson);
   await ensureAuthenticatedLesson(page, lesson);
   return [await saveCurrentPagePdf(page, lesson, "lesson")];
@@ -343,7 +367,7 @@ const addCoverAndContents = async (output, printableLessons) => {
   const cover = output.addPage([595.28, 841.89]);
   cover.drawText("FALOWEN", { x: 54, y: 755, size: 28, font: bold, color: rgb(0.08, 0.25, 0.65) });
   cover.drawText(`${level} Course Materials`, { x: 54, y: 670, size: 30, font: bold });
-  cover.drawText(level === "A1" ? "Complete course book and workbook lessons" : "Course materials", { x: 54, y: 625, size: 15, font });
+  cover.drawText(["A1", "A2", "B1"].includes(level) ? "Grammar Notes & Workbook" : "Course materials", { x: 54, y: 625, size: 15, font });
   cover.drawText(`Curriculum version: ${manifest.generatedAt.slice(0, 10)}`, { x: 54, y: 570, size: 11, font });
   cover.drawText(`Printable lessons: ${manifest.printableLessonCount}`, { x: 54, y: 548, size: 11, font });
 
@@ -356,6 +380,12 @@ const addCoverAndContents = async (output, printableLessons) => {
     for (const line of lines) {
       toc.drawText(line, { x: 58, y, size: 10.5, font });
       y -= 16;
+    }
+    if (level === "A2" || level === "B1") {
+      toc.drawText("Grammar", { x: 76, y, size: 9.5, font });
+      y -= 14;
+      toc.drawText("Workbook", { x: 76, y, size: 9.5, font });
+      y -= 14;
     }
     y -= 4;
     if (y < 70) {
