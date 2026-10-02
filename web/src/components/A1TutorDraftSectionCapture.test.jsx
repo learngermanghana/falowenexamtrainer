@@ -72,18 +72,17 @@ test("visible workbook options become the A1 draft controls instead of a duplica
   });
 });
 
-test("Health Teil 3 adds ten short-answer fields and autosaves typed vocabulary", () => {
+test("Health Teil 3 adds six listening choices and autosaves selected answers", () => {
   renderSection("A1-14.1", "teil-3");
 
-  const inputs = screen.getAllByPlaceholderText("Write the German word");
-  expect(inputs).toHaveLength(10);
-  fireEvent.change(inputs[0], { target: { value: "der Kopf" } });
-  fireEvent.change(inputs[9], { target: { value: "der Bauch" } });
+  expect(screen.getAllByRole("radio")).toHaveLength(18);
+  fireEvent.click(screen.getByLabelText("Question 1: A"));
+  fireEvent.click(screen.getByLabelText("Question 6: C"));
 
-  expect(screen.getByText("2 of 10 answered")).toBeInTheDocument();
+  expect(screen.getByText("2 of 6 answered")).toBeInTheDocument();
   const stored = readA1WorkbookDraft("A1-14.1");
-  expect(stored.sections["teil-3"].answers[1]).toBe("der Kopf");
-  expect(stored.sections["teil-3"].answers[10]).toBe("der Bauch");
+  expect(stored.sections["teil-3"].answers[1]).toBe("A");
+  expect(stored.sections["teil-3"].answers[6]).toBe("C");
 });
 
 test("ordinary writing sections remain clearly draft-only", () => {
