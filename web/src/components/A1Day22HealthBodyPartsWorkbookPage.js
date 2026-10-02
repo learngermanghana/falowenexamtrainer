@@ -148,9 +148,15 @@ const vocabItems = [
 
 const HealthOverview = () => (
   <section style={sectionStyle} data-a1-day22-health-overview="true">
+    <div style={{ border: "1px solid #f59e0b", background: "#fffbeb", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
+      <strong>Finish Strong · Final Independent Challenge · 30 minutes</strong>
+      <p style={{ margin: "6px 0 0" }}>
+        Use what you know from the whole A1 course. Complete the reading, write the 35–50 word email and recall the body-part vocabulary without live writing feedback. Mark My Letter is locked while the timer is running.
+      </p>
+    </div>
     <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Complete Teil 1, write the Teil 2 E-Mail, check it with Mark My Letter, finish Teil 3 vocabulary, then open Submit Assignment.
+      Complete Teil 1, write the Teil 2 E-Mail independently, finish Teil 3 vocabulary, then open Submit Assignment. Use Mark My Letter only when the timed work is later unlocked for review.
     </p>
   </section>
 );
