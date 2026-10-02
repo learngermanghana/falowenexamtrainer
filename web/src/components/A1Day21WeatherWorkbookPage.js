@@ -47,6 +47,12 @@ const WeatherOverview = () => (
         style={{ width: "100%", height: 200, objectFit: "cover" }}
       />
       <div style={{ padding: 16, display: "grid", gap: 8 }}>
+        <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
+          <strong>Finish Strong · Controlled Mock · 35 minutes</strong>
+          <p style={{ margin: "6px 0 0" }}>
+            This is one of your final A1 challenges. Prepare before you start, then work independently: read carefully, manage your time and write the 35–50 word email from memory. Mark My Letter is locked while the timer is running.
+          </p>
+        </div>
         <h2 style={{ margin: 0 }}>A1 Day 21 · Kapitel 13 Assignment Overview</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Complete each section separately. Use Teil 1 for advertisements, Teil 2 for the message,
