@@ -196,3 +196,39 @@ describe("standardized A1 teacher videos", () => {
     ]);
   });
 });
+
+
+test("Day 2 Chapter 1.1 uses the replacement teacher lecture and removes the old video", () => {
+  const configuredVideo = getCanonicalA1TeacherVideoResource(2, "1.1");
+
+  expect(configuredVideo).toEqual(
+    expect.objectContaining({
+      chapter: "1.1",
+      topic: "Personal Pronouns and Verb Conjugation",
+      url: "https://youtu.be/xyRogEAA9qM",
+    })
+  );
+
+  const urls = A1_TEACHER_VIDEO_RESOURCES.map((video) => video.url);
+  expect(urls).not.toContain("https://youtu.be/AjsnO1hxDs4");
+
+  const lesson = normalizeLesson(
+    {
+      day: 2,
+      chapter: "1.1",
+      lesen_hören: {
+        chapter: "1.1",
+        workbook_link: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+      },
+    },
+    "A1"
+  );
+
+  const teacherVideos = lesson.resources.videos.filter((video) =>
+    `${video.key} ${video.title}`.toLowerCase().includes("teacher")
+  );
+
+  expect(teacherVideos.map((video) => video.url)).toEqual([
+    "https://youtu.be/xyRogEAA9qM",
+  ]);
+});
