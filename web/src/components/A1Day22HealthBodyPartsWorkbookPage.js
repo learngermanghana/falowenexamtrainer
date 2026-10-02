@@ -148,9 +148,15 @@ const vocabItems = [
 
 const HealthOverview = () => (
   <section style={sectionStyle} data-a1-day22-health-overview="true">
+    <div style={{ border: "1px solid #f59e0b", background: "#fffbeb", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
+      <strong>Finish Strong · Final Independent Challenge · 30 minutes</strong>
+      <p style={{ margin: "6px 0 0" }}>
+        Use what you know from the whole A1 course. Complete the reading, write the 35–50 word email and recall the body-part vocabulary without live writing feedback. Mark My Letter is locked while the timer is running.
+      </p>
+    </div>
     <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Complete Teil 1, write the Teil 2 E-Mail, check it with Mark My Letter, finish Teil 3 vocabulary, then open Submit Assignment.
+      Complete Teil 1, write the Teil 2 E-Mail independently, finish Teil 3 vocabulary, then open Submit Assignment. Use Mark My Letter only when the timed work is later unlocked for review.
     </p>
   </section>
 );
@@ -266,7 +272,7 @@ const A1Day22HealthBodyPartsWorkbookPage = () => (
     fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
     title="A1 · Day 22 Workbook · Health and Body Parts"
     subtitle="Kapitel 14.1 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit Assignment and send your final answers to your tutor."
+    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 30-minute final challenge. Submit your own work first; use Mark My Letter later when review is unlocked."
     submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
     submitDescription="Submit your reading answers, final writing task and vocabulary answers together for tutor marking."
   >

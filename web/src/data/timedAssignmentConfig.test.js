@@ -17,7 +17,10 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("A1-12.3")).toBe(30 * 60);
     expect(getTimedAssignmentConfig("A1-12.3")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("A1-13")).toBe(35 * 60);
-    expect(getTimedAssignmentDurationSeconds("A1-14.1")).toBe(35 * 60);
+    expect(getTimedAssignmentDurationSeconds("A1-14.1")).toBe(30 * 60);
+    expect(getTimedAssignmentConfig("A1-13")?.timedTabs).toEqual(["teil-1", "teil-2", "teil-3"]);
+    expect(getTimedAssignmentConfig("A1-14.1")?.timedTabs).toEqual(["teil-1", "teil-2", "teil-3"]);
+    expect(getTimedAssignmentConfig("A1-14.1")?.scope).toMatch(/10 body-part vocabulary answers/);
     expect(getTimedAssignmentConfig("A1-8")).toBeNull();
   });
 

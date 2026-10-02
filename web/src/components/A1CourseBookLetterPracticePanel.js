@@ -8,6 +8,7 @@ import {
   saveWritingProgress,
 } from "../services/writingProgressService";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import { useTimedAssignment } from "./SharedTimedAssignment";
 
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
@@ -50,6 +51,12 @@ export default function A1CourseBookLetterPracticePanel({
   lessonId = "A1-day-20-chapter-12.3",
 }) {
   const { user, idToken, studentProfile } = useAuth();
+  const timed = useTimedAssignment();
+  const normalizedAssignmentKey = String(assignmentKey || "").trim().toUpperCase();
+  const independentFinalMock = ["A1-13", "A1-14.1"].includes(normalizedAssignmentKey);
+  const feedbackLockedDuringAttempt = Boolean(
+    independentFinalMock && timed?.enabled && timed?.attemptState === "active" && !timed?.reviewUnlocked,
+  );
   const textareaRef = useRef(null);
   const [draft, setDraft] = useState("");
   const [feedbackData, setFeedbackData] = useState(null);
@@ -165,6 +172,10 @@ export default function A1CourseBookLetterPracticePanel({
   };
 
   const markDraft = async () => {
+    if (feedbackLockedDuringAttempt) {
+      setError("Finish the timed attempt independently. Mark My Letter unlocks again for review after the attempt.");
+      return;
+    }
     const text = draft.trim();
     if (!text) {
       setError("Write or paste your letter before marking it.");
@@ -261,10 +272,14 @@ export default function A1CourseBookLetterPracticePanel({
             fontWeight: 900,
           }}
         >
-          Practice only · not final submission
+          {feedbackLockedDuringAttempt ? "Independent timed attempt" : "Practice only · not final submission"}
         </span>
         <h3 style={{ margin: 0 }}>{title}</h3>
-        <p style={{ ...styles.helperText, margin: 0 }}>{description}</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          {feedbackLockedDuringAttempt
+            ? "Write independently while the timer is running. Falowen will not mark or reveal writing feedback during this attempt."
+            : description}
+        </p>
       </div>
 
       <label style={{ ...styles.label, margin: 0 }} htmlFor={`${taskId}-draft`}>
@@ -322,9 +337,9 @@ export default function A1CourseBookLetterPracticePanel({
           type="button"
           style={styles.primaryButton}
           onClick={markDraft}
-          disabled={loading}
+          disabled={loading || feedbackLockedDuringAttempt}
         >
-          {loading ? "Marking your letter…" : title}
+          {feedbackLockedDuringAttempt ? "Mark My Letter locked during timed attempt" : loading ? "Marking your letter…" : title}
         </button>
         <button type="button" style={styles.secondaryButton} onClick={clearDraft}>
           Clear practice draft
@@ -348,7 +363,7 @@ export default function A1CourseBookLetterPracticePanel({
         </div>
       ) : null}
 
-      {feedbackData ? (
+      {feedbackData && !feedbackLockedDuringAttempt ? (
         <WritingFeedbackCard
           feedback={feedbackData.feedback || "Analysis completed."}
           level="A1"
