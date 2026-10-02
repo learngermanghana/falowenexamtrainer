@@ -73,6 +73,9 @@ jobs:
       - name: Validate bundle renderer auth guard
         run: |
           node --check scripts/course-material-bundles/renderLevelBundleV2.mjs
+          node --check scripts/course-material-bundles/renderA1Bundle.mjs
+          node --check scripts/course-material-bundles/pdfNavigation.mjs
+          node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
 
       - name: Build and validate manifest
@@ -174,6 +177,12 @@ jobs:
         if: ${{ inputs.build_pdf }}
         run: npx playwright install --with-deps chromium
 
+      - name: Install PDF text validator
+        if: ${{ inputs.build_pdf && (inputs.level == 'A1' || inputs.level == 'A2' || inputs.level == 'B1') }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
       - name: Render and merge course materials
         if: ${{ inputs.build_pdf }}
         run: |
@@ -187,6 +196,10 @@ jobs:
           FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
           FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
           FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+
+      - name: Validate generated A1-B1 PDF
+        if: ${{ inputs.build_pdf && (inputs.level == 'A1' || inputs.level == 'A2' || inputs.level == 'B1') }}
+        run: node scripts/course-material-bundles/validateGeneratedBundle.mjs "${{ inputs.level }}"
 
       - name: Upload consolidated level PDF
         if: ${{ inputs.build_pdf }}
