@@ -95,19 +95,25 @@ function validateDay24WeilPhraseFocus() {
   const source = read(file);
 
   const requiredMarkers = [
-    "Gründe geben mit weil + nützliche A1-Redemittel",
-    "Leider muss ich den Termin absagen.",
-    "Ich möchte mich für den Deutschkurs anmelden.",
-    "Herzlichen Glückwunsch zum Geburtstag!",
-    "Wie viel kostet der Kurs?",
-    "Können wir einen anderen Termin vereinbaren?",
-    "Können Sie mir bitte mehr Informationen über den Kurs geben?",
-    "Deshalb starts in A2",
+    'data-a1-5-10-interactive-workbook="true"',
+    "A1 · Kapitel 5.10 · Interactive Workbook",
+    "Weil & nützliche A1-Redemittel",
+    "weil + verb at the end",
+    'testId="quick-check"',
+    'testId="sentence-builder"',
+    'testId="reason-matching"',
+    'testId="register-check"',
+    'testId="repair-message"',
+    'testId="apply"',
+    'testId="connector-recognition"',
+    'testId="final-transfer"',
+    "Recognise <strong>und, aber, oder</strong> and <strong>denn</strong>",
+    "deshalb</em> starts properly in A2",
   ];
 
   const missing = requiredMarkers.filter((marker) => !source.includes(marker));
   if (missing.length) {
-    throw new Error(`A1 Day 24 weil/useful-phrases lesson is missing: ${missing.join(", ")}`);
+    throw new Error(`A1 Day 24 interactive weil workbook is missing: ${missing.join(", ")}`);
   }
 
   const staleMarkers = [

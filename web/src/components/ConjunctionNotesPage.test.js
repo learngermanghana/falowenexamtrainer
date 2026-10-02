@@ -114,3 +114,26 @@ function withinButton(container, name, occurrence) {
   );
   return buttons[occurrence] || buttons[0];
 }
+
+
+test("build guard markers match the interactive Day 24 workbook", () => {
+  const source = require("node:fs").readFileSync(
+    require("node:path").join(process.cwd(), "src/components/ConjunctionNotesPage.js"),
+    "utf8",
+  );
+
+  [
+    'data-a1-5-10-interactive-workbook="true"',
+    "A1 · Kapitel 5.10 · Interactive Workbook",
+    "Weil & nützliche A1-Redemittel",
+    "weil + verb at the end",
+    'testId="quick-check"',
+    'testId="sentence-builder"',
+    'testId="reason-matching"',
+    'testId="register-check"',
+    'testId="repair-message"',
+    'testId="apply"',
+    'testId="connector-recognition"',
+    'testId="final-transfer"',
+  ].forEach((marker) => expect(source).toContain(marker));
+});
