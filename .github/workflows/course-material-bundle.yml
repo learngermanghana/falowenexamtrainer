@@ -78,6 +78,12 @@ jobs:
           node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
 
+      - name: Runtime-test PDF navigation objects
+        if: ${{ matrix.level == 'A1' }}
+        run: |
+          npm install --no-save --package-lock=false pdf-lib@1.17.1
+          node --test scripts/course-material-bundles/pdfNavigation.test.mjs
+
       - name: Build and validate manifest
         env:
           LEVEL: ${{ matrix.level }}
