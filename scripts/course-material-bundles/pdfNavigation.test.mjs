@@ -28,7 +28,7 @@ test("PDF navigation serializes clickable contents and hierarchical outlines", a
   const bytes = await pdf.save();
   const loaded = await PDFDocument.load(bytes);
 
-  assert.ok(loaded.catalog.lookupMaybe(PDFName.of("Outlines")));
+  assert.ok(loaded.catalog.get(PDFName.of("Outlines")));
   assert.equal(loaded.catalog.get(PDFName.of("PageMode"))?.toString(), "/UseOutlines");
 
   const linkedPages = loaded.getPages().filter((page) => {
