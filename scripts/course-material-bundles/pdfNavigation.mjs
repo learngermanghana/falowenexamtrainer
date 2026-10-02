@@ -136,64 +136,85 @@ export const createPdfNavigation = async (output, { level }) => {
   const addClickableContents = (navigation) => {
     if (!navigation.length) return [];
 
-    const tocPages = [];
-    let tocPage = null;
-    let y = 0;
-
-    const startPage = () => {
-      tocPage = output.insertPage(1 + tocPages.length, A4_PAGE);
-      tocPages.push(tocPage);
-      tocPage.drawText(tocPages.length === 1 ? "Contents" : "Contents continued", {
-        x: 54,
-        y: 790,
-        size: tocPages.length === 1 ? 24 : 18,
-        font: bold,
-      });
-      y = 748;
-    };
-
-    const ensureSpace = (height) => {
-      if (!tocPage || y - height < 65) startPage();
-    };
-
-    const drawRow = ({ label, targetPage, indent = 0, size = 10.5, useBold = false, rowHeight = 16 }) => {
-      ensureSpace(rowHeight);
-      const x = 58 + indent;
-      const pageNumber = pageNumberFor(output, targetPage);
-      const pageText = pageNumber ? String(pageNumber) : "—";
-      const shown = truncate(label, indent ? 62 : 72);
-      tocPage.drawText(shown, { x, y, size, font: useBold ? bold : font });
-      const pageTextWidth = font.widthOfTextAtSize(pageText, size);
-      tocPage.drawText(pageText, { x: 528 - pageTextWidth, y, size, font });
-      addInternalLink(output, tocPage, targetPage, {
-        x,
-        y: y - 3,
-        width: 480 - indent,
-        height: rowHeight,
-      });
-      y -= rowHeight;
-    };
-
+    const rows = [];
     for (const entry of navigation) {
       const first = entry.sections[0];
       if (!first) continue;
-      drawRow({
+      rows.push({
         label: `Day ${entry.day} · ${entry.title}`,
         targetPage: first.page,
+        indent: 0,
+        size: 10.5,
         useBold: true,
         rowHeight: 18,
       });
       for (const section of entry.sections) {
-        drawRow({
+        rows.push({
           label: section.label,
           targetPage: section.page,
           indent: 18,
           size: 9.5,
+          useBold: false,
           rowHeight: 15,
         });
       }
-      y -= 5;
+      rows.push({ gap: 5 });
     }
+
+    const pageRows = [[]];
+    let y = 748;
+    for (const row of rows) {
+      if (row.gap) {
+        y -= row.gap;
+        continue;
+      }
+      if (y - row.rowHeight < 65) {
+        pageRows.push([]);
+        y = 748;
+      }
+      pageRows[pageRows.length - 1].push({ ...row, y });
+      y -= row.rowHeight;
+    }
+
+    const tocPages = pageRows.map((_, index) => {
+      const page = output.insertPage(1 + index, A4_PAGE);
+      page.drawText(index === 0 ? "Contents" : "Contents continued", {
+        x: 54,
+        y: 790,
+        size: index === 0 ? 24 : 18,
+        font: bold,
+      });
+      return page;
+    });
+
+    pageRows.forEach((rowsForPage, pageIndex) => {
+      const tocPage = tocPages[pageIndex];
+      for (const row of rowsForPage) {
+        const x = 58 + row.indent;
+        const pageNumber = pageNumberFor(output, row.targetPage);
+        const pageText = pageNumber ? String(pageNumber) : "—";
+        const shown = truncate(row.label, row.indent ? 62 : 72);
+        tocPage.drawText(shown, {
+          x,
+          y: row.y,
+          size: row.size,
+          font: row.useBold ? bold : font,
+        });
+        const pageTextWidth = font.widthOfTextAtSize(pageText, row.size);
+        tocPage.drawText(pageText, {
+          x: 528 - pageTextWidth,
+          y: row.y,
+          size: row.size,
+          font,
+        });
+        addInternalLink(output, tocPage, row.targetPage, {
+          x,
+          y: row.y - 3,
+          width: 480 - row.indent,
+          height: row.rowHeight,
+        });
+      }
+    });
 
     return tocPages;
   };
