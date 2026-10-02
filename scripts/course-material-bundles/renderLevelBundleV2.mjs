@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { createPdfNavigation } from "./pdfNavigation.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -361,7 +362,7 @@ const renderLesson = async (page, lesson) => {
   return [await saveCurrentPagePdf(page, lesson, "lesson")];
 };
 
-const addCoverAndContents = async (output, printableLessons) => {
+const addCover = async (output) => {
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
@@ -370,7 +371,11 @@ const addCoverAndContents = async (output, printableLessons) => {
   cover.drawText(["A1", "A2", "B1"].includes(level) ? "Grammar Notes & Workbook" : "Course materials", { x: 54, y: 625, size: 15, font });
   cover.drawText(`Curriculum version: ${manifest.generatedAt.slice(0, 10)}`, { x: 54, y: 570, size: 11, font });
   cover.drawText(`Printable lessons: ${manifest.printableLessonCount}`, { x: 54, y: 548, size: 11, font });
+};
 
+const addLegacyContents = async (output, printableLessons) => {
+  const font = await output.embedFont(StandardFonts.Helvetica);
+  const bold = await output.embedFont(StandardFonts.HelveticaBold);
   let toc = output.addPage([595.28, 841.89]);
   toc.drawText("Contents", { x: 54, y: 780, size: 24, font: bold });
   let y = 744;
@@ -381,12 +386,6 @@ const addCoverAndContents = async (output, printableLessons) => {
       toc.drawText(line, { x: 58, y, size: 10.5, font });
       y -= 16;
     }
-    if (level === "A2" || level === "B1") {
-      toc.drawText("Grammar", { x: 76, y, size: 9.5, font });
-      y -= 14;
-      toc.drawText("Workbook", { x: 76, y, size: 9.5, font });
-      y -= 14;
-    }
     y -= 4;
     if (y < 70) {
       toc = output.addPage([595.28, 841.89]);
@@ -396,17 +395,47 @@ const addCoverAndContents = async (output, printableLessons) => {
   }
 };
 
+const appendPdfFile = async (output, file) => {
+  const source = await PDFDocument.load(fs.readFileSync(file));
+  const pages = await output.copyPages(source, source.getPageIndices());
+  pages.forEach((page) => output.addPage(page));
+};
+
 const mergeBundle = async (renderedLessons) => {
   const output = await PDFDocument.create();
   const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
-  await addCoverAndContents(output, printableLessons);
+  await addCover(output);
 
-  for (const lesson of printableLessons) {
-    const files = renderedLessons.get(lesson.day) || [];
-    for (const item of files) {
-      const source = await PDFDocument.load(fs.readFileSync(item.file));
-      const pages = await output.copyPages(source, source.getPageIndices());
-      pages.forEach((page) => output.addPage(page));
+  if (level === "A2" || level === "B1") {
+    const pdfNavigation = await createPdfNavigation(output, { level });
+    const navigation = [];
+
+    for (const lesson of printableLessons) {
+      const files = renderedLessons.get(lesson.day) || [];
+      const sections = [];
+      for (const item of files) {
+        if (item.tab !== "grammar" && item.tab !== "workbook") continue;
+        const label = item.tab === "grammar" ? "Grammar" : "Workbook";
+        const dividerPage = pdfNavigation.addSectionDivider({ lesson, sectionLabel: label });
+        sections.push({ label, page: dividerPage });
+        await appendPdfFile(output, item.file);
+      }
+
+      if (sections.length !== 2 || sections[0]?.label !== "Grammar" || sections[1]?.label !== "Workbook") {
+        throw new Error(
+          `${level} Day ${lesson.day}: expected exactly Grammar then Workbook in the final PDF, received ${sections.map((section) => section.label).join(", ") || "nothing"}.`,
+        );
+      }
+
+      navigation.push({ day: lesson.day, title: lesson.title, sections });
+    }
+
+    pdfNavigation.finalize(navigation);
+  } else {
+    await addLegacyContents(output, printableLessons);
+    for (const lesson of printableLessons) {
+      const files = renderedLessons.get(lesson.day) || [];
+      for (const item of files) await appendPdfFile(output, item.file);
     }
   }
 

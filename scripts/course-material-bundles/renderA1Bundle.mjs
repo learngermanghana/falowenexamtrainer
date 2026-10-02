@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { createPdfNavigation } from "./pdfNavigation.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -174,7 +175,7 @@ const downloadExternalPdf = async (lesson, target, index) => {
   return { kind: target.kind, source: target.url, file };
 };
 
-const addCoverAndContents = async (output) => {
+const addCover = async (output) => {
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
@@ -182,30 +183,12 @@ const addCoverAndContents = async (output) => {
   cover.drawText("A1 Grammar Notes & Workbook", { x: 54, y: 670, size: 28, font: bold });
   cover.drawText("Grammar notes and workbook practice", { x: 54, y: 625, size: 15, font });
   cover.drawText("Generated for administration", { x: 54, y: 110, size: 11, font });
+};
 
-  let toc = output.addPage([595.28, 841.89]);
-  toc.drawText("Contents", { x: 54, y: 780, size: 24, font: bold });
-  let y = 744;
-  for (const lesson of plan.lessons) {
-    const label = `Day ${lesson.day} · ${lesson.title}`;
-    toc.drawText(label.slice(0, 82), { x: 58, y, size: 10.5, font });
-    y -= 16;
-    const kinds = [...new Set((lesson.targets || []).map((target) => target.kind))];
-    const sectionLabel = [
-      kinds.includes("grammar") ? "Grammar" : "",
-      kinds.includes("workbook") ? "Workbook" : "",
-    ].filter(Boolean).join(" · ");
-    if (sectionLabel) {
-      toc.drawText(sectionLabel, { x: 76, y, size: 9.5, font });
-      y -= 16;
-    }
-    y -= 3;
-    if (y < 70) {
-      toc = output.addPage([595.28, 841.89]);
-      toc.drawText("Contents continued", { x: 54, y: 810, size: 18, font: bold });
-      y = 780;
-    }
-  }
+const appendPdfFile = async (output, file) => {
+  const source = await PDFDocument.load(fs.readFileSync(file));
+  const pages = await output.copyPages(source, source.getPageIndices());
+  pages.forEach((page) => output.addPage(page));
 };
 
 const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
@@ -251,21 +234,39 @@ try {
 }
 
 const output = await PDFDocument.create();
-await addCoverAndContents(output);
+await addCover(output);
+const pdfNavigation = await createPdfNavigation(output, { level: "A1" });
+const navigation = [];
+
 for (const lesson of plan.lessons) {
-  for (const item of rendered.get(lesson.day) || []) {
-    const source = await PDFDocument.load(fs.readFileSync(item.file));
-    const pages = await output.copyPages(source, source.getPageIndices());
-    pages.forEach((p) => output.addPage(p));
+  const lessonOutputs = rendered.get(lesson.day) || [];
+  const sections = [];
+
+  for (const kind of ["grammar", "workbook"]) {
+    const items = lessonOutputs.filter((item) => item.kind === kind);
+    if (!items.length) continue;
+
+    const label = kind === "grammar" ? "Grammar" : "Workbook";
+    const dividerPage = pdfNavigation.addSectionDivider({ lesson, sectionLabel: label });
+    sections.push({ label, page: dividerPage });
+    for (const item of items) await appendPdfFile(output, item.file);
   }
+
+  if (!sections.length) {
+    throw new Error(`A1 Day ${lesson.day}: no Grammar or Workbook section was available for the final PDF.`);
+  }
+
+  navigation.push({ day: lesson.day, title: lesson.title, sections });
 }
+
+pdfNavigation.finalize(navigation);
 
 const footerFont = await output.embedFont(StandardFonts.Helvetica);
 const pages = output.getPages();
-pages.forEach((p, index) => {
-  const { width } = p.getSize();
-  p.drawText("Falowen Learning Hub", { x: 36, y: 20, size: 8, font: footerFont, color: rgb(0.45, 0.5, 0.58) });
-  p.drawText(`${index + 1} / ${pages.length}`, { x: width - 70, y: 20, size: 8, font: footerFont, color: rgb(0.45, 0.5, 0.58) });
+pages.forEach((page, index) => {
+  const { width } = page.getSize();
+  page.drawText("Falowen Learning Hub", { x: 36, y: 20, size: 8, font: footerFont, color: rgb(0.45, 0.5, 0.58) });
+  page.drawText(`${index + 1} / ${pages.length}`, { x: width - 70, y: 20, size: 8, font: footerFont, color: rgb(0.45, 0.5, 0.58) });
 });
 
 fs.writeFileSync(finalPdfPath, await output.save());
