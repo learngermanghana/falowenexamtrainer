@@ -4,7 +4,6 @@ import { styles } from "../styles";
 
 const card = { ...styles.card, display: "grid", gap: 12 };
 const paragraph = { margin: 0, lineHeight: 1.75 };
-const list = { margin: 0, paddingLeft: 22, lineHeight: 1.8 };
 const optionGrid = { display: "grid", gap: 8 };
 
 const quickChecks = [
