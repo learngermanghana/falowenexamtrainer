@@ -272,7 +272,7 @@ const A1Day22HealthBodyPartsWorkbookPage = () => (
     fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
     title="A1 · Day 22 Workbook · Health and Body Parts"
     subtitle="Kapitel 14.1 · Tutor-marked Lesen & Schreiben assignment"
-    assignmentIntro="Use Overview, complete Teil 1, Teil 2 and Teil 3 separately, check your writing with Mark My Letter, then open Submit Assignment and send your final answers to your tutor."
+    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 30-minute final challenge. Submit your own work first; use Mark My Letter later when review is unlocked."
     submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
     submitDescription="Submit your reading answers, final writing task and vocabulary answers together for tutor marking."
   >
