@@ -51,6 +51,7 @@ export const A2_EARLY_COURSE_ALIGNMENT = Object.freeze({
   }),
   8: Object.freeze({
     chapter: "3.8",
+    title: "Im Restaurant – bestellen und reagieren (Exercise) 3.8",
     video: "https://youtu.be/hxkk6dZSjNM",
     grammarPage: "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
     workbookRoute: "/campus/course/a2-day-8-rezepte-und-essen-workbook",
