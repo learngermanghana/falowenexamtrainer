@@ -356,7 +356,7 @@ const topics = [
   [7, "a2-day-7-wohnung-suchen", "Eine Wohnung suchen", "Welche Wohnung suchst du und warum?", ["Größe und Zimmer", "Lage", "Miete und Kosten", "Ausstattung", "Besichtigung"], earlyA2LessonBranchesByDay[7]],
   [8, "a2-day-8-rezepte-essen", "Rezepte und Essen", "Was kochst oder isst du gern?", ["Gericht", "Zutaten", "Vorbereitung", "Kochschritte", "Geschmack und Anlass"], earlyA2LessonBranchesByDay[8]],
   [9, "a2-day-9-urlaub", "Urlaub", "Wie war dein Urlaub oder wie planst du Urlaub?", ["Ort", "Reise", "Aktivitäten", "Wetter", "Meinung"]],
-  [10, "a2-day-10-tourismus-feste", "Tourismus und traditionelle Feste", "Welches Fest oder welchen Ort empfiehlst du?", ["Ort", "Fest", "Essen", "Aktivitäten", "Tipp"]],
+  [10, "a2-day-10-stadt-entdecken", "Eine Stadt entdecken und etwas erleben", "Welche Stadt oder welchen neuen Ort möchtest du entdecken und was möchtest du dort machen?", ["Ort", "Erster Stopp", "Essen oder Café", "Aktivität", "Tipp"]],
   [11, "a2-day-11-verkehrsmittel", "Verkehrsmittel vergleichen", "Welches Verkehrsmittel benutzt du und warum?", ["Verkehrsmittel", "Preis", "Zeit", "Komfort", "Meinung"]],
   [12, "a2-day-12-traumberuf", "Mein Traumberuf", "Was ist dein Traumberuf und warum?", ["Beruf", "Aufgaben", "Ort", "Stärken", "Ziel"]],
   [13, "a2-day-13-vorstellungsgespraech", "Ein Vorstellungsgespräch", "Sie sind bei Amazon im Vorstellungsgespräch. Wie stellen Sie sich vor?", ["Vorstellung", "Ausbildung", "Berufserfahrung", "Fähigkeiten", "Motivation"], vorstellungsgespraechBranches],
