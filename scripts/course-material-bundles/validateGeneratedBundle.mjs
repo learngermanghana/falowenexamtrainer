@@ -20,7 +20,7 @@ if (!fs.existsSync(pdfPath)) throw new Error(`Generated PDF not found: ${pdfPath
 
 const bytes = fs.readFileSync(pdfPath);
 const pdf = await PDFDocument.load(bytes);
-const outlines = pdf.catalog.lookupMaybe(PDFName.of("Outlines"));
+const outlines = pdf.catalog.get(PDFName.of("Outlines"));
 if (!outlines) throw new Error(`${level} PDF has no bookmark outline tree.`);
 
 const linkedPages = pdf.getPages().filter((page) => {
