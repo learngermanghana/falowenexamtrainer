@@ -39,22 +39,23 @@ const guides = {
     starters: ["Ich suche eine Wohnung, die ...", "Ich möchte ein Zimmer, das ...", "Der Vermieter, der ...", "Wichtig ist eine Lage, die ..."]
   },
   8: {
-    title: "Imperativ: ein Rezept Schritt für Schritt erklären",
-    rule: "Mit dem Imperativ gibst du Anweisungen. du: Schneide! / ihr: Schneidet! / Sie: Schneiden Sie! Bei Rezepten stehen oft kurze Imperativsätze in einer klaren Reihenfolge.",
+    title: "Im Restaurant: höflich bestellen und reagieren",
+    rule: "Benutze höfliche Redemittel statt direkter Befehle: Ich hätte gern ... / Ich nehme ... / Könnte ich bitte ...? / Was empfehlen Sie? / Entschuldigung, ich habe ... bestellt. / Wir möchten bitte zahlen.",
     examples: [
-      "Schneide die Tomaten.",
-      "Gib etwas Salz dazu.",
-      "Mischt alle Zutaten gut.",
-      "Backen Sie den Kuchen 30 Minuten."
+      "Könnte ich bitte die Speisekarte bekommen?",
+      "Ich hätte gern die Gemüsesuppe und ein Mineralwasser.",
+      "Was empfehlen Sie heute?",
+      "Entschuldigung, ich habe Wasser ohne Kohlensäure bestellt.",
+      "Wir möchten bitte zahlen."
     ],
     questions: [
-      { stem: "Imperativ für du: ___ die Zwiebel klein.", options: ["Schneidest", "Schneide", "Schneiden Sie"], answer: 1, explanation: "du-Imperativ: Schneide!" },
-      { stem: "Imperativ für ihr: ___ alles gut.", options: ["Mischt", "Mischen", "Mischst"], answer: 0, explanation: "ihr-Imperativ entspricht der ihr-Form ohne Pronomen." },
-      { stem: "Höflicher Imperativ: ___ bitte das Wasser dazu.", options: ["Gib", "Gebt", "Geben Sie"], answer: 2, explanation: "Sie-Imperativ: Verb + Sie." },
-      { stem: "Welche Reihenfolge klingt wie ein Rezept?", options: ["Zuerst ... Dann ... Zum Schluss ...", "Vielleicht ... Trotzdem ... Obwohl ..."], answer: 0, explanation: "Rezepte brauchen klare Schrittfolge." }
+      { stem: "Du möchtest höflich eine Suppe bestellen.", options: ["Ich hätte gern die Tomatensuppe.", "Gib mir die Suppe!", "Ich bin Tomatensuppe."], answer: 0, explanation: "Ich hätte gern ... ist eine natürliche höfliche Bestellform." },
+      { stem: "Du möchtest die Speisekarte.", options: ["Könnte ich bitte die Speisekarte bekommen?", "Die Speisekarte bekommt.", "Gib Speisekarte!"], answer: 0, explanation: "Könnte ich bitte ...? ist eine höfliche Bitte." },
+      { stem: "Du möchtest nach einer Empfehlung fragen.", options: ["Was empfehlen Sie heute?", "Was Sie empfehlen heute?", "Was empfehle ich Sie?"], answer: 0, explanation: "In der direkten Frage steht das konjugierte Verb vor dem Subjekt: empfehlen Sie." },
+      { stem: "Du hast das falsche Getränk bekommen.", options: ["Entschuldigung, ich habe ein Wasser ohne Kohlensäure bestellt.", "Du falsch!", "Ich trinken nicht."], answer: 0, explanation: "Nenne das Problem ruhig und höflich." }
     ],
-    outputPrompt: "Erkläre ein einfaches Rezept in 4–6 Imperativsätzen.",
-    starters: ["Zuerst ...", "Dann ...", "Danach ...", "Zum Schluss ..."]
+    outputPrompt: "Spielt eine kurze Restaurantszene: Speisekarte → bestellen → nachfragen → kleines Problem lösen → bezahlen.",
+    starters: ["Ich hätte gern ...", "Könnte ich bitte ...?", "Was empfehlen Sie ...?", "Entschuldigung, ich habe ... bestellt.", "Wir möchten bitte zahlen."]
   },
   9: {
     title: "Perfekt: über den letzten Urlaub sprechen",
