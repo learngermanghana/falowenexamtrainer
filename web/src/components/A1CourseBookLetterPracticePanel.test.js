@@ -10,6 +10,7 @@ import {
 import A1CourseBookLetterPracticePanel, {
   __TESTING__,
 } from "./A1CourseBookLetterPracticePanel";
+import { useTimedAssignment } from "./SharedTimedAssignment";
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: jest.fn(),
@@ -17,6 +18,10 @@ jest.mock("../context/AuthContext", () => ({
 
 jest.mock("../services/coachService", () => ({
   markLetterWithAI: jest.fn(),
+}));
+
+jest.mock("./SharedTimedAssignment", () => ({
+  useTimedAssignment: jest.fn(),
 }));
 
 jest.mock("../services/writingProgressService", () => ({
@@ -60,6 +65,11 @@ beforeEach(() => {
       level: "A1",
       program: "german",
     },
+  });
+  useTimedAssignment.mockReturnValue({
+    enabled: false,
+    attemptState: "disabled",
+    reviewUnlocked: false,
   });
   loadWritingProgress.mockResolvedValue(null);
   saveWritingProgress.mockResolvedValue(true);
@@ -157,4 +167,41 @@ test("builds different marker contexts for formal and informal tasks", () => {
       promptType: "email",
     }),
   ).toBe("course-task:formal language school email formal email");
+});
+
+
+test("locks Mark My Letter during A1-13 and A1-14.1 timed attempts", async () => {
+  useTimedAssignment.mockReturnValue({
+    enabled: true,
+    attemptState: "active",
+    reviewUnlocked: false,
+  });
+
+  render(
+    <A1CourseBookLetterPracticePanel
+      {...formalProps}
+      assignmentKey="A1-14.1"
+      title="Mark My Health Letter"
+    />,
+  );
+
+  await screen.findByLabelText("Your letter");
+  expect(
+    screen.getByRole("button", { name: "Mark My Letter locked during timed attempt" }),
+  ).toBeDisabled();
+  expect(screen.getByText(/write independently while the timer is running/i)).toBeInTheDocument();
+  expect(markLetterWithAI).not.toHaveBeenCalled();
+});
+
+test("keeps ordinary A1 letter practice marking available outside the final timed mocks", async () => {
+  useTimedAssignment.mockReturnValue({
+    enabled: true,
+    attemptState: "active",
+    reviewUnlocked: false,
+  });
+
+  render(<A1CourseBookLetterPracticePanel {...formalProps} assignmentKey="A1-12.3" />);
+
+  await screen.findByLabelText("Your letter");
+  expect(screen.getByRole("button", { name: "Mark My Formal Letter" })).not.toBeDisabled();
 });
