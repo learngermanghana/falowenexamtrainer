@@ -21,54 +21,29 @@ export const A1_DAY3_PRACTICE_VIDEOS = Object.freeze([
 export const A1_DAY3_KAPITEL_11_TEACHER_VIDEO = getCanonicalA1TeacherVideoResource(3, "1.1");
 
 const LIVE_CLASS_LESSON_ID = "A1-day-3-kapitel-1.1-w-words";
+const W_WORD_OPTIONS = ["Was", "Wer", "Wie", "Wo", "Woher"];
+
 const liveQuestions = [
-  { id: "1", stem: "1. ___ ist das?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "2", stem: "2. ___ ist Martin?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "3", stem: "3. ___ ist der Ball?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "4", stem: "4. ___ ist das?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "5", stem: "5. ___ spielt mit dem Ball?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "6", stem: "6. ___ heißt du?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "7", stem: "7. ___ wohnt deine Mutter?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "8", stem: "8. ___ ist dein Job?", options: ["Was", "Wer", "Wie", "Wo"] },
-  { id: "9", stem: "9. ___ heißt deine Mutter?", options: ["Was", "Wer", "Wie", "Wo"] },
+  { id: "1", stem: "1. ___ ist das?", options: W_WORD_OPTIONS },
+  { id: "2", stem: "2. ___ ist Martin?", options: W_WORD_OPTIONS },
+  { id: "3", stem: "3. ___ ist der Ball?", options: W_WORD_OPTIONS },
+  { id: "4", stem: "4. ___ ist das?", options: W_WORD_OPTIONS },
+  { id: "5", stem: "5. ___ spielt mit dem Ball?", options: W_WORD_OPTIONS },
+  { id: "6", stem: "6. ___ heißt du?", options: W_WORD_OPTIONS },
+  { id: "7", stem: "7. ___ wohnst du?", options: W_WORD_OPTIONS },
+  { id: "8", stem: "8. ___ kommst du?", options: W_WORD_OPTIONS },
 ];
 
 const answerClues = [
-  "Das ist ein Ball.",
+  "Das ist der Tisch.",
   "Martin ist in Ghana.",
   "Der Ball ist klein.",
   "Das ist Martin.",
   "Martin spielt mit dem Ball.",
-  "Ich heiße Felix.",
-  "Meine Mutter wohnt in Accra.",
-  "Ich bin Lehrer.",
-  "Sie heißt Anna.",
+  "Ich heiße Ama.",
+  "Ich wohne in Accra.",
+  "Ich komme aus Ghana.",
 ];
-
-const focusCardStyle = {
-  border: "1px solid #bfdbfe",
-  background: "#f8fbff",
-  borderRadius: 14,
-  padding: 14,
-  display: "grid",
-  gap: 12,
-};
-
-const miniGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-  gap: 10,
-};
-
-const miniCardStyle = {
-  border: "1px solid #dbeafe",
-  background: "#fff",
-  borderRadius: 10,
-  padding: 11,
-  display: "grid",
-  gap: 5,
-  lineHeight: 1.55,
-};
 
 const replaceText = (element, label, value) => {
   if (!element) return;
@@ -267,65 +242,6 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
           description="Watch the teacher lecture and AI lesson, then use the Kapitel 1.1 practice book for personal information, articles, adjectives and W-questions."
         />
 
-        <section style={{ ...focusCardStyle, marginTop: 12 }} data-a1-day3-kapitel11-core-notes="true">
-          <div>
-            <h2 style={{ margin: 0 }}>Kapitel 1.1 core language</h2>
-            <p style={{ margin: "6px 0 0", lineHeight: 1.6, color: "#475569" }}>
-              Use these patterns before the W-question, speaking and introduction exercises below.
-            </p>
-          </div>
-          <div style={miniGridStyle}>
-            <div style={miniCardStyle}>
-              <strong>Personal information</strong>
-              <span>Wie heißt du? – Ich heiße Ama.</span>
-              <span>Woher kommst du? – Ich komme aus Ghana.</span>
-              <span>Wo wohnst du? – Ich wohne in Accra.</span>
-            </div>
-
-            <div style={{ ...miniCardStyle, gridColumn: "1 / -1", gap: 10 }}>
-              <div>
-                <strong>Articles: der · die · das</strong>
-                <p style={{ margin: "5px 0 0" }}>
-                  An article comes before a noun. In German, every noun has a grammatical gender, so learn the noun and its article together.
-                </p>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
-                <div style={{ border: "1px solid #dbeafe", borderRadius: 9, padding: 9, background: "#eff6ff" }}>
-                  <strong>der · masculine</strong><br />
-                  der Mann<br />der Tisch<br />der Stift
-                </div>
-                <div style={{ border: "1px solid #fbcfe8", borderRadius: 9, padding: 9, background: "#fdf2f8" }}>
-                  <strong>die · feminine</strong><br />
-                  die Frau<br />die Schule<br />die Tasche
-                </div>
-                <div style={{ border: "1px solid #ddd6fe", borderRadius: 9, padding: 9, background: "#f5f3ff" }}>
-                  <strong>das · neuter</strong><br />
-                  das Kind<br />das Buch<br />das Auto
-                </div>
-                <div style={{ border: "1px solid #bbf7d0", borderRadius: 9, padding: 9, background: "#f0fdf4" }}>
-                  <strong>die · plural</strong><br />
-                  die Bücher<br />die Autos<br />die Taschen
-                </div>
-              </div>
-              <div style={{ borderLeft: "4px solid #2563eb", paddingLeft: 10 }}>
-                <strong>When you mean “a / an”:</strong> <strong>ein</strong> Mann · <strong>eine</strong> Frau · <strong>ein</strong> Kind.
-              </div>
-              <span><strong>Best habit:</strong> do not learn only “Tisch”. Learn <strong>der Tisch</strong>. Do not learn only “Tasche”. Learn <strong>die Tasche</strong>.</span>
-            </div>
-
-            <div style={miniCardStyle}>
-              <strong>Simple adjectives</strong>
-              <span>Der Ball ist <strong>klein</strong>.</span>
-              <span>Die Frau ist <strong>freundlich</strong>.</span>
-              <span>Das Haus ist <strong>groß</strong>.</span>
-            </div>
-            <div style={miniCardStyle}>
-              <strong>W-questions</strong>
-              <span><strong>Was</strong> = what · <strong>Wer</strong> = who</span>
-              <span><strong>Wie</strong> = how / what … called · <strong>Wo</strong> = where</span>
-            </div>
-          </div>
-        </section>
       </div>
 
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
