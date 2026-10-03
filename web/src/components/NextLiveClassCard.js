@@ -1,5 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
+import "./NextLiveClassCard.css";
 import { alignedLiveClassNow } from "../services/canonicalLiveClassService";
 import {
   GHANA_TIMEZONE,
@@ -144,8 +145,12 @@ export default function NextLiveClassCard({
   const joinOpenLabel = liveClassJoinOpensAt(session, locale).replace(/^Join opens at\s*/i, "");
 
   return (
-    <section data-next-live-class-card="true" style={compact ? compactCardStyle : cardStyle}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
+    <section
+      data-next-live-class-card="true"
+      className={`next-live-class-card ${compact ? "next-live-class-card--compact" : "next-live-class-card--home"}`}
+      style={compact ? compactCardStyle : cardStyle}
+    >
+      <div className="next-live-class-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
         <div>
           <div style={{ color: compact ? "#bfdbfe" : "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: "0.08em" }}>
             NEXT LIVE CLASS
@@ -158,15 +163,15 @@ export default function NextLiveClassCard({
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 4 }}>
+      <div className="next-live-class-copy" style={{ display: "grid", gap: 4 }}>
         <div style={{ color: compact ? "#bfdbfe" : "#2563eb", fontSize: compact ? 13 : 15, fontWeight: 900 }}>{lessonLabel}</div>
-        <h3 style={{ margin: 0, color: textColor, fontSize: compact ? 19 : 25, lineHeight: 1.18 }}>{title}</h3>
+        <h3 className="next-live-class-title" style={{ margin: 0, color: textColor, fontSize: compact ? 19 : 25, lineHeight: 1.18 }}>{title}</h3>
         <div style={{ color: mutedColor, fontSize: compact ? 12 : 14, fontWeight: 700 }}>
           {className}{assignment ? ` · ${assignment}` : ""}
         </div>
       </div>
 
-      <div style={{ borderRadius: 12, padding: compact ? "9px 10px" : "11px 12px", background: compact ? "rgba(15,23,42,0.18)" : "rgba(255,255,255,0.75)", display: "grid", gap: 4 }}>
+      <div className="next-live-class-time" style={{ borderRadius: 12, padding: compact ? "9px 10px" : "11px 12px", background: compact ? "rgba(15,23,42,0.18)" : "rgba(255,255,255,0.75)", display: "grid", gap: 4 }}>
         <strong style={{ color: textColor, fontSize: compact ? 13 : 15 }}>{formatDate(session.startsAt, locale)} · {ghanaRange} Ghana time</strong>
         <span style={{ color: compact ? "#fef3c7" : "#1d4ed8", fontSize: compact ? 12 : 14, fontWeight: 900 }}>{countdown(session, effectiveNow)}</span>
         {showDeviceTime ? <span style={{ color: mutedColor, fontSize: 12 }}>Your device: {deviceRange} ({deviceTimeZone})</span> : null}
@@ -177,9 +182,10 @@ export default function NextLiveClassCard({
         ) : null}
       </div>
 
-      <div style={buttonRowStyle} aria-label="Class actions">
+      <div className="next-live-class-actions" style={buttonRowStyle} aria-label="Class actions">
         <a
           href={lessonLink}
+          className="next-live-class-action next-live-class-action--lesson"
           style={{
             ...styles.primaryButton,
             ...actionBaseStyle,
@@ -192,6 +198,7 @@ export default function NextLiveClassCard({
         </a>
         <a
           href={fullCalendarLink}
+          className="next-live-class-action next-live-class-action--timetable"
           style={{
             ...styles.secondaryButton,
             ...actionBaseStyle,
@@ -206,6 +213,7 @@ export default function NextLiveClassCard({
         {joinEnabled ? (
           <a
             href={zoom.url}
+            className="next-live-class-action next-live-class-action--join"
             target="_blank"
             rel="noreferrer"
             style={{
@@ -222,6 +230,7 @@ export default function NextLiveClassCard({
           <button
             type="button"
             disabled
+            className="next-live-class-action next-live-class-action--join"
             style={{
               ...styles.secondaryButton,
               ...actionBaseStyle,
@@ -241,10 +250,10 @@ export default function NextLiveClassCard({
       </div>
 
       {afterThis.length ? (
-        <div style={{ borderTop: compact ? "1px solid rgba(255,255,255,0.2)" : "1px solid #bfdbfe", paddingTop: 10, display: "grid", gap: 7 }}>
+        <div className="next-live-class-after" style={{ borderTop: compact ? "1px solid rgba(255,255,255,0.2)" : "1px solid #bfdbfe", paddingTop: 10, display: "grid", gap: 7 }}>
           <strong style={{ color: textColor, fontSize: 12 }}>After this</strong>
           {afterThis.map((item) => (
-            <a key={item.id || item.startsAt} href={liveClassLessonLink(summary, item)} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 8, color: textColor, textDecoration: "none", alignItems: "start" }}>
+            <a className="next-live-class-after-item" key={item.id || item.startsAt} href={liveClassLessonLink(summary, item)} style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 8, color: textColor, textDecoration: "none", alignItems: "start" }}>
               <span style={{ color: compact ? "#bfdbfe" : "#2563eb", fontSize: 11, fontWeight: 900 }}>{liveClassLessonLabel(item, level)}</span>
               <span style={{ minWidth: 0 }}>
                 <span style={{ display: "block", fontSize: compact ? 12 : 13, fontWeight: 800, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{liveClassCleanTitle(item)}</span>
