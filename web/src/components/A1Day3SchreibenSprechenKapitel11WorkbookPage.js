@@ -45,31 +45,6 @@ const answerClues = [
   "Ich komme aus Ghana.",
 ];
 
-const focusCardStyle = {
-  border: "1px solid #bfdbfe",
-  background: "#f8fbff",
-  borderRadius: 14,
-  padding: 14,
-  display: "grid",
-  gap: 12,
-};
-
-const miniGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-  gap: 10,
-};
-
-const miniCardStyle = {
-  border: "1px solid #dbeafe",
-  background: "#fff",
-  borderRadius: 10,
-  padding: 11,
-  display: "grid",
-  gap: 5,
-  lineHeight: 1.55,
-};
-
 const replaceText = (element, label, value) => {
   if (!element) return;
   const strong = document.createElement("strong");
