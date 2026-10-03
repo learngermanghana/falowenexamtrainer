@@ -612,10 +612,10 @@ const AccountSettings = () => {
         aria-label="Account overview"
         style={{
           ...styles.card,
-          border: `1px solid ${accountAccess.border}`,
-          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 62%, " + accountAccess.background + " 100%)",
+          border: "1px solid #e2e8f0",
+          background: "#ffffff",
           display: "grid",
-          gap: 14,
+          gap: 12,
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 14, alignItems: "flex-start", flexWrap: "wrap" }}>
