@@ -427,7 +427,7 @@ const TuitionStatusCard = ({
                 {isStartingPayment
                   ? t("accountSettings.tuition.opening")
                   : paymentActionLabel || `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)}`}
-              </button>>
+              </button>
             </>
           )}
 
