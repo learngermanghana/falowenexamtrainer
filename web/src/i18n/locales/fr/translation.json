@@ -1425,7 +1425,7 @@
       "graceEnded": "La période de grâce de paiement est terminée.",
       "graceDays": "Fenêtre de paiement : {{count}} jour restant.",
       "graceDays_plural": "Fenêtre de paiement : {{count}} jours restants.",
-      "graceBody": "Veuillez payer dans les 7 jours suivant l'inscription. Sans paiement, vos données étudiantes seront supprimées après 7 jours.",
+      "graceBody": "Payez avant la fin de votre essai pour conserver un accès continu. Après l’expiration, votre progression reste récupérable pendant 30 jours.",
       "finalPayment": "Paiement final",
       "finalPaymentHelp": "Votre solde restant est inférieur au minimum de versement {{min}}, vous pouvez donc payer le montant exact.",
       "opening": "Ouverture de Paystack ...",
