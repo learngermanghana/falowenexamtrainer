@@ -12,24 +12,31 @@ describe("payment recovery billing flow", () => {
       "Part payment received",
       "Paid",
       "Payment needs attention",
-      "Refresh payment status",
       "Continue payment",
       "Pay balance",
     ].forEach((text) => expect(source).toContain(text));
+    expect(source).toContain("handleRefreshPaymentStatus");
   });
 
-  test("billing keeps one summary and a compact payment panel", () => {
+  test("billing uses a compact two-column summary without a duplicate status card", () => {
     const source = read("AccountSettings.js");
     expect(source).toContain("data-account-billing-summary");
+    expect(source).toContain('gridTemplateColumns: "repeat(2, minmax(0, 1fr))"');
     expect(source).toContain(">Tuition<");
     expect(source).toContain(">Paid<");
     expect(source).toContain(">Balance<");
-    expect(source).toContain(">Access until<");
-    expect(source).toContain(">Payment status<");
-    expect(source).toContain("Course access details");
+    expect(source).toContain('"Trial ends" : "Access until"');
+    expect(source).not.toContain(">Payment status<");
     expect(source).toContain("showSummary={false}");
-    expect(source).toContain("transactionHistory.slice(0, 2)");
-    expect(source).toContain("older transaction");
+  });
+
+  test("billing hides empty contract detail rows and collapses transaction history", () => {
+    const source = read("AccountSettings.js");
+    expect(source).toContain("studentProfile?.contractStart || studentProfile?.contractEnd");
+    expect(source).toContain("Course access details");
+    expect(source).toContain("Transaction history{transactionHistory.length > 0");
+    expect(source).toContain("transactionHistory.map((tx, index)");
+    expect(source).not.toContain("transactionHistory.slice(0, 2)");
   });
 
   test("billing uses trial expiry when there is no contract end", () => {
@@ -38,12 +45,30 @@ describe("payment recovery billing flow", () => {
     expect(source).toContain("formatDate(accessUntil)");
   });
 
-  test("transaction history sorts raw timestamps before collapsing older items", () => {
+  test("transaction history sorts raw timestamps before rendering", () => {
     const source = read("AccountSettings.js");
     expect(source).toContain("const timestamp = toDateMs(rawDate)");
     expect(source).toContain("timestamp: Number.isFinite(timestamp) ? timestamp : 0");
     expect(source).toContain(".sort((a, b) => b.timestamp - a.timestamp)");
-    expect(source).toContain("transactionHistory.slice(0, 2)");
+    expect(source).toContain("transactionHistory.map((tx, index)");
+  });
+
+  test("compact payment panel removes repeated trial warning and duplicate balance button", () => {
+    const source = read("TuitionStatusCardLegacy.js");
+    expect(source).toContain("showSummary && paymentGraceNotice");
+    expect(source).toContain('background: "transparent"');
+    expect(source).toContain('width: "100%"');
+    expect(source).toContain("Paystack fee share");
+    expect(source).not.toContain('t("accountSettings.tuition.payOutstanding"');
+  });
+
+  test("trial copy uses the 30-day recovery window instead of seven-day deletion", () => {
+    const source = fs.readFileSync(
+      path.resolve(__dirname, "../i18n/locales/en/translation.json"),
+      "utf8"
+    );
+    expect(source).toContain("30-day recovery window");
+    expect(source).not.toContain("student data will be deleted after 7 days");
   });
 
   test("refresh payment status re-fetches the student Firestore profile", () => {
