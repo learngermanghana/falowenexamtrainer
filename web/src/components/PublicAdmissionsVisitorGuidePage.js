@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
+import "./PublicAdmissionsVisitorGuidePage.css";
 import { updatePageMeta } from "../lib/pageMeta";
 import { loadPublicClasses, slugifyPublicClass } from "../services/publicClassCatalogService";
 import { resolveAdmissionsRef, trackAdmissionsEngagement } from "../services/admissionsEngagementService";
@@ -122,8 +123,8 @@ const PublicAdmissionsVisitorGuidePage = () => {
   };
 
   return (
-    <main style={{ ...styles.container, maxWidth: 1040, display: "grid", gap: 16, paddingBottom: 48 }}>
-      <section style={{ ...card, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+    <main className="visitor-guide-page" style={{ ...styles.container, maxWidth: 1040, display: "grid", gap: 16, paddingBottom: 48 }}>
+      <section className="visitor-guide-hero" style={{ ...card, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <div style={{ color: "#1d4ed8", fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase", fontSize: 12 }}>
           Admissions · School background
         </div>
@@ -142,7 +143,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
         ) : null}
       </section>
 
-      <section style={{ ...card, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
+      <section className="visitor-guide-class-card" style={{ ...card, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
         <div style={{ color: "#166534", fontWeight: 900, fontSize: 12, textTransform: "uppercase", letterSpacing: ".04em" }}>
           {selectedClass ? "Your selected class" : requestedSlug ? "Class information" : "Choose your next step"}
         </div>
@@ -151,7 +152,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
         ) : selectedClass ? (
           <>
             <h2 style={{ margin: 0 }}>{selectedClass.title}</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+            <div className="visitor-guide-class-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
               <div><strong>Start date</strong><div>{formatDate(selectedClass.startDate)}</div></div>
               <div><strong>Course fee</strong><div>{formatFee(selectedClass)}</div></div>
               <div><strong>Learning mode</strong><div>{formatLearningMode(selectedClass)}</div></div>
@@ -172,7 +173,7 @@ const PublicAdmissionsVisitorGuidePage = () => {
           </>
         )}
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="visitor-guide-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <a
             href={brochureHref}
             onClick={() => trackClick("brochure_open")}
@@ -188,6 +189,13 @@ const PublicAdmissionsVisitorGuidePage = () => {
             Register now
           </a>
         </div>
+        <a
+          className="visitor-guide-all-classes-link"
+          href="/classes/"
+          onClick={() => trackClick("all_classes_open")}
+        >
+          View all classes
+        </a>
       </section>
 
       <section style={{ ...card, overflow: "hidden" }}>
@@ -325,10 +333,10 @@ const PublicAdmissionsVisitorGuidePage = () => {
         </div>
       </section>
 
-      <section style={{ ...card, background: "#f8fafc" }}>
+      <section className="visitor-guide-final-card" style={{ ...card, background: "#f8fafc" }}>
         <h2 style={{ margin: 0 }}>Ready for the next step?</h2>
         <p style={{ margin: 0, lineHeight: 1.65 }}>You can review the class details again or continue directly to registration.</p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div className="visitor-guide-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <a href={brochureHref} onClick={() => trackClick("brochure_open")} style={{ ...action, background: "#fff", color: "#1d4ed8" }}>
             View class brochure
           </a>
