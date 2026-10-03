@@ -142,6 +142,19 @@ describe("live class card UI protection", () => {
     expect(card).toContain("Previously:");
   });
 
+  test("the homepage next class card has responsive mobile and desktop actions", () => {
+    const card = source("./NextLiveClassCard.js");
+    const css = source("./NextLiveClassCard.css");
+    expect(card).toContain("next-live-class-card--home");
+    expect(card).toContain("next-live-class-action--lesson");
+    expect(card).toContain("next-live-class-action--timetable");
+    expect(card).toContain("next-live-class-action--join");
+    expect(css).toContain("@media (max-width: 640px)");
+    expect(css).toContain("grid-template-columns: repeat(2, minmax(0, 1fr)) !important");
+    expect(css).toContain("@media (min-width: 768px)");
+    expect(css).toContain("grid-template-columns: repeat(3, minmax(0, 1fr)) !important");
+  });
+
   test("the full calendar places next class before progress and collapses the complete register", () => {
     const fullCard = source("./ClassCalendarCardV2.js");
     expect(fullCard.indexOf("<NextLiveClassCard")).toBeGreaterThan(-1);
