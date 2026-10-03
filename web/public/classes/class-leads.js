@@ -254,7 +254,8 @@
       body.lead-gate-active .page > .grid,
       body.lead-gate-active .page > p.footer,
       body.lead-gate-active .hero-actions { display: none !important; }
-      .lead-capture-card { margin-top: 14px; display: grid; gap: 14px; border-color: #bfdbfe; background: linear-gradient(180deg, #ffffff, #eff6ff); }
+      .lead-capture-card { margin-top: 14px; display: grid; gap: 14px; border-color: #dbeafe; background: #ffffff; box-shadow: 0 10px 28px rgba(15, 23, 42, .08); }
+      .lead-capture-card > div:first-child { display: grid; gap: 5px; }
       .lead-capture-card h2 { margin: 0; font-size: clamp(23px, 7vw, 34px); letter-spacing: -0.035em; }
       .lead-decision-summary { display: grid; gap: 12px; border: 1px solid #93c5fd; background: #eff6ff; border-radius: 14px; padding: 14px; }
       .lead-decision-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -273,14 +274,14 @@
       .lead-decision-actions { display: grid; gap: 8px; }
       .lead-placement-link { width: fit-content; color: #1d4ed8; font-size: 13px; font-weight: 850; text-decoration: none; }
       .lead-capture-card p { margin: 0; color: #334155; line-height: 1.6; font-size: 14px; }
-      .lead-capture-form { display: grid; gap: 10px; }
+      .lead-capture-form { display: grid; gap: 11px; min-width: 0; }
       .lead-field { display: grid; gap: 5px; }
       .lead-field label { font-weight: 850; color: #0f172a; font-size: 13px; }
-      .lead-field input, .lead-field select { width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 12px; font: inherit; color: #111827; }
+      .lead-field input, .lead-field select { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid #cbd5e1; background: #ffffff; padding: 10px 12px; font: inherit; color: #111827; line-height: 1.35; }
       .lead-field input:focus, .lead-field select:focus { outline: 2px solid #bfdbfe; border-color: #1455f5; }
       .lead-form-grid { display: grid; gap: 10px; }
       .lead-help { color: #64748b; font-size: 12px; line-height: 1.45; }
-      .lead-selected-class { border: 1px solid #bfdbfe; border-radius: 12px; background: #eff6ff; color: #1e3a8a; font-size: 12px; font-weight: 800; line-height: 1.5; padding: 9px 10px; }
+      .lead-selected-class { border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; color: #1e3a8a; font-size: 12px; font-weight: 800; line-height: 1.45; padding: 8px 10px; overflow-wrap: anywhere; }
       .lead-actions { display: grid; gap: 10px; }
       .lead-submit { width: 100%; min-height: 50px; }
       .lead-whatsapp { width: 100%; min-height: 50px; }
@@ -295,7 +296,14 @@
       .lead-debug.active { display: block; }
       .lead-debug pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
       @media (max-width: 560px) {
-        .lead-track-record { grid-template-columns: 1fr; }
+        .lead-capture-card { padding: 14px; gap: 12px; border-radius: 16px; box-shadow: none; }
+        .lead-capture-card h2 { font-size: 24px; line-height: 1.12; }
+        .lead-decision-grid, .lead-track-record { grid-template-columns: 1fr; }
+        .lead-decision-summary { padding: 12px; gap: 10px; }
+        .lead-decision-heading { align-items: center; }
+        .lead-decision-heading strong { font-size: 16px; }
+        .lead-decision-fee { font-size: 15px; }
+        .lead-submit, .lead-whatsapp { min-height: 48px; }
       }
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -303,6 +311,22 @@
         .lead-actions { grid-template-columns: 1fr 1fr; }
         .lead-decision-actions { grid-template-columns: 1.4fr 1fr; }
         .lead-track-record { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      @media (min-width: 900px) {
+        .lead-capture-card {
+          grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+          gap: 18px 20px;
+          padding: 22px;
+          align-items: start;
+        }
+        .lead-capture-card > div:first-child { grid-column: 1 / -1; }
+        .lead-capture-form {
+          padding: 18px;
+          border: 1px solid #e2e8f0;
+          border-radius: 16px;
+          background: #f8fafc;
+        }
+        .lead-decision-summary { align-self: start; min-height: 100%; }
       }
     `;
     document.head.appendChild(style);
