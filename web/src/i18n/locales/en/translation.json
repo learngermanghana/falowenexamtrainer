@@ -1536,7 +1536,7 @@
       "graceEnded": "Payment grace period ended.",
       "graceDays": "Payment window: {{count}} day left.",
       "graceDays_plural": "Payment window: {{count}} days left.",
-      "graceBody": "Please make payment within 7 days of signup. If no payment is made, your student data will be deleted after 7 days.",
+      "graceBody": "Pay before your trial ends to keep uninterrupted access. If the trial expires, your progress enters the 30-day recovery window.",
       "finalPayment": "Final payment",
       "finalPaymentHelp": "Your remaining balance is below the {{min}} installment minimum, so you can pay the exact balance to finish.",
       "opening": "Opening Paystack ...",
