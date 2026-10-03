@@ -200,34 +200,28 @@ const TuitionStatusCard = ({
   const feeSummary = amountToPay > 0 ? (
     <div
       style={{
-        ...styles.card,
-        margin: "10px 0 0",
-        background: "#f8fafc",
-        borderColor: "#cbd5e1",
+        marginTop: 10,
+        paddingTop: 10,
+        borderTop: "1px solid #e2e8f0",
+        display: "grid",
+        gap: 6,
       }}
       data-testid="paystack-fee-breakdown"
     >
       <div style={styles.metaRow}>
-        <span>Tuition payment</span>
+        <span style={{ color: "#64748b" }}>Tuition</span>
         <strong>{formatCheckoutMoney(feeBreakdown.tuitionAmount)}</strong>
       </div>
-      <div style={{ ...styles.metaRow, marginTop: 6 }}>
-        <span>Your 50% Paystack fee share</span>
+      <div style={styles.metaRow}>
+        <span style={{ color: "#64748b" }}>Paystack fee share</span>
         <strong>{formatCheckoutMoney(feeBreakdown.studentFeeContribution)}</strong>
       </div>
-      <div
-        style={{
-          ...styles.metaRow,
-          marginTop: 8,
-          paddingTop: 8,
-          borderTop: "1px solid #cbd5e1",
-        }}
-      >
-        <span><strong>Total charged by Paystack</strong></span>
+      <div style={{ ...styles.metaRow, paddingTop: 6, borderTop: "1px solid #e2e8f0" }}>
+        <span><strong>Total</strong></span>
         <strong>{formatCheckoutMoney(feeBreakdown.checkoutAmount)}</strong>
       </div>
-      <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-        Paystack’s estimated 1.95% transaction fee is shared equally. Falowen pays the other 50%.
+      <p style={{ ...styles.helperText, margin: 0, fontSize: 11 }}>
+        Falowen covers the other half of the estimated Paystack fee.
       </p>
     </div>
   ) : null;
@@ -290,7 +284,11 @@ const TuitionStatusCard = ({
 
   return (
     <div
-      style={{ ...styles.card, margin: 0 }}
+      style={
+        showSummary
+          ? { ...styles.card, margin: 0 }
+          : { margin: 0, padding: 0, border: 0, background: "transparent", boxShadow: "none" }
+      }
       data-testid="tuition-status-card"
       data-compact-payment={showSummary ? "false" : "true"}
     >
@@ -326,7 +324,7 @@ const TuitionStatusCard = ({
 
       {paymentsEnabled && showPaymentAction ? (
         <div style={{ marginTop: 12 }}>
-          {paymentGraceNotice ? (
+          {showSummary && paymentGraceNotice ? (
             <div
               style={{
                 ...styles.errorBox,
@@ -349,8 +347,8 @@ const TuitionStatusCard = ({
             </div>
           ) : null}
 
-          <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155" }}>
-            {t("payments.notice.nonRefundable")} {" "}
+          <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155", fontSize: showSummary ? undefined : 12 }}>
+            {t("payments.notice.nonRefundable")}{" "}
             <a
               href="https://register.falowen.app/"
               target="_blank"
@@ -359,17 +357,18 @@ const TuitionStatusCard = ({
             >
               {t("payments.notice.contractLink")}
             </a>
-            . {t("payments.notice.emailReminder")}
+            {showSummary ? `. ${t("payments.notice.emailReminder")}` : "."}
           </p>
 
           {maxPayable <= 0 ? null : isFinalTopUp ? (
             <>
               <div
                 style={{
-                  ...styles.card,
                   margin: 0,
+                  padding: "9px 10px",
                   background: "#f8fafc",
-                  borderColor: "#e2e8f0",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 10,
                 }}
               >
                 <div style={styles.metaRow}>
@@ -388,7 +387,7 @@ const TuitionStatusCard = ({
 
               <button
                 type="button"
-                style={{ ...styles.primaryButton, marginTop: 10 }}
+                style={{ ...styles.primaryButton, marginTop: 10, width: "100%" }}
                 onClick={startPayment}
                 disabled={!canPay || isStartingPayment}
               >
@@ -419,32 +418,16 @@ const TuitionStatusCard = ({
               {feeSummary}
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
 
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
-                <button
-                  type="button"
-                  style={styles.secondaryButton}
-                  onClick={() => {
-                    setPaymentError("");
-                    setAmountText(String(maxPayable));
-                  }}
-                  disabled={maxPayable <= 0 || isStartingPayment}
-                >
-                  {t("accountSettings.tuition.payOutstanding", {
-                    amount: formatMoney(maxPayable),
-                  })}
-                </button>
-
-                <button
-                  type="button"
-                  style={styles.primaryButton}
-                  onClick={startPayment}
-                  disabled={!canPay || isStartingPayment}
-                >
-                  {isStartingPayment
-                    ? t("accountSettings.tuition.opening")
-                    : paymentActionLabel || `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)} online`}
-                </button>
-              </div>
+              <button
+                type="button"
+                style={{ ...styles.primaryButton, marginTop: 10, width: "100%" }}
+                onClick={startPayment}
+                disabled={!canPay || isStartingPayment}
+              >
+                {isStartingPayment
+                  ? t("accountSettings.tuition.opening")
+                  : paymentActionLabel || `Pay ${formatCheckoutMoney(feeBreakdown.checkoutAmount)}`}
+              </button>
             </>
           )}
 

@@ -1422,7 +1422,7 @@
       "graceEnded": "Zahlungsfrist ist abgelaufen.",
       "graceDays": "Zahlungsfenster: noch {{count}} Tag.",
       "graceDays_plural": "Zahlungsfenster: noch {{count}} Tage.",
-      "graceBody": "Bitte zahle innerhalb von 7 Tagen nach der Anmeldung. Ohne Zahlung werden die Profildaten nach 7 Tagen gelöscht.",
+      "graceBody": "Zahle vor Ende deiner Testphase, damit dein Zugang ohne Unterbrechung weiterläuft. Nach Ablauf bleibt dein Lernfortschritt 30 Tage lang wiederherstellbar.",
       "finalPayment": "Abschlusszahlung",
       "finalPaymentHelp": "Dein Restbetrag liegt unter der Mindestrate von {{min}}, daher kannst du den exakten Restbetrag zahlen.",
       "opening": "Paystack wird geöffnet ...",
