@@ -1,0 +1,160 @@
+.visitor-guide-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.visitor-guide-hero,
+.visitor-guide-class-card,
+.visitor-guide-final-card {
+  min-width: 0;
+}
+
+.visitor-guide-class-card {
+  box-shadow: 0 8px 24px rgba(22, 101, 52, 0.07);
+}
+
+.visitor-guide-class-grid > div {
+  min-width: 0;
+  border: 1px solid #dcfce7;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 11px 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.visitor-guide-class-grid > div > strong {
+  color: #475569;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.visitor-guide-class-grid > div > div {
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.visitor-guide-actions {
+  min-width: 0;
+}
+
+.visitor-guide-actions > a {
+  box-sizing: border-box;
+}
+
+.visitor-guide-all-classes-link {
+  width: fit-content;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 850;
+  text-decoration: none;
+  padding: 2px 0;
+}
+
+.visitor-guide-all-classes-link:hover {
+  text-decoration: underline;
+}
+
+.visitor-guide-all-classes-link:focus-visible,
+.visitor-guide-actions > a:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.25);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .visitor-guide-page {
+    gap: 12px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-bottom: 32px !important;
+  }
+
+  .visitor-guide-hero,
+  .visitor-guide-class-card,
+  .visitor-guide-final-card {
+    padding: 14px !important;
+    border-radius: 16px !important;
+    gap: 11px !important;
+  }
+
+  .visitor-guide-hero h1 {
+    font-size: 25px;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+  }
+
+  .visitor-guide-class-card h2 {
+    font-size: 21px;
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+
+  .visitor-guide-class-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .visitor-guide-class-grid > div {
+    padding: 9px 10px;
+  }
+
+  .visitor-guide-actions {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .visitor-guide-actions > a {
+    width: 100%;
+    min-height: 46px;
+    padding: 10px 12px !important;
+  }
+
+  .visitor-guide-all-classes-link {
+    width: 100%;
+    text-align: center;
+    padding: 6px 0 2px;
+  }
+}
+
+@media (min-width: 760px) {
+  .visitor-guide-page {
+    gap: 18px !important;
+  }
+
+  .visitor-guide-hero,
+  .visitor-guide-class-card,
+  .visitor-guide-final-card {
+    padding: 20px !important;
+  }
+
+  .visitor-guide-class-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .visitor-guide-actions {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(180px, 230px)) !important;
+    gap: 10px !important;
+    justify-content: start;
+  }
+
+  .visitor-guide-actions > a {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .visitor-guide-class-card {
+    padding: 22px !important;
+    gap: 14px !important;
+  }
+
+  .visitor-guide-class-grid > div {
+    padding: 12px 14px;
+  }
+}

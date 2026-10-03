@@ -32,6 +32,8 @@ test("visitor guide explains school, selected class, learning flow and actions",
   assert.ok(page.indexOf("Visit LLEA") < page.indexOf("Why students study with us"));
   assert.match(page, /View class brochure/);
   assert.match(page, /Register now/);
+  assert.match(page, /View all classes/);
+  assert.match(page, /PublicAdmissionsVisitorGuidePage\.css/);
   assert.match(page, /academyProfile\.team/);
   assert.match(page, /Teaching in practice/);
   assert.match(page, /Useful links/);
@@ -39,6 +41,16 @@ test("visitor guide explains school, selected class, learning flow and actions",
   assert.match(page, /visitor_guide_open/);
   assert.match(page, /brochure_open/);
   assert.match(page, /registration_click/);
+});
+
+test("visitor guide class actions are responsive on phone and desktop", () => {
+  const css = read("web/src/components/PublicAdmissionsVisitorGuidePage.css");
+  assert.match(css, /@media \(max-width: 640px\)/);
+  assert.match(css, /@media \(min-width: 760px\)/);
+  assert.match(css, /visitor-guide-class-grid/);
+  assert.match(css, /visitor-guide-actions/);
+  assert.match(css, /grid-template-columns: 1fr !important/);
+  assert.match(css, /repeat\(2, minmax\(180px, 230px\)\)/);
 });
 
 test("class brochure preserves admissions reference and records engagement", () => {

@@ -98,7 +98,7 @@
       "body.post-lead-class-detail .post-lead-hide{display:none!important}" +
       "body.post-lead-class-detail .class-main-card{margin-top:0!important}" +
       "body.post-lead-class-detail .page{padding-top:12px!important}" +
-      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))!important}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(3,minmax(0,1fr))!important}}";
+      "@media(min-width:760px){.simple-class-steps{grid-template-columns:repeat(4,minmax(0,1fr))!important}.simple-class-step{align-items:flex-start}body.simple-classes-form .lead-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}}";
 
     var tag = document.getElementById("simpleClassFlowStyles");
     if (!tag) {

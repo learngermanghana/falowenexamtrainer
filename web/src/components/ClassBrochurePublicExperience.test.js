@@ -117,6 +117,21 @@ describe("public class brochure experience", () => {
     expect(source).toContain("FalowenLoadClassCatalog");
   });
 
+  test("class selection and other-class cards stay responsive across phone and desktop", () => {
+    const leads = publicClassFile("class-leads.js");
+    const flow = publicClassFile("class-simple-flow.js");
+    const hero = publicClassFile("class-hero-banner.js");
+    const postLead = publicClassFile("post-lead-focus.js");
+
+    expect(leads).toContain("@media (min-width: 900px)");
+    expect(leads).toContain("grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr)");
+    expect(leads).toContain(".lead-decision-grid, .lead-track-record { grid-template-columns: 1fr; }");
+    expect(flow).toContain("lead-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}");
+    expect(hero).toContain("@media(min-width:680px)");
+    expect(hero).toContain("@media(min-width:1040px)");
+    expect(postLead).toContain('link.textContent = "View all classes"');
+  });
+
   test("fallback catalogue keeps A1, A2 and B1 available instead of collapsing to B2 and C1", () => {
     const brochure = publicClassFile("brochure.js");
     const filter = publicClassFile("active-class-filter.js");

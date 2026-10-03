@@ -61,14 +61,17 @@
       .view-other-classes-cta {
         display: inline-flex;
         justify-content: center;
-        width: 100%;
-        min-height: 48px;
+        width: fit-content;
+        min-width: 210px;
+        min-height: 46px;
         background: #ffffff !important;
         color: #1d4ed8 !important;
         border-color: #bfdbfe !important;
+        box-shadow: none !important;
       }
       @media (max-width: 520px) {
         body.post-lead-focus .page { padding-left: 8px !important; padding-right: 8px !important; }
+        .view-other-classes-cta { width: 100%; min-width: 0; }
       }
     `;
     document.head.appendChild(style);
@@ -235,7 +238,7 @@
     link.id = "viewOtherClassesCta";
     link.className = "button view-other-classes-cta";
     link.href = "/classes/";
-    link.textContent = "View other classes";
+    link.textContent = "View all classes";
     anchor.insertAdjacentElement("afterend", link);
   }
 
