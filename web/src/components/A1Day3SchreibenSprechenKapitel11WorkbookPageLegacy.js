@@ -104,70 +104,79 @@ const emojiStyle = {
   lineHeight: 1,
 };
 
-const wWordQuestions = [
+const W_WORD_OPTIONS = ["Was", "Wer", "Wie", "Wo", "Woher"];
+
+export const A1_DAY3_W_WORD_QUESTIONS = [
   {
     id: 1,
     stem: "1. ___ ist das?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Was",
-    response: "Das ist ein Ball.",
+    response: "Das ist der Tisch.",
   },
   {
     id: 2,
     stem: "2. ___ ist Martin?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Wo",
     response: "Martin ist in Ghana.",
   },
   {
     id: 3,
     stem: "3. ___ ist der Ball?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Wie",
     response: "Der Ball ist klein.",
   },
   {
     id: 4,
     stem: "4. ___ ist das?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Wer",
     response: "Das ist Martin.",
   },
   {
     id: 5,
     stem: "5. ___ spielt mit dem Ball?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Wer",
     response: "Martin spielt mit dem Ball.",
   },
   {
     id: 6,
     stem: "6. ___ heißt du?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    options: W_WORD_OPTIONS,
     correct: "Wie",
-    response: "Ich heiße Felix.",
+    response: "Ich heiße Ama.",
   },
   {
     id: 7,
-    stem: "7. ___ wohnt deine Mutter?",
-    options: ["Was", "Wer", "Wie", "Wo"],
+    stem: "7. ___ wohnst du?",
+    options: W_WORD_OPTIONS,
     correct: "Wo",
-    response: "Meine Mutter wohnt in Berlin.",
+    response: "Ich wohne in Accra.",
   },
   {
     id: 8,
-    stem: "8. ___ ist dein Job?",
-    options: ["Was", "Wer", "Wie", "Wo"],
-    correct: "Was",
-    response: "Ich bin Lehrer.",
+    stem: "8. ___ kommst du?",
+    options: W_WORD_OPTIONS,
+    correct: "Woher",
+    response: "Ich komme aus Ghana.",
   },
-  {
-    id: 9,
-    stem: "9. ___ heißt deine Mutter?",
-    options: ["Was", "Wer", "Wie", "Wo"],
-    correct: "Wie",
-    response: "Sie heißt Anna.",
-  },
+];
+
+export const A1_DAY3_ARTICLE_GENDER_QUESTIONS = [
+  { id: "article-1", noun: "der Tisch", correct: "masculine" },
+  { id: "article-2", noun: "die Frau", correct: "feminine" },
+  { id: "article-3", noun: "das Buch", correct: "neuter" },
+  { id: "article-4", noun: "die Schule", correct: "feminine" },
+  { id: "article-5", noun: "das Auto", correct: "neuter" },
+];
+
+const articleGenderOptions = [
+  { value: "masculine", label: "Masculine" },
+  { value: "feminine", label: "Feminine" },
+  { value: "neuter", label: "Neuter" },
 ];
 
 const scenarios = [
@@ -305,12 +314,20 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
   const [showScenarioAnswers, setShowScenarioAnswers] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [checkedAnswers, setCheckedAnswers] = useState(false);
+  const [selectedGenderAnswers, setSelectedGenderAnswers] = useState({});
+  const [checkedGenderAnswers, setCheckedGenderAnswers] = useState(false);
 
   const score = useMemo(() => {
-    return wWordQuestions.reduce((total, question) => {
+    return A1_DAY3_W_WORD_QUESTIONS.reduce((total, question) => {
       return total + (selectedAnswers[question.id] === question.correct ? 1 : 0);
     }, 0);
   }, [selectedAnswers]);
+
+  const articleScore = useMemo(() => {
+    return A1_DAY3_ARTICLE_GENDER_QUESTIONS.reduce((total, question) => {
+      return total + (selectedGenderAnswers[question.id] === question.correct ? 1 : 0);
+    }, 0);
+  }, [selectedGenderAnswers]);
 
   const handleSelect = (questionId, option) => {
     setSelectedAnswers((prev) => ({
@@ -328,19 +345,121 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
     setCheckedAnswers(false);
   };
 
+  const handleGenderSelect = (questionId, option) => {
+    setSelectedGenderAnswers((prev) => ({
+      ...prev,
+      [questionId]: option,
+    }));
+    setCheckedGenderAnswers(false);
+  };
+
+  const handleResetGenderAnswers = () => {
+    setSelectedGenderAnswers({});
+    setCheckedGenderAnswers(false);
+  };
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 Practice Book · Greetings, Spelling, Vocabulary &amp; W-Words
+          A1 · Day 3 Practice Book · Personal Information, Articles, Adjectives &amp; W-Questions
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          This is a practice page only. Read, speak, spell, and practise basic A1 German.
+          Learn the new patterns first, then choose the correct article gender and W-word.
         </p>
       </div>
+
+      <section style={sectionStyle} data-a1-day3-foundations="true">
+        <h2 style={{ margin: 0 }}>Personal information</h2>
+        <div style={subCardStyle}>
+          <span>Wie heißt du? – <strong>Ich heiße Ama.</strong></span>
+          <span>Woher kommst du? – <strong>Ich komme aus Ghana.</strong></span>
+          <span>Wo wohnst du? – <strong>Ich wohne in Accra.</strong></span>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>Articles: der · die · das</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            An article comes before a noun. In German, every singular noun has a grammatical gender.
+            Learn the noun and its article together.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
+            <div style={vocabItemStyle}><strong>der · masculine</strong><span>der Mann · der Tisch · der Stift</span></div>
+            <div style={vocabItemStyle}><strong>die · feminine</strong><span>die Frau · die Schule · die Tasche</span></div>
+            <div style={vocabItemStyle}><strong>das · neuter</strong><span>das Kind · das Buch · das Auto</span></div>
+          </div>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>For now:</strong> learn only <strong>der, die, das</strong>. You will learn plural articles
+            and indefinite articles later.
+          </p>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Best habit:</strong> do not learn only “Tisch”. Learn <strong>der Tisch</strong>.
+          </p>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>Choose the noun gender</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Read the noun with its article. Is it masculine, feminine or neuter?
+          </p>
+          {A1_DAY3_ARTICLE_GENDER_QUESTIONS.map((question) => (
+            <div key={question.id} style={questionBoxStyle}>
+              <strong>{question.noun} — masculine, feminine or neuter?</strong>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {articleGenderOptions.map((option) => {
+                  const selected = selectedGenderAnswers[question.id] === option.value;
+                  const correct = question.correct === option.value;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => handleGenderSelect(question.id, option.value)}
+                      style={optionButtonStyle(selected, correct, checkedGenderAnswers)}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {checkedGenderAnswers ? (
+                <span>
+                  <strong>Answer:</strong> {articleGenderOptions.find((option) => option.value === question.correct)?.label}
+                </span>
+              ) : null}
+            </div>
+          ))}
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <button
+              type="button"
+              onClick={() => setCheckedGenderAnswers(true)}
+              style={{ ...styles.button, width: "fit-content" }}
+            >
+              Check Answers
+            </button>
+            <button
+              type="button"
+              onClick={handleResetGenderAnswers}
+              style={{ ...styles.secondaryButton, width: "fit-content" }}
+            >
+              Reset
+            </button>
+            {checkedGenderAnswers ? <strong>Your score: {articleScore} / {A1_DAY3_ARTICLE_GENDER_QUESTIONS.length}</strong> : null}
+          </div>
+        </div>
+
+        <div style={subCardStyle}>
+          <strong>Simple statements with adjectives</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            A noun + <strong>ist</strong> + adjective can be a complete statement.
+          </p>
+          <span>Der Ball ist <strong>klein</strong>.</span>
+          <span>Die Frau ist <strong>freundlich</strong>.</span>
+          <span>Das Haus ist <strong>groß</strong>.</span>
+        </div>
+      </section>
 
       <section style={sectionStyle}>
         <img
@@ -477,7 +596,17 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
           loading="lazy"
           style={imageStyle}
         />
-        <h2 style={{ margin: 0 }}>Explanation of W-Words and Their Usage</h2>
+        <h2 style={{ margin: 0 }}>W-questions: learn the rule first</h2>
+
+        <div style={{ ...subCardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <strong>W-word + conjugated verb + subject / rest</strong>
+          <span>Wie + heißt + du? → <strong>Wie heißt du?</strong></span>
+          <span>Wo + wohnst + du? → <strong>Wo wohnst du?</strong></span>
+          <span>Woher + kommst + du? → <strong>Woher kommst du?</strong></span>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            First decide what information you need. Then put the conjugated verb directly after the W-word.
+          </p>
+        </div>
 
         <div style={subCardStyle}>
           <strong>1. Was (What)</strong>
@@ -485,7 +614,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             <strong>Usage:</strong> For objects and things.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Example:</strong> Das ist ein Ball.
+            <strong>Example:</strong> Das ist der Tisch.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Purpose:</strong> To ask about an object or thing.
@@ -535,11 +664,11 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Lückentext mit W-Wörtern</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Below are questions that use the German W-Words. Fill in the blanks with the correct W-Word
-          (Was, Wer, Wie, Wo). Choose one answer for each question, then check your work.
+          Read the answer clue first. Then choose the W-word that asks for that information
+          (Was, Wer, Wie, Wo, Woher). You do not need to invent a long sentence.
         </p>
 
-        {wWordQuestions.map((question) => (
+        {A1_DAY3_W_WORD_QUESTIONS.map((question) => (
           <div key={question.id} style={questionBoxStyle}>
             <strong>{question.stem}</strong>
             <div style={{ display: "grid", gap: 8 }}>
@@ -596,7 +725,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
 
           {checkedAnswers ? (
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              <strong>Your score:</strong> {score} / {wWordQuestions.length}
+              <strong>Your score:</strong> {score} / {A1_DAY3_W_WORD_QUESTIONS.length}
             </p>
           ) : (
             <p style={{ margin: 0, color: "#6b7280" }}>
@@ -605,8 +734,9 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
           )}
 
           <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.7 }}>
-            Explanation: <strong>Was</strong> asks about things, <strong>Wo</strong> asks about place,
-            <strong> Wie</strong> asks about condition or form, and <strong>Wer</strong> asks about people.
+            Explanation: <strong>Was</strong> asks about things, <strong>Wer</strong> about people,
+            <strong> Wie</strong> about name or condition, <strong>Wo</strong> about location, and
+            <strong> Woher</strong> about origin.
           </p>
         </div>
       </section>
