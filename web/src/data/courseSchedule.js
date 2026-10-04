@@ -449,18 +449,18 @@ const A2_SCHEDULE = [
   },
   {
     day: 29,
-    topic: "Goethe A2 Exam Orientation & Official Practice",
-    chapter: "Exam Orientation",
+    topic: "A2 Final Mock Exam",
+    chapter: "Final Mock",
     attendance: false,
-    goal: "Understand the official Goethe A2 exam structure and use the official practice materials confidently.",
+    goal: "Complete an A2 exam-style mock across Lesen, Hören, Schreiben and Sprechen and identify the areas that need more practice.",
     instruction:
-      "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, review the four official exam sections, then use the official Goethe A2 practice materials to familiarise yourself with the real exam format.",
+      "Complete the A2 Final Mock sections under exam-style conditions. This is repeatable exam practice and does not add a 29th required course assignment.",
     grammar_topic: null,
     assignment: false,
     video: null,
     youtube_link: null,
     grammarbook_link: null,
-    workbook_link: "/campus/course/a2-day-29-goethe-exam-orientation",
+    workbook_link: "/campus/course/a2-final-mock-exam",
   },
   {
     day: 30,
