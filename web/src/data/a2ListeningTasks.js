@@ -141,14 +141,15 @@ export const A2_LISTENING_TASKS = {
   11: {
     chapter: "4.11",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre das Gespräch bei der Autovermietung und beantworte die Fragen. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/cpiYNbbIvr4",
+    task: "Hören Sie das Gespräch zwischen Anna und Tom zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-11/day-11.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Wohin möchte Thomas fahren?", options: ["A) Zum Strand", "B) In die Berge", "C) In die Stadt", "D) Zum Flughafen"] },
-      { stem: "Welches Auto wählt Thomas?", options: ["A) Ein kleines Auto", "B) Ein mittelgroßes Auto", "C) Ein großes Auto", "D) Ein Elektroauto"] },
-      { stem: "Wie viel kostet das Auto pro Tag?", options: ["A) 40 Euro", "B) 50 Euro", "C) 60 Euro", "D) 70 Euro"] },
-      { stem: "Welche Dokumente zeigt Thomas?", options: ["A) Führerschein und Personalausweis", "B) Führerschein und Reisepass", "C) Führerschein und Kreditkarte", "D) Reisepass und Mietvertrag"] },
-      { stem: "Was überprüft Thomas vor der Fahrt?", options: ["A) Den Benzinstand", "B) Das Auto auf mögliche Schäden", "C) Das Navigationssystem", "D) Die Klimaanlage"] },
+      { stem: "Wie fährt Tom jeden Tag zur Arbeit?", options: ["A) Mit dem Bus", "B) Mit der U-Bahn", "C) Mit dem Auto"] },
+      { stem: "Warum fährt Anna lieber mit der U-Bahn?", options: ["A) Sie ist kostenlos.", "B) Sie ist schneller und immer pünktlich.", "C) Sie findet dort immer einen Parkplatz."] },
+      { stem: "Warum fährt Anna bei Regen nicht gern mit dem Fahrrad?", options: ["A) Sie hat kein Fahrrad.", "B) Das Fahrrad ist zu teuer.", "C) Bei Regen ist es nicht schön."] },
+      { stem: "Wie lange dauert Annas Zugfahrt nach Berlin?", options: ["A) Zwei Stunden", "B) Vier Stunden", "C) Sechs Stunden"] },
+      { stem: "Was wollen Anna und Tom morgen machen, wenn der Bus wieder zu spät kommt?", options: ["A) Die U-Bahn nehmen", "B) Mit dem Auto fahren", "C) Ein Taxi nehmen"] },
     ],
   },
   12: {
