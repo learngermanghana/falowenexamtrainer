@@ -245,7 +245,7 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
       })
       .catch((loadError) => {
         if (!active) return;
-        setError(loadError?.response?.data?.error || loadError?.message || "Audio konnte nicht geladen werden.");
+        setError(loadError?.response?.data?.error || loadError?.message || "Could not load the audio.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -267,7 +267,7 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
         onStatusChange("started");
       })
       .catch((playError) => {
-        setError(playError?.message || "Audio konnte nicht gestartet werden.");
+        setError(playError?.message || "Could not start the audio.");
       });
   };
 
@@ -288,14 +288,14 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
         }}
       />
       <div>
-        <strong>Prüfungs-Audio · {part.replace("teil-", "Teil ")}</strong>
-        <p>Nach dem Start kann dieses Audio nicht pausiert oder neu gestartet werden.</p>
+        <strong>Exam audio · {part.replace("teil-", "Teil ")}</strong>
+        <p>Once started, this audio cannot be paused or restarted during the same exam session.</p>
       </div>
       <div className="a1-final-mock-audio-progress" aria-label={`Audio progress ${progress}%`}>
         <span style={{ width: `${progress}%` }} />
       </div>
       {status === "ended" ? (
-        <strong className="a1-final-mock-audio-done">Audio beendet</strong>
+        <strong className="a1-final-mock-audio-done">Audio finished</strong>
       ) : (
         <button
           type="button"
@@ -303,12 +303,12 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
           disabled={loading || !audioUrl || startedThisMount}
         >
           {loading
-            ? "Audio wird vorbereitet …"
+            ? "Preparing audio …"
             : startedThisMount
-              ? "Audio läuft …"
+              ? "Audio playing …"
               : status === "started"
-                ? "Unterbrochenes Audio neu starten"
-                : "Audio starten"}
+                ? "Restart interrupted audio"
+                : "Start audio"}
         </button>
       )}
       {error ? <p className="a1-final-mock-error">{error}</p> : null}
@@ -319,15 +319,15 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
 const SectionHeader = ({ label, secondsLeft, attemptInfo }) => (
   <div className="a1-final-mock-sectionbar">
     <div>
-      <span>Aktueller Teil</span>
+      <span>Current section</span>
       <strong>{label}</strong>
     </div>
     <div>
-      <span>Restzeit</span>
+      <span>Time left</span>
       <strong className={secondsLeft <= 120 ? "warning" : ""}>{formatTime(secondsLeft)}</strong>
     </div>
     <div>
-      <span>Versuch</span>
+      <span>Attempt</span>
       <strong>{attemptInfo?.firstAttempt ? "Readiness 1" : `Practice ${attemptInfo?.attemptNumber || ""}`}</strong>
     </div>
   </div>
@@ -543,7 +543,7 @@ export default function A1FinalMockExamPage() {
 
   const renderLesen = () => (
     <>
-      <SectionHeader label="Lesen · 25 Minuten" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+      <SectionHeader label="Lesen · 25 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
       <article className="a1-goethe-mock-exam">
         <header className="a1-goethe-mock-header">
           <p className="a1-goethe-mock-kicker">A1 · Lesen</p>
@@ -623,8 +623,8 @@ export default function A1FinalMockExamPage() {
         </section>
 
         <div className="a1-final-mock-submitbar">
-          <span>{Object.keys(exam.lesenAnswers).length}/15 beantwortet</span>
-          <button type="button" onClick={submitLesen}>Lesen abgeben und mit Hören weiter</button>
+          <span>{Object.keys(exam.lesenAnswers).length}/15 answered</span>
+          <button type="button" onClick={submitLesen}>Submit Lesen → Hören</button>
         </div>
       </article>
     </>
@@ -681,12 +681,12 @@ export default function A1FinalMockExamPage() {
 
   const renderHoeren = () => (
     <>
-      <SectionHeader label="Hören · maximal 20 Minuten" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+      <SectionHeader label="Hören · max. 20 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
       <article className="a1-goethe-mock-exam a1-hoeren-mock-exam">
         <header className="a1-goethe-mock-header">
           <p className="a1-goethe-mock-kicker">A1 · Hören</p>
           <h1>Teil 1–3</h1>
-          <p>Starten Sie jedes Prüfungs-Audio einmal. Es läuft ohne Pause bis zum Ende.</p>
+          <p>Start each exam audio once. It will play without pause until it ends.</p>
         </header>
 
         {renderHoerenQuestions("teil-1", A1_GOETHE_LISTENING_MOCK.teil1)}
@@ -694,9 +694,9 @@ export default function A1FinalMockExamPage() {
         {renderHoerenQuestions("teil-3", A1_GOETHE_LISTENING_MOCK.teil3)}
 
         <div className="a1-final-mock-submitbar">
-          <span>{Object.keys(exam.hoerenAnswers).length}/15 beantwortet</span>
+          <span>{Object.keys(exam.hoerenAnswers).length}/15 answered</span>
           <button type="button" onClick={submitHoeren} disabled={!allHoerenAudioEnded}>
-            {allHoerenAudioEnded ? "Hören abgeben und mit Schreiben weiter" : "Alle drei Audios zuerst beenden"}
+            {allHoerenAudioEnded ? "Submit Hören → Schreiben" : "Finish all three audios first"}
           </button>
         </div>
       </article>
@@ -707,12 +707,12 @@ export default function A1FinalMockExamPage() {
     const wordCount = exam.schreibenText.trim() ? exam.schreibenText.trim().split(/\s+/).length : 0;
     return (
       <>
-        <SectionHeader label="Schreiben · 20 Minuten" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+        <SectionHeader label="Schreiben · 20 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
         <article className="a1-goethe-mock-exam a1-schreiben-mock-exam">
           <header className="a1-goethe-mock-header">
             <p className="a1-goethe-mock-kicker">A1 · Schreiben</p>
             <h1>Teil 1–2</h1>
-            <p>Teil 1 wird automatisch geprüft. Teil 2 wird nach A1-Standard von Falowen markiert.</p>
+            <p>Teil 1 is marked automatically. Teil 2 is marked by Falowen at A1 standard.</p>
           </header>
 
           <section className="a1-schreiben-part">
@@ -785,7 +785,7 @@ export default function A1FinalMockExamPage() {
           <div className="a1-final-mock-submitbar">
             <span>Falowen feedback is shown only after the full mock.</span>
             <button type="button" onClick={submitSchreiben} disabled={busy === "schreiben"}>
-              {busy === "schreiben" ? "Schreiben wird markiert …" : "Schreiben abgeben und mit Sprechen weiter"}
+              {busy === "schreiben" ? "Marking Schreiben …" : "Submit Schreiben → Sprechen"}
             </button>
           </div>
         </article>
@@ -940,7 +940,7 @@ export default function A1FinalMockExamPage() {
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
           <button type="button" className="a1-final-mock-start" onClick={() => startExam()} disabled={busy === "start"}>
-            {busy === "start" ? "Mock wird vorbereitet …" : "A1 Mock starten"}
+            {busy === "start" ? "Preparing mock …" : "Start A1 Mock"}
           </button>
         </article>
       </main>
@@ -961,7 +961,7 @@ export default function A1FinalMockExamPage() {
       {exam.stage === "schreiben" ? renderSchreiben() : null}
       {exam.stage === "sprechen" ? (
         <>
-          <SectionHeader label="Sprechen · 15 Minuten" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+          <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
           <A1GoetheSpeakingMockPreview
             embedded
             autoStart
