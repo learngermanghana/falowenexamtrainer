@@ -22,8 +22,20 @@ describe("B1 canonical listening registry", () => {
       const task = getB1ListeningTask(day);
       expect(task.submitRequired).toBe(true);
       expect(task.questions).toHaveLength(5);
-      expect(task.embedUrl || task.videoId).toBeTruthy();
+      expect(task.audioKey || task.embedUrl || task.videoId).toBeTruthy();
     }
+  });
+
+  test("Day 15 and Day 16 use the uploaded protected R2 recordings", () => {
+    const day15 = getB1ListeningTask(15);
+    const day16 = getB1ListeningTask(16);
+
+    expect(day15.audioKey).toBe("audio/day_15.mp3");
+    expect(day16.audioKey).toBe("audio/day_16.mp3");
+    expect(day15.embedUrl || day15.videoId || day15.externalUrl).toBeFalsy();
+    expect(day16.embedUrl || day16.videoId || day16.externalUrl).toBeFalsy();
+    expect(day15.questions).toHaveLength(5);
+    expect(day16.questions).toHaveLength(5);
   });
 
   test("special non-audio cases stay explicit", () => {
