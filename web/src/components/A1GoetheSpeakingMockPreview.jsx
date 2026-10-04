@@ -77,6 +77,7 @@ export default function A1GoetheSpeakingMockPreview() {
   const recordingIntervalRef = useRef(null);
   const recordingSecondsRef = useRef(0);
   const activeTaskRef = useRef(null);
+  const attemptsRef = useRef({});
 
   const tasks = A1_GOETHE_SPEAKING_MOCK.tasks;
 
@@ -93,14 +94,18 @@ export default function A1GoetheSpeakingMockPreview() {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   }, [secondsLeft, recordingTaskId]);
 
+  useEffect(() => {
+    attemptsRef.current = attempts;
+  }, [attempts]);
+
   useEffect(
     () => () => {
       if (recordingIntervalRef.current) window.clearInterval(recordingIntervalRef.current);
       if (recorderRef.current?.state === "recording") recorderRef.current.stop();
       if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
-      Object.values(attempts).forEach((attempt) => revokeObjectUrl(attempt?.audioUrl));
+      Object.values(attemptsRef.current).forEach((attempt) => revokeObjectUrl(attempt?.audioUrl));
     },
-    [attempts],
+    [],
   );
 
   const completedCount = useMemo(
