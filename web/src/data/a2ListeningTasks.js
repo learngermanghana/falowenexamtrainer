@@ -191,7 +191,8 @@ export const A2_LISTENING_TASKS = {
     chapter: "6.15",
     mode: A2_LISTENING_MODES.GRADED,
     task: "Hören Sie den Beitrag über Sportangebote in der Stadt. Achten Sie auf Kurse, Orte und Zielgruppen.",
-    audioUrl: "https://youtu.be/p_OE59m0J-Y",
+    audioKey: "a2/day-15/day-15.mp3",
+    audioUrl: "",
     questions: [
       { stem: "Was ist besonders beliebt im neuen Fitnessstudio \"Vital Plus\"?", options: ["A) Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Kletterkurse"] },
       { stem: "Was bietet der Stadtpark im Sommer an?", options: ["A) Kostenlose Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Fußballturniere"] },
