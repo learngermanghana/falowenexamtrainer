@@ -197,7 +197,7 @@ export const A2_LISTENING_TASKS = {
       { stem: "Was ist Toms Lieblingssport?", options: ["A) Schwimmen", "B) Fußball", "C) Tennis"] },
       { stem: "Wie oft spielt Tom Fußball?", options: ["A) Jeden Tag", "B) Einmal pro Woche", "C) Zweimal pro Woche"] },
       { stem: "Wann geht Anna normalerweise ins Schwimmbad?", options: ["A) Jeden Mittwoch", "B) Jeden Samstag", "C) Jeden Dienstag"] },
-      { stem: "Warum findet Tom Mannschaftssport besser?", options: ["A) Weil er lieber allein trainiert.", "B) Weil er nur bei gutem Wetter Sport macht.", "C) Weil man nicht allein ist und es mehr Spaß macht."] },
+      { stem: "Wo spielt Tom mit seinen Freunden, wenn das Wetter gut ist?", options: ["A) Im Schwimmbad", "B) In der Sporthalle", "C) Im Park"] },
       { stem: "Wann treffen sich Anna und Tom zum Schwimmen?", options: ["A) Am Mittwoch um vier Uhr", "B) Am Mittwoch um sechs Uhr", "C) Am Samstag um sechs Uhr"] },
     ],
   },
