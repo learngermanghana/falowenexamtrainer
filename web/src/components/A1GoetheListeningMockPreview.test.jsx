@@ -8,16 +8,27 @@ describe("A1 Goethe-style Hören mock preview", () => {
     expect(A1_GOETHE_LISTENING_MOCK.teil2.plays).toBe(1);
   });
 
-  test("keeps five Teil 3 multiple-choice questions and two plays", () => {
+  test("keeps five Teil 3 multiple-choice questions numbered 11 to 15", () => {
     expect(A1_GOETHE_LISTENING_MOCK.teil3.questions).toHaveLength(5);
-    expect(A1_GOETHE_LISTENING_MOCK.teil3.questions.map((q) => q.number)).toEqual([1, 2, 3, 4, 5]);
+    expect(A1_GOETHE_LISTENING_MOCK.teil3.questions.map((q) => q.number)).toEqual([11, 12, 13, 14, 15]);
     expect(A1_GOETHE_LISTENING_MOCK.teil3.plays).toBe(2);
     expect(A1_GOETHE_LISTENING_MOCK.teil3.questions.every((q) => q.options.length === 3)).toBe(true);
+    expect(A1_GOETHE_LISTENING_MOCK.teil3.audioObjectKey).toBe("a1/mock-hoeren/mock-01/teil-3.mp3");
   });
 
-  test("does not hardcode answer keys before the user supplies them", () => {
+  test("uses the supplied Teil 3 answer key", () => {
+    expect(
+      Object.fromEntries(
+        A1_GOETHE_LISTENING_MOCK.teil3.questions.map((q) => [q.number, q.answer]),
+      ),
+    ).toEqual({
+      11: "B",
+      12: "A",
+      13: "B",
+      14: "B",
+      15: "A",
+    });
     expect(A1_GOETHE_LISTENING_MOCK.teil2.questions.every((q) => !("answer" in q))).toBe(true);
-    expect(A1_GOETHE_LISTENING_MOCK.teil3.questions.every((q) => !("answer" in q))).toBe(true);
   });
 
   test("stays hidden from the A1 Course Book", () => {
