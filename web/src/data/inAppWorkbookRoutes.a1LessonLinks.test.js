@@ -44,7 +44,7 @@ const A1_RESOURCE_HUB_CASES = [
   [20, "12.3", "/campus/course/letter-writing-intro-german-a1-day-12-3"],
   [21, "13", "/campus/course/a1-day-21-weather-workbook"],
   [22, "14.1", "/campus/course/a1-day-22-health-and-body-parts-workbook"],
-  [24, "5.10", "/campus/course/conjunctions-5-10"],
+  [24, "5.10", "/campus/course/a1-final-mock-exam"],
 ].map(([day, chapter, workbookPath]) => ({ day, chapter, workbookPath }));
 
 const getAiVideoUrls = (day, chapter) =>
@@ -238,7 +238,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       "/campus/course/a1-day-21-weather-workbook",
       "/campus/course/a1-day-22-health-and-body-parts-workbook",
       "/campus/course/a1-day-23-writing-workshop-14-2",
-      "/campus/course/conjunctions-5-10",
+      "/campus/course/a1-final-mock-exam",
     ].forEach((route) => expect(appSource).toContain(route));
 
     expect(indexSource).toContain("A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH");
