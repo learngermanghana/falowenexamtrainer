@@ -477,17 +477,17 @@
     "sequence": 28,
     "day": 23,
     "chapter": "14.2",
-    "title": "Dative and Accusative Verbs",
+    "title": "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
     "assignmentId": "A1-14.2",
     "assignmentType": "Schreiben & Sprechen",
     "kind": "schreiben_sprechen",
-    "grammarPage": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
-    "workbookRoute": "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
-    "video": "https://youtu.be/J98JJU2v4Uw",
+    "grammarPage": "/campus/course/a1-day-23-writing-workshop-14-2",
+    "workbookRoute": "/campus/course/a1-day-23-writing-workshop-14-2",
+    "video": "https://youtu.be/mgfauvqhoCI",
     "submissionRequired": false,
     "progressionEligible": false,
     "contentStatus": "published",
-    "teacherVideo": "https://youtu.be/J98JJU2v4Uw"
+    "teacherVideo": "https://youtu.be/mgfauvqhoCI"
   },
   {
     "id": "A1-5.10",

@@ -85,8 +85,8 @@ const PRACTICE_LESSONS = [
   practice({
     chapter: "14.2",
     day: 23,
-    title: "Dative and Accusative Verbs",
-    destination: "/campus/course/dative-and-accusative-verbs-14-2",
+    title: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
+    destination: "/campus/course/a1-day-23-writing-workshop-14-2",
   }),
   practice({
     chapter: "5.10",

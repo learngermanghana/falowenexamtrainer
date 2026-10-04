@@ -1,48 +1,48 @@
 import { getA1CourseBookCard } from "./a1CourseBookCards";
 import {
-  A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
+  A1_DAY23_CHAPTER142_WRITING_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
 import {
-  A1_DAY23_CHAPTER142_GRAMMAR_PATH,
+  A1_DAY23_CHAPTER142_WRITING_PATH,
   shouldRenderWorkbookGuide,
   shouldSuppressGenericWorkbookGuide,
 } from "../utils/autoWorkbookGuideRouting";
 
-describe("A1 Day 23 Chapter 14.2 grammar-only lesson", () => {
+describe("A1 Day 23 Chapter 14.2 writing workshop", () => {
   const originalPath = window.location.pathname;
 
   afterEach(() => {
     window.history.replaceState({}, "", originalPath || "/");
   });
 
-  it("remains self-learning and not progression eligible", () => {
+  it("stays self-practice and does not gate course progression", () => {
     const card = getA1CourseBookCard({ displayDay: 23, chapter: "14.2" });
 
-    expect(card?.assessmentType).toBe("self-practice");
-    expect(card?.submissionRequired).toBe(false);
-    expect(card?.progressionEligible).toBe(false);
+    expect(card).toMatchObject({
+      title: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
+      assessmentType: "self-practice",
+      submissionRequired: false,
+      progressionEligible: false,
+    });
   });
 
-  it("opens the grammar page from the Day 23 lesson link", () => {
+  it("opens the writing workshop from the Day 23 lesson link", () => {
     window.history.replaceState({}, "", "/campus/course/lesson/A1/23?chapter=14.2");
 
     expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe(
-      A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
+      A1_DAY23_CHAPTER142_WRITING_ROUTE,
     );
   });
 
-  it("is not registered as an A1 workbook destination", () => {
+  it("remains a self-managed destination rather than a generic workbook route", () => {
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe("");
-  });
-
-  it("never receives the generic workbook or assignment guide", () => {
-    expect(A1_DAY23_CHAPTER142_GRAMMAR_PATH).toBe(A1_DAY23_CHAPTER142_GRAMMAR_ROUTE);
-    expect(shouldSuppressGenericWorkbookGuide(A1_DAY23_CHAPTER142_GRAMMAR_PATH)).toBe(true);
+    expect(A1_DAY23_CHAPTER142_WRITING_PATH).toBe(A1_DAY23_CHAPTER142_WRITING_ROUTE);
+    expect(shouldSuppressGenericWorkbookGuide(A1_DAY23_CHAPTER142_WRITING_PATH)).toBe(true);
     expect(
       shouldRenderWorkbookGuide({
-        pathname: A1_DAY23_CHAPTER142_GRAMMAR_PATH,
+        pathname: A1_DAY23_CHAPTER142_WRITING_PATH,
         search: "",
         match: { level: "A1", day: 23, resource: { chapter: "14.2", assignment: false } },
       }),

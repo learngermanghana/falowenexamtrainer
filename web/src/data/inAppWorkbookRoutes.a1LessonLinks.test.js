@@ -3,7 +3,7 @@ import path from "path";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
-  A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
+  A1_DAY23_CHAPTER142_WRITING_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
@@ -220,11 +220,11 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("keeps Day 23 Chapter 14.2 as the intentional grammar-only exception", () => {
+  it("opens Day 23 Chapter 14.2 as the intentional writing-workshop exception", () => {
     window.history.replaceState({}, "", "/campus/course/lesson/A1/23?chapter=14.2");
 
     expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe(
-      A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
+      A1_DAY23_CHAPTER142_WRITING_ROUTE,
     );
     expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe("");
   });
@@ -237,7 +237,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       "/campus/course/verboten-erlaubt-5-9",
       "/campus/course/a1-day-21-weather-workbook",
       "/campus/course/a1-day-22-health-and-body-parts-workbook",
-      "/campus/course/dative-and-accusative-verbs-14-2",
+      "/campus/course/a1-day-23-writing-workshop-14-2",
       "/campus/course/conjunctions-5-10",
     ].forEach((route) => expect(appSource).toContain(route));
 
