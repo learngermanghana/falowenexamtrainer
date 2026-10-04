@@ -1674,6 +1674,72 @@ const speechTrainerPrompt = ({ level, note }) =>
     .filter(Boolean)
     .join(" ");
 
+const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+  const safeAttempts = attempts.map((attempt) => ({
+    teil: String(attempt?.teil || "").trim(),
+    task: String(attempt?.task || "").trim(),
+    transcript: String(attempt?.transcript || "").trim(),
+    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
+  }));
+
+  return [
+    "You are a strict Goethe-style A1 speaking examiner for a Falowen mock exam.",
+    "Assess ONLY what the learner actually said in the supplied transcripts. Do not invent missing content.",
+    "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+    "Judge at CEFR A1 standard. Normal A1 grammar mistakes are acceptable when the message is understandable.",
+    "Do not reward advanced language simply for sounding sophisticated. If language is clearly far beyond normal A1 production, set level_mismatch=true, but NEVER accuse the learner of using AI, a translator, or memorization.",
+    "Because the source is a speech-to-text transcript, do not pretend you can measure accent or phonetic precision. Score comprehensibility/readiness from whether the spoken response was successfully captured and communicatively clear.",
+    "",
+    "SCORING — total 25 points:",
+    "Teil 1 self-introduction: 9 points. Task coverage 5; simple A1 language/control 2; comprehensibility 2.",
+    "Teil 2 question from keyword: 8 points. Appropriate question/task fulfilment 4; A1 question form 2; comprehensibility 2.",
+    "Teil 3 polite request: 8 points. Appropriate request/task fulfilment 4; polite A1 form 2; comprehensibility 2.",
+    "Pass mark for Sprechen mock: 15/25.",
+    "",
+    "Required JSON only, no markdown:",
+    JSON.stringify({
+      score: 0,
+      maxScore: 25,
+      passed: false,
+      level_mismatch: false,
+      overall_feedback_en: "Short English feedback.",
+      parts: {
+        teil1: {
+          score: 0,
+          maxScore: 9,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        },
+        teil2: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        },
+        teil3: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        }
+      }
+    }),
+    "",
+    "Student attempts:",
+    JSON.stringify(safeAttempts),
+  ].join("\n");
+};
+
+
 const placementPrompt = ({ answers, targetLevel }) => {
   const formattedAnswers = answers
     .map((item, idx) => `Answer ${idx + 1} (${item.taskType || "custom"}): ${item.text}`)
@@ -3184,6 +3250,101 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
     console.error("/speaking/interaction-score error", err);
     auditAIRequest({ route: "/speaking/interaction-score", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to score interaction" });
+  }
+});
+
+app.post("/speaking/a1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    if (attempts.length !== 3) {
+      return res.status(400).json({ error: "Three speaking attempts are required." });
+    }
+
+    const normalizedAttempts = attempts.map((attempt) => ({
+      teil: String(attempt?.teil || "").trim(),
+      task: String(attempt?.task || "").trim().slice(0, 600),
+      transcript: String(attempt?.transcript || "").trim().slice(0, 3000),
+      analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2000),
+    }));
+
+    const expectedTeils = ["1", "2", "3"];
+    const suppliedTeils = normalizedAttempts.map((attempt) => attempt.teil).sort();
+    if (
+      suppliedTeils.length !== expectedTeils.length ||
+      suppliedTeils.some((teil, index) => teil !== expectedTeils[index]) ||
+      normalizedAttempts.some((attempt) => !attempt.transcript)
+    ) {
+      return res.status(400).json({ error: "A completed transcript for Teil 1, Teil 2 and Teil 3 is required." });
+    }
+
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speaking",
+      limit: DAILY_LIMITS.speaking,
+    });
+    if (!quota.allowed) {
+      return res.status(429).json({
+        error: "Daily speaking analysis limit reached",
+        code: "SPEAKING_QUOTA_REACHED",
+      });
+    }
+
+    const messages = [
+      { role: "system", content: a1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "user", content: "Return the final A1 mock speaking assessment as the required JSON object." },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1000 });
+    const cleanedReply = String(reply || "")
+      .trim()
+      .replace(/^\`\`\`(?:json)?\s*/i, "")
+      .replace(/\s*\`\`\`$/i, "");
+
+    let result;
+    try {
+      result = JSON.parse(cleanedReply);
+    } catch (_error) {
+      return res.status(502).json({
+        error: "Falowen could not read the speaking assessment safely. Please try marking again.",
+        code: "INVALID_SPEAKING_ASSESSMENT",
+      });
+    }
+
+    const numericScore = Math.max(0, Math.min(25, Number(result?.score) || 0));
+    result.score = numericScore;
+    result.maxScore = 25;
+    result.passed = numericScore >= 15;
+    result.level_mismatch = Boolean(result?.level_mismatch);
+
+    auditAIRequest({
+      route: "/speaking/a1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        attemptsCount: normalizedAttempts.length,
+        score: numericScore,
+        passed: result.passed,
+        levelMismatch: result.level_mismatch,
+        quotaRemaining: quota.remaining,
+      },
+    });
+
+    return res.json({ result, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speaking/a1-mock-score error", err);
+    auditAIRequest({
+      route: "/speaking/a1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A1 speaking mock." });
   }
 });
 
