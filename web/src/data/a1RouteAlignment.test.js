@@ -105,6 +105,25 @@ describe("A1 route integrity", () => {
     expect(card?.grammarPage).not.toBe(card?.workbookRoute);
   });
 
+  it("keeps the Day 24 final mock title through runtime alignment", () => {
+    const card = getA1CourseBookCard({ displayDay: 24, chapter: "5.10" });
+    expect(card?.title).toBe("A1 Final Mock Exam");
+    expect(card?.workbookRoute).toBe("/campus/course/a1-final-mock-exam");
+
+    const [aligned] = alignA1CurriculumEntries([
+      {
+        level: "A1",
+        day: 24,
+        chapter: "5.10",
+        title: "A1 Final Mock Exam",
+        topic: "A1 Final Mock Exam",
+        workbookRoute: "/campus/course/a1-final-mock-exam",
+      },
+    ]);
+    expect(aligned.title).toBe("A1 Final Mock Exam");
+    expect(aligned.topic).toBe("A1 Final Mock Exam");
+  });
+
   it("preserves the A1 alignment whenever curriculum files are regenerated", () => {
     expect(syncScriptSource).toContain("alignA1CurriculumEntries");
     expect(syncScriptSource).toContain("getLessonsByLevel");

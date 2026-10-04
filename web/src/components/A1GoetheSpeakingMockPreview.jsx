@@ -101,6 +101,7 @@ export default function A1GoetheSpeakingMockPreview({
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [marking, setMarking] = useState(false);
+  const [timedOutMarkFailed, setTimedOutMarkFailed] = useState(false);
   const [result, setResult] = useState(initialResult);
 
   const recorderRef = useRef(null);
@@ -318,6 +319,7 @@ export default function A1GoetheSpeakingMockPreview({
   const markSpeaking = useCallback(async ({ force = false } = {}) => {
     if ((!force && completedCount !== tasks.length) || marking || result) return;
     setMarking(true);
+    setTimedOutMarkFailed(false);
     setError("");
     setStatus("Falowen is marking your complete A1 Sprechen mock…");
 
@@ -336,11 +338,12 @@ export default function A1GoetheSpeakingMockPreview({
       if (typeof onComplete === "function") onComplete(assessment);
     } catch (markError) {
       setError(markError?.message || "Could not mark the complete speaking mock.");
+      if (force && secondsLeft <= 0) setTimedOutMarkFailed(true);
       setStatus("");
     } finally {
       setMarking(false);
     }
-  }, [completedCount, idToken, marking, onComplete, result, tasks]);
+  }, [completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
 
   useEffect(() => {
     if (!started || secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
@@ -466,7 +469,22 @@ export default function A1GoetheSpeakingMockPreview({
       {status ? <p className="a1-sprechen-status">{status}</p> : null}
       {error ? <p className="a1-sprechen-error">{error}</p> : null}
 
-      {completedCount === tasks.length && !result ? (
+      {timedOutMarkFailed && !result ? (
+        <div className="a1-sprechen-final-action">
+          <h2>Marking could not finish.</h2>
+          <p>Your speaking time has ended, but your submitted answers are still saved. Retry the final marking without recording again.</p>
+          <button
+            type="button"
+            className="a1-sprechen-primary"
+            onClick={() => markSpeaking({ force: true })}
+            disabled={marking}
+          >
+            {marking ? "Sprechen wird markiert …" : "Retry Sprechen marking"}
+          </button>
+        </div>
+      ) : null}
+
+      {completedCount === tasks.length && !result && !timedOutMarkFailed ? (
         <div className="a1-sprechen-final-action">
           <h2>Alle drei Teile sind abgegeben.</h2>
           <p>Falowen markiert jetzt Teil 1, Teil 2 und Teil 3 gemeinsam nach A1-Standard.</p>
