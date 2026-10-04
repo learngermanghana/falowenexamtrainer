@@ -59,35 +59,74 @@ const formatTime = (seconds) => {
 
 const partLabel = (teil) => `Teil ${teil}`;
 
-export default function A1GoetheSpeakingMockPreview() {
+const sanitizeAttemptsForPersistence = (attempts = {}) =>
+  Object.fromEntries(
+    Object.entries(attempts).map(([key, attempt]) => [
+      key,
+      {
+        duration: Number(attempt?.duration || 0),
+        transcript: String(attempt?.transcript || ""),
+        analysisFeedback: String(attempt?.analysisFeedback || ""),
+        submitted: Boolean(attempt?.submitted),
+      },
+    ]),
+  );
+
+export default function A1GoetheSpeakingMockPreview({
+  embedded = false,
+  autoStart = false,
+  externalSecondsLeft,
+  initialAttempts = {},
+  initialResult = null,
+  onProgress,
+  onComplete,
+}) {
   const { idToken, user } = useAuth();
-  const [started, setStarted] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(A1_GOETHE_SPEAKING_MOCK.durationSeconds);
-  const [attempts, setAttempts] = useState({});
+  const usesExternalTimer = Number.isFinite(Number(externalSecondsLeft));
+  const [started, setStarted] = useState(Boolean(autoStart));
+  const [internalSecondsLeft, setInternalSecondsLeft] = useState(A1_GOETHE_SPEAKING_MOCK.durationSeconds);
+  const [attempts, setAttempts] = useState(() =>
+    Object.fromEntries(
+      Object.entries(initialAttempts || {}).map(([key, attempt]) => [
+        key,
+        {
+          ...attempt,
+          submitted: Boolean(attempt?.submitted || attempt?.transcript),
+        },
+      ]),
+    ),
+  );
   const [recordingTaskId, setRecordingTaskId] = useState("");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [marking, setMarking] = useState(false);
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState(initialResult);
 
   const recorderRef = useRef(null);
   const streamRef = useRef(null);
   const chunksRef = useRef([]);
   const recordingIntervalRef = useRef(null);
   const recordingSecondsRef = useRef(0);
-  const activeTaskRef = useRef(null);
   const attemptsRef = useRef({});
+  const timeoutMarkTriggeredRef = useRef(false);
 
   const tasks = A1_GOETHE_SPEAKING_MOCK.tasks;
+  const secondsLeft = usesExternalTimer
+    ? Math.max(0, Number(externalSecondsLeft) || 0)
+    : internalSecondsLeft;
 
   useEffect(() => {
-    if (!started || secondsLeft <= 0) return undefined;
+    if (autoStart) setStarted(true);
+  }, [autoStart]);
+
+  useEffect(() => {
+    if (usesExternalTimer || !started || internalSecondsLeft <= 0) return undefined;
     const timer = window.setInterval(() => {
-      setSecondsLeft((current) => Math.max(0, current - 1));
+      setInternalSecondsLeft((current) => Math.max(0, current - 1));
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [started, secondsLeft]);
+  }, [usesExternalTimer, started, internalSecondsLeft]);
 
   useEffect(() => {
     if (secondsLeft > 0 || !recordingTaskId) return;
@@ -96,7 +135,15 @@ export default function A1GoetheSpeakingMockPreview() {
 
   useEffect(() => {
     attemptsRef.current = attempts;
-  }, [attempts]);
+    if (typeof onProgress === "function") {
+      onProgress({
+        attempts: sanitizeAttemptsForPersistence(attempts),
+        started,
+        secondsLeft,
+        completedCount: tasks.filter((task) => Boolean(attempts[task.id]?.transcript)).length,
+      });
+    }
+  }, [attempts, started, secondsLeft, onProgress, tasks]);
 
   useEffect(
     () => () => {
@@ -132,6 +179,7 @@ export default function A1GoetheSpeakingMockPreview() {
       return {
         ...current,
         [taskId]: {
+          ...current[taskId],
           audioBlob: blob,
           audioUrl,
           duration,
@@ -149,7 +197,6 @@ export default function A1GoetheSpeakingMockPreview() {
     setStatus("");
     setRecordingSeconds(0);
     recordingSecondsRef.current = 0;
-    activeTaskRef.current = task;
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -199,9 +246,7 @@ export default function A1GoetheSpeakingMockPreview() {
         recordingSecondsRef.current += 1;
         const next = recordingSecondsRef.current;
         setRecordingSeconds(next);
-        if (next >= task.maxRecordingSeconds && recorder.state === "recording") {
-          recorder.stop();
-        }
+        if (next >= task.maxRecordingSeconds && recorder.state === "recording") recorder.stop();
       }, 1000);
     } catch (recordError) {
       setError(recordError?.message || "Microphone access was blocked.");
@@ -271,8 +316,8 @@ export default function A1GoetheSpeakingMockPreview() {
     });
   };
 
-  const markSpeaking = async () => {
-    if (completedCount !== tasks.length || marking) return;
+  const markSpeaking = async ({ force = false } = {}) => {
+    if ((!force && completedCount !== tasks.length) || marking || result) return;
     setMarking(true);
     setError("");
     setStatus("Falowen is marking your complete A1 Sprechen mock…");
@@ -282,13 +327,14 @@ export default function A1GoetheSpeakingMockPreview() {
         attempts: tasks.map((task) => ({
           teil: task.teil,
           task: task.prompt,
-          transcript: attempts[task.id]?.transcript || "",
-          analysisFeedback: attempts[task.id]?.analysisFeedback || "",
+          transcript: attemptsRef.current[task.id]?.transcript || "",
+          analysisFeedback: attemptsRef.current[task.id]?.analysisFeedback || "",
         })),
         idToken,
       });
       setResult(assessment);
       setStatus("Sprechen result ready.");
+      if (typeof onComplete === "function") onComplete(assessment);
     } catch (markError) {
       setError(markError?.message || "Could not mark the complete speaking mock.");
       setStatus("");
@@ -297,9 +343,189 @@ export default function A1GoetheSpeakingMockPreview() {
     }
   };
 
+  useEffect(() => {
+    if (!started || secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
+    timeoutMarkTriggeredRef.current = true;
+    markSpeaking({ force: true });
+  }, [started, secondsLeft, result, marking]);
+
   const scorePercent = result
     ? Math.round((Number(result.score || 0) / Number(result.maxScore || 25)) * 100)
     : 0;
+
+  const body = (
+    <article className="a1-goethe-mock-exam a1-sprechen-mock-exam">
+      <header className="a1-goethe-mock-header">
+        <p className="a1-goethe-mock-kicker">A1 · Sprechen</p>
+        <h1>Prüfungssimulation</h1>
+        <p>Bearbeitungszeit: 15 Minuten. Nehmen Sie Ihre Antworten auf Deutsch auf.</p>
+        <p><strong>Falowen hört alle drei Teile, transkribiert sie und markiert die komplette Sprechprüfung erst am Ende.</strong></p>
+      </header>
+
+      <div className="a1-sprechen-controlbar">
+        <div>
+          <span className="a1-sprechen-control-label">Zeit</span>
+          <strong className={secondsLeft <= 120 ? "a1-sprechen-timer a1-sprechen-timer-warning" : "a1-sprechen-timer"}>
+            {formatTime(secondsLeft)}
+          </strong>
+        </div>
+        <div>
+          <span className="a1-sprechen-control-label">Fortschritt</span>
+          <strong>{completedCount}/3 Teile abgegeben</strong>
+        </div>
+        {!started ? (
+          <button type="button" className="a1-sprechen-primary" onClick={() => setStarted(true)}>
+            Sprechen starten
+          </button>
+        ) : null}
+      </div>
+
+      {tasks.map((task, index) => {
+        const attempt = attempts[task.id] || {};
+        const unlocked = isUnlocked(index);
+        const currentlyRecording = recordingTaskId === task.id;
+        const lockedByPrior = started && !unlocked;
+        return (
+          <section
+            className={unlocked ? "a1-sprechen-task" : "a1-sprechen-task a1-sprechen-task-locked"}
+            key={task.id}
+          >
+            <div className="a1-sprechen-task-heading">
+              <div>
+                <p className="a1-sprechen-part-kicker">{partLabel(task.teil)}</p>
+                <h2>{task.title.replace(/^Teil \d+ · /, "")}</h2>
+                <p>{task.context}</p>
+              </div>
+              <span>{task.maxRecordingSeconds} Sek. max.</span>
+            </div>
+
+            <div className="a1-sprechen-prompt">
+              <strong>Aufgabe</strong>
+              <p>{task.prompt}</p>
+            </div>
+
+            {task.card ? (
+              <div className="a1-sprechen-intro-card">
+                {task.card.map((item) => <span key={item}>{item}</span>)}
+              </div>
+            ) : null}
+
+            {task.keyword ? (
+              <div className="a1-sprechen-keyword-card">
+                <span>{task.teil === "2" ? "Wort" : "Karte"}</span>
+                <strong>{task.keyword}</strong>
+              </div>
+            ) : null}
+
+            {lockedByPrior ? (
+              <p className="a1-sprechen-locked-note">Geben Sie zuerst {tasks[index - 1].title} ab.</p>
+            ) : null}
+
+            {unlocked ? (
+              <div className="a1-sprechen-recorder">
+                <div className="a1-sprechen-recorder-actions">
+                  <button
+                    type="button"
+                    className={currentlyRecording ? "a1-sprechen-record a1-sprechen-recording" : "a1-sprechen-record"}
+                    onClick={() => (currentlyRecording ? stopRecording() : startRecording(task))}
+                    disabled={Boolean(recordingTaskId && !currentlyRecording) || attempt.submitted || secondsLeft <= 0}
+                  >
+                    {currentlyRecording ? "Aufnahme stoppen" : attempt.audioBlob ? "Neu aufnehmen" : "Antwort aufnehmen"}
+                  </button>
+                  {currentlyRecording ? <strong>{formatTime(recordingSeconds)}</strong> : null}
+                  {attempt.audioUrl && !attempt.submitted ? (
+                    <button type="button" className="a1-sprechen-secondary" onClick={() => resetUnsubmittedRecording(task.id)}>
+                      Aufnahme löschen
+                    </button>
+                  ) : null}
+                </div>
+
+                {attempt.audioUrl ? (
+                  <audio className="a1-sprechen-audio" controls src={attempt.audioUrl} preload="metadata">
+                    Ihr Browser unterstützt dieses Audio nicht.
+                  </audio>
+                ) : null}
+
+                {attempt.audioBlob && !attempt.submitted ? (
+                  <button type="button" className="a1-sprechen-primary" onClick={() => submitTask(task)} disabled={attempt.submitting}>
+                    {attempt.submitting ? "Wird geprüft …" : "Diese Antwort abgeben"}
+                  </button>
+                ) : null}
+
+                {attempt.submitted ? (
+                  <div className="a1-sprechen-submitted">
+                    <strong>Abgegeben</strong>
+                    <p>Falowen hat Ihre Aufnahme verstanden. Feedback bleibt bis zum Ende der Prüfung verborgen.</p>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </section>
+        );
+      })}
+
+      {status ? <p className="a1-sprechen-status">{status}</p> : null}
+      {error ? <p className="a1-sprechen-error">{error}</p> : null}
+
+      {completedCount === tasks.length && !result ? (
+        <div className="a1-sprechen-final-action">
+          <h2>Alle drei Teile sind abgegeben.</h2>
+          <p>Falowen markiert jetzt Teil 1, Teil 2 und Teil 3 gemeinsam nach A1-Standard.</p>
+          <button type="button" className="a1-sprechen-primary" onClick={() => markSpeaking()} disabled={marking}>
+            {marking ? "Sprechen wird markiert …" : "Sprechen markieren"}
+          </button>
+        </div>
+      ) : null}
+
+      {result && !embedded ? (
+        <section className="a1-sprechen-result">
+          <div className="a1-sprechen-result-summary">
+            <div>
+              <span>Sprechen</span>
+              <strong>{result.score}/{result.maxScore || 25}</strong>
+              <small>{scorePercent}%</small>
+            </div>
+            <div>
+              <span>Ergebnis</span>
+              <strong>{result.passed ? "Passed" : "Needs more practice"}</strong>
+              <small>Pass mark: 15/25</small>
+            </div>
+          </div>
+
+          <div className="a1-sprechen-feedback">
+            <h2>AI feedback</h2>
+            <p>{result.overall_feedback_en}</p>
+            {result.level_mismatch ? (
+              <p className="a1-sprechen-level-note">
+                This response uses language that is noticeably above typical A1 level. Practise expressing the same ideas with simpler A1 structures.
+              </p>
+            ) : null}
+          </div>
+
+          <div className="a1-sprechen-part-results">
+            {["teil1", "teil2", "teil3"].map((key) => {
+              const part = result.parts?.[key];
+              if (!part) return null;
+              return (
+                <div key={key}>
+                  <strong>{key.replace("teil", "Teil ")} · {part.score}/{part.maxScore}</strong>
+                  <p>{part.feedback_en}</p>
+                  {part.corrected_example_de ? <small>German example: {part.corrected_example_de}</small> : null}
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="a1-sprechen-result-actions">
+            <a href="/exams/question" className="a1-sprechen-primary">Practice more in Exams Room</a>
+            <a href="/exams/speaking" className="a1-sprechen-secondary">More Sprechen practice</a>
+          </div>
+        </section>
+      ) : null}
+    </article>
+  );
+
+  if (embedded) return body;
 
   return (
     <main className="a1-goethe-mock-shell" data-a1-goethe-speaking-mock-preview>
@@ -307,185 +533,7 @@ export default function A1GoetheSpeakingMockPreview() {
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">Sprechen mock · AI marked · not in Course Book</span>
       </div>
-
-      <article className="a1-goethe-mock-exam a1-sprechen-mock-exam">
-        <header className="a1-goethe-mock-header">
-          <p className="a1-goethe-mock-kicker">A1 · Sprechen</p>
-          <h1>Prüfungssimulation</h1>
-          <p>Bearbeitungszeit: 15 Minuten. Nehmen Sie Ihre Antworten auf Deutsch auf.</p>
-          <p><strong>Falowen hört alle drei Teile, transkribiert sie und markiert die komplette Sprechprüfung am Ende.</strong></p>
-        </header>
-
-        <div className="a1-sprechen-controlbar">
-          <div>
-            <span className="a1-sprechen-control-label">Zeit</span>
-            <strong className={secondsLeft <= 120 ? "a1-sprechen-timer a1-sprechen-timer-warning" : "a1-sprechen-timer"}>
-              {formatTime(secondsLeft)}
-            </strong>
-          </div>
-          <div>
-            <span className="a1-sprechen-control-label">Fortschritt</span>
-            <strong>{completedCount}/3 Teile abgegeben</strong>
-          </div>
-          {!started ? (
-            <button type="button" className="a1-sprechen-primary" onClick={() => setStarted(true)}>
-              Sprechen starten
-            </button>
-          ) : null}
-        </div>
-
-        {tasks.map((task, index) => {
-          const attempt = attempts[task.id] || {};
-          const unlocked = isUnlocked(index);
-          const currentlyRecording = recordingTaskId === task.id;
-          const lockedByPrior = started && !unlocked;
-          return (
-            <section
-              className={unlocked ? "a1-sprechen-task" : "a1-sprechen-task a1-sprechen-task-locked"}
-              key={task.id}
-            >
-              <div className="a1-sprechen-task-heading">
-                <div>
-                  <p className="a1-sprechen-part-kicker">{partLabel(task.teil)}</p>
-                  <h2>{task.title.replace(/^Teil \d+ · /, "")}</h2>
-                  <p>{task.context}</p>
-                </div>
-                <span>{task.maxRecordingSeconds} Sek. max.</span>
-              </div>
-
-              <div className="a1-sprechen-prompt">
-                <strong>Aufgabe</strong>
-                <p>{task.prompt}</p>
-              </div>
-
-              {task.card ? (
-                <div className="a1-sprechen-intro-card">
-                  {task.card.map((item) => <span key={item}>{item}</span>)}
-                </div>
-              ) : null}
-
-              {task.keyword ? (
-                <div className="a1-sprechen-keyword-card">
-                  <span>{task.teil === "2" ? "Wort" : "Karte"}</span>
-                  <strong>{task.keyword}</strong>
-                </div>
-              ) : null}
-
-              {lockedByPrior ? (
-                <p className="a1-sprechen-locked-note">Geben Sie zuerst {tasks[index - 1].title} ab.</p>
-              ) : null}
-
-              {unlocked ? (
-                <div className="a1-sprechen-recorder">
-                  <div className="a1-sprechen-recorder-actions">
-                    <button
-                      type="button"
-                      className={currentlyRecording ? "a1-sprechen-record a1-sprechen-recording" : "a1-sprechen-record"}
-                      onClick={() => (currentlyRecording ? stopRecording() : startRecording(task))}
-                      disabled={Boolean(recordingTaskId && !currentlyRecording) || attempt.submitted || secondsLeft <= 0}
-                    >
-                      {currentlyRecording ? "Aufnahme stoppen" : attempt.audioBlob ? "Neu aufnehmen" : "Antwort aufnehmen"}
-                    </button>
-                    {currentlyRecording ? <strong>{formatTime(recordingSeconds)}</strong> : null}
-                    {attempt.audioUrl && !attempt.submitted ? (
-                      <button
-                        type="button"
-                        className="a1-sprechen-secondary"
-                        onClick={() => resetUnsubmittedRecording(task.id)}
-                      >
-                        Aufnahme löschen
-                      </button>
-                    ) : null}
-                  </div>
-
-                  {attempt.audioUrl ? (
-                    <audio className="a1-sprechen-audio" controls src={attempt.audioUrl} preload="metadata">
-                      Ihr Browser unterstützt dieses Audio nicht.
-                    </audio>
-                  ) : null}
-
-                  {attempt.audioBlob && !attempt.submitted ? (
-                    <button
-                      type="button"
-                      className="a1-sprechen-primary"
-                      onClick={() => submitTask(task)}
-                      disabled={attempt.submitting}
-                    >
-                      {attempt.submitting ? "Wird geprüft …" : "Diese Antwort abgeben"}
-                    </button>
-                  ) : null}
-
-                  {attempt.submitted ? (
-                    <div className="a1-sprechen-submitted">
-                      <strong>Abgegeben</strong>
-                      <p>Falowen hat Ihre Aufnahme verstanden. Die Bewertung sehen Sie erst nach Teil 3.</p>
-                    </div>
-                  ) : null}
-                </div>
-              ) : null}
-            </section>
-          );
-        })}
-
-        {status ? <p className="a1-sprechen-status">{status}</p> : null}
-        {error ? <p className="a1-sprechen-error">{error}</p> : null}
-
-        {completedCount === tasks.length && !result ? (
-          <div className="a1-sprechen-final-action">
-            <h2>Alle drei Teile sind abgegeben.</h2>
-            <p>Falowen markiert jetzt Teil 1, Teil 2 und Teil 3 gemeinsam nach A1-Standard.</p>
-            <button type="button" className="a1-sprechen-primary" onClick={markSpeaking} disabled={marking}>
-              {marking ? "Sprechen wird markiert …" : "Sprechen markieren"}
-            </button>
-          </div>
-        ) : null}
-
-        {result ? (
-          <section className="a1-sprechen-result">
-            <div className="a1-sprechen-result-summary">
-              <div>
-                <span>Sprechen</span>
-                <strong>{result.score}/{result.maxScore || 25}</strong>
-                <small>{scorePercent}%</small>
-              </div>
-              <div>
-                <span>Ergebnis</span>
-                <strong>{result.passed ? "Passed" : "Needs more practice"}</strong>
-                <small>Pass mark: 15/25</small>
-              </div>
-            </div>
-
-            <div className="a1-sprechen-feedback">
-              <h2>AI feedback</h2>
-              <p>{result.overall_feedback_en}</p>
-              {result.level_mismatch ? (
-                <p className="a1-sprechen-level-note">
-                  This response uses language that is noticeably above typical A1 level. Practise expressing the same ideas with simpler A1 structures.
-                </p>
-              ) : null}
-            </div>
-
-            <div className="a1-sprechen-part-results">
-              {["teil1", "teil2", "teil3"].map((key) => {
-                const part = result.parts?.[key];
-                if (!part) return null;
-                return (
-                  <div key={key}>
-                    <strong>{key.replace("teil", "Teil ")} · {part.score}/{part.maxScore}</strong>
-                    <p>{part.feedback_en}</p>
-                    {part.corrected_example_de ? <small>German example: {part.corrected_example_de}</small> : null}
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="a1-sprechen-result-actions">
-              <a href="/exams/question" className="a1-sprechen-primary">Practice more in Exams Room</a>
-              <a href="/exams/speaking" className="a1-sprechen-secondary">More Sprechen practice</a>
-            </div>
-          </section>
-        ) : null}
-      </article>
+      {body}
     </main>
   );
 }
