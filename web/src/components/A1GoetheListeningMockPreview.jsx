@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
 import AppBackButton from "./navigation/AppBackButton";
 import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheListeningMockPreview.css";
@@ -178,16 +180,67 @@ export const A1_GOETHE_LISTENING_MOCK = Object.freeze({
   },
 });
 
-const AudioPlaceholder = ({ plays, context }) => (
-  <div className="a1-hoeren-mock-audio" aria-label={`Audio placeholder: ${context}`}>
-    <div className="a1-hoeren-mock-play" aria-hidden="true">▶</div>
-    <div>
-      <strong>MP3 / Audio</strong>
-      <p>Audio wird später hinzugefügt.</p>
+const PartAudioPlayer = ({ part, objectKey, plays, idToken }) => {
+  const [audioUrl, setAudioUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const prepareAudio = async () => {
+    if (audioUrl || loading) return;
+    setLoading(true);
+    setError("");
+    try {
+      const result = await fetchA1MockAudioPlaybackUrl({
+        mockId: "mock-01",
+        part,
+        key: objectKey,
+        idToken,
+      });
+      setAudioUrl(result.url);
+    } catch (err) {
+      setError(err?.response?.data?.error || err?.message || "Audio konnte nicht geladen werden.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="a1-hoeren-mock-part-audio">
+      <div className="a1-hoeren-mock-part-audio-copy">
+        <strong>Prüfungs-Audio</strong>
+        <p>
+          {plays === 1
+            ? "Die Ansagen werden im Audio einmal abgespielt."
+            : "Die Texte werden im Audio zweimal abgespielt."}
+        </p>
+      </div>
+
+      {audioUrl ? (
+        <audio
+          className="a1-hoeren-mock-native-audio"
+          controls
+          controlsList="nodownload"
+          src={audioUrl}
+          preload="metadata"
+        >
+          Ihr Browser unterstützt dieses Audio nicht.
+        </audio>
+      ) : (
+        <button
+          type="button"
+          className="a1-hoeren-mock-load-audio"
+          onClick={prepareAudio}
+          disabled={loading}
+        >
+          {loading ? "Audio wird geladen …" : "Audio laden"}
+        </button>
+      )}
+
+      <span className="a1-hoeren-mock-play-count">{plays}× im Prüfungs-Audio</span>
+      {error ? <p className="a1-hoeren-mock-audio-error">{error}</p> : null}
     </div>
-    <span className="a1-hoeren-mock-play-count">{plays}× hören</span>
-  </div>
-);
+  );
+};
 
 const TrueFalseChoices = ({ name, value, onChange }) => (
   <div className="a1-hoeren-mock-true-false" role="radiogroup" aria-label="Richtig oder Falsch">
@@ -222,6 +275,7 @@ const MultipleChoice = ({ name, options, value, onChange }) => (
 );
 
 export default function A1GoetheListeningMockPreview() {
+  const { idToken } = useAuth();
   const [answers, setAnswers] = useState({});
   const setAnswer = (key, value) => setAnswers((current) => ({ ...current, [key]: value }));
 
@@ -229,14 +283,14 @@ export default function A1GoetheListeningMockPreview() {
     <main className="a1-goethe-mock-shell" data-a1-goethe-listening-mock-preview>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">Hören mock · audio pending · not in Course Book</span>
+        <span className="a1-goethe-mock-preview-badge">Hören mock · R2 audio · not in Course Book</span>
       </div>
 
       <article className="a1-goethe-mock-exam a1-hoeren-mock-exam">
         <header className="a1-goethe-mock-header">
           <p className="a1-goethe-mock-kicker">A1 · Hören</p>
           <h1>Mockprüfung</h1>
-          <p>Bearbeiten Sie die Aufgaben wie in der Prüfung. Die Audiodateien werden später ergänzt.</p>
+          <p>Bearbeiten Sie die Aufgaben wie in der Prüfung. Starten Sie jedes Teil-Audio einmal und beantworten Sie die Aufgaben in der vorgesehenen Reihenfolge.</p>
         </header>
 
         <section className="a1-hoeren-mock-part">
@@ -246,13 +300,19 @@ export default function A1GoetheListeningMockPreview() {
             <p><strong>{A1_GOETHE_LISTENING_MOCK.teil1.responseInstruction}</strong></p>
           </header>
 
+          <PartAudioPlayer
+            part="teil-1"
+            objectKey={A1_GOETHE_LISTENING_MOCK.teil1.audioObjectKey}
+            plays={A1_GOETHE_LISTENING_MOCK.teil1.plays}
+            idToken={idToken}
+          />
+
           {A1_GOETHE_LISTENING_MOCK.teil1.questions.map((question) => {
             const key = `teil1-${question.number}`;
             return (
               <section className="a1-hoeren-mock-question" key={key}>
                 <p className="a1-hoeren-mock-number">Aufgabe {question.number}</p>
                 <p className="a1-hoeren-mock-context">{question.context}</p>
-                <AudioPlaceholder plays={2} context={question.context} />
                 <h3>{question.question}</h3>
                 <p className="a1-hoeren-mock-prompt">Wählen Sie: A, B oder C</p>
                 <MultipleChoice
@@ -273,6 +333,13 @@ export default function A1GoetheListeningMockPreview() {
             <p><strong>{A1_GOETHE_LISTENING_MOCK.teil2.responseInstruction}</strong></p>
           </header>
 
+          <PartAudioPlayer
+            part="teil-2"
+            objectKey={A1_GOETHE_LISTENING_MOCK.teil2.audioObjectKey}
+            plays={A1_GOETHE_LISTENING_MOCK.teil2.plays}
+            idToken={idToken}
+          />
+
           {A1_GOETHE_LISTENING_MOCK.teil2.questions.map((question) => {
             const key = `teil2-${question.number}`;
             return (
@@ -280,7 +347,6 @@ export default function A1GoetheListeningMockPreview() {
                 <p className="a1-hoeren-mock-number">Aufgabe {question.number}</p>
                 <p className="a1-hoeren-mock-context">{question.context}</p>
                 <h3>{question.statement}</h3>
-                <AudioPlaceholder plays={1} context={question.context} />
                 <p className="a1-hoeren-mock-prompt">Wählen Sie: Richtig oder Falsch</p>
                 <TrueFalseChoices
                   name={key}
@@ -299,13 +365,19 @@ export default function A1GoetheListeningMockPreview() {
             <p><strong>{A1_GOETHE_LISTENING_MOCK.teil3.responseInstruction}</strong></p>
           </header>
 
+          <PartAudioPlayer
+            part="teil-3"
+            objectKey={A1_GOETHE_LISTENING_MOCK.teil3.audioObjectKey}
+            plays={A1_GOETHE_LISTENING_MOCK.teil3.plays}
+            idToken={idToken}
+          />
+
           {A1_GOETHE_LISTENING_MOCK.teil3.questions.map((question) => {
             const key = `teil3-${question.number}`;
             return (
               <section className="a1-hoeren-mock-question" key={key}>
                 <p className="a1-hoeren-mock-number">Aufgabe {question.number}</p>
                 <p className="a1-hoeren-mock-context">{question.context}</p>
-                <AudioPlaceholder plays={2} context={question.context} />
                 <h3>{question.question}</h3>
                 <p className="a1-hoeren-mock-prompt">Wählen Sie: A, B oder C</p>
                 <MultipleChoice
