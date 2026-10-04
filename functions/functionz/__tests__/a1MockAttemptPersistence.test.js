@@ -25,4 +25,17 @@ describe("A1 mock attempt persistence safety", () => {
     expect(routeSource).toContain("String(userData.activeAttemptId) === attemptId");
     expect(routeSource).toContain("progressUserPatch.activeAttemptId = attemptId");
   });
+
+  test("syncs every completed attempt to Admin results and the student notification path", () => {
+    const start = appSource.indexOf('app.post("/a1-mock/attempt/save"');
+    const end = appSource.indexOf('app.post("/speaking/analyze"', start);
+    const routeSource = appSource.slice(start, end);
+
+    expect(appSource).toContain('require("./a1MockCompletionSync")');
+    expect(routeSource).toContain('status === "completed"');
+    expect(routeSource).toContain("syncA1MockCompletion");
+    expect(routeSource).toContain("completionSync");
+    expect(routeSource).toContain("scoreDocId");
+    expect(routeSource).toContain("notificationId");
+  });
 });

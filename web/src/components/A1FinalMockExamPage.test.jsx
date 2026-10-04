@@ -37,6 +37,21 @@ describe("A1 Final Mock Exam Day 24", () => {
     expect(componentSource).toContain("saveA1MockAttempt");
   });
 
+  test("finalizes completed mocks immediately so Admin and student announcements can sync", () => {
+    expect(componentSource).toContain("completionSaveRef");
+    expect(componentSource).toContain('section: "result"');
+    expect(componentSource).toContain('status: "completed"');
+    expect(componentSource).toContain("Could not finalize A1 mock result sync");
+  });
+
+  test("renders the mixed Goethe-style Schreiben form inside the full mock", () => {
+    expect(componentSource).toContain("A1_GOETHE_WRITING_MOCK.teil1.formRows.map");
+    expect(componentSource).toContain('field.kind === "choice"');
+    expect(componentSource).toContain("a1-schreiben-form-choice-list");
+    expect(componentSource).not.toContain("A1_GOETHE_WRITING_MOCK.teil1.prefilled.map");
+    expect(componentSource).not.toContain("A1_GOETHE_WRITING_MOCK.teil1.fields.map");
+  });
+
   test("keeps certificate ownership at the existing 19 tutor-marked A1 assignments", () => {
     expect(A1_ASSIGNMENT_ORDER).toHaveLength(19);
     expect(getA1Assignment("A1-5.10")).toBeNull();

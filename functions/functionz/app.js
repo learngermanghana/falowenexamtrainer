@@ -81,6 +81,7 @@ function initFirebaseAdmin() {
 initFirebaseAdmin();
 
 const { scoresSummaryHandler } = require("./routes/scoresSummary");
+const { syncA1MockCompletion } = require("./a1MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -3614,7 +3615,70 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       return res.status(403).json({ error: "This mock attempt belongs to another account." });
     }
 
-    return res.json(saveOutcome || { ok: true, attemptId, status });
+    let completionSync = null;
+    if (status === "completed" && saveOutcome?.ok) {
+      try {
+        const studentProfile = await findAuthedStudentProfile(db, authedUser);
+        const attemptSnap = await attemptRef.get();
+        const attemptData = attemptSnap.exists ? attemptSnap.data() || {} : {};
+        const effectiveOverall = attemptData.overall && typeof attemptData.overall === "object"
+          ? attemptData.overall
+          : overall || {};
+        const effectiveSectionScores =
+          attemptData.sectionScores && typeof attemptData.sectionScores === "object"
+            ? attemptData.sectionScores
+            : sectionScores || {};
+
+        completionSync = await syncA1MockCompletion({
+          db,
+          admin,
+          authedUser,
+          studentProfile,
+          attemptId,
+          attemptNumber: Number(attemptData.attemptNumber || 1),
+          firstAttempt: Boolean(attemptData.firstAttempt),
+          overall: effectiveOverall,
+          sectionScores: effectiveSectionScores,
+          now:
+            typeof attemptData.completedAt?.toDate === "function"
+              ? attemptData.completedAt.toDate()
+              : new Date(),
+        });
+
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: true,
+              scoreDocId: completionSync.scoreDocId,
+              notificationId: completionSync.notificationId,
+              syncedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        );
+      } catch (syncError) {
+        console.error("A1 mock completion sync failed", syncError);
+        completionSync = {
+          ok: false,
+          error: syncError?.message || "Could not sync the completed mock result.",
+        };
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: false,
+              error: completionSync.error,
+              lastTriedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        ).catch(() => {});
+      }
+    }
+
+    return res.json({
+      ...(saveOutcome || { ok: true, attemptId, status }),
+      ...(completionSync ? { completionSync } : {}),
+    });
   } catch (err) {
     console.error("/a1-mock/attempt/save error", err);
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });

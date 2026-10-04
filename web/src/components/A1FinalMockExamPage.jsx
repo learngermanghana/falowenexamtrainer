@@ -342,6 +342,7 @@ export default function A1FinalMockExamPage() {
   const [error, setError] = useState("");
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
+  const completionSaveRef = useRef("");
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -374,6 +375,35 @@ export default function A1FinalMockExamPage() {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     };
   }, [exam, idToken, storageKey]);
+
+  useEffect(() => {
+    const attemptId = exam.attemptInfo?.attemptId;
+    if (!exam.completed || !attemptId || !idToken) return;
+
+    const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}`;
+    if (completionSaveRef.current === completionKey) return;
+    completionSaveRef.current = completionKey;
+
+    saveA1MockAttempt({
+      idToken,
+      attemptId,
+      section: "result",
+      state: exam,
+      sectionScores: exam.sectionScores,
+      status: "completed",
+      overall: exam.overall,
+    }).catch((saveError) => {
+      console.error("Could not finalize A1 mock result sync", saveError);
+      completionSaveRef.current = "";
+    });
+  }, [
+    exam.completed,
+    exam.attemptInfo?.attemptId,
+    exam.overall,
+    exam.sectionScores,
+    exam,
+    idToken,
+  ]);
 
   const secondsLeft = useMemo(() => {
     if (!exam.sectionDeadlineMs || !SECTION_DURATIONS[exam.stage]) return 0;
@@ -728,28 +758,70 @@ export default function A1FinalMockExamPage() {
                 <div className="a1-schreiben-form-title">ANMELDUNG</div>
               </div>
               <div className="a1-schreiben-form-body">
-                {A1_GOETHE_WRITING_MOCK.teil1.prefilled.map((field) => (
-                  <div className="a1-schreiben-form-row a1-schreiben-form-example" key={field.label}>
-                    <span className="a1-schreiben-form-label">{field.label}</span>
-                    <span className="a1-schreiben-form-prefilled">{field.value}</span>
-                  </div>
-                ))}
-                {A1_GOETHE_WRITING_MOCK.teil1.fields.map((field) => (
-                  <label className="a1-schreiben-form-row" key={field.number}>
-                    <span className="a1-schreiben-form-label">{field.label}</span>
-                    <span className="a1-schreiben-form-number">{field.number}</span>
-                    <input
-                      type="text"
-                      value={exam.schreibenForm?.[field.number] || ""}
-                      onChange={(event) =>
-                        setExam((current) => ({
-                          ...current,
-                          schreibenForm: { ...current.schreibenForm, [field.number]: event.target.value },
-                        }))
-                      }
-                    />
-                  </label>
-                ))}
+                {A1_GOETHE_WRITING_MOCK.teil1.formRows.map((field) => {
+                  if (field.kind === "prefilled") {
+                    return (
+                      <div
+                        className={field.example ? "a1-schreiben-form-row a1-schreiben-form-example" : "a1-schreiben-form-row"}
+                        key={field.label}
+                      >
+                        <span className="a1-schreiben-form-label">{field.label}</span>
+                        <span className="a1-schreiben-form-prefilled">
+                          {field.value}
+                          {field.example ? <small>Beispiel (0)</small> : null}
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  if (field.kind === "choice") {
+                    return (
+                      <fieldset className="a1-schreiben-form-row a1-schreiben-form-choice-row" key={field.number}>
+                        <legend className="a1-schreiben-form-label">{field.label}</legend>
+                        <span className="a1-schreiben-form-number">{field.number}</span>
+                        <div className="a1-schreiben-form-choice-list">
+                          {field.options.map((option) => (
+                            <label key={option.value}>
+                              <input
+                                type="radio"
+                                name={`a1-final-mock-form-${field.number}`}
+                                value={option.value}
+                                checked={(exam.schreibenForm?.[field.number] || "") === option.value}
+                                onChange={(event) =>
+                                  setExam((current) => ({
+                                    ...current,
+                                    schreibenForm: {
+                                      ...current.schreibenForm,
+                                      [field.number]: event.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                              <span>{option.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                    );
+                  }
+
+                  return (
+                    <label className="a1-schreiben-form-row" key={field.number}>
+                      <span className="a1-schreiben-form-label">{field.label}</span>
+                      <span className="a1-schreiben-form-number">{field.number}</span>
+                      <input
+                        type="text"
+                        value={exam.schreibenForm?.[field.number] || ""}
+                        onChange={(event) =>
+                          setExam((current) => ({
+                            ...current,
+                            schreibenForm: { ...current.schreibenForm, [field.number]: event.target.value },
+                          }))
+                        }
+                      />
+                    </label>
+                  );
+                })}
               </div>
             </div>
           </section>
