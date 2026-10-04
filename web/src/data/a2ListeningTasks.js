@@ -169,14 +169,15 @@ export const A2_LISTENING_TASKS = {
   13: {
     chapter: "5.13",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre die Tipps zum Vorstellungsgespräch. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    audioUrl: "https://youtu.be/kr9Rj2j-ghw",
+    task: "Hören Sie das Vorstellungsgespräch zwischen Frau Keller und Herrn Yilmaz zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-13/day-13.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Warum ist es wichtig, sich über das Unternehmen zu informieren?", options: ["A) Um Produkte zu kaufen", "B) Um Interesse zu zeigen", "C) Um Fragen zu vermeiden", "D) Um Kleidung auszuwählen"] },
-      { stem: "Was ist ein Zeichen von Professionalität und Respekt?", options: ["A) Zu spät kommen", "B) Pünktlich sein", "C) Unpassende Kleidung", "D) Leise sprechen"] },
-      { stem: "Warum sollte man dem Arbeitgeber Fragen stellen?", options: ["A) Um das Gespräch zu verlängern", "B) Um Unsicherheit zu zeigen", "C) Um Interesse zu zeigen", "D) Um die Kleidung zu bewerten"] },
-      { stem: "Welche Art von E-Mail wird nach dem Gespräch empfohlen?", options: ["A) Eine Dankes-E-Mail", "B) Eine Beschwerde-E-Mail", "C) Eine Frage-E-Mail", "D) Eine Kündigungs-E-Mail"] },
-      { stem: "Was sollte man während des Gesprächs tun?", options: ["A) Unvorbereitet sein", "B) Klar und deutlich sprechen", "C) Nur zuhören", "D) Unpassende Fragen stellen"] },
+      { stem: "Wo hat Herr Yilmaz zwei Jahre gearbeitet?", options: ["A) In einem Restaurant", "B) In einem Supermarkt", "C) In einem Büro"] },
+      { stem: "Welche Sprachen spricht Herr Yilmaz?", options: ["A) Englisch und Deutsch", "B) Türkisch und Englisch", "C) Türkisch und Deutsch"] },
+      { stem: "Wann kann Herr Yilmaz am Wochenende arbeiten?", options: ["A) Samstags immer", "B) Nur sonntags", "C) Gar nicht am Wochenende"] },
+      { stem: "Wann kann Herr Yilmaz anfangen?", options: ["A) Am ersten Februar", "B) Am ersten März", "C) Ende März"] },
+      { stem: "Wie viel verdient Herr Yilmaz pro Stunde?", options: ["A) Neun Euro", "B) Zehn Euro", "C) Zwölf Euro"] },
     ],
   },
   14: {
