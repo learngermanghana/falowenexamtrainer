@@ -91,8 +91,8 @@ const PRACTICE_LESSONS = [
   practice({
     chapter: "5.10",
     day: 24,
-    title: "Conjunctions",
-    destination: "/campus/course/conjunctions-5-10",
+    title: "A1 Final Mock Exam",
+    destination: "/campus/course/a1-final-mock-exam",
   }),
 ];
 
