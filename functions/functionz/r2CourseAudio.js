@@ -2,12 +2,14 @@ const crypto = require("crypto");
 
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([13, "14.1"]),
-  A2: new Set([24, 26, 27, 28]),
+  A2: new Set([7, 8, 9, 24, 26, 27, 28]),
+  B1: new Set([15, 16]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
 const A1_LISTENING_DAYS = COURSE_LISTENING_DAYS.A1;
 const A2_LISTENING_DAYS = COURSE_LISTENING_DAYS.A2;
+const B1_LISTENING_DAYS = COURSE_LISTENING_DAYS.B1;
 const C2_LISTENING_DAYS = COURSE_LISTENING_DAYS.C2;
 const B2_LISTENING_DAYS = COURSE_LISTENING_DAYS.B2;
 const DEFAULT_EXPIRES_SECONDS = 60 * 60;
@@ -96,7 +98,12 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   if (!COURSE_LISTENING_DAYS[normalizedLevel]) return null;
   if (!normalizedDay || !normalizedKey) return null;
   if (normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
-  if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) return null;
+  if (normalizedLevel === "B1") {
+    const expectedStem = `audio/day_${normalizedDay}.`;
+    if (!normalizedKey.startsWith(expectedStem)) return null;
+  } else if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) {
+    return null;
+  }
   if (!isAudioObjectKey(normalizedKey)) return null;
 
   return { level: normalizedLevel, day: normalizedDay, key: normalizedKey };
@@ -131,6 +138,11 @@ const validateA1MockAudioKey = ({ mockId, part, key }) => {
 
 const validateA2AudioKey = ({ day, key }) => {
   const validated = validateCourseAudioKey({ level: "A2", day, key });
+  return validated ? { day: validated.day, key: validated.key } : null;
+};
+
+const validateB1AudioKey = ({ day, key }) => {
+  const validated = validateCourseAudioKey({ level: "B1", day, key });
   return validated ? { day: validated.day, key: validated.key } : null;
 };
 
@@ -350,6 +362,9 @@ const createA1MockAudioSignedUrl = async ({
 const createA2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "A2", day, key, env, now });
 
+const createB1AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
+  createCourseAudioSignedUrl({ level: "B1", day, key, env, now });
+
 const createC2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "C2", day, key, env, now });
 
@@ -360,6 +375,7 @@ module.exports = {
   COURSE_LISTENING_DAYS,
   A1_LISTENING_DAYS,
   A2_LISTENING_DAYS,
+  B1_LISTENING_DAYS,
   C2_LISTENING_DAYS,
   B2_LISTENING_DAYS,
   DEFAULT_EXPIRES_SECONDS,
@@ -371,6 +387,7 @@ module.exports = {
   validateA1AudioKey,
   validateA1MockAudioKey,
   validateA2AudioKey,
+  validateB1AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   getR2AudioConfig,
@@ -378,6 +395,7 @@ module.exports = {
   createA1AudioSignedUrl,
   createA1MockAudioSignedUrl,
   createA2AudioSignedUrl,
+  createB1AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
 };
