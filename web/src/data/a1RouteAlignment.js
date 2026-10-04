@@ -7,9 +7,6 @@ import {
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
 const hasOwn = (object, key) => Object.prototype.hasOwnProperty.call(object || {}, key);
-const A1_CONTENT_TITLE_BY_CHAPTER = Object.freeze({
-  "5.10": "Weil & Useful A1 Phrases · Interactive Workbook",
-});
 const firstPresent = (...values) =>
   values.find((value) => value !== undefined && value !== null && String(value).trim() !== "");
 
@@ -85,11 +82,6 @@ export const alignA1CurriculumEntry = (entry = {}, parentContext = {}) => {
   });
 
   const aligned = { ...entry };
-  const contentTitle = A1_CONTENT_TITLE_BY_CHAPTER[chapter];
-  if (contentTitle) {
-    aligned.title = contentTitle;
-    aligned.topic = contentTitle;
-  }
   const hadGrammarField = ["grammarPage", "grammarbook_link", "grammar_link"].some((field) =>
     hasOwn(entry, field),
   );
