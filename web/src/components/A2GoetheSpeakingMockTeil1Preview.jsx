@@ -157,7 +157,7 @@ export default function A2GoetheSpeakingMockTeil1Preview() {
   return (
     <main className="a1-goethe-mock-shell">
       <div className="a1-goethe-mock-topbar">
-        <AppBackButton label="Back to A2 Final Mock" fallbackPath="/campus/course/a2-final-mock-exam" />
+        <AppBackButton label="Back to A2 Mock Preview" fallbackPath="/campus/course/a2-mock-practice-preview" />
         <span className="a1-goethe-mock-preview-badge">A2 Sprechen · Teil 1</span>
       </div>
 
