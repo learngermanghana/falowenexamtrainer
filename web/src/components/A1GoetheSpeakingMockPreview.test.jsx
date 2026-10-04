@@ -39,6 +39,18 @@ describe("A1 Goethe-style Sprechen mock preview", () => {
     expect(coachServiceSource).toContain("/speaking/a1-mock-score");
   });
 
+  test("lets a timed-out incomplete attempt retry final marking after a request failure", () => {
+    const componentSource = fs.readFileSync(
+      path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
+      "utf8",
+    );
+
+    expect(componentSource).toContain("timedOutMarkFailed");
+    expect(componentSource).toContain("Retry Sprechen marking");
+    expect(componentSource).toContain("markSpeaking({ force: true })");
+    expect(componentSource).toContain("your submitted answers are still saved");
+  });
+
   test("keeps English final feedback and Exams Room practice links", () => {
     const componentSource = fs.readFileSync(
       path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
