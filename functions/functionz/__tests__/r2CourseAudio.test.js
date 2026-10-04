@@ -2,6 +2,7 @@ const {
   validateA1AudioKey,
   validateA1MockAudioKey,
   validateA2AudioKey,
+  validateB1AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   validateCourseAudioKey,
@@ -9,6 +10,7 @@ const {
   createA1AudioSignedUrl,
   createA1MockAudioSignedUrl,
   createA2AudioSignedUrl,
+  createB1AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
   getCourseMediaStaffEmails,
@@ -16,7 +18,7 @@ const {
   hasCourseMediaLevelAccess,
 } = require("../r2CourseAudio");
 
-describe("A1/A2/B2/C2 R2 course audio", () => {
+describe("A1/A2/B1/B2/C2 R2 course audio", () => {
   test("accepts the protected A1 Day 13 and Chapter 14.1 folders", () => {
     expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toEqual({ day: 13, key: "a1/day-13/day-13.mp3" });
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toEqual({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" });
@@ -48,7 +50,13 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
       key: "a1/day-13/day-13.mp3",
     })).toBeNull();
   });
-  test("accepts protected A2 Day 24 and Day 26–28 audio folders", () => {
+  test("accepts protected A2 Day 7–9, Day 24 and Day 26–28 audio folders", () => {
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-09/day-09.mp3" })).toEqual({ day: 9, key: "a2/day-09/day-09.mp3" });
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-08/day-08.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 7, key: "a2/day-07/day-07.mp3" })).toEqual({ day: 7, key: "a2/day-07/day-07.mp3" });
+    expect(validateA2AudioKey({ day: 7, key: "a2/day-08/day-08.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 8, key: "a2/day-08/day-08.mp3" })).toEqual({ day: 8, key: "a2/day-08/day-08.mp3" });
+    expect(validateA2AudioKey({ day: 8, key: "a2/day-24/day-24.mp3" })).toBeNull();
     expect(
       validateA2AudioKey({ day: 28, key: "a2/day-28/day-28.mp3" }),
     ).toEqual({ day: 28, key: "a2/day-28/day-28.mp3" });
@@ -60,6 +68,20 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
     expect(validateA2AudioKey({ day: 28, key: "b2/day-28/day-28.mp3" })).toBeNull();
     expect(validateA2AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
   });
+  test("accepts the flat Cloudflare B1 Day 15 and Day 16 audio keys", () => {
+    expect(validateB1AudioKey({ day: 15, key: "audio/day_15.mp3" })).toEqual({
+      day: 15,
+      key: "audio/day_15.mp3",
+    });
+    expect(validateB1AudioKey({ day: 16, key: "audio/day_16.mp3" })).toEqual({
+      day: 16,
+      key: "audio/day_16.mp3",
+    });
+    expect(validateB1AudioKey({ day: 15, key: "audio/day_16.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 14, key: "audio/day_14.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 15, key: "../day_15.mp3" })).toBeNull();
+  });
+
   test("accepts only audio objects inside the matching C2 listening day folder", () => {
     expect(
       validateC2AudioKey({ day: 2, key: "c2/day-02/listening.mp3" }),
@@ -160,7 +182,7 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
     })).toBe(true);
   });
 
-  test("creates A1, A2, C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
+  test("creates A1, A2, B1, C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
     const a1 = await createA1AudioSignedUrl({
       day: "14.1",
       key: "a1/day-14-1/day-14-1.mp3",
@@ -210,6 +232,22 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
     expect(a2.url).toContain("/a2/day-28/day-28.mp3");
     expect(a2.url).toContain("X-Amz-Signature=");
     expect(a2.level).toBe("A2");
+
+    const b1 = await createB1AudioSignedUrl({
+      day: 16,
+      key: "audio/day_16.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b1.url).toContain("/audio/day_16.mp3");
+    expect(b1.url).toContain("X-Amz-Signature=");
+    expect(b1.level).toBe("B1");
 
     const result = await createC2AudioSignedUrl({
       day: 2,
