@@ -495,16 +495,14 @@
     "sequence": 29,
     "day": 24,
     "chapter": "5.10",
-    "title": "Reasons with weil and Useful A1 Phrases",
+    "title": "A1 Final Mock Exam",
     "assignmentId": "A1-5.10",
-    "assignmentType": "Schreiben & Sprechen",
-    "kind": "schreiben_sprechen",
-    "workbookRoute": "/campus/course/conjunctions-5-10",
-    "video": "https://youtu.be/8l1LiXGYqFA",
+    "assignmentType": "Final Mock Exam",
+    "kind": "practice",
+    "workbookRoute": "/campus/course/a1-final-mock-exam",
     "submissionRequired": false,
     "progressionEligible": false,
-    "contentStatus": "published",
-    "teacherVideo": "https://youtu.be/8l1LiXGYqFA"
+    "contentStatus": "published"
   },
   {
     "id": "A2-Tutorial",
