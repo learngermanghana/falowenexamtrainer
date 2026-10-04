@@ -34,8 +34,10 @@ import A2GoetheListeningMockTeil2Preview from "./components/A2GoetheListeningMoc
 import A2GoetheListeningMockTeil3Preview from "./components/A2GoetheListeningMockTeil3Preview";
 import A2GoetheListeningMockTeil4Preview from "./components/A2GoetheListeningMockTeil4Preview";
 import A2GoetheWritingMockPreview from "./components/A2GoetheWritingMockPreview";
+import A2GoetheSpeakingMockTeil1Preview from "./components/A2GoetheSpeakingMockTeil1Preview";
 import A2GoetheSpeakingMockTeil2Preview from "./components/A2GoetheSpeakingMockTeil2Preview";
 import A2GoetheSpeakingMockTeil3Preview from "./components/A2GoetheSpeakingMockTeil3Preview";
+import A2FinalMockExamPage from "./components/A2FinalMockExamPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -832,6 +834,10 @@ const AppShell = ({
             element={<A2GoetheWritingMockPreview />}
           />
           <Route
+            path="/campus/course/a2-mock-sprechen-teil-1-preview"
+            element={<A2GoetheSpeakingMockTeil1Preview />}
+          />
+          <Route
             path="/campus/course/a2-mock-sprechen-teil-2-preview"
             element={<A2GoetheSpeakingMockTeil2Preview />}
           />
@@ -968,7 +974,8 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" element={withRadioWorkbookGate("A2", 26, <A2Day26GefuehleInVerschiedenenSituationenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-27-digitale-kommunikation-workbook" element={withRadioWorkbookGate("A2", 27, <A2Day27DigitaleKommunikationWorkbookPage />)} />
           <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={withRadioWorkbookGate("A2", 28, <A2Day28UeberDieZukunftSprechenWorkbookPage />)} />
-          <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A2" />} />
+          <Route path="/campus/course/a2-final-mock-exam" element={<A2FinalMockExamPage />} />
+          <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
           <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A1" />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="B1" />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
