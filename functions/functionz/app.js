@@ -81,7 +81,11 @@ function initFirebaseAdmin() {
 initFirebaseAdmin();
 
 const { scoresSummaryHandler } = require("./routes/scoresSummary");
-const { syncA1MockCompletion } = require("./a1MockCompletionSync");
+const {
+  buildVerifiedA1MockScore,
+  persistVerifiedA1MockSection,
+  syncA1MockCompletion,
+} = require("./a1MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -3313,6 +3317,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       ? req.body.formValues
       : {};
     const text = String(req.body?.text || "").trim().slice(0, 5000);
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
 
     if (!ensureOpenAIConfigured(res)) return;
 
@@ -3382,6 +3387,38 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       letter,
       submittedText: text,
     };
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) {
+        return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      }
+      try {
+        await persistVerifiedA1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "schreiben",
+          score,
+          source: "/writing/a1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A1_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A1_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A1_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Schreiben result for this mock attempt.",
+          code: code || "A1_MOCK_SCHREIBEN_VERIFY_FAILED",
+        });
+      }
+    }
 
     auditAIRequest({
       route: "/writing/a1-mock-score",
@@ -3856,6 +3893,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     if (!authedUser) return;
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking attempts are required." });
     }
@@ -3916,6 +3954,38 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     result.maxScore = 25;
     result.passed = numericScore >= 15;
     result.level_mismatch = Boolean(result?.level_mismatch);
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) {
+        return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      }
+      try {
+        await persistVerifiedA1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "sprechen",
+          score: numericScore,
+          source: "/speaking/a1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A1_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A1_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A1_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Sprechen result for this mock attempt.",
+          code: code || "A1_MOCK_SPRECHEN_VERIFY_FAILED",
+        });
+      }
+    }
 
     auditAIRequest({
       route: "/speaking/a1-mock-score",
