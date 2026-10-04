@@ -425,6 +425,21 @@ const A2_SCHEDULE = [
   },
   {
     day: 29,
+    topic: "A2 Final Mock Exam",
+    chapter: "Final Mock",
+    attendance: false,
+    goal: "Complete an A2 exam-style mock across Lesen, Hören, Schreiben and Sprechen and identify the areas that need more practice.",
+    instruction:
+      "Complete the A2 Final Mock sections under exam-style conditions. This is repeatable exam practice and does not add a 29th required course assignment.",
+    grammar_topic: null,
+    assignment: false,
+    video: null,
+    youtube_link: null,
+    grammarbook_link: null,
+    workbook_link: "/campus/course/a2-final-mock-exam",
+  },
+  {
+    day: 30,
     topic: "Course Completed!",
     chapter: null,
     ...buildCompletionMessage({ level: "A2", nextLevel: "B1" }),
