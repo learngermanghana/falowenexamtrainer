@@ -48,8 +48,8 @@ export default function A2FinalMockExamPage() {
       </div>
 
       <header className="a2-final-mock-hero">
-        <p>A2 Final Mock Exam</p>
-        <h1>Final exam practice</h1>
+        <p>A2 Mock Practice · Preview</p>
+        <h1>A2 exam-format practice</h1>
         <p>
           Work through Lesen, Hören, Schreiben and Sprechen under exam-style conditions.
           This mock is practice and does not increase the 28 required course assignments.
@@ -58,7 +58,7 @@ export default function A2FinalMockExamPage() {
 
       <section className="a2-final-mock-rules">
         <strong>Before you start</strong>
-        <p>Complete each section without translation tools. Follow the time shown for each exam area and answer in German where required.</p>
+        <p>Use each section as focused exam practice. Do not rely on this preview as a completed final mock until Falowen adds persistent answers, scoring and one unified result.</p>
       </section>
 
       <section className="a2-final-mock-grid">
@@ -79,9 +79,9 @@ export default function A2FinalMockExamPage() {
       </section>
 
       <section className="a2-final-mock-after">
-        <h2>After the mock</h2>
+        <h2>After practice</h2>
         <p>
-          Review weak areas in the Exams Room. You can also compare the format with the official Goethe A2 practice material.
+          Continue practising in the Exams Room. You can also compare the format with the official Goethe A2 practice material.
         </p>
         <div>
           <Link to="/exams/question">Practice more in Exams Room</Link>
