@@ -1878,17 +1878,19 @@ const scoreA1MockWritingForm = (formValues = {}) => {
   const checks = {
     1: /^(3|drei)( personen)?$/.test(value(1)),
     2: /^(1|ein|eins|eine)( kind)?$/.test(value(2)),
-    3: /^(10|zehn)( jahre?)?$/.test(value(3)),
-    4: /24/.test(value(4)) && /(oktober|10)/.test(value(4)),
-    5: /^(bar|barzahlung)$/.test(value(5)),
+    3:
+      /(gartenstrasse|gartenstr)\s*12/.test(value(3)) ||
+      /12\s*(gartenstrasse|gartenstr)/.test(value(3)),
+    4: /^(bar|barzahlung)$/.test(value(4)),
+    5: /24/.test(value(5)) && /(oktober|10)/.test(value(5)),
   };
 
   const labels = {
     1: "3 Personen",
     2: "1 Kind",
-    3: "10 Jahre",
-    4: "Samstag, 24. Oktober",
-    5: "bar",
+    3: "Gartenstraße 12",
+    4: "Bar",
+    5: "Samstag, 24. Oktober",
   };
 
   const fields = Object.entries(checks).map(([number, correct]) => ({

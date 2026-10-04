@@ -95,6 +95,20 @@
   color: #243a7a;
 }
 
+.a1-schreiben-form-prefilled {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.a1-schreiben-form-prefilled small {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+}
+
 .a1-schreiben-form-number {
   position: absolute;
   left: calc(40% - 16px);
@@ -120,6 +134,41 @@
   font: 20px/1.2 "Comic Sans MS", "Bradley Hand", cursive;
   color: #111;
   outline: none;
+}
+
+.a1-schreiben-form-choice-row {
+  border: 0;
+  border-bottom: 1px solid #777;
+  padding: 0;
+  margin: 0;
+}
+
+.a1-schreiben-form-choice-row legend {
+  float: left;
+  width: calc(40% - 18px);
+  box-sizing: border-box;
+}
+
+.a1-schreiben-form-choice-list {
+  margin: 9px 0 9px 34px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.a1-schreiben-form-choice-list label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.a1-schreiben-form-choice-list input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  padding: 0;
+  accent-color: #6f354e;
 }
 
 .a1-schreiben-form-row input:focus {
@@ -242,5 +291,15 @@
   .a1-schreiben-form-row input {
     margin-left: 0;
     padding-right: 42px;
+  }
+
+  .a1-schreiben-form-choice-row legend {
+    float: none;
+    width: 100%;
+    padding-right: 42px;
+  }
+
+  .a1-schreiben-form-choice-list {
+    margin-left: 0;
   }
 }
