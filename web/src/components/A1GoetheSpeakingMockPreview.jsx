@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { analyzeAudio, scoreA1MockSpeaking } from "../services/coachService";
@@ -315,7 +315,7 @@ export default function A1GoetheSpeakingMockPreview({
     });
   };
 
-  const markSpeaking = async ({ force = false } = {}) => {
+  const markSpeaking = useCallback(async ({ force = false } = {}) => {
     if ((!force && completedCount !== tasks.length) || marking || result) return;
     setMarking(true);
     setError("");
@@ -340,13 +340,13 @@ export default function A1GoetheSpeakingMockPreview({
     } finally {
       setMarking(false);
     }
-  };
+  }, [completedCount, idToken, marking, onComplete, result, tasks]);
 
   useEffect(() => {
     if (!started || secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
     timeoutMarkTriggeredRef.current = true;
     markSpeaking({ force: true });
-  }, [started, secondsLeft, result, marking]);
+  }, [started, secondsLeft, result, marking, markSpeaking]);
 
   const scorePercent = result
     ? Math.round((Number(result.score || 0) / Number(result.maxScore || 25)) * 100)
