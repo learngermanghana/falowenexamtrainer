@@ -71,14 +71,15 @@ export const A2_LISTENING_TASKS = {
   6: {
     chapter: "3.6",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Sieh dir das eingebettete Video über die Wohnungsanzeigen an. Vergleiche die 2-Zimmer-Wohnung und die 3-Zimmer-Wohnung. Trage anschließend deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    audioUrl: "https://youtu.be/WuA8Xabn-Uw",
+    task: "Hören Sie das Gespräch zwischen Anna und Tom zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-06/day-06.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Welche Wohnung ist 70 Quadratmeter groß?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-      { stem: "Welche Wohnung hat einen Balkon?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-      { stem: "Wie hoch sind die Nebenkosten für die 3-Zimmer-Wohnung?", options: ["a) 150 Euro pro Monat", "b) 200 Euro pro Monat"] },
-      { stem: "Welche Wohnung erlaubt Haustiere?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
-      { stem: "Welche Wohnung ist ab dem 1. August verfügbar?", options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"] },
+      { stem: "Wie viele Zimmer hat Toms neue Wohnung?", options: ["A) Zwei Zimmer", "B) Drei Zimmer", "C) Vier Zimmer"] },
+      { stem: "Was steht neben dem Fenster im Wohnzimmer?", options: ["A) Ein Bücherregal", "B) Eine Lampe", "C) Ein Fernseher"] },
+      { stem: "Was sagt Tom über den Kleiderschrank im Schlafzimmer?", options: ["A) Er ist zu groß.", "B) Er ist ein bisschen zu klein.", "C) Er steht links neben dem Bett."] },
+      { stem: "Was hat Tom im Arbeitszimmer?", options: ["A) Einen Schreibtisch, einen Stuhl und einen Computer", "B) Ein Sofa, einen Tisch und einen Fernseher", "C) Ein Bett, einen Schrank und eine Lampe"] },
+      { stem: "Was möchte Anna am Samstag mitbringen?", options: ["A) Einen Kuchen", "B) Eine Pflanze", "C) Kaffee"] },
     ],
   },
   7: {
