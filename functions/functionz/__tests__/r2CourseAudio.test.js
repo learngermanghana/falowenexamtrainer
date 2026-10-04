@@ -1,11 +1,13 @@
 const {
   validateA1AudioKey,
+  validateA1MockAudioKey,
   validateA2AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   validateCourseAudioKey,
   getR2AudioConfig,
   createA1AudioSignedUrl,
+  createA1MockAudioSignedUrl,
   createA2AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
@@ -20,6 +22,31 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toEqual({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" });
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14/day-14.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toBeNull();
+  });
+
+  test("accepts protected A1 mock Hören files without treating them as Course Book days", () => {
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+    })).toEqual({
+      level: "A1",
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+    });
+
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "a1/mock-hoeren/mock-01/teil-4.wav",
+    })).toBeNull();
+
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/day-13/day-13.mp3",
+    })).toBeNull();
   });
   test("accepts protected A2 Day 24 and Day 26–28 audio folders", () => {
     expect(
@@ -150,6 +177,23 @@ describe("A1/A2/B2/C2 R2 course audio", () => {
     expect(a1.url).toContain("X-Amz-Signature=");
     expect(a1.level).toBe("A1");
 
+    const a1Mock = await createA1MockAudioSignedUrl({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(a1Mock.url).toContain("/a1/mock-hoeren/mock-01/teil-1.wav");
+    expect(a1Mock.url).toContain("X-Amz-Signature=");
+    expect(a1Mock.mockId).toBe("mock-01");
+    expect(a1Mock.part).toBe("teil-1");
 
     const a2 = await createA2AudioSignedUrl({
       day: 28,
