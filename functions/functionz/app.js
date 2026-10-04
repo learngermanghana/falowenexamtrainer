@@ -1684,7 +1684,7 @@ const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
 
   return [
     "You are a strict Goethe-style A1 speaking examiner for a Falowen mock exam.",
-    "Assess ONLY what the learner actually said in the supplied transcripts. Do not invent missing content.",
+    "Assess ONLY what the learner actually said in the supplied transcripts. Do not invent missing content. If a Teil transcript is empty because the learner did not complete it before time expired, score that Teil 0.",
     "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
     "Judge at CEFR A1 standard. Normal A1 grammar mistakes are acceptable when the message is understandable.",
     "Do not reward advanced language simply for sounding sophisticated. If language is clearly far beyond normal A1 production, set level_mismatch=true, but NEVER accuse the learner of using AI, a translator, or memorization.",
@@ -1739,6 +1739,96 @@ const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
   ].join("\n");
 };
 
+
+const normalizeA1MockFormValue = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[.,;:!?()[\]{}]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const scoreA1MockWritingForm = (formValues = {}) => {
+  const value = (number) => normalizeA1MockFormValue(formValues?.[number] ?? formValues?.[String(number)] ?? "");
+  const checks = {
+    1: /^(3|drei)( personen)?$/.test(value(1)),
+    2: /^(1|ein|eins|eine)( kind)?$/.test(value(2)),
+    3: /^(10|zehn)( jahre?)?$/.test(value(3)),
+    4:
+      (/24/.test(value(4)) && /(oktober|10)/.test(value(4))) ||
+      /samstag/.test(value(4)),
+    5: /^(bar|barzahlung|cash)$/.test(value(5)),
+  };
+
+  const labels = {
+    1: "3 Personen",
+    2: "1 Kind",
+    3: "10 Jahre",
+    4: "Samstag, 24. Oktober",
+    5: "bar",
+  };
+
+  const fields = Object.entries(checks).map(([number, correct]) => ({
+    number: Number(number),
+    correct: Boolean(correct),
+    expected: labels[number],
+    submitted: String(formValues?.[number] ?? formValues?.[String(number)] ?? "").trim(),
+  }));
+
+  return {
+    score: fields.filter((field) => field.correct).length * 2,
+    maxScore: 10,
+    fields,
+  };
+};
+
+const a1MockWritingScorePrompt = ({ text = "" }) => [
+  "You are a strict Goethe-style A1 writing examiner for a Falowen mock exam.",
+  "Assess the learner's German email exactly as submitted. Do not rewrite it before scoring and do not invent missing information.",
+  "The task: write to Kochschule GenussZeit. The learner must (1) register for the course 'Italienische Küche', (2) ask when the next course begins, and (3) ask the price.",
+  "A suitable greeting, closing and the learner's name are required, but they are not extra content points.",
+  "Feedback for the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR A1 standard. Normal A1 grammar/spelling errors are acceptable when the message remains understandable.",
+  "Do not reward advanced vocabulary merely because it sounds impressive. If the language is clearly far beyond typical A1 production, set level_mismatch=true, but NEVER accuse the learner of using AI, a translator or memorization.",
+  "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
+  "",
+  "SCORING — 15 points total:",
+  "Content points: 6 points — 2 each for registration, next-course-start question, price question.",
+  "Message structure: 3 points — greeting 1, closing 1, name 1.",
+  "A1 language control: 4 points — simple understandable sentences/questions, basic word order and vocabulary. Meaning matters more than perfection.",
+  "A1 appropriateness: 2 points — reasonably simple A1 production, not unnecessarily elaborate.",
+  "",
+  "Return JSON only, no markdown, using exactly this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 15,
+    level_mismatch: false,
+    content: {
+      registration: 0,
+      next_course_start: 0,
+      price: 0
+    },
+    structure: {
+      greeting: 0,
+      closing: 0,
+      name: 0
+    },
+    a1_language_score: 0,
+    a1_fit_score: 0,
+    feedback_en: "Short English feedback.",
+    corrections: [
+      {
+        original_de: "Short student phrase if needed.",
+        corrected_de: "Short corrected German phrase.",
+        explanation_en: "Brief English explanation."
+      }
+    ]
+  }),
+  "",
+  `Student email:\n${String(text || "").trim()}`,
+].join("\n");
 
 const placementPrompt = ({ answers, targetLevel }) => {
   const formattedAnswers = answers
