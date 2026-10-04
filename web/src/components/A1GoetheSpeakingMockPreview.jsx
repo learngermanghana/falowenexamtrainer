@@ -139,11 +139,10 @@ export default function A1GoetheSpeakingMockPreview({
       onProgress({
         attempts: sanitizeAttemptsForPersistence(attempts),
         started,
-        secondsLeft,
         completedCount: tasks.filter((task) => Boolean(attempts[task.id]?.transcript)).length,
       });
     }
-  }, [attempts, started, secondsLeft, onProgress, tasks]);
+  }, [attempts, started, onProgress, tasks]);
 
   useEffect(
     () => () => {
