@@ -63,7 +63,7 @@ test("presents one A2 course as A2.1 Days 1-14 and A2.2 Days 15-28", () => {
 test("shows Day 29 as a separate A2 Mock Preview section and opens the preview directly", () => {
   render(<CourseTab defaultLevel="A2" />);
 
-  const preview = sectionByTitle("A2 Mock Preview");
+  const preview = sectionByTitle("A2 Mock Practice");
   expect(preview).toBeTruthy();
   expect(within(preview).getByText(/A2 Mock Practice · Preview/i)).toBeInTheDocument();
 
