@@ -51,6 +51,24 @@ describe("A1 Goethe-style Sprechen mock preview", () => {
     expect(componentSource).toContain("your submitted answers are still saved");
   });
 
+  test("uses English for recording and submission controls", () => {
+    const componentSource = fs.readFileSync(
+      path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
+      "utf8",
+    );
+
+    expect(componentSource).toContain("Start speaking");
+    expect(componentSource).toContain("Record answer");
+    expect(componentSource).toContain("Stop recording");
+    expect(componentSource).toContain("Delete recording");
+    expect(componentSource).toContain("Send answer");
+    expect(componentSource).toContain("Progress");
+    expect(componentSource).toContain("Time left");
+    expect(componentSource).not.toContain("Sprechen starten");
+    expect(componentSource).not.toContain("Aufnahme löschen");
+    expect(componentSource).not.toContain("Diese Antwort abgeben");
+  });
+
   test("keeps English final feedback and Exams Room practice links", () => {
     const componentSource = fs.readFileSync(
       path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
