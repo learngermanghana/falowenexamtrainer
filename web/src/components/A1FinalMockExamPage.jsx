@@ -224,6 +224,7 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
   const audioRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(true);
+  const [startedThisMount, setStartedThisMount] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
 
@@ -261,7 +262,10 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
     const audio = audioRef.current;
     audio.currentTime = 0;
     audio.play()
-      .then(() => onStatusChange("started"))
+      .then(() => {
+        setStartedThisMount(true);
+        onStatusChange("started");
+      })
       .catch((playError) => {
         setError(playError?.message || "Audio konnte nicht gestartet werden.");
       });
@@ -296,14 +300,14 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
         <button
           type="button"
           onClick={startAudio}
-          disabled={loading || !audioUrl || (status === "started" && Boolean(audioUrl))}
+          disabled={loading || !audioUrl || startedThisMount}
         >
           {loading
             ? "Audio wird vorbereitet …"
-            : status === "started" && !audioUrl
-              ? "Unterbrochenes Audio neu starten"
+            : startedThisMount
+              ? "Audio läuft …"
               : status === "started"
-                ? "Audio läuft …"
+                ? "Unterbrochenes Audio neu starten"
                 : "Audio starten"}
         </button>
       )}
