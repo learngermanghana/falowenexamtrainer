@@ -23,6 +23,7 @@ import LetterPracticePage from "./components/LetterPracticePage";
 import A1Day23WritingWorkshopPage from "./components/A1Day23WritingWorkshopPage";
 import A1GoetheReadingMockTeil1Preview from "./components/A1GoetheReadingMockTeil1Preview";
 import A1GoetheReadingMockTeil2Preview from "./components/A1GoetheReadingMockTeil2Preview";
+import A1GoetheReadingMockTeil3Preview from "./components/A1GoetheReadingMockTeil3Preview";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -774,6 +775,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-mock-lesen-teil-2-preview"
             element={<A1GoetheReadingMockTeil2Preview />}
+          />
+          <Route
+            path="/campus/course/a1-mock-lesen-teil-3-preview"
+            element={<A1GoetheReadingMockTeil3Preview />}
           />
           <Route
             path="/campus/course/a1-day-23-writing-workshop-14-2"
