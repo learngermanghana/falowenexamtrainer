@@ -370,8 +370,8 @@ export default function A2GoetheReadingMockPreview() {
   return (
     <main className="a2-mock-shell" data-a2-reading-mock-preview>
       <div className="a2-mock-topbar">
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span>A2 Lesen mock · preview only</span>
+        <AppBackButton label="Back to A2 Final Mock" fallbackPath="/campus/course/a2-final-mock-exam" />
+        <span>A2 Lesen mock · Final Mock</span>
       </div>
 
       <article className="a2-mock-exam">
