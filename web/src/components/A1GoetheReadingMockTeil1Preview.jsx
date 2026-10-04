@@ -20,7 +20,7 @@ export const A1_GOETHE_READING_MOCK_TEIL1 = Object.freeze({
       "Lieber Jonas,",
       "am nächsten Freitag ziehe ich in meine neue Wohnung.",
       "Am Samstagabend möchte ich dort mit meinen Freunden feiern. Wir beginnen um 18 Uhr.",
-      "Auch viele Kollegen aus meinem Büro kommen. Kannst du bitte Saft oder Wasser mitbringen?",
+      "Etwa zwölf Freunde und Kollegen kommen. Kannst du bitte Saft oder Wasser mitbringen?",
       "Wir sitzen zuerst draußen im Garten. Wenn es kalt wird, gehen wir ins Haus.",
       "Ich freue mich auf dich!",
       "Bis Samstag",
@@ -36,8 +36,8 @@ export const A1_GOETHE_READING_MOCK_TEIL1 = Object.freeze({
     { number: 1, statement: "Samiras Bus kommt nach halb drei an.", answer: "richtig", text: 1 },
     { number: 2, statement: "Nina wartet den ganzen Vormittag am Busbahnhof.", answer: "falsch", text: 1 },
     { number: 3, statement: "Mira ist schon am letzten Wochenende umgezogen.", answer: "falsch", text: 2 },
-    { number: 4, statement: "Mira feiert nur mit zwei oder drei Freunden.", answer: "falsch", text: 2 },
-    { number: 5, statement: "Die Feier beginnt draußen.", answer: "richtig", text: 2 },
+    { number: 4, statement: "Mira feiert nur mit zwei oder drei Leuten.", answer: "falsch", text: 2 },
+    { number: 5, statement: "Mira und ihre Gäste sind zuerst im Garten.", answer: "richtig", text: 2 },
   ],
 });
 
