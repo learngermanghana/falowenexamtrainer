@@ -23,7 +23,9 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14/day-14.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toBeNull();
   });
-  test("accepts protected A2 Day 7–8, Day 24 and Day 26–28 audio folders", () => {
+  test("accepts protected A2 Day 7–9, Day 24 and Day 26–28 audio folders", () => {
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-09/day-09.mp3" })).toEqual({ day: 9, key: "a2/day-09/day-09.mp3" });
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-08/day-08.mp3" })).toBeNull();
     expect(validateA2AudioKey({ day: 7, key: "a2/day-07/day-07.mp3" })).toEqual({ day: 7, key: "a2/day-07/day-07.mp3" });
     expect(validateA2AudioKey({ day: 7, key: "a2/day-08/day-08.mp3" })).toBeNull();
     expect(validateA2AudioKey({ day: 8, key: "a2/day-08/day-08.mp3" })).toEqual({ day: 8, key: "a2/day-08/day-08.mp3" });

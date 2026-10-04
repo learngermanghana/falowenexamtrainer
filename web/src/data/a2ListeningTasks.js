@@ -112,14 +112,15 @@ export const A2_LISTENING_TASKS = {
   9: {
     chapter: "4.9",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Sieh dir das eingebettete Video über Annas letzten Sommerurlaub an. Achte auf das Reiseziel, die Dauer, besondere Orte, Aktivitäten und Annas Wunsch. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/Q6PjXP6Ccik",
+    task: "Hören Sie das Gespräch zwischen Lena, Max und Jonas zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-09/day-09.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Wohin ist Anna im letzten Sommerurlaub gereist?", options: ["a) Italien", "b) Griechenland", "c) Spanien"] },
-      { stem: "Wie lange blieb Anna auf Kreta?", options: ["a) Eine Woche", "b) Zwei Wochen", "c) Drei Tage"] },
-      { stem: "Was hat Anna besonders gut gefallen?", options: ["a) Die Altstadt von Chania", "b) Der Strand von Elafonissi", "c) Die Berge"] },
-      { stem: "Was haben Anna und ihre Freunde am letzten Tag gemacht?", options: ["a) Eine Wanderung", "b) Eine Bootstour", "c) Einen Museumsbesuch"] },
-      { stem: "Was hofft Anna bald wieder zu tun?", options: ["a) Nach Kreta zu reisen", "b) Nach Italien zu reisen", "c) Nach Spanien zu reisen"] },
+      { stem: "Warum möchte Jonas im Sommer nicht nach Spanien fahren?", options: ["A) Weil er nicht schwimmen kann.", "B) Weil es dort zu kalt ist.", "C) Weil es dort sehr teuer und sehr voll ist."] },
+      { stem: "Für welches Reiseziel entscheiden sich die Freunde?", options: ["A) Für einen Strand in Spanien", "B) Für den Wörthersee in Österreich", "C) Für die Berge in der Schweiz"] },
+      { stem: "Wo möchten die Freunde übernachten?", options: ["A) Im Zelt auf einem Campingplatz direkt am Wasser", "B) In einem Hotel im Stadtzentrum", "C) In einer Ferienwohnung in den Bergen"] },
+      { stem: "Wann möchten die Freunde verreisen?", options: ["A) Vom 10. bis zum 17. Juli", "B) Vom 12. bis zum 19. Juli", "C) Vom 15. bis zum 22. Juli"] },
+      { stem: "Welche Aufgaben übernimmt Lena vor der Reise?", options: ["A) Sie bucht die Zugtickets und bringt das Zelt mit.", "B) Sie besorgt die Lebensmittel und schreibt eine Packliste.", "C) Sie bringt das Zelt und den Kocher mit."] },
     ],
   },
   10: {
