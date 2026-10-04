@@ -251,18 +251,8 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
     videoResources: [],
   };
 
-  a1[24] = {
-    videoResources: [
-      {
-        key: "a1-day24-conjunctions-ai-video",
-        chapter: "5.10",
-        title: "A1 Day 24 · Conjunctions · AI video",
-        description:
-          "AI video lesson for connecting ideas with German conjunctions in short exam-ready sentences and letters.",
-        url: "https://youtu.be/gprBXwwAT-o",
-      },
-    ],
-  };
+  // Day 24 is the final mock exam, not a teaching-video day.
+  a1[24] = { videoResources: [] };
 
   standardizeA1TeacherVideos(a1);
   return dictionary;
