@@ -84,14 +84,15 @@ export const A2_LISTENING_TASKS = {
   7: {
     chapter: "3.7",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Sieh dir das eingebettete Video zur Wohnungsbeschreibung an. Achte auf Stockwerk, Größe, Zimmer, Ausstattung und Nebenkosten. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/hM1iPUq1Spg",
+    task: "Hören Sie das Telefongespräch zwischen Maria Lopez und Herrn Schmidt zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-07/day-07.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "In welchem Stockwerk befindet sich die Wohnung?", options: ["a) Im ersten Stock", "b) Im zweiten Stock", "c) Im dritten Stock"] },
-      { stem: "Wie groß ist die Wohnung?", options: ["a) 70 Quadratmeter", "b) 75 Quadratmeter", "c) 80 Quadratmeter"] },
-      { stem: "Wie viele Zimmer hat die Wohnung?", options: ["a) Zwei", "b) Drei", "c) Vier"] },
-      { stem: "Was gehört zur Wohnung?", options: ["a) Ein Balkon", "b) Ein Garten", "c) Eine Garage"] },
-      { stem: "Wie hoch sind die Nebenkosten?", options: ["a) 100 Euro", "b) 150 Euro", "c) 200 Euro"] },
+      { stem: "Wie groß ist die Wohnung in der Lindenstraße?", options: ["A) 50 Quadratmeter", "B) 60 Quadratmeter", "C) 75 Quadratmeter"] },
+      { stem: "Wie viel muss Maria jeden Monat für die Miete mit Nebenkosten bezahlen?", options: ["A) 650 Euro", "B) 100 Euro", "C) 750 Euro"] },
+      { stem: "Was sagt Herr Schmidt über Haustiere?", options: ["A) Eine Katze ist erlaubt, ein Hund nicht.", "B) Ein Hund ist erlaubt, eine Katze nicht.", "C) Katzen und Hunde sind erlaubt."] },
+      { stem: "Wie hoch ist die Kaution?", options: ["A) 650 Euro", "B) 1.300 Euro", "C) 1.500 Euro"] },
+      { stem: "Wann besichtigt Maria die Wohnung?", options: ["A) Am Donnerstag um 17 Uhr", "B) Am Freitag um 18 Uhr", "C) Am Donnerstag um 18 Uhr"] },
     ],
   },
   8: {
