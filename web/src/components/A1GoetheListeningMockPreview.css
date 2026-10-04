@@ -1,0 +1,178 @@
+.a1-hoeren-mock-exam {
+  background: #f1e5ef;
+}
+
+.a1-hoeren-mock-part {
+  margin-top: 30px;
+  background: #fff;
+  border: 1px solid #d9c7d3;
+}
+
+.a1-hoeren-mock-part-header {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid #8d4d64;
+}
+
+.a1-hoeren-mock-part-header h2 {
+  margin: 0 0 12px;
+  font-size: 27px;
+}
+
+.a1-hoeren-mock-part-header p {
+  margin: 5px 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.a1-hoeren-mock-question {
+  padding: 28px;
+  border-bottom: 1px solid #8d4d64;
+}
+
+.a1-hoeren-mock-question:last-child {
+  border-bottom: 0;
+}
+
+.a1-hoeren-mock-number {
+  margin: 0 0 5px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #333;
+}
+
+.a1-hoeren-mock-context {
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b5565;
+}
+
+.a1-hoeren-mock-question h3 {
+  margin: 0 0 20px;
+  max-width: 850px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.a1-hoeren-mock-audio {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  max-width: 760px;
+  padding: 14px 16px;
+  border: 1px solid #bbb;
+  background: #f5f5f5;
+}
+
+.a1-hoeren-mock-play {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #272727;
+  color: #fff;
+  font-size: 16px;
+}
+
+.a1-hoeren-mock-audio strong {
+  font-size: 15px;
+}
+
+.a1-hoeren-mock-audio p {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: #666;
+}
+
+.a1-hoeren-mock-play-count {
+  padding: 5px 9px;
+  border: 1px solid #aaa;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.a1-hoeren-mock-prompt {
+  margin: 23px 0 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.a1-hoeren-mock-true-false,
+.a1-hoeren-mock-multiple-choice {
+  display: grid;
+  gap: 12px;
+  max-width: 720px;
+}
+
+.a1-hoeren-mock-binary-choice,
+.a1-hoeren-mock-option {
+  display: grid;
+  grid-template-columns: auto 42px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border: 1px solid #c9b8c5;
+  background: #fff;
+  cursor: pointer;
+}
+
+.a1-hoeren-mock-binary-choice:has(input:checked),
+.a1-hoeren-mock-option:has(input:checked) {
+  outline: 2px solid #86536a;
+  outline-offset: -2px;
+  background: #fbf6fa;
+}
+
+.a1-hoeren-mock-binary-choice input,
+.a1-hoeren-mock-option input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: #6f354e;
+}
+
+.a1-hoeren-mock-choice-letter,
+.a1-hoeren-mock-option-letter {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  background: #eee1ec;
+  border: 1px solid #b79aaa;
+  font-weight: 900;
+}
+
+.a1-hoeren-mock-option-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.a1-hoeren-mock-option-copy small {
+  color: #666;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .a1-hoeren-mock-part-header,
+  .a1-hoeren-mock-question {
+    padding: 20px 16px;
+  }
+
+  .a1-hoeren-mock-audio {
+    grid-template-columns: auto 1fr;
+  }
+
+  .a1-hoeren-mock-play-count {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
+  .a1-hoeren-mock-question h3 {
+    font-size: 18px;
+  }
+}
