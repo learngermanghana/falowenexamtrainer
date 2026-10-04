@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import {
   SPEAKING_AUDIO_MIN_SECONDS,
@@ -48,6 +48,8 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
   const chunksRef = useRef([]);
   const secondsRef = useRef(0);
   const intervalRef = useRef(null);
+  const mountedRef = useRef(true);
+  const attemptRef = useRef(null);
 
   const clearTimer = () => {
     if (intervalRef.current) {
@@ -62,6 +64,32 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
       streamRef.current = null;
     }
   };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      clearTimer();
+
+      const recorder = recorderRef.current;
+      if (recorder) {
+        recorder.ondataavailable = null;
+        recorder.onstop = null;
+        if (recorder.state === "recording") {
+          try {
+            recorder.stop();
+          } catch {
+            // The recorder may already be stopping during navigation.
+          }
+        }
+        recorderRef.current = null;
+      }
+
+      stopTracks();
+      if (attemptRef.current?.url) revokeObjectUrl(attemptRef.current.url);
+      attemptRef.current = null;
+    };
+  }, []);
 
   const stopRecording = () => {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
@@ -82,6 +110,11 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
           channelCount: 1,
         },
       });
+      if (!mountedRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
       chunksRef.current = [];
       const recorder = createSpeakingMediaRecorder(stream);
@@ -93,6 +126,11 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
 
       recorder.onstop = () => {
         clearTimer();
+        if (!mountedRef.current) {
+          stopTracks();
+          return;
+        }
+
         setRecording(false);
         const duration = secondsRef.current;
 
@@ -104,7 +142,9 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
           const url = URL.createObjectURL(blob);
           setAttempt((current) => {
             if (current?.url) revokeObjectUrl(current.url);
-            return { blob, url, duration };
+            const next = { blob, url, duration };
+            attemptRef.current = next;
+            return next;
           });
         } catch (recordError) {
           setError(userFacingAudioError(recordError, recordError?.message || "No usable audio was captured."));
@@ -129,13 +169,16 @@ export default function A2GoetheSpeakingMockTeil3Preview() {
         }
       }, 1000);
     } catch (recordError) {
-      setError(recordError?.message || "Microphone access was blocked.");
+      if (mountedRef.current) {
+        setError(recordError?.message || "Microphone access was blocked.");
+      }
       stopTracks();
     }
   };
 
   const deleteRecording = () => {
     if (attempt?.url) revokeObjectUrl(attempt.url);
+    attemptRef.current = null;
     setAttempt(null);
   };
 
