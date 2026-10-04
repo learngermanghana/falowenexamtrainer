@@ -144,7 +144,7 @@ describe("A1 workbook AI video header", () => {
     expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
   });
 
-  test("shows a coming-soon card when the workbook has no approved AI video", () => {
+  test("hides the AI lesson video block when no approved video exists", () => {
     buildWorkbookDom();
 
     expect(
@@ -152,11 +152,21 @@ describe("A1 workbook AI video header", () => {
         pathname: "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
         search: "?assignmentKey=A1-10&level=A1",
       }),
-    ).toBe(1);
+    ).toBe(0);
 
-    const card = document.querySelector('[data-a1-workbook-video-header="true"]');
-    expect(card).toHaveTextContent("AI lesson video coming soon");
-    expect(card.querySelector("iframe")).toBeNull();
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
+  });
+
+  test("does not show an AI lesson video placeholder on the A1 Final Mock Exam", () => {
+    buildWorkbookDom();
+
+    expect(
+      applyA1WorkbookVideoHeader({
+        pathname: "/campus/course/a1-final-mock-exam",
+      }),
+    ).toBe(0);
+
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
   });
 
   test("places the AI video after Back and before the workbook hero without repeating the chapter title", () => {
