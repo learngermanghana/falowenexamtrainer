@@ -32,7 +32,7 @@ const isMountedCourseRoute = (route = "") => {
   );
 };
 const cardKey = (day, chapter) => `${Number(day)}:${String(chapter || "").trim()}`;
-const isDay23GrammarOnlyCard = (card) =>
+const isDay23WritingWorkshopCard = (card) =>
   Number(card?.displayDay) === 23 && String(card?.chapter || "").trim() === "14.2";
 
 describe("A1 full Course Book consolidation", () => {
@@ -49,7 +49,7 @@ describe("A1 full Course Book consolidation", () => {
     }
   });
 
-  test("every A1 workbook card resolves centrally except the intentional Day 23 grammar-only chapter", () => {
+  test("every A1 workbook card resolves centrally except the intentional Day 23 writing-workshop chapter", () => {
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       const configuredRoute = getConfiguredInAppWorkbookResourceRoute({
         level: "A1",
@@ -57,7 +57,7 @@ describe("A1 full Course Book consolidation", () => {
         chapter: card.chapter,
       });
 
-      if (isDay23GrammarOnlyCard(card)) {
+      if (isDay23WritingWorkshopCard(card)) {
         expect(configuredRoute).toBe("");
         return;
       }
