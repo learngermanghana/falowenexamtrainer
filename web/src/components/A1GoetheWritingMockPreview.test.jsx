@@ -3,15 +3,49 @@ import path from "path";
 import { A1_GOETHE_WRITING_MOCK } from "./A1GoetheWritingMockPreview";
 
 describe("A1 Goethe-style Schreiben mock preview", () => {
-  test("keeps Teil 1 as a five-gap form task", () => {
-    expect(A1_GOETHE_WRITING_MOCK.teil1.fields).toHaveLength(5);
-    expect(A1_GOETHE_WRITING_MOCK.teil1.fields.map((field) => field.number)).toEqual([1, 2, 3, 4, 5]);
-    expect(A1_GOETHE_WRITING_MOCK.teil1.prefilled).toEqual([
-      { label: "Familienname, Vorname", value: "Mensah, Linda" },
-      { label: "Hotel", value: "Hotel Adler" },
-      { label: "Ausflug", value: "Busfahrt" },
-      { label: "Ziel", value: "Schwarzwald" },
+  test("keeps Teil 1 as a five-gap Goethe-style mixed form task", () => {
+    const rows = A1_GOETHE_WRITING_MOCK.teil1.formRows;
+    const gaps = rows.filter((field) => field.kind === "input" || field.kind === "choice");
+
+    expect(gaps).toHaveLength(5);
+    expect(gaps.map((field) => field.number)).toEqual([1, 2, 3, 4, 5]);
+    expect(rows.map((field) => field.kind)).toEqual([
+      "prefilled",
+      "input",
+      "input",
+      "prefilled",
+      "prefilled",
+      "input",
+      "prefilled",
+      "prefilled",
+      "prefilled",
+      "choice",
+      "prefilled",
+      "input",
     ]);
+  });
+
+  test("uses clear labels and a real payment choice", () => {
+    const rows = A1_GOETHE_WRITING_MOCK.teil1.formRows;
+    const payment = rows.find((field) => field.number === 4);
+
+    expect(rows.find((field) => field.number === 3)).toMatchObject({
+      label: "Straße, Hausnummer",
+      answer: "Gartenstraße 12",
+    });
+    expect(payment).toMatchObject({
+      kind: "choice",
+      label: "Zahlungsweise",
+      answer: "bar",
+    });
+    expect(payment.options).toEqual([
+      { value: "bar", label: "Bar" },
+      { value: "kreditkarte", label: "Kreditkarte" },
+    ]);
+    expect(rows.find((field) => field.number === 5)).toMatchObject({
+      label: "Reisetermin",
+      answer: "Samstag, 24. Oktober",
+    });
   });
 
   test("keeps Teil 2 to exactly three content points", () => {
