@@ -107,6 +107,28 @@ const validateA1AudioKey = ({ day, key }) => {
   return validated ? { day: validated.day, key: validated.key } : null;
 };
 
+const validateA1MockAudioKey = ({ mockId, part, key }) => {
+  const normalizedMockId = clean(mockId).toLowerCase();
+  const normalizedPart = clean(part).toLowerCase();
+  const normalizedKey = clean(key).replace(/^\/+/, "");
+
+  if (!/^mock-\d{2}$/.test(normalizedMockId)) return null;
+  if (!/^teil-[123]$/.test(normalizedPart)) return null;
+  if (!normalizedKey || normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
+
+  const expectedPrefix = `a1/mock-hoeren/${normalizedMockId}/`;
+  const expectedKey = `${expectedPrefix}${normalizedPart}`;
+  if (!normalizedKey.startsWith(expectedKey)) return null;
+  if (!isAudioObjectKey(normalizedKey)) return null;
+
+  return {
+    level: "A1",
+    mockId: normalizedMockId,
+    part: normalizedPart,
+    key: normalizedKey,
+  };
+};
+
 const validateA2AudioKey = ({ day, key }) => {
   const validated = validateCourseAudioKey({ level: "A2", day, key });
   return validated ? { day: validated.day, key: validated.key } : null;
@@ -254,6 +276,77 @@ const createCourseAudioSignedUrl = async ({
 const createA1AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "A1", day, key, env, now });
 
+const createA1MockAudioSignedUrl = async ({
+  mockId,
+  part,
+  key,
+  env = process.env,
+  now = new Date(),
+}) => {
+  const validated = validateA1MockAudioKey({ mockId, part, key });
+  if (!validated) {
+    const error = new Error("Invalid A1 mock audio object key");
+    error.code = "INVALID_A1_MOCK_AUDIO_KEY";
+    throw error;
+  }
+
+  const config = getR2AudioConfig(env);
+  const requestDate = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(requestDate.getTime())) {
+    throw new Error("Invalid signing date");
+  }
+
+  const amzDate = formatAmzDate(requestDate);
+  const dateStamp = amzDate.slice(0, 8);
+  const region = "auto";
+  const service = "s3";
+  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+  const host = `${config.bucket}.${config.accountId}.r2.cloudflarestorage.com`;
+  const canonicalUri = `/${encodePath(validated.key)}`;
+
+  const queryEntries = [
+    ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
+    ["X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD"],
+    ["X-Amz-Credential", `${config.accessKeyId}/${credentialScope}`],
+    ["X-Amz-Date", amzDate],
+    ["X-Amz-Expires", String(config.expiresIn)],
+    ["X-Amz-SignedHeaders", "host"],
+  ];
+  const canonicalQuery = buildCanonicalQuery(queryEntries);
+  const canonicalHeaders = `host:${host}\n`;
+  const canonicalRequest = [
+    "GET",
+    canonicalUri,
+    canonicalQuery,
+    canonicalHeaders,
+    "host",
+    "UNSIGNED-PAYLOAD",
+  ].join("\n");
+
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256Hex(canonicalRequest),
+  ].join("\n");
+
+  const dateKey = hmac(`AWS4${config.secretAccessKey}`, dateStamp);
+  const regionKey = hmac(dateKey, region);
+  const serviceKey = hmac(regionKey, service);
+  const signingKey = hmac(serviceKey, "aws4_request");
+  const signature = hmac(signingKey, stringToSign, "hex");
+
+  return {
+    url: `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`,
+    level: validated.level,
+    mockId: validated.mockId,
+    part: validated.part,
+    key: validated.key,
+    expiresIn: config.expiresIn,
+    expiresAt: new Date(requestDate.getTime() + config.expiresIn * 1000).toISOString(),
+  };
+};
+
 const createA2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "A2", day, key, env, now });
 
@@ -276,12 +369,14 @@ module.exports = {
   hasCourseMediaLevelAccess,
   validateCourseAudioKey,
   validateA1AudioKey,
+  validateA1MockAudioKey,
   validateA2AudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
   getR2AudioConfig,
   createCourseAudioSignedUrl,
   createA1AudioSignedUrl,
+  createA1MockAudioSignedUrl,
   createA2AudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
