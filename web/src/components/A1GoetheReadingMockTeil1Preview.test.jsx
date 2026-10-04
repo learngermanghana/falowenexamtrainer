@@ -27,6 +27,14 @@ describe("A1 Goethe-style Lesen Teil 1 mock preview", () => {
     expect(allText).not.toContain("Hannover");
   });
 
+  test("uses precise quantity and paraphrase checks in the second text", () => {
+    expect(A1_GOETHE_READING_MOCK_TEIL1.text2.body.join(" ")).toContain("Etwa zwölf Freunde und Kollegen");
+    expect(A1_GOETHE_READING_MOCK_TEIL1.questions.find((question) => question.number === 4)?.statement)
+      .toBe("Mira feiert nur mit zwei oder drei Leuten.");
+    expect(A1_GOETHE_READING_MOCK_TEIL1.questions.find((question) => question.number === 5)?.statement)
+      .toBe("Mira und ihre Gäste sind zuerst im Garten.");
+  });
+
   test("has a hidden preview route but no A1 Course Book registration", () => {
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     const courseBookSource = fs.readFileSync(path.resolve(__dirname, "../data/a1CourseBookCards.js"), "utf8");
