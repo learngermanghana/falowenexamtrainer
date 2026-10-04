@@ -58,7 +58,7 @@ export default function A2FinalMockExamPage() {
 
       <section className="a2-final-mock-rules">
         <strong>Before you start</strong>
-        <p>Use each section as focused exam practice. Do not rely on this preview as a completed final mock until Falowen adds persistent answers, scoring and one unified result.</p>
+        <p><strong>This is a preview.</strong> Use each section as focused exam practice. Answers are not yet saved across sections, so there is no unified score or final result yet.</p>
       </section>
 
       <section className="a2-final-mock-grid">
