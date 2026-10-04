@@ -3,17 +3,17 @@ import path from "path";
 
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
-describe("A2 Day 29 final mock", () => {
+describe("A2 Day 29 mock preview", () => {
   const schedule = read("../data/courseSchedule.js");
   const app = read("../App.js");
   const completionJourney = read("../data/courseCompletionJourney.js");
   const lifecyclePatch = read("../../scripts/patchA2CompletionAndDay0ClassParticipation.mjs");
   const finalMock = read("A2FinalMockExamPage.jsx");
 
-  test("uses Day 29 for the A2 Final Mock and Day 30 for completion", () => {
+  test("uses Day 29 for the A2 mock preview and Day 30 for completion", () => {
     expect(schedule).toContain("day: 29");
-    expect(schedule).toContain('topic: "A2 Final Mock Exam"');
-    expect(schedule).toContain('workbook_link: "/campus/course/a2-final-mock-exam"');
+    expect(schedule).toContain('topic: "A2 Mock Practice · Preview"');
+    expect(schedule).toContain('workbook_link: "/campus/course/a2-mock-practice-preview"');
     expect(schedule).toContain("day: 30");
     expect(schedule).toContain('topic: "Course Completed!"');
   });
@@ -23,7 +23,13 @@ describe("A2 Day 29 final mock", () => {
     expect(schedule).toContain("does not add a 29th required course assignment");
   });
 
-  test("opens the four A2 mock areas from the final mock hub", () => {
+  test("does not present the unfinished previews as a completed scored mock", () => {
+    expect(schedule).toContain("answers are not yet saved across sections");
+    expect(finalMock).toContain("This is a preview");
+    expect(finalMock).toContain("there is no unified score or final result yet");
+  });
+
+  test("opens the four A2 practice areas from the preview hub", () => {
     ["Lesen", "Hören", "Schreiben", "Sprechen"].forEach((section) => {
       expect(finalMock).toContain(`title: "${section}"`);
     });
@@ -38,14 +44,15 @@ describe("A2 Day 29 final mock", () => {
     expect(finalMock).toContain("Official Goethe A2 practice");
   });
 
-  test("registers the canonical mock route and keeps the old orientation URL as an alias", () => {
+  test("registers the canonical preview route and keeps prior URLs as aliases", () => {
     expect(app).toContain('import A2FinalMockExamPage from "./components/A2FinalMockExamPage";');
+    expect(app).toContain('path="/campus/course/a2-mock-practice-preview" element={<A2FinalMockExamPage />}');
     expect(app).toContain('path="/campus/course/a2-final-mock-exam" element={<A2FinalMockExamPage />}');
     expect(app).toContain('path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />}');
   });
 
-  test("keeps lifecycle normalization aligned with the Day 30 milestone after the final mock", () => {
-    expect(lifecyclePatch).toContain("Day 29 final mock");
+  test("keeps lifecycle normalization aligned with the Day 30 milestone after the mock preview", () => {
+    expect(lifecyclePatch).toContain("Day 29 mock preview");
     expect(lifecyclePatch).toContain('day: 30,\\n    topic: "Course Completed!"');
   });
 });
