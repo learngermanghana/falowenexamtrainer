@@ -377,7 +377,7 @@ export default function A1GoetheSpeakingMockPreview({
         </div>
         {!started ? (
           <button type="button" className="a1-sprechen-primary" onClick={() => setStarted(true)}>
-            Sprechen starten
+            Start speaking
           </button>
         ) : null}
       </div>
@@ -437,7 +437,7 @@ export default function A1GoetheSpeakingMockPreview({
                   {currentlyRecording ? <strong>{formatTime(recordingSeconds)}</strong> : null}
                   {attempt.audioUrl && !attempt.submitted ? (
                     <button type="button" className="a1-sprechen-secondary" onClick={() => resetUnsubmittedRecording(task.id)}>
-                      Aufnahme löschen
+                      Delete recording
                     </button>
                   ) : null}
                 </div>
