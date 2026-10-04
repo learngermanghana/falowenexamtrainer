@@ -947,7 +947,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       String(selectedCourseLevel || "").toUpperCase() === "A2" &&
       Number(entry?.day) === 29
     ) {
-      return entry?.workbook_link || "/campus/course/a2-final-mock-exam";
+      return entry?.workbook_link || "/campus/course/a2-mock-practice-preview";
     }
 
     const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
