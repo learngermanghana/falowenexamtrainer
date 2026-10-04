@@ -67,6 +67,19 @@ describe("A1 Final Mock Exam Day 24", () => {
     ).toBeTruthy();
   });
 
+  test("uses English for app controls while keeping German exam content", () => {
+    expect(componentSource).toContain("Current section");
+    expect(componentSource).toContain("Time left");
+    expect(componentSource).toContain("Start A1 Mock");
+    expect(componentSource).toContain("Submit Lesen → Hören");
+    expect(componentSource).toContain("Submit Hören → Schreiben");
+    expect(componentSource).toContain("Submit Schreiben → Sprechen");
+    expect(componentSource).toContain("Start audio");
+    expect(componentSource).not.toContain("Aktueller Teil");
+    expect(componentSource).not.toContain("Restzeit");
+    expect(componentSource).not.toContain("A1 Mock starten");
+  });
+
   test("routes further practice to the Exams Room and keeps the mock non-certificate-bearing", () => {
     expect(componentSource).toContain('href="/exams/question"');
     expect(componentSource).toContain('href="/exams/speaking"');
