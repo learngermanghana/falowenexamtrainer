@@ -190,7 +190,7 @@ export const A2_LISTENING_TASKS = {
   15: {
     chapter: "6.15",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Day 15 listening exercise.",
+    task: "Gespräch: Anna und Tom über ihren Lieblingssport. Fragen 1–5 mit A, B oder C.",
     audioKey: "a2/day-15/day-15.mp3",
     audioUrl: "",
     questions: [
