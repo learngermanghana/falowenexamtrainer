@@ -10,10 +10,10 @@ const authHeaders = (idToken) =>
       }
     : {};
 
-export const scoreA1MockWriting = async ({ formValues, text, idToken }) => {
+export const scoreA1MockWriting = async ({ formValues, text, attemptId, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/a1-mock-score`,
-    { formValues, text },
+    { formValues, text, attemptId },
     { headers: authHeaders(idToken) },
   );
   return response.data?.result || response.data;
