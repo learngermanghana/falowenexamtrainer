@@ -1260,8 +1260,8 @@ const RAW_COURSE_SCHEDULES = {
         "Use the writing workshop to practise appointment, arrangement, reservation, help, problem and registration tasks. This is self-practice and has no tutor submission.",
       grammar_topic: "A1 letter writing: three-point planning and formal/informal register",
       schreiben_sprechen: {
-        video: "",
-        youtube_link: "",
+        video: "https://youtu.be/mgfauvqhoCI",
+        youtube_link: "https://youtu.be/mgfauvqhoCI",
         assignment: false,
         grammarbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
         workbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
