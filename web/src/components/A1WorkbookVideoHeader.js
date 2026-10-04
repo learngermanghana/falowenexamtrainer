@@ -341,7 +341,7 @@ export const applyA1WorkbookVideoHeader = ({
 
   const existing = root.querySelector(`[${HEADER_ATTRIBUTE}="true"]`);
   const model = buildA1WorkbookVideoModel({ pathname, search });
-  if (!model || root.querySelector(RADIO_GATE_SELECTOR) || root.querySelector(`[${A1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)) {
+  if (!model?.embedUrl || root.querySelector(RADIO_GATE_SELECTOR) || root.querySelector(`[${A1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)) {
     existing?.remove();
     return 0;
   }
