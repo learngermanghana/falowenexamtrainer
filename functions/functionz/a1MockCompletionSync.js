@@ -11,6 +11,166 @@ const SECTION_LABELS = Object.freeze({
   sprechen: "Sprechen",
 });
 
+const READING_ANSWER_KEY = Object.freeze({
+  "t1-1": "richtig",
+  "t1-2": "falsch",
+  "t1-3": "falsch",
+  "t1-4": "falsch",
+  "t1-5": "richtig",
+  "t2-6": "a",
+  "t2-7": "b",
+  "t2-8": "a",
+  "t2-9": "b",
+  "t2-10": "b",
+  "t3-11": "richtig",
+  "t3-12": "falsch",
+  "t3-13": "falsch",
+  "t3-14": "richtig",
+  "t3-15": "richtig",
+});
+
+const LISTENING_ANSWER_KEY = Object.freeze({
+  "t1-1": "b",
+  "t1-2": "b",
+  "t1-3": "a",
+  "t1-4": "b",
+  "t1-5": "b",
+  "t1-6": "b",
+  "t2-7": "falsch",
+  "t2-8": "richtig",
+  "t2-9": "falsch",
+  "t2-10": "richtig",
+  "t3-11": "b",
+  "t3-12": "a",
+  "t3-13": "b",
+  "t3-14": "b",
+  "t3-15": "a",
+});
+
+const normalizeObjectiveAnswer = (value) => String(value || "").trim().toLowerCase();
+
+const scoreObjectiveAnswers = (answers = {}, answerKey = {}) => {
+  const entries = Object.entries(answerKey);
+  const correct = entries.reduce(
+    (count, [key, expected]) =>
+      normalizeObjectiveAnswer(answers?.[key]) === normalizeObjectiveAnswer(expected)
+        ? count + 1
+        : count,
+    0,
+  );
+  return {
+    correct,
+    total: entries.length,
+    score: Number(((correct / Math.max(1, entries.length)) * 25).toFixed(1)),
+    maxScore: 25,
+  };
+};
+
+const verifiedSectionScore = (verifiedSections = {}, section) => {
+  const record = verifiedSections?.[section];
+  const score = Number(record?.score);
+  if (!record?.verified || !Number.isFinite(score)) {
+    const error = new Error(`Server-verified ${section} score is required before completion.`);
+    error.code = "A1_MOCK_SECTION_NOT_VERIFIED";
+    error.section = section;
+    throw error;
+  }
+  return Math.max(0, Math.min(25, score));
+};
+
+const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {} } = {}) => {
+  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, READING_ANSWER_KEY);
+  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, LISTENING_ANSWER_KEY);
+  const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
+  const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
+
+  const sectionScores = {
+    lesen: lesen.score,
+    hoeren: hoeren.score,
+    schreiben,
+    sprechen,
+  };
+  const overallScore = Number(
+    Object.values(sectionScores)
+      .reduce((sum, value) => sum + Number(value || 0), 0)
+      .toFixed(1),
+  );
+
+  return {
+    sectionScores,
+    overall: {
+      score: overallScore,
+      maxScore: 100,
+      passed: overallScore >= 60,
+    },
+    objective: { lesen, hoeren },
+  };
+};
+
+const persistVerifiedA1MockSection = async ({
+  db,
+  admin,
+  uid,
+  attemptId,
+  section,
+  score,
+  source,
+} = {}) => {
+  if (!db || !admin) throw new Error("Firestore verification dependencies are unavailable.");
+  if (!clean(uid) || !clean(attemptId)) {
+    throw new Error("uid and attemptId are required to persist a verified mock section.");
+  }
+  if (!["schreiben", "sprechen"].includes(section)) {
+    throw new Error("Only Schreiben and Sprechen can be persisted as verified AI sections.");
+  }
+
+  const numericScore = Number(score);
+  if (!Number.isFinite(numericScore) || numericScore < 0 || numericScore > 25) {
+    throw new Error("Verified mock section score must be between 0 and 25.");
+  }
+
+  const attemptRef = db
+    .collection("a1MockExamUsers")
+    .doc(clean(uid))
+    .collection("attempts")
+    .doc(clean(attemptId));
+  const snap = await attemptRef.get();
+  if (!snap.exists) {
+    const error = new Error("Mock attempt not found for verified section.");
+    error.code = "A1_MOCK_ATTEMPT_NOT_FOUND";
+    throw error;
+  }
+
+  const attempt = snap.data() || {};
+  if (attempt.uid && attempt.uid !== clean(uid)) {
+    const error = new Error("Mock attempt belongs to another account.");
+    error.code = "A1_MOCK_ATTEMPT_FORBIDDEN";
+    throw error;
+  }
+  if (attempt.status === "completed") {
+    const existing = attempt.verifiedSections?.[section];
+    if (existing?.verified && Number.isFinite(Number(existing.score))) {
+      return existing;
+    }
+    const error = new Error("Completed mock attempts cannot receive new verified section scores.");
+    error.code = "A1_MOCK_ALREADY_COMPLETED";
+    throw error;
+  }
+
+  const record = {
+    verified: true,
+    score: Number(numericScore.toFixed(1)),
+    maxScore: 25,
+    source: clean(source),
+    gradedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+  await attemptRef.update({
+    [`verifiedSections.${section}`]: record,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  return record;
+};
+
 const clean = (value = "") => String(value ?? "").trim();
 
 const safeDocId = (value = "") =>
@@ -272,6 +432,11 @@ const syncA1MockCompletion = async ({
 
 module.exports = {
   MOCK_TITLE,
+  READING_ANSWER_KEY,
+  LISTENING_ANSWER_KEY,
+  scoreObjectiveAnswers,
+  buildVerifiedA1MockScore,
+  persistVerifiedA1MockSection,
   buildSectionBreakdown,
   deriveMockInsights,
   resolveStudentIdentity,
