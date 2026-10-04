@@ -4,6 +4,81 @@ import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheListeningMockPreview.css";
 
 export const A1_GOETHE_LISTENING_MOCK = Object.freeze({
+  teil1: {
+    title: "Teil 1",
+    instruction: "Sie hören sechs kurze Gespräche. Sie hören jeden Text zweimal.",
+    responseInstruction: "Kreuzen Sie die richtige Lösung A, B oder C an.",
+    plays: 2,
+    audioObjectKey: "a1/mock-hoeren/mock-01/teil-1.mp3",
+    questions: [
+      {
+        number: 1,
+        context: "In der Bäckerei",
+        question: "Was kostet das Brot?",
+        answer: "B",
+        options: [
+          { id: "A", label: "0,50 Euro", short: "0,50 €" },
+          { id: "B", label: "2,50 Euro", short: "2,50 €" },
+          { id: "C", label: "3,00 Euro", short: "3,00 €" },
+        ],
+      },
+      {
+        number: 2,
+        context: "Deutschkurs",
+        question: "Wann beginnt der Deutschkurs heute?",
+        answer: "B",
+        options: [
+          { id: "A", label: "Um 9 Uhr", short: "09:00 Uhr" },
+          { id: "B", label: "Um halb neun", short: "08:30 Uhr" },
+          { id: "C", label: "Um 8 Uhr", short: "08:00 Uhr" },
+        ],
+      },
+      {
+        number: 3,
+        context: "Im Restaurant",
+        question: "Was bestellt der Gast zu trinken?",
+        answer: "A",
+        options: [
+          { id: "A", label: "Einen Tee", short: "Tee" },
+          { id: "B", label: "Einen Kaffee", short: "Kaffee" },
+          { id: "C", label: "Eine Suppe", short: "Suppe" },
+        ],
+      },
+      {
+        number: 4,
+        context: "Auf der Straße",
+        question: "Wie geht die Frau zur Post?",
+        answer: "B",
+        options: [
+          { id: "A", label: "Geradeaus, dann die erste Straße links", short: "1. Straße links" },
+          { id: "B", label: "Geradeaus, dann die zweite Straße links", short: "2. Straße links" },
+          { id: "C", label: "Geradeaus, dann die zweite Straße rechts", short: "2. Straße rechts" },
+        ],
+      },
+      {
+        number: 5,
+        context: "Familie",
+        question: "Wie viele Geschwister hat Lisa?",
+        answer: "B",
+        options: [
+          { id: "A", label: "Keine Geschwister", short: "0" },
+          { id: "B", label: "Ein Geschwister", short: "1" },
+          { id: "C", label: "Zwei Geschwister", short: "2" },
+        ],
+      },
+      {
+        number: 6,
+        context: "Arztpraxis",
+        question: "Wann ist der Termin?",
+        answer: "B",
+        options: [
+          { id: "A", label: "Am Mittwoch um 9 Uhr", short: "Mi · 09:00" },
+          { id: "B", label: "Am Mittwoch um 10 Uhr", short: "Mi · 10:00" },
+          { id: "C", label: "Am Donnerstag um 10 Uhr", short: "Do · 10:00" },
+        ],
+      },
+    ],
+  },
   teil2: {
     title: "Teil 2",
     instruction: "Sie hören vier kurze Ansagen. Sie hören jeden Text einmal.",
@@ -163,6 +238,33 @@ export default function A1GoetheListeningMockPreview() {
           <h1>Mockprüfung</h1>
           <p>Bearbeiten Sie die Aufgaben wie in der Prüfung. Die Audiodateien werden später ergänzt.</p>
         </header>
+
+        <section className="a1-hoeren-mock-part">
+          <header className="a1-hoeren-mock-part-header">
+            <h2>{A1_GOETHE_LISTENING_MOCK.teil1.title}</h2>
+            <p>{A1_GOETHE_LISTENING_MOCK.teil1.instruction}</p>
+            <p><strong>{A1_GOETHE_LISTENING_MOCK.teil1.responseInstruction}</strong></p>
+          </header>
+
+          {A1_GOETHE_LISTENING_MOCK.teil1.questions.map((question) => {
+            const key = `teil1-${question.number}`;
+            return (
+              <section className="a1-hoeren-mock-question" key={key}>
+                <p className="a1-hoeren-mock-number">Aufgabe {question.number}</p>
+                <p className="a1-hoeren-mock-context">{question.context}</p>
+                <AudioPlaceholder plays={2} context={question.context} />
+                <h3>{question.question}</h3>
+                <p className="a1-hoeren-mock-prompt">Wählen Sie: A, B oder C</p>
+                <MultipleChoice
+                  name={key}
+                  options={question.options}
+                  value={answers[key] || ""}
+                  onChange={(value) => setAnswer(key, value)}
+                />
+              </section>
+            );
+          })}
+        </section>
 
         <section className="a1-hoeren-mock-part">
           <header className="a1-hoeren-mock-part-header">
