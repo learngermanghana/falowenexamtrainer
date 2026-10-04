@@ -321,7 +321,7 @@ export default function A1GoetheSpeakingMockPreview({
     setMarking(true);
     setTimedOutMarkFailed(false);
     setError("");
-    setStatus("Falowen is marking your complete A1 Sprechen mock…");
+    setStatus("Falowen is marking your complete A1 Sprechen mock …");
 
     try {
       const assessment = await scoreA1MockSpeaking({
@@ -334,7 +334,7 @@ export default function A1GoetheSpeakingMockPreview({
         idToken,
       });
       setResult(assessment);
-      setStatus("Sprechen result ready.");
+      setStatus("Speaking result ready.");
       if (typeof onComplete === "function") onComplete(assessment);
     } catch (markError) {
       setError(markError?.message || "Could not mark the complete speaking mock.");
@@ -360,20 +360,20 @@ export default function A1GoetheSpeakingMockPreview({
       <header className="a1-goethe-mock-header">
         <p className="a1-goethe-mock-kicker">A1 · Sprechen</p>
         <h1>Prüfungssimulation</h1>
-        <p>Bearbeitungszeit: 15 Minuten. Nehmen Sie Ihre Antworten auf Deutsch auf.</p>
-        <p><strong>Falowen hört alle drei Teile, transkribiert sie und markiert die komplette Sprechprüfung erst am Ende.</strong></p>
+        <p>You have 15 minutes. Record your answers in German.</p>
+        <p><strong>Falowen listens to all three parts, transcribes them, and marks the full speaking section only at the end.</strong></p>
       </header>
 
       <div className="a1-sprechen-controlbar">
         <div>
-          <span className="a1-sprechen-control-label">Zeit</span>
+          <span className="a1-sprechen-control-label">Time left</span>
           <strong className={secondsLeft <= 120 ? "a1-sprechen-timer a1-sprechen-timer-warning" : "a1-sprechen-timer"}>
             {formatTime(secondsLeft)}
           </strong>
         </div>
         <div>
-          <span className="a1-sprechen-control-label">Fortschritt</span>
-          <strong>{completedCount}/3 Teile abgegeben</strong>
+          <span className="a1-sprechen-control-label">Progress</span>
+          <strong>{completedCount}/3 parts submitted</strong>
         </div>
         {!started ? (
           <button type="button" className="a1-sprechen-primary" onClick={() => setStarted(true)}>
@@ -398,11 +398,11 @@ export default function A1GoetheSpeakingMockPreview({
                 <h2>{task.title.replace(/^Teil \d+ · /, "")}</h2>
                 <p>{task.context}</p>
               </div>
-              <span>{task.maxRecordingSeconds} Sek. max.</span>
+              <span>{task.maxRecordingSeconds} sec max.</span>
             </div>
 
             <div className="a1-sprechen-prompt">
-              <strong>Aufgabe</strong>
+              <strong>Task</strong>
               <p>{task.prompt}</p>
             </div>
 
@@ -414,13 +414,13 @@ export default function A1GoetheSpeakingMockPreview({
 
             {task.keyword ? (
               <div className="a1-sprechen-keyword-card">
-                <span>{task.teil === "2" ? "Wort" : "Karte"}</span>
+                <span>{task.teil === "2" ? "Keyword" : "Card"}</span>
                 <strong>{task.keyword}</strong>
               </div>
             ) : null}
 
             {lockedByPrior ? (
-              <p className="a1-sprechen-locked-note">Geben Sie zuerst {tasks[index - 1].title} ab.</p>
+              <p className="a1-sprechen-locked-note">Submit {tasks[index - 1].title} first.</p>
             ) : null}
 
             {unlocked ? (
@@ -432,7 +432,7 @@ export default function A1GoetheSpeakingMockPreview({
                     onClick={() => (currentlyRecording ? stopRecording() : startRecording(task))}
                     disabled={Boolean(recordingTaskId && !currentlyRecording) || attempt.submitted || secondsLeft <= 0}
                   >
-                    {currentlyRecording ? "Aufnahme stoppen" : attempt.audioBlob ? "Neu aufnehmen" : "Antwort aufnehmen"}
+                    {currentlyRecording ? "Stop recording" : attempt.audioBlob ? "Record again" : "Record answer"}
                   </button>
                   {currentlyRecording ? <strong>{formatTime(recordingSeconds)}</strong> : null}
                   {attempt.audioUrl && !attempt.submitted ? (
@@ -444,20 +444,20 @@ export default function A1GoetheSpeakingMockPreview({
 
                 {attempt.audioUrl ? (
                   <audio className="a1-sprechen-audio" controls src={attempt.audioUrl} preload="metadata">
-                    Ihr Browser unterstützt dieses Audio nicht.
+                    Your browser does not support this audio.
                   </audio>
                 ) : null}
 
                 {attempt.audioBlob && !attempt.submitted ? (
                   <button type="button" className="a1-sprechen-primary" onClick={() => submitTask(task)} disabled={attempt.submitting}>
-                    {attempt.submitting ? "Wird geprüft …" : "Diese Antwort abgeben"}
+                    {attempt.submitting ? "Sending …" : "Send answer"}
                   </button>
                 ) : null}
 
                 {attempt.submitted ? (
                   <div className="a1-sprechen-submitted">
-                    <strong>Abgegeben</strong>
-                    <p>Falowen hat Ihre Aufnahme verstanden. Feedback bleibt bis zum Ende der Prüfung verborgen.</p>
+                    <strong>Submitted</strong>
+                    <p>Falowen received your recording. Feedback stays hidden until the end of the exam.</p>
                   </div>
                 ) : null}
               </div>
@@ -479,17 +479,17 @@ export default function A1GoetheSpeakingMockPreview({
             onClick={() => markSpeaking({ force: true })}
             disabled={marking}
           >
-            {marking ? "Sprechen wird markiert …" : "Retry Sprechen marking"}
+            {marking ? "Marking speaking …" : "Retry speaking marking"}
           </button>
         </div>
       ) : null}
 
       {completedCount === tasks.length && !result && !timedOutMarkFailed ? (
         <div className="a1-sprechen-final-action">
-          <h2>Alle drei Teile sind abgegeben.</h2>
-          <p>Falowen markiert jetzt Teil 1, Teil 2 und Teil 3 gemeinsam nach A1-Standard.</p>
+          <h2>All three parts are submitted.</h2>
+          <p>Falowen will now mark Teil 1, Teil 2 and Teil 3 together at A1 standard.</p>
           <button type="button" className="a1-sprechen-primary" onClick={() => markSpeaking()} disabled={marking}>
-            {marking ? "Sprechen wird markiert …" : "Sprechen markieren"}
+            {marking ? "Marking speaking …" : "Mark speaking"}
           </button>
         </div>
       ) : null}
@@ -503,7 +503,7 @@ export default function A1GoetheSpeakingMockPreview({
               <small>{scorePercent}%</small>
             </div>
             <div>
-              <span>Ergebnis</span>
+              <span>Result</span>
               <strong>{result.passed ? "Passed" : "Needs more practice"}</strong>
               <small>Pass mark: 15/25</small>
             </div>
