@@ -97,14 +97,15 @@ export const A2_LISTENING_TASKS = {
   8: {
     chapter: "3.8",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Sieh dir das eingebettete Video zum Thema Rezepte und Essen an. Achte auf den Tag, die Zutaten, den Ort und das Gericht. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/mYh4DRaaWSY",
+    task: "Hören Sie das Gespräch im Restaurant zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-08/day-08.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Wann gehen die Personen einkaufen oder kochen zusammen?", options: ["a) Montag", "b) Samstag", "c) Mittwoch"] },
-      { stem: "Was kaufen sie?", options: ["a) Fleisch und Fisch", "b) Obst und Gemüse", "c) Brot und Käse"] },
-      { stem: "Welche Zutat wird im Hörtext genannt?", options: ["a) Reis", "b) Mozzarella", "c) Kartoffeln"] },
-      { stem: "Was machen sie danach?", options: ["a) Sie gehen ins Kino", "b) Sie gehen in ein Café", "c) Sie gehen in die Schule"] },
-      { stem: "Welches Gericht wird genannt?", options: ["a) Gemüselasagne", "b) Bratwurst mit Sauerkraut", "c) Fischsuppe"] },
+      { stem: "Wo bekommen die beiden Frauen einen Tisch?", options: ["A) Neben der Tür", "B) Am Fenster", "C) Auf der Terrasse"] },
+      { stem: "Welche Getränke bestellt die Kundin zuerst?", options: ["A) Ein Mineralwasser und einen Apfelsaft", "B) Zwei Kaffee", "C) Einen Apfelsaft und einen Orangensaft"] },
+      { stem: "Was bestellt die Kundin für sich selbst zum Essen?", options: ["A) Schnitzel mit Kartoffelsalat", "B) Spaghetti mit Tomatensoße", "C) Eine Gemüsepfanne mit Reis"] },
+      { stem: "Wie möchte die Freundin ihr Schnitzel haben?", options: ["A) Ohne Salat", "B) Mit Kartoffelsalat", "C) Mit Tomatensoße"] },
+      { stem: "Was macht die Kundin beim Bezahlen?", options: ["A) Sie bezahlt genau 38,50 Euro und gibt kein Trinkgeld.", "B) Sie gibt 40 Euro und lässt den Rest als Trinkgeld da.", "C) Sie bezahlt nur ihr eigenes Essen und ihre Getränke."] },
     ],
   },
   9: {

@@ -2,6 +2,7 @@ import { A2_LISTENING_MODES, getA2ListeningTask } from "./a2ListeningTasks";
 
 describe("A2 listening tasks", () => {
   test.each([
+    [8, "3.8", "a2/day-08/day-08.mp3"],
     [24, "9.24", "a2/day-24/day-24.mp3"],
     [26, "10.26", "a2/day-26/day-26.mp3"],
     [27, "10.27", "a2/day-27/day-27.mp3"],
