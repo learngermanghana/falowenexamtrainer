@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -826,6 +826,59 @@ app.get("/course-media/a1/mock-audio-url", async (req, res) => {
     }
     console.error("Failed to create A1 mock audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this A1 mock audio right now." });
+  }
+});
+
+app.get("/course-media/a2/mock-audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.query?.mockId || "").trim();
+    const part = String(req.query?.part || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateA2MockAudioKey({ mockId, part, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid A2 mock audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getA2MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.a2_mock.access_denied", {
+        reason: accessBlockReason,
+        mockId: validated.mockId,
+        part: validated.part,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "A2 mock audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createA2MockAudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+      mockId: signed.mockId,
+      part: signed.part,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("A2 mock R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "A2 mock audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_A2_MOCK_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid A2 mock audio request" });
+    }
+    console.error("Failed to create A2 mock audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this A2 mock audio right now." });
   }
 });
 
