@@ -108,24 +108,63 @@ export const B1_DAY16_PRUEFUNGSANGST_STRESSBEWAELTIGUNG_WORKBOOK_CONFIG = {
   writing: getB1WritingTask(16),
   reading: getB1ReadingTask(16),
   listening: {
-    title: "Hören Sie den Text über Prüfungsangst und beantworten Sie die fünf Fragen.",
-    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    title: "Hören Sie das Interview über Prüfungsangst und beantworten Sie die fünf Fragen.",
+    instructions: "Lesen Sie zuerst die Fragen. Hören Sie dann aufmerksam auf Ellens Strategien vor und während einer Prüfung.",
     image: "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "Stressbewältigung vor einer Prüfung",
-    embedUrl: "https://www.youtube-nocookie.com/embed/XT5pZGgvMGk?rel=0&playsinline=1",
-    externalUrl: "https://youtu.be/XT5pZGgvMGk",
+    audioKey: "audio/day_16.mp3",
     videoTitle: "B1 Day 16 Prüfungsangst und Stressbewältigung Hören",
     submitRequired: true,
     selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
     questions: [
-      { stem: "Welche Vorbereitungsmethode wird im Hörtext empfohlen?", options: ["a) Intensives Lernen in der Nacht vor der Prüfung.", "b) Regelmäßiges Lernen und Pausen machen.", "c) Die Prüfung ignorieren.", "d) Nur in der Gruppe lernen."] },
-      { stem: "Was wird als wichtige Methode zur Stressbewältigung genannt?", options: ["a) Meditation und positives Denken.", "b) Langes Lernen ohne Pausen.", "c) Frühes Aufstehen am Prüfungstag.", "d) Ein sehr großes Frühstück."] },
-      { stem: "Welche Rolle spielt das Gespräch mit anderen bei Prüfungsangst?", options: ["a) Es ist nicht wichtig.", "b) Es verschlimmert die Situation.", "c) Es kann helfen, die Angst zu reduzieren.", "d) Man sollte das Gespräch vermeiden."] },
-      { stem: "Was ist laut dem Hörtext der Schlüssel zum Erfolg bei Prüfungen?", options: ["a) Viele Entspannungsübungen.", "b) Sich klarzumachen, dass die Prüfung nur eine Momentaufnahme ist.", "c) Gute Beziehungen zu Lehrern.", "d) Sehr viel Schlaf."] },
-      { stem: "Was sollte man laut dem Hörtext vermeiden?", options: ["a) Langfristige Vorbereitung.", "b) Gespräche über die Angst.", "c) Negative Gedanken und Stress.", "d) Den Prüfungsstoff durchzugehen."] },
+      {
+        stem: "Was hilft Ellen heute vor einer Prüfung?",
+        options: [
+          "a) Sie lernt die ganze Nacht.",
+          "b) Sie lernt jeden Tag ein bisschen und macht eine Atemübung.",
+          "c) Sie vermeidet den Prüfungsstoff.",
+          "d) Sie trinkt viel Kaffee.",
+        ],
+      },
+      {
+        stem: "Was empfiehlt Ellen für die mündliche Prüfung?",
+        options: [
+          "a) Nur leise im Kopf üben.",
+          "b) Schwierige Wörter auswendig lernen und sonst nicht sprechen.",
+          "c) Mit einer anderen Person üben, laut sprechen und die Prüfungssituation trainieren.",
+          "d) Erst am Prüfungstag mit dem Sprechen beginnen.",
+        ],
+      },
+      {
+        stem: "Warum ist Schlaf vor der Prüfung wichtig?",
+        options: [
+          "a) Das Gehirn braucht Schlaf, damit man das Gelernte behalten kann.",
+          "b) Man hat dann weniger Zeit zum Nachdenken.",
+          "c) Schlaf ersetzt die Prüfungsvorbereitung.",
+          "d) Man kann dadurch jede Aufgabe sofort lösen.",
+        ],
+      },
+      {
+        stem: "Was soll man tun, wenn eine Aufgabe in der Prüfung zu schwer ist?",
+        options: [
+          "a) Sofort die Prüfung beenden.",
+          "b) Die gleiche Aufgabe immer wieder schnell lesen.",
+          "c) Den Prüfer nach der richtigen Lösung fragen.",
+          "d) Ruhig bleiben, langsam noch einmal lesen und gegebenenfalls später zurückkommen.",
+        ],
+      },
+      {
+        stem: "Was sagt Ellen über Fehler in der Prüfung?",
+        options: [
+          "a) Jeder Fehler führt automatisch zum Nichtbestehen.",
+          "b) Wichtig ist, dass man sich verständigen kann; ein fehlendes Wort kann man umschreiben.",
+          "c) Nur Muttersprachler dürfen Fehler machen.",
+          "d) Man sollte lieber schweigen, wenn ein Wort fehlt.",
+        ],
+      },
     ],
     steps: [
-      "Hören Sie den Text einmal komplett.",
+      "Hören Sie das Interview einmal vollständig.",
       "Lesen Sie die Fragen und Antwortmöglichkeiten.",
       "Hören Sie wichtige Stellen ein zweites Mal.",
       "Schreiben Sie Ihre fünf Antwortbuchstaben in den Submit-Tab.",
