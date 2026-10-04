@@ -1393,8 +1393,8 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
     A1: [
       "A1 GOETHE CHECKS:",
       "- Teil 1: self-introduction (e.g., Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby) in short simple sentences.",
-      "- Teil 2: student should ask and answer their own short question (W-question or Ja/Nein question).",
-      "- Teil 3: student should make a request using patterns like 'Verb + Sie + bitte' or 'Können Sie ...' with infinitive at the end.",
+      "- Teil 2: student should form an appropriate short question from the prompt/keyword (W-question or Ja/Nein question). In this single-candidate mock, do not require the student to answer their own question.",
+      "- Teil 3: student should make one understandable polite request using patterns like 'Verb + Sie + bitte' or 'Können Sie ...' with infinitive at the end.",
     ].join("\n"),
     A2: [
       "A2 GOETHE CHECKS:",
@@ -1756,10 +1756,8 @@ const scoreA1MockWritingForm = (formValues = {}) => {
     1: /^(3|drei)( personen)?$/.test(value(1)),
     2: /^(1|ein|eins|eine)( kind)?$/.test(value(2)),
     3: /^(10|zehn)( jahre?)?$/.test(value(3)),
-    4:
-      (/24/.test(value(4)) && /(oktober|10)/.test(value(4))) ||
-      /samstag/.test(value(4)),
-    5: /^(bar|barzahlung|cash)$/.test(value(5)),
+    4: /24/.test(value(4)) && /(oktober|10)/.test(value(4)),
+    5: /^(bar|barzahlung)$/.test(value(5)),
   };
 
   const labels = {
