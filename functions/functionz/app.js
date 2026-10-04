@@ -3639,6 +3639,10 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: effectiveOverall,
           sectionScores: effectiveSectionScores,
+          now:
+            typeof attemptData.completedAt?.toDate === "function"
+              ? attemptData.completedAt.toDate()
+              : new Date(),
         });
 
         await attemptRef.set(
