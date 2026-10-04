@@ -205,6 +205,7 @@ const syncA1MockCompletion = async ({
   firstAttempt,
   overall,
   sectionScores,
+  now,
 } = {}) => {
   if (!db || !admin) throw new Error("Firestore sync dependencies are unavailable.");
   if (!clean(attemptId)) throw new Error("attemptId is required for A1 mock completion sync.");
@@ -217,6 +218,7 @@ const syncA1MockCompletion = async ({
     firstAttempt,
     overall,
     sectionScores,
+    now,
   });
 
   const batch = db.batch();
