@@ -194,11 +194,11 @@ export const A2_LISTENING_TASKS = {
     audioKey: "a2/day-15/day-15.mp3",
     audioUrl: "",
     questions: [
-      { stem: "Was ist besonders beliebt im neuen Fitnessstudio \"Vital Plus\"?", options: ["A) Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Kletterkurse"] },
-      { stem: "Was bietet der Stadtpark im Sommer an?", options: ["A) Kostenlose Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Fußballturniere"] },
-      { stem: "Was bietet das Schwimmbad \"Aqua Fun\" an?", options: ["A) Wassergymnastik und Aqua-Zumba", "B) Kletterkurse", "C) Fußballkurse", "D) Boxtraining"] },
-      { stem: "Für wen ist der neue Kletterpark geeignet?", options: ["A) Nur für Anfänger", "B) Nur für Fortgeschrittene", "C) Für Anfänger und Fortgeschrittene", "D) Nur für Kinder"] },
-      { stem: "Was bietet der Sportverein \"Fitness für alle\" an?", options: ["A) Yoga-Kurse", "B) Volleyball und Basketball", "C) Schwimmkurse", "D) Tennis und Golf"] },
+      { stem: "Was ist Toms Lieblingssport?", options: ["A) Schwimmen", "B) Fußball", "C) Tennis"] },
+      { stem: "Wie oft spielt Tom Fußball?", options: ["A) Jeden Tag", "B) Einmal pro Woche", "C) Zweimal pro Woche"] },
+      { stem: "Wann geht Anna normalerweise ins Schwimmbad?", options: ["A) Jeden Mittwoch", "B) Jeden Samstag", "C) Jeden Dienstag"] },
+      { stem: "Warum findet Tom Mannschaftssport besser?", options: ["A) Weil er lieber allein trainiert.", "B) Weil er nur bei gutem Wetter Sport macht.", "C) Weil man nicht allein ist und es mehr Spaß macht."] },
+      { stem: "Wann treffen sich Anna und Tom zum Schwimmen?", options: ["A) Am Mittwoch um vier Uhr", "B) Am Mittwoch um sechs Uhr", "C) Am Samstag um sechs Uhr"] },
     ],
   },
   16: {
