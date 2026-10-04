@@ -14,10 +14,12 @@ export const A1_GOETHE_WRITING_MOCK = Object.freeze({
     ],
     instruction:
       "Helfen Sie Ihrer Freundin und schreiben Sie die fünf fehlenden Informationen in das Formular.",
-    example: {
-      label: "Familienname, Vorname",
-      value: "Mensah, Linda",
-    },
+    prefilled: [
+      { label: "Familienname, Vorname", value: "Mensah, Linda" },
+      { label: "Hotel", value: "Hotel Adler" },
+      { label: "Ausflug", value: "Busfahrt" },
+      { label: "Ziel", value: "Schwarzwald" },
+    ],
     fields: [
       { number: 1, label: "Anzahl Personen", answer: "3" },
       { number: 2, label: "Kinder", answer: "1" },
@@ -52,10 +54,12 @@ const Teil1Form = ({ values, onChange }) => (
     </div>
 
     <div className="a1-schreiben-form-body">
-      <div className="a1-schreiben-form-row a1-schreiben-form-example">
-        <span className="a1-schreiben-form-label">{A1_GOETHE_WRITING_MOCK.teil1.example.label}</span>
-        <span className="a1-schreiben-form-prefilled">{A1_GOETHE_WRITING_MOCK.teil1.example.value}</span>
-      </div>
+      {A1_GOETHE_WRITING_MOCK.teil1.prefilled.map((field) => (
+        <div className="a1-schreiben-form-row a1-schreiben-form-example" key={field.label}>
+          <span className="a1-schreiben-form-label">{field.label}</span>
+          <span className="a1-schreiben-form-prefilled">{field.value}</span>
+        </div>
+      ))}
 
       {A1_GOETHE_WRITING_MOCK.teil1.fields.map((field) => (
         <label className="a1-schreiben-form-row" key={field.number}>
