@@ -8,24 +8,34 @@ export const A1_GOETHE_WRITING_MOCK = Object.freeze({
     title: "Teil 1",
     scenario: [
       "Ihre Freundin Linda Mensah macht mit ihrem Mann und ihrer Tochter (10 Jahre alt) Urlaub in Freiburg.",
+      "Sie wohnen im Hotel Adler, Gartenstraße 12, 79098 Freiburg.",
       "Im Reisebüro bucht sie für Samstag, den 24. Oktober, eine Busfahrt in den Schwarzwald.",
       "Frau Mensah hat keine Kreditkarte.",
-      "Sie wohnen im Hotel Adler in Freiburg.",
     ],
     instruction:
       "Helfen Sie Ihrer Freundin und schreiben Sie die fünf fehlenden Informationen in das Formular.",
-    prefilled: [
-      { label: "Familienname, Vorname", value: "Mensah, Linda" },
-      { label: "Hotel", value: "Hotel Adler" },
-      { label: "Ausflug", value: "Busfahrt" },
-      { label: "Ziel", value: "Schwarzwald" },
-    ],
-    fields: [
-      { number: 1, label: "Anzahl Personen", answer: "3" },
-      { number: 2, label: "Kinder", answer: "1" },
-      { number: 3, label: "Alter des Kindes", answer: "10" },
-      { number: 4, label: "Termin", answer: "Samstag, 24. Oktober" },
-      { number: 5, label: "Zahlung", answer: "bar" },
+    formRows: [
+      { kind: "prefilled", label: "Familienname, Vorname", value: "Mensah, Linda", example: true },
+      { kind: "input", number: 1, label: "Anzahl der Personen", answer: "3" },
+      { kind: "input", number: 2, label: "Davon Kinder", answer: "1" },
+      { kind: "prefilled", label: "Alter des Kindes", value: "10 Jahre" },
+      { kind: "prefilled", label: "Urlaubsadresse", value: "Hotel Adler" },
+      { kind: "input", number: 3, label: "Straße, Hausnummer", answer: "Gartenstraße 12" },
+      { kind: "prefilled", label: "PLZ", value: "79098" },
+      { kind: "prefilled", label: "Urlaubsort", value: "Freiburg" },
+      { kind: "prefilled", label: "Ausflug", value: "Busfahrt" },
+      {
+        kind: "choice",
+        number: 4,
+        label: "Zahlungsweise",
+        options: [
+          { value: "bar", label: "Bar" },
+          { value: "kreditkarte", label: "Kreditkarte" },
+        ],
+        answer: "bar",
+      },
+      { kind: "prefilled", label: "Ziel", value: "Schwarzwald" },
+      { kind: "input", number: 5, label: "Reisetermin", answer: "Samstag, 24. Oktober" },
     ],
   },
   teil2: {
@@ -54,29 +64,62 @@ const Teil1Form = ({ values, onChange }) => (
     </div>
 
     <div className="a1-schreiben-form-body">
-      {A1_GOETHE_WRITING_MOCK.teil1.prefilled.map((field) => (
-        <div className="a1-schreiben-form-row a1-schreiben-form-example" key={field.label}>
-          <span className="a1-schreiben-form-label">{field.label}</span>
-          <span className="a1-schreiben-form-prefilled">{field.value}</span>
-        </div>
-      ))}
+      {A1_GOETHE_WRITING_MOCK.teil1.formRows.map((field) => {
+        if (field.kind === "prefilled") {
+          return (
+            <div
+              className={field.example ? "a1-schreiben-form-row a1-schreiben-form-example" : "a1-schreiben-form-row"}
+              key={field.label}
+            >
+              <span className="a1-schreiben-form-label">{field.label}</span>
+              <span className="a1-schreiben-form-prefilled">
+                {field.value}
+                {field.example ? <small>Beispiel (0)</small> : null}
+              </span>
+            </div>
+          );
+        }
 
-      {A1_GOETHE_WRITING_MOCK.teil1.fields.map((field) => (
-        <label className="a1-schreiben-form-row" key={field.number}>
-          <span className="a1-schreiben-form-label">{field.label}</span>
-          <span className="a1-schreiben-form-number">{field.number}</span>
-          <input
-            type="text"
-            value={values[field.number] || ""}
-            onChange={(event) => onChange(field.number, event.target.value)}
-            aria-label={`Aufgabe ${field.number}: ${field.label}`}
-            autoComplete="off"
-          />
-        </label>
-      ))}
+        if (field.kind === "choice") {
+          return (
+            <fieldset className="a1-schreiben-form-row a1-schreiben-form-choice-row" key={field.number}>
+              <legend className="a1-schreiben-form-label">{field.label}</legend>
+              <span className="a1-schreiben-form-number">{field.number}</span>
+              <div className="a1-schreiben-form-choice-list">
+                {field.options.map((option) => (
+                  <label key={option.value}>
+                    <input
+                      type="radio"
+                      name={`a1-schreiben-form-${field.number}`}
+                      value={option.value}
+                      checked={(values[field.number] || "") === option.value}
+                      onChange={(event) => onChange(field.number, event.target.value)}
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          );
+        }
+
+        return (
+          <label className="a1-schreiben-form-row" key={field.number}>
+            <span className="a1-schreiben-form-label">{field.label}</span>
+            <span className="a1-schreiben-form-number">{field.number}</span>
+            <input
+              type="text"
+              value={values[field.number] || ""}
+              onChange={(event) => onChange(field.number, event.target.value)}
+              aria-label={`Aufgabe ${field.number}: ${field.label}`}
+              autoComplete="off"
+            />
+          </label>
+        );
+      })}
 
       <div className="a1-schreiben-form-note">
-        Bitte alle Angaben gut lesbar eintragen.
+        Schreiben Sie nur die fünf fehlenden Angaben. Bei der Zahlungsweise kreuzen Sie eine Möglichkeit an.
       </div>
     </div>
   </div>
