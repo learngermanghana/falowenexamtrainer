@@ -20,7 +20,7 @@ import AttendanceTab from "./components/AttendanceTab";
 import ClassMembersTab from "./components/ClassMembersTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
-import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
+import A1Day23WritingWorkshopPage from "./components/A1Day23WritingWorkshopPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -766,12 +766,16 @@ const AppShell = ({
           <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
+            path="/campus/course/a1-day-23-writing-workshop-14-2"
+            element={<A1Day23WritingWorkshopPage />}
+          />
+          <Route
             path="/campus/course/dative-and-accusative-verbs-14-2"
-            element={<DativeAdjectiveDeclensionPage />}
+            element={<A1Day23WritingWorkshopPage />}
           />
           <Route
             path="/campus/course/dative-verbs-adjective-declension-14-2"
-            element={<DativeAdjectiveDeclensionPage />}
+            element={<A1Day23WritingWorkshopPage />}
           />
           <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/directions-imperative-11" element={<DirectionsImperativePage />} />
