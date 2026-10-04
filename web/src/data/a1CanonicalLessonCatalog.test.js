@@ -137,6 +137,7 @@ describe("A1 canonical lesson catalog", () => {
       ["1.2-PRACTICE", "/campus/course/a1-day-3-kapitel-1-2-workbook"],
       ["1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
       ["14.2", "/campus/course/a1-day-23-writing-workshop-14-2"],
+      ["5.10", "/campus/course/a1-final-mock-exam"],
     ].forEach(([identity, destination]) => {
       expect(getA1CanonicalLesson(identity)?.destination).toBe(destination);
     });

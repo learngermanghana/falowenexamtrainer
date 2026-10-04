@@ -109,9 +109,10 @@ describe("A1 full Course Book consolidation", () => {
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
     });
 
-    for (let day = 1; day <= 24; day += 1) {
+    for (let day = 1; day <= 23; day += 1) {
       expect(getA1TeacherVideoResources(day).length).toBeGreaterThan(0);
     }
+    expect(getA1TeacherVideoResources(24)).toHaveLength(0);
   });
 
   test("the Day 2 alphabet submission cannot omit its Hören section", () => {

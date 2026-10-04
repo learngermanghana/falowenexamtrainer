@@ -1,0 +1,246 @@
+.a1-schreiben-mock-exam {
+  background: #f2e8f0;
+}
+
+.a1-schreiben-part {
+  margin-top: 30px;
+  padding-bottom: 34px;
+  border: 1px solid #d7c4d1;
+  background: #fff;
+}
+
+.a1-schreiben-part-header {
+  padding: 24px 30px 20px;
+  border-bottom: 1px solid #8d4d64;
+}
+
+.a1-schreiben-part-header h2 {
+  margin: 0 0 16px;
+  font-size: 27px;
+}
+
+.a1-schreiben-part-header p {
+  margin: 7px 0;
+  max-width: 920px;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+.a1-schreiben-form-paper {
+  width: min(760px, calc(100% - 70px));
+  margin: 38px auto 8px;
+  background: #fff;
+  border: 1px solid #999;
+  box-shadow: 10px 10px 13px rgba(49, 37, 45, 0.2);
+  transform: rotate(-0.25deg);
+}
+
+.a1-schreiben-form-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 105px;
+  border-bottom: 3px solid #111;
+}
+
+.a1-schreiben-form-header > div:first-child {
+  padding: 22px 26px;
+  display: grid;
+  align-content: center;
+  border-right: 2px solid #111;
+}
+
+.a1-schreiben-form-header strong {
+  font-size: 24px;
+  letter-spacing: 0.05em;
+}
+
+.a1-schreiben-form-header span {
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+.a1-schreiben-form-title {
+  display: grid;
+  place-items: center;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.a1-schreiben-form-body {
+  padding: 26px 30px 30px;
+}
+
+.a1-schreiben-form-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(240px, 1.2fr);
+  align-items: center;
+  min-height: 58px;
+  border-bottom: 1px solid #777;
+}
+
+.a1-schreiben-form-example {
+  background: #f7f7f7;
+}
+
+.a1-schreiben-form-label {
+  padding-right: 18px;
+  font-weight: 700;
+}
+
+.a1-schreiben-form-prefilled {
+  font-family: "Comic Sans MS", "Bradley Hand", cursive;
+  font-size: 22px;
+  color: #243a7a;
+}
+
+.a1-schreiben-form-number {
+  position: absolute;
+  left: calc(40% - 16px);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #efe2eb;
+  border: 1px solid #8d4d64;
+  font-weight: 900;
+}
+
+.a1-schreiben-form-row input {
+  min-width: 0;
+  margin: 8px 0 8px 34px;
+  padding: 10px 8px 7px;
+  border: 0;
+  border-bottom: 2px dotted #555;
+  background: transparent;
+  font: 20px/1.2 "Comic Sans MS", "Bradley Hand", cursive;
+  color: #111;
+  outline: none;
+}
+
+.a1-schreiben-form-row input:focus {
+  border-bottom-style: solid;
+  border-bottom-color: #6f354e;
+}
+
+.a1-schreiben-form-note {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #555;
+}
+
+.a1-schreiben-letter-task {
+  padding: 30px;
+}
+
+.a1-schreiben-three-points {
+  display: grid;
+  gap: 12px;
+  max-width: 850px;
+}
+
+.a1-schreiben-point {
+  display: grid;
+  grid-template-columns: 38px 1fr;
+  align-items: start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #d4c2ce;
+}
+
+.a1-schreiben-point > span {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #eee1ec;
+  border: 1px solid #b79aaa;
+  font-weight: 900;
+}
+
+.a1-schreiben-point p {
+  margin: 3px 0 0;
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.a1-schreiben-reminder {
+  margin: 22px 0;
+  max-width: 880px;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.a1-schreiben-textarea-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 800;
+}
+
+.a1-schreiben-letter-task textarea {
+  width: 100%;
+  max-width: 900px;
+  min-height: 260px;
+  resize: vertical;
+  padding: 18px;
+  border: 1px solid #9a8794;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fff 0,
+      #fff 31px,
+      #e5dce2 32px
+    );
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 18px;
+  line-height: 32px;
+}
+
+.a1-schreiben-word-count {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+@media (max-width: 760px) {
+  .a1-schreiben-part-header,
+  .a1-schreiben-letter-task {
+    padding: 20px 16px;
+  }
+
+  .a1-schreiben-form-paper {
+    width: calc(100% - 24px);
+    margin-top: 26px;
+  }
+
+  .a1-schreiben-form-header {
+    grid-template-columns: 1fr;
+  }
+
+  .a1-schreiben-form-header > div:first-child {
+    border-right: 0;
+    border-bottom: 2px solid #111;
+  }
+
+  .a1-schreiben-form-row {
+    grid-template-columns: 1fr;
+    padding: 12px 0;
+  }
+
+  .a1-schreiben-form-number {
+    left: auto;
+    right: 0;
+    top: 17px;
+    transform: none;
+  }
+
+  .a1-schreiben-form-row input {
+    margin-left: 0;
+    padding-right: 42px;
+  }
+}

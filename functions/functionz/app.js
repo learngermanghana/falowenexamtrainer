@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA1AudioKey, validateA2AudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA2AudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -776,6 +776,59 @@ app.get("/course-media/a1/audio-url", async (req, res) => {
   }
 });
 
+app.get("/course-media/a1/mock-audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.query?.mockId || "").trim();
+    const part = String(req.query?.part || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateA1MockAudioKey({ mockId, part, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid A1 mock audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getA1MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.a1_mock.access_denied", {
+        reason: accessBlockReason,
+        mockId: validated.mockId,
+        part: validated.part,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "A1 mock audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createA1MockAudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+      mockId: signed.mockId,
+      part: signed.part,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("A1 mock R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "A1 mock audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_A1_MOCK_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid A1 mock audio request" });
+    }
+    console.error("Failed to create A1 mock audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this A1 mock audio right now." });
+  }
+});
+
 app.get("/course-media/a2/audio-url", async (req, res) => {
   try {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
@@ -1410,8 +1463,8 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
     A1: [
       "A1 GOETHE CHECKS:",
       "- Teil 1: self-introduction (e.g., Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby) in short simple sentences.",
-      "- Teil 2: student should ask and answer their own short question (W-question or Ja/Nein question).",
-      "- Teil 3: student should make a request using patterns like 'Verb + Sie + bitte' or 'Können Sie ...' with infinitive at the end.",
+      "- Teil 2: student should form an appropriate short question from the prompt/keyword (W-question or Ja/Nein question). In this single-candidate mock, do not require the student to answer their own question.",
+      "- Teil 3: student should make one understandable polite request using patterns like 'Verb + Sie + bitte' or 'Können Sie ...' with infinitive at the end.",
     ].join("\n"),
     A2: [
       "A2 GOETHE CHECKS:",
@@ -1690,6 +1743,160 @@ const speechTrainerPrompt = ({ level, note }) =>
   ]
     .filter(Boolean)
     .join(" ");
+
+const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+  const safeAttempts = attempts.map((attempt) => ({
+    teil: String(attempt?.teil || "").trim(),
+    task: String(attempt?.task || "").trim(),
+    transcript: String(attempt?.transcript || "").trim(),
+    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
+  }));
+
+  return [
+    "You are a strict Goethe-style A1 speaking examiner for a Falowen mock exam.",
+    "Assess ONLY what the learner actually said in the supplied transcripts. Do not invent missing content. If a Teil transcript is empty because the learner did not complete it before time expired, score that Teil 0.",
+    "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+    "Judge at CEFR A1 standard. Normal A1 grammar mistakes are acceptable when the message is understandable.",
+    "Do not reward advanced language simply for sounding sophisticated. If language is clearly far beyond normal A1 production, set level_mismatch=true, but NEVER accuse the learner of using AI, a translator, or memorization.",
+    "Because the source is a speech-to-text transcript, do not pretend you can measure accent or phonetic precision. Score comprehensibility/readiness from whether the spoken response was successfully captured and communicatively clear.",
+    "",
+    "SCORING — total 25 points:",
+    "Teil 1 self-introduction: 9 points. Task coverage 5; simple A1 language/control 2; comprehensibility 2.",
+    "Teil 2 question from keyword: 8 points. Appropriate question/task fulfilment 4; A1 question form 2; comprehensibility 2.",
+    "Teil 3 polite request: 8 points. Appropriate request/task fulfilment 4; polite A1 form 2; comprehensibility 2.",
+    "Pass mark for Sprechen mock: 15/25.",
+    "",
+    "Required JSON only, no markdown:",
+    JSON.stringify({
+      score: 0,
+      maxScore: 25,
+      passed: false,
+      level_mismatch: false,
+      overall_feedback_en: "Short English feedback.",
+      parts: {
+        teil1: {
+          score: 0,
+          maxScore: 9,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        },
+        teil2: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        },
+        teil3: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a1_language: 0,
+          comprehensibility: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A1 German example."
+        }
+      }
+    }),
+    "",
+    "Student attempts:",
+    JSON.stringify(safeAttempts),
+  ].join("\n");
+};
+
+
+const normalizeA1MockFormValue = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[.,;:!?()[\]{}]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const scoreA1MockWritingForm = (formValues = {}) => {
+  const value = (number) => normalizeA1MockFormValue(formValues?.[number] ?? formValues?.[String(number)] ?? "");
+  const checks = {
+    1: /^(3|drei)( personen)?$/.test(value(1)),
+    2: /^(1|ein|eins|eine)( kind)?$/.test(value(2)),
+    3: /^(10|zehn)( jahre?)?$/.test(value(3)),
+    4: /24/.test(value(4)) && /(oktober|10)/.test(value(4)),
+    5: /^(bar|barzahlung)$/.test(value(5)),
+  };
+
+  const labels = {
+    1: "3 Personen",
+    2: "1 Kind",
+    3: "10 Jahre",
+    4: "Samstag, 24. Oktober",
+    5: "bar",
+  };
+
+  const fields = Object.entries(checks).map(([number, correct]) => ({
+    number: Number(number),
+    correct: Boolean(correct),
+    expected: labels[number],
+    submitted: String(formValues?.[number] ?? formValues?.[String(number)] ?? "").trim(),
+  }));
+
+  return {
+    score: fields.filter((field) => field.correct).length * 2,
+    maxScore: 10,
+    fields,
+  };
+};
+
+const a1MockWritingScorePrompt = ({ text = "" }) => [
+  "You are a strict Goethe-style A1 writing examiner for a Falowen mock exam.",
+  "Assess the learner's German email exactly as submitted. Do not rewrite it before scoring and do not invent missing information.",
+  "The task: write to Kochschule GenussZeit. The learner must (1) register for the course 'Italienische Küche', (2) ask when the next course begins, and (3) ask the price.",
+  "A suitable greeting, closing and the learner's name are required, but they are not extra content points.",
+  "Feedback for the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR A1 standard. Normal A1 grammar/spelling errors are acceptable when the message remains understandable.",
+  "Do not reward advanced vocabulary merely because it sounds impressive. If the language is clearly far beyond typical A1 production, set level_mismatch=true, but NEVER accuse the learner of using AI, a translator or memorization.",
+  "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
+  "",
+  "SCORING — 15 points total:",
+  "Content points: 6 points — 2 each for registration, next-course-start question, price question.",
+  "Message structure: 3 points — greeting 1, closing 1, name 1.",
+  "A1 language control: 4 points — simple understandable sentences/questions, basic word order and vocabulary. Meaning matters more than perfection.",
+  "A1 appropriateness: 2 points — reasonably simple A1 production, not unnecessarily elaborate.",
+  "",
+  "Return JSON only, no markdown, using exactly this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 15,
+    level_mismatch: false,
+    content: {
+      registration: 0,
+      next_course_start: 0,
+      price: 0
+    },
+    structure: {
+      greeting: 0,
+      closing: 0,
+      name: 0
+    },
+    a1_language_score: 0,
+    a1_fit_score: 0,
+    feedback_en: "Short English feedback.",
+    corrections: [
+      {
+        original_de: "Short student phrase if needed.",
+        corrected_de: "Short corrected German phrase.",
+        explanation_en: "Brief English explanation."
+      }
+    ]
+  }),
+  "",
+  `Student email:\n${String(text || "").trim()}`,
+].join("\n");
 
 const placementPrompt = ({ answers, targetLevel }) => {
   const formattedAnswers = answers
@@ -3040,6 +3247,270 @@ app.get("/results/history", async (req, res) => {
   }
 });
 
+app.post("/writing/a1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const formValues = req.body?.formValues && typeof req.body.formValues === "object"
+      ? req.body.formValues
+      : {};
+    const text = String(req.body?.text || "").trim().slice(0, 5000);
+
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const form = scoreA1MockWritingForm(formValues);
+    let letter;
+
+    if (!text) {
+      letter = {
+        score: 0,
+        maxScore: 15,
+        level_mismatch: false,
+        content: { registration: 0, next_course_start: 0, price: 0 },
+        structure: { greeting: 0, closing: 0, name: 0 },
+        a1_language_score: 0,
+        a1_fit_score: 0,
+        feedback_en: "No email was submitted. Write a short A1 email that answers all three content points.",
+        corrections: [],
+      };
+    } else {
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: a1MockWritingScorePrompt({ text }) },
+          { role: "user", content: "Return the strict A1 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 900 },
+      );
+
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/i, "");
+
+      try {
+        letter = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the writing assessment safely. Please try marking again.",
+          code: "INVALID_WRITING_ASSESSMENT",
+        });
+      }
+
+      letter.score = Math.max(0, Math.min(15, Number(letter?.score) || 0));
+      letter.maxScore = 15;
+      letter.level_mismatch = Boolean(letter?.level_mismatch);
+      letter.feedback_en = String(letter?.feedback_en || "").trim();
+      letter.corrections = Array.isArray(letter?.corrections) ? letter.corrections.slice(0, 5) : [];
+    }
+
+    const score = Math.max(0, Math.min(25, Number(form.score || 0) + Number(letter.score || 0)));
+    const result = {
+      score,
+      maxScore: 25,
+      passed: score >= 15,
+      form,
+      letter,
+      submittedText: text,
+    };
+
+    auditAIRequest({
+      route: "/writing/a1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        score,
+        formScore: form.score,
+        letterScore: letter.score,
+        levelMismatch: Boolean(letter.level_mismatch),
+      },
+    });
+
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/a1-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/a1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A1 writing mock." });
+  }
+});
+
+app.post("/a1-mock/attempt/start", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
+    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a1MockExamUsers").doc(authedUser.uid);
+    const newAttemptRef = userRef.collection("attempts").doc();
+    let responsePayload = null;
+
+    await db.runTransaction(async (tx) => {
+      const userSnap = await tx.get(userRef);
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      if (activeAttemptId) {
+        const activeRef = userRef.collection("attempts").doc(activeAttemptId);
+        const activeSnap = await tx.get(activeRef);
+        if (activeSnap.exists) {
+          const activeData = activeSnap.data() || {};
+          if (activeData.mockId === mockId && activeData.status === "in_progress") {
+            responsePayload = {
+              attemptId: activeAttemptId,
+              attemptNumber: Number(activeData.attemptNumber || 1),
+              firstAttempt: Boolean(activeData.firstAttempt),
+              state: activeData.state || null,
+              resumed: true,
+            };
+            return;
+          }
+        }
+      }
+
+      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptNumber = attemptCount + 1;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(
+        userRef,
+        {
+          uid: authedUser.uid,
+          email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+          attemptCount: attemptNumber,
+          activeAttemptId: newAttemptRef.id,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      tx.set(newAttemptRef, {
+        uid: authedUser.uid,
+        email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+        mockId,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        status: "in_progress",
+        section: "intro",
+        state: null,
+        sectionScores: {},
+        startedAt: now,
+        updatedAt: now,
+      });
+
+      responsePayload = {
+        attemptId: newAttemptRef.id,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        state: null,
+        resumed: false,
+      };
+    });
+
+    return res.json(responsePayload);
+  } catch (err) {
+    console.error("/a1-mock/attempt/start error", err);
+    return res.status(500).json({ error: err.message || "Could not start the A1 mock attempt." });
+  }
+});
+
+app.post("/a1-mock/attempt/save", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const attemptId = String(req.body?.attemptId || "").trim();
+    const status = String(req.body?.status || "in_progress").trim();
+    const section = String(req.body?.section || "").trim().slice(0, 40);
+    const state = req.body?.state && typeof req.body.state === "object" ? req.body.state : {};
+    const sectionScores = req.body?.sectionScores && typeof req.body.sectionScores === "object"
+      ? req.body.sectionScores
+      : {};
+    const overall = req.body?.overall && typeof req.body.overall === "object"
+      ? req.body.overall
+      : null;
+
+    if (!attemptId) return res.status(400).json({ error: "attemptId is required" });
+    if (!["in_progress", "completed"].includes(status)) {
+      return res.status(400).json({ error: "Invalid mock attempt status" });
+    }
+
+    const serializedState = JSON.stringify(state);
+    if (serializedState.length > 150000) {
+      return res.status(400).json({ error: "Mock attempt state is too large." });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a1MockExamUsers").doc(authedUser.uid);
+    const attemptRef = userRef.collection("attempts").doc(attemptId);
+    const attemptSnap = await attemptRef.get();
+    if (!attemptSnap.exists) return res.status(404).json({ error: "Mock attempt not found." });
+
+    const existing = attemptSnap.data() || {};
+    if (existing.uid && existing.uid !== authedUser.uid) {
+      return res.status(403).json({ error: "This mock attempt belongs to another account." });
+    }
+
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const patch = {
+      state,
+      section,
+      sectionScores,
+      status,
+      updatedAt: now,
+      ...(overall ? { overall } : {}),
+      ...(status === "completed" ? { completedAt: now } : {}),
+    };
+    await attemptRef.set(patch, { merge: true });
+
+    if (status === "completed") {
+      await userRef.set(
+        {
+          activeAttemptId: null,
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(overall?.score || 0),
+          lastCompletedPassed: Boolean(overall?.passed),
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+    } else {
+      await userRef.set({ activeAttemptId: attemptId, updatedAt: now }, { merge: true });
+    }
+
+    return res.json({ ok: true, attemptId, status });
+  } catch (err) {
+    console.error("/a1-mock/attempt/save error", err);
+    return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
+  }
+});
+
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
@@ -3201,6 +3672,100 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
     console.error("/speaking/interaction-score error", err);
     auditAIRequest({ route: "/speaking/interaction-score", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to score interaction" });
+  }
+});
+
+app.post("/speaking/a1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    if (attempts.length !== 3) {
+      return res.status(400).json({ error: "Three speaking attempts are required." });
+    }
+
+    const normalizedAttempts = attempts.map((attempt) => ({
+      teil: String(attempt?.teil || "").trim(),
+      task: String(attempt?.task || "").trim().slice(0, 600),
+      transcript: String(attempt?.transcript || "").trim().slice(0, 3000),
+      analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2000),
+    }));
+
+    const expectedTeils = ["1", "2", "3"];
+    const suppliedTeils = normalizedAttempts.map((attempt) => attempt.teil).sort();
+    if (
+      suppliedTeils.length !== expectedTeils.length ||
+      suppliedTeils.some((teil, index) => teil !== expectedTeils[index])
+    ) {
+      return res.status(400).json({ error: "Teil 1, Teil 2 and Teil 3 are required." });
+    }
+
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speaking",
+      limit: DAILY_LIMITS.speaking,
+    });
+    if (!quota.allowed) {
+      return res.status(429).json({
+        error: "Daily speaking analysis limit reached",
+        code: "SPEAKING_QUOTA_REACHED",
+      });
+    }
+
+    const messages = [
+      { role: "system", content: a1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "user", content: "Return the final A1 mock speaking assessment as the required JSON object." },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1000 });
+    const cleanedReply = String(reply || "")
+      .trim()
+      .replace(/^\`\`\`(?:json)?\s*/i, "")
+      .replace(/\s*\`\`\`$/i, "");
+
+    let result;
+    try {
+      result = JSON.parse(cleanedReply);
+    } catch (_error) {
+      return res.status(502).json({
+        error: "Falowen could not read the speaking assessment safely. Please try marking again.",
+        code: "INVALID_SPEAKING_ASSESSMENT",
+      });
+    }
+
+    const numericScore = Math.max(0, Math.min(25, Number(result?.score) || 0));
+    result.score = numericScore;
+    result.maxScore = 25;
+    result.passed = numericScore >= 15;
+    result.level_mismatch = Boolean(result?.level_mismatch);
+
+    auditAIRequest({
+      route: "/speaking/a1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        attemptsCount: normalizedAttempts.length,
+        score: numericScore,
+        passed: result.passed,
+        levelMismatch: result.level_mismatch,
+        quotaRemaining: quota.remaining,
+      },
+    });
+
+    return res.json({ result, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speaking/a1-mock-score error", err);
+    auditAIRequest({
+      route: "/speaking/a1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A1 speaking mock." });
   }
 });
 
