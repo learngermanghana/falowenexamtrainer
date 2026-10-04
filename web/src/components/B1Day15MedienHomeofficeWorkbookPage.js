@@ -113,70 +113,63 @@ export const B1_DAY15_MEDIEN_HOMEOFFICE_WORKBOOK_CONFIG = {
   writing: getB1WritingTask(15),
   reading: getB1ReadingTask(15),
   listening: {
-    title:
-      "Hören Sie den Beitrag über Digitalisierung und beantworten Sie die fünf Fragen.",
-    instructions:
-      "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
-    image:
-      "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Hörübung über Digitalisierung",
-    videoId: "8_-AA6tpbUI",
-    externalUrl: "https://youtu.be/8_-AA6tpbUI",
+    title: "Hören Sie das Interview über Homeoffice und digitale Medien und beantworten Sie die fünf Fragen.",
+    instructions: "Lesen Sie zuerst die Fragen. Hören Sie dann aufmerksam auf Ellens Erfahrungen, die verwendeten Medien und ihre praktischen Tipps.",
+    image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Hörübung über Homeoffice und digitale Medien",
+    audioKey: "audio/day_15.mp3",
     videoTitle: "B1 Day 15 Medien und Arbeiten im Homeoffice Hören",
     submitRequired: true,
-    selfCheckText:
-      "Hören ist Teil dieser Aufgabe. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    selfCheckText: "Hören ist Teil dieser Aufgabe. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
     questions: [
       {
-        stem: "Was ist ein Vorteil der Digitalisierung im Berufsleben?",
+        stem: "Welchen Vorteil des Homeoffice nennt Ellen?",
         options: [
-          "a) Mehr Arbeitsplätze.",
-          "b) Höhere Produktivität.",
-          "c) Flexibilität durch Homeoffice.",
-          "d) Weniger Arbeit.",
+          "a) Sie verdient im Homeoffice mehr Geld.",
+          "b) Sie spart Zeit und kann ihren Tag flexibler planen.",
+          "c) Sie hat dort mehr Besprechungen.",
+          "d) Sie muss keine Pausen machen.",
         ],
       },
       {
-        stem:
-          "Welche Probleme entstehen durch die ständige Verfügbarkeit von digitalen Tools?",
+        stem: "Welche Nachteile des Homeoffice beschreibt Ellen?",
         options: [
-          "a) Keine Freizeit.",
-          "b) Mehr Stress und weniger Trennung von Arbeit und Privatleben.",
-          "c) Weniger Kommunikation.",
-          "d) Weniger Arbeit.",
+          "a) Sie muss häufiger pendeln und länger arbeiten.",
+          "b) Sie hat zu viele persönliche Treffen.",
+          "c) Sie hat weniger Kontakt zu den Kollegen und kann nach der Arbeit schwer abschalten.",
+          "d) Sie kann digitale Medien nicht benutzen.",
         ],
       },
       {
-        stem: "Warum profitieren nicht alle Menschen von der digitalen Bildung?",
+        stem: "Welche Medien nutzt Ellens Team für die Zusammenarbeit?",
         options: [
-          "a) Wegen technischer Ungleichheiten.",
-          "b) Wegen mangelndem Interesse.",
-          "c) Wegen überfüllter Schulen.",
-          "d) Wegen schlechter Lehrer.",
+          "a) Videokonferenzen für große Besprechungen und einen Chat für kurze Fragen.",
+          "b) Nur E-Mails für alle Gespräche.",
+          "c) Ausschließlich Telefonate.",
+          "d) Soziale Medien für Besprechungen.",
         ],
       },
       {
-        stem: "Welche negativen Folgen hat die digitale Freizeitgestaltung?",
+        stem: "Wie prüft Ellen Informationen aus dem Internet?",
         options: [
-          "a) Mehr soziale Kontakte.",
-          "b) Schlechte Unterhaltungsmöglichkeiten.",
-          "c) Gesundheitliche Probleme.",
-          "d) Mehr Stress.",
+          "a) Sie vertraut immer der ersten Webseite.",
+          "b) Sie fragt nur Kolleginnen und Kollegen.",
+          "c) Sie vergleicht mehrere Quellen.",
+          "d) Sie liest keine Online-Nachrichten.",
         ],
       },
       {
-        stem:
-          "Was ist die größte Herausforderung für den digitalen Menschen laut dem Hörtext?",
+        stem: "Welchen praktischen Rat gibt Ellen für gutes Arbeiten im Homeoffice?",
         options: [
-          "a) Ständige technologische Entwicklung.",
-          "b) Fehlende Freizeitmöglichkeiten.",
-          "c) Eine Balance zwischen digitalem und realem Leben finden.",
-          "d) Zu wenig technische Möglichkeiten.",
+          "a) Den ganzen Tag am Küchentisch arbeiten und Pausen vermeiden.",
+          "b) Einen festen Arbeitsplatz haben, feste Pausen machen und Kollegen auch persönlich treffen.",
+          "c) Nach Feierabend weiter erreichbar bleiben.",
+          "d) Möglichst alle Aufgaben allein erledigen.",
         ],
       },
     ],
     steps: [
-      "Hören Sie den Beitrag einmal vollständig.",
+      "Hören Sie das Interview einmal vollständig.",
       "Lesen Sie die Fragen und Antwortmöglichkeiten.",
       "Hören Sie wichtige Stellen ein zweites Mal.",
       "Schreiben Sie Ihre fünf Antwortbuchstaben in den Submit-Tab.",
