@@ -343,6 +343,9 @@ export default function A1FinalMockExamPage() {
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
   const completionSaveRef = useRef("");
+  const completionRetryCountRef = useRef(0);
+  const completionRetryTimerRef = useRef(null);
+  const [completionRetryNonce, setCompletionRetryNonce] = useState(0);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -354,7 +357,7 @@ export default function A1FinalMockExamPage() {
       window.localStorage.setItem(storageKey, JSON.stringify(exam));
     }
 
-    if (!exam.attemptInfo?.attemptId || !idToken) return undefined;
+    if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
 
     saveTimerRef.current = window.setTimeout(() => {
@@ -378,11 +381,13 @@ export default function A1FinalMockExamPage() {
 
   useEffect(() => {
     const attemptId = exam.attemptInfo?.attemptId;
-    if (!exam.completed || !attemptId || !idToken) return;
+    if (!exam.completed || !attemptId || !idToken) return undefined;
 
-    const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}`;
-    if (completionSaveRef.current === completionKey) return;
+    const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
+    if (completionSaveRef.current === completionKey) return undefined;
     completionSaveRef.current = completionKey;
+
+    let cancelled = false;
 
     saveA1MockAttempt({
       idToken,
@@ -392,11 +397,43 @@ export default function A1FinalMockExamPage() {
       sectionScores: exam.sectionScores,
       status: "completed",
       overall: exam.overall,
-    }).catch((saveError) => {
-      console.error("Could not finalize A1 mock result sync", saveError);
-      completionSaveRef.current = "";
-    });
+    })
+      .then((response) => {
+        if (cancelled) return;
+        if (response?.completionSync && response.completionSync.ok === false) {
+          const syncError = new Error(response.completionSync.error || "Could not sync final mock result.");
+          syncError.retryable = true;
+          throw syncError;
+        }
+        completionRetryCountRef.current = 0;
+        if (completionRetryTimerRef.current) {
+          window.clearTimeout(completionRetryTimerRef.current);
+          completionRetryTimerRef.current = null;
+        }
+      })
+      .catch((saveError) => {
+        if (cancelled) return;
+        console.error("Could not finalize A1 mock result sync", saveError);
+        completionSaveRef.current = "";
+
+        const retryIndex = Math.min(completionRetryCountRef.current, 3);
+        const retryDelay = [3000, 10000, 30000, 60000][retryIndex];
+        completionRetryCountRef.current += 1;
+
+        if (completionRetryTimerRef.current) {
+          window.clearTimeout(completionRetryTimerRef.current);
+        }
+        completionRetryTimerRef.current = window.setTimeout(() => {
+          completionRetryTimerRef.current = null;
+          setCompletionRetryNonce((value) => value + 1);
+        }, retryDelay);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [
+    completionRetryNonce,
     exam.completed,
     exam.attemptInfo?.attemptId,
     exam.overall,
@@ -404,6 +441,15 @@ export default function A1FinalMockExamPage() {
     exam,
     idToken,
   ]);
+
+  useEffect(
+    () => () => {
+      if (completionRetryTimerRef.current) {
+        window.clearTimeout(completionRetryTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const secondsLeft = useMemo(() => {
     if (!exam.sectionDeadlineMs || !SECTION_DURATIONS[exam.stage]) return 0;
@@ -494,6 +540,7 @@ export default function A1FinalMockExamPage() {
       const result = await scoreA1MockWriting({
         formValues: exam.schreibenForm,
         text: exam.schreibenText,
+        attemptId: exam.attemptInfo?.attemptId || "",
         idToken,
       });
       moveToSection("sprechen", {
@@ -506,7 +553,7 @@ export default function A1FinalMockExamPage() {
     } finally {
       setBusy("");
     }
-  }, [busy, exam.schreibenForm, exam.schreibenText, exam.sectionScores, exam.speakingProgress, idToken, moveToSection]);
+  }, [busy, exam.attemptInfo?.attemptId, exam.schreibenForm, exam.schreibenText, exam.sectionScores, exam.speakingProgress, idToken, moveToSection]);
 
   const finishExamWithSpeaking = useCallback((speakingResult) => {
     setExam((current) => {
@@ -1040,6 +1087,7 @@ export default function A1FinalMockExamPage() {
             externalSecondsLeft={secondsLeft}
             initialAttempts={exam.speakingProgress?.attempts || {}}
             initialResult={exam.speakingResult}
+            attemptId={exam.attemptInfo?.attemptId || ""}
             onProgress={speakingProgressHandler}
             onComplete={finishExamWithSpeaking}
           />

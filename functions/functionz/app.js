@@ -81,7 +81,11 @@ function initFirebaseAdmin() {
 initFirebaseAdmin();
 
 const { scoresSummaryHandler } = require("./routes/scoresSummary");
-const { syncA1MockCompletion } = require("./a1MockCompletionSync");
+const {
+  buildVerifiedA1MockScore,
+  persistVerifiedA1MockSection,
+  syncA1MockCompletion,
+} = require("./a1MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -3313,6 +3317,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       ? req.body.formValues
       : {};
     const text = String(req.body?.text || "").trim().slice(0, 5000);
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
 
     if (!ensureOpenAIConfigured(res)) return;
 
@@ -3382,6 +3387,38 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       letter,
       submittedText: text,
     };
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) {
+        return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      }
+      try {
+        await persistVerifiedA1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "schreiben",
+          score,
+          source: "/writing/a1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A1_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A1_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A1_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Schreiben result for this mock attempt.",
+          code: code || "A1_MOCK_SCHREIBEN_VERIFY_FAILED",
+        });
+      }
+    }
 
     auditAIRequest({
       route: "/writing/a1-mock-score",
@@ -3547,13 +3584,42 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      // Completion is monotonic. A delayed autosave or stale tab must never reopen
-      // a completed attempt or make it active again.
+      // Completion is monotonic, but a completed record is only publishable when
+      // all four section scores can be reconstructed from server-trusted data.
       if (existing.status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedA1MockScore({
+            state: existing.state || {},
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "A1_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
         const completedUserPatch = {
           lastCompletedAttemptId: attemptId,
-          lastCompletedScore: Number(existing.overall?.score || 0),
-          lastCompletedPassed: Boolean(existing.overall?.passed),
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
           updatedAt: now,
         };
         if (String(userData.activeAttemptId || "") === attemptId) {
@@ -3569,22 +3635,56 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         return;
       }
 
-      const patch = {
-        state,
-        section,
-        sectionScores,
-        status,
-        updatedAt: now,
-        ...(overall ? { overall } : {}),
-        ...(status === "completed" ? { completedAt: now } : {}),
-      };
-      tx.set(attemptRef, patch, { merge: true });
-
       if (status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedA1MockScore({
+            state,
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          tx.set(
+            attemptRef,
+            {
+              state,
+              section,
+              sectionScores,
+              ...(overall ? { overall } : {}),
+              status: "in_progress",
+              updatedAt: now,
+            },
+            { merge: true },
+          );
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "A1_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            state,
+            section,
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            status: "completed",
+            completedAt: now,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
         const completedUserPatch = {
           lastCompletedAttemptId: attemptId,
-          lastCompletedScore: Number(overall?.score || 0),
-          lastCompletedPassed: Boolean(overall?.passed),
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
           updatedAt: now,
         };
         if (
@@ -3594,18 +3694,32 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           completedUserPatch.activeAttemptId = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
-      } else {
-        const progressUserPatch = { updatedAt: now };
-        if (
-          !userData.activeAttemptId ||
-          String(userData.activeAttemptId) === attemptId
-        ) {
-          progressUserPatch.activeAttemptId = attemptId;
-        }
-        tx.set(userRef, progressUserPatch, { merge: true });
+        saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
       }
 
-      saveOutcome = { ok: true, attemptId, status };
+      tx.set(
+        attemptRef,
+        {
+          state,
+          section,
+          sectionScores,
+          ...(overall ? { overall } : {}),
+          status: "in_progress",
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      const progressUserPatch = { updatedAt: now };
+      if (
+        !userData.activeAttemptId ||
+        String(userData.activeAttemptId) === attemptId
+      ) {
+        progressUserPatch.activeAttemptId = attemptId;
+      }
+      tx.set(userRef, progressUserPatch, { merge: true });
+      saveOutcome = { ok: true, attemptId, status: "in_progress" };
     });
 
     if (saveOutcome?.notFound) {
@@ -3614,6 +3728,14 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     if (saveOutcome?.forbidden) {
       return res.status(403).json({ error: "This mock attempt belongs to another account." });
     }
+    if (saveOutcome?.invalidCompletion) {
+      return res.status(409).json({
+        error: saveOutcome.error,
+        code: saveOutcome.code,
+        section: saveOutcome.section,
+        retryable: true,
+      });
+    }
 
     let completionSync = null;
     if (status === "completed" && saveOutcome?.ok) {
@@ -3621,13 +3743,18 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         const studentProfile = await findAuthedStudentProfile(db, authedUser);
         const attemptSnap = await attemptRef.get();
         const attemptData = attemptSnap.exists ? attemptSnap.data() || {} : {};
-        const effectiveOverall = attemptData.overall && typeof attemptData.overall === "object"
-          ? attemptData.overall
-          : overall || {};
-        const effectiveSectionScores =
-          attemptData.sectionScores && typeof attemptData.sectionScores === "object"
-            ? attemptData.sectionScores
-            : sectionScores || {};
+        const verifiedOverall =
+          attemptData.verifiedOverall && typeof attemptData.verifiedOverall === "object"
+            ? attemptData.verifiedOverall
+            : null;
+        const verifiedSectionScores =
+          attemptData.verifiedSectionScores && typeof attemptData.verifiedSectionScores === "object"
+            ? attemptData.verifiedSectionScores
+            : null;
+
+        if (!verifiedOverall || !verifiedSectionScores) {
+          throw new Error("Server-verified A1 mock totals are missing.");
+        }
 
         completionSync = await syncA1MockCompletion({
           db,
@@ -3637,8 +3764,8 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           attemptId,
           attemptNumber: Number(attemptData.attemptNumber || 1),
           firstAttempt: Boolean(attemptData.firstAttempt),
-          overall: effectiveOverall,
-          sectionScores: effectiveSectionScores,
+          overall: verifiedOverall,
+          sectionScores: verifiedSectionScores,
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
@@ -3672,6 +3799,12 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           },
           { merge: true },
         ).catch(() => {});
+
+        return res.status(503).json({
+          ...(saveOutcome || { ok: true, attemptId, status: "completed" }),
+          completionSync,
+          retryable: true,
+        });
       }
     }
 
@@ -3684,7 +3817,6 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
   }
 });
-
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
@@ -3856,6 +3988,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     if (!authedUser) return;
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking attempts are required." });
     }
@@ -3916,6 +4049,38 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     result.maxScore = 25;
     result.passed = numericScore >= 15;
     result.level_mismatch = Boolean(result?.level_mismatch);
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) {
+        return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      }
+      try {
+        await persistVerifiedA1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "sprechen",
+          score: numericScore,
+          source: "/speaking/a1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A1_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A1_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A1_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Sprechen result for this mock attempt.",
+          code: code || "A1_MOCK_SPRECHEN_VERIFY_FAILED",
+        });
+      }
+    }
 
     auditAIRequest({
       route: "/speaking/a1-mock-score",

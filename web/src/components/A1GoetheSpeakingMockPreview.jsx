@@ -78,6 +78,7 @@ export default function A1GoetheSpeakingMockPreview({
   externalSecondsLeft,
   initialAttempts = {},
   initialResult = null,
+  attemptId = "",
   onProgress,
   onComplete,
 }) {
@@ -331,6 +332,7 @@ export default function A1GoetheSpeakingMockPreview({
           transcript: attemptsRef.current[task.id]?.transcript || "",
           analysisFeedback: attemptsRef.current[task.id]?.analysisFeedback || "",
         })),
+        attemptId,
         idToken,
       });
       setResult(assessment);
@@ -343,7 +345,7 @@ export default function A1GoetheSpeakingMockPreview({
     } finally {
       setMarking(false);
     }
-  }, [completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
+  }, [attemptId, completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
 
   useEffect(() => {
     if (!started || secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;

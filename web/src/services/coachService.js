@@ -138,10 +138,10 @@ export const scoreInteractionAudio = async ({
   return response.data;
 };
 
-export const scoreA1MockSpeaking = async ({ attempts, idToken }) => {
+export const scoreA1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
   const response = await axios.post(
     `${speakingApiUrl}/speaking/a1-mock-score`,
-    { attempts },
+    { attempts, attemptId },
     { headers: authHeaders(idToken) }
   );
 
