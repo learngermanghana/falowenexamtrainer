@@ -943,6 +943,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   const getLessonHref = (entry) => {
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "A2" &&
+      Number(entry?.day) === 29
+    ) {
+      return entry?.workbook_link || "/campus/course/a2-final-mock-exam";
+    }
+
     const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
     const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";
     return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;
