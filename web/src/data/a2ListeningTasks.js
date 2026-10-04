@@ -155,14 +155,15 @@ export const A2_LISTENING_TASKS = {
   12: {
     chapter: "5.12",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre den Beitrag über Dr. Müllers Arbeitstag. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    audioUrl: "https://youtu.be/VGzHSjn3O-A",
+    task: "Hören Sie Lenas Monolog über ihren Traumberuf zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-12/day-12.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Wann beginnt Dr. Müllers Arbeitstag?", options: ["A) Um 5:00 Uhr", "B) Um 6:00 Uhr", "C) Um 7:00 Uhr", "D) Um 8:00 Uhr"] },
-      { stem: "Was macht Dr. Müller um 7:00 Uhr?", options: ["A) Liest die Patientenakten", "B) Bereitet sich auf die Visite vor", "C) Beginnt die Visite auf der Station", "D) Hat eine Besprechung mit Kollegen"] },
-      { stem: "Wann beginnt die Sprechstunde?", options: ["A) Um 8:00 Uhr", "B) Um 9:00 Uhr", "C) Um 10:00 Uhr", "D) Um 11:00 Uhr"] },
-      { stem: "Was macht Dr. Müller oft während seiner Mittagspause?", options: ["A) Isst in Ruhe", "B) Führt wichtige Telefonate", "C) Geht spazieren", "D) Liest ein Buch"] },
-      { stem: "Wann endet Dr. Müllers Arbeitstag selten?", options: ["A) Vor 16:00 Uhr", "B) Vor 17:00 Uhr", "C) Vor 18:00 Uhr", "D) Vor 19:00 Uhr"] },
+      { stem: "Was ist Lenas Traumberuf?", options: ["A) Lehrerin", "B) Tierärztin", "C) Biologin"] },
+      { stem: "Welche Tiere hat Lena zu Hause?", options: ["A) Zwei Hunde und eine Katze", "B) Einen Hund und ein Pferd", "C) Einen Hund und zwei Katzen"] },
+      { stem: "Wo arbeitet Lena als Tierärztin?", options: ["A) In einer Praxis", "B) Nur auf einem Bauernhof", "C) In einer Schule"] },
+      { stem: "Wie lange dauert Lenas Studium?", options: ["A) Drei Jahre", "B) Vier Jahre", "C) Sechs Jahre"] },
+      { stem: "Warum muss Lenas Deutsch besser werden?", options: ["A) Weil sie Deutschlehrerin werden möchte.", "B) Weil sie in Deutschland arbeiten möchte.", "C) Weil sie nach Österreich reisen möchte."] },
     ],
   },
   13: {
