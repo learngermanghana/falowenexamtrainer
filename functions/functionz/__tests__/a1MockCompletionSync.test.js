@@ -1,5 +1,8 @@
 const {
+  READING_ANSWER_KEY,
+  LISTENING_ANSWER_KEY,
   assignmentIdForAttempt,
+  buildVerifiedA1MockScore,
   buildA1MockCompletionArtifacts,
   deriveMockInsights,
 } = require("../a1MockCompletionSync");
@@ -94,5 +97,69 @@ describe("A1 mock completion Admin + announcement sync", () => {
       strongest: "Sprechen",
       weakest: "Schreiben",
     });
+  });
+});
+
+
+describe("A1 mock verified score publication", () => {
+  const verifiedSections = {
+    schreiben: { verified: true, score: 18, source: "/writing/a1-mock-score" },
+    sprechen: { verified: true, score: 20, source: "/speaking/a1-mock-score" },
+  };
+
+  test("recomputes Lesen and Hören from server answer keys", () => {
+    const result = buildVerifiedA1MockScore({
+      state: {
+        lesenAnswers: { ...READING_ANSWER_KEY },
+        hoerenAnswers: { ...LISTENING_ANSWER_KEY },
+      },
+      verifiedSections,
+    });
+
+    expect(result.sectionScores).toEqual({
+      lesen: 25,
+      hoeren: 25,
+      schreiben: 18,
+      sprechen: 20,
+    });
+    expect(result.overall).toEqual({
+      score: 88,
+      maxScore: 100,
+      passed: true,
+    });
+  });
+
+  test("rejects completion when a server-verified AI section is missing", () => {
+    expect(() =>
+      buildVerifiedA1MockScore({
+        state: {
+          lesenAnswers: { ...READING_ANSWER_KEY },
+          hoerenAnswers: { ...LISTENING_ANSWER_KEY },
+        },
+        verifiedSections: {
+          schreiben: { verified: true, score: 25 },
+        },
+      }),
+    ).toThrow(/server-verified sprechen/i);
+  });
+
+  test("ignores forged client totals by scoring objective answers itself", () => {
+    const result = buildVerifiedA1MockScore({
+      state: {
+        lesenAnswers: {},
+        hoerenAnswers: {
+          ...LISTENING_ANSWER_KEY,
+          "t1-1": "A",
+        },
+        overall: { score: 100, passed: true },
+        sectionScores: { lesen: 25, hoeren: 25, schreiben: 25, sprechen: 25 },
+      },
+      verifiedSections,
+    });
+
+    expect(result.sectionScores.lesen).toBe(0);
+    expect(result.objective.hoeren.correct).toBe(14);
+    expect(result.sectionScores.hoeren).toBe(23.3);
+    expect(result.overall.score).toBe(61.3);
   });
 });
