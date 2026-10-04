@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import {
   SPEAKING_AUDIO_MIN_SECONDS,
@@ -33,6 +33,8 @@ const useRecorder = () => {
   const chunksRef = useRef([]);
   const secondsRef = useRef(0);
   const timerRef = useRef(null);
+  const mountedRef = useRef(true);
+  const recordingsRef = useRef({});
 
   const cleanup = () => {
     if (timerRef.current) window.clearInterval(timerRef.current);
@@ -40,6 +42,33 @@ const useRecorder = () => {
     if (streamRef.current) streamRef.current.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
   };
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      cleanup();
+
+      const recorder = recorderRef.current;
+      if (recorder) {
+        recorder.ondataavailable = null;
+        recorder.onstop = null;
+        if (recorder.state === "recording") {
+          try {
+            recorder.stop();
+          } catch {
+            // Recorder may already be stopping while navigating away.
+          }
+        }
+        recorderRef.current = null;
+      }
+
+      Object.values(recordingsRef.current).forEach((item) => {
+        if (item?.url) revokeObjectUrl(item.url);
+      });
+      recordingsRef.current = {};
+    };
+  }, []);
 
   const start = async ({ id, maxSeconds }) => {
     setError("");
@@ -54,6 +83,11 @@ const useRecorder = () => {
           channelCount: 1,
         },
       });
+      if (!mountedRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+
       streamRef.current = stream;
       chunksRef.current = [];
       const recorder = createSpeakingMediaRecorder(stream);
@@ -65,6 +99,7 @@ const useRecorder = () => {
 
       recorder.onstop = () => {
         cleanup();
+        if (!mountedRef.current) return;
         setRecordingId("");
         const duration = secondsRef.current;
         try {
@@ -75,7 +110,9 @@ const useRecorder = () => {
           const url = URL.createObjectURL(blob);
           setRecordings((current) => {
             if (current[id]?.url) revokeObjectUrl(current[id].url);
-            return { ...current, [id]: { blob, url, duration } };
+            const next = { ...current, [id]: { blob, url, duration } };
+            recordingsRef.current = next;
+            return next;
           });
         } catch (recordError) {
           setError(userFacingAudioError(recordError, recordError?.message || "No usable audio was captured."));
@@ -91,7 +128,9 @@ const useRecorder = () => {
       }, 1000);
     } catch (recordError) {
       cleanup();
-      setError(recordError?.message || "Microphone access was blocked.");
+      if (mountedRef.current) {
+        setError(recordError?.message || "Microphone access was blocked.");
+      }
     }
   };
 
