@@ -3469,42 +3469,97 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
 
     const userRef = db.collection("a1MockExamUsers").doc(authedUser.uid);
     const attemptRef = userRef.collection("attempts").doc(attemptId);
-    const attemptSnap = await attemptRef.get();
-    if (!attemptSnap.exists) return res.status(404).json({ error: "Mock attempt not found." });
-
-    const existing = attemptSnap.data() || {};
-    if (existing.uid && existing.uid !== authedUser.uid) {
-      return res.status(403).json({ error: "This mock attempt belongs to another account." });
-    }
-
     const now = admin.firestore.FieldValue.serverTimestamp();
-    const patch = {
-      state,
-      section,
-      sectionScores,
-      status,
-      updatedAt: now,
-      ...(overall ? { overall } : {}),
-      ...(status === "completed" ? { completedAt: now } : {}),
-    };
-    await attemptRef.set(patch, { merge: true });
+    let saveOutcome = null;
 
-    if (status === "completed") {
-      await userRef.set(
-        {
-          activeAttemptId: null,
+    await db.runTransaction(async (tx) => {
+      const [attemptSnap, userSnap] = await Promise.all([
+        tx.get(attemptRef),
+        tx.get(userRef),
+      ]);
+
+      if (!attemptSnap.exists) {
+        saveOutcome = { notFound: true };
+        return;
+      }
+
+      const existing = attemptSnap.data() || {};
+      if (existing.uid && existing.uid !== authedUser.uid) {
+        saveOutcome = { forbidden: true };
+        return;
+      }
+
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      // Completion is monotonic. A delayed autosave or stale tab must never reopen
+      // a completed attempt or make it active again.
+      if (existing.status === "completed") {
+        const completedUserPatch = {
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(existing.overall?.score || 0),
+          lastCompletedPassed: Boolean(existing.overall?.passed),
+          updatedAt: now,
+        };
+        if (String(userData.activeAttemptId || "") === attemptId) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "completed",
+          alreadyCompleted: true,
+        };
+        return;
+      }
+
+      const patch = {
+        state,
+        section,
+        sectionScores,
+        status,
+        updatedAt: now,
+        ...(overall ? { overall } : {}),
+        ...(status === "completed" ? { completedAt: now } : {}),
+      };
+      tx.set(attemptRef, patch, { merge: true });
+
+      if (status === "completed") {
+        const completedUserPatch = {
           lastCompletedAttemptId: attemptId,
           lastCompletedScore: Number(overall?.score || 0),
           lastCompletedPassed: Boolean(overall?.passed),
           updatedAt: now,
-        },
-        { merge: true },
-      );
-    } else {
-      await userRef.set({ activeAttemptId: attemptId, updatedAt: now }, { merge: true });
+        };
+        if (
+          !userData.activeAttemptId ||
+          String(userData.activeAttemptId) === attemptId
+        ) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+      } else {
+        const progressUserPatch = { updatedAt: now };
+        if (
+          !userData.activeAttemptId ||
+          String(userData.activeAttemptId) === attemptId
+        ) {
+          progressUserPatch.activeAttemptId = attemptId;
+        }
+        tx.set(userRef, progressUserPatch, { merge: true });
+      }
+
+      saveOutcome = { ok: true, attemptId, status };
+    });
+
+    if (saveOutcome?.notFound) {
+      return res.status(404).json({ error: "Mock attempt not found." });
+    }
+    if (saveOutcome?.forbidden) {
+      return res.status(403).json({ error: "This mock attempt belongs to another account." });
     }
 
-    return res.json({ ok: true, attemptId, status });
+    return res.json(saveOutcome || { ok: true, attemptId, status });
   } catch (err) {
     console.error("/a1-mock/attempt/save error", err);
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
