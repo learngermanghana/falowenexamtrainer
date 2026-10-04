@@ -223,43 +223,48 @@ const NoticeCard = ({ notice }) => (
 const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) => {
   const audioRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState("");
-  const [pendingPlay, setPendingPlay] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!audioUrl || !pendingPlay || !audioRef.current) return;
-    const audio = audioRef.current;
-    audio.play()
-      .then(() => {
-        setPendingPlay(false);
-        onStatusChange("started");
-      })
-      .catch((playError) => {
-        setPendingPlay(false);
-        setError(playError?.message || "Audio konnte nicht gestartet werden.");
-      });
-  }, [audioUrl, pendingPlay, onStatusChange]);
-
-  const startAudio = async () => {
-    if (loading || status === "ended") return;
+    let active = true;
     setLoading(true);
     setError("");
-    try {
-      const result = await fetchA1MockAudioPlaybackUrl({
-        mockId: "mock-01",
-        part,
-        key: objectKey,
-        idToken,
+
+    fetchA1MockAudioPlaybackUrl({
+      mockId: "mock-01",
+      part,
+      key: objectKey,
+      idToken,
+    })
+      .then((result) => {
+        if (!active) return;
+        setAudioUrl(result.url);
+      })
+      .catch((loadError) => {
+        if (!active) return;
+        setError(loadError?.response?.data?.error || loadError?.message || "Audio konnte nicht geladen werden.");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
       });
-      setAudioUrl(result.url);
-      setPendingPlay(true);
-    } catch (loadError) {
-      setError(loadError?.response?.data?.error || loadError?.message || "Audio konnte nicht geladen werden.");
-    } finally {
-      setLoading(false);
-    }
+
+    return () => {
+      active = false;
+    };
+  }, [idToken, objectKey, part]);
+
+  const startAudio = () => {
+    if (loading || status === "ended" || !audioRef.current || !audioUrl) return;
+    setError("");
+    const audio = audioRef.current;
+    audio.currentTime = 0;
+    audio.play()
+      .then(() => onStatusChange("started"))
+      .catch((playError) => {
+        setError(playError?.message || "Audio konnte nicht gestartet werden.");
+      });
   };
 
   return (
@@ -288,8 +293,18 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange }) =
       {status === "ended" ? (
         <strong className="a1-final-mock-audio-done">Audio beendet</strong>
       ) : (
-        <button type="button" onClick={startAudio} disabled={loading || pendingPlay || (status === "started" && Boolean(audioUrl))}>
-          {loading ? "Audio wird geladen …" : status === "started" && !audioUrl ? "Unterbrochenes Audio neu starten" : status === "started" ? "Audio läuft …" : "Audio starten"}
+        <button
+          type="button"
+          onClick={startAudio}
+          disabled={loading || !audioUrl || (status === "started" && Boolean(audioUrl))}
+        >
+          {loading
+            ? "Audio wird vorbereitet …"
+            : status === "started" && !audioUrl
+              ? "Unterbrochenes Audio neu starten"
+              : status === "started"
+                ? "Audio läuft …"
+                : "Audio starten"}
         </button>
       )}
       {error ? <p className="a1-final-mock-error">{error}</p> : null}
