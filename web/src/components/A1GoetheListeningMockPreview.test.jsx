@@ -66,6 +66,18 @@ describe("A1 Goethe-style Hören mock preview", () => {
     });
   });
 
+  test("uses one protected R2 audio object per Hören part", () => {
+    expect([
+      A1_GOETHE_LISTENING_MOCK.teil1.audioObjectKey,
+      A1_GOETHE_LISTENING_MOCK.teil2.audioObjectKey,
+      A1_GOETHE_LISTENING_MOCK.teil3.audioObjectKey,
+    ]).toEqual([
+      "a1/mock-hoeren/mock-01/teil-1.mp3",
+      "a1/mock-hoeren/mock-01/teil-2.mp3",
+      "a1/mock-hoeren/mock-01/teil-3.mp3",
+    ]);
+  });
+
   test("stays hidden from the A1 Course Book", () => {
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     const courseBookSource = fs.readFileSync(path.resolve(__dirname, "../data/a1CourseBookCards.js"), "utf8");
