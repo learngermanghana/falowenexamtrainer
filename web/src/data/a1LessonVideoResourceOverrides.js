@@ -248,16 +248,7 @@ export const applyA1LessonVideoResourceOverrides = (dictionary = {}) => {
   };
 
   a1[23] = {
-    videoResources: [
-      {
-        key: "a1-day23-dative-accusative-verbs-ai-video",
-        chapter: "14.2",
-        title: "A1 Day 23 · Dative and Accusative Verbs · AI video",
-        description:
-          "AI video lesson for recognizing dative and accusative verbs and using the correct German cases.",
-        url: "https://youtu.be/V4RxPYSPwhg",
-      },
-    ],
+    videoResources: [],
   };
 
   a1[24] = {
