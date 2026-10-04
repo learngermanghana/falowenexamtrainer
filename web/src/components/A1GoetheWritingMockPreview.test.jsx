@@ -6,7 +6,12 @@ describe("A1 Goethe-style Schreiben mock preview", () => {
   test("keeps Teil 1 as a five-gap form task", () => {
     expect(A1_GOETHE_WRITING_MOCK.teil1.fields).toHaveLength(5);
     expect(A1_GOETHE_WRITING_MOCK.teil1.fields.map((field) => field.number)).toEqual([1, 2, 3, 4, 5]);
-    expect(A1_GOETHE_WRITING_MOCK.teil1.example.value).toBe("Mensah, Linda");
+    expect(A1_GOETHE_WRITING_MOCK.teil1.prefilled).toEqual([
+      { label: "Familienname, Vorname", value: "Mensah, Linda" },
+      { label: "Hotel", value: "Hotel Adler" },
+      { label: "Ausflug", value: "Busfahrt" },
+      { label: "Ziel", value: "Schwarzwald" },
+    ]);
   });
 
   test("keeps Teil 2 to exactly three content points", () => {
