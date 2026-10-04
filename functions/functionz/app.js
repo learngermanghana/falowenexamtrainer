@@ -3179,6 +3179,270 @@ app.get("/results/history", async (req, res) => {
   }
 });
 
+app.post("/writing/a1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const formValues = req.body?.formValues && typeof req.body.formValues === "object"
+      ? req.body.formValues
+      : {};
+    const text = String(req.body?.text || "").trim().slice(0, 5000);
+
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const form = scoreA1MockWritingForm(formValues);
+    let letter;
+
+    if (!text) {
+      letter = {
+        score: 0,
+        maxScore: 15,
+        level_mismatch: false,
+        content: { registration: 0, next_course_start: 0, price: 0 },
+        structure: { greeting: 0, closing: 0, name: 0 },
+        a1_language_score: 0,
+        a1_fit_score: 0,
+        feedback_en: "No email was submitted. Write a short A1 email that answers all three content points.",
+        corrections: [],
+      };
+    } else {
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: a1MockWritingScorePrompt({ text }) },
+          { role: "user", content: "Return the strict A1 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 900 },
+      );
+
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/i, "");
+
+      try {
+        letter = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the writing assessment safely. Please try marking again.",
+          code: "INVALID_WRITING_ASSESSMENT",
+        });
+      }
+
+      letter.score = Math.max(0, Math.min(15, Number(letter?.score) || 0));
+      letter.maxScore = 15;
+      letter.level_mismatch = Boolean(letter?.level_mismatch);
+      letter.feedback_en = String(letter?.feedback_en || "").trim();
+      letter.corrections = Array.isArray(letter?.corrections) ? letter.corrections.slice(0, 5) : [];
+    }
+
+    const score = Math.max(0, Math.min(25, Number(form.score || 0) + Number(letter.score || 0)));
+    const result = {
+      score,
+      maxScore: 25,
+      passed: score >= 15,
+      form,
+      letter,
+      submittedText: text,
+    };
+
+    auditAIRequest({
+      route: "/writing/a1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        score,
+        formScore: form.score,
+        letterScore: letter.score,
+        levelMismatch: Boolean(letter.level_mismatch),
+      },
+    });
+
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/a1-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/a1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A1 writing mock." });
+  }
+});
+
+app.post("/a1-mock/attempt/start", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
+    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a1MockExamUsers").doc(authedUser.uid);
+    const newAttemptRef = userRef.collection("attempts").doc();
+    let responsePayload = null;
+
+    await db.runTransaction(async (tx) => {
+      const userSnap = await tx.get(userRef);
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      if (activeAttemptId) {
+        const activeRef = userRef.collection("attempts").doc(activeAttemptId);
+        const activeSnap = await tx.get(activeRef);
+        if (activeSnap.exists) {
+          const activeData = activeSnap.data() || {};
+          if (activeData.mockId === mockId && activeData.status === "in_progress") {
+            responsePayload = {
+              attemptId: activeAttemptId,
+              attemptNumber: Number(activeData.attemptNumber || 1),
+              firstAttempt: Boolean(activeData.firstAttempt),
+              state: activeData.state || null,
+              resumed: true,
+            };
+            return;
+          }
+        }
+      }
+
+      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptNumber = attemptCount + 1;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(
+        userRef,
+        {
+          uid: authedUser.uid,
+          email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+          attemptCount: attemptNumber,
+          activeAttemptId: newAttemptRef.id,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      tx.set(newAttemptRef, {
+        uid: authedUser.uid,
+        email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+        mockId,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        status: "in_progress",
+        section: "intro",
+        state: null,
+        sectionScores: {},
+        startedAt: now,
+        updatedAt: now,
+      });
+
+      responsePayload = {
+        attemptId: newAttemptRef.id,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        state: null,
+        resumed: false,
+      };
+    });
+
+    return res.json(responsePayload);
+  } catch (err) {
+    console.error("/a1-mock/attempt/start error", err);
+    return res.status(500).json({ error: err.message || "Could not start the A1 mock attempt." });
+  }
+});
+
+app.post("/a1-mock/attempt/save", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const attemptId = String(req.body?.attemptId || "").trim();
+    const status = String(req.body?.status || "in_progress").trim();
+    const section = String(req.body?.section || "").trim().slice(0, 40);
+    const state = req.body?.state && typeof req.body.state === "object" ? req.body.state : {};
+    const sectionScores = req.body?.sectionScores && typeof req.body.sectionScores === "object"
+      ? req.body.sectionScores
+      : {};
+    const overall = req.body?.overall && typeof req.body.overall === "object"
+      ? req.body.overall
+      : null;
+
+    if (!attemptId) return res.status(400).json({ error: "attemptId is required" });
+    if (!["in_progress", "completed"].includes(status)) {
+      return res.status(400).json({ error: "Invalid mock attempt status" });
+    }
+
+    const serializedState = JSON.stringify(state);
+    if (serializedState.length > 150000) {
+      return res.status(400).json({ error: "Mock attempt state is too large." });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a1MockExamUsers").doc(authedUser.uid);
+    const attemptRef = userRef.collection("attempts").doc(attemptId);
+    const attemptSnap = await attemptRef.get();
+    if (!attemptSnap.exists) return res.status(404).json({ error: "Mock attempt not found." });
+
+    const existing = attemptSnap.data() || {};
+    if (existing.uid && existing.uid !== authedUser.uid) {
+      return res.status(403).json({ error: "This mock attempt belongs to another account." });
+    }
+
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const patch = {
+      state,
+      section,
+      sectionScores,
+      status,
+      updatedAt: now,
+      ...(overall ? { overall } : {}),
+      ...(status === "completed" ? { completedAt: now } : {}),
+    };
+    await attemptRef.set(patch, { merge: true });
+
+    if (status === "completed") {
+      await userRef.set(
+        {
+          activeAttemptId: null,
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(overall?.score || 0),
+          lastCompletedPassed: Boolean(overall?.passed),
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+    } else {
+      await userRef.set({ activeAttemptId: attemptId, updatedAt: now }, { merge: true });
+    }
+
+    return res.json({ ok: true, attemptId, status });
+  } catch (err) {
+    console.error("/a1-mock/attempt/save error", err);
+    return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
+  }
+});
+
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
@@ -3365,10 +3629,9 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     const suppliedTeils = normalizedAttempts.map((attempt) => attempt.teil).sort();
     if (
       suppliedTeils.length !== expectedTeils.length ||
-      suppliedTeils.some((teil, index) => teil !== expectedTeils[index]) ||
-      normalizedAttempts.some((attempt) => !attempt.transcript)
+      suppliedTeils.some((teil, index) => teil !== expectedTeils[index])
     ) {
-      return res.status(400).json({ error: "A completed transcript for Teil 1, Teil 2 and Teil 3 is required." });
+      return res.status(400).json({ error: "Teil 1, Teil 2 and Teil 3 are required." });
     }
 
     if (!ensureOpenAIConfigured(res)) return;
