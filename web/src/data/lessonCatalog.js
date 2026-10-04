@@ -490,11 +490,11 @@ const lessonCatalog = Object.freeze([
     "kind": "schreiben_sprechen",
     "grammarPage": "/campus/course/a1-day-23-writing-workshop-14-2",
     "workbookRoute": "/campus/course/a1-day-23-writing-workshop-14-2",
-    "video": "",
+    "video": "https://youtu.be/mgfauvqhoCI",
     "submissionRequired": false,
     "progressionEligible": false,
     "contentStatus": "published",
-    "teacherVideo": ""
+    "teacherVideo": "https://youtu.be/mgfauvqhoCI"
   },
   {
     "id": "A1-5.10",
