@@ -27,6 +27,7 @@ import A1GoetheReadingMockTeil3Preview from "./components/A1GoetheReadingMockTei
 import A1GoetheListeningMockPreview from "./components/A1GoetheListeningMockPreview";
 import A1GoetheWritingMockPreview from "./components/A1GoetheWritingMockPreview";
 import A1GoetheSpeakingMockPreview from "./components/A1GoetheSpeakingMockPreview";
+import A1FinalMockExamPage from "./components/A1FinalMockExamPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -36,7 +37,6 @@ import B2Day0SelfLearningOrientationWorkbookPage from "./components/B2Day0SelfLe
 import C1Day0ProgressionWorkbookPage from "./components/C1Day0ProgressionWorkbookPage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
 import FullClassCalendarPage from "./components/FullClassCalendarPage";
-import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
 import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
@@ -796,6 +796,10 @@ const AppShell = ({
             element={<A1GoetheSpeakingMockPreview />}
           />
           <Route
+            path="/campus/course/a1-final-mock-exam"
+            element={<A1FinalMockExamPage />}
+          />
+          <Route
             path="/campus/course/a1-day-23-writing-workshop-14-2"
             element={<A1Day23WritingWorkshopPage />}
           />
@@ -822,7 +826,7 @@ const AppShell = ({
             path="/campus/course/letter-writing-intro-german-a1-day-12-3"
             element={<LetterWritingIntroPage />}
           />
-          <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
+          <Route path="/campus/course/conjunctions-5-10" element={<A1FinalMockExamPage />} />
           <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
