@@ -190,7 +190,7 @@ export const A2_LISTENING_TASKS = {
   15: {
     chapter: "6.15",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Beitrag über Sportangebote in der Stadt. Achten Sie auf Kurse, Orte und Zielgruppen.",
+    task: "Day 15 listening exercise.",
     audioKey: "a2/day-15/day-15.mp3",
     audioUrl: "",
     questions: [
