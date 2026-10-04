@@ -863,18 +863,18 @@ const courseSchedules = {
     },
     {
       day: 23,
-      topic: "Dative and Accusative Verbs",
+      topic: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
       chapter: "14.2",
-      goal: "Understand how accusative and dative verbs affect nouns and pronouns",
+      goal: "Write short A1 messages independently using a greeting, three content points, a closing and a name",
       instruction:
-        "This chapter has no assignment. Read the lesson notes first, then complete the in-app practice book for self-practice.",
-      grammar_topic: "Dative and Accusative Verbs",
-      lesen_hören: {
-        video: "https://youtu.be/J98JJU2v4Uw",
-        youtube_link: "https://youtu.be/J98JJU2v4Uw",
+        "Use the writing workshop to practise appointment, arrangement, reservation, help, problem and registration tasks. This is self-practice and has no tutor submission.",
+      grammar_topic: "A1 letter writing: three-point planning and formal/informal register",
+      schreiben_sprechen: {
+        video: "",
+        youtube_link: "",
         assignment: false,
-        grammarbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
-        workbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
+        grammarbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
+        workbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
       },
     },
     {
