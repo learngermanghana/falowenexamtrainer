@@ -3,6 +3,28 @@ import path from "path";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
 
 describe("A1 Goethe-style Hören mock preview", () => {
+  test("keeps Teil 1 Aufgaben 1 to 6 and two-play format", () => {
+    expect(A1_GOETHE_LISTENING_MOCK.teil1.questions.map((q) => q.number)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(A1_GOETHE_LISTENING_MOCK.teil1.plays).toBe(2);
+    expect(A1_GOETHE_LISTENING_MOCK.teil1.audioObjectKey).toBe("a1/mock-hoeren/mock-01/teil-1.mp3");
+    expect(A1_GOETHE_LISTENING_MOCK.teil1.questions.every((q) => q.options.length === 3)).toBe(true);
+  });
+
+  test("uses the supplied Teil 1 answer key", () => {
+    expect(
+      Object.fromEntries(
+        A1_GOETHE_LISTENING_MOCK.teil1.questions.map((q) => [q.number, q.answer]),
+      ),
+    ).toEqual({
+      1: "B",
+      2: "B",
+      3: "A",
+      4: "B",
+      5: "B",
+      6: "B",
+    });
+  });
+
   test("keeps Teil 2 Aufgaben 7 to 10 and one-play format", () => {
     expect(A1_GOETHE_LISTENING_MOCK.teil2.questions.map((q) => q.number)).toEqual([7, 8, 9, 10]);
     expect(A1_GOETHE_LISTENING_MOCK.teil2.plays).toBe(1);
