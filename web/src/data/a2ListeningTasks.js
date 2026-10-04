@@ -127,14 +127,15 @@ export const A2_LISTENING_TASKS = {
   10: {
     chapter: "4.10",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre den Beitrag über das Oktoberfest. Achte auf Ort, Dauer, Essen, Kleidung und Aktivitäten. Submitte deine Antwortbuchstaben im Submit-Tab.",
-    audioUrl: "https://youtu.be/yOfTCQDn_JM",
+    task: "Hören Sie das Gespräch in der Touristeninformation zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-10/day-10.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Wo findet das Oktoberfest statt?", options: ["a) Berlin", "b) Hamburg", "c) München", "d) Frankfurt"] },
-      { stem: "Wie lange dauert das Oktoberfest?", options: ["a) Eine Woche", "b) Zwei Wochen", "c) Drei Wochen", "d) Vier Wochen"] },
-      { stem: "Welche traditionellen Gerichte werden auf dem Oktoberfest serviert?", options: ["a) Pizza und Pasta", "b) Brezeln, Bratwurst und Schweinebraten", "c) Sushi und Ramen", "d) Tacos und Burritos"] },
-      { stem: "Welche Kleidung tragen viele Menschen auf dem Oktoberfest?", options: ["a) Anzüge und Kleider", "b) Lederhosen und Dirndl", "c) Jeans und T-Shirts", "d) Bademode"] },
-      { stem: "Was gibt es neben Essen und Trinken noch auf dem Oktoberfest?", options: ["a) Konzerte und Opern", "b) Fahrgeschäfte und Spiele", "c) Sportveranstaltungen", "d) Filmvorführungen"] },
+      { stem: "Welche Aktivität empfiehlt der Mitarbeiter zuerst?", options: ["A) Eine Hafenrundfahrt", "B) Einen Museumsbesuch", "C) Einen Spaziergang im Stadtpark"] },
+      { stem: "Wie viel kostet die Hafenrundfahrt mit der Gästekarte?", options: ["A) 12 Euro", "B) 20 Euro", "C) 25 Euro"] },
+      { stem: "Was kann die Touristin mit der Gästekarte machen?", options: ["A) Nur kostenlos ins Museum gehen", "B) Nur die Hafenrundfahrt billiger buchen", "C) Zwei Tage Bus und Bahn fahren und Rabatt im Museum bekommen"] },
+      { stem: "Wann beginnt das Konzert in der Elbphilharmonie?", options: ["A) Um 18 Uhr", "B) Um 20 Uhr", "C) Um 22 Uhr"] },
+      { stem: "Welches Museum empfiehlt der Mitarbeiter für morgen?", options: ["A) Das Hafenmuseum", "B) Das Kunstmuseum", "C) Das Stadtmuseum"] },
     ],
   },
   11: {
