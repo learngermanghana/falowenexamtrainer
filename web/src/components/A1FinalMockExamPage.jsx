@@ -377,6 +377,18 @@ export default function A1FinalMockExamPage() {
     setBusy("start");
     setError("");
     try {
+      if (forceNew && exam.completed && exam.attemptInfo?.attemptId) {
+        await saveA1MockAttempt({
+          idToken,
+          attemptId: exam.attemptInfo.attemptId,
+          section: "result",
+          state: exam,
+          sectionScores: exam.sectionScores,
+          status: "completed",
+          overall: exam.overall,
+        });
+      }
+
       if (forceNew && typeof window !== "undefined") {
         window.localStorage.removeItem(storageKey);
       }
