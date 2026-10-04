@@ -190,14 +190,15 @@ export const A2_LISTENING_TASKS = {
   15: {
     chapter: "6.15",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Beitrag über Sportangebote in der Stadt. Achten Sie auf Kurse, Orte und Zielgruppen.",
-    audioUrl: "https://youtu.be/p_OE59m0J-Y",
+    task: "Gespräch: Anna und Tom über ihren Lieblingssport. Fragen 1–5 mit A, B oder C.",
+    audioKey: "a2/day-15/day-15.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Was ist besonders beliebt im neuen Fitnessstudio \"Vital Plus\"?", options: ["A) Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Kletterkurse"] },
-      { stem: "Was bietet der Stadtpark im Sommer an?", options: ["A) Kostenlose Yoga-Kurse", "B) Pilates- und Aerobic-Kurse", "C) Schwimmkurse", "D) Fußballturniere"] },
-      { stem: "Was bietet das Schwimmbad \"Aqua Fun\" an?", options: ["A) Wassergymnastik und Aqua-Zumba", "B) Kletterkurse", "C) Fußballkurse", "D) Boxtraining"] },
-      { stem: "Für wen ist der neue Kletterpark geeignet?", options: ["A) Nur für Anfänger", "B) Nur für Fortgeschrittene", "C) Für Anfänger und Fortgeschrittene", "D) Nur für Kinder"] },
-      { stem: "Was bietet der Sportverein \"Fitness für alle\" an?", options: ["A) Yoga-Kurse", "B) Volleyball und Basketball", "C) Schwimmkurse", "D) Tennis und Golf"] },
+      { stem: "Was ist Toms Lieblingssport?", options: ["A) Schwimmen", "B) Fußball", "C) Tennis"] },
+      { stem: "Wie oft spielt Tom Fußball?", options: ["A) Jeden Tag", "B) Einmal pro Woche", "C) Zweimal pro Woche"] },
+      { stem: "Wann geht Anna normalerweise ins Schwimmbad?", options: ["A) Jeden Mittwoch", "B) Jeden Samstag", "C) Jeden Dienstag"] },
+      { stem: "Wo spielt Tom mit seinen Freunden, wenn das Wetter gut ist?", options: ["A) Im Schwimmbad", "B) In der Sporthalle", "C) Im Park"] },
+      { stem: "Wann treffen sich Anna und Tom zum Schwimmen?", options: ["A) Am Mittwoch um vier Uhr", "B) Am Mittwoch um sechs Uhr", "C) Am Samstag um sechs Uhr"] },
     ],
   },
   16: {
