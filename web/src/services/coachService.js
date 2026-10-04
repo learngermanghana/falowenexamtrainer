@@ -138,6 +138,16 @@ export const scoreInteractionAudio = async ({
   return response.data;
 };
 
+export const scoreA1MockSpeaking = async ({ attempts, idToken }) => {
+  const response = await axios.post(
+    `${speakingApiUrl}/speaking/a1-mock-score`,
+    { attempts },
+    { headers: authHeaders(idToken) }
+  );
+
+  return response.data?.result || response.data;
+};
+
 export const analyzeText = async ({ text, teil, level, targetLevel, userId, idToken }) => {
   const response = await axios.post(
     `${speakingApiUrl}/speaking/analyze-text`,
