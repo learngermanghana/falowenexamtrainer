@@ -90,43 +90,42 @@ function keepDay23AtA1CaseScope() {
   write(file, source);
 }
 
-function validateDay24WeilPhraseFocus() {
-  const file = "web/src/components/ConjunctionNotesPage.js";
-  const source = read(file);
+function validateDay24FinalMock() {
+  const componentFile = "web/src/components/A1FinalMockExamPage.jsx";
+  const componentSource = read(componentFile);
+  const scheduleSource = read("web/src/data/courseSchedule.js");
 
   const requiredMarkers = [
-    'data-a1-5-10-interactive-workbook="true"',
-    "A1 · Kapitel 5.10 · Interactive Workbook",
-    "Weil & nützliche A1-Redemittel",
-    "weil + verb at the end",
-    'testId="quick-check"',
-    'testId="sentence-builder"',
-    'testId="reason-matching"',
-    'testId="register-check"',
-    'testId="repair-message"',
-    'testId="apply"',
-    'testId="connector-recognition"',
-    'testId="final-transfer"',
-    "Recognise <strong>und, aber, oder</strong> and <strong>denn</strong>",
-    "deshalb</em> starts properly in A2",
+    'data-a1-final-mock',
+    "A1 Final Mock Exam",
+    "SECTION_DURATIONS",
+    "lesen: 25 * 60",
+    "hoeren: 20 * 60",
+    "schreiben: 20 * 60",
+    "sprechen: 15 * 60",
+    "scoreA1MockWriting",
+    "A1GoetheSpeakingMockPreview",
+    'href="/exams/question"',
+    "Practice the full mock again",
   ];
 
-  const missing = requiredMarkers.filter((marker) => !source.includes(marker));
+  const missing = requiredMarkers.filter((marker) => !componentSource.includes(marker));
   if (missing.length) {
-    throw new Error(`A1 Day 24 interactive weil workbook is missing: ${missing.join(", ")}`);
+    throw new Error(`A1 Day 24 final mock is missing: ${missing.join(", ")}`);
   }
 
-  const staleMarkers = [
-    "Verb Position Colour Guide: denn, weil, deshalb",
-    'Section title="Final Grammar Check: Perfekt"',
-    "Final Grammar Check: Perfekt and Adjective Endings",
-    'title: "7) Task"',
-    'title: "8) Task"',
+  const staleScheduleMarkers = [
+    'topic: "Conjunctions"',
+    'grammar_topic: "German Conjunctions"',
+    'workbook_link: "/campus/course/conjunctions-5-10"',
   ];
-
-  const stale = staleMarkers.filter((marker) => source.includes(marker));
+  const stale = staleScheduleMarkers.filter((marker) => scheduleSource.includes(marker));
   if (stale.length) {
-    throw new Error(`A1 Day 24 still contains stale prebuild-injected material: ${stale.join(", ")}`);
+    throw new Error(`A1 Day 24 still points to the old conjunction lesson: ${stale.join(", ")}`);
+  }
+
+  if (!scheduleSource.includes('workbook_link: "/campus/course/a1-final-mock-exam"')) {
+    throw new Error("A1 Day 24 schedule must route to the final mock exam.");
   }
 }
 
@@ -148,7 +147,7 @@ function removeDuplicateDay24ScheduleVideo() {
 
 patchDay21Perfekt();
 keepDay23AtA1CaseScope();
-validateDay24WeilPhraseFocus();
+validateDay24FinalMock();
 removeDuplicateDay24ScheduleVideo();
 
-console.log("Applied A1 late-course grammar boundary, Day 24 weil/useful-phrases validation and media cleanup.");
+console.log("Applied A1 late-course grammar boundary and validated the Day 24 final mock exam.");
