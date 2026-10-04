@@ -18,6 +18,7 @@ import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import { getB1ListeningTask } from "../data/b1ListeningTasks";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
+import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 
 const card = {
   ...styles.card,
@@ -548,6 +549,16 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                             : "Add the listening media, questions and self-check instructions here when the material is ready."
                         }
                       />
+                    ) : listening.audioKey ? (
+                      <>
+                        <B1ProtectedAudioPlayer
+                          day={config.day}
+                          audioKey={listening.audioKey}
+                          title={listening.videoTitle || `B1 Day ${config.day} Hören`}
+                        />
+                        {listening.selfCheckText ? <p style={{ margin: 0 }}>{listening.selfCheckText}</p> : null}
+                        <QuestionList questions={listening.questions || []} />
+                      </>
                     ) : embedUrl ? (
                       <>
                         <iframe title={listening.videoTitle || `B1 Day ${config.day} listening`} src={embedUrl} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={videoStyle} />
