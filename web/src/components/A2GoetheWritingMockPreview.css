@@ -1,0 +1,151 @@
+.a2-schreiben-exam {
+  background: #efe5ed;
+}
+
+.a2-schreiben-part {
+  margin-top: 28px;
+  background: #fff;
+  border: 1px solid #cbb8c5;
+}
+
+.a2-schreiben-part-header {
+  padding: 24px 30px 20px;
+  border-bottom: 1px solid #8f5267;
+}
+
+.a2-schreiben-part-header h2 {
+  margin: 0 0 14px;
+  font-size: 28px;
+}
+
+.a2-schreiben-part-header p {
+  margin: 0;
+  max-width: 900px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.a2-schreiben-task-paper {
+  padding: 28px 30px 34px;
+}
+
+.a2-schreiben-points {
+  margin: 0;
+  padding-left: 24px;
+  max-width: 900px;
+}
+
+.a2-schreiben-points li {
+  margin: 10px 0;
+  padding-left: 4px;
+  font-size: 17px;
+  line-height: 1.48;
+}
+
+.a2-schreiben-instruction {
+  margin: 22px 0;
+  padding-top: 18px;
+  border-top: 1px solid #d7c9d2;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.a2-schreiben-sms-frame {
+  width: min(620px, 100%);
+  margin: 24px auto 0;
+  border: 1px solid #777;
+  background: #f7f7f7;
+  box-shadow: 7px 7px 12px rgba(0,0,0,.12);
+}
+
+.a2-schreiben-sms-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #e5e5e5;
+  border-bottom: 1px solid #8e8e8e;
+  font-size: 14px;
+}
+
+.a2-schreiben-sms-frame textarea,
+.a2-schreiben-email-frame textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  resize: vertical;
+  padding: 18px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      #fff 0,
+      #fff 31px,
+      #e2dde0 32px
+    );
+  font: 18px/32px Georgia, "Times New Roman", serif;
+  outline: none;
+}
+
+.a2-schreiben-count {
+  width: min(620px, 100%);
+  margin: 9px auto 0;
+  color: #6b6167;
+  font-size: 13px;
+}
+
+.a2-schreiben-count.in-range {
+  color: #276738;
+}
+
+.a2-schreiben-email-frame {
+  width: min(760px, 100%);
+  margin: 24px auto 0;
+  border: 1px solid #888;
+  background: #f8f8f8;
+  box-shadow: 7px 7px 12px rgba(0,0,0,.12);
+}
+
+.a2-schreiben-email-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 7px 10px;
+  background: #e4e4e4;
+  border-bottom: 1px solid #999;
+  font-size: 13px;
+}
+
+.a2-schreiben-email-toolbar button {
+  padding: 5px 12px;
+  border: 1px solid #777;
+  background: #f7f7f7;
+}
+
+.a2-schreiben-email-field {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  min-height: 33px;
+  background: #fff;
+  border-bottom: 1px solid #c4c4c4;
+  font-size: 14px;
+}
+
+.a2-schreiben-email-field strong,
+.a2-schreiben-email-field span {
+  padding: 7px 10px;
+}
+
+.a2-schreiben-email-field strong {
+  background: #efefef;
+}
+
+.a2-schreiben-task-paper.email .a2-schreiben-count {
+  width: min(760px, 100%);
+}
+
+@media (max-width: 700px) {
+  .a2-schreiben-part-header,
+  .a2-schreiben-task-paper {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

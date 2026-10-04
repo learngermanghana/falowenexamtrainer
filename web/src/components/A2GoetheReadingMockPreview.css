@@ -1,0 +1,397 @@
+.a2-mock-shell {
+  min-height: 100vh;
+  padding: 0 30px 50px;
+  background: #bac5cf;
+  color: #161616;
+}
+
+.a2-mock-topbar {
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 16px 18px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  font: 700 13px/1.3 Arial, Helvetica, sans-serif;
+  color: #52606d;
+}
+
+.a2-mock-exam {
+  width: min(1220px, 100%);
+  margin: 0 auto;
+  padding: 32px 48px 60px;
+  box-sizing: border-box;
+  background: #efe5ed;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 14px 30px rgba(27, 38, 49, 0.11);
+}
+
+.a2-mock-title {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 20px;
+  align-items: end;
+  margin-bottom: 28px;
+}
+
+.a2-mock-title p {
+  grid-column: 1 / -1;
+  margin: 0 0 4px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.a2-mock-title h1 {
+  margin: 0;
+  font-size: 34px;
+}
+
+.a2-mock-title span {
+  font-size: 14px;
+  font-weight: 800;
+  color: #5f5860;
+}
+
+.a2-mock-part {
+  margin-top: 30px;
+  background: #fff;
+  border: 1px solid #ccb9c6;
+  padding: 28px 32px 40px;
+}
+
+.a2-mock-part-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #8f5267;
+}
+
+.a2-mock-part-heading h2 {
+  margin: 0 0 13px;
+  font-size: 28px;
+}
+
+.a2-mock-part-heading p {
+  margin: 5px 0;
+  font-size: 16px;
+  line-height: 1.48;
+}
+
+.a2-mock-newspaper {
+  width: min(820px, calc(100% - 36px));
+  margin: 34px auto 24px;
+  padding: 30px 40px 36px;
+  box-sizing: border-box;
+  background: #e7e7e7;
+  color: #191919;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.a2-mock-newspaper h3 {
+  margin: 0;
+  font-size: 29px;
+}
+
+.a2-mock-newspaper h4 {
+  margin: 8px 0 22px;
+  font-size: 19px;
+  font-style: italic;
+}
+
+.a2-mock-newspaper p {
+  margin: 0 0 17px;
+  font-size: 17px;
+  line-height: 1.52;
+}
+
+.a2-mock-question {
+  padding: 24px 2px;
+  border-bottom: 1px solid #d7c9d2;
+}
+
+.a2-mock-question:last-child {
+  border-bottom: 0;
+}
+
+.a2-mock-question h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  color: #404040;
+}
+
+.a2-mock-question > p {
+  margin: 0 0 16px;
+  font: 700 18px/1.5 Georgia, "Times New Roman", serif;
+}
+
+.a2-mock-example {
+  background: #faf8fa;
+}
+
+.a2-mock-choice-list {
+  display: grid;
+  gap: 10px;
+}
+
+.a2-mock-choice {
+  display: grid;
+  grid-template-columns: 20px 24px 1fr;
+  gap: 9px;
+  align-items: start;
+  font-size: 16px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.a2-mock-choice input {
+  width: 16px;
+  height: 16px;
+  margin: 3px 0 0;
+  accent-color: #6f354e;
+}
+
+.a2-mock-choice strong {
+  text-transform: lowercase;
+}
+
+.a2-mock-directory {
+  width: min(870px, calc(100% - 36px));
+  margin: 34px auto 25px;
+  padding: 22px 30px 28px;
+  box-sizing: border-box;
+  background: #ededed;
+  border: 1px solid #b8b8b8;
+}
+
+.a2-mock-directory h3 {
+  margin: 0 0 18px;
+  font-size: 26px;
+  text-align: center;
+}
+
+.a2-mock-floor {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 15px;
+  padding: 11px 0;
+  border-top: 1px solid #b0b0b0;
+}
+
+.a2-mock-floor strong {
+  font-size: 17px;
+}
+
+.a2-mock-floor p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.48;
+}
+
+.a2-mock-email {
+  width: min(900px, calc(100% - 30px));
+  margin: 34px auto 25px;
+  background: #f7f7f7;
+  border: 1px solid #9d9d9d;
+  box-shadow: 7px 7px 12px rgba(0,0,0,.14);
+}
+
+.a2-mock-email-toolbar {
+  min-height: 38px;
+  padding: 6px 9px;
+  box-sizing: border-box;
+  background: #e1e1e1;
+  border-bottom: 1px solid #9f9f9f;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+}
+
+.a2-mock-email-toolbar button {
+  border: 1px solid #8a8a8a;
+  background: #f8f8f8;
+  padding: 4px 12px;
+}
+
+.a2-mock-email-field {
+  min-height: 31px;
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  border-bottom: 1px solid #c2c2c2;
+  background: #fff;
+  font-size: 14px;
+}
+
+.a2-mock-email-field strong,
+.a2-mock-email-field span {
+  padding: 6px 9px;
+}
+
+.a2-mock-email-field strong {
+  background: #efefef;
+}
+
+.a2-mock-email-body {
+  padding: 24px 34px 30px;
+  max-height: 690px;
+  overflow-y: auto;
+  background: #fff;
+  font: 16px/1.5 Arial, Helvetica, sans-serif;
+}
+
+.a2-mock-email-body p {
+  margin: 0 0 15px;
+}
+
+.a2-mock-email-closing {
+  margin-bottom: 3px !important;
+}
+
+.a2-mock-people-sheet {
+  margin-top: 30px;
+  border-top: 2px solid #373737;
+}
+
+.a2-mock-person-row {
+  display: grid;
+  grid-template-columns: 1fr 150px;
+  gap: 22px;
+  align-items: center;
+  padding: 19px 8px;
+  border-bottom: 1px solid #777;
+}
+
+.a2-mock-person-row strong {
+  font-size: 16px;
+}
+
+.a2-mock-person-row p {
+  margin: 7px 0 0;
+  font: 700 17px/1.45 Georgia, "Times New Roman", serif;
+}
+
+.a2-mock-person-row label {
+  display: grid;
+  grid-template-columns: auto 62px;
+  gap: 8px;
+  align-items: center;
+  font-weight: 700;
+}
+
+.a2-mock-person-row select {
+  width: 62px;
+  padding: 7px;
+  border: 1px solid #666;
+  background: #fff;
+  font: 700 16px/1 Arial, Helvetica, sans-serif;
+}
+
+.a2-mock-ads-title {
+  margin: 38px 0 20px;
+  font-size: 23px;
+}
+
+.a2-mock-ads-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.a2-mock-ad {
+  border: 1px solid #777;
+  background: #fff;
+}
+
+.a2-mock-ad-browser {
+  min-height: 32px;
+  padding: 5px 9px;
+  box-sizing: border-box;
+  background: #e6e6e6;
+  border-bottom: 1px solid #888;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 9px;
+  align-items: center;
+}
+
+.a2-mock-ad-browser strong {
+  text-transform: lowercase;
+  font-size: 18px;
+}
+
+.a2-mock-ad-browser span {
+  padding: 3px 7px;
+  background: #fff;
+  border: 1px solid #aaa;
+  font-size: 13px;
+}
+
+.a2-mock-ad-body {
+  padding: 18px 20px 22px;
+  min-height: 245px;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.a2-mock-ad-body h4 {
+  margin: 0 0 12px;
+  font-size: 21px;
+}
+
+.a2-mock-ad-body p {
+  margin: 7px 0;
+  font-size: 15px;
+  line-height: 1.42;
+}
+
+@media (max-width: 760px) {
+  .a2-mock-shell {
+    padding: 0 0 28px;
+    background: #efe5ed;
+  }
+
+  .a2-mock-topbar {
+    padding: 12px 14px;
+    flex-wrap: wrap;
+  }
+
+  .a2-mock-exam {
+    width: 100%;
+    padding: 24px 14px 40px;
+    box-shadow: none;
+  }
+
+  .a2-mock-part {
+    padding: 22px 14px 30px;
+  }
+
+  .a2-mock-newspaper,
+  .a2-mock-directory,
+  .a2-mock-email {
+    width: 100%;
+  }
+
+  .a2-mock-newspaper {
+    padding: 24px 20px 28px;
+  }
+
+  .a2-mock-floor {
+    grid-template-columns: 80px 1fr;
+  }
+
+  .a2-mock-person-row {
+    grid-template-columns: 1fr;
+  }
+
+  .a2-mock-person-row label {
+    width: fit-content;
+  }
+
+  .a2-mock-ads-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .a2-mock-ad-body {
+    min-height: 0;
+  }
+}

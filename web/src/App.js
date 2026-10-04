@@ -28,6 +28,14 @@ import A1GoetheListeningMockPreview from "./components/A1GoetheListeningMockPrev
 import A1GoetheWritingMockPreview from "./components/A1GoetheWritingMockPreview";
 import A1GoetheSpeakingMockPreview from "./components/A1GoetheSpeakingMockPreview";
 import A1FinalMockExamPage from "./components/A1FinalMockExamPage";
+import A2GoetheReadingMockPreview from "./components/A2GoetheReadingMockPreview";
+import A2GoetheListeningMockTeil1Preview from "./components/A2GoetheListeningMockTeil1Preview";
+import A2GoetheListeningMockTeil2Preview from "./components/A2GoetheListeningMockTeil2Preview";
+import A2GoetheListeningMockTeil3Preview from "./components/A2GoetheListeningMockTeil3Preview";
+import A2GoetheListeningMockTeil4Preview from "./components/A2GoetheListeningMockTeil4Preview";
+import A2GoetheWritingMockPreview from "./components/A2GoetheWritingMockPreview";
+import A2GoetheSpeakingMockTeil2Preview from "./components/A2GoetheSpeakingMockTeil2Preview";
+import A2GoetheSpeakingMockTeil3Preview from "./components/A2GoetheSpeakingMockTeil3Preview";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -798,6 +806,38 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-final-mock-exam"
             element={<A1FinalMockExamPage />}
+          />
+          <Route
+            path="/campus/course/a2-mock-lesen-preview"
+            element={<A2GoetheReadingMockPreview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-hoeren-teil-1-preview"
+            element={<A2GoetheListeningMockTeil1Preview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-hoeren-teil-2-preview"
+            element={<A2GoetheListeningMockTeil2Preview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-hoeren-teil-3-preview"
+            element={<A2GoetheListeningMockTeil3Preview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-hoeren-teil-4-preview"
+            element={<A2GoetheListeningMockTeil4Preview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-schreiben-preview"
+            element={<A2GoetheWritingMockPreview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-sprechen-teil-2-preview"
+            element={<A2GoetheSpeakingMockTeil2Preview />}
+          />
+          <Route
+            path="/campus/course/a2-mock-sprechen-teil-3-preview"
+            element={<A2GoetheSpeakingMockTeil3Preview />}
           />
           <Route
             path="/campus/course/a1-day-23-writing-workshop-14-2"
