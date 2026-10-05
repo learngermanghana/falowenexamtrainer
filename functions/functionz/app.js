@@ -1873,6 +1873,135 @@ const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
 };
 
 
+const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
+  const safeAttempts = attempts.map((attempt) => ({
+    id: String(attempt?.id || "").trim(),
+    teil: String(attempt?.teil || "").trim(),
+    task: String(attempt?.task || "").trim(),
+    transcript: String(attempt?.transcript || "").trim(),
+    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
+  }));
+
+  return [
+    "You are a strict Goethe-style A2 speaking examiner for a Falowen final mock exam.",
+    "Assess ONLY what the learner actually said in the supplied speech-to-text transcripts. Never invent missing content.",
+    "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+    "Judge at CEFR A2 standard. Accept normal A2 grammar mistakes when communication is clear.",
+    "Because the source is a transcript, do not claim to measure accent or precise pronunciation. Judge clarity from successful transcription and communicative comprehensibility.",
+    "",
+    "SCORING — total 25 points:",
+    "Teil 1: 9 points. The learner asks suitable personal questions from the four keywords and answers the four partner questions with relevant A2 information.",
+    "Teil 2: 8 points. The learner talks about the weekend using all four prompts, connects ideas, and answers the follow-up question.",
+    "Teil 3: 8 points. The learner reacts to the partner, suggests an activity, gives a time and meeting place, includes food, and ends with a clear shared plan.",
+    "Pass mark for Sprechen mock: 15/25.",
+    "",
+    "Required JSON only, no markdown:",
+    JSON.stringify({
+      score: 0,
+      maxScore: 25,
+      passed: false,
+      level_mismatch: false,
+      overall_feedback_en: "Short English feedback.",
+      parts: {
+        teil1: {
+          score: 0,
+          maxScore: 9,
+          task_completion: 0,
+          a2_language: 0,
+          interaction: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A2 German example."
+        },
+        teil2: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a2_language: 0,
+          interaction: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A2 German example."
+        },
+        teil3: {
+          score: 0,
+          maxScore: 8,
+          task_completion: 0,
+          a2_language: 0,
+          interaction: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short A2 German example."
+        }
+      }
+    }),
+    "",
+    "Student attempts:",
+    JSON.stringify(safeAttempts),
+  ].join("\n");
+};
+
+const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
+  "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
+  "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
+  "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR A2 standard. Normal A2 grammar and spelling mistakes are acceptable when the intended meaning is clear.",
+  "",
+  "TEIL 1 — SMS, 10 points:",
+  "Situation: The learner is late meeting Mila.",
+  "Required points: (1) apologise for being late, (2) explain why, (3) give a new meeting place and a new time.",
+  "Target length: 20–30 words. Do not fail only because the word count is slightly outside the target.",
+  "",
+  "TEIL 2 — E-Mail, 15 points:",
+  "Situation: Frau Becker invited the learner to the language school's summer party.",
+  "Required points: (1) thank her and say the learner will come, (2) say the learner will bring one person, (3) ask how to get to the party.",
+  "Target length: 30–40 words. The email should use an appropriate greeting and closing.",
+  "",
+  "Return JSON only, no markdown, using exactly this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 25,
+    passed: false,
+    level_mismatch: false,
+    overall_feedback_en: "Short English feedback.",
+    parts: {
+      teil1: {
+        score: 0,
+        maxScore: 10,
+        content_score: 0,
+        language_score: 0,
+        appropriateness_score: 0,
+        feedback_en: "English feedback.",
+        corrections: [
+          {
+            original_de: "Short student phrase if needed.",
+            corrected_de: "Short corrected German phrase.",
+            explanation_en: "Brief English explanation."
+          }
+        ]
+      },
+      teil2: {
+        score: 0,
+        maxScore: 15,
+        content_score: 0,
+        structure_score: 0,
+        language_score: 0,
+        cohesion_score: 0,
+        feedback_en: "English feedback.",
+        corrections: [
+          {
+            original_de: "Short student phrase if needed.",
+            corrected_de: "Short corrected German phrase.",
+            explanation_en: "Brief English explanation."
+          }
+        ]
+      }
+    }
+  }),
+  "",
+  `Teil 1 SMS:\n${String(sms || "").trim()}`,
+  "",
+  `Teil 2 email:\n${String(email || "").trim()}`,
+].join("\n");
+
+
 const normalizeA1MockFormValue = (value = "") =>
   String(value || "")
     .trim()
