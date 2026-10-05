@@ -42,7 +42,7 @@ const readAssignmentComponentSource = (componentName) => {
 
 describe("A1 Course Book health", () => {
   test("keeps the complete canonical A1 Course Book shape", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(29);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
 
     const countsByDay = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
@@ -53,7 +53,7 @@ describe("A1 Course Book health", () => {
       expect(normalize(card.workbookRoute)).not.toBe("");
     });
 
-    for (let day = 0; day <= 24; day += 1) {
+    for (let day = 0; day <= 23; day += 1) {
       expect(countsByDay.get(day) || 0).toBe(day === 2 || day === 3 || day === 16 || day === 18 ? 2 : 1);
     }
   });
@@ -110,9 +110,10 @@ describe("A1 Course Book health", () => {
       resourceKeys.add(resource.key);
     });
 
-    for (let day = 1; day <= 24; day += 1) {
+    for (let day = 1; day <= 22; day += 1) {
       expect(getA1TeacherVideoResources(day).length).toBeGreaterThan(0);
     }
+    expect(getA1TeacherVideoResources(23)).toHaveLength(0);
   });
 
   test("keeps retired generic A1 workbook tabs from returning", () => {
