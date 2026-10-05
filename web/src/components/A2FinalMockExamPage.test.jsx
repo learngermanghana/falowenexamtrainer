@@ -11,6 +11,10 @@ describe("A2 Final Mock Exam Day 29", () => {
     path.resolve(__dirname, "./A2FinalMockSpeaking.jsx"),
     "utf8",
   );
+  const coachServiceSource = fs.readFileSync(
+    path.resolve(__dirname, "../services/coachService.js"),
+    "utf8",
+  );
 
   test("uses one synchronized four-section mock instead of the old preview hub", () => {
     expect(componentSource).toContain("Start A2 Mock");
@@ -67,11 +71,17 @@ describe("A2 Final Mock Exam Day 29", () => {
     expect(speakingSource).toContain("Feedback stays hidden until the end of the exam.");
   });
 
-  test("waits for in-flight transcription before timeout grading", () => {
+  test("waits for in-flight transcription but bounds the wait before timeout grading", () => {
     expect(speakingSource).toContain("hasInFlightSubmission");
     expect(speakingSource).toContain("attempts[task.id]?.submitting");
     expect(speakingSource).toContain("hasInFlightSubmission ||");
     expect(speakingSource).toContain("[secondsLeft, result, marking, hasInFlightSubmission, markSpeaking]");
+
+    expect(coachServiceSource).toContain("SPEAKING_ANALYZE_TIMEOUT_MS = 30_000");
+    expect(coachServiceSource).toContain("controller.abort()");
+    expect(coachServiceSource).toContain("signal: controller.signal");
+    expect(coachServiceSource).toContain("timeout: SPEAKING_ANALYZE_TIMEOUT_MS");
+    expect(coachServiceSource).toContain("Promise.race([runAnalysis(), timeoutPromise])");
   });
 
   test("collects all five A2 speaking responses into one final score", () => {
