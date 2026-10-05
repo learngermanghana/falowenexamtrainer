@@ -1,4 +1,6 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
 import "./A2GoetheReadingMockPreview.css";
 
 export const A2_READING_PRACTICE_SET_01 = Object.freeze({
@@ -369,16 +371,33 @@ const allAnswers = (set) => ({
 });
 
 export default function A2ReadingPracticeSet() {
+  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30 * 60);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [savedAttempt, setSavedAttempt] = useState(null);
   const answerKey = useMemo(() => allAnswers(A2_READING_PRACTICE_SET_01), []);
   const answered = Object.keys(answers).length;
   const total = Object.keys(answerKey).length;
   const score = Object.entries(answerKey).filter(
     ([number, answer]) => String(answers[number] || "") === String(answer),
   ).length;
+  const sectionScores = useMemo(() => {
+    const scoreItems = (label, items) => ({
+      label,
+      score: items.filter((item) => String(answers[item.number] || "") === String(item.answer)).length,
+      total: items.length,
+    });
+    return [
+      scoreItems("Teil 1", A2_READING_PRACTICE_SET_01.teil1.questions),
+      scoreItems("Teil 2", A2_READING_PRACTICE_SET_01.teil2.questions),
+      scoreItems("Teil 3", A2_READING_PRACTICE_SET_01.teil3.questions),
+      scoreItems("Teil 4", A2_READING_PRACTICE_SET_01.teil4.people),
+    ];
+  }, [answers]);
+  const percent = Math.round((score / Math.max(1, total)) * 100);
+  const weakestSection = getWeakestReadingSection(sectionScores);
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0 || submitted) return undefined;
@@ -402,8 +421,24 @@ export default function A2ReadingPracticeSet() {
   const reset = () => {
     setAnswers({});
     setSubmitted(false);
+    setSavedAttempt(null);
     setSecondsLeft(30 * 60);
     setTimerRunning(false);
+  };
+
+  const submitAttempt = () => {
+    if (answered !== total || submitted) return;
+    setTimerRunning(false);
+    const attempt = saveReadingPracticeAttempt({
+      level: "A2",
+      setId: "a2-reading-practice-01",
+      score,
+      total,
+      elapsedSeconds: 30 * 60 - secondsLeft,
+      sectionScores,
+    });
+    setSavedAttempt(attempt);
+    setSubmitted(true);
   };
 
   const formatTime = (seconds) =>
@@ -604,22 +639,32 @@ export default function A2ReadingPracticeSet() {
       >
         {submitted ? (
           <>
-            <h2 style={{ marginTop: 0 }}>Result: {score}/{total}</h2>
-            <p>{Math.round((score / total) * 100)}% correct. Review the highlighted answers above, then reset when you want a fresh attempt.</p>
-            <button type="button" onClick={reset}>Practice again</button>
+            <h2 style={{ marginTop: 0 }}>Result: {score}/{total} · {percent}%</h2>
+            <p>
+              <strong>{getReadingReadinessLabel(percent)}.</strong>
+              {weakestSection ? ` Practise next: ${weakestSection.label}.` : ""}
+              {savedAttempt ? ` Saved as attempt ${savedAttempt.attemptNumber} in My Exam File.` : ""}
+            </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, margin: "14px 0" }}>
+              {sectionScores.map((section) => (
+                <div key={section.label} style={{ border: "1px solid #d1d5db", padding: 10, background: "#ffffff" }}>
+                  <strong>{section.label}</strong>
+                  <div>{section.score}/{section.total}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button type="button" onClick={reset}>Practice Lesen again</button>
+              <button type="button" onClick={() => navigate("/exams/speaking")}>Go to Sprechen</button>
+              <button type="button" onClick={() => navigate("/exams/writing")}>Go to Schreiben</button>
+              <button type="button" onClick={() => navigate("/exams/overview")}>Back to Exams Room</button>
+            </div>
           </>
         ) : (
           <>
             <strong>Check your answers</strong>
             <p>{answered === total ? "All 20 questions are answered." : `Answer all 20 questions first. ${total - answered} remaining.`}</p>
-            <button
-              type="button"
-              disabled={answered !== total}
-              onClick={() => {
-                setTimerRunning(false);
-                setSubmitted(true);
-              }}
-            >
+            <button type="button" disabled={answered !== total} onClick={submitAttempt}>
               Check answers
             </button>
           </>
