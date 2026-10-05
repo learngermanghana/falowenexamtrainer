@@ -1609,7 +1609,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
-      {examSection === "writing" ? <WritingPage mode="exam" /> : null}
+      {examSection === "writing" ? <WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage /> : null}
       {examSection === "lesen" ? <LesenPage /> : null}
