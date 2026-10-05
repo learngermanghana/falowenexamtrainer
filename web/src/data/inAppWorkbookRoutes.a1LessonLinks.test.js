@@ -3,7 +3,6 @@ import path from "path";
 import { getA1GrammarRoute } from "./a1GrammarRoutes";
 import { getA1TeacherVideoResources } from "./a1TeacherVideoResources";
 import {
-  A1_DAY23_CHAPTER142_WRITING_ROUTE,
   getConfiguredInAppWorkbookResourceRoute,
   getConfiguredInAppWorkbookRoute,
 } from "./inAppWorkbookRoutes";
@@ -44,7 +43,7 @@ const A1_RESOURCE_HUB_CASES = [
   [20, "12.3", "/campus/course/letter-writing-intro-german-a1-day-12-3"],
   [21, "13", "/campus/course/a1-day-21-weather-workbook"],
   [22, "14.1", "/campus/course/a1-day-22-health-and-body-parts-workbook"],
-  [24, "5.10", "/campus/course/a1-final-mock-exam"],
+  [23, "5.10", "/campus/course/a1-final-mock-exam"],
 ].map(([day, chapter, workbookPath]) => ({ day, chapter, workbookPath }));
 
 const getAiVideoUrls = (day, chapter) =>
@@ -220,15 +219,6 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
   });
 
-  it("opens Day 23 Chapter 14.2 as the intentional writing-workshop exception", () => {
-    window.history.replaceState({}, "", "/campus/course/lesson/A1/23?chapter=14.2");
-
-    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe(
-      A1_DAY23_CHAPTER142_WRITING_ROUTE,
-    );
-    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe("");
-  });
-
   it("keeps the later A1 destination pages registered", () => {
     const appSource = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     const indexSource = fs.readFileSync(path.resolve(__dirname, "../index.jsx"), "utf8");
@@ -237,7 +227,6 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
       "/campus/course/verboten-erlaubt-5-9",
       "/campus/course/a1-day-21-weather-workbook",
       "/campus/course/a1-day-22-health-and-body-parts-workbook",
-      "/campus/course/a1-day-23-writing-workshop-14-2",
       "/campus/course/a1-final-mock-exam",
     ].forEach((route) => expect(appSource).toContain(route));
 
