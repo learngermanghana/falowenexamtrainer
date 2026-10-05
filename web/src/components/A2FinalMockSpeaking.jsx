@@ -181,8 +181,14 @@ export default function A2FinalMockSpeaking({
   const recordingSecondsRef = useRef(0);
   const attemptsRef = useRef({});
   const timeoutMarkTriggeredRef = useRef(false);
+  const timeoutAutoSubmitTaskIdRef = useRef("");
+  const secondsLeftRef = useRef(0);
 
   const secondsLeft = Math.max(0, Number(externalSecondsLeft) || 0);
+
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
 
   useEffect(() => {
     attemptsRef.current = attempts;
@@ -222,6 +228,20 @@ export default function A2FinalMockSpeaking({
 
   const hasInFlightSubmission = useMemo(
     () => TASKS.some((task) => Boolean(attempts[task.id]?.submitting)),
+    [attempts],
+  );
+
+  const pendingRecordedTask = useMemo(
+    () =>
+      TASKS.find((task) => {
+        const attempt = attempts[task.id];
+        return Boolean(
+          attempt?.audioBlob &&
+          !attempt?.submitted &&
+          !attempt?.submitting &&
+          !attempt?.timeoutSubmissionFailed
+        );
+      }) || null,
     [attempts],
   );
 
@@ -322,9 +342,9 @@ export default function A2FinalMockSpeaking({
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   };
 
-  const submitTask = async (task) => {
+  const submitTask = useCallback(async (task, { timeoutAuto = false } = {}) => {
     const attempt = attempts[task.id];
-    if (!attempt?.audioBlob || attempt.submitted) return;
+    if (!attempt?.audioBlob || attempt.submitted || attempt.submitting) return;
 
     setError("");
     setStatus(`${task.title}: Falowen is listening and transcribing…`);
@@ -364,11 +384,15 @@ export default function A2FinalMockSpeaking({
     } catch (submitError) {
       setAttempts((current) => ({
         ...current,
-        [task.id]: { ...current[task.id], submitting: false },
+        [task.id]: {
+          ...current[task.id],
+          submitting: false,
+          timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0,
+        },
       }));
       setError(userFacingAudioError(submitError, submitError?.message || "Could not analyze this recording."));
     }
-  };
+  }, [attempts, idToken, user?.uid]);
 
   const resetUnsubmittedRecording = (taskId) => {
     setAttempts((current) => {
@@ -417,14 +441,35 @@ export default function A2FinalMockSpeaking({
       secondsLeft > 0 ||
       result ||
       marking ||
-      hasInFlightSubmission ||
       timeoutMarkTriggeredRef.current
     ) {
       return;
     }
+
+    if (recordingTaskId || hasInFlightSubmission) {
+      return;
+    }
+
+    if (pendingRecordedTask) {
+      if (timeoutAutoSubmitTaskIdRef.current !== pendingRecordedTask.id) {
+        timeoutAutoSubmitTaskIdRef.current = pendingRecordedTask.id;
+        submitTask(pendingRecordedTask, { timeoutAuto: true });
+      }
+      return;
+    }
+
     timeoutMarkTriggeredRef.current = true;
     markSpeaking({ force: true });
-  }, [secondsLeft, result, marking, hasInFlightSubmission, markSpeaking]);
+  }, [
+    secondsLeft,
+    result,
+    marking,
+    recordingTaskId,
+    hasInFlightSubmission,
+    pendingRecordedTask,
+    submitTask,
+    markSpeaking,
+  ]);
 
   return (
     <article className="a1-goethe-mock-exam a1-sprechen-mock-exam">
