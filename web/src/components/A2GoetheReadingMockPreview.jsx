@@ -10,76 +10,65 @@ export const A2_GOETHE_READING_MOCK = Object.freeze({
       "Markieren Sie für die Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
     ],
     article: {
-      title: "Die Konditorin Maria Lenz",
-      subtitle: "„Neue Ideen gehören für mich einfach dazu.“",
+      title: "Ein neuer Treffpunkt im Viertel: Das Stadtteilcafé „Miteinander“",
+      subtitle: "",
       paragraphs: [
-        "In der kleinen Konditorei von Maria Lenz findet man nicht nur klassische Kuchen. Sie entwickelt regelmäßig neue Rezepte und kombiniert zum Beispiel Schokolade mit ungewöhnlichen Früchten oder Gewürzen. Viele Kunden kommen gerade deshalb zu ihr. Besonders am Wochenende ist das Geschäft sehr voll. Wer eine Geburtstagstorte oder eine andere besondere Torte möchte, sollte deshalb einige Tage vorher bestellen.",
-        "Obwohl ihre Konditorei sehr erfolgreich ist, möchte Maria keine zweite Filiale eröffnen. „Natürlich könnte ich damit mehr verdienen“, sagt sie. „Aber dann hätte ich weniger Zeit für meine Kunden und für neue Rezepte. Das möchte ich nicht.“",
-        "Maria wurde 1982 in Kassel geboren. Nach der Schule machte sie eine Ausbildung in einer großen Bäckerei. Danach arbeitete sie zunächst ein Jahr in Österreich. Später reiste sie mehrere Monate durch Italien und Frankreich und lernte dort neue Ideen für Kuchen und Desserts kennen.",
-        "Nach ihrer Rückkehr zog sie wegen einer Arbeitsstelle nach Leipzig. Dort arbeitete sie zuerst in einem Hotel. Zwei Jahre später eröffnete sie ihre eigene kleine Konditorei.",
-        "Heute kennen viele Menschen Maria auch aus der Fernsehsendung „Süß und einfach“. Dort backt sie zusammen mit bekannten Gästen und zeigt Rezepte, die man auch zu Hause ausprobieren kann.",
+        "Seit letzter Woche gibt es in der Goethestraße ein neues Stadtteilcafé. Es heißt „Miteinander“ und hat von Dienstag bis Sonntag geöffnet. Nur am Montag ist Ruhetag. Das Café ist mehr als ein normaler Gastronomiebetrieb: Hier können sich Nachbarn treffen, gemeinsam Deutsch sprechen oder Bücher austauschen.",
+        "Die Idee zu dem Projekt hatte Sabine Meyer. Sie wohnt seit 20 Jahren im Viertel. „Viele ältere Menschen sind oft allein und Jugendliche suchen nach der Schule einen ruhigen Ort für die Hausaufgaben. Bei uns sind alle willkommen“, erklärt Frau Meyer. Im Café arbeiten vier fest angestellte Mitarbeiter und sechs ehrenamtliche Helferinnen und Helfer.",
+        "Besonders beliebt ist das Frühstück am Wochenende. Von 9:00 bis 12:00 Uhr gibt es frische Brötchen, Käse, Obst und selbst gemachte Marmelade. Das Frühstück kostet 5 Euro pro Person. Kinder unter 6 Jahren essen kostenlos.",
+        "Ab nächstem Monat bietet das Café auch Abendkurse an. Jeden Mittwoch von 18:00 bis 20:00 Uhr gibt es einen internationalen Kochkurs. Eine Anmeldung ist nicht nötig – man kann einfach vorbeikommen.",
       ],
-    },
-    example: {
-      number: 0,
-      question: "In Marias Konditorei können Kunden ...",
-      options: [
-        { id: "a", label: "klassische Kuchen und neue Kreationen kaufen." },
-        { id: "b", label: "nur Torten für Geburtstage bestellen." },
-        { id: "c", label: "hauptsächlich italienische Gerichte essen." },
-      ],
-      answer: "a",
     },
     questions: [
       {
         number: 1,
-        question: "Wer eine besondere Torte möchte, ...",
+        question: "Das Stadtteilcafé „Miteinander“ ...",
         options: [
-          { id: "a", label: "muss sie einige Tage vorher bestellen." },
-          { id: "b", label: "kann sie nur am Wochenende kaufen." },
-          { id: "c", label: "muss persönlich mit Maria sprechen." },
-        ],
-        answer: "a",
-      },
-      {
-        number: 2,
-        question: "Maria möchte keine zweite Filiale, weil ...",
-        options: [
-          { id: "a", label: "sie mit der Konditorei zu wenig verdient." },
-          { id: "b", label: "sie genug Zeit für Kunden und neue Rezepte haben möchte." },
-          { id: "c", label: "sie lieber wieder in einem Hotel arbeiten möchte." },
+          { id: "a", label: "hat an allen Tagen der Woche geöffnet." },
+          { id: "b", label: "ist montags geschlossen." },
+          { id: "c", label: "hat nur am Wochenende geöffnet." },
         ],
         answer: "b",
       },
       {
-        number: 3,
-        question: "Nach ihrer Ausbildung ...",
+        number: 2,
+        question: "Sabine Meyer ...",
         options: [
-          { id: "a", label: "eröffnete Maria sofort ihre eigene Konditorei." },
-          { id: "b", label: "arbeitete sie zuerst eine Zeit lang in Österreich." },
-          { id: "c", label: "zog sie direkt nach Leipzig." },
+          { id: "a", label: "wohnt erst seit wenigen Monaten im Viertel." },
+          { id: "b", label: "hat das Café zusammen mit Jugendlichen gegründet." },
+          { id: "c", label: "hatte die Idee für das Café." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 3,
+        question: "Im Café arbeiten ...",
+        options: [
+          { id: "a", label: "nur ehrenamtliche Personen." },
+          { id: "b", label: "insgesamt zehn Personen." },
+          { id: "c", label: "vier ehrenamtliche Helfer." },
         ],
         answer: "b",
       },
       {
         number: 4,
-        question: "Viele Menschen kennen Maria heute durch ...",
+        question: "Das Wochenende-Frühstück ...",
         options: [
-          { id: "a", label: "eine Fernsehsendung." },
-          { id: "b", label: "ihre Arbeit in Frankreich." },
-          { id: "c", label: "ein großes Hotel in Leipzig." },
+          { id: "a", label: "kostet für kleine Kinder nichts." },
+          { id: "b", label: "dauert von 9:00 bis 10:00 Uhr." },
+          { id: "c", label: "kostet für Kinder ab 6 Jahren 10 Euro." },
         ],
         answer: "a",
       },
       {
         number: 5,
-        question: "Der Text berichtet hauptsächlich über ...",
+        question: "Wer am Kochkurs am Mittwoch teilnehmen möchte, ...",
         options: [
-          { id: "a", label: "Marias beruflichen Weg und ihre Arbeit als Konditorin." },
-          { id: "b", label: "verschiedene Kuchen aus Deutschland, Italien und Frankreich." },
-          { id: "c", label: "die Ausbildungsmöglichkeiten in einer Bäckerei." },
+          { id: "a", label: "muss vorher anrufen und reservieren." },
+          { id: "b", label: "kann ohne vorherige Anmeldung kommen." },
+          { id: "c", label: "muss einen Platz im Internet buchen." },
         ],
-        answer: "a",
+        answer: "b",
       },
     ],
   },
@@ -389,17 +378,19 @@ export default function A2GoetheReadingMockPreview() {
             {A2_GOETHE_READING_MOCK.teil1.article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
           </article>
 
-          <section className="a2-mock-question a2-mock-example">
-            <h3>Beispiel 0</h3>
-            <p>{A2_GOETHE_READING_MOCK.teil1.example.question}</p>
-            <ChoiceList
-              name="a2-t1-example"
-              options={A2_GOETHE_READING_MOCK.teil1.example.options}
-              value={A2_GOETHE_READING_MOCK.teil1.example.answer}
-              onChange={() => {}}
-              disabled
-            />
-          </section>
+          {A2_GOETHE_READING_MOCK.teil1.example ? (
+            <section className="a2-mock-question a2-mock-example">
+              <h3>Beispiel 0</h3>
+              <p>{A2_GOETHE_READING_MOCK.teil1.example.question}</p>
+              <ChoiceList
+                name="a2-t1-example"
+                options={A2_GOETHE_READING_MOCK.teil1.example.options}
+                value={A2_GOETHE_READING_MOCK.teil1.example.answer}
+                onChange={() => {}}
+                disabled
+              />
+            </section>
+          ) : null}
 
           {A2_GOETHE_READING_MOCK.teil1.questions.map((question) => (
             <section className="a2-mock-question" key={question.number}>
