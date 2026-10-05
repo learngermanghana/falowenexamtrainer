@@ -659,6 +659,7 @@ export default function A2FinalMockExamPage() {
             {A2_GOETHE_READING_MOCK.teil3.instruction.map((line) => <p key={line}>{line}</p>)}
           </header>
           <article className="a2-mock-email">
+            <div className="a2-mock-email-field"><strong>Von:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.from}</span></div>
             <div className="a2-mock-email-field"><strong>An:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.to}</span></div>
             <div className="a2-mock-email-field"><strong>Betreff:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.subject}</span></div>
             <div className="a2-mock-email-body">
