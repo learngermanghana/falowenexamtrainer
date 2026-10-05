@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
 import { A2_READING_PRACTICE_SET_01 } from "./A2ReadingPracticeSet";
+import { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
 import { A1_GOETHE_READING_MOCK_TEIL1 } from "./A1GoetheReadingMockTeil1Preview";
 import { A2_GOETHE_READING_MOCK } from "./A2GoetheReadingMockPreview";
 
@@ -65,6 +66,43 @@ describe("Exams Room Lesen practice banks", () => {
     });
   });
 
+  test("provides three complete A2 Lesen samples with 20 questions each", () => {
+    expect(A2_READING_PRACTICE_SAMPLES).toHaveLength(3);
+
+    A2_READING_PRACTICE_SAMPLES.forEach((sample) => {
+      expect(sample.teil1.questions).toHaveLength(5);
+      expect(sample.teil2.questions).toHaveLength(5);
+      expect(sample.teil3.questions).toHaveLength(5);
+      expect(sample.teil4.people).toHaveLength(5);
+
+      expect(
+        sample.teil1.questions.length +
+          sample.teil2.questions.length +
+          sample.teil3.questions.length +
+          sample.teil4.people.length,
+      ).toBe(20);
+
+      expect(sample.teil1.questions.map((item) => item.number)).toEqual([1, 2, 3, 4, 5]);
+      expect(sample.teil2.questions.map((item) => item.number)).toEqual([6, 7, 8, 9, 10]);
+      expect(sample.teil3.questions.map((item) => item.number)).toEqual([11, 12, 13, 14, 15]);
+      expect(sample.teil4.people.map((item) => item.number)).toEqual([16, 17, 18, 19, 20]);
+    });
+  });
+
+  test("routes A2 directly into the selectable four-part sample experience", () => {
+    expect(lesenPageSource).toContain("<A2ReadingPracticeSamples />");
+    const source = fs.readFileSync(
+      path.resolve(__dirname, "A2ReadingPracticeSamples.jsx"),
+      "utf8",
+    );
+    expect(source).toContain('aria-label="A2 Lesen sample selector"');
+    expect(source).toContain('aria-label="A2 Lesen part selector"');
+    expect(source).toContain("Lesen Sample 1");
+    expect(source).toContain("Lesen Sample 2");
+    expect(source).toContain("Lesen Sample 3");
+    expect(source).not.toContain("Demnächst");
+  });
+
   test("provides a complete 20-question A2 reading practice set", () => {
     const total =
       A2_READING_PRACTICE_SET_01.teil1.questions.length +
@@ -75,15 +113,17 @@ describe("Exams Room Lesen practice banks", () => {
     expect(total).toBe(20);
   });
 
-  test("keeps A2 Exams Room questions separate from the Course Book mock", () => {
-    expect(A2_READING_PRACTICE_SET_01.teil1.article.title).not.toBe(
-      A2_GOETHE_READING_MOCK.teil1.article.title,
-    );
-    expect(A2_READING_PRACTICE_SET_01.teil3.email.subject).not.toBe(
-      A2_GOETHE_READING_MOCK.teil3.email.subject,
-    );
-    expect(A2_READING_PRACTICE_SET_01.teil4.ads.map((ad) => ad.title)).not.toEqual(
-      A2_GOETHE_READING_MOCK.teil4.ads.map((ad) => ad.title),
-    );
+  test("keeps every A2 Exams Room sample separate from the Course Book mock", () => {
+    A2_READING_PRACTICE_SAMPLES.forEach((sample) => {
+      expect(sample.teil1.article.title).not.toBe(
+        A2_GOETHE_READING_MOCK.teil1.article.title,
+      );
+      expect(sample.teil3.email.subject).not.toBe(
+        A2_GOETHE_READING_MOCK.teil3.email.subject,
+      );
+      expect(sample.teil4.ads.map((ad) => ad.title)).not.toEqual(
+        A2_GOETHE_READING_MOCK.teil4.ads.map((ad) => ad.title),
+      );
+    });
   });
 });
