@@ -83,14 +83,8 @@ const PRACTICE_LESSONS = [
     destination: "/campus/course/verboten-erlaubt-5-9",
   }),
   practice({
-    chapter: "14.2",
-    day: 23,
-    title: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
-    destination: "/campus/course/a1-day-23-writing-workshop-14-2",
-  }),
-  practice({
     chapter: "5.10",
-    day: 24,
+    day: 23,
     title: "A1 Final Mock Exam",
     destination: "/campus/course/a1-final-mock-exam",
   }),
@@ -142,7 +136,6 @@ export const A1_COURSE_LESSON_ORDER = Object.freeze([
   "12.3",
   "13",
   "14.1",
-  "14.2",
   "5.10",
 ]);
 
