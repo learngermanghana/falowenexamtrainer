@@ -2041,7 +2041,9 @@ const WritingPage = ({
             ? "View tutor comments and reply from here."
             : isCourseMode
               ? "For Days 1–19, build consistency by writing and analysing one section at a time. From Day 21, write and mark one complete essay."
-              : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
+              : isSimplifiedExamFlow
+                ? "Choose a letter question, write one answer, get AI marking, and save the marked copy for your tutor."
+                : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
