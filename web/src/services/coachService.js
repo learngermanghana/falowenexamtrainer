@@ -9,7 +9,7 @@ import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 const backendUrl = getBackendUrl();
 const speakingApiUrl = getSpeakingApiUrl() || backendUrl;
 
-export const SPEAKING_ANALYZE_TIMEOUT_MS = 30_000;
+export const TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS = 30_000;
 
 const createSpeakingAnalyzeTimeoutError = () => {
   const error = new Error(
@@ -58,16 +58,29 @@ export const analyzeAudio = async ({
   interactionMode,
   userId,
   idToken,
+  timeoutMs = null,
 }) => {
-  const controller = new AbortController();
+  const numericTimeoutMs = Number(timeoutMs);
+  const hasTimeout =
+    timeoutMs !== null &&
+    timeoutMs !== undefined &&
+    Number.isFinite(numericTimeoutMs) &&
+    numericTimeoutMs > 0;
+  const controller = hasTimeout ? new AbortController() : null;
   let timeoutId = null;
 
-  const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = globalThis.setTimeout(() => {
-      controller.abort();
-      reject(createSpeakingAnalyzeTimeoutError());
-    }, SPEAKING_ANALYZE_TIMEOUT_MS);
-  });
+  const timeoutPromise = hasTimeout
+    ? new Promise((_, reject) => {
+        timeoutId = globalThis.setTimeout(() => {
+          controller.abort();
+          reject(createSpeakingAnalyzeTimeoutError());
+        }, numericTimeoutMs);
+      })
+    : null;
+
+  const requestTimeoutConfig = hasTimeout
+    ? { signal: controller.signal, timeout: numericTimeoutMs }
+    : {};
 
   const runAnalysis = async () => {
     const submitViaFirebaseUrl = async () => {
@@ -87,8 +100,7 @@ export const analyzeAudio = async ({
           "Content-Type": "application/json",
           ...authHeaders(idToken),
         },
-        signal: controller.signal,
-        timeout: SPEAKING_ANALYZE_TIMEOUT_MS,
+        ...requestTimeoutConfig,
       });
 
       return response.data;
@@ -112,8 +124,7 @@ export const analyzeAudio = async ({
         headers: {
           ...authHeaders(idToken),
         },
-        signal: controller.signal,
-        timeout: SPEAKING_ANALYZE_TIMEOUT_MS,
+        ...requestTimeoutConfig,
       });
 
       return response.data;
@@ -126,13 +137,20 @@ export const analyzeAudio = async ({
     try {
       return await submitViaFirebaseUrl();
     } catch (error) {
-      if (controller.signal.aborted || error?.code === "ECONNABORTED") {
+      if (
+        hasTimeout &&
+        (controller?.signal?.aborted || error?.code === "ECONNABORTED")
+      ) {
         throw createSpeakingAnalyzeTimeoutError();
       }
       console.warn("Falling back to direct audio upload for speaking analyze", error);
       return submitAsMultipartFallback();
     }
   };
+
+  if (!hasTimeout) {
+    return runAnalysis();
+  }
 
   try {
     return await Promise.race([runAnalysis(), timeoutPromise]);
