@@ -1,51 +1,33 @@
+import fs from "fs";
+import path from "path";
 import { getA1CourseBookCard } from "./a1CourseBookCards";
-import {
-  A1_DAY23_CHAPTER142_WRITING_ROUTE,
-  getConfiguredInAppWorkbookResourceRoute,
-  getConfiguredInAppWorkbookRoute,
-} from "./inAppWorkbookRoutes";
-import {
-  A1_DAY23_CHAPTER142_WRITING_PATH,
-  shouldRenderWorkbookGuide,
-  shouldSuppressGenericWorkbookGuide,
-} from "../utils/autoWorkbookGuideRouting";
+import { getConfiguredInAppWorkbookResourceRoute } from "./inAppWorkbookRoutes";
 
-describe("A1 Day 23 Chapter 14.2 writing workshop", () => {
-  const originalPath = window.location.pathname;
+const read = (relativePath) =>
+  fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
-  afterEach(() => {
-    window.history.replaceState({}, "", originalPath || "/");
+describe("A1 Day 23 final mock handoff", () => {
+  it("retires Chapter 14.2 from the A1 Course Book", () => {
+    expect(getA1CourseBookCard({ displayDay: 23, chapter: "14.2" })).toBeNull();
   });
 
-  it("stays self-practice and does not gate course progression", () => {
-    const card = getA1CourseBookCard({ displayDay: 23, chapter: "14.2" });
+  it("makes the A1 Final Mock the Day 23 Course Book destination", () => {
+    const card = getA1CourseBookCard({ displayDay: 23, chapter: "5.10" });
 
     expect(card).toMatchObject({
-      title: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
+      title: "A1 Final Mock Exam",
       assessmentType: "self-practice",
       submissionRequired: false,
       progressionEligible: false,
     });
-  });
-
-  it("opens the writing workshop from the Day 23 lesson link", () => {
-    window.history.replaceState({}, "", "/campus/course/lesson/A1/23?chapter=14.2");
-
-    expect(getConfiguredInAppWorkbookRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe(
-      A1_DAY23_CHAPTER142_WRITING_ROUTE,
+    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "5.10" })).toBe(
+      "/campus/course/a1-final-mock-exam",
     );
   });
 
-  it("remains a self-managed destination rather than a generic workbook route", () => {
-    expect(getConfiguredInAppWorkbookResourceRoute({ level: "A1", day: 23, chapter: "14.2" })).toBe("");
-    expect(A1_DAY23_CHAPTER142_WRITING_PATH).toBe(A1_DAY23_CHAPTER142_WRITING_ROUTE);
-    expect(shouldSuppressGenericWorkbookGuide(A1_DAY23_CHAPTER142_WRITING_PATH)).toBe(true);
-    expect(
-      shouldRenderWorkbookGuide({
-        pathname: A1_DAY23_CHAPTER142_WRITING_PATH,
-        search: "",
-        match: { level: "A1", day: 23, resource: { chapter: "14.2", assignment: false } },
-      }),
-    ).toBe(false);
+  it("redirects old Chapter 14.2 URLs to Exams Room Schreiben", () => {
+    const app = read("../App.js");
+    expect(app).toContain('path="/campus/course/a1-day-23-writing-workshop-14-2"');
+    expect(app).toContain('<Navigate to="/exams/writing" replace />');
   });
 });
