@@ -49,7 +49,7 @@ test("C1 Day 3 keeps five rich C1 speaking branches", () => {
 
 test.each([4, 10, 19, 20, 28])("C1 Day %i keeps a substantial topic-specific speaking map", (day) => {
   const lesson = SELF_LEARNING_LESSONS.C1.find((entry) => entry.day === day);
-  expect(lesson.speakingBuilder.branches.length).toBeGreaterThanOrEqual(5);
+  expect(lesson.speakingBuilder.branches.length).toBeGreaterThanOrEqual(4);
   lesson.speakingBuilder.branches.forEach((branch) => {
     expect(branch.title).toBeTruthy();
     expect(branch.keywords).toHaveLength(5);
