@@ -2,7 +2,7 @@ import React from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples from "./A1ReadingPracticeSamples";
-import A2ReadingPracticeSet from "./A2ReadingPracticeSet";
+import A2ReadingPracticeSamples from "./A2ReadingPracticeSamples";
 
 const lesenLevels = [
   {
@@ -40,7 +40,7 @@ const LesenPage = () => {
             Interactive A2 reading practice with a separate question bank from the Course Book mock.
           </p>
         </div>
-        <A2ReadingPracticeSet />
+        <A2ReadingPracticeSamples />
       </section>
     );
   }
