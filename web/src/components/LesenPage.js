@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import A2ReadingPracticeSet from "./A2ReadingPracticeSet";
+import { getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
 
 const lesenLevels = [
   {
@@ -334,6 +336,7 @@ const flattenQuestions = (sections) =>
   sections.flatMap((section) => section.tasks.flatMap((task) => task.questions));
 
 const LesenPage = () => {
+  const navigate = useNavigate();
   const { level } = useExam();
   const { studentProfile, user } = useAuth();
   const normalizedLevel = String(level || "A1").toUpperCase();
@@ -341,6 +344,8 @@ const LesenPage = () => {
   const A1_EXAM_SECONDS = 25 * 60;
   const [remainingSeconds, setRemainingSeconds] = useState(A1_EXAM_SECONDS);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [savedAttempt, setSavedAttempt] = useState(null);
 
   const visibleLevels = useMemo(() => {
     const match = lesenLevels.find((item) => item.level === normalizedLevel);
@@ -349,8 +354,22 @@ const LesenPage = () => {
 
   const allQuestions = useMemo(() => flattenQuestions(A1_READING_PRACTICE_SET_01.sections), []);
   const answeredCount = Object.keys(answers).length;
-  const isComplete = answeredCount === allQuestions.length && allQuestions.length > 0;
+  const allAnswered = answeredCount === allQuestions.length && allQuestions.length > 0;
   const score = allQuestions.filter((question) => answers[question.id] === question.correct).length;
+  const sectionScores = useMemo(
+    () =>
+      A1_READING_PRACTICE_SET_01.sections.map((section, index) => {
+        const questions = section.tasks.flatMap((task) => task.questions);
+        return {
+          label: `Teil ${index + 1}`,
+          score: questions.filter((question) => answers[question.id] === question.correct).length,
+          total: questions.length,
+        };
+      }),
+    [answers],
+  );
+  const percent = Math.round((score / Math.max(1, allQuestions.length)) * 100);
+  const weakestSection = getWeakestReadingSection(sectionScores);
   const studentName = studentProfile?.name || studentProfile?.displayName || user?.displayName || "Student";
 
   useEffect(() => {
@@ -375,9 +394,12 @@ const LesenPage = () => {
 
   useEffect(() => {
     if (normalizedLevel !== "A1") return;
+    setAnswers({});
+    setSubmitted(false);
+    setSavedAttempt(null);
     setRemainingSeconds(A1_EXAM_SECONDS);
     setTimerRunning(false);
-  }, [normalizedLevel, A1_EXAM_SECONDS]);
+  }, [normalizedLevel]);
 
   const handleTimerToggle = () => {
     if (remainingSeconds <= 0) {
@@ -400,19 +422,44 @@ const LesenPage = () => {
   };
 
   const handleAnswer = (questionId, option) => {
+    if (submitted) return;
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
+  };
+
+  const resetA1Practice = () => {
+    setAnswers({});
+    setSubmitted(false);
+    setSavedAttempt(null);
+    setRemainingSeconds(A1_EXAM_SECONDS);
+    setTimerRunning(false);
+  };
+
+  const submitA1Practice = () => {
+    if (!allAnswered || submitted) return;
+    setTimerRunning(false);
+    const attempt = saveReadingPracticeAttempt({
+      level: "A1",
+      setId: "a1-reading-practice-01",
+      score,
+      total: allQuestions.length,
+      elapsedSeconds: A1_EXAM_SECONDS - remainingSeconds,
+      sectionScores,
+    });
+    setSavedAttempt(attempt);
+    setSubmitted(true);
   };
 
   const renderOptionButton = (question, option) => {
     const selected = answers[question.id] === option;
-    const isCorrect = isComplete && option === question.correct;
-    const isIncorrect = isComplete && selected && option !== question.correct;
+    const isCorrect = submitted && option === question.correct;
+    const isIncorrect = submitted && selected && option !== question.correct;
 
     return (
       <button
         key={option}
         type="button"
         onClick={() => handleAnswer(question.id, option)}
+        disabled={submitted}
         style={{
           ...styles.buttonSecondary,
           ...(selected ? styles.buttonSecondaryActive : {}),
@@ -449,6 +496,18 @@ const LesenPage = () => {
       <div style={{ ...styles.focusNotice, marginTop: 0 }}>
         Showing resources for level <strong>{normalizedLevel}</strong> so you can stay focused.
       </div>
+      {["A1", "A2"].includes(normalizedLevel) ? (
+        <div style={{ ...styles.card, margin: 0, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <strong>Lesen practice sets</strong>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Set 1 is active. Add future sets without changing this page.</p>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <span style={styles.badge}>Practice Set 1 · Active</span>
+            <span style={styles.badge}>Practice Set 2 · Coming later</span>
+          </div>
+        </div>
+      ) : null}
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
         {visibleLevels.map((levelItem) => (
           <div key={levelItem.level} style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
@@ -543,7 +602,7 @@ const LesenPage = () => {
                           <div style={{ display: "grid", gap: 6 }}>
                             {question.options.map((option) => renderOptionButton(question, option))}
                           </div>
-                          {isComplete ? (
+                          {submitted ? (
                             <div
                               style={{
                                 fontSize: 13,
@@ -566,21 +625,50 @@ const LesenPage = () => {
             style={{
               ...styles.card,
               margin: 0,
-              background: "#f8fafc",
+              background: submitted ? "#f0fdf4" : "#f8fafc",
               borderColor: "#e2e8f0",
               display: "grid",
-              gap: 6,
+              gap: 10,
             }}
           >
-            <div style={{ fontWeight: 700 }}>Progress</div>
-            <div style={{ fontSize: 14, color: "#475569" }}>
-              Answered {answeredCount} of {allQuestions.length} questions.
-            </div>
-            {isComplete ? (
-              <div style={{ fontWeight: 700, color: "#0f172a" }}>
-                Score: {score} / {allQuestions.length}
-              </div>
-            ) : null}
+            {submitted ? (
+              <>
+                <div style={{ fontWeight: 800, fontSize: 18 }}>
+                  Result: {score}/{allQuestions.length} · {percent}%
+                </div>
+                <div style={{ fontSize: 14, color: "#475569" }}>
+                  <strong>{getReadingReadinessLabel(percent)}.</strong>
+                  {weakestSection ? ` Practise next: ${weakestSection.label}.` : ""}
+                  {savedAttempt ? ` Saved as attempt ${savedAttempt.attemptNumber} in My Exam File.` : ""}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8 }}>
+                  {sectionScores.map((section) => (
+                    <div key={section.label} style={{ border: "1px solid #d1d5db", padding: 10, background: "#ffffff" }}>
+                      <strong>{section.label}</strong>
+                      <div>{section.score}/{section.total}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button type="button" style={styles.primaryButton} onClick={resetA1Practice}>Practice Lesen again</button>
+                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/speaking")}>Go to Sprechen</button>
+                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/writing")}>Go to Schreiben</button>
+                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/overview")}>Back to Exams Room</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontWeight: 700 }}>Check your answers</div>
+                <div style={{ fontSize: 14, color: "#475569" }}>
+                  Answered {answeredCount} of {allQuestions.length} questions.
+                </div>
+                <div>
+                  <button type="button" style={styles.primaryButton} disabled={!allAnswered} onClick={submitA1Practice}>
+                    Check answers
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       ) : null}
