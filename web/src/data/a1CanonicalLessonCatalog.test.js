@@ -10,7 +10,7 @@ import {
 const EXPECTED_ROUTE_KEYS = [
   "0.1", "0.2", "1.1", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
   "12.1", "12.2", "12.3", "13", "14.1",
-  "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "14.2", "5.10",
+  "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "5.10",
 ];
 
 describe("A1 canonical lesson catalog", () => {
@@ -123,9 +123,10 @@ describe("A1 canonical lesson catalog", () => {
       kind: "practice",
     });
     expect(getA1CourseLessonNeighbors("A1-14.1").next).toMatchObject({
-      routeKey: "14.2",
+      routeKey: "5.10",
       day: 23,
       kind: "practice",
+      destination: "/campus/course/a1-final-mock-exam",
     });
   });
 
@@ -136,7 +137,6 @@ describe("A1 canonical lesson catalog", () => {
       ["1.1-PRACTICE", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
       ["1.2-PRACTICE", "/campus/course/a1-day-3-kapitel-1-2-workbook"],
       ["1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
-      ["14.2", "/campus/course/a1-day-23-writing-workshop-14-2"],
       ["5.10", "/campus/course/a1-final-mock-exam"],
     ].forEach(([identity, destination]) => {
       expect(getA1CanonicalLesson(identity)?.destination).toBe(destination);
