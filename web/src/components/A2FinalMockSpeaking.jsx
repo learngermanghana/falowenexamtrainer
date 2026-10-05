@@ -1,6 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { analyzeAudio, scoreA2MockSpeaking } from "../services/coachService";
+import {
+  TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS,
+  analyzeAudio,
+  scoreA2MockSpeaking,
+} from "../services/coachService";
 import {
   SPEAKING_AUDIO_MIN_SECONDS,
   buildRecordedAudioBlob,
@@ -363,6 +367,7 @@ export default function A2FinalMockSpeaking({
         interactionMode: "single-candidate A2 mock",
         userId: user?.uid || "guest",
         idToken,
+        timeoutMs: TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS,
       });
 
       const transcript = String(response?.transcript || "").trim();
