@@ -16,7 +16,7 @@ const PRACTICE_SECTIONS = [
   {
     key: "writing",
     title: "Schreiben",
-    description: "Writing practice with corrections and tutor-ready submissions.",
+    description: "Choose one letter question, get AI marking, then save the marked copy for tutor review.",
     status: "Ready",
   },
   {
