@@ -978,7 +978,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-mock-practice-preview" element={<A2FinalMockExamPage />} />
           <Route path="/campus/course/a2-final-mock-exam" element={<A2FinalMockExamPage />} />
           <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
-          <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A1" />} />
+          <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="B1" />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
