@@ -8,7 +8,7 @@ import { toDate } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { goetheExamLevels as fallbackGoetheExamLevels } from "../data/goetheExamSchedule";
 import { getGoetheExamFileGuide, GOETHE_EXAM_FILE_LEVELS } from "../data/goetheExamFileGuide";
-import { getReadingPracticeHistory, getReadingReadinessLabel } from "../services/readingPracticeHistory";
+import { getReadingPracticeHistory, getReadingPracticeStudentKey, getReadingReadinessLabel } from "../services/readingPracticeHistory";
 
 const GOETHE_ACCOUNT_URL =
   "https://login.goethe.de/cas/login?service=https%3A%2F%2Fwww.goethe.de%2Fservices%2Fcas%2Fservice%2Fgoethe%2F&locale=de&renew=false";
@@ -130,7 +130,7 @@ const StatusBadge = ({ status, registrationStart }) => {
 };
 
 const MyExamFilePage = () => {
-  const { studentProfile } = useAuth();
+  const { studentProfile, user } = useAuth();
   const { level, levelConfirmed } = useExam();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -163,9 +163,13 @@ const MyExamFilePage = () => {
     return String(raw || "").toUpperCase();
   }, [level, levelConfirmed, studentProfile]);
   const [showAllLevels, setShowAllLevels] = useState(!detectedLevel);
+  const readingStudentKey = useMemo(
+    () => getReadingPracticeStudentKey({ studentProfile, user }),
+    [studentProfile, user],
+  );
   const readingHistory = useMemo(
-    () => getReadingPracticeHistory(detectedLevel).slice(0, 8),
-    [detectedLevel],
+    () => getReadingPracticeHistory(detectedLevel, readingStudentKey).slice(0, 8),
+    [detectedLevel, readingStudentKey],
   );
 
   useEffect(() => {
