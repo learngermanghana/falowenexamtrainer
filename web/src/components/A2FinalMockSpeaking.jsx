@@ -220,6 +220,11 @@ export default function A2FinalMockSpeaking({
     [attempts],
   );
 
+  const hasInFlightSubmission = useMemo(
+    () => TASKS.some((task) => Boolean(attempts[task.id]?.submitting)),
+    [attempts],
+  );
+
   const isUnlocked = (index) => {
     if (index === 0) return true;
     return Boolean(attempts[TASKS[index - 1].id]?.transcript);
@@ -408,10 +413,18 @@ export default function A2FinalMockSpeaking({
   }, [attemptId, completedCount, idToken, marking, onComplete, result, secondsLeft]);
 
   useEffect(() => {
-    if (secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
+    if (
+      secondsLeft > 0 ||
+      result ||
+      marking ||
+      hasInFlightSubmission ||
+      timeoutMarkTriggeredRef.current
+    ) {
+      return;
+    }
     timeoutMarkTriggeredRef.current = true;
     markSpeaking({ force: true });
-  }, [secondsLeft, result, marking, markSpeaking]);
+  }, [secondsLeft, result, marking, hasInFlightSubmission, markSpeaking]);
 
   return (
     <article className="a1-goethe-mock-exam a1-sprechen-mock-exam">

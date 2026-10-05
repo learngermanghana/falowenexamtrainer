@@ -32,7 +32,7 @@ describe("A2 Final Mock Exam Day 29", () => {
     expect(componentSource).toContain("Sprechen feedback");
   });
 
-  test("contains the supplied Stadtteilcafé, Kaufhaus ALEX and Julia email Lesen tasks", () => {
+  test("contains the supplied Lesen Teil 1–4 tasks and answer keys", () => {
     expect(A2_GOETHE_READING_MOCK.teil1.article.title).toContain("Stadtteilcafé „Miteinander“");
     expect(A2_GOETHE_READING_MOCK.teil1.questions.map((item) => item.answer)).toEqual(["b", "c", "b", "a", "b"]);
 
@@ -45,12 +45,33 @@ describe("A2 Final Mock Exam Day 29", () => {
       subject: "Meine neue Wohnung / Einladung zur Party",
     });
     expect(A2_GOETHE_READING_MOCK.teil3.questions.map((item) => item.answer)).toEqual(["b", "b", "a", "c", "b"]);
+
+    expect(A2_GOETHE_READING_MOCK.teil4.example).toMatchObject({
+      person: "Markus möchte am Sonntagmorgen mit seiner Familie ausgiebig frühstücken.",
+      answer: "c",
+    });
+    expect(A2_GOETHE_READING_MOCK.teil4.people.map((item) => item.answer)).toEqual(["e", "b", "a", "d", "X"]);
+    expect(A2_GOETHE_READING_MOCK.teil4.ads.map((item) => item.title)).toEqual([
+      "Café & Bistro „Bambini“",
+      "Pizzeria „Bella Napoli“",
+      "Café „MorgenSonn“",
+      "Bio-Snack „Grün & Schnell“",
+      "Bar & Restaurant „Havana Club“",
+      "Trattoria „Mamma Mia“",
+    ]);
   });
 
   test("keeps feedback hidden until the full mock result", () => {
     expect(componentSource).toContain("feedback is revealed only after the full mock is finished");
     expect(componentSource).toContain("Results remain hidden until the full mock is complete.");
     expect(speakingSource).toContain("Feedback stays hidden until the end of the exam.");
+  });
+
+  test("waits for in-flight transcription before timeout grading", () => {
+    expect(speakingSource).toContain("hasInFlightSubmission");
+    expect(speakingSource).toContain("attempts[task.id]?.submitting");
+    expect(speakingSource).toContain("hasInFlightSubmission ||");
+    expect(speakingSource).toContain("[secondsLeft, result, marking, hasInFlightSubmission, markSpeaking]");
   });
 
   test("collects all five A2 speaking responses into one final score", () => {

@@ -14,7 +14,7 @@ describe("A2 final mock verified scoring and persistence", () => {
     sprechen: { verified: true, score: 20, source: "/speaking/a2-mock-score" },
   };
 
-  test("uses the supplied Lesen answer keys for Teil 1–3", () => {
+  test("uses the supplied Lesen answer keys for Teil 1–4", () => {
     expect(READING_ANSWER_KEY).toMatchObject({
       "t1-1": "b",
       "t1-2": "c",
@@ -31,6 +31,11 @@ describe("A2 final mock verified scoring and persistence", () => {
       "t3-13": "a",
       "t3-14": "c",
       "t3-15": "b",
+      "t4-16": "e",
+      "t4-17": "b",
+      "t4-18": "a",
+      "t4-19": "d",
+      "t4-20": "x",
     });
   });
 

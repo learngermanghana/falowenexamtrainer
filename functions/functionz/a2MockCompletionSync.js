@@ -27,11 +27,11 @@ const READING_ANSWER_KEY = Object.freeze({
   "t3-13": "a",
   "t3-14": "c",
   "t3-15": "b",
-  "t4-16": "f",
-  "t4-17": "c",
-  "t4-18": "x",
-  "t4-19": "b",
-  "t4-20": "a",
+  "t4-16": "e",
+  "t4-17": "b",
+  "t4-18": "a",
+  "t4-19": "d",
+  "t4-20": "x",
 });
 
 const LISTENING_ANSWER_KEY = Object.freeze({
