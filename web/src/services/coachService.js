@@ -63,7 +63,7 @@ export const analyzeAudio = async ({
   let timeoutId = null;
 
   const timeoutPromise = new Promise((_, reject) => {
-    timeoutId = window.setTimeout(() => {
+    timeoutId = globalThis.setTimeout(() => {
       controller.abort();
       reject(createSpeakingAnalyzeTimeoutError());
     }, SPEAKING_ANALYZE_TIMEOUT_MS);
@@ -137,7 +137,7 @@ export const analyzeAudio = async ({
   try {
     return await Promise.race([runAnalysis(), timeoutPromise]);
   } finally {
-    if (timeoutId) window.clearTimeout(timeoutId);
+    if (timeoutId) globalThis.clearTimeout(timeoutId);
   }
 };
 
