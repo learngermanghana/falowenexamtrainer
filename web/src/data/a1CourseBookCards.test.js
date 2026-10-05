@@ -8,7 +8,7 @@ describe("authoritative A1 course-book cards", () => {
     );
     const assignmentIds = A1_COURSE_BOOK_CARDS.map((card) => card.assignmentId).filter(Boolean);
 
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(29);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
     expect(new Set(dayChapters).size).toBe(dayChapters.length);
     expect(new Set(assignmentIds).size).toBe(assignmentIds.length);
   });
