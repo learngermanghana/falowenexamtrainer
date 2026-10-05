@@ -173,8 +173,16 @@ export const resolveWorkbookNavigation = ({ pathname = "", search = "", schedule
   };
 };
 
-export const shouldUseUniversalWorkbookNavigator = ({ pathname = "", search = "" } = {}) =>
-  !getA2B1WorkbookExperienceContext(pathname, search);
+const TERMINAL_COURSE_ROUTES = new Set([
+  "/campus/course/a1-final-mock-exam",
+  "/campus/course/conjunctions-5-10",
+]);
+
+export const shouldUseUniversalWorkbookNavigator = ({ pathname = "", search = "" } = {}) => {
+  const normalizedPath = String(pathname || "").replace(/\/+$/, "").toLowerCase();
+  if (TERMINAL_COURSE_ROUTES.has(normalizedPath)) return false;
+  return !getA2B1WorkbookExperienceContext(pathname, search);
+};
 
 const lessonLabel = (lesson) => {
   if (!lesson) return "";
