@@ -4097,6 +4097,379 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
   }
 });
+app.post("/a2-mock/attempt/start", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
+    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a2MockExamUsers").doc(authedUser.uid);
+    const newAttemptRef = userRef.collection("attempts").doc();
+    let responsePayload = null;
+
+    await db.runTransaction(async (tx) => {
+      const userSnap = await tx.get(userRef);
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      if (activeAttemptId) {
+        const activeRef = userRef.collection("attempts").doc(activeAttemptId);
+        const activeSnap = await tx.get(activeRef);
+        if (activeSnap.exists) {
+          const activeData = activeSnap.data() || {};
+          if (activeData.mockId === mockId && activeData.status === "in_progress") {
+            responsePayload = {
+              attemptId: activeAttemptId,
+              attemptNumber: Number(activeData.attemptNumber || 1),
+              firstAttempt: Boolean(activeData.firstAttempt),
+              state: activeData.state || null,
+              resumed: true,
+            };
+            return;
+          }
+        }
+      }
+
+      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptNumber = attemptCount + 1;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(
+        userRef,
+        {
+          uid: authedUser.uid,
+          email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+          attemptCount: attemptNumber,
+          activeAttemptId: newAttemptRef.id,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      tx.set(newAttemptRef, {
+        uid: authedUser.uid,
+        email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+        mockId,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        status: "in_progress",
+        section: "intro",
+        state: null,
+        sectionScores: {},
+        startedAt: now,
+        updatedAt: now,
+      });
+
+      responsePayload = {
+        attemptId: newAttemptRef.id,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        state: null,
+        resumed: false,
+      };
+    });
+
+    return res.json(responsePayload);
+  } catch (err) {
+    console.error("/a2-mock/attempt/start error", err);
+    return res.status(500).json({ error: err.message || "Could not start the A2 mock attempt." });
+  }
+});
+
+app.post("/a2-mock/attempt/save", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const attemptId = String(req.body?.attemptId || "").trim();
+    const status = String(req.body?.status || "in_progress").trim();
+    const section = String(req.body?.section || "").trim().slice(0, 40);
+    const state = req.body?.state && typeof req.body.state === "object" ? req.body.state : {};
+    const sectionScores = req.body?.sectionScores && typeof req.body.sectionScores === "object"
+      ? req.body.sectionScores
+      : {};
+    const overall = req.body?.overall && typeof req.body.overall === "object"
+      ? req.body.overall
+      : null;
+
+    if (!attemptId) return res.status(400).json({ error: "attemptId is required" });
+    if (!["in_progress", "completed"].includes(status)) {
+      return res.status(400).json({ error: "Invalid mock attempt status" });
+    }
+
+    const serializedState = JSON.stringify(state);
+    if (serializedState.length > 150000) {
+      return res.status(400).json({ error: "Mock attempt state is too large." });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("a2MockExamUsers").doc(authedUser.uid);
+    const attemptRef = userRef.collection("attempts").doc(attemptId);
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    let saveOutcome = null;
+
+    await db.runTransaction(async (tx) => {
+      const [attemptSnap, userSnap] = await Promise.all([
+        tx.get(attemptRef),
+        tx.get(userRef),
+      ]);
+
+      if (!attemptSnap.exists) {
+        saveOutcome = { notFound: true };
+        return;
+      }
+
+      const existing = attemptSnap.data() || {};
+      if (existing.uid && existing.uid !== authedUser.uid) {
+        saveOutcome = { forbidden: true };
+        return;
+      }
+
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      // Completion is monotonic, but a completed record is only publishable when
+      // all four section scores can be reconstructed from server-trusted data.
+      if (existing.status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedA2MockScore({
+            state: existing.state || {},
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "A2_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
+        const completedUserPatch = {
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
+          updatedAt: now,
+        };
+        if (String(userData.activeAttemptId || "") === attemptId) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "completed",
+          alreadyCompleted: true,
+        };
+        return;
+      }
+
+      if (status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedA2MockScore({
+            state,
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          tx.set(
+            attemptRef,
+            {
+              state,
+              section,
+              sectionScores,
+              ...(overall ? { overall } : {}),
+              status: "in_progress",
+              updatedAt: now,
+            },
+            { merge: true },
+          );
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "A2_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            state,
+            section,
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            status: "completed",
+            completedAt: now,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
+        const completedUserPatch = {
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
+          updatedAt: now,
+        };
+        if (
+          !userData.activeAttemptId ||
+          String(userData.activeAttemptId) === attemptId
+        ) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+        saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      tx.set(
+        attemptRef,
+        {
+          state,
+          section,
+          sectionScores,
+          ...(overall ? { overall } : {}),
+          status: "in_progress",
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      const progressUserPatch = { updatedAt: now };
+      if (
+        !userData.activeAttemptId ||
+        String(userData.activeAttemptId) === attemptId
+      ) {
+        progressUserPatch.activeAttemptId = attemptId;
+      }
+      tx.set(userRef, progressUserPatch, { merge: true });
+      saveOutcome = { ok: true, attemptId, status: "in_progress" };
+    });
+
+    if (saveOutcome?.notFound) {
+      return res.status(404).json({ error: "Mock attempt not found." });
+    }
+    if (saveOutcome?.forbidden) {
+      return res.status(403).json({ error: "This mock attempt belongs to another account." });
+    }
+    if (saveOutcome?.invalidCompletion) {
+      return res.status(409).json({
+        error: saveOutcome.error,
+        code: saveOutcome.code,
+        section: saveOutcome.section,
+        retryable: true,
+      });
+    }
+
+    let completionSync = null;
+    if (status === "completed" && saveOutcome?.ok) {
+      try {
+        const studentProfile = await findAuthedStudentProfile(db, authedUser);
+        const attemptSnap = await attemptRef.get();
+        const attemptData = attemptSnap.exists ? attemptSnap.data() || {} : {};
+        const verifiedOverall =
+          attemptData.verifiedOverall && typeof attemptData.verifiedOverall === "object"
+            ? attemptData.verifiedOverall
+            : null;
+        const verifiedSectionScores =
+          attemptData.verifiedSectionScores && typeof attemptData.verifiedSectionScores === "object"
+            ? attemptData.verifiedSectionScores
+            : null;
+
+        if (!verifiedOverall || !verifiedSectionScores) {
+          throw new Error("Server-verified A2 mock totals are missing.");
+        }
+
+        completionSync = await syncA2MockCompletion({
+          db,
+          admin,
+          authedUser,
+          studentProfile,
+          attemptId,
+          attemptNumber: Number(attemptData.attemptNumber || 1),
+          firstAttempt: Boolean(attemptData.firstAttempt),
+          overall: verifiedOverall,
+          sectionScores: verifiedSectionScores,
+          now:
+            typeof attemptData.completedAt?.toDate === "function"
+              ? attemptData.completedAt.toDate()
+              : new Date(),
+        });
+
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: true,
+              scoreDocId: completionSync.scoreDocId,
+              notificationId: completionSync.notificationId,
+              syncedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        );
+      } catch (syncError) {
+        console.error("A2 mock completion sync failed", syncError);
+        completionSync = {
+          ok: false,
+          error: syncError?.message || "Could not sync the completed mock result.",
+        };
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: false,
+              error: completionSync.error,
+              lastTriedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        ).catch(() => {});
+
+        return res.status(503).json({
+          ...(saveOutcome || { ok: true, attemptId, status: "completed" }),
+          completionSync,
+          retryable: true,
+        });
+      }
+    }
+
+    return res.json({
+      ...(saveOutcome || { ok: true, attemptId, status }),
+      ...(completionSync ? { completionSync } : {}),
+    });
+  } catch (err) {
+    console.error("/a2-mock/attempt/save error", err);
+    return res.status(500).json({ error: err.message || "Could not save the A2 mock attempt." });
+  }
+});
+
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
