@@ -32,35 +32,27 @@ const isMountedCourseRoute = (route = "") => {
   );
 };
 const cardKey = (day, chapter) => `${Number(day)}:${String(chapter || "").trim()}`;
-const isDay23WritingWorkshopCard = (card) =>
-  Number(card?.displayDay) === 23 && String(card?.chapter || "").trim() === "14.2";
-
 describe("A1 full Course Book consolidation", () => {
-  test("covers the complete A1 programme from Day 0 through Day 24", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(29);
+  test("covers the complete A1 programme from Day 0 through the Day 23 Final Mock", () => {
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
     const counts = new Map();
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       counts.set(Number(card.displayDay), (counts.get(Number(card.displayDay)) || 0) + 1);
     });
 
-    for (let day = 0; day <= 24; day += 1) {
+    for (let day = 0; day <= 23; day += 1) {
       const expected = [2, 3, 16, 18].includes(day) ? 2 : 1;
       expect(counts.get(day) || 0).toBe(expected);
     }
   });
 
-  test("every A1 workbook card resolves centrally except the intentional Day 23 writing-workshop chapter", () => {
+  test("every A1 workbook card resolves centrally", () => {
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       const configuredRoute = getConfiguredInAppWorkbookResourceRoute({
         level: "A1",
         day: card.displayDay,
         chapter: card.chapter,
       });
-
-      if (isDay23WritingWorkshopCard(card)) {
-        expect(configuredRoute).toBe("");
-        return;
-      }
 
       expect(configuredRoute).toBe(card.workbookRoute);
       expect(configuredRoute).toMatch(/^\/campus\/course\//);
@@ -109,10 +101,10 @@ describe("A1 full Course Book consolidation", () => {
       expect(resource.url).toMatch(/^https:\/\/youtu\.be\//);
     });
 
-    for (let day = 1; day <= 23; day += 1) {
+    for (let day = 1; day <= 22; day += 1) {
       expect(getA1TeacherVideoResources(day).length).toBeGreaterThan(0);
     }
-    expect(getA1TeacherVideoResources(24)).toHaveLength(0);
+    expect(getA1TeacherVideoResources(23)).toHaveLength(0);
   });
 
   test("the Day 2 alphabet submission cannot omit its Hören section", () => {
