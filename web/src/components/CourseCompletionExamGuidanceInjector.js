@@ -175,12 +175,18 @@ export const applyCourseCompletionExamGuidance = (root = document) => {
     const level = readLevel(heading?.textContent || card.textContent);
     if (!level) return;
 
-    const expectedHeading = `After ${level}: continue in the Falowen Exams Room`;
+    const expectedHeading =
+      level === "A1"
+        ? "After A1: continue in the Falowen Exams Room"
+        : `After ${level}: prepare for the Goethe ${level} exam`;
     if (heading && normalizeText(heading.textContent) !== expectedHeading) {
       heading.textContent = expectedHeading;
     }
 
-    const introText = `Your ${level} exam level is selected automatically from your student profile. Continue in the Exams Room for focused practice after your Course Book and final mock.`;
+    const introText =
+      level === "A1"
+        ? "Your A1 exam level is selected automatically from your student profile. After the Final Mock, continue in the Exams Room for focused practice."
+        : `Your ${level} exam level is selected automatically from your student profile. Use the Exams Room for additional focused practice alongside the official Goethe ${level} material.`;
     let intro = card.querySelector('[data-course-completion-exam-intro="true"]');
     if (!intro) {
       intro = Array.from(card.querySelectorAll("p")).find((paragraph) => {
