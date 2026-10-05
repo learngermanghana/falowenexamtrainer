@@ -4,7 +4,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import A2ReadingPracticeSet from "./A2ReadingPracticeSet";
-import { getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
+import { getReadingPracticeStudentKey, getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
 
 const lesenLevels = [
   {
@@ -340,6 +340,7 @@ const LesenPage = () => {
   const { level } = useExam();
   const { studentProfile, user } = useAuth();
   const normalizedLevel = String(level || "A1").toUpperCase();
+  const readingStudentKey = getReadingPracticeStudentKey({ studentProfile, user });
   const [answers, setAnswers] = useState({});
   const A1_EXAM_SECONDS = 25 * 60;
   const [remainingSeconds, setRemainingSeconds] = useState(A1_EXAM_SECONDS);
@@ -444,6 +445,7 @@ const LesenPage = () => {
       total: allQuestions.length,
       elapsedSeconds: A1_EXAM_SECONDS - remainingSeconds,
       sectionScores,
+      studentKey: readingStudentKey,
     });
     setSavedAttempt(attempt);
     setSubmitted(true);
