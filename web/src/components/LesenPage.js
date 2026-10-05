@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
@@ -348,6 +348,7 @@ const LesenPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [savedAttempt, setSavedAttempt] = useState(null);
   const [activeA1SectionId, setActiveA1SectionId] = useState("teil-1");
+  const skipNextA1PersistRef = useRef(false);
 
   const allQuestions = useMemo(() => flattenQuestions(A1_READING_PRACTICE_SET_01.sections), []);
   const answeredCount = Object.keys(answers).length;
@@ -394,6 +395,7 @@ const LesenPage = () => {
       const saved = JSON.parse(window.localStorage.getItem(a1StorageKey) || "null");
       if (!saved || typeof saved !== "object") return;
       if (saved.answers && typeof saved.answers === "object") {
+        skipNextA1PersistRef.current = true;
         setAnswers(saved.answers);
       }
       if (
@@ -415,6 +417,10 @@ const LesenPage = () => {
       submitted ||
       typeof window === "undefined"
     ) {
+      return;
+    }
+    if (skipNextA1PersistRef.current) {
+      skipNextA1PersistRef.current = false;
       return;
     }
     window.localStorage.setItem(
@@ -448,7 +454,7 @@ const LesenPage = () => {
   }, [timerRunning, remainingSeconds]);
 
   useEffect(() => {
-    if (normalizedLevel !== "A1") return;
+    if (normalizedLevel === "A1") return;
     setAnswers({});
     setSubmitted(false);
     setSavedAttempt(null);
