@@ -169,6 +169,11 @@
     },
     "28": {
       "*": "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook"
+    },
+    "29": {
+      "Exam Orientation": "/campus/course/a2-mock-practice-preview",
+      "Mock Preview": "/campus/course/a2-mock-practice-preview",
+      "*": "/campus/course/a2-mock-practice-preview"
     }
   },
   "B1": {
