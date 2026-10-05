@@ -62,6 +62,8 @@ describe("A1 Goethe-style Sprechen mock preview", () => {
     expect(componentSource).toContain("recordingTaskId || hasInFlightSubmission");
     expect(componentSource).toContain("submitTask(pendingRecordedTask, { timeoutAuto: true })");
     expect(componentSource).toContain("timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0");
+    expect(componentSource).toContain("TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS");
+    expect(componentSource).toContain("timeoutMs: TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS");
   });
 
   test("uses English for recording and submission controls", () => {

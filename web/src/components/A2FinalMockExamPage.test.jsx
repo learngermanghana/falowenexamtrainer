@@ -82,11 +82,12 @@ describe("A2 Final Mock Exam Day 29", () => {
     expect(speakingSource).toContain("submitTask(pendingRecordedTask, { timeoutAuto: true })");
     expect(speakingSource).toContain("timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0");
 
-    expect(coachServiceSource).toContain("SPEAKING_ANALYZE_TIMEOUT_MS = 30_000");
-    expect(coachServiceSource).toContain("controller.abort()");
-    expect(coachServiceSource).toContain("signal: controller.signal");
-    expect(coachServiceSource).toContain("timeout: SPEAKING_ANALYZE_TIMEOUT_MS");
+    expect(coachServiceSource).toContain("TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS = 30_000");
+    expect(coachServiceSource).toContain("timeoutMs = null");
+    expect(coachServiceSource).toContain("if (!hasTimeout)");
+    expect(coachServiceSource).toContain("return runAnalysis()");
     expect(coachServiceSource).toContain("Promise.race([runAnalysis(), timeoutPromise])");
+    expect(speakingSource).toContain("timeoutMs: TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS");
   });
 
   test("keeps Hören audio rules and answer data aligned", () => {
