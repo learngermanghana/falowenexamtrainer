@@ -569,11 +569,18 @@ const WritingPage = ({
   });
   const visibleWritingTasks = useMemo(() => {
     if (isExamMode) {
-      return writingTasks.filter((task) => task.level === level);
+      const levelTasks = writingTasks.filter((task) => task.level === level);
+      if (!isSimplifiedExamFlow) return levelTasks;
+
+      const letterPattern = /(brief|e-mail|email|nachricht|postkarte)/i;
+      const letterTasks = levelTasks.filter((task) =>
+        letterPattern.test(`${task.letter || ""} ${task.situation || ""}`),
+      );
+      return letterTasks.length ? letterTasks : levelTasks;
     }
 
     return writingTasks;
-  }, [isExamMode, level, writingTasks]);
+  }, [isExamMode, isSimplifiedExamFlow, level, writingTasks]);
   const selectedLetter = useMemo(
     () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
     [selectedLetterId, visibleWritingTasks],
@@ -2049,10 +2056,17 @@ const WritingPage = ({
                 essay.
               </>
             ) : (
-              <>
-                From Day 21, use <strong>Mark my letter</strong> for one
-                complete essay. Use Study Buddy if a question is unclear.
-              </>
+              isSimplifiedExamFlow ? (
+                <>
+                  Choose one letter question, write your answer, get AI marking,
+                  and save the marked copy for your tutor.
+                </>
+              ) : (
+                <>
+                  From Day 21, use <strong>Mark my letter</strong> for one
+                  complete essay. Use Study Buddy if a question is unclear.
+                </>
+              )
             )}
           </p>
         </div>
