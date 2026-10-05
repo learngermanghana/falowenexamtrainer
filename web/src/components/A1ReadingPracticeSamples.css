@@ -1,0 +1,220 @@
+.a1-reading-practice-shell {
+  padding-top: 18px;
+}
+
+.a1-reading-practice-topbar {
+  border-radius: 16px 16px 0 0;
+}
+
+.a1-reading-practice-topbar > div {
+  display: grid;
+  gap: 3px;
+}
+
+.a1-reading-practice-topbar strong {
+  font-size: 16px;
+}
+
+.a1-reading-practice-topbar span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.a1-reading-practice-back {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  padding: 9px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.a1-reading-sample-selector {
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #d7dde5;
+  box-sizing: border-box;
+}
+
+.a1-reading-sample-selector button,
+.a1-reading-part-selector button {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 12px;
+  padding: 11px 14px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+}
+
+.a1-reading-sample-selector button small,
+.a1-reading-part-selector button small {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.a1-reading-sample-selector button.is-active,
+.a1-reading-part-selector button.is-active {
+  border-color: #6f354e;
+  background: #6f354e;
+  color: #fff;
+}
+
+.a1-reading-sample-selector button.is-active small,
+.a1-reading-part-selector button.is-active small {
+  color: #f8eaf0;
+}
+
+.a1-reading-practice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.a1-reading-practice-timer {
+  min-width: 190px;
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid #b78ba0;
+  border-radius: 12px;
+  background: rgba(255,255,255,.48);
+}
+
+.a1-reading-practice-timer span {
+  font-size: 12px;
+  font-weight: 800;
+  color: #5f4150;
+}
+
+.a1-reading-practice-timer strong {
+  font-size: 24px;
+}
+
+.a1-reading-practice-timer button,
+.a1-reading-practice-footer button {
+  border: 0;
+  border-radius: 9px;
+  background: #6f354e;
+  color: #fff;
+  padding: 9px 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.a1-reading-practice-footer button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.a1-reading-part-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+.a1-reading-practice-text-group + .a1-reading-practice-text-group {
+  margin-top: 18px;
+}
+
+.a1-reading-practice-feedback {
+  margin: 12px 0 0;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.a1-reading-practice-feedback.is-correct {
+  color: #166534;
+}
+
+.a1-reading-practice-feedback.is-wrong {
+  color: #991b1b;
+}
+
+.a1-reading-practice-footer {
+  margin-top: 30px;
+  padding: 22px 4px 0;
+  border-top: 2px solid #88425c;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.a1-reading-practice-footer > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.a1-reading-practice-footer > div:first-child span {
+  color: #5f4150;
+  font-size: 13px;
+}
+
+.a1-reading-practice-result {
+  display: grid;
+  gap: 9px;
+  max-width: 620px;
+}
+
+.a1-reading-practice-result > div {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.a1-reading-practice-result > div span {
+  border: 1px solid #caa9b8;
+  border-radius: 8px;
+  background: rgba(255,255,255,.55);
+  padding: 6px 9px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .a1-reading-practice-shell {
+    padding-top: 0;
+  }
+
+  .a1-reading-sample-selector {
+    grid-template-columns: 1fr;
+    padding: 12px 14px;
+  }
+
+  .a1-reading-practice-header {
+    display: grid;
+  }
+
+  .a1-reading-practice-timer {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .a1-reading-part-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .a1-reading-practice-footer {
+    display: grid;
+  }
+
+  .a1-reading-practice-footer button {
+    width: 100%;
+  }
+}
