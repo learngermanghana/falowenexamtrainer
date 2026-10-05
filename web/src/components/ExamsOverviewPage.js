@@ -1,152 +1,162 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
+import { getMockExamsForLevel } from "../data/mockExamCatalog";
 
-const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
-const EXAMS_OVERVIEW_HERO_IMAGE =
-  "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000";
-const EXAM_TABS_OVERVIEW = [
+const PRACTICE_SECTIONS = [
   {
     key: "lesen",
     title: "Lesen",
     description: "Reading practice with exam-style texts and comprehension checks.",
   },
   {
-    key: "speaking",
-    title: "Speaking",
-    description: "Oral warm-ups and speaking tasks to build confidence for exam day.",
+    key: "horen",
+    title: "Hören",
+    description: "Listening drills and comprehension practice.",
   },
   {
     key: "writing",
-    title: "Writing",
-    description: "Draft letters, get AI corrections, and submit work for tutor review.",
+    title: "Schreiben",
+    description: "Writing practice with corrections and tutor-ready submissions.",
   },
   {
-    key: "vocab",
-    title: "Vocab",
-    description: "Quick word practice to strengthen common exam vocabulary.",
-  },
-  {
-    key: "horen",
-    title: "Hören",
-    description: "Listening drills to improve understanding of spoken German.",
-  },
-  {
-    key: "resources",
-    title: "Resources",
-    description: "Useful exam materials, notes, and support links in one place.",
-  },
-  {
-    key: "study",
-    title: "Study",
-    description: "Track your study plan and prepare consistently through the week.",
-  },
-  {
-    key: "file",
-    title: "My file",
-    description: "Review your saved exam items and personal learning records.",
+    key: "speaking",
+    title: "Sprechen",
+    description: "Speaking warm-ups, timed responses and oral exam practice.",
   },
 ];
 
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
   const { level } = useExam();
-  const [lastSection, setLastSection] = useState("speaking");
-
-  useEffect(() => {
-    try {
-      const storedSection = localStorage.getItem(LAST_SECTION_STORAGE_KEY);
-      if (storedSection) {
-        setLastSection(storedSection);
-      }
-    } catch (error) {
-      console.warn("Failed to load exam overview storage", error);
-    }
-  }, []);
-
-  const resumeSection = lastSection || "speaking";
+  const mocks = getMockExamsForLevel(level);
+  const primaryMock = mocks[0] || null;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section
         style={{
           ...styles.card,
-          backgroundImage: `linear-gradient(130deg, rgba(17, 24, 39, 0.74), rgba(30, 64, 175, 0.58)), url(${EXAMS_OVERVIEW_HERO_IMAGE})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "linear-gradient(135deg, #1f2937, #374151)",
           color: "#f8fafc",
           border: "none",
+          padding: 24,
         }}
       >
-        <p style={{ ...styles.helperText, margin: 0 }}>Exams Room overview</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Start here for level {level}</h2>
-        <p style={{ ...styles.helperText, margin: 0, color: "#e2e8f0" }}>
-          Get a quick snapshot of your activity, then jump into the tab you need most today.
+        <p style={{ margin: 0, fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.5 }}>
+          Falowen Exams Room
         </p>
-        <p style={{ ...styles.helperText, margin: 0, color: "#cbd5e1", fontSize: 12 }}>
-          Photo by{" "}
-          <a
-            href="https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-writing-on-brown-wooden-table-4145153/"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#bfdbfe" }}
-          >
-            Julia M Cameron / Pexels
-          </a>
+        <h2 style={{ ...styles.sectionTitle, margin: "7px 0 8px", color: "#ffffff" }}>
+          Prepare for your {level} exam
+        </h2>
+        <p style={{ margin: 0, maxWidth: 760, lineHeight: 1.55, color: "#e5e7eb" }}>
+          Use full mock exams for realistic exam practice, or work on one section at a time when you want focused training.
         </p>
-        <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button
-            type="button"
-            style={styles.primaryButton}
-            onClick={() => navigate(`/exams/${resumeSection}`)}
-          >
-            Resume last session
+        <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" style={styles.primaryButton} onClick={() => navigate("/exams/mocks")}>
+            Open mock exams
           </button>
-          <button
-            type="button"
-            style={styles.secondaryButton}
-            onClick={() => navigate("/exams/speaking")}
-          >
-            Start speaking warm-up
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/file")}>
+            My Exam File
           </button>
         </div>
       </section>
 
       <section style={styles.card}>
-        <h3 style={styles.sectionTitle}>What each tab is for</h3>
-        <p style={{ ...styles.helperText, marginTop: -4 }}>
-          Use this map to choose the right tab quickly when you open the Exams room.
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <div>
+            <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
+            <h3 style={{ ...styles.sectionTitle, margin: "5px 0 6px" }}>Mock Exams</h3>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Complete Lesen, Hören, Schreiben and Sprechen as one exam journey.
+            </p>
+          </div>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/mocks")}>
+            View all
+          </button>
+        </div>
+
+        {primaryMock ? (
+          <article
+            style={{
+              marginTop: 14,
+              border: "1px solid #d1d5db",
+              borderRadius: 12,
+              padding: 16,
+              background: "#f9fafb",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+              <div>
+                <strong>{primaryMock.shortTitle || primaryMock.title}</strong>
+                <p style={{ ...styles.helperText, margin: "5px 0 0" }}>
+                  {primaryMock.durationLabel} · {(primaryMock.sections || []).join(" · ")}
+                </p>
+              </div>
+              <button type="button" style={styles.primaryButton} onClick={() => navigate(primaryMock.route)}>
+                {primaryMock.status === "preview" ? "Open preview" : "Start mock"}
+              </button>
+            </div>
+          </article>
+        ) : (
+          <p style={{ ...styles.helperText, marginBottom: 0 }}>
+            No full {level} mock has been published yet. Use section practice below.
+          </p>
+        )}
+      </section>
+
+      <section style={styles.card}>
+        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Practice by Section</h3>
+        <p style={{ ...styles.helperText, marginTop: 0 }}>
+          Train the skill you want without starting a complete mock.
         </p>
         <div style={styles.gridTwo}>
-          {EXAM_TABS_OVERVIEW.map((tab) => (
+          {PRACTICE_SECTIONS.map((section) => (
             <article
-              key={tab.key}
+              key={section.key}
               style={{
                 border: "1px solid #e5e7eb",
                 borderRadius: 12,
-                padding: 12,
+                padding: 14,
                 background: "#f9fafb",
                 display: "grid",
                 gap: 8,
               }}
             >
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                <strong>{tab.title}</strong>
+              <strong>{section.title}</strong>
+              <p style={{ ...styles.helperText, margin: 0 }}>{section.description}</p>
+              <div>
                 <button
                   type="button"
                   style={styles.secondaryButton}
-                  onClick={() => navigate(`/exams/${tab.key}`)}
+                  onClick={() => navigate(`/exams/${section.key}`)}
                 >
-                  Open
+                  Practice {section.title}
                 </button>
               </div>
-              <p style={{ ...styles.helperText, margin: 0 }}>{tab.description}</p>
             </article>
           ))}
         </div>
       </section>
 
+      <section style={styles.card}>
+        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Support & history</h3>
+        <p style={{ ...styles.helperText, marginTop: 0 }}>
+          Review saved exam work, practise vocabulary, or open official preparation resources.
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/file")}>
+            My Exam File
+          </button>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/vocab")}>
+            Vocab
+          </button>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/resources")}>
+            Resources
+          </button>
+        </div>
+      </section>
     </div>
   );
 };
