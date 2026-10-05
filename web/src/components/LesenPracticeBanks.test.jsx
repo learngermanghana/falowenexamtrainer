@@ -15,6 +15,10 @@ describe("Exams Room Lesen practice banks", () => {
     path.resolve(__dirname, "A1ReadingPracticeSamples.jsx"),
     "utf8",
   );
+  const a2PracticeSource = fs.readFileSync(
+    path.resolve(__dirname, "A2ReadingPracticeSamples.jsx"),
+    "utf8",
+  );
 
   test("routes A1 directly into the dedicated three-sample reading experience", () => {
     expect(lesenPageSource).toContain("return <A1ReadingPracticeSamples />");
@@ -101,6 +105,29 @@ describe("Exams Room Lesen practice banks", () => {
     expect(source).toContain("Lesen Sample 2");
     expect(source).toContain("Lesen Sample 3");
     expect(source).not.toContain("Demnächst");
+  });
+
+  test("persists completed Lesen samples so refresh cannot duplicate attempts", () => {
+    [a1PracticeSource, a2PracticeSource].forEach((source) => {
+      expect(source).toContain("if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample)");
+      expect(source).toContain("submittedBySample,");
+      expect(source).toContain("if (submitted) return");
+    });
+  });
+
+  test("restores the saved Teil and only resets to Teil 1 on an explicit sample change", () => {
+    [a1PracticeSource, a2PracticeSource].forEach((source) => {
+      expect(source).toContain("const selectSample = (nextSampleId) =>");
+      expect(source).toContain('setPartKey("teil1")');
+      expect(source).not.toContain('useEffect(() => {\n    setTimerRunning(false);\n    setPartKey("teil1");\n  }, [sampleId]);');
+    });
+  });
+
+  test("does not overwrite restored progress before hydration finishes", () => {
+    [a1PracticeSource, a2PracticeSource].forEach((source) => {
+      expect(source).toContain("hydratedStorageKey !== storageKey");
+      expect(source).toContain("setHydratedStorageKey(storageKey)");
+    });
   });
 
   test("provides a complete 20-question A2 reading practice set", () => {

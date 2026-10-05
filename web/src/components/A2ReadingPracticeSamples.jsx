@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -318,7 +318,7 @@ export default function A2ReadingPracticeSamples() {
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
-  const restoredRef = useRef(false);
+  const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
     () => A2_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A2_READING_PRACTICE_SAMPLES[0],
@@ -350,26 +350,36 @@ export default function A2ReadingPracticeSamples() {
       const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
       if (!saved || typeof saved !== "object") return;
       if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
+      if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
       if (saved.remainingBySample) setRemainingBySample(saved.remainingBySample);
       if (saved.sampleId && A2_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
       if (["teil1", "teil2", "teil3", "teil4"].includes(saved.partKey)) setPartKey(saved.partKey);
     } catch {
       // Ignore malformed saved practice state.
     } finally {
-      restoredRef.current = true;
+      setHydratedStorageKey(storageKey);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!restoredRef.current || typeof window === "undefined") return;
+    if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
     window.localStorage.setItem(storageKey, JSON.stringify({
       sampleId,
       partKey,
       answersBySample,
+      submittedBySample,
       remainingBySample,
       updatedAt: new Date().toISOString(),
     }));
-  }, [answersBySample, partKey, remainingBySample, sampleId, storageKey]);
+  }, [
+    answersBySample,
+    partKey,
+    remainingBySample,
+    sampleId,
+    hydratedStorageKey,
+    submittedBySample,
+    storageKey,
+  ]);
 
   useEffect(() => {
     if (!timerRunning || submitted) return undefined;
@@ -386,10 +396,12 @@ export default function A2ReadingPracticeSamples() {
     return () => window.clearInterval(timer);
   }, [remainingSeconds, sample.id, submitted, timerRunning]);
 
-  useEffect(() => {
+  const selectSample = (nextSampleId) => {
+    if (nextSampleId === sample.id) return;
     setTimerRunning(false);
+    setSampleId(nextSampleId);
     setPartKey("teil1");
-  }, [sampleId]);
+  };
 
   const setAnswer = (number, value) => {
     if (submitted) return;
@@ -460,7 +472,7 @@ export default function A2ReadingPracticeSamples() {
 
       <div className="a2-reading-sample-selector" aria-label="A2 Lesen sample selector">
         {A2_READING_PRACTICE_SAMPLES.map((item, index) => (
-          <button key={item.id} type="button" className={item.id === sample.id ? "is-active" : ""} onClick={() => setSampleId(item.id)}>
+          <button key={item.id} type="button" className={item.id === sample.id ? "is-active" : ""} onClick={() => selectSample(item.id)}>
             Lesen Sample {index + 1}
             <small>20 questions · Teil 1–4</small>
           </button>
