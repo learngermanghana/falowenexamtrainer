@@ -3725,6 +3725,29 @@ app.post("/writing/a2-mock-score", async (req, res) => {
   }
 });
 
+const FINAL_MOCK_SECTION_RANK = Object.freeze({
+  intro: 0,
+  lesen: 1,
+  hoeren: 2,
+  schreiben: 3,
+  sprechen: 4,
+  result: 5,
+});
+
+const shouldIgnoreStaleFinalMockProgress = ({ existing = {}, section = "", state = {} } = {}) => {
+  const existingSection = String(existing.section || existing.state?.stage || "intro").trim();
+  const incomingSection = String(section || state?.stage || "intro").trim();
+  const existingRank = Number(FINAL_MOCK_SECTION_RANK[existingSection] ?? 0);
+  const incomingRank = Number(FINAL_MOCK_SECTION_RANK[incomingSection] ?? 0);
+
+  if (incomingRank < existingRank) return true;
+  if (incomingRank > existingRank) return false;
+
+  const existingSavedAt = Number(existing.state?.clientSavedAtMs || 0);
+  const incomingSavedAt = Number(state?.clientSavedAtMs || 0);
+  return existingSavedAt > 0 && incomingSavedAt > 0 && incomingSavedAt < existingSavedAt;
+};
+
 app.post("/a1-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
@@ -3975,6 +3998,17 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      if (shouldIgnoreStaleFinalMockProgress({ existing, section, state })) {
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "in_progress",
+          staleIgnored: true,
+          section: existing.section || existing.state?.stage || "intro",
+        };
         return;
       }
 
@@ -4347,6 +4381,17 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      if (shouldIgnoreStaleFinalMockProgress({ existing, section, state })) {
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "in_progress",
+          staleIgnored: true,
+          section: existing.section || existing.state?.stage || "intro",
+        };
         return;
       }
 
