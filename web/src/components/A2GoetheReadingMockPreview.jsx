@@ -10,156 +10,136 @@ export const A2_GOETHE_READING_MOCK = Object.freeze({
       "Markieren Sie für die Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
     ],
     article: {
-      title: "Die Konditorin Maria Lenz",
-      subtitle: "„Neue Ideen gehören für mich einfach dazu.“",
+      title: "Ein neuer Treffpunkt im Viertel: Das Stadtteilcafé „Miteinander“",
+      subtitle: "",
       paragraphs: [
-        "In der kleinen Konditorei von Maria Lenz findet man nicht nur klassische Kuchen. Sie entwickelt regelmäßig neue Rezepte und kombiniert zum Beispiel Schokolade mit ungewöhnlichen Früchten oder Gewürzen. Viele Kunden kommen gerade deshalb zu ihr. Besonders am Wochenende ist das Geschäft sehr voll. Wer eine Geburtstagstorte oder eine andere besondere Torte möchte, sollte deshalb einige Tage vorher bestellen.",
-        "Obwohl ihre Konditorei sehr erfolgreich ist, möchte Maria keine zweite Filiale eröffnen. „Natürlich könnte ich damit mehr verdienen“, sagt sie. „Aber dann hätte ich weniger Zeit für meine Kunden und für neue Rezepte. Das möchte ich nicht.“",
-        "Maria wurde 1982 in Kassel geboren. Nach der Schule machte sie eine Ausbildung in einer großen Bäckerei. Danach arbeitete sie zunächst ein Jahr in Österreich. Später reiste sie mehrere Monate durch Italien und Frankreich und lernte dort neue Ideen für Kuchen und Desserts kennen.",
-        "Nach ihrer Rückkehr zog sie wegen einer Arbeitsstelle nach Leipzig. Dort arbeitete sie zuerst in einem Hotel. Zwei Jahre später eröffnete sie ihre eigene kleine Konditorei.",
-        "Heute kennen viele Menschen Maria auch aus der Fernsehsendung „Süß und einfach“. Dort backt sie zusammen mit bekannten Gästen und zeigt Rezepte, die man auch zu Hause ausprobieren kann.",
+        "Seit letzter Woche gibt es in der Goethestraße ein neues Stadtteilcafé. Es heißt „Miteinander“ und hat von Dienstag bis Sonntag geöffnet. Nur am Montag ist Ruhetag. Das Café ist mehr als ein normaler Gastronomiebetrieb: Hier können sich Nachbarn treffen, gemeinsam Deutsch sprechen oder Bücher austauschen.",
+        "Die Idee zu dem Projekt hatte Sabine Meyer. Sie wohnt seit 20 Jahren im Viertel. „Viele ältere Menschen sind oft allein und Jugendliche suchen nach der Schule einen ruhigen Ort für die Hausaufgaben. Bei uns sind alle willkommen“, erklärt Frau Meyer. Im Café arbeiten vier fest angestellte Mitarbeiter und sechs ehrenamtliche Helferinnen und Helfer.",
+        "Besonders beliebt ist das Frühstück am Wochenende. Von 9:00 bis 12:00 Uhr gibt es frische Brötchen, Käse, Obst und selbst gemachte Marmelade. Das Frühstück kostet 5 Euro pro Person. Kinder unter 6 Jahren essen kostenlos.",
+        "Ab nächstem Monat bietet das Café auch Abendkurse an. Jeden Mittwoch von 18:00 bis 20:00 Uhr gibt es einen internationalen Kochkurs. Eine Anmeldung ist nicht nötig – man kann einfach vorbeikommen.",
       ],
-    },
-    example: {
-      number: 0,
-      question: "In Marias Konditorei können Kunden ...",
-      options: [
-        { id: "a", label: "klassische Kuchen und neue Kreationen kaufen." },
-        { id: "b", label: "nur Torten für Geburtstage bestellen." },
-        { id: "c", label: "hauptsächlich italienische Gerichte essen." },
-      ],
-      answer: "a",
     },
     questions: [
       {
         number: 1,
-        question: "Wer eine besondere Torte möchte, ...",
+        question: "Das Stadtteilcafé „Miteinander“ ...",
         options: [
-          { id: "a", label: "muss sie einige Tage vorher bestellen." },
-          { id: "b", label: "kann sie nur am Wochenende kaufen." },
-          { id: "c", label: "muss persönlich mit Maria sprechen." },
-        ],
-        answer: "a",
-      },
-      {
-        number: 2,
-        question: "Maria möchte keine zweite Filiale, weil ...",
-        options: [
-          { id: "a", label: "sie mit der Konditorei zu wenig verdient." },
-          { id: "b", label: "sie genug Zeit für Kunden und neue Rezepte haben möchte." },
-          { id: "c", label: "sie lieber wieder in einem Hotel arbeiten möchte." },
+          { id: "a", label: "hat an allen Tagen der Woche geöffnet." },
+          { id: "b", label: "ist montags geschlossen." },
+          { id: "c", label: "hat nur am Wochenende geöffnet." },
         ],
         answer: "b",
       },
       {
-        number: 3,
-        question: "Nach ihrer Ausbildung ...",
+        number: 2,
+        question: "Sabine Meyer ...",
         options: [
-          { id: "a", label: "eröffnete Maria sofort ihre eigene Konditorei." },
-          { id: "b", label: "arbeitete sie zuerst eine Zeit lang in Österreich." },
-          { id: "c", label: "zog sie direkt nach Leipzig." },
+          { id: "a", label: "wohnt erst seit wenigen Monaten im Viertel." },
+          { id: "b", label: "hat das Café zusammen mit Jugendlichen gegründet." },
+          { id: "c", label: "hatte die Idee für das Café." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 3,
+        question: "Im Café arbeiten ...",
+        options: [
+          { id: "a", label: "nur ehrenamtliche Personen." },
+          { id: "b", label: "insgesamt zehn Personen." },
+          { id: "c", label: "vier ehrenamtliche Helfer." },
         ],
         answer: "b",
       },
       {
         number: 4,
-        question: "Viele Menschen kennen Maria heute durch ...",
+        question: "Das Wochenende-Frühstück ...",
         options: [
-          { id: "a", label: "eine Fernsehsendung." },
-          { id: "b", label: "ihre Arbeit in Frankreich." },
-          { id: "c", label: "ein großes Hotel in Leipzig." },
+          { id: "a", label: "kostet für kleine Kinder nichts." },
+          { id: "b", label: "dauert von 9:00 bis 10:00 Uhr." },
+          { id: "c", label: "kostet für Kinder ab 6 Jahren 10 Euro." },
         ],
         answer: "a",
       },
       {
         number: 5,
-        question: "Der Text berichtet hauptsächlich über ...",
+        question: "Wer am Kochkurs am Mittwoch teilnehmen möchte, ...",
         options: [
-          { id: "a", label: "Marias beruflichen Weg und ihre Arbeit als Konditorin." },
-          { id: "b", label: "verschiedene Kuchen aus Deutschland, Italien und Frankreich." },
-          { id: "c", label: "die Ausbildungsmöglichkeiten in einer Bäckerei." },
+          { id: "a", label: "muss vorher anrufen und reservieren." },
+          { id: "b", label: "kann ohne vorherige Anmeldung kommen." },
+          { id: "c", label: "muss einen Platz im Internet buchen." },
         ],
-        answer: "a",
+        answer: "b",
       },
     ],
   },
   teil2: {
     title: "Teil 2",
     instruction: [
-      "Sie sind in einem Kaufhaus.",
-      "Lesen Sie die Informationen und markieren Sie für die Aufgaben 6 bis 10 die richtige Lösung a, b oder c.",
+      "Sie lesen die Informationstafel in einem Kaufhaus.",
+      "Lesen Sie die Aufgaben 6 bis 10 und den Text.",
+      "In welchen Stock gehen Sie? Markieren Sie die richtige Lösung a, b oder c.",
     ],
     store: {
-      title: "Kaufhaus Linden",
+      title: "Kaufhaus „ALEX“ – Wegweiser",
       floors: [
-        ["4. Stock", "Bücher, Romane, Reisetaschen, Koffer, Rucksäcke, Spielzeug, Brettspiele, Geschenkartikel, Café, Friseur, Kunden-WC"],
-        ["3. Stock", "Smartphones, Kopfhörer, Radios, Fernseher, Computer, Laptops, Tablets, Drucker, Computerspiele, Sportbekleidung, Sporttaschen, Arbeitskleidung"],
-        ["2. Stock", "Herrenmode, Hemden, Hosen, Nachtwäsche für Herren, Unterwäsche für Herren, Möbel für Wohn- und Schlafzimmer, Regale, Lampen, Teppiche, Gardinen, Kissen, Decken"],
-        ["1. Stock", "Damenmode, Nachtwäsche für Damen, Unterwäsche für Damen, Kinder- und Jugendmode, Babykleidung, Kinderwagen, Schuhe, Teller und Gläser, Besteck, Töpfe, Pfannen, Küchenzubehör"],
-        ["EG", "Information, Uhren, Schmuck, Parfüm, Kosmetik, Schreibwaren, Grußkarten, Kalender, Schultaschen, Reiseführer, Souvenirs, Schuhreparatur, Schlüsseldienst, Blumen und Pflanzen"],
-        ["UG", "Bäckerei, Lebensmittel, Getränke, Waschmittel, Reinigungsmittel, Fotoservice, Zeitschriften, Zeitungen, Konzertkarten, Theaterkarten, Reisebüro, Geldautomat, Kunden-WC"],
+        ["4. Obergeschoss (4. OG)", "Restaurant & Café, Kundenservice, Fundbüro, Toiletten, Wickelraum"],
+        ["3. Obergeschoss (3. OG)", "Elektronik, Smartphones, Fotozubehör, Computer & Videospiele"],
+        ["2. Obergeschoss (2. OG)", "Damenmode, Kindermode, Spielwaren, Babyausstattung, Kinderbücher"],
+        ["1. Obergeschoss (1. OG)", "Herrenmode, Sportbekleidung & Sportschuhe, Koffer und Reisetaschen"],
+        ["Erdgeschoss (EG)", "Kosmetik, Parfum, Uhren, Schmuck, Schreibwaren, Information"],
+        ["Untergeschoss (UG)", "Supermarkt (Lebensmittel & Bäckerei)"],
       ],
-    },
-    example: {
-      number: 0,
-      question: "Sie brauchen einen neuen Sessel für Ihr Wohnzimmer.",
-      options: [
-        { id: "a", label: "4. Stock" },
-        { id: "b", label: "2. Stock" },
-        { id: "c", label: "anderer Stock" },
-      ],
-      answer: "b",
     },
     questions: [
       {
         number: 6,
-        question: "Sie möchten Ihrer Mutter zum Geburtstag einen Blumenstrauß kaufen.",
+        question: "Sie möchten eine neue Jeans für Ihren 8-jährigen Sohn kaufen.",
         options: [
-          { id: "a", label: "1. Stock" },
-          { id: "b", label: "EG" },
-          { id: "c", label: "anderer Stock" },
+          { id: "a", label: "2. OG" },
+          { id: "b", label: "1. OG" },
+          { id: "c", label: "Anderer Stock" },
         ],
-        answer: "b",
+        answer: "a",
       },
       {
         number: 7,
-        question: "Sie möchten die Fotos von Ihrem Urlaub auf Papier haben.",
+        question: "Sie suchen eine neue Kamera für Ihren Urlaub.",
         options: [
-          { id: "a", label: "UG" },
-          { id: "b", label: "3. Stock" },
-          { id: "c", label: "anderer Stock" },
+          { id: "a", label: "Erdgeschoss" },
+          { id: "b", label: "3. OG" },
+          { id: "c", label: "Anderer Stock" },
         ],
-        answer: "a",
+        answer: "b",
       },
       {
         number: 8,
-        question: "Sie möchten mit einer Freundin Kaffee trinken und etwas essen.",
+        question: "Sie haben Ihre Jacke im Kaufhaus vergessen und suchen das Fundbüro.",
         options: [
-          { id: "a", label: "2. Stock" },
-          { id: "b", label: "4. Stock" },
-          { id: "c", label: "anderer Stock" },
+          { id: "a", label: "4. OG" },
+          { id: "b", label: "2. OG" },
+          { id: "c", label: "3. OG" },
         ],
-        answer: "b",
+        answer: "a",
       },
       {
         number: 9,
-        question: "Bei einem Schuh ist der Absatz kaputt. Sie möchten ihn reparieren lassen.",
+        question: "Sie suchen frisches Brot und Käse für das Abendessen.",
         options: [
-          { id: "a", label: "1. Stock" },
-          { id: "b", label: "EG" },
-          { id: "c", label: "anderer Stock" },
+          { id: "a", label: "Untergeschoss" },
+          { id: "b", label: "4. OG" },
+          { id: "c", label: "Anderer Stock" },
         ],
-        answer: "b",
+        answer: "a",
       },
       {
         number: 10,
-        question: "Ihr Bruder braucht eine neue Jacke für das Fußballtraining.",
+        question: "Sie möchten eine neue Sehhilfe kaufen und einen Sehtest machen (Optiker).",
         options: [
-          { id: "a", label: "3. Stock" },
-          { id: "b", label: "2. Stock" },
-          { id: "c", label: "anderer Stock" },
+          { id: "a", label: "Erdgeschoss" },
+          { id: "b", label: "3. OG" },
+          { id: "c", label: "Anderer Stock" },
         ],
-        answer: "a",
+        answer: "c",
       },
     ],
   },
@@ -170,68 +150,69 @@ export const A2_GOETHE_READING_MOCK = Object.freeze({
       "Markieren Sie für die Aufgaben 11 bis 15 die richtige Lösung a, b oder c.",
     ],
     email: {
-      to: "Daniel",
-      subject: "Grüße aus München",
-      greeting: "Lieber Daniel,",
+      from: "Julia",
+      to: "Sarah",
+      subject: "Meine neue Wohnung / Einladung zur Party",
+      greeting: "Liebe Sarah,",
       paragraphs: [
-        "jetzt bin ich schon seit fünf Wochen in München und langsam kenne ich mich hier besser aus. Am Anfang war vieles schwieriger, als ich gedacht hatte. Besonders die Wohnungssuche hat lange gedauert. In den ersten zehn Tagen habe ich noch in einem kleinen Hotel gewohnt. Zum Glück hat mir dann eine Kollegin geholfen, ein Zimmer zu finden.",
-        "Ich arbeite hier für sechs Monate in einer internationalen Firma. In der ersten Woche hat unsere Abteilung für die neuen Mitarbeiter eine Führung organisiert. Wir haben die Büros, die Kantine und die verschiedenen Besprechungsräume gesehen. Die Stadt selbst habe ich später zusammen mit meiner Mitbewohnerin entdeckt. Sie kennt München sehr gut und hat mir viele schöne Orte gezeigt.",
-        "Ich wohne jetzt mit zwei anderen Personen zusammen: mit Laura aus Spanien und Kenji aus Japan. Unsere Wohnung ist nicht besonders groß, aber wir haben einen schönen Balkon. Sonntags frühstücken wir meistens zusammen. Jeder bringt etwas mit, deshalb muss nicht immer eine Person alles vorbereiten.",
-        "Bei der Arbeit sprechen viele Kollegen Englisch, weil nicht alle gut Deutsch können. Für mich ist das manchmal praktisch, aber eigentlich möchte ich so oft wie möglich Deutsch sprechen. Deshalb besuche ich zweimal pro Woche einen Abendkurs. Besonders gut gefällt mir dort die Lehrerin, Frau Kramer. Sie erklärt alles sehr verständlich und wir sprechen im Unterricht sehr viel.",
-        "Im Dezember möchte ich ein paar Tage Urlaub nehmen. Wenn du Zeit hast, kannst du mich besuchen. Dann zeige ich dir München und vielleicht fahren wir für einen Tag in die Berge. Schlafen kannst du bei uns im Wohnzimmer. Laura ist in dieser Woche bei ihrer Familie in Spanien, deshalb haben wir genug Platz.",
+        "wie geht es dir? Entschuldige, dass ich mich erst jetzt melde, aber die letzten Wochen waren wirklich stressig.",
+        "Ich bin endlich in meine neue Wohnung eingezogen! Sie liegt im zweiten Stock und ist sehr hell. Das Beste ist der Balkon: Von dort kann man direkt auf einen kleinen Park schauen. Die Wohnung ist nicht sehr groß, hat aber zwei schöne Zimmer und eine moderne Küche. Die Miete ist auch ganz okay, nur der Umzug war sehr anstrengend, weil es im Haus keinen Aufzug gibt. Zum Glück haben mir meine Brüder beim Tragen der Möbel geholfen.",
+        "Am nächsten Samstag, den 15. Oktober, möchte ich eine kleine Einweihungsparty feiern. Die Feier beginnt um 18:00 Uhr. Wenn das Wetter gut ist, können wir auf dem Balkon grillen. Bring bitte keine Geschenke mit, aber vielleicht könntest du einen Salat oder einen Kuchen machen? Getränke habe ich schon gekauft.",
+        "Sag mir bitte bis Donnerstag Bescheid, ob du kommen kannst. Du kannst gerne auch deinen Freund Thomas mitbringen!",
+        "Ich freue mich schon sehr auf dich!",
       ],
-      closing: ["Melde dich bald!", "Viele Grüße", "Nina"],
+      closing: ["Liebe Grüße", "Julia"],
     },
     questions: [
       {
         number: 11,
-        question: "Nina sagt über ihre erste Zeit in München, dass ...",
+        question: "Warum antwortet Julia erst jetzt?",
         options: [
-          { id: "a", label: "sie sofort eine Wohnung gefunden hat." },
-          { id: "b", label: "sie die ersten Wochen bei einer Kollegin gewohnt hat." },
-          { id: "c", label: "einige Dinge am Anfang nicht einfach waren." },
-        ],
-        answer: "c",
-      },
-      {
-        number: 12,
-        question: "Die Führung in der ersten Arbeitswoche ...",
-        options: [
-          { id: "a", label: "zeigte den neuen Mitarbeitern die Firma." },
-          { id: "b", label: "führte Nina durch die Münchner Innenstadt." },
-          { id: "c", label: "wurde von Ninas Mitbewohnerin organisiert." },
-        ],
-        answer: "a",
-      },
-      {
-        number: 13,
-        question: "In Ninas Wohnung ...",
-        options: [
-          { id: "a", label: "bereitet Laura jeden Sonntag das Frühstück vor." },
-          { id: "b", label: "essen die Mitbewohner nur selten zusammen." },
-          { id: "c", label: "bringt sonntags jeder etwas zum Frühstück mit." },
-        ],
-        answer: "c",
-      },
-      {
-        number: 14,
-        question: "Nina möchte ...",
-        options: [
-          { id: "a", label: "bei der Arbeit hauptsächlich Englisch sprechen." },
-          { id: "b", label: "ihre Deutschkenntnisse verbessern." },
-          { id: "c", label: "weniger Zeit im Deutschkurs verbringen." },
+          { id: "a", label: "Sie war im Urlaub." },
+          { id: "b", label: "Sie hatte viel Stress." },
+          { id: "c", label: "Sie war krank." },
         ],
         answer: "b",
       },
       {
-        number: 15,
-        question: "Wenn Daniel Nina im Dezember besucht, ...",
+        number: 12,
+        question: "Was gefällt Julia an der neuen Wohnung besonders gut?",
         options: [
-          { id: "a", label: "schlafen beide in einem Hotel." },
-          { id: "b", label: "fahren sie für mehrere Tage nach Spanien." },
-          { id: "c", label: "kann Daniel in Ninas Wohnung übernachten." },
+          { id: "a", label: "Der Aufzug im Haus." },
+          { id: "b", label: "Der Balkon mit Blick auf den Park." },
+          { id: "c", label: "Das große Wohnzimmer." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 13,
+        question: "Wer hat Julia beim Umzug geholfen?",
+        options: [
+          { id: "a", label: "Ihre Brüder." },
+          { id: "b", label: "Ihre Freundin Sarah." },
+          { id: "c", label: "Ihr Freund Thomas." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 14,
+        question: "Was soll Sarah zur Party mitbringen?",
+        options: [
+          { id: "a", label: "Getränke." },
+          { id: "b", label: "Ein Geschenk." },
+          { id: "c", label: "Etwas zu essen." },
         ],
         answer: "c",
+      },
+      {
+        number: 15,
+        question: "Sarah soll Julia bis Donnerstag sagen, ...",
+        options: [
+          { id: "a", label: "wann Thomas Zeit hat." },
+          { id: "b", label: "ob sie zur Party kommt." },
+          { id: "c", label: "was sie grillen möchten." },
+        ],
+        answer: "b",
       },
     ],
   },
@@ -389,17 +370,19 @@ export default function A2GoetheReadingMockPreview() {
             {A2_GOETHE_READING_MOCK.teil1.article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
           </article>
 
-          <section className="a2-mock-question a2-mock-example">
-            <h3>Beispiel 0</h3>
-            <p>{A2_GOETHE_READING_MOCK.teil1.example.question}</p>
-            <ChoiceList
-              name="a2-t1-example"
-              options={A2_GOETHE_READING_MOCK.teil1.example.options}
-              value={A2_GOETHE_READING_MOCK.teil1.example.answer}
-              onChange={() => {}}
-              disabled
-            />
-          </section>
+          {A2_GOETHE_READING_MOCK.teil1.example ? (
+            <section className="a2-mock-question a2-mock-example">
+              <h3>Beispiel 0</h3>
+              <p>{A2_GOETHE_READING_MOCK.teil1.example.question}</p>
+              <ChoiceList
+                name="a2-t1-example"
+                options={A2_GOETHE_READING_MOCK.teil1.example.options}
+                value={A2_GOETHE_READING_MOCK.teil1.example.answer}
+                onChange={() => {}}
+                disabled
+              />
+            </section>
+          ) : null}
 
           {A2_GOETHE_READING_MOCK.teil1.questions.map((question) => (
             <section className="a2-mock-question" key={question.number}>
@@ -427,17 +410,19 @@ export default function A2GoetheReadingMockPreview() {
             ))}
           </article>
 
-          <section className="a2-mock-question a2-mock-example">
-            <h3>Beispiel 0</h3>
-            <p>{A2_GOETHE_READING_MOCK.teil2.example.question}</p>
-            <ChoiceList
-              name="a2-t2-example"
-              options={A2_GOETHE_READING_MOCK.teil2.example.options}
-              value={A2_GOETHE_READING_MOCK.teil2.example.answer}
-              onChange={() => {}}
-              disabled
-            />
-          </section>
+          {A2_GOETHE_READING_MOCK.teil2.example ? (
+            <section className="a2-mock-question a2-mock-example">
+              <h3>Beispiel 0</h3>
+              <p>{A2_GOETHE_READING_MOCK.teil2.example.question}</p>
+              <ChoiceList
+                name="a2-t2-example"
+                options={A2_GOETHE_READING_MOCK.teil2.example.options}
+                value={A2_GOETHE_READING_MOCK.teil2.example.answer}
+                onChange={() => {}}
+                disabled
+              />
+            </section>
+          ) : null}
 
           {A2_GOETHE_READING_MOCK.teil2.questions.map((question) => (
             <section className="a2-mock-question" key={question.number}>
@@ -461,6 +446,7 @@ export default function A2GoetheReadingMockPreview() {
               <span>Antworten</span>
               <span>Weiterleiten</span>
             </div>
+            <div className="a2-mock-email-field"><strong>Von:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.from}</span></div>
             <div className="a2-mock-email-field"><strong>An:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.to}</span></div>
             <div className="a2-mock-email-field"><strong>Cc:</strong><span></span></div>
             <div className="a2-mock-email-field"><strong>Betreff:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.subject}</span></div>
