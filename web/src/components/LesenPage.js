@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
+import A2ReadingPracticeSet from "./A2ReadingPracticeSet";
 
 const lesenLevels = [
   {
@@ -12,9 +13,9 @@ const lesenLevels = [
   },
   {
     level: "A2",
-    description: "Lesen sample PDF.",
-    url: "https://drive.google.com/file/d/1YMjpi2aJ6o3TkLOR3ld81SfNzdZQxMQB/view?usp=sharing",
-    actionLabel: "Open A2 Lesen sample",
+    description:
+      "Interactive A2 Lesen Practice Set 1. It follows the four-part exam format with a separate question bank from the Course Book mock.",
+    url: null,
   },
   {
     level: "B1",
@@ -442,7 +443,7 @@ const LesenPage = () => {
       <div>
         <h2 style={{ margin: 0 }}>Lesen samples</h2>
         <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-          Download the official PDFs and practice with a timer just like the exam day.
+          A1 and A2 now have interactive reading practice with separate questions from the Course Book mocks.
         </p>
       </div>
       <div style={{ ...styles.focusNotice, marginTop: 0 }}>
@@ -466,7 +467,7 @@ const LesenPage = () => {
               </a>
             ) : (
               <span style={{ fontSize: 14, color: "#9ca3af" }}>
-                {levelItem.level === "A1" ? "Practice below" : "Available soon"}
+                {["A1", "A2"].includes(levelItem.level) ? "Practice below" : "Available soon"}
               </span>
             )}
           </div>
@@ -583,6 +584,8 @@ const LesenPage = () => {
           </div>
         </div>
       ) : null}
+
+      {normalizedLevel === "A2" ? <A2ReadingPracticeSet /> : null}
     </section>
   );
 };
