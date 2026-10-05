@@ -37,6 +37,7 @@ const CourseCompletionConclusion = ({
 
   const nextLevel = nextLevelByLevel[normalizedLevel] || "";
   const isTutorGuided = tutorGuidedLevels.has(normalizedLevel);
+  const isA1ExamRoomHandoff = normalizedLevel === "A1";
   const goetheGuide = getGoetheExamFileGuide(normalizedLevel);
   const officialGoetheSampleUrl = goetheGuide?.sampleUrl || "";
   const progressPercent = totalRequirements
@@ -77,9 +78,13 @@ const CourseCompletionConclusion = ({
         </h2>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65, maxWidth: 780 }}>
           {isComplete
-            ? nextLevel
-                ? `You have completed the required ${normalizedLevel} Course Book work. Use your final mock and continue in the Exams Room for focused exam preparation before deciding when to move to ${nextLevel}.`
-                : `You have completed the required ${normalizedLevel} Course Book work. Continue in the Exams Room for focused exam preparation.`
+            ? isA1ExamRoomHandoff
+              ? nextLevel
+                ? `You have completed the required A1 Course Book work. Use your Final Mock result and continue in the Exams Room for focused exam preparation before deciding when to move to ${nextLevel}.`
+                : "You have completed the required A1 Course Book work. Continue in the Exams Room for focused exam preparation."
+              : nextLevel
+                ? `You have completed the required ${normalizedLevel} Course Book work. Review your progress, continue with exam preparation, or preview what comes next in ${nextLevel}.`
+                : `You have completed the required ${normalizedLevel} Course Book work. Review your progress and continue with focused exam preparation.`
             : `This is the final checkpoint for your ${normalizedLevel} Course Book. You are ${progressPercent}% complete. Finish the outstanding required work and review corrections before moving forward.`}
         </p>
       </div>
@@ -118,24 +123,46 @@ const CourseCompletionConclusion = ({
           {!isComplete ? <li>Complete the remaining required Course Book work.</li> : null}
           <li>Review your Results, corrections and weak areas.</li>
           {isTutorGuided ? <li>Check your Attendance and Class Participation records.</li> : null}
-          {normalizedLevel === "A1" ? (
-            <li>Take the A1 Final Mock, then use the result to identify the areas that need more practice.</li>
-          ) : null}
-          <li>Continue in the Falowen Exams Room for ongoing exam practice and weak-area training.</li>
-          <li>Use the official Goethe {normalizedLevel} sample as an additional external reference when you want to compare the official format.</li>
+          {isA1ExamRoomHandoff ? (
+            <>
+              <li>Take the A1 Final Mock, then use the result to identify the areas that need more practice.</li>
+              <li>Continue in the Falowen Exams Room for ongoing exam practice and weak-area training.</li>
+              <li>Use the official Goethe A1 sample as an additional external reference when you want to compare the official format.</li>
+            </>
+          ) : (
+            <>
+              <li>Open the official Goethe {normalizedLevel} exam sample and work through the real practice material.</li>
+              <li>Go to the Falowen Exams Room for additional practice in weak areas.</li>
+            </>
+          )}
           {nextLevel ? <li>Preview the first {nextLevel} chapter before deciding when to upgrade.</li> : null}
         </ol>
       </div>
 
       <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
-        <a href="/exams/overview" style={{ ...styles.primaryButton, textDecoration: "none" }}>
-          Continue to Exams Room
-        </a>
-        {officialGoetheSampleUrl ? (
-          <a href={officialGoetheSampleUrl} target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-            Official Goethe {normalizedLevel} Sample
-          </a>
-        ) : null}
+        {isA1ExamRoomHandoff ? (
+          <>
+            <a href="/exams/overview" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+              Continue to Exams Room
+            </a>
+            {officialGoetheSampleUrl ? (
+              <a href={officialGoetheSampleUrl} target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                Official Goethe A1 Sample
+              </a>
+            ) : null}
+          </>
+        ) : (
+          <>
+            {officialGoetheSampleUrl ? (
+              <a href={officialGoetheSampleUrl} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+                Open Official Goethe {normalizedLevel} Exam Sample
+              </a>
+            ) : null}
+            <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Go to Exams Room
+            </a>
+          </>
+        )}
       </div>
 
       <div style={{ borderRadius: 14, padding: 13, background: "#fffbeb", border: "1px solid #fde68a", color: "#78350f", lineHeight: 1.6 }}>
