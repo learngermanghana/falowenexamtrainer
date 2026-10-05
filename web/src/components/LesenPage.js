@@ -35,7 +35,7 @@ const lesenLevels = [
   },
 ];
 
-const a1Reading = {
+export const A1_READING_PRACTICE_SET_01 = {
   sections: [
     {
       id: "teil-1",
@@ -347,7 +347,7 @@ const LesenPage = () => {
     return match ? [match] : lesenLevels;
   }, [normalizedLevel]);
 
-  const allQuestions = useMemo(() => flattenQuestions(a1Reading.sections), []);
+  const allQuestions = useMemo(() => flattenQuestions(A1_READING_PRACTICE_SET_01.sections), []);
   const answeredCount = Object.keys(answers).length;
   const isComplete = answeredCount === allQuestions.length && allQuestions.length > 0;
   const score = allQuestions.filter((question) => answers[question.id] === question.correct).length;
@@ -477,9 +477,9 @@ const LesenPage = () => {
       {normalizedLevel === "A1" ? (
         <div style={{ ...styles.card, margin: 0, display: "grid", gap: 16 }}>
           <div>
-            {a1Reading.title ? <h3 style={{ margin: 0 }}>{a1Reading.title}</h3> : null}
-            {a1Reading.subtitle ? (
-              <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{a1Reading.subtitle}</p>
+            {A1_READING_PRACTICE_SET_01.title ? <h3 style={{ margin: 0 }}>{A1_READING_PRACTICE_SET_01.title}</h3> : null}
+            {A1_READING_PRACTICE_SET_01.subtitle ? (
+              <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{A1_READING_PRACTICE_SET_01.subtitle}</p>
             ) : null}
           </div>
           <div
@@ -523,7 +523,7 @@ const LesenPage = () => {
             </div>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
-            {a1Reading.sections.map((section) => (
+            {A1_READING_PRACTICE_SET_01.sections.map((section) => (
               <div key={section.id} style={{ display: "grid", gap: 12 }}>
                 <h4 style={{ margin: 0 }}>{section.title}</h4>
                 {section.tasks.map((task) => (
