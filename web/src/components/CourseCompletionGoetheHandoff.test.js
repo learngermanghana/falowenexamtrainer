@@ -14,7 +14,7 @@ describe("course completion exam actions", () => {
     ["B2", "https://www.goethe.de/en/spr/prf/ueb/pb2.html"],
     ["C1", "https://www.goethe.de/en/spr/prf/ueb/pc1.html"],
     ["C2", "https://www.goethe.de/en/spr/prf/ueb/pc2.html"],
-  ])("%s shows the official sample and Falowen Exams Room", (level, sampleUrl) => {
+  ])("%s makes Exams Room primary while keeping the official sample", (level, sampleUrl) => {
     render(
       <CourseCompletionConclusion
         level={level}
@@ -26,8 +26,8 @@ describe("course completion exam actions", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: `Open Official Goethe ${level} Exam Sample` })).toHaveAttribute("href", sampleUrl);
-    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
+    expect(screen.getByRole("link", { name: "Continue to Exams Room" })).toHaveAttribute("href", "/exams/overview");
+    expect(screen.getByRole("link", { name: `Official Goethe ${level} Sample` })).toHaveAttribute("href", sampleUrl);
   });
 
   test("an incomplete course still exposes both practice destinations", () => {
@@ -42,8 +42,8 @@ describe("course completion exam actions", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Open Official Goethe A2 Exam Sample" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
+    expect(screen.getByRole("link", { name: "Continue to Exams Room" })).toHaveAttribute("href", "/exams/overview");
+    expect(screen.getByRole("link", { name: "Official Goethe A2 Sample" })).toBeInTheDocument();
   });
 
   test("the YouTube button no longer injects a duplicate completion handoff", () => {
