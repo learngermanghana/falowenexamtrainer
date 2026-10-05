@@ -4761,6 +4761,134 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
   }
 });
 
+app.post("/speaking/a2-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    if (attempts.length !== 3) {
+      return res.status(400).json({ error: "Three speaking attempts are required." });
+    }
+
+    const normalizedAttempts = attempts.map((attempt) => ({
+      teil: String(attempt?.teil || "").trim(),
+      task: String(attempt?.task || "").trim().slice(0, 600),
+      transcript: String(attempt?.transcript || "").trim().slice(0, 3000),
+      analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2000),
+    }));
+
+    const expectedIds = ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
+    const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();
+    const expectedSorted = [...expectedIds].sort();
+    if (
+      suppliedIds.length !== expectedSorted.length ||
+      suppliedIds.some((id, index) => id !== expectedSorted[index])
+    ) {
+      return res.status(400).json({ error: "All five A2 speaking responses are required." });
+    }
+
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speaking",
+      limit: DAILY_LIMITS.speaking,
+    });
+    if (!quota.allowed) {
+      return res.status(429).json({
+        error: "Daily speaking analysis limit reached",
+        code: "SPEAKING_QUOTA_REACHED",
+      });
+    }
+
+    const messages = [
+      { role: "system", content: a2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "user", content: "Return the final A2 mock speaking assessment as the required JSON object." },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1000 });
+    const cleanedReply = String(reply || "")
+      .trim()
+      .replace(/^\`\`\`(?:json)?\s*/i, "")
+      .replace(/\s*\`\`\`$/i, "");
+
+    let result;
+    try {
+      result = JSON.parse(cleanedReply);
+    } catch (_error) {
+      return res.status(502).json({
+        error: "Falowen could not read the speaking assessment safely. Please try marking again.",
+        code: "INVALID_SPEAKING_ASSESSMENT",
+      });
+    }
+
+    const numericScore = Math.max(0, Math.min(25, Number(result?.score) || 0));
+    result.score = numericScore;
+    result.maxScore = 25;
+    result.passed = numericScore >= 15;
+    result.level_mismatch = Boolean(result?.level_mismatch);
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) {
+        return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      }
+      try {
+        await persistVerifiedA2MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "sprechen",
+          score: numericScore,
+          source: "/speaking/a2-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A2_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A2_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A2_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Sprechen result for this mock attempt.",
+          code: code || "A2_MOCK_SPRECHEN_VERIFY_FAILED",
+        });
+      }
+    }
+
+    auditAIRequest({
+      route: "/speaking/a2-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        attemptsCount: normalizedAttempts.length,
+        score: numericScore,
+        passed: result.passed,
+        levelMismatch: result.level_mismatch,
+        quotaRemaining: quota.remaining,
+      },
+    });
+
+    return res.json({ result, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speaking/a2-mock-score error", err);
+    auditAIRequest({
+      route: "/speaking/a2-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A2 speaking mock." });
+  }
+});
+
 app.post("/speech-trainer/feedback", audioUpload, async (req, res) => {
   let authedUser;
   try {
