@@ -76,6 +76,25 @@ describe("A2 final mock verified scoring and persistence", () => {
     expect(appSource).toContain("responsePresent: Boolean(email)");
   });
 
+  test("does not coerce an absent format cap to zero", () => {
+    const appSource = fs.readFileSync(path.resolve(__dirname, "../app.js"), "utf8");
+    expect(appSource).toContain("formatCap !== null && formatCap !== undefined");
+    expect(appSource).toContain("const numericFormatCap = Number(formatCap)");
+    expect(appSource).not.toContain("if (Number.isFinite(Number(formatCap)))");
+  });
+
+  test("rejects malformed task and format flags before persisting an A2 Schreiben score", () => {
+    const appSource = fs.readFileSync(path.resolve(__dirname, "../app.js"), "utf8");
+    expect(appSource).toContain("parseA2MockRequiredPointFlags");
+    expect(appSource).toContain('typeof entry === "boolean"');
+    expect(appSource).toContain("value.length !== 3");
+    expect(appSource).toContain("INVALID_A2_WRITING_TASK_FLAGS");
+    expect(appSource).toContain('typeof result?.parts?.teil2?.greeting_ok !== "boolean"');
+    expect(appSource).toContain('typeof result?.parts?.teil2?.closing_ok !== "boolean"');
+    expect(appSource).toContain("INVALID_A2_WRITING_FORMAT_FLAGS");
+    expect(appSource).toContain("return res.status(502).json");
+  });
+
   test("recomputes objective sections server-side and combines four 25-point skills", () => {
     const result = buildVerifiedA2MockScore({
       state: {
