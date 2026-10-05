@@ -26,11 +26,17 @@ const CourseCompletionHandoff = ({
   onOpenExamsRoom,
   onReviewFinalLesson,
 }) => {
+  const normalizedLevel = String(level || "").trim().toUpperCase();
   const youtubeId = extractYouTubeId(journey?.videoUrl || "");
   const title = isComplete ? journey?.completedTitle : journey?.title;
   const description = isComplete ? journey?.completedDescription : journey?.description;
   const goetheOrientation = getGoetheExamOrientationConfig(level);
-  const useOfficialGoetheHandoff = Boolean(isComplete && goetheOrientation?.courseRoute && onOpenOfficialGoethe);
+  const useOfficialGoetheHandoff = Boolean(
+    normalizedLevel !== "A1" &&
+      isComplete &&
+      goetheOrientation?.courseRoute &&
+      onOpenOfficialGoethe,
+  );
 
   return (
     <section
@@ -110,15 +116,19 @@ const CourseCompletionHandoff = ({
           {isComplete ? (
             <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", color: "#166534", borderRadius: 14, padding: 12, lineHeight: 1.6 }}>
               <strong>Do not stop here.</strong>{" "}
-              {goetheOrientation
-                ? `Your language course is complete. Continue first with the official Goethe ${goetheOrientation.level} practice in the final Course Book Exam Orientation.`
-                : "Your language course is complete, but exam preparation is the next stage of your journey."}
+              {normalizedLevel === "A1"
+                ? "Your language course is complete. Use your Final Mock result and continue in the Falowen Exams Room for focused exam practice."
+                : goetheOrientation
+                  ? `Your language course is complete. Continue first with the official Goethe ${goetheOrientation.level} practice in the final Course Book Exam Orientation.`
+                  : "Your language course is complete, but exam preparation is the next stage of your journey."}
             </div>
           ) : (
             <div style={{ border: "1px solid #fde68a", background: "#fffbeb", color: "#92400e", borderRadius: 14, padding: 12, lineHeight: 1.6 }}>
-              {goetheOrientation
-                ? `Finish the remaining Course Book work, then continue to the official Goethe ${goetheOrientation.level} Exam Orientation.`
-                : "Finish the remaining Course Book lessons, then use the Exams Room for focused exam preparation."}
+              {normalizedLevel === "A1"
+                ? "Finish the remaining Course Book work, take the A1 Final Mock, then continue in the Exams Room."
+                : goetheOrientation
+                  ? `Finish the remaining Course Book work, then continue to the official Goethe ${goetheOrientation.level} Exam Orientation.`
+                  : "Finish the remaining Course Book lessons, then use the Exams Room for focused exam preparation."}
             </div>
           )}
 
