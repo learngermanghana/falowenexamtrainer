@@ -77,7 +77,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
 
 export const getMockExam = (id) => MOCK_EXAM_CATALOG[id] || null;
 
-export const getMockExamsForLevel = (level, { includeCourse = true } = {}) => {
+export const getMockExamsForLevel = (level, { includeCourse = false } = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   return Object.values(MOCK_EXAM_CATALOG).filter(
     (exam) =>
