@@ -13,9 +13,12 @@ describe("mock exam catalog", () => {
     ]);
   });
 
-  test("filters mocks by student level", () => {
+  test("filters Exams Room mocks by level without reusing course questions", () => {
     expect(getMockExamsForLevel("A1").map((exam) => exam.id)).toContain("a1-final-01");
-    expect(getMockExamsForLevel("A2").map((exam) => exam.id)).toContain("a2-course-preview-01");
+    expect(getMockExamsForLevel("A2").map((exam) => exam.id)).not.toContain("a2-course-preview-01");
+    expect(getMockExamsForLevel("A2", { includeCourse: true }).map((exam) => exam.id)).toContain(
+      "a2-course-preview-01",
+    );
   });
 
   test("creates a new practice question set without duplicating page code", () => {
