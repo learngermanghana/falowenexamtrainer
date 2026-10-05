@@ -1018,7 +1018,7 @@ export default function A1FinalMockExamPage() {
         </section>
 
         <div className="a1-final-mock-result-actions">
-          <a href="/exams/question">Practice more in Exams Room</a>
+          <a href="/exams/overview">Continue in Exams Room</a>
           <a href="/exams/speaking">More Sprechen practice</a>
           <button type="button" onClick={() => startExam({ forceNew: true })} disabled={busy === "start"}>
             Practice the full mock again
@@ -1040,7 +1040,7 @@ export default function A1FinalMockExamPage() {
           <span className="a1-goethe-mock-preview-badge">A1 Final Mock · repeatable practice</span>
         </div>
         <article className="a1-final-mock-intro">
-          <p className="a1-goethe-mock-kicker">Day 24 · A1</p>
+          <p className="a1-goethe-mock-kicker">Day 23 · A1</p>
           <h1>A1 Final Mock Exam</h1>
           <p>Complete all four sections in order. Answers and AI feedback are revealed only after the full mock is finished.</p>
 
