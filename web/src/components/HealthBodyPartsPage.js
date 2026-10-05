@@ -219,65 +219,69 @@ const doctorConsultationQuiz = [
 const letterTopics = [
   "Invite a friend to your birthday.",
   "Cancel an appointment with a teacher or doctor.",
-  "Write about your daily routine.",
+  "Register for a German course.",
   "Plan a weekend with a classmate.",
   "Thank someone for help.",
   "Ask for information about a course.",
 ];
 
 const shortSentencePatterns = [
-  "Ich habe Zeit heute.",
-  "Ich kaufe Brot morgen.",
-  "Ich esse gern Pizza.",
-  "Ich trinke viel Wasser.",
-  "Meine Hobbys sind Lesen.",
-  "Ich habe zwei Brüder.",
+  "Course registration: Ich möchte mich für einen Deutschkurs anmelden. (I would like to register for a German course.)",
+  "Course interest: Ich interessiere mich für Ihren Deutschkurs. (I am interested in your German course.)",
+  "Birthday wishes: Herzlichen Glückwunsch zum Geburtstag! (Happy birthday!)",
+  "Invitation: Ich lade dich zu meiner Geburtstagsfeier ein. (I invite you to my birthday party.)",
+  "Thanks: Danke für deine Einladung. (Thank you for your invitation.)",
+  "Availability: Ich habe am Montag um 16 Uhr Zeit. (I am free on Monday at 4 p.m.)",
+  "Cancellation: Leider kann ich nicht kommen. (Unfortunately, I cannot come.)",
+  "Health reason: Ich bin krank. Ich habe Fieber. (I am sick. I have a fever.)",
+  "Weather reason: Es regnet sehr stark. (It is raining very heavily.)",
+  "Another meeting: Können wir uns nächste Woche treffen? (Can we meet next week?)",
 ];
 
 const wQuestionPatterns = [
-  "Wie heißt du?",
-  "Was kaufst du heute?",
-  "Wo wohnst du jetzt?",
-  "Wann kommst du nach Hause?",
+  "Wann hast du Zeit? / Wann haben Sie Zeit? (When are you free? Informal / formal.)",
+  "Wann beginnt der Deutschkurs? (When does the German course start?)",
+  "Wie viel kostet der Kurs? (How much does the course cost?)",
+  "Wo findet der Kurs statt? (Where does the course take place?)",
+  "Wo kann ich mich anmelden? (Where can I register?)",
+  "Was muss ich mitbringen? (What do I need to bring?)",
+  "Wann ist deine Geburtstagsfeier? (When is your birthday party?)",
+  "Wo treffen wir uns? (Where are we meeting?)",
 ];
 
 const modalVerbExamples = [
-  "Ich kann heute kommen.",
-  "Wir müssen Deutsch lernen.",
-  "Darf ich später anrufen?",
-  "Kannst du mir helfen?",
+  "Leider kann ich heute nicht kommen. (Unfortunately, I cannot come today.)",
+  "Ich möchte mich für den Kurs anmelden. (I would like to register for the course.)",
+  "Können wir uns am Samstag um 15 Uhr treffen? (Can we meet on Saturday at 3 p.m.?)",
+  "Kann ich meine Familie mitbringen? (Can I bring my family?)",
 ];
 
 const weilExamples = [
-  "Ich bleibe zu Hause, weil ich krank bin.",
-  "Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.",
-  "Ich komme später, weil der Bus zu spät ist.",
+  "Leider kann ich nicht kommen, weil ich krank bin.",
+  "Ich kann nicht zur Feier kommen, weil es stark regnet.",
+  "Ich schreibe Ihnen, weil ich mich für den Deutschkurs anmelden möchte.",
 ];
 
 const letterWritingQuiz = [
   {
-    prompt: 'Choose the best introduction for a formal letter.',
-    options: ["Hallo Anna!", "Sehr geehrte Frau Keller,", "Hey du,"],
-    answer: "Sehr geehrte Frau Keller,",
+    prompt: "How do you register for a German course?",
+    options: ["Ich möchte mich für einen Deutschkurs anmelden.", "Ich möchte mich für einen Deutschkurs angemeldet.", "Ich anmelden einen Deutschkurs."],
+    answer: "Ich möchte mich für einen Deutschkurs anmelden.",
   },
   {
-    prompt: 'Choose the correct weil sentence.',
-    options: [
-      "Ich lerne, weil ich habe eine Prüfung.",
-      "Ich lerne, weil ich eine Prüfung habe.",
-      "Ich lerne weil habe ich eine Prüfung.",
-    ],
-    answer: "Ich lerne, weil ich eine Prüfung habe.",
+    prompt: "Choose the correct health reason with weil.",
+    options: ["Ich kann nicht kommen, weil ich bin krank.", "Ich kann nicht kommen, weil ich krank bin.", "Ich kann nicht kommen, weil bin ich krank."],
+    answer: "Ich kann nicht kommen, weil ich krank bin.",
   },
   {
-    prompt: 'Choose the correct modal verb question.',
-    options: ["Kannst du morgen kommen?", "Du kannst morgen kommen?", "Kommen kannst du morgen?"],
-    answer: "Kannst du morgen kommen?",
+    prompt: "Choose the correct question to suggest another meeting.",
+    options: ["Können wir uns am Samstag treffen?", "Wir können uns am Samstag treffen?", "Treffen können wir uns am Samstag?"],
+    answer: "Können wir uns am Samstag treffen?",
   },
   {
-    prompt: "Which sentence is short and clear (good for A1 writing)?",
-    options: ["Ich gehe jetzt nach Hause.", "Ich gehe jetzt nach Hause und danach werde ich vielleicht noch einkaufen gehen."],
-    answer: "Ich gehe jetzt nach Hause.",
+    prompt: "Ask a course teacher formally when they are free.",
+    options: ["Wann Sie haben Zeit?", "Wann hast du Zeit?", "Wann haben Sie Zeit?"],
+    answer: "Wann haben Sie Zeit?",
   },
 ];
 
@@ -287,7 +291,7 @@ const summaryPoints = [
   "Wie geht es dir? = How are you?",
   "Ich möchte den Termin absagen. = I would like to cancel the appointment.",
   "Short A1 writing is better than long unclear sentences.",
-  "Use weil, modal verbs, and W-questions to improve letters.",
+  "Ask about a course, an invitation or a new meeting with a clear W-question.",
 ];
 
 const answerButtonStyle = (selected, correct) => ({
@@ -351,9 +355,10 @@ const HealthBodyPartsPage = () => {
 
           <p style={mutedText}>
             Today you will learn how to talk about health problems, ask about
-            someone’s health, and write a formal cancellation message. You will
-            then build confidence for A1 letter writing with short structures,
-            weil, modal verbs, and W-questions.
+            someone’s health, and use a health problem as a reason for cancelling.
+            Build on chapters 12.3 and 13: write a short message, answer the task
+            points, and suggest another meeting. Reuse the phrases below for
+            birthdays, course enquiries, and appointments.
           </p>
         </div>
 
@@ -431,6 +436,8 @@ const HealthBodyPartsPage = () => {
 
       <Section title="Part 3: Writing – Cancel an Appointment">
         <InfoBox title="Model Sentences">
+          <p style={{ marginTop: 0 }}>Use these formal phrases with a doctor or
+            course office. For the message to Felix, use the informal model in Part 4.</p>
           <div style={{ lineHeight: 1.8 }}>
             {cancellationLines.map((line, index) => (
               <div key={`${line}-${index}`}>{line}</div>
@@ -466,17 +473,19 @@ const HealthBodyPartsPage = () => {
             <strong>Introduction:</strong> greet and state your reason in one short sentence.
           </p>
           <p style={{ margin: "0 0 6px" }}>
-            Example: <strong>Sehr geehrte Frau Keller, ich schreibe Ihnen, weil ich den Termin absagen möchte.</strong>
+            Example for this chapter: <strong>Lieber Felix, danke für deine Einladung.</strong>
           </p>
           <p style={{ margin: "0 0 6px" }}>
-            <strong>Body:</strong> write 2–3 short points (5–6 words each if possible).
+            <strong>Body:</strong> answer exactly the three task points: you cannot
+            come, give a health reason, and suggest another meeting.
           </p>
           <p style={{ margin: "0 0 6px" }}>
-            Example: <strong>Ich bin krank. Ich kann nicht kommen.</strong>
+            Example: <strong>Leider kann ich nicht kommen. Ich habe Fieber.
+              Können wir uns am Montag um 16 Uhr treffen?</strong>
           </p>
           <p style={{ margin: 0 }}>
             <strong>Conclusion:</strong> polite closing + name. Example:{" "}
-            <strong>Mit freundlichen Grüßen, Ali.</strong>
+            <strong>Liebe Grüße, Ali.</strong>
           </p>
         </InfoBox>
 
@@ -492,11 +501,16 @@ const HealthBodyPartsPage = () => {
           />
         </InfoBox>
 
-        <InfoBox title="Useful Short Statements (A1)">
+        <InfoBox title="Useful Short Statements for A1 Letters (12.3–14.1)">
+          <p style={{ marginTop: 0 }}>Choose phrases that answer your task. Use
+            <strong> du / deine</strong> with a friend and <strong>Sie / Ihren</strong> with a course office.</p>
           <BulletList items={shortSentencePatterns} />
         </InfoBox>
 
-        <InfoBox title="W-Questions: wie, was, wo, wann">
+        <InfoBox title="W-Questions for Courses, Invitations and Meetings">
+          <p style={{ marginTop: 0 }}>Use <strong>W-word + conjugated verb + subject</strong>:
+            Wann <strong>hast du</strong> Zeit? Reply with <strong>am</strong> + day
+            and <strong>um</strong> + time: Ich habe am Montag um 16 Uhr Zeit.</p>
           <BulletList items={wQuestionPatterns} />
         </InfoBox>
 
@@ -505,6 +519,9 @@ const HealthBodyPartsPage = () => {
         </InfoBox>
 
         <InfoBox title="Using weil (because)">
+          <p style={{ marginTop: 0 }}>Put the conjugated verb at the end after
+            <strong> weil</strong>. Two short sentences are also enough:
+            Leider kann ich nicht kommen. Ich bin krank.</p>
           <BulletList items={weilExamples} />
         </InfoBox>
 
@@ -533,8 +550,8 @@ const HealthBodyPartsPage = () => {
               "Did I write an introduction?",
               "Did I answer all task points?",
               "Did I use short clear sentences?",
-              "Did I use one weil sentence correctly?",
-              "Did I include one modal verb sentence or question?",
+              "Is my reason clear? If I used weil, is the verb at the end?",
+              "Is my new meeting suggestion clear, with the correct day and time?",
               "Did I write a conclusion and my name?",
             ]}
           />
@@ -542,9 +559,10 @@ const HealthBodyPartsPage = () => {
 
         <InfoBox title="One Safe Exam Formula">
           <p style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7 }}>
-            Greeting + reason + 2 short details + one <strong>weil</strong>{" "}
-            sentence + polite closing. If you keep this structure, you can pass
-            with clear writing even at basic level.
+            Greeting → cannot come → health reason → another meeting → closing
+            and name. For chapter 14.1, these are three content points; the
+            greeting, closing and name are letter form. A correct weil sentence
+            is optional.
           </p>
         </InfoBox>
       </Section>
@@ -559,3 +577,4 @@ const HealthBodyPartsPage = () => {
 };
 
 export default HealthBodyPartsPage;
+
