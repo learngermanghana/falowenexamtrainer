@@ -67,8 +67,12 @@ for (const day of days) {
     fail(assignmentId, "reading task is missing title, text, format or strategy");
     continue;
   }
-  if (!Array.isArray(questions) || questions.length !== 5) {
-    fail(assignmentId, "Lesen must contain exactly 5 questions; found " + (questions?.length || 0));
+  const expectedQuestionCount = day === 11 ? 7 : 5;
+  if (!Array.isArray(questions) || questions.length !== expectedQuestionCount) {
+    fail(
+      assignmentId,
+      "Lesen must contain exactly " + expectedQuestionCount + " questions; found " + (questions?.length || 0),
+    );
     continue;
   }
 

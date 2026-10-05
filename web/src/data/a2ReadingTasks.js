@@ -190,22 +190,29 @@ Der Eintritt ist kostenlos. Getränke und Essen muss man bezahlen. Bei starkem R
   },
   11: {
     chapter: "4.11",
-    format: "Verkehrsinformation",
-    title: "Drei Wege zum Flughafen",
-    strategy: "Vergleiche Fahrzeit, Preis und Abfahrtsort. Zahlen und Einheiten helfen dir beim schnellen Lesen.",
-    text: `Zum Flughafen gibt es drei Möglichkeiten:
+    format: "Zeitungsartikel",
+    title: "Verkehrsmittel vergleichen",
+    strategy: "Lesen Sie den Zeitungsartikel und beantworten Sie die Fragen 1–7. Wählen Sie die richtige Lösung (a, b oder c).",
+    text: `Zeitung: Berliner Tagesblatt
+Thema: Unterwegs in Deutschland – Auto, Bahn, Bus oder Fahrrad?
 
-S-Bahn S8: alle 20 Minuten ab Hauptbahnhof, Fahrzeit 35 Minuten, Ticket 7 Euro.
-Flughafenbus: alle 30 Minuten ab ZOB, Fahrzeit 45 Minuten, Ticket 9 Euro.
-Taxi: jederzeit, Fahrzeit etwa 25 Minuten, Preis ungefähr 38 Euro.
+Wie reist man am besten in Deutschland? Jeden Tag fahren Millionen Menschen zur Arbeit, zur Universität oder in den Urlaub. Dabei nutzen sie ganz unterschiedliche Verkehrsmittel.
 
-Am Montag fährt die S8 wegen Bauarbeiten erst ab 08:30 Uhr.`,
+Das Auto ist besonders bei Familien sehr beliebt. Es ist bequem, wenn man viel Gepäck hat und direkt von Tür zu Tür fahren möchte. Aber in großen Städten gibt es oft Probleme: Das Benzin wird immer teurer und man findet nur schwer einen Parkplatz.
+
+Für lange Strecken wählen viele Personen lieber die Bahn. Der Schnellzug (ICE) ist meistens viel schneller als das Auto und man steht am Freitag nicht im Stau. Im Zug kann man entspannen, lesen oder am Laptop arbeiten. Allerdings sind Zugtickets oft teuer, wenn man sie nicht früh bucht.
+
+Wer wenig Geld hat – wie viele Studentinnen und Studenten –, fährt oft mit dem Fernbus. Die Fahrt mit dem Bus dauert zwar am längsten, aber die Tickets sind viel günstiger als Bahnfahrkarten oder Flugtickets.
+
+In der Innenstadt liegt das Fahrrad im Trend. Immer mehr Menschen nutzen für kurze Wege ein Fahrrad oder E-Bike, weil es umweltfreundlicher und gesünder ist als das Auto. Außerdem spart man Geld für Benzin und Parkplätze.`,
     questions: [
-      { stem: "Welches Verkehrsmittel ist normalerweise am schnellsten?", options: ["A) S-Bahn", "B) Flughafenbus", "C) Taxi", "D) Alle sind gleich schnell."] },
-      { stem: "Wie viel kostet die S-Bahn?", options: ["A) 7 Euro", "B) 9 Euro", "C) 25 Euro", "D) 38 Euro"] },
-      { stem: "Wo fährt der Flughafenbus ab?", options: ["A) Am Flughafen", "B) Am ZOB", "C) Am Rathaus", "D) An der Universität"] },
-      { stem: "Wie oft fährt die S-Bahn?", options: ["A) Alle 10 Minuten", "B) Alle 20 Minuten", "C) Alle 30 Minuten", "D) Einmal pro Stunde"] },
-      { stem: "Was ist am Montagmorgen anders?", options: ["A) Der Bus kostet weniger.", "B) Das Taxi fährt nicht.", "C) Die S8 fährt erst ab 08:30 Uhr.", "D) Der Flughafen ist geschlossen."] },
+      { stem: "Warum fahren viele Familien gerne mit dem Auto?", options: ["A) Weil Autotickets günstiger als Bustickets sind.", "B) Weil man viel Gepäck bequem von Tür zu Tür transportieren kann.", "C) Weil man in der Innenstadt immer schnell einen Parkplatz findet."] },
+      { stem: "Welchen Vorteil hat die Bahn auf langen Strecken?", options: ["A) Sie ist schneller als das Auto und steht nicht im Stau.", "B) Die Tickets sind am Freitag immer kostenlos.", "C) Die Fahrt dauert länger als mit dem Bus, ist aber billiger."] },
+      { stem: "Was kann man im Zug machen, während man reist?", options: ["A) Selbst ein Parkhaus suchen.", "B) Entspannen, lesen oder am Laptop arbeiten.", "C) Billigeres Benzin kaufen."] },
+      { stem: "Warum wählen viele Studierende den Fernbus?", options: ["A) Weil der Fernbus das schnellste Verkehrsmittel ist.", "B) Weil sie im Bus keinen Sitzplatz buchen müssen.", "C) Weil die Tickets viel günstiger sind als bei der Bahn."] },
+      { stem: "Was ist ein Nachteil vom Auto in der Stadt?", options: ["A) Man darf mit dem Auto nicht in der Innenstadt fahren.", "B) Benzin ist teuer und Parkplätze sind schwer zu finden.", "C) Es gibt im Auto keinen Platz für Gepäck."] },
+      { stem: "Warum fahren immer mehr Menschen in der Stadt mit dem Fahrrad?", options: ["A) Weil Fahrradfahren gesünder und umweltfreundlicher ist.", "B) Weil Fahrräder auf der Autobahn schneller als Autos sind.", "C) Weil man für Fahrräder teure Parktickets kaufen muss."] },
+      { stem: "Welche Aussage über die Verkehrsmittel ist RICHTIG?", options: ["A) Die Bahn ist das langsamste Verkehrsmittel.", "B) Das Auto ist für Studenten am günstigsten.", "C) Der Fernbus braucht am meisten Zeit, ist aber besonders preiswert."] },
     ],
   },
   12: {
