@@ -409,17 +409,19 @@ export default function A2GoetheReadingMockPreview() {
             ))}
           </article>
 
-          <section className="a2-mock-question a2-mock-example">
-            <h3>Beispiel 0</h3>
-            <p>{A2_GOETHE_READING_MOCK.teil2.example.question}</p>
-            <ChoiceList
-              name="a2-t2-example"
-              options={A2_GOETHE_READING_MOCK.teil2.example.options}
-              value={A2_GOETHE_READING_MOCK.teil2.example.answer}
-              onChange={() => {}}
-              disabled
-            />
-          </section>
+          {A2_GOETHE_READING_MOCK.teil2.example ? (
+            <section className="a2-mock-question a2-mock-example">
+              <h3>Beispiel 0</h3>
+              <p>{A2_GOETHE_READING_MOCK.teil2.example.question}</p>
+              <ChoiceList
+                name="a2-t2-example"
+                options={A2_GOETHE_READING_MOCK.teil2.example.options}
+                value={A2_GOETHE_READING_MOCK.teil2.example.answer}
+                onChange={() => {}}
+                disabled
+              />
+            </section>
+          ) : null}
 
           {A2_GOETHE_READING_MOCK.teil2.questions.map((question) => (
             <section className="a2-mock-question" key={question.number}>
