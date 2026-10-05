@@ -19,6 +19,24 @@ describe("in-app workbook routes", () => {
     });
   });
 
+  test("A2 Day 29 legacy Exam Orientation links resolve to the mock preview", () => {
+    expect(
+      getConfiguredInAppWorkbookRoute({
+        level: "A2",
+        day: 29,
+        chapter: "Exam Orientation",
+      }),
+    ).toBe("/campus/course/a2-mock-practice-preview");
+
+    expect(
+      getConfiguredInAppWorkbookResourceRoute({
+        level: "A2",
+        day: 29,
+        chapter: "Mock Preview",
+      }),
+    ).toBe("/campus/course/a2-mock-practice-preview");
+  });
+
   test("B1 workbook routes do not include the completed radio flag", () => {
     [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, ...days(12, 14), ...days(16, 28)].forEach((day) => {
       const route = getConfiguredInAppWorkbookRoute({ level: "B1", day });

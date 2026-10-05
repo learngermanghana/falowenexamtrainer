@@ -6,6 +6,7 @@ const read = (file) =>
 
 describe("A2 speaking preview recorder cleanup", () => {
   test.each([
+    ["Teil 1", "./A2GoetheSpeakingMockTeil1Preview.jsx"],
     ["Teil 2", "./A2GoetheSpeakingMockTeil2Preview.jsx"],
     ["Teil 3", "./A2GoetheSpeakingMockTeil3Preview.jsx"],
   ])("%s stops media capture and revokes object URLs on unmount", (_label, file) => {

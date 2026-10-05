@@ -53,7 +53,7 @@ const addClassParticipationToDay0 = (source, level) => {
 
 let courseTab = fs.readFileSync(courseTabPath, "utf8");
 
-// A2 has a canonical Day 30 completion milestone after the Day 29 exam orientation.
+// A2 has a canonical Day 30 completion milestone after the Day 29 mock preview.
 // Do not duplicate it in the generic next-lesson slot at the top.
 const completionText = "Course Book complete";
 if (!courseTab.includes('normalizedSelectedCourseLevel === "A2" ? null : (') && courseTab.includes(completionText)) {
@@ -82,7 +82,7 @@ if (courseTab.includes(completionText) && !courseTab.includes('normalizedSelecte
 let schedule = fs.readFileSync(schedulePath, "utf8");
 if (!schedule.includes('day: 30,\n    topic: "Course Completed!"')) {
   throw new Error(
-    "A2 Day 30 completion milestone is missing after Day 29 exam orientation; cannot suppress the duplicate top message safely.",
+    "A2 Day 30 completion milestone is missing after Day 29 mock preview; cannot suppress the duplicate top message safely.",
   );
 }
 
@@ -130,5 +130,5 @@ for (const [level, day0Path] of day0Paths) {
 }
 
 console.log(
-  "Legacy completion copy retired; A2 Day 30 milestone remains bottom-only after Day 29 exam orientation, and A1-A2-B1 Day 0 includes Class Participation.",
+  "Legacy completion copy retired; A2 Day 30 milestone remains bottom-only after Day 29 mock preview, and A1-A2-B1 Day 0 includes Class Participation.",
 );

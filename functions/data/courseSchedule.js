@@ -425,6 +425,21 @@ const A2_SCHEDULE = [
   },
   {
     day: 29,
+    topic: "A2 Mock Practice · Preview",
+    chapter: "Mock Preview",
+    attendance: false,
+    goal: "Practise the A2 exam format across Lesen, Hören, Schreiben and Sprechen while the unified scored mock is still being completed.",
+    instruction:
+      "Use these exam-style preview sections for practice. Answers are not yet saved across sections and there is no unified A2 result yet. This preview does not add a 29th required course assignment.",
+    grammar_topic: null,
+    assignment: false,
+    video: null,
+    youtube_link: null,
+    grammarbook_link: null,
+    workbook_link: "/campus/course/a2-mock-practice-preview",
+  },
+  {
+    day: 30,
     topic: "Course Completed!",
     chapter: null,
     ...buildCompletionMessage({ level: "A2", nextLevel: "B1" }),

@@ -7,43 +7,39 @@ const normalizeText = (value = "") =>
     .trim();
 
 const normalizeLower = (value = "") => normalizeText(value).toLowerCase();
-const GUIDANCE_VERSION = "3";
+const GUIDANCE_VERSION = "4";
 const A1_COMPLETION_VIDEO_ID = "Iu_Ydk0vjHE";
 const A1_COMPLETION_VIDEO_URL = `https://youtu.be/${A1_COMPLETION_VIDEO_ID}`;
 const A1_COMPLETION_VIDEO_EMBED_URL = `https://www.youtube-nocookie.com/embed/${A1_COMPLETION_VIDEO_ID}`;
 
 const EXAM_TAB_GUIDANCE = [
   {
-    name: "Question of the day",
-    description: "practise one level-appropriate question at a time.",
+    name: "Overview",
+    description: "see your current exam-practice options and latest progress.",
   },
   {
-    name: "Reading",
-    description: "practise reading questions for your current exam level.",
+    name: "Mock Exams",
+    description: "open complete exam-format practice sets when they are available.",
   },
   {
-    name: "Speaking",
-    description: "practise speaking prompts and review your answers.",
+    name: "Lesen",
+    description: "practise timed reading sets and review your scores by Teil.",
   },
   {
-    name: "Writing",
-    description: "practise writing tasks and improve your corrections.",
+    name: "Schreiben",
+    description: "write one exam-style letter, get AI marking and save a copy for tutor review.",
   },
   {
-    name: "Vocab",
-    description: "review and strengthen vocabulary for your current level.",
-  },
-  {
-    name: "Listening",
-    description: "practise listening questions for your current exam level.",
-  },
-  {
-    name: "Resources",
-    description: "open official Goethe exam information and practice materials.",
+    name: "Sprechen",
+    description: "use the speaking app for timed oral-exam practice.",
   },
   {
     name: "Exam File",
-    description: "check your progress, results, feedback and exam readiness.",
+    description: "review saved attempts, feedback and exam readiness.",
+  },
+  {
+    name: "Resources",
+    description: "open official Goethe material as an additional reference.",
   },
 ];
 
@@ -179,12 +175,18 @@ export const applyCourseCompletionExamGuidance = (root = document) => {
     const level = readLevel(heading?.textContent || card.textContent);
     if (!level) return;
 
-    const expectedHeading = `After ${level}: prepare for the Goethe ${level} exam`;
+    const expectedHeading =
+      level === "A1"
+        ? "After A1: continue in the Falowen Exams Room"
+        : `After ${level}: prepare for the Goethe ${level} exam`;
     if (heading && normalizeText(heading.textContent) !== expectedHeading) {
       heading.textContent = expectedHeading;
     }
 
-    const introText = `Your ${level} exam level is selected automatically from your student profile. Use the current Exams Room tabs to practise for the Goethe ${level} exam.`;
+    const introText =
+      level === "A1"
+        ? "Your A1 exam level is selected automatically from your student profile. After the Final Mock, continue in the Exams Room for focused practice."
+        : `Your ${level} exam level is selected automatically from your student profile. Use the Exams Room for additional focused practice alongside the official Goethe ${level} material.`;
     let intro = card.querySelector('[data-course-completion-exam-intro="true"]');
     if (!intro) {
       intro = Array.from(card.querySelectorAll("p")).find((paragraph) => {

@@ -20,7 +20,6 @@ import AttendanceTab from "./components/AttendanceTab";
 import ClassMembersTab from "./components/ClassMembersTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
-import A1Day23WritingWorkshopPage from "./components/A1Day23WritingWorkshopPage";
 import A1GoetheReadingMockTeil1Preview from "./components/A1GoetheReadingMockTeil1Preview";
 import A1GoetheReadingMockTeil2Preview from "./components/A1GoetheReadingMockTeil2Preview";
 import A1GoetheReadingMockTeil3Preview from "./components/A1GoetheReadingMockTeil3Preview";
@@ -34,8 +33,10 @@ import A2GoetheListeningMockTeil2Preview from "./components/A2GoetheListeningMoc
 import A2GoetheListeningMockTeil3Preview from "./components/A2GoetheListeningMockTeil3Preview";
 import A2GoetheListeningMockTeil4Preview from "./components/A2GoetheListeningMockTeil4Preview";
 import A2GoetheWritingMockPreview from "./components/A2GoetheWritingMockPreview";
+import A2GoetheSpeakingMockTeil1Preview from "./components/A2GoetheSpeakingMockTeil1Preview";
 import A2GoetheSpeakingMockTeil2Preview from "./components/A2GoetheSpeakingMockTeil2Preview";
 import A2GoetheSpeakingMockTeil3Preview from "./components/A2GoetheSpeakingMockTeil3Preview";
+import A2FinalMockExamPage from "./components/A2FinalMockExamPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -182,6 +183,8 @@ import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
+import ExamsOverviewPage from "./components/ExamsOverviewPage";
+import MockExamLibraryPage from "./components/MockExamLibraryPage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import GermanLevelSeoPage from "./components/GermanLevelSeoPage";
 import OfflineBanner from "./components/OfflineBanner";
@@ -832,6 +835,10 @@ const AppShell = ({
             element={<A2GoetheWritingMockPreview />}
           />
           <Route
+            path="/campus/course/a2-mock-sprechen-teil-1-preview"
+            element={<A2GoetheSpeakingMockTeil1Preview />}
+          />
+          <Route
             path="/campus/course/a2-mock-sprechen-teil-2-preview"
             element={<A2GoetheSpeakingMockTeil2Preview />}
           />
@@ -841,15 +848,15 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-23-writing-workshop-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route
             path="/campus/course/dative-and-accusative-verbs-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route
             path="/campus/course/dative-verbs-adjective-declension-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/directions-imperative-11" element={<DirectionsImperativePage />} />
@@ -968,8 +975,10 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" element={withRadioWorkbookGate("A2", 26, <A2Day26GefuehleInVerschiedenenSituationenWorkbookPage />)} />
           <Route path="/campus/course/a2-day-27-digitale-kommunikation-workbook" element={withRadioWorkbookGate("A2", 27, <A2Day27DigitaleKommunikationWorkbookPage />)} />
           <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={withRadioWorkbookGate("A2", 28, <A2Day28UeberDieZukunftSprechenWorkbookPage />)} />
-          <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A2" />} />
-          <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<GoetheExamOrientationPage level="A1" />} />
+          <Route path="/campus/course/a2-mock-practice-preview" element={<A2FinalMockExamPage />} />
+          <Route path="/campus/course/a2-final-mock-exam" element={<A2FinalMockExamPage />} />
+          <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
+          <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<GoetheExamOrientationPage level="B1" />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
@@ -1422,6 +1431,8 @@ const ExamArea = ({ onBack }) => {
   const examSection = useMemo(() => {
     if (
       [
+        "overview",
+        "mocks",
         "question",
         "speaking",
         "writing",
@@ -1434,7 +1445,7 @@ const ExamArea = ({ onBack }) => {
     ) {
       return section;
     }
-    return "question";
+    return "overview";
   }, [section]);
 
   useEffect(() => {
@@ -1471,14 +1482,13 @@ const ExamArea = ({ onBack }) => {
   }, [level, profileExamLevel, setLevel]);
 
   const tabs = [
-    { key: "question", label: t("appNav.examTabs.question") },
+    { key: "overview", label: "Overview" },
+    { key: "mocks", label: "Mock Exams" },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
-    { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
-    { key: "vocab", label: t("appNav.examTabs.vocab") },
-    { key: "horen", label: t("appNav.examTabs.horen") },
-    { key: "resources", label: t("appNav.examTabs.resources") },
+    { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
+    { key: "resources", label: t("appNav.examTabs.resources") },
   ];
 
   const examHeroConfig = {
@@ -1594,9 +1604,11 @@ const ExamArea = ({ onBack }) => {
         ) : null}
       </div>
 
+      {examSection === "overview" ? <ExamsOverviewPage /> : null}
+      {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
-      {examSection === "writing" ? <WritingPage mode="exam" /> : null}
+      {examSection === "writing" ? <WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage /> : null}
       {examSection === "lesen" ? <LesenPage /> : null}

@@ -8,6 +8,7 @@ import { toDate } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { goetheExamLevels as fallbackGoetheExamLevels } from "../data/goetheExamSchedule";
 import { getGoetheExamFileGuide, GOETHE_EXAM_FILE_LEVELS } from "../data/goetheExamFileGuide";
+import { getReadingPracticeHistory, getReadingPracticeStudentKey, getReadingReadinessLabel } from "../services/readingPracticeHistory";
 
 const GOETHE_ACCOUNT_URL =
   "https://login.goethe.de/cas/login?service=https%3A%2F%2Fwww.goethe.de%2Fservices%2Fcas%2Fservice%2Fgoethe%2F&locale=de&renew=false";
@@ -38,6 +39,14 @@ const endOfScheduleDay = (value) => {
   const date = new Date(parsed);
   date.setHours(23, 59, 59, 999);
   return date;
+};
+
+const formatElapsed = (seconds) => {
+  if (!Number.isFinite(Number(seconds))) return "Time not recorded";
+  const total = Math.max(0, Number(seconds));
+  const minutes = Math.floor(total / 60);
+  const remainder = total % 60;
+  return `${minutes}m ${String(remainder).padStart(2, "0")}s`;
 };
 
 const isScheduleEntryCurrent = (exam, now) => {
@@ -121,7 +130,7 @@ const StatusBadge = ({ status, registrationStart }) => {
 };
 
 const MyExamFilePage = () => {
-  const { studentProfile } = useAuth();
+  const { studentProfile, user } = useAuth();
   const { level, levelConfirmed } = useExam();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
@@ -154,6 +163,14 @@ const MyExamFilePage = () => {
     return String(raw || "").toUpperCase();
   }, [level, levelConfirmed, studentProfile]);
   const [showAllLevels, setShowAllLevels] = useState(!detectedLevel);
+  const readingStudentKey = useMemo(
+    () => getReadingPracticeStudentKey({ studentProfile, user }),
+    [studentProfile, user],
+  );
+  const readingHistory = useMemo(
+    () => getReadingPracticeHistory(detectedLevel, readingStudentKey).slice(0, 8),
+    [detectedLevel, readingStudentKey],
+  );
 
   useEffect(() => {
     if (!detectedLevel) setShowAllLevels(true);
@@ -208,6 +225,62 @@ const MyExamFilePage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <section style={{ ...styles.card, display: "grid", gap: 12 }} data-reading-practice-history="true">
+        <div>
+          <p style={{ ...styles.helperText, margin: 0 }}>Exams Room practice history</p>
+          <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Lesen attempts</h2>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Completed A1/A2 reading practice is saved here separately from course assignments and certificate results.
+          </p>
+        </div>
+
+        {readingHistory.length ? (
+          <div style={{ display: "grid", gap: 8 }}>
+            {readingHistory.map((attempt) => (
+              <article
+                key={attempt.id}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 11,
+                  padding: 12,
+                  background: "#f9fafb",
+                  display: "grid",
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                  <div>
+                    <strong>{attempt.level} Lesen · Practice Set {String(attempt.setId || "").endsWith("-01") ? "1" : attempt.setId}</strong>
+                    <div style={{ ...styles.helperText, marginTop: 3 }}>
+                      Attempt {attempt.attemptNumber} · {new Date(attempt.completedAt).toLocaleString()}
+                    </div>
+                  </div>
+                  <span style={styles.badge}>
+                    {attempt.score}/{attempt.total} · {attempt.percent}% · {getReadingReadinessLabel(attempt.percent)}
+                  </span>
+                </div>
+                <div style={{ ...styles.helperText }}>
+                  Time used: {formatElapsed(attempt.elapsedSeconds)}
+                </div>
+                {Array.isArray(attempt.sectionScores) && attempt.sectionScores.length ? (
+                  <div style={{ display: "flex", gap: 7, flexWrap: "wrap" }}>
+                    {attempt.sectionScores.map((section) => (
+                      <span key={section.label} style={styles.badge}>
+                        {section.label}: {section.score}/{section.total}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div style={{ ...styles.focusNotice, marginTop: 0 }}>
+            No Lesen practice result saved yet for {detectedLevel || "your current level"}.
+          </div>
+        )}
+      </section>
+
       <section style={{ ...styles.card, display: "grid", gap: 14 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
           <div style={{ minWidth: 0 }}>

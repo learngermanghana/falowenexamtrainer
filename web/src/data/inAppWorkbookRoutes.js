@@ -4,8 +4,6 @@ const GUARDED_LEVELS = new Set(["A1", "A2"]);
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 const normalizeChapter = (value = "") => String(value || "").trim();
 const A1_DAY18_CHAPTER122_WORKBOOK_ROUTE = "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook";
-const A1_DAY23_CHAPTER142_WRITING_ROUTE = "/campus/course/a1-day-23-writing-workshop-14-2";
-const A1_DAY23_CHAPTER142_GRAMMAR_ROUTE = A1_DAY23_CHAPTER142_WRITING_ROUTE;
 
 const b1WorkbookLessonRoute = (day) => `/campus/course/lesson/B1/${day}?view=workbook`;
 
@@ -97,15 +95,6 @@ export const getConfiguredInAppWorkbookRoute = ({ level, day, chapter } = {}) =>
   const normalizedDay = String(Number(day));
   const normalizedChapter = normalizeChapter(chapter);
 
-  if (
-    normalizedLevel === "A1"
-    && normalizedDay === "23"
-    && normalizedChapter === "14.2"
-    && isA1LessonRoute()
-  ) {
-    return A1_DAY23_CHAPTER142_WRITING_ROUTE;
-  }
-
   // Keep the legacy lesson route as the Radio entry point. Once Radio is complete,
   // skip the old resource hub and continue straight into the configured Course Book.
   if (normalizedLevel === "A1" && normalizedDay !== "0" && isA1LessonRoute()) {
@@ -140,7 +129,5 @@ export const hasOnlyInAppWorkbookRoutesForLevel = (level) => {
 
 export {
   A1_DAY18_CHAPTER122_WORKBOOK_ROUTE,
-  A1_DAY23_CHAPTER142_GRAMMAR_ROUTE,
-  A1_DAY23_CHAPTER142_WRITING_ROUTE,
   GUARDED_LEVELS,
 };

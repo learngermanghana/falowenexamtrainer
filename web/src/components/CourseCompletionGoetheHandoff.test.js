@@ -7,30 +7,56 @@ import CourseCompletionConclusion from "./CourseCompletionConclusion";
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 describe("course completion exam actions", () => {
+  test("A1 makes Exams Room primary after the Final Mock", () => {
+    render(
+      <CourseCompletionConclusion
+        level="A1"
+        isComplete
+        completedRequirements={19}
+        totalRequirements={19}
+        passedAssignments={19}
+        totalAssignments={19}
+      />,
+    );
+
+    expect(screen.getByRole("link", { name: "Continue to Exams Room" })).toHaveAttribute(
+      "href",
+      "/exams/overview",
+    );
+    expect(screen.getByRole("link", { name: "Official Goethe A1 Sample" })).toHaveAttribute(
+      "href",
+      "https://bfu.goethe.de/a1_sd1/hoeren.php",
+    );
+  });
+
   test.each([
-    ["A1", "https://bfu.goethe.de/a1_sd1/hoeren.php"],
     ["A2", "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html"],
     ["B1", "https://bfu.goethe.de/b1_mod/lesen.php"],
     ["B2", "https://www.goethe.de/en/spr/prf/ueb/pb2.html"],
     ["C1", "https://www.goethe.de/en/spr/prf/ueb/pc1.html"],
     ["C2", "https://www.goethe.de/en/spr/prf/ueb/pc2.html"],
-  ])("%s shows the official sample and Falowen Exams Room", (level, sampleUrl) => {
+  ])("%s keeps official Goethe practice primary until its full mock flow is promoted", (level, sampleUrl) => {
     render(
       <CourseCompletionConclusion
         level={level}
         isComplete
-        completedRequirements={level === "A1" ? 19 : 28}
-        totalRequirements={level === "A1" ? 19 : 28}
-        passedAssignments={level === "A1" ? 19 : 28}
-        totalAssignments={level === "A1" ? 19 : 28}
+        completedRequirements={28}
+        totalRequirements={28}
+        passedAssignments={28}
+        totalAssignments={28}
       />,
     );
 
-    expect(screen.getByRole("link", { name: `Open Official Goethe ${level} Exam Sample` })).toHaveAttribute("href", sampleUrl);
-    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
+    expect(
+      screen.getByRole("link", { name: `Open Official Goethe ${level} Exam Sample` }),
+    ).toHaveAttribute("href", sampleUrl);
+    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute(
+      "href",
+      "/exams/overview",
+    );
   });
 
-  test("an incomplete course still exposes both practice destinations", () => {
+  test("an incomplete A2 course still exposes both practice destinations", () => {
     render(
       <CourseCompletionConclusion
         level="A2"
@@ -42,8 +68,13 @@ describe("course completion exam actions", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Open Official Goethe A2 Exam Sample" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute("href", "/exams/question");
+    expect(
+      screen.getByRole("link", { name: "Open Official Goethe A2 Exam Sample" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Go to Exams Room" })).toHaveAttribute(
+      "href",
+      "/exams/overview",
+    );
   });
 
   test("the YouTube button no longer injects a duplicate completion handoff", () => {

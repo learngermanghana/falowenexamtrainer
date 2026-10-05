@@ -5,7 +5,7 @@ import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import { getA1CanonicalLesson } from "../data/a1CanonicalLessonCatalog";
 import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 
-describe("A1 Final Mock Exam Day 24", () => {
+describe("A1 Final Mock Exam Day 23", () => {
   const componentSource = fs.readFileSync(
     path.resolve(__dirname, "./A1FinalMockExamPage.jsx"),
     "utf8",
@@ -57,9 +57,9 @@ describe("A1 Final Mock Exam Day 24", () => {
     expect(getA1Assignment("A1-5.10")).toBeNull();
   });
 
-  test("makes Day 24 an exam-only self-practice card without lesson videos", () => {
+  test("makes Day 23 an exam-only self-practice card without lesson videos", () => {
     expect(getA1CanonicalLesson("5.10")).toMatchObject({
-      day: 24,
+      day: 23,
       title: "A1 Final Mock Exam",
       destination: "/campus/course/a1-final-mock-exam",
       kind: "practice",
@@ -67,14 +67,14 @@ describe("A1 Final Mock Exam Day 24", () => {
     expect(
       getConfiguredInAppWorkbookResourceRoute({
         level: "A1",
-        day: 24,
+        day: 23,
         chapter: "5.10",
       }),
     ).toBe("/campus/course/a1-final-mock-exam");
-    expect(getA1TeacherVideoResources(24)).toHaveLength(0);
+    expect(getA1TeacherVideoResources(23)).toHaveLength(0);
   });
 
-  test("keeps the old Day 24 URL as a compatibility alias to the final mock", () => {
+  test("keeps the old Day 23 URL as a compatibility alias to the final mock", () => {
     expect(appSource).toContain('path="/campus/course/a1-final-mock-exam"');
     expect(appSource).toContain('path="/campus/course/conjunctions-5-10"');
     expect(
@@ -96,7 +96,7 @@ describe("A1 Final Mock Exam Day 24", () => {
   });
 
   test("routes further practice to the Exams Room and keeps the mock non-certificate-bearing", () => {
-    expect(componentSource).toContain('href="/exams/question"');
+    expect(componentSource).toContain('href="/exams/overview"');
     expect(componentSource).toContain('href="/exams/speaking"');
     expect(componentSource).toContain("does not add a new certificate assignment");
   });

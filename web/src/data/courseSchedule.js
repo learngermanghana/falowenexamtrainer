@@ -449,18 +449,18 @@ const A2_SCHEDULE = [
   },
   {
     day: 29,
-    topic: "Goethe A2 Exam Orientation & Official Practice",
-    chapter: "Exam Orientation",
+    topic: "A2 Mock Practice · Preview",
+    chapter: "Mock Preview",
     attendance: false,
-    goal: "Understand the official Goethe A2 exam structure and use the official practice materials confidently.",
+    goal: "Practise the A2 exam format across Lesen, Hören, Schreiben and Sprechen while the unified scored mock is still being completed.",
     instruction:
-      "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, review the four official exam sections, then use the official Goethe A2 practice materials to familiarise yourself with the real exam format.",
+      "Use these exam-style preview sections for practice. Answers are not yet saved across sections and there is no unified A2 result yet. This preview does not add a 29th required course assignment.",
     grammar_topic: null,
     assignment: false,
     video: null,
     youtube_link: null,
     grammarbook_link: null,
-    workbook_link: "/campus/course/a2-day-29-goethe-exam-orientation",
+    workbook_link: "/campus/course/a2-mock-practice-preview",
   },
   {
     day: 30,
@@ -1253,26 +1253,10 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 23,
-      topic: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
-      chapter: "14.2",
-      goal: "Write short A1 messages independently using a greeting, three content points, a closing and a name",
-      instruction:
-        "Use the writing workshop to practise appointment, arrangement, reservation, help, problem and registration tasks. This is self-practice and has no tutor submission.",
-      grammar_topic: "A1 letter writing: three-point planning and formal/informal register",
-      schreiben_sprechen: {
-        video: "https://youtu.be/mgfauvqhoCI",
-        youtube_link: "https://youtu.be/mgfauvqhoCI",
-        assignment: false,
-        grammarbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
-        workbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
-      },
-    },
-    {
-      day: 24,
       topic: "A1 Final Mock Exam",
       chapter: "5.10",
       goal: "Complete a full A1 mock exam across Lesen, Hören, Schreiben and Sprechen and identify the areas that still need practice.",
-      instruction: "Start the timed A1 Final Mock Exam. Complete each section in order. Answers and AI feedback are shown only after the full mock is submitted.",
+      instruction: "Start the timed A1 Final Mock Exam. Complete each section in order. Answers and AI feedback are shown only after the full mock is submitted. After the mock, continue in the Falowen Exams Room for focused practice.",
       grammar_topic: null,
       assignment: false,
       schreiben_sprechen: {
@@ -1283,24 +1267,7 @@ const RAW_COURSE_SCHEDULES = {
       },
     },
     {
-      day: 25,
-      topic: "Goethe A1 Exam Orientation & Official Practice",
-      chapter: "Exam Orientation",
-      attendance: false,
-      goal: "Use the official Goethe A1 model test directly from the Course Book and identify the areas that still need review.",
-      instruction:
-        "No new lesson content and no Falowen submission. Open the Day 25 exam-orientation page, then use the official Goethe A1 model test. The official link starts with Hören and also provides access to Lesen, Schreiben and Sprechen.",
-      grammar_topic: null,
-      assignment: false,
-      lesen_hören: {
-        video: null,
-        youtube_link: null,
-        grammarbook_link: null,
-        workbook_link: "/campus/course/a1-day-25-goethe-exam-orientation",
-      },
-    },
-    {
-      day: 26,
+      day: 24,
       topic: "Course Completed!",
       chapter: null,
       ...buildCompletionMessage({ level: "A1", nextLevel: "A2" }),

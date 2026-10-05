@@ -7,8 +7,8 @@ import { getA1RadioResource } from "./a1RadioResources";
 
 const practices = A1_CANONICAL_LESSON_CATALOG.filter((lesson) => lesson.kind === "practice");
 
-test("A1 has ten explicit self-practice lessons with no tutor assignment identity", () => {
-  expect(practices).toHaveLength(10);
+test("A1 has nine explicit practice lessons with no tutor assignment identity", () => {
+  expect(practices).toHaveLength(9);
   expect(practices.every((lesson) => lesson.assignmentKey === null)).toBe(true);
   expect(practices.map((lesson) => `${lesson.day}:${lesson.chapter}`)).toEqual([
     "3:1.1",
@@ -19,8 +19,7 @@ test("A1 has ten explicit self-practice lessons with no tutor assignment identit
     "14:3.6",
     "15:4.7",
     "19:5.9",
-    "23:14.2",
-    "24:5.10",
+    "23:5.10",
   ]);
 });
 

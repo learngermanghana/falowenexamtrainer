@@ -15,8 +15,6 @@ const expectedPractices = [
   [14, "3.6", "/campus/course/modal-verbs-day-14-3-6"],
   [15, "4.7", "/campus/course/speaking-exams-intro-4-7"],
   [19, "5.9", "/campus/course/verboten-erlaubt-5-9"],
-  [23, "14.2", "/campus/course/dative-and-accusative-verbs-14-2"],
-  [24, "5.10", "/campus/course/conjunctions-5-10"],
 ];
 
 const FakePracticeWorkbook = ({ remountOnSearch = false }) => {
@@ -57,8 +55,8 @@ describe("A1 shared self-practice navigation", () => {
     window.cancelAnimationFrame = (id) => window.clearTimeout(id);
   });
 
-  test("keeps exactly the requested ten self-practice identities separate from tutor assignments", () => {
-    expect(A1_SHARED_PRACTICE_LESSONS).toHaveLength(10);
+  test("keeps only the eight workbook self-practice identities separate from tutor assignments", () => {
+    expect(A1_SHARED_PRACTICE_LESSONS).toHaveLength(8);
     expectedPractices.forEach(([day, chapter, pathname]) => {
       const practice = resolveA1SharedPracticeLesson({ pathname });
       expect(practice).toEqual(expect.objectContaining({ day, chapter, kind: "practice", assignmentKey: null }));
@@ -111,11 +109,11 @@ describe("A1 shared self-practice navigation", () => {
   });
 
 
-  test("keeps Day 6 div-card Teil content separated by the selected tab", async () => {
+  test("does not add shared section tabs to the Day 6 single-page lesson", async () => {
     render(
       <MemoryRouter
         initialEntries={[
-          "/campus/course/a1-day-6-family-and-hobbies-workbook?radio=done&materials=done&workbookTab=section-1",
+          "/campus/course/a1-day-6-family-and-hobbies-workbook?radio=done&materials=done",
         ]}
       >
         <FakeDivCardPracticeWorkbook />
@@ -123,15 +121,11 @@ describe("A1 shared self-practice navigation", () => {
       </MemoryRouter>,
     );
 
-    await screen.findByRole("tab", { name: "Teil 1" });
-    await waitFor(() => expect(screen.getByTestId("practice-section-1")).toBeVisible());
-    expect(screen.getByTestId("practice-section-2")).not.toBeVisible();
-    expect(screen.getByTestId("practice-section-3")).not.toBeVisible();
-
-    fireEvent.click(screen.getByRole("tab", { name: "Teil 2" }));
-    await waitFor(() => expect(screen.getByTestId("practice-section-2")).toBeVisible());
-    expect(screen.getByTestId("practice-section-1")).not.toBeVisible();
-    expect(screen.getByTestId("practice-section-3")).not.toBeVisible();
+    await new Promise((resolve) => window.setTimeout(resolve, 10));
+    expect(screen.queryByRole("region", { name: "A1 self-practice workbook navigation" })).not.toBeInTheDocument();
+    expect(screen.getByTestId("practice-section-1")).toBeVisible();
+    expect(screen.getByTestId("practice-section-2")).toBeVisible();
+    expect(screen.getByTestId("practice-section-3")).toBeVisible();
   });
 
   test("keeps the selected Teil visible when a query update remounts the workbook DOM", async () => {

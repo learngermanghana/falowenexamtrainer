@@ -15,7 +15,9 @@ const normalizePath = (value = "") => String(value || "").replace(/\/+$/, "") ||
 const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim();
 
 export const A1_SHARED_PRACTICE_LESSONS = Object.freeze(
-  A1_CANONICAL_LESSON_CATALOG.filter((lesson) => lesson.kind === "practice"),
+  A1_CANONICAL_LESSON_CATALOG.filter(
+    (lesson) => lesson.kind === "practice" && lesson.routeKey !== "5.10",
+  ),
 );
 
 export const resolveA1SharedPracticeLesson = ({ pathname = "" } = {}) => {

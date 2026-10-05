@@ -42,8 +42,8 @@ jobs:
         include:
           - level: A1
             first_day: 0
-            last_day: 24
-            lesson_count: 25
+            last_day: 23
+            lesson_count: 24
           - level: A2
             first_day: 0
             last_day: 28

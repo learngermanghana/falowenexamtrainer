@@ -54,8 +54,8 @@ const COURSE_BOOK_FILTERS = [
 const A1_COURSE_BOOK_SECTIONS = [
   { key: "orientation", title: "Orientation", days: "Day 0", firstDay: 0, lastDay: 0 },
   { key: "a1-1", title: "A1.1 – Foundations", days: "Days 1–12", firstDay: 1, lastDay: 12 },
-  { key: "a1-2", title: "A1.2 – Application and Readiness", days: "Days 13–24", firstDay: 13, lastDay: 24 },
-  { key: "a1-exam", title: "A1 Exam Orientation", days: "Day 25", firstDay: 25, lastDay: 25 },
+  { key: "a1-2", title: "A1.2 – Application and Readiness", days: "Days 13–22", firstDay: 13, lastDay: 22 },
+  { key: "a1-exam", title: "A1 Final Mock", days: "Day 23", firstDay: 23, lastDay: 23 },
 ];
 
 const getA1CourseBookSection = (entry) => {
@@ -943,6 +943,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   const getLessonHref = (entry) => {
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "A2" &&
+      Number(entry?.day) === 29
+    ) {
+      return entry?.workbook_link || "/campus/course/a2-mock-practice-preview";
+    }
+
     const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
     const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";
     return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;

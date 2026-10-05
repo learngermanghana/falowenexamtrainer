@@ -6,6 +6,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const file = path.join(root, "web/src/components/CourseTab.js");
 let source = fs.readFileSync(file, "utf8");
 
+source = source
+  .replace(
+    '{ key: "a2-exam", title: "A2 Mock Practice", days: "Day 29", firstDay: 29, lastDay: 29 },',
+    '{ key: "a2-exam", title: "A2 Mock Preview", days: "Day 29", firstDay: 29, lastDay: 29 },',
+  )
+  .replace(
+    '{ key: "a2-exam", title: "A2 Exam Orientation", days: "Day 29", firstDay: 29, lastDay: 29,',
+    '{ key: "a2-exam", title: "A2 Mock Preview", days: "Day 29", firstDay: 29, lastDay: 29,',
+  );
+
 const anchor = `const getA2CourseBookSection = (entry) => {
   const day = Number(entry.displayDay ?? entry.day);
   return A2_COURSE_BOOK_SECTIONS.find(({ firstDay, lastDay }) => day >= firstDay && day <= lastDay);

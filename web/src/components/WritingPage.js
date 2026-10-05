@@ -458,6 +458,7 @@ const WritingPage = ({
   draftLabel,
   draftPlaceholder,
   writingContext = {},
+  simplifiedExamFlow = false,
 }) => {
   const {
     level,
@@ -479,6 +480,7 @@ const WritingPage = ({
     "";
   const isExamMode = mode === "exam";
   const isCourseMode = mode === "course";
+  const isSimplifiedExamFlow = isExamMode && simplifiedExamFlow;
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   const examWritingLetters = useMemo(
@@ -576,6 +578,16 @@ const WritingPage = ({
     () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
     [selectedLetterId, visibleWritingTasks],
   );
+
+  useEffect(() => {
+    if (!isExamMode || visibleWritingTasks.length === 0) return;
+    const hasValidSelection = visibleWritingTasks.some(
+      (item) => item.id === selectedLetterId,
+    );
+    if (!hasValidSelection) {
+      setSelectedLetterId(visibleWritingTasks[0].id);
+    }
+  }, [isExamMode, selectedLetterId, visibleWritingTasks]);
   const pinnedIdeaQuestion = useMemo(() => {
     const firstUserMessage = chatMessages.find(
       (message) => message.role === "user",
@@ -721,9 +733,9 @@ const WritingPage = ({
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
   // Idea support now lives in Study Buddy so the writing room can stay focused.
   const canUseIdeasGenerator = false;
-  const canUsePracticeLetters = isExamMode;
-  const canUseFormsPractice = isExamMode && level === "A1";
-  const canUseTutorFeedback = isExamMode;
+  const canUsePracticeLetters = isExamMode && !isSimplifiedExamFlow;
+  const canUseFormsPractice = isExamMode && level === "A1" && !isSimplifiedExamFlow;
+  const canUseTutorFeedback = isExamMode && !isSimplifiedExamFlow;
   const isTutorOnlyView = initialTab === "tutor" && canUseTutorFeedback;
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
@@ -731,10 +743,12 @@ const WritingPage = ({
       {
         key: "mark",
         label:
-          markLabel || (isCourseMode ? "Analyse my text" : "Mark my letter"),
+          markLabel || (isCourseMode ? "Analyse my text" : isSimplifiedExamFlow ? "Writing practice" : "Mark my letter"),
       },
     ];
-    tabs.push({ key: "references", label: "References (notes)" });
+    if (!isSimplifiedExamFlow) {
+      tabs.push({ key: "references", label: "References (notes)" });
+    }
 
     if (canUsePracticeLetters) {
       tabs.push({ key: "practice", label: "Practice prompts" });
@@ -759,6 +773,7 @@ const WritingPage = ({
     canUseTutorFeedback,
     enabledTabs,
     isCourseMode,
+    isSimplifiedExamFlow,
     markLabel,
   ]);
   const visibleTabs = useMemo(() => {
@@ -1595,13 +1610,17 @@ const WritingPage = ({
 
   const handleSaveForTutorReview = async () => {
     if (!isExamMode) return;
-    const draftToSave = revisedDraftText.trim();
+    const draftToSave = isSimplifiedExamFlow
+      ? typedAnswer.trim()
+      : revisedDraftText.trim();
 
     if (!draftToSave) {
       setTutorSaveState({
         loading: false,
         success: "",
-        error: "Please add your improved draft before saving for tutor review.",
+        error: isSimplifiedExamFlow
+          ? "Write your letter first."
+          : "Please add your improved draft before saving for tutor review.",
       });
       return;
     }
@@ -1615,7 +1634,7 @@ const WritingPage = ({
       return;
     }
 
-    if (!revisionSummary.changed || !workflowComplete) {
+    if (!isSimplifiedExamFlow && (!revisionSummary.changed || !workflowComplete)) {
       setTutorSaveState({
         loading: false,
         success: "",
@@ -1646,12 +1665,13 @@ const WritingPage = ({
         promptTitle: selectedLetter?.letter || "Custom prompt",
         draft: firstDraftSnapshot || typedAnswer,
         aiFeedback: markFeedback,
-        revisedDraft: revisedDraftText,
-        reflection: reflectionText,
+        revisedDraft: isSimplifiedExamFlow ? "" : revisedDraftText,
+        reflection: isSimplifiedExamFlow ? "" : reflectionText,
+        source: isSimplifiedExamFlow ? "exam-room-simple-writing" : "exam-room",
       });
       setTutorSaveState({
         loading: false,
-        success: "Submitted. A tutor copy is now in the review queue.",
+        success: "Saved. Your marked letter is now in the tutor review queue.",
         error: "",
       });
     } catch (err) {
@@ -2024,7 +2044,9 @@ const WritingPage = ({
             ? "View tutor comments and reply from here."
             : isCourseMode
               ? "For Days 1–19, build consistency by writing and analysing one section at a time. From Day 21, write and mark one complete essay."
-              : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
+              : isSimplifiedExamFlow
+                ? "Choose a letter question, write one answer, get AI marking, and save the marked copy for your tutor."
+                : "Write one complete exam response, get feedback, improve one section, then save the version for your tutor."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
@@ -2039,10 +2061,17 @@ const WritingPage = ({
                 essay.
               </>
             ) : (
-              <>
-                From Day 21, use <strong>Mark my letter</strong> for one
-                complete essay. Use Study Buddy if a question is unclear.
-              </>
+              isSimplifiedExamFlow ? (
+                <>
+                  Choose one letter question, write your answer, get AI marking,
+                  and save the marked copy for your tutor.
+                </>
+              ) : (
+                <>
+                  From Day 21, use <strong>Mark my letter</strong> for one
+                  complete essay. Use Study Buddy if a question is unclear.
+                </>
+              )
             )}
           </p>
         </div>
@@ -2296,8 +2325,45 @@ const WritingPage = ({
             <p style={styles.helperText}>
               {markDescription || (isCourseMode
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
-                : "From Day 21, write one complete essay, get full feedback, and save one revised version.")}
+                : isSimplifiedExamFlow
+                  ? "Choose one exam-style writing question, write your answer, and analyse that exact response with AI. You can then save the marked copy for your tutor."
+                  : "From Day 21, write one complete essay, get full feedback, and save one revised version.")}
             </p>
+
+            {isSimplifiedExamFlow ? (
+              <div style={{ ...styles.helperCard, marginBottom: 14, display: "grid", gap: 10 }}>
+                <div>
+                  <label style={styles.label}>Choose a writing question</label>
+                  <select
+                    value={selectedLetterId}
+                    onChange={(event) => {
+                      setSelectedLetterId(event.target.value);
+                      setTypedAnswer("");
+                      setMarkFeedback("");
+                      setTutorSaveState({ loading: false, success: "", error: "" });
+                    }}
+                    style={styles.select}
+                  >
+                    {visibleWritingTasks.map((item) => (
+                      <option key={item.id} value={item.id}>{item.letter}</option>
+                    ))}
+                  </select>
+                </div>
+                {selectedLetter ? (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <strong>{selectedLetter.situation}</strong>
+                    {(selectedLetter.whatToInclude || []).length ? (
+                      <ul style={{ ...styles.checklist, margin: 0 }}>
+                        {selectedLetter.whatToInclude.map((item) => <li key={item}>{item}</li>)}
+                      </ul>
+                    ) : null}
+                    <span style={styles.badge}>
+                      Target: {WORD_TARGETS[level] || "Use the task guidance"}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
@@ -2323,7 +2389,7 @@ const WritingPage = ({
             <label style={styles.label}>
               {draftLabel || (isCourseMode
                 ? "Your combined section"
-                : "Your complete letter or essay")}
+                : isSimplifiedExamFlow ? "Your answer" : "Your complete letter or essay")}
             </label>
             <textarea
               ref={markDraftRef}
@@ -2335,18 +2401,22 @@ const WritingPage = ({
               placeholder={
                 draftPlaceholder || (isCourseMode
                   ? "Combine what you wrote today and paste it here for level-based analysis..."
-                  : "Paste your finished letter or essay here for marking...")
+                  : isSimplifiedExamFlow ? "Write your answer to the selected question here..." : "Paste your finished letter or essay here for marking...")
               }
               style={styles.textArea}
               rows={9}
             />
-            <LiveGermanWritingCoach text={typedAnswer} onChange={setTypedAnswer} />
-            <PrepositionCaseCoachField
-              text={typedAnswer}
-              level={level}
-              textareaRef={markDraftRef}
-              studentProfile={studentProfile}
-            />
+            {!isSimplifiedExamFlow ? (
+              <>
+                <LiveGermanWritingCoach text={typedAnswer} onChange={setTypedAnswer} />
+                <PrepositionCaseCoachField
+                  text={typedAnswer}
+                  level={level}
+                  textareaRef={markDraftRef}
+                  studentProfile={studentProfile}
+                />
+              </>
+            ) : null}
             <SpecialCharacterRow
               onInsert={(character) =>
                 insertSpecialCharacter(setTypedAnswer, markDraftRef, character)
@@ -2379,44 +2449,48 @@ const WritingPage = ({
                       ? "Retry"
                       : isCourseMode
                         ? submitLabel || "Analyse my text"
-                        : submitLabel || "Get AI feedback"}
+                        : submitLabel || (isSimplifiedExamFlow ? "Analyze my text" : "Get AI feedback")}
                 </button>
+
+                {!isSimplifiedExamFlow ? (
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={handleExportDraft}
+                    disabled={!typedAnswer.trim()}
+                  >
+                    Export / Print draft
+                  </button>
+                ) : null}
 
                 <button
                   type="button"
-                  style={styles.secondaryButton}
-                  onClick={handleExportDraft}
-                  disabled={!typedAnswer.trim()}
-                >
-                  Export / Print draft
-                </button>
-
-                <button
-                  type="button"
-                  style={styles.dangerButton}
+                  style={isSimplifiedExamFlow ? styles.secondaryButton : styles.dangerButton}
                   onClick={handleResetWorkspace}
                 >
-                  Reset writing workspace
+                  Start again
                 </button>
               </div>
             </div>
 
-            <WritingHistorySection
-              title={isCourseMode ? "Saved Texts" : "Saved Letters"}
-              entries={writingHistory}
-              level={level}
-              onOpen={(entry) => {
-                setTypedAnswer(
-                  entry.originalLetter || entry.originalText || "",
-                );
-                setMarkFeedback(entry.feedback || "");
-                setMarkRubric(entry.rubricScores || null);
-                setMarkCorrections(
-                  Array.isArray(entry.corrections) ? entry.corrections : [],
-                );
-                setMarkStructuredFeedback(entry.structuredFeedback || null);
-              }}
-            />
+            {!isSimplifiedExamFlow ? (
+              <WritingHistorySection
+                title={isCourseMode ? "Saved Texts" : "Saved Letters"}
+                entries={writingHistory}
+                level={level}
+                onOpen={(entry) => {
+                  setTypedAnswer(
+                    entry.originalLetter || entry.originalText || "",
+                  );
+                  setMarkFeedback(entry.feedback || "");
+                  setMarkRubric(entry.rubricScores || null);
+                  setMarkCorrections(
+                    Array.isArray(entry.corrections) ? entry.corrections : [],
+                  );
+                  setMarkStructuredFeedback(entry.structuredFeedback || null);
+                }}
+              />
+            ) : null}
 
             {markFeedback ? (
               <div style={{ marginTop: 16 }}>
@@ -2433,7 +2507,7 @@ const WritingPage = ({
               </div>
             ) : null}
 
-            {markFeedback && isExamMode ? (
+            {markFeedback && isExamMode && !isSimplifiedExamFlow ? (
               <div
                 style={{
                   ...styles.helperCard,
@@ -2565,6 +2639,29 @@ const WritingPage = ({
               </div>
             ) : null}
 
+            {markFeedback && isSimplifiedExamFlow ? (
+              <div style={{ ...styles.helperCard, marginTop: 18, display: "grid", gap: 10 }}>
+                <div>
+                  <h4 style={{ ...styles.resultHeading, marginBottom: 4 }}>Send a copy to your tutor</h4>
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    Your original letter and AI feedback will be saved to the tutor review queue.
+                  </p>
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    style={styles.primaryButton}
+                    onClick={handleSaveForTutorReview}
+                    disabled={tutorSaveState.loading}
+                  >
+                    {tutorSaveState.loading ? "Saving..." : "Save marked letter for tutor"}
+                  </button>
+                </div>
+                {tutorSaveState.error ? <div style={styles.errorBox}>{tutorSaveState.error}</div> : null}
+                {tutorSaveState.success ? <div style={styles.successBox}>{tutorSaveState.success}</div> : null}
+              </div>
+            ) : null}
+
             {error && (
               <div style={styles.errorBox}>
                 <strong>Note:</strong> {error}
@@ -2572,7 +2669,7 @@ const WritingPage = ({
             )}
           </section>
 
-          {improvedFeedback ? (
+          {!isSimplifiedExamFlow && improvedFeedback ? (
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>Updated AI feedback</h3>
               <WritingFeedbackCard
@@ -2603,7 +2700,7 @@ const WritingPage = ({
             </section>
           ) : null}
 
-          {draftHistory.length >= 2 && (
+          {!isSimplifiedExamFlow && draftHistory.length >= 2 && (
             <section style={styles.card}>
               <details>
                 <summary style={{ cursor: "pointer", fontWeight: 700 }}>
@@ -2644,7 +2741,7 @@ const WritingPage = ({
             </section>
           )}
 
-          <ResultHistory results={resultHistory} />
+          {!isSimplifiedExamFlow ? <ResultHistory results={resultHistory} /> : null}
         </>
       )}
 
