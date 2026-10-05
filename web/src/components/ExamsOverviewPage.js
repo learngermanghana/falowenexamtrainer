@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
+import { getLatestReadingPracticeResult } from "../services/readingPracticeHistory";
 
 const PRACTICE_SECTIONS = [
   {
@@ -37,6 +38,7 @@ const ExamsOverviewPage = () => {
   const { level } = useExam();
   const mocks = getMockExamsForLevel(level);
   const primaryMock = mocks[0] || null;
+  const latestReading = getLatestReadingPracticeResult(level);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -131,9 +133,18 @@ const ExamsOverviewPage = () => {
             >
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
                 <strong>{section.title}</strong>
-                <span style={styles.badge}>{section.status}</span>
+                <span style={styles.badge}>
+                  {section.key === "lesen" && latestReading
+                    ? `${latestReading.percent}% · last attempt`
+                    : section.status}
+                </span>
               </div>
-              <p style={{ ...styles.helperText, margin: 0 }}>{section.description}</p>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                {section.description}
+                {section.key === "lesen" && latestReading
+                  ? ` Latest: ${latestReading.score}/${latestReading.total} on Practice Set ${latestReading.setId.endsWith("-01") ? "1" : latestReading.setId}.`
+                  : ""}
+              </p>
               <div>
                 <button
                   type="button"
