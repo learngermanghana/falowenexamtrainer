@@ -112,6 +112,8 @@ export default function A1GoetheSpeakingMockPreview({
   const recordingSecondsRef = useRef(0);
   const attemptsRef = useRef({});
   const timeoutMarkTriggeredRef = useRef(false);
+  const timeoutAutoSubmitTaskIdRef = useRef("");
+  const secondsLeftRef = useRef(0);
 
   const tasks = A1_GOETHE_SPEAKING_MOCK.tasks;
   const secondsLeft = usesExternalTimer
@@ -121,6 +123,10 @@ export default function A1GoetheSpeakingMockPreview({
   useEffect(() => {
     if (autoStart) setStarted(true);
   }, [autoStart]);
+
+  useEffect(() => {
+    secondsLeftRef.current = secondsLeft;
+  }, [secondsLeft]);
 
   useEffect(() => {
     if (usesExternalTimer || !started || internalSecondsLeft <= 0) return undefined;
@@ -158,6 +164,25 @@ export default function A1GoetheSpeakingMockPreview({
 
   const completedCount = useMemo(
     () => tasks.filter((task) => Boolean(attempts[task.id]?.transcript)).length,
+    [attempts, tasks],
+  );
+
+  const hasInFlightSubmission = useMemo(
+    () => tasks.some((task) => Boolean(attempts[task.id]?.submitting)),
+    [attempts, tasks],
+  );
+
+  const pendingRecordedTask = useMemo(
+    () =>
+      tasks.find((task) => {
+        const attempt = attempts[task.id];
+        return Boolean(
+          attempt?.audioBlob &&
+          !attempt?.submitted &&
+          !attempt?.submitting &&
+          !attempt?.timeoutSubmissionFailed
+        );
+      }) || null,
     [attempts, tasks],
   );
 
@@ -258,9 +283,9 @@ export default function A1GoetheSpeakingMockPreview({
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   };
 
-  const submitTask = async (task) => {
+  const submitTask = useCallback(async (task, { timeoutAuto = false } = {}) => {
     const attempt = attempts[task.id];
-    if (!attempt?.audioBlob || attempt.submitted) return;
+    if (!attempt?.audioBlob || attempt.submitted || attempt.submitting) return;
 
     setError("");
     setStatus(`${task.title}: Falowen is listening and transcribing…`);
@@ -300,11 +325,15 @@ export default function A1GoetheSpeakingMockPreview({
     } catch (submitError) {
       setAttempts((current) => ({
         ...current,
-        [task.id]: { ...current[task.id], submitting: false },
+        [task.id]: {
+          ...current[task.id],
+          submitting: false,
+          timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0,
+        },
       }));
       setError(userFacingAudioError(submitError, submitError?.message || "Could not analyze this recording."));
     }
-  };
+  }, [attempts, idToken, user?.uid]);
 
   const resetUnsubmittedRecording = (taskId) => {
     setAttempts((current) => {
@@ -348,10 +377,41 @@ export default function A1GoetheSpeakingMockPreview({
   }, [attemptId, completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
 
   useEffect(() => {
-    if (!started || secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
+    if (
+      !started ||
+      secondsLeft > 0 ||
+      result ||
+      marking ||
+      timeoutMarkTriggeredRef.current
+    ) {
+      return;
+    }
+
+    if (recordingTaskId || hasInFlightSubmission) {
+      return;
+    }
+
+    if (pendingRecordedTask) {
+      if (timeoutAutoSubmitTaskIdRef.current !== pendingRecordedTask.id) {
+        timeoutAutoSubmitTaskIdRef.current = pendingRecordedTask.id;
+        submitTask(pendingRecordedTask, { timeoutAuto: true });
+      }
+      return;
+    }
+
     timeoutMarkTriggeredRef.current = true;
     markSpeaking({ force: true });
-  }, [started, secondsLeft, result, marking, markSpeaking]);
+  }, [
+    started,
+    secondsLeft,
+    result,
+    marking,
+    recordingTaskId,
+    hasInFlightSubmission,
+    pendingRecordedTask,
+    submitTask,
+    markSpeaking,
+  ]);
 
   const scorePercent = result
     ? Math.round((Number(result.score || 0) / Number(result.maxScore || 25)) * 100)

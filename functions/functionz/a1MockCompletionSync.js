@@ -293,6 +293,8 @@ const buildA1MockCompletionArtifacts = ({
     link: "/campus/course/a1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
+    attemptLabel,
+    attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
     mockAttemptId: clean(attemptId),
     sectionScores: Object.fromEntries(breakdown.map((item) => [item.key, item.score])),
     scoreBreakdown: breakdown,
@@ -328,6 +330,8 @@ const buildA1MockCompletionArtifacts = ({
     read: false,
     data: {
       type: "marked_assignment",
+      attemptLabel,
+      attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
       category: "feedback",
       route: MOCK_ROUTE,
       assignment: MOCK_TITLE,

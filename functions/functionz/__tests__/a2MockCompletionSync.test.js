@@ -39,6 +39,43 @@ describe("A2 final mock verified scoring and persistence", () => {
     });
   });
 
+  test("uses the audited Hören key for all four parts", () => {
+    expect(LISTENING_ANSWER_KEY).toEqual({
+      "t1-1": "c",
+      "t1-2": "b",
+      "t1-3": "b",
+      "t1-4": "b",
+      "t1-5": "b",
+      "t2-6": "a",
+      "t2-7": "b",
+      "t2-8": "c",
+      "t2-9": "d",
+      "t2-10": "e",
+      "t3-11": "a",
+      "t3-12": "c",
+      "t3-13": "b",
+      "t3-14": "a",
+      "t3-15": "c",
+      "t4-16": "ja",
+      "t4-17": "nein",
+      "t4-18": "ja",
+      "t4-19": "nein",
+      "t4-20": "ja",
+    });
+  });
+
+  test("caps Schreiben when required content points are missing", () => {
+    const appSource = fs.readFileSync(path.resolve(__dirname, "../app.js"), "utf8");
+    expect(appSource).toContain("capA2MockWritingScoreForTaskCompletion");
+    expect(appSource).toContain("missingCaps: [7, 4, 1]");
+    expect(appSource).toContain("missingCaps: [11, 7, 3]");
+    expect(appSource).toContain("required_points_met");
+    expect(appSource).toContain("greeting_ok");
+    expect(appSource).toContain("closing_ok");
+    expect(appSource).toContain("responsePresent: Boolean(sms)");
+    expect(appSource).toContain("responsePresent: Boolean(email)");
+  });
+
   test("recomputes objective sections server-side and combines four 25-point skills", () => {
     const result = buildVerifiedA2MockScore({
       state: {
@@ -100,6 +137,8 @@ describe("A2 final mock verified scoring and persistence", () => {
       score: 88,
       certificateEligible: false,
       progressionEligible: false,
+      attemptLabel: "First readiness attempt",
+      attemptType: "readiness",
     });
     expect(artifacts.notificationDocument.title).toBe("Your A2 Final Mock result is ready");
   });

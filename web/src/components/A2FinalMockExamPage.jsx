@@ -203,7 +203,7 @@ const SectionHeader = ({ label, secondsLeft, attemptInfo }) => (
   </div>
 );
 
-const LockedExamAudio = ({ part, config, idToken, status, onStatusChange }) => {
+const LockedExamAudio = ({ part, config, idToken, status, onStatusChange, expired = false }) => {
   const audioRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -235,8 +235,13 @@ const LockedExamAudio = ({ part, config, idToken, status, onStatusChange }) => {
     };
   }, [config.audioObjectKey, idToken, part]);
 
+  useEffect(() => {
+    if (!expired || !audioRef.current) return;
+    audioRef.current.pause();
+  }, [expired]);
+
   const startAudio = () => {
-    if (loading || status === "ended" || !audioRef.current || !audioUrl) return;
+    if (expired || loading || status === "ended" || !audioRef.current || !audioUrl) return;
     const audio = audioRef.current;
     audio.currentTime = 0;
     audio.play()
@@ -273,7 +278,7 @@ const LockedExamAudio = ({ part, config, idToken, status, onStatusChange }) => {
       {status === "ended" ? (
         <strong className="a1-final-mock-audio-done">Audio finished</strong>
       ) : (
-        <button type="button" onClick={startAudio} disabled={loading || !audioUrl || startedThisMount}>
+        <button type="button" onClick={startAudio} disabled={expired || loading || !audioUrl || startedThisMount}>
           {loading
             ? "Preparing audio …"
             : startedThisMount
@@ -317,8 +322,13 @@ export default function A2FinalMockExamPage() {
   }, []);
 
   useEffect(() => {
+    const persistedState = {
+      ...exam,
+      clientSavedAtMs: Date.now(),
+    };
+
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(storageKey, JSON.stringify(exam));
+      window.localStorage.setItem(storageKey, JSON.stringify(persistedState));
     }
 
     if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
@@ -329,7 +339,7 @@ export default function A2FinalMockExamPage() {
         idToken,
         attemptId: exam.attemptInfo.attemptId,
         section: exam.stage,
-        state: exam,
+        state: persistedState,
         sectionScores: exam.sectionScores,
         status: "in_progress",
         overall: exam.overall,
@@ -445,9 +455,17 @@ export default function A2FinalMockExamPage() {
 
       const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID });
       if (response?.resumed && response?.state && !forceNew) {
+        const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
+        const localSavedAt = Number(exam.clientSavedAtMs || 0);
+        const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
+        const newestState =
+          sameLocalAttempt && localSavedAt > serverSavedAt
+            ? exam
+            : response.state;
+
         setExam({
           ...emptyState(),
-          ...response.state,
+          ...newestState,
           attemptInfo: {
             attemptId: response.attemptId,
             attemptNumber: response.attemptNumber,
@@ -754,6 +772,7 @@ export default function A2FinalMockExamPage() {
             <LockedExamAudio
               part="teil-1"
               config={A2_GOETHE_LISTENING_TEIL1}
+              expired={secondsLeft <= 0}
               idToken={idToken}
               status={exam.hoerenAudio?.["teil-1"] || "not_started"}
               onStatusChange={(status) => setExam((current) => ({
@@ -783,6 +802,7 @@ export default function A2FinalMockExamPage() {
             <LockedExamAudio
               part="teil-2"
               config={A2_GOETHE_LISTENING_TEIL2}
+              expired={secondsLeft <= 0}
               idToken={idToken}
               status={exam.hoerenAudio?.["teil-2"] || "not_started"}
               onStatusChange={(status) => setExam((current) => ({
@@ -824,6 +844,7 @@ export default function A2FinalMockExamPage() {
             <LockedExamAudio
               part="teil-3"
               config={A2_GOETHE_LISTENING_TEIL3}
+              expired={secondsLeft <= 0}
               idToken={idToken}
               status={exam.hoerenAudio?.["teil-3"] || "not_started"}
               onStatusChange={(status) => setExam((current) => ({
@@ -852,6 +873,7 @@ export default function A2FinalMockExamPage() {
             <LockedExamAudio
               part="teil-4"
               config={A2_GOETHE_LISTENING_TEIL4}
+              expired={secondsLeft <= 0}
               idToken={idToken}
               status={exam.hoerenAudio?.["teil-4"] || "not_started"}
               onStatusChange={(status) => setExam((current) => ({

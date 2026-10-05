@@ -1946,13 +1946,16 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "",
   "TEIL 1 — SMS, 10 points:",
   "Situation: The learner is late meeting Mila.",
-  "Required points: (1) apologise for being late, (2) explain why, (3) give a new meeting place and a new time.",
+  "Required points: (1) apologise for being late, (2) explain why, (3) give a new meeting place AND a new time.",
+  "Scoring emphasis: task completion is essential. If one required point is missing, Teil 1 may score at most 7/10; if two are missing, at most 4/10; if all three are missing, at most 1/10.",
   "Target length: 20–30 words. Do not fail only because the word count is slightly outside the target.",
   "",
   "TEIL 2 — E-Mail, 15 points:",
   "Situation: Frau Becker invited the learner to the language school's summer party.",
-  "Required points: (1) thank her and say the learner will come, (2) say the learner will bring one person, (3) ask how to get to the party.",
-  "Target length: 30–40 words. The email should use an appropriate greeting and closing.",
+  "Required points: (1) thank her AND clearly say the learner will come, (2) say the learner will bring one person, (3) ask how to get to the party.",
+  "Scoring emphasis: task completion is essential. If one required point is missing, Teil 2 may score at most 11/15; if two are missing, at most 7/15; if all three are missing, at most 3/15.",
+  "Target length: 30–40 words. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
+  "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
   "",
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
@@ -1968,6 +1971,8 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         content_score: 0,
         language_score: 0,
         appropriateness_score: 0,
+        required_points_met: [false, false, false],
+        missing_required_points: ["apology", "reason", "new place and time"],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -1984,6 +1989,10 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         structure_score: 0,
         language_score: 0,
         cohesion_score: 0,
+        greeting_ok: false,
+        closing_ok: false,
+        required_points_met: [false, false, false],
+        missing_required_points: ["thanks and acceptance", "bring one person", "directions question"],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -3579,6 +3588,36 @@ app.post("/writing/a1-mock-score", async (req, res) => {
   }
 });
 
+const capA2MockWritingScoreForTaskCompletion = ({
+  rawScore = 0,
+  maxScore = 0,
+  requiredPointsMet = null,
+  missingCaps = [],
+  responsePresent = true,
+  formatCap = null,
+} = {}) => {
+  if (!responsePresent) return 0;
+  let score = Math.max(0, Math.min(Number(maxScore) || 0, Number(rawScore) || 0));
+  const flags =
+    Array.isArray(requiredPointsMet) && requiredPointsMet.length === 3
+      ? requiredPointsMet.map(Boolean)
+      : null;
+
+  if (flags) {
+    const missingCount = flags.filter((met) => !met).length;
+    if (missingCount > 0) {
+      const cap = Number(missingCaps[missingCount - 1]);
+      if (Number.isFinite(cap)) score = Math.min(score, cap);
+    }
+  }
+
+  if (Number.isFinite(Number(formatCap))) {
+    score = Math.min(score, Number(formatCap));
+  }
+
+  return Number(score.toFixed(1));
+};
+
 app.post("/writing/a2-mock-score", async (req, res) => {
   let authedUser;
   try {
@@ -3638,8 +3677,31 @@ app.post("/writing/a2-mock-score", async (req, res) => {
         });
       }
 
-      const teil1Score = Math.max(0, Math.min(10, Number(result?.parts?.teil1?.score) || 0));
-      const teil2Score = Math.max(0, Math.min(15, Number(result?.parts?.teil2?.score) || 0));
+      const teil1Flags = Array.isArray(result?.parts?.teil1?.required_points_met)
+        ? result.parts.teil1.required_points_met
+        : null;
+      const teil2Flags = Array.isArray(result?.parts?.teil2?.required_points_met)
+        ? result.parts.teil2.required_points_met
+        : null;
+      const teil2GreetingOk = result?.parts?.teil2?.greeting_ok !== false;
+      const teil2ClosingOk = result?.parts?.teil2?.closing_ok !== false;
+      const teil2FormatCap = !teil2GreetingOk && !teil2ClosingOk ? 13 : null;
+
+      const teil1Score = capA2MockWritingScoreForTaskCompletion({
+        rawScore: result?.parts?.teil1?.score,
+        maxScore: 10,
+        requiredPointsMet: teil1Flags,
+        missingCaps: [7, 4, 1],
+        responsePresent: Boolean(sms),
+      });
+      const teil2Score = capA2MockWritingScoreForTaskCompletion({
+        rawScore: result?.parts?.teil2?.score,
+        maxScore: 15,
+        requiredPointsMet: teil2Flags,
+        missingCaps: [11, 7, 3],
+        responsePresent: Boolean(email),
+        formatCap: teil2FormatCap,
+      });
       const score = Math.max(0, Math.min(25, Number((teil1Score + teil2Score).toFixed(1))));
       result = {
         ...result,
@@ -3724,6 +3786,29 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     return res.status(500).json({ error: err.message || "Failed to score the A2 writing mock." });
   }
 });
+
+const FINAL_MOCK_SECTION_RANK = Object.freeze({
+  intro: 0,
+  lesen: 1,
+  hoeren: 2,
+  schreiben: 3,
+  sprechen: 4,
+  result: 5,
+});
+
+const shouldIgnoreStaleFinalMockProgress = ({ existing = {}, section = "", state = {} } = {}) => {
+  const existingSection = String(existing.section || existing.state?.stage || "intro").trim();
+  const incomingSection = String(section || state?.stage || "intro").trim();
+  const existingRank = Number(FINAL_MOCK_SECTION_RANK[existingSection] ?? 0);
+  const incomingRank = Number(FINAL_MOCK_SECTION_RANK[incomingSection] ?? 0);
+
+  if (incomingRank < existingRank) return true;
+  if (incomingRank > existingRank) return false;
+
+  const existingSavedAt = Number(existing.state?.clientSavedAtMs || 0);
+  const incomingSavedAt = Number(state?.clientSavedAtMs || 0);
+  return existingSavedAt > 0 && incomingSavedAt > 0 && incomingSavedAt < existingSavedAt;
+};
 
 app.post("/a1-mock/attempt/start", async (req, res) => {
   let authedUser;
@@ -3975,6 +4060,17 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      if (shouldIgnoreStaleFinalMockProgress({ existing, section, state })) {
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "in_progress",
+          staleIgnored: true,
+          section: existing.section || existing.state?.stage || "intro",
+        };
         return;
       }
 
@@ -4347,6 +4443,17 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         }
         tx.set(userRef, completedUserPatch, { merge: true });
         saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      if (shouldIgnoreStaleFinalMockProgress({ existing, section, state })) {
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "in_progress",
+          staleIgnored: true,
+          section: existing.section || existing.state?.stage || "intro",
+        };
         return;
       }
 

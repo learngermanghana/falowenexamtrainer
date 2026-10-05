@@ -353,8 +353,13 @@ export default function A1FinalMockExamPage() {
   }, []);
 
   useEffect(() => {
+    const persistedState = {
+      ...exam,
+      clientSavedAtMs: Date.now(),
+    };
+
     if (typeof window !== "undefined") {
-      window.localStorage.setItem(storageKey, JSON.stringify(exam));
+      window.localStorage.setItem(storageKey, JSON.stringify(persistedState));
     }
 
     if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
@@ -365,9 +370,9 @@ export default function A1FinalMockExamPage() {
         idToken,
         attemptId: exam.attemptInfo.attemptId,
         section: exam.stage,
-        state: exam,
+        state: persistedState,
         sectionScores: exam.sectionScores,
-        status: exam.completed ? "completed" : "in_progress",
+        status: "in_progress",
         overall: exam.overall,
       }).catch((saveError) => {
         console.error("Could not autosave A1 mock", saveError);
@@ -490,7 +495,15 @@ export default function A1FinalMockExamPage() {
 
       const response = await startA1MockAttempt({ idToken, mockId: A1_FINAL_MOCK_ID });
       if (response?.resumed && response?.state && !forceNew) {
-        setExam({ ...emptyState(), ...response.state, attemptInfo: {
+        const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
+        const localSavedAt = Number(exam.clientSavedAtMs || 0);
+        const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
+        const newestState =
+          sameLocalAttempt && localSavedAt > serverSavedAt
+            ? exam
+            : response.state;
+
+        setExam({ ...emptyState(), ...newestState, attemptInfo: {
           attemptId: response.attemptId,
           attemptNumber: response.attemptNumber,
           firstAttempt: response.firstAttempt,
