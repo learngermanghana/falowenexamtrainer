@@ -3588,6 +3588,22 @@ app.post("/writing/a1-mock-score", async (req, res) => {
   }
 });
 
+const parseA2MockRequiredPointFlags = (value, { required = true } = {}) => {
+  if (!required && (value === null || value === undefined)) return null;
+  if (
+    !Array.isArray(value) ||
+    value.length !== 3 ||
+    !value.every((entry) => typeof entry === "boolean")
+  ) {
+    const error = new Error(
+      "Falowen returned malformed A2 writing task-completion data. Please try marking again.",
+    );
+    error.code = "INVALID_A2_WRITING_TASK_FLAGS";
+    throw error;
+  }
+  return value;
+};
+
 const capA2MockWritingScoreForTaskCompletion = ({
   rawScore = 0,
   maxScore = 0,
@@ -3598,21 +3614,19 @@ const capA2MockWritingScoreForTaskCompletion = ({
 } = {}) => {
   if (!responsePresent) return 0;
   let score = Math.max(0, Math.min(Number(maxScore) || 0, Number(rawScore) || 0));
-  const flags =
-    Array.isArray(requiredPointsMet) && requiredPointsMet.length === 3
-      ? requiredPointsMet.map(Boolean)
-      : null;
+  const flags = parseA2MockRequiredPointFlags(requiredPointsMet);
 
-  if (flags) {
-    const missingCount = flags.filter((met) => !met).length;
-    if (missingCount > 0) {
-      const cap = Number(missingCaps[missingCount - 1]);
-      if (Number.isFinite(cap)) score = Math.min(score, cap);
-    }
+  const missingCount = flags.filter((met) => !met).length;
+  if (missingCount > 0) {
+    const cap = Number(missingCaps[missingCount - 1]);
+    if (Number.isFinite(cap)) score = Math.min(score, cap);
   }
 
-  if (Number.isFinite(Number(formatCap))) {
-    score = Math.min(score, Number(formatCap));
+  if (formatCap !== null && formatCap !== undefined) {
+    const numericFormatCap = Number(formatCap);
+    if (Number.isFinite(numericFormatCap)) {
+      score = Math.min(score, numericFormatCap);
+    }
   }
 
   return Number(score.toFixed(1));
@@ -3677,14 +3691,44 @@ app.post("/writing/a2-mock-score", async (req, res) => {
         });
       }
 
-      const teil1Flags = Array.isArray(result?.parts?.teil1?.required_points_met)
-        ? result.parts.teil1.required_points_met
-        : null;
-      const teil2Flags = Array.isArray(result?.parts?.teil2?.required_points_met)
-        ? result.parts.teil2.required_points_met
-        : null;
-      const teil2GreetingOk = result?.parts?.teil2?.greeting_ok !== false;
-      const teil2ClosingOk = result?.parts?.teil2?.closing_ok !== false;
+      let teil1Flags = null;
+      let teil2Flags = null;
+      let teil2GreetingOk = true;
+      let teil2ClosingOk = true;
+
+      try {
+        teil1Flags = parseA2MockRequiredPointFlags(
+          result?.parts?.teil1?.required_points_met,
+          { required: Boolean(sms) },
+        );
+        teil2Flags = parseA2MockRequiredPointFlags(
+          result?.parts?.teil2?.required_points_met,
+          { required: Boolean(email) },
+        );
+
+        if (email) {
+          if (
+            typeof result?.parts?.teil2?.greeting_ok !== "boolean" ||
+            typeof result?.parts?.teil2?.closing_ok !== "boolean"
+          ) {
+            const formatError = new Error(
+              "Falowen returned malformed A2 writing format data. Please try marking again.",
+            );
+            formatError.code = "INVALID_A2_WRITING_FORMAT_FLAGS";
+            throw formatError;
+          }
+          teil2GreetingOk = result.parts.teil2.greeting_ok;
+          teil2ClosingOk = result.parts.teil2.closing_ok;
+        }
+      } catch (validationError) {
+        return res.status(502).json({
+          error:
+            validationError?.message ||
+            "Falowen could not validate the A2 writing assessment safely. Please try marking again.",
+          code: validationError?.code || "INVALID_A2_WRITING_ASSESSMENT",
+        });
+      }
+
       const teil2FormatCap = !teil2GreetingOk && !teil2ClosingOk ? 13 : null;
 
       const teil1Score = capA2MockWritingScoreForTaskCompletion({
