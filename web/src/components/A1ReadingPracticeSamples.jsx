@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getReadingPracticeStudentKey,
@@ -439,7 +439,7 @@ export default function A1ReadingPracticeSamples() {
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
-  const restoredRef = useRef(false);
+  const [storageHydrated, setStorageHydrated] = useState(false);
 
   const sample = useMemo(
     () => A1_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A1_READING_PRACTICE_SAMPLES[0],
@@ -478,6 +478,7 @@ export default function A1ReadingPracticeSamples() {
       const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
       if (!saved || typeof saved !== "object") return;
       if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
+      if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
       if (saved.remainingBySample) setRemainingBySample(saved.remainingBySample);
       if (saved.sampleId && A1_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
       if (["teil1", "teil2", "teil3"].includes(saved.partKey)) setPartKey(saved.partKey);
@@ -514,10 +515,12 @@ export default function A1ReadingPracticeSamples() {
     return () => window.clearInterval(id);
   }, [remainingSeconds, sample.id, submitted, timerRunning]);
 
-  useEffect(() => {
+  const selectSample = (nextSampleId) => {
+    if (nextSampleId === sample.id) return;
     setTimerRunning(false);
+    setSampleId(nextSampleId);
     setPartKey("teil1");
-  }, [sampleId]);
+  };
 
   const answer = (number, value) => {
     if (submitted) return;
@@ -583,7 +586,7 @@ export default function A1ReadingPracticeSamples() {
             key={item.id}
             type="button"
             className={item.id === sample.id ? "is-active" : ""}
-            onClick={() => setSampleId(item.id)}
+            onClick={() => selectSample(item.id)}
           >
             Lesen Sample {index + 1}
             <small>15 questions · Teil 1–3</small>
