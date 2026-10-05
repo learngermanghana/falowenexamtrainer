@@ -8,22 +8,27 @@ const PRACTICE_SECTIONS = [
   {
     key: "lesen",
     title: "Lesen",
-    description: "Reading practice with exam-style texts and comprehension checks.",
-  },
-  {
-    key: "horen",
-    title: "Hören",
-    description: "Listening drills and comprehension practice.",
+    description: "Interactive A1/A2 reading sets with exam-style texts, timing and answer checking.",
+    status: "Ready",
   },
   {
     key: "writing",
     title: "Schreiben",
     description: "Writing practice with corrections and tutor-ready submissions.",
+    status: "Ready",
   },
   {
     key: "speaking",
     title: "Sprechen",
-    description: "Speaking warm-ups, timed responses and oral exam practice.",
+    description: "Use the existing speaking app for timed responses and oral exam practice.",
+    status: "Ready",
+  },
+  {
+    key: "horen",
+    title: "Hören",
+    description: "The reusable exam-format listening bank will be added next.",
+    status: "Coming later",
+    disabled: true,
   },
 ];
 
@@ -124,15 +129,21 @@ const ExamsOverviewPage = () => {
                 gap: 8,
               }}
             >
-              <strong>{section.title}</strong>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                <strong>{section.title}</strong>
+                <span style={styles.badge}>{section.status}</span>
+              </div>
               <p style={{ ...styles.helperText, margin: 0 }}>{section.description}</p>
               <div>
                 <button
                   type="button"
                   style={styles.secondaryButton}
-                  onClick={() => navigate(`/exams/${section.key}`)}
+                  disabled={section.disabled}
+                  onClick={() => {
+                    if (!section.disabled) navigate(`/exams/${section.key}`);
+                  }}
                 >
-                  Practice {section.title}
+                  {section.disabled ? "Coming later" : `Practice ${section.title}`}
                 </button>
               </div>
             </article>
