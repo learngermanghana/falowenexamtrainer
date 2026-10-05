@@ -184,6 +184,8 @@ import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
+import ExamsOverviewPage from "./components/ExamsOverviewPage";
+import MockExamLibraryPage from "./components/MockExamLibraryPage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import GermanLevelSeoPage from "./components/GermanLevelSeoPage";
 import OfflineBanner from "./components/OfflineBanner";
@@ -1430,6 +1432,8 @@ const ExamArea = ({ onBack }) => {
   const examSection = useMemo(() => {
     if (
       [
+        "overview",
+        "mocks",
         "question",
         "speaking",
         "writing",
@@ -1442,7 +1446,7 @@ const ExamArea = ({ onBack }) => {
     ) {
       return section;
     }
-    return "question";
+    return "overview";
   }, [section]);
 
   useEffect(() => {
@@ -1479,14 +1483,14 @@ const ExamArea = ({ onBack }) => {
   }, [level, profileExamLevel, setLevel]);
 
   const tabs = [
-    { key: "question", label: t("appNav.examTabs.question") },
+    { key: "overview", label: "Overview" },
+    { key: "mocks", label: "Mock Exams" },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
-    { key: "speaking", label: t("appNav.examTabs.speaking") },
-    { key: "writing", label: t("appNav.examTabs.writing") },
-    { key: "vocab", label: t("appNav.examTabs.vocab") },
     { key: "horen", label: t("appNav.examTabs.horen") },
-    { key: "resources", label: t("appNav.examTabs.resources") },
+    { key: "writing", label: t("appNav.examTabs.writing") },
+    { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
+    { key: "resources", label: t("appNav.examTabs.resources") },
   ];
 
   const examHeroConfig = {
@@ -1602,6 +1606,8 @@ const ExamArea = ({ onBack }) => {
         ) : null}
       </div>
 
+      {examSection === "overview" ? <ExamsOverviewPage /> : null}
+      {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
