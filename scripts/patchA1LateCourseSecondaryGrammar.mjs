@@ -90,7 +90,7 @@ function keepDay23AtA1CaseScope() {
   write(file, source);
 }
 
-function validateDay24FinalMock() {
+function validateDay23FinalMock() {
   const componentFile = "web/src/components/A1FinalMockExamPage.jsx";
   const componentSource = read(componentFile);
   const scheduleSource = read("web/src/data/courseSchedule.js");
@@ -105,13 +105,13 @@ function validateDay24FinalMock() {
     "sprechen: 15 * 60",
     "scoreA1MockWriting",
     "A1GoetheSpeakingMockPreview",
-    'href="/exams/question"',
+    'href="/exams/overview"',
     "Practice the full mock again",
   ];
 
   const missing = requiredMarkers.filter((marker) => !componentSource.includes(marker));
   if (missing.length) {
-    throw new Error(`A1 Day 24 final mock is missing: ${missing.join(", ")}`);
+    throw new Error(`A1 Day 23 final mock is missing: ${missing.join(", ")}`);
   }
 
   const staleScheduleMarkers = [
@@ -121,15 +121,15 @@ function validateDay24FinalMock() {
   ];
   const stale = staleScheduleMarkers.filter((marker) => scheduleSource.includes(marker));
   if (stale.length) {
-    throw new Error(`A1 Day 24 still points to the old conjunction lesson: ${stale.join(", ")}`);
+    throw new Error(`A1 Day 23 still points to the old conjunction lesson: ${stale.join(", ")}`);
   }
 
   if (!scheduleSource.includes('workbook_link: "/campus/course/a1-final-mock-exam"')) {
-    throw new Error("A1 Day 24 schedule must route to the final mock exam.");
+    throw new Error("A1 Day 23 schedule must route to the final mock exam.");
   }
 }
 
-function removeDuplicateDay24ScheduleVideo() {
+function removeDuplicateFinalMockScheduleVideo() {
   const file = "web/src/data/courseSchedule.js";
   let source = read(file);
 
@@ -139,15 +139,14 @@ function removeDuplicateDay24ScheduleVideo() {
   );
 
   if (source.includes("LKWf257-d8E")) {
-    throw new Error("A1 Day 24 duplicate schedule video is still present.");
+    throw new Error("A1 final mock duplicate schedule video is still present.");
   }
 
   write(file, source);
 }
 
 patchDay21Perfekt();
-keepDay23AtA1CaseScope();
-validateDay24FinalMock();
-removeDuplicateDay24ScheduleVideo();
+validateDay23FinalMock();
+removeDuplicateFinalMockScheduleVideo();
 
-console.log("Applied A1 late-course grammar boundary and validated the Day 24 final mock exam.");
+console.log("Applied A1 late-course grammar boundary and validated the Day 23 final mock exam.");
