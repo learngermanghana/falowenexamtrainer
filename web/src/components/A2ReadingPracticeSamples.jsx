@@ -318,7 +318,7 @@ export default function A2ReadingPracticeSamples() {
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
-  const [storageHydrated, setStorageHydrated] = useState(false);
+  const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
     () => A2_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A2_READING_PRACTICE_SAMPLES[0],
@@ -357,12 +357,12 @@ export default function A2ReadingPracticeSamples() {
     } catch {
       // Ignore malformed saved practice state.
     } finally {
-      setStorageHydrated(true);
+      setHydratedStorageKey(storageKey);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!storageHydrated || typeof window === "undefined") return;
+    if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
     window.localStorage.setItem(storageKey, JSON.stringify({
       sampleId,
       partKey,
@@ -376,7 +376,7 @@ export default function A2ReadingPracticeSamples() {
     partKey,
     remainingBySample,
     sampleId,
-    storageHydrated,
+    hydratedStorageKey,
     submittedBySample,
     storageKey,
   ]);
