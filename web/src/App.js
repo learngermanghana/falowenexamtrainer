@@ -1486,7 +1486,6 @@ const ExamArea = ({ onBack }) => {
     { key: "overview", label: "Overview" },
     { key: "mocks", label: "Mock Exams" },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
-    { key: "horen", label: t("appNav.examTabs.horen") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
