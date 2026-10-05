@@ -86,6 +86,11 @@ const {
   persistVerifiedA1MockSection,
   syncA1MockCompletion,
 } = require("./a1MockCompletionSync");
+const {
+  buildVerifiedA2MockScore,
+  persistVerifiedA2MockSection,
+  syncA2MockCompletion,
+} = require("./a2MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
