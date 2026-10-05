@@ -22,7 +22,7 @@ describe("A2 canonical Lesen tasks", () => {
       expect(task.title).toBeTruthy();
       expect(task.strategy).toBeTruthy();
       expect(task.text.length).toBeGreaterThan(100);
-      expect(task.questions).toHaveLength(5);
+      expect(task.questions).toHaveLength(day === 11 ? 7 : 5);
 
       task.questions.forEach((question) => {
         expect(question.stem).toBeTruthy();
@@ -41,6 +41,9 @@ describe("A2 canonical Lesen tasks", () => {
   });
 
   test("replaces the known weak or mismatched Lesen content", () => {
+    expect(A2_READING_TASKS[11].title).toBe("Verkehrsmittel vergleichen");
+    expect(A2_READING_TASKS[11].questions).toHaveLength(7);
+    expect(A2_READING_TASKS[11].text).toMatch(/Berliner Tagesblatt/);
     expect(A2_READING_TASKS[12].text).not.toMatch(/beglaubigen|Anerkennung ausländischer Abschlüsse/i);
     expect(A2_READING_TASKS[13].title).toMatch(/Vorstellungsgespräch/i);
     expect(A2_READING_TASKS[13].text).not.toMatch(/Kinderbetreuung|Kinderkrippe/i);
