@@ -439,7 +439,7 @@ export default function A1ReadingPracticeSamples() {
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
-  const [storageHydrated, setStorageHydrated] = useState(false);
+  const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
     () => A1_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A1_READING_PRACTICE_SAMPLES[0],
@@ -485,20 +485,29 @@ export default function A1ReadingPracticeSamples() {
     } catch {
       // Ignore malformed local practice data.
     } finally {
-      restoredRef.current = true;
+      setHydratedStorageKey(storageKey);
     }
   }, [storageKey]);
 
   useEffect(() => {
-    if (!restoredRef.current || typeof window === "undefined") return;
+    if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
     window.localStorage.setItem(storageKey, JSON.stringify({
       sampleId,
       partKey,
       answersBySample,
+      submittedBySample,
       remainingBySample,
       updatedAt: new Date().toISOString(),
     }));
-  }, [answersBySample, partKey, remainingBySample, sampleId, storageKey]);
+  }, [
+    answersBySample,
+    hydratedStorageKey,
+    partKey,
+    remainingBySample,
+    sampleId,
+    storageKey,
+    submittedBySample,
+  ]);
 
   useEffect(() => {
     if (!timerRunning || submitted) return;
