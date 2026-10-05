@@ -137,6 +137,8 @@ describe("A2 final mock verified scoring and persistence", () => {
       score: 88,
       certificateEligible: false,
       progressionEligible: false,
+      attemptLabel: "First readiness attempt",
+      attemptType: "readiness",
     });
     expect(artifacts.notificationDocument.title).toBe("Your A2 Final Mock result is ready");
   });
