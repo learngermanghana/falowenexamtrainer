@@ -59,7 +59,7 @@ describe("A1 Final Mock Exam Day 23", () => {
 
   test("makes Day 23 an exam-only self-practice card without lesson videos", () => {
     expect(getA1CanonicalLesson("5.10")).toMatchObject({
-      day: 24,
+      day: 23,
       title: "A1 Final Mock Exam",
       destination: "/campus/course/a1-final-mock-exam",
       kind: "practice",
@@ -67,11 +67,11 @@ describe("A1 Final Mock Exam Day 23", () => {
     expect(
       getConfiguredInAppWorkbookResourceRoute({
         level: "A1",
-        day: 24,
+        day: 23,
         chapter: "5.10",
       }),
     ).toBe("/campus/course/a1-final-mock-exam");
-    expect(getA1TeacherVideoResources(24)).toHaveLength(0);
+    expect(getA1TeacherVideoResources(23)).toHaveLength(0);
   });
 
   test("keeps the old Day 23 URL as a compatibility alias to the final mock", () => {
