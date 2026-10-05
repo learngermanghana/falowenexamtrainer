@@ -150,6 +150,7 @@ export const A2_GOETHE_READING_MOCK = Object.freeze({
       "Markieren Sie für die Aufgaben 11 bis 15 die richtige Lösung a, b oder c.",
     ],
     email: {
+      from: "Julia",
       to: "Sarah",
       subject: "Meine neue Wohnung / Einladung zur Party",
       greeting: "Liebe Sarah,",
@@ -445,6 +446,7 @@ export default function A2GoetheReadingMockPreview() {
               <span>Antworten</span>
               <span>Weiterleiten</span>
             </div>
+            <div className="a2-mock-email-field"><strong>Von:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.from}</span></div>
             <div className="a2-mock-email-field"><strong>An:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.to}</span></div>
             <div className="a2-mock-email-field"><strong>Cc:</strong><span></span></div>
             <div className="a2-mock-email-field"><strong>Betreff:</strong><span>{A2_GOETHE_READING_MOCK.teil3.email.subject}</span></div>
