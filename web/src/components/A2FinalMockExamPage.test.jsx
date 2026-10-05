@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { A2_GOETHE_READING_MOCK } from "./A2GoetheReadingMockPreview";
+import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
+import { A2_GOETHE_LISTENING_TEIL2 } from "./A2GoetheListeningMockTeil2Preview";
+import { A2_GOETHE_LISTENING_TEIL3 } from "./A2GoetheListeningMockTeil3Preview";
+import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
 
 describe("A2 Final Mock Exam Day 29", () => {
   const componentSource = fs.readFileSync(
@@ -71,17 +75,39 @@ describe("A2 Final Mock Exam Day 29", () => {
     expect(speakingSource).toContain("Feedback stays hidden until the end of the exam.");
   });
 
-  test("waits for in-flight transcription but bounds the wait before timeout grading", () => {
+  test("waits for transcription and auto-submits a recording made before timeout", () => {
     expect(speakingSource).toContain("hasInFlightSubmission");
-    expect(speakingSource).toContain("attempts[task.id]?.submitting");
-    expect(speakingSource).toContain("hasInFlightSubmission ||");
-    expect(speakingSource).toContain("[secondsLeft, result, marking, hasInFlightSubmission, markSpeaking]");
+    expect(speakingSource).toContain("pendingRecordedTask");
+    expect(speakingSource).toContain("recordingTaskId || hasInFlightSubmission");
+    expect(speakingSource).toContain("submitTask(pendingRecordedTask, { timeoutAuto: true })");
+    expect(speakingSource).toContain("timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0");
 
     expect(coachServiceSource).toContain("SPEAKING_ANALYZE_TIMEOUT_MS = 30_000");
     expect(coachServiceSource).toContain("controller.abort()");
     expect(coachServiceSource).toContain("signal: controller.signal");
     expect(coachServiceSource).toContain("timeout: SPEAKING_ANALYZE_TIMEOUT_MS");
     expect(coachServiceSource).toContain("Promise.race([runAnalysis(), timeoutPromise])");
+  });
+
+  test("keeps Hören audio rules and answer data aligned", () => {
+    expect(A2_GOETHE_LISTENING_TEIL1.plays).toBe(2);
+    expect(A2_GOETHE_LISTENING_TEIL2.plays).toBe(1);
+    expect(A2_GOETHE_LISTENING_TEIL3.plays).toBe(1);
+    expect(A2_GOETHE_LISTENING_TEIL4.plays).toBe(2);
+
+    expect(A2_GOETHE_LISTENING_TEIL1.questions.map((item) => item.answer)).toEqual(["c", "b", "b", "b", "b"]);
+    expect(A2_GOETHE_LISTENING_TEIL2.tasks.map((item) => item.answer.toLowerCase())).toEqual(["a", "b", "c", "d", "e"]);
+    expect(A2_GOETHE_LISTENING_TEIL3.questions.map((item) => item.answer.toLowerCase())).toEqual(["a", "c", "b", "a", "c"]);
+    expect(A2_GOETHE_LISTENING_TEIL4.questions.map((item) => item.answer)).toEqual(["ja", "nein", "ja", "nein", "ja"]);
+    expect(componentSource.match(/expired=\{secondsLeft <= 0\}/g)).toHaveLength(4);
+    expect(componentSource).toContain("audioRef.current.pause()");
+  });
+
+  test("keeps the freshest local attempt on resume and timestamps autosaves", () => {
+    expect(componentSource).toContain("clientSavedAtMs: Date.now()");
+    expect(componentSource).toContain("localSavedAt > serverSavedAt");
+    expect(componentSource).toContain("sameLocalAttempt");
+    expect(componentSource).toContain("state: persistedState");
   });
 
   test("collects all five A2 speaking responses into one final score", () => {
