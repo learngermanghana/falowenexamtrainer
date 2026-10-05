@@ -42,8 +42,10 @@ test("Day 11 has seven Lesen and ten Hören questions with one clickable answer 
 
   for (const [scope, letters] of [[reading, ["B", "B", "C", "B", "A", "C", "A"]], [listening, ["B", "B", "B", "B", "A", "B", "B", "B", "B", "B"]]]) {
     for (const [index, letter] of letters.entries()) {
-      const group = await scope.findByRole("radiogroup", { name: `Question ${index + 1}` });
-      fireEvent.click(within(group).getByRole("radio", { name: new RegExp(`^${letter}\\)`, "i") }));
+      await waitFor(() => {
+        const group = scope.getByRole("radiogroup", { name: `Question ${index + 1}` });
+        fireEvent.click(within(group).getByRole("radio", { name: new RegExp(`^${letter}\\)`, "i") }));
+      });
     }
   }
 

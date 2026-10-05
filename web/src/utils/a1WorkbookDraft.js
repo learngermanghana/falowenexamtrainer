@@ -4,12 +4,34 @@ export const A1_WORKBOOK_DRAFT_UPDATED_EVENT = "falowen:a1:workbook-draft-update
 const normalizeAssignmentKey = (value = "") =>
   String(value || "").trim().toUpperCase().replace(/[^A-Z0-9._-]/g, "-");
 
+// A1-7's Maria reading replaces the former ten-question exercise. Keep the
+// unchanged Hören draft, but never reuse answers to the old reading questions.
+const A1_7_READING_REVISION = "maria-time-7-v1";
+const readingRevision = (assignmentKey) => normalizeAssignmentKey(assignmentKey) === "A1-7"
+  ? { readingRevision: A1_7_READING_REVISION }
+  : {};
+const sanitizeA1WorkbookDraft = (draft) => {
+  if (normalizeAssignmentKey(draft.assignmentKey) !== "A1-7") return draft;
+  const sections = { ...(draft.sections || {}) };
+  if (draft.readingRevision !== A1_7_READING_REVISION) {
+    delete sections["teil-1"];
+  } else if (sections["teil-1"]) {
+    sections["teil-1"] = {
+      ...sections["teil-1"],
+      answers: Object.fromEntries(Object.entries(sections["teil-1"].answers || {})
+        .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= 7)),
+    };
+  }
+  return { ...draft, ...readingRevision(draft.assignmentKey), sections };
+};
+
 export const buildA1WorkbookDraftStorageKey = (assignmentKey = "") =>
   `${STORAGE_PREFIX}:${normalizeAssignmentKey(assignmentKey) || "UNKNOWN"}`;
 
 export const makeEmptyA1WorkbookDraft = (assignmentKey = "") => ({
   version: 1,
   assignmentKey: normalizeAssignmentKey(assignmentKey),
+  ...readingRevision(assignmentKey),
   sections: {},
   updatedAt: "",
 });
@@ -23,12 +45,13 @@ export const readA1WorkbookDraft = (assignmentKey = "") => {
     if (!raw) return empty;
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return empty;
-    return {
+    return sanitizeA1WorkbookDraft({
       ...empty,
       ...parsed,
       assignmentKey: empty.assignmentKey,
+      ...(empty.assignmentKey === "A1-7" ? { readingRevision: parsed.readingRevision } : {}),
       sections: parsed.sections && typeof parsed.sections === "object" ? parsed.sections : {},
-    };
+    });
   } catch (error) {
     console.warn("Could not read A1 workbook draft", error);
     return empty;
@@ -54,12 +77,13 @@ const announceA1WorkbookDraftUpdated = (draft) => {
 };
 
 export const saveA1WorkbookDraft = ({ assignmentKey = "", sections = {} } = {}) => {
-  const next = {
+  const next = sanitizeA1WorkbookDraft({
     version: 1,
     assignmentKey: normalizeAssignmentKey(assignmentKey),
+    ...readingRevision(assignmentKey),
     sections: sections && typeof sections === "object" ? sections : {},
     updatedAt: new Date().toISOString(),
-  };
+  });
 
   if (typeof window !== "undefined" && window.localStorage) {
     try {
@@ -85,10 +109,11 @@ const sortedAnswerEntries = (answers = {}) =>
 
 export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
   if (!assignment || !draft) return "";
+  const currentDraft = sanitizeA1WorkbookDraft({ ...draft, assignmentKey: assignment.assignmentKey || assignment.assignmentId || assignment.id || draft.assignmentKey });
 
   return (assignment.sections || [])
     .map(({ key, number }) => {
-      const section = draft.sections?.[key] || {};
+      const section = currentDraft.sections?.[key] || {};
       const answerLines = sortedAnswerEntries(section.answers).map(
         ([answerNumber, value]) => `${answerNumber}. ${value}`,
       );

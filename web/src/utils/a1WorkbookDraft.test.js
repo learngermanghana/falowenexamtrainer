@@ -77,3 +77,32 @@ test("counts only non-empty required answers", () => {
     complete: false,
   });
 });
+
+
+test("replaces legacy A1-7 Lesen drafts while preserving Hören answers", () => {
+  const legacy = {
+    assignmentKey: "A1-7",
+    sections: {
+      "teil-1": { answers: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [i + 1, "B"])) },
+      "teil-2": { answers: { 1: "B", 10: "B" } },
+    },
+  };
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey("A1-7"), JSON.stringify(legacy));
+  const draft = readA1WorkbookDraft("A1-7");
+  expect(draft.sections["teil-1"]).toBeUndefined();
+  expect(draft.sections["teil-2"]).toEqual(legacy.sections["teil-2"]);
+  const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft: legacy });
+  expect(submission).not.toContain("TEIL 1");
+  expect(submission).toContain("TEIL 2\n1. B\n10. B");
+});
+
+test("retains new A1-7 answers and drops obsolete Lesen numbers", () => {
+  saveA1WorkbookDraft({ assignmentKey: "A1-7", sections: {
+    "teil-1": { answers: { 1: "B", 7: "A", 8: "OLD", 10: "OLD" } },
+    "teil-2": { answers: { 10: "B" } },
+  } });
+  const draft = readA1WorkbookDraft("A1-7");
+  expect(draft.sections["teil-1"].answers).toEqual({ 1: "B", 7: "A" });
+  const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft });
+  expect(submission).toBe("TEIL 1\n1. B\n7. A\n\nTEIL 2\n10. B");
+});
