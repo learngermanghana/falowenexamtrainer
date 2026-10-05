@@ -28,6 +28,14 @@ describe("workbook page chrome ownership", () => {
     ).toBe(false);
   });
 
+  test("does not add previous/next course chrome to the terminal A1 final mock", () => {
+    expect(
+      shouldUseUniversalWorkbookNavigator({
+        pathname: "/campus/course/a1-final-mock-exam",
+      }),
+    ).toBe(false);
+  });
+
   test("keeps universal navigation available for levels that do not use the A2/B1 header", () => {
     expect(
       shouldUseUniversalWorkbookNavigator({
