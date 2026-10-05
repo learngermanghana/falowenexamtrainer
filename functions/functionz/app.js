@@ -3579,6 +3579,152 @@ app.post("/writing/a1-mock-score", async (req, res) => {
   }
 });
 
+app.post("/writing/a2-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const sms = String(req.body?.sms || "").trim().slice(0, 4000);
+    const email = String(req.body?.email || "").trim().slice(0, 6000);
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+
+    let result;
+    if (!sms && !email) {
+      result = {
+        score: 0,
+        maxScore: 25,
+        passed: false,
+        level_mismatch: false,
+        overall_feedback_en: "No writing response was submitted.",
+        parts: {
+          teil1: { score: 0, maxScore: 10, feedback_en: "No SMS was submitted.", corrections: [] },
+          teil2: { score: 0, maxScore: 15, feedback_en: "No email was submitted.", corrections: [] },
+        },
+      };
+    } else {
+      if (!ensureOpenAIConfigured(res)) return;
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
+          { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 1200 },
+      );
+
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^\`\`\`(?:json)?\s*/i, "")
+        .replace(/\s*\`\`\`$/i, "");
+
+      try {
+        result = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the A2 writing assessment safely. Please try marking again.",
+          code: "INVALID_A2_WRITING_ASSESSMENT",
+        });
+      }
+
+      const teil1Score = Math.max(0, Math.min(10, Number(result?.parts?.teil1?.score) || 0));
+      const teil2Score = Math.max(0, Math.min(15, Number(result?.parts?.teil2?.score) || 0));
+      const score = Math.max(0, Math.min(25, Number((teil1Score + teil2Score).toFixed(1))));
+      result = {
+        ...result,
+        score,
+        maxScore: 25,
+        passed: score >= 15,
+        level_mismatch: Boolean(result?.level_mismatch),
+        parts: {
+          ...(result?.parts || {}),
+          teil1: {
+            ...(result?.parts?.teil1 || {}),
+            score: teil1Score,
+            maxScore: 10,
+            corrections: Array.isArray(result?.parts?.teil1?.corrections)
+              ? result.parts.teil1.corrections.slice(0, 5)
+              : [],
+          },
+          teil2: {
+            ...(result?.parts?.teil2 || {}),
+            score: teil2Score,
+            maxScore: 15,
+            corrections: Array.isArray(result?.parts?.teil2?.corrections)
+              ? result.parts.teil2.corrections.slice(0, 5)
+              : [],
+          },
+        },
+        submittedSms: sms,
+        submittedEmail: email,
+      };
+    }
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      try {
+        await persistVerifiedA2MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "schreiben",
+          score: Number(result?.score || 0),
+          source: "/writing/a2-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "A2_MOCK_ATTEMPT_NOT_FOUND"
+            ? 404
+            : code === "A2_MOCK_ATTEMPT_FORBIDDEN"
+              ? 403
+              : code === "A2_MOCK_ALREADY_COMPLETED"
+                ? 409
+                : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Schreiben result for this A2 mock attempt.",
+          code: code || "A2_MOCK_SCHREIBEN_VERIFY_FAILED",
+        });
+      }
+    }
+
+    auditAIRequest({
+      route: "/writing/a2-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        score: Number(result?.score || 0),
+        teil1: Number(result?.parts?.teil1?.score || 0),
+        teil2: Number(result?.parts?.teil2?.score || 0),
+      },
+    });
+
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/a2-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/a2-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the A2 writing mock." });
+  }
+});
+
 app.post("/a1-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
