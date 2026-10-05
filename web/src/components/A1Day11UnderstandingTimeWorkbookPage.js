@@ -47,19 +47,16 @@ const videoFrame = {
 };
 
 const teil1Questions = [
-  { stem: "1. Wann steht Maria auf?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
-  { stem: "2. Wann frühstückt Maria?", options: ["a) Um sieben Uhr", "b) Um acht Uhr", "c) Um neun Uhr"] },
-  { stem: "3. Wann kommt Maria nach Hause?", options: ["a) Um fünf Uhr", "b) Um sechs Uhr", "c) Um sieben Uhr"] },
-  { stem: "4. Wann geht Maria ins Bett?", options: ["a) Um neun Uhr", "b) Um zehn Uhr", "c) Um elf Uhr"] },
-  { stem: "5. Um wie viel Uhr hat Paul Deutschunterricht?", options: ["a) Um acht Uhr", "b) Um neun Uhr", "c) Um zehn Uhr"] },
-  { stem: "6. Wann geht Paul nach Hause?", options: ["a) Morgens", "b) Mittags", "c) Nachmittags"] },
-  { stem: "7. Wann isst Paul zu Abend?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
-  { stem: "8. Welcher Tag ist heute?", options: ["a) Montag", "b) Dienstag", "c) Freitag"] },
+  { stem: "1. Wann steht Maria jeden Morgen auf?", options: ["a) Um Viertel nach sechs", "b) Um Viertel vor sieben", "c) Um halb sieben"] },
+  { stem: "2. Wann frühstückt Maria?", options: ["a) Um Viertel nach sieben", "b) Um halb acht", "c) Um halb neun"] },
+  { stem: "3. Wann geht Maria zur Arbeit?", options: ["a) Um Viertel vor acht", "b) Um halb neun", "c) Um Viertel nach acht"] },
   {
-    stem: "9. Wann hat Peter Fußballtraining?",
-    options: ["a) Am Montag", "b) Am Dienstag und Donnerstag", "c) Am Samstag und Sonntag"],
+    stem: "4. An welchen Tagen hat Maria Deutschunterricht?",
+    options: ["a) Am Montag und Mittwoch", "b) Am Dienstag und Donnerstag", "c) Am Dienstag und Freitag"],
   },
-  { stem: "10. Was macht Peter am Sonntag?", options: ["a) Er spielt im Park.", "b) Er ruht sich aus.", "c) Er geht ins Kino."] },
+  { stem: "5. Wann ist der Deutschunterricht zu Ende?", options: ["a) Um Viertel vor sieben", "b) Um Viertel nach sechs", "c) Um halb sieben"] },
+  { stem: "6. Wann geht Maria am Freitag ins Kino?", options: ["a) Um Viertel vor sieben", "b) Um halb acht", "c) Um Viertel nach sieben"] },
+  { stem: "7. Wann steht Maria am Samstag auf?", options: ["a) Um Viertel nach neun", "b) Um halb zehn", "c) Um Viertel vor zehn"] },
 ];
 
 const teil2Text1Questions = [
@@ -108,26 +105,19 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           loading="lazy"
           style={{ width: "100%", borderRadius: 10, maxHeight: 280, objectFit: "cover" }}
         />
-        <h2 style={sectionTitle}>Teil 1 (Lesen): 12-Hour Clock, Prepositions of Time, Days of the Week</h2>
+        <h2 style={sectionTitle}>Teil 1 (Lesen): Die Uhrzeit (12-Stunden-Uhr), Präpositionen der Zeit, Wochentage</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>A1 · Anspruchsvollere Version · 7 Fragen. Lesen Sie den Text und wählen Sie a, b oder c.</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text 1:</strong> "Es ist sieben Uhr morgens. Maria steht um sieben Uhr auf und macht sich fertig für den Tag.
-          Sie frühstückt um acht Uhr mit ihrer Familie. Danach geht sie zur Arbeit. Am Abend um sechs Uhr kommt sie
-          nach Hause und isst zu Abend. Um zehn Uhr geht sie ins Bett."
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text 2:</strong> "Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die
-          Bibliothek und lernt dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht
-          seine Hausaufgaben. Abends um sieben Uhr isst er zu Abend und entspannt sich."
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text 3:</strong> "Heute ist Montag. Peter hat am Dienstag und Donnerstag Fußballtraining. Am Freitag geht er
-          mit seinen Freunden ins Kino. Am Wochenende besucht er seine Großeltern. Am Samstag spielt er oft im Park
-          und am Sonntag ruht er sich aus."
+          <strong>Text:</strong> Heute ist Montag. Maria steht jeden Morgen um Viertel vor sieben auf. Um halb acht
+          frühstückt sie mit ihrer Familie. Um Viertel nach acht geht sie zur Arbeit. Am Dienstag und Donnerstag
+          hat sie Deutschunterricht. Der Unterricht beginnt um halb sechs und ist um Viertel vor sieben zu Ende.
+          Am Freitag geht sie um Viertel nach sieben mit ihren Freunden ins Kino. Der Film beginnt um halb acht.
+          Am Samstag schläft sie lange und steht erst um Viertel nach neun auf.
         </p>
 
         {teil1Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+            <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
             {question.options.map((option) => (
               <p key={option} style={optionLine}>{option}</p>
             ))}
@@ -138,7 +128,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       <div style={card}>
         <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Sehen und hören Sie das Video. Beantworten Sie danach die Fragen zu Text 1 und Text 2.
+          Sehen und hören Sie das Video. Beantworten Sie die 10 Fragen: Text 1 (Fragen 1–5) und Text 2 (Fragen 6–10).
         </p>
 
         <div style={videoWrapper}>
@@ -155,7 +145,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
         <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 1: 12-Hour Clock</h3>
         {teil2Text1Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+            <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
             {question.options.map((option) => (
               <p key={option} style={optionLine}>{option}</p>
             ))}
@@ -163,14 +153,9 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
         ))}
 
         <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 2: Prepositions of Time</h3>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          "Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die Bibliothek und
-          lernt dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht seine
-          Hausaufgaben. Abends um sieben Uhr isst er zu Abend und entspannt sich."
-        </p>
         {teil2Text2Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+            <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
             {question.options.map((option) => (
               <p key={option} style={optionLine}>{option}</p>
             ))}
