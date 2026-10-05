@@ -2,8 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
+import { useAuth } from "../context/AuthContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
-import { getLatestReadingPracticeResult } from "../services/readingPracticeHistory";
+import { getLatestReadingPracticeResult, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
 
 const PRACTICE_SECTIONS = [
   {
@@ -36,9 +37,11 @@ const PRACTICE_SECTIONS = [
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
   const { level } = useExam();
+  const { studentProfile, user } = useAuth();
+  const readingStudentKey = getReadingPracticeStudentKey({ studentProfile, user });
   const mocks = getMockExamsForLevel(level);
   const primaryMock = mocks[0] || null;
-  const latestReading = getLatestReadingPracticeResult(level);
+  const latestReading = getLatestReadingPracticeResult(level, readingStudentKey);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
