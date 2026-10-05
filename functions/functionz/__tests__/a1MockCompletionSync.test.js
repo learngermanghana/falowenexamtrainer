@@ -47,6 +47,8 @@ describe("A1 mock completion Admin + announcement sync", () => {
       progressionEligible: false,
       strongestArea: "Hören",
       practiseNext: "Schreiben",
+      attemptLabel: "First readiness attempt",
+      attemptType: "readiness",
     });
     expect(artifacts.scoreDocument.date).toBe("2026-10-04T19:00:00.000Z");
   });
