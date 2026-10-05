@@ -102,20 +102,9 @@ describe("standardized A1 teacher videos", () => {
     );
   });
 
-  test("Day 23 Chapter 14.2 reuses the letter-writing lecture, not the old dative lesson", () => {
-    const configuredVideo = getCanonicalA1TeacherVideoResource(23, "14.2");
-
-    expect(configuredVideo).toEqual(
-      expect.objectContaining({
-        chapter: "14.2",
-        topic: "A1 Writing Workshop",
-        url: "https://youtu.be/mgfauvqhoCI",
-      })
-    );
-
-    const day23Urls = getA1TeacherVideoResources(23, "14.2").map((video) => video.url);
-    expect(day23Urls).not.toContain("https://youtu.be/J98JJU2v4Uw");
-    expect(day23Urls).not.toContain("https://youtu.be/V4RxPYSPwhg");
+  test("Day 23 Final Mock has no retired Chapter 14.2 teacher lecture", () => {
+    expect(getCanonicalA1TeacherVideoResource(23, "14.2")).toBeNull();
+    expect(getA1TeacherVideoResources(23, "14.2")).toHaveLength(0);
   });
 
   test("Day 20 Chapter 12.3 uses the new teacher lecture only", () => {
