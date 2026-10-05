@@ -9,7 +9,7 @@ const ALLOWED_ASSESSMENT_TYPES = new Set(['tutor-marked', 'self-practice']);
 const ALLOWED_RESOURCE_SECTIONS = new Set(['lesen_hören', 'schreiben_sprechen', 'grammar', 'practice']);
 const MULTI_CARD_DAYS = new Set([2, 3, 16, 18]);
 const FIRST_DAY = 0;
-const LAST_DAY = 24;
+const LAST_DAY = 23;
 
 const normalize = (value = '') => String(value || '').trim();
 const normalizeLower = (value = '') => normalize(value).toLowerCase().replace(/\s+/g, ' ');
