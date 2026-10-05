@@ -37,6 +37,13 @@ describe("A1 Final Mock Exam Day 23", () => {
     expect(componentSource).toContain("saveA1MockAttempt");
   });
 
+  test("keeps the freshest local attempt on resume", () => {
+    expect(componentSource).toContain("clientSavedAtMs: Date.now()");
+    expect(componentSource).toContain("localSavedAt > serverSavedAt");
+    expect(componentSource).toContain("sameLocalAttempt");
+    expect(componentSource).toContain("state: persistedState");
+  });
+
   test("finalizes completed mocks immediately so Admin and student announcements can sync", () => {
     expect(componentSource).toContain("completionSaveRef");
     expect(componentSource).toContain('section: "result"');
