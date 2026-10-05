@@ -48,7 +48,7 @@ const collectRouteFields = (value, routes = []) => {
 
 describe("A1 route integrity", () => {
   it("uses only internal registered routes on every displayed A1 Course Book card", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(29);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
 
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       [card.grammarPage, card.workbookRoute].filter(Boolean).forEach((route) => {
@@ -105,15 +105,15 @@ describe("A1 route integrity", () => {
     expect(card?.grammarPage).not.toBe(card?.workbookRoute);
   });
 
-  it("keeps the Day 24 final mock title through runtime alignment", () => {
-    const card = getA1CourseBookCard({ displayDay: 24, chapter: "5.10" });
+  it("keeps the Day 23 final mock title through runtime alignment", () => {
+    const card = getA1CourseBookCard({ displayDay: 23, chapter: "5.10" });
     expect(card?.title).toBe("A1 Final Mock Exam");
     expect(card?.workbookRoute).toBe("/campus/course/a1-final-mock-exam");
 
     const [aligned] = alignA1CurriculumEntries([
       {
         level: "A1",
-        day: 24,
+        day: 23,
         chapter: "5.10",
         title: "A1 Final Mock Exam",
         topic: "A1 Final Mock Exam",
