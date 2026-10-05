@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
-import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import { useAuth } from "../context/AuthContext";
 import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import { styles } from "../styles";
@@ -41,98 +40,87 @@ const questionBoxStyle = {
 
 const teil1Questions = [
   {
-    title: "Frage 1",
-    prompt: "Sie brauchen einen Arzttermin für eine Untersuchung.",
-    adA: [
-      "Allgemeinarzt Dr. Müller",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 8:00 - 16:00 Uhr",
-      "• Samstag: 9:00 - 12:00 Uhr",
-      "Adresse: Musterstraße 10, 12345 Berlin",
+    "title": "Situation 1",
+    "prompt": "Sie sind krank. Sie haben Bauchschmerzen und müssen heute sofort zum Arzt. Sie haben keinen Termin.",
+    "adA": [
+      "Praxis Dr. Weber",
+      "Sprechzeiten: Mo–Fr 8:00 – 12:00 Uhr.",
+      "Wichtig: Bitte nur mit Termin kommen!",
+      "Telefon: 030 / 123456"
     ],
-    adB: [
-      "Hausarzt Dr. Schmidt",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 9:00 - 18:00 Uhr",
-      "• Samstag: 10:00 - 14:00 Uhr",
-      "Adresse: Beispielstraße 20, 67890 München",
-    ],
+    "adB": [
+      "Praxis Dr. Klein",
+      "Sprechzeiten: Mo–Fr 8:00 – 12:00 Uhr.",
+      "Ohne Termin: Kommen Sie einfach vorbei."
+    ]
   },
   {
-    title: "Frage 2",
-    prompt:
-      "Sie brauchen einen Termin für Physiotherapie. Sie arbeiten von Montag bis Freitag und haben am Wochenende nur mittags Zeit.",
-    adA: [
-      "Physiotherapiezentrum GesundFit",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 7:00 - 19:00 Uhr",
-      "• Samstag: 8:00 - 9:00 Uhr",
-      "Adresse: Hauptstraße 50, 12345 Berlin",
+    "title": "Situation 2",
+    "prompt": "Es ist Samstagabend. Ihr Zahn tut sehr weh. Sie suchen heute einen Zahnarzt.",
+    "adA": [
+      "Zahnarzt Dr. Lang",
+      "Montag bis Freitag: 8:00 – 18:00 Uhr.",
+      "Samstag und Sonntag: Geschlossen."
     ],
-    adB: [
-      "Physiotherapie Gesundheit",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 8:00 - 17:00 Uhr",
-      "• Samstag: 9:00 - 13:00 Uhr",
-      "Adresse: Nebenstraße 30, 67890 München",
-    ],
+    "adB": [
+      "Notfall-Zahnarzt Berlin",
+      "Samstag und Sonntag: 24 Stunden geöffnet.",
+      "Ohne Termin."
+    ]
   },
   {
-    title: "Frage 3",
-    prompt: "Sie brauchen eine Apotheke, die um zehn Minuten vor halb neun geöffnet ist.",
-    adA: [
-      "Apotheke am Markt",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 10:00 - 14:00 Uhr",
-      "• Samstag: 8:00 - 8:10 Uhr",
-      "• Sonntag: geschlossen",
-      "Adresse: Marktstraße 15, 12345 Berlin",
+    "title": "Situation 3",
+    "prompt": "Ihr Sohn (4 Jahre alt) ist krank. Sie suchen einen Arzt für Ihr Kind.",
+    "adA": [
+      "Dr. Becker – Kinderarzt",
+      "Hilfe für Babys und Kinder.",
+      "Mo–Fr: 9:00 – 15:00 Uhr."
     ],
-    adB: [
-      "City Apotheke",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 6:10 - 7:30 Uhr",
-      "• Samstag: 8:00 - 8:45 Uhr",
-      "• Sonntag: geschlossen",
-      "Adresse: Hauptplatz 1, 67890 München",
-    ],
+    "adB": [
+      "Dr. Fischer – Augenarzt",
+      "Brillen und Sehtests für Kinder und Erwachsene.",
+      "Termine online."
+    ]
   },
   {
-    title: "Frage 4",
-    prompt: "Sie brauchen einen Termin beim Zahnarzt in der Hauptstadt Deutschlands.",
-    adA: [
-      "Zahnarztpraxis Dr. Lenz",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 7:30 - 16:00 Uhr",
-      "• Samstag: nach Vereinbarung",
-      "Adresse: Bahnhofstraße 25, 12345 Berlin",
+    "title": "Situation 4",
+    "prompt": "Sie haben am Donnerstag einen Termin beim Arzt. Sie können nicht kommen und möchten den Termin absagen.",
+    "adA": [
+      "Praxis Dr. Kurz",
+      "Termin absagen?",
+      "Bitte 24 Stunden vorher anrufen oder eine E-Mail schreiben."
     ],
-    adB: [
-      "Zahnarzt Dr. Klein",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 8:00 - 17:00 Uhr",
-      "• Samstag: geschlossen",
-      "Adresse: Gartenstraße 8, 67890 München",
+    "adB": [
+      "Praxis Dr. Kurz – Online-Service",
+      "Hier können Sie neue Termine buchen.",
+      "Achtung: Absagen sind online nicht möglich."
     ],
+    "question": "Wie können Sie den Termin absagen?",
+    "options": [
+      "a) Per Anruf oder E-Mail (Anzeige A)",
+      "b) Im Online-Service (Anzeige B)"
+    ]
   },
   {
-    title: "Frage 5",
-    prompt: "Sie brauchen Informationen über eine Grippeimpfung. Sie möchten dort am Nachmittag vorbeikommen.",
-    adA: [
-      "Impfzentrum Berlin",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 9:00 - 18:00 Uhr",
-      "• Samstag: 10:00 - 13:00 Uhr",
-      "Adresse: Ringstraße 30, 12345 Berlin",
+    "title": "Situation 5",
+    "prompt": "Sie haben eine normale Krankenkasse (z. B. AOK oder TK). Sie suchen einen Arzt und möchten nicht viel Geld selbst bezahlen.",
+    "adA": [
+      "Privatpraxis Dr. Meier",
+      "Nur für Privatpatienten (Sie bezahlen die Rechnung selbst)."
     ],
-    adB: [
-      "Impfzentrum München",
-      "Öffnungszeiten:",
-      "• Montag - Freitag: 8:00 - 13:00 Uhr",
-      "• Samstag: 9:00 - 12:00 Uhr",
-      "Adresse: Hauptstraße 20, 67890 München",
-    ],
-  },
+    "adB": [
+      "Praxis Dr. Schulze",
+      "Für alle Krankenkassen und Privatpatienten."
+    ]
+  }
+];
+
+const appointmentStatements = [
+  "Der Termin ist am Dienstag, 12. Oktober.",
+  "Frau Perez soll um 10:15 Uhr da sein.",
+  "Frau Perez muss ihre Karte mitbringen.",
+  "Frau Perez soll anrufen, wenn sie nicht kommen kann.",
+  "Es gibt keinen Fahrstuhl im Haus.",
 ];
 
 const DAY14_AUDIO_KEY = "a1/day-14-1/day-14-1.mp3";
@@ -193,12 +181,12 @@ const HealthOverview = () => (
     <div style={{ border: "1px solid #f59e0b", background: "#fffbeb", borderRadius: 12, padding: 12, lineHeight: 1.65 }}>
       <strong>Finish Strong · Final Independent Challenge · 30 minutes</strong>
       <p style={{ margin: "6px 0 0" }}>
-        Use what you know from the whole A1 course. Complete the reading, write the 35–50 word email and finish the listening task independently. Mark My Letter is locked while the timer is running.
+        Use what you know from the whole A1 course. Read the five advertisement situations and the appointment email, then finish the six listening questions independently.
       </p>
     </div>
     <h2 style={{ margin: 0 }}>A1 Day 22 · Kapitel 14.1 Assignment Overview</h2>
     <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Complete Teil 1, write the Teil 2 E-Mail independently, finish Teil 3 Hören, then open Submit Assignment. Use Mark My Letter only when the timed work is later unlocked for review.
+      Complete Teil 1 Anzeigen, Teil 2 Lesen: Ihr Termin and Teil 3 Hören, then open Submit Assignment.
     </p>
   </section>
 );
@@ -217,10 +205,10 @@ const Teil1Content = () => (
           <strong>Aufgabe:</strong> Read each advertisement pair and choose the correct option.
         </p>
 
-        {teil1Questions.map((question) => (
+        {teil1Questions.map((question, index) => (
           <div key={question.title} style={questionBoxStyle}>
-            <strong style={{ lineHeight: 1.6 }}>{question.title}:</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
+            <h3 style={{ margin: 0, lineHeight: 1.6 }}>{question.title}</h3>
+            <p style={{ margin: 0, lineHeight: 1.7 }}><strong>{index + 1}. {question.prompt}</strong></p>
 
             <A1ReadingSourceGrid minWidth={220}>
               <A1ReadingSourceCard label="Anzeige A" title={question.adA[0]}>
@@ -237,59 +225,40 @@ const Teil1Content = () => (
             </A1ReadingSourceGrid>
 
             <p style={{ margin: 0 }}>
-              <strong>Welche Anzeige ist richtig?</strong>
+              <strong>{question.question || "Welche Anzeige passt?"}</strong>
             </p>
-            <span>1. Anzeige A</span>
-            <span>2. Anzeige B</span>
+            {(question.options || ["a) Anzeige A", "b) Anzeige B"]).map((option) => (
+              <p key={option} style={{ margin: 0 }}>{option}</p>
+            ))}
           </div>
         ))}
+
       </section>
 );
 
 const Teil2Content = () => (
       <section style={sectionStyle} data-a1-day22-health-teil="2">
-        <h2 style={{ margin: 0 }}>Teil 2 · Schreiben: E-Mail an Felix</h2>
-
-        <div style={infoBoxStyle}>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Schreiben Sie eine E-Mail an Felix. Er hat Sie zum Geburtstag eingeladen, aber Sie können nicht teilnehmen.
-          </p>
-
-          <p style={{ margin: 0 }}><strong>Punkte:</strong></p>
-          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>Warum schreiben Sie?</li>
-            <li>Was ist der Grund? (Use a health-related reason connected to class content.)</li>
-            <li>Fragen Sie nach einem anderen Termin.</li>
+        <h2 style={{ margin: 0 }}>Teil 2 · Lesen: Ihr Termin</h2>
+        <A1ReadingSourceCard label="E-Mail" title="Betreff: Ihr Termin">
+          <p style={{ margin: 0 }}>Hallo Frau Perez,</p>
+          <p style={{ margin: 0 }}>Ihr Termin bei Dr. Schmidt ist am Dienstag, 12. Oktober um 10:30 Uhr.</p>
+          <p style={{ margin: 0 }}>Bitte beachten Sie:</p>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            <li>Kommen Sie bitte um 10:15 Uhr.</li>
+            <li>Bringen Sie Ihre Arztkarte / Krankenkarte mit.</li>
+            <li>Sie können nicht kommen? Bitte rufen Sie uns an: 040 / 555 444.</li>
+            <li>Ein Fahrstuhl ist im Haus.</li>
           </ul>
-        </div>
-
-        <div style={infoBoxStyle}>
-          <p style={{ margin: 0 }}><strong>Structure / Aufbau</strong></p>
-          <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>Begrüßung / Greeting</li>
-            <li>Einleitung / Introduction</li>
-            <li>Hauptteil / Main Part (2–3 Sätze / Sentences)</li>
-            <li>Schluss und Abschied / Conclusion &amp; Final Greeting</li>
-          </ol>
-        </div>
-
-        <A1CourseBookLetterPracticePanel
-          title="Mark My Health Letter"
-          description="Write or paste your E-Mail to Felix here. Falowen will mark it and explain the corrections before you copy the improved version to Submit Assignment."
-          taskId="A1-14.1-teil-2-health-letter"
-          taskTitle="Health reason email to Felix"
-          taskContext="email to Felix declining a birthday invitation with a health reason and asking for another appointment"
-          letterType="informal"
-          promptType="email"
-          placeholder={"Lieber Felix,\n\nich schreibe dir, weil ...\n\nLiebe Grüße\n..."}
-          minimumWords={35}
-          maximumWords={50}
-          assignmentKey={DAY22_ASSIGNMENT_KEY}
-          workbookId="A1-14.1-health-body-parts-workbook"
-          day={22}
-          chapter="14.1"
-          lessonId="A1-day-22-chapter-14.1"
-        />
+          <p style={{ margin: 0 }}>Viele Grüße<br />Praxis Dr. Schmidt</p>
+        </A1ReadingSourceCard>
+        <p style={{ margin: 0 }}>Lesen Sie die Nachricht. Sind die Aussagen richtig (R) oder falsch (F)?</p>
+        {appointmentStatements.map((statement, index) => (
+          <div key={statement} style={questionBoxStyle}>
+            <p style={{ margin: 0 }}><strong>{index + 1}. {statement}</strong></p>
+            <p style={{ margin: 0 }}>Richtig</p>
+            <p style={{ margin: 0 }}>Falsch</p>
+          </div>
+        ))}
       </section>
 );
 
@@ -350,10 +319,10 @@ const A1Day22HealthBodyPartsWorkbookPage = () => (
   <A1TutorMarkedWorkbookShell
     fallbackAssignmentKey={DAY22_ASSIGNMENT_KEY}
     title="A1 · Day 22 Workbook · Health and Body Parts"
-    subtitle="Kapitel 14.1 · Tutor-marked Lesen, Schreiben & Hören assignment"
-    assignmentIntro="Use Overview, then complete Teil 1, Teil 2 and Teil 3 independently inside the 30-minute final challenge. Teil 3 is now a real listening task. Submit your own work first; use Mark My Letter later when review is unlocked."
+    subtitle="Kapitel 14.1 · Tutor-marked Lesen & Hören assignment"
+    assignmentIntro="Use Overview, then complete the five advertisement questions in Teil 1, the five Richtig/Falsch questions in Teil 2 and the six listening questions in Teil 3 inside the 30-minute final challenge."
     submitTitle="Submit A1 · Day 22 · Kapitel 14.1"
-    submitDescription="Submit your reading answers, final writing task and listening answers together for tutor marking."
+    submitDescription="Submit both sets of reading answers and your listening answers together for tutor marking."
   >
     <HealthOverview />
     <WorkbookSection sectionKey="teil-1"><Teil1Content /></WorkbookSection>
@@ -363,3 +332,4 @@ const A1Day22HealthBodyPartsWorkbookPage = () => (
 );
 
 export default A1Day22HealthBodyPartsWorkbookPage;
+

@@ -106,3 +106,32 @@ test("retains new A1-7 answers and drops obsolete Lesen numbers", () => {
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft });
   expect(submission).toBe("TEIL 1\n1. B\n7. A\n\nTEIL 2\n10. B");
 });
+
+
+test.each(["A1-13", "A1-14.1"])("new %s reading clears both former reading parts while retaining unchanged tasks", (assignmentKey) => {
+  const unchangedKey = assignmentKey === "A1-13" ? "teil-4" : "teil-3";
+  const legacy = {
+    assignmentKey,
+    sections: {
+      "teil-1": { answers: { 1: "A", 6: "B" } },
+      "teil-2": { text: "Former email", answers: { 1: "B" } },
+      [unchangedKey]: { answers: { 1: "A", 6: "A" } },
+      ...(assignmentKey === "A1-13" ? { "teil-3": { text: "Liebe Bina, ich kann leider nicht kommen." } } : {}),
+    },
+  };
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey(assignmentKey), JSON.stringify(legacy));
+  const migrated = readA1WorkbookDraft(assignmentKey);
+  expect(migrated.sections["teil-1"]).toBeUndefined();
+  expect(migrated.sections["teil-2"]).toBeUndefined();
+  expect(migrated.sections[unchangedKey]).toEqual(legacy.sections[unchangedKey]);
+  if (assignmentKey === "A1-13") expect(migrated.sections["teil-3"].text).toBe(legacy.sections["teil-3"].text);
+  saveA1WorkbookDraft({ assignmentKey, sections: {
+    ...migrated.sections,
+    "teil-1": { answers: { 1: "B", 5: "A", 6: "OBSOLETE" } },
+    "teil-2": { text: "OBSOLETE", answers: { 1: "Richtig", 5: "Falsch", 6: "OBSOLETE" } },
+  } });
+  const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment(assignmentKey), draft: readA1WorkbookDraft(assignmentKey) });
+  expect(submission).toContain("TEIL 1\n1. B\n5. A");
+  expect(submission).toContain("TEIL 2\n1. Richtig\n5. Falsch");
+  expect(submission).not.toContain("OBSOLETE");
+});

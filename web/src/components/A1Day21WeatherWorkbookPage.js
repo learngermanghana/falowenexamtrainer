@@ -97,8 +97,8 @@ const WeatherOverview = () => (
     <section style={card}>
       <h2 style={{ margin: 0 }}>Workbook sections</h2>
       {[
-        ["Teil 1 · Anzeigen", "Read two sets of advertisements and answer questions 1–6."],
-        ["Teil 2 · Nachricht", "Read Felix’s message and answer questions 7–9."],
+        ["Teil 1 · Anzeigen", "Read five weather situations and choose Text A or Text B."],
+        ["Teil 2 · Nachricht", "Read the Radio ND2 weather report and answer five Richtig/Falsch questions."],
         ["Teil 3 · Schreiben", "Write the requested email using weather as the reason."],
         ["Teil 4 · Hören", "Listen to Anna’s message and answer six multiple-choice questions."],
       ].map(([title, description]) => (
@@ -111,69 +111,57 @@ const WeatherOverview = () => (
   </div>
 );
 
+const weatherSituations = [
+  {
+    "prompt": "Sie möchten heute draußen im See schwimmen gehen. Sie suchen schönes, heißes Sommerwetter.",
+    "textA": "Wetter heute: Starker Regen und kalter Wind bei 12 Grad. Ziehen Sie eine warme Jacke an!",
+    "textB": "Wetter heute: Viel Sonnenschein und 28 Grad! Perfekt für den Strand und das Schwimmbad."
+  },
+  {
+    "prompt": "Es ist Winter. Sie möchten mit Ihren Kindern im Schnee spielen und einen Schneemann bauen.",
+    "textA": "Wetterbericht: Schnee und Kälte im Süden! Am Wochenende ideal zum Skifahren und Spielen im Schnee.",
+    "textB": "Wetterbericht: Viel Sonne und milde 15 Grad im Westen. Kein Schnee in Sicht."
+  },
+  {
+    "prompt": "Sie möchten morgen ein Picknick im Park machen. Sie suchen einen Tag, an dem es nicht regnet und die Sonne scheint.",
+    "textA": "Wetter morgen: Den ganzen Tag trocken und sonnig. Keine Wolken bei 22 Grad.",
+    "textB": "Wetter morgen: Am Nachmittag dunkle Wolken und starker Regen. Vergessen Sie den Regenschirm nicht!"
+  },
+  {
+    "prompt": "Sie müssen morgen früh mit dem Auto zur Arbeit fahren. Sie möchten wissen, ob die Straßen gefährlich (Eis/Frost) sind.",
+    "textA": "Achtung Autofahrer: Heute Nacht Frost und Glatteis auf den Straßen. Fahren Sie bitte vorsichtig und langsam!",
+    "textB": "Schönes Frühlingswetter: Milde 18 Grad und trocken. Gute Fahrt!"
+  },
+  {
+    "prompt": "Es regnet diese Woche jeden Tag. Sie möchten einen Schutz gegen den Regen kaufen.",
+    "textA": "Supermarkt Angebot: Große Sonnenschirme für den Garten – heute nur 15 Euro!",
+    "textB": "Wetter-Shop: Praktische Regenschirme – klein, windfest und 100 % wasserdicht."
+  }
+];
+
+const weatherStatements = [
+  "Am Samstag ist das Wetter im Norden warm und sonnig.",
+  "Am Samstag braucht man im Süden keinen Regenschirm.",
+  "Am Sonntag regnet es den ganzen Tag.",
+  "Am Sonntag gibt es viel Wind.",
+  "Ab Montag wird das Wetter wieder wärmer."
+];
+
 const Teil1Content = () => (
   <section style={card} data-a1-day21-weather-teil="1">
     <h2>Teil 1 · Anzeigen</h2>
-    <p><b>Instruction:</b> Read each question and choose the correct option.</p>
-
-    <A1ReadingSourceGrid>
-      <A1ReadingSourceCard label="Anzeige A" title="Sommerurlaub in Spanien">
-        <div>Costa Brava</div>
-        <div>1. Juli – 31. August</div>
-        <div>25°C – 30°C</div>
-        <div>Flug: Berlin, Hamburg, München</div>
-        <div>Hotel oder Ferienwohnung</div>
-        <div>Strände, Freizeitparks, Märkte</div>
-      </A1ReadingSourceCard>
-      <A1ReadingSourceCard label="Anzeige B" title="Winterurlaub in Österreich">
-        <div>Tirol</div>
-        <div>1. Dezember – 31. Januar</div>
-        <div>-5°C bis 5°C</div>
-        <div>Zug: Frankfurt, Stuttgart, Wien</div>
-        <div>Berghütte oder Hotel</div>
-        <div>Skifahren, Thermen, Weihnachtsmärkte</div>
-      </A1ReadingSourceCard>
-    </A1ReadingSourceGrid>
-
-    {[
-      "Du möchtest im Sommer an den Strand gehen und warmes Wetter genießen.",
-      "Du liebst Skifahren und möchtest Winterurlaub machen.",
-      "Du suchst ein Hotel in Spanien für deinen Urlaub.",
-    ].map((question, index) => (
-      <div key={question} style={questionBox}>
-        <b>{index + 1}. {question}</b>
-        <div>A. Anzeige A</div>
-        <div>B. Anzeige B</div>
-      </div>
-    ))}
-
-    <A1ReadingSourceGrid>
-      <A1ReadingSourceCard label="Anzeige A" title="Arbeiten am Meer in Griechenland">
-        <div>Kreta</div>
-        <div>Ganzjährig</div>
-        <div>Direkt am Strand</div>
-        <div>Gastronomie, Tourismus, Hotel</div>
-        <div>Flug: Frankfurt, Berlin, Düsseldorf</div>
-        <div>Mitarbeiterwohnung</div>
-      </A1ReadingSourceCard>
-      <A1ReadingSourceCard label="Anzeige B" title="Berufschancen in Kanada">
-        <div>Vancouver</div>
-        <div>Ganzjährig</div>
-        <div>Pazifikküste</div>
-        <div>IT, Gesundheit, Bildung</div>
-        <div>Firmenwohnung oder eigene Unterkunft</div>
-      </A1ReadingSourceCard>
-    </A1ReadingSourceGrid>
-
-    {[
-      "Du möchtest am Meer arbeiten in der Gastronomie.",
-      "Du willst im IT-Bereich arbeiten und in einer multikulturellen Stadt leben.",
-      "Du möchtest in Kanada arbeiten und nahe der Pazifikküste leben.",
-    ].map((question, index) => (
-      <div key={question} style={questionBox}>
-        <b>{index + 4}. {question}</b>
-        <div>A. Anzeige A</div>
-        <div>B. Anzeige B</div>
+    <p>Lesen Sie die Situationen (1–5) und die zwei Texte (A und B). Welcher Text passt? Wählen Sie a oder b.</p>
+    {weatherSituations.map((item, index) => (
+      <div key={item.prompt} style={questionBox}>
+        <h3 style={{ margin: 0 }}>Situation {index + 1}</h3>
+        <strong>{index + 1}. {item.prompt}</strong>
+        <A1ReadingSourceGrid>
+          <A1ReadingSourceCard label="Text A"><p style={{ margin: 0 }}>{item.textA}</p></A1ReadingSourceCard>
+          <A1ReadingSourceCard label="Text B"><p style={{ margin: 0 }}>{item.textB}</p></A1ReadingSourceCard>
+        </A1ReadingSourceGrid>
+        <p style={{ margin: 0 }}>Welcher Text passt?</p>
+        <p style={{ margin: 0 }}>a) Text A</p>
+        <p style={{ margin: 0 }}>b) Text B</p>
       </div>
     ))}
   </section>
@@ -182,25 +170,18 @@ const Teil1Content = () => (
 const Teil2Content = () => (
   <section style={card} data-a1-day21-weather-teil="2">
     <h2>Teil 2 · Nachricht</h2>
-    <div style={highlight}>
-      <p><b>Liebe Freunde,</b></p>
-      <p>Ich habe tolle Neuigkeiten! Es gibt spannende Jobangebote im Ausland.</p>
-      <p><b>Jobangebot 1:</b> Mallorca (Spanien)</p>
-      <p>Jobs: Kellner, Koch, Reinigungskraft • Unterkunft: Hotelzimmer • Wetter: sonnig • Sprachkurs: Spanisch</p>
-      <p><b>Jobangebot 2:</b> Toronto (Kanada)</p>
-      <p>Jobs: Verkäufer, Büroassistent • Unterkunft: WG/Apartments • multikulturell • Englischkurs</p>
-      <p>Liebe Grüße, Felix</p>
-    </div>
-
-    {[
-      "Wo kannst du im Sommer als Kellner oder Koch arbeiten?",
-      "Welche Stadt bietet Englischkurse und Stadtbesichtigungen?",
-      "Welche Unterkunft gibt es in Kanada?",
-    ].map((question, index) => (
-      <div key={question} style={questionBox}>
-        <b>{index + 7}. {question}</b>
-        <div>A. Option A</div>
-        <div>B. Option B</div>
+    <p>Lesen Sie den Wetterbericht aus dem Radio. Sind die Aussagen (1–5) Richtig (R) oder Falsch (F)?</p>
+    <A1ReadingSourceCard label="Radio-Wetterbericht" title="Radio ND2 – Der Wetterbericht für das Wochenende">
+      <p>Guten Tag, liebe Hörerinnen und Hörer! Hier ist das Wetter für Samstag und Sonntag.</p>
+      <p>Am Samstag ist das Wetter im Norden sehr schön: Die Sonne scheint den ganzen Tag und es wird warm bis 24 Grad. Im Süden ist es kälter (nur 12 Grad) und am Nachmittag gibt es starken Regen. Vergessen Sie dort Ihren Regenschirm nicht!</p>
+      <p>Am Sonntag wird es überall sehr windig und viele Wolken sind am Himmel. Es regnet aber nicht mehr und die Temperaturen liegen bei 18 Grad.</p>
+      <p>Achtung: Ab Montag wird es wieder richtig kalt mit Schnee im ganzen Land.</p>
+    </A1ReadingSourceCard>
+    {weatherStatements.map((statement, index) => (
+      <div key={statement} style={questionBox}>
+        <strong>{index + 1}. {statement}</strong>
+        <p style={{ margin: 0 }}>Richtig</p>
+        <p style={{ margin: 0 }}>Falsch</p>
       </div>
     ))}
   </section>
@@ -295,8 +276,8 @@ const Teil4Content = () => {
 
       {DAY13_LISTENING_QUESTIONS.map((item, index) => (
         <div key={item.stem} style={questionBox}>
-          <b>{index + 1}. {item.stem}</b>
-          {item.options.map((option) => <div key={option}>{option}</div>)}
+          <strong>{index + 1}. {item.stem}</strong>
+        {item.options.map((option) => <span key={option}>{option}</span>)}
         </div>
       ))}
     </section>

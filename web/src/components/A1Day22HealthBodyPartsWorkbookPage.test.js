@@ -16,14 +16,14 @@ describe("A1 Day 22 Health and Body Parts workbook", () => {
     expect(source).toContain('<WorkbookSection sectionKey="teil-2"><Teil2Content /></WorkbookSection>');
     expect(source).toContain('<WorkbookSection sectionKey="teil-3"><Teil3Content /></WorkbookSection>');
     expect(source).toContain('Teil 1 · Lesen: Anzeigen und Termine');
-    expect(source).toContain('Teil 2 · Schreiben: E-Mail an Felix');
-    expect(source).toContain('Teil 3 · Wortschatz: Translate into German');
+    expect(source).toContain('Teil 2 · Lesen: Ihr Termin');
+    expect(source).toContain('Teil 3 · Hören');
   });
 
-  it("adds Mark My Letter to the Schreiben task with A1-14.1 metadata", () => {
-    expect(source).toContain('title="Mark My Health Letter"');
-    expect(source).toContain('taskId="A1-14.1-teil-2-health-letter"');
-    expect(source).toContain('assignmentKey={DAY22_ASSIGNMENT_KEY}');
-    expect(source).toContain('workbookId="A1-14.1-health-body-parts-workbook"');
+  it("uses the appointment email as the second reading task", () => {
+    expect(source).toContain('Betreff: Ihr Termin');
+    expect(source).toContain('Frau Perez soll um 10:15 Uhr da sein.');
+    expect(source).toContain('Es gibt keinen Fahrstuhl im Haus.');
+    expect(source).not.toContain('Mark My Health Letter');
   });
 });
