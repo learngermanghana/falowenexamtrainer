@@ -51,6 +51,19 @@ describe("A1 Goethe-style Sprechen mock preview", () => {
     expect(componentSource).toContain("your submitted answers are still saved");
   });
 
+  test("waits for in-flight transcription and auto-submits a pre-timeout recording", () => {
+    const componentSource = fs.readFileSync(
+      path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
+      "utf8",
+    );
+
+    expect(componentSource).toContain("hasInFlightSubmission");
+    expect(componentSource).toContain("pendingRecordedTask");
+    expect(componentSource).toContain("recordingTaskId || hasInFlightSubmission");
+    expect(componentSource).toContain("submitTask(pendingRecordedTask, { timeoutAuto: true })");
+    expect(componentSource).toContain("timeoutSubmissionFailed: timeoutAuto || secondsLeftRef.current <= 0");
+  });
+
   test("uses English for recording and submission controls", () => {
     const componentSource = fs.readFileSync(
       path.resolve(__dirname, "./A1GoetheSpeakingMockPreview.jsx"),
