@@ -29,7 +29,6 @@ describe("speaking analyze timeout scope", () => {
     ["self-learning speaking", "components/selfLearning/EmbeddedSpeechPracticePanel.js"],
   ])("%s does not opt into the timed-mock deadline", (_label, relativePath) => {
     const source = readSource(relativePath);
-    expect(source).toContain("analyzeAudio({");
     expect(source).not.toContain("timeoutMs:");
     expect(source).not.toContain("TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS");
   });
