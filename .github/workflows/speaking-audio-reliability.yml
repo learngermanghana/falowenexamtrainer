@@ -28,6 +28,7 @@ on:
       - 'web/src/lib/speakingExamLock.js'
       - 'web/src/lib/speakingExamLock.test.js'
       - 'web/src/services/coachService.js'
+      - 'web/src/services/coachServiceTimeoutScope.test.js'
       - 'web/src/services/speechTrainerService.js'
       - 'web/src/services/presentationCoachService.js'
       - 'web/src/services/presentationCoachService.test.js'
@@ -134,6 +135,7 @@ jobs:
             src/services/presentationCoachService.test.js \
             src/hooks/useCustomCoachSpeech.test.js \
             src/components/GoetheCoachAudioFailureUi.test.js \
+            src/services/coachServiceTimeoutScope.test.js \
             2>&1 | tee ../speaking-ui-tests.log
           status=${PIPESTATUS[0]}
           exit "$status"
