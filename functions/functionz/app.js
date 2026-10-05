@@ -4769,11 +4769,12 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
-    if (attempts.length !== 3) {
-      return res.status(400).json({ error: "Three speaking attempts are required." });
+    if (attempts.length !== 5) {
+      return res.status(400).json({ error: "Five speaking responses are required for the complete A2 mock." });
     }
 
     const normalizedAttempts = attempts.map((attempt) => ({
+      id: String(attempt?.id || "").trim(),
       teil: String(attempt?.teil || "").trim(),
       task: String(attempt?.task || "").trim().slice(0, 600),
       transcript: String(attempt?.transcript || "").trim().slice(0, 3000),
