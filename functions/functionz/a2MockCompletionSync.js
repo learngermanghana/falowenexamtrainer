@@ -12,11 +12,11 @@ const SECTION_LABELS = Object.freeze({
 });
 
 const READING_ANSWER_KEY = Object.freeze({
-  "t1-1": "a",
-  "t1-2": "b",
+  "t1-1": "b",
+  "t1-2": "c",
   "t1-3": "b",
   "t1-4": "a",
-  "t1-5": "a",
+  "t1-5": "b",
   "t2-6": "b",
   "t2-7": "a",
   "t2-8": "b",
