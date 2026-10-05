@@ -12,9 +12,16 @@ describe("Exams Room simplified Schreiben flow", () => {
     expect(app).toContain(
       '<WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow />',
     );
-    expect(writingPage).toContain("Choose a letter question");
+    expect(writingPage).toContain("Choose a writing question");
     expect(writingPage).toContain("isSimplifiedExamFlow");
-    expect(writingPage).toContain("letterPattern");
+    expect(writingPage).toContain("return writingTasks.filter((task) => task.level === level)");
+    expect(writingPage).not.toContain("const letterPattern =");
+  });
+
+  test("keeps every level prompt selectable and repairs an invalid selection", () => {
+    expect(writingPage).toContain("visibleWritingTasks.some");
+    expect(writingPage).toContain("setSelectedLetterId(visibleWritingTasks[0].id)");
+    expect(writingPage).toContain("Analyze my text");
   });
 
   test("saves the marked original letter directly to tutor review", () => {
