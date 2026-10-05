@@ -20,17 +20,17 @@ const DEFAULT_COMPLETION_JOURNEY = {
 const COMPLETION_JOURNEYS = {
   A1: {
     ...DEFAULT_COMPLETION_JOURNEY,
-    title: "After A1: prepare with the official Goethe A1 practice",
-    completedTitle: "You finished the A1 Course Book — continue to official Goethe practice",
+    title: "After A1: move from the Final Mock to the Exams Room",
+    completedTitle: "You finished the A1 Course Book — continue in the Exams Room",
     description:
-      "Finish your required A1 Course Book work, then use the final Exam Orientation day to open the official Goethe A1 model test directly.",
+      "Finish your required A1 Course Book work, take the A1 Final Mock, then continue in the Falowen Exams Room for focused exam practice.",
     completedDescription:
-      "You have reached the end of the A1 Course Book. Continue to the final Exam Orientation day and work with the official Goethe A1 material before using the Falowen Exams Room for extra practice.",
+      "You have reached the end of the A1 Course Book. Use your Final Mock result to identify weak areas, then continue practising in the Falowen Exams Room.",
     steps: [
-      "Open the final A1 Exam Orientation day in the Course Book.",
-      "Use the single official Goethe link and practise Lesen, Hören, Schreiben and Sprechen.",
-      "Work through the four exam parts directly on the official Goethe page.",
-      "Use the Falowen Exams Room afterwards only for additional practice in weak areas.",
+      "Complete the A1 Final Mock across Lesen, Hören, Schreiben and Sprechen.",
+      "Review the result and identify your weakest section.",
+      "Continue in the Falowen Exams Room with Lesen, Schreiben and Sprechen practice.",
+      "Use the official Goethe A1 sample as an additional external reference when you want to compare the official format.",
     ],
   },
   A2: {
