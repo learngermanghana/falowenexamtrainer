@@ -20,7 +20,6 @@ import AttendanceTab from "./components/AttendanceTab";
 import ClassMembersTab from "./components/ClassMembersTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
-import A1Day23WritingWorkshopPage from "./components/A1Day23WritingWorkshopPage";
 import A1GoetheReadingMockTeil1Preview from "./components/A1GoetheReadingMockTeil1Preview";
 import A1GoetheReadingMockTeil2Preview from "./components/A1GoetheReadingMockTeil2Preview";
 import A1GoetheReadingMockTeil3Preview from "./components/A1GoetheReadingMockTeil3Preview";
@@ -849,15 +848,15 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-23-writing-workshop-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route
             path="/campus/course/dative-and-accusative-verbs-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route
             path="/campus/course/dative-verbs-adjective-declension-14-2"
-            element={<A1Day23WritingWorkshopPage />}
+            element={<Navigate to="/exams/writing" replace />}
           />
           <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/directions-imperative-11" element={<DirectionsImperativePage />} />
