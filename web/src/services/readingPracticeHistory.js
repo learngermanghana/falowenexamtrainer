@@ -24,15 +24,30 @@ export const loadReadingPracticeHistory = () =>
     .filter((item) => item && item.level && item.setId)
     .sort((a, b) => new Date(b.completedAt || 0).getTime() - new Date(a.completedAt || 0).getTime());
 
-export const getReadingPracticeHistory = (level = "") => {
+export const getReadingPracticeStudentKey = ({ studentProfile = null, user = null } = {}) =>
+  String(
+    studentProfile?.id ||
+      studentProfile?.studentCode ||
+      studentProfile?.studentcode ||
+      user?.uid ||
+      user?.email ||
+      "local-student",
+  )
+    .trim()
+    .toLowerCase();
+
+export const getReadingPracticeHistory = (level = "", studentKey = "") => {
   const normalized = String(level || "").toUpperCase();
+  const normalizedStudentKey = String(studentKey || "").trim().toLowerCase();
   return loadReadingPracticeHistory().filter(
-    (item) => !normalized || String(item.level || "").toUpperCase() === normalized,
+    (item) =>
+      (!normalized || String(item.level || "").toUpperCase() === normalized) &&
+      (!normalizedStudentKey || String(item.studentKey || "").toLowerCase() === normalizedStudentKey),
   );
 };
 
-export const getLatestReadingPracticeResult = (level = "") =>
-  getReadingPracticeHistory(level)[0] || null;
+export const getLatestReadingPracticeResult = (level = "", studentKey = "") =>
+  getReadingPracticeHistory(level, studentKey)[0] || null;
 
 export const saveReadingPracticeAttempt = ({
   level,
@@ -41,9 +56,11 @@ export const saveReadingPracticeAttempt = ({
   total,
   elapsedSeconds = null,
   sectionScores = [],
+  studentKey = "local-student",
 } = {}) => {
   const normalizedLevel = String(level || "").trim().toUpperCase();
   const normalizedSetId = String(setId || "").trim();
+  const normalizedStudentKey = String(studentKey || "local-student").trim().toLowerCase();
   const numericScore = Number(score);
   const numericTotal = Number(total);
 
@@ -55,12 +72,14 @@ export const saveReadingPracticeAttempt = ({
   const previousAttempts = history.filter(
     (item) =>
       String(item.level || "").toUpperCase() === normalizedLevel &&
-      String(item.setId || "") === normalizedSetId,
+      String(item.setId || "") === normalizedSetId &&
+      String(item.studentKey || "").toLowerCase() === normalizedStudentKey,
   ).length;
 
   const attempt = {
     id: `${normalizedLevel.toLowerCase()}-${normalizedSetId}-${Date.now()}`,
     type: "lesen",
+    studentKey: normalizedStudentKey,
     level: normalizedLevel,
     setId: normalizedSetId,
     attemptNumber: previousAttempts + 1,
