@@ -9,6 +9,16 @@ import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 const backendUrl = getBackendUrl();
 const speakingApiUrl = getSpeakingApiUrl() || backendUrl;
 
+export const SPEAKING_ANALYZE_TIMEOUT_MS = 30_000;
+
+const createSpeakingAnalyzeTimeoutError = () => {
+  const error = new Error(
+    "Falowen could not finish transcribing this recording in time. Please try again.",
+  );
+  error.code = "SPEAKING_ANALYZE_TIMEOUT";
+  return error;
+};
+
 const authHeaders = (idToken) =>
   idToken
     ? {
@@ -49,60 +59,85 @@ export const analyzeAudio = async ({
   userId,
   idToken,
 }) => {
-  const submitViaFirebaseUrl = async () => {
-    const audioUrl = audioBlob ? await uploadSpeakingAudio(audioBlob) : "";
-    const payload = {
-      teil,
-      level,
-      contextType,
-      question,
-      interactionMode,
-      userId: userId || "guest",
-      audioUrl,
+  const controller = new AbortController();
+  let timeoutId = null;
+
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = window.setTimeout(() => {
+      controller.abort();
+      reject(createSpeakingAnalyzeTimeoutError());
+    }, SPEAKING_ANALYZE_TIMEOUT_MS);
+  });
+
+  const runAnalysis = async () => {
+    const submitViaFirebaseUrl = async () => {
+      const audioUrl = audioBlob ? await uploadSpeakingAudio(audioBlob) : "";
+      const payload = {
+        teil,
+        level,
+        contextType,
+        question,
+        interactionMode,
+        userId: userId || "guest",
+        audioUrl,
+      };
+
+      const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          ...authHeaders(idToken),
+        },
+        signal: controller.signal,
+        timeout: SPEAKING_ANALYZE_TIMEOUT_MS,
+      });
+
+      return response.data;
     };
 
-    const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, payload, {
-      headers: {
-        "Content-Type": "application/json",
-        ...authHeaders(idToken),
-      },
-    });
+    const submitAsMultipartFallback = async () => {
+      const formData = new FormData();
+      const filename = audioBlob?.name || "recording.webm";
+      formData.append("audio", audioBlob, filename);
+      formData.append("teil", teil);
+      formData.append("level", level);
+      formData.append("userId", userId || "guest");
 
-    return response.data;
-  };
+      if (contextType) formData.append("contextType", contextType);
+      if (question) formData.append("question", question);
+      if (typeof interactionMode !== "undefined") {
+        formData.append("interactionMode", interactionMode);
+      }
 
-  const submitAsMultipartFallback = async () => {
-    const formData = new FormData();
-    const filename = audioBlob?.name || "recording.webm";
-    formData.append("audio", audioBlob, filename);
-    formData.append("teil", teil);
-    formData.append("level", level);
-    formData.append("userId", userId || "guest");
+      const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, formData, {
+        headers: {
+          ...authHeaders(idToken),
+        },
+        signal: controller.signal,
+        timeout: SPEAKING_ANALYZE_TIMEOUT_MS,
+      });
 
-    if (contextType) formData.append("contextType", contextType);
-    if (question) formData.append("question", question);
-    if (typeof interactionMode !== "undefined") {
-      formData.append("interactionMode", interactionMode);
+      return response.data;
+    };
+
+    if (!audioBlob) {
+      return submitAsMultipartFallback();
     }
 
-    const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, formData, {
-      headers: {
-        ...authHeaders(idToken),
-      },
-    });
-
-    return response.data;
+    try {
+      return await submitViaFirebaseUrl();
+    } catch (error) {
+      if (controller.signal.aborted || error?.code === "ECONNABORTED") {
+        throw createSpeakingAnalyzeTimeoutError();
+      }
+      console.warn("Falling back to direct audio upload for speaking analyze", error);
+      return submitAsMultipartFallback();
+    }
   };
 
-  if (!audioBlob) {
-    return submitAsMultipartFallback();
-  }
-
   try {
-    return await submitViaFirebaseUrl();
-  } catch (error) {
-    console.warn("Falling back to direct audio upload for speaking analyze", error);
-    return submitAsMultipartFallback();
+    return await Promise.race([runAnalysis(), timeoutPromise]);
+  } finally {
+    if (timeoutId) window.clearTimeout(timeoutId);
   }
 };
 
