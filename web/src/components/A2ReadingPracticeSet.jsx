@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
+import { useAuth } from "../context/AuthContext";
+import { getReadingPracticeStudentKey, getReadingReadinessLabel, getWeakestReadingSection, saveReadingPracticeAttempt } from "../services/readingPracticeHistory";
 import "./A2GoetheReadingMockPreview.css";
 
 export const A2_READING_PRACTICE_SET_01 = Object.freeze({
@@ -372,6 +373,8 @@ const allAnswers = (set) => ({
 
 export default function A2ReadingPracticeSet() {
   const navigate = useNavigate();
+  const { studentProfile, user } = useAuth();
+  const readingStudentKey = getReadingPracticeStudentKey({ studentProfile, user });
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30 * 60);
@@ -436,6 +439,7 @@ export default function A2ReadingPracticeSet() {
       total,
       elapsedSeconds: 30 * 60 - secondsLeft,
       sectionScores,
+      studentKey: readingStudentKey,
     });
     setSavedAttempt(attempt);
     setSubmitted(true);
