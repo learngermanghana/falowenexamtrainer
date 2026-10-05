@@ -22,11 +22,11 @@ describe("A1 Day 21 Weather workbook", () => {
     expect(source).not.toContain('nextSearch.set("workbookTab"');
   });
 
-  it("preserves the existing sections and adds Teil 4 Hören", () => {
+  it("uses the new weather readings and preserves writing and listening", () => {
     expect(source).toContain("Teil 1 · Anzeigen");
     expect(source).toContain("Teil 2 · Nachricht");
     expect(source).toContain("Teil 3 · Schreiben");
-    expect(source).toContain("Sommerurlaub in Spanien");
+    expect(source).toContain("Radio ND2 – Der Wetterbericht für das Wochenende");
     expect(source).toContain("Schreiben Sie eine E-Mail an Bina");
     expect(source).toContain("Teil 4 · Hören");
     expect(source).toContain('const DAY13_AUDIO_KEY = "a1/day-13/day-13.mp3"');

@@ -4,24 +4,31 @@ export const A1_WORKBOOK_DRAFT_UPDATED_EVENT = "falowen:a1:workbook-draft-update
 const normalizeAssignmentKey = (value = "") =>
   String(value || "").trim().toUpperCase().replace(/[^A-Z0-9._-]/g, "-");
 
-// A1-7's Maria reading replaces the former ten-question exercise. Keep the
-// unchanged Hören draft, but never reuse answers to the old reading questions.
-const A1_7_READING_REVISION = "maria-time-7-v1";
-const readingRevision = (assignmentKey) => normalizeAssignmentKey(assignmentKey) === "A1-7"
-  ? { readingRevision: A1_7_READING_REVISION }
-  : {};
+// Changed reading exercises must not reuse answers to the former questions.
+// Retain sections whose questions have not changed.
+const READING_REVISIONS = {
+  "A1-7": { revision: "maria-time-7-v1", sections: { "teil-1": 7 } },
+  "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
+  "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
+};
+const readingRevision = (assignmentKey) => {
+  const config = READING_REVISIONS[normalizeAssignmentKey(assignmentKey)];
+  return config ? { readingRevision: config.revision } : {};
+};
 const sanitizeA1WorkbookDraft = (draft) => {
-  if (normalizeAssignmentKey(draft.assignmentKey) !== "A1-7") return draft;
+  const config = READING_REVISIONS[normalizeAssignmentKey(draft.assignmentKey)];
+  if (!config) return draft;
   const sections = { ...(draft.sections || {}) };
-  if (draft.readingRevision !== A1_7_READING_REVISION) {
-    delete sections["teil-1"];
-  } else if (sections["teil-1"]) {
-    sections["teil-1"] = {
-      ...sections["teil-1"],
-      answers: Object.fromEntries(Object.entries(sections["teil-1"].answers || {})
-        .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= 7)),
-    };
-  }
+  Object.entries(config.sections).forEach(([sectionKey, questionCount]) => {
+    if (draft.readingRevision !== config.revision) {
+      delete sections[sectionKey];
+    } else if (sections[sectionKey]) {
+      sections[sectionKey] = {
+        answers: Object.fromEntries(Object.entries(sections[sectionKey].answers || {})
+          .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= questionCount)),
+      };
+    }
+  });
   return { ...draft, ...readingRevision(draft.assignmentKey), sections };
 };
 
@@ -49,7 +56,7 @@ export const readA1WorkbookDraft = (assignmentKey = "") => {
       ...empty,
       ...parsed,
       assignmentKey: empty.assignmentKey,
-      ...(empty.assignmentKey === "A1-7" ? { readingRevision: parsed.readingRevision } : {}),
+      ...(READING_REVISIONS[empty.assignmentKey] ? { readingRevision: parsed.readingRevision } : {}),
       sections: parsed.sections && typeof parsed.sections === "object" ? parsed.sections : {},
     });
   } catch (error) {
@@ -132,3 +139,4 @@ export const countCompletedA1Answers = (answers = {}, total = 0) => {
 };
 
 export const __TESTING__ = { normalizeAssignmentKey, sortedAnswerEntries };
+

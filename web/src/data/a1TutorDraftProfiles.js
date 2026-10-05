@@ -151,16 +151,16 @@ const profiles = {
   },
   "A1-13": {
     sections: {
-      "teil-1": section(choiceItems(6, ["A", "B"]), { label: "Anzeigen" }),
-      "teil-2": section(choiceItems(3, ["A", "B"]), { label: "Nachricht" }),
+      "teil-1": section(choiceItems(5, ["A", "B"]), { label: "Anzeigen" }),
+      "teil-2": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Nachricht" }),
       "teil-3": section([], { label: "Schreiben", embeddedWriting: true }),
       "teil-4": section(choiceItems(6, ["A", "B", "C"]), { label: "Hören" }),
     },
   },
   "A1-14.1": {
     sections: {
-      "teil-1": section(choiceItems(5, ["Anzeige A", "Anzeige B"]), { label: "Lesen" }),
-      "teil-2": section([], { label: "Schreiben", embeddedWriting: true }),
+      "teil-1": section(choiceItems(5, ["A", "B"]), { label: "Lesen" }),
+      "teil-2": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen: Ihr Termin" }),
       "teil-3": section(choiceItems(6, ["A", "B", "C"]), { label: "Hören" }),
     },
   },
@@ -248,3 +248,4 @@ export const validateA1TutorDraftSubmissionSections = ({ assignmentKey = "", sec
 };
 
 export const __TESTING__ = { choiceItems, shortItems, section, hasValue };
+
