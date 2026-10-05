@@ -347,11 +347,7 @@ const LesenPage = () => {
   const [timerRunning, setTimerRunning] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [savedAttempt, setSavedAttempt] = useState(null);
-
-  const visibleLevels = useMemo(() => {
-    const match = lesenLevels.find((item) => item.level === normalizedLevel);
-    return match ? [match] : lesenLevels;
-  }, [normalizedLevel]);
+  const [activeA1SectionId, setActiveA1SectionId] = useState("teil-1");
 
   const allQuestions = useMemo(() => flattenQuestions(A1_READING_PRACTICE_SET_01.sections), []);
   const answeredCount = Object.keys(answers).length;
@@ -372,6 +368,64 @@ const LesenPage = () => {
   const percent = Math.round((score / Math.max(1, allQuestions.length)) * 100);
   const weakestSection = getWeakestReadingSection(sectionScores);
   const studentName = studentProfile?.name || studentProfile?.displayName || user?.displayName || "Student";
+  const a1StorageKey = useMemo(
+    () => `falowen:exams:lesen:a1:set-1:${readingStudentKey || "guest"}`,
+    [readingStudentKey],
+  );
+  const activeA1SectionIndex = Math.max(
+    0,
+    A1_READING_PRACTICE_SET_01.sections.findIndex(
+      (section) => section.id === activeA1SectionId,
+    ),
+  );
+  const activeA1Section =
+    A1_READING_PRACTICE_SET_01.sections[activeA1SectionIndex] ||
+    A1_READING_PRACTICE_SET_01.sections[0];
+  const activeA1Questions = activeA1Section.tasks.flatMap(
+    (task) => task.questions,
+  );
+  const activeA1AnsweredCount = activeA1Questions.filter(
+    (question) => answers[question.id],
+  ).length;
+
+  useEffect(() => {
+    if (normalizedLevel !== "A1" || typeof window === "undefined") return;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(a1StorageKey) || "null");
+      if (!saved || typeof saved !== "object") return;
+      if (saved.answers && typeof saved.answers === "object") {
+        setAnswers(saved.answers);
+      }
+      if (
+        typeof saved.activeSectionId === "string" &&
+        A1_READING_PRACTICE_SET_01.sections.some(
+          (section) => section.id === saved.activeSectionId,
+        )
+      ) {
+        setActiveA1SectionId(saved.activeSectionId);
+      }
+    } catch {
+      // Ignore malformed local practice state and start clean.
+    }
+  }, [a1StorageKey, normalizedLevel]);
+
+  useEffect(() => {
+    if (
+      normalizedLevel !== "A1" ||
+      submitted ||
+      typeof window === "undefined"
+    ) {
+      return;
+    }
+    window.localStorage.setItem(
+      a1StorageKey,
+      JSON.stringify({
+        answers,
+        activeSectionId: activeA1SectionId,
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+  }, [a1StorageKey, activeA1SectionId, answers, normalizedLevel, submitted]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -400,6 +454,7 @@ const LesenPage = () => {
     setSavedAttempt(null);
     setRemainingSeconds(A1_EXAM_SECONDS);
     setTimerRunning(false);
+    setActiveA1SectionId("teil-1");
   }, [normalizedLevel]);
 
   const handleTimerToggle = () => {
@@ -433,6 +488,10 @@ const LesenPage = () => {
     setSavedAttempt(null);
     setRemainingSeconds(A1_EXAM_SECONDS);
     setTimerRunning(false);
+    setActiveA1SectionId("teil-1");
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(a1StorageKey);
+    }
   };
 
   const submitA1Practice = () => {
@@ -449,6 +508,9 @@ const LesenPage = () => {
     });
     setSavedAttempt(attempt);
     setSubmitted(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(a1StorageKey);
+    }
   };
 
   const renderOptionButton = (question, option) => {
@@ -489,51 +551,49 @@ const LesenPage = () => {
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div>
-        <h2 style={{ margin: 0 }}>Lesen samples</h2>
-        <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-          A1 and A2 now have interactive reading practice with separate questions from the Course Book mocks.
-        </p>
-      </div>
-      <div style={{ ...styles.focusNotice, marginTop: 0 }}>
-        Showing resources for level <strong>{normalizedLevel}</strong> so you can stay focused.
-      </div>
       {["A1", "A2"].includes(normalizedLevel) ? (
-        <div style={{ ...styles.card, margin: 0, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <div style={{ display: "grid", gap: 12 }}>
           <div>
-            <strong>Lesen practice sets</strong>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Set 1 is active. Add future sets without changing this page.</p>
+            <h2 style={{ margin: 0 }}>Lesen practice</h2>
+            <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
+              Start directly with the current reading set for level <strong>{normalizedLevel}</strong>.
+            </p>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <span style={styles.badge}>Practice Set 1 · Active</span>
-            <span style={styles.badge}>Practice Set 2 · Coming later</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="Lesen set selector">
+            <button type="button" style={styles.primaryButton}>Lesen 1</button>
+            <button type="button" style={styles.secondaryButton} disabled>Lesen 2 · Demnächst</button>
+            <button type="button" style={styles.secondaryButton} disabled>Lesen 3 · Demnächst</button>
           </div>
         </div>
-      ) : null}
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        {visibleLevels.map((levelItem) => (
-          <div key={levelItem.level} style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
-            <div>
-              <h3 style={{ margin: 0 }}>{levelItem.level}</h3>
-              <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{levelItem.description}</p>
-            </div>
-            {levelItem.url ? (
-              <a
-                href={levelItem.url}
-                target="_blank"
-                rel="noreferrer"
-                style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}
-              >
-                {levelItem.actionLabel}
-              </a>
-            ) : (
-              <span style={{ fontSize: 14, color: "#9ca3af" }}>
-                {["A1", "A2"].includes(levelItem.level) ? "Practice below" : "Available soon"}
-              </span>
-            )}
+      ) : (
+        <>
+          <div>
+            <h2 style={{ margin: 0 }}>Lesen samples</h2>
+            <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
+              Reading resources for level <strong>{normalizedLevel}</strong>.
+            </p>
           </div>
-        ))}
-      </div>
+          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            {lesenLevels
+              .filter((item) => item.level === normalizedLevel)
+              .map((levelItem) => (
+                <div key={levelItem.level} style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>{levelItem.level}</h3>
+                    <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{levelItem.description}</p>
+                  </div>
+                  {levelItem.url ? (
+                    <a href={levelItem.url} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
+                      {levelItem.actionLabel}
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: 14, color: "#9ca3af" }}>Available soon</span>
+                  )}
+                </div>
+              ))}
+          </div>
+        </>
+      )}
 
       {normalizedLevel === "A1" ? (
         <div style={{ ...styles.card, margin: 0, display: "grid", gap: 16 }}>
@@ -584,44 +644,94 @@ const LesenPage = () => {
             </div>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
-            {A1_READING_PRACTICE_SET_01.sections.map((section) => (
-              <div key={section.id} style={{ display: "grid", gap: 12 }}>
-                <h4 style={{ margin: 0 }}>{section.title}</h4>
-                {section.tasks.map((task) => (
-                  <div key={task.id} style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
-                    <div>
-                      <strong>{task.heading}</strong>
-                      {task.text.map((line, index) => (
-                        <p key={`${task.id}-line-${index}`} style={{ margin: "6px 0", color: "#111827" }}>
-                          {line}
-                        </p>
-                      ))}
-                    </div>
-                    <div style={{ display: "grid", gap: 10 }}>
-                      {task.questions.map((question) => (
-                        <div key={question.id} style={{ display: "grid", gap: 8 }}>
-                          <div style={{ fontWeight: 600 }}>{question.text}</div>
-                          <div style={{ display: "grid", gap: 6 }}>
-                            {question.options.map((option) => renderOptionButton(question, option))}
-                          </div>
-                          {submitted ? (
-                            <div
-                              style={{
-                                fontSize: 13,
-                                color:
-                                  answers[question.id] === question.correct ? "#166534" : "#991b1b",
-                              }}
-                            >
-                              {answers[question.id] === question.correct ? "Correct." : "Not correct."} {question.explanation}
-                            </div>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="A1 Lesen part selector">
+              {A1_READING_PRACTICE_SET_01.sections.map((section, index) => {
+                const questions = section.tasks.flatMap((task) => task.questions);
+                const answered = questions.filter((question) => answers[question.id]).length;
+                const active = section.id === activeA1Section.id;
+                return (
+                  <button
+                    key={section.id}
+                    type="button"
+                    onClick={() => setActiveA1SectionId(section.id)}
+                    style={active ? styles.primaryButton : styles.secondaryButton}
+                  >
+                    Teil {index + 1} · {answered}/{questions.length}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div style={{ ...styles.focusNotice, marginTop: 0 }}>
+              <strong>{activeA1Section.title}</strong> · {activeA1AnsweredCount}/{activeA1Questions.length} answered · {answeredCount}/{allQuestions.length} overall
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              {activeA1Section.tasks.map((task) => (
+                <div key={task.id} style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
+                  <div>
+                    <strong>{task.heading}</strong>
+                    {task.text.map((line, index) => (
+                      <p key={`${task.id}-line-${index}`} style={{ margin: "6px 0", color: "#111827" }}>
+                        {line}
+                      </p>
+                    ))}
                   </div>
-                ))}
-              </div>
-            ))}
+                  <div style={{ display: "grid", gap: 10 }}>
+                    {task.questions.map((question) => (
+                      <div key={question.id} style={{ display: "grid", gap: 8 }}>
+                        <div style={{ fontWeight: 600 }}>{question.text}</div>
+                        <div style={{ display: "grid", gap: 6 }}>
+                          {question.options.map((option) => renderOptionButton(question, option))}
+                        </div>
+                        {submitted ? (
+                          <div style={{ fontSize: 13, color: answers[question.id] === question.correct ? "#166534" : "#991b1b" }}>
+                            {answers[question.id] === question.correct ? "Correct." : "Not correct."} {question.explanation}
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                disabled={activeA1SectionIndex === 0}
+                onClick={() =>
+                  setActiveA1SectionId(
+                    A1_READING_PRACTICE_SET_01.sections[
+                      Math.max(0, activeA1SectionIndex - 1)
+                    ].id,
+                  )
+                }
+              >
+                ← Previous part
+              </button>
+              <button
+                type="button"
+                style={styles.primaryButton}
+                disabled={
+                  activeA1SectionIndex ===
+                  A1_READING_PRACTICE_SET_01.sections.length - 1
+                }
+                onClick={() =>
+                  setActiveA1SectionId(
+                    A1_READING_PRACTICE_SET_01.sections[
+                      Math.min(
+                        A1_READING_PRACTICE_SET_01.sections.length - 1,
+                        activeA1SectionIndex + 1,
+                      )
+                    ].id,
+                  )
+                }
+              >
+                Next part →
+              </button>
+            </div>
           </div>
           <div
             style={{
