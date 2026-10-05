@@ -569,22 +569,25 @@ const WritingPage = ({
   });
   const visibleWritingTasks = useMemo(() => {
     if (isExamMode) {
-      const levelTasks = writingTasks.filter((task) => task.level === level);
-      if (!isSimplifiedExamFlow) return levelTasks;
-
-      const letterPattern = /(brief|e-mail|email|nachricht|postkarte)/i;
-      const letterTasks = levelTasks.filter((task) =>
-        letterPattern.test(`${task.letter || ""} ${task.situation || ""}`),
-      );
-      return letterTasks.length ? letterTasks : levelTasks;
+      return writingTasks.filter((task) => task.level === level);
     }
 
     return writingTasks;
-  }, [isExamMode, isSimplifiedExamFlow, level, writingTasks]);
+  }, [isExamMode, level, writingTasks]);
   const selectedLetter = useMemo(
     () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
     [selectedLetterId, visibleWritingTasks],
   );
+
+  useEffect(() => {
+    if (!isExamMode || visibleWritingTasks.length === 0) return;
+    const hasValidSelection = visibleWritingTasks.some(
+      (item) => item.id === selectedLetterId,
+    );
+    if (!hasValidSelection) {
+      setSelectedLetterId(visibleWritingTasks[0].id);
+    }
+  }, [isExamMode, selectedLetterId, visibleWritingTasks]);
   const pinnedIdeaQuestion = useMemo(() => {
     const firstUserMessage = chatMessages.find(
       (message) => message.role === "user",
@@ -740,7 +743,7 @@ const WritingPage = ({
       {
         key: "mark",
         label:
-          markLabel || (isCourseMode ? "Analyse my text" : "Mark my letter"),
+          markLabel || (isCourseMode ? "Analyse my text" : isSimplifiedExamFlow ? "Writing practice" : "Mark my letter"),
       },
     ];
     if (!isSimplifiedExamFlow) {
@@ -2323,14 +2326,14 @@ const WritingPage = ({
               {markDescription || (isCourseMode
                 ? "Write the section you built today. AI will analyse it at your level so you can improve without the pressure of finishing a full essay."
                 : isSimplifiedExamFlow
-                  ? "Choose one exam-style letter, write your answer, get AI marking, then save the marked copy for your tutor."
+                  ? "Choose one exam-style writing question, write your answer, and analyse that exact response with AI. You can then save the marked copy for your tutor."
                   : "From Day 21, write one complete essay, get full feedback, and save one revised version.")}
             </p>
 
             {isSimplifiedExamFlow ? (
               <div style={{ ...styles.helperCard, marginBottom: 14, display: "grid", gap: 10 }}>
                 <div>
-                  <label style={styles.label}>Choose a letter question</label>
+                  <label style={styles.label}>Choose a writing question</label>
                   <select
                     value={selectedLetterId}
                     onChange={(event) => {
@@ -2386,7 +2389,7 @@ const WritingPage = ({
             <label style={styles.label}>
               {draftLabel || (isCourseMode
                 ? "Your combined section"
-                : "Your complete letter or essay")}
+                : isSimplifiedExamFlow ? "Your answer" : "Your complete letter or essay")}
             </label>
             <textarea
               ref={markDraftRef}
@@ -2398,7 +2401,7 @@ const WritingPage = ({
               placeholder={
                 draftPlaceholder || (isCourseMode
                   ? "Combine what you wrote today and paste it here for level-based analysis..."
-                  : "Paste your finished letter or essay here for marking...")
+                  : isSimplifiedExamFlow ? "Write your answer to the selected question here..." : "Paste your finished letter or essay here for marking...")
               }
               style={styles.textArea}
               rows={9}
@@ -2446,7 +2449,7 @@ const WritingPage = ({
                       ? "Retry"
                       : isCourseMode
                         ? submitLabel || "Analyse my text"
-                        : submitLabel || "Get AI feedback"}
+                        : submitLabel || (isSimplifiedExamFlow ? "Analyze my text" : "Get AI feedback")}
                 </button>
 
                 {!isSimplifiedExamFlow ? (
