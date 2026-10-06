@@ -22,7 +22,7 @@ describe("Exams Room section navigation", () => {
 
   test("Lesen uses a vertical sample list and opens A1/A2 samples on their own URLs", () => {
     expect(lesenSource).toContain('display: "grid"');
-    expect(lesenSource).toContain('sample-1');
+    expect(lesenSource).toContain('slug: `sample-${index + 1}`');
     expect(lesenSource).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}');
     expect(lesenSource).toContain('A1_READING_PRACTICE_SAMPLES');
     expect(lesenSource).toContain('A2_READING_PRACTICE_SAMPLES');
