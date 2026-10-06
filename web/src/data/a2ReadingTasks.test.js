@@ -22,11 +22,11 @@ describe("A2 canonical Lesen tasks", () => {
       expect(task.title).toBeTruthy();
       expect(task.strategy).toBeTruthy();
       expect(task.text.length).toBeGreaterThan(100);
-      expect(task.questions).toHaveLength(day === 11 ? 7 : 5);
+      expect(task.questions).toHaveLength(day === 11 ? 7 : day === 17 ? 8 : 5);
 
       task.questions.forEach((question) => {
         expect(question.stem).toBeTruthy();
-        expect(question.options.length).toBeGreaterThanOrEqual(3);
+        expect(question.options.length).toBeGreaterThanOrEqual(day === 17 ? 2 : 3);
         expect(new Set(question.options).size).toBe(question.options.length);
         question.options.forEach((option) => expect(option).toMatch(/^[A-D]\)/));
       });
@@ -47,6 +47,10 @@ describe("A2 canonical Lesen tasks", () => {
     expect(A2_READING_TASKS[12].text).not.toMatch(/beglaubigen|Anerkennung ausländischer Abschlüsse/i);
     expect(A2_READING_TASKS[13].title).toMatch(/Vorstellungsgespräch/i);
     expect(A2_READING_TASKS[13].text).not.toMatch(/Kinderbetreuung|Kinderkrippe/i);
+    expect(A2_READING_TASKS[17].title).toBe("Hamburg erleben");
+    expect(A2_READING_TASKS[17].questions).toHaveLength(8);
+    expect(A2_READING_TASKS[17].text).toMatch(/Elbphilharmonie/);
+    expect(A2_READING_TASKS[17].questions.slice(3).every((question) => question.options.length === 2)).toBe(true);
     expect(A2_READING_TASKS[19].text).not.toMatch(/soziale Gerechtigkeit|Umweltverschmutzung/i);
     expect(A2_READING_TASKS[23].text).toMatch(/Regionalzug/);
     expect(A2_READING_TASKS[23].text).toMatch(/Bus 16/);
