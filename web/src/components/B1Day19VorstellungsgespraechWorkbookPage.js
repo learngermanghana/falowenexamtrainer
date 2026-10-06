@@ -73,17 +73,17 @@ const WritingSupportVideo = () => (
   </article>
 );
 
-const energyQuestions = [
-  { number: 1, stem: "In diesem Text geht es um ...", options: ["a) die neue Technologie von Eckhard Meier.", "b) die umweltfreundliche Stromproduktion in Feldheim.", "c) einen Studiengang an der Universität Göttingen."] },
-  { number: 2, stem: "Die Wissenschaftler wollten zeigen, dass ...", options: ["a) ein ganzes Dorf von modernen Energien leben kann.", "b) eine Bio-Gasanlage mehr Strom produziert, als ein Dorf braucht.", "c) man größere Mengen Strom sparen kann."] },
-  { number: 3, stem: "Damit die Idee auch in anderen Dörfern funktioniert, ...", options: ["a) benötigt man viel Geld.", "b) braucht man genug Platz für die Technik.", "c) muss die Bevölkerung dafür sein."] },
+const interviewReadingQuestions = [
+  { number: 1, stem: "Warum war Felix vor dem Gespräch sehr nervös?", options: ["a) Weil er zu spät zum Termin gekommen ist.", "b) Weil ihm die Stelle bei der Agentur sehr wichtig ist.", "c) Weil er die Personalleiterin bereits kannte."] },
+  { number: 2, stem: "Was musste Felix zu Beginn des Gesprächs machen?", options: ["a) Eine Präsentation über die Agentur halten.", "b) Seinen bisherigen Werdegang und seine Erfahrungen beschreiben.", "c) Einen schriftlichen Englischtest ausfüllen."] },
+  { number: 3, stem: "Welche unerwartete Situation gab es während des Gesprächs?", options: ["a) Frau Weber stellte ihm plötzlich Fragen auf Englisch.", "b) Der Abteilungsleiter musste den Raum vorzeitig verlassen.", "c) Das Gespräch wurde nach 15 Minuten abgebrochen."] },
+  { number: 4, stem: "Worüber sprach Felix beim englischen Teil des Gesprächs?", options: ["a) Über seine Gehaltsvorstellungen.", "b) Über seinen Umgang mit Stress und Zeitdruck.", "c) Über seine Sprachkenntnisse in anderen Sprachen."] },
+  { number: 5, stem: "Welche Fragen hat Felix am Ende des Gesprächs gestellt?", options: ["a) Nach den Urlaubstagen und dem Gehalt.", "b) Nach Arbeitszeiten und Fortbildungsangeboten.", "c) Nach den Namen der anderen Bewerber."] },
+  { number: 6, stem: "Wann erfährt Felix voraussichtlich das Ergebnis der Bewerbung?", options: ["a) Noch am selben Tag per E-Mail.", "b) Bis Ende nächster Woche.", "c) Erst am 1. des nächsten Monats."] },
+  { number: 7, stem: "Wie viele andere Bewerber werden diese Woche noch interviewt?", options: ["a) Keine weiteren Bewerber.", "b) Drei andere Kandidaten.", "c) Fünfzehn Personen."] },
 ];
 
-const murtenQuestions = [
-  { number: 4, stem: "In diesem Text geht es darum, dass ...", options: ["a) die Geschichte von Murten neu erzählt wird.", "b) es ein neues Tourismus-Angebot gibt.", "c) man in Murten neue Velo-Wege bauen will."] },
-  { number: 5, stem: "Für die Rundfahrt ...", options: ["a) braucht man ein eigenes Velo.", "b) muss man nicht sportlich sein.", "c) sollte man mit der Bahn anreisen."] },
-  { number: 6, stem: "Der Geschäftsführer von Murten Tourismus will, dass ...", options: ["a) es in Murten mehr Stadtführungen für Gruppen gibt.", "b) die Leute normale Velos statt Elektro-Velos benutzen.", "c) mehr Velo-Touristen in die Region kommen."] },
-];
+
 
 const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
   const reading = getB1ReadingTask(19);
@@ -135,16 +135,16 @@ const B1Day19PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
           <article style={box}>
-            <h3 style={{ margin: 0 }}>Ein Dorf für grüne Energie</h3>
-            <p>Das Dorf Feldheim in Brandenburg macht sich unabhängig von Öl und Kohle. Seit Kurzem deckt das Dorf seinen kompletten Strombedarf und drei Viertel des Wärmebedarfs durch moderne Energien.</p>
-            <p>„Das funktioniert mithilfe einer modernen Anlage für Bio-Gas“, erklärt der Diplom-Physiker Eckhard Meier. „Da kommen Abfall von den Tieren, Getreide und Holz rein und werden erwärmt. Ein Motor verbrennt das Gas und erzeugt dabei Wärme. Der Motor treibt dann einen Generator an, der Strom produziert.“</p>
-            <p>Entstanden ist die Idee des „Bio-Energiedorfs“ an der Universität Göttingen. Ziel der Wissenschaftler war es zu zeigen, dass es möglich ist, ein Dorf komplett mit erneuerbaren Energien zu versorgen und damit einen Beitrag zum Klimaschutz zu leisten.</p>
-            <p>Tatsächlich: Die Bio-Gasanlage erzeugt jährlich doppelt so viel Strom wie die Gemeinde verbraucht. Der Rest wird in das Stromnetz abgegeben und kostenlos anderen Dörfern zur Verfügung gestellt.</p>
-            <p>Passt das Konzept auch für andere Dörfer? „Im Prinzip schon“, meint Eckhard Meier. Die technischen Anlagen könnten an anderen Orten genauso aufgebaut werden – der Raumbedarf ist gering. Man benötigt allerdings vor allem eines: aktive und begeisterte Einwohner!</p>
-            <p style={{ margin: 0 }}>(aus einer deutschen Zeitung)</p>
+            <h3 style={{ margin: 0 }}>E-Mail von Felix an seine Freundin Sarah</h3>
+            <p style={{ margin: 0 }}><strong>Betreff: Mein Vorstellungsgespräch gestern – wie es gelaufen ist!</strong></p>
+            <p style={{ margin: 0 }}><strong>Liebe Sarah,</strong></p>
+            <p>wie du weißt, hatte ich gestern Nachmittag endlich mein Vorstellungsgespräch bei der Marketing-Agentur „MediaPlus“ in Frankfurt. Ich war vorher schrecklich nervös, weil ich die Stelle als Junior-Projektmanager unbedingt bekommen möchte.</p>
+            <p>Das Gespräch hat um 14:00 Uhr begonnen und dauerte fast eine Stunde. Zuerst haben sich die Personalleiterin, Frau Weber, und der Abteilungsleiter kurz vorgestellt. Danach sollte ich meinen bisherigen Werdegang beschreiben. Zum Glück hatte ich mich gut vorbereitet und konnte flüssig erklären, welche Erfahrungen ich bereits während meines Praktikums gesammelt habe.</p>
+            <p>Besonders überrascht war ich, als Frau Weber plötzlich auf Englisch wechselte. Sie wollte wissen, wie ich mit stressigen Situationen und knappen Fristen umgehe. Obwohl ich kurz ins Stocken geriet, konnte ich die Frage verständlich beantworten. Am Ende durfte ich selbst noch Fragen stellen. Ich habe nach den flexiblen Arbeitszeiten und den Weiterbildungsmöglichkeiten im Betrieb gefragt.</p>
+            <p>Frau Weber meinte, dass sie diese Woche noch mit drei anderen Kandidaten sprechen werden. Bis Ende nächster Woche wollen sie mir Bescheid geben. Wenn alles klappt, könnte ich schon am 1. des nächsten Monats anfangen. Drück mir die Daumen!</p>
+            <p style={{ margin: 0 }}><strong>Liebe Grüße<br />Felix</strong></p>
           </article>
-          <div style={highlight}><strong>Beispiel 0 – Die Bio-Gasanlage ...</strong><span>a) gehört Eckhard Meier.</span><span>b) gibt es seit einem Dreivierteljahr.</span><span>c) produziert Strom und Wärme. ✅ (Lösung)</span></div>
-          <QuestionList items={energyQuestions} />
+          <QuestionList items={interviewReadingQuestions} />
           <WorkbookSubmissionReminder />
           <Prepared checked={prepared.lesen} onChange={mark("lesen")} />
         </section>
