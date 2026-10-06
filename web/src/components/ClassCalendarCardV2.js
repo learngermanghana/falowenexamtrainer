@@ -426,6 +426,7 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, ho
                 locale={locale}
                 fullCalendarLink={fullCalendarLink}
                 updating={canonicalStatus === "loading" || canonicalStatus === "cached"}
+                simple
               />
             ) : (
               <section style={{ ...infoCardStyle, background: "#f8fafc" }}>
