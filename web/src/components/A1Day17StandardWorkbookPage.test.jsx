@@ -68,11 +68,11 @@ describe("A1 Day 17 native standard workbook", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 1/i }));
     expect(screen.getByRole("heading", { name: /Der Weg von der Touristeninformation zum Schiff/i })).toBeVisible();
-    expect(screen.getByText(/Nach insgesamt 10 Minuten zu Fuß/i)).toBeVisible();
+    expect(screen.getByText("10 Minuten zu Fuß")).toBeVisible();
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 2/i }));
     expect(screen.getByRole("heading", { name: /Hören: Wegbeschreibung zum Bahnhof/i })).toBeVisible();
-    fireEvent.click(screen.getByRole("button", { name: "Hören starten" }));
+    expect(screen.queryByRole("button", { name: "Hören starten" })).not.toBeInTheDocument();
 
     expect(fetchA1AudioPlaybackUrl).toHaveBeenCalledWith({
       day: 17,

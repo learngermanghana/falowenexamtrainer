@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
-import { useAuth } from "../context/AuthContext";
-import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
+import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
 import { styles } from "../styles";
 
 const DAY22_ASSIGNMENT_KEY = "A1-14.1";
@@ -263,28 +262,7 @@ const Teil2Content = () => (
 );
 
 const Teil3Content = () => {
-  const { idToken } = useAuth();
-  const [audioUrl, setAudioUrl] = useState("");
-  const [audioError, setAudioError] = useState("");
-  const [loadingAudio, setLoadingAudio] = useState(false);
 
-  const loadAudio = async () => {
-    if (audioUrl || loadingAudio) return;
-    setLoadingAudio(true);
-    setAudioError("");
-    try {
-      const playback = await fetchA1AudioPlaybackUrl({
-        day: 22,
-        key: DAY22_AUDIO_KEY,
-        idToken,
-      });
-      setAudioUrl(playback.url);
-    } catch (error) {
-      setAudioError(error?.response?.data?.error || error?.message || "Audio could not be loaded.");
-    } finally {
-      setLoadingAudio(false);
-    }
-  };
 
   return (
     <section style={sectionStyle} data-a1-day22-health-teil="3">
@@ -293,16 +271,7 @@ const Teil3Content = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Aufgabe:</strong> Hören Sie die Nachricht aus der Arztpraxis zweimal. Wählen Sie bei jeder Frage A, B oder C.
         </p>
-        {!audioUrl ? (
-          <button type="button" onClick={loadAudio} disabled={loadingAudio} style={{ justifySelf: "start" }}>
-            {loadingAudio ? "Audio wird geladen …" : "Hören starten"}
-          </button>
-        ) : (
-          <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }}>
-            Ihr Browser unterstützt dieses Audio nicht.
-          </audio>
-        )}
-        {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
+        <A1ProtectedAudioPlayer day={22} audioKey={DAY22_AUDIO_KEY} />
       </div>
 
       {healthListeningQuestions.map((item, index) => (

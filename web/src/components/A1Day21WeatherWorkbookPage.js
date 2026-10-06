@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
-import { useAuth } from "../context/AuthContext";
-import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
+import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
 import { styles } from "../styles";
 
 const DAY21_ASSIGNMENT_KEY = "A1-13";
@@ -231,28 +230,7 @@ const Teil3Content = () => (
 
 
 const Teil4Content = () => {
-  const { idToken } = useAuth();
-  const [audioUrl, setAudioUrl] = useState("");
-  const [audioError, setAudioError] = useState("");
-  const [loadingAudio, setLoadingAudio] = useState(false);
 
-  const loadAudio = async () => {
-    if (audioUrl || loadingAudio) return;
-    setLoadingAudio(true);
-    setAudioError("");
-    try {
-      const playback = await fetchA1AudioPlaybackUrl({
-        day: 21,
-        key: DAY21_AUDIO_KEY,
-        idToken,
-      });
-      setAudioUrl(playback.url);
-    } catch (error) {
-      setAudioError(error?.response?.data?.error || error?.message || "Audio could not be loaded.");
-    } finally {
-      setLoadingAudio(false);
-    }
-  };
 
   return (
     <section style={card} data-a1-day21-weather-teil="4">
@@ -262,16 +240,7 @@ const Teil4Content = () => {
           <b>Instruction:</b> Listen to Anna’s message twice. Choose A, B or C for each question.
           Pay attention to the weather, days and appointment times.
         </p>
-        {!audioUrl ? (
-          <button type="button" onClick={loadAudio} disabled={loadingAudio} style={{ justifySelf: "start" }}>
-            {loadingAudio ? "Audio wird geladen …" : "Hören starten"}
-          </button>
-        ) : (
-          <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }}>
-            Ihr Browser unterstützt dieses Audio nicht.
-          </audio>
-        )}
-        {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
+        <A1ProtectedAudioPlayer day={21} audioKey={DAY21_AUDIO_KEY} />
       </div>
 
       {DAY21_LISTENING_QUESTIONS.map((item, index) => (
