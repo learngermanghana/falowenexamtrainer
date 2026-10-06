@@ -130,20 +130,32 @@ Wohnung C: WG-Zimmer, 20 m², 430 Euro warm. Küche und Bad gemeinsam. Direkt an
   },
   8: {
     chapter: "3.8",
-    format: "Rezept",
-    title: "Nudeln mit Gemüse",
-    strategy: "Bei Rezepten sind Reihenfolge, Mengen und Imperativformen wichtig. Suche nach zuerst, dann und zum Schluss.",
-    text: `Nudeln mit Gemüse – für zwei Personen
+    format: "Goethe A2 · Lesen",
+    title: "Im Restaurant Seeblick am Hafen",
+    strategy: "Lies den Dialog und achte besonders auf Reservierung, Empfehlung, Getränk, Reaktion auf das Essen und Trinkgeld.",
+    text: `Kellner: Guten Abend! Herzlich willkommen im Restaurant Seeblick. Haben Sie reserviert?
+Gast: Guten Abend! Nein, ich habe nicht reserviert. Ich bin alleine. Ist noch ein Platz frei?
+Kellner: Ja, natürlich! Hier am Fenster ist noch ein schöner Tisch frei. Hier ist die Speisekarte.
+Gast: Vielen Dank! Was können Sie mir empfehlen? Ich möchte gerne frischen Fisch essen.
+Kellner: Unser Fischgericht des Tages ist gebratenes Fischfilet mit Kartoffeln und Salat für 18.50 €. Das schmeckt hervorragend.
+Gast: Das klingt lecker! Das nehme ich. Und bringen Sie mir bitte ein Mineralwasser ohne Kohlensäure.
+Kellner: Sehr gerne! Kommt sofort.
 
-Du brauchst: 200 g Nudeln, eine Paprika, eine kleine Zucchini, eine Zwiebel, zwei Tomaten, Öl, Salz und Pfeffer.
+Nach dem Essen
 
-Koche zuerst die Nudeln in Salzwasser. Schneide in der Zwischenzeit das Gemüse klein. Gib etwas Öl in eine Pfanne und brate zuerst die Zwiebel. Dann kommen Paprika und Zucchini dazu. Nach fünf Minuten gibst du die Tomaten in die Pfanne. Mische zum Schluss die Nudeln mit dem Gemüse und würze alles mit Salz und Pfeffer.`,
+Kellner: Hat es Ihnen geschmeckt? War alles in Ordnung?
+Gast: Ja, wunderbar! Das Essen war ausgezeichnet. Ich möchte bitte bezahlen.
+Kellner: Zahlen Sie bar oder mit Karte?
+Gast: Ich bezahle mit Karte.
+Kellner: Das macht zusammen 21.00 € mit dem Getränk.
+Gast: Hier bitte. Machen Sie 23.00 €. Der Rest ist für Sie!
+Kellner: Vielen Dank! Ich wünsche Ihnen noch einen schönen Abend.`,
     questions: [
-      { stem: "Für wie viele Personen ist das Rezept?", options: ["A) Für eine Person", "B) Für zwei Personen", "C) Für drei Personen", "D) Für vier Personen"] },
-      { stem: "Was soll man zuerst kochen?", options: ["A) Die Tomaten", "B) Die Nudeln", "C) Die Zwiebel", "D) Die Paprika"] },
-      { stem: "Welches Gemüse kommt zuerst in die Pfanne?", options: ["A) Die Zwiebel", "B) Die Tomaten", "C) Die Zucchini", "D) Die Paprika"] },
-      { stem: "Wann kommen die Tomaten in die Pfanne?", options: ["A) Sofort am Anfang", "B) Nach fünf Minuten", "C) Nach dem Essen", "D) Gleichzeitig mit den Nudeln ins Wasser"] },
-      { stem: "Was macht man ganz zum Schluss?", options: ["A) Man schneidet die Zwiebel.", "B) Man kauft Gemüse.", "C) Man mischt Nudeln und Gemüse und würzt.", "D) Man kocht Wasser."] },
+      { stem: "Hat der Gast vorher einen Tisch im Restaurant reserviert?", options: ["A) Ja, er hat vor zwei Tagen reserviert.", "B) Nein, er kommt ohne Reservierung ins Restaurant.", "C) Er hat für eine Gruppe reserviert."] },
+      { stem: "Welche Empfehlung gibt der Kellner dem Gast?", options: ["A) Eine Gemüsesuppe", "B) Gebratenes Fischfilet mit Kartoffeln und Salat", "C) Einen Teller Pasta"] },
+      { stem: "Was bestellt der Gast zum Trinken?", options: ["A) Einen Apfelsaft", "B) Ein Glas Rotwein", "C) Ein Mineralwasser ohne Kohlensäure"] },
+      { stem: "Wie reagiert der Gast auf die Frage, ob das Essen geschmeckt hat?", options: ["A) Er findet das Essen ausgezeichnet und lobt es.", "B) Er beschwert sich, weil das Essen kalt war.", "C) Er antwortet gar nicht."] },
+      { stem: "Wie viel Trinkgeld gibt der Gast beim Bezahlen?", options: ["A) Er gibt kein Trinkgeld.", "B) Er gibt 2.00 € Trinkgeld (er rundet von 21.00 € auf 23.00 € auf).", "C) Er gibt 10.00 € Trinkgeld."] },
     ],
   },
   9: {
