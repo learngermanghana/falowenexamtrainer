@@ -1170,6 +1170,7 @@ const AppShell = ({
           <Route path="/attendance/:className" element={<LegacyAttendanceRedirect />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
+          <Route path="/exams/:section/:practiceLevel/:sampleId" element={<ExamArea onBack={goHome} />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -1420,7 +1421,7 @@ const CampusArea = ({
 
 const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
-  const { section } = useParams();
+  const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
   const { level, setLevel } = useExam();
   const { studentProfile } = useAuth();
@@ -1485,6 +1486,7 @@ const ExamArea = ({ onBack }) => {
     { key: "overview", label: "Overview" },
     { key: "mocks", label: "Mock Exams" },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
+    { key: "horen", label: t("appNav.examTabs.horen") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
@@ -1610,8 +1612,8 @@ const ExamArea = ({ onBack }) => {
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
-      {examSection === "horen" ? <HorenPage /> : null}
-      {examSection === "lesen" ? <LesenPage /> : null}
+      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
+      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
     </>
