@@ -71,7 +71,7 @@ export const A2_GOETHE_LISTENING_TEIL3 = Object.freeze({
   ],
 });
 
-const Picture = ({ icon }) => {
+export const A2ListeningTeil3Picture = ({ icon }) => {
   const render = {
     juice: <><div className="a2-t3-bottle">O</div><div className="a2-t3-glass" /></>,
     cake: <><div className="a2-t3-cake">🎂</div></>,
@@ -176,7 +176,7 @@ export default function A2GoetheListeningMockTeil3Preview() {
                       onChange={() => setAnswers((current) => ({ ...current, [question.number]: option.id }))}
                     />
                     <span className="a2-t3-letter">{option.id}</span>
-                    <Picture icon={option.icon} />
+                    <A2ListeningTeil3Picture icon={option.icon} />
                     <span className="a2-t3-hidden-label">{option.label}</span>
                   </label>
                 ))}
