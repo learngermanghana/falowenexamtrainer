@@ -68,4 +68,33 @@ describe("background push contract", () => {
     expect(functionsIndex).toContain("findOwnedMessagingToken");
     expect(functionsIndex).toContain("Background push is working on this device.");
   });
+  test("iPhone push setup is gated by the installed Home Screen context", () => {
+    const firebaseClient = fs.readFileSync(
+      path.join(process.cwd(), "src", "firebase.js"),
+      "utf8"
+    );
+    const authContext = fs.readFileSync(
+      path.join(process.cwd(), "src", "context", "AuthContext.js"),
+      "utf8"
+    );
+    const settings = fs.readFileSync(
+      path.join(process.cwd(), "src", "components", "NotificationSettingsCard.js"),
+      "utf8"
+    );
+    const manifest = JSON.parse(
+      fs.readFileSync(path.join(process.cwd(), "public", "manifest.json"), "utf8")
+    );
+
+    expect(firebaseClient).toContain("const getPushEnvironment = () =>");
+    expect(firebaseClient).toContain("environment.ios && !environment.standalone");
+    expect(firebaseClient.indexOf("ensureNotificationPermission()")).toBeLessThan(
+      firebaseClient.indexOf("isSupported().catch")
+    );
+    expect(authContext).toContain("if (!pushEnvironment.notificationApi)");
+    expect(settings).toContain("Home Screen app");
+    expect(settings).toContain("Web Push unavailable");
+    expect(manifest.display).toBe("standalone");
+    expect(manifest.id).toBe("/");
+  });
+
 });
