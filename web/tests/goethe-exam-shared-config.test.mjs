@@ -51,7 +51,8 @@ test("Exam File gives students registration, sample and structure guidance witho
   assert.match(examFile, /The registration link is the same for every date/);
   assert.match(examFile, /Registration: \{formatDate\(exam\.registrationStart\)\}/);
   assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
-  assert.match(examFile, /Checking the latest exam dates/);\n  assert.doesNotMatch(examFile, /Schedule synced from Falowen Admin|last saved schedule|built-in schedule/);
+  assert.match(examFile, /Checking the latest exam dates/);
+  assert.doesNotMatch(examFile, /Schedule synced from Falowen Admin|last saved schedule|built-in schedule/);
 
   assert.doesNotMatch(examFile, /downloadExamReminder/);
   assert.doesNotMatch(examFile, /Add exam reminder/);
