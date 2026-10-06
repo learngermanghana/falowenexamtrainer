@@ -431,18 +431,38 @@ Am Abend haben sie um 19 Uhr einen Tisch in einem Restaurant reserviert. Danach 
   },
   22: {
     chapter: "8.22",
-    format: "Wochenplan",
-    title: "Eine volle Woche",
-    strategy: "Ordne die Informationen nach Wochentagen. Dadurch findest du Details schneller.",
-    text: `Nina arbeitet von Montag bis Freitag in einem Büro. Am Montag hat sie nach der Arbeit einen Deutschkurs. Dienstagabend geht sie ins Fitnessstudio. Am Mittwoch arbeitet sie im Homeoffice, deshalb kann sie in der Mittagspause einen Arzttermin wahrnehmen. Donnerstag trifft sie nach der Arbeit eine Freundin im Café. Am Freitag macht Nina keine Termine am Abend, weil sie sich ausruhen möchte.
+    format: "Touristeninformation",
+    title: "In der Touristeninformation Hamburg",
+    strategy: "Lies zuerst die Frage und suche dann gezielt nach Zeit, Preis, Ort oder Vorteil im Gespräch.",
+    text: `Tourist: Guten Tag! Ich bin zum ersten Mal in Hamburg und bleibe nur zwei Tage. Was kann ich hier sehen und erleben?
 
-Am Samstag erledigt sie ihren Einkauf und putzt die Wohnung. Wenn sie danach noch Zeit hat, besucht sie ihre Schwester. Am Sonntag lernt sie am Vormittag und geht am Nachmittag spazieren. Nina trägt alle Termine in ihren Kalender ein, damit sie nichts vergisst.`,
+Mitarbeiterin: Am besten machen Sie eine Hafenrundfahrt. Das Schiff fährt jede Stunde, und die Fahrt dauert eine Stunde. Ein Ticket kostet 25 €, mit der Gästekarte bezahlen Sie nur 20 €. Das Schiff fährt an den Landungsbrücken ab.
+
+Tourist: Was ist eine Gästekarte?
+
+Mitarbeiterin: Mit der Gästekarte fahren Sie zwei Tage lang mit Bus und Bahn und bekommen Rabatt im Museum. Sie kostet 12 €.
+
+Tourist: Dann nehme ich eine Gästekarte, bitte. Gibt es heute Abend ein Konzert?
+
+Mitarbeiterin: Ja, in der Elbphilharmonie spielt heute Abend um 20 Uhr ein Orchester. Karten gibt es leider nur noch auf den hinteren Plätzen.
+
+Tourist: Wo kann ich vorher noch gut Fisch essen?
+
+Mitarbeiterin: Im Hafen gibt es viele Restaurants. Das Restaurant Seeblick ist besonders gut und nicht teuer.
+
+Tourist: Und für morgen? Ich möchte gern ein Museum besuchen.
+
+Mitarbeiterin: Besuchen Sie das Hafenmuseum. Es ist klein und sehr interessant, zwei Stunden reichen dort. Danach können Sie im Stadtpark spazieren gehen.
+
+Mitarbeiterin: Hier ist auch ein Stadtplan, auf dem ich das Schiff, das Restaurant und das Museum markiert habe.`,
     questions: [
-      { stem: "Was macht Nina am Montag nach der Arbeit?", options: ["A) Sie besucht einen Deutschkurs.", "B) Sie geht zum Arzt.", "C) Sie trifft ihre Schwester.", "D) Sie arbeitet im Homeoffice."] },
-      { stem: "Warum kann Nina am Mittwoch mittags zum Arzt?", options: ["A) Sie hat Urlaub.", "B) Sie arbeitet im Homeoffice.", "C) Das Büro ist geschlossen.", "D) Sie arbeitet nur abends."] },
-      { stem: "Wann trifft Nina eine Freundin?", options: ["A) Dienstag", "B) Mittwoch", "C) Donnerstag", "D) Sonntag"] },
-      { stem: "Was macht Nina am Samstag?", options: ["A) Einkauf und Wohnung putzen", "B) Deutschkurs und Fitnessstudio", "C) Arzttermin und Café", "D) Nur lernen"] },
-      { stem: "Warum trägt Nina ihre Termine in den Kalender ein?", options: ["A) Damit sie nichts vergisst.", "B) Weil sie keinen Computer hat.", "C) Damit sie später arbeitet.", "D) Weil sie keine Freizeit möchte."] },
+      { stem: "Wie lange bleibt der Tourist in Hamburg?", options: ["A) Nur einen Tag", "B) Zwei Tage", "C) Eine ganze Woche"] },
+      { stem: "Wie viel kostet die Hafenrundfahrt mit der Gästekarte?", options: ["A) 12 €", "B) 20 €", "C) 25 €"] },
+      { stem: "Wo startet das Schiff für die Hafenrundfahrt?", options: ["A) Am Stadtpark", "B) An der Elbphilharmonie", "C) An den Landungsbrücken"] },
+      { stem: "Welchen Vorteil bietet die Gästekarte?", options: ["A) Freie Fahrt mit Bus und Bahn für zwei Tage", "B) Kostenloses Abendessen im Restaurant", "C) Freie Wahl der besten Plätze in der Elbphilharmonie"] },
+      { stem: "Wann beginnt das Konzert in der Elbphilharmonie?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Welches Restaurant wird für frischen Fisch empfohlen?", options: ["A) Hafenmuseum", "B) Seeblick", "C) Landungsbrücken"] },
+      { stem: "Wie viel Zeit sollte man für das Hafenmuseum einplanen?", options: ["A) Ungefähr zwei Stunden", "B) Den ganzen Tag", "C) Nur 10 Minuten"] },
     ],
   },
   23: {
