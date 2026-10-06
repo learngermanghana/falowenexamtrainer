@@ -29,9 +29,13 @@ describe("homepage and Exams Room student-facing cleanup", () => {
   test("compact homepage class area contains only next class and Zoom, not the long class feed", () => {
     const canonicalStart = classCardSource.indexOf("{canonicalSummary ? (");
     const compactStart = classCardSource.indexOf("homepageCompact ? (", canonicalStart);
-    const fullStart = classCardSource.indexOf(") : (", compactStart);
+    const zoomIndex = classCardSource.indexOf("<HomeZoomAccessCard", compactStart);
+    const fullStart = classCardSource.indexOf("        ) : (\n        <>", zoomIndex);
     const compactBranch = classCardSource.slice(compactStart, fullStart);
 
+    expect(compactStart).toBeGreaterThan(canonicalStart);
+    expect(zoomIndex).toBeGreaterThan(compactStart);
+    expect(fullStart).toBeGreaterThan(zoomIndex);
     expect(compactBranch).toContain("<NextLiveClassCard");
     expect(compactBranch).toContain("simple");
     expect(compactBranch).toContain("<HomeZoomAccessCard");
