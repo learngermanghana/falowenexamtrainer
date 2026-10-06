@@ -587,7 +587,7 @@ export const B1_READING_TASKS = Object.freeze({
   11: Object.freeze({ assignmentKey: "B1-4.11", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1C, 2B, 3C …" }),
   19: Object.freeze({ assignmentKey: "B1-6.19", title: "Lesen · Das Vorstellungsgespräch", instructions: "Lies die E-Mail von Felix an Sarah und die Aufgaben 1–7. Wähle bei jeder Aufgabe die richtige Lösung A, B oder C.", submissionNote: "Submit only answer letters, for example: 1B, 2B, 3A." }),
   20: Object.freeze({ assignmentKey: "B1-6.20", title: "Lesen Sie den Blogeintrag und beantworten Sie alle sechs Richtig/Falsch-Fragen.", instructions: "Lesen Sie zuerst den vollständigen Text. Entscheiden Sie danach bei jeder Aussage: A) Richtig oder B) Falsch.", submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3A …" }),
-  22: Object.freeze({ assignmentKey: "B1-7.22", title: "Lesen Sie den Text Berlin und beantworten Sie alle fünf Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1D, 2B, 3D …" }),
+  22: Object.freeze({ assignmentKey: "B1-7.22", title: "Lesen · Was ist dir in einer Beziehung wichtig?", instructions: "Lies den Text und die Aufgaben 1–7. Wähle bei jeder Aufgabe die richtige Lösung A, B oder C.", submissionNote: "Submit only the answer letters in this format: 1B, 2B, 3B …" }),
 });
 
 export function getB1ReadingTask(day) {
