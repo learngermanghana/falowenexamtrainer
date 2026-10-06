@@ -74,10 +74,6 @@ const normalizeDay = (level, value) => {
   const allowedDays = COURSE_LISTENING_DAYS[normalizedLevel];
   const raw = clean(value);
 
-  if (normalizedLevel === "A1" && raw === "14.1" && allowedDays?.has("14.1")) {
-    return "14.1";
-  }
-
   const day = Number(raw);
   return Number.isInteger(day) && allowedDays?.has(day) ? day : null;
 };
