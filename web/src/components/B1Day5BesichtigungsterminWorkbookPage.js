@@ -67,13 +67,13 @@ const speakingSupport = [
 ];
 
 const readingQuestions = [
-  { stem: "1. Wann fand der Besichtigungstermin statt?", options: ["a) Am Freitag um 14:00 Uhr", "b) Am Samstag um 14:00 Uhr", "c) Am Sonntag um 15:00 Uhr", "d) Am Samstag um 16:00 Uhr"] },
-  { stem: "2. Wie wurde die Wohnung beschrieben?", options: ["a) Klein und dunkel", "b) Hell und geräumig", "c) Alt und renovierungsbedürftig", "d) Eng und dunkel"] },
-  { stem: "3. Was gefiel Anna besonders an der Wohnung?", options: ["a) Die Lage", "b) Die Badewanne", "c) Der Boden", "d) Die Fenster"] },
-  { stem: "4. Wie hoch war die verlangte Kaution?", options: ["a) Eine Monatsmiete", "b) Zwei Monatsmieten", "c) Drei Monatsmieten", "d) Vier Monatsmieten"] },
-  { stem: "5. Wann wäre die Wohnung verfügbar?", options: ["a) Ab dem ersten des nächsten Monats", "b) Sofort", "c) In zwei Monaten", "d) Ab dem nächsten Jahr"] },
-  { stem: "6. Welche Vertragsdauer wurde besprochen?", options: ["a) Sechs Monate", "b) Ein Jahr", "c) Zwei Jahre", "d) Drei Jahre"] },
-  { stem: "7. Wie reagierte Anna am nächsten Tag?", options: ["a) Sie entschied sich, die Wohnung nicht zu nehmen.", "b) Sie wollte mehr Zeit zum Überlegen.", "c) Sie entschied sich, die Wohnung zu mieten.", "d) Sie konnte den Vermieter nicht erreichen."] },
+  { stem: "1. Seit wann sucht Laura bereits nach einer Wohnung?", options: ["a) Seit zwei Wochen", "b) Seit drei Monaten", "c) Seit einem halben Jahr"] },
+  { stem: "2. Wie organisierte der Vermieter die Besichtigung?", options: ["a) Alle Interessenten mussten die Wohnung gleichzeitig besichtigen.", "b) Die Bewerber durften die Räume einzeln nacheinander ansehen.", "c) Er zeigte nur den ersten drei Personen die Wohnung."] },
+  { stem: "3. Was wird über den Balkon der Wohnung gesagt?", options: ["a) Er ist laut, weil er zur Hauptstraße zeigt.", "b) Er liegt auf der Rückseite des Hauses und ist ruhig.", "c) Er ist zu klein, um draußen zu sitzen."] },
+  { stem: "4. Wie hoch ist die Gesamtmiete (Warmmiete) pro Monat?", options: ["a) 650 Euro", "b) 750 Euro", "c) 800 Euro"] },
+  { stem: "5. Warum findet Laura den Preis trotz der höheren Kosten akzeptabel?", options: ["a) Weil die Wohnung frisch renoviert wurde und ein Garagenstellplatz dabei ist.", "b) Weil die U-Bahn nah ist und die Einbauküche bereits enthalten ist.", "c) Weil der Vermieter ihr einen Rabatt angeboten hat."] },
+  { stem: "6. Welche Unterlagen hat Laura dem Vermieter gegeben?", options: ["a) Gehaltsnachweis und Schufa-Auskunft", "b) Arbeitsvertrag und Empfehlungsschreiben", "c) Personalausweis und Kontoauszüge"] },
+  { stem: "7. Wann erfährt Laura, ob sie die Wohnung bekommt?", options: ["a) Am selben Abend", "b) Bis Freitag", "c) Erst nächsten Monat"] },
 ];
 
 const listeningQuestions = [
@@ -189,12 +189,14 @@ const B1Day5PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
             <p style={{ margin: 0 }}>{reading.instructions}</p>
           </WorkbookTaskCard>
 
-          <h3 style={{ margin: 0 }}>Eine Wohnungsbesichtigung in der Innenstadt</h3>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Anna hatte schon lange nach einer passenden Wohnung in der Innenstadt gesucht. Als sie endlich eine Anzeige für eine vielversprechende Wohnung fand, zögerte sie nicht und rief sofort den Vermieter an. Der Vermieter vereinbarte mit Anna einen Termin für den kommenden Samstag um 14:00 Uhr.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Die Wohnung befand sich in einem alten, aber gut erhaltenen Gebäude im Herzen der Stadt. In der Nähe gab es viele Geschäfte, Restaurants und öffentliche Verkehrsmittel. Die Wohnung war hell und geräumig. Die großen Fenster ließen viel Licht herein, und die hohen Decken gaben dem Raum ein luftiges Gefühl.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Die Küche war modern und gut ausgestattet. Das Badezimmer hatte eine große Badewanne, was Anna besonders gefiel. Es gab auch einen kleinen Balkon mit einem schönen Blick auf die Stadt.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Die Miete war fair, und der Vermieter verlangte eine Kaution in Höhe von zwei Monatsmieten. Die Wohnung war ab dem ersten des nächsten Monats verfügbar. Die Mietvertragsdauer betrug mindestens ein Jahr.</p>
-          <p style={{ margin: 0, lineHeight: 1.75 }}>Am nächsten Tag rief Anna den Vermieter an und sagte ihm, dass sie die Wohnung nehmen würde. Sie vereinbarten einen weiteren Termin, um den Mietvertrag zu unterschreiben und die Kaution zu übergeben.</p>
+          <h3 style={{ margin: 0 }}>Lesen Teil 1 · Der Besichtigungstermin</h3>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Betreff: Mein Besichtigungstermin heute Nachmittag – endlich eine Traumwohnung?</strong></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Lieber Simon,</strong></p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>wie du weißt, suche ich schon seit drei Monaten nach einer bezahlbaren Zwei-Zimmer-Wohnung in der Innenstadt. Heute um 16:30 Uhr hatte ich endlich einen Besichtigungstermin für eine Wohnung, die genau meinen Vorstellungen entspricht.</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>Als ich ankam, war ich überrascht: Es warteten bereits mindestens fünfzehn andere Interessenten vor der Tür. Der Vermieter, Herr Krüger, ließ uns aber glücklicherweise einzeln durch die Räume gehen, sodass man sich alles in Ruhe ansehen konnte. Die Wohnung liegt im dritten Stock eines alten, aber sehr gut gepflegten Hauses. Sie hat hohe Decken, einen Parkettboden und einen kleinen Balkon nach hinten raus, wo es sehr ruhig ist.</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>Die Kaltmiete beträgt 650 Euro, dazu kommen noch 150 Euro Nebenkosten. Das ist zwar etwas mehr, als ich ursprünglich ausgeben wollte, aber die Lage ist einfach perfekt, da ich in nur fünf Minuten zur U-Bahn-Station laufen kann. Außerdem ist die Einbauküche bereits im Preis enthalten und in sehr gutem Zustand.</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}>Herr Krüger hat gesagt, dass er bis Freitag entscheiden wird, wer die Wohnung bekommt. Ich habe ihm direkt alle meine Unterlagen übergeben, inklusive Gehaltsnachweis und Schufa-Auskunft. Jetzt kann ich nur hoffen und abwarten! Drück mir die Daumen!</p>
+          <p style={{ margin: 0, lineHeight: 1.75 }}><strong>Liebe Grüße<br />Laura</strong></p>
 
           <h3 style={sectionTitle}>Questions</h3>
           <QuestionList questions={readingQuestions} />
