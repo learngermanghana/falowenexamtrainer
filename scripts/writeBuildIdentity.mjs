@@ -34,6 +34,38 @@ const payload = {
   generatedAt: new Date().toISOString(),
 };
 
+const firebaseConfigOutputPath = path.join(
+  repoRoot,
+  "web",
+  "public",
+  "__falowen-firebase-config.js"
+);
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "",
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "",
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "",
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: process.env.REACT_APP_FIREBASE_APP_ID || "",
+};
+
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.writeFileSync(outputPath, JSON.stringify(payload, null, 2) + "\n", "utf8");
+fs.writeFileSync(
+  firebaseConfigOutputPath,
+  `self.__FALOWEN_FIREBASE_CONFIG__ = ${JSON.stringify(firebaseConfig, null, 2)};\n`,
+  "utf8"
+);
+
+const hasMessagingConfig = Boolean(
+  firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId
+);
+
 console.log(`Falowen build identity: ${commitSha || "unknown"} (${commitRef || "unknown"})`);
+console.log(
+  `Falowen background push config: ${hasMessagingConfig ? "ready" : "missing Firebase client env"}`
+);
