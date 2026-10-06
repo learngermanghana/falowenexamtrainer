@@ -25,7 +25,7 @@ export const A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   "A2-8.22": timed({ level: "A2", durationMinutes: 30, scope: "Teil 2 Schreiben and Teil 3 Lesen", timedTabs: ["schreiben", "lesen"], preparationLabel: A2_B1_PREP }),
   "A2-9.23": timed({ level: "A2", durationMinutes: 10, scope: "Teil 3 Lesen", timedTabs: ["lesen"], preparationLabel: A2_B1_PREP }),
   "A2-9.24": timed({ level: "A2", durationMinutes: 40, scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören", timedTabs: ["schreiben", "lesen", "hoeren"], preparationLabel: A2_B1_PREP }),
-  "A2-9.25": timed({ level: "A2", durationMinutes: 45, scope: "Teil 3 Lesen", timedTabs: ["lesen"], preparationLabel: A2_B1_PREP }),
+  "A2-9.25": timed({ level: "A2", durationMinutes: 10, scope: "Teil 3 Lesen", timedTabs: ["lesen"], preparationLabel: A2_B1_PREP }),
   "A2-10.26": timed({ level: "A2", durationMinutes: 45, scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören", timedTabs: ["schreiben", "lesen", "hoeren"], preparationLabel: A2_B1_PREP }),
   "A2-10.27": timed({ level: "A2", durationMinutes: 45, scope: "Teil 3 Lesen and Teil 4 Hören", timedTabs: ["lesen", "hoeren"], preparationLabel: A2_B1_PREP, mode: "mock" }),
   "A2-10.28": timed({ level: "A2", durationMinutes: 45, scope: "Teil 2 Schreiben, Teil 3 Lesen and Teil 4 Hören", timedTabs: ["schreiben", "lesen", "hoeren"], preparationLabel: A2_B1_PREP, mode: "mock" }),
