@@ -4,10 +4,16 @@ importScripts(
   "https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js"
 );
 
+try {
+  importScripts("/__falowen-firebase-config.js");
+} catch (error) {
+  console.warn("Falowen background push config could not be loaded", error);
+}
+
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v15`;
+const CACHE_NAME = `${CACHE_PREFIX}-v16`;
 const OFFLINE_URL = "/offline.html";
 const VERSIONED_ASSET_PREFIX = "/assets/";
 const BUILD_ASSET_MANIFEST_URL = "/offline-build-assets.json";
@@ -115,7 +121,9 @@ const resolveNotificationContent = (payload = {}) => {
 function initializeMessaging(config) {
   if (!config || messaging || !config.apiKey) return;
 
-  firebase.initializeApp(config);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+  }
   messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
@@ -128,6 +136,10 @@ function initializeMessaging(config) {
     });
   });
 }
+
+// Initialize immediately so a push can wake this service worker from a cold
+// browser/app state without requiring an open Falowen page to post INIT_FIREBASE.
+initializeMessaging(self.__FALOWEN_FIREBASE_CONFIG__);
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
