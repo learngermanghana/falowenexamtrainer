@@ -448,7 +448,7 @@ const registerMessagingServiceWorker = async () => {
   }
 
   messagingServiceWorkerRegistrationPromise = navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
+    .register("/firebase-messaging-sw.js", { updateViaCache: "none" })
     .then(() => navigator.serviceWorker.ready)
     .then(sendFirebaseConfigToServiceWorker)
     .catch((error) => {
