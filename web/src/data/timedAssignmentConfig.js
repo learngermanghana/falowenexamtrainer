@@ -123,9 +123,9 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   }),
   "A2-9.23": timed({
     level: "A2",
-    durationMinutes: 40,
-    scope: "Teil 2 Schreiben and Teil 3 Lesen",
-    timedTabs: ["schreiben", "lesen"],
+    durationMinutes: 10,
+    scope: "Teil 3 Lesen",
+    timedTabs: ["lesen"],
     preparationLabel: A2_B1_PREP,
   }),
   "A2-9.24": timed({
