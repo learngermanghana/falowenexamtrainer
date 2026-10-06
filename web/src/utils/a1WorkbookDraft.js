@@ -9,6 +9,7 @@ const normalizeAssignmentKey = (value = "") =>
 const READING_REVISIONS = {
   "A1-7": { revision: "thomas-time-and-new-listening-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-8": { revision: "hamburg-message-and-berlin-train-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
+  "A1-11": { revision: "directions-reading-and-listening-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
 };
