@@ -192,6 +192,7 @@ import AttendanceCheckinCard from "./components/AttendanceCheckinCard";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
 import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
+import PublicExamPracticePage from "./components/PublicExamPracticePage";
 import PublicAdmissionsVisitorGuidePage from "./components/PublicAdmissionsVisitorGuidePage";
 import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
@@ -402,6 +403,11 @@ function App() {
 
   if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
     return <PublicAdmissionsVisitorGuidePage />;
+  }
+
+  const publicExamPracticeMatch = location.pathname.match(/^\/exam-practice(?:\/(a1|a2|b1))?\/?$/i);
+  if (publicExamPracticeMatch) {
+    return <PublicExamPracticePage level={String(publicExamPracticeMatch[1] || "").toUpperCase()} />;
   }
 
   if (!isFirebaseConfigured) {
