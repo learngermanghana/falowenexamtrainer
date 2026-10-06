@@ -99,7 +99,7 @@ const NotificationSettingsCard = () => {
 
     setIsTesting(true);
     setTestMessage(
-      "Test scheduled. Lock your screen now. Falowen will send the notification in about 8 seconds."
+      "Test scheduled. Lock your screen now. The notification should arrive in about 8 seconds."
     );
 
     try {
@@ -150,7 +150,7 @@ const NotificationSettingsCard = () => {
           onClick={handleTestPush}
           disabled={isTesting || notificationStatus !== "granted" || !messagingToken}
         >
-          {isTesting ? "Sending test..." : "Send screen-off test"}
+          {isTesting ? "Sending test..." : "Send test notification"}
         </button>
       </div>
 
@@ -160,7 +160,6 @@ const NotificationSettingsCard = () => {
       <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}><strong>Android / Chrome:</strong> tap Enable notifications and allow the browser permission.</p>
         <p style={{ margin: 0 }}><strong>iPhone:</strong> add Falowen to your Home Screen first, open it from the Home Screen icon, then enable notifications.</p>
-        <p style={{ margin: 0 }}><strong>Screen off:</strong> use Send screen-off test, then lock the phone. Falowen sends the test from the backend after about 8 seconds.</p>
       </div>
     </section>
   );
