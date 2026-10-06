@@ -47,11 +47,11 @@ for (const marker of [
 }
 
 const listening = A2_LISTENING_TASKS[23];
-if (listening?.mode !== A2_LISTENING_MODES.SELF_CHECK) {
-  throw new Error("A2 Day 23 canonical Hören must remain Goethe self-check practice.");
+if (listening?.mode !== A2_LISTENING_MODES.NONE) {
+  throw new Error("A2 Day 23 must not expose a Teil 4 Hören section.");
 }
-if (!String(listening.audioUrl || "").includes("6DA1dYfqEZo")) {
-  throw new Error("A2 Day 23 canonical Hören video changed unexpectedly.");
+if (String(listening.audioUrl || "") !== "" || (listening.questions || []).length !== 0) {
+  throw new Error("A2 Day 23 no-Hören source must keep audio and questions empty.");
 }
 
-console.log("A2 Day 23 uses canonical Lesen and canonical Hören self-check in the shared workbook shell.");
+console.log("A2 Day 23 uses canonical Markus Lesen with no Teil 4 Hören in the shared workbook shell.");

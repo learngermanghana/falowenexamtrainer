@@ -130,7 +130,7 @@ describe("shared A2 workbook regression", () => {
   it("preserves the already-clean Day 27 digital communication lesson", () => {
     expect(day27).toContain('chapter="10.27"');
     expect(day27).toContain("Digitale Kommunikation");
-    expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
+    expect(A2_READING_TASKS[27].title).toBe("Digitale Mitteilungen & Online-Anzeigen");
     expect(day27).toContain("A2Days26To28LearningUpgrade");
     expect(A2_LISTENING_TASKS[27].audioKey).toBe("a2/day-27/day-27.mp3");
     expect(A2_LISTENING_TASKS[27].audioUrl).toBe("");

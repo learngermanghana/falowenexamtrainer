@@ -35,7 +35,7 @@ describe("A2 Days 23-28 assessment integrity", () => {
   });
 
   test("Day 27 keeps digital-communication Lesen and protected graded Hören", () => {
-    expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
+    expect(A2_READING_TASKS[27].title).toBe("Digitale Mitteilungen & Online-Anzeigen");
     expect(A2_READING_TASKS[27].questions).toHaveLength(5);
     expect(A2_LISTENING_TASKS[27].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(A2_LISTENING_TASKS[27].audioKey).toBe("a2/day-27/day-27.mp3");
