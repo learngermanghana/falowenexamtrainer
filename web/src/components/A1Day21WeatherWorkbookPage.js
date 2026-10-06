@@ -19,7 +19,7 @@ const DAY21_WORKBOOK_TABS = Object.freeze([
 const headerImage =
   "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80";
 
-const DAY13_AUDIO_KEY = "a1/day-13/day-13.mp3";
+const DAY21_AUDIO_KEY = "a1/day-21/day-21.mp3";
 
 const DAY13_LISTENING_QUESTIONS = Object.freeze([
   {
@@ -242,8 +242,8 @@ const Teil4Content = () => {
     setAudioError("");
     try {
       const playback = await fetchA1AudioPlaybackUrl({
-        day: 13,
-        key: DAY13_AUDIO_KEY,
+        day: 21,
+        key: DAY21_AUDIO_KEY,
         idToken,
       });
       setAudioUrl(playback.url);
