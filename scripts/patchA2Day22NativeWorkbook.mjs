@@ -44,11 +44,11 @@ for (const marker of retiredMarkers) {
 }
 
 const listening = A2_LISTENING_TASKS[22];
-if (listening?.mode !== A2_LISTENING_MODES.SELF_CHECK) {
-  throw new Error("A2 Day 22 canonical Hören must remain Goethe self-check practice.");
+if (listening?.mode !== A2_LISTENING_MODES.NONE) {
+  throw new Error("A2 Day 22 must not expose a Teil 4 Hören section.");
 }
-if (!String(listening.audioUrl || "").includes("wK9JOG5lhdc")) {
-  throw new Error("A2 Day 22 canonical Hören video changed unexpectedly.");
+if (String(listening.audioUrl || "") !== "" || (listening.questions || []).length !== 0) {
+  throw new Error("A2 Day 22 no-Hören source must keep audio and questions empty.");
 }
 
-console.log("A2 Day 22 uses the shared shell with canonical Lesen and canonical Hören self-check sources.");
+console.log("A2 Day 22 uses the shared shell with canonical Hamburg Lesen and no Teil 4 Hören.");
