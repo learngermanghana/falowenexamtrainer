@@ -1,10 +1,15 @@
 import React, { useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { functions, httpsCallable } from "../firebase";
+import { functions, getPushEnvironment, httpsCallable } from "../firebase";
 import { styles } from "../styles";
 
 const getBrowserPermission = () => {
-  if (typeof Notification === "undefined") return "unsupported";
+  const environment = getPushEnvironment();
+  if (!environment.notificationApi) {
+    if (environment.ios && !environment.standalone) return "Home Screen app required";
+    if (environment.ios && environment.standalone) return "Web Push unavailable";
+    return "unsupported";
+  }
   return Notification.permission || "default";
 };
 
@@ -55,6 +60,7 @@ const NotificationSettingsCard = () => {
   const [message, setMessage] = useState("");
   const [testMessage, setTestMessage] = useState("");
   const [browserPermission, setBrowserPermission] = useState(getBrowserPermission);
+  const pushEnvironment = getPushEnvironment();
 
   const copy = statusCopy[notificationStatus] || statusCopy.idle;
   const toneStyle = getToneStyle(copy.tone);
@@ -135,6 +141,12 @@ const NotificationSettingsCard = () => {
       </div>
 
       <div style={{ ...styles.card, margin: "10px 0 0", background: "#f8fafc" }}>
+        {pushEnvironment.ios ? (
+          <div style={styles.metaRow}>
+            <span>Home Screen app</span>
+            <strong>{pushEnvironment.standalone ? "Yes" : "No"}</strong>
+          </div>
+        ) : null}
         <div style={styles.metaRow}><span>Browser permission</span><strong>{browserPermission}</strong></div>
         <div style={styles.metaRow}><span>Saved devices</span><strong>{deviceCount}</strong></div>
         <div style={styles.metaRow}><span>This account</span><strong>{studentProfile?.email || studentProfile?.studentCode || "Student"}</strong></div>
@@ -159,7 +171,9 @@ const NotificationSettingsCard = () => {
 
       <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}><strong>Android / Chrome:</strong> tap Enable notifications and allow the browser permission.</p>
-        <p style={{ margin: 0 }}><strong>iPhone:</strong> add Falowen to your Home Screen first, open it from the Home Screen icon, then enable notifications.</p>
+        <p style={{ margin: 0 }}>
+          <strong>iPhone:</strong> open Falowen from the Home Screen icon, then tap Enable notifications. If the row above says “Home Screen app: No” or “Web Push unavailable”, remove the old icon, open <strong>www.falowen.app</strong> in Safari, add it to the Home Screen again, and use the new icon.
+        </p>
       </div>
     </section>
   );
