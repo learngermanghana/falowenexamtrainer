@@ -262,21 +262,50 @@ export const B1_LISTENING_TASKS = Object.freeze({
     ],
   }),
   17: task({
-    title: "Hören Sie den Text über Lerntechniken und beantworten Sie die fünf Fragen.",
-    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    title: "Podcast · Wie lernt man am besten?",
+    instructions: "Hören Sie den Podcast aufmerksam. Lesen Sie die fünf Fragen und wählen Sie jeweils A, B, C oder D. Reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Digitale Lerntechniken und Konzentration",
-    embedUrl: "https://www.youtube-nocookie.com/embed/NCfwHzAHoJI?rel=0&playsinline=1",
-    externalUrl: "https://youtu.be/NCfwHzAHoJI",
-    videoTitle: "B1 Day 17 Wie lernt man am besten Hören",
+    imageAlt: "Podcast über effektives Deutschlernen",
+    videoTitle: "B1 Day 17 Podcast Wie lernt man am besten",
     submitRequired: true,
     selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    transcript: `Anna: Hallo und willkommen zu "Deutsch einfach"! Ich bin Anna.
+
+Ben: Hallo Anna, und hallo an alle Deutschlernenden! Heute sprechen wir über eine wichtige Frage: Wie lernt man am besten?
+
+Anna: Genau, Ben. Ich lerne seit zwei Jahren Deutsch, aber manchmal weiß ich nicht: Mache ich es richtig?
+
+Ben: Das ist ganz normal. Mein erster Tipp: Lerne jeden Tag, auch wenn es nur zwanzig Minuten sind. Das ist besser als einmal pro Woche drei Stunden.
+
+Anna: Wirklich? Ich dachte, lange Lernzeiten sind besser.
+
+Ben: Nein. Das Gehirn braucht Wiederholung. Wenn du jeden Tag etwas wiederholst, bleiben die Wörter länger im Kopf.
+
+Anna: Und was ist mit Vokabeln? Ich schreibe sie immer auf Karten, aber ich vergesse sie schnell.
+
+Ben: Lerne Wörter nie allein, sondern in ganzen Sätzen. Zum Beispiel nicht nur "der Termin", sondern: "Ich habe morgen einen Termin beim Arzt."
+
+Anna: Das ist eine tolle Idee! Und wie kann ich besser sprechen?
+
+Ben: Sprich so viel wie möglich! Such dir einen Lernpartner oder sprich laut mit dir selbst. Fehler sind kein Problem, denn aus Fehlern lernt man.
+
+Anna: Hören ist auch wichtig, oder? Ich höre gern Podcasts, so wie diesen hier.
+
+Ben: Genau! Höre jeden Tag etwas auf Deutsch: Musik, Podcasts oder Filme. Und lies auch kurze Texte.
+
+Anna: Okay, also zusammengefasst: jeden Tag lernen, Wörter in Sätzen lernen, viel sprechen und viel hören.
+
+Ben: Perfekt! Und das Wichtigste: Hab Geduld und Spaß dabei.
+
+Anna: Vielen Dank fürs Zuhören! Bis zur nächsten Folge. Tschüss!
+
+Ben: Tschüss!`,
     questions: [
-      q("Was versteht man unter chunking?", ["a) Der Lernstoff wird in kleinere Abschnitte aufgeteilt.", "b) Man lernt den Stoff in einem Stück.", "c) Man ignoriert schwierige Themen.", "d) Man lernt alles am Prüfungstag."]),
-      q("Warum ist regelmäßiges Wiederholen wichtig?", ["a) Es spart Zeit.", "b) Es hilft, den Stoff dauerhaft zu behalten.", "c) Es hilft nur beim Sprachenlernen.", "d) Es verbessert die Prüfungsnoten."]),
-      q("Was ist laut dem Hörtext ein wichtiger Faktor beim Lernen?", ["a) Die Länge der Lernzeit.", "b) Eine ruhige und aufgeräumte Umgebung.", "c) Das Lernen mit Freunden.", "d) Ein fester Platz in der Bibliothek."]),
-      q("Wie kann man den Lernprozess reflektieren?", ["a) Indem man schwierige Themen ignoriert.", "b) Indem man sich selbst Fragen zum Gelernten stellt.", "c) Indem man nur stur auswendig lernt.", "d) Indem man den Stoff vor sich hin liest."]),
-      q("Was sollte man tun, nachdem man ein Lernziel erreicht hat?", ["a) Sofort weiterlernen.", "b) Sich selbst belohnen.", "c) Neue Ziele setzen.", "d) Eine lange Pause machen."]),
+      q("Wie sollte man laut Ben lernen?", ["a) Einmal pro Woche drei Stunden", "b) Jeden Tag, auch nur zwanzig Minuten", "c) Nur vor der Prüfung", "d) Nur am Wochenende"]),
+      q("Warum ist tägliches Lernen besser?", ["a) Weil man dann weniger Zeit braucht", "b) Weil das Gehirn Wiederholung braucht", "c) Weil Anna das sagt", "d) Weil Lernen am Abend leichter ist"]),
+      q("Wie soll man Vokabeln lernen?", ["a) Nur einzelne Wörter auf Karten", "b) Nur mit dem Wörterbuch", "c) In ganzen Sätzen", "d) Gar nicht, man lernt sie automatisch"]),
+      q("Was empfiehlt Ben, um besser zu sprechen?", ["a) Nur leise lesen", "b) Fehler immer vermeiden", "c) Nur Grammatik üben", "d) Viel sprechen, auch laut mit sich selbst"]),
+      q("Was ist laut Ben das Wichtigste beim Lernen?", ["a) Ein teures Buch", "b) Geduld und Spaß", "c) Perfekte Aussprache", "d) Jeden Tag drei Stunden Zeit"]),
     ],
   }),
   18: task({
