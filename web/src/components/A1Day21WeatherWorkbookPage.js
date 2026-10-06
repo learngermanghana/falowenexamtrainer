@@ -21,7 +21,7 @@ const headerImage =
 
 const DAY21_AUDIO_KEY = "a1/day-21/day-21.mp3";
 
-const DAY13_LISTENING_QUESTIONS = Object.freeze([
+const DAY21_LISTENING_QUESTIONS = Object.freeze([
   {
     stem: "Wie ist das Wetter heute?",
     options: ["A. Es ist warm und sonnig.", "B. Es ist kalt und es regnet.", "C. Es ist windig und warm."],
@@ -274,7 +274,7 @@ const Teil4Content = () => {
         {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
       </div>
 
-      {DAY13_LISTENING_QUESTIONS.map((item, index) => (
+      {DAY21_LISTENING_QUESTIONS.map((item, index) => (
         <div key={item.stem} style={questionBox}>
           <strong>{index + 1}. {item.stem}</strong>
         {item.options.map((option) => <span key={option}>{option}</span>)}
