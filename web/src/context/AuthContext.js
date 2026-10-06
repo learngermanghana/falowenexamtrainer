@@ -8,6 +8,7 @@ import {
   signInWithPopup,
   signOut,
   requestMessagingToken,
+  getPushEnvironment,
   db,
   collection,
   query,
@@ -1044,16 +1045,23 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      if (typeof Notification !== "undefined") {
-        if (Notification.permission === "denied") {
-          setNotificationStatus("blocked");
-          return;
-        }
+      const pushEnvironment = getPushEnvironment();
+      if (!pushEnvironment.notificationApi) {
+        // iOS only exposes the Notifications API to a valid installed Home
+        // Screen web app. Do not turn that state into a generic setup error.
+        setNotificationStatus(storedToken ? "stale" : "idle");
+        return;
+      }
 
-        if (Notification.permission === "default") {
-          setNotificationStatus(storedToken ? "stale" : "idle");
-          return;
-        }
+      if (Notification.permission === "denied") {
+        setNotificationStatus("blocked");
+        return;
+      }
+
+      if (Notification.permission === "default") {
+        // Permission must be requested from an explicit user gesture.
+        setNotificationStatus(storedToken ? "stale" : "idle");
+        return;
       }
 
       if (!storedToken) {
