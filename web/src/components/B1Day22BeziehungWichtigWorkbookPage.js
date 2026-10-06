@@ -59,12 +59,14 @@ const profileQuestions = [
   "Was sind Ihre Lebensziele oder Träume für die Zukunft?",
 ];
 
-const berlinQuestions = [
-  { stem: "Wie alt ist der Große Tiergarten?", options: ["A) wenige Minuten", "B) wenige Jahre", "C) Das steht nicht im Text.", "D) 500 Jahre"] },
-  { stem: "In der Nähe welches Platzes befinden sich Weltzeituhr und Fernsehturm?", options: ["A) Siegessäule", "B) Alexanderplatz", "C) Brandenburger Tor", "D) Kurfürstendamm"] },
-  { stem: "Was ist der Kurfürstendamm?", options: ["A) Ein Restaurant", "B) Ein Hotel", "C) Eine Hauptstadt", "D) Eine Einkaufsstraße"] },
-  { stem: "Wo arbeitet die Erzählerin?", options: ["A) in einem Geschäft", "B) in einem Restaurant", "C) am Alexanderplatz", "D) in einem Hotel"] },
-  { stem: "Was bietet das Hotel als besonderen Service für seine Gäste?", options: ["A) Fahrkarten für die U-Bahn", "B) eine Weltzeituhr", "C) Stadtrundfahrten", "D) kostenloses Frühstück"] },
+const relationshipQuestions = [
+  { stem: "Was steht für die meisten Menschen in einer Beziehung an erster Stelle?", options: ["A) Ein hohes Einkommen des Partners", "B) Vertrauen und Ehrlichkeit", "C) Dieselben Hobbys zu haben"] },
+  { stem: "Warum ist ständige Eifersucht laut Text schädlich?", options: ["A) Weil man dadurch weniger Freizeit hat.", "B) Weil sie das Vertrauen und die Basis der Beziehung zerstört.", "C) Weil man dadurch keine gemeinsamen Freunde findet."] },
+  { stem: "Wie sollten Paare laut Artikel mit Problemen umgehen?", options: ["A) Sie sollten Konflikte verschweigen und abwarten.", "B) Sie sollten Probleme direkt und offen ansprechen.", "C) Sie sollten sofort den Partner wechseln."] },
+  { stem: "Was bedeutet Unterstützung in einer Partnerschaft?", options: ["A) Dass man dem Partner alle Entscheidungen abnimmt.", "B) Dass man den Partner bei seinen Zielen ermutigt und in schweren Zeiten beisteht.", "C) Dass man nur noch dieselbe Arbeit ausübt."] },
+  { stem: "Warum ist Freiraum in einer Beziehung wichtig?", options: ["A) Damit jeder eigene Hobbys und persönliche Kontakte pflegen kann.", "B) Weil man sonst keine gemeinsame Wohnung mieten kann.", "C) Damit man den Partner nicht mehr wiedersehen muss."] },
+  { stem: "Was kann passieren, wenn ein Paar ausschließlich alles zusammen macht?", options: ["A) Die Beziehung wird automatisch perfekt.", "B) Es kann auf Dauer zu Spannungen führen.", "C) Man spart sehr viel Geld."] },
+  { stem: "Was hält eine Beziehung laut dem letzten Abschnitt lebendig?", options: ["A) Ein gewisses Maß an Eigenständigkeit neben gemeinsamen Interessen.", "B) Täglich stundenlange Diskussionen über die Zukunft.", "C) Das Aufgeben aller persönlichen Freundschaften."] },
 ];
 
 const bewerbungQuestions = [
@@ -188,13 +190,14 @@ const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           </WorkbookTaskCard>
 
           <article style={contentCard}>
-            <h3 style={{ margin: 0 }}>Berlin</h3>
-            <p style={{ margin: 0 }}>Berlin ist nicht nur Weltmetropole und die Hauptstadt Deutschlands, sondern auch meine Heimatstadt. Jeden Morgen auf dem Weg zur Arbeit komme ich an vielen berühmten Sehenswürdigkeiten vorbei. Da ist zunächst der Große Tiergarten, welcher schon über 500 Jahre alt ist. Von hier ist es nicht weit bis zum Brandenburger Tor und der Siegessäule. Hier steige ich in die U-Bahn und fahre einige Stationen bis zum Alexanderplatz, wo sich die Weltzeituhr und das Wahrzeichen der Stadt, der Fernsehturm, befinden.</p>
-            <p style={{ margin: 0 }}>Von dort sind es nur wenige Minuten Fußweg bis zum Kurfürstendamm, der riesigen Einkaufsstraße mit zahlreichen Restaurants, Geschäften und Hotels.</p>
-            <p style={{ margin: 0 }}>Hier arbeite ich als Hotelfachfrau und betreue die zahlreichen Gäste des Hotels, welche als Touristen Berlin besichtigen. Als echte Berlinerin kann ich ihnen gute Tipps geben. Als besonderen Service bietet unser Hotel auch eigene Stadtrundfahrten an, die immer sehr gern gebucht werden.</p>
+            <h3 style={{ margin: 0 }}>Magazin „Partnerschaft & Leben“ – Was macht eine gute Beziehung aus?</h3>
+            <p>Für eine funktionierende und glückliche Beziehung gibt es kein allgemeingültiges Rezept. Jede Partnerschaft ist unterschiedlich, doch in Umfragen nennen viele Menschen ähnliche Werte, wenn sie gefragt werden, was ihnen bei einem Partner oder einer Partnerin besonders wichtig ist.</p>
+            <p>An erster Stelle steht für die meisten Befragten das Vertrauen. Ohne Vertrauen und Ehrlichkeit kann eine Beziehung auf Dauer nicht bestehen. Wer ständig eifersüchtig ist oder den Partner kontrollieren möchte, zerstört die Basis des Zusammenlebens. Dazu gehört auch eine offene Kommunikation: Probleme und Missverständnisse sollten direkt angesprochen werden, anstatt Konflikte zu verschweigen.</p>
+            <p>Ein weiterer zentraler Punkt ist gegenseitiger Respekt und Unterstützung. In einer Partnerschaft ist es wichtig, die Meinung des anderen zu schätzen und sich gegenseitig bei beruflichen oder persönlichen Zielen zu ermutigen. Auch in schwierigen Lebensphasen sollte man füreinander da sein.</p>
+            <p style={{ margin: 0 }}>Gleichzeitig betonen Experten, wie wichtig Freiraum und Unabhängigkeit sind. Auch in einer festen Beziehung sollte jeder Partner eigene Hobbys pflegen, Freundschaften außerhalb der Partnerschaft erhalten und Zeit für sich selbst haben. Wenn man alles nur noch gemeinsam unternimmt, kann das auf Dauer zu Spannungen führen. Gemeinsame Interessen und Humor verbinden zwar, aber ein gewisses Maß an Eigenständigkeit hält die Beziehung lebendig.</p>
           </article>
 
-          <QuestionList questions={berlinQuestions} />
+          <QuestionList questions={relationshipQuestions} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </section>
