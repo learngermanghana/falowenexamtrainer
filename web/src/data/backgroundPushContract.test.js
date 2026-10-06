@@ -56,7 +56,7 @@ describe("background push contract", () => {
       path.join(process.cwd(), "src", "components", "NotificationSettingsCard.js"),
       "utf8"
     );
-    expect(settings).toContain("Send screen-off test");
+    expect(settings).toContain("Send test notification");
     expect(settings).toContain("sendPushTestNotification");
     expect(settings).toContain("delaySeconds: 8");
 
