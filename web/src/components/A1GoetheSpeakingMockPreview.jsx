@@ -615,7 +615,7 @@ export default function A1GoetheSpeakingMockPreview({
     <main className="a1-goethe-mock-shell" data-a1-goethe-speaking-mock-preview>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">Sprechen mock · AI marked · not in Course Book</span>
+        <span className="a1-goethe-mock-preview-badge">A1 Sprechen practice</span>
       </div>
       {body}
     </main>
