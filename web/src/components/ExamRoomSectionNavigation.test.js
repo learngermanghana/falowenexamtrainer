@@ -52,6 +52,6 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain('Explore the navigation above');
     expect(overviewSource).not.toContain('PRACTICE_SECTIONS');
     expect(overviewSource).not.toContain('getMockExamsForLevel');
-    expect(appSource).toContain('examSection !== "overview"');
+    expect(appSource).toContain('examSection !== "overview" && !sampleId');
   });
 });
