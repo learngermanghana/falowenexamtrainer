@@ -2,15 +2,21 @@ import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import A1Day17InstructionsDirectionsKapitel11WorkbookPage from "./A1Day17InstructionsDirectionsKapitel11WorkbookPage";
+
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ idToken: "test-token" }),
+}));
+
+jest.mock("../services/a1AudioService", () => ({
+  fetchA1AudioPlaybackUrl: jest.fn(() => Promise.resolve({ url: "https://example.test/day-17.mp3" })),
+}));
 
 jest.mock("./VerifiedCloudDraftSubmissionPage", () => () => (
   <div data-testid="verified-cloud-draft-submission" />
 ));
 
-// This suite verifies the shared workbook navigation contract, not draft-answer
-// DOM binding. Keeping the observer-heavy capture runtime out of this test avoids
-// retaining jsdom mutation observers while still exercising the real tab layout.
 jest.mock("./A1TutorDraftSectionCapture", () => () => null);
 
 jest.mock("./A1TimedMockExam", () => ({
@@ -26,7 +32,7 @@ jest.mock("./A1TimedMockExam", () => ({
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {
-  test("uses the same native A1 shared navigation contract as Day 1", () => {
+  test("uses the new two-part Lesen and Hören contract", () => {
     const { container } = render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day17InstructionsDirectionsKapitel11WorkbookPage />
@@ -38,20 +44,22 @@ describe("A1 Day 17 native standard workbook", () => {
         layoutMode: "native",
         day: 17,
         chapter: "11",
+        sections: [
+          expect.objectContaining({ key: "teil-1", label: expect.stringMatching(/Lesen/) }),
+          expect.objectContaining({ key: "teil-2", label: expect.stringMatching(/Hören/) }),
+        ],
       }),
     );
     expect(container.querySelector('[data-a1-shared-workbook="A1-11"]')).toBeInTheDocument();
 
     const navigation = screen.getByRole("tablist", { name: /A1-11 workbook sections/i });
     expect(navigation).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Overview" })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 1/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 2/i })).toBeVisible();
-    expect(screen.getByRole("tab", { name: /Teil 3/i })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Review & Submit" })).toBeVisible();
+    expect(screen.queryByRole("tab", { name: /Teil 3/i })).not.toBeInTheDocument();
   });
 
-  test("opens each original section through the native tabs", () => {
+  test("shows the replacement reading and protected Day 17 listening", async () => {
     render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day17InstructionsDirectionsKapitel11WorkbookPage />
@@ -59,15 +67,18 @@ describe("A1 Day 17 native standard workbook", () => {
     );
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 1/i }));
-    expect(screen.getByRole("heading", { name: /Teil 1 · Lesen Essay: Wegbeschreibungen/i })).toBeVisible();
-    expect(screen.getByText("Wo ist der Bahnhof?")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Der Weg von der Touristeninformation zum Schiff/i })).toBeVisible();
+    expect(screen.getByText(/Nach insgesamt 10 Minuten zu Fuß/i)).toBeVisible();
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 2/i }));
-    expect(screen.getByRole("heading", { name: /Teil 2 · Lesen Essay: Wegbeschreibungen/i })).toBeVisible();
-    expect(screen.getByText("Wo ist die Apotheke?")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Hören: Wegbeschreibung zum Bahnhof/i })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Hören starten" }));
 
-    fireEvent.click(screen.getByRole("tab", { name: /Teil 3/i }));
-    expect(screen.getByRole("heading", { name: /Teil 3 · Schreiben Assignment/i })).toBeVisible();
-    expect(screen.getByText(/How do I get to the train station/i)).toBeVisible();
+    expect(fetchA1AudioPlaybackUrl).toHaveBeenCalledWith({
+      day: 17,
+      key: "a1/day-17/day-17.mp3",
+      idToken: "test-token",
+    });
+    expect(screen.getByText("Zusatzaufgabe · nicht benotet")).toBeVisible();
   });
 });
