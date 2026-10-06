@@ -600,22 +600,26 @@ Das Hafenmuseum ist klein und sehr interessant. Planen Sie etwa 2 Stunden für I
   28: {
     chapter: "10.28",
     format: "E-Mail über Zukunftspläne",
-    title: "Meine Pläne für die nächsten Jahre",
-    strategy: "Ordne Kofis Pläne nach Zeit und Zweck. Unterscheide berufliche, sprachliche, private und Reiseziele.",
-    text: `Hallo Sofia,
+    title: "Reisepläne für Hamburg",
+    strategy: "Lies zuerst die fünf Fragen. Achte dann auf Reihenfolge und Zeitangaben wie heute Abend, morgen, nachmittags und zwei Tage lang.",
+    text: `Hallo Jan,
 
-du hast gefragt, was ich nach dem Deutschkurs machen möchte. Nächstes Jahr will ich zuerst die B1-Prüfung machen. Danach möchte ich mich für eine Ausbildung im Bereich Logistik bewerben. Wenn alles klappt, werde ich im Herbst mit der Ausbildung beginnen.
+ich bin gut in Hamburg angekommen! Ich bleibe zwei Tage hier und habe schon viele Pläne.
 
-Später möchte ich Berufserfahrung sammeln und vielleicht noch eine Weiterbildung machen. Ich will auch weiter Deutsch lernen, weil ich im Beruf sicher sprechen und schreiben möchte. In zwei oder drei Jahren möchte ich in eine größere Wohnung ziehen. Reisen ist mir ebenfalls wichtig: Ich hoffe, dass ich nächstes Jahr meine Schwester in Wien besuchen kann.
+Heute Abend werde ich im Restaurant Seeblick im Hafen frischen Fisch essen. Danach gehe ich um 20:00 Uhr in die Elbphilharmonie. Dort spielt ein Orchester.
 
-Liebe Grüße
-Kofi`,
+Morgen möchte ich zuerst das Hafenmuseum besuchen. Die Mitarbeiterin in der Touristeninformation hat gesagt, dass zwei Stunden dort reichen. Nachmittags werde ich im Stadtpark spazieren gehen und einen Kaffee trinken.
+
+Für die zwei Tage kaufe ich mir eine Gästekarte. Damit kann ich zwei Tage lang mit Bus und Bahn fahren und bekomme Rabatt im Museum und auf dem Schiff.
+
+Bis bald und liebe Grüße
+Markus`,
     questions: [
-      { stem: "Kofi hat mehrere Pläne für das nächste Jahr. Welcher Schritt kommt vor der Bewerbung um eine Ausbildung?", options: ["A) Die B1-Prüfung", "B) Eine Wohnung kaufen", "C) Nach Wien ziehen", "D) Eine Firma gründen"] },
-      { stem: "Welcher berufliche Schritt folgt direkt auf die geplante Sprachprüfung?", options: ["A) Für ein Studium", "B) Für eine Ausbildung in Logistik", "C) Für einen Sprachkurs in Wien", "D) Für einen Urlaub"] },
-      { stem: "Wenn Kofis Bewerbung erfolgreich ist, in welcher Jahreszeit soll der nächste Schritt beginnen?", options: ["A) Im Frühling", "B) Im Sommer", "C) Im Herbst", "D) Im Winter"] },
-      { stem: "Welches Ziel erklärt, warum Kofi auch nach dem Kurs weiter Deutsch lernen möchte?", options: ["A) Weil er nur reisen möchte.", "B) Weil er im Beruf sicher sprechen und schreiben möchte.", "C) Weil seine Wohnung klein ist.", "D) Weil er keine Ausbildung machen will."] },
-      { stem: "Welcher Plan gehört zu Kofis privatem Reiseleben und nicht zu seiner beruflichen Entwicklung?", options: ["A) Seinen Lehrer", "B) Seine Schwester", "C) Einen Kollegen", "D) Sofia"] },
+      { stem: "Was wird Markus heute Abend als Erstes machen?", options: ["A) Er wird im Stadtpark spazieren gehen.", "B) Er wird im Restaurant Seeblick Fisch essen.", "C) Er wird das Hafenmuseum besuchen."] },
+      { stem: "Wann geht Markus in die Elbphilharmonie?", options: ["A) Heute Abend um 20:00 Uhr", "B) Morgen Nachmittag", "C) In zwei Wochen"] },
+      { stem: "Was hat Markus für morgen Vormittag geplant?", options: ["A) Er möchte eine Hafenrundfahrt buchen.", "B) Er möchte das Hafenmuseum besuchen.", "C) Er möchte den ganzen Tag im Hotel bleiben."] },
+      { stem: "Was wird Markus nach dem Museumsbesuch machen?", options: ["A) Er wird direkt nach Hause fahren.", "B) Er wird im Stadtpark spazieren gehen.", "C) Er wird ein neues Ticket für die Bahn kaufen."] },
+      { stem: "Wie lange möchte Markus die Gästekarte nutzen?", options: ["A) Nur für eine Stunde", "B) Einen ganzen Monat", "C) Zwei Tage lang für Bus und Bahn"] },
     ],
   },
 };
