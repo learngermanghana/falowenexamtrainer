@@ -545,18 +545,24 @@ Für den zweiten Tag merke ich mir einen zweistündigen Besuch im Hafenmuseum vo
   },
   26: {
     chapter: "10.26",
-    format: "Alltagssituationen",
-    title: "Ein Tag mit verschiedenen Gefühlen",
-    strategy: "Verbinde Auslöser, Gefühl und Reaktion. Achte besonders darauf, wie sich Samuels Stimmung im Laufe des Tages verändert.",
-    text: `Am Morgen ist Samuel nervös, weil er eine wichtige Präsentation bei der Arbeit hat. Kurz vor der Präsentation atmet er langsam ein und aus. Danach ist er sehr erleichtert, denn alles ist gut gelaufen.
+    format: "Gefühle und Reaktionen im Gespräch",
+    title: "Gefühle und Reaktionen im Gespräch",
+    strategy: "Lies die fünf Situationen und achte auf die Reaktion des Touristen. Entscheide, welches Gefühl oder welche Haltung seine Worte ausdrücken.",
+    text: `Situation 1: Die Mitarbeiterin schlägt eine einstündige Hafenrundfahrt vor. Der Tourist ist begeistert und sagt: „Das klingt toll.“
 
-In der Mittagspause bekommt Samuel eine Nachricht von seiner Schwester: Sie hat ihre Prüfung bestanden. Samuel freut sich sehr für sie. Am Abend wartet er lange auf einen Bus, der nicht kommt. Deshalb ist er genervt. Zu Hause hört er Musik und wird wieder ruhiger.`,
+Situation 2: Der Tourist möchte am Abend etwas Kulturelles unternehmen. Er zeigt sein Interesse mit den Worten: „Ich interessiere mich auch für Musik.“
+
+Situation 3: Die Mitarbeiterin erklärt, dass es für das Orchesterkonzert nur noch Karten auf den hinteren Plätzen gibt. Der Tourist bleibt gelassen und antwortet: „Das ist nicht schlimm.“
+
+Situation 4: Für das Abendessen empfiehlt die Mitarbeiterin das Restaurant Seeblick im Hafen. Der Tourist freut sich über die Empfehlung: „Super Tipp. Danke.“
+
+Situation 5: Für den zweiten Tag wird ein kurzer Besuch im Hafenmuseum und ein Spaziergang im Stadtpark empfohlen. Der Tourist ist zufrieden: „Das gefällt mir.“`,
     questions: [
-      { stem: "Welches Ereignis erklärt Samuels Nervosität am Morgen?", options: ["A) Er hat eine wichtige Präsentation.", "B) Er wartet auf den Bus.", "C) Seine Schwester ruft an.", "D) Er hat Urlaub."] },
-      { stem: "Welche Strategie benutzt Samuel unmittelbar vor der stressigen Situation?", options: ["A) Er trinkt Kaffee.", "B) Er atmet langsam ein und aus.", "C) Er geht nach Hause.", "D) Er ruft seine Schwester an."] },
-      { stem: "Welche Gefühlsveränderung passt dazu, dass die Präsentation gut gelaufen ist?", options: ["A) Erleichtert", "B) Wütend", "C) Traurig", "D) Müde"] },
-      { stem: "Welche Nachricht verändert Samuels Stimmung in der Mittagspause positiv?", options: ["A) Er bekommt Geld.", "B) Seine Schwester hat eine Prüfung bestanden.", "C) Der Bus kommt.", "D) Er hat Feierabend."] },
-      { stem: "Welche Handlung hilft Samuel, seine negative Stimmung am Abend wieder zu regulieren?", options: ["A) Sport", "B) Musik", "C) Arbeit", "D) Fernsehen im Büro"] },
+      { stem: "Wie reagiert der Tourist auf den Vorschlag für die Hafenrundfahrt?", options: ["A) Er ist unsicher und möchte lieber warten.", "B) Er findet die Idee sehr gut („Das klingt toll“).", "C) Er reagiert verärgert über den Preis."] },
+      { stem: "Wie drückt der Tourist sein Interesse an einem Konzert aus?", options: ["A) „Ich interessiere mich auch für Musik.“", "B) „Ich habe keine Lust auf Musik.“", "C) „Musik ist mir zu teuer.“"] },
+      { stem: "Welches Gefühl zeigt der Tourist, als es nur noch hintere Plätze im Konzert gibt?", options: ["A) Er ist enttäuscht und geht nicht hin.", "B) Er ist gelassen und nimmt die Karten trotzdem („Das ist nicht schlimm“).", "C) Er ist wütend auf die Mitarbeiterin."] },
+      { stem: "Wie fühlt sich der Tourist nach dem Restauranttipp der Mitarbeiterin?", options: ["A) Er freut sich über den guten Rat („Super Tipp. Danke“).", "B) Er ist traurig, weil es keinen Fisch gibt.", "C) Er möchte lieber im Hotel essen."] },
+      { stem: "Was bedeutet die Reaktion „Das gefällt mir“ beim Tagesprogramm für Tag 2?", options: ["A) Der Tourist ist mit dem Plan für Museum und Stadtpark zufrieden.", "B) Der Tourist möchte den Plan komplett ändern.", "C) Der Tourist versteht den Stadtplan nicht."] },
     ],
   },
   27: {
