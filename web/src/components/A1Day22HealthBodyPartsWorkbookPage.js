@@ -123,7 +123,7 @@ const appointmentStatements = [
   "Es gibt keinen Fahrstuhl im Haus.",
 ];
 
-const DAY14_AUDIO_KEY = "a1/day-14-1/day-14-1.mp3";
+const DAY22_AUDIO_KEY = "a1/day-22/day-22.mp3";
 
 const healthListeningQuestions = Object.freeze([
   {
@@ -274,8 +274,8 @@ const Teil3Content = () => {
     setAudioError("");
     try {
       const playback = await fetchA1AudioPlaybackUrl({
-        day: "14.1",
-        key: DAY14_AUDIO_KEY,
+        day: 22,
+        key: DAY22_AUDIO_KEY,
         idToken,
       });
       setAudioUrl(playback.url);

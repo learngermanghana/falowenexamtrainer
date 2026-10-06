@@ -29,8 +29,9 @@ describe("A1 Day 21 Weather workbook", () => {
     expect(source).toContain("Radio ND2 – Der Wetterbericht für das Wochenende");
     expect(source).toContain("Schreiben Sie eine E-Mail an Bina");
     expect(source).toContain("Teil 4 · Hören");
-    expect(source).toContain('const DAY13_AUDIO_KEY = "a1/day-13/day-13.mp3"');
-    expect(source).toContain("DAY13_LISTENING_QUESTIONS");
+    expect(source).toContain('const DAY21_AUDIO_KEY = "a1/day-21/day-21.mp3"');
+    expect(source).toContain("DAY21_LISTENING_QUESTIONS");
+    expect(source).toContain("day: 21");
     expect(source).toContain('<WorkbookSection sectionKey="teil-4"><Teil4Content /></WorkbookSection>');
   });
 

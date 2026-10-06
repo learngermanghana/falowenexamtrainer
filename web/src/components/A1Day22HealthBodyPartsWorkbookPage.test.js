@@ -18,6 +18,9 @@ describe("A1 Day 22 Health and Body Parts workbook", () => {
     expect(source).toContain('Teil 1 · Lesen: Anzeigen und Termine');
     expect(source).toContain('Teil 2 · Lesen: Ihr Termin');
     expect(source).toContain('Teil 3 · Hören');
+    expect(source).toContain('const DAY22_AUDIO_KEY = "a1/day-22/day-22.mp3"');
+    expect(source).toContain("day: 22");
+    expect(source).not.toContain("a1/day-14-1/day-14-1.mp3");
   });
 
   it("uses the appointment email as the second reading task", () => {
