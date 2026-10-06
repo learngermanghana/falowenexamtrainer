@@ -74,7 +74,7 @@
     "audit:teaching:all": "node ../scripts/auditTeachingQuality.js --mode=all",
     "audit:teaching:a2": "node ../scripts/auditTeachingQuality.js --mode=a2",
     "generate:ai-course-map": "node ../scripts/generateFalowenCourseMap.mjs",
-    "gate:production": "jest --runInBand --runTestsByPath src/data/a2B1LessonProfile.test.js src/data/a2B1LessonProfileTimerIntegration.test.js src/data/a2B1LessonProfileBuildSafety.test.js src/components/A2B1WorkbookSectionProfile.test.js src/components/A2Day25BuildNavigation.test.js src/utils/structuredSubmissionTemplate.test.js src/data/productionDeploymentContract.test.js src/data/timedAssignmentConfig.test.js src/data/backgroundPushContract.test.js",
+    "gate:production": "jest --runInBand --runTestsByPath src/data/a2B1LessonProfile.test.js src/data/a2B1LessonProfileTimerIntegration.test.js src/data/a2B1LessonProfileBuildSafety.test.js src/components/A2B1WorkbookSectionProfile.test.js src/components/A2Day25BuildNavigation.test.js src/utils/structuredSubmissionTemplate.test.js src/data/productionDeploymentContract.test.js src/data/timedAssignmentConfig.test.js src/data/examResourcesRemoval.test.js src/data/a2ListeningPictureChoices.test.js src/data/backgroundPushContract.test.js",
     "generate:build-identity": "node ../scripts/writeBuildIdentity.mjs"
   }
 }
