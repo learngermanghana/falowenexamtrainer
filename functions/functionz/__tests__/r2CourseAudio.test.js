@@ -21,6 +21,7 @@ const {
 describe("A1/A2/B1/B2/C2 R2 course audio", () => {
   test("accepts the protected A1 Day 13 and Chapter 14.1 folders", () => {
     expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toEqual({ day: 13, key: "a1/day-13/day-13.mp3" });
+    expect(validateA1AudioKey({ day: 17, key: "a1/day-17/day-17.mp3" })).toEqual({ day: 17, key: "a1/day-17/day-17.mp3" });
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toEqual({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" });
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14/day-14.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toBeNull();
