@@ -86,16 +86,16 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 22 focused on weekly planning with contextual Submit", () => {
     expect(day22).toContain('chapter="8.22"');
-    expect(A2_READING_TASKS[22].title).toBe("Eine volle Woche");
-    expect(A2_LISTENING_TASKS[22].audioUrl).toContain("wK9JOG5lhdc");
+    expect(A2_READING_TASKS[22].title).toBe("In der Touristeninformation Hamburg");
+    expect(A2_LISTENING_TASKS[22].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(day22).not.toMatch(/Gülcan|Willkommensführung|Literaturkurs/i);
     expect(day22).not.toContain("Go to Submission Area");
   });
 
   it("keeps Day 23 commuting tabs and content coherent", () => {
     expect(day23).toContain('chapter="9.23"');
-    expect(A2_READING_TASKS[23].title).toBe("Drei Wege zur Arbeit");
-    expect(A2_LISTENING_TASKS[23].audioUrl).toContain("6DA1dYfqEZo");
+    expect(A2_READING_TASKS[23].title).toBe("Mein Weg zur Arbeit");
+    expect(A2_LISTENING_TASKS[23].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(day23).not.toMatch(/key:\s*"teil[1-4]"/i);
   });
 
