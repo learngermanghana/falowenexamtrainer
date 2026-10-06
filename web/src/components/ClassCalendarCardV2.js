@@ -395,12 +395,14 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, ho
     <div id={id} style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Live class access & calendar</h2>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Your next lesson, timetable, Zoom access and course progress.</p>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{homepageCompact ? "Your next class" : "Live class access & calendar"}</h2>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{homepageCompact ? "Your next lesson and Zoom access." : "Your next lesson, timetable, Zoom access and course progress."}</p>
         </div>
-        <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
-          {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Updating schedule…" : canonicalStatus === "cached" ? "Last known schedule" : "Legacy schedule"}
-        </span>
+        {!homepageCompact ? (
+          <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
+            {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Updating schedule…" : canonicalStatus === "cached" ? "Last known schedule" : "Legacy schedule"}
+          </span>
+        ) : null}
       </div>
 
       <section style={infoCardStyle}>
