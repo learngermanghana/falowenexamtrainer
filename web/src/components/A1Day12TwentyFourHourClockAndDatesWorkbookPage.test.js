@@ -11,7 +11,8 @@ test("A1 Day 12 uses the new five-question reading and listening sets", () => {
   assert.match(workbookSource, /Der Zug kommt um neunzehn Uhr zwanzig in Berlin an\./);
   assert.match(workbookSource, /Script optional anzeigen/);
   assert.match(workbookSource, /a1\/day-12\/day-12\.mp3/);
-  assert.match(workbookSource, /Hören starten/);
+  assert.match(workbookSource, /<A1ProtectedAudioPlayer day=\{12\}/);
+  assert.doesNotMatch(workbookSource, /Hören starten/);
   assert.match(workbookSource, /Viertel vor drei \(nachmittags\)/);
   assert.doesNotMatch(workbookSource, /Wie viele Tage hat der Februar in einem Schaltjahr/);
   assert.doesNotMatch(workbookSource, /vm22NeVPFNA/);
