@@ -346,20 +346,31 @@ Freitag, 19:00 Uhr. Atemübungen und einfache Techniken gegen Stress.`,
   },
   17: {
     chapter: "6.17",
-    format: "Apothekeninformation",
-    title: "Erkältung: Was können Sie tun?",
-    strategy: "Unterscheide Symptome, Empfehlungen und Warnhinweise. Lies besonders Wörter wie wenn, nicht und bitte.",
-    text: `Information aus der Stadt-Apotheke
+    format: "Goethe A2 · Lesen · Teil 1 und Teil 2",
+    title: "Hamburg erleben",
+    strategy: "Teil 1: Wähle a, b oder c. Teil 2: Entscheide bei jeder Aussage zwischen Richtig und Falsch.",
+    text: `Teil 1 · Multiple Choice
 
-Bei einer leichten Erkältung helfen oft Ruhe, viel Wasser oder Tee und frische Luft. Gegen Halsschmerzen gibt es Lutschtabletten. Bei Husten kann ein Hustensaft helfen. Nasenspray sollte man nur wenige Tage benutzen.
+Text 1
 
-Bitte fragen Sie in der Apotheke nach, wenn Sie andere Medikamente nehmen. Bei hohem Fieber, starken Schmerzen oder wenn die Beschwerden länger als eine Woche dauern, sollten Sie zum Arzt gehen. Medikamente für Kinder müssen immer zum Alter des Kindes passen.`,
+Ein Mann ist in Hamburg. Er macht eine Fahrt mit dem Schiff. Die Fahrt dauert eine Stunde. Das Ticket kostet 25 Euro. Mit der Gästekarte kostet das Ticket nur 20 Euro.
+
+Text 2
+
+Heute Abend gibt es Musik. Ein Orchester spielt in der Elbphilharmonie. Das Konzert beginnt um 20 Uhr. Der Mann kauft ein Ticket. Er geht vorher Fisch essen. Das Restaurant ist im Hafen und nicht teuer.
+
+Teil 2 · Richtig oder Falsch?
+
+Der Mann bleibt zwei Tage in Hamburg. Er kauft eine Gästekarte für 12 Euro. Er fährt damit zwei Tage mit Bus und Bahn. Heute isst er Fisch im Restaurant Seeblick. Das Essen ist gut. Morgen besucht er ein kleines Museum. Der Besuch dauert zwei Stunden. Danach geht er im Stadtpark spazieren. Die Frau gibt ihm einen Stadtplan.`,
     questions: [
-      { stem: "Was wird bei einer leichten Erkältung empfohlen?", options: ["A) Viel Sport", "B) Ruhe und viel trinken", "C) Wenig schlafen", "D) Nur Kaffee trinken"] },
-      { stem: "Was kann gegen Halsschmerzen helfen?", options: ["A) Lutschtabletten", "B) Nasenspray", "C) Sonnencreme", "D) Pflaster"] },
-      { stem: "Wie lange sollte man Nasenspray benutzen?", options: ["A) Mehrere Monate", "B) Nur wenige Tage", "C) Immer", "D) Genau drei Wochen"] },
-      { stem: "Wann sollte man zum Arzt gehen?", options: ["A) Bei hohem Fieber oder starken Schmerzen", "B) Bei jedem kleinen Husten", "C) Nur am Wochenende", "D) Wenn man Wasser trinkt"] },
-      { stem: "Was ist bei Medikamenten für Kinder wichtig?", options: ["A) Die Farbe", "B) Der Preis", "C) Sie müssen zum Alter passen.", "D) Sie müssen immer Tabletten sein."] },
+      { stem: "Teil 1 · Wie lange dauert die Fahrt mit dem Schiff?", options: ["A) 10 Minuten", "B) Eine Stunde", "C) Zwei Tage"] },
+      { stem: "Teil 1 · Wie viel kostet das Ticket mit der Gästekarte?", options: ["A) 12 Euro", "B) 20 Euro", "C) 25 Euro"] },
+      { stem: "Teil 1 · Wann beginnt das Konzert?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Teil 2 · Der Mann bleibt zwei Tage in Hamburg.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Die Gästekarte kostet 50 Euro.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Der Mann isst im Restaurant Fisch.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Das Museum ist sehr groß.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Der Mann bekommt einen Stadtplan.", options: ["A) Richtig", "B) Falsch"] },
     ],
   },
   18: {
