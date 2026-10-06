@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { updatePageMeta } from "../lib/pageMeta";
 import A1GoetheReadingMockTeil1Preview from "./A1GoetheReadingMockTeil1Preview";
 import A2GoetheReadingMockPreview from "./A2GoetheReadingMockPreview";
 
@@ -25,28 +26,68 @@ const actionStyle = {
 
 export default function PublicExamPracticePage({ level = "" }) {
   useEffect(() => {
-    const previousTitle = document.title;
-    const description = document.querySelector('meta[name="description"]');
-    const previousDescription = description?.getAttribute("content") || "";
-
-    document.title = level
-      ? `Free ${level} German Exam Practice | Falowen`
-      : "Free German Exam Practice A1 & A2 | Falowen";
-    if (description) {
-      description.setAttribute(
-        "content",
-        "Practise German exam-style reading tasks for free with Falowen. No login required for selected A1 and A2 practice.",
-      );
-    }
-
-    return () => {
-      document.title = previousTitle;
-      if (description) description.setAttribute("content", previousDescription);
+    const metadataByLevel = {
+      A1: {
+        title: "Free A1 German Reading Practice | Falowen",
+        description:
+          "Practise selected A1 German exam-style reading tasks for free with Falowen. No login required and get an instant score.",
+        canonicalPath: "/exam-practice/a1",
+      },
+      A2: {
+        title: "Free A2 German Reading Practice | Falowen",
+        description:
+          "Practise a 20-question A2 German exam-style reading set for free with Falowen. No login required and get an instant score.",
+        canonicalPath: "/exam-practice/a2",
+      },
+      B1: {
+        title: "B1 German Exam Practice Coming Soon | Falowen",
+        description:
+          "Falowen public B1 German exam practice is coming soon. B1 students can continue using the full Exam Room after signing in.",
+        canonicalPath: "/exam-practice/b1",
+      },
     };
+
+    const metadata = metadataByLevel[level] || {
+      title: "Free German Exam Practice A1 & A2 | Falowen",
+      description:
+        "Practise selected A1 and A2 German exam-style reading tasks for free with Falowen. No login required for public practice.",
+      canonicalPath: "/exam-practice",
+    };
+
+    updatePageMeta({
+      ...metadata,
+      lang: "en",
+    });
   }, [level]);
 
   if (level === "A1") return <A1GoetheReadingMockTeil1Preview publicMode />;
   if (level === "A2") return <A2GoetheReadingMockPreview publicMode />;
+
+  if (level === "B1") {
+    return (
+      <main style={{ minHeight: "100vh", background: "#f8fafc", padding: "32px 16px 56px" }}>
+        <div style={{ maxWidth: 760, margin: "0 auto" }}>
+          <section style={{ ...cardStyle, padding: 28 }}>
+            <p style={{ margin: 0, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#64748b" }}>
+              Falowen Exam Practice
+            </p>
+            <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.2rem)", lineHeight: 1.05 }}>
+              B1 public practice is coming soon
+            </h1>
+            <p style={{ margin: 0, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
+              We have not published a complete public-ready B1 mock yet. B1 students can continue practising inside the full Falowen Exam Room.
+            </p>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
+              <a href="/exam-practice" style={actionStyle}>Back to free A1 & A2 practice</a>
+              <a href="/login/" style={{ ...actionStyle, background: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1" }}>
+                Student sign in
+              </a>
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main style={{ minHeight: "100vh", background: "#f8fafc", padding: "32px 16px 56px" }}>
