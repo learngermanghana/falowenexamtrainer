@@ -330,7 +330,6 @@ const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
-      )}
     </>
   );
 };
