@@ -19,13 +19,14 @@ const {
 } = require("../r2CourseAudio");
 
 describe("A1/A2/B1/B2/C2 R2 course audio", () => {
-  test("accepts the protected A1 Day 12, Day 13 and Chapter 14.1 folders", () => {
+  test("accepts protected A1 audio by visible course day", () => {
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a1/day-12/day-12.mp3" });
-    expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toEqual({ day: 13, key: "a1/day-13/day-13.mp3" });
-    expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toEqual({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" });
-    expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14/day-14.mp3" })).toBeNull();
-    expect(validateA1AudioKey({ day: 11, key: "a1/day-11/day-11.mp3" })).toBeNull();
-    expect(validateA1AudioKey({ day: 12, key: "a1/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 21, key: "a1/day-21/day-21.mp3" })).toEqual({ day: 21, key: "a1/day-21/day-21.mp3" });
+    expect(validateA1AudioKey({ day: 22, key: "a1/day-22/day-22.mp3" })).toEqual({ day: 22, key: "a1/day-22/day-22.mp3" });
+    expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 21, key: "a1/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 22, key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
   });
 
   test("accepts protected A1 mock Hören files without treating them as Course Book days", () => {
@@ -217,8 +218,8 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
 
   test("creates A1, A2, B1, C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
     const a1 = await createA1AudioSignedUrl({
-      day: "14.1",
-      key: "a1/day-14-1/day-14-1.mp3",
+      day: 22,
+      key: "a1/day-22/day-22.mp3",
       env: {
         R2_ACCOUNT_ID: "1234567890abcdef",
         R2_ACCESS_KEY_ID: "test-access",
@@ -228,7 +229,7 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
       },
     });
 
-    expect(a1.url).toContain("/a1/day-14-1/day-14-1.mp3");
+    expect(a1.url).toContain("/a1/day-22/day-22.mp3");
     expect(a1.url).toContain("X-Amz-Signature=");
     expect(a1.level).toBe("A1");
 
