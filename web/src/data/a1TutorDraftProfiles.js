@@ -97,9 +97,14 @@ const profiles = {
   },
   "A1-8": {
     sections: {
-      "teil-1": section(choiceItems(5), { label: "Lesen" }),
-      "teil-2": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Richtig oder Falsch" }),
-      "teil-3": section(choiceItems(5), { label: "Hörverstehen" }),
+      "teil-1": section(choiceItems(5, ["A", "B", "C"]), { label: "Lesen" }),
+      "teil-2": section([
+        { number: 1, type: "choice", choices: ["A", "B"] },
+        { number: 2, type: "choice", choices: ["A", "B"] },
+        { number: 3, type: "choice", choices: ["A", "B"] },
+        { number: 4, type: "choice", choices: ["A", "B", "C"] },
+        { number: 5, type: "choice", choices: ["A", "B", "C"] },
+      ], { label: "Hören" }),
     },
   },
   "A1-9": {
