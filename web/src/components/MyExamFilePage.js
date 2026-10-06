@@ -138,7 +138,6 @@ const MyExamFilePage = () => {
   const {
     config: goetheExamConfig,
     loading: examScheduleLoading,
-    source: examScheduleSource,
   } = useGoetheExamConfig();
   const goetheExamLevels = useMemo(() => {
     const merged = new Map(
