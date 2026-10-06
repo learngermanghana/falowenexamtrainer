@@ -110,7 +110,7 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 25 aligned with canonical Lesen and no Teil 4", () => {
     expect(day25).toContain('chapter="9.25"');
-    expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
+    expect(A2_READING_TASKS[25].title).toBe("Mein Tagesablauf in Hamburg");
     expect(A2_LISTENING_TASKS[25].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(day25).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
     expect(day25).not.toContain(["There is no", "Hören assignment in this workbook"].join(" "));
@@ -118,7 +118,7 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 26 focused on feelings", () => {
     expect(day26).toContain('chapter="10.26"');
-    expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
+    expect(A2_READING_TASKS[26].title).toBe("Gefühle und Reaktionen im Gespräch");
     expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
     expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
