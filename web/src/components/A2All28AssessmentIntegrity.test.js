@@ -19,16 +19,16 @@ describe("A2 canonical assessment content guard", () => {
     expect(A2_LISTENING_DAYS).toEqual(days);
   });
 
-  test("keeps exactly five canonical Lesen questions per day", () => {
+  test("keeps canonical Lesen question counts, including the seven-question Day 22 Hamburg task", () => {
     A2_READING_DAYS.forEach((day) => {
-      expect(A2_READING_TASKS[day].questions).toHaveLength(5);
+      expect(A2_READING_TASKS[day].questions).toHaveLength(day === 22 ? 7 : 5);
     });
   });
 
   test("keeps the approved A2 Hören mode split", () => {
     expect(A2_GRADED_LISTENING_DAYS).toHaveLength(21);
-    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([21, 22, 23, 24, 26]);
-    expect(A2_NO_LISTENING_DAYS).toEqual([14, 25]);
+    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([21, 24, 26]);
+    expect(A2_NO_LISTENING_DAYS).toEqual([14, 22, 23, 25]);
   });
 
   test("graded Hören always has audio and questions", () => {
