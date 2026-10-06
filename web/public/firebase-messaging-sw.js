@@ -127,8 +127,11 @@ function initializeMessaging(config) {
   messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    const { title, body } = resolveNotificationContent(payload);
+    // Firebase automatically displays messages that include a notification
+    // payload. Only render manually for data-only pushes to avoid duplicates.
+    if (payload?.notification) return;
 
+    const { title, body } = resolveNotificationContent(payload);
     self.registration.showNotification(title, {
       body,
       icon: "/logo192.png",
