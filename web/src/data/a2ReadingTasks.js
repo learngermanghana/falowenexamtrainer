@@ -527,18 +527,20 @@ Ruhe und Erholung pur im Schwarzwald. Große Saunalandschaft, Massagen und gutes
   },
   25: {
     chapter: "9.25",
-    format: "Tagesablauf",
-    title: "Annas Arbeitstag",
-    strategy: "Ordne Annas Tag chronologisch und verbinde Zeitangaben mit Gründen und Häufigkeit. Einige Antworten stehen nicht direkt neben dem passenden Signalwort.",
-    text: `Anna steht werktags um 6:30 Uhr auf. Am Abend vorher legt sie ihre Kleidung bereit, damit sie morgens Zeit spart. Nach dem Frühstück fährt sie um 7:30 Uhr mit dem Bus zur Arbeit. Ihr Arbeitstag beginnt um 8 Uhr.
+    format: "Goethe A2 · Lesen Teil 1",
+    title: "Mein Tagesablauf in Hamburg",
+    strategy: "Lies zuerst die fünf Fragen. Achte dann besonders auf Reihenfolge, Preise, Orte und Uhrzeiten im Tagesablauf.",
+    text: `Ich bin für zwei Tage in Hamburg. Mein erster Tag beginnt in der Touristeninformation. Dort kaufe ich für 12 € eine Gästekarte, mit der ich zwei Tage lang Bus und Bahn nutzen kann.
 
-Um 12:30 Uhr macht Anna Mittagspause. Meistens isst sie mit zwei Kolleginnen in der Kantine. Um 16:30 Uhr hat sie Feierabend. Zweimal pro Woche geht sie danach ins Fitnessstudio. An den anderen Tagen fährt sie direkt nach Hause. Abends kocht sie, ruft manchmal ihre Mutter an und liest noch etwas. Gegen 22:30 Uhr geht sie schlafen.`,
+Danach gehe ich zehn Minuten zu Fuß zu den Landungsbrücken. Dort startet mein Schiff für eine einstündige Hafenrundfahrt. Am späten Nachmittag esse ich im Hafen im Restaurant Seeblick frischen Fisch. Um 20:00 Uhr besuche ich ein Orchesterkonzert in der Elbphilharmonie.
+
+Für den zweiten Tag merke ich mir einen zweistündigen Besuch im Hafenmuseum vor. Anschließend möchte ich im Stadtpark spazieren gehen und einen Kaffee trinken.`,
     questions: [
-      { stem: "Anna bereitet ihre Kleidung schon am Vorabend vor. Welches Ziel verfolgt sie damit?", options: ["A) Damit sie morgens Zeit spart.", "B) Weil sie morgens Sport macht.", "C) Damit sie später arbeitet.", "D) Weil sie die Kleidung wäscht."] },
-      { stem: "Welche Information passt zu Annas Weg zwischen Frühstück und Arbeitsbeginn?", options: ["A) Mit dem Zug", "B) Mit dem Bus", "C) Mit dem Fahrrad", "D) Mit dem Auto"] },
-      { stem: "Zwischen Arbeitsbeginn und Feierabend gibt es eine feste Pause. Wann findet sie statt?", options: ["A) Um 8:00 Uhr", "B) Um 12:30 Uhr", "C) Um 16:30 Uhr", "D) Um 22:30 Uhr"] },
-      { stem: "Welche Aktivität gehört nicht jeden Tag, sondern nur zweimal pro Woche zu Annas Nachmittag?", options: ["A) Sie besucht ihre Mutter.", "B) Sie geht ins Fitnessstudio.", "C) Sie arbeitet länger.", "D) Sie geht einkaufen."] },
-      { stem: "Welche Uhrzeit markiert ungefähr das Ende von Annas normalem Werktag?", options: ["A) Um 20:00 Uhr", "B) Um 21:00 Uhr", "C) Um 22:30 Uhr", "D) Nach Mitternacht"] },
+      { stem: "Was macht der Tourist am ersten Tag nach dem Besuch der Touristeninformation?", options: ["A) Er geht direkt ins Hafenmuseum.", "B) Er macht eine Hafenrundfahrt an den Landungsbrücken.", "C) Er fährt in den Stadtpark."] },
+      { stem: "Wie viel kostet die Hafenrundfahrt mit der Gästekarte?", options: ["A) 12 €", "B) 20 € (statt 25 €)", "C) 25 €"] },
+      { stem: "Wo möchte der Tourist am späten Nachmittag essen?", options: ["A) Auf dem Fischmarkt", "B) Im Restaurant Seeblick", "C) Im Stadtpark"] },
+      { stem: "Um wie viel Uhr beginnt das Konzert in der Elbphilharmonie?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Was ist für den zweiten Tag geplant?", options: ["A) Eine zweite Schiffsfahrt", "B) Ein Besuch im Hafenmuseum und ein Spaziergang im Stadtpark", "C) Ein ganzer Tag im Konzertsaal"] },
     ],
   },
   26: {
