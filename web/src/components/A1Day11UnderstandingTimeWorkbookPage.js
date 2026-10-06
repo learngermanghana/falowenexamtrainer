@@ -47,44 +47,19 @@ const videoFrame = {
 };
 
 const teil1Questions = [
-  { stem: "1. Wann steht Maria jeden Morgen auf?", options: ["a) Um Viertel nach sechs", "b) Um Viertel vor sieben", "c) Um halb sieben"] },
-  { stem: "2. Wann frühstückt Maria?", options: ["a) Um Viertel nach sieben", "b) Um halb acht", "c) Um halb neun"] },
-  { stem: "3. Wann geht Maria zur Arbeit?", options: ["a) Um Viertel vor acht", "b) Um halb neun", "c) Um Viertel nach acht"] },
-  {
-    stem: "4. An welchen Tagen hat Maria Deutschunterricht?",
-    options: ["a) Am Montag und Mittwoch", "b) Am Dienstag und Donnerstag", "c) Am Dienstag und Freitag"],
-  },
-  { stem: "5. Wann ist der Deutschunterricht zu Ende?", options: ["a) Um Viertel vor sieben", "b) Um Viertel nach sechs", "c) Um halb sieben"] },
-  { stem: "6. Wann geht Maria am Freitag ins Kino?", options: ["a) Um Viertel vor sieben", "b) Um halb acht", "c) Um Viertel nach sieben"] },
-  { stem: "7. Wann steht Maria am Samstag auf?", options: ["a) Um Viertel nach neun", "b) Um halb zehn", "c) Um Viertel vor zehn"] },
+  { stem: "1. Wie lange bleibt Thomas in Hamburg?", options: ["a) Einen Tag", "b) Zwei Tage", "c) Eine Woche"] },
+  { stem: "2. Wie lange geht Thomas zu Fuß zum Schiff?", options: ["a) 10 Minuten", "b) Eine Stunde", "c) 20 Minuten"] },
+  { stem: "3. Wie lange dauert die Fahrt mit dem Schiff?", options: ["a) 10 Minuten", "b) Eine Stunde", "c) Zwei Tage"] },
+  { stem: "4. Wann beginnt das Konzert?", options: ["a) Um 10 Uhr", "b) Um 12 Uhr", "c) Um 20 Uhr"] },
+  { stem: "5. Wie lange dauert der Besuch im Museum?", options: ["a) 10 Minuten", "b) Zwei Stunden", "c) Den ganzen Tag"] },
 ];
 
-const teil2Text1Questions = [
-  { stem: "1. Wann steht Maria auf?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
-  { stem: "2. Wann frühstückt Maria?", options: ["a) Um sieben Uhr", "b) Um acht Uhr", "c) Um neun Uhr"] },
-  { stem: "3. Wann kommt Maria nach Hause?", options: ["a) Um fünf Uhr", "b) Um sechs Uhr", "c) Um sieben Uhr"] },
-  { stem: "4. Wann geht Maria ins Bett?", options: ["a) Um neun Uhr", "b) Um zehn Uhr", "c) Um elf Uhr"] },
-  {
-    stem: "5. Was macht Maria nach dem Frühstück?",
-    options: ["a) Sie geht zur Arbeit.", "b) Sie geht spazieren.", "c) Sie geht einkaufen."],
-  },
-];
-
-const teil2Text2Questions = [
-  { stem: "6. Um wie viel Uhr hat Paul Deutschunterricht?", options: ["a) Um acht Uhr", "b) Um neun Uhr", "c) Um zehn Uhr"] },
-  {
-    stem: "7. Was macht Paul nach dem Unterricht?",
-    options: ["a) Er geht nach Hause.", "b) Er geht in die Bibliothek.", "c) Er geht einkaufen."],
-  },
-  {
-    stem: "8. Bis wann lernt Paul in der Bibliothek?",
-    options: ["a) Bis ein Uhr nachmittags", "b) Bis zwei Uhr nachmittags", "c) Bis drei Uhr nachmittags"],
-  },
-  {
-    stem: "9. Wann geht Paul nach Hause?",
-    options: ["a) Um zwei Uhr nachmittags", "b) Um drei Uhr nachmittags", "c) Um vier Uhr nachmittags"],
-  },
-  { stem: "10. Wann isst Paul zu Abend?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
+const teil2Questions = [
+  { stem: "1. Es ist Viertel nach drei.", options: ["a) Richtig", "b) Falsch"] },
+  { stem: "2. Der Deutschkurs fängt um fünf Uhr an.", options: ["a) Richtig", "b) Falsch"] },
+  { stem: "3. Anna steht um halb sieben auf.", options: ["a) Richtig", "b) Falsch"] },
+  { stem: "4. Wann macht der Supermarkt zu?", options: ["a) Um vier Uhr.", "b) Um sechs Uhr.", "c) Um acht Uhr."] },
+  { stem: "5. Wann ruft Tom Anna an, und was macht er dann?", options: ["a) Um Viertel vor sechs, er holt Anna ab.", "b) Um halb sieben, er kauft ein.", "c) Um acht Uhr, er sieht fern."] },
 ];
 
 const A1Day11UnderstandingTimeWorkbookPage = () => {
@@ -105,14 +80,13 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           loading="lazy"
           style={{ width: "100%", borderRadius: 10, maxHeight: 280, objectFit: "cover" }}
         />
-        <h2 style={sectionTitle}>Teil 1 (Lesen): Die Uhrzeit (12-Stunden-Uhr), Präpositionen der Zeit, Wochentage</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>A1 · Anspruchsvollere Version · 7 Fragen. Lesen Sie den Text und wählen Sie a, b oder c.</p>
+        <h2 style={sectionTitle}>Teil 1 (Lesen): Thomas in Hamburg</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>Goethe A1.1 · 5 einfache Fragen. Lesen Sie den Text und wählen Sie a, b oder c.</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text:</strong> Heute ist Montag. Maria steht jeden Morgen um Viertel vor sieben auf. Um halb acht
-          frühstückt sie mit ihrer Familie. Um Viertel nach acht geht sie zur Arbeit. Am Dienstag und Donnerstag
-          hat sie Deutschunterricht. Der Unterricht beginnt um halb sechs und ist um Viertel vor sieben zu Ende.
-          Am Freitag geht sie um Viertel nach sieben mit ihren Freunden ins Kino. Der Film beginnt um halb acht.
-          Am Samstag schläft sie lange und steht erst um Viertel nach neun auf.
+          <strong>Text:</strong> Hallo! Ich bin Thomas. Ich bin in Hamburg. Ich bleibe <strong>zwei Tage</strong>.
+          Ich gehe <strong>10 Minuten</strong> zu Fuß zum Schiff. Die Fahrt mit dem Schiff dauert <strong>eine Stunde</strong>.
+          Heute Abend gehe ich in ein Konzert. Das Konzert beginnt <strong>um 20 Uhr</strong>. Ich esse Fisch im Restaurant
+          <em> Seeblick</em>. Morgen gehe ich in ein Museum. Der Besuch dauert <strong>zwei Stunden</strong>.
         </p>
 
         {teil1Questions.map((question) => (
@@ -128,7 +102,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       <div style={card}>
         <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Sehen und hören Sie das Video. Beantworten Sie die 10 Fragen: Text 1 (Fragen 1–5) und Text 2 (Fragen 6–10).
+          Sehen und hören Sie das Video. Beantworten Sie die fünf Fragen. Aufgaben 1–3: Richtig oder falsch? Aufgaben 4–5: Wählen Sie die richtige Antwort.
         </p>
 
         <div style={videoWrapper}>
@@ -142,8 +116,7 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           />
         </div>
 
-        <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 1: 12-Hour Clock</h3>
-        {teil2Text1Questions.map((question) => (
+        {teil2Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
             <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
             {question.options.map((option) => (
@@ -152,15 +125,11 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           </div>
         ))}
 
-        <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 2: Prepositions of Time</h3>
-        {teil2Text2Questions.map((question) => (
-          <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
-            {question.options.map((option) => (
-              <p key={option} style={optionLine}>{option}</p>
-            ))}
-          </div>
-        ))}
+        <div style={{ ...questionBlock, background: "#f8fafc" }}>
+          <p style={{ margin: 0 }}><strong>Zusatzaufgabe · trennbare Verben</strong></p>
+          <p style={{ margin: 0 }}>Ergänzen Sie: „Ich ___ um sieben Uhr ___ (aufstehen).“</p>
+          <p style={{ margin: 0, color: "#64748b" }}>Diese Zusatzaufgabe ist Übung und gehört nicht zu den fünf benoteten Hören-Fragen.</p>
+        </div>
       </div>
 
       <div style={card}>
