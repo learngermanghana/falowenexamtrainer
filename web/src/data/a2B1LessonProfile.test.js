@@ -98,7 +98,7 @@ describe("canonical A2/B1 lesson profiles", () => {
     expect(getA2B1LessonProfile("A2", 25)).toMatchObject({
       assignmentKey: "A2-9.25",
       timer: {
-        durationMinutes: 45,
+        durationMinutes: 10,
         timedTabs: ["lesen"],
         source: "lesson-profile",
       },
