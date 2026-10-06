@@ -282,9 +282,9 @@ export const A2_LISTENING_TASKS = {
   },
   23: {
     chapter: "9.23",
-    mode: A2_LISTENING_MODES.SELF_CHECK,
-    task: "Öffnen Sie die separate Goethe-Hören-Übung für Teil 4. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht die Teil-4-Aufgabe.",
-    audioUrl: "https://youtu.be/6DA1dYfqEZo?list=PLg78ckjpHfZzy9rvr_CmY73BLJiPTiaXL",
+    mode: A2_LISTENING_MODES.NONE,
+    task: "",
+    audioUrl: "",
     questions: [],
   },
   24: {
