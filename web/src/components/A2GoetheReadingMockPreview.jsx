@@ -310,22 +310,59 @@ const TeilHeading = ({ data }) => (
   </header>
 );
 
-export default function A2GoetheReadingMockPreview() {
+export default function A2GoetheReadingMockPreview({ publicMode = false }) {
   const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
 
+  const publicQuestions = useMemo(
+    () => [
+      ...A2_GOETHE_READING_MOCK.teil1.questions,
+      ...A2_GOETHE_READING_MOCK.teil2.questions,
+      ...A2_GOETHE_READING_MOCK.teil3.questions,
+      ...A2_GOETHE_READING_MOCK.teil4.people,
+    ],
+    [],
+  );
   const answered = useMemo(
     () => Object.keys(answers).filter((key) => /^q\d+$/.test(key)).length,
     [answers],
   );
+  const correctCount = useMemo(
+    () => publicQuestions.filter((question) => answers[`q${question.number}`] === question.answer).length,
+    [answers, publicQuestions],
+  );
+  const publicPercent = Math.round((correctCount / Math.max(1, publicQuestions.length)) * 100);
 
-  const setAnswer = (number, value) =>
+  const setAnswer = (number, value) => {
+    setSubmitted(false);
     setAnswers((current) => ({ ...current, [`q${number}`]: value }));
+  };
+
+  const submitPublicPractice = () => {
+    if (answered < publicQuestions.length) return;
+    setSubmitted(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "falowen:public-exam-practice:a2:lesen",
+        JSON.stringify({
+          score: correctCount,
+          total: publicQuestions.length,
+          percent: publicPercent,
+          completedAt: new Date().toISOString(),
+        }),
+      );
+    }
+  };
 
   return (
     <main className="a2-mock-shell" data-a2-reading-mock-preview>
       <div className="a2-mock-topbar">
-        <AppBackButton label="Back to A2 mock" fallbackPath="/campus/course/a2-mock-practice-preview" />
-        <span>A2 Lesen practice</span>
+        {publicMode ? (
+          <a href="/exam-practice" style={{ fontWeight: 700, textDecoration: "none" }}>← Back to free practice</a>
+        ) : (
+          <AppBackButton label="Back to A2 mock" fallbackPath="/campus/course/a2-mock-practice-preview" />
+        )}
+        <span>{publicMode ? "Free A2 practice" : "A2 Lesen practice"}</span>
       </div>
 
       <article className="a2-mock-exam">
@@ -499,6 +536,48 @@ export default function A2GoetheReadingMockPreview() {
             ))}
           </div>
         </section>
+
+        {publicMode ? (
+          <section style={{ marginTop: 24, padding: 20, border: "1px solid #dbeafe", borderRadius: 16, background: "#f8fbff" }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>Free Falowen practice · {answered}/{publicQuestions.length} answered</p>
+            {!submitted ? (
+              <>
+                <p style={{ margin: "8px 0 14px", color: "#475569" }}>
+                  Complete all 20 questions to receive an instant reading score. Public attempts never affect student coursework.
+                </p>
+                <button
+                  type="button"
+                  onClick={submitPublicPractice}
+                  disabled={answered < publicQuestions.length}
+                  style={{ padding: "10px 16px", borderRadius: 10, border: 0, fontWeight: 700, cursor: answered === publicQuestions.length ? "pointer" : "not-allowed" }}
+                >
+                  Check my result
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 style={{ margin: "10px 0 4px" }}>{correctCount}/{publicQuestions.length} · {publicPercent}%</h2>
+                <p style={{ margin: "0 0 14px", color: "#475569" }}>
+                  {publicPercent >= 60 ? "Good progress. Continue with more exam-style practice to build consistency." : "Keep practising. Review the reading tasks and try the mock again."}
+                </p>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAnswers({});
+                      setSubmitted(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    Try again
+                  </button>
+                  <a href="/signup?program=german&source=public-exam-practice" style={{ fontWeight: 700 }}>Create a Falowen account</a>
+                  <a href="/login/" style={{ fontWeight: 700 }}>Student sign in</a>
+                </div>
+              </>
+            )}
+          </section>
+        ) : null}
       </article>
     </main>
   );
