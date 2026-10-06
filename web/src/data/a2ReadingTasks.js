@@ -467,46 +467,62 @@ Mitarbeiterin: Hier ist auch ein Stadtplan, auf dem ich das Schiff, das Restaura
   },
   23: {
     chapter: "9.23",
-    format: "Arbeitsweg",
-    title: "Drei Wege zur Arbeit",
-    strategy: "Achte darauf, wer welches Verkehrsmittel benutzt und warum. Jede Information muss wirklich im Text stehen.",
-    text: `Drei Kolleginnen und Kollegen erzählen von ihrem Arbeitsweg.
+    format: "Blogbeitrag",
+    title: "Mein Weg zur Arbeit",
+    strategy: "Lies zuerst die Aufgaben und suche dann gezielt nach Verkehrsmittel, Dauer, Grund, Problem und Preis.",
+    text: `Hallo zusammen!
 
-Matthias wohnt außerhalb der Stadt. Er fährt morgens mit dem Regionalzug und danach noch zwei Stationen mit der Straßenbahn. Insgesamt braucht er etwa 45 Minuten.
+Ich heiße Markus und wohne in Bremen. Jeden Morgen muss ich zur Arbeit in die Innenstadt fahren. Mein Weg ist ziemlich lang: Zuerst gehe ich zehn Minuten zu Fuß zum Bahnhof. Dann nehme ich um 7:15 Uhr die S-Bahn. Die Fahrt dauert etwa 25 Minuten. Wenn die S-Bahn pünktlich ist, komme ich um 7:50 Uhr im Büro an.
 
-Bernd wohnt nur vier Kilometer vom Büro entfernt. Wenn das Wetter gut ist, fährt er mit dem Fahrrad. Bei Regen nimmt er den Bus 16.
+Im Sommer fahre ich manchmal mit dem Fahrrad, aber das dauert fast eine Stunde. Das ist mir im Winter zu kalt. Mein Kollege Jan fährt immer mit dem Auto, aber er steht oft im Stau und findet schwer einen Parkplatz. Deshalb finde ich die S-Bahn am besten, auch wenn ein Monatsticket 65 Euro kostet.
 
-Thomas wohnt im Zentrum. Er geht meistens zu Fuß zur Arbeit. Das dauert 20 Minuten. Nur wenn er sehr spät dran ist, nimmt er die U-Bahn.`,
+Wie fahrt ihr zur Arbeit oder zur Schule? Schreibt mir einen Kommentar!`,
     questions: [
-      { stem: "Welches Verkehrsmittel benutzt Matthias zuerst?", options: ["A) Den Regionalzug", "B) Das Fahrrad", "C) Den Bus 16", "D) Die U-Bahn"] },
-      { stem: "Wie lange braucht Matthias ungefähr zur Arbeit?", options: ["A) 20 Minuten", "B) 30 Minuten", "C) 45 Minuten", "D) Eine Stunde"] },
-      { stem: "Wann fährt Bernd mit dem Fahrrad?", options: ["A) Bei gutem Wetter", "B) Bei Regen", "C) Nur am Sonntag", "D) Wenn er spät dran ist"] },
-      { stem: "Was nimmt Bernd bei Regen?", options: ["A) Die Straßenbahn", "B) Den Bus 16", "C) Die U-Bahn", "D) Den Regionalzug"] },
-      { stem: "Wie kommt Thomas meistens zur Arbeit?", options: ["A) Mit dem Auto", "B) Mit der U-Bahn", "C) Zu Fuß", "D) Mit dem Fahrrad"] },
+      { stem: "Wie kommt Markus morgens zum Bahnhof?", options: ["A) Mit dem Fahrrad", "B) Zu Fuß", "C) Mit dem Auto"] },
+      { stem: "Wie lange dauert die Fahrt mit der S-Bahn?", options: ["A) 10 Minuten", "B) 25 Minuten", "C) 50 Minuten"] },
+      { stem: "Warum fährt Markus im Winter nicht mit dem Fahrrad?", options: ["A) Weil es ihm zu kalt ist.", "B) Weil sein Fahrrad kaputt ist.", "C) Weil die Fahrkarte teuer ist."] },
+      { stem: "Welches Problem hat sein Kollege Jan?", options: ["A) Die S-Bahn ist oft zu spät.", "B) Er findet schwer einen Parkplatz.", "C) Er darf nicht mit dem Auto fahren."] },
+      { stem: "Was kostet Markus' Monatsticket?", options: ["A) 25 Euro", "B) 50 Euro", "C) 65 Euro"] },
     ],
   },
   24: {
     chapter: "9.24",
-    format: "Reiseangebote zuordnen",
-    title: "Welches Angebot passt?",
-    strategy: "Lies zuerst die Wünsche der Reisenden. Vergleiche danach Reiseziel, Preis, Verkehrsmittel und Aktivitäten.",
-    text: `Angebot A – Hamburg-Wochenende
-2 Nächte, Hotel mit Frühstück, Hafenrundfahrt inklusive, Anreise mit dem Zug, 229 Euro.
+    format: "Situationen und Anzeigen zuordnen",
+    title: "Welche Anzeige passt?",
+    strategy: "Lies zuerst die fünf Situationen. Markiere Schlüsselwörter wie Sport, Kinder, Kultur, Berge oder günstig und vergleiche sie dann mit den Anzeigen A–F.",
+    text: `Situationen / Personen
 
-Angebot B – Wandern im Harz
-3 Nächte in einer Pension, Frühstück, zwei geführte Wanderungen, eigene Anreise, 189 Euro.
+1. Herr Becker möchte im Urlaub viel Sport machen, am liebsten im Meer schwimmen und tauchen lernen.
+2. Familie Meier reist mit zwei kleinen Kindern. Sie suchen ein Hotel direkt am Strand mit Betreuung für die Kinder.
+3. Frau Klum möchte eine Städtereise machen. Sie interessiert sich für Kunst, Museen und ein Konzert oder Musical.
+4. Markus und Lisa möchten in den Sommerferien in den Bergen wandern und die Natur genießen.
+5. Sarah ist Studentin, hat wenig Geld und sucht eine sehr günstige Unterkunft im Stadtzentrum.
 
-Angebot C – Wellness am See
-2 Nächte, Hotel mit Pool und Sauna, Abendessen inklusive, 310 Euro.
+Anzeigen A–F
 
-Angebot D – Berlin günstig
-2 Nächte im Hostel, ohne Frühstück, Busfahrt hin und zurück inklusive, 149 Euro.`,
+Anzeige A – Hotel Alpin in Tirol
+Genießen Sie frische Bergluft! Ideal für Wanderer und Naturfreunde. Geführte Bergtouren jeden Tag. Rezeption rund um die Uhr besetzt.
+
+Anzeige B – City-Hostel Zentrum
+Günstig übernachten mitten in der Stadt! Mehrbettzimmer ab 18 € pro Nacht. Perfekt für Studenten und junge Leute.
+
+Anzeige C – Familien-Resort Ostsee
+Urlaub direkt am Sandstrand! Großer Spielplatz, Kinderbetreuung und Animation von 3 bis 10 Jahren. Die Eltern entspannen am Strand.
+
+Anzeige D – Wassersport-Camp Mittelmeer
+Aktivurlaub für Sportfans! Tauchkurse für Anfänger, Windsurfen und Segeln im Meer. Moderne Ausrüstung inklusive.
+
+Anzeige E – Hamburg Kultur-Spezial
+3 Tage Städtereise inklusive Hotel, Stadtplan, Eintritt ins Museum und Konzertkarte für die Elbphilharmonie!
+
+Anzeige F – Wellness-Hotel Waldruh
+Ruhe und Erholung pur im Schwarzwald. Große Saunalandschaft, Massagen und gutes Essen. Nur für Erwachsene.`,
     questions: [
-      { stem: "Nora möchte eine Hafenrundfahrt machen und mit dem Zug reisen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "David möchte vor allem wandern und weniger als 200 Euro bezahlen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Mina möchte Sauna und Pool im Hotel.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Jonas sucht das günstigste Angebot mit Hin- und Rückfahrt.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Bei welchem Angebot ist Abendessen inklusive?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Herr Becker", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Familie Meier", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Frau Klum", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Markus und Lisa", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Sarah", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
     ],
   },
   25: {
