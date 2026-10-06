@@ -22,7 +22,7 @@ describe("A2 Day 21 and B1 Day 17 workbook updates", () => {
     expect(screen.getByText("Was planst du für das Wochenende?")).toBeInTheDocument();
   });
 
-  test("uses only the approved YouTube video for B1 Day 17 Teil 4 Hören", () => {
+  test("uses the Anna and Ben podcast questions for B1 Day 17 Teil 4 Hören", () => {
     const config = B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG;
     const { listening, ...nonListeningConfig } = config;
 
@@ -30,9 +30,19 @@ describe("A2 Day 21 and B1 Day 17 workbook updates", () => {
       expect.objectContaining({
         embedUrl: "https://www.youtube-nocookie.com/embed/NCfwHzAHoJI?rel=0&playsinline=1",
         externalUrl: "https://youtu.be/NCfwHzAHoJI",
+        title: "Podcast · Wie lernt man am besten?",
       }),
     );
-    expect(JSON.stringify(listening)).not.toContain("1p0C0Gz_8d_0y9GHF-4RzqDFTQ89fvpDi");
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.questions.map((question) => question.stem)).toEqual([
+      "1. Wie sollte man laut Ben lernen?",
+      "2. Warum ist tägliches Lernen besser?",
+      "3. Wie soll man Vokabeln lernen?",
+      "4. Was empfiehlt Ben, um besser zu sprechen?",
+      "5. Was ist laut Ben das Wichtigste beim Lernen?",
+    ]);
+    expect(listening.transcript).toMatch(/zwanzig Minuten/);
+    expect(listening.transcript).toMatch(/Geduld und Spaß/);
     expect(JSON.stringify(nonListeningConfig)).not.toContain("NCfwHzAHoJI");
   });
 });
