@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import { useAuth } from "../context/AuthContext";
+import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 import { styles } from "../styles";
 
 const GRAMMAR_ROUTE = "/campus/course/a1-day-12-the-24-hour-clock-and-dates";
+const DAY12_AUDIO_KEY = "a1/day-12/day-12.mp3";
 
 const pageGrid = {
   display: "grid",
@@ -76,7 +79,29 @@ const QuestionList = ({ questions }) => (
 );
 
 export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
+  const { idToken } = useAuth();
   const [showScript, setShowScript] = useState(false);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [audioError, setAudioError] = useState("");
+  const [loadingAudio, setLoadingAudio] = useState(false);
+
+  const loadAudio = async () => {
+    if (audioUrl || loadingAudio) return;
+    setLoadingAudio(true);
+    setAudioError("");
+    try {
+      const playback = await fetchA1AudioPlaybackUrl({
+        day: 12,
+        key: DAY12_AUDIO_KEY,
+        idToken,
+      });
+      setAudioUrl(playback.url);
+    } catch (error) {
+      setAudioError(error?.response?.data?.error || error?.message || "Audio could not be loaded.");
+    } finally {
+      setLoadingAudio(false);
+    }
+  };
 
   return (
     <A1TutorMarkedWorkbookShell
@@ -120,6 +145,24 @@ export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
           <h2 style={sectionTitle}>Teil 2: Hören · Zug nach Berlin</h2>
           <div style={instructionBox}>
             Aufgaben 1–3: Richtig oder falsch? Aufgaben 4–5: Wählen Sie die richtige Antwort.
+          </div>
+
+          <div style={{ ...questionBlock, background: "#f8fafc" }}>
+            {!audioUrl ? (
+              <button
+                type="button"
+                onClick={loadAudio}
+                disabled={loadingAudio}
+                style={{ ...styles.secondaryButton, width: "fit-content" }}
+              >
+                {loadingAudio ? "Audio wird geladen …" : "Hören starten"}
+              </button>
+            ) : (
+              <audio controls preload="metadata" src={audioUrl} style={{ width: "100%" }}>
+                Ihr Browser unterstützt dieses Audio nicht.
+              </audio>
+            )}
+            {audioError ? <p style={{ margin: 0, color: "#b91c1c" }}>{audioError}</p> : null}
           </div>
 
           <div style={{ display: "grid", gap: 8 }}>
