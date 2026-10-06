@@ -2,6 +2,7 @@ const exportedFunctions = require("./index");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
+const { absolutePushLink } = require("./pushLinks");
 
 const NOTIFICATION_BATCH_SIZE = 500;
 const PAYMENT_REMINDER_DAYS = new Set([15, 7, 3, 1, 0]);
@@ -125,7 +126,7 @@ const sendPush = async ({ tokens, notification, data, tokenOwners }) => {
       webpush: {
         headers: { TTL: "86400", Urgency: "high" },
         notification: { actions: [{ action: "open", title: "Open" }], data },
-        fcmOptions: data.route ? { link: data.route } : undefined,
+        fcmOptions: data.route ? { link: absolutePushLink(data.route) } : undefined,
       },
     });
     response.responses.forEach((result, index) => {

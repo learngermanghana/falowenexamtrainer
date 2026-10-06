@@ -553,7 +553,7 @@ const requestMessagingToken = async (shouldRetry = true) => {
   const environment = getPushEnvironment();
   if (environment.ios && !environment.standalone) {
     throw new Error(
-      "On iPhone, Falowen notifications only work from the installed Home Screen app. Open Falowen from its Home Screen icon, then tap Enable notifications."
+      "On iPhone (iOS 16.4 or newer), notifications only work from the Home Screen app, not a Safari tab. In Safari, tap Share → Add to Home Screen, open the new Falowen icon, then tap Enable notifications."
     );
   }
 

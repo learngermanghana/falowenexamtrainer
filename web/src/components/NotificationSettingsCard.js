@@ -57,7 +57,7 @@ const getPushTestErrorMessage = (error) => {
     code.includes("not-found") ||
     code.includes("unavailable")
   ) {
-    return "Falowen could not reach the push test service. Refresh this page and try again in a moment.";
+    return "The notification test failed. Tap Refresh this device, then try again. If it still fails, contact support so we can check the Firebase function logs.";
   }
 
   if (code.includes("unauthenticated")) {
@@ -197,7 +197,7 @@ const NotificationSettingsCard = () => {
       <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}><strong>Android / Chrome:</strong> tap Enable notifications and allow the browser permission.</p>
         <p style={{ margin: 0 }}>
-          <strong>iPhone:</strong> open Falowen from the Home Screen icon, then tap Enable notifications. If the row above says “Home Screen app: No” or “Web Push unavailable”, remove the old icon, open <strong>www.falowen.app</strong> in Safari, add it to the Home Screen again, and use the new icon.
+          <strong>iPhone (iOS 16.4 or newer):</strong> push notifications do not work in a normal Safari tab. Open <strong>www.falowen.app</strong> in Safari, tap Share → Add to Home Screen, then open that icon and tap Enable notifications. If “Web Push unavailable” still appears, check your iOS version and reinstall the Home Screen app.
         </p>
       </div>
     </section>

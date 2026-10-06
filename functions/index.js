@@ -8,6 +8,7 @@ const {
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const { absolutePushLink } = require("./pushLinks");
 const { FieldValue, FieldPath } = require("firebase-admin/firestore");
 
 const getAdmin = () => {
@@ -811,7 +812,7 @@ const sendNotifications = async ({
       actions: [{ action: "open", title: "Open" }],
       data: { ...data },
     },
-    fcmOptions: data?.route ? { link: data.route } : undefined,
+    fcmOptions: data?.route ? { link: absolutePushLink(data.route) } : undefined,
   };
 
   for (let i = 0; i < tokens.length; i += NOTIFICATION_BATCH_SIZE) {
@@ -902,7 +903,7 @@ exports.sendPushTestNotification = onCall(
           actions: [{ action: "open", title: "Open" }],
           data: { ...data },
         },
-        fcmOptions: { link: route },
+        fcmOptions: { link: absolutePushLink(route) },
       },
     });
 
