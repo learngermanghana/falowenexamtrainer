@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -10,11 +10,9 @@ import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
 import TrialCountdownBanner from "./TrialCountdownBanner";
-import { fetchAnnouncements } from "../services/announcementService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
-import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import LegalFooter from "./LegalFooter";
 import { detectLevelKey } from "../lib/day0Workbook";
 
@@ -210,51 +208,6 @@ const CompactCourseGuide = ({ studentProfile, levelKey, onOpenDay0, onOpenCourse
   );
 };
 
-const AnnouncementSection = ({ announcements, announcementStatus, announcementIndex, t }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <SectionHeader
-      eyebrow={t("generalHome.announcements.eyebrow")}
-      title={t("generalHome.announcements.title")}
-      subtitle={t("generalHome.announcements.subtitle")}
-    />
-    {announcementStatus === "loading" ? (
-      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.loading")}</p>
-    ) : null}
-    {announcementStatus === "error" ? (
-      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.error")}</p>
-    ) : null}
-    {announcementStatus === "success" && announcements.length === 0 ? (
-      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.empty")}</p>
-    ) : null}
-    {announcementStatus === "success" && announcements.length > 0 ? (
-      <div className="announcement-slider" aria-label={t("generalHome.announcements.ariaLabel")} aria-live="polite">
-        <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
-          {(() => {
-            const announcement = announcements[announcementIndex] || {};
-            return (
-              <>
-                <div className="announcement-message">
-                  <span className="announcement-ticker-title">{announcement.title}</span>
-                </div>
-                {announcement.linkUrl ? (
-                  <a href={announcement.linkUrl} target="_blank" rel="noreferrer" className="announcement-ticker-link">
-                    {announcement.linkLabel || t("generalHome.announcements.openUpdate")}
-                  </a>
-                ) : null}
-              </>
-            );
-          })()}
-        </div>
-        {announcements.length > 1 ? (
-          <div className="announcement-slide-count" aria-hidden="true">
-            {announcementIndex + 1} / {announcements.length}
-          </div>
-        ) : null}
-      </div>
-    ) : null}
-  </section>
-);
-
 const GeneralHome = ({
   onSelectArea,
   studentProfile,
@@ -279,9 +232,6 @@ const GeneralHome = ({
     studentProfile?.classId || studentProfile?.classRecordId || studentProfile?.assignedClassId || ""
   ).trim();
   const classCalendarId = "class-calendar-card";
-  const [announcements, setAnnouncements] = useState([]);
-  const [announcementStatus, setAnnouncementStatus] = useState("idle");
-  const [announcementIndex, setAnnouncementIndex] = useState(0);
   const levelKey = detectLevelKey(studentProfile);
   const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
@@ -360,45 +310,6 @@ const GeneralHome = ({
     navigate("/");
   };
 
-  useEffect(() => {
-    let mounted = true;
-    const loadAnnouncements = async () => {
-      setAnnouncementStatus("loading");
-      try {
-        const items = await fetchAnnouncements({
-          className: studentProfile?.className,
-          program: studentProfile?.program,
-          locale,
-        });
-        if (!mounted) return;
-        setAnnouncements(items);
-        setAnnouncementStatus("success");
-      } catch (error) {
-        console.error("Failed to load announcements", error);
-        if (!mounted) return;
-        setAnnouncements([]);
-        setAnnouncementStatus("error");
-      }
-    };
-
-    loadAnnouncements();
-    return () => {
-      mounted = false;
-    };
-  }, [locale, studentProfile?.className, studentProfile?.program]);
-
-  useEffect(() => {
-    if (announcements.length <= 1) {
-      setAnnouncementIndex(0);
-      return undefined;
-    }
-
-    const interval = setInterval(() => {
-      setAnnouncementIndex((current) => (current + 1) % announcements.length);
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, [announcements]);
 
   if (!onboardingCompleted) {
     return (
@@ -438,7 +349,7 @@ const GeneralHome = ({
             title="Check your Zoom and calendar here"
             subtitle="Use this during onboarding only. After setup, it will move into the dashboard under Live class access & calendar."
           />
-          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
+          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} homepageCompact />
         </section>
         <LegalFooter />
       </div>
@@ -491,20 +402,8 @@ const GeneralHome = ({
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
 
-      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
+      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} homepageCompact />
 
-      <AnnouncementSection
-        announcements={announcements}
-        announcementStatus={announcementStatus}
-        announcementIndex={announcementIndex}
-        t={t}
-      />
-
-      <section style={{ ...styles.card, marginBottom: 0 }}>
-        <PrimaryActionBar align="start">
-          <YouTubeSubscribeButton />
-        </PrimaryActionBar>
-      </section>
       <LegalFooter />
     </div>
   );
