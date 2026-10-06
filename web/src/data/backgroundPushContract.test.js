@@ -12,6 +12,7 @@ describe("background push contract", () => {
     expect(worker).toContain('importScripts("/__falowen-firebase-config.js")');
     expect(worker).toContain("initializeMessaging(self.__FALOWEN_FIREBASE_CONFIG__)");
     expect(worker).toContain("messaging.onBackgroundMessage");
+    expect(worker).toContain("if (payload?.notification) return;");
   });
 
   test("production build emits a Firebase config file for the service worker", () => {
