@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 import AppBackButton from "./navigation/AppBackButton";
@@ -97,30 +98,21 @@ const professionGroups = [
 ];
 
 const readingQuestions = [
-  {
-    stem: "Erst durch den Anruf bemerkte Susanne das Fehlen ihrer Brieftasche.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
-  {
-    stem: "Susanne glaubte, die Brieftasche beim Bezahlen vergessen zu haben.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
-  {
-    stem: "Der Finder hatte die Brieftasche ins Fundbüro gebracht.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
-  {
-    stem: "Die Telefonnummer der Bank war in der Brieftasche.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
-  {
-    stem: "In Susannes Brieftasche fehlte nichts.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
-  {
-    stem: "Susanne konnte dem Finder persönlich für seine Ehrlichkeit danken.",
-    options: ["A) Richtig", "B) Falsch"],
-  },
+  { stem: "Warum ist der Beruf des Reiseleiters für viele attraktiv?", options: ["A) Weil man von Anfang an sehr viel Geld verdient.", "B) Weil man Reisen und Beruf miteinander verbinden kann.", "C) Weil die Ausbildung sehr kurz und einfach ist."] },
+  { stem: "Wie ist die Ausbildung zum Reiseleiter in Deutschland geregelt?", options: ["A) Es gibt eine dreijährige staatliche Berufsausbildung.", "B) Man muss zwingend ein Studium der Geografie vorweisen.", "C) Es gibt keine staatlich vorgeschriebene, feste Ausbildung."] },
+  { stem: "Welche Qualifikation wird von vielen Reiseveranstaltern geschätzt?", options: ["A) Ein Führerschein für Busse und Lkws.", "B) Ein Studium oder eine Ausbildung im Bereich Tourismus, Sprachen oder Kultur.", "C) Langjährige Erfahrung als Hotelmanager."] },
+  { stem: "Welche Sprachkenntnisse werden im Text als besonders wichtig genannt?", options: ["A) Ausschließlich Deutschkenntnisse auf Muttersprachenniveau.", "B) Fließendes Englisch und nach Möglichkeit die Sprache des Reiselandes.", "C) Mindestens vier verschiedene Fremdsprachen perfekt."] },
+  { stem: "Welche Eigenschaft muss ein Reiseleiter bei Problemen zeigen?", options: ["A) Er muss ruhige und schnelle Entscheidungen treffen können.", "B) Er muss das Geld für die Reise sofort zurückzahlen.", "C) Er muss die Gruppe bitten, das Problem selbst zu lösen."] },
+  { stem: "Was lernen Teilnehmer in den Vorbereitungskursen der Agenturen?", options: ["A) Wie man Reisebusse repariert und pflegt.", "B) Themen wie Rhetorik, Erste Hilfe und Reiserecht.", "C) Wie man ein eigenes Reiseunternehmen gründet."] },
+  { stem: "Wie starten Anfänger meistens in den Beruf?", options: ["A) Sie leiten sofort große Gruppen auf Fernreisen.", "B) Sie arbeiten zuerst als Lehrer an einer Sprachschule.", "C) Sie sammeln Erfahrung auf kürzeren Fahrten."] },
+];
+
+const listeningQuestions = [
+  { stem: "Welchen Schulabschluss braucht man mindestens?", options: ["A) Hauptschulabschluss", "B) Mittleren Abschluss", "C) Abitur"] },
+  { stem: "Wie lange dauert die Ausbildung meistens?", options: ["A) Ein bis zwei Jahre", "B) Drei bis vier Jahre", "C) Sechs Jahre"] },
+  { stem: "Richtig oder falsch: In allen Bundesländern bekommt man Geld in der Ausbildung.", options: ["A) Richtig", "B) Falsch"] },
+  { stem: "Was macht man im Beruf?", options: ["A) Man bastelt und singt mit den Kindern", "B) Man arbeitet nur im Büro", "C) Man repariert Spielzeug"] },
+  { stem: "Welche Eigenschaft ist laut Ben wichtig?", options: ["A) Schnell laufen", "B) Geduld", "C) Gut kochen"] },
 ];
 
 const PreparedCheckbox = ({ checked, onChange }) => (
@@ -299,17 +291,12 @@ const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
           />
 
           <article style={questionCardStyle}>
-            <h3 style={{ margin: 0 }}>SusannesAlltagsBlog.at</h3>
-            <p style={{ margin: 0, color: "#475569" }}>Mein Alltag, meine Gedanken, mein Leben ... · Donnerstag, den 23. Juni</p>
-            <p style={{ margin: 0 }}>
-              Als Susanne beim Kochen war, rief eine Mitarbeiterin ihrer Bank an. Eine Brieftasche war in der Bankfiliale abgegeben worden. Susanne hatte noch gar nicht bemerkt, dass sie fehlte.
-            </p>
-            <p style={{ margin: 0 }}>
-              Ein junger Mann hatte die Brieftasche auf dem Parkplatz vor dem Supermarkt gefunden. Er wollte sie zuerst ins Fundbüro bringen, aber der Weg war zu weit. Auf der Bankomatkarte fand er Susannes Namen und ihre Bank.
-            </p>
-            <p style={{ margin: 0 }}>
-              Die Bank konnte Susannes Telefonnummer herausfinden. Zum Glück war alles noch in der Brieftasche. Susanne kennt den Finder nicht und kann ihm deshalb nicht persönlich danken.
-            </p>
+            <h3 style={{ margin: 0 }}>Berufsbild · Wie wird man eigentlich Reiseleiter/in?</h3>
+            <p style={{ margin: 0, color: "#475569" }}>Magazin „Beruf & Zukunft“</p>
+            <p>Viele Menschen träumen davon, ihr Hobby zum Beruf zu machen und fremde Länder zu bereisen. Der Beruf des Reiseleiters klingt für viele nach Urlaub, doch der Arbeitsalltag ist anspruchsvoll und erfordert hohe Flexibilität. Aber wie wird man überhaupt Reiseleiter oder Reiseleiterin?</p>
+            <p>In Deutschland gibt es keine klassische, staatlich geregelte Berufsausbildung für Reiseleiter. Das bedeutet, dass der Zugang zu diesem Beruf nicht gesetzlich geschützt ist und man keine mehrjährige Lehre absolvieren muss. Viele Reiseveranstalter suchen Bewerber mit einer Ausbildung im Tourismusbereich oder einem abgeschlossenen Studium, beispielsweise in Geschichte, Geografie, Kulturwissenschaften oder Sprachen.</p>
+            <p>Wichtiger als ein bestimmter Studienabschluss sind jedoch praktische Fähigkeiten. Gute Sprachkenntnisse – vor allem fließendes Englisch und idealerweise die Landessprache des Zielgebiets – sind eine grundlegende Voraussetzung. Zudem muss ein Reiseleiter organisatorisches Talent besitzen, stressresistent sein und gut mit Menschen umgehen können. Wenn vor Ort Probleme auftreten, etwa wenn ein Bus Verspätung hat oder ein Hotelzimmer nicht bereitsteht, muss der Reiseleiter schnell und ruhig eine Lösung finden.</p>
+            <p style={{ margin: 0 }}>Wer als Reiseleiter arbeiten möchte, nimmt häufig an speziellen Schulungen und Vorbereitungskursen von Reiseagenturen teil. Diese Kompaktkurse dauern meist einige Wochen und vermitteln Kenntnisse in Rhetorik, Erste Hilfe, Gruppenführung und Reiserecht. Anschließend beginnt man oft als Nachwuchskraft auf kürzeren Fahrten, bevor man eigenverantwortlich große Reisegruppen im Ausland betreut.</p>
           </article>
 
           <h3 style={sectionTitle}>Questions</h3>
@@ -321,43 +308,25 @@ const B1Day20PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
 
 {activeTab === "hoeren" && (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 4 · Hören (Self-check)</h2>
+          <h2 style={sectionTitle}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard
-            eyebrow="Independent practice · Listening"
-            title="Bearbeiten Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst."
-            practiceOnly
-            submissionNote="Teil 4 is self-check practice. Do not submit your Hören answers."
+            eyebrow="Your assignment · Listening"
+            title="Hören · Ausbildung und Beruf"
+            submissionNote="Submit only the five answer letters, for example: 1B, 2B, 3B."
           >
             <p style={{ margin: 0 }}>
-              Lesen Sie zuerst die Aufgaben im Video, hören Sie aufmerksam zu und vergleichen Sie Ihre Lösungen danach mit den Antworten im Video.
+              Hören Sie aufmerksam zu und wählen Sie bei jeder Frage die richtige Lösung.
             </p>
           </WorkbookTaskCard>
 
-          <img
-            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
-            alt="Headphones for German listening practice"
-            loading="lazy"
-            style={tabImageStyle}
+          <B1ProtectedAudioPlayer
+            day={20}
+            audioKey="b1/day-20/day-20.mp3"
+            title="B1 Day 20 · Hören"
           />
 
-          <iframe
-            style={videoStyle}
-            src="https://www.youtube-nocookie.com/embed/fMCYUVNYc9U?rel=0&playsinline=1"
-            title="B1 Day 20 Hören"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-
-          <div style={questionCardStyle}>
-            <strong>Self-check instructions</strong>
-            <ol style={listSpacing}>
-              <li>Lesen Sie zuerst alle Aufgaben.</li>
-              <li>Hören Sie aufmerksam zu.</li>
-              <li>Bearbeiten Sie schwierige Teile ein zweites Mal.</li>
-              <li>Vergleichen Sie Ihre Antworten mit den Lösungen im Video.</li>
-            </ol>
-          </div>
-
+          <QuestionList questions={listeningQuestions} />
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
       )}
@@ -371,9 +340,9 @@ const config = {
   assignmentKey: "B1-6.20",
   workbookId: "B1Day20BerufKennen",
   title: "Wie wird man …?",
-  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. Teil 4 remains self-check and is not submitted.",
-  submitListening: false,
-  listening: { submitRequired: false },
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. Teil 3 Lesen and Teil 4 Hören are graded assignments.",
+  submitListening: true,
+  listening: { submitRequired: true, audioKey: "b1/day-20/day-20.mp3" },
 };
 
 export default function B1Day20BerufKennenWorkbookPage() {
