@@ -25,22 +25,22 @@ jest.mock("./A1TutorMarkedWorkbookShell", () => {
 
 beforeEach(() => window.localStorage.clear());
 
-test("Day 11 has seven Lesen and ten Hören questions with one clickable answer set per question", async () => {
+test("Day 11 has five Lesen and five Hören questions with one clickable answer set per question", async () => {
   render(<A1Day11UnderstandingTimeWorkbookPage />);
   const reading = within(screen.getByTestId("teil-1"));
   const listening = within(screen.getByTestId("teil-2"));
   await waitFor(() => {
-    expect(reading.getAllByRole("radiogroup")).toHaveLength(7);
-    expect(listening.getAllByRole("radiogroup")).toHaveLength(10);
-    expect(reading.getAllByRole("radio")).toHaveLength(21);
-    expect(listening.getAllByRole("radio")).toHaveLength(30);
+    expect(reading.getAllByRole("radiogroup")).toHaveLength(5);
+    expect(listening.getAllByRole("radiogroup")).toHaveLength(5);
+    expect(reading.getAllByRole("radio")).toHaveLength(15);
+    expect(listening.getAllByRole("radio")).toHaveLength(12);
     expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
   });
 
-  expect(reading.getByText(/Maria steht jeden Morgen um Viertel vor sieben auf/)).toBeInTheDocument();
+  expect(reading.getByText(/Ich bin Thomas/)).toBeInTheDocument();
   expect(listening.queryByText(/Paul hat jeden Morgen um neun Uhr Deutschunterricht/)).not.toBeInTheDocument();
 
-  for (const [scope, letters] of [[reading, ["B", "B", "C", "B", "A", "C", "A"]], [listening, ["B", "B", "B", "B", "A", "B", "B", "B", "B", "B"]]]) {
+  for (const [scope, letters] of [[reading, ["B", "A", "B", "C", "B"]], [listening, ["A", "B", "A", "B", "A"]]]) {
     for (const [index, letter] of letters.entries()) {
       await waitFor(() => {
         const group = scope.getByRole("radiogroup", { name: `Question ${index + 1}` });
@@ -51,5 +51,5 @@ test("Day 11 has seven Lesen and ten Hören questions with one clickable answer 
 
   await waitFor(() => expect(getA1TutorDraftProgress({
     assignmentKey: "A1-7", draft: readA1WorkbookDraft("A1-7"),
-  })).toEqual(expect.objectContaining({ complete: true, completed: 17, total: 17 })));
+  })).toEqual(expect.objectContaining({ complete: true, completed: 10, total: 10 })));
 });
