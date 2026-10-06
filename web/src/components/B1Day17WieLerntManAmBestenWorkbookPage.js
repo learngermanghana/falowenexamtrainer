@@ -103,27 +103,56 @@ export const B1_DAY17_WIE_LERNT_MAN_AM_BESTEN_WORKBOOK_CONFIG = {
   writing: getB1WritingTask(17),
   reading: getB1ReadingTask(17),
   listening: {
-    title: "Hören Sie den Text über Lerntechniken und beantworten Sie die fünf Fragen.",
-    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    title: "Podcast · Wie lernt man am besten?",
+    instructions: "Hören Sie den Podcast aufmerksam. Lesen Sie die fünf Fragen und wählen Sie jeweils A, B, C oder D. Reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Digitale Lerntechniken und Konzentration",
-    embedUrl: "https://www.youtube-nocookie.com/embed/NCfwHzAHoJI?rel=0&playsinline=1",
-    externalUrl: "https://youtu.be/NCfwHzAHoJI",
-    videoTitle: "B1 Day 17 Wie lernt man am besten Hören",
+    imageAlt: "Podcast über effektives Deutschlernen",
+    videoTitle: "B1 Day 17 Podcast Wie lernt man am besten",
     submitRequired: true,
     selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    transcript: `Anna: Hallo und willkommen zu "Deutsch einfach"! Ich bin Anna.
+
+Ben: Hallo Anna, und hallo an alle Deutschlernenden! Heute sprechen wir über eine wichtige Frage: Wie lernt man am besten?
+
+Anna: Genau, Ben. Ich lerne seit zwei Jahren Deutsch, aber manchmal weiß ich nicht: Mache ich es richtig?
+
+Ben: Das ist ganz normal. Mein erster Tipp: Lerne jeden Tag, auch wenn es nur zwanzig Minuten sind. Das ist besser als einmal pro Woche drei Stunden.
+
+Anna: Wirklich? Ich dachte, lange Lernzeiten sind besser.
+
+Ben: Nein. Das Gehirn braucht Wiederholung. Wenn du jeden Tag etwas wiederholst, bleiben die Wörter länger im Kopf.
+
+Anna: Und was ist mit Vokabeln? Ich schreibe sie immer auf Karten, aber ich vergesse sie schnell.
+
+Ben: Lerne Wörter nie allein, sondern in ganzen Sätzen. Zum Beispiel nicht nur "der Termin", sondern: "Ich habe morgen einen Termin beim Arzt."
+
+Anna: Das ist eine tolle Idee! Und wie kann ich besser sprechen?
+
+Ben: Sprich so viel wie möglich! Such dir einen Lernpartner oder sprich laut mit dir selbst. Fehler sind kein Problem, denn aus Fehlern lernt man.
+
+Anna: Hören ist auch wichtig, oder? Ich höre gern Podcasts, so wie diesen hier.
+
+Ben: Genau! Höre jeden Tag etwas auf Deutsch: Musik, Podcasts oder Filme. Und lies auch kurze Texte.
+
+Anna: Okay, also zusammengefasst: jeden Tag lernen, Wörter in Sätzen lernen, viel sprechen und viel hören.
+
+Ben: Perfekt! Und das Wichtigste: Hab Geduld und Spaß dabei.
+
+Anna: Vielen Dank fürs Zuhören! Bis zur nächsten Folge. Tschüss!
+
+Ben: Tschüss!`,
     questions: [
-      { stem: "Was versteht man unter chunking?", options: ["a) Der Lernstoff wird in kleinere Abschnitte aufgeteilt.", "b) Man lernt den Stoff in einem Stück.", "c) Man ignoriert schwierige Themen.", "d) Man lernt alles am Prüfungstag."] },
-      { stem: "Warum ist regelmäßiges Wiederholen wichtig?", options: ["a) Es spart Zeit.", "b) Es hilft, den Stoff dauerhaft zu behalten.", "c) Es hilft nur beim Sprachenlernen.", "d) Es verbessert die Prüfungsnoten."] },
-      { stem: "Was ist laut dem Hörtext ein wichtiger Faktor beim Lernen?", options: ["a) Die Länge der Lernzeit.", "b) Eine ruhige und aufgeräumte Umgebung.", "c) Das Lernen mit Freunden.", "d) Ein fester Platz in der Bibliothek."] },
-      { stem: "Wie kann man den Lernprozess reflektieren?", options: ["a) Indem man schwierige Themen ignoriert.", "b) Indem man sich selbst Fragen zum Gelernten stellt.", "c) Indem man nur stur auswendig lernt.", "d) Indem man den Stoff vor sich hin liest."] },
-      { stem: "Was sollte man tun, nachdem man ein Lernziel erreicht hat?", options: ["a) Sofort weiterlernen.", "b) Sich selbst belohnen.", "c) Neue Ziele setzen.", "d) Eine lange Pause machen."] },
+      { stem: "1. Wie sollte man laut Ben lernen?", options: ["A) Einmal pro Woche drei Stunden", "B) Jeden Tag, auch nur zwanzig Minuten", "C) Nur vor der Prüfung", "D) Nur am Wochenende"] },
+      { stem: "2. Warum ist tägliches Lernen besser?", options: ["A) Weil man dann weniger Zeit braucht", "B) Weil das Gehirn Wiederholung braucht", "C) Weil Anna das sagt", "D) Weil Lernen am Abend leichter ist"] },
+      { stem: "3. Wie soll man Vokabeln lernen?", options: ["A) Nur einzelne Wörter auf Karten", "B) Nur mit dem Wörterbuch", "C) In ganzen Sätzen", "D) Gar nicht, man lernt sie automatisch"] },
+      { stem: "4. Was empfiehlt Ben, um besser zu sprechen?", options: ["A) Nur leise lesen", "B) Fehler immer vermeiden", "C) Nur Grammatik üben", "D) Viel sprechen, auch laut mit sich selbst"] },
+      { stem: "5. Was ist laut Ben das Wichtigste beim Lernen?", options: ["A) Ein teures Buch", "B) Geduld und Spaß", "C) Perfekte Aussprache", "D) Jeden Tag drei Stunden Zeit"] },
     ],
     steps: [
-      "Hören Sie den Text einmal komplett.",
-      "Lesen Sie die Fragen und Antwortmöglichkeiten.",
+      "Lesen Sie zuerst die fünf Fragen.",
+      "Hören Sie den Podcast einmal komplett.",
       "Hören Sie wichtige Stellen ein zweites Mal.",
-      "Schreiben Sie Ihre fünf Antwortbuchstaben in den Submit-Tab.",
+      "Schreiben Sie nur die fünf Antwortbuchstaben in den Submit-Tab.",
     ],
   },
   submitListening: true,
