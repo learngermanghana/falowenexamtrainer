@@ -5,13 +5,13 @@ const readSource = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, "..", relativePath), "utf8");
 
 describe("Exams Room section navigation", () => {
-  const appSource = readSource("../App.js");
-  const lesenSource = readSource("LesenPage.js");
-  const horenSource = readSource("HorenPage.js");
-  const listeningSampleSource = readSource("ListeningPracticeSamplePage.jsx");
-  const overviewSource = readSource("ExamsOverviewPage.js");
-  const a1ReadingSource = readSource("A1ReadingPracticeSamples.jsx");
-  const a2ReadingSource = readSource("A2ReadingPracticeSamples.jsx");
+  const appSource = readSource("App.js");
+  const lesenSource = readSource("components/LesenPage.js");
+  const horenSource = readSource("components/HorenPage.js");
+  const listeningSampleSource = readSource("components/ListeningPracticeSamplePage.jsx");
+  const overviewSource = readSource("components/ExamsOverviewPage.js");
+  const a1ReadingSource = readSource("components/A1ReadingPracticeSamples.jsx");
+  const a2ReadingSource = readSource("components/A2ReadingPracticeSamples.jsx");
 
   test("adds dedicated sample URLs and exposes Hören in the Exams Room nav", () => {
     expect(appSource).toContain('/exams/:section/:practiceLevel/:sampleId');
