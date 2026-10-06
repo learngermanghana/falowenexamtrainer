@@ -467,22 +467,22 @@ Mitarbeiterin: Hier ist auch ein Stadtplan, auf dem ich das Schiff, das Restaura
   },
   23: {
     chapter: "9.23",
-    format: "Arbeitsweg",
-    title: "Drei Wege zur Arbeit",
-    strategy: "Achte darauf, wer welches Verkehrsmittel benutzt und warum. Jede Information muss wirklich im Text stehen.",
-    text: `Drei Kolleginnen und Kollegen erzählen von ihrem Arbeitsweg.
+    format: "Blogbeitrag",
+    title: "Mein Weg zur Arbeit",
+    strategy: "Lies zuerst die Aufgaben und suche dann gezielt nach Verkehrsmittel, Dauer, Grund, Problem und Preis.",
+    text: `Hallo zusammen!
 
-Matthias wohnt außerhalb der Stadt. Er fährt morgens mit dem Regionalzug und danach noch zwei Stationen mit der Straßenbahn. Insgesamt braucht er etwa 45 Minuten.
+Ich heiße Markus und wohne in Bremen. Jeden Morgen muss ich zur Arbeit in die Innenstadt fahren. Mein Weg ist ziemlich lang: Zuerst gehe ich zehn Minuten zu Fuß zum Bahnhof. Dann nehme ich um 7:15 Uhr die S-Bahn. Die Fahrt dauert etwa 25 Minuten. Wenn die S-Bahn pünktlich ist, komme ich um 7:50 Uhr im Büro an.
 
-Bernd wohnt nur vier Kilometer vom Büro entfernt. Wenn das Wetter gut ist, fährt er mit dem Fahrrad. Bei Regen nimmt er den Bus 16.
+Im Sommer fahre ich manchmal mit dem Fahrrad, aber das dauert fast eine Stunde. Das ist mir im Winter zu kalt. Mein Kollege Jan fährt immer mit dem Auto, aber er steht oft im Stau und findet schwer einen Parkplatz. Deshalb finde ich die S-Bahn am besten, auch wenn ein Monatsticket 65 Euro kostet.
 
-Thomas wohnt im Zentrum. Er geht meistens zu Fuß zur Arbeit. Das dauert 20 Minuten. Nur wenn er sehr spät dran ist, nimmt er die U-Bahn.`,
+Wie fahrt ihr zur Arbeit oder zur Schule? Schreibt mir einen Kommentar!`,
     questions: [
-      { stem: "Welches Verkehrsmittel benutzt Matthias zuerst?", options: ["A) Den Regionalzug", "B) Das Fahrrad", "C) Den Bus 16", "D) Die U-Bahn"] },
-      { stem: "Wie lange braucht Matthias ungefähr zur Arbeit?", options: ["A) 20 Minuten", "B) 30 Minuten", "C) 45 Minuten", "D) Eine Stunde"] },
-      { stem: "Wann fährt Bernd mit dem Fahrrad?", options: ["A) Bei gutem Wetter", "B) Bei Regen", "C) Nur am Sonntag", "D) Wenn er spät dran ist"] },
-      { stem: "Was nimmt Bernd bei Regen?", options: ["A) Die Straßenbahn", "B) Den Bus 16", "C) Die U-Bahn", "D) Den Regionalzug"] },
-      { stem: "Wie kommt Thomas meistens zur Arbeit?", options: ["A) Mit dem Auto", "B) Mit der U-Bahn", "C) Zu Fuß", "D) Mit dem Fahrrad"] },
+      { stem: "Wie kommt Markus morgens zum Bahnhof?", options: ["A) Mit dem Fahrrad", "B) Zu Fuß", "C) Mit dem Auto"] },
+      { stem: "Wie lange dauert die Fahrt mit der S-Bahn?", options: ["A) 10 Minuten", "B) 25 Minuten", "C) 50 Minuten"] },
+      { stem: "Warum fährt Markus im Winter nicht mit dem Fahrrad?", options: ["A) Weil es ihm zu kalt ist.", "B) Weil sein Fahrrad kaputt ist.", "C) Weil die Fahrkarte teuer ist."] },
+      { stem: "Welches Problem hat sein Kollege Jan?", options: ["A) Die S-Bahn ist oft zu spät.", "B) Er findet schwer einen Parkplatz.", "C) Er darf nicht mit dem Auto fahren."] },
+      { stem: "Was kostet Markus' Monatsticket?", options: ["A) 25 Euro", "B) 50 Euro", "C) 65 Euro"] },
     ],
   },
   24: {
