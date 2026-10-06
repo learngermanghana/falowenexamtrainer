@@ -1,206 +1,85 @@
 export const WRITING_PROMPTS = {
   "A1": [
     {
-      "Thema": "Sie reisen bald zusammen mit Ihrem deutschen Freund Patrick nach Köln. Vor der Reise haben Sie noch Fragen. Schreiben Sie Patrick eine E-Mail.",
+      "Thema": "Sie möchten im Sommer nach Berlin reisen und brauchen ein Hotelzimmer. Schreiben Sie eine E-Mail an das Hotel „Berliner Hof“.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Bitten Sie: Informationen über die Stadt.",
-        "Fragen Sie: übernachten?",
-      ],
+        "Ankunftsdatum und Dauer: Wann kommen Sie an? Wie lange bleiben Sie?",
+        "Zimmerwunsch: Einzelzimmer oder Doppelzimmer mit Frühstück?",
+        "Preis: Fragen Sie nach dem Preis."
+      ]
     },
     {
-      "Thema": "Sie möchten am Sonntag Fahrrad fahren. Ihr deutscher Freund Moritz wohnt in Ihrer Stadt und fährt auch gern Fahrrad. Schreiben Sie Moritz eine E-Mail.",
+      "Thema": "Ihr Freund Michael feiert am Samstag Geburtstag und hat Sie eingeladen. Schreiben Sie eine E-Mail an Michael.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Fragen Sie: zusammen?",
-        "Sagen Sie: von wann bis wann haben Sie Zeit.",
-      ],
+        "Zusage: Sagen Sie, dass Sie gerne zur Party kommen.",
+        "Geschenk: Fragen Sie, was Michael sich wünscht oder was Sie mitbringen sollen.",
+        "Uhrzeit: Fragen Sie, wann die Party beginnt."
+      ]
     },
     {
-      "Thema": "Ihr neuer Kollege, Herr Peter, hat Sie am Dienstag um 15 Uhr zu seiner Geburtstagsfeier im Büro eingeladen. Schreiben Sie an Herrn Peter.",
+      "Thema": "Sie sind krank und können am Donnerstag nicht zum Deutschkurs kommen. Schreiben Sie an Ihre Lehrerin, Frau Müller.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Später kommen?",
-        "Helfen?",
-      ],
+        "Grund: Sagen Sie, dass Sie krank sind.",
+        "Entschuldigung: Sagen Sie, dass Sie am Donnerstag fehlen.",
+        "Hausaufgaben: Fragen Sie nach den Hausaufgaben."
+      ]
     },
     {
-      "Thema": "Schreiben Sie eine Einladung an Ihren Freund zur Feier Ihres neuen Jobs.",
+      "Thema": "Sie möchten einen Deutschkurs bei der Sprachschule „Aktiv“ machen. Schreiben Sie eine E-Mail an die Sprachschule.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Wann ist die Feier?",
-        "Wer soll was mitbringen?",
-      ],
+        "Kursstart: Fragen Sie, wann der nächste A1-Kurs beginnt.",
+        "Kurszeiten: Fragen Sie, ob es Abendkurse gibt.",
+        "Kosten: Fragen Sie, wie viel der Kurs kostet."
+      ]
     },
     {
-      "Thema": "Ihre Nachbarin Anna hat am 4.Mai Geburtstag. Sie hat Sie eingeladen. Schreiben Sie an Anna.",
+      "Thema": "Sie möchten sich am Wochenende mit Ihrer Freundin Sarah in der Stadt treffen. Schreiben Sie an Sarah.",
       "Punkte": [
-        "Dank für die Einladung!",
-        "Warum können Sie nicht kommen?",
-        "Welches Geschenk?",
-      ],
+        "Vorschlag: Schlagen Sie ein Treffen am Samstag vor.",
+        "Aktivität: Schlagen Sie Kaffee trinken oder Kino vor.",
+        "Treffpunkt und Uhrzeit: Fragen oder sagen Sie, wo und wann Sie sich treffen."
+      ]
     },
     {
-      "Thema": "Schreiben Sie eine E-Mail an Ihren Lehrer und sagen Sie, dass Sie krank sind.",
+      "Thema": "Sie planen eine Reise nach Hamburg. Schreiben Sie an die Touristeninformation Hamburg.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Wie fühlen Sie sich?",
-        "Wann kommen Sie wieder in den Kurs?",
-      ],
+        "Stadtplan: Bitten Sie um einen Stadtplan.",
+        "Informationen: Fragen Sie nach Ausflugstipps oder einer Hafenrundfahrt.",
+        "Zuschicken: Bitten Sie darum, Prospekte per Post oder E-Mail zu senden."
+      ]
     },
     {
-      "Thema": "Schreiben Sie eine E-Mail an Ihren Arzt und sagen Sie Ihren Termin ab.",
+      "Thema": "Sie haben im Internet ein gebrauchtes Fahrrad gesehen und möchten es kaufen. Schreiben Sie an den Verkäufer, Herrn Weber.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Sagen Sie: den Grund für die Absage.",
-        "Fragen Sie: nach einem neuen Termin.",
-      ],
+        "Interesse: Sagen Sie, dass Sie das Fahrrad kaufen möchten.",
+        "Zustand: Fragen Sie nach dem Alter oder Zustand des Fahrrads.",
+        "Termin: Fragen Sie nach einem Termin für eine Probefahrt."
+      ]
     },
     {
-      "Thema": "Sie möchten am Samstagabend ein großes Familienfest mit 150 Leuten feiern. Sie brauchen einen großen Raum. Schreiben Sie an das Hotel AMANO:",
+      "Thema": "Sie möchten im Sportverein „Fit & Aktiv“ Mitglied werden. Schreiben Sie eine E-Mail.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Essen und Trinken: Preis?",
-        "Raum: frei?",
-        "Wann?",
-      ],
+        "Probetraining: Fragen Sie nach einem kostenlosen Probetraining.",
+        "Öffnungszeiten: Fragen Sie nach den Öffnungszeiten am Wochenende.",
+        "Mitgliedsbeitrag: Fragen Sie, wie viel die Mitgliedschaft pro Monat kostet."
+      ]
     },
     {
-      "Thema": "Schreiben Sie eine Einladung an Ihre Kollegin zum Mittagessen.",
+      "Thema": "Ihre Bekannte Lisa hat Sie für das Wochenende zu sich nach München eingeladen. Schreiben Sie an Lisa.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Wo treffen Sie sich?",
-        "Wann treffen Sie sich?",
-      ],
+        "Dank: Bedanken Sie sich für die Einladung.",
+        "Ankunftszeit: Sagen Sie, wann Sie am Bahnhof ankommen.",
+        "Verkehrsmittel: Sagen Sie, wie Sie reisen, zum Beispiel mit dem Zug."
+      ]
     },
     {
-      "Thema": "Ihr Freund Peter ist Computeringenieur. Schreiben Sie eine E-Mail an Peter.",
+      "Thema": "Die Heizung in Ihrer Wohnung ist kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
       "Punkte": [
-        "Sie sollten einen neuen Computer kaufen.",
-        "Sie sollten zusammen einkaufen.",
-        "Fragen Sie: Wann hat Peter Zeit?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an einen Freund und bitten Sie um Hilfe beim Umzug.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wann ziehen Sie um?",
-        "Was soll Ihr Freund mitbringen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Nachricht an Ihre Freundin, Sie möchten morgen lernen.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wo wollen Sie lernen?",
-        "Um wie viel Uhr?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an ein Hotel und reservieren Sie ein Zimmer.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Für welche Daten?",
-        "Was für ein Zimmer möchten Sie?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Nachricht an Ihren Bruder, er soll Ihre Katze füttern.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wann sind Sie weg?",
-        "Wie oft soll er kommen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an Ihren Sportverein und kündigen Sie die Mitgliedschaft.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Ab wann möchten Sie kündigen?",
-        "Bitten Sie um Bestätigung.",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Nachricht an Ihre Freundin, Sie kommen zu spät zum Treffen.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wie spät kommen Sie?",
-        "Was sollen Sie machen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an die Busfirma, Sie haben eine Tasche im Bus vergessen.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Was haben Sie verloren?",
-        "Wo können Sie die Tasche abholen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie einen Brief an Ihren Chef, Sie brauchen einen freien Tag.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Für welchen Tag brauchen Sie frei?",
-        "Bitten Sie um Antwort.",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Nachricht an Ihren Freund, Sie möchten sein Buch leihen.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Welches Buch möchten Sie?",
-        "Wann geben Sie es zurück?",
-      ],
-    },
-    {
-      "Thema": "Sie möchten ein Buch in der Bibliothek ausleihen. Schreiben Sie eine Nachricht an die Bibliothek.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Welches Buch möchten Sie ausleihen?",
-        "Für wie lange möchten Sie das Buch ausleihen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an Ihre Schule, Sie möchten den Deutschkurs wechseln.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "In welchen Kurs möchten Sie?",
-        "Wann können Sie beginnen?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Nachricht an Ihre Nachbarin, sie soll Ihr Paket annehmen.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wann kommt das Paket?",
-        "Was soll die Nachbarin tun?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine Postkarte an Ihren Freund, Sie sind am Meer.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wie ist das Meer?",
-        "Was machen Sie heute?",
-      ],
-    },
-    {
-      "Thema": "Schreiben Sie eine E-Mail an eine Freundin, Sie planen eine Geburtstagsfeier.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Wann ist die Feier?",
-        "Was soll sie mitbringen?",
-      ],
-    },
-    {
-      "Thema": "Sie möchten im Sommer in München Urlaub machen. Schreiben Sie an die Touristeninformation.",
-      "Punkte": [
-        "Warum schreiben Sie?",
-        "Günstige Hotels?",
-        "Sehenswürdigkeiten?",
-      ],
-    },
+        "Problem: Sagen Sie, dass die Heizung nicht funktioniert und die Wohnung kalt ist.",
+        "Termin: Sagen Sie, wann Sie für den Handwerker zu Hause sind.",
+        "Rückruf: Bitten Sie um eine schnelle Reparatur oder einen Anruf."
+      ]
+    }
   ],
   "A2": [
     {
