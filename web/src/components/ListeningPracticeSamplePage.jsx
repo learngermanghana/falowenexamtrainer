@@ -288,7 +288,7 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
         <h2 style={{ margin: 0 }}>Hören Sample 1</h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          This sample uses the same Hören question bank and audio as the {normalizedLevel} final mock.
+          Complete all listening parts, then check your answers at the end.
         </p>
       </section>
 
