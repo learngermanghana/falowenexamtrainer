@@ -20,7 +20,7 @@ const examFile = patchFile("src/components/MyExamFilePage.js", (source) => {
   if (next.includes(oldImport)) next = next.replace(oldImport, newImport);
 
   const hookAnchor = '  const formatMoney = useCallback((value) => formatCurrency(value, { locale }), [locale]);';
-  const hookBlock = `${hookAnchor}\n  const {\n    config: goetheExamConfig,\n    loading: examScheduleLoading,\n    source: examScheduleSource,\n  } = useGoetheExamConfig();\n  const goetheExamLevels = goetheExamConfig.levels;`;
+  const hookBlock = `${hookAnchor}\n  const {\n    config: goetheExamConfig,\n    loading: examScheduleLoading,\n  } = useGoetheExamConfig();\n  const goetheExamLevels = goetheExamConfig.levels;`;
   if (!next.includes("config: goetheExamConfig")) {
     if (!next.includes(hookAnchor)) throw new Error("Exam File shared-config hook anchor was not found.");
     next = next.replace(hookAnchor, hookBlock);
