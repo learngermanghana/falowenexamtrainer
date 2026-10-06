@@ -1546,39 +1546,41 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
-        <div
-          style={{
-            ...styles.card,
-            margin: 0,
-            display: "flex",
-            gap: 12,
-            flexWrap: "wrap",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ minWidth: 160 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
-            <strong style={{ fontSize: 16 }}>{level}</strong>
+        {examSection !== "overview" ? (
+          <div
+            style={{
+              ...styles.card,
+              margin: 0,
+              display: "flex",
+              gap: 12,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ minWidth: 160 }}>
+              <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
+              <strong style={{ fontSize: 16 }}>{level}</strong>
+            </div>
+            <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
+              <label htmlFor="exam-level-selector" style={styles.helperText}>
+                Exam level is selected automatically from your student profile
+              </label>
+              <select
+                id="exam-level-selector"
+                value={level}
+                onChange={(event) => setLevel(event.target.value)}
+                disabled={Boolean(profileExamLevel)}
+                style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
-            <label htmlFor="exam-level-selector" style={styles.helperText}>
-              Exam level is selected automatically from your student profile
-            </label>
-            <select
-              id="exam-level-selector"
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-              disabled={Boolean(profileExamLevel)}
-              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
-            >
-              {ALLOWED_LEVELS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        ) : null}
 
         {activeExamHero ? (
           <section
