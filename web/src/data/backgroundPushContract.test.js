@@ -67,6 +67,15 @@ describe("background push contract", () => {
     expect(functionsIndex).toContain("exports.sendPushTestNotification = onCall");
     expect(functionsIndex).toContain("findOwnedMessagingToken");
     expect(functionsIndex).toContain("Background push is working on this device.");
+
+    const deployWorkflow = fs.readFileSync(
+      path.join(root, ".github", "workflows", "deploy-functions.yml"),
+      "utf8"
+    );
+    expect(deployWorkflow).toContain("functions:falowenexamtrainer:sendPushTestNotification");
+    expect(deployWorkflow).toContain("Push test callable export was not discovered");
+    expect(settings).toContain("getPushTestErrorMessage");
+    expect(settings).not.toContain("? error.message\n          : \"Could not send the background push test");
   });
   test("iPhone push setup is gated by the installed Home Screen context", () => {
     const firebaseClient = fs.readFileSync(

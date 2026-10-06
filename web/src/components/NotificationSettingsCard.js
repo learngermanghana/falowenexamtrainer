@@ -46,6 +46,35 @@ const statusCopy = {
   },
 };
 
+const getPushTestErrorMessage = (error) => {
+  const code = String(error?.code || "").toLowerCase();
+  const message = String(error?.message || "").trim();
+  const normalizedMessage = message.toLowerCase();
+
+  if (
+    normalizedMessage === "internal" ||
+    code.includes("internal") ||
+    code.includes("not-found") ||
+    code.includes("unavailable")
+  ) {
+    return "Falowen could not reach the push test service. Refresh this page and try again in a moment.";
+  }
+
+  if (code.includes("unauthenticated")) {
+    return "Your session expired. Sign in again, then retry the test notification.";
+  }
+
+  if (code.includes("permission-denied")) {
+    return "This device is not linked to the signed-in account. Tap Refresh this device, then try again.";
+  }
+
+  if (code.includes("failed-precondition")) {
+    return message || "This device token needs to be refreshed before testing notifications.";
+  }
+
+  return message || "Could not send the background push test. Refresh this device and try again.";
+};
+
 const getToneStyle = (tone) => {
   if (tone === "success") return { border: "#bbf7d0", background: "#f0fdf4", color: "#166534" };
   if (tone === "warning") return { border: "#fde68a", background: "#fffbeb", color: "#92400e" };
@@ -118,11 +147,7 @@ const NotificationSettingsCard = () => {
         "Test sent. If the screen was locked, you should receive a normal Falowen phone notification. If nothing appears, check Android notification and battery settings."
       );
     } catch (error) {
-      setTestMessage(
-        error instanceof Error
-          ? error.message
-          : "Could not send the background push test. Refresh this device and try again."
-      );
+      setTestMessage(getPushTestErrorMessage(error));
     } finally {
       setIsTesting(false);
     }
