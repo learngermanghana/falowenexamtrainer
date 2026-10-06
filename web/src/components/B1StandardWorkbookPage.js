@@ -566,6 +566,15 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                         {listening.selfCheckText ? <p style={{ margin: 0 }}>{listening.selfCheckText}</p> : null}
                         <QuestionList questions={listening.questions || []} />
                       </>
+                    ) : listening.transcript ? (
+                      <>
+                        <PlaceholderCard
+                          title="Podcast audio pending"
+                          text="The matching Anna/Ben podcast audio still needs to be added. The old mismatched listening video has been removed."
+                        />
+                        {listening.selfCheckText ? <p style={{ margin: 0 }}>{listening.selfCheckText}</p> : null}
+                        <QuestionList questions={listening.questions || []} />
+                      </>
                     ) : (
                       <PlaceholderCard
                         title="Listening media missing"
