@@ -42,7 +42,7 @@ const SampleList = ({ level, samples, onOpen }) => (
     <div>
       <h2 style={{ margin: 0 }}>{level} Lesen practice</h2>
       <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-        Choose one sample. Each sample opens on its own page.
+        Choose a reading sample to practise.
       </p>
     </div>
 
