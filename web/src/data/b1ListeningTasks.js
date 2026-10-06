@@ -327,10 +327,44 @@ Ben: Tschüss!`,
     ],
   }),
   19: task({
-    mode: "reading-fallback",
+    title: "Hören · Das Vorstellungsgespräch",
+    instructions: "Hören Sie den Dialog zwischen Herrn Weber und Frau Keller aufmerksam. Wählen Sie bei jeder Frage A, B, C oder D und reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Vorstellungsgespräch in einer Klinik",
+    audioKey: "b1/day-19/day-19.mp3",
+    videoTitle: "B1 Day 19 Das Vorstellungsgespräch Hören",
     submitRequired: true,
-    title: "Kein Hören-Medium wurde geliefert: Bearbeiten Sie den zweiten Lesetext als Teil 4.",
-    instructions: "This lesson intentionally preserves its second reading task in Teil 4 because no Hören URL was supplied.",
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    transcript: `Herr Weber: Guten Tag, Frau Keller! Schön, dass Sie da sind. Bitte nehmen Sie Platz.
+Frau Keller: Guten Tag, Herr Weber. Vielen Dank für die Einladung.
+Herr Weber: Möchten Sie etwas trinken? Wasser oder Kaffee?
+Frau Keller: Ein Glas Wasser, bitte. Danke.
+Herr Weber: Gut. Erzählen Sie mir zuerst etwas über sich. Wer sind Sie, und was haben Sie bisher gemacht?
+Frau Keller: Ich bin achtundzwanzig Jahre alt und komme aus Spanien. Seit drei Jahren lebe ich in Deutschland. Ich habe eine Ausbildung als Krankenschwester gemacht und danach zwei Jahre in einem Krankenhaus gearbeitet.
+Herr Weber: Sehr interessant. Warum möchten Sie bei uns arbeiten?
+Frau Keller: Ihre Klinik hat einen sehr guten Ruf. Außerdem arbeite ich gern im Team, und ich möchte neue Dinge lernen.
+Herr Weber: Was sind Ihre Stärken?
+Frau Keller: Ich bin zuverlässig und geduldig. Mit Patienten spreche ich ruhig und freundlich. Und ich lerne schnell.
+Herr Weber: Und gibt es etwas, das Sie noch verbessern möchten?
+Frau Keller: Ja. Manchmal bin ich zu perfektionistisch. Ich arbeite daran und frage öfter meine Kollegen um Hilfe.
+Herr Weber: Das ist ehrlich. Wie gut ist Ihr Deutsch?
+Frau Keller: Ich spreche Deutsch auf B1-Niveau, und ich besuche noch einen Kurs. Im Alltag verstehe ich fast alles.
+Herr Weber: Sehr gut. Sie müssten auch im Schichtdienst arbeiten, am Wochenende und nachts. Ist das ein Problem?
+Frau Keller: Nein, das ist kein Problem. Ich habe schon im Schichtdienst gearbeitet.
+Herr Weber: Haben Sie noch Fragen an uns?
+Frau Keller: Ja, gern. Wie sieht die Einarbeitung aus? Und gibt es Weiterbildungen?
+Herr Weber: Die ersten vier Wochen arbeiten Sie mit einer erfahrenen Kollegin zusammen. Weiterbildungen bieten wir regelmäßig an.
+Frau Keller: Das klingt sehr gut.
+Herr Weber: Wir melden uns bis Ende der Woche bei Ihnen. Vielen Dank für das Gespräch, Frau Keller.
+Frau Keller: Ich danke Ihnen auch, Herr Weber. Auf Wiedersehen!
+Herr Weber: Auf Wiedersehen!`,
+    questions: [
+      q("Welchen Beruf hat Frau Keller gelernt?", ["a) Ärztin", "b) Krankenschwester", "c) Lehrerin", "d) Verkäuferin"]),
+      q("Seit wann lebt Frau Keller in Deutschland?", ["a) Seit einem Jahr", "b) Seit zwei Jahren", "c) Seit drei Jahren", "d) Seit fünf Jahren"]),
+      q("Warum möchte Frau Keller in der Klinik arbeiten?", ["a) Die Klinik hat einen guten Ruf, und sie arbeitet gern im Team", "b) Die Klinik ist nah bei ihrer Wohnung", "c) Die Klinik zahlt am meisten", "d) Ihre Freundin arbeitet dort"]),
+      q("Was sagt Frau Keller über ihre Schwäche?", ["a) Sie kommt oft zu spät", "b) Sie spricht kein Deutsch", "c) Sie ist manchmal zu perfektionistisch", "d) Sie möchte nicht im Team arbeiten"]),
+      q("Wie lange arbeitet Frau Keller am Anfang mit einer erfahrenen Kollegin zusammen?", ["a) Eine Woche", "b) Zwei Wochen", "c) Vier Wochen", "d) Sechs Monate"]),
+    ],
   }),
   20: task({
     title: "Bearbeiten Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
