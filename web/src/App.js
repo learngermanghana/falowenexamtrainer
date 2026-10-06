@@ -1546,7 +1546,7 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
-        {examSection !== "overview" ? (
+        {examSection !== "overview" && !sampleId ? (
           <div
             style={{
               ...styles.card,
