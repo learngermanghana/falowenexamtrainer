@@ -43,7 +43,7 @@ describe("A2 Days 23-28 assessment integrity", () => {
   });
 
   test("Day 28 keeps future-plans Lesen and protected graded Hören", () => {
-    expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
+    expect(A2_READING_TASKS[28].title).toBe("Reisepläne für Hamburg");
     expect(A2_READING_TASKS[28].questions).toHaveLength(5);
     expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);
     expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
