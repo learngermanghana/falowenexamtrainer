@@ -349,7 +349,7 @@ const GeneralHome = ({
             title="Check your Zoom and calendar here"
             subtitle="Use this during onboarding only. After setup, it will move into the dashboard under Live class access & calendar."
           />
-          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} homepageCompact />
+          <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />
         </section>
         <LegalFooter />
       </div>
