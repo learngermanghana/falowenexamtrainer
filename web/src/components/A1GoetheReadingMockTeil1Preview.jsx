@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import "./A1GoetheReadingMockTeil1Preview.css";
 
@@ -101,13 +101,45 @@ const QuestionBlock = ({ question, value, onChange, example = false, children = 
   </section>
 );
 
-export default function A1GoetheReadingMockTeil1Preview() {
+export default function A1GoetheReadingMockTeil1Preview({ publicMode = false }) {
   const [answers, setAnswers] = useState({
     0: A1_GOETHE_READING_MOCK_TEIL1.example.answer,
   });
+  const [submitted, setSubmitted] = useState(false);
+
+  const answeredCount = useMemo(
+    () => A1_GOETHE_READING_MOCK_TEIL1.questions.filter((question) => Boolean(answers[question.number])).length,
+    [answers],
+  );
+  const correctCount = useMemo(
+    () => A1_GOETHE_READING_MOCK_TEIL1.questions.filter(
+      (question) => answers[question.number] === question.answer,
+    ).length,
+    [answers],
+  );
+  const publicPercent = Math.round(
+    (correctCount / Math.max(1, A1_GOETHE_READING_MOCK_TEIL1.questions.length)) * 100,
+  );
 
   const setAnswer = (number, value) => {
+    setSubmitted(false);
     setAnswers((current) => ({ ...current, [number]: value }));
+  };
+
+  const submitPublicPractice = () => {
+    if (answeredCount < A1_GOETHE_READING_MOCK_TEIL1.questions.length) return;
+    setSubmitted(true);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "falowen:public-exam-practice:a1:lesen-teil1",
+        JSON.stringify({
+          score: correctCount,
+          total: A1_GOETHE_READING_MOCK_TEIL1.questions.length,
+          percent: publicPercent,
+          completedAt: new Date().toISOString(),
+        }),
+      );
+    }
   };
 
   const text1Questions = A1_GOETHE_READING_MOCK_TEIL1.questions.filter((question) => question.text === 1);
@@ -116,8 +148,12 @@ export default function A1GoetheReadingMockTeil1Preview() {
   return (
     <main className="a1-goethe-mock-shell" data-a1-goethe-reading-mock-preview>
       <div className="a1-goethe-mock-topbar">
-        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">A1 Lesen practice</span>
+        {publicMode ? (
+          <a href="/exam-practice" style={{ fontWeight: 700, textDecoration: "none" }}>← Back to free practice</a>
+        ) : (
+          <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+        )}
+        <span className="a1-goethe-mock-preview-badge">{publicMode ? "Free A1 practice" : "A1 Lesen practice"}</span>
       </div>
 
       <article className="a1-goethe-mock-exam">
@@ -174,6 +210,48 @@ export default function A1GoetheReadingMockTeil1Preview() {
             onChange={(value) => setAnswer(question.number, value)}
           />
         ))}
+
+        {publicMode ? (
+          <section style={{ marginTop: 24, padding: 20, border: "1px solid #dbeafe", borderRadius: 16, background: "#f8fbff" }}>
+            <p style={{ margin: 0, fontWeight: 700 }}>Free Falowen practice · {answeredCount}/5 answered</p>
+            {!submitted ? (
+              <>
+                <p style={{ margin: "8px 0 14px", color: "#475569" }}>
+                  Finish all five questions to see your result. This public attempt is not added to any student record.
+                </p>
+                <button
+                  type="button"
+                  onClick={submitPublicPractice}
+                  disabled={answeredCount < 5}
+                  style={{ padding: "10px 16px", borderRadius: 10, border: 0, fontWeight: 700, cursor: answeredCount === 5 ? "pointer" : "not-allowed" }}
+                >
+                  Check my result
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 style={{ margin: "10px 0 4px" }}>{correctCount}/5 · {publicPercent}%</h2>
+                <p style={{ margin: "0 0 14px", color: "#475569" }}>
+                  {publicPercent >= 60 ? "Good start. Keep practising to make this consistent." : "Keep practising. Review the text carefully and try again."}
+                </p>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAnswers({ 0: A1_GOETHE_READING_MOCK_TEIL1.example.answer });
+                      setSubmitted(false);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                  >
+                    Try again
+                  </button>
+                  <a href="/signup?program=german&source=public-exam-practice" style={{ fontWeight: 700 }}>Create a Falowen account</a>
+                  <a href="/login/" style={{ fontWeight: 700 }}>Student sign in</a>
+                </div>
+              </>
+            )}
+          </section>
+        ) : null}
       </article>
     </main>
   );

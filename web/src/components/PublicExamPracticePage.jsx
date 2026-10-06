@@ -1,0 +1,115 @@
+import React, { useEffect } from "react";
+import A1GoetheReadingMockTeil1Preview from "./A1GoetheReadingMockTeil1Preview";
+import A2GoetheReadingMockPreview from "./A2GoetheReadingMockPreview";
+
+const cardStyle = {
+  border: "1px solid #e2e8f0",
+  borderRadius: 18,
+  padding: 20,
+  background: "#ffffff",
+  boxShadow: "0 10px 30px rgba(15, 23, 42, 0.06)",
+};
+
+const actionStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: 42,
+  padding: "0 16px",
+  borderRadius: 10,
+  textDecoration: "none",
+  fontWeight: 700,
+  background: "#0f172a",
+  color: "#ffffff",
+};
+
+export default function PublicExamPracticePage({ level = "" }) {
+  useEffect(() => {
+    const previousTitle = document.title;
+    const description = document.querySelector('meta[name="description"]');
+    const previousDescription = description?.getAttribute("content") || "";
+
+    document.title = level
+      ? `Free ${level} German Exam Practice | Falowen`
+      : "Free German Exam Practice A1 & A2 | Falowen";
+    if (description) {
+      description.setAttribute(
+        "content",
+        "Practise German exam-style reading tasks for free with Falowen. No login required for selected A1 and A2 practice.",
+      );
+    }
+
+    return () => {
+      document.title = previousTitle;
+      if (description) description.setAttribute("content", previousDescription);
+    };
+  }, [level]);
+
+  if (level === "A1") return <A1GoetheReadingMockTeil1Preview publicMode />;
+  if (level === "A2") return <A2GoetheReadingMockPreview publicMode />;
+
+  return (
+    <main style={{ minHeight: "100vh", background: "#f8fafc", padding: "32px 16px 56px" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto", display: "grid", gap: 22 }}>
+        <header style={{ ...cardStyle, padding: 28 }}>
+          <p style={{ margin: 0, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#2563eb" }}>
+            Falowen Exam Practice
+          </p>
+          <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.5rem)", lineHeight: 1.02 }}>
+            Practise German exam tasks for free
+          </h1>
+          <p style={{ margin: 0, maxWidth: 760, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
+            Try selected A1 and A2 exam-style reading practice without signing in. Get an instant score, then continue in the full Falowen Exam Room when you are ready.
+          </p>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
+            <a href="/exam-practice/a1" style={actionStyle}>Start A1 free practice</a>
+            <a href="/exam-practice/a2" style={actionStyle}>Start A2 free practice</a>
+            <a href="/login/" style={{ ...actionStyle, background: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1" }}>
+              Student sign in
+            </a>
+          </div>
+        </header>
+
+        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
+          <article style={cardStyle}>
+            <span style={{ fontWeight: 800, color: "#2563eb" }}>A1</span>
+            <h2 style={{ margin: "8px 0" }}>Lesen · Teil 1</h2>
+            <p style={{ color: "#475569", lineHeight: 1.55 }}>
+              Five realistic reading questions with instant scoring. No account required.
+            </p>
+            <a href="/exam-practice/a1" style={actionStyle}>Try A1 free</a>
+          </article>
+
+          <article style={cardStyle}>
+            <span style={{ fontWeight: 800, color: "#2563eb" }}>A2</span>
+            <h2 style={{ margin: "8px 0" }}>Complete Lesen practice</h2>
+            <p style={{ color: "#475569", lineHeight: 1.55 }}>
+              Twenty questions across four reading parts with an instant final score.
+            </p>
+            <a href="/exam-practice/a2" style={actionStyle}>Try A2 free</a>
+          </article>
+
+          <article style={{ ...cardStyle, opacity: 0.78 }}>
+            <span style={{ fontWeight: 800, color: "#64748b" }}>B1</span>
+            <h2 style={{ margin: "8px 0" }}>Public practice coming soon</h2>
+            <p style={{ color: "#475569", lineHeight: 1.55 }}>
+              B1 remains inside the student Exam Room until a complete public-ready mock is available.
+            </p>
+            <span style={{ fontWeight: 700, color: "#64748b" }}>Coming soon</span>
+          </article>
+        </section>
+
+        <section style={{ ...cardStyle, background: "#eff6ff" }}>
+          <h2 style={{ marginTop: 0 }}>What stays inside the student Exam Room?</h2>
+          <p style={{ marginBottom: 0, color: "#334155", lineHeight: 1.6 }}>
+            Full mock history, saved attempts, detailed Schreiben feedback, Sprechen assessment, readiness tracking and the complete exam library remain student features. Public practice never changes course progress or official Falowen results.
+          </p>
+        </section>
+
+        <footer style={{ color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
+          Falowen is an independent learning platform and is not affiliated with or endorsed by Goethe-Institut.
+        </footer>
+      </div>
+    </main>
+  );
+}
