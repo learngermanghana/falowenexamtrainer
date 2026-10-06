@@ -581,7 +581,7 @@ export const B1_READING_TASKS = Object.freeze({
       ],
     },
   } }),
-  6: Object.freeze({ assignmentKey: "B1-2.6", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–C, for every question.", submissionNote: "Submit only answer letters, for example: 1B, 2C, 3A." }),
+  6: Object.freeze({ assignmentKey: "B1-2.6", title: "Zeitungsartikel · Stadt oder Land", instructions: "Lies den Zeitungsartikel und die Aufgaben 1–5. Wähle bei jeder Aufgabe die richtige Lösung A, B oder C.", submissionNote: "Submit only answer letters, for example: 1A, 2B, 3C." }),
   7: Object.freeze({ assignmentKey: "B1-3.7", title: "Lesen Sie den Text und beantworten Sie sieben Textfragen und fünf Anzeige-Fragen.", instructions: "Read the complete text first. Then choose one answer, A–C, for questions 1–7 and one Anzeige letter, A–F, for questions 1–5.", submissionNote: "Submit only answer letters, for example: Text: 1A, 2B. Anzeigen: 1F, 2B." }),
   8: Object.freeze({ assignmentKey: "B1-3.8", title: "Lesen Sie den Text „Ein moderner Held in der Medizinwelt“ und beantworten Sie 7 Fragen.", instructions: "Read the complete text. Choose one answer, a–d, for each question.", submissionNote: "Submit only answer letters, for example: 1A, 2B, 3C." }),
   11: Object.freeze({ assignmentKey: "B1-4.11", title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.", instructions: "Read the complete text first. Then choose one answer, A–D, for every question.", submissionNote: "Submit only the answer letters in this format: 1C, 2B, 3C …" }),
