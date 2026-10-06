@@ -139,7 +139,7 @@ export default function A1GoetheWritingMockPreview() {
     <main className="a1-goethe-mock-shell" data-a1-goethe-writing-mock-preview>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">Schreiben mock · not in Course Book</span>
+        <span className="a1-goethe-mock-preview-badge">A1 Schreiben practice</span>
       </div>
 
       <article className="a1-goethe-mock-exam a1-schreiben-mock-exam">
