@@ -326,6 +326,30 @@ const loadFallbackProgress = async ({ studentCode, email, userId, normalizedLeve
   });
 };
 
+// A pending projection must not hide a score already saved in the mirror.
+export const mergeLessonProgress = (...sources) => {
+  const merged = {};
+  sources.forEach((source = {}) => {
+    Object.entries(source).forEach(([key, incoming]) => {
+      const current = merged[key];
+      if (!current) {
+        merged[key] = incoming;
+        return;
+      }
+      const currentMarked = toMillis(current.markedAt);
+      const incomingMarked = toMillis(incoming.markedAt);
+      const currentMarkedResult = current.hasResult && ["passed", "failed"].includes(current.status);
+      const incomingMarkedResult = incoming.hasResult && ["passed", "failed"].includes(incoming.status);
+      const keepCurrentResult = currentMarkedResult &&
+        (!incomingMarkedResult || currentMarked > incomingMarked);
+      merged[key] = keepCurrentResult
+        ? { ...incoming, ...current }
+        : { ...current, ...incoming };
+    });
+  });
+  return merged;
+};
+
 export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
   const studentCode = useMemo(() => normalizeStudentCode(studentProfile, user), [studentProfile, user]);
   const email = useMemo(() => normalizeEmail(studentProfile, user), [studentProfile, user]);
@@ -338,15 +362,18 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
   useEffect(() => {
     let cancelled = false;
     let unsubscribe = null;
+    const scoreUnsubscribes = [];
+    const scoreRowsByQuery = new Map();
     let fallbackProgress = {};
     let liveProgress = {};
+    let scoreProgress = {};
 
     const publish = ({ loading = false, error = "", source = "fallback" } = {}) => {
       if (cancelled) return;
       setState({
         loading,
         error,
-        progressByAssignmentId: { ...fallbackProgress, ...liveProgress },
+        progressByAssignmentId: mergeLessonProgress(fallbackProgress, liveProgress, scoreProgress),
         source,
       });
     };
@@ -358,6 +385,41 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
       }
 
       publish({ loading: true, source: "loading" });
+
+      if (db) {
+        const scoreQueries = [];
+        if (studentCode) {
+          const variants = studentCodeVariants(studentCode);
+          ["studentCode", "studentcode", "student_code"].forEach((field) => {
+            scoreQueries.push([field, variants]);
+          });
+        }
+        if (userId) scoreQueries.push(["studentId", [userId]], ["uid", [userId]]);
+        if (email) scoreQueries.push(["studentEmail", [email]], ["email", [email]]);
+        scoreQueries.forEach(([field, values]) => {
+          const constraint = values.length > 1
+            ? where(field, "in", values)
+            : where(field, "==", values[0]);
+          try {
+            scoreUnsubscribes.push(onSnapshot(
+              query(collection(db, "scores"), constraint),
+              (snapshot) => {
+                if (cancelled) return;
+                scoreRowsByQuery.set(field, snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+                const rows = new Map();
+                scoreRowsByQuery.forEach((entries) => entries.forEach((row) => rows.set(row.id, row)));
+                scoreProgress = buildProgressByAssignmentId({
+                  results: [...rows.values()], level: normalizedLevel, studentCode,
+                });
+                publish({ source: "scores" });
+              },
+              (error) => console.warn("Could not subscribe to course-book scores", error)
+            ));
+          } catch (error) {
+            console.warn("Could not start course-book score subscription", error);
+          }
+        });
+      }
 
       if (db && studentCode) {
         try {
@@ -396,6 +458,7 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
     return () => {
       cancelled = true;
       if (typeof unsubscribe === "function") unsubscribe();
+      scoreUnsubscribes.forEach((stop) => stop());
     };
   }, [email, normalizedLevel, refreshRevision, studentCode, userId]);
 
