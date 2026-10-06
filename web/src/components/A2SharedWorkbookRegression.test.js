@@ -139,7 +139,7 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 28 future-focused with standard Grammar and Submit ownership", () => {
     expect(day28).toContain('chapter="10.28"');
-    expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
+    expect(A2_READING_TASKS[28].title).toBe("Reisepläne für Hamburg");
     expect(day28).toContain("A2Days26To28LearningUpgrade");
     expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
     expect(A2_LISTENING_TASKS[28].audioUrl).toBe("");
