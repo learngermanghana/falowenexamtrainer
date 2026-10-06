@@ -284,7 +284,7 @@ export default function A1GoetheReadingMockTeil2Preview() {
     <main className="a1-goethe-mock-shell" data-a1-goethe-reading-mock-teil2-preview>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">Mock preview · not in Course Book</span>
+        <span className="a1-goethe-mock-preview-badge">A1 Lesen practice</span>
       </div>
 
       <article className="a1-goethe-mock-exam">

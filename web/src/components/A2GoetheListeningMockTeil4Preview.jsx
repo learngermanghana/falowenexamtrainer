@@ -90,8 +90,8 @@ export default function A2GoetheListeningMockTeil4Preview() {
   return (
     <main className="a1-goethe-mock-shell" data-a2-goethe-listening-mock-teil4-preview>
       <div className="a1-goethe-mock-topbar">
-        <AppBackButton label="Back to A2 Mock Preview" fallbackPath="/campus/course/a2-mock-practice-preview" />
-        <span className="a1-goethe-mock-preview-badge">A2 Hören Teil 4 · preview only</span>
+        <AppBackButton label="Back to A2 mock" fallbackPath="/campus/course/a2-mock-practice-preview" />
+        <span className="a1-goethe-mock-preview-badge">A2 Hören · Teil 4</span>
       </div>
 
       <article className="a1-goethe-mock-exam a2-t4-exam">

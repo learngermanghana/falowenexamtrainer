@@ -1484,19 +1484,19 @@ const WritingPage = ({
               key: "task",
               label: "Task completion",
               score: Number(data.rubric.task || 0),
-              explanation: "Backend rubric",
+              explanation: "Based on your response",
             },
             {
               key: "coherence",
               label: "Coherence",
               score: Number(data.rubric.coherence || 0),
-              explanation: "Backend rubric",
+              explanation: "Based on your response",
             },
             {
               key: "grammar",
               label: "Grammar & accuracy",
               score: Number(data.rubric.grammar || 0),
-              explanation: "Backend rubric",
+              explanation: "Based on your response",
             },
           ]
         : buildRubricBreakdown(data.feedback);

@@ -1098,7 +1098,7 @@ export default function A2FinalMockExamPage() {
         <article className="a1-final-mock-intro">
           <p className="a1-goethe-mock-kicker">Day 29 · A2</p>
           <h1>A2 Final Mock Exam</h1>
-          <p>Complete all four sections in order. Your answers are autosaved and feedback is revealed only after the full mock is finished.</p>
+          <p>Complete all four sections in order. Your answers are saved automatically. Feedback appears after the full mock is finished.</p>
 
           <div className="a1-final-mock-overview">
             <div><strong>Lesen</strong><span>30 min · 25 points</span></div>
@@ -1110,7 +1110,7 @@ export default function A2FinalMockExamPage() {
           <div className="a1-final-mock-rules">
             <strong>Pass mark: 60/100</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
-            <p>Your progress is autosaved. Completed sections are locked.</p>
+            <p>Your progress is saved automatically. Completed sections are locked.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
@@ -1127,7 +1127,7 @@ export default function A2FinalMockExamPage() {
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">
-          {exam.completed ? "Mock complete" : "A2 Final Mock · answers autosaved"}
+          {exam.completed ? "Mock complete" : "A2 Final Mock"}
         </span>
       </div>
 

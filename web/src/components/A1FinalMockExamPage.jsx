@@ -1067,7 +1067,7 @@ export default function A1FinalMockExamPage() {
           <div className="a1-final-mock-rules">
             <strong>Pass mark: 60/100</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
-            <p>Your progress is autosaved. Completed sections are locked.</p>
+            <p>Your progress is saved automatically. Completed sections are locked.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
@@ -1084,7 +1084,7 @@ export default function A1FinalMockExamPage() {
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">
-          {exam.completed ? "Mock complete" : "A1 Final Mock · answers autosaved"}
+          {exam.completed ? "Mock complete" : "A1 Final Mock"}
         </span>
       </div>
 

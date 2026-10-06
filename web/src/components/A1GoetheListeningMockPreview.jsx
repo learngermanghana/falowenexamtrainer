@@ -283,7 +283,7 @@ export default function A1GoetheListeningMockPreview() {
     <main className="a1-goethe-mock-shell" data-a1-goethe-listening-mock-preview>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-        <span className="a1-goethe-mock-preview-badge">Hören mock · R2 audio · not in Course Book</span>
+        <span className="a1-goethe-mock-preview-badge">A1 Hören practice</span>
       </div>
 
       <article className="a1-goethe-mock-exam a1-hoeren-mock-exam">

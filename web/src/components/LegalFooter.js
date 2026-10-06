@@ -10,33 +10,66 @@ const links = [
 
 const LegalFooter = ({ compact = false }) => (
   <footer
-    aria-label="Falowen legal links"
+    aria-label="Falowen footer"
     style={{
-      marginTop: compact ? 12 : 20,
-      paddingTop: compact ? 10 : 14,
-      borderTop: "1px solid #e5e7eb",
+      marginTop: compact ? 12 : 18,
+      border: "1px solid #e2e8f0",
+      borderRadius: 16,
+      background: "linear-gradient(180deg, #ffffff, #f8fafc)",
+      padding: compact ? "14px 16px" : "18px 20px",
       color: "#64748b",
       fontSize: 12,
-      textAlign: "center",
     }}
   >
-    <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
-      {links.map((link) => (
-        <a
-          key={link.href}
-          href={link.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: "#475569", textDecoration: "none", fontWeight: 700 }}
-        >
-          {link.label}
-        </a>
-      ))}
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 14,
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ display: "grid", gap: 3 }}>
+        <strong style={{ color: "#0f172a", fontSize: 14 }}>Falowen</strong>
+        {!compact ? (
+          <span>Learning by Learn Language Education Academy</span>
+        ) : null}
+      </div>
+
+      <nav
+        aria-label="Falowen legal links"
+        style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}
+      >
+        {links.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#475569", textDecoration: "none", fontWeight: 700 }}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
     </div>
+
     {!compact ? (
-      <p style={{ margin: "8px 0 0" }}>
-        Enrollment, payment and use of Falowen are subject to the applicable agreement and policies.
-      </p>
+      <div
+        style={{
+          marginTop: 14,
+          paddingTop: 12,
+          borderTop: "1px solid #e5e7eb",
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <span>Use Falowen for your course learning and exam preparation.</span>
+        <span>© {new Date().getFullYear()} Falowen</span>
+      </div>
     ) : null}
   </footer>
 );

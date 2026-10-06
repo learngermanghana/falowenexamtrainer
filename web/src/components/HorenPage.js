@@ -34,7 +34,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <div>
           <h2 style={{ margin: 0 }}>{normalizedLevel} Hören practice</h2>
           <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-            Choose a listening sample. Each sample opens on its own page.
+            Choose a listening sample to practise.
           </p>
         </div>
 

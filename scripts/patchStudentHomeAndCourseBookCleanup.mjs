@@ -90,10 +90,9 @@ if (!classCalendar.includes(compactClassActionsMarker)) {
   }
 }
 
-// Dashboard: the live-class block is the final dashboard content. Keep only a
-// lightweight Falowen Blog link beneath it; announcements/subscription cards no
-// longer compete with the student's class information. Remove the hidden
-// announcement machinery too so no feed requests or rotation rerenders remain.
+// Dashboard: keep the live-class block compact and remove the old announcement
+// machinery. The homepage now ends with Next Class, Zoom access and LegalFooter,
+// so this lifecycle patch must not append any extra content after the class area.
 generalHome = generalHome
   .replace(
     'import React, { useCallback, useEffect, useMemo, useState } from "react";\n',
@@ -135,32 +134,14 @@ if (announcementRotationEffectStart !== -1) {
   generalHome = `${generalHome.slice(0, announcementRotationEffectStart)}${generalHome.slice(announcementRotationEffectEnd + announcementRotationEffectEndMarker.length)}`;
 }
 
-if (!generalHome.includes('data-dashboard-footer-blog="true"')) {
-  const classCardAnchor = `      <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} initialClassId={preferredClassId} program={studentProfile?.program} />`;
-  const classCardStart = generalHome.lastIndexOf(classCardAnchor);
-  if (classCardStart === -1) {
-    throw new Error("Student cleanup patch anchor missing: dashboard class card");
+const legacyBlogStart = generalHome.indexOf('      <div data-dashboard-footer-blog="true"');
+if (legacyBlogStart !== -1) {
+  const legacyBlogEndMarker = '      </div>\n';
+  const legacyBlogEnd = generalHome.indexOf(legacyBlogEndMarker, legacyBlogStart);
+  if (legacyBlogEnd === -1) {
+    throw new Error("Student cleanup patch anchor missing: legacy dashboard blog footer end");
   }
-  const afterClassCard = classCardStart + classCardAnchor.length;
-  const dashboardClose = generalHome.indexOf(`    </div>\n  );\n};`, afterClassCard);
-  if (dashboardClose === -1) {
-    throw new Error("Student cleanup patch anchor missing: dashboard closing block");
-  }
-
-  const blogFooter = `
-
-      <div data-dashboard-footer-blog="true" style={{ display: "flex", justifyContent: "center", padding: "2px 0 4px" }}>
-        <a
-          href="https://blog.falowen.app/blogs/"
-          target="_blank"
-          rel="noreferrer"
-          style={{ color: "#2563eb", fontSize: 13, fontWeight: 800, textDecoration: "none" }}
-        >
-          Falowen Blog
-        </a>
-      </div>
-`;
-  generalHome = `${generalHome.slice(0, afterClassCard)}${blogFooter}${generalHome.slice(dashboardClose)}`;
+  generalHome = `${generalHome.slice(0, legacyBlogStart)}${generalHome.slice(legacyBlogEnd + legacyBlogEndMarker.length)}`;
 }
 
 fs.writeFileSync(courseTabPath, courseTab, "utf8");
