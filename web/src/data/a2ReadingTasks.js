@@ -567,23 +567,34 @@ Situation 5: Für den zweiten Tag wird ein kurzer Besuch im Hafenmuseum und ein 
   },
   27: {
     chapter: "10.27",
-    format: "Digitale Hinweise",
-    title: "Sicher kommunizieren",
-    strategy: "Wende die Regeln auf konkrete Situationen an. Entscheide nicht nur nach einem Schlüsselwort, sondern prüfe, welche Empfehlung wirklich zur Situation passt.",
-    text: `Tipps für sichere digitale Kommunikation
+    format: "Digitale Mitteilungen & Online-Anzeigen",
+    title: "Digitale Mitteilungen & Online-Anzeigen",
+    strategy: "Lies zuerst die fünf Fragen. Ordne dann die Informationen aus App, E-Mail, Website und Digital-Info gezielt nach Vorteil, Sitzplatz, Reservierung, Dauer und Download.",
+    text: `Anzeige A: Hamburg-App Notification
 
-1. Verwende für wichtige Konten unterschiedliche Passwörter.
-2. Teile Passwörter nie per Chat oder E-Mail.
-3. Öffne keine unbekannten Links, wenn du den Absender nicht kennst.
-4. Prüfe bei Nachrichten von Banken oder Behörden immer die Absenderadresse.
-5. In Klassengruppen oder Arbeitschats: Schreibe persönliche Daten nur, wenn es wirklich nötig ist.
-6. Wenn eine Nachricht beleidigend oder bedrohend ist, antworte nicht sofort. Speichere die Nachricht und informiere eine verantwortliche Person.`,
+Gästekarte Hamburg Digital
+Fahren Sie zwei Tage lang unbegrenzt mit Bus und Bahn! Nutzen Sie 20 % Rabatt bei der Hafenrundfahrt an den Landungsbrücken (20 € statt 25 €) sowie Rabatte in vielen Museen. Kaufen und aktivieren Sie die Karte direkt in der App.
+
+Anzeige B: E-Mail-Bestätigung — Kultur-Ticket
+
+Elbphilharmonie Hamburg — Ihre Buchung
+Vielen Dank für Ihre Bestellung! Ihr Ticket für das Orchesterkonzert heute Abend um 20:00 Uhr ist bestätigt. Hinweis: Sie buchten Plätze in der letzten Reihe (hintere Plätze). Bitte zeigen Sie den QR-Code auf Ihrem Smartphone am Eingang vor.
+
+Anzeige C: Website-Anzeige — Gastronomie
+
+Restaurant Seeblick am Hafen
+Lust auf frischen Fisch am Hafen? Besuchen Sie uns! Hervorragende Küche zu günstigen Preisen. Öffnungszeiten & Tischreservierung online unter www.seeblick-hamburg.de.
+
+Anzeige D: Digitaler Stadtplan & Museumsinfos
+
+Hafenmuseum & Stadtpark Info
+Das Hafenmuseum ist klein und sehr interessant. Planen Sie etwa 2 Stunden für Ihren Besuch ein. Lade dir jetzt den digitalen Stadtplan mit allen Markierungen auf dein Handy herunter!`,
     questions: [
-      { stem: "Lena benutzt für E-Mail und Online-Banking dasselbe Passwort. Welche Empfehlung aus dem Text widerspricht diesem Verhalten?", options: ["A) Immer dasselbe Passwort", "B) Unterschiedliche Passwörter", "C) Gar kein Passwort", "D) Das Passwort im Chat speichern"] },
-      { stem: "Ein Klassenkamerad bittet dich im Chat um deine Zugangsdaten. Welche Information sollst du laut Text auf keinen Fall schicken?", options: ["A) Einen Termin", "B) Ein Passwort", "C) Eine Begrüßung", "D) Einen Filmtipp"] },
-      { stem: "Du bekommst einen Link von einer Person, die du nicht kennst. Welche Reaktion passt zu den Sicherheitstipps?", options: ["A) Sofort öffnen", "B) An alle weiterleiten", "C) Nicht öffnen, wenn man den Absender nicht kennt", "D) Das Passwort eingeben"] },
-      { stem: "Eine Nachricht sieht aus, als käme sie von einer Bank. Was solltest du prüfen, bevor du ihr vertraust?", options: ["A) Nur die Schriftfarbe", "B) Die Absenderadresse", "C) Das Wetter", "D) Den Akkustand"] },
-      { stem: "In einem Gruppenchat erhältst du eine beleidigende und bedrohliche Nachricht. Welche Reaktion entspricht dem Text?", options: ["A) Sofort beleidigend antworten.", "B) Die Nachricht speichern und eine verantwortliche Person informieren.", "C) Das Passwort senden.", "D) Den Absender anrufen und bedrohen."] },
+      { stem: "Was bietet die digitale Gästekarte in der App?", options: ["A) Kostenlosen Eintritt in alle Fischrestaurants", "B) Freie Fahrt mit Bus und Bahn für zwei Tage sowie Rabatte", "C) Ein Gratis-Ticket für das Orchesterkonzert"] },
+      { stem: "Welche Information steht in der E-Mail der Elbphilharmonie?", options: ["A) Das Konzert ist abgesagt.", "B) Die Vorstellung beginnt bereits um 12:00 Uhr.", "C) Die gebuchten Plätze befinden sich auf den hinteren Rängen."] },
+      { stem: "Wo kann man online einen Tisch für frischen Fisch buchen?", options: ["A) Auf der Website des Restaurants Seeblick", "B) In der App des Hafenmuseums", "C) Per SMS bei der Touristeninformation"] },
+      { stem: "Wie lange dauert ein Besuch im Hafenmuseum laut Digital-Info?", options: ["A) Den ganzen Tag", "B) Ungefähr zwei Stunden", "C) Genau zehn Minuten"] },
+      { stem: "Was kann man auf das Smartphone herunterladen?", options: ["A) Eine kostenlose Fahrkarte für die Elbphilharmonie", "B) Einen digitalen Stadtplan mit Markierungen für Sehenswürdigkeiten", "C) Ein Kochbuch für Fischgerichte"] },
     ],
   },
   28: {
