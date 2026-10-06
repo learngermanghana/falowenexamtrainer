@@ -71,7 +71,7 @@ export const A2_GOETHE_LISTENING_TEIL3 = Object.freeze({
   ],
 });
 
-const Picture = ({ icon }) => {
+export const A2ListeningTeil3Picture = ({ icon }) => {
   const render = {
     juice: <><div className="a2-t3-bottle">O</div><div className="a2-t3-glass" /></>,
     cake: <><div className="a2-t3-cake">🎂</div></>,
@@ -122,8 +122,8 @@ export default function A2GoetheListeningMockTeil3Preview() {
   return (
     <main className="a1-goethe-mock-shell" data-a2-goethe-listening-mock-teil3-preview>
       <div className="a1-goethe-mock-topbar">
-        <AppBackButton label="Back to A2 Mock Preview" fallbackPath="/campus/course/a2-mock-practice-preview" />
-        <span className="a1-goethe-mock-preview-badge">A2 Hören Teil 3 · preview only</span>
+        <AppBackButton label="Back to A2 mock" fallbackPath="/campus/course/a2-mock-practice-preview" />
+        <span className="a1-goethe-mock-preview-badge">A2 Hören · Teil 3</span>
       </div>
 
       <article className="a1-goethe-mock-exam a2-t3-exam">
@@ -176,7 +176,7 @@ export default function A2GoetheListeningMockTeil3Preview() {
                       onChange={() => setAnswers((current) => ({ ...current, [question.number]: option.id }))}
                     />
                     <span className="a2-t3-letter">{option.id}</span>
-                    <Picture icon={option.icon} />
+                    <A2ListeningTeil3Picture icon={option.icon} />
                     <span className="a2-t3-hidden-label">{option.label}</span>
                   </label>
                 ))}

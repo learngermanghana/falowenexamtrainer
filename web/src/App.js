@@ -156,7 +156,6 @@ import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
 import OnboardingChecklist from "./components/OnboardingChecklist";
 import SpeakingPage from "./components/SpeakingPage";
-import ExamResources from "./components/ExamResources";
 import HorenPage from "./components/HorenPage";
 import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
@@ -1430,6 +1429,7 @@ const ExamArea = ({ onBack }) => {
   const lastSectionStorageKey = "falowen_exam_last_section";
 
   const examSection = useMemo(() => {
+    if (section === "resources") return "file";
     if (
       [
         "overview",
@@ -1437,7 +1437,6 @@ const ExamArea = ({ onBack }) => {
         "question",
         "speaking",
         "writing",
-        "resources",
         "file",
         "vocab",
         "horen",
@@ -1490,7 +1489,6 @@ const ExamArea = ({ onBack }) => {
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
-    { key: "resources", label: t("appNav.examTabs.resources") },
   ];
 
   const examHeroConfig = {
@@ -1517,10 +1515,6 @@ const ExamArea = ({ onBack }) => {
     horen: {
       label: t("appNav.examTabs.horen"),
       image: "https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
-    },
-    resources: {
-      label: t("appNav.examTabs.resources"),
-      image: "https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
     },
     file: {
       label: t("appNav.examTabs.file"),
@@ -1616,7 +1610,6 @@ const ExamArea = ({ onBack }) => {
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
-      {examSection === "resources" ? <ExamResources /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
     </>
   );

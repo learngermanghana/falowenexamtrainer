@@ -138,7 +138,6 @@ const MyExamFilePage = () => {
   const {
     config: goetheExamConfig,
     loading: examScheduleLoading,
-    source: examScheduleSource,
   } = useGoetheExamConfig();
   const goetheExamLevels = useMemo(() => {
     const merged = new Map(
@@ -216,12 +215,8 @@ const MyExamFilePage = () => {
     : "Date pending";
 
   const scheduleStatus = examScheduleLoading
-    ? "Updating Goethe schedule…"
-    : examScheduleSource === "admin"
-      ? "Schedule synced from Falowen Admin."
-      : examScheduleSource === "cache"
-        ? "Showing the last saved schedule while checking for updates."
-        : "Showing the current built-in schedule.";
+    ? "Checking the latest exam dates…"
+    : "Check the details below before you register.";
 
   return (
     <div style={{ display: "grid", gap: 12 }}>

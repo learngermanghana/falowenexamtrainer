@@ -5,7 +5,7 @@ import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
 
 const statusLabel = (status) => {
-  if (status === "preview") return "Preview";
+  if (status === "preview") return "Practice";
   if (status === "ready") return "Ready";
   return "Planned";
 };
@@ -21,7 +21,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Complete exam-format sets here. Each mock has its own question-set ID so new mocks can reuse the same exam engine without copying the page structure.
+          Practise a complete exam under timed conditions and review your result when you finish.
         </p>
       </section>
 
@@ -35,13 +35,13 @@ export default function MockExamLibraryPage() {
                     <h3 style={{ margin: 0 }}>{mock.shortTitle || mock.title}</h3>
                     <span style={styles.badge}>{statusLabel(mock.status)}</span>
                   </div>
-                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{mock.description}</p>
+                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>Complete {(mock.sections || []).join(", ")} in one exam-style practice.</p>
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
-                    {mock.durationLabel} · {(mock.sections || []).join(" · ")} · question set: {mock.questionSetId}
+                    {mock.durationLabel} · {(mock.sections || []).join(" · ")}
                   </p>
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.status === "preview" ? "Open preview" : "Start mock"}
+                  {mock.status === "preview" ? "Open practice" : "Start mock"}
                 </button>
               </div>
             </article>
@@ -50,7 +50,7 @@ export default function MockExamLibraryPage() {
       ) : (
         <section style={styles.card}>
           <strong>No full {level} mock is published yet.</strong>
-          <p style={styles.helperText}>Use Practice by Section while the first reusable question set is prepared.</p>
+          <p style={styles.helperText}>Use the section practice while a full mock is not yet available.</p>
         </section>
       )}
     </div>

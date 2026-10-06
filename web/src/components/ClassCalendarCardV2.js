@@ -210,6 +210,92 @@ function LegacyClassCard({ selectedClass, classDetails, now }) {
   );
 }
 
+function HomeZoomAccessCard({ zoom = {}, className = "" }) {
+  if (!zoom.url) return null;
+
+  return (
+    <section
+      data-home-zoom-access
+      style={{
+        ...infoCardStyle,
+        borderColor: "#c7d2fe",
+        background: "linear-gradient(135deg, #eef2ff 0%, #ffffff 62%, #eff6ff 100%)",
+        boxShadow: "0 14px 30px rgba(37, 99, 235, 0.08)",
+        padding: 18,
+        gap: 12,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <div style={{ display: "grid", gap: 4 }}>
+          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>Live class</span>
+          <h3 style={{ margin: 0, fontSize: 19 }}>Join your class on Zoom</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {className ? `${className} · ` : ""}Use this link when it is time for your live lesson.
+          </p>
+        </div>
+        <a
+          href={zoom.url}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            ...styles.primaryButton,
+            textDecoration: "none",
+            minWidth: 150,
+            textAlign: "center",
+            boxShadow: "0 8px 18px rgba(37, 99, 235, 0.18)",
+          }}
+        >
+          Open Zoom
+        </a>
+      </div>
+
+      {zoom.meetingId || zoom.passcode ? (
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: 8,
+          }}
+        >
+          {zoom.meetingId ? (
+            <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: "10px 12px", background: "#ffffff" }}>
+              <span style={{ ...styles.helperText, display: "block", marginBottom: 2 }}>Meeting ID</span>
+              <strong>{zoom.meetingId}</strong>
+            </div>
+          ) : null}
+          {zoom.passcode ? (
+            <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: "10px 12px", background: "#ffffff" }}>
+              <span style={{ ...styles.helperText, display: "block", marginBottom: 2 }}>Passcode</span>
+              <strong>{zoom.passcode}</strong>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function LegacyHomeClassCard({ selectedClass, classDetails, now }) {
+  const nextClass = findNextClassSession(selectedClass, now);
+  return (
+    <>
+      <section style={{ ...infoCardStyle, background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderColor: "#bfdbfe" }}>
+        <span style={{ ...styles.badge, width: "fit-content" }}>Next class</span>
+        <h3 style={{ margin: 0 }}>{selectedClass}</h3>
+        {nextClass ? (
+          <p style={{ margin: 0 }}>
+            <strong>{nextClass.weekday}, {nextClass.date}</strong> · {nextClass.startTime}–{nextClass.endTime}
+          </p>
+        ) : (
+          <p style={{ ...styles.helperText, margin: 0 }}>No upcoming class is currently scheduled.</p>
+        )}
+        <p style={{ ...styles.helperText, margin: 0 }}>{formatScheduleSummary(classDetails?.schedule)}</p>
+      </section>
+      <HomeZoomAccessCard zoom={ZOOM_DETAILS} className={selectedClass} />
+    </>
+  );
+}
+
 function ClassEndedNotice({ summary, locale }) {
   const endedLabel = summary?.classEndedAt ? formatDate(summary.classEndedAt, locale) : "the official end date";
   return (
@@ -227,7 +313,7 @@ function ClassEndedNotice({ summary, locale }) {
   );
 }
 
-const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) => {
+const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, homepageCompact = false }) => {
   const { i18n } = useTranslation();
   const locale = i18n.language || "en";
   const resolvedCatalog = useMemo(() => program === "french" ? frenchClassCatalog : classCatalog, [program]);
@@ -309,12 +395,14 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) 
     <div id={id} style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Live class access & calendar</h2>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Your next lesson, timetable, Zoom access and course progress.</p>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{homepageCompact ? "Your next class" : "Live class access & calendar"}</h2>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{homepageCompact ? "Your next lesson and Zoom access." : "Your next lesson, timetable, Zoom access and course progress."}</p>
         </div>
-        <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
-          {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Updating schedule…" : canonicalStatus === "cached" ? "Last known schedule" : "Legacy schedule"}
-        </span>
+        {!homepageCompact ? (
+          <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
+            {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Updating schedule…" : canonicalStatus === "cached" ? "Last known schedule" : "Legacy schedule"}
+          </span>
+        ) : null}
       </div>
 
       <section style={infoCardStyle}>
@@ -327,6 +415,29 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) 
       </section>
 
       {canonicalSummary ? (
+        homepageCompact ? (
+          <>
+            {nextSession ? (
+              <NextLiveClassCard
+                summary={canonicalSummary}
+                session={nextSession}
+                zoom={zoom}
+                now={now}
+                locale={locale}
+                fullCalendarLink={fullCalendarLink}
+                updating={canonicalStatus === "loading" || canonicalStatus === "cached"}
+                simple
+              />
+            ) : (
+              <section style={{ ...infoCardStyle, background: "#f8fafc" }}>
+                <span style={{ ...styles.badge, width: "fit-content" }}>Next class</span>
+                <strong>No upcoming class</strong>
+                <span style={styles.helperText}>There is no upcoming live lesson scheduled right now.</span>
+              </section>
+            )}
+            <HomeZoomAccessCard zoom={zoom} className={canonicalSummary.klass?.name || selectedClass} />
+          </>
+        ) : (
         <>
           {classEnded ? <ClassEndedNotice summary={canonicalSummary} locale={locale} /> : nextSession ? (
             <NextLiveClassCard
@@ -395,10 +506,13 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program }) 
             <a href="/campus/course" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open Course Book</a>
           </div>
         </>
+        )
       ) : canonicalStatus === "loading" ? (
         <section style={infoCardStyle}><span style={styles.helperText}>Loading the latest class schedule…</span></section>
       ) : classDetails ? (
-        <LegacyClassCard selectedClass={selectedClass} classDetails={classDetails} now={now} />
+        homepageCompact
+          ? <LegacyHomeClassCard selectedClass={selectedClass} classDetails={classDetails} now={now} />
+          : <LegacyClassCard selectedClass={selectedClass} classDetails={classDetails} now={now} />
       ) : (
         <section style={{ ...infoCardStyle, background: "#fef2f2", borderColor: "#fecaca" }}>
           <strong>Class schedule unavailable</strong>

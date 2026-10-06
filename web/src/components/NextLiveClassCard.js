@@ -121,6 +121,7 @@ export default function NextLiveClassCard({
   fullCalendarLink = "#full-session-timetable",
   compact = false,
   updating = false,
+  simple = false,
 }) {
   if (!session) return null;
 
@@ -155,7 +156,7 @@ export default function NextLiveClassCard({
           <div style={{ color: compact ? "#bfdbfe" : "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: "0.08em" }}>
             NEXT LIVE CLASS
           </div>
-          {updating ? <div style={{ color: compact ? "#fef3c7" : "#92400e", fontSize: 11, fontWeight: 700, marginTop: 3 }}>Updating timetable…</div> : null}
+          {updating && !simple ? <div style={{ color: compact ? "#fef3c7" : "#92400e", fontSize: 11, fontWeight: 700, marginTop: 3 }}>Updating timetable…</div> : null}
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
           {rescheduled ? <span style={{ ...styles.badge, background: "#ffedd5", color: "#9a3412" }}>Rescheduled</span> : null}
@@ -196,60 +197,64 @@ export default function NextLiveClassCard({
           <span>Open lesson</span>
           <span aria-hidden="true">→</span>
         </a>
-        <a
-          href={fullCalendarLink}
-          className="next-live-class-action next-live-class-action--timetable"
-          style={{
-            ...styles.secondaryButton,
-            ...actionBaseStyle,
-            textDecoration: "none",
-            padding: compact ? "9px 10px" : actionBaseStyle.padding,
-            color: compact ? "#ffffff" : undefined,
-            borderColor: compact ? "rgba(255,255,255,0.5)" : undefined,
-          }}
-        >
-          View full timetable
-        </a>
-        {joinEnabled ? (
-          <a
-            href={zoom.url}
-            className="next-live-class-action next-live-class-action--join"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              ...styles.primaryButton,
-              ...actionBaseStyle,
-              textDecoration: "none",
-              background: "#16a34a",
-              padding: compact ? "9px 10px" : actionBaseStyle.padding,
-            }}
-          >
-            Join live class
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="next-live-class-action next-live-class-action--join"
-            style={{
-              ...styles.secondaryButton,
-              ...actionBaseStyle,
-              opacity: 0.72,
-              cursor: "not-allowed",
-              padding: compact ? "9px 10px" : actionBaseStyle.padding,
-              color: compact ? "#ffffff" : undefined,
-              borderColor: compact ? "rgba(255,255,255,0.45)" : undefined,
-              background: compact ? "rgba(255,255,255,0.08)" : undefined,
-            }}
-          >
-            {zoom?.url && joinOpenLabel && joinOpenLabel !== "Join unavailable"
-              ? `Join class · Opens ${joinOpenLabel}`
-              : "Join class · Link pending"}
-          </button>
-        )}
+        {!simple ? (
+          <>
+            <a
+              href={fullCalendarLink}
+              className="next-live-class-action next-live-class-action--timetable"
+              style={{
+                ...styles.secondaryButton,
+                ...actionBaseStyle,
+                textDecoration: "none",
+                padding: compact ? "9px 10px" : actionBaseStyle.padding,
+                color: compact ? "#ffffff" : undefined,
+                borderColor: compact ? "rgba(255,255,255,0.5)" : undefined,
+              }}
+            >
+              View full timetable
+            </a>
+            {joinEnabled ? (
+              <a
+                href={zoom.url}
+                className="next-live-class-action next-live-class-action--join"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  ...styles.primaryButton,
+                  ...actionBaseStyle,
+                  textDecoration: "none",
+                  background: "#16a34a",
+                  padding: compact ? "9px 10px" : actionBaseStyle.padding,
+                }}
+              >
+                Join live class
+              </a>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="next-live-class-action next-live-class-action--join"
+                style={{
+                  ...styles.secondaryButton,
+                  ...actionBaseStyle,
+                  opacity: 0.72,
+                  cursor: "not-allowed",
+                  padding: compact ? "9px 10px" : actionBaseStyle.padding,
+                  color: compact ? "#ffffff" : undefined,
+                  borderColor: compact ? "rgba(255,255,255,0.45)" : undefined,
+                  background: compact ? "rgba(255,255,255,0.08)" : undefined,
+                }}
+              >
+                {zoom?.url && joinOpenLabel && joinOpenLabel !== "Join unavailable"
+                  ? `Join class · Opens ${joinOpenLabel}`
+                  : "Join class · Link pending"}
+              </button>
+            )}
+          </>
+        ) : null}
       </div>
 
-      {afterThis.length ? (
+      {!simple && afterThis.length ? (
         <div className="next-live-class-after" style={{ borderTop: compact ? "1px solid rgba(255,255,255,0.2)" : "1px solid #bfdbfe", paddingTop: 10, display: "grid", gap: 7 }}>
           <strong style={{ color: textColor, fontSize: 12 }}>After this</strong>
           {afterThis.map((item) => (

@@ -20,7 +20,7 @@ const examFile = patchFile("src/components/MyExamFilePage.js", (source) => {
   if (next.includes(oldImport)) next = next.replace(oldImport, newImport);
 
   const hookAnchor = '  const formatMoney = useCallback((value) => formatCurrency(value, { locale }), [locale]);';
-  const hookBlock = `${hookAnchor}\n  const {\n    config: goetheExamConfig,\n    loading: examScheduleLoading,\n    source: examScheduleSource,\n  } = useGoetheExamConfig();\n  const goetheExamLevels = goetheExamConfig.levels;`;
+  const hookBlock = `${hookAnchor}\n  const {\n    config: goetheExamConfig,\n    loading: examScheduleLoading,\n  } = useGoetheExamConfig();\n  const goetheExamLevels = goetheExamConfig.levels;`;
   if (!next.includes("config: goetheExamConfig")) {
     if (!next.includes(hookAnchor)) throw new Error("Exam File shared-config hook anchor was not found.");
     next = next.replace(hookAnchor, hookBlock);
@@ -32,13 +32,6 @@ const examFile = patchFile("src/components/MyExamFilePage.js", (source) => {
     "[detectedLevel, goetheExamLevels, showAllLevels]",
   );
   if (next.includes(visibleLevelsOld)) next = next.replace(visibleLevelsOld, visibleLevelsNew);
-
-  const statusAnchor = '          <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>\n            Date format: month day, year (e.g., March 5, 2025). Exams are arranged by level and then by date.\n          </div>';
-  const statusBlock = `${statusAnchor}\n          <div style={{ ...styles.helperText, margin: "-2px 0 0", color: examScheduleLoading ? "#92400e" : "#166534" }}>\n            {examScheduleLoading\n              ? "Updating Goethe schedule…"\n              : examScheduleSource === "admin"\n                ? "Schedule synced from Falowen Admin."\n                : examScheduleSource === "cache"\n                  ? "Showing the last saved Admin schedule while checking for updates."\n                  : "Showing the built-in schedule until Admin publishes an update."}\n          </div>`;
-  if (!next.includes("Schedule synced from Falowen Admin")) {
-    if (!next.includes(statusAnchor)) throw new Error("Exam File schedule-status anchor was not found.");
-    next = next.replace(statusAnchor, statusBlock);
-  }
 
   return next;
 });
@@ -72,7 +65,7 @@ const studyCalendar = patchFile("src/components/StudyCalendarPage.js", (source) 
 
 const checks = [
   [examFile.includes('useGoetheExamConfig'), "Exam File does not import the shared Goethe hook."],
-  [examFile.includes("Schedule synced from Falowen Admin"), "Exam File does not show shared schedule status."],
+  [examFile.includes("Checking the latest exam dates"), "Exam File does not show the student-facing schedule status."],
   [examFile.includes("[detectedLevel, goetheExamLevels, showAllLevels]"), "Exam File does not refresh level cards when Admin config arrives."],
   [studyCalendar.includes('useGoetheExamConfig'), "Study Calendar does not import the shared Goethe hook."],
   [studyCalendar.includes("goetheExamConfig.levels"), "Study Calendar is not using shared levels."],

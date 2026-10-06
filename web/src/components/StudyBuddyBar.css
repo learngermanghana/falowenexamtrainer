@@ -365,7 +365,15 @@
   padding: 10px 14px;
   font-size: 13px;
   font-weight: 900;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: left, top;
+}
+
+.study-buddy-reopen:active {
+  cursor: grabbing;
 }
 
 .study-buddy-reopen:hover,

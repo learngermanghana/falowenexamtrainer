@@ -30,7 +30,7 @@ test("Exam File and Study Calendar react when the shared Admin config arrives", 
   ]);
   assert.match(patch, /MyExamFilePage\.js/);
   assert.match(patch, /StudyCalendarPage\.js/);
-  assert.match(patch, /Schedule synced from Falowen Admin/);
+  assert.match(patch, /Checking the latest exam dates/);
   assert.match(patch, /const goetheExamLevels = goetheExamConfig\.levels/);
   assert.match(patch, /\[detectedLevel, goetheExamLevels, showAllLevels\]/);
   assert.match(patch, /\[goetheExamLevels, selectedLevel\]/);
@@ -51,7 +51,8 @@ test("Exam File gives students registration, sample and structure guidance witho
   assert.match(examFile, /The registration link is the same for every date/);
   assert.match(examFile, /Registration: \{formatDate\(exam\.registrationStart\)\}/);
   assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
-  assert.match(examFile, /Schedule synced from Falowen Admin/);
+  assert.match(examFile, /Checking the latest exam dates/);
+  assert.doesNotMatch(examFile, /Schedule synced from Falowen Admin|last saved schedule|built-in schedule/);
 
   assert.doesNotMatch(examFile, /downloadExamReminder/);
   assert.doesNotMatch(examFile, /Add exam reminder/);
