@@ -79,9 +79,10 @@ test("counts only non-empty required answers", () => {
 });
 
 
-test("replaces legacy A1-7 Lesen drafts while preserving Hören answers", () => {
+test("replaces legacy A1-7 Lesen and Hören drafts after both tasks changed", () => {
   const legacy = {
     assignmentKey: "A1-7",
+    readingRevision: "maria-time-7-v1",
     sections: {
       "teil-1": { answers: Object.fromEntries(Array.from({ length: 10 }, (_, i) => [i + 1, "B"])) },
       "teil-2": { answers: { 1: "B", 10: "B" } },
@@ -90,21 +91,23 @@ test("replaces legacy A1-7 Lesen drafts while preserving Hören answers", () => 
   window.localStorage.setItem(buildA1WorkbookDraftStorageKey("A1-7"), JSON.stringify(legacy));
   const draft = readA1WorkbookDraft("A1-7");
   expect(draft.sections["teil-1"]).toBeUndefined();
-  expect(draft.sections["teil-2"]).toEqual(legacy.sections["teil-2"]);
+  expect(draft.sections["teil-2"]).toBeUndefined();
+  expect(draft.readingRevision).toBe("thomas-time-and-new-listening-5-each-v2");
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft: legacy });
   expect(submission).not.toContain("TEIL 1");
-  expect(submission).toContain("TEIL 2\n1. B\n10. B");
+  expect(submission).not.toContain("TEIL 2");
 });
 
-test("retains new A1-7 answers and drops obsolete Lesen numbers", () => {
+test("retains new A1-7 answers and drops obsolete numbers in both replaced sections", () => {
   saveA1WorkbookDraft({ assignmentKey: "A1-7", sections: {
-    "teil-1": { answers: { 1: "B", 7: "A", 8: "OLD", 10: "OLD" } },
-    "teil-2": { answers: { 10: "B" } },
+    "teil-1": { answers: { 1: "B", 5: "B", 6: "OLD", 7: "OLD" } },
+    "teil-2": { answers: { 1: "A", 5: "A", 6: "OLD", 10: "OLD" } },
   } });
   const draft = readA1WorkbookDraft("A1-7");
-  expect(draft.sections["teil-1"].answers).toEqual({ 1: "B", 7: "A" });
+  expect(draft.sections["teil-1"].answers).toEqual({ 1: "B", 5: "B" });
+  expect(draft.sections["teil-2"].answers).toEqual({ 1: "A", 5: "A" });
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft });
-  expect(submission).toBe("TEIL 1\n1. B\n7. A\n\nTEIL 2\n10. B");
+  expect(submission).toBe("TEIL 1\n1. B\n5. B\n\nTEIL 2\n1. A\n5. A");
 });
 
 
