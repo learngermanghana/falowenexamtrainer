@@ -167,25 +167,22 @@ Hotel Stadtblick`,
   },
   10: {
     chapter: "4.10",
-    format: "Veranstaltungsprogramm",
-    title: "Stadtfest am Sonntag",
-    strategy: "Bei Programmen kannst du Namen und Uhrzeiten schnell suchen. Lies nicht immer den ganzen Text von Anfang an.",
-    text: `Stadtfest am Sonntag – Marktplatz
+    format: "Goethe A2 · Lesen",
+    title: "Eine Stadt entdecken und etwas erleben (Hamburg)",
+    strategy: "Lies zuerst die fünf Fragen. Suche dann gezielt nach Orten, Uhrzeiten und der Reihenfolge der Aktivitäten.",
+    text: `Eine Stadt entdecken und etwas erleben (Hamburg)
 
-10:00 Eröffnung mit Musik
-11:30 Tanzgruppe aus der Region
-13:00 Internationales Mittagessen
-14:30 Kinderprogramm vor dem Rathaus
-16:00 Konzert der Band „Nordlicht“
-18:00 Ende des Festes
+Wer eine neue Stadt entdeckt, kann an zwei Tagen sehr viel erleben. In der Touristeninformation bekommt man viele Tipps und einen Stadtplan, auf dem die wichtigsten Orte markiert sind. Mit einer Gästekarte für 12 € kann man zwei Tage lang bequem mit Bus und Bahn fahren und erhält Rabatte.
 
-Der Eintritt ist kostenlos. Getränke und Essen muss man bezahlen. Bei starkem Regen findet das Konzert im Kulturhaus statt.`,
+An den Landungsbrücken startet jede Stunde eine einstündige Hafenrundfahrt mit dem Schiff. Wer am Abend Kultur erleben möchte, kann um 20:00 Uhr ein Orchesterkonzert in der Elbphilharmonie besuchen. Für ein gutes Abendessen wird das Restaurant Seeblick im Hafen empfohlen, wo man frischen Fisch essen kann.
+
+Am zweiten Tag lohnt sich ein Besuch im Hafenmuseum. Es ist klein, aber sehr interessant – zwei Stunden reichen dafür völlig aus. Danach kann man bei einem Spaziergang im Stadtpark entspannen.`,
     questions: [
-      { stem: "Wann beginnt das Stadtfest?", options: ["A) Um 10:00 Uhr", "B) Um 11:30 Uhr", "C) Um 13:00 Uhr", "D) Um 18:00 Uhr"] },
-      { stem: "Was gibt es um 13:00 Uhr?", options: ["A) Ein Konzert", "B) Ein Kinderprogramm", "C) Internationales Mittagessen", "D) Eine Tanzgruppe"] },
-      { stem: "Wo findet das Kinderprogramm statt?", options: ["A) Im Kulturhaus", "B) Vor dem Rathaus", "C) Im Bahnhof", "D) In einem Restaurant"] },
-      { stem: "Wie viel kostet der Eintritt?", options: ["A) 5 Euro", "B) 10 Euro", "C) Er ist kostenlos.", "D) Nur Kinder zahlen nichts."] },
-      { stem: "Was passiert bei starkem Regen mit dem Konzert?", options: ["A) Es fällt immer aus.", "B) Es beginnt früher.", "C) Es findet im Kulturhaus statt.", "D) Es findet am Bahnhof statt."] },
+      { stem: "Wo bekommt man Tipps und einen markierten Stadtplan für die Stadtbesichtigung?", options: ["A) In der Touristeninformation", "B) Im Hafenmuseum", "C) Im Stadtpark"] },
+      { stem: "Wo startet die Hafenrundfahrt mit dem Schiff?", options: ["A) Im Stadtpark", "B) An den Landungsbrücken", "C) In der Elbphilharmonie"] },
+      { stem: "Welches Erlebnis wird für den Abend um 20:00 Uhr empfohlen?", options: ["A) Ein Spaziergang im Stadtpark", "B) Ein Besuch im Hafenmuseum", "C) Ein Orchesterkonzert in der Elbphilharmonie"] },
+      { stem: "Wo kann man im Hafen gut frischen Fisch essen?", options: ["A) Im Restaurant Seeblick", "B) In der Touristeninformation", "C) Auf dem Schiff"] },
+      { stem: "Was kann man am zweiten Tag nach dem Museumsbesuch erleben?", options: ["A) Im Stadtpark spazieren gehen", "B) Eine zwei Tage lange Zugfahrt machen", "C) Eine neue Gästekarte kaufen"] },
     ],
   },
   11: {
