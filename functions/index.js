@@ -805,6 +805,9 @@ const sendNotifications = async ({
       Urgency: "high",
     },
     notification: {
+      title: notification.title || "Falowen",
+      body: notification.body || "You have a new Falowen update.",
+      icon: "/logo192.png",
       actions: [{ action: "open", title: "Open" }],
       data: { ...data },
     },
@@ -893,6 +896,9 @@ exports.sendPushTestNotification = onCall(
           Urgency: "high",
         },
         notification: {
+          title: "Falowen background test",
+          body: "Background push is working on this device.",
+          icon: "/logo192.png",
           actions: [{ action: "open", title: "Open" }],
           data: { ...data },
         },
