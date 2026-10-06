@@ -118,7 +118,7 @@ describe("shared A2 workbook regression", () => {
 
   it("keeps Day 26 focused on feelings", () => {
     expect(day26).toContain('chapter="10.26"');
-    expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
+    expect(A2_READING_TASKS[26].title).toBe("Gefühle und Reaktionen im Gespräch");
     expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
     expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
