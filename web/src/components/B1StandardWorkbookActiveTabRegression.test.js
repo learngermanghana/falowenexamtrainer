@@ -27,6 +27,7 @@ describe("B1StandardWorkbookPage active-tab runtime safety", () => {
     expect(source).toContain('resolvedActiveTab === "hoeren"');
     expect(source).toContain('resolvedActiveTab === "references"');
     expect(source).toContain('resolvedActiveTab === "submit"');
+    expect(source).toContain("activeTab: resolvedActiveTab");
     expect(source).toContain("displayedActiveTab: resolvedActiveTab");
   });
 });

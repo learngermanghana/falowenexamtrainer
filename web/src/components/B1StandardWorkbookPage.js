@@ -339,7 +339,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                 )}
           
                 {renderSections && (resolvedActiveTab !== "hoeren" || listening.mode === "reading-fallback") ? (
-                  React.createElement(renderSections, { displayedActiveTab: resolvedActiveTab, prepared, setPreparedFor, listening, lessonProfile })
+                  React.createElement(renderSections, { activeTab: resolvedActiveTab, displayedActiveTab: resolvedActiveTab, prepared, setPreparedFor, listening, lessonProfile })
                 ) : (
                   <>
                 {resolvedActiveTab === "sprechen" && (
