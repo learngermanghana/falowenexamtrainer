@@ -266,6 +266,7 @@ export const B1_LISTENING_TASKS = Object.freeze({
     instructions: "Hören Sie den Podcast aufmerksam. Lesen Sie die fünf Fragen und wählen Sie jeweils A, B, C oder D. Reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
     image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "Podcast über effektives Deutschlernen",
+    audioKey: "audio/day_17.mp3",
     videoTitle: "B1 Day 17 Podcast Wie lernt man am besten",
     submitRequired: true,
     selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
