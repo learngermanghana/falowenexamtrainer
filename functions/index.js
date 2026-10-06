@@ -626,6 +626,51 @@ const fetchStudentMessagingToken = async (studentCode) => {
   return null;
 };
 
+const findOwnedMessagingToken = async ({ authUid, authEmail = "", token }) => {
+  if (!authUid || !token) return null;
+
+  const db = getFirestore();
+  const candidates = new Map();
+  const addSnapshot = (snapshot) => {
+    if (!snapshot?.exists) return;
+    candidates.set(snapshot.id, snapshot);
+  };
+  const addQuerySnapshot = (snapshot) => {
+    snapshot?.docs?.forEach((docSnap) => candidates.set(docSnap.id, docSnap));
+  };
+
+  const directSnapshot = await db.collection("students").doc(authUid).get();
+  addSnapshot(directSnapshot);
+
+  const uidSnapshot = await db
+    .collection("students")
+    .where("uid", "==", authUid)
+    .limit(5)
+    .get();
+  addQuerySnapshot(uidSnapshot);
+
+  const normalizedEmail = String(authEmail || "").trim().toLowerCase();
+  if (normalizedEmail) {
+    for (const field of ["email", "authEmail", "loginEmail"]) {
+      const emailSnapshot = await db
+        .collection("students")
+        .where(field, "==", normalizedEmail)
+        .limit(5)
+        .get();
+      addQuerySnapshot(emailSnapshot);
+    }
+  }
+
+  for (const docSnap of candidates.values()) {
+    const data = docSnap.data() || {};
+    if (getTokensFromStudentData(data).includes(token)) {
+      return { docId: docSnap.id, data };
+    }
+  }
+
+  return null;
+};
+
 const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new Set() }) => {
   const db = getFirestore();
   const snapshot = await db
@@ -791,6 +836,93 @@ const sendNotifications = async ({
 
   return null;
 };
+
+exports.sendPushTestNotification = onCall(
+  { region: "europe-west1", timeoutSeconds: 30 },
+  async (request) => {
+    const authUid = request.auth?.uid || "";
+    if (!authUid) {
+      throw new HttpsError("unauthenticated", "Please sign in before sending a test notification.");
+    }
+
+    const token = normalizeCallableText(request.data?.token, 4096);
+    if (!token) {
+      throw new HttpsError(
+        "invalid-argument",
+        "This device does not have an active push token. Refresh this device first."
+      );
+    }
+
+    const owner = await findOwnedMessagingToken({
+      authUid,
+      authEmail: request.auth?.token?.email || "",
+      token,
+    });
+    if (!owner) {
+      throw new HttpsError(
+        "permission-denied",
+        "This push token is not registered to your signed-in student account. Refresh this device and try again."
+      );
+    }
+
+    const requestedDelay = Number(request.data?.delaySeconds);
+    const delaySeconds = Number.isFinite(requestedDelay)
+      ? Math.min(Math.max(Math.round(requestedDelay), 0), 15)
+      : 8;
+
+    if (delaySeconds > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delaySeconds * 1000));
+    }
+
+    const route = "/campus/account";
+    const data = {
+      type: "push_test",
+      route,
+      sentAt: new Date().toISOString(),
+    };
+    const response = await getAdmin().messaging().sendEachForMulticast({
+      tokens: [token],
+      notification: {
+        title: "Falowen background test",
+        body: "Background push is working on this device.",
+      },
+      data,
+      webpush: {
+        headers: {
+          TTL: "300",
+          Urgency: "high",
+        },
+        notification: {
+          actions: [{ action: "open", title: "Open" }],
+          data: { ...data },
+        },
+        fcmOptions: { link: route },
+      },
+    });
+
+    const result = response.responses[0];
+    if (!result?.success) {
+      const errorCode = result?.error?.code || "messaging/unknown";
+      const invalidReason = getInvalidTokenReason(errorCode);
+      if (invalidReason) {
+        await cleanupInvalidTokens(
+          new Map([[token, owner.docId]]),
+          [token]
+        );
+      }
+
+      throw new HttpsError(
+        "failed-precondition",
+        invalidReason
+          ? "This device token is stale. Tap Refresh this device, then try the screen-off test again."
+          : "Falowen could not send the test push. Please try again.",
+        { code: errorCode }
+      );
+    }
+
+    return { ok: true, delaySeconds };
+  }
+);
 
 const getThreadMetadata = async (threadId) => {
   const db = getFirestore();
