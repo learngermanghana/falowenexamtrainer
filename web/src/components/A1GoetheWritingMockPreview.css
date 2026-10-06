@@ -303,3 +303,75 @@
     margin-left: 0;
   }
 }
+
+
+.a1-schreiben-sample-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.a1-schreiben-sample-picker button {
+  padding: 11px 12px;
+  border: 1px solid #b79aaa;
+  border-radius: 8px;
+  background: #fff;
+  color: #3f2634;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.a1-schreiben-sample-picker button.is-active {
+  border-color: #6f354e;
+  background: #eee1ec;
+}
+
+.a1-schreiben-active-sample {
+  max-width: 900px;
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-left: 4px solid #6f354e;
+  background: #faf6f9;
+}
+
+.a1-schreiben-active-sample-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.a1-schreiben-active-sample-heading h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.a1-schreiben-active-sample-heading span {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #eee1ec;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.a1-schreiben-active-sample p {
+  margin: 10px 0 0;
+  line-height: 1.6;
+}
+
+.a1-schreiben-checklist {
+  max-width: 900px;
+  margin: 0 0 22px;
+  padding: 16px 18px;
+  border: 1px solid #d7c4d1;
+  background: #fbf8fa;
+}
+
+.a1-schreiben-checklist ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  line-height: 1.65;
+}

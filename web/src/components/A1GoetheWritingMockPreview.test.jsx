@@ -48,13 +48,25 @@ describe("A1 Goethe-style Schreiben mock preview", () => {
     });
   });
 
-  test("keeps Teil 2 to exactly three content points", () => {
-    expect(A1_GOETHE_WRITING_MOCK.teil2.points).toHaveLength(3);
-    expect(A1_GOETHE_WRITING_MOCK.teil2.points).toEqual([
-      "Melden Sie sich für den Kochkurs „Italienische Küche“ an.",
-      "Fragen Sie, wann der nächste Kurs beginnt.",
-      "Fragen Sie nach dem Preis.",
-    ]);
+  test("replaces the old single Teil 2 task with ten A1 letter samples", () => {
+    expect(A1_GOETHE_WRITING_MOCK.teil2.samples).toHaveLength(10);
+    A1_GOETHE_WRITING_MOCK.teil2.samples.forEach((sample) => {
+      expect(sample.points).toHaveLength(3);
+      expect(sample.situation).toBeTruthy();
+      expect(sample.register).toBeTruthy();
+    });
+    expect(A1_GOETHE_WRITING_MOCK.teil2.samples[0]).toMatchObject({
+      id: "hotel-berliner-hof",
+      register: "Formal",
+    });
+    expect(A1_GOETHE_WRITING_MOCK.teil2.samples[9]).toMatchObject({
+      id: "landlord-heating",
+      register: "Formal",
+    });
+  });
+
+  test("removes the old GenussZeit cooking-school sample", () => {
+    expect(JSON.stringify(A1_GOETHE_WRITING_MOCK.teil2)).not.toMatch(/GenussZeit|Italienische Küche/);
   });
 
   test("requires greeting, closing, and name without making them extra content points", () => {
