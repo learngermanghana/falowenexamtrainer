@@ -4,6 +4,12 @@ importScripts(
   "https://www.gstatic.com/firebasejs/10.14.0/firebase-messaging-compat.js"
 );
 
+try {
+  importScripts("/__falowen-firebase-config.js");
+} catch (error) {
+  console.warn("Falowen background push config could not be loaded", error);
+}
+
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
@@ -115,12 +121,17 @@ const resolveNotificationContent = (payload = {}) => {
 function initializeMessaging(config) {
   if (!config || messaging || !config.apiKey) return;
 
-  firebase.initializeApp(config);
+  if (!firebase.apps.length) {
+    firebase.initializeApp(config);
+  }
   messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    const { title, body } = resolveNotificationContent(payload);
+    // Firebase automatically displays messages that include a notification
+    // payload. Only render manually for data-only pushes to avoid duplicates.
+    if (payload?.notification) return;
 
+    const { title, body } = resolveNotificationContent(payload);
     self.registration.showNotification(title, {
       body,
       icon: "/logo192.png",
@@ -128,6 +139,10 @@ function initializeMessaging(config) {
     });
   });
 }
+
+// Initialize immediately so a push can wake this service worker from a cold
+// browser/app state without requiring an open Falowen page to post INIT_FIREBASE.
+initializeMessaging(self.__FALOWEN_FIREBASE_CONFIG__);
 
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();

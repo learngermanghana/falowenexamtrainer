@@ -448,7 +448,7 @@ const registerMessagingServiceWorker = async () => {
   }
 
   messagingServiceWorkerRegistrationPromise = navigator.serviceWorker
-    .register("/firebase-messaging-sw.js")
+    .register("/firebase-messaging-sw.js", { updateViaCache: "none" })
     .then(() => navigator.serviceWorker.ready)
     .then(sendFirebaseConfigToServiceWorker)
     .catch((error) => {
@@ -529,19 +529,57 @@ const ensureNotificationPermission = async () => {
   return Notification.requestPermission();
 };
 
+const getPushEnvironment = () => {
+  const ios = isIosDevice();
+  const standalone = isRunningStandalone();
+  const notificationApi = typeof Notification !== "undefined";
+  const serviceWorker = typeof navigator !== "undefined" && "serviceWorker" in navigator;
+  const pushManager =
+    typeof window !== "undefined" &&
+    typeof window.PushManager !== "undefined";
+
+  return {
+    ios,
+    standalone,
+    notificationApi,
+    serviceWorker,
+    pushManager,
+  };
+};
+
 const requestMessagingToken = async (shouldRetry = true) => {
   assertFirebaseReady();
-  const supported = await isSupported().catch(() => false);
-  if (!supported) {
-    if (isIosDevice() && !isRunningStandalone()) {
-      throw new Error("On iPhone, add Falowen to your Home Screen and open it from that app icon before enabling push notifications.");
-    }
-    throw new Error("This browser does not support Firebase Cloud Messaging. Please use Chrome/Edge on Android or the installed Home Screen app on iPhone.");
+
+  const environment = getPushEnvironment();
+  if (environment.ios && !environment.standalone) {
+    throw new Error(
+      "On iPhone, Falowen notifications only work from the installed Home Screen app. Open Falowen from its Home Screen icon, then tap Enable notifications."
+    );
   }
 
+  if (!environment.notificationApi) {
+    if (environment.ios && environment.standalone) {
+      throw new Error(
+        "This Falowen Home Screen install does not have access to iPhone Web Push. Delete the current Falowen Home Screen icon, open https://www.falowen.app in Safari, add it to the Home Screen again, then open that new icon and enable notifications."
+      );
+    }
+    throw new Error("This browser does not expose the Notifications API required for push notifications.");
+  }
+
+  // On iPhone/iPad the permission request must happen directly from the user's
+  // tap before Firebase Messaging initializes or checks the subscription.
   const permission = await ensureNotificationPermission();
   if (permission !== "granted") {
     return null;
+  }
+
+  const supported = await isSupported().catch(() => false);
+  if (!supported) {
+    throw new Error(
+      environment.ios
+        ? "Falowen is installed, but iPhone Web Push is not available in this app session. Close Falowen, reopen it from the Home Screen icon, and try again."
+        : "This browser does not support Firebase Cloud Messaging. Please use Chrome or Edge on Android/desktop."
+    );
   }
 
   const messaging = getMessaging(app);
@@ -598,6 +636,7 @@ export {
   reload,
   GoogleAuthProvider,
   requestMessagingToken,
+  getPushEnvironment,
   listenForForegroundMessages,
   getActionCodeSettings,
   collection,

@@ -82,4 +82,22 @@ describe("StudyBuddyBar", () => {
     expect(document.body.querySelector(".study-buddy-bar")).toBeNull();
   });
 
+  it("restores a saved draggable launcher position", () => {
+    localStorage.setItem(
+      "studyBuddyLauncherPosition",
+      JSON.stringify({ left: 24, top: 96 })
+    );
+
+    render(<StudyBuddyBar studentProfile={{}} />);
+
+    const launcher = screen.getByRole("button", { name: /reopen study buddy bar/i });
+    expect(launcher).toHaveStyle({
+      left: "24px",
+      top: "96px",
+      right: "auto",
+      bottom: "auto",
+    });
+    expect(launcher).toHaveAttribute("title", "Drag to move Study Buddy. Tap to open.");
+  });
+
 });

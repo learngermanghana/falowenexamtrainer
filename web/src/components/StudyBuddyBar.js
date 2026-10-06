@@ -23,6 +23,8 @@ const ATTENDANCE_TARGET = 80;
 const EXAM_SIMULATION_WINDOW_DAYS = 45;
 const COLLAPSED_PLAN_LIMIT = 2;
 const GERMAN_KEYS = ["ä", "ö", "ü", "ß"];
+const STUDY_BUDDY_LAUNCHER_POSITION_KEY = "studyBuddyLauncherPosition";
+const STUDY_BUDDY_LAUNCHER_EDGE_GAP = 8;
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -46,6 +48,17 @@ const readStoredPlanState = (storageKey) => {
   }
 };
 
+const readStoredLauncherPosition = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const stored = JSON.parse(localStorage.getItem(STUDY_BUDDY_LAUNCHER_POSITION_KEY) || "null");
+    if (!Number.isFinite(stored?.left) || !Number.isFinite(stored?.top)) return null;
+    return { left: stored.left, top: stored.top };
+  } catch (error) {
+    return null;
+  }
+};
+
 const renderStudyBuddyOverlay = (node) => {
   if (typeof document === "undefined" || !document.body) return node;
   return createPortal(node, document.body);
@@ -58,10 +71,14 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const locale = i18n.language;
   const quickQuestionInputRef = useRef(null);
   const chatEndRef = useRef(null);
+  const launcherRef = useRef(null);
+  const launcherDragRef = useRef(null);
+  const suppressLauncherClickRef = useRef(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   // Keep workbook content unobstructed until the student deliberately opens
   // Study Buddy from the fixed launcher in the bottom-right corner.
   const [isDismissed, setIsDismissed] = useState(true);
+  const [launcherPosition, setLauncherPosition] = useState(readStoredLauncherPosition);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
@@ -581,6 +598,76 @@ const StudyBuddyBar = ({ studentProfile }) => {
     [focusQuickQuestion, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
   );
 
+  const clampLauncherPosition = useCallback((left, top) => {
+    if (typeof window === "undefined") return { left, top };
+    const launcher = launcherRef.current;
+    const width = launcher?.offsetWidth || 120;
+    const height = launcher?.offsetHeight || 44;
+    const maxLeft = Math.max(STUDY_BUDDY_LAUNCHER_EDGE_GAP, window.innerWidth - width - STUDY_BUDDY_LAUNCHER_EDGE_GAP);
+    const maxTop = Math.max(STUDY_BUDDY_LAUNCHER_EDGE_GAP, window.innerHeight - height - STUDY_BUDDY_LAUNCHER_EDGE_GAP);
+    return {
+      left: Math.min(Math.max(STUDY_BUDDY_LAUNCHER_EDGE_GAP, left), maxLeft),
+      top: Math.min(Math.max(STUDY_BUDDY_LAUNCHER_EDGE_GAP, top), maxTop),
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!launcherPosition) return undefined;
+    try {
+      localStorage.setItem(STUDY_BUDDY_LAUNCHER_POSITION_KEY, JSON.stringify(launcherPosition));
+    } catch (error) {
+      // Ignore storage errors (privacy mode, etc.)
+    }
+
+    const keepLauncherOnScreen = () => {
+      setLauncherPosition((current) =>
+        current ? clampLauncherPosition(current.left, current.top) : current
+      );
+    };
+    window.addEventListener("resize", keepLauncherOnScreen);
+    window.addEventListener("orientationchange", keepLauncherOnScreen);
+    return () => {
+      window.removeEventListener("resize", keepLauncherOnScreen);
+      window.removeEventListener("orientationchange", keepLauncherOnScreen);
+    };
+  }, [clampLauncherPosition, launcherPosition]);
+
+  const handleLauncherPointerDown = useCallback((event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    launcherDragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originLeft: rect.left,
+      originTop: rect.top,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }, []);
+
+  const handleLauncherPointerMove = useCallback((event) => {
+    const drag = launcherDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - drag.startX;
+    const deltaY = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(deltaX, deltaY) < 5) return;
+    drag.moved = true;
+    const next = clampLauncherPosition(drag.originLeft + deltaX, drag.originTop + deltaY);
+    setLauncherPosition(next);
+  }, [clampLauncherPosition]);
+
+  const finishLauncherDrag = useCallback((event) => {
+    const drag = launcherDragRef.current;
+    if (!drag || drag.pointerId !== event.pointerId) return;
+    if (drag.moved) {
+      suppressLauncherClickRef.current = true;
+      trackStudyBuddyEvent("launcher_drag");
+    }
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    launcherDragRef.current = null;
+  }, [trackStudyBuddyEvent]);
+
   useEffect(() => {
     try {
       localStorage.setItem("studyBuddyHighContrast", String(isHighContrast));
@@ -592,13 +679,33 @@ const StudyBuddyBar = ({ studentProfile }) => {
   if (isDismissed) {
     return renderStudyBuddyOverlay(
       <button
+        ref={launcherRef}
         className={`study-buddy-reopen${isHighContrast ? " is-high-contrast" : ""}`}
         type="button"
+        style={
+          launcherPosition
+            ? {
+                left: `${launcherPosition.left}px`,
+                top: `${launcherPosition.top}px`,
+                right: "auto",
+                bottom: "auto",
+              }
+            : undefined
+        }
+        onPointerDown={handleLauncherPointerDown}
+        onPointerMove={handleLauncherPointerMove}
+        onPointerUp={finishLauncherDrag}
+        onPointerCancel={finishLauncherDrag}
         onClick={() => {
+          if (suppressLauncherClickRef.current) {
+            suppressLauncherClickRef.current = false;
+            return;
+          }
           setIsDismissed(false);
           trackStudyBuddyEvent("reopen");
         }}
         aria-label={t("studyBuddy.actions.reopenAria")}
+        title="Drag to move Study Buddy. Tap to open."
       >
         {t("studyBuddy.actions.reopen")}
       </button>
