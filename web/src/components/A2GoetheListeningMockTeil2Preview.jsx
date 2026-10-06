@@ -33,7 +33,7 @@ export const A2_GOETHE_LISTENING_TEIL2 = Object.freeze({
   ],
 });
 
-const PictureScene = ({ type }) => {
+export const A2ListeningTeil2PictureScene = ({ type }) => {
   const scenes = {
     classroom: (
       <>
@@ -197,7 +197,7 @@ export default function A2GoetheListeningMockTeil2Preview() {
                 key={picture.id}
               >
                 <div className="a2-hoeren-picture-letter">{picture.id}</div>
-                <PictureScene type={picture.type} />
+                <A2ListeningTeil2PictureScene type={picture.type} />
                 <span className="a2-hoeren-picture-admin-label">{picture.label}</span>
               </article>
             ))}

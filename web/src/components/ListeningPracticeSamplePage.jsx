@@ -6,10 +6,12 @@ import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
 import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
-import { A2_GOETHE_LISTENING_TEIL2 } from "./A2GoetheListeningMockTeil2Preview";
-import { A2_GOETHE_LISTENING_TEIL3 } from "./A2GoetheListeningMockTeil3Preview";
+import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
+import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
 import "./A1GoetheListeningMockPreview.css";
+import "./A2GoetheListeningMockTeil2Preview.css";
+import "./A2GoetheListeningMockTeil3Preview.css";
 
 const A2_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A2_GOETHE_LISTENING_TEIL1 },
@@ -226,16 +228,64 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
               );
             })}
           </div>
-          <div style={{ marginTop: 12, display: "grid", gap: 6 }}>
-            <strong>Pictures A–I</strong>
-            {part.data.pictures.map((picture) => (
-              <div key={picture.id} style={{ display: "flex", gap: 8 }}>
-                <strong>{picture.id}</strong>
-                <span>{picture.label}</span>
-              </div>
-            ))}
-          </div>
+          <section className="a2-hoeren-picture-section" style={{ marginTop: 12 }}>
+            <h3 style={{ marginTop: 0 }}>Bilder A–I</h3>
+            <div className="a2-hoeren-picture-grid">
+              {part.data.pictures.map((picture) => (
+                <article
+                  className={used.has(picture.id) ? "a2-hoeren-picture-card selected" : "a2-hoeren-picture-card"}
+                  key={picture.id}
+                >
+                  <div className="a2-hoeren-picture-letter">{picture.id}</div>
+                  <A2ListeningTeil2PictureScene type={picture.type} />
+                  <span className="a2-hoeren-picture-admin-label">{picture.label}</span>
+                </article>
+              ))}
+            </div>
+          </section>
         </>
+      );
+    }
+
+    if (normalizedLevel === "A2" && part.key === "teil3") {
+      return (
+        <div className="a2-t3-list">
+          {(part.data.questions || []).map((question) => {
+            const key = `${part.key}-${question.number}`;
+            return (
+              <article className="a2-t3-question" key={key}>
+                <header>
+                  <div>
+                    <strong>Aufgabe {question.number}</strong>
+                    {question.context ? <span>{question.context}</span> : null}
+                  </div>
+                  <h2>{question.question}</h2>
+                </header>
+
+                <div className="a2-t3-options">
+                  {question.options.map((option) => (
+                    <label
+                      className={answers[key] === option.id ? "a2-t3-option selected" : "a2-t3-option"}
+                      key={option.id}
+                    >
+                      <input
+                        type="radio"
+                        name={key}
+                        checked={answers[key] === option.id}
+                        onChange={() => setAnswer(key, option.id)}
+                        disabled={submitted}
+                      />
+                      <span className="a2-t3-letter">{option.id}</span>
+                      <A2ListeningTeil3Picture icon={option.icon} />
+                      <span className="a2-t3-hidden-label">{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {feedback(key, question.answer)}
+              </article>
+            );
+          })}
+        </div>
       );
     }
 
