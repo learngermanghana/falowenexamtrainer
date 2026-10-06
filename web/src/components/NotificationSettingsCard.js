@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { functions, httpsCallable } from "../firebase";
 import { styles } from "../styles";
 
 const getBrowserPermission = () => {
@@ -10,7 +11,7 @@ const getBrowserPermission = () => {
 const statusCopy = {
   granted: {
     label: "Enabled on this device",
-    detail: "This device can receive Falowen push notifications.",
+    detail: "Browser permission and the Falowen push token are active on this device.",
     tone: "success",
   },
   pending: {
@@ -48,9 +49,11 @@ const getToneStyle = (tone) => {
 };
 
 const NotificationSettingsCard = () => {
-  const { enableNotifications, notificationStatus, studentProfile } = useAuth();
+  const { enableNotifications, notificationStatus, studentProfile, messagingToken } = useAuth();
   const [isEnabling, setIsEnabling] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
   const [message, setMessage] = useState("");
+  const [testMessage, setTestMessage] = useState("");
   const [browserPermission, setBrowserPermission] = useState(getBrowserPermission);
 
   const copy = statusCopy[notificationStatus] || statusCopy.idle;
@@ -81,6 +84,44 @@ const NotificationSettingsCard = () => {
     }
   };
 
+  const handleTestPush = async () => {
+    setTestMessage("");
+
+    if (notificationStatus !== "granted" || !messagingToken) {
+      setTestMessage("Refresh this device first so Falowen has a current push token.");
+      return;
+    }
+
+    if (!functions) {
+      setTestMessage("Falowen push testing is not available on this deployment.");
+      return;
+    }
+
+    setIsTesting(true);
+    setTestMessage(
+      "Test scheduled. Lock your screen now. Falowen will send the notification in about 8 seconds."
+    );
+
+    try {
+      const sendTestPush = httpsCallable(functions, "sendPushTestNotification");
+      const result = await sendTestPush({ token: messagingToken, delaySeconds: 8 });
+      if (!result?.data?.ok) {
+        throw new Error("Falowen did not confirm the test push.");
+      }
+      setTestMessage(
+        "Test sent. If the screen was locked, you should receive a normal Falowen phone notification. If nothing appears, check Android notification and battery settings."
+      );
+    } catch (error) {
+      setTestMessage(
+        error instanceof Error
+          ? error.message
+          : "Could not send the background push test. Refresh this device and try again."
+      );
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
   return (
     <section style={styles.card}>
       <h2 style={styles.sectionTitle}>Notification setup</h2>
@@ -103,14 +144,23 @@ const NotificationSettingsCard = () => {
         <button type="button" style={styles.primaryButton} onClick={handleEnable} disabled={isEnabling || notificationStatus === "pending"}>
           {isEnabling || notificationStatus === "pending" ? "Setting up..." : notificationStatus === "granted" ? "Refresh this device" : "Enable notifications"}
         </button>
+        <button
+          type="button"
+          style={styles.secondaryButton}
+          onClick={handleTestPush}
+          disabled={isTesting || notificationStatus !== "granted" || !messagingToken}
+        >
+          {isTesting ? "Sending test..." : "Send screen-off test"}
+        </button>
       </div>
 
       {message ? <p style={{ ...styles.helperText, marginTop: 8 }}>{message}</p> : null}
+      {testMessage ? <p style={{ ...styles.helperText, marginTop: 8 }}><strong>{testMessage}</strong></p> : null}
 
       <div style={{ display: "grid", gap: 8, marginTop: 12, lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}><strong>Android / Chrome:</strong> tap Enable notifications and allow the browser permission.</p>
         <p style={{ margin: 0 }}><strong>iPhone:</strong> add Falowen to your Home Screen first, open it from the Home Screen icon, then enable notifications.</p>
-        <p style={{ margin: 0 }}><strong>Screen off:</strong> once enabled, notifications are sent by the backend, so they can arrive even when the app is closed or the screen is off.</p>
+        <p style={{ margin: 0 }}><strong>Screen off:</strong> use Send screen-off test, then lock the phone. Falowen sends the test from the backend after about 8 seconds.</p>
       </div>
     </section>
   );
