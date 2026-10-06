@@ -80,7 +80,7 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateA2AudioKey({ day: 28, key: "b2/day-28/day-28.mp3" })).toBeNull();
     expect(validateA2AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
   });
-  test("accepts the flat Cloudflare B1 Day 15, Day 16 and Day 17 audio keys", () => {
+  test("accepts legacy flat B1 keys and newer Cloudflare folder keys", () => {
     expect(validateB1AudioKey({ day: 15, key: "audio/day_15.mp3" })).toEqual({
       day: 15,
       key: "audio/day_15.mp3",
@@ -89,13 +89,18 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
       day: 16,
       key: "audio/day_16.mp3",
     });
-    expect(validateB1AudioKey({ day: 17, key: "audio/day_17.mp3" })).toEqual({
+    expect(validateB1AudioKey({ day: 17, key: "b1/day-17/day-17.mp3" })).toEqual({
       day: 17,
-      key: "audio/day_17.mp3",
+      key: "b1/day-17/day-17.mp3",
+    });
+    expect(validateB1AudioKey({ day: 18, key: "b1/day-18/day-18.mp3" })).toEqual({
+      day: 18,
+      key: "b1/day-18/day-18.mp3",
     });
     expect(validateB1AudioKey({ day: 15, key: "audio/day_16.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 14, key: "audio/day_14.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 17, key: "audio/day_16.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 18, key: "b1/day-17/day-17.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 15, key: "../day_15.mp3" })).toBeNull();
   });
 

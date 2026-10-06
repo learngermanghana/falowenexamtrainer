@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([13, "14.1"]),
   A2: new Set([6, 7, 8, 9, 10, 11, 12, 13, 15, 24, 26, 27, 28]),
-  B1: new Set([15, 16, 17]),
+  B1: new Set([15, 16, 17, 18]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
@@ -99,8 +99,9 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   if (!normalizedDay || !normalizedKey) return null;
   if (normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
   if (normalizedLevel === "B1") {
-    const expectedStem = `audio/day_${normalizedDay}.`;
-    if (!normalizedKey.startsWith(expectedStem)) return null;
+    const legacyFlatStem = `audio/day_${normalizedDay}.`;
+    const folderPrefix = `b1/day-${String(normalizedDay).padStart(2, "0")}/day-${String(normalizedDay).padStart(2, "0")}.`;
+    if (!normalizedKey.startsWith(legacyFlatStem) && !normalizedKey.startsWith(folderPrefix)) return null;
   } else if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) {
     return null;
   }
