@@ -1,9 +1,66 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
+import { useExam } from "../context/ExamContext";
+import ListeningPracticeSamplePage from "./ListeningPracticeSamplePage";
 
-const HorenPage = () => {
+const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { level } = useExam();
+  const profileLevel = String(level || "A1").toUpperCase();
+  const routeLevel = String(practiceLevel || "").toUpperCase();
+  const normalizedLevel = ["A1", "A2"].includes(routeLevel) ? routeLevel : profileLevel;
+
+  if (normalizedLevel === "A1" || normalizedLevel === "A2") {
+    if (sampleId) {
+      if (sampleId !== "sample-1") {
+        return (
+          <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+            <h2 style={{ margin: 0 }}>{normalizedLevel} Hören sample not found</h2>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/horen")}>
+              Back to Hören samples
+            </button>
+          </section>
+        );
+      }
+
+      return <ListeningPracticeSamplePage level={normalizedLevel} />;
+    }
+
+    return (
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div>
+          <h2 style={{ margin: 0 }}>{normalizedLevel} Hören practice</h2>
+          <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
+            Choose a listening sample. Each sample opens on its own page.
+          </p>
+        </div>
+
+        <div style={{ display: "grid", gap: 10 }}>
+          <button
+            type="button"
+            onClick={() => navigate(`/exams/horen/${normalizedLevel.toLowerCase()}/sample-1`)}
+            style={{
+              ...styles.secondaryButton,
+              width: "100%",
+              textAlign: "left",
+              display: "grid",
+              gap: 4,
+              padding: "14px 16px",
+            }}
+          >
+            <strong>Hören Sample 1</strong>
+            <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+              {normalizedLevel === "A1" ? "15 questions · Teil 1–3" : "20 questions · Teil 1–4"}
+            </span>
+          </button>
+        </div>
+      </section>
+    );
+  }
+
   const day2GermanAlphabetUrl = "https://youtu.be/pCQVdJGsvtk";
   const horenPlaylistUrl =
     "https://www.youtube.com/watch?list=PLg78ckjpHfZy5lkbq8bw26rLXkZ8jLRUN&v=H2eUgxXfkS4&feature=youtu.be";

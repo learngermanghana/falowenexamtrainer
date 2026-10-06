@@ -428,11 +428,15 @@ const LetterChoices = ({ name, value, onChange, disabled }) => (
   </div>
 );
 
-export default function A1ReadingPracticeSamples() {
+export default function A1ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
   const navigate = useNavigate();
   const { studentProfile, user } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
-  const [sampleId, setSampleId] = useState(A1_READING_PRACTICE_SAMPLES[0].id);
+  const [sampleId, setSampleId] = useState(() =>
+    A1_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)
+      ? initialSampleId
+      : A1_READING_PRACTICE_SAMPLES[0].id
+  );
   const [partKey, setPartKey] = useState("teil1");
   const [answersBySample, setAnswersBySample] = useState({});
   const [submittedBySample, setSubmittedBySample] = useState({});
@@ -445,6 +449,14 @@ export default function A1ReadingPracticeSamples() {
     () => A1_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A1_READING_PRACTICE_SAMPLES[0],
     [sampleId],
   );
+
+  useEffect(() => {
+    if (!initialSampleId || !A1_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)) return;
+    setTimerRunning(false);
+    setSampleId(initialSampleId);
+    setPartKey("teil1");
+  }, [initialSampleId]);
+
   const answers = answersBySample[sample.id] || {};
   const submitted = Boolean(submittedBySample[sample.id]);
   const remainingSeconds = remainingBySample[sample.id] ?? SAMPLE_DURATION_SECONDS;
@@ -480,14 +492,14 @@ export default function A1ReadingPracticeSamples() {
       if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
       if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
       if (saved.remainingBySample) setRemainingBySample(saved.remainingBySample);
-      if (saved.sampleId && A1_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
+      if (!initialSampleId && saved.sampleId && A1_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
       if (["teil1", "teil2", "teil3"].includes(saved.partKey)) setPartKey(saved.partKey);
     } catch {
       // Ignore malformed local practice data.
     } finally {
       setHydratedStorageKey(storageKey);
     }
-  }, [storageKey]);
+  }, [initialSampleId, storageKey]);
 
   useEffect(() => {
     if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
@@ -586,22 +598,24 @@ export default function A1ReadingPracticeSamples() {
           <strong>A1 Lesen · Exams Room</strong>
           <span>Three complete Goethe-style practice samples · 15 questions each</span>
         </div>
-        <button type="button" className="a1-reading-practice-back" onClick={() => navigate("/exams/overview")}>Back to Exams Room</button>
+        <button type="button" className="a1-reading-practice-back" onClick={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>{standalone ? "Back to Lesen samples" : "Back to Exams Room"}</button>
       </div>
 
-      <div className="a1-reading-sample-selector" aria-label="A1 Lesen sample selector">
-        {A1_READING_PRACTICE_SAMPLES.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            className={item.id === sample.id ? "is-active" : ""}
-            onClick={() => selectSample(item.id)}
-          >
-            Lesen Sample {index + 1}
-            <small>15 questions · Teil 1–3</small>
-          </button>
-        ))}
-      </div>
+      {!standalone ? (
+        <div className="a1-reading-sample-selector" aria-label="A1 Lesen sample selector">
+          {A1_READING_PRACTICE_SAMPLES.map((item, index) => (
+            <button
+              key={item.id}
+              type="button"
+              className={item.id === sample.id ? "is-active" : ""}
+              onClick={() => selectSample(item.id)}
+            >
+              Lesen Sample {index + 1}
+              <small>15 questions · Teil 1–3</small>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <article className="a1-goethe-mock-exam">
         <header className="a1-goethe-mock-header a1-reading-practice-header">

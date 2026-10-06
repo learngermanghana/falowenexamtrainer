@@ -307,11 +307,15 @@ const allItems = (sample) => [
 const formatTime = (seconds) =>
   `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 
-export default function A2ReadingPracticeSamples() {
+export default function A2ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
   const navigate = useNavigate();
   const { studentProfile, user } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
-  const [sampleId, setSampleId] = useState(A2_READING_PRACTICE_SAMPLES[0].id);
+  const [sampleId, setSampleId] = useState(() =>
+    A2_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)
+      ? initialSampleId
+      : A2_READING_PRACTICE_SAMPLES[0].id
+  );
   const [partKey, setPartKey] = useState("teil1");
   const [answersBySample, setAnswersBySample] = useState({});
   const [submittedBySample, setSubmittedBySample] = useState({});
@@ -324,6 +328,14 @@ export default function A2ReadingPracticeSamples() {
     () => A2_READING_PRACTICE_SAMPLES.find((item) => item.id === sampleId) || A2_READING_PRACTICE_SAMPLES[0],
     [sampleId],
   );
+
+  useEffect(() => {
+    if (!initialSampleId || !A2_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)) return;
+    setTimerRunning(false);
+    setSampleId(initialSampleId);
+    setPartKey("teil1");
+  }, [initialSampleId]);
+
   const answers = answersBySample[sample.id] || {};
   const submitted = Boolean(submittedBySample[sample.id]);
   const remainingSeconds = remainingBySample[sample.id] ?? SAMPLE_DURATION_SECONDS;
@@ -352,14 +364,14 @@ export default function A2ReadingPracticeSamples() {
       if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
       if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
       if (saved.remainingBySample) setRemainingBySample(saved.remainingBySample);
-      if (saved.sampleId && A2_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
+      if (!initialSampleId && saved.sampleId && A2_READING_PRACTICE_SAMPLES.some((item) => item.id === saved.sampleId)) setSampleId(saved.sampleId);
       if (["teil1", "teil2", "teil3", "teil4"].includes(saved.partKey)) setPartKey(saved.partKey);
     } catch {
       // Ignore malformed saved practice state.
     } finally {
       setHydratedStorageKey(storageKey);
     }
-  }, [storageKey]);
+  }, [initialSampleId, storageKey]);
 
   useEffect(() => {
     if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
@@ -467,17 +479,19 @@ export default function A2ReadingPracticeSamples() {
           <strong>A2 Lesen · Exams Room</strong>
           <span>Three complete practice samples · 20 questions each</span>
         </div>
-        <button type="button" onClick={() => navigate("/exams/overview")}>Back to Exams Room</button>
+        <button type="button" onClick={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>{standalone ? "Back to Lesen samples" : "Back to Exams Room"}</button>
       </div>
 
-      <div className="a2-reading-sample-selector" aria-label="A2 Lesen sample selector">
-        {A2_READING_PRACTICE_SAMPLES.map((item, index) => (
-          <button key={item.id} type="button" className={item.id === sample.id ? "is-active" : ""} onClick={() => selectSample(item.id)}>
-            Lesen Sample {index + 1}
-            <small>20 questions · Teil 1–4</small>
-          </button>
-        ))}
-      </div>
+      {!standalone ? (
+        <div className="a2-reading-sample-selector" aria-label="A2 Lesen sample selector">
+          {A2_READING_PRACTICE_SAMPLES.map((item, index) => (
+            <button key={item.id} type="button" className={item.id === sample.id ? "is-active" : ""} onClick={() => selectSample(item.id)}>
+              Lesen Sample {index + 1}
+              <small>20 questions · Teil 1–4</small>
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <article className="a2-mock-exam">
         <header className="a2-mock-title a2-reading-practice-title">

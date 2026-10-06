@@ -1170,6 +1170,7 @@ const AppShell = ({
           <Route path="/attendance/:className" element={<LegacyAttendanceRedirect />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
+          <Route path="/exams/:section/:practiceLevel/:sampleId" element={<ExamArea onBack={goHome} />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -1420,7 +1421,7 @@ const CampusArea = ({
 
 const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
-  const { section } = useParams();
+  const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
   const { level, setLevel } = useExam();
   const { studentProfile } = useAuth();
@@ -1485,6 +1486,7 @@ const ExamArea = ({ onBack }) => {
     { key: "overview", label: "Overview" },
     { key: "mocks", label: "Mock Exams" },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
+    { key: "horen", label: t("appNav.examTabs.horen") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
@@ -1544,39 +1546,41 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
-        <div
-          style={{
-            ...styles.card,
-            margin: 0,
-            display: "flex",
-            gap: 12,
-            flexWrap: "wrap",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ minWidth: 160 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
-            <strong style={{ fontSize: 16 }}>{level}</strong>
+        {examSection !== "overview" && !sampleId ? (
+          <div
+            style={{
+              ...styles.card,
+              margin: 0,
+              display: "flex",
+              gap: 12,
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ minWidth: 160 }}>
+              <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
+              <strong style={{ fontSize: 16 }}>{level}</strong>
+            </div>
+            <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
+              <label htmlFor="exam-level-selector" style={styles.helperText}>
+                Exam level is selected automatically from your student profile
+              </label>
+              <select
+                id="exam-level-selector"
+                value={level}
+                onChange={(event) => setLevel(event.target.value)}
+                disabled={Boolean(profileExamLevel)}
+                style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
-            <label htmlFor="exam-level-selector" style={styles.helperText}>
-              Exam level is selected automatically from your student profile
-            </label>
-            <select
-              id="exam-level-selector"
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-              disabled={Boolean(profileExamLevel)}
-              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
-            >
-              {ALLOWED_LEVELS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        ) : null}
 
         {activeExamHero ? (
           <section
@@ -1610,8 +1614,8 @@ const ExamArea = ({ onBack }) => {
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
-      {examSection === "horen" ? <HorenPage /> : null}
-      {examSection === "lesen" ? <LesenPage /> : null}
+      {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
+      {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
     </>
