@@ -28,11 +28,11 @@ describe("A2 Day 21 and B1 Day 17 workbook updates", () => {
 
     expect(listening).toEqual(
       expect.objectContaining({
-        embedUrl: "https://www.youtube-nocookie.com/embed/NCfwHzAHoJI?rel=0&playsinline=1",
-        externalUrl: "https://youtu.be/NCfwHzAHoJI",
         title: "Podcast · Wie lernt man am besten?",
       }),
     );
+    expect(listening.embedUrl).toBeUndefined();
+    expect(listening.externalUrl).toBeUndefined();
     expect(listening.questions).toHaveLength(5);
     expect(listening.questions.map((question) => question.stem)).toEqual([
       "1. Wie sollte man laut Ben lernen?",
