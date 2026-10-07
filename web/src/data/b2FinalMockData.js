@@ -564,6 +564,56 @@ export const B2_LISTENING = Object.freeze({
       },
     ],
   },
+  teil3: {
+    id: "teil-3",
+    title: "Hören · Teil 3",
+    audioObjectKey: "b2/mock-hoeren-1/teil-3.mp3",
+    audioNote:
+      "Die vollständige Audiodatei für Teil 3 wird hier als eine zusammenhängende Prüfungsaudio abgespielt.",
+    intro:
+      "Wer sagt das? Ordnen Sie die Aussagen 17 bis 22 Frau Lenz, Herrn Albers oder Herrn Demir zu.",
+    speakers: [
+      { id: "a", label: "Frau Lenz" },
+      { id: "b", label: "Herr Albers" },
+      { id: "c", label: "Herr Demir" },
+    ],
+    example: {
+      statement: "Wir teilen uns Werkzeug, Garten und ein Auto.",
+      answer: "a",
+    },
+    questions: [
+      {
+        number: 17,
+        statement: "Ich habe weniger Besitz und fühle mich dadurch freier.",
+        answer: "b",
+      },
+      {
+        number: 18,
+        statement: "Die Miete ist bei uns niedriger als auf dem normalen Markt.",
+        answer: "c",
+      },
+      {
+        number: 19,
+        statement: "Es gab am Anfang Streit wegen unterschiedlicher Ruhezeiten.",
+        answer: "a",
+      },
+      {
+        number: 20,
+        statement: "Ein Stellplatz war schwer zu finden.",
+        answer: "b",
+      },
+      {
+        number: 21,
+        statement: "Man muss regelmäßig an langen Versammlungen teilnehmen.",
+        answer: "c",
+      },
+      {
+        number: 22,
+        statement: "Ältere Menschen sind bei uns nicht mehr einsam.",
+        answer: "a",
+      },
+    ],
+  },
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
