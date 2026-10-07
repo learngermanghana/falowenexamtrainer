@@ -271,3 +271,86 @@ export const C1_EXAM_HOEREN_SAMPLE_1_TEIL3 = Object.freeze({
     },
   ],
 });
+
+
+export const C1_EXAM_HOEREN_SAMPLE_1_TEIL4 = Object.freeze({
+  id: "c1-hoeren-sample-1-teil-4",
+  title: "Teil 4",
+  instruction:
+    "Aufgaben 24 bis 30: Hören Sie den Vortrag und wählen Sie bei jeder Aufgabe die richtige Lösung.",
+  responseInstruction: "Wählen Sie bei jeder Aufgabe a, b oder c.",
+  audioObjectKey: "c1/exam-horen-1/teil-4.mp3",
+  plays: 1,
+  questions: [
+    {
+      number: 24,
+      question: "Was wird durch das einheitliche Ladekabel laut Kommission erreicht?",
+      options: [
+        { id: "a", label: "Alle Geräte werden billiger." },
+        { id: "b", label: "Es wird weniger Elektroschrott erzeugt." },
+        { id: "c", label: "Handys werden schneller geladen." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 25,
+      question: "Was ist laut dem Redner das Problem beim Thema Roaming?",
+      options: [
+        { id: "a", label: "Es ist weiterhin zu teuer." },
+        { id: "b", label: "Es gilt nur in manchen Ländern." },
+        { id: "c", label: "Der Nutzen wird kaum noch wahrgenommen, weil er selbstverständlich ist." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 26,
+      question: "Was sagt der Redner über das Verbot von Einwegprodukten aus Plastik?",
+      options: [
+        { id: "a", label: "Es hat keine messbare Wirkung." },
+        { id: "b", label: "Es wirkt, aber Verpackungen bleiben das größere Problem." },
+        { id: "c", label: "Es wurde bereits wieder aufgehoben." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 27,
+      question: "Was ist bei Erasmus plus inzwischen anders als ursprünglich geplant?",
+      options: [
+        { id: "a", label: "Es steht auch Auszubildenden und Nichtstudierenden offen." },
+        { id: "b", label: "Es ist nur noch für Studierende zugänglich." },
+        { id: "c", label: "Es dauert nun immer ein ganzes Jahr." },
+      ],
+      answer: "a",
+    },
+    {
+      number: 28,
+      question: "Was gilt beim Onlinekauf in allen Mitgliedsstaaten?",
+      options: [
+        { id: "a", label: "Die Garantie beträgt fünf Jahre." },
+        { id: "b", label: "Man kann den Kauf innerhalb von vierzehn Tagen widerrufen." },
+        { id: "c", label: "Rücksendungen sind immer kostenlos." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 29,
+      question: "Wie beurteilt der Redner das geplante Aus für Verbrennungsmotoren ab 2035?",
+      options: [
+        { id: "a", label: "Es ist unumstritten." },
+        { id: "b", label: "Es wurde bereits umgesetzt." },
+        { id: "c", label: "Es ist politisch umstritten, der Ausgang ist offen." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 30,
+      question: "Was ist das Fazit des Redners?",
+      options: [
+        { id: "a", label: "Alle Maßnahmen waren erfolgreich." },
+        { id: "b", label: "Nicht jede Maßnahme war ein Erfolg, aber sie zeigen, was gemeinsames Handeln bewirken kann." },
+        { id: "c", label: "Die EU sollte weniger regeln." },
+      ],
+      answer: "b",
+    },
+  ],
+});
