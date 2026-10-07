@@ -125,7 +125,12 @@ const readState = () => {
       Boolean(Object.keys(parsed.speakingProgress?.attempts || {}).length) ||
       parsed.stage === "sprechen";
     const migratedFromSchreibenCompletion =
-      Boolean(parsed.completed && parsed.schreibenCompleted && !hasSprechenProgress);
+      Boolean(
+        parsed.completed &&
+        parsed.schreibenCompleted &&
+        parsed.schreibenResult &&
+        !hasSprechenProgress
+      );
 
     const stage = migratedFromTeil3Completion
       ? "teil4"
@@ -1419,7 +1424,7 @@ export default function B2FinalMockExamPage() {
 
       {pageError ? <div className="b2-mock-timeup"><strong>Fehler</strong><span>{pageError}</span></div> : null}
 
-            {state.started && Number.isFinite(secondsLeft) && secondsLeft <= 0 ? (
+      {state.started && Number.isFinite(secondsLeft) && secondsLeft <= 0 ? (
         <div className="b2-mock-timeup">
           <strong>Zeit abgelaufen.</strong>
           <span>Ihre bisherigen Antworten bleiben gespeichert. Sie können zum nächsten Teil weitergehen.</span>
