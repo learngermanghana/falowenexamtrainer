@@ -170,3 +170,104 @@ export const C1_EXAM_HOEREN_SAMPLE_1_TEIL2 = Object.freeze({
     },
   ],
 });
+
+
+export const C1_EXAM_HOEREN_SAMPLE_1_TEIL3 = Object.freeze({
+  id: "c1-hoeren-sample-1-teil-3",
+  title: "Teil 3",
+  instruction:
+    "Aufgaben 16 bis 23: Sie hören vier Abschnitte eines Gesprächs. Wählen Sie bei jeder Aufgabe die richtige Lösung.",
+  responseInstruction: "Wählen Sie bei jeder Aufgabe a, b oder c.",
+  audioObjectKey: "c1/exam-horen-1/teil-3.mp3",
+  plays: 1,
+  questions: [
+    {
+      number: 16,
+      context: "Abschnitt 1",
+      question: "Wie werden Wohnungen laut Frau Kramer in Zukunft sein?",
+      options: [
+        { id: "a", label: "Größer als heute." },
+        { id: "b", label: "Flexibel, mit verschiebbaren Wänden." },
+        { id: "c", label: "Nur noch für Einzelpersonen." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 17,
+      context: "Abschnitt 1",
+      question: "Was sieht Herr Wagner als Hauptproblem?",
+      options: [
+        { id: "a", label: "Den Platzbedarf." },
+        { id: "b", label: "Den hohen Preis des Bodens." },
+        { id: "c", label: "Fehlende Architekten." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 18,
+      context: "Abschnitt 2",
+      question: "Was ist laut Frau Kramer der größte Hebel für mehr Klimaschutz beim Bauen?",
+      options: [
+        { id: "a", label: "Mehr Neubauten aus Holz." },
+        { id: "b", label: "Bestehende Gebäude sanieren." },
+        { id: "c", label: "Weniger Wohnungen bauen." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 19,
+      context: "Abschnitt 2",
+      question: "Woran scheitert die Sanierung laut Herrn Wagner oft?",
+      options: [
+        { id: "a", label: "An fehlenden Handwerkern." },
+        { id: "b", label: "An zu hohen Materialpreisen." },
+        { id: "c", label: "An komplizierten Förderanträgen." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 20,
+      context: "Abschnitt 3",
+      question: "Wo sieht Herr Wagner den größten Nutzen von Smart Home?",
+      options: [
+        { id: "a", label: "Bei älteren Menschen, die länger zu Hause leben können." },
+        { id: "b", label: "Bei der Heizung." },
+        { id: "c", label: "Bei der Beleuchtung." },
+      ],
+      answer: "a",
+    },
+    {
+      number: 21,
+      context: "Abschnitt 3",
+      question: "Wie bewertet Frau Kramer die Energieeinsparung durch Smart Home?",
+      options: [
+        { id: "a", label: "Sie liegt bei dreißig Prozent." },
+        { id: "b", label: "Sie ist kleiner als versprochen." },
+        { id: "c", label: "Sie ist nicht messbar." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 22,
+      context: "Abschnitt 4",
+      question: "Welche Bedingung nennt Frau Kramer für das Leben auf dem Land?",
+      options: [
+        { id: "a", label: "Günstige Mieten." },
+        { id: "b", label: "Schnelles Internet und guter Nahverkehr." },
+        { id: "c", label: "Mehr Supermärkte." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 23,
+      context: "Abschnitt 4",
+      question: "Was schlägt Herr Wagner für Dörfer vor?",
+      options: [
+        { id: "a", label: "Neue Wohnsiedlungen bauen." },
+        { id: "b", label: "Den Verkehr verbieten." },
+        { id: "c", label: "Leerstehende Gebäude umnutzen." },
+      ],
+      answer: "c",
+    },
+  ],
+});
