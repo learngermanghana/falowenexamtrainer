@@ -10,7 +10,10 @@ import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
-import { C1_EXAM_HOEREN_SAMPLE_1 } from "../data/c1ExamHorenSample1";
+import {
+  C1_EXAM_HOEREN_SAMPLE_1,
+  C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
+} from "../data/c1ExamHorenSample1";
 import "./A1GoetheListeningMockPreview.css";
 import "./A2GoetheListeningMockTeil2Preview.css";
 import "./A2GoetheListeningMockTeil3Preview.css";
@@ -30,6 +33,7 @@ const A1_PARTS = Object.freeze([
 
 const C1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: C1_EXAM_HOEREN_SAMPLE_1 },
+  { key: "teil2", audioPart: "teil-2", data: C1_EXAM_HOEREN_SAMPLE_1_TEIL2 },
 ]);
 
 const answerKeyForPart = (level, part) => {
