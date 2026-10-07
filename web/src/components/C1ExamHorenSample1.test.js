@@ -4,6 +4,7 @@ import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL3,
+  C1_EXAM_HOEREN_SAMPLE_1_TEIL4,
 } from "../data/c1ExamHorenSample1";
 
 describe("C1 Exams Room Hören Sample 1", () => {
@@ -45,9 +46,19 @@ describe("C1 Exams Room Hören Sample 1", () => {
     ]);
   });
 
+  test("uses the supplied C1 Teil 4 EU measures questions and key", () => {
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL4.audioObjectKey).toBe("c1/exam-horen-1/teil-4.mp3");
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL4.questions.map((question) => question.number)).toEqual([
+      24, 25, 26, 27, 28, 29, 30,
+    ]);
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL4.questions.map((question) => question.answer)).toEqual([
+      "b", "c", "b", "a", "b", "c", "b",
+    ]);
+  });
+
   test("publishes it under Exams Room Hören, not Mock Exams", () => {
     expect(horenPage).toContain('["A1", "A2", "C1"].includes(normalizedLevel)');
-    expect(horenPage).toContain('"23 questions · Teil 1–3"');
+    expect(horenPage).toContain('"30 questions · Teil 1–4"');
     expect(samplePage).toContain("fetchC1ExamHorenAudioPlaybackUrl");
     expect(samplePage).toContain('level === "C1"');
     expect(catalog).not.toContain("c1-final-01");
