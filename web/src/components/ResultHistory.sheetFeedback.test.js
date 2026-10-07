@@ -32,9 +32,11 @@ describe("Sheet result feedback presentation", () => {
 
     expect(source).toContain("const hasStructuredFeedback = hasStructuredResultFeedback(item)");
     expect(source).toContain("const correctionPoints = hasStructuredFeedback ? getCorrectionPoints(item) : []");
-    expect(source).toContain("{hasStructuredFeedback ? (");
+    expect(source).toContain("const shouldShowScoreBreakdown");
     expect(source).toContain('const distinctFeedback = getDistinctFeedbackText(item)');
     expect(source).toContain('<TextBlock title={t("resultHistory.feedbackTitle")} text={distinctFeedback} />');
+    expect(source).not.toContain(">Your score</p>");
+    expect(source).not.toContain(">Date marked</p>");
   });
 
   test("objective feedback uses student-friendly review labels instead of raw admin wording", () => {
