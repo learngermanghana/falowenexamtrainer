@@ -339,6 +339,8 @@ export const B2_LISTENING = Object.freeze({
     id: "teil-1",
     title: "Hören · Teil 1",
     audioObjectKey: "b2/mock-hoeren-1/teil-1.mp3",
+    audioNote:
+      "Einleitung, Beispiel, Lesepause und Text 1 bis Text 5 sind bereits in dieser einen Datei enthalten.",
     intro:
       "Die Audiodatei enthält die Einleitung, den Beispieltext, die Lesepause für 01 und 02 sowie die fünf Texte zu den Aufgaben 1 bis 10.",
     example: [
@@ -495,6 +497,8 @@ export const B2_LISTENING = Object.freeze({
     id: "teil-2",
     title: "Hören · Teil 2",
     audioObjectKey: "b2/mock-hoeren-1/teil-2.mp3",
+    audioNote:
+      "Die vollständige Audiodatei für Teil 2 wird hier als eine zusammenhängende Prüfungsaudio abgespielt.",
     intro:
       "Hören Sie das Interview und bearbeiten Sie die Aufgaben 11 bis 16. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
     questions: [
