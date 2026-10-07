@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
 import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
+import C1FinalMockExamPage from "./C1FinalMockExamPage";
 
 const lesenLevels = [
   {
@@ -17,12 +18,17 @@ const lesenLevels = [
     description: "PDF coming soon.",
     url: null,
   },
-  {
-    level: "C1",
-    description: "PDF coming soon.",
-    url: null,
-  },
+
 ];
+
+const C1_READING_PRACTICE_SAMPLES = Object.freeze([
+  {
+    id: "c1-reading-01",
+    slug: "sample-1",
+    label: "C1 Lesen Sample 1",
+    detail: "30 questions · Teil 1–4",
+  },
+]);
 
 const sampleMetaForLevel = (level) => {
   const samples = level === "A2" ? A2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
@@ -74,7 +80,37 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
-  const normalizedLevel = ["A1", "A2"].includes(routeLevel) ? routeLevel : profileLevel;
+  const normalizedLevel = ["A1", "A2", "B1", "B2", "C1"].includes(routeLevel)
+    ? routeLevel
+    : profileLevel;
+
+  if (normalizedLevel === "C1") {
+    const samples = C1_READING_PRACTICE_SAMPLES;
+    const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
+
+    if (sampleId && !selected) {
+      return (
+        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+          <h2 style={{ margin: 0 }}>C1 Lesen sample not found</h2>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/lesen")}>
+            Back to Lesen samples
+          </button>
+        </section>
+      );
+    }
+
+    if (!selected) {
+      return (
+        <SampleList
+          level="C1"
+          samples={samples}
+          onOpen={(sample) => navigate(`/exams/lesen/c1/${sample.slug}`)}
+        />
+      );
+    }
+
+    return <C1FinalMockExamPage />;
+  }
 
   if (normalizedLevel === "A1" || normalizedLevel === "A2") {
     const samples = sampleMetaForLevel(normalizedLevel);
