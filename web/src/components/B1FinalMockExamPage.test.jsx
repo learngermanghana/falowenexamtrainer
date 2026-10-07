@@ -54,6 +54,8 @@ describe("B1 Final Mock Exam", () => {
       "richtig","richtig","falsch","falsch","richtig","falsch",
     ]);
     expect(B1_READING.teil2.questions.map((q) => q.answer)).toEqual(["b","a","b"]);
+    expect(B1_READING.teil2.text2.heading).toContain("Ehrenamt im Trend");
+    expect(B1_READING.teil2.text2.questions.map((q) => q.answer)).toEqual(["b","a","b"]);
     expect(B1_READING.teil3.situations.map((q) => q.answer)).toEqual(["b","e","a","0","d","f","i"]);
     expect(B1_READING.teil4.comments.map((q) => q.answer)).toEqual(["nein","ja","nein","nein","ja","nein","ja"]);
     expect(B1_READING.teil5.questions.map((q) => q.answer)).toEqual(["b","b","b","a"]);
