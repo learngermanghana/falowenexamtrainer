@@ -37,7 +37,7 @@ export const C1_READING_TEIL2 = Object.freeze({
       { id: "d", label: "Die Weigerung der Kinder, das Smartphone nachts auszuschalten." }
     ], answer: "a" },
     { number: 11, question: "Welche Haltung nehmen die Wissenschaftler gegenüber Medienverboten ein?", options: [
-      { id: "a", label: "Strikte Verbote sind das wirksamste Mittel gegen problematische Mediennutzung." },
+      { id: "a", label: "Strikte Verbote sind das wirksamste Mittel gegen Suchtverhalten." },
       { id: "b", label: "Verbote sollten nur für Kinder unter zehn Jahren ausgesprochen werden." },
       { id: "c", label: "Radikale Verbote verhindern den Erwerb von echter Medienkompetenz und fördern Heimlichkeiten." },
       { id: "d", label: "Zeitlich begrenzte Verbote sind eine angemessene Reaktion auf schlechte Noten." }
