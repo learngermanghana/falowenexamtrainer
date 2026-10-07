@@ -16,7 +16,7 @@ describe("B2 Final Mock Lesen Teil 1", () => {
   });
 
   test("keeps the Goethe-style 18-minute section and autosaves answers", () => {
-    expect(page).toContain("const DURATION_SECONDS = 18 * 60");
+    expect(page).toContain("teil1: 18 * 60");
     expect(page).toContain("window.localStorage.setItem");
     expect(page).toContain("Automatisch gespeichert");
     expect(page).toContain("Die Personen können mehrmals gewählt werden");
