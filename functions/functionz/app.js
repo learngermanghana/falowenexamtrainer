@@ -5336,7 +5336,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       validateString(teil, { maxLength: 20, label: "teil" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(contextType, { maxLength: 60, label: "context" }) ||
-      validateString(question, { maxLength: 400, label: "question" }) ||
+      validateString(question, { maxLength: 2000, label: "question" }) ||
       validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
