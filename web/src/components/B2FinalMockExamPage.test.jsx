@@ -136,6 +136,14 @@ describe("B2 Final Mock Lesen", () => {
     ]);
   });
 
+  test("recovers interrupted Hören playback after refresh", () => {
+    expect(page).toContain("const restoreAudioStatus = (status) =>");
+    expect(page).toContain('if (normalized === "ended") return "ended"');
+    expect(page).toContain('return "not_started"');
+    expect(page).toContain("hoeren1AudioStatus: restoreAudioStatus(parsed.hoeren1AudioStatus)");
+    expect(page).toContain("hoeren2AudioStatus: restoreAudioStatus(parsed.hoeren2AudioStatus)");
+  });
+
   test("continues Hören Teil 1 into Teil 2 and autosaves Teil 2 state", () => {
     expect(page).toContain('stage: "hoeren-teil2"');
     expect(page).toContain("hoeren2Answers");

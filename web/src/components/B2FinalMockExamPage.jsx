@@ -39,6 +39,15 @@ const initialState = () => ({
   completed: false,
 });
 
+const restoreAudioStatus = (status) => {
+  const normalized = String(status || "not_started");
+  if (normalized === "ended") return "ended";
+  // A persisted "started" status only means playback was active before the page
+  // was interrupted. A new <audio> element cannot continue that session, so make
+  // the start control available again instead of leaving the learner stuck.
+  return "not_started";
+};
+
 const readState = () => {
   if (typeof window === "undefined") return initialState();
 
@@ -93,10 +102,10 @@ const readState = () => {
       teil4Answers: parsed.teil4Answers || {},
       teil4Completed: Boolean(parsed.teil4Completed),
       hoeren1Answers: parsed.hoeren1Answers || {},
-      hoeren1AudioStatus: parsed.hoeren1AudioStatus || "not_started",
+      hoeren1AudioStatus: restoreAudioStatus(parsed.hoeren1AudioStatus),
       hoeren1Completed: Boolean(parsed.hoeren1Completed),
       hoeren2Answers: parsed.hoeren2Answers || {},
-      hoeren2AudioStatus: parsed.hoeren2AudioStatus || "not_started",
+      hoeren2AudioStatus: restoreAudioStatus(parsed.hoeren2AudioStatus),
       hoeren2Completed: Boolean(parsed.hoeren2Completed),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
