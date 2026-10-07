@@ -41,6 +41,7 @@ const COPY = {
     resources: [
       { label: "Upcoming classes", href: "/classes/" },
       { label: "Free placement test", href: "/placement-test" },
+      { label: "Free Goethe exam practice", href: "/exam-practice" },
       { label: "How Falowen works", href: "/help" },
       { label: "Course schedules", href: "/courses/" },
       { label: "Free lesson", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
