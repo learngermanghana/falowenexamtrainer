@@ -142,7 +142,7 @@ const PreparedCheckbox = ({ checked, onChange, label = "I prepared this part." }
 const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultImages.sprechen} alt={alt} loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />;
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
-const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
+const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true, initialTab = "sprechen" }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const listeningConfig = getA2ListeningTask(day);
@@ -150,7 +150,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const part4Profile = lessonProfile?.sections?.part4;
   const showHoeren = Boolean(part4Profile?.visible);
   const writingRequired = Boolean(lessonProfile?.sections?.writing?.visible);
-  const [activeTab, setActiveTab] = useState("sprechen");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const requestedView = normalizeA2B1SectionView(
     new URLSearchParams(location.search || "").get("view") || "",
   );
