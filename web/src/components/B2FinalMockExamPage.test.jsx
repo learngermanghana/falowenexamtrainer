@@ -16,10 +16,34 @@ describe("B2 Final Mock Lesen Teil 1", () => {
   });
 
   test("keeps the Goethe-style 18-minute section and autosaves answers", () => {
-    expect(page).toContain("const DURATION_SECONDS = 18 * 60");
+    expect(page).toContain("teil1: 18 * 60");
     expect(page).toContain("window.localStorage.setItem");
     expect(page).toContain("Automatisch gespeichert");
     expect(page).toContain("Die Personen können mehrmals gewählt werden");
+  });
+
+  test("uses the supplied Repair-Café reconstruction and answer key", () => {
+    expect(B2_READING.teil2.articleTitle).toBe("Die Renaissance der Reparaturkultur");
+    expect(B2_READING.teil2.sentences.map((sentence) => sentence.id)).toEqual([
+      "A", "B", "C", "D", "E", "F", "G", "H",
+    ]);
+    expect(B2_READING.teil2.answers).toEqual({
+      10: "B",
+      11: "C",
+      12: "D",
+      13: "F",
+      14: "A",
+      15: "H",
+    });
+  });
+
+  test("renders Teil 2 as an inline-gap newspaper reconstruction with a sentence bank", () => {
+    expect(page).toContain("teil2: 12 * 60");
+    expect(page).toContain("b2-mock-article-grid");
+    expect(page).toContain("b2-mock-inline-gap");
+    expect(page).toContain("Sätze A bis H · Teil 2");
+    expect(page).toContain("Zwei Sätze passen nicht.");
+    expect(page).toContain("Automatisch gespeichert");
   });
 
   test("publishes only a preview route while the B2 mock is still being built", () => {

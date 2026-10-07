@@ -51,7 +51,108 @@ export const B2_READING = Object.freeze({
       { number: 8, statement: "sieht im verringerten Konsum vor allem einen Beitrag zum Umweltschutz.", answer: "C" },
       { number: 9, statement: "findet einen minimalistischen Lebensstil mit einer Familie schwer umsetzbar.", answer: "B" },
     ],
+  },  teil2: {
+    title: "Teil 2",
+    time: "12 Minuten",
+    intro:
+      "Lesen Sie den Text aus einer Zeitung. Welche Sätze (A–H) passen in die Lücken (10–15)? Zwei Sätze passen nicht. Markieren Sie Ihre Antworten.",
+    articleTitle: "Die Renaissance der Reparaturkultur",
+    paragraphs: [
+      {
+        number: 10,
+        before:
+          "In vielen Städten schießen sogenannte Repair-Cafés wie Pilze aus dem Boden. Hier kommen Menschen zusammen, um defekte Toaster, Fahrräder oder Kleidungsstücke gemeinsam zu reparieren, statt sie wegzuwerfen.",
+        after:
+          "Initiatoren betonen, dass es bei diesen Treffen nicht nur um Geldersparnis geht, sondern vor allem um ein neues Bewusstsein für Nachhaltigkeit.",
+      },
+      {
+        number: 11,
+        before:
+          "Früher war das Reparieren eine Selbstverständlichkeit, da Konsumgüter teuer und kostbar waren. Mit dem Aufkommen der Massenproduktion und günstiger Importe veränderte sich jedoch das Konsumverhalten radikal.",
+        after:
+          "Wegwerfen und Neuanschaffen wurde für viele Verbraucher oft günstiger und bequemer, als Ersatzteile zu beschaffen oder professionelle Handwerker zu bezahlen.",
+      },
+      {
+        number: 12,
+        before:
+          "Die Folgen dieser Entwicklung für die Umwelt sind gravierend. Riesige Mengen an Elektroschrott belasten die Ökosysteme weltweit, und wertvolle Rohstoffe gehen unwiederbringlich verloren.",
+        after:
+          "Aus diesem Grund fordern Verbraucherschützer und Umweltorganisationen schon seit Längerem ein gesetzlich verankertes „Recht auf Reparatur“.",
+      },
+      {
+        number: 13,
+        before:
+          "Dieses Konzept soll Hersteller dazu verpflichten, technische Geräte von vornherein so zu konstruieren, dass sie problemlos geöffnet und repariert werden können.",
+        after:
+          "Darüber hinaus müssen Ersatzteile über viele Jahre hinweg zu angemessenen Preisen zur Verfügung gestellt werden. Erste Richtlinien der Europäischen Union weisen bereits in diese Richtung.",
+      },
+      {
+        number: 14,
+        before:
+          "Allerdings gibt es auch Kritik seitens mancher Industrieunternehmen. Sie befürchten hohe Zusatzkosten bei der Produktentwicklung und verweisen auf Sicherheitsrisiken, wenn Laien an komplexen elektronischen Geräten hantieren.",
+        after:
+          "Befürworter halten dagegen, dass gut verständliche Anleitungen und modulare Bauweisen solche Gefahren minimieren können.",
+      },
+      {
+        number: 15,
+        before:
+          "Der Erfolg der Repair-Cafés zeigt jedenfalls, dass in der Bevölkerung ein Umdenken stattfindet. Das gemeinsame Werkeln stärkt zudem das Gemeinschaftsgefühl in den Nachbarschaften.",
+        after:
+          "Am Ende profitieren somit nicht nur die Umwelt und der Geldbeutel, sondern auch das soziale Miteinander.",
+      },
+    ],
+    sentences: [
+      {
+        id: "A",
+        text:
+          "Viele Unternehmen befürchten zudem, dass durch erzwungene Transparenz geschützte Betriebsgeheimnisse offengelegt werden könnten.",
+      },
+      {
+        id: "B",
+        text:
+          "Ehrenamtliche Fachleute unterstützen die Besucherinnen und Besucher dabei kostenlos mit Werkzeug und praktischem Know-how.",
+      },
+      {
+        id: "C",
+        text:
+          "Gegenstände wurden zunehmend als Einwegprodukte betrachtet, die nach kurzem Gebrauch einfach ersetzt wurden.",
+      },
+      {
+        id: "D",
+        text:
+          "Daher suchen immer mehr Bürgerinnen und Bürger nach Möglichkeiten, den wachsenden Müllbergen etwas entgegenzusetzen.",
+      },
+      {
+        id: "E",
+        text:
+          "Deshalb weigern sich viele Kunden heutzutage komplett, neue elektronische Geräte zu kaufen.",
+      },
+      {
+        id: "F",
+        text:
+          "Zudem müsste die starke Verklebung von Gehäusen, die das eigenständige Öffnen verhindert, verboten werden.",
+      },
+      {
+        id: "G",
+        text:
+          "Aus diesem Grund bieten immer mehr Schulen verpflichtenden Handwerksunterricht für Kinder an.",
+      },
+      {
+        id: "H",
+        text:
+          "Viele Menschen erleben es als sehr befriedigend, ein kaputtes Objekt wieder selbst funktionstüchtig zu machen.",
+      },
+    ],
+    answers: {
+      10: "B",
+      11: "C",
+      12: "D",
+      13: "F",
+      14: "A",
+      15: "H",
+    },
   },
+
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
