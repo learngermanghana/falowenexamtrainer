@@ -9,7 +9,7 @@ import "./C1FinalMockExamPage.css";
 const SECTION_DURATIONS = Object.freeze({
   teil1: 10 * 60,
   teil2: 20 * 60,
-  teil3: 15 * 60,
+  teil3: 20 * 60,
 });
 
 const formatTime = (seconds) => {
@@ -225,69 +225,87 @@ const Teil2 = ({ answers, onChoose, secondsLeft, onFinish }) => {
   );
 };
 
-const SectionMatchChoices = ({ number, value, onChoose, disabled }) => (
-  <div className="c1-mock-section-options" role="radiogroup" aria-label={`Aufgabe ${number}`}>
-    {C1_READING_TEIL3.sections.map((section) => (
-      <label key={section.id} className={value === section.id ? "selected" : ""}>
-        <input
-          type="radio"
-          name={`c1-lesenteil3-${number}`}
-          checked={value === section.id}
-          onChange={() => onChoose(number, section.id)}
-          disabled={disabled}
-        />
-        <strong>{section.id}</strong>
-      </label>
-    ))}
-  </div>
-);
+const Teil3GapSelect = ({ number, value, answers, onChoose, disabled }) => {
+  const usedLetters = new Set(
+    Object.entries(answers)
+      .filter(([gapNumber]) => Number(gapNumber) !== Number(number))
+      .map(([, letter]) => letter)
+      .filter(Boolean),
+  );
+
+  return (
+    <span className="c1-mock-reconstruction-gap">
+      <strong>{number}</strong>
+      <select
+        aria-label={`Lücke ${number}: Satz auswählen`}
+        value={value || ""}
+        onChange={(event) => onChoose(number, event.target.value)}
+        disabled={disabled}
+      >
+        <option value="">–</option>
+        {C1_READING_TEIL3.sentences.map((sentence) => (
+          <option
+            key={sentence.id}
+            value={sentence.id}
+            disabled={usedLetters.has(sentence.id)}
+          >
+            {sentence.id}
+          </option>
+        ))}
+      </select>
+    </span>
+  );
+};
 
 const Teil3 = ({ answers, onChoose, secondsLeft, onFinish }) => {
-  const answeredCount = C1_READING_TEIL3.questions.filter(
-    (question) => Boolean(answers[question.number]),
+  const answeredCount = Object.keys(C1_READING_TEIL3.answers).filter(
+    (number) => Boolean(answers[number]),
   ).length;
 
   return (
     <>
-      <section className="c1-mock-article c1-mock-section-article">
-        <p className="c1-mock-section-label">Abschnitte A bis D · Teil 3</p>
+      <section className="c1-mock-article c1-mock-reconstruction">
+        <p className="c1-mock-section-label">Kommentar · Teil 3</p>
         <h2>{C1_READING_TEIL3.articleTitle}</h2>
 
-        <div className="c1-mock-section-list">
-          {C1_READING_TEIL3.sections.map((section) => (
-            <article className="c1-mock-section-card" key={section.id}>
-              <div className="c1-mock-section-badge">{section.id}</div>
-              <div>
-                <h3>{section.person} <span>({section.role})</span></h3>
-                <p>{section.text}</p>
-              </div>
-            </article>
+        <div className="c1-mock-reconstruction-body">
+          {C1_READING_TEIL3.paragraphs.map((paragraph) => (
+            <p key={paragraph.gap}>
+              {paragraph.before}{" "}
+              <Teil3GapSelect
+                number={paragraph.gap}
+                value={answers[paragraph.gap]}
+                answers={answers}
+                onChoose={onChoose}
+                disabled={secondsLeft <= 0}
+              />{" "}
+              {paragraph.after}
+            </p>
           ))}
         </div>
       </section>
 
-      <section className="c1-mock-tasks">
+      <section className="c1-mock-tasks c1-mock-sentence-bank">
         <div className="c1-mock-task-heading">
           <div>
-            <p className="c1-mock-section-label">Aufgaben 13 bis 22</p>
-            <h2>Welcher Abschnitt passt?</h2>
-            <p>Die Abschnitte können mehrmals gewählt werden.</p>
+            <p className="c1-mock-section-label">Sätze A bis H · Teil 3</p>
+            <h2>Welche Sätze passen in die Lücken 13 bis 18?</h2>
+            <p>Zwei Sätze passen nicht.</p>
           </div>
-          <strong>{answeredCount}/10 beantwortet</strong>
+          <strong>{answeredCount}/6 beantwortet</strong>
         </div>
 
-        <div className="c1-mock-match-list">
-          {C1_READING_TEIL3.questions.map((question) => (
-            <article className="c1-mock-match-row" key={question.number}>
-              <p><strong>{question.number}.</strong> In welchem Abschnitt {question.statement}</p>
-              <SectionMatchChoices
-                number={question.number}
-                value={answers[question.number]}
-                onChoose={onChoose}
-                disabled={secondsLeft <= 0}
-              />
-            </article>
-          ))}
+        <div className="c1-mock-sentence-list">
+          {C1_READING_TEIL3.sentences.map((sentence) => {
+            const usedAt = Object.entries(answers).find(([, value]) => value === sentence.id)?.[0];
+            return (
+              <article className={usedAt ? "used" : ""} key={sentence.id}>
+                <strong>{sentence.id}</strong>
+                <p>{sentence.text}</p>
+                {usedAt ? <span>Lücke {usedAt}</span> : null}
+              </article>
+            );
+          })}
         </div>
 
         <p className="c1-mock-autosave">Automatisch gespeichert</p>
