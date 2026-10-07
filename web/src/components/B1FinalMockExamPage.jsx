@@ -73,6 +73,7 @@ const scoreObjective = (answers, questions) => {
 const lesenQuestions = [
   ...B1_READING.teil1.questions.map((q) => ({ ...q, key: `t1-${q.number}` })),
   ...B1_READING.teil2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
+  ...B1_READING.teil2.text2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
   ...B1_READING.teil3.situations.map((q) => ({ ...q, question: q.text, key: `t3-${q.number}` })),
   ...B1_READING.teil4.comments.map((q) => ({ ...q, question: q.person, key: `t4-${q.number}` })),
   ...B1_READING.teil5.questions.map((q) => ({ ...q, key: `t5-${q.number}` })),
@@ -478,13 +479,32 @@ export default function B1FinalMockExamPage() {
             ))}
           </ReadingPart>
 
-          <ReadingPart title="Teil 2 · Text 1">
+          <ReadingPart title="Teil 2 · Text 1" time="20 Minuten · gesamter Teil 2">
             <div className="b1-final-press-text">
               <small>Text aus der Presse</small>
               <h3>{B1_READING.teil2.heading}</h3>
               {B1_READING.teil2.paragraphs.map((p) => <p key={p}>{p}</p>)}
             </div>
             {B1_READING.teil2.questions.map((q) => (
+              <div className="b1-final-question" key={q.number}>
+                <strong>{q.number}. {q.question}</strong>
+                <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
+                  value={exam.lesenAnswers[`t2-${q.number}`]}
+                  onChange={(value) => setLesen(`t2-${q.number}`, value)} />
+              </div>
+            ))}
+
+            <div className="b1-final-text-divider">
+              <strong>{B1_READING.teil2.text2.title}</strong>
+              <span>Aufgaben 10–12</span>
+            </div>
+            <p>{B1_READING.teil2.text2.intro}</p>
+            <div className="b1-final-press-text">
+              <small>Text aus der Presse</small>
+              <h3>{B1_READING.teil2.text2.heading}</h3>
+              {B1_READING.teil2.text2.paragraphs.map((p) => <p key={p}>{p}</p>)}
+            </div>
+            {B1_READING.teil2.text2.questions.map((q) => (
               <div className="b1-final-question" key={q.number}>
                 <strong>{q.number}. {q.question}</strong>
                 <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
