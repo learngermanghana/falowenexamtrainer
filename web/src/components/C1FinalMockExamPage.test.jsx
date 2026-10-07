@@ -5,9 +5,10 @@ import { C1_READING_TEIL2 } from "../data/c1FinalMockTeil2Data";
 import { C1_READING_TEIL3 } from "../data/c1FinalMockTeil3Data";
 import { C1_READING_TEIL4 } from "../data/c1FinalMockTeil4Data";
 
-describe("C1 Final Mock Lesen", () => {
+describe("C1 Lesen practice", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "./C1FinalMockExamPage.jsx"), "utf8");
   const app = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
+  const lesenPage = fs.readFileSync(path.resolve(__dirname, "./LesenPage.js"), "utf8");
 
   test("uses the supplied GreenVoyage cloze task and answer key", () => {
     expect(C1_READING.teil1.articleTitle).toBe("Ein Pionier des nachhaltigen Reisens");
@@ -95,7 +96,16 @@ describe("C1 Final Mock Lesen", () => {
     expect(page).toContain("completed: Boolean(parsed.completed && parsed.teil4Completed)");
   });
 
-  test("publishes a C1 mock preview route while the remaining parts are built", () => {
-    expect(app).toContain('path="/campus/course/c1-mock-practice-preview" element={<C1FinalMockExamPage />}');
+  test("publishes C1 as Lesen practice in the Exams Room, not as a mock route", () => {
+    expect(lesenPage).toContain('label: "C1 Lesen Sample 1"');
+    expect(lesenPage).toContain('detail: "30 questions · Teil 1–4"');
+    expect(lesenPage).toContain('navigate(`/exams/lesen/c1/${sample.slug}`)');
+    expect(app).not.toContain('path="/campus/course/c1-mock-practice-preview"');
+  });
+
+  test("uses a Lesen-practice storage key and only reads the old mock key for migration", () => {
+    expect(page).toContain("C1_READING_PRACTICE_STORAGE_KEY");
+    expect(page).toContain("C1_FINAL_MOCK_STORAGE_KEY");
+    expect(page).toContain("Dieses Training gehört zum Lesen-Bereich im Exams Room und ist kein vollständiger C1-Mock.");
   });
 });

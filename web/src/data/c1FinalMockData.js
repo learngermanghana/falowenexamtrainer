@@ -113,4 +113,5 @@ export const C1_READING = Object.freeze({
   },
 });
 
-export const C1_FINAL_MOCK_STORAGE_KEY = "falowen-c1-final-mock-v1";
+export const C1_READING_PRACTICE_STORAGE_KEY = "falowen-c1-lesen-practice-01-v1";
+export const C1_FINAL_MOCK_STORAGE_KEY = "falowen-c1-final-mock-v1"; // legacy migration only

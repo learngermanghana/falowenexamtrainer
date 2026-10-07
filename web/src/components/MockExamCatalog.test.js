@@ -35,6 +35,10 @@ describe("mock exam catalog", () => {
     });
   });
 
+  test("keeps C1 Lesen out of the Mock Exams catalog until a real C1 mock is built", () => {
+    expect(getMockExamsForLevel("C1")).toEqual([]);
+  });
+
   test("creates a new practice question set without duplicating page code", () => {
     const exam = buildPracticeMockConfig({
       id: "a2-practice-02",
