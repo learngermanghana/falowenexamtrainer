@@ -123,7 +123,9 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('? "hoeren-teil1"');
     expect(page).toContain("migratedFromHoeren1Completion");
     expect(page).toContain('? "hoeren-teil2"');
-    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren2Completed)");
+    expect(page).toContain("migratedFromHoeren2Completion");
+    expect(page).toContain('? "hoeren-teil3"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren3Completed)");
   });
 
   test("uses the supplied B2 Hören Teil 2 interview and answer key", () => {
@@ -142,6 +144,7 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('return "not_started"');
     expect(page).toContain("hoeren1AudioStatus: restoreAudioStatus(parsed.hoeren1AudioStatus)");
     expect(page).toContain("hoeren2AudioStatus: restoreAudioStatus(parsed.hoeren2AudioStatus)");
+    expect(page).toContain("hoeren3AudioStatus: restoreAudioStatus(parsed.hoeren3AudioStatus)");
   });
 
   test("continues Hören Teil 1 into Teil 2 and autosaves Teil 2 state", () => {
@@ -151,6 +154,35 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Hören Teil 1 abschließen · weiter zu Teil 2");
     expect(page).toContain("Aufgaben 11 bis 16 · Hören Teil 2");
     expect(page).toContain("Hören Teil 2 abschließen");
+  });
+
+  test("uses the supplied B2 Hören Teil 3 speaker matching and answer key", () => {
+    expect(B2_LISTENING.teil3.audioObjectKey).toBe("b2/mock-hoeren-1/teil-3.mp3");
+    expect(B2_LISTENING.teil3.speakers).toEqual([
+      { id: "a", label: "Frau Lenz" },
+      { id: "b", label: "Herr Albers" },
+      { id: "c", label: "Herr Demir" },
+    ]);
+    expect(B2_LISTENING.teil3.example).toEqual({
+      statement: "Wir teilen uns Werkzeug, Garten und ein Auto.",
+      answer: "a",
+    });
+    expect(B2_LISTENING.teil3.questions.map((question) => question.number)).toEqual([
+      17, 18, 19, 20, 21, 22,
+    ]);
+    expect(B2_LISTENING.teil3.questions.map((question) => question.answer)).toEqual([
+      "b", "c", "a", "b", "c", "a",
+    ]);
+  });
+
+  test("continues Hören Teil 2 into Teil 3 and autosaves Teil 3 state", () => {
+    expect(page).toContain('stage: "hoeren-teil3"');
+    expect(page).toContain("hoeren3Answers");
+    expect(page).toContain("hoeren3AudioStatus");
+    expect(page).toContain("Hören Teil 2 abschließen · weiter zu Teil 3");
+    expect(page).toContain("Aufgaben 17 bis 22 · Hören Teil 3");
+    expect(page).toContain("Wer sagt das?");
+    expect(page).toContain("Hören Teil 3 abschließen");
   });
 
   test("publishes only a preview route while the B2 mock is still being built", () => {
