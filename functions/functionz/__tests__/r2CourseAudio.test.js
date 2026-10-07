@@ -6,6 +6,7 @@ const {
   validateB1MockAudioKey,
   validateC2AudioKey,
   validateB2AudioKey,
+  validateB2MockAudioKey,
   validateCourseAudioKey,
   getR2AudioConfig,
   createA1AudioSignedUrl,
@@ -15,6 +16,7 @@ const {
   createB1MockAudioSignedUrl,
   createC2AudioSignedUrl,
   createB2AudioSignedUrl,
+  createB2MockAudioSignedUrl,
   getCourseMediaStaffEmails,
   hasCourseMediaStaffAccess,
   hasCourseMediaLevelAccess,
@@ -162,6 +164,42 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateC2AudioKey({ day: 1, key: "c2/day-01/listening.mp3" })).toBeNull();
     expect(validateC2AudioKey({ day: 2, key: "../secret.mp3" })).toBeNull();
     expect(validateC2AudioKey({ day: 2, key: "c2/day-02/notes.pdf" })).toBeNull();
+  });
+
+  test("accepts protected B2 mock Hören objects in the mock-hoeren-1 folder", () => {
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+    })).toEqual({
+      level: "B2",
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+    });
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "b2/mock-hoeren-1/teil-4.mp3",
+    })).toEqual({
+      level: "B2",
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "b2/mock-hoeren-1/teil-4.mp3",
+    });
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-5",
+      key: "b2/mock-hoeren-1/teil-5.mp3",
+    })).toBeNull();
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/day-02/listening.mp3",
+    })).toBeNull();
   });
 
   test("accepts only audio objects inside matching B2 listening day folders", () => {
@@ -353,6 +391,25 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(result.url).toContain("r2.cloudflarestorage.com");
     expect(result.url).toContain("X-Amz-Signature=");
     expect(result.expiresIn).toBe(3600);
+
+    const b2Mock = await createB2MockAudioSignedUrl({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b2Mock.url).toContain("/b2/mock-hoeren-1/teil-1.mp3");
+    expect(b2Mock.url).toContain("X-Amz-Signature=");
+    expect(b2Mock.level).toBe("B2");
+    expect(b2Mock.mockId).toBe("mock-01");
+    expect(b2Mock.part).toBe("teil-1");
 
     const b2 = await createB2AudioSignedUrl({
       day: 2,
