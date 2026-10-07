@@ -491,6 +491,75 @@ export const B2_LISTENING = Object.freeze({
       },
     ],
   },
+  teil2: {
+    id: "teil-2",
+    title: "Hören · Teil 2",
+    audioObjectKey: "b2/mock-hoeren-1/teil-2.mp3",
+    intro:
+      "Hören Sie das Interview und bearbeiten Sie die Aufgaben 11 bis 16. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+    questions: [
+      {
+        number: 11,
+        question: "Warum wurde der Professor Meeresbiologe?",
+        options: [
+          { id: "a", label: "Sein Lehrer hat es empfohlen." },
+          { id: "b", label: "Ein Urlaub in Ägypten hat ihn dazu gebracht." },
+          { id: "c", label: "Seine Eltern sind Biologen." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 12,
+        question: "Was ist laut dem Professor die Hauptursache für das Korallensterben?",
+        options: [
+          { id: "a", label: "Die Verschmutzung der Meere." },
+          { id: "b", label: "Zu viel Fischerei." },
+          { id: "c", label: "Die steigende Wassertemperatur." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 13,
+        question: "Wie lange dauert die Erholung eines Riffs nach einer Bleiche oft?",
+        options: [
+          { id: "a", label: "Ein paar Wochen." },
+          { id: "b", label: "Etwa ein Jahr." },
+          { id: "c", label: "Zehn Jahre oder länger." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 14,
+        question: "Wie arbeiten die Freiwilligen?",
+        options: [
+          { id: "a", label: "Sie zählen Fische und fotografieren Korallen." },
+          { id: "b", label: "Sie bekommen ein festes Gehalt." },
+          { id: "c", label: "Sie arbeiten nur im Labor." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 15,
+        question: "Wie sieht der Professor die Zukunft der Riffe?",
+        options: [
+          { id: "a", label: "Sehr pessimistisch." },
+          { id: "b", label: "Vorsichtig optimistisch, aber die Politik muss schneller handeln." },
+          { id: "c", label: "Völlig sorglos." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 16,
+        question: "Was empfiehlt er jedem Einzelnen?",
+        options: [
+          { id: "a", label: "Weniger Flugreisen und weniger Fleisch." },
+          { id: "b", label: "Keine Sonnencreme zu benutzen." },
+          { id: "c", label: "Mehr Fische zu essen." },
+        ],
+        answer: "a",
+      },
+    ],
+  },
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
