@@ -286,3 +286,140 @@
     grid-template-columns: 72px 1fr 42px;
   }
 }
+
+
+.b2-mock-next {
+  display: block;
+  margin: 20px 0 0 auto;
+  border: 0;
+  background: #29323a;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  padding: 11px 17px;
+  cursor: pointer;
+}
+
+.b2-mock-reconstruction,
+.b2-mock-sentence-bank {
+  margin-top: 26px;
+  background: #f6e8dc;
+  padding: 28px 30px;
+}
+
+.b2-mock-reconstruction > h2 {
+  margin: 24px 0 8px;
+  text-align: center;
+  font-size: 31px;
+}
+
+.b2-mock-article-lead {
+  margin: 0 0 26px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.b2-mock-article-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 34px;
+  align-items: start;
+}
+
+.b2-mock-article-column {
+  display: grid;
+  gap: 22px;
+}
+
+.b2-mock-article-column p {
+  margin: 0;
+  line-height: 1.48;
+  font-size: 16px;
+}
+
+.b2-mock-inline-gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  font-weight: 800;
+}
+
+.b2-mock-inline-gap strong {
+  font-size: 14px;
+}
+
+.b2-mock-inline-gap select {
+  min-width: 56px;
+  height: 34px;
+  border: 1px solid #7f7f7f;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 6px;
+}
+
+.b2-mock-inline-gap select:focus {
+  outline: 2px solid #8f1d2c;
+  outline-offset: 1px;
+}
+
+.b2-mock-sentence-list {
+  display: grid;
+  gap: 0;
+  margin-top: 8px;
+}
+
+.b2-mock-sentence {
+  display: grid;
+  grid-template-columns: 86px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  padding: 12px 4px;
+  border-bottom: 1px solid #d5b8a7;
+  line-height: 1.5;
+}
+
+.b2-mock-sentence strong {
+  color: #3b2a22;
+}
+
+.b2-mock-sentence em {
+  color: #8f1d2c;
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.b2-mock-sentence.used {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 900px) {
+  .b2-mock-article-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  .b2-mock-reconstruction,
+  .b2-mock-sentence-bank {
+    padding: 18px 16px;
+  }
+
+  .b2-mock-inline-gap {
+    display: inline-flex;
+    margin: 4px 2px;
+  }
+
+  .b2-mock-sentence {
+    grid-template-columns: 68px 1fr;
+  }
+
+  .b2-mock-sentence em {
+    grid-column: 2;
+  }
+}
