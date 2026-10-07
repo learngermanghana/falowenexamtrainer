@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -541,6 +541,27 @@ const getB1MediaAccessBlockReason = ({ authedUser, student }) => {
 
   if (!hasCourseMediaLevelAccess({ student, requiredLevel: "B1" })) {
     return "b1_not_assigned";
+  }
+
+  const status = String(student.status || "").trim().toLowerCase();
+  if (status && !C2_MEDIA_ACTIVE_STATUSES.has(status)) return "student_inactive";
+
+  const paymentStatus = String(student.paymentStatus || "").trim().toLowerCase();
+  if (C2_MEDIA_BLOCKED_PAYMENT_STATUSES.has(paymentStatus)) return "payment_blocked";
+
+  const contractEnd = parseContractEnd(student.contractEnd);
+  if (contractEnd && contractEnd.getTime() <= Date.now()) return "contract_ended";
+
+  return "";
+};
+
+const getC1MediaAccessBlockReason = ({ authedUser, student }) => {
+  if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
+
+  if (!student) return "student_profile_missing";
+
+  if (!hasCourseMediaLevelAccess({ student, requiredLevel: "C1" })) {
+    return "c1_not_assigned";
   }
 
   const status = String(student.status || "").trim().toLowerCase();
@@ -1089,6 +1110,59 @@ app.get("/course-media/c2/audio-url", async (req, res) => {
     }
     console.error("Failed to create C2 audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this C2 audio right now." });
+  }
+});
+
+app.get("/course-media/c1/exam-hoeren-audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const sampleId = String(req.query?.sampleId || "").trim();
+    const part = String(req.query?.part || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateC1ExamHorenAudioKey({ sampleId, part, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid C1 Hören practice audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getC1MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.c1_exam_hoeren.access_denied", {
+        reason: accessBlockReason,
+        sampleId: validated.sampleId,
+        part: validated.part,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "C1 Hören practice audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createC1ExamHorenAudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+      sampleId: signed.sampleId,
+      part: signed.part,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("C1 Exams Room Hören R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "C1 Hören audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_C1_EXAM_HOEREN_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid C1 Hören practice audio request" });
+    }
+    console.error("Failed to create C1 Hören practice audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this C1 Hören audio right now." });
   }
 });
 

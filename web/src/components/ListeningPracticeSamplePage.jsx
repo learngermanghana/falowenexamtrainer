@@ -4,11 +4,13 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
+import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
 import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
+import { C1_EXAM_HOEREN_SAMPLE_1 } from "../data/c1ExamHorenSample1";
 import "./A1GoetheListeningMockPreview.css";
 import "./A2GoetheListeningMockTeil2Preview.css";
 import "./A2GoetheListeningMockTeil3Preview.css";
@@ -24,6 +26,10 @@ const A1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_GOETHE_LISTENING_MOCK.teil1 },
   { key: "teil2", audioPart: "teil-2", data: A1_GOETHE_LISTENING_MOCK.teil2 },
   { key: "teil3", audioPart: "teil-3", data: A1_GOETHE_LISTENING_MOCK.teil3 },
+]);
+
+const C1_PARTS = Object.freeze([
+  { key: "teil1", audioPart: "teil-1", data: C1_EXAM_HOEREN_SAMPLE_1 },
 ]);
 
 const answerKeyForPart = (level, part) => {
@@ -51,13 +57,19 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
     setLoading(true);
     setError("");
     try {
-      const loader = level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl;
-      const result = await loader({
-        mockId: "mock-01",
-        part,
-        key: objectKey,
-        idToken,
-      });
+      const result = level === "C1"
+        ? await fetchC1ExamHorenAudioPlaybackUrl({
+            sampleId: "sample-1",
+            part,
+            key: objectKey,
+            idToken,
+          })
+        : await (level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
+            mockId: "mock-01",
+            part,
+            key: objectKey,
+            idToken,
+          });
       setAudioUrl(result.url);
     } catch (loadError) {
       setError(loadError?.response?.data?.error || loadError?.message || "Could not load audio.");
@@ -70,7 +82,13 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
     <div className="a1-hoeren-mock-part-audio">
       <div className="a1-hoeren-mock-part-audio-copy">
         <strong>Exam audio</strong>
-        <p>{plays === 2 ? "The required repetition is already included in the audio." : "This audio is heard once in the mock."}</p>
+        <p>
+          {level === "C1"
+            ? "This audio belongs to C1 Hören practice in the Exams Room."
+            : plays === 2
+              ? "The required repetition is already included in the audio."
+              : "This audio is heard once in the mock."}
+        </p>
       </div>
 
       {audioUrl ? (
@@ -89,7 +107,9 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
         </button>
       )}
 
-      <span className="a1-hoeren-mock-play-count">{plays}× in the mock audio</span>
+      <span className="a1-hoeren-mock-play-count">
+        {level === "C1" ? `${plays}× practice audio` : `${plays}× in the mock audio`}
+      </span>
       {error ? <p className="a1-hoeren-mock-audio-error">{error}</p> : null}
     </div>
   );
@@ -156,8 +176,14 @@ const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
 export default function ListeningPracticeSamplePage({ level = "A1" }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
-  const normalizedLevel = String(level || "A1").toUpperCase() === "A2" ? "A2" : "A1";
-  const parts = normalizedLevel === "A2" ? A2_PARTS : A1_PARTS;
+  const requestedLevel = String(level || "A1").toUpperCase();
+  const normalizedLevel = ["A1", "A2", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
+  const parts =
+    normalizedLevel === "C1"
+      ? C1_PARTS
+      : normalizedLevel === "A2"
+        ? A2_PARTS
+        : A1_PARTS;
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
