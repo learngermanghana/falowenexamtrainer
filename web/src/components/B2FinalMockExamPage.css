@@ -1,0 +1,288 @@
+.b2-mock-shell {
+  width: min(1360px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 18px 0 60px;
+  color: #292929;
+}
+
+.b2-mock-header {
+  background: #fff;
+  border-top: 2px solid #8f1d2c;
+  padding: 24px 32px 18px;
+  margin-top: 14px;
+}
+
+.b2-mock-kicker {
+  margin: 0 0 10px;
+  color: #8f1d2c;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.b2-mock-title-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.b2-mock-title-row h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+}
+
+.b2-mock-title-row p,
+.b2-mock-instruction {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.b2-mock-instruction {
+  margin-top: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #8f1d2c;
+}
+
+.b2-mock-timer {
+  min-width: 118px;
+  border: 1px solid #d6d6d6;
+  background: #fafafa;
+  padding: 10px 14px;
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.b2-mock-timer span {
+  color: #666;
+  font-size: 12px;
+}
+
+.b2-mock-timer strong {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.b2-mock-timer.danger strong {
+  color: #a11d2d;
+}
+
+.b2-mock-start,
+.b2-mock-forum,
+.b2-mock-tasks {
+  margin-top: 26px;
+  background: #f6e8dc;
+  padding: 28px 30px;
+}
+
+.b2-mock-start {
+  background: #fff;
+  border: 1px solid #d9dde1;
+}
+
+.b2-mock-start h2,
+.b2-mock-forum h2,
+.b2-mock-tasks h2 {
+  margin-top: 0;
+}
+
+.b2-mock-start button {
+  border: 0;
+  background: #29323a;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  padding: 11px 17px;
+  cursor: pointer;
+}
+
+.b2-mock-section-label {
+  margin: 0 0 8px;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.b2-mock-forum > h2 {
+  text-align: center;
+  margin: 28px 0 26px;
+  font-size: 31px;
+}
+
+.b2-mock-people {
+  display: grid;
+  gap: 26px;
+}
+
+.b2-mock-person {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+
+.b2-mock-person-badge {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid #baa99d;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.b2-mock-person h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.b2-mock-person h3 span {
+  font-weight: 500;
+}
+
+.b2-mock-person p {
+  margin: 0;
+  line-height: 1.55;
+  font-size: 16px;
+}
+
+.b2-mock-task-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: end;
+  border-bottom: 1px solid #8f1d2c;
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+
+.b2-mock-task-heading h2 {
+  margin: 0;
+}
+
+.b2-mock-example,
+.b2-mock-question-row {
+  background: rgba(255,255,255,.74);
+  border-bottom: 1px solid #a43340;
+  padding: 14px 16px;
+}
+
+.b2-mock-example {
+  display: grid;
+  grid-template-columns: 90px 1fr 80px;
+  gap: 14px;
+  align-items: center;
+}
+
+.b2-mock-example p {
+  margin: 0;
+}
+
+.b2-mock-example-answer {
+  text-align: center;
+  font-size: 20px;
+}
+
+.b2-mock-question-table {
+  display: grid;
+}
+
+.b2-mock-question-row {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: 18px;
+  align-items: center;
+}
+
+.b2-mock-question-row p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.b2-mock-person-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.b2-mock-person-options label {
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: #fff;
+  border: 1px solid #b7b7b7;
+  cursor: pointer;
+}
+
+.b2-mock-person-options label.selected {
+  border-color: #8f1d2c;
+  box-shadow: inset 0 0 0 1px #8f1d2c;
+}
+
+.b2-mock-person-options input {
+  position: absolute;
+  opacity: 0;
+}
+
+.b2-mock-person-options span {
+  font-weight: 800;
+}
+
+.b2-mock-autosave {
+  margin: 14px 0 0;
+  color: #667085;
+  font-size: 13px;
+}
+
+.b2-mock-timeup {
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #e5b9bf;
+  background: #fff6f7;
+  display: grid;
+  gap: 3px;
+}
+
+@media (max-width: 760px) {
+  .b2-mock-shell {
+    width: min(100% - 14px, 1360px);
+  }
+
+  .b2-mock-header,
+  .b2-mock-start,
+  .b2-mock-forum,
+  .b2-mock-tasks {
+    padding: 18px 16px;
+  }
+
+  .b2-mock-title-row,
+  .b2-mock-task-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .b2-mock-timer {
+    text-align: left;
+  }
+
+  .b2-mock-person {
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+  }
+
+  .b2-mock-person-badge {
+    width: 42px;
+    height: 42px;
+    font-size: 19px;
+  }
+
+  .b2-mock-question-row {
+    grid-template-columns: 1fr;
+  }
+
+  .b2-mock-example {
+    grid-template-columns: 72px 1fr 42px;
+  }
+}
