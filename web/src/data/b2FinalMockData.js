@@ -229,6 +229,109 @@ export const B2_READING = Object.freeze({
       },
     ],
   },
+  teil4: {
+    title: "Teil 4",
+    time: "12 Minuten",
+    intro:
+      "Lesen Sie die 8 Stellungnahmen (A–H) zum Thema „Künstliche Intelligenz (KI) in der Arbeitswelt“. Welche Stellungnahme passt zu welcher Aussage (22–27)? Zwei Stellungnahmen passen nicht. Markieren Sie Ihre Antworten.",
+    topic: "Künstliche Intelligenz (KI) in der Arbeitswelt",
+    statements: [
+      {
+        id: "A",
+        person: "Sandra",
+        role: "Marketingmanagerin",
+        text:
+          "Ich nutze KI-Tools täglich für das Verfassen erster Textentwürfe und die Bildgenerierung. Das spart mir extrem viel Zeit bei einfachen Routineaufgaben, sodass ich mich voll auf strategische Entscheidungen und kreative Konzeptentwicklung konzentrieren kann. KI ersetzt uns nicht, sondern ergänzt unsere menschlichen Fähigkeiten hervorragend.",
+      },
+      {
+        id: "B",
+        person: "Markus",
+        role: "Buchhalter",
+        text:
+          "In unserer Abteilung wurden vor kurzem automatisierte Programme eingeführt. Seitdem herrscht bei vielen Kolleginnen und Kollegen große Unsicherheit. Zwar wird behauptet, dass niemand entlassen werden soll, aber freigewordene Stellen werden einfach nicht mehr nachbesetzt. Ich befürchte, dass dadurch auf lange Sicht viele Arbeitsplätze schleichend verloren gehen.",
+      },
+      {
+        id: "C",
+        person: "Elena",
+        role: "IT-Sicherheitsexpertin",
+        text:
+          "Das größte Problem beim Einsatz von KI in Unternehmen ist der Schutz vertraulicher Daten. Wenn sensible Firmeninterna oder Kundendaten in globale Algorithmen eingespeist werden, ist das ein unkalkulierbares Risiko. Bevor der Gesetzgeber hier keine strengen rechtlichen Leitlinien schafft, sollten Firmen äußerst zurückhaltend agieren.",
+      },
+      {
+        id: "D",
+        person: "Florian",
+        role: "Wirtschaftsberater",
+        text:
+          "Wir dürfen den Anschluss an den Weltmarkt nicht verlieren. Länder wie die USA und China investieren Milliarden in KI-Technologien. Wenn europäische Unternehmen aus Sorge vor Risiken zögern und den Wandel ausbremsen, werden wir wirtschaftlich den Kürzeren ziehen. Innovation erfordert Mut zur Veränderung.",
+      },
+      {
+        id: "E",
+        person: "Thomas",
+        role: "Logistikleiter",
+        text:
+          "Durch den Einsatz intelligenter Systeme in unserem Lager konnten wir die Fehlerquote beim Verpacken von Waren nahezu auf Null senken. Das führt zu einer enormen Kosteneinsparung und zufriedeneren Kunden. Für reine Kontrollarbeiten sind Maschinen dem Menschen schlichtweg überlegen.",
+      },
+      {
+        id: "F",
+        person: "Sabine",
+        role: "Berufsschullehrerin",
+        text:
+          "Ich stelle fest, dass junge Menschen durch die ständige Nutzung von KI-Tools kaum noch lernen, komplexe Aufgaben eigenständig zu durchdenken. Wenn man sich bei jeder Problemstellung sofort auf Algorithmen verlässt, verkümmern das kritische Denken und die analytischen Fähigkeiten. Das halte ich für eine sehr bedenkliche Entwicklung.",
+      },
+      {
+        id: "G",
+        person: "Dr. Aris",
+        role: "Mediziner",
+        text:
+          "Mich stört an der aktuellen Debatte, dass meistens nur über Risiken gesprochen wird. Dabei bietet KI gerade im Gesundheitswesen riesige Chancen, etwa bei der Früherkennung von Tumorerkrankungen durch präzise Bildanalyse. Hier kann moderne Technologie das Leben von Tausenden Menschen retten.",
+      },
+      {
+        id: "H",
+        person: "Jörg",
+        role: "Soziologe",
+        text:
+          "Ein unkontrollierter Einsatz von KI wird die soziale Ungleichheit in unserer Gesellschaft weiter verschärfen. Während hochqualifizierte Fachkräfte profitieren und noch produktiver werden, drohen Geringqualifizierte abgetrennt zu werden. Die Politik muss dringend Steuerungsinstrumente entwickeln, um diesen sozialen Graben zu verhindern.",
+      },
+    ],
+    questions: [
+      {
+        number: 22,
+        statement:
+          "befürchtet einen schleichenden Abbau von Stellen durch die Nichtbesetzung freier Arbeitsplätze.",
+        answer: "B",
+      },
+      {
+        number: 23,
+        statement:
+          "sieht in der Nutzung von KI im medizinischen Bereich ein großes Potenzial zur Lebensrettung.",
+        answer: "G",
+      },
+      {
+        number: 24,
+        statement:
+          "warnt vor einer Verschlechterung der eigenständigen Denk- und Problemlösefähigkeiten bei Lernenden.",
+        answer: "F",
+      },
+      {
+        number: 25,
+        statement:
+          "betont die Notwendigkeit von schnellen Innovationen, um international wettbewerbsfähig zu bleiben.",
+        answer: "D",
+      },
+      {
+        number: 26,
+        statement:
+          "sieht durch KI-Tools eine Entlastung von Routinearbeiten und mehr Raum für Kreativität.",
+        answer: "A",
+      },
+      {
+        number: 27,
+        statement:
+          "hält strengere rechtliche Vorgaben zum Schutz vertraulicher Informationen für erforderlich.",
+        answer: "C",
+      },
+    ],
+  },
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";

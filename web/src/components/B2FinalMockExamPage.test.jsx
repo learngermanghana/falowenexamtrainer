@@ -68,6 +68,36 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Teil 3 abschließen");
   });
 
+  test("uses the supplied KI statements and answer key for Teil 4", () => {
+    expect(B2_READING.teil4.topic).toBe("Künstliche Intelligenz (KI) in der Arbeitswelt");
+    expect(B2_READING.teil4.statements.map((statement) => statement.id)).toEqual([
+      "A", "B", "C", "D", "E", "F", "G", "H",
+    ]);
+    expect(B2_READING.teil4.questions.map((question) => question.number)).toEqual([
+      22, 23, 24, 25, 26, 27,
+    ]);
+    expect(B2_READING.teil4.questions.map((question) => question.answer)).toEqual([
+      "B", "G", "F", "D", "A", "C",
+    ]);
+  });
+
+  test("renders Teil 4 as statement matching with its own timer and autosave", () => {
+    expect(page).toContain("teil4: 12 * 60");
+    expect(page).toContain("b2-mock-teil4-statements");
+    expect(page).toContain("Stellungnahmen A bis H · Teil 4");
+    expect(page).toContain("Aufgaben 22 bis 27 · Teil 4");
+    expect(page).toContain("Teil 3 abschließen · weiter zu Teil 4");
+    expect(page).toContain("Teil 4 abschließen");
+    expect(page).toContain("teil4Answers");
+    expect(page).toContain("teil4Completed");
+  });
+
+  test("migrates a previously completed Teil 3 preview forward to Teil 4", () => {
+    expect(page).toContain("migratedFromTeil3Completion");
+    expect(page).toContain('stage = migratedFromTeil3Completion ? "teil4"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.teil4Completed)");
+  });
+
   test("publishes only a preview route while the B2 mock is still being built", () => {
     expect(app).toContain('path="/campus/course/b2-mock-practice-preview" element={<B2FinalMockExamPage />}');
   });
