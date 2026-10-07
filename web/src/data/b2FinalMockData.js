@@ -614,6 +614,97 @@ export const B2_LISTENING = Object.freeze({
       },
     ],
   },
+  teil4: {
+    id: "teil-4",
+    title: "Hören · Teil 4",
+    audioObjectKey: "b2/mock-hoeren-1/teil-4.mp3",
+    audioNote:
+      "Die vollständige Audiodatei für Teil 4 wird hier als eine zusammenhängende Prüfungsaudio abgespielt.",
+    intro:
+      "Hören Sie den Vortrag und bearbeiten Sie die Aufgaben 23 bis 30. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+    questions: [
+      {
+        number: 23,
+        question: "Was ist laut dem Redner entscheidend für gute Leistung?",
+        options: [
+          { id: "a", label: "Möglichst lange zu arbeiten." },
+          { id: "b", label: "Die Zeit gut einzuteilen." },
+          { id: "c", label: "Mehr Pausen als Arbeit." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 24,
+        question: "Wann sollte man die wichtigsten Aufgaben erledigen?",
+        options: [
+          { id: "a", label: "Am Vormittag." },
+          { id: "b", label: "Am späten Abend." },
+          { id: "c", label: "Direkt nach dem Mittagessen." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 25,
+        question: "Wie oft sollte man seine E-Mails ansehen?",
+        options: [
+          { id: "a", label: "Alle paar Minuten." },
+          { id: "b", label: "Nur einmal pro Woche." },
+          { id: "c", label: "Dreimal am Tag." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 26,
+        question: "Wie sollte man die Pausen verbringen?",
+        options: [
+          { id: "a", label: "Am Handy." },
+          { id: "b", label: "Mit etwas Bewegung." },
+          { id: "c", label: "Im Gespräch mit Kollegen." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 27,
+        question: "Was sagt der Redner über Multitasking?",
+        options: [
+          { id: "a", label: "Es ist besonders effektiv." },
+          { id: "b", label: "Man macht dabei mehr Fehler." },
+          { id: "c", label: "Es spart Zeit bei Besprechungen." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 28,
+        question: "Warum ist ein aufgeräumter Schreibtisch hilfreich?",
+        options: [
+          { id: "a", label: "Er sieht besser aus." },
+          { id: "b", label: "Er ist wichtig für Kunden." },
+          { id: "c", label: "Man verliert weniger Zeit mit Suchen." },
+        ],
+        answer: "c",
+      },
+      {
+        number: 29,
+        question: "Was empfiehlt er am Ende des Arbeitstages?",
+        options: [
+          { id: "a", label: "Zehn Minuten für den nächsten Tag zu planen." },
+          { id: "b", label: "Alle E-Mails zu beantworten." },
+          { id: "c", label: "Den Schreibtisch zu putzen." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 30,
+        question: "Wie sollen Besprechungen sein?",
+        options: [
+          { id: "a", label: "Möglichst mit allen Kollegen." },
+          { id: "b", label: "Ohne feste Dauer." },
+          { id: "c", label: "Mit nötigen Personen und höchstens dreißig Minuten." },
+        ],
+        answer: "c",
+      },
+    ],
+  },
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";

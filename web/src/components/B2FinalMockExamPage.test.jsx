@@ -125,7 +125,9 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('? "hoeren-teil2"');
     expect(page).toContain("migratedFromHoeren2Completion");
     expect(page).toContain('? "hoeren-teil3"');
-    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren3Completed)");
+    expect(page).toContain("migratedFromHoeren3Completion");
+    expect(page).toContain('? "hoeren-teil4"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren4Completed)");
   });
 
   test("uses the supplied B2 Hören Teil 2 interview and answer key", () => {
@@ -145,6 +147,7 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("hoeren1AudioStatus: restoreAudioStatus(parsed.hoeren1AudioStatus)");
     expect(page).toContain("hoeren2AudioStatus: restoreAudioStatus(parsed.hoeren2AudioStatus)");
     expect(page).toContain("hoeren3AudioStatus: restoreAudioStatus(parsed.hoeren3AudioStatus)");
+    expect(page).toContain("hoeren4AudioStatus: restoreAudioStatus(parsed.hoeren4AudioStatus)");
   });
 
   test("continues Hören Teil 1 into Teil 2 and autosaves Teil 2 state", () => {
@@ -183,6 +186,26 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Aufgaben 17 bis 22 · Hören Teil 3");
     expect(page).toContain("Wer sagt das?");
     expect(page).toContain("Hören Teil 3 abschließen");
+  });
+
+  test("uses the supplied B2 Hören Teil 4 productivity talk and answer key", () => {
+    expect(B2_LISTENING.teil4.audioObjectKey).toBe("b2/mock-hoeren-1/teil-4.mp3");
+    expect(B2_LISTENING.teil4.questions.map((question) => question.number)).toEqual([
+      23, 24, 25, 26, 27, 28, 29, 30,
+    ]);
+    expect(B2_LISTENING.teil4.questions.map((question) => question.answer)).toEqual([
+      "b", "a", "c", "b", "b", "c", "a", "c",
+    ]);
+  });
+
+  test("continues Hören Teil 3 into Teil 4 and completes the listening module", () => {
+    expect(page).toContain('stage: "hoeren-teil4"');
+    expect(page).toContain("hoeren4Answers");
+    expect(page).toContain("hoeren4AudioStatus");
+    expect(page).toContain("Hören Teil 3 abschließen · weiter zu Teil 4");
+    expect(page).toContain("Aufgaben 23 bis 30 · Hören Teil 4");
+    expect(page).toContain("Hören abschließen");
+    expect(page).toContain("Lesen Teil 1–4 und Hören Teil 1–4 gespeichert");
   });
 
   test("publishes only a preview route while the B2 mock is still being built", () => {
