@@ -82,12 +82,6 @@ export const buildResultResubmitTarget = (item = {}) => {
   return appendSubmissionParams(workbookRoute, { level, assignmentKey });
 };
 
-const asPercent = (value) => {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return "—";
-  return `${Math.round(numeric)}%`;
-};
-
 const normalizeArray = (value) => {
   if (Array.isArray(value)) return value;
   if (typeof value === "string" && value.trim()) {
@@ -112,6 +106,83 @@ const normalizeObject = (value) => {
     }
   }
   return {};
+};
+
+const normalizeBreakdownLabel = (value = "") =>
+  String(value || "").trim().toLowerCase().replace(/[^a-zäöüß0-9]+/gi, " ").trim();
+
+const scoreBreakdownCategory = (label = "") => {
+  const normalized = normalizeBreakdownLabel(label);
+  if (/objective|mcq|reading|listening|lesen|hören|hoeren/.test(normalized)) return "objective";
+  if (/writing|schreiben/.test(normalized)) return "writing";
+  return normalized || "other";
+};
+
+const hasValue = (value) => value !== null && value !== undefined && value !== "";
+
+export const resolveResultScore = (item = {}) => {
+  const storedScore = toNumericScore(item.numericScore ?? item.score ?? item.finalScore);
+  const objectiveTotal = Number(item.objectiveTotal || 0);
+  const objectiveCorrect = Number(item.objectiveCorrect || 0);
+  const explicitBreakdown = normalizeArray(item.scoreBreakdown);
+  const hasWritingScore = hasValue(item.writingScore);
+  const hasNonObjectiveComponent = explicitBreakdown.some(
+    (row) => row?.label && scoreBreakdownCategory(row.label) !== "objective",
+  );
+
+  if (objectiveTotal > 0 && !hasWritingScore && !hasNonObjectiveComponent) {
+    const recordedObjectivePercent = toNumericScore(item.objectiveScore);
+    const calculatedObjectivePercent =
+      Number.isFinite(objectiveCorrect) && objectiveTotal > 0
+        ? Math.round((objectiveCorrect / objectiveTotal) * 100)
+        : null;
+    const objectivePercent =
+      recordedObjectivePercent !== null ? Math.round(recordedObjectivePercent) : calculatedObjectivePercent;
+    if (objectivePercent !== null && Number.isFinite(objectivePercent)) {
+      return Math.max(0, Math.min(100, objectivePercent));
+    }
+  }
+
+  return storedScore;
+};
+
+const isPlaceholderAssignmentTitle = (value = "") =>
+  !String(value || "").trim() ||
+  /^(true|false|feedback|result|null|undefined)$/i.test(String(value || "").trim());
+
+export const resolveResultAssignmentTitle = (entry = {}) => {
+  const rawTitle = String(entry.assignment || "").trim();
+  if (!isPlaceholderAssignmentTitle(rawTitle)) return rawTitle;
+
+  const level = String(entry.level || "").trim().toUpperCase();
+  const assignmentKey = String(
+    entry.assignmentKey || entry.assignmentId || entry.assignment_id || "",
+  ).trim().toUpperCase();
+
+  const curriculumEntry = CURRICULUM_ENTRIES.find((candidate) => {
+    if (level && String(candidate?.level || "").trim().toUpperCase() !== level) return false;
+    const ids = [
+      candidate?.canonicalAssignmentId,
+      candidate?.assignmentId,
+      candidate?.assignment_id,
+      candidate?.id,
+    ]
+      .map((value) => String(value || "").trim().toUpperCase())
+      .filter(Boolean);
+    return assignmentKey && ids.includes(assignmentKey);
+  });
+
+  if (curriculumEntry) {
+    const prefix = [
+      curriculumEntry.level,
+      Number.isFinite(Number(curriculumEntry.day)) ? `Day ${curriculumEntry.day}` : "",
+    ].filter(Boolean).join(" · ");
+    const chapter = curriculumEntry.chapter ? ` · Chapter ${curriculumEntry.chapter}` : "";
+    return `${prefix}: ${curriculumEntry.title || assignmentKey}${chapter}`;
+  }
+
+  if (assignmentKey) return [level, assignmentKey].filter(Boolean).join(" · ");
+  return "Result";
 };
 
 const splitSentences = (text = "") =>
@@ -145,40 +216,52 @@ const formatWritingScore = (item = {}) => {
   return `${percent}%`;
 };
 
-const getScoreBreakdownRows = (item = {}) => {
+export const getScoreBreakdownRows = (item = {}) => {
   const rows = [];
+  const seenCategories = new Set();
+  const addRow = (row) => {
+    if (!row?.label) return;
+    const category = scoreBreakdownCategory(row.label);
+    if (seenCategories.has(category)) return;
+    seenCategories.add(category);
+    rows.push(row);
+  };
+
   const objectiveTotal = Number(item.objectiveTotal || 0);
+  const objectiveCorrect = Number(item.objectiveCorrect || 0);
   if (objectiveTotal > 0) {
-    rows.push({
+    const objectivePercent =
+      toNumericScore(item.objectiveScore) ??
+      (Number.isFinite(objectiveCorrect) ? Math.round((objectiveCorrect / objectiveTotal) * 100) : null);
+    addRow({
       label: "Objective / MCQ",
-      score: `${item.objectiveCorrect || 0}/${objectiveTotal}`,
-      detail: `${asPercent(item.objectiveScore)} from reading/listening or multiple-choice answers`,
+      score: `${objectiveCorrect || 0}/${objectiveTotal}`,
+      detail: `${objectivePercent === null ? "—" : `${Math.round(objectivePercent)}%`} objective score`,
     });
   }
 
-  if (item.writingScore !== null && item.writingScore !== undefined && item.writingScore !== "") {
-    rows.push({
+  if (hasValue(item.writingScore)) {
+    addRow({
       label: "Writing",
       score: formatWritingScore(item),
       detail: "Task completion, grammar, vocabulary, structure, tone and clarity",
     });
   }
 
-  const explicitBreakdown = normalizeArray(item.scoreBreakdown);
-  explicitBreakdown.forEach((row) => {
-    if (!row?.label) return;
-    rows.push({
-      label: row.label,
-      score: row.score ?? row.value ?? "—",
-      detail: row.reason || row.detail || "",
+  normalizeArray(item.scoreBreakdown).forEach((row) => {
+    addRow({
+      label: row?.label,
+      score: row?.score ?? row?.value ?? "—",
+      detail: row?.reason || row?.detail || "",
     });
   });
 
   if (!rows.length) {
-    rows.push({
+    const score = resolveResultScore(item);
+    addRow({
       label: "Overall score",
-      score: `${item.numericScore ?? item.score ?? "—"}/100`,
-      detail: item.numericScore >= PASS_MARK ? "Passed this task" : "Needs improvement before this task is secure",
+      score: `${score ?? "—"}/100`,
+      detail: score >= PASS_MARK ? "Passed this task" : "Needs improvement before this task is secure",
     });
   }
 
@@ -261,20 +344,34 @@ const getCorrectionPoints = (item = {}) => {
   return useful.slice(0, 4);
 };
 
+const isGenericFeedbackText = (value = "") =>
+  /^(good|great|excellent|ok|okay|passed|true|false|well done)[.!]?$/i.test(
+    String(value || "").trim(),
+  );
+
 const getWhyThisScore = (item = {}) => {
-  if (item.markingReason) return String(item.markingReason).trim();
-  if (item.improvementSummary) return String(item.improvementSummary).trim();
-  const sentences = splitSentences(item.comments);
-  if (sentences.length <= 2) return item.comments || "Your tutor has marked this work. Review the feedback and improve the weak points.";
-  return sentences.slice(0, 2).join(" ");
+  const comments = String(item.comments || "").trim().toLowerCase();
+  const candidates = [item.markingReason, item.improvementSummary]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+
+  return (
+    candidates.find(
+      (value) => !isGenericFeedbackText(value) && value.toLowerCase() !== comments,
+    ) || ""
+  );
 };
 
-const getNextStep = (item = {}) => {
-  if (item.numericScore < PASS_MARK) {
-    return "Revise the correction points, practise the weak area, then submit an improved version.";
-  }
-  return "You passed this task. Still revise the feedback so the same mistakes do not appear in your next work.";
+const getDistinctFeedbackText = (item = {}) => {
+  const feedback = String(item.comments || "").trim();
+  if (!feedback || isGenericFeedbackText(feedback)) return "";
+  const why = getWhyThisScore(item);
+  if (why && feedback.toLowerCase() === why.toLowerCase()) return "";
+  return feedback;
 };
+
+const getNextStep = () =>
+  "Revise the correction points and questions to review, then submit an improved version.";
 
 export const hasStructuredResultFeedback = (item = {}) => {
   const objectiveDetails = normalizeObject(item.objectiveDetails);
@@ -319,7 +416,7 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
   );
 };
 
-const FeedbackDetailCard = ({ item, statusVariant }) => {
+const FeedbackDetailCard = ({ item }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const breakdownRows = getScoreBreakdownRows(item);
@@ -330,65 +427,56 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
   const passed = item.numericScore >= PASS_MARK;
   const objectiveTotal = Number(item.objectiveTotal || 0);
   const objectiveCorrect = Number(item.objectiveCorrect || 0);
-  const objectiveAllCorrect = objectiveTotal > 0 && objectiveCorrect === objectiveTotal && wrongObjectiveRows.length === 0;
   const objectiveNeedsReview = wrongObjectiveRows.length;
+  const whyThisScore = getWhyThisScore(item);
+  const distinctFeedback = getDistinctFeedbackText(item);
+  const shouldShowScoreBreakdown =
+    breakdownRows.length > 1 ||
+    (breakdownRows.length === 1 && scoreBreakdownCategory(breakdownRows[0].label) !== "objective");
+  const objectiveShownInBreakdown =
+    shouldShowScoreBreakdown &&
+    breakdownRows.some((row) => scoreBreakdownCategory(row.label) === "objective");
 
   return (
     <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-          gap: 10,
-        }}
-      >
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Your score</p>
-          <strong style={{ fontSize: 24, color: statusVariant === "fail" ? "#b91c1c" : "#065f46" }}>
-            {item.numericScore ?? item.score ?? "—"}/100
-          </strong>
-        </div>
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Status</p>
-          <strong>{passed ? "Passed" : "Needs improvement"}</strong>
-        </div>
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Date marked</p>
-          <strong>{item.createdLabel || "Not recorded"}</strong>
-        </div>
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Assignment ID</p>
-          <strong>{item.assignmentId || item.assignmentKey || "—"}</strong>
-        </div>
-      </div>
-
-      {hasStructuredFeedback ? (
-        <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
-          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Why you got this score</h4>
-          <p style={{ ...styles.resultText, margin: 0 }}>{getWhyThisScore(item)}</p>
+      {item.scoreWasReconciled ? (
+        <div style={{ border: "1px solid #fde68a", borderRadius: 12, background: "#fffbeb", padding: 12 }}>
+          <strong>Score corrected from the marked components</strong>
+          <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#78350f" }}>
+            The saved total ({item.storedNumericScore}/100) did not match the objective result. This page now uses {item.numericScore}/100 from {objectiveCorrect}/{objectiveTotal} correct.
+          </p>
         </div>
       ) : null}
 
-      <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, background: "#ffffff", overflow: "hidden" }}>
-        <div style={{ padding: 10, background: "#f8fafc", fontWeight: 800 }}>Score breakdown</div>
-        {breakdownRows.map((row, index) => (
-          <div
-            key={`${row.label}-${index}`}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(130px, 1fr) minmax(80px, auto) 2fr",
-              gap: 8,
-              padding: 10,
-              borderTop: "1px solid #e5e7eb",
-              fontSize: 13,
-            }}
-          >
-            <strong>{row.label}</strong>
-            <span>{row.score}</span>
-            <span style={{ color: "#4b5563" }}>{row.detail}</span>
-          </div>
-        ))}
-      </div>
+      {whyThisScore ? (
+        <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
+          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Why you got this score</h4>
+          <p style={{ ...styles.resultText, margin: 0 }}>{whyThisScore}</p>
+        </div>
+      ) : null}
+
+      {shouldShowScoreBreakdown ? (
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, background: "#ffffff", overflow: "hidden" }}>
+          <div style={{ padding: 10, background: "#f8fafc", fontWeight: 800 }}>Score breakdown</div>
+          {breakdownRows.map((row, index) => (
+            <div
+              key={`${row.label}-${index}`}
+              style={{
+                display: "grid",
+                gridTemplateColumns: "minmax(110px, 1fr) minmax(70px, auto) minmax(0, 1.6fr)",
+                gap: 8,
+                padding: 10,
+                borderTop: "1px solid #e5e7eb",
+                fontSize: 13,
+              }}
+            >
+              <strong>{row.label}</strong>
+              <span>{row.score}</span>
+              <span style={{ color: "#4b5563", overflowWrap: "anywhere" }}>{row.detail}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       {correctionPoints.length ? (
         <div style={{ border: "1px solid #fde68a", borderRadius: 12, background: "#fffbeb", padding: 12 }}>
@@ -405,8 +493,7 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
           <div style={{ fontWeight: 800 }}>Reading & Listening summary</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <strong>{objectiveCorrect}/{objectiveTotal} correct</strong>
-            <span style={{ color: "#475569" }}>·</span>
+            {!objectiveShownInBreakdown ? <strong>{objectiveCorrect}/{objectiveTotal} correct</strong> : null}
             <span style={{ color: objectiveNeedsReview ? "#b91c1c" : "#065f46", fontWeight: 700 }}>
               {objectiveNeedsReview
                 ? `${objectiveNeedsReview} question${objectiveNeedsReview === 1 ? "" : "s"} need review`
@@ -437,15 +524,6 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
               </a>
             </div>
           ) : null}
-        </div>
-      ) : null}
-
-      {objectiveAllCorrect ? (
-        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12 }}>
-          <h4 style={{ ...styles.resultHeading, margin: 0 }}>Objective questions</h4>
-          <p style={{ ...styles.resultText, margin: "6px 0 0" }}>
-            Excellent — all reading/listening or multiple-choice answers were correct.
-          </p>
         </div>
       ) : null}
 
@@ -496,28 +574,22 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
         </div>
       ) : null}
 
-      {hasStructuredFeedback ? (
-        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12, display: "grid", gap: 8 }}>
+      {!passed ? (
+        <div style={{ border: "1px solid #fde68a", borderRadius: 12, background: "#fffbeb", padding: 12, display: "grid", gap: 8 }}>
           <h4 style={{ ...styles.resultHeading, margin: 0 }}>Next step</h4>
           <p style={{ ...styles.resultText, margin: 0 }}>{getNextStep(item)}</p>
-          {!passed ? (
-            <button
-              type="button"
-              style={{ ...styles.primaryButton, width: "fit-content" }}
-              onClick={() => navigate(resubmitTarget)}
-            >
-              Improve and resubmit
-            </button>
-          ) : null}
+          <button
+            type="button"
+            style={{ ...styles.primaryButton, width: "fit-content" }}
+            onClick={() => navigate(resubmitTarget)}
+          >
+            Improve and resubmit
+          </button>
         </div>
-      ) : !passed ? (
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, width: "fit-content" }}
-          onClick={() => navigate(resubmitTarget)}
-        >
-          Improve and resubmit
-        </button>
+      ) : null}
+
+      {distinctFeedback ? (
+        <TextBlock title={t("resultHistory.feedbackTitle")} text={distinctFeedback} />
       ) : null}
     </div>
   );
@@ -570,14 +642,16 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     const list = (Array.isArray(activeResults) ? activeResults : []).map((entry, idx) => {
       const dateRaw = entry.date || entry.createdAt || entry.created_at || entry.dateIso || "";
       const createdMs = dateRaw ? Date.parse(dateRaw) : NaN;
-      const numericScore = toNumericScore(entry.score ?? entry.finalScore);
+      const storedNumericScore = toNumericScore(entry.score ?? entry.finalScore);
+      const numericScore = resolveResultScore({ ...entry, numericScore: storedNumericScore });
+      const assignment = resolveResultAssignmentTitle(entry);
       const key =
         entry.id ||
-        `${entry.studentcode || t("resultHistory.studentFallback")}-${entry.assignment || t("resultHistory.assignmentKeyFallback")}-${dateRaw || idx}`;
+        `${entry.studentcode || t("resultHistory.studentFallback")}-${assignment || t("resultHistory.assignmentKeyFallback")}-${dateRaw || idx}`;
 
       return {
         key,
-        assignment: entry.assignment || t("resultHistory.assignmentFallback"),
+        assignment,
         assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey || "",
         assignmentKey: entry.assignmentKey || entry.canonicalAssignmentKey || "",
         level: (entry.level || "").toUpperCase(),
@@ -585,6 +659,11 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         studentcode: entry.studentcode || entry.studentCode || "",
         score: entry.score ?? entry.finalScore,
         numericScore,
+        storedNumericScore,
+        scoreWasReconciled:
+          storedNumericScore !== null &&
+          numericScore !== null &&
+          Math.round(storedNumericScore) !== Math.round(numericScore),
         comments: entry.comments || entry.feedback || entry.aiFeedback || "",
         link: entry.link || "",
         dateRaw,
@@ -829,7 +908,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         {filtered.map((item) => {
           const isExpanded = expandedResultKeys.has(item.key);
           const detailsId = `result-details-${String(item.key).replace(/[^a-zA-Z0-9_-]+/g, "-")}`;
-          const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
+          const meta = [item.level, item.assignmentId || item.assignmentKey, item.createdLabel].filter(Boolean).join(" · ");
           const studentMeta = [item.name, item.studentcode].filter(Boolean).join(" · ");
           const statusVariant =
             item.passedOverall === true
@@ -863,9 +942,9 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 : t("resultHistory.bestScoreNeeded", { score: item.bestScore, mark: PASS_MARK })
               : null;
           const scoreDisplay =
-            typeof item.bestScore === "number"
-              ? item.bestScore
-              : item.score || item.numericScore || "–";
+            typeof item.numericScore === "number"
+              ? item.numericScore
+              : item.score || "–";
 
           return (
             <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
@@ -953,11 +1032,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 </div>
               ) : null}
 
-              <FeedbackDetailCard item={item} statusVariant={statusVariant} />
-
-              <div style={{ marginTop: 12 }}>
-                <TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />
-              </div>
+              <FeedbackDetailCard item={item} />
                 </div>
               ) : null}
             </article>
