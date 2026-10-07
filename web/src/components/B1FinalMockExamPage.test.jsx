@@ -63,6 +63,12 @@ describe("B1 Final Mock Exam", () => {
     expect(source).toContain("forceNew && exam.completed && exam.attemptInfo?.attemptId");
   });
 
+  test("lets React StrictMode replay own the completion sync", () => {
+    expect(source).toContain('if (completionSavedRef.current === completionKey) {');
+    expect(source).toContain('completionSavedRef.current = "";');
+    expect(source).toContain("cancelled = true");
+  });
+
   test("keeps supplied reading answers aligned", () => {
     expect(B1_READING.teil1.questions.map((q) => q.answer)).toEqual([
       "richtig","richtig","falsch","falsch","richtig","falsch",

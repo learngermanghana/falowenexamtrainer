@@ -304,6 +304,9 @@ export default function B1FinalMockExamPage() {
 
     return () => {
       cancelled = true;
+      if (completionSavedRef.current === completionKey) {
+        completionSavedRef.current = "";
+      }
     };
   }, [
     completionRetryNonce,
