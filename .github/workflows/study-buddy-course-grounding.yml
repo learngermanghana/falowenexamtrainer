@@ -1,8 +1,25 @@
 name: Study Buddy course grounding
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/AssessmentSupport*"
+      - "web/src/hooks/useAssessmentRestriction.js"
+      - "web/src/utils/assessmentRestrictions.js"
+      - "web/src/components/SharedTimedAssignment.jsx"
+      - "web/src/components/*FinalMockExamPage.jsx"
+      - "web/src/services/studyBuddy*"
+      - "web/src/App.js"
+      - ".github/workflows/study-buddy-course-grounding.yml"
   pull_request:
     paths:
+      - "web/src/components/AssessmentSupport*"
+      - "web/src/hooks/useAssessmentRestriction.js"
+      - "web/src/utils/assessmentRestrictions.js"
+      - "web/src/components/SharedTimedAssignment.jsx"
+      - "web/src/components/*FinalMockExamPage.jsx"
+      - "web/src/App.js"
       - "web/src/services/studyBuddyLessonContext.js"
       - "web/src/services/studyBuddyLessonContext.test.js"
       - "web/src/services/studyBuddyService.js"
@@ -36,4 +53,4 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyLessonContext.test.js src/services/studyBuddyService.test.js src/components/StudyBuddyChatInterface.test.js
+        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyLessonContext.test.js src/services/studyBuddyService.test.js src/components/StudyBuddyChatInterface.test.js src/components/AssessmentSupport.test.jsx src/utils/timedAssignmentAccess.test.js src/utils/timedAssignmentClock.test.js

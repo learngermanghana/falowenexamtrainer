@@ -1,3 +1,4 @@
+import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
@@ -303,6 +304,7 @@ const WordCount = ({ text, min, max }) => {
 };
 
 export default function A2FinalMockExamPage() {
+  useAssessmentRestriction();
   const { idToken, user } = useAuth();
   const storageKey = `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey));

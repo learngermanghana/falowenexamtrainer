@@ -1,3 +1,4 @@
+import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { auth, db, doc, onSnapshot, serverTimestamp, setDoc } from "../firebase";
 import { useAuth } from "../context/AuthContext";
@@ -164,6 +165,7 @@ export default function SharedTimedAssignment({
     attemptState,
     progress: assignmentProgress,
   });
+  useAssessmentRestriction(enabled && !reviewUnlocked);
   const resultStatus = String(assignmentProgress?.status || "").trim().toLowerCase();
   const expiryHandledRef = useRef(false);
   const expiryCallbackRef = useRef(onTimeExpired);
@@ -597,7 +599,7 @@ export function TimedAssignmentPanel() {
               disabled={checking || cloudError || startBusy}
               onChange={(event) => setAgreed(event.target.checked)}
             />
-            I understand that I have {config.durationMinutes} minutes and Falowen will submit my latest saved answers automatically at 00:00.
+            I agree to work independently without StudyBuddy, translators, dictionaries or outside help. I understand that I have {config.durationMinutes} minutes and Falowen will submit my latest saved answers automatically at 00:00.
           </label>
           <button
             type="button"

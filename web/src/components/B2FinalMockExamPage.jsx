@@ -1,3 +1,4 @@
+import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { B2_FINAL_MOCK_STORAGE_KEY, B2_READING } from "../data/b2FinalMockData";
@@ -405,6 +406,7 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
 };
 
 export default function B2FinalMockExamPage() {
+  useAssessmentRestriction();
   const [state, setState] = useState(readState);
   const [now, setNow] = useState(Date.now());
 

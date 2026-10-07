@@ -1,3 +1,5 @@
+import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
+import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -585,6 +587,7 @@ const AppShell = ({
   const { i18n, t } = useTranslation();
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
   const isOnboarding = location.pathname === "/onboarding";
+  const mockAssessment = isMockAssessmentRoute(location.pathname);
   const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
   const requiresOnboarding =
     !["admin", "tutor"].includes(onboardingRole) &&
@@ -746,6 +749,7 @@ const AppShell = ({
       <main className="layout-main" style={{ minWidth: 0 }}>
         {!isOnboarding ? <AutoWorkbookStartGuide /> : null}
         {!isOnboarding ? <BookPdfDownloadInjector /> : null}
+        <AssessmentRulesNotice restricted={mockAssessment} />
         <Routes>
           <Route
             path="/onboarding"
@@ -1186,7 +1190,7 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      {!isOnboarding ? <StudyBuddyBar studentProfile={studentProfile} /> : null}
+      {!isOnboarding ? <AssessmentStudySupport restricted={mockAssessment}><StudyBuddyBar studentProfile={studentProfile} /></AssessmentStudySupport> : null}
     </div>
   );
 };

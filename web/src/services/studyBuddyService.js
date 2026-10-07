@@ -1,3 +1,4 @@
+import { isAssessmentRestricted, isMockAssessmentRoute } from "../utils/assessmentRestrictions";
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 import { getStudyBuddyLessonContext } from "./studyBuddyLessonContext";
@@ -207,6 +208,9 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
 };
 
 export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) => {
+  if (isAssessmentRestricted() || (typeof window !== "undefined" && isMockAssessmentRoute(window.location.pathname))) {
+    throw new Error("StudyBuddy is unavailable during timed assignments and mock exams. Complete the assessment independently.");
+  }
   const conversationHistory = readStudyBuddyConversationHistory({ idToken, level });
   const structuredLessonContext = lessonContext && typeof lessonContext === "object" && Object.keys(lessonContext).length
     ? lessonContext

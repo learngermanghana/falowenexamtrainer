@@ -1,3 +1,4 @@
+import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
@@ -205,6 +206,7 @@ const ReadingPart = ({ children, title, time }) => (
 );
 
 export default function B1FinalMockExamPage() {
+  useAssessmentRestriction();
   const { idToken, user } = useAuth();
   const storageKey = `${B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey));

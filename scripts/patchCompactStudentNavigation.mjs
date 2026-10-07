@@ -267,14 +267,17 @@ if (!app.includes('<CampusPrimaryNavigation allowedSections={allowedSections} />
 }
 
 if (!app.includes("<CampusMobileBottomNav allowedSections={allowedSections} />")) {
+  const studyBuddyMount = app.includes("<AssessmentStudySupport restricted={mockAssessment}>")
+    ? '{!isOnboarding ? <AssessmentStudySupport restricted={mockAssessment}><StudyBuddyBar studentProfile={studentProfile} /></AssessmentStudySupport> : null}'
+    : '{!isOnboarding ? <StudyBuddyBar studentProfile={studentProfile} /> : null}';
   app = replaceOnce(
     app,
-    `      </main>\n      {!isOnboarding ? <StudyBuddyBar studentProfile={studentProfile} /> : null}`,
+    `      </main>\n      ${studyBuddyMount}`,
     `      </main>
       {!isOnboarding && location.pathname.startsWith("/campus") ? (
         <CampusMobileBottomNav allowedSections={allowedSections} />
       ) : null}
-      {!isOnboarding ? <StudyBuddyBar studentProfile={studentProfile} /> : null}`,
+      ${studyBuddyMount}`,
     "mobile bottom navigation mount",
   );
 }

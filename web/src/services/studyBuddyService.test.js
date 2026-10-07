@@ -1,3 +1,4 @@
+import { registerAssessmentRestriction } from "../utils/assessmentRestrictions";
 import { callAI } from "./aiClient";
 import {
   clearStudyBuddyConversationHistory,
@@ -132,4 +133,22 @@ describe("Study Buddy conversation memory", () => {
 
     expect(readStudyBuddyConversationHistory({ idToken: "", level: "C1" })).toEqual([]);
   });
+});
+
+it("does not request AI help while an assessment is mounted", async () => {
+  callAI.mockClear();
+  const release = registerAssessmentRestriction();
+  try {
+    await expect(requestStudyBuddyReply({ message: "Give me the answer", level: "A1" })).rejects.toThrow("StudyBuddy is unavailable");
+    expect(callAI).not.toHaveBeenCalled();
+  } finally { release(); }
+});
+
+it("blocks a direct StudyBuddy request on a mock route", async () => {
+  callAI.mockClear();
+  window.history.replaceState({}, "", "/campus/course/a1-final-mock-exam");
+  try {
+    await expect(requestStudyBuddyReply({ message: "Translate this", level: "A1" })).rejects.toThrow("StudyBuddy is unavailable");
+    expect(callAI).not.toHaveBeenCalled();
+  } finally { window.history.replaceState({}, "", "/"); }
 });
