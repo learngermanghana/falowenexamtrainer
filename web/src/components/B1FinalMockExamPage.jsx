@@ -214,6 +214,9 @@ export default function B1FinalMockExamPage() {
   const saveTimerRef = useRef(null);
   const timeoutHandledRef = useRef("");
   const completionSavedRef = useRef("");
+  const completionRetryCountRef = useRef(0);
+  const completionRetryTimerRef = useRef(null);
+  const [completionRetryNonce, setCompletionRetryNonce] = useState(0);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -222,9 +225,14 @@ export default function B1FinalMockExamPage() {
 
   useEffect(() => {
     const persisted = { ...exam, clientSavedAtMs: Date.now() };
-    window.localStorage.setItem(storageKey, JSON.stringify(persisted));
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(storageKey, JSON.stringify(persisted));
+    }
+
     if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
+
     saveTimerRef.current = window.setTimeout(() => {
       saveB1MockAttempt({
         idToken,
@@ -234,31 +242,87 @@ export default function B1FinalMockExamPage() {
         sectionScores: exam.sectionScores,
         status: "in_progress",
         overall: exam.overall,
-      }).catch((saveError) => console.error("Could not autosave B1 mock", saveError));
+      }).catch((saveError) => {
+        console.error("Could not autosave B1 mock", saveError);
+      });
     }, 900);
+
     return () => {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
     };
   }, [exam, idToken, storageKey]);
 
   useEffect(() => {
-    if (!exam.completed || !exam.attemptInfo?.attemptId || !idToken) return;
-    const completionKey = `${exam.attemptInfo.attemptId}:${exam.overall?.score}`;
-    if (completionSavedRef.current === completionKey) return;
+    const attemptId = exam.attemptInfo?.attemptId;
+    if (!exam.completed || !attemptId || !idToken) return undefined;
+
+    const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
+    if (completionSavedRef.current === completionKey) return undefined;
     completionSavedRef.current = completionKey;
+
+    let cancelled = false;
+
     saveB1MockAttempt({
       idToken,
-      attemptId: exam.attemptInfo.attemptId,
+      attemptId,
       section: "result",
       state: exam,
       sectionScores: exam.sectionScores,
       status: "completed",
       overall: exam.overall,
-    }).catch((saveError) => {
-      completionSavedRef.current = "";
-      console.error("Could not finalize B1 mock", saveError);
-    });
-  }, [exam, idToken]);
+    })
+      .then((response) => {
+        if (cancelled) return;
+        if (response?.completionSync && response.completionSync.ok === false) {
+          throw new Error(response.completionSync.error || "Could not sync final B1 mock result.");
+        }
+
+        completionRetryCountRef.current = 0;
+        if (completionRetryTimerRef.current) {
+          window.clearTimeout(completionRetryTimerRef.current);
+          completionRetryTimerRef.current = null;
+        }
+      })
+      .catch((saveError) => {
+        if (cancelled) return;
+        console.error("Could not finalize B1 mock result sync", saveError);
+        completionSavedRef.current = "";
+
+        const retryIndex = Math.min(completionRetryCountRef.current, 3);
+        const retryDelay = [3000, 10000, 30000, 60000][retryIndex];
+        completionRetryCountRef.current += 1;
+
+        if (completionRetryTimerRef.current) {
+          window.clearTimeout(completionRetryTimerRef.current);
+        }
+
+        completionRetryTimerRef.current = window.setTimeout(() => {
+          completionRetryTimerRef.current = null;
+          setCompletionRetryNonce((value) => value + 1);
+        }, retryDelay);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    completionRetryNonce,
+    exam,
+    exam.attemptInfo?.attemptId,
+    exam.completed,
+    exam.overall,
+    exam.sectionScores,
+    idToken,
+  ]);
+
+  useEffect(
+    () => () => {
+      if (completionRetryTimerRef.current) {
+        window.clearTimeout(completionRetryTimerRef.current);
+      }
+    },
+    [],
+  );
 
   const secondsLeft = useMemo(() => {
     if (!exam.sectionDeadlineMs || !SECTION_DURATIONS[exam.stage]) return 0;
@@ -281,30 +345,54 @@ export default function B1FinalMockExamPage() {
     setBusy("start");
     setError("");
     try {
-      if (forceNew) window.localStorage.removeItem(storageKey);
-      const response = await startB1MockAttempt({ idToken, mockId: B1_FINAL_MOCK_ID });
-      if (response?.resumed && response?.state && !forceNew) {
-        setExam({
-          ...emptyState(),
-          ...response.state,
-          attemptInfo: {
-            attemptId: response.attemptId,
-            attemptNumber: response.attemptNumber,
-            firstAttempt: response.firstAttempt,
-          },
-        });
-      } else {
-        setExam({
-          ...emptyState(),
-          stage: "lesen",
-          sectionDeadlineMs: Date.now() + SECTION_DURATIONS.lesen * 1000,
-          attemptInfo: {
-            attemptId: response.attemptId,
-            attemptNumber: response.attemptNumber,
-            firstAttempt: response.firstAttempt,
-          },
+      if (forceNew && exam.completed && exam.attemptInfo?.attemptId) {
+        await saveB1MockAttempt({
+          idToken,
+          attemptId: exam.attemptInfo.attemptId,
+          section: "result",
+          state: exam,
+          sectionScores: exam.sectionScores,
+          status: "completed",
+          overall: exam.overall,
         });
       }
+
+      if (forceNew && typeof window !== "undefined") {
+        window.localStorage.removeItem(storageKey);
+      }
+
+      const response = await startB1MockAttempt({ idToken, mockId: B1_FINAL_MOCK_ID });
+      if (response?.resumed && response?.state && !forceNew) {
+        const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
+        const localSavedAt = Number(exam.clientSavedAtMs || 0);
+        const serverSavedAt = Number(response.state?.clientSavedAtMs || 0);
+        const newestState =
+          sameLocalAttempt && localSavedAt > serverSavedAt
+            ? exam
+            : response.state;
+
+        setExam({
+          ...emptyState(),
+          ...newestState,
+          attemptInfo: {
+            attemptId: response.attemptId,
+            attemptNumber: response.attemptNumber,
+            firstAttempt: response.firstAttempt,
+          },
+        });
+        return;
+      }
+
+      setExam({
+        ...emptyState(),
+        stage: "lesen",
+        sectionDeadlineMs: Date.now() + SECTION_DURATIONS.lesen * 1000,
+        attemptInfo: {
+          attemptId: response.attemptId,
+          attemptNumber: response.attemptNumber,
+          firstAttempt: response.firstAttempt,
+        },
+      });
     } catch (startError) {
       setError(startError?.response?.data?.error || startError?.message || "Could not start the B1 mock.");
     } finally {
