@@ -82,12 +82,6 @@ export const buildResultResubmitTarget = (item = {}) => {
   return appendSubmissionParams(workbookRoute, { level, assignmentKey });
 };
 
-const asPercent = (value) => {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return "—";
-  return `${Math.round(numeric)}%`;
-};
-
 const normalizeArray = (value) => {
   if (Array.isArray(value)) return value;
   if (typeof value === "string" && value.trim()) {
@@ -422,7 +416,7 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
   );
 };
 
-const FeedbackDetailCard = ({ item, statusVariant }) => {
+const FeedbackDetailCard = ({ item }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const breakdownRows = getScoreBreakdownRows(item);
@@ -596,7 +590,6 @@ const FeedbackDetailCard = ({ item, statusVariant }) => {
 
       {distinctFeedback ? (
         <TextBlock title={t("resultHistory.feedbackTitle")} text={distinctFeedback} />
-      ) : null}
       ) : null}
     </div>
   );
@@ -1039,7 +1032,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 </div>
               ) : null}
 
-              <FeedbackDetailCard item={item} statusVariant={statusVariant} />
+              <FeedbackDetailCard item={item} />
                 </div>
               ) : null}
             </article>
