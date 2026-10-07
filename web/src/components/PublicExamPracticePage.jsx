@@ -28,35 +28,72 @@ export default function PublicExamPracticePage({ level = "" }) {
   useEffect(() => {
     const metadataByLevel = {
       A1: {
-        title: "Free A1 German Reading Practice | Falowen",
+        title: "Free Goethe A1 Exam Practice – Lesen | Falowen",
         description:
-          "Practise selected A1 German exam-style reading tasks for free with Falowen. No login required and get an instant score.",
+          "Practise free Goethe-style A1 exam Lesen tasks with Falowen. No login required. Work through realistic reading questions and get an instant score.",
         canonicalPath: "/exam-practice/a1",
       },
       A2: {
-        title: "Free A2 German Reading Practice | Falowen",
+        title: "Free Goethe A2 Exam Practice – Lesen | Falowen",
         description:
-          "Practise a 20-question A2 German exam-style reading set for free with Falowen. No login required and get an instant score.",
+          "Practise free Goethe-style A2 exam Lesen tasks with Falowen. Complete 20 reading questions across four parts and get an instant score.",
         canonicalPath: "/exam-practice/a2",
       },
       B1: {
-        title: "B1 German Exam Practice Coming Soon | Falowen",
+        title: "Goethe B1 Exam Practice Coming Soon | Falowen",
         description:
-          "Falowen public B1 German exam practice is coming soon. B1 students can continue using the full Exam Room after signing in.",
+          "Falowen public Goethe-style B1 exam practice is coming soon. B1 students can continue using the full Exam Room after signing in.",
         canonicalPath: "/exam-practice/b1",
       },
     };
 
     const metadata = metadataByLevel[level] || {
-      title: "Free German Exam Practice A1 & A2 | Falowen",
+      title: "Free Goethe Exam Practice A1 & A2 | Falowen",
       description:
-        "Practise selected A1 and A2 German exam-style reading tasks for free with Falowen. No login required for public practice.",
+        "Practise free Goethe-style German exam tasks by level with Falowen. Public A1 and A2 Lesen practice is available without login, with more levels planned.",
       canonicalPath: "/exam-practice",
     };
+
+    const provider = {
+      "@type": "EducationalOrganization",
+      name: "Falowen",
+      url: "https://www.falowen.app/",
+    };
+    const structuredData =
+      level === "A1" || level === "A2"
+        ? {
+            id: "public-goethe-practice",
+            schema: {
+              "@context": "https://schema.org",
+              "@type": "LearningResource",
+              name: `Free Goethe ${level} exam practice – Lesen`,
+              url: `https://www.falowen.app${metadata.canonicalPath}`,
+              description: metadata.description,
+              educationalLevel: level,
+              learningResourceType: "Practice test",
+              isAccessibleForFree: true,
+              inLanguage: ["de", "en"],
+              teaches: `German ${level} exam reading practice`,
+              provider,
+            },
+          }
+        : {
+            id: "public-goethe-practice",
+            schema: {
+              "@context": "https://schema.org",
+              "@type": level === "B1" ? "WebPage" : "CollectionPage",
+              name: metadata.title,
+              url: `https://www.falowen.app${metadata.canonicalPath}`,
+              description: metadata.description,
+              isAccessibleForFree: true,
+              provider,
+            },
+          };
 
     updatePageMeta({
       ...metadata,
       lang: "en",
+      structuredData,
     });
   }, [level]);
 
@@ -72,7 +109,7 @@ export default function PublicExamPracticePage({ level = "" }) {
               Falowen Exam Practice
             </p>
             <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.2rem)", lineHeight: 1.05 }}>
-              B1 public practice is coming soon
+              Goethe B1 public exam practice is coming soon
             </h1>
             <p style={{ margin: 0, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
               We have not published a complete public-ready B1 mock yet. B1 students can continue practising inside the full Falowen Exam Room.
@@ -97,10 +134,10 @@ export default function PublicExamPracticePage({ level = "" }) {
             Falowen Exam Practice
           </p>
           <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.5rem)", lineHeight: 1.02 }}>
-            Practise German exam tasks for free
+            Free Goethe A1 & A2 exam practice
           </h1>
           <p style={{ margin: 0, maxWidth: 760, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
-            Try selected A1 and A2 exam-style reading practice without signing in. Get an instant score, then continue in the full Falowen Exam Room when you are ready.
+            Practise Goethe-style German exam tasks by level without signing in. Start with A1 or A2 Lesen, get an instant score, then use the full Falowen Exam Room when you need complete mocks, Schreiben, Sprechen and saved progress.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
             <a href="/exam-practice/a1" style={actionStyle}>Start A1 free practice</a>
@@ -114,7 +151,7 @@ export default function PublicExamPracticePage({ level = "" }) {
         <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
           <article style={cardStyle}>
             <span style={{ fontWeight: 800, color: "#2563eb" }}>A1</span>
-            <h2 style={{ margin: "8px 0" }}>Lesen · Teil 1</h2>
+            <h2 style={{ margin: "8px 0" }}>Goethe A1 Lesen · Teil 1</h2>
             <p style={{ color: "#475569", lineHeight: 1.55 }}>
               Five realistic reading questions with instant scoring. No account required.
             </p>
@@ -123,7 +160,7 @@ export default function PublicExamPracticePage({ level = "" }) {
 
           <article style={cardStyle}>
             <span style={{ fontWeight: 800, color: "#2563eb" }}>A2</span>
-            <h2 style={{ margin: "8px 0" }}>Complete Lesen practice</h2>
+            <h2 style={{ margin: "8px 0" }}>Goethe A2 Lesen · 4 parts</h2>
             <p style={{ color: "#475569", lineHeight: 1.55 }}>
               Twenty questions across four reading parts with an instant final score.
             </p>

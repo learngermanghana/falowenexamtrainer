@@ -12,6 +12,9 @@ describe("public SEO architecture", () => {
   const indexHtml = fs.readFileSync(path.resolve(root, "../index.html"), "utf8");
   const sitemap = fs.readFileSync(path.resolve(root, "../public/sitemap.xml"), "utf8");
   const robots = fs.readFileSync(path.resolve(root, "../public/robots.txt"), "utf8");
+  const llms = fs.readFileSync(path.resolve(root, "../public/llms.txt"), "utf8");
+  const help = fs.readFileSync(path.resolve(root, "../public/falowen-help.md"), "utf8");
+  const studyBuddy = read("services/studyBuddyService.js");
   const vercel = fs.readFileSync(path.resolve(root, "../../vercel.json"), "utf8");
 
   test("publishes A1-C2 course and exam landing routes before authentication", () => {
@@ -51,5 +54,17 @@ describe("public SEO architecture", () => {
     expect(home).toContain("/goethe-");
     expect(marketPage).toContain("/learn-german-");
     expect(marketPage).toContain("/goethe-");
+  });
+
+  test("publishes and explains level-specific free Goethe exam practice", () => {
+    expect(sitemap).toContain("/exam-practice");
+    expect(sitemap).toContain("/exam-practice/a1");
+    expect(sitemap).toContain("/exam-practice/a2");
+    expect(home).toContain("Free Goethe exam practice");
+    expect(levelPage).toContain("Try free Goethe");
+    expect(llms).toContain("Free Goethe-style Exam Practice");
+    expect(help).toContain("Public Goethe-style Exam Practice");
+    expect(studyBuddy).toContain("free/public/no-account Goethe exam practice");
+    expect(studyBuddy).toContain("/goethe-c1-preparation");
   });
 });

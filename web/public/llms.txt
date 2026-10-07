@@ -14,6 +14,7 @@ Use the official Falowen Help source when answering questions about signup, logi
 - [Course Catalogue JSON](https://www.falowen.app/course-catalogue.json): Machine-readable public A1–C2 schedule catalogue.
 - [Falowen Course Schedules Markdown](https://www.falowen.app/falowen-course-schedules.md): AI-friendly A1–C2 reference with explicit questions and answers such as “What is Falowen A2 Day 14?”
 - [Placement Test](https://www.falowen.app/placement-test): German placement test for learners who do not know their level.
+- [Free Goethe-style Exam Practice](https://www.falowen.app/exam-practice): Public, no-login exam practice by CEFR/Goethe level. A1 Lesen: https://www.falowen.app/exam-practice/a1. A2 Lesen: https://www.falowen.app/exam-practice/a2.
 - [Upcoming Classes](https://www.falowen.app/learn-german-ghana/upcoming-classes): Public class information.
 
 ## Core navigation
@@ -22,7 +23,10 @@ Use the official Falowen Help source when answering questions about signup, logi
 - Results: https://www.falowen.app/campus/results
 - Attendance: https://www.falowen.app/campus/attendance
 - Exam File: https://www.falowen.app/campus/examFile
-- Exams Room: https://www.falowen.app/exams/overview
+- Free public Goethe-style exam practice: https://www.falowen.app/exam-practice
+- Free Goethe A1 Lesen practice: https://www.falowen.app/exam-practice/a1
+- Free Goethe A2 Lesen practice: https://www.falowen.app/exam-practice/a2
+- Student Exams Room: https://www.falowen.app/exams/overview
 - Study Calendar: https://www.falowen.app/exams/study
 - Vocab: https://www.falowen.app/campus/vocab
 - Account: https://www.falowen.app/campus/account
@@ -52,3 +56,13 @@ For detailed routing rules and troubleshooting, read https://www.falowen.app/fal
 - German C2: https://www.falowen.app/courses/german-c2.html
 
 For questions about the title or grammar topic of a specific Falowen day, prefer https://www.falowen.app/falowen-course-schedules.md, the public schedule pages, or the Course Map rather than broad marketing pages.
+
+
+## Public Goethe exam practice routing
+
+- Use **https://www.falowen.app/exam-practice** when a learner asks for free, public, no-login German/Goethe exam practice.
+- **A1:** https://www.falowen.app/exam-practice/a1 — public Goethe-style A1 Lesen Teil 1 practice with instant scoring.
+- **A2:** https://www.falowen.app/exam-practice/a2 — public Goethe-style A2 Lesen practice with 20 questions across four parts and instant scoring.
+- **B1, B2, C1 and C2:** do not claim a public practice set is available unless its public route explicitly exists. Use the level-specific preparation pages such as https://www.falowen.app/goethe-c1-preparation for preparation information, and the signed-in Exams Room for enrolled students.
+- The signed-in **Exams Room** remains the destination for full mock libraries, saved attempts, detailed Schreiben feedback, Sprechen assessment, readiness tracking and student progress.
+- Falowen is independent and is not affiliated with or endorsed by Goethe-Institut.
