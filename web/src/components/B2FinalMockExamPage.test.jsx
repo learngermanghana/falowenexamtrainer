@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
+import { B2_LISTENING, B2_READING, B2_SPEAKING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 
 describe("B2 Final Mock Lesen", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "./B2FinalMockExamPage.jsx"), "utf8");
@@ -129,7 +129,9 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('? "hoeren-teil4"');
     expect(page).toContain("migratedFromHoeren4Completion");
     expect(page).toContain('? "schreiben"');
-    expect(page).toContain("completed: Boolean(parsed.completed && parsed.schreibenCompleted)");
+    expect(page).toContain("migratedFromSchreibenCompletion");
+    expect(page).toContain('? "sprechen"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.sprechenCompleted)");
   });
 
   test("uses the supplied B2 Hören Teil 2 interview and answer key", () => {
@@ -207,7 +209,7 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Hören Teil 3 abschließen · weiter zu Teil 4");
     expect(page).toContain("Aufgaben 23 bis 30 · Hören Teil 4");
     expect(page).toContain("Hören abschließen");
-    expect(page).toContain("Lesen Teil 1–4 und Hören Teil 1–4 gespeichert");
+    expect(page).toContain("Hören abschließen · weiter zu Schreiben");
   });
 
   test("uses the supplied B2 Schreiben tasks and word targets", () => {
@@ -236,10 +238,33 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Hilfsmittel wie Wörterbücher oder Mobiltelefone sind nicht erlaubt.");
     expect(page).toContain("wordCount(value)");
     expect(page).toContain("Automatisch gespeichert");
-    expect(page).toContain("Schreiben abschließen");
+    expect(page).toContain("Schreiben abschließen · weiter zu Sprechen");
   });
 
-  test("publishes only a preview route while the B2 mock is still being built", () => {
+  test("uses the supplied B2 Sprechen presentation choices and discussion topic", () => {
+    expect(B2_SPEAKING.teil1.themes.map((theme) => theme.title)).toEqual([
+      "Konsumverhalten – Kaufen wir zu viele unnötige Dinge?",
+      "Weiterbildung im Beruf – Pflicht oder Eigenverantwortung?",
+    ]);
+    expect(B2_SPEAKING.teil1.prepSeconds).toBe(15 * 60);
+    expect(B2_SPEAKING.teil2.topic).toBe(
+      "Soll der öffentliche Personennahverkehr (ÖPNV) für alle Bürger komplett kostenlos sein?",
+    );
+    expect(B2_SPEAKING.teil2.points).toHaveLength(3);
+  });
+
+  test("marks Schreiben and Sprechen and builds a 100-point final result", () => {
+    expect(page).toContain("scoreB2MockWriting");
+    expect(page).toContain("B2FinalMockSpeaking");
+    expect(page).toContain("sprechen: 30 * 60");
+    expect(page).toContain("const buildFinalScore = (state) =>");
+    expect(page).toContain("const overall = Number((lesen + hoeren + schreiben + sprechen).toFixed(1))");
+    expect(page).toContain("passed: overall >= 60");
+    expect(page).toContain("Pass mark for this Falowen B2 mock: 60/100.");
+  });
+
+  test("publishes both the Course Book preview alias and ready final route", () => {
     expect(app).toContain('path="/campus/course/b2-mock-practice-preview" element={<B2FinalMockExamPage />}');
+    expect(app).toContain('path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />}');
   });
 });
