@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -91,6 +91,11 @@ const {
   persistVerifiedA2MockSection,
   syncA2MockCompletion,
 } = require("./a2MockCompletionSync");
+const {
+  buildVerifiedB1MockScore,
+  persistVerifiedB1MockSection,
+  syncB1MockCompletion,
+} = require("./b1MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -987,6 +992,59 @@ app.get("/course-media/b1/audio-url", async (req, res) => {
     }
     console.error("Failed to create B1 audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this B1 audio right now." });
+  }
+});
+
+app.get("/course-media/b1/mock-audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.query?.mockId || "").trim();
+    const part = String(req.query?.part || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateB1MockAudioKey({ mockId, part, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid B1 mock audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getB1MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.b1_mock.access_denied", {
+        reason: accessBlockReason,
+        mockId: validated.mockId,
+        part: validated.part,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "B1 mock audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createB1MockAudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+      mockId: signed.mockId,
+      part: signed.part,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("B1 mock R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "B1 mock audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_B1_MOCK_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid B1 mock audio request" });
+    }
+    console.error("Failed to create B1 mock audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this B1 mock audio right now." });
   }
 });
 
