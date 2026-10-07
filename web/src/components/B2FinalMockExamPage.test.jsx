@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { B2_READING } from "../data/b2FinalMockData";
+import { B2_LISTENING, B2_READING } from "../data/b2FinalMockData";
 
 describe("B2 Final Mock Lesen", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "./B2FinalMockExamPage.jsx"), "utf8");
@@ -96,6 +96,32 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("migratedFromTeil3Completion");
     expect(page).toContain('stage = migratedFromTeil3Completion ? "teil4"');
     expect(page).toContain("completed: Boolean(parsed.completed && parsed.teil4Completed)");
+  });
+
+  test("uses the supplied B2 Hören Teil 1 audio and answer key", () => {
+    expect(B2_LISTENING.teil1.audioObjectKey).toBe("b2/mock-hoeren-1/teil-1.mp3");
+    expect(B2_LISTENING.teil1.example.map((question) => question.answer)).toEqual(["b", "b"]);
+    expect(
+      B2_LISTENING.teil1.texts.flatMap((textBlock) =>
+        textBlock.questions.map((question) => question.answer),
+      ),
+    ).toEqual(["b", "c", "b", "a", "b", "a", "b", "c", "b", "b"]);
+  });
+
+  test("adds Hören Teil 1 after Lesen Teil 4 with protected one-file playback and autosave", () => {
+    expect(page).toContain('stage: "hoeren-teil1"');
+    expect(page).toContain("fetchB2MockAudioPlaybackUrl");
+    expect(page).toContain("B2MockAudioPlayer");
+    expect(page).toContain("Einleitung, Beispiel, Lesepause und Text 1 bis Text 5");
+    expect(page).toContain("hoeren1Answers");
+    expect(page).toContain("hoeren1AudioStatus");
+    expect(page).toContain("Hören Teil 1 abschließen");
+  });
+
+  test("migrates a previously completed Lesen preview forward to Hören Teil 1", () => {
+    expect(page).toContain("migratedFromLesenCompletion");
+    expect(page).toContain('? "hoeren-teil1"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren1Completed)");
   });
 
   test("publishes only a preview route while the B2 mock is still being built", () => {
