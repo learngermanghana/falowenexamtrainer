@@ -949,6 +949,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     ) {
       return entry?.workbook_link || "/campus/course/a2-mock-practice-preview";
     }
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "B1" &&
+      Number(entry?.day) === 29
+    ) {
+      return "/campus/course/b1-mock-practice-preview";
+    }
 
     const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
     const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";

@@ -19,6 +19,13 @@ describe("mock exam catalog", () => {
     expect(getMockExamsForLevel("A2", { includeCourse: true }).map((exam) => exam.id)).toContain(
       "a2-course-preview-01",
     );
+    expect(getMockExamsForLevel("B1").map((exam) => exam.id)).toContain("b1-final-01");
+    expect(getMockExam("b1-final-01")).toMatchObject({
+      level: "B1",
+      route: "/campus/course/b1-final-mock-exam",
+      status: "ready",
+      mode: "full",
+    });
   });
 
   test("creates a new practice question set without duplicating page code", () => {

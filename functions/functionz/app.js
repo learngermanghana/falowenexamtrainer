@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
+const { validateA1AudioKey, validateA1MockAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
@@ -91,6 +91,11 @@ const {
   persistVerifiedA2MockSection,
   syncA2MockCompletion,
 } = require("./a2MockCompletionSync");
+const {
+  buildVerifiedB1MockScore,
+  persistVerifiedB1MockSection,
+  syncB1MockCompletion,
+} = require("./b1MockCompletionSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -987,6 +992,59 @@ app.get("/course-media/b1/audio-url", async (req, res) => {
     }
     console.error("Failed to create B1 audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this B1 audio right now." });
+  }
+});
+
+app.get("/course-media/b1/mock-audio-url", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.query?.mockId || "").trim();
+    const part = String(req.query?.part || "").trim();
+    const key = String(req.query?.key || "").trim();
+    const validated = validateB1MockAudioKey({ mockId, part, key });
+    if (!validated) {
+      return res.status(400).json({ error: "Invalid B1 mock audio request" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Student access service is unavailable" });
+
+    const profileMatch = await findAuthedStudentProfile(db, authedUser);
+    const student = profileMatch?.data || null;
+    const accessBlockReason = getB1MediaAccessBlockReason({ authedUser, student });
+    if (accessBlockReason) {
+      log.warn("course_media.b1_mock.access_denied", {
+        reason: accessBlockReason,
+        mockId: validated.mockId,
+        part: validated.part,
+        hasStudentProfile: Boolean(student),
+      });
+      return res.status(403).json({
+        error: "B1 mock audio access is not available for this account.",
+        code: accessBlockReason,
+      });
+    }
+
+    const signed = await createB1MockAudioSignedUrl(validated);
+    res.set("Cache-Control", "private, no-store");
+    return res.json({
+      url: signed.url,
+      expiresAt: signed.expiresAt,
+      mockId: signed.mockId,
+      part: signed.part,
+    });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      console.error("B1 mock R2 audio is not configured", error?.missing || error?.message);
+      return res.status(503).json({ error: "B1 mock audio storage is not configured yet." });
+    }
+    if (error?.code === "INVALID_B1_MOCK_AUDIO_KEY") {
+      return res.status(400).json({ error: "Invalid B1 mock audio request" });
+    }
+    console.error("Failed to create B1 mock audio playback URL", error);
+    return res.status(500).json({ error: "Could not prepare this B1 mock audio right now." });
   }
 });
 
@@ -1938,6 +1996,72 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
   ].join("\n");
 };
 
+const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+  const safeAttempts = attempts.map((attempt) => ({
+    id: String(attempt?.id || "").trim(),
+    teil: String(attempt?.teil || "").trim(),
+    task: String(attempt?.task || "").trim(),
+    transcript: String(attempt?.transcript || "").trim(),
+    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
+  }));
+
+  return [
+    "You are a strict Goethe-style B1 speaking examiner for a Falowen final mock exam.",
+    "Assess ONLY what the learner actually said in the supplied speech-to-text transcripts. Never invent missing content.",
+    "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+    "Judge at CEFR B1 standard. Because the source is a transcript, do not claim to measure accent or exact pronunciation.",
+    "Teil 1 was recorded while a simulated partner audio played. Ignore obvious partner/instruction fragments if they appear in the transcript and score the learner's meaningful planning contributions.",
+    "If a task transcript is empty, treat that task as no response and award 0 points for that task.",
+    "",
+    "SCORING — total 25 points:",
+    "Teil 1: 9 points. Joint planning: make and react to suggestions, cover the relevant party-planning points (where, when, food/drinks, invitations, gift, responsibilities), and move toward agreement.",
+    "Teil 2: 10 points. Structured presentation on printed books versus digital learning: personal experience, situation in the learner's home country, advantages/disadvantages, and a clear opinion/future view. Reward connected B1 speech and useful linking language.",
+    "Teil 3: 6 points. React appropriately to the partner statement about concentration with printed books, state agreement/disagreement, and justify the reaction with a relevant reason or example.",
+    "Pass mark for this Sprechen mock: 15/25.",
+    "",
+    "Required JSON only, no markdown:",
+    JSON.stringify({
+      score: 0,
+      maxScore: 25,
+      passed: false,
+      level_mismatch: false,
+      overall_feedback_en: "Short English feedback.",
+      parts: {
+        teil1: {
+          score: 0,
+          maxScore: 9,
+          task_completion: 0,
+          b1_language: 0,
+          interaction: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short B1 German example."
+        },
+        teil2: {
+          score: 0,
+          maxScore: 10,
+          task_completion: 0,
+          structure_cohesion: 0,
+          b1_language: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short B1 German example."
+        },
+        teil3: {
+          score: 0,
+          maxScore: 6,
+          reaction_relevance: 0,
+          justification: 0,
+          b1_language: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short B1 German example."
+        }
+      }
+    }),
+    "",
+    "Student attempts:",
+    JSON.stringify(safeAttempts),
+  ].join("\n");
+};
+
 const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
@@ -2010,6 +2134,64 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   `Teil 2 email:\n${String(email || "").trim()}`,
 ].join("\n");
 
+
+const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
+  "You are a strict Goethe-style B1 writing examiner for a Falowen final mock exam.",
+  "Assess the learner's three German writing responses exactly as submitted. Never invent missing content.",
+  "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR B1 standard: task fulfilment, communicative appropriateness, organisation/cohesion, vocabulary, grammar and spelling.",
+  "Do not punish a small word-count difference by itself. Missing required content, wrong register, or an incomplete response must reduce the score.",
+  "",
+  "AUFGABE 1 — informal email, 10 points, target about 80 words.",
+  "Situation: new apartment and housewarming party; friend Jan could not come.",
+  "Required points: (1) describe how the party was, (2) explain why moving to the new apartment was a good choice, (3) suggest a meeting to show Jan the apartment.",
+  "Use an appropriate informal greeting and closing.",
+  "",
+  "AUFGABE 2 — discussion post, 10 points, target about 80 words.",
+  "Topic: cashless payment versus cash.",
+  "Required points: (1) clear opinion, (2) reasons for the position, (3) advantages and/or disadvantages.",
+  "The text should be connected and suitable for an online discussion.",
+  "",
+  "AUFGABE 3 — formal email, 5 points, target about 40 words.",
+  "Situation: learner cannot attend German class one day next week because of an important doctor appointment; recipient Frau Schneider.",
+  "Required points: (1) apologise for absence, (2) give the reason, (3) ask for homework/course materials.",
+  "Use formal address/register and an appropriate closing.",
+  "",
+  "Return JSON only, no markdown, using this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 25,
+    passed: false,
+    level_mismatch: false,
+    overall_feedback_en: "Short English feedback.",
+    parts: {
+      teil1: {
+        score: 0, maxScore: 10,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      },
+      teil2: {
+        score: 0, maxScore: 10,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      },
+      teil3: {
+        score: 0, maxScore: 5,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      }
+    }
+  }),
+  "",
+  `Aufgabe 1:\n${String(teil1 || "").trim()}`,
+  "",
+  `Aufgabe 2:\n${String(teil2 || "").trim()}`,
+  "",
+  `Aufgabe 3:\n${String(teil3 || "").trim()}`,
+].join("\n");
 
 const normalizeA1MockFormValue = (value = "") =>
   String(value || "")
@@ -3831,6 +4013,144 @@ app.post("/writing/a2-mock-score", async (req, res) => {
   }
 });
 
+app.post("/writing/b1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const teil1 = String(req.body?.teil1 || "").trim().slice(0, 8000);
+    const teil2 = String(req.body?.teil2 || "").trim().slice(0, 8000);
+    const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+
+    let result;
+    if (!teil1 && !teil2 && !teil3) {
+      result = {
+        score: 0,
+        maxScore: 25,
+        passed: false,
+        level_mismatch: false,
+        overall_feedback_en: "No writing response was submitted.",
+        parts: {
+          teil1: { score: 0, maxScore: 10, feedback_en: "No response was submitted.", corrections: [] },
+          teil2: { score: 0, maxScore: 10, feedback_en: "No response was submitted.", corrections: [] },
+          teil3: { score: 0, maxScore: 5, feedback_en: "No response was submitted.", corrections: [] },
+        },
+      };
+    } else {
+      if (!ensureOpenAIConfigured(res)) return;
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
+          { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 1400 },
+      );
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^\`\`\`(?:json)?\s*/i, "")
+        .replace(/\s*\`\`\`$/i, "");
+
+      try {
+        result = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the B1 writing assessment safely. Please try marking again.",
+          code: "INVALID_B1_WRITING_ASSESSMENT",
+        });
+      }
+
+      const caps = { teil1: 10, teil2: 10, teil3: 5 };
+      Object.entries(caps).forEach(([key, maxScore]) => {
+        const part = result?.parts?.[key] || {};
+        const rawFlags = Array.isArray(part.required_points_met) ? part.required_points_met.slice(0, 3) : [];
+        const flags = [0, 1, 2].map((index) => rawFlags[index] === true);
+        const missing = flags.filter((value) => !value).length;
+        const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
+        const rawScore = Math.max(0, Math.min(maxScore, Number(part.score) || 0));
+        const cappedScore = missing ? Math.min(rawScore, missingCaps[Math.min(missing, 3) - 1]) : rawScore;
+        result.parts = result.parts || {};
+        result.parts[key] = {
+          ...part,
+          score: Number(cappedScore.toFixed(1)),
+          maxScore,
+          required_points_met: flags,
+          corrections: Array.isArray(part.corrections) ? part.corrections.slice(0, 5) : [],
+        };
+      });
+
+      const numericScore = Number(
+        (Number(result.parts.teil1.score || 0) +
+          Number(result.parts.teil2.score || 0) +
+          Number(result.parts.teil3.score || 0)).toFixed(1),
+      );
+      result.score = Math.max(0, Math.min(25, numericScore));
+      result.maxScore = 25;
+      result.passed = result.score >= 15;
+      result.level_mismatch = Boolean(result?.level_mismatch);
+      result.submittedTeil1 = teil1;
+      result.submittedTeil2 = teil2;
+      result.submittedTeil3 = teil3;
+    }
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      try {
+        await persistVerifiedB1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "schreiben",
+          score: Number(result?.score || 0),
+          source: "/writing/b1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "B1_MOCK_ATTEMPT_NOT_FOUND" ? 404 :
+          code === "B1_MOCK_ATTEMPT_FORBIDDEN" ? 403 :
+          code === "B1_MOCK_ALREADY_COMPLETED" ? 409 : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Schreiben result for this B1 mock attempt.",
+          code: code || "B1_MOCK_SCHREIBEN_VERIFY_FAILED",
+        });
+      }
+    }
+
+    auditAIRequest({
+      route: "/writing/b1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { score: Number(result?.score || 0) },
+    });
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/b1-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/b1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the B1 writing mock." });
+  }
+});
+
 const FINAL_MOCK_SECTION_RANK = Object.freeze({
   intro: 0,
   lesen: 1,
@@ -4621,6 +4941,390 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
   }
 });
 
+app.post("/b1-mock/attempt/start", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const mockId = String(req.body?.mockId || "b1-mock-01").trim().slice(0, 80);
+    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("b1MockExamUsers").doc(authedUser.uid);
+    const newAttemptRef = userRef.collection("attempts").doc();
+    let responsePayload = null;
+
+    await db.runTransaction(async (tx) => {
+      const userSnap = await tx.get(userRef);
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      if (activeAttemptId) {
+        const activeRef = userRef.collection("attempts").doc(activeAttemptId);
+        const activeSnap = await tx.get(activeRef);
+        if (activeSnap.exists) {
+          const activeData = activeSnap.data() || {};
+          if (activeData.mockId === mockId && activeData.status === "in_progress") {
+            responsePayload = {
+              attemptId: activeAttemptId,
+              attemptNumber: Number(activeData.attemptNumber || 1),
+              firstAttempt: Boolean(activeData.firstAttempt),
+              state: activeData.state || null,
+              resumed: true,
+            };
+            return;
+          }
+        }
+      }
+
+      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptNumber = attemptCount + 1;
+      const now = admin.firestore.FieldValue.serverTimestamp();
+
+      tx.set(
+        userRef,
+        {
+          uid: authedUser.uid,
+          email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+          attemptCount: attemptNumber,
+          activeAttemptId: newAttemptRef.id,
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      tx.set(newAttemptRef, {
+        uid: authedUser.uid,
+        email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+        mockId,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        status: "in_progress",
+        section: "intro",
+        state: null,
+        sectionScores: {},
+        startedAt: now,
+        updatedAt: now,
+      });
+
+      responsePayload = {
+        attemptId: newAttemptRef.id,
+        attemptNumber,
+        firstAttempt: attemptNumber === 1,
+        state: null,
+        resumed: false,
+      };
+    });
+
+    return res.json(responsePayload);
+  } catch (err) {
+    console.error("/b1-mock/attempt/start error", err);
+    return res.status(500).json({ error: err.message || "Could not start the B1 mock attempt." });
+  }
+});
+
+app.post("/b1-mock/attempt/save", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const attemptId = String(req.body?.attemptId || "").trim();
+    const status = String(req.body?.status || "in_progress").trim();
+    const section = String(req.body?.section || "").trim().slice(0, 40);
+    const state = req.body?.state && typeof req.body.state === "object" ? req.body.state : {};
+    const sectionScores = req.body?.sectionScores && typeof req.body.sectionScores === "object"
+      ? req.body.sectionScores
+      : {};
+    const overall = req.body?.overall && typeof req.body.overall === "object"
+      ? req.body.overall
+      : null;
+
+    if (!attemptId) return res.status(400).json({ error: "attemptId is required" });
+    if (!["in_progress", "completed"].includes(status)) {
+      return res.status(400).json({ error: "Invalid mock attempt status" });
+    }
+
+    const serializedState = JSON.stringify(state);
+    if (serializedState.length > 150000) {
+      return res.status(400).json({ error: "Mock attempt state is too large." });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+
+    const userRef = db.collection("b1MockExamUsers").doc(authedUser.uid);
+    const attemptRef = userRef.collection("attempts").doc(attemptId);
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    let saveOutcome = null;
+
+    await db.runTransaction(async (tx) => {
+      const [attemptSnap, userSnap] = await Promise.all([
+        tx.get(attemptRef),
+        tx.get(userRef),
+      ]);
+
+      if (!attemptSnap.exists) {
+        saveOutcome = { notFound: true };
+        return;
+      }
+
+      const existing = attemptSnap.data() || {};
+      if (existing.uid && existing.uid !== authedUser.uid) {
+        saveOutcome = { forbidden: true };
+        return;
+      }
+
+      const userData = userSnap.exists ? userSnap.data() || {} : {};
+
+      // Completion is monotonic, but a completed record is only publishable when
+      // all four section scores can be reconstructed from server-trusted data.
+      if (existing.status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedB1MockScore({
+            state: existing.state || {},
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "B1_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
+        const completedUserPatch = {
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
+          updatedAt: now,
+        };
+        if (String(userData.activeAttemptId || "") === attemptId) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "completed",
+          alreadyCompleted: true,
+        };
+        return;
+      }
+
+      if (status === "completed") {
+        let verifiedCompletion;
+        try {
+          verifiedCompletion = buildVerifiedB1MockScore({
+            state,
+            verifiedSections: existing.verifiedSections || {},
+          });
+        } catch (verificationError) {
+          tx.set(
+            attemptRef,
+            {
+              state,
+              section,
+              sectionScores,
+              ...(overall ? { overall } : {}),
+              status: "in_progress",
+              updatedAt: now,
+            },
+            { merge: true },
+          );
+          saveOutcome = {
+            invalidCompletion: true,
+            code: verificationError?.code || "B1_MOCK_COMPLETION_NOT_VERIFIED",
+            error: verificationError?.message || "Mock completion is not server verified.",
+            section: verificationError?.section || null,
+          };
+          return;
+        }
+
+        tx.set(
+          attemptRef,
+          {
+            state,
+            section,
+            sectionScores: verifiedCompletion.sectionScores,
+            overall: verifiedCompletion.overall,
+            verifiedSectionScores: verifiedCompletion.sectionScores,
+            verifiedOverall: verifiedCompletion.overall,
+            objectiveVerification: verifiedCompletion.objective,
+            status: "completed",
+            completedAt: now,
+            updatedAt: now,
+          },
+          { merge: true },
+        );
+
+        const completedUserPatch = {
+          lastCompletedAttemptId: attemptId,
+          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
+          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
+          updatedAt: now,
+        };
+        if (
+          !userData.activeAttemptId ||
+          String(userData.activeAttemptId) === attemptId
+        ) {
+          completedUserPatch.activeAttemptId = null;
+        }
+        tx.set(userRef, completedUserPatch, { merge: true });
+        saveOutcome = { ok: true, attemptId, status: "completed" };
+        return;
+      }
+
+      if (shouldIgnoreStaleFinalMockProgress({ existing, section, state })) {
+        saveOutcome = {
+          ok: true,
+          attemptId,
+          status: "in_progress",
+          staleIgnored: true,
+          section: existing.section || existing.state?.stage || "intro",
+        };
+        return;
+      }
+
+      tx.set(
+        attemptRef,
+        {
+          state,
+          section,
+          sectionScores,
+          ...(overall ? { overall } : {}),
+          status: "in_progress",
+          updatedAt: now,
+        },
+        { merge: true },
+      );
+
+      const progressUserPatch = { updatedAt: now };
+      if (
+        !userData.activeAttemptId ||
+        String(userData.activeAttemptId) === attemptId
+      ) {
+        progressUserPatch.activeAttemptId = attemptId;
+      }
+      tx.set(userRef, progressUserPatch, { merge: true });
+      saveOutcome = { ok: true, attemptId, status: "in_progress" };
+    });
+
+    if (saveOutcome?.notFound) {
+      return res.status(404).json({ error: "Mock attempt not found." });
+    }
+    if (saveOutcome?.forbidden) {
+      return res.status(403).json({ error: "This mock attempt belongs to another account." });
+    }
+    if (saveOutcome?.invalidCompletion) {
+      return res.status(409).json({
+        error: saveOutcome.error,
+        code: saveOutcome.code,
+        section: saveOutcome.section,
+        retryable: true,
+      });
+    }
+
+    let completionSync = null;
+    if (status === "completed" && saveOutcome?.ok) {
+      try {
+        const studentProfile = await findAuthedStudentProfile(db, authedUser);
+        const attemptSnap = await attemptRef.get();
+        const attemptData = attemptSnap.exists ? attemptSnap.data() || {} : {};
+        const verifiedOverall =
+          attemptData.verifiedOverall && typeof attemptData.verifiedOverall === "object"
+            ? attemptData.verifiedOverall
+            : null;
+        const verifiedSectionScores =
+          attemptData.verifiedSectionScores && typeof attemptData.verifiedSectionScores === "object"
+            ? attemptData.verifiedSectionScores
+            : null;
+
+        if (!verifiedOverall || !verifiedSectionScores) {
+          throw new Error("Server-verified B1 mock totals are missing.");
+        }
+
+        completionSync = await syncB1MockCompletion({
+          db,
+          admin,
+          authedUser,
+          studentProfile,
+          attemptId,
+          attemptNumber: Number(attemptData.attemptNumber || 1),
+          firstAttempt: Boolean(attemptData.firstAttempt),
+          overall: verifiedOverall,
+          sectionScores: verifiedSectionScores,
+          now:
+            typeof attemptData.completedAt?.toDate === "function"
+              ? attemptData.completedAt.toDate()
+              : new Date(),
+        });
+
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: true,
+              scoreDocId: completionSync.scoreDocId,
+              notificationId: completionSync.notificationId,
+              syncedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        );
+      } catch (syncError) {
+        console.error("B1 mock completion sync failed", syncError);
+        completionSync = {
+          ok: false,
+          error: syncError?.message || "Could not sync the completed mock result.",
+        };
+        await attemptRef.set(
+          {
+            completionSync: {
+              ok: false,
+              error: completionSync.error,
+              lastTriedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+          },
+          { merge: true },
+        ).catch(() => {});
+
+        return res.status(503).json({
+          ...(saveOutcome || { ok: true, attemptId, status: "completed" }),
+          completionSync,
+          retryable: true,
+        });
+      }
+    }
+
+    return res.json({
+      ...(saveOutcome || { ok: true, attemptId, status }),
+      ...(completionSync ? { completionSync } : {}),
+    });
+  } catch (err) {
+    console.error("/b1-mock/attempt/save error", err);
+    return res.status(500).json({ error: err.message || "Could not save the B1 mock attempt." });
+  }
+});
+
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
@@ -4633,7 +5337,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       validateString(teil, { maxLength: 20, label: "teil" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(contextType, { maxLength: 60, label: "context" }) ||
-      validateString(question, { maxLength: 400, label: "question" }) ||
+      validateString(question, { maxLength: 2000, label: "question" }) ||
       validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
@@ -5038,6 +5742,138 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       success: false,
     });
     return res.status(500).json({ error: err.message || "Failed to score the A2 speaking mock." });
+  }
+});
+
+app.post("/speaking/b1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    if (attempts.length !== 3) {
+      return res.status(400).json({ error: "Three speaking responses are required for the complete B1 mock." });
+    }
+
+    const normalizedAttempts = attempts.map((attempt) => ({
+      id: String(attempt?.id || "").trim(),
+      teil: String(attempt?.teil || "").trim(),
+      task: String(attempt?.task || "").trim().slice(0, 1600),
+      transcript: String(attempt?.transcript || "").trim().slice(0, 7000),
+      analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2500),
+    }));
+
+    const expectedIds = ["teil1", "teil2", "teil3"];
+    const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();
+    if (
+      suppliedIds.length !== expectedIds.length ||
+      suppliedIds.some((id, index) => id !== expectedIds[index])
+    ) {
+      return res.status(400).json({ error: "All three B1 speaking responses are required." });
+    }
+    if (!ensureOpenAIConfigured(res)) return;
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speaking",
+      limit: DAILY_LIMITS.speaking,
+    });
+    if (!quota.allowed) {
+      return res.status(429).json({
+        error: "Daily speaking analysis limit reached",
+        code: "SPEAKING_QUOTA_REACHED",
+      });
+    }
+
+    const reply = await createChatCompletion(
+      [
+        { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+        { role: "user", content: "Return the final B1 mock speaking assessment as the required JSON object." },
+      ],
+      { temperature: 0.1, max_tokens: 1100 },
+    );
+    const cleanedReply = String(reply || "")
+      .trim()
+      .replace(/^\`\`\`(?:json)?\s*/i, "")
+      .replace(/\s*\`\`\`$/i, "");
+
+    let result;
+    try {
+      result = JSON.parse(cleanedReply);
+    } catch (_error) {
+      return res.status(502).json({
+        error: "Falowen could not read the B1 speaking assessment safely. Please try marking again.",
+        code: "INVALID_B1_SPEAKING_ASSESSMENT",
+      });
+    }
+
+    const maxByPart = { teil1: 9, teil2: 10, teil3: 6 };
+    Object.entries(maxByPart).forEach(([key, maxScore]) => {
+      result.parts = result.parts || {};
+      result.parts[key] = {
+        ...(result.parts[key] || {}),
+        score: Math.max(0, Math.min(maxScore, Number(result.parts?.[key]?.score) || 0)),
+        maxScore,
+      };
+    });
+    const numericScore = Number(
+      (result.parts.teil1.score + result.parts.teil2.score + result.parts.teil3.score).toFixed(1),
+    );
+    result.score = Math.max(0, Math.min(25, numericScore));
+    result.maxScore = 25;
+    result.passed = result.score >= 15;
+    result.level_mismatch = Boolean(result?.level_mismatch);
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      try {
+        await persistVerifiedB1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "sprechen",
+          score: result.score,
+          source: "/speaking/b1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "B1_MOCK_ATTEMPT_NOT_FOUND" ? 404 :
+          code === "B1_MOCK_ATTEMPT_FORBIDDEN" ? 403 :
+          code === "B1_MOCK_ALREADY_COMPLETED" ? 409 : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Sprechen result for this B1 mock attempt.",
+          code: code || "B1_MOCK_SPRECHEN_VERIFY_FAILED",
+        });
+      }
+    }
+
+    auditAIRequest({
+      route: "/speaking/b1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        attemptsCount: normalizedAttempts.length,
+        score: result.score,
+        passed: result.passed,
+        levelMismatch: result.level_mismatch,
+        quotaRemaining: quota.remaining,
+      },
+    });
+
+    return res.json({ result, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speaking/b1-mock-score error", err);
+    auditAIRequest({
+      route: "/speaking/b1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the B1 speaking mock." });
   }
 });
 

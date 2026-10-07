@@ -211,6 +211,16 @@ export const scoreA2MockSpeaking = async ({ attempts, attemptId, idToken }) => {
   return response.data?.result || response.data;
 };
 
+export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
+  const response = await axios.post(
+    `${speakingApiUrl}/speaking/b1-mock-score`,
+    { attempts, attemptId },
+    { headers: authHeaders(idToken) }
+  );
+
+  return response.data?.result || response.data;
+};
+
 export const analyzeText = async ({ text, teil, level, targetLevel, userId, idToken }) => {
   const response = await axios.post(
     `${speakingApiUrl}/speaking/analyze-text`,
