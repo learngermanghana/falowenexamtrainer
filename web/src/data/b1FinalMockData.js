@@ -47,6 +47,34 @@ export const B1_READING = Object.freeze({
         { id: "c", label: "die Gäste die Arbeit auf den Feldern übernehmen." },
       ], answer: "b" },
     ],
+    text2: {
+      title: "Teil 2 · Text 2",
+      heading: "Ehrenamt im Trend – Warum sich immer mehr Jugendliche engagieren",
+      intro: "Lesen Sie den Text aus der Presse und die Aufgaben 10 bis 12 dazu. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+      paragraphs: [
+        "Ob im Sportverein, beim Umweltschutz oder in der Hausaufgabenbetreuung für Grundschulkinder: Immer mehr Jugendliche in Deutschland entscheiden sich dafür, in ihrer Freizeit ehrenamtlich zu arbeiten, also ohne Bezahlung zu helfen.",
+        "Viele Erwachsene sind überrascht über diese Entwicklung, da junge Menschen in den Medien oft als oberflächlich oder ausschließlich an sozialen Netzwerken interessiert dargestellt werden. Eine aktuelle Studie zeigt jedoch ein ganz anderes Bild: Fast 40 Prozent der Jugendlichen zwischen 14 und 20 Jahren übernehmen regelmäßig eine freiwillige Aufgabe in der Gesellschaft.",
+        "Für die Jugendlichen steht dabei nicht nur der Wunsch im Vordergrund, anderen zu helfen. Sie profitieren auch selbst persönlich von ihrem Einsatz. Durch die praktische Arbeit sammeln sie wertvolle Erfahrungen für das spätere Berufsleben und stärken soziale Fähigkeiten wie Teamgeist und Verantwortungsbewusstsein. Zudem stellen viele Organisationen offizielle Zertifikate aus, die bei späteren Bewerbungen um eine Ausbildungsstelle oder einen Studienplatz sehr nützlich sein können.",
+        "Trotz des großen Interesses bleibt der Zeitmangel die größte Hürde für viele Jugendliche. Wegen des langen Schulunterrichts und des Prüfungsdrucks fällt es vielen schwer, eine ehrenamtliche Tätigkeit fest in ihren Wochenplan zu integrieren.",
+      ],
+      questions: [
+        { number: 10, question: "Die aktuelle Studie zeigt, dass Jugendliche …", options: [
+          { id: "a", label: "viel mehr Zeit im Internet verbringen als früher." },
+          { id: "b", label: "sich häufiger freiwillig engagieren als oft gedacht wird." },
+          { id: "c", label: "sich hauptsächlich für Sportvereine interessieren." },
+        ], answer: "b" },
+        { number: 11, question: "Ein freiwilliges Engagement ist für Jugendliche nützlich, weil …", options: [
+          { id: "a", label: "sie dadurch praktische Erfahrungen für die berufliche Zukunft sammeln." },
+          { id: "b", label: "sie dafür von den Organisationen gut bezahlt werden." },
+          { id: "c", label: "sie weniger Zeit für die Schule aufwenden müssen." },
+        ], answer: "a" },
+        { number: 12, question: "Viele Jugendliche finden es schwierig, ein Ehrenamt auszuüben, weil …", options: [
+          { id: "a", label: "die Organisationen hohe Beiträge verlangen." },
+          { id: "b", label: "sie durch die Schule oft nur wenig freie Zeit haben." },
+          { id: "c", label: "Betriebe ehrenamtliche Arbeit bei Bewerbungen ablehnen." },
+        ], answer: "b" },
+      ],
+    },
   },
   teil3: {
     title: "Teil 3",
