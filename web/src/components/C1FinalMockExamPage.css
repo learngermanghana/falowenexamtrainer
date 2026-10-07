@@ -305,3 +305,102 @@
     columns: 1;
   }
 }
+
+
+.c1-mock-reconstruction-body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 34px;
+}
+
+.c1-mock-reconstruction-body p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.c1-mock-reconstruction-gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 3px;
+  white-space: nowrap;
+  font-weight: 800;
+}
+
+.c1-mock-reconstruction-gap strong {
+  color: #8f1d2c;
+}
+
+.c1-mock-reconstruction-gap select {
+  min-width: 58px;
+  height: 34px;
+  border: 1px solid #7f7f7f;
+  background: #fff;
+  color: #111;
+  font: inherit;
+  font-weight: 800;
+  text-align: center;
+  padding: 2px 6px;
+}
+
+.c1-mock-reconstruction-gap select:focus {
+  outline: 2px solid #8f1d2c;
+  outline-offset: 1px;
+}
+
+.c1-mock-sentence-list {
+  display: grid;
+}
+
+.c1-mock-sentence-list article {
+  display: grid;
+  grid-template-columns: 42px 1fr auto;
+  gap: 12px;
+  align-items: start;
+  padding: 13px 12px;
+  background: rgba(255,255,255,.72);
+  border-bottom: 1px solid #c8aa99;
+}
+
+.c1-mock-sentence-list article > strong {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  border: 1px solid #a69488;
+}
+
+.c1-mock-sentence-list article p {
+  margin: 3px 0 0;
+  line-height: 1.5;
+}
+
+.c1-mock-sentence-list article > span {
+  margin-top: 3px;
+  color: #8f1d2c;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.c1-mock-sentence-list article.used {
+  background: #fff;
+}
+
+@media (max-width: 900px) {
+  .c1-mock-reconstruction-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .c1-mock-sentence-list article {
+    grid-template-columns: 36px 1fr;
+  }
+
+  .c1-mock-sentence-list article > span {
+    grid-column: 2;
+  }
+}
