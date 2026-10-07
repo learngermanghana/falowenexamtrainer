@@ -39,6 +39,9 @@ const initialState = () => ({
   hoeren3Answers: {},
   hoeren3AudioStatus: "not_started",
   hoeren3Completed: false,
+  hoeren4Answers: {},
+  hoeren4AudioStatus: "not_started",
+  hoeren4Completed: false,
   completed: false,
 });
 
@@ -89,6 +92,14 @@ const readState = () => {
     const migratedFromHoeren2Completion =
       Boolean(parsed.completed && parsed.hoeren2Completed && !hasHoeren3Progress);
 
+    const hasHoeren4Progress =
+      Boolean(parsed.hoeren4Completed) ||
+      Boolean(Object.keys(parsed.hoeren4Answers || {}).length) ||
+      ["started", "ended"].includes(String(parsed.hoeren4AudioStatus || "")) ||
+      parsed.stage === "hoeren-teil4";
+    const migratedFromHoeren3Completion =
+      Boolean(parsed.completed && parsed.hoeren3Completed && !hasHoeren4Progress);
+
     const stage = migratedFromTeil3Completion
       ? "teil4"
       : migratedFromLesenCompletion
@@ -97,13 +108,16 @@ const readState = () => {
           ? "hoeren-teil2"
           : migratedFromHoeren2Completion
             ? "hoeren-teil3"
-            : (parsed.stage || "teil1");
+            : migratedFromHoeren3Completion
+              ? "hoeren-teil4"
+              : (parsed.stage || "teil1");
 
     const migratedForward =
       migratedFromTeil3Completion ||
       migratedFromLesenCompletion ||
       migratedFromHoeren1Completion ||
-      migratedFromHoeren2Completion;
+      migratedFromHoeren2Completion ||
+      migratedFromHoeren3Completion;
 
     return {
       ...initialState(),
@@ -124,9 +138,12 @@ const readState = () => {
       hoeren3Answers: parsed.hoeren3Answers || {},
       hoeren3AudioStatus: restoreAudioStatus(parsed.hoeren3AudioStatus),
       hoeren3Completed: Boolean(parsed.hoeren3Completed),
+      hoeren4Answers: parsed.hoeren4Answers || {},
+      hoeren4AudioStatus: restoreAudioStatus(parsed.hoeren4AudioStatus),
+      hoeren4Completed: Boolean(parsed.hoeren4Completed),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
-      completed: Boolean(parsed.completed && parsed.hoeren3Completed),
+      completed: Boolean(parsed.completed && parsed.hoeren4Completed),
     };
   } catch (_error) {
     return initialState();
@@ -134,8 +151,11 @@ const readState = () => {
 };
 
 const getStageConfig = (stage) => {
-  if (["hoeren-teil1", "hoeren-teil2", "hoeren-teil3"].includes(stage)) {
-    const partNumber = stage === "hoeren-teil3" ? 3 : stage === "hoeren-teil2" ? 2 : 1;
+  if (["hoeren-teil1", "hoeren-teil2", "hoeren-teil3", "hoeren-teil4"].includes(stage)) {
+    const partNumber =
+      stage === "hoeren-teil4" ? 4 :
+      stage === "hoeren-teil3" ? 3 :
+      stage === "hoeren-teil2" ? 2 : 1;
     const listeningPart = B2_LISTENING[`teil${partNumber}`];
     return {
       module: "HÖREN",
@@ -782,7 +802,57 @@ const HoerenTeil3 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusCha
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Hören Teil 3 abschließen
+          Hören Teil 3 abschließen · weiter zu Teil 4
+        </button>
+      </section>
+    </>
+  );
+};
+
+const HoerenTeil4 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusChange, onFinish }) => {
+  const part = B2_LISTENING.teil4;
+  const answeredCount = part.questions.filter((question) => Boolean(answers[question.number])).length;
+
+  return (
+    <>
+      <section className="b2-mock-hoeren-section">
+        <p className="b2-mock-section-label">Vortrag · Zeitmanagement und Produktivität</p>
+        <h2>Hören Teil 4</h2>
+        <B2MockAudioPlayer
+          idToken={idToken}
+          part={part}
+          status={audioStatus}
+          onStatusChange={onAudioStatusChange}
+        />
+      </section>
+
+      <section className="b2-mock-hoeren-tasks">
+        <div className="b2-mock-task-heading">
+          <div>
+            <p className="b2-mock-section-label">Aufgaben 23 bis 30 · Hören Teil 4</p>
+            <h2>Wählen Sie a, b oder c.</h2>
+          </div>
+          <strong>{answeredCount}/8 beantwortet</strong>
+        </div>
+
+        <section className="b2-mock-hoeren-text-block">
+          <h3>Vortrag über effektives Arbeiten</h3>
+          {part.questions.map((question) => (
+            <article className="b2-mock-hoeren-question" key={question.number}>
+              <strong>{question.number}. {question.question}</strong>
+              <HorenChoiceList
+                partId="teil-4"
+                question={question}
+                value={answers[question.number]}
+                onChoose={onChoose}
+              />
+            </article>
+          ))}
+        </section>
+
+        <p className="b2-mock-autosave">Automatisch gespeichert</p>
+        <button type="button" className="b2-mock-next" onClick={onFinish}>
+          Hören abschließen
         </button>
       </section>
     </>
@@ -912,6 +982,21 @@ export default function B2FinalMockExamPage() {
     }));
   };
 
+  const chooseHoeren4 = (number, answer) => {
+    if (!state.started) return;
+    setState((current) => ({
+      ...current,
+      hoeren4Answers: { ...current.hoeren4Answers, [number]: answer },
+    }));
+  };
+
+  const setHoeren4AudioStatus = (audioStatus) => {
+    setState((current) => ({
+      ...current,
+      hoeren4AudioStatus: audioStatus,
+    }));
+  };
+
   const continueToTeil2 = () => {
     setState((current) => ({
       ...current,
@@ -979,10 +1064,22 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishHoerenTeil3 = () => {
+  const continueToHoerenTeil4 = () => {
     setState((current) => ({
       ...current,
       hoeren3Completed: true,
+      stage: "hoeren-teil4",
+      started: false,
+      completed: false,
+      deadlineMs: null,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const finishHoerenTeil4 = () => {
+    setState((current) => ({
+      ...current,
+      hoeren4Completed: true,
       completed: true,
       deadlineMs: null,
     }));
@@ -995,9 +1092,9 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · MOCK</p>
-          <h1>Lesen Teil 1–4 und Hören Teil 1–3 gespeichert</h1>
+          <h1>Lesen Teil 1–4 und Hören Teil 1–4 gespeichert</h1>
           <p>
-            Ihre Antworten wurden gespeichert. Weitere Hörteile werden diesem B2-Mock Schritt für Schritt hinzugefügt.
+            Ihre Lesen- und Hören-Antworten wurden gespeichert. Als Nächstes können wir Schreiben und Sprechen ergänzen.
           </p>
         </section>
       </main>
@@ -1015,6 +1112,15 @@ export default function B2FinalMockExamPage() {
           <p>{getStageConfig(state.stage).intro}</p>
           <button type="button" onClick={start}>{getStageConfig(state.stage).title} starten</button>
         </section>
+      ) : state.stage === "hoeren-teil4" ? (
+        <HoerenTeil4
+          idToken={idToken}
+          answers={state.hoeren4Answers}
+          audioStatus={state.hoeren4AudioStatus}
+          onChoose={chooseHoeren4}
+          onAudioStatusChange={setHoeren4AudioStatus}
+          onFinish={finishHoerenTeil4}
+        />
       ) : state.stage === "hoeren-teil3" ? (
         <HoerenTeil3
           idToken={idToken}
@@ -1022,7 +1128,7 @@ export default function B2FinalMockExamPage() {
           audioStatus={state.hoeren3AudioStatus}
           onChoose={chooseHoeren3}
           onAudioStatusChange={setHoeren3AudioStatus}
-          onFinish={finishHoerenTeil3}
+          onFinish={continueToHoerenTeil4}
         />
       ) : state.stage === "hoeren-teil2" ? (
         <HoerenTeil2
