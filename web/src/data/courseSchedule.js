@@ -1706,19 +1706,23 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 29,
-      topic: "Goethe B1 Exam Orientation & Official Practice",
-      chapter: "Exam Orientation",
+      topic: "B1 Final Mock Exam",
+      chapter: "Final Mock",
       attendance: false,
-      goal: "Use the official Goethe B1 model test directly from the Course Book and identify the areas that still need review.",
+      goal: "Complete the full B1 mock across Lesen, Hören, Schreiben and Sprechen under exam-style conditions.",
       instruction:
-        "No new lesson content and no Falowen submission. Open the Day 29 exam-orientation page, then use the official Goethe B1 model test. The official link starts with Lesen and also provides access to Hören, Schreiben and Sprechen.",
+        "Open the B1 Final Mock directly from Day 29. Your progress is autosaved and the final mock result is recorded separately from the normal workbook assignments.",
       grammar_topic: null,
       assignment: false,
+      video: null,
+      youtube_link: null,
+      grammarbook_link: null,
+      workbook_link: "/campus/course/b1-mock-practice-preview",
       lesen_hören: {
         video: null,
         youtube_link: null,
         grammarbook_link: null,
-        workbook_link: "/campus/course/b1-day-29-goethe-exam-orientation",
+        workbook_link: "/campus/course/b1-mock-practice-preview",
       },
     },
     {
