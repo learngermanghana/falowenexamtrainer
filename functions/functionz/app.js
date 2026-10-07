@@ -2069,6 +2069,64 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
 ].join("\n");
 
 
+const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
+  "You are a strict Goethe-style B1 writing examiner for a Falowen final mock exam.",
+  "Assess the learner's three German writing responses exactly as submitted. Never invent missing content.",
+  "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR B1 standard: task fulfilment, communicative appropriateness, organisation/cohesion, vocabulary, grammar and spelling.",
+  "Do not punish a small word-count difference by itself. Missing required content, wrong register, or an incomplete response must reduce the score.",
+  "",
+  "AUFGABE 1 — informal email, 10 points, target about 80 words.",
+  "Situation: new apartment and housewarming party; friend Jan could not come.",
+  "Required points: (1) describe how the party was, (2) explain why moving to the new apartment was a good choice, (3) suggest a meeting to show Jan the apartment.",
+  "Use an appropriate informal greeting and closing.",
+  "",
+  "AUFGABE 2 — discussion post, 10 points, target about 80 words.",
+  "Topic: cashless payment versus cash.",
+  "Required points: (1) clear opinion, (2) reasons for the position, (3) advantages and/or disadvantages.",
+  "The text should be connected and suitable for an online discussion.",
+  "",
+  "AUFGABE 3 — formal email, 5 points, target about 40 words.",
+  "Situation: learner cannot attend German class one day next week because of an important doctor appointment; recipient Frau Schneider.",
+  "Required points: (1) apologise for absence, (2) give the reason, (3) ask for homework/course materials.",
+  "Use formal address/register and an appropriate closing.",
+  "",
+  "Return JSON only, no markdown, using this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 25,
+    passed: false,
+    level_mismatch: false,
+    overall_feedback_en: "Short English feedback.",
+    parts: {
+      teil1: {
+        score: 0, maxScore: 10,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      },
+      teil2: {
+        score: 0, maxScore: 10,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      },
+      teil3: {
+        score: 0, maxScore: 5,
+        required_points_met: [false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      }
+    }
+  }),
+  "",
+  `Aufgabe 1:\n${String(teil1 || "").trim()}`,
+  "",
+  `Aufgabe 2:\n${String(teil2 || "").trim()}`,
+  "",
+  `Aufgabe 3:\n${String(teil3 || "").trim()}`,
+].join("\n");
+
 const normalizeA1MockFormValue = (value = "") =>
   String(value || "")
     .trim()
@@ -3886,6 +3944,144 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       success: false,
     });
     return res.status(500).json({ error: err.message || "Failed to score the A2 writing mock." });
+  }
+});
+
+app.post("/writing/b1-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const teil1 = String(req.body?.teil1 || "").trim().slice(0, 8000);
+    const teil2 = String(req.body?.teil2 || "").trim().slice(0, 8000);
+    const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+
+    let result;
+    if (!teil1 && !teil2 && !teil3) {
+      result = {
+        score: 0,
+        maxScore: 25,
+        passed: false,
+        level_mismatch: false,
+        overall_feedback_en: "No writing response was submitted.",
+        parts: {
+          teil1: { score: 0, maxScore: 10, feedback_en: "No response was submitted.", corrections: [] },
+          teil2: { score: 0, maxScore: 10, feedback_en: "No response was submitted.", corrections: [] },
+          teil3: { score: 0, maxScore: 5, feedback_en: "No response was submitted.", corrections: [] },
+        },
+      };
+    } else {
+      if (!ensureOpenAIConfigured(res)) return;
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
+          { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 1400 },
+      );
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^\`\`\`(?:json)?\s*/i, "")
+        .replace(/\s*\`\`\`$/i, "");
+
+      try {
+        result = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the B1 writing assessment safely. Please try marking again.",
+          code: "INVALID_B1_WRITING_ASSESSMENT",
+        });
+      }
+
+      const caps = { teil1: 10, teil2: 10, teil3: 5 };
+      Object.entries(caps).forEach(([key, maxScore]) => {
+        const part = result?.parts?.[key] || {};
+        const rawFlags = Array.isArray(part.required_points_met) ? part.required_points_met.slice(0, 3) : [];
+        const flags = [0, 1, 2].map((index) => rawFlags[index] === true);
+        const missing = flags.filter((value) => !value).length;
+        const missingCaps = maxScore === 5 ? [4, 2, 0.5] : [7, 4, 1];
+        const rawScore = Math.max(0, Math.min(maxScore, Number(part.score) || 0));
+        const cappedScore = missing ? Math.min(rawScore, missingCaps[Math.min(missing, 3) - 1]) : rawScore;
+        result.parts = result.parts || {};
+        result.parts[key] = {
+          ...part,
+          score: Number(cappedScore.toFixed(1)),
+          maxScore,
+          required_points_met: flags,
+          corrections: Array.isArray(part.corrections) ? part.corrections.slice(0, 5) : [],
+        };
+      });
+
+      const numericScore = Number(
+        (Number(result.parts.teil1.score || 0) +
+          Number(result.parts.teil2.score || 0) +
+          Number(result.parts.teil3.score || 0)).toFixed(1),
+      );
+      result.score = Math.max(0, Math.min(25, numericScore));
+      result.maxScore = 25;
+      result.passed = result.score >= 15;
+      result.level_mismatch = Boolean(result?.level_mismatch);
+      result.submittedTeil1 = teil1;
+      result.submittedTeil2 = teil2;
+      result.submittedTeil3 = teil3;
+    }
+
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+      try {
+        await persistVerifiedB1MockSection({
+          db,
+          admin,
+          uid: authedUser.uid,
+          attemptId,
+          section: "schreiben",
+          score: Number(result?.score || 0),
+          source: "/writing/b1-mock-score",
+        });
+      } catch (verificationError) {
+        const code = String(verificationError?.code || "");
+        const statusCode =
+          code === "B1_MOCK_ATTEMPT_NOT_FOUND" ? 404 :
+          code === "B1_MOCK_ATTEMPT_FORBIDDEN" ? 403 :
+          code === "B1_MOCK_ALREADY_COMPLETED" ? 409 : 500;
+        return res.status(statusCode).json({
+          error: verificationError?.message || "Could not verify the Schreiben result for this B1 mock attempt.",
+          code: code || "B1_MOCK_SCHREIBEN_VERIFY_FAILED",
+        });
+      }
+    }
+
+    auditAIRequest({
+      route: "/writing/b1-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { score: Number(result?.score || 0) },
+    });
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/b1-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/b1-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the B1 writing mock." });
   }
 });
 
