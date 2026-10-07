@@ -443,7 +443,7 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Teil 4 abschließen
+          Teil 4 abschließen · weiter zu Hören
         </button>
       </section>
     </>
