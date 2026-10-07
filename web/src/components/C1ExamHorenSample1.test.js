@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { C1_EXAM_HOEREN_SAMPLE_1 } from "../data/c1ExamHorenSample1";
+import {
+  C1_EXAM_HOEREN_SAMPLE_1,
+  C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
+} from "../data/c1ExamHorenSample1";
 
 describe("C1 Exams Room Hören Sample 1", () => {
   const horenPage = fs.readFileSync(path.resolve(__dirname, "./HorenPage.js"), "utf8");
@@ -17,9 +20,19 @@ describe("C1 Exams Room Hören Sample 1", () => {
     ]);
   });
 
+  test("uses the supplied C1 Teil 2 sleep-research interview questions and key", () => {
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL2.audioObjectKey).toBe("c1/exam-horen-1/teil-2.mp3");
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL2.questions.map((question) => question.number)).toEqual([
+      7, 8, 9, 10, 11, 12, 13, 14, 15,
+    ]);
+    expect(C1_EXAM_HOEREN_SAMPLE_1_TEIL2.questions.map((question) => question.answer)).toEqual([
+      "b", "b", "b", "c", "a", "b", "b", "a", "b",
+    ]);
+  });
+
   test("publishes it under Exams Room Hören, not Mock Exams", () => {
     expect(horenPage).toContain('["A1", "A2", "C1"].includes(normalizedLevel)');
-    expect(horenPage).toContain('"6 questions · Teil 1"');
+    expect(horenPage).toContain('"15 questions · Teil 1–2"');
     expect(samplePage).toContain("fetchC1ExamHorenAudioPlaybackUrl");
     expect(samplePage).toContain('level === "C1"');
     expect(catalog).not.toContain("c1-final-01");
