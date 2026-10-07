@@ -7,6 +7,7 @@ const SECTION_DURATIONS = Object.freeze({
   teil1: 18 * 60,
   teil2: 12 * 60,
   teil3: 12 * 60,
+  teil4: 12 * 60,
 });
 
 const formatTime = (seconds) => {
@@ -24,6 +25,8 @@ const initialState = () => ({
   teil2Answers: {},
   teil3Answers: {},
   teil3Completed: false,
+  teil4Answers: {},
+  teil4Completed: false,
   completed: false,
 });
 
@@ -34,17 +37,27 @@ const readState = () => {
     const parsed = JSON.parse(window.localStorage.getItem(B2_FINAL_MOCK_STORAGE_KEY) || "null");
     if (!parsed || typeof parsed !== "object") return initialState();
 
+    const hasTeil4Progress =
+      Boolean(parsed.teil4Completed) ||
+      Boolean(Object.keys(parsed.teil4Answers || {}).length) ||
+      parsed.stage === "teil4";
+    const migratedFromTeil3Completion =
+      Boolean(parsed.completed && parsed.teil3Completed && !hasTeil4Progress);
+    const stage = migratedFromTeil3Completion ? "teil4" : (parsed.stage || "teil1");
+
     return {
       ...initialState(),
       ...parsed,
-      stage: parsed.stage || "teil1",
+      stage,
       teil1Answers: parsed.teil1Answers || parsed.answers || {},
       teil2Answers: parsed.teil2Answers || {},
       teil3Answers: parsed.teil3Answers || {},
       teil3Completed: Boolean(parsed.teil3Completed),
-      deadlineMs: Number(parsed.deadlineMs) || null,
-      started: Boolean(parsed.started),
-      completed: Boolean(parsed.completed && parsed.teil3Completed),
+      teil4Answers: parsed.teil4Answers || {},
+      teil4Completed: Boolean(parsed.teil4Completed),
+      deadlineMs: migratedFromTeil3Completion ? null : (Number(parsed.deadlineMs) || null),
+      started: migratedFromTeil3Completion ? false : Boolean(parsed.started),
+      completed: Boolean(parsed.completed && parsed.teil4Completed),
     };
   } catch (_error) {
     return initialState();
@@ -257,7 +270,7 @@ const Teil3ChoiceList = ({ question, value, onChoose, disabled }) => (
   </div>
 );
 
-const Teil3 = ({ answers, onChoose, secondsLeft, onFinish }) => {
+const Teil3 = ({ answers, onChoose, secondsLeft, onContinue }) => {
   const answeredCount = B2_READING.teil3.questions.filter((question) => Boolean(answers[question.number])).length;
   const midpoint = Math.ceil(B2_READING.teil3.paragraphs.length / 2);
   const left = B2_READING.teil3.paragraphs.slice(0, midpoint);
@@ -302,8 +315,89 @@ const Teil3 = ({ answers, onChoose, secondsLeft, onFinish }) => {
         </div>
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
+        <button type="button" className="b2-mock-next" onClick={onContinue}>
+          Teil 3 abschließen · weiter zu Teil 4
+        </button>
+      </section>
+    </>
+  );
+};
+
+const Teil4Select = ({ number, value, answers, onChange, disabled }) => {
+  const usedLetters = new Set(
+    Object.entries(answers)
+      .filter(([questionNumber]) => Number(questionNumber) !== Number(number))
+      .map(([, letter]) => letter)
+      .filter(Boolean),
+  );
+
+  return (
+    <select
+      className="b2-mock-teil4-select"
+      aria-label={`Aufgabe ${number}: Stellungnahme auswählen`}
+      value={value || ""}
+      onChange={(event) => onChange(number, event.target.value)}
+      disabled={disabled}
+    >
+      <option value="">–</option>
+      {B2_READING.teil4.statements.map((statement) => (
+        <option key={statement.id} value={statement.id} disabled={usedLetters.has(statement.id)}>
+          {statement.id}
+        </option>
+      ))}
+    </select>
+  );
+};
+
+const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
+  const answeredCount = B2_READING.teil4.questions.filter((question) => Boolean(answers[question.number])).length;
+
+  return (
+    <>
+      <section className="b2-mock-teil4-statements">
+        <p className="b2-mock-section-label">Stellungnahmen A bis H · Teil 4</p>
+        <h2>{B2_READING.teil4.topic}</h2>
+
+        <div className="b2-mock-teil4-list">
+          {B2_READING.teil4.statements.map((statement) => (
+            <article className="b2-mock-teil4-statement" key={statement.id}>
+              <div className="b2-mock-teil4-letter">{statement.id}</div>
+              <div>
+                <h3>{statement.person} <span>({statement.role})</span></h3>
+                <p>{statement.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="b2-mock-teil4-tasks">
+        <div className="b2-mock-task-heading">
+          <div>
+            <p className="b2-mock-section-label">Aufgaben 22 bis 27 · Teil 4</p>
+            <h2>Welche Stellungnahme passt?</h2>
+          </div>
+          <strong>{answeredCount}/6 beantwortet</strong>
+        </div>
+
+        <div className="b2-mock-teil4-question-list">
+          {B2_READING.teil4.questions.map((question) => (
+            <div className="b2-mock-teil4-question" key={question.number}>
+              <p><strong>{question.number}.</strong> {question.statement}</p>
+              <Teil4Select
+                number={question.number}
+                value={answers[question.number]}
+                answers={answers}
+                onChange={onChoose}
+                disabled={secondsLeft <= 0}
+              />
+            </div>
+          ))}
+        </div>
+
+        <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Teil 3 abschließen
+          Teil 4 abschließen
         </button>
       </section>
     </>
@@ -370,6 +464,14 @@ export default function B2FinalMockExamPage() {
     }));
   };
 
+  const chooseTeil4 = (number, answer) => {
+    if (!state.started || secondsLeft <= 0) return;
+    setState((current) => ({
+      ...current,
+      teil4Answers: { ...current.teil4Answers, [number]: answer },
+    }));
+  };
+
   const continueToTeil2 = () => {
     setState((current) => ({
       ...current,
@@ -390,10 +492,21 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishTeil3 = () => {
+  const continueToTeil4 = () => {
     setState((current) => ({
       ...current,
       teil3Completed: true,
+      stage: "teil4",
+      started: true,
+      deadlineMs: Date.now() + SECTION_DURATIONS.teil4 * 1000,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const finishTeil4 = () => {
+    setState((current) => ({
+      ...current,
+      teil4Completed: true,
       completed: true,
       deadlineMs: null,
     }));
@@ -406,7 +519,7 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · LESEN</p>
-          <h1>Teil 1 bis Teil 3 gespeichert</h1>
+          <h1>Teil 1 bis Teil 4 gespeichert</h1>
           <p>
             Ihre Antworten wurden gespeichert. Weitere Leseteile werden diesem B2-Mock Schritt für Schritt hinzugefügt.
           </p>
@@ -422,19 +535,23 @@ export default function B2FinalMockExamPage() {
 
       {!state.started ? (
         <section className="b2-mock-start">
-          <h2>B2 Lesen · Teil 1</h2>
-          <p>
-            Lesen Sie zuerst die vier Forumsbeiträge. Danach ordnen Sie die Aussagen 1–9 den Personen A–D zu.
-            Die Personen können mehrmals gewählt werden.
-          </p>
-          <button type="button" onClick={start}>Teil 1 starten</button>
+          <h2>B2 Lesen · {B2_READING[state.stage]?.title || "Teil 1"}</h2>
+          <p>{B2_READING[state.stage]?.intro}</p>
+          <button type="button" onClick={start}>{B2_READING[state.stage]?.title || "Teil 1"} starten</button>
         </section>
+      ) : state.stage === "teil4" ? (
+        <Teil4
+          answers={state.teil4Answers}
+          onChoose={chooseTeil4}
+          secondsLeft={secondsLeft}
+          onFinish={finishTeil4}
+        />
       ) : state.stage === "teil3" ? (
         <Teil3
           answers={state.teil3Answers}
           onChoose={chooseTeil3}
           secondsLeft={secondsLeft}
-          onFinish={finishTeil3}
+          onContinue={continueToTeil4}
         />
       ) : state.stage === "teil2" ? (
         <Teil2
