@@ -57,7 +57,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
                 ? "15 questions · Teil 1–3"
                 : normalizedLevel === "A2"
                   ? "20 questions · Teil 1–4"
-                  : "15 questions · Teil 1–2"}
+                  : "23 questions · Teil 1–3"}
             </span>
           </button>
         </div>
