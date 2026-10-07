@@ -36,6 +36,9 @@ const initialState = () => ({
   hoeren2Answers: {},
   hoeren2AudioStatus: "not_started",
   hoeren2Completed: false,
+  hoeren3Answers: {},
+  hoeren3AudioStatus: "not_started",
+  hoeren3Completed: false,
   completed: false,
 });
 
@@ -78,18 +81,29 @@ const readState = () => {
     const migratedFromHoeren1Completion =
       Boolean(parsed.completed && parsed.hoeren1Completed && !hasHoeren2Progress);
 
+    const hasHoeren3Progress =
+      Boolean(parsed.hoeren3Completed) ||
+      Boolean(Object.keys(parsed.hoeren3Answers || {}).length) ||
+      ["started", "ended"].includes(String(parsed.hoeren3AudioStatus || "")) ||
+      parsed.stage === "hoeren-teil3";
+    const migratedFromHoeren2Completion =
+      Boolean(parsed.completed && parsed.hoeren2Completed && !hasHoeren3Progress);
+
     const stage = migratedFromTeil3Completion
       ? "teil4"
       : migratedFromLesenCompletion
         ? "hoeren-teil1"
         : migratedFromHoeren1Completion
           ? "hoeren-teil2"
-          : (parsed.stage || "teil1");
+          : migratedFromHoeren2Completion
+            ? "hoeren-teil3"
+            : (parsed.stage || "teil1");
 
     const migratedForward =
       migratedFromTeil3Completion ||
       migratedFromLesenCompletion ||
-      migratedFromHoeren1Completion;
+      migratedFromHoeren1Completion ||
+      migratedFromHoeren2Completion;
 
     return {
       ...initialState(),
@@ -107,9 +121,12 @@ const readState = () => {
       hoeren2Answers: parsed.hoeren2Answers || {},
       hoeren2AudioStatus: restoreAudioStatus(parsed.hoeren2AudioStatus),
       hoeren2Completed: Boolean(parsed.hoeren2Completed),
+      hoeren3Answers: parsed.hoeren3Answers || {},
+      hoeren3AudioStatus: restoreAudioStatus(parsed.hoeren3AudioStatus),
+      hoeren3Completed: Boolean(parsed.hoeren3Completed),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
-      completed: Boolean(parsed.completed && parsed.hoeren2Completed),
+      completed: Boolean(parsed.completed && parsed.hoeren3Completed),
     };
   } catch (_error) {
     return initialState();
@@ -117,11 +134,12 @@ const readState = () => {
 };
 
 const getStageConfig = (stage) => {
-  if (stage === "hoeren-teil1" || stage === "hoeren-teil2") {
-    const listeningPart = stage === "hoeren-teil2" ? B2_LISTENING.teil2 : B2_LISTENING.teil1;
+  if (["hoeren-teil1", "hoeren-teil2", "hoeren-teil3"].includes(stage)) {
+    const partNumber = stage === "hoeren-teil3" ? 3 : stage === "hoeren-teil2" ? 2 : 1;
+    const listeningPart = B2_LISTENING[`teil${partNumber}`];
     return {
       module: "HÖREN",
-      title: stage === "hoeren-teil2" ? "Teil 2" : "Teil 1",
+      title: `Teil ${partNumber}`,
       time: "",
       intro: listeningPart.intro,
     };
@@ -681,7 +699,90 @@ const HoerenTeil2 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusCha
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Hören Teil 2 abschließen
+          Hören Teil 2 abschließen · weiter zu Teil 3
+        </button>
+      </section>
+    </>
+  );
+};
+
+const HorenSpeakerChoices = ({ questionNumber, value, onChoose, disabled = false, example = false, answer = "" }) => (
+  <div className="b2-mock-hoeren-options" role="radiogroup" aria-label={`Aufgabe ${questionNumber || "Beispiel"}`}>
+    {B2_LISTENING.teil3.speakers.map((speaker) => {
+      const selected = example ? answer === speaker.id : value === speaker.id;
+      return (
+        <label key={speaker.id} className={selected ? "selected" : ""}>
+          <input
+            type="radio"
+            name={`b2-hoeren-teil-3-${questionNumber || "example"}`}
+            checked={selected}
+            onChange={() => !example && onChoose(questionNumber, speaker.id)}
+            disabled={disabled || example}
+          />
+          <strong>{speaker.id})</strong>
+          <span>{speaker.label}</span>
+        </label>
+      );
+    })}
+  </div>
+);
+
+const HoerenTeil3 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusChange, onFinish }) => {
+  const part = B2_LISTENING.teil3;
+  const answeredCount = part.questions.filter((question) => Boolean(answers[question.number])).length;
+
+  return (
+    <>
+      <section className="b2-mock-hoeren-section">
+        <p className="b2-mock-section-label">Wer sagt das? · Teil 3</p>
+        <h2>Hören Teil 3</h2>
+        <B2MockAudioPlayer
+          idToken={idToken}
+          part={part}
+          status={audioStatus}
+          onStatusChange={onAudioStatusChange}
+        />
+
+        <article className="b2-mock-hoeren-question">
+          <div className="b2-mock-hoeren-question-heading">
+            <span>Beispiel</span>
+            <strong>{part.example.statement}</strong>
+          </div>
+          <HorenSpeakerChoices
+            questionNumber="example"
+            value={part.example.answer}
+            onChoose={() => {}}
+            example
+            answer={part.example.answer}
+          />
+        </article>
+      </section>
+
+      <section className="b2-mock-hoeren-tasks">
+        <div className="b2-mock-task-heading">
+          <div>
+            <p className="b2-mock-section-label">Aufgaben 17 bis 22 · Hören Teil 3</p>
+            <h2>Wer sagt das?</h2>
+          </div>
+          <strong>{answeredCount}/6 beantwortet</strong>
+        </div>
+
+        <section className="b2-mock-hoeren-text-block">
+          {part.questions.map((question) => (
+            <article className="b2-mock-hoeren-question" key={question.number}>
+              <strong>{question.number}. {question.statement}</strong>
+              <HorenSpeakerChoices
+                questionNumber={question.number}
+                value={answers[question.number]}
+                onChoose={onChoose}
+              />
+            </article>
+          ))}
+        </section>
+
+        <p className="b2-mock-autosave">Automatisch gespeichert</p>
+        <button type="button" className="b2-mock-next" onClick={onFinish}>
+          Hören Teil 3 abschließen
         </button>
       </section>
     </>
@@ -796,6 +897,21 @@ export default function B2FinalMockExamPage() {
     }));
   };
 
+  const chooseHoeren3 = (number, answer) => {
+    if (!state.started) return;
+    setState((current) => ({
+      ...current,
+      hoeren3Answers: { ...current.hoeren3Answers, [number]: answer },
+    }));
+  };
+
+  const setHoeren3AudioStatus = (audioStatus) => {
+    setState((current) => ({
+      ...current,
+      hoeren3AudioStatus: audioStatus,
+    }));
+  };
+
   const continueToTeil2 = () => {
     setState((current) => ({
       ...current,
@@ -851,10 +967,22 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishHoerenTeil2 = () => {
+  const continueToHoerenTeil3 = () => {
     setState((current) => ({
       ...current,
       hoeren2Completed: true,
+      stage: "hoeren-teil3",
+      started: false,
+      completed: false,
+      deadlineMs: null,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const finishHoerenTeil3 = () => {
+    setState((current) => ({
+      ...current,
+      hoeren3Completed: true,
       completed: true,
       deadlineMs: null,
     }));
@@ -867,7 +995,7 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · MOCK</p>
-          <h1>Lesen Teil 1–4 und Hören Teil 1–2 gespeichert</h1>
+          <h1>Lesen Teil 1–4 und Hören Teil 1–3 gespeichert</h1>
           <p>
             Ihre Antworten wurden gespeichert. Weitere Hörteile werden diesem B2-Mock Schritt für Schritt hinzugefügt.
           </p>
@@ -887,6 +1015,15 @@ export default function B2FinalMockExamPage() {
           <p>{getStageConfig(state.stage).intro}</p>
           <button type="button" onClick={start}>{getStageConfig(state.stage).title} starten</button>
         </section>
+      ) : state.stage === "hoeren-teil3" ? (
+        <HoerenTeil3
+          idToken={idToken}
+          answers={state.hoeren3Answers}
+          audioStatus={state.hoeren3AudioStatus}
+          onChoose={chooseHoeren3}
+          onAudioStatusChange={setHoeren3AudioStatus}
+          onFinish={finishHoerenTeil3}
+        />
       ) : state.stage === "hoeren-teil2" ? (
         <HoerenTeil2
           idToken={idToken}
@@ -894,7 +1031,7 @@ export default function B2FinalMockExamPage() {
           audioStatus={state.hoeren2AudioStatus}
           onChoose={chooseHoeren2}
           onAudioStatusChange={setHoeren2AudioStatus}
-          onFinish={finishHoerenTeil2}
+          onFinish={continueToHoerenTeil3}
         />
       ) : state.stage === "hoeren-teil1" ? (
         <HoerenTeil1
