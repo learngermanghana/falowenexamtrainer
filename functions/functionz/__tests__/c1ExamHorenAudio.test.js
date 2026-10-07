@@ -39,6 +39,17 @@ describe("C1 Exams Room Hören audio", () => {
     });
 
     expect(validateC1ExamHorenAudioKey({
+      sampleId: "sample-1",
+      part: "teil-4",
+      key: "c1/exam-horen-1/teil-4.mp3",
+    })).toEqual({
+      level: "C1",
+      sampleId: "sample-1",
+      part: "teil-4",
+      key: "c1/exam-horen-1/teil-4.mp3",
+    });
+
+    expect(validateC1ExamHorenAudioKey({
       sampleId: "sample-2",
       part: "teil-1",
       key: "c1/exam-horen-1/teil-1.mp3",
