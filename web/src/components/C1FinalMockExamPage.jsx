@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
-import { C1_FINAL_MOCK_STORAGE_KEY, C1_READING } from "../data/c1FinalMockData";
+import {
+  C1_FINAL_MOCK_STORAGE_KEY,
+  C1_READING,
+  C1_READING_PRACTICE_STORAGE_KEY,
+} from "../data/c1FinalMockData";
 import { C1_READING_TEIL2 } from "../data/c1FinalMockTeil2Data";
 import { C1_READING_TEIL3 } from "../data/c1FinalMockTeil3Data";
 import { C1_READING_TEIL4 } from "../data/c1FinalMockTeil4Data";
@@ -39,7 +43,11 @@ const initialState = () => ({
 const readState = () => {
   if (typeof window === "undefined") return initialState();
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(C1_FINAL_MOCK_STORAGE_KEY) || "null");
+    const parsed = JSON.parse(
+      window.localStorage.getItem(C1_READING_PRACTICE_STORAGE_KEY) ||
+      window.localStorage.getItem(C1_FINAL_MOCK_STORAGE_KEY) ||
+      "null",
+    );
     if (!parsed || typeof parsed !== "object") return initialState();
 
     const legacyTeil1Answers = parsed.teil1Answers || parsed.answers || {};
@@ -423,7 +431,7 @@ export default function C1FinalMockExamPage() {
 
   useEffect(() => {
     window.localStorage.setItem(
-      C1_FINAL_MOCK_STORAGE_KEY,
+      C1_READING_PRACTICE_STORAGE_KEY,
       JSON.stringify({ ...state, savedAt: Date.now() }),
     );
   }, [state]);
@@ -540,8 +548,8 @@ export default function C1FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="c1-mock-start">
           <p className="c1-mock-kicker">GOETHE-ZERTIFIKAT C1 · LESEN</p>
-          <h1>Teil 1 bis Teil 4 gespeichert</h1>
-          <p>Ihre Antworten wurden gespeichert. Die weiteren C1-Leseteile werden diesem Mock Schritt für Schritt hinzugefügt.</p>
+          <h1>C1 Lesen Sample 1 abgeschlossen</h1>
+          <p>Ihre Antworten für Teil 1 bis Teil 4 wurden gespeichert. Dieses Training gehört zum Lesen-Bereich im Exams Room und ist kein vollständiger C1-Mock.</p>
         </section>
       </main>
     );
