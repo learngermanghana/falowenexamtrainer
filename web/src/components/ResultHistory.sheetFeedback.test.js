@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { buildResultResubmitTarget, hasStructuredResultFeedback } from "./ResultHistory";
+import { buildResultResubmitTarget, getScoreBreakdownRows, hasStructuredResultFeedback, resolveResultAssignmentTitle, resolveResultScore } from "./ResultHistory";
 
 describe("Sheet result feedback presentation", () => {
   test("a basic Sheet row with one comments column is not expanded into duplicate feedback sections", () => {
@@ -33,7 +33,8 @@ describe("Sheet result feedback presentation", () => {
     expect(source).toContain("const hasStructuredFeedback = hasStructuredResultFeedback(item)");
     expect(source).toContain("const correctionPoints = hasStructuredFeedback ? getCorrectionPoints(item) : []");
     expect(source).toContain("{hasStructuredFeedback ? (");
-    expect(source).toContain('<TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />');
+    expect(source).toContain('const distinctFeedback = getDistinctFeedbackText(item)');
+    expect(source).toContain('<TextBlock title={t("resultHistory.feedbackTitle")} text={distinctFeedback} />');
   });
 
   test("objective feedback uses student-friendly review labels instead of raw admin wording", () => {
@@ -56,6 +57,55 @@ describe("Sheet result feedback presentation", () => {
     expect(source).toContain("...styles.primaryButton");
     expect(source).toContain("item.link && !Number(item.objectiveTotal || 0)");
   });
+  test("objective-only results reconcile stale overall scores with the marked objective score", () => {
+    expect(
+      resolveResultScore({
+        score: 100,
+        objectiveScore: 20,
+        objectiveCorrect: 3,
+        objectiveTotal: 15,
+        scoreBreakdown: [{ label: "Objective / MCQ", score: "3/15" }],
+      }),
+    ).toBe(20);
+  });
+
+  test("mixed writing and objective results keep their weighted overall score", () => {
+    expect(
+      resolveResultScore({
+        score: 82,
+        objectiveScore: 70,
+        objectiveCorrect: 7,
+        objectiveTotal: 10,
+        writingScore: 36,
+        maxWritingScore: 40,
+      }),
+    ).toBe(82);
+  });
+
+  test("duplicate objective breakdown rows collapse into one summary row", () => {
+    expect(
+      getScoreBreakdownRows({
+        objectiveScore: 20,
+        objectiveCorrect: 3,
+        objectiveTotal: 15,
+        scoreBreakdown: [
+          { label: "Objective / MCQ", score: "3/15", reason: "20% objective score" },
+          { label: "Objective / MCQ", score: "3/15", reason: "duplicate" },
+        ],
+      }),
+    ).toHaveLength(1);
+  });
+
+  test("boolean-like assignment titles resolve from the curriculum assignment ID", () => {
+    expect(
+      resolveResultAssignmentTitle({
+        assignment: "TRUE",
+        assignmentId: "A1-11",
+        level: "A1",
+      }),
+    ).toContain("Instructions");
+  });
+
   test("failed A1 results reopen the exact workbook on Review & Submit", () => {
     const target = buildResultResubmitTarget({
       level: "A1",
