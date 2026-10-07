@@ -160,6 +160,26 @@ export default function B1FinalMockSpeaking({
     [attempts],
   );
 
+  const hasUnsentRecording = useMemo(
+    () =>
+      Boolean(recordingTaskId) ||
+      TASKS.some((task) => Boolean(attempts[task.id]?.audioBlob && !attempts[task.id]?.submitted)),
+    [attempts, recordingTaskId],
+  );
+
+  useEffect(() => {
+    if (!hasUnsentRecording) return undefined;
+
+    const warnBeforeRefresh = (event) => {
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("beforeunload", warnBeforeRefresh);
+    return () => window.removeEventListener("beforeunload", warnBeforeRefresh);
+  }, [hasUnsentRecording]);
+
   const isUnlocked = (index) => index === 0 || Boolean(attempts[TASKS[index - 1].id]?.transcript);
 
   const clearRecorderTimer = () => {
@@ -424,6 +444,24 @@ export default function B1FinalMockSpeaking({
         <div><span className="a1-sprechen-control-label">Time left</span><strong>{formatTime(secondsLeft)}</strong></div>
         <div><span className="a1-sprechen-control-label">Progress</span><strong>{completedCount}/3 submitted</strong></div>
       </div>
+
+      {hasUnsentRecording ? (
+        <div
+          role="alert"
+          style={{
+            margin: "12px 0",
+            padding: 12,
+            border: "1px solid #f59e0b",
+            borderRadius: 10,
+            background: "#fffbeb",
+            color: "#92400e",
+            lineHeight: 1.55,
+          }}
+        >
+          <strong>Do not refresh yet.</strong> This recording is still only on this device. Send the answer first;
+          after submission, the transcript and speaking result are autosaved and the raw audio is no longer needed.
+        </div>
+      ) : null}
 
       {TASKS.map((task, index) => {
         const attempt = attempts[task.id] || {};
