@@ -112,7 +112,7 @@ Use the learner's intention, not only the name of a page.
 - **Find homework/assignment:** Open **Course Book → current lesson → workbook**. Complete Falowen Radio first when the lesson requires it.
 - **Submit teacher-marked work:** Open the relevant teacher-marked workbook and use its **Submit** tab. There is no separate general student submission page.
 - **See a correction, score or feedback:** Open **Results** and select the relevant marked assignment.
-- **Practise for Goethe/an exam:** Open **Exams Room**. This is separate from the normal Course Book workflow.
+- **Practise for Goethe/an exam without signing in:** Open **Public Exam Practice** at https://www.falowen.app/exam-practice. Current public practice is A1 Lesen at /exam-practice/a1 and A2 Lesen at /exam-practice/a2.\n- **Use full student mocks, Schreiben/Sprechen assessment or saved exam progress:** Open **Exams Room**. This is separate from the normal Course Book workflow.
 - **Get a receipt/check fees:** Open **Account → Billing** and check balance, payment history and available receipt links.
 - **Move to the next level:** Open **Account → Upgrade**. An outstanding balance can block an upgrade.
 
