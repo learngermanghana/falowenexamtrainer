@@ -81,7 +81,7 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
       ? `Goethe ${normalizedLevel} Exam Preparation | German ${normalizedLevel} Practice | Falowen`
       : `German ${normalizedLevel} Course Online | ${normalizedLevel} Lessons & Practice | Falowen`;
     const description = isExam
-      ? `Prepare for German ${normalizedLevel} exams with Falowen: structured reading, listening, writing and speaking practice, detailed grammar, tutor feedback and progress tracking.`
+      ? `Prepare for the Goethe ${normalizedLevel} German exam with Falowen: level-specific Lesen, Hören, Schreiben and Sprechen practice, detailed grammar, tutor feedback and progress tracking.`
       : `Learn German ${normalizedLevel} online with Falowen. Study structured lessons, grammar, vocabulary, listening, writing, speaking, tutor-marked assignments and exam preparation.`;
 
     const provider = {
@@ -96,11 +96,11 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
       ? {
           "@context": "https://schema.org",
           "@type": "LearningResource",
-          name: `German ${normalizedLevel} exam preparation with Falowen`,
+          name: `Goethe ${normalizedLevel} exam preparation with Falowen`,
           url: `https://www.falowen.app${canonicalPath}`,
           description,
           educationalLevel: normalizedLevel,
-          learningResourceType: "German exam preparation",
+          learningResourceType: "Goethe-style German exam preparation",
           inLanguage: ["de", "en"],
           provider,
         }
@@ -130,8 +130,8 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
         },
         {
           "@type": "Question",
-          name: `Does Falowen include ${normalizedLevel} exam preparation?`,
-          acceptedAnswer: { "@type": "Answer", text: `Yes. Falowen combines structured ${normalizedLevel} learning with reading, listening, writing and speaking practice, tutor feedback and progress tracking.` },
+          name: `Does Falowen include Goethe ${normalizedLevel} exam preparation?`,
+          acceptedAnswer: { "@type": "Answer", text: `Yes. Falowen combines structured ${normalizedLevel} learning with Goethe-style Lesen, Hören, Schreiben and Sprechen practice, tutor feedback and progress tracking.` },
         },
         {
           "@type": "Question",
@@ -146,8 +146,8 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Falowen", item: "https://www.falowen.app/" },
-        { "@type": "ListItem", position: 2, name: isExam ? "German exam preparation" : "German courses", item: "https://www.falowen.app/learn-german-ghana" },
-        { "@type": "ListItem", position: 3, name: isExam ? `${normalizedLevel} exam preparation` : `German ${normalizedLevel}`, item: `https://www.falowen.app${canonicalPath}` },
+        { "@type": "ListItem", position: 2, name: isExam ? "Goethe exam preparation" : "German courses", item: "https://www.falowen.app/learn-german-ghana" },
+        { "@type": "ListItem", position: 3, name: isExam ? `Goethe ${normalizedLevel} exam preparation` : `German ${normalizedLevel}`, item: `https://www.falowen.app${canonicalPath}` },
       ],
     };
 
@@ -173,11 +173,16 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
           <Chip>Reading · Listening · Writing · Speaking</Chip>
         </div>
         <h1 style={{ margin: 0, fontSize: "clamp(30px, 6vw, 48px)", lineHeight: 1.05 }}>
-          {isExam ? `German ${normalizedLevel} exam preparation with Falowen` : `Learn German ${normalizedLevel} online with Falowen`}
+          {isExam ? `Goethe ${normalizedLevel} exam preparation with Falowen` : `Learn German ${normalizedLevel} online with Falowen`}
         </h1>
         <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.75, maxWidth: 820 }}>{content.summary}</p>
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
           <button type="button" style={styles.primaryButton} onClick={() => onSignUp?.("german")}>Start German {normalizedLevel}</button>
+          {isExam && ["A1", "A2"].includes(normalizedLevel) ? (
+            <a href={`/exam-practice/${normalizedLevel.toLowerCase()}`} style={{ ...styles.secondaryButton, textDecoration: "none", background: "#ffffff" }}>
+              Try free Goethe {normalizedLevel} Lesen practice
+            </a>
+          ) : null}
           <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none", background: "#ffffff" }}>Take the placement test</a>
           <button type="button" style={{ ...styles.secondaryButton, background: "#ffffff" }} onClick={onLogin}>Log in</button>
         </div>
