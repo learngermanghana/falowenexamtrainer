@@ -153,6 +153,82 @@ export const B2_READING = Object.freeze({
     },
   },
 
+  teil3: {
+    title: "Teil 3",
+    time: "12 Minuten",
+    intro:
+      "Lesen Sie den Text aus einer Zeitung und die Aufgaben 16 bis 21 dazu. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
+    articleTitle: "Arbeitswelt im Wandel: Die Vier-Tage-Woche auf dem Prüfstand",
+    paragraphs: [
+      "Immer mehr Unternehmen in Deutschland testen ein Arbeitsmodell, das vor wenigen Jahren noch als nahezu undenkbar galt: die Vier-Tage-Woche bei vollem Lohnausgleich. Während Gewerkschaften und Arbeitnehmervertreter das Modell als bahnbrechenden Schritt für die Gesundheit und Zufriedenheit der Beschäftigten feiern, äußern viele Wirtschaftsverbände erhebliche Bedenken hinsichtlich der Wettbewerbsfähigkeit und Produktivität.",
+      "Ein großes Pilotprojekt in Großbritannien sowie ähnliche Versuche in skandinavischen Ländern zeigten überraschend vielversprechende Ergebnisse. Die Mehrheit der teilnehmenden Betriebe berichtete von einer gleichbleibenden oder sogar steigenden Produktivität, obwohl die Gesamtarbeitszeit von 40 auf 32 Stunden reduziert wurde. Zudem ging der Krankenstand unter den Angestellten spürbar zurück. Psychologen erklären diesen Effekt damit, dass Beschäftigte durch das verlängerte Wochenende deutlich besser entspannen können und motivierter an ihren Arbeitsplatz zurückkehren.",
+      "Dennoch lässt sich das Modell nicht ohne Weiteres auf alle Branchen übertragen. Besonders im Dienstleistungssektor, in der Pflege sowie im Handwerk stoßen Unternehmen schnell an ihre Grenzen. In Berufen, die eine ständige Präsenz vor Ort erfordern, bedeutet eine Reduzierung der Arbeitszeit, dass zusätzliches Personal eingestellt werden muss, um die entstehenden Lücken zu füllen. Angesichts des akuten Fachkräftemangels in vielen Wirtschaftsbereichen halten Kritiker dies jedoch für eine reine Illusion.",
+      "Ein weiteres Argument der Gegner betrifft die sogenannte Arbeitsverdichtung. Wenn die gleiche Arbeitsmenge in vier statt fünf Tagen erledigt werden muss, steigt der tägliche Stresspegel für die Beschäftigten erheblich. Pausenzeiten werden oft verkürzt, und der informelle Austausch unter Kolleginnen und Kollegen leidet. Einige Experten warnen daher davor, dass der vermeintliche Gewinn an Freizeit durch eine deutlich höhere Belastung an den verbleibenden Arbeitstagen teuer erkauft werden könnte.",
+      "Trotz aller Einwände zeichnet sich ab, dass flexible Arbeitszeitmodelle für die jüngere Generation von Arbeitnehmern ein entscheidendes Kriterium bei der Arbeitgeberwahl darstellen. Betriebe, die sich diesen Entwicklungen komplett verschließen, könnten es in Zukunft schwer haben, qualifizierten Nachwuchs zu gewinnen. Fachleute plädieren daher für individuelle, branchenspezifische Lösungen anstelle starrer gesetzlicher Vorgaben für die gesamte Wirtschaft.",
+    ],
+    questions: [
+      {
+        number: 16,
+        question: "Die Einführung der Vier-Tage-Woche bei gleichem Gehalt …",
+        options: [
+          { id: "a", label: "wird von Wirtschaftsverbänden wegen möglicher Leistungseinbußen kritisch gesehen." },
+          { id: "b", label: "führt nach Ansicht der Gewerkschaften zu schlechteren Arbeitsbedingungen." },
+          { id: "c", label: "ist in den meisten deutschen Unternehmen bereits gesetzlich vorgeschrieben." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 17,
+        question: "Welche Erkenntnis brachten internationale Pilotprojekte hervor?",
+        options: [
+          { id: "a", label: "Die Fehlzeiten der Mitarbeiter wegen Krankheit nahmen deutlich zu." },
+          { id: "b", label: "Trotz verkürzter Arbeitszeit blieb die Arbeitsleistung stabil oder stieg an." },
+          { id: "c", label: "Die teilnehmenden Betriebe erlitten erhebliche finanzielle Verluste." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 18,
+        question: "Warum ist das Modell in Bereichen wie der Pflege oder dem Handwerk schwer umsetzbar?",
+        options: [
+          { id: "a", label: "Weil die Angestellten dort keine verkürzten Arbeitszeiten wünschen." },
+          { id: "b", label: "Weil diese Branchen eine ständige Präsenz erfordern und Personal fehlt." },
+          { id: "c", label: "Weil die Kundschaft am Wochenende keine Dienstleistungen nutzt." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 19,
+        question: "Welche Gefahr sehen Kritiker in Bezug auf die „Arbeitsverdichtung“?",
+        options: [
+          { id: "a", label: "Dass die Mitarbeiter mehr Pausen machen und weniger arbeiten." },
+          { id: "b", label: "Dass der tägliche Druck steigt und soziale Kontakte im Betrieb abnehmen." },
+          { id: "c", label: "Dass die Gehälter Schritt für Schritt gesenkt werden müssen." },
+        ],
+        answer: "b",
+      },
+      {
+        number: 20,
+        question: "Für jüngere Arbeitssuchende ist die Flexibilität der Arbeitszeit …",
+        options: [
+          { id: "a", label: "ein wichtiges Entscheidungskriterium bei der Bewerbung." },
+          { id: "b", label: "heutzutage von eher geringer Bedeutung." },
+          { id: "c", label: "nur dann attraktiv, wenn sie ausschließlich von zu Hause aus arbeiten." },
+        ],
+        answer: "a",
+      },
+      {
+        number: 21,
+        question: "Welches Fazit ziehen Fachleute bezüglich der Zukunft dieses Arbeitsmodells?",
+        options: [
+          { id: "a", label: "Es sollte ein einheitliches Gesetz für alle Unternehmen geben." },
+          { id: "b", label: "Die Vier-Tage-Woche sollte bundesweit verboten werden." },
+          { id: "c", label: "Es braucht maßgeschneiderte Lösungen für die jeweiligen Branchen." },
+        ],
+        answer: "c",
+      },
+    ],
+  },
 });
 
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
