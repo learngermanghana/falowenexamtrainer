@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
@@ -67,6 +67,8 @@ const renderStudyBuddyOverlay = (node) => {
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const pinLauncherToSafeCorner = /^\/campus\/results\/?$/i.test(location.pathname || "");
   const { idToken, user } = useAuth();
   const locale = i18n.language;
   const quickQuestionInputRef = useRef(null);
@@ -683,7 +685,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         className={`study-buddy-reopen${isHighContrast ? " is-high-contrast" : ""}`}
         type="button"
         style={
-          launcherPosition
+          launcherPosition && !pinLauncherToSafeCorner
             ? {
                 left: `${launcherPosition.left}px`,
                 top: `${launcherPosition.top}px`,
@@ -692,10 +694,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
               }
             : undefined
         }
-        onPointerDown={handleLauncherPointerDown}
-        onPointerMove={handleLauncherPointerMove}
-        onPointerUp={finishLauncherDrag}
-        onPointerCancel={finishLauncherDrag}
+        onPointerDown={pinLauncherToSafeCorner ? undefined : handleLauncherPointerDown}
+        onPointerMove={pinLauncherToSafeCorner ? undefined : handleLauncherPointerMove}
+        onPointerUp={pinLauncherToSafeCorner ? undefined : finishLauncherDrag}
+        onPointerCancel={pinLauncherToSafeCorner ? undefined : finishLauncherDrag}
         onClick={() => {
           if (suppressLauncherClickRef.current) {
             suppressLauncherClickRef.current = false;
@@ -705,7 +707,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
           trackStudyBuddyEvent("reopen");
         }}
         aria-label={t("studyBuddy.actions.reopenAria")}
-        title="Drag to move Study Buddy. Tap to open."
+        title={pinLauncherToSafeCorner ? "Tap to open Study Buddy." : "Drag to move Study Buddy. Tap to open."}
       >
         {t("studyBuddy.actions.reopen")}
       </button>
