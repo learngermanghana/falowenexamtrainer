@@ -334,4 +334,163 @@ export const B2_READING = Object.freeze({
   },
 });
 
+export const B2_LISTENING = Object.freeze({
+  teil1: {
+    id: "teil-1",
+    title: "Hören · Teil 1",
+    audioObjectKey: "b2/mock-hoeren-1/teil-1.mp3",
+    intro:
+      "Die Audiodatei enthält die Einleitung, den Beispieltext, die Lesepause für 01 und 02 sowie die fünf Texte zu den Aufgaben 1 bis 10.",
+    example: [
+      {
+        number: "01",
+        question: "Der Flug am 14. Juni wurde …",
+        options: [
+          { id: "a", label: "verspätet." },
+          { id: "b", label: "gestrichen." },
+          { id: "c", label: "umgebucht, ohne die Kundin zu informieren." },
+        ],
+        answer: "b",
+      },
+      {
+        number: "02",
+        question: "Was soll Herr Vogel tun?",
+        options: [
+          { id: "a", label: "Die Zusatzkosten bezahlen." },
+          { id: "b", label: "Bis Freitag zurückrufen." },
+          { id: "c", label: "Das Hotel anrufen." },
+        ],
+        answer: "b",
+      },
+    ],
+    texts: [
+      {
+        title: "Text 1 · Fahrradkurier",
+        questions: [
+          {
+            number: 1,
+            question: "Was gefällt dem Sprecher an seiner Arbeit am meisten?",
+            options: [
+              { id: "a", label: "Das hohe Gehalt." },
+              { id: "b", label: "Dass er draußen arbeitet." },
+              { id: "c", label: "Dass er keine Route planen muss." },
+            ],
+            answer: "b",
+          },
+          {
+            number: 2,
+            question: "Was plant er für die Zukunft?",
+            options: [
+              { id: "a", label: "Er will den Job wechseln." },
+              { id: "b", label: "Er will in ein Büro zurück." },
+              { id: "c", label: "Er will mit Kollegen eine Firma gründen." },
+            ],
+            answer: "c",
+          },
+        ],
+      },
+      {
+        title: "Text 2 · Radio: Pfandbecher",
+        questions: [
+          {
+            number: 3,
+            question: "Wie ist die Bilanz in Freiburg?",
+            options: [
+              { id: "a", label: "Niemand nutzt die Pfandbecher." },
+              { id: "b", label: "Etwa ein Drittel der Kunden nutzt sie, mehr als erwartet." },
+              { id: "c", label: "Alle Cafés machen mit." },
+            ],
+            answer: "b",
+          },
+          {
+            number: 4,
+            question: "Was diskutiert der Stadtrat?",
+            options: [
+              { id: "a", label: "Finanzielle Hilfe für kleine Betriebe." },
+              { id: "b", label: "Eine sofortige Pflicht zum Mehrwegbecher." },
+              { id: "c", label: "Ein Verbot von Cafés." },
+            ],
+            answer: "a",
+          },
+        ],
+      },
+      {
+        title: "Text 3 · Bibliothek: Ansage",
+        questions: [
+          {
+            number: 5,
+            question: "Was gilt für Medien, deren Leihfrist in der Schließzeit endet?",
+            options: [
+              { id: "a", label: "Man muss sie sofort abgeben." },
+              { id: "b", label: "Es entstehen keine Gebühren." },
+              { id: "c", label: "Man muss sie verlängern." },
+            ],
+            answer: "b",
+          },
+          {
+            number: 6,
+            question: "Was ist in der Zweigstelle anders?",
+            options: [
+              { id: "a", label: "Samstags ist bis 16 Uhr geöffnet." },
+              { id: "b", label: "Sie schließt ebenfalls." },
+              { id: "c", label: "Das Lesecafé öffnet dort neu." },
+            ],
+            answer: "a",
+          },
+        ],
+      },
+      {
+        title: "Text 4 · Professorin: Lernen",
+        questions: [
+          {
+            number: 7,
+            question: "Woran liegt das Problem laut der Professorin meist?",
+            options: [
+              { id: "a", label: "An zu vielen Aufgaben." },
+              { id: "b", label: "An der Organisation des Lernens." },
+              { id: "c", label: "An zu wenig Büchern." },
+            ],
+            answer: "b",
+          },
+          {
+            number: 8,
+            question: "Was bietet die Universität an?",
+            options: [
+              { id: "a", label: "Online-Prüfungen." },
+              { id: "b", label: "Mehr Aufgaben." },
+              { id: "c", label: "Abendkurse." },
+            ],
+            answer: "c",
+          },
+        ],
+      },
+      {
+        title: "Text 5 · Berufswechsel: Tischlerin",
+        questions: [
+          {
+            number: 9,
+            question: "Warum hat die Sprecherin ihren Job gekündigt?",
+            options: [
+              { id: "a", label: "Sie hat zu wenig verdient." },
+              { id: "b", label: "Die Schreibtischarbeit machte sie nicht mehr glücklich." },
+              { id: "c", label: "Ihr Chef war unfreundlich." },
+            ],
+            answer: "b",
+          },
+          {
+            number: 10,
+            question: "Wie reagiert die Familie?",
+            options: [
+              { id: "a", label: "Alle sind dagegen." },
+              { id: "b", label: "Die meisten unterstützen sie, nur der Vater ist skeptisch." },
+              { id: "c", label: "Niemand weiß davon." },
+            ],
+            answer: "b",
+          },
+        ],
+      },
+    ],
+  },
+});
+
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
