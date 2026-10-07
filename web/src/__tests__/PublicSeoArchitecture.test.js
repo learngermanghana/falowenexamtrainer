@@ -11,7 +11,10 @@ describe("public SEO architecture", () => {
   const home = read("components/LandingPageSimple.js");
   const indexHtml = fs.readFileSync(path.resolve(root, "../index.html"), "utf8");
   const sitemap = fs.readFileSync(path.resolve(root, "../public/sitemap.xml"), "utf8");
-  const robots = fs.readFileSync(path.resolve(root, "../public/robots.txt"), "utf8");\n  const llms = fs.readFileSync(path.resolve(root, "../public/llms.txt"), "utf8");\n  const help = fs.readFileSync(path.resolve(root, "../public/falowen-help.md"), "utf8");\n  const studyBuddy = read("services/studyBuddyService.js");
+  const robots = fs.readFileSync(path.resolve(root, "../public/robots.txt"), "utf8");
+  const llms = fs.readFileSync(path.resolve(root, "../public/llms.txt"), "utf8");
+  const help = fs.readFileSync(path.resolve(root, "../public/falowen-help.md"), "utf8");
+  const studyBuddy = read("services/studyBuddyService.js");
   const vercel = fs.readFileSync(path.resolve(root, "../../vercel.json"), "utf8");
 
   test("publishes A1-C2 course and exam landing routes before authentication", () => {
