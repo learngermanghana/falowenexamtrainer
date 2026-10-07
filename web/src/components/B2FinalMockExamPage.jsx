@@ -6,6 +6,7 @@ import "./B2FinalMockExamPage.css";
 const SECTION_DURATIONS = Object.freeze({
   teil1: 18 * 60,
   teil2: 12 * 60,
+  teil3: 12 * 60,
 });
 
 const formatTime = (seconds) => {
@@ -21,6 +22,8 @@ const initialState = () => ({
   deadlineMs: null,
   teil1Answers: {},
   teil2Answers: {},
+  teil3Answers: {},
+  teil3Completed: false,
   completed: false,
 });
 
@@ -37,9 +40,11 @@ const readState = () => {
       stage: parsed.stage || "teil1",
       teil1Answers: parsed.teil1Answers || parsed.answers || {},
       teil2Answers: parsed.teil2Answers || {},
+      teil3Answers: parsed.teil3Answers || {},
+      teil3Completed: Boolean(parsed.teil3Completed),
       deadlineMs: Number(parsed.deadlineMs) || null,
       started: Boolean(parsed.started),
-      completed: Boolean(parsed.completed),
+      completed: Boolean(parsed.completed && parsed.teil3Completed),
     };
   } catch (_error) {
     return initialState();
@@ -183,7 +188,7 @@ const ArticleColumn = ({ paragraphs, answers, onChoose, secondsLeft }) => (
   </div>
 );
 
-const Teil2 = ({ answers, onChoose, secondsLeft, onFinish }) => {
+const Teil2 = ({ answers, onChoose, secondsLeft, onContinue }) => {
   const answeredCount = B2_READING.teil2.paragraphs.filter((paragraph) => Boolean(answers[paragraph.number])).length;
   const left = B2_READING.teil2.paragraphs.slice(0, 3);
   const right = B2_READING.teil2.paragraphs.slice(3);
@@ -226,8 +231,79 @@ const Teil2 = ({ answers, onChoose, secondsLeft, onFinish }) => {
         </div>
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
+        <button type="button" className="b2-mock-next" onClick={onContinue}>
+          Teil 2 abschließen · weiter zu Teil 3
+        </button>
+      </section>
+    </>
+  );
+};
+
+const Teil3ChoiceList = ({ question, value, onChoose, disabled }) => (
+  <div className="b2-mock-teil3-options" role="radiogroup" aria-label={`Aufgabe ${question.number}`}>
+    {question.options.map((option) => (
+      <label key={option.id} className={value === option.id ? "selected" : ""}>
+        <input
+          type="radio"
+          name={`b2-lesenteil3-${question.number}`}
+          checked={value === option.id}
+          onChange={() => onChoose(question.number, option.id)}
+          disabled={disabled}
+        />
+        <strong>{option.id})</strong>
+        <span>{option.label}</span>
+      </label>
+    ))}
+  </div>
+);
+
+const Teil3 = ({ answers, onChoose, secondsLeft, onFinish }) => {
+  const answeredCount = B2_READING.teil3.questions.filter((question) => Boolean(answers[question.number])).length;
+  const midpoint = Math.ceil(B2_READING.teil3.paragraphs.length / 2);
+  const left = B2_READING.teil3.paragraphs.slice(0, midpoint);
+  const right = B2_READING.teil3.paragraphs.slice(midpoint);
+
+  return (
+    <>
+      <section className="b2-mock-teil3-article">
+        <p className="b2-mock-section-label">Text Zeitungsartikel · Teil 3</p>
+        <h2>{B2_READING.teil3.articleTitle}</h2>
+        <p className="b2-mock-teil3-deck">
+          Vier Tage arbeiten, fünf Tage Leistung? Chancen und Grenzen eines Arbeitsmodells, das immer mehr Betriebe testen.
+        </p>
+
+        <div className="b2-mock-teil3-columns">
+          <div>{left.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+          <div>{right.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</div>
+        </div>
+      </section>
+
+      <section className="b2-mock-teil3-tasks">
+        <div className="b2-mock-task-heading">
+          <div>
+            <p className="b2-mock-section-label">Aufgaben 16 bis 21 · Teil 3</p>
+            <h2>Wählen Sie a, b oder c.</h2>
+          </div>
+          <strong>{answeredCount}/6 beantwortet</strong>
+        </div>
+
+        <div className="b2-mock-teil3-question-list">
+          {B2_READING.teil3.questions.map((question) => (
+            <article className="b2-mock-teil3-question" key={question.number}>
+              <h3>{question.number}. {question.question}</h3>
+              <Teil3ChoiceList
+                question={question}
+                value={answers[question.number]}
+                onChoose={onChoose}
+                disabled={secondsLeft <= 0}
+              />
+            </article>
+          ))}
+        </div>
+
+        <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Teil 2 abschließen
+          Teil 3 abschließen
         </button>
       </section>
     </>
@@ -286,6 +362,14 @@ export default function B2FinalMockExamPage() {
     }));
   };
 
+  const chooseTeil3 = (number, answer) => {
+    if (!state.started || secondsLeft <= 0) return;
+    setState((current) => ({
+      ...current,
+      teil3Answers: { ...current.teil3Answers, [number]: answer },
+    }));
+  };
+
   const continueToTeil2 = () => {
     setState((current) => ({
       ...current,
@@ -296,9 +380,20 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishTeil2 = () => {
+  const continueToTeil3 = () => {
     setState((current) => ({
       ...current,
+      stage: "teil3",
+      started: true,
+      deadlineMs: Date.now() + SECTION_DURATIONS.teil3 * 1000,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const finishTeil3 = () => {
+    setState((current) => ({
+      ...current,
+      teil3Completed: true,
       completed: true,
       deadlineMs: null,
     }));
@@ -311,7 +406,7 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · LESEN</p>
-          <h1>Teil 1 und Teil 2 gespeichert</h1>
+          <h1>Teil 1 bis Teil 3 gespeichert</h1>
           <p>
             Ihre Antworten wurden gespeichert. Weitere Leseteile werden diesem B2-Mock Schritt für Schritt hinzugefügt.
           </p>
@@ -334,12 +429,19 @@ export default function B2FinalMockExamPage() {
           </p>
           <button type="button" onClick={start}>Teil 1 starten</button>
         </section>
+      ) : state.stage === "teil3" ? (
+        <Teil3
+          answers={state.teil3Answers}
+          onChoose={chooseTeil3}
+          secondsLeft={secondsLeft}
+          onFinish={finishTeil3}
+        />
       ) : state.stage === "teil2" ? (
         <Teil2
           answers={state.teil2Answers}
           onChoose={chooseTeil2}
           secondsLeft={secondsLeft}
-          onFinish={finishTeil2}
+          onContinue={continueToTeil3}
         />
       ) : (
         <Teil1
