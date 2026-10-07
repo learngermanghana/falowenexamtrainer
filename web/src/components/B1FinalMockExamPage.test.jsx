@@ -49,6 +49,20 @@ describe("B1 Final Mock Exam", () => {
     expect(speaking).toContain("Start 5-minute preparation");
   });
 
+  test("matches A1/A2 recovery protections for autosave and final-result sync", () => {
+    expect(source).toContain("clientSavedAtMs: Date.now()");
+    expect(source).toContain("sameLocalAttempt");
+    expect(source).toContain("localSavedAt");
+    expect(source).toContain("serverSavedAt");
+    expect(source).toContain("localSavedAt > serverSavedAt");
+    expect(source).toContain("completionRetryCountRef");
+    expect(source).toContain("completionRetryTimerRef");
+    expect(source).toContain("[3000, 10000, 30000, 60000]");
+    expect(source).toContain("setCompletionRetryNonce");
+    expect(source).toContain("Could not finalize B1 mock result sync");
+    expect(source).toContain("forceNew && exam.completed && exam.attemptInfo?.attemptId");
+  });
+
   test("keeps supplied reading answers aligned", () => {
     expect(B1_READING.teil1.questions.map((q) => q.answer)).toEqual([
       "richtig","richtig","falsch","falsch","richtig","falsch",
