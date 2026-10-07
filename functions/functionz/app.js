@@ -2115,6 +2115,64 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
   ].join("\n");
 };
 
+const b2MockSpeakingScorePrompt = ({ attempts = [] }) => {
+  const safeAttempts = attempts.map((attempt) => ({
+    id: String(attempt?.id || "").trim(),
+    teil: String(attempt?.teil || "").trim(),
+    task: String(attempt?.task || "").trim(),
+    transcript: String(attempt?.transcript || "").trim(),
+    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
+  }));
+
+  return [
+    "You are a strict Goethe-style B2 speaking examiner for a Falowen final mock exam.",
+    "Assess ONLY what the learner actually said in the supplied speech-to-text transcripts. Never invent missing content.",
+    "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+    "Judge at CEFR B2 standard: task fulfilment, organisation, argumentation, interaction evidence, range/precision of vocabulary, grammar, cohesion and communicative clarity.",
+    "Because the source is a transcript, do not claim to measure accent or exact pronunciation.",
+    "If a task transcript is empty, award 0 points for that task.",
+    "",
+    "SCORING — total 25 points:",
+    "Teil 1 presentation: 13 points. The learner chooses ONE of two topics and should give a structured, connected presentation with a clear position, relevant examples/reasons and a conclusion. Reward B2-level linking, lexical range and accurate complex structures.",
+    "Teil 2 discussion: 12 points. Topic: whether public transport should be completely free. The learner should present pros and cons, explicitly react to at least one counterargument, use polite agreement/disagreement language, and reach a clear summary or conclusion.",
+    "This mock has no partner audio for Teil 2. Do NOT penalize the learner simply because there is no second speaker. Instead, judge whether the learner convincingly simulates an exchange by identifying and responding to an opposing view.",
+    "Pass mark for this Sprechen mock: 15/25.",
+    "",
+    "Required JSON only, no markdown:",
+    JSON.stringify({
+      score: 0,
+      maxScore: 25,
+      passed: false,
+      level_mismatch: false,
+      overall_feedback_en: "Short English feedback.",
+      parts: {
+        teil1: {
+          score: 0,
+          maxScore: 13,
+          task_completion: 0,
+          structure_cohesion: 0,
+          b2_language: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short B2 German example."
+        },
+        teil2: {
+          score: 0,
+          maxScore: 12,
+          argumentation: 0,
+          interaction_evidence: 0,
+          conclusion: 0,
+          b2_language: 0,
+          feedback_en: "English feedback.",
+          corrected_example_de: "Short B2 German example."
+        }
+      }
+    }),
+    "",
+    "Student attempts:",
+    JSON.stringify(safeAttempts),
+  ].join("\n");
+};
+
 const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
@@ -2187,6 +2245,63 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   `Teil 2 email:\n${String(email || "").trim()}`,
 ].join("\n");
 
+
+const b2MockWritingScorePrompt = ({ teil1 = "", teil2 = "" }) => [
+  "You are a strict Goethe-style B2 writing examiner for a Falowen final mock exam.",
+  "Assess the learner's two German writing responses exactly as submitted. Never invent missing content or silently rewrite the response before scoring.",
+  "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+  "Judge at CEFR B2 standard: task fulfilment, communicative appropriateness/register, organisation/cohesion, lexical range/precision, grammar and spelling.",
+  "Do not punish a small word-count difference by itself. Missing required content, weak organisation, inappropriate register, or language clearly below B2 must reduce the score.",
+  "",
+  "TEIL 1 — Forumsbeitrag, 15 points, target about 150 words.",
+  "Topic: Homeoffice – Arbeiten von zu Hause aus.",
+  "Required points: (1) give a clear opinion about working from home, (2) explain reasons why homeoffice is becoming more popular, (3) give ways companies can support employees working from home, (4) discuss advantages and disadvantages of office work as an alternative.",
+  "The text should have a distinct introduction and suitable conclusion and connect the points into a coherent forum contribution.",
+  "",
+  "TEIL 2 — formelle Nachricht, 10 points, target about 100 words.",
+  "Situation: the learner is attending professional training but cannot attend an important project seminar next week because of an unavoidable business trip. Recipient: Frau Dr. Weber.",
+  "Required points: (1) state the reason for writing and apologise for the absence, (2) explain why the business trip is urgent, (3) propose how to catch up on the missed seminar content, (4) ask for the materials or presentation.",
+  "Use an appropriate formal salutation, formal register and suitable closing.",
+  "",
+  "Return JSON only, no markdown, using this shape:",
+  JSON.stringify({
+    score: 0,
+    maxScore: 25,
+    passed: false,
+    level_mismatch: false,
+    overall_feedback_en: "Short English feedback.",
+    parts: {
+      teil1: {
+        score: 0,
+        maxScore: 15,
+        task_completion: 0,
+        organisation_cohesion: 0,
+        vocabulary: 0,
+        grammar: 0,
+        required_points_met: [false, false, false, false],
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      },
+      teil2: {
+        score: 0,
+        maxScore: 10,
+        task_completion: 0,
+        register: 0,
+        organisation_cohesion: 0,
+        language: 0,
+        required_points_met: [false, false, false, false],
+        greeting_ok: false,
+        closing_ok: false,
+        feedback_en: "English feedback.",
+        corrections: [{ original_de: "", corrected_de: "", explanation_en: "" }]
+      }
+    }
+  }),
+  "",
+  `Teil 1 Forumsbeitrag:\n${String(teil1 || "").trim()}`,
+  "",
+  `Teil 2 formelle Nachricht:\n${String(teil2 || "").trim()}`,
+].join("\n");
 
 const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
   "You are a strict Goethe-style B1 writing examiner for a Falowen final mock exam.",
@@ -4204,6 +4319,122 @@ app.post("/writing/b1-mock-score", async (req, res) => {
   }
 });
 
+app.post("/writing/b2-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const teil1 = String(req.body?.teil1 || "").trim().slice(0, 12000);
+    const teil2 = String(req.body?.teil2 || "").trim().slice(0, 9000);
+
+    let result;
+    if (!teil1 && !teil2) {
+      result = {
+        score: 0,
+        maxScore: 25,
+        passed: false,
+        level_mismatch: false,
+        overall_feedback_en: "No writing response was submitted.",
+        parts: {
+          teil1: { score: 0, maxScore: 15, feedback_en: "No response was submitted.", corrections: [] },
+          teil2: { score: 0, maxScore: 10, feedback_en: "No response was submitted.", corrections: [] },
+        },
+      };
+    } else {
+      if (!ensureOpenAIConfigured(res)) return;
+      const quota = await enforceUserQuota({
+        uid: authedUser.uid,
+        category: "grammar",
+        limit: DAILY_LIMITS.grammar,
+      });
+      if (!quota.allowed) {
+        return res.status(429).json({
+          error: "Daily writing analysis limit reached",
+          code: "WRITING_QUOTA_REACHED",
+        });
+      }
+
+      const reply = await createChatCompletion(
+        [
+          { role: "system", content: b2MockWritingScorePrompt({ teil1, teil2 }) },
+          { role: "user", content: "Return the strict B2 mock writing result as JSON only." },
+        ],
+        { temperature: 0.1, max_tokens: 1400 },
+      );
+      const cleanedReply = String(reply || "")
+        .trim()
+        .replace(/^\`\`\`(?:json)?\s*/i, "")
+        .replace(/\s*\`\`\`$/i, "");
+
+      try {
+        result = JSON.parse(cleanedReply);
+      } catch (_error) {
+        return res.status(502).json({
+          error: "Falowen could not read the B2 writing assessment safely. Please try marking again.",
+          code: "INVALID_B2_WRITING_ASSESSMENT",
+        });
+      }
+
+      const caps = {
+        teil1: { maxScore: 15, missingCaps: [11, 7, 4, 1] },
+        teil2: { maxScore: 10, missingCaps: [7, 4, 2, 0.5] },
+      };
+      Object.entries(caps).forEach(([key, policy]) => {
+        const part = result?.parts?.[key] || {};
+        const rawFlags = Array.isArray(part.required_points_met) ? part.required_points_met.slice(0, 4) : [];
+        const flags = [0, 1, 2, 3].map((index) => rawFlags[index] === true);
+        const missing = flags.filter((value) => !value).length;
+        const rawScore = Math.max(0, Math.min(policy.maxScore, Number(part.score) || 0));
+        const cappedScore = missing
+          ? Math.min(rawScore, policy.missingCaps[Math.min(missing, 4) - 1])
+          : rawScore;
+
+        result.parts = result.parts || {};
+        result.parts[key] = {
+          ...part,
+          score: Number(cappedScore.toFixed(1)),
+          maxScore: policy.maxScore,
+          required_points_met: flags,
+          corrections: Array.isArray(part.corrections) ? part.corrections.slice(0, 6) : [],
+        };
+      });
+
+      result.score = Number(
+        Math.max(
+          0,
+          Math.min(
+            25,
+            Number(result.parts.teil1.score || 0) + Number(result.parts.teil2.score || 0),
+          ),
+        ).toFixed(1),
+      );
+      result.maxScore = 25;
+      result.passed = result.score >= 15;
+      result.level_mismatch = Boolean(result?.level_mismatch);
+      result.submittedTeil1 = teil1;
+      result.submittedTeil2 = teil2;
+    }
+
+    auditAIRequest({
+      route: "/writing/b2-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { score: Number(result?.score || 0) },
+    });
+    return res.json({ result });
+  } catch (err) {
+    console.error("/writing/b2-mock-score error", err);
+    auditAIRequest({
+      route: "/writing/b2-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the B2 writing mock." });
+  }
+});
+
 const FINAL_MOCK_SECTION_RANK = Object.freeze({
   intro: 0,
   lesen: 1,
@@ -5927,6 +6158,118 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
       success: false,
     });
     return res.status(500).json({ error: err.message || "Failed to score the B1 speaking mock." });
+  }
+});
+
+app.post("/speaking/b2-mock-score", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
+    if (attempts.length !== 2) {
+      return res.status(400).json({ error: "Two speaking responses are required for the complete B2 mock." });
+    }
+
+    const normalizedAttempts = attempts.map((attempt) => ({
+      id: String(attempt?.id || "").trim(),
+      teil: String(attempt?.teil || "").trim(),
+      task: String(attempt?.task || "").trim().slice(0, 2200),
+      transcript: String(attempt?.transcript || "").trim().slice(0, 9000),
+      analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2500),
+    }));
+
+    const expectedIds = ["teil1", "teil2"];
+    const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();
+    if (
+      suppliedIds.length !== expectedIds.length ||
+      suppliedIds.some((id, index) => id !== expectedIds[index])
+    ) {
+      return res.status(400).json({ error: "Both B2 speaking responses are required." });
+    }
+
+    if (!ensureOpenAIConfigured(res)) return;
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speaking",
+      limit: DAILY_LIMITS.speaking,
+    });
+    if (!quota.allowed) {
+      return res.status(429).json({
+        error: "Daily speaking analysis limit reached",
+        code: "SPEAKING_QUOTA_REACHED",
+      });
+    }
+
+    const reply = await createChatCompletion(
+      [
+        { role: "system", content: b2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+        { role: "user", content: "Return the final B2 mock speaking assessment as the required JSON object." },
+      ],
+      { temperature: 0.1, max_tokens: 1100 },
+    );
+    const cleanedReply = String(reply || "")
+      .trim()
+      .replace(/^\`\`\`(?:json)?\s*/i, "")
+      .replace(/\s*\`\`\`$/i, "");
+
+    let result;
+    try {
+      result = JSON.parse(cleanedReply);
+    } catch (_error) {
+      return res.status(502).json({
+        error: "Falowen could not read the B2 speaking assessment safely. Please try marking again.",
+        code: "INVALID_B2_SPEAKING_ASSESSMENT",
+      });
+    }
+
+    const maxByPart = { teil1: 13, teil2: 12 };
+    Object.entries(maxByPart).forEach(([key, maxScore]) => {
+      result.parts = result.parts || {};
+      result.parts[key] = {
+        ...(result.parts[key] || {}),
+        score: Math.max(0, Math.min(maxScore, Number(result.parts?.[key]?.score) || 0)),
+        maxScore,
+      };
+    });
+
+    result.score = Number(
+      Math.max(
+        0,
+        Math.min(
+          25,
+          Number(result.parts.teil1.score || 0) + Number(result.parts.teil2.score || 0),
+        ),
+      ).toFixed(1),
+    );
+    result.maxScore = 25;
+    result.passed = result.score >= 15;
+    result.level_mismatch = Boolean(result?.level_mismatch);
+
+    auditAIRequest({
+      route: "/speaking/b2-mock-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: {
+        attemptsCount: normalizedAttempts.length,
+        score: result.score,
+        passed: result.passed,
+        levelMismatch: result.level_mismatch,
+        quotaRemaining: quota.remaining,
+      },
+    });
+
+    return res.json({ result, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speaking/b2-mock-score error", err);
+    auditAIRequest({
+      route: "/speaking/b2-mock-score",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
+    return res.status(500).json({ error: err.message || "Failed to score the B2 speaking mock." });
   }
 });
 
