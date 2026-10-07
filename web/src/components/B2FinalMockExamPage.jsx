@@ -613,6 +613,7 @@ const HoerenTeil1 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusCha
 
 export default function B2FinalMockExamPage() {
   useAssessmentRestriction();
+  const { idToken } = useAuth();
   const [state, setState] = useState(readState);
   const [now, setNow] = useState(Date.now());
 
