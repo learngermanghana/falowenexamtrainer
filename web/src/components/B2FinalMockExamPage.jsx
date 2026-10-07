@@ -230,12 +230,15 @@ const buildFinalScore = (state) => {
   const hoeren = objectiveScore(hoerenPairs, 25);
   const schreiben = Number(state.schreibenResult?.score || 0);
   const sprechen = Number(state.sprechenResult?.score || 0);
+  const sectionScores = { lesen, hoeren, schreiben, sprechen };
   const overall = Number((lesen + hoeren + schreiben + sprechen).toFixed(1));
+  const passedModules = Object.values(sectionScores).filter((score) => Number(score) >= 15).length;
 
   return {
-    sectionScores: { lesen, hoeren, schreiben, sprechen },
+    sectionScores,
     overall,
-    passed: overall >= 60,
+    passedModules,
+    passed: passedModules === 4,
   };
 };
 
@@ -1308,7 +1311,7 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · FINAL MOCK</p>
-          <h1>{finalScore.overall}/100 · {finalScore.passed ? "PASS" : "NOT YET PASSED"}</h1>
+          <h1>{finalScore.overall}/100 · {finalScore.passed ? "ALL MODULES PASSED" : "MODULE(S) TO REPEAT"}</h1>
           <div className="b2-mock-final-grid">
             {Object.entries(finalScore.sectionScores).map(([section, score]) => (
               <div key={section}>
@@ -1323,7 +1326,7 @@ export default function B2FinalMockExamPage() {
           {state.sprechenResult?.overall_feedback_en ? (
             <p><strong>Sprechen:</strong> {state.sprechenResult.overall_feedback_en}</p>
           ) : null}
-          <p>Pass mark for this Falowen B2 mock: 60/100.</p>
+          <p>Goethe-style module rule: each module needs at least 60% — 15/25 in this mock.</p>
         </section>
       </main>
     );
