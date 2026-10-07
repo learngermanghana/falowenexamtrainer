@@ -112,16 +112,17 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('stage: "hoeren-teil1"');
     expect(page).toContain("fetchB2MockAudioPlaybackUrl");
     expect(page).toContain("B2MockAudioPlayer");
-    expect(page).toContain("Einleitung, Beispiel, Lesepause und Text 1 bis Text 5");
+    expect(B2_LISTENING.teil1.audioNote).toContain("Einleitung, Beispiel, Lesepause und Text 1 bis Text 5");
     expect(page).toContain("hoeren1Answers");
     expect(page).toContain("hoeren1AudioStatus");
     expect(page).toContain("Hören Teil 1 abschließen");
   });
 
-  test("migrates a previously completed Lesen preview forward to Hören Teil 1", () => {
+  test("migrates previously completed preview stages forward", () => {
     expect(page).toContain("migratedFromLesenCompletion");
     expect(page).toContain('? "hoeren-teil1"');
     expect(page).toContain("migratedFromHoeren1Completion");
+    expect(page).toContain('? "hoeren-teil2"');
     expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren2Completed)");
   });
 
