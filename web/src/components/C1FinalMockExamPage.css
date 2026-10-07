@@ -275,3 +275,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+
+.c1-mock-reading-article .c1-mock-article-body {
+  columns: 2;
+  column-gap: 38px;
+}
+
+.c1-mock-question-long > div {
+  min-width: 0;
+}
+
+.c1-mock-question-text {
+  margin: 0 0 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.c1-mock-question-long .c1-mock-options {
+  grid-template-columns: 1fr;
+}
+
+.c1-mock-question-long .c1-mock-options label {
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .c1-mock-reading-article .c1-mock-article-body {
+    columns: 1;
+  }
+}
