@@ -348,6 +348,13 @@ export default function B1FinalMockExamPage() {
     }
   }, [busy, exam.attemptInfo?.attemptId, exam.schreiben, exam.sectionScores, idToken, moveToSection]);
 
+  const handleSpeakingProgress = useCallback((progress) => {
+    setExam((current) => ({
+      ...current,
+      speakingProgress: { ...current.speakingProgress, ...progress },
+    }));
+  }, []);
+
   const finishSpeaking = useCallback((speakingResult) => {
     setExam((current) => {
       const scores = { ...current.sectionScores, sprechen: Number(speakingResult?.score || 0) };
@@ -627,10 +634,7 @@ export default function B1FinalMockExamPage() {
           initialAttempts={exam.speakingProgress?.attempts || {}}
           initialResult={exam.speakingResult}
           attemptId={exam.attemptInfo?.attemptId || ""}
-          onProgress={(progress) => setExam((current) => ({
-            ...current,
-            speakingProgress: { ...current.speakingProgress, ...progress },
-          }))}
+          onProgress={handleSpeakingProgress}
           onComplete={finishSpeaking}
         />
       ) : null}
