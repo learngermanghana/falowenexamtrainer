@@ -259,8 +259,8 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("sprechen: 30 * 60");
     expect(page).toContain("const buildFinalScore = (state) =>");
     expect(page).toContain("const overall = Number((lesen + hoeren + schreiben + sprechen).toFixed(1))");
-    expect(page).toContain("passed: overall >= 60");
-    expect(page).toContain("Pass mark for this Falowen B2 mock: 60/100.");
+    expect(page).toContain("passed: passedModules === 4");
+    expect(page).toContain("each module needs at least 60% — 15/25 in this mock.");
   });
 
   test("publishes both the Course Book preview alias and ready final route", () => {
