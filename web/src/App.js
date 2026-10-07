@@ -41,7 +41,6 @@ import A2GoetheSpeakingMockTeil3Preview from "./components/A2GoetheSpeakingMockT
 import A2FinalMockExamPage from "./components/A2FinalMockExamPage";
 import B1FinalMockExamPage from "./components/B1FinalMockExamPage";
 import B2FinalMockExamPage from "./components/B2FinalMockExamPage";
-import C1FinalMockExamPage from "./components/C1FinalMockExamPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
@@ -995,7 +994,6 @@ const AppShell = ({
           <Route path="/campus/course/b1-final-mock-exam" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/b2-mock-practice-preview" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />} />
-          <Route path="/campus/course/c1-mock-practice-preview" element={<C1FinalMockExamPage />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
