@@ -649,3 +649,148 @@
     width: 88px;
   }
 }
+
+
+.b2-mock-hoeren-section,
+.b2-mock-hoeren-tasks {
+  margin-top: 26px;
+  background: #f6e8dc;
+  padding: 28px 30px;
+}
+
+.b2-mock-hoeren-section > h2 {
+  margin: 20px 0 18px;
+  font-size: 30px;
+}
+
+.b2-mock-hoeren-player {
+  display: grid;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #d5dbe0;
+  padding: 16px;
+  margin-bottom: 22px;
+}
+
+.b2-mock-hoeren-player p {
+  margin: 4px 0 0;
+  line-height: 1.5;
+  color: #667085;
+}
+
+.b2-mock-hoeren-player button {
+  justify-self: start;
+  border: 0;
+  background: #29323a;
+  color: #fff;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+.b2-mock-hoeren-player button:disabled {
+  opacity: .58;
+  cursor: not-allowed;
+}
+
+.b2-mock-hoeren-progress {
+  height: 7px;
+  background: #e6e8eb;
+  overflow: hidden;
+}
+
+.b2-mock-hoeren-progress span {
+  display: block;
+  height: 100%;
+  background: #8f1d2c;
+}
+
+.b2-mock-hoeren-finished {
+  color: #047857;
+}
+
+.b2-mock-hoeren-error {
+  color: #991b1b !important;
+}
+
+.b2-mock-hoeren-example,
+.b2-mock-hoeren-text-block {
+  display: grid;
+  gap: 0;
+}
+
+.b2-mock-hoeren-text-block {
+  margin-top: 18px;
+  border-top: 1px solid #8f1d2c;
+}
+
+.b2-mock-hoeren-text-block > h3 {
+  margin: 0;
+  padding: 14px 4px 8px;
+  font-size: 17px;
+}
+
+.b2-mock-hoeren-question {
+  padding: 14px 4px;
+  border-bottom: 1px solid #c6a999;
+}
+
+.b2-mock-hoeren-question > strong,
+.b2-mock-hoeren-question-heading {
+  display: grid;
+  gap: 4px;
+  line-height: 1.5;
+}
+
+.b2-mock-hoeren-question-heading > span {
+  color: #8f1d2c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.b2-mock-hoeren-options {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.b2-mock-hoeren-options label {
+  display: grid;
+  grid-template-columns: 24px 28px 1fr;
+  gap: 8px;
+  align-items: start;
+  background: rgba(255,255,255,.72);
+  border: 1px solid #d8c8bd;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.b2-mock-hoeren-options label.selected {
+  border-color: #8f1d2c;
+  box-shadow: inset 0 0 0 1px #8f1d2c;
+  background: #fff;
+}
+
+.b2-mock-hoeren-options label:has(input:disabled) {
+  cursor: default;
+}
+
+.b2-mock-hoeren-options input {
+  margin-top: 4px;
+}
+
+.b2-mock-hoeren-options strong {
+  text-transform: lowercase;
+}
+
+@media (max-width: 760px) {
+  .b2-mock-hoeren-section,
+  .b2-mock-hoeren-tasks {
+    padding: 18px 16px;
+  }
+
+  .b2-mock-hoeren-options label {
+    grid-template-columns: 22px 24px 1fr;
+  }
+}
