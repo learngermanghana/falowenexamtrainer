@@ -13,6 +13,7 @@ import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
 import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
+  C1_EXAM_HOEREN_SAMPLE_1_TEIL3,
 } from "../data/c1ExamHorenSample1";
 import "./A1GoetheListeningMockPreview.css";
 import "./A2GoetheListeningMockTeil2Preview.css";
@@ -34,6 +35,7 @@ const A1_PARTS = Object.freeze([
 const C1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: C1_EXAM_HOEREN_SAMPLE_1 },
   { key: "teil2", audioPart: "teil-2", data: C1_EXAM_HOEREN_SAMPLE_1_TEIL2 },
+  { key: "teil3", audioPart: "teil-3", data: C1_EXAM_HOEREN_SAMPLE_1_TEIL3 },
 ]);
 
 const answerKeyForPart = (level, part) => {
