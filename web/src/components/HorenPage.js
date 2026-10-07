@@ -11,9 +11,9 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
-  const normalizedLevel = ["A1", "A2"].includes(routeLevel) ? routeLevel : profileLevel;
+  const normalizedLevel = ["A1", "A2", "C1"].includes(routeLevel) ? routeLevel : profileLevel;
 
-  if (normalizedLevel === "A1" || normalizedLevel === "A2") {
+  if (["A1", "A2", "C1"].includes(normalizedLevel)) {
     if (sampleId) {
       if (sampleId !== "sample-1") {
         return (
@@ -53,7 +53,11 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
           >
             <strong>Hören Sample 1</strong>
             <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
-              {normalizedLevel === "A1" ? "15 questions · Teil 1–3" : "20 questions · Teil 1–4"}
+              {normalizedLevel === "A1"
+                ? "15 questions · Teil 1–3"
+                : normalizedLevel === "A2"
+                  ? "20 questions · Teil 1–4"
+                  : "6 questions · Teil 1"}
             </span>
           </button>
         </div>
