@@ -5,13 +5,13 @@ const read = (relativePath) =>
   fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 describe("A2 Day 9 Urlaub grammar notes", () => {
-  test("opens the Day 9 workbook on Grammar so the notes are easy to find", () => {
+  test("uses the standard A2 workbook tab behavior", () => {
     const page = read("./A2Day9UrlaubWorkbookPage.js");
     const standard = read("./A2StandardTabbedWorkbookPage.js");
 
-    expect(page).toContain('initialTab="grammar"');
-    expect(standard).toContain('initialTab = "sprechen"');
-    expect(standard).toContain("useState(initialTab)");
+    expect(page).not.toContain("initialTab");
+    expect(standard).not.toContain("initialTab");
+    expect(standard).toContain('useState("sprechen")');
   });
 
   test("contains full Perfekt notes instead of a small summary", () => {
