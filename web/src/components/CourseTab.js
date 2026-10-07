@@ -943,11 +943,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   };
 
   const getLessonHref = (entry) => {
-    const normalizedLevel = String(selectedCourseLevel || "").toUpperCase();
-    if (Number(entry?.day) === 29 && normalizedLevel === "A2") {
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "A2" &&
+      Number(entry?.day) === 29
+    ) {
       return entry?.workbook_link || "/campus/course/a2-mock-practice-preview";
     }
-    if (Number(entry?.day) === 29 && normalizedLevel === "B1") {
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "B1" &&
+      Number(entry?.day) === 29
+    ) {
       return "/campus/course/b1-mock-practice-preview";
     }
 
