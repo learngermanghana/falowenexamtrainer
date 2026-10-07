@@ -69,6 +69,15 @@ describe("B1 Final Mock Exam", () => {
     expect(source).toContain("cancelled = true");
   });
 
+  test("warns before refresh when a speaking recording has not been submitted", () => {
+    expect(speaking).toContain("hasUnsentRecording");
+    expect(speaking).toContain('window.addEventListener("beforeunload", warnBeforeRefresh)');
+    expect(speaking).toContain("Do not refresh yet.");
+    expect(speaking).toContain("after submission, the transcript and speaking result are autosaved");
+    expect(speaking).toContain("transcript: String(attempt?.transcript || \"\")");
+    expect(speaking).not.toContain("audioBlob: attempt?.audioBlob");
+  });
+
   test("keeps supplied reading answers aligned", () => {
     expect(B1_READING.teil1.questions.map((q) => q.answer)).toEqual([
       "richtig","richtig","falsch","falsch","richtig","falsch",
