@@ -857,7 +857,7 @@ export default function B2FinalMockExamPage() {
       <main className="b2-mock-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
-          <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · LESEN</p>
+          <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · MOCK</p>
           <h1>Lesen Teil 1–4 und Hören Teil 1–2 gespeichert</h1>
           <p>
             Ihre Antworten wurden gespeichert. Weitere Hörteile werden diesem B2-Mock Schritt für Schritt hinzugefügt.
