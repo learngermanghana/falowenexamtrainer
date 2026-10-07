@@ -82,7 +82,13 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
     <div className="a1-hoeren-mock-part-audio">
       <div className="a1-hoeren-mock-part-audio-copy">
         <strong>Exam audio</strong>
-        <p>{plays === 2 ? "The required repetition is already included in the audio." : "This audio is heard once in the mock."}</p>
+        <p>
+          {level === "C1"
+            ? "This audio belongs to C1 Hören practice in the Exams Room."
+            : plays === 2
+              ? "The required repetition is already included in the audio."
+              : "This audio is heard once in the mock."}
+        </p>
       </div>
 
       {audioUrl ? (
@@ -101,7 +107,9 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
         </button>
       )}
 
-      <span className="a1-hoeren-mock-play-count">{plays}× in the mock audio</span>
+      <span className="a1-hoeren-mock-play-count">
+        {level === "C1" ? `${plays}× practice audio` : `${plays}× in the mock audio`}
+      </span>
       {error ? <p className="a1-hoeren-mock-audio-error">{error}</p> : null}
     </div>
   );
