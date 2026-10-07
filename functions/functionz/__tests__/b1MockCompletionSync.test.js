@@ -30,7 +30,12 @@ describe("B1 final mock verified scoring and persistence", () => {
       sprechen: 20,
     });
     expect(result.overall).toEqual({ score: 88, maxScore: 100, passed: true });
-    expect(Object.keys(READING_ANSWER_KEY)).toHaveLength(27);
+    expect(Object.keys(READING_ANSWER_KEY)).toHaveLength(30);
+    expect(READING_ANSWER_KEY).toMatchObject({
+      "t2-10": "b",
+      "t2-11": "a",
+      "t2-12": "b",
+    });
     expect(Object.keys(LISTENING_ANSWER_KEY)).toHaveLength(30);
   });
 

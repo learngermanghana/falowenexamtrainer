@@ -15,6 +15,7 @@ const READING_ANSWER_KEY = Object.freeze({
   "t1-1": "richtig", "t1-2": "richtig", "t1-3": "falsch", "t1-4": "falsch",
   "t1-5": "richtig", "t1-6": "falsch",
   "t2-7": "b", "t2-8": "a", "t2-9": "b",
+  "t2-10": "b", "t2-11": "a", "t2-12": "b",
   "t3-13": "b", "t3-14": "e", "t3-15": "a", "t3-16": "0",
   "t3-17": "d", "t3-18": "f", "t3-19": "i",
   "t4-20": "nein", "t4-21": "ja", "t4-22": "nein", "t4-23": "nein",
