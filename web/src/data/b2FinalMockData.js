@@ -707,4 +707,41 @@ export const B2_LISTENING = Object.freeze({
   },
 });
 
+export const B2_WRITING_TASKS = Object.freeze([
+  {
+    id: "teil1",
+    title: "Teil 1 · Forumsbeitrag",
+    meta: "Empfohlene Arbeitszeit: 50 Minuten · ca. 150 Wörter",
+    topic: "Homeoffice – Arbeiten von zu Hause aus",
+    prompt:
+      "Sie schreiben einen Beitrag für ein Online-Forum zum Thema „Homeoffice – Arbeiten von zu Hause aus“.",
+    points: [
+      "Äußern Sie Ihre Meinung zum Thema Arbeiten im Homeoffice.",
+      "Nennen Sie Gründe, warum dieses Arbeitsmodell heutzutage immer beliebter wird.",
+      "Nennen Sie Möglichkeiten, wie Unternehmen ihre Mitarbeiter im Homeoffice gut unterstützen können.",
+      "Nennen Sie Vor- und Nachteile der Arbeit im Büro als Alternative zum Homeoffice.",
+    ],
+    guidance:
+      "Denken Sie an eine getrennte Einleitung und einen passenden Schlusssatz. Verbinden Sie die Punkte zu einem zusammenhängenden Text.",
+    target: 150,
+  },
+  {
+    id: "teil2",
+    title: "Teil 2 · Formelle Nachricht",
+    meta: "Empfohlene Arbeitszeit: 25 Minuten · ca. 100 Wörter",
+    topic: "Projektseminar und Dienstreise",
+    prompt:
+      "Sie nehmen zurzeit an einer beruflichen Weiterbildung teil. Nächste Woche soll ein wichtiges Projektseminar stattfinden, an dem Sie wegen einer unaufschiebbaren Dienstreise nicht teilnehmen können. Schreiben Sie eine formelle Nachricht an die Seminarleiterin, Frau Dr. Weber.",
+    points: [
+      "Schreiben Sie den Grund für Ihre Nachricht und entschuldigen Sie Ihr Fehlen.",
+      "Erklären Sie, warum die Dienstreise dringend erforderlich ist.",
+      "Machen Sie einen Vorschlag, wie Sie den verpassten Seminarstoff nachholen können.",
+      "Bitten Sie um Zusendung der Unterlagen oder Präsentationen.",
+    ],
+    guidance:
+      "Achten Sie auf eine passende formelle Anrede, einen klaren Aufbau und einen angemessenen Schluss.",
+    target: 100,
+  },
+]);
+
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";

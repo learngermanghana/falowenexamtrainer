@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
-import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING } from "../data/b2FinalMockData";
+import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 import "./B2FinalMockExamPage.css";
 
 const SECTION_DURATIONS = Object.freeze({
@@ -11,6 +11,7 @@ const SECTION_DURATIONS = Object.freeze({
   teil2: 12 * 60,
   teil3: 12 * 60,
   teil4: 12 * 60,
+  schreiben: 75 * 60,
 });
 
 const formatTime = (seconds) => {
@@ -42,6 +43,8 @@ const initialState = () => ({
   hoeren4Answers: {},
   hoeren4AudioStatus: "not_started",
   hoeren4Completed: false,
+  schreiben: { teil1: "", teil2: "" },
+  schreibenCompleted: false,
   completed: false,
 });
 
@@ -100,6 +103,14 @@ const readState = () => {
     const migratedFromHoeren3Completion =
       Boolean(parsed.completed && parsed.hoeren3Completed && !hasHoeren4Progress);
 
+    const hasSchreibenProgress =
+      Boolean(parsed.schreibenCompleted) ||
+      Boolean(String(parsed.schreiben?.teil1 || "").trim()) ||
+      Boolean(String(parsed.schreiben?.teil2 || "").trim()) ||
+      parsed.stage === "schreiben";
+    const migratedFromHoeren4Completion =
+      Boolean(parsed.completed && parsed.hoeren4Completed && !hasSchreibenProgress);
+
     const stage = migratedFromTeil3Completion
       ? "teil4"
       : migratedFromLesenCompletion
@@ -110,14 +121,17 @@ const readState = () => {
             ? "hoeren-teil3"
             : migratedFromHoeren3Completion
               ? "hoeren-teil4"
-              : (parsed.stage || "teil1");
+              : migratedFromHoeren4Completion
+                ? "schreiben"
+                : (parsed.stage || "teil1");
 
     const migratedForward =
       migratedFromTeil3Completion ||
       migratedFromLesenCompletion ||
       migratedFromHoeren1Completion ||
       migratedFromHoeren2Completion ||
-      migratedFromHoeren3Completion;
+      migratedFromHoeren3Completion ||
+      migratedFromHoeren4Completion;
 
     return {
       ...initialState(),
@@ -141,9 +155,14 @@ const readState = () => {
       hoeren4Answers: parsed.hoeren4Answers || {},
       hoeren4AudioStatus: restoreAudioStatus(parsed.hoeren4AudioStatus),
       hoeren4Completed: Boolean(parsed.hoeren4Completed),
+      schreiben: {
+        teil1: String(parsed.schreiben?.teil1 || ""),
+        teil2: String(parsed.schreiben?.teil2 || ""),
+      },
+      schreibenCompleted: Boolean(parsed.schreibenCompleted),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
-      completed: Boolean(parsed.completed && parsed.hoeren4Completed),
+      completed: Boolean(parsed.completed && parsed.schreibenCompleted),
     };
   } catch (_error) {
     return initialState();
@@ -151,6 +170,14 @@ const readState = () => {
 };
 
 const getStageConfig = (stage) => {
+  if (stage === "schreiben") {
+    return {
+      module: "SCHREIBEN",
+      title: "Schreiben",
+      time: "75 Minuten",
+      intro: "Bearbeiten Sie beide Schreibaufgaben. Hilfsmittel wie Wörterbücher oder Mobiltelefone sind nicht erlaubt.",
+    };
+  }
   if (["hoeren-teil1", "hoeren-teil2", "hoeren-teil3", "hoeren-teil4"].includes(stage)) {
     const partNumber =
       stage === "hoeren-teil4" ? 4 :
@@ -852,12 +879,62 @@ const HoerenTeil4 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusCha
 
         <p className="b2-mock-autosave">Automatisch gespeichert</p>
         <button type="button" className="b2-mock-next" onClick={onFinish}>
-          Hören abschließen
+          Hören abschließen · weiter zu Schreiben
         </button>
       </section>
     </>
   );
 };
+
+const wordCount = (text) =>
+  String(text || "").trim().split(/\s+/).filter(Boolean).length;
+
+const Schreiben = ({ values, onChange, onFinish }) => (
+  <>
+    <section className="b2-mock-writing-intro">
+      <p className="b2-mock-section-label">GOETHE-ZERTIFIKAT B2 · SCHREIBEN</p>
+      <h2>Gesamtdauer: 75 Minuten</h2>
+      <p>Hilfsmittel wie Wörterbücher oder Mobiltelefone sind nicht erlaubt.</p>
+    </section>
+
+    {B2_WRITING_TASKS.map((task) => {
+      const value = values?.[task.id] || "";
+      return (
+        <section className="b2-mock-writing-task" key={task.id}>
+          <div className="b2-mock-writing-heading">
+            <div>
+              <p className="b2-mock-section-label">{task.title}</p>
+              <h2>{task.topic}</h2>
+            </div>
+            <span>{task.meta}</span>
+          </div>
+
+          <p className="b2-mock-writing-prompt">{task.prompt}</p>
+          <ul className="b2-mock-writing-points">
+            {task.points.map((point) => <li key={point}>{point}</li>)}
+          </ul>
+          <p className="b2-mock-writing-guidance">{task.guidance}</p>
+
+          <div className="b2-mock-writing-label">
+            <strong>Ihre Antwort</strong>
+            <span>{wordCount(value)} Wörter · ca. {task.target}</span>
+          </div>
+          <textarea
+            value={value}
+            onChange={(event) => onChange(task.id, event.target.value)}
+            placeholder="Hier schreiben …"
+            rows={task.id === "teil1" ? 15 : 11}
+          />
+          <p className="b2-mock-autosave">Automatisch gespeichert</p>
+        </section>
+      );
+    })}
+
+    <button type="button" className="b2-mock-next" onClick={onFinish}>
+      Schreiben abschließen
+    </button>
+  </>
+);
 
 export default function B2FinalMockExamPage() {
   useAssessmentRestriction();
@@ -997,6 +1074,14 @@ export default function B2FinalMockExamPage() {
     }));
   };
 
+  const updateSchreiben = (partId, value) => {
+    if (!state.started || secondsLeft <= 0) return;
+    setState((current) => ({
+      ...current,
+      schreiben: { ...current.schreiben, [partId]: value },
+    }));
+  };
+
   const continueToTeil2 = () => {
     setState((current) => ({
       ...current,
@@ -1076,10 +1161,22 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishHoerenTeil4 = () => {
+  const continueToSchreiben = () => {
     setState((current) => ({
       ...current,
       hoeren4Completed: true,
+      stage: "schreiben",
+      started: true,
+      completed: false,
+      deadlineMs: Date.now() + SECTION_DURATIONS.schreiben * 1000,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const finishSchreiben = () => {
+    setState((current) => ({
+      ...current,
+      schreibenCompleted: true,
       completed: true,
       deadlineMs: null,
     }));
@@ -1092,9 +1189,9 @@ export default function B2FinalMockExamPage() {
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · MOCK</p>
-          <h1>Lesen Teil 1–4 und Hören Teil 1–4 gespeichert</h1>
+          <h1>Lesen, Hören und Schreiben gespeichert</h1>
           <p>
-            Ihre Lesen- und Hören-Antworten wurden gespeichert. Als Nächstes können wir Schreiben und Sprechen ergänzen.
+            Ihre Antworten wurden gespeichert. Als Nächstes können wir den B2-Sprechen-Teil ergänzen.
           </p>
         </section>
       </main>
@@ -1112,6 +1209,12 @@ export default function B2FinalMockExamPage() {
           <p>{getStageConfig(state.stage).intro}</p>
           <button type="button" onClick={start}>{getStageConfig(state.stage).title} starten</button>
         </section>
+      ) : state.stage === "schreiben" ? (
+        <Schreiben
+          values={state.schreiben}
+          onChange={updateSchreiben}
+          onFinish={finishSchreiben}
+        />
       ) : state.stage === "hoeren-teil4" ? (
         <HoerenTeil4
           idToken={idToken}
@@ -1119,7 +1222,7 @@ export default function B2FinalMockExamPage() {
           audioStatus={state.hoeren4AudioStatus}
           onChoose={chooseHoeren4}
           onAudioStatusChange={setHoeren4AudioStatus}
-          onFinish={finishHoerenTeil4}
+          onFinish={continueToSchreiben}
         />
       ) : state.stage === "hoeren-teil3" ? (
         <HoerenTeil3
