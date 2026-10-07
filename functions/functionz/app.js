@@ -2011,6 +2011,7 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
     "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
     "Judge at CEFR B1 standard. Because the source is a transcript, do not claim to measure accent or exact pronunciation.",
     "Teil 1 was recorded while a simulated partner audio played. Ignore obvious partner/instruction fragments if they appear in the transcript and score the learner's meaningful planning contributions.",
+    "If a task transcript is empty, treat that task as no response and award 0 points for that task.",
     "",
     "SCORING — total 25 points:",
     "Teil 1: 9 points. Joint planning: make and react to suggestions, cover the relevant party-planning points (where, when, food/drinks, invitations, gift, responsibilities), and move toward agreement.",
@@ -5772,10 +5773,6 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     ) {
       return res.status(400).json({ error: "All three B1 speaking responses are required." });
     }
-    if (normalizedAttempts.some((attempt) => !attempt.transcript)) {
-      return res.status(400).json({ error: "Each B1 speaking task needs a usable transcript." });
-    }
-
     if (!ensureOpenAIConfigured(res)) return;
     const quota = await enforceUserQuota({
       uid: authedUser.uid,
