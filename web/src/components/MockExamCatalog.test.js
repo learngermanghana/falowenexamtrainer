@@ -26,6 +26,13 @@ describe("mock exam catalog", () => {
       status: "ready",
       mode: "full",
     });
+    expect(getMockExamsForLevel("B2").map((exam) => exam.id)).toContain("b2-final-01");
+    expect(getMockExam("b2-final-01")).toMatchObject({
+      level: "B2",
+      route: "/campus/course/b2-final-mock-exam",
+      status: "ready",
+      mode: "full",
+    });
   });
 
   test("creates a new practice question set without duplicating page code", () => {

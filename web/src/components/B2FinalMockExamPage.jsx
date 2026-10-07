@@ -1,8 +1,10 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
+import { scoreB2MockWriting } from "../services/b2FinalMockService";
+import B2FinalMockSpeaking from "./B2FinalMockSpeaking";
 import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 import "./B2FinalMockExamPage.css";
 
@@ -12,6 +14,7 @@ const SECTION_DURATIONS = Object.freeze({
   teil3: 12 * 60,
   teil4: 12 * 60,
   schreiben: 75 * 60,
+  sprechen: 30 * 60,
 });
 
 const formatTime = (seconds) => {
@@ -44,7 +47,11 @@ const initialState = () => ({
   hoeren4AudioStatus: "not_started",
   hoeren4Completed: false,
   schreiben: { teil1: "", teil2: "" },
+  schreibenResult: null,
   schreibenCompleted: false,
+  speakingProgress: { attempts: {}, selectedTopic: "" },
+  sprechenResult: null,
+  sprechenCompleted: false,
   completed: false,
 });
 
@@ -111,6 +118,20 @@ const readState = () => {
     const migratedFromHoeren4Completion =
       Boolean(parsed.completed && parsed.hoeren4Completed && !hasSchreibenProgress);
 
+    const hasSprechenProgress =
+      Boolean(parsed.sprechenCompleted) ||
+      Boolean(parsed.sprechenResult) ||
+      Boolean(parsed.speakingProgress?.selectedTopic) ||
+      Boolean(Object.keys(parsed.speakingProgress?.attempts || {}).length) ||
+      parsed.stage === "sprechen";
+    const migratedFromSchreibenCompletion =
+      Boolean(
+        parsed.completed &&
+        parsed.schreibenCompleted &&
+        parsed.schreibenResult &&
+        !hasSprechenProgress
+      );
+
     const stage = migratedFromTeil3Completion
       ? "teil4"
       : migratedFromLesenCompletion
@@ -123,7 +144,9 @@ const readState = () => {
               ? "hoeren-teil4"
               : migratedFromHoeren4Completion
                 ? "schreiben"
-                : (parsed.stage || "teil1");
+                : migratedFromSchreibenCompletion
+                  ? "sprechen"
+                  : (parsed.stage || "teil1");
 
     const migratedForward =
       migratedFromTeil3Completion ||
@@ -131,7 +154,8 @@ const readState = () => {
       migratedFromHoeren1Completion ||
       migratedFromHoeren2Completion ||
       migratedFromHoeren3Completion ||
-      migratedFromHoeren4Completion;
+      migratedFromHoeren4Completion ||
+      migratedFromSchreibenCompletion;
 
     return {
       ...initialState(),
@@ -159,14 +183,63 @@ const readState = () => {
         teil1: String(parsed.schreiben?.teil1 || ""),
         teil2: String(parsed.schreiben?.teil2 || ""),
       },
+      schreibenResult: parsed.schreibenResult || null,
       schreibenCompleted: Boolean(parsed.schreibenCompleted),
+      speakingProgress: {
+        attempts: parsed.speakingProgress?.attempts || {},
+        selectedTopic: String(parsed.speakingProgress?.selectedTopic || ""),
+      },
+      sprechenResult: parsed.sprechenResult || null,
+      sprechenCompleted: Boolean(parsed.sprechenCompleted),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
-      completed: Boolean(parsed.completed && parsed.schreibenCompleted),
+      completed: Boolean(parsed.completed && parsed.sprechenCompleted),
     };
   } catch (_error) {
     return initialState();
   }
+};
+
+const normalizedAnswer = (value) => String(value || "").trim().toLowerCase();
+
+const objectiveScore = (pairs, maxScore = 25) => {
+  const correct = pairs.filter(([actual, expected]) =>
+    normalizedAnswer(actual) === normalizedAnswer(expected)
+  ).length;
+  return Number(((correct / Math.max(1, pairs.length)) * maxScore).toFixed(1));
+};
+
+const buildFinalScore = (state) => {
+  const lesenPairs = [
+    ...B2_READING.teil1.questions.map((question) => [state.teil1Answers?.[question.number], question.answer]),
+    ...Object.entries(B2_READING.teil2.answers).map(([number, answer]) => [state.teil2Answers?.[number], answer]),
+    ...B2_READING.teil3.questions.map((question) => [state.teil3Answers?.[question.number], question.answer]),
+    ...B2_READING.teil4.questions.map((question) => [state.teil4Answers?.[question.number], question.answer]),
+  ];
+
+  const hoerenPairs = [
+    ...B2_LISTENING.teil1.texts.flatMap((textBlock) =>
+      textBlock.questions.map((question) => [state.hoeren1Answers?.[question.number], question.answer])
+    ),
+    ...B2_LISTENING.teil2.questions.map((question) => [state.hoeren2Answers?.[question.number], question.answer]),
+    ...B2_LISTENING.teil3.questions.map((question) => [state.hoeren3Answers?.[question.number], question.answer]),
+    ...B2_LISTENING.teil4.questions.map((question) => [state.hoeren4Answers?.[question.number], question.answer]),
+  ];
+
+  const lesen = objectiveScore(lesenPairs, 25);
+  const hoeren = objectiveScore(hoerenPairs, 25);
+  const schreiben = Number(state.schreibenResult?.score || 0);
+  const sprechen = Number(state.sprechenResult?.score || 0);
+  const sectionScores = { lesen, hoeren, schreiben, sprechen };
+  const overall = Number((lesen + hoeren + schreiben + sprechen).toFixed(1));
+  const passedModules = Object.values(sectionScores).filter((score) => Number(score) >= 15).length;
+
+  return {
+    sectionScores,
+    overall,
+    passedModules,
+    passed: passedModules === 4,
+  };
 };
 
 const getStageConfig = (stage) => {
@@ -176,6 +249,14 @@ const getStageConfig = (stage) => {
       title: "Schreiben",
       time: "75 Minuten",
       intro: "Bearbeiten Sie beide Schreibaufgaben. Hilfsmittel wie Wörterbücher oder Mobiltelefone sind nicht erlaubt.",
+    };
+  }
+  if (stage === "sprechen") {
+    return {
+      module: "SPRECHEN",
+      title: "Sprechen",
+      time: "30 Minuten inklusive Vorbereitung",
+      intro: "Bearbeiten Sie die Präsentation und die Diskussion. Ihre Aufnahmen werden nach dem Senden transkribiert; nur das Ergebnis wird gespeichert.",
     };
   }
   if (["hoeren-teil1", "hoeren-teil2", "hoeren-teil3", "hoeren-teil4"].includes(stage)) {
@@ -889,7 +970,7 @@ const HoerenTeil4 = ({ idToken, answers, audioStatus, onChoose, onAudioStatusCha
 const wordCount = (text) =>
   String(text || "").trim().split(/\s+/).filter(Boolean).length;
 
-const Schreiben = ({ values, onChange, onFinish }) => (
+const Schreiben = ({ values, onChange, onFinish, busy = false }) => (
   <>
     <section className="b2-mock-writing-intro">
       <p className="b2-mock-section-label">GOETHE-ZERTIFIKAT B2 · SCHREIBEN</p>
@@ -930,8 +1011,8 @@ const Schreiben = ({ values, onChange, onFinish }) => (
       );
     })}
 
-    <button type="button" className="b2-mock-next" onClick={onFinish}>
-      Schreiben abschließen
+    <button type="button" className="b2-mock-next" onClick={onFinish} disabled={busy}>
+      {busy ? "Schreiben wird bewertet …" : "Schreiben abschließen · weiter zu Sprechen"}
     </button>
   </>
 );
@@ -941,6 +1022,8 @@ export default function B2FinalMockExamPage() {
   const { idToken } = useAuth();
   const [state, setState] = useState(readState);
   const [now, setNow] = useState(Date.now());
+  const [busy, setBusy] = useState("");
+  const [pageError, setPageError] = useState("");
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -1173,26 +1256,77 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const finishSchreiben = () => {
+  const finishSchreiben = async () => {
+    if (busy === "schreiben") return;
+    setBusy("schreiben");
+    setPageError("");
+    try {
+      const result = await scoreB2MockWriting({
+        teil1: state.schreiben.teil1,
+        teil2: state.schreiben.teil2,
+        idToken,
+      });
+      setState((current) => ({
+        ...current,
+        schreibenResult: result,
+        schreibenCompleted: true,
+        stage: "sprechen",
+        started: true,
+        completed: false,
+        deadlineMs: Date.now() + SECTION_DURATIONS.sprechen * 1000,
+      }));
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (markError) {
+      setPageError(markError?.response?.data?.error || markError?.message || "Could not mark B2 Schreiben.");
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const handleSpeakingProgress = useCallback((progress) => {
     setState((current) => ({
       ...current,
-      schreibenCompleted: true,
+      speakingProgress: {
+        ...current.speakingProgress,
+        ...progress,
+      },
+    }));
+  }, []);
+
+  const finishSpeaking = useCallback((result) => {
+    setState((current) => ({
+      ...current,
+      sprechenResult: result,
+      sprechenCompleted: true,
       completed: true,
       deadlineMs: null,
     }));
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
   if (state.completed) {
+    const finalScore = buildFinalScore(state);
     return (
       <main className="b2-mock-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <section className="b2-mock-start">
-          <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · MOCK</p>
-          <h1>Lesen, Hören und Schreiben gespeichert</h1>
-          <p>
-            Ihre Antworten wurden gespeichert. Als Nächstes können wir den B2-Sprechen-Teil ergänzen.
-          </p>
+          <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · FINAL MOCK</p>
+          <h1>{finalScore.overall}/100 · {finalScore.passed ? "ALL MODULES PASSED" : "MODULE(S) TO REPEAT"}</h1>
+          <div className="b2-mock-final-grid">
+            {Object.entries(finalScore.sectionScores).map(([section, score]) => (
+              <div key={section}>
+                <span>{section.charAt(0).toUpperCase() + section.slice(1)}</span>
+                <strong>{score}/25</strong>
+              </div>
+            ))}
+          </div>
+          {state.schreibenResult?.overall_feedback_en ? (
+            <p><strong>Schreiben:</strong> {state.schreibenResult.overall_feedback_en}</p>
+          ) : null}
+          {state.sprechenResult?.overall_feedback_en ? (
+            <p><strong>Sprechen:</strong> {state.sprechenResult.overall_feedback_en}</p>
+          ) : null}
+          <p>Goethe-style module rule: each module needs at least 60% — 15/25 in this mock.</p>
         </section>
       </main>
     );
@@ -1209,11 +1343,21 @@ export default function B2FinalMockExamPage() {
           <p>{getStageConfig(state.stage).intro}</p>
           <button type="button" onClick={start}>{getStageConfig(state.stage).title} starten</button>
         </section>
+      ) : state.stage === "sprechen" ? (
+        <B2FinalMockSpeaking
+          externalSecondsLeft={secondsLeft}
+          initialAttempts={state.speakingProgress?.attempts || {}}
+          initialSelectedTopic={state.speakingProgress?.selectedTopic || ""}
+          initialResult={state.sprechenResult}
+          onProgress={handleSpeakingProgress}
+          onComplete={finishSpeaking}
+        />
       ) : state.stage === "schreiben" ? (
         <Schreiben
           values={state.schreiben}
           onChange={updateSchreiben}
           onFinish={finishSchreiben}
+          busy={busy === "schreiben"}
         />
       ) : state.stage === "hoeren-teil4" ? (
         <HoerenTeil4
@@ -1280,6 +1424,8 @@ export default function B2FinalMockExamPage() {
           onContinue={continueToTeil2}
         />
       )}
+
+      {pageError ? <div className="b2-mock-timeup"><strong>Fehler</strong><span>{pageError}</span></div> : null}
 
       {state.started && Number.isFinite(secondsLeft) && secondsLeft <= 0 ? (
         <div className="b2-mock-timeup">

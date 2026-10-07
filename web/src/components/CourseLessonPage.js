@@ -397,6 +397,12 @@ export default function CourseLessonPage() {
     return <Navigate to="/campus/course/b1-mock-practice-preview" replace state={location.state} />;
   }
 
+  const isB2Day29Mock = level === "B2" && day === 29;
+
+  if (isB2Day29Mock) {
+    return <Navigate to="/campus/course/b2-final-mock-exam" replace state={location.state} />;
+  }
+
   if (level === "A1") applyA1GrammarRouteToLesson(location.state?.entry, day);
   if (level === "B1") applyB1LessonResourceOverride(location.state?.entry, day);
   if (isA1Day3) decorateA1Day3Lesson(location.state?.entry);

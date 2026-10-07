@@ -993,6 +993,7 @@ const AppShell = ({
           <Route path="/campus/course/b1-mock-practice-preview" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/b1-final-mock-exam" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/b2-mock-practice-preview" element={<B2FinalMockExamPage />} />
+          <Route path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1FinalMockExamPage />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
