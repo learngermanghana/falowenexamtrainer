@@ -744,4 +744,43 @@ export const B2_WRITING_TASKS = Object.freeze([
   },
 ]);
 
+export const B2_SPEAKING = Object.freeze({
+  teil1: {
+    id: "teil1",
+    title: "Teil 1 · Präsentation",
+    prepSeconds: 15 * 60,
+    maxRecordingSeconds: 4 * 60,
+    instruction:
+      "Wählen Sie eines der beiden Themen. Strukturieren Sie Ihre Präsentation klar und sprechen Sie zusammenhängend. Nennen Sie Beispiele, begründen Sie Ihre Position und schließen Sie mit einem kurzen Fazit.",
+    themes: [
+      {
+        id: "thema1",
+        title: "Konsumverhalten – Kaufen wir zu viele unnötige Dinge?",
+        prompt:
+          "Sprechen Sie über das Kaufverhalten in der heutigen Gesellschaft und Möglichkeiten, bewusster einzukaufen.",
+      },
+      {
+        id: "thema2",
+        title: "Weiterbildung im Beruf – Pflicht oder Eigenverantwortung?",
+        prompt:
+          "Sprechen Sie über Möglichkeiten und die Bedeutung von lebenslangem Lernen und beruflicher Fortbildung.",
+      },
+    ],
+  },
+  teil2: {
+    id: "teil2",
+    title: "Teil 2 · Diskutieren / Standpunkte austauschen",
+    maxRecordingSeconds: 5 * 60,
+    topic:
+      "Soll der öffentliche Personennahverkehr (ÖPNV) für alle Bürger komplett kostenlos sein?",
+    points: [
+      "Tauschen Sie Ihre Argumente aus: Nennen Sie Vor- und Nachteile eines kostenlosen Bus- und Bahnverkehrs, zum Beispiel Umwelt, Finanzierung, Qualität und Verkehrsbelastung.",
+      "Gehen Sie auf Gegenargumente ein: Stimmen Sie einer anderen Position zu oder widersprechen Sie höflich und begründen Sie Ihre Reaktion.",
+      "Erreichen Sie ein Fazit: Versuchen Sie am Ende, eine gemeinsame Position oder eine klare Zusammenfassung zu formulieren.",
+    ],
+    simulationNote:
+      "Da in diesem Mock kein Partner-Audio vorgegeben ist, simulieren Sie beide Seiten der Diskussion: Nennen Sie mindestens ein Gegenargument ausdrücklich und reagieren Sie darauf.",
+  },
+});
+
 export const B2_FINAL_MOCK_STORAGE_KEY = "falowen:b2-final-mock:b2-mock-01";
