@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { B2_LISTENING, B2_READING } from "../data/b2FinalMockData";
+import { B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 
 describe("B2 Final Mock Lesen", () => {
   const page = fs.readFileSync(path.resolve(__dirname, "./B2FinalMockExamPage.jsx"), "utf8");
@@ -127,7 +127,9 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain('? "hoeren-teil3"');
     expect(page).toContain("migratedFromHoeren3Completion");
     expect(page).toContain('? "hoeren-teil4"');
-    expect(page).toContain("completed: Boolean(parsed.completed && parsed.hoeren4Completed)");
+    expect(page).toContain("migratedFromHoeren4Completion");
+    expect(page).toContain('? "schreiben"');
+    expect(page).toContain("completed: Boolean(parsed.completed && parsed.schreibenCompleted)");
   });
 
   test("uses the supplied B2 Hören Teil 2 interview and answer key", () => {
@@ -206,6 +208,35 @@ describe("B2 Final Mock Lesen", () => {
     expect(page).toContain("Aufgaben 23 bis 30 · Hören Teil 4");
     expect(page).toContain("Hören abschließen");
     expect(page).toContain("Lesen Teil 1–4 und Hören Teil 1–4 gespeichert");
+  });
+
+  test("uses the supplied B2 Schreiben tasks and word targets", () => {
+    expect(B2_WRITING_TASKS).toHaveLength(2);
+    expect(B2_WRITING_TASKS[0]).toMatchObject({
+      id: "teil1",
+      topic: "Homeoffice – Arbeiten von zu Hause aus",
+      target: 150,
+    });
+    expect(B2_WRITING_TASKS[0].points).toHaveLength(4);
+    expect(B2_WRITING_TASKS[1]).toMatchObject({
+      id: "teil2",
+      topic: "Projektseminar und Dienstreise",
+      target: 100,
+    });
+    expect(B2_WRITING_TASKS[1].prompt).toContain("Frau Dr. Weber");
+    expect(B2_WRITING_TASKS[1].points).toHaveLength(4);
+  });
+
+  test("continues Hören into a 75-minute autosaved Schreiben section", () => {
+    expect(page).toContain("schreiben: 75 * 60");
+    expect(page).toContain('stage: "schreiben"');
+    expect(page).toContain("schreibenCompleted");
+    expect(page).toContain("Hören abschließen · weiter zu Schreiben");
+    expect(page).toContain("Gesamtdauer: 75 Minuten");
+    expect(page).toContain("Hilfsmittel wie Wörterbücher oder Mobiltelefone sind nicht erlaubt.");
+    expect(page).toContain("wordCount(value)");
+    expect(page).toContain("Automatisch gespeichert");
+    expect(page).toContain("Schreiben abschließen");
   });
 
   test("publishes only a preview route while the B2 mock is still being built", () => {
