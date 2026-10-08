@@ -10,7 +10,7 @@ const tasks = getA2GoetheWritingTasks();
 assert.equal(tasks.length, 28, "Expected all 28 learner A2 writing tasks");
 assert.equal(new Set(tasks.map(task => task.assignmentKey)).size, tasks.length);
 const snapshot = Object.fromEntries(tasks.map(({ day, assignmentKey, title, situation, points }) => {
-  assert.match(assignmentKey, /^A2-\\d+\\.\\d+$/);
+  assert.match(assignmentKey, /^A2-[0-9]+[.][0-9]+$/);
   assert.equal(points.length, 3, assignmentKey);
   return [assignmentKey, { day, assignmentKey, title, situation, points: [...points] }];
 }));
