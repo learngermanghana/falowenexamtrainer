@@ -712,6 +712,14 @@ const QuestionOfDayPage = () => {
       setPractised(true);
       setSubmittedToTutor(Boolean(submittedToTutor));
     }
+    if (user?.uid) {
+      void saveDailyWarmupProgress({
+        userId: user.uid,
+        level: activeLevel,
+        taskType: dailyTask?.type || "warm-up",
+        submittedToTutor,
+      });
+    }
   };
 
   const markPractised = () => {
