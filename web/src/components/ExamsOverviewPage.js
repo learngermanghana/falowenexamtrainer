@@ -198,9 +198,14 @@ export default function ExamsOverviewPage() {
             <h3 style={{ margin: "0 0 4px" }}>Your recent practice</h3>
             <p style={smallLabel}>Recorded scores help you see your progress over time.</p>
           </div>
-          <button type="button" style={secondaryButton} onClick={() => navigate("/exams/mocks")}>
-            Open mock exams →
-          </button>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <button type="button" style={secondaryButton} onClick={() => navigate("/exams/mocks")}>
+              Open mock exams →
+            </button>
+            <button type="button" style={secondaryButton} onClick={() => navigate("/exams/file")}>
+              Review your Exam File →
+            </button>
+          </div>
         </div>
         {loading ? <p style={smallLabel}>Loading saved practice results…</p> : null}
         {loadIssue ? <p role="status" style={{ ...smallLabel, marginTop: 10, color: "#92400e" }}>{loadIssue}</p> : null}
