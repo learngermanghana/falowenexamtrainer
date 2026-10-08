@@ -1684,6 +1684,53 @@ app.post("/exam-room/results", async (req, res) => {
   }
 });
 
+// Only return Exam Room attempts owned by the authenticated student. Never scan
+// scores without the Firebase uid constraint or accept an arbitrary student code.
+app.get("/exam-room/results", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Result storage is unavailable." });
+    const level = String(req.query.level || "").trim().toUpperCase();
+    if (level && !["A1", "A2", "B1", "B2", "C1", "C2"].includes(level)) {
+      return res.status(400).json({ error: "Invalid exam level." });
+    }
+
+    const snapshot = await db.collection("scores")
+      .where("uid", "==", authedUser.uid).limit(200).get();
+    const results = snapshot.docs
+      .map((entry) => ({ id: entry.id, ...entry.data() }))
+      .filter((item) => item.source === "exam_room_practice" ||
+        (String(item.source || "").endsWith("_final_mock") && item.examSection))
+      .filter((item) => !level || String(item.level || "").toUpperCase() === level)
+      .map((item) => ({
+        id: item.id,
+        level: item.level,
+        section: item.examSection,
+        title: item.assignment,
+        setId: item.setId,
+        attemptId: item.examRoomAttemptId,
+        attemptNumber: item.attemptNumber,
+        score: item.rawScore,
+        total: item.total,
+        percent: item.percent,
+        completedAt: item.date,
+        route: item.route,
+        sectionScores: item.sectionScores || {},
+        resultType: item.resultType || "practice",
+      }))
+      .sort((left, right) =>
+        Date.parse(right.completedAt || "") - Date.parse(left.completedAt || ""))
+      .slice(0, 100);
+
+    return res.json({ ok: true, results, limited: snapshot.size >= 200 });
+  } catch (error) {
+    console.error("exam_room_result_read_failed", error?.message || error);
+    return res.status(500).json({ error: "Could not load Exam Room results." });
+  }
+});
+
 app.get("/scores/summary", scoresSummaryHandler);
 
 const transcribeAudio = async (file) => {
