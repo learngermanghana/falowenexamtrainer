@@ -11,7 +11,11 @@ import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
-import { A1_EXAM_HOEREN_SAMPLE_2_TEIL1 } from "../data/a1ExamHorenSample2";
+import {
+  A1_EXAM_HOEREN_SAMPLE_2_TEIL1,
+  A1_EXAM_HOEREN_SAMPLE_2_TEIL2,
+  A1_EXAM_HOEREN_SAMPLE_2_TEIL3,
+} from "../data/a1ExamHorenSample2";
 import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
@@ -19,6 +23,7 @@ import {
   C1_EXAM_HOEREN_SAMPLE_1_TEIL4,
 } from "../data/c1ExamHorenSample1";
 import "./A1GoetheListeningMockPreview.css";
+import "./A1ExamHorenSample2.css";
 import "./A2GoetheListeningMockTeil2Preview.css";
 import "./A2GoetheListeningMockTeil3Preview.css";
 
@@ -37,6 +42,8 @@ const A1_PARTS = Object.freeze([
 
 const A1_SAMPLE_2_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL1 },
+  { key: "teil2", audioPart: "teil-2", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL2 },
+  { key: "teil3", audioPart: "teil-3", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL3 },
 ]);
 
 const C1_PARTS = Object.freeze([
@@ -169,6 +176,140 @@ const ChoiceOptions = ({ name, options, value, onChange, disabled }) => (
   </div>
 );
 
+const A1ListeningPictureScene = ({ picture }) => {
+  const type = picture?.type || "";
+  const value = picture?.value || "";
+
+  if (type === "clock") {
+    const hour = Number(String(value).split(":")[0]) % 12;
+    const angle = (hour / 12) * Math.PI * 2 - Math.PI / 2;
+    const x = 60 + Math.cos(angle) * 25;
+    const y = 60 + Math.sin(angle) * 25;
+    return (
+      <svg viewBox="0 0 120 120" className="a1-practice-picture-svg" aria-hidden="true">
+        <circle cx="60" cy="60" r="44" fill="white" stroke="currentColor" strokeWidth="3" />
+        <line x1="60" y1="60" x2={x} y2={y} stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+        <line x1="60" y1="60" x2="60" y2="29" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        <circle cx="60" cy="60" r="4" fill="currentColor" />
+        <text x="60" y="108" textAnchor="middle" fontSize="14" fontWeight="700">{value}</text>
+      </svg>
+    );
+  }
+
+  if (type === "train") {
+    const cancelled = value === "cancelled";
+    const delayed = value === "delay";
+    return (
+      <svg viewBox="0 0 160 115" className="a1-practice-picture-svg" aria-hidden="true">
+        <rect x="28" y="21" width="104" height="64" rx="8" fill="white" stroke="currentColor" strokeWidth="3" />
+        <rect x="42" y="32" width="29" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        <rect x="89" y="32" width="29" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        <line x1="80" y1="21" x2="80" y2="84" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="51" cy="90" r="8" fill="white" stroke="currentColor" strokeWidth="3" />
+        <circle cx="109" cy="90" r="8" fill="white" stroke="currentColor" strokeWidth="3" />
+        {cancelled ? (
+          <>
+            <line x1="35" y1="17" x2="129" y2="99" stroke="currentColor" strokeWidth="7" />
+            <line x1="129" y1="17" x2="35" y2="99" stroke="currentColor" strokeWidth="7" />
+          </>
+        ) : delayed ? (
+          <>
+            <circle cx="135" cy="28" r="18" fill="white" stroke="currentColor" strokeWidth="3" />
+            <line x1="135" y1="28" x2="135" y2="18" stroke="currentColor" strokeWidth="3" />
+            <line x1="135" y1="28" x2="144" y2="33" stroke="currentColor" strokeWidth="3" />
+            <text x="135" y="61" textAnchor="middle" fontSize="14" fontWeight="800">+10</text>
+          </>
+        ) : (
+          <text x="80" y="111" textAnchor="middle" fontSize="14" fontWeight="800">früher</text>
+        )}
+      </svg>
+    );
+  }
+
+  if (type === "action") {
+    if (value === "calendar") {
+      return (
+        <svg viewBox="0 0 140 110" className="a1-practice-picture-svg" aria-hidden="true">
+          <rect x="28" y="20" width="84" height="72" rx="5" fill="white" stroke="currentColor" strokeWidth="3" />
+          <line x1="28" y1="39" x2="112" y2="39" stroke="currentColor" strokeWidth="3" />
+          <text x="70" y="72" textAnchor="middle" fontSize="24" fontWeight="800">MO</text>
+        </svg>
+      );
+    }
+    if (value === "email") {
+      return (
+        <svg viewBox="0 0 140 110" className="a1-practice-picture-svg" aria-hidden="true">
+          <rect x="20" y="28" width="100" height="60" rx="4" fill="white" stroke="currentColor" strokeWidth="3" />
+          <path d="M22 31 L70 66 L118 31" fill="none" stroke="currentColor" strokeWidth="3" />
+        </svg>
+      );
+    }
+    return (
+      <svg viewBox="0 0 140 110" className="a1-practice-picture-svg" aria-hidden="true">
+        <path d="M43 25 C39 32 40 42 45 51 L57 64 C62 69 67 70 73 67 L83 61 C90 69 97 76 105 81 L99 91 C96 96 91 98 85 96 C60 88 40 68 32 43 C30 37 34 31 43 25 Z" fill="white" stroke="currentColor" strokeWidth="3" />
+        <path d="M95 27 C107 31 115 40 119 52 M94 38 C101 40 106 46 109 52" fill="none" stroke="currentColor" strokeWidth="3" />
+      </svg>
+    );
+  }
+
+  if (type === "apples") {
+    return (
+      <svg viewBox="0 0 160 110" className="a1-practice-picture-svg" aria-hidden="true">
+        <path d="M36 78 H104 L113 96 H28 Z" fill="white" stroke="currentColor" strokeWidth="3" />
+        {[45, 67, 89].map((cx) => (
+          <g key={cx}>
+            <circle cx={cx} cy="61" r="14" fill="white" stroke="currentColor" strokeWidth="2.5" />
+            <path d={`M${cx} 47 Q${cx + 3} 39 ${cx + 9} 36`} fill="none" stroke="currentColor" strokeWidth="2.5" />
+          </g>
+        ))}
+        <rect x="113" y="22" width="38" height="28" rx="4" fill="white" stroke="currentColor" strokeWidth="2.5" />
+        <text x="132" y="42" textAnchor="middle" fontSize="15" fontWeight="800">{value}</text>
+      </svg>
+    );
+  }
+
+  const labels = {
+    "bread-milk": ["Brot", "Milch"],
+    "cheese-water": ["Käse", "Wasser"],
+    "fruit-bread": ["Obst", "Brot"],
+  }[value] || ["Brot", "Milch"];
+
+  return (
+    <svg viewBox="0 0 160 110" className="a1-practice-picture-svg" aria-hidden="true">
+      <rect x="12" y="23" width="62" height="62" rx="8" fill="white" stroke="currentColor" strokeWidth="3" />
+      <rect x="86" y="23" width="62" height="62" rx="8" fill="white" stroke="currentColor" strokeWidth="3" />
+      <text x="43" y="60" textAnchor="middle" fontSize="13" fontWeight="800">{labels[0]}</text>
+      <text x="117" y="60" textAnchor="middle" fontSize="13" fontWeight="800">{labels[1]}</text>
+    </svg>
+  );
+};
+
+const A1PictureOptions = ({ name, options, value, onChange, disabled }) => (
+  <div className="a1-practice-picture-options" role="radiogroup">
+    {options.map((option) => (
+      <label
+        key={option.id}
+        className={value === option.id ? "a1-practice-picture-card selected" : "a1-practice-picture-card"}
+      >
+        <div className="a1-practice-picture-frame">
+          <A1ListeningPictureScene picture={option.picture} />
+        </div>
+        <div className="a1-practice-picture-answer">
+          <input
+            type="radio"
+            name={name}
+            checked={value === option.id}
+            onChange={() => onChange(option.id)}
+            disabled={disabled}
+          />
+          <strong>{option.id})</strong>
+          <span>{option.label}</span>
+        </div>
+      </label>
+    ))}
+  </div>
+);
+
 const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
   <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
     {labels.map(([id, label]) => (
@@ -244,6 +385,30 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   };
 
   const renderPartQuestions = (part) => {
+    if (normalizedLevel === "A1" && sampleId === "sample-2" && part.key === "teil1") {
+      return (
+        <div className="a1-practice-picture-question-list">
+          {(part.data.questions || []).map((question) => {
+            const key = `${part.key}-${question.number}`;
+            return (
+              <article className="a1-practice-picture-question" key={key}>
+                <strong>Aufgabe {question.number}</strong>
+                <h3>{question.question}</h3>
+                <A1PictureOptions
+                  name={key}
+                  options={question.options}
+                  value={answers[key] || ""}
+                  onChange={(value) => setAnswer(key, value)}
+                  disabled={submitted}
+                />
+                {feedback(key, question.answer)}
+              </article>
+            );
+          })}
+        </div>
+      );
+    }
+
     if (normalizedLevel === "A2" && part.key === "teil2") {
       const used = new Set(
         part.data.tasks
@@ -410,6 +575,29 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             plays={part.data.plays}
             idToken={idToken}
           />
+
+          {part.data.example ? (
+            <div
+              style={{
+                border: "1px solid #d1d5db",
+                borderRadius: 10,
+                padding: 12,
+                background: "#f9fafb",
+                display: "grid",
+                gap: 8,
+              }}
+            >
+              <strong>Beispiel</strong>
+              <p style={{ margin: 0 }}>{part.data.example.question}</p>
+              <div style={{ display: "grid", gap: 4 }}>
+                {part.data.example.options.map((option) => (
+                  <span key={option.id}>
+                    <strong>{option.id})</strong> {option.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div style={{ display: "grid", gap: 14 }}>
             {renderPartQuestions(part)}

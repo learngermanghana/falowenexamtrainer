@@ -80,7 +80,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             >
               <strong>Hören Sample 2</strong>
               <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
-                5 questions · Teil 1
+                15 questions · Teil 1–3
               </span>
             </button>
           ) : null}
