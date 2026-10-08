@@ -58,7 +58,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             <strong>Hören Sample 1</strong>
             <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
               {normalizedLevel === "A1"
-                ? "110 questions · Teil 1–2–3"
+                ? "115 questions · Teil 1–3–3"
                 : normalizedLevel === "A2"
                   ? "20 questions · Teil 1–4"
                   : "30 questions · Teil 1–4"}
