@@ -96,6 +96,7 @@ const {
   persistVerifiedB1MockSection,
   syncB1MockCompletion,
 } = require("./b1MockCompletionSync");
+const { syncExamRoomResult } = require("./examRoomResultSync");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -1650,6 +1651,38 @@ app.post("/admin/purge-expired-students", async (req, res) => {
   }
 });
 
+
+app.post("/exam-room/results", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Result storage is unavailable." });
+
+    const studentProfile = await findAuthedStudentProfile(db, authedUser);
+    const result = await syncExamRoomResult({
+      db,
+      admin,
+      authedUser,
+      studentProfile,
+      input: req.body || {},
+      now: new Date(),
+    });
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("exam_room_result_sync_failed", {
+      message: error?.message || String(error),
+      level: req.body?.level || "",
+      section: req.body?.section || "",
+      setId: req.body?.setId || req.body?.set_id || "",
+    });
+    const message = error?.message || "Could not save this Exams Room result.";
+    const status = /required|valid|greater than|non-negative/i.test(message) ? 400 : 500;
+    return res.status(status).json({ error: message });
+  }
+});
 
 app.get("/scores/summary", scoresSummaryHandler);
 
