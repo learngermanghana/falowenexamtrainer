@@ -7,6 +7,7 @@ import {
   saveReadingPracticeAttempt,
 } from "../services/readingPracticeHistory";
 import { useAuth } from "../context/AuthContext";
+import { saveExamRoomResult } from "../services/examRoomResultService";
 import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheReadingMockTeil2Preview.css";
 import "./A1GoetheReadingMockTeil3Preview.css";
@@ -430,7 +431,7 @@ const LetterChoices = ({ name, value, onChange, disabled }) => (
 
 export default function A1ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
   const navigate = useNavigate();
-  const { studentProfile, user } = useAuth();
+  const { studentProfile, user, idToken } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
   const [sampleId, setSampleId] = useState(() =>
     A1_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)
@@ -567,6 +568,28 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
       studentKey,
     });
     setSavedAttemptBySample((current) => ({ ...current, [sample.id]: attempt }));
+    if (attempt && idToken) {
+      void saveExamRoomResult({
+        idToken,
+        level: "A1",
+        section: "lesen",
+        setId: sample.id,
+        title: `A1 ${sample.label || "Lesen practice"}`,
+        score,
+        total: 15,
+        percent,
+        passed: percent >= 60,
+        attemptId: attempt.id,
+        attemptNumber: attempt.attemptNumber,
+        resultType: "practice",
+        route: "/exams/lesen",
+        sectionScores: Object.fromEntries(
+          sectionScores.map((section) => [section.label.toLowerCase().replace(/\s+/g, ""), section.score]),
+        ),
+      }).catch((error) => {
+        console.warn("Could not sync A1 Lesen practice result", error);
+      });
+    }
     setSubmittedBySample((current) => ({ ...current, [sample.id]: true }));
   };
 

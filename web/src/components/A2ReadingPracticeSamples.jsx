@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { saveExamRoomResult } from "../services/examRoomResultService";
 import {
   getReadingPracticeStudentKey,
   getReadingReadinessLabel,
@@ -309,7 +310,7 @@ const formatTime = (seconds) =>
 
 export default function A2ReadingPracticeSamples({ initialSampleId = "", standalone = false }) {
   const navigate = useNavigate();
-  const { studentProfile, user } = useAuth();
+  const { studentProfile, user, idToken } = useAuth();
   const studentKey = getReadingPracticeStudentKey({ studentProfile, user });
   const [sampleId, setSampleId] = useState(() =>
     A2_READING_PRACTICE_SAMPLES.some((item) => item.id === initialSampleId)
@@ -439,6 +440,28 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
       studentKey,
     });
     setSavedAttemptBySample((current) => ({ ...current, [sample.id]: attempt }));
+    if (attempt && idToken) {
+      void saveExamRoomResult({
+        idToken,
+        level: "A2",
+        section: "lesen",
+        setId: sample.id,
+        title: `A2 ${sample.label || "Lesen practice"}`,
+        score,
+        total: 20,
+        percent,
+        passed: percent >= 60,
+        attemptId: attempt.id,
+        attemptNumber: attempt.attemptNumber,
+        resultType: "practice",
+        route: "/exams/lesen",
+        sectionScores: Object.fromEntries(
+          sectionScores.map((section) => [section.label.toLowerCase().replace(/\s+/g, ""), section.score]),
+        ),
+      }).catch((error) => {
+        console.warn("Could not sync A2 Lesen practice result", error);
+      });
+    }
     setSubmittedBySample((current) => ({ ...current, [sample.id]: true }));
   };
 
