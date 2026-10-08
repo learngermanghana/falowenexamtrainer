@@ -138,11 +138,16 @@ const validateA1ExamHorenAudioKey = ({ sampleId, part, key }) => {
   const normalizedPart = clean(part).toLowerCase();
   const normalizedKey = clean(key).replace(/^\/+/, "");
 
-  if (normalizedSampleId !== "sample-2") return null;
+  const folderBySample = {
+    "sample-2": "horen-part-2",
+    "sample-3": "horen-part-3",
+  };
+  const folder = folderBySample[normalizedSampleId];
+  if (!folder) return null;
   if (!/^teil-[123]$/.test(normalizedPart)) return null;
   if (!normalizedKey || normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
 
-  const expectedKey = `a1/horen-part-2/${normalizedPart}`;
+  const expectedKey = `a1/${folder}/${normalizedPart}`;
   if (!normalizedKey.startsWith(expectedKey)) return null;
   if (!isAudioObjectKey(normalizedKey)) return null;
 
