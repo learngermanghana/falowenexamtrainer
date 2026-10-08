@@ -58,3 +58,73 @@ export const A1_EXAM_HOEREN_SAMPLE_2_TEIL1 = Object.freeze({
     },
   ],
 });
+
+
+export const A1_EXAM_HOEREN_SAMPLE_2_TEIL2 = Object.freeze({
+  id: "a1-hoeren-sample-2-teil-2",
+  title: "Teil 2",
+  instruction: "Fragen 6 bis 10: Kreuzen Sie die richtige Antwort an.",
+  responseInstruction: "Wählen Sie bei jeder Aufgabe a, b oder c.",
+  audioObjectKey: "a1/horen-part-2/teil-2.mp3",
+  plays: 1,
+  example: {
+    question: "Wohin fährt der Bus Linie 12 heute?",
+    options: [
+      { id: "a", label: "Zum Flughafen." },
+      { id: "b", label: "Zum Bahnhof." },
+      { id: "c", label: "Zum Markt." },
+    ],
+  },
+  questions: [
+    {
+      number: 6,
+      question: "Wann ist die Bibliothek heute offen?",
+      options: [
+        { id: "a", label: "Von neun bis siebzehn Uhr." },
+        { id: "b", label: "Von zehn bis achtzehn Uhr." },
+        { id: "c", label: "Von zehn bis zwanzig Uhr." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 7,
+      question: "Was gibt es heute mit Rabatt?",
+      options: [
+        { id: "a", label: "Kleider." },
+        { id: "b", label: "Schuhe." },
+        { id: "c", label: "Taschen." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 8,
+      question: "Wie ist das Wetter am Nachmittag?",
+      options: [
+        { id: "a", label: "Es regnet." },
+        { id: "b", label: "Es ist windig." },
+        { id: "c", label: "Die Sonne scheint." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 9,
+      question: "Wann ist der Friseur wieder offen?",
+      options: [
+        { id: "a", label: "Am Samstag." },
+        { id: "b", label: "Am Montag." },
+        { id: "c", label: "Am Dienstag." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 10,
+      question: "Wann schließt das Schwimmbad heute?",
+      options: [
+        { id: "a", label: "Um sechzehn Uhr." },
+        { id: "b", label: "Um siebzehn Uhr." },
+        { id: "c", label: "Um achtzehn Uhr." },
+      ],
+      answer: "c",
+    },
+  ],
+});
