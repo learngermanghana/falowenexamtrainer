@@ -6,6 +6,7 @@ import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
 import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
+import { saveExamRoomResult } from "../services/examRoomResultService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
 import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
@@ -366,6 +367,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             : A1_PARTS;
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [resultSyncStatus, setResultSyncStatus] = useState("idle");
 
   const questions = useMemo(
     () => parts.flatMap((part) =>
@@ -381,6 +383,48 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   const score = questions.filter(
     (question) => String(answers[question.key] || "").toLowerCase() === String(question.answer).toLowerCase()
   ).length;
+
+  const percent = Math.round((score / Math.max(1, questions.length)) * 100);
+  const sampleNumber = sampleId === "sample-3" ? 3 : sampleId === "sample-2" ? 2 : 1;
+
+  const submitResults = async () => {
+    if (submitted || answered !== questions.length) return;
+    setSubmitted(true);
+    setResultSyncStatus("saving");
+
+    const sectionScores = Object.fromEntries(
+      parts.map((part) => {
+        const partQuestions = answerKeyForPart(normalizedLevel, part);
+        const partScore = partQuestions.filter((question) => {
+          const key = `${part.key}-${question.number}`;
+          return String(answers[key] || "").toLowerCase() === String(question.answer).toLowerCase();
+        }).length;
+        return [part.key, partScore];
+      }),
+    );
+
+    try {
+      await saveExamRoomResult({
+        idToken,
+        level: normalizedLevel,
+        section: "hoeren",
+        setId: `${normalizedLevel.toLowerCase()}-hoeren-${sampleId}`,
+        title: `${normalizedLevel} Hören Sample ${sampleNumber}`,
+        score,
+        total: questions.length,
+        percent,
+        passed: percent >= 60,
+        attemptId: `hoeren-${normalizedLevel.toLowerCase()}-${sampleId}-${Date.now()}`,
+        resultType: "practice",
+        route: `/exams/horen/${normalizedLevel.toLowerCase()}/${sampleId}`,
+        sectionScores,
+      });
+      setResultSyncStatus("saved");
+    } catch (error) {
+      console.warn("Could not sync Hören practice result", error);
+      setResultSyncStatus("failed");
+    }
+  };
 
   const setAnswer = (key, value) => {
     if (submitted) return;
@@ -624,16 +668,21 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
         <div>
           <strong>{answered}/{questions.length} answered</strong>
           {submitted ? (
-            <p style={{ margin: "5px 0 0" }}>
-              Result: <strong>{score}/{questions.length}</strong> · {Math.round((score / questions.length) * 100)}%
-            </p>
+            <>
+              <p style={{ margin: "5px 0 0" }}>
+                Result: <strong>{score}/{questions.length}</strong> · {percent}%
+              </p>
+              {resultSyncStatus === "saving" ? <small>Saving result…</small> : null}
+              {resultSyncStatus === "saved" ? <small>Result saved.</small> : null}
+              {resultSyncStatus === "failed" ? <small>Result shown here, but email sync could not be confirmed.</small> : null}
+            </>
           ) : (
             <p style={{ ...styles.helperText, margin: "5px 0 0" }}>Complete every Teil before checking your answers.</p>
           )}
         </div>
 
         {!submitted ? (
-          <button type="button" style={styles.primaryButton} disabled={answered !== questions.length} onClick={() => setSubmitted(true)}>
+          <button type="button" style={styles.primaryButton} disabled={answered !== questions.length} onClick={submitResults}>
             Check answers
           </button>
         ) : (
@@ -643,6 +692,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             onClick={() => {
               setAnswers({});
               setSubmitted(false);
+              setResultSyncStatus("idle");
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
