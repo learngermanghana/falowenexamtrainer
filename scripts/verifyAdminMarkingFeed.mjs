@@ -26,5 +26,20 @@ assert.match(server, /app\.get\("\/internal\/marking-manifest"/);
 assert.match(server, /getAuthedUser\(req\)/);
 assert.match(server, /Staff access required/);
 assert.match(server, /private, no-store/);
-assert.match(server, /await import\("\.\.\/\.\.\/web\/src\/data\/a2GoetheWritingTasks\.js"\)/);
+assert.ok(server.includes('require("../data/a2GoetheWritingTasks.json")[assignmentId]'), "Function must use its packaged A2 task snapshot");
+assert.ok(!server.includes('await import("../../web/'), "Runtime must not depend on sibling web/ files");
+const packaged = JSON.parse(readFileSync(new URL("../functions/data/a2GoetheWritingTasks.json", import.meta.url), "utf8"));
+assert.equal(Object.keys(packaged).length, 28);
+for (const task of tasks) {
+  const item = packaged[task.assignmentKey];
+  assert.ok(item, "Packaged task missing: " + task.assignmentKey);
+  assert.deepEqual(item, {
+    day: task.day,
+    assignmentKey: task.assignmentKey,
+    title: task.title,
+    situation: task.situation,
+    points: [...task.points],
+  }, "Packaged function task must exactly match learner coursebook: " + task.assignmentKey);
+}
+
 console.log("PASS: 28 A2 writing contracts, Day 10 key alignment, and staff-only live API route");

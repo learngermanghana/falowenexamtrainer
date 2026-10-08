@@ -7,6 +7,8 @@ on:
       - "api/index.js"
       - "functions/functionz/paymentAwareApp.js"
       - "functions/data/answerKeyManifest.json"
+      - "functions/data/a2GoetheWritingTasks.json"
+      - "scripts/generateFunctionMarkingTasks.mjs"
       - "web/src/data/a2GoetheWritingTasks.js"
       - "scripts/verifyAdminMarkingFeed.mjs"
       - "vercel.json"
@@ -49,6 +51,8 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Generate Firebase A2 task snapshot from coursebook
+        run: node scripts/generateFunctionMarkingTasks.mjs
       - name: Validate staff marking contract and canonical learner tasks
         run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Validate production release wiring
@@ -71,6 +75,8 @@ jobs:
         run: npm --prefix functions install --no-audit --no-fund --loglevel=error
       - name: Install web dependencies
         run: npm --prefix web install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Generate Firebase-packaged A2 task from coursebook
+        run: node scripts/generateFunctionMarkingTasks.mjs
       - name: Verify staff-only learner marking feed before deploy
         run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Run exact production build gate
