@@ -91,9 +91,13 @@ export const buildExamRoomCoach = ({
       : "All four skills have been practised. Keep improving with another attempt.";
 
   let weakPart = "";
-  if (shouldRevise && focus.key === "lesen" &&
-      Array.isArray(focusResult?.sectionScores)) {
-    const ranked = focusResult.sectionScores
+  const localDetails = localReading.find((row) =>
+    String(row?.id || "") === String(focusResult?.id || "") &&
+    Array.isArray(row?.sectionScores))?.sectionScores;
+  const readingParts = Array.isArray(focusResult?.sectionScores)
+    ? focusResult.sectionScores : localDetails;
+  if (shouldRevise && focus.key === "lesen" && Array.isArray(readingParts)) {
+    const ranked = readingParts
       .filter((part) => Number(part.total) > 0)
       .sort((a, b) => Number(a.score || 0) / Number(a.total) -
         Number(b.score || 0) / Number(b.total));
