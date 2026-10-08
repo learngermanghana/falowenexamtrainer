@@ -39,6 +39,39 @@ describe("A1 Exams Room Hören practice audio", () => {
     });
 
     expect(validateA1ExamHorenAudioKey({
+      sampleId: "sample-3",
+      part: "teil-1",
+      key: "a1/horen-part-3/teil-1.mp3",
+    })).toEqual({
+      level: "A1",
+      sampleId: "sample-3",
+      part: "teil-1",
+      key: "a1/horen-part-3/teil-1.mp3",
+    });
+
+    expect(validateA1ExamHorenAudioKey({
+      sampleId: "sample-3",
+      part: "teil-2",
+      key: "a1/horen-part-3/teil-2.mp3",
+    })).toEqual({
+      level: "A1",
+      sampleId: "sample-3",
+      part: "teil-2",
+      key: "a1/horen-part-3/teil-2.mp3",
+    });
+
+    expect(validateA1ExamHorenAudioKey({
+      sampleId: "sample-3",
+      part: "teil-3",
+      key: "a1/horen-part-3/teil-3.mp3",
+    })).toEqual({
+      level: "A1",
+      sampleId: "sample-3",
+      part: "teil-3",
+      key: "a1/horen-part-3/teil-3.mp3",
+    });
+
+    expect(validateA1ExamHorenAudioKey({
       sampleId: "sample-1",
       part: "teil-1",
       key: "a1/horen-part-2/teil-1.mp3",
@@ -48,6 +81,12 @@ describe("A1 Exams Room Hören practice audio", () => {
       sampleId: "sample-2",
       part: "teil-1",
       key: "a1/mock-hoeren/mock-01/teil-1.mp3",
+    })).toBeNull();
+
+    expect(validateA1ExamHorenAudioKey({
+      sampleId: "sample-3",
+      part: "teil-1",
+      key: "a1/horen-part-2/teil-1.mp3",
     })).toBeNull();
 
     expect(validateA1ExamHorenAudioKey({

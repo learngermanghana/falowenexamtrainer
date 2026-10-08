@@ -17,7 +17,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
     if (sampleId) {
       const sampleExists =
         sampleId === "sample-1" ||
-        (normalizedLevel === "A1" && sampleId === "sample-2");
+        (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId));
 
       if (!sampleExists) {
         return (
@@ -66,23 +66,43 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
           </button>
 
           {normalizedLevel === "A1" ? (
-            <button
-              type="button"
-              onClick={() => navigate("/exams/horen/a1/sample-2")}
-              style={{
-                ...styles.secondaryButton,
-                width: "100%",
-                textAlign: "left",
-                display: "grid",
-                gap: 4,
-                padding: "14px 16px",
-              }}
-            >
-              <strong>Hören Sample 2</strong>
-              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
-                15 questions · Teil 1–3
-              </span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => navigate("/exams/horen/a1/sample-2")}
+                style={{
+                  ...styles.secondaryButton,
+                  width: "100%",
+                  textAlign: "left",
+                  display: "grid",
+                  gap: 4,
+                  padding: "14px 16px",
+                }}
+              >
+                <strong>Hören Sample 2</strong>
+                <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                  15 questions · Teil 1–3
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate("/exams/horen/a1/sample-3")}
+                style={{
+                  ...styles.secondaryButton,
+                  width: "100%",
+                  textAlign: "left",
+                  display: "grid",
+                  gap: 4,
+                  padding: "14px 16px",
+                }}
+              >
+                <strong>Hören Sample 3</strong>
+                <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                  15 questions · Teil 1–3
+                </span>
+              </button>
+            </>
           ) : null}
         </div>
       </section>

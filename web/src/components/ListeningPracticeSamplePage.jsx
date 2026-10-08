@@ -17,6 +17,11 @@ import {
   A1_EXAM_HOEREN_SAMPLE_2_TEIL3,
 } from "../data/a1ExamHorenSample2";
 import {
+  A1_EXAM_HOEREN_SAMPLE_3_TEIL1,
+  A1_EXAM_HOEREN_SAMPLE_3_TEIL2,
+  A1_EXAM_HOEREN_SAMPLE_3_TEIL3,
+} from "../data/a1ExamHorenSample3";
+import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL3,
@@ -44,6 +49,12 @@ const A1_SAMPLE_2_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL1 },
   { key: "teil2", audioPart: "teil-2", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL2 },
   { key: "teil3", audioPart: "teil-3", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL3 },
+]);
+
+const A1_SAMPLE_3_PARTS = Object.freeze([
+  { key: "teil1", audioPart: "teil-1", data: A1_EXAM_HOEREN_SAMPLE_3_TEIL1 },
+  { key: "teil2", audioPart: "teil-2", data: A1_EXAM_HOEREN_SAMPLE_3_TEIL2 },
+  { key: "teil3", audioPart: "teil-3", data: A1_EXAM_HOEREN_SAMPLE_3_TEIL3 },
 ]);
 
 const C1_PARTS = Object.freeze([
@@ -79,7 +90,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
     setError("");
     try {
       const result =
-        level === "A1" && sampleId === "sample-2"
+        level === "A1" && ["sample-2", "sample-3"].includes(sampleId)
           ? await fetchA1ExamHorenAudioPlaybackUrl({
               sampleId,
               part,
@@ -112,7 +123,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
       <div className="a1-hoeren-mock-part-audio-copy">
         <strong>Exam audio</strong>
         <p>
-          {level === "C1" || (level === "A1" && sampleId === "sample-2")
+          {level === "C1" || (level === "A1" && ["sample-2", "sample-3"].includes(sampleId))
             ? `This audio belongs to ${level} Hören practice in the Exams Room.`
             : plays === 2
               ? "The required repetition is already included in the audio."
@@ -137,7 +148,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
       )}
 
       <span className="a1-hoeren-mock-play-count">
-        {level === "C1" || (level === "A1" && sampleId === "sample-2")
+        {level === "C1" || (level === "A1" && ["sample-2", "sample-3"].includes(sampleId))
           ? `${plays}× practice audio`
           : `${plays}× in the mock audio`}
       </span>
@@ -348,9 +359,11 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
       ? C1_PARTS
       : normalizedLevel === "A2"
         ? A2_PARTS
-        : sampleId === "sample-2"
-          ? A1_SAMPLE_2_PARTS
-          : A1_PARTS;
+        : sampleId === "sample-3"
+          ? A1_SAMPLE_3_PARTS
+          : sampleId === "sample-2"
+            ? A1_SAMPLE_2_PARTS
+            : A1_PARTS;
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -553,7 +566,9 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
           Back to Hören samples
         </button>
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
-        <h2 style={{ margin: 0 }}>Hören {sampleId === "sample-2" ? "Sample 2" : "Sample 1"}</h2>
+        <h2 style={{ margin: 0 }}>
+          Hören {sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}
+        </h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
           Complete all listening parts, then check your answers at the end.
         </p>
@@ -631,7 +646,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            Try {sampleId === "sample-2" ? "Sample 2" : "Sample 1"} again
+            Try {sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"} again
           </button>
         )}
       </section>
