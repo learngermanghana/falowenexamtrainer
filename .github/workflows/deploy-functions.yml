@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'functions/**'
+      - 'web/src/data/a2GoetheWritingTasks.js'
+      - 'scripts/generateFunctionMarkingTasks.mjs'
       - 'scripts/patchResubmissionReviewGate.mjs'
       - 'firebase.json'
       - '.firebaserc'
@@ -43,6 +45,11 @@ jobs:
       - name: Install functions dependencies
         working-directory: functions
         run: npm install --no-audit --no-fund
+
+      - name: Package latest canonical learner writing tasks for Firebase
+        run: |
+          node scripts/generateFunctionMarkingTasks.mjs
+          node scripts/verifyAdminMarkingFeed.mjs
 
       - name: Apply resubmission review gate
         run: node scripts/patchResubmissionReviewGate.mjs
