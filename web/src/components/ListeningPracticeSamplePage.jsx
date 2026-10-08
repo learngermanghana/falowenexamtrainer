@@ -11,7 +11,10 @@ import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
-import { A1_EXAM_HOEREN_SAMPLE_2_TEIL1 } from "../data/a1ExamHorenSample2";
+import {
+  A1_EXAM_HOEREN_SAMPLE_2_TEIL1,
+  A1_EXAM_HOEREN_SAMPLE_2_TEIL2,
+} from "../data/a1ExamHorenSample2";
 import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
@@ -37,6 +40,7 @@ const A1_PARTS = Object.freeze([
 
 const A1_SAMPLE_2_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL1 },
+  { key: "teil2", audioPart: "teil-2", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL2 },
 ]);
 
 const C1_PARTS = Object.freeze([
@@ -410,6 +414,29 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             plays={part.data.plays}
             idToken={idToken}
           />
+
+          {part.data.example ? (
+            <div
+              style={{
+                border: "1px solid #d1d5db",
+                borderRadius: 10,
+                padding: 12,
+                background: "#f9fafb",
+                display: "grid",
+                gap: 8,
+              }}
+            >
+              <strong>Beispiel</strong>
+              <p style={{ margin: 0 }}>{part.data.example.question}</p>
+              <div style={{ display: "grid", gap: 4 }}>
+                {part.data.example.options.map((option) => (
+                  <span key={option.id}>
+                    <strong>{option.id})</strong> {option.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div style={{ display: "grid", gap: 14 }}>
             {renderPartQuestions(part)}
