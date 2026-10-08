@@ -26,8 +26,8 @@ assert.match(server, /app\.get\("\/internal\/marking-manifest"/);
 assert.match(server, /getAuthedUser\(req\)/);
 assert.match(server, /Staff access required/);
 assert.match(server, /private, no-store/);
-assert.match(server, /require\\("\\.\\.\\/data\\/a2GoetheWritingTasks\\.json"\\)/);
-assert.doesNotMatch(server, /await import\\("\\.\\.\\/\\.\\.\\/web\\//, "Runtime must not depend on sibling web/ files");
+assert.ok(server.includes('require("../data/a2GoetheWritingTasks.json")[assignmentId]'), "Function must use its packaged A2 task snapshot");
+assert.ok(!server.includes('await import("../../web/'), "Runtime must not depend on sibling web/ files");
 const packaged = JSON.parse(readFileSync(new URL("../functions/data/a2GoetheWritingTasks.json", import.meta.url), "utf8"));
 assert.equal(Object.keys(packaged).length, 28);
 for (const task of tasks) {
