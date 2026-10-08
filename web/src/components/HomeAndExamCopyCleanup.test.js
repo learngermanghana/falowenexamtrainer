@@ -68,7 +68,8 @@ describe("homepage and Exams Room student-facing cleanup", () => {
       "Open preview",
     ].forEach((phrase) => expect(mockLibrarySource).not.toContain(phrase));
 
-    expect(mockLibrarySource).toContain("Practise a complete exam under timed conditions");
+    expect(mockLibrarySource).toContain("Choose a full timed mock when available");
+    expect(mockLibrarySource).toContain("does not yet generate one final combined score");
     expect(mockLibrarySource).toContain("Open practice");
   });
 
