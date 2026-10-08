@@ -133,6 +133,27 @@ const validateA1MockAudioKey = ({ mockId, part, key }) => {
   };
 };
 
+const validateA1ExamHorenAudioKey = ({ sampleId, part, key }) => {
+  const normalizedSampleId = clean(sampleId).toLowerCase();
+  const normalizedPart = clean(part).toLowerCase();
+  const normalizedKey = clean(key).replace(/^\/+/, "");
+
+  if (normalizedSampleId !== "sample-2") return null;
+  if (!/^teil-[123]$/.test(normalizedPart)) return null;
+  if (!normalizedKey || normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
+
+  const expectedKey = `a1/horen-part-2/${normalizedPart}`;
+  if (!normalizedKey.startsWith(expectedKey)) return null;
+  if (!isAudioObjectKey(normalizedKey)) return null;
+
+  return {
+    level: "A1",
+    sampleId: normalizedSampleId,
+    part: normalizedPart,
+    key: normalizedKey,
+  };
+};
+
 const validateA2MockAudioKey = ({ mockId, part, key }) => {
   const normalizedMockId = clean(mockId).toLowerCase();
   const normalizedPart = clean(part).toLowerCase();
@@ -443,6 +464,75 @@ const createA1MockAudioSignedUrl = async ({
   };
 };
 
+const createA1ExamHorenAudioSignedUrl = async ({
+  sampleId,
+  part,
+  key,
+  env = process.env,
+  now = new Date(),
+}) => {
+  const validated = validateA1ExamHorenAudioKey({ sampleId, part, key });
+  if (!validated) {
+    const error = new Error("Invalid A1 exam Hören audio object key");
+    error.code = "INVALID_A1_EXAM_HOEREN_AUDIO_KEY";
+    throw error;
+  }
+
+  const config = getR2AudioConfig(env);
+  const requestDate = now instanceof Date ? now : new Date(now);
+  if (Number.isNaN(requestDate.getTime())) throw new Error("Invalid signing date");
+
+  const amzDate = formatAmzDate(requestDate);
+  const dateStamp = amzDate.slice(0, 8);
+  const region = "auto";
+  const service = "s3";
+  const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+  const host = `${config.bucket}.${config.accountId}.r2.cloudflarestorage.com`;
+  const canonicalUri = `/${encodePath(validated.key)}`;
+
+  const queryEntries = [
+    ["X-Amz-Algorithm", "AWS4-HMAC-SHA256"],
+    ["X-Amz-Content-Sha256", "UNSIGNED-PAYLOAD"],
+    ["X-Amz-Credential", `${config.accessKeyId}/${credentialScope}`],
+    ["X-Amz-Date", amzDate],
+    ["X-Amz-Expires", String(config.expiresIn)],
+    ["X-Amz-SignedHeaders", "host"],
+  ];
+  const canonicalQuery = buildCanonicalQuery(queryEntries);
+  const canonicalHeaders = `host:${host}\n`;
+  const canonicalRequest = [
+    "GET",
+    canonicalUri,
+    canonicalQuery,
+    canonicalHeaders,
+    "host",
+    "UNSIGNED-PAYLOAD",
+  ].join("\n");
+
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256Hex(canonicalRequest),
+  ].join("\n");
+
+  const dateKey = hmac(`AWS4${config.secretAccessKey}`, dateStamp);
+  const regionKey = hmac(dateKey, region);
+  const serviceKey = hmac(regionKey, service);
+  const signingKey = hmac(serviceKey, "aws4_request");
+  const signature = hmac(signingKey, stringToSign, "hex");
+
+  return {
+    url: `https://${host}${canonicalUri}?${canonicalQuery}&X-Amz-Signature=${signature}`,
+    level: validated.level,
+    sampleId: validated.sampleId,
+    part: validated.part,
+    key: validated.key,
+    expiresIn: config.expiresIn,
+    expiresAt: new Date(requestDate.getTime() + config.expiresIn * 1000).toISOString(),
+  };
+};
+
 const createA2AudioSignedUrl = ({ day, key, env = process.env, now = new Date() }) =>
   createCourseAudioSignedUrl({ level: "A2", day, key, env, now });
 
@@ -746,6 +836,7 @@ module.exports = {
   validateCourseAudioKey,
   validateA1AudioKey,
   validateA1MockAudioKey,
+  validateA1ExamHorenAudioKey,
   validateA2MockAudioKey,
   validateB1MockAudioKey,
   validateB2MockAudioKey,
@@ -758,6 +849,7 @@ module.exports = {
   createCourseAudioSignedUrl,
   createA1AudioSignedUrl,
   createA1MockAudioSignedUrl,
+  createA1ExamHorenAudioSignedUrl,
   createA2AudioSignedUrl,
   createA2MockAudioSignedUrl,
   createB1MockAudioSignedUrl,

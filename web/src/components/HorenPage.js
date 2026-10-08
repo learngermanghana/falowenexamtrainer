@@ -15,7 +15,11 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
 
   if (["A1", "A2", "C1"].includes(normalizedLevel)) {
     if (sampleId) {
-      if (sampleId !== "sample-1") {
+      const sampleExists =
+        sampleId === "sample-1" ||
+        (normalizedLevel === "A1" && sampleId === "sample-2");
+
+      if (!sampleExists) {
         return (
           <section style={{ ...styles.card, display: "grid", gap: 10 }}>
             <h2 style={{ margin: 0 }}>{normalizedLevel} Hören sample not found</h2>
@@ -26,7 +30,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
         );
       }
 
-      return <ListeningPracticeSamplePage level={normalizedLevel} />;
+      return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} />;
     }
 
     return (
@@ -60,6 +64,26 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
                   : "30 questions · Teil 1–4"}
             </span>
           </button>
+
+          {normalizedLevel === "A1" ? (
+            <button
+              type="button"
+              onClick={() => navigate("/exams/horen/a1/sample-2")}
+              style={{
+                ...styles.secondaryButton,
+                width: "100%",
+                textAlign: "left",
+                display: "grid",
+                gap: 4,
+                padding: "14px 16px",
+              }}
+            >
+              <strong>Hören Sample 2</strong>
+              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                5 questions · Teil 1
+              </span>
+            </button>
+          ) : null}
         </div>
       </section>
     );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
+import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
@@ -10,6 +11,7 @@ import { A2_GOETHE_LISTENING_TEIL1 } from "./A2GoetheListeningMockTeil1Preview";
 import { A2_GOETHE_LISTENING_TEIL2, A2ListeningTeil2PictureScene } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3, A2ListeningTeil3Picture } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
+import { A1_EXAM_HOEREN_SAMPLE_2_TEIL1 } from "../data/a1ExamHorenSample2";
 import {
   C1_EXAM_HOEREN_SAMPLE_1,
   C1_EXAM_HOEREN_SAMPLE_1_TEIL2,
@@ -31,6 +33,10 @@ const A1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_GOETHE_LISTENING_MOCK.teil1 },
   { key: "teil2", audioPart: "teil-2", data: A1_GOETHE_LISTENING_MOCK.teil2 },
   { key: "teil3", audioPart: "teil-3", data: A1_GOETHE_LISTENING_MOCK.teil3 },
+]);
+
+const A1_SAMPLE_2_PARTS = Object.freeze([
+  { key: "teil1", audioPart: "teil-1", data: A1_EXAM_HOEREN_SAMPLE_2_TEIL1 },
 ]);
 
 const C1_PARTS = Object.freeze([
@@ -55,7 +61,7 @@ const answerKeyForPart = (level, part) => {
   }));
 };
 
-const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
+const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -65,19 +71,27 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
     setLoading(true);
     setError("");
     try {
-      const result = level === "C1"
-        ? await fetchC1ExamHorenAudioPlaybackUrl({
-            sampleId: "sample-1",
-            part,
-            key: objectKey,
-            idToken,
-          })
-        : await (level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
-            mockId: "mock-01",
-            part,
-            key: objectKey,
-            idToken,
-          });
+      const result =
+        level === "A1" && sampleId === "sample-2"
+          ? await fetchA1ExamHorenAudioPlaybackUrl({
+              sampleId,
+              part,
+              key: objectKey,
+              idToken,
+            })
+          : level === "C1"
+            ? await fetchC1ExamHorenAudioPlaybackUrl({
+                sampleId: "sample-1",
+                part,
+                key: objectKey,
+                idToken,
+              })
+            : await (level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
+                mockId: "mock-01",
+                part,
+                key: objectKey,
+                idToken,
+              });
       setAudioUrl(result.url);
     } catch (loadError) {
       setError(loadError?.response?.data?.error || loadError?.message || "Could not load audio.");
@@ -91,8 +105,8 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
       <div className="a1-hoeren-mock-part-audio-copy">
         <strong>Exam audio</strong>
         <p>
-          {level === "C1"
-            ? "This audio belongs to C1 Hören practice in the Exams Room."
+          {level === "C1" || (level === "A1" && sampleId === "sample-2")
+            ? `This audio belongs to ${level} Hören practice in the Exams Room.`
             : plays === 2
               ? "The required repetition is already included in the audio."
               : "This audio is heard once in the mock."}
@@ -116,7 +130,9 @@ const SampleAudio = ({ level, part, objectKey, plays, idToken }) => {
       )}
 
       <span className="a1-hoeren-mock-play-count">
-        {level === "C1" ? `${plays}× practice audio` : `${plays}× in the mock audio`}
+        {level === "C1" || (level === "A1" && sampleId === "sample-2")
+          ? `${plays}× practice audio`
+          : `${plays}× in the mock audio`}
       </span>
       {error ? <p className="a1-hoeren-mock-audio-error">{error}</p> : null}
     </div>
@@ -181,7 +197,7 @@ const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
   </div>
 );
 
-export default function ListeningPracticeSamplePage({ level = "A1" }) {
+export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1" }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
@@ -191,7 +207,9 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
       ? C1_PARTS
       : normalizedLevel === "A2"
         ? A2_PARTS
-        : A1_PARTS;
+        : sampleId === "sample-2"
+          ? A1_SAMPLE_2_PARTS
+          : A1_PARTS;
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
@@ -370,7 +388,7 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
           Back to Hören samples
         </button>
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
-        <h2 style={{ margin: 0 }}>Hören Sample 1</h2>
+        <h2 style={{ margin: 0 }}>Hören {sampleId === "sample-2" ? "Sample 2" : "Sample 1"}</h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
           Complete all listening parts, then check your answers at the end.
         </p>
@@ -386,6 +404,7 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
 
           <SampleAudio
             level={normalizedLevel}
+            sampleId={sampleId}
             part={part.audioPart}
             objectKey={part.data.audioObjectKey}
             plays={part.data.plays}
@@ -424,7 +443,7 @@ export default function ListeningPracticeSamplePage({ level = "A1" }) {
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            Try Sample 1 again
+            Try {sampleId === "sample-2" ? "Sample 2" : "Sample 1"} again
           </button>
         )}
       </section>
