@@ -128,3 +128,65 @@ export const A1_EXAM_HOEREN_SAMPLE_2_TEIL2 = Object.freeze({
     },
   ],
 });
+
+
+export const A1_EXAM_HOEREN_SAMPLE_2_TEIL3 = Object.freeze({
+  id: "a1-hoeren-sample-2-teil-3",
+  title: "Teil 3",
+  instruction: "Fragen 11 bis 15: Kreuzen Sie die richtige Antwort an.",
+  responseInstruction: "Wählen Sie bei jeder Aufgabe a, b oder c.",
+  audioObjectKey: "a1/horen-part-2/teil-3.mp3",
+  plays: 1,
+  questions: [
+    {
+      number: 11,
+      question: "Bis wann gibt es Frühstück im Hotel?",
+      options: [
+        { id: "a", label: "Bis sieben Uhr." },
+        { id: "b", label: "Bis neun Uhr." },
+        { id: "c", label: "Bis zehn Uhr." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 12,
+      question: "Wo ist der Deutschkurs morgen?",
+      options: [
+        { id: "a", label: "Im Raum zwölf." },
+        { id: "b", label: "Im Raum zwanzig." },
+        { id: "c", label: "Im Raum zweiundzwanzig." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 13,
+      question: "Für wie viele Personen ist der Tisch reserviert?",
+      options: [
+        { id: "a", label: "Für zwei Personen." },
+        { id: "b", label: "Für drei Personen." },
+        { id: "c", label: "Für vier Personen." },
+      ],
+      answer: "b",
+    },
+    {
+      number: 14,
+      question: "Was soll Opa tun?",
+      options: [
+        { id: "a", label: "Sophie am Bahnhof abholen." },
+        { id: "b", label: "Sophie anrufen." },
+        { id: "c", label: "Mit dem Zug fahren." },
+      ],
+      answer: "c",
+    },
+    {
+      number: 15,
+      question: "Was möchte Julia?",
+      options: [
+        { id: "a", label: "Max soll Karten kaufen." },
+        { id: "b", label: "Max soll mit ins Konzert kommen." },
+        { id: "c", label: "Max soll am Freitag kochen." },
+      ],
+      answer: "a",
+    },
+  ],
+});
