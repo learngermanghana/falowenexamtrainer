@@ -582,7 +582,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
         attemptId: attempt.id,
         attemptNumber: attempt.attemptNumber,
         resultType: "practice",
-        route: `/exams/lesen/a1/${sample.id}`,
+        route: "/exams/lesen",
         sectionScores: Object.fromEntries(
           sectionScores.map((section) => [section.label.toLowerCase().replace(/\s+/g, ""), section.score]),
         ),
