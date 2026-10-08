@@ -670,6 +670,19 @@ const QuestionOfDayPage = () => {
     return "";
   }, [dailyTask, activeLevel, todayLabel]);
 
+  useEffect(() => {
+    if (!user?.uid) return undefined;
+    let cancelled = false;
+    loadDailyWarmupProgress({ userId: user.uid, level: activeLevel })
+      .then((record) => {
+        if (cancelled || !record?.practised) return;
+        setPractised(true);
+        if (record.submittedToTutor) setSubmittedToTutor(true);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [activeLevel, user?.uid]);
+
   const saveWarmupLocally = ({ submittedToTutor = false, reviewId = "", sentOnWhatsapp = false } = {}) => {
     try {
       const key = getProgressKey(activeLevel);
