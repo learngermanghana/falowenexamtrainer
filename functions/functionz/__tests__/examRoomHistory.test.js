@@ -50,7 +50,7 @@ describe("authenticated Exam Room history", () => {
       String(i).padStart(4, "0"),
       { source: "course_assignment", level: "A1", date: "2026-10-08T12:00:00Z" },
     ));
-    const old = practice(12, "2026-01-01T12:00:00Z");
+    const old = practice(248, "2026-01-01T12:00:00Z");
     const newest = practice(250, "2026-10-08T12:00:00Z");
     const { db, observed } = fakeFirestore([...mostlyAssignments, old, newest,
       record("private", { uid: "another-student", source: "exam_room_practice",
@@ -59,7 +59,7 @@ describe("authenticated Exam Room history", () => {
     const history = await getStudentExamRoomHistory({ db, uid: "student-1", level: "A1" });
     expect(history.results).toHaveLength(2);
     expect(history.results[0].attemptId).toBe("lesen-250");
-    expect(history.results[1].attemptId).toBe("lesen-12");
+    expect(history.results[1].attemptId).toBe("lesen-248");
     expect(history.limited).toBe(false);
     expect(history.fetched).toBeGreaterThan(200);
     expect(observed.every((call) =>
