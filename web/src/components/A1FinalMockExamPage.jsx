@@ -15,6 +15,7 @@ import { A1_GOETHE_READING_MOCK_TEIL2 } from "./A1GoetheReadingMockTeil2Preview"
 import { A1_GOETHE_READING_MOCK_TEIL3 } from "./A1GoetheReadingMockTeil3Preview";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
 import { A1_GOETHE_WRITING_MOCK } from "./A1GoetheWritingMockPreview";
+import { A1_FINAL_MOCK_WRITING_TASK } from "../data/a1FinalMockWritingTask";
 import A1GoetheSpeakingMockPreview from "./A1GoetheSpeakingMockPreview";
 import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheReadingMockTeil2Preview.css";
@@ -891,12 +892,12 @@ export default function A1FinalMockExamPage() {
           <section className="a1-schreiben-part">
             <header className="a1-schreiben-part-header">
               <h2>Teil 2</h2>
-              <p>{A1_GOETHE_WRITING_MOCK.teil2.situation}</p>
+              <p>{A1_FINAL_MOCK_WRITING_TASK.situation}</p>
               <p><strong>{A1_GOETHE_WRITING_MOCK.teil2.instruction}</strong></p>
             </header>
             <div className="a1-schreiben-letter-task">
               <div className="a1-schreiben-three-points">
-                {A1_GOETHE_WRITING_MOCK.teil2.points.map((point, index) => (
+                {A1_FINAL_MOCK_WRITING_TASK.points.map((point, index) => (
                   <div className="a1-schreiben-point" key={point}>
                     <span>{index + 1}</span><p>{point}</p>
                   </div>
