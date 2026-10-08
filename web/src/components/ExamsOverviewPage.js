@@ -220,7 +220,7 @@ export default function ExamsOverviewPage() {
                   flexWrap: "wrap", gap: 8,
                 }}>
                 <div style={{ minWidth: 0 }}>
-                  <strong>{EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
+                  <strong>{attempt.section === "mixed" ? "Full mock exam" : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
                   <p style={{ ...smallLabel, marginTop: 3 }}>{readableDate(attempt.completedAt)} · {attempt.title}</p>
                 </div>
                 <strong>{attempt.percent}%</strong>
