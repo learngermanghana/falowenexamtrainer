@@ -138,12 +138,12 @@ const SUPPORT_BY_DAY = Object.freeze({
     example: "Ich lerne besser, wenn ich regelmäßig Pausen mache.",
   },
   18: {
-    terms: "Infinitiv mit zu = infinitive with zu · Relativsatz = relative clause · je nachdem = depending on",
-    rule: "A relative clause gives extra information about a noun and places the conjugated verb at the end. je nachdem introduces different possibilities or conditions.",
-    structure: "Noun, relative pronoun + ... + verb. · je nachdem, ob/wie/was ...",
-    use: "Use relative clauses to describe jobs, skills and people more precisely.",
-    watchOut: "Choose the relative pronoun according to gender and grammatical case, not only according to the noun's article.",
-    example: "Ein Beruf, der zu mir passt, sollte abwechslungsreich sein.",
+    terms: "um ... zu = in order to · Infinitiv = infinitive · Zweck = purpose",
+    rule: "Use um ... zu to explain the purpose of an action when the person doing the action is also the person aiming for the result.",
+    structure: "Main clause + comma + um + details + zu + infinitive at the end.",
+    use: "Use this pattern to say why you take a career step, such as studying, applying for a job or doing an internship.",
+    watchOut: "Do not repeat the subject after um or omit zu: write 'um Erfahrungen zu sammeln', not 'um ich Erfahrungen sammle' or 'um Erfahrungen sammeln'.",
+    example: "Ich mache ein Praktikum, um Berufserfahrung zu sammeln.",
   },
   19: {
     terms: "Konjunktiv II = polite/hypothetical form · Sie-Form = formal you",
