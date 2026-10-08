@@ -1,0 +1,310 @@
+{
+  "A2-1.1": {
+    "day": 1,
+    "assignmentKey": "A2-1.1",
+    "title": "E-Mail an Felix: Arbeit und Familie",
+    "situation": "Sie schreiben eine E-Mail an Ihren Freund Felix. Sie möchten ihm von Ihrer Arbeit oder Ihrem Studium und von Ihrer Familie erzählen.",
+    "points": [
+      "Schreiben Sie, warum Sie Felix schreiben.",
+      "Erzählen Sie von Ihrer Arbeit oder Ihrem Studium und von Ihrer Familie.",
+      "Fragen Sie Felix, wie es ihm geht und was bei ihm neu ist."
+    ]
+  },
+  "A2-1.2": {
+    "day": 2,
+    "assignmentKey": "A2-1.2",
+    "title": "E-Mail an Felix: Mein Chef / Meine Chefin",
+    "situation": "Sie schreiben eine E-Mail an Ihren Freund Felix und möchten Ihren Chef oder Ihre Chefin beschreiben.",
+    "points": [
+      "Beschreiben Sie das Aussehen Ihres Chefs oder Ihrer Chefin.",
+      "Beschreiben Sie die Persönlichkeit und das Verhalten bei der Arbeit.",
+      "Sagen Sie, was Ihnen gefällt oder was besser sein könnte, und fragen Sie Felix nach seinem Chef oder seiner Chefin."
+    ]
+  },
+  "A2-1.3": {
+    "day": 3,
+    "assignmentKey": "A2-1.3",
+    "title": "E-Mail an Felix: Meine Eltern vergleichen",
+    "situation": "Sie schreiben eine E-Mail an Ihren Freund Felix und möchten Ihre Mutter und Ihren Vater vergleichen.",
+    "points": [
+      "Vergleichen Sie das Aussehen Ihrer Mutter und Ihres Vaters.",
+      "Vergleichen Sie ihren Charakter.",
+      "Sagen Sie, was Sie an beiden besonders mögen, und fragen Sie Felix nach seinen Eltern."
+    ]
+  },
+  "A2-2.4": {
+    "day": 4,
+    "assignmentKey": "A2-2.4",
+    "title": "E-Mail an Herrn Asadu: Gemeinsam etwas unternehmen",
+    "situation": "Sie möchten Herrn Felix Asadu zu einem gemeinsamen Wochenende einladen. Schreiben Sie ihm eine E-Mail.",
+    "points": [
+      "Erklären Sie, warum Sie ihn einladen, und schlagen Sie eine Aktivität vor.",
+      "Fragen Sie, wann er Zeit hat und wo Sie sich treffen können.",
+      "Fragen Sie, ob er etwas für das Essen oder die Aktivität mitbringen kann."
+    ]
+  },
+  "A2-2.5": {
+    "day": 5,
+    "assignmentKey": "A2-2.5",
+    "title": "E-Mail an Alex: Freizeit planen",
+    "situation": "Sie möchten mit Ihrem Freund Alex am Wochenende etwas unternehmen. Schreiben Sie Alex eine E-Mail.",
+    "points": [
+      "Sagen Sie, dass Sie am Wochenende Zeit haben und etwas zusammen machen möchten.",
+      "Fragen Sie, ob Alex am Wochenende frei ist und wann er Zeit hat.",
+      "Schlagen Sie eine konkrete Aktivität vor und fragen Sie, was Alex davon hält."
+    ]
+  },
+  "A2-3.6": {
+    "day": 6,
+    "assignmentKey": "A2-3.6",
+    "title": "E-Mail über Ihr neues Zimmer",
+    "situation": "Sie sind vor Kurzem umgezogen und möchten einer Freundin oder einem Freund von Ihrem neuen Zimmer erzählen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Schreiben Sie, warum Sie schreiben oder dass Sie umgezogen sind.",
+      "Beschreiben Sie Ihr Zimmer und die wichtigsten Möbel.",
+      "Sagen Sie, was Ihnen an Ihrem Zimmer besonders gefällt, und erklären Sie warum."
+    ]
+  },
+  "A2-3.7": {
+    "day": 7,
+    "assignmentKey": "A2-3.7",
+    "title": "E-Mail an einen Vermieter",
+    "situation": "Sie möchten eine Wohnung in einer bestimmten Stadt mieten. Schreiben Sie eine E-Mail an den Vermieter.",
+    "points": [
+      "Fragen Sie nach einer verfügbaren Wohnung.",
+      "Nennen Sie wichtige Kriterien, zum Beispiel Größe, Lage oder Preis.",
+      "Fragen Sie nach den Mietbedingungen und nach einem Besichtigungstermin."
+    ]
+  },
+  "A2-3.8": {
+    "day": 8,
+    "assignmentKey": "A2-3.8",
+    "title": "E-Mail an ein Restaurant",
+    "situation": "Sie möchten einen Tisch in einem Restaurant reservieren. Schreiben Sie eine E-Mail an das Restaurant.",
+    "points": [
+      "Fragen Sie nach einem freien Tisch.",
+      "Nennen Sie Datum, Uhrzeit und Anzahl der Personen.",
+      "Fragen Sie nach dem Menü und den Preisen."
+    ]
+  },
+  "A2-4.9": {
+    "day": 9,
+    "assignmentKey": "A2-4.9",
+    "title": "E-Mail an ein Hotel",
+    "situation": "Sie planen einen Urlaub und möchten eine Unterkunft reservieren. Schreiben Sie eine E-Mail an ein Hotel.",
+    "points": [
+      "Fragen Sie nach einem freien Zimmer.",
+      "Nennen Sie wichtige Reisedaten, zum Beispiel Datum, Anzahl der Personen oder Zimmerart.",
+      "Fragen Sie nach dem Preis und nach zusätzlichen Leistungen, zum Beispiel Frühstück oder WLAN."
+    ]
+  },
+  "A2-4.10": {
+    "day": 10,
+    "assignmentKey": "A2-4.10",
+    "title": "E-Mail an einen Freund / eine Freundin: Gemeinsam die Stadt entdecken",
+    "situation": "Sie möchten mit einem Freund oder einer Freundin einen Tag in einer Stadt oder in einem neuen Viertel verbringen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Sagen Sie, welchen Ort Sie gemeinsam entdecken möchten und warum.",
+      "Schlagen Sie zwei Aktivitäten oder Orte vor, zum Beispiel einen Markt, einen Park, ein Café oder eine Sehenswürdigkeit.",
+      "Nennen Sie einen konkreten Tag und Treffpunkt und fragen Sie, was die Person lieber machen möchte."
+    ]
+  },
+  "A2-4.11": {
+    "day": 11,
+    "assignmentKey": "A2-4.11",
+    "title": "E-Mail an eine Autovermietung",
+    "situation": "Sie sind in Deutschland und möchten für das Wochenende ein Auto mieten. Schreiben Sie eine E-Mail an eine Autovermietung.",
+    "points": [
+      "Fragen Sie, ob für das Wochenende noch ein Auto verfügbar ist.",
+      "Fragen Sie, welche Dokumente benötigt werden.",
+      "Fragen Sie nach dem Preis und ob eine Versicherung enthalten ist."
+    ]
+  },
+  "A2-5.12": {
+    "day": 12,
+    "assignmentKey": "A2-5.12",
+    "title": "E-Mail an ein Unternehmen: Bewerbung",
+    "situation": "Sie sind in Deutschland und möchten sich um eine Arbeitsstelle bewerben. Schreiben Sie eine E-Mail an ein Unternehmen.",
+    "points": [
+      "Fragen Sie, ob es noch offene Stellen gibt.",
+      "Beschreiben Sie Ihre Fähigkeiten und Fertigkeiten für die Stelle.",
+      "Fragen Sie nach den Arbeitszeiten und dem Gehalt."
+    ]
+  },
+  "A2-5.13": {
+    "day": 13,
+    "assignmentKey": "A2-5.13",
+    "title": "Bewerbung bei CityMall",
+    "situation": "Sie möchten sich bei CityMall um eine Stelle als Verkäufer/in oder Kundenservice-Mitarbeiter/in bewerben. Schreiben Sie eine formelle E-Mail.",
+    "points": [
+      "Erklären Sie, warum Sie sich um die Stelle bewerben.",
+      "Beschreiben Sie Ihre Erfahrungen und Stärken.",
+      "Fragen Sie nach den Arbeitszeiten, den Aufgaben oder den Weiterbildungsmöglichkeiten."
+    ]
+  },
+  "A2-5.14": {
+    "day": 14,
+    "assignmentKey": "A2-5.14",
+    "title": "E-Mail an einen Kollegen: Karriereseminar",
+    "situation": "Ihr Kollege hat Ihnen ein berufliches Seminar vorgeschlagen, das Ihre Karriere fördern könnte. Schreiben Sie ihm eine formelle E-Mail.",
+    "points": [
+      "Bedanken Sie sich für den Vorschlag und sagen Sie, dass Sie interessiert sind.",
+      "Fragen Sie nach dem Inhalt und den Terminen des Seminars.",
+      "Fragen Sie nach den Kosten."
+    ]
+  },
+  "A2-6.15": {
+    "day": 15,
+    "assignmentKey": "A2-6.15",
+    "title": "E-Mail an einen Sportverein",
+    "situation": "Sie sind in Deutschland und möchten sich für einen Sportkurs anmelden. Schreiben Sie eine E-Mail an einen Sportverein oder ein Fitnessstudio.",
+    "points": [
+      "Fragen Sie, ob es noch freie Plätze gibt.",
+      "Beschreiben Sie Ihre Erfahrung oder Motivation.",
+      "Fragen Sie nach den Trainingszeiten und den Kosten."
+    ]
+  },
+  "A2-6.16": {
+    "day": 16,
+    "assignmentKey": "A2-6.16",
+    "title": "E-Mail an einen Arzt",
+    "situation": "Sie möchten wegen Ihrer Gesundheit einen Arzt kontaktieren. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Fragen Sie nach einem Termin.",
+      "Fragen Sie nach den Kosten oder ob Ihre Versicherung die Behandlung bezahlt.",
+      "Fragen Sie nach möglichen Untersuchungen oder Behandlungen."
+    ]
+  },
+  "A2-6.17": {
+    "day": 17,
+    "assignmentKey": "A2-6.17",
+    "title": "E-Mail an eine Apotheke",
+    "situation": "Sie möchten ein bestimmtes Medikament kaufen. Schreiben Sie eine E-Mail an eine Apotheke.",
+    "points": [
+      "Erklären Sie kurz, warum Sie das Medikament benötigen.",
+      "Fragen Sie nach den Kosten und ob die Versicherung das Medikament übernimmt.",
+      "Fragen Sie nach der richtigen Dosierung oder möglichen Nebenwirkungen."
+    ]
+  },
+  "A2-7.18": {
+    "day": 18,
+    "assignmentKey": "A2-7.18",
+    "title": "E-Mail an Ihre Bank",
+    "situation": "Sie sind in Ghana und Ihre Bankkarte wurde gesperrt. Schreiben Sie eine E-Mail an Ihre Bank.",
+    "points": [
+      "Fragen Sie, ob Ihre Karte entsperrt werden kann.",
+      "Fragen Sie, welche Dokumente oder Informationen benötigt werden.",
+      "Fragen Sie, wie lange der Vorgang dauern wird."
+    ]
+  },
+  "A2-7.19": {
+    "day": 19,
+    "assignmentKey": "A2-7.19",
+    "title": "E-Mail an einen Freund / eine Freundin: Einkaufen",
+    "situation": "Sie möchten mit einem Freund oder einer Freundin Möbel für Ihre neue Wohnung einkaufen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Laden Sie die Person zum Einkaufen ein und erklären Sie den Grund.",
+      "Schlagen Sie vor, wann und wo Sie sich treffen können.",
+      "Fragen Sie nach der Meinung der Person."
+    ]
+  },
+  "A2-7.20": {
+    "day": 20,
+    "assignmentKey": "A2-7.20",
+    "title": "Formelle E-Mail: Reklamation",
+    "situation": "Sie haben ein Produkt gekauft, aber es ist defekt oder nicht wie bestellt. Schreiben Sie eine formelle Reklamation.",
+    "points": [
+      "Erklären Sie, was Sie gekauft haben und warum Sie schreiben.",
+      "Beschreiben Sie das Problem genau.",
+      "Bitten Sie höflich um Umtausch, Reparatur oder Rückerstattung."
+    ]
+  },
+  "A2-8.21": {
+    "day": 21,
+    "assignmentKey": "A2-8.21",
+    "title": "E-Mail an einen Freund / eine Freundin: Wochenende",
+    "situation": "Sie möchten einen Freund oder eine Freundin zu einem gemeinsamen Wochenende einladen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind.",
+      "Nennen Sie wichtige Details, zum Beispiel Datum, Ort, Treffpunkt oder Dauer.",
+      "Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann."
+    ]
+  },
+  "A2-8.22": {
+    "day": 22,
+    "assignmentKey": "A2-8.22",
+    "title": "E-Mail an einen Freund / eine Freundin: Meine Woche",
+    "situation": "Sie möchten einem Freund oder einer Freundin von Ihrer kommenden Woche erzählen und ein Treffen planen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Nennen Sie mindestens drei Termine oder Aktivitäten in Ihrer Woche.",
+      "Schreiben Sie, wann Sie Zeit haben.",
+      "Schlagen Sie ein Treffen mit einem konkreten Termin vor."
+    ]
+  },
+  "A2-9.23": {
+    "day": 23,
+    "assignmentKey": "A2-9.23",
+    "title": "E-Mail über Ihren Weg zur Schule oder Arbeit",
+    "situation": "Sie schreiben einem Freund oder einer Freundin über Ihren Weg zur Schule oder zur Arbeit.",
+    "points": [
+      "Beschreiben Sie, welche Verkehrsmittel Sie benutzen.",
+      "Schreiben Sie, wie lange der Weg dauert, und nennen Sie einen Vor- oder Nachteil.",
+      "Fragen Sie, wie die andere Person zur Schule oder zur Arbeit kommt."
+    ]
+  },
+  "A2-9.24": {
+    "day": 24,
+    "assignmentKey": "A2-9.24",
+    "title": "E-Mail an Sandra: Urlaub planen",
+    "situation": "Sie möchten zusammen mit Sandra einen Urlaub planen. Schreiben Sie ihr eine E-Mail.",
+    "points": [
+      "Laden Sie Sandra zur gemeinsamen Urlaubsplanung ein.",
+      "Schlagen Sie einen Termin und einen Treffpunkt für die Planung vor.",
+      "Fragen Sie nach ihrer Meinung zu Reiseziel, Transport oder Unterkunft."
+    ]
+  },
+  "A2-9.25": {
+    "day": 25,
+    "assignmentKey": "A2-9.25",
+    "title": "E-Mail über Ihren Tagesablauf",
+    "situation": "Sie möchten einem Freund oder einer Freundin von Ihrem Tagesablauf erzählen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Beschreiben Sie Ihren Morgen und Ihren Arbeits- oder Schultag.",
+      "Erklären Sie, was Sie am Abend machen.",
+      "Fragen Sie nach dem Tagesablauf der anderen Person."
+    ]
+  },
+  "A2-10.26": {
+    "day": 26,
+    "assignmentKey": "A2-10.26",
+    "title": "Dankesnachricht an einen Nachbarn / eine Nachbarin",
+    "situation": "Ihr Nachbar oder Ihre Nachbarin hat Ihnen geholfen, als Sie krank waren. Schreiben Sie eine kurze Dankesnachricht.",
+    "points": [
+      "Bedanken Sie sich für die Hilfe.",
+      "Erklären Sie, wie Ihnen die Hilfe geholfen hat oder wie Sie sich dadurch gefühlt haben.",
+      "Bieten Sie an, sich zu revanchieren."
+    ]
+  },
+  "A2-10.27": {
+    "day": 27,
+    "assignmentKey": "A2-10.27",
+    "title": "E-Mail an den Kundenservice",
+    "situation": "Sie haben Ihr Handy verloren und möchten ein neues bestellen. Schreiben Sie eine E-Mail an den Kundenservice.",
+    "points": [
+      "Erklären Sie, warum Sie ein neues Handy benötigen.",
+      "Fragen Sie nach einer Empfehlung für ein passendes Modell.",
+      "Fragen Sie nach der Bestellung und der Lieferung."
+    ]
+  },
+  "A2-10.28": {
+    "day": 28,
+    "assignmentKey": "A2-10.28",
+    "title": "E-Mail über Ihre Zukunftspläne",
+    "situation": "Sie möchten einem Freund oder einer Freundin von Ihren Zukunftsplänen erzählen. Schreiben Sie eine E-Mail.",
+    "points": [
+      "Beschreiben Sie Ihre beruflichen, schulischen oder Ausbildungsziele.",
+      "Nennen Sie einen weiteren persönlichen Wunsch für die Zukunft.",
+      "Fragen Sie nach den Zukunftsplänen der anderen Person."
+    ]
+  }
+}
