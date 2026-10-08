@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
 import { scoreB2MockWriting } from "../services/b2FinalMockService";
+import { saveExamRoomResult } from "../services/examRoomResultService";
 import B2FinalMockSpeaking from "./B2FinalMockSpeaking";
 import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 import "./B2FinalMockExamPage.css";
@@ -52,6 +53,8 @@ const initialState = () => ({
   speakingProgress: { attempts: {}, selectedTopic: "" },
   sprechenResult: null,
   sprechenCompleted: false,
+  completedAt: "",
+  resultSyncScoreDocId: "",
   completed: false,
 });
 
@@ -1038,6 +1041,47 @@ export default function B2FinalMockExamPage() {
     );
   }, [state]);
 
+  useEffect(() => {
+    if (!state.completed || !idToken || state.resultSyncScoreDocId) return;
+
+    const completedAt = state.completedAt || new Date().toISOString();
+    const finalScore = buildFinalScore(state);
+    const attemptId = `b2-final-${completedAt.replace(/[^0-9A-Za-z]+/g, "-")}`;
+
+    let cancelled = false;
+    saveExamRoomResult({
+      idToken,
+      level: "B2",
+      section: "mixed",
+      setId: "b2-final-mock",
+      title: "B2 Final Mock Exam",
+      score: finalScore.overall,
+      total: 100,
+      percent: finalScore.overall,
+      passed: finalScore.passed,
+      attemptId,
+      attemptNumber: 1,
+      resultType: "final_mock",
+      route: "/campus/results",
+      sectionScores: finalScore.sectionScores,
+    })
+      .then((result) => {
+        if (cancelled || !result?.scoreDocId) return;
+        setState((current) => ({
+          ...current,
+          completedAt: current.completedAt || completedAt,
+          resultSyncScoreDocId: result.scoreDocId,
+        }));
+      })
+      .catch((error) => {
+        console.warn("Could not sync B2 Final Mock result", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [idToken, state]);
+
   const secondsLeft = useMemo(() => {
     const duration = SECTION_DURATIONS[state.stage];
     if (!duration) return null;
@@ -1298,6 +1342,7 @@ export default function B2FinalMockExamPage() {
       ...current,
       sprechenResult: result,
       sprechenCompleted: true,
+      completedAt: current.completedAt || new Date().toISOString(),
       completed: true,
       deadlineMs: null,
     }));
