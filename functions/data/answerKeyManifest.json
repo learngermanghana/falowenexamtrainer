@@ -765,28 +765,6 @@
     "format": "objective",
     "assignment_id": "A2-4.9"
   },
-  "A2 4.10 Tourismus und Traditionelle Feste": {
-    "answers": {
-      "teil3": {
-        "Answer1": "A) Um 10:00 Uhr",
-        "Answer2": "C) Internationales Mittagessen",
-        "Answer3": "B) Vor dem Rathaus",
-        "Answer4": "C) Er ist kostenlos.",
-        "Answer5": "C) Es findet im Kulturhaus statt."
-      },
-      "teil4": {
-        "Answer1": "A) Eine Hafenrundfahrt",
-        "Answer2": "B) 20 Euro",
-        "Answer3": "C) Zwei Tage Bus und Bahn fahren und Rabatt im Museum bekommen",
-        "Answer4": "B) Um 20 Uhr",
-        "Answer5": "A) Das Hafenmuseum"
-      }
-    },
-    "answer_url": "https://docs.google.com/spreadsheets/d/1fhMpgMdfNWuZcoRnXMvKhGxXBJLYF-cGV4hyPHmcFu4/gviz/tq?tqx=out:html&sheet=Key",
-    "sheet_url": "https://docs.google.com/spreadsheets/d/1fhMpgMdfNWuZcoRnXMvKhGxXBJLYF-cGV4hyPHmcFu4/edit",
-    "format": "objective",
-    "assignment_id": "A2-4.10"
-  },
   "A2 4.11 Unterwegs: Verkehrsmittel vergleichen": {
     "answers": {
       "teil3": {
@@ -1811,5 +1789,27 @@
       }
     },
     "assignment_id": "A1-3"
+  },
+  "A2 4.10 Eine Stadt entdecken und etwas erleben": {
+    "answers": {
+      "teil3": {
+        "Answer1": "A) In der Touristeninformation",
+        "Answer2": "B) An den Landungsbrücken",
+        "Answer3": "C) Ein Orchesterkonzert in der Elbphilharmonie",
+        "Answer4": "A) Im Restaurant Seeblick",
+        "Answer5": "A) Im Stadtpark spazieren gehen"
+      },
+      "teil4": {
+        "Answer1": "A) Eine Hafenrundfahrt",
+        "Answer2": "B) 20 Euro",
+        "Answer3": "C) Zwei Tage Bus und Bahn fahren und Rabatt im Museum bekommen",
+        "Answer4": "B) Um 20 Uhr",
+        "Answer5": "A) Das Hafenmuseum"
+      }
+    },
+    "answer_url": "https://docs.google.com/spreadsheets/d/1fhMpgMdfNWuZcoRnXMvKhGxXBJLYF-cGV4hyPHmcFu4/gviz/tq?tqx=out:html&sheet=Key",
+    "sheet_url": "https://docs.google.com/spreadsheets/d/1fhMpgMdfNWuZcoRnXMvKhGxXBJLYF-cGV4hyPHmcFu4/edit",
+    "format": "objective",
+    "assignment_id": "A2-4.10"
   }
 }

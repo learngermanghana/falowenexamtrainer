@@ -5,6 +5,10 @@ on:
     paths:
       - ".github/workflows/production-release.yml"
       - "api/index.js"
+      - "functions/functionz/paymentAwareApp.js"
+      - "functions/data/answerKeyManifest.json"
+      - "web/src/data/a2GoetheWritingTasks.js"
+      - "scripts/verifyAdminMarkingFeed.mjs"
       - "vercel.json"
       - "web/package.json"
       - "web/src/data/a2B1LessonProfile.js"
@@ -45,6 +49,8 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Validate staff marking contract and canonical learner tasks
+        run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Validate production release wiring
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/data/productionDeploymentContract.test.js
@@ -65,6 +71,8 @@ jobs:
         run: npm --prefix functions install --no-audit --no-fund --loglevel=error
       - name: Install web dependencies
         run: npm --prefix web install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Verify staff-only learner marking feed before deploy
+        run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Run exact production build gate
         env:
           CI: true

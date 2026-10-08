@@ -717,6 +717,59 @@ app.post("/paystack/webhook", async (req, res) => {
   }
 });
 
+// Versioned, staff-only coursebook/answer-key contract consumed by Falowen Admin.
+// Never expose correct answers in a public student endpoint.
+app.get("/internal/marking-manifest", async (req, res) => {
+  res.set("Cache-Control", "private, no-store, max-age=0");
+  res.set("Vary", "Authorization");
+  const identity = await getAuthedUser(req);
+  if (!identity) return res.status(401).json({ error: "Staff authentication required" });
+  const isStaff = identity.admin === true || identity.role === "admin"
+    || identity.role === "tutor" || identity.email === "moxflex@gmail.com";
+  if (!isStaff) return res.status(403).json({ error: "Staff access required" });
+
+  const assignmentId = String(req.query?.assignmentId || "").trim().toUpperCase();
+  if (!/^(?:A1|A2|B1|B2|C1|C2)-[A-Z0-9.]+$/.test(assignmentId)) {
+    return res.status(400).json({ error: "Valid assignmentId required" });
+  }
+  try {
+    const source = require("../data/answerKeyManifest.json");
+    const sourceRow = Object.entries(source).find(([, row]) =>
+      String(row?.assignment_id || "").trim().toUpperCase() === assignmentId);
+    const [label, key] = sourceRow || ["", null];
+    let writingTask = null;
+    if (assignmentId.startsWith("A2-")) {
+      // Import the actual learner-facing canonical task, not an admin copy.
+      const { getA2GoetheWritingTasks } = await import("../../web/src/data/a2GoetheWritingTasks.js");
+      const item = getA2GoetheWritingTasks().find(row => row.assignmentKey === assignmentId);
+      if (item) {
+        writingTask = {
+          assignmentKey: assignmentId,
+          title: item.title,
+          taskSituationDe: item.situation,
+          taskPointsDe: [...item.points],
+          taskText: [item.situation, "Schreiben Sie zu allen drei Punkten:", ...item.points.map(p => "• " + p)].join(" "),
+          source: "learner-coursebook",
+        };
+      }
+    }
+    if (!key && !writingTask) return res.status(404).json({ error: "Assignment not found" });
+    const contract = {
+      schemaVersion: 1,
+      assignmentId,
+      sourceVersion: String(process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || "unversioned"),
+      writingTask,
+      // This is returned ONLY after verifying a privileged Firebase ID token.
+      answerKey: key ? { sourceTitle: label, answers: key.answers || {}, format: key.format || "", assignmentId } : null,
+    };
+    contract.checksum = crypto.createHash("sha256").update(JSON.stringify(contract)).digest("hex");
+    return res.status(200).json(contract);
+  } catch (error) {
+    console.error("Staff marking contract unavailable", { assignmentId, message: error?.message });
+    return res.status(503).json({ error: "Marking contract temporarily unavailable" });
+  }
+});
+
 app.use(legacyApp);
 
 module.exports = app;
