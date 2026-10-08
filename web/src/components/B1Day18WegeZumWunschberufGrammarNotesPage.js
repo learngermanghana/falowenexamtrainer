@@ -33,7 +33,7 @@ export default function B1Day18WegeZumWunschberufGrammarNotesPage() {
         <div style={good}>
           <strong>Beispiel</strong>
           <span>Ich mache ein Praktikum, <strong>um Berufserfahrung zu sammeln</strong>.</span>
-          <span>Warum mache ich ein Praktikum? Damit ich Berufserfahrung bekomme.</span>
+          <span>Ziel: Berufserfahrung sammeln.</span>
         </div>
       </section>
 
