@@ -3,15 +3,15 @@ import A2MiniLearningBlock from "./A2MiniLearningBlock";
 
 const LESSONS = {
   18: {
-    title: "Wege zum Wunschberuf: Ziel, Weg und Begründung",
-    rule: "Denke zuerst: Was ist mein Ziel? Welcher Weg bringt mich dorthin? Warum passt er? Nutze um ... zu für Ziele, Relativsätze für Fähigkeiten und weil/dass/wenn für Begründungen.",
-    examples: ["Ich mache ein Praktikum, um Berufserfahrung zu sammeln.", "Ich suche einen Beruf, der zu meinen Stärken passt."],
+    title: "Wege zum Wunschberuf: Ziele mit um ... zu",
+    rule: "Drücke das Ziel einer Handlung mit um ... zu + Infinitiv aus. Die handelnde Person bleibt dieselbe. Beispiel: Ich lerne Deutsch, um in Deutschland zu arbeiten.",
+    examples: ["Ich mache ein Praktikum, um Berufserfahrung zu sammeln.", "Ich besuche einen Kurs, um meine Fähigkeiten zu verbessern."],
     questions: [
-      { stem: "Welche Form drückt ein Ziel korrekt aus?", options: ["Ich mache einen Kurs, um meine Chancen zu verbessern.", "Ich mache einen Kurs, weil meine Chancen verbessern."], answer: 0, explanation: "um ... zu + Infinitiv drückt ein Ziel aus." },
-      { stem: "Welche Form ist ein korrekter Relativsatz?", options: ["Ich suche einen Beruf, der mich interessiert.", "Ich suche einen Beruf, interessiert der mich."], answer: 0, explanation: "Im Relativsatz steht das Verb am Ende." },
+      { stem: "Welcher Satz drückt ein Ziel korrekt aus?", options: ["Ich mache einen Kurs, um meine Chancen zu verbessern.", "Ich mache einen Kurs, um ich verbessere meine Chancen."], answer: 0, explanation: "Mit um ... zu erklärst du das Ziel der Handlung; das Subjekt wird nicht wiederholt." },
+      { stem: "Wo steht zu richtig?", options: ["Ich schreibe einen Lebenslauf, um zu mich bewerben.", "Ich schreibe einen Lebenslauf, um mich zu bewerben."], answer: 1, explanation: "zu steht unmittelbar vor dem Infinitiv: mich zu bewerben." },
     ],
-    outputPrompt: "Formuliere drei Sätze über deinen Wunschberuf: Ziel → Weg → Begründung.",
-    starters: ["Mein Wunschberuf ist ...", "Um dieses Ziel zu erreichen, ...", "Ich brauche eine Fähigkeit, die ..."],
+    outputPrompt: "Formuliere drei Schritte zu deinem Wunschberuf. Erkläre bei jedem Schritt den Zweck mit um ... zu.",
+    starters: ["Ich besuche einen Kurs, um ... zu ...", "Ich mache ein Praktikum, um ... zu ...", "Ich lerne ..., um ... zu ..."],
   },
   19: {
     title: "Vorstellungsgespräch: höflich, klar, begründet",
