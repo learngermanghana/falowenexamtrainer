@@ -739,9 +739,9 @@ app.get("/internal/marking-manifest", async (req, res) => {
     const [label, key] = sourceRow || ["", null];
     let writingTask = null;
     if (assignmentId.startsWith("A2-")) {
-      // Import the actual learner-facing canonical task, not an admin copy.
-      const { getA2GoetheWritingTasks } = await import("../../web/src/data/a2GoetheWritingTasks.js");
-      const item = getA2GoetheWritingTasks().find(row => row.assignmentKey === assignmentId);
+      // Generated directly from the learner coursebook, but bundled inside
+      // functions/ because Firebase uploads ONLY this source directory.
+      const item = require("../data/a2GoetheWritingTasks.json")[assignmentId];
       if (item) {
         writingTask = {
           assignmentKey: assignmentId,
