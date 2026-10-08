@@ -51,8 +51,8 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Check Firebase A2 task source is generated from coursebook
-        run: node scripts/generateFunctionMarkingTasks.mjs --check
+      - name: Generate Firebase A2 task snapshot from coursebook
+        run: node scripts/generateFunctionMarkingTasks.mjs
       - name: Validate staff marking contract and canonical learner tasks
         run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Validate production release wiring
@@ -75,8 +75,8 @@ jobs:
         run: npm --prefix functions install --no-audit --no-fund --loglevel=error
       - name: Install web dependencies
         run: npm --prefix web install --legacy-peer-deps --no-audit --no-fund --loglevel=error
-      - name: Check Firebase-packaged A2 task parity
-        run: node scripts/generateFunctionMarkingTasks.mjs --check
+      - name: Generate Firebase-packaged A2 task from coursebook
+        run: node scripts/generateFunctionMarkingTasks.mjs
       - name: Verify staff-only learner marking feed before deploy
         run: node scripts/verifyAdminMarkingFeed.mjs
       - name: Run exact production build gate
