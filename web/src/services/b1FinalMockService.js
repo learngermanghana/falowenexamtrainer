@@ -1,3 +1,4 @@
+import { postMockAssessment } from "./mockAssessmentRequest";
 import axios from "axios";
 import { getBackendUrl } from "./backendUrl";
 
@@ -7,7 +8,7 @@ const authHeaders = (idToken) =>
   idToken ? { Authorization: `Bearer ${idToken}` } : {};
 
 export const scoreB1MockWriting = async ({ teil1, teil2, teil3, attemptId, idToken }) => {
-  const response = await axios.post(
+  const response = await postMockAssessment(
     `${backendUrl}/writing/b1-mock-score`,
     { teil1, teil2, teil3, attemptId },
     { headers: authHeaders(idToken) },

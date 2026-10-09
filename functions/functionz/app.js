@@ -20,6 +20,7 @@ const bcrypt = require("bcryptjs");
 
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { createMockAssessment } = require("./mockAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
@@ -4074,7 +4075,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
 
       pendingQuotaDate = quota.date;
 
-      const reply = await createChatCompletion(
+      const reply = await createMockAssessment(
         [
           { role: "system", content: a1MockWritingScorePrompt({ text }) },
           { role: "user", content: "Return the strict A1 mock writing result as JSON only." },
@@ -4169,7 +4170,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the A1 writing mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A1 writing mock." });
   }
 });
 
@@ -4267,12 +4268,13 @@ app.post("/writing/a2-mock-score", async (req, res) => {
 
       pendingQuotaDate = quota.date;
 
-      const reply = await createChatCompletion(
+      const reply = await createMockAssessment(
         [
           { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
+        { partKeys: ["teil1", "teil2"], pointCounts: { teil1: 3, teil2: 3 }, formatPart: "teil2" },
       );
 
       const cleanedReply = String(reply || "")
@@ -4429,7 +4431,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the A2 writing mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A2 writing mock." });
   }
 });
 
@@ -4485,12 +4487,13 @@ app.post("/writing/b1-mock-score", async (req, res) => {
 
       pendingQuotaDate = quota.date;
 
-      const reply = await createChatCompletion(
+      const reply = await createMockAssessment(
         [
           { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
           { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
+        { partKeys: ["teil1", "teil2", "teil3"], pointCounts: { teil1: 3, teil2: 3, teil3: 3 } },
       );
       const cleanedReply = String(reply || "")
         .trim()
@@ -4583,7 +4586,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the B1 writing mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the B1 writing mock." });
   }
 });
 
@@ -4636,12 +4639,13 @@ app.post("/writing/b2-mock-score", async (req, res) => {
 
       pendingQuotaDate = quota.date;
 
-      const reply = await createChatCompletion(
+      const reply = await createMockAssessment(
         [
           { role: "system", content: b2MockWritingScorePrompt({ teil1, teil2 }) },
           { role: "user", content: "Return the strict B2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
+        { partKeys: ["teil1", "teil2"], pointCounts: { teil1: 4, teil2: 4 } },
       );
       const cleanedReply = String(reply || "")
         .trim()
@@ -4715,7 +4719,7 @@ app.post("/writing/b2-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the B2 writing mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the B2 writing mock." });
   }
 });
 
@@ -6104,7 +6108,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
       { role: "user", content: "Return the final A1 mock speaking assessment as the required JSON object." },
     ];
 
-    const reply = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1000 });
+    const reply = await createMockAssessment(messages, { temperature: 0.1, max_tokens: 1000 }, { partKeys: ["teil1", "teil2", "teil3"] });
     const cleanedReply = String(reply || "")
       .trim()
       .replace(/^\`\`\`(?:json)?\s*/i, "")
@@ -6180,7 +6184,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the A1 speaking mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A1 speaking mock." });
   }
 });
 
@@ -6233,7 +6237,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       { role: "user", content: "Return the final A2 mock speaking assessment as the required JSON object." },
     ];
 
-    const reply = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1000 });
+    const reply = await createMockAssessment(messages, { temperature: 0.1, max_tokens: 1000 }, { partKeys: ["teil1", "teil2", "teil3"] });
     const cleanedReply = String(reply || "")
       .trim()
       .replace(/^\`\`\`(?:json)?\s*/i, "")
@@ -6309,7 +6313,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the A2 speaking mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A2 speaking mock." });
   }
 });
 
@@ -6354,12 +6358,13 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
       });
     }
 
-    const reply = await createChatCompletion(
+    const reply = await createMockAssessment(
       [
         { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
         { role: "user", content: "Return the final B1 mock speaking assessment as the required JSON object." },
       ],
       { temperature: 0.1, max_tokens: 1100 },
+      { partKeys: ["teil1", "teil2", "teil3"] },
     );
     const cleanedReply = String(reply || "")
       .trim()
@@ -6441,7 +6446,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the B1 speaking mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the B1 speaking mock." });
   }
 });
 
@@ -6486,12 +6491,13 @@ app.post("/speaking/b2-mock-score", async (req, res) => {
       });
     }
 
-    const reply = await createChatCompletion(
+    const reply = await createMockAssessment(
       [
         { role: "system", content: b2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
         { role: "user", content: "Return the final B2 mock speaking assessment as the required JSON object." },
       ],
       { temperature: 0.1, max_tokens: 1100 },
+      { partKeys: ["teil1", "teil2"] },
     );
     const cleanedReply = String(reply || "")
       .trim()
@@ -6553,7 +6559,7 @@ app.post("/speaking/b2-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(500).json({ error: err.message || "Failed to score the B2 speaking mock." });
+    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the B2 speaking mock." });
   }
 });
 

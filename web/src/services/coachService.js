@@ -1,3 +1,4 @@
+import { postMockAssessment } from "./mockAssessmentRequest";
 import axios from "axios";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../firebase";
@@ -192,7 +193,7 @@ export const scoreInteractionAudio = async ({
 };
 
 export const scoreA1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
-  const response = await axios.post(
+  const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/a1-mock-score`,
     { attempts, attemptId },
     { headers: authHeaders(idToken) }
@@ -202,7 +203,7 @@ export const scoreA1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
 };
 
 export const scoreA2MockSpeaking = async ({ attempts, attemptId, idToken }) => {
-  const response = await axios.post(
+  const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/a2-mock-score`,
     { attempts, attemptId },
     { headers: authHeaders(idToken) }
@@ -212,7 +213,7 @@ export const scoreA2MockSpeaking = async ({ attempts, attemptId, idToken }) => {
 };
 
 export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
-  const response = await axios.post(
+  const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/b1-mock-score`,
     { attempts, attemptId },
     { headers: authHeaders(idToken) }
@@ -222,7 +223,7 @@ export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
 };
 
 export const scoreB2MockSpeaking = async ({ attempts, idToken }) => {
-  const response = await axios.post(
+  const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/b2-mock-score`,
     { attempts },
     { headers: authHeaders(idToken) }

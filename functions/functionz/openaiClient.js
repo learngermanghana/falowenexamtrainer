@@ -17,7 +17,7 @@ const getOpenAIClient = () => {
   return client;
 };
 
-const createChatCompletion = async (messages, options = {}) => {
+const createChatCompletion = async (messages, options = {}, requestOptions = {}) => {
   const clientInstance = getOpenAIClient();
   const model = options.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
   const startedAt = Date.now();
@@ -31,11 +31,11 @@ const createChatCompletion = async (messages, options = {}) => {
       max_tokens: 750,
       messages,
       ...options,
-    });
+    }, requestOptions);
 
     const reply = response?.choices?.[0]?.message?.content;
     if (!reply) {
-      throw new Error("OpenAI response missing content");
+      throw Object.assign(new Error("OpenAI response missing content"), { code: "OPENAI_EMPTY_RESPONSE" });
     }
 
     incrementCounter("openai_success", model);
