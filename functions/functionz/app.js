@@ -97,6 +97,7 @@ const {
 const {
   buildVerifiedB1MockScore,
   persistVerifiedB1MockSection,
+  capB1SpeakingMarksToSubmittedAnswers,
   syncB1MockCompletion,
 } = require("./b1MockCompletionSync");
 const { syncExamRoomResult } = require("./examRoomResultSync");
@@ -6439,22 +6440,9 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
       });
     }
 
-    const maxByPart = { teil1: 9, teil2: 10, teil3: 6 };
-    Object.entries(maxByPart).forEach(([key, maxScore]) => {
-      result.parts = result.parts || {};
-      result.parts[key] = {
-        ...(result.parts[key] || {}),
-        score: Math.max(0, Math.min(maxScore, Number(result.parts?.[key]?.score) || 0)),
-        maxScore,
-      };
-    });
-    const numericScore = Number(
-      (result.parts.teil1.score + result.parts.teil2.score + result.parts.teil3.score).toFixed(1),
-    );
-    result.score = Math.max(0, Math.min(25, numericScore));
-    result.maxScore = 25;
-    result.passed = result.score >= 15;
-    result.level_mismatch = Boolean(result?.level_mismatch);
+    // Blank timed-out responses are automatically submitted as unanswered,
+    // never awarded marks based on a model-generated description.
+    result = capB1SpeakingMarksToSubmittedAnswers(result, normalizedAttempts);
 
     if (attemptId) {
       const db = getFirestoreSafe();
