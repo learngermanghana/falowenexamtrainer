@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
-import { analyzeAudio, TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS } from "../services/coachService";
+import { analyzeAudio, scoreA2MockSpeaking, TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS } from "../services/coachService";
 import { SPEAKING_AUDIO_MIN_SECONDS, buildRecordedAudioBlob, createSpeakingMediaRecorder, userFacingAudioError } from "../lib/speakingAudio";
 import { A2_MOCK_2_SPEAKING as CONTENT, A2_MOCK_2_SPEAKING_RUBRIC as RUBRIC } from "../data/a2Mock2Speaking";
 import "./A2Mock2Lesen.css";
@@ -24,6 +24,8 @@ export default function A2Mock2Sprechen(){
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState("");
  const [status,setStatus]=useState("");
+ const [marking,setMarking]=useState(false);
+ const [assessment,setAssessment]=useState(null);
  const [audio,setAudio]=useState(null);
  const recorder=useRef(null),stream=useRef(null),chunks=useRef([]),timer=useRef(null),elapsedRef=useRef(0),urlRef=useRef(null);
  const task=tasks[active];
@@ -63,6 +65,15 @@ export default function A2Mock2Sprechen(){
   finally{setBusy(false)}
  };
  const completed=tasks.filter(t=>attempts[t.id]?.transcript).length;
+ const mark=async()=>{
+  if(completed!==tasks.length||marking)return;
+  setMarking(true);setError("");
+  try {
+   const result=await scoreA2MockSpeaking({idToken, mockId:"a2-mock-02", rubric:RUBRIC, attempts:tasks.map(t=>({id:t.id,teil:t.teil,task:t.prompt,transcript:attempts[t.id]?.transcript||"",analysisFeedback:attempts[t.id]?.feedback||""}))});
+   setAssessment(result);setStatus("KI-Feedback erhalten. Die abschließende serververifizierte Mock-2-Note ist noch nicht verfügbar.");
+  } catch(e) {setError(e?.response?.data?.error||e.message||"Sprechen konnte nicht bewertet werden.");}
+  finally {setMarking(false);}
+ };
  return <main className="a2-mock2-shell" lang="de" data-a2-mock2-sprechen>
   <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Sprechen</span></div>
   <header className="a2-mock2-progress"><div><strong>Sprechen · Übungstest 2</strong><span>{completed}/5 Aufnahmen abgegeben</span></div><strong>Teil {task.teil}</strong></header>
@@ -77,8 +88,9 @@ export default function A2Mock2Sprechen(){
    {attempts[task.id]?.transcript?<div className="a2-mock2-speaking-saved"><strong>Antwort eingereicht</strong><p>{attempts[task.id].transcript}</p><p>Ihre Aufnahme wurde transkribiert. Die endgültige Mock-2-Bewertung wird erst nach Einrichtung der passenden Bewertungslogik angezeigt.</p></div>:<>
    <div className="a2-mock2-speaking-record"><p>Maximale Aufnahmezeit: {Math.floor(task.time/60)} Minuten · aufgenommen: {elapsed} Sekunden</p><button type="button" disabled={busy} onClick={recording?stop:start}>{recording?"Aufnahme beenden":"Aufnahme starten"}</button>
    {audio?.taskId===task.id?<><audio controls src={audio.url}/><button type="button" onClick={send} disabled={busy}>{busy?"Wird verarbeitet …":"Antwort senden"}</button></>:null}</div></>}
+   {assessment?<section className="a2-mock2-speaking-saved"><h2>Sprechen · KI-Übungsfeedback</h2><p>{assessment.overall_feedback_en||assessment.feedback||"Auswertung empfangen."}</p>{["teil1","teil2","teil3"].map(k=>assessment.parts?.[k]?<div key={k}><strong>{k.toUpperCase()}</strong><p>{assessment.parts[k].feedback_en||assessment.parts[k].feedback||""}</p></div>:null)}<p>Diese Auswertung ist noch nicht als Mock-2-Gesamtergebnis verifiziert.</p></section>:null}
    {status?<p role="status">{status}</p>:null}{error?<p role="alert">{error}</p>:null}
-   <div className="a2-mock2-actions"><button type="button" onClick={()=>setActive(i=>Math.max(0,i-1))} disabled={active===0||recording||busy}>Zurück</button>{active<4?<button type="button" className="a2-mock2-primary" onClick={()=>{setActive(i=>i+1);setAudio(null)}} disabled={recording||busy}>Weiter</button>:<strong>{completed===5?"Alle Teile eingereicht":"Bitte alle fünf Aufnahmen einreichen."}</strong>}</div>
+   <div className="a2-mock2-actions"><button type="button" onClick={()=>setActive(i=>Math.max(0,i-1))} disabled={active===0||recording||busy}>Zurück</button>{active<4?<button type="button" className="a2-mock2-primary" onClick={()=>{setActive(i=>i+1);setAudio(null)}} disabled={recording||busy}>Weiter</button>:<strong>{completed===5?<button type="button" className="a2-mock2-primary" onClick={mark} disabled={marking}>{marking?"KI bewertet …":"Sprechen mit KI bewerten"}</button>:"Bitte alle fünf Aufnahmen einreichen."}</strong>}</div>
   </article>
  </main>
 }
