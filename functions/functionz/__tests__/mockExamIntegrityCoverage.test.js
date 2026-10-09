@@ -12,7 +12,7 @@ test.each([
   const s = read(filename);
   expect(s).toContain('from "../hooks/useMockExamIntegrity"');
   expect(s).toContain("useMockExamIntegrity(");
-  expect(s).toContain('level: ' + level);
+  expect(s).toMatch(new RegExp("level\\s*:\\s*" + level));
   expect(s).toContain("MockExamIntegrityNotice");
   expect(s).toContain("onCopyCapture={integrity.onCopyCapture}");
   expect(s).toContain("onPasteCapture={integrity.onPasteCapture}");
