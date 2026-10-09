@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
 import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
+import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
+import { B1_LISTENING } from "../data/b1FinalMockData";
 import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
 import { saveExamRoomResult } from "../services/examRoomResultService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
@@ -58,6 +60,23 @@ const A1_SAMPLE_3_PARTS = Object.freeze([
   { key: "teil3", audioPart: "teil-3", data: A1_EXAM_HOEREN_SAMPLE_3_TEIL3 },
 ]);
 
+// Practice reuses the exact protected recordings and answer keys from the B1
+// mock; option pairs need normalising for the generic practice radio UI.
+const B1_PARTS = Object.freeze(B1_LISTENING.map((part, index) => ({
+  key: `teil${index + 1}`,
+  audioPart: part.id,
+  data: {
+    ...part,
+    instruction: part.note,
+    responseInstruction: "Wählen Sie die richtige Antwort.",
+    plays: index === 3 ? 2 : 1,
+    questions: part.questions.map((question) => ({
+      ...question,
+      options: question.options.map(([id, label]) => ({ id, label })),
+    })),
+  },
+})));
+
 const C1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: C1_EXAM_HOEREN_SAMPLE_1 },
   { key: "teil2", audioPart: "teil-2", data: C1_EXAM_HOEREN_SAMPLE_1_TEIL2 },
@@ -98,6 +117,13 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
               key: objectKey,
               idToken,
             })
+          : level === "B1"
+            ? await fetchB1MockAudioPlaybackUrl({
+                mockId: "mock-01",
+                part,
+                key: objectKey,
+                idToken,
+              })
           : level === "C1"
             ? await fetchC1ExamHorenAudioPlaybackUrl({
                 sampleId: "sample-1",
@@ -354,9 +380,11 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
-  const normalizedLevel = ["A1", "A2", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
+  const normalizedLevel = ["A1", "A2", "B1", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
   const parts =
-    normalizedLevel === "C1"
+    normalizedLevel === "B1"
+      ? B1_PARTS
+      : normalizedLevel === "C1"
       ? C1_PARTS
       : normalizedLevel === "A2"
         ? A2_PARTS
