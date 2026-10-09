@@ -106,7 +106,7 @@ function validateDay23FinalMock() {
     "scoreA1MockWriting",
     "A1GoetheSpeakingMockPreview",
     'href="/exams/overview"',
-    "Practice the full mock again",
+    '<FullMockRecovery level="A1"',
   ];
 
   const missing = requiredMarkers.filter((marker) => !componentSource.includes(marker));
