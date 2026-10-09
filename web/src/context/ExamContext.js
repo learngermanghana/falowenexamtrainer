@@ -165,10 +165,9 @@ export const ExamProvider = ({ children }) => {
   useEffect(() => {
     // Hydrate profile changes and saved exam preferences without editing enrollment.
     // Deliberately do not depend on "level": manual downward switches must persist.
-    setLevelState(resolveExamPracticeLevel(
-      profileExamLevel,
-      loadPreferredLevel(user?.uid),
-    ));
+    const storedLevel = loadPreferredLevel(user?.uid);
+    setLevelState(resolveExamPracticeLevel(profileExamLevel, storedLevel));
+    if (storedLevel) setLevelConfirmed(true);
   }, [profileExamLevel, user?.uid]);
 
   useEffect(() => {
