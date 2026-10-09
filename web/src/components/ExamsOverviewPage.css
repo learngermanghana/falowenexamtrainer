@@ -1,0 +1,392 @@
+.exam-room-overview {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.exam-room-summary {
+  border-radius: 16px;
+  padding: 18px 20px;
+  color: #fff;
+  background: linear-gradient(125deg, #0f172a, #1e40af);
+}
+
+.exam-room-summary-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.exam-room-eyebrow {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.exam-room-summary h2 {
+  margin: 0;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.2;
+}
+
+.exam-room-summary-intro {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.exam-room-level {
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9px;
+  padding: 6px 9px;
+  font-weight: 800;
+}
+
+.exam-room-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.exam-room-metric {
+  padding: 11px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.exam-room-metric strong {
+  display: block;
+  font-size: clamp(18px, 3vw, 23px);
+}
+
+.exam-room-metric span {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.exam-room-coverage {
+  margin-top: 13px;
+}
+
+.exam-room-coverage-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.exam-room-coverage-track {
+  overflow: hidden;
+  height: 7px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.exam-room-coverage-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #93c5fd;
+}
+
+.exam-room-coverage-note {
+  margin: 6px 0 0;
+  opacity: 0.85;
+  font-size: 11px;
+}
+
+.exam-room-mock-entry,
+.exam-room-skill,
+.exam-room-text-action {
+  font: inherit;
+  cursor: pointer;
+}
+
+.exam-room-mock-entry {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 17px;
+  text-align: left;
+  color: #172554;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+}
+
+.exam-room-mock-entry:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.exam-room-mock-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #1d4ed8;
+  color: white;
+  font-size: 22px;
+}
+
+.exam-room-mock-copy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.exam-room-mock-copy strong {
+  font-size: 18px;
+}
+
+.exam-room-mock-copy span {
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.exam-room-arrow {
+  flex-shrink: 0;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+.exam-room-skills-heading h3,
+.exam-room-activity h3 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 19px;
+}
+
+.exam-room-skills-heading p,
+.exam-room-activity p {
+  margin: 0;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.exam-room-skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 11px;
+}
+
+.exam-room-skill {
+  min-width: 0;
+  display: grid;
+  align-content: space-between;
+  gap: 11px;
+  padding: 13px;
+  text-align: left;
+  color: #0f172a;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.exam-room-skill:hover {
+  background: #f8fafc;
+  border-color: #64748b;
+}
+
+.exam-room-skill-recommended {
+  border-color: #2563eb;
+}
+
+.exam-room-skill-top,
+.exam-room-skill-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.exam-room-skill-icon {
+  font-size: 23px;
+}
+
+.exam-room-skill-suggested {
+  color: #1d4ed8;
+  font-weight: 700;
+  font-size: 10px;
+  text-align: right;
+}
+
+.exam-room-skill-title {
+  display: block;
+  margin-top: 8px;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.exam-room-skill-description,
+.exam-room-skill-bottom {
+  font-size: 12px;
+  color: #475569;
+}
+
+.exam-room-skill-description {
+  display: block;
+  margin-top: 2px;
+}
+
+.exam-room-skill-bottom .exam-room-arrow {
+  color: #1d4ed8;
+  font-size: 18px;
+}
+
+.exam-room-suggestion {
+  margin: 10px 0 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.exam-room-activity {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 15px;
+  background: #fff;
+}
+
+.exam-room-warmup {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.exam-room-warmup-icon {
+  font-size: 22px;
+}
+
+.exam-room-warmup-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-room-warmup-copy strong {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.exam-room-text-action {
+  flex-shrink: 0;
+  border: 0;
+  padding: 8px 2px;
+  background: transparent;
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 12px;
+  text-align: right;
+}
+
+.exam-room-text-action:hover {
+  text-decoration: underline;
+}
+
+.exam-room-mock-entry:focus-visible,
+.exam-room-skill:focus-visible,
+.exam-room-text-action:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.exam-room-recent-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.exam-room-recent-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+}
+
+.exam-room-recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border-radius: 9px;
+  padding: 10px;
+  background: #f8fafc;
+}
+
+.exam-room-recent-item strong {
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.exam-room-recent-item p {
+  overflow-wrap: anywhere;
+}
+
+.exam-room-recent-score {
+  flex-shrink: 0;
+  font-size: 15px !important;
+}
+
+.exam-room-status {
+  margin-top: 10px !important;
+}
+
+@media (min-width: 800px) {
+  .exam-room-skills-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 410px) {
+  .exam-room-summary {
+    padding: 15px;
+  }
+  .exam-room-metric {
+    padding: 9px 7px;
+  }
+  .exam-room-mock-entry {
+    padding: 13px;
+    gap: 10px;
+  }
+  .exam-room-mock-icon {
+    width: 39px;
+    height: 39px;
+  }
+  .exam-room-skill {
+    padding: 11px;
+  }
+  .exam-room-warmup {
+    flex-wrap: wrap;
+  }
+  .exam-room-warmup .exam-room-text-action {
+    margin-left: 33px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exam-room-skill {
+    transition: none;
+  }
+}
