@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { getA2GoetheWritingTasks } from "../web/src/data/a2GoetheWritingTasks.js";
 
 const tasks = getA2GoetheWritingTasks();
@@ -28,6 +28,7 @@ assert.match(server, /Staff access required/);
 assert.match(server, /private, no-store/);
 assert.ok(server.includes('require("../data/a2GoetheWritingTasks.json")[assignmentId]'), "Function must use its packaged A2 task snapshot");
 assert.ok(!server.includes('await import("../../web/'), "Runtime must not depend on sibling web/ files");
+assert.ok(!existsSync(new URL("../functions/data/a2GoetheWritingTasks.cjs", import.meta.url)), "Unused duplicate CJS snapshot must not be added; the function consumes only generated JSON");
 const packaged = JSON.parse(readFileSync(new URL("../functions/data/a2GoetheWritingTasks.json", import.meta.url), "utf8"));
 assert.equal(Object.keys(packaged).length, 28);
 for (const task of tasks) {
