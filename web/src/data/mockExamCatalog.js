@@ -71,6 +71,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "a2-final-01",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a2-mock-02": {
+    id: "a2-mock-02", level: "A2", title: "A2 Mock 2", shortTitle: "A2 Mock 2",
+    description: "Four linked sections with saved progress. Final AI grading is pending.",
+    durationLabel: "Four sections · final grading pending", status: "preview",
+    route: "/campus/course/a2-mock-2", mode: "section-preview",
+    questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
+  },
   "a2-mock-02-lesen": {
     id: "a2-mock-02-lesen",
     level: "A2",
