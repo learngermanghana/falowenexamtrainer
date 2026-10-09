@@ -5,6 +5,7 @@ import { updatePageMeta } from "../lib/pageMeta";
 import { loadPublicClasses, slugifyPublicClass } from "../services/publicClassCatalogService";
 import { resolveAdmissionsRef, trackAdmissionsEngagement } from "../services/admissionsEngagementService";
 import academyProfile from "../data/publicAcademyProfile.json";
+import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
 
 const card = { ...styles.card, display: "grid", gap: 12, borderRadius: 16 };
 const action = {
@@ -227,33 +228,26 @@ const PublicAdmissionsVisitorGuidePage = () => {
         </div>
       </section>
 
-      <section style={card}>
-        <h2 style={{ margin: 0 }}>Why students study with us</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
-          {[
-            ["Flexible learning", "Learn in person, online or with recorded lessons where available."],
-            ["Structured teaching", "Lessons use organised teaching material, grammar support and guided workbook practice."],
-            ["Falowen access", "Use Falowen for lessons, assignments, progress tracking, results and learning support."],
-            ["Exam preparation", "Course work develops reading, listening, writing and speaking skills for German-language examinations."],
-            ["Tutor-marked work", "Teacher-marked assignments give students concrete scores and feedback during the course."],
-            ["Progress visibility", "Students can follow attendance, results, learning progress and the next task in one system."],
-          ].map(([title, body]) => (
-            <article key={title} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
-              <strong>{title}</strong>
-              <p style={{ margin: "6px 0 0", lineHeight: 1.6, color: "#475569" }}>{body}</p>
+      <section className="visitor-guide-marketing" aria-labelledby="visitor-guide-marketing-title">
+        <div className="visitor-guide-marketing-heading">
+          <span>GERMAN LEARNING THAT FITS YOUR LIFE</span>
+          <h2 id="visitor-guide-marketing-title">Four ways to get started with Falowen</h2>
+          <p>Find your level, prepare for Goethe-style exams, join a live class or learn at your own pace — with AI and tutor support.</p>
+        </div>
+        <div className="visitor-guide-marketing-grid">
+          {PUBLIC_MARKETING_FEATURES.map((feature) => (
+            <article key={feature.key} className="visitor-guide-marketing-card">
+              <span className="visitor-guide-marketing-icon" aria-hidden="true">{feature.icon}</span>
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+              <a href={feature.key === "self"
+                ? "/signup?program=german&ref=" + encodeURIComponent(engagementRef) + "&source=visitor-guide"
+                : feature.href}
+                onClick={feature.key === "self" ? () => trackClick("registration_click") : undefined}
+              >{feature.action} →</a>
             </article>
           ))}
         </div>
-      </section>
-
-      <section style={card}>
-        <h2 style={{ margin: 0 }}>How your course works</h2>
-        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 10, lineHeight: 1.65 }}>
-          <li><strong>Orientation:</strong> understand the course structure, Falowen and what is expected before normal lessons begin.</li>
-          <li><strong>Classes + Falowen:</strong> attend lessons and use the course material, grammar support and practice in Falowen.</li>
-          <li><strong>Assignments + feedback:</strong> complete required work, receive scores and use feedback to improve weak areas.</li>
-          <li><strong>Completion + exam preparation:</strong> finish the course, review your progress and continue with focused examination preparation.</li>
-        </ol>
       </section>
 
       <section style={card}>
