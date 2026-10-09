@@ -1,0 +1,151 @@
+.falowen-public-home {
+  --ink: #142138;
+  --blue: #174bbb;
+  --pale: #eff5ff;
+  color: var(--ink);
+  min-height: 100vh;
+  padding: max(16px, env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+  background: #f8faff;
+  font-family: inherit;
+}
+.falowen-public-home * { box-sizing: border-box; }
+.falowen-home-shell { width: min(1160px, 100%); margin: 0 auto; display: grid; gap: 32px; }
+.falowen-home-nav { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 54px; }
+.falowen-home-brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: #12213a; font-weight: 900; font-size: 23px; letter-spacing: -.05em; }
+.falowen-home-brand img { width: 38px; height: 38px; border-radius: 10px; }
+.falowen-home-brand-dot { color: #2b6be1; }
+.falowen-home-nav-links { display: flex; align-items: center; gap: 22px; }
+.falowen-home-nav-links a { color: #35455e; text-decoration: none; font-size: 13px; font-weight: 750; }
+.falowen-home-nav-links a:hover, .falowen-home-footer a:hover { color: #174bbb; }
+.falowen-home-nav-actions { display: flex; align-items: center; gap: 9px; }
+.falowen-home-language { min-height: 43px; max-width: 116px; padding: 6px 9px; border: 1px solid #d3dce9; border-radius: 10px; background: #fff; color: #142138; font-weight: 700; }
+.falowen-home-visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.falowen-home-login, .falowen-home-nav-signup { min-height: 43px; padding: 8px 14px; font-size: 13px; font-weight: 800; border-radius: 10px; cursor: pointer; }
+.falowen-home-login { color: #16243f; background: transparent; border: 1px solid transparent; }
+.falowen-home-nav-signup { color: #fff; background: #174bbb; border: 1px solid #174bbb; }
+.falowen-home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, .88fr);
+  min-width: 0;
+  gap: clamp(24px, 5vw, 62px);
+  align-items: center;
+  padding: clamp(24px, 5vw, 62px);
+  background: linear-gradient(127deg, #11398a, #1e59c8 61%, #2d68c7);
+  color: white;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 20px 48px rgba(21, 63, 147, .14);
+}
+.falowen-home-copy { min-width: 0; display: grid; justify-items: start; gap: 19px; }
+.falowen-home-eyebrow { padding: 8px 11px; font-size: 11px; line-height: 1.4; color: #d9eaff; font-weight: 900; letter-spacing: .12em; border: 1px solid #6a93e5; background: rgba(255,255,255,.09); border-radius: 100px; }
+.falowen-home-copy h1 { font-size: clamp(38px, 5vw, 61px); line-height: 1.055; letter-spacing: -.05em; font-weight: 900; margin: 0; max-width: 630px; }
+.falowen-home-copy h1 span { color: #fcd77b; }
+.falowen-home-intro { font-size: clamp(15px, 1.8vw, 18px); line-height: 1.68; margin: 0; max-width: 570px; color: #e5efff; }
+.falowen-home-cta-row, .falowen-home-final-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.falowen-home-button {
+  appearance: none; min-height: 49px; padding: 11px 18px;
+  border: 1px solid transparent; border-radius: 11px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  text-decoration: none; line-height: 1.3; font-family: inherit;
+  font-size: 14px; font-weight: 850; cursor: pointer;
+  text-align: center; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.falowen-home-button-primary { color: #142138; background: #ffdc85; border-color: #ffdc85; }
+.falowen-home-button-primary:hover { background: #ffe8ae; }
+.falowen-home-button-outline { color: #fff; background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.66); }
+.falowen-home-button-outline:hover { background: rgba(255,255,255,.20); }
+.falowen-home-button-light { color: #1c438a; background: #fff; border-color: #fff; }
+.falowen-home-helper { margin: -8px 0 0; color: #d6e8ff; font-size: 12px; }
+.falowen-home-proof { display: flex; flex-wrap: wrap; gap: 8px; }
+.falowen-home-proof span { display: inline-flex; align-items: center; border-radius: 100px; padding: 7px 10px; color: #e5efff; font-size: 11px; font-weight: 750; background: rgba(255,255,255,.11); }
+.falowen-home-hero-art { height: 100%; min-height: 340px; position: relative; border-radius: 22px; overflow: hidden; background: #a2b7da; }
+.falowen-home-classroom { width: 100%; height: 100%; min-height: 340px; max-height: 475px; object-fit: cover; display: block; }
+.falowen-home-image-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 44px 20px 19px; display: grid; gap: 5px; background: linear-gradient(0deg, rgba(8,23,54,.94), transparent); }
+.falowen-home-image-overlay span { font-weight: 850; color: #fff; font-size: 17px; }
+.falowen-home-image-overlay strong { color: #c8dbf7; font-size: 12px; line-height: 1.6; }
+.falowen-home-image-sticker { position: absolute; top: 17px; right: 17px; border-radius: 12px; background: #ffda86; color: #1e3767; padding: 10px 12px; font-size: 15px; font-weight: 900; box-shadow: 0 10px 20px rgba(10,40,70,.18); }
+.falowen-home-features { display: grid; gap: 24px; padding: 12px 0 3px; }
+.falowen-home-section-heading { display: grid; gap: 9px; text-align: center; justify-items: center; }
+.falowen-home-section-kicker { color: #1c53ae; letter-spacing: .12em; font-size: 11px; font-weight: 900; }
+.falowen-home-section-heading h2 { margin: 0; font-size: clamp(26px, 3.3vw, 38px); line-height: 1.16; letter-spacing: -.035em; max-width: 700px; }
+.falowen-home-section-heading p { margin: 0; color: #64748b; font-size: 15px; line-height: 1.6; max-width: 680px; }
+.falowen-home-feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+.falowen-home-feature {
+  min-width: 0; border: 1px solid #e0e8f4; border-radius: 18px;
+  background: #fff; padding: 23px 19px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 13px;
+  box-shadow: 0 10px 30px rgba(23,44,83,.035);
+}
+.falowen-home-feature-top { width: 100%; display: flex; align-items: flex-start; justify-content: space-between; }
+.falowen-home-feature-icon { width: 49px; height: 49px; border-radius: 14px; display: grid; place-items: center; font-size: 23px; background: #ebf3ff; }
+.falowen-home-feature-index { font-size: 12px; font-weight: 850; color: #b0bed0; }
+.falowen-home-feature h3 { margin: 2px 0 0; font-size: 18px; line-height: 1.35; letter-spacing: -.02em; }
+.falowen-home-feature p { flex-grow: 1; margin: 0; color: #52627a; line-height: 1.65; font-size: 13px; }
+.falowen-home-feature-link { border: 0; background: transparent; color: #1b51a7; font-family: inherit; text-decoration: none; text-align: left; padding: 5px 0 0; font-weight: 850; font-size: 13px; cursor: pointer; }
+.falowen-home-feature-link:hover { text-decoration: underline; }
+.falowen-home-support { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: clamp(24px, 4vw, 42px); border-radius: 23px; background: #ebf3ff; border: 1px solid #d9e6fc; }
+.falowen-home-support-copy { display: grid; gap: 11px; max-width: 690px; }
+.falowen-home-support h2 { margin: 0; font-size: clamp(23px, 2.6vw, 30px); line-height: 1.25; letter-spacing: -.03em; }
+.falowen-home-support p { margin: 0; color: #4a5f7e; line-height: 1.65; font-size: 14px; }
+.falowen-home-support-link { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #fff; border-radius: 11px; padding: 13px 16px; color: #1b51a7; text-decoration: none; font-weight: 850; font-size: 13px; }
+.falowen-home-reviews-intro { display: flex; align-items: center; justify-content: center; gap: 11px; text-align: center; margin-bottom: -19px; }
+.falowen-home-reviews-intro span { color: #cb8a1a; letter-spacing: .08em; font-size: 15px; }
+.falowen-home-reviews-intro p { margin: 0; color: #34445f; font-size: 14px; font-weight: 800; }
+.falowen-final-cta { background: #152743; color: #fff; padding: clamp(25px, 4vw, 42px); border-radius: 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 25px; }
+.falowen-final-cta .falowen-home-section-kicker { color: #b4d0ff; }
+.falowen-final-cta h2 { font-size: clamp(24px, 3vw, 34px); margin: 10px 0; letter-spacing: -.025em; }
+.falowen-final-cta p { margin: 0; color: #d7e2f4; max-width: 550px; line-height: 1.65; }
+.falowen-home-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 0 0 4px; }
+.falowen-home-footer-links { display: flex; flex-wrap: wrap; gap: 13px; }
+.falowen-home-footer a { font-size: 12px; font-weight: 750; color: #4c5f79; text-decoration: none; }
+.falowen-home-footer .falowen-home-contact-link { color: #1952b0; }
+.falowen-mobile-actions { display: none; }
+.falowen-public-home a:focus-visible, .falowen-public-home button:focus-visible, .falowen-home-language:focus-visible { outline: 3px solid #f9b83d; outline-offset: 3px; }
+@media (max-width: 1000px) {
+  .falowen-home-nav-links { display: none; }
+  .falowen-home-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .falowen-home-hero { grid-template-columns: minmax(0, 1.15fr) minmax(250px, .85fr); padding: 29px; }
+  .falowen-home-copy h1 { font-size: 44px; }
+}
+@media (max-width: 700px) {
+  .falowen-public-home { padding: max(10px, env(safe-area-inset-top)) 10px calc(97px + env(safe-area-inset-bottom)); }
+  .falowen-home-shell { gap: 22px; }
+  .falowen-home-nav { gap: 9px; padding: 4px 3px; }
+  .falowen-home-brand { font-size: 21px; }
+  .falowen-home-nav-signup { display: none; }
+  .falowen-home-login { border: 1px solid #d6dfed; background: #fff; padding: 7px 12px; }
+  .falowen-home-language { max-width: 91px; font-size: 12px; }
+  .falowen-home-hero { grid-template-columns: 1fr; gap: 22px; padding: 26px 20px 18px; border-radius: 20px; }
+  .falowen-home-copy { gap: 15px; }
+  .falowen-home-copy h1 { font-size: clamp(36px, 9vw, 47px); }
+  .falowen-home-intro { font-size: 15px; }
+  .falowen-home-cta-row { width: 100%; }
+  .falowen-home-cta-row .falowen-home-button { flex: 1 1 180px; }
+  .falowen-home-hero-art { min-height: 200px; max-height: 240px; }
+  .falowen-home-classroom { min-height: 200px; max-height: 240px; }
+  .falowen-home-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .falowen-home-feature { padding: 15px 12px; border-radius: 14px; gap: 10px; }
+  .falowen-home-feature h3 { font-size: 15px; }
+  .falowen-home-feature p { font-size: 12px; }
+  .falowen-home-feature-icon { width: 41px; height: 41px; font-size: 20px; }
+  .falowen-home-support { flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
+  .falowen-home-reviews-intro { margin-bottom: -10px; }
+  .falowen-final-cta { padding: 23px 19px; }
+  .falowen-home-final-actions { width: 100%; }
+  .falowen-home-final-actions .falowen-home-button { flex: 1 1 150px; }
+  .falowen-mobile-actions {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    padding: 9px 10px calc(9px + env(safe-area-inset-bottom));
+    border-top: 1px solid #d6e3f5; background: rgba(255,255,255,.97);
+    box-shadow: 0 -8px 25px rgba(15,34,66,.12); backdrop-filter: blur(12px);
+  }
+  .falowen-mobile-actions .falowen-home-button { font-size: 12px; padding: 8px 7px; min-height: 45px; }
+  .falowen-mobile-actions .falowen-home-button-outline { border: 1px solid #1d4ed8; color: #1d4ed8; background: #fff; }
+}
+@media (max-width: 360px) {
+  .falowen-home-feature-grid { grid-template-columns: 1fr; }
+  .falowen-home-brand img { width: 32px; height: 32px; }
+  .falowen-home-login { padding: 6px 7px; }
+}
