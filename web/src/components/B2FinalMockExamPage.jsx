@@ -56,6 +56,7 @@ const initialState = () => ({
   sprechenResult: null,
   sprechenCompleted: false,
   completedAt: "",
+  attemptNumber: 1,
   resultSyncScoreDocId: "",
   completed: false,
 });
@@ -198,6 +199,7 @@ const readState = () => {
       sprechenCompleted: Boolean(parsed.sprechenCompleted),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
+      attemptNumber: Math.max(1, Number(parsed.attemptNumber) || 1),
       completed: Boolean(parsed.completed && parsed.sprechenCompleted),
     };
   } catch (_error) {
@@ -1063,7 +1065,7 @@ export default function B2FinalMockExamPage() {
       percent: finalScore.overall,
       passed: finalScore.passed,
       attemptId,
-      attemptNumber: 1,
+      attemptNumber: Math.max(1, Number(state.attemptNumber) || 1),
       resultType: "final_mock",
       route: "/campus/results",
       sectionScores: finalScore.sectionScores,
@@ -1361,7 +1363,10 @@ export default function B2FinalMockExamPage() {
   const restartFullMock = () => {
     if (!state.resultSyncScoreDocId) return; // Never clear a completed unsynced attempt.
     setPageError("");
-    setState(initialState());
+    setState((current) => ({
+      ...initialState(),
+      attemptNumber: Math.max(1, Number(current.attemptNumber) || 1) + 1,
+    }));
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
