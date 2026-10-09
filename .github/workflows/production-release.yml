@@ -7,6 +7,7 @@ on:
       - "api/index.js"
       - "functions/functionz/paymentAwareApp.js"
       - "functions/data/answerKeyManifest.json"
+      - "functions/data/a2GoetheWritingTasks.cjs"
       - "functions/data/a2GoetheWritingTasks.json"
       - "scripts/generateFunctionMarkingTasks.mjs"
       - "web/src/data/a2GoetheWritingTasks.js"
