@@ -64,7 +64,12 @@ export function useMockExamIntegrity({ level, mockId, idToken, attemptId, sectio
   const requestFullscreen = () => {
     if (typeof document !== "undefined" && !document.fullscreenElement &&
       typeof document.documentElement?.requestFullscreen === "function") {
-      document.documentElement.requestFullscreen().catch(() => {});
+      try {
+        const request = document.documentElement.requestFullscreen();
+        if (request && typeof request.catch === "function") request.catch(() => {});
+      } catch (_) {
+        // Fullscreen is optional and unsupported on some mobile browsers.
+      }
     }
   };
   return {
