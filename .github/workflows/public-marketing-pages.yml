@@ -9,6 +9,9 @@ on:
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
       - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/PublicUpcomingClassesPage.js'
+      - 'web/src/components/PublicUpcomingClassesPage.css'
+      - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
       - 'web/src/__tests__/LandingPageMobile.test.js'
       - 'tests/public-admissions-visitor-guide.test.mjs'
@@ -22,6 +25,9 @@ on:
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
       - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/PublicUpcomingClassesPage.js'
+      - 'web/src/components/PublicUpcomingClassesPage.css'
+      - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
       - 'web/src/__tests__/LandingPageMobile.test.js'
       - 'tests/public-admissions-visitor-guide.test.mjs'
@@ -44,7 +50,7 @@ jobs:
         run: npm ci
       - name: Marketing and mobile homepage regression
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/components/PublicMarketingLanding.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/components/PublicMarketingLanding.test.js src/components/PublicUpcomingClassesPage.test.jsx
       - name: Compile website
         working-directory: web
         run: npx vite build
