@@ -5306,6 +5306,64 @@ app.post("/mock/attempt/integrity-event", async (req, res) => {
   }
 });
 
+
+// Only levels with an existing mock/practice page can report exam-integrity
+// events. Each event belongs to the authenticated account; never trust a uid
+// or email supplied by a browser. No scores are modified here.
+const MOCK_INTEGRITY_IDS = Object.freeze({
+  A2: ["a2-mock-01", "a2-mock-02"],
+  B1: ["b1-mock-01"],
+  B2: ["b2-mock-01"],
+  C1: ["c1-lesen-sample-01"],
+});
+const MOCK_INTEGRITY_SECTIONS = new Set([
+  "lesen", "hoeren", "schreiben", "sprechen", "teil1", "teil2", "teil3", "teil4",
+]);
+app.post("/mock/attempt/integrity-event", async (req, res) => {
+  try {
+    const user = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!user) return;
+    const level = String(req.body?.level || "").toUpperCase().trim();
+    const mockId = String(req.body?.mockId || "").trim();
+    const attemptId = String(req.body?.attemptId || "").trim();
+    const section = String(req.body?.section || "").trim();
+    const type = String(req.body?.type || "").trim();
+    if (!(MOCK_INTEGRITY_IDS[level] || []).includes(mockId) ||
+        !/^[a-zA-Z0-9_-]{1,120}$/.test(attemptId) ||
+        !MOCK_INTEGRITY_SECTIONS.has(section) ||
+        !A1_MOCK_INTEGRITY_KINDS.has(type)) {
+      return res.status(400).json({ error: "Invalid mock activity signal." });
+    }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Exam monitoring unavailable." });
+    const ref = db.collection("mockIntegritySignals")
+      .doc([user.uid, level, mockId, attemptId].join("__"));
+    let limited = false;
+    await db.runTransaction(async tx => {
+      const snapshot = await tx.get(ref);
+      const previous = snapshot.exists ? snapshot.data() || {} : {};
+      const counts = Object.fromEntries([...A1_MOCK_INTEGRITY_KINDS]
+        .map(key => [key, Math.max(0, Math.min(250, Math.floor(Number(previous.counts?.[key]) || 0)))]));
+      if (Object.values(counts).reduce((a, b) => a + b, 0) >= 250) {
+        limited = true; return;
+      }
+      counts[type] += 1;
+      const events = [...(Array.isArray(previous.events) ? previous.events : []),
+        { type, section, at: new Date().toISOString() }].slice(-30);
+      tx.set(ref, {
+        uid: user.uid, email: String(user.email || "").toLowerCase().slice(0, 200),
+        level, mockId, attemptId, counts, events,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        ...(!snapshot.exists ? { startedAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
+      }, { merge: true });
+    });
+    return res.json({ ok: true, limited });
+  } catch (error) {
+    console.error("Mock activity signal failed", error);
+    return res.status(500).json({ error: "Unable to record mock activity." });
+  }
+});
+
 app.post("/a2-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
