@@ -491,6 +491,7 @@ const SpeakingPage = ({
         teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
         level: selectedLevel,
         question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
+        taskId: selectedQuestion.id,
         idToken,
       });
       const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
@@ -743,6 +744,7 @@ const SpeakingPage = ({
               teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
               level: selectedLevel,
               question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
+              taskId: selectedQuestion.id,
               userId,
               idToken,
               durationSeconds: duration,

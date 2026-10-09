@@ -20,6 +20,7 @@ const bcrypt = require("bcryptjs");
 
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
 const { createMockAssessment } = require("./mockAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -781,6 +782,8 @@ app.use(
     },
   })
 );
+
+app.use(requireMockTaskVersion);
 
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) =>
@@ -2141,9 +2144,7 @@ const speechTrainerPrompt = ({ level, note }) =>
 const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
   const safeAttempts = attempts.map((attempt) => ({
     teil: String(attempt?.teil || "").trim(),
-    task: String(attempt?.task || "").trim(),
     transcript: String(attempt?.transcript || "").trim(),
-    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
   }));
 
   return [
@@ -2198,7 +2199,8 @@ const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    "Student attempts:",
+    mockTaskPrompt("A1", "speaking"),
+    "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
 };
@@ -2208,9 +2210,7 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
-    task: String(attempt?.task || "").trim(),
     transcript: String(attempt?.transcript || "").trim(),
-    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
   }));
 
   return [
@@ -2221,9 +2221,9 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
     "Because the source is a transcript, do not claim to measure accent or precise pronunciation. Judge clarity from successful transcription and communicative comprehensibility.",
     "",
     "SCORING — total 25 points:",
-    "Teil 1: 9 points. The learner asks suitable personal questions from the four keywords and answers the four partner questions with relevant A2 information.",
-    "Teil 2: 8 points. The learner talks about the weekend using all four prompts, connects ideas, and answers the follow-up question.",
-    "Teil 3: 8 points. The learner reacts to the partner, suggests an activity, gives a time and meeting place, includes food, and ends with a clear shared plan.",
+    "Teil 1: 9 points. The learner asks suitable personal questions from every canonical keyword and answers every canonical partner question with relevant A2 information.",
+    "Teil 2: 8 points. The learner talks about the canonical Teil 2 topic using all prompts, connects ideas, and answers the follow-up question.",
+    "Teil 3: 8 points. The learner reacts to the canonical partner statement, covers every planning point and ends with a clear shared plan.",
     "Pass mark for Sprechen mock: 15/25.",
     "",
     "Required JSON only, no markdown:",
@@ -2264,7 +2264,8 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    "Student attempts:",
+    mockTaskPrompt("A2", "speaking"),
+    "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
 };
@@ -2273,9 +2274,7 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
-    task: String(attempt?.task || "").trim(),
     transcript: String(attempt?.transcript || "").trim(),
-    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
   }));
 
   return [
@@ -2287,9 +2286,9 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
     "If a task transcript is empty, treat that task as no response and award 0 points for that task.",
     "",
     "SCORING — total 25 points:",
-    "Teil 1: 9 points. Joint planning: make and react to suggestions, cover the relevant party-planning points (where, when, food/drinks, invitations, gift, responsibilities), and move toward agreement.",
-    "Teil 2: 10 points. Structured presentation on printed books versus digital learning: personal experience, situation in the learner's home country, advantages/disadvantages, and a clear opinion/future view. Reward connected B1 speech and useful linking language.",
-    "Teil 3: 6 points. React appropriately to the partner statement about concentration with printed books, state agreement/disagreement, and justify the reaction with a relevant reason or example.",
+    "Teil 1: 9 points. Joint planning: make and react to suggestions, cover every canonical planning point, and move toward agreement.",
+    "Teil 2: 10 points. Structured presentation addressing all canonical Teil 2 points. Reward connected B1 speech and useful linking language.",
+    "Teil 3: 6 points. React appropriately to the canonical partner statement, state agreement/disagreement, and justify the reaction with a relevant reason or example.",
     "Pass mark for this Sprechen mock: 15/25.",
     "",
     "Required JSON only, no markdown:",
@@ -2330,18 +2329,17 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    "Student attempts:",
+    mockTaskPrompt("B1", "speaking"),
+    "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
 };
 
-const b2MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const b2MockSpeakingScorePrompt = ({ attempts = [], selectedTopicId = "" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
-    task: String(attempt?.task || "").trim(),
     transcript: String(attempt?.transcript || "").trim(),
-    analysisFeedback: String(attempt?.analysisFeedback || "").trim(),
   }));
 
   return [
@@ -2354,7 +2352,7 @@ const b2MockSpeakingScorePrompt = ({ attempts = [] }) => {
     "",
     "SCORING — total 25 points:",
     "Teil 1 presentation: 13 points. The learner chooses ONE of two topics and should give a structured, connected presentation with a clear position, relevant examples/reasons and a conclusion. Reward B2-level linking, lexical range and accurate complex structures.",
-    "Teil 2 discussion: 12 points. Topic: whether public transport should be completely free. The learner should present pros and cons, explicitly react to at least one counterargument, use polite agreement/disagreement language, and reach a clear summary or conclusion.",
+    "Teil 2 discussion: 12 points. Use the canonical discussion topic. The learner should present pros and cons, explicitly react to at least one counterargument, use polite agreement/disagreement language, and reach a clear summary or conclusion.",
     "This mock has no partner audio for Teil 2. Do NOT penalize the learner simply because there is no second speaker. Instead, judge whether the learner convincingly simulates an exchange by identifying and responding to an opposing view.",
     "Pass mark for this Sprechen mock: 15/25.",
     "",
@@ -2388,7 +2386,8 @@ const b2MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    "Student attempts:",
+    mockTaskPrompt("B2", "speaking", selectedTopicId),
+    "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
 };
@@ -2400,18 +2399,15 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "Judge at CEFR A2 standard. Normal A2 grammar and spelling mistakes are acceptable when the intended meaning is clear.",
   "",
   "TEIL 1 — SMS, 10 points:",
-  "Situation: The learner is late meeting Mila.",
-  "Required points: (1) apologise for being late, (2) explain why, (3) give a new meeting place AND a new time.",
   "Scoring emphasis: task completion is essential. If one required point is missing, Teil 1 may score at most 7/10; if two are missing, at most 4/10; if all three are missing, at most 1/10.",
-  "Target length: 20–30 words. Do not fail only because the word count is slightly outside the target.",
+  "Use the word target in the canonical task; do not fail only because the count is slightly outside it.",
   "",
   "TEIL 2 — E-Mail, 15 points:",
-  "Situation: Frau Becker invited the learner to the language school's summer party.",
-  "Required points: (1) thank her AND clearly say the learner will come, (2) say the learner will bring one person, (3) ask how to get to the party.",
   "Scoring emphasis: task completion is essential. If one required point is missing, Teil 2 may score at most 11/15; if two are missing, at most 7/15; if all three are missing, at most 3/15.",
-  "Target length: 30–40 words. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
+  "Use the canonical word target. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
   "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
   "",
+  mockTaskPrompt("A2", "writing"),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
@@ -2427,7 +2423,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         language_score: 0,
         appropriateness_score: 0,
         required_points_met: [false, false, false],
-        missing_required_points: ["apology", "reason", "new place and time"],
+        missing_required_points: [],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -2447,7 +2443,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         greeting_ok: false,
         closing_ok: false,
         required_points_met: [false, false, false],
-        missing_required_points: ["thanks and acceptance", "bring one person", "directions question"],
+        missing_required_points: [],
         feedback_en: "English feedback.",
         corrections: [
           {
@@ -2473,16 +2469,13 @@ const b2MockWritingScorePrompt = ({ teil1 = "", teil2 = "" }) => [
   "Judge at CEFR B2 standard: task fulfilment, communicative appropriateness/register, organisation/cohesion, lexical range/precision, grammar and spelling.",
   "Do not punish a small word-count difference by itself. Missing required content, weak organisation, inappropriate register, or language clearly below B2 must reduce the score.",
   "",
-  "TEIL 1 — Forumsbeitrag, 15 points, target about 150 words.",
-  "Topic: Homeoffice – Arbeiten von zu Hause aus.",
-  "Required points: (1) give a clear opinion about working from home, (2) explain reasons why homeoffice is becoming more popular, (3) give ways companies can support employees working from home, (4) discuss advantages and disadvantages of office work as an alternative.",
+  "TEIL 1 — Forumsbeitrag, 15 points; use the canonical word target.",
   "The text should have a distinct introduction and suitable conclusion and connect the points into a coherent forum contribution.",
   "",
-  "TEIL 2 — formelle Nachricht, 10 points, target about 100 words.",
-  "Situation: the learner is attending professional training but cannot attend an important project seminar next week because of an unavoidable business trip. Recipient: Frau Dr. Weber.",
-  "Required points: (1) state the reason for writing and apologise for the absence, (2) explain why the business trip is urgent, (3) propose how to catch up on the missed seminar content, (4) ask for the materials or presentation.",
+  "TEIL 2 — formelle Nachricht, 10 points; use the canonical word target.",
   "Use an appropriate formal salutation, formal register and suitable closing.",
   "",
+  mockTaskPrompt("B2", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
     score: 0,
@@ -2530,21 +2523,16 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
   "Judge at CEFR B1 standard: task fulfilment, communicative appropriateness, organisation/cohesion, vocabulary, grammar and spelling.",
   "Do not punish a small word-count difference by itself. Missing required content, wrong register, or an incomplete response must reduce the score.",
   "",
-  "AUFGABE 1 — informal email, 10 points, target about 80 words.",
-  "Situation: new apartment and housewarming party; friend Jan could not come.",
-  "Required points: (1) describe how the party was, (2) explain why moving to the new apartment was a good choice, (3) suggest a meeting to show Jan the apartment.",
+  "AUFGABE 1 — informal email, 10 points; use the canonical word target.",
   "Use an appropriate informal greeting and closing.",
   "",
-  "AUFGABE 2 — discussion post, 10 points, target about 80 words.",
-  "Topic: cashless payment versus cash.",
-  "Required points: (1) clear opinion, (2) reasons for the position, (3) advantages and/or disadvantages.",
+  "AUFGABE 2 — discussion post, 10 points; use the canonical word target.",
   "The text should be connected and suitable for an online discussion.",
   "",
-  "AUFGABE 3 — formal email, 5 points, target about 40 words.",
-  "Situation: learner cannot attend German class one day next week because of an important doctor appointment; recipient Frau Schneider.",
-  "Required points: (1) apologise for absence, (2) give the reason, (3) ask for homework/course materials.",
+  "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
   "",
+  mockTaskPrompt("B1", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
     score: 0,
@@ -2628,7 +2616,6 @@ const scoreA1MockWritingForm = (formValues = {}) => {
 const a1MockWritingScorePrompt = ({ text = "" }) => [
   "You are a strict Goethe-style A1 writing examiner for a Falowen mock exam.",
   "Assess the learner's German email exactly as submitted. Do not rewrite it before scoring and do not invent missing information.",
-  "The task: write to Kochschule GenussZeit. The learner must (1) register for the course 'Italienische Küche', (2) ask when the next course begins, and (3) ask the price.",
   "A suitable greeting, closing and the learner's name are required, but they are not extra content points.",
   "Feedback for the learner MUST be in English. German may appear only in short corrected examples.",
   "Judge at CEFR A1 standard. Normal A1 grammar/spelling errors are acceptable when the message remains understandable.",
@@ -2636,11 +2623,12 @@ const a1MockWritingScorePrompt = ({ text = "" }) => [
   "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
   "",
   "SCORING — 15 points total:",
-  "Content points: 6 points — 2 each for registration, next-course-start question, price question.",
+  "Content points: 6 points — 2 for each of the three canonical task points, in order. Output keys registration, next_course_start, price represent points 1, 2, 3 respectively.",
   "Message structure: 3 points — greeting 1, closing 1, name 1.",
   "A1 language control: 4 points — simple understandable sentences/questions, basic word order and vocabulary. Meaning matters more than perfection.",
   "A1 appropriateness: 2 points — reasonably simple A1 production, not unnecessarily elaborate.",
   "",
+  mockTaskPrompt("A1", "writing"),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
@@ -3491,7 +3479,9 @@ app.post("/writing/mark", async (req, res) => {
           })
         : trimmedText;
 
-    const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program, submissionContext });
+    const selectedTask = resolvePracticeTask("writing", req.body?.taskId, level, req.body?.taskContext);
+    const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program, submissionContext }) +
+      (selectedTask ? "\n" + assessmentTaskPrompt(selectedTask) : "\nNo catalog task supplied: assess language only; do not invent task requirements or claim full task completion.");
     const messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: userContent },
@@ -3600,7 +3590,7 @@ app.post("/writing/mark", async (req, res) => {
     });
   } catch (err) {
     console.error("/writing/mark error", err);
-    res.status(500).json({ error: err.message || "Failed to mark letter" });
+    res.status(err.status || 500).json({ code: err.code || null, error: err.message || "Failed to mark letter" });
   }
 });
 
@@ -5913,6 +5903,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    const selectedTask = resolvePracticeTask("speaking", req.body?.taskId, level, { text: question });
     if (!ensureOpenAIConfigured(res)) return;
 
     let audioFile = req.file;
@@ -5928,7 +5919,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     if (!quota.allowed) return res.status(429).json({ error: "Daily speaking analysis limit reached", code: "SPEAKING_QUOTA_REACHED" });
 
     const messages = [
-      { role: "system", content: speakingPrompt({ teil, level, contextType, question, interactionMode }) },
+      { role: "system", content: speakingPrompt({ teil, level, contextType, question: selectedTask?.text || question, interactionMode }) + (selectedTask ? "\n" + assessmentTaskPrompt(selectedTask) : "") },
       { role: "user", content: `User ${authedUser.uid || userId} speaking sample transcript: ${transcript}` },
     ];
 
@@ -5951,7 +5942,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     console.error("/speaking/analyze error", err);
     auditAIRequest({ route: "/speaking/analyze", uid: authedUser?.uid, email: authedUser?.email, success: false });
     if (/^(AUDIO_|NO_SPEECH_DETECTED|TRANSCRIPTION_)/.test(String(err?.code || ""))) { const mapped = audioHttpError(err); return res.status(mapped.status).json(mapped.body); }
-    return res.status(500).json({ error: err.message || "Failed to analyze speaking", code: "SPEAKING_ANALYSIS_FAILED" });
+    return res.status(err.status || 500).json({ error: err.message || "Failed to analyze speaking", code: err.code || "SPEAKING_ANALYSIS_FAILED" });
   }
 });
 
@@ -5972,6 +5963,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
       validateString(question, { maxLength: 500, label: "question" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    const selectedTask = resolvePracticeTask("speaking", req.body?.taskId, level, { text: question });
     if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
@@ -5981,7 +5973,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: speakingPrompt({ teil, level: targetLevel || level, question }) },
+      { role: "system", content: speakingPrompt({ teil, level: targetLevel || level, question: selectedTask?.text || question }) + (selectedTask ? "\n" + assessmentTaskPrompt(selectedTask) : "") },
       { role: "user", content: `User ${authedUser.uid || userId} transcript: ${trimmed}` },
     ];
 
@@ -5998,7 +5990,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
   } catch (err) {
     console.error("/speaking/analyze-text error", err);
     auditAIRequest({ route: "/speaking/analyze-text", uid: authedUser?.uid, email: authedUser?.email, success: false });
-    return res.status(500).json({ error: err.message || "Failed to analyze text" });
+    return res.status(err.status || 500).json({ code: err.code || null, error: err.message || "Failed to analyze text" });
   }
 });
 
@@ -6493,7 +6485,7 @@ app.post("/speaking/b2-mock-score", async (req, res) => {
 
     const reply = await createMockAssessment(
       [
-        { role: "system", content: b2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+        { role: "system", content: b2MockSpeakingScorePrompt({ attempts: normalizedAttempts, selectedTopicId: req.body?.selectedTopicId }) },
         { role: "user", content: "Return the final B2 mock speaking assessment as the required JSON object." },
       ],
       { temperature: 0.1, max_tokens: 1100 },

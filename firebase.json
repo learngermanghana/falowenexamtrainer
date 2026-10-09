@@ -4,6 +4,7 @@
   },
   "functions": {
     "source": "functions",
+    "predeploy": ["node scripts/generateAssessmentTaskRegistry.mjs"],
     "codebase": "falowenexamtrainer"
   },
   "emulators": {

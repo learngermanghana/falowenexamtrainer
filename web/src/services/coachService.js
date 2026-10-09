@@ -56,6 +56,7 @@ export const analyzeAudio = async ({
   level,
   contextType,
   question,
+  taskId,
   interactionMode,
   userId,
   idToken,
@@ -91,6 +92,7 @@ export const analyzeAudio = async ({
         level,
         contextType,
         question,
+        taskId,
         interactionMode,
         userId: userId || "guest",
         audioUrl,
@@ -117,6 +119,7 @@ export const analyzeAudio = async ({
 
       if (contextType) formData.append("contextType", contextType);
       if (question) formData.append("question", question);
+      if (taskId) formData.append("taskId", taskId);
       if (typeof interactionMode !== "undefined") {
         formData.append("interactionMode", interactionMode);
       }
@@ -222,10 +225,10 @@ export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
   return response.data?.result || response.data;
 };
 
-export const scoreB2MockSpeaking = async ({ attempts, idToken }) => {
+export const scoreB2MockSpeaking = async ({ attempts, selectedTopicId, idToken }) => {
   const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/b2-mock-score`,
-    { attempts },
+    { attempts, selectedTopicId },
     { headers: authHeaders(idToken) }
   );
 
@@ -265,7 +268,7 @@ const toLegacyRubric = (normalized) => {
   return rubric;
 };
 
-export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, promptType, previousText, previousFeedback, idToken }) => {
+export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, promptType, previousText, previousFeedback, taskId, taskContext, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/mark`,
     {
@@ -277,6 +280,8 @@ export const markLetterWithAI = async ({ text, level, studentName, program, subm
       promptType,
       previousText,
       previousFeedback,
+      taskId,
+      taskContext,
     },
     { headers: authHeaders(idToken) }
   );

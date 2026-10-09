@@ -1470,6 +1470,8 @@ const WritingPage = ({
     try {
       const studentName = user?.displayName || user?.email || "Student";
       const data = await markLetterWithAI({
+        taskId: selectedLetter?.id,
+        taskContext: selectedLetter ? { situation: selectedLetter.situation, whatToInclude: selectedLetter.whatToInclude || [] } : undefined,
         text: trimmed,
         level,
         studentName,
@@ -1732,6 +1734,8 @@ const WritingPage = ({
     try {
       const studentName = user?.displayName || user?.email || "Student";
       const data = await markLetterWithAI({
+        taskId: selectedLetter?.id,
+        taskContext: selectedLetter ? { situation: selectedLetter.situation, whatToInclude: selectedLetter.whatToInclude || [] } : undefined,
         text: revisedDraftText.trim(),
         level,
         studentName,

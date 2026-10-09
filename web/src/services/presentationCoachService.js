@@ -205,7 +205,7 @@ export const requestCustomSpeakingChatReply = async ({ message, level, history, 
   });
 };
 
-export const requestSpeakingTextAnalysis = async ({ text, teil, level, question, idToken }) =>
+export const requestSpeakingTextAnalysis = async ({ text, teil, level, question, taskId, idToken }) =>
   callAI({
     path: "/speaking/analyze-text",
     payload: {
@@ -213,6 +213,7 @@ export const requestSpeakingTextAnalysis = async ({ text, teil, level, question,
       teil,
       level,
       question,
+      taskId,
     },
     idToken,
   });

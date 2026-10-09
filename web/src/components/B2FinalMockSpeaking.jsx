@@ -353,6 +353,7 @@ export default function B2FinalMockSpeaking({
 
     try {
       const assessment = await scoreB2MockSpeaking({
+        selectedTopicId: selectedTopic,
         attempts: TASKS.map((task) => ({
           id: task.id,
           teil: task.id.replace("teil", ""),

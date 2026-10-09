@@ -1,0 +1,2950 @@
+{
+  "writing": {
+    "a1-apartment-note": {
+      "id": "a1-apartment-note",
+      "letter": "A1: Notiz an die Mitbewohnerin",
+      "level": "A1",
+      "tags": [
+        "note",
+        "household"
+      ],
+      "durationMinutes": 15,
+      "situation": "Du musst früher zur Arbeit und hinterlässt eine kurze Nachricht für deine Mitbewohnerin.",
+      "whatToInclude": [
+        "Grund der Nachricht (früher weg, Termin)",
+        "Bitte, den Müll rauszubringen oder das Fenster zu schließen",
+        "Wo du den Schlüssel lässt",
+        "Höflicher Abschluss"
+      ]
+    },
+    "a1-birthday-invite": {
+      "id": "a1-birthday-invite",
+      "letter": "A1: Einladung zum Geburtstag",
+      "level": "A1",
+      "tags": [
+        "birthday",
+        "invitation"
+      ],
+      "durationMinutes": 15,
+      "situation": "Du lädst eine Freundin oder einen Freund zu deinem Geburtstag ein.",
+      "whatToInclude": [
+        "Wann und wo die Feier ist",
+        "Was ihr machen wollt",
+        "Bitte um Antwort",
+        "Freundlicher Abschluss"
+      ]
+    },
+    "a2-library-email": {
+      "id": "a2-library-email",
+      "letter": "A2: E-Mail an die Bibliothek",
+      "level": "A2",
+      "tags": [
+        "reservation",
+        "request"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du möchtest ein deutsches Buch verlängern und fragst nach Kursmaterialien.",
+      "whatToInclude": [
+        "Buchtitel und Datum der Ausleihe",
+        "Bitte um Verlängerung und neue Rückgabefrist",
+        "Frage nach einfachen Deutschkurs-Materialien",
+        "Kontakt und Dank"
+      ]
+    },
+    "a2-course-feedback": {
+      "id": "a2-course-feedback",
+      "letter": "A2: Rückmeldung zum Sprachkurs",
+      "level": "A2",
+      "tags": [
+        "feedback",
+        "course"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du schreibst deiner Sprachschule, was dir hilft und was dir noch schwer fällt.",
+      "whatToInclude": [
+        "Welche Übungen gefallen dir? (z. B. Dialoge, Hörtexte)",
+        "Welche Themen sind schwer? (z. B. Grammatik, Aussprache)",
+        "Konkreter Wunsch für den Unterricht",
+        "Bitte um Antwort"
+      ]
+    },
+    "b1-job-application": {
+      "id": "b1-job-application",
+      "letter": "B1: Bewerbung auf einen Minijob",
+      "level": "B1",
+      "tags": [
+        "application",
+        "job"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du bewirbst dich für einen Minijob im Café deiner Stadt.",
+      "whatToInclude": [
+        "Wer du bist und wo du Deutsch lernst",
+        "Warum dich der Job interessiert",
+        "Welche Erfahrung du hast (Service, Kundenkontakt)",
+        "Wann du arbeiten kannst und Bitte um Rückmeldung"
+      ]
+    },
+    "b1-complaint-delivery": {
+      "id": "b1-complaint-delivery",
+      "letter": "B1: Beschwerde an einen Lieferdienst",
+      "level": "B1",
+      "tags": [
+        "complaint",
+        "service"
+      ],
+      "durationMinutes": 20,
+      "situation": "Die letzte Lieferung kam zu spät und war unvollständig.",
+      "whatToInclude": [
+        "Bestellnummer, Datum und was gefehlt hat",
+        "Welche Probleme entstanden sind",
+        "Was du als Lösung möchtest (Rückerstattung, erneute Lieferung)",
+        "Höflicher Abschluss mit Kontakt"
+      ]
+    },
+    "b2-opinion-digital": {
+      "id": "b2-opinion-digital",
+      "letter": "B2: Meinung zum digitalen Lernen",
+      "level": "B2",
+      "tags": [
+        "opinion",
+        "article"
+      ],
+      "durationMinutes": 20,
+      "situation": "Ein Magazin bittet dich um einen kurzen Artikel über digitales Lernen.",
+      "whatToInclude": [
+        "Deine Erfahrung mit Onlinekursen",
+        "Vorteile und Nachteile (Beispiele nennen)",
+        "Empfehlungen für Lernende",
+        "Schluss mit eigener Position"
+      ]
+    },
+    "b2-formal-request": {
+      "id": "b2-formal-request",
+      "letter": "B2: Anfrage an das Rathaus",
+      "level": "B2",
+      "tags": [
+        "appointment",
+        "formal request"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du planst ein Nachbarschaftsprojekt und bittest die Stadt um Unterstützung.",
+      "whatToInclude": [
+        "Kurze Vorstellung des Projekts und Ziels",
+        "Welche Unterstützung du brauchst (Raum, Material, Werbung)",
+        "Zeitraum und Nutzen für die Stadt",
+        "Bitte um Rückmeldung oder Gespräch"
+      ]
+    },
+    "a1-1": {
+      "id": "a1-1",
+      "level": "A1",
+      "situation": "Sie möchten im Sommer nach Berlin reisen und brauchen ein Hotelzimmer. Schreiben Sie eine E-Mail an das Hotel „Berliner Hof“.",
+      "whatToInclude": [
+        "Ankunftsdatum und Dauer: Wann kommen Sie an? Wie lange bleiben Sie?",
+        "Zimmerwunsch: Einzelzimmer oder Doppelzimmer mit Frühstück?",
+        "Preis: Fragen Sie nach dem Preis."
+      ]
+    },
+    "a1-2": {
+      "id": "a1-2",
+      "level": "A1",
+      "situation": "Ihr Freund Michael feiert am Samstag Geburtstag und hat Sie eingeladen. Schreiben Sie eine E-Mail an Michael.",
+      "whatToInclude": [
+        "Zusage: Sagen Sie, dass Sie gerne zur Party kommen.",
+        "Geschenk: Fragen Sie, was Michael sich wünscht oder was Sie mitbringen sollen.",
+        "Uhrzeit: Fragen Sie, wann die Party beginnt."
+      ]
+    },
+    "a1-3": {
+      "id": "a1-3",
+      "level": "A1",
+      "situation": "Sie sind krank und können am Donnerstag nicht zum Deutschkurs kommen. Schreiben Sie an Ihre Lehrerin, Frau Müller.",
+      "whatToInclude": [
+        "Grund: Sagen Sie, dass Sie krank sind.",
+        "Entschuldigung: Sagen Sie, dass Sie am Donnerstag fehlen.",
+        "Hausaufgaben: Fragen Sie nach den Hausaufgaben."
+      ]
+    },
+    "a1-4": {
+      "id": "a1-4",
+      "level": "A1",
+      "situation": "Sie möchten einen Deutschkurs bei der Sprachschule „Aktiv“ machen. Schreiben Sie eine E-Mail an die Sprachschule.",
+      "whatToInclude": [
+        "Kursstart: Fragen Sie, wann der nächste A1-Kurs beginnt.",
+        "Kurszeiten: Fragen Sie, ob es Abendkurse gibt.",
+        "Kosten: Fragen Sie, wie viel der Kurs kostet."
+      ]
+    },
+    "a1-5": {
+      "id": "a1-5",
+      "level": "A1",
+      "situation": "Sie möchten sich am Wochenende mit Ihrer Freundin Sarah in der Stadt treffen. Schreiben Sie an Sarah.",
+      "whatToInclude": [
+        "Vorschlag: Schlagen Sie ein Treffen am Samstag vor.",
+        "Aktivität: Schlagen Sie Kaffee trinken oder Kino vor.",
+        "Treffpunkt und Uhrzeit: Fragen oder sagen Sie, wo und wann Sie sich treffen."
+      ]
+    },
+    "a1-6": {
+      "id": "a1-6",
+      "level": "A1",
+      "situation": "Sie planen eine Reise nach Hamburg. Schreiben Sie an die Touristeninformation Hamburg.",
+      "whatToInclude": [
+        "Stadtplan: Bitten Sie um einen Stadtplan.",
+        "Informationen: Fragen Sie nach Ausflugstipps oder einer Hafenrundfahrt.",
+        "Zuschicken: Bitten Sie darum, Prospekte per Post oder E-Mail zu senden."
+      ]
+    },
+    "a1-7": {
+      "id": "a1-7",
+      "level": "A1",
+      "situation": "Sie haben im Internet ein gebrauchtes Fahrrad gesehen und möchten es kaufen. Schreiben Sie an den Verkäufer, Herrn Weber.",
+      "whatToInclude": [
+        "Interesse: Sagen Sie, dass Sie das Fahrrad kaufen möchten.",
+        "Zustand: Fragen Sie nach dem Alter oder Zustand des Fahrrads.",
+        "Termin: Fragen Sie nach einem Termin für eine Probefahrt."
+      ]
+    },
+    "a1-8": {
+      "id": "a1-8",
+      "level": "A1",
+      "situation": "Sie möchten im Sportverein „Fit & Aktiv“ Mitglied werden. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Probetraining: Fragen Sie nach einem kostenlosen Probetraining.",
+        "Öffnungszeiten: Fragen Sie nach den Öffnungszeiten am Wochenende.",
+        "Mitgliedsbeitrag: Fragen Sie, wie viel die Mitgliedschaft pro Monat kostet."
+      ]
+    },
+    "a1-9": {
+      "id": "a1-9",
+      "level": "A1",
+      "situation": "Ihre Bekannte Lisa hat Sie für das Wochenende zu sich nach München eingeladen. Schreiben Sie an Lisa.",
+      "whatToInclude": [
+        "Dank: Bedanken Sie sich für die Einladung.",
+        "Ankunftszeit: Sagen Sie, wann Sie am Bahnhof ankommen.",
+        "Verkehrsmittel: Sagen Sie, wie Sie reisen, zum Beispiel mit dem Zug."
+      ]
+    },
+    "a1-10": {
+      "id": "a1-10",
+      "level": "A1",
+      "situation": "Die Heizung in Ihrer Wohnung ist kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Problem: Sagen Sie, dass die Heizung nicht funktioniert und die Wohnung kalt ist.",
+        "Termin: Sagen Sie, wann Sie für den Handwerker zu Hause sind.",
+        "Rückruf: Bitten Sie um eine schnelle Reparatur oder einen Anruf."
+      ]
+    },
+    "a2-1": {
+      "id": "a2-1",
+      "level": "A2",
+      "situation": "Schreiben Sie eine Beschwerde an eine Firma über einen defekten Fernseher.",
+      "whatToInclude": [
+        "Was haben Sie gekauft?",
+        "Was ist das Problem?",
+        "Was erwarten Sie?"
+      ]
+    },
+    "a2-2": {
+      "id": "a2-2",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Sprachschule und informieren Sie sich über einen Kurs.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wann möchten Sie beginnen?",
+        "Was möchten Sie wissen?"
+      ]
+    },
+    "a2-3": {
+      "id": "a2-3",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Brief an Ihren Freund und erzählen Sie von Ihrem neuen Hobby.",
+      "whatToInclude": [
+        "Was ist Ihr Hobby?",
+        "Wie oft machen Sie es?",
+        "Warum mögen Sie es?"
+      ]
+    },
+    "a2-4": {
+      "id": "a2-4",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an Ihren Chef und erklären Sie, warum Sie heute zu spät kommen.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Was ist passiert?",
+        "Wann kommen Sie zur Arbeit?"
+      ]
+    },
+    "a2-5": {
+      "id": "a2-5",
+      "level": "A2",
+      "situation": "Schreiben Sie eine Nachricht an Ihren Nachbarn, Sie feiern am Samstag eine Party.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wann beginnt die Party?",
+        "Worauf sollen die Nachbarn achten?"
+      ]
+    },
+    "a2-6": {
+      "id": "a2-6",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Universität und bitten Sie um Informationen zum Studium.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welchen Studiengang möchten Sie?",
+        "Welche Fragen haben Sie?"
+      ]
+    },
+    "a2-7": {
+      "id": "a2-7",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Blogbeitrag über Ihren letzten Urlaub.",
+      "whatToInclude": [
+        "Wohin sind Sie gefahren?",
+        "Was haben Sie erlebt?",
+        "Würden Sie wieder dorthin fahren?"
+      ]
+    },
+    "a2-8": {
+      "id": "a2-8",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an einen Freund und bitten Sie ihn, Ihre Pflanzen zu gießen.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wie lange sind Sie weg?",
+        "Was soll Ihr Freund noch machen?"
+      ]
+    },
+    "a2-9": {
+      "id": "a2-9",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Wohnungsgesellschaft und fragen Sie nach einer Wohnung.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welche Wohnung suchen Sie?",
+        "Wann möchten Sie einziehen?"
+      ]
+    },
+    "a2-10": {
+      "id": "a2-10",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Brief an Ihren Sportlehrer und melden Sie sich zum Kurs an.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Für welchen Kurs?",
+        "Wann können Sie teilnehmen?"
+      ]
+    },
+    "b1-1": {
+      "id": "b1-1",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Leserbrief an eine Zeitung über die Umweltverschmutzung in Ihrer Stadt.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welche Probleme sehen Sie?",
+        "Was schlagen Sie vor?"
+      ]
+    },
+    "b1-2": {
+      "id": "b1-2",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an einen Reiseveranstalter und beschweren Sie sich über Ihren Urlaub.",
+      "whatToInclude": [
+        "Wohin sind Sie gereist?",
+        "Was hat Ihnen nicht gefallen?",
+        "Was erwarten Sie als Entschädigung?"
+      ]
+    },
+    "b1-3": {
+      "id": "b1-3",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Bericht für Ihren Chef über ein erfolgreiches Projekt.",
+      "whatToInclude": [
+        "Welches Projekt?",
+        "Was waren die Ergebnisse?",
+        "Was empfehlen Sie für die Zukunft?"
+      ]
+    },
+    "b1-4": {
+      "id": "b1-4",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an Ihren Professor und bitten Sie um eine Verlängerung der Abgabefrist.",
+      "whatToInclude": [
+        "Warum brauchen Sie mehr Zeit?",
+        "Wie lange brauchen Sie?",
+        "Wie bedanken Sie sich?"
+      ]
+    },
+    "b1-5": {
+      "id": "b1-5",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Artikel für den Schulblog über gesunde Ernährung.",
+      "whatToInclude": [
+        "Warum ist das Thema wichtig?",
+        "Welche Tipps haben Sie?",
+        "Was ist Ihr persönlicher Rat?"
+      ]
+    },
+    "b1-6": {
+      "id": "b1-6",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an einen Freund und erzählen Sie von Ihrem Umzug in eine andere Stadt.",
+      "whatToInclude": [
+        "Warum sind Sie umgezogen?",
+        "Wie gefällt es Ihnen dort?",
+        "Was vermissen Sie?"
+      ]
+    },
+    "b1-7": {
+      "id": "b1-7",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Brief an Ihre Gemeinde und schlagen Sie ein neues Sportzentrum vor.",
+      "whatToInclude": [
+        "Warum wäre es wichtig?",
+        "Wo sollte es stehen?",
+        "Wer würde es nutzen?"
+      ]
+    },
+    "b1-8": {
+      "id": "b1-8",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an eine Firma und bewerben Sie sich um ein Praktikum.",
+      "whatToInclude": [
+        "Was studieren Sie?",
+        "Warum interessieren Sie sich für die Firma?",
+        "Was können Sie anbieten?"
+      ]
+    },
+    "b1-9": {
+      "id": "b1-9",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Kommentar in einem Forum über die Nutzung von Smartphones.",
+      "whatToInclude": [
+        "Was ist Ihre Meinung?",
+        "Welche Vorteile sehen Sie?",
+        "Welche Nachteile gibt es?"
+      ]
+    },
+    "b1-10": {
+      "id": "b1-10",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Brief an einen Freund und erzählen Sie von einem kulturellen Erlebnis.",
+      "whatToInclude": [
+        "Was haben Sie erlebt?",
+        "Mit wem waren Sie dort?",
+        "Wie haben Sie sich gefühlt?"
+      ]
+    },
+    "b2-1": {
+      "id": "b2-1",
+      "level": "B2",
+      "situation": "Schreiben Sie einen Bericht an Ihren Vorgesetzten über die Ergebnisse einer Marktanalyse.",
+      "whatToInclude": [
+        "Welche Ziele hatte die Analyse?",
+        "Welche wichtigsten Ergebnisse haben Sie gefunden?",
+        "Welche nächsten Schritte empfehlen Sie?"
+      ]
+    },
+    "b2-2": {
+      "id": "b2-2",
+      "level": "B2",
+      "situation": "Verfassen Sie eine formelle E-Mail an einen Geschäftspartner, um eine Verzögerung im Projekt zu erklären.",
+      "whatToInclude": [
+        "Warum gibt es die Verzögerung?",
+        "Welche Auswirkungen hat sie?",
+        "Wie möchten Sie weiter vorgehen?"
+      ]
+    },
+    "b2-3": {
+      "id": "b2-3",
+      "level": "B2",
+      "situation": "Schreiben Sie eine Stellungnahme für die Personalabteilung zur Verbesserung der Arbeitsbedingungen.",
+      "whatToInclude": [
+        "Welche Probleme haben Sie beobachtet?",
+        "Welche Vorschläge haben Sie?",
+        "Wie profitieren Mitarbeiter und Unternehmen?"
+      ]
+    },
+    "b2-4": {
+      "id": "b2-4",
+      "level": "B2",
+      "situation": "Erstellen Sie eine Einladung zu einem Workshop für Mitarbeiter über digitales Marketing.",
+      "whatToInclude": [
+        "Warum wird der Workshop veranstaltet?",
+        "Welche Themen werden behandelt?",
+        "Wie können sich Mitarbeiter anmelden?"
+      ]
+    },
+    "b2-5": {
+      "id": "b2-5",
+      "level": "B2",
+      "situation": "Schreiben Sie einen Bericht über die Ergebnisse einer Kundenumfrage für die Geschäftsleitung.",
+      "whatToInclude": [
+        "Wie wurde die Umfrage durchgeführt?",
+        "Welche Trends zeigen die Ergebnisse?",
+        "Welche Maßnahmen schlagen Sie vor?"
+      ]
+    },
+    "c1-1": {
+      "id": "c1-1",
+      "level": "C1",
+      "situation": "Verfassen Sie eine Analyse für ein Fachjournal über die Auswirkungen der Globalisierung auf mittelständische Unternehmen.",
+      "whatToInclude": [
+        "Welche Aspekte der Globalisierung betrachten Sie?",
+        "Welche Chancen und Risiken sehen Sie?",
+        "Welche Handlungsempfehlungen geben Sie?"
+      ]
+    },
+    "c1-2": {
+      "id": "c1-2",
+      "level": "C1",
+      "situation": "Schreiben Sie ein Gutachten für eine Kommune zur Integration erneuerbarer Energien in die städtische Infrastruktur.",
+      "whatToInclude": [
+        "Welche Technologien schlagen Sie vor?",
+        "Wie sollen sie finanziert werden?",
+        "Welche langfristigen Vorteile erwarten Sie?"
+      ]
+    },
+    "c1-3": {
+      "id": "c1-3",
+      "level": "C1",
+      "situation": "Erstellen Sie eine Rede für eine Konferenz zum Thema digitale Ethik.",
+      "whatToInclude": [
+        "Welche Hauptpunkte möchten Sie hervorheben?",
+        "Welche Beispiele unterstützen Ihre Argumente?",
+        "Welche Fragen stellen Sie dem Publikum?"
+      ]
+    },
+    "c1-4": {
+      "id": "c1-4",
+      "level": "C1",
+      "situation": "Verfassen Sie einen Kommentar für eine Zeitung über die Bedeutung lebenslangen Lernens in der modernen Arbeitswelt.",
+      "whatToInclude": [
+        "Warum ist lebenslanges Lernen wichtig?",
+        "Welche Herausforderungen gibt es?",
+        "Welche Lösungen schlagen Sie vor?"
+      ]
+    },
+    "c1-5": {
+      "id": "c1-5",
+      "level": "C1",
+      "situation": "Schreiben Sie einen Projektvorschlag für eine internationale Kooperation in der Forschung.",
+      "whatToInclude": [
+        "Welches Ziel verfolgt das Projekt?",
+        "Wer sind die beteiligten Partner?",
+        "Wie wird der Erfolg gemessen?"
+      ]
+    }
+  },
+  "speaking": {
+    "a1-teil-1-introduction": {
+      "id": "a1-teil-1-introduction",
+      "level": "A1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Stellen Sie sich kurz vor",
+      "keywordSubtopic": "Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby",
+      "text": "Stellen Sie sich kurz vor (Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby)",
+      "hint": "Sprechen Sie kurz über alle Punkte in einer Antwort."
+    },
+    "a1-teil-2-gesch-ft-9": {
+      "id": "a1-teil-2-gesch-ft-9",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Geschäft",
+      "keywordSubtopic": "schließen",
+      "text": "Geschäft (schließen)",
+      "hint": "Stichwort: schließen"
+    },
+    "a1-teil-2-uhr-10": {
+      "id": "a1-teil-2-uhr-10",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Uhr",
+      "keywordSubtopic": "Uhrzeit",
+      "text": "Uhr (Uhrzeit)",
+      "hint": "Stichwort: Uhrzeit"
+    },
+    "a1-teil-2-rauchen-11": {
+      "id": "a1-teil-2-rauchen-11",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Rauchen",
+      "keywordSubtopic": "Verboten",
+      "text": "Rauchen (Verboten)",
+      "hint": "Stichwort: Verboten"
+    },
+    "a1-teil-2-essen-12": {
+      "id": "a1-teil-2-essen-12",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Essen",
+      "keywordSubtopic": "Erlaubt",
+      "text": "Essen (Erlaubt)",
+      "hint": "Stichwort: Erlaubt"
+    },
+    "a1-teil-2-arbeit-13": {
+      "id": "a1-teil-2-arbeit-13",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Arbeit",
+      "keywordSubtopic": "Kollege",
+      "text": "Arbeit (Kollege)",
+      "hint": "Stichwort: Kollege"
+    },
+    "a1-teil-2-hausaufgabe-14": {
+      "id": "a1-teil-2-hausaufgabe-14",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Hausaufgabe",
+      "keywordSubtopic": "machen",
+      "text": "Hausaufgabe (machen)",
+      "hint": "Stichwort: machen"
+    },
+    "a1-teil-2-k-che-15": {
+      "id": "a1-teil-2-k-che-15",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Küche",
+      "keywordSubtopic": "kochen",
+      "text": "Küche (kochen)",
+      "hint": "Stichwort: kochen"
+    },
+    "a1-teil-2-freizeit-16": {
+      "id": "a1-teil-2-freizeit-16",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freizeit",
+      "keywordSubtopic": "lesen",
+      "text": "Freizeit (lesen)",
+      "hint": "Stichwort: lesen"
+    },
+    "a1-teil-2-telefon-17": {
+      "id": "a1-teil-2-telefon-17",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Telefon",
+      "keywordSubtopic": "anrufen",
+      "text": "Telefon (anrufen)",
+      "hint": "Stichwort: anrufen"
+    },
+    "a1-teil-2-reise-18": {
+      "id": "a1-teil-2-reise-18",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Reise",
+      "keywordSubtopic": "Hotel",
+      "text": "Reise (Hotel)",
+      "hint": "Stichwort: Hotel"
+    },
+    "a1-teil-2-auto-19": {
+      "id": "a1-teil-2-auto-19",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Auto",
+      "keywordSubtopic": "fahren",
+      "text": "Auto (fahren)",
+      "hint": "Stichwort: fahren"
+    },
+    "a1-teil-2-einkaufen-20": {
+      "id": "a1-teil-2-einkaufen-20",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen",
+      "keywordSubtopic": "Obst",
+      "text": "Einkaufen (Obst)",
+      "hint": "Stichwort: Obst"
+    },
+    "a1-teil-2-schule-21": {
+      "id": "a1-teil-2-schule-21",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Schule",
+      "keywordSubtopic": "Lehrer",
+      "text": "Schule (Lehrer)",
+      "hint": "Stichwort: Lehrer"
+    },
+    "a1-teil-2-geburtstag-22": {
+      "id": "a1-teil-2-geburtstag-22",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Geburtstag",
+      "keywordSubtopic": "Geschenk",
+      "text": "Geburtstag (Geschenk)",
+      "hint": "Stichwort: Geschenk"
+    },
+    "a1-teil-2-essen-23": {
+      "id": "a1-teil-2-essen-23",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Essen",
+      "keywordSubtopic": "Frühstück",
+      "text": "Essen (Frühstück)",
+      "hint": "Stichwort: Frühstück"
+    },
+    "a1-teil-2-arzt-24": {
+      "id": "a1-teil-2-arzt-24",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Arzt",
+      "keywordSubtopic": "Termin",
+      "text": "Arzt (Termin)",
+      "hint": "Stichwort: Termin"
+    },
+    "a1-teil-2-zug-25": {
+      "id": "a1-teil-2-zug-25",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Zug",
+      "keywordSubtopic": "Abfahrt",
+      "text": "Zug (Abfahrt)",
+      "hint": "Stichwort: Abfahrt"
+    },
+    "a1-teil-2-wetter-26": {
+      "id": "a1-teil-2-wetter-26",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wetter",
+      "keywordSubtopic": "Regen",
+      "text": "Wetter (Regen)",
+      "hint": "Stichwort: Regen"
+    },
+    "a1-teil-2-buch-27": {
+      "id": "a1-teil-2-buch-27",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Buch",
+      "keywordSubtopic": "lesen",
+      "text": "Buch (lesen)",
+      "hint": "Stichwort: lesen"
+    },
+    "a1-teil-2-computer-28": {
+      "id": "a1-teil-2-computer-28",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Computer",
+      "keywordSubtopic": "E-Mail",
+      "text": "Computer (E-Mail)",
+      "hint": "Stichwort: E-Mail"
+    },
+    "a1-teil-2-kind-29": {
+      "id": "a1-teil-2-kind-29",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kind",
+      "keywordSubtopic": "spielen",
+      "text": "Kind (spielen)",
+      "hint": "Stichwort: spielen"
+    },
+    "a1-teil-2-wochenende-30": {
+      "id": "a1-teil-2-wochenende-30",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wochenende",
+      "keywordSubtopic": "Plan",
+      "text": "Wochenende (Plan)",
+      "hint": "Stichwort: Plan"
+    },
+    "a1-teil-2-bank-31": {
+      "id": "a1-teil-2-bank-31",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bank",
+      "keywordSubtopic": "Geld",
+      "text": "Bank (Geld)",
+      "hint": "Stichwort: Geld"
+    },
+    "a1-teil-2-sport-32": {
+      "id": "a1-teil-2-sport-32",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sport",
+      "keywordSubtopic": "laufen",
+      "text": "Sport (laufen)",
+      "hint": "Stichwort: laufen"
+    },
+    "a1-teil-2-abend-33": {
+      "id": "a1-teil-2-abend-33",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Abend",
+      "keywordSubtopic": "Fernsehen",
+      "text": "Abend (Fernsehen)",
+      "hint": "Stichwort: Fernsehen"
+    },
+    "a1-teil-2-freunde-34": {
+      "id": "a1-teil-2-freunde-34",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freunde",
+      "keywordSubtopic": "Besuch",
+      "text": "Freunde (Besuch)",
+      "hint": "Stichwort: Besuch"
+    },
+    "a1-teil-2-bahn-35": {
+      "id": "a1-teil-2-bahn-35",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bahn",
+      "keywordSubtopic": "Fahrkarte",
+      "text": "Bahn (Fahrkarte)",
+      "hint": "Stichwort: Fahrkarte"
+    },
+    "a1-teil-2-stra-e-36": {
+      "id": "a1-teil-2-stra-e-36",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Straße",
+      "keywordSubtopic": "Stau",
+      "text": "Straße (Stau)",
+      "hint": "Stichwort: Stau"
+    },
+    "a1-teil-2-essen-gehen-37": {
+      "id": "a1-teil-2-essen-gehen-37",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Essen gehen",
+      "keywordSubtopic": "Restaurant",
+      "text": "Essen gehen (Restaurant)",
+      "hint": "Stichwort: Restaurant"
+    },
+    "a1-teil-2-hund-38": {
+      "id": "a1-teil-2-hund-38",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Hund",
+      "keywordSubtopic": "Futter",
+      "text": "Hund (Futter)",
+      "hint": "Stichwort: Futter"
+    },
+    "a1-teil-2-familie-39": {
+      "id": "a1-teil-2-familie-39",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Familie",
+      "keywordSubtopic": "Kinder",
+      "text": "Familie (Kinder)",
+      "hint": "Stichwort: Kinder"
+    },
+    "a1-teil-2-post-40": {
+      "id": "a1-teil-2-post-40",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Post",
+      "keywordSubtopic": "Brief",
+      "text": "Post (Brief)",
+      "hint": "Stichwort: Brief"
+    },
+    "a1-teil-2-nachbarn-41": {
+      "id": "a1-teil-2-nachbarn-41",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Nachbarn",
+      "keywordSubtopic": "laut",
+      "text": "Nachbarn (laut)",
+      "hint": "Stichwort: laut"
+    },
+    "a1-teil-2-kleid-42": {
+      "id": "a1-teil-2-kleid-42",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kleid",
+      "keywordSubtopic": "kaufen",
+      "text": "Kleid (kaufen)",
+      "hint": "Stichwort: kaufen"
+    },
+    "a1-teil-2-b-ro-43": {
+      "id": "a1-teil-2-b-ro-43",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Büro",
+      "keywordSubtopic": "Chef",
+      "text": "Büro (Chef)",
+      "hint": "Stichwort: Chef"
+    },
+    "a1-teil-2-urlaub-44": {
+      "id": "a1-teil-2-urlaub-44",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Urlaub",
+      "keywordSubtopic": "Strand",
+      "text": "Urlaub (Strand)",
+      "hint": "Stichwort: Strand"
+    },
+    "a1-teil-2-kino-45": {
+      "id": "a1-teil-2-kino-45",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kino",
+      "keywordSubtopic": "Film",
+      "text": "Kino (Film)",
+      "hint": "Stichwort: Film"
+    },
+    "a1-teil-2-internet-46": {
+      "id": "a1-teil-2-internet-46",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Internet",
+      "keywordSubtopic": "Seite",
+      "text": "Internet (Seite)",
+      "hint": "Stichwort: Seite"
+    },
+    "a1-teil-2-bus-47": {
+      "id": "a1-teil-2-bus-47",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bus",
+      "keywordSubtopic": "Abfahrt",
+      "text": "Bus (Abfahrt)",
+      "hint": "Stichwort: Abfahrt"
+    },
+    "a1-teil-2-arztpraxis-48": {
+      "id": "a1-teil-2-arztpraxis-48",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Arztpraxis",
+      "keywordSubtopic": "Wartezeit",
+      "text": "Arztpraxis (Wartezeit)",
+      "hint": "Stichwort: Wartezeit"
+    },
+    "a1-teil-2-kuchen-49": {
+      "id": "a1-teil-2-kuchen-49",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kuchen",
+      "keywordSubtopic": "backen",
+      "text": "Kuchen (backen)",
+      "hint": "Stichwort: backen"
+    },
+    "a1-teil-2-park-50": {
+      "id": "a1-teil-2-park-50",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Park",
+      "keywordSubtopic": "spazieren",
+      "text": "Park (spazieren)",
+      "hint": "Stichwort: spazieren"
+    },
+    "a1-teil-2-b-ckerei-51": {
+      "id": "a1-teil-2-b-ckerei-51",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bäckerei",
+      "keywordSubtopic": "Brötchen",
+      "text": "Bäckerei (Brötchen)",
+      "hint": "Stichwort: Brötchen"
+    },
+    "a1-teil-2-geldautomat-52": {
+      "id": "a1-teil-2-geldautomat-52",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Geldautomat",
+      "keywordSubtopic": "Karte",
+      "text": "Geldautomat (Karte)",
+      "hint": "Stichwort: Karte"
+    },
+    "a1-teil-2-buchladen-53": {
+      "id": "a1-teil-2-buchladen-53",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Buchladen",
+      "keywordSubtopic": "Roman",
+      "text": "Buchladen (Roman)",
+      "hint": "Stichwort: Roman"
+    },
+    "a1-teil-2-fernseher-54": {
+      "id": "a1-teil-2-fernseher-54",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Fernseher",
+      "keywordSubtopic": "Programm",
+      "text": "Fernseher (Programm)",
+      "hint": "Stichwort: Programm"
+    },
+    "a1-teil-2-tasche-55": {
+      "id": "a1-teil-2-tasche-55",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Tasche",
+      "keywordSubtopic": "vergessen",
+      "text": "Tasche (vergessen)",
+      "hint": "Stichwort: vergessen"
+    },
+    "a1-teil-2-stadtplan-56": {
+      "id": "a1-teil-2-stadtplan-56",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Stadtplan",
+      "keywordSubtopic": "finden",
+      "text": "Stadtplan (finden)",
+      "hint": "Stichwort: finden"
+    },
+    "a1-teil-2-ticket-57": {
+      "id": "a1-teil-2-ticket-57",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Ticket",
+      "keywordSubtopic": "bezahlen",
+      "text": "Ticket (bezahlen)",
+      "hint": "Stichwort: bezahlen"
+    },
+    "a1-teil-2-zahnarzt-58": {
+      "id": "a1-teil-2-zahnarzt-58",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Zahnarzt",
+      "keywordSubtopic": "Schmerzen",
+      "text": "Zahnarzt (Schmerzen)",
+      "hint": "Stichwort: Schmerzen"
+    },
+    "a1-teil-2-museum-59": {
+      "id": "a1-teil-2-museum-59",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Museum",
+      "keywordSubtopic": "Öffnungszeiten",
+      "text": "Museum (Öffnungszeiten)",
+      "hint": "Stichwort: Öffnungszeiten"
+    },
+    "a1-teil-2-handy-60": {
+      "id": "a1-teil-2-handy-60",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Handy",
+      "keywordSubtopic": "Akku leer",
+      "text": "Handy (Akku leer)",
+      "hint": "Stichwort: Akku leer"
+    },
+    "a1-teil-3-radio-anmachen-61": {
+      "id": "a1-teil-3-radio-anmachen-61",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Radio anmachen",
+      "keywordSubtopic": "",
+      "text": "Radio anmachen",
+      "hint": ""
+    },
+    "a1-teil-3-fenster-zumachen-62": {
+      "id": "a1-teil-3-fenster-zumachen-62",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fenster zumachen",
+      "keywordSubtopic": "",
+      "text": "Fenster zumachen",
+      "hint": ""
+    },
+    "a1-teil-3-licht-anschalten-63": {
+      "id": "a1-teil-3-licht-anschalten-63",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Licht anschalten",
+      "keywordSubtopic": "",
+      "text": "Licht anschalten",
+      "hint": ""
+    },
+    "a1-teil-3-t-r-aufmachen-64": {
+      "id": "a1-teil-3-t-r-aufmachen-64",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tür aufmachen",
+      "keywordSubtopic": "",
+      "text": "Tür aufmachen",
+      "hint": ""
+    },
+    "a1-teil-3-tisch-sauber-machen-65": {
+      "id": "a1-teil-3-tisch-sauber-machen-65",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tisch sauber machen",
+      "keywordSubtopic": "",
+      "text": "Tisch sauber machen",
+      "hint": ""
+    },
+    "a1-teil-3-hausaufgaben-schicken-66": {
+      "id": "a1-teil-3-hausaufgaben-schicken-66",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Hausaufgaben schicken",
+      "keywordSubtopic": "",
+      "text": "Hausaufgaben schicken",
+      "hint": ""
+    },
+    "a1-teil-3-buch-bringen-67": {
+      "id": "a1-teil-3-buch-bringen-67",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Buch bringen",
+      "keywordSubtopic": "",
+      "text": "Buch bringen",
+      "hint": ""
+    },
+    "a1-teil-3-handy-ausmachen-68": {
+      "id": "a1-teil-3-handy-ausmachen-68",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Handy ausmachen",
+      "keywordSubtopic": "",
+      "text": "Handy ausmachen",
+      "hint": ""
+    },
+    "a1-teil-3-stuhl-nehmen-69": {
+      "id": "a1-teil-3-stuhl-nehmen-69",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Stuhl nehmen",
+      "keywordSubtopic": "",
+      "text": "Stuhl nehmen",
+      "hint": ""
+    },
+    "a1-teil-3-wasser-holen-70": {
+      "id": "a1-teil-3-wasser-holen-70",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Wasser holen",
+      "keywordSubtopic": "",
+      "text": "Wasser holen",
+      "hint": ""
+    },
+    "a1-teil-3-fenster-ffnen-71": {
+      "id": "a1-teil-3-fenster-ffnen-71",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fenster öffnen",
+      "keywordSubtopic": "",
+      "text": "Fenster öffnen",
+      "hint": ""
+    },
+    "a1-teil-3-musik-leiser-machen-72": {
+      "id": "a1-teil-3-musik-leiser-machen-72",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Musik leiser machen",
+      "keywordSubtopic": "",
+      "text": "Musik leiser machen",
+      "hint": ""
+    },
+    "a1-teil-3-tafel-sauber-wischen-73": {
+      "id": "a1-teil-3-tafel-sauber-wischen-73",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tafel sauber wischen",
+      "keywordSubtopic": "",
+      "text": "Tafel sauber wischen",
+      "hint": ""
+    },
+    "a1-teil-3-kaffee-kochen-74": {
+      "id": "a1-teil-3-kaffee-kochen-74",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Kaffee kochen",
+      "keywordSubtopic": "",
+      "text": "Kaffee kochen",
+      "hint": ""
+    },
+    "a1-teil-3-deutsch-ben-75": {
+      "id": "a1-teil-3-deutsch-ben-75",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Deutsch üben",
+      "keywordSubtopic": "",
+      "text": "Deutsch üben",
+      "hint": ""
+    },
+    "a1-teil-3-auto-waschen-76": {
+      "id": "a1-teil-3-auto-waschen-76",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Auto waschen",
+      "keywordSubtopic": "",
+      "text": "Auto waschen",
+      "hint": ""
+    },
+    "a1-teil-3-kind-abholen-77": {
+      "id": "a1-teil-3-kind-abholen-77",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Kind abholen",
+      "keywordSubtopic": "",
+      "text": "Kind abholen",
+      "hint": ""
+    },
+    "a1-teil-3-tisch-decken-78": {
+      "id": "a1-teil-3-tisch-decken-78",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tisch decken",
+      "keywordSubtopic": "",
+      "text": "Tisch decken",
+      "hint": ""
+    },
+    "a1-teil-3-termin-machen-79": {
+      "id": "a1-teil-3-termin-machen-79",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Termin machen",
+      "keywordSubtopic": "",
+      "text": "Termin machen",
+      "hint": ""
+    },
+    "a1-teil-3-nachricht-schreiben-80": {
+      "id": "a1-teil-3-nachricht-schreiben-80",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Nachricht schreiben",
+      "keywordSubtopic": "",
+      "text": "Nachricht schreiben",
+      "hint": ""
+    },
+    "a2-teil-1-wohnort-81": {
+      "id": "a2-teil-1-wohnort-81",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wohnort",
+      "keywordSubtopic": "",
+      "text": "Wohnort",
+      "hint": ""
+    },
+    "a2-teil-1-tagesablauf-82": {
+      "id": "a2-teil-1-tagesablauf-82",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Tagesablauf",
+      "keywordSubtopic": "",
+      "text": "Tagesablauf",
+      "hint": ""
+    },
+    "a2-teil-1-freizeit-83": {
+      "id": "a2-teil-1-freizeit-83",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Freizeit",
+      "keywordSubtopic": "",
+      "text": "Freizeit",
+      "hint": ""
+    },
+    "a2-teil-1-sprachen-84": {
+      "id": "a2-teil-1-sprachen-84",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sprachen",
+      "keywordSubtopic": "",
+      "text": "Sprachen",
+      "hint": ""
+    },
+    "a2-teil-1-essen-trinken-85": {
+      "id": "a2-teil-1-essen-trinken-85",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Essen & Trinken",
+      "keywordSubtopic": "",
+      "text": "Essen & Trinken",
+      "hint": ""
+    },
+    "a2-teil-1-haustiere-86": {
+      "id": "a2-teil-1-haustiere-86",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Haustiere",
+      "keywordSubtopic": "",
+      "text": "Haustiere",
+      "hint": ""
+    },
+    "a2-teil-1-lieblingsmonat-87": {
+      "id": "a2-teil-1-lieblingsmonat-87",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Lieblingsmonat",
+      "keywordSubtopic": "",
+      "text": "Lieblingsmonat",
+      "hint": ""
+    },
+    "a2-teil-1-jahreszeit-88": {
+      "id": "a2-teil-1-jahreszeit-88",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Jahreszeit",
+      "keywordSubtopic": "",
+      "text": "Jahreszeit",
+      "hint": ""
+    },
+    "a2-teil-1-sport-89": {
+      "id": "a2-teil-1-sport-89",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sport",
+      "keywordSubtopic": "",
+      "text": "Sport",
+      "hint": ""
+    },
+    "a2-teil-1-kleidung-sommer-90": {
+      "id": "a2-teil-1-kleidung-sommer-90",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Kleidung (Sommer)",
+      "keywordSubtopic": "",
+      "text": "Kleidung (Sommer)",
+      "hint": ""
+    },
+    "a2-teil-1-familie-91": {
+      "id": "a2-teil-1-familie-91",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Familie",
+      "keywordSubtopic": "",
+      "text": "Familie",
+      "hint": ""
+    },
+    "a2-teil-1-beruf-92": {
+      "id": "a2-teil-1-beruf-92",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Beruf",
+      "keywordSubtopic": "",
+      "text": "Beruf",
+      "hint": ""
+    },
+    "a2-teil-1-hobbys-93": {
+      "id": "a2-teil-1-hobbys-93",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Hobbys",
+      "keywordSubtopic": "",
+      "text": "Hobbys",
+      "hint": ""
+    },
+    "a2-teil-1-feiertage-94": {
+      "id": "a2-teil-1-feiertage-94",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Feiertage",
+      "keywordSubtopic": "",
+      "text": "Feiertage",
+      "hint": ""
+    },
+    "a2-teil-1-reisen-95": {
+      "id": "a2-teil-1-reisen-95",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Reisen",
+      "keywordSubtopic": "",
+      "text": "Reisen",
+      "hint": ""
+    },
+    "a2-teil-1-lieblingsessen-96": {
+      "id": "a2-teil-1-lieblingsessen-96",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Lieblingsessen",
+      "keywordSubtopic": "",
+      "text": "Lieblingsessen",
+      "hint": ""
+    },
+    "a2-teil-1-schule-97": {
+      "id": "a2-teil-1-schule-97",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Schule",
+      "keywordSubtopic": "",
+      "text": "Schule",
+      "hint": ""
+    },
+    "a2-teil-1-wetter-98": {
+      "id": "a2-teil-1-wetter-98",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wetter",
+      "keywordSubtopic": "",
+      "text": "Wetter",
+      "hint": ""
+    },
+    "a2-teil-1-auto-oder-fahrrad-99": {
+      "id": "a2-teil-1-auto-oder-fahrrad-99",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Auto oder Fahrrad",
+      "keywordSubtopic": "",
+      "text": "Auto oder Fahrrad",
+      "hint": ""
+    },
+    "a2-teil-1-perfekter-tag-100": {
+      "id": "a2-teil-1-perfekter-tag-100",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Perfekter Tag",
+      "keywordSubtopic": "",
+      "text": "Perfekter Tag",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-mit-ihrem-geld-101": {
+      "id": "a2-teil-2-was-machen-sie-mit-ihrem-geld-101",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie mit Ihrem Geld?",
+      "keywordSubtopic": "",
+      "text": "Was machen Sie mit Ihrem Geld?",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-am-wochenende-102": {
+      "id": "a2-teil-2-was-machen-sie-am-wochenende-102",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie am Wochenende?",
+      "keywordSubtopic": "",
+      "text": "Was machen Sie am Wochenende?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-verbringen-sie-ihren-urlaub-103": {
+      "id": "a2-teil-2-wie-verbringen-sie-ihren-urlaub-103",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie verbringen Sie Ihren Urlaub?",
+      "keywordSubtopic": "",
+      "text": "Wie verbringen Sie Ihren Urlaub?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-oft-gehen-sie-einkaufen-und-was-kaufen-sie-104": {
+      "id": "a2-teil-2-wie-oft-gehen-sie-einkaufen-und-was-kaufen-sie-104",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie oft gehen Sie einkaufen und was kaufen Sie?",
+      "keywordSubtopic": "",
+      "text": "Wie oft gehen Sie einkaufen und was kaufen Sie?",
+      "hint": ""
+    },
+    "a2-teil-2-was-f-r-musik-h-ren-sie-gern-105": {
+      "id": "a2-teil-2-was-f-r-musik-h-ren-sie-gern-105",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was für Musik hören Sie gern?",
+      "keywordSubtopic": "",
+      "text": "Was für Musik hören Sie gern?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-feiern-sie-ihren-geburtstag-106": {
+      "id": "a2-teil-2-wie-feiern-sie-ihren-geburtstag-106",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie feiern Sie Ihren Geburtstag?",
+      "keywordSubtopic": "",
+      "text": "Wie feiern Sie Ihren Geburtstag?",
+      "hint": ""
+    },
+    "a2-teil-2-welche-verkehrsmittel-nutzen-sie-107": {
+      "id": "a2-teil-2-welche-verkehrsmittel-nutzen-sie-107",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welche Verkehrsmittel nutzen Sie?",
+      "keywordSubtopic": "",
+      "text": "Welche Verkehrsmittel nutzen Sie?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-bleiben-sie-gesund-108": {
+      "id": "a2-teil-2-wie-bleiben-sie-gesund-108",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie bleiben Sie gesund?",
+      "keywordSubtopic": "",
+      "text": "Wie bleiben Sie gesund?",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-gern-mit-ihrer-familie-109": {
+      "id": "a2-teil-2-was-machen-sie-gern-mit-ihrer-familie-109",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie gern mit Ihrer Familie?",
+      "keywordSubtopic": "",
+      "text": "Was machen Sie gern mit Ihrer Familie?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-sieht-ihr-traumhaus-aus-110": {
+      "id": "a2-teil-2-wie-sieht-ihr-traumhaus-aus-110",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie sieht Ihr Traumhaus aus?",
+      "keywordSubtopic": "",
+      "text": "Wie sieht Ihr Traumhaus aus?",
+      "hint": ""
+    },
+    "a2-teil-2-welche-filme-oder-serien-m-gen-sie-111": {
+      "id": "a2-teil-2-welche-filme-oder-serien-m-gen-sie-111",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welche Filme oder Serien mögen Sie?",
+      "keywordSubtopic": "",
+      "text": "Welche Filme oder Serien mögen Sie?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-oft-gehen-sie-ins-restaurant-112": {
+      "id": "a2-teil-2-wie-oft-gehen-sie-ins-restaurant-112",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie oft gehen Sie ins Restaurant?",
+      "keywordSubtopic": "",
+      "text": "Wie oft gehen Sie ins Restaurant?",
+      "hint": ""
+    },
+    "a2-teil-2-was-ist-ihr-lieblingsfeiertag-113": {
+      "id": "a2-teil-2-was-ist-ihr-lieblingsfeiertag-113",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was ist Ihr Lieblingsfeiertag?",
+      "keywordSubtopic": "",
+      "text": "Was ist Ihr Lieblingsfeiertag?",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-morgens-als-erstes-114": {
+      "id": "a2-teil-2-was-machen-sie-morgens-als-erstes-114",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie morgens als Erstes?",
+      "keywordSubtopic": "",
+      "text": "Was machen Sie morgens als Erstes?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-lange-schlafen-sie-normalerweise-115": {
+      "id": "a2-teil-2-wie-lange-schlafen-sie-normalerweise-115",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie lange schlafen Sie normalerweise?",
+      "keywordSubtopic": "",
+      "text": "Wie lange schlafen Sie normalerweise?",
+      "hint": ""
+    },
+    "a2-teil-2-welche-hobbys-hatten-sie-als-kind-116": {
+      "id": "a2-teil-2-welche-hobbys-hatten-sie-als-kind-116",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welche Hobbys hatten Sie als Kind?",
+      "keywordSubtopic": "",
+      "text": "Welche Hobbys hatten Sie als Kind?",
+      "hint": ""
+    },
+    "a2-teil-2-machen-sie-lieber-urlaub-am-meer-oder-in-den-bergen-117": {
+      "id": "a2-teil-2-machen-sie-lieber-urlaub-am-meer-oder-in-den-bergen-117",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Machen Sie lieber Urlaub am Meer oder in den Bergen?",
+      "keywordSubtopic": "",
+      "text": "Machen Sie lieber Urlaub am Meer oder in den Bergen?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-sieht-ihr-lieblingszimmer-aus-118": {
+      "id": "a2-teil-2-wie-sieht-ihr-lieblingszimmer-aus-118",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie sieht Ihr Lieblingszimmer aus?",
+      "keywordSubtopic": "",
+      "text": "Wie sieht Ihr Lieblingszimmer aus?",
+      "hint": ""
+    },
+    "a2-teil-2-was-ist-ihr-lieblingsgesch-ft-119": {
+      "id": "a2-teil-2-was-ist-ihr-lieblingsgesch-ft-119",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was ist Ihr Lieblingsgeschäft?",
+      "keywordSubtopic": "",
+      "text": "Was ist Ihr Lieblingsgeschäft?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-sieht-ein-perfekter-tag-f-r-sie-aus-120": {
+      "id": "a2-teil-2-wie-sieht-ein-perfekter-tag-f-r-sie-aus-120",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie sieht ein perfekter Tag für Sie aus?",
+      "keywordSubtopic": "",
+      "text": "Wie sieht ein perfekter Tag für Sie aus?",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-ins-kino-gehen-121": {
+      "id": "a2-teil-3-zusammen-ins-kino-gehen-121",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen ins Kino gehen",
+      "keywordSubtopic": "",
+      "text": "Zusammen ins Kino gehen",
+      "hint": ""
+    },
+    "a2-teil-3-ein-caf-besuchen-122": {
+      "id": "a2-teil-3-ein-caf-besuchen-122",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein Café besuchen",
+      "keywordSubtopic": "",
+      "text": "Ein Café besuchen",
+      "hint": ""
+    },
+    "a2-teil-3-gemeinsam-einkaufen-gehen-123": {
+      "id": "a2-teil-3-gemeinsam-einkaufen-gehen-123",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Gemeinsam einkaufen gehen",
+      "keywordSubtopic": "",
+      "text": "Gemeinsam einkaufen gehen",
+      "hint": ""
+    },
+    "a2-teil-3-ein-picknick-im-park-organisieren-124": {
+      "id": "a2-teil-3-ein-picknick-im-park-organisieren-124",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein Picknick im Park organisieren",
+      "keywordSubtopic": "",
+      "text": "Ein Picknick im Park organisieren",
+      "hint": ""
+    },
+    "a2-teil-3-eine-fahrradtour-planen-125": {
+      "id": "a2-teil-3-eine-fahrradtour-planen-125",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Eine Fahrradtour planen",
+      "keywordSubtopic": "",
+      "text": "Eine Fahrradtour planen",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-in-die-stadt-gehen-126": {
+      "id": "a2-teil-3-zusammen-in-die-stadt-gehen-126",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen in die Stadt gehen",
+      "keywordSubtopic": "",
+      "text": "Zusammen in die Stadt gehen",
+      "hint": ""
+    },
+    "a2-teil-3-einen-ausflug-ins-schwimmbad-machen-127": {
+      "id": "a2-teil-3-einen-ausflug-ins-schwimmbad-machen-127",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Ausflug ins Schwimmbad machen",
+      "keywordSubtopic": "",
+      "text": "Einen Ausflug ins Schwimmbad machen",
+      "hint": ""
+    },
+    "a2-teil-3-eine-party-organisieren-128": {
+      "id": "a2-teil-3-eine-party-organisieren-128",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Eine Party organisieren",
+      "keywordSubtopic": "",
+      "text": "Eine Party organisieren",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-abendessen-gehen-129": {
+      "id": "a2-teil-3-zusammen-abendessen-gehen-129",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen Abendessen gehen",
+      "keywordSubtopic": "",
+      "text": "Zusammen Abendessen gehen",
+      "hint": ""
+    },
+    "a2-teil-3-gemeinsam-einen-freund-eine-freundin-besuchen-130": {
+      "id": "a2-teil-3-gemeinsam-einen-freund-eine-freundin-besuchen-130",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Gemeinsam einen Freund/eine Freundin besuchen",
+      "keywordSubtopic": "",
+      "text": "Gemeinsam einen Freund/eine Freundin besuchen",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-ins-museum-gehen-131": {
+      "id": "a2-teil-3-zusammen-ins-museum-gehen-131",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen ins Museum gehen",
+      "keywordSubtopic": "",
+      "text": "Zusammen ins Museum gehen",
+      "hint": ""
+    },
+    "a2-teil-3-einen-spaziergang-im-park-machen-132": {
+      "id": "a2-teil-3-einen-spaziergang-im-park-machen-132",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Spaziergang im Park machen",
+      "keywordSubtopic": "",
+      "text": "Einen Spaziergang im Park machen",
+      "hint": ""
+    },
+    "a2-teil-3-ein-konzert-besuchen-133": {
+      "id": "a2-teil-3-ein-konzert-besuchen-133",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein Konzert besuchen",
+      "keywordSubtopic": "",
+      "text": "Ein Konzert besuchen",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-eine-ausstellung-besuchen-134": {
+      "id": "a2-teil-3-zusammen-eine-ausstellung-besuchen-134",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen eine Ausstellung besuchen",
+      "keywordSubtopic": "",
+      "text": "Zusammen eine Ausstellung besuchen",
+      "hint": ""
+    },
+    "a2-teil-3-einen-wochenendausflug-planen-135": {
+      "id": "a2-teil-3-einen-wochenendausflug-planen-135",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Wochenendausflug planen",
+      "keywordSubtopic": "",
+      "text": "Einen Wochenendausflug planen",
+      "hint": ""
+    },
+    "a2-teil-3-ein-theaterst-ck-ansehen-136": {
+      "id": "a2-teil-3-ein-theaterst-ck-ansehen-136",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein Theaterstück ansehen",
+      "keywordSubtopic": "",
+      "text": "Ein Theaterstück ansehen",
+      "hint": ""
+    },
+    "a2-teil-3-ein-neues-restaurant-ausprobieren-137": {
+      "id": "a2-teil-3-ein-neues-restaurant-ausprobieren-137",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein neues Restaurant ausprobieren",
+      "keywordSubtopic": "",
+      "text": "Ein neues Restaurant ausprobieren",
+      "hint": ""
+    },
+    "a2-teil-3-einen-kochabend-organisieren-138": {
+      "id": "a2-teil-3-einen-kochabend-organisieren-138",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Kochabend organisieren",
+      "keywordSubtopic": "",
+      "text": "Einen Kochabend organisieren",
+      "hint": ""
+    },
+    "a2-teil-3-einen-sportevent-besuchen-139": {
+      "id": "a2-teil-3-einen-sportevent-besuchen-139",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Sportevent besuchen",
+      "keywordSubtopic": "",
+      "text": "Einen Sportevent besuchen",
+      "hint": ""
+    },
+    "a2-teil-3-eine-wanderung-machen-140": {
+      "id": "a2-teil-3-eine-wanderung-machen-140",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Eine Wanderung machen",
+      "keywordSubtopic": "",
+      "text": "Eine Wanderung machen",
+      "hint": ""
+    },
+    "b1-teil-1-mithilfe-beim-sommerfest-141": {
+      "id": "b1-teil-1-mithilfe-beim-sommerfest-141",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Mithilfe beim Sommerfest",
+      "keywordSubtopic": "",
+      "text": "Mithilfe beim Sommerfest",
+      "hint": ""
+    },
+    "b1-teil-1-eine-reise-nach-k-ln-planen-142": {
+      "id": "b1-teil-1-eine-reise-nach-k-ln-planen-142",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Eine Reise nach Köln planen",
+      "keywordSubtopic": "",
+      "text": "Eine Reise nach Köln planen",
+      "hint": ""
+    },
+    "b1-teil-1-berraschungsparty-organisieren-143": {
+      "id": "b1-teil-1-berraschungsparty-organisieren-143",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Überraschungsparty organisieren",
+      "keywordSubtopic": "",
+      "text": "Überraschungsparty organisieren",
+      "hint": ""
+    },
+    "b1-teil-1-kulturelles-ereignis-konzert-144": {
+      "id": "b1-teil-1-kulturelles-ereignis-konzert-144",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Kulturelles Ereignis (Konzert",
+      "keywordSubtopic": "Ausstellung) planen",
+      "text": "Kulturelles Ereignis (Konzert (Ausstellung) planen)",
+      "hint": "Stichwort: Ausstellung) planen"
+    },
+    "b1-teil-1-museumsbesuch-organisieren-145": {
+      "id": "b1-teil-1-museumsbesuch-organisieren-145",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Museumsbesuch organisieren",
+      "keywordSubtopic": "",
+      "text": "Museumsbesuch organisieren",
+      "hint": ""
+    },
+    "b1-teil-2-ausbildung-146": {
+      "id": "b1-teil-2-ausbildung-146",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Ausbildung",
+      "keywordSubtopic": "",
+      "text": "Ausbildung",
+      "hint": ""
+    },
+    "b1-teil-2-auslandsaufenthalt-147": {
+      "id": "b1-teil-2-auslandsaufenthalt-147",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Auslandsaufenthalt",
+      "keywordSubtopic": "",
+      "text": "Auslandsaufenthalt",
+      "hint": ""
+    },
+    "b1-teil-2-behinderten-sport-148": {
+      "id": "b1-teil-2-behinderten-sport-148",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Behinderten-Sport",
+      "keywordSubtopic": "",
+      "text": "Behinderten-Sport",
+      "hint": ""
+    },
+    "b1-teil-2-berufst-tige-eltern-149": {
+      "id": "b1-teil-2-berufst-tige-eltern-149",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Berufstätige Eltern",
+      "keywordSubtopic": "",
+      "text": "Berufstätige Eltern",
+      "hint": ""
+    },
+    "b1-teil-2-berufswahl-150": {
+      "id": "b1-teil-2-berufswahl-150",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Berufswahl",
+      "keywordSubtopic": "",
+      "text": "Berufswahl",
+      "hint": ""
+    },
+    "b1-teil-2-bio-essen-151": {
+      "id": "b1-teil-2-bio-essen-151",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bio-Essen",
+      "keywordSubtopic": "",
+      "text": "Bio-Essen",
+      "hint": ""
+    },
+    "b1-teil-2-chatten-152": {
+      "id": "b1-teil-2-chatten-152",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Chatten",
+      "keywordSubtopic": "",
+      "text": "Chatten",
+      "hint": ""
+    },
+    "b1-teil-2-computer-f-r-jeden-kursraum-153": {
+      "id": "b1-teil-2-computer-f-r-jeden-kursraum-153",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Computer für jeden Kursraum",
+      "keywordSubtopic": "",
+      "text": "Computer für jeden Kursraum",
+      "hint": ""
+    },
+    "b1-teil-2-das-internet-154": {
+      "id": "b1-teil-2-das-internet-154",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Das Internet",
+      "keywordSubtopic": "",
+      "text": "Das Internet",
+      "hint": ""
+    },
+    "b1-teil-2-einkaufen-in-einkaufszentren-155": {
+      "id": "b1-teil-2-einkaufen-in-einkaufszentren-155",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen in Einkaufszentren",
+      "keywordSubtopic": "",
+      "text": "Einkaufen in Einkaufszentren",
+      "hint": ""
+    },
+    "b1-teil-2-einkaufen-im-internet-156": {
+      "id": "b1-teil-2-einkaufen-im-internet-156",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen im Internet",
+      "keywordSubtopic": "",
+      "text": "Einkaufen im Internet",
+      "hint": ""
+    },
+    "b1-teil-2-extremsport-157": {
+      "id": "b1-teil-2-extremsport-157",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Extremsport",
+      "keywordSubtopic": "",
+      "text": "Extremsport",
+      "hint": ""
+    },
+    "b1-teil-2-facebook-158": {
+      "id": "b1-teil-2-facebook-158",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Facebook",
+      "keywordSubtopic": "",
+      "text": "Facebook",
+      "hint": ""
+    },
+    "b1-teil-2-fertigessen-159": {
+      "id": "b1-teil-2-fertigessen-159",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Fertigessen",
+      "keywordSubtopic": "",
+      "text": "Fertigessen",
+      "hint": ""
+    },
+    "b1-teil-2-freiwillige-arbeit-160": {
+      "id": "b1-teil-2-freiwillige-arbeit-160",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freiwillige Arbeit",
+      "keywordSubtopic": "",
+      "text": "Freiwillige Arbeit",
+      "hint": ""
+    },
+    "b1-teil-2-freundschaft-161": {
+      "id": "b1-teil-2-freundschaft-161",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freundschaft",
+      "keywordSubtopic": "",
+      "text": "Freundschaft",
+      "hint": ""
+    },
+    "b1-teil-2-gebrauchte-kleidung-162": {
+      "id": "b1-teil-2-gebrauchte-kleidung-162",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Gebrauchte Kleidung",
+      "keywordSubtopic": "",
+      "text": "Gebrauchte Kleidung",
+      "hint": ""
+    },
+    "b1-teil-2-getrennter-unterricht-f-r-jungen-und-m-dchen-163": {
+      "id": "b1-teil-2-getrennter-unterricht-f-r-jungen-und-m-dchen-163",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Getrennter Unterricht für Jungen und Mädchen",
+      "keywordSubtopic": "",
+      "text": "Getrennter Unterricht für Jungen und Mädchen",
+      "hint": ""
+    },
+    "b1-teil-2-haushalt-164": {
+      "id": "b1-teil-2-haushalt-164",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Haushalt",
+      "keywordSubtopic": "",
+      "text": "Haushalt",
+      "hint": ""
+    },
+    "b1-teil-2-haustiere-165": {
+      "id": "b1-teil-2-haustiere-165",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Haustiere",
+      "keywordSubtopic": "",
+      "text": "Haustiere",
+      "hint": ""
+    },
+    "b1-teil-2-heiraten-166": {
+      "id": "b1-teil-2-heiraten-166",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Heiraten",
+      "keywordSubtopic": "",
+      "text": "Heiraten",
+      "hint": ""
+    },
+    "b1-teil-2-hotel-mama-167": {
+      "id": "b1-teil-2-hotel-mama-167",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Hotel Mama",
+      "keywordSubtopic": "",
+      "text": "Hotel Mama",
+      "hint": ""
+    },
+    "b1-teil-2-ich-bin-reich-genug-168": {
+      "id": "b1-teil-2-ich-bin-reich-genug-168",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Ich bin reich genug",
+      "keywordSubtopic": "",
+      "text": "Ich bin reich genug",
+      "hint": ""
+    },
+    "b1-teil-2-informationen-im-internet-169": {
+      "id": "b1-teil-2-informationen-im-internet-169",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Informationen im Internet",
+      "keywordSubtopic": "",
+      "text": "Informationen im Internet",
+      "hint": ""
+    },
+    "b1-teil-2-kinder-und-fernsehen-170": {
+      "id": "b1-teil-2-kinder-und-fernsehen-170",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kinder und Fernsehen",
+      "keywordSubtopic": "",
+      "text": "Kinder und Fernsehen",
+      "hint": ""
+    },
+    "b1-teil-2-kinder-und-handys-171": {
+      "id": "b1-teil-2-kinder-und-handys-171",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kinder und Handys",
+      "keywordSubtopic": "",
+      "text": "Kinder und Handys",
+      "hint": ""
+    },
+    "b1-teil-2-kinos-sterben-172": {
+      "id": "b1-teil-2-kinos-sterben-172",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kinos sterben",
+      "keywordSubtopic": "",
+      "text": "Kinos sterben",
+      "hint": ""
+    },
+    "b1-teil-2-kreditkarten-173": {
+      "id": "b1-teil-2-kreditkarten-173",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kreditkarten",
+      "keywordSubtopic": "",
+      "text": "Kreditkarten",
+      "hint": ""
+    },
+    "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt-174": {
+      "id": "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt-174",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Leben auf dem Land oder in der Stadt",
+      "keywordSubtopic": "",
+      "text": "Leben auf dem Land oder in der Stadt",
+      "hint": ""
+    },
+    "b1-teil-2-makeup-f-r-kinder-175": {
+      "id": "b1-teil-2-makeup-f-r-kinder-175",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Makeup für Kinder",
+      "keywordSubtopic": "",
+      "text": "Makeup für Kinder",
+      "hint": ""
+    },
+    "b1-teil-2-marken-kleidung-176": {
+      "id": "b1-teil-2-marken-kleidung-176",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Marken-Kleidung",
+      "keywordSubtopic": "",
+      "text": "Marken-Kleidung",
+      "hint": ""
+    },
+    "b1-teil-2-mode-177": {
+      "id": "b1-teil-2-mode-177",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Mode",
+      "keywordSubtopic": "",
+      "text": "Mode",
+      "hint": ""
+    },
+    "b1-teil-2-musikinstrument-lernen-178": {
+      "id": "b1-teil-2-musikinstrument-lernen-178",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Musikinstrument lernen",
+      "keywordSubtopic": "",
+      "text": "Musikinstrument lernen",
+      "hint": ""
+    },
+    "b1-teil-2-musik-im-zeitalter-des-internets-179": {
+      "id": "b1-teil-2-musik-im-zeitalter-des-internets-179",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Musik im Zeitalter des Internets",
+      "keywordSubtopic": "",
+      "text": "Musik im Zeitalter des Internets",
+      "hint": ""
+    },
+    "b1-teil-2-rauchen-180": {
+      "id": "b1-teil-2-rauchen-180",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Rauchen",
+      "keywordSubtopic": "",
+      "text": "Rauchen",
+      "hint": ""
+    },
+    "b1-teil-2-reisen-181": {
+      "id": "b1-teil-2-reisen-181",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Reisen",
+      "keywordSubtopic": "",
+      "text": "Reisen",
+      "hint": ""
+    },
+    "b1-teil-2-schokolade-macht-gl-cklich-182": {
+      "id": "b1-teil-2-schokolade-macht-gl-cklich-182",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Schokolade macht glücklich",
+      "keywordSubtopic": "",
+      "text": "Schokolade macht glücklich",
+      "hint": ""
+    },
+    "b1-teil-2-sport-treiben-183": {
+      "id": "b1-teil-2-sport-treiben-183",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sport treiben",
+      "keywordSubtopic": "",
+      "text": "Sport treiben",
+      "hint": ""
+    },
+    "b1-teil-2-sprachenlernen-184": {
+      "id": "b1-teil-2-sprachenlernen-184",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sprachenlernen",
+      "keywordSubtopic": "",
+      "text": "Sprachenlernen",
+      "hint": ""
+    },
+    "b1-teil-2-sprachenlernen-mit-dem-internet-185": {
+      "id": "b1-teil-2-sprachenlernen-mit-dem-internet-185",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sprachenlernen mit dem Internet",
+      "keywordSubtopic": "",
+      "text": "Sprachenlernen mit dem Internet",
+      "hint": ""
+    },
+    "b1-teil-2-stadtzentrum-ohne-autos-186": {
+      "id": "b1-teil-2-stadtzentrum-ohne-autos-186",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Stadtzentrum ohne Autos",
+      "keywordSubtopic": "",
+      "text": "Stadtzentrum ohne Autos",
+      "hint": ""
+    },
+    "b1-teil-2-studenten-und-arbeit-in-den-ferien-187": {
+      "id": "b1-teil-2-studenten-und-arbeit-in-den-ferien-187",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Studenten und Arbeit in den Ferien",
+      "keywordSubtopic": "",
+      "text": "Studenten und Arbeit in den Ferien",
+      "hint": ""
+    },
+    "b1-teil-2-studium-188": {
+      "id": "b1-teil-2-studium-188",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Studium",
+      "keywordSubtopic": "",
+      "text": "Studium",
+      "hint": ""
+    },
+    "b1-teil-2-tattoos-189": {
+      "id": "b1-teil-2-tattoos-189",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Tattoos",
+      "keywordSubtopic": "",
+      "text": "Tattoos",
+      "hint": ""
+    },
+    "b1-teil-2-teilzeitarbeit-190": {
+      "id": "b1-teil-2-teilzeitarbeit-190",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Teilzeitarbeit",
+      "keywordSubtopic": "",
+      "text": "Teilzeitarbeit",
+      "hint": ""
+    },
+    "b1-teil-2-unsere-idole-191": {
+      "id": "b1-teil-2-unsere-idole-191",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Unsere Idole",
+      "keywordSubtopic": "",
+      "text": "Unsere Idole",
+      "hint": ""
+    },
+    "b1-teil-2-umweltschutz-192": {
+      "id": "b1-teil-2-umweltschutz-192",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Umweltschutz",
+      "keywordSubtopic": "",
+      "text": "Umweltschutz",
+      "hint": ""
+    },
+    "b1-teil-2-vegetarische-ern-hrung-193": {
+      "id": "b1-teil-2-vegetarische-ern-hrung-193",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Vegetarische Ernährung",
+      "keywordSubtopic": "",
+      "text": "Vegetarische Ernährung",
+      "hint": ""
+    },
+    "b1-teil-2-zeitungslesen-194": {
+      "id": "b1-teil-2-zeitungslesen-194",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Zeitungslesen",
+      "keywordSubtopic": "",
+      "text": "Zeitungslesen",
+      "hint": ""
+    },
+    "b1-teil-3-fragen-stellen-zu-einer-pr-sentation-195": {
+      "id": "b1-teil-3-fragen-stellen-zu-einer-pr-sentation-195",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fragen stellen zu einer Präsentation",
+      "keywordSubtopic": "",
+      "text": "Fragen stellen zu einer Präsentation",
+      "hint": ""
+    },
+    "b1-teil-3-positives-feedback-geben-196": {
+      "id": "b1-teil-3-positives-feedback-geben-196",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Positives Feedback geben",
+      "keywordSubtopic": "",
+      "text": "Positives Feedback geben",
+      "hint": ""
+    },
+    "b1-teil-3-etwas-berraschend-finden-oder-planen-197": {
+      "id": "b1-teil-3-etwas-berraschend-finden-oder-planen-197",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Etwas überraschend finden oder planen",
+      "keywordSubtopic": "",
+      "text": "Etwas überraschend finden oder planen",
+      "hint": ""
+    },
+    "b1-teil-3-weitere-details-erfragen-198": {
+      "id": "b1-teil-3-weitere-details-erfragen-198",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Weitere Details erfragen",
+      "keywordSubtopic": "",
+      "text": "Weitere Details erfragen",
+      "hint": ""
+    },
+    "b2-teil-1-sollten-smartphones-in-der-schule-erlaubt-sein-199": {
+      "id": "b2-teil-1-sollten-smartphones-in-der-schule-erlaubt-sein-199",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sollten Smartphones in der Schule erlaubt sein?",
+      "keywordSubtopic": "",
+      "text": "Sollten Smartphones in der Schule erlaubt sein?",
+      "hint": ""
+    },
+    "b2-teil-1-wie-wichtig-ist-umweltschutz-in-unserem-alltag-200": {
+      "id": "b2-teil-1-wie-wichtig-ist-umweltschutz-in-unserem-alltag-200",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wie wichtig ist Umweltschutz in unserem Alltag?",
+      "keywordSubtopic": "",
+      "text": "Wie wichtig ist Umweltschutz in unserem Alltag?",
+      "hint": ""
+    },
+    "b2-teil-1-wie-beeinflusst-social-media-unser-leben-201": {
+      "id": "b2-teil-1-wie-beeinflusst-social-media-unser-leben-201",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wie beeinflusst Social Media unser Leben?",
+      "keywordSubtopic": "",
+      "text": "Wie beeinflusst Social Media unser Leben?",
+      "hint": ""
+    },
+    "b2-teil-1-welche-rolle-spielt-sport-f-r-die-gesundheit-202": {
+      "id": "b2-teil-1-welche-rolle-spielt-sport-f-r-die-gesundheit-202",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Welche Rolle spielt Sport für die Gesundheit?",
+      "keywordSubtopic": "",
+      "text": "Welche Rolle spielt Sport für die Gesundheit?",
+      "hint": ""
+    },
+    "b2-teil-2-die-bedeutung-von-ehrenamt-203": {
+      "id": "b2-teil-2-die-bedeutung-von-ehrenamt-203",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Die Bedeutung von Ehrenamt",
+      "keywordSubtopic": "",
+      "text": "Die Bedeutung von Ehrenamt",
+      "hint": ""
+    },
+    "b2-teil-2-vorteile-und-nachteile-von-homeoffice-204": {
+      "id": "b2-teil-2-vorteile-und-nachteile-von-homeoffice-204",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Vorteile und Nachteile von Homeoffice",
+      "keywordSubtopic": "",
+      "text": "Vorteile und Nachteile von Homeoffice",
+      "hint": ""
+    },
+    "b2-teil-2-auswirkungen-der-digitalisierung-auf-die-arbeitswelt-205": {
+      "id": "b2-teil-2-auswirkungen-der-digitalisierung-auf-die-arbeitswelt-205",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Auswirkungen der Digitalisierung auf die Arbeitswelt",
+      "keywordSubtopic": "",
+      "text": "Auswirkungen der Digitalisierung auf die Arbeitswelt",
+      "hint": ""
+    },
+    "b2-teil-2-mein-sch-nstes-reiseerlebnis-206": {
+      "id": "b2-teil-2-mein-sch-nstes-reiseerlebnis-206",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Mein schönstes Reiseerlebnis",
+      "keywordSubtopic": "",
+      "text": "Mein schönstes Reiseerlebnis",
+      "hint": ""
+    },
+    "b2-teil-3-sollte-man-in-der-stadt-oder-auf-dem-land-leben-207": {
+      "id": "b2-teil-3-sollte-man-in-der-stadt-oder-auf-dem-land-leben-207",
+      "level": "B2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Sollte man in der Stadt oder auf dem Land leben?",
+      "keywordSubtopic": "",
+      "text": "Sollte man in der Stadt oder auf dem Land leben?",
+      "hint": ""
+    },
+    "b2-teil-3-sind-e-autos-die-zukunft-208": {
+      "id": "b2-teil-3-sind-e-autos-die-zukunft-208",
+      "level": "B2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Sind E-Autos die Zukunft?",
+      "keywordSubtopic": "",
+      "text": "Sind E-Autos die Zukunft?",
+      "hint": ""
+    },
+    "b2-teil-3-brauchen-wir-mehr-urlaubstage-209": {
+      "id": "b2-teil-3-brauchen-wir-mehr-urlaubstage-209",
+      "level": "B2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Brauchen wir mehr Urlaubstage?",
+      "keywordSubtopic": "",
+      "text": "Brauchen wir mehr Urlaubstage?",
+      "hint": ""
+    },
+    "b2-teil-3-muss-schule-mehr-praktische-f-cher-anbieten-210": {
+      "id": "b2-teil-3-muss-schule-mehr-praktische-f-cher-anbieten-210",
+      "level": "B2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Muss Schule mehr praktische Fächer anbieten?",
+      "keywordSubtopic": "",
+      "text": "Muss Schule mehr praktische Fächer anbieten?",
+      "hint": ""
+    },
+    "c1-teil-1-die-zukunft-der-k-nstlichen-intelligenz-211": {
+      "id": "c1-teil-1-die-zukunft-der-k-nstlichen-intelligenz-211",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Die Zukunft der künstlichen Intelligenz",
+      "keywordSubtopic": "",
+      "text": "Die Zukunft der künstlichen Intelligenz",
+      "hint": ""
+    },
+    "c1-teil-1-internationale-migration-herausforderungen-und-chancen-212": {
+      "id": "c1-teil-1-internationale-migration-herausforderungen-und-chancen-212",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Internationale Migration: Herausforderungen und Chancen",
+      "keywordSubtopic": "",
+      "text": "Internationale Migration: Herausforderungen und Chancen",
+      "hint": ""
+    },
+    "c1-teil-1-wandel-der-arbeitswelt-im-21-jahrhundert-213": {
+      "id": "c1-teil-1-wandel-der-arbeitswelt-im-21-jahrhundert-213",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wandel der Arbeitswelt im 21. Jahrhundert",
+      "keywordSubtopic": "",
+      "text": "Wandel der Arbeitswelt im 21. Jahrhundert",
+      "hint": ""
+    },
+    "c1-teil-1-digitalisierung-und-datenschutz-214": {
+      "id": "c1-teil-1-digitalisierung-und-datenschutz-214",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Digitalisierung und Datenschutz",
+      "keywordSubtopic": "",
+      "text": "Digitalisierung und Datenschutz",
+      "hint": ""
+    },
+    "c1-teil-2-sollten-universit-ten-studiengeb-hren-verlangen-215": {
+      "id": "c1-teil-2-sollten-universit-ten-studiengeb-hren-verlangen-215",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sollten Universitäten Studiengebühren verlangen?",
+      "keywordSubtopic": "",
+      "text": "Sollten Universitäten Studiengebühren verlangen?",
+      "hint": ""
+    },
+    "c1-teil-2-welchen-einfluss-haben-soziale-medien-auf-die-demokratie-216": {
+      "id": "c1-teil-2-welchen-einfluss-haben-soziale-medien-auf-die-demokratie-216",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welchen Einfluss haben soziale Medien auf die Demokratie?",
+      "keywordSubtopic": "",
+      "text": "Welchen Einfluss haben soziale Medien auf die Demokratie?",
+      "hint": ""
+    },
+    "c1-teil-2-ist-lebenslanges-lernen-notwendig-217": {
+      "id": "c1-teil-2-ist-lebenslanges-lernen-notwendig-217",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Ist lebenslanges Lernen notwendig?",
+      "keywordSubtopic": "",
+      "text": "Ist lebenslanges Lernen notwendig?",
+      "hint": ""
+    },
+    "c1-teil-2-die-bedeutung-von-nachhaltigkeit-in-der-wirtschaft-218": {
+      "id": "c1-teil-2-die-bedeutung-von-nachhaltigkeit-in-der-wirtschaft-218",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Die Bedeutung von Nachhaltigkeit in der Wirtschaft",
+      "keywordSubtopic": "",
+      "text": "Die Bedeutung von Nachhaltigkeit in der Wirtschaft",
+      "hint": ""
+    },
+    "c1-teil-3-die-wichtigsten-kompetenzen-f-r-die-zukunft-219": {
+      "id": "c1-teil-3-die-wichtigsten-kompetenzen-f-r-die-zukunft-219",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Die wichtigsten Kompetenzen für die Zukunft",
+      "keywordSubtopic": "",
+      "text": "Die wichtigsten Kompetenzen für die Zukunft",
+      "hint": ""
+    },
+    "c1-teil-3-vor-und-nachteile-globaler-zusammenarbeit-220": {
+      "id": "c1-teil-3-vor-und-nachteile-globaler-zusammenarbeit-220",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Vor- und Nachteile globaler Zusammenarbeit",
+      "keywordSubtopic": "",
+      "text": "Vor- und Nachteile globaler Zusammenarbeit",
+      "hint": ""
+    },
+    "c1-teil-3-welchen-einfluss-hat-technik-auf-unser-leben-221": {
+      "id": "c1-teil-3-welchen-einfluss-hat-technik-auf-unser-leben-221",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Welchen Einfluss hat Technik auf unser Leben?",
+      "keywordSubtopic": "",
+      "text": "Welchen Einfluss hat Technik auf unser Leben?",
+      "hint": ""
+    },
+    "c1-teil-3-wie-ver-ndert-sich-die-familie-222": {
+      "id": "c1-teil-3-wie-ver-ndert-sich-die-familie-222",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Wie verändert sich die Familie?",
+      "keywordSubtopic": "",
+      "text": "Wie verändert sich die Familie?",
+      "hint": ""
+    }
+  },
+  "mocks": {
+    "A1": {
+      "writing": {
+        "situation": "Sie möchten einen Kochkurs besuchen. Schreiben Sie eine E-Mail an die Kochschule „GenussZeit“.",
+        "points": [
+          "Melden Sie sich für den Kurs „Italienische Küche“ an.",
+          "Fragen Sie, wann der nächste Kurs beginnt.",
+          "Fragen Sie nach dem Preis."
+        ],
+        "instruction": "Schreiben Sie ungefähr 30 Wörter."
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich kurz vor. Sprechen Sie über Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby. Buchstabieren Sie am Ende Ihren Familiennamen.",
+          "card": [
+            "Name",
+            "Alter",
+            "Land",
+            "Wohnort",
+            "Sprachen",
+            "Beruf",
+            "Hobby",
+            "Familienname buchstabieren"
+          ]
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Um Informationen bitten",
+          "context": "Thema: Freizeit",
+          "maxRecordingSeconds": 45,
+          "prompt": "Thema: Freizeit. Ihr Wort ist „Wochenende“. Stellen Sie eine passende A1-Frage mit diesem Wort.",
+          "keyword": "Wochenende"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Eine Bitte formulieren",
+          "context": "Bitte im Alltag",
+          "maxRecordingSeconds": 45,
+          "prompt": "Karte: Fenster. Ihnen ist warm. Bitten Sie die andere Person höflich, das Fenster zu öffnen.",
+          "keyword": "Fenster"
+        }
+      ]
+    },
+    "A2": {
+      "writing": {
+        "teil1": {
+          "title": "Teil 1",
+          "situation": "Sie sind unterwegs in der Stadt und schreiben eine SMS an Ihre Freundin Mila.",
+          "points": [
+            "Entschuldigen Sie sich, dass Sie zu spät kommen.",
+            "Schreiben Sie, warum Sie sich verspäten.",
+            "Nennen Sie einen neuen Treffpunkt und eine neue Uhrzeit."
+          ],
+          "instruction": "Schreiben Sie 20–30 Wörter.",
+          "reminder": "Schreiben Sie zu allen drei Punkten."
+        },
+        "teil2": {
+          "title": "Teil 2",
+          "situation": "Ihre Kursleiterin, Frau Becker, hat Sie zu einem Sommerfest der Sprachschule eingeladen. Schreiben Sie Frau Becker eine E-Mail.",
+          "points": [
+            "Bedanken Sie sich für die Einladung und sagen Sie, dass Sie kommen.",
+            "Informieren Sie, dass Sie eine Person mitbringen.",
+            "Fragen Sie, wie Sie zum Fest kommen."
+          ],
+          "instruction": "Schreiben Sie 30–40 Wörter.",
+          "reminder": "Schreiben Sie zu allen drei Punkten."
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1_questions",
+          "teil": "1",
+          "title": "Teil 1 · Ask four questions",
+          "prompt": "Use the four keywords Wohnort, Familie, Hobby, Beruf. Ask one suitable A2 question for each keyword.",
+          "maxRecordingSeconds": 90
+        },
+        {
+          "id": "teil1_answers",
+          "teil": "1",
+          "title": "Teil 1 · Answer your partner",
+          "prompt": "Answer all four partner questions in complete German sentences: Wo wohnst du? Und wie gefällt es dir dort? | Hast du Geschwister? Erzähl mir ein bisschen von deiner Familie. | Was machst du in deiner Freizeit? Wie oft machst du das? | Was bist du von Beruf, oder was lernst du gerade? Was möchtest du später machen?",
+          "maxRecordingSeconds": 120
+        },
+        {
+          "id": "teil2_main",
+          "teil": "2",
+          "title": "Teil 2 · Wochenende",
+          "prompt": "Erzählen Sie etwas über Ihr Wochenende. Sprechen Sie zu jedem Stichwort ein paar Sätze. Stichwörter: aufstehen (Wann?), Aktivität (Was?), Personen (Mit wem?), Essen (Wo?)",
+          "maxRecordingSeconds": 120
+        },
+        {
+          "id": "teil2_followup",
+          "teil": "2",
+          "title": "Teil 2 · Nachfrage",
+          "prompt": "Was machst du am liebsten am Sonntag?",
+          "maxRecordingSeconds": 45
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Gemeinsam planen",
+          "prompt": "Sie möchten am Samstag mit Ihrem Freund oder Ihrer Freundin etwas unternehmen. Partner: Am Samstag habe ich ab 15 Uhr Zeit. Ins Schwimmbad möchte ich nicht. Ich würde gern etwas machen und danach zusammen essen. Planen Sie den Nachmittag. Reagieren Sie auf Ihren Partner und machen Sie einen gemeinsamen Plan. Punkte: Aktivität – Was möchten Sie machen? | Uhrzeit – Wann? | Treffpunkt – Wo treffen Sie sich? | Essen – Wo oder was möchten Sie essen? Reagieren Sie auf die Idee Ihres Partners, machen Sie einen Vorschlag und nennen Sie am Ende einen gemeinsamen Plan.",
+          "maxRecordingSeconds": 90
+        }
+      ]
+    },
+    "B1": {
+      "writing": [
+        {
+          "id": "teil1",
+          "title": "Aufgabe 1 · Informelle E-Mail",
+          "meta": "Empfohlene Arbeitszeit: 20 Minuten · ca. 80 Wörter",
+          "prompt": "Sie haben vor Kurzem eine neue Wohnung bezogen und am Wochenende eine Einweihungsparty gefeiert. Ihr Freund Jan konnte leider nicht kommen. Schreiben Sie eine E-Mail an Ihren Freund Jan.",
+          "points": [
+            "Beschreiben Sie: Wie war die Party?",
+            "Begründen Sie: Warum war der Umzug in die neue Wohnung eine gute Wahl?",
+            "Machen Sie einen Vorschlag: Schlagen Sie ein Treffen vor, um Jan die Wohnung persönlich zu zeigen."
+          ],
+          "target": 80
+        },
+        {
+          "id": "teil2",
+          "title": "Aufgabe 2 · Diskussionsbeitrag",
+          "meta": "Empfohlene Arbeitszeit: 25 Minuten · ca. 80 Wörter",
+          "prompt": "Thema: „Brauchen wir bargeldloses Bezahlen oder sollen wir weiter mit Bargeld bezahlen?“ Lara (24): „Ich zahle fast alles nur noch mit dem Smartphone oder mit der Karte. Das geht super schnell und ich muss nicht mehr ständig zum Geldautomaten laufen. Bargeld braucht heutzutage doch kein Mensch mehr!“",
+          "points": [
+            "Äußern Sie Ihre Meinung zum Thema Kartenzahlung vs. Bargeld.",
+            "Nennen Sie Gründe für Ihre Haltung.",
+            "Führen Sie Vor- oder Nachteile an."
+          ],
+          "target": 80
+        },
+        {
+          "id": "teil3",
+          "title": "Aufgabe 3 · Formelle E-Mail",
+          "meta": "Empfohlene Arbeitszeit: 15 Minuten · ca. 40 Wörter",
+          "prompt": "Sie besuchen einen Deutschkurs. Nächste Woche können Sie an einem Tag nicht am Unterricht teilnehmen, weil Sie einen wichtigen Arzttermin haben. Schreiben Sie eine formelle E-Mail an Ihre Kursleiterin, Frau Schneider.",
+          "points": [
+            "Entschuldigen Sie Ihr Fehlen im Unterricht.",
+            "Nennen Sie den Grund für Ihr Fehlen.",
+            "Bitten Sie um die Hausaufgaben / Kursunterlagen für diesen Tag."
+          ],
+          "target": 40
+        }
+      ],
+      "speaking": {
+        "teil1": {
+          "id": "teil1",
+          "title": "Aufgabe 1 · Gemeinsam planen",
+          "audioObjectKey": "b1/mock-hoeren-1/sprechen-teil-1.mp3",
+          "situation": "Sie möchten mit Ihrem Partner für eine gute Freundin eine Überraschungsparty zum Geburtstag organisieren.",
+          "points": [
+            "Wo?",
+            "Wann?",
+            "Essen und Trinken",
+            "Einladung der Gäste",
+            "Geschenk",
+            "Wer macht was?"
+          ],
+          "instruction": "Machen Sie Vorschläge und reagieren Sie auf die Vorschläge Ihrer Partnerin. Die Partneraufnahme enthält sechs Antwortfenster. Ihr Mikrofon bleibt für das ganze Gespräch aktiv.",
+          "maxRecordingSeconds": 240
+        },
+        "teil2": {
+          "id": "teil2",
+          "title": "Aufgabe 2 · Präsentation",
+          "topic": "Brauchen wir noch gedruckte Bücher oder lernen wir nur noch digital?",
+          "points": [
+            "Persönliche Erfahrungen: Wie lernen Sie lieber – mit Büchern aus Papier oder mit Smartphone/Tablet/Laptop?",
+            "Rolle im Heimatland: Wie wird in den Schulen und Universitäten in Ihrem Heimatland gelernt?",
+            "Vor- und Nachteile: Welche Vorteile haben digitale Medien gegenüber klassischen Lehrbüchern (und umgekehrt)?",
+            "Ihre Meinung: Wie sieht die Zukunft des Lernens aus?"
+          ],
+          "prepSeconds": 300,
+          "maxRecordingSeconds": 180
+        },
+        "teil3": {
+          "id": "teil3",
+          "title": "Aufgabe 3 · Reagieren",
+          "prompt": "Ihr Gesprächspartner sagt: „Digitale Medien sind praktisch, aber mit einem gedruckten Buch kann ich mich besser konzentrieren.“ Reagieren Sie auf die Aussage. Sagen Sie, ob Sie zustimmen, und begründen Sie kurz Ihre Meinung.",
+          "maxRecordingSeconds": 90
+        }
+      }
+    },
+    "B2": {
+      "writing": [
+        {
+          "id": "teil1",
+          "title": "Teil 1 · Forumsbeitrag",
+          "meta": "Empfohlene Arbeitszeit: 50 Minuten · ca. 150 Wörter",
+          "topic": "Homeoffice – Arbeiten von zu Hause aus",
+          "prompt": "Sie schreiben einen Beitrag für ein Online-Forum zum Thema „Homeoffice – Arbeiten von zu Hause aus“.",
+          "points": [
+            "Äußern Sie Ihre Meinung zum Thema Arbeiten im Homeoffice.",
+            "Nennen Sie Gründe, warum dieses Arbeitsmodell heutzutage immer beliebter wird.",
+            "Nennen Sie Möglichkeiten, wie Unternehmen ihre Mitarbeiter im Homeoffice gut unterstützen können.",
+            "Nennen Sie Vor- und Nachteile der Arbeit im Büro als Alternative zum Homeoffice."
+          ],
+          "guidance": "Denken Sie an eine getrennte Einleitung und einen passenden Schlusssatz. Verbinden Sie die Punkte zu einem zusammenhängenden Text.",
+          "target": 150
+        },
+        {
+          "id": "teil2",
+          "title": "Teil 2 · Formelle Nachricht",
+          "meta": "Empfohlene Arbeitszeit: 25 Minuten · ca. 100 Wörter",
+          "topic": "Projektseminar und Dienstreise",
+          "prompt": "Sie nehmen zurzeit an einer beruflichen Weiterbildung teil. Nächste Woche soll ein wichtiges Projektseminar stattfinden, an dem Sie wegen einer unaufschiebbaren Dienstreise nicht teilnehmen können. Schreiben Sie eine formelle Nachricht an die Seminarleiterin, Frau Dr. Weber.",
+          "points": [
+            "Schreiben Sie den Grund für Ihre Nachricht und entschuldigen Sie Ihr Fehlen.",
+            "Erklären Sie, warum die Dienstreise dringend erforderlich ist.",
+            "Machen Sie einen Vorschlag, wie Sie den verpassten Seminarstoff nachholen können.",
+            "Bitten Sie um Zusendung der Unterlagen oder Präsentationen."
+          ],
+          "guidance": "Achten Sie auf eine passende formelle Anrede, einen klaren Aufbau und einen angemessenen Schluss.",
+          "target": 100
+        }
+      ],
+      "speaking": {
+        "teil1": {
+          "id": "teil1",
+          "title": "Teil 1 · Präsentation",
+          "prepSeconds": 900,
+          "maxRecordingSeconds": 240,
+          "instruction": "Wählen Sie eines der beiden Themen. Strukturieren Sie Ihre Präsentation klar und sprechen Sie zusammenhängend. Nennen Sie Beispiele, begründen Sie Ihre Position und schließen Sie mit einem kurzen Fazit.",
+          "themes": [
+            {
+              "id": "thema1",
+              "title": "Konsumverhalten – Kaufen wir zu viele unnötige Dinge?",
+              "prompt": "Sprechen Sie über das Kaufverhalten in der heutigen Gesellschaft und Möglichkeiten, bewusster einzukaufen."
+            },
+            {
+              "id": "thema2",
+              "title": "Weiterbildung im Beruf – Pflicht oder Eigenverantwortung?",
+              "prompt": "Sprechen Sie über Möglichkeiten und die Bedeutung von lebenslangem Lernen und beruflicher Fortbildung."
+            }
+          ]
+        },
+        "teil2": {
+          "id": "teil2",
+          "title": "Teil 2 · Diskutieren / Standpunkte austauschen",
+          "maxRecordingSeconds": 300,
+          "topic": "Soll der öffentliche Personennahverkehr (ÖPNV) für alle Bürger komplett kostenlos sein?",
+          "points": [
+            "Tauschen Sie Ihre Argumente aus: Nennen Sie Vor- und Nachteile eines kostenlosen Bus- und Bahnverkehrs, zum Beispiel Umwelt, Finanzierung, Qualität und Verkehrsbelastung.",
+            "Gehen Sie auf Gegenargumente ein: Stimmen Sie einer anderen Position zu oder widersprechen Sie höflich und begründen Sie Ihre Reaktion.",
+            "Erreichen Sie ein Fazit: Versuchen Sie am Ende, eine gemeinsame Position oder eine klare Zusammenfassung zu formulieren."
+          ],
+          "simulationNote": "Da in diesem Mock kein Partner-Audio vorgegeben ist, simulieren Sie beide Seiten der Diskussion: Nennen Sie mindestens ein Gegenargument ausdrücklich und reagieren Sie darauf."
+        }
+      }
+    }
+  }
+}

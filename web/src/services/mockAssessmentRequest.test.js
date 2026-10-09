@@ -28,3 +28,12 @@ test("reports a persistent gateway failure with recovery instructions", async ()
   await expect(postMockAssessment("/mark", {})).rejects.toMatchObject({ message: expect.stringContaining("retry marking") });
   expect(axios.post).toHaveBeenCalledTimes(2);
 });
+
+test('sends the bundled question version without changing the caller answers', async () => {
+  const versions = require('../data/assessmentTaskVersions.json');
+  const payload = { text: 'Meine Antwort', attemptId: 'same-attempt' };
+  axios.post.mockResolvedValue({ data: {} });
+  await postMockAssessment('/api/writing/b1-mock-score', payload);
+  expect(axios.post.mock.calls[0][1]).toEqual({ ...payload, taskVersion: versions.B1.writing });
+  expect(payload.taskVersion).toBeUndefined();
+});

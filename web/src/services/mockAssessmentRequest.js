@@ -1,11 +1,14 @@
 import axios from "axios";
+import taskVersions from "../data/assessmentTaskVersions.json";
 
 // Retry a gateway failure once, using the same answers and attempt identity.
 // Application failures already retried by the backend are left for the learner.
 export async function postMockAssessment(url, payload, config = {}) {
+  const task = url.match(/\/(writing|speaking)\/(a1|a2|b1|b2)-mock-score$/);
+  const requestPayload = task ? { ...payload, taskVersion: taskVersions[task[2].toUpperCase()][task[1]] } : payload;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
-      return await axios.post(url, payload, { ...config, timeout: 55000 });
+      return await axios.post(url, requestPayload, { ...config, timeout: 55000 });
     } catch (error) {
       const status = error?.response?.status;
       const code = error?.response?.data?.code;
