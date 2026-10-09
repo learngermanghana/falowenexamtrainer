@@ -73,12 +73,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   },
   "a2-mock-02": {
     id: "a2-mock-02", level: "A2", title: "A2 Mock 2", shortTitle: "A2 Mock 2",
-    description: "Four linked sections with saved progress. Final AI grading is pending.",
-    durationLabel: "Four sections · final grading pending", status: "preview",
+    description: "Your second A2 mock: complete Lesen, Hören, Schreiben and Sprechen from one exam dashboard. Final combined grading is being verified.",
+    durationLabel: "4 modules · saved progress", status: "preview",
     route: "/campus/course/a2-mock-2", mode: "section-preview",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a2-mock-02-lesen": {
+    showInMockLibrary: false,
     id: "a2-mock-02-lesen",
     level: "A2",
     title: "A2 Mock 2 · Lesen",
@@ -92,6 +93,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     sections: ["Lesen only (Teil 1–4)"],
   },
   "a2-mock-02-schreiben": {
+    showInMockLibrary: false,
     id: "a2-mock-02-schreiben",
     level: "A2",
     title: "A2 Mock 2 · Schreiben",
@@ -105,6 +107,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     sections: ["Schreiben only (Teil 1–2)"],
   },
   "a2-mock-02-hoeren": {
+    showInMockLibrary: false,
     id: "a2-mock-02-hoeren",
     level: "A2",
     title: "A2 Mock 2 · Hören",
@@ -118,6 +121,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     sections: ["Hören only (Teil 1–4)"],
   },
   "a2-mock-02-sprechen": {
+    showInMockLibrary: false,
     id: "a2-mock-02-sprechen",
     level: "A2",
     title: "A2 Mock 2 · Sprechen",
@@ -183,6 +187,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a2-course-preview-01": {
+    showInMockLibrary: false,
     id: "a2-course-preview-01",
     level: "A2",
     title: "A2 exam-format practice",
@@ -212,7 +217,8 @@ export const getMockExamsForLevel = (level, { includeCourse = false } = {}) => {
   return Object.values(MOCK_EXAM_CATALOG).filter(
     (exam) =>
       exam.level === normalizedLevel &&
-      (includeCourse || exam.mode !== "section-preview"),
+      (includeCourse || exam.mode !== "section-preview") &&
+      exam.showInMockLibrary !== false,
   );
 };
 
