@@ -874,13 +874,11 @@
   "A2 6.16 Wohlbefinden und Entspannung": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Weil sie viel Stress haben und wenig Zeit für sich haben.",
-        "Answer2": "B) Alle zwei Stunden für 10 Minuten.",
-        "Answer3": "A) Aufstehen und Wasser oder Kräutertee trinken.",
-        "Answer4": "B) Die frische Luft hilft dem Gehirn, sich zu erholen.",
-        "Answer5": "A) Weil das Bildschirmlicht den Schlaf stört.",
-        "Answer6": "B) Ein Buch lesen oder ruhige Musik hören.",
-        "Answer7": "B) Sie helfen, den Kopf frei zu bekommen und Energie zu tanken."
+        "Answer1": "B) Angebot B",
+        "Answer2": "C) Angebot C",
+        "Answer3": "D) Angebot D",
+        "Answer4": "A) Angebot A",
+        "Answer5": "C) Angebot C"
       },
       "teil4": {
         "Answer1": "B) Sie schläft schlecht.",
