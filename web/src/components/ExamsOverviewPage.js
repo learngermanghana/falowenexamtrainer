@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { EXAM_SKILLS, buildExamRoomCoach } from "../lib/examRoomCoach";
+import { buildExamRoomInsights, getAttemptBreakdown } from "../lib/examRoomInsights";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
 import {
@@ -39,6 +40,7 @@ export default function ExamsOverviewPage() {
     () => buildExamRoomCoach({ level: currentLevel, cloudResults, localReading }),
     [currentLevel, cloudResults, localReading],
   );
+  const insights = useMemo(() => buildExamRoomInsights(coach, currentLevel), [coach, currentLevel]);
   const hasFullMock = useMemo(
     () => getMockExamsForLevel(currentLevel, { includeCourse: true })
       .some((mock) => mock.mode === "full" && mock.status === "ready"),
@@ -171,6 +173,62 @@ export default function ExamsOverviewPage() {
         </p>
       </section>
 
+      <section className="exam-room-learning" aria-labelledby="exam-room-learning-heading">
+        <div className="exam-room-learning-head">
+          <div>
+            <h3 id="exam-room-learning-heading">Your exam progress</h3>
+            <p>Based on recorded scores at your selected {currentLevel} level.</p>
+          </div>
+          <span className="exam-room-evidence-label">{insights.evidenceLabel}</span>
+        </div>
+        <p className="exam-room-evidence-note">{insights.evidenceText}</p>
+        <div className="exam-room-scores-by-skill" aria-label="Latest recorded score by skill">
+          {insights.skillScores.map((skill) => (
+            <div key={skill.key} className="exam-room-score-row">
+              <span>{skill.title}</span>
+              <div className="exam-room-score-track" aria-hidden="true">
+                <span style={{ width: (skill.percent ?? 0) + "%" }} />
+              </div>
+              <strong>{skill.percent === null ? "—" : skill.percent + "%"}</strong>
+            </div>
+          ))}
+        </div>
+        {insights.trend.length ? (
+          <div className="exam-room-mock-trend">
+            <h4>Server-scored full mock trend</h4>
+            <ol>
+              {insights.trend.map((point) => (
+                <li key={point.id}>
+                  <span>{point.label}</span>
+                  <div className="exam-room-score-track" aria-hidden="true">
+                    <span style={{ width: point.percent + "%" }} />
+                  </div>
+                  <strong>{point.percent}%</strong>
+                </li>
+              ))}
+            </ol>
+            {insights.weakestMockPart ? <p>
+              Lowest recorded full-mock section: <strong>{insights.weakestMockPart.label}</strong>
+              {" · "}{insights.weakestMockPart.score}/{insights.weakestMockPart.total}.
+            </p> : null}
+          </div>
+        ) : null}
+        <details className="exam-room-study-plan">
+          <summary>My personalised 7-day practice plan</summary>
+          <p>This plan uses your saved practice results. It is study guidance, not an AI-verified exam prediction.</p>
+          <ol>
+            {insights.weeklyPlan.map((day) => (
+              <li key={day.day}>
+                <div><strong>Day {day.day} · {day.title}</strong><p>{day.detail}</p><small>{day.status}</small></div>
+                <button type="button" className="exam-room-text-action" onClick={() => navigate(day.route)}>
+                  Practise →
+                </button>
+              </li>
+            ))}
+          </ol>
+        </details>
+      </section>
+
       <section className="exam-room-activity" aria-label="Warm-up and recent practice">
         <div className="exam-room-warmup">
           <span className="exam-room-warmup-icon" aria-hidden="true">☀️</span>
@@ -202,13 +260,30 @@ export default function ExamsOverviewPage() {
           <ol className="exam-room-recent-list">
             {coach.attempts.slice(0, 3).map((attempt, index) => (
               <li className="exam-room-recent-item" key={attempt.id || attempt.section + "-" + index}>
-                <div>
-                  <strong>{attempt.section === "mixed"
-                    ? "Full mock exam"
-                    : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
-                  <p>{readableDate(attempt.completedAt)} · {attempt.title}</p>
-                </div>
-                <strong className="exam-room-recent-score">{attempt.percent}%</strong>
+                <details className="exam-room-attempt-details">
+                  <summary>
+                    <span>
+                      <strong>{attempt.section === "mixed"
+                        ? "Full mock exam"
+                        : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
+                      <span className="exam-room-attempt-subtitle">{readableDate(attempt.completedAt)} · {attempt.title}</span>
+                    </span>
+                    <strong className="exam-room-recent-score">{attempt.percent}%</strong>
+                  </summary>
+                  {getAttemptBreakdown(attempt).length ? (
+                    <ul className="exam-room-attempt-parts">
+                      {getAttemptBreakdown(attempt).map((part) => (
+                        <li key={part.label}>
+                          <span>{part.label}</span>
+                          <strong>{part.score}/{part.total} · {part.percent}%</strong>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : <p>Only the overall score is available for this saved attempt. Detailed feedback is not recorded.</p>}
+                  <button type="button" className="exam-room-text-action" onClick={() => navigate(attempt.route)}>
+                    Open practice →
+                  </button>
+                </details>
               </li>
             ))}
           </ol>
