@@ -1,3 +1,4 @@
+import { useMockExamIntegrity, MockExamIntegrityNotice } from "../hooks/useMockExamIntegrity";
 import React, { useCallback, useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
@@ -46,6 +47,7 @@ export default function A2Mock2ExamHub(){
  const [flow,setFlow] = useState(initialize);
  const [progress,setProgress] = useState(getProgress);
  const stage = flow.stage;
+ const integrity = useMockExamIntegrity({level:"A2", mockId:"a2-mock-02", idToken, attemptId:"", section:stage, active:stage!=="intro" && stage!=="result"});
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
  const refresh = useCallback(()=>setProgress(getProgress()),[]);
@@ -100,7 +102,8 @@ export default function A2Mock2ExamHub(){
   schreiben:<A2Mock2Schreiben embedded onComplete={advance}/>,
   sprechen:<A2Mock2Sprechen embedded onComplete={advance}/>,
  };
- return <main className="a2-mock2-full" lang="de">
+ return <main className="a2-mock2-full" lang="de" onCopyCapture={integrity.onCopyCapture} onPasteCapture={integrity.onPasteCapture}>
+    <MockExamIntegrityNotice guard={integrity} />
    <div className="a2-mock2-top"><AppBackButton label="Zurück zu den Mocktests" fallbackPath="/exams/mocks"/><span>A2 · Mockprüfung 2</span></div>
    <header className="a2-mock2-full-heading">
     <p className="a2-mock2-kicker">A2 · Vollständiger Übungstest 2</p>
