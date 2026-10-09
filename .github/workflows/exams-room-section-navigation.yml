@@ -7,6 +7,11 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/B1ReadingPracticeSamples.jsx'
+      - 'web/src/components/B1ExamRoomNavigation.test.js'
+      - 'web/src/data/b1ReadingPracticeSamples.js'
+      - 'web/src/data/b1ReadingPracticeSamples.test.js'
+      - 'web/src/data/b1FinalMockData.js'
       - 'web/src/components/A1ReadingPracticeSamples.jsx'
       - 'web/src/components/A2ReadingPracticeSamples.jsx'
       - 'web/src/components/ExamsOverviewPage.js'
@@ -20,6 +25,11 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/B1ReadingPracticeSamples.jsx'
+      - 'web/src/components/B1ExamRoomNavigation.test.js'
+      - 'web/src/data/b1ReadingPracticeSamples.js'
+      - 'web/src/data/b1ReadingPracticeSamples.test.js'
+      - 'web/src/data/b1FinalMockData.js'
       - 'web/src/components/A1ReadingPracticeSamples.jsx'
       - 'web/src/components/A2ReadingPracticeSamples.jsx'
       - 'web/src/components/ExamsOverviewPage.js'
@@ -42,5 +52,7 @@ jobs:
       - run: npm ci
       - name: Navigation regression
         run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js
+      - name: B1 Lesen and Hören practice regression
+        run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
       - name: Direct web compile
         run: npx vite build
