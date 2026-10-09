@@ -406,7 +406,7 @@ async function enforceUserQuota({ uid, category, limit }) {
 
       tx.set(ref, { counters: updatedCounters, updatedAt: now }, { merge: true });
 
-      return { allowed: true, remaining: Math.max(limit - (current + 1), 0) };
+      return { allowed: true, remaining: Math.max(limit - (current + 1), 0), date: today };
     });
   }
 
@@ -420,7 +420,39 @@ async function enforceUserQuota({ uid, category, limit }) {
   }
 
   memoryQuota.set(key, currentEntry + 1);
-  return { allowed: true, remaining: Math.max(limit - (currentEntry + 1), 0) };
+  return { allowed: true, remaining: Math.max(limit - (currentEntry + 1), 0), date: today };
+}
+
+// A transient writing scorer error must not spend the last daily allowance.
+// Refund only reservations actually consumed by this request. Firestore's
+// transaction keeps a concurrent successful request's quota untouched.
+async function refundFailedMockWritingQuota({ uid, date, category = "grammar" }) {
+  if (!uid || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(date || ""))) return;
+  const db = getFirestoreSafe();
+  if (db) {
+    const ref = db.collection("usageQuotas").doc(uid);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      const counters = data.counters || {};
+      const day = counters[date] || {};
+      const count = Number(day[category] || 0);
+      if (count <= 0) return;
+      tx.set(ref, {
+        counters: {
+          ...counters,
+          [date]: { ...day, [category]: count - 1 },
+        },
+        updatedAt: admin.firestore.Timestamp.now(),
+      }, { merge: true });
+    });
+    return;
+  }
+
+  const key = `${uid}:${date}:${category}`;
+  const count = Number(memoryQuota.get(key) || 0);
+  if (count > 0) memoryQuota.set(key, count - 1);
 }
 
 async function auditAIRequest({ route, uid, email, metadata = {}, success = true }) {
@@ -3989,6 +4021,17 @@ app.get("/results/history", async (req, res) => {
 
 app.post("/writing/a1-mock-score", async (req, res) => {
   let authedUser;
+  let pendingQuotaDate = "";
+  const refundFailedMarking = async () => {
+    if (!pendingQuotaDate || !authedUser?.uid) return;
+    const date = pendingQuotaDate;
+    pendingQuotaDate = ""; // at most one refund per request
+    try {
+      await refundFailedMockWritingQuota({ uid: authedUser.uid, date });
+    } catch (quotaError) {
+      console.error("Unable to refund failed A1 mock writing quota", quotaError);
+    }
+  };
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -4029,6 +4072,8 @@ app.post("/writing/a1-mock-score", async (req, res) => {
         });
       }
 
+      pendingQuotaDate = quota.date;
+
       const reply = await createChatCompletion(
         [
           { role: "system", content: a1MockWritingScorePrompt({ text }) },
@@ -4045,6 +4090,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       try {
         letter = JSON.parse(cleanedReply);
       } catch (_error) {
+        await refundFailedMarking();
         return res.status(502).json({
           error: "Falowen could not read the writing assessment safely. Please try marking again.",
           code: "INVALID_WRITING_ASSESSMENT",
@@ -4112,9 +4158,11 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       },
     });
 
+    pendingQuotaDate = "";
     return res.json({ result });
   } catch (err) {
     console.error("/writing/a1-mock-score error", err);
+    await refundFailedMarking();
     auditAIRequest({
       route: "/writing/a1-mock-score",
       uid: authedUser?.uid,
@@ -4171,6 +4219,17 @@ const capA2MockWritingScoreForTaskCompletion = ({
 
 app.post("/writing/a2-mock-score", async (req, res) => {
   let authedUser;
+  let pendingQuotaDate = "";
+  const refundFailedMarking = async () => {
+    if (!pendingQuotaDate || !authedUser?.uid) return;
+    const date = pendingQuotaDate;
+    pendingQuotaDate = ""; // at most one refund per request
+    try {
+      await refundFailedMockWritingQuota({ uid: authedUser.uid, date });
+    } catch (quotaError) {
+      console.error("Unable to refund failed A2 mock writing quota", quotaError);
+    }
+  };
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -4206,6 +4265,8 @@ app.post("/writing/a2-mock-score", async (req, res) => {
         });
       }
 
+      pendingQuotaDate = quota.date;
+
       const reply = await createChatCompletion(
         [
           { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
@@ -4222,6 +4283,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       try {
         result = JSON.parse(cleanedReply);
       } catch (_error) {
+        await refundFailedMarking();
         return res.status(502).json({
           error: "Falowen could not read the A2 writing assessment safely. Please try marking again.",
           code: "INVALID_A2_WRITING_ASSESSMENT",
@@ -4258,6 +4320,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           teil2ClosingOk = result.parts.teil2.closing_ok;
         }
       } catch (validationError) {
+        await refundFailedMarking();
         return res.status(502).json({
           error:
             validationError?.message ||
@@ -4355,9 +4418,11 @@ app.post("/writing/a2-mock-score", async (req, res) => {
       },
     });
 
+    pendingQuotaDate = "";
     return res.json({ result });
   } catch (err) {
     console.error("/writing/a2-mock-score error", err);
+    await refundFailedMarking();
     auditAIRequest({
       route: "/writing/a2-mock-score",
       uid: authedUser?.uid,
@@ -4370,6 +4435,17 @@ app.post("/writing/a2-mock-score", async (req, res) => {
 
 app.post("/writing/b1-mock-score", async (req, res) => {
   let authedUser;
+  let pendingQuotaDate = "";
+  const refundFailedMarking = async () => {
+    if (!pendingQuotaDate || !authedUser?.uid) return;
+    const date = pendingQuotaDate;
+    pendingQuotaDate = ""; // at most one refund per request
+    try {
+      await refundFailedMockWritingQuota({ uid: authedUser.uid, date });
+    } catch (quotaError) {
+      console.error("Unable to refund failed B1 mock writing quota", quotaError);
+    }
+  };
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -4407,6 +4483,8 @@ app.post("/writing/b1-mock-score", async (req, res) => {
         });
       }
 
+      pendingQuotaDate = quota.date;
+
       const reply = await createChatCompletion(
         [
           { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
@@ -4422,6 +4500,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
       try {
         result = JSON.parse(cleanedReply);
       } catch (_error) {
+        await refundFailedMarking();
         return res.status(502).json({
           error: "Falowen could not read the B1 writing assessment safely. Please try marking again.",
           code: "INVALID_B1_WRITING_ASSESSMENT",
@@ -4493,9 +4572,11 @@ app.post("/writing/b1-mock-score", async (req, res) => {
       email: authedUser.email,
       metadata: { score: Number(result?.score || 0) },
     });
+    pendingQuotaDate = "";
     return res.json({ result });
   } catch (err) {
     console.error("/writing/b1-mock-score error", err);
+    await refundFailedMarking();
     auditAIRequest({
       route: "/writing/b1-mock-score",
       uid: authedUser?.uid,
@@ -4508,6 +4589,17 @@ app.post("/writing/b1-mock-score", async (req, res) => {
 
 app.post("/writing/b2-mock-score", async (req, res) => {
   let authedUser;
+  let pendingQuotaDate = "";
+  const refundFailedMarking = async () => {
+    if (!pendingQuotaDate || !authedUser?.uid) return;
+    const date = pendingQuotaDate;
+    pendingQuotaDate = ""; // at most one refund per request
+    try {
+      await refundFailedMockWritingQuota({ uid: authedUser.uid, date });
+    } catch (quotaError) {
+      console.error("Unable to refund failed B2 mock writing quota", quotaError);
+    }
+  };
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -4542,6 +4634,8 @@ app.post("/writing/b2-mock-score", async (req, res) => {
         });
       }
 
+      pendingQuotaDate = quota.date;
+
       const reply = await createChatCompletion(
         [
           { role: "system", content: b2MockWritingScorePrompt({ teil1, teil2 }) },
@@ -4557,6 +4651,7 @@ app.post("/writing/b2-mock-score", async (req, res) => {
       try {
         result = JSON.parse(cleanedReply);
       } catch (_error) {
+        await refundFailedMarking();
         return res.status(502).json({
           error: "Falowen could not read the B2 writing assessment safely. Please try marking again.",
           code: "INVALID_B2_WRITING_ASSESSMENT",
@@ -4609,9 +4704,11 @@ app.post("/writing/b2-mock-score", async (req, res) => {
       email: authedUser.email,
       metadata: { score: Number(result?.score || 0) },
     });
+    pendingQuotaDate = "";
     return res.json({ result });
   } catch (err) {
     console.error("/writing/b2-mock-score error", err);
+    await refundFailedMarking();
     auditAIRequest({
       route: "/writing/b2-mock-score",
       uid: authedUser?.uid,
