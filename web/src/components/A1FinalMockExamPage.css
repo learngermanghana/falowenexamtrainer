@@ -360,3 +360,32 @@
     padding: 18px 12px 26px;
   }
 }
+
+/* Visible, non-punitive feedback about browser activity during the mock. */
+.a1-final-mock-integrity {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border: 1px solid #d4c2a3;
+  border-radius: 12px;
+  background: #fff9ed;
+  color: #563b20;
+  margin: 14px 0;
+}
+.a1-final-mock-integrity p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
+.a1-final-mock-integrity-warning { font-weight: 750; }
+.a1-final-mock-integrity button {
+  flex-shrink: 0;
+  background: #fff;
+  color: #563b20;
+  border: 1px solid #a88a63;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+@media (max-width: 560px) {
+  .a1-final-mock-integrity { flex-direction: column; align-items: stretch; }
+}
