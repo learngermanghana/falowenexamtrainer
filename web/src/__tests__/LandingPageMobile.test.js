@@ -36,25 +36,29 @@ describe("Falowen public homepage on mobile", () => {
     jest.clearAllMocks();
   });
 
-  it("offers German only, including after a saved French selection and language change", async () => {
+  it("offers German only, with a clear signup CTA and translated placement link", async () => {
     const onSignUp = jest.fn();
     render(<LandingPage program="french" onSignUp={onSignUp} />);
     expect(screen.queryByRole("button", { name: "French" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Start German" }));
+    fireEvent.click(screen.getByRole("button", { name: /Start learning/ }));
     expect(onSignUp).toHaveBeenCalledWith("german");
+    expect(screen.getAllByRole("link", { name: /Take free placement test/ })[0]).toHaveAttribute("href", "/placement-test");
     fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: "de" } });
-    await waitFor(() => expect(screen.getByRole("button", { name: "Deutsch starten" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: /Jetzt lernen/ })).toBeInTheDocument());
+    expect(screen.getAllByRole("link", { name: /Kostenlosen Einstufungstest machen/ })[0]).toHaveAttribute("href", "/placement-test");
     expect(screen.queryByText(/Französisch/)).not.toBeInTheDocument();
   });
 
-  it("shows the academy track record without limiting exam performance to Goethe", () => {
-    render(<LandingHost />);
-
-    expect(screen.getByRole("heading", { name: "Our track record" })).toBeInTheDocument();
-    expect(screen.getByText("2022")).toBeInTheDocument();
-    expect(screen.getByText("High exam pass rate")).toBeInTheDocument();
-    expect(screen.getByText("A1–C2")).toBeInTheDocument();
-    expect(screen.getByText(/not limited to one exam provider/i)).toBeInTheDocument();
+  it("has exactly four marketing features and no long onboarding or course directory", () => {
+    const { container } = render(<LandingHost />);
+    expect(screen.getByRole("heading", { name: /Learn German your way/ })).toBeInTheDocument();
+    expect(container.querySelectorAll(".falowen-home-feature")).toHaveLength(4);
+    expect(screen.getByRole("heading", { name: "Find your German level" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Prepare for Goethe-style exams" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Learn with a live class" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Learn at your own pace" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Start in three simple steps" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /German A1–C2 courses and exam preparation/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Goethe pass rate/i)).not.toBeInTheDocument();
   });
 
@@ -79,9 +83,9 @@ describe("Falowen public homepage on mobile", () => {
     const { container } = render(<LandingHost />);
     const css = container.querySelector("style")?.textContent || "";
 
-    expect(css).toContain("env(safe-area-inset-top)");
-    expect(css).toContain("env(safe-area-inset-bottom)");
-    expect(css).toContain("padding-bottom: calc(92px + env(safe-area-inset-bottom))");
-    expect(css).toContain(".falowen-mobile-actions");
+    expect(container.querySelector(".falowen-mobile-actions")).toBeInTheDocument();
+    expect(css).not.toContain("overflow: hidden");
+    expect(screen.getByRole("img", { name: "German classroom at Learn Language Education Academy" })).toHaveAttribute("src", "/classes/llea-classroom.jpg");
+    expect(screen.getAllByRole("link", { name: /View live classes/ })[0]).toHaveAttribute("href", "/classes/");
   });
 });
