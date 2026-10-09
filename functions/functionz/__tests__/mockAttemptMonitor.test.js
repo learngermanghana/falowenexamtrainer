@@ -58,8 +58,8 @@ test("A2 Mock 2 browser progress cannot expose answers or pretend to be a verifi
 });
 
 
-test("mock monitoring allows verified Admin and staff identities but denies learners", () => {
-  expect(isAuthorizedMockMonitor({ uid: "staff", email: "staff@falowen.app" })).toBe(true);
+test("mock monitoring only allows privileged identity claims or owner", () => {
+  expect(isAuthorizedMockMonitor({ uid: "staff", email: "staff@falowen.app" })).toBe(false);
   expect(isAuthorizedMockMonitor({ uid: "admin", email: "moxflex@gmail.com" })).toBe(true);
   expect(isAuthorizedMockMonitor({ uid: "tutor", role: "tutor" })).toBe(true);
   expect(isAuthorizedMockMonitor({ uid: "admin-claim", admin: true })).toBe(true);
