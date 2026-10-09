@@ -29,6 +29,28 @@ const iso = value => {
   const ms = toMillis(value);
   return ms ? new Date(ms).toISOString() : null;
 };
+
+const INTEGRITY_TYPES = new Set(["tab_hidden", "window_blur", "fullscreen_exit", "paste_attempt", "copy_attempt"]);
+// Client-reported signals are deliberately unverified. Never treat them as proof of cheating.
+const normalizeMockIntegrity = raw => {
+  if (!raw || typeof raw !== "object") return null;
+  const counts = {};
+  for (const type of INTEGRITY_TYPES) {
+    const count = Number(raw.counts?.[type]);
+    counts[type] = Number.isFinite(count) ? Math.max(0, Math.min(10000, Math.floor(count))) : 0;
+  }
+  const events = (Array.isArray(raw.events) ? raw.events : [])
+    .filter(event => INTEGRITY_TYPES.has(event?.type))
+    .slice(-8)
+    .map(event => ({
+      type: event.type,
+      section: String(event.section || "").slice(0, 30),
+      at: iso(event.at),
+    }));
+  return { counts, total: Object.values(counts).reduce((sum, n) => sum + n, 0),
+    events, source: "browser_reported" };
+};
+
 const normalizeMockAttempt = doc => {
   const path = String(doc.ref?.path || "");
   const parts = path.split("/");
@@ -60,6 +82,7 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
+    integrity: normalizeMockIntegrity(state.integrity),
     overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
       ? Number(data.verifiedOverall.score) : null,
   };
@@ -208,4 +231,4 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
   return { attempts: await enrichStudentNames(db, attempts), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, normalizeMockIntegrity, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
