@@ -1,6 +1,7 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { useAuth } from "../context/AuthContext";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
 import {
@@ -436,7 +437,7 @@ export default function B1FinalMockExamPage() {
         sectionScores: { ...exam.sectionScores, schreiben: Number(result?.score || 0) },
       });
     } catch (markError) {
-      setError(markError?.response?.data?.error || markError?.message || "Could not mark B1 Schreiben.");
+      setError(getMockWritingSubmissionError(markError));
     } finally {
       setBusy("");
     }
