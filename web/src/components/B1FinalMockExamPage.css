@@ -420,3 +420,86 @@
   color: #64748b;
   font-size: 14px;
 }
+
+
+/* Persistent four-module orientation: never imply a single section is the full exam. */
+.b1-final-journey {
+  background: #fff;
+  border: 1px solid #d4dce3;
+  border-radius: 14px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.b1-final-journey-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px 18px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.b1-final-journey-heading strong { font-size: 17px; }
+.b1-final-journey-heading span,
+.b1-final-small-note { color: #475569; font-size: 14px; }
+
+.b1-final-journey ol {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 8px;
+}
+
+.b1-final-journey li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  min-width: 0;
+}
+
+.b1-final-journey li.is-current { border-color: #8f1d2c; background: #fff1f2; }
+.b1-final-journey li.is-done { border-color: #86b7a1; background: #f0fdf4; }
+
+.b1-final-journey-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  font-weight: 800;
+}
+
+.b1-final-journey li.is-current .b1-final-journey-number { background: #8f1d2c; color: white; }
+.b1-final-journey li.is-done .b1-final-journey-number { background: #166534; color: white; }
+.b1-final-journey li span:last-child { display: grid; gap: 3px; min-width: 0; }
+.b1-final-journey li small { color: #475569; font-size: 12px; }
+.b1-final-small-note { line-height: 1.5; }
+
+.b1-final-practice-recovery { display: grid; gap: 10px; margin: 18px 0; }
+.b1-final-practice-recovery h3 { margin: 0 0 2px; }
+.b1-final-practice-recovery button {
+  text-align: left;
+  padding: 12px 14px;
+  font: inherit;
+  border: 1px solid #d4dce3;
+  background: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.b1-final-practice-recovery button:hover,
+.b1-final-practice-recovery button:focus-visible { border-color: #8f1d2c; }
+
+@media (max-width: 760px) {
+  .b1-final-journey ol { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .b1-final-journey { padding: 12px; }
+  .b1-final-journey li { padding: 9px; gap: 6px; }
+}
