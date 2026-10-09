@@ -461,8 +461,9 @@ const WritingPage = ({
   simplifiedExamFlow = false,
 }) => {
   const {
-    level,
+    level: examPracticeLevel,
     setLevel,
+    accessibleLevels,
     resultHistory,
     addResultToHistory,
     error,
@@ -480,6 +481,9 @@ const WritingPage = ({
     "";
   const isExamMode = mode === "exam";
   const isCourseMode = mode === "course";
+  const enrolledLevel = ALLOWED_LEVELS.find((option) =>
+    String(studentProfile?.level || "").trim().toUpperCase().startsWith(option)) || "";
+  const level = isCourseMode && enrolledLevel ? enrolledLevel : examPracticeLevel;
   const isSimplifiedExamFlow = isExamMode && simplifiedExamFlow;
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
@@ -716,21 +720,9 @@ const WritingPage = ({
     setActiveTab("mark");
   };
 
-  const normalizeProfileLevel = (rawLevel) => {
-    const normalized = (rawLevel || "").trim().toUpperCase();
-    if (ALLOWED_LEVELS.includes(normalized)) {
-      return normalized;
-    }
-
-    const fuzzyMatch = ALLOWED_LEVELS.find((allowed) =>
-      normalized.startsWith(allowed),
-    );
-
-    return fuzzyMatch || "";
-  };
-
-  const profileLevel = normalizeProfileLevel(studentProfile?.level);
-  const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  // Only course writing uses the registered level; exam writing follows the
+  // chosen accessible Exam Room level without changing the student profile.
+  const isLevelLocked = isCourseMode && Boolean(enrolledLevel);
   // Idea support now lives in Study Buddy so the writing room can stay focused.
   const canUseIdeasGenerator = false;
   const canUsePracticeLetters = isExamMode && !isSimplifiedExamFlow;
@@ -792,13 +784,7 @@ const WritingPage = ({
   }, [availableTabs, initialTab]);
   const progressMode = isExamMode ? "exam" : "course";
   const alternateProgressMode = progressMode === "exam" ? "course" : "exam";
-  useEffect(() => {
-    if (isLevelLocked && profileLevel !== level) {
-      setLevel(profileLevel);
-    }
-  }, [isLevelLocked, level, profileLevel, setLevel]);
-
-  useEffect(() => {
+   useEffect(() => {
     if (!visibleTabs.some((tab) => tab.key === activeTab)) {
       setActiveTab(visibleTabs[0]?.key || "mark");
       setIdeaError("");
@@ -2368,7 +2354,7 @@ const WritingPage = ({
                 ) : null}
               </div>
             ) : null}
-            <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
+            {!isSimplifiedExamFlow ? <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
                 {isLevelLocked && (
@@ -2384,11 +2370,11 @@ const WritingPage = ({
                 style={styles.select}
                 disabled={isLevelLocked}
               >
-                {ALLOWED_LEVELS.map((option) => (
+                {(isExamMode ? accessibleLevels : ALLOWED_LEVELS).map((option) => (
                   <option key={option}>{option}</option>
                 ))}
               </select>
-            </div>
+            </div> : null>
 
             <label style={styles.label}>
               {draftLabel || (isCourseMode
