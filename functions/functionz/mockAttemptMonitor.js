@@ -82,7 +82,7 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
-    integrity: normalizeMockIntegrity(state.integrity),
+    integrity: normalizeMockIntegrity(data.integrityAudit || state.integrity),
     overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
       ? Number(data.verifiedOverall.score) : null,
   };
