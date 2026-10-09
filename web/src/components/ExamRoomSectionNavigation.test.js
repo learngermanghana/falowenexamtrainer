@@ -47,12 +47,16 @@ describe("Exams Room section navigation", () => {
     expect(listeningSampleSource).toContain('Check answers');
   });
 
-  test("Overview guides students toward scored progress and daily practice", () => {
-    expect(overviewSource).toContain("Prepare for your {currentLevel} Goethe exam");
+  test("Overview preserves scored progress with one mock entry and direct skill navigation", () => {
+    expect(overviewSource).toContain("Your {currentLevel} exam room");
     expect(overviewSource).toContain("buildExamRoomCoach");
-    expect(overviewSource).toContain("Start today's warm-up");
-    expect(overviewSource).toContain("Practice coverage across exam skills");
-    expect(overviewSource).not.toContain('PRACTICE_SECTIONS');
+    expect(overviewSource).toContain("Exam skill practice coverage");
+    expect(overviewSource).toContain("getMockExamsForLevel");
+    expect(overviewSource).toContain('onClick={() => navigate("/exams/mocks")}');
+    expect(overviewSource).toContain('aria-label={"Practise " + skill.title}');
+    expect(overviewSource).toContain('onClick={() => navigate("/exams/question")}');
+    expect(overviewSource).toContain('onClick={() => navigate("/exams/file")}');
+    expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
     expect(appSource).toContain('examSection !== "overview" && !sampleId');
   });
 });
