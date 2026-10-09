@@ -1,3 +1,4 @@
+import { useMockExamIntegrity, MockExamIntegrityNotice } from "../hooks/useMockExamIntegrity";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -1030,6 +1031,7 @@ export default function B2FinalMockExamPage() {
   useAssessmentRestriction();
   const { idToken } = useAuth();
   const [state, setState] = useState(readState);
+  const integrity = useMockExamIntegrity({ level: "B2", mockId: "b2-final-mock", idToken, attemptId: "", section: state.stage, active: Boolean(state.started && !state.completed) });
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [pageError, setPageError] = useState("");
@@ -1098,6 +1100,7 @@ export default function B2FinalMockExamPage() {
   }, [now, state.completed, state.deadlineMs, state.stage, state.started]);
 
   const start = () => {
+    integrity.requestFullscreen();
     setState((current) => {
       const stage = current.stage || "teil1";
       const duration = SECTION_DURATIONS[stage];
@@ -1410,7 +1413,8 @@ export default function B2FinalMockExamPage() {
   }
 
   return (
-    <main className="b2-mock-shell">
+    <main className="b2-mock-shell" onCopyCapture={integrity.onCopyCapture} onPasteCapture={integrity.onPasteCapture}>
+      <MockExamIntegrityNotice guard={integrity} />
       <AppBackButton label="Back to course" fallbackPath="/campus/course" />
       <SectionHeader stage={state.stage} secondsLeft={secondsLeft} />
       <FullMockGuide

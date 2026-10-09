@@ -1,3 +1,4 @@
+import { useMockExamIntegrity, MockExamIntegrityNotice } from "../hooks/useMockExamIntegrity";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -214,6 +215,7 @@ export default function B1FinalMockExamPage() {
   const { idToken, user } = useAuth();
   const storageKey = `${B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey));
+  const integrity = useMockExamIntegrity({ level: "B1", mockId: B1_FINAL_MOCK_ID, idToken, attemptId: exam.attemptInfo?.attemptId, section: exam.stage, active: Boolean(exam.attemptInfo?.attemptId && !exam.completed && SECTION_DURATIONS[exam.stage]) });
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -352,6 +354,7 @@ export default function B1FinalMockExamPage() {
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
+    integrity.requestFullscreen();
     setBusy("start");
     setError("");
     try {
@@ -566,7 +569,8 @@ export default function B1FinalMockExamPage() {
   }
 
   return (
-    <main className="b1-final-shell">
+    <main className="b1-final-shell" onCopyCapture={integrity.onCopyCapture} onPasteCapture={integrity.onPasteCapture}>
+      <MockExamIntegrityNotice guard={integrity} />
       <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
       <SectionBar stage={exam.stage} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
       <FullMockGuide level="B1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} />

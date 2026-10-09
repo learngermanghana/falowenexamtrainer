@@ -1,4 +1,5 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
+import { appendA1MockIntegrityEvent, A1_INTEGRITY_MESSAGES } from "../utils/a1MockIntegrity.mjs";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
@@ -14,6 +15,7 @@ import {
   A1_FINAL_MOCK_ID,
   A1_FINAL_MOCK_STORAGE_KEY,
   saveA1MockAttempt,
+  reportA1MockIntegrityEvent,
   scoreA1MockWriting,
   startA1MockAttempt,
 } from "../services/a1FinalMockService";
@@ -67,6 +69,7 @@ const emptyState = (mockId = A1_FINAL_MOCK_ID) => ({
   sectionScores: {},
   overall: null,
   completed: false,
+  integrity: { counts: {}, events: [] },
 });
 
 const formatTime = (seconds) => {
@@ -362,12 +365,72 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [integrityNotice, setIntegrityNotice] = useState("");
+  const lastFocusSignalRef = useRef(0);
+  const hadFullscreenRef = useRef(false);
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
   const completionSaveRef = useRef("");
   const completionRetryCountRef = useRef(0);
   const completionRetryTimerRef = useRef(null);
   const [completionRetryNonce, setCompletionRetryNonce] = useState(0);
+
+  const integrityActive = Boolean(exam.attemptInfo?.attemptId && SECTION_DURATIONS[exam.stage] && !exam.completed);
+  const recordIntegrityEvent = useCallback((type) => {
+    if (!integrityActive) return;
+    const at = Date.now();
+    if (type === "window_blur" && document.hidden) return;
+    if ((type === "window_blur" || type === "tab_hidden") &&
+        at - lastFocusSignalRef.current < 1500) return;
+    if (type === "window_blur" || type === "tab_hidden") lastFocusSignalRef.current = at;
+    setExam(current => {
+      if (!current.attemptInfo?.attemptId || !SECTION_DURATIONS[current.stage] || current.completed) return current;
+      return { ...current, integrity: appendA1MockIntegrityEvent(current.integrity, type, current.stage, at) };
+    });
+    setIntegrityNotice(A1_INTEGRITY_MESSAGES[type] || "Exam activity recorded for review.");
+    void reportA1MockIntegrityEvent({ idToken, attemptId: exam.attemptInfo?.attemptId, type, section: exam.stage });
+  }, [integrityActive, idToken, exam.attemptInfo?.attemptId, exam.stage]);
+
+  useEffect(() => {
+    if (!integrityActive) return undefined;
+    hadFullscreenRef.current = Boolean(document.fullscreenElement);
+    const onVisibility = () => { if (document.hidden) recordIntegrityEvent("tab_hidden"); };
+    const onBlur = () => recordIntegrityEvent("window_blur");
+    const onFullscreenChange = () => {
+      if (hadFullscreenRef.current && !document.fullscreenElement) recordIntegrityEvent("fullscreen_exit");
+      hadFullscreenRef.current = Boolean(document.fullscreenElement);
+    };
+    const onBeforeUnload = event => {
+      // Browsers choose whether to display the built-in leave confirmation.
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("blur", onBlur);
+    document.addEventListener("fullscreenchange", onFullscreenChange);
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("blur", onBlur);
+      document.removeEventListener("fullscreenchange", onFullscreenChange);
+      window.removeEventListener("beforeunload", onBeforeUnload);
+    };
+  }, [integrityActive, recordIntegrityEvent]);
+
+  const enterExamFullscreen = () => {
+    if (typeof document === "undefined") return;
+    const target = document.documentElement;
+    if (typeof target.requestFullscreen === "function" && !document.fullscreenElement) {
+      // Not supported on every phone/browser; failure must not block the exam.
+      target.requestFullscreen().catch(() => {});
+    }
+  };
+  const preventExternalText = (event, kind) => {
+    if (!integrityActive) return;
+    event.preventDefault();
+    recordIntegrityEvent(kind);
+  };
+
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -496,6 +559,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
+    enterExamFullscreen();
     setBusy("start");
     setError("");
     try {
@@ -1109,6 +1173,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             <strong>Pass mark: 60/100</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
             <p>Your progress is saved automatically. Completed sections are locked. <strong>Leaving does not pause the section timer.</strong> Return to this page to resume the unfinished attempt; it is not a failed mock.</p>
+            <p><strong>Exam integrity:</strong> Do not use ChatGPT or other outside help. Falowen logs tab/window exits and attempts to copy or paste for teacher review; these flags do not automatically fail you. Fullscreen is requested where supported, but your browser can still let you leave.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
@@ -1121,13 +1186,24 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   }
 
   return (
-    <main className="a1-goethe-mock-shell a1-final-mock-shell" data-a1-final-mock>
+    <main className="a1-goethe-mock-shell a1-final-mock-shell" data-a1-final-mock
+      onCopyCapture={event => preventExternalText(event, "copy_attempt")}
+      onPasteCapture={event => preventExternalText(event, "paste_attempt")}>
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label={isMock2 ? "Back to Mock Exams" : "Back to Course Book"} fallbackPath={isMock2 ? "/exams/mocks" : "/campus/course"} />
         <span className="a1-goethe-mock-preview-badge">
           {exam.completed ? "Mock complete" : title}
         </span>
       </div>
+
+      {integrityActive ? <aside className="a1-final-mock-integrity" aria-live="polite">
+        <div>
+          <strong>Exam integrity · {Object.values(exam.integrity?.counts || {}).reduce((sum, count) => sum + (Number(count) || 0), 0)} review flags</strong>
+          <p>Stay on this exam page and write answers yourself. Leaving the tab or copying/pasting is recorded; no automatic penalty.</p>
+          {integrityNotice ? <p role="status" className="a1-final-mock-integrity-warning">{integrityNotice}</p> : null}
+        </div>
+        <button type="button" onClick={enterExamFullscreen}>Enter fullscreen</button>
+      </aside> : null}
 
       {exam.stage !== "result" ? <FullMockGuide level="A1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
 

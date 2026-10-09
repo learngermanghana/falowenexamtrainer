@@ -37,5 +37,8 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
+      - name: Validate A1 mock browser integrity rules
+        run: node --test web/src/utils/a1MockIntegrity.test.mjs
+
       - name: Run Firebase emulator integration tests
         run: npm run test:integration
