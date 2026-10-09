@@ -40,11 +40,11 @@ describe("Falowen public homepage on mobile", () => {
     const onSignUp = jest.fn();
     render(<LandingPage program="french" onSignUp={onSignUp} />);
     expect(screen.queryByRole("button", { name: "French" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /Start learning/ }));
+    fireEvent.click(screen.getAllByRole("button", { name: /Start learning/ })[0]);
     expect(onSignUp).toHaveBeenCalledWith("german");
     expect(screen.getAllByRole("link", { name: /Take free placement test/ })[0]).toHaveAttribute("href", "/placement-test");
     fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: "de" } });
-    await waitFor(() => expect(screen.getByRole("button", { name: /Jetzt lernen/ })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("button", { name: /Jetzt lernen/ })[0]).toBeInTheDocument());
     expect(screen.getAllByRole("link", { name: /Kostenlosen Einstufungstest machen/ })[0]).toHaveAttribute("href", "/placement-test");
     expect(screen.queryByText(/Französisch/)).not.toBeInTheDocument();
   });
