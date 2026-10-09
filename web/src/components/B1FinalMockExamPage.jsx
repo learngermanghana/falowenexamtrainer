@@ -240,6 +240,7 @@ export default function B1FinalMockExamPage() {
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [confirmIncompleteHoeren, setConfirmIncompleteHoeren] = useState(false);
   const saveTimerRef = useRef(null);
   const timeoutHandledRef = useRef("");
   const completionSavedRef = useRef("");
@@ -510,6 +511,16 @@ export default function B1FinalMockExamPage() {
   }));
 
   const mockProgress = getB1MockProgress(exam.stage, exam.sectionScores);
+  const hoerenAudioFinished = B1_LISTENING.filter((part) => exam.hoerenAudio?.[part.id] === "ended").length;
+  const hoerenAnswered = hoerenQuestions.filter((question) => Boolean(exam.hoerenAnswers?.[question.key])).length;
+  const hoerenIncomplete = hoerenAudioFinished < B1_LISTENING.length || hoerenAnswered < hoerenQuestions.length;
+  const confirmHoerenFinish = () => {
+    if (secondsLeft > 0 && hoerenIncomplete) {
+      setConfirmIncompleteHoeren(true);
+      return;
+    }
+    submitHoeren();
+  };
 
   if (exam.stage === "intro") {
     return (
@@ -724,10 +735,15 @@ export default function B1FinalMockExamPage() {
 
       {exam.stage === "hoeren" ? (
         <>
-          <header className="b1-final-module-header"><p>GOETHE-ZERTIFIKAT B1</p><h1>Hören</h1></header>
+          <header className="b1-final-module-header">
+            <p>GOETHE-ZERTIFIKAT B1 · Module 2 of 4</p>
+            <h1>Hören</h1>
+            <p>This module has <strong>four separate audio Teile</strong>. Complete all four before moving to Schreiben.</p>
+            <p><strong>{hoerenAudioFinished}/4 audio Teile finished · {hoerenAnswered}/30 questions answered</strong></p>
+          </header>
           {B1_LISTENING.map((part, partIndex) => (
             <section className="b1-final-paper" key={part.id}>
-              <div className="b1-final-part-heading"><h2>{part.title}</h2></div>
+              <div className="b1-final-part-heading"><h2>{part.title} · Audio {partIndex + 1} of 4</h2></div>
               <LockedAudio
                 part={part}
                 idToken={idToken}
@@ -751,9 +767,21 @@ export default function B1FinalMockExamPage() {
               ))}
             </section>
           ))}
-          <button type="button" className="b1-final-primary b1-final-submit" onClick={submitHoeren}>
-            Finish Hören (2/4) → Schreiben (3/4)
-          </button>
+          {confirmIncompleteHoeren ? (
+            <div className="b1-final-hoeren-check" role="alert">
+              <strong>Hören is not yet complete.</strong>
+              <p>You have finished {hoerenAudioFinished} of 4 audio Teile and answered {hoerenAnswered} of 30 questions.
+                Moving on now will score the missing answers as incorrect. It will not finish the full four-module mock.</p>
+              <div>
+                <button type="button" onClick={() => setConfirmIncompleteHoeren(false)}>Go back and finish Hören</button>
+                <button type="button" className="b1-final-primary" onClick={submitHoeren}>Finish Hören anyway → Schreiben</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="b1-final-primary b1-final-submit" onClick={confirmHoerenFinish}>
+              Finish Hören (2/4) → Schreiben (3/4)
+            </button>
+          )}
         </>
       ) : null}
 
