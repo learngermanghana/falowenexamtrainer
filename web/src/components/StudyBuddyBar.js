@@ -15,8 +15,18 @@ import {
   requestStudyBuddyReply,
 } from "../services/studyBuddyService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import { splitStudyBuddySafeLinks } from "../services/studyBuddyNavigation";
 import "./StudyBuddyBar.css";
 import "./StudyBuddyChat.css";
+
+const renderStudyBuddyText = (content) => splitStudyBuddySafeLinks(content).map((part, index) =>
+  part.href ? (
+    <React.Fragment key={index}>
+      <a href={part.href} className="study-buddy-chat-safe-link">{part.text}</a>
+      {part.suffix}
+    </React.Fragment>
+  ) : <React.Fragment key={index}>{part.text}</React.Fragment>
+);
 
 const PASS_MARK = 60;
 const ATTENDANCE_TARGET = 80;
@@ -799,7 +809,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
                     key={`${entry.role}-${index}-${entry.content.slice(0, 24)}`}
                   >
                     <div className="study-buddy-chat-speaker">{entry.role === "assistant" ? "Study Buddy" : "You"}</div>
-                    <div className="study-buddy-chat-bubble">{entry.content}</div>
+                    <div className="study-buddy-chat-bubble">{renderStudyBuddyText(entry.content)}</div>
                   </div>
                 ))}
                 {isReplyLoading ? (
