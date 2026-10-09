@@ -4034,7 +4034,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
           { role: "system", content: a1MockWritingScorePrompt({ text }) },
           { role: "user", content: "Return the strict A1 mock writing result as JSON only." },
         ],
-        { temperature: 0.1, max_tokens: 900 },
+        { temperature: 0.1, max_tokens: 1500, response_format: { type: "json_object" } },
       );
 
       const cleanedReply = String(reply || "")
@@ -4211,7 +4211,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
-        { temperature: 0.1, max_tokens: 1200 },
+        { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
       );
 
       const cleanedReply = String(reply || "")
@@ -4412,7 +4412,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
           { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
           { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
         ],
-        { temperature: 0.1, max_tokens: 1400 },
+        { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
       );
       const cleanedReply = String(reply || "")
         .trim()
@@ -4547,7 +4547,7 @@ app.post("/writing/b2-mock-score", async (req, res) => {
           { role: "system", content: b2MockWritingScorePrompt({ teil1, teil2 }) },
           { role: "user", content: "Return the strict B2 mock writing result as JSON only." },
         ],
-        { temperature: 0.1, max_tokens: 1400 },
+        { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
       );
       const cleanedReply = String(reply || "")
         .trim()
