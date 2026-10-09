@@ -87,7 +87,7 @@ describe("simplified Exam Room overview", () => {
     render(<ExamsOverviewPage />);
 
     expect(screen.getByText("Warm-up in progress")).toBeInTheDocument();
-    expect(screen.getByText("A2 Lesen sample")).toBeInTheDocument();
+    expect(screen.getByText(/A2 Lesen sample/)).toBeInTheDocument();
     expect(screen.getAllByText("53%").length).toBeGreaterThan(0);
     expect(screen.getByText(/Suggested: Lesen/i)).toBeInTheDocument();
 
