@@ -145,7 +145,7 @@ const MockJourney = ({ stage, sectionScores }) => {
 
 const SectionBar = ({ stage, secondsLeft, attemptInfo }) => (
   <div className="b1-final-sectionbar">
-    <div><span>Current section</span><strong>{SECTION_LABELS[stage]}</strong></div>
+    <div><span>Full mock progress</span><strong>Module {B1_MOCK_STEPS.findIndex((step) => step.key === stage) + 1}/4 · {SECTION_LABELS[stage]}</strong></div>
     <div><span>Time left</span><strong className={secondsLeft <= 120 ? "warning" : ""}>{formatTime(secondsLeft)}</strong></div>
     <div><span>Attempt</span><strong>{attemptInfo?.firstAttempt ? "Readiness 1" : `Practice ${attemptInfo?.attemptNumber || ""}`}</strong></div>
   </div>
