@@ -103,6 +103,13 @@ const COPY = {
   },
 };
 
+const FOOTER_LINKS = [
+  { href: "/courses/", labelKey: "footerCourses" },
+  { href: "/exam-practice", labelKey: "footerExam" },
+  { href: "/reviews/", labelKey: "footerReviews" },
+  { href: "/help", labelKey: "footerHelp" },
+];
+
 const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
   { value: "de", label: "Deutsch" },
@@ -244,10 +251,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
 
         <footer className="falowen-home-footer">
           <div className="falowen-home-footer-links">
-            <a href="/courses/">{copy.footerCourses}</a>
-            <a href="/exam-practice">{copy.footerExam}</a>
-            <a href="/reviews/">{copy.footerReviews}</a>
-            <a href="/help">{copy.footerHelp}</a>
+            {FOOTER_LINKS.map((item) => <a href={item.href} key={item.href}>{copy[item.labelKey]}</a>)}
           </div>
           <a className="falowen-home-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">{copy.contact} ↗</a>
         </footer>
