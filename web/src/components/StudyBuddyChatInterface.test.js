@@ -23,6 +23,14 @@ describe("Study Buddy chat interface", () => {
     expect(chatCssSource).toContain("study-buddy-chat-row--assistant");
   });
 
+  test("makes only first-party Falowen navigation URLs tappable", () => {
+    expect(componentSource).toContain("splitStudyBuddySafeLinks");
+    expect(componentSource).toContain("renderStudyBuddyText(entry.content)");
+    expect(componentSource).toContain("href={part.href}");
+    expect(componentSource).toContain('className="study-buddy-chat-safe-link"');
+    expect(chatCssSource).toContain(".study-buddy-chat-safe-link");
+  });
+
   test("keeps chat compact on mobile", () => {
     expect(chatCssSource).toContain("@media (max-width: 640px)");
     expect(chatCssSource).toContain("max-height: 210px");
