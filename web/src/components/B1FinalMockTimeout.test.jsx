@@ -58,11 +58,14 @@ describe("B1 expired section automatic submission", () => {
   });
 
   it("submits the saved Schreiben answers on resume at 00:00 and continues to Sprechen", async () => {
-    scoreB1MockWriting.mockResolvedValue({ score: 18, maxScore: 25 });
+    let finishMarking;
+    scoreB1MockWriting.mockImplementation(() => new Promise((resolve) => { finishMarking = resolve; }));
     render(<B1FinalMockExamPage />);
-    expect(screen.getByText(/Time is up. Falowen is automatically submitting/)).toBeInTheDocument();
+    expect(screen.getAllByRole("status").some((element) =>
+      element.textContent.includes("Time is up. Falowen is automatically submitting")
+    )).toBe(true);
 
-    await act(async () => { await Promise.resolve(); });
+    await act(async () => { finishMarking({ score: 18, maxScore: 25 }); await Promise.resolve(); });
     expect(scoreB1MockWriting).toHaveBeenCalledTimes(1);
     expect(scoreB1MockWriting).toHaveBeenCalledWith(expect.objectContaining({
       attemptId: "existing-attempt",
