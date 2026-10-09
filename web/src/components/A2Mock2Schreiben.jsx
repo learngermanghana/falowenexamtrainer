@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { markLetterWithAI } from "../services/coachService";
@@ -27,7 +27,7 @@ export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
   useEffect(() => { if (expired && !draft.submittedAt) setDraft(old => ({ ...old, submittedAt: Date.now() })); }, [expired, draft.submittedAt]);
   const start = () => { setNow(Date.now()); setDraft({ ...initial(), startedAt: Date.now() }); };
   const edit = (field,value) => { if (!done) setDraft(old => ({ ...old, [field]: value })); };
-  const mark = async () => {
+  const mark = useCallback(async () => {
     if (!done || marking) return;
     setMarking(true); setMarkError("");
     try {
@@ -36,13 +36,15 @@ export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
         const result = await markLetterWithAI({text: i === 0 ? draft.sms : draft.email, level: "A2", idToken, taskId: `a2-mock-02-schreiben-${part}`, promptType: i === 0 ? "informal_message" : "formal_email", submissionContext: `A2 Mock 2 Schreiben ${part}`, taskContext: `${t.situation} ${t.instruction} ${t.points.join("; ")} Word target ${t.minWords}-${t.maxWords}. Assess whether all three required points and correct greeting/closing are present. Do not assess any A2 Mock 1 task.`});
         return { part, score: result.score, maxScore: result.maxScore, feedback: result.feedback, structuredFeedback: result.structuredFeedback };
       }));
-      setDraft(old => ({...old, aiFeedback: grades}));
+      const completedDraft = {...draft, aiFeedback: grades};
+      localStorage.setItem(KEY, JSON.stringify(completedDraft));
+      setDraft(completedDraft);
       if (embedded && onComplete) onComplete();
     } catch (e) { setMarkError(e?.response?.data?.error || e.message || "Bewertung derzeit nicht verfügbar."); }
     finally {setMarking(false);}
-  };
+  }, [done, marking, draft, idToken, embedded, onComplete]);
   const submit = () => { if (window.confirm("Beide Texte abgeben? Danach können Sie nichts mehr ändern.")) setDraft(old => ({ ...old, submittedAt: Date.now() })); };
-  useEffect(() => { if (embedded && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, done, Boolean(draft.aiFeedback), marking, markError]);
+  useEffect(() => { if (embedded && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, done, draft.aiFeedback, marking, markError, mark]);
   return <main className="a2-mock2-shell" lang="de">
     {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Schreiben</span></div> : null}
     {!draft.startedAt ? <section className="a2-mock2-intro"><p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Schreiben</h1><p>Sie haben 30 Minuten für zwei Aufgaben. Teil 1: etwa 10 Minuten, Teil 2: etwa 20 Minuten. Schreiben Sie zu allen drei Punkten und achten Sie auf Anrede und Gruß.</p><div className="a2-mock2-stat"><span>30 Minuten</span><span>2 Aufgaben</span><span>20–30 / 30–40 Wörter</span></div><p>Ihre Entwürfe werden auf diesem Gerät automatisch gespeichert. Die Uhr läuft weiter, wenn Sie die Seite verlassen.</p><button type="button" className="a2-mock2-primary" onClick={start}>Schreiben starten</button></section> : <>
