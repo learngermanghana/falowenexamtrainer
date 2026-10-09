@@ -195,10 +195,10 @@ export const scoreInteractionAudio = async ({
   return response.data;
 };
 
-export const scoreA1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
+export const scoreA1MockSpeaking = async ({ attempts, attemptId, mockId = "a1-mock-01", idToken }) => {
   const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/a1-mock-score`,
-    { attempts, attemptId },
+    { attempts, attemptId, mockId },
     { headers: authHeaders(idToken) }
   );
 

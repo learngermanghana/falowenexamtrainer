@@ -21,6 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
+const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -2141,7 +2142,7 @@ const speechTrainerPrompt = ({ level, note }) =>
     .filter(Boolean)
     .join(" ");
 
-const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const a1MockSpeakingScorePrompt = ({ attempts = [], mockId = "a1-mock-01" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     teil: String(attempt?.teil || "").trim(),
     transcript: String(attempt?.transcript || "").trim(),
@@ -2199,7 +2200,8 @@ const a1MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    mockTaskPrompt("A1", "speaking"),
+    mockTaskPrompt("A1", "speaking", undefined, mockId),
+    ...(mockId === "a1-mock-02" ? ["For Mock 2, assess the question AND the response in Teil 2, and the polite request AND the response in Teil 3. The followUp fields define the partner/examiner questions; assess them too. The introduction may use a fictional phone number."] : []),
     "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
@@ -2613,7 +2615,7 @@ const scoreA1MockWritingForm = (formValues = {}) => {
   };
 };
 
-const a1MockWritingScorePrompt = ({ text = "" }) => [
+const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
   "You are a strict Goethe-style A1 writing examiner for a Falowen mock exam.",
   "Assess the learner's German email exactly as submitted. Do not rewrite it before scoring and do not invent missing information.",
   "A suitable greeting, closing and the learner's name are required, but they are not extra content points.",
@@ -2623,22 +2625,18 @@ const a1MockWritingScorePrompt = ({ text = "" }) => [
   "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
   "",
   "SCORING — 15 points total:",
-  "Content points: 6 points — 2 for each of the three canonical task points, in order. Output keys registration, next_course_start, price represent points 1, 2, 3 respectively.",
+  mockId === "a1-mock-02" ? "Content points: 6 points — 2 each for inviting Markus (invitation), specifying a day/time/address (when_where), and asking him to bring something (bring). Accept any sensible chosen day, time, address and item. Use informal register with Markus." : "Content points: 6 points — 2 for each of the three canonical task points, in order. Output keys registration, next_course_start, price represent points 1, 2, 3 respectively.",
   "Message structure: 3 points — greeting 1, closing 1, name 1.",
   "A1 language control: 4 points — simple understandable sentences/questions, basic word order and vocabulary. Meaning matters more than perfection.",
   "A1 appropriateness: 2 points — reasonably simple A1 production, not unnecessarily elaborate.",
   "",
-  mockTaskPrompt("A1", "writing"),
+  mockTaskPrompt("A1", "writing", undefined, mockId),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
     maxScore: 15,
     level_mismatch: false,
-    content: {
-      registration: 0,
-      next_course_start: 0,
-      price: 0
-    },
+    content: mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
     structure: {
       greeting: 0,
       closing: 0,
@@ -4032,10 +4030,11 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       : {};
     const text = String(req.body?.text || "").trim().slice(0, 5000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId = await resolveA1MarkingSet({ db: getFirestoreSafe(), uid: authedUser.uid, attemptId, mockId: req.body?.mockId || "a1-mock-01" });
 
     if (!ensureOpenAIConfigured(res)) return;
 
-    const form = scoreA1MockWritingForm(formValues);
+    const form = mockId === "a1-mock-02" ? scoreA1Mock2Form(formValues) : scoreA1MockWritingForm(formValues);
     let letter;
 
     if (!text) {
@@ -4043,7 +4042,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
         score: 0,
         maxScore: 15,
         level_mismatch: false,
-        content: { registration: 0, next_course_start: 0, price: 0 },
+        content: mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
         structure: { greeting: 0, closing: 0, name: 0 },
         a1_language_score: 0,
         a1_fit_score: 0,
@@ -4067,7 +4066,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: a1MockWritingScorePrompt({ text }) },
+          { role: "system", content: a1MockWritingScorePrompt({ text, mockId }) },
           { role: "user", content: "Return the strict A1 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 1500, response_format: { type: "json_object" } },
@@ -4160,7 +4159,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A1 writing mock." });
+    return res.status(err?.status || (err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500)).json({ code: err?.code || null, error: err.message || "Failed to score the A1 writing mock." });
   }
 });
 
@@ -4743,7 +4742,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    validateA1MockId(mockId);
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -4756,7 +4755,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      const activeAttemptId = String(userData.activeAttemptIds?.[mockId] || (mockId === "a1-mock-01" ? userData.activeAttemptId : "") || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -4775,7 +4774,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptCount = Math.max(0, Number(userData.attemptCounts?.[mockId] ?? (mockId === "a1-mock-01" ? userData.attemptCount : 0) ?? 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -4784,8 +4783,9 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
-          activeAttemptId: newAttemptRef.id,
+          ...(mockId === "a1-mock-01" ? { attemptCount: attemptNumber, activeAttemptId: newAttemptRef.id } : {}),
+          attemptCounts: { [mockId]: attemptNumber },
+          activeAttemptIds: { [mockId]: newAttemptRef.id },
           updatedAt: now,
         },
         { merge: true },
@@ -4817,7 +4817,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
     return res.json(responsePayload);
   } catch (err) {
     console.error("/a1-mock/attempt/start error", err);
-    return res.status(500).json({ error: err.message || "Could not start the A1 mock attempt." });
+    return res.status(err?.status || 500).json({ error: err.message || "Could not start the A1 mock attempt." });
   }
 });
 
@@ -4874,6 +4874,12 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
+      const mockId = existing.mockId || "a1-mock-01";
+      validateA1MockId(mockId);
+      if (state.mockId && state.mockId !== mockId) {
+        saveOutcome = { invalidCompletion: true, code: "ASSESSMENT_TASK_CHANGED", error: "This progress belongs to a different mock." };
+        return;
+      }
 
       // Completion is monotonic, but a completed record is only publishable when
       // all four section scores can be reconstructed from server-trusted data.
@@ -4881,6 +4887,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         let verifiedCompletion;
         try {
           verifiedCompletion = buildVerifiedA1MockScore({
+            mockId,
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
           });
@@ -4908,12 +4915,13 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         );
 
         const completedUserPatch = {
+          ...(userData.activeAttemptIds?.[mockId] === attemptId ? { activeAttemptIds: { [mockId]: null } } : {}),
           lastCompletedAttemptId: attemptId,
           lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
           lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
           updatedAt: now,
         };
-        if (String(userData.activeAttemptId || "") === attemptId) {
+        if (mockId === "a1-mock-01" && String(userData.activeAttemptId || "") === attemptId) {
           completedUserPatch.activeAttemptId = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
@@ -4930,6 +4938,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         let verifiedCompletion;
         try {
           verifiedCompletion = buildVerifiedA1MockScore({
+            mockId,
             state,
             verifiedSections: existing.verifiedSections || {},
           });
@@ -4973,14 +4982,15 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         );
 
         const completedUserPatch = {
+          ...(userData.activeAttemptIds?.[mockId] === attemptId ? { activeAttemptIds: { [mockId]: null } } : {}),
           lastCompletedAttemptId: attemptId,
           lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
           lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
           updatedAt: now,
         };
         if (
-          !userData.activeAttemptId ||
-          String(userData.activeAttemptId) === attemptId
+          mockId === "a1-mock-01" && (!userData.activeAttemptId ||
+          String(userData.activeAttemptId) === attemptId)
         ) {
           completedUserPatch.activeAttemptId = null;
         }
@@ -5013,10 +5023,10 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         { merge: true },
       );
 
-      const progressUserPatch = { updatedAt: now };
+      const progressUserPatch = { updatedAt: now, ...(!userData.activeAttemptIds?.[mockId] || userData.activeAttemptIds[mockId] === attemptId ? { activeAttemptIds: { [mockId]: attemptId } } : {}) };
       if (
-        !userData.activeAttemptId ||
-        String(userData.activeAttemptId) === attemptId
+        mockId === "a1-mock-01" && (!userData.activeAttemptId ||
+        String(userData.activeAttemptId) === attemptId)
       ) {
         progressUserPatch.activeAttemptId = attemptId;
       }
@@ -5059,6 +5069,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
         }
 
         completionSync = await syncA1MockCompletion({
+          mockId: attemptData.mockId || "a1-mock-01",
           db,
           admin,
           authedUser,
@@ -6061,6 +6072,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId = await resolveA1MarkingSet({ db: getFirestoreSafe(), uid: authedUser.uid, attemptId, mockId: req.body?.mockId || "a1-mock-01" });
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking attempts are required." });
     }
@@ -6096,7 +6108,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: a1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "system", content: a1MockSpeakingScorePrompt({ attempts: normalizedAttempts, mockId }) },
       { role: "user", content: "Return the final A1 mock speaking assessment as the required JSON object." },
     ];
 
@@ -6176,7 +6188,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
       email: authedUser?.email,
       success: false,
     });
-    return res.status(err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500).json({ code: err?.code || null, error: err.message || "Failed to score the A1 speaking mock." });
+    return res.status(err?.status || (err?.code === "MOCK_MARKING_UNAVAILABLE" ? 503 : 500)).json({ code: err?.code || null, error: err.message || "Failed to score the A1 speaking mock." });
   }
 });
 

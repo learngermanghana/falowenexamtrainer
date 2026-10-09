@@ -1,5 +1,7 @@
 "use strict";
 
+const { getA1MockSet } = require("./a1MockSets");
+
 const MOCK_TITLE = "A1 Final Mock Exam";
 const MOCK_ROUTE = "/campus/results";
 
@@ -78,9 +80,10 @@ const verifiedSectionScore = (verifiedSections = {}, section) => {
   return Math.max(0, Math.min(25, score));
 };
 
-const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {} } = {}) => {
-  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, READING_ANSWER_KEY);
-  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, LISTENING_ANSWER_KEY);
+const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {}, mockId = "a1-mock-01" } = {}) => {
+  const mockSet = getA1MockSet(mockId);
+  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, mockSet?.readingAnswerKey || READING_ANSWER_KEY);
+  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, mockSet?.listeningAnswerKey || LISTENING_ANSWER_KEY);
   const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
   const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
 
@@ -231,7 +234,8 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
   };
 };
 
-const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false } = {}) => {
+const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "a1-mock-01" } = {}) => {
+  if (mockId === "a1-mock-02") return firstAttempt || Number(attemptNumber) === 1 ? "A1-MOCK-02" : `A1-MOCK-02-PRACTICE-${Math.max(1, Number(attemptNumber) || 1)}`;
   const number = Math.max(1, Number(attemptNumber) || 1);
   return firstAttempt || number === 1
     ? "A1-FINAL-MOCK"
@@ -239,6 +243,7 @@ const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false } = {}
 };
 
 const buildA1MockCompletionArtifacts = ({
+  mockId = "a1-mock-01",
   authedUser = {},
   studentProfile = null,
   attemptId,
@@ -249,10 +254,11 @@ const buildA1MockCompletionArtifacts = ({
   now = new Date(),
 } = {}) => {
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
+  const mockTitle = mockId === "a1-mock-02" ? "A1 Mock 2" : MOCK_TITLE;
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
-  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt });
+  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1
     ? "First readiness attempt"
     : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
@@ -277,7 +283,8 @@ const buildA1MockCompletionArtifacts = ({
     name: identity.name,
     studentName: identity.name,
     level: "A1",
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
+    mockId,
     assignmentId,
     assignment_id: assignmentId,
     canonicalAssignmentKey: assignmentId,
@@ -290,7 +297,7 @@ const buildA1MockCompletionArtifacts = ({
     comments,
     feedback: comments,
     date: iso,
-    link: "/campus/course/a1-final-mock-exam",
+    link: mockId === "a1-mock-02" ? "/campus/course/a1-final-mock-2" : "/campus/course/a1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
     attemptLabel,
@@ -305,7 +312,7 @@ const buildA1MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = firstAttempt
+  const notificationTitle = mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
     ? "Your A1 Final Mock result is ready"
     : "Your A1 Final Mock practice result is ready";
 
@@ -322,7 +329,8 @@ const buildA1MockCompletionArtifacts = ({
     studentCode: identity.studentCode,
     studentCodeOriginal: identity.studentCode,
     studentName: identity.name,
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
+    mockId,
     assignmentId,
     level: "A1",
     score,
@@ -334,7 +342,8 @@ const buildA1MockCompletionArtifacts = ({
       attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
       category: "feedback",
       route: MOCK_ROUTE,
-      assignment: MOCK_TITLE,
+      assignment: mockTitle,
+      mockId,
       assignmentId,
       level: "A1",
       score: String(score),
@@ -360,6 +369,7 @@ const buildA1MockCompletionArtifacts = ({
 };
 
 const syncA1MockCompletion = async ({
+  mockId = "a1-mock-01",
   db,
   admin,
   authedUser,
@@ -375,6 +385,7 @@ const syncA1MockCompletion = async ({
   if (!clean(attemptId)) throw new Error("attemptId is required for A1 mock completion sync.");
 
   const artifacts = buildA1MockCompletionArtifacts({
+    mockId,
     authedUser,
     studentProfile,
     attemptId,

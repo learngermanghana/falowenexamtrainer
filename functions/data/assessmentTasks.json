@@ -1,4 +1,171 @@
 {
+  "mockSets": {
+    "a1-mock-02": {
+      "level": "A1",
+      "writing": {
+        "id": "a1-mock-02-housewarming",
+        "title": "Einladung zur Einweihungsparty",
+        "register": "Informal",
+        "recipient": "Markus",
+        "wordTarget": 30,
+        "situation": "Sie haben eine neue Wohnung gefunden und möchten eine kleine Einweihungsparty (Housewarming Party) feiern. Laden Sie Ihren Freund Markus ein.",
+        "instruction": "Schreiben Sie eine kurze E-Mail an Ihren Freund Markus. Schreiben Sie zu allen drei Punkten (ca. 30 Wörter). Vergessen Sie nicht die Anrede und den Gruß!",
+        "points": [
+          "Grund des Schreibens: Einladung zur Party.",
+          "Wann und wo? Tag, Uhrzeit, Adresse.",
+          "Mitbringen: Was soll Markus mitbringen?"
+        ],
+        "contentKeys": [
+          "invitation",
+          "when_where",
+          "bring"
+        ],
+        "form": {
+          "scenario": [
+            "Ihre Bekannte, Frau Elena Rossi, möchte an einem Sprachkurs in Berlin teilnehmen. Sie füllen für sie das Anmeldeformular aus.",
+            "Ihre Bekannte, Elena Rossi, kommt aus Italien (Rom). Sie ist 26 Jahre alt und möchte im August einen Deutschkurs an der Sprachschule Berlin besuchen. Sie reist mit ihrem Ehemann und zwei Kindern nach Berlin. Während des Kurses wohnt die Familie im Hotel Central, Hauptstraße 14, 10117 Berlin. Frau Rossi hat bereits Deutsch gelernt und hat das Sprachniveau A1. Sie möchte die Kursgebühr bar vor Ort bezahlen."
+          ],
+          "instruction": "Schreiben Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Formular.",
+          "formRows": [
+            {
+              "kind": "prefilled",
+              "label": "Familienname",
+              "value": "Rossi"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Vorname",
+              "value": "Elena"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Heimatland",
+              "value": "Italien"
+            },
+            {
+              "kind": "input",
+              "number": 1,
+              "label": "Anzahl der mitreisenden Familienmitglieder",
+              "answer": "3",
+              "alternatives": [
+                "drei"
+              ],
+              "explanation": "Ehemann + 2 Kinder = 3 mitreisende Familienmitglieder. Elena selbst zählt hier nicht mit."
+            },
+            {
+              "kind": "input",
+              "number": 2,
+              "label": "Adresse in Berlin",
+              "answer": "Hotel Central, Hauptstraße 14, 10117 Berlin",
+              "alternatives": [
+                "Hotel Central, Hauptstraße 14"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 3,
+              "label": "Deutschkenntnisse (Niveau)",
+              "answer": "A1",
+              "alternatives": [
+                "Grundkenntnisse"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 4,
+              "label": "Wunschmonat für den Kurs",
+              "answer": "August",
+              "alternatives": []
+            },
+            {
+              "kind": "input",
+              "number": 5,
+              "label": "Bezahlung (wie?)",
+              "answer": "Bar",
+              "alternatives": [
+                "Barzahlung"
+              ]
+            }
+          ]
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich anhand der Stichpunkte auf der Karte vor. Der Prüfer stellt Ihnen danach noch 1–2 Fragen (z. B. Buchstabieren oder eine Zahl nennen).",
+          "card": [
+            "Name?",
+            "Alter?",
+            "Land?",
+            "Wohnort?",
+            "Sprachen?",
+            "Beruf?",
+            "Hobby?"
+          ],
+          "followUp": "Prüferfragen für diese Aufnahme: Wie buchstabieren Sie Ihren Familiennamen? Wie lautet Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen."
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Informationen erfragen und geben",
+          "context": "Thema: Einkaufen",
+          "maxRecordingSeconds": 60,
+          "prompt": "Sie ziehen eine Karte mit einem Thema und einem Wort. Stellen Sie Ihrem Partner eine Frage und antworten Sie auf die Frage Ihres Partners.",
+          "keyword": "Bäckerei",
+          "followUp": "Stellen Sie zuerst Ihre Frage zum Thema Einkaufen mit dem Wort „Bäckerei“. Beantworten Sie danach diese Partnerfrage: Was kaufen Sie in der Bäckerei?"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Bitten formulieren und darauf reagieren",
+          "context": "Höfliche Bitte",
+          "maxRecordingSeconds": 60,
+          "prompt": "Sie ziehen eine Karte mit einem Bild. Formulieren Sie eine höfliche Bitte an Ihren Partner. Der Partner reagiert darauf.",
+          "picture": "pencil",
+          "pictureAlt": "Ein Bleistift",
+          "followUp": "Formulieren Sie zuerst eine höfliche Bitte zum Bild. Reagieren Sie danach auf diese Partnerbitte: Können Sie mir bitte einen Stift geben?"
+        }
+      ],
+      "readingAnswerKey": {
+        "t1-1": "falsch",
+        "t1-2": "richtig",
+        "t1-3": "richtig",
+        "t1-4": "richtig",
+        "t1-5": "falsch",
+        "t2-6": "a",
+        "t2-7": "b",
+        "t2-8": "b",
+        "t2-9": "a",
+        "t2-10": "b",
+        "t3-11": "falsch",
+        "t3-12": "richtig",
+        "t3-13": "richtig",
+        "t3-14": "richtig",
+        "t3-15": "falsch"
+      },
+      "listeningAnswerKey": {
+        "t1-1": "b",
+        "t1-2": "b",
+        "t1-3": "c",
+        "t1-4": "a",
+        "t1-5": "a",
+        "t2-6": "b",
+        "t2-7": "b",
+        "t2-8": "c",
+        "t2-9": "b",
+        "t2-10": "c",
+        "t3-11": "b",
+        "t3-12": "c",
+        "t3-13": "b",
+        "t3-14": "c",
+        "t3-15": "a"
+      }
+    }
+  },
   "writing": {
     "a1-apartment-note": {
       "id": "a1-apartment-note",

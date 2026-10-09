@@ -322,7 +322,7 @@ const A1ListeningPictureScene = ({ picture }) => {
   );
 };
 
-const A1PictureOptions = ({ name, options, value, onChange, disabled }) => (
+export const A1PictureOptions = ({ name, options, value, onChange, disabled }) => (
   <div className="a1-practice-picture-options" role="radiogroup">
     {options.map((option) => (
       <label

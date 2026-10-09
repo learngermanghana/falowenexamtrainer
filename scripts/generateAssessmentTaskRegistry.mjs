@@ -8,6 +8,7 @@ import { writingLetters } from '../web/src/data/writingLetters.js';
 import { WRITING_PROMPTS } from '../web/src/data/writingExamPrompts.js';
 import { speakingQuestionDictionary } from '../web/src/data/speakingDictionary.js';
 import { A1_FINAL_MOCK_WRITING_TASK } from '../web/src/data/a1FinalMockWritingTask.js';
+import { A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from '../web/src/data/a1FinalMock2Data.js';
 import { B1_WRITING_TASKS, B1_SPEAKING } from '../web/src/data/b1FinalMockData.js';
 import { B2_WRITING_TASKS, B2_SPEAKING } from '../web/src/data/b2FinalMockData.js';
 
@@ -27,6 +28,15 @@ const a2Bindings = Object.fromEntries([1, 2, 3].map(n => {
   return [name, data(`A2GoetheSpeakingMockTeil${n}Preview.jsx`, name)];
 }));
 const registry = {
+  mockSets: {
+    'a1-mock-02': {
+      level: 'A1',
+      writing: { ...A1_MOCK_2_WRITING_TASK, modelAnswer: undefined, form: A1_MOCK_2_WRITING.teil1 },
+      speaking: A1_MOCK_2_SPEAKING.tasks,
+      readingAnswerKey: Object.fromEntries(Object.values(A1_MOCK_2_READING).flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
+      listeningAnswerKey: Object.fromEntries([A1_MOCK_2_LISTENING.teil1, A1_MOCK_2_LISTENING.teil2, A1_MOCK_2_LISTENING.teil3].flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
+    },
+  },
   writing: Object.fromEntries([
     ...writingLetters,
     ...Object.entries(WRITING_PROMPTS).flatMap(([level, rows]) => rows.map((row, i) => ({
@@ -46,6 +56,7 @@ for (const part of Object.values(registry.mocks.A2.writing)) assert.equal(part.p
 for (const part of registry.mocks.B1.writing) assert.equal(part.points.length, 3, 'B1 writing rubric requires three points');
 for (const part of registry.mocks.B2.writing) assert.equal(part.points.length, 4, 'B2 writing rubric requires four points');
 const versions = Object.fromEntries(Object.entries(registry.mocks).map(([level, kinds]) => [level, Object.fromEntries(Object.entries(kinds).map(([kind, task]) => [kind, createHash('sha256').update(JSON.stringify(task)).digest('hex')]))]));
+versions.A1_MOCK_2 = Object.fromEntries(['writing', 'speaking'].map(kind => [kind, createHash('sha256').update(JSON.stringify(registry.mockSets['a1-mock-02'][kind])).digest('hex')]));
 const versionTarget = new URL('../web/src/data/assessmentTaskVersions.json', import.meta.url);
 const versionText = JSON.stringify(versions, null, 2) + '\n';
 if (process.argv.includes('--check')) assert.equal(readFileSync(versionTarget, 'utf8'), versionText, 'Mock task versions are stale');

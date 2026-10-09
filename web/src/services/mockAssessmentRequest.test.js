@@ -37,3 +37,14 @@ test('sends the bundled question version without changing the caller answers', a
   expect(axios.post.mock.calls[0][1]).toEqual({ ...payload, taskVersion: versions.B1.writing });
   expect(payload.taskVersion).toBeUndefined();
 });
+
+test('sends Mock 2 task versions for both AI sections without changing Mock 1', async () => {
+  const versions=require('../data/assessmentTaskVersions.json');
+  axios.post.mockResolvedValue({data:{}});
+  for(const kind of ['writing','speaking']) {
+    await postMockAssessment(`/api/${kind}/a1-mock-score`,{mockId:'a1-mock-02',attemptId:'two'});
+    expect(axios.post.mock.calls.at(-1)[1].taskVersion).toBe(versions.A1_MOCK_2[kind]);
+    await postMockAssessment(`/api/${kind}/a1-mock-score`,{attemptId:'one'});
+    expect(axios.post.mock.calls.at(-1)[1].taskVersion).toBe(versions.A1[kind]);
+  }
+});

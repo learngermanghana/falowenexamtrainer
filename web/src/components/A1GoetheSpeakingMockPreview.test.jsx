@@ -46,7 +46,7 @@ describe("A1 Goethe-style Sprechen mock preview", () => {
     );
 
     expect(componentSource).toContain("timedOutMarkFailed");
-    expect(componentSource).toContain("Retry Sprechen marking");
+    expect(componentSource).toContain("Retry speaking marking");
     expect(componentSource).toContain("markSpeaking({ force: true })");
     expect(componentSource).toContain("your submitted answers are still saved");
   });

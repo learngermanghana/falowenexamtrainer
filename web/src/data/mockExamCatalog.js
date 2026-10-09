@@ -52,6 +52,12 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "a1-final-01",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a1-final-02": {
+    id: "a1-final-02", level: "A1", title: "A1 Mock 2", shortTitle: "A1 Mock 2",
+    description: "A second full timed A1 mock with new reading, writing and speaking tasks, plus Hören Sample 2.",
+    durationLabel: "about 80 min", status: "ready", route: "/campus/course/a1-final-mock-2",
+    mode: "full", questionSetId: "a1-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
+  },
   "a2-final-01": {
     id: "a2-final-01",
     level: "A2",
