@@ -1,5 +1,7 @@
+import { useMockExamIntegrity, MockExamIntegrityNotice } from "../hooks/useMockExamIntegrity";
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { useAuth } from "../context/AuthContext";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import {
   C1_FINAL_MOCK_STORAGE_KEY,
@@ -421,7 +423,9 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
 
 export default function C1FinalMockExamPage() {
   useAssessmentRestriction();
+  const { idToken } = useAuth();
   const [state, setState] = useState(readState);
+  const integrity = useMockExamIntegrity({ level: "C1", mockId: "c1-lesen-sample-01", idToken, attemptId: "", section: state.stage, active: Boolean(state.started && !state.completed) });
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -451,6 +455,7 @@ export default function C1FinalMockExamPage() {
   }, [now, state.completed, state.deadlineMs, state.stage, state.started]);
 
   const start = () => {
+    integrity.requestFullscreen();
     setState((current) => {
       const duration = SECTION_DURATIONS[current.stage] || SECTION_DURATIONS.teil1;
       return {
@@ -562,7 +567,8 @@ export default function C1FinalMockExamPage() {
   }
 
   return (
-    <main className="c1-mock-shell">
+    <main className="c1-mock-shell" onCopyCapture={integrity.onCopyCapture} onPasteCapture={integrity.onPasteCapture}>
+      <MockExamIntegrityNotice guard={integrity} />
       <AppBackButton label="Back to course" fallbackPath="/campus/course" />
 
       <header className="c1-mock-header">
