@@ -16,13 +16,14 @@ const timeLabel = (ms) => {
   const seconds = Math.ceil(Math.max(0, ms) / 1000);
   return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
 };
-export default function A2Mock2Lesen() {
-  const [state, setState] = useState(readState);
+export default function A2Mock2Lesen({ embedded = false, onComplete }) {
+  const [state, setState] = useState(() => { const v = readState(); return embedded && !v.startedAt ? { ...v, startedAt: Date.now() } : v; });
   const [now, setNow] = useState(Date.now());
   const [active, setActive] = useState(0);
   const deadline = state.startedAt ? state.startedAt + DURATION : null;
   const expired = Boolean(deadline && now >= deadline);
   const finished = Boolean(state.completedAt || expired);
+  useEffect(() => { if (embedded && finished && state.completedAt && onComplete) onComplete(); }, [embedded, finished, state.completedAt, onComplete]);
   const answers = state.answers || {};
   const answered = Object.keys(answers).filter(key => answers[key]).length;
   const correct = A2_MOCK_2_LESEN_QUESTIONS.filter(q => answers[q.number] === q.answer).length;
@@ -44,7 +45,7 @@ export default function A2Mock2Lesen() {
   const finish = () => { if (window.confirm("Lesen jetzt abgeben? Nicht beantwortete Aufgaben werden als falsch gewertet.")) setState(current => ({ ...current, completedAt: Date.now() })); };
   const part = A2_MOCK_2_LESEN[active];
   return <main className="a2-mock2-shell" lang="de">
-    <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Lesen</span></div>
+    {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Lesen</span></div> : null}
     {!state.startedAt ? <section className="a2-mock2-intro">
       <p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Lesen</h1>
       <p>Vier Teile, 20 Aufgaben. Sie haben 30 Minuten Zeit. Lesen Sie alle Texte und wählen Sie die richtige Antwort.</p>
