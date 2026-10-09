@@ -12,6 +12,7 @@ export default function A2Day17InDieApothekeModalverbenFragenGrammarPage() {
         <p style={{ ...styles.subtitle, margin: 0 }}>Grammatik: Modalverben für Fragen, Beschwerden und Empfehlungen.</p>
       </header>
       <A2MiniLearningBlock
+        essential
         title="können, müssen und sollen in der Apotheke"
         rule="Das Modalverb steht an Position 2, der zweite Infinitiv am Satzende. können = Möglichkeit/Bitte, müssen = Notwendigkeit, sollen = Empfehlung."
         examples={[
