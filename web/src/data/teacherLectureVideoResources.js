@@ -17,7 +17,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     6: [{ chapter: "3.6", topic: "Möbel und Räume kennenlernen", title: "Möbel und Räume · Teacher lecture video", tutor_lecture_video: "https://youtu.be/lr00YnyH0GI" }],
     7: [{ chapter: "3.7", tutor_lecture_video: "" }],
     8: [{ chapter: "3.8", topic: "Rezepte und Essen", tutor_lecture_video: "https://youtu.be/diUTkWdqT_0" }],
-    9: [{ chapter: "4.9", topic: "Urlaub", tutor_lecture_video: "https://youtu.be/iKKyQRbuc-8" }],
+    9: [{ chapter: "4.9", topic: "Urlaub", tutor_lecture_video: "https://youtu.be/OHue53UjOEk" }],
     10: [{ chapter: "4.10", tutor_lecture_video: "" }],
     11: [{ chapter: "4.11", tutor_lecture_video: "" }],
     12: [{ chapter: "5.12", tutor_lecture_video: "" }],
