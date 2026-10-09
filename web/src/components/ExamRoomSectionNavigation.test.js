@@ -57,6 +57,8 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain('onClick={() => navigate("/exams/question")}');
     expect(overviewSource).toContain('onClick={() => navigate("/exams/file")}');
     expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
-    expect(appSource).toContain('examSection !== "overview" && !sampleId');
+    expect(appSource).toContain('{!sampleId ? (');
+    expect(appSource).toContain('accessibleLevels.map((option)');
+    expect(appSource).toContain('id="exam-level-selector"');
   });
 });
