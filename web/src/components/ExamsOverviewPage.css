@@ -140,6 +140,22 @@
   font-size: 22px;
 }
 
+.exam-room-mock-action {
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #ffffff;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18);
+}
+
+.exam-room-mock-entry:hover .exam-room-mock-action {
+  background: #1e40af;
+}
+
 .exam-room-mock-copy {
   min-width: 0;
   display: grid;
@@ -370,6 +386,10 @@
     padding: 13px;
     gap: 10px;
   }
+  .exam-room-mock-action {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
   .exam-room-mock-icon {
     width: 39px;
     height: 39px;
@@ -388,5 +408,158 @@
 @media (prefers-reduced-motion: reduce) {
   .exam-room-skill {
     transition: none;
+  }
+}
+
+/* Phase 2: evidence-first coaching and transparent per-attempt feedback. */
+.exam-room-learning {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #fff;
+  min-width: 0;
+}
+.exam-room-learning-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.exam-room-learning h3,
+.exam-room-learning h4 {
+  margin: 0;
+  color: #0f172a;
+}
+.exam-room-learning h3 { font-size: 19px; }
+.exam-room-learning h4 { font-size: 14px; }
+.exam-room-learning p {
+  margin: 4px 0 0;
+  color: #475569;
+  line-height: 1.45;
+  font-size: 13px;
+}
+.exam-room-evidence-label {
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: #1e40af;
+  background: #eff6ff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.exam-room-evidence-note { max-width: 65ch; }
+.exam-room-scores-by-skill {
+  display: grid;
+  gap: 9px;
+}
+.exam-room-score-row,
+.exam-room-mock-trend li {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) 50px;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+}
+.exam-room-score-row strong,
+.exam-room-mock-trend strong { text-align: right; }
+.exam-room-score-track {
+  height: 9px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.exam-room-score-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+}
+.exam-room-mock-trend {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+.exam-room-mock-trend ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+.exam-room-study-plan {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+}
+.exam-room-study-plan summary {
+  cursor: pointer;
+  color: #1d4ed8;
+  font-weight: 800;
+  font-size: 14px;
+}
+.exam-room-study-plan summary:focus-visible,
+.exam-room-attempt-details summary:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+.exam-room-study-plan ol {
+  margin: 12px 0 0;
+  padding-left: 22px;
+  display: grid;
+  gap: 8px;
+}
+.exam-room-study-plan li {
+  padding: 8px 0;
+}
+.exam-room-study-plan li > div {
+  min-width: 0;
+}
+.exam-room-study-plan li p {
+  overflow-wrap: anywhere;
+}
+.exam-room-study-plan li small {
+  color: #64748b;
+}
+.exam-room-study-plan li .exam-room-text-action {
+  margin-top: 2px;
+}
+.exam-room-attempt-details { width: 100%; min-width: 0; }
+.exam-room-attempt-details summary {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.exam-room-attempt-details summary > span { min-width: 0; }
+.exam-room-attempt-subtitle {
+  display: block;
+  color: #475569;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+.exam-room-attempt-parts {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 10px 0;
+  list-style: none;
+  border-top: 1px solid #cbd5e1;
+}
+.exam-room-attempt-parts li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+}
+.exam-room-attempt-details > p { margin-top: 8px; }
+@media (max-width: 410px) {
+  .exam-room-learning { padding: 12px; }
+  .exam-room-score-row,
+  .exam-room-mock-trend li {
+    grid-template-columns: 75px minmax(0, 1fr) 43px;
+    gap: 6px;
   }
 }

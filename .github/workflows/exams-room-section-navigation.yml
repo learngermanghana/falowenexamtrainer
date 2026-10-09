@@ -40,6 +40,11 @@ on:
       - 'web/src/components/ExamsOverviewPage.js'
       - 'web/src/components/ExamsOverviewPage.css'
       - 'web/src/components/ExamsOverviewPage.test.jsx'
+      - 'web/src/lib/examRoomInsights.js'
+      - 'web/src/lib/examRoomInsights.test.js'
+      - 'web/src/lib/examRoomCoach.js'
+      - 'web/src/components/B1FinalMockSpeaking.jsx'
+      - 'web/src/components/A2Mock2Sprechen.jsx'
       - 'web/src/components/ExamRoomSectionNavigation.test.js'
       - '.github/workflows/exams-room-section-navigation.yml'
   push:
@@ -83,6 +88,11 @@ on:
       - 'web/src/components/ExamsOverviewPage.js'
       - 'web/src/components/ExamsOverviewPage.css'
       - 'web/src/components/ExamsOverviewPage.test.jsx'
+      - 'web/src/lib/examRoomInsights.js'
+      - 'web/src/lib/examRoomInsights.test.js'
+      - 'web/src/lib/examRoomCoach.js'
+      - 'web/src/components/B1FinalMockSpeaking.jsx'
+      - 'web/src/components/A2Mock2Sprechen.jsx'
       - 'web/src/components/ExamRoomSectionNavigation.test.js'
       - '.github/workflows/exams-room-section-navigation.yml'
 
@@ -101,7 +111,7 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - run: npm ci
       - name: Overview, level access and navigation regression
-        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js src/components/ExamsOverviewPage.test.jsx src/components/ExamRoomLowerLevelNavigation.test.js src/context/ExamContext.levelSwitching.test.jsx src/utils/examLevelAccess.test.js src/data/examResourcesRemoval.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js src/components/ExamsOverviewPage.test.jsx src/lib/examRoomCoach.test.js src/lib/examRoomInsights.test.js src/components/ExamRoomLowerLevelNavigation.test.js src/context/ExamContext.levelSwitching.test.jsx src/utils/examLevelAccess.test.js src/data/examResourcesRemoval.test.js
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
       - name: B1 four-module mock guidance and recovery regression

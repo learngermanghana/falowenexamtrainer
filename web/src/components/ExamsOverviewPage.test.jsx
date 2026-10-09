@@ -49,7 +49,11 @@ describe("simplified Exam Room overview", () => {
       .toHaveAttribute("aria-valuenow", "0");
     expect(screen.getByText(/Coverage records practice, not an exam pass/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Browse full mock exams" }));
+    const mockButton = screen.getByRole("button", { name: "Start Full Mock Test" });
+    expect(mockButton).toHaveTextContent("Start Full Mock Test");
+    expect(mockButton).toHaveTextContent("Tap here to choose a test");
+    expect(mockButton).toHaveTextContent("Start →");
+    fireEvent.click(mockButton);
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
 
     [
@@ -68,11 +72,11 @@ describe("simplified Exam Room overview", () => {
     (level) => {
       mockLevel = level;
       render(<ExamsOverviewPage />);
-      expect(screen.getByRole("button", { name: "Browse available exam practice" }))
+      expect(screen.getByRole("button", { name: "Explore available exam practice" }))
         .toHaveTextContent("A complete " + level + " mock is not yet published");
-      expect(screen.queryByRole("button", { name: "Browse full mock exams" }))
+      expect(screen.queryByRole("button", { name: "Start Full Mock Test" }))
         .not.toBeInTheDocument();
-      fireEvent.click(screen.getByRole("button", { name: "Browse available exam practice" }));
+      fireEvent.click(screen.getByRole("button", { name: "Explore available exam practice" }));
       expect(mockNavigate).toHaveBeenCalledWith("/exams/mocks");
     },
   );
@@ -95,6 +99,30 @@ describe("simplified Exam Room overview", () => {
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/question");
     fireEvent.click(screen.getByRole("button", { name: "Exam File →" }));
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/file");
+  });
+
+  it("shows evidence-only readiness, a seven-day plan and genuine reading part details", () => {
+    mockLevel = "A1";
+    mockReadingHistory = [{
+      id: "reading-7", level: "A1", score: 6, total: 15,
+      completedAt: "2026-10-08T10:00:00Z", title: "A1 Lesen sample",
+      sectionScores: [
+        { label: "Teil 1", score: 4, total: 5 },
+        { label: "Teil 2", score: 0, total: 5 },
+        { label: "Teil 3", score: 2, total: 5 },
+      ],
+    }];
+    render(<ExamsOverviewPage />);
+
+    expect(screen.getByText("Not assessed")).toBeInTheDocument();
+    expect(screen.getByText(/practice coverage alone is not readiness/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText("My personalised 7-day practice plan"));
+    expect(screen.getByText(/Start with Teil 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Day 7 · Review and recheck/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText(/A1 Lesen sample/));
+    expect(screen.getByText("0/5 · 0%")).toBeInTheDocument();
+    expect(screen.getByText("4/5 · 80%")).toBeInTheDocument();
   });
 
   it("preserves a completed warm-up state without another prominent card", () => {
