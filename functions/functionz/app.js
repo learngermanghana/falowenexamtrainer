@@ -4735,6 +4735,64 @@ const shouldIgnoreStaleFinalMockProgress = ({ existing = {}, section = "", state
   return existingSavedAt > 0 && incomingSavedAt > 0 && incomingSavedAt < existingSavedAt;
 };
 
+// Only authenticated students can update their own ungraded Mock 2 progress.
+// This is an observation signal, never a marking or completion authority.
+app.post("/internal/mock-progress", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!identity) return;
+    if (req.body?.mockId !== "a2-mock-02") return res.status(400).json({ error: "Unsupported mock" });
+    const validStages = ["intro", "lesen", "hoeren", "schreiben", "sprechen", "result"];
+    const section = String(req.body?.section || "intro").toLowerCase();
+    if (!validStages.includes(section)) return res.status(400).json({ error: "Invalid mock section" });
+    const complete = ["lesen", "hoeren", "schreiben", "sprechen"]
+      .filter(k => Array.isArray(req.body?.completedSections) && req.body.completedSections.includes(k));
+    const deadline = Number(req.body?.sectionDeadlineMs);
+    const maxFuture = Date.now() + 2 * 60 * 60 * 1000;
+    const sectionDeadlineMs = Number.isFinite(deadline) && deadline > Date.now() - 60 * 60 * 1000 && deadline <= maxFuture
+      ? deadline : null;
+    const started = Number(req.body?.startedAtMs);
+    const startedAt = Number.isFinite(started) && started > Date.now() - 7 * 24 * 60 * 60 * 1000 && started <= Date.now()
+      ? new Date(started) : new Date();
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock progress storage unavailable" });
+    const completed = section === "result" && complete.length === 4;
+    await db.collection("mockProgressMonitor").doc("A2_" + identity.uid).set({
+      uid: identity.uid,
+      email: String(identity.email || "").toLowerCase(),
+      mockId: "a2-mock-02", section, completedSections: complete,
+      status: completed ? "completed" : "in_progress",
+      sectionDeadlineMs, startedAt, updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      ...(completed ? { completedAt: admin.firestore.FieldValue.serverTimestamp() } : {}),
+    }, { merge: true });
+    return res.json({ ok: true });
+  } catch (error) {
+    console.error("mock progress signal failed", error);
+    return res.status(503).json({ error: "Could not update mock progress" });
+  }
+});
+
+// Server-owned monitor for authenticated Falowen staff. No student response data.
+app.get("/internal/mock-attempts", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!identity) return;
+    const email = String(identity.email || "").toLowerCase();
+    const role = String(identity.role || "").toLowerCase();
+    const isStaff = identity.admin === true || role === "admin" || role === "tutor" ||
+      email === "moxflex@gmail.com";
+    if (!isStaff) return res.status(403).json({ error: "Staff access required" });
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock monitoring storage unavailable" });
+    const { listMockAttempts } = require("./mockAttemptMonitor");
+    const data = await listMockAttempts(db);
+    return res.json({ ok: true, ...data, checkedAt: new Date().toISOString() });
+  } catch (error) {
+    console.error("mock attempt monitor failed", error);
+    return res.status(503).json({ error: "Could not load mock attempt monitoring" });
+  }
+});
+
 app.post("/a1-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
