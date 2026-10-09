@@ -71,11 +71,15 @@ export default function A2Mock2Sprechen({ embedded = false, onComplete }){
   try {
    const result=await scoreA2MockSpeaking({idToken, mockId:"a2-mock-02", rubric:RUBRIC, attempts:tasks.map(t=>({id:t.id,teil:t.teil,task:t.prompt,transcript:attempts[t.id]?.transcript||"",analysisFeedback:attempts[t.id]?.feedback||""}))});
    setAssessment(result);setStatus("KI-Feedback erhalten. Die abschließende serververifizierte Mock-2-Note ist noch nicht verfügbar.");
+   const verified = {...attempts, _mock2AiScored:true};
+   localStorage.setItem(KEY,JSON.stringify(verified));
+   setAttempts(verified);
    if(embedded && onComplete) onComplete();
   } catch(e) {setError(e?.response?.data?.error||e.message||"Sprechen konnte nicht bewertet werden.");}
   finally {setMarking(false);}
  };
- return <main className="a2-mock2-shell" lang="de" data-a2-mock2-sprechen>
+ useEffect(()=>{if(embedded && completed===5 && !marking && !assessment && !error && !attempts._mock2AiScored)mark();},[embedded,completed,marking,assessment,error,attempts._mock2AiScored]);
+  return <main className="a2-mock2-shell" lang="de" data-a2-mock2-sprechen>
   {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Sprechen</span></div> : null}
   <header className="a2-mock2-progress"><div><strong>Sprechen · Übungstest 2</strong><span>{completed}/5 Aufnahmen abgegeben</span></div><strong>Teil {task.teil}</strong></header>
   <nav className="a2-mock2-speaking-nav">{tasks.map((t,i)=><button type="button" key={t.id} className={active===i?"selected":""} disabled={recording||busy} onClick={()=>{setActive(i);setAudio(null);setError("");}}>{t.title}{attempts[t.id]?.transcript?" ✓":""}</button>)}</nav>
