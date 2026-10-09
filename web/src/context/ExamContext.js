@@ -1,6 +1,7 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { loadPreferredLevel, savePreferredLevel } from "../services/levelStorage";
+import { getExamPracticeLevels, resolveExamPracticeLevel } from "../utils/examLevelAccess";
 
 export const SPEAKING_FORMATS = {
   A1: [
@@ -133,51 +134,42 @@ export const getTasksForLevel = (level) =>
 
 const ExamContext = createContext();
 
-const getInitialLevel = () => {
-  const stored = loadPreferredLevel();
-  if (stored && ALLOWED_LEVELS.includes(stored)) {
-    return stored;
-  }
-  return ALLOWED_LEVELS[0];
-};
-
-const initialLevel = getInitialLevel();
-
 export const ExamProvider = ({ children }) => {
-  const { studentProfile, saveStudentProfile } = useAuth();
-  const [level, setLevelState] = useState(initialLevel);
-  const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel()));
-  const [teil, setTeil] = useState(getTasksForLevel(initialLevel)[0].label);
+  const { user, studentProfile } = useAuth();
+  const profileExamLevel = studentProfile?.level || studentProfile?.className || "";
+  const accessibleLevels = useMemo(() => getExamPracticeLevels(profileExamLevel), [profileExamLevel]);
+  const [level, setLevelState] = useState(() =>
+    resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
+  const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel(user?.uid)));
+  const [teil, setTeil] = useState(() =>
+    getTasksForLevel(resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)))[0].label);
   const [result, setResult] = useState(null);
   const [resultHistory, setResultHistory] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const setLevel = useCallback(
-    (newLevel) => {
-      const safeLevel = ALLOWED_LEVELS.includes(newLevel)
-        ? newLevel
-        : ALLOWED_LEVELS[0];
-      setLevelState(safeLevel);
+    (requestedLevel) => {
+      const nextLevel = String(requestedLevel || "").trim().toUpperCase();
+      // Never permit a higher level than the student's registered course.
+      if (!accessibleLevels.includes(nextLevel)) return;
+      setLevelState(nextLevel);
       setLevelConfirmed(true);
-      savePreferredLevel(safeLevel);
-
-      if (studentProfile?.id && (studentProfile.level || "").toUpperCase() !== safeLevel) {
-        saveStudentProfile({ level: safeLevel }).catch((error) => {
-          console.warn("Failed to sync level to student profile", error);
-        });
-      }
+      setResult(null);
+      setError("");
+      savePreferredLevel(nextLevel, user?.uid);
     },
-    [saveStudentProfile, studentProfile?.id, studentProfile?.level]
+    [accessibleLevels, user?.uid],
   );
 
   useEffect(() => {
-    const profileLevel = (studentProfile?.level || "").toUpperCase();
-    if (!profileLevel || !ALLOWED_LEVELS.includes(profileLevel)) return;
-    if (profileLevel === level) return;
-
-    setLevel(profileLevel);
-  }, [level, setLevel, studentProfile?.level]);
+    // Hydrate profile changes and saved exam preferences without editing enrollment.
+    // Deliberately do not depend on "level": manual downward switches must persist.
+    setLevelState(resolveExamPracticeLevel(
+      profileExamLevel,
+      loadPreferredLevel(user?.uid),
+    ));
+  }, [profileExamLevel, user?.uid]);
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);
@@ -207,6 +199,7 @@ export const ExamProvider = ({ children }) => {
         setTeil,
         level,
         setLevel,
+        accessibleLevels,
         levelConfirmed,
         setLevelConfirmed,
         result,
