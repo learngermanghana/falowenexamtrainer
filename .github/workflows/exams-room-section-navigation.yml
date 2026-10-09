@@ -4,6 +4,12 @@ on:
   pull_request:
     paths:
       - 'web/src/App.js'
+      - 'web/src/context/ExamContext.js'
+      - 'web/src/context/ExamContext.levelSwitching.test.jsx'
+      - 'web/src/services/levelStorage.js'
+      - 'web/src/utils/examLevelAccess.js'
+      - 'web/src/utils/examLevelAccess.test.js'
+      - 'web/src/components/ExamRoomLowerLevelNavigation.test.js'
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
@@ -40,6 +46,12 @@ on:
       - main
     paths:
       - 'web/src/App.js'
+      - 'web/src/context/ExamContext.js'
+      - 'web/src/context/ExamContext.levelSwitching.test.jsx'
+      - 'web/src/services/levelStorage.js'
+      - 'web/src/utils/examLevelAccess.js'
+      - 'web/src/utils/examLevelAccess.test.js'
+      - 'web/src/components/ExamRoomLowerLevelNavigation.test.js'
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
@@ -86,8 +98,8 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - name: Overview and navigation regression
-        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js src/components/ExamsOverviewPage.test.jsx src/data/examResourcesRemoval.test.js
+      - name: Overview, level access and navigation regression
+        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js src/components/ExamsOverviewPage.test.jsx src/components/ExamRoomLowerLevelNavigation.test.js src/context/ExamContext.levelSwitching.test.jsx src/utils/examLevelAccess.test.js src/data/examResourcesRemoval.test.js
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
       - name: B1 four-module mock guidance and recovery regression
