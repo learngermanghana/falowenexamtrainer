@@ -97,6 +97,30 @@ describe("simplified Exam Room overview", () => {
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/file");
   });
 
+  it("shows evidence-only readiness, a seven-day plan and genuine reading part details", () => {
+    mockLevel = "A1";
+    mockReadingHistory = [{
+      id: "reading-7", level: "A1", score: 6, total: 15,
+      completedAt: "2026-10-08T10:00:00Z", title: "A1 Lesen sample",
+      sectionScores: [
+        { label: "Teil 1", score: 4, total: 5 },
+        { label: "Teil 2", score: 0, total: 5 },
+        { label: "Teil 3", score: 2, total: 5 },
+      ],
+    }];
+    render(<ExamsOverviewPage />);
+
+    expect(screen.getByText("Not assessed")).toBeInTheDocument();
+    expect(screen.getByText(/practice coverage alone is not readiness/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByText("My personalised 7-day practice plan"));
+    expect(screen.getByText(/Start with Teil 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Day 7 · Review and recheck/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("A1 Lesen sample"));
+    expect(screen.getByText("0/5 · 0%")).toBeInTheDocument();
+    expect(screen.getByText("4/5 · 80%")).toBeInTheDocument();
+  });
+
   it("preserves a completed warm-up state without another prominent card", () => {
     mockDaily = { practised: true, hasDraft: false };
     render(<ExamsOverviewPage />);
