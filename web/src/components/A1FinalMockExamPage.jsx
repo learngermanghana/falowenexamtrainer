@@ -1094,7 +1094,7 @@ export default function A1FinalMockExamPage() {
         </span>
       </div>
 
-      <FullMockGuide level="A1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
+      {exam.stage !== "result" ? <FullMockGuide level="A1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
 
       {exam.stage === "lesen" ? renderLesen() : null}
       {exam.stage === "hoeren" ? renderHoeren() : null}
