@@ -21,7 +21,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Choose a full timed mock when available, or work on individual sections. At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead; it does not generate a full mock score.
+          Choose a full timed mock when available, or work on individual sections. At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead. Section practice does not yet generate one final combined score.
         </p>
       </section>
 
@@ -54,7 +54,7 @@ export default function MockExamLibraryPage() {
                   )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.status === "planned" ? "Browse exam skills" : "Open section practice"}
+                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>
