@@ -344,33 +344,42 @@ Freitag, 19:00 Uhr. Atemübungen und einfache Techniken gegen Stress.`,
       { stem: "Welches Angebot hat individuelle Termine?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
     ],
   },
+
   17: {
     chapter: "6.17",
-    format: "Goethe A2 · Lesen · Teil 1 und Teil 2",
-    title: "Hamburg erleben",
-    strategy: "Teil 1: Wähle a, b oder c. Teil 2: Entscheide bei jeder Aussage zwischen Richtig und Falsch.",
-    text: `Teil 1 · Multiple Choice
+    format: "Informationstafel",
+    title: "Willkommen in der Apotheke am Markt!",
+    strategy: "Lesen Sie die Informationstafel genau. Achten Sie auf Angebote, Öffnungszeiten, Kosten und Bedingungen.",
+    text: `Informationstafel in der „Apotheke am Markt“
 
-Text 1
+Willkommen in der Apotheke am Markt!
 
-Ein Mann ist in Hamburg. Er macht eine Fahrt mit dem Schiff. Die Fahrt dauert eine Stunde. Das Ticket kostet 25 Euro. Mit der Gästekarte kostet das Ticket nur 20 Euro.
+Unsere Angebote und Services für Sie:
 
-Text 2
+Medikamente & Beratung:
+Wir bieten Ihnen eine große Auswahl an rezeptfreien und rezeptpflichtigen Arzneimitteln. Unser Team berät Sie gerne zu allen Gesundheitsfragen.
 
-Heute Abend gibt es Musik. Ein Orchester spielt in der Elbphilharmonie. Das Konzert beginnt um 20 Uhr. Der Mann kauft ein Ticket. Er geht vorher Fisch essen. Das Restaurant ist im Hafen und nicht teuer.
+Kosmetik & Sonnenschutz:
+Produkte für empfindliche Haut und Babypflege. Heute: 15 % Rabatt auf alle Sonnenschutzmittel und Hautcremes!
 
-Teil 2 · Richtig oder Falsch?
+Gesundheits-Check:
+Blutdruck- und Blutzuckermessung im 1. Stock (Aufzug vorhanden). Von Montag bis Freitag zwischen 09:00 und 12:00 Uhr ohne Termin. Kosten: 3 Euro.
 
-Der Mann bleibt zwei Tage in Hamburg. Er kauft eine Gästekarte für 12 Euro. Er fährt damit zwei Tage mit Bus und Bahn. Heute isst er Fisch im Restaurant Seeblick. Das Essen ist gut. Morgen besucht er ein kleines Museum. Der Besuch dauert zwei Stunden. Danach geht er im Stadtpark spazieren. Die Frau gibt ihm einen Stadtplan.`,
+Kostenloser Lieferservice:
+Sie können Ihre Wohnung wegen Krankheit nicht verlassen? Wir bringen Ihnen Ihre Medikamente gratis nach Hause! Bestellungen bis 14:00 Uhr liefern wir noch am selben Tag.
+
+Öffnungszeiten:
+Montag bis Freitag: 08:00 – 18:30 Uhr durchgehend
+Samstag: 08:30 – 13:00 Uhr
+
+Notdienst:
+Informationen zum Sonntags- und Nachtnotdienst finden Sie am Aushang rechts neben der Eingangstür.`,
     questions: [
-      { stem: "Teil 1 · Wie lange dauert die Fahrt mit dem Schiff?", options: ["A) 10 Minuten", "B) Eine Stunde", "C) Zwei Tage"] },
-      { stem: "Teil 1 · Wie viel kostet das Ticket mit der Gästekarte?", options: ["A) 12 Euro", "B) 20 Euro", "C) 25 Euro"] },
-      { stem: "Teil 1 · Wann beginnt das Konzert?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
-      { stem: "Teil 2 · Der Mann bleibt zwei Tage in Hamburg.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Die Gästekarte kostet 50 Euro.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Der Mann isst im Restaurant Fisch.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Das Museum ist sehr groß.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Der Mann bekommt einen Stadtplan.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Worauf gibt es heute einen Rabatt?", options: ["A) Auf alle rezeptpflichtigen Medikamente.", "B) Auf Sonnenschutzmittel und Hautcremes.", "C) Auf Gesundheits-Checks im 1. Stock."] },
+      { stem: "Wenn Sie Ihren Blutdruck messen lassen möchten, ...", options: ["A) müssen Sie vorher einen Termin vereinbaren.", "B) können Sie von Montag bis Freitag am Vormittag kommen.", "C) müssen Sie die Treppe in den 1. Stock nehmen."] },
+      { stem: "Wer muss für den Lieferservice nach Hause nichts bezahlen?", options: ["A) Alle Kunden, die am Samstag bestellen.", "B) Kunden, die wegen Krankheit nicht vorbeikommen können.", "C) Nur Kunden, die mehr als 3 Euro ausgeben."] },
+      { stem: "Wann kommen die Medikamente am selben Tag an?", options: ["A) Wenn man vor 14:00 Uhr bestellt.", "B) Wenn man erst nach 18:30 Uhr anruft.", "C) Nur bei Bestellungen am Samstagmorgen."] },
+      { stem: "Wo steht, welche Apotheke am Sonntag Notdienst hat?", options: ["A) Auf einem Aushang neben der Tür.", "B) Im Prospekt im 1. Stock.", "C) Auf der Quittung der Medikamente."] },
     ],
   },
   18: {

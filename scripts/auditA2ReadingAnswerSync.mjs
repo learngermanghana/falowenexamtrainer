@@ -67,7 +67,7 @@ for (const day of days) {
     fail(assignmentId, "reading task is missing title, text, format or strategy");
     continue;
   }
-  const expectedQuestionCount = day === 11 ? 7 : day === 17 ? 8 : 5;
+  const expectedQuestionCount = day === 11 ? 7 : 5;
   if (!Array.isArray(questions) || questions.length !== expectedQuestionCount) {
     fail(
       assignmentId,
@@ -97,7 +97,7 @@ for (const day of days) {
   }
 
   questions.forEach((question, index) => {
-    const minimumOptions = day === 17 && index >= 3 ? 2 : 3;
+    const minimumOptions = 3;
     if (!question?.stem || !Array.isArray(question.options) || question.options.length < minimumOptions) {
       fail(assignmentId, "question " + (index + 1) + " is missing a stem or usable options");
       return;
