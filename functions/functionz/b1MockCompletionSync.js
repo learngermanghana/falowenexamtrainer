@@ -137,6 +137,34 @@ const formatScore = (value) => {
   return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
 };
 
+// A timer can submit an incomplete Sprechen attempt. AI must not award marks
+// for tasks without any submitted transcript (including a missed recording).
+const capB1SpeakingMarksToSubmittedAnswers = (result = {}, attempts = []) => {
+  const caps = { teil1: 9, teil2: 10, teil3: 6 };
+  const transcriptByPart = new Map((Array.isArray(attempts) ? attempts : [])
+    .map((attempt) => [String(attempt?.id || ""), String(attempt?.transcript || "").trim()]));
+  const parts = { ...(result?.parts || {}) };
+  for (const [key, maxScore] of Object.entries(caps)) {
+    parts[key] = {
+      ...(parts[key] || {}),
+      score: transcriptByPart.get(key)
+        ? Math.max(0, Math.min(maxScore, Number(parts[key]?.score) || 0))
+        : 0,
+      maxScore,
+    };
+  }
+  const score = Number(Object.values(caps).reduce((sum, maxScore, index) =>
+    sum + Number(parts[Object.keys(caps)[index]].score || 0), 0).toFixed(1));
+  return {
+    ...result,
+    parts,
+    score,
+    maxScore: 25,
+    passed: score >= 15,
+    level_mismatch: Boolean(result?.level_mismatch),
+  };
+};
+
 const buildSectionBreakdown = (sectionScores = {}) =>
   SECTION_ORDER.map((key) => ({
     key, label: SECTION_LABELS[key],
@@ -256,7 +284,7 @@ const syncB1MockCompletion = async ({
 
 module.exports = {
   MOCK_TITLE, READING_ANSWER_KEY, LISTENING_ANSWER_KEY, scoreObjectiveAnswers,
-  buildVerifiedB1MockScore, persistVerifiedB1MockSection, buildSectionBreakdown,
+  buildVerifiedB1MockScore, persistVerifiedB1MockSection, capB1SpeakingMarksToSubmittedAnswers, buildSectionBreakdown,
   deriveMockInsights, resolveStudentIdentity, assignmentIdForAttempt,
   buildB1MockCompletionArtifacts, syncB1MockCompletion,
 };
