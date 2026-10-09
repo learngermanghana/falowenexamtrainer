@@ -5,9 +5,9 @@ import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
 
 const statusLabel = (status) => {
-  if (status === "preview") return "Practice";
-  if (status === "ready") return "Ready";
-  return "Planned";
+  if (status === "preview") return "Section practice only";
+  if (status === "ready") return "Complete 4-module mock";
+  return "Full mock not published";
 };
 
 export default function MockExamLibraryPage() {
@@ -21,7 +21,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Choose a full timed mock when available, or practise exam sections in the course preview. Preview practice does not yet generate one final combined score.
+          At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead; it does not generate a full mock score.
         </p>
       </section>
 
@@ -35,18 +35,26 @@ export default function MockExamLibraryPage() {
                     <h3 style={{ margin: 0 }}>{mock.shortTitle || mock.title}</h3>
                     <span style={styles.badge}>{statusLabel(mock.status)}</span>
                   </div>
-                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>Complete {(mock.sections || []).join(", ")} in one exam-style practice.</p>
+                  <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                    {mock.mode === "full"
+                      ? "Complete Lesen, Hören, Schreiben and Sprechen in one exam-style attempt."
+                      : mock.description}
+                  </p>
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
                     {mock.durationLabel} · {(mock.sections || []).join(" · ")}
                   </p>
-                  {mock.level === "B1" && mock.mode === "full" ? (
+                  {mock.mode === "full" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
-                      One complete mock = 4 modules. Finish all four for a final score. If you leave, return to resume your saved attempt; exam timers continue.
+                      One full mock = 4 modules. Complete all four for the final score. If you leave, return to continue where you stopped. A running module's timer does not pause.
                     </p>
-                  ) : null}
+                  ) : (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
+                      This is section practice, not a completed four-module mock. No overall mock pass/fail score is available.
+                    </p>
+                  )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.status === "preview" ? "Open practice" : mock.level === "B1" ? "Start or resume all 4 modules" : "Start mock"}
+                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.status === "planned" ? "Browse exam skills" : "Open section practice"}
                 </button>
               </div>
             </article>
