@@ -16,3 +16,12 @@ test('public catalogue publishes only German A1–C2 and removes old French outp
   }
   assert.ok(existsSync(root + 'web/src/data/frenchCourseSchedule.js'));
 });
+test('homepage serves current HTML and cannot offer French signup', () => {
+  const config = JSON.parse(readFileSync(root + 'vercel.json', 'utf8'));
+  const homepage = config.routes.find(route => route.src === '/');
+  assert.equal(homepage.dest, '/index.html');
+  assert.match(homepage.headers['Cache-Control'], /no-store/);
+  const landing = readFileSync(root + 'web/src/components/LandingPageSimple.js', 'utf8');
+  assert.doesNotMatch(landing, /copy\.french|handleProgramChange\("french"\)|German A1–C2 and French/);
+  assert.match(landing, /const resolvedProgram = "german"/);
+});
