@@ -9,23 +9,22 @@ const COPY = {
     languageLabel: "Language",
     login: "Log in",
     signup: "Sign up",
-    badge: "German A1–C2 and French learning in one place",
-    title: "Learn. Practise. Get ready for your exam.",
+    badge: "Learn German A1–C2 in one place",
+    title: "Learn German. Practise. Get ready for your exam.",
     subtitle:
       "Falowen brings your course book, assignments, tutor feedback, attendance, and exam practice together in one simple learning hub.",
     chooseProgram: "What do you want to study?",
     german: "German",
-    french: "French",
     joinProgram: "Start {{program}}",
     viewClasses: "View classes",
     benefits: [
-      { icon: "📘", title: "Structured lessons", text: "Follow structured German learning from A1 to C2, plus French study paths." },
+      { icon: "📘", title: "Structured lessons", text: "Follow structured German learning from A1 to C2." },
       { icon: "✍️", title: "Tutor feedback", text: "Submit work and learn from corrections and scores." },
       { icon: "🎯", title: "Exam preparation", text: "Practise speaking, writing, listening, and reading." },
     ],
     howTitle: "Start in three simple steps",
     steps: [
-      { title: "Choose your programme", text: "Select German or French and create your account." },
+      { title: "Choose your German level", text: "Choose your German level and create your account." },
       { title: "Join your class", text: "Choose a live class or self-learning option." },
       { title: "Learn in Falowen", text: "Open lessons, submit assignments, and track progress." },
     ],
@@ -50,7 +49,7 @@ const COPY = {
     finalTitle: "Ready to start learning?",
     finalText: "Create your Falowen account or log in to continue your course.",
     contact: "Need help? Chat with us on WhatsApp",
-    metaTitle: "Falowen | Learn German A1–C2 Online & French Courses",
+    metaTitle: "Falowen | Learn German A1–C2 Online",
     metaDescription:
       "Learn German A1–C2 with Falowen from Learn Language Education Academy, established in 2022, with structured lessons, tutor feedback, exam preparation and a high exam pass rate.",
   },
@@ -58,13 +57,12 @@ const COPY = {
     languageLabel: "Sprache",
     login: "Anmelden",
     signup: "Registrieren",
-    badge: "Deutsch A1–C2 und Französisch an einem Ort lernen",
+    badge: "Deutsch A1–C2 an einem Ort lernen",
     title: "Lernen. Üben. Sicher in die Prüfung gehen.",
     subtitle:
       "Falowen vereint Kursbuch, Aufgaben, Tutor-Feedback, Anwesenheit und Prüfungsvorbereitung in einer einfachen Lernplattform.",
     chooseProgram: "Was möchtest du lernen?",
     german: "Deutsch",
-    french: "Französisch",
     joinProgram: "{{program}} starten",
     viewClasses: "Kurse ansehen",
     benefits: [
@@ -74,7 +72,7 @@ const COPY = {
     ],
     howTitle: "In drei einfachen Schritten starten",
     steps: [
-      { title: "Programm wählen", text: "Wähle Deutsch oder Französisch und erstelle dein Konto." },
+      { title: "Programm wählen", text: "Wähle dein Deutschniveau und erstelle dein Konto." },
       { title: "Kurs beitreten", text: "Wähle einen Live-Kurs oder eine Selbstlernoption." },
       { title: "Mit Falowen lernen", text: "Öffne Lektionen, reiche Aufgaben ein und verfolge deinen Fortschritt." },
     ],
@@ -98,7 +96,7 @@ const COPY = {
     finalTitle: "Bereit zum Lernen?",
     finalText: "Erstelle dein Falowen-Konto oder melde dich an, um deinen Kurs fortzusetzen.",
     contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
-    metaTitle: "Falowen | Deutsch A1–C2 online lernen & Französischkurse",
+    metaTitle: "Falowen | Deutsch A1–C2 online lernen",
     metaDescription:
       "Lerne Deutsch A1–C2 mit Falowen von der Learn Language Education Academy, gegründet 2022, mit strukturierten Lektionen, Tutor-Feedback, Prüfungsvorbereitung und hoher Bestehensquote.",
   },
@@ -106,13 +104,12 @@ const COPY = {
     languageLabel: "Langue",
     login: "Se connecter",
     signup: "S'inscrire",
-    badge: "Apprendre l'allemand et le français au même endroit",
+    badge: "Apprendre l’allemand A1–C2 au même endroit",
     title: "Apprenez. Pratiquez. Préparez votre examen.",
     subtitle:
       "Falowen réunit votre manuel, vos devoirs, les commentaires du professeur, la présence et la préparation aux examens dans un espace simple.",
     chooseProgram: "Que voulez-vous étudier ?",
     german: "Allemand",
-    french: "Français",
     joinProgram: "Commencer le {{program}}",
     viewClasses: "Voir les cours",
     benefits: [
@@ -122,7 +119,7 @@ const COPY = {
     ],
     howTitle: "Commencez en trois étapes simples",
     steps: [
-      { title: "Choisissez votre programme", text: "Sélectionnez l'allemand ou le français et créez votre compte." },
+      { title: "Choisissez votre programme", text: "Choisissez votre niveau d’allemand et créez votre compte." },
       { title: "Rejoignez votre cours", text: "Choisissez un cours en direct ou une option d'auto-apprentissage." },
       { title: "Apprenez avec Falowen", text: "Ouvrez les leçons, envoyez les devoirs et suivez vos progrès." },
     ],
@@ -146,7 +143,7 @@ const COPY = {
     finalTitle: "Prêt à commencer ?",
     finalText: "Créez votre compte Falowen ou connectez-vous pour continuer votre cours.",
     contact: "Besoin d'aide ? Écrivez-nous sur WhatsApp",
-    metaTitle: "Falowen | Cours d'allemand et de français",
+    metaTitle: "Falowen | Cours d’allemand A1–C2",
     metaDescription:
       "Apprenez l’allemand A1–C2 avec Falowen de Learn Language Education Academy, créée en 2022, avec des cours structurés, des retours de tuteur, une préparation aux examens et un taux de réussite élevé.",
   },
@@ -158,13 +155,13 @@ const LANGUAGE_OPTIONS = [
   { value: "fr", label: "Français" },
 ];
 
-const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
+const LandingPageSimple = ({ onSignUp, onLogin }) => {
   const { i18n } = useTranslation();
   const initialLanguage = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
   const [interfaceLanguage, setInterfaceLanguage] = useState(COPY[initialLanguage] ? initialLanguage : "en");
-  const resolvedProgram = program === "french" ? "french" : "german";
+  const resolvedProgram = "german";
   const copy = COPY[interfaceLanguage] || COPY.en;
-  const selectedProgramLabel = resolvedProgram === "french" ? copy.french : copy.german;
+  const selectedProgramLabel = copy.german;
 
   const actionStyle = useMemo(
     () => ({
@@ -211,7 +208,6 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     }
   };
 
-  const handleProgramChange = (nextProgram) => onProgramSelect?.(nextProgram);
   const handleSignup = () => onSignUp?.(resolvedProgram);
   const handleLogin = () => onLogin?.();
 
@@ -372,27 +368,6 @@ const LandingPageSimple = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             <h1>{copy.title}</h1>
             <p>{copy.subtitle}</p>
 
-            <div className="falowen-program-picker">
-              <span className="falowen-program-label">{copy.chooseProgram}</span>
-              <div className="falowen-program-buttons" role="group" aria-label={copy.chooseProgram}>
-                <button
-                  type="button"
-                  className="falowen-program-button"
-                  aria-pressed={resolvedProgram === "german"}
-                  onClick={() => handleProgramChange("german")}
-                >
-                  {copy.german}
-                </button>
-                <button
-                  type="button"
-                  className="falowen-program-button"
-                  aria-pressed={resolvedProgram === "french"}
-                  onClick={() => handleProgramChange("french")}
-                >
-                  {copy.french}
-                </button>
-              </div>
-            </div>
 
             <div className="falowen-home-cta-row">
               <button type="button" onClick={handleSignup} className="falowen-home-primary" style={actionStyle}>

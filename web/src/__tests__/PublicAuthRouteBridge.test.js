@@ -44,13 +44,13 @@ describe("PublicAuthRouteBridge", () => {
     expect(window.localStorage.getItem("falowen:signup-program")).toBe("german");
   });
 
-  it("keeps French as the only programme query parameter", async () => {
+  it("redirects old French signup links to German registration", async () => {
     renderAt("/signup?program=french");
 
     await waitFor(() =>
-      expect(screen.getByTestId("route")).toHaveTextContent("/signup?program=french")
+      expect(screen.getByTestId("route")).toHaveTextContent(/^\/signup$/)
     );
-    expect(window.localStorage.getItem("falowen:signup-program")).toBe("french");
+    expect(window.localStorage.getItem("falowen:signup-program")).toBe("german");
   });
 
   it("preserves other signup parameters while removing program=german", async () => {
@@ -71,7 +71,7 @@ describe("PublicAuthRouteBridge", () => {
   });
 
   it("opens the clean German route from the landing signup button", async () => {
-    window.localStorage.setItem("falowen:signup-program", "german");
+    window.localStorage.setItem("falowen:signup-program", "french");
     renderAt(
       "/",
       <button type="button" className="falowen-home-primary">Start German</button>

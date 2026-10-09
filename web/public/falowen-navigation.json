@@ -18,7 +18,8 @@
     "If a route depends on level or access, explain the relevant prerequisite briefly.",
     "For private account state, explain where to check it rather than claiming to know it.",
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
-    "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio."
+    "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
+    "Falowen currently offers German A1\u2013C2 only. Recommend German signup and German courses; French enrollment is paused."
   ],
   "navigation": [
     {
@@ -42,17 +43,6 @@
       "aliases": [
         "register for German",
         "join German"
-      ]
-    },
-    {
-      "id": "signup-french",
-      "label": "French signup",
-      "route": "/signup?program=french",
-      "purpose": "Create a new French learner account",
-      "requiresLogin": false,
-      "aliases": [
-        "register for French",
-        "join French"
       ]
     },
     {
@@ -154,7 +144,7 @@
     },
     {
       "id": "student-data",
-      "label": "Account → Student Data",
+      "label": "Account \u2192 Student Data",
       "route": "/campus/account?tab=studentData",
       "purpose": "View profile and student information",
       "requiresLogin": true,
@@ -165,7 +155,7 @@
     },
     {
       "id": "notifications",
-      "label": "Account → Notifications",
+      "label": "Account \u2192 Notifications",
       "route": "/campus/account?tab=notifications",
       "purpose": "Manage notification settings",
       "requiresLogin": true,
@@ -176,7 +166,7 @@
     },
     {
       "id": "billing",
-      "label": "Account → Billing",
+      "label": "Account \u2192 Billing",
       "route": "/campus/account?tab=billing",
       "purpose": "View tuition, balance, payment history and available receipts",
       "requiresLogin": true,
@@ -190,7 +180,7 @@
     },
     {
       "id": "upgrade",
-      "label": "Account → Upgrade",
+      "label": "Account \u2192 Upgrade",
       "route": "/campus/account?tab=upgrade",
       "purpose": "Check or start movement to the next level",
       "requiresLogin": true,
@@ -213,7 +203,7 @@
       "meaning": "Teaching material, explanations and guided lesson content"
     },
     {
-      "label": "Hören",
+      "label": "H\u00f6ren",
       "meaning": "Listening practice"
     },
     {

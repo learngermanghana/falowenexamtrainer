@@ -118,7 +118,7 @@ const PublicStudentGuidePage = () => {
         <h2 style={{ margin: 0 }}>Start here</h2>
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
           <li>If you do not know your German level, use the <RouteLink href="/placement-test">Placement Test</RouteLink>.</li>
-          <li>If you are ready to register, use <RouteLink href="/signup?program=german">German signup</RouteLink> or <RouteLink href="/signup?program=french">French signup</RouteLink>.</li>
+          <li>If you are ready to register, use <RouteLink href="/signup?program=german">German signup</RouteLink>.</li>
           <li>If you already registered, go to <RouteLink href="/login/">Log in</RouteLink>.</li>
           <li>After signup, activate access with the one-time 7-day free trial or tuition payment.</li>
           <li>Complete onboarding, then tap/click <strong>Course Book</strong> to continue your lessons.</li>

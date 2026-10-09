@@ -16,19 +16,18 @@ const SIGNUP_LABELS = ["create account", "sign up", "registrieren", "s'inscrire"
 const HOME_LABELS = ["back to overview", "back to landing", "zurück", "retour"];
 
 const getSignupProgram = (search = "") =>
-  new URLSearchParams(search).get("program") === "french" ? "french" : "german";
+  "german";
 
 const buildSignupPath = (program = "german", search = "") => {
   const params = new URLSearchParams(search);
   params.delete("program");
-  if (program === "french") params.set("program", "french");
   const query = params.toString();
   return `/signup${query ? `?${query}` : ""}`;
 };
 
 const saveProgram = (program) => {
   try {
-    window.localStorage.setItem(PROGRAM_STORAGE_KEY, program === "french" ? "french" : "german");
+    window.localStorage.setItem(PROGRAM_STORAGE_KEY, "german");
   } catch (_error) {}
 };
 
@@ -72,12 +71,7 @@ export default function PublicAuthRouteBridge() {
       if (!isSignupRoute && isSignupControl) {
         event.preventDefault();
         event.stopPropagation();
-        const storedProgram = window.localStorage.getItem(PROGRAM_STORAGE_KEY);
-        const program = location.pathname.startsWith("/learn-german-")
-          ? "german"
-          : storedProgram === "french"
-            ? "french"
-            : "german";
+        const program = "german";
         saveProgram(program);
         navigate(buildSignupPath(program));
         return;

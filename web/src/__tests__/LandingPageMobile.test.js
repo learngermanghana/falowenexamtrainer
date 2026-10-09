@@ -36,22 +36,15 @@ describe("Falowen public homepage on mobile", () => {
     jest.clearAllMocks();
   });
 
-  it("keeps the selected programme when the interface language changes", async () => {
-    render(<LandingHost />);
-
-    expect(screen.queryByRole("note")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "German" })).toHaveAttribute("aria-pressed", "true");
-
-    fireEvent.click(screen.getByRole("button", { name: "French" }));
-    expect(screen.getByRole("button", { name: "French" })).toHaveAttribute("aria-pressed", "true");
-
-    fireEvent.change(screen.getByRole("combobox", { name: "Language" }), {
-      target: { value: "de" },
-    });
-
-    await waitFor(() =>
-      expect(screen.getByRole("button", { name: "Französisch" })).toHaveAttribute("aria-pressed", "true")
-    );
+  it("offers German only, including after a saved French selection and language change", async () => {
+    const onSignUp = jest.fn();
+    render(<LandingPage program="french" onSignUp={onSignUp} />);
+    expect(screen.queryByRole("button", { name: "French" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Start German" }));
+    expect(onSignUp).toHaveBeenCalledWith("german");
+    fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: "de" } });
+    await waitFor(() => expect(screen.getByRole("button", { name: "Deutsch starten" })).toBeInTheDocument());
+    expect(screen.queryByText(/Französisch/)).not.toBeInTheDocument();
   });
 
   it("shows the academy track record without limiting exam performance to Goethe", () => {

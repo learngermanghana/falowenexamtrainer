@@ -1,7 +1,9 @@
 {
   "version": 2,
   "functions": {
-    "api/index.js": { "maxDuration": 60 }
+    "api/index.js": {
+      "maxDuration": 60
+    }
   },
   "installCommand": "npm install && npm --prefix functions install && npm --prefix web install",
   "buildCommand": "npm --prefix web run build",
@@ -159,6 +161,14 @@
     }
   ],
   "routes": [
+    {
+      "src": "/courses/french-a1\\.html",
+      "status": 307,
+      "headers": {
+        "Location": "/courses/",
+        "X-Robots-Tag": "noindex"
+      }
+    },
     {
       "src": "/signup/?",
       "headers": {

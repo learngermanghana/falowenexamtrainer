@@ -1,6 +1,6 @@
 # Falowen
 
-> Official navigation and product guidance for Falowen, a language-learning campus for German and French learners.
+> Official navigation and product guidance for Falowen, a German-learning campus for A1–C2 learners.
 
 Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
 

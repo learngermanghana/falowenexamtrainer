@@ -12,7 +12,6 @@ import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import LandingPage from "./components/LandingPage";
-import FrenchSignUpPage from "./components/FrenchSignUpPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
@@ -288,7 +287,7 @@ function App() {
   const programStorageKey = "falowen:signup-program";
   const [signupProgram, setSignupProgram] = useState(() => {
     if (typeof window === "undefined") return "german";
-    return localStorage.getItem(programStorageKey) || "german";
+    return "german";
   });
   const location = useLocation();
   const navigate = useNavigate();
@@ -329,8 +328,7 @@ function App() {
   useEffect(() => {
     if (location.pathname.startsWith("/signup")) {
       const params = new URLSearchParams(location.search);
-      const program = params.get("program");
-      if (["german", "french"].includes(program)) setSignupProgram(program);
+      setSignupProgram("german");
       setAuthMode("signup");
 
       const engagementRef = String(params.get("ref") || "").trim();
@@ -508,10 +506,6 @@ function App() {
 
   if (!user) {
     if (authMode === "signup") {
-      if (signupProgram === "french") {
-        return <FrenchSignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
-      }
-
       return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
     }
 
@@ -519,9 +513,9 @@ function App() {
       return (
         <LandingPage
           program={signupProgram}
-          onProgramSelect={setSignupProgram}
+          onProgramSelect={() => setSignupProgram("german")}
           onSignUp={(program) => {
-            const nextProgram = program || "german";
+            const nextProgram = "german";
             setSignupProgram(nextProgram);
             setAuthMode("signup");
             navigate(`/signup?program=${encodeURIComponent(nextProgram)}`);

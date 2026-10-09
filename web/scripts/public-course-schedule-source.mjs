@@ -6,7 +6,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 
 const canonicalPath = path.join(repoRoot, "shared", "curriculumCanonical.json");
-const frenchPath = path.join(repoRoot, "web", "src", "data", "frenchCourseSchedule.js");
 const c2ExamPath = path.join(repoRoot, "web", "src", "data", "c2ExamStandardContent.js");
 const c2TopicPath = path.join(repoRoot, "web", "src", "data", "c2TopicKnowledge.js");
 
@@ -74,16 +73,6 @@ const courseSchedules = Object.fromEntries(
     ];
   }),
 );
-
-const frenchSource = await fs.readFile(frenchPath, "utf8");
-const frenchMatch = frenchSource.match(/export\s+const\s+FRENCH_A1_SCHEDULE\s*=\s*(\[[\s\S]*\])\s*;?\s*$/);
-if (!frenchMatch) {
-  throw new Error("Could not parse FRENCH_A1_SCHEDULE for the public catalogue.");
-}
-
-// This evaluates only the repository-controlled array literal from
-// frenchCourseSchedule.js. It does not import any frontend application module.
-courseSchedules.FRENCH_A1 = Function(`"use strict"; return (${frenchMatch[1]});`)();
 
 export { courseSchedules };
 export default courseSchedules;
