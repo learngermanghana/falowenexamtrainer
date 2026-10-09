@@ -1,6 +1,7 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
 import { scoreB2MockWriting } from "../services/b2FinalMockService";
@@ -1321,7 +1322,7 @@ export default function B2FinalMockExamPage() {
       }));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (markError) {
-      setPageError(markError?.response?.data?.error || markError?.message || "Could not mark B2 Schreiben.");
+      setPageError(getMockWritingSubmissionError(markError));
     } finally {
       setBusy("");
     }
