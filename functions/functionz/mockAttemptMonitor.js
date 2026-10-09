@@ -8,6 +8,15 @@ const MOCK_PARENTS = Object.freeze({
   b1MockExamUsers: "B1",
 });
 const SECTIONS = ["lesen", "hoeren", "schreiben", "sprechen"];
+// Both the Admin account and the dedicated staff login can open /timed-attempts.
+// Restrict monitor access to verified Firebase identity claims or these explicit accounts.
+const isAuthorizedMockMonitor = (identity = {}) => {
+  if (!identity.uid) return false;
+  const email = String(identity.email || "").trim().toLowerCase();
+  const role = String(identity.role || "").trim().toLowerCase();
+  return identity.admin === true || role === "admin" || role === "tutor" ||
+    email === "moxflex@gmail.com" || email === "staff@falowen.app";
+};
 const toMillis = value => {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
@@ -118,4 +127,4 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
   return { attempts, partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor };
