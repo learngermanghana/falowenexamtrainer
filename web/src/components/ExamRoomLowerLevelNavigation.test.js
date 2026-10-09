@@ -10,9 +10,10 @@ describe("Exams Room level selector across all sections", () => {
   const schreiben = readSource("components/WritingPage.js");
 
   it("shows one unlocked lower-level selector in the shared Exams Room shell", () => {
-    expect(app).toContain('id="exam-level-selector"');
+    expect(app).toContain('role="group" aria-label="Choose exam practice level"');
     expect(app).toContain("accessibleLevels.map((option)");
-    expect(app).toContain('onChange={(event) => setLevel(event.target.value)}');
+    expect(app).toContain('aria-pressed={level === option}');
+    expect(app).toContain('if (sampleId) navigate(`/exams/${examSection}`)');
     expect(app).toContain("Your Course Book level stays unchanged");
     expect(app).not.toContain("disabled={Boolean(profileExamLevel)}");
     expect(app).not.toContain("setLevel(profileExamLevel)");

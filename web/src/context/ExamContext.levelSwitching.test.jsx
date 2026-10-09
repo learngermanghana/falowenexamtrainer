@@ -81,6 +81,25 @@ describe("Exams Room practice level never changes course enrollment", () => {
     expect(loadPreferredLevel("student-b1")).toBe("A1");
   });
 
+  it("shows only A1 to an A1 student", () => {
+    mockStudentProfile = { id: "student-a1", level: "A1", className: "A1" };
+    mockUser = { uid: "student-a1" };
+    mount();
+    expect(screen.getByTestId("allowed-levels")).toHaveTextContent("A1");
+    fireEvent.click(screen.getByText("Choose A2"));
+    expect(screen.getByTestId("exam-level")).toHaveTextContent("A1");
+  });
+
+  it("uses the same permitted levels in the exam screen on every section", () => {
+    const fs = require("fs");
+    const app = fs.readFileSync(require.resolve("../App.js"), "utf8");
+    expect(app).toContain('role="group" aria-label="Choose exam practice level"');
+    expect(app).toContain("accessibleLevels.map((option)");
+    expect(app).toContain("aria-pressed={level === option}");
+    expect(app).toContain("if (sampleId) navigate(`/exams/${examSection}`)");
+    expect(app).not.toContain('{!sampleId ? (\n          <div\n            className="exam-room-level-picker"');
+  });
+
   it("clamps a stored higher level to the registered student level", () => {
     window.localStorage.setItem("exam-coach-level:student-b1", "C2");
     mount();
