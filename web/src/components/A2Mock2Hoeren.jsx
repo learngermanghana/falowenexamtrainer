@@ -8,7 +8,7 @@ import "./A2Mock2Hoeren.css";
 const STORAGE = "falowen:a2:mock-02:hoeren:v1";
 const START = { answers: {}, partIndex: 0, completedAt: null };
 const restore = () => { try { return { ...START, ...JSON.parse(localStorage.getItem(STORAGE) || "null") }; } catch { return START; } };
-export default function A2Mock2Hoeren() {
+export default function A2Mock2Hoeren({ embedded = false, onComplete }) {
   const { idToken } = useAuth();
   const [exam, setExam] = useState(restore);
   const [audioUrl, setAudioUrl] = useState("");
@@ -19,6 +19,7 @@ export default function A2Mock2Hoeren() {
   const player = useRef(null);
   const part = PARTS[exam.partIndex];
   const finished = Boolean(exam.completedAt);
+  useEffect(() => { if (embedded && finished && onComplete) onComplete(); }, [embedded, finished, onComplete]);
   const correct = QUESTIONS.filter(q => String(exam.answers[q.number] || "") === q.answer).length;
   useEffect(() => { localStorage.setItem(STORAGE, JSON.stringify(exam)); }, [exam]);
   useEffect(() => { setAudioUrl(""); setError(""); }, [exam.partIndex]);
@@ -39,7 +40,7 @@ export default function A2Mock2Hoeren() {
   const selections = Object.values(exam.answers).filter(Boolean);
   const chosenPictureIds = new Set(part.id === "teil-2" ? part.questions.map(q => exam.answers[q.number]).filter(Boolean) : []);
   return <main className="a2-mock2-shell" lang="de" data-a2-mock2-hoeren>
-    <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Hören</span></div>
+    {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Hören</span></div> : null}
     {!finished ? <>
       <header className="a2-mock2-progress"><div><strong>Hören · Übungstest 2</strong><span>{selections.length}/20 beantwortet</span></div><strong>Teil {exam.partIndex+1}/4</strong></header>
       <nav className="a2-mock2-nav" aria-label="Hören-Teile">{PARTS.map((p,i)=><button type="button" key={p.id} className={i===exam.partIndex?"selected":""} onClick={()=>changePart(i)}>Teil {i+1}<small>{p.questions.filter(q=>exam.answers[q.number]).length}/5</small></button>)}</nav>
