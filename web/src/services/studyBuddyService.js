@@ -2,6 +2,7 @@ import { isAssessmentRestricted, isMockAssessmentRoute } from "../utils/assessme
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 import { getStudyBuddyLessonContext } from "./studyBuddyLessonContext";
+import { resolveStudyBuddyNavigationReply } from "./studyBuddyNavigation";
 
 const DEFAULT_STUDY_BUDDY_MODE = "lesson";
 const STUDY_BUDDY_MODE_LABELS = {
@@ -16,12 +17,14 @@ const STUDY_BUDDY_HISTORY_MAX_MESSAGE_CHARS = 1200;
 const FALOWEN_NAVIGATION_GUIDANCE = [
   "FALOWEN NAVIGATION SUPPORT (authoritative):",
   "Falowen navigation and product-help questions are always in scope. Answer the navigation question directly before any language coaching. Do not redirect a Falowen navigation question back to German practice.",
-  "Course Book: in the signed-in campus, tap/click the visible Learn navigation item. Learn opens the Course Book at https://www.falowen.app/campus/course.",
-  "Mobile: Learn is the first item in the bottom navigation. Desktop: Learn is in the campus navigation row.",
+  "Course Book is the current campus navigation label. Open the Course Book at https://www.falowen.app/campus/course.",
+  "Use the visible Course Book navigation item on mobile or desktop. Do not refer to an old Learn label.",
   "Practice opens vocabulary practice at https://www.falowen.app/campus/vocab. Results opens https://www.falowen.app/campus/results. Attendance opens https://www.falowen.app/campus/attendance when available for the learner.",
   "Free public Goethe-style exam practice (no login): https://www.falowen.app/exam-practice. A1 Lesen: https://www.falowen.app/exam-practice/a1. A2 Lesen: https://www.falowen.app/exam-practice/a2.",
   "When a learner asks for free/public/no-account Goethe exam practice, send them to the public Exam Practice route for their available level. Do not claim B1, B2, C1 or C2 public practice exists until it is published.",
-  "For full mock libraries, saved attempts, detailed Schreiben feedback, Sprechen assessment or readiness tracking, use the signed-in Exams Room: https://www.falowen.app/exams/overview.",
+  "CRITICAL RESULTS VS EXAMS DISTINCTION: when a learner asks where to see their result, results, score, marks, grades, assignment corrections or tutor feedback (including an exam result), lead with Results: https://www.falowen.app/campus/results. Do not send this question to Exams Room.",
+  "Exams Room at https://www.falowen.app/exams/overview is for starting/resuming timed mocks, mock practice and detailed full-mock review. It is not a replacement for the Results page.",
+  "If a result is missing, explain that marking/synchronisation may be pending; never invent a score or claim a submission was marked without verified data.",
   "Level-specific Goethe preparation information is public at /goethe-a1-preparation through /goethe-c2-preparation. Example: Goethe C1 preparation is https://www.falowen.app/goethe-c1-preparation.",
   "Exam File: https://www.falowen.app/campus/examFile. Study Calendar: https://www.falowen.app/exams/study.",
   "Account settings are opened from the profile menu. Billing: https://www.falowen.app/campus/account?tab=billing.",
@@ -212,6 +215,21 @@ export const requestStudyBuddyReply = async ({ message, level, idToken, mode, le
     throw new Error("StudyBuddy is unavailable during timed assignments and mock exams. Complete the assessment independently.");
   }
   const conversationHistory = readStudyBuddyConversationHistory({ idToken, level });
+  const navigation = resolveStudyBuddyNavigationReply(message, conversationHistory);
+  if (navigation) {
+    // For known Falowen navigation intents, use a verified direct answer
+    // rather than asking a language model to choose between similar pages.
+    writeStudyBuddyConversationHistory({
+      idToken,
+      level,
+      history: [
+        ...conversationHistory,
+        { role: "user", content: message },
+        { role: "assistant", content: navigation.reply },
+      ],
+    });
+    return { reply: navigation.reply, navigation: navigation.destination };
+  }
   const structuredLessonContext = lessonContext && typeof lessonContext === "object" && Object.keys(lessonContext).length
     ? lessonContext
     : getStudyBuddyLessonContext();
