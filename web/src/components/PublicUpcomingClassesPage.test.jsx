@@ -46,7 +46,8 @@ describe("public full class schedule", () => {
 
     await screen.findByRole("heading", { name: "Weekly class calendar" });
     expect(screen.getByRole("heading", { name: "Full class schedule" })).toBeInTheDocument();
-    const week = screen.getByLabelText("Weekly class calendar");
+    const week = document.querySelector(".falowen-schedule-week");
+    expect(week).toHaveAttribute("aria-label", "Weekly class calendar");
     expect(within(week).getByRole("heading", { name: "Monday" })).toBeInTheDocument();
     expect(within(week).getByRole("heading", { name: "Wednesday" })).toBeInTheDocument();
     expect(within(week).getAllByText("18:00–19:00")).toHaveLength(2);
