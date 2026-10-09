@@ -1,6 +1,5 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
@@ -13,6 +12,8 @@ import {
 } from "../services/b1FinalMockService";
 import { B1_LISTENING, B1_READING, B1_WRITING_TASKS } from "../data/b1FinalMockData";
 import B1FinalMockSpeaking from "./B1FinalMockSpeaking";
+import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
+import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { B1_MOCK_STEPS, getB1MockProgress, getB1MockPracticeRecommendations } from "../utils/b1MockProgress";
 import "./B1FinalMockExamPage.css";
 
@@ -119,30 +120,6 @@ const ChoiceList = ({ name, options, value, onChange }) => (
   </div>
 );
 
-const MockJourney = ({ stage, sectionScores }) => {
-  const progress = getB1MockProgress(stage, sectionScores);
-  return (
-    <section className="b1-final-journey" aria-label="B1 full mock exam progress">
-      <div className="b1-final-journey-heading">
-        <strong>{progress.isComplete ? "All four modules completed" : `${progress.completed} of 4 modules completed`}</strong>
-        <span>Final result only after Lesen, Hören, Schreiben and Sprechen</span>
-      </div>
-      <ol>
-        {B1_MOCK_STEPS.map((step, index) => {
-          const done = Object.prototype.hasOwnProperty.call(sectionScores || {}, step.key);
-          const active = stage === step.key;
-          return (
-            <li key={step.key} className={done ? "is-done" : active ? "is-current" : "is-upcoming"} aria-current={active ? "step" : undefined}>
-              <span className="b1-final-journey-number">{done ? "✓" : index + 1}</span>
-              <span><strong>{step.label}</strong><small>{done ? "Completed" : active ? "Current section" : "Not yet completed"}</small></span>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
-};
-
 const SectionBar = ({ stage, secondsLeft, attemptInfo }) => (
   <div className="b1-final-sectionbar">
     <div><span>Full mock progress</span><strong>Module {B1_MOCK_STEPS.findIndex((step) => step.key === stage) + 1}/4 · {SECTION_LABELS[stage]}</strong></div>
@@ -234,7 +211,6 @@ const ReadingPart = ({ children, title, time }) => (
 export default function B1FinalMockExamPage() {
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
-  const navigate = useNavigate();
   const storageKey = `${B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey));
   const [now, setNow] = useState(Date.now());
@@ -533,6 +509,7 @@ export default function B1FinalMockExamPage() {
         </header>
         <section className="b1-final-rules">
           <h2>Before you start</h2>
+          <FullMockGuide level="B1" stage="intro" />
           <div className="b1-final-duration-grid">
             <div><strong>Lesen</strong><span>65 min</span></div>
             <div><strong>Hören</strong><span>40 min</span></div>
@@ -566,7 +543,7 @@ export default function B1FinalMockExamPage() {
             {exam.overall?.passed ? "PASS" : "NEEDS MORE PRACTICE"}
           </p>
         </header>
-        <MockJourney stage="result" sectionScores={exam.sectionScores} />
+        <FullMockGuide level="B1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
         <section className="b1-final-result-grid">
           {entries.map(([key, score]) => (
             <div key={key}><span>{SECTION_LABELS[key]}</span><strong>{score}/25</strong></div>
@@ -578,20 +555,10 @@ export default function B1FinalMockExamPage() {
           <p>{exam.overall?.passed
             ? "You completed the full mock. You can strengthen any weaker module before your next attempt."
             : "You have completed the whole mock, but your overall score needs improvement. You do not have to restart immediately: practise the sections that need work, then retake the full mock when ready."}</p>
-          <div className="b1-final-practice-recovery">
-            <h3>Choose what to practise next</h3>
-            {recommendations.map((item) => (
-              <button type="button" key={item.key} onClick={() => navigate(item.practiceRoute)}>
-                Practise {item.label} · {item.score}/25
-              </button>
-            ))}
-          </div>
+          <FullMockRecovery level="B1" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="A new full attempt begins with Lesen. Your completed result stays in the history." />
           {exam.schreibenResult?.overall_feedback_en ? <p>{exam.schreibenResult.overall_feedback_en}</p> : null}
           {exam.speakingResult?.overall_feedback_en ? <p>{exam.speakingResult.overall_feedback_en}</p> : null}
-          <button type="button" className="b1-final-primary" onClick={() => startExam({ forceNew: true })} disabled={busy === "start"}>
-            Retake full mock (all 4 sections)
-          </button>
-          <p className="b1-final-small-note">A new attempt starts from Lesen. Your completed attempt is retained in the results history.</p>
+
         </section>
       </main>
     );
@@ -601,7 +568,7 @@ export default function B1FinalMockExamPage() {
     <main className="b1-final-shell">
       <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
       <SectionBar stage={exam.stage} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
-      <MockJourney stage={exam.stage} sectionScores={exam.sectionScores} />
+      <FullMockGuide level="B1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} />
       <p className="b1-final-small-note" role="status">
         Section {mockProgress.currentIndex + 1} of 4 · Completing this section will open
         {mockProgress.nextStep ? ` ${mockProgress.nextStep.label}` : " your final result"}. Do not leave after only one section.
