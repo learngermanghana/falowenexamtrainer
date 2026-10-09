@@ -67,3 +67,65 @@ test("mock monitoring only allows privileged identity claims or owner", () => {
   expect(isAuthorizedMockMonitor({ email: "staff@falowen.app" })).toBe(false);
   expect(isAuthorizedMockMonitor(null)).toBe(false);
 });
+
+test("mock monitor resolves registered student names by UID and email for existing attempts", async () => {
+  const docs = [
+    { id: "one", ref: { path: "a1MockExamUsers/uid-1/attempts/one" },
+      data: () => ({ uid: "uid-1", email: "one@example.org", status: "in_progress" }) },
+    { id: "two", ref: { path: "a2MockExamUsers/uid-2/attempts/two" },
+      data: () => ({ uid: "uid-2", email: "two@example.org", status: "completed" }) },
+  ];
+  const directory = [
+    { id: "STU-01", data: () => ({ uid: "uid-1", email: "one@example.org",
+      name: "Ama Mensah", answers: { secret: "not for the monitor" } }) },
+    { id: "STU-02", data: () => ({ email: "two@example.org",
+      fullName: "Kojo Asare", notes: "confidential" }) },
+  ];
+  const db = {
+    collectionGroup: () => ({ orderBy: () => ({ limit: () => ({
+      get: async () => ({ docs, size: docs.length }),
+    }) }) }),
+    collection: path => {
+      if (path === "mockProgressMonitor") return { limit: () => ({
+        get: async () => ({ docs: [], size: 0 }),
+      }) };
+      if (path !== "students") throw new Error("Unexpected collection");
+      return { where: (field, op, values) => ({
+        get: async () => ({ docs: directory.filter(entry => values.includes(entry.data()[field])) }),
+      }) };
+    },
+  };
+  const result = await listMockAttempts(db);
+  expect(result.attempts.map(row => row.studentName)).toEqual(["Ama Mensah", "Kojo Asare"]);
+  expect(result.attempts[0].studentEmail).toBe("one@example.org");
+  expect(result.attempts[1].studentEmail).toBe("two@example.org");
+  expect(JSON.stringify(result)).not.toMatch(/confidential|not for the monitor/);
+});
+
+test("mock monitor resolves legacy profiles keyed by UID and preserves email fallback", async () => {
+  const docs = [
+    { id: "a", ref: { path: "b1MockExamUsers/legacy-uid/attempts/a" },
+      data: () => ({ email: "legacy@example.org" }) },
+    { id: "b", ref: { path: "a1MockExamUsers/missing-uid/attempts/b" },
+      data: () => ({ email: "missing@example.org" }) },
+  ];
+  const db = {
+    collectionGroup: () => ({ orderBy: () => ({ limit: () => ({
+      get: async () => ({ docs, size: docs.length }),
+    }) }) }),
+    collection: path => {
+      if (path === "mockProgressMonitor") return { limit: () => ({
+        get: async () => ({ docs: [], size: 0 }),
+      }) };
+      return { where: () => ({ get: async () => ({ docs: [] }) }),
+        doc: uid => ({ id: uid }) };
+    },
+    getAll: async (...refs) => refs.map(ref => ({
+      id: ref.id, exists: ref.id === "legacy-uid",
+      data: () => ({ name: "Nana Boateng" }),
+    })),
+  };
+  const result = await listMockAttempts(db);
+  expect(result.attempts.map(row => row.studentName)).toEqual(["Nana Boateng", ""]);
+  expect(result.attempts[1].studentEmail).toBe("missing@example.org");
+});
