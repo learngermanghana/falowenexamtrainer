@@ -26,9 +26,11 @@ export const getFullMockProgress = ({ stage = "intro", completedSkills = [], com
 
 export const getFullMockPracticeRoutes = (level) => {
   const normalized = String(level || "").trim().toLowerCase();
+  const nativeReading = ["a1", "a2", "b1", "c1"].includes(normalized);
+  const nativeListening = ["a1", "a2", "b1", "c1"].includes(normalized);
   return {
-    lesen: `/exams/lesen/${normalized}/sample-1`,
-    hoeren: `/exams/horen/${normalized}/sample-1`,
+    lesen: nativeReading ? `/exams/lesen/${normalized}/sample-1` : "/exams/lesen",
+    hoeren: nativeListening ? `/exams/horen/${normalized}/sample-1` : "/exams/horen",
     schreiben: "/exams/writing",
     sprechen: "/exams/speaking",
   };
