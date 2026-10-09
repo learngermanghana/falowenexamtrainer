@@ -4777,14 +4777,10 @@ app.get("/internal/mock-attempts", async (req, res) => {
   try {
     const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
     if (!identity) return;
-    const email = String(identity.email || "").toLowerCase();
-    const role = String(identity.role || "").toLowerCase();
-    const isStaff = identity.admin === true || role === "admin" || role === "tutor" ||
-      email === "moxflex@gmail.com";
-    if (!isStaff) return res.status(403).json({ error: "Staff access required" });
+    const { listMockAttempts, isAuthorizedMockMonitor } = require("./mockAttemptMonitor");
+    if (!isAuthorizedMockMonitor(identity)) return res.status(403).json({ error: "Staff access required" });
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock monitoring storage unavailable" });
-    const { listMockAttempts } = require("./mockAttemptMonitor");
     const data = await listMockAttempts(db);
     return res.json({ ok: true, ...data, checkedAt: new Date().toISOString() });
   } catch (error) {

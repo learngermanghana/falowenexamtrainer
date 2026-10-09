@@ -1,4 +1,4 @@
-const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts } = require("../mockAttemptMonitor");
+const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts, isAuthorizedMockMonitor } = require("../mockAttemptMonitor");
 
 test("mock monitor redacts student answers and preserves section timing", () => {
   const row = normalizeMockAttempt({
@@ -55,4 +55,15 @@ test("A2 Mock 2 browser progress cannot expose answers or pretend to be a verifi
   expect(row.overallScore).toBeNull();
   expect(row.progressSource).toBe("browser_reported");
   expect(JSON.stringify(row)).not.toContain("private");
+});
+
+
+test("mock monitoring only allows privileged identity claims or owner", () => {
+  expect(isAuthorizedMockMonitor({ uid: "staff", email: "staff@falowen.app" })).toBe(false);
+  expect(isAuthorizedMockMonitor({ uid: "admin", email: "moxflex@gmail.com" })).toBe(true);
+  expect(isAuthorizedMockMonitor({ uid: "tutor", role: "tutor" })).toBe(true);
+  expect(isAuthorizedMockMonitor({ uid: "admin-claim", admin: true })).toBe(true);
+  expect(isAuthorizedMockMonitor({ uid: "learner", role: "student", email: "learner@example.com" })).toBe(false);
+  expect(isAuthorizedMockMonitor({ email: "staff@falowen.app" })).toBe(false);
+  expect(isAuthorizedMockMonitor(null)).toBe(false);
 });

@@ -8,6 +8,15 @@ const MOCK_PARENTS = Object.freeze({
   b1MockExamUsers: "B1",
 });
 const SECTIONS = ["lesen", "hoeren", "schreiben", "sprechen"];
+// Mock attempts contain private student metadata. Only server-verified admin/tutor
+// claims and the owner account may access the monitoring projection.
+const isAuthorizedMockMonitor = (identity = {}) => {
+  if (!identity?.uid) return false;
+  const email = String(identity.email || "").trim().toLowerCase();
+  const role = String(identity.role || "").trim().toLowerCase();
+  return identity.admin === true || role === "admin" || role === "tutor" ||
+    email === "moxflex@gmail.com";
+};
 const toMillis = value => {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
@@ -118,4 +127,4 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
   return { attempts, partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor };
