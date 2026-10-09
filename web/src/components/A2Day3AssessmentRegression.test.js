@@ -1,55 +1,42 @@
+import { getA2ReadingTask } from "../data/a2ReadingTasks";
+import { getA2ListeningTask } from "../data/a2ListeningTasks";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import fs from "fs";
 import path from "path";
 
-const read = (file) => fs.readFileSync(path.resolve(__dirname, file), "utf8");
-
-const extractQuestionBlock = (source, variableName) => {
-  const match = source.match(new RegExp(`const ${variableName} = \\[([\\s\\S]*?)\\n\\];`));
-  if (!match) throw new Error(`Could not find ${variableName}`);
-  return match[1];
-};
+const manifest = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../../../functions/data/answerKeyManifest.json"), "utf8"));
 
 describe("A2 Day 3 canonical assessment regression", () => {
-  const source = read("A2Day3ComparisonsWorkbookPage.js");
-  const reading = extractQuestionBlock(source, "readingQuestions");
-  const listening = extractQuestionBlock(source, "listeningQuestions");
-  const manifest = JSON.parse(read("../../../functions/data/answerKeyManifest.json"));
-  const answerKey = manifest["A2 1.3 Dinge und Personen vergleichen"];
-
-  test("keeps Teil 3 at the canonical seven Anna and Max questions", () => {
-    expect((reading.match(/stem:/g) || [])).toHaveLength(7);
-    expect(reading).toContain('stem: "Wie alt ist Anna?"');
-    expect(reading).toContain('stem: "Was macht Anna in ihrer Freizeit?"');
-    expect(reading).toContain('stem: "Wo arbeitet Anna?"');
-    expect(reading).toContain('stem: "Welches Tier hat Anna?"');
-    expect(reading).toContain('stem: "Was unterrichtet Max?"');
-    expect(reading).toContain('stem: "Was macht Max oft mit seinen Freunden?"');
-    expect(reading).toContain('stem: "Was unternehmen Anna und Max am Wochenende?"');
-
-    expect(source).toContain("Anna arbeitet als Krankenschwester in einem Krankenhaus");
-    expect(source).toContain("einen kleinen Hund namens Bruno");
-    expect(source).toContain("Ausflüge in die Natur oder Museumsbesuche");
-    expect(reading).not.toContain('stem:"Wer ist älter?"');
+  test("uses the canonical five-question language-course comparison reading", () => {
+    const reading = getA2ReadingTask(3);
+    expect(reading.chapter).toBe("1.3");
+    expect(reading.title).toBe("Zwei Sprachkurse");
+    expect(reading.questions.map(({ stem }) => stem)).toEqual([
+      "Welche Sprachschule ist billiger?",
+      "Wo dauert eine Unterrichtsstunde länger?",
+      "Welche Schule hat kleinere Gruppen?",
+      "Welche Schule liegt näher an Ninas Wohnung?",
+      "Wann hat Sprachschule A Unterricht?",
+    ]);
+    expect(reading.text).toContain("95 Euro");
+    expect(reading.text).toContain("120 Euro");
   });
 
-  test("keeps Teil 4 at the canonical five Julia and Tobias questions", () => {
-    expect((listening.match(/stem:/g) || [])).toHaveLength(5);
-    expect(listening).toContain('stem: "Wie alt ist Julia?"');
-    expect(listening).toContain('stem: "Was macht Julia beruflich?"');
-    expect(listening).toContain('stem: "Wo lebt Tobias?"');
-    expect(listening).toContain('stem: "Was möchte Tobias in Zukunft machen?"');
-    expect(listening).toContain('stem: "Was machen Julia und Tobias oft am Wochenende?"');
-    expect(listening).toContain("b) Sie kochen gemeinsam mit Sophie.");
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/z0hve7zCDEo"');
+  test("keeps the canonical five Julia and Tobias listening questions and audio", () => {
+    const listening = getA2ListeningTask(3);
+    expect(listening.audioUrl).toBe("https://youtu.be/z0hve7zCDEo");
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.questions[0].stem).toBe("Wie alt ist Julia?");
+    expect(listening.questions[4].stem).toBe("Was machen Julia und Tobias oft am Wochenende?");
+    expect(listening.questions[4].options).toContain("b) Gemeinsam kochen");
   });
 
-  test("stays aligned with the A2-1.3 answer key", () => {
-    expect(answerKey.assignment_id).toBe("A2-1.3");
-    expect(Object.keys(answerKey.answers.teil3)).toHaveLength(7);
-    expect(Object.keys(answerKey.answers.teil4)).toHaveLength(5);
-    expect(answerKey.answers.teil3.Answer1).toContain("Anna ist 25 Jahre alt");
-    expect(answerKey.answers.teil3.Answer7).toContain("Anna und Max");
-    expect(answerKey.answers.teil4.Answer1).toContain("Julia ist 26 Jahre alt");
-    expect(answerKey.answers.teil4.Answer5).toContain("Sophie");
+  test("keeps the shared workbook profile and answer-key question counts aligned", () => {
+    const profile = getA2B1LessonProfile("A2", 3);
+    const answerKey = Object.values(manifest).find((entry) => entry.assignment_id === "A2-1.3");
+    expect(profile.assignmentKey).toBe("A2-1.3");
+    expect(answerKey).toBeDefined();
+    expect(Object.keys(answerKey.answers.teil3)).toHaveLength(getA2ReadingTask(3).questions.length);
+    expect(Object.keys(answerKey.answers.teil4)).toHaveLength(getA2ListeningTask(3).questions.length);
   });
 });

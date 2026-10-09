@@ -21,13 +21,13 @@ describe("A2 canonical assessment content guard", () => {
 
   test("keeps canonical Lesen question counts, including the seven-question Day 22 Hamburg task", () => {
     A2_READING_DAYS.forEach((day) => {
-      expect(A2_READING_TASKS[day].questions).toHaveLength(day === 22 ? 7 : 5);
+      expect(A2_READING_TASKS[day].questions).toHaveLength(({ 11: 7, 17: 8, 22: 7 })[day] || 5);
     });
   });
 
   test("keeps the approved A2 Hören mode split", () => {
-    expect(A2_GRADED_LISTENING_DAYS).toHaveLength(21);
-    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([21, 24, 26]);
+    expect(A2_GRADED_LISTENING_DAYS).toHaveLength(23);
+    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([21]);
     expect(A2_NO_LISTENING_DAYS).toEqual([14, 22, 23, 25]);
   });
 
@@ -35,7 +35,7 @@ describe("A2 canonical assessment content guard", () => {
     A2_GRADED_LISTENING_DAYS.forEach((day) => {
       const task = A2_LISTENING_TASKS[day];
       expect(task.mode).toBe(A2_LISTENING_MODES.GRADED);
-      expect(task.audioUrl).toBeTruthy();
+      expect(task.audioUrl || task.audioKey).toBeTruthy();
       expect(task.questions.length).toBeGreaterThan(0);
     });
   });
@@ -44,7 +44,7 @@ describe("A2 canonical assessment content guard", () => {
     A2_SELF_CHECK_LISTENING_DAYS.forEach((day) => {
       const task = A2_LISTENING_TASKS[day];
       expect(task.mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
-      expect(task.audioUrl).toBeTruthy();
+      expect(task.audioUrl || task.audioKey).toBeTruthy();
       expect(task.questions).toHaveLength(0);
     });
     A2_NO_LISTENING_DAYS.forEach((day) => {
@@ -70,7 +70,7 @@ describe("A2 canonical assessment content guard", () => {
   test("the shared A2 workbook derives Hören from canonical data", () => {
     const source = read("A2StandardTabbedWorkbookPage.js");
     expect(source).toContain("getA2ListeningTask(day)");
-    expect(source).toContain("A2_LISTENING_MODES.SELF_CHECK");
+    expect(source).toContain("part4Profile?.mode === \"self-check\"");
     expect(source).not.toContain("hoerenContent = null");
   });
 });

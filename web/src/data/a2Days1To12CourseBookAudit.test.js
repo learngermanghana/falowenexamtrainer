@@ -149,7 +149,8 @@ describe("A2 Course Book batch audit · Days 1–12", () => {
     expect(source).toContain("day={12}");
     expect(source).toContain('chapter="5.12"');
     expect(source).toContain('workbookId="A2Day12MeinTraumberuf"');
-    expect(A2_LISTENING_TASKS[12].audioUrl).toBe("https://youtu.be/VGzHSjn3O-A");
+    expect(A2_LISTENING_TASKS[12].audioKey).toBe("a2/day-12/day-12.mp3");
+    expect(A2_LISTENING_TASKS[12].questions).toHaveLength(5);
     expect(source).not.toMatch(/WorkbookPageLegacy|patchListeningMedia|MutationObserver/);
   });
 });

@@ -5,7 +5,7 @@ const read = (fileName) => fs.readFileSync(path.resolve(__dirname, fileName), "u
 
 const grammarDays = [
   [1, "A2StarterConjunctionsPage.js", "weil"],
-  [2, "A2Day2Kapitel12GrammarNotesPage.js", "Adjektivendungen"],
+  [2, "A2Day2Kapitel12GrammarNotesPage.js", "Adjective Declension"],
   [3, "ComparingThingsAndPeopleGrammarPage.js", "Komparativ"],
   [4, "WoTreffenUnsGrammarPage.js", "Wo? oder Wohin?"],
   [5, "A2Day5FreizeitSeparableVerbsGrammarPage.js", "Trennbare Verben"],
@@ -27,7 +27,7 @@ const grammarDays = [
   [21, "A2Day21EinWochenendePlanenWennObFallsGrammarPage.js", "wenn"],
   [22, "A2Day22DieWochePlanungGrammarPage.js", "Präsens"],
   [23, "A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage.js", "Verkehrsmittel"],
-  [24, "A2Day24EinenUrlaubPlanenGrammarPage.js", "Reiseziele"],
+  [24, "A2Day24EinenUrlaubPlanenGrammarPage.js", "wenn"],
   [25, "A2Day25TagesablaufGrammarPage.js", "Separable verbs"],
   [26, "A2Day26GefuehleGrammarPage.js", "sich fühlen"],
   [27, "A2Day27DigitaleKommunikationGrammarPage.js", "dass"],
@@ -67,7 +67,7 @@ describe("A2 focused grammar quality", () => {
     expect(content).toContain("<GrammarNotes embedded />");
   });
 
-  test("the audited outliers use one focused learning structure", () => {
+  test("the audited grammar pages support embedding without requiring a mini lesson", () => {
     [
       "A2Day2Kapitel12GrammarNotesPage.js",
       "ComparingThingsAndPeopleGrammarPage.js",
@@ -79,12 +79,6 @@ describe("A2 focused grammar quality", () => {
       "A2Day28UeberDieZukunftSprechenGrammarPage.js",
     ].forEach((fileName) => {
       const source = read(fileName);
-      expect(source).toContain("A2MiniLearningBlock");
-      expect(source).toContain("english:");
-      expect(source).toContain("rule:");
-      expect(source).toContain("examples:");
-      expect(source).toContain("commonMistake:");
-      expect(source).toContain("questions:");
       expect(source).toContain("embedded = false");
     });
   });

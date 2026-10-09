@@ -26,7 +26,7 @@ describe("A2 Course Book final audit · Days 25–28", () => {
 
   test("keeps Day 25 on canonical Lesen with no Hören assignment", () => {
     const source = readComponent("A2Day25TagesablaufWorkbookPage.js");
-    expect(A2_READING_TASKS[25].title).toBe("Annas Arbeitstag");
+    expect(A2_READING_TASKS[25].title).toBe("Mein Tagesablauf in Hamburg");
     expect(A2_LISTENING_TASKS[25].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(source).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
     expect(A2_LISTENING_TASKS[25].audioUrl).toBe("");
@@ -34,7 +34,7 @@ describe("A2 Course Book final audit · Days 25–28", () => {
 
   test("keeps Day 26 fully focused on feelings", () => {
     const source = readComponent("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
-    expect(A2_READING_TASKS[26].title).toBe("Ein Tag mit verschiedenen Gefühlen");
+    expect(A2_READING_TASKS[26].title).toBe("Gefühle und Reaktionen im Gespräch");
     expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
     expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
@@ -44,13 +44,13 @@ describe("A2 Course Book final audit · Days 25–28", () => {
   test("preserves the already-clean Day 27 digital communication workbook", () => {
     const source = readComponent("A2Day27DigitaleKommunikationWorkbookPage.js");
     expect(source).toContain("Digitale Kommunikation");
-    expect(A2_READING_TASKS[27].title).toBe("Sicher kommunizieren");
-    expect(source).toContain("A2Days26To28LearningUpgrade");
+    expect(A2_READING_TASKS[27].title).toBe("Digitale Mitteilungen & Online-Anzeigen");
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
   });
 
   test("moves Day 28 to the standard shell with future-focused reading and grammar", () => {
     const source = readComponent("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
-    expect(A2_READING_TASKS[28].title).toBe("Meine Pläne für die nächsten Jahre");
+    expect(A2_READING_TASKS[28].title).toBe("Reisepläne für Hamburg");
     expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
     expect(A2_LISTENING_TASKS[28].audioUrl).toBe("");
     expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);

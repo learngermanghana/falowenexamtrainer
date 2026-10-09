@@ -26,6 +26,7 @@ on:
       - "web/src/components/A2Day*Grammar*.js"
       - "web/src/components/A2StarterConjunctionsPage.js"
       - "web/src/components/A2FocusedGrammarQuality.test.js"
+      - "web/src/components/A2Day2Day3GrammarRestoration.test.jsx"
       - "web/src/components/ComparingThingsAndPeopleGrammarPage.js"
       - "web/src/components/WoTreffenUnsGrammarPage.js"
       - "web/src/components/A2MiniLearningBlock.jsx"
@@ -66,6 +67,7 @@ jobs:
           src/components/A2Day1RadioRegression.test.js
           src/components/A2Day14BerufUndKarriereWorkbookPage.test.js
           src/components/A2FocusedGrammarQuality.test.js
+          src/components/A2Day2Day3GrammarRestoration.test.jsx
           src/components/A2SharedWorkbookRegression.test.js
       - name: Build web app
         working-directory: web

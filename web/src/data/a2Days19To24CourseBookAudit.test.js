@@ -78,7 +78,7 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     const source = readComponent("A2Day24EinenUrlaubPlanenWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="9.24"');
-    expect(A2_READING_TASKS[24].title).toBe("Welches Angebot passt?");
+    expect(A2_READING_TASKS[24].title).toBe("Welche Anzeige passt?");
     expect(source).not.toMatch(/Park-Café|Kindergeburtstag|Weinhaus/i);
     expect(source).not.toContain("Go to submission area");
   });

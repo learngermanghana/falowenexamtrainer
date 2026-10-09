@@ -73,12 +73,11 @@ describe("A2/B1 tutor grammar AI videos", () => {
     expect(screen.getByText(/5\. Struktur für einen Meinungsaufsatz/i)).toBeVisible();
   });
 
-  test("does not add a video-only grammar card when a B1 deep-grammar page is unavailable", async () => {
+  test("renders the added B1 Day 24 grammar notes with their configured video", async () => {
     renderWithRouter(<A2B1GrammarNotesTab level="B1" day={24} />);
-
-    await waitFor(() => {
-      expect(document.querySelector(`[${A2_B1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)).toBeNull();
-    }, { timeout: 5000 });
-    expect(await screen.findByText(/separate deep-grammar page has not been added/i, {}, { timeout: 5000 })).toBeVisible();
+    expect(await screen.findByRole("heading", { name: "Konsum und Nachhaltigkeit – Mittel, Folgen und Vergleiche" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "1. Wie? – indem und dadurch dass" })).toBeVisible();
+    expect(document.querySelector(`[${A2_B1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)).not.toBeNull();
+    expect(screen.queryByText(/Grammar notes have not been added/i)).not.toBeInTheDocument();
   });
 });

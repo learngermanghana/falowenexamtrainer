@@ -31,7 +31,8 @@ describe("A2 Course Book continuation audit · Days 13–18", () => {
     expect(source).toContain("day={13}");
     expect(source).toContain('chapter="5.13"');
     expect(source).toContain('title="Ein Vorstellungsgespräch"');
-    expect(A2_LISTENING_TASKS[13].audioUrl).toBe("https://youtu.be/kr9Rj2j-ghw");
+    expect(A2_LISTENING_TASKS[13].audioKey).toBe("a2/day-13/day-13.mp3");
+    expect(A2_LISTENING_TASKS[13].questions).toHaveLength(5);
     expect(source).not.toMatch(/patchReadingContent|WorkbookPageLegacy|MutationObserver/);
   });
 
