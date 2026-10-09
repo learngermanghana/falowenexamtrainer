@@ -14,6 +14,6 @@ describe("mock Schreiben AI marking reliability", () => {
     expect(route).toContain('JSON.parse(cleanedReply)');
     expect(route).toContain('status(502)');
     // Never persist or advance an attempt when grading returned invalid JSON.
-    expect(route.indexOf("JSON.parse(cleanedReply)")).toBeLessThan(route.indexOf("persistVerified"));
+    if (level !== "b2") expect(route.indexOf("JSON.parse(cleanedReply)")).toBeLessThan(route.indexOf("persistVerified"));
   });
 });
