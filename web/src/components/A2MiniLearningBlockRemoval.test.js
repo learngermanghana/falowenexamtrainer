@@ -1,9 +1,14 @@
 import fs from "fs";
 import path from "path";
 
-test("the optional Kurz lernen block no longer renders for A2 or B1", () => {
-  const source = fs.readFileSync(path.join(__dirname, "A2MiniLearningBlock.jsx"), "utf8");
-  expect(source).toContain("return null;");
+const read = (name) => fs.readFileSync(path.join(__dirname, name), "utf8");
+
+test("supplementary Kurz lernen blocks stay hidden, essential A2 grammar remains", () => {
+  const source = read("A2MiniLearningBlock.jsx");
+  expect(source).toContain("if (!essential) return null;");
+  expect(source).not.toContain("Kurz lernen · dann anwenden");
   expect(source).not.toContain("data-a2-focused-learning-block");
-  expect(source).not.toContain("<section");
+  expect(read("A2Day17InDieApothekeModalverbenFragenGrammarPage.js")).toMatch(/<A2MiniLearningBlock\s+essential/);
+  expect(read("A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage.js")).toContain("<A2MiniLearningBlock essential {...lesson} />");
+  expect(read("A2Day28UeberDieZukunftSprechenGrammarPage.js")).toContain("<A2MiniLearningBlock essential {...lesson} />");
 });
