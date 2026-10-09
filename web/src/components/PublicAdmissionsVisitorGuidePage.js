@@ -240,11 +240,18 @@ const PublicAdmissionsVisitorGuidePage = () => {
               <span className="visitor-guide-marketing-icon" aria-hidden="true">{feature.icon}</span>
               <h3>{feature.title}</h3>
               <p>{feature.description}</p>
-              <a href={feature.key === "self"
-                ? "/signup?program=german&ref=" + encodeURIComponent(engagementRef) + "&source=visitor-guide"
-                : feature.href}
-                onClick={feature.key === "self" ? () => trackClick("registration_click") : undefined}
-              >{feature.action} →</a>
+              <div className="visitor-guide-marketing-actions">
+                <a href={feature.key === "self"
+                  ? "/signup?program=german&ref=" + encodeURIComponent(engagementRef) + "&source=visitor-guide"
+                  : feature.href}
+                  onClick={feature.key === "self" ? () => trackClick("registration_click") : undefined}
+                >{feature.action} →</a>
+                {feature.scheduleHref ? (
+                  <a className="visitor-guide-marketing-schedule" href={feature.scheduleHref}>
+                    <span aria-hidden="true">🗓</span> {feature.scheduleAction} →
+                  </a>
+                ) : null}
+              </div>
             </article>
           ))}
         </div>
