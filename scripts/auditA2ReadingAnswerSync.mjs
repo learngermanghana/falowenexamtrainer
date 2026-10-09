@@ -67,7 +67,7 @@ for (const day of days) {
     fail(assignmentId, "reading task is missing title, text, format or strategy");
     continue;
   }
-  const expectedQuestionCount = day === 11 ? 7 : day === 17 ? 8 : 5;
+  const expectedQuestionCount = day === 11 || day === 19 ? 7 : day === 17 ? 8 : 5;
   if (!Array.isArray(questions) || questions.length !== expectedQuestionCount) {
     fail(
       assignmentId,
