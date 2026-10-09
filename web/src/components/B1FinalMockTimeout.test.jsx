@@ -61,9 +61,7 @@ describe("B1 expired section automatic submission", () => {
     let finishMarking;
     scoreB1MockWriting.mockImplementation(() => new Promise((resolve) => { finishMarking = resolve; }));
     render(<B1FinalMockExamPage />);
-    expect(screen.getAllByRole("status").some((element) =>
-      element.textContent.includes("Time is up. Falowen is automatically submitting")
-    )).toBe(true);
+    expect(screen.getByRole("button", { name: /Auto-submitting Schreiben/ })).toBeDisabled();
 
     await act(async () => { finishMarking({ score: 18, maxScore: 25 }); await Promise.resolve(); });
     expect(scoreB1MockWriting).toHaveBeenCalledTimes(1);
