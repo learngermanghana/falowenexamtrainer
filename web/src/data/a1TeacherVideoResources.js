@@ -4,7 +4,7 @@ const A1_TEACHER_VIDEO_ENTRIES = [
   [2, "1.1", "Personal Pronouns and Verb Conjugation", "https://youtu.be/xyRogEAA9qM"],
   [3, "1.1", "Personal Information, Articles, Adjectives and W-Questions", "https://youtu.be/Ygbpt6yC_f4"],
   [3, "1.2", "Personal Pronouns and Verb Conjugation", "https://youtu.be/9CTJ-2nsY8U"],
-  [4, "2", "German Numbers", "https://youtu.be/lN7xxSbkPZ4"],
+  [4, "2", "German Numbers", "https://youtu.be/XFZbjeKFgxw"],
   [5, "1.3", "Introducing Yourself and Articles", "https://youtu.be/KuGq_0r0FCY"],
   [6, "2.3", "Family and Hobbies", "https://youtu.be/_WdlEcKXuVg"],
   [7, "3", "Asking About Prices", "https://youtu.be/Ioq0_bNJ1bE"],
