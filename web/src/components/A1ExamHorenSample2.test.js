@@ -58,7 +58,7 @@ describe("A1 Exams Room Hören Sample 2", () => {
   });
 
   test("publishes Sample 2 under A1 Exams Room Hören", () => {
-    expect(horenPage).toContain('normalizedLevel === "A1" && sampleId === "sample-2"');
+    expect(horenPage).toContain('normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)');
     expect(horenPage).toContain('navigate("/exams/horen/a1/sample-2")');
     expect(horenPage).toContain("<strong>Hören Sample 2</strong>");
     expect(horenPage).toContain("15 questions · Teil 1–3");
@@ -68,8 +68,8 @@ describe("A1 Exams Room Hören Sample 2", () => {
     expect(samplePage).toContain("fetchA1ExamHorenAudioPlaybackUrl");
   });
 
-  test("keeps Sample 2 separate from Mock Exams", () => {
-    expect(samplePage).toContain('level === "A1" && sampleId === "sample-2"');
+  test("keeps the standalone Sample 2 route alongside the full mock", () => {
+    expect(samplePage).toContain('level === "A1" && ["sample-2", "sample-3"].includes(sampleId)');
     expect(samplePage).toContain("This audio belongs to");
     expect(catalog).not.toContain("a1-hoeren-sample-2");
   });

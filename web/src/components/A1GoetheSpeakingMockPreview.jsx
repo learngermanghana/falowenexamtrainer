@@ -77,6 +77,8 @@ const sanitizeAttemptsForPersistence = (attempts = {}) =>
   );
 
 export default function A1GoetheSpeakingMockPreview({
+  config = A1_GOETHE_SPEAKING_MOCK,
+  mockId = "a1-mock-01",
   embedded = false,
   autoStart = false,
   externalSecondsLeft,
@@ -89,7 +91,7 @@ export default function A1GoetheSpeakingMockPreview({
   const { idToken, user } = useAuth();
   const usesExternalTimer = Number.isFinite(Number(externalSecondsLeft));
   const [started, setStarted] = useState(Boolean(autoStart));
-  const [internalSecondsLeft, setInternalSecondsLeft] = useState(A1_GOETHE_SPEAKING_MOCK.durationSeconds);
+  const [internalSecondsLeft, setInternalSecondsLeft] = useState(config.durationSeconds);
   const [attempts, setAttempts] = useState(() =>
     Object.fromEntries(
       Object.entries(initialAttempts || {}).map(([key, attempt]) => [
@@ -119,7 +121,7 @@ export default function A1GoetheSpeakingMockPreview({
   const timeoutAutoSubmitTaskIdRef = useRef("");
   const secondsLeftRef = useRef(0);
 
-  const tasks = A1_GOETHE_SPEAKING_MOCK.tasks;
+  const tasks = config.tasks;
   const secondsLeft = usesExternalTimer
     ? Math.max(0, Number(externalSecondsLeft) || 0)
     : internalSecondsLeft;
@@ -304,7 +306,7 @@ export default function A1GoetheSpeakingMockPreview({
         teil: task.teil,
         level: "A1",
         contextType: "A1 full mock exam",
-        question: task.prompt,
+        question: [task.prompt, task.context, task.followUp].filter(Boolean).join(" "),
         interactionMode: "single-candidate mock",
         userId: user?.uid || "guest",
         idToken,
@@ -362,11 +364,12 @@ export default function A1GoetheSpeakingMockPreview({
       const assessment = await scoreA1MockSpeaking({
         attempts: tasks.map((task) => ({
           teil: task.teil,
-          task: task.prompt,
+          task: [task.prompt, task.context, task.followUp].filter(Boolean).join(" "),
           transcript: attemptsRef.current[task.id]?.transcript || "",
           analysisFeedback: attemptsRef.current[task.id]?.analysisFeedback || "",
         })),
         attemptId,
+        mockId,
         idToken,
       });
       setResult(assessment);
@@ -379,7 +382,7 @@ export default function A1GoetheSpeakingMockPreview({
     } finally {
       setMarking(false);
     }
-  }, [attemptId, completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
+  }, [attemptId, mockId, completedCount, idToken, marking, onComplete, result, secondsLeft, tasks]);
 
   useEffect(() => {
     if (
@@ -479,6 +482,12 @@ export default function A1GoetheSpeakingMockPreview({
               </div>
             ) : null}
 
+            {task.picture === "pencil" ? <figure className="a1-sprechen-picture-card">
+              <svg viewBox="0 0 160 160" role="img" aria-label={task.pictureAlt}>
+                <g transform="rotate(35 80 80)"><path d="M65 30h30v95H65z" fill="#f1cc5a" stroke="#222" strokeWidth="3" /><path d="M65 125l15 26 15-26" fill="#eedac0" stroke="#222" strokeWidth="3" /><path d="M74 141l6 10 6-10" fill="#222" /><path d="M65 30v-9q15-12 30 0v9" fill="#e6a3ac" stroke="#222" strokeWidth="3" /><path d="M65 35h30M75 40v80M85 40v80" fill="none" stroke="#555" strokeWidth="2" /></g>
+              </svg>
+            </figure> : null}
+            {task.followUp ? <p className="a1-sprechen-follow-up">{task.followUp}</p> : null}
             {task.keyword ? (
               <div className="a1-sprechen-keyword-card">
                 <span>{task.teil === "2" ? "Keyword" : "Card"}</span>

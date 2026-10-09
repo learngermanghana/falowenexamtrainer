@@ -33,7 +33,7 @@ describe("A1 Final Mock Exam Day 23", () => {
   test("keeps the first readiness attempt separate from later practice attempts", () => {
     expect(componentSource).toContain("First readiness attempt");
     expect(componentSource).toContain("Practice Attempt");
-    expect(componentSource).toContain("Practice the full mock again");
+    expect(componentSource).toContain("<FullMockRecovery");
     expect(componentSource).toContain("saveA1MockAttempt");
   });
 
@@ -52,7 +52,7 @@ describe("A1 Final Mock Exam Day 23", () => {
   });
 
   test("renders the mixed Goethe-style Schreiben form inside the full mock", () => {
-    expect(componentSource).toContain("A1_GOETHE_WRITING_MOCK.teil1.formRows.map");
+    expect(componentSource).toContain("writing.teil1.formRows.map");
     expect(componentSource).toContain('field.kind === "choice"');
     expect(componentSource).toContain("a1-schreiben-form-choice-list");
     expect(componentSource).not.toContain("A1_GOETHE_WRITING_MOCK.teil1.prefilled.map");
@@ -90,9 +90,9 @@ describe("A1 Final Mock Exam Day 23", () => {
   });
 
   test("uses English for app controls while keeping German exam content", () => {
-    expect(componentSource).toContain("Current section");
+    expect(componentSource).toContain("Full mock ·");
     expect(componentSource).toContain("Time left");
-    expect(componentSource).toContain("Start A1 Mock");
+    expect(componentSource).toContain("Start or resume all 4 modules");
     expect(componentSource).toContain("Submit Lesen → Hören");
     expect(componentSource).toContain("Submit Hören → Schreiben");
     expect(componentSource).toContain("Submit Schreiben → Sprechen");

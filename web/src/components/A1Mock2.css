@@ -1,0 +1,18 @@
+.a1-mock2-email-meta { padding: 16px 26px; border-bottom: 1px solid #d6d6d6; font-family: Arial, sans-serif; font-size: 14px; }
+.a1-mock2-email-meta p { margin: 3px 0; }
+.a1-mock2-reading .a1-goethe-mock-paper-copy p { margin: 0 0 14px; }
+.a1-mock2-sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin: 26px 0; }
+.a1-mock2-source-copy { padding: 18px; font: 17px/1.5 Georgia, serif; background: #fff; }
+.a1-mock2-source-copy h3 { margin-top: 0; }
+.a1-mock2-reading .a1-goethe-mock-choice { min-height: 44px; }
+.a1-mock2-writing .a1-schreiben-form-row:has(input[type="text"]) { grid-template-columns: 1fr; gap: 8px; padding: 14px 0; }
+.a1-mock2-writing .a1-schreiben-form-row:has(input[type="text"]) .a1-schreiben-form-label { padding-right: 42px; }
+.a1-mock2-writing .a1-schreiben-form-row:has(input[type="text"]) .a1-schreiben-form-number { left: auto; right: 0; top: 12px; transform: none; }
+.a1-mock2-writing .a1-schreiben-form-row input { margin-left: 0; width: 100%; }
+.a1-mock2-writing .a1-schreiben-form-header strong { font-size: 21px; }
+.a1-mock2-model-answer { white-space: pre-line; font: 18px/1.65 Georgia, serif; }
+.a1-mock2-explanation { flex-basis: 100%; margin: 4px 0; }
+.a1-sprechen-picture-card { width: min(330px, 100%); margin: 20px auto; padding: 26px; background: #fff; border: 3px solid #222; box-shadow: 8px 8px 10px rgba(40,32,37,.16); text-align: center; }
+.a1-sprechen-picture-card svg { width: 140px; max-width: 100%; height: 140px; }
+.a1-sprechen-follow-up { padding: 14px 16px; background: #faf6f9; border-left: 3px solid #6f354e; line-height: 1.6; }
+@media(max-width:760px) { .a1-mock2-sources { grid-template-columns: 1fr; } }
