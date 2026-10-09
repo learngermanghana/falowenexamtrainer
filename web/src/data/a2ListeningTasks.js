@@ -201,17 +201,19 @@ export const A2_LISTENING_TASKS = {
       { stem: "Wann treffen sich Anna und Tom zum Schwimmen?", options: ["A) Am Mittwoch um vier Uhr", "B) Am Mittwoch um sechs Uhr", "C) Am Samstag um sechs Uhr"] },
     ],
   },
+
   16: {
     chapter: "6.16",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Text über gesunde Ernährung, Bewegung, Fitness und regelmäßige Arztbesuche. Wählen Sie jeweils die richtige Antwort.",
-    audioUrl: "https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing",
+    task: "Hören Sie das Gespräch zwischen Lena und Max. Wählen Sie für Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
+    // A replacement audio recording is required for these new questions.
+    audioUrl: "",
     questions: [
-      { stem: "Was wird als ein einfacher Anfang für eine gesunde Ernährung empfohlen?", options: ["A) Mehr Fleisch essen", "B) Mehr Obst und Gemüse essen", "C) Mehr Fast Food essen"] },
-      { stem: "Wie lange sollte man täglich mindestens gehen oder sich bewegen?", options: ["A) 10 Minuten", "B) 20 Minuten", "C) 30 Minuten"] },
-      { stem: "Was kann motivierend sein, um fit zu bleiben?", options: ["A) Der Besuch eines Fitnessstudios", "B) Mehr zu schlafen", "C) Mehr Fernsehen schauen"] },
-      { stem: "Warum ist der regelmäßige Besuch beim Arzt wichtig?", options: ["A) Um neue Rezepte zu bekommen", "B) Um Krankheiten frühzeitig zu erkennen", "C) Um Medikamente zu kaufen"] },
-      { stem: "Welche Sportarten werden im Text als motivierend erwähnt?", options: ["A) Yoga und Pilates", "B) Schwimmen und Laufen", "C) Tanzen und Radfahren"] },
+      { stem: "Was ist Lenas Problem?", options: ["A) Sie hat Kopfschmerzen.", "B) Sie schläft schlecht.", "C) Sie hat keine Arbeit."] },
+      { stem: "Wann geht Max zum Yoga?", options: ["A) Montag und Mittwoch.", "B) Dienstag und Donnerstag.", "C) Am Wochenende."] },
+      { stem: "Was kostet der Yogakurs?", options: ["A) Die erste Stunde ist gratis.", "B) Alle Stunden sind gratis.", "C) Eine Stunde kostet achtzig Euro."] },
+      { stem: "Was macht Max abends, um besser zu schlafen?", options: ["A) Er schaut Videos.", "B) Er trinkt Kaffee.", "C) Er liest ein Buch."] },
+      { stem: "Was machen Lena und Max am Samstag?", options: ["A) Sie gehen in die Sauna.", "B) Sie gehen ins Kino.", "C) Sie gehen im Park spazieren."] },
     ],
   },
   17: {
