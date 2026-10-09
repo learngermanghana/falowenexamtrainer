@@ -11,12 +11,11 @@ describe("A2/B1 workbook navigation and A2 Day 14 placement", () => {
       expect(source.indexOf(marker)).toBeGreaterThan(source.indexOf("Back to Course Book"));
     }
   });
-  test("Day 14 short goal lesson is owned by Teil 1 Sprechen", () => {
+  test("Day 14 begins with the standard speaking brain map rather than quick learning", () => {
     const page = read("A2Day14BerufUndKarriereWorkbookPage.js");
-    expect(page).toContain("sprechenContent={<A2Day14QuickLearnSpeaking />}");
-    const practice = read("A2Day14QuickLearnSpeaking.js");
-    expect(practice).toContain("Berufsziele mit um ... zu ausdrücken");
-    expect(practice).toContain("Jetzt selbst anwenden");
-    expect(practice).toContain("Kurz prüfen");
+    expect(page).toContain("mindMapOnlySpeaking");
+    expect(page).not.toContain("A2Day14QuickLearnSpeaking");
+    expect(page).not.toContain("sprechenContent=");
+    expect(read("A2StandardTabbedWorkbookPage.js")).toContain("<SpeakingMindMap config={getA2SpeakingMindMap(day)} />");
   });
 });
