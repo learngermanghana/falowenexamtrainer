@@ -1,3 +1,4 @@
+import { useMockExamIntegrity, MockExamIntegrityNotice } from "../hooks/useMockExamIntegrity";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -311,6 +312,7 @@ export default function A2FinalMockExamPage() {
   const { idToken, user } = useAuth();
   const storageKey = `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey));
+  const integrity = useMockExamIntegrity({ level: "A2", mockId: A2_FINAL_MOCK_ID, idToken, attemptId: exam.attemptInfo?.attemptId, section: exam.stage, active: Boolean(exam.attemptInfo?.attemptId && !exam.completed && SECTION_DURATIONS[exam.stage]) });
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -439,6 +441,7 @@ export default function A2FinalMockExamPage() {
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
+    integrity.requestFullscreen();
     setBusy("start");
     setError("");
     try {
@@ -1129,7 +1132,8 @@ export default function A2FinalMockExamPage() {
   }
 
   return (
-    <main className="a1-goethe-mock-shell a1-final-mock-shell" data-a2-final-mock>
+    <main className="a1-goethe-mock-shell a1-final-mock-shell" data-a2-final-mock onCopyCapture={integrity.onCopyCapture} onPasteCapture={integrity.onPasteCapture}>
+      <MockExamIntegrityNotice guard={integrity} />
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">
