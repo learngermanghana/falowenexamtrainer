@@ -5256,6 +5256,7 @@ app.post("/mock/attempt/integrity-event", async (req, res) => {
     const section = String(req.body?.section || "").trim().toLowerCase();
     const type = String(req.body?.type || "").trim();
     if (!MOCK_INTEGRITY_ALLOWED_IDS[level]?.has(mockId) ||
+        (attemptId && !/^[a-zA-Z0-9_-]{1,120}$/.test(attemptId)) ||
         !MOCK_INTEGRITY_SECTIONS.test(section) ||
         !A1_MOCK_INTEGRITY_KINDS.has(type)) {
       return res.status(400).json({ error: "Invalid mock activity report." });
