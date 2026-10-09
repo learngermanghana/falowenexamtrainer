@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { normalizeMockAttempt, listMockAttempts } = require("../mockAttemptMonitor");
+const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts } = require("../mockAttemptMonitor");
 
 test("mock monitor exposes sections, deadlines and status, never student answer data", () => {
   const doc = {
@@ -41,4 +41,17 @@ test("mock list filters attempts before returning them to staff", async () => {
   const result = await listMockAttempts(fakeDb);
   assert.equal(result.attempts.length,1);
   assert.equal(result.partial,false);
+});
+
+test("browser-reported A2 Mock 2 activity is sanitized and never treated as a verified score", () => {
+ const row = normalizeBrowserProgress({data:()=>({
+   uid:"student",mockId:"a2-mock-02",section:"schreiben",status:"in_progress",
+   completedSections:["lesen","hoeren"],sectionDeadlineMs:1791546000000,
+   rawAnswers:{"x":"private"},
+ })});
+ assert.equal(row.level,"A2");
+ assert.equal(row.progressCount,2);
+ assert.equal(row.overallScore,null);
+ assert.equal(row.progressSource,"browser_reported");
+ assert.equal(JSON.stringify(row).includes("private"),false);
 });
