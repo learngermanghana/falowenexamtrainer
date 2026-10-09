@@ -10,6 +10,7 @@ const COPY = {
   en: {
     language: "Language", login: "Log in", signup: "Sign up",
     navClasses: "Live classes", navExams: "Exam practice", navHelp: "How Falowen works",
+    classScheduleAction: "View full class schedule",
     eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
     title: "Learn German your way.",
     titleAccent: "Grow with Falowen.",
@@ -38,6 +39,7 @@ const COPY = {
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren",
     navClasses: "Live-Kurse", navExams: "Prüfungsvorbereitung", navHelp: "So funktioniert Falowen",
+    classScheduleAction: "Vollständigen Kursplan ansehen",
     eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
     title: "Lerne Deutsch auf deine Weise.",
     titleAccent: "Mit Falowen kommst du weiter.",
@@ -71,6 +73,7 @@ const COPY = {
   fr: {
     language: "Langue", login: "Se connecter", signup: "S'inscrire",
     navClasses: "Cours en direct", navExams: "Examens blancs", navHelp: "Comment fonctionne Falowen",
+    classScheduleAction: "Voir le calendrier complet des cours",
     eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
     title: "Apprenez l'allemand à votre façon.",
     titleAccent: "Progressez avec Falowen.",
@@ -215,11 +218,20 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
                   </div>
                   <h3>{localized?.[0] || feature.title}</h3>
                   <p>{localized?.[1] || feature.description}</p>
-                  {feature.key === "self" ? (
-                    <button type="button" className="falowen-home-feature-link" onClick={signup}>{localized?.[2] || feature.action} ↗</button>
-                  ) : (
-                    <a className="falowen-home-feature-link" href={feature.href}>{localized?.[2] || feature.action} ↗</a>
-                  )}
+                  <div className="falowen-home-feature-actions">
+                    {feature.key === "self" ? (
+                      <button type="button" className="falowen-home-feature-link" onClick={signup}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></button>
+                    ) : (
+                      <a className="falowen-home-feature-link" href={feature.href}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></a>
+                    )}
+                    {feature.scheduleHref ? (
+                      <a className="falowen-home-feature-schedule" href={feature.scheduleHref}>
+                        <span aria-hidden="true">🗓</span>
+                        <span>{copy.classScheduleAction || feature.scheduleAction}</span>
+                        <span aria-hidden="true">→</span>
+                      </a>
+                    ) : null}
+                  </div>
                 </article>
               );
             })}
