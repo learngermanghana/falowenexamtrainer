@@ -148,7 +148,8 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
     }
   };
 
-  const signup = () => onSignUp?.("german");
+  const resolvedProgram = "german";
+  const signup = () => onSignUp?.(resolvedProgram);
   const login = () => onLogin?.();
 
   return (
