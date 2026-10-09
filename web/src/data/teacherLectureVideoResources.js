@@ -19,7 +19,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     8: [{ chapter: "3.8", topic: "Rezepte und Essen", tutor_lecture_video: "https://youtu.be/diUTkWdqT_0" }],
     9: [{ chapter: "4.9", topic: "Urlaub", tutor_lecture_video: "https://youtu.be/iKKyQRbuc-8" }],
     10: [{ chapter: "4.10", tutor_lecture_video: "" }],
-    11: [{ chapter: "4.11", tutor_lecture_video: "" }],
+    11: [{ chapter: "4.11", topic: "Unterwegs: Verkehrsmittel vergleichen", tutor_lecture_video: "https://youtu.be/fgKqPTifKmk" }],
     12: [{ chapter: "5.12", tutor_lecture_video: "" }],
     13: [{ chapter: "5.13", tutor_lecture_video: "" }],
     14: [{ chapter: "5.14", topic: "Beruf und Karriere", tutor_lecture_video: "https://youtu.be/hGK64aXtARk" }],
