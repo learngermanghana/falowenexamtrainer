@@ -39,9 +39,14 @@ export default function MockExamLibraryPage() {
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
                     {mock.durationLabel} · {(mock.sections || []).join(" · ")}
                   </p>
+                  {mock.level === "B1" && mock.mode === "full" ? (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
+                      One complete mock = 4 modules. Finish all four for a final score. If you leave, return to resume your saved attempt; exam timers continue.
+                    </p>
+                  ) : null}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.status === "preview" ? "Open practice" : "Start mock"}
+                  {mock.status === "preview" ? "Open practice" : mock.level === "B1" ? "Start or resume all 4 modules" : "Start mock"}
                 </button>
               </div>
             </article>
