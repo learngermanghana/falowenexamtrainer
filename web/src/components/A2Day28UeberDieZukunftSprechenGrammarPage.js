@@ -24,7 +24,7 @@ const lesson = {
   starters: ["Nächstes Jahr ...", "Ich möchte ...", "Später werde ich ...", "In fünf Jahren werde ich ..."],
 };
 
-const FocusedContent = () => <A2MiniLearningBlock {...lesson} />;
+const FocusedContent = () => <A2MiniLearningBlock essential {...lesson} />;
 
 export default function A2Day28UeberDieZukunftSprechenGrammarPage({ embedded = false }) {
   if (embedded) return <FocusedContent />;
