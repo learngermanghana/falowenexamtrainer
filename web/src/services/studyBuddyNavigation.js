@@ -21,7 +21,7 @@ const normalize = (value) => String(value || "")
   .replace(/\s+/g, " ")
   .trim();
 
-const resultWords = /\b(?:results?|grades?|scores?|marks?|corrections?)\b|\bergebnisse?\b|\bnoten\b|\brésultats?\b/;
+const resultWords = /\b(?:results?|grades?|scores?|marks?|corrections?|feedback|marked assignments?)\b|\bergebnisse?\b|\bnoten\b|\brésultats?\b/;
 const mockWords = /\b(?:mock|goethe|exams?|prüfung|prüfungen|test)\b/;
 const navigationWords = /\b(?:how|where|access|find|open|view|see|check|show|link|locate|navigate|go to|take me|which page|which tab|can i|could i|i want|i need|help me|look up|wo|wohin|finde|anzeigen|sehen|öffnen|où|comment|voir|trouver|accéder)\b/;
 const resultsQuestion = /\b(?:my|the|mein(?:e|en|es)?|mes|mon)\s+(?:results?|grades?|scores?|marks?)\b/;
@@ -34,9 +34,9 @@ const resultsMessage = (message) => {
   const isMock = mockWords.test(message);
   const pending = /\b(?:missing|not showing|not there|not available|not received|haven't|waiting|pending|unmarked|still marking)\b/.test(message);
   return [
-    `Open **Results** in your Falowen campus: ${linkTo("results")}. This is where you check your marks, graded assignments, scores and tutor feedback.`,
+    `Open Results in your Falowen campus: ${linkTo("results")}. This is where you check your marks, graded assignments, scores and tutor feedback.`,
     pending ? "If a recent result is missing, marking or result synchronisation may still be pending. Do not resubmit the assignment just because the result is not visible." : "",
-    isMock ? `For detailed full-mock review or to resume a mock, open **Exams Room**: ${linkTo("exams")}.` : "",
+    isMock ? `For detailed full-mock review or to resume a mock, open Exams Room: ${linkTo("exams")}.` : "",
     "Sign in to Falowen first if prompted.",
   ].filter(Boolean).join("\n\n");
 };
@@ -66,30 +66,33 @@ export const resolveStudyBuddyNavigationReply = (rawMessage, conversationHistory
     return { destination: "results", reply: resultsMessage(resolvedMessage) };
   }
 
-  if (requiresNavigation(resolvedMessage, /\b(?:exam file|prüfungsakte)\b/)) {
-    return { destination: "examFile", reply: makeReply("examFile", "Open **Exam File** from your Falowen campus:") };
+  if (requiresNavigation(resolvedMessage, /\b(?:submit|hand in|turn in|upload)\b.*\b(?:assignment|homework|workbook|writing task)\b/)) {
+    return { destination: "courseBook", reply: makeReply("courseBook", "Open Course Book, select the relevant lesson and use its Submit tab to hand in the assignment:") };
   }
-  if (requiresNavigation(resolvedMessage, /\b(?:mock exam|mock test|exams room|exam practice|goethe practice|prüfungsübungen)\b/) ||
+  if (requiresNavigation(resolvedMessage, /\b(?:exam file|prüfungsakte)\b/)) {
+    return { destination: "examFile", reply: makeReply("examFile", "Open Exam File from your Falowen campus:") };
+  }
+  if (requiresNavigation(resolvedMessage, /\b(?:mock(?: exam| test| attempt| review| feedback| details)?|exams room|exam practice|goethe practice|prüfungsübungen)\b/) ||
       /\b(?:start|resume|continue|take|practise|practice|sit)\b.*\b(?:mock|goethe exam)\b/.test(resolvedMessage)) {
-    return { destination: "exams", reply: makeReply("exams", "Open **Exams Room** to start or resume an available mock exam:") };
+    return { destination: "exams", reply: makeReply("exams", "Open Exams Room to start or resume an available mock exam:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:course book|workbook|my lessons?|lesson material|kursbuch|lehrbuch)\b/)) {
-    return { destination: "courseBook", reply: makeReply("courseBook", "Open **Course Book** from your Falowen campus:", "Choose your level and lesson there.") };
+    return { destination: "courseBook", reply: makeReply("courseBook", "Open Course Book from your Falowen campus:", "Choose your level and lesson there.") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:attendance|presence|anwesenheit)\b/)) {
-    return { destination: "attendance", reply: makeReply("attendance", "Open **Attendance** in your campus:", "Attendance may not appear for self-learning courses.") };
+    return { destination: "attendance", reply: makeReply("attendance", "Open Attendance in your campus:", "Attendance may not appear for self-learning courses.") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:vocab|vocabulary|word practice|wortschatz)\b/)) {
-    return { destination: "vocab", reply: makeReply("vocab", "Open **Vocab** to practise words:") };
+    return { destination: "vocab", reply: makeReply("vocab", "Open Vocab to practise words:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:study calendar|study plan|learning calendar|lernkalender)\b/)) {
-    return { destination: "calendar", reply: makeReply("calendar", "Open **Study Calendar** to plan your preparation:") };
+    return { destination: "calendar", reply: makeReply("calendar", "Open Study Calendar to plan your preparation:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:billing|payment history|receipts?|invoice|balance|zahlungen|rechnung)\b/)) {
-    return { destination: "billing", reply: makeReply("billing", "Open **Billing** in your account settings:") };
+    return { destination: "billing", reply: makeReply("billing", "Open Billing in your account settings:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:placement test|level test|einstufungstest|test de niveau)\b/)) {
-    return { destination: "placement", reply: makeReply("placement", "Take the **Placement Test** here:") };
+    return { destination: "placement", reply: makeReply("placement", "Take the Placement Test here:") };
   }
   return null;
 };
