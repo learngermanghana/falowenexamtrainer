@@ -3,7 +3,7 @@ import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
+import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import NextLevelPreviewPage from "./components/NextLevelPreviewPage";
 import CourseLessonPage from "./components/CourseLessonPage";
@@ -1432,8 +1432,7 @@ const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
   const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
-  const { level, setLevel } = useExam();
-  const { studentProfile } = useAuth();
+  const { level, setLevel, accessibleLevels } = useExam();
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -1479,17 +1478,6 @@ const ExamArea = ({ onBack }) => {
     }
   }, [examSection, lastSectionStorageKey, lastVisitStorageKey]);
 
-
-  const profileExamLevel = useMemo(() => {
-    const normalized = String(studentProfile?.level || "").toUpperCase();
-    return ALLOWED_LEVELS.includes(normalized) ? normalized : "";
-  }, [studentProfile?.level]);
-
-  useEffect(() => {
-    if (profileExamLevel && profileExamLevel !== level) {
-      setLevel(profileExamLevel);
-    }
-  }, [level, profileExamLevel, setLevel]);
 
   const tabs = [
     { key: "overview", label: "Overview" },
@@ -1550,39 +1538,36 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
-        {examSection !== "overview" && !sampleId ? (
+        {!sampleId ? (
           <div
+            className="exam-room-level-picker"
             style={{
               ...styles.card,
               margin: 0,
+              padding: "10px 14px",
               display: "flex",
               gap: 12,
               flexWrap: "wrap",
               alignItems: "center",
             }}
           >
-            <div style={{ minWidth: 160 }}>
-              <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
-              <strong style={{ fontSize: 16 }}>{level}</strong>
-            </div>
-            <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
-              <label htmlFor="exam-level-selector" style={styles.helperText}>
-                Exam level is selected automatically from your student profile
-              </label>
-              <select
-                id="exam-level-selector"
-                value={level}
-                onChange={(event) => setLevel(event.target.value)}
-                disabled={Boolean(profileExamLevel)}
-                style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
-              >
-                {ALLOWED_LEVELS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <label htmlFor="exam-level-selector" style={{ fontSize: 13, fontWeight: 750 }}>
+              Exam level
+            </label>
+            <select
+              id="exam-level-selector"
+              aria-label="Exam level"
+              value={level}
+              onChange={(event) => setLevel(event.target.value)}
+              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8, maxWidth: 150, minWidth: 92 }}
+            >
+              {accessibleLevels.map((option) => (
+                <option key={option} value={option}>{option}</option>
+              ))}
+            </select>
+            <small style={{ ...styles.helperText, margin: 0, flex: "1 1 190px" }}>
+              Practise your current or a lower level. Your Course Book level stays unchanged.
+            </small>
           </div>
         ) : null}
 
