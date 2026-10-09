@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/patchA1Day19CombinedPracticeAndSpeakingReliability.mjs"
       - "scripts/runA1Day19CombinedPracticeAndSpeakingReliabilityPatch.mjs"
+      - "scripts/tests/a1SpeakingBuildPatch.test.mjs"
       - "web/package.json"
       - "web/src/components/VerbotenErlaubtPage.js"
       - "web/src/components/VerbotenErlaubtPage.test.jsx"
@@ -29,6 +30,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Verify question-aware build patch and repeat runs
+        run: node --test scripts/tests/a1SpeakingBuildPatch.test.mjs
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund

@@ -113,6 +113,13 @@ if (!speakingAudio.includes("analyzeSpeakingAudioWithTranscriptRetry")) {
 write(paths.speakingAudio, speakingAudio);
 
 let speakingPage = read(paths.speakingPage);
+// Keep the selected catalog question in both legacy and already-patched payloads.
+// Normalize this field before exact-match migrations so task-aware marking
+// remains compatible with repeat prebuild/pretest runs.
+speakingPage = speakingPage.replace(
+  /(question: selectedQuestion\.text \|\| selectedQuestion\.topicPrompt \|\| "",\n)([ \t]*)(userId,)/g,
+  '$1$2taskId: selectedQuestion.id,\n$2$3',
+);
 speakingPage = replaceOnce(
   speakingPage,
   `  SPEAKING_AUDIO_MIN_SECONDS as MIN_RECORDING_SECONDS,\n  buildRecordedAudioBlob,`,
@@ -137,14 +144,14 @@ speakingPage = replaceOnce(
 );
 speakingPage = replaceOnce(
   speakingPage,
-  `            const response = await analyzeAudio({\n              audioBlob: blob,\n              teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",\n              level: selectedLevel,\n              question: selectedQuestion.text || selectedQuestion.topicPrompt || "",\n              userId,\n              idToken,\n              durationSeconds: duration,\n            });`,
-  `            const response = await analyzeSpeakingAudioWithTranscriptRetry({\n              analyze: analyzeAudio,\n              payload: {\n                audioBlob: blob,\n                teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",\n                level: selectedLevel,\n                question: selectedQuestion.text || selectedQuestion.topicPrompt || "",\n                userId,\n                idToken,\n                durationSeconds: duration,\n              },\n            });`,
+  `            const response = await analyzeAudio({\n              audioBlob: blob,\n              teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",\n              level: selectedLevel,\n              question: selectedQuestion.text || selectedQuestion.topicPrompt || "",\n              taskId: selectedQuestion.id,\n              userId,\n              idToken,\n              durationSeconds: duration,\n            });`,
+  `            const response = await analyzeSpeakingAudioWithTranscriptRetry({\n              analyze: analyzeAudio,\n              payload: {\n                audioBlob: blob,\n                teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",\n                level: selectedLevel,\n                question: selectedQuestion.text || selectedQuestion.topicPrompt || "",\n                taskId: selectedQuestion.id,\n                userId,\n                idToken,\n                durationSeconds: duration,\n              },\n            });`,
   "exam speaking transcript retry",
 );
 speakingPage = replaceOnce(
   speakingPage,
-  `            if (transcript) {\n              appendCoachText(\`Transcript I heard: ${transcript}\`);\n            }`,
-  `            setChatMessages((current) => current.map((message) => (\n              message.id === voiceMessage.id\n                ? { ...message, transcript, transcriptionState: transcript ? "done" : "failed" }\n                : message\n            )));\n            if (transcript) {\n              appendCoachText(\`Transcript I heard: ${transcript}\`);\n            } else {\n              appendCoachText("Falowen could not transcribe this recording after a retry. Your audio is still available; play it back and record again.");\n            }`,
+  `            if (transcript) {\n              appendCoachText(\`Transcript I heard: \${transcript}\`);\n            }`,
+  `            setChatMessages((current) => current.map((message) => (\n              message.id === voiceMessage.id\n                ? { ...message, transcript, transcriptionState: transcript ? "done" : "failed" }\n                : message\n            )));\n            if (transcript) {\n              appendCoachText(\`Transcript I heard: \${transcript}\`);\n            } else {\n              appendCoachText("Falowen could not transcribe this recording after a retry. Your audio is still available; play it back and record again.");\n            }`,
   "exam speaking transcript state",
 );
 const stableSection = `<section\n                style={{\n                  background: "#E5E7EB",\n                  display: "grid",\n                  gridTemplateRows: "minmax(0, 1fr) auto",\n                  height: isCompactViewport ? "min(680px, 78vh)" : "min(760px, 76vh)",\n                  minHeight: isCompactViewport ? 480 : 580,\n                  maxHeight: isCompactViewport ? 680 : 760,\n                  overflow: "hidden",\n                }}\n              >`;
