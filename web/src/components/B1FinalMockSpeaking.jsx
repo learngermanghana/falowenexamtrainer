@@ -567,6 +567,25 @@ export default function B1FinalMockSpeaking({
         );
       })}
 
+      {result ? (
+        <section className="a1-sprechen-final-action" aria-label="Your marked speaking feedback">
+          <h2>B1 Sprechen · review your answers</h2>
+          <p>These notes are from your submitted speech analysis. Review them after the full speaking mark; the final mock score remains the authoritative result.</p>
+          {TASKS.map((task) => {
+            const response = attempts[task.id] || {};
+            return (
+              <details key={task.id} style={{ marginTop: 10 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>{task.title}</summary>
+                {response.transcript ? <p><strong>Transcript:</strong> {response.transcript}</p> : <p>No saved transcript for this task.</p>}
+                {response.analysisFeedback ? <p><strong>Task feedback:</strong> {response.analysisFeedback}</p>
+                  : <p>Individual analysis feedback was not saved for this task.</p>}
+              </details>
+            );
+          })}
+          <p>For further speaking practice, use the Sprechen section in your Exam Room.</p>
+        </section>
+      ) : null}
+
       {status ? <p className="a1-sprechen-status">{status}</p> : null}
       {error ? <p className="a1-sprechen-error">{error}</p> : null}
 
