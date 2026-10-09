@@ -47,6 +47,7 @@ const normalizeMockAttempt = doc => {
     id: level + ":" + parts[1] + ":" + doc.id,
     uid: String(data.uid || parts[1]),
     studentEmail: String(data.email || "").slice(0, 200),
+    studentName: nameFromStudent(data),
     level,
     mockId,
     attemptNumber: Number(data.attemptNumber || 1),
@@ -85,6 +86,7 @@ const normalizeBrowserProgress = doc => {
   return {
     id: "A2:" + row.uid + ":mock-02", uid: String(row.uid),
     studentEmail: String(row.email || "").slice(0, 200),
+    studentName: nameFromStudent(row),
     level: "A2", mockId: "a2-mock-02", attemptNumber: 1,
     status: row.status === "completed" ? "completed" : "in_progress",
     section: String(row.section || "intro"), completedSections,
@@ -95,6 +97,85 @@ const normalizeBrowserProgress = doc => {
     progressSource: "browser_reported",
   };
 };
+
+// Names come from the private student directory, not from exam answers.
+const usableName = value => {
+  const name = typeof value === "string" ? value.trim().replace(/\s+/g, " ") : "";
+  return name && !name.includes("@") ? name.slice(0, 160) : "";
+};
+const nameFromStudent = data => {
+  if (!data || typeof data !== "object") return "";
+  const combined = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  return [data.name, data.fullName, data.studentName, data.displayName, combined]
+    .map(usableName).find(Boolean) || "";
+};
+const normalizedEmail = email => String(email || "").trim().toLowerCase();
+const inBatches = (values, size) =>
+  Array.from({ length: Math.ceil(values.length / size) }, (_, index) =>
+    values.slice(index * size, (index + 1) * size));
+
+// Resolve only students represented in this page of attempts. Batch indexed
+// uid/email lookups rather than downloading the entire student directory or
+// exposing student records to the browser. Keep identity enrichment best-effort.
+async function enrichStudentNames(db, rows) {
+  const missing = rows.filter(row => !row.studentName);
+  if (!missing.length || typeof db.collection !== "function") return rows;
+  let students;
+  try { students = db.collection("students"); } catch { return rows; }
+  if (!students || typeof students.where !== "function") return rows;
+
+  const uids = [...new Set(missing.map(row => String(row.uid || "").trim()).filter(Boolean))];
+  const emails = [...new Set(missing.map(row => normalizedEmail(row.studentEmail)).filter(Boolean))];
+  const wantedUids = new Set(uids);
+  const wantedEmails = new Set(emails);
+  const namesByUid = new Map();
+  const namesByEmail = new Map();
+  const collect = snapshot => {
+    if (!snapshot || typeof snapshot.data !== "function") return;
+    const data = snapshot.data() || {};
+    const name = nameFromStudent(data);
+    if (!name) return;
+    for (const uid of [snapshot.id, data.uid, data.userId, data.authUid]) {
+      const key = String(uid || "").trim();
+      if (wantedUids.has(key)) namesByUid.set(key, name);
+    }
+    const email = normalizedEmail(data.email);
+    if (wantedEmails.has(email)) namesByEmail.set(email, name);
+  };
+  const batchLookup = async (field, values) => {
+    if (!values.length) return;
+    await Promise.all(inBatches(values, 30).map(async batch => {
+      try {
+        const snapshot = await students.where(field, "in", batch).get();
+        for (const doc of snapshot.docs || []) collect(doc);
+      } catch {
+        // A profile lookup must not prevent an authorized monitor from loading.
+      }
+    }));
+  };
+  await Promise.all([batchLookup("uid", uids), batchLookup("email", emails)]);
+
+  // Some legacy profiles are keyed directly by Firebase UID but have no uid
+  // field. Read just those document IDs as a bounded fallback.
+  const unmatched = uids.filter(uid => !namesByUid.has(uid));
+  if (unmatched.length && typeof db.getAll === "function" && typeof students.doc === "function") {
+    await Promise.all(inBatches(unmatched, 100).map(async batch => {
+      try {
+        const snapshots = await db.getAll(...batch.map(uid => students.doc(uid)));
+        for (const doc of snapshots) if (doc?.exists) collect(doc);
+      } catch {
+        // Keep email or attempt-name fallback when a legacy record is missing.
+      }
+    }));
+  }
+
+  return rows.map(row => ({
+    ...row,
+    studentName: row.studentName ||
+      namesByUid.get(String(row.uid || "").trim()) ||
+      namesByEmail.get(normalizedEmail(row.studentEmail)) || "",
+  }));
+}
 
 async function listMockAttempts(db, { limit = 200 } = {}) {
   let documents;
@@ -124,7 +205,7 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
     .filter(Boolean)
     .sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
     .slice(0, Math.min(500, Math.max(1, Number(limit) || 200)));
-  return { attempts, partial };
+  return { attempts: await enrichStudentNames(db, attempts), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
