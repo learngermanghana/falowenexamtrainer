@@ -21,7 +21,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead; it does not generate a full mock score.
+          Choose a full timed mock when available, or work on individual sections. At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead; it does not generate a full mock score.
         </p>
       </section>
 
