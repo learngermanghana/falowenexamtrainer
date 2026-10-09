@@ -1,4 +1,4 @@
-import { normalizeA2B1Lesson } from "./lessonModel";
+import { normalizeA1Lesson, normalizeA2B1Lesson } from "./lessonModel";
 import { getLessonVideoResources } from "./lessonVideoDictionary";
 import {
   getTeacherLectureVideoResources,
@@ -6,6 +6,43 @@ import {
 } from "./teacherLectureVideoResources";
 
 describe("teacher lecture media regressions", () => {
+  test("A1 Day 4 chapter 2 exposes the replacement German Numbers teacher lecture", () => {
+    const lesson = normalizeA1Lesson({
+      day: 4,
+      chapter: "2",
+      lesen_hören: { chapter: "2" },
+    });
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({ url: "https://youtu.be/XFZbjeKFgxw", chapter: "2" }),
+    );
+    expect(lesson.resources.videos.map((video) => video.url)).not.toContain(
+      "https://youtu.be/lN7xxSbkPZ4",
+    );
+  });
+
+  test("B1 Day 18 chapter 6.18 exposes the new teacher lecture", () => {
+    const lesson = normalizeA2B1Lesson({
+      day: 18,
+      chapter: "6.18",
+      assignmentId: "B1-6.18",
+    }, "B1");
+
+    expect(getTeacherLectureVideoResources("B1", 18)).toEqual([
+      expect.objectContaining({
+        chapter: "6.18",
+        url: "https://youtu.be/UxCX5OeuqVM",
+      }),
+    ]);
+    expect(lesson.resources.teacherVideo).toEqual(
+      expect.objectContaining({
+        chapter: "6.18",
+        title: "Kapitel 6.18 · Teacher lecture video",
+        url: "https://youtu.be/UxCX5OeuqVM",
+      }),
+    );
+    expect(lesson.submission.assignmentId).toBe("B1-6.18");
+  });
+
   test("renders the A2 Day 1 Small Talk teacher lecture through the shared lesson model", () => {
     const lesson = normalizeA2B1Lesson(
       {
