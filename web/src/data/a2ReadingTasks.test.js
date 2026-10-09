@@ -22,7 +22,7 @@ describe("A2 canonical Lesen tasks", () => {
       expect(task.title).toBeTruthy();
       expect(task.strategy).toBeTruthy();
       expect(task.text.length).toBeGreaterThan(100);
-      expect(task.questions).toHaveLength(day === 11 ? 7 : day === 17 ? 8 : 5);
+      expect(task.questions).toHaveLength(day === 11 || day === 19 ? 7 : day === 17 ? 8 : 5);
 
       task.questions.forEach((question) => {
         expect(question.stem).toBeTruthy();

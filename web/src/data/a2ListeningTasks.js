@@ -243,15 +243,9 @@ export const A2_LISTENING_TASKS = {
   19: {
     chapter: "7.19",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Text ‚Online Shopping und Konsumverhalten‘ und wählen Sie jeweils die richtige Antwort.",
-    audioUrl: "https://drive.google.com/file/d/1OsT5j6Y7a-rMdB0HlRJJ98gTgSvxm_LB/view?usp=sharing",
-    questions: [
-      { stem: "Was bietet Online-Shopping den Verbrauchern?", options: ["A) Hohe Preise", "B) Bequeme Möglichkeit, Produkte nach Hause zu bestellen", "C) Weniger Auswahl"] },
-      { stem: "Was ist ein Nachteil des Online-Shoppings?", options: ["A) Geringe Anzahl von Rücksendungen", "B) Hohe Anzahl von Rücksendungen und Umweltbelastung", "C) Niedrige Preise"] },
-      { stem: "Worauf müssen Verbraucher beim Online-Kauf achten?", options: ["A) Auf vertrauenswürdige Websites und Schutz persönlicher Daten", "B) Auf hohe Preise", "C) Auf schnelle Lieferung"] },
-      { stem: "Wo sollten die Produkte, die online gekauft werden, herkommen?", options: ["A) Aus nachhaltigen Quellen und fairen Bedingungen", "B) Aus dem Ausland", "C) Aus teuren Geschäften"] },
-      { stem: "Wie hat das Internet den Konsum verändert?", options: ["A) Es hat den Konsum eingeschränkt", "B) Es hat den Konsum revolutioniert und neue Möglichkeiten geschaffen", "C) Es hat keine großen Veränderungen gebracht"] },
-    ],
+    task: "Sie hören ein Gespräch einmal. Markieren Sie für die Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
+    audioKey: "a2/day-19/day-19.mp3",
+    questions: [{"stem":"Wo kauft Paul Obst und Gemüse?","options":["A) Im Supermarkt.","B) Auf dem Wochenmarkt.","C) Im Internet."]},{"stem":"Wann gibt es auf dem Markt oft Rabatt?","options":["A) Am Anfang des Marktes.","B) Am Sonntag.","C) Kurz vor zwei Uhr."]},{"stem":"Warum geht Paul gern in den Supermarkt in der Bahnhofstraße?","options":["A) Er ist billig und lange geöffnet.","B) Er ist groß und modern.","C) Er liegt direkt neben seiner Wohnung."]},{"stem":"Wo kauft Paul Jacken und Schuhe am liebsten?","options":["A) Auf dem Markt.","B) Im Geschäft.","C) Im Internet."]},{"stem":"Wie bezahlt man auf dem Markt am besten?","options":["A) Mit Karte.","B) Mit dem Handy.","C) Bar."]}],
   },
   20: {
     chapter: "7.20",

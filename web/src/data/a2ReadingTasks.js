@@ -396,21 +396,11 @@ Stadtbank`,
   },
   19: {
     chapter: "7.19",
-    format: "Einkaufsinformationen",
-    title: "Wo kaufe ich was?",
-    strategy: "Lies Preise, Öffnungszeiten und besondere Hinweise. Das ist typisches Informations-Scanning.",
-    text: `Wochenmarkt: Dienstag und Samstag, 7–13 Uhr. Obst, Gemüse, Brot und Käse. Viele Produkte kommen aus der Region. Kartenzahlung ist nicht an allen Ständen möglich.
-
-Supermarkt City: Montag bis Samstag, 8–21 Uhr. Große Auswahl. Ab 19 Uhr sind einige Backwaren günstiger.
-
-Secondhand-Laden: Mittwoch bis Freitag, 11–18 Uhr. Kleidung und kleine Haushaltsartikel. Man kann gut erhaltene Kleidung auch dort abgeben.`,
-    questions: [
-      { stem: "Wann ist der Wochenmarkt geöffnet?", options: ["A) Dienstag und Samstag", "B) Nur Sonntag", "C) Jeden Abend", "D) Montag bis Freitag"] },
-      { stem: "Was ist auf dem Wochenmarkt nicht überall möglich?", options: ["A) Brot kaufen", "B) Kartenzahlung", "C) Gemüse kaufen", "D) Käse kaufen"] },
-      { stem: "Wann sind im Supermarkt einige Backwaren günstiger?", options: ["A) Vor 8 Uhr", "B) Ab 19 Uhr", "C) Nur am Sonntag", "D) Mittags"] },
-      { stem: "Was verkauft der Secondhand-Laden?", options: ["A) Nur Lebensmittel", "B) Kleidung und kleine Haushaltsartikel", "C) Fahrräder", "D) Medikamente"] },
-      { stem: "Was kann man im Secondhand-Laden zusätzlich tun?", options: ["A) Kleidung abgeben", "B) Geld wechseln", "C) Einen Sprachkurs besuchen", "D) Lebensmittel bestellen"] },
-    ],
+    format: "A2 · Lesen · Multiple Choice",
+    title: "Einkaufen: Wo und wie kaufen die Menschen ein?",
+    strategy: "Lesen Sie den Text und die Aufgaben 1 bis 7. Wählen Sie a, b oder c.",
+    text: "Einkaufen: Wo und wie kaufen die Menschen ein?\n\nIn Deutschland gibt es viele verschiedene Möglichkeiten einzukaufen. Je nachdem, was man braucht, wählen die Menschen unterschiedliche Orte und Wege.\n\n1. Supermarkt und Discounter: Die meisten Menschen kaufen ihre täglichen Lebensmittel im Supermarkt oder Discounter. Dort ist die Auswahl riesig und die Preise sind oft günstig. Man findet alles an einem Ort: von Brot, Milch und Käse bis zu Getränken und Putzmitteln.\n\n2. Der Wochenmarkt: Auf dem Wochenmarkt verkaufen Bauern aus der Region frisches Obst, Gemüse, Käse, Eier und Blumen. Die Produkte sind sehr frisch und oft bio. Viele Menschen gehen besonders gern am Samstagmorgen auf den Markt, weil die Atmosphäre gemütlich ist und man dort Bekannte trifft.\n\n3. Online-Shopping: Immer mehr Leute bestellen Kleidung, Schuhe, Bücher und Elektronik im Internet. Der größte Vorteil ist die Bequemlichkeit: Man kann rund um die Uhr von zu Hause aus einkaufen. Ein kleiner Nachteil ist jedoch, dass man meistens ein paar Tage auf das Paket warten muss.\n\n4. Kleine Fachgeschäfte: Für frisches Brot gehen viele Deutsche lieber in eine kleine Bäckerei und für Wurst oder Fleisch in die Metzgerei. Die Waren sind dort zwar etwas teurer als im Supermarkt, aber die Qualität ist sehr hoch und die Verkäufer beraten die Kunden persönlich.",
+    questions: [{"stem":"Wo kaufen die meisten Menschen ihre alltäglichen Lebensmittel?","options":["A) Im Internet.","B) Im Supermarkt oder Discounter.","C) Nur in kleinen Fachgeschäften."]},{"stem":"Welchen Vorteil bietet der Supermarkt?","options":["A) Man findet viele verschiedene Produkte an einem Ort.","B) Die Waren sind immer kostenlos.","C) Die Produkte kommen immer aus der eigenen Stadt."]},{"stem":"Wer verkauft Waren auf dem Wochenmarkt?","options":["A) Verkäufer aus großen Einkaufszentren.","B) Bauern aus der Region.","C) Mitarbeiter von Online-Shops."]},{"stem":"Warum gehen viele Menschen gerne am Samstagmorgen auf den Wochenmarkt?","options":["A) Weil dort alle Waren nur die Hälfte kosten.","B) Weil der Markt nur samstags kurz geöffnet ist.","C) Weil die Stimmung nett ist und man andere Leute trifft."]},{"stem":"Was ist der größte Vorteil beim Online-Shopping?","options":["A) Man kann jederzeit bequem von zu Hause bestellen.","B) Die Lieferanten bringen die Ware immer nach 10 Minuten.","C) Man muss die Kleidung nicht anprobieren."]},{"stem":"Welcher Nachteil wird beim Online-Kaufen genannt?","options":["A) Man darf dort keine Bücher bestellen.","B) Man muss ein paar Tage auf die Lieferung warten.","C) Es gibt dort keine große Auswahl."]},{"stem":"Warum gehen manche Kunden lieber in die Bäckerei oder Metzgerei?","options":["A) Weil die Produkte dort billiger sind als im Supermarkt.","B) Weil man dort gute Qualität und persönliche Beratung bekommt.","C) Weil Fachgeschäfte immer auch sonntags offen sind."]}],
   },
   20: {
     chapter: "7.20",

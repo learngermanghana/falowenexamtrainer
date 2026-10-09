@@ -21,7 +21,7 @@ describe("A2 canonical assessment content guard", () => {
 
   test("keeps canonical Lesen question counts, including the seven-question Day 22 Hamburg task", () => {
     A2_READING_DAYS.forEach((day) => {
-      expect(A2_READING_TASKS[day].questions).toHaveLength(({ 11: 7, 17: 8, 22: 7 })[day] || 5);
+      expect(A2_READING_TASKS[day].questions).toHaveLength(({ 11: 7, 17: 8, 19: 7, 22: 7 })[day] || 5);
     });
   });
 
