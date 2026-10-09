@@ -214,17 +214,19 @@ export const A2_LISTENING_TASKS = {
       { stem: "Welche Sportarten werden im Text als motivierend erwähnt?", options: ["A) Yoga und Pilates", "B) Schwimmen und Laufen", "C) Tanzen und Radfahren"] },
     ],
   },
+
   17: {
     chapter: "6.17",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre das Gespräch in der Apotheke. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    audioUrl: "https://youtu.be/jgl__L4L9kE",
+    task: "Hören Sie das Gespräch zwischen dem Kunden und der Apotheke. Beantworten Sie die fünf Fragen. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Bereich ein.",
+    // The previous recording described Anna and different questions. Do not attach it to this new task.
+    audioUrl: "",
     questions: [
-      { stem: "Warum ging Anna in die Apotheke?", options: ["A) Um Medikamente gegen Husten zu kaufen", "B) Wegen Kopfschmerzen", "C) Um eine Creme zu kaufen", "D) Um Proben zu holen"] },
-      { stem: "Was empfahl die Apothekerin gegen Kopfschmerzen?", options: ["A) Aspirin", "B) Paracetamol", "C) Ibuprofen", "D) Nasenspray"] },
-      { stem: "Welches Problem hatte Anna noch?", options: ["A) Halsschmerzen", "B) Trockene Haut", "C) Schnupfen", "D) Fieber"] },
-      { stem: "Wie reagierte Anna auf die Empfehlungen der Apothekerin?", options: ["A) Sie war skeptisch", "B) Sie war erleichtert", "C) Sie war verwirrt", "D) Sie war unzufrieden"] },
-      { stem: "Was bekam Anna zusätzlich zu den Medikamenten?", options: ["A) Ein Rezept", "B) Proben von Produkten", "C) Eine Broschüre", "D) Ein neues Medikament"] },
+      { stem: "Was für Probleme hat der Kunde?", options: ["A) Halsschmerzen und Fieber.", "B) Halsschmerzen und eine laufende Nase.", "C) Kopfschmerzen und Husten."] },
+      { stem: "Wie oft muss der Kunde die Lutschtabletten nehmen?", options: ["A) Alle drei Stunden.", "B) Morgens und abends.", "C) Einmal am Tag."] },
+      { stem: "Braucht der Kunde ein Rezept?", options: ["A) Ja, für das Spray.", "B) Ja, für die Tabletten.", "C) Nein, er braucht kein Rezept."] },
+      { stem: "Was kauft der Kunde noch für seinen Sohn?", options: ["A) Ein Pflaster mit bunten Tieren.", "B) Hustensaft.", "C) Eine Creme."] },
+      { stem: "Wie bezahlt der Kunde?", options: ["A) Bar.", "B) Mit Karte.", "C) Mit dem Handy."] },
     ],
   },
   18: {
