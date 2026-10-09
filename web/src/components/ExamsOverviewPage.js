@@ -121,17 +121,17 @@ export default function ExamsOverviewPage() {
       <button
         type="button"
         className="exam-room-mock-entry"
-        aria-label={hasFullMock ? "Browse full mock exams" : "Browse available exam practice"}
+        aria-label={hasFullMock ? "Start Full Mock Test" : "Explore available exam practice"}
         onClick={() => navigate("/exams/mocks")}
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
-          <strong>{hasFullMock ? "Full Mock Exam" : "Mock Exams & Practice"}</strong>
+          <strong>{hasFullMock ? "Start Full Mock Test" : "Explore Exam Practice"}</strong>
           <span>{hasFullMock
-            ? "Complete Lesen, Hören, Schreiben and Sprechen for a full result. Choose or resume a mock."
+            ? "Tap here to choose a test, then begin or resume all four sections: Lesen, Hören, Schreiben and Sprechen."
             : "A complete " + currentLevel + " mock is not yet published. Explore available section practice."}</span>
         </span>
-        <span className="exam-room-arrow" aria-hidden="true">→</span>
+        <span className="exam-room-mock-action" aria-hidden="true">{hasFullMock ? "Start →" : "Explore →"}</span>
       </button>
 
       <section aria-labelledby="exam-room-skills-heading">
