@@ -194,7 +194,14 @@ function LockedAudio({ part, idToken, status, onStatusChange, expired }) {
           {loading ? "Preparing audio …" : started ? "Audio playing …" : "Start audio"}
         </button>
       )}
-      {error ? <p className="b1-final-error">{error}</p> : null}
+      {error ? <p className="b1-final-error" role="alert">{error}</p> : null}
+      {exam.stage === "schreiben" && secondsLeft === 0 ? (
+        <p className="b1-final-small-note" role="status">
+          Time is up. Falowen is automatically submitting your saved Schreiben answers.
+          {busy === "schreiben" ? " Marking in progress — please keep this page open." :
+            " If marking fails, your answers remain saved and you can retry."}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -220,6 +227,10 @@ export default function B1FinalMockExamPage() {
   const [confirmIncompleteHoeren, setConfirmIncompleteHoeren] = useState(false);
   const saveTimerRef = useRef(null);
   const timeoutHandledRef = useRef("");
+  const schreibenSubmissionRef = useRef(false);
+  const timeoutRetryTimerRef = useRef(null);
+  const timeoutRetryCountRef = useRef(0);
+  const [timeoutRetryNonce, setTimeoutRetryNonce] = useState(0);
   const completionSavedRef = useRef("");
   const completionRetryCountRef = useRef(0);
   const completionRetryTimerRef = useRef(null);
@@ -340,6 +351,11 @@ export default function B1FinalMockExamPage() {
   }, [exam.sectionDeadlineMs, exam.stage, now]);
 
   const moveToSection = useCallback((stage, patch = {}) => {
+    if (timeoutRetryTimerRef.current) {
+      window.clearTimeout(timeoutRetryTimerRef.current);
+      timeoutRetryTimerRef.current = null;
+    }
+    timeoutRetryCountRef.current = 0;
     setExam((current) => ({
       ...current,
       ...patch,
@@ -427,7 +443,10 @@ export default function B1FinalMockExamPage() {
   }, [exam.hoerenAnswers, exam.sectionScores, moveToSection]);
 
   const submitSchreiben = useCallback(async () => {
-    if (busy) return;
+    // A timer effect and a button click can fire in the same render. The ref
+    // prevents duplicate paid AI-marking requests before React updates busy.
+    if (schreibenSubmissionRef.current) return;
+    schreibenSubmissionRef.current = true;
     setBusy("schreiben");
     setError("");
     try {
@@ -442,10 +461,26 @@ export default function B1FinalMockExamPage() {
       });
     } catch (markError) {
       setError(getMockWritingSubmissionError(markError));
+      // An expired section must never get stuck at 00:00 after a 502,
+      // connection loss or transient marking error. Preserve the saved text
+      // and retry automatically (up to 3 times) while the page is open.
+      const expired = Number(exam.sectionDeadlineMs) > 0 &&
+        Date.now() >= Number(exam.sectionDeadlineMs);
+      if (expired && timeoutRetryCountRef.current < 3) {
+        const retryDelay = [5000, 15000, 30000][timeoutRetryCountRef.current];
+        timeoutRetryCountRef.current += 1;
+        if (timeoutRetryTimerRef.current) window.clearTimeout(timeoutRetryTimerRef.current);
+        timeoutRetryTimerRef.current = window.setTimeout(() => {
+          timeoutRetryTimerRef.current = null;
+          timeoutHandledRef.current = "";
+          setTimeoutRetryNonce((value) => value + 1);
+        }, retryDelay);
+      }
     } finally {
+      schreibenSubmissionRef.current = false;
       setBusy("");
     }
-  }, [busy, exam.attemptInfo?.attemptId, exam.schreiben, exam.sectionScores, idToken, moveToSection]);
+  }, [exam.attemptInfo?.attemptId, exam.schreiben, exam.sectionScores, exam.sectionDeadlineMs, idToken, moveToSection]);
 
   const handleSpeakingProgress = useCallback((progress) => {
     setExam((current) => ({
@@ -473,12 +508,37 @@ export default function B1FinalMockExamPage() {
 
   useEffect(() => {
     if (!SECTION_DURATIONS[exam.stage] || exam.stage === "sprechen" || secondsLeft > 0) return;
-    if (timeoutHandledRef.current === exam.stage) return;
-    timeoutHandledRef.current = exam.stage;
+    if (!exam.attemptInfo?.attemptId || !idToken || !exam.sectionDeadlineMs) return;
+    // Also runs when a student resumes an expired mock on another visit.
+    const timeoutKey = `${exam.attemptInfo.attemptId}:${exam.stage}:${exam.sectionDeadlineMs}`;
+    if (timeoutHandledRef.current === timeoutKey) return;
+    timeoutHandledRef.current = timeoutKey;
     if (exam.stage === "lesen") submitLesen();
     if (exam.stage === "hoeren") submitHoeren();
     if (exam.stage === "schreiben") submitSchreiben();
-  }, [exam.stage, secondsLeft, submitHoeren, submitLesen, submitSchreiben]);
+  }, [exam.attemptInfo?.attemptId, exam.sectionDeadlineMs, exam.stage, secondsLeft, idToken,
+    timeoutRetryNonce, submitHoeren, submitLesen, submitSchreiben]);
+
+  useEffect(() => () => {
+    if (timeoutRetryTimerRef.current) window.clearTimeout(timeoutRetryTimerRef.current);
+  }, []);
+
+  useEffect(() => {
+    // A renewed connection is an opportunity to retry an expired section
+    // immediately, rather than leaving the student at 00:00.
+    const retryWhenOnline = () => {
+      if (exam.stage !== "schreiben" || secondsLeft > 0 || schreibenSubmissionRef.current) return;
+      if (timeoutRetryTimerRef.current) {
+        window.clearTimeout(timeoutRetryTimerRef.current);
+        timeoutRetryTimerRef.current = null;
+      }
+      timeoutRetryCountRef.current = 0;
+      timeoutHandledRef.current = "";
+      setTimeoutRetryNonce((value) => value + 1);
+    };
+    window.addEventListener("online", retryWhenOnline);
+    return () => window.removeEventListener("online", retryWhenOnline);
+  }, [exam.stage, secondsLeft]);
 
   const setLesen = (key, value) => setExam((current) => ({
     ...current, lesenAnswers: { ...current.lesenAnswers, [key]: value },
@@ -771,6 +831,7 @@ export default function B1FinalMockExamPage() {
                 </div>
                 <textarea
                   value={text}
+                  disabled={secondsLeft <= 0}
                   onChange={(event) => setExam((current) => ({
                     ...current,
                     schreiben: { ...current.schreiben, [task.id]: event.target.value },
@@ -783,7 +844,9 @@ export default function B1FinalMockExamPage() {
             );
           })}
           <button type="button" className="b1-final-primary b1-final-submit" onClick={submitSchreiben} disabled={busy === "schreiben"}>
-            {busy === "schreiben" ? "Marking Schreiben …" : "Finish Schreiben (3/4) → Sprechen (4/4)"}
+            {busy === "schreiben" ? "Auto-submitting Schreiben …" :
+              secondsLeft <= 0 ? "Retry expired Schreiben submission → Sprechen" :
+                "Finish Schreiben (3/4) → Sprechen (4/4)"}
           </button>
         </>
       ) : null}
