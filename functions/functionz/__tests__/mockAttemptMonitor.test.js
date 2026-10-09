@@ -1,4 +1,4 @@
-const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts, isAuthorizedMockMonitor } = require("../mockAttemptMonitor");
+const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts, isAuthorizedMockMonitor, normalizeSharedMockIntegrity, joinSharedMockIntegrity } = require("../mockAttemptMonitor");
 
 test("mock monitor redacts student answers and preserves section timing", () => {
   const row = normalizeMockAttempt({
@@ -157,4 +157,36 @@ test("A1 integrity is absent for legacy attempts rather than inventing violation
     data: () => ({ status: "in_progress", state: { stage: "lesen" } }),
   });
   expect(row.integrity).toBeNull();
+});
+
+test("A2/B1 generic incidents join the correct saved attempt; B2/C1 are activity-only", () => {
+  const from = (level, uid, mockId, attemptId = "") =>
+    normalizeSharedMockIntegrity({ data: () => ({
+      level, uid, mockId, attemptId, section: "schreiben",
+      email: "student@example.org", updatedAt: "2026-10-09T18:00:00Z",
+      counts: { paste_attempt: 2, tab_hidden: 1 },
+      events: [{ type: "paste_attempt", section: "schreiben", at: "2026-10-09T18:00:00Z",
+        rawClipboardText: "should never be included" }],
+    }) });
+  const existing = [{ id: "A2:u1:attempt-1", uid: "u1", level: "A2",
+    mockId: "a2-mock-01", studentEmail: "student@example.org",
+    section: "schreiben", status: "in_progress" }];
+  const joined = joinSharedMockIntegrity(existing, [
+    from("A2", "u1", "a2-mock-01", "attempt-1"),
+    from("B2", "u2", "b2-final-mock"),
+    from("C1", "u3", "c1-lesen-sample-01"),
+  ]);
+  expect(joined).toHaveLength(3);
+  expect(joined[0].integrity.total).toBe(3);
+  expect(joined[0].status).toBe("in_progress");
+  expect(joined[1].status).toBe("activity_only");
+  expect(joined[1].integrityOnly).toBe(true);
+  expect(joined[2].status).toBe("activity_only");
+  expect(JSON.stringify(joined)).not.toContain("should never be included");
+});
+test("malformed and non-supported mock audit records are excluded", () => {
+  expect(normalizeSharedMockIntegrity({ data: () => ({
+    level: "A1", uid: "1", mockId: "a1-mock-01", counts: {} }) })).toBeNull();
+  expect(normalizeSharedMockIntegrity({ data: () => ({
+    level: "B2", mockId: "b2-final-mock" }) })).toBeNull();
 });
