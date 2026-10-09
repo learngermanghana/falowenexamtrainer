@@ -14,6 +14,14 @@ describe("Falowen public marketing redesign", () => {
       "/placement-test", "/exam-practice", "/classes/", "/signup?program=german",
     ]);
     expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "exams").description).toMatch(/Goethe|Lesen/);
+    expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "class")).toEqual(
+      expect.objectContaining({
+        href: "/classes/",
+        action: "View live classes",
+        scheduleHref: "/learn-german-ghana/upcoming-classes",
+        scheduleAction: "View full class schedule",
+      })
+    );
 
     const landing = read("./LandingPageSimple.js");
     const visitor = read("./PublicAdmissionsVisitorGuidePage.js");
@@ -35,6 +43,11 @@ describe("Falowen public marketing redesign", () => {
     expect(landing).toContain("falowen-final-cta");
     expect(landing).toContain("academyProfile.classroomImage");
     expect(landing).toContain("FOOTER_LINKS");
+    expect(landing).toContain("falowen-home-feature-schedule");
+    expect(visitor).toContain("visitor-guide-marketing-schedule");
+    expect(styles).toContain("@media (max-width: 600px)");
+    expect(styles).toContain(".falowen-home-feature-actions");
+    expect(read("./PublicUpcomingClassesPage.js")).toContain("Weekly class calendar");
     expect(styles).toContain("env(safe-area-inset-bottom)");
     expect(styles).toContain(".falowen-mobile-actions");
     expect(guideStyles).toContain(".visitor-guide-marketing-grid");
