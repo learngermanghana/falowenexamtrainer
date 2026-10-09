@@ -71,6 +71,69 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "a2-final-01",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a2-mock-02": {
+    id: "a2-mock-02", level: "A2", title: "A2 Mock 2", shortTitle: "A2 Mock 2",
+    description: "Your second A2 mock: complete Lesen, Hören, Schreiben and Sprechen from one exam dashboard. Final combined grading is being verified.",
+    durationLabel: "4 modules · saved progress", status: "preview",
+    route: "/campus/course/a2-mock-2", mode: "section-preview",
+    questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
+  },
+  "a2-mock-02-lesen": {
+    showInMockLibrary: false,
+    id: "a2-mock-02-lesen",
+    level: "A2",
+    title: "A2 Mock 2 · Lesen",
+    shortTitle: "A2 Mock 2 · Lesen",
+    description: "Second reading test: 20 questions across four parts, timed for 30 minutes with a reading-only result.",
+    durationLabel: "30 min · reading only",
+    status: "preview",
+    route: "/campus/course/a2-mock-2-lesen",
+    mode: "section-preview",
+    questionSetId: "a2-mock-02-lesen",
+    sections: ["Lesen only (Teil 1–4)"],
+  },
+  "a2-mock-02-schreiben": {
+    showInMockLibrary: false,
+    id: "a2-mock-02-schreiben",
+    level: "A2",
+    title: "A2 Mock 2 · Schreiben",
+    shortTitle: "A2 Mock 2 · Schreiben",
+    description: "Two timed writing tasks: an informal message to Julia and a formal hotel email. Drafts save on this device; automatic marking is not yet available.",
+    durationLabel: "30 min · writing only",
+    status: "preview",
+    route: "/campus/course/a2-mock-2-schreiben",
+    mode: "section-preview",
+    questionSetId: "a2-mock-02-schreiben",
+    sections: ["Schreiben only (Teil 1–2)"],
+  },
+  "a2-mock-02-hoeren": {
+    showInMockLibrary: false,
+    id: "a2-mock-02-hoeren",
+    level: "A2",
+    title: "A2 Mock 2 · Hören",
+    shortTitle: "A2 Mock 2 · Hören",
+    description: "Twenty listening questions across four parts, including image matching A–I. Audio requires files and authorized playback for mock-02.",
+    durationLabel: "listening only · 4 Teile",
+    status: "preview",
+    route: "/campus/course/a2-mock-2-hoeren",
+    mode: "section-preview",
+    questionSetId: "a2-mock-02-hoeren",
+    sections: ["Hören only (Teil 1–4)"],
+  },
+  "a2-mock-02-sprechen": {
+    showInMockLibrary: false,
+    id: "a2-mock-02-sprechen",
+    level: "A2",
+    title: "A2 Mock 2 · Sprechen",
+    shortTitle: "A2 Mock 2 · Sprechen",
+    description: "Four question cards, free-afternoon presentation, examiner follow-ups, and a birthday-party planning conversation. Recorded submissions with task-aware transcription; final grading pending dedicated Mock 2 scorer.",
+    durationLabel: "speaking only · 3 Teile",
+    status: "preview",
+    route: "/campus/course/a2-mock-2-sprechen",
+    mode: "section-preview",
+    questionSetId: "a2-mock-02-sprechen",
+    sections: ["Sprechen only (Teil 1–3)"],
+  },
   "b1-final-01": {
     id: "b1-final-01",
     level: "B1",
@@ -124,6 +187,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a2-course-preview-01": {
+    showInMockLibrary: false,
     id: "a2-course-preview-01",
     level: "A2",
     title: "A2 exam-format practice",
@@ -153,7 +217,8 @@ export const getMockExamsForLevel = (level, { includeCourse = false } = {}) => {
   return Object.values(MOCK_EXAM_CATALOG).filter(
     (exam) =>
       exam.level === normalizedLevel &&
-      (includeCourse || exam.mode !== "section-preview"),
+      (includeCourse || exam.mode !== "section-preview") &&
+      exam.showInMockLibrary !== false,
   );
 };
 

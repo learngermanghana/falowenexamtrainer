@@ -11,10 +11,10 @@ const authHeaders = (idToken) =>
       }
     : {};
 
-export const scoreA2MockWriting = async ({ sms, email, attemptId, idToken }) => {
+export const scoreA2MockWriting = async ({ sms, email, attemptId, idToken, mockId = "a2-mock-01", taskContext }) => {
   const response = await postMockAssessment(
     `${backendUrl}/writing/a2-mock-score`,
-    { sms, email, attemptId },
+    { sms, email, attemptId, mockId, taskContext },
     { headers: authHeaders(idToken) },
   );
   return response.data?.result || response.data;
