@@ -212,14 +212,17 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <p style={{ ...styles.subtitle, margin: 0 }}>{writingRequired
               ? (showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below.")
               : (showHoeren ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required." : "Today: Sprechen in class, then Lesen. Schreiben is not required.")} The tabs stay visible at the top of the workbook.</p>
-            <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
+
+          </div>
+          <div data-a2-workbook-sticky-navigation="true" style={{ position: "sticky", top: 0, zIndex: 80, alignSelf: "start", padding: 8, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}>
+            <WorkbookTabNav
                 activeTab={displayedActiveTab}
                 onChange={setActiveTab}
                 tabs={visibleTabs}
                 isTabLocked={isTabLocked}
                 ariaLabel={`A2 Day ${day} workbook sections`}
                 renderLegacyGrammarPanel={false}
-              /></div>
+              />
           </div>
           {showWorkbookGuidance && displayedActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
 
