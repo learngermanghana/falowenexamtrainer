@@ -200,6 +200,58 @@ async function enrichStudentNames(db, rows) {
   }));
 }
 
+
+const normalizeSharedMockIntegrity = doc => {
+  const data = doc.data() || {};
+  const level = String(data.level || "").toUpperCase();
+  if (!["A2", "B1", "B2", "C1"].includes(level) || !data.uid ||
+      !data.mockId) return null;
+  const audit = normalizeMockIntegrity(data);
+  if (!audit) return null;
+  return {
+    uid: String(data.uid).slice(0, 150),
+    email: String(data.email || "").slice(0, 200),
+    level,
+    mockId: String(data.mockId).slice(0, 80),
+    attemptId: String(data.attemptId || "").slice(0, 120),
+    section: String(data.section || "intro").slice(0, 30),
+    startedAt: iso(data.startedAt),
+    updatedAt: iso(data.updatedAt),
+    integrity: audit,
+  };
+};
+const joinSharedMockIntegrity = (attempts, audits) => {
+  const rows = [...attempts];
+  for (const audit of audits) {
+    let match = rows.find(row =>
+      row.uid === audit.uid && row.level === audit.level && row.mockId === audit.mockId &&
+      (!audit.attemptId || row.id.endsWith(":" + audit.attemptId)));
+    if (match) {
+      match.integrity = audit.integrity;
+    } else if (audit.level === "B2" || audit.level === "C1" || audit.mockId === "a2-mock-02") {
+      // Browser-only mock flows must not be presented as verified completed work.
+      rows.push({
+        id: audit.level + ":" + audit.uid + ":" + audit.mockId + ":integrity",
+        uid: audit.uid,
+        studentEmail: audit.email,
+        studentName: "",
+        level: audit.level,
+        mockId: audit.mockId,
+        attemptNumber: 1,
+        status: "in_progress",
+        section: audit.section,
+        completedSections: [], progressCount: 0, totalSections: 4,
+        sectionDeadlineMs: null,
+        startedAt: audit.startedAt, updatedAt: audit.updatedAt,
+        completedAt: null, overallScore: null,
+        progressSource: "browser_reported", integrityOnly: true,
+        integrity: audit.integrity,
+      });
+    }
+  }
+  return rows;
+};
+
 async function listMockAttempts(db, { limit = 200 } = {}) {
   let documents;
   let partial = false;
@@ -224,11 +276,17 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
       partial = true;
     }
   }
-  const attempts = [...documents.map(normalizeMockAttempt), ...browserAttempts]
-    .filter(Boolean)
-    .sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
+  let audits = [];
+  try {
+    const auditSnap = await db.collection("mockIntegrityMonitor").limit(350).get();
+    audits = auditSnap.docs.map(normalizeSharedMockIntegrity).filter(Boolean);
+    if (auditSnap.size === 350) partial = true;
+  } catch { partial = true; }
+  const attempts = joinSharedMockIntegrity(
+    [...documents.map(normalizeMockAttempt), ...browserAttempts].filter(Boolean), audits
+  ).sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
     .slice(0, Math.min(500, Math.max(1, Number(limit) || 200)));
   return { attempts: await enrichStudentNames(db, attempts), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, normalizeMockIntegrity, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, normalizeMockIntegrity, normalizeSharedMockIntegrity, joinSharedMockIntegrity, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
