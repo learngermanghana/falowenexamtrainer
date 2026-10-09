@@ -24,7 +24,7 @@ const lesson = {
   starters: ["Ich fahre/gehe mit ...", "Ich fahre zur/zum ...", "Der Weg dauert ...", "Ich benutze ..., weil ..."],
 };
 
-const FocusedContent = () => <A2MiniLearningBlock {...lesson} />;
+const FocusedContent = () => <A2MiniLearningBlock essential {...lesson} />;
 
 export default function A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage({ embedded = false }) {
   if (embedded) return <FocusedContent />;
