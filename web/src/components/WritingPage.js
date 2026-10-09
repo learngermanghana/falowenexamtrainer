@@ -2374,7 +2374,7 @@ const WritingPage = ({
                   <option key={option}>{option}</option>
                 ))}
               </select>
-            </div> : null>
+            </div> : null}
 
             <label style={styles.label}>
               {draftLabel || (isCourseMode
