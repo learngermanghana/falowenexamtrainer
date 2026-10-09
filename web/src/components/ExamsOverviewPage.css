@@ -140,6 +140,22 @@
   font-size: 22px;
 }
 
+.exam-room-mock-action {
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #1d4ed8;
+  color: #ffffff;
+  padding: 10px 13px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(30, 64, 175, 0.18);
+}
+
+.exam-room-mock-entry:hover .exam-room-mock-action {
+  background: #1e40af;
+}
+
 .exam-room-mock-copy {
   min-width: 0;
   display: grid;
@@ -369,6 +385,10 @@
   .exam-room-mock-entry {
     padding: 13px;
     gap: 10px;
+  }
+  .exam-room-mock-action {
+    font-size: 12px;
+    padding: 8px 10px;
   }
   .exam-room-mock-icon {
     width: 39px;
