@@ -219,8 +219,7 @@ export const A2_LISTENING_TASKS = {
     chapter: "6.17",
     mode: A2_LISTENING_MODES.GRADED,
     task: "Hören Sie das Gespräch zwischen dem Kunden und der Apotheke. Beantworten Sie die fünf Fragen. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    // The previous recording described Anna and different questions. Do not attach it to this new task.
-    audioUrl: "",
+    audioKey: "a2/day-17/day-17.mp3",
     questions: [
       { stem: "Was für Probleme hat der Kunde?", options: ["A) Halsschmerzen und Fieber.", "B) Halsschmerzen und eine laufende Nase.", "C) Kopfschmerzen und Husten."] },
       { stem: "Wie oft muss der Kunde die Lutschtabletten nehmen?", options: ["A) Alle drei Stunden.", "B) Morgens und abends.", "C) Einmal am Tag."] },
