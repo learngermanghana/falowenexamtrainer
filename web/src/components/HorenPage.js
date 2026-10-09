@@ -11,9 +11,9 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
-  const normalizedLevel = ["A1", "A2", "C1"].includes(routeLevel) ? routeLevel : profileLevel;
+  const normalizedLevel = ["A1", "A2", "B1", "C1"].includes(routeLevel) ? routeLevel : profileLevel;
 
-  if (["A1", "A2", "C1"].includes(normalizedLevel)) {
+  if (["A1", "A2", "B1", "C1"].includes(normalizedLevel)) {
     if (sampleId) {
       const sampleExists =
         sampleId === "sample-1" ||
