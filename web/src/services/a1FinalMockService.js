@@ -53,5 +53,18 @@ export const saveA1MockAttempt = async ({
   return response.data;
 };
 
+
+export const reportA1MockIntegrityEvent = ({ idToken, attemptId, type, section }) => {
+  if (!idToken || !attemptId) return Promise.resolve();
+  // Keepalive is best-effort for a tab becoming hidden; browsers can still stop
+  // network calls when closed. No answer text or clipboard data is transmitted.
+  return fetch(backendUrl + "/a1-mock/attempt/integrity-event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders(idToken) },
+    body: JSON.stringify({ attemptId, type, section }),
+    keepalive: true,
+  }).catch(() => {});
+};
+
 export const A1_FINAL_MOCK_ID = "a1-mock-01";
 export const A1_FINAL_MOCK_STORAGE_KEY = "falowen:a1-final-mock:a1-mock-01";
