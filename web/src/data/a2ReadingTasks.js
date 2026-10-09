@@ -320,28 +320,35 @@ Montag, 18:30–19:30 Uhr. 30 Euro pro Monat. Besonders geeignet für Personen, 
       { stem: "Leonie möchte möglichst nichts bezahlen, zweimal pro Woche trainieren und sich nicht vorher anmelden. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot D", "D) Angebot E"] },
     ],
   },
+
   16: {
     chapter: "6.16",
-    format: "Anzeigen zuordnen",
-    title: "Etwas für das Wohlbefinden",
-    strategy: "Vergleiche Problem und Angebot. Achte auf Wörter wie Rücken, Stress, Ernährung und Entspannung.",
-    text: `Angebot A – Yoga am Abend
-Montag und Donnerstag, 18:30 Uhr. Ruhige Übungen für Anfänger.
+    format: "A2 · Lesen · Multiple Choice",
+    title: "Tipps für mehr Wohlbefinden und Entspannung",
+    strategy: "Lesen Sie den Text und die Aufgaben 1 bis 7. Wählen Sie a, b oder c.",
+    text: `Tipps für mehr Wohlbefinden und Entspannung im Alltag
 
-Angebot B – Rückenkurs
-Mittwoch, 17:00 Uhr. Übungen für Menschen mit Rückenproblemen.
+Viele Menschen haben heute viel Stress bei der Arbeit oder in der Schule. Sie sind oft müde und haben wenig Zeit für sich selbst. Aber Entspannung ist sehr wichtig für die Gesundheit! Hier sind einige einfache Tipps, wie Sie Ihren Alltag ruhiger gestalten können:
 
-Angebot C – Ernährungsberatung
-Individuelle Termine. Tipps für gesundes Essen im Alltag.
+1. Kleine Pausen machen:
+Arbeiten Sie nicht stundenlang ohne Pause. Machen Sie alle zwei Stunden eine kurze Pause von 10 Minuten. Trinken Sie ein Glas Wasser oder einen heißen Kräutertee, atmen Sie tief durch und stehen Sie vom Schreibtisch auf.
 
-Angebot D – Entspannung nach der Arbeit
-Freitag, 19:00 Uhr. Atemübungen und einfache Techniken gegen Stress.`,
+2. Bewegung an der frischen Luft:
+Ein kurzer Spaziergang im Park oder im Wald wirkt Wunder gegen Stress. Die frische Luft hilft dem Gehirn, sich zu erholen. Bewegung am Abend verbessert außerdem den Schlaf.
+
+3. Digitale Auszeit (Digital Detox):
+Schalten Sie Ihr Smartphone oder Ihr Tablet mindestens eine Stunde vor dem Schlafen aus. Das blaue Licht von Bildschirmen stört den Schlaf. Lesen Sie stattdessen ein Buch oder hören Sie ruhige Musik.
+
+4. Zeit für Hobbys:
+Machen Sie jeden Tag etwas, das Ihnen Freude bringt. Egal ob Yoga, Kochen, Malen oder Gartenarbeit – Hobbys helfen, den Kopf frei zu bekommen und neue Energie zu tanken.`,
     questions: [
-      { stem: "Marta sitzt viel im Büro und hat oft Rückenschmerzen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Kwame möchte lernen, im Alltag gesünder zu essen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Nora ist nach der Arbeit oft gestresst und sucht etwas am Freitagabend.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Jonas möchte als Anfänger zweimal pro Woche ruhige Übungen machen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
-      { stem: "Welches Angebot hat individuelle Termine?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Warum sind viele Menschen im Alltag oft müde?", options: ["A) Weil sie zu viel Sport machen.", "B) Weil sie viel Stress haben und wenig Zeit für sich haben.", "C) Weil sie keinen Kräutertee trinken."] },
+      { stem: "Wie oft sollte man bei der Arbeit eine kurze Pause machen?", options: ["A) Jede Stunde für 30 Minuten.", "B) Alle zwei Stunden für 10 Minuten.", "C) Nur einmal am Tag nach dem Mittagessen."] },
+      { stem: "Was wird für die kurze Pause empfohlen?", options: ["A) Aufstehen und Wasser oder Kräutertee trinken.", "B) Schnell etwas Süßes essen.", "C) Am Schreibtisch weiterarbeiten und Musik hören."] },
+      { stem: "Wie hilft ein Spaziergang im Park gegen Stress?", options: ["A) Er macht einen sofort wieder müde.", "B) Die frische Luft hilft dem Gehirn, sich zu erholen.", "C) Er ersetzt das Abendessen."] },
+      { stem: "Warum sollte man das Smartphone vor dem Schlafen ausschalten?", options: ["A) Weil das Bildschirmlicht den Schlaf stört.", "B) Weil das Smartphone sonst nachts kaputtgeht.", "C) Weil man abends keine Nachrichten bekommen darf."] },
+      { stem: "Was kann man vor dem Schlafen statt der Smartphone-Nutzung tun?", options: ["A) Im Internet surfen.", "B) Ein Buch lesen oder ruhige Musik hören.", "C) Sport im Fitnessstudio machen."] },
+      { stem: "Warum sind Hobbys gut für das Wohlbefinden?", options: ["A) Sie kosten kein Geld.", "B) Sie helfen, den Kopf frei zu bekommen und Energie zu tanken.", "C) Man kann dadurch schneller arbeiten."] },
     ],
   },
   17: {
