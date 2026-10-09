@@ -82,6 +82,20 @@
   overflow-wrap: anywhere;
 }
 
+.study-buddy-chat-safe-link {
+  color: #93c5fd;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+  font-weight: 800;
+}
+.study-buddy-chat-safe-link:hover { color: #ffffff; }
+.study-buddy-chat-safe-link:focus-visible {
+  outline: 2px solid #fde68a;
+  outline-offset: 2px;
+}
+.study-buddy-bar.is-high-contrast .study-buddy-chat-safe-link { color: #fde68a; }
+
 .study-buddy-chat-row--user .study-buddy-chat-bubble {
   border-color: rgba(96, 165, 250, 0.48);
   border-radius: 14px 14px 5px 14px;
