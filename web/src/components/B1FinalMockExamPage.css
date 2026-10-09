@@ -503,3 +503,26 @@
   .b1-final-journey { padding: 12px; }
   .b1-final-journey li { padding: 9px; gap: 6px; }
 }
+
+
+.b1-final-hoeren-check {
+  background: #fffbeb;
+  border: 2px solid #d97706;
+  border-radius: 14px;
+  padding: 18px;
+  margin: 18px 0;
+  color: #78350f;
+}
+.b1-final-hoeren-check p { line-height: 1.5; }
+.b1-final-hoeren-check > div { display: flex; gap: 10px; flex-wrap: wrap; }
+.b1-final-hoeren-check button {
+  border: 1px solid #92400e;
+  border-radius: 10px;
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  background: #fff;
+  color: #78350f;
+}
+.b1-final-hoeren-check button.b1-final-primary { background: #263238; color: #fff; border: 0; }
