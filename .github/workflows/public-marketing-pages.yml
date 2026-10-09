@@ -4,6 +4,10 @@ on:
   pull_request:
     paths:
       - 'web/src/components/LandingPageSimple.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/NextLiveClassCard.css'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/SignedInHomeClassSchedule.test.jsx'
       - 'web/src/components/LandingPageMarketing.css'
       - 'web/src/components/LandingPage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
@@ -11,7 +15,7 @@ on:
       - 'web/src/components/PublicMarketingLanding.test.js'
       - 'web/src/components/PublicUpcomingClassesPage.js'
       - 'web/src/components/PublicUpcomingClassesPage.css'
-      - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
+      - 'web/src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js'
       - 'web/src/data/publicMarketingFeatures.js'
       - 'web/src/__tests__/LandingPageMobile.test.js'
       - 'tests/public-admissions-visitor-guide.test.mjs'
@@ -21,6 +25,10 @@ on:
       - main
     paths:
       - 'web/src/components/LandingPageSimple.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/NextLiveClassCard.css'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/SignedInHomeClassSchedule.test.jsx'
       - 'web/src/components/LandingPageMarketing.css'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
       - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
