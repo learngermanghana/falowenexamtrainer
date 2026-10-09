@@ -84,6 +84,50 @@
 .falowen-home-feature p { flex-grow: 1; margin: 0; color: #52627a; line-height: 1.65; font-size: 13px; }
 .falowen-home-feature-link { border: 0; background: transparent; color: #1b51a7; font-family: inherit; text-decoration: none; text-align: left; padding: 5px 0 0; font-weight: 850; font-size: 13px; cursor: pointer; }
 .falowen-home-feature-link:hover { text-decoration: underline; }
+
+.falowen-home-feature-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 9px;
+  margin-top: auto;
+}
+.falowen-home-feature-actions .falowen-home-feature-link {
+  min-height: 44px;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 2px;
+  line-height: 1.35;
+}
+.falowen-home-feature-schedule {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid #bfd4f5;
+  border-radius: 11px;
+  background: #eff5ff;
+  color: #164ba4;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-align: left;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.falowen-home-feature-schedule span:nth-child(2) { flex: 1; }
+.falowen-home-feature-schedule:hover { background: #dfebff; border-color: #93b7f1; }
+
 .falowen-home-support { display: flex; align-items: center; justify-content: space-between; gap: 30px; padding: clamp(24px, 4vw, 42px); border-radius: 23px; background: #ebf3ff; border: 1px solid #d9e6fc; }
 .falowen-home-support-copy { display: grid; gap: 11px; max-width: 690px; }
 .falowen-home-support h2 { margin: 0; font-size: clamp(23px, 2.6vw, 30px); line-height: 1.25; letter-spacing: -.03em; }
@@ -129,6 +173,9 @@
   .falowen-home-feature h3 { font-size: 15px; }
   .falowen-home-feature p { font-size: 12px; }
   .falowen-home-feature-icon { width: 41px; height: 41px; font-size: 20px; }
+  .falowen-home-feature-actions { gap: 7px; }
+  .falowen-home-feature-schedule { min-height: 48px; font-size: 12px; padding: 10px 11px; }
+
   .falowen-home-support { flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
   .falowen-home-reviews-intro { margin-bottom: -10px; }
   .falowen-final-cta { padding: 23px 19px; }
@@ -144,6 +191,17 @@
   .falowen-mobile-actions .falowen-home-button { font-size: 12px; padding: 8px 7px; min-height: 45px; }
   .falowen-mobile-actions .falowen-home-button-outline { border: 1px solid #1d4ed8; color: #1d4ed8; background: #fff; }
 }
+/* Real phone widths: keep all four feature cards and their actions readable,
+   rather than squeezing two long CTAs into a 150px-wide card. */
+@media (max-width: 600px) {
+  .falowen-home-feature-grid { grid-template-columns: minmax(0, 1fr); }
+  .falowen-home-feature { padding: 18px; gap: 10px; }
+  .falowen-home-feature h3 { font-size: 17px; }
+  .falowen-home-feature p { font-size: 13px; }
+  .falowen-home-feature-actions .falowen-home-feature-link { font-size: 13px; }
+  .falowen-home-feature-schedule { justify-content: flex-start; gap: 11px; font-size: 13px; }
+}
+
 @media (max-width: 360px) {
   .falowen-home-feature-grid { grid-template-columns: 1fr; }
   .falowen-home-brand img { width: 32px; height: 32px; }
