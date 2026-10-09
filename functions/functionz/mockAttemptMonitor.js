@@ -277,11 +277,13 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
     }
   }
   let audits = [];
-  try {
-    const auditSnap = await db.collection("mockIntegrityMonitor").limit(350).get();
-    audits = auditSnap.docs.map(normalizeSharedMockIntegrity).filter(Boolean);
-    if (auditSnap.size === 350) partial = true;
-  } catch { partial = true; }
+  if (typeof db.collection === "function") {
+    try {
+      const auditSnap = await db.collection("mockIntegrityMonitor").limit(350).get();
+      audits = auditSnap.docs.map(normalizeSharedMockIntegrity).filter(Boolean);
+      if (auditSnap.size === 350) partial = true;
+    } catch { partial = true; }
+  }
   const attempts = joinSharedMockIntegrity(
     [...documents.map(normalizeMockAttempt), ...browserAttempts].filter(Boolean), audits
   ).sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
