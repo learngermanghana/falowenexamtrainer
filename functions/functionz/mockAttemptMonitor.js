@@ -68,6 +68,25 @@ async function fallbackByParent(db) {
   return rows;
 }
 
+const normalizeBrowserProgress = doc => {
+  const row = doc.data() || {};
+  if (row.mockId !== "a2-mock-02" || !row.uid) return null;
+  const completedSections = SECTIONS.filter(section => Array.isArray(row.completedSections) && row.completedSections.includes(section));
+  const deadline = Number(row.sectionDeadlineMs);
+  return {
+    id: "A2:" + row.uid + ":mock-02", uid: String(row.uid),
+    studentEmail: String(row.email || "").slice(0, 200),
+    level: "A2", mockId: "a2-mock-02", attemptNumber: 1,
+    status: row.status === "completed" ? "completed" : "in_progress",
+    section: String(row.section || "intro"), completedSections,
+    progressCount: completedSections.length, totalSections: 4,
+    sectionDeadlineMs: Number.isFinite(deadline) && deadline > 0 ? deadline : null,
+    startedAt: iso(row.startedAt), updatedAt: iso(row.updatedAt),
+    completedAt: iso(row.completedAt), overallScore: null,
+    progressSource: "browser_reported",
+  };
+};
+
 async function listMockAttempts(db, { limit = 200 } = {}) {
   let documents;
   let partial = false;
@@ -82,12 +101,21 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
     documents = await fallbackByParent(db);
     partial = true;
   }
-  const attempts = documents
-    .map(normalizeMockAttempt)
+  let browserAttempts = [];
+  if (typeof db.collection === "function") {
+    try {
+      const browserSnap = await db.collection("mockProgressMonitor").limit(250).get();
+      browserAttempts = browserSnap.docs.map(normalizeBrowserProgress).filter(Boolean);
+      if (browserSnap.size === 250) partial = true;
+    } catch (error) {
+      partial = true;
+    }
+  }
+  const attempts = [...documents.map(normalizeMockAttempt), ...browserAttempts]
     .filter(Boolean)
     .sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
     .slice(0, Math.min(500, Math.max(1, Number(limit) || 200)));
   return { attempts, partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress };
