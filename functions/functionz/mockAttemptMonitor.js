@@ -11,7 +11,7 @@ const SECTIONS = ["lesen", "hoeren", "schreiben", "sprechen"];
 // Both the Admin account and the dedicated staff login can open /timed-attempts.
 // Restrict monitor access to verified Firebase identity claims or these explicit accounts.
 const isAuthorizedMockMonitor = (identity = {}) => {
-  if (!identity.uid) return false;
+  if (!identity?.uid) return false;
   const email = String(identity.email || "").trim().toLowerCase();
   const role = String(identity.role || "").trim().toLowerCase();
   return identity.admin === true || role === "admin" || role === "tutor" ||
