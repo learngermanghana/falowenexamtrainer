@@ -15,6 +15,7 @@ import {
   A1_FINAL_MOCK_ID,
   A1_FINAL_MOCK_STORAGE_KEY,
   saveA1MockAttempt,
+  reportA1MockIntegrityEvent,
   scoreA1MockWriting,
   startA1MockAttempt,
 } from "../services/a1FinalMockService";
@@ -387,7 +388,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       return { ...current, integrity: appendA1MockIntegrityEvent(current.integrity, type, current.stage, at) };
     });
     setIntegrityNotice(A1_INTEGRITY_MESSAGES[type] || "Exam activity recorded for review.");
-  }, [integrityActive]);
+    void reportA1MockIntegrityEvent({ idToken, attemptId: exam.attemptInfo?.attemptId, type, section: exam.stage });
+  }, [integrityActive, idToken, exam.attemptInfo?.attemptId, exam.stage]);
 
   useEffect(() => {
     if (!integrityActive) return undefined;
