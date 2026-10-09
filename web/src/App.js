@@ -1538,38 +1538,49 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
-        {!sampleId ? (
-          <div
-            className="exam-room-level-picker"
-            style={{
-              ...styles.card,
-              margin: 0,
-              padding: "10px 14px",
-              display: "flex",
-              gap: 12,
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <label htmlFor="exam-level-selector" style={{ fontSize: 13, fontWeight: 750 }}>
-              Exam level
-            </label>
-            <select
-              id="exam-level-selector"
-              aria-label="Exam level"
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8, maxWidth: 150, minWidth: 92 }}
-            >
-              {accessibleLevels.map((option) => (
-                <option key={option} value={option}>{option}</option>
-              ))}
-            </select>
-            <small style={{ ...styles.helperText, margin: 0, flex: "1 1 190px" }}>
-              Practise your current or a lower level. Your Course Book level stays unchanged.
+        <div
+          className="exam-room-level-picker"
+          style={{
+            ...styles.card,
+            margin: 0,
+            padding: "10px 14px",
+            display: "grid",
+            gap: 8,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
+            <strong style={{ fontSize: 13 }}>Exam level</strong>
+            <small style={{ ...styles.helperText, margin: 0 }}>
+              Your Course Book level stays unchanged.
             </small>
           </div>
-        ) : null}
+          <div role="group" aria-label="Choose exam practice level" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {accessibleLevels.map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-pressed={level === option}
+                onClick={() => {
+                  if (option === level) return;
+                  setLevel(option);
+                  // A sample URL contains its original CEFR level; leave it before switching.
+                  if (sampleId) navigate(`/exams/${examSection}`);
+                }}
+                style={{
+                  ...(level === option ? styles.navButtonActive : styles.navButton),
+                  minWidth: 58,
+                  textAlign: "center",
+                  padding: "8px 14px",
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+          <small style={{ ...styles.helperText, margin: 0 }}>
+            Choose your current level or any lower level for mock exams, Lesen, Hören, Schreiben and Sprechen.
+          </small>
+        </div>
 
         {activeExamHero ? (
           <section
