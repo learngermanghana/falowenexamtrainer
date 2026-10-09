@@ -31,6 +31,8 @@ on:
       - 'web/src/components/A1ReadingPracticeSamples.jsx'
       - 'web/src/components/A2ReadingPracticeSamples.jsx'
       - 'web/src/components/ExamsOverviewPage.js'
+      - 'web/src/components/ExamsOverviewPage.css'
+      - 'web/src/components/ExamsOverviewPage.test.jsx'
       - 'web/src/components/ExamRoomSectionNavigation.test.js'
       - '.github/workflows/exams-room-section-navigation.yml'
   push:
@@ -65,6 +67,8 @@ on:
       - 'web/src/components/A1ReadingPracticeSamples.jsx'
       - 'web/src/components/A2ReadingPracticeSamples.jsx'
       - 'web/src/components/ExamsOverviewPage.js'
+      - 'web/src/components/ExamsOverviewPage.css'
+      - 'web/src/components/ExamsOverviewPage.test.jsx'
       - 'web/src/components/ExamRoomSectionNavigation.test.js'
       - '.github/workflows/exams-room-section-navigation.yml'
 
@@ -82,8 +86,8 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - name: Navigation regression
-        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js
+      - name: Overview and navigation regression
+        run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js src/components/ExamsOverviewPage.test.jsx src/data/examResourcesRemoval.test.js
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
       - name: B1 four-module mock guidance and recovery regression
