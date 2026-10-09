@@ -153,8 +153,8 @@ const capB1SpeakingMarksToSubmittedAnswers = (result = {}, attempts = []) => {
       maxScore,
     };
   }
-  const score = Number(Object.values(caps).reduce((sum, maxScore, index) =>
-    sum + Number(parts[Object.keys(caps)[index]].score || 0), 0).toFixed(1));
+  const score = Number(Object.keys(caps).reduce((sum, key) =>
+    sum + Number(parts[key].score || 0), 0).toFixed(1));
   return {
     ...result,
     parts,
