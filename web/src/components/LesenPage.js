@@ -4,15 +4,11 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
 import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
+import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
+import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
 
 const lesenLevels = [
-  {
-    level: "B1",
-    description: "Lesen sample PDF.",
-    url: "https://drive.google.com/file/d/1Iqho5cIe_2RJKz66JMfA22LGHoYwurfy/view?usp=sharing",
-    actionLabel: "Open B1 Lesen sample",
-  },
   {
     level: "B2",
     description: "PDF coming soon.",
@@ -31,9 +27,10 @@ const C1_READING_PRACTICE_SAMPLES = Object.freeze([
 ]);
 
 const sampleMetaForLevel = (level) => {
-  const samples = level === "A2" ? A2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
-  const questionCount = level === "A2" ? 20 : 15;
-  const partCount = level === "A2" ? 4 : 3;
+  const samples = level === "B1" ? B1_READING_PRACTICE_SAMPLES :
+    level === "A2" ? A2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
+  const questionCount = level === "B1" ? 30 : level === "A2" ? 20 : 15;
+  const partCount = level === "B1" ? 5 : level === "A2" ? 4 : 3;
 
   return samples.map((sample, index) => ({
     id: sample.id,
@@ -112,7 +109,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
     return <C1FinalMockExamPage />;
   }
 
-  if (normalizedLevel === "A1" || normalizedLevel === "A2") {
+  if (["A1", "A2", "B1"].includes(normalizedLevel)) {
     const samples = sampleMetaForLevel(normalizedLevel);
     const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
 
@@ -137,7 +134,9 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
       );
     }
 
-    return normalizedLevel === "A2" ? (
+    return normalizedLevel === "B1" ? (
+      <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
+    ) : normalizedLevel === "A2" ? (
       <A2ReadingPracticeSamples initialSampleId={selected.id} standalone />
     ) : (
       <A1ReadingPracticeSamples initialSampleId={selected.id} standalone />
