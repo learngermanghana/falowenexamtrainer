@@ -41,13 +41,13 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).not.toMatch(/Frauensachen|Berufswahl|vor 50 Jahren/i);
   });
 
-  test("keeps Day 21 fully focused on weekend planning with a separate Teil 4 Hören", () => {
+  test("keeps Day 21 weekend planning as Lesen-only without Teil 4", () => {
     const source = readComponent("A2Day21EinWochenendePlanenWorkbookPage.js");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain('chapter="8.21"');
-    expect(A2_READING_TASKS[21].title).toBe("Unser Wochenende in Köln");
-    expect(A2_LISTENING_TASKS[21].audioUrl).toBe("https://youtu.be/Qg0tQFveI0M");
-    expect(A2_LISTENING_TASKS[21].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_READING_TASKS[21].title).toBe("Ein Wochenende planen (Anzeigen & Aushänge)");
+    expect(A2_LISTENING_TASKS[21].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[21].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(A2_LISTENING_TASKS[21].audioUrl).not.toContain("LlXsNA1a8lc");
     expect(source).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
