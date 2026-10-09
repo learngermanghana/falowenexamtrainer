@@ -195,8 +195,9 @@ for (const day of expectedDays) {
     fail(label, `workbook chapter ${wrapper.chapter} does not match canonical chapter ${reading.chapter}`);
   }
 
-  if (!Array.isArray(reading.questions) || reading.questions.length !== 5) {
-    fail(label, `Lesen must have exactly 5 questions; found ${reading.questions?.length ?? 0}`);
+  const expectedReadingCount = day === 19 ? 7 : 5;
+  if (!Array.isArray(reading.questions) || reading.questions.length !== expectedReadingCount) {
+    fail(label, `Lesen must have exactly ${expectedReadingCount} questions; found ${reading.questions?.length ?? 0}`);
   }
 
   const manifestEntry = manifestById.get(expectedAssignmentId);
@@ -206,8 +207,8 @@ for (const day of expectedDays) {
   }
 
   const readingAnswers = sortedAnswers(manifestEntry.answers?.teil3);
-  if (readingAnswers.length !== 5) {
-    fail(label, `manifest Teil 3 must contain exactly 5 answers; found ${readingAnswers.length}`);
+  if (readingAnswers.length !== expectedReadingCount) {
+    fail(label, `manifest Teil 3 must contain exactly ${expectedReadingCount} answers; found ${readingAnswers.length}`);
   }
   reading.questions.forEach((question, index) => {
     const answer = readingAnswers[index];
