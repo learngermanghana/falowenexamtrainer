@@ -550,6 +550,12 @@ export default function C1FinalMockExamPage() {
           <p className="c1-mock-kicker">GOETHE-ZERTIFIKAT C1 · LESEN</p>
           <h1>C1 Lesen Sample 1 abgeschlossen</h1>
           <p>Ihre Antworten für Teil 1 bis Teil 4 wurden gespeichert. Dieses Training gehört zum Lesen-Bereich im Exams Room und ist kein vollständiger C1-Mock.</p>
+          <p><strong>Lesen-Teil 4 von 4 abgeschlossen.</strong> Es gibt hier keine Gesamtprüfung und keine Bestehen/Nichtbestehen-Bewertung für C1.</p>
+          <button type="button" onClick={() => {
+            if (window.confirm("C1 Lesen Sample 1 neu starten? Die bisherigen Antworten auf diesem Gerät werden ersetzt.")) {
+              setState(initialState());
+            }
+          }}>Lesen Sample 1 erneut üben</button>
         </section>
       </main>
     );
@@ -572,6 +578,7 @@ export default function C1FinalMockExamPage() {
           </div>
         </div>
         <p className="c1-mock-instruction">{config.intro}</p>
+        <p className="c1-mock-instruction"><strong>C1 Lesen: Teil {Math.max(1, ["teil1", "teil2", "teil3", "teil4"].indexOf(state.stage) + 1)} von 4.</strong> Nur Leseübungen – dies ist kein vollständiger vierteiliger C1-Mock mit Hören, Schreiben und Sprechen. Ihre Antworten werden auf diesem Gerät gespeichert; der Timer läuft während einer Unterbrechung weiter.</p>
       </header>
 
       {!state.started ? (

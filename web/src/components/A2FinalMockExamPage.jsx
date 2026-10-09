@@ -2,6 +2,8 @@ import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
+import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
+import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { useAuth } from "../context/AuthContext";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import {
@@ -191,7 +193,7 @@ const BinaryChoice = ({ name, value, onChange }) => (
 const SectionHeader = ({ label, secondsLeft, attemptInfo }) => (
   <div className="a1-final-mock-sectionbar">
     <div>
-      <span>Current section</span>
+      <span>Full mock · {FULL_MOCK_SKILLS.findIndex((step) => label.startsWith(step.label)) + 1}/4</span>
       <strong>{label}</strong>
     </div>
     <div>
@@ -994,6 +996,7 @@ export default function A2FinalMockExamPage() {
           <p>{attemptLabel}</p>
         </header>
 
+        <FullMockGuide level="A2" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
         <div className="a1-final-mock-scoregrid">
           {["lesen", "hoeren", "schreiben", "sprechen"].map((key) => (
             <div key={key}>
@@ -1076,12 +1079,11 @@ export default function A2FinalMockExamPage() {
           })}
         </section>
 
+        <FullMockRecovery level="A2" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="Completed attempts stay recorded; a retake starts again from Lesen." />
         <div className="a1-final-mock-result-actions">
           <a href="/exams/overview">Continue in Exams Room</a>
           <a href="/exams/speaking">More Sprechen practice</a>
-          <button type="button" onClick={() => startExam({ forceNew: true })} disabled={busy === "start"}>
-            Practice the full mock again
-          </button>
+          
         </div>
 
         <p className="a1-final-mock-certificate-note">
@@ -1103,6 +1105,7 @@ export default function A2FinalMockExamPage() {
           <h1>A2 Final Mock Exam</h1>
           <p>Complete all four sections in order. Your answers are saved automatically. Feedback appears after the full mock is finished.</p>
 
+          <FullMockGuide level="A2" stage="intro" />
           <div className="a1-final-mock-overview">
             <div><strong>Lesen</strong><span>30 min · 25 points</span></div>
             <div><strong>Hören</strong><span>30 min · 25 points</span></div>
@@ -1113,12 +1116,12 @@ export default function A2FinalMockExamPage() {
           <div className="a1-final-mock-rules">
             <strong>Pass mark: 60/100</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
-            <p>Your progress is saved automatically. Completed sections are locked.</p>
+            <p>Your progress is saved automatically. Completed sections are locked. <strong>Leaving does not pause the section timer.</strong> Return to this page to resume the unfinished attempt; it is not a failed mock.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
           <button type="button" className="a1-final-mock-start" onClick={() => startExam()} disabled={busy === "start"}>
-            {busy === "start" ? "Preparing mock …" : "Start A2 Mock"}
+            {busy === "start" ? "Preparing mock …" : "Start or resume all 4 modules"}
           </button>
         </article>
       </main>
@@ -1133,6 +1136,8 @@ export default function A2FinalMockExamPage() {
           {exam.completed ? "Mock complete" : "A2 Final Mock"}
         </span>
       </div>
+
+      {exam.stage !== "result" ? <FullMockGuide level="A2" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
 
       {exam.stage === "lesen" ? renderLesen() : null}
       {exam.stage === "hoeren" ? renderHoeren() : null}

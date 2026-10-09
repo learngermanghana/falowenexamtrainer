@@ -2,6 +2,8 @@ import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
+import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
+import { FULL_MOCK_SKILLS, getFullMockSkillForStage } from "../utils/fullMockProgress";
 import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
 import { scoreB2MockWriting } from "../services/b2FinalMockService";
@@ -55,6 +57,7 @@ const initialState = () => ({
   sprechenResult: null,
   sprechenCompleted: false,
   completedAt: "",
+  attemptNumber: 1,
   resultSyncScoreDocId: "",
   completed: false,
 });
@@ -197,6 +200,7 @@ const readState = () => {
       sprechenCompleted: Boolean(parsed.sprechenCompleted),
       deadlineMs: migratedForward ? null : (Number(parsed.deadlineMs) || null),
       started: migratedForward ? false : Boolean(parsed.started),
+      attemptNumber: Math.max(1, Number(parsed.attemptNumber) || 1),
       completed: Boolean(parsed.completed && parsed.sprechenCompleted),
     };
   } catch (_error) {
@@ -301,6 +305,7 @@ const SectionHeader = ({ stage, secondsLeft }) => {
         ) : null}
       </div>
       <p className="b2-mock-instruction">{config.intro}</p>
+      <p className="b2-mock-instruction"><strong>Module {FULL_MOCK_SKILLS.findIndex((step) => step.key === getFullMockSkillForStage(stage)) + 1} of 4 · {config.module}</strong>. Complete all four exam modules for a final result.</p>
     </header>
   );
 };
@@ -1061,7 +1066,7 @@ export default function B2FinalMockExamPage() {
       percent: finalScore.overall,
       passed: finalScore.passed,
       attemptId,
-      attemptNumber: 1,
+      attemptNumber: Math.max(1, Number(state.attemptNumber) || 1),
       resultType: "final_mock",
       route: "/campus/results",
       sectionScores: finalScore.sectionScores,
@@ -1350,6 +1355,22 @@ export default function B2FinalMockExamPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
+  const completedSkills = [
+    state.teil4Completed ? "lesen" : null,
+    state.hoeren4Completed ? "hoeren" : null,
+    state.schreibenCompleted ? "schreiben" : null,
+    state.sprechenCompleted ? "sprechen" : null,
+  ].filter(Boolean);
+  const restartFullMock = () => {
+    if (!state.resultSyncScoreDocId) return; // Never clear a completed unsynced attempt.
+    setPageError("");
+    setState((current) => ({
+      ...initialState(),
+      attemptNumber: Math.max(1, Number(current.attemptNumber) || 1) + 1,
+    }));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   if (state.completed) {
     const finalScore = buildFinalScore(state);
     return (
@@ -1358,6 +1379,7 @@ export default function B2FinalMockExamPage() {
         <section className="b2-mock-start">
           <p className="b2-mock-kicker">GOETHE-ZERTIFIKAT B2 · FINAL MOCK</p>
           <h1>{finalScore.overall}/100 · {finalScore.passed ? "ALL MODULES PASSED" : "MODULE(S) TO REPEAT"}</h1>
+          <FullMockGuide level="B2" stage="result" completedSkills={completedSkills} complete />
           <div className="b2-mock-final-grid">
             {Object.entries(finalScore.sectionScores).map(([section, score]) => (
               <div key={section}>
@@ -1373,6 +1395,15 @@ export default function B2FinalMockExamPage() {
             <p><strong>Sprechen:</strong> {state.sprechenResult.overall_feedback_en}</p>
           ) : null}
           <p>Goethe-style module rule: each module needs at least 60% — 15/25 in this mock.</p>
+          <FullMockRecovery
+            level="B2"
+            sectionScores={finalScore.sectionScores}
+            onRetake={restartFullMock}
+            retakeDisabled={!state.resultSyncScoreDocId}
+            retakeNote={state.resultSyncScoreDocId
+              ? "This attempt has been saved to your Exam Room history. Retaking will begin again with Lesen."
+              : "Saving your full mock result first. Retake becomes available once your completed result is recorded; do not clear or reset this page."}
+          />
         </section>
       </main>
     );
@@ -1382,12 +1413,21 @@ export default function B2FinalMockExamPage() {
     <main className="b2-mock-shell">
       <AppBackButton label="Back to course" fallbackPath="/campus/course" />
       <SectionHeader stage={state.stage} secondsLeft={secondsLeft} />
+      <FullMockGuide
+        level="B2"
+        stage={state.stage}
+        completedSkills={completedSkills}
+        detail={state.started
+          ? "Your answers are saved on this device. Leaving does not pause a running section timer. Return to continue this unfinished mock."
+          : "This is one full four-module exam, not a single reading or listening exercise. Start this section to continue; your previous work stays saved on this device."}
+      />
 
       {!state.started ? (
         <section className="b2-mock-start">
           <h2>B2 {getStageConfig(state.stage).module} · {getStageConfig(state.stage).title}</h2>
           <p>{getStageConfig(state.stage).intro}</p>
-          <button type="button" onClick={start}>{getStageConfig(state.stage).title} starten</button>
+          <p><strong>Full mock: Lesen → Hören → Schreiben → Sprechen.</strong> Your final result appears only after all four modules.</p>
+          <button type="button" onClick={start}>Start or continue {getStageConfig(state.stage).module} · Module {FULL_MOCK_SKILLS.findIndex((step) => step.key === getFullMockSkillForStage(state.stage)) + 1}/4</button>
         </section>
       ) : state.stage === "sprechen" ? (
         <B2FinalMockSpeaking

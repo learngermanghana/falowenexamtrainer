@@ -13,6 +13,9 @@ import {
 } from "../services/b1FinalMockService";
 import { B1_LISTENING, B1_READING, B1_WRITING_TASKS } from "../data/b1FinalMockData";
 import B1FinalMockSpeaking from "./B1FinalMockSpeaking";
+import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
+import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
+import { B1_MOCK_STEPS, getB1MockProgress, getB1MockPracticeRecommendations } from "../utils/b1MockProgress";
 import "./B1FinalMockExamPage.css";
 
 const SECTION_DURATIONS = Object.freeze({
@@ -120,7 +123,7 @@ const ChoiceList = ({ name, options, value, onChange }) => (
 
 const SectionBar = ({ stage, secondsLeft, attemptInfo }) => (
   <div className="b1-final-sectionbar">
-    <div><span>Current section</span><strong>{SECTION_LABELS[stage]}</strong></div>
+    <div><span>Full mock progress</span><strong>Module {B1_MOCK_STEPS.findIndex((step) => step.key === stage) + 1}/4 · {SECTION_LABELS[stage]}</strong></div>
     <div><span>Time left</span><strong className={secondsLeft <= 120 ? "warning" : ""}>{formatTime(secondsLeft)}</strong></div>
     <div><span>Attempt</span><strong>{attemptInfo?.firstAttempt ? "Readiness 1" : `Practice ${attemptInfo?.attemptNumber || ""}`}</strong></div>
   </div>
@@ -214,6 +217,7 @@ export default function B1FinalMockExamPage() {
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
+  const [confirmIncompleteHoeren, setConfirmIncompleteHoeren] = useState(false);
   const saveTimerRef = useRef(null);
   const timeoutHandledRef = useRef("");
   const completionSavedRef = useRef("");
@@ -483,6 +487,18 @@ export default function B1FinalMockExamPage() {
     ...current, hoerenAnswers: { ...current.hoerenAnswers, [key]: value },
   }));
 
+  const mockProgress = getB1MockProgress(exam.stage, exam.sectionScores);
+  const hoerenAudioFinished = B1_LISTENING.filter((part) => exam.hoerenAudio?.[part.id] === "ended").length;
+  const hoerenAnswered = hoerenQuestions.filter((question) => Boolean(exam.hoerenAnswers?.[question.key])).length;
+  const hoerenIncomplete = hoerenAudioFinished < B1_LISTENING.length || hoerenAnswered < hoerenQuestions.length;
+  const confirmHoerenFinish = () => {
+    if (secondsLeft > 0 && hoerenIncomplete) {
+      setConfirmIncompleteHoeren(true);
+      return;
+    }
+    submitHoeren();
+  };
+
   if (exam.stage === "intro") {
     return (
       <main className="b1-final-shell">
@@ -490,19 +506,22 @@ export default function B1FinalMockExamPage() {
         <header className="b1-final-hero">
           <p>B1 · Day 29 · Complete mock</p>
           <h1>GOETHE-ZERTIFIKAT B1 Mock 1</h1>
-          <p>Complete Lesen, Hören, Schreiben and Sprechen under exam-style conditions. Your progress is autosaved.</p>
+          <p>This is <strong>one four-section exam</strong>, not four separate short mocks. You must finish Lesen, Hören, Schreiben <strong>and</strong> Sprechen to receive your final result.</p>
         </header>
         <section className="b1-final-rules">
           <h2>Before you start</h2>
+          <FullMockGuide level="B1" stage="intro" />
           <div className="b1-final-duration-grid">
             <div><strong>Lesen</strong><span>65 min</span></div>
             <div><strong>Hören</strong><span>40 min</span></div>
             <div><strong>Schreiben</strong><span>75 min</span></div>
             <div><strong>Sprechen</strong><span>20 min</span></div>
           </div>
+          <p><strong>How it works:</strong> Finish Lesen (1 of 4), then Hören (2 of 4), Schreiben (3 of 4), and Sprechen (4 of 4). Hören contains four audio Teile, and Sprechen has three speaking tasks.</p>
+          <p><strong>If you leave early:</strong> Your answers are saved. Return to this mock to continue your unfinished attempt; the section timer is <strong>not paused</strong> while you are away. An unfinished mock is not a failed mock.</p>
           <p>Audio parts can only be started once in the active attempt. The speaking partner audio already contains the response windows.</p>
           <button type="button" className="b1-final-primary" onClick={() => startExam()} disabled={busy === "start"}>
-            {busy === "start" ? "Starting …" : "Start B1 mock"}
+            {busy === "start" ? "Opening mock …" : "Start or resume complete B1 mock"}
           </button>
           {error ? <p className="b1-final-error">{error}</p> : null}
         </section>
@@ -513,16 +532,19 @@ export default function B1FinalMockExamPage() {
   if (exam.stage === "result") {
     const entries = Object.entries(exam.sectionScores || {});
     const sorted = [...entries].sort((a, b) => Number(b[1]) - Number(a[1]));
+    const recommendations = getB1MockPracticeRecommendations(exam.sectionScores);
+    const weakest = recommendations[0];
     return (
       <main className="b1-final-shell">
         <AppBackButton label="Back to Exams Room" fallbackPath="/exams/overview" />
         <header className="b1-final-hero">
-          <p>B1 Mock 1 · Result</p>
+          <p>B1 Mock 1 · All four sections completed</p>
           <h1>{exam.overall?.score || 0}%</h1>
           <p className={exam.overall?.passed ? "b1-final-pass" : "b1-final-needs-work"}>
             {exam.overall?.passed ? "PASS" : "NEEDS MORE PRACTICE"}
           </p>
         </header>
+        <FullMockGuide level="B1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
         <section className="b1-final-result-grid">
           {entries.map(([key, score]) => (
             <div key={key}><span>{SECTION_LABELS[key]}</span><strong>{score}/25</strong></div>
@@ -530,12 +552,14 @@ export default function B1FinalMockExamPage() {
         </section>
         <section className="b1-final-rules">
           <p><strong>Strongest:</strong> {SECTION_LABELS[sorted[0]?.[0]] || "—"}</p>
-          <p><strong>Practise next:</strong> {SECTION_LABELS[sorted[sorted.length - 1]?.[0]] || "—"}</p>
+          <p><strong>Practise next:</strong> {weakest?.label || SECTION_LABELS[sorted[sorted.length - 1]?.[0]] || "—"}{weakest ? ` (${weakest.score}/25)` : ""}</p>
+          <p>{exam.overall?.passed
+            ? "You completed the full mock. You can strengthen any weaker module before your next attempt."
+            : "You have completed the whole mock, but your overall score needs improvement. You do not have to restart immediately: practise the sections that need work, then retake the full mock when ready."}</p>
+          <FullMockRecovery level="B1" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="A new full attempt begins with Lesen. Your completed result stays in the history." />
           {exam.schreibenResult?.overall_feedback_en ? <p>{exam.schreibenResult.overall_feedback_en}</p> : null}
           {exam.speakingResult?.overall_feedback_en ? <p>{exam.speakingResult.overall_feedback_en}</p> : null}
-          <button type="button" className="b1-final-primary" onClick={() => startExam({ forceNew: true })} disabled={busy === "start"}>
-            Start another practice attempt
-          </button>
+
         </section>
       </main>
     );
@@ -543,8 +567,13 @@ export default function B1FinalMockExamPage() {
 
   return (
     <main className="b1-final-shell">
-      <AppBackButton label="Leave mock" fallbackPath="/campus/course" />
+      <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
       <SectionBar stage={exam.stage} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+      <FullMockGuide level="B1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} />
+      <p className="b1-final-small-note" role="status">
+        Section {mockProgress.currentIndex + 1} of 4 · Completing this section will open
+        {mockProgress.nextStep ? ` ${mockProgress.nextStep.label}` : " your final result"}. Do not leave after only one section.
+      </p>
       {error ? <p className="b1-final-error">{error}</p> : null}
 
       {exam.stage === "lesen" ? (
@@ -668,16 +697,21 @@ export default function B1FinalMockExamPage() {
             ))}
           </ReadingPart>
 
-          <button type="button" className="b1-final-primary b1-final-submit" onClick={submitLesen}>Finish Lesen and continue</button>
+          <button type="button" className="b1-final-primary b1-final-submit" onClick={submitLesen}>Finish Lesen (1/4) → Hören (2/4)</button>
         </>
       ) : null}
 
       {exam.stage === "hoeren" ? (
         <>
-          <header className="b1-final-module-header"><p>GOETHE-ZERTIFIKAT B1</p><h1>Hören</h1></header>
+          <header className="b1-final-module-header">
+            <p>GOETHE-ZERTIFIKAT B1 · Module 2 of 4</p>
+            <h1>Hören</h1>
+            <p>This module has <strong>four separate audio Teile</strong>. Complete all four before moving to Schreiben.</p>
+            <p><strong>{hoerenAudioFinished}/4 audio Teile finished · {hoerenAnswered}/30 questions answered</strong></p>
+          </header>
           {B1_LISTENING.map((part, partIndex) => (
             <section className="b1-final-paper" key={part.id}>
-              <div className="b1-final-part-heading"><h2>{part.title}</h2></div>
+              <div className="b1-final-part-heading"><h2>{part.title} · Audio {partIndex + 1} of 4</h2></div>
               <LockedAudio
                 part={part}
                 idToken={idToken}
@@ -701,9 +735,21 @@ export default function B1FinalMockExamPage() {
               ))}
             </section>
           ))}
-          <button type="button" className="b1-final-primary b1-final-submit" onClick={submitHoeren}>
-            Finish Hören and continue
-          </button>
+          {confirmIncompleteHoeren ? (
+            <div className="b1-final-hoeren-check" role="alert">
+              <strong>Hören is not yet complete.</strong>
+              <p>You have finished {hoerenAudioFinished} of 4 audio Teile and answered {hoerenAnswered} of 30 questions.
+                Moving on now will score the missing answers as incorrect. It will not finish the full four-module mock.</p>
+              <div>
+                <button type="button" onClick={() => setConfirmIncompleteHoeren(false)}>Go back and finish Hören</button>
+                <button type="button" className="b1-final-primary" onClick={submitHoeren}>Finish Hören anyway → Schreiben</button>
+              </div>
+            </div>
+          ) : (
+            <button type="button" className="b1-final-primary b1-final-submit" onClick={confirmHoerenFinish}>
+              Finish Hören (2/4) → Schreiben (3/4)
+            </button>
+          )}
         </>
       ) : null}
 
@@ -737,7 +783,7 @@ export default function B1FinalMockExamPage() {
             );
           })}
           <button type="button" className="b1-final-primary b1-final-submit" onClick={submitSchreiben} disabled={busy === "schreiben"}>
-            {busy === "schreiben" ? "Marking Schreiben …" : "Finish Schreiben and continue"}
+            {busy === "schreiben" ? "Marking Schreiben …" : "Finish Schreiben (3/4) → Sprechen (4/4)"}
           </button>
         </>
       ) : null}

@@ -7,12 +7,22 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
-      - 'web/src/components/A1FinalMockExamPage.jsx'
-      - 'web/src/components/A2FinalMockExamPage.jsx'
-      - 'web/src/components/B1FinalMockExamPage.jsx'
-      - 'web/src/components/B2FinalMockExamPage.jsx'
       - 'web/src/services/mockWritingSubmissionError.js'
       - 'web/src/services/mockWritingSubmissionError.test.js'
+      - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/A1FinalMockExamPage.jsx'
+      - 'web/src/components/A2FinalMockExamPage.jsx'
+      - 'web/src/components/B2FinalMockExamPage.jsx'
+      - 'web/src/components/C1FinalMockExamPage.jsx'
+      - 'web/src/components/FullMockGuidance.jsx'
+      - 'web/src/components/FullMockGuidance.css'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/utils/fullMockProgress.js'
+      - 'web/src/utils/fullMockProgress.test.js'
+      - 'web/src/components/B1FinalMockExamPage.css'
+      - 'web/src/components/MockExamLibraryPage.js'
+      - 'web/src/utils/b1MockProgress.js'
+      - 'web/src/utils/b1MockProgress.test.js'
       - 'web/src/components/B1ReadingPracticeSamples.jsx'
       - 'web/src/components/B1ExamRoomNavigation.test.js'
       - 'web/src/data/b1ReadingPracticeSamples.js'
@@ -31,12 +41,22 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
-      - 'web/src/components/A1FinalMockExamPage.jsx'
-      - 'web/src/components/A2FinalMockExamPage.jsx'
-      - 'web/src/components/B1FinalMockExamPage.jsx'
-      - 'web/src/components/B2FinalMockExamPage.jsx'
       - 'web/src/services/mockWritingSubmissionError.js'
       - 'web/src/services/mockWritingSubmissionError.test.js'
+      - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/A1FinalMockExamPage.jsx'
+      - 'web/src/components/A2FinalMockExamPage.jsx'
+      - 'web/src/components/B2FinalMockExamPage.jsx'
+      - 'web/src/components/C1FinalMockExamPage.jsx'
+      - 'web/src/components/FullMockGuidance.jsx'
+      - 'web/src/components/FullMockGuidance.css'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/utils/fullMockProgress.js'
+      - 'web/src/utils/fullMockProgress.test.js'
+      - 'web/src/components/B1FinalMockExamPage.css'
+      - 'web/src/components/MockExamLibraryPage.js'
+      - 'web/src/utils/b1MockProgress.js'
+      - 'web/src/utils/b1MockProgress.test.js'
       - 'web/src/components/B1ReadingPracticeSamples.jsx'
       - 'web/src/components/B1ExamRoomNavigation.test.js'
       - 'web/src/data/b1ReadingPracticeSamples.js'
@@ -66,6 +86,10 @@ jobs:
         run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
+      - name: B1 four-module mock guidance and recovery regression
+        run: npx jest --runInBand --runTestsByPath src/utils/b1MockProgress.test.js
+      - name: A1-C2 mock completion and availability regression
+        run: npx jest --runInBand --runTestsByPath src/utils/fullMockProgress.test.js
       - name: Recoverable mock Schreiben error regression
         run: npx jest --runInBand --runTestsByPath src/services/mockWritingSubmissionError.test.js
       - name: Direct web compile
