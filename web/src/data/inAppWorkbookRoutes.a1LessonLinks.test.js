@@ -209,7 +209,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   });
 
   it("keeps the A1 Day 4 resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
+    expect(getTeacherVideoUrls(4, "2")).toEqual(["https://youtu.be/XFZbjeKFgxw"]);
     expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");
     expect(getA1GrammarRoute({ day: 4, chapter: "2" })).toBe(
       "/campus/course/german-numbers-1-10-with-pronunciation",
