@@ -5184,6 +5184,57 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
   }
 });
+
+const A1_MOCK_INTEGRITY_KINDS = new Set([
+  "tab_hidden", "window_blur", "fullscreen_exit", "paste_attempt", "copy_attempt",
+]);
+const A1_MOCK_INTEGRITY_SECTIONS = new Set(["lesen", "hoeren", "schreiben", "sprechen"]);
+
+// Append a small server-timestamped review trail. This does not detect ChatGPT
+// and MUST NOT automatically reduce scores or accuse students of cheating.
+app.post("/a1-mock/attempt/integrity-event", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 130);
+    const type = String(req.body?.type || "").trim();
+    const section = String(req.body?.section || "").trim();
+    if (!attemptId || !A1_MOCK_INTEGRITY_KINDS.has(type) ||
+        !A1_MOCK_INTEGRITY_SECTIONS.has(section)) {
+      return res.status(400).json({ error: "Invalid mock integrity event." });
+    }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+    const ref = db.collection("a1MockExamUsers").doc(authedUser.uid)
+      .collection("attempts").doc(attemptId);
+    let outcome = "saved";
+    await db.runTransaction(async tx => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) { outcome = "not_found"; return; }
+      const data = snap.data() || {};
+      if ((data.uid && data.uid !== authedUser.uid) || data.status === "completed") {
+        outcome = "unavailable"; return;
+      }
+      const old = data.integrityAudit || {};
+      const counts = Object.fromEntries([...A1_MOCK_INTEGRITY_KINDS].map(key =>
+        [key, Math.min(250, Math.max(0, Math.floor(Number(old.counts?.[key]) || 0)))]));
+      const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      if (total >= 250) { outcome = "limit_reached"; return; }
+      counts[type] += 1;
+      const events = [...(Array.isArray(old.events) ? old.events : []),
+        { type, section, at: new Date().toISOString() }].slice(-30);
+      tx.set(ref, { integrityAudit: { counts, events,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp() } }, { merge: true });
+    });
+    if (outcome === "not_found") return res.status(404).json({ error: "Mock attempt not found." });
+    if (outcome === "unavailable") return res.status(409).json({ error: "Mock attempt is not active." });
+    return res.json({ ok: true, limited: outcome === "limit_reached" });
+  } catch (error) {
+    console.error("A1 mock integrity audit failed", error);
+    return res.status(500).json({ error: "Could not record exam activity." });
+  }
+});
+
 app.post("/a2-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
