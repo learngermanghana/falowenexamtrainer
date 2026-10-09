@@ -32,12 +32,16 @@
   const isA2B1CourseLesson = (pathname = window.location.pathname) =>
     matchesCourseLevel(A2_B1_LEVELS, pathname);
 
-  const isGrammarViewActive = (pathname = window.location.pathname) => {
+  const isSpeakingViewInactive = (pathname = window.location.pathname) => {
     if (!isA2B1CourseLesson(pathname)) return false;
     const path = normalizePath(pathname);
 
-    // Dedicated grammar-note routes should never carry a speaking coach.
+    // The speaking coach belongs exclusively to Teil 1 on A2/B1 workbook pages.
     if (/(?:grammar|grammatik)(?:-notes)?(?:\/|$)/.test(path)) return true;
+    const view = new URLSearchParams(window.location.search).get("view");
+    if (view && !["sprechen", "teil1", "workbook", "radio"].includes(view.toLowerCase())) return true;
+    const selectedTabs = Array.from(document.querySelectorAll('[data-workbook-tab-navigation] [role="tab"][aria-selected="true"]'));
+    if (selectedTabs.length) return !selectedTabs.some((tab) => /teil\s*1|sprechen/i.test(String(tab.getAttribute("aria-label") || tab.textContent || "")));
 
     // Shared A2/B1 workbook navigation exposes the active tab accessibly.
     const selectedGrammarTab = Array.from(
@@ -113,7 +117,7 @@
 
   const cleanCourseSpeakingChat = () => {
     if (!isCourseLesson()) return false;
-    if (isGrammarViewActive()) return hideA2B1GrammarSpeakingChat();
+    if (isSpeakingViewInactive()) return hideA2B1GrammarSpeakingChat();
     return restoreCourseSpeakingChat();
   };
 
@@ -150,5 +154,5 @@
   [100, 350, 800, 1500, 2600].forEach((delay) => window.setTimeout(scheduleCleanup, delay));
 
   window.cleanCourseSpeakingChat = cleanCourseSpeakingChat;
-  window.isA2B1GrammarViewActive = isGrammarViewActive;
+  window.isA2B1GrammarViewActive = isSpeakingViewInactive;
 })();
