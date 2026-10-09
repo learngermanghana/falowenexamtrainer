@@ -13,7 +13,7 @@ const statusLabel = (status) => {
 export default function MockExamLibraryPage() {
   const navigate = useNavigate();
   const { level } = useExam();
-  const mocks = getMockExamsForLevel(level);
+  const mocks = getMockExamsForLevel(level, { includeCourse: true });
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -21,7 +21,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Practise a complete exam under timed conditions and review your result when you finish.
+          Choose a full timed mock when available, or practise exam sections in the course preview. Preview practice does not yet generate one final combined score.
         </p>
       </section>
 

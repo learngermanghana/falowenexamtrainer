@@ -10,6 +10,7 @@ import {
   subscribeTutorReviewsForStudent,
 } from "../services/tutorReviewService";
 import { styles } from "../styles";
+import { loadDailyWarmupProgress, saveDailyWarmupProgress } from "../services/examRoomDashboardService";
 
 const STORAGE_KEY = "falowen_exam_warmup_progress";
 const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
@@ -669,6 +670,19 @@ const QuestionOfDayPage = () => {
     return "";
   }, [dailyTask, activeLevel, todayLabel]);
 
+  useEffect(() => {
+    if (!user?.uid) return undefined;
+    let cancelled = false;
+    loadDailyWarmupProgress({ userId: user.uid, level: activeLevel })
+      .then((record) => {
+        if (cancelled || !record?.practised) return;
+        setPractised(true);
+        if (record.submittedToTutor) setSubmittedToTutor(true);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [activeLevel, user?.uid]);
+
   const saveWarmupLocally = ({ submittedToTutor = false, reviewId = "", sentOnWhatsapp = false } = {}) => {
     try {
       const key = getProgressKey(activeLevel);
@@ -697,6 +711,14 @@ const QuestionOfDayPage = () => {
     } catch {
       setPractised(true);
       setSubmittedToTutor(Boolean(submittedToTutor));
+    }
+    if (user?.uid) {
+      void saveDailyWarmupProgress({
+        userId: user.uid,
+        level: activeLevel,
+        taskType: dailyTask?.type || "warm-up",
+        submittedToTutor,
+      });
     }
   };
 

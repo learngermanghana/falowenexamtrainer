@@ -97,6 +97,7 @@ const {
   syncB1MockCompletion,
 } = require("./b1MockCompletionSync");
 const { syncExamRoomResult } = require("./examRoomResultSync");
+const { getStudentExamRoomHistory } = require("./examRoomHistory");
 
 const ATTENDANCE_CHECKIN_SOURCES = new Set(["falowen_student_app", "public_checkin"]);
 const normalizeStudentCodeForAttendance = (value) => String(value || "").trim();
@@ -1681,6 +1682,32 @@ app.post("/exam-room/results", async (req, res) => {
     const message = error?.message || "Could not save this Exams Room result.";
     const status = /required|valid|greater than|non-negative/i.test(message) ? 400 : 500;
     return res.status(status).json({ error: message });
+  }
+});
+
+// Only return Exam Room attempts owned by the authenticated student. Never scan
+// scores without the Firebase uid constraint or accept an arbitrary student code.
+app.get("/exam-room/results", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Result storage is unavailable." });
+    const level = String(req.query.level || "").trim().toUpperCase();
+    if (level && !["A1", "A2", "B1", "B2", "C1", "C2"].includes(level)) {
+      return res.status(400).json({ error: "Invalid exam level." });
+    }
+
+    const { results, limited } = await getStudentExamRoomHistory({
+      db,
+      uid: authedUser.uid,
+      level,
+    });
+    return res.json({ ok: true, results, limited });
+  } catch (error) {
+    console.error("exam_room_result_read_failed", error?.message || error);
+    return res.status(500).json({ error: "Could not load Exam Room results." });
   }
 });
 

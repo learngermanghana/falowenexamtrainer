@@ -22,7 +22,8 @@ describe("Exams Room navigation cleanup", () => {
       path.join(process.cwd(), "src", "components", "ExamsOverviewPage.js"),
       "utf8"
     );
-    expect(overview).toContain("review your Exam File");
+    expect(overview).toContain("Review your Exam File");
+    expect(overview).toContain("Practise the four exam skills");
     expect(overview).not.toContain("review your exam resources");
   });
 });
