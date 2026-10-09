@@ -85,19 +85,65 @@ describe("Study Buddy conversation memory", () => {
     expect(request.payload.message).toContain("do not reveal the correct option before the student has tried");
   });
 
-  it("treats Falowen navigation questions as in-scope and supplies the canonical Course Book path", async () => {
-    callAI.mockResolvedValue({ reply: "Tap Learn to open your Course Book." });
-
-    await requestStudyBuddyReply({
+  it("answers the canonical Course Book route without relying on an AI-generated link", async () => {
+    const response = await requestStudyBuddyReply({
       message: "Where can I access my course book?",
       level: "A2",
       idToken: "",
     });
 
+    expect(response.reply).toContain("Course Book");
+    expect(response.reply).toContain("https://www.falowen.app/campus/course");
+    expect(response.navigation).toBe("courseBook");
+    expect(callAI).not.toHaveBeenCalled();
+  });
+
+  it("takes the student's exact Results question to Results, never Exams Room", async () => {
+    const response = await requestStudyBuddyReply({
+      message: "How can I access my result?",
+      level: "B1",
+      idToken: "",
+    });
+    expect(response.navigation).toBe("results");
+    expect(response.reply).toContain("https://www.falowen.app/campus/results");
+    expect(response.reply).not.toContain("https://www.falowen.app/exams/overview");
+    expect(callAI).not.toHaveBeenCalled();
+    expect(readStudyBuddyConversationHistory({ idToken: "", level: "B1" })).toEqual([
+      { role: "user", content: "How can I access my result?" },
+      { role: "assistant", content: response.reply },
+    ]);
+  });
+
+  it("keeps mock results distinct from starting or resuming a mock", async () => {
+    const result = await requestStudyBuddyReply({
+      message: "Where can I check my B1 exam results?",
+      level: "B1",
+      idToken: "",
+    });
+    const exam = await requestStudyBuddyReply({
+      message: "Where can I start a B1 mock exam?",
+      level: "B1",
+      idToken: "",
+    });
+    expect(result.navigation).toBe("results");
+    expect(result.reply).toContain("/campus/results");
+    expect(exam.navigation).toBe("exams");
+    expect(exam.reply).toContain("/exams/overview");
+    expect(callAI).not.toHaveBeenCalled();
+  });
+
+  it("does not hijack grammar learning questions", async () => {
+    callAI.mockResolvedValue({ reply: "Mit is followed by Dativ." });
+    const response = await requestStudyBuddyReply({
+      message: "Why is mit followed by Dativ?",
+      level: "A2",
+      idToken: "",
+    });
+    expect(response.reply).toBe("Mit is followed by Dativ.");
+    expect(callAI).toHaveBeenCalledTimes(1);
     const prompt = callAI.mock.calls[0][0].payload.message;
     expect(prompt).toContain("FALOWEN NAVIGATION SUPPORT (authoritative)");
-    expect(prompt).toContain("tap/click the visible Learn navigation item");
-    expect(prompt).toContain("https://www.falowen.app/campus/course");
+    expect(prompt).toContain("CRITICAL RESULTS VS EXAMS DISTINCTION");
     expect(prompt).toContain("Falowen navigation/support questions are not unrelated");
     expect(prompt).toContain("My Library");
     expect(prompt).toContain("Learning Hub");
