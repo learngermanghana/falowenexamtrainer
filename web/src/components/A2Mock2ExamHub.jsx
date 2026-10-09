@@ -93,6 +93,7 @@ export default function A2Mock2ExamHub(){
   window.scrollTo({top:0,behavior:"smooth"});
  },[]);
  const start = () => {
+  integrity.requestFullscreen();
   setFlow({stage:"lesen",startedAt:Date.now()});
   window.scrollTo({top:0,behavior:"smooth"});
  };
