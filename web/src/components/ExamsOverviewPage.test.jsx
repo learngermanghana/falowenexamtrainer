@@ -116,7 +116,7 @@ describe("simplified Exam Room overview", () => {
     expect(screen.getByText(/Start with Teil 2/)).toBeInTheDocument();
     expect(screen.getByText(/Day 7 · Review and recheck/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText("A1 Lesen sample"));
+    fireEvent.click(screen.getByText(/A1 Lesen sample/));
     expect(screen.getByText("0/5 · 0%")).toBeInTheDocument();
     expect(screen.getByText("4/5 · 80%")).toBeInTheDocument();
   });
