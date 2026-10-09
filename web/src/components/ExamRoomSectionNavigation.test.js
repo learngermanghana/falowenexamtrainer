@@ -57,8 +57,8 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain('onClick={() => navigate("/exams/question")}');
     expect(overviewSource).toContain('onClick={() => navigate("/exams/file")}');
     expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
-    expect(appSource).toContain('{!sampleId ? (');
+    expect(appSource).toContain('role="group" aria-label="Choose exam practice level"');
     expect(appSource).toContain('accessibleLevels.map((option)');
-    expect(appSource).toContain('id="exam-level-selector"');
+    expect(appSource).toContain('aria-pressed={level === option}');
   });
 });
