@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { useAuth } from "../context/AuthContext";
+import { getBackendUrl } from "../services/backendUrl";
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
 import A2Mock2Schreiben from "./A2Mock2Schreiben";
@@ -40,6 +42,7 @@ const initialize = () => {
  return {stage:started ? (first || "result") : "intro", startedAt: started ? Date.now() : null};
 };
 export default function A2Mock2ExamHub(){
+ const { idToken } = useAuth();
  const [flow,setFlow] = useState(initialize);
  const [progress,setProgress] = useState(getProgress);
  const stage = flow.stage;
@@ -52,6 +55,32 @@ export default function A2Mock2ExamHub(){
   window.addEventListener("focus",sync); window.addEventListener("storage",sync);
   return ()=>{window.removeEventListener("focus",sync);window.removeEventListener("storage",sync)};
  },[refresh]);
+ // Lightweight staff monitoring signal: metadata only, never answers or audio.
+ const reportProgress = useCallback(async () => {
+  if (!idToken || stage === "intro") return;
+  const completedSections = ORDER.filter(k => progress[k].done);
+  const sectionData = ORDER.includes(stage) ? read(STORAGE[stage]) : {};
+  const rawStart = Number(sectionData.startedAt);
+  const sectionDeadlineMs = ["lesen", "schreiben"].includes(stage) && rawStart > 0
+    ? rawStart + 30 * 60 * 1000 : null;
+  try {
+   await fetch(`${getBackendUrl()}/internal/mock-progress`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ mockId: "a2-mock-02", section: stage,
+     completedSections, startedAtMs: flow.startedAt, sectionDeadlineMs }),
+   });
+  } catch (_) {
+   // Monitoring must never block the learner's exam or submission.
+  }
+ }, [idToken, stage, progress, flow.startedAt]);
+ useEffect(() => {
+  if (stage === "intro") return undefined;
+  reportProgress();
+  if (stage === "result") return undefined;
+  const interval = window.setInterval(reportProgress, 60000);
+  return () => window.clearInterval(interval);
+ }, [reportProgress, stage]);
  const advance = useCallback(()=>{
   setProgress(getProgress());
   setFlow(current=>{
