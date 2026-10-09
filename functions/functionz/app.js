@@ -5235,6 +5235,77 @@ app.post("/a1-mock/attempt/integrity-event", async (req, res) => {
   }
 });
 
+
+const MOCK_INTEGRITY_ALLOWED_IDS = Object.freeze({
+  A2: new Set(["a2-mock-01", "a2-mock-02"]),
+  B1: new Set(["b1-mock-01"]),
+  B2: new Set(["b2-final-mock"]),
+  C1: new Set(["c1-lesen-sample-01"]),
+});
+const MOCK_INTEGRITY_SECTIONS = /^[a-z0-9-]{2,24}$/i;
+
+// Same bounded activity review signals across all other available mock levels.
+// Browser focus changes do not prove AI use; these records cannot affect scores.
+app.post("/mock/attempt/integrity-event", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    const level = String(req.body?.level || "").trim().toUpperCase();
+    const mockId = String(req.body?.mockId || "").trim();
+    const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const section = String(req.body?.section || "").trim().toLowerCase();
+    const type = String(req.body?.type || "").trim();
+    if (!MOCK_INTEGRITY_ALLOWED_IDS[level]?.has(mockId) ||
+        !MOCK_INTEGRITY_SECTIONS.test(section) ||
+        !A1_MOCK_INTEGRITY_KINDS.has(type)) {
+      return res.status(400).json({ error: "Invalid mock activity report." });
+    }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
+    // A2/B1 full mocks have server-managed attempts; reject made-up IDs.
+    if ((level === "A2" && mockId === "a2-mock-01") || level === "B1") {
+      if (!attemptId) return res.status(400).json({ error: "Mock attempt ID is required." });
+      const parent = level === "A2" ? "a2MockExamUsers" : "b1MockExamUsers";
+      const verified = await db.collection(parent).doc(authedUser.uid)
+        .collection("attempts").doc(attemptId).get();
+      const attempt = verified.exists ? verified.data() || {} : {};
+      if (!verified.exists || attempt.mockId !== mockId ||
+          (attempt.uid && attempt.uid !== authedUser.uid) ||
+          attempt.status === "completed") {
+        return res.status(409).json({ error: "No active mock attempt matches this report." });
+      }
+    }
+    const safeId = [level, authedUser.uid, mockId, attemptId].filter(Boolean).join("_");
+    const ref = db.collection("mockIntegrityMonitor").doc(safeId);
+    let limited = false;
+    await db.runTransaction(async tx => {
+      const snap = await tx.get(ref);
+      const old = snap.exists ? snap.data() || {} : {};
+      const counts = Object.fromEntries([...A1_MOCK_INTEGRITY_KINDS].map(key =>
+        [key, Math.min(250, Math.max(0, Math.floor(Number(old.counts?.[key]) || 0)))]));
+      if (Object.values(counts).reduce((sum, n) => sum + n, 0) >= 250) {
+        limited = true;
+        return;
+      }
+      counts[type] += 1;
+      const events = [...(Array.isArray(old.events) ? old.events : []),
+        { type, section, at: new Date().toISOString() }].slice(-30);
+      tx.set(ref, {
+        uid: authedUser.uid,
+        email: String(authedUser.email || "").slice(0, 200),
+        level, mockId, attemptId, section,
+        counts, events, source: "browser_reported",
+        ...(snap.exists ? {} : { startedAt: admin.firestore.FieldValue.serverTimestamp() }),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+    });
+    return res.json({ ok: true, limited });
+  } catch (error) {
+    console.error("Shared mock integrity audit failed", error);
+    return res.status(500).json({ error: "Could not record mock exam activity." });
+  }
+});
+
 app.post("/a2-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
