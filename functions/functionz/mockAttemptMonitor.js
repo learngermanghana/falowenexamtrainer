@@ -238,7 +238,7 @@ const joinSharedMockIntegrity = (attempts, audits) => {
         level: audit.level,
         mockId: audit.mockId,
         attemptNumber: 1,
-        status: "in_progress",
+        status: "activity_only",
         section: audit.section,
         completedSections: [], progressCount: 0, totalSections: 4,
         sectionDeadlineMs: null,
