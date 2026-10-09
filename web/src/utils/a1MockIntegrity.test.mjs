@@ -25,3 +25,32 @@ test("unexpected event kinds do not become student misconduct flags", () => {
   const current = { counts: {}, events: [] };
   assert.equal(appendA1MockIntegrityEvent(current, "used_chatgpt", "lesen"), current);
 });
+
+test("the shared integrity hook covers all current mock interfaces", async () => {
+  const fs = await import("node:fs");
+  const path = await import("node:path");
+  const names = [
+    "A2FinalMockExamPage.jsx",
+    "B1FinalMockExamPage.jsx",
+    "B2FinalMockExamPage.jsx",
+    "C1FinalMockExamPage.jsx",
+    "A2Mock2ExamHub.jsx",
+  ];
+  for (const name of names) {
+    const contents = fs.readFileSync(path.resolve("web/src/components", name), "utf8");
+    assert.match(contents, /useMockExamIntegrity\(/, name);
+    assert.match(contents, /MockExamIntegrityNotice/, name);
+    assert.match(contents, /onPasteCapture=\{integrity\.onPasteCapture\}/, name);
+    assert.match(contents, /onCopyCapture=\{integrity\.onCopyCapture\}/, name);
+    assert.match(contents, /integrity\.requestFullscreen\(\)/, name);
+  }
+  const hook = fs.readFileSync("web/src/hooks/useMockExamIntegrity.jsx", "utf8");
+  assert.match(hook, /\/mock\/attempt\/integrity-event/);
+  assert.match(hook, /keepalive: true/);
+  const app = fs.readFileSync("functions/functionz/app.js", "utf8");
+  assert.match(app, /app\.post\("\/mock\/attempt\/integrity-event"/);
+  assert.match(app, /A2: new Set/);
+  assert.match(app, /B1: new Set/);
+  assert.match(app, /B2: new Set/);
+  assert.match(app, /C1: new Set/);
+});
