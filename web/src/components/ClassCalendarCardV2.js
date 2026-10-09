@@ -519,6 +519,30 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, ho
           <span style={styles.helperText}>Ask the administrator to create “{selectedClass}” under Live Classes.</span>
         </section>
       )}
+      {homepageCompact && !nextSession && canonicalStatus !== "loading" && (initialClassId || selectedClass) ? (
+        <a
+          href={fullCalendarLink}
+          className="next-class-full-schedule-fallback"
+          style={{
+            ...styles.secondaryButton,
+            width: "100%",
+            minWidth: 0,
+            minHeight: 48,
+            boxSizing: "border-box",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            textAlign: "center",
+            textDecoration: "none",
+            overflowWrap: "anywhere",
+          }}
+        >
+          <span aria-hidden="true">🗓</span>
+          View full class schedule
+          <span aria-hidden="true">→</span>
+        </a>
+      ) : null}
     </div>
   );
 };
