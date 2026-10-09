@@ -13,8 +13,8 @@ const load = () => { try { const value = JSON.parse(localStorage.getItem(KEY)); 
 const count = (s) => s.trim() ? s.trim().split(/\s+/).length : 0;
 const clock = (ms) => { const s = Math.ceil(Math.max(0, ms)/1000); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 const WordCount = ({ value, task }) => <p className="a2-schreiben-count" aria-live="polite">Wörter: <strong>{count(value)}</strong> · Ziel: {task.minWords}–{task.maxWords}</p>;
-export default function A2Mock2Schreiben() {
-  const [draft, setDraft] = useState(load);
+export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
+  const [draft, setDraft] = useState(() => { const v = load(); return embedded && !v.startedAt ? { ...v, startedAt: Date.now() } : v; });
   const [now, setNow] = useState(Date.now());
   const { idToken } = useAuth();
   const [marking, setMarking] = useState(false);
@@ -37,12 +37,14 @@ export default function A2Mock2Schreiben() {
         return { part, score: result.score, maxScore: result.maxScore, feedback: result.feedback, structuredFeedback: result.structuredFeedback };
       }));
       setDraft(old => ({...old, aiFeedback: grades}));
+      if (embedded && onComplete) onComplete();
     } catch (e) { setMarkError(e?.response?.data?.error || e.message || "Bewertung derzeit nicht verfügbar."); }
     finally {setMarking(false);}
   };
   const submit = () => { if (window.confirm("Beide Texte abgeben? Danach können Sie nichts mehr ändern.")) setDraft(old => ({ ...old, submittedAt: Date.now() })); };
+  useEffect(() => { if (embedded && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, done, Boolean(draft.aiFeedback), marking, markError]);
   return <main className="a2-mock2-shell" lang="de">
-    <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Schreiben</span></div>
+    {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Schreiben</span></div> : null}
     {!draft.startedAt ? <section className="a2-mock2-intro"><p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Schreiben</h1><p>Sie haben 30 Minuten für zwei Aufgaben. Teil 1: etwa 10 Minuten, Teil 2: etwa 20 Minuten. Schreiben Sie zu allen drei Punkten und achten Sie auf Anrede und Gruß.</p><div className="a2-mock2-stat"><span>30 Minuten</span><span>2 Aufgaben</span><span>20–30 / 30–40 Wörter</span></div><p>Ihre Entwürfe werden auf diesem Gerät automatisch gespeichert. Die Uhr läuft weiter, wenn Sie die Seite verlassen.</p><button type="button" className="a2-mock2-primary" onClick={start}>Schreiben starten</button></section> : <>
       <header className="a2-mock2-progress"><div><strong>Mock 2 · Schreiben</strong><span>Teil 1 und Teil 2</span></div><strong aria-label="Verbleibende Zeit">{clock(deadline-now)}</strong></header>
       <article className="a2-mock2-paper a2-schreiben-exam">
