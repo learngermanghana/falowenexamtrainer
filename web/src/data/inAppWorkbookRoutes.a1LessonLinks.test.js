@@ -86,7 +86,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
   });
 
   it("keeps the Day 2 Chapter 1.1 resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(2, "1.1")).toContain("https://youtu.be/AjsnO1hxDs4");
+    expect(getTeacherVideoUrls(2, "1.1")).toEqual(["https://youtu.be/xyRogEAA9qM"]);
     expect(getAiVideoUrls(2, "1.1")).toContain("https://youtu.be/kqagu9qsOcc");
     expect(getA1GrammarRoute({ day: 2, chapter: "1.1" })).toBe(
       "/campus/course/singular-pronouns-verb-conjugation-day-2",
@@ -192,24 +192,23 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     expect(layoutSource).not.toContain('position: "sticky"');
   });
 
-  it("keeps both A1 Day 13 teacher videos and uses the new recording as video 2", () => {
+  it("keeps the single current A1 Day 13 chapter 3.5 teacher lecture", () => {
     const teacherVideos = getA1TeacherVideoResources(13).filter(
       (video) => String(video.chapter) === "3.5",
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/eqSc_5p5uyQ",
       "https://youtu.be/zizS5WdOYs8",
     ]);
-    expect(teacherVideos[1]).toMatchObject({
-      videoNumber: 2,
-      key: "a1-day13-chapter-3-5-teacher-video-2",
-      title: "Revision: Numbers, Time and Prices · Teacher video 2",
+    expect(teacherVideos[0]).toMatchObject({
+      videoNumber: 1,
+      key: "a1-day13-chapter-3-5-teacher-video",
+      title: "Revision: Numbers, Time and Prices · Teacher lecture",
     });
   });
 
   it("keeps the A1 Day 4 resources configured for their separate stages", () => {
-    expect(getTeacherVideoUrls(4, "2")).toContain("https://youtu.be/lN7xxSbkPZ4");
+    expect(getTeacherVideoUrls(4, "2")).toEqual(["https://youtu.be/XFZbjeKFgxw"]);
     expect(getAiVideoUrls(4, "2")).toContain("https://youtu.be/GyhH8zPXDy4");
     expect(getA1GrammarRoute({ day: 4, chapter: "2" })).toBe(
       "/campus/course/german-numbers-1-10-with-pronunciation",

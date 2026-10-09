@@ -230,3 +230,28 @@ describe("canonical lesson model", () => {
     );
   });
 });
+
+test("B1 Day 18 chapter 6.18 exposes the assigned teacher lecture, separate from its AI video", () => {
+  const lesson = normalizeA2B1Lesson({
+    day: 18,
+    chapter: "6.18",
+    assignmentId: "B1-6.18",
+    lesen_hören: {
+      chapter: "6.18",
+      workbook_link: "/campus/course/lesson/B1/18?view=workbook",
+    },
+  }, "B1");
+  expect(lesson.resources.teacherVideo).toEqual(
+    expect.objectContaining({
+      chapter: "6.18",
+      title: "Kapitel 6.18 · Teacher lecture video",
+      url: "https://youtu.be/UxCX5OeuqVM",
+    })
+  );
+  const teacherVideos = lesson.resources.videos.filter((video) =>
+    /teacher|tutor lecture/i.test(`${video.key} ${video.title}`)
+  );
+  expect(teacherVideos.map((video) => video.url)).toEqual(["https://youtu.be/UxCX5OeuqVM"]);
+  expect(lesson.resources.aiVideo?.url).not.toBe("https://youtu.be/UxCX5OeuqVM");
+  expect(lesson.submission.assignmentId).toBe("B1-6.18");
+});
