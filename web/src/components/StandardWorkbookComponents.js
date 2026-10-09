@@ -198,8 +198,10 @@ export const WorkbookTabNav = ({
         aria-label={ariaLabel}
         data-workbook-tab-navigation
         style={{
-          position: "relative",
-          zIndex: 30,
+          position: legacyGrammarContext ? "sticky" : "relative",
+          top: legacyGrammarContext ? 0 : undefined,
+          alignSelf: "start",
+          zIndex: 80,
           display: "grid",
           gap: 10,
           width: "100%",
