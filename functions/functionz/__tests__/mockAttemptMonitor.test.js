@@ -129,3 +129,32 @@ test("mock monitor resolves legacy profiles keyed by UID and preserves email fal
   expect(result.attempts.map(row => row.studentName)).toEqual(["Nana Boateng", ""]);
   expect(result.attempts[1].studentEmail).toBe("missing@example.org");
 });
+
+test("A1 monitor exposes bounded browser integrity events without reading answers", () => {
+  const row = normalizeMockAttempt({
+    id: "exam-a", ref: { path: "a1MockExamUsers/uid-a/attempts/exam-a" },
+    data: () => ({
+      status: "in_progress", section: "schreiben",
+      state: { stage: "schreiben", schreibenText: "confidential writing",
+        integrity: { counts: { tab_hidden: 2, paste_attempt: 1, unknown: 100 },
+          events: [
+            { type: "tab_hidden", section: "lesen", at: "2026-10-09T19:30:00Z" },
+            { type: "paste_attempt", section: "schreiben", at: "2026-10-09T19:31:00Z", pastedText: "secret answer" },
+            { type: "unknown", section: "schreiben", at: "2026-10-09T19:32:00Z" },
+          ] },
+      },
+    }),
+  });
+  expect(row.integrity.source).toBe("browser_reported");
+  expect(row.integrity.total).toBe(3);
+  expect(row.integrity.events).toHaveLength(2);
+  expect(row.integrity.counts.unknown).toBeUndefined();
+  expect(JSON.stringify(row)).not.toMatch(/confidential writing|secret answer/);
+});
+test("A1 integrity is absent for legacy attempts rather than inventing violations", () => {
+  const row = normalizeMockAttempt({
+    id: "legacy", ref: { path: "a1MockExamUsers/uid/attempts/legacy" },
+    data: () => ({ status: "in_progress", state: { stage: "lesen" } }),
+  });
+  expect(row.integrity).toBeNull();
+});
