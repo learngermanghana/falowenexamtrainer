@@ -204,7 +204,9 @@ export const A2_LISTENING_TASKS = {
 
   16: {
     chapter: "6.16",
-    mode: A2_LISTENING_MODES.GRADED,
+    // The new Lena/Max recording has not been provided. Keep the task unavailable
+    // so learners are not required to submit an unplayable listening exercise.
+    mode: A2_LISTENING_MODES.NONE,
     task: "Hören Sie das Gespräch zwischen Lena und Max. Wählen Sie für Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
     // A replacement audio recording is required for these new questions.
     audioUrl: "",
