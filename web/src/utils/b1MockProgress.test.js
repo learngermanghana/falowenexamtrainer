@@ -47,11 +47,11 @@ describe("B1 mock completion guidance and recovery", () => {
   });
 
   it("labels all four stages and preserves original attempt and timing behavior", () => {
-    expect(component).toContain('aria-label="B1 full mock exam progress"');
+    expect(component).toContain('<FullMockGuide level="B1"');
     expect(component).toContain("Start or resume complete B1 mock");
     expect(component).toContain("An unfinished mock is not a failed mock.");
     expect(component).toContain("the section timer is <strong>not paused</strong>");
-    expect(component).toContain("Retake full mock (all 4 sections)");
+    expect(component).toContain('<FullMockRecovery level="B1"');
     expect(component).toContain("getB1MockPracticeRecommendations");
     expect(component).toContain('sectionScores: scores');
     expect(component).toContain('stage: "result"');
