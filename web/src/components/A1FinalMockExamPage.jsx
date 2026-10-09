@@ -1,6 +1,7 @@
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
 import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { useAuth } from "../context/AuthContext";
@@ -567,7 +568,7 @@ export default function A1FinalMockExamPage() {
         speakingProgress: exam.speakingProgress || { attempts: {} },
       });
     } catch (markError) {
-      setError(markError?.message || "Could not mark Schreiben.");
+      setError(getMockWritingSubmissionError(markError));
     } finally {
       setBusy("");
     }
