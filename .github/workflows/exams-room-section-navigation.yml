@@ -7,6 +7,12 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/A1FinalMockExamPage.jsx'
+      - 'web/src/components/A2FinalMockExamPage.jsx'
+      - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/B2FinalMockExamPage.jsx'
+      - 'web/src/services/mockWritingSubmissionError.js'
+      - 'web/src/services/mockWritingSubmissionError.test.js'
       - 'web/src/components/B1ReadingPracticeSamples.jsx'
       - 'web/src/components/B1ExamRoomNavigation.test.js'
       - 'web/src/data/b1ReadingPracticeSamples.js'
@@ -25,6 +31,12 @@ on:
       - 'web/src/components/LesenPage.js'
       - 'web/src/components/HorenPage.js'
       - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/A1FinalMockExamPage.jsx'
+      - 'web/src/components/A2FinalMockExamPage.jsx'
+      - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/B2FinalMockExamPage.jsx'
+      - 'web/src/services/mockWritingSubmissionError.js'
+      - 'web/src/services/mockWritingSubmissionError.test.js'
       - 'web/src/components/B1ReadingPracticeSamples.jsx'
       - 'web/src/components/B1ExamRoomNavigation.test.js'
       - 'web/src/data/b1ReadingPracticeSamples.js'
@@ -54,5 +66,7 @@ jobs:
         run: npx jest --runInBand --runTestsByPath src/components/ExamRoomSectionNavigation.test.js
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
+      - name: Recoverable mock Schreiben error regression
+        run: npx jest --runInBand --runTestsByPath src/services/mockWritingSubmissionError.test.js
       - name: Direct web compile
         run: npx vite build
