@@ -4,7 +4,8 @@ import { useExam } from "../context/ExamContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
 
-const statusLabel = (status) => {
+const statusLabel = (status, mock) => {
+  if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";
@@ -33,7 +34,7 @@ export default function MockExamLibraryPage() {
                 <div style={{ maxWidth: 720 }}>
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                     <h3 style={{ margin: 0 }}>{mock.shortTitle || mock.title}</h3>
-                    <span style={styles.badge}>{statusLabel(mock.status)}</span>
+                    <span style={styles.badge}>{statusLabel(mock.status, mock)}</span>
                   </div>
                   <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                     {mock.mode === "full"
@@ -47,6 +48,10 @@ export default function MockExamLibraryPage() {
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
                       One full mock = 4 modules. Complete all four for the final score. If you leave, return to continue where you stopped. A running module's timer does not pause.
                     </p>
+                  ) : mock.id === "a2-mock-02" ? (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                      All four modules are inside this mock. Your progress is saved on this device; verified final scores are not available yet.
+                    </p>
                   ) : (
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
                       This is section practice, not a completed four-module mock. No overall mock pass/fail score is available.
@@ -54,7 +59,7 @@ export default function MockExamLibraryPage() {
                   )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>
