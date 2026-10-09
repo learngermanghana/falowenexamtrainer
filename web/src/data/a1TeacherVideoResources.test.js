@@ -237,3 +237,31 @@ test("Day 2 Chapter 1.1 uses the replacement teacher lecture and removes the old
     "https://youtu.be/xyRogEAA9qM",
   ]);
 });
+
+test("A1 Day 4 chapter 2 uses the assigned teacher lecture without changing the AI video", () => {
+  expect(getCanonicalA1TeacherVideoResource(4, "2")).toEqual(
+    expect.objectContaining({
+      topic: "German Numbers",
+      url: "https://youtu.be/XFZbjeKFgxw",
+    })
+  );
+
+  const lesson = normalizeLesson({
+    day: 4,
+    chapter: "2",
+    lesen_hören: { chapter: "2" },
+  }, "A1");
+  expect(lesson.resources.teacherVideo).toEqual(
+    expect.objectContaining({
+      chapter: "2",
+      url: "https://youtu.be/XFZbjeKFgxw",
+    })
+  );
+  expect(lesson.resources.videos.filter((video) =>
+    /teacher/i.test(`${video.key} ${video.title}`)
+  ).map((video) => video.url)).toEqual(["https://youtu.be/XFZbjeKFgxw"]);
+  expect(lesson.resources.aiVideo?.url).not.toBe("https://youtu.be/XFZbjeKFgxw");
+  expect(lesson.resources.videos.map(({ url }) => url)).not.toContain(
+    "https://youtu.be/lN7xxSbkPZ4"
+  );
+});
