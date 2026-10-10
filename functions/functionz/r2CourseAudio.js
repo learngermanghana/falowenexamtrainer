@@ -168,9 +168,12 @@ const validateA2MockAudioKey = ({ mockId, part, key }) => {
   if (!/^teil-[1234]$/.test(normalizedPart)) return null;
   if (!normalizedKey || normalizedKey.includes("..") || normalizedKey.includes("\\")) return null;
 
-  const expectedPrefix = `a2/mock-hoeren/${normalizedMockId}/`;
-  const expectedKey = `${expectedPrefix}${normalizedPart}`;
-  if (!normalizedKey.startsWith(expectedKey)) return null;
+  // Mock 2 audio lives in falowen-course-audio/a2/mock-horen-2/teil-N.mp3.
+  // Keep the existing mock-01 layout supported for older exam recordings.
+  const expectedKey = normalizedMockId === "mock-02"
+    ? `a2/mock-horen-2/${normalizedPart}.mp3`
+    : `a2/mock-hoeren/${normalizedMockId}/${normalizedPart}`;
+  if (normalizedMockId === "mock-02" ? normalizedKey !== expectedKey : !normalizedKey.startsWith(expectedKey)) return null;
   if (!isAudioObjectKey(normalizedKey)) return null;
 
   return {
