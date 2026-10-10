@@ -57,7 +57,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     16: [{ chapter: "5.16", tutor_lecture_video: "" }],
     17: [{ chapter: "5.17", tutor_lecture_video: "" }],
     18: [{ chapter: "6.18", topic: "Wege zum Wunschberuf", tutor_lecture_video: "https://youtu.be/UxCX5OeuqVM" }],
-    19: [{ chapter: "6.19", tutor_lecture_video: "" }],
+    19: [{ chapter: "6.19", tutor_lecture_video: "https://youtu.be/Le_pW3eoBZA" }],
     20: [{ chapter: "6.20", tutor_lecture_video: "" }],
     21: [{ chapter: "7.21", tutor_lecture_video: "" }],
     22: [{ chapter: "7.22", tutor_lecture_video: "" }],
