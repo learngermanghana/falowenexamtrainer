@@ -119,23 +119,25 @@ export default function ExamsOverviewPage() {
       <button
         type="button"
         className="exam-room-mock-entry"
-        aria-label={hasFullMock ? "Browse full mock exams" : "Browse available exam practice"}
+        aria-label={hasFullMock ? "Start or resume a full mock exam" : "Browse available exam practice"}
         onClick={() => navigate("/exams/mocks")}
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
-          <strong>{hasFullMock ? "Full Mock Exam" : "Mock Exams & Practice"}</strong>
+          <span className="exam-room-mock-eyebrow">{hasFullMock ? "Option 1 · Complete exam" : "Available exam practice"}</span>
+          <strong>{hasFullMock ? "Start Full Mock" : "Explore Mock Practice"}</strong>
           <span>{hasFullMock
-            ? "Complete Lesen, Hören, Schreiben and Sprechen for a full result. Choose or resume a mock."
-            : "A complete " + currentLevel + " mock is not yet published. Explore available section practice."}</span>
+            ? "Take Lesen, Hören, Schreiben and Sprechen together. Start a new mock or resume one already in progress."
+            : "A complete " + currentLevel + " mock is not yet published. Explore the available practice."}</span>
+          <span className="exam-room-mock-action">{hasFullMock ? "Choose or resume a full mock" : "See available practice"} <span aria-hidden="true">→</span></span>
         </span>
-        <span className="exam-room-arrow" aria-hidden="true">→</span>
-      </button>
+        </button>
 
       <section aria-labelledby="exam-room-skills-heading">
         <div className="exam-room-skills-heading">
-          <h3 id="exam-room-skills-heading">Or practise one skill</h3>
-          <p>Tap any skill to go straight to its practice area.</p>
+          <span className="exam-room-skills-eyebrow">Option 2 · Practice in parts</span>
+          <h3 id="exam-room-skills-heading">Practise individual exam sections</h3>
+          <p>Not ready for a complete mock? Choose Lesen, Hören, Schreiben or Sprechen below and practise one section at a time.</p>
         </div>
         <div className="exam-room-skills-grid">
           {EXAM_SKILLS.map((skill) => {

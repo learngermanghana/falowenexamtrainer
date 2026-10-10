@@ -23,7 +23,7 @@ describe("Exams Room navigation cleanup", () => {
       "utf8"
     );
     expect(overview).toContain('onClick={() => navigate("/exams/file")}');
-    expect(overview).toContain("Or practise one skill");
+    expect(overview).toContain("Practise individual exam sections");
     expect(overview).not.toContain("review your exam resources");
   });
 });

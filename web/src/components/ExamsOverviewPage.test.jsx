@@ -49,7 +49,7 @@ describe("simplified Exam Room overview", () => {
       .toHaveAttribute("aria-valuenow", "0");
     expect(screen.getByText(/Coverage records practice, not an exam pass/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Browse full mock exams" }));
+    fireEvent.click(screen.getByRole("button", { name: "Start or resume a full mock exam" }));
     expect(mockNavigate).toHaveBeenLastCalledWith("/exams/mocks");
 
     [
@@ -70,7 +70,7 @@ describe("simplified Exam Room overview", () => {
       render(<ExamsOverviewPage />);
       expect(screen.getByRole("button", { name: "Browse available exam practice" }))
         .toHaveTextContent("A complete " + level + " mock is not yet published");
-      expect(screen.queryByRole("button", { name: "Browse full mock exams" }))
+      expect(screen.queryByRole("button", { name: "Start or resume a full mock exam" }))
         .not.toBeInTheDocument();
       fireEvent.click(screen.getByRole("button", { name: "Browse available exam practice" }));
       expect(mockNavigate).toHaveBeenCalledWith("/exams/mocks");
