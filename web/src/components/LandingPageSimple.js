@@ -8,7 +8,7 @@ import "./LandingPageMarketing.css";
 
 const COPY = {
   en: {
-    language: "Language", login: "Log in", signup: "Sign up",
+    language: "Language", login: "Log in", signup: "Sign up", returning: "Already signed up?",
     navClasses: "Live classes", navExams: "Exam practice", navHelp: "How Falowen works",
     classScheduleAction: "View full class schedule",
     eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
@@ -37,7 +37,7 @@ const COPY = {
     metaDescription: "Learn German from A1 to C2 with live classes or self-learning, recorded teacher lectures, AI-supported practice, tutor support and Goethe-style sample and mock exams on Falowen.",
   },
   de: {
-    language: "Sprache", login: "Anmelden", signup: "Registrieren",
+    language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
     navClasses: "Live-Kurse", navExams: "Prüfungsvorbereitung", navHelp: "So funktioniert Falowen",
     classScheduleAction: "Vollständigen Kursplan ansehen",
     eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
@@ -71,7 +71,7 @@ const COPY = {
     metaDescription: "Deutsch A1–C2 mit Falowen: Live-Kurse, Selbstlernen, aufgezeichnete Lektionen, KI-Übungen, Tutor-Feedback und Goethe-orientierte Probeprüfungen.",
   },
   fr: {
-    language: "Langue", login: "Se connecter", signup: "S'inscrire",
+    language: "Langue", login: "Se connecter", signup: "S'inscrire", returning: "Déjà inscrit ?",
     navClasses: "Cours en direct", navExams: "Examens blancs", navHelp: "Comment fonctionne Falowen",
     classScheduleAction: "Voir le calendrier complet des cours",
     eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
@@ -187,7 +187,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <p className="falowen-home-intro">{copy.subtitle}</p>
             <div className="falowen-home-cta-row">
               <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start} <span aria-hidden="true">↗</span></button>
-              <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.login} · Already signed up</button>
+              <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.returning} {copy.login}</button>
               <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement} <span aria-hidden="true">→</span></a>
             </div>
             <p className="falowen-home-helper">{copy.smallNote}</p>
