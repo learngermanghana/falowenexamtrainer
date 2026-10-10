@@ -878,26 +878,10 @@ const courseSchedules = {
     },
     {
       day: 23,
-      topic: "Schreiben: E-Mails und Briefe für Alltag und Prüfung",
-      chapter: "14.2",
-      goal: "Write short A1 messages independently using a greeting, three content points, a closing and a name",
-      instruction:
-        "Use the writing workshop to practise appointment, arrangement, reservation, help, problem and registration tasks. This is self-practice and has no tutor submission.",
-      grammar_topic: "A1 letter writing: three-point planning and formal/informal register",
-      schreiben_sprechen: {
-        video: "https://youtu.be/mgfauvqhoCI",
-        youtube_link: "https://youtu.be/mgfauvqhoCI",
-        assignment: false,
-        grammarbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
-        workbook_link: "/campus/course/a1-day-23-writing-workshop-14-2",
-      },
-    },
-    {
-      day: 24,
       topic: "A1 Final Mock Exam",
       chapter: "5.10",
       goal: "Complete a full A1 mock exam across Lesen, Hören, Schreiben and Sprechen and identify the areas that still need practice.",
-      instruction: "Start the timed A1 Final Mock Exam. Complete each section in order. Answers and AI feedback are shown only after the full mock is submitted.",
+      instruction: "Start the timed A1 Final Mock Exam. Complete each section in order. Answers and AI feedback are shown only after the full mock is submitted. After the mock, continue in the Falowen Exams Room for focused practice.",
       grammar_topic: null,
       assignment: false,
       schreiben_sprechen: {
@@ -908,7 +892,7 @@ const courseSchedules = {
       },
     },
     {
-      day: 25,
+      day: 24,
       topic: "Course Completed!",
       chapter: null,
       ...buildCompletionMessage({ level: "A1", nextLevel: "A2" }),

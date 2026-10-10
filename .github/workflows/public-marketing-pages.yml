@@ -18,6 +18,9 @@ on:
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
       - 'web/src/__tests__/LandingPageMobile.test.js'
+      - 'web/src/__tests__/PublicSeoArchitecture.test.js'
+      - 'web/public/homepage-reviews.js'
+      - 'web/public/reviews.json'
       - 'tests/public-admissions-visitor-guide.test.mjs'
       - '.github/workflows/public-marketing-pages.yml'
   push:
@@ -38,6 +41,9 @@ on:
       - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
       - 'web/src/data/publicMarketingFeatures.js'
       - 'web/src/__tests__/LandingPageMobile.test.js'
+      - 'web/src/__tests__/PublicSeoArchitecture.test.js'
+      - 'web/public/homepage-reviews.js'
+      - 'web/public/reviews.json'
       - 'tests/public-admissions-visitor-guide.test.mjs'
       - '.github/workflows/public-marketing-pages.yml'
 
@@ -58,7 +64,7 @@ jobs:
         run: npm ci
       - name: Marketing and mobile homepage regression
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/components/PublicMarketingLanding.test.js src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js
+        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/__tests__/PublicSeoArchitecture.test.js src/components/PublicMarketingLanding.test.js src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js
       - name: Compile website
         working-directory: web
         run: npx vite build

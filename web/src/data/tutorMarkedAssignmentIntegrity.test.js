@@ -405,8 +405,9 @@ describe("all tutor-marked A1 through C1 assignments", () => {
   });
 
   test("all 28 B1 workbook components own the correct canonical Submit context", () => {
-    expect(b1ShellSource).toContain("assignmentKey: config.assignmentKey");
-    expect(b1ShellSource).toContain("canonicalAssignmentKey: config.assignmentKey");
+    expect(b1ShellSource).toContain("const resolvedAssignmentKey = lessonProfile?.assignmentKey || config.assignmentKey;");
+    expect(b1ShellSource).toContain("assignmentKey: resolvedAssignmentKey");
+    expect(b1ShellSource).toContain("canonicalAssignmentKey: resolvedAssignmentKey");
 
     tutorAssignments("B1").forEach((entry) => {
       const day = Number(entry.day);

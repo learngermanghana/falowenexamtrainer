@@ -134,16 +134,25 @@
 .falowen-home-support p { margin: 0; color: #4a5f7e; line-height: 1.65; font-size: 14px; }
 .falowen-home-support-link { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #fff; border-radius: 11px; padding: 13px 16px; color: #1b51a7; text-decoration: none; font-weight: 850; font-size: 13px; }
 .falowen-home-reviews-intro { display: flex; align-items: center; justify-content: center; gap: 11px; text-align: center; margin-bottom: -19px; }
-.falowen-home-reviews-intro span { color: #cb8a1a; letter-spacing: .08em; font-size: 15px; }
 .falowen-home-reviews-intro p { margin: 0; color: #34445f; font-size: 14px; font-weight: 800; }
 .falowen-final-cta { background: #152743; color: #fff; padding: clamp(25px, 4vw, 42px); border-radius: 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 25px; }
 .falowen-final-cta .falowen-home-section-kicker { color: #b4d0ff; }
 .falowen-final-cta h2 { font-size: clamp(24px, 3vw, 34px); margin: 10px 0; letter-spacing: -.025em; }
 .falowen-final-cta p { margin: 0; color: #d7e2f4; max-width: 550px; line-height: 1.65; }
-.falowen-home-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; padding: 0 0 4px; }
-.falowen-home-footer-links { display: flex; flex-wrap: wrap; gap: 13px; }
+.falowen-home-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 0 0 4px; }
+.falowen-home-footer-links { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 13px; }
 .falowen-home-footer a { font-size: 12px; font-weight: 750; color: #4c5f79; text-decoration: none; }
-.falowen-home-footer .falowen-home-contact-link { color: #1952b0; }
+.falowen-home-level-directory { grid-column: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.falowen-home-level-group { min-width: 0; display: grid; align-content: start; gap: 8px; }
+.falowen-home-level-title { color: #34445f; font-size: 12px; font-weight: 850; }
+.falowen-home-level-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.falowen-home-footer .falowen-home-level-list a {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 44px; min-height: 44px; padding: 8px 10px;
+  border: 1px solid #dce7fa; border-radius: 9px; background: #edf3ff;
+  color: #1b51a7; font-weight: 800;
+}
+.falowen-home-footer .falowen-home-contact-link { grid-column: 2; color: #1952b0; }
 .falowen-mobile-actions { display: none; }
 .falowen-public-home a:focus-visible, .falowen-public-home button:focus-visible, .falowen-home-language:focus-visible { outline: 3px solid #f9b83d; outline-offset: 3px; }
 @media (max-width: 1000px) {
@@ -178,6 +187,9 @@
 
   .falowen-home-support { flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
   .falowen-home-reviews-intro { margin-bottom: -10px; }
+  .falowen-home-footer { grid-template-columns: minmax(0, 1fr); }
+  .falowen-home-level-directory { grid-column: 1; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .falowen-home-footer .falowen-home-contact-link { grid-column: 1; }
   .falowen-final-cta { padding: 23px 19px; }
   .falowen-home-final-actions { width: 100%; }
   .falowen-home-final-actions .falowen-home-button { flex: 1 1 150px; }

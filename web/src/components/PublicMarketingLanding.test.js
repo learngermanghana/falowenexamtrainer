@@ -33,6 +33,16 @@ describe("Falowen public marketing redesign", () => {
     expect(landing).not.toContain("German A1–C2 courses and exam preparation");
   });
 
+  test("leaves review score to the existing data-driven Google review renderer", () => {
+    const homepage = read("./LandingPageSimple.js");
+    const loader = read("../../public/homepage-reviews.js");
+    expect(homepage).not.toContain("★★★★★");
+    expect(loader).toContain("summary(reviews)");
+    expect(loader).toContain("stats.average");
+    expect(loader).toContain('fetch("/reviews.json"');
+    expect(loader).toContain(".catch(function (error)");
+  });
+
   test("keeps real reviews and admissions class context and mobile access", () => {
     const wrapper = read("./LandingPage.js");
     const landing = read("./LandingPageSimple.js");

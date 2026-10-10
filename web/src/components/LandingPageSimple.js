@@ -30,7 +30,8 @@ const COPY = {
     finalEyebrow: "YOUR NEXT STEP",
     finalTitle: "Your German journey starts here.",
     finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
-    footerCourses: "German courses A1–C2", footerExam: "Goethe-style practice", footerReviews: "Student reviews", footerHelp: "Help",
+    footerCourses: "German courses A1–C2", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "Help",
+    footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
     metaTitle: "Falowen | German A1–C2, Live Classes, AI & Goethe-Style Mocks",
@@ -60,6 +61,7 @@ const COPY = {
     finalTitle: "Dein Deutschweg beginnt hier.",
     finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
     footerCourses: "Deutschkurse A1–C2", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe",
+    footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Goethe-Prüfungsvorbereitung nach Niveau",
     contact: "Fragen? Schreib uns auf WhatsApp",
     featureCopy: {
       placement: ["Finde dein Deutschniveau", "Mache einen kostenlosen Einstufungstest und finde deinen Einstieg.", "Einstufungstest machen"],
@@ -94,6 +96,7 @@ const COPY = {
     finalTitle: "Votre apprentissage commence ici.",
     finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
     footerCourses: "Cours A1–C2", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide",
+    footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Préparation Goethe par niveau",
     contact: "Des questions ? Contactez-nous sur WhatsApp",
     featureCopy: {
       placement: ["Trouvez votre niveau d'allemand", "Faites un test de niveau gratuit pour savoir par où commencer.", "Faire le test"],
@@ -112,6 +115,8 @@ const FOOTER_LINKS = [
   { href: "/reviews/", labelKey: "footerReviews" },
   { href: "/visitor-guide", labelKey: "footerHelp" },
 ];
+
+const COURSE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
@@ -248,7 +253,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           <a className="falowen-home-support-link" href="/visitor-guide">{copy.supportLink} →</a>
         </section>
 
-        <div className="falowen-home-reviews-intro"><span>★★★★★</span><p>{copy.reviewsIntro}</p></div>
+        <div className="falowen-home-reviews-intro"><p>{copy.reviewsIntro}</p></div>
         {/* /homepage-reviews.js injects genuine Google reviews before the final CTA. */}
 
         <section className="falowen-final-cta">
@@ -266,6 +271,24 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
         <footer className="falowen-home-footer">
           <div className="falowen-home-footer-links">
             {FOOTER_LINKS.map((item) => <a href={item.href} key={item.href}>{copy[item.labelKey]}</a>)}
+          </div>
+          <div className="falowen-home-level-directory">
+            <nav className="falowen-home-level-group" aria-label={copy.footerCourseLevels}>
+              <span className="falowen-home-level-title">{copy.footerCourseLevels}</span>
+              <div className="falowen-home-level-list">
+                {COURSE_LEVELS.map((level) => (
+                  <a key={level} href={`/learn-german-${level.toLowerCase()}`}>{level}</a>
+                ))}
+              </div>
+            </nav>
+            <nav className="falowen-home-level-group" aria-label={copy.footerGoetheLevels}>
+              <span className="falowen-home-level-title">{copy.footerGoetheLevels}</span>
+              <div className="falowen-home-level-list">
+                {COURSE_LEVELS.map((level) => (
+                  <a key={level} href={`/goethe-${level.toLowerCase()}-preparation`}>{level}</a>
+                ))}
+              </div>
+            </nav>
           </div>
           <a className="falowen-home-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">{copy.contact} ↗</a>
         </footer>
