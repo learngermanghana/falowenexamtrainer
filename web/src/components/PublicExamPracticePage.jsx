@@ -161,15 +161,15 @@ export default function PublicExamPracticePage({ level = "" }) {
                   <p>{levelDescription[examLevel]}</p>
                   <div className="public-goethe-mock-list">
                     {mocks.map((mock) => (
-                      <div className="public-goethe-mock" key={mock.id}>
+                      <a className="public-goethe-mock" key={mock.id} href={mock.status === "planned" ? "/exams/overview" : mock.route}>
                         <div><strong>{mock.shortTitle || mock.title}</strong><small>{mock.durationLabel} · {mock.status === "ready" ? "Student full mock" : mock.status === "preview" ? "Section practice / preview" : "Not yet published"}</small></div>
-                        <span>{mock.status === "ready" ? "Ready" : mock.status === "preview" ? "Preview" : "Planned"}</span>
-                      </div>
+                        <span>{mock.status === "ready" ? "Open ↗" : mock.status === "preview" ? "Preview ↗" : "Planned ↗"}</span>
+                      </a>
                     ))}
                   </div>
                   <div className="public-goethe-level-actions">
                     {freePath[examLevel] && <a className="public-goethe-btn public-goethe-btn-outline" href={freePath[examLevel]}>Free Lesen sample</a>}
-                    <a className="public-goethe-btn public-goethe-btn-primary" href="/login/">{full.length ? "Access full mocks" : previews.length ? "Open student practice" : "Explore Exam Room"} <span aria-hidden="true">↗</span></a>
+                    <a className="public-goethe-btn public-goethe-btn-primary" href={full[0]?.route || previews[0]?.route || "/exams/overview"}>{full.length ? "Access full mocks" : previews.length ? "Open student practice" : "Explore Exam Room"} <span aria-hidden="true">↗</span></a>
                   </div>
                 </article>
               );
