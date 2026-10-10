@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
@@ -112,6 +112,12 @@ describe("A1 lesson and workbook routing regressions", () => {
     expect(screen.queryByText("Practice · Change the statement into a question")).not.toBeInTheDocument();
     expect(screen.queryByText("Yes/No questions self-check")).not.toBeInTheDocument();
     expect(screen.getAllByText("Ich schwimme gern.", { exact: true }).length).toBeGreaterThan(0);
-    expect(screen.getByText("Schwimmst du gern?", { exact: true })).toBeVisible();
+    expect(screen.getByText(/Form a yes\/no question/i)).toBeVisible();
+    const answer = screen.getByRole("textbox", { name: /Your German yes-no question/i });
+    fireEvent.change(answer, { target: { value: "Liest du gern?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check answer" }));
+    expect(screen.getByRole("status")).toHaveTextContent("Richtig!");
+    fireEvent.click(screen.getByRole("button", { name: "Next question" }));
+    expect(screen.getByText(/schwimmen/i)).toBeVisible();
   });
 });
