@@ -175,7 +175,7 @@ const hobbies = [
 const hobbyQuestionTasks = [
   { verb: "lesen", pronoun: "du", answer: "Liest du gern?" },
   { verb: "schwimmen", pronoun: "er", answer: "Schwimmt er gern?" },
-  { verb: "kochen", pronoun: "sie", answer: "Kocht sie gern?" },
+  { verb: "kochen", pronoun: "sie", meaning: "she", answer: "Kocht sie gern?" },
   { verb: "reisen", pronoun: "du", answer: "Reist du gern?" },
 ];
 const normalizeYesNoQuestion = (value) => String(value || "")
@@ -328,7 +328,7 @@ function HobbyQuestionPractice() {
   return (
     <div style={questionCardStyle} aria-label="Hobby yes-no question practice">
       <strong>Jetzt du! · Form a yes/no question</strong>
-      <p style={{ margin: 0 }}>Use <strong>{task.pronoun}</strong> with <strong>{task.verb}</strong> and <strong>gern</strong>. Put the verb first.</p>
+      <p style={{ margin: 0 }}>Use <strong>{task.pronoun}{task.meaning ? ` (${task.meaning})` : ""}</strong> with <strong>{task.verb}</strong> and <strong>gern</strong>. Put the verb first.</p>
       <small>Example: spielen + du → Spielst du gern?</small>
       <label style={{ display: "grid", gap: 6 }}>
         <span>Question {index + 1} of {hobbyQuestionTasks.length}</span>
