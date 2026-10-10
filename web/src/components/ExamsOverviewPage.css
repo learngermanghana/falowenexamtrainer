@@ -123,6 +123,35 @@
   border-radius: 14px;
 }
 
+.exam-room-mock-entry:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 3px;
+}
+
+.exam-room-mock-action {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+  border-radius: 9px;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 11px 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .exam-room-mock-entry {
+    flex-wrap: wrap;
+    padding: 14px;
+  }
+  .exam-room-mock-action {
+    width: 100%;
+  }
+}
+
 .exam-room-mock-entry:hover {
   background: #dbeafe;
   border-color: #93c5fd;
