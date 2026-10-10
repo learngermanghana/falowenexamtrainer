@@ -369,6 +369,9 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
   const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
   const levelPrefix = workbookLevel || "A2/B1";
+  const lessonDay = typeof window === "undefined" ? null
+    : resolveA2B1WorkbookDayFromLocation(workbookLevel, window.location.pathname);
+  const lessonContext = lessonDay ? `Day ${lessonDay} · ${workbookLabel}` : workbookLabel;
 
   return (
     <>
@@ -394,12 +397,12 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
             listStylePosition: "inside",
           }}
         >
-          How this workbook works · open guide
+          {lessonContext} · how to complete this workbook
         </summary>
 
         <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Use <strong>Grammar</strong> first when you need the lesson notes, then move through the four workbook parts of this {workbookLabel}. Use <strong>Ref</strong> for reflection and the <strong>Submit</strong> tab in the Course Book when your final answers are ready.
+            Review the <strong>Grammar</strong> notes for {lessonContext} when needed. Complete the lesson’s speaking, writing, reading and listening tasks, then use <strong>Ref</strong> to reflect on your answers. The <strong>Submit</strong> tab is for final work only.
           </p>
           <p style={{ margin: 0 }}>
             <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
