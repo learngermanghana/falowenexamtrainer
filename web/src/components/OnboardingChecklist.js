@@ -36,6 +36,8 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const { showToast } = useToast();
   const { logout } = useAuth();
   const [savingAction, setSavingAction] = useState("");
+  const [showWorkbookGuide, setShowWorkbookGuide] = useState(false);
+  const [showGettingStarted, setShowGettingStarted] = useState(false);
 
   const level = detectLevelKey(studentProfile);
   const className = studentProfile?.className || "Not assigned yet";
@@ -44,6 +46,10 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const paymentComplete = paymentStatus === "paid" || hasClearedBalance(balanceDue);
   const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
   const firstLessonPath = day0WorkbookByLevel[level] || "/campus/course";
+  const dayOnePath = level ? `/campus/course/lesson/${level}/1?view=workbook` : "/campus/course";
+  // Reuse the authenticated profile and existing routes. No extra database
+  // reads, AI calls, Firestore listeners, or scheduled functions on login.
+  const learnerFirstName = String(studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || "").trim().split(/\s+/)[0];
 
   const accessLabel = paymentComplete
     ? "Paid access active"
@@ -86,7 +92,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>
-              Welcome to Falowen{level ? ` · ${level}` : ""}
+              Study Buddy · Welcome to Falowen{level ? ` · ${level}` : ""}
             </span>
             <button
               type="button"
@@ -98,13 +104,52 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             </button>
           </div>
           <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 40px)", lineHeight: 1.12 }}>
-            Your learning account is ready
+            Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}! I’m Study Buddy, your learning partner 👋
           </h1>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 16 }}>
-            We already have what we need from signup. Review your course details below, then choose what you want to do next.
+            Welcome to Falowen! I’ll be here whenever your tutor isn’t around. Ask me about your lessons, German practice, assignments, results, or where to find something in Falowen. Your tutor leads your classes, and I help between lessons. Where should we begin?
           </p>
         </div>
 
+        <div role="group" aria-label="Choose your Falowen starting point" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <button type="button" style={{ ...styles.primaryButton, padding: 18, textAlign: "left" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "orientation")}>
+            {savingAction === "orientation" ? "Opening..." : "🎬 Start Orientation · See how Falowen works"}
+          </button>
+          <button type="button" style={{ ...styles.secondaryButton, padding: 18, textAlign: "left" }} disabled={Boolean(savingAction)} onClick={() => setShowWorkbookGuide(true)}>
+            📘 Day 1 Workbook · Begin your first lesson
+          </button>
+        </div>
+        {showWorkbookGuide ? (
+          <section aria-label="Day 1 navigation guide" style={{ ...styles.card, display: "grid", gap: 12, margin: 0, border: "1px solid #93c5fd", background: "#eff6ff" }}>
+            <h2 style={{ margin: 0, fontSize: 19 }}>Study Buddy · Before your first workbook</h2>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>Your teacher's Day 0 orientation includes the navigation introduction. See how to open Course Book, find lessons and submit work, or go straight to your {level || "course"} Day 1 lesson. Your normal course access rules still apply.</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <button type="button" style={styles.secondaryButton} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "video")}>
+                {savingAction === "video" ? "Opening..." : "Watch teacher navigation video"}
+              </button>
+              <button type="button" style={styles.primaryButton} disabled={Boolean(savingAction)} onClick={() => finishAndGo(dayOnePath, "day1")}>
+                {savingAction === "day1" ? "Opening..." : "Open my Day 1 workbook"}
+              </button>
+              <button type="button" style={styles.secondaryButton} onClick={() => setShowWorkbookGuide(false)}>Back</button>
+            </div>
+          </section>
+        ) : null}
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} aria-expanded={showGettingStarted} onClick={() => setShowGettingStarted((open) => !open)}>
+          {showGettingStarted ? "Hide getting started guide" : "Show my getting started guide"}
+        </button>
+        {showGettingStarted ? (
+          <section aria-label="Getting started guide" style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 10 }}>
+            <h2 style={{ margin: 0, fontSize: 19 }}>Your first steps{level ? ` · ${level}` : ""}</h2>
+            <p style={{ margin: 0 }}>1. Watch the teacher's Day 0 orientation to learn the navigation.</p>
+            <p style={{ margin: 0 }}>2. Open Day 1 from your Course Book.</p>
+            <p style={{ margin: 0 }}>3. Practise and submit activities when requested.</p>
+            <p style={{ margin: 0 }}>4. Review your tutor's feedback in Results, then continue.</p>
+            <small>This is a guide, not a completion tracker. Falowen uses your real lesson and assignment records for progress.</small>
+          </section>
+        ) : null}
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus?studyBuddy=open", "ask")}>
+          {savingAction === "ask" ? "Opening..." : "💬 Ask Study Buddy anything"}
+        </button>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           <StatusItem label="Level" value={level || studentProfile?.level || "Not selected"} />
           <StatusItem label="Class" value={className} />
@@ -125,20 +170,11 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         >
           <h2 style={{ margin: 0, fontSize: 18 }}>What happens next?</h2>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-            Your progress is saved automatically. Start from Day 0 so Falowen can prepare you for the course structure. You can review your class details anytime, and if you started with the free trial you can complete payment from Account & Billing without losing your progress.
+            Orientation explains Falowen navigation and classroom expectations. If you prefer to start Day 1, you can watch the teacher navigation guide first. Your progress and account access rules stay in place.
           </p>
         </section>
 
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-          <button
-            type="button"
-            style={styles.primaryButton}
-            disabled={Boolean(savingAction)}
-            onClick={() => finishAndGo(firstLessonPath, "start")}
-          >
-            {savingAction === "start" ? "Opening..." : "Start learning"}
-          </button>
-
           <button
             type="button"
             style={styles.secondaryButton}

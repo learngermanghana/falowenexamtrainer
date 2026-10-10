@@ -90,6 +90,17 @@ const StudyBuddyBar = ({ studentProfile }) => {
   // Keep workbook content unobstructed until the student deliberately opens
   // Study Buddy from the fixed launcher in the bottom-right corner.
   const [isDismissed, setIsDismissed] = useState(true);
+  // Explicit first-login request: open the existing Study Buddy chat once,
+  // then clear the URL flag so future visits remain unobtrusive.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search || "");
+    if (params.get("studyBuddy") !== "open") return;
+    setIsDismissed(false);
+    setIsCollapsed(false);
+    params.delete("studyBuddy");
+    navigate({ pathname: location.pathname, search: params.toString() ? `?${params.toString()}` : "" }, { replace: true });
+  }, [location.pathname, location.search, navigate]);
+
   const [launcherPosition, setLauncherPosition] = useState(readStoredLauncherPosition);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
