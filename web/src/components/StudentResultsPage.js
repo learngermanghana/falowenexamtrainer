@@ -258,7 +258,7 @@ const StudentResultsPage = () => {
             {t("examReadiness.certificate.title")}
           </h3>
           <p style={{ ...styles.helperText, margin: 0, color: "#dbeafe" }}>
-            Track your readiness while you complete your level.
+            Your readiness status is based on your recorded course progress.
           </p>
         </div>
         <div style={{ padding: "0 18px 16px" }}>
@@ -274,8 +274,8 @@ const StudentResultsPage = () => {
             : error
             ? "Could not load results."
             : summary.count === 0
-            ? "No results found yet."
-            : `Loaded ${summary.count} results${
+            ? "No marked results yet. Once your work is graded, your scores and feedback will appear here."
+            : `You have ${summary.count} recorded result${summary.count === 1 ? "" : "s"}${
                 summary.avg !== null ? ` · Avg score: ${summary.avg}` : ""
               }`}
         </p>
