@@ -79,7 +79,7 @@ export default function ExamsOverviewPage() {
           <div>
             <p className="exam-room-eyebrow">Falowen · Exam Room</p>
             <h2>Your {currentLevel} exam room</h2>
-            <p className="exam-room-summary-intro">Choose a mock or one skill to practise today.</p>
+            <p className="exam-room-summary-intro">{hasFullMock ? "Choose an available full mock or focus on one skill below. Your progress and latest results appear here." : "A complete mock is not yet available at this level. Practise the available skills below and review your progress here."}</p>
           </div>
           <span className="exam-room-level">{currentLevel}</span>
         </div>

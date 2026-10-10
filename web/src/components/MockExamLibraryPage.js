@@ -22,7 +22,7 @@ export default function MockExamLibraryPage() {
         <p style={{ ...styles.helperText, margin: 0 }}>Full exam practice</p>
         <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{level} Mock Exams</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Choose a full timed mock when available, or work on individual sections. At every level (A1–C2), a complete mock means Lesen, Hören, Schreiben and Sprechen. Finish all four for a full result. If a complete mock is not yet available for your level, use individual skill practice instead. Section practice does not yet generate one final combined score.
+          {mocks.some((mock) => mock.mode === "full" && mock.status === "ready") ? "Choose a complete mock or practise one skill. Full mocks cover all four modules; previews may not produce a combined score." : "A full mock is not yet published for this level. Choose available skill practice below; it does not produce an overall mock result."}
         </p>
       </section>
 
@@ -37,16 +37,14 @@ export default function MockExamLibraryPage() {
                     <span style={styles.badge}>{statusLabel(mock.status, mock)}</span>
                   </div>
                   <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                    {mock.mode === "full"
-                      ? "Complete Lesen, Hören, Schreiben and Sprechen in one exam-style attempt."
-                      : mock.description}
+                    {mock.description}
                   </p>
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
                     {mock.durationLabel} · {(mock.sections || []).join(" · ")}
                   </p>
                   {mock.mode === "full" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
-                      One full mock = 4 modules. Complete all four for the final score. If you leave, return to continue where you stopped. A running module's timer does not pause.
+                      Finish all four modules for your final result. You can resume an unfinished attempt; running timers do not pause.
                     </p>
                   ) : mock.id === "a2-mock-02" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
@@ -54,12 +52,12 @@ export default function MockExamLibraryPage() {
                     </p>
                   ) : (
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
-                      This is section practice, not a completed four-module mock. No overall mock pass/fail score is available.
+                      Section practice does not generate a complete mock score.
                     </p>
                   )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
-                  {mock.mode === "full" ? "Start or resume all 4 modules" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                  {mock.mode === "full" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>

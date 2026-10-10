@@ -39,7 +39,8 @@ describe("B1 canonical listening registry", () => {
   });
 
   test("special non-audio cases stay explicit", () => {
-    expect(getB1ListeningTask(19).mode).toBe("reading-fallback");
+    expect(getB1ListeningTask(19).audioKey).toBe("b1/day-19/day-19.mp3");
+    expect(getB1ListeningTask(19).submitRequired).toBe(true);
     expect(getB1ListeningTask(21).status).toBe("unavailable");
     expect(getB1ListeningTask(22).mode).toBe("reading-fallback");
     expect(getB1ListeningTask(23).status).toBe("unavailable");

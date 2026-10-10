@@ -14,7 +14,7 @@ export function FullMockGuide({ level, stage, completedSkills = [], complete = f
     <section className="full-mock-guide" aria-label={`${level} full mock exam progress`}>
       <div className="full-mock-guide-title">
         <strong>{progress.complete ? "All 4 modules completed" : `${progress.count} of 4 modules completed`}</strong>
-        <span>Final result only after Lesen, Hören, Schreiben and Sprechen</span>
+        <span>{progress.complete ? "All modules completed. Review your result." : `Current module: ${FULL_MOCK_SKILLS.find((skill) => skill.key === progress.current)?.label || "next skill"}. Finish all four for a final result.`}</span>
       </div>
       <ol className="full-mock-guide-steps">
         {FULL_MOCK_SKILLS.map((skill, index) => {
@@ -32,7 +32,7 @@ export function FullMockGuide({ level, stage, completedSkills = [], complete = f
       {!complete && stage !== "intro" ? <p className="full-mock-guide-detail">
         {progress.current === "sprechen"
           ? "Finish Sprechen to complete all four modules and receive your final result."
-          : "Keep going after this section. Finishing one module does not complete the full mock."}
+          : "Complete the remaining modules to receive your combined result."}
       </p> : null}
     </section>
   );

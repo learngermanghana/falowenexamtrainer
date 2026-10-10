@@ -121,7 +121,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       <SectionHeader
         eyebrow={t("generalHome.campus.eyebrow")}
         title={t("generalHome.campus.title")}
-        subtitle="Course book, workbook submissions, results and grammar help."
+        subtitle="Continue your current lesson, submit finished workbook answers, or open your results."
         actions={
           <PrimaryActionBar align="flex-end">
             <PillBadge tone="success">Daily work</PillBadge>
@@ -130,7 +130,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       />
       <PrimaryActionBar align="start">
         <button style={styles.primaryButton} onClick={openCampus}>
-          Enter Campus
+          Continue in Campus
         </button>
       </PrimaryActionBar>
     </section>
@@ -147,7 +147,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       <SectionHeader
         eyebrow={t("generalHome.exams.eyebrow")}
         title={t("generalHome.exams.title")}
-        subtitle="Speaking, writing, listening, reading and exam readiness."
+        subtitle="Choose an available mock or practise one exam skill; review your results in the Exam Room."
         actions={
           <PrimaryActionBar align="flex-end">
             <PillBadge tone="info">Exam mode</PillBadge>
