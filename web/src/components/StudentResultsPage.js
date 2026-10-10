@@ -154,8 +154,9 @@ const StudentResultsPage = () => {
 
   const summary = useMemo(() => {
     const scores = results
+      .filter((r) => r.score !== null && r.score !== undefined && String(r.score).trim() !== "")
       .map((r) => Number(r.score))
-      .filter((n) => Number.isFinite(n));
+      .filter((n) => Number.isFinite(n) && n >= 0 && n <= 100);
 
     if (!scores.length) return { count: results.length, avg: null };
     const avg =
