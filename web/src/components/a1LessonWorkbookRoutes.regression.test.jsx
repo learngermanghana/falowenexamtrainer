@@ -118,6 +118,6 @@ describe("A1 lesson and workbook routing regressions", () => {
     fireEvent.click(screen.getByRole("button", { name: "Check answer" }));
     expect(screen.getByRole("status")).toHaveTextContent("Richtig!");
     fireEvent.click(screen.getByRole("button", { name: "Next question" }));
-    expect(screen.getByText(/schwimmen/i)).toBeVisible();
+    expect(screen.getByText("Question 2 of 4")).toBeVisible();
   });
 });
