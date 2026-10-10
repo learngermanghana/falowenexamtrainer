@@ -40,7 +40,7 @@ describe("Falowen public homepage on mobile", () => {
     const onSignUp = jest.fn();
     render(<LandingPage program="french" onSignUp={onSignUp} />);
     expect(screen.queryByRole("button", { name: "French" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getAllByRole("button", { name: /Start learning/ })[0]);
+    fireEvent.click(screen.getAllByRole("button", { name: /Start 7 days free trial/ })[0]);
     expect(onSignUp).toHaveBeenCalledWith("german");
     expect(screen.getAllByRole("link", { name: /Take free placement test/ })[0]).toHaveAttribute("href", "/placement-test");
     fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: "de" } });
@@ -86,9 +86,9 @@ describe("Falowen public homepage on mobile", () => {
     expect(container.querySelector(".falowen-mobile-actions")).toBeInTheDocument();
     expect(css).not.toContain("overflow: hidden");
     expect(screen.getByRole("img", { name: "German classroom at Learn Language Education Academy" })).toHaveAttribute("src", "/classes/llea-classroom.jpg");
-    expect(screen.getAllByRole("link", { name: /View live classes/ })[0]).toHaveAttribute("href", "/classes/");
+    expect(screen.getAllByRole("link", { name: /View live classes/ })[0]).toHaveAttribute("href", "/classes");
     expect(screen.getByRole("link", { name: /View full class schedule/ })).toHaveAttribute(
-      "href", "/learn-german-ghana/upcoming-classes"
+      "href", "/classes"
     );
   });
   it("keeps the class schedule CTA translated in German and French", async () => {
@@ -98,13 +98,13 @@ describe("Falowen public homepage on mobile", () => {
     });
     await waitFor(() => expect(
       screen.getByRole("link", { name: /Vollständigen Kursplan ansehen/ })
-    ).toHaveAttribute("href", "/learn-german-ghana/upcoming-classes"));
+    ).toHaveAttribute("href", "/classes"));
     fireEvent.change(screen.getByRole("combobox", { name: "Sprache" }), {
       target: { value: "fr" },
     });
     await waitFor(() => expect(
       screen.getByRole("link", { name: /Voir le calendrier complet des cours/ })
-    ).toHaveAttribute("href", "/learn-german-ghana/upcoming-classes"));
+    ).toHaveAttribute("href", "/classes"));
   });
 
 
