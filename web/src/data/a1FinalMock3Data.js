@@ -154,7 +154,7 @@ export const A1_MOCK_3_WRITING = Object.freeze({
       { kind: 'prefilled', label: 'Straße, Hausnummer', value: 'Hauptstraße 12' },
       { kind: 'input', number: 1, label: 'Wohnort / PLZ', answer: '10115 Berlin', alternatives: ['Berlin 10115'], explanation: 'Eva wohnt in Berlin mit der Postleitzahl 10115.' },
       { kind: 'input', number: 2, label: 'Herkunftsland', answer: 'Kanada', alternatives: ['Canada'], explanation: 'Eva kommt aus Kanada.' },
-      { kind: 'input', number: 3, label: 'Beruf', answer: 'Architektin', alternatives: ['Architekt'], explanation: 'Eva arbeitet als Architektin.' },
+      { kind: 'input', number: 3, label: 'Beruf', answer: 'Architektin', alternatives: [], explanation: 'Eva arbeitet als Architektin.' },
       { kind: 'choice', number: 4, label: 'Gewünschter Kurs', answer: 'Abendkurs', options: [{ value: 'Vormittagskurs', label: 'Vormittagskurs' }, { value: 'Abendkurs', label: 'Abendkurs' }], explanation: 'Eva möchte einen Deutschkurs am Abend.' },
       { kind: 'input', number: 5, label: 'Gewünschte Sprachstufe', answer: 'A1', alternatives: ['A 1'], explanation: 'Eva möchte den Deutschkurs auf der Stufe A1 besuchen.' },
     ],
