@@ -1,6 +1,6 @@
 import { A1_EXAM_HOEREN_SAMPLE_3_TEIL1, A1_EXAM_HOEREN_SAMPLE_3_TEIL2, A1_EXAM_HOEREN_SAMPLE_3_TEIL3 } from './a1ExamHorenSample3';
 
-// A1 Mock 3: Lesen is complete, Hören reuses Sample 3, Schreiben uses a separate exam task. Sprechen remains unpublished.
+// A1 Mock 3: Lesen is complete, Hören reuses Sample 3, Schreiben uses a separate exam task. Sprechen has dedicated tasks.
 export const A1_MOCK_3_ID = 'a1-mock-03';
 
 export const A1_MOCK_3_READING = Object.freeze({
@@ -163,4 +163,29 @@ export const A1_MOCK_3_WRITING = Object.freeze({
     instruction: A1_MOCK_3_WRITING_TASK.instruction,
     reminder: 'Schreiben Sie die Anrede, alle drei Inhaltspunkte, einen Gruß und Ihren Namen.',
   },
+});
+
+export const A1_MOCK_3_SPEAKING = Object.freeze({
+  durationSeconds: 15 * 60, maxScore: 25, passScore: 15,
+  tasks: [
+    {
+      id: 'teil1', teil: '1', title: 'Teil 1 · Sich vorstellen',
+      context: 'Persönliche Vorstellung', maxRecordingSeconds: 90,
+      prompt: 'Stellen Sie sich anhand der folgenden Stichpunkte vor. Antworten Sie danach auf die möglichen Prüferfragen.',
+      card: ['Name?', 'Alter?', 'Land?', 'Wohnort?', 'Sprachen?', 'Beruf?', 'Hobby?'],
+      followUp: 'Mögliche Prüferfragen: 1. Können Sie Ihren Familiennamen bitte buchstabieren? 2. Wie ist Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen.',
+    },
+    {
+      id: 'teil2', teil: '2', title: 'Teil 2 · Um Informationen bitten und Informationen geben',
+      context: 'Thema: Einkaufen', maxRecordingSeconds: 60,
+      prompt: 'Stellen Sie Ihrem Partner / Ihrer Partnerin eine Frage zu der folgenden Karte. Thema: Einkaufen. Wort: Brot.',
+      keyword: 'Brot',
+    },
+    {
+      id: 'teil3', teil: '3', title: 'Teil 3 · Bitten formulieren und darauf reagieren',
+      context: 'Eine höfliche Bitte', maxRecordingSeconds: 60,
+      prompt: 'Formulieren Sie eine passende höfliche Bitte zur Bildkarte: Ein Glas Wasser.',
+      picture: 'glass-water', pictureAlt: 'Ein Glas Wasser',
+    },
+  ],
 });
