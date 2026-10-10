@@ -9,6 +9,7 @@ import { WRITING_PROMPTS } from '../web/src/data/writingExamPrompts.js';
 import { speakingQuestionDictionary } from '../web/src/data/speakingDictionary.js';
 import { A1_FINAL_MOCK_WRITING_TASK } from '../web/src/data/a1FinalMockWritingTask.js';
 import { A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from '../web/src/data/a1FinalMock2Data.js';
+import { A1_MOCK_3_READING, A1_MOCK_3_LISTENING, A1_MOCK_3_WRITING, A1_MOCK_3_WRITING_TASK, A1_MOCK_3_SPEAKING } from '../web/src/data/a1FinalMock3Data.js';
 import { B1_WRITING_TASKS, B1_SPEAKING } from '../web/src/data/b1FinalMockData.js';
 import { B2_WRITING_TASKS, B2_SPEAKING } from '../web/src/data/b2FinalMockData.js';
 
@@ -36,6 +37,13 @@ const registry = {
       readingAnswerKey: Object.fromEntries(Object.values(A1_MOCK_2_READING).flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
       listeningAnswerKey: Object.fromEntries([A1_MOCK_2_LISTENING.teil1, A1_MOCK_2_LISTENING.teil2, A1_MOCK_2_LISTENING.teil3].flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
     },
+    'a1-mock-03': {
+      level: 'A1',
+      writing: { ...A1_MOCK_3_WRITING_TASK, modelAnswer: undefined, form: A1_MOCK_3_WRITING.teil1 },
+      speaking: A1_MOCK_3_SPEAKING.tasks,
+      readingAnswerKey: Object.fromEntries(Object.values(A1_MOCK_3_READING).flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
+      listeningAnswerKey: Object.fromEntries([A1_MOCK_3_LISTENING.teil1, A1_MOCK_3_LISTENING.teil2, A1_MOCK_3_LISTENING.teil3].flatMap((part, index) => part.questions.map(question => [`t${index + 1}-${question.number}`, question.answer]))),
+    },
   },
   writing: Object.fromEntries([
     ...writingLetters,
@@ -57,6 +65,7 @@ for (const part of registry.mocks.B1.writing) assert.equal(part.points.length, 3
 for (const part of registry.mocks.B2.writing) assert.equal(part.points.length, 4, 'B2 writing rubric requires four points');
 const versions = Object.fromEntries(Object.entries(registry.mocks).map(([level, kinds]) => [level, Object.fromEntries(Object.entries(kinds).map(([kind, task]) => [kind, createHash('sha256').update(JSON.stringify(task)).digest('hex')]))]));
 versions.A1_MOCK_2 = Object.fromEntries(['writing', 'speaking'].map(kind => [kind, createHash('sha256').update(JSON.stringify(registry.mockSets['a1-mock-02'][kind])).digest('hex')]));
+versions.A1_MOCK_3 = Object.fromEntries(['writing', 'speaking'].map(kind => [kind, createHash('sha256').update(JSON.stringify(registry.mockSets['a1-mock-03'][kind])).digest('hex')]));
 const versionTarget = new URL('../web/src/data/assessmentTaskVersions.json', import.meta.url);
 const versionText = JSON.stringify(versions, null, 2) + '\n';
 if (process.argv.includes('--check')) assert.equal(readFileSync(versionTarget, 'utf8'), versionText, 'Mock task versions are stale');
