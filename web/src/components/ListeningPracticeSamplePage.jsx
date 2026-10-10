@@ -7,6 +7,7 @@ import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioSe
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
 import { B1_LISTENING } from "../data/b1FinalMockData";
+import { A2_MOCK_2_HOEREN } from "../data/a2Mock2Hoeren";
 import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
 import { saveExamRoomResult } from "../services/examRoomResultService";
 import { A1_GOETHE_LISTENING_MOCK } from "./A1GoetheListeningMockPreview";
@@ -41,6 +42,16 @@ const A2_PARTS = Object.freeze([
   { key: "teil3", audioPart: "teil-3", data: A2_GOETHE_LISTENING_TEIL3 },
   { key: "teil4", audioPart: "teil-4", data: A2_GOETHE_LISTENING_TEIL4 },
 ]);
+
+const A2_SAMPLE_2_PARTS = Object.freeze(A2_MOCK_2_HOEREN.map((part, index) => ({
+  key: `teil${index + 1}`,
+  audioPart: part.id,
+  data: {
+    ...part,
+    title: `Teil ${index + 1}`,
+    responseInstruction: index === 1 ? "Wählen Sie jeden Buchstaben nur einmal." : "Wählen Sie die richtige Antwort.",
+  },
+})));
 
 const A1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: A1_GOETHE_LISTENING_MOCK.teil1 },
@@ -85,7 +96,7 @@ const C1_PARTS = Object.freeze([
 ]);
 
 const answerKeyForPart = (level, part) => {
-  if (level === "A2" && part.key === "teil2") {
+  if (level === "A2" && part.key === "teil2" && Array.isArray(part.data.tasks)) {
     return part.data.tasks.map((task) => ({
       number: task.number,
       answer: task.answer,
@@ -132,7 +143,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
                 idToken,
               })
             : await (level === "A2" ? fetchA2MockAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
-                mockId: "mock-01",
+                mockId: level === "A2" && sampleId === "sample-2" ? "mock-02" : "mock-01",
                 part,
                 key: objectKey,
                 idToken,
@@ -387,7 +398,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
       : normalizedLevel === "C1"
       ? C1_PARTS
       : normalizedLevel === "A2"
-        ? A2_PARTS
+        ? sampleId === "sample-2" ? A2_SAMPLE_2_PARTS : A2_PARTS
         : sampleId === "sample-3"
           ? A1_SAMPLE_3_PARTS
           : sampleId === "sample-2"
@@ -491,6 +502,44 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             );
           })}
         </div>
+      );
+    }
+
+    if (normalizedLevel === "A2" && sampleId === "sample-2" && part.key === "teil2") {
+      const used = new Set(part.data.questions.map((question) => answers[`${part.key}-${question.number}`]).filter(Boolean));
+      return (
+        <>
+          <div style={{ display: "grid", gap: 10 }}>
+            {part.data.questions.map((question) => {
+              const key = `${part.key}-${question.number}`;
+              return (
+                <label key={key} style={{ display: "grid", gap: 5 }}>
+                  <strong>Aufgabe {question.number} · {question.question}</strong>
+                  <select
+                    aria-label={`Aufgabe ${question.number}`}
+                    value={answers[key] || ""}
+                    disabled={submitted}
+                    onChange={(event) => setAnswer(key, event.target.value)}
+                    style={{ padding: 11, maxWidth: "100%", border: "1px solid #cbd5e1", borderRadius: 8 }}
+                  >
+                    <option value="">Bild wählen</option>
+                    {part.data.pictures.map(([id, label]) => (
+                      <option key={id} value={id.toLowerCase()} disabled={used.has(id.toLowerCase()) && answers[key] !== id.toLowerCase()}>{id} · {label}</option>
+                    ))}
+                  </select>
+                  {feedback(key, question.answer)}
+                </label>
+              );
+            })}
+          </div>
+          <div className="a2-hoeren-picture-grid">
+            {part.data.pictures.map(([id, label, emoji]) => (
+              <div key={id} className="a2-hoeren-picture-card" style={{ padding: 12 }}>
+                <strong>{id}</strong> <span aria-hidden="true">{emoji}</span> {label}
+              </div>
+            ))}
+          </div>
+        </>
       );
     }
 
