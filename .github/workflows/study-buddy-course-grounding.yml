@@ -24,6 +24,9 @@ on:
       - "web/src/services/studyBuddyLessonContext.test.js"
       - "web/src/services/studyBuddyService.js"
       - "web/src/services/studyBuddyService.test.js"
+      - "web/src/services/studyBuddyNavigation.js"
+      - "web/src/services/studyBuddyNavigation.test.js"
+      - "web/src/components/StudyBuddyChat.css"
       - "web/src/components/StudyBuddyBar.js"
       - "web/src/components/StudyBuddyChatInterface.test.js"
       - ".github/workflows/study-buddy-course-grounding.yml"
@@ -53,4 +56,4 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyLessonContext.test.js src/services/studyBuddyService.test.js src/components/StudyBuddyChatInterface.test.js src/components/AssessmentSupport.test.jsx src/utils/timedAssignmentAccess.test.js src/utils/timedAssignmentClock.test.js
+        run: npx jest --runInBand --runTestsByPath src/services/studyBuddyLessonContext.test.js src/services/studyBuddyService.test.js src/services/studyBuddyNavigation.test.js src/components/StudyBuddyChatInterface.test.js src/components/AssessmentSupport.test.jsx src/utils/timedAssignmentAccess.test.js src/utils/timedAssignmentClock.test.js
