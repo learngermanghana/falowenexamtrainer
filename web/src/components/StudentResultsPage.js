@@ -163,6 +163,28 @@ const StudentResultsPage = () => {
     return { count: results.length, avg };
   }, [results]);
 
+  const scoreInsight = useMemo(() => {
+    const scored = results
+      .filter((row) => row.score !== null && row.score !== undefined && String(row.score).trim() !== "")
+      .map((row) => ({ ...row, numericScore: Number(row.score) }))
+      .filter((row) => Number.isFinite(row.numericScore) && row.numericScore >= 0 && row.numericScore <= 100);
+    if (!scored.length) return null;
+    const belowPass = scored.filter((row) => row.numericScore < PASS_MARK);
+    const mostRecent = scored.reduce((latest, row) => {
+      const date = Date.parse(row.date || row.created_at || row.markedAt || row.createdAt || "");
+      return Number.isFinite(date) && date > latest.date ? { date, row } : latest;
+    }, { date: -Infinity, row: null }).row;
+    const recentLabel = mostRecent?.assignment || mostRecent?.assignmentTitle || mostRecent?.assignmentId || "";
+    return {
+      total: scored.length,
+      belowPass: belowPass.length,
+      latest: mostRecent ? `Latest recorded score: ${mostRecent.numericScore}%${recentLabel ? ` · ${recentLabel}` : ""}.` : "",
+      guidance: belowPass.length
+        ? `${belowPass.length} recorded result${belowPass.length === 1 ? " is" : "s are"} below the ${PASS_MARK}% course pass mark. Open the result history below to review the feedback for those assignments.`
+        : `All ${scored.length} recorded numeric score${scored.length === 1 ? " meets" : "s meet"} the ${PASS_MARK}% course pass mark. Review individual feedback below for specific improvements.`,
+    };
+  }, [results]);
+
   const assignmentProgress = useMemo(() => {
     const merged = mergeAssignmentProgress({
       curriculumEntries: [],
@@ -279,6 +301,14 @@ const StudentResultsPage = () => {
                 summary.avg !== null ? ` · Avg score: ${summary.avg}` : ""
               }`}
         </p>
+
+        {!loading && !error && scoreInsight ? (
+          <div role="status" style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "12px 14px", marginTop: 8 }}>
+            <strong>Your marked-work overview</strong>
+            {scoreInsight.latest ? <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{scoreInsight.latest}</p> : null}
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{scoreInsight.guidance}</p>
+          </div>
+        ) : null}
 
         {!loading && !error ? (
           <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
