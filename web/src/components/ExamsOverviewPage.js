@@ -5,11 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { EXAM_SKILLS, buildExamRoomCoach } from "../lib/examRoomCoach";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
-import {
-  getLocalDailyWarmup,
-  loadDailyWarmupProgress,
-  loadExamRoomResults,
-} from "../services/examRoomDashboardService";
+import { loadExamRoomResults } from "../services/examRoomDashboardService";
 import "./ExamsOverviewPage.css";
 
 const sectionIcons = { lesen: "📖", hoeren: "🎧", schreiben: "✍️", sprechen: "🎤" };
@@ -29,12 +25,9 @@ export default function ExamsOverviewPage() {
   const [loading, setLoading] = useState(false);
   const [loadIssue, setLoadIssue] = useState("");
   const [limited, setLimited] = useState(false);
-  const [dailyCloudStatus, setDailyCloudStatus] = useState(null);
   const localReading = useMemo(() => getReadingPracticeHistory(
     currentLevel, getReadingPracticeStudentKey({ user, studentProfile }),
   ), [currentLevel, user, studentProfile]);
-  const localDaily = getLocalDailyWarmup(currentLevel);
-  const dailyDone = Boolean(localDaily.practised || dailyCloudStatus?.practised);
   const coach = useMemo(
     () => buildExamRoomCoach({ level: currentLevel, cloudResults, localReading }),
     [currentLevel, cloudResults, localReading],
@@ -48,7 +41,6 @@ export default function ExamsOverviewPage() {
   useEffect(() => {
     let cancelled = false;
     setCloudResults([]);
-    setDailyCloudStatus(null);
     setLimited(false);
     setLoadIssue("");
     if (!idToken || !user?.uid) return undefined;
@@ -64,10 +56,6 @@ export default function ExamsOverviewPage() {
         if (!cancelled) setLoadIssue("Cloud results are temporarily unavailable. Lesen history from this device may still appear.");
       })
       .finally(() => { if (!cancelled) setLoading(false); });
-
-    loadDailyWarmupProgress({ userId: user.uid, level: currentLevel })
-      .then((progress) => { if (!cancelled) setDailyCloudStatus(progress); })
-      .catch(() => { /* Local warm-up progress remains usable offline. */ });
 
     return () => { cancelled = true; };
   }, [currentLevel, idToken, user?.uid]);
@@ -119,17 +107,17 @@ export default function ExamsOverviewPage() {
       <button
         type="button"
         className="exam-room-mock-entry"
-        aria-label={hasFullMock ? "Browse full mock exams" : "Browse available exam practice"}
+        aria-label={hasFullMock ? "Start full mock exam" : "Browse available exam practice"}
         onClick={() => navigate("/exams/mocks")}
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
-          <strong>{hasFullMock ? "Full Mock Exam" : "Mock Exams & Practice"}</strong>
+          <strong>{hasFullMock ? "Start Full Mock" : "Mock Exams & Practice"}</strong>
           <span>{hasFullMock
             ? "Complete Lesen, Hören, Schreiben and Sprechen for a full result. Choose or resume a mock."
             : "A complete " + currentLevel + " mock is not yet published. Explore available section practice."}</span>
         </span>
-        <span className="exam-room-arrow" aria-hidden="true">→</span>
+        <span className="exam-room-mock-action" aria-hidden="true">{hasFullMock ? "Start Full Mock →" : "View practice →"}</span>
       </button>
 
       <section aria-labelledby="exam-room-skills-heading">
@@ -171,21 +159,7 @@ export default function ExamsOverviewPage() {
         </p>
       </section>
 
-      <section className="exam-room-activity" aria-label="Warm-up and recent practice">
-        <div className="exam-room-warmup">
-          <span className="exam-room-warmup-icon" aria-hidden="true">☀️</span>
-          <div className="exam-room-warmup-copy">
-            <strong>{dailyDone ? "Warm-up completed" : localDaily.hasDraft ? "Warm-up in progress" : "Daily warm-up"}</strong>
-            <p>{dailyDone
-              ? "Today's warm-up is recorded."
-              : localDaily.hasDraft
-                ? "Your saved warm-up is waiting."
-                : "A short German task for your level."}</p>
-          </div>
-          <button type="button" className="exam-room-text-action" onClick={() => navigate("/exams/question")}>
-            {dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
-          </button>
-        </div>
+      <section className="exam-room-activity" aria-label="Recent practice">
         <div className="exam-room-recent-heading">
           <div>
             <h3>Your recent practice</h3>
