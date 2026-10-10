@@ -23,3 +23,11 @@ test("A2 shared workbook guide reuses the lesson's actual grammar and applicatio
   expect(workbook).toContain("lessonLearning.rule");
   expect(workbook).toContain("lessonLearning.outputPrompt");
 });
+
+test("A2 and B1 guidance uses an exact curriculum workbook route, not an ambiguous day guess", () => {
+  expect(workbook).toContain('getLessonsByLevel(workbookLevel)');
+  expect(workbook).toContain('entry.workbookRoute');
+  expect(workbook).toContain('catalogLesson?.title');
+  expect(workbook).toContain('catalogLesson?.submissionRequired');
+  expect(workbook).toContain('This lesson does not require a graded workbook submission.');
+});
