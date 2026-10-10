@@ -179,7 +179,7 @@ const hobbyQuestionTasks = [
   { verb: "reisen", pronoun: "du", answer: "Reist du gern?" },
 ];
 const normalizeYesNoQuestion = (value) => String(value || "")
-  .trim().toLocaleLowerCase("de-DE").replace(/[?.!]+$/g, "").replace(/\\s+/g, " ");
+  .trim().toLocaleLowerCase("de-DE").replace(/[?.!]+$/g, "").replace(/\s+/g, " ");
 
 const writingTemplate = [
   ["Name", "Ich heiße … / Mein Name ist …", "My name is … / I am called …", "Ich heiße Ama.", "My name is Ama."],
@@ -555,10 +555,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
               <strong>Ich spreche Deutsch.</strong> = I speak German.
               <br />
               <strong>Ich spreche ein bisschen Deutsch.</strong> = I speak a little German.
-              <br />
-              <strong>Ich spreche ein bisschen Englisch.</strong> = I speak a little English.
-              <br />
-              <strong>Ich verstehe ein bisschen Deutsch.</strong> = I understand a little German.
+
             </div>
           </div>
         </div>
