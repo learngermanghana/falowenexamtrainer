@@ -11,7 +11,7 @@ describe("Falowen public marketing redesign", () => {
     ]);
     expect(new Set(PUBLIC_MARKETING_FEATURES.map((feature) => feature.key)).size).toBe(4);
     expect(PUBLIC_MARKETING_FEATURES.map((feature) => feature.href)).toEqual([
-      "/placement-test", "/exam-practice", "/classes/", "/signup?program=german",
+      "/placement-test", "/exam-practice", "/classes", "/signup?program=german",
     ]);
     expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "exams").description).toMatch(/Goethe|Lesen/);
     expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "class")).toEqual(
