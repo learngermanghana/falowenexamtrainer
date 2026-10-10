@@ -54,7 +54,10 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain("getMockExamsForLevel");
     expect(overviewSource).toContain('onClick={() => navigate("/exams/mocks")}');
     expect(overviewSource).toContain('aria-label={"Practise " + skill.title}');
-    expect(overviewSource).toContain('onClick={() => navigate("/exams/question")}');
+    expect(overviewSource).toContain("Start Full Mock");
+    expect(overviewSource).toContain('aria-label={hasFullMock ? "Start full mock exam" : "Browse available exam practice"}');
+    expect(overviewSource).not.toContain('onClick={() => navigate("/exams/question")}');
+    expect(overviewSource).not.toContain("loadDailyWarmupProgress");
     expect(overviewSource).toContain('onClick={() => navigate("/exams/file")}');
     expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
     expect(appSource).toContain('role="group" aria-label="Choose exam practice level"');
