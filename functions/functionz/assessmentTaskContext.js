@@ -27,7 +27,8 @@ function assessmentTaskPrompt(task) {
   ].join('\n');
 }
 function mockTaskPrompt(level, kind, selectedTopicId, mockId) {
-  const task = mockId === 'a1-mock-02' && level === 'A1' ? registry.mockSets[mockId][kind] : registry.mocks[level]?.[kind];
+  const task = level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)
+    ? registry.mockSets[mockId]?.[kind] : registry.mocks[level]?.[kind];
   if (!task) throw new Error('Missing canonical mock task');
   if (level === 'B2' && kind === 'speaking' && selectedTopicId) {
     const theme = task.teil1.themes.find(item => item.id === selectedTopicId);
@@ -39,7 +40,8 @@ function mockTaskPrompt(level, kind, selectedTopicId, mockId) {
 module.exports = { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt };
 
 function mockTaskVersion(level, kind, mockId) {
-  const task = mockId === 'a1-mock-02' && level === 'A1' ? registry.mockSets[mockId][kind] : registry.mocks[level][kind];
+  const task = level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)
+    ? registry.mockSets[mockId]?.[kind] : registry.mocks[level][kind];
   return require('crypto').createHash('sha256').update(JSON.stringify(task)).digest('hex');
 }
 function requireMockTaskVersion(req, res, next) {
