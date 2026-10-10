@@ -16,9 +16,9 @@ describe("Falowen public marketing redesign", () => {
     expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "exams").description).toMatch(/Goethe|Lesen/);
     expect(PUBLIC_MARKETING_FEATURES.find((feature) => feature.key === "class")).toEqual(
       expect.objectContaining({
-        href: "/classes/",
+        href: "/classes",
         action: "View live classes",
-        scheduleHref: "/learn-german-ghana/upcoming-classes",
+        scheduleHref: "/classes",
         scheduleAction: "View full class schedule",
       })
     );
