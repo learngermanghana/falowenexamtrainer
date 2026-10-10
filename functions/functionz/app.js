@@ -4125,6 +4125,17 @@ app.post("/writing/a1-mock-score", async (req, res) => {
           score,
           source: "/writing/a1-mock-score",
         });
+        // The verified score is committed first. An audit-write failure must never
+        // change a student's grade or trigger a second AI scoring request.
+        try {
+          await require("./mockWritingAudit").saveMockWritingReview({
+            db, level: "A1", uid: authedUser.uid, attemptId,
+            answers: { formValues, text }, result: result,
+            source: "/writing/a1-mock-score",
+          });
+        } catch (auditError) {
+          console.error("Could not save A1 mock Schreiben audit", auditError);
+        }
       } catch (verificationError) {
         const code = String(verificationError?.code || "");
         const statusCode =
@@ -4387,6 +4398,17 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           score: Number(result?.score || 0),
           source: "/writing/a2-mock-score",
         });
+        // The verified score is committed first. An audit-write failure must never
+        // change a student's grade or trigger a second AI scoring request.
+        try {
+          await require("./mockWritingAudit").saveMockWritingReview({
+            db, level: "A2", uid: authedUser.uid, attemptId,
+            answers: { sms, email }, result: result,
+            source: "/writing/a2-mock-score",
+          });
+        } catch (auditError) {
+          console.error("Could not save A2 mock Schreiben audit", auditError);
+        }
       } catch (verificationError) {
         const code = String(verificationError?.code || "");
         const statusCode =
@@ -4551,6 +4573,17 @@ app.post("/writing/b1-mock-score", async (req, res) => {
           score: Number(result?.score || 0),
           source: "/writing/b1-mock-score",
         });
+        // The verified score is committed first. An audit-write failure must never
+        // change a student's grade or trigger a second AI scoring request.
+        try {
+          await require("./mockWritingAudit").saveMockWritingReview({
+            db, level: "B1", uid: authedUser.uid, attemptId,
+            answers: { teil1, teil2, teil3 }, result: result,
+            source: "/writing/b1-mock-score",
+          });
+        } catch (auditError) {
+          console.error("Could not save B1 mock Schreiben audit", auditError);
+        }
       } catch (verificationError) {
         const code = String(verificationError?.code || "");
         const statusCode =
@@ -4792,6 +4825,27 @@ app.get("/internal/mock-attempts", async (req, res) => {
   } catch (error) {
     console.error("mock attempt monitor failed", error);
     return res.status(503).json({ error: "Could not load mock attempt monitoring" });
+  }
+});
+
+app.get("/internal/mock-writing-review", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!identity) return;
+    const { isAuthorizedMockMonitor } = require("./mockAttemptMonitor");
+    if (!isAuthorizedMockMonitor(identity)) return res.status(403).json({ error: "Staff access required" });
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock writing audit storage unavailable" });
+    const { getMockWritingReview, parseReviewId } = require("./mockWritingAudit");
+    const attempt = String(req.query?.attempt || "");
+    if (!parseReviewId(attempt)) return res.status(400).json({ error: "Valid mock attempt identifier required" });
+    const review = await getMockWritingReview(db, attempt);
+    if (!review) return res.status(404).json({ error: "Mock attempt not found" });
+    res.set("Cache-Control", "no-store");
+    return res.json({ ok: true, review });
+  } catch (err) {
+    console.error("Staff mock writing review failed", err);
+    return res.status(503).json({ error: "Could not load the mock writing review" });
   }
 });
 
