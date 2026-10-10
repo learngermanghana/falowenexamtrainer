@@ -37,6 +37,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const { logout } = useAuth();
   const [savingAction, setSavingAction] = useState("");
   const [showWorkbookGuide, setShowWorkbookGuide] = useState(false);
+  const [showGettingStarted, setShowGettingStarted] = useState(false);
 
   const level = detectLevelKey(studentProfile);
   const className = studentProfile?.className || "Not assigned yet";
@@ -46,6 +47,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
   const trialLifecycle = useMemo(() => getTrialLifecycleState(studentProfile), [studentProfile]);
   const firstLessonPath = day0WorkbookByLevel[level] || "/campus/course";
   const dayOnePath = level ? `/campus/course/lesson/${level}/1?view=workbook` : "/campus/course";
+  // Reuse the authenticated profile and existing routes. No extra database
+  // reads, AI calls, Firestore listeners, or scheduled functions on login.
+  const learnerFirstName = String(studentProfile?.firstName || studentProfile?.name || studentProfile?.fullName || "").trim().split(/\s+/)[0];
 
   const accessLabel = paymentComplete
     ? "Paid access active"
@@ -100,7 +104,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             </button>
           </div>
           <h1 style={{ margin: 0, fontSize: "clamp(28px, 5vw, 40px)", lineHeight: 1.12 }}>
-            Hallo! I’m Study Buddy, your learning partner 👋
+            Hallo{learnerFirstName ? `, ${learnerFirstName}` : ""}! I’m Study Buddy, your learning partner 👋
           </h1>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.7, fontSize: 16 }}>
             Welcome to Falowen! I’ll be here whenever your tutor isn’t around. Ask me about your lessons, German practice, assignments, results, or where to find something in Falowen. Your tutor leads your classes, and I help between lessons. Where should we begin?
@@ -128,6 +132,19 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
               </button>
               <button type="button" style={styles.secondaryButton} onClick={() => setShowWorkbookGuide(false)}>Back</button>
             </div>
+          </section>
+        ) : null}
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} aria-expanded={showGettingStarted} onClick={() => setShowGettingStarted((open) => !open)}>
+          {showGettingStarted ? "Hide getting started guide" : "Show my getting started guide"}
+        </button>
+        {showGettingStarted ? (
+          <section aria-label="Getting started guide" style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 10 }}>
+            <h2 style={{ margin: 0, fontSize: 19 }}>Your first steps{level ? ` · ${level}` : ""}</h2>
+            <p style={{ margin: 0 }}>1. Watch the teacher's Day 0 orientation to learn the navigation.</p>
+            <p style={{ margin: 0 }}>2. Open Day 1 from your Course Book.</p>
+            <p style={{ margin: 0 }}>3. Practise and submit activities when requested.</p>
+            <p style={{ margin: 0 }}>4. Review your tutor's feedback in Results, then continue.</p>
+            <small>This is a guide, not a completion tracker. Falowen uses your real lesson and assignment records for progress.</small>
           </section>
         ) : null}
         <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus?studyBuddy=open", "ask")}>
