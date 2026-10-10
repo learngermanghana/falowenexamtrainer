@@ -7,6 +7,9 @@ const buddy = fs.readFileSync(path.join(process.cwd(), "src/components/StudyBudd
 describe("first-login Study Buddy onboarding", () => {
   test("introduces Study Buddy and offers orientation, Day 1 and a live chat", () => {
     expect(onboarding).toContain("I’m Study Buddy, your learning partner");
+    expect(onboarding).toContain("learnerFirstName");
+    expect(onboarding).toContain("Show my getting started guide");
+    expect(onboarding).toContain("This is a guide, not a completion tracker.");
     expect(onboarding).toContain("Start Orientation");
     expect(onboarding).toContain("Day 1 Workbook");
     expect(onboarding).toContain("Ask Study Buddy anything");
