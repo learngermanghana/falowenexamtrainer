@@ -65,7 +65,7 @@ describe("A1–C2 honest mock completion and recovery", () => {
     expect(c2[0].status).toBe("planned");
     expect(c2[0].mode).toBe("section-preview");
     expect(component("C1FinalMockExamPage.jsx")).toContain("kein vollständiger vierteiliger C1-Mock");
-    expect(component("MockExamLibraryPage.js")).toContain("No overall mock pass/fail score");
+    expect(component("MockExamLibraryPage.js")).toContain("Section practice does not generate a complete mock score.");
   });
 
   it("never links to nonexistent B2/C2 listening or reading native sample URLs", () => {
