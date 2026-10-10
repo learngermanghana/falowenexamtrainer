@@ -29,6 +29,7 @@ import A1GoetheWritingMockPreview from "./components/A1GoetheWritingMockPreview"
 import A1GoetheSpeakingMockPreview from "./components/A1GoetheSpeakingMockPreview";
 import A1FinalMockExamPage from "./components/A1FinalMockExamPage";
 import A1Mock3Reading from "./components/A1Mock3Reading";
+import A1Mock3Listening from "./components/A1Mock3Listening";
 import A2GoetheReadingMockPreview from "./components/A2GoetheReadingMockPreview";
 import A2GoetheListeningMockTeil1Preview from "./components/A2GoetheListeningMockTeil1Preview";
 import A2GoetheListeningMockTeil2Preview from "./components/A2GoetheListeningMockTeil2Preview";
@@ -832,6 +833,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-final-mock-3"
             element={<A1Mock3Reading />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-3-hoeren"
+            element={<A1Mock3Listening />}
           />
           <Route
             path="/campus/course/a2-mock-lesen-preview"
