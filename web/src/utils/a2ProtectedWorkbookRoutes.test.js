@@ -1,5 +1,7 @@
 import fs from "fs";
 import path from "path";
+import { A2_LISTENING_MODES, getA2ListeningTask } from "../data/a2ListeningTasks";
+import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import {
   A2_DAY20_DYNAMIC_LESSON_PATH,
   A2_DAY20_LEGACY_WORKBOOK_PATH,
@@ -77,21 +79,44 @@ describe("protected A2 workbook routes", () => {
     ).toBe(expectedRoutes[21]);
   });
 
-  test("keeps the later Day 20 Hören workbook content", () => {
+  test("keeps Day 20 Hören questions and submission in the shared workbook", () => {
     const source = fs.readFileSync(
       path.resolve(__dirname, "../components/A2Day20TypischeReklamationssituationenWorkbookPage.js"),
       "utf8",
     );
+    const sharedWorkbook = fs.readFileSync(
+      path.resolve(__dirname, "../components/A2StandardTabbedWorkbookPage.js"),
+      "utf8",
+    );
+    const listening = getA2ListeningTask(20);
+    const lessonProfile = getA2B1LessonProfile("A2", 20);
 
-    expect(source.length).toBeGreaterThan(15000);
-    expect(source).toContain("Teil 1 · Sprechen");
-    expect(source).toContain("Sprechen wie bei einer Mini-Präsentation");
-    expect(source).toContain("Zentrales Thema: Reklamieren");
-    expect(source).toContain("Teil 2 · Schreiben (Formeller Brief)");
-    expect(source).toContain("pH1X3E7vOao");
-    expect(source).toContain("Warum bringt Laura den Wasserkocher zurück?");
     expect(source).toContain("RadioFirstWorkbookGate");
-    expect(source).not.toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain("day={20}");
+    expect(source).toContain("Zentrales Thema: Reklamieren".replace("Zentrales Thema: ", ""));
+    expect(source).toContain("formelle Reklamation");
+
+    expect(sharedWorkbook).toContain("const listeningConfig = getA2ListeningTask(day)");
+    expect(sharedWorkbook).toContain("const hoerenQuestions = listeningConfig?.questions || []");
+    expect(sharedWorkbook).toContain("ListeningMedia");
+    expect(sharedWorkbook).toContain("ContextualAssignmentSubmissionPage");
+
+    expect(listening).toEqual(expect.objectContaining({
+      chapter: "7.20",
+      mode: A2_LISTENING_MODES.GRADED,
+      audioUrl: "https://youtu.be/pH1X3E7vOao",
+    }));
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.questions.map((question) => question.stem)).toContain(
+      "Warum bringt Laura den Wasserkocher zurück?",
+    );
+    expect(lessonProfile.sections.part4).toEqual(expect.objectContaining({
+      visible: true,
+      submitRequired: true,
+      contentType: "listening",
+    }));
+    expect(lessonProfile.requiredSubmissionParts.map((part) => part.partId)).toContain("teil4");
   });
 });
 
