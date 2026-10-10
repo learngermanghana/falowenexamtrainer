@@ -63,7 +63,7 @@ test("presents one A2 course as A2.1 Days 1-14 and A2.2 Days 15-28", () => {
 test("does not show the retired A2 Day 29 mock preview as a course lesson", () => {
   render(<CourseTab defaultLevel="A2" />);
   expect(screen.queryByRole("heading", { name: "A2 Mock Practice" })).not.toBeInTheDocument();
-  expect(screen.queryByRole("link", { name: "Open Lesson", href: "/campus/course/a2-mock-practice-preview" })).not.toBeInTheDocument();
+  expect(document.querySelector('a[href="/campus/course/a2-mock-practice-preview"]')).not.toBeInTheDocument();
 });
 
 test("keeps Day 15 on its existing A2 identity and chapter route", () => {
