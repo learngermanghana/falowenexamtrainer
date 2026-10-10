@@ -259,6 +259,79 @@
             }
           ]
         }
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich anhand der folgenden Stichpunkte vor. Antworten Sie danach auf die möglichen Prüferfragen.",
+          "card": [
+            "Name?",
+            "Alter?",
+            "Land?",
+            "Wohnort?",
+            "Sprachen?",
+            "Beruf?",
+            "Hobby?"
+          ],
+          "followUp": "Mögliche Prüferfragen: 1. Können Sie Ihren Familiennamen bitte buchstabieren? 2. Wie ist Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen."
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Um Informationen bitten und Informationen geben",
+          "context": "Thema: Einkaufen",
+          "maxRecordingSeconds": 60,
+          "prompt": "Stellen Sie Ihrem Partner / Ihrer Partnerin eine Frage zu der folgenden Karte. Thema: Einkaufen. Wort: Brot.",
+          "keyword": "Brot"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Bitten formulieren und darauf reagieren",
+          "context": "Eine höfliche Bitte",
+          "maxRecordingSeconds": 60,
+          "prompt": "Formulieren Sie eine passende höfliche Bitte zur Bildkarte: Ein Glas Wasser.",
+          "picture": "glass-water",
+          "pictureAlt": "Ein Glas Wasser"
+        }
+      ],
+      "readingAnswerKey": {
+        "t1-1": "richtig",
+        "t1-2": "falsch",
+        "t1-3": "richtig",
+        "t1-4": "falsch",
+        "t1-5": "richtig",
+        "t2-6": "a",
+        "t2-7": "a",
+        "t2-8": "b",
+        "t2-9": "a",
+        "t2-10": "a",
+        "t3-11": "falsch",
+        "t3-12": "richtig",
+        "t3-13": "richtig",
+        "t3-14": "falsch",
+        "t3-15": "falsch"
+      },
+      "listeningAnswerKey": {
+        "t1-1": "b",
+        "t1-2": "a",
+        "t1-3": "b",
+        "t1-4": "a",
+        "t1-5": "b",
+        "t1-6": "b",
+        "t2-7": "a",
+        "t2-8": "c",
+        "t2-9": "b",
+        "t2-10": "b",
+        "t3-11": "b",
+        "t3-12": "c",
+        "t3-13": "c",
+        "t3-14": "b",
+        "t3-15": "b"
       }
     }
   },
