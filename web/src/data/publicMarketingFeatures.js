@@ -23,9 +23,9 @@ export const PUBLIC_MARKETING_FEATURES = Object.freeze([
     title: "Learn with a live class",
     description: "Join guided lessons with a tutor, get feedback and revisit recorded lectures.",
     action: "View live classes",
-    href: "/classes/",
+    href: "/classes",
     scheduleAction: "View full class schedule",
-    scheduleHref: "/learn-german-ghana/upcoming-classes",
+    scheduleHref: "/classes",
   },
   {
     key: "self",
