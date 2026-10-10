@@ -60,16 +60,10 @@ test("presents one A2 course as A2.1 Days 1-14 and A2.2 Days 15-28", () => {
   expect(within(second).getByRole("heading", { name: "Welcome to A2.2" })).toBeInTheDocument();
 });
 
-test("shows Day 29 as a separate A2 Mock Preview section and opens the preview directly", () => {
+test("does not show the retired A2 Day 29 mock preview as a course lesson", () => {
   render(<CourseTab defaultLevel="A2" />);
-
-  const preview = sectionByTitle("A2 Mock Practice");
-  expect(preview).toBeTruthy();
-  expect(within(preview).getByText(/A2 Mock Practice · Preview/i)).toBeInTheDocument();
-
-  const card = within(preview).getByRole("article");
-  const lessonLink = within(card).getByRole("link", { name: "Open Lesson" });
-  expect(lessonLink.getAttribute("href")).toBe("/campus/course/a2-mock-practice-preview");
+  expect(screen.queryByRole("heading", { name: "A2 Mock Practice" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: "Open Lesson", href: "/campus/course/a2-mock-practice-preview" })).not.toBeInTheDocument();
 });
 
 test("keeps Day 15 on its existing A2 identity and chapter route", () => {
