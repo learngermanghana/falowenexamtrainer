@@ -214,7 +214,8 @@
               "answer": "10115 Berlin",
               "alternatives": [
                 "Berlin 10115"
-              ]
+              ],
+              "explanation": "Eva wohnt in Berlin mit der Postleitzahl 10115."
             },
             {
               "kind": "input",
@@ -223,14 +224,16 @@
               "answer": "Kanada",
               "alternatives": [
                 "Canada"
-              ]
+              ],
+              "explanation": "Eva kommt aus Kanada."
             },
             {
               "kind": "input",
               "number": 3,
               "label": "Beruf",
               "answer": "Architektin",
-              "alternatives": []
+              "alternatives": [],
+              "explanation": "Eva arbeitet als Architektin."
             },
             {
               "kind": "choice",
@@ -246,7 +249,8 @@
                   "value": "Abendkurs",
                   "label": "Abendkurs"
                 }
-              ]
+              ],
+              "explanation": "Eva möchte einen Deutschkurs am Abend."
             },
             {
               "kind": "input",
@@ -255,7 +259,8 @@
               "answer": "A1",
               "alternatives": [
                 "A 1"
-              ]
+              ],
+              "explanation": "Eva möchte den Deutschkurs auf der Stufe A1 besuchen."
             }
           ]
         }
