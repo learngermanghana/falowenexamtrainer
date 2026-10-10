@@ -2,6 +2,7 @@ const {
   validateA1AudioKey,
   validateA1MockAudioKey,
   validateA2AudioKey,
+  validateA2MockAudioKey,
   validateB1AudioKey,
   validateB1MockAudioKey,
   validateC2AudioKey,
@@ -23,6 +24,20 @@ const {
 } = require("../r2CourseAudio");
 
 describe("A1/A2/B1/B2/C2 R2 course audio", () => {
+  test("A2 Mock 2 resolves the four uploaded falowen-course-audio files", () => {
+    for (let number = 1; number <= 4; number += 1) {
+      const part = `teil-${number}`;
+      const key = `a2/mock-horen-2/${part}.mp3`;
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key }))
+        .toEqual({ level: "A2", mockId: "mock-02", part, key });
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` })).toBeNull();
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-horen-2/${part}-other.mp3` })).toBeNull();
+    }
+    expect(validateA2MockAudioKey({
+      mockId: "mock-01", part: "teil-1", key: "a2/mock-hoeren/mock-01/teil-1.mp3",
+    })).toMatchObject({ mockId: "mock-01", part: "teil-1" });
+  });
+
   test("accepts protected A1 audio by visible course day", () => {
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a1/day-12/day-12.mp3" });
     expect(validateA1AudioKey({ day: 17, key: "a1/day-17/day-17.mp3" })).toEqual({ day: 17, key: "a1/day-17/day-17.mp3" });
