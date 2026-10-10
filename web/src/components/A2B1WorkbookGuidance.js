@@ -376,11 +376,11 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   const lessonLearning = workbookLevel === "A2" ? A2_DAYS_11_TO_15_LEARNING[lessonDay] : null;
   const catalogLesson = useMemo(() => {
     if (!workbookLevel || typeof window === "undefined") return null;
-    const currentPath = window.location.pathname.replace(/\\/$/, "");
+    const currentPath = window.location.pathname.replace(/\/$/, "");
     const lessons = getLessonsByLevel(workbookLevel);
     // Match the actual workbook route. A day may contain multiple chapters,
     // so guessing by day would show guidance for the wrong assignment.
-    return lessons.find((entry) => String(entry.workbookRoute || "").replace(/\\/$/, "") === currentPath) || null;
+    return lessons.find((entry) => String(entry.workbookRoute || "").replace(/\/$/, "") === currentPath) || null;
   }, [workbookLevel]);
   const specificLessonTitle = catalogLesson?.title || "";
   const hasLessonSubmission = Boolean(catalogLesson?.submissionRequired);
