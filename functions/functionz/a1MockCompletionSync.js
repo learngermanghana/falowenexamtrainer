@@ -235,7 +235,10 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
 };
 
 const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "a1-mock-01" } = {}) => {
-  if (mockId === "a1-mock-02") return firstAttempt || Number(attemptNumber) === 1 ? "A1-MOCK-02" : `A1-MOCK-02-PRACTICE-${Math.max(1, Number(attemptNumber) || 1)}`;
+  if (["a1-mock-02", "a1-mock-03"].includes(mockId)) {
+    const id = mockId === "a1-mock-03" ? "A1-MOCK-03" : "A1-MOCK-02";
+    return firstAttempt || Number(attemptNumber) === 1 ? id : `${id}-PRACTICE-${Math.max(1, Number(attemptNumber) || 1)}`;
+  }
   const number = Math.max(1, Number(attemptNumber) || 1);
   return firstAttempt || number === 1
     ? "A1-FINAL-MOCK"
@@ -254,7 +257,7 @@ const buildA1MockCompletionArtifacts = ({
   now = new Date(),
 } = {}) => {
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
-  const mockTitle = mockId === "a1-mock-02" ? "A1 Mock 2" : MOCK_TITLE;
+  const mockTitle = mockId === "a1-mock-03" ? "A1 Mock 3" : mockId === "a1-mock-02" ? "A1 Mock 2" : MOCK_TITLE;
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
@@ -297,7 +300,7 @@ const buildA1MockCompletionArtifacts = ({
     comments,
     feedback: comments,
     date: iso,
-    link: mockId === "a1-mock-02" ? "/campus/course/a1-final-mock-2" : "/campus/course/a1-final-mock-exam",
+    link: mockId === "a1-mock-03" ? "/campus/course/a1-final-mock-3" : mockId === "a1-mock-02" ? "/campus/course/a1-final-mock-2" : "/campus/course/a1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
     attemptLabel,
@@ -312,7 +315,7 @@ const buildA1MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
+  const notificationTitle = mockId === "a1-mock-03" ? "Your A1 Mock 3 result is ready" : mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
     ? "Your A1 Final Mock result is ready"
     : "Your A1 Final Mock practice result is ready";
 
