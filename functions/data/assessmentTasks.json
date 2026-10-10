@@ -164,6 +164,180 @@
         "t3-14": "c",
         "t3-15": "a"
       }
+    },
+    "a1-mock-03": {
+      "level": "A1",
+      "writing": {
+        "id": "a1-mock-03-anna-dinner",
+        "title": "Einladung zum Essen",
+        "register": "Informal",
+        "recipient": "Anna",
+        "wordTarget": 30,
+        "situation": "Sie möchten Ihre Freundin Anna am Wochenende zum Essen zu sich nach Hause einladen.",
+        "instruction": "Schreiben Sie eine kurze E-Mail an Ihre Freundin Anna. Schreiben Sie ca. 30 Wörter und gehen Sie auf alle drei Punkte ein. Vergessen Sie nicht die Anrede und den Gruß!",
+        "points": [
+          "Grund des Schreibens: Einladung zum Essen.",
+          "Wann? Nennen Sie einen Tag am Wochenende und eine Uhrzeit.",
+          "Mitbringen: Fragen Sie Anna, ob sie ein Dessert oder Getränke mitbringen kann."
+        ],
+        "contentKeys": [
+          "invitation",
+          "when",
+          "bring"
+        ],
+        "form": {
+          "scenario": [
+            "Ihre Bekannte Eva Miller möchte an einer Sprachschule einen Deutschkurs besuchen. Helfen Sie ihr und tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+            "Eva Miller kommt aus Kanada und wohnt seit zwei Wochen in Berlin (Postleitzahl: 10115, Hauptstraße 12). Sie ist 28 Jahre alt und arbeitet als Architektin. Sie möchte ab dem 1. November einen Abendkurs für Deutsch auf der Stufe A1 besuchen. Sie bezahlt die Kursgebühr in bar."
+          ],
+          "instruction": "Tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+          "formRows": [
+            {
+              "kind": "prefilled",
+              "label": "Familienname",
+              "value": "Miller"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Vorname",
+              "value": "Eva"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Straße, Hausnummer",
+              "value": "Hauptstraße 12"
+            },
+            {
+              "kind": "input",
+              "number": 1,
+              "label": "Wohnort / PLZ",
+              "answer": "10115 Berlin",
+              "alternatives": [
+                "Berlin 10115"
+              ],
+              "explanation": "Eva wohnt in Berlin mit der Postleitzahl 10115."
+            },
+            {
+              "kind": "input",
+              "number": 2,
+              "label": "Herkunftsland",
+              "answer": "Kanada",
+              "alternatives": [
+                "Canada"
+              ],
+              "explanation": "Eva kommt aus Kanada."
+            },
+            {
+              "kind": "input",
+              "number": 3,
+              "label": "Beruf",
+              "answer": "Architektin",
+              "alternatives": [],
+              "explanation": "Eva arbeitet als Architektin."
+            },
+            {
+              "kind": "choice",
+              "number": 4,
+              "label": "Gewünschter Kurs",
+              "answer": "Abendkurs",
+              "options": [
+                {
+                  "value": "Vormittagskurs",
+                  "label": "Vormittagskurs"
+                },
+                {
+                  "value": "Abendkurs",
+                  "label": "Abendkurs"
+                }
+              ],
+              "explanation": "Eva möchte einen Deutschkurs am Abend."
+            },
+            {
+              "kind": "input",
+              "number": 5,
+              "label": "Gewünschte Sprachstufe",
+              "answer": "A1",
+              "alternatives": [
+                "A 1"
+              ],
+              "explanation": "Eva möchte den Deutschkurs auf der Stufe A1 besuchen."
+            }
+          ]
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich anhand der folgenden Stichpunkte vor. Antworten Sie danach auf die möglichen Prüferfragen.",
+          "card": [
+            "Name?",
+            "Alter?",
+            "Land?",
+            "Wohnort?",
+            "Sprachen?",
+            "Beruf?",
+            "Hobby?"
+          ],
+          "followUp": "Mögliche Prüferfragen: 1. Können Sie Ihren Familiennamen bitte buchstabieren? 2. Wie ist Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen."
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Um Informationen bitten und Informationen geben",
+          "context": "Thema: Einkaufen",
+          "maxRecordingSeconds": 60,
+          "prompt": "Stellen Sie Ihrem Partner / Ihrer Partnerin eine Frage zu der folgenden Karte. Thema: Einkaufen. Wort: Brot.",
+          "keyword": "Brot"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Bitten formulieren und darauf reagieren",
+          "context": "Eine höfliche Bitte",
+          "maxRecordingSeconds": 60,
+          "prompt": "Formulieren Sie eine passende höfliche Bitte zur Bildkarte: Ein Glas Wasser.",
+          "picture": "glass-water",
+          "pictureAlt": "Ein Glas Wasser"
+        }
+      ],
+      "readingAnswerKey": {
+        "t1-1": "richtig",
+        "t1-2": "falsch",
+        "t1-3": "richtig",
+        "t1-4": "falsch",
+        "t1-5": "richtig",
+        "t2-6": "a",
+        "t2-7": "a",
+        "t2-8": "b",
+        "t2-9": "a",
+        "t2-10": "a",
+        "t3-11": "falsch",
+        "t3-12": "richtig",
+        "t3-13": "richtig",
+        "t3-14": "falsch",
+        "t3-15": "falsch"
+      },
+      "listeningAnswerKey": {
+        "t1-1": "b",
+        "t1-2": "a",
+        "t1-3": "b",
+        "t1-4": "a",
+        "t1-5": "b",
+        "t1-6": "b",
+        "t2-7": "a",
+        "t2-8": "c",
+        "t2-9": "b",
+        "t2-10": "b",
+        "t3-11": "b",
+        "t3-12": "c",
+        "t3-13": "c",
+        "t3-14": "b",
+        "t3-15": "b"
+      }
     }
   },
   "writing": {

@@ -387,11 +387,12 @@ const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
   </div>
 );
 
-export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1" }) {
+export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1", mockId = "" }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
   const normalizedLevel = ["A1", "A2", "B1", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
+  const isMock3 = normalizedLevel === "A1" && sampleId === "sample-3" && mockId === "a1-mock-03";
   const parts =
     normalizedLevel === "B1"
       ? B1_PARTS
@@ -447,15 +448,15 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
         idToken,
         level: normalizedLevel,
         section: "hoeren",
-        setId: `${normalizedLevel.toLowerCase()}-hoeren-${sampleId}`,
-        title: `${normalizedLevel} Hören Sample ${sampleNumber}`,
+        setId: isMock3 ? "a1-mock-03-hoeren" : `${normalizedLevel.toLowerCase()}-hoeren-${sampleId}`,
+        title: isMock3 ? "A1 Mock 3 · Hören" : `${normalizedLevel} Hören Sample ${sampleNumber}`,
         score,
         total: questions.length,
         percent,
         passed: percent >= 60,
         attemptId: `hoeren-${normalizedLevel.toLowerCase()}-${sampleId}-${Date.now()}`,
         resultType: "practice",
-        route: `/exams/horen/${normalizedLevel.toLowerCase()}/${sampleId}`,
+        route: isMock3 ? "/campus/course/a1-final-mock-3-hoeren" : `/exams/horen/${normalizedLevel.toLowerCase()}/${sampleId}`,
         sectionScores,
       });
       setResultSyncStatus("saved");
@@ -683,15 +684,15 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   return (
     <main style={{ display: "grid", gap: 12 }} data-hoeren-practice-sample>
       <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/exams/horen")}>
-          Back to Hören samples
+        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate(isMock3 ? "/campus/course/a1-final-mock-3" : "/exams/horen")}>
+          {isMock3 ? "← Back to A1 Mock 3 Lesen" : "Back to Hören samples"}
         </button>
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
         <h2 style={{ margin: 0 }}>
-          Hören {sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}
+          {isMock3 ? "A1 Mock 3 · Hören" : `Hören ${sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}`}
         </h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete all listening parts, then check your answers at the end.
+          {isMock3 ? "Hören Sample 3 is reused here. Complete all 15 questions; this score belongs to Mock 3." : "Complete all listening parts, then check your answers at the end."}
         </p>
       </section>
 
@@ -773,7 +774,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
               window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
-            Try {sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"} again
+            Try {isMock3 ? "Mock 3 Hören" : sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"} again
           </button>
         )}
       </section>

@@ -21,7 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
-const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form } = require("./a1MockSets");
+const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -2627,7 +2627,11 @@ const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
   "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
   "",
   "SCORING — 15 points total:",
-  mockId === "a1-mock-02" ? "Content points: 6 points — 2 each for inviting Markus (invitation), specifying a day/time/address (when_where), and asking him to bring something (bring). Accept any sensible chosen day, time, address and item. Use informal register with Markus." : "Content points: 6 points — 2 for each of the three canonical task points, in order. Output keys registration, next_course_start, price represent points 1, 2, 3 respectively.",
+  mockId === "a1-mock-03"
+    ? "Content points: 6 points — 2 for inviting Anna to eat at the learner's home (invitation), 2 for specifying a Saturday or Sunday and a time (when), 2 for asking Anna to bring a dessert or drinks (bring). An informal German greeting and closing are required. Accept any sensible weekend day and clock time."
+    : mockId === "a1-mock-02"
+      ? "Content points: 6 points — 2 each for inviting Markus (invitation), specifying a day/time/address (when_where), and asking him to bring something (bring). Accept any sensible chosen day, time, address and item. Use informal register with Markus."
+      : "Content points: 6 points — 2 for each of the three canonical task points, in order. Output keys registration, next_course_start, price represent points 1, 2, 3 respectively.",
   "Message structure: 3 points — greeting 1, closing 1, name 1.",
   "A1 language control: 4 points — simple understandable sentences/questions, basic word order and vocabulary. Meaning matters more than perfection.",
   "A1 appropriateness: 2 points — reasonably simple A1 production, not unnecessarily elaborate.",
@@ -2638,7 +2642,7 @@ const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
     score: 0,
     maxScore: 15,
     level_mismatch: false,
-    content: mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
+    content: mockId === "a1-mock-03" ? { invitation: 0, when: 0, bring: 0 } : mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
     structure: {
       greeting: 0,
       closing: 0,
@@ -4036,7 +4040,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
 
     if (!ensureOpenAIConfigured(res)) return;
 
-    const form = mockId === "a1-mock-02" ? scoreA1Mock2Form(formValues) : scoreA1MockWritingForm(formValues);
+    const form = mockId === "a1-mock-03" ? scoreA1Mock3Form(formValues) : mockId === "a1-mock-02" ? scoreA1Mock2Form(formValues) : scoreA1MockWritingForm(formValues);
     let letter;
 
     if (!text) {
@@ -4044,7 +4048,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
         score: 0,
         maxScore: 15,
         level_mismatch: false,
-        content: mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
+        content: mockId === "a1-mock-03" ? { invitation: 0, when: 0, bring: 0 } : mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
         structure: { greeting: 0, closing: 0, name: 0 },
         a1_language_score: 0,
         a1_fit_score: 0,

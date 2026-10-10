@@ -7,6 +7,8 @@ import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { useAuth } from "../context/AuthContext";
 import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioService";
 import A1Mock2Reading from "./A1Mock2Reading";
+import A1Mock3ReadingSection from "./A1Mock3ReadingSection";
+import { A1_MOCK_3_ID, A1_MOCK_3_READING, A1_MOCK_3_LISTENING, A1_MOCK_3_WRITING, A1_MOCK_3_WRITING_TASK, A1_MOCK_3_SPEAKING } from "../data/a1FinalMock3Data";
 import { A1_MOCK_2_ID, A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from "../data/a1FinalMock2Data";
 import { A1PictureOptions } from "./ListeningPracticeSamplePage";
 import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
@@ -347,17 +349,19 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
   const isMock2 = mockId === A1_MOCK_2_ID;
-  const title = isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
-  const listening = isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
-  const writing = isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
-  const writingTask = isMock2 ? A1_MOCK_2_WRITING_TASK : A1_FINAL_MOCK_WRITING_TASK;
-  const lesenScoredQuestions = useMemo(() => isMock2
-    ? Object.values(A1_MOCK_2_READING).flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
-    : defaultLesenQuestions, [isMock2]);
-  const hoerenScoredQuestions = useMemo(() => isMock2
+  const isMock3 = mockId === A1_MOCK_3_ID;
+  const isAdditionalMock = isMock2 || isMock3;
+  const title = isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
+  const listening = isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
+  const writing = isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
+  const writingTask = isMock3 ? A1_MOCK_3_WRITING_TASK : isMock2 ? A1_MOCK_2_WRITING_TASK : A1_FINAL_MOCK_WRITING_TASK;
+  const lesenScoredQuestions = useMemo(() => isAdditionalMock
+    ? Object.values(isMock3 ? A1_MOCK_3_READING : A1_MOCK_2_READING).flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
+    : defaultLesenQuestions, [isAdditionalMock, isMock3]);
+  const hoerenScoredQuestions = useMemo(() => isAdditionalMock
     ? [listening.teil1, listening.teil2, listening.teil3].flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
-    : defaultHoerenQuestions, [isMock2, listening]);
-  const storageKey = `${isMock2 ? `falowen:a1-final-mock:${mockId}` : A1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
+    : defaultHoerenQuestions, [isAdditionalMock, listening]);
+  const storageKey = `${isAdditionalMock ? `falowen:a1-final-mock:${mockId}` : A1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey, mockId));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
@@ -660,11 +664,11 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       <article className="a1-goethe-mock-exam">
         <header className="a1-goethe-mock-header">
           <p className="a1-goethe-mock-kicker">A1 · Lesen</p>
-          <h1>{isMock2 ? "Goethe-Zertifikat A1: Lesen (Übungstest)" : "Teil 1–3"}</h1>
+          <h1>{isAdditionalMock ? "Goethe-Zertifikat A1: Lesen (Übungstest)" : "Teil 1–3"}</h1>
           <p>Bearbeiten Sie alle 15 Aufgaben. Nach der Abgabe können Sie nicht zurückgehen.</p>
         </header>
 
-        {isMock2 ? <A1Mock2Reading answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : <>
+        {isMock3 ? <A1Mock3ReadingSection answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : isMock2 ? <A1Mock2Reading answers={exam.lesenAnswers} onChange={setLesenAnswer} /> : <>
         <section className="a1-final-mock-part">
           <h2>Teil 1</h2>
           <p>Lesen Sie die beiden Texte. Kreuzen Sie an: Richtig oder Falsch.</p>
@@ -834,7 +838,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     return (
       <>
         <SectionHeader label="Schreiben · 20 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
-        <article className={`a1-goethe-mock-exam a1-schreiben-mock-exam${isMock2 ? " a1-mock2-writing" : ""}`}>
+        <article className={`a1-goethe-mock-exam a1-schreiben-mock-exam${isAdditionalMock ? " a1-mock2-writing" : ""}`}>
           <header className="a1-goethe-mock-header">
             <p className="a1-goethe-mock-kicker">A1 · Schreiben</p>
             <h1>Teil 1–2</h1>
@@ -850,7 +854,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
             <div className="a1-schreiben-form-paper">
               <div className="a1-schreiben-form-header">
-                <div><strong>{isMock2 ? "SPRACHSCHULE" : "REISEBÜRO"}</strong><span>{isMock2 ? "Berlin" : "Stadttour & Ausflug"}</span></div>
+                <div><strong>{isAdditionalMock ? "SPRACHSCHULE" : "REISEBÜRO"}</strong><span>{isAdditionalMock ? "Berlin" : "Stadttour & Ausflug"}</span></div>
                 <div className="a1-schreiben-form-title">ANMELDUNG</div>
               </div>
               <div className="a1-schreiben-form-body">
@@ -944,7 +948,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
                 value={exam.schreibenText}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenText: event.target.value }))}
                 rows={11}
-                placeholder={isMock2 ? "Lieber Markus, ..." : "Sehr geehrte Damen und Herren, ..."}
+                placeholder={isMock3 ? "Liebe Anna, ..." : isMock2 ? "Lieber Markus, ..." : "Sehr geehrte Damen und Herren, ..."}
               />
               <div className="a1-schreiben-word-count">Wörter: <strong>{wordCount}</strong> · Ziel: ungefähr 30</div>
             </div>
@@ -1001,7 +1005,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.part === "t2" && isMock2 && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
@@ -1018,7 +1022,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.part === "t2" && isMock2 && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
@@ -1027,7 +1031,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
         <section className="a1-final-mock-feedback">
           <h2>Schreiben feedback</h2>
-          {isMock2 ? <details><summary>Musterlösung · E-Mail an Markus</summary><p className="a1-mock2-model-answer">{writingTask.modelAnswer}</p><p>Ein mögliches Beispiel. Andere passende Antworten sind möglich.</p></details> : null}
+          {isAdditionalMock ? <details><summary>Musterlösung · {isMock3 ? "E-Mail an Anna" : "E-Mail an Markus"}</summary><p className="a1-mock2-model-answer">{writingTask.modelAnswer}</p><p>Ein mögliches Beispiel. Andere passende Antworten sind möglich.</p></details> : null}
           <p><strong>Form:</strong> {exam.writingResult?.form?.score || 0}/10</p>
           <div className="a1-final-mock-review">
             {(exam.writingResult?.form?.fields || []).map((field) => (
@@ -1089,11 +1093,11 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     return (
       <main className="a1-goethe-mock-shell a1-final-mock-shell">
         <div className="a1-goethe-mock-topbar">
-          <AppBackButton label={isMock2 ? "Back to Mock Exams" : "Back to Course Book"} fallbackPath={isMock2 ? "/exams/mocks" : "/campus/course"} />
+          <AppBackButton label={isAdditionalMock ? "Back to Mock Exams" : "Back to Course Book"} fallbackPath={isAdditionalMock ? "/exams/mocks" : "/campus/course"} />
           <span className="a1-goethe-mock-preview-badge">{title} · repeatable practice</span>
         </div>
         <article className="a1-final-mock-intro">
-          <p className="a1-goethe-mock-kicker">{isMock2 ? "Exams Room · A1" : "Day 23 · A1"}</p>
+          <p className="a1-goethe-mock-kicker">{isAdditionalMock ? "Exams Room · A1" : "Day 23 · A1"}</p>
           <h1>{title}</h1>
           <p>Complete all four sections in order. Answers and AI feedback are revealed only after the full mock is finished.</p>
 
@@ -1123,7 +1127,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   return (
     <main className="a1-goethe-mock-shell a1-final-mock-shell" data-a1-final-mock>
       <div className="a1-goethe-mock-topbar">
-        <AppBackButton label={isMock2 ? "Back to Mock Exams" : "Back to Course Book"} fallbackPath={isMock2 ? "/exams/mocks" : "/campus/course"} />
+        <AppBackButton label={isAdditionalMock ? "Back to Mock Exams" : "Back to Course Book"} fallbackPath={isAdditionalMock ? "/exams/mocks" : "/campus/course"} />
         <span className="a1-goethe-mock-preview-badge">
           {exam.completed ? "Mock complete" : title}
         </span>
@@ -1139,7 +1143,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
           <A1GoetheSpeakingMockPreview
             mockId={mockId}
-            config={isMock2 ? A1_MOCK_2_SPEAKING : undefined}
+            config={isMock3 ? A1_MOCK_3_SPEAKING : isMock2 ? A1_MOCK_2_SPEAKING : undefined}
             embedded
             autoStart
             externalSecondsLeft={secondsLeft}

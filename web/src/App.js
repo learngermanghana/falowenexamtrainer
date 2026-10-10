@@ -834,6 +834,14 @@ const AppShell = ({
             element={<A1FinalMockExamPage key="a1-mock-02" mockId="a1-mock-02" />}
           />
           <Route
+            path="/campus/course/a1-final-mock-3"
+            element={<A1FinalMockExamPage key="a1-mock-03" mockId="a1-mock-03" />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-3-hoeren"
+            element={<A1FinalMockExamPage key="a1-mock-03" mockId="a1-mock-03" />}
+          />
+          <Route
             path="/campus/course/a2-mock-lesen-preview"
             element={<A2GoetheReadingMockPreview />}
           />

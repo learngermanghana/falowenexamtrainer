@@ -487,6 +487,15 @@ export default function A1GoetheSpeakingMockPreview({
                 <g transform="rotate(35 80 80)"><path d="M65 30h30v95H65z" fill="#f1cc5a" stroke="#222" strokeWidth="3" /><path d="M65 125l15 26 15-26" fill="#eedac0" stroke="#222" strokeWidth="3" /><path d="M74 141l6 10 6-10" fill="#222" /><path d="M65 30v-9q15-12 30 0v9" fill="#e6a3ac" stroke="#222" strokeWidth="3" /><path d="M65 35h30M75 40v80M85 40v80" fill="none" stroke="#555" strokeWidth="2" /></g>
               </svg>
             </figure> : null}
+            {task.picture === "glass-water" ? <figure className="a1-sprechen-picture-card">
+              <svg viewBox="0 0 160 160" role="img" aria-label={task.pictureAlt}>
+                <path d="M34 24 H126 L116 135 Q80 148 44 135 Z" fill="#fafcff" stroke="#273b53" strokeWidth="5" strokeLinejoin="round" />
+                <path d="M43 75 Q80 65 117 75 L110 128 Q80 139 50 128 Z" fill="#9bd8f1" stroke="none" />
+                <path d="M43 75 Q80 65 117 75" fill="none" stroke="#2c84aa" strokeWidth="3" />
+                <path d="M52 43 L52 58 M64 36 L64 46" stroke="#c8e4ee" strokeWidth="5" strokeLinecap="round" />
+                <path d="M55 142 H105" stroke="#273b53" strokeWidth="4" strokeLinecap="round" />
+              </svg>
+            </figure> : null}
             {task.followUp ? <p className="a1-sprechen-follow-up">{task.followUp}</p> : null}
             {task.keyword ? (
               <div className="a1-sprechen-keyword-card">
