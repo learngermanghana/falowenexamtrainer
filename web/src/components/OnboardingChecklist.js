@@ -130,6 +130,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             </div>
           </section>
         ) : null}
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus?studyBuddy=open", "ask")}>
+          {savingAction === "ask" ? "Opening..." : "💬 Ask Study Buddy anything"}
+        </button>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           <StatusItem label="Level" value={level || studentProfile?.level || "Not selected"} />
           <StatusItem label="Class" value={className} />
@@ -155,15 +158,6 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
         </section>
 
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-          <button
-            type="button"
-            style={styles.primaryButton}
-            disabled={Boolean(savingAction)}
-            onClick={() => finishAndGo(firstLessonPath, "start")}
-          >
-            {savingAction === "start" ? "Opening..." : "Start learning"}
-          </button>
-
           <button
             type="button"
             style={styles.secondaryButton}
