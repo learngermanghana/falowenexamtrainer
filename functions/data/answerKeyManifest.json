@@ -1043,7 +1043,13 @@
         "Answer4": "A) Anzeige A",
         "Answer5": "B) Anzeige B"
       },
-      "teil4": {}
+      "teil4": {
+        "Answer1": "B) Italien",
+        "Answer2": "B) Gutes Frühstück, ein ruhiges Zimmer und die Nähe zum Strand",
+        "Answer3": "A) Weil die Autofahrt sehr lang wäre",
+        "Answer4": "B) Eine Kirche besichtigen, durch die Altstadt spazieren und in einem Restaurant essen",
+        "Answer5": "B) Die Abfahrtszeit, die Wettervorhersage und ihre Reservierung"
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1VhkmUp18ZHieB-bTyZavqvEs1ikz9bXAHh_aDOai-7E/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1VhkmUp18ZHieB-bTyZavqvEs1ikz9bXAHh_aDOai-7E/edit",
@@ -1075,7 +1081,13 @@
         "Answer4": "A) Er freut sich über den guten Rat („Super Tipp. Danke“).",
         "Answer5": "A) Der Tourist ist mit dem Plan für Museum und Stadtpark zufrieden."
       },
-      "teil4": {}
+      "teil4": {
+        "Answer1": "B) Weil sie immer wieder an die Aufgaben denkt",
+        "Answer2": "C) Glücklich und erleichtert",
+        "Answer3": "A) Weil er die neue Stelle nicht bekommen hat",
+        "Answer4": "C) Seine Freundin",
+        "Answer5": "B) Eine Überraschungsparty"
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1SQsUUW6_A3X-SGbOsyMZuOgm6Qo7gGsnqY9pbNxYgmY/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1SQsUUW6_A3X-SGbOsyMZuOgm6Qo7gGsnqY9pbNxYgmY/edit",
@@ -1092,10 +1104,11 @@
         "Answer5": "B) Einen digitalen Stadtplan mit Markierungen für Sehenswürdigkeiten"
       },
       "teil4": {
-        "Answer1": "B) Ihr Handy",
-        "Answer2": "B) Auf www.jumiagh.com",
-        "Answer3": "B) Nach Modell-Empfehlung sowie Bestellung und Lieferung",
-        "Answer4": "A) Gute Kamera und lange Akkulaufzeit"
+        "Answer1": "A) Weil ihre Schwester in Österreich lebt",
+        "Answer2": "B) Sie machen eine Videokonferenz",
+        "Answer3": "B) Weil er am Abend nicht ständig auf sein Handy schauen möchte",
+        "Answer4": "B) Weil ihr Datenschutz wichtiger geworden ist",
+        "Answer5": "C) Missverständnisse können leichter entstehen"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1CDLU1BEBm-xCS0BEdXunjSN8CHol1UMuxlF_QDSGNc8/gviz/tq?tqx=out:html&sheet=Key",
