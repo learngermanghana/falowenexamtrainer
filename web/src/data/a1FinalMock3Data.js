@@ -1,4 +1,4 @@
-import { A1_EXAM_HOEREN_SAMPLE_3_TEIL1, A1_EXAM_HOEREN_SAMPLE_3_TEIL2, A1_EXAM_HOEREN_SAMPLE_3_TEIL3 } from './a1ExamHorenSample3';
+import { A1_EXAM_HOEREN_SAMPLE_3_TEIL1, A1_EXAM_HOEREN_SAMPLE_3_TEIL2, A1_EXAM_HOEREN_SAMPLE_3_TEIL3 } from './a1ExamHorenSample3.js';
 
 // A1 Mock 3: Lesen is complete, Hören reuses Sample 3, Schreiben uses a separate exam task. Sprechen has dedicated tasks.
 export const A1_MOCK_3_ID = 'a1-mock-03';
