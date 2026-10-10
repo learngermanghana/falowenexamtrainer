@@ -370,8 +370,24 @@ const getDistinctFeedbackText = (item = {}) => {
   return feedback;
 };
 
-const getNextStep = () =>
-  "Revise the correction points and questions to review, then submit an improved version.";
+export const getNextStep = (item = {}) => {
+  const corrections = getCorrectionPoints(item);
+  const wrongAnswers = normalizeArray(item.wrongAnswers);
+  if (corrections.length && wrongAnswers.length) {
+    return "Review the corrections shown above and compare your missed questions with the expected answers before resubmitting.";
+  }
+  if (corrections.length) {
+    return "Use the specific corrections shown above when revising your assignment, then resubmit your updated answers.";
+  }
+  if (wrongAnswers.length) {
+    return "Check the missed questions and their correct answers above before submitting an improved attempt.";
+  }
+  const specificFeedback = getWhyThisScore(item) || getDistinctFeedbackText(item);
+  if (specificFeedback) {
+    return "Read the marking feedback above and address its points before resubmitting.";
+  }
+  return "Open your assignment, compare your answers with the lesson requirements and submit a revised attempt.";
+};
 
 export const hasStructuredResultFeedback = (item = {}) => {
   const objectiveDetails = normalizeObject(item.objectiveDetails);
