@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import React, { useState } from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "../i18n";
 import i18n from "../i18n";
 import LandingPage from "../components/LandingPage";
@@ -60,6 +60,19 @@ describe("Falowen public homepage on mobile", () => {
     expect(screen.queryByRole("heading", { name: "Start in three simple steps" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: /German A1–C2 courses and exam preparation/ })).not.toBeInTheDocument();
     expect(screen.queryByText(/Goethe pass rate/i)).not.toBeInTheDocument();
+  });
+
+  it("keeps compact A1–C2 course and Goethe preparation links without a fixed rating", () => {
+    const { container } = render(<LandingHost />);
+    const courses = within(screen.getByRole("navigation", { name: "German courses by level" }));
+    const exams = within(screen.getByRole("navigation", { name: "Free Goethe exam practice" }));
+
+    for (const level of ["a1", "a2", "b1", "b2", "c1", "c2"]) {
+      expect(courses.getByRole("link", { name: level.toUpperCase() })).toHaveAttribute("href", `/learn-german-${level}`);
+      expect(exams.getByRole("link", { name: level.toUpperCase() })).toHaveAttribute("href", `/goethe-${level}-preparation`);
+    }
+    expect(container.querySelectorAll(".falowen-home-feature")).toHaveLength(4);
+    expect(container.querySelector(".falowen-home-reviews-intro")).not.toHaveTextContent("★★★★★");
   });
 
   it("does not show the removed Falowen Radio promotion", () => {
