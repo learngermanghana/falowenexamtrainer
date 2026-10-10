@@ -23,3 +23,12 @@ test("Sample 2 retains unique matching answers and independent Exam Room result 
   expect(practice).toContain('setId: `${normalizedLevel.toLowerCase()}-hoeren-${sampleId}`');
   expect(practice).toContain('section: "hoeren"');
 });
+
+test("A2 Sample 2 Teil 3 uses visible text options rather than hidden icon choices", () => {
+  const practice = read("ListeningPracticeSamplePage.jsx");
+  expect(practice).toContain('sampleId !== "sample-2" && part.key === "teil3"');
+  expect(practice).toContain("<ChoiceOptions");
+  expect(A2_MOCK_2_HOEREN[2].questions.every((question) =>
+    question.options.every((option) => option.id && option.label && !option.icon)
+  )).toBe(true);
+});
