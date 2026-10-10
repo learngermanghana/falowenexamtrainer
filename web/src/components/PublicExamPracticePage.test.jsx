@@ -12,7 +12,7 @@ describe("PublicExamPracticePage", () => {
     expect(screen.getByText("Goethe-style B2 practice")).toBeInTheDocument();
     expect(screen.getByText("Goethe-style C1 practice")).toBeInTheDocument();
     expect(screen.getByText("Goethe-style C2 practice")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Access full mocks/ })).toHaveAttribute("href", "/campus/course/a1-final-mock-exam");
+    expect(screen.getAllByRole("link", { name: /Access full mocks/ })[0]).toHaveAttribute("href", "/campus/course/a1-final-mock-exam");
     expect(document.title).toBe("Goethe Exam Practice A1–C2 | Falowen Mocks");
     expect(document.querySelector('link[rel="canonical"]')).toHaveAttribute("href", expect.stringMatching(/\/exam-practice$/));
   });
