@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { updatePageMeta } from "../lib/pageMeta";
 import A1GoetheReadingMockTeil1Preview from "./A1GoetheReadingMockTeil1Preview";
 import A2GoetheReadingMockPreview from "./A2GoetheReadingMockPreview";
+import { getMockExamsForLevel } from "../data/mockExamCatalog";
+import "./PublicExamPracticePage.css";
 
 const cardStyle = {
   border: "1px solid #e2e8f0",
@@ -40,17 +42,17 @@ export default function PublicExamPracticePage({ level = "" }) {
         canonicalPath: "/exam-practice/a2",
       },
       B1: {
-        title: "Goethe B1 Exam Practice Coming Soon | Falowen",
+        title: "Goethe B1 Exam Preparation and Mock Tests | Falowen",
         description:
-          "Falowen public Goethe-style B1 exam practice is coming soon. B1 students can continue using the full Exam Room after signing in.",
+          "Explore B1 full mock exams in Falowen’s student Exam Room; sign in to access complete practice and results.",
         canonicalPath: "/exam-practice/b1",
       },
     };
 
     const metadata = metadataByLevel[level] || {
-      title: "Free Goethe Exam Practice A1 & A2 | Falowen",
+      title: "Goethe Exam Practice A1–C2 | Falowen Mocks",
       description:
-        "Practise free Goethe-style German exam tasks by level with Falowen. Public A1 and A2 Lesen practice is available without login, with more levels planned.",
+        "Explore Falowen Goethe-style practice by level: free A1/A2 reading samples, complete A1–B2 mocks for students, C1 reading practice and C2 exam preparation.",
       canonicalPath: "/exam-practice",
     };
 
@@ -100,93 +102,85 @@ export default function PublicExamPracticePage({ level = "" }) {
   if (level === "A1") return <A1GoetheReadingMockTeil1Preview publicMode />;
   if (level === "A2") return <A2GoetheReadingMockPreview publicMode />;
 
-  if (level === "B1") {
-    return (
-      <main style={{ minHeight: "100vh", background: "#f8fafc", padding: "32px 16px 56px" }}>
-        <div style={{ maxWidth: 760, margin: "0 auto" }}>
-          <section style={{ ...cardStyle, padding: 28 }}>
-            <p style={{ margin: 0, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#64748b" }}>
-              Falowen Exam Practice
-            </p>
-            <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.2rem)", lineHeight: 1.05 }}>
-              Goethe B1 public exam practice is coming soon
-            </h1>
-            <p style={{ margin: 0, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
-              We have not published a complete public-ready B1 mock yet. B1 students can continue practising inside the full Falowen Exam Room.
-            </p>
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
-              <a href="/exam-practice" style={actionStyle}>Back to free A1 & A2 practice</a>
-              <a href="/login/" style={{ ...actionStyle, background: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1" }}>
-                Student sign in
-              </a>
-            </div>
-          </section>
-        </div>
-      </main>
-    );
-  }
+  const levels = level === "B1" ? ["B1"] : ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const freePath = { A1: "/exam-practice/a1", A2: "/exam-practice/a2" };
+  const levelDescription = {
+    A1: "Build confidence with a free Lesen sample, then try two complete student mocks.",
+    A2: "Start with free Lesen. Progress to Mock 1 or explore the four-section Mock 2 preview.",
+    B1: "A complete timed B1 mock is available in the signed-in Exam Room.",
+    B2: "Practise the four modules in a complete B2 mock through your student account.",
+    C1: "Focused reading practice is available; a complete C1 mock is not yet published.",
+    C2: "Explore C2 exam preparation. A complete four-module mock is not yet published.",
+  };
 
   return (
-    <main style={{ minHeight: "100vh", background: "#f8fafc", padding: "32px 16px 56px" }}>
-      <div style={{ maxWidth: 1040, margin: "0 auto", display: "grid", gap: 22 }}>
-        <header style={{ ...cardStyle, padding: 28 }}>
-          <p style={{ margin: 0, fontWeight: 800, letterSpacing: 0.6, textTransform: "uppercase", color: "#2563eb" }}>
-            Falowen Exam Practice
-          </p>
-          <h1 style={{ margin: "8px 0 10px", fontSize: "clamp(2rem, 7vw, 3.5rem)", lineHeight: 1.02 }}>
-            Free Goethe A1 & A2 exam practice
-          </h1>
-          <p style={{ margin: 0, maxWidth: 760, color: "#475569", fontSize: 17, lineHeight: 1.6 }}>
-            Practise Goethe-style German exam tasks by level without signing in. Start with A1 or A2 Lesen, get an instant score, then use the full Falowen Exam Room when you need complete mocks, Schreiben, Sprechen and saved progress.
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 18 }}>
-            <a href="/exam-practice/a1" style={actionStyle}>Start A1 free practice</a>
-            <a href="/exam-practice/a2" style={actionStyle}>Start A2 free practice</a>
-            <a href="/login/" style={{ ...actionStyle, background: "#ffffff", color: "#0f172a", border: "1px solid #cbd5e1" }}>
-              Student sign in
-            </a>
+    <main className="public-goethe">
+      <div className="public-goethe-shell">
+        <nav className="public-goethe-nav" aria-label="Exam preparation navigation">
+          <a href="/" className="public-goethe-brand">Falowen <span>Exam Practice</span></a>
+          <a href="/login/" className="public-goethe-nav-login">Student sign in <span aria-hidden="true">↗</span></a>
+        </nav>
+        <header className="public-goethe-hero">
+          <div className="public-goethe-hero-content">
+            <span className="public-goethe-eyebrow">GOETHE-STYLE EXAM PREPARATION · A1–C2</span>
+            <h1>Prepare with purpose.<br /><em>Practise with Falowen.</em></h1>
+            <p>Find the right German exam practice for your level. Try public reading samples for free, or sign in for full mock exams, timed sections and your saved results.</p>
+            <div className="public-goethe-hero-actions">
+              <a href="/exam-practice/a1" className="public-goethe-btn public-goethe-btn-primary">Try free A1 reading <span aria-hidden="true">↗</span></a>
+              <a href="/exam-practice/a2" className="public-goethe-btn public-goethe-btn-light">Try free A2 reading</a>
+            </div>
+            <p className="public-goethe-hero-note">Free samples require no account. Full mock exams require student access.</p>
+          </div>
+          <div className="public-goethe-hero-panel" aria-label="Exam preparation overview">
+            <span className="public-goethe-panel-label">YOUR EXAM JOURNEY</span>
+            <div className="public-goethe-panel-number">4 <span>skills</span></div>
+            <div className="public-goethe-skills">
+              {["Lesen", "Hören", "Schreiben", "Sprechen"].map((skill, index) => (
+                <div key={skill}><span>{String(index + 1).padStart(2, "0")}</span><strong>{skill}</strong><span aria-hidden="true">↗</span></div>
+              ))}
+            </div>
+            <p>Build skills, complete mocks and review your performance at your own level.</p>
           </div>
         </header>
-
-        <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
-          <article style={cardStyle}>
-            <span style={{ fontWeight: 800, color: "#2563eb" }}>A1</span>
-            <h2 style={{ margin: "8px 0" }}>Goethe A1 Lesen · Teil 1</h2>
-            <p style={{ color: "#475569", lineHeight: 1.55 }}>
-              Five realistic reading questions with instant scoring. No account required.
-            </p>
-            <a href="/exam-practice/a1" style={actionStyle}>Try A1 free</a>
-          </article>
-
-          <article style={cardStyle}>
-            <span style={{ fontWeight: 800, color: "#2563eb" }}>A2</span>
-            <h2 style={{ margin: "8px 0" }}>Goethe A2 Lesen · 4 parts</h2>
-            <p style={{ color: "#475569", lineHeight: 1.55 }}>
-              Twenty questions across four reading parts with an instant final score.
-            </p>
-            <a href="/exam-practice/a2" style={actionStyle}>Try A2 free</a>
-          </article>
-
-          <article style={{ ...cardStyle, opacity: 0.78 }}>
-            <span style={{ fontWeight: 800, color: "#64748b" }}>B1</span>
-            <h2 style={{ margin: "8px 0" }}>Public practice coming soon</h2>
-            <p style={{ color: "#475569", lineHeight: 1.55 }}>
-              B1 remains inside the student Exam Room until a complete public-ready mock is available.
-            </p>
-            <span style={{ fontWeight: 700, color: "#64748b" }}>Coming soon</span>
-          </article>
+        <section className="public-goethe-overview" aria-label="How exam practice works">
+          <div><strong>01</strong><span>Choose your level</span><p>From beginner A1 to advanced C2 preparation.</p></div>
+          <div><strong>02</strong><span>Select your practice</span><p>Public reading samples or available student mock exams.</p></div>
+          <div><strong>03</strong><span>Review your results</span><p>Results and saved attempts are available for supported student exams.</p></div>
         </section>
-
-        <section style={{ ...cardStyle, background: "#eff6ff" }}>
-          <h2 style={{ marginTop: 0 }}>What stays inside the student Exam Room?</h2>
-          <p style={{ marginBottom: 0, color: "#334155", lineHeight: 1.6 }}>
-            Full mock history, saved attempts, detailed Schreiben feedback, Sprechen assessment, readiness tracking and the complete exam library remain student features. Public practice never changes course progress or official Falowen results.
-          </p>
+        <section className="public-goethe-library" aria-labelledby="public-goethe-library-title">
+          <div className="public-goethe-section-title"><div><span className="public-goethe-kicker">THE PRACTICE LIBRARY</span><h2 id="public-goethe-library-title">Find your exam level</h2><p>Availability is taken from the current Falowen mock exam catalog, not a fixed list of promised exams.</p></div></div>
+          <div className="public-goethe-level-grid">
+            {levels.map((examLevel) => {
+              const mocks = getMockExamsForLevel(examLevel, { includeCourse: true });
+              const full = mocks.filter((mock) => mock.mode === "full" && mock.status === "ready");
+              const previews = mocks.filter((mock) => mock.mode === "section-preview" && mock.status === "preview");
+              return (
+                <article className="public-goethe-level" key={examLevel}>
+                  <div className="public-goethe-level-top"><span className="public-goethe-level-chip">{examLevel}</span><span className="public-goethe-level-state">{full.length ? `${full.length} full ${full.length === 1 ? "mock" : "mocks"}` : previews.length ? "Skill practice" : "Preparation"}</span></div>
+                  <h3>Goethe-style {examLevel} practice</h3>
+                  <p>{levelDescription[examLevel]}</p>
+                  <div className="public-goethe-mock-list">
+                    {mocks.map((mock) => (
+                      <div className="public-goethe-mock" key={mock.id}>
+                        <div><strong>{mock.shortTitle || mock.title}</strong><small>{mock.durationLabel} · {mock.status === "ready" ? "Student full mock" : mock.status === "preview" ? "Section practice / preview" : "Not yet published"}</small></div>
+                        <span>{mock.status === "ready" ? "Ready" : mock.status === "preview" ? "Preview" : "Planned"}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="public-goethe-level-actions">
+                    {freePath[examLevel] && <a className="public-goethe-btn public-goethe-btn-outline" href={freePath[examLevel]}>Free Lesen sample</a>}
+                    <a className="public-goethe-btn public-goethe-btn-primary" href="/login/">{full.length ? "Access full mocks" : previews.length ? "Open student practice" : "Explore Exam Room"} <span aria-hidden="true">↗</span></a>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </section>
-
-        <footer style={{ color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
-          Falowen is an independent learning platform and is not affiliated with or endorsed by Goethe-Institut.
-        </footer>
+        <section className="public-goethe-bottom">
+          <div><span className="public-goethe-kicker">FOR FALOWEN STUDENTS</span><h2>Ready for a complete exam experience?</h2><p>Sign in to your Exam Room for eligible timed mock exams, four-skill practice, saved attempts and available marking feedback. Features vary by exam and level.</p></div>
+          <a href="/login/" className="public-goethe-btn public-goethe-btn-light">Go to student sign in <span aria-hidden="true">↗</span></a>
+        </section>
+        <footer className="public-goethe-footer"><span>© Falowen · German exam preparation</span><span>Falowen is independent and is not affiliated with or endorsed by Goethe-Institut.</span></footer>
       </div>
     </main>
   );
