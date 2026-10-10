@@ -152,7 +152,8 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(sitemap).toContain("https://www.falowen.app/course-catalogue.json");
     expect(robots).toContain("https://www.falowen.app/sitemap-courses.xml");
-    expect(landing).toContain('href: "/help"');
+    expect(landing).toContain('{ href: "/help", labelKey: "footerHelp" }');
+    expect(landing).toContain('<a href="/help">{copy.navHelp}</a>');
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
     expect(catalogueGenerator).toContain('{ key: "C2", slug: "german-c2"');
     expect(catalogueGenerator).toContain("day-by-day course schedule");
