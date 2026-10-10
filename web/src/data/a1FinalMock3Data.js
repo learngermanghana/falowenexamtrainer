@@ -1,6 +1,6 @@
 import { A1_EXAM_HOEREN_SAMPLE_3_TEIL1, A1_EXAM_HOEREN_SAMPLE_3_TEIL2, A1_EXAM_HOEREN_SAMPLE_3_TEIL3 } from './a1ExamHorenSample3';
 
-// A1 Mock 3: Lesen is complete; Hören reuses existing Sample 3. Schreiben and Sprechen remain unpublished.
+// A1 Mock 3: Lesen is complete, Hören reuses Sample 3, Schreiben uses a separate exam task. Sprechen remains unpublished.
 export const A1_MOCK_3_ID = 'a1-mock-03';
 
 export const A1_MOCK_3_READING = Object.freeze({
@@ -122,4 +122,45 @@ export const A1_MOCK_3_LISTENING = Object.freeze({
   teil1: A1_EXAM_HOEREN_SAMPLE_3_TEIL1,
   teil2: A1_EXAM_HOEREN_SAMPLE_3_TEIL2,
   teil3: A1_EXAM_HOEREN_SAMPLE_3_TEIL3,
+});
+
+export const A1_MOCK_3_WRITING_TASK = Object.freeze({
+  id: 'a1-mock-03-anna-dinner',
+  title: 'Einladung zum Essen',
+  register: 'Informal',
+  recipient: 'Anna',
+  wordTarget: 30,
+  situation: 'Sie möchten Ihre Freundin Anna am Wochenende zum Essen zu sich nach Hause einladen.',
+  instruction: 'Schreiben Sie eine kurze E-Mail an Ihre Freundin Anna. Schreiben Sie ca. 30 Wörter und gehen Sie auf alle drei Punkte ein. Vergessen Sie nicht die Anrede und den Gruß!',
+  points: [
+    'Grund des Schreibens: Einladung zum Essen.',
+    'Wann? Nennen Sie einen Tag am Wochenende und eine Uhrzeit.',
+    'Mitbringen: Fragen Sie Anna, ob sie ein Dessert oder Getränke mitbringen kann.',
+  ],
+  contentKeys: ['invitation', 'when', 'bring'],
+  modelAnswer: 'Liebe Anna,\n\nich möchte dich am Samstag um 18 Uhr zum Essen zu mir nach Hause einladen. Hast du Zeit? Kannst du bitte ein Dessert oder Getränke mitbringen?\n\nLiebe Grüße\nEva',
+});
+
+export const A1_MOCK_3_WRITING = Object.freeze({
+  teil1: {
+    scenario: [
+      'Ihre Bekannte Eva Miller möchte an einer Sprachschule einen Deutschkurs besuchen. Helfen Sie ihr und tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.',
+      'Eva Miller kommt aus Kanada und wohnt seit zwei Wochen in Berlin (Postleitzahl: 10115, Hauptstraße 12). Sie ist 28 Jahre alt und arbeitet als Architektin. Sie möchte ab dem 1. November einen Abendkurs für Deutsch auf der Stufe A1 besuchen. Sie bezahlt die Kursgebühr in bar.',
+    ],
+    instruction: 'Tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.',
+    formRows: [
+      { kind: 'prefilled', label: 'Familienname', value: 'Miller' },
+      { kind: 'prefilled', label: 'Vorname', value: 'Eva' },
+      { kind: 'prefilled', label: 'Straße, Hausnummer', value: 'Hauptstraße 12' },
+      { kind: 'input', number: 1, label: 'Wohnort / PLZ', answer: '10115 Berlin', alternatives: ['Berlin 10115'], explanation: 'Eva wohnt in Berlin mit der Postleitzahl 10115.' },
+      { kind: 'input', number: 2, label: 'Herkunftsland', answer: 'Kanada', alternatives: ['Canada'], explanation: 'Eva kommt aus Kanada.' },
+      { kind: 'input', number: 3, label: 'Beruf', answer: 'Architektin', alternatives: ['Architekt'], explanation: 'Eva arbeitet als Architektin.' },
+      { kind: 'choice', number: 4, label: 'Gewünschter Kurs', answer: 'Abendkurs', options: [{ value: 'Vormittagskurs', label: 'Vormittagskurs' }, { value: 'Abendkurs', label: 'Abendkurs' }], explanation: 'Eva möchte einen Deutschkurs am Abend.' },
+      { kind: 'input', number: 5, label: 'Gewünschte Sprachstufe', answer: 'A1', alternatives: ['A 1'], explanation: 'Eva möchte den Deutschkurs auf der Stufe A1 besuchen.' },
+    ],
+  },
+  teil2: {
+    instruction: A1_MOCK_3_WRITING_TASK.instruction,
+    reminder: 'Schreiben Sie die Anrede, alle drei Inhaltspunkte, einen Gruß und Ihren Namen.',
+  },
 });
