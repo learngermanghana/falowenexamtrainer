@@ -65,7 +65,7 @@ describe("Falowen public homepage on mobile", () => {
   it("keeps compact A1–C2 course and Goethe preparation links without a fixed rating", () => {
     const { container } = render(<LandingHost />);
     const courses = within(screen.getByRole("navigation", { name: "German courses by level" }));
-    const exams = within(screen.getByRole("navigation", { name: "Free Goethe exam practice" }));
+    const exams = within(screen.getByRole("navigation", { name: "Goethe-style preparation by level" }));
 
     for (const level of ["a1", "a2", "b1", "b2", "c1", "c2"]) {
       expect(courses.getByRole("link", { name: level.toUpperCase() })).toHaveAttribute("href", `/learn-german-${level}`);
