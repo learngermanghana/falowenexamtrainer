@@ -118,14 +118,23 @@
   padding: 17px;
   text-align: left;
   color: #172554;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 14px;
+  background: linear-gradient(125deg, #eff6ff 0%, #dbeafe 100%);
+  border: 2px solid #2563eb;
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.10);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .exam-room-mock-entry:hover {
   background: #dbeafe;
-  border-color: #93c5fd;
+  box-shadow: 0 9px 25px rgba(37, 99, 235, 0.16);
+  transform: translateY(-1px);
+}
+
+.exam-room-mock-entry:focus-visible,
+.exam-room-skill:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
 }
 
 .exam-room-mock-icon {
@@ -148,7 +157,38 @@
 }
 
 .exam-room-mock-copy strong {
-  font-size: 18px;
+  font-size: clamp(20px, 3vw, 25px);
+  color: #1e3a8a;
+}
+
+.exam-room-mock-copy .exam-room-mock-eyebrow,
+.exam-room-skills-eyebrow {
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.exam-room-mock-copy .exam-room-mock-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  margin-top: 8px;
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: #1d4ed8;
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.exam-room-skills-heading {
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
 }
 
 .exam-room-mock-copy span {
@@ -389,4 +429,11 @@
   .exam-room-skill {
     transition: none;
   }
+}
+
+@media (max-width: 480px) {
+  .exam-room-mock-entry { padding: 15px 12px; gap: 10px; align-items: flex-start; }
+  .exam-room-mock-icon { width: 38px; height: 38px; font-size: 19px; }
+  .exam-room-mock-copy .exam-room-mock-action { width: 100%; justify-content: center; text-align: center; }
+  .exam-room-skills-heading { padding: 12px; }
 }
