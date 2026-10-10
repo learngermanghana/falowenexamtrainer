@@ -9,7 +9,7 @@ const writingAuditRecord = ({ level, attemptId, answers = {}, result = {}, sourc
   attemptId,
   source,
   savedAt: new Date().toISOString(),
-  answers: Object.fromEntries(Object.entries(answers).map(([key, value]) => [key, safeText(value)])),
+  answers: Object.fromEntries(Object.entries(answers).map(([key, value]) => [key, typeof value === "string" ? safeText(value) : JSON.parse(JSON.stringify(value ?? null))])),
   score: Number(result.score) || 0,
   maxScore: Number(result.maxScore) || 25,
   // Store the actual assessment breakdown for staff verification rather than
