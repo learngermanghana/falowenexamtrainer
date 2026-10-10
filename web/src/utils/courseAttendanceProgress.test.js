@@ -18,8 +18,9 @@ describe("course attendance progress", () => {
     expect(formatCourseAttendanceProgress({ attended: 5, level: "B1" }).label).toBe("5/28");
   });
 
-  test("excludes the A1 Course Completed marker from the expected session total", () => {
-    expect(getExpectedCourseSessionCount("A1")).toBe(24);
+  test("excludes A1 Day 0 and the Day 24 Course Completed marker from attendance sessions", () => {
+    expect(getExpectedCourseSessionCount("A1")).toBe(23);
+    expect(formatCourseAttendanceProgress({ attended: 5, level: "A1" }).label).toBe("5/23");
   });
 
   test("never invents an attended-over-attended denominator when a level is unknown", () => {
