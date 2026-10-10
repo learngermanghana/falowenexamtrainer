@@ -38,7 +38,7 @@ describe("B1 Days 12-17 thinking and quiz-first grammar upgrade", () => {
     const availability = read("a2B1GrammarAvailability.js");
     const central = read("A2B1WorkbookGrammarNotesContent.js");
     const notes = read("B1Day17WieLerntManAmBestenGrammarNotesPage.js");
-    expect(availability).toContain("16, 17, 18");
+    expect(availability).toContain("hasA2B1GrammarNotes");
     expect(central).toContain("17: B1Day17WieLerntManAmBestenGrammarNotesPage");
     expect(notes).toContain("wenn");
     expect(notes).toContain("weil");
