@@ -30,8 +30,8 @@ const COPY = {
     finalEyebrow: "YOUR NEXT STEP",
     finalTitle: "Your German journey starts here.",
     finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
-    footerCourses: "German courses A1–C2", footerExam: "Goethe-style practice", footerReviews: "Student reviews", footerHelp: "Help",
-    footerCourseLevels: "German courses by level", footerGoetheLevels: "Free Goethe exam practice",
+    footerCourses: "German courses A1–C2", footerExam: "Free Goethe exam practice", footerReviews: "Student reviews", footerHelp: "Help",
+    footerCourseLevels: "German courses by level", footerGoetheLevels: "Goethe-style preparation by level",
     contact: "Questions? Chat with us on WhatsApp",
     featureCopy: {},
     metaTitle: "Falowen | German A1–C2, Live Classes, AI & Goethe-Style Mocks",
@@ -61,7 +61,7 @@ const COPY = {
     finalTitle: "Dein Deutschweg beginnt hier.",
     finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
     footerCourses: "Deutschkurse A1–C2", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe",
-    footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Kostenlose Goethe-Prüfungsübungen",
+    footerCourseLevels: "Deutschkurse nach Niveau", footerGoetheLevels: "Goethe-Prüfungsvorbereitung nach Niveau",
     contact: "Fragen? Schreib uns auf WhatsApp",
     featureCopy: {
       placement: ["Finde dein Deutschniveau", "Mache einen kostenlosen Einstufungstest und finde deinen Einstieg.", "Einstufungstest machen"],
@@ -96,7 +96,7 @@ const COPY = {
     finalTitle: "Votre apprentissage commence ici.",
     finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
     footerCourses: "Cours A1–C2", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide",
-    footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Examens blancs Goethe gratuits",
+    footerCourseLevels: "Cours d’allemand par niveau", footerGoetheLevels: "Préparation Goethe par niveau",
     contact: "Des questions ? Contactez-nous sur WhatsApp",
     featureCopy: {
       placement: ["Trouvez votre niveau d'allemand", "Faites un test de niveau gratuit pour savoir par où commencer.", "Faire le test"],
