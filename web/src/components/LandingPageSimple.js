@@ -15,7 +15,7 @@ const COPY = {
     title: "Learn German your way.",
     titleAccent: "Grow with Falowen.",
     subtitle: "From A1 to C2, learn with live classes or at your own pace. Get recorded lectures, interactive workbooks, AI-powered practice and real tutor support — all in one place.",
-    start: "Start learning", placement: "Take free placement test",
+    start: "Start 7 days free trial", placement: "Take free placement test",
     smallNote: "Not sure where to begin? Discover your level first.",
     heroPhoto: "Real German classes. Real support.",
     levels: "A1–C2", flexible: "Live or self-paced", supported: "AI + tutor support",
@@ -44,7 +44,7 @@ const COPY = {
     title: "Lerne Deutsch auf deine Weise.",
     titleAccent: "Mit Falowen kommst du weiter.",
     subtitle: "Von A1 bis C2: Live-Kurse oder selbstständiges Lernen, mit Unterrichtsaufzeichnungen, interaktiven Arbeitsheften, KI-Übungen und Unterstützung von Lehrkräften.",
-    start: "Jetzt lernen", placement: "Kostenlosen Einstufungstest machen",
+    start: "7 Tage kostenlos testen", placement: "Kostenlosen Einstufungstest machen",
     smallNote: "Noch unsicher beim Niveau? Finde deinen passenden Einstieg.",
     heroPhoto: "Echter Deutschunterricht. Persönliche Unterstützung.",
     levels: "A1–C2", flexible: "Live oder im eigenen Tempo", supported: "KI + Lehrkräfte",
@@ -78,7 +78,7 @@ const COPY = {
     title: "Apprenez l'allemand à votre façon.",
     titleAccent: "Progressez avec Falowen.",
     subtitle: "Du niveau A1 au C2 : cours en direct ou à votre rythme, vidéos enregistrées, cahiers interactifs, exercices avec IA et aide d'enseignants.",
-    start: "Commencer", placement: "Faire le test de niveau gratuit",
+    start: "Essayer gratuitement pendant 7 jours", placement: "Faire le test de niveau gratuit",
     smallNote: "Vous ne connaissez pas votre niveau ? Commencez par le test gratuit.",
     heroPhoto: "De vrais cours d'allemand. Un soutien humain.",
     levels: "A1–C2", flexible: "En direct ou à son rythme", supported: "IA + enseignants",
@@ -110,7 +110,7 @@ const FOOTER_LINKS = [
   { href: "/courses/", labelKey: "footerCourses" },
   { href: "/exam-practice", labelKey: "footerExam" },
   { href: "/reviews/", labelKey: "footerReviews" },
-  { href: "/help", labelKey: "footerHelp" },
+  { href: "/visitor-guide", labelKey: "footerHelp" },
 ];
 
 const LANGUAGE_OPTIONS = [
@@ -164,9 +164,9 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <span>falowen<span className="falowen-home-brand-dot">.</span></span>
           </a>
           <div className="falowen-home-nav-links">
-            <a href="/classes/">{copy.navClasses}</a>
+            <a href="/classes">{copy.navClasses}</a>
             <a href="/exam-practice">{copy.navExams}</a>
-            <a href="/help">{copy.navHelp}</a>
+            <a href="/visitor-guide">{copy.navHelp}</a>
           </div>
           <div className="falowen-home-nav-actions">
             <label className="falowen-home-language-wrap">
@@ -187,6 +187,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <p className="falowen-home-intro">{copy.subtitle}</p>
             <div className="falowen-home-cta-row">
               <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start} <span aria-hidden="true">↗</span></button>
+              <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.login} · Already signed up</button>
               <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement} <span aria-hidden="true">→</span></a>
             </div>
             <p className="falowen-home-helper">{copy.smallNote}</p>
@@ -244,7 +245,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
             <h2 id="falowen-support-heading">{copy.supportTitle}</h2>
             <p>{copy.supportText}</p>
           </div>
-          <a className="falowen-home-support-link" href="/help">{copy.supportLink} →</a>
+          <a className="falowen-home-support-link" href="/visitor-guide">{copy.supportLink} →</a>
         </section>
 
         <div className="falowen-home-reviews-intro"><span>★★★★★</span><p>{copy.reviewsIntro}</p></div>
@@ -258,7 +259,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           </div>
           <div className="falowen-home-final-actions">
             <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.signup} ↗</button>
-            <a href="/classes/" className="falowen-home-button falowen-home-button-light">{copy.navClasses} →</a>
+            <a href="/classes" className="falowen-home-button falowen-home-button-light">{copy.navClasses} →</a>
           </div>
         </section>
 
@@ -271,6 +272,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
       </div>
       <div className="falowen-mobile-actions">
         <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start}</button>
+        <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.login}</button>
         <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement}</a>
       </div>
     </main>
