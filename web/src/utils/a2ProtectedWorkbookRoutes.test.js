@@ -94,7 +94,7 @@ describe("protected A2 workbook routes", () => {
     expect(source).toContain("RadioFirstWorkbookGate");
     expect(source).toContain("A2StandardTabbedWorkbookPage");
     expect(source).toContain("day={20}");
-    expect(source).toContain("Zentrales Thema: Reklamieren".replace("Zentrales Thema: ", ""));
+    expect(source).toContain("reklamieren");
     expect(source).toContain("formelle Reklamation");
 
     expect(sharedWorkbook).toContain("const listeningConfig = getA2ListeningTask(day)");
