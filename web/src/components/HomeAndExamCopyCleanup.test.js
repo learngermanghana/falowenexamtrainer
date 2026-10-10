@@ -68,9 +68,9 @@ describe("homepage and Exams Room student-facing cleanup", () => {
       "Open preview",
     ].forEach((phrase) => expect(mockLibrarySource).not.toContain(phrase));
 
-    expect(mockLibrarySource).toContain("Choose a full timed mock when available");
-    expect(mockLibrarySource).toContain("does not yet generate one final combined score");
-    expect(mockLibrarySource).toContain("Open practice");
+    expect(mockLibrarySource).toContain("Choose a complete mock or practise one skill");
+    expect(mockLibrarySource).toContain("Section practice does not generate a complete mock score.");
+    expect(mockLibrarySource).toContain("Open practice section");
   });
 
   test("Exam File and writing feedback avoid source/backend wording", () => {
