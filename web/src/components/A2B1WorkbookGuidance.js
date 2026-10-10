@@ -372,6 +372,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
   const lessonDay = typeof window === "undefined" ? null
     : resolveA2B1WorkbookDayFromLocation(workbookLevel, window.location.pathname);
   const lessonContext = lessonDay ? `Day ${lessonDay} · ${workbookLabel}` : workbookLabel;
+  const lessonLearning = workbookLevel === "A2" ? A2_DAYS_11_TO_15_LEARNING[lessonDay] : null;
 
   return (
     <>
@@ -404,6 +405,13 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
           <p style={{ margin: 0 }}>
             Review the <strong>Grammar</strong> notes for {lessonContext} when needed. Complete the lesson’s speaking, writing, reading and listening tasks, then use <strong>Ref</strong> to reflect on your answers. The <strong>Submit</strong> tab is for final work only.
           </p>
+          {lessonLearning ? (
+            <div style={{ background: "#fff", border: "1px solid #bfdbfe", borderRadius: 10, padding: "10px 12px" }}>
+              <strong>{lessonLearning.title}</strong>
+              <p style={{ margin: "6px 0" }}>{lessonLearning.rule}</p>
+              <p style={{ margin: 0 }}><strong>Apply it:</strong> {lessonLearning.outputPrompt}</p>
+            </div>
+          ) : null}
           <p style={{ margin: 0 }}>
             <strong>{levelPrefix} · Teil 1 · Sprechen:</strong> prepare for class and practise with the AI speaking coach. Teil 1 is not submitted.
           </p>
