@@ -16,3 +16,10 @@ test("A2/B1 workbook guide names the current lesson instead of a generic workboo
   expect(workbook).toContain('{lessonContext} · how to complete this workbook');
   expect(workbook).toContain('The <strong>Submit</strong> tab is for final work only.');
 });
+
+test("A2 shared workbook guide reuses the lesson's actual grammar and application task", () => {
+  expect(workbook).toContain('const lessonLearning = workbookLevel === "A2"');
+  expect(workbook).toContain("lessonLearning.title");
+  expect(workbook).toContain("lessonLearning.rule");
+  expect(workbook).toContain("lessonLearning.outputPrompt");
+});
