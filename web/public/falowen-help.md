@@ -233,6 +233,10 @@ These pages publish the exact day-by-day lesson title, chapter and grammar topic
 - German A1–C2 course pages: https://www.falowen.app/learn-german-a1 through https://www.falowen.app/learn-german-c2
 - Goethe preparation pages: https://www.falowen.app/goethe-a1-preparation through https://www.falowen.app/goethe-c2-preparation
 
+### Public Goethe-style Exam Practice
+
+Visitors can try free public German exam practice without signing in at https://www.falowen.app/exam-practice. Current public samples include A1 Lesen (https://www.falowen.app/exam-practice/a1) and A2 Lesen (https://www.falowen.app/exam-practice/a2). For A1–C2 preparation information, use the level-specific Goethe-style preparation pages linked above. These are independent practice resources, not official Goethe-Institut exams or certificates. Enrolled learners use the separate Exams Room for full student mocks and saved progress.
+
 ## Common learner questions and routing answers
 
 ### “I am new. How do I start?”
