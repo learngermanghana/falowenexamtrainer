@@ -37,9 +37,7 @@ export default function MockExamLibraryPage() {
                     <span style={styles.badge}>{statusLabel(mock.status, mock)}</span>
                   </div>
                   <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                    {mock.mode === "full"
-                      ? "{mock.description}"
-                      : mock.description}
+                    {mock.description}
                   </p>
                   <p style={{ ...styles.helperText, margin: "8px 0 0", fontSize: 12 }}>
                     {mock.durationLabel} · {(mock.sections || []).join(" · ")}
