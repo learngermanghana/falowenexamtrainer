@@ -609,6 +609,15 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
       {
+        key: "results",
+        label: t("studyBuddy.shortcuts.results", { defaultValue: "My results" }),
+        action: () => {
+          playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "results", shortcutLabel: "My results", destination: "/campus/results" });
+          navigate("/campus/results");
+        },
+      },
+      {
         key: "exams",
         label: t("studyBuddy.shortcuts.exams"),
         action: () => {
