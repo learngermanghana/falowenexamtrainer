@@ -17,19 +17,26 @@ test("public admissions visitor guide is available before auth loading", () => {
   assert.ok(routeIndex < authLoadingIndex);
 });
 
-test("visitor guide explains school, selected class, learning flow and actions", () => {
+test("visitor guide explains school, selected class, four learning choices and actions", () => {
   const page = read("web/src/components/PublicAdmissionsVisitorGuidePage.js");
   assert.match(page, /Learn Language Education Academy/);
   assert.match(page, /Your selected class/);
-  assert.match(page, /Why students study with us/);
-  assert.match(page, /How your course works/);
+  assert.match(page, /Four ways to get started with Falowen/);
+  assert.match(page, /PUBLIC_MARKETING_FEATURES\.map/);
+  assert.doesNotMatch(page, /Why students study with us|How your course works/);
+  const marketing = read("web/src/data/publicMarketingFeatures.js");
+  assert.equal((marketing.match(/key: "/g) || []).length, 4);
+  assert.match(marketing, /Goethe-style exams/);
+  assert.match(marketing, /full mocks/);
+  assert.match(marketing, /recorded lectures/);
+  assert.match(marketing, /tutor support/);
   assert.match(page, /The people behind the school/);
   assert.match(page, /Visit LLEA/);
   assert.match(page, /Open exact location in Google Maps/);
   assert.match(page, /LLEA classroom · Awoshie, Accra/);
   assert.match(page, /In person in Awoshie, live online, or recorded lesson catch-up/);
   assert.match(page, /publicAcademyProfile\.json/);
-  assert.ok(page.indexOf("Visit LLEA") < page.indexOf("Why students study with us"));
+  assert.ok(page.indexOf("Visit LLEA") < page.indexOf("Four ways to get started with Falowen"));
   assert.match(page, /View class brochure/);
   assert.match(page, /Register now/);
   assert.match(page, /View all classes/);
@@ -51,6 +58,8 @@ test("visitor guide class actions are responsive on phone and desktop", () => {
   assert.match(css, /visitor-guide-actions/);
   assert.match(css, /grid-template-columns: 1fr !important/);
   assert.match(css, /repeat\(2, minmax\(180px, 230px\)\)/);
+  assert.match(css, /visitor-guide-marketing-grid/);
+  assert.match(css, /repeat\(4, minmax\(0, 1fr\)\)/);
 });
 
 test("class brochure preserves admissions reference and records engagement", () => {

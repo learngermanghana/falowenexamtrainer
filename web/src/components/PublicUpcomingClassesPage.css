@@ -1,0 +1,95 @@
+.falowen-public-schedule {
+  color: #142138;
+  background: #f7faff;
+  min-height: 100vh;
+  padding: max(16px, env(safe-area-inset-top)) 16px calc(32px + env(safe-area-inset-bottom));
+}
+.falowen-public-schedule * { box-sizing: border-box; }
+.falowen-public-schedule-shell { width: min(1160px, 100%); margin: 0 auto; display: grid; gap: 22px; }
+.falowen-schedule-hero {
+  border-radius: 24px;
+  background: linear-gradient(122deg, #133a8e, #1b5acc);
+  color: #fff;
+  padding: clamp(24px, 5vw, 48px);
+  display: grid;
+  justify-items: start;
+  gap: 13px;
+}
+.falowen-schedule-back { color: #dbeafe; text-decoration: none; font-weight: 800; font-size: 13px; padding: 4px 0; }
+.falowen-schedule-back:hover { text-decoration: underline; }
+.falowen-schedule-eyebrow { font-size: 11px; font-weight: 900; letter-spacing: .11em; color: #1d53b5; }
+.falowen-schedule-hero .falowen-schedule-eyebrow { color: #d7e7ff; }
+.falowen-schedule-hero h1 { margin: 0; font-size: clamp(30px, 5vw, 49px); line-height: 1.08; letter-spacing: -.04em; }
+.falowen-schedule-hero p { margin: 0; color: #dbeafe; line-height: 1.65; font-size: 15px; max-width: 730px; }
+.falowen-schedule-meta { display: flex; flex-wrap: wrap; gap: 9px; }
+.falowen-schedule-meta span { background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.19); border-radius: 999px; padding: 7px 11px; font-weight: 800; font-size: 12px; }
+.falowen-schedule-section {
+  padding: clamp(18px, 3vw, 28px);
+  display: grid;
+  gap: 19px;
+  background: white;
+  border: 1px solid #e0e7f3;
+  border-radius: 21px;
+}
+.falowen-schedule-section-heading { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; }
+.falowen-schedule-section-heading > div { display: grid; gap: 7px; }
+.falowen-schedule-section-heading h2 { margin: 0; line-height: 1.2; font-size: clamp(23px, 3vw, 30px); letter-spacing: -.02em; }
+.falowen-schedule-section-heading p { margin: 0; color: #53657f; line-height: 1.6; font-size: 13px; max-width: 720px; }
+.falowen-schedule-count { background: #e8f1ff; border-radius: 999px; color: #16438b; padding: 8px 12px; white-space: nowrap; font-size: 12px; font-weight: 900; }
+.falowen-schedule-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.falowen-schedule-day { min-width: 0; border-radius: 13px; border: 1px solid #e3eaf5; background: #f9fbff; padding: 11px 8px; display: flex; flex-direction: column; gap: 8px; }
+.falowen-schedule-day h3 { font-size: 12px; line-height: 1.25; color: #223c68; margin: 0; }
+.falowen-schedule-no-session { font-size: 11px; color: #7a899e; line-height: 1.45; }
+.falowen-schedule-session {
+  min-width: 0; display: flex; flex-direction: column; gap: 5px; border-radius: 10px;
+  text-decoration: none; background: #e8f0ff; border: 1px solid #cfe1ff;
+  padding: 9px 7px; overflow-wrap: anywhere; color: #1b3a70;
+}
+.falowen-schedule-session:hover { background: #dbe9ff; }
+.falowen-schedule-session-time { font-size: 11px; color: #204ea2; font-weight: 900; }
+.falowen-schedule-session strong { font-size: 12px; line-height: 1.35; }
+.falowen-schedule-session-level { font-size: 10px; line-height: 1.4; color: #41618e; font-weight: 750; }
+.falowen-schedule-class-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.falowen-schedule-class { min-width: 0; padding: 18px; border: 1px solid #e1e8f3; border-radius: 16px; display: flex; flex-direction: column; gap: 11px; }
+.falowen-schedule-class-top { display: flex; gap: 8px; justify-content: space-between; align-items: center; }
+.falowen-schedule-level { border-radius: 8px; background: #e8f1ff; color: #1a4da0; font-size: 12px; font-weight: 900; padding: 6px 10px; }
+.falowen-schedule-class-mode { color: #61728c; font-size: 12px; font-weight: 800; }
+.falowen-schedule-class h3 { margin: 0; line-height: 1.25; font-size: 19px; letter-spacing: -.02em; }
+.falowen-schedule-start { margin: 0; color: #53657f; font-size: 13px; }
+.falowen-schedule-meetings { display: grid; gap: 7px; }
+.falowen-schedule-meetings > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 9px; border-radius: 9px; background: #f3f6fb; font-size: 12px; }
+.falowen-schedule-meetings strong { font-weight: 800; }
+.falowen-schedule-meetings span { color: #526680; }
+.falowen-schedule-actions { display: grid; gap: 8px; margin-top: auto; }
+.falowen-schedule-actions a { display: inline-flex; align-items: center; justify-content: center; min-height: 45px; padding: 10px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 850; line-height: 1.35; text-align: center; }
+.falowen-schedule-action-main { color: #fff; background: #174bbb; }
+.falowen-schedule-action-calendar { color: #174bbb; background: #eef5ff; border: 1px solid #c6d9f5; }
+.falowen-schedule-empty { padding: 24px; border-radius: 16px; border: 1px solid #d7e6fa; background: #f2f7ff; color: #385579; line-height: 1.65; font-size: 14px; }
+.falowen-schedule-self-learning { display: flex; gap: 15px; align-items: center; justify-content: space-between; flex-wrap: wrap; border: 1px solid #d9e6f7; background: #eaf3ff; border-radius: 17px; padding: 20px; }
+.falowen-schedule-self-learning h2 { margin: 0 0 7px; font-size: 20px; }
+.falowen-schedule-self-learning p { margin: 0; color: #4b6484; font-size: 13px; line-height: 1.6; }
+.falowen-schedule-self-learning a { color: #164ca9; font-weight: 850; white-space: nowrap; text-decoration: none; }
+.falowen-schedule-footer { display: flex; flex-wrap: wrap; gap: 14px; padding: 0 4px; }
+.falowen-schedule-footer a { color: #1853ae; text-decoration: none; font-weight: 800; font-size: 13px; min-height: 40px; display: inline-flex; align-items: center; }
+.falowen-public-schedule a:focus-visible { outline: 3px solid #f0ae27; outline-offset: 3px; }
+@media (max-width: 1030px) {
+  .falowen-schedule-week { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .falowen-schedule-class-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .falowen-public-schedule { padding: max(10px, env(safe-area-inset-top)) 10px calc(25px + env(safe-area-inset-bottom)); }
+  .falowen-public-schedule-shell { gap: 13px; }
+  .falowen-schedule-hero { border-radius: 17px; padding: 22px 18px; }
+  .falowen-schedule-section { border-radius: 16px; padding: 18px 14px; gap: 14px; }
+  .falowen-schedule-week { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .falowen-schedule-day { padding: 11px; }
+  .falowen-schedule-session { min-height: 60px; padding: 10px; }
+  .falowen-schedule-class-grid { grid-template-columns: minmax(0, 1fr); }
+  .falowen-schedule-class { padding: 17px; }
+  .falowen-schedule-actions a { min-height: 48px; }
+  .falowen-schedule-self-learning { padding: 18px; }
+}
+@media (max-width: 380px) {
+  .falowen-schedule-week { grid-template-columns: minmax(0, 1fr); }
+  .falowen-schedule-day { gap: 8px; }
+}

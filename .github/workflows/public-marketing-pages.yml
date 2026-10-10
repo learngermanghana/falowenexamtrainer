@@ -1,0 +1,64 @@
+name: Public Marketing Pages
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/LandingPageSimple.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/NextLiveClassCard.css'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/SignedInHomeClassSchedule.test.jsx'
+      - 'web/src/components/LandingPageMarketing.css'
+      - 'web/src/components/LandingPage.js'
+      - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
+      - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
+      - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/PublicUpcomingClassesPage.js'
+      - 'web/src/components/PublicUpcomingClassesPage.css'
+      - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
+      - 'web/src/data/publicMarketingFeatures.js'
+      - 'web/src/__tests__/LandingPageMobile.test.js'
+      - 'tests/public-admissions-visitor-guide.test.mjs'
+      - '.github/workflows/public-marketing-pages.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/src/components/LandingPageSimple.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/NextLiveClassCard.css'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/SignedInHomeClassSchedule.test.jsx'
+      - 'web/src/components/LandingPageMarketing.css'
+      - 'web/src/components/PublicAdmissionsVisitorGuidePage.js'
+      - 'web/src/components/PublicAdmissionsVisitorGuidePage.css'
+      - 'web/src/components/PublicMarketingLanding.test.js'
+      - 'web/src/components/PublicUpcomingClassesPage.js'
+      - 'web/src/components/PublicUpcomingClassesPage.css'
+      - 'web/src/components/PublicUpcomingClassesPage.test.jsx'
+      - 'web/src/data/publicMarketingFeatures.js'
+      - 'web/src/__tests__/LandingPageMobile.test.js'
+      - 'tests/public-admissions-visitor-guide.test.mjs'
+      - '.github/workflows/public-marketing-pages.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Verify visitor guide marketing and class links
+        run: node --test --test-name-pattern="visitor guide explains school|visitor guide class actions" tests/public-admissions-visitor-guide.test.mjs
+      - name: Install website dependencies
+        working-directory: web
+        run: npm ci
+      - name: Marketing and mobile homepage regression
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/__tests__/LandingPageMobile.test.js src/components/PublicMarketingLanding.test.js src/components/PublicUpcomingClassesPage.test.jsx src/components/SignedInHomeClassSchedule.test.jsx src/components/LiveClassCardRedesign.test.js src/components/GeneralHomeClassIdentity.test.js
+      - name: Compile website
+        working-directory: web
+        run: npx vite build

@@ -139,3 +139,27 @@
     grid-column: 1 / -1;
   }
 }
+
+
+/* The signed-in Home "Your next class" summary keeps both actions visible,
+   without adding the longer join/live controls used elsewhere. */
+.next-live-class-card--home.next-live-class-card--simple .next-live-class-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+.next-live-class-card--home.next-live-class-card--simple .next-live-class-action--timetable {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .next-live-class-card--home.next-live-class-card--simple .next-live-class-actions {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .next-live-class-card--home.next-live-class-card--simple .next-live-class-action {
+    min-height: 48px !important;
+    padding: 11px 13px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+}

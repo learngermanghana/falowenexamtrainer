@@ -148,7 +148,7 @@ export default function NextLiveClassCard({
   return (
     <section
       data-next-live-class-card="true"
-      className={`next-live-class-card ${compact ? "next-live-class-card--compact" : "next-live-class-card--home"}`}
+      className={`next-live-class-card ${compact ? "next-live-class-card--compact" : "next-live-class-card--home"}${simple ? " next-live-class-card--simple" : ""}`}
       style={compact ? compactCardStyle : cardStyle}
     >
       <div className="next-live-class-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
@@ -197,22 +197,23 @@ export default function NextLiveClassCard({
           <span>Open lesson</span>
           <span aria-hidden="true">→</span>
         </a>
+        <a
+          href={fullCalendarLink}
+          className="next-live-class-action next-live-class-action--timetable"
+          style={{
+            ...styles.secondaryButton,
+            ...actionBaseStyle,
+            textDecoration: "none",
+            padding: compact ? "9px 10px" : actionBaseStyle.padding,
+            color: compact ? "#ffffff" : undefined,
+            borderColor: compact ? "rgba(255,255,255,0.5)" : undefined,
+          }}
+        >
+          <span aria-hidden="true">🗓</span>
+          <span>{simple ? "View full class schedule" : "View full timetable"}</span>
+        </a>
         {!simple ? (
           <>
-            <a
-              href={fullCalendarLink}
-              className="next-live-class-action next-live-class-action--timetable"
-              style={{
-                ...styles.secondaryButton,
-                ...actionBaseStyle,
-                textDecoration: "none",
-                padding: compact ? "9px 10px" : actionBaseStyle.padding,
-                color: compact ? "#ffffff" : undefined,
-                borderColor: compact ? "rgba(255,255,255,0.5)" : undefined,
-              }}
-            >
-              View full timetable
-            </a>
             {joinEnabled ? (
               <a
                 href={zoom.url}

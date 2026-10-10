@@ -1,153 +1,117 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
+import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
+import "./LandingPageMarketing.css";
 
 const COPY = {
   en: {
-    languageLabel: "Language",
-    login: "Log in",
-    signup: "Sign up",
-    badge: "Learn German A1–C2 in one place",
-    title: "Learn German. Practise. Get ready for your exam.",
-    subtitle:
-      "Falowen brings your course book, assignments, tutor feedback, attendance, and exam practice together in one simple learning hub.",
-    chooseProgram: "What do you want to study?",
-    german: "German",
-    joinProgram: "Start {{program}}",
-    viewClasses: "View classes",
-    benefits: [
-      { icon: "📘", title: "Structured lessons", text: "Follow structured German learning from A1 to C2." },
-      { icon: "✍️", title: "Tutor feedback", text: "Submit work and learn from corrections and scores." },
-      { icon: "🎯", title: "Exam preparation", text: "Practise speaking, writing, listening, and reading." },
-    ],
-    howTitle: "Start in three simple steps",
-    steps: [
-      { title: "Choose your German level", text: "Choose your German level and create your account." },
-      { title: "Join your class", text: "Choose a live class or self-learning option." },
-      { title: "Learn in Falowen", text: "Open lessons, submit assignments, and track progress." },
-    ],
-    trackRecordTitle: "Our track record",
-    trackRecordIntro: "Learn Language Education Academy has supported German learners since {{year}} with structured teaching, tutor-marked assignments and exam preparation.",
-    trackEstablished: "Established",
-    trackPass: "Exam performance",
-    trackPassValue: "High exam pass rate",
-    trackLevels: "German learning",
-    trackExamScope: "Across German language examinations, not limited to one exam provider.",
-    levelsTitle: "German A1–C2 courses and exam preparation",
-    exploreTitle: "Useful links",
-    resources: [
-      { label: "Upcoming classes", href: "/classes/" },
-      { label: "Free placement test", href: "/placement-test" },
-      { label: "Free Goethe exam practice", href: "/exam-practice" },
-      { label: "How Falowen works", href: "/help" },
-      { label: "Course schedules", href: "/courses/" },
-      { label: "Free lesson", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
-      { label: "Falowen blog", href: "https://blog.falowen.app", external: true },
-    ],
-    finalTitle: "Ready to start learning?",
-    finalText: "Create your Falowen account or log in to continue your course.",
-    contact: "Need help? Chat with us on WhatsApp",
-    metaTitle: "Falowen | Learn German A1–C2 Online",
-    metaDescription:
-      "Learn German A1–C2 with Falowen from Learn Language Education Academy, established in 2022, with structured lessons, tutor feedback, exam preparation and a high exam pass rate.",
+    language: "Language", login: "Log in", signup: "Sign up",
+    navClasses: "Live classes", navExams: "Exam practice", navHelp: "How Falowen works",
+    classScheduleAction: "View full class schedule",
+    eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
+    title: "Learn German your way.",
+    titleAccent: "Grow with Falowen.",
+    subtitle: "From A1 to C2, learn with live classes or at your own pace. Get recorded lectures, interactive workbooks, AI-powered practice and real tutor support — all in one place.",
+    start: "Start learning", placement: "Take free placement test",
+    smallNote: "Not sure where to begin? Discover your level first.",
+    heroPhoto: "Real German classes. Real support.",
+    levels: "A1–C2", flexible: "Live or self-paced", supported: "AI + tutor support",
+    featuresEyebrow: "WHY LEARN WITH FALOWEN",
+    featuresTitle: "Four ways to move forward in German.",
+    featuresIntro: "Whether you're beginning, improving your skills or preparing for an exam, Falowen helps you take the next step.",
+    supportEyebrow: "YOUR SUPPORT SYSTEM",
+    supportTitle: "Practise with AI. Improve with a tutor.",
+    supportText: "Replay lectures, practise as often as you need and receive practical learning feedback — with teacher guidance when you need it.",
+    supportLink: "See how Falowen works",
+    reviewsIntro: "Hear it from our students",
+    finalEyebrow: "YOUR NEXT STEP",
+    finalTitle: "Your German journey starts here.",
+    finalText: "Choose a class or learn at your own pace. We bring your lessons, practice and support together.",
+    footerCourses: "German courses A1–C2", footerExam: "Goethe-style practice", footerReviews: "Student reviews", footerHelp: "Help",
+    contact: "Questions? Chat with us on WhatsApp",
+    featureCopy: {},
+    metaTitle: "Falowen | German A1–C2, Live Classes, AI & Goethe-Style Mocks",
+    metaDescription: "Learn German from A1 to C2 with live classes or self-learning, recorded teacher lectures, AI-supported practice, tutor support and Goethe-style sample and mock exams on Falowen.",
   },
   de: {
-    languageLabel: "Sprache",
-    login: "Anmelden",
-    signup: "Registrieren",
-    badge: "Deutsch A1–C2 an einem Ort lernen",
-    title: "Lernen. Üben. Sicher in die Prüfung gehen.",
-    subtitle:
-      "Falowen vereint Kursbuch, Aufgaben, Tutor-Feedback, Anwesenheit und Prüfungsvorbereitung in einer einfachen Lernplattform.",
-    chooseProgram: "Was möchtest du lernen?",
-    german: "Deutsch",
-    joinProgram: "{{program}} starten",
-    viewClasses: "Kurse ansehen",
-    benefits: [
-      { icon: "📘", title: "Strukturierte Lektionen", text: "Folge einem klaren Lernplan von A1 bis zu höheren Niveaus." },
-      { icon: "✍️", title: "Tutor-Feedback", text: "Reiche Aufgaben ein und lerne aus Korrekturen und Ergebnissen." },
-      { icon: "🎯", title: "Prüfungsvorbereitung", text: "Übe Sprechen, Schreiben, Hören und Lesen." },
-    ],
-    howTitle: "In drei einfachen Schritten starten",
-    steps: [
-      { title: "Programm wählen", text: "Wähle dein Deutschniveau und erstelle dein Konto." },
-      { title: "Kurs beitreten", text: "Wähle einen Live-Kurs oder eine Selbstlernoption." },
-      { title: "Mit Falowen lernen", text: "Öffne Lektionen, reiche Aufgaben ein und verfolge deinen Fortschritt." },
-    ],
-    trackRecordTitle: "Unsere Erfahrung",
-    trackRecordIntro: "Die Learn Language Education Academy unterstützt Deutschlernende seit {{year}} mit strukturiertem Unterricht, korrigierten Aufgaben und Prüfungsvorbereitung.",
-    trackEstablished: "Gegründet",
-    trackPass: "Prüfungsergebnisse",
-    trackPassValue: "Hohe Bestehensquote",
-    trackLevels: "Deutsch lernen",
-    trackExamScope: "Bei Deutschprüfungen verschiedener Anbieter, nicht nur bei einem Prüfungsanbieter.",
-    levelsTitle: "Deutschkurse A1–C2 und Prüfungsvorbereitung",
-    exploreTitle: "Nützliche Links",
-    resources: [
-      { label: "Kommende Kurse", href: "/classes/" },
-      { label: "Kostenloser Einstufungstest", href: "/placement-test" },
-      { label: "So funktioniert Falowen", href: "/help" },
-      { label: "Kurspläne", href: "/courses/" },
-      { label: "Kostenlose Lektion", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
-      { label: "Falowen-Blog", href: "https://blog.falowen.app", external: true },
-    ],
-    finalTitle: "Bereit zum Lernen?",
-    finalText: "Erstelle dein Falowen-Konto oder melde dich an, um deinen Kurs fortzusetzen.",
-    contact: "Brauchst du Hilfe? Schreib uns auf WhatsApp",
-    metaTitle: "Falowen | Deutsch A1–C2 online lernen",
-    metaDescription:
-      "Lerne Deutsch A1–C2 mit Falowen von der Learn Language Education Academy, gegründet 2022, mit strukturierten Lektionen, Tutor-Feedback, Prüfungsvorbereitung und hoher Bestehensquote.",
+    language: "Sprache", login: "Anmelden", signup: "Registrieren",
+    navClasses: "Live-Kurse", navExams: "Prüfungsvorbereitung", navHelp: "So funktioniert Falowen",
+    classScheduleAction: "Vollständigen Kursplan ansehen",
+    eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
+    title: "Lerne Deutsch auf deine Weise.",
+    titleAccent: "Mit Falowen kommst du weiter.",
+    subtitle: "Von A1 bis C2: Live-Kurse oder selbstständiges Lernen, mit Unterrichtsaufzeichnungen, interaktiven Arbeitsheften, KI-Übungen und Unterstützung von Lehrkräften.",
+    start: "Jetzt lernen", placement: "Kostenlosen Einstufungstest machen",
+    smallNote: "Noch unsicher beim Niveau? Finde deinen passenden Einstieg.",
+    heroPhoto: "Echter Deutschunterricht. Persönliche Unterstützung.",
+    levels: "A1–C2", flexible: "Live oder im eigenen Tempo", supported: "KI + Lehrkräfte",
+    featuresEyebrow: "WARUM FALOWEN",
+    featuresTitle: "Vier Wege, um mit Deutsch weiterzukommen.",
+    featuresIntro: "Ganz gleich, ob du beginnst, dein Deutsch verbesserst oder eine Prüfung vorbereitest.",
+    supportEyebrow: "DEINE LERNUNTERSTÜTZUNG",
+    supportTitle: "Mit KI üben. Mit Lehrkräften besser werden.",
+    supportText: "Schau dir Lektionen erneut an, übe so oft du möchtest und erhalte hilfreiches Feedback und Unterstützung.",
+    supportLink: "Falowen kennenlernen",
+    reviewsIntro: "Das sagen unsere Lernenden",
+    finalEyebrow: "DEIN NÄCHSTER SCHRITT",
+    finalTitle: "Dein Deutschweg beginnt hier.",
+    finalText: "Wähle einen Live-Kurs oder lerne selbstständig. Falowen verbindet Unterricht, Übungen und Unterstützung.",
+    footerCourses: "Deutschkurse A1–C2", footerExam: "Goethe-Prüfungsübungen", footerReviews: "Bewertungen", footerHelp: "Hilfe",
+    contact: "Fragen? Schreib uns auf WhatsApp",
+    featureCopy: {
+      placement: ["Finde dein Deutschniveau", "Mache einen kostenlosen Einstufungstest und finde deinen Einstieg.", "Einstufungstest machen"],
+      exams: ["Bereite dich auf Goethe-Prüfungen vor", "Übe mit Beispieltests und vollständigen Probeprüfungen für Lesen, Hören, Schreiben und Sprechen, mit KI-Feedback.", "Prüfungen üben"],
+      class: ["Lerne im Live-Kurs", "Lerne mit Lehrkräften, erhalte Feedback und sieh dir aufgezeichnete Lektionen erneut an.", "Live-Kurse ansehen"],
+      self: ["Lerne in deinem Tempo", "Lerne selbstständig mit Arbeitsheften, Unterrichtsaufzeichnungen, KI-Übungen und Unterstützung.", "Selbstständig starten"],
+    },
+    metaTitle: "Falowen | Deutsch A1–C2 mit Live-Kursen und KI",
+    metaDescription: "Deutsch A1–C2 mit Falowen: Live-Kurse, Selbstlernen, aufgezeichnete Lektionen, KI-Übungen, Tutor-Feedback und Goethe-orientierte Probeprüfungen.",
   },
   fr: {
-    languageLabel: "Langue",
-    login: "Se connecter",
-    signup: "S'inscrire",
-    badge: "Apprendre l’allemand A1–C2 au même endroit",
-    title: "Apprenez. Pratiquez. Préparez votre examen.",
-    subtitle:
-      "Falowen réunit votre manuel, vos devoirs, les commentaires du professeur, la présence et la préparation aux examens dans un espace simple.",
-    chooseProgram: "Que voulez-vous étudier ?",
-    german: "Allemand",
-    joinProgram: "Commencer le {{program}}",
-    viewClasses: "Voir les cours",
-    benefits: [
-      { icon: "📘", title: "Leçons structurées", text: "Suivez un programme clair du niveau A1 aux niveaux avancés." },
-      { icon: "✍️", title: "Retour du professeur", text: "Envoyez vos travaux et apprenez grâce aux corrections et aux notes." },
-      { icon: "🎯", title: "Préparation aux examens", text: "Pratiquez l'oral, l'écrit, l'écoute et la lecture." },
-    ],
-    howTitle: "Commencez en trois étapes simples",
-    steps: [
-      { title: "Choisissez votre programme", text: "Choisissez votre niveau d’allemand et créez votre compte." },
-      { title: "Rejoignez votre cours", text: "Choisissez un cours en direct ou une option d'auto-apprentissage." },
-      { title: "Apprenez avec Falowen", text: "Ouvrez les leçons, envoyez les devoirs et suivez vos progrès." },
-    ],
-    trackRecordTitle: "Notre parcours",
-    trackRecordIntro: "Learn Language Education Academy accompagne les apprenants d’allemand depuis {{year}} avec des cours structurés, des devoirs corrigés et une préparation aux examens.",
-    trackEstablished: "Créée en",
-    trackPass: "Résultats aux examens",
-    trackPassValue: "Taux de réussite élevé",
-    trackLevels: "Allemand",
-    trackExamScope: "Pour les examens d’allemand de différents organismes, sans se limiter à un seul prestataire.",
-    levelsTitle: "Cours d’allemand A1–C2 et préparation aux examens",
-    exploreTitle: "Liens utiles",
-    resources: [
-      { label: "Prochains cours", href: "/classes/" },
-      { label: "Test de niveau gratuit", href: "/placement-test" },
-      { label: "Comment fonctionne Falowen", href: "/help" },
-      { label: "Programmes des cours", href: "/courses/" },
-      { label: "Leçon gratuite", href: "https://www.youtube.com/watch?v=CFkrrVxhdL4", external: true },
-      { label: "Blog Falowen", href: "https://blog.falowen.app", external: true },
-    ],
-    finalTitle: "Prêt à commencer ?",
-    finalText: "Créez votre compte Falowen ou connectez-vous pour continuer votre cours.",
-    contact: "Besoin d'aide ? Écrivez-nous sur WhatsApp",
-    metaTitle: "Falowen | Cours d’allemand A1–C2",
-    metaDescription:
-      "Apprenez l’allemand A1–C2 avec Falowen de Learn Language Education Academy, créée en 2022, avec des cours structurés, des retours de tuteur, une préparation aux examens et un taux de réussite élevé.",
+    language: "Langue", login: "Se connecter", signup: "S'inscrire",
+    navClasses: "Cours en direct", navExams: "Examens blancs", navHelp: "Comment fonctionne Falowen",
+    classScheduleAction: "Voir le calendrier complet des cours",
+    eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
+    title: "Apprenez l'allemand à votre façon.",
+    titleAccent: "Progressez avec Falowen.",
+    subtitle: "Du niveau A1 au C2 : cours en direct ou à votre rythme, vidéos enregistrées, cahiers interactifs, exercices avec IA et aide d'enseignants.",
+    start: "Commencer", placement: "Faire le test de niveau gratuit",
+    smallNote: "Vous ne connaissez pas votre niveau ? Commencez par le test gratuit.",
+    heroPhoto: "De vrais cours d'allemand. Un soutien humain.",
+    levels: "A1–C2", flexible: "En direct ou à son rythme", supported: "IA + enseignants",
+    featuresEyebrow: "POURQUOI FALOWEN",
+    featuresTitle: "Quatre façons de progresser en allemand.",
+    featuresIntro: "Débutez, perfectionnez vos compétences ou préparez votre examen à votre rythme.",
+    supportEyebrow: "VOTRE ACCOMPAGNEMENT",
+    supportTitle: "Pratiquez avec l'IA. Progressez avec un enseignant.",
+    supportText: "Revoyez les cours, exercez-vous autant que nécessaire et profitez de conseils d'enseignants.",
+    supportLink: "Découvrir Falowen",
+    reviewsIntro: "L'avis de nos élèves",
+    finalEyebrow: "VOTRE PROCHAINE ÉTAPE",
+    finalTitle: "Votre apprentissage commence ici.",
+    finalText: "Choisissez un cours en direct ou apprenez à votre rythme. Falowen réunit les cours, exercices et aides.",
+    footerCourses: "Cours A1–C2", footerExam: "Examens de type Goethe", footerReviews: "Avis des élèves", footerHelp: "Aide",
+    contact: "Des questions ? Contactez-nous sur WhatsApp",
+    featureCopy: {
+      placement: ["Trouvez votre niveau d'allemand", "Faites un test de niveau gratuit pour savoir par où commencer.", "Faire le test"],
+      exams: ["Préparez les examens de type Goethe", "Entraînez-vous avec des examens blancs complets et des exemples en lecture, écoute, écrit et oral, avec l'aide de l'IA.", "Préparer l'examen"],
+      class: ["Apprenez en classe", "Suivez des cours avec un enseignant, obtenez des corrections et revoyez les leçons enregistrées.", "Voir les cours"],
+      self: ["Apprenez à votre rythme", "Étudiez en autonomie avec des cahiers, cours enregistrés, exercices avec IA et aide humaine.", "Étudier en autonomie"],
+    },
+    metaTitle: "Falowen | Allemand A1–C2, cours en direct, IA et examens blancs",
+    metaDescription: "Apprenez l'allemand A1–C2 avec Falowen : cours en direct ou autonomes, vidéos enregistrées, exercices assistés par IA et préparation aux examens de type Goethe.",
   },
 };
+
+const FOOTER_LINKS = [
+  { href: "/courses/", labelKey: "footerCourses" },
+  { href: "/exam-practice", labelKey: "footerExam" },
+  { href: "/reviews/", labelKey: "footerReviews" },
+  { href: "/help", labelKey: "footerHelp" },
+];
 
 const LANGUAGE_OPTIONS = [
   { value: "en", label: "English" },
@@ -155,355 +119,160 @@ const LANGUAGE_OPTIONS = [
   { value: "fr", label: "Français" },
 ];
 
-const LandingPageSimple = ({ onSignUp, onLogin }) => {
+export default function LandingPageSimple({ onSignUp, onLogin }) {
   const { i18n } = useTranslation();
-  const initialLanguage = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
-  const [interfaceLanguage, setInterfaceLanguage] = useState(COPY[initialLanguage] ? initialLanguage : "en");
-  const resolvedProgram = "german";
-  const copy = COPY[interfaceLanguage] || COPY.en;
-  const selectedProgramLabel = copy.german;
-
-  const actionStyle = useMemo(
-    () => ({
-      minHeight: 46,
-      borderRadius: 12,
-      padding: "11px 18px",
-      fontSize: 15,
-      fontWeight: 800,
-      cursor: "pointer",
-      touchAction: "manipulation",
-      WebkitTapHighlightColor: "transparent",
-    }),
-    []
-  );
+  const detected = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
+  const [language, setLanguage] = useState(COPY[detected] ? detected : "en");
+  const copy = COPY[language] || COPY.en;
 
   useEffect(() => {
-    const nextLanguage = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
-    if (COPY[nextLanguage]) setInterfaceLanguage(nextLanguage);
+    const next = String(i18n.resolvedLanguage || i18n.language || "en").slice(0, 2);
+    if (COPY[next]) setLanguage(next);
   }, [i18n.language, i18n.resolvedLanguage]);
 
   useEffect(() => {
     updatePageMeta({
-      title: copy.metaTitle,
-      description: copy.metaDescription,
-      canonicalPath: "/",
-      lang: interfaceLanguage,
-      ogType: "website",
+      title: copy.metaTitle, description: copy.metaDescription,
+      canonicalPath: "/", lang: language, ogType: "website",
     });
-    document.documentElement.lang = interfaceLanguage;
-  }, [copy.metaDescription, copy.metaTitle, interfaceLanguage]);
+    document.documentElement.lang = language;
+  }, [copy.metaTitle, copy.metaDescription, language]);
 
-  const handleLanguageChange = async (event) => {
-    const nextLanguage = event.target.value;
-    if (!COPY[nextLanguage]) return;
-
-    setInterfaceLanguage(nextLanguage);
-    persistInterfaceLanguage(nextLanguage);
-    document.documentElement.lang = nextLanguage;
-
+  const changeLanguage = async (event) => {
+    const next = event.target.value;
+    if (!COPY[next]) return;
+    setLanguage(next);
+    persistInterfaceLanguage(next);
+    document.documentElement.lang = next;
     try {
-      await i18n.changeLanguage(nextLanguage);
+      await i18n.changeLanguage(next);
     } catch (error) {
       console.error("Failed to change interface language", error);
     }
   };
 
-  const handleSignup = () => onSignUp?.(resolvedProgram);
-  const handleLogin = () => onLogin?.();
+  const resolvedProgram = "german";
+  const signup = () => onSignUp?.(resolvedProgram);
+  const login = () => onLogin?.();
 
   return (
     <main className="falowen-public-home">
-      <style>{`
-        .falowen-public-home {
-          min-height: 100vh;
-          background: #f8fafc;
-          color: #0f172a;
-          padding: max(14px, env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom));
-        }
-        .falowen-public-home * { box-sizing: border-box; }
-        .falowen-home-shell { width: min(1080px, 100%); margin: 0 auto; display: grid; gap: 18px; }
-        .falowen-home-nav {
-          display: flex; align-items: center; justify-content: space-between; gap: 12px;
-          padding: 8px 2px;
-        }
-        .falowen-home-brand { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 20px; }
-        .falowen-home-brand img { width: 38px; height: 38px; border-radius: 10px; }
-        .falowen-home-nav-actions { display: flex; align-items: center; gap: 9px; }
-        .falowen-home-language {
-          min-height: 42px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff;
-          padding: 0 10px; font-weight: 700; color: #0f172a;
-        }
-        .falowen-home-hero {
-          display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(270px, .75fr); gap: 24px;
-          align-items: center; padding: clamp(24px, 5vw, 54px); border-radius: 26px;
-          background: linear-gradient(135deg, #1d4ed8, #172554); color: #fff;
-          box-shadow: 0 22px 50px rgba(30, 64, 175, .22);
-        }
-        .falowen-home-copy { display: grid; gap: 15px; }
-        .falowen-home-badge {
-          width: fit-content; padding: 7px 11px; border-radius: 999px; background: rgba(255,255,255,.16);
-          border: 1px solid rgba(255,255,255,.2); font-size: 12px; font-weight: 900;
-        }
-        .falowen-home-copy h1 { margin: 0; font-size: clamp(34px, 6vw, 58px); line-height: 1.02; letter-spacing: -.035em; }
-        .falowen-home-copy > p { margin: 0; color: #dbeafe; font-size: 17px; line-height: 1.65; max-width: 680px; }
-        .falowen-program-picker { display: grid; gap: 8px; }
-        .falowen-program-label { font-size: 13px; font-weight: 800; color: #dbeafe; }
-        .falowen-program-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
-        .falowen-program-button {
-          min-height: 40px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35);
-          padding: 8px 14px; color: #fff; background: transparent; font-weight: 800; cursor: pointer;
-          touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-        }
-        .falowen-program-button[aria-pressed="true"] { background: #fff; color: #1e3a8a; border-color: #fff; }
-        .falowen-home-cta-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .falowen-home-primary { border: 1px solid #fbbf24; background: #fbbf24; color: #111827; }
-        .falowen-home-secondary { border: 1px solid rgba(255,255,255,.48); background: rgba(255,255,255,.08); color: #fff; }
-        .falowen-home-visual {
-          background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18); border-radius: 20px;
-          padding: 14px; display: grid; gap: 10px;
-        }
-        .falowen-home-visual-card { background: #fff; color: #0f172a; border-radius: 15px; padding: 13px; display: grid; gap: 5px; }
-        .falowen-home-visual-card span { font-size: 12px; color: #64748b; font-weight: 700; }
-        .falowen-home-visual-card strong { font-size: 15px; }
-        .falowen-benefits, .falowen-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-        .falowen-track-record {
-          background: #fff; border: 1px solid #bfdbfe; border-radius: 20px; padding: 20px;
-          display: grid; gap: 14px; box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
-        }
-        .falowen-track-record h2 { margin: 0; font-size: 22px; }
-        .falowen-track-record > p { margin: 0; color: #475569; line-height: 1.6; font-size: 14px; }
-        .falowen-track-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-        .falowen-track-stat {
-          border: 1px solid #dbeafe; border-radius: 14px; background: #eff6ff; padding: 13px;
-          display: grid; gap: 4px;
-        }
-        .falowen-track-stat span { color: #475569; font-size: 11px; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
-        .falowen-track-stat strong { color: #0f172a; font-size: 17px; line-height: 1.35; }
-        .falowen-track-scope { color: #64748b !important; font-size: 12px !important; }
-        .falowen-info-card {
-          background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 18px;
-          display: grid; gap: 7px; box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
-        }
-        .falowen-info-card h3 { margin: 0; font-size: 16px; }
-        .falowen-info-card p { margin: 0; color: #475569; line-height: 1.55; font-size: 14px; }
-        .falowen-section { background: #fff; border: 1px solid #e2e8f0; border-radius: 22px; padding: 22px; display: grid; gap: 15px; }
-        .falowen-section h2 { margin: 0; font-size: 24px; }
-        .falowen-step-number {
-          width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center;
-          background: #dbeafe; color: #1e40af; font-weight: 900;
-        }
-        .falowen-resources { display: flex; gap: 9px; flex-wrap: wrap; }
-        .falowen-resource-link {
-          min-height: 42px; display: inline-flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 999px;
-          padding: 9px 14px; text-decoration: none; color: #1e3a8a; background: #fff; font-weight: 800;
-          touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-        }
-        .falowen-final-cta {
-          display: flex; justify-content: space-between; align-items: center; gap: 18px; flex-wrap: wrap;
-          padding: 24px; border-radius: 22px; background: #0f172a; color: #fff;
-        }
-        .falowen-final-cta h2 { margin: 0 0 6px; }
-        .falowen-final-cta p { margin: 0; color: #cbd5e1; }
-        .falowen-contact-link { color: #1d4ed8; text-decoration: none; font-weight: 800; text-align: center; }
-        .falowen-mobile-actions { display: none; }
-        @media (max-width: 760px) {
-          .falowen-public-home { padding-left: 10px; padding-right: 10px; padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
-          .falowen-home-nav { align-items: flex-start; }
-          .falowen-home-brand { font-size: 18px; }
-          .falowen-home-brand img { width: 34px; height: 34px; }
-          .falowen-home-nav-actions > button { display: none; }
-          .falowen-home-language { max-width: 118px; }
-          .falowen-home-hero { grid-template-columns: 1fr; padding: 24px 18px; border-radius: 20px; }
-          .falowen-home-copy h1 { font-size: 38px; }
-          .falowen-home-copy > p { font-size: 15px; }
-          .falowen-home-visual { display: none; }
-          .falowen-benefits, .falowen-steps, .falowen-track-stats { grid-template-columns: 1fr; }
-          .falowen-section { padding: 18px; }
-          .falowen-final-cta { padding: 20px; }
-          .falowen-mobile-actions {
-            position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
-            padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-            background: rgba(255,255,255,.96); border-top: 1px solid #dbeafe;
-            box-shadow: 0 -12px 28px rgba(15,23,42,.12); backdrop-filter: blur(12px);
-          }
-        }
-      `}</style>
-
       <div className="falowen-home-shell">
         <nav className="falowen-home-nav" aria-label="Falowen">
-          <div className="falowen-home-brand">
-            <img src="/logo192.png" alt="" />
-            <span>Falowen</span>
+          <a href="/" className="falowen-home-brand" aria-label="Falowen home">
+            <img src="/logo192.png" alt="" width="38" height="38" />
+            <span>falowen<span className="falowen-home-brand-dot">.</span></span>
+          </a>
+          <div className="falowen-home-nav-links">
+            <a href="/classes/">{copy.navClasses}</a>
+            <a href="/exam-practice">{copy.navExams}</a>
+            <a href="/help">{copy.navHelp}</a>
           </div>
           <div className="falowen-home-nav-actions">
-            <label>
-              <span style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", clip: "rect(0 0 0 0)" }}>
-                {copy.languageLabel}
-              </span>
-              <select
-                className="falowen-home-language"
-                value={interfaceLanguage}
-                onChange={handleLanguageChange}
-                aria-label={copy.languageLabel}
-              >
-                {LANGUAGE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
+            <label className="falowen-home-language-wrap">
+              <span className="falowen-home-visually-hidden">{copy.language}</span>
+              <select value={language} onChange={changeLanguage} aria-label={copy.language} className="falowen-home-language">
+                {LANGUAGE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
             </label>
-            <button
-              type="button"
-              onClick={handleLogin}
-              style={{ ...actionStyle, border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a" }}
-            >
-              {copy.login}
-            </button>
+            <button className="falowen-home-login" type="button" onClick={login}>{copy.login}</button>
+            <button className="falowen-home-nav-signup" type="button" onClick={signup}>{copy.signup} ↗</button>
           </div>
         </nav>
 
-        <section className="falowen-home-hero">
+        <section className="falowen-home-hero" aria-labelledby="falowen-home-title">
           <div className="falowen-home-copy">
-            <span className="falowen-home-badge">{copy.badge}</span>
-            <h1>{copy.title}</h1>
-            <p>{copy.subtitle}</p>
-
-
+            <span className="falowen-home-eyebrow">{copy.eyebrow}</span>
+            <h1 id="falowen-home-title">{copy.title} <span>{copy.titleAccent}</span></h1>
+            <p className="falowen-home-intro">{copy.subtitle}</p>
             <div className="falowen-home-cta-row">
-              <button type="button" onClick={handleSignup} className="falowen-home-primary" style={actionStyle}>
-                {copy.joinProgram.replace("{{program}}", selectedProgramLabel)}
-              </button>
-              <button type="button" onClick={handleLogin} className="falowen-home-secondary" style={actionStyle}>
-                {copy.login}
-              </button>
-              <a href="/classes/" className="falowen-resource-link" style={{ borderColor: "rgba(255,255,255,.38)", background: "transparent", color: "#fff" }}>
-                {copy.viewClasses}
-              </a>
+              <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start} <span aria-hidden="true">↗</span></button>
+              <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement} <span aria-hidden="true">→</span></a>
+            </div>
+            <p className="falowen-home-helper">{copy.smallNote}</p>
+            <div className="falowen-home-proof" aria-label="Falowen A1 to C2 learning options">
+              {[copy.levels, copy.flexible, copy.supported].map((label) => <span key={label}>✓ {label}</span>)}
             </div>
           </div>
-
-          <div className="falowen-home-visual" aria-label="Falowen learning hub preview">
-            {copy.benefits.map((benefit, index) => (
-              <div className="falowen-home-visual-card" key={benefit.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{benefit.title}</strong>
-              </div>
-            ))}
+          <div className="falowen-home-hero-art">
+            <img src={academyProfile.classroomImage} alt="German classroom at Learn Language Education Academy" className="falowen-home-classroom" width="560" height="520" />
+            <div className="falowen-home-image-overlay"><span>{copy.heroPhoto}</span><strong>Learn Language Education Academy · Accra & online</strong></div>
+            <div className="falowen-home-image-sticker" aria-hidden="true">A1 → C2</div>
           </div>
         </section>
 
-        <section className="falowen-track-record" aria-labelledby="falowen-track-record-title">
-          <h2 id="falowen-track-record-title">{copy.trackRecordTitle}</h2>
-          <p>{copy.trackRecordIntro.replace("{{year}}", String(academyProfile.establishedYear))}</p>
-          <div className="falowen-track-stats">
-            <div className="falowen-track-stat">
-              <span>{copy.trackEstablished}</span>
-              <strong>{academyProfile.establishedYear}</strong>
-            </div>
-            <div className="falowen-track-stat">
-              <span>{copy.trackPass}</span>
-              <strong>{interfaceLanguage === "en" ? academyProfile.examPassHeadline : copy.trackPassValue}</strong>
-            </div>
-            <div className="falowen-track-stat">
-              <span>{copy.trackLevels}</span>
-              <strong>{academyProfile.germanLevels}</strong>
-            </div>
+        <section className="falowen-home-features" aria-labelledby="falowen-features-title">
+          <div className="falowen-home-section-heading">
+            <span className="falowen-home-section-kicker">{copy.featuresEyebrow}</span>
+            <h2 id="falowen-features-title">{copy.featuresTitle}</h2>
+            <p>{copy.featuresIntro}</p>
           </div>
-          <p className="falowen-track-scope">{copy.trackExamScope}</p>
-        </section>
-
-        <section className="falowen-benefits" aria-label={copy.howTitle}>
-          {copy.benefits.map((benefit) => (
-            <article className="falowen-info-card" key={benefit.title}>
-              <span aria-hidden style={{ fontSize: 22 }}>{benefit.icon}</span>
-              <h3>{benefit.title}</h3>
-              <p>{benefit.text}</p>
-            </article>
-          ))}
-        </section>
-
-        <section className="falowen-section">
-          <h2>{copy.howTitle}</h2>
-          <div className="falowen-steps">
-            {copy.steps.map((step, index) => (
-              <article className="falowen-info-card" key={step.title}>
-                <span className="falowen-step-number">{index + 1}</span>
-                <h3>{step.title}</h3>
-                <p>{step.text}</p>
-              </article>
-            ))}
+          <div className="falowen-home-feature-grid">
+            {PUBLIC_MARKETING_FEATURES.map((feature, index) => {
+              const localized = copy.featureCopy[feature.key];
+              return (
+                <article className="falowen-home-feature" key={feature.key}>
+                  <div className="falowen-home-feature-top">
+                    <span className="falowen-home-feature-icon" aria-hidden="true">{feature.icon}</span>
+                    <span className="falowen-home-feature-index" aria-hidden="true">0{index + 1}</span>
+                  </div>
+                  <h3>{localized?.[0] || feature.title}</h3>
+                  <p>{localized?.[1] || feature.description}</p>
+                  <div className="falowen-home-feature-actions">
+                    {feature.key === "self" ? (
+                      <button type="button" className="falowen-home-feature-link" onClick={signup}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></button>
+                    ) : (
+                      <a className="falowen-home-feature-link" href={feature.href}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></a>
+                    )}
+                    {feature.scheduleHref ? (
+                      <a className="falowen-home-feature-schedule" href={feature.scheduleHref}>
+                        <span aria-hidden="true">🗓</span>
+                        <span>{copy.classScheduleAction || feature.scheduleAction}</span>
+                        <span aria-hidden="true">→</span>
+                      </a>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
           </div>
         </section>
 
-        <section className="falowen-section">
-          <h2>{copy.levelsTitle}</h2>
-          <div className="falowen-resources">
-            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
-              <a key={level} href={`/learn-german-${level.toLowerCase()}`} className="falowen-resource-link">
-                German {level}
-              </a>
-            ))}
+        <section className="falowen-home-support" aria-labelledby="falowen-support-heading">
+          <div className="falowen-home-support-copy">
+            <span className="falowen-home-section-kicker">{copy.supportEyebrow}</span>
+            <h2 id="falowen-support-heading">{copy.supportTitle}</h2>
+            <p>{copy.supportText}</p>
           </div>
-          <div className="falowen-resources">
-            {["A1", "A2", "B1", "B2", "C1", "C2"].map((level) => (
-              <a key={level} href={`/goethe-${level.toLowerCase()}-preparation`} className="falowen-resource-link">
-                {level} exam preparation
-              </a>
-            ))}
-          </div>
+          <a className="falowen-home-support-link" href="/help">{copy.supportLink} →</a>
         </section>
 
-        <section className="falowen-section">
-          <h2>{copy.exploreTitle}</h2>
-          <div className="falowen-resources">
-            {copy.resources.map((resource) => (
-              <a
-                key={resource.href}
-                href={resource.href}
-                className="falowen-resource-link"
-                target={resource.external ? "_blank" : undefined}
-                rel={resource.external ? "noopener noreferrer" : undefined}
-              >
-                {resource.label}
-              </a>
-            ))}
-          </div>
-        </section>
+        <div className="falowen-home-reviews-intro"><span>★★★★★</span><p>{copy.reviewsIntro}</p></div>
+        {/* /homepage-reviews.js injects genuine Google reviews before the final CTA. */}
 
         <section className="falowen-final-cta">
           <div>
+            <span className="falowen-home-section-kicker">{copy.finalEyebrow}</span>
             <h2>{copy.finalTitle}</h2>
             <p>{copy.finalText}</p>
           </div>
-          <div className="falowen-home-cta-row">
-            <button type="button" onClick={handleSignup} className="falowen-home-primary" style={actionStyle}>
-              {copy.signup}
-            </button>
-            <button type="button" onClick={handleLogin} className="falowen-home-secondary" style={actionStyle}>
-              {copy.login}
-            </button>
+          <div className="falowen-home-final-actions">
+            <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.signup} ↗</button>
+            <a href="/classes/" className="falowen-home-button falowen-home-button-light">{copy.navClasses} →</a>
           </div>
         </section>
 
-        <a className="falowen-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">
-          {copy.contact}
-        </a>
+        <footer className="falowen-home-footer">
+          <div className="falowen-home-footer-links">
+            {FOOTER_LINKS.map((item) => <a href={item.href} key={item.href}>{copy[item.labelKey]}</a>)}
+          </div>
+          <a className="falowen-home-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">{copy.contact} ↗</a>
+        </footer>
       </div>
-
-      <div className="falowen-mobile-actions" aria-label={`${copy.signup} / ${copy.login}`}>
-        <button type="button" onClick={handleSignup} className="falowen-home-primary" style={actionStyle}>
-          {copy.signup}
-        </button>
-        <button
-          type="button"
-          onClick={handleLogin}
-          style={{ ...actionStyle, border: "1px solid #cbd5e1", background: "#fff", color: "#0f172a" }}
-        >
-          {copy.login}
-        </button>
+      <div className="falowen-mobile-actions">
+        <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start}</button>
+        <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement}</a>
       </div>
     </main>
   );
-};
-
-export default LandingPageSimple;
+}
