@@ -16,3 +16,13 @@ test("results copy distinguishes an empty record from an actual loading failure"
   expect(source).toContain("Could not load results.");
   expect(source).toContain("your scores and feedback will appear here");
 });
+
+test("result insights use recorded scores without treating missing marks as zero", () => {
+  const source = read("StudentResultsPage.js");
+  expect(source).toContain('row.score !== null && row.score !== undefined');
+  expect(source).toContain('String(r.score).trim() !== ""');
+  expect(source).toContain("below the");
+  expect(source).toContain("Open the result history below");
+  expect(source).toContain("Your marked-work overview");
+  expect(source).toContain("scoreInsight.guidance");
+});
