@@ -505,7 +505,8 @@ function App() {
     return <PublicStudentGuidePage />;
   }
 
-  if (location.pathname === "/learn-german-ghana/upcoming-classes") {
+  if (location.pathname === "/classes" || location.pathname === "/classes/") { 
+    return <PublicUpcomingClassesPage />;\n  }\n\n  if (location.pathname === "/learn-german-ghana/upcoming-classes") {
     return <PublicUpcomingClassesPage />;
   }
 
