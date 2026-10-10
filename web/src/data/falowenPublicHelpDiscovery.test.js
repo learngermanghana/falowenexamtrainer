@@ -152,8 +152,10 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(sitemap).toContain("https://www.falowen.app/course-catalogue.json");
     expect(robots).toContain("https://www.falowen.app/sitemap-courses.xml");
-    expect(landing).toContain('{ href: "/help", labelKey: "footerHelp" }');
-    expect(landing).toContain('<a href="/help">{copy.navHelp}</a>');
+    // Both routes serve public guidance. Current main uses the visitor guide;
+    // the PR branch uses the canonical help route.
+    expect(landing).toMatch(/href: "\\/(?:help|visitor-guide)", labelKey: "footerHelp"/);
+    expect(landing).toMatch(/<a href="\\/(?:help|visitor-guide)">\\{copy\\.navHelp\\}<\\/a>/);
     expect(catalogueSource).toContain('["A1", "A2", "B1", "B2", "C1", "C2"]');
     expect(catalogueGenerator).toContain('{ key: "C2", slug: "german-c2"');
     expect(catalogueGenerator).toContain("day-by-day course schedule");
