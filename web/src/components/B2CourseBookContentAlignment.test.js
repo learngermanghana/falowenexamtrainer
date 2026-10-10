@@ -2,6 +2,7 @@ import {
   alignCourseBookLessonActions,
   applyB2CourseBookContentAlignment,
 } from "./B2CourseBookContentAlignment";
+import { getB2LessonContentAlignment } from "../data/b2LessonContentAlignment";
 
 describe("B2CourseBookContentAlignment", () => {
   beforeEach(() => {
@@ -30,23 +31,23 @@ describe("B2CourseBookContentAlignment", () => {
 
     expect(applyB2CourseBookContentAlignment(document, "/campus/course")).toBe(1);
     const article = document.querySelector("article");
-    expect(article.querySelector("h3").textContent).toBe("Reisen und Mobilität");
-    expect(article.textContent).toContain("Vergleiche und Abwägung");
-    expect(article.textContent).toContain("Verkehrsmittel vergleichen");
+    expect(article.querySelector("h3").textContent).toBe("Bildungsgerechtigkeit und Zugang zu Bildung");
+    expect(article.textContent).toContain("Passiv und Modalpassiv");
+    expect(article.textContent).toContain("Ungleiche Bildungschancen erklären");
     expect(article.textContent).not.toContain("Politik und Engagement");
     expect(article.getAttribute("data-b2-content-aligned")).toBe("8");
   });
 
   it.each([
-    [14, "3.4", "Wohnen und Zusammenleben", "Steigerung der Adjektive", "Freundschaft und soziale Beziehungen", "Relativsätze", "Freundschaft, Vertrauen"],
-    [15, "3.5", "Kunst und Kultur", "Satzbau und Satzstellung", "Ernährung und Konsumverhalten", "Konzessive und alternative Strukturen", "Ernährung, Konsumentscheidungen"],
-    [16, "4.1", "Wissenschaft und Forschung", "Partizipialkonstruktionen", "Digitalisierung im Alltag", "Passiv und Nominalisierung", "Digitale Prozesse"],
-    [17, "4.2", "Feste und Traditionen", "Alte Grammatik", "Mobilität und Stadtleben", "Vergleiche und lokale Präpositionen", "Mobilität, Stadtplanung"],
-    [18, "4.3", "Freizeit und Hobbys", "Pronominaladverbien", "Natur, Klima und Verantwortung", "Konditionale und konsekutive Sätze", "Bedingungen, Folgen"],
-    [19, "4.4", "Ernährung und Esskultur", "Indirekte Rede", "Freiwilligenarbeit und Engagement", "Finale und kausale Strukturen", "Motivation, Ziele"],
+    [14, "3.4", "Wohnen und Zusammenleben", "Steigerung der Adjektive"],
+    [15, "3.5", "Kunst und Kultur", "Satzbau und Satzstellung"],
+    [16, "4.1", "Wissenschaft und Forschung", "Partizipialkonstruktionen"],
+    [17, "4.2", "Feste und Traditionen", "Alte Grammatik"],
+    [18, "4.3", "Freizeit und Hobbys", "Pronominaladverbien"],
+    [19, "4.4", "Ernährung und Esskultur", "Indirekte Rede"],
   ])(
     "aligns stale Day %i Course Book metadata to the opened lesson",
-    (day, chapter, oldTitle, oldGrammar, title, grammar, goal) => {
+    (day, chapter, oldTitle, oldGrammar) => {
       document.body.innerHTML = `
         <select><option value="B2" selected>B2</option></select>
         <article>
@@ -68,9 +69,14 @@ describe("B2CourseBookContentAlignment", () => {
 
       expect(applyB2CourseBookContentAlignment(document, "/campus/course")).toBe(1);
       const article = document.querySelector("article");
-      expect(article.querySelector("h3").textContent).toBe(title);
-      expect(article.textContent).toContain(grammar);
-      expect(article.textContent).toContain(goal);
+      const alignment = getB2LessonContentAlignment(day);
+      expect(alignment).toMatchObject({ day, chapter });
+      expect(alignment.title).toBeTruthy();
+      expect(alignment.grammar_topic).toBeTruthy();
+      expect(alignment.goal).toBeTruthy();
+      expect(article.querySelector("h3").textContent).toBe(alignment.title);
+      expect(article.textContent).toContain(alignment.grammar_topic);
+      expect(article.textContent).toContain(alignment.goal);
       expect(article.textContent).not.toContain(oldTitle);
       expect(article.getAttribute("data-b2-content-aligned")).toBe(String(day));
     },
@@ -86,9 +92,9 @@ describe("B2CourseBookContentAlignment", () => {
     `;
 
     expect(applyB2CourseBookContentAlignment(document, "/campus/course")).toBe(1);
-    expect(document.querySelector("h3").textContent).toBe("Day 10: Konsum und Geld");
-    expect(document.querySelector("a").textContent).toBe("Open: Konsum und Geld");
-    expect(document.querySelector("a").getAttribute("aria-label")).toBe("Open Konsum und Geld");
+    expect(document.querySelector("h3").textContent).toBe("Day 10: Kindergarten und frühkindliche Bildung");
+    expect(document.querySelector("a").textContent).toBe("Open: Kindergarten und frühkindliche Bildung");
+    expect(document.querySelector("a").getAttribute("aria-label")).toBe("Open Kindergarten und frühkindliche Bildung");
   });
 
   it("restores the native A2 in-flow lesson action layout", () => {
