@@ -17,7 +17,8 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
     if (sampleId) {
       const sampleExists =
         sampleId === "sample-1" ||
-        (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId));
+        (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)) ||
+        (normalizedLevel === "A2" && sampleId === "sample-2");
 
       if (!sampleExists) {
         return (
@@ -64,6 +65,26 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
                   : "30 questions · Teil 1–4"}
             </span>
           </button>
+
+          {normalizedLevel === "A2" ? (
+            <button
+              type="button"
+              onClick={() => navigate("/exams/horen/a2/sample-2")}
+              style={{
+                ...styles.secondaryButton,
+                width: "100%",
+                textAlign: "left",
+                display: "grid",
+                gap: 4,
+                padding: "14px 16px",
+              }}
+            >
+              <strong>Hören Sample 2</strong>
+              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                20 questions · Teil 1–4 · From A2 Mock 2
+              </span>
+            </button>
+          ) : null}
 
           {normalizedLevel === "A1" ? (
             <>
