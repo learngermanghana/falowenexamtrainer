@@ -658,11 +658,11 @@
   "A2 2.5 Was machst du in deiner Freizeit": {
     "answers": {
       "teil3": {
-        "Answer1": "C) Fahrradtour",
-        "Answer2": "B) Im Raum 5",
-        "Answer3": "C) Der Kochkurs",
-        "Answer4": "C) Für Fahrradtour und Kochkurs",
-        "Answer5": "A) 5 Euro"
+        "Answer1": "C) Angebot C",
+        "Answer2": "B) Angebot B",
+        "Answer3": "C) Angebot C",
+        "Answer4": "C) Angebot C",
+        "Answer5": "A) Angebot A"
       },
       "teil4": {
         "Answer1": "A) Tee trinken und lesen",
@@ -724,11 +724,11 @@
   "A2 3.8 Rezepte und Essen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Für zwei Personen",
-        "Answer2": "B) Die Nudeln",
-        "Answer3": "A) Die Zwiebel",
-        "Answer4": "B) Nach fünf Minuten",
-        "Answer5": "C) Man mischt Nudeln und Gemüse und würzt."
+        "Answer1": "B) Nein, er kommt ohne Reservierung ins Restaurant.",
+        "Answer2": "B) Gebratenes Fischfilet mit Kartoffeln und Salat",
+        "Answer3": "C) Ein Mineralwasser ohne Kohlensäure",
+        "Answer4": "A) Er findet das Essen ausgezeichnet und lobt es.",
+        "Answer5": "B) Er gibt 2.00 € Trinkgeld (er rundet von 21.00 € auf 23.00 € auf)."
       },
       "teil4": {
         "Answer1": "B) Am Fenster",
@@ -852,11 +852,11 @@
   "A2 6.15 Mein Lieblingssport": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Laufgruppe",
-        "Answer2": "B) Im Hallenbad",
-        "Answer3": "C) Freitag um 17:30 Uhr",
-        "Answer4": "B) Für Erwachsene mit Kindern ab 6 Jahren",
-        "Answer5": "B) Schwimmen und Badminton"
+        "Answer1": "D) Angebot E",
+        "Answer2": "C) Angebot C",
+        "Answer3": "C) Angebot D",
+        "Answer4": "B) Angebot B",
+        "Answer5": "A) Angebot A"
       },
       "teil4": {
         "Answer1": "B) Fußball",
@@ -1003,11 +1003,13 @@
   "A2 8.22 Die Woche Plannung": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Sie besucht einen Deutschkurs.",
-        "Answer2": "B) Sie arbeitet im Homeoffice.",
-        "Answer3": "C) Donnerstag",
-        "Answer4": "A) Einkauf und Wohnung putzen",
-        "Answer5": "A) Damit sie nichts vergisst."
+        "Answer1": "B) Zwei Tage",
+        "Answer2": "B) 20 €",
+        "Answer3": "C) An den Landungsbrücken",
+        "Answer4": "A) Freie Fahrt mit Bus und Bahn für zwei Tage",
+        "Answer5": "C) Um 20 Uhr",
+        "Answer6": "B) Seeblick",
+        "Answer7": "A) Ungefähr zwei Stunden"
       },
       "teil4": {}
     },
@@ -1019,11 +1021,11 @@
   "A2 9.23 Wie kommst du zur Schule / zur Arbeit?": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Den Regionalzug",
-        "Answer2": "C) 45 Minuten",
-        "Answer3": "A) Bei gutem Wetter",
-        "Answer4": "B) Den Bus 16",
-        "Answer5": "C) Zu Fuß"
+        "Answer1": "B) Zu Fuß",
+        "Answer2": "B) 25 Minuten",
+        "Answer3": "A) Weil es ihm zu kalt ist.",
+        "Answer4": "B) Er findet schwer einen Parkplatz.",
+        "Answer5": "C) 65 Euro"
       },
       "teil4": {}
     },
@@ -1035,11 +1037,11 @@
   "A2 9.24 Einen Urlaub planen": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Angebot A",
-        "Answer2": "B) Angebot B",
-        "Answer3": "C) Angebot C",
-        "Answer4": "D) Angebot D",
-        "Answer5": "C) Angebot C"
+        "Answer1": "D) Anzeige D",
+        "Answer2": "C) Anzeige C",
+        "Answer3": "E) Anzeige E",
+        "Answer4": "A) Anzeige A",
+        "Answer5": "B) Anzeige B"
       },
       "teil4": {}
     },
@@ -1051,11 +1053,11 @@
   "A2 9.25 Tagesablauf": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Damit sie morgens Zeit spart.",
-        "Answer2": "B) Mit dem Bus",
-        "Answer3": "B) Um 12:30 Uhr",
-        "Answer4": "B) Sie geht ins Fitnessstudio.",
-        "Answer5": "C) Um 22:30 Uhr"
+        "Answer1": "B) Er macht eine Hafenrundfahrt an den Landungsbrücken.",
+        "Answer2": "B) 20 € (statt 25 €)",
+        "Answer3": "B) Im Restaurant Seeblick",
+        "Answer4": "C) Um 20 Uhr",
+        "Answer5": "B) Ein Besuch im Hafenmuseum und ein Spaziergang im Stadtpark"
       },
       "teil4": {}
     },
@@ -1067,11 +1069,11 @@
   "A2 10.26 Gefühle in verschiedenen Situationen beschr": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Er hat eine wichtige Präsentation.",
-        "Answer2": "B) Er atmet langsam ein und aus.",
-        "Answer3": "A) Erleichtert",
-        "Answer4": "B) Seine Schwester hat eine Prüfung bestanden.",
-        "Answer5": "B) Musik"
+        "Answer1": "B) Er findet die Idee sehr gut („Das klingt toll“).",
+        "Answer2": "A) „Ich interessiere mich auch für Musik.“",
+        "Answer3": "B) Er ist gelassen und nimmt die Karten trotzdem („Das ist nicht schlimm“).",
+        "Answer4": "A) Er freut sich über den guten Rat („Super Tipp. Danke“).",
+        "Answer5": "A) Der Tourist ist mit dem Plan für Museum und Stadtpark zufrieden."
       },
       "teil4": {}
     },
@@ -1083,11 +1085,11 @@
   "A2 10.27 Digitale Kommunikation": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Unterschiedliche Passwörter",
-        "Answer2": "B) Ein Passwort",
-        "Answer3": "C) Nicht öffnen, wenn man den Absender nicht kennt",
-        "Answer4": "B) Die Absenderadresse",
-        "Answer5": "B) Die Nachricht speichern und eine verantwortliche Person informieren."
+        "Answer1": "B) Freie Fahrt mit Bus und Bahn für zwei Tage sowie Rabatte",
+        "Answer2": "C) Die gebuchten Plätze befinden sich auf den hinteren Rängen.",
+        "Answer3": "A) Auf der Website des Restaurants Seeblick",
+        "Answer4": "B) Ungefähr zwei Stunden",
+        "Answer5": "B) Einen digitalen Stadtplan mit Markierungen für Sehenswürdigkeiten"
       },
       "teil4": {
         "Answer1": "B) Ihr Handy",
@@ -1104,11 +1106,11 @@
   "A2 10.28 Über die Zukunft sprechen": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Die B1-Prüfung",
-        "Answer2": "B) Für eine Ausbildung in Logistik",
-        "Answer3": "C) Im Herbst",
-        "Answer4": "B) Weil er im Beruf sicher sprechen und schreiben möchte.",
-        "Answer5": "B) Seine Schwester"
+        "Answer1": "B) Er wird im Restaurant Seeblick Fisch essen.",
+        "Answer2": "A) Heute Abend um 20:00 Uhr",
+        "Answer3": "B) Er möchte das Hafenmuseum besuchen.",
+        "Answer4": "B) Er wird im Stadtpark spazieren gehen.",
+        "Answer5": "C) Zwei Tage lang für Bus und Bahn"
       },
       "teil4": {
         "Answer1": "B) Weil sie später mehr Verantwortung übernehmen möchte",
