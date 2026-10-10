@@ -75,8 +75,12 @@ describe("Falowen public help and AI discovery", () => {
   });
 
   test("publishes the generated A1-C2 lesson map with exact level rules", () => {
-    expect(courseMap.counts).toMatchObject({ A1: 29, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
-    expect(courseMap.lessons).toHaveLength(173);
+    expect(courseMap.counts).toMatchObject({ A1: 28, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
+    expect(courseMap.lessons).toHaveLength(172);
+    const a1Days = courseMap.lessons.filter((lesson) => lesson.level === "A1").map((lesson) => lesson.day);
+    expect(a1Days).toContain(0);
+    expect(a1Days).toContain(23);
+    expect(a1Days).not.toContain(24);
 
     const a1Day1 = courseMap.lessons.find((lesson) => lesson.level === "A1" && lesson.day === 1);
     const a2Day6 = courseMap.lessons.find((lesson) => lesson.level === "A2" && lesson.day === 6);
