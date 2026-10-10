@@ -135,7 +135,9 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
       expect(source).toContain(`<B1GrammarEnglishSupport day={${day}} />`);
     });
 
-    expect(availability).toContain("24, 25, 26, 27, 28");
+    expect(availability).toContain("hasA2B1GrammarNotes");
+    const canonical = fs.readFileSync(path.join(process.cwd(), "src", "data", "a2B1GrammarAvailability.js"), "utf8");
+    expect(canonical).toContain("Array.from({ length: 28 }");
   });
 
   test("CourseLessonPage mounts all six workbooks and all six Grammar deep-link pages", () => {
