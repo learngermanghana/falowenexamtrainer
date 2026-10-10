@@ -149,28 +149,37 @@ const familyGroups = [
 ];
 
 const languageNames = [
-  ["Deutsch", "German"],
-  ["Englisch", "English"],
-  ["Spanisch", "Spanish"],
-  ["Französisch", "French"],
-  ["Italienisch", "Italian"],
-  ["Russisch", "Russian"],
-  ["Chinesisch", "Chinese"],
-  ["Japanisch", "Japanese"],
-  ["Portugiesisch", "Portuguese"],
-  ["Arabisch", "Arabic"],
+  ["🇩🇪", "Deutschland", "Deutsch", "German"],
+  ["🇬🇧", "Großbritannien", "Englisch", "English"],
+  ["🇪🇸", "Spanien", "Spanisch", "Spanish"],
+  ["🇫🇷", "Frankreich", "Französisch", "French"],
+  ["🇮🇹", "Italien", "Italienisch", "Italian"],
+  ["🇷🇺", "Russland", "Russisch", "Russian"],
+  ["🇨🇳", "China", "Chinesisch", "Chinese"],
+  ["🇯🇵", "Japan", "Japanisch", "Japanese"],
+  ["🇵🇹", "Portugal", "Portugiesisch", "Portuguese"],
+  ["🇸🇦", "Saudi-Arabien · andere Länder", "Arabisch", "Arabic"],
 ];
 
 const hobbies = [
-  ["Lesen", "Reading"],
-  ["Schwimmen", "Swimming"],
+  ["lesen", "Reading"],
+  ["schwimmen", "Swimming"],
   ["Fußball spielen", "Playing football"],
-  ["Malen", "Painting"],
+  ["malen", "Painting"],
   ["Musik hören", "Listening to music"],
-  ["Kochen", "Cooking"],
-  ["Reisen", "Travelling"],
-  ["Wandern", "Hiking"],
+  ["kochen", "Cooking"],
+  ["reisen", "Travelling"],
+  ["wandern", "Hiking"],
 ];
+
+const hobbyQuestionTasks = [
+  { verb: "lesen", pronoun: "du", answer: "Liest du gern?" },
+  { verb: "schwimmen", pronoun: "er", answer: "Schwimmt er gern?" },
+  { verb: "kochen", pronoun: "sie", answer: "Kocht sie gern?" },
+  { verb: "reisen", pronoun: "du", answer: "Reist du gern?" },
+];
+const normalizeYesNoQuestion = (value) => String(value || "")
+  .trim().toLocaleLowerCase("de-DE").replace(/[?.!]+$/g, "").replace(/\s+/g, " ");
 
 const writingTemplate = [
   ["Name", "Ich heiße … / Mein Name ist …", "My name is … / I am called …", "Ich heiße Ama.", "My name is Ama."],
@@ -305,6 +314,33 @@ function QuizBlock({ title, questions }) {
           </strong>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function HobbyQuestionPractice() {
+  const [index, setIndex] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [checked, setChecked] = useState(false);
+  const task = hobbyQuestionTasks[index];
+  const correct = normalizeYesNoQuestion(answer) === normalizeYesNoQuestion(task.answer);
+  const next = () => { setIndex((current) => (current + 1) % hobbyQuestionTasks.length); setAnswer(""); setChecked(false); };
+  return (
+    <div style={questionCardStyle} aria-label="Hobby yes-no question practice">
+      <strong>Jetzt du! · Form a yes/no question</strong>
+      <p style={{ margin: 0 }}>Use <strong>{task.pronoun}</strong> with <strong>{task.verb}</strong> and <strong>gern</strong>. Put the verb first.</p>
+      <small>Example: spielen + du → Spielst du gern?</small>
+      <label style={{ display: "grid", gap: 6 }}>
+        <span>Question {index + 1} of {hobbyQuestionTasks.length}</span>
+        <input aria-label="Your German yes-no question" value={answer} onChange={(event) => { setAnswer(event.target.value); setChecked(false); }} placeholder="Write your German question" style={{ width: "100%", minWidth: 0, boxSizing: "border-box", padding: 12, border: "1px solid #cbd5e1", borderRadius: 9, fontSize: 16 }} />
+      </label>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <button type="button" style={styles.primaryButton} disabled={!answer.trim()} onClick={() => setChecked(true)}>Check answer</button>
+        {checked ? <button type="button" style={styles.secondaryButton} onClick={next}>{index === hobbyQuestionTasks.length - 1 ? "Practise again" : "Next question"}</button> : null}
+      </div>
+      {checked ? <p role="status" style={{ margin: 0, color: correct ? "#166534" : "#9a3412" }}>
+        {correct ? "✓ Richtig!" : `Not quite. Correct: ${task.answer}`}
+      </p> : null}
     </div>
   );
 }
@@ -493,11 +529,16 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         <h2 style={sectionTitle}>Languages and „ein bisschen“</h2>
 
         <div style={infoBoxStyle}>
-          <strong>Language Names</strong>
-          <div style={{ display: "grid", gap: 6 }}>
-            {languageNames.map(([german, english]) => (
-              <div key={german}>
-                {german} – {english}
+          <strong>Sprachen · Languages</strong>
+          <p style={{ margin: 0, fontSize: 13 }}>The flag shows one example country, not every country where the language is spoken.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 180px), 1fr))", gap: 8 }}>
+            {languageNames.map(([flag, country, german, english]) => (
+              <div key={german} style={{ background: "#fff", border: "1px solid #dbeafe", borderRadius: 10, padding: "9px 11px", display: "flex", alignItems: "center", gap: 9, minWidth: 0 }}>
+                <span aria-hidden="true" style={{ fontSize: 24 }}>{flag}</span>
+                <div style={{ display: "grid", minWidth: 0, gap: 2 }}>
+                  <strong style={{ fontSize: 13 }}>{german} <span style={{ fontWeight: 400, color: "#64748b" }}>· {english}</span></strong>
+                  <small style={{ color: "#475569", overflowWrap: "anywhere" }}>{country}</small>
+                </div>
               </div>
             ))}
           </div>
@@ -514,10 +555,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
               <strong>Ich spreche Deutsch.</strong> = I speak German.
               <br />
               <strong>Ich spreche ein bisschen Deutsch.</strong> = I speak a little German.
-              <br />
-              <strong>Ich spreche ein bisschen Englisch.</strong> = I speak a little English.
-              <br />
-              <strong>Ich verstehe ein bisschen Deutsch.</strong> = I understand a little German.
+
             </div>
           </div>
         </div>
@@ -557,12 +595,12 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         <h2 style={sectionTitle}>Hobbies and „gern“</h2>
 
         <div style={infoBoxStyle}>
-          <strong>Common Hobbies Vocabulary</strong>
-          <div style={{ display: "grid", gap: 6 }}>
+          <strong>Hobbys · Common vocabulary</strong>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
             {hobbies.map(([german, english]) => (
-              <div key={german}>
-                {german} – {english}
-              </div>
+              <span key={german} style={{ background: "#fff", border: "1px solid #dbeafe", borderRadius: 999, padding: "7px 10px", fontSize: 13 }}>
+                <strong>{german}</strong> · {english}
+              </span>
             ))}
           </div>
         </div>
@@ -584,28 +622,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           </div>
         </div>
 
-        <div style={questionCardStyle}>
-          <strong>Ask a yes/no question about a hobby</strong>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Use the same yes/no rule: start with the conjugated verb, then the subject. Keep <strong>gern</strong> in the
-            sentence.
-          </p>
-          <div style={sentenceBoxStyle}>
-            <strong>Ich schwimme gern.</strong> = I like swimming.
-            <br />
-            <strong>Schwimmst du gern?</strong> = Do you like swimming?
-            <br />
-            <br />
-            <strong>Ich spiele gern Fußball.</strong> = I like playing football.
-            <br />
-            <strong>Spielst du gern Fußball?</strong> = Do you like playing football?
-            <br />
-            <br />
-            <strong>Ich höre gern Musik.</strong> = I like listening to music.
-            <br />
-            <strong>Hörst du gern Musik?</strong> = Do you like listening to music?
-          </div>
-        </div>
+        <HobbyQuestionPractice />
 
         <QuizBlock title="Hobbies self-check" questions={hobbyQuiz} />
         <PreparedCheckbox checked={prepared.hobbies} onChange={setPreparedFor("hobbies")} />
