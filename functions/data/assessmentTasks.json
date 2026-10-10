@@ -164,6 +164,102 @@
         "t3-14": "c",
         "t3-15": "a"
       }
+    },
+    "a1-mock-03": {
+      "level": "A1",
+      "writing": {
+        "id": "a1-mock-03-anna-dinner",
+        "title": "Einladung zum Essen",
+        "register": "Informal",
+        "recipient": "Anna",
+        "wordTarget": 30,
+        "situation": "Sie möchten Ihre Freundin Anna am Wochenende zum Essen zu sich nach Hause einladen.",
+        "instruction": "Schreiben Sie eine kurze E-Mail an Ihre Freundin Anna. Schreiben Sie ca. 30 Wörter und gehen Sie auf alle drei Punkte ein. Vergessen Sie nicht die Anrede und den Gruß!",
+        "points": [
+          "Grund des Schreibens: Einladung zum Essen.",
+          "Wann? Nennen Sie einen Tag am Wochenende und eine Uhrzeit.",
+          "Mitbringen: Fragen Sie Anna, ob sie ein Dessert oder Getränke mitbringen kann."
+        ],
+        "contentKeys": [
+          "invitation",
+          "when",
+          "bring"
+        ],
+        "form": {
+          "scenario": [
+            "Ihre Bekannte Eva Miller möchte an einer Sprachschule einen Deutschkurs besuchen. Helfen Sie ihr und tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+            "Eva Miller kommt aus Kanada und wohnt seit zwei Wochen in Berlin (Postleitzahl: 10115, Hauptstraße 12). Sie ist 28 Jahre alt und arbeitet als Architektin. Sie möchte ab dem 1. November einen Abendkurs für Deutsch auf der Stufe A1 besuchen. Sie bezahlt die Kursgebühr in bar."
+          ],
+          "instruction": "Tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+          "formRows": [
+            {
+              "kind": "prefilled",
+              "label": "Familienname",
+              "value": "Miller"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Vorname",
+              "value": "Eva"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Straße, Hausnummer",
+              "value": "Hauptstraße 12"
+            },
+            {
+              "kind": "input",
+              "number": 1,
+              "label": "Wohnort / PLZ",
+              "answer": "10115 Berlin",
+              "alternatives": [
+                "Berlin 10115"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 2,
+              "label": "Herkunftsland",
+              "answer": "Kanada",
+              "alternatives": [
+                "Canada"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 3,
+              "label": "Beruf",
+              "answer": "Architektin",
+              "alternatives": []
+            },
+            {
+              "kind": "choice",
+              "number": 4,
+              "label": "Gewünschter Kurs",
+              "answer": "Abendkurs",
+              "options": [
+                {
+                  "value": "Vormittagskurs",
+                  "label": "Vormittagskurs"
+                },
+                {
+                  "value": "Abendkurs",
+                  "label": "Abendkurs"
+                }
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 5,
+              "label": "Gewünschte Sprachstufe",
+              "answer": "A1",
+              "alternatives": [
+                "A 1"
+              ]
+            }
+          ]
+        }
+      }
     }
   },
   "writing": {
