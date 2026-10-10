@@ -598,7 +598,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
       );
     }
 
-    if (normalizedLevel === "A2" && part.key === "teil3") {
+    if (normalizedLevel === "A2" && sampleId !== "sample-2" && part.key === "teil3") {
       return (
         <div className="a2-t3-list">
           {(part.data.questions || []).map((question) => {
