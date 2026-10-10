@@ -44,7 +44,7 @@ describe("Falowen public homepage on mobile", () => {
     expect(onSignUp).toHaveBeenCalledWith("german");
     expect(screen.getAllByRole("link", { name: /Take free placement test/ })[0]).toHaveAttribute("href", "/placement-test");
     fireEvent.change(screen.getByRole("combobox", { name: "Language" }), { target: { value: "de" } });
-    await waitFor(() => expect(screen.getAllByRole("button", { name: /Jetzt lernen/ })[0]).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByRole("button", { name: /7 Tage kostenlos testen/ })[0]).toBeInTheDocument());
     expect(screen.getAllByRole("link", { name: /Kostenlosen Einstufungstest machen/ })[0]).toHaveAttribute("href", "/placement-test");
     expect(screen.queryByText(/Französisch/)).not.toBeInTheDocument();
   });
