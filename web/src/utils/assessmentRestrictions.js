@@ -22,6 +22,6 @@ export const subscribeAssessmentRestrictions = (listener) => {
 
 export function isMockAssessmentRoute(pathname = "") {
   const path = String(pathname).toLowerCase().replace(/\/+$/, "");
-  return /^\/campus\/course\/(?:a1|a2|b1|b2|c1|c2)-(?:final-mock-exam|mock-)/.test(path)
+  return /^\/campus\/course\/(?:a1|a2|b1|b2|c1|c2)-(?:final-mock(?:-exam|-[0-9]+)|mock-)/.test(path)
     || ["/campus/course/conjunctions-5-10", "/campus/course/a2-day-29-goethe-exam-orientation", "/campus/course/b1-day-29-goethe-exam-orientation"].includes(path);
 }
