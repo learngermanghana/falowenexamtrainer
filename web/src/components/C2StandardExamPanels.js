@@ -1,3 +1,4 @@
+import C2GrammarTeaching from "./C2GrammarTeaching";
 import React,{useEffect,useMemo,useState}from"react";
 import{styles}from"../styles";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
@@ -58,6 +59,7 @@ export function C2StandardGrammarPanel({day,completed,onCompleteChange}){
  const [principle,...examples]=d.grammar||[];
  return <div style={{display:"grid",gap:14}}>
   <TopicFoundation knowledge={d.topicKnowledge}/>
+  <C2GrammarTeaching day={day}/>
   <Section title={`Grammar · ${d.grammarFocus}`}>
    <span style={{...styles.badge,width:"fit-content",background:"#dbeafe",color:"#1e3a8a"}}>C2 Day {day} · {d.title}</span>
    <p style={{margin:0,lineHeight:1.75,color:"#334155"}}>{principle}</p>

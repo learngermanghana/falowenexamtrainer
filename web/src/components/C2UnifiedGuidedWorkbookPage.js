@@ -1,3 +1,4 @@
+import C2GrammarTeaching from "./C2GrammarTeaching";
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
@@ -61,13 +62,9 @@ function TopicLanguage({mastery}){
  </Section>;
 }
 
-function GrammarTeaching({mastery,standard}){
- const grammar=mastery.grammarNotes;
+function GrammarTeaching({standard}){
  return <Section title={`Grammatik · ${standard.grammarFocus}`}>
-  <div><strong>Wann und warum?</strong><p style={{lineHeight:1.75,marginBottom:0}}>{grammar.usage}</p></div>
-  <div><strong>Struktur kontrollieren</strong><p style={{lineHeight:1.75,marginBottom:0}}>{grammar.wordOrder}</p></div>
-  <div><strong>Modelle zum heutigen Thema</strong><div style={{display:"grid",gap:8,marginTop:8}}>{grammar.examples.map((example,index)=><div key={example} style={sub}><strong>{index===0?"Grundmuster":"C2-Anwendung"}</strong><span>{example}</span></div>)}</div></div>
-  <div style={{border:"1px solid #fecaca",borderRadius:12,padding:12,background:"#fff7f7"}}><strong>Typischer Fehler</strong><p style={{marginBottom:0}}>{grammar.commonMistakes[0]}</p></div>
+  <C2GrammarTeaching day={standard.day}/>
  </Section>;
 }
 

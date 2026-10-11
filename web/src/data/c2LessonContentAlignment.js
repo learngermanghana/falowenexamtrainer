@@ -1,3 +1,4 @@
+import { getC2GrammarTeaching } from "./c2GrammarTeaching";
 import { getC2ExamStandard } from "./c2ExamStandardContent";
 import { getC2TopicKnowledge, getC2TopicCollocations, getC2TopicChecks } from "./c2TopicKnowledge";
 
@@ -10,6 +11,7 @@ const buildCurrentC2Mastery = (day) => {
   if (!standard || !knowledge) return null;
 
   const checks = getC2TopicChecks(dayNumber);
+  const teaching = getC2GrammarTeaching(dayNumber);
   const grammarExamples = Array.isArray(standard.grammar) ? standard.grammar.slice(1) : [];
   const primaryCheck = checks[0] || {};
   const reformulations = Array.isArray(standard.reformulations) ? standard.reformulations : [];
@@ -54,21 +56,13 @@ const buildCurrentC2Mastery = (day) => {
     grammarNotes: {
       title: standard.grammarFocus,
       usage: standard.grammar?.[0] || `Use ${standard.grammarFocus} only when it makes the intended meaning more precise.`,
-      wordOrder: "Build the meaning first, then control verb position, case, reference and information hierarchy. Complexity is useful only when the relationship remains immediately clear.",
-      examples: grammarExamples,
-      commonMistakes: [
-        `Do not use ${standard.grammarFocus} merely to sound advanced; the structure must match the intended logical function.`,
-      ],
+      definitionDe: teaching.definitionDe,
+      supportEn: teaching.supportEn,
+      wordOrder: teaching.structureDe,
+      examples: [teaching.workedExample, ...grammarExamples],
+      commonMistakes: [teaching.explanationDe],
     },
-    grammarChecks: [
-      ...checks,
-      ...(grammarExamples.length >= 2 ? [{
-        question: `Welche Formulierung zeigt ${standard.grammarFocus} am kontrolliertesten?`,
-        options: grammarExamples,
-        answerIndex: grammarExamples.length - 1,
-        explanation: "Choose the version because it expresses the intended relation, evidence level or register precisely—not simply because it is longer.",
-      }] : []),
-    ],
+    grammarChecks: [teaching.check],
     writingExercise: {
       prompt: standard.writeType === "opinion"
         ? `Verfassen Sie eine differenzierte Stellungnahme zu „${standard.title}“.`
