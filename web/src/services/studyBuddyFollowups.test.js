@@ -79,3 +79,47 @@ test("does not reuse an older practice request for a later question", () => {
   expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
   expect(classifyStudyBuddyTurn("Auto?", dialogue).intent).toBe("new_question");
 });
+
+test.each(["Hint?", "Help?", "Why?", "Explain this exercise"])("retains direct quiz through %s and its hint", help => {
+  const dialogue = [
+    { role: "user", content: "Quiz me" },
+    { role: "assistant", content: "How do you say ‘car’ in German?" },
+    { role: "user", content: help },
+    { role: "assistant", content: "Hint: it begins with A. How do you say ‘car’ in German?" },
+  ];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("Auto", dialogue).intent).toBe("check_answer");
+  expect(studyBuddyFollowupInstructions({ message: "Auto", history: dialogue })).toContain("Active exercise:");
+});
+test("keeps exercise through feedback and a hint without repetition", () => {
+  const dialogue = [
+    { role: "user", content: "Quiz me" },
+    { role: "assistant", content: "What is the plural of Auto?" },
+    { role: "user", content: "Auton" },
+    { role: "assistant", content: "Not quite. Try again." },
+    { role: "user", content: "Hint?" },
+    { role: "assistant", content: "Add s to this noun." },
+  ];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("Autos?", dialogue).intent).toBe("check_answer");
+});
+test.each(["Eine Übung, bitte", "Übung", "Gib mir Übungen"])("recognises German practice request %s", request => {
+  expect(classifyStudyBuddyTurn(request, history).intent).toBe("guided_practice");
+  const dialogue = [{ role: "user", content: request }, { role: "assistant", content: "Wie heißt ‘car’ auf Deutsch?" }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("Auto", dialogue).intent).toBe("check_answer");
+});
+test.each(['What does “Niveau” mean?', 'How do you say “ready” in German?', 'What is the German word for language?', 'What does payment mean?'])("allows setup vocabulary as quiz target: %s", content => {
+  const dialogue = [{ role: "user", content: "Quiz me" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("bereit", dialogue).intent).toBe("check_answer");
+});
+test.each(["new topic: Perfekt", "Why does gehen use sein in the Perfekt?", "Where is my Course Book?"])("ends practice for %s", message => {
+  const dialogue = [
+    { role: "user", content: "Quiz me" }, { role: "assistant", content: "How do you say car in German?" },
+    { role: "user", content: "Hint?" }, { role: "assistant", content: "It starts with A." },
+    { role: "user", content: message }, { role: "assistant", content: "Here is the explanation." },
+  ];
+  expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
+  expect(classifyStudyBuddyTurn("Auto", dialogue).intent).toBe("new_question");
+});
