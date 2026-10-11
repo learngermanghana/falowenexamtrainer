@@ -1,11 +1,12 @@
 import React, { useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { toDateMs } from "../lib/dateUtils";
 import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
+import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
@@ -224,6 +225,7 @@ const GeneralHome = ({
   );
   const translate = useCallback((key, values) => t(key, values), [t]);
   const navigate = useNavigate();
+  const location = useLocation();
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
@@ -358,6 +360,9 @@ const GeneralHome = ({
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      {new URLSearchParams(location.search).get("welcome") === "1" ? (
+        <OnboardingStudyBuddyStart orientationPath={day0WorkbookLink} />
+      ) : null}
       <WelcomeHero
         studentProfile={studentProfile}
         onOpenExamFile={openExamFile}
