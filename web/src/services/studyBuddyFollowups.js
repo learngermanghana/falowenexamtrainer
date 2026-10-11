@@ -13,6 +13,7 @@ const isDirectQuizQuestion = (content, practiceActive) => {
   const questions = String(content || "").match(/(?:^|[.!]\s+|\n)\s*(?:[0-9]+[.)]\s*)?(?:how|which|what|who|where|when|why|wie|welche[rns]?|was|wer|wo|wann|warum)\b[^?]*\?/gi) || [];
   return questions.some(question =>
     !/https?:\/\//i.test(question) &&
+    !/\b(?:what (?:would you like|do you want) to (?:practi[cs]e|study|learn)|what (?:should|shall) we (?:practi[cs]e|study|learn)|was (?:möchtest|willst) du (?:üben|lernen))\b/i.test(question) &&
     !/\b(?:what|which)\s+(?:topic|level|language|skill|difficulty)\b.*\b(?:would you like|do you want|should we|shall we)\b/i.test(question) &&
     !/\b(?:how do you (?:want to pay|open|navigate|sign up|log in)|(?:what|which) (?:topic|level|skill|difficulty) (?:should|shall)|(?:welches thema|welches niveau) (?:möchtest|sollen))\b/i.test(question));
 };
@@ -62,6 +63,9 @@ export const classifyStudyBuddyTurn = (message, history = [], practiceState) => 
   const previousStudent = [...messages].reverse().find((item) => item.role === "user")?.content || "";
   if (!previousStudent) return { intent: "new_question", previousStudent: "" };
   if (/^(?:new topic|change topic|something else|forget that|neues thema)\b/.test(text)) {
+    return { intent: "new_question", previousStudent: "" };
+  }
+  if (/^(?:tell me about|teach me about|let['’]s (?:study|learn|discuss)|can we (?:study|learn|discuss)|erklär(?:e)? mir|lass uns (?:lernen|über))\b/i.test(text)) {
     return { intent: "new_question", previousStudent: "" };
   }
   if (isShortHelpRequest(text)) return { intent: "clarify_followup", previousStudent };
