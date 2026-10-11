@@ -18,6 +18,7 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { splitStudyBuddySafeLinks } from "../services/studyBuddyNavigation";
 import "./StudyBuddyBar.css";
 import "./StudyBuddyChat.css";
+import StudyBuddyNavigationActions from "./StudyBuddyNavigationActions";
 
 const renderStudyBuddyText = (content) => splitStudyBuddySafeLinks(content).map((part, index) =>
   part.href ? (
@@ -78,6 +79,11 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const openChatDestination = (path) => {
+    setIsDismissed(true);
+    setIsCollapsed(true);
+    navigate(path);
+  };
   const pinLauncherToSafeCorner = /^\/campus\/results\/?$/i.test(location.pathname || "");
   const { idToken, user } = useAuth();
   const locale = i18n.language;
@@ -830,6 +836,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
                   >
                     <div className="study-buddy-chat-speaker">{entry.role === "assistant" ? "Study Buddy" : "You"}</div>
                     <div className="study-buddy-chat-bubble">{renderStudyBuddyText(entry.content)}</div>
+                    {entry.role === "assistant" ? <StudyBuddyNavigationActions content={entry.content} onNavigate={openChatDestination} /> : null}
                   </div>
                 ))}
                 {isReplyLoading ? (

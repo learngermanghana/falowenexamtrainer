@@ -6,6 +6,7 @@ import { toDateMs } from "../lib/dateUtils";
 import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
+import FirstLessonGuide from "./FirstLessonGuide";
 import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
@@ -121,8 +122,8 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
     >
       <SectionHeader
         eyebrow={t("generalHome.campus.eyebrow")}
-        title={t("generalHome.campus.title")}
-        subtitle="Continue your current lesson, submit finished workbook answers, or open your results."
+        title="Continue learning"
+        subtitle="Open Course Book to see your current lesson and next step, practise, or submit finished workbook answers."
         actions={
           <PrimaryActionBar align="flex-end">
             <PillBadge tone="success">Daily work</PillBadge>
@@ -131,7 +132,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
       />
       <PrimaryActionBar align="start">
         <button style={styles.primaryButton} onClick={openCampus}>
-          Continue in Campus
+          Open Course Book
         </button>
       </PrimaryActionBar>
     </section>
@@ -247,8 +248,8 @@ const GeneralHome = ({
 
   const openCampus = useCallback(() => {
     playOpenFeedback();
-    onSelectArea("campus");
-  }, [onSelectArea, playOpenFeedback]);
+    navigate("/campus/course");
+  }, [navigate, playOpenFeedback]);
 
   const openExamFile = useCallback(() => {
     playOpenFeedback();
@@ -396,6 +397,7 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
+      <FirstLessonGuide />
 
       <CompactCourseGuide
         studentProfile={studentProfile}
