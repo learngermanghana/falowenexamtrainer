@@ -54,3 +54,28 @@ test.each(["Translate: 'I have a car.'", "Your answer?", "Choose the correct wor
   expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
   expect(classifyStudyBuddyTurn("kein?", dialogue).intent).toBe("check_answer");
 });
+
+test.each([
+  "How do you say ‘car’ in German?",
+  "Which word is correct here?",
+  "Great! What is the plural of Auto?",
+  "1. Wie heißt ‘car’ auf Deutsch?",
+])("recognises direct quiz question: %s", content => {
+  const dialogue = [{ role: "user", content: "Quiz me on German vocabulary" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("Auto", dialogue).intent).toBe("check_answer");
+  expect(classifyStudyBuddyTurn("Auto?", dialogue).intent).toBe("check_answer");
+});
+test.each(["Hint?", "Help?", "Again?", "Correct?", "Really?", "Hilfe?", "Tipp?"])("keeps short help request %s as clarification", message => {
+  expect(classifyStudyBuddyTurn(message, exercise).intent).toBe("clarify_followup");
+  expect(classifyStudyBuddyTurn(message.replace("?", ""), exercise).intent).toBe("clarify_followup");
+});
+test.each(["What topic would you like to practise?", "Which level should we practise?", "What language do you want?", "How do you want to pay?"])("does not activate practice for setup or support: %s", content => {
+  const dialogue = [{ role: "user", content: "Quiz me" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
+});
+test("does not reuse an older practice request for a later question", () => {
+  const dialogue = [...exercise, { role: "user", content: "Where are lessons?" }, { role: "assistant", content: "Which lesson do you want to open?" }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
+  expect(classifyStudyBuddyTurn("Auto?", dialogue).intent).toBe("new_question");
+});
