@@ -35,7 +35,7 @@ jobs:
           node-version: 22
 
       - name: Install rules deployment client
-        run: npm ci --prefix functions --no-audit --no-fund
+        run: npm install --prefix functions --no-audit --no-fund
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
