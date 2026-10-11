@@ -1,4 +1,4 @@
-import { classifyStudyBuddyTurn, studyBuddyFollowupInstructions } from "./studyBuddyFollowups";
+import { classifyStudyBuddyTurn, studyBuddyFollowupInstructions, getStudyBuddyPracticeActions } from "./studyBuddyFollowups";
 
 const history = [
   { role: "user", content: "Explain kein and nicht" },
@@ -33,4 +33,24 @@ test("practice controls preserve or advance the exercise", () => {
   expect(classifyStudyBuddyTurn("Try again", exercise).intent).toBe("retry_practice");
   expect(studyBuddyFollowupInstructions({ message: "Explain this exercise", history: exercise })).toContain("repeat the same exercise");
   expect(studyBuddyFollowupInstructions({ message: "Next practice question", history: exercise })).toContain("exactly ONE new question");
+});
+
+test.each(["A?", "kein?", "42?"])("preserves uncertain answer %s", answer => {
+  expect(classifyStudyBuddyTurn(answer, exercise).intent).toBe("check_answer");
+});
+test.each([
+  "Open Course Book: https://www.falowen.app/campus/course. Choose your level and lesson there.",
+  "Complete your profile to continue.",
+  "It is your turn to open Billing.",
+  "The word __kein__ negates nouns.",
+  "Which topic would you like to practise?",
+])("does not treat ordinary prose as an exercise: %s", content => {
+  const dialogue = [{ role: "user", content: "Quiz me" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
+  expect(classifyStudyBuddyTurn("A?", dialogue).intent).toBe("new_question");
+});
+test.each(["Translate: 'I have a car.'", "Your answer?", "Choose the correct word. A) kein B) nicht", "Ergänze: Ich habe ___ Auto."])("recognises structured exercise %s", content => {
+  const dialogue = [{ role: "user", content: "Help me learn" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toHaveLength(3);
+  expect(classifyStudyBuddyTurn("kein?", dialogue).intent).toBe("check_answer");
 });

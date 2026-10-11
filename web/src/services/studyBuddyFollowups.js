@@ -4,7 +4,12 @@ const recent = (history) => (Array.isArray(history) ? history : [])
   .filter((item) => item && (item.role === "user" || item.role === "assistant") && typeof item.content === "string")
   .slice(-10);
 
-const isPracticePrompt = (content) => /\b(?:fill in|complete|choose|translate|your answer|your turn|try this|ergänze|wähle|übersetze|antworte)\b/i.test(content) || /_{2,}/.test(content);
+// Require an answer request or exercise structure, not navigation verbs.
+const isPracticePrompt = (content) =>
+  /\b(?:your answer|what is your answer|deine antwort)\s*[?:]/i.test(content) ||
+  /(?:^|[\s:])_{2,}(?=$|[\s.,!?;])/m.test(content) ||
+  /(?:^|\n)\s*(?:translate|übersetze|fill in|ergänze|complete (?:the|this) sentence)\b[^\n]*[:“"']/i.test(content) ||
+  (/\b(?:choose|wähle)\b/i.test(content) && /(?:^|[\s,])(?:[a-d])[.):]\s*\S/im.test(content));
 
 export const getStudyBuddyPracticeActions = (history = []) => {
   const messages = recent(history);
@@ -13,8 +18,7 @@ export const getStudyBuddyPracticeActions = (history = []) => {
   const prior = messages.slice(0, -1);
   const student = prior[prior.length - 1];
   const feedback = student?.role === "user" && classifyStudyBuddyTurn(student.content, prior.slice(0, -1)).intent === "check_answer";
-  const requestedPractice = /\b(?:quiz me|test me|practi[cs]e|exercise|übung)\b/i.test(student?.content || "");
-  if (!feedback && !isPracticePrompt(latest.content) && !(requestedPractice && /\?/.test(latest.content))) return [];
+  if (!feedback && !isPracticePrompt(latest.content)) return [];
   return [
     { label: "Try again", message: "Try again" },
     { label: "Explain this", message: "Explain this exercise" },
@@ -46,9 +50,9 @@ export const classifyStudyBuddyTurn = (message, history = []) => {
   // exercise must not turn replies to a later explanation into answer attempts.
   const latest = messages[messages.length - 1];
   const tutorPrompt = latest?.role === "assistant" ? latest.content : "";
-  const practiceRequested = /\b(?:quiz me|test me|practi[cs]e|exercise|übung)\b/i.test(previousStudent);
-  const awaitingAnswer = isPracticePrompt(tutorPrompt) || (practiceRequested && /\?/.test(tutorPrompt));
-  const asksQuestion = /\?/.test(text) || /^(?:why|how|what|when|where|who|can|could|please|explain|warum|wieso|wie|was|wann|wo|wer|kann)\b/i.test(text);
+  const awaitingAnswer = isPracticePrompt(tutorPrompt);
+  const answerShaped = /^[\p{L}\p{N}]+[?.!]*$/u.test(text) && !/^(?:why|how|what|when|where|who|warum|wieso|wie|was|wann|wo|wer)[?.!]*$/i.test(text);
+  const asksQuestion = (/\?/.test(text) && !answerShaped) || /^(?:why|how|what|when|where|who|can|could|please|explain|warum|wieso|wie|was|wann|wo|wer|kann)\b/i.test(text);
   if (text && awaitingAnswer && !asksQuestion &&
       !/^(?:okay|ok|again|more|weiter)[.!\s]*$/i.test(text) &&
       !/\b(?:don't understand|don't get it|explain again|simpler|easier|nochmal|einfacher)\b/i.test(text)) {
