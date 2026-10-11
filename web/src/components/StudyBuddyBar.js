@@ -18,6 +18,7 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { splitStudyBuddySafeLinks } from "../services/studyBuddyNavigation";
 import "./StudyBuddyBar.css";
 import "./StudyBuddyChat.css";
+import StudyBuddyPracticeActions from "./StudyBuddyPracticeActions";
 import StudyBuddyNavigationActions from "./StudyBuddyNavigationActions";
 
 const renderStudyBuddyText = (content) => splitStudyBuddySafeLinks(content).map((part, index) =>
@@ -836,6 +837,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
                   >
                     <div className="study-buddy-chat-speaker">{entry.role === "assistant" ? "Study Buddy" : "You"}</div>
                     <div className="study-buddy-chat-bubble">{renderStudyBuddyText(entry.content)}</div>
+                    {entry.role === "assistant" && index === conversationHistory.length - 1 ? <StudyBuddyPracticeActions history={conversationHistory} disabled={isReplyLoading} onAction={submitQuickQuestion} /> : null}
                     {entry.role === "assistant" ? <StudyBuddyNavigationActions content={entry.content} onNavigate={openChatDestination} /> : null}
                   </div>
                 ))}
