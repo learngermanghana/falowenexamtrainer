@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'firestore.rules'
+      - 'scripts/deployFirestoreRules.cjs'
       - 'firebase.json'
       - '.firebaserc'
       - '.github/workflows/deploy-firestore-rules.yml'
@@ -33,25 +34,19 @@ jobs:
         with:
           node-version: 22
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+      - name: Install rules deployment client
+        run: npm ci --prefix functions --no-audit --no-fund
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
-      - name: Deploy Firestore security rules
+      - name: Validate and release Firestore security rules
         shell: bash
         run: |
-          set +e
-          firebase deploy \
-            --project "$FIREBASE_PROJECT_ID" \
-            --only firestore:rules \
-            --debug > firebase-rules-deploy.log 2>&1
-          status=$?
-          tail -n 180 firebase-rules-deploy.log || true
-          exit "$status"
+          set -o pipefail
+          node scripts/deployFirestoreRules.cjs 2>&1 | tee firebase-rules-deploy.log
 
       - name: Upload Firestore deployment diagnostics
         if: always()

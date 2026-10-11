@@ -2,7 +2,7 @@ const {createRequire}=require("node:module");
 const path=require("node:path");
 const {google}=createRequire(path.resolve(__dirname,"../functions/package.json"))("googleapis");
 const project="falowen-examiner-trainer";
-const required=["firebaserules.rulesets.test","firebaserules.rulesets.create","firebaserules.releases.update"];
+const required=["firebaserules.rulesets.create","firebaserules.releases.update"];
 (async()=>{
  if(process.env.FIREBASE_PROJECT_ID!==project)throw Error("Unexpected project");
  const auth=await new google.auth.GoogleAuth({scopes:["https://www.googleapis.com/auth/cloud-platform"]}).getClient();

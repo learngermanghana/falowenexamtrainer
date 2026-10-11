@@ -90,6 +90,7 @@ jobs:
         run: |
           gcloud auth list --filter=status:ACTIVE --format='value(account)'
           node scripts/checkDeletionDeploymentPermissions.cjs
+          node scripts/deployFirestoreRules.cjs
 
       - name: Deploy exam trainer API and notification lifecycle
         shell: bash
