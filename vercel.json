@@ -198,6 +198,13 @@
       "dest": "/index.html"
     },
     {
+      "src": "/help/?",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      },
+      "dest": "/help.html"
+    },
+    {
       "handle": "filesystem"
     },
     {

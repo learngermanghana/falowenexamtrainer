@@ -4,6 +4,8 @@
 
 Use the official Falowen Help source when answering questions about signup, login, course navigation, Falowen Radio, assignments, submissions, results, attendance, exams, billing, notifications, level upgrades, trials or account access.
 
+Last reviewed: 11 October 2026. Read the linked official sources for current instructions; private account status is not public.
+
 ## Primary documentation
 
 - [Falowen Help / How Falowen Works](https://www.falowen.app/help): Human-readable official guide.
@@ -66,3 +68,11 @@ For questions about the title or grammar topic of a specific Falowen day, prefer
 - **B1, B2, C1 and C2:** do not claim a public practice set is available unless its public route explicitly exists. Use the level-specific preparation pages such as https://www.falowen.app/goethe-c1-preparation for preparation information, and the signed-in Exams Room for enrolled students.
 - The signed-in **Exams Room** remains the destination for full mock libraries, saved attempts, detailed Schreiben feedback, Sprechen assessment, readiness tracking and student progress.
 - Falowen is independent and is not affiliated with or endorsed by Goethe-Institut.
+
+## Current learner flows
+
+- Full mocks: https://www.falowen.app/exams/mocks; individual skills: https://www.falowen.app/exams/overview. Availability depends on published practice.
+- Exams Room allows the enrolled level and lower levels without changing Course Book enrollment.
+- Course assignment scores belong in Results, not the Exams Room.
+- Signed-in homepage: use View full class schedule on the next live class card for the assigned timetable.
+- Billing offers Pay balance or Continue payment when available. A checkout return is not proof of payment: refresh status and inspect transaction history before paying again.

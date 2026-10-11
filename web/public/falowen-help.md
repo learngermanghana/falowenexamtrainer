@@ -1,7 +1,7 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **28 September 2026**.
+Last reviewed: **11 October 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
@@ -195,6 +195,24 @@ B2/C1 self-learning tracks intentionally do not show the standard class Attendan
 - **Exam File:** https://www.falowen.app/campus/examFile — exam details and Goethe-related information for enrolled A1–C2 learners.
 - **Exams Room:** https://www.falowen.app/exams/overview — separate exam-style practice. This is not the normal Course Book assignment flow.
 - **Study Calendar:** https://www.falowen.app/exams/study — study and exam-preparation planning.
+
+## Current exam practice and live classes
+
+- Open Exams Room at https://www.falowen.app/exams/overview. Choose **Start Full Mock** for Lesen, Hören, Schreiben and Sprechen together, or choose an individual skill below. Only published practice is available; do not promise a full mock or a particular mock number at every level.
+- The full mock library is https://www.falowen.app/exams/mocks. Choose a published mock or resume one already in progress.
+- In the Exams Room level selector, learners can practise at their enrolled level or a lower level: A2 can choose A1; B1 can choose A2 or A1. This changes exam practice only, not their Course Book level or enrollment. A1 cannot select a higher level.
+- For course assignment scores and tutor feedback, use Results at https://www.falowen.app/campus/results. For mock progress and recent exam practice results, use Exams Room. Do not substitute the exam room for course Results.
+- On the signed-in homepage, the next live class card offers **View full class schedule** for the learner's assigned class. Use that link for the full timetable; the public Upcoming Classes page describes new classes and is not a substitute for a student's assigned schedule.
+- StudyBuddy can explain lessons, clarify a previous explanation, offer examples and guide practice one question at a time. It can also direct learners to Results, Billing and other Falowen pages. It does not provide access to another learner's private account or bypass timed-mock restrictions.
+
+## Paying and recovering an unfinished payment
+
+1. Log in, then open **Account → Billing**: https://www.falowen.app/campus/account?tab=billing.
+2. Check the current balance and payment state. When online payment is available, use **Pay balance** or **Continue payment**, as shown, to open Paystack.
+3. Complete the payment using the methods offered by the checkout. Read the amount and any displayed fee before confirming; do not assume a fixed price or a payment method that checkout does not offer.
+4. Returning from checkout alone does not prove payment succeeded. Falowen marks payment confirmed only after provider confirmation.
+5. If the account still shows pending or unpaid after payment, use the payment-status refresh action in Billing or setup. Check transaction history before starting another payment. If the discrepancy remains, contact Falowen support with the payment reference; never share a password or card security code.
+6. An unfinished checkout does not mark the account paid. Continue the pending payment when that action is available.
 
 ## Account area
 
