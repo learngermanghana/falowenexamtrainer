@@ -1,3 +1,4 @@
+import WritingMistakeList from "./WritingMistakeList";
 import React, { useMemo, useState } from "react";
 
 const CEFR_EXPECTATIONS = {
@@ -17,8 +18,6 @@ const RUBRIC_LABELS = {
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-const countWords = (value = "") =>
-  (String(value || "").trim().match(/\S+/g) || []).length;
 
 const cleanTags = (text = "") =>
   String(text || "")
@@ -41,8 +40,7 @@ const parseCorrectionsFromText = (feedback = "") => {
   const correctionLines = text
     .split("\n")
     .map((line) => line.trim())
-    .filter((line) => /→|->/.test(line))
-    .slice(0, 12);
+    .filter((line) => /→|->/.test(line));
 
   return correctionLines
     .map((line) => {
@@ -116,26 +114,26 @@ const toSimpleFeedback = (
 
   const corrections = mappedCorrections.length
     ? mappedCorrections
-    : fixesFromSimple.slice(0, 6).map((line) => {
+    : fixesFromSimple.map((line) => {
         const [wrong, correct] = line
           .split(/→|->/)
           .map((part) => (part || "").trim());
         return {
-          wrong: wrong || "Review this phrase",
-          correct: correct || "Use the correct form",
+          wrong,
+          correct,
           reason: "Keep this sentence clear and correct.",
         };
-      });
+      }).filter(item => item.wrong && item.correct && item.wrong !== item.correct);
 
   const nextAction = stripMarkdownSections(
     simplifiedFeedback?.nextAction ||
-      "Rewrite 2 sentences using the corrections above.",
+      (mappedCorrections.length ? "Start with the first correction and apply the same rule to similar sentences." : "Review the task feedback and any optional suggestions."),
   );
 
   return {
     strengths: strengths.length
       ? strengths
-      : ["You answered the task and your message is understandable."],
+      : ["No specific strength was provided in this assessment."],
     corrections,
     nextAction,
   };
@@ -144,6 +142,8 @@ const toSimpleFeedback = (
 const styles = {
   wrap: { display: "grid", gap: 12 },
   card: {
+    minWidth: 0,
+    overflowWrap: "anywhere",
     border: "1px solid #cbd5e1",
     background: "#f8fafc",
     borderRadius: 12,
@@ -154,6 +154,7 @@ const styles = {
     borderRadius: 12,
     padding: 10,
     background: "#ffffff",
+    overflowWrap: "anywhere",
   },
   wrong: {
     color: "#7f1d1d",
@@ -181,7 +182,6 @@ const WritingFeedbackCard = ({
 }) => {
   const [copyState, setCopyState] = useState("");
   const normalizedLevel = String(level || "A1").toUpperCase();
-  const correctionDisplayLimit = ["B1", "B2", "C1", "C2"].includes(normalizedLevel) ? 10 : 5;
   const structured =
     structuredFeedback && typeof structuredFeedback === "object"
       ? structuredFeedback
@@ -197,38 +197,27 @@ const WritingFeedbackCard = ({
           const category = cleanTags(item?.category || "");
           const reason = cleanTags(item?.reason || item?.explanation || "");
           return {
-            wrong: cleanTags(item?.wrong || item?.original || ""),
+            wrong: cleanTags(item?.wrong || item?.original || item?.from || ""),
             correct: cleanTags(
-              item?.correct || item?.corrected || item?.improved || "",
+              item?.correct || item?.corrected || item?.improved || item?.to || "",
             ),
-            reason:
-              [category, reason].filter(Boolean).join(": ") ||
-              "Use the corrected form for accuracy.",
+            category,
+            reason: reason || "No explanation was provided for this correction.",
           };
         })
         .filter(
           (item) =>
             item.wrong &&
             item.correct &&
-            item.wrong.trim().toLowerCase() !==
-              item.correct.trim().toLowerCase(),
-        )
-        .filter(
-          (item) =>
-            countWords(item.wrong) <= 18 &&
-            countWords(item.correct) <= 18 &&
-            countWords(item.reason) <= 28,
-        )
-        .slice(0, correctionDisplayLimit);
+            item.wrong.trim() !== item.correct.trim(),
+        );
     }
     return parseCorrectionsFromText(feedback)
       .filter(
         (item) =>
-          item.wrong.trim().toLowerCase() !==
-          item.correct.trim().toLowerCase(),
-      )
-      .slice(0, correctionDisplayLimit);
-  }, [structuredCorrections, feedback, correctionDisplayLimit]);
+          item.wrong.trim() !== item.correct.trim(),
+      );
+  }, [structuredCorrections, feedback]);
 
   const activeRubric = structured?.rubric || rubric || {};
   const maxScore = useMemo(() => {
@@ -275,14 +264,13 @@ const WritingFeedbackCard = ({
         strengths: strengths.length
           ? strengths
           : [
-              summary ||
-                "You answered the task and your message is understandable.",
+              "No specific strength was provided in this assessment.",
             ],
         corrections: mappedCorrections,
         nextAction:
           nextTask ||
           simplifiedFeedback?.nextAction ||
-          "Rewrite 2 sentences using the corrections above.",
+          (mappedCorrections.length ? "Start with the first correction and apply the same rule to similar sentences." : "Review the task feedback and any optional suggestions."),
       };
     }
     return toSimpleFeedback(feedback, mappedCorrections, simplifiedFeedback);
@@ -295,6 +283,10 @@ const WritingFeedbackCard = ({
     summary,
     nextTask,
   ]);
+
+  const taskPoints = Array.isArray(structured?.taskPoints) ? structured.taskPoints : [];
+  const optionalImprovements = Array.isArray(structured?.optionalImprovements)
+    ? structured.optionalImprovements.map(stripMarkdownSections).filter(Boolean) : [];
 
   const handleCopy = async () => {
     const text = [
@@ -311,15 +303,21 @@ const WritingFeedbackCard = ({
       "",
       "Fix these mistakes",
       ...simple.corrections
-        .slice(0, correctionDisplayLimit)
         .flatMap((item) => [
-          `- ❌ Needs fix: ${item.wrong}`,
-          `  ✅ Better: ${item.correct}`,
+          `- You wrote: ${item.wrong}`,
+          `  Correct: ${item.correct}`,
           `  Why: ${item.reason}`,
         ]),
       "",
-      "Next action",
+      "Task points",
+      ...taskPoints.map(point => `- ${point.label}: ${point.status}. ${point.evidence || ""} ${point.reason || ""}`),
+      "",
+      "Optional style improvements",
+      ...optionalImprovements.map(item => `- ${item}`),
+      "",
+      "Main priority",
       `- ${simple.nextAction}`,
+      ...(improvedVersion ? ["", "Corrected draft", improvedVersion] : []),
     ].join("\n");
 
     if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
@@ -344,70 +342,39 @@ const WritingFeedbackCard = ({
         </div>
       </div>
 
-      {summary ? (
-        <div style={styles.card}>
-          <strong>Short summary</strong>
-          <div style={{ marginTop: 6 }}>{summary}</div>
-        </div>
-      ) : null}
+      <section style={styles.card} aria-label="Quick overview">
+        <h3 style={{margin:0}}>Quick overview</h3>
+        {summary ? <p>{summary}</p> : null}
+        <strong>What you did well</strong>
+        <ul>{simple.strengths.slice(0, 2).map((item,index)=><li key={index}>{item}</li>)}</ul>
+        {mainIssues.length ? <p><strong>Main issue:</strong> {mainIssues[0]}</p> : null}
+      </section>
 
-      <div style={styles.card}>
-        <strong>Strengths</strong>
-        <ul style={{ margin: "8px 0 0 18px" }}>
-          {simple.strengths.slice(0, 3).map((item, index) => (
-            <li key={`${item}-${index}`}>{item}</li>
-          ))}
-        </ul>
-      </div>
+      <WritingMistakeList corrections={simple.corrections} level={normalizedLevel}/>
 
-      {mainIssues.length ? (
-        <div style={styles.card}>
-          <strong>Main issues</strong>
-          <ul style={{ margin: "8px 0 0 18px" }}>
-            {mainIssues.slice(0, 4).map((item, index) => (
-              <li key={`${item}-${index}`}>{item}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      {taskPoints.length ? <section style={styles.card} aria-label="Task points">
+        <h3 style={{margin:0}}>Task points</h3>
+        <div style={{display:"grid",gap:10,marginTop:12}}>{taskPoints.map((point,index)=><article key={index} style={styles.correctionCard}>
+          <strong>{point.label}</strong><p><strong>{({met:"Answered",partial:"Partly answered",missing:"Missing"})[point.status] || "Review"}</strong></p>
+          {point.evidence ? <p><strong>Your evidence:</strong> {point.evidence}</p> : null}
+          {point.reason ? <p>{point.reason}</p> : null}
+        </article>)}</div>
+      </section> : null}
 
-      <div style={styles.card}>
-        <strong>Corrections</strong>
-        <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-          {simple.corrections.length ? (
-            simple.corrections.slice(0, correctionDisplayLimit).map((item, index) => (
-              <div key={`${item.wrong}-${index}`} style={styles.correctionCard}>
-                <div style={styles.wrong}>
-                  <strong>❌ Needs fix:</strong> {item.wrong}
-                </div>
-                <div style={{ height: 6 }} />
-                <div style={styles.correct}>
-                  <strong>✅ Better:</strong> {item.correct}
-                </div>
-                <div style={{ marginTop: 6, fontSize: 14 }}>
-                  <strong>Why:</strong> {item.reason}
-                </div>
-              </div>
-            ))
-          ) : (
-            <div>No correction needed.</div>
-          )}
-        </div>
-      </div>
+      <section style={styles.card} aria-label="Main priority">
+        <h3 style={{margin:0}}>Main priority · fix this first</h3><p>{simple.nextAction}</p>
+      </section>
 
-      {improvedVersion ? (
-        <div style={styles.card}>
-          <strong>Improved version</strong>
-          <div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>
-            {improvedVersion}
-          </div>
-        </div>
-      ) : null}
+      {optionalImprovements.length ? <section style={styles.card} aria-label="Optional improvements">
+        <h3 style={{margin:0}}>Optional style improvements</h3><p>These are suggestions, not language mistakes.</p>
+        <ul>{optionalImprovements.map((item,index)=><li key={index}>{item}</li>)}</ul>
+      </section> : null}
 
-      <div style={styles.card}>
-        <strong>Next task</strong>
-        <div style={{ marginTop: 6 }}>- {simple.nextAction}</div>
-      </div>
+      {mainIssues.length > 1 ? <details style={styles.card}><summary style={{cursor:"pointer",fontWeight:700}}>More feedback on your writing</summary><ul>{mainIssues.slice(1).map((item,index)=><li key={index}>{item}</li>)}</ul></details> : null}
+      {improvedVersion ? <details style={styles.card}>
+        <summary style={{cursor:"pointer",fontWeight:700}}>Corrected draft · compare after reviewing your mistakes</summary>
+        <div style={{marginTop:12,whiteSpace:"pre-wrap"}}>{improvedVersion}</div>
+      </details> : null}
 
       <div style={styles.card}>
         <div
@@ -431,7 +398,7 @@ const WritingFeedbackCard = ({
           style={{
             marginTop: 8,
             display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))",
             gap: 8,
             fontSize: 13,
           }}

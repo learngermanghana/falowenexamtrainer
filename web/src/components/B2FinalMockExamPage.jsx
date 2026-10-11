@@ -1,3 +1,4 @@
+import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -1391,6 +1392,13 @@ export default function B2FinalMockExamPage() {
           {state.schreibenResult?.overall_feedback_en ? (
             <p><strong>Schreiben:</strong> {state.schreibenResult.overall_feedback_en}</p>
           ) : null}
+          {Object.entries(state.schreibenResult?.parts || {}).map(([key, part]) => (
+            <section key={key}>
+              <h4>{key.replace("teil", "Teil ")} · {part.score}/{part.maxScore}</h4>
+              <p>{part.feedback_en}</p>
+              <WritingMistakeList corrections={part.corrections} level="B2" />
+            </section>
+          ))}
           {state.sprechenResult?.overall_feedback_en ? (
             <p><strong>Sprechen:</strong> {state.sprechenResult.overall_feedback_en}</p>
           ) : null}

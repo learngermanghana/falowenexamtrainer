@@ -1,3 +1,4 @@
+import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -1051,13 +1052,8 @@ export default function A2FinalMockExamPage() {
               <div key={key}>
                 <strong>{key.replace("teil", "Teil ")} · {part.score}/{part.maxScore}</strong>
                 <p>{part.feedback_en}</p>
-                {(part.corrections || []).map((correction, index) => (
-                  <div className="a1-final-mock-correction" key={`${key}-${index}`}>
-                    <span>{correction.original_de}</span>
-                    <strong>{correction.corrected_de}</strong>
-                    <small>{correction.explanation_en}</small>
-                  </div>
-                ))}
+                <WritingMistakeList corrections={part.corrections} level="A2"/>
+
               </div>
             );
           })}

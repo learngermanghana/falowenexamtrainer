@@ -1,3 +1,4 @@
+import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -1049,13 +1050,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               This response uses language that is noticeably above typical A1 level. Practise the same task again using simpler A1 structures.
             </p>
           ) : null}
-          {(exam.writingResult?.letter?.corrections || []).map((correction, index) => (
-            <div className="a1-final-mock-correction" key={index}>
-              <span>{correction.original_de}</span>
-              <strong>{correction.corrected_de}</strong>
-              <small>{correction.explanation_en}</small>
-            </div>
-          ))}
+          <WritingMistakeList corrections={exam.writingResult?.letter?.corrections} level="A1"/>
+
         </section>
 
         <section className="a1-final-mock-feedback">

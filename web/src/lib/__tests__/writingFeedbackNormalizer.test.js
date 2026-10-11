@@ -54,12 +54,12 @@ describe("normalizeWritingFeedback", () => {
           corrected: "ich gehe",
           explanation: "Verb form",
         },
-        { wrong: "der Frau", correct: "die Frau", reason: "Accusative" },
+        { wrong: "der Frau", correct: "die Frau", reason: "Accusative", category: "" },
       ],
     });
     expect(result.corrections).toEqual([
-      { wrong: "ich bin gehen", correct: "ich gehe", reason: "Verb form" },
-      { wrong: "der Frau", correct: "die Frau", reason: "Accusative" },
+      { wrong: "ich bin gehen", correct: "ich gehe", reason: "Verb form", category: "" },
+      { wrong: "der Frau", correct: "die Frau", reason: "Accusative", category: "" },
     ]);
   });
 
@@ -121,3 +121,13 @@ describe("normalizeWritingFeedback", () => {
     expect(result.rubric.coherence.score).toBe(4);
   });
 });
+
+ it("preserves all corrections and separates task coverage from optional style", () => {
+   const corrections = Array.from({length:12}, (_,i) => ({wrong:`phrase ${i}`,correct:`correction ${i}`,category:"Grammar",reason:"Rule"}));
+   const result = normalizeWritingFeedback({score:19,maxScore:25,corrections,optionalImprovements:["Optional wording"],taskPoints:[{label:"Reason",status:"partial",reason:"Add detail"}]});
+   expect(result.score).toBe(19);
+   expect(result.corrections).toHaveLength(12);
+   expect(result.corrections[11].category).toBe("Grammar");
+   expect(result.optionalImprovements).toEqual(["Optional wording"]);
+   expect(result.taskPoints[0].status).toBe("partial");
+ });

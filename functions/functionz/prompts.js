@@ -268,6 +268,8 @@ Use exactly this JSON shape:
       "reason": ""
     }
   ],
+  "optionalImprovements": [],
+  "taskPoints": [{ "label": "", "status": "met", "evidence": "", "reason": "" }],
   "improvedVersion": "",
   "nextTask": ""
 }
@@ -284,7 +286,10 @@ Scoring rules:
 Feedback rules:
 - Keep summary, strengths, mainIssues, reasons, improvedVersion, and nextTask concise so the response does not get cut off.
 - If the answer is excellent, do not force corrections; return an empty corrections array.
-- corrections must only contain real errors from the student's text.
+- corrections must only contain real errors from the student's text. Quote the actual student phrase, provide its corrected form, and explain the rule in plain English. Keep the explanation useful rather than shortening it to a vague instruction.
+- Put optional style suggestions in optionalImprovements, never in corrections.
+- When an exact writing task is supplied, return taskPoints for its actual requirements with status met, partial or missing, a short exact student quotation as evidence where available, and a brief reason. If no exact task is supplied, return an empty taskPoints array; never invent requirements.
+- nextTask should prioritise the most important real correction or missing task point. When none is present, give an optional improvement rather than inventing a mistake.
 - corrections must never include items where wrong and correct are identical.
 - If a sentence is correct but can be improved stylistically, do not put it in corrections. Put it in mainIssues or nextTask as an optional improvement.
 - For A1/A2, limit corrections to the 5 most useful actual errors.

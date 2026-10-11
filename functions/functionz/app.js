@@ -3277,34 +3277,7 @@ const normalizeShortStringArray = (value = [], limit = 5) =>
     .filter(Boolean)
     .slice(0, limit);
 
-const sanitizeWritingCorrections = (value = []) => {
-  if (!Array.isArray(value)) return [];
-  const seen = new Set();
-  return value
-    .map((item) => {
-      const wrong = String(item?.wrong || "").trim();
-      const correct = String(item?.correct || "").trim();
-      const category = String(item?.category || "").trim();
-      const reason = String(item?.reason || "").trim();
-      return { wrong, correct, category, reason };
-    })
-    .filter((item) => item.wrong && item.correct)
-    .filter((item) => item.wrong.toLocaleLowerCase() !== item.correct.toLocaleLowerCase())
-    .filter((item) => {
-      const key = `${item.wrong.toLocaleLowerCase()}->${item.correct.toLocaleLowerCase()}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    })
-    .filter((item) => {
-      const wrong = item.wrong.replace(/[.!?]+$/g, "").trim().toLocaleLowerCase();
-      const correct = item.correct.replace(/[.!?]+$/g, "").trim().toLocaleLowerCase();
-      if (wrong === correct) return false;
-      if (wrong === "ich sehe fern" && correct === "ich sehe fern") return false;
-      return true;
-    })
-    .slice(0, 5);
-};
+const { sanitizeWritingCorrections, normalizeTaskPoints } = require("./writingFeedbackNormalization");
 
 const rubricCriterionFromScore = (score) => clampNumber(Math.round(Number(score || 0) / 5), 0, 5);
 
@@ -3338,6 +3311,8 @@ const normalizeWritingInsights = ({ parsed = {}, feedback = "", promptType = "un
     mainIssues,
     corrections,
     improvedVersion: String(parsed?.improvedVersion || "").trim(),
+    optionalImprovements: normalizeShortStringArray(parsed?.optionalImprovements, 12),
+    taskPoints: normalizeTaskPoints(parsed?.taskPoints),
     nextTask,
     simplifiedFeedback: {
       topFixes: corrections.map((item) => `${item.wrong} → ${item.correct}${item.reason ? ` — ${item.reason}` : ""}`),
@@ -3585,6 +3560,8 @@ app.post("/writing/mark", async (req, res) => {
       mainIssues: writingInsights?.mainIssues || [],
       corrections: writingInsights?.corrections || [],
       improvedVersion: writingInsights?.improvedVersion || "",
+      optionalImprovements: writingInsights?.optionalImprovements || [],
+      taskPoints: writingInsights?.taskPoints || [],
       nextTask: writingInsights?.nextTask || "",
       structuredFeedback: writingInsights || null,
       simplifiedFeedback: writingInsights?.simplifiedFeedback || null,
@@ -4097,7 +4074,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
       letter.maxScore = 15;
       letter.level_mismatch = Boolean(letter?.level_mismatch);
       letter.feedback_en = String(letter?.feedback_en || "").trim();
-      letter.corrections = Array.isArray(letter?.corrections) ? letter.corrections.slice(0, 5) : [];
+      letter.corrections = Array.isArray(letter?.corrections) ? letter.corrections : [];
     }
 
     const score = Math.max(0, Math.min(25, Number(form.score || 0) + Number(letter.score || 0)));
@@ -4368,7 +4345,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
             score: teil1Score,
             maxScore: 10,
             corrections: Array.isArray(result?.parts?.teil1?.corrections)
-              ? result.parts.teil1.corrections.slice(0, 5)
+              ? result.parts.teil1.corrections
               : [],
           },
           teil2: {
@@ -4376,7 +4353,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
             score: teil2Score,
             maxScore: 15,
             corrections: Array.isArray(result?.parts?.teil2?.corrections)
-              ? result.parts.teil2.corrections.slice(0, 5)
+              ? result.parts.teil2.corrections
               : [],
           },
         },
@@ -4542,7 +4519,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
           score: Number(cappedScore.toFixed(1)),
           maxScore,
           required_points_met: flags,
-          corrections: Array.isArray(part.corrections) ? part.corrections.slice(0, 5) : [],
+          corrections: Array.isArray(part.corrections) ? part.corrections : [],
         };
       });
 
@@ -4710,7 +4687,7 @@ app.post("/writing/b2-mock-score", async (req, res) => {
           score: Number(cappedScore.toFixed(1)),
           maxScore: policy.maxScore,
           required_points_met: flags,
-          corrections: Array.isArray(part.corrections) ? part.corrections.slice(0, 6) : [],
+          corrections: Array.isArray(part.corrections) ? part.corrections : [],
         };
       });
 

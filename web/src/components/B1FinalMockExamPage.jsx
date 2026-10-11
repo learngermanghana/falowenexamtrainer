@@ -1,3 +1,4 @@
+import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -558,6 +559,13 @@ export default function B1FinalMockExamPage() {
             : "You have completed the whole mock, but your overall score needs improvement. You do not have to restart immediately: practise the sections that need work, then retake the full mock when ready."}</p>
           <FullMockRecovery level="B1" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="A new full attempt begins with Lesen. Your completed result stays in the history." />
           {exam.schreibenResult?.overall_feedback_en ? <p>{exam.schreibenResult.overall_feedback_en}</p> : null}
+          {Object.entries(exam.schreibenResult?.parts || {}).map(([key, part]) => (
+            <section key={key}>
+              <h4>{key.replace("teil", "Teil ")} · {part.score}/{part.maxScore}</h4>
+              <p>{part.feedback_en}</p>
+              <WritingMistakeList corrections={part.corrections} level="B1" />
+            </section>
+          ))}
           {exam.speakingResult?.overall_feedback_en ? <p>{exam.speakingResult.overall_feedback_en}</p> : null}
 
         </section>

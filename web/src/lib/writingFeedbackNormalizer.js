@@ -7,6 +7,8 @@ const empty = {
   areasToImprove: [],
   mainIssues: [],
   corrections: [],
+  optionalImprovements: [],
+  taskPoints: [],
   improvedVersion: "",
   nextTask: "",
   parseError: false,
@@ -40,6 +42,8 @@ const FEEDBACK_SHAPE_KEYS = [
   "improved_version",
   "nextTask",
   "next_task",
+  "taskPoints",
+  "optionalImprovements",
 ];
 
 const cleanText = (value) =>
@@ -262,12 +266,14 @@ export const normalizeWritingFeedback = (input) => {
       corrections: Array.isArray(parsed.corrections)
         ? parsed.corrections
             .map((correction) => ({
-              wrong: cleanText(correction?.wrong || correction?.original || ""),
+              category: cleanText(correction?.category || ""),
+              wrong: cleanText(correction?.wrong || correction?.original || correction?.from || ""),
               correct: cleanText(
                 correction?.correct ||
                   correction?.corrected ||
                   correction?.improved ||
                   correction?.correction ||
+                  correction?.to ||
                   "",
               ),
               reason: cleanText(
@@ -276,6 +282,11 @@ export const normalizeWritingFeedback = (input) => {
             }))
             .filter((correction) => correction.wrong || correction.correct)
         : [],
+      optionalImprovements: asArray(parsed.optionalImprovements),
+      taskPoints: (Array.isArray(parsed.taskPoints) ? parsed.taskPoints : []).map(point => ({
+        label: cleanText(point?.label), status: cleanText(point?.status).toLowerCase(),
+        evidence: cleanText(point?.evidence), reason: cleanText(point?.reason),
+      })).filter(point => point.label && ["met", "partial", "missing"].includes(point.status)),
       improvedVersion: cleanText(
         parsed.improvedVersion ||
           parsed.improved_version ||
