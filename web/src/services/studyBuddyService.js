@@ -3,6 +3,7 @@ import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from ".
 import { callAI } from "./aiClient";
 import { getStudyBuddyLessonContext } from "./studyBuddyLessonContext";
 import { resolveStudyBuddyNavigationReply } from "./studyBuddyNavigation";
+import { studyBuddyFollowupInstructions } from "./studyBuddyFollowups";
 
 const DEFAULT_STUDY_BUDDY_MODE = "lesson";
 const STUDY_BUDDY_MODE_LABELS = {
@@ -193,7 +194,8 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, conversationH
     "If the student asks about something unrelated to both Falowen support and the lesson, briefly redirect them back to the lesson and give one useful lesson-based example.",
     "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
     "Keep the answer short and phone-friendly. Do not give many corrections at once; correct only the 1-2 most important mistakes per turn.",
-    "Use the recent conversation only to understand references and follow-up questions such as 'why?', 'what do you mean?', or 'give me another example'. If old conversation conflicts with the CURRENT LESSON CONTEXT, follow the current lesson context.",
+    "Use the recent conversation to continue the same teaching exchange across turns, including questions, learner attempts and corrective feedback. If the student clearly changes topics, follow the new question. If old conversation conflicts with the CURRENT LESSON CONTEXT, follow the current lesson context.",
+    studyBuddyFollowupInstructions({ message, history: conversationHistory }),
     "Level rules: A1/A2 = simple English explanation + simple German examples. B1 = correct and help build longer connected sentences. B2 = improve argumentation, connectors and natural expression. C1 = upgrade to advanced, natural, precise German.",
     "For C1 useful replies, include exactly this compact pattern: a short natural response; 'Besser / C1-Version:' with one upgraded sentence; 'Nützlicher Ausdruck:' with one strong C1 phrase and English meaning; one deeper follow-up question. Do not only correct; upgrade.",
     "Current-info safety: if the student asks about current politics, current office holders, current government, current prices, latest news, or anything that may change, do not answer with certainty unless live/current data is provided. Say: 'Bei aktuellen Informationen kann ich mich irren. Bitte prüfe eine aktuelle Quelle.' Then continue language practice with a safe sentence frame.",
