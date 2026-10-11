@@ -123,3 +123,16 @@ test.each(["new topic: Perfekt", "Why does gehen use sein in the Perfekt?", "Whe
   expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
   expect(classifyStudyBuddyTurn("Auto", dialogue).intent).toBe("new_question");
 });
+
+test.each(["What would you like to practise?", "What do you want to study?", "What should we learn?", "Was möchtest du üben?"])("does not grade setup response: %s", content => {
+  const dialogue = [{ role: "user", content: "Quiz me" }, { role: "assistant", content }];
+  expect(getStudyBuddyPracticeActions(dialogue)).toEqual([]);
+  expect(classifyStudyBuddyTurn("grammar", dialogue).intent).toBe("new_question");
+});
+test.each(["Tell me about the dative case", "Let's study Perfekt instead", "Let’s learn the accusative", "Teach me about word order"])("topic command ends retained practice: %s", message => {
+  const dialogue = [...exercise, { role: "user", content: "kein" }, { role: "assistant", content: "Correct!" }];
+  expect(classifyStudyBuddyTurn(message, dialogue)).toEqual({ intent: "new_question", previousStudent: "" });
+  const changed = [...dialogue, { role: "user", content: message }, { role: "assistant", content: "Here is the explanation." }];
+  expect(getStudyBuddyPracticeActions(changed)).toEqual([]);
+  expect(classifyStudyBuddyTurn("kein", changed).intent).toBe("new_question");
+});
