@@ -4,8 +4,19 @@ const recent = (history) => (Array.isArray(history) ? history : [])
   .filter((item) => item && (item.role === "user" || item.role === "assistant") && typeof item.content === "string")
   .slice(-10);
 
+const isShortHelpRequest = (text) => /^(?:hint|help|again|correct|really|explain|huh|hilfe|tipp|nochmal|richtig|wirklich)[?.!\s]*$/i.test(text);
+
+const isDirectQuizQuestion = (content, previousStudent) => {
+  if (!/\b(?:quiz me|test me|practi[cs]e|exercise|übung|try again)\b/i.test(previousStudent || "")) return false;
+  const questions = String(content || "").match(/(?:^|[.!]\s+|\n)\s*(?:[0-9]+[.)]\s*)?(?:how|which|what|who|where|when|why|wie|welche[rns]?|was|wer|wo|wann|warum)\b[^?]*\?/gi) || [];
+  return questions.some(question =>
+    !/https?:\/\//i.test(question) &&
+    !/\b(?:topic|level|language|skill|difficulty|ready|pay|payment|billing|open|navigate|sign up|log in|would you like|do you want|shall we|thema|niveau|möchtest|bereit)\b/i.test(question));
+};
+
 // Require an answer request or exercise structure, not navigation verbs.
-const isPracticePrompt = (content) =>
+const isPracticePrompt = (content, previousStudent) =>
+  isDirectQuizQuestion(content, previousStudent) ||
   /\b(?:your answer|what is your answer|deine antwort)\s*[?:]/i.test(content) ||
   /(?:^|[\s:])_{2,}(?=$|[\s.,!?;])/m.test(content) ||
   /(?:^|\n)\s*(?:translate|übersetze|fill in|ergänze|complete (?:the|this) sentence)\b[^\n]*[:“"']/i.test(content) ||
@@ -18,7 +29,7 @@ export const getStudyBuddyPracticeActions = (history = []) => {
   const prior = messages.slice(0, -1);
   const student = prior[prior.length - 1];
   const feedback = student?.role === "user" && classifyStudyBuddyTurn(student.content, prior.slice(0, -1)).intent === "check_answer";
-  if (!feedback && !isPracticePrompt(latest.content)) return [];
+  if (!feedback && !isPracticePrompt(latest.content, student?.content)) return [];
   return [
     { label: "Try again", message: "Try again" },
     { label: "Explain this", message: "Explain this exercise" },
@@ -34,6 +45,7 @@ export const classifyStudyBuddyTurn = (message, history = []) => {
   if (/^(?:new topic|change topic|something else|forget that|neues thema)\b/.test(text)) {
     return { intent: "new_question", previousStudent: "" };
   }
+  if (isShortHelpRequest(text)) return { intent: "clarify_followup", previousStudent };
   if (/^try again[.!\s]*$/i.test(text)) return { intent: "retry_practice", previousStudent };
   if (/^explain this exercise[.!\s]*$/i.test(text)) return { intent: "explain_practice", previousStudent };
   if (/^next (?:practice )?question[.!\s]*$/i.test(text)) return { intent: "next_practice", previousStudent };
@@ -50,8 +62,8 @@ export const classifyStudyBuddyTurn = (message, history = []) => {
   // exercise must not turn replies to a later explanation into answer attempts.
   const latest = messages[messages.length - 1];
   const tutorPrompt = latest?.role === "assistant" ? latest.content : "";
-  const awaitingAnswer = isPracticePrompt(tutorPrompt);
-  const answerShaped = /^[\p{L}\p{N}]+[?.!]*$/u.test(text) && !/^(?:why|how|what|when|where|who|warum|wieso|wie|was|wann|wo|wer)[?.!]*$/i.test(text);
+  const awaitingAnswer = isPracticePrompt(tutorPrompt, previousStudent);
+  const answerShaped = /^[\p{L}\p{N}]+[?.!]*$/u.test(text) && !isShortHelpRequest(text) && !/^(?:why|how|what|when|where|who|warum|wieso|wie|was|wann|wo|wer)[?.!]*$/i.test(text);
   const asksQuestion = (/\?/.test(text) && !answerShaped) || /^(?:why|how|what|when|where|who|can|could|please|explain|warum|wieso|wie|was|wann|wo|wer|kann)\b/i.test(text);
   if (text && awaitingAnswer && !asksQuestion &&
       !/^(?:okay|ok|again|more|weiter)[.!\s]*$/i.test(text) &&
