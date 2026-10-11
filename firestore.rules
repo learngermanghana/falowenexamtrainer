@@ -237,11 +237,16 @@ service cloud.firestore {
       allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
       allow write: if false;
     }
-    match /students/{document=**} {
-      allow read: if signedIn() || (request.auth != null && (resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion']));
-      allow update: if signedIn() && (isStaff() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion']));
+    match /students/{studentId} {
+      // Recovery may look up a missing UID document before querying the legacy
+      // student-code profile. Only the root profile is readable while paused.
+      allow read: if signedIn() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
+      allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
+      allow update: if signedIn() && (isStaff() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
       allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid);
+      match /{collectionId}/{documentId}/{nested=**} {
+        allow read, write: if signedIn();
+      }
     }
     match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }

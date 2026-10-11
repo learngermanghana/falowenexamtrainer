@@ -48,6 +48,9 @@ jobs:
           set -o pipefail
           node scripts/deployFirestoreRules.cjs 2>&1 | tee firebase-rules-deploy.log
 
+      - name: Verify legacy-profile deletion recovery
+        run: node scripts/testLiveAccountDeletion.cjs
+
       - name: Upload Firestore deployment diagnostics
         if: always()
         uses: actions/upload-artifact@v4

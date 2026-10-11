@@ -10,6 +10,7 @@ const PROJECT="falowen-examiner-trainer";
 const ORIGIN="https://www.falowen.app";
 const uid=`e2e-account-delete-${crypto.randomUUID()}`;
 const email=`${uid}@example.invalid`;
+const studentDocId=`code-${uid}`;
 const password=crypto.randomBytes(32).toString("base64url");
 if(process.env.FIREBASE_PROJECT_ID!==PROJECT) throw Error("Unexpected Firebase project");
 admin.initializeApp({projectId:PROJECT});
@@ -33,23 +34,25 @@ async function run(){
  const config=JSON.parse(json[1]);assert.equal(config.projectId,PROJECT);
  await admin.auth().createUser({uid,email,password,emailVerified:true});
  await admin.auth().setCustomUserClaims(uid,{systemDeletionTest:true});
- await db.collection("students").doc(uid).set({uid,email,role:"student",status:"active",level:"A1",systemDeletionTest:true,messagingToken:"disposable-non-fcm-token",messagingTokens:[{token:"disposable-non-fcm-token"}],notificationPreferences:{classReminders:false},contractEnd:"2099-01-01T00:00:00.000Z"});
+ await db.collection("students").doc(studentDocId).set({uid,email,role:"student",status:"active",level:"A1",systemDeletionTest:true,messagingToken:"disposable-non-fcm-token",messagingTokens:[{token:"disposable-non-fcm-token"}],notificationPreferences:{classReminders:false},contractEnd:"2099-01-01T00:00:00.000Z"});
  await db.collection("writingProgress").doc(uid).set({uid,score:19,maxScore:25});
  let token=await signIn(config.apiKey);
  assert.equal((await readWithToken(token,"writingProgress",uid)).status,200,"Learning data is accessible before deletion");
  const first=await callable("requestAccountDeletion",token,{confirmation:"DELETE"});
  assert.equal(first.status,"pending");
  const remaining=Date.parse(first.deleteAt)-Date.now();assert.ok(remaining>29.9*86400000 && remaining<=30*86400000,"Deadline is 30 days away");
- const student=(await db.collection("students").doc(uid).get()).data();
+ const student=(await db.collection("students").doc(studentDocId).get()).data();
  assert.equal(student.notificationsPausedForDeletion,true);assert.equal(student.messagingToken,null);assert.equal(student.messagingTokens.length,0);
  assert.equal((await readWithToken(token,"writingProgress",uid)).status,403,"Pending deletion blocks learning data");
+ assert.equal((await readWithToken(token,"students",uid)).status,404,"Recovery can check a missing UID profile before finding its student-code profile");
+ assert.equal((await readWithToken(token,"students",studentDocId)).status,200,"The student-code profile remains readable for recovery");
  const directWrite=await fetch(`https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents/accountDeletionRequests/${uid}`,{method:"PATCH",headers:{"Content-Type":"application/json",Authorization:`Bearer ${token}`},body:JSON.stringify({fields:{status:{stringValue:"cancelled"}}})});
  assert.equal(directWrite.status,403,"Students cannot bypass the cancellation endpoint");
  const again=await callable("requestAccountDeletion",token,{confirmation:"DELETE"});assert.equal(again.deleteAt,first.deleteAt,"Repeated requests preserve deadline");
  token=await signIn(config.apiKey);
  const cancelled=await callable("cancelAccountDeletion",token,{});assert.equal(cancelled.status,"cancelled");
  assert.equal((await readWithToken(token,"writingProgress",uid)).status,200,"Signing back in and cancelling restores learning data");
- const restored=(await db.collection("students").doc(uid).get()).data();assert.equal(restored.notificationsPausedForDeletion,false);assert.equal(restored.notificationPreferences.classReminders,false);
+ const restored=(await db.collection("students").doc(studentDocId).get()).data();assert.equal(restored.notificationsPausedForDeletion,false);assert.equal(restored.notificationPreferences.classReminders,false);
  console.log("PASS live account deletion: password sign-in, 30-day deadline, token removal, access blocking, direct-write denial, idempotency, re-sign-in and cancellation");
 }
 run().catch(()=>{console.error("Live account deletion verification failed; inspect the assertion and deployment status.");process.exitCode=1;}).finally(async()=>{
@@ -58,7 +61,7 @@ run().catch(()=>{console.error("Live account deletion verification failed; inspe
  assert.ok(uid.startsWith("e2e-account-delete-"));
  await db.collection("accountDeletionRequests").doc(uid).delete();
  await db.recursiveDelete(db.collection("writingProgress").doc(uid));
- await db.recursiveDelete(db.collection("students").doc(uid));
+ await db.recursiveDelete(db.collection("students").doc(studentDocId));
  await admin.auth().deleteUser(uid).catch(error=>{if(error.code!=="auth/user-not-found") throw error;});
  console.log("Disposable verification account removed");
 });
