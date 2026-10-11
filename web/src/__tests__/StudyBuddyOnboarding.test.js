@@ -13,7 +13,7 @@ describe("first-login Study Buddy onboarding", () => {
     expect(onboarding).toContain("Start Orientation");
     expect(onboarding).toContain("Day 1 Workbook");
     expect(onboarding).toContain("Ask Study Buddy anything");
-    expect(onboarding).toContain('finishAndGo("/campus?studyBuddy=open", "ask")');
+    expect(onboarding).toContain('finishAndGo("/?studyBuddy=open&welcome=1", "ask")');
   });
 
   test("preserves the real Day 0 teacher-navigation entry and level-specific guarded lesson route", () => {

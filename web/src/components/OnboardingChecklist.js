@@ -147,7 +147,7 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             <small>This is a guide, not a completion tracker. Falowen uses your real lesson and assignment records for progress.</small>
           </section>
         ) : null}
-        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/campus?studyBuddy=open", "ask")}>
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo("/?studyBuddy=open&welcome=1", "ask")}>
           {savingAction === "ask" ? "Opening..." : "💬 Ask Study Buddy anything"}
         </button>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
