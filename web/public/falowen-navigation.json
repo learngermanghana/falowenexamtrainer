@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-09-28",
+  "lastReviewed": "2026-10-11",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -391,5 +391,28 @@
     },
     "guidance": "Use the Markdown reference or level schedule pages for exact day-by-day lesson titles, chapters and grammar topics.",
     "aiReference": "https://www.falowen.app/falowen-course-schedules.md"
+  },
+  "currentGuidance": {
+    "examPractice": {
+      "overview": "/exams/overview",
+      "mocks": "/exams/mocks",
+      "levelAccess": "Enrolled level and lower levels only; Course Book enrollment stays unchanged.",
+      "availability": "Only published mocks and skill practice; do not promise every level has a full mock.",
+      "courseResults": "/campus/results"
+    },
+    "liveClasses": {
+      "action": "View full class schedule",
+      "location": "Signed-in homepage next live class card",
+      "note": "Use the assigned class link, not the public upcoming classes page."
+    },
+    "paymentRecovery": {
+      "route": "/campus/account?tab=billing",
+      "actions": [
+        "Pay balance",
+        "Continue payment"
+      ],
+      "confirmation": "Provider confirmation is required; returning from checkout is not proof of payment.",
+      "pending": "Refresh payment status and inspect transaction history before paying again."
+    }
   }
 }

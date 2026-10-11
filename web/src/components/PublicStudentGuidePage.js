@@ -47,7 +47,7 @@ const PublicStudentGuidePage = () => {
           "@type": "Article",
           headline: "Falowen Help & Navigation Guide",
           description,
-          dateModified: "2026-09-28",
+          dateModified: "2026-10-11",
           author: { "@type": "Organization", name: "Falowen" },
           publisher: { "@type": "Organization", name: "Falowen" },
         },
@@ -106,6 +106,7 @@ const PublicStudentGuidePage = () => {
       <section style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ ...styles.badge, width: "fit-content", margin: 0 }}>Official Falowen guide</p>
         <h1 style={{ margin: 0 }}>Falowen Help & Navigation</h1>
+        <p style={{ margin: 0 }}>Updated 11 October 2026</p>
         <p style={{ margin: 0, color: "#1f2937", lineHeight: 1.7 }}>
           Use this guide if you are new, lost, blocked, looking for a feature, or trying to understand where to go next in Falowen.
         </p>
@@ -243,6 +244,25 @@ const PublicStudentGuidePage = () => {
         </p>
       </section>
 
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Full mocks, sections and practice levels</h2>
+        <p>Open <RouteLink href="/exams/overview">Exams Room</RouteLink>. Choose <strong>Start Full Mock</strong> for all four skills together, or practise Lesen, Hören, Schreiben or Sprechen individually below. The <RouteLink href="/exams/mocks">mock library</RouteLink> lets you choose a published mock or resume one in progress. Availability varies by level.</p>
+        <p>Use the exam level selector to practise at your enrolled level or a lower level. A2 can choose A1; B1 can choose A2 or A1. Your Course Book level stays unchanged.</p>
+        <p>For course assignment scores and tutor feedback, open <RouteLink href="/campus/results">Results</RouteLink>. For saved mock progress and recent exam practice results, open Exams Room.</p>
+      </section>
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Your live class schedule</h2>
+        <p>On your signed-in homepage, use <strong>View full class schedule</strong> on the next live class card for your assigned class timetable. Public Upcoming Classes describes new classes.</p>
+      </section>
+      <section style={cardStyle}>
+        <h2 style={{ margin: 0 }}>Pay or continue a payment</h2>
+        <ol style={{ paddingLeft: 22, lineHeight: 1.7 }}>
+          <li>Log in and open <RouteLink href="/campus/account?tab=billing">Account → Billing</RouteLink>. Check your balance and payment state.</li>
+          <li>When online payment is available, use <strong>Pay balance</strong> or <strong>Continue payment</strong>, as shown, to open Paystack. Check the amount and displayed fees, then use a method offered by checkout.</li>
+          <li>Falowen confirms payment after provider confirmation. Returning from checkout alone does not confirm payment.</li>
+          <li>If payment is pending, refresh payment status and check transaction history before paying again. If it remains unresolved, contact Falowen support with your payment reference.</li>
+        </ol>
+      </section>
       <section style={cardStyle}>
         <h2 style={{ margin: 0 }}>Account</h2>
         <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 7, lineHeight: 1.65 }}>
