@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { EmailAuthProvider, GoogleAuthProvider, reauthenticateWithCredential, reauthenticateWithPopup } from "firebase/auth";
-import { db, doc, onSnapshot, functions, httpsCallable } from "../firebase";
+import { db, doc, getDoc, onSnapshot, functions, httpsCallable } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 const box = { border: "1px solid #fca5a5", borderRadius: 14, padding: 20, maxWidth: 640, margin: "20px auto", background: "#fff", overflowWrap: "anywhere" };
 export function AccountDeletionCard({ pending = null }) {
@@ -10,6 +10,13 @@ export function AccountDeletionCard({ pending = null }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
+  const [available, setAvailable] = useState(Boolean(pending));
+  useEffect(() => {
+    let cancelled = false;
+    if (!user?.uid || pending) return;
+    getDoc(doc(db, "accountDeletionRequests", user.uid)).then(() => { if (!cancelled) setAvailable(true); }).catch(() => { if (!cancelled) setAvailable(false); });
+    return () => { cancelled = true; };
+  }, [user?.uid, pending]);
   const google = user?.providerData?.some(provider => provider.providerId === "google.com");
   const state = pending || result;
   if (state?.status === "completed") return <section style={box}><h2>Account deleted</h2><p>Your account deletion is complete.</p><button onClick={()=>logout()}>Sign out</button></section>;
@@ -36,8 +43,9 @@ export function AccountDeletionCard({ pending = null }) {
     {(!state || recoverable) ? <form onSubmit={submit} style={{display:"grid",gap:12}}>
       {!state ? <label>Type DELETE to confirm<input value={confirmation} onChange={event=>setConfirmation(event.target.value)} autoComplete="off" style={{display:"block",width:"100%",boxSizing:"border-box",padding:10}} /></label> : null}
       {!google ? <label>Confirm your password<input type="password" value={password} onChange={event=>setPassword(event.target.value)} autoComplete="current-password" required style={{display:"block",width:"100%",boxSizing:"border-box",padding:10}} /></label> : <p>Confirm with your Google account.</p>}
-      <button type="submit" disabled={busy || (!state && confirmation !== "DELETE")} style={{padding:12,cursor:"pointer"}}>{busy ? "Please wait…" : state ? "Cancel deletion and restore account" : "Request account deletion"}</button>
+      <button type="submit" disabled={!available || busy || (!state && confirmation !== "DELETE")} style={{padding:12,cursor:"pointer"}}>{busy ? "Please wait…" : state ? "Cancel deletion and restore account" : "Request account deletion"}</button>
     </form> : null}
+    {!available && !state ? <p role="status">Account deletion is temporarily unavailable. Please try again later.</p> : null}
     {error ? <p role="alert">{error}</p> : null}
     {state ? <button type="button" disabled={busy} onClick={()=>logout()} style={{marginTop:12,padding:12}}>Sign out</button> : null}
   </section>;
@@ -48,10 +56,11 @@ export default function AccountDeletionBoundary({ children }) {
   useEffect(()=>{
     if (!user) { setState({uid:null,loading:false,data:null,error:""}); return; }
     setState({uid:user.uid,loading:true,data:null,error:""});
-    return onSnapshot(doc(db,"accountDeletionRequests",user.uid),snapshot=>setState({uid:user.uid,loading:false,data:snapshot.data(),error:""}),()=>setState({uid:user.uid,loading:false,data:null,error:"Account status could not be checked. Refresh to try again."}));
+    return onSnapshot(doc(db,"accountDeletionRequests",user.uid),snapshot=>setState({uid:user.uid,loading:false,data:snapshot.data(),error:""}),failure=>setState({uid:user.uid,loading:false,data:null,error:failure.code === "permission-denied" ? "rules-unavailable" : "Account status could not be checked. Refresh to try again."}));
   },[user?.uid]);
   if (!user) return children;
   if (state.loading || state.uid !== user.uid) return <p role="status">Checking account status…</p>;
+  if (state.error === "rules-unavailable") return children;
   if (state.error) return <section style={box}><p role="alert">{state.error}</p><button onClick={()=>window.location.reload()}>Refresh</button></section>;
   if (["pending","processing","completed"].includes(state.data?.status)) return <AccountDeletionCard pending={state.data}/>;
   return children;

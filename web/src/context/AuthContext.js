@@ -741,7 +741,10 @@ export const AuthProvider = ({ children }) => {
       const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
         const token = await credential.user.getIdToken();
         setIdToken(token);
-        const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid));
+        const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid)).catch(error => {
+          if (error.code === "permission-denied") return { data: () => null };
+          throw error;
+        });
         if (["pending", "processing", "completed"].includes(recovery.data()?.status)) {
           setStudentProfile(null); setMessagingToken(null);
           return { credential, ...meta };
@@ -884,7 +887,10 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Google sign-in did not return an email address. Please try another account.");
     }
 
-    const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid));
+    const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid)).catch(error => {
+          if (error.code === "permission-denied") return { data: () => null };
+          throw error;
+        });
     if (["pending", "processing", "completed"].includes(recovery.data()?.status)) {
       setIdToken(await credential.user.getIdToken()); setStudentProfile(null); setMessagingToken(null);
       return { credential };

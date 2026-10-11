@@ -86,6 +86,11 @@ jobs:
         with:
           project_id: '${{ env.FIREBASE_PROJECT_ID }}'
 
+      - name: Verify account deletion rules deployment permissions
+        run: |
+          gcloud auth list --filter=status:ACTIVE --format='value(account)'
+          node scripts/checkDeletionDeploymentPermissions.cjs
+
       - name: Deploy exam trainer API and notification lifecycle
         shell: bash
         run: |
