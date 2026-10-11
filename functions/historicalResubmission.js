@@ -1,4 +1,5 @@
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { _protectedOnCall: onCall } = require("./accountDeletion");
+const { HttpsError } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const { FieldValue } = require("firebase-admin/firestore");
 const { _testing: resubmissionHelpers } = require("./resubmission");

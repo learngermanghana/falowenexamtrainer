@@ -741,6 +741,11 @@ export const AuthProvider = ({ children }) => {
       const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
         const token = await credential.user.getIdToken();
         setIdToken(token);
+        const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid));
+        if (["pending", "processing", "completed"].includes(recovery.data()?.status)) {
+          setStudentProfile(null); setMessagingToken(null);
+          return { credential, ...meta };
+        }
         const profile =
           profileOverride ||
           (await fetchStudentProfileByUid(credential.user.uid)) ||
@@ -879,6 +884,11 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Google sign-in did not return an email address. Please try another account.");
     }
 
+    const recovery = await getDoc(doc(db, "accountDeletionRequests", credential.user.uid));
+    if (["pending", "processing", "completed"].includes(recovery.data()?.status)) {
+      setIdToken(await credential.user.getIdToken()); setStudentProfile(null); setMessagingToken(null);
+      return { credential };
+    }
     const existingProfile =
       (await fetchStudentProfileByUid(credential.user.uid)) ||
       (await fetchStudentProfileByEmail(email));

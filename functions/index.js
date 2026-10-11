@@ -1,5 +1,7 @@
+const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
+const { _protectedOnCall: onCall } = require("./accountDeletion");
 const { setGlobalOptions } = require("firebase-functions/v2");
-const { onCall, HttpsError, onRequest } = require("firebase-functions/v2/https");
+const { HttpsError, onRequest } = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
@@ -571,6 +573,7 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
 };
 
 const getTokensFromStudentData = (data = {}) => {
+  if (notificationsPaused(data)) return [];
   const tokens = new Set();
   if (data.messagingToken) {
     tokens.add(data.messagingToken);
@@ -795,6 +798,9 @@ const sendNotifications = async ({
   data = {},
   tokenOwners = new Map(),
 }) => {
+  const allowedOwners = new Set();
+  for (const id of new Set(tokenOwners.values())) if (await currentNotificationStudent(getFirestore(), id)) allowedOwners.add(id);
+  tokens = tokens.filter(token => allowedOwners.has(tokenOwners.get(token)));
   if (!tokens.length) return null;
 
   const messaging = getAdmin().messaging();
@@ -884,6 +890,7 @@ exports.sendPushTestNotification = onCall(
       route,
       sentAt: new Date().toISOString(),
     };
+    if (!await currentNotificationStudent(getFirestore(), owner.docId)) throw new HttpsError("permission-denied", "Notifications are paused during account deletion.");
     const response = await getAdmin().messaging().sendEachForMulticast({
       tokens: [token],
       notification: {
@@ -993,6 +1000,13 @@ exports.onStudentCreated = onDocumentCreated(
     if (!snap) return;
 
     const student = snap.data();
+    if (student.systemDeletionTest && String(student.uid || "").startsWith("e2e-account-delete-")) {
+      const identity = await getAdmin().auth().getUser(student.uid).catch(error => {
+        if (error.code === "auth/user-not-found") return null;
+        throw error;
+      });
+      if (!identity || identity.customClaims?.systemDeletionTest === true) return null;
+    }
     if (!student) return;
 
     process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
@@ -1027,6 +1041,13 @@ exports.onStudentUpdated = onDocumentUpdated(
     if (!after?.exists) return;
 
     const student = after.data();
+    if (student.systemDeletionTest && String(student.uid || "").startsWith("e2e-account-delete-")) {
+      const identity = await getAdmin().auth().getUser(student.uid).catch(error => {
+        if (error.code === "auth/user-not-found") return null;
+        throw error;
+      });
+      if (!identity || identity.customClaims?.systemDeletionTest === true) return null;
+    }
     if (!student) return;
 
     process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
@@ -1111,6 +1132,7 @@ exports.archiveOldThreads = onSchedule(
 exports.cleanupExpiredTrials = onSchedule(
   {
     region: "europe-west1",
+    timeoutSeconds: 540,
     schedule: "every day 02:45",
     timeZone: "Etc/UTC",
     secrets: [
@@ -1128,6 +1150,11 @@ exports.cleanupExpiredTrials = onSchedule(
     process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
     process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
     process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    await require("./accountDeletion")._purgeDueAccounts({
+      db, auth,
+      purgeSheets: (identity) => getStudentSheetPurger()({ ...identity, scoresSpreadsheetUrl: RESULTS_SHEET_PUBLISHED_CSV_URL.value(), scoresTabName: "scores_backup" }),
+    });
 
     const snapshot = await db.collection("students").get();
     if (snapshot.empty) {
@@ -1147,6 +1174,8 @@ exports.cleanupExpiredTrials = onSchedule(
 
     for (const docSnap of snapshot.docs) {
       const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
       const lifecycle = getTrialLifecycleState(student, nowMs);
       if (lifecycle.state === "not_trial") continue;
       trialRecords += 1;
@@ -1318,6 +1347,8 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
 
     for (const docSnap of staleDocs) {
       const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
       const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
       const uid = String(student.uid || "").trim();
 
@@ -1395,6 +1426,8 @@ exports.cleanupExpiredStudentContracts = onSchedule(
       for (const docSnap of snapshot.docs) {
         scanned += 1;
         const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
 
         if (student.purgeStatus === "failed") {
           skippedFailed += 1;

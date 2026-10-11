@@ -1,3 +1,4 @@
+import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
 import React, { useEffect, useMemo, useState } from "react";
@@ -574,7 +575,7 @@ function App() {
   );
 }
 
-export default App;
+export default function AccountProtectedApp() { return <AccountDeletionBoundary><App /></AccountDeletionBoundary>; }
 
 const AppShell = ({
   allowedSections,

@@ -1,3 +1,4 @@
+import { getAuth } from "firebase/auth";
 import axios from "axios";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../firebase";
@@ -26,6 +27,7 @@ const uploadSpeechTrainerAudio = async (audioBlob) => {
   const storageRef = ref(storage, buildFirebaseAudioPath());
 
   await uploadBytes(storageRef, audioBlob, {
+    customMetadata: { uid: getAuth().currentUser?.uid || "" },
     contentType: audioBlob?.type || "audio/webm",
     cacheControl: "private, max-age=0, no-cache",
   });

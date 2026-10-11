@@ -2,7 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null && (
+        !exists(/databases/$(database)/documents/accountDeletionRequests/$(request.auth.uid)) ||
+        get(/databases/$(database)/documents/accountDeletionRequests/$(request.auth.uid)).data.status == 'cancelled'
+      );
     }
 
     function isOwner(uid) {
@@ -230,7 +233,16 @@ service cloud.firestore {
     match /sessions/{document=**} { allow read, write: if signedIn(); }
     match /studentActivityEvents/{document=**} { allow read, write: if signedIn(); }
     match /studentNotifications/{document=**} { allow read, write: if signedIn(); }
-    match /students/{document=**} { allow read, write: if signedIn(); }
+    match /accountDeletionRequests/{uid} {
+      allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
+      allow write: if false;
+    }
+    match /students/{document=**} {
+      allow read: if signedIn() || (request.auth != null && (resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
+      allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion']));
+      allow update: if signedIn() && (isStaff() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion']));
+      allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
     match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
     match /writingScoreStats/{document=**} { allow read, write: if signedIn(); }

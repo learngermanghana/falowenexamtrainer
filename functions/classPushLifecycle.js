@@ -1,3 +1,4 @@
+const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const admin = require("firebase-admin");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
@@ -88,6 +89,7 @@ const absoluteLink = (route = "/") => {
 };
 
 const tokensFromStudent = (student = {}) => {
+  if (notificationsPaused(student)) return [];
   const tokens = new Set();
   if (student.messagingToken) tokens.add(student.messagingToken);
   if (Array.isArray(student.messagingTokens)) {
@@ -117,6 +119,9 @@ const findClassTargets = async (session = {}) => {
 const toFcmData = (data = {}) => Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value == null ? "" : String(value)]));
 
 const sendToStudent = async ({ target, notificationId, title, body, type, route, data = {} }) => {
+  const current = await currentNotificationStudent(db(), target.id);
+  if (!current) return { success: 0 };
+  target = { ...target, data: current };
   const payloadData = toFcmData({ ...data, notificationId, type, category: "class", route, url: absoluteLink(route), title, body, timestamp: Date.now() });
   await db().collection("students").doc(target.id).collection("notifications").doc(notificationId).set({
     type: "Class",

@@ -151,7 +151,10 @@ async function getAuthedUser(req) {
   if (!match) return null;
 
   try {
-    return await admin.auth().verifyIdToken(match[1]);
+    const token = await admin.auth().verifyIdToken(match[1]);
+    const deletion = await admin.firestore().collection("accountDeletionRequests").doc(token.uid).get();
+    if (["pending", "processing", "completed"].includes(deletion.data()?.status)) { req.accountDeletionBlocked = true; return null; }
+    return token;
   } catch (err) {
     console.warn("Failed to verify ID token", err);
     return null;
@@ -478,6 +481,10 @@ async function auditAIRequest({ route, uid, email, metadata = {}, success = true
 
 async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   const authedUser = await getAuthedUser(req);
+  if (req.accountDeletionBlocked) {
+    res.status(403).json({ error: "Cancel your account deletion request to restore learning access." });
+    return null;
+  }
   if (!authedUser?.uid) {
     if (!allowGuest) {
       res.status(401).json({ error: "Authentication required" });

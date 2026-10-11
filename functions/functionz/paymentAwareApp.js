@@ -196,7 +196,10 @@ const getAuthedUser = async (req) => {
   const match = header.match(/^Bearer (.+)$/i);
   if (!match) return null;
   try {
-    return await admin.auth().verifyIdToken(match[1]);
+    const token = await admin.auth().verifyIdToken(match[1]);
+    const deletion = await admin.firestore().collection("accountDeletionRequests").doc(token.uid).get();
+    if (["pending", "processing", "completed"].includes(deletion.data()?.status)) return null;
+    return token;
   } catch (_error) {
     return null;
   }

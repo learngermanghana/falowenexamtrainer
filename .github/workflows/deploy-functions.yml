@@ -23,7 +23,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 60
     env:
       FIREBASE_PROJECT_ID: falowen-examiner-trainer
       GOOGLE_CLOUD_PROJECT: falowen-examiner-trainer
@@ -60,6 +60,9 @@ jobs:
       - name: Validate committed functions source
         working-directory: functions
         run: |
+          node --test __tests__/accountDeletion.test.cjs __tests__/deletionNotifications.test.cjs
+          node --check accountDeletion.js
+          node --check deletionNotifications.js
           node --check index.js
           node --check index.entry.js
           node --check index.notifications.js
@@ -94,6 +97,34 @@ jobs:
           status=$?
           tail -n 180 firebase-deploy.log || true
           exit "$status"
+
+      - name: Deploy account deletion and notification safeguards in small batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          batches=(
+            "requestAccountDeletion,cancelAccountDeletion"
+            "cleanupExpiredTrials,cleanupStaleUnpaidSignups"
+            "cleanupExpiredStudentContracts,submitHistoricalAssignmentResubmission"
+            "sendPaymentReminders,onMarkedAssignmentNotificationCreated"
+            "onClassLessonNoteCreated,onClassBoardPostCreated"
+            "onAnnouncementCreated,onQaPostCreated"
+            "onQaPostUpdated,onScoreCreated"
+            "onAttendanceSessionUpdated,onExamTutorReviewCreated"
+            "onExamTutorReviewUpdated,onStudentCreated"
+            "onStudentUpdated"
+          )
+          for batch in "${batches[@]}"; do
+            targets=""
+            IFS=',' read -ra names <<< "$batch"
+            for name in "${names[@]}"; do
+              targets="${targets:+$targets,}functions:falowenexamtrainer:$name"
+            done
+            firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$targets" --non-interactive
+          done
+
+      - name: Verify account deletion and recovery against live Firebase
+        run: node scripts/testLiveAccountDeletion.cjs
 
       - name: Apply API runtime capacity
         shell: bash

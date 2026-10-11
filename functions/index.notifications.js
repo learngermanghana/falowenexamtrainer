@@ -1,3 +1,4 @@
+const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const exportedFunctions = require("./index");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
@@ -40,6 +41,7 @@ const formatGhs = (value) => {
 };
 
 const tokensFromStudent = (student = {}) => {
+  if (notificationsPaused(student)) return [];
   const tokens = new Set();
   if (student.messagingToken) tokens.add(student.messagingToken);
   if (Array.isArray(student.messagingTokens)) {
@@ -75,6 +77,7 @@ const toFcmData = (data = {}) =>
   Object.fromEntries(Object.entries(data).map(([key, value]) => [key, value == null ? "" : String(value)]));
 
 const persistInAppNotification = async ({ studentDocId, notificationId, notification, data, type = "Update" }) => {
+  if (!await currentNotificationStudent(db(), studentDocId)) return;
   await db().collection("students").doc(studentDocId).collection("notifications").doc(notificationId).set(
     {
       type,
@@ -116,6 +119,10 @@ const cleanupInvalidTokens = async (tokenOwners, invalidTokens) => {
 };
 
 const sendPush = async ({ tokens, notification, data, tokenOwners }) => {
+  const allowedOwners = new Set();
+  for (const id of new Set(tokenOwners.values())) if (await currentNotificationStudent(db(), id)) allowedOwners.add(id);
+  tokens = tokens.filter(token => allowedOwners.has(tokenOwners.get(token)));
+
   if (!tokens.length) return;
   const invalidTokens = new Set();
   for (const chunk of chunksOf(tokens, NOTIFICATION_BATCH_SIZE)) {
@@ -290,6 +297,7 @@ const getStudentBalanceDue = (student = {}) => {
 };
 
 const getPaymentReminderCandidate = ({ docId, student, nowMs }) => {
+  if (notificationsPaused(student)) return null;
   const balanceDue = getStudentBalanceDue(student);
   if (balanceDue <= 0) return null;
 
@@ -324,7 +332,9 @@ const buildPaymentReminderPayload = ({ student, balanceDue, daysLeft }) => {
 };
 
 const sendPaymentReminderToStudent = async ({ candidate, runDateKey }) => {
-  const { docId, student, balanceDue, daysLeft } = candidate;
+  const { docId, balanceDue, daysLeft } = candidate;
+  const student = await currentNotificationStudent(db(), docId);
+  if (!student) return;
   const { notification, data } = buildPaymentReminderPayload({ student, balanceDue, daysLeft });
   const notificationId = `payment-reminder-${runDateKey}-${daysLeft}`;
 

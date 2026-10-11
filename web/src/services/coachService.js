@@ -1,3 +1,4 @@
+import { getAuth } from "firebase/auth";
 import { postMockAssessment } from "./mockAssessmentRequest";
 import axios from "axios";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
@@ -43,6 +44,7 @@ const uploadSpeakingAudio = async (audioBlob) => {
   const storageRef = ref(storage, buildSpeakingAudioPath());
 
   await uploadBytes(storageRef, audioBlob, {
+    customMetadata: { uid: getAuth().currentUser?.uid || "" },
     contentType: audioBlob?.type || "audio/webm",
     cacheControl: "private, max-age=0, no-cache",
   });

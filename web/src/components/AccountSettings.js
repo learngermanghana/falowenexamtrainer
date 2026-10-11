@@ -1,3 +1,4 @@
+import { AccountDeletionCard } from "./AccountDeletion";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -908,6 +909,7 @@ const AccountSettings = () => {
       </section>
       ) : null}
 
+      <AccountDeletionCard />
       {activeTab === "upgrade" ? (
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>

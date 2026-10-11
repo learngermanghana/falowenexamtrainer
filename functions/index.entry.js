@@ -43,4 +43,8 @@ exportedFunctions.submitAssignmentResubmission = submitAssignmentResubmission;
 exportedFunctions.submitHistoricalAssignmentResubmission = submitHistoricalAssignmentResubmission;
 exportedFunctions.publicClassesCatalog = publicClassesCatalog;
 
+const accountDeletion = require("./accountDeletion");
+exportedFunctions.requestAccountDeletion = accountDeletion.requestAccountDeletion;
+exportedFunctions.cancelAccountDeletion = accountDeletion.cancelAccountDeletion;
+
 module.exports = exportedFunctions;
