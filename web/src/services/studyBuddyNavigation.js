@@ -65,6 +65,12 @@ export const resolveStudyBuddyNavigationReply = (rawMessage, conversationHistory
   if (requiresNavigation(resolvedMessage, resultWords)) {
     return { destination: "results", reply: resultsMessage(resolvedMessage) };
   }
+  if (/\b(?:payment|paid|paystack)\b/.test(message) && /\b(?:pending|missing|not showing|not updated|no access|cannot access|can't access|still unpaid)\b/.test(message)) {
+    return { destination: "billing", reply: makeReply("billing", "Check your payment state in Account → Billing:", "Use Refresh and check transaction history before paying again. Returning from checkout alone does not confirm payment. If it remains unresolved, contact Falowen support with your payment reference. I cannot verify your private payment status from this conversation.") };
+  }
+  if (/\bmock\b/.test(message) && /\b(?:missing|not showing|can't find|cannot find|not available)\b/.test(message)) {
+    return { destination: "exams", reply: makeReply("exams", "Check published practice in Exams Room:", "Check the selected practice level, then open the full mock library or choose a skill. Only published mocks appear; a full mock or a particular mock number may not be available at every level. I cannot confirm unpublished practice or your private saved attempts.") };
+  }
 
   if (requiresNavigation(resolvedMessage, /\b(?:submit|hand in|turn in|upload)\b.*\b(?:assignment|homework|workbook|writing task)\b/)) {
     return { destination: "courseBook", reply: makeReply("courseBook", "Open Course Book, select the relevant lesson and use its Submit tab to hand in the assignment:") };
@@ -114,4 +120,19 @@ export const splitStudyBuddySafeLinks = (content) => {
       return { text: part };
     }
   });
+};
+
+export const getStudyBuddyNavigationActions = (content) => {
+  const actions = [];
+  for (const part of splitStudyBuddySafeLinks(content)) {
+    if (!part.href) continue;
+    const url = new URL(part.href);
+    if (url.username || url.password || url.port) continue;
+    const path = url.pathname + url.search;
+    const destination = Object.values(STUDY_BUDDY_DESTINATIONS).find((item) => item.path === path);
+    if (!destination || actions.some((item) => item.path === path)) continue;
+    const label = destination.label === "Results" ? "View Results" : destination.label === "Billing" ? "Go to Billing" : `Open ${destination.label}`;
+    actions.push({ path, label });
+  }
+  return actions;
 };
