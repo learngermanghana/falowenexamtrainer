@@ -414,7 +414,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             ))}
           </select>
         </label>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(125px, 1fr))", gap: 8 }}>
+        <div data-a1-modal-conjugation-cards="true" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(125px, 1fr))", gap: 8 }}>
           {modalConjugations.map((row) => (
             <div key={row.pronoun} style={{ ...softBlue, padding: 10 }}>
               <strong>{row.pronoun}</strong>
@@ -533,7 +533,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="6) Extra train reading practice">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The practice resources are shown below. Each part is open by default and can be collapsed or expanded separately.
+          Open the departure board, ticket, or vocabulary below when you need it. These reference sections start closed to keep the lesson shorter on your phone.
         </p>
         <div style={{ display: "grid", gap: 12 }}>
           <details style={detailsStyle}>
