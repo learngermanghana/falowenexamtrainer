@@ -126,77 +126,50 @@ const travelVocabulary = [
 
 const knowledgeQuestions = [
   {
-    id: "prefix-abfahren",
-    prompt: "Which prefix belongs to abfahren?",
-    options: ["ab-", "an-", "um-"],
-    answer: "ab-",
-    explanation: "The separable prefix in abfahren is ab-: ab|fahren.",
+    "id": "without-modal-abfahren",
+    "prompt": "Choose the correct sentence without a modal verb.",
+    "options": [
+      "Der Zug fährt um 14:20 Uhr ab.",
+      "Der Zug abfährt um 14:20 Uhr.",
+      "Der Zug fährt ab um 14:20 Uhr ab."
+    ],
+    "answer": "Der Zug fährt um 14:20 Uhr ab.",
+    "explanation": "Without a modal, the conjugated separable verb moves its prefix to the end: fährt ... ab."
   },
   {
-    id: "without-modal-abfahren",
-    prompt: "Choose the correct sentence without a modal verb.",
-    options: ["Der Zug fährt um 14:20 Uhr ab.", "Der Zug abfährt um 14:20 Uhr.", "Der Zug fährt ab um 14:20 Uhr ab."],
-    answer: "Der Zug fährt um 14:20 Uhr ab.",
-    explanation: "Without a modal verb, the separable main verb is conjugated and the prefix moves to the end: fährt ... ab.",
+    "id": "modal-einsteigen",
+    "prompt": "Complete: Die Fahrgäste dürfen jetzt ___.",
+    "options": [
+      "einsteigen",
+      "steigen ... ein",
+      "ein ... steigen"
+    ],
+    "answer": "einsteigen",
+    "explanation": "After dürfen, the complete infinitive einsteigen stays together at the end."
   },
   {
-    id: "with-modal-abfahren",
-    prompt: "Choose the correct sentence with a modal verb.",
-    options: ["Der Zug muss um 14:20 Uhr abfahren.", "Der Zug muss um 14:20 Uhr fährt ab.", "Der Zug abfahren muss um 14:20 Uhr."],
-    answer: "Der Zug muss um 14:20 Uhr abfahren.",
-    explanation: "After a modal verb, the separable main verb abfahren stays together in the infinitive form at the end.",
+    "id": "modal-aussteigen",
+    "prompt": "Which sentence is correct?",
+    "options": [
+      "Ich muss am Hauptbahnhof aussteigen.",
+      "Ich muss am Hauptbahnhof steige aus.",
+      "Ich aussteigen muss am Hauptbahnhof."
+    ],
+    "answer": "Ich muss am Hauptbahnhof aussteigen.",
+    "explanation": "The conjugated modal comes early and aussteigen goes together at the end."
   },
   {
-    id: "modal-ankommen",
-    prompt: "Complete: Der Zug soll um 16:08 Uhr ___.",
-    options: ["ankommen", "kommt ... an", "an ... kommen"],
-    answer: "ankommen",
-    explanation: "With sollen, the separable main verb ankommen stays together at the end.",
-  },
-  {
-    id: "modal-umsteigen",
-    prompt: "Choose the correct word order.",
-    options: ["Wir müssen in Hannover umsteigen.", "Wir müssen in Hannover steigen um.", "Wir umsteigen müssen in Hannover."],
-    answer: "Wir müssen in Hannover umsteigen.",
-    explanation: "The modal verb is conjugated and the separable main verb umsteigen stays together at the end.",
-  },
-  {
-    id: "modal-einsteigen",
-    prompt: "Complete: Die Fahrgäste dürfen jetzt ___.",
-    options: ["einsteigen", "steigen ... ein", "ein ... steigen"],
-    answer: "einsteigen",
-    explanation: "After dürfen, use the complete separable main verb einsteigen at the end.",
-  },
-  {
-    id: "modal-aussteigen",
-    prompt: "Which sentence is correct?",
-    options: ["Ich muss am Hauptbahnhof aussteigen.", "Ich muss am Hauptbahnhof steige aus.", "Ich aussteigen muss am Hauptbahnhof."],
-    answer: "Ich muss am Hauptbahnhof aussteigen.",
-    explanation: "The separable main verb aussteigen goes to the end in the infinitive form.",
-  },
-  {
-    id: "modal-zurueckfahren",
-    prompt: "Complete: Wir möchten am Sonntag ___.",
-    options: ["zurückfahren", "fahren ... zurück", "zurück ... fahren"],
-    answer: "zurückfahren",
-    explanation: "After möchten, the separable main verb zurückfahren stays together at the end.",
-  },
-  {
-    id: "board-platform",
-    prompt: "Auf welchem Gleis fährt der ICE 593 ab?",
-    options: ["Gleis 3", "Gleis 7", "Gleis 11"],
-    answer: "Gleis 7",
-    explanation: "The departure board shows ICE 593 on Gleis 7.",
-  },
-  {
-    id: "ticket-arrival",
-    prompt: "Wann ist die Ankunft in Hamburg?",
-    options: ["um 14:20 Uhr", "um 16:08 Uhr", "um 18:07 Uhr"],
-    answer: "um 16:08 Uhr",
-    explanation: "The example ticket shows the arrival time as 16:08 Uhr.",
-  },
+    "id": "board-platform",
+    "prompt": "Auf welchem Gleis fährt der ICE 593 ab?",
+    "options": [
+      "Gleis 3",
+      "Gleis 7",
+      "Gleis 11"
+    ],
+    "answer": "Gleis 7",
+    "explanation": "The departure board shows ICE 593 on Gleis 7."
+  }
 ];
-
 
 const guidedChecks = [
   {
@@ -213,57 +186,11 @@ const guidedChecks = [
     answer: "abfahren",
     explanation: "After muss, the entire separable verb abfahren stays together as an infinitive.",
   },
-  {
-    id: "word-order",
-    prompt: "Choose the sentence with correct word order.",
-    options: ["Ich muss am Bahnhof aussteigen.", "Ich muss am Bahnhof steige aus.", "Ich aussteigen muss am Bahnhof."],
-    answer: "Ich muss am Bahnhof aussteigen.",
-    explanation: "The conjugated modal follows the subject and the infinitive goes to the end.",
-  },
 ];
 
 const sentenceTasks = [
   { id: "departure", prompt: "Der Zug fährt um 14:20 Uhr ab. (müssen)", answer: "Der Zug muss um 14:20 Uhr abfahren." },
-  { id: "change", prompt: "Wir steigen in Hannover um. (müssen)", answer: "Wir müssen in Hannover umsteigen." },
   { id: "board", prompt: "Die Fahrgäste steigen jetzt ein. (dürfen)", answer: "Die Fahrgäste dürfen jetzt einsteigen." },
-  { id: "get-off", prompt: "Ich steige am Hauptbahnhof aus. (müssen)", answer: "Ich muss am Hauptbahnhof aussteigen." },
-  { id: "return", prompt: "Wir fahren am Sonntag zurück. (möchten)", answer: "Wir möchten am Sonntag zurückfahren." },
-];
-
-const readingChecks = [
-  {
-    id: "platform-change",
-    prompt: "Auf welchem Gleis fährt der ICE 847 nach dem Gleiswechsel ab?",
-    options: ["Gleis 3", "Gleis 11", "Gleis 12"],
-    answer: "Gleis 12",
-    explanation: "Gleiswechsel: 12 means the platform has changed from 11 to 12.",
-  },
-  {
-    id: "delay",
-    prompt: "Der RE 4 soll um 14:35 Uhr abfahren. Er hat 10 Minuten Verspätung. Wann fährt er ab?",
-    options: ["14:25 Uhr", "14:35 Uhr", "14:45 Uhr"],
-    answer: "14:45 Uhr",
-    explanation: "14:35 + 10 minutes = 14:45 Uhr.",
-  },
-  {
-    id: "ticket-seat",
-    prompt: "Welchen Wagen und Sitz zeigt die Fahrkarte?",
-    options: ["Wagen 6, Sitz 42", "Wagen 7, Sitz 42", "Wagen 6, Sitz 24"],
-    answer: "Wagen 6, Sitz 42",
-    explanation: "The ticket says Wagen 6 · Sitz 42.",
-  },
-  {
-    id: "direct",
-    prompt: "Müssen Sie auf der Fahrt Berlin–Hamburg umsteigen?",
-    options: ["Ja, in Hannover.", "Nein, die Verbindung ist direkt.", "Ja, in Potsdam."],
-    answer: "Nein, die Verbindung ist direkt.",
-    explanation: "Direktverbindung: kein Umstieg means there is no change of trains.",
-  },
-];
-
-const exitTasks = [
-  { id: "exit-depart", prompt: "Der Zug fährt um 14:20 Uhr ab. Rewrite with müssen.", answer: "Der Zug muss um 14:20 Uhr abfahren." },
-  { id: "exit-get-off", prompt: "Ich steige am Hauptbahnhof aus. Rewrite with müssen.", answer: "Ich muss am Hauptbahnhof aussteigen." },
 ];
 
 const normalizeSentence = (value) =>
@@ -295,10 +222,6 @@ const A1Day14ModalVerbsWorkbookPage = () => {
   const [guidedAnswers, setGuidedAnswers] = useState({});
   const [sentenceAnswers, setSentenceAnswers] = useState({});
   const [sentenceChecked, setSentenceChecked] = useState(false);
-  const [readingAnswers, setReadingAnswers] = useState({});
-  const [readingChecked, setReadingChecked] = useState(false);
-  const [exitAnswers, setExitAnswers] = useState({});
-  const [exitChecked, setExitChecked] = useState(false);
 
   const score = useMemo(
     () => knowledgeQuestions.reduce(
@@ -309,22 +232,13 @@ const A1Day14ModalVerbsWorkbookPage = () => {
   );
 
   const answeredCount = knowledgeQuestions.filter((question) => Boolean(selectedAnswers[question.id])).length;
-  const grammarScore = knowledgeQuestions.slice(0, 8)
+  const grammarScore = knowledgeQuestions.slice(0, 3)
     .filter((question) => selectedAnswers[question.id] === question.answer).length;
-  const readingScore = knowledgeQuestions.slice(8)
+  const readingScore = knowledgeQuestions.slice(3)
     .filter((question) => selectedAnswers[question.id] === question.answer).length;
   const sentencesAnswered = sentenceTasks.filter((task) => String(sentenceAnswers[task.id] || "").trim()).length;
   const sentenceScore = sentenceTasks.filter(
     (task) => normalizeSentence(sentenceAnswers[task.id]) === normalizeSentence(task.answer),
-  ).length;
-  const readingAnswered = readingChecks.filter((question) => Boolean(readingAnswers[question.id])).length;
-  const readingPracticeScore = readingChecks.filter(
-    (question) => readingAnswers[question.id] === question.answer,
-  ).length;
-  const exitReady = exitTasks.every((task) => String(exitAnswers[task.id] || "").trim())
-    && String(exitAnswers.rule || "").trim();
-  const exitScore = exitTasks.filter(
-    (task) => normalizeSentence(exitAnswers[task.id]) === normalizeSentence(task.answer),
   ).length;
 
   if (isA2Day17Context) {
@@ -359,7 +273,10 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 14 Workbook · Modal Verbs with Separable Verbs</h1>
             <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 3.6 · Trennbare Verben after modal verbs</p>
             <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.7 }}>
-              You already know how modal verbs work with normal main verbs. This lesson shows what changes when the main verb is separable.
+              Focus on one rule: after a modal verb, keep the complete separable infinitive at the end.
+            </p>
+            <p style={{ ...softBlue, margin: "6px 0 0", padding: "10px 12px", fontWeight: 700 }}>
+              Just 8 essential checks: 2 guided choices · 2 written sentences · 4 final questions.
             </p>
           </div>
         </div>
@@ -531,9 +448,9 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </details>
       </SectionCard>
 
-      <SectionCard title="6) Extra train reading practice">
+      <SectionCard title="6) Optional train-reading resources">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Open the departure board, ticket, or vocabulary below when you need it. These reference sections start closed to keep the lesson shorter on your phone.
+          The final check has one departure-board question. Open the board to answer it; the ticket and vocabulary are optional. These reference sections start closed to keep the lesson shorter on your phone.
         </p>
         <div style={{ display: "grid", gap: 12 }}>
           <details style={detailsStyle}>
@@ -599,8 +516,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="7) Guided practice · Schritt für Schritt">
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          First choose the correct modal form, then choose the complete infinitive, and finally check the word order.
-          These three short checks prepare you to build sentences on your own.
+          Choose the correct modal form, then the complete infinitive. These two quick checks prepare you to build your own sentences.
         </p>
         <div style={{ display: "grid", gap: 12 }}>
           {guidedChecks.map((question, index) => (
@@ -626,7 +542,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="8) Build your own sentences">
+      <SectionCard title="8) Write two sentences">
         <p style={{ margin: 0 }}>Rewrite each sentence using the modal verb in brackets. Put the complete infinitive at the end. Answers are hidden until you check.</p>
         <div style={{ display: "grid", gap: 12 }}>
           {sentenceTasks.map((task, index) => {
@@ -663,41 +579,14 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           <button type="button" style={primaryBtn} disabled={sentencesAnswered < sentenceTasks.length} onClick={() => setSentenceChecked(true)}>Check my sentences</button>
           <button type="button" style={secondaryBtn} onClick={() => { setSentenceAnswers({}); setSentenceChecked(false); }}>Try again</button>
         </div>
-        {sentenceChecked ? <div role="status" style={sentenceScore >= 4 ? softGreen : softAmber}>
+        {sentenceChecked ? <div role="status" style={sentenceScore === sentenceTasks.length ? softGreen : softAmber}>
           <strong>{sentenceScore} of {sentenceTasks.length} example answers matched.</strong> Review any differences above and retry.
           Other natural German wordings may be correct; this offline checker compares your text with the taught examples.
         </div> : null}
       </SectionCard>
 
-      <SectionCard title="9) Train-reading practice · Lesen">
-        <p style={{ margin: 0 }}>Use the departure board and ticket in Section 6 to find the information. Open either resource when you need it.</p>
-        <div style={{ display: "grid", gap: 12 }}>
-          {readingChecks.map((question, index) => (
-            <fieldset key={question.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
-              <legend style={{ padding: "0 6px", fontWeight: 700 }}>{index + 1}. {question.prompt}</legend>
-              {question.options.map((option) => (
-                <label key={option} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 0", cursor: "pointer" }}>
-                  <input type="radio" name={"reading-" + question.id} checked={readingAnswers[question.id] === option}
-                    onChange={() => { setReadingAnswers((current) => ({ ...current, [question.id]: option })); setReadingChecked(false); }} />
-                  <span>{option}</span>
-                </label>
-              ))}
-              {readingChecked ? <div style={readingAnswers[question.id] === question.answer ? softGreen : softAmber}>
-                <strong>{readingAnswers[question.id] === question.answer ? "Correct." : "Correct answer: " + question.answer}</strong>
-                <p style={{ marginBottom: 0 }}>{question.explanation}</p>
-              </div> : null}
-            </fieldset>
-          ))}
-        </div>
-        <p role="status" style={{ margin: 0 }}>{readingAnswered} of {readingChecks.length} reading questions answered</p>
-        <button type="button" style={primaryBtn} disabled={readingAnswered < readingChecks.length} onClick={() => setReadingChecked(true)}>Check reading answers</button>
-        {readingChecked ? <div role="status" style={readingPracticeScore >= 3 ? softGreen : softAmber}>
-          <strong>Reading practice: {readingPracticeScore} / {readingChecks.length}</strong> · Review the departure board or ticket for any missed details.
-        </div> : null}
-      </SectionCard>
-
-      <SectionCard title="10) Knowledge test">
-        <p style={{ margin: 0 }}>Answer all ten questions before checking. Questions 1–8 test grammar; 9–10 check train reading.</p>
+      <SectionCard title="9) Final knowledge check">
+        <p style={{ margin: 0 }}>Four final questions: three about separable verbs and one about the departure board in Section 6. Answer all four before checking.</p>
         <p role="status" style={{ margin: 0, fontWeight: 700 }}>{answeredCount} of {knowledgeQuestions.length} questions answered</p>
         <progress aria-label="Knowledge test completion" max={knowledgeQuestions.length} value={answeredCount} style={{ width: "100%", height: 12 }} />
         <div style={{ display: "grid", gap: 14 }}>
@@ -741,63 +630,19 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           </button>
         </div>
         {testSubmitted ? (
-          <div role="status" style={score >= 7 ? softGreen : softAmber}>
+          <div role="status" style={score >= 3 ? softGreen : softAmber}>
             <strong>Score: {score} / {knowledgeQuestions.length}</strong><br />
-            <span>Grammar: {grammarScore} / 8 · Reading: {readingScore} / 2</span><br />
-            {score >= 7
+            <span>Grammar: {grammarScore} / 3 · Reading: {readingScore} / 1</span><br />
+            {score >= 3
               ? "Good progress. Review any mistakes above before moving on."
               : "Review the missed answers and try again. Focus on modal endings and keeping the complete infinitive together."}
-            {grammarScore < 6 ? <p style={{ marginBottom: 0 }}>Grammar focus: review Sections 3–5, then redo the sentence-building exercises.</p> : null}
-            {readingScore < 2 ? <p style={{ marginBottom: 0 }}>Reading focus: reopen the departure board and ticket in Section 6.</p> : null}
+            {grammarScore < 3 ? <p style={{ marginBottom: 0 }}>Grammar focus: review Sections 3–5, then try the two written sentences again.</p> : null}
+            {readingScore < 1 ? <p style={{ marginBottom: 0 }}>Reading focus: reopen the departure board in Section 6.</p> : null}
           </div>
         ) : null}
       </SectionCard>
 
 
-      <SectionCard title="11) Exit check · Show what you learned">
-        <p style={{ margin: 0 }}>Complete two transformations without looking at the examples. Then explain the word-order rule in your own words. Compare your work before you finish this lesson.</p>
-        <div style={{ display: "grid", gap: 12 }}>
-          {exitTasks.map((task, index) => (
-            <div key={task.id}>
-              <label htmlFor={"exit-" + task.id} style={{ fontWeight: 700, display: "block", marginBottom: 6 }}>
-                {index + 1}. {task.prompt}
-              </label>
-              <textarea id={"exit-" + task.id} rows={2} value={exitAnswers[task.id] || ""}
-                onChange={(event) => { setExitAnswers((current) => ({ ...current, [task.id]: event.target.value })); setExitChecked(false); }}
-                style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
-              {exitChecked ? <p role="status" style={{ marginTop: 5 }}>
-                <strong>{normalizeSentence(exitAnswers[task.id]) === normalizeSentence(task.answer) ? "Matches the example." : "Compare with:"}</strong> {task.answer}
-              </p> : null}
-            </div>
-          ))}
-          <div>
-            <label htmlFor="exit-rule" style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
-              3. Explain: What happens to the separable prefix when you add a modal verb?
-            </label>
-            <textarea id="exit-rule" rows={3} value={exitAnswers.rule || ""}
-              onChange={(event) => { setExitAnswers((current) => ({ ...current, rule: event.target.value })); setExitChecked(false); }}
-              placeholder="Explain in German or English."
-              style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
-          </div>
-        </div>
-        <button type="button" style={primaryBtn} disabled={!exitReady} onClick={() => setExitChecked(true)}>Compare my exit check</button>
-        {exitChecked ? <div role="status" style={softBlue}>
-          <strong>Sentence examples matched: {exitScore} / {exitTasks.length}.</strong>
-          <p style={{ margin: "8px 0 0" }}><strong>Rule to compare with your explanation:</strong> Without a modal, the prefix separates (fährt ... ab). With a modal, the conjugated modal comes early and the complete infinitive stays at the end (muss ... abfahren).</p>
-          <p style={{ marginBottom: 0 }}>Read your explanation again. Does it clearly mention the whole infinitive at the end? This self-check does not use AI or upload answers.</p>
-        </div> : null}
-      </SectionCard>
-
-      <SectionCard title="12) Final self-check">
-        <ul style={listStyle}>
-          <li>I can identify the conjugated modal verb and the main verb.</li>
-          <li>I know that the main verb goes to the end in the infinitive form after a modal verb.</li>
-          <li>I can recognise common separable prefixes such as ab-, an-, ein-, aus-, um- and zurück-.</li>
-          <li>I can separate the main verb when there is no modal verb: <strong>Der Zug fährt ab.</strong></li>
-          <li>I can keep the separable main verb together after a modal verb: <strong>Der Zug muss abfahren.</strong></li>
-          <li>I can explain the difference between a normal main verb such as <strong>kaufen</strong> and a separable main verb such as <strong>abfahren</strong>.</li>
-        </ul>
-      </SectionCard>
     </div>
   );
 };
