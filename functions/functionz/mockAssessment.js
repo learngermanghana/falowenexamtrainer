@@ -21,7 +21,7 @@ const retryable = (error) => ["INVALID_MOCK_ASSESSMENT", "OPENAI_EMPTY_RESPONSE"
 
 // Two bounded attempts fit within the 60-second API gateway budget. Retrying
 // here charges the application's quota once and never writes a partial grade.
-const createMockAssessment = async (messages, options = {}, { partKeys = [], pointCounts = {}, formatPart = "" } = {}) => {
+const createMockAssessment = async (messages, options = {}, { partKeys = [], pointCounts = {}, formatPart = "", validateResult } = {}) => {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       const reply = await createChatCompletion(messages, {
@@ -31,7 +31,9 @@ const createMockAssessment = async (messages, options = {}, { partKeys = [], poi
       }, { timeout: 20000, maxRetries: 0 });
       let result;
       try { result = JSON.parse(reply); } catch (_error) { throw invalidAssessment(); }
-      return JSON.stringify(validateAssessment(result, partKeys, pointCounts, formatPart));
+      validateAssessment(result, partKeys, pointCounts, formatPart);
+      if (validateResult) validateResult(result);
+      return JSON.stringify(result);
     } catch (error) {
       if (!retryable(error)) throw error;
       if (attempt === 1) {

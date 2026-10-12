@@ -23,6 +23,7 @@ const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
 const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
+const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
@@ -2406,9 +2407,10 @@ const b2MockSpeakingScorePrompt = ({ attempts = [], selectedTopicId = "" }) => {
 const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
-  "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
+  "Feedback shown to the learner MUST be in English. German may appear in exact evidence quotes and short corrected examples.",
   "Judge at CEFR A2 standard. Normal A2 grammar and spelling mistakes are acceptable when the intended meaning is clear.",
   "",
+  A2_WRITING_GUIDANCE,
   "TEIL 1 — SMS, 10 points:",
   "Scoring emphasis: task completion is essential. If one required point is missing, Teil 1 may score at most 7/10; if two are missing, at most 4/10; if all three are missing, at most 1/10.",
   "Use the word target in the canonical task; do not fail only because the count is slightly outside it.",
@@ -2433,6 +2435,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         content_score: 0,
         language_score: 0,
         appropriateness_score: 0,
+        point_assessments: pointAssessmentShape(),
         required_points_met: [false, false, false],
         missing_required_points: [],
         feedback_en: "English feedback.",
@@ -2453,6 +2456,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
         cohesion_score: 0,
         greeting_ok: false,
         closing_ok: false,
+        point_assessments: pointAssessmentShape(),
         required_points_met: [false, false, false],
         missing_required_points: [],
         feedback_en: "English feedback.",
@@ -4264,7 +4268,8 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
-        { partKeys: ["teil1", "teil2"], pointCounts: { teil1: 3, teil2: 3 }, formatPart: "teil2" },
+        { partKeys: ["teil1", "teil2"], pointCounts: { teil1: 3, teil2: 3 }, formatPart: "teil2",
+          validateResult: (assessment) => validateA2WritingEvidence(assessment, { sms, email }) },
       );
 
       const cleanedReply = String(reply || "")
