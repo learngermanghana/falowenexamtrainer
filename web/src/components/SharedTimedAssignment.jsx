@@ -169,6 +169,11 @@ export default function SharedTimedAssignment({
   const resultStatus = String(assignmentProgress?.status || "").trim().toLowerCase();
   const expiryHandledRef = useRef(false);
   const expiryCallbackRef = useRef(onTimeExpired);
+  // Workbook profiles are recreated on navigation. Keep cloud subscriptions
+  // independent of their object identity so agreement and timer state survive.
+  const configRef = useRef(config);
+  configRef.current = config;
+  const autoSubmit = Boolean(config?.autoSubmit);
   const warningThresholdsRef = useRef(new Set());
 
   useEffect(() => {
@@ -239,9 +244,9 @@ export default function SharedTimedAssignment({
         if (nextState === "expired") {
           const shouldRecoverExpiry = !expiryHandledRef.current;
           expiryHandledRef.current = true;
-          if (shouldRecoverExpiry && config?.autoSubmit) {
+          if (shouldRecoverExpiry && autoSubmit) {
             window.setTimeout(() => {
-              expiryCallbackRef.current?.({ assignmentKey, config });
+              expiryCallbackRef.current?.({ assignmentKey, config: configRef.current });
             }, 0);
           }
         } else if (nextState === "submitted") {
@@ -271,7 +276,7 @@ export default function SharedTimedAssignment({
     enabled,
     localSession,
     normalizedLevel,
-    config,
+    autoSubmit,
   ]);
 
   const markExpired = useCallback(() => {
