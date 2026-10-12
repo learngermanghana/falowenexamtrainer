@@ -186,7 +186,6 @@ const guidedChecks = [
     answer: "abfahren",
     explanation: "After muss, the entire separable verb abfahren stays together as an infinitive.",
   },
-  },
 ];
 
 const sentenceTasks = [
