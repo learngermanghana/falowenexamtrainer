@@ -67,68 +67,123 @@ export const C2_READING_PRACTICE = Object.freeze({
   },
 
   5: {
-    title: "Vertrauen entsteht nicht durch Fehlerlosigkeit",
-    text: [
-      "Öffentliches Vertrauen wird häufig so behandelt, als müsse eine Institution vor allem Fehler vermeiden. In komplexen politischen und administrativen Entscheidungen ist vollständige Fehlerlosigkeit jedoch unrealistisch. Entscheidend ist deshalb nicht nur, ob eine Entscheidung erfolgreich war, sondern auch, wie nachvollziehbar sie vorbereitet, begründet und später überprüft wird.",
-      "Transparenz kann Vertrauen stärken, wenn sie mehr bedeutet als die Veröffentlichung großer Mengen von Dokumenten. Bürger benötigen Informationen, aus denen hervorgeht, welche Ziele verfolgt wurden, welche Alternativen geprüft wurden und auf welcher Datengrundlage eine Entscheidung beruhte. Transparenz ohne Verständlichkeit kann sogar den gegenteiligen Effekt haben: Wer tausend Seiten veröffentlicht, aber zentrale Annahmen nicht erklärt, schafft formal Zugang zu Informationen, ohne tatsächlich Orientierung zu ermöglichen.",
-      "Ähnlich verhält es sich mit politischen Fehlern. Ein offenes Eingeständnis kann kurzfristig Kritik verstärken, langfristig aber Glaubwürdigkeit fördern, sofern nachvollziehbar erklärt wird, was schiefgelaufen ist und welche Konsequenzen daraus gezogen werden. Problematisch wird es, wenn Verantwortung ausschließlich kommunikativ übernommen wird, ohne dass sich Verfahren oder Entscheidungen ändern.",
-      "Vertrauen ist daher kein direkter Lohn für perfekte Ergebnisse. Es entsteht eher aus einem Zusammenspiel von Kompetenz, überprüfbaren Begründungen, verständlicher Kommunikation und der Bereitschaft, Entscheidungen zu korrigieren. Gerade in Situationen mit unsicherer Datenlage kann es glaubwürdiger sein, Unsicherheit offen zu benennen, als eine Sicherheit vorzutäuschen, die sachlich nicht gegeben ist."
+    "title": "Das Mandat des Zweifels: Über das fragile Fundament politischer Legitimität",
+    "text": [
+      "Öffentliches Vertrauen in politische Institutionen gilt gemeinhin als das unverzichtbare Schmiermittel repräsentativer Demokratien. Doch in zeitgenössischen Debatten verkommt dieser Begriff nicht selten zu einem wohlfeilen Rufen nach unkritischer Gefolgschaft. Dass Vertrauen in einer offenen Gesellschaft keineswegs mit blindem Glauben gleichzusetzen ist, gerät dabei leicht aus dem Blick. Vielmehr speist sich demokratische Legitimität aus der dauerhaften Bereitschaft der Bürgerinnen und Bürger, Entscheidungen der gewählten Mandatsträger kritisch zu hinterfragen. Das Dilemma der Spätmoderne liegt somit nicht in einer prinzipiellen Verweigerung von Vertrauen, sondern in einer veränderten Erwartungshaltung: Die Wählerschaft fordert einerseits kompromisslose Rechenschaft, neigt andererseits jedoch dazu, die prinzipielle Komplexität politischer Entscheidungsprozesse auszublenden.",
+      "Hierin offenbart sich die Crux politischer Verantwortung. Politiker bewegen sich unentwegt in einem Spannungsfeld zwischen der kurzfristigen Erfüllung von Wählerinteressen und der Wahrnehmung langfristiger, mitunter unpopulärer Notwendigkeiten. Wer sich ausschließlich an Stimmungsbildern orientiert, verspielt die Möglichkeit, gesellschaftliche Entwicklungen vorausschauend zu gestalten; wer hingegen im Namen vermeintlich höherer Einsichten die Wünsche des Souveräns ignoriert, setzt sich dem Vorwurf paternalistischer Bevormundung aus. Verantwortung im ethischen Sinne verlangt daher das Wagnis, auch unliebsame Wahrheiten offen auszusprechen – wohl wissend, dass das politische Überleben im Zeitalter medialer Dauererregung oft an die Vermeidung von Kontroversen gekoppelt scheint.",
+      "Verschärft wird diese Dynamik durch einen Wandel der politischen Kommunikation. Anstatt komplexe Sachverhalte in ihrer Vielschichtigkeit transparent zu machen, greifen Akteure zunehmend zu verkürzenden Slogans und rhetorischen Schaufechten. Diese defensive Strategie soll vermeintlich Handlungsfähigkeit signalisieren und politische Risiken minimieren. Paradoxerweise bewirkt sie jedoch das genaue Gegenteil: Die Öffentlichkeit durchschaut das kalkulierte Ausweichen und reagiert mit wachsendem Zynismus. Wo Sprache nicht mehr der Vermittlung von Inhalten, sondern der Schadensbegrenzung dient, büßt die Politik ihre glaubwürdigste Währung ein. Vertrauen lässt sich weder verordnen noch durch geschicktes Marketing herbeiführen; es wächst einzig aus der Kohärenz von Wort und Tat.",
+      "Eine Rekonstruktion öffentlichen Vertrauens bedarf folglich eines grundlegenden Umdenkens auf beiden Seiten des politischen Repräsentationsverhältnisses. Aufseiten der Mandatsträger bedarf es des Mutes zur Unvollkommenheit: Das Eingestehen von Nichtwissen oder Fehlentscheidungen schwächt die politische Autorität keineswegs dauerhaft, sondern kann sie – als Zeichen intellektueller Redlichkeit – sogar stärken. Aufseiten der Bürgerinnen und Bürger erfordert dies wiederum eine gesteigerte Ambiguitätstoleranz, also die Eigenschaft, Ungewissheiten und Kompromisse als immanente Bestandteile demokratischer Prozesse zu akzeptieren. Erst wenn Vertrauen als ein reziproker, fortlaufender Aushandlungsprozess begriffen wird, vermag die Politik den Teufelskreis aus Populismus und Entfremdung nachhaltig zu durchbrechen."
     ],
-    questions: [
+    "questions": [
       {
-        question: "Was ist die zentrale These des Textes?",
-        options: [
-          "Vertrauen entsteht nur, wenn Institutionen keine Fehler machen.",
-          "Vertrauen hängt auch von nachvollziehbaren Verfahren und dem Umgang mit Fehlern ab.",
-          "Transparenz ist grundsätzlich schädlich.",
-          "Politische Entscheidungen sollten ohne öffentliche Begründung getroffen werden."
+        "question": "Was bemängelt der Autor am aktuellen Verständnis von öffentlichem Vertrauen?",
+        "options": [
+          "Dass es zunehmend als Einforderung unkritischer Gefolgschaft missverstanden wird.",
+          "Dass es von den politischen Institutionen überhaupt nicht mehr eingefordert wird.",
+          "Dass die Bürger es fälschlicherweise mit einer Absage an die Demokratie gleichsetzen.",
+          "Dass es in Zeiten wirtschaftlicher Krisen völlig an Bedeutung verloren hat."
         ],
-        answerIndex: 1,
-        explanation: "Der Text verschiebt den Fokus von Fehlerlosigkeit auf Begründung, Transparenz, Korrektur und Kompetenz."
+        "answerIndex": 0,
+        "explanation": "Der Autor bewertet die Forderung nach Vertrauen als oft unverhältnismäßiges „Rufen nach unkritischer Gefolgschaft“ (Abschnitt 1)."
       },
       {
-        question: "Warum reicht die Veröffentlichung vieler Dokumente nicht automatisch für Transparenz?",
-        options: [
-          "Weil Bürger grundsätzlich keine Dokumente lesen.",
-          "Weil Informationen auch verständlich und einordnungsfähig sein müssen.",
-          "Weil nur mündliche Kommunikation Vertrauen schafft.",
-          "Weil Daten in politischen Entscheidungen keine Rolle spielen."
+        "question": "Wie charakterisiert der Autor das Demokratieverständnis einer offenen Gesellschaft?",
+        "options": [
+          "Es basiert auf der bedingungslosen Zusage von Vertrauen gegenüber den gewählten Mandatsträgern.",
+          "Es speist sich aus der ständigen Bereitschaft der Bürger, politische Entscheidungen kritisch zu hinterfragen.",
+          "Es verlangt von den Bürgern, eigene Interessen stets dem Gemeinwohl unterzuordnen.",
+          "Es setzt voraus, dass die Öffentlichkeit komplexe Entscheidungsprozesse klaglos hinnimmt."
         ],
-        answerIndex: 1,
-        explanation: "Formaler Zugang ohne verständliche Erklärung schafft laut Text noch keine echte Orientierung."
+        "answerIndex": 1,
+        "explanation": "Demokratische Legitimität beruht laut Text auf der Bereitschaft der Bürger, Entscheidungen „kritisch zu hinterfragen“ (Abschnitt 1)."
       },
       {
-        question: "Unter welcher Bedingung kann ein Fehlergeständnis Glaubwürdigkeit fördern?",
-        options: [
-          "Wenn anschließend keine weiteren Informationen veröffentlicht werden.",
-          "Wenn erklärt wird, was schiefging und welche Konsequenzen folgen.",
-          "Wenn die Verantwortung vollständig auf andere übertragen wird.",
-          "Wenn nur die öffentliche Reaktion kritisiert wird."
+        "question": "Welcher innere Widerspruch prägt das Verhalten der modernen Wählerschaft?",
+        "options": [
+          "Sie verlangt maximale Transparenz, verweigert aber selbst jede aktive politische Partizipation.",
+          "Sie wünscht sich starke Führungspersönlichkeiten, lehnt jedoch jegliche Autorität grundsätzlich ab.",
+          "Sie fordert kompromisslose Rechenschaft, blendet jedoch die Vielschichtigkeit politischer Entscheidungen aus.",
+          "Sie verlangt sofortige Problemlösungen, weigert sich aber, dafür höhere Kosten zu tragen."
         ],
-        answerIndex: 1,
-        explanation: "Das Eingeständnis muss mit Erklärung und tatsächlichen Konsequenzen verbunden sein."
+        "answerIndex": 2,
+        "explanation": "Der Text führt explizit an, dass die Wählerschaft „kompromisslose Rechenschaft“ fordert, aber gleichzeitig die Komplexität ausblendet (Abschnitt 1)."
       },
       {
-        question: "Welche Kritik übt der Text an rein kommunikativer Verantwortungsübernahme?",
-        options: [
-          "Sie ist zu teuer.",
-          "Sie kann ohne Veränderungen an Verfahren folgenlos bleiben.",
-          "Sie verhindert jede öffentliche Diskussion.",
-          "Sie führt immer zu juristischen Verfahren."
+        "question": "Worin besteht das zentrale Dilemma gewählter Politiker bei der Wahrnehmung ihrer Verantwortung?",
+        "options": [
+          "Sie müssen Parteiprogramme umsetzen, ohne dabei die Vorgaben der europäischen Gesetzgebung zu verletzen.",
+          "Sie schwanken zwischen kurzfristiger Ausrichtung an Stimmungsbildern und vorausschauender, unpopulärer Politik.",
+          "Sie versuchen, die Wünsche des Souveräns zu erfüllen, ohne die Medien gegen sich aufzubringen.",
+          "Sie stehen vor der Herausforderung, ethische Grundsätze mit ökonomischen Interessen zu vereinen."
         ],
-        answerIndex: 1,
-        explanation: "Bloße Worte reichen nicht, wenn sich Verfahren und Entscheidungen nicht verändern."
+        "answerIndex": 1,
+        "explanation": "Das Spannungsfeld liegt zwischen kurzfristigen Wählerinteressen und langfristigen, unpopulären Notwendigkeiten (Abschnitt 2)."
       },
       {
-        question: "Wie sollte mit unsicherer Datenlage umgegangen werden?",
-        options: [
-          "Unsicherheit sollte verschwiegen werden.",
-          "Man sollte möglichst große Sicherheit behaupten.",
-          "Unsicherheit sollte offen markiert werden, wenn sie sachlich besteht.",
-          "Entscheidungen sollten grundsätzlich vermieden werden."
+        "question": "Welche Gefahr droht Politikern, die sich ausschließlich an vermeintlich höheren Einsichten orientieren?",
+        "options": [
+          "Sie werden in der eigenen Partei isoliert und verlieren ihr Abgeordnetenmandat.",
+          "Sie geraten in den Verdacht, die Bürger paternalistisch zu bevormunden.",
+          "Sie scheitern an den verfassungsrechtlichen Hürden der repräsentativen Demokratie.",
+          "Sie büßen die Unterstützung der Medien bei künftigen Wahlkämpfen ein."
         ],
-        answerIndex: 2,
-        explanation: "Der Text bewertet offen benannte Unsicherheit als glaubwürdiger als vorgetäuschte Gewissheit."
+        "answerIndex": 1,
+        "explanation": "Das Ignorieren des Souveräns führt direkt zum Vorwurf „paternalistischer Bevormundung“ (Abschnitt 2)."
+      },
+      {
+        "question": "Warum fällt es Politikern heute schwer, unliebsame Wahrheiten offen auszusprechen?",
+        "options": [
+          "Weil ihnen in den Ministerien die dafür erforderlichen wissenschaftlichen Zuarbeiten fehlen.",
+          "Weil die mediale Dauererregung das Erzeugen von Kontroversen als politisches Risiko erscheinen lässt.",
+          "Weil die verfassungsrechtlichen Rahmenbedingungen transparente Kommunikation erschweren.",
+          "Weil Parteivorgaben die Freiheit der eigenen Meinungsäußerung stark einschränken."
+        ],
+        "answerIndex": 1,
+        "explanation": "Im Zeitalter der „medialen Dauererregung“ erscheint die Vermeidung von Kontroversen überlebensnotwendig (Abschnitt 2)."
+      },
+      {
+        "question": "Welche Kritik übt der Autor an der gegenwärtigen politischen Kommunikation?",
+        "options": [
+          "Sie vernachlässigt digitale Medien und setzt weiterhin auf veraltete Printformate.",
+          "Sie greift auf vereinfachende Parolen und defensive Rhetorik zurück, um Handlungsfähigkeit vorzutäuschen.",
+          "Sie informiert die Öffentlichkeit zu detailliert und führt dadurch zu allgemeiner Überforderung.",
+          "Sie überlässt die Ausgestaltung politischer Debatten primär den sozialen Netzwerken."
+        ],
+        "answerIndex": 1,
+        "explanation": "Bemängelt werden verkürzende Slogans und Schaufechte, die Handlungsfähigkeit nur vorspiegeln (Abschnitt 3)."
+      },
+      {
+        "question": "Welche Konsequenz hat das kalkulierte Ausweichen von Politikern auf die Bürger?",
+        "options": [
+          "Es stärkt das Vertrauen in die akademische Expertise von Beratergremien.",
+          "Es führt zu einer zunehmend zynischen Haltung der Öffentlichkeit gegenüber der Politik.",
+          "Es veranlasst immer mehr Bürger dazu, eigene politische Parteien zu gründen.",
+          "Es fördert den Konsens zwischen verschiedenen gesellschaftlichen Gruppen."
+        ],
+        "answerIndex": 1,
+        "explanation": "Die Öffentlichkeit durchschaut die Manöver und reagiert mit „wachsendem Zynismus“ (Abschnitt 3)."
+      },
+      {
+        "question": "Was verlangt der Autor von den Mandatsträgern, um das politische Vertrauen wiederherzustellen?",
+        "options": [
+          "Das fehlerfreie Durchsetzen von Reformen ohne lange parlamentarische Debatten.",
+          "Den Mut, eigene Wissenslücken oder Fehlentscheidungen offen einzugestehen.",
+          "Eine stärkere Ausrichtung aller Regierungsentscheidungen an wissenschaftlichen Gutachten.",
+          "Den Verzicht auf Parteipolitik zugunsten einer überparteilichen Konsensregierung."
+        ],
+        "answerIndex": 1,
+        "explanation": "Gefordert wird der „Mut zur Unvollkommenheit“ und das Eingestehen von Nichtwissen oder Fehlern (Abschnitt 4)."
+      },
+      {
+        "question": "Welche Anforderung stellt der Text an die Bürgerinnen und Bürger für eine Erneuerung der Vertrauenskultur?",
+        "options": [
+          "Eine höhere Ambiguitätstoleranz gegenüber Ungewissheiten und Kompromissen.",
+          "Das bedingungslose Akzeptieren parlamentarischer Mehrheitsentscheidungen.",
+          "Die Bereitschaft, politische Aufgaben verstärkt in ehrenamtlicher Arbeit zu übernehmen.",
+          "Eine kritische Distanz zu allen Medienberichten über politische Skandale."
+        ],
+        "answerIndex": 0,
+        "explanation": "Auf Bürgerseite braucht es „Ambiguitätstoleranz“, um Ungewissheiten und Kompromisse als Teil der Demokratie zu akzeptieren (Abschnitt 4)."
       }
     ]
   },

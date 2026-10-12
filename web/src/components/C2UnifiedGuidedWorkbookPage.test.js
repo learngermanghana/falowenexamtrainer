@@ -88,7 +88,7 @@ describe("C2 unified topic-first workbook", () => {
       const reading = getC2ReadingPractice(day);
       expect(reading).toBeTruthy();
       expect(reading.text.length).toBeGreaterThanOrEqual(4);
-      expect(reading.questions).toHaveLength(5);
+      expect(reading.questions).toHaveLength(day === 5 ? 10 : 5);
       reading.questions.forEach((question) => {
         expect(question.options.length).toBeGreaterThanOrEqual(4);
         expect(Number.isInteger(question.answerIndex)).toBe(true);
