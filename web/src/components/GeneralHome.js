@@ -8,7 +8,6 @@ import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
 import FirstLessonGuide from "./FirstLessonGuide";
 import OnboardingStudyBuddyStart from "./OnboardingStudyBuddyStart";
-import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
 import TrialCountdownBanner from "./TrialCountdownBanner";
@@ -24,29 +23,6 @@ const day0WorkbookByLevel = {
   B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
   B2: "/campus/course/lesson/B2/0",
   C1: "/campus/course/lesson/C1/0",
-};
-
-const selfLearningLevels = new Set(["B2", "C1"]);
-
-const formatDate = (value) =>
-  new Date(value).toLocaleDateString(undefined, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-
-const formatContractStatus = (studentProfile = {}) => {
-  const contractEndMs = toDateMs(studentProfile.contractEnd);
-  if (!Number.isFinite(contractEndMs)) return "Access active";
-
-  const dayMs = 1000 * 60 * 60 * 24;
-  const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
-  const contractDate = formatDate(contractEndMs);
-
-  if (daysLeft < 0) return `Access expired · ended ${contractDate}`;
-  if (daysLeft === 0) return "Access active · ends today";
-  if (daysLeft <= 45) return `Access active · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
-  return `Access active until ${contractDate}`;
 };
 
 const classLevelFromName = (className = "") => {
@@ -165,51 +141,6 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
   </div>
 );
 
-const CompactCourseGuide = ({ studentProfile, levelKey, onOpenDay0, onOpenCourseBook, onOpenExamsRoom }) => {
-  const className = studentProfile?.className || "Not assigned yet";
-  const courseName = levelKey ? `${levelKey} ${selfLearningLevels.has(levelKey) ? "Self-learning" : "Course"}` : "Course not selected";
-
-  return (
-    <section style={{ ...styles.card, display: "grid", gap: 10, border: "1px solid #bfdbfe", background: "#f8fafc" }}>
-      <details>
-        <summary style={{ cursor: "pointer", fontWeight: 800, color: "#1d4ed8" }}>
-          Expand course guide, access and navigation help
-        </summary>
-        <div style={{ display: "grid", gap: 14, marginTop: 12 }}>
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-            <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-              <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Course</p>
-              <strong>{courseName}</strong>
-            </div>
-            <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-              <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Assigned class</p>
-              <strong>{className}</strong>
-            </div>
-            <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-              <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>Access</p>
-              <strong>{formatContractStatus(studentProfile)}</strong>
-            </div>
-          </div>
-
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Best flow: Course Book → Learn → Speak → Write → Finish. For B2/C1, start with Day 0 Orientation first.
-          </p>
-
-          <PrimaryActionBar align="start" wrap>
-            <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>Open Day 0 Orientation</button>
-            <button type="button" style={styles.primaryButton} onClick={onOpenCourseBook}>Continue Course Book</button>
-            <button type="button" style={styles.secondaryButton} onClick={onOpenExamsRoom}>Open Exams Room</button>
-          </PrimaryActionBar>
-
-          <div style={{ borderTop: "1px solid #dbe3ee", paddingTop: 12 }}>
-            <NavigationGuide />
-          </div>
-        </div>
-      </details>
-    </section>
-  );
-};
-
 const GeneralHome = ({
   onSelectArea,
   studentProfile,
@@ -270,11 +201,6 @@ const GeneralHome = ({
     playOpenFeedback();
     onSelectArea("exams");
   }, [onSelectArea, playOpenFeedback]);
-
-  const openDay0 = useCallback(() => {
-    playOpenFeedback();
-    navigate(day0WorkbookLink);
-  }, [day0WorkbookLink, navigate, playOpenFeedback]);
 
   const joinZoom = useCallback(() => {
     playOpenFeedback();
@@ -398,14 +324,6 @@ const GeneralHome = ({
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
       <FirstLessonGuide />
-
-      <CompactCourseGuide
-        studentProfile={studentProfile}
-        levelKey={levelKey}
-        onOpenDay0={openDay0}
-        onOpenCourseBook={openCampus}
-        onOpenExamsRoom={openExamsRoom}
-      />
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
 
