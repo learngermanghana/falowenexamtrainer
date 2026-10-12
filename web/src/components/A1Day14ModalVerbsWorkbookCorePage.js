@@ -596,23 +596,110 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="7) Sentence-building practice">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Change each sentence so that it contains a modal verb. Keep the separable main verb together at the end.
+
+      <SectionCard title="7) Guided practice · Schritt für Schritt">
+        <p style={{ margin: 0, lineHeight: 1.65 }}>
+          First choose the correct modal form, then choose the complete infinitive, and finally check the word order.
+          These three short checks prepare you to build sentences on your own.
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
-          <div style={softAmber}><strong>Der Zug fährt um 14:20 Uhr ab.</strong><br />→ Der Zug muss um 14:20 Uhr abfahren.</div>
-          <div style={softAmber}><strong>Wir steigen in Hannover um.</strong><br />→ Wir müssen in Hannover umsteigen.</div>
-          <div style={softAmber}><strong>Die Fahrgäste steigen jetzt ein.</strong><br />→ Die Fahrgäste dürfen jetzt einsteigen.</div>
-          <div style={softAmber}><strong>Ich steige am Hauptbahnhof aus.</strong><br />→ Ich muss am Hauptbahnhof aussteigen.</div>
-        </div>
-        <div style={softGreen}>
-          <strong>Your turn:</strong> Write one sentence each with <strong>ankommen, abfahren, umsteigen, einsteigen</strong> and <strong>aussteigen</strong>. Use a different modal verb where possible.
+        <div style={{ display: "grid", gap: 12 }}>
+          {guidedChecks.map((question, index) => (
+            <fieldset key={question.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+              <legend style={{ padding: "0 6px", fontWeight: 700 }}>Step {index + 1}: {question.prompt}</legend>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {question.options.map((option) => (
+                  <button type="button" key={option}
+                    aria-pressed={guidedAnswers[question.id] === option}
+                    style={{ ...secondaryBtn, padding: "10px 12px", border: guidedAnswers[question.id] === option ? "2px solid #2563eb" : "1px solid #cbd5e1" }}
+                    onClick={() => setGuidedAnswers((current) => ({ ...current, [question.id]: option }))}>
+                    {option}
+                  </button>
+                ))}
+              </div>
+              {guidedAnswers[question.id] ? (
+                <p role="status" style={{ marginBottom: 0, color: guidedAnswers[question.id] === question.answer ? "#166534" : "#92400e" }}>
+                  <strong>{guidedAnswers[question.id] === question.answer ? "Correct! " : "Try again. "}</strong>{question.explanation}
+                </p>
+              ) : null}
+            </fieldset>
+          ))}
         </div>
       </SectionCard>
 
-      <SectionCard title="8) Knowledge test">
-        <p style={{ margin: 0 }}>Answer all ten questions. The final two questions use the train-reading practice above.</p>
+      <SectionCard title="8) Build your own sentences">
+        <p style={{ margin: 0 }}>Rewrite each sentence using the modal verb in brackets. Put the complete infinitive at the end. Answers are hidden until you check.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {sentenceTasks.map((task, index) => {
+            const correct = normalizeSentence(sentenceAnswers[task.id]) === normalizeSentence(task.answer);
+            return (
+              <div key={task.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+                <label htmlFor={"sentence-" + task.id} style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>
+                  {index + 1}. {task.prompt}
+                </label>
+                <textarea
+                  id={"sentence-" + task.id}
+                  aria-label={"Rewrite sentence " + (index + 1)}
+                  rows={2}
+                  value={sentenceAnswers[task.id] || ""}
+                  onChange={(event) => {
+                    setSentenceAnswers((current) => ({ ...current, [task.id]: event.target.value }));
+                    setSentenceChecked(false);
+                  }}
+                  placeholder="Write the complete German sentence..."
+                  style={{ width: "100%", boxSizing: "border-box", font: "inherit", padding: 12, borderRadius: 9, border: "1px solid #94a3b8" }}
+                />
+                {sentenceChecked ? (
+                  <div role="status" style={{ ...(correct ? softGreen : softAmber), marginTop: 8 }}>
+                    <strong>{correct ? "Correct!" : "Suggested answer:"}</strong> {task.answer}
+                    {!correct ? <p style={{ marginBottom: 0 }}>Check the modal ending and keep the infinitive together at the end. Punctuation and capitals do not affect this check.</p> : null}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ margin: 0 }} role="status">{sentencesAnswered} of {sentenceTasks.length} sentences written</p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" style={primaryBtn} disabled={sentencesAnswered < sentenceTasks.length} onClick={() => setSentenceChecked(true)}>Check my sentences</button>
+          <button type="button" style={secondaryBtn} onClick={() => { setSentenceAnswers({}); setSentenceChecked(false); }}>Try again</button>
+        </div>
+        {sentenceChecked ? <div role="status" style={sentenceScore >= 4 ? softGreen : softAmber}>
+          <strong>{sentenceScore} of {sentenceTasks.length} example answers matched.</strong> Review any differences above and retry.
+          Other natural German wordings may be correct; this offline checker compares your text with the taught examples.
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="9) Train-reading practice · Lesen">
+        <p style={{ margin: 0 }}>Use the departure board and ticket in Section 6 to find the information. Open either resource when you need it.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {readingChecks.map((question, index) => (
+            <fieldset key={question.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+              <legend style={{ padding: "0 6px", fontWeight: 700 }}>{index + 1}. {question.prompt}</legend>
+              {question.options.map((option) => (
+                <label key={option} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 0", cursor: "pointer" }}>
+                  <input type="radio" name={"reading-" + question.id} checked={readingAnswers[question.id] === option}
+                    onChange={() => { setReadingAnswers((current) => ({ ...current, [question.id]: option })); setReadingChecked(false); }} />
+                  <span>{option}</span>
+                </label>
+              ))}
+              {readingChecked ? <div style={readingAnswers[question.id] === question.answer ? softGreen : softAmber}>
+                <strong>{readingAnswers[question.id] === question.answer ? "Correct." : "Correct answer: " + question.answer}</strong>
+                <p style={{ marginBottom: 0 }}>{question.explanation}</p>
+              </div> : null}
+            </fieldset>
+          ))}
+        </div>
+        <p role="status" style={{ margin: 0 }}>{readingAnswered} of {readingChecks.length} reading questions answered</p>
+        <button type="button" style={primaryBtn} disabled={readingAnswered < readingChecks.length} onClick={() => setReadingChecked(true)}>Check reading answers</button>
+        {readingChecked ? <div role="status" style={readingPracticeScore >= 3 ? softGreen : softAmber}>
+          <strong>Reading practice: {readingPracticeScore} / {readingChecks.length}</strong> · Review the departure board or ticket for any missed details.
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="10) Knowledge test">
+        <p style={{ margin: 0 }}>Answer all ten questions before checking. Questions 1–8 test grammar; 9–10 check train reading.</p>
+        <p role="status" style={{ margin: 0, fontWeight: 700 }}>{answeredCount} of {knowledgeQuestions.length} questions answered</p>
+        <progress aria-label="Knowledge test completion" max={knowledgeQuestions.length} value={answeredCount} style={{ width: "100%", height: 12 }} />
         <div style={{ display: "grid", gap: 14 }}>
           {knowledgeQuestions.map((question, index) => {
             const selected = selectedAnswers[question.id];
@@ -646,7 +733,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           })}
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={primaryBtn} onClick={() => setTestSubmitted(true)}>
+          <button type="button" style={primaryBtn} disabled={answeredCount < knowledgeQuestions.length} onClick={() => setTestSubmitted(true)}>
             Check knowledge test
           </button>
           <button type="button" style={secondaryBtn} onClick={resetTest}>
@@ -656,14 +743,52 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         {testSubmitted ? (
           <div role="status" style={score >= 7 ? softGreen : softAmber}>
             <strong>Score: {score} / {knowledgeQuestions.length}</strong><br />
+            <span>Grammar: {grammarScore} / 8 · Reading: {readingScore} / 2</span><br />
             {score >= 7
-              ? "Good understanding. Review any incorrect separable prefixes and practise the sentence pairs aloud."
-              : "Review the prefix list and the difference between sentences with and without modal verbs, then try again."}
+              ? "Good progress. Review any mistakes above before moving on."
+              : "Review the missed answers and try again. Focus on modal endings and keeping the complete infinitive together."}
+            {grammarScore < 6 ? <p style={{ marginBottom: 0 }}>Grammar focus: review Sections 3–5, then redo the sentence-building exercises.</p> : null}
+            {readingScore < 2 ? <p style={{ marginBottom: 0 }}>Reading focus: reopen the departure board and ticket in Section 6.</p> : null}
           </div>
         ) : null}
       </SectionCard>
 
-      <SectionCard title="9) Final self-check">
+
+      <SectionCard title="11) Exit check · Show what you learned">
+        <p style={{ margin: 0 }}>Complete two transformations without looking at the examples. Then explain the word-order rule in your own words. Compare your work before you finish this lesson.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {exitTasks.map((task, index) => (
+            <div key={task.id}>
+              <label htmlFor={"exit-" + task.id} style={{ fontWeight: 700, display: "block", marginBottom: 6 }}>
+                {index + 1}. {task.prompt}
+              </label>
+              <textarea id={"exit-" + task.id} rows={2} value={exitAnswers[task.id] || ""}
+                onChange={(event) => { setExitAnswers((current) => ({ ...current, [task.id]: event.target.value })); setExitChecked(false); }}
+                style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
+              {exitChecked ? <p role="status" style={{ marginTop: 5 }}>
+                <strong>{normalizeSentence(exitAnswers[task.id]) === normalizeSentence(task.answer) ? "Matches the example." : "Compare with:"}</strong> {task.answer}
+              </p> : null}
+            </div>
+          ))}
+          <div>
+            <label htmlFor="exit-rule" style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+              3. Explain: What happens to the separable prefix when you add a modal verb?
+            </label>
+            <textarea id="exit-rule" rows={3} value={exitAnswers.rule || ""}
+              onChange={(event) => { setExitAnswers((current) => ({ ...current, rule: event.target.value })); setExitChecked(false); }}
+              placeholder="Explain in German or English."
+              style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
+          </div>
+        </div>
+        <button type="button" style={primaryBtn} disabled={!exitReady} onClick={() => setExitChecked(true)}>Compare my exit check</button>
+        {exitChecked ? <div role="status" style={softBlue}>
+          <strong>Sentence examples matched: {exitScore} / {exitTasks.length}.</strong>
+          <p style={{ margin: "8px 0 0" }}><strong>Rule to compare with your explanation:</strong> Without a modal, the prefix separates (fährt ... ab). With a modal, the conjugated modal comes early and the complete infinitive stays at the end (muss ... abfahren).</p>
+          <p style={{ marginBottom: 0 }}>Read your explanation again. Does it clearly mention the whole infinitive at the end? This self-check does not use AI or upload answers.</p>
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="12) Final self-check">
         <ul style={listStyle}>
           <li>I can identify the conjugated modal verb and the main verb.</li>
           <li>I know that the main verb goes to the end in the infinitive form after a modal verb.</li>
