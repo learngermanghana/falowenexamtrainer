@@ -11,8 +11,12 @@ describe("canonical course completion wiring", () => {
     expect(home).not.toContain('import CourseCompletionProgressCard from "./CourseCompletionProgressCard";');
     expect(home).not.toContain('import useCourseCompletionProgress from "../hooks/useCourseCompletionProgress";');
     expect(home).not.toContain("<CourseCompletionProgressCard");
-    expect(generalHome).toContain('data-home-course-access-guide="open"');
-    expect(generalHome).toContain("Course access and navigation");
+    expect(generalHome).not.toContain('data-home-course-access-guide="open"');
+    expect(generalHome).not.toContain("Course access and navigation");
+    expect(generalHome).not.toContain("CompactCourseGuide");
+    expect(generalHome).toContain("<QuickMainAccess");
+    expect(generalHome).toContain("<HomeMetrics");
+    expect(generalHome).toContain("<ClassCalendarCard");
   });
 
   test("Course Book keeps canonical A1-C1 completion and separate C2 cloud progress", () => {
