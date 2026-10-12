@@ -162,6 +162,15 @@ function patchAuthContext() {
 function patchGeneralHome() {
   const file = "web/src/components/GeneralHome.js";
   let content = read(file);
+  // The signed-in homepage no longer shows the redundant course access guide.
+  // The upgrade-specific access label was displayed only inside that guide;
+  // keep upgrade/payment behavior in AccountSettings without reviving the card.
+  if (!content.includes("const CompactCourseGuide =")) {
+    if (!content.includes("const GeneralHome =")) {
+      throw new Error("Payment-driven account upgrade patch cannot identify GeneralHome.");
+    }
+    return;
+  }
   if (content.includes(`const ${MARKER}`)) return;
 
   content = replaceOnce(
