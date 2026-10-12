@@ -100,7 +100,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
   });
 
 
-  test("requires all ten knowledge answers, reports grammar and reading scores, and resets", () => {
+  test("requires all four final answers, reports grammar and reading scores, and resets", () => {
     const { container } = render(
       <MemoryRouter initialEntries={[workbookRoute]}>
         <A1Day14ModalVerbsWorkbookPage />
@@ -111,9 +111,9 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(check).toBeDisabled();
     const section = check.closest("section");
     const questions = section.querySelectorAll("fieldset");
-    expect(questions).toHaveLength(10);
-    fireEvent.click(screen.getByLabelText("ab-"));
-    expect(section).toHaveTextContent("1 of 10 questions answered");
+    expect(questions).toHaveLength(4);
+    fireEvent.click(within(questions[0]).getByRole("radio", { name: "Der Zug fährt um 14:20 Uhr ab." }));
+    expect(section).toHaveTextContent("1 of 4 questions answered");
     expect(check).toBeDisabled();
     questions.forEach((fieldset) => {
       const first = fieldset.querySelector('input[type="radio"]');
@@ -121,13 +121,13 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     });
     expect(check).toBeEnabled();
     fireEvent.click(check);
-    expect(section).toHaveTextContent("Score: 8 / 10");
-    expect(section).toHaveTextContent("Grammar: 8 / 8");
-    expect(section).toHaveTextContent("Reading: 0 / 2");
+    expect(section).toHaveTextContent("Score: 3 / 4");
+    expect(section).toHaveTextContent("Grammar: 3 / 3");
+    expect(section).toHaveTextContent("Reading: 0 / 1");
 
     fireEvent.click(screen.getByRole("button", { name: /Reset test/i }));
     expect(check).toBeDisabled();
-    expect(section).toHaveTextContent("0 of 10 questions answered");
+    expect(section).toHaveTextContent("0 of 4 questions answered");
   });
 
   test("guides students, checks independent sentences and handles punctuation", () => {
@@ -144,49 +144,35 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(check).toBeDisabled();
     const values = [
       "der zug muss um 14:20 uhr abfahren",
-      "Wir müssen in Hannover umsteigen.",
       "Die Fahrgäste dürfen jetzt einsteigen.",
-      "Ich muss am Hauptbahnhof aussteigen.",
-      "Wir möchten am Sonntag zurückfahren.",
     ];
     values.forEach((value, index) => {
       fireEvent.change(screen.getByRole("textbox", { name: "Rewrite sentence " + (index + 1) }), { target: { value } });
     });
     expect(check).toBeEnabled();
     fireEvent.click(check);
-    expect(screen.getByText(/5 of 5 example answers matched/)).toBeVisible();
-    fireEvent.change(screen.getByRole("textbox", { name: "Rewrite sentence 3" }), { target: { value: "Die Fahrgäste darf einsteigen" } });
-    expect(screen.queryByText(/5 of 5 example answers matched/)).not.toBeInTheDocument();
+    expect(screen.getByText(/2 of 2 example answers matched/)).toBeVisible();
+    fireEvent.change(screen.getByRole("textbox", { name: "Rewrite sentence 2" }), { target: { value: "Die Fahrgäste darf einsteigen" } });
+    expect(screen.queryByText(/2 of 2 example answers matched/)).not.toBeInTheDocument();
   });
 
-  test("checks realistic train-reading answers and compares an exit check locally", () => {
-    render(
+  test("keeps eight essential tasks and removes duplicate reading and exit assessments", () => {
+    const { container } = render(
       <MemoryRouter initialEntries={[workbookRoute]}>
         <A1Day14ModalVerbsWorkbookPage />
       </MemoryRouter>,
     );
-    const readingCheck = screen.getByRole("button", { name: /Check reading answers/i });
-    expect(readingCheck).toBeDisabled();
-    ["Gleis 12", "14:45 Uhr", "Wagen 6, Sitz 42", "Nein, die Verbindung ist direkt."].forEach((answer) => {
-      fireEvent.click(screen.getByLabelText(answer));
-    });
-    fireEvent.click(readingCheck);
-    expect(screen.getByText(/Reading practice: 4 \/ 4/)).toBeVisible();
-
-    const exitCheck = screen.getByRole("button", { name: /Compare my exit check/i });
-    expect(exitCheck).toBeDisabled();
-    fireEvent.change(screen.getByLabelText(/1\. Der Zug fährt um 14:20 Uhr ab. Rewrite with müssen/i), {
-      target: { value: "Der Zug muss um 14:20 Uhr abfahren." },
-    });
-    fireEvent.change(screen.getByLabelText(/2\. Ich steige am Hauptbahnhof aus. Rewrite with müssen/i), {
-      target: { value: "Ich muss am Hauptbahnhof aussteigen." },
-    });
-    fireEvent.change(screen.getByLabelText(/3\. Explain: What happens to the separable prefix/i), {
-      target: { value: "The whole infinitive stays together at the end." },
-    });
-    expect(exitCheck).toBeEnabled();
-    fireEvent.click(exitCheck);
-    expect(screen.getByText(/Sentence examples matched: 2 \/ 2/)).toBeVisible();
+    expect(document.body).toHaveTextContent("Just 8 essential checks");
+    expect(screen.getAllByRole("group", { name: /Step [12]:/ })).toHaveLength(2);
+    expect(screen.getAllByRole("textbox", { name: /Rewrite sentence [12]/ })).toHaveLength(2);
+    const finalCheck = screen.getByRole("button", { name: /Check knowledge test/i }).closest("section");
+    expect(finalCheck.querySelectorAll("fieldset")).toHaveLength(4);
+    expect(screen.queryByRole("button", { name: /Check reading answers/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Compare my exit check/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: /Final self-check/i })).not.toBeInTheDocument();
+    expect(screen.getByText("Departure board · Die Abfahrtstafel")).toBeInTheDocument();
+    expect(screen.getByText("Ticket · Die Fahrkarte")).toBeInTheDocument();
+    expect(container).toBeTruthy();
   });
 
 });
