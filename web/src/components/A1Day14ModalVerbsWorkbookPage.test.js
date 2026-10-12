@@ -58,7 +58,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     expect(screen.getByRole("heading", { name: /Modal Verbs with Separable Verbs/i })).toBeVisible();
     expect(screen.getByRole("combobox", { name: /Choose modal verb to review/i })).toBeVisible();
     fireEvent.change(screen.getByRole("combobox", { name: /Choose modal verb to review/i }), { target: { value: "müssen" } });
-    expect(screen.getAllByText("musst").length).toBeGreaterThan(0);
+    expect(within(document.querySelector('[data-a1-modal-conjugation-cards="true"]')).getByText("musst")).toBeVisible();
     fireEvent.click(screen.getByText("Show complete conjugation table (optional)"));
     expect(screen.getByRole("table", { name: /Modal verb conjugation table/i })).toBeVisible();
     expect(document.body).toHaveTextContent("Subject + conjugated modal verb + details + main verb in the infinitive form");
@@ -74,6 +74,7 @@ describe("A1 Day 14 modal verbs with separable verbs workbook", () => {
     const ticketSummary = screen.getByText("Ticket · Die Fahrkarte");
     const vocabularySummary = screen.getByText("Vocabulary · Wortschatz");
 
+    expect(document.body).toHaveTextContent("These reference sections start closed");
     expect(departureSummary.closest("details")).not.toHaveAttribute("open");
     expect(ticketSummary.closest("details")).not.toHaveAttribute("open");
     expect(vocabularySummary.closest("details")).not.toHaveAttribute("open");
