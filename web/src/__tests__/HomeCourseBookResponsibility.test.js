@@ -35,6 +35,6 @@ describe("Home and Course Book responsibility split", () => {
     expect(courseTab).toContain("buildCourseCompletionProgress");
     expect(courseTab).toMatch(/courseCompletion(?:\?\.|\.)completionPercent/);
     expect(courseTab).toMatch(/courseCompletion(?:\?\.|\.)total/);
-    expect(courseTab).toContain("Required work");
+    expect(courseTab).toMatch(/courseCompletion(?:\?\.|\.)completed/);
   });
 });
