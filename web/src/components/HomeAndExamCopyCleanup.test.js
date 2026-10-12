@@ -29,11 +29,28 @@ describe("homepage and Exams Room student-facing cleanup", () => {
 
   test("Course Book and Exams Room are equally prominent blue homepage buttons", () => {
     const quickAccessStart = homeSource.indexOf("const QuickMainAccess");
-    const quickAccessEnd = homeSource.indexOf("const CompactCourseGuide", quickAccessStart);
+    const quickAccessEnd = homeSource.indexOf("const GeneralHome", quickAccessStart);
     const access = homeSource.slice(quickAccessStart, quickAccessEnd);
     expect(access).toContain('<button style={styles.primaryButton} onClick={openCampus}>');
     expect(access).toContain('<button type="button" style={styles.primaryButton} onClick={openExamsRoom}>');
     expect(access).not.toContain('<button style={styles.secondaryButton} onClick={openExamsRoom}>');
+  });
+
+  test("signed-in homepage omits duplicate course access and navigation guide", () => {
+    expect(homeSource).not.toContain("CompactCourseGuide");
+    expect(homeSource).not.toContain("NavigationGuide");
+    expect(homeSource).not.toContain("Expand course guide, access and navigation help");
+    expect(homeSource).not.toContain("Best flow: Course Book");
+    expect(homeSource).not.toContain("formatContractStatus");
+    expect(homeSource).toContain("<WelcomeHero");
+    expect(homeSource).toContain("<QuickMainAccess");
+    expect(homeSource).toContain("<FirstLessonGuide");
+    expect(homeSource).toContain("<HomeMetrics");
+    expect(homeSource).toContain("<ClassCalendarCard");
+    expect(homeSource).toContain("onOpenAccount={openAccount}");
+    expect(homeSource).toContain("onOpenExamFile={openExamFile}");
+    expect(homeSource).toContain("initialClassName={preferredClass}");
+    expect(homeSource).toContain("homepageCompact");
   });
 
   test("compact homepage class area contains only next class and Zoom, not the long class feed", () => {
