@@ -20,7 +20,7 @@ describe("Home and Course Book responsibility split", () => {
     expect(generalHome).toContain("<FirstLessonGuide");
   });
 
-  it("does not duplicate learning actions inside the Home navigation guide", () => {
+  it("does not restore the removed course guide actions on Home", () => {
     expect(generalHome).not.toContain("Open Day 0 Orientation");
     expect(generalHome).not.toContain("Continue Course Book");
   });
@@ -33,8 +33,8 @@ describe("Home and Course Book responsibility split", () => {
 
   it("keeps canonical course progress in Course Book", () => {
     expect(courseTab).toContain("buildCourseCompletionProgress");
-    expect(courseTab).toContain("courseCompletion.completionPercent");
-    expect(courseTab).toContain("courseCompletion.total");
+    expect(courseTab).toMatch(/courseCompletion(?:\?\.|\.)completionPercent/);
+    expect(courseTab).toMatch(/courseCompletion(?:\?\.|\.)total/);
     expect(courseTab).toContain("Required work");
   });
 });
