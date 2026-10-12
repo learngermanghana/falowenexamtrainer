@@ -103,7 +103,8 @@ const openCourseGuide = `const CompactCourseGuide = ({ studentProfile, levelKey 
   );
 };`;
 
-if (!homeGuideAlreadyOpen) {
+const hasLegacyHomeGuide = generalHome.includes("const CompactCourseGuide = (");
+if (hasLegacyHomeGuide && !homeGuideAlreadyOpen) {
   const guideStartMarker = "const CompactCourseGuide = (";
   const guideStart = generalHome.indexOf(guideStartMarker);
   const announcementEnd = generalHome.indexOf("\n\nconst AnnouncementSection =", guideStart);
@@ -113,19 +114,34 @@ if (!homeGuideAlreadyOpen) {
     throw new Error("Could not locate the Home course guide block.");
   }
   generalHome = `${generalHome.slice(0, guideStart)}${openCourseGuide}${generalHome.slice(guideEnd)}`;
-} else {
+} else if (homeGuideAlreadyOpen) {
   console.log("Home course access/navigation guide is already permanently open; legacy guide rewrite skipped.");
+} else {
+  // A simplified homepage intentionally has no duplicate course access card.
+  // Keep this script's Course Book completion-progress changes without
+  // restoring the removed homepage section during prebuild/pretest.
+  if (!generalHome.includes("const GeneralHome = (")) {
+    throw new Error("Could not locate the main homepage component.");
+  }
+  console.log("No home course access guide to rewrite; Course Book completion stays intact.");
 }
 
-[
-  "Expand course guide, access and navigation help",
-  "Open Day 0 Orientation",
-  "Continue Course Book",
-].forEach((marker) => {
-  if (generalHome.includes(marker)) throw new Error(`Home course guide still contains retired UI: ${marker}`);
-});
-if (!generalHome.includes('data-home-course-access-guide="open"') || !generalHome.includes("Course access and navigation")) {
-  throw new Error("Home course access/navigation guide is not permanently open.");
+if (hasLegacyHomeGuide || homeGuideAlreadyOpen) {
+  [
+    "Expand course guide, access and navigation help",
+    "Open Day 0 Orientation",
+    "Continue Course Book",
+  ].forEach((marker) => {
+    if (generalHome.includes(marker)) throw new Error(`Home course guide still contains retired UI: ${marker}`);
+  });
+  if (!generalHome.includes('data-home-course-access-guide="open"') || !generalHome.includes("Course access and navigation")) {
+    throw new Error("Home course access/navigation guide is not permanently open.");
+  }
+} else if (
+  generalHome.includes('data-home-course-access-guide="open"') ||
+  generalHome.includes("Course access and navigation")
+) {
+  throw new Error("Removed home course access guide was unexpectedly reintroduced.");
 }
 
 // Course Book: replace page-count progress with the canonical completion engine.

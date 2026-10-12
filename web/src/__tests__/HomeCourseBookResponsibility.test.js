@@ -9,11 +9,15 @@ const homeMetrics = readComponent("HomeMetrics.js");
 const courseTab = readComponent("CourseTab.js");
 
 describe("Home and Course Book responsibility split", () => {
-  it("keeps Home course access and navigation help permanently visible", () => {
-    expect(generalHome).toContain('data-home-course-access-guide="open"');
-    expect(generalHome).toContain("Course access and navigation");
-    expect(generalHome).toContain("<NavigationGuide />");
-    expect(generalHome).not.toContain("Expand course guide, access and navigation help");
+  it("keeps the homepage focused on useful cards without a redundant course access guide", () => {
+    expect(generalHome).not.toContain('data-home-course-access-guide="open"');
+    expect(generalHome).not.toContain("Course access and navigation");
+    expect(generalHome).not.toContain("<NavigationGuide />");
+    expect(generalHome).not.toContain("CompactCourseGuide");
+    expect(generalHome).toContain("<QuickMainAccess");
+    expect(generalHome).toContain("<HomeMetrics");
+    expect(generalHome).toContain("<ClassCalendarCard");
+    expect(generalHome).toContain("<FirstLessonGuide");
   });
 
   it("does not duplicate learning actions inside the Home navigation guide", () => {
