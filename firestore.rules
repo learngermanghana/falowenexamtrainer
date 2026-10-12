@@ -272,6 +272,10 @@ service cloud.firestore {
     match /examTutorReviewQueue/{document=**} { allow read, write: if isStaff(); }
     match /ai_issue_reports/{document=**} { allow read, write: if isStaff(); }
     match /markingJobs/{document=**} { allow read, write: if isStaff(); }
+    // Generated AI marking drafts are private staff records, not student scores.
+    // The Admin marking screen writes these before a teacher approves the result.
+    match /markingResults/{document=**} { allow read, write: if isStaff(); }
+    match /aiMarkingAudit/{document=**} { allow read, write: if isStaff(); }
     match /answerKeyRegistry/{document=**} { allow read, write: if isStaff(); }
     match /answerKeySyncRuns/{document=**} { allow read, write: if isStaff(); }
 
