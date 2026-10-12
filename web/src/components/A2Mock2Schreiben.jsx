@@ -1,3 +1,4 @@
+import { getStudentMockStorageKey, getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
 import React, { useCallback, useEffect, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
@@ -9,20 +10,22 @@ import "./A2GoetheWritingMockPreview.css";
 const KEY = "falowen:a2:mock-02:schreiben:v1";
 const LIMIT = 30 * 60 * 1000;
 const initial = () => ({ startedAt: null, submittedAt: null, sms: "", email: "" });
-const load = () => { try { const value = JSON.parse(localStorage.getItem(KEY)); return value?.startedAt ? { ...initial(), ...value } : initial(); } catch { return initial(); } };
+const load = (storageKey) => { try { const value = JSON.parse(localStorage.getItem(storageKey)); return value?.startedAt ? { ...initial(), ...value } : initial(); } catch { return initial(); } };
 const count = (s) => s.trim() ? s.trim().split(/\s+/).length : 0;
 const clock = (ms) => { const s = Math.ceil(Math.max(0, ms)/1000); return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
 const WordCount = ({ value, task }) => <p className="a2-schreiben-count" aria-live="polite">Wörter: <strong>{count(value)}</strong> · Ziel: {task.minWords}–{task.maxWords}</p>;
-export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
-  const [draft, setDraft] = useState(() => { const v = load(); return embedded && !v.startedAt ? { ...v, startedAt: Date.now() } : v; });
+function A2Mock2SchreibenAttempt({ embedded = false, onComplete, reviewReleased = false }) {
+  const { idToken, user } = useAuth();
+  const storageKey = getStudentMockStorageKey(KEY, user?.uid);
+  const reveal = (!embedded || reviewReleased) && isA2Mock2ReviewReady(getA2Mock2StorageKeys(user?.uid));
+  const [draft, setDraft] = useState(() => { const v = load(storageKey); return embedded && !v.startedAt ? { ...v, startedAt: Date.now() } : v; });
   const [now, setNow] = useState(Date.now());
-  const { idToken } = useAuth();
   const [marking, setMarking] = useState(false);
   const [markError, setMarkError] = useState("");
   const deadline = draft.startedAt ? draft.startedAt + LIMIT : null;
   const expired = Boolean(deadline && now >= deadline);
   const done = Boolean(draft.submittedAt || expired);
-  useEffect(() => { localStorage.setItem(KEY, JSON.stringify(draft)); }, [draft]);
+  useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(draft)); }, [draft, storageKey]);
   useEffect(() => { if (!draft.startedAt || draft.submittedAt) return undefined; const t = window.setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, [draft.startedAt, draft.submittedAt]);
   useEffect(() => { if (expired && !draft.submittedAt) setDraft(old => ({ ...old, submittedAt: Date.now() })); }, [expired, draft.submittedAt]);
   const start = () => { setNow(Date.now()); setDraft({ ...initial(), startedAt: Date.now() }); };
@@ -37,12 +40,13 @@ export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
         return { part, score: result.score, maxScore: result.maxScore, feedback: result.feedback, structuredFeedback: result.structuredFeedback };
       }));
       const completedDraft = {...draft, aiFeedback: grades};
-      localStorage.setItem(KEY, JSON.stringify(completedDraft));
+      localStorage.setItem(storageKey, JSON.stringify(completedDraft));
       setDraft(completedDraft);
-      if (embedded && onComplete) onComplete();
+
     } catch (e) { setMarkError(e?.response?.data?.error || e.message || "Bewertung derzeit nicht verfügbar."); }
     finally {setMarking(false);}
-  }, [done, marking, draft, idToken, embedded, onComplete]);
+  }, [done, marking, draft, idToken, embedded, onComplete, storageKey]);
+  useEffect(() => { if (embedded && draft.aiFeedback?.length === 2 && onComplete) onComplete(); }, [embedded, draft.aiFeedback, onComplete]);
   const submit = () => { if (window.confirm("Beide Texte abgeben? Danach können Sie nichts mehr ändern.")) setDraft(old => ({ ...old, submittedAt: Date.now() })); };
   useEffect(() => { if (embedded && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, done, draft.aiFeedback, marking, markError, mark]);
   return <main className="a2-mock2-shell" lang="de">
@@ -54,8 +58,14 @@ export default function A2Mock2Schreiben({ embedded = false, onComplete }) {
           {field==="sms" ? <div className="a2-schreiben-sms-frame"><div className="a2-schreiben-sms-header"><span>Nachricht</span><strong>Julia</strong></div><textarea aria-label="A2 Mock 2 Schreiben Teil 1 Nachricht" placeholder="Hallo Julia, ..." value={draft.sms} disabled={done} onChange={e=>edit("sms",e.target.value)} rows={7}/></div> : <div className="a2-schreiben-email-frame"><div className="a2-schreiben-email-field"><strong>An:</strong><span>{task.recipient}</span></div><div className="a2-schreiben-email-field"><strong>Betreff:</strong><span>{task.subject}</span></div><textarea aria-label="A2 Mock 2 Schreiben Teil 2 E-Mail" placeholder="Sehr geehrte Damen und Herren, ..." value={draft.email} disabled={done} onChange={e=>edit("email",e.target.value)} rows={10}/></div>}
           <WordCount value={draft[field]} task={task}/>
         </div></section>; })}
-        {done ? <section className="a2-mock2-results"><h2>Schreiben abgegeben</h2><p>Ihre Texte sind gespeichert. Nutzen Sie dieselbe Falowen-KI wie im ersten A2-Mock, mit den Aufgaben von Mock 2 als Bewertungskontext. Das Ergebnis ist Übungsfeedback, keine serververifizierte Abschlussnote.</p><button type="button" className="a2-mock2-primary" disabled={marking} onClick={mark}>{marking ? "KI bewertet …" : "Mit Falowen-KI auswerten"}</button>{markError?<p role="alert">{markError}</p>:null}{draft.aiFeedback?.map(item=><div key={item.part}><h3>{item.part === "teil1" ? "Teil 1" : "Teil 2"} · KI-Feedback</h3><p>{item.feedback}</p>{Number.isFinite(Number(item.score)) && Number.isFinite(Number(item.maxScore)) ? <p>Übungspunkte: {item.score}/{item.maxScore}</p>:null}</div>)}<button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Neuen Versuch starten? Der gespeicherte Entwurf wird ersetzt."))start();}}>Erneut üben</button></section> : <div className="a2-mock2-actions"><p>Beide Aufgaben abgeben · automatische Speicherung aktiv</p><button type="button" className="a2-mock2-primary" onClick={submit}>Schreiben abgeben</button></div>}
+        {done ? <section className="a2-mock2-results"><h2>Schreiben abgegeben</h2><p>Ihre Texte sind gespeichert. Nutzen Sie dieselbe Falowen-KI wie im ersten A2-Mock, mit den Aufgaben von Mock 2 als Bewertungskontext. Das Ergebnis ist Übungsfeedback, keine serververifizierte Abschlussnote.</p><button type="button" className="a2-mock2-primary" disabled={marking} onClick={mark}>{marking ? "KI bewertet …" : "Mit Falowen-KI auswerten"}</button>{markError?<p role="alert">{markError}</p>:null}{reveal ? draft.aiFeedback?.map(item=><div key={item.part}><h3>{item.part === "teil1" ? "Teil 1" : "Teil 2"} · KI-Feedback</h3><p>{item.feedback}</p>{Number.isFinite(Number(item.score)) && Number.isFinite(Number(item.maxScore)) ? <p>Übungspunkte: {item.score}/{item.maxScore}</p>:null}</div>) : <p>Feedback erscheint erst nach Abschluss aller vier Module.</p>}{!embedded ? <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Neuen Versuch starten? Der gespeicherte Entwurf wird ersetzt."))start();}}>Erneut üben</button> : null}</section> : <div className="a2-mock2-actions"><p>Beide Aufgaben abgeben · automatische Speicherung aktiv</p><button type="button" className="a2-mock2-primary" onClick={submit}>Schreiben abgeben</button></div>}
       </article>
     </>}
   </main>;
+}
+
+// Switching accounts must remount local exam state, not copy the prior answers.
+export default function A2Mock2Schreiben(props) {
+  const { user } = useAuth();
+  return <A2Mock2SchreibenAttempt key={user?.uid || "guest"} {...props} />;
 }

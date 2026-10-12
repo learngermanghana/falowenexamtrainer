@@ -1,3 +1,4 @@
+import { getStudentMockStorageKey, getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
 import React, { useEffect, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
@@ -14,10 +15,12 @@ const tasks = [
   {id:"t3_plan",teil:"3",title:"Teil 3 · Gemeinsam planen",time:240,display:"Antworten Sie auf die Vorschläge Ihres Partners und besprechen Sie alle vier Punkte.",prompt:`${CONTENT.teil3.situation} Punkte: ${CONTENT.teil3.points.join("; ")} Partner sagt: ${CONTENT.teil3.partnerOpening} / ${CONTENT.teil3.partnerFollowup} / ${CONTENT.teil3.partnerLast}. ${RUBRIC.teil3}`},
 ];
 const KEY="falowen:a2:mock-02:sprechen:v1";
-const getSaved=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch{return {}}};
-export default function A2Mock2Sprechen({ embedded = false, onComplete }){
+const getSaved=(storageKey)=>{try{return JSON.parse(localStorage.getItem(storageKey)||"{}")}catch{return {}}};
+function A2Mock2SprechenAttempt({ embedded = false, onComplete, reviewReleased = false }){
  const { idToken,user }=useAuth();
- const [attempts,setAttempts]=useState(getSaved);
+ const storageKey = getStudentMockStorageKey(KEY, user?.uid);
+ const [attempts,setAttempts]=useState(() => getSaved(storageKey));
+ const reveal = (!embedded || reviewReleased) && isA2Mock2ReviewReady(getA2Mock2StorageKeys(user?.uid));
  const [active,setActive]=useState(0);
  const [recording,setRecording]=useState(false);
  const [elapsed,setElapsed]=useState(0);
@@ -25,11 +28,11 @@ export default function A2Mock2Sprechen({ embedded = false, onComplete }){
  const [error,setError]=useState("");
  const [status,setStatus]=useState("");
  const [marking,setMarking]=useState(false);
- const [assessment,setAssessment]=useState(null);
+ const [assessment,setAssessment]=useState(() => getSaved(storageKey)._mock2Assessment || null);
  const [audio,setAudio]=useState(null);
  const recorder=useRef(null),stream=useRef(null),chunks=useRef([]),timer=useRef(null),elapsedRef=useRef(0),urlRef=useRef(null);
  const task=tasks[active];
- useEffect(()=>{localStorage.setItem(KEY,JSON.stringify(attempts))},[attempts]);
+ useEffect(()=>{localStorage.setItem(storageKey,JSON.stringify(attempts))},[attempts,storageKey]);
  useEffect(()=>()=>{clearInterval(timer.current);if(recorder.current?.state==="recording")recorder.current.stop();stream.current?.getTracks().forEach(t=>t.stop());if(urlRef.current)URL.revokeObjectURL(urlRef.current)},[]);
  const stop=()=>{if(recorder.current?.state==="recording")recorder.current.stop()};
  const start=async()=>{
@@ -64,6 +67,7 @@ export default function A2Mock2Sprechen({ embedded = false, onComplete }){
   }catch(e){setError(userFacingAudioError(e,e.message||"Audio konnte nicht ausgewertet werden."))}
   finally{setBusy(false)}
  };
+ useEffect(() => { if (embedded && attempts._mock2AiScored && onComplete) onComplete(); }, [embedded, attempts._mock2AiScored, onComplete]);
  const completed=tasks.filter(t=>attempts[t.id]?.transcript).length;
  const mark=async()=>{
   if(completed!==tasks.length||marking)return;
@@ -71,10 +75,10 @@ export default function A2Mock2Sprechen({ embedded = false, onComplete }){
   try {
    const result=await scoreA2MockSpeaking({idToken, mockId:"a2-mock-02", rubric:RUBRIC, attempts:tasks.map(t=>({id:t.id,teil:t.teil,task:t.prompt,transcript:attempts[t.id]?.transcript||"",analysisFeedback:attempts[t.id]?.feedback||""}))});
    setAssessment(result);setStatus("KI-Feedback erhalten. Die abschließende serververifizierte Mock-2-Note ist noch nicht verfügbar.");
-   const verified = {...attempts, _mock2AiScored:true};
-   localStorage.setItem(KEY,JSON.stringify(verified));
+   const verified = {...attempts, _mock2AiScored:true,_mock2Assessment:result};
+   localStorage.setItem(storageKey,JSON.stringify(verified));
    setAttempts(verified);
-   if(embedded && onComplete) onComplete();
+
   } catch(e) {setError(e?.response?.data?.error||e.message||"Sprechen konnte nicht bewertet werden.");}
   finally {setMarking(false);}
  };
@@ -93,9 +97,15 @@ export default function A2Mock2Sprechen({ embedded = false, onComplete }){
    {attempts[task.id]?.transcript?<div className="a2-mock2-speaking-saved"><strong>Antwort eingereicht</strong><p>{attempts[task.id].transcript}</p><p>Ihre Aufnahme wurde transkribiert. Die endgültige Mock-2-Bewertung wird erst nach Einrichtung der passenden Bewertungslogik angezeigt.</p></div>:<>
    <div className="a2-mock2-speaking-record"><p>Maximale Aufnahmezeit: {Math.floor(task.time/60)} Minuten · aufgenommen: {elapsed} Sekunden</p><button type="button" disabled={busy} onClick={recording?stop:start}>{recording?"Aufnahme beenden":"Aufnahme starten"}</button>
    {audio?.taskId===task.id?<><audio controls src={audio.url}/><button type="button" onClick={send} disabled={busy}>{busy?"Wird verarbeitet …":"Antwort senden"}</button></>:null}</div></>}
-   {assessment?<section className="a2-mock2-speaking-saved"><h2>Sprechen · KI-Übungsfeedback</h2><p>{assessment.overall_feedback_en||assessment.feedback||"Auswertung empfangen."}</p>{["teil1","teil2","teil3"].map(k=>assessment.parts?.[k]?<div key={k}><strong>{k.toUpperCase()}</strong><p>{assessment.parts[k].feedback_en||assessment.parts[k].feedback||""}</p></div>:null)}<p>Diese Auswertung ist noch nicht als Mock-2-Gesamtergebnis verifiziert.</p></section>:null}
+   {assessment && reveal?<section className="a2-mock2-speaking-saved"><h2>Sprechen · KI-Übungsfeedback</h2><p>{assessment.overall_feedback_en||assessment.feedback||"Auswertung empfangen."}</p>{["teil1","teil2","teil3"].map(k=>assessment.parts?.[k]?<div key={k}><strong>{k.toUpperCase()}</strong><p>{assessment.parts[k].feedback_en||assessment.parts[k].feedback||""}</p></div>:null)}<p>Diese Auswertung ist noch nicht als Mock-2-Gesamtergebnis verifiziert.</p></section>:null}
    {status?<p role="status">{status}</p>:null}{error?<p role="alert">{error}</p>:null}
    <div className="a2-mock2-actions"><button type="button" onClick={()=>setActive(i=>Math.max(0,i-1))} disabled={active===0||recording||busy}>Zurück</button>{active<4?<button type="button" className="a2-mock2-primary" onClick={()=>{setActive(i=>i+1);setAudio(null)}} disabled={recording||busy}>Weiter</button>:<strong>{completed===5?<button type="button" className="a2-mock2-primary" onClick={mark} disabled={marking}>{marking?"KI bewertet …":"Sprechen mit KI bewerten"}</button>:"Bitte alle fünf Aufnahmen einreichen."}</strong>}</div>
   </article>
  </main>
+}
+
+// Switching accounts must remount local exam state, not copy the prior answers.
+export default function A2Mock2Sprechen(props) {
+  const { user } = useAuth();
+  return <A2Mock2SprechenAttempt key={user?.uid || "guest"} {...props} />;
 }

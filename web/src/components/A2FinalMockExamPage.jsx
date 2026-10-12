@@ -1,3 +1,4 @@
+import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -128,7 +129,7 @@ const readStoredState = (storageKey) => {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(storageKey) || "null");
     if (!parsed || parsed.mockId !== A2_FINAL_MOCK_ID) return emptyState();
-    return { ...emptyState(), ...parsed };
+    return restoreFullMockReviewState({ ...emptyState(), ...parsed });
   } catch (_error) {
     return emptyState();
   }
@@ -1151,7 +1152,7 @@ export default function A2FinalMockExamPage() {
           />
         </>
       ) : null}
-      {exam.stage === "result" ? renderResult() : null}
+      {exam.stage === "result" && canReviewFullMock(exam) ? renderResult() : null}
     </main>
   );
 }

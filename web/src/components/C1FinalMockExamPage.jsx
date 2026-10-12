@@ -1,3 +1,5 @@
+import { useAuth } from "../context/AuthContext";
+import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import React, { useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
@@ -40,12 +42,12 @@ const initialState = () => ({
   completed: false,
 });
 
-const readState = () => {
+const readState = (storageKey, legacyStorageKey) => {
   if (typeof window === "undefined") return initialState();
   try {
     const parsed = JSON.parse(
-      window.localStorage.getItem(C1_READING_PRACTICE_STORAGE_KEY) ||
-      window.localStorage.getItem(C1_FINAL_MOCK_STORAGE_KEY) ||
+      window.localStorage.getItem(storageKey) ||
+      window.localStorage.getItem(legacyStorageKey) ||
       "null",
     );
     if (!parsed || typeof parsed !== "object") return initialState();
@@ -419,9 +421,12 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
   );
 };
 
-export default function C1FinalMockExamPage() {
+function C1FinalMockExamPageAttempt() {
   useAssessmentRestriction();
-  const [state, setState] = useState(readState);
+  const { user } = useAuth();
+  const storageKey = getStudentMockStorageKey(C1_READING_PRACTICE_STORAGE_KEY, user?.uid);
+  const legacyStorageKey = getStudentMockStorageKey(C1_FINAL_MOCK_STORAGE_KEY, user?.uid);
+  const [state, setState] = useState(() => readState(storageKey, legacyStorageKey));
   const [now, setNow] = useState(Date.now());
 
   useEffect(() => {
@@ -431,10 +436,10 @@ export default function C1FinalMockExamPage() {
 
   useEffect(() => {
     window.localStorage.setItem(
-      C1_READING_PRACTICE_STORAGE_KEY,
+      storageKey,
       JSON.stringify({ ...state, savedAt: Date.now() }),
     );
-  }, [state]);
+  }, [state, storageKey]);
 
   const config =
     state.stage === "teil4"
@@ -625,4 +630,10 @@ export default function C1FinalMockExamPage() {
       ) : null}
     </main>
   );
+}
+
+// Switching accounts must remount local exam state, not copy the prior answers.
+export default function C1FinalMockExamPage(props) {
+  const { user } = useAuth();
+  return <C1FinalMockExamPageAttempt key={user?.uid || "guest"} {...props} />;
 }

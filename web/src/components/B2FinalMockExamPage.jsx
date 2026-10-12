@@ -1,3 +1,4 @@
+import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -72,11 +73,11 @@ const restoreAudioStatus = (status) => {
   return "not_started";
 };
 
-const readState = () => {
+const readState = (storageKey) => {
   if (typeof window === "undefined") return initialState();
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(B2_FINAL_MOCK_STORAGE_KEY) || "null");
+    const parsed = JSON.parse(window.localStorage.getItem(storageKey) || "null");
     if (!parsed || typeof parsed !== "object") return initialState();
 
     const hasTeil4Progress =
@@ -1027,10 +1028,11 @@ const Schreiben = ({ values, onChange, onFinish, busy = false }) => (
   </>
 );
 
-export default function B2FinalMockExamPage() {
+function B2FinalMockExamPageAttempt() {
   useAssessmentRestriction();
-  const { idToken } = useAuth();
-  const [state, setState] = useState(readState);
+  const { idToken, user } = useAuth();
+  const storageKey = getStudentMockStorageKey(B2_FINAL_MOCK_STORAGE_KEY, user?.uid);
+  const [state, setState] = useState(() => readState(storageKey));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [pageError, setPageError] = useState("");
@@ -1043,10 +1045,10 @@ export default function B2FinalMockExamPage() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     window.localStorage.setItem(
-      B2_FINAL_MOCK_STORAGE_KEY,
+      storageKey,
       JSON.stringify({ ...state, savedAt: Date.now() }),
     );
-  }, [state]);
+  }, [state, storageKey]);
 
   useEffect(() => {
     if (!state.completed || !idToken || state.resultSyncScoreDocId) return;
@@ -1529,4 +1531,10 @@ export default function B2FinalMockExamPage() {
       ) : null}
     </main>
   );
+}
+
+// Switching accounts must remount local exam state, not copy the prior answers.
+export default function B2FinalMockExamPage(props) {
+  const { user } = useAuth();
+  return <B2FinalMockExamPageAttempt key={user?.uid || "guest"} {...props} />;
 }

@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
@@ -12,44 +13,39 @@ import "./A2Mock2Lesen.css";
 import "./A1FinalMockExamPage.css";
 import "./A2Mock2ExamHub.css";
 
-const FLOW_KEY = "falowen:a2:mock-02:full-flow:v2";
 const ORDER = ["lesen", "hoeren", "schreiben", "sprechen"];
 const LABELS = ["Lesen", "Hören", "Schreiben", "Sprechen"];
-const STORAGE = {
-  lesen:"falowen:a2:mock-02:lesen:v1",
-  hoeren:"falowen:a2:mock-02:hoeren:v1",
-  schreiben:"falowen:a2:mock-02:schreiben:v1",
-  sprechen:"falowen:a2:mock-02:sprechen:v1",
-};
 const read = key => { try { return JSON.parse(window.localStorage.getItem(key) || "null") || {}; } catch { return {}; } };
-const getProgress = () => {
+const getProgress = (STORAGE) => {
  const l = read(STORAGE.lesen), h = read(STORAGE.hoeren), w = read(STORAGE.schreiben), s = read(STORAGE.sprechen);
  return {
   lesen: { done: Boolean(l.completedAt), count: Object.values(l.answers || {}).filter(Boolean).length,
    score: A2_MOCK_2_LESEN_QUESTIONS.filter(q => l.answers?.[q.number] === q.answer).length * 1.25 },
   hoeren: { done: Boolean(h.completedAt), count: Object.values(h.answers || {}).filter(Boolean).length,
    score: A2_MOCK_2_HOEREN_QUESTIONS.filter(q => h.answers?.[q.number] === q.answer).length * 1.25 },
-  schreiben: { done: Boolean(w.aiFeedback?.length === 2), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
-  sprechen: { done: Boolean(s._mock2AiScored), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
+  schreiben: { done: Boolean(w.submittedAt && w.aiFeedback?.length === 2), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
+  sprechen: { done: Boolean(s._mock2AiScored && ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
  };
 };
-const initialize = () => {
- const saved = read(FLOW_KEY);
- if (saved.stage && ["intro",...ORDER,"result"].includes(saved.stage)) return saved;
- const p=getProgress();
+const initialize = (STORAGE) => {
+ const saved = read(STORAGE.flow);
+ if (saved.stage && ["intro",...ORDER,"result"].includes(saved.stage) && (saved.stage !== "result" || isA2Mock2ReviewReady(STORAGE))) return saved;
+ const p=getProgress(STORAGE);
  const first=ORDER.find(k => !p[k].done);
  const started=ORDER.some(k=>p[k].done || p[k].count > 0);
  return {stage:started ? (first || "result") : "intro", startedAt: started ? Date.now() : null};
 };
-export default function A2Mock2ExamHub(){
- const { idToken } = useAuth();
- const [flow,setFlow] = useState(initialize);
- const [progress,setProgress] = useState(getProgress);
+function A2Mock2ExamHubAttempt(){
+ const { idToken, user } = useAuth();
+ const STORAGE = useMemo(() => getA2Mock2StorageKeys(user?.uid), [user?.uid]);
+ const [flow,setFlow] = useState(() => initialize(STORAGE));
+ const [progress,setProgress] = useState(() => getProgress(STORAGE));
+ const [resetError, setResetError] = useState("");
  const stage = flow.stage;
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
- const refresh = useCallback(()=>setProgress(getProgress()),[]);
- useEffect(()=>{localStorage.setItem(FLOW_KEY,JSON.stringify(flow));},[flow]);
+ const refresh = useCallback(()=>setProgress(getProgress(STORAGE)),[STORAGE]);
+ useEffect(()=>{localStorage.setItem(STORAGE.flow,JSON.stringify(flow));},[flow, STORAGE]);
  useEffect(()=>{
   const sync=()=>refresh();
   window.addEventListener("focus",sync); window.addEventListener("storage",sync);
@@ -73,7 +69,7 @@ export default function A2Mock2ExamHub(){
   } catch (_) {
    // Monitoring must never block the learner's exam or submission.
   }
- }, [idToken, stage, progress, flow.startedAt]);
+ }, [idToken, stage, progress, flow.startedAt, STORAGE]);
  useEffect(() => {
   if (stage === "intro") return undefined;
   reportProgress();
@@ -82,17 +78,30 @@ export default function A2Mock2ExamHub(){
   return () => window.clearInterval(interval);
  }, [reportProgress, stage]);
  const advance = useCallback(()=>{
-  setProgress(getProgress());
+  setProgress(getProgress(STORAGE));
   setFlow(current=>{
    const i=ORDER.indexOf(current.stage);
    if(i<0)return current;
    return {...current,stage:i===3?"result":ORDER[i+1]};
   });
   window.scrollTo({top:0,behavior:"smooth"});
- },[]);
+ },[STORAGE]);
  const start = () => {
   setFlow({stage:"lesen",startedAt:Date.now()});
   window.scrollTo({top:0,behavior:"smooth"});
+ };
+ const restart = () => {
+  if (!isA2Mock2ReviewReady(STORAGE) || !window.confirm("Neuen vollständigen Mocktest starten? Ihr abgeschlossenes Ergebnis bleibt im Verlauf gespeichert.")) return;
+  try {
+   const historyKey = `${STORAGE.flow}:history`;
+   const history = read(historyKey);
+   const completedAttempt = Object.fromEntries(Object.entries(STORAGE).map(([name, key]) => [name, read(key)]));
+   localStorage.setItem(historyKey, JSON.stringify([...(Array.isArray(history) ? history : []), completedAttempt]));
+   Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
+   setFlow({ stage: "intro", startedAt: null });
+   setProgress(getProgress(STORAGE));
+   setResetError("");
+  } catch (_) { setResetError("Der Verlauf konnte nicht gespeichert werden. Ihr bisheriger Versuch wurde nicht zurückgesetzt."); }
  };
  const screens = {
   lesen:<A2Mock2Lesen embedded onComplete={advance}/>,
@@ -125,11 +134,23 @@ export default function A2Mock2ExamHub(){
      <div className="a2-mock2-full-module"><strong>Modul {index+1} von 4 · {LABELS[index]}</strong><p>Nach Abgabe wechseln Sie automatisch zum nächsten Modul.</p></div>
      {screens[stage]}
    </section>:null}
-   {stage==="result"?<section className="a2-mock2-full-intro">
+   {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
     <h2>Alle vier Module bearbeitet</h2>
     <p>Vielen Dank. Ihre Antworten und KI-Übungsrückmeldungen bleiben auf diesem Gerät gespeichert.</p>
     <p>Lesen: <strong>{progress.lesen.score.toFixed(1)}/25</strong> · Hören: <strong>{progress.hoeren.score.toFixed(1)}/25</strong></p>
+    <button type="button" className="a2-mock2-primary" onClick={restart}>Neuen vollständigen Mocktest starten</button>
+    {resetError ? <p role="alert">{resetError}</p> : null}
+    <details><summary>Lesen · Antworten und Lösungen ansehen</summary><A2Mock2Lesen embedded reviewReleased /></details>
+    <details><summary>Hören · Antworten und Lösungen ansehen</summary><A2Mock2Hoeren embedded reviewReleased /></details>
+    <details><summary>Schreiben · Feedback ansehen</summary><A2Mock2Schreiben embedded reviewReleased /></details>
+    <details><summary>Sprechen · Feedback ansehen</summary><A2Mock2Sprechen embedded reviewReleased /></details>
     <p>Ein verifiziertes Gesamtergebnis von 100 Punkten wird erst angezeigt, wenn die KI-Bewertungen von Schreiben und Sprechen sicher dem zweiten Mocktest zugeordnet werden können.</p>
    </section>:null}
  </main>;
+}
+
+// Switching accounts must remount local exam state, not copy the prior answers.
+export default function A2Mock2ExamHub(props) {
+  const { user } = useAuth();
+  return <A2Mock2ExamHubAttempt key={user?.uid || "guest"} {...props} />;
 }

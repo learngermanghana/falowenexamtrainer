@@ -1,3 +1,4 @@
+import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -95,7 +96,7 @@ const readStoredState = (key) => {
   if (typeof window === "undefined") return emptyState();
   try {
     const parsed = JSON.parse(window.localStorage.getItem(key) || "null");
-    return parsed?.mockId === B1_FINAL_MOCK_ID ? { ...emptyState(), ...parsed } : emptyState();
+    return parsed?.mockId === B1_FINAL_MOCK_ID ? restoreFullMockReviewState({ ...emptyState(), ...parsed }) : emptyState();
   } catch (_error) {
     return emptyState();
   }
@@ -530,7 +531,7 @@ export default function B1FinalMockExamPage() {
     );
   }
 
-  if (exam.stage === "result") {
+  if (exam.stage === "result" && canReviewFullMock(exam)) {
     const entries = Object.entries(exam.sectionScores || {});
     const sorted = [...entries].sort((a, b) => Number(b[1]) - Number(a[1]));
     const recommendations = getB1MockPracticeRecommendations(exam.sectionScores);
