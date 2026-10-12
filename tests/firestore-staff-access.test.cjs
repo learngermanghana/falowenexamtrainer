@@ -10,7 +10,7 @@ before(async () => {
   });
   await env.withSecurityRulesDisabled(async context => {
     const db = context.firestore();
-    for (const path of ['examTutorReviewQueue/review', 'ai_issue_reports/report', 'submissions/flat', 'submissions/A1/posts/nested', 'courses/A1/submissions/legacy', 'answerKeyRegistry/key', 'markingJobs/job']) {
+    for (const path of ['examTutorReviewQueue/review', 'ai_issue_reports/report', 'submissions/flat', 'submissions/A1/posts/nested', 'courses/A1/submissions/legacy', 'answerKeyRegistry/key', 'markingJobs/job', 'markingResults/result', 'aiMarkingAudit/audit']) {
       await setDoc(doc(db, path), { studentId: 'student-owner', userId: 'student-owner', status: 'pending' });
     }
   });
@@ -27,20 +27,32 @@ for (const [label, token] of [
 ]) {
   test(`${label} can load dashboard panels and all submission shapes`, async () => {
     const db = env.authenticatedContext(`operator-${label.replace(/ /g, '-')}`, token).firestore();
-    for (const name of ['examTutorReviewQueue', 'ai_issue_reports', 'answerKeyRegistry', 'markingJobs']) await assertSucceeds(getDocs(collection(db, name)));
+    for (const name of ['examTutorReviewQueue', 'ai_issue_reports', 'answerKeyRegistry', 'markingJobs', 'markingResults', 'aiMarkingAudit']) await assertSucceeds(getDocs(collection(db, name)));
     await assertSucceeds(getDocs(collectionGroup(db, 'submissions')));
     await assertSucceeds(getDocs(collectionGroup(db, 'posts')));
     await assertSucceeds(setDoc(doc(db, 'markingJobs/new-job'), { studentId: 'student-owner' }));
+    // The MarkingPage saves drafts before the tutor sends a final mark.
+    await assertSucceeds(getDoc(doc(db, 'markingResults/result')));
+    await assertSucceeds(setDoc(doc(db, 'markingResults/new-result'), {
+      submissionId: 'flat', status: 'needs_review', result: { score: 26 },
+    }, {merge: true}));
+    await assertSucceeds(setDoc(doc(db, 'aiMarkingAudit/new-audit'), {
+      submissionId: 'flat', status: 'draft', feedback: 'Staff review only',
+    }, {merge: true}));
   });
 }
 
 test('ordinary student and signed-out accounts cannot access staff panels or other students submissions', async () => {
   for (const context of [env.authenticatedContext('other-student', { email: 'student@example.com', role: 'student' }), env.unauthenticatedContext()]) {
     const db = context.firestore();
-    for (const name of ['examTutorReviewQueue', 'ai_issue_reports', 'answerKeyRegistry', 'markingJobs']) await assertFails(getDocs(collection(db, name)));
+    for (const name of ['examTutorReviewQueue', 'ai_issue_reports', 'answerKeyRegistry', 'markingJobs', 'markingResults', 'aiMarkingAudit']) await assertFails(getDocs(collection(db, name)));
     await assertFails(getDoc(doc(db, 'submissions/flat')));
     await assertFails(getDocs(collectionGroup(db, 'posts')));
     await assertFails(setDoc(doc(db, 'markingJobs/forbidden'), { studentId: 'student-owner' }));
+    await assertFails(getDoc(doc(db, 'markingResults/result')));
+    await assertFails(getDoc(doc(db, 'aiMarkingAudit/audit')));
+    await assertFails(setDoc(doc(db, 'markingResults/forbidden'), {status:'needs_review'}));
+    await assertFails(setDoc(doc(db, 'aiMarkingAudit/forbidden'), {status:'draft'}));
   }
 });
 
