@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { courseSchedules } from "../data/courseSchedule";
 import { normalizeLesson } from "../data/lessonModel";
@@ -112,6 +112,11 @@ describe("A1 lesson and workbook routing regressions", () => {
     expect(screen.queryByText("Practice · Change the statement into a question")).not.toBeInTheDocument();
     expect(screen.queryByText("Yes/No questions self-check")).not.toBeInTheDocument();
     expect(screen.getAllByText("Ich schwimme gern.", { exact: true }).length).toBeGreaterThan(0);
-    expect(screen.getByText("Schwimmst du gern?", { exact: true })).toBeVisible();
+    // Day 6 now uses an interactive yes/no hobby-question practice rather than a printed example.
+    const hobbyQuestion = screen.getByRole("textbox", { name: "Your German yes-no question" });
+    expect(hobbyQuestion).toBeVisible();
+    fireEvent.change(hobbyQuestion, { target: { value: "Liest du gern?" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check answer" }));
+    expect(screen.getByText(/Richtig!/)).toBeVisible();
   });
 });
