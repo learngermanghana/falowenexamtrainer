@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
 import { useTimedAssignment } from "./SharedTimedAssignment";
+import { SUBMISSION_COOLDOWN_MS, resolveSubmissionCooldownDeadline } from "../utils/submissionCooldown";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
@@ -50,7 +51,7 @@ const MIN_RESUBMISSION_NEW_WORDS = 8;
 const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
 const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
-const ACTION_COOLDOWN_MS = 10 * 60 * 1000;
+
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 const MAX_ASSIGNMENT_DAY_BY_LEVEL = { A1: 22, A2: 28, B1: 28, B2: 28, C1: 28 };
@@ -76,7 +77,7 @@ const getCooldownDetailsFromError = (error) => {
     ? remainingSeconds * 1000
     : Math.max(0, new Date(nextAllowedAt || 0).getTime() - Date.now());
   if (!remainingMs) return null;
-  return { nextAllowedAt, remainingMs };
+  return { nextAllowedAt, remainingMs: Math.min(SUBMISSION_COOLDOWN_MS, Math.max(0, remainingMs)) };
 };
 
 const formatDate = (timestamp) => {
@@ -1038,6 +1039,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return normalizeLevel(selectedAssignmentEntry?.level || selectedSubmitLevel);
   }, [selectedAssignmentEntry?.level, selectedSubmitLevel]);
 
+  const groupSubmissionConsent = ["A1", "A2", "B1"].includes(selectedAssignmentLevel);
+
   const minimumSubmissionWords = useMemo(
     () => getAssignmentSubmissionWordMinimum({
       level: selectedAssignmentLevel,
@@ -1790,10 +1793,15 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     return latest;
   }, [isSameSelectedAssignment, recentSubmissions]);
 
+  const cooldownDeadlinesRef = useRef(new Map());
   const nextAllowedSubmissionAt = useMemo(() => {
-    if (!latestSubmissionActionAt) return null;
-    return new Date(latestSubmissionActionAt.getTime() + ACTION_COOLDOWN_MS);
-  }, [latestSubmissionActionAt]);
+    const deadline = resolveSubmissionCooldownDeadline({
+      submittedAtMs: latestSubmissionActionAt?.getTime(),
+      assignmentKey: selectedCanonicalAssignmentKey || form.assignmentTitle,
+      deadlines: cooldownDeadlinesRef.current,
+    });
+    return deadline === null ? null : new Date(deadline);
+  }, [latestSubmissionActionAt, selectedCanonicalAssignmentKey, form.assignmentTitle]);
 
   const submissionCooldownRemainingMs = useMemo(() => {
     if (!nextAllowedSubmissionAt) return 0;
@@ -2856,17 +2864,33 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             </div>
           </div>
 
-          <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
-            <input
-              type="checkbox"
-              checked={form.confirmed || confirmationLocked}
-              onChange={handleChange("confirmed")}
-              disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay || !hasSelectedAssignment}
-            />
-            <span style={{ ...styles.label, margin: 0 }}>
-              I checked that this is the correct assignment.
-            </span>
-          </label>
+          <div
+            data-submission-consent-group={groupSubmissionConsent ? "true" : undefined}
+            role={groupSubmissionConsent ? "group" : undefined}
+            aria-label={groupSubmissionConsent ? "Confirm your submission" : undefined}
+            style={groupSubmissionConsent ? {
+              border: "1px solid #bfdbfe", borderRadius: 14, padding: 14,
+              background: "#eff6ff", display: "grid", gap: 8,
+            } : undefined}
+          >
+            {groupSubmissionConsent ? (
+              <strong style={{ color: "#1e3a8a" }}>Confirm your submission</strong>
+            ) : null}
+            <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
+              <input
+                type="checkbox"
+                checked={form.confirmed || confirmationLocked}
+                onChange={handleChange("confirmed")}
+                disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay || !hasSelectedAssignment}
+              />
+              <span style={{ ...styles.label, margin: 0 }}>
+                I checked that this is the correct assignment.
+              </span>
+            </label>
+            {groupSubmissionConsent ? (
+              <div data-submission-consent-slot="true" />
+            ) : null}
+          </div>
 
           <details style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
             <summary style={{ fontWeight: 700, cursor: "pointer", padding: "4px 0" }}>Review details</summary>

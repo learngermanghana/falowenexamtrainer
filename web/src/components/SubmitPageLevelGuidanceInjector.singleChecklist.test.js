@@ -52,3 +52,43 @@ describe("A2 submission completion checklist", () => {
     expect(button).toHaveTextContent("Submit final answers");
   });
 });
+
+describe("grouped A1–B1 submission confirmations", () => {
+  test.each(["A1", "A2", "B1"])("%s keeps assignment and required answers in the same panel", (level) => {
+    document.body.innerHTML = `
+      <select aria-label="Level"><option value="${level}" selected>${level}</option></select>
+      <select aria-label="Assignment"><option selected>${level} workbook</option></select>
+      <form>
+        <label>Your text<textarea>My final answers</textarea></label>
+        <span>Autosaved</span>
+        <div role="group" aria-label="Confirm your submission" data-submission-consent-group="true">
+          <label><input id="assignment-confirmation" type="checkbox">I checked that this is the correct assignment.</label>
+          <div data-submission-consent-slot="true"></div>
+        </div>
+        <button type="submit">Submit Assignment</button>
+      </form>`;
+    const assignmentCheck = document.getElementById("assignment-confirmation");
+    const assignmentLabel = assignmentCheck.parentElement;
+    const onChange = jest.fn();
+    assignmentCheck.addEventListener("change", onChange);
+    const options = { pathname: "/campus/submit", search: `?level=${level}`, root: document };
+    syncSubmitCompletionGuide(options);
+    const group = document.querySelector('[data-submission-consent-group="true"]');
+    const card = document.getElementById("falowen-submit-level-guidance");
+    expect(group).toContainElement(card);
+    expect(group).toContainElement(assignmentCheck);
+    expect(assignmentCheck.parentElement).toBe(assignmentLabel);
+    expect(card).not.toHaveTextContent("Completion consent");
+    const checks = [...card.querySelectorAll('input[name="falowen-submit-completion-check"]')];
+    expect(checks.length).toBeGreaterThan(0);
+    expect(document.querySelector('button[type="submit"]')).toBeDisabled();
+    assignmentCheck.click();
+    expect(onChange).toHaveBeenCalledTimes(1);
+    checks.forEach(check => { check.checked = true; });
+    syncSubmitCompletionGuide(options);
+    expect(document.querySelector('button[type="submit"]')).not.toBeDisabled();
+    expect(assignmentCheck).toBeChecked();
+    expect(document.querySelectorAll('#falowen-submit-level-guidance')).toHaveLength(1);
+    expect([...card.querySelectorAll('input[name="falowen-submit-completion-check"]')].every(check => check.checked)).toBe(true);
+  });
+});

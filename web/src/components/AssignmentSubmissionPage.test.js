@@ -96,6 +96,13 @@ describe("AssignmentSubmissionPage", () => {
     jest.clearAllMocks();
   });
 
+  it("groups the assignment confirmation beside the required-answer checklist slot", () => {
+    renderPage();
+    const group = screen.getByRole("group", { name: "Confirm your submission" });
+    expect(group).toContainElement(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
+    expect(group.querySelector('[data-submission-consent-slot="true"]')).toBeInTheDocument();
+  });
+
   it("requires an explicit assignment selection and excludes orientation from options", async () => {
     renderPage();
 

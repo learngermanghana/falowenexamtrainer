@@ -213,6 +213,17 @@ const guidanceHtml = (copy, level, assignment, checklist) => `
   <div style="font-size:12px;color:#64748b;">Detected assignment: <strong>${escapeHtml(assignment || "Select an assignment")}</strong> · Level: <strong>${escapeHtml(level || "A1")}</strong></div>
 `;
 
+// The assignment checkbox remains React-owned; inject required-part checks
+// into its adjacent slot rather than moving React nodes into an injected card.
+const groupedGuidanceHtml = (copy, assignment, checklist) => `
+  <div style="display:grid;gap:8px;color:#374151;font-size:14px;">
+    ${checklist.map((item) => `<label style="display:flex;align-items:flex-start;gap:8px;line-height:1.45;"><input type="checkbox" name="${CHECKLIST_NAME}" data-check-id="${escapeHtml(item.id)}" style="margin-top:3px;"><span>${escapeHtml(item.label)}</span></label>`).join("")}
+  </div>
+  <span style="font-size:12px;color:#64748b;">The Submit button unlocks only after every required item is checked.</span>
+  ${copy.note ? `<div style="font-size:13px;color:#92400e;line-height:1.5;"><strong>Note:</strong> ${escapeHtml(copy.note)}</div>` : ""}
+  <div style="font-size:12px;color:#64748b;">Required final answers · ${escapeHtml(assignment || "Select an assignment")}</div>
+`;
+
 const findEditorContainer = (form) => {
   const textarea = form?.querySelector?.("textarea");
   if (!textarea) return null;
@@ -220,6 +231,11 @@ const findEditorContainer = (form) => {
 };
 
 const placeGuidanceBelowEditor = (card, form) => {
+  const consentSlot = form?.querySelector('[data-submission-consent-slot="true"]');
+  if (consentSlot) {
+    if (card.parentElement !== consentSlot) consentSlot.appendChild(card);
+    return;
+  }
   const editorContainer = findEditorContainer(form);
   if (editorContainer?.parentElement) {
     if (editorContainer.nextElementSibling !== card) {
@@ -322,9 +338,16 @@ export const syncSubmitCompletionGuide = ({
   }
 
   card.__falowenSubmissionForm = form;
-  const checklistIdentity = `${level}:${assignmentKey}:${checklist.map((item) => item.id).join(",")}`;
+  const grouped = Boolean(form.querySelector('[data-submission-consent-slot="true"]'));
+  card.style.border = grouped ? "0" : "1px solid #bfdbfe";
+  card.style.background = grouped ? "transparent" : "linear-gradient(135deg, #eff6ff, #ffffff)";
+  card.style.padding = grouped ? "0" : "14px";
+  card.style.boxShadow = grouped ? "none" : "0 10px 24px rgba(15,23,42,.06)";
+  const checklistIdentity = `${grouped}:${level}:${assignmentKey}:${checklist.map((item) => item.id).join(",")}`;
   if (card.dataset.checklistIdentity !== checklistIdentity) {
-    card.innerHTML = guidanceHtml(copy, level, assignmentLabel, checklist);
+    card.innerHTML = grouped
+      ? groupedGuidanceHtml(copy, assignmentLabel, checklist)
+      : guidanceHtml(copy, level, assignmentLabel, checklist);
     card.dataset.checklistIdentity = checklistIdentity;
   }
 
