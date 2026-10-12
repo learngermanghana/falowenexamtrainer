@@ -157,7 +157,7 @@ const QuickMainAccess = ({ t, openCampus, openExamsRoom }) => (
         }
       />
       <PrimaryActionBar align="start">
-        <button style={styles.secondaryButton} onClick={openExamsRoom}>
+        <button type="button" style={styles.primaryButton} onClick={openExamsRoom}>
           Open Exams Room
         </button>
       </PrimaryActionBar>

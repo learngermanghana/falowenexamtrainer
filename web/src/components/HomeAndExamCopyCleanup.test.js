@@ -26,6 +26,16 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(footerIndex).toBeGreaterThan(classCardIndex);
   });
 
+
+  test("Course Book and Exams Room are equally prominent blue homepage buttons", () => {
+    const quickAccessStart = homeSource.indexOf("const QuickMainAccess");
+    const quickAccessEnd = homeSource.indexOf("const CompactCourseGuide", quickAccessStart);
+    const access = homeSource.slice(quickAccessStart, quickAccessEnd);
+    expect(access).toContain('<button style={styles.primaryButton} onClick={openCampus}>');
+    expect(access).toContain('<button type="button" style={styles.primaryButton} onClick={openExamsRoom}>');
+    expect(access).not.toContain('<button style={styles.secondaryButton} onClick={openExamsRoom}>');
+  });
+
   test("compact homepage class area contains only next class and Zoom, not the long class feed", () => {
     const canonicalStart = classCardSource.indexOf("{canonicalSummary ? (");
     const compactStart = classCardSource.indexOf("homepageCompact ? (", canonicalStart);

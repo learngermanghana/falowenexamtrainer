@@ -197,6 +197,79 @@ const knowledgeQuestions = [
   },
 ];
 
+
+const guidedChecks = [
+  {
+    id: "conjugate",
+    prompt: "Wir ___ in Hannover umsteigen.",
+    options: ["müssen", "muss", "musst"],
+    answer: "müssen",
+    explanation: "Wir takes müssen. The modal verb is conjugated for the subject.",
+  },
+  {
+    id: "infinitive",
+    prompt: "Der Zug muss um 14:20 Uhr ___.",
+    options: ["abfahren", "fährt ab", "abfährt"],
+    answer: "abfahren",
+    explanation: "After muss, the entire separable verb abfahren stays together as an infinitive.",
+  },
+  {
+    id: "word-order",
+    prompt: "Choose the sentence with correct word order.",
+    options: ["Ich muss am Bahnhof aussteigen.", "Ich muss am Bahnhof steige aus.", "Ich aussteigen muss am Bahnhof."],
+    answer: "Ich muss am Bahnhof aussteigen.",
+    explanation: "The conjugated modal follows the subject and the infinitive goes to the end.",
+  },
+];
+
+const sentenceTasks = [
+  { id: "departure", prompt: "Der Zug fährt um 14:20 Uhr ab. (müssen)", answer: "Der Zug muss um 14:20 Uhr abfahren." },
+  { id: "change", prompt: "Wir steigen in Hannover um. (müssen)", answer: "Wir müssen in Hannover umsteigen." },
+  { id: "board", prompt: "Die Fahrgäste steigen jetzt ein. (dürfen)", answer: "Die Fahrgäste dürfen jetzt einsteigen." },
+  { id: "get-off", prompt: "Ich steige am Hauptbahnhof aus. (müssen)", answer: "Ich muss am Hauptbahnhof aussteigen." },
+  { id: "return", prompt: "Wir fahren am Sonntag zurück. (möchten)", answer: "Wir möchten am Sonntag zurückfahren." },
+];
+
+const readingChecks = [
+  {
+    id: "platform-change",
+    prompt: "Auf welchem Gleis fährt der ICE 847 nach dem Gleiswechsel ab?",
+    options: ["Gleis 3", "Gleis 11", "Gleis 12"],
+    answer: "Gleis 12",
+    explanation: "Gleiswechsel: 12 means the platform has changed from 11 to 12.",
+  },
+  {
+    id: "delay",
+    prompt: "Der RE 4 soll um 14:35 Uhr abfahren. Er hat 10 Minuten Verspätung. Wann fährt er ab?",
+    options: ["14:25 Uhr", "14:35 Uhr", "14:45 Uhr"],
+    answer: "14:45 Uhr",
+    explanation: "14:35 + 10 minutes = 14:45 Uhr.",
+  },
+  {
+    id: "ticket-seat",
+    prompt: "Welchen Wagen und Sitz zeigt die Fahrkarte?",
+    options: ["Wagen 6, Sitz 42", "Wagen 7, Sitz 42", "Wagen 6, Sitz 24"],
+    answer: "Wagen 6, Sitz 42",
+    explanation: "The ticket says Wagen 6 · Sitz 42.",
+  },
+  {
+    id: "direct",
+    prompt: "Müssen Sie auf der Fahrt Berlin–Hamburg umsteigen?",
+    options: ["Ja, in Hannover.", "Nein, die Verbindung ist direkt.", "Ja, in Potsdam."],
+    answer: "Nein, die Verbindung ist direkt.",
+    explanation: "Direktverbindung: kein Umstieg means there is no change of trains.",
+  },
+];
+
+const exitTasks = [
+  { id: "exit-depart", prompt: "Der Zug fährt um 14:20 Uhr ab. Rewrite with müssen.", answer: "Der Zug muss um 14:20 Uhr abfahren." },
+  { id: "exit-get-off", prompt: "Ich steige am Hauptbahnhof aus. Rewrite with müssen.", answer: "Ich muss am Hauptbahnhof aussteigen." },
+];
+
+const normalizeSentence = (value) =>
+  String(value || "").normalize("NFC").trim().toLocaleLowerCase("de-DE")
+    .replace(/[.!?]+$/g, "").replace(/\s+/g, " ");
+
 const SectionCard = ({ title, children }) => (
   <section style={card}>
     <h2 style={sectionTitle}>{title}</h2>
@@ -218,6 +291,14 @@ const A1Day14ModalVerbsWorkbookPage = () => {
   const isA2Day17Context = requestedLevel === "A2" && requestedDay === 17;
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [testSubmitted, setTestSubmitted] = useState(false);
+  const [activeModal, setActiveModal] = useState("können");
+  const [guidedAnswers, setGuidedAnswers] = useState({});
+  const [sentenceAnswers, setSentenceAnswers] = useState({});
+  const [sentenceChecked, setSentenceChecked] = useState(false);
+  const [readingAnswers, setReadingAnswers] = useState({});
+  const [readingChecked, setReadingChecked] = useState(false);
+  const [exitAnswers, setExitAnswers] = useState({});
+  const [exitChecked, setExitChecked] = useState(false);
 
   const score = useMemo(
     () => knowledgeQuestions.reduce(
@@ -226,6 +307,25 @@ const A1Day14ModalVerbsWorkbookPage = () => {
     ),
     [selectedAnswers],
   );
+
+  const answeredCount = knowledgeQuestions.filter((question) => Boolean(selectedAnswers[question.id])).length;
+  const grammarScore = knowledgeQuestions.slice(0, 8)
+    .filter((question) => selectedAnswers[question.id] === question.answer).length;
+  const readingScore = knowledgeQuestions.slice(8)
+    .filter((question) => selectedAnswers[question.id] === question.answer).length;
+  const sentencesAnswered = sentenceTasks.filter((task) => String(sentenceAnswers[task.id] || "").trim()).length;
+  const sentenceScore = sentenceTasks.filter(
+    (task) => normalizeSentence(sentenceAnswers[task.id]) === normalizeSentence(task.answer),
+  ).length;
+  const readingAnswered = readingChecks.filter((question) => Boolean(readingAnswers[question.id])).length;
+  const readingPracticeScore = readingChecks.filter(
+    (question) => readingAnswers[question.id] === question.answer,
+  ).length;
+  const exitReady = exitTasks.every((task) => String(exitAnswers[task.id] || "").trim())
+    && String(exitAnswers.rule || "").trim();
+  const exitScore = exitTasks.filter(
+    (task) => normalizeSentence(exitAnswers[task.id]) === normalizeSentence(task.answer),
+  ).length;
 
   if (isA2Day17Context) {
     return <A2Day17InDieApothekeModalverbenFragenGrammarPage />;
@@ -244,7 +344,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1600&q=80"
             alt="Train journey through Germany"
             loading="lazy"
-            style={{ width: "100%", height: 230, objectFit: "cover", display: "block" }}
+            style={{ width: "100%", height: "clamp(150px, 24vw, 230px)", objectFit: "cover", display: "block" }}
           />
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.15))" }} />
           <div style={{ position: "absolute", left: 14, right: 14, bottom: 12, color: "white" }}>
@@ -279,6 +379,10 @@ const A1Day14ModalVerbsWorkbookPage = () => {
       </SectionCard>
 
       <SectionCard title="2) Quick modal-verb review">
+        <p style={{ margin: 0 }}>Already know these modal verbs? Continue to the main sentence pattern below.</p>
+        <details style={detailsStyle}>
+          <summary style={summaryStyle}>Review meanings and example sentences (optional)</summary>
+          <div style={{ display: "grid", gap: 12, padding: 12 }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10 }}>
           {modalVerbs.map((item) => (
             <div key={item.verb} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 13, background: "#f8fafc" }}>
@@ -290,30 +394,56 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         <div style={softAmber}>
           <strong>Remember:</strong> <strong>mögen</strong> means to like: <em>Ich mag Zugreisen.</em> <strong>möchten</strong> expresses a polite wish: <em>Ich möchte morgen zurückfahren.</em>
         </div>
+          </div>
+        </details>
       </SectionCard>
 
+
       <SectionCard title="3) Quick conjugation review">
-        <div style={{ overflowX: "auto", border: "1px solid #dbeafe", borderRadius: 14 }}>
-          <table aria-label="Modal verb conjugation table" style={{ width: "100%", minWidth: 760, borderCollapse: "collapse", background: "white" }}>
-            <thead>
-              <tr style={{ background: "#eff6ff" }}>
+        <p style={{ margin: 0 }}>Select one modal verb to see its forms without scrolling sideways on your phone.</p>
+        <label style={{ display: "grid", gap: 6, maxWidth: 320 }}>
+          <strong>Modal verb</strong>
+          <select
+            aria-label="Choose modal verb to review"
+            value={activeModal}
+            onChange={(event) => setActiveModal(event.target.value)}
+            style={{ padding: 12, borderRadius: 10, border: "1px solid #94a3b8", fontSize: "1rem" }}
+          >
+            {["können", "müssen", "dürfen", "wollen", "sollen", "möchten"].map((verb) => (
+              <option key={verb} value={verb}>{verb}</option>
+            ))}
+          </select>
+        </label>
+        <div data-a1-modal-conjugation-cards="true" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(125px, 1fr))", gap: 8 }}>
+          {modalConjugations.map((row) => (
+            <div key={row.pronoun} style={{ ...softBlue, padding: 10 }}>
+              <strong>{row.pronoun}</strong>
+              <div style={{ fontSize: "1.08rem", fontWeight: 800 }}>{row[activeModal]}</div>
+            </div>
+          ))}
+        </div>
+        <details style={detailsStyle}>
+          <summary style={summaryStyle}>Show complete conjugation table (optional)</summary>
+          <div style={{ overflowX: "auto", padding: 8 }}>
+            <table aria-label="Modal verb conjugation table" style={{ width: "100%", minWidth: 760, borderCollapse: "collapse", background: "white" }}>
+              <thead><tr style={{ background: "#eff6ff" }}>
                 {["Pronoun", "können", "müssen", "dürfen", "wollen", "sollen", "möchten"].map((heading) => (
                   <th key={heading} scope="col" style={{ textAlign: "left", padding: 11, borderBottom: "1px solid #bfdbfe", whiteSpace: "nowrap" }}>{heading}</th>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {modalConjugations.map((row) => (
-                <tr key={row.pronoun}>
-                  <th scope="row" style={{ textAlign: "left", padding: 11, borderBottom: "1px solid #e5e7eb", whiteSpace: "nowrap" }}>{row.pronoun}</th>
-                  {["können", "müssen", "dürfen", "wollen", "sollen", "möchten"].map((verb) => (
-                    <td key={verb} style={{ padding: 11, borderBottom: "1px solid #e5e7eb", whiteSpace: "nowrap" }}>{row[verb]}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </tr></thead>
+              <tbody>
+                {modalConjugations.map((row) => (
+                  <tr key={row.pronoun}>
+                    <th scope="row" style={{ textAlign: "left", padding: 11, borderBottom: "1px solid #e5e7eb", whiteSpace: "nowrap" }}>{row.pronoun}</th>
+                    {["können", "müssen", "dürfen", "wollen", "sollen", "möchten"].map((verb) => (
+                      <td key={verb} style={{ padding: 11, borderBottom: "1px solid #e5e7eb", whiteSpace: "nowrap" }}>{row[verb]}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
       </SectionCard>
 
       <SectionCard title="4) Modal verb + main verb">
@@ -350,7 +480,11 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="5) Separable main verbs · Trennbare Hauptverben">
+      <SectionCard title="5) More separable verb examples">
+        <p style={{ margin: 0 }}>The key rule is above. Open these examples whenever you need extra support.</p>
+        <details style={detailsStyle}>
+          <summary style={summaryStyle}>Compare six separable verbs with and without modals</summary>
+          <div style={{ display: "grid", gap: 12, padding: 12 }}>
         <div style={softBlue}>
           <strong>Pattern for a separable main verb:</strong> Subject + conjugated modal verb + details + <strong>complete separable main verb</strong>.<br />
           <strong>Example:</strong> Wir <strong>müssen</strong> in Hannover <strong>umsteigen</strong>.
@@ -393,14 +527,16 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           <s>Wir müssen in Hannover steigen um.</s><br />
           <strong>Correct:</strong> Wir müssen in Hannover umsteigen.
         </div>
+          </div>
+        </details>
       </SectionCard>
 
       <SectionCard title="6) Extra train reading practice">
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          The practice resources are shown below. Each part is open by default and can be collapsed or expanded separately.
+          Open the departure board, ticket, or vocabulary below when you need it. These reference sections start closed to keep the lesson shorter on your phone.
         </p>
         <div style={{ display: "grid", gap: 12 }}>
-          <details open style={detailsStyle}>
+          <details style={detailsStyle}>
             <summary style={summaryStyle}>Departure board · Die Abfahrtstafel</summary>
             <div style={{ padding: 14 }}>
               <div aria-label="German train departure board" style={{ borderRadius: 14, border: "1px solid #334155", background: "#0f172a", color: "#f8fafc", overflow: "hidden" }}>
@@ -426,7 +562,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             </div>
           </details>
 
-          <details open style={detailsStyle}>
+          <details style={detailsStyle}>
             <summary style={summaryStyle}>Ticket · Die Fahrkarte</summary>
             <div style={{ padding: 14 }}>
               <div aria-label="Example German train ticket" style={{ border: "2px solid #1d4ed8", borderRadius: 18, overflow: "hidden", background: "#ffffff", boxShadow: "0 10px 24px rgba(15,23,42,.08)" }}>
@@ -447,7 +583,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             </div>
           </details>
 
-          <details open style={detailsStyle}>
+          <details style={detailsStyle}>
             <summary style={summaryStyle}>Vocabulary · Wortschatz</summary>
             <div style={{ padding: 14, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8 }}>
               {travelVocabulary.map(([german, english]) => (
@@ -460,23 +596,110 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="7) Sentence-building practice">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Change each sentence so that it contains a modal verb. Keep the separable main verb together at the end.
+
+      <SectionCard title="7) Guided practice · Schritt für Schritt">
+        <p style={{ margin: 0, lineHeight: 1.65 }}>
+          First choose the correct modal form, then choose the complete infinitive, and finally check the word order.
+          These three short checks prepare you to build sentences on your own.
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 10 }}>
-          <div style={softAmber}><strong>Der Zug fährt um 14:20 Uhr ab.</strong><br />→ Der Zug muss um 14:20 Uhr abfahren.</div>
-          <div style={softAmber}><strong>Wir steigen in Hannover um.</strong><br />→ Wir müssen in Hannover umsteigen.</div>
-          <div style={softAmber}><strong>Die Fahrgäste steigen jetzt ein.</strong><br />→ Die Fahrgäste dürfen jetzt einsteigen.</div>
-          <div style={softAmber}><strong>Ich steige am Hauptbahnhof aus.</strong><br />→ Ich muss am Hauptbahnhof aussteigen.</div>
-        </div>
-        <div style={softGreen}>
-          <strong>Your turn:</strong> Write one sentence each with <strong>ankommen, abfahren, umsteigen, einsteigen</strong> and <strong>aussteigen</strong>. Use a different modal verb where possible.
+        <div style={{ display: "grid", gap: 12 }}>
+          {guidedChecks.map((question, index) => (
+            <fieldset key={question.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+              <legend style={{ padding: "0 6px", fontWeight: 700 }}>Step {index + 1}: {question.prompt}</legend>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {question.options.map((option) => (
+                  <button type="button" key={option}
+                    aria-pressed={guidedAnswers[question.id] === option}
+                    style={{ ...secondaryBtn, padding: "10px 12px", border: guidedAnswers[question.id] === option ? "2px solid #2563eb" : "1px solid #cbd5e1" }}
+                    onClick={() => setGuidedAnswers((current) => ({ ...current, [question.id]: option }))}>
+                    {option}
+                  </button>
+                ))}
+              </div>
+              {guidedAnswers[question.id] ? (
+                <p role="status" style={{ marginBottom: 0, color: guidedAnswers[question.id] === question.answer ? "#166534" : "#92400e" }}>
+                  <strong>{guidedAnswers[question.id] === question.answer ? "Correct! " : "Try again. "}</strong>{question.explanation}
+                </p>
+              ) : null}
+            </fieldset>
+          ))}
         </div>
       </SectionCard>
 
-      <SectionCard title="8) Knowledge test">
-        <p style={{ margin: 0 }}>Answer all ten questions. The final two questions use the train-reading practice above.</p>
+      <SectionCard title="8) Build your own sentences">
+        <p style={{ margin: 0 }}>Rewrite each sentence using the modal verb in brackets. Put the complete infinitive at the end. Answers are hidden until you check.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {sentenceTasks.map((task, index) => {
+            const correct = normalizeSentence(sentenceAnswers[task.id]) === normalizeSentence(task.answer);
+            return (
+              <div key={task.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+                <label htmlFor={"sentence-" + task.id} style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>
+                  {index + 1}. {task.prompt}
+                </label>
+                <textarea
+                  id={"sentence-" + task.id}
+                  aria-label={"Rewrite sentence " + (index + 1)}
+                  rows={2}
+                  value={sentenceAnswers[task.id] || ""}
+                  onChange={(event) => {
+                    setSentenceAnswers((current) => ({ ...current, [task.id]: event.target.value }));
+                    setSentenceChecked(false);
+                  }}
+                  placeholder="Write the complete German sentence..."
+                  style={{ width: "100%", boxSizing: "border-box", font: "inherit", padding: 12, borderRadius: 9, border: "1px solid #94a3b8" }}
+                />
+                {sentenceChecked ? (
+                  <div role="status" style={{ ...(correct ? softGreen : softAmber), marginTop: 8 }}>
+                    <strong>{correct ? "Correct!" : "Suggested answer:"}</strong> {task.answer}
+                    {!correct ? <p style={{ marginBottom: 0 }}>Check the modal ending and keep the infinitive together at the end. Punctuation and capitals do not affect this check.</p> : null}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+        <p style={{ margin: 0 }} role="status">{sentencesAnswered} of {sentenceTasks.length} sentences written</p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" style={primaryBtn} disabled={sentencesAnswered < sentenceTasks.length} onClick={() => setSentenceChecked(true)}>Check my sentences</button>
+          <button type="button" style={secondaryBtn} onClick={() => { setSentenceAnswers({}); setSentenceChecked(false); }}>Try again</button>
+        </div>
+        {sentenceChecked ? <div role="status" style={sentenceScore >= 4 ? softGreen : softAmber}>
+          <strong>{sentenceScore} of {sentenceTasks.length} example answers matched.</strong> Review any differences above and retry.
+          Other natural German wordings may be correct; this offline checker compares your text with the taught examples.
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="9) Train-reading practice · Lesen">
+        <p style={{ margin: 0 }}>Use the departure board and ticket in Section 6 to find the information. Open either resource when you need it.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {readingChecks.map((question, index) => (
+            <fieldset key={question.id} style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+              <legend style={{ padding: "0 6px", fontWeight: 700 }}>{index + 1}. {question.prompt}</legend>
+              {question.options.map((option) => (
+                <label key={option} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "7px 0", cursor: "pointer" }}>
+                  <input type="radio" name={"reading-" + question.id} checked={readingAnswers[question.id] === option}
+                    onChange={() => { setReadingAnswers((current) => ({ ...current, [question.id]: option })); setReadingChecked(false); }} />
+                  <span>{option}</span>
+                </label>
+              ))}
+              {readingChecked ? <div style={readingAnswers[question.id] === question.answer ? softGreen : softAmber}>
+                <strong>{readingAnswers[question.id] === question.answer ? "Correct." : "Correct answer: " + question.answer}</strong>
+                <p style={{ marginBottom: 0 }}>{question.explanation}</p>
+              </div> : null}
+            </fieldset>
+          ))}
+        </div>
+        <p role="status" style={{ margin: 0 }}>{readingAnswered} of {readingChecks.length} reading questions answered</p>
+        <button type="button" style={primaryBtn} disabled={readingAnswered < readingChecks.length} onClick={() => setReadingChecked(true)}>Check reading answers</button>
+        {readingChecked ? <div role="status" style={readingPracticeScore >= 3 ? softGreen : softAmber}>
+          <strong>Reading practice: {readingPracticeScore} / {readingChecks.length}</strong> · Review the departure board or ticket for any missed details.
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="10) Knowledge test">
+        <p style={{ margin: 0 }}>Answer all ten questions before checking. Questions 1–8 test grammar; 9–10 check train reading.</p>
+        <p role="status" style={{ margin: 0, fontWeight: 700 }}>{answeredCount} of {knowledgeQuestions.length} questions answered</p>
+        <progress aria-label="Knowledge test completion" max={knowledgeQuestions.length} value={answeredCount} style={{ width: "100%", height: 12 }} />
         <div style={{ display: "grid", gap: 14 }}>
           {knowledgeQuestions.map((question, index) => {
             const selected = selectedAnswers[question.id];
@@ -510,7 +733,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           })}
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={primaryBtn} onClick={() => setTestSubmitted(true)}>
+          <button type="button" style={primaryBtn} disabled={answeredCount < knowledgeQuestions.length} onClick={() => setTestSubmitted(true)}>
             Check knowledge test
           </button>
           <button type="button" style={secondaryBtn} onClick={resetTest}>
@@ -520,14 +743,52 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         {testSubmitted ? (
           <div role="status" style={score >= 7 ? softGreen : softAmber}>
             <strong>Score: {score} / {knowledgeQuestions.length}</strong><br />
+            <span>Grammar: {grammarScore} / 8 · Reading: {readingScore} / 2</span><br />
             {score >= 7
-              ? "Good understanding. Review any incorrect separable prefixes and practise the sentence pairs aloud."
-              : "Review the prefix list and the difference between sentences with and without modal verbs, then try again."}
+              ? "Good progress. Review any mistakes above before moving on."
+              : "Review the missed answers and try again. Focus on modal endings and keeping the complete infinitive together."}
+            {grammarScore < 6 ? <p style={{ marginBottom: 0 }}>Grammar focus: review Sections 3–5, then redo the sentence-building exercises.</p> : null}
+            {readingScore < 2 ? <p style={{ marginBottom: 0 }}>Reading focus: reopen the departure board and ticket in Section 6.</p> : null}
           </div>
         ) : null}
       </SectionCard>
 
-      <SectionCard title="9) Final self-check">
+
+      <SectionCard title="11) Exit check · Show what you learned">
+        <p style={{ margin: 0 }}>Complete two transformations without looking at the examples. Then explain the word-order rule in your own words. Compare your work before you finish this lesson.</p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {exitTasks.map((task, index) => (
+            <div key={task.id}>
+              <label htmlFor={"exit-" + task.id} style={{ fontWeight: 700, display: "block", marginBottom: 6 }}>
+                {index + 1}. {task.prompt}
+              </label>
+              <textarea id={"exit-" + task.id} rows={2} value={exitAnswers[task.id] || ""}
+                onChange={(event) => { setExitAnswers((current) => ({ ...current, [task.id]: event.target.value })); setExitChecked(false); }}
+                style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
+              {exitChecked ? <p role="status" style={{ marginTop: 5 }}>
+                <strong>{normalizeSentence(exitAnswers[task.id]) === normalizeSentence(task.answer) ? "Matches the example." : "Compare with:"}</strong> {task.answer}
+              </p> : null}
+            </div>
+          ))}
+          <div>
+            <label htmlFor="exit-rule" style={{ display: "block", fontWeight: 700, marginBottom: 6 }}>
+              3. Explain: What happens to the separable prefix when you add a modal verb?
+            </label>
+            <textarea id="exit-rule" rows={3} value={exitAnswers.rule || ""}
+              onChange={(event) => { setExitAnswers((current) => ({ ...current, rule: event.target.value })); setExitChecked(false); }}
+              placeholder="Explain in German or English."
+              style={{ width: "100%", boxSizing: "border-box", padding: 12, font: "inherit", border: "1px solid #94a3b8", borderRadius: 9 }} />
+          </div>
+        </div>
+        <button type="button" style={primaryBtn} disabled={!exitReady} onClick={() => setExitChecked(true)}>Compare my exit check</button>
+        {exitChecked ? <div role="status" style={softBlue}>
+          <strong>Sentence examples matched: {exitScore} / {exitTasks.length}.</strong>
+          <p style={{ margin: "8px 0 0" }}><strong>Rule to compare with your explanation:</strong> Without a modal, the prefix separates (fährt ... ab). With a modal, the conjugated modal comes early and the complete infinitive stays at the end (muss ... abfahren).</p>
+          <p style={{ marginBottom: 0 }}>Read your explanation again. Does it clearly mention the whole infinitive at the end? This self-check does not use AI or upload answers.</p>
+        </div> : null}
+      </SectionCard>
+
+      <SectionCard title="12) Final self-check">
         <ul style={listStyle}>
           <li>I can identify the conjugated modal verb and the main verb.</li>
           <li>I know that the main verb goes to the end in the infinitive form after a modal verb.</li>
