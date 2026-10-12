@@ -81,7 +81,7 @@ jest.mock("../firebase", () => ({
   setDoc: jest.fn(() => Promise.resolve()),
 }));
 
-import { addDoc, getDocs } from "../firebase";
+import { addDoc, getDocs, getDoc } from "../firebase";
 import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
 
 const renderPage = (initialEntries = ["/"]) =>
@@ -101,6 +101,21 @@ describe("AssignmentSubmissionPage", () => {
     const group = screen.getByRole("group", { name: "Confirm your submission" });
     expect(group).toContainElement(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
     expect(group.querySelector('[data-submission-consent-slot="true"]')).toBeInTheDocument();
+  });
+
+  it("saves a student's first submission without reading a missing lock document", async () => {
+    getDocs.mockResolvedValue({ docs: [], empty: true });
+    getDoc.mockRejectedValueOnce(Object.assign(new Error("Missing or insufficient permissions"), { code: "permission-denied" }));
+    renderPage(["/campus/submit?level=A1&assignmentKey=A1-1.1"]);
+    await waitFor(() => expect(screen.getByRole("textbox", { name: /Your text/i })).not.toBeDisabled());
+    fireEvent.change(screen.getByRole("textbox", { name: /Your text/i }), {
+      target: { value: "Meine Antwort beschreibt meine Familie und meinen Alltag. Ich lerne Deutsch und übe jeden Tag mit meinen Freunden in unserer Klasse." },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
+    fireEvent.click(screen.getByRole("button", { name: /^Submit assignment$/i }));
+    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    expect(getDoc).not.toHaveBeenCalled();
+    getDoc.mockReset().mockResolvedValue({ exists: () => false });
   });
 
   it("requires an explicit assignment selection and excludes orientation from options", async () => {

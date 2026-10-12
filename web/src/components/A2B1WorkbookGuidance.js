@@ -204,7 +204,7 @@ const hideLegacyWorkbookTabSelectors = () => {
 
   document.querySelectorAll("div, nav").forEach((container) => {
     if (container.closest("[data-universal-a2-workbook-tabs]")) return;
-    if (container.matches("[data-workbook-tab-navigation]") || container.querySelector("[data-workbook-tab-navigation]")) return;
+    if (container.closest("[data-workbook-tab-navigation]") || container.querySelector("[data-workbook-tab-navigation]")) return;
 
     const directButtons = Array.from(container.children).filter((child) => child.tagName === "BUTTON");
     if (directButtons.length < 4 || directButtons.length > 8) return;
@@ -284,6 +284,13 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
     }
 
     const checkTabs = () => {
+      // Native workbook navigation owns its section state and must stay visible.
+      // The compatibility tabs are only needed when that navigation is absent.
+      const nativeNavigation = document.querySelector("[data-workbook-tab-navigation]");
+      if (nativeNavigation && isElementVisible(nativeNavigation)) {
+        setShowFallbackTabs(false);
+        return;
+      }
       if (shouldForceSharedA2Tabs()) {
         hideLegacyWorkbookTabSelectors();
         setShowFallbackTabs(true);

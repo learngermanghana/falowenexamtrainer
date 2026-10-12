@@ -4,6 +4,7 @@ on:
     paths:
       - 'firestore.rules'
       - 'tests/firestore-staff-access.test.cjs'
+      - 'tests/firestore-submission-lock.test.cjs'
       - '.github/workflows/admin-staff-access-tests.yml'
   workflow_dispatch:
 jobs:
@@ -24,4 +25,4 @@ jobs:
         env:
           NODE_PATH: ${{ runner.temp }}/falowen-rules-tests/node_modules
         run: |
-          "$RUNNER_TEMP/falowen-rules-tests/node_modules/.bin/firebase" emulators:exec --only firestore --project demo-falowen-staff 'node --test tests/firestore-staff-access.test.cjs'
+          "$RUNNER_TEMP/falowen-rules-tests/node_modules/.bin/firebase" emulators:exec --only firestore --project demo-falowen-staff 'node --test tests/firestore-staff-access.test.cjs tests/firestore-submission-lock.test.cjs'

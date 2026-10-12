@@ -5,6 +5,8 @@ import { styles } from "../styles";
 import { InfoBox } from "./ui";
 import { useTimedAssignment } from "./SharedTimedAssignment";
 import { SUBMISSION_COOLDOWN_MS, resolveSubmissionCooldownDeadline } from "../utils/submissionCooldown";
+import { findOwnedSubmissionLock } from "../services/submissionLockService";
+import { getSubmissionSaveError } from "../utils/submissionSaveError";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
@@ -23,7 +25,6 @@ import {
   collection,
   db,
   doc,
-  getDoc,
   functions,
   getDocs,
   httpsCallable,
@@ -1174,8 +1175,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       const lockId = getLockDocId(form.assignmentTitle);
       const lockRef = doc(db, LOCK_COLLECTION, lockId);
 
-      const lockSnap = await getDoc(lockRef);
-      if (lockSnap.exists()) {
+      const existingLock = await findOwnedSubmissionLock({ db, studentId: user.uid, lockId });
+      if (existingLock) {
         const chapterKey = buildChapterKey(form.assignmentTitle);
         if (chapterKey) setLockedChapters((prev) => new Set([...prev, chapterKey]));
         setConfirmationLocked(true);
@@ -2144,7 +2145,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       }
     } catch (error) {
       console.error("Failed to save submission", error);
-      setStatus({ loading: false, error: "Could not save your submission.", success: "" });
+      setStatus({ loading: false, error: getSubmissionSaveError(error), success: "" });
     }
   };
 
@@ -2281,7 +2282,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       });
     } catch (error) {
       console.error("Failed to save draft", error);
-      setStatus({ loading: false, error: "Could not save your draft.", success: "" });
+      setStatus({ loading: false, error: getSubmissionSaveError(error, "draft"), success: "" });
     }
   };
 
