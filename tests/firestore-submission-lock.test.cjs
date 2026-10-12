@@ -13,6 +13,30 @@ test('a missing lock read is denied to a student but allowed to staff', async ()
   await assertFails(getDoc(doc(student, 'submissionLocks/not-created')));
   await assertSucceeds(getDoc(doc(staff, 'submissionLocks/not-created')));
 });
+test('A1 timed mock can check its own unused lock without exposing another student', async () => {
+  const owner = env.authenticatedContext('timed-student', { email: 'student@example.com' }).firestore();
+  const other = env.authenticatedContext('student-two').firestore();
+  const signedOut = env.unauthenticatedContext().firestore();
+  // The UI normalizes both UID and assignment key when constructing the lock ID.
+  const path = 'submissionLocks/timed__timed-student__a1-8.22';
+  const unused = await assertSucceeds(getDoc(doc(owner, path)));
+  if (unused.exists()) throw new Error('First timed attempt must not already exist');
+
+  await assertFails(getDoc(doc(other, path)));
+  await assertFails(getDoc(doc(signedOut, path)));
+  await assertFails(getDoc(doc(owner, 'submissionLocks/timed__student-two__a1-8.22')));
+  await assertFails(getDoc(doc(owner, 'submissionLocks/unrelated-missing-lock')));
+
+  const lock = { studentId: 'timed-student', assignmentKey: 'A1-8.22',
+    timerRecord: true, status: 'active', level: 'A1', durationSeconds: 2100 };
+  await assertSucceeds(setDoc(doc(owner, path), lock));
+  const active = await assertSucceeds(getDoc(doc(owner, path)));
+  if (!active.exists() || active.data().status !== 'active') {
+    throw new Error('Owner cannot resume their timed attempt');
+  }
+  await assertFails(getDoc(doc(other, path)));
+});
+
 test('owner-scoped lookup permits first submission and saving a draft without broadening access', async () => {
   const db = env.authenticatedContext('student-one', { email: 'student@example.com' }).firestore();
   const locks = query(collection(db, 'submissionLocks'), where('studentId', '==', 'student-one'));

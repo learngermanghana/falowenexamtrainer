@@ -102,6 +102,13 @@ service cloud.firestore {
 
     match /submissionLocks/{lockId} {
       allow create: if ownsStudentIncoming() || isStaff();
+      // The timed-assignment UI listens to a student's deterministic lock ID
+      // before the first attempt exists. An absent document has no resource.data
+      // for ownsStudentResource() to check; permit only this owner's missing lock.
+      // Existing lock contents remain subject to the ownership check below.
+      allow get: if signedIn()
+        && resource == null
+        && lockId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
       allow read: if ownsStudentResource() || isStaff();
       allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
       allow delete: if isStaff();
