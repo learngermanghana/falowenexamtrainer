@@ -80,7 +80,7 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         >
           Continue learning
         </button>
-        <div className="falowen-welcome-secondary" aria-label="More student actions">
+        <div className="falowen-welcome-secondary" role="group" aria-label="More student actions">
           <button
             type="button"
             className="falowen-welcome-secondary-button"
@@ -94,8 +94,10 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
             className="falowen-welcome-secondary-button"
             style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
             onClick={onJoinZoom}
+            aria-label={t("generalHome.welcome.joinZoom")}
           >
-            {t("generalHome.welcome.joinZoom")}
+            <span className="falowen-welcome-zoom-desktop">{t("generalHome.welcome.joinZoom")}</span>
+            <span className="falowen-welcome-zoom-mobile" aria-hidden="true">Zoom</span>
           </button>
           <div className="falowen-welcome-exam-badge">
             <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
