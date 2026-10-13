@@ -130,4 +130,23 @@ describe("authenticated Exam Room history", () => {
       rawScore: 0, total: 5,
     }).percent).toBe(0);
   });
+  test("old B2 full mock rows gain four-skill breakdown without a database migration", () => {
+    const row = normalizeExamRoomHistoryRow("b2-score", {
+      source: "b2_final_mock", level: "B2", score: 76,
+      sectionScores: { lesen: 20, hoeren: 18, schreiben: 17, sprechen: 21 },
+    });
+    expect(row.scoreBreakdown.map((part) => [part.label, part.score, part.maxScore]))
+      .toEqual([
+        ["Lesen", 20, 25], ["Hören", 18, 25],
+        ["Schreiben", 17, 25], ["Sprechen", 21, 25],
+      ]);
+    const partial = normalizeExamRoomHistoryRow("old-score", {
+      source: "a1_final_mock", level: "A1", score: 0,
+      sectionScores: { lesen: 0, hoeren: null },
+    });
+    expect(partial.scoreBreakdown).toHaveLength(1);
+    expect(partial.scoreBreakdown[0].score).toBe(0);
+  });
+
+
 });
