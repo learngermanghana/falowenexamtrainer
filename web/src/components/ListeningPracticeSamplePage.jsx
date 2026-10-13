@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
@@ -197,7 +198,7 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
 
 const ChoiceOptions = ({ name, options, value, onChange, disabled }) => (
   <div style={{ display: "grid", gap: 8 }}>
-    {options.map((option) => (
+    {arrangeMockChoices(options, `sample-${name}`).map((option) => (
       <label
         key={option.id}
         style={{
@@ -218,7 +219,7 @@ const ChoiceOptions = ({ name, options, value, onChange, disabled }) => (
           onChange={() => onChange(option.id)}
           disabled={disabled}
         />
-        <strong>{option.id}</strong>
+        <strong>{option.displayId}</strong>
         <span>{option.label || option.short || option.id}</span>
       </label>
     ))}
@@ -471,12 +472,12 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
     setAnswers((current) => ({ ...current, [key]: value }));
   };
 
-  const feedback = (key, answer) => {
+  const feedback = (key, answer, options = null, displayKey = `sample-${key}`) => {
     if (!submitted) return null;
     const correct = String(answers[key] || "").toLowerCase() === String(answer).toLowerCase();
     return (
       <p style={{ margin: "8px 0 0", fontWeight: 700, color: correct ? "#166534" : "#991b1b" }}>
-        {correct ? "Correct." : `Correct answer: ${answer}`}
+        {correct ? "Correct." : `Correct answer: ${options ? mockDisplayAnswer(options, answer, displayKey) : answer}`}
       </p>
     );
   };
@@ -508,6 +509,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
 
     if (normalizedLevel === "A2" && sampleId === "sample-2" && part.key === "teil2") {
       const used = new Set(part.data.questions.map((question) => answers[`${part.key}-${question.number}`]).filter(Boolean));
+      const pictureChoices = arrangeMockChoices(part.data.pictures.map(([id,label,icon]) => ({id: id.toLowerCase(),label,icon})), "a2-mock2-picture-board");
       return (
         <>
           <div style={{ display: "grid", gap: 10 }}>
@@ -524,19 +526,19 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
                     style={{ padding: 11, maxWidth: "100%", border: "1px solid #cbd5e1", borderRadius: 8 }}
                   >
                     <option value="">Bild wählen</option>
-                    {part.data.pictures.map(([id, label]) => (
-                      <option key={id} value={id.toLowerCase()} disabled={used.has(id.toLowerCase()) && answers[key] !== id.toLowerCase()}>{id} · {label}</option>
+                    {pictureChoices.map(({id, displayId, label}) => (
+                      <option key={id} value={id} disabled={used.has(id) && answers[key] !== id}>{displayId.toUpperCase()} · {label}</option>
                     ))}
                   </select>
-                  {feedback(key, question.answer)}
+                  {feedback(key, question.answer, pictureChoices, "a2-mock2-picture-board")}
                 </label>
               );
             })}
           </div>
           <div className="a2-hoeren-picture-grid">
-            {part.data.pictures.map(([id, label, emoji]) => (
+            {pictureChoices.map(({id, displayId, label, icon}) => (
               <div key={id} className="a2-hoeren-picture-card" style={{ padding: 12 }}>
-                <strong>{id}</strong> <span aria-hidden="true">{emoji}</span> {label}
+                <strong>{displayId.toUpperCase()}</strong> <span aria-hidden="true">{icon}</span> {label}
               </div>
             ))}
           </div>
@@ -615,7 +617,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
                 </header>
 
                 <div className="a2-t3-options">
-                  {question.options.map((option) => (
+                  {arrangeMockChoices(question.options, `sample-${key}`).map((option) => (
                     <label
                       className={answers[key] === option.id ? "a2-t3-option selected" : "a2-t3-option"}
                       key={option.id}
@@ -627,13 +629,13 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
                         onChange={() => setAnswer(key, option.id)}
                         disabled={submitted}
                       />
-                      <span className="a2-t3-letter">{option.id}</span>
+                      <span className="a2-t3-letter">{option.displayId}</span>
                       <A2ListeningTeil3Picture icon={option.icon} />
                       <span className="a2-t3-hidden-label">{option.label}</span>
                     </label>
                   ))}
                 </div>
-                {feedback(key, question.answer)}
+                {feedback(key, question.answer, question.options, `sample-${key}`)}
               </article>
             );
           })}
@@ -675,7 +677,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
               disabled={submitted}
             />
           )}
-          {feedback(key, question.answer)}
+          {feedback(key, question.answer, question.options)}
         </article>
       );
     });
