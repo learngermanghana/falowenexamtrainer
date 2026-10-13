@@ -78,3 +78,10 @@ test("all released full-mock writing textareas start without model answers or st
   expect(a2).toContain('sms: "", email: ""');
   expect(a2).toContain('Antwortfeld leeren');
 });
+
+test("JSX textarea matcher includes attributes after an inline arrow-function handler", () => {
+  const jsx = '<textarea value={text} onChange={(event) => setText(event.target.value)} rows={5} autoComplete="off" />';
+  const matched = jsx.match(/<textarea\\b[\\s\\S]*?\\/>/g) || [];
+  expect(matched).toEqual([jsx]);
+  expect(matched[0]).toContain('autoComplete="off"');
+});
