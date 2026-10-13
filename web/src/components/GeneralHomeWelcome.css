@@ -25,6 +25,7 @@
   padding: 10px 16px !important;
 }
 .falowen-welcome-mobile-exam { display: none; }
+.falowen-welcome-zoom-mobile { display: none; }
 .falowen-welcome-actions button:focus-visible {
   outline: 3px solid #fef08a;
   outline-offset: 2px;
@@ -87,6 +88,8 @@
   }
   /* The desktop readiness status button contains a progress badge and is too
      wide for a phone. Retain the destination as one clear, compact touch target. */
+  .falowen-welcome-zoom-desktop { display: none; }
+  .falowen-welcome-zoom-mobile { display: inline; }
   .falowen-welcome-exam-badge { display: none; }
   .falowen-welcome-mobile-exam {
     display: inline-flex;
