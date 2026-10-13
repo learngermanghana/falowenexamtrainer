@@ -15,12 +15,13 @@ describe("A1 Day 15 · Speaking Exam Intro English support", () => {
     ["wiederholen", "to repeat", "Wiederholen Sie das bitte.", "Please repeat that.", "Können Sie das bitte wiederholen?", "Could you please repeat that?"],
     ["sprechen", "to speak", "Sprechen Sie bitte langsamer.", "Please speak more slowly.", "Können Sie bitte langsamer sprechen?", "Could you please speak more slowly?"],
   ])("keeps %s and shows the English directly beneath each German form", (infinitive, infinitiveEn, imperative, imperativeEn, question, questionEn) => {
+    const imperativeTable = screen.getAllByRole("table")[1];
     for (const [german, english] of [
       [infinitive, infinitiveEn],
       [imperative, imperativeEn],
       [question, questionEn],
     ]) {
-      const cell = screen.getByText(german).closest("td");
+      const cell = within(imperativeTable).getByText(german).closest("td");
       expect(cell).toBeInTheDocument();
       const translation = within(cell).getByText(english);
       expect(translation).toHaveAttribute("lang", "en");
