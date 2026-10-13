@@ -232,6 +232,10 @@
       "dest": "/api/sync-student.js"
     },
     {
+      "src": "/api/placement-attempts",
+      "dest": "/api/placement-attempts.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
