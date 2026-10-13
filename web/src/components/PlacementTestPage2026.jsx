@@ -90,6 +90,19 @@ export default function PlacementTestPage2026() {
       lang: i18n.language,
       canonicalPath: "/placement-test",
       ogType: "article",
+      structuredData: [{
+        id: "article",
+        schema: {
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: pageTitle,
+          description: pageDescription,
+          author: { "@type": "Organization", name: "Falowen" },
+          publisher: { "@type": "Organization", name: "Falowen", logo: { "@type": "ImageObject", url: "https://www.falowen.app/logo512.png" } },
+          mainEntityOfPage: "https://www.falowen.app/placement-test",
+          dateModified: new Date().toISOString(),
+        },
+      }],
     });
   }, [i18n.language, t]);
 
