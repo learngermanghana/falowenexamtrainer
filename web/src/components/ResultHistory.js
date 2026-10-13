@@ -6,6 +6,7 @@ import { CURRICULUM_ENTRIES } from "../data/curriculumManifest";
 import { getConfiguredInAppWorkbookResourceRoute, normalizeFalowenCourseRoute } from "../data/inAppWorkbookRoutes";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
+import { getSavedMockSectionRows, formatMockSectionScore } from "../utils/mockSectionScores";
 import { EmptyState, InfoBox, PillBadge, SectionHeader, SkeletonRow } from "./ui";
 
 const PASS_MARK = 60;
@@ -217,6 +218,14 @@ const formatWritingScore = (item = {}) => {
 };
 
 export const getScoreBreakdownRows = (item = {}) => {
+  const mockModules = getSavedMockSectionRows(item);
+  if (mockModules.length) {
+    return mockModules.map(({ label, score, maxScore }) => ({
+      label,
+      score: `${formatMockSectionScore(score)}/${formatMockSectionScore(maxScore)}`,
+      detail: "Saved mock section result",
+    }));
+  }
   const rows = [];
   const seenCategories = new Set();
   const addRow = (row) => {
@@ -695,6 +704,9 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         writingScorePercent: entry.writingScorePercent ?? null,
         maxWritingScore: entry.maxWritingScore ?? null,
         scoreBreakdown: entry.scoreBreakdown ?? [],
+        sectionScores: entry.sectionScores ?? {},
+        source: entry.source || "",
+        resultType: entry.resultType || "",
         corrections: entry.corrections ?? [],
         improvementSummary: entry.improvementSummary || "",
         markingReason: entry.markingReason || entry.rawAiReason || entry.aiReason || "",
