@@ -16,6 +16,7 @@ import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
 import { detectLevelKey } from "../lib/day0Workbook";
+import { getSessionHomeMotivation } from "../data/homeMotivationMessages";
 
 const day0WorkbookByLevel = {
   A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
@@ -36,6 +37,12 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
   const courseLabel = levelKey ? `${levelKey} course` : "your course";
+  const learnerId = studentProfile?.uid || studentProfile?.id || studentProfile?.studentCode
+    || studentProfile?.studentcode || studentProfile?.email;
+  const motivation = useMemo(
+    () => getSessionHomeMotivation({ studentId: learnerId, level: levelKey }),
+    [learnerId, levelKey],
+  );
 
   return (
     <section
@@ -50,8 +57,10 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
       }}
     >
       <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>{t("generalHome.welcome.eyebrow")}</p>
-      <h2 style={{ margin: 0, fontSize: 24, letterSpacing: -0.3 }}>
-        {t("generalHome.welcome.title", { studentName })}
+      <h2 data-testid="home-motivation-heading" style={{ margin: 0, fontSize: "clamp(20px, 4vw, 26px)", lineHeight: 1.3, letterSpacing: -0.3, overflowWrap: "break-word" }}>
+        {motivation.id === "fallback"
+          ? t("generalHome.welcome.title", { studentName })
+          : `${studentName}, ${motivation.headline}`}
       </h2>
       <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
         Your {courseLabel} is ready. Use Campus for daily learning, and use Exams Room for exam practice.
