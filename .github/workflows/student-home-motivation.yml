@@ -6,6 +6,8 @@ on:
       - "web/src/data/homeMotivationMessages.js"
       - "web/src/data/homeMotivationMessages.test.js"
       - "web/src/components/GeneralHome.js"
+      - "web/src/components/GeneralHomeWelcome.css"
+      - "web/src/components/GeneralHomeMobileWelcome.test.js"
       - "web/src/context/AuthContext.js"
       - ".github/workflows/student-home-motivation.yml"
   push:
@@ -14,6 +16,8 @@ on:
       - "web/src/data/homeMotivationMessages.js"
       - "web/src/data/homeMotivationMessages.test.js"
       - "web/src/components/GeneralHome.js"
+      - "web/src/components/GeneralHomeWelcome.css"
+      - "web/src/components/GeneralHomeMobileWelcome.test.js"
       - "web/src/context/AuthContext.js"
       - ".github/workflows/student-home-motivation.yml"
 
@@ -32,7 +36,7 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Verify session rotation and homepage regressions
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/data/homeMotivationMessages.test.js src/components/GeneralHomeClassIdentity.test.js src/components/HomeAndExamCopyCleanup.test.js src/components/SignedInHomeClassSchedule.test.jsx
+        run: npx jest --runInBand --runTestsByPath src/data/homeMotivationMessages.test.js src/components/GeneralHomeMobileWelcome.test.js src/components/GeneralHomeClassIdentity.test.js src/components/HomeAndExamCopyCleanup.test.js src/components/SignedInHomeClassSchedule.test.jsx
       - name: Build student website
         working-directory: web
         run: npx vite build
