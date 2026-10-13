@@ -1,6 +1,6 @@
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
-import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
+import { arrangeMockChoices, mockA1ReviewAnswer } from "../utils/mockChoicePresentation";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -1007,8 +1007,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : submitted}</span>
-                <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Your answer: {mockA1ReviewAnswer(question, submitted, "lesen", key)}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockA1ReviewAnswer(question, question.answer, "lesen", key) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
@@ -1024,8 +1024,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Your answer: {mockA1ReviewAnswer(question, submitted, "hoeren", key)}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockA1ReviewAnswer(question, question.answer, "hoeren", key) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
