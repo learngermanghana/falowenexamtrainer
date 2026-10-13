@@ -46,3 +46,22 @@ export function mockDisplayAnswer(options, answer, questionKey) {
     String(option.id).toLowerCase() === String(answer).toLowerCase());
   return String(item?.displayId || answer).toUpperCase();
 }
+
+
+/**
+ * A1 review must display the same letters as the answer controls.
+ * section is lesen or hoeren, matching the input name. Picture answer
+ * controls additionally prefix their input name with a1-picture-.
+ * Original answer IDs and scores remain untouched.
+ */
+export function mockA1ReviewAnswer(question, answer, section, key) {
+  if (!question?.options || question.options.length < 3) return answer || "—";
+  const inputName = `${section}-${key}`;
+  const usesPictureCards = section === "hoeren" &&
+    question.options.some((option) => Boolean(option.picture));
+  return mockDisplayAnswer(
+    question.options,
+    answer,
+    usesPictureCards ? `a1-picture-${inputName}` : inputName,
+  );
+}
