@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import PlacementTestPageLegacy from "./PlacementTestPageLegacy";
+import PlacementTestPage2026 from "./PlacementTestPage2026";
 import PlacementFunnelNextStep from "./PlacementFunnelNextStep";
 import {
   rememberPublicFunnelContext,
@@ -87,7 +87,7 @@ export default function PlacementTestPage() {
 
   return (
     <div ref={rootRef}>
-      <PlacementTestPageLegacy />
+      <PlacementTestPage2026 />
       {mount && result ? createPortal(<PlacementFunnelNextStep result={result} />, mount) : null}
     </div>
   );
