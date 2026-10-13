@@ -169,6 +169,14 @@
       "dest": "/index.html"
     },
     {
+      "src": "/goethe-a1-preparation/?",
+      "dest": "/__seo/goethe-a1-preparation.html"
+    },
+    {
+      "src": "/exam-practice/a1/?",
+      "dest": "/__seo/exam-practice-a1.html"
+    },
+    {
       "src": "/courses/french-a1\\.html",
       "status": 307,
       "headers": {
