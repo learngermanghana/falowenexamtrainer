@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { postPlacementEvent } from "../lib/placementMonitoring";
 import {
   buildPublicFunnelUrl,
   followUpIso,
@@ -22,6 +23,9 @@ const button = (background, color = "#fff") => ({
 });
 
 export default function PlacementFunnelNextStep({ result }) {
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [consent, setConsent] = useState(false);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [saving, setSaving] = useState(false);
@@ -32,6 +36,7 @@ export default function PlacementFunnelNextStep({ result }) {
   const classesUrl = buildPublicFunnelUrl("/classes/", {
     source,
     video,
+    leadId: result.attemptId || "",
     level: result.level,
     utm_source: context.utm_source || source,
     utm_medium: context.utm_medium || "placement_test",
@@ -41,6 +46,7 @@ export default function PlacementFunnelNextStep({ result }) {
   const signupUrl = buildPublicFunnelUrl("/signup/", {
     source,
     video,
+    leadId: result.attemptId || "",
     level: result.level,
     utm_source: context.utm_source || source,
     utm_medium: context.utm_medium || "placement_test",
@@ -48,43 +54,56 @@ export default function PlacementFunnelNextStep({ result }) {
     utm_content: "continue_application",
   });
   const whatsappText = encodeURIComponent(
-    `Hello Falowen, my placement-test result is ${result.level}. Please help me choose a class.${video ? ` I came from YouTube lesson ${video}.` : ""}`
+    `Hello Falowen, my placement-test result is ${result.level} (${result.correct}/${result.total}). Please help me choose a class.${video ? ` I came from YouTube lesson ${video}.` : ""}`
   );
 
   const saveReminder = async (event) => {
     event.preventDefault();
     const normalizedEmail = email.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
-      setStatus("Enter a valid email address.");
-      return;
+    const normalizedName=name.trim();
+    const normalizedPhone=phone.trim();
+    if(normalizedName.length<2 || (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) && !/^\+?[0-9 ()-]{9,25}$/.test(normalizedPhone))){
+      setStatus("Enter your name and a valid email or phone number.");return;
     }
+    if(!consent){setStatus("Please agree to be contacted about Falowen classes.");return;}
+    if(!result.attemptId){setStatus("Your attempt ID is unavailable. Please reload the result page.");return;}
 
     setSaving(true);
     setStatus("Saving your reminder request...");
     try {
-      await submitPublicLead({
-        id: `placement_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      await postPlacementEvent({
+        id:result.attemptId,action:"contact",name:normalizedName,email:normalizedEmail,
+        phone:normalizedPhone,consent:true,
+      });
+      // Preserve the existing admissions/Google Apps Script funnel. The Apps Script
+      // request is opaque (no-cors), so success here means the private result is saved.
+      void submitPublicLead({
+        id: result.attemptId,
         createdAt: new Date().toISOString(),
         source: "placement-test-result",
         status: "placement_completed",
         email: normalizedEmail,
-        name: "",
-        phone: "",
+        name: normalizedName,
+        phone: normalizedPhone,
         level: result.level,
         className: `${result.level} recommendation`,
         classSlug: result.level.toLowerCase(),
         placementCorrect: result.correct,
+        placementA1: result.a1,
+        placementA2: result.a2,
+        placementB1: result.b1,
+        placementAttemptId: result.attemptId,
         placementTotal: result.total,
         placementScore: result.total ? Math.round((result.correct / result.total) * 100) : 0,
-        emailReminderRequested: true,
+        emailReminderRequested: Boolean(normalizedEmail),
         reminderType: "placement_result_and_class_follow_up",
         nextFollowUpAt: followUpIso(24),
         paymentStatus: "not_requested",
         followUpCount: 0,
         attribution: context,
-      });
-      trackPublicFunnelEvent("placement_reminder_requested", { level: result.level });
-      setStatus("Reminder request saved for your result and recommended-class follow-up.");
+      }).catch(()=>{ /* private record is saved; staff can follow up from Admin monitoring */ });
+      trackPublicFunnelEvent("placement_contact_saved", { level: result.level });
+      setStatus("Your placement result and contact details are saved. You can now continue your registration.");
     } catch (_error) {
       setStatus("We could not save the reminder. Please use WhatsApp or try again.");
     } finally {
@@ -107,11 +126,20 @@ export default function PlacementFunnelNextStep({ result }) {
       </div>
 
       <form onSubmit={saveReminder} style={{ display: "grid", gap: 8, maxWidth: 560 }}>
-        <label htmlFor="placement-reminder-email" style={{ fontWeight: 850 }}>Save my result and class-reminder request</label>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <input id="placement-reminder-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" autoComplete="email" style={{ flex: "1 1 240px", minHeight: 44, borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 12px", font: "inherit" }} />
-          <button type="submit" disabled={saving} style={{ minHeight: 44, padding: "10px 14px", border: 0, borderRadius: 10, background: "#0f172a", color: "#fff", fontWeight: 900 }}>{saving ? "Saving..." : "Save email reminder"}</button>
+        <strong>Save my result and get class guidance</strong>
+        <p style={{margin:0,color:"#475569",fontSize:13}}>Optional: leave your contact details so our admissions team can help you enrol at the right level. You can register without submitting this form.</p>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          <input type="text" aria-label="Your full name" autoComplete="name" required value={name} onChange={e=>setName(e.target.value)} placeholder="Full name" style={{flex:"1 1 220px",minHeight:44,borderRadius:10,border:"1px solid #cbd5e1",padding:"10px 12px",font:"inherit"}}/>
+          <input type="tel" aria-label="Phone or WhatsApp (optional if email given)" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="Phone / WhatsApp" style={{flex:"1 1 220px",minHeight:44,borderRadius:10,border:"1px solid #cbd5e1",padding:"10px 12px",font:"inherit"}}/>
         </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input id="placement-reminder-email" aria-label="Email (optional if phone given)" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email address" autoComplete="email" style={{ flex: "1 1 240px", minHeight: 44, borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 12px", font: "inherit" }} />
+          <button type="submit" disabled={saving} style={{ minHeight: 44, padding: "10px 14px", border: 0, borderRadius: 10, background: "#0f172a", color: "#fff", fontWeight: 900 }}>{saving ? "Saving..." : "Save result & contact"}</button>
+        </div>
+        <label style={{display:"flex",alignItems:"flex-start",gap:9,color:"#475569",fontSize:13}}>
+          <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} />
+          I agree that Falowen may contact me about German classes and registration. My test result will be used to recommend a starting level.
+        </label>
         {status ? <div role="status" style={{ color: status.startsWith("We could") || status.startsWith("Enter") ? "#b91c1c" : "#166534", fontSize: 13 }}>{status}</div> : null}
       </form>
     </section>
