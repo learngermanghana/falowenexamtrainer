@@ -3,6 +3,8 @@ import { updatePageMeta } from "../lib/pageMeta";
 import A1GoetheReadingMockTeil1Preview from "./A1GoetheReadingMockTeil1Preview";
 import A2GoetheReadingMockPreview from "./A2GoetheReadingMockPreview";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
+import otherLevelSeoPractice from "../data/otherLevelSeoPracticeContent.json";
+import OtherLevelSeoSamples from "./OtherLevelSeoSamples";
 import "./PublicExamPracticePage.css";
 
 const cardStyle = {
@@ -49,12 +51,17 @@ export default function PublicExamPracticePage({ level = "" }) {
       },
     };
 
-    const metadata = metadataByLevel[level] || {
+    const additionalMeta = otherLevelSeoPractice[level]?.titles;
+    const metadata = metadataByLevel[level] || (additionalMeta ? {
+      title: additionalMeta.practice,
+      description: additionalMeta.practiceDescription,
+      canonicalPath: `/exam-practice/${level.toLowerCase()}`,
+    } : {
       title: "Goethe Exam Practice A1–C2 | Falowen Mocks",
       description:
         "Explore Falowen Goethe-style practice by level: free A1/A2 reading samples, complete A1–B2 mocks for students, C1 reading practice and C2 exam preparation.",
       canonicalPath: "/exam-practice",
-    };
+    });
 
     const provider = {
       "@type": "EducationalOrganization",
@@ -102,8 +109,8 @@ export default function PublicExamPracticePage({ level = "" }) {
   if (level === "A1") return <A1GoetheReadingMockTeil1Preview publicMode />;
   if (level === "A2") return <A2GoetheReadingMockPreview publicMode />;
 
-  const levels = level === "B1" ? ["B1"] : ["A1", "A2", "B1", "B2", "C1", "C2"];
-  const freePath = { A1: "/exam-practice/a1", A2: "/exam-practice/a2" };
+  const levels = level ? [level] : ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const freePath = { A1: "/exam-practice/a1", A2: "/exam-practice/a2", B1: "/exam-practice/b1", B2: "/exam-practice/b2", C1: "/exam-practice/c1", C2: "/exam-practice/c2" };
   const levelDescription = {
     A1: "Build confidence with a free Lesen sample, then try two complete student mocks.",
     A2: "Start with free Lesen. Progress to Mock 1 or explore the four-section Mock 2 preview.",
@@ -147,8 +154,9 @@ export default function PublicExamPracticePage({ level = "" }) {
           <div><strong>02</strong><span>Select your practice</span><p>Public reading samples or available student mock exams.</p></div>
           <div><strong>03</strong><span>Review your results</span><p>Results and saved attempts are available for supported student exams.</p></div>
         </section>
+        {otherLevelSeoPractice[level] && level !== "A2" ? <OtherLevelSeoSamples level={level} onPracticePage /> : null}
         <section className="public-goethe-library" aria-labelledby="public-goethe-library-title">
-          <div className="public-goethe-section-title"><div><span className="public-goethe-kicker">THE PRACTICE LIBRARY</span><h2 id="public-goethe-library-title">Find your exam level</h2><p>Availability is taken from the current Falowen mock exam catalog, not a fixed list of promised exams.</p></div></div>
+          <div className="public-goethe-section-title"><div><span className="public-goethe-kicker">THE PRACTICE LIBRARY</span><h2 id="public-goethe-library-title">Find your exam level</h2><p>Explore public exercises for every level. Available full mocks and student practice are taken from the current Falowen exam catalog.</p></div></div>
           <div className="public-goethe-level-grid">
             {levels.map((examLevel) => {
               const mocks = getMockExamsForLevel(examLevel, { includeCourse: true });
@@ -168,7 +176,7 @@ export default function PublicExamPracticePage({ level = "" }) {
                     ))}
                   </div>
                   <div className="public-goethe-level-actions">
-                    {freePath[examLevel] && <a className="public-goethe-btn public-goethe-btn-outline" href={freePath[examLevel]}>Free Lesen sample</a>}
+                    {freePath[examLevel] && <a className="public-goethe-btn public-goethe-btn-outline" href={freePath[examLevel]}>{examLevel === "A1" || examLevel === "A2" ? "Free Lesen sample" : "Free sample & answers"}</a>}
                     <a className="public-goethe-btn public-goethe-btn-primary" href={full[0]?.route || previews[0]?.route || "/exams/overview"}>{full.length ? "Access full mocks" : previews.length ? "Open student practice" : "Explore Exam Room"} <span aria-hidden="true">↗</span></a>
                   </div>
                 </article>

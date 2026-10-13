@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import a1SeoPractice from "../data/a1SeoPracticeContent.json";
+import otherLevelSeoPractice from "../data/otherLevelSeoPracticeContent.json";
+import OtherLevelSeoSamples from "./OtherLevelSeoSamples";
 
 const LEVEL_COPY = {
   A1: {
@@ -147,12 +149,12 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
     const title = isExam
       ? normalizedLevel === "A1"
         ? "Goethe A1 Practice Materials with Answers | Falowen"
-        : `Goethe ${normalizedLevel} Exam Preparation | German ${normalizedLevel} Practice | Falowen`
+        : (otherLevelSeoPractice[normalizedLevel]?.titles.landing || `Goethe ${normalizedLevel} Exam Preparation | German ${normalizedLevel} Practice | Falowen`)
       : `German ${normalizedLevel} Course Online | ${normalizedLevel} Lessons & Practice | Falowen`;
     const description = isExam
       ? normalizedLevel === "A1"
         ? "Goethe A1 practice materials with answers: free Lesen sample, writing and speaking model answers, and student mock exams on Falowen."
-        : `Prepare for the Goethe ${normalizedLevel} German exam with Falowen: level-specific Lesen, Hören, Schreiben and Sprechen practice, detailed grammar, tutor feedback and progress tracking.`
+        : (otherLevelSeoPractice[normalizedLevel]?.titles.landingDescription || `Prepare for the Goethe ${normalizedLevel} German exam with Falowen: level-specific Lesen, Hören, Schreiben and Sprechen practice, detailed grammar, tutor feedback and progress tracking.`)
       : `Learn German ${normalizedLevel} online with Falowen. Study structured lessons, grammar, vocabulary, listening, writing, speaking, tutor-marked assignments and exam preparation.`;
 
     const provider = {
@@ -246,7 +248,7 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
         <h1 style={{ margin: 0, fontSize: "clamp(30px, 6vw, 48px)", lineHeight: 1.05 }}>
           {isExam ? `Goethe ${normalizedLevel} exam preparation with Falowen` : `Learn German ${normalizedLevel} online with Falowen`}
         </h1>
-        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.75, maxWidth: 820 }}>{isExam && normalizedLevel === "A1" ? a1SeoPractice.intro : content.summary}</p>
+        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.75, maxWidth: 820 }}>{isExam && normalizedLevel === "A1" ? a1SeoPractice.intro : isExam && otherLevelSeoPractice[normalizedLevel] ? otherLevelSeoPractice[normalizedLevel].intro : content.summary}</p>
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
           <button type="button" style={styles.primaryButton} onClick={() => onSignUp?.("german")}>Start German {normalizedLevel}</button>
           {isExam && ["A1", "A2"].includes(normalizedLevel) ? (
@@ -260,6 +262,7 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
       </section>
 
       {isExam && normalizedLevel === "A1" ? <A1PracticeSamples /> : null}
+      {isExam && otherLevelSeoPractice[normalizedLevel] ? <OtherLevelSeoSamples level={normalizedLevel} /> : null}
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}> 
         <SeoCard title="Grammar you build">

@@ -413,7 +413,7 @@ function App() {
     return <PublicAdmissionsVisitorGuidePage />;
   }
 
-  const publicExamPracticeMatch = location.pathname.match(/^\/exam-practice(?:\/(a1|a2|b1))?\/?$/i);
+  const publicExamPracticeMatch = location.pathname.match(/^\/exam-practice(?:\/(a1|a2|b1|b2|c1|c2))?\/?$/i);
   if (publicExamPracticeMatch) {
     return <PublicExamPracticePage level={String(publicExamPracticeMatch[1] || "").toUpperCase()} />;
   }
