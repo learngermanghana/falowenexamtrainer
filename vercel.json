@@ -177,6 +177,46 @@
       "dest": "/__seo/exam-practice-a1.html"
     },
     {
+      "src": "/goethe-a2-preparation/?",
+      "dest": "/__seo/goethe-a2-preparation.html"
+    },
+    {
+      "src": "/exam-practice/a2/?",
+      "dest": "/__seo/exam-practice-a2.html"
+    },
+    {
+      "src": "/goethe-b1-preparation/?",
+      "dest": "/__seo/goethe-b1-preparation.html"
+    },
+    {
+      "src": "/exam-practice/b1/?",
+      "dest": "/__seo/exam-practice-b1.html"
+    },
+    {
+      "src": "/goethe-b2-preparation/?",
+      "dest": "/__seo/goethe-b2-preparation.html"
+    },
+    {
+      "src": "/exam-practice/b2/?",
+      "dest": "/__seo/exam-practice-b2.html"
+    },
+    {
+      "src": "/goethe-c1-preparation/?",
+      "dest": "/__seo/goethe-c1-preparation.html"
+    },
+    {
+      "src": "/exam-practice/c1/?",
+      "dest": "/__seo/exam-practice-c1.html"
+    },
+    {
+      "src": "/goethe-c2-preparation/?",
+      "dest": "/__seo/goethe-c2-preparation.html"
+    },
+    {
+      "src": "/exam-practice/c2/?",
+      "dest": "/__seo/exam-practice-c2.html"
+    },
+    {
       "src": "/courses/french-a1\\.html",
       "status": 307,
       "headers": {
