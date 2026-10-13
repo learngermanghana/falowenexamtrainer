@@ -53,7 +53,23 @@ const normalizeExamRoomHistoryRow = (id, row = {}, requestedLevel = "") => {
     completedAt: row.date || "",
     route: String(row.route || row.link || (isMock ? "/exams/mocks" : "/exams/overview")),
     sectionScores: row.sectionScores || {},
-    scoreBreakdown: Array.isArray(row.scoreBreakdown) ? row.scoreBreakdown : [],
+    scoreBreakdown: Array.isArray(row.scoreBreakdown) && row.scoreBreakdown.length
+      ? row.scoreBreakdown
+      : isMock && row.sectionScores && typeof row.sectionScores === "object"
+        ? ["lesen", "hoeren", "schreiben", "sprechen"]
+          .filter((key) => row.sectionScores[key] !== null
+            && row.sectionScores[key] !== undefined
+            && row.sectionScores[key] !== ""
+            && Number.isFinite(Number(row.sectionScores[key]))
+            && Number(row.sectionScores[key]) >= 0
+            && Number(row.sectionScores[key]) <= 25)
+          .map((key) => ({
+            key,
+            label: { lesen: "Lesen", hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[key],
+            score: Number(row.sectionScores[key]),
+            maxScore: 25,
+          }))
+        : [],
     resultType: isMock ? "final_mock" : "practice",
   };
 };
