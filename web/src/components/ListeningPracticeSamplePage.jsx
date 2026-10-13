@@ -499,7 +499,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
                   onChange={(value) => setAnswer(key, value)}
                   disabled={submitted}
                 />
-                {feedback(key, question.answer)}
+                {feedback(key, question.answer, question.options, `a1-picture-${key}`)}
               </article>
             );
           })}
