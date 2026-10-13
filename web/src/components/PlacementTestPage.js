@@ -21,6 +21,10 @@ const readResult = (root) => {
   return {
     section,
     level,
+    attemptId: section.dataset.placementAttemptId || "",
+    a1: Number(section.dataset.placementA1 || 0),
+    a2: Number(section.dataset.placementA2 || 0),
+    b1: Number(section.dataset.placementB1 || 0),
     correct: Number(score?.[1] || 0),
     total: Number(score?.[2] || 0),
   };
@@ -58,9 +62,10 @@ export default function PlacementTestPage() {
       setResult((current) =>
         current?.level === parsed.level &&
         current?.correct === parsed.correct &&
-        current?.total === parsed.total
+        current?.total === parsed.total &&
+        current?.attemptId === parsed.attemptId
           ? current
-          : { level: parsed.level, correct: parsed.correct, total: parsed.total }
+          : { level: parsed.level, correct: parsed.correct, total: parsed.total, attemptId: parsed.attemptId, a1:parsed.a1, a2:parsed.a2, b1:parsed.b1 }
       );
 
       const key = `${parsed.level}:${parsed.correct}:${parsed.total}`;
