@@ -140,15 +140,20 @@ export default function PlacementTestPage2026() {
   }, [started, finished]);
 
   useEffect(() => {
-    if (!session.id || !session.startedAt) return;
-    void sendPlacementEventOnce({id:session.id,action:"start"}).catch(()=>{});
+    if (!session.id || !session.startedAt) return undefined;
+    const send = () => void sendPlacementEventOnce({id:session.id,action:"start"}).catch(()=>{});
+    send();
+    window.addEventListener("online",send);
+    return () => window.removeEventListener("online",send);
   }, [session.id,session.startedAt]);
 
   useEffect(() => {
-    if (!session.id || !session.completedAt) return;
-    void sendPlacementEventOnce({
-      id:session.id,action:"complete",answers:answersToIndices(session.answers,placementQuestions)
-    }).catch(()=>{});
+    if (!session.id || !session.completedAt) return undefined;
+    const payload={id:session.id,action:"complete",answers:answersToIndices(session.answers,placementQuestions)};
+    const send=()=>void sendPlacementEventOnce(payload).catch(()=>{});
+    send();
+    window.addEventListener("online",send);
+    return () => window.removeEventListener("online",send);
   }, [session.id,session.completedAt,session.answers]);
 
   useEffect(() => {
