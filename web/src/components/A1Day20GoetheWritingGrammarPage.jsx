@@ -1,5 +1,6 @@
 import React from "react";
 import { LetterWritingGrammarNotesPage } from "./LetterWritingIntroPage";
+import ConsistentWritingPatternGuide from "./ConsistentWritingPatternGuide";
 
 const pageStyle = {
   display: "grid",
@@ -320,6 +321,8 @@ const A1Day20GoetheWritingGrammarPage = () => (
         <strong> du</strong>, and never finish a formal letter with <strong>Liebe Grüße</strong>.
       </div>
     </section>
+
+    <ConsistentWritingPatternGuide level="A1" taskTitle="Formelle und informelle Schreibaufgaben" defaultOpen />
 
     <section style={{ ...sectionStyle, background: "#f8fafc" }}>
       <h2 style={{ margin: 0 }}>Now study the complete letter structure</h2>
