@@ -31,6 +31,7 @@ import {
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import ConsistentWritingPatternGuide from "./ConsistentWritingPatternGuide";
 import WritingHistorySection, {
   buildWritingHistoryRecord,
 } from "./WritingHistorySection";
@@ -2375,6 +2376,14 @@ const WritingPage = ({
                 ))}
               </select>
             </div> : null}
+
+            {isExamMode && ["A1", "A2", "B1"].includes(level) ? (
+              <ConsistentWritingPatternGuide
+                level={level}
+                taskTitle={selectedLetter?.situation || selectedLetter?.letter || ""}
+                text={typedAnswer}
+              />
+            ) : null}
 
             <label style={styles.label}>
               {draftLabel || (isCourseMode

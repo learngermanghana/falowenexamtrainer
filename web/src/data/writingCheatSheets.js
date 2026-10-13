@@ -1,3 +1,5 @@
+import { LETTER_PATTERNS } from "./consistentWritingPatterns";
+
 export const C1_WRITING_CHEAT_SHEET = [
   {
     id: "c1-vocab-position-and-argument",
@@ -155,6 +157,7 @@ export const B1_WRITING_CHEAT_SHEET = [
     title: "B1 vocabulary group · Connectors and structure",
     items: [
       { phrase: "zuerst / danach / zum Schluss", meaning: "first / after that / finally" },
+      { phrase: "erstens / zweitens / außerdem", meaning: "first / second / furthermore · organize three points" },
       { phrase: "weil", meaning: "because" },
       { phrase: "denn", meaning: "because / for" },
       { phrase: "deshalb", meaning: "therefore" },
@@ -193,27 +196,12 @@ export const B1_WRITING_CHEAT_SHEET = [
     id: "b1-formal-letter-template",
     title: "FORMAL LETTER · Use this for Vermieter, Schule, Firma, Amt or official emails",
     layout: "template",
-    items: [
-      { phrase: "Anrede", meaning: "Sehr geehrte Damen und Herren,\nSehr geehrte Frau [Name] / Sehr geehrter Herr [Name]," },
-      { phrase: "Grund", meaning: "ich schreibe Ihnen, weil [Grund]." },
-      { phrase: "Information / Frage", meaning: "Ich möchte gern wissen, ob [Frage]. Außerdem ist für mich wichtig, dass [Information]." },
-      { phrase: "Bitte", meaning: "Könnten Sie mir bitte antworten?" },
-      { phrase: "Schluss", meaning: "Vielen Dank im Voraus.\n\nMit freundlichen Grüßen\n[Ihr Name]" },
-    ],
-  },
+    items: LETTER_PATTERNS.formal.steps.map(({ label, text }) => ({ phrase: label, meaning: text })),  },
   {
     id: "b1-informal-letter-template",
     title: "INFORMAL LETTER · Use this for friends, family or personal messages",
     layout: "template",
-    items: [
-      { phrase: "Anrede", meaning: "Liebe/r [Name],\nHallo [Name]," },
-      { phrase: "Start", meaning: "wie geht es dir? Ich hoffe, es geht dir gut." },
-      { phrase: "Grund", meaning: "ich schreibe dir, weil [Grund]." },
-      { phrase: "Hauptteil", meaning: "Ich möchte dir erzählen, dass [Information]. Außerdem [weitere Information]." },
-      { phrase: "Frage / Einladung", meaning: "Hast du Zeit? / Was meinst du dazu? / Kannst du mir helfen?" },
-      { phrase: "Schluss", meaning: "Schreib mir bald.\n\nLiebe Grüße\n[Ihr Name]" },
-    ],
-  },
+    items: LETTER_PATTERNS.informal.steps.map(({ label, text }) => ({ phrase: label, meaning: text })),  },
 ];
 
 export const A2_WRITING_CHEAT_SHEET = [
@@ -226,6 +214,7 @@ export const A2_WRITING_CHEAT_SHEET = [
       { phrase: "denn", meaning: "because / for" },
       { phrase: "dann", meaning: "then" },
       { phrase: "danach", meaning: "after that" },
+      { phrase: "erstens / zweitens / außerdem", meaning: "first / second / furthermore · organize three points" },
       { phrase: "heute / morgen / gestern", meaning: "today / tomorrow / yesterday" },
       { phrase: "um … Uhr", meaning: "at … o’clock" },
       { phrase: "zum Beispiel", meaning: "for example" },
@@ -244,6 +233,18 @@ export const A2_WRITING_CHEAT_SHEET = [
       { phrase: "vielen Dank", meaning: "many thanks" },
       { phrase: "bis bald", meaning: "see you soon" },
     ],
+  },
+  {
+    id: "a2-informal-letter-template",
+    title: "A2 INFORMAL LETTER · Repeat the same opening and cover all three points",
+    layout: "template",
+    items: LETTER_PATTERNS.informal.steps.map(({ label, text }) => ({ phrase: label, meaning: text })),
+  },
+  {
+    id: "a2-formal-letter-template",
+    title: "A2 FORMAL LETTER · Use Sie/Ihnen and the same three-point structure",
+    layout: "template",
+    items: LETTER_PATTERNS.formal.steps.map(({ label, text }) => ({ phrase: label, meaning: text })),
   },
 ];
 
