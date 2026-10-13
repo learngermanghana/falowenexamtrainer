@@ -29,6 +29,49 @@ const iso = value => {
   const ms = toMillis(value);
   return ms ? new Date(ms).toISOString() : null;
 };
+// Only server-verifiable scores are sent to Admin. In-progress objective marks
+// are browser-reported and cannot be represented as verified results.
+const verifiedScore = value => {
+  if (value === null || value === undefined || value === "") return null;
+  const score = Number(value);
+  return Number.isFinite(score) && score >= 0 && score <= 25 ? score : null;
+};
+const mockScoreAudit = (data = {}) => {
+  const completed = data.status === "completed";
+  const verified = completed && data.verifiedSectionScores &&
+    typeof data.verifiedSectionScores === "object"
+    ? data.verifiedSectionScores : {};
+  const sections = {};
+  for (const key of SECTIONS) {
+    const score = completed
+      ? verifiedScore(verified[key])
+      : data.verifiedSections?.[key]?.verified === true
+        ? verifiedScore(data.verifiedSections[key].score)
+        : null;
+    if (score !== null) sections[key] = score;
+  }
+  const rawOverall = data.verifiedOverall?.score;
+  const total = completed && rawOverall !== null && rawOverall !== undefined &&
+    rawOverall !== "" && Number.isFinite(Number(rawOverall))
+      ? Number(rawOverall) : null;
+  const allVerified = completed && SECTIONS.every(section =>
+    Object.prototype.hasOwnProperty.call(sections, section));
+  const sum = allVerified
+    ? Number(SECTIONS.reduce((value, section) => value + sections[section], 0).toFixed(1))
+    : null;
+  return {
+    sectionScores: sections,
+    scoreVerification: allVerified ? "verified" : completed ? "incomplete" : "in_progress",
+    sectionTotal: sum,
+    scoreMatchesOverall: sum === null || total === null
+      ? null : Math.abs(sum - total) <= 0.11,
+    overallScore: total !== null && total >= 0 && total <= 100 ? total : null,
+    completionSyncStatus: completed
+      ? data.completionSync?.ok === true ? "saved"
+        : data.completionSync?.ok === false ? "failed" : "unknown"
+      : "not_complete",
+  };
+};
 const normalizeMockAttempt = doc => {
   const path = String(doc.ref?.path || "");
   const parts = path.split("/");
@@ -43,6 +86,7 @@ const normalizeMockAttempt = doc => {
   const state = data.state && typeof data.state === "object" ? data.state : {};
   const deadline = Number(state.sectionDeadlineMs);
   const mockId = String(data.mockId || (level.toLowerCase() + "-mock-01")).slice(0, 80);
+  const scoreAudit = mockScoreAudit(data);
   return {
     id: level + ":" + parts[1] + ":" + doc.id,
     uid: String(data.uid || parts[1]),
@@ -60,8 +104,7 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
-    overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
-      ? Number(data.verifiedOverall.score) : null,
+    ...scoreAudit,
   };
 };
 
@@ -94,6 +137,9 @@ const normalizeBrowserProgress = doc => {
     sectionDeadlineMs: Number.isFinite(deadline) && deadline > 0 ? deadline : null,
     startedAt: iso(row.startedAt), updatedAt: iso(row.updatedAt),
     completedAt: iso(row.completedAt), overallScore: null,
+    sectionScores: {}, scoreVerification: "browser_reported",
+    sectionTotal: null, scoreMatchesOverall: null,
+    completionSyncStatus: "not_available",
     progressSource: "browser_reported",
   };
 };
@@ -208,4 +254,4 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
   return { attempts: await enrichStudentNames(db, attempts), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, mockScoreAudit, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
