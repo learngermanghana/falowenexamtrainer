@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const webDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const distDir = path.resolve(process.argv[2] || path.join(webDir, "dist"));
 const content = JSON.parse(fs.readFileSync(path.join(webDir, "src/data/a1SeoPracticeContent.json"), "utf8"));
+const otherLevels = JSON.parse(fs.readFileSync(path.join(webDir, "src/data/otherLevelSeoPracticeContent.json"), "utf8"));
 const indexFile = path.join(distDir, "index.html");
 const template = fs.readFileSync(indexFile, "utf8");
 const BASE = "https://www.falowen.app";
@@ -110,7 +111,7 @@ function render(route) {
     name: route.heading,
     description: route.description,
     url: canonical,
-    educationalLevel: "A1",
+    educationalLevel: route.level || "A1",
     learningResourceType: "German language examination practice",
     isAccessibleForFree: true,
     inLanguage: ["de", "en"],
@@ -125,17 +126,69 @@ function render(route) {
     '<main id="falowen-startup" class="falowen-startup">', "startup main");
   html = replaceOnce(html, /<h1 id="falowen-startup-title">([^<]*)<\/h1>/,
     (_, message) => '<p id="falowen-startup-title">' + message + '</p>', "startup heading");
+  const pageLevel = (route.level || 'A1').toLowerCase();
   const seoMarkup = '<div class="a1-seo-fallback"><header><nav><a href="/">Falowen</a> · ' +
     '<a href="/exam-practice">Exam practice</a></nav><h1>' + escapeHtml(route.heading) + '</h1><p>' +
     escapeHtml(route.lead) + '</p></header>' + route.content +
     '<footer><p>Falowen provides independent Goethe-style practice and is not affiliated with or endorsed by Goethe-Institut.</p>' +
-    '<p><a href="/goethe-a1-preparation">Goethe A1 preparation</a> · <a href="/exam-practice/a1">Free A1 Lesen</a>' +
+    '<p><a href="/goethe-' + pageLevel + '-preparation">Goethe ' + pageLevel.toUpperCase() + ' preparation</a> · <a href="/exam-practice/' + pageLevel + '">' + pageLevel.toUpperCase() + ' practice</a>' +
     ' · <a href="/login/">Student sign in</a></p></footer></div>';
   html = replaceOnce(html, /<\/main>\s*<\/div>\s*<script>/,
     seoMarkup + "</main></div><script>", "startup main closing marker");
   const output = path.join(distDir, "__seo", route.file);
   fs.mkdirSync(path.dirname(output), { recursive: true });
   fs.writeFileSync(output, html, "utf8");
+}
+
+
+function otherSamples(level, sample, onPracticePage) {
+  const { reading, writing, speaking } = sample;
+  const escape = escapeHtml;
+  const details = (label, answer, explanation) =>
+    '<details><summary>' + escape(label) + '</summary><p lang="de" class="a1-seo-lines"><strong>' +
+    escape(answer) + '</strong></p><p>' + escape(explanation) + '</p></details>';
+  const actions = level === "a2" ? '<a href="/exam-practice/a2">Try free interactive A2 Lesen</a>'
+    : onPracticePage ? '<a href="/goethe-' + level + '-preparation">Go to preparation guide</a>'
+      : '<a href="/exam-practice/' + level + '">Try free ' + level.toUpperCase() + ' questions</a>';
+  return [
+    card("Goethe " + level.toUpperCase() + " practice materials and availability",
+      '<p>' + escape(sample.status) + '</p><div class="a1-seo-links">' + actions +
+      '<a href="/exam-practice">Browse all levels</a><a href="/login/">Sign in for student mocks</a></div>'),
+    card("Lesen · " + level.toUpperCase() + " reading question",
+      '<p lang="de">' + escape(reading.text) + '</p><p lang="de"><strong>' + escape(reading.question) +
+      '</strong></p><ol type="A">' + reading.options.map(x=>'<li lang="de">'+escape(x)+'</li>').join("") +
+      '</ol>' + details("Show reading answer and explanation",reading.answer,reading.explanation)),
+    card("Schreiben · " + level.toUpperCase() + " sample writing task",
+      '<p lang="de">' + escape(writing.task) + '</p>' +
+      details("Show writing model answer",writing.answer,writing.tip)),
+    card("Sprechen · " + level.toUpperCase() + " speaking practice",
+      '<p lang="de">' + escape(speaking.task) + '</p>' +
+      details("Show speaking model answer",speaking.answer,speaking.tip))
+  ].join("\n");
+}
+
+for (const [level, sample] of Object.entries(otherLevels)) {
+  const slug = level.toLowerCase();
+  routes.push({
+    level,
+    file: "goethe-" + slug + "-preparation.html",
+    path: "/goethe-" + slug + "-preparation",
+    title: sample.titles.landing,
+    description: sample.titles.landingDescription,
+    heading: "Goethe " + level + " Practice Materials with Answers",
+    lead: sample.intro,
+    content: otherSamples(slug, sample, false)
+  });
+  routes.push({
+    level,
+    file: "exam-practice-" + slug + ".html",
+    path: "/exam-practice/" + slug,
+    title: sample.titles.practice,
+    description: sample.titles.practiceDescription,
+    heading: level === "A2" ? "Free Goethe A2 Lesen Practice" : "Goethe " + level + " Practice Questions and Answers",
+    lead: sample.intro,
+    content: otherSamples(slug, sample, true)
+  });
 }
 
 routes.forEach(render);
