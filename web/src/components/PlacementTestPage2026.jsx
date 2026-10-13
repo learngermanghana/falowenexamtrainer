@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { makePlacementAttemptId, sendPlacementEventOnce, answersToIndices } from "../lib/placementMonitoring";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import {
@@ -14,6 +15,7 @@ import {
 } from "./placementTest2026Data";
 
 const initialSession = () => ({
+  id: null,
   startedAt: null,
   completedAt: null,
   completionReason: null,
@@ -30,6 +32,7 @@ const readSession = () => {
     const timedOut = Date.now() >= startedAt + PLACEMENT_DURATION_MS;
     const wasCompleted = Number.isFinite(saved.completedAt);
     return {
+      id: /^pt_[a-zA-Z0-9-]{12,90}$/.test(String(saved.id||"")) ? saved.id : makePlacementAttemptId(),
       startedAt,
       completedAt: wasCompleted ? saved.completedAt : timedOut ? startedAt + PLACEMENT_DURATION_MS : null,
       completionReason: wasCompleted ? saved.completionReason || "submitted" : timedOut ? "time" : null,
@@ -137,6 +140,18 @@ export default function PlacementTestPage2026() {
   }, [started, finished]);
 
   useEffect(() => {
+    if (!session.id || !session.startedAt) return;
+    void sendPlacementEventOnce({id:session.id,action:"start"}).catch(()=>{});
+  }, [session.id,session.startedAt]);
+
+  useEffect(() => {
+    if (!session.id || !session.completedAt) return;
+    void sendPlacementEventOnce({
+      id:session.id,action:"complete",answers:answersToIndices(session.answers,placementQuestions)
+    }).catch(()=>{});
+  }, [session.id,session.completedAt,session.answers]);
+
+  useEffect(() => {
     if (!finished || trackedCompletion.current) return;
     trackedCompletion.current = true;
     recordEvent("complete", {
@@ -152,7 +167,7 @@ export default function PlacementTestPage2026() {
     const current = Date.now();
     setNow(current);
     trackedCompletion.current = false;
-    setSession({ ...initialSession(), startedAt: current });
+    setSession({ ...initialSession(), id:makePlacementAttemptId(), startedAt: current });
     recordEvent("start", { questionCount: placementQuestions.length, durationMinutes: 20 });
   };
 
@@ -331,7 +346,7 @@ export default function PlacementTestPage2026() {
               </div>
             </section>
           ) : (
-            <section style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
+            <section data-placement-attempt-id={session.id||""} data-placement-a1={levelStats.A1.correct} data-placement-a2={levelStats.A2.correct} data-placement-b1={levelStats.B1.correct} style={{ ...styles.card, display: "grid", gap: 15, border: "1px solid #bfdbfe" }}>
               <div style={{ padding: 14, background: "#eff6ff", borderRadius: 12 }}>
                 <p style={{ ...subtleText, margin: 0, fontWeight: 800 }}>{session.completionReason === "time" ? "Time is up · answers submitted automatically" : "Assessment complete"}</p>
                 <h2 style={{ fontSize: 27, margin: "7px 0", color: "#0f172a" }}>Your suggested starting level: {suggestedLevel}</h2>
