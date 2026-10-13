@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
+import a1SeoPractice from "../data/a1SeoPracticeContent.json";
 
 const LEVEL_COPY = {
   A1: {
@@ -68,6 +69,72 @@ const SeoCard = ({ title, children }) => (
   </section>
 );
 
+
+const A1PracticeSamples = () => (
+  <section style={{ display: "grid", gap: 14 }} aria-label="Goethe A1 practice materials">
+    <SeoCard title="Goethe A1 practice materials with answers">
+      <p style={{ margin: 0, color: "#334155", lineHeight: 1.7 }}>
+        Practise for the Goethe-Zertifikat A1: Start Deutsch 1. Try a free interactive A1 reading sample without an account,
+        check the model answers below, or sign in for full student mock exams.
+      </p>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
+        <a href="/exam-practice/a1" style={{ ...styles.primaryButton, textDecoration: "none" }}>Start free A1 Lesen practice</a>
+        <a href="/exam-practice" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Explore exam practice</a>
+      </div>
+    </SeoCard>
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
+      <SeoCard title="Lesen · Reading">
+        <p style={{ margin: 0, color: "#475569" }}>Read notices, short messages and everyday information, then check the correct answer.</p>
+        <a href="/exam-practice/a1">Try the free interactive A1 reading test</a>
+      </SeoCard>
+      <SeoCard title="Hören · Listening">
+        <p style={{ margin: 0, color: "#475569" }}>Practise understanding short conversations and announcements in the student Exam Room.</p>
+        <a href="/login/">Sign in to access listening practice</a>
+      </SeoCard>
+      <SeoCard title="Schreiben · Writing">
+        <p style={{ margin: 0, color: "#475569" }}>Practise forms and brief personal messages. See the writing model below.</p>
+        <a href="#a1-writing-example">View writing task and sample answer</a>
+      </SeoCard>
+      <SeoCard title="Sprechen · Speaking">
+        <p style={{ margin: 0, color: "#475569" }}>Prepare your introduction, short questions and everyday requests.</p>
+        <a href="#a1-speaking-example">View speaking task and model answer</a>
+      </SeoCard>
+    </div>
+    <SeoCard title="Quick A1 Lesen exercise with answer">
+      <p lang="de" style={{ margin: 0, color: "#334155", lineHeight: 1.75 }}>{a1SeoPractice.reading.text}</p>
+      <p lang="de" style={{ margin: 0, fontWeight: 700 }}>{a1SeoPractice.reading.question}</p>
+      <ol type="A" style={{ margin: 0, paddingLeft: 22, lineHeight: 1.7 }}>
+        {a1SeoPractice.reading.options.map((choice) => <li lang="de" key={choice}>{choice}</li>)}
+      </ol>
+      <details>
+        <summary style={{ cursor: "pointer", fontWeight: 700 }}>Show the correct answer and explanation</summary>
+        <p style={{ marginBottom: 0 }}><strong>{a1SeoPractice.reading.answer}.</strong> {a1SeoPractice.reading.explanation}</p>
+      </details>
+    </SeoCard>
+    <SeoCard title="A1 Schreiben · Sample task and answer">
+      <div id="a1-writing-example" />
+      <p lang="de" style={{ margin: 0, lineHeight: 1.7 }}>{a1SeoPractice.writing.task}</p>
+      <details>
+        <summary style={{ cursor: "pointer", fontWeight: 700 }}>Show a model message</summary>
+        <p lang="de" style={{ whiteSpace: "pre-line", lineHeight: 1.7 }}>{a1SeoPractice.writing.answer}</p>
+        <p style={{ color: "#475569" }}>{a1SeoPractice.writing.tip}</p>
+      </details>
+    </SeoCard>
+    <SeoCard title="A1 Sprechen · Introduction practice">
+      <div id="a1-speaking-example" />
+      <p lang="de" style={{ margin: 0, lineHeight: 1.7 }}>{a1SeoPractice.speaking.task}</p>
+      <details>
+        <summary style={{ cursor: "pointer", fontWeight: 700 }}>Show a model introduction</summary>
+        <p lang="de" style={{ lineHeight: 1.7 }}>{a1SeoPractice.speaking.answer}</p>
+        <p style={{ color: "#475569" }}>{a1SeoPractice.speaking.tip}</p>
+      </details>
+    </SeoCard>
+    <p style={{ margin: 0, color: "#64748b", fontSize: 12 }}>
+      Falowen publishes original Goethe-style practice; these are not official Goethe-Institut examination questions.
+    </p>
+  </section>
+);
+
 export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSignUp, onLogin }) {
   const normalizedLevel = String(level || "").toUpperCase();
   const content = LEVEL_COPY[normalizedLevel] || LEVEL_COPY.A1;
@@ -78,10 +145,14 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
 
   useEffect(() => {
     const title = isExam
-      ? `Goethe ${normalizedLevel} Exam Preparation | German ${normalizedLevel} Practice | Falowen`
+      ? normalizedLevel === "A1"
+        ? "Goethe A1 Practice Materials with Answers | Falowen"
+        : `Goethe ${normalizedLevel} Exam Preparation | German ${normalizedLevel} Practice | Falowen`
       : `German ${normalizedLevel} Course Online | ${normalizedLevel} Lessons & Practice | Falowen`;
     const description = isExam
-      ? `Prepare for the Goethe ${normalizedLevel} German exam with Falowen: level-specific Lesen, Hören, Schreiben and Sprechen practice, detailed grammar, tutor feedback and progress tracking.`
+      ? normalizedLevel === "A1"
+        ? "Goethe A1 practice materials with answers: free Lesen sample, writing and speaking model answers, and student mock exams on Falowen."
+        : `Prepare for the Goethe ${normalizedLevel} German exam with Falowen: level-specific Lesen, Hören, Schreiben and Sprechen practice, detailed grammar, tutor feedback and progress tracking.`
       : `Learn German ${normalizedLevel} online with Falowen. Study structured lessons, grammar, vocabulary, listening, writing, speaking, tutor-marked assignments and exam preparation.`;
 
     const provider = {
@@ -175,7 +246,7 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
         <h1 style={{ margin: 0, fontSize: "clamp(30px, 6vw, 48px)", lineHeight: 1.05 }}>
           {isExam ? `Goethe ${normalizedLevel} exam preparation with Falowen` : `Learn German ${normalizedLevel} online with Falowen`}
         </h1>
-        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.75, maxWidth: 820 }}>{content.summary}</p>
+        <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.75, maxWidth: 820 }}>{isExam && normalizedLevel === "A1" ? a1SeoPractice.intro : content.summary}</p>
         <div style={{ display: "flex", gap: 9, flexWrap: "wrap" }}>
           <button type="button" style={styles.primaryButton} onClick={() => onSignUp?.("german")}>Start German {normalizedLevel}</button>
           {isExam && ["A1", "A2"].includes(normalizedLevel) ? (
@@ -188,7 +259,9 @@ export default function GermanLevelSeoPage({ level = "A1", mode = "course", onSi
         </div>
       </section>
 
-      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}>
+      {isExam && normalizedLevel === "A1" ? <A1PracticeSamples /> : null}
+
+      <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12 }}> 
         <SeoCard title="Grammar you build">
           <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.75, color: "#334155" }}>{content.grammar.map((item) => <li key={item}>{item}</li>)}</ul>
         </SeoCard>
