@@ -138,12 +138,37 @@ const SpeakingExamIntroPage = () => (
           </thead>
           <tbody>
             {[
-              ["warten", "Warten Sie bitte.", "Können Sie bitte warten?"],
-              ["helfen", "Helfen Sie mir bitte.", "Können Sie mir bitte helfen?"],
-              ["wiederholen", "Wiederholen Sie das bitte.", "Können Sie das bitte wiederholen?"],
-              ["sprechen", "Sprechen Sie bitte langsamer.", "Können Sie bitte langsamer sprechen?"],
+              [
+                ["warten", "to wait"],
+                ["Warten Sie bitte.", "Please wait."],
+                ["Können Sie bitte warten?", "Could you please wait?"],
+              ],
+              [
+                ["helfen", "to help"],
+                ["Helfen Sie mir bitte.", "Please help me."],
+                ["Können Sie mir bitte helfen?", "Could you please help me?"],
+              ],
+              [
+                ["wiederholen", "to repeat"],
+                ["Wiederholen Sie das bitte.", "Please repeat that."],
+                ["Können Sie das bitte wiederholen?", "Could you please repeat that?"],
+              ],
+              [
+                ["sprechen", "to speak"],
+                ["Sprechen Sie bitte langsamer.", "Please speak more slowly."],
+                ["Können Sie bitte langsamer sprechen?", "Could you please speak more slowly?"],
+              ],
             ].map((row) => (
-              <tr key={row[0]}>{row.map((cell) => <td key={cell} style={{ border: "1px solid #e2e8f0", padding: 10 }}>{cell}</td>)}</tr>
+              <tr key={row[0][0]}>
+                {row.map(([german, english]) => (
+                  <td key={german} style={{ border: "1px solid #e2e8f0", padding: 10, verticalAlign: "top" }}>
+                    <span style={{ display: "block", fontWeight: 600 }}>{german}</span>
+                    <span lang="en" style={{ display: "block", marginTop: 4, color: "#475569", fontSize: 13, lineHeight: 1.45 }}>
+                      {english}
+                    </span>
+                  </td>
+                ))}
+              </tr>
             ))}
           </tbody>
         </table>
@@ -154,15 +179,29 @@ const SpeakingExamIntroPage = () => (
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 12 }}>
         <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
           <strong>Accept</strong>
-          <span>Ja, natürlich.</span>
-          <span>Ja, gern.</span>
-          <span>Natürlich, hier bitte.</span>
+          {[
+            ["Ja, natürlich.", "Yes, of course."],
+            ["Ja, gern.", "Yes, I'd be happy to."],
+            ["Natürlich, hier bitte.", "Of course, here you go."],
+          ].map(([german, english]) => (
+            <div key={german} style={{ display: "grid", gap: 2 }}>
+              <span style={{ fontWeight: 600 }}>{german}</span>
+              <span lang="en" style={{ color: "#475569", fontSize: 13 }}>{english}</span>
+            </div>
+          ))}
         </div>
         <div style={{ border: "1px solid #fecdd3", background: "#fff1f2", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
           <strong>Refuse</strong>
-          <span>Tut mir leid, das geht leider nicht.</span>
-          <span>Leider kann ich nicht.</span>
-          <span>Entschuldigung, das ist leider nicht möglich.</span>
+          {[
+            ["Tut mir leid, das geht leider nicht.", "I'm sorry, that's not possible."],
+            ["Leider kann ich nicht.", "Unfortunately, I can't."],
+            ["Entschuldigung, das ist leider nicht möglich.", "I'm sorry, unfortunately that's not possible."],
+          ].map(([german, english]) => (
+            <div key={german} style={{ display: "grid", gap: 2 }}>
+              <span style={{ fontWeight: 600 }}>{german}</span>
+              <span lang="en" style={{ color: "#475569", fontSize: 13 }}>{english}</span>
+            </div>
+          ))}
         </div>
       </div>
     </Section>
