@@ -1,5 +1,6 @@
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
+import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -137,7 +138,7 @@ const readStoredState = (storageKey) => {
 
 const ChoiceList = ({ name, options, value, onChange, disabled = false }) => (
   <div className="a2-mock-choice-list">
-    {options.map((option) => (
+    {arrangeMockChoices(options, name).map((option) => (
       <label className="a2-mock-choice" key={option.id}>
         <input
           type="radio"
@@ -146,7 +147,7 @@ const ChoiceList = ({ name, options, value, onChange, disabled = false }) => (
           onChange={() => onChange(option.id)}
           disabled={disabled}
         />
-        <strong>{option.id}</strong>
+        <strong>{option.displayId}</strong>
         <span>{option.label}</span>
       </label>
     ))}
@@ -155,7 +156,7 @@ const ChoiceList = ({ name, options, value, onChange, disabled = false }) => (
 
 const MultipleChoice = ({ name, options, value, onChange }) => (
   <div className="a1-hoeren-mock-multiple-choice" role="radiogroup">
-    {options.map((option) => (
+    {arrangeMockChoices(options, name).map((option) => (
       <label key={option.id} className="a1-hoeren-mock-option">
         <input
           type="radio"
@@ -163,7 +164,7 @@ const MultipleChoice = ({ name, options, value, onChange }) => (
           checked={String(value).toLowerCase() === String(option.id).toLowerCase()}
           onChange={() => onChange(option.id)}
         />
-        <span className="a1-hoeren-mock-option-letter">{option.id}</span>
+        <span className="a1-hoeren-mock-option-letter">{option.displayId}</span>
         <span className="a1-hoeren-mock-option-copy">
           <strong>{option.label}</strong>
           {option.short ? <small>{option.short}</small> : null}
@@ -940,7 +941,7 @@ export default function A2FinalMockExamPage() {
                 value={exam.schreibenSms}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenSms: event.target.value }))}
                 rows={7}
-                placeholder="Hallo Mila, ..."
+                placeholder="" autoComplete="off"
                 aria-label="A2 Schreiben Teil 1 SMS"
               />
             </div>
@@ -965,7 +966,7 @@ export default function A2FinalMockExamPage() {
                 value={exam.schreibenEmail}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenEmail: event.target.value }))}
                 rows={10}
-                placeholder="Sehr geehrte Frau Becker, ..."
+                placeholder="" autoComplete="off"
                 aria-label="A2 Schreiben Teil 2 E-Mail"
               />
             </div>
@@ -1021,8 +1022,8 @@ export default function A2FinalMockExamPage() {
             return (
               <div className={correct ? "correct" : "incorrect"} key={question.key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.answer}</span>
+                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `a2-final-${question.key}`) : submitted}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `a2-final-${question.key}`) : question.answer}</span>
               </div>
             );
           })}
@@ -1036,8 +1037,8 @@ export default function A2FinalMockExamPage() {
             return (
               <div className={correct ? "correct" : "incorrect"} key={question.key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.answer}</span>
+                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `a2-final-hoeren-${question.key}`) : submitted}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `a2-final-hoeren-${question.key}`) : question.answer}</span>
               </div>
             );
           })}

@@ -1,5 +1,6 @@
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
+import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresentation";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -148,7 +149,7 @@ const BinaryChoices = ({ name, value, onChange, disabled = false }) => (
 
 const LetterChoices = ({ name, options, value, onChange, disabled = false }) => (
   <div className="a1-final-mock-letter-choices" role="radiogroup">
-    {options.map((option) => (
+    {arrangeMockChoices(options, name).map((option) => (
       <label key={option.id} className="a1-hoeren-mock-option">
         <input
           type="radio"
@@ -157,7 +158,7 @@ const LetterChoices = ({ name, options, value, onChange, disabled = false }) => 
           onChange={() => onChange(option.id)}
           disabled={disabled}
         />
-        <span className="a1-hoeren-mock-option-letter">{option.id}</span>
+        <span className="a1-hoeren-mock-option-letter">{option.displayId}</span>
         <span className="a1-hoeren-mock-option-copy">
           <strong>{option.label || option.url || option.id}</strong>
           {option.short ? <small>{option.short}</small> : null}
@@ -950,7 +951,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
                 value={exam.schreibenText}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenText: event.target.value }))}
                 rows={11}
-                placeholder={isMock3 ? "Liebe Anna, ..." : isMock2 ? "Lieber Markus, ..." : "Sehr geehrte Damen und Herren, ..."}
+                placeholder="" autoComplete="off"
               />
               <div className="a1-schreiben-word-count">Wörter: <strong>{wordCount}</strong> · Ziel: ungefähr 30</div>
             </div>
@@ -1006,7 +1007,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {submitted}</span>
+                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : submitted}</span>
                 <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
@@ -1024,7 +1025,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );

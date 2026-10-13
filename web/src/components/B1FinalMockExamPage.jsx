@@ -1,5 +1,6 @@
 import { canReviewFullMock, restoreFullMockReviewState } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
+import { arrangeMockChoices } from "../utils/mockChoicePresentation";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
@@ -104,9 +105,9 @@ const readStoredState = (key) => {
 
 const ChoiceList = ({ name, options, value, onChange }) => (
   <div className="b1-final-choices" role="radiogroup">
-    {options.map((option) => {
-      const id = Array.isArray(option) ? option[0] : option.id;
-      const label = Array.isArray(option) ? option[1] : option.label;
+    {arrangeMockChoices(options, name).map((option) => {
+      const id = option.id;
+      const label = option.label;
       return (
         <label key={id} className={String(value) === String(id) ? "selected" : ""}>
           <input
@@ -115,7 +116,7 @@ const ChoiceList = ({ name, options, value, onChange }) => (
             checked={String(value) === String(id)}
             onChange={() => onChange(id)}
           />
-          <strong>{["richtig", "falsch"].includes(String(id)) ? "" : id}</strong>
+          <strong>{["richtig", "falsch"].includes(String(id)) ? "" : option.displayId}</strong>
           <span>{label}</span>
         </label>
       );
@@ -784,7 +785,7 @@ export default function B1FinalMockExamPage() {
                     ...current,
                     schreiben: { ...current.schreiben, [task.id]: event.target.value },
                   }))}
-                  placeholder="Hier schreiben …"
+                  placeholder="" autoComplete="off"
                   rows={task.id === "teil3" ? 8 : 12}
                 />
                 <small>Automatisch gespeichert</small>
