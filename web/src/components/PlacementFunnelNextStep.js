@@ -69,7 +69,7 @@ export default function PlacementFunnelNextStep({ result }) {
     if(!result.attemptId){setStatus("Your attempt ID is unavailable. Please reload the result page.");return;}
 
     setSaving(true);
-    setStatus("Saving your reminder request...");
+    setStatus("Saving your placement result and contact details...");
     try {
       await postPlacementEvent({
         id:result.attemptId,action:"contact",name:normalizedName,email:normalizedEmail,
@@ -105,7 +105,7 @@ export default function PlacementFunnelNextStep({ result }) {
       trackPublicFunnelEvent("placement_contact_saved", { level: result.level });
       setStatus("Your placement result and contact details are saved. You can now continue your registration.");
     } catch (_error) {
-      setStatus("We could not save the reminder. Please use WhatsApp or try again.");
+      setStatus("We could not save your contact details. You can still register or contact us on WhatsApp.");
     } finally {
       setSaving(false);
     }
