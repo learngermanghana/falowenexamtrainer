@@ -1,119 +1,39 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import './index.css';
-import './goetheFreeChatMobile.css';
-import './i18n';
-import App from './App';
 import AppStartupBoundary from './components/AppStartupBoundary';
-import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
-import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
-import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
-import RouteScopedAppServices from './components/RouteScopedAppServices';
-import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
-import SelfLearningLessonDirectNavigationFix from './components/SelfLearningLessonDirectNavigationFix';
-import A1CanonicalChapterLessonRoute from './components/A1CanonicalChapterLessonRoute';
-import A1ChapterSpecificLessonRouteBoundary from './components/A1ChapterSpecificLessonRouteBoundary';
-import A1ChapterResourceHubRoute, {
-  A1_CHAPTER_RESOURCE_HUB_PARENT_PATH,
-} from './components/A1ChapterResourceHubRoute';
-import A1Day13RevisionNumberCleanup from './components/A1Day13RevisionNumberCleanup';
-import A1Day5FinalWorkbookOpenFix from './components/A1Day5FinalWorkbookOpenFix';
-import A1RadioFirstWorkbookRoutes from './components/A1RadioFirstWorkbookRoutes';
-import A1SharedPracticeWorkbookNavigation from './components/A1SharedPracticeWorkbookNavigation';
-import RequestedLessonAiVideoHeader from './components/RequestedLessonAiVideoHeader';
-import A1Day11DirectWorkbookRoute, {
-  A1_DAY11_DIRECT_WORKBOOK_PATH,
-} from './components/A1Day11DirectWorkbookRoute';
-import A1Day16Chapter9DirectWorkbookRoute, {
-  A1_DAY16_CHAPTER9_DIRECT_WORKBOOK_PATH,
-} from './components/A1Day16Chapter9DirectWorkbookRoute';
-import A1Day20Chapter123DirectWorkbookRoute, {
-  A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH,
-} from './components/A1Day20Chapter123DirectWorkbookRoute';
-import A1SpeakingExamIntroEntryRoute, {
-  A1_SPEAKING_EXAM_INTRO_ENTRY_PATH,
-} from './components/A1SpeakingExamIntroEntryRoute';
-import A2Day27DigitaleKommunikationGrammarPage from './components/A2Day27DigitaleKommunikationGrammarPage';
-import { A1_CANONICAL_LESSON_CATALOG } from './data/a1CanonicalLessonCatalog';
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './context/AuthContext';
-import { ToastProvider } from './context/ToastContext';
 
 const normalizedPublicPath = window.location.pathname.replace(/\/+$/, '') || '/';
-const isFalowenRadioSeoPage = normalizedPublicPath === '/falowen-radio';
+const isPlacementTestPage = normalizedPublicPath === '/placement-test';
+
+const PlacementTestPage = React.lazy(() => import('./components/PlacementTestPage'));
+const AuthenticatedAppRoot = React.lazy(() => import('./AuthenticatedAppRoot'));
+
 const A1_DAY0_TUTORIAL_ROUTE = '/campus/course/lesson/A1/0';
 const A1_DAY0_WORKBOOK_ROUTE = '/campus/course/a1-day-0-orientation-and-knowledge-test-workbook';
 const A2_DAY27_GRAMMAR_ROUTE = '/campus/course/a2-day-27-digitale-kommunikation-dass-grammar';
-const A1_SHORT_CHAPTER_LESSON_ROUTES = A1_CANONICAL_LESSON_CATALOG.filter(
-  (lesson) => lesson.shortLessonRoute,
-);
 
-const AppMountedSignal = () => {
-  React.useEffect(() => {
-    window.dispatchEvent(new Event('falowen:app-mounted'));
-  }, []);
-
-  return null;
-};
-
-const AuthenticatedAppRoutes = () => (
-  <>
-    <PublicAuthRouteBridge />
-    <PublicAuthMobileRecovery />
-    <A1Day13RevisionNumberCleanup />
-    <AuthProvider>
-      <ToastProvider>
-        <A1ChapterSpecificLessonRouteBoundary>
-          <RouteScopedAppServices />
-          <SelfLearningLessonDirectNavigationFix />
-          <A1RadioFirstWorkbookRoutes />
-          <A1Day5FinalWorkbookOpenFix />
-          <A1SharedPracticeWorkbookNavigation />
-          <RequestedLessonAiVideoHeader />
-          <Routes>
-            <Route path={A1_DAY0_TUTORIAL_ROUTE} element={<Navigate to={A1_DAY0_WORKBOOK_ROUTE} replace />} />
-            <Route
-              path="/campus/course/lesson/A1/chapter/:chapter"
-              element={<A1CanonicalChapterLessonRoute />}
-            />
-            {A1_SHORT_CHAPTER_LESSON_ROUTES.map((lesson) => (
-              <Route
-                key={lesson.routeKey}
-                path={lesson.shortLessonRoute}
-                element={<A1CanonicalChapterLessonRoute chapter={lesson.routeKey} />}
-              />
-            ))}
-            <Route
-              path={A1_DAY11_DIRECT_WORKBOOK_PATH}
-              element={<A1Day11DirectWorkbookRoute />}
-            />
-            <Route
-              path={A1_DAY16_CHAPTER9_DIRECT_WORKBOOK_PATH}
-              element={<A1Day16Chapter9DirectWorkbookRoute />}
-            />
-            <Route
-              path={A1_DAY20_CHAPTER123_DIRECT_WORKBOOK_PATH}
-              element={<A1Day20Chapter123DirectWorkbookRoute />}
-            />
-            <Route
-              path={A1_SPEAKING_EXAM_INTRO_ENTRY_PATH}
-              element={<A1SpeakingExamIntroEntryRoute workbookElement={<App />} />}
-            />
-            <Route
-              path={A1_CHAPTER_RESOURCE_HUB_PARENT_PATH}
-              element={<A1ChapterResourceHubRoute level="A1" fallback={<App />} />}
-            />
-            <Route
-              path={A2_DAY27_GRAMMAR_ROUTE}
-              element={<A2Day27DigitaleKommunikationGrammarPage />}
-            />
-            <Route path="*" element={<App />} />
-          </Routes>
-        </A1ChapterSpecificLessonRouteBoundary>
-      </ToastProvider>
-    </AuthProvider>
-  </>
+const InitialRouteLoader = () => (
+  <main
+    aria-live="polite"
+    style={{
+      minHeight: '100vh',
+      display: 'grid',
+      placeItems: 'center',
+      padding: 24,
+      boxSizing: 'border-box',
+      background: '#f8fafc',
+      color: '#0f172a',
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+    }}
+  >
+    <div style={{ textAlign: 'center' }}>
+      <strong>{isPlacementTestPage ? 'Opening placement test…' : 'Opening Falowen…'}</strong>
+      <div style={{ marginTop: 8, fontSize: 14, color: '#64748b' }}>Loading only what this page needs.</div>
+    </div>
+  </main>
 );
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -121,16 +41,12 @@ root.render(
   <React.StrictMode>
     <AppStartupBoundary>
       <BrowserRouter>
-        <AppMountedSignal />
-        <RouteScopedBackgroundServices />
-        {isFalowenRadioSeoPage ? (
-          <FalowenRadioSeoPage />
-        ) : (
-          <AuthenticatedAppRoutes />
-        )}
+        <Suspense fallback={<InitialRouteLoader />}>
+          {isPlacementTestPage ? <PlacementTestPage /> : <AuthenticatedAppRoot />}
+        </Suspense>
       </BrowserRouter>
     </AppStartupBoundary>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
 
 reportWebVitals();
