@@ -98,10 +98,20 @@ const normalizeResultInput = (input = {}) => {
     input.sectionScores && typeof input.sectionScores === "object" && !Array.isArray(input.sectionScores)
       ? Object.fromEntries(
           Object.entries(input.sectionScores)
-            .map(([key, value]) => [clean(key).toLowerCase(), asNumber(value, null)])
+            .filter(([, value]) => value !== null && value !== undefined && value !== "")
+            .map(([key, value]) => [clean(key).toLowerCase().replace("hören", "hoeren"), asNumber(value, null)])
             .filter(([, value]) => value !== null),
         )
       : {};
+
+  // Full mocks have four separately graded modules, each worth 25 points.
+  // Keep partial/missing module marks absent rather than showing them as zero.
+  const verifiedMockScores = isFinalMock
+    ? Object.fromEntries(["lesen", "hoeren", "schreiben", "sprechen"]
+      .filter((key) => Number.isFinite(sectionScores[key])
+        && sectionScores[key] >= 0 && sectionScores[key] <= 25)
+      .map((key) => [key, sectionScores[key]]))
+    : sectionScores;
 
   return {
     level,
@@ -118,7 +128,7 @@ const normalizeResultInput = (input = {}) => {
     passed,
     source,
     route,
-    sectionScores,
+    sectionScores: verifiedMockScores,
   };
 };
 
@@ -140,6 +150,16 @@ const buildExamRoomResultArtifacts = ({
     ? `${normalized.title} · ${normalized.percent}/100 · ${normalized.passed ? "PASS" : "NEEDS MORE PRACTICE"}`
     : `${normalized.title} · ${normalized.rawScore}/${normalized.total} · ${normalized.percent}%`;
 
+  const scoreBreakdown = normalized.resultType === "final_mock"
+    ? ["lesen", "hoeren", "schreiben", "sprechen"]
+      .filter((key) => Object.prototype.hasOwnProperty.call(normalized.sectionScores, key))
+      .map((key) => ({
+        key,
+        label: sectionLabel(key),
+        score: normalized.sectionScores[key],
+        maxScore: 25,
+      }))
+    : [];
   const scoreDocument = {
     studentCode: identity.studentCode,
     studentcode: identity.studentCode,
@@ -175,6 +195,7 @@ const buildExamRoomResultArtifacts = ({
     examSection: normalized.section,
     resultType: normalized.resultType,
     sectionScores: normalized.sectionScores,
+    scoreBreakdown,
     source: normalized.source,
     certificateEligible: false,
     progressionEligible: false,
