@@ -15,9 +15,30 @@ function replaceOnce(before, after, label) {
   source = source.replace(before, after);
 }
 
-replaceOnce(
-  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";',
-  'import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCoachSpeech, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";\nimport {\n  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,\n  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,\n  normalizeSpeakingChatDurationMinutes,\n  speakingChatSessionSeconds,\n} from "../lib/speakingSessionDuration";',
+const durationHelperImport = `import {
+  CUSTOM_SPEAKING_CHAT_DURATION_OPTIONS,
+  DEFAULT_CUSTOM_SPEAKING_CHAT_DURATION_MINUTES,
+  normalizeSpeakingChatDurationMinutes,
+  speakingChatSessionSeconds,
+} from "../lib/speakingSessionDuration";`;
+
+function ensureImportAfter(anchorPath, importPath, importBlock, label) {
+  if (source.includes(importPath)) return;
+  const anchorIndex = source.indexOf(anchorPath);
+  if (anchorIndex === -1) {
+    throw new Error(`Custom speaking duration patch anchor missing: ${label}`);
+  }
+  const anchorEnd = source.indexOf(";", anchorIndex);
+  if (anchorEnd === -1) {
+    throw new Error(`Custom speaking duration patch anchor missing terminator: ${label}`);
+  }
+  source = `${source.slice(0, anchorEnd + 1)}\n${importBlock}${source.slice(anchorEnd + 1)}`;
+}
+
+ensureImportAfter(
+  'from "../services/presentationCoachService"',
+  'from "../lib/speakingSessionDuration"',
+  durationHelperImport,
   "duration helper import",
 );
 
