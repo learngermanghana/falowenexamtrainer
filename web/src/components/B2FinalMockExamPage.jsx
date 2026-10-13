@@ -1,3 +1,4 @@
+import { arrangeMockChoices } from "../utils/mockChoicePresentation";
 import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
@@ -482,7 +483,7 @@ const Teil2 = ({ answers, onChoose, secondsLeft, onContinue }) => {
 
 const Teil3ChoiceList = ({ question, value, onChoose, disabled }) => (
   <div className="b2-mock-teil3-options" role="radiogroup" aria-label={`Aufgabe ${question.number}`}>
-    {question.options.map((option) => (
+    {arrangeMockChoices(question.options, `b2-${question.number}-lesen`).map((option) => (
       <label key={option.id} className={value === option.id ? "selected" : ""}>
         <input
           type="radio"
@@ -491,7 +492,7 @@ const Teil3ChoiceList = ({ question, value, onChoose, disabled }) => (
           onChange={() => onChoose(question.number, option.id)}
           disabled={disabled}
         />
-        <strong>{option.id})</strong>
+        <strong>{option.displayId})</strong>
         <span>{option.label}</span>
       </label>
     ))}
@@ -634,7 +635,7 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
 
 const HorenChoiceList = ({ partId = "teil-1", question, value, onChoose, disabled = false, example = false }) => (
   <div className="b2-mock-hoeren-options" role="radiogroup" aria-label={`Aufgabe ${question.number}`}>
-    {question.options.map((option) => {
+    {arrangeMockChoices(question.options, `b2-${partId}-${question.number}-hoeren`).map((option) => {
       const selected = example ? question.answer === option.id : value === option.id;
       return (
         <label key={option.id} className={selected ? "selected" : ""}>
@@ -645,7 +646,7 @@ const HorenChoiceList = ({ partId = "teil-1", question, value, onChoose, disable
             onChange={() => !example && onChoose(question.number, option.id)}
             disabled={disabled || example}
           />
-          <strong>{option.id})</strong>
+          <strong>{option.displayId})</strong>
           <span>{option.label}</span>
         </label>
       );
@@ -1014,7 +1015,7 @@ const Schreiben = ({ values, onChange, onFinish, busy = false }) => (
           <textarea
             value={value}
             onChange={(event) => onChange(task.id, event.target.value)}
-            placeholder="Hier schreiben …"
+            placeholder="" autoComplete="off"
             rows={task.id === "teil1" ? 15 : 11}
           />
           <p className="b2-mock-autosave">Automatisch gespeichert</p>
