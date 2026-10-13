@@ -67,7 +67,7 @@ test("all released full-mock writing textareas start without model answers or st
   ];
   for (const file of pages) {
     const contents = fs.readFileSync(path.join(webRoot, "utils", file), "utf8");
-    const textareas = contents.match(/<textarea\\b[^>]*>/gs) || [];
+    const textareas = contents.match(/<textarea\b[^>]*>/gs) || [];
     expect(textareas.length).toBeGreaterThan(0);
     for(const textArea of textareas) {
       expect(textArea).not.toMatch(/defaultValue|placeholder="(?:Hallo|Liebe|Lieber|Sehr geehrte|Hier schreiben)/i);
