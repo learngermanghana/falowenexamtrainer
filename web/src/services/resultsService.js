@@ -239,6 +239,12 @@ const buildResults = (scores = []) => {
         maxWritingScore: row.maxWritingScore ?? null,
         corrections: row.corrections ?? [],
         scoreBreakdown: row.scoreBreakdown ?? [],
+        sectionScores: row.sectionScores ?? {},
+        source: row.source || "",
+        resultType: row.resultType || "",
+        mockId: row.mockId || "",
+        mockAttemptId: row.mockAttemptId || row.examRoomAttemptId || "",
+        attemptType: row.attemptType || "",
         improvementSummary: normalizeString(row.improvementSummary || row.resubmissionSummary) || "",
         markingReason: normalizeString(row.markingReason || row.rawAiReason || row.aiReason) || "",
       };
