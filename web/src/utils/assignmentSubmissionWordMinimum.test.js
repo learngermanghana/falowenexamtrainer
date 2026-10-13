@@ -45,13 +45,22 @@ describe("assignment submission word minimum", () => {
     expect(buildAssignmentSubmissionWordProgressText({ wordCount: 5, minimumWords: 0 })).toBe("");
   });
 
-  test("explains exactly how many words are missing for a normal writing task", () => {
+  test("explains exactly why a normal writing task cannot submit yet", () => {
     expect(buildAssignmentSubmissionWordError({
       level: "A1",
       chapter: "3",
       wordCount: 7,
       minimumWords: 10,
-    })).toBe("Your answer has 7 words. You need at least 10 words. Add 3 more words before submitting.");
+    })).toBe("Cannot submit yet. Your answer has 7 words. This task needs at least 10 words. Add 3 more words, then press Submit assignment again.");
+  });
+
+  test("keeps the higher-level 20-word shortfall explicit", () => {
+    expect(buildAssignmentSubmissionWordError({
+      level: "A2",
+      chapter: "3",
+      wordCount: 14,
+      minimumWords: 20,
+    })).toBe("Cannot submit yet. Your answer has 14 words. This task needs at least 20 words. Add 6 more words, then press Submit assignment again.");
   });
 
   test("explains that both 12.3 letters are required", () => {
@@ -60,7 +69,7 @@ describe("assignment submission word minimum", () => {
       chapter: "12.3",
       wordCount: 42,
       minimumWords: A1_LETTER_ASSIGNMENT_MINIMUM_WORDS,
-    })).toBe("Your answer has 42 words. You need at least 50 words for both letters. Add 8 more words before submitting.");
+    })).toBe("Cannot submit yet. Your answer has 42 words. This task needs at least 50 words for both letters. Add 8 more words, then press Submit assignment again.");
   });
 
   test.each(["13", "14.1"])("explains the letter and answers required for A1 %s", (chapter) => {
@@ -69,6 +78,6 @@ describe("assignment submission word minimum", () => {
       chapter,
       wordCount: 35,
       minimumWords: A1_LETTER_ASSIGNMENT_MINIMUM_WORDS,
-    })).toBe(`Your answer has 35 words. You need at least 50 words for the letter-writing task and answers. Add 15 more words before submitting.`);
+    })).toBe(`Cannot submit yet. Your answer has 35 words. This task needs at least 50 words for the letter-writing task and answers. Add 15 more words, then press Submit assignment again.`);
   });
 });
