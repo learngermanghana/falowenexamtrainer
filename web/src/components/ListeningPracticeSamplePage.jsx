@@ -336,7 +336,7 @@ const A1ListeningPictureScene = ({ picture }) => {
 
 export const A1PictureOptions = ({ name, options, value, onChange, disabled }) => (
   <div className="a1-practice-picture-options" role="radiogroup">
-    {options.map((option) => (
+    {arrangeMockChoices(options, `a1-picture-${name}`).map((option) => (
       <label
         key={option.id}
         className={value === option.id ? "a1-practice-picture-card selected" : "a1-practice-picture-card"}
@@ -352,7 +352,7 @@ export const A1PictureOptions = ({ name, options, value, onChange, disabled }) =
             onChange={() => onChange(option.id)}
             disabled={disabled}
           />
-          <strong>{option.id})</strong>
+          <strong>{option.displayId})</strong>
           <span>{option.label}</span>
         </div>
       </label>
