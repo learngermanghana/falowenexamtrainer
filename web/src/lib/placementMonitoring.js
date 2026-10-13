@@ -23,6 +23,8 @@ export async function sendPlacementEventOnce(payload){
   return result;
 }
 export function answersToIndices(answers,questions){
-  return questions.map(q=>Object.prototype.hasOwnProperty.call(answers,q.id)
-    ? Math.max(0,q.options.indexOf(answers[q.id])):null);
+  return questions.map(q=>{
+    const index=q.options.indexOf(answers[q.id]);
+    return Object.prototype.hasOwnProperty.call(answers,q.id)&&index>=0?index:null;
+  });
 }
