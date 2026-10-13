@@ -97,4 +97,44 @@ describe("Exams Room result sync", () => {
       }),
     ).toThrow(/setId is required/i);
   });
+  test("persists B2 mixed final mock with a four-section breakdown", () => {
+    const artifacts = buildExamRoomResultArtifacts({
+      authedUser: { uid: "student-uid" },
+      studentProfile,
+      input: {
+        level: "B2", section: "mixed", setId: "b2-final-mock",
+        title: "B2 Final Mock Exam", resultType: "final_mock",
+        attemptId: "b2-run-2", score: 76, total: 100,
+        sectionScores: { lesen: 20, hoeren: 18, schreiben: 17, sprechen: 21 },
+      },
+    });
+    expect(artifacts.scoreDocument.score).toBe(76);
+    expect(artifacts.scoreDocument.sectionScores).toEqual({
+      lesen: 20, hoeren: 18, schreiben: 17, sprechen: 21,
+    });
+    expect(artifacts.scoreDocument.scoreBreakdown).toEqual([
+      { key: "lesen", label: "Lesen", score: 20, maxScore: 25 },
+      { key: "hoeren", label: "Hören", score: 18, maxScore: 25 },
+      { key: "schreiben", label: "Schreiben", score: 17, maxScore: 25 },
+      { key: "sprechen", label: "Sprechen", score: 21, maxScore: 25 },
+    ]);
+  });
+
+  test("does not manufacture missing module grades or discard practice parts", () => {
+    const partial = normalizeResultInput({
+      level: "B2", section: "mixed", resultType: "final_mock",
+      setId: "b2-final-mock", attemptId: "partial",
+      score: 5, total: 100,
+      sectionScores: { lesen: 0, hoeren: null, schreiben: 40 },
+    });
+    expect(partial.sectionScores).toEqual({ lesen: 0 });
+    const practice = normalizeResultInput({
+      level: "A1", section: "lesen", setId: "sample-1",
+      attemptId: "practice-1", score: 3, total: 5,
+      sectionScores: { teil1: 1, teil2: 2 },
+    });
+    expect(practice.sectionScores).toEqual({ teil1: 1, teil2: 2 });
+  });
+
+
 });
