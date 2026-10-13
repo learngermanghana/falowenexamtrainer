@@ -161,4 +161,19 @@ describe("Sheet result feedback presentation", () => {
     expect(source).toContain("{isExpanded ? (");
   });
 
+  test("saved full mock results retain all four section scores without objective collapse", () => {
+    const rows = getScoreBreakdownRows({
+      assignmentId: "A2-FINAL-MOCK", source: "a2_final_mock",
+      score: 76, sectionScores: { lesen: 20, hoeren: 18, schreiben: 17, sprechen: 21 },
+    });
+    expect(rows.map(({ label, score }) => [label, score])).toEqual([
+      ["Lesen", "20/25"], ["Hören", "18/25"],
+      ["Schreiben", "17/25"], ["Sprechen", "21/25"],
+    ]);
+    expect(getScoreBreakdownRows({
+      source: "b2_final_mock", sectionScores: { lesen: 0 },
+    })).toMatchObject([{ label: "Lesen", score: "0/25" }]);
+  });
+
+
 });
