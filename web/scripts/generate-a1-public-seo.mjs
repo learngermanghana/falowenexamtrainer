@@ -123,6 +123,8 @@ function render(route) {
     "<noscript>The public exercises and examples below are readable without JavaScript. Enable it for interactive practice.</noscript>", "noscript");
   html = replaceOnce(html, /<main id="falowen-startup" class="falowen-startup" role="status" aria-live="polite">/,
     '<main id="falowen-startup" class="falowen-startup">', "startup main");
+  html = replaceOnce(html, /<h1 id="falowen-startup-title">([^<]*)<\/h1>/,
+    (_, message) => '<p id="falowen-startup-title">' + message + '</p>', "startup heading");
   const seoMarkup = '<div class="a1-seo-fallback"><header><nav><a href="/">Falowen</a> · ' +
     '<a href="/exam-practice">Exam practice</a></nav><h1>' + escapeHtml(route.heading) + '</h1><p>' +
     escapeHtml(route.lead) + '</p></header>' + route.content +
