@@ -98,7 +98,7 @@ describe("signed-in Falowen session motivation", () => {
     expect(source).toContain("studentName");
     expect(source).toContain("data-testid=\"home-motivation-heading\"");
     expect(source).toContain('fontSize: "clamp(20px, 4vw, 26px)"');
-    expect(source).toContain("Open Campus");
+    expect(source).toContain("Continue learning");
     expect(source).toContain("onOpenAccount");
     expect(source).toContain("onJoinZoom");
     expect(source).toContain("<ExamReadinessBadge");
