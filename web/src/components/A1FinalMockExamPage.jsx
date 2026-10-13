@@ -1007,7 +1007,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `hoeren-${key}`) : submitted}</span>
+                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : submitted}</span>
                 <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
@@ -1025,7 +1025,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `hoeren-${key}`) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
