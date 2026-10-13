@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getWritingCheatSheet } from "../data/writingCheatSheets";
 import { styles } from "../styles";
 import B1InlineWritingAnalyser from "./B1InlineWritingAnalyser";
+import ConsistentWritingPatternGuide from "./ConsistentWritingPatternGuide";
 
 const textareaStyle = {
   width: "100%",
@@ -450,6 +451,13 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
             Turn your points into one complete German text. When you finish, analyse the same text below.
           </p>
         </div>
+
+        <ConsistentWritingPatternGuide
+          level={level}
+          taskTitle={[writingContext.taskTitle, writingContext.instructions, writingContext.question].filter(Boolean).join(" ")}
+          text={germanDraft}
+          defaultOpen
+        />
 
         {level === "B1" ? (
           <B1WritingSupport
