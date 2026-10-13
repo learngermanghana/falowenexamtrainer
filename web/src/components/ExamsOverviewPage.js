@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { EXAM_SKILLS, buildExamRoomCoach } from "../lib/examRoomCoach";
+import { getSavedMockSectionRows, formatMockSectionScore } from "../utils/mockSectionScores";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
 import {
@@ -202,17 +203,27 @@ export default function ExamsOverviewPage() {
         {limited ? <p className="exam-room-status">Showing results from a limited history window.</p> : null}
         {coach.attempts.length ? (
           <ol className="exam-room-recent-list">
-            {coach.attempts.slice(0, 3).map((attempt, index) => (
-              <li className="exam-room-recent-item" key={attempt.id || attempt.section + "-" + index}>
-                <div>
-                  <strong>{attempt.section === "mixed"
-                    ? "Full mock exam"
-                    : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
-                  <p>{readableDate(attempt.completedAt)} · {attempt.title}</p>
-                </div>
-                <strong className="exam-room-recent-score">{attempt.percent}%</strong>
-              </li>
-            ))}
+            {coach.attempts.slice(0, 3).map((attempt, index) => {
+              const mockScores = getSavedMockSectionRows(attempt);
+              return (
+                <li className="exam-room-recent-item" key={attempt.id || attempt.section + "-" + index}>
+                  <div className="exam-room-recent-main">
+                    <strong>{attempt.section === "mixed"
+                      ? "Full mock exam"
+                      : EXAM_SKILLS.find((skill) => skill.key === attempt.section)?.title}</strong>
+                    <p>{readableDate(attempt.completedAt)} · {attempt.title}</p>
+                    {mockScores.length ? (
+                      <div className="exam-room-recent-modules" aria-label="Saved mock section scores">
+                        {mockScores.map((module) => (
+                          <span key={module.key}>{module.label}: {formatMockSectionScore(module.score)}/{formatMockSectionScore(module.maxScore)}</span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  <strong className="exam-room-recent-score">{attempt.percent}%</strong>
+                </li>
+              );
+            })}
           </ol>
         ) : (
           <p className="exam-room-status">No scored practice yet. Choose a mock or skill above to begin.</p>
