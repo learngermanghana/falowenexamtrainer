@@ -60,6 +60,11 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
+    sectionScores: Object.fromEntries(SECTIONS.map(section => {
+      const value = data.status === "completed" ? data.verifiedSectionScores?.[section] : null;
+      const score = value !== null && value !== undefined && value !== "" ? Number(value) : NaN;
+      return [section, Number.isFinite(score) && score >= 0 && score <= 25 ? score : null];
+    })),
     overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
       ? Number(data.verifiedOverall.score) : null,
   };
