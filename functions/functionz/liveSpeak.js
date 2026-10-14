@@ -175,6 +175,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if ((Number(usage.data()?.turns) || 0) + BASIC_SESSIONS * MAX_TURNS > spendingCap()) {
         return error(res, 429, "budget_reached", "The speaking pilot has reached its current capacity. No payment has been taken.");
       }
+      if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The natural German voice service is not configured.");
       const subscription = await db().collection("liveSpeakSubscriptions").doc(student.auth.uid).get();
       if (withinWindow(subscription.data()) && Number(subscription.data()?.remaining) > 0) {
         return error(res, 409, "sessions_remaining", "Please use your remaining sessions before purchasing another package.");
@@ -253,6 +254,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
       if (!student) return;
+      if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The natural German voice service is not configured.");
       const level = cleanLevel(req.body?.level);
       const subRef = db().collection("liveSpeakSubscriptions").doc(student.auth.uid);
       const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
@@ -375,16 +377,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       await sessionRef.update({ inFlight: false });
       return res.json({ ok:true, transcript, reply, audioBase64: mp3.toString("base64"), mimeType:"audio/mpeg" });
     } catch (err) {
-      if (accepted && sessionRef && globalRef) {
-        try {
-          await db().runTransaction(async tx => {
-            const [session, usage] = await Promise.all([tx.get(sessionRef),tx.get(globalRef)]);
-            if (session.exists && session.data()?.inFlight) {
-              tx.update(sessionRef, { inFlight: false, turnsUsed: admin.firestore.FieldValue.increment(-1) });
-              if (usage.exists && Number(usage.data()?.turns) > 0) tx.update(globalRef, { turns: admin.firestore.FieldValue.increment(-1) });
-            }
-          });
-        } catch (rollbackError) { console.error("Live Speak rollback failed", rollbackError?.message); }
+      // Provider calls may already have incurred costs. Keep the metered turn and
+      // global spend counter, even on provider errors, to prevent unlimited retries.
+      if (accepted && sessionRef) {
+        try { await sessionRef.update({ inFlight: false }); }
+        catch (releaseError) { console.error("Live Speak lock release failed", releaseError?.message); }
       }
       if (err?.status) return error(res, err.status, err.code, err.message);
       console.error("Live Speak turn error", err?.message);
