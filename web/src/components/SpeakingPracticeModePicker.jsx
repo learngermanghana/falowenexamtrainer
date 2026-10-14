@@ -17,7 +17,7 @@ const MODES = [
   },
 ];
 
-export default function SpeakingPracticeModePicker({ value = "coach", onChange, compact = false }) {
+export default function SpeakingPracticeModePicker({ value = "coach", onChange, compact = false, disabled = false }) {
   return (
     <section aria-label="Choose speaking practice mode"
       style={{padding:compact ? "13px 12px" : "17px 20px",background:"#fff",borderBottom:"1px solid #e2e8f0"}}>
@@ -30,13 +30,13 @@ export default function SpeakingPracticeModePicker({ value = "coach", onChange, 
         {MODES.map((mode) => {
           const active = value === mode.key;
           return (
-            <button key={mode.key} type="button" aria-pressed={active}
-              onClick={() => onChange?.(mode.key)}
+            <button key={mode.key} type="button" aria-pressed={active} disabled={disabled}
+              onClick={() => { if (!disabled) onChange?.(mode.key); }}
               style={{
                 display:"flex",alignItems:"flex-start",gap:10,width:"100%",minWidth:0,
                 textAlign:"left",padding:compact ? "12px" : "14px 15px",borderRadius:13,
                 border:active ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                background:active ? "#eff6ff" : "#fff",color:"#0f172a",cursor:"pointer",
+                background:active ? "#eff6ff" : "#fff",color:"#0f172a",cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.6:1,
                 boxShadow:active ? "0 2px 8px rgba(37,99,235,.09)" : "none",
               }}>
               <span aria-hidden="true" style={{fontSize:22,lineHeight:1.25}}>{mode.icon}</span>
