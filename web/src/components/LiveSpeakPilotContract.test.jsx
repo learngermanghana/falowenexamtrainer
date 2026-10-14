@@ -1,7 +1,7 @@
 import React from "react";
 import fs from "fs";
 import path from "path";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import LiveSpeakPage from "./LiveSpeakPage";
@@ -78,4 +78,49 @@ test("learner must review the microphone transcript before AI feedback", () => {
   expect(source).toContain("Record again");
   expect(source).toContain("Listen to your own recording");
   expect(source).toContain("result.needsConfirmation");
+});
+
+test("the embedded banner and resumed conversation retain backend topic after same-source changes", async () => {
+  const expiresAt = new Date(Date.now() + 240000).toISOString();
+  const active = {
+    sessionId:"already-running", expiresAt, resumed:true,
+    level:"B1", topic:"Nachhaltige Mobilität", source:"exam-speaking-practice",
+  };
+  global.fetch.mockImplementation(async (url) => ({
+    ok:true,
+    json:async () => String(url).endsWith("/live-speak/status")
+      ? {enabled:true, remaining:1, maxTurns:10, capReached:false,
+         pilotAvailable:false, activeSession:active}
+      : {ok:true,...active},
+  }));
+  const { rerender } = render(
+    <MemoryRouter><LiveSpeakPage embedded initialLevel="B1"
+      practiceTopic="Nachhaltige Mobilität" practiceSource="exam-speaking-practice" /></MemoryRouter>,
+  );
+  await waitFor(() => expect(screen.getByRole("button", {name:"Resume voice conversation"})).toBeInTheDocument());
+  const activeBanner = () => screen.getByText((_, el) =>
+    el?.tagName === "P" && el.textContent.includes("Level: B1 · Topic: Nachhaltige Mobilität"));
+  expect(activeBanner()).toBeInTheDocument();
+  expect(screen.queryByText(/This voice conversation is still using/)).not.toBeInTheDocument();
+
+  // Change a selected exam prompt without changing source or remounting the component.
+  rerender(
+    <MemoryRouter><LiveSpeakPage embedded initialLevel="B1"
+      practiceTopic="Im Restaurant" practiceSource="exam-speaking-practice" /></MemoryRouter>,
+  );
+  expect(activeBanner()).toBeInTheDocument();
+  expect(screen.getByText(/This voice conversation is still using/)).toHaveTextContent("Nachhaltige Mobilität");
+
+  fireEvent.click(screen.getByRole("button", {name:"Resume voice conversation"}));
+  await waitFor(() => expect(screen.getByText(/Your existing voice session is still using its original topic and level/)).toBeInTheDocument());
+  expect(activeBanner()).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"German conversation · B1"})).toBeInTheDocument();
+
+  // Changing both lesson and level while active must never overwrite the saved context.
+  rerender(
+    <MemoryRouter><LiveSpeakPage embedded initialLevel="A2"
+      practiceTopic="Mein Urlaub" practiceSource="exam-speaking-practice" /></MemoryRouter>,
+  );
+  expect(activeBanner()).toBeInTheDocument();
+  expect(screen.getByText(/This voice conversation is still using/)).toHaveTextContent("Nachhaltige Mobilität");
 });

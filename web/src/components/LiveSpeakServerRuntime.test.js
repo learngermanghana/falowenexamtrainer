@@ -213,6 +213,11 @@ test("workbook topic starts a real scoped voice session; Exam Room cannot silent
   expect(started.code).toBe(200);
   expect(started.payload.topic).toBe("Nachhaltige Mobilität");
   expect(started.payload.source).toBe("b2-workbook");
+  const status = await api.call("GET","/live-speak/status");
+  expect(status.payload.activeSession).toEqual(expect.objectContaining({
+    level:"B2",topic:"Nachhaltige Mobilität",source:"b2-workbook",
+    sessionId:started.payload.sessionId,
+  }));
   const record=api.docs.get("liveSpeakSessions/u123");
   expect(record.level).toBe("B2");
   expect(record.topic).toBe("Nachhaltige Mobilität");
