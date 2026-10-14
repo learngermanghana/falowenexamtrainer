@@ -1,3 +1,4 @@
+const { deliverCurrentStudentToSheet } = require("./studentSheetDelivery");
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const { _protectedOnCall: onCall } = require("./accountDeletion");
 const { setGlobalOptions } = require("firebase-functions/v2");
@@ -987,6 +988,7 @@ exports.onStudentCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "students/{studentCode}",
+    retry: true,
     secrets: [
       GOOGLE_SERVICE_ACCOUNT_JSON_B64,
       STUDENTS_SHEET_ID,
@@ -1015,8 +1017,9 @@ exports.onStudentCreated = onDocumentCreated(
 
     const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
 
-    const result = await getStudentAppender()({
-      ...student,
+    const result = await deliverCurrentStudentToSheet({
+      snapshot: snap,
+      appendStudent: getStudentAppender(),
       studentCode,
     });
 
@@ -1030,6 +1033,7 @@ exports.onStudentUpdated = onDocumentUpdated(
   {
     region: "europe-west1",
     document: "students/{studentCode}",
+    retry: true,
     secrets: [
       GOOGLE_SERVICE_ACCOUNT_JSON_B64,
       STUDENTS_SHEET_ID,
@@ -1055,8 +1059,9 @@ exports.onStudentUpdated = onDocumentUpdated(
     process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
 
     const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
-    const result = await getStudentAppender()({
-      ...student,
+    const result = await deliverCurrentStudentToSheet({
+      snapshot: after,
+      appendStudent: getStudentAppender(),
       studentCode,
     });
 
