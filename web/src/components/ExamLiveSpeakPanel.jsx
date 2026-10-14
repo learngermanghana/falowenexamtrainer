@@ -7,18 +7,26 @@ export default function ExamLiveSpeakPanel({
   onQuestionChange, questions = [], question = null,
   formatQuestion, compact = false,
 }) {
-  const selectedTopic = question?.topicPrompt || question?.question || "Goethe speaking exam practice";
+  const selectedTopic = question?.topicPrompt || question?.text || "Goethe speaking exam practice";
+  const examinerTask = question ? {
+    id: question.id,
+    teil: question.teilLabel || question.teilId || "",
+    prompt: question.topicPrompt || question.text || "",
+    keywords: question.keywordSubtopic || "",
+    hint: question.hint || "",
+  } : null;
   return (
-    <section aria-label="Live German speaking conversation" style={{background:"#f8fafc",padding:compact?12:20,display:"grid",gap:16}}>
+    <section aria-label="Goethe AI Examiner speaking practice" style={{background:"#f8fafc",padding:compact?12:20,display:"grid",gap:16}}>
       <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
         <div style={{display:"grid",gap:4}}>
           <p style={{margin:0,fontSize:12,color:"#1d4ed8",fontWeight:800,letterSpacing:".04em",textTransform:"uppercase"}}>
-            AI German speaking partner
+            Goethe AI Examiner · speaking simulation
           </p>
-          <h2 style={{margin:0,fontSize:compact?21:24,color:"#0f172a"}}>Speak naturally. Learn as you talk.</h2>
+          <h2 style={{margin:0,fontSize:compact?21:24,color:"#0f172a"}}>Practise the Goethe speaking task aloud.</h2>
           <p style={{margin:0,maxWidth:620,fontSize:13,lineHeight:1.6,color:"#475569"}}>
-            Choose a Goethe topic, listen to the AI and reply aloud.
-            Review what the microphone heard before getting a short correction and another German question.
+            Choose an exam part and prompt. The AI Examiner introduces the task, listens and asks
+            appropriate follow-up questions. Review the transcript before continuing;
+            task feedback comes after you finish.
           </p>
         </div>
         <span style={{fontSize:12,fontWeight:700,color:"#1e40af",background:"#dbeafe",padding:"7px 11px",borderRadius:999}}>
@@ -29,7 +37,7 @@ export default function ExamLiveSpeakPanel({
         background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,
         padding:compact?12:15,display:"grid",gap:11,
       }}>
-        <div style={{fontSize:14,fontWeight:750,color:"#0f172a"}}>Select your speaking topic</div>
+        <div style={{fontSize:14,fontWeight:750,color:"#0f172a"}}>Choose your Goethe exam task</div>
         <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(115px, 1fr) minmax(0, 3fr)",gap:12}}>
           <label style={{display:"grid",gap:5,color:"#334155",fontSize:12,fontWeight:650}}>
             Exam part
@@ -61,11 +69,14 @@ export default function ExamLiveSpeakPanel({
           it continues with its original topic until you end it.
         </p>
       </div>
-      <LiveSpeakPage embedded initialLevel={level}
-        practiceTopic={selectedTopic} practiceSource="exam-speaking-practice" />
+      {examinerTask ? (
+        <LiveSpeakPage embedded initialLevel={level}
+          practiceTopic={selectedTopic} practiceSource="exam-speaking-practice"
+          examTask={examinerTask} />
+      ) : <p role="status">Select a speaking task to start your AI Examiner.</p>}
       <p style={{fontSize:12,lineHeight:1.5,color:"#64748b",margin:0}}>
-        This is optional conversational practice, not a timed or graded Goethe mock exam.
-        Your Exam Coach results and progress are not changed.
+        The AI Examiner gives practice-only feedback after the task. It does not interrupt to correct
+        mistakes or produce an official Goethe exam score. Timed mocks and saved exam results are unchanged.
       </p>
     </section>
   );
