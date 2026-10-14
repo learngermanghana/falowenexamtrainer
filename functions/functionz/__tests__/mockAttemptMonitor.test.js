@@ -31,6 +31,7 @@ test("unrelated nested attempts are excluded and completed scores are verified",
   });
   expect(completed.overallScore).toBe(80);
   expect(completed.progressCount).toBe(2);
+  expect(completed.sectionScores).toEqual({ lesen: 0, hoeren: 10 });
 });
 
 test("listMockAttempts loads recent monitored rows", async () => {
@@ -129,3 +130,28 @@ test("mock monitor resolves legacy profiles keyed by UID and preserves email fal
   expect(result.attempts.map(row => row.studentName)).toEqual(["Nana Boateng", ""]);
   expect(result.attempts[1].studentEmail).toBe("missing@example.org");
 });
+
+
+test("mock monitor publishes only completed, server-verified section scores", () => {
+  const attempt = (data) => normalizeMockAttempt({
+    id: "verified", ref: { path: "a2MockExamUsers/uid/attempts/verified" }, data: () => data,
+  });
+  expect(attempt({
+    status: "completed", sectionScores: { lesen: 0, hoeren: 25, schreiben: 18.5, sprechen: 21 },
+    verifiedOverall: { score: 64.5 },
+  }).sectionScores).toEqual({ lesen: 0, hoeren: 25, schreiben: 18.5, sprechen: 21 });
+  expect(attempt({
+    status: "in_progress", sectionScores: { lesen: 25, hoeren: 20 },
+    verifiedOverall: { score: 90 },
+  }).sectionScores).toBeNull();
+  expect(attempt({
+    status: "completed", sectionScores: { lesen: 25 },
+    overall: { score: 100 },
+  }).sectionScores).toBeNull();
+  expect(attempt({
+    status: "completed", sectionScores: {
+      lesen: 0, hoeren: "", schreiben: "invalid", sprechen: 29,
+    }, verifiedOverall: { score: 25 },
+  }).sectionScores).toEqual({ lesen: 0 });
+});
+
