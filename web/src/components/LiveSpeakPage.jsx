@@ -29,6 +29,11 @@ export default function LiveSpeakPage() {
   const [session, setSession] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [messages, setMessages] = useState([]);
+  const [pending, setPending] = useState(null);
+  const [recognizedText, setRecognizedText] = useState("");
+  const [studentAudioUrl, setStudentAudioUrl] = useState("");
+  const recordedUrlRef = useRef(null);
+  const [selectedLevel, setSelectedLevel] = useState("");
   const [recording, setRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [voiceReady, setVoiceReady] = useState(false);
@@ -40,7 +45,7 @@ export default function LiveSpeakPage() {
   const requestBusy = useRef(false);
   const mounted = useRef(true);
   const level = String(studentProfile?.level || "A2").toUpperCase();
-  const safeLevel = /^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2";
+  const safeLevel = selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -78,6 +83,7 @@ export default function LiveSpeakPage() {
       mediaRef.current?.getTracks().forEach(track => track.stop());
       if (recordingTicker.current) clearInterval(recordingTicker.current);
       voiceRef.current?.pause();
+      if (recordedUrlRef.current) URL.revokeObjectURL(recordedUrlRef.current);
     };
   }, [refresh]);
 
@@ -115,6 +121,13 @@ export default function LiveSpeakPage() {
         sessionId: currentSession.sessionId, history, ...payload,
       });
       if (!mounted.current) return;
+      if (result.needsConfirmation) {
+        setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,uncertain:Boolean(result.uncertain)});
+        setRecognizedText(result.transcript);
+        setNotice(result.uncertain ? "The recording was unclear. Please listen, correct the transcript, or record again." :
+          "Check what the AI heard before the tutor responds.");
+        return;
+      }
       setMessages(old => [
         ...old,
         ...(result.transcript ? [{role:"user",text:result.transcript}] : []),
@@ -130,6 +143,51 @@ export default function LiveSpeakPage() {
     }
   };
 
+  const confirmTranscript = async () => {
+    if (!pending || !session || requestBusy.current || busy) return;
+    const text = recognizedText.trim();
+    if (text.length < 2 || text.length > 600) {
+      setErrorMessage("Check the German transcript (2–600 characters) before continuing.");
+      return;
+    }
+    requestBusy.current = true;
+    setBusy(true);
+    setErrorMessage("");
+    try {
+      const history = messages.slice(-6).map(msg => ({role:msg.role,text:msg.text}));
+      const result = await api("/live-speak/session/confirm", "POST", {
+        sessionId:session.sessionId,pendingId:pending.pendingId,transcript:text,history,
+      });
+      if (!mounted.current) return;
+      setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",text:result.reply}]);
+      setPending(null);
+      setRecognizedText("");
+      setLastAudio(result.audioBase64);
+      setNotice("");
+      await playVoice(result.audioBase64);
+    } catch (err) {
+      if (mounted.current) {
+        setErrorMessage(err.message);
+        if (err.code === "transcript_missing") setPending(null);
+      }
+    } finally {
+      requestBusy.current = false;
+      if (mounted.current) setBusy(false);
+    }
+  };
+
+  const clearRecording = () => {
+    if (recordedUrlRef.current) URL.revokeObjectURL(recordedUrlRef.current);
+    recordedUrlRef.current = null;
+    setStudentAudioUrl("");
+  };
+  const retryTranscript = () => {
+    setPending(null);
+    setRecognizedText("");
+    setNotice("Record your answer again. The AI will not correct the previous transcript.");
+    clearRecording();
+  };
+
   const startSession = async () => {
     if (busy || session) return;
     setBusy(true);
@@ -137,6 +195,8 @@ export default function LiveSpeakPage() {
     try {
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel});
       setSession(result);
+      setPending(null);
+      clearRecording();
       if (!result.resumed) {
         setMessages([]);
         setLastAudio("");
@@ -159,6 +219,8 @@ export default function LiveSpeakPage() {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
     const existing = session;
     setSession(null);
+    setPending(null);
+    clearRecording();
     setNotice("Your conversation has ended. Review your corrections and phrases below.");
     try { await api("/live-speak/session/end", "POST", { sessionId: existing.sessionId }); }
     catch (_error) { /* The server expiry and quotas still apply. */ }
@@ -166,7 +228,7 @@ export default function LiveSpeakPage() {
   };
 
   const startRecording = async () => {
-    if (!session || busy || recording || now >= Date.parse(session.expiresAt)) return;
+    if (!session || busy || recording || pending || now >= Date.parse(session.expiresAt)) return;
     setErrorMessage("");
     if (typeof MediaRecorder === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setErrorMessage("Audio recording is not supported on this browser. Use a recent Chrome or Safari version.");
@@ -198,6 +260,10 @@ export default function LiveSpeakPage() {
           return;
         }
         try {
+          clearRecording();
+          const playableUrl = URL.createObjectURL(blob);
+          recordedUrlRef.current = playableUrl;
+          setStudentAudioUrl(playableUrl);
           const audioBase64 = await toBase64(blob);
           await sendTurn(session, {intro:false, audioBase64, mimeType:blob.type});
         } catch (err) { setErrorMessage(err.message); }
@@ -260,6 +326,13 @@ export default function LiveSpeakPage() {
           <h2 style={{margin:0}}>Your free voice test</h2>
           <p style={{margin:0,color:"#334155"}}>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice. There are no payments or subscriptions during this test.</p>
           <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
+          {!session ? <label style={{display:"grid",gap:5,maxWidth:245}}>
+            <strong>German conversation level</strong>
+            <select value={safeLevel} onChange={e=>setSelectedLevel(e.target.value)}
+              style={{padding:"10px 12px",border:"1px solid #cbd5e1",borderRadius:10,background:"#fff"}}>
+              {["A1","A2","B1","B2","C1","C2"].map(option=><option key={option} value={option}>{option}</option>)}
+            </select>
+          </label> : null}
           {details.expiresAt ? <p style={{margin:0,color:"#475569",fontSize:13}}>Test access expires {new Date(details.expiresAt).toLocaleDateString()}.</p> : null}
           {details.capReached ? <p role="alert">The pilot's monthly AI-usage limit has been reached. Testing is temporarily paused.</p> : null}
           {!session && details.pilotAvailable ? (
@@ -294,19 +367,41 @@ export default function LiveSpeakPage() {
                 <p style={{margin:"7px 0 0",lineHeight:1.65}} lang="de">{message.text}</p>
               </div>
             ))}
-            {busy ? <p>Listening, correcting and preparing a German voice reply…</p> : null}
+            {busy ? <p>{pending ? "Preparing the tutor’s spoken reply…" : "Processing your German recording…"}</p> : null}
           </div>
           {lastAudio && voiceReady ? <button type="button" style={styles.secondaryButton} onClick={()=>playVoice(lastAudio)}>▶ Play AI voice again</button> : null}
+          {pending ? <div role="group" aria-label="Review German speech recognition"
+            style={{background:"#fff7ed",border:"1px solid #fdba74",padding:14,borderRadius:12,display:"grid",gap:10}}>
+            <strong>Did Falowen hear you correctly?</strong>
+            <p style={{margin:0,fontSize:13}}>
+              {pending.uncertain ? "Recognition confidence is low. Listen to the recording and correct the text, or try again." :
+                "Please check the German words below. If a word is wrong, correct it before the tutor speaks."}
+            </p>
+            <label style={{display:"grid",gap:5}}>
+              <span>What I said (you can edit this)</span>
+              <textarea lang="de" rows={3} value={recognizedText} maxLength={600}
+                onChange={event=>setRecognizedText(event.target.value)}
+                style={{border:"1px solid #cbd5e1",borderRadius:10,padding:10,fontSize:16}}/>
+            </label>
+            {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}} /> : null}
+            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+              <button type="button" style={styles.primaryButton}
+                disabled={busy || expired || recognizedText.trim().length < 2}
+                onClick={confirmTranscript}>Use this German answer</button>
+              <button type="button" style={styles.secondaryButton}
+                disabled={busy} onClick={retryTranscript}>Record again</button>
+            </div>
+          </div> : null}
           {expired ? <p role="status">Your five-minute session has ended. Your corrections remain visible here.</p> : null}
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
             <button type="button" style={styles.primaryButton}
               onClick={recording?stopRecording:startRecording}
-              disabled={busy || expired}>
+              disabled={busy || expired || Boolean(pending)}>
               {recording ? "■ Stop & send (" + recordingSeconds + "s)" : "🎤 Speak German"}
             </button>
             <button type="button" style={styles.secondaryButton} onClick={endSession}>End session</button>
           </div>
-          <small style={{color:"#475569"}}>Speak for 2–20 seconds per turn. Your audio is processed for this reply and is not saved to your student results.</small>
+          <small style={{color:"#475569"}}>Speak for 2–20 seconds. Review or correct what the microphone recognized before the tutor responds. Audio is temporary and is not saved to student results.</small>
         </section>
       ) : null}
 
