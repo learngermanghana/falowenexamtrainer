@@ -19,7 +19,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage() {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "" }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,10 @@ export default function LiveSpeakPage() {
   const requestBusy = useRef(false);
   const mounted = useRef(true);
   const level = String(studentProfile?.level || "A2").toUpperCase();
-  const safeLevel = selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
+  const contextualLevel = String(initialLevel || "").toUpperCase();
+  const fixedLevel = embedded && /^(A1|A2|B1|B2|C1|C2)$/.test(contextualLevel) ? contextualLevel : "";
+  const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
+  const Container = embedded ? "section" : "main";
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -193,7 +196,7 @@ export default function LiveSpeakPage() {
     setBusy(true);
     setErrorMessage("");
     try {
-      const result = await api("/live-speak/session/start", "POST", {level:safeLevel});
+      const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource});
       setSession(result);
       setPending(null);
       clearRecording();
@@ -204,7 +207,11 @@ export default function LiveSpeakPage() {
       setNow(Date.now());
       setBusy(false);
       if (!result.resumed) await sendTurn(result, {intro:true});
-      else setNotice("Your ongoing speaking session has resumed. Continue speaking German.");
+      else setNotice(
+        result.source && practiceSource && result.source !== practiceSource
+          ? "Your existing voice session was started elsewhere. It keeps its original topic and level until you end it."
+          : "Your ongoing speaking session has resumed. Continue speaking German."
+      );
       refresh();
     } catch (err) {
       setErrorMessage(err.message);
@@ -304,13 +311,18 @@ export default function LiveSpeakPage() {
   const expired = Boolean(session) && timeRemaining <= 0;
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
   return (
-    <main style={{ ...styles.container, maxWidth: 940, paddingBottom: 65, display:"grid", gap:16 }}>
-      <Link to="/" style={{ color:"#1d4ed8", fontWeight:700, textDecoration:"none" }}>← Back to Falowen</Link>
-      <section style={{ ...shell, background:"linear-gradient(135deg,#132f67,#145b8f)",color:"#fff" }}>
-        <p style={{ margin:0, letterSpacing:1, textTransform:"uppercase",fontSize:12 }}>Private German voice pilot · No payments</p>
-        <h1 style={{ margin:"8px 0",color:"#fff",fontSize:"clamp(27px,6vw,39px)" }}>Falowen Live Speak</h1>
-        <p style={{ margin:0,color:"#e0efff",lineHeight:1.6 }}>Speak German with a natural AI voice, hear a gentle correction after your turn, and keep the conversation going. Five-minute sessions. No continuous listening.</p>
-      </section>
+    <Container data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
+      style={embedded
+        ? { display:"grid", gap:12, maxWidth:"100%", minWidth:0, padding:"8px 0" }
+        : { ...styles.container, maxWidth:940, paddingBottom:65, display:"grid", gap:16 }}>
+      {!embedded ? <Link to="/" style={{ color:"#1d4ed8", fontWeight:700, textDecoration:"none" }}>← Back to Falowen</Link> : null}
+      {!embedded ? (
+        <section style={{ ...shell, background:"linear-gradient(135deg,#132f67,#145b8f)",color:"#fff" }}>
+          <p style={{ margin:0, letterSpacing:1, textTransform:"uppercase",fontSize:12 }}>German voice pilot · No payments</p>
+          <h1 style={{ margin:"8px 0",color:"#fff",fontSize:"clamp(27px,6vw,39px)" }}>Falowen Live Speak</h1>
+          <p style={{ margin:0,color:"#e0efff",lineHeight:1.6 }}>Speak German with a natural AI voice, hear a gentle correction after your turn, and keep the conversation going. Five-minute sessions. No continuous listening.</p>
+        </section>
+      ) : null}
 
       {loading ? <section style={shell}>Checking your speaking allowance…</section> : null}
       {!loading && details && !details.enabled ? (
@@ -324,9 +336,16 @@ export default function LiveSpeakPage() {
       {details?.enabled ? (
         <section style={{...shell, display:"grid",gap:10}}>
           <h2 style={{margin:0}}>Your free voice test</h2>
-          <p style={{margin:0,color:"#334155"}}>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice. There are no payments or subscriptions during this test.</p>
+          <p style={{margin:0,color:"#334155"}}>
+            {embedded ? "Practise your current speaking lesson with a natural German AI voice." :
+              <>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice.</>}
+            {" "}There are no payments or subscriptions during this test.
+          </p>
+          {embedded ? <p style={{margin:0,color:"#475569",fontSize:13}}>
+            <strong>Level:</strong> {safeLevel}{practiceTopic ? ` · Topic: ${practiceTopic}` : ""}
+          </p> : null}
           <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
-          {!session ? <label style={{display:"grid",gap:5,maxWidth:245}}>
+          {!session && !fixedLevel ? <label style={{display:"grid",gap:5,maxWidth:245}}>
             <strong>German conversation level</strong>
             <select value={safeLevel} onChange={e=>setSelectedLevel(e.target.value)}
               style={{padding:"10px 12px",border:"1px solid #cbd5e1",borderRadius:10,background:"#fff"}}>
@@ -355,7 +374,7 @@ export default function LiveSpeakPage() {
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0}}>German conversation · {safeLevel}</h2>
+              <h2 style={{margin:0}}>German conversation · {session.level || safeLevel}</h2>
               <p style={{margin:"5px 0",color:"#475569"}}>The tutor will speak first, then listen to each response.</p>
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
@@ -412,6 +431,6 @@ export default function LiveSpeakPage() {
         <p>This pilot tests whether our natural German AI voice, speech recognition and short corrections work well. Your usual course, Goethe Free Sprechen Chat and Speaking Trainer remain unchanged. Feedback covers grammar and communication, not precise phonetic pronunciation scores.</p>
         <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice can make mistakes. Report unusual pronunciation or delays. There is no checkout, charge or subscription in this testing version. Server-side access and usage limits apply.</p>
       </section>
-    </main>
+    </Container>
   );
 }

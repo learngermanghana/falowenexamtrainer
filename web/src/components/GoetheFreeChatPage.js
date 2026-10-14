@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
+import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { requestCustomSpeakingChatReply } from "../services/presentationCoachService";
@@ -430,7 +431,9 @@ export default function GoetheFreeChatPage({ lockedLevel = "", contextLabel = ""
   };
 
   return (
-    <div data-goethe-free-chat="text-first" style={{ ...styles.card, margin: 0, padding: 0, overflow: "hidden" }}>
+    <div data-course-speaking-options="true" style={{display:"grid",gap:12,minWidth:0}}>
+      <LiveSpeakInlinePractice level={level} topic={topic || contextLabel} source="course-workbook" />
+      <div data-goethe-free-chat="text-first" style={{ ...styles.card, margin: 0, padding: 0, overflow: "hidden" }}>
       <header style={{ padding: 16, background: "linear-gradient(120deg,#047857,#0f766e)", color: "#fff", display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <div>
           <strong style={{ fontSize: 20 }}>Goethe Free Sprechen Chat · {level}</strong>
@@ -524,6 +527,7 @@ export default function GoetheFreeChatPage({ lockedLevel = "", contextLabel = ""
           </div>
         </section>
       </div>
+    </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import B2TopicIntroduction, { B2_TOPIC_FOUNDATIONS } from "./B2TopicIntroduction";
 import { getB2ReviewKeyPoints } from "../data/b2ReviewKeyPoints";
 import B2SpeakingSupportGuide from "./B2SpeakingSupportGuide";
+import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import { EmbeddedSpeechPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 import GuidedWritingWorkspace from "./GuidedWritingWorkspace";
 import WritingCheatSheetTabs from "./WritingCheatSheetTabs";
@@ -469,7 +470,7 @@ export default function B2UnifiedGuidedWorkbookPage({ lesson, canonicalLesson = 
 
     {active === "lesen" ? <ReadingPractice day={day} progress={progress} setProgress={setProgress} /> : null}
     {active === "hoeren" ? <ListeningPractice day={day} progress={progress} setProgress={setProgress} /> : null}
-    {active === "speak" ? <Section title="Sprechen"><B2SpeakingSupportGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700 }}><input type="checkbox" checked={Boolean(progress.speakDone)} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />Ich habe die Sprechaufgabe abgeschlossen.</label></Section> : null}
+    {active === "speak" ? <Section title="Sprechen"><B2SpeakingSupportGuide lesson={lesson} /><EmbeddedSpeechPracticePanel /><LiveSpeakInlinePractice level="B2" topic={alignment.lessonTopic || alignment.title} source="b2-workbook" /><label style={{ display: "flex", gap: 9, alignItems: "flex-start", fontWeight: 700 }}><input type="checkbox" checked={Boolean(progress.speakDone)} onChange={(event) => setProgress((old) => ({ ...old, speakDone: event.target.checked }))} />Ich habe die Sprechaufgabe abgeschlossen.</label></Section> : null}
     {active === "write" ? <Section title="Schreiben"><WritingCheatSheetTabs level="B2" day={day}><WritingTaskPrompt lesson={writingLesson} /><GuidedWritingWorkspace config={writingConfig} storageKey={getStandardLessonStorageKey(lesson, "writing")} cloudField={getStandardWritingCloudField(lesson)} onStatusChange={({ complete }) => setProgress((old) => old.writeDone === Boolean(complete) ? old : ({ ...old, writeDone: Boolean(complete) }))} /></WritingCheatSheetTabs></Section> : null}
     {active === "review" ? <Review day={day} alignment={alignment} lesson={lesson} skillLabel={skillLabel} ready={ready} progress={progress} /> : null}
     {active === "references" ? <WorkbookReferenceAnswers level="B2" lesson={lesson} workbookId={`B2-day-${day}`} /> : null}

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
+import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -954,6 +955,16 @@ const SpeakingPage = ({
             Clear conversation
           </button>
         </div>
+
+        {isExamMode && typeof window !== "undefined" && /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname) ? (
+          <div style={{padding:"12px 16px",background:"#f8fafc"}}>
+            <LiveSpeakInlinePractice
+              level={selectedLevel}
+              topic={selectedQuestion?.topicPrompt || selectedQuestion?.question || "Goethe speaking exam practice"}
+              source="exam-speaking-practice"
+            />
+          </div>
+        ) : null}
 
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
