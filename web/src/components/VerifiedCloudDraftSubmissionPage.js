@@ -4,6 +4,7 @@ import { useToast } from "../context/ToastContext";
 import { collection, db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { styles } from "../styles";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import { findOwnedSubmissionLock } from "../services/submissionLockService";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { InfoBox } from "./ui";
@@ -476,9 +477,9 @@ const VerifiedCloudDraftSubmissionPage = ({
       }
 
       try {
-        const lockSnapshot = await getDoc(doc(db, LOCK_COLLECTION, draftDocId));
+        const lockSnapshot = await findOwnedSubmissionLock({ db, studentId: user.uid, lockId: draftDocId });
         if (cancelled) return;
-        if (lockSnapshot.exists()) {
+        if (lockSnapshot?.exists()) {
           setLockData(lockSnapshot.data() || {});
           setLocked(true);
           setReady(true);
@@ -716,8 +717,8 @@ const VerifiedCloudDraftSubmissionPage = ({
       }
 
       const lockRef = doc(db, LOCK_COLLECTION, draftDocId);
-      const existingLock = await getDoc(lockRef);
-      if (existingLock.exists()) {
+      const existingLock = await findOwnedSubmissionLock({ db, studentId: user.uid, lockId: draftDocId });
+      if (existingLock?.exists()) {
         setLockData(existingLock.data() || {});
         setLocked(true);
         setReady(true);
