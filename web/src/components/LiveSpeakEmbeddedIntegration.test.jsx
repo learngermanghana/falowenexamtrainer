@@ -37,7 +37,7 @@ test("workbook and exam room reuse the same embedded voice component and existin
   expect(workbookChat).toContain('source="course-workbook"');
   expect(workbookChat).toContain('data-goethe-free-chat="text-first"');
   expect(exam).toContain('import LiveSpeakPage from "./LiveSpeakPage"');
-  expect(exam).toContain("<LiveSpeakPage embedded");
+  expect(exam).toMatch(/<LiveSpeakPage\s+key=\{selectedLevel/);
   expect(exam).toContain('practiceSource="exam-speaking-practice"');
   expect(exam).toContain("selectedQuestion.topicPrompt");
   expect(exam).toContain("examTask={{");
