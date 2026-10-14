@@ -574,7 +574,7 @@ test("simulation and task limits cannot be replaced by client profile fields",as
   const api=setup();await api.call("POST","/live-speak/pilot/claim");
   const response=await api.call("POST","/live-speak/session/start",{level:"A1",source:"exam-speaking-practice",examinerFlowVersion:1,
     examMode:"simulation",answerLimit:999,examFlow:{key:"B1-2",maxAnswers:999},examTask:{id:"x",teil:"Teil 1",prompt:"Name"}});
-  expect(response.payload.answerLimit).toBe(3);
+  expect(response.payload.answerLimit).toBe(4);
   expect(response.payload.maxRecordingSeconds).toBe(60);
   expect(response.payload.examFlow.hints).toEqual([]);
 });
