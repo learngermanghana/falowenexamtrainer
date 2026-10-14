@@ -5,15 +5,15 @@ const MODES = [
     key: "coach",
     icon: "📝",
     title: "Exam Coach",
-    description: "Type or record answers to Goethe prompts and review coaching and corrections.",
-    detail: "Exam prompts · Custom chat",
+    description: "Type or record your answer and review corrections.",
+    detail: "Questions · Feedback",
   },
   {
     key: "voice",
     icon: "🎙️",
     title: "Practise with AI Examiner",
-    description: "Hear Goethe-style questions, respond aloud and receive feedback after your task.",
-    detail: "Spoken exam simulation · Free pilot",
+    description: "Listen, speak and receive feedback after the task.",
+    detail: "Spoken exam practice",
   },
 ];
 
@@ -23,7 +23,7 @@ export default function SpeakingPracticeModePicker({ value = "coach", onChange, 
       style={{padding:compact ? "13px 12px" : "17px 20px",background:"#fff",borderBottom:"1px solid #e2e8f0"}}>
       <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:8,flexWrap:"wrap",marginBottom:10}}>
         <h2 style={{fontSize:15,margin:0,color:"#0f172a"}}>How would you like to practise?</h2>
-        <span style={{fontSize:12,color:"#64748b"}}>Both options are optional and separate from graded mocks</span>
+
       </div>
       <div role="group" aria-label="Speaking practice mode"
         style={{display:"grid",gridTemplateColumns:compact ? "minmax(0, 1fr)" : "repeat(2, minmax(0, 1fr))",gap:10}}>
