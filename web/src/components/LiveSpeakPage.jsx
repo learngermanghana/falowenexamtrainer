@@ -6,6 +6,7 @@ import GoetheExamTaskCard from "./GoetheExamTaskCard";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
+import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
 
 const MAX_RECORDING_SECONDS = 20;
 const MAX_AUDIO_BYTES = 350000;
@@ -43,6 +44,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [recording, setRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [voiceReady, setVoiceReady] = useState(false);
+  const [voiceState, setVoiceState] = useState("idle");
+  const [audioRetry, setAudioRetry] = useState(null);
   const recorderRef = useRef(null);
   const mediaRef = useRef(null);
   const recordingTicker = useRef(null);
@@ -134,19 +137,37 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   }, [session]);
 
   const stopAudio = () => {
-    voiceRef.current?.pause();
+    const previous = voiceRef.current;
+    if (previous) {
+      previous.onended = null;
+      previous.onerror = null;
+      previous.pause();
+    }
     voiceRef.current = null;
     setVoiceReady(false);
+    setVoiceState("idle");
   };
 
   const playVoice = async (base64) => {
     stopAudio();
-    if (!base64) return;
+    if (!base64) { setVoiceState("ready"); return; }
     const audio = new Audio("data:audio/mpeg;base64," + base64);
     voiceRef.current = audio;
+    audio.onended = () => {
+      if (voiceRef.current === audio && mounted.current) setVoiceState("ready");
+    };
+    audio.onerror = () => {
+      if (voiceRef.current !== audio || !mounted.current) return;
+      setVoiceState("blocked");
+      setNotice("German audio could not play. Tap Replay examiner audio, or continue using the written question.");
+    };
     setVoiceReady(true);
-    try { await audio.play(); } catch (_err) {
-      setNotice("Your device blocked automatic playback. Tap Play AI voice to hear the reply.");
+    setVoiceState("playing");
+    try { await audio.play(); }
+    catch (_err) {
+      if (voiceRef.current !== audio || !mounted.current) return;
+      setVoiceState("blocked");
+      setNotice("Automatic audio playback was blocked. Tap Replay examiner audio to listen, or read the question.");
     }
   };
   const [lastAudio, setLastAudio] = useState("");
@@ -163,6 +184,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       if (result.needsConfirmation) {
+        setAudioRetry(null);
         setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,transcript:result.transcript,uncertain:Boolean(result.uncertain)});
         setRecognizedText(result.transcript);
         setRecognitionCorrection(false);
@@ -170,6 +192,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           "Check what the AI heard before the tutor responds.");
         return;
       }
+      setAudioRetry(null);
       setMessages(old => [
         ...old,
         ...(result.transcript ? [{role:"user",text:result.transcript}] : []),
@@ -204,6 +227,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply}]);
       setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20,maxTranscriptChars:result.maxTranscriptChars || old.maxTranscriptChars,...(result.examFlow ? {examFlow:result.examFlow} : {})} : old);
       setPending(null);
+      setAudioRetry(null);
       setRecognizedText("");
       setLastAudio(result.audioBase64);
       setNotice("");
@@ -238,6 +262,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setStudentAudioUrl("");
   };
   const retryTranscript = () => {
+    setAudioRetry(null);
     setPending(null);
     setRecognizedText("");
     setNotice("Record your answer again. The AI will not correct the previous transcript.");
@@ -259,6 +284,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
       setSession(result);
+      setAudioRetry(null);
+      setVoiceState("idle");
       setLocalRetry(false);
       setExamFeedback("");
       setRecognitionCorrection(false);
@@ -302,6 +329,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     const existing = session;
     setSession(null);
     setPending(null);
+    setAudioRetry(null);
     clearRecording();
     setNotice(examinerSession ? "The examiner task was ended without feedback." : "Your conversation has ended. Review your corrections and phrases below.");
     try { await api("/live-speak/session/end", "POST", { sessionId: existing.sessionId }); }
@@ -333,7 +361,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   };
 
   const startRecording = async (localOnly = false) => {
-    if (recordingStarting.current || busy || feedbackBusy || recording || pending) return;
+    if (recordingStarting.current || busy || feedbackBusy || recording || pending || audioRetry || voiceState === "playing") return;
     if (!localOnly && (!session || taskReady || now >= Date.parse(session.expiresAt))) return;
     if (localOnly && !examFeedback) return;
     setErrorMessage("");
@@ -349,9 +377,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) { stream.getTracks().forEach(track => track.stop()); return; }
       mediaRef.current = stream;
-      const mime = voiceTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
+      const mime = voiceTypes.find(type => typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(type)) || "";
       const recorder = new MediaRecorder(stream, {audioBitsPerSecond:24000, ...(mime ? {mimeType:mime} : {})});
       recorderRef.current = recorder;
+      recorder.onerror = () => setErrorMessage("Recording was interrupted. Check microphone access and record again.");
       const chunks = [];
       let recordedBytes = 0;
       recorder.ondataavailable = event => {
@@ -401,7 +430,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }, 300);
     } catch (err) {
       mediaRef.current?.getTracks().forEach(track => track.stop());
-      setErrorMessage(err?.message || "Microphone permission was denied.");
+      setErrorMessage(microphoneFailureMessage(err));
     } finally {
       recordingStarting.current = false;
     }
@@ -416,6 +445,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
+  const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
       style={embedded
