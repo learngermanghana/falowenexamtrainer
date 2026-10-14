@@ -12,6 +12,7 @@ const SESSION_MS = 5 * 60 * 1000;
 const PILOT_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_TURNS = 10;
 const MAX_AUDIO_BYTES = 350000;
+const MAX_CONFIRMED_CHARS = 600;
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
 const VALID_AUDIO = new Set(["audio/webm", "audio/mp4", "audio/mpeg", "audio/wav", "audio/ogg"]);
 const GERMAN_OPENINGS = {
@@ -35,6 +36,17 @@ const cleanLevel = (value) => {
   return LEVELS.has(level) ? level : "A2";
 };
 const error = (res, status, code, message) => res.status(status).json({ error: message, code });
+const transcriptUncertain = (recognition) => {
+  const values = Array.isArray(recognition?.logprobs)
+    ? recognition.logprobs.map(entry => Number(entry?.logprob)).filter(Number.isFinite)
+    : [];
+  const average = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+  return average !== null && average < -0.8;
+};
+const germanTranscriptionPrompt = (level) =>
+  "Dies ist eine Deutsch-Sprechübung auf Niveau " + level +
+  ". Schreibe nur die tatsächlich gesprochenen Wörter auf Deutsch. " +
+  "Wenn die Aufnahme unklar ist, erfinde keine Wörter. Das Deutsch darf grammatische Fehler enthalten.";
 const addDays = (milliseconds) => new Date(Date.now() + milliseconds).toISOString();
 const withinWindow = (sub) => Boolean(sub && Date.parse(sub.expiresAt || "") > Date.now());
 const receiptStatus = (sub) => ({
@@ -209,38 +221,53 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (Number(session.turnsUsed) >= MAX_TURNS) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
         if ((Number(usageSnap.data()?.turns) || 0) >= spendingCap()) throw Object.assign(new Error("Pilot spending limit reached."), {status:429,code:"budget_reached"});
         level = cleanLevel(session.level);
-        tx.update(sessionRef, { inFlight: true, turnsUsed: admin.firestore.FieldValue.increment(1) });
-        tx.set(globalRef, { turns: admin.firestore.FieldValue.increment(1), updatedAt: admin.firestore.FieldValue.serverTimestamp() }, {merge:true});
+        const reservedCalls = intro ? 1 : 2; // Transcribe now; reserve one response call for confirmation.
+        if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > spendingCap()) {
+          throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
+        }
+        tx.update(sessionRef, {
+          inFlight: true, turnsUsed: admin.firestore.FieldValue.increment(1),
+          pendingId: null, pendingTranscript: null,
+        });
+        tx.set(globalRef, {
+          turns: admin.firestore.FieldValue.increment(reservedCalls),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }, {merge:true});
         accepted = true;
       });
 
       if (!process.env.OPENAI_API_KEY) throw new Error("Live Speak AI is not configured.");
       const client = getOpenAIClient();
-      let transcript = "", reply = "";
-      if (intro) {
-        reply = GERMAN_OPENINGS[level];
-      } else {
-        const ext = mime === "audio/mp4" ? "m4a" : mime === "audio/ogg" ? "ogg" : mime === "audio/wav" ? "wav" : mime === "audio/mpeg" ? "mp3" : "webm";
-        const file = await toFile(audioBytes, "student." + ext, {type:mime});
+      if (!intro) {
+        const ext = mime === "audio/mp4" ? "m4a" : mime === "audio/ogg" ? "ogg" :
+          mime === "audio/wav" ? "wav" : mime === "audio/mpeg" ? "mp3" : "webm";
+        const file = await toFile(audioBytes, "student." + ext, { type: mime });
         const recognition = await client.audio.transcriptions.create({
-          file, model: process.env.LIVE_SPEAK_TRANSCRIBE_MODEL || "gpt-4o-mini-transcribe", language: "de",
+          file,
+          model: process.env.LIVE_SPEAK_TRANSCRIBE_MODEL || "gpt-4o-transcribe",
+          language: "de",
+          prompt: germanTranscriptionPrompt(level),
+          response_format: "json",
+          include: ["logprobs"],
         });
-        transcript = String(recognition?.text || "").trim().slice(0, 600);
-        if (!transcript) throw Object.assign(new Error("Could not hear your German clearly. Please try again."),{status:422,code:"transcript_empty"});
-        const history = (Array.isArray(req.body?.history) ? req.body.history : [])
-          .slice(-6)
-          .filter(x => (x?.role === "assistant" || x?.role === "user") && typeof x.text === "string")
-          .map(x => ({role:x.role,content:x.text.slice(0,450)}));
-        const system = "You are an encouraging native Standard German conversation tutor for CEFR " + level +
-          ". Respond ONLY in clear, idiomatic German. After each learner answer, briefly correct at most ONE important grammar or word-choice error; otherwise acknowledge naturally. Then ask exactly ONE relevant follow-up question. Keep replies to 1–3 short sentences, fewer than 280 characters. Remain on the current topic. Do not output markdown or assessment scores.";
-        const answer = await client.chat.completions.create({
-          model: process.env.LIVE_SPEAK_CHAT_MODEL || "gpt-4o-mini",
-          messages: [{role:"system",content:system}, ...history, {role:"user",content:transcript}],
-          max_tokens: 160, temperature:0.5,
+        const transcript = String(recognition?.text || "").trim().slice(0, MAX_CONFIRMED_CHARS);
+        if (!transcript) {
+          throw Object.assign(new Error("The recording could not be understood. Please record again."), {
+            status: 422, code: "transcript_empty",
+          });
+        }
+        const pendingId = crypto.randomUUID();
+        await sessionRef.update({
+          inFlight: false, pendingId, pendingTranscript: transcript,
+          pendingAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        reply = String(answer?.choices?.[0]?.message?.content || "").trim().slice(0, 420);
-        if (!reply) throw new Error("The speaking tutor could not reply.");
+        // Do not let the tutor judge grammar based on unconfirmed speech recognition.
+        return res.json({
+          ok: true, needsConfirmation: true, pendingId, transcript,
+          uncertain: transcriptUncertain(recognition),
+        });
       }
+      const reply = GERMAN_OPENINGS[level];
       const audio = await client.audio.speech.create({
         model: process.env.LIVE_SPEAK_TTS_MODEL || "gpt-4o-mini-tts",
         voice: process.env.LIVE_SPEAK_TTS_VOICE || "marin",
@@ -251,7 +278,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const mp3 = Buffer.from(await audio.arrayBuffer());
       if (!mp3.length || mp3.length > 1500000) throw new Error("The voice response is too large.");
       await sessionRef.update({ inFlight: false });
-      return res.json({ ok:true, transcript, reply, audioBase64: mp3.toString("base64"), mimeType:"audio/mpeg" });
+      return res.json({ ok:true, transcript:"", reply, audioBase64: mp3.toString("base64"), mimeType:"audio/mpeg" });
     } catch (err) {
       // Provider calls may already have incurred costs. Keep the metered turn and
       // global spend counter, even on provider errors, to prevent unlimited retries.
@@ -264,6 +291,80 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       return error(res, 503, "voice_unavailable", "Live Speak could not complete this turn. Please try again.");
     }
   });
+  app.post("/live-speak/session/confirm", async (req, res) => {
+    let sessionRef, reserved = false;
+    try {
+      if (!requireEnabled(res)) return;
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const sessionId = String(req.body?.sessionId || "");
+      const pendingId = String(req.body?.pendingId || "");
+      const confirmed = String(req.body?.transcript || "").trim();
+      if (!pendingId || confirmed.length < 2 || confirmed.length > MAX_CONFIRMED_CHARS) {
+        return error(res, 400, "invalid_transcript", "Review the recognized words before continuing.");
+      }
+      sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      let level = "A2";
+      await db().runTransaction(async tx => {
+        const snap = await tx.get(sessionRef);
+        const session = snap.data() || {};
+        if (!sessionId || session.sessionId !== sessionId || session.endedAt ||
+          Date.parse(session.expiresAt || "") <= Date.now()) {
+          throw Object.assign(new Error("The speaking session has ended."), {status:409,code:"session_ended"});
+        }
+        if (session.inFlight) {
+          throw Object.assign(new Error("A spoken reply is already processing."), {status:409,code:"turn_in_progress"});
+        }
+        if (!pendingId || pendingId !== session.pendingId || !session.pendingTranscript) {
+          throw Object.assign(new Error("Record your German answer again before continuing."), {status:409,code:"transcript_missing"});
+        }
+        level = cleanLevel(session.level);
+        // Confirmation may be edited by the learner; it is allowed only after a
+        // metered, authenticated audio transcription in the same session.
+        tx.update(sessionRef, {
+          inFlight:true, pendingId:null, pendingTranscript:null,
+        });
+        reserved = true;
+      });
+      const client = getOpenAIClient();
+      const history = (Array.isArray(req.body?.history) ? req.body.history : [])
+        .slice(-6)
+        .filter(x => (x?.role === "assistant" || x?.role === "user") && typeof x.text === "string")
+        .map(x => ({role:x.role, content:x.text.slice(0,450)}));
+      const system = "You are an encouraging native Standard German tutor for CEFR " + level +
+        ". Reply ONLY in natural spoken German. The student's German was spoken, not typed. " +
+        "Never mention Tippfehler or guess at garbled words. If meaning is unclear, politely ask for repetition " +
+        "instead of inventing a correction. If clear, correct at most one important grammar/word-choice error " +
+        "and then ask one relevant follow-up question. Limit response to three short sentences under 280 characters. No markdown.";
+      const answer = await client.chat.completions.create({
+        model: process.env.LIVE_SPEAK_CHAT_MODEL || "gpt-4o-mini",
+        messages: [{role:"system",content:system},...history,{role:"user",content:confirmed}],
+        max_tokens:160, temperature:0.5,
+      });
+      const reply = String(answer?.choices?.[0]?.message?.content || "").trim().slice(0,420);
+      if (!reply) throw new Error("The tutor could not reply.");
+      const audio = await client.audio.speech.create({
+        model: process.env.LIVE_SPEAK_TTS_MODEL || "gpt-4o-mini-tts",
+        voice: process.env.LIVE_SPEAK_TTS_VOICE || "marin",
+        input: reply,
+        response_format: "mp3",
+        instructions: "Speak fluent, natural Standard German, with clear pronunciation and friendly intonation.",
+      });
+      const mp3 = Buffer.from(await audio.arrayBuffer());
+      if (!mp3.length || mp3.length > 1500000) throw new Error("The voice response is too large.");
+      await sessionRef.update({inFlight:false});
+      return res.json({ok:true, transcript:confirmed, reply, audioBase64:mp3.toString("base64"),mimeType:"audio/mpeg"});
+    } catch (err) {
+      if (reserved && sessionRef) {
+        try { await sessionRef.update({inFlight:false}); }
+        catch (releaseError) { console.error("Live Speak confirm unlock error",releaseError?.message); }
+      }
+      if (err?.status) return error(res,err.status,err.code,err.message);
+      console.error("Live Speak confirm error",err?.message);
+      return error(res,503,"voice_unavailable","The tutor could not speak this time. Please record again.");
+    }
+  });
+
 }
 
-module.exports = { registerLiveSpeakRoutes, MAX_TURNS, PILOT_SESSIONS };
+module.exports = { registerLiveSpeakRoutes, MAX_TURNS, PILOT_SESSIONS, transcriptUncertain };
