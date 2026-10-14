@@ -10,6 +10,11 @@ function patchSpeakingPage() {
 
   const replaceOnce = (before, after, label) => {
     if (source.includes(after)) return;
+    // The modern speaking screen keeps the locked Teil display while adding
+    // a live-session guard to its selector. That is already the patched form.
+    if (label === "locked Teil display" &&
+        source.includes("{normalizedLockedTeil ? (") &&
+        source.includes(">Teil {normalizedLockedTeil}</div>")) return;
     if (!source.includes(before)) throw new Error(`Locked speaking patch anchor missing: ${label}`);
     source = source.replace(before, after);
   };
