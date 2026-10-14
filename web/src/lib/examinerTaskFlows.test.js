@@ -91,3 +91,59 @@ test("feedback readiness alone does not complete interrupted tasks",()=>{
  expect(flows.isReady({examFlow,answeredTurns:2,taskReady:true})).toBe(true);
  expect(flows.isComplete({examFlow,answeredTurns:2,taskReady:true})).toBe(false);
 });
+
+test("A1 Teil 1 keeps spelling and numbers, then asks exactly one personal follow-up",()=>{
+  const task={teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"};
+  const examFlow=flows.createExaminerFlow("A1",task);
+  expect(examFlow.key).toBe("A1-1");
+  expect(flows.maxAnswers({examFlow})).toBe(4);
+  expect([0,1,2,3].map(i=>flows.currentStep(examFlow,i).action))
+    .toEqual(["introduce","spell","number","personal-follow-up"]);
+  expect(flows.currentStep(examFlow,4)).toBe(null);
+  const session={examFlow,level:"A1",examTask:task,answeredTurns:3,
+    confirmedAnswers:["Ich heiße Ama. Ich wohne in Accra. Ich spiele gern Fußball.","A M A","024 123 4567"]};
+  const plan=flows.responsePlan(session);
+  expect(plan).toEqual(expect.objectContaining({dynamic:true,ready:false}));
+  const instructions=flows.partnerInstructions(session,plan);
+  expect(instructions).toMatch(/Ask exactly ONE short, easy A1 personal follow-up/);
+  expect(instructions).toContain("Ich spiele gern Fußball");
+  expect(flows.responsePlan({...session,answeredTurns:4})).toEqual(expect.objectContaining({ready:true,dynamic:false}));
+});
+
+test("A1 Teil 3 uses two picture/action cards and alternates requesting with reacting",()=>{
+  const task={teil:"Teil 3",prompt:"Fenster zumachen"};
+  const examFlow=flows.createExaminerFlow("A1",task);
+  expect(flows.maxAnswers({examFlow})).toBe(4);
+  expect(examFlow.requestCards[0].word).toBe("Fenster zumachen");
+  expect(examFlow.requestCards[0].symbol).toBe("🪟");
+  expect(examFlow.requestCards[1].word).not.toBe("Fenster zumachen");
+  expect([0,1,2,3].map(i=>flows.currentStep(examFlow,i).action))
+    .toEqual(["make-request","respond-request","make-request","respond-request"]);
+  expect(flows.currentStep(examFlow,1).instruction).toMatch(/bitte/i);
+  expect(flows.currentStep(examFlow,2).instruction).toContain(examFlow.requestCards[1].word);
+  expect(flows.currentStep(examFlow,3).instruction).not.toBe(flows.currentStep(examFlow,1).instruction);
+  for(const i of [1,3]) {
+    const session={level:"A1",examFlow,examTask:task,answeredTurns:i,confirmedAnswers:["Können Sie bitte das Fenster zumachen?"]};
+    const plan=flows.responsePlan(session);
+    expect(plan).toEqual(expect.objectContaining({dynamic:true,ready:false}));
+    expect(flows.partnerInstructions(session,plan)).toMatch(/React naturally to the candidate's actual polite request/);
+  }
+  expect(flows.responsePlan({examFlow,answeredTurns:4})).toEqual(expect.objectContaining({ready:true,dynamic:false}));
+  const preview=examinerTaskPreview("A1",task);
+  const view=flows.publicFlow({examFlow,answeredTurns:0});
+  expect(preview.requestCards).toEqual(view.requestCards);
+  expect(JSON.stringify(view)).not.toContain("partnerRequest");
+  expect(JSON.stringify(publicCatalogue)).not.toContain("partnerRequest");
+});
+
+test("A1 Teil 2 retains two word-card question-and-answer rounds",()=>{
+  const task={teil:"Teil 2",prompt:"Essen",keywords:"Frühstück"};
+  const examFlow=flows.createExaminerFlow("A1",task);
+  expect(examFlow.cards.map(card=>card.word)).toEqual(["Frühstück","Wochenende"]);
+  const steps=[0,1,2,3].map(i=>flows.currentStep(examFlow,i));
+  expect(steps.map(step=>step.action)).toEqual(["ask-question","answer-question","ask-question","answer-question"]);
+  expect(steps[0].instruction).toContain("Frühstück");
+  expect(steps[2].instruction).toContain("Wochenende");
+  expect(flows.responsePlan({examFlow,answeredTurns:1}).dynamic).toBe(true);
+  expect(flows.responsePlan({examFlow,answeredTurns:3}).dynamic).toBe(true);
+});
