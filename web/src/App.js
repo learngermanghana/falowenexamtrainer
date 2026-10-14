@@ -1558,7 +1558,7 @@ const ExamArea = ({ onBack }) => {
   return (
     <>
       <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
-        <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
+        <div className="nav-row exam-nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
           <button style={styles.secondaryButton} onClick={onBack}>
             {t("appNav.backHome")}
           </button>
@@ -1572,6 +1572,22 @@ const ExamArea = ({ onBack }) => {
             </button>
           ))}
         </div>
+        <details className="mobile-exam-menu" key={examSection}>
+          <summary aria-label="Open Exam Room navigation">
+            <span aria-hidden="true">☰</span> Exam Room
+            <strong>{tabs.find((tab) => tab.key === examSection)?.label || "Overview"}</strong>
+            <span aria-hidden="true" className="mobile-exam-menu__chevron">⌄</span>
+          </summary>
+          <nav className="mobile-exam-menu__links" aria-label="Exam Room sections">
+            <button type="button" onClick={onBack}>← {t("appNav.backHome")}</button>
+            {tabs.map((tab) => (
+              <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
+                onClick={() => navigate(`/exams/${tab.key}`)}>
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </details>
         <div
           className="exam-room-level-picker"
           style={{
