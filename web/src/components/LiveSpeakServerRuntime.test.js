@@ -2,169 +2,148 @@ import fs from "fs";
 import path from "path";
 import vm from "vm";
 
-const source = fs.readFileSync(
-  path.resolve(__dirname, "../../../functions/functionz/liveSpeak.js"), "utf8",
-);
-function setup(envOverrides = {}) {
+const source = fs.readFileSync(path.resolve(__dirname, "../../../functions/functionz/liveSpeak.js"), "utf8");
+
+function setup(overrides = {}, authOverride = {}) {
   const docs = new Map();
   const routes = new Map();
-  const writes = [];
-  let nextId = 0;
-  const snapshot = (key) => ({
-    exists: docs.has(key),
-    data: () => docs.get(key),
-  });
-  const change = (key, delta, merge) => {
-    const old = merge ? { ...(docs.get(key) || {}) } : {};
-    for (const [field, value] of Object.entries(delta)) {
-      old[field] = value && typeof value === "object" && "incrementBy" in value
-        ? (Number(old[field]) || 0) + value.incrementBy
-        : value;
+  const snapshot = key => ({ exists:docs.has(key), data:()=>docs.get(key) });
+  const mutate = (key, value, merge) => {
+    const old = merge ? {...(docs.get(key)||{})} : {};
+    for (const [field, delta] of Object.entries(value)) {
+      old[field] = delta && typeof delta==="object" && "incrementBy" in delta ?
+        (Number(old[field])||0)+delta.incrementBy : delta;
     }
     docs.set(key, old);
-    writes.push({ key, value: { ...old } });
   };
-  const ref = (key) => ({
+  const doc = key => ({
     key,
-    get: async () => snapshot(key),
-    create: async value => {
-      if (docs.has(key)) throw new Error("Already exists");
-      change(key, value, false);
-    },
-    update: async value => change(key, value, true),
+    get:async()=>snapshot(key),
+    update:async(value)=>mutate(key,value,true),
   });
   const db = {
-    collection: name => ({ doc: id => ref(name + "/" + id) }),
-    runTransaction: fn => fn({
-      get: async target => snapshot(target.key),
-      set: (target,value,opt) => change(target.key,value,Boolean(opt?.merge)),
-      update: (target,value) => change(target.key,value,true),
+    collection:name=>({doc:id=>doc(name+"/"+id)}),
+    runTransaction:async action=>action({
+      get:async ref=>snapshot(ref.key),
+      update:(ref,value)=>mutate(ref.key,value,true),
+      set:(ref,value,options)=>mutate(ref.key,value,Boolean(options?.merge)),
     }),
   };
-  const admin = {
-    firestore: Object.assign(() => db, {
-      FieldValue: { serverTimestamp:()=> "server", increment:n=>({incrementBy:n}) },
-    }),
-  };
-  const fakeFetch = jest.fn(async (url, opt) => {
-    if (url.includes("/transaction/initialize")) {
-      const request = JSON.parse(opt.body);
-      const key = "liveSpeakPaymentIntents/" + request.reference;
-      if (!docs.has(key)) throw new Error("Checkout intent was not persisted before calling Paystack");
-      return {ok:true,json:async()=>({status:true,data:{reference:request.reference,authorization_url:"https://checkout.paystack.com/test-ref"}})};
-    }
-    if (url.includes("/transaction/verify/")) {
-      return {ok:true,json:async()=>({status:true,data:{
-        reference:url.split("/").pop(),status:"success",currency:"GHS",
-        amount:4039,customer:{email:"student@example.com"},
-      }})};
-    }
-    throw new Error("Unexpected network endpoint " + url);
-  });
+  const admin = {firestore:Object.assign(()=>db,{
+    FieldValue:{ serverTimestamp:()=> "server",increment:n=>({incrementBy:n}) },
+  })};
   const fakeClient = {
     audio:{
       transcriptions:{create:jest.fn(async()=>({text:"Ich gehen heute zum Markt."}))},
-      speech:{create:jest.fn(async()=>({arrayBuffer:async()=>Uint8Array.from([1,2,3,4]).buffer}))},
+      speech:{create:jest.fn(async()=>({arrayBuffer:async()=>Uint8Array.from([1,2,3]).buffer}))},
     },
     chat:{completions:{create:jest.fn(async()=>({choices:[{message:{content:"Fast richtig: Ich gehe heute zum Markt. Und was kaufst du dort?"}}]}))}},
   };
-  const mockModule = {exports:{}};
-  const context = {
-    module:mockModule, exports:mockModule.exports, Buffer, Date, console, AbortSignal,
-    process:{ env:{
-      LIVE_SPEAK_ENABLED:"true", LIVE_SPEAK_TRIAL_ENABLED:"false",
-      PAYSTACK_SECRET:"sk_test_fake", OPENAI_API_KEY:"sk_fake",
-      ...envOverrides,
-    }},
-    fetch:fakeFetch,
+  const moduleObj={exports:{}};
+  const env={LIVE_SPEAK_ENABLED:"true",LIVE_SPEAK_TESTER_UIDS:"u123",
+    LIVE_SPEAK_MONTHLY_TURN_CAP:"40",OPENAI_API_KEY:"sk_test_fake",...overrides};
+  vm.runInNewContext(source,{
+    module:moduleObj,exports:moduleObj.exports, Buffer, Date, console,
+    process:{env},
     require:name=>{
-      if(name==="crypto") return {randomUUID:()=> "uuid" + String(++nextId).padStart(7,"0")};
-      if(name==="openai") return {toFile:async (_buffer,name)=>({name})};
-      if(name==="./openaiClient") return {getOpenAIClient:()=>fakeClient};
-      throw new Error("Unexpected module "+name);
+      if(name==="crypto")return {randomUUID:()=>"unique-session-id"};
+      if(name==="openai")return {toFile:async(_data,name)=>({name})};
+      if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
+      throw new Error("Unexpected require "+name);
     },
+  },{filename:"liveSpeak.js"});
+  const app={
+    post:(route,handler)=>routes.set("POST "+route,handler),
+    get:(route,handler)=>routes.set("GET "+route,handler),
   };
-  vm.runInNewContext(source,context,{filename:"liveSpeak.js"});
-  const app = {
-    post:(url,fn)=>routes.set("POST "+url,fn),
-    get:(url,fn)=>routes.set("GET "+url,fn),
-  };
-  const student = {
-    auth:{uid:"u123",email:"student@example.com"},
-    profile:{uid:"u123",email:"student@example.com",studentCode:"FAL-001"},
-  };
-  mockModule.exports.registerLiveSpeakRoutes(app,{
-    admin,
-    getAuthedUser:async()=>student.auth,
+  const student={auth:{uid:"u123",email:"student@example.com"},profile:{uid:"u123",email:"student@example.com"}};
+  const auth = {...student.auth,...authOverride};
+  moduleObj.exports.registerLiveSpeakRoutes(app,{
+    admin,getAuthedUser:async()=>auth,
     findStudentByCodeOrEmail:async()=>({snap:{data:()=>student.profile}}),
-    calculateSharedPaystackFee:()=>({checkoutAmount:40.39,studentFeeContribution:0.39}),
   });
-  const call = async (method,url,body={}) => {
-    const handler=routes.get(method+" "+url);
-    if(!handler) throw new Error("Missing route "+url);
-    const response = {
-      code:200,payload:null,
-      status(value){this.code=value;return this;},
-      json(value){this.payload=value;return this;},
-    };
-    await handler({body,headers:{authorization:"Bearer test"}},response);
-    return response;
+  const call=async(method,route,body={})=>{
+    const fn=routes.get(method+" "+route);
+    if(!fn)throw new Error("Missing route "+route);
+    const res={code:200,payload:null,status(n){this.code=n;return this},json(p){this.payload=p;return this}};
+    await fn({body,headers:{authorization:"Bearer test"}},res);
+    return res;
   };
-  return {db,docs,writes,call,fakeFetch,fakeClient,exports:mockModule.exports};
+  return {call,db,docs,routes,fakeClient};
 }
 
-test("pilot disabled at server denies charging regardless of client request", async()=>{
-  const server=setup({LIVE_SPEAK_ENABLED:"false"});
-  const buy=await server.call("POST","/live-speak/checkout",{amount:0});
-  expect(buy.code).toBe(503);
-  expect(buy.payload.code).toBe("pilot_disabled");
-  expect(server.fakeFetch).not.toHaveBeenCalled();
+test("no payment or checkout routes are registered anywhere in the voice pilot",()=>{
+  const api=setup();
+  const routes=Array.from(api.routes.keys());
+  expect(routes).toContain("POST /live-speak/pilot/claim");
+  expect(routes).toContain("POST /live-speak/session/turn");
+  expect(routes.some(x=>/paystack|checkout|billing|payment|verify/i.test(x))).toBe(false);
 });
 
-test("checkout fixes price and stores intent before Paystack initialization", async()=>{
-  const server=setup();
-  const paid=await server.call("POST","/live-speak/checkout",{amount:1,priceGhs:0});
-  expect(paid.code).toBe(200);
-  expect(paid.payload.priceGhs).toBe(40);
-  const requested=JSON.parse(server.fakeFetch.mock.calls[0][1].body);
-  expect(requested.amount).toBe(4039);
-  expect(requested.currency).toBe("GHS");
-  expect(requested.metadata.product).toBe("falowen_live_speak_basic");
-  expect(requested.callback_url).toBe("https://www.falowen.app/campus/live-speak");
-  expect(server.docs.get("liveSpeakPaymentIntents/"+requested.reference).status).toBe("pending");
+test("the pilot is disabled by default without explicit server activation",async()=>{
+  const api=setup({LIVE_SPEAK_ENABLED:"false"});
+  const grant=await api.call("POST","/live-speak/pilot/claim");
+  expect(grant.code).toBe(503);
+  expect(grant.payload.code).toBe("pilot_disabled");
+  expect(api.docs.size).toBe(0);
 });
 
-test("verified payment grants credits once; double verification is harmless",async()=>{
-  const server=setup();
-  const checkout=await server.call("POST","/live-speak/checkout");
-  const ref=checkout.payload.reference;
-  const first=await server.call("POST","/live-speak/payment/verify",{reference:ref});
-  expect(first.payload.paid).toBe(true);
-  expect(server.docs.get("liveSpeakSubscriptions/u123").remaining).toBe(8);
-  const duplicate=await server.call("POST","/live-speak/payment/verify",{reference:ref});
-  expect(duplicate.payload.duplicate).toBe(true);
-  expect(server.docs.get("liveSpeakSubscriptions/u123").remaining).toBe(8);
+test("student not in Firebase UID allowlist cannot claim or generate voice",async()=>{
+  const api=setup({LIVE_SPEAK_TESTER_UIDS:"another-user"});
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.approved).toBe(false);
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(403);
+  const start=await api.call("POST","/live-speak/session/start");
+  expect(start.code).toBe(403);
+  const turn=await api.call("POST","/live-speak/session/turn",{intro:true});
+  expect(turn.code).toBe(403);
+  expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
 });
 
-test("session credit is debited once, microphone turn is metered, expired session is denied",async()=>{
-  const server=setup();
-  server.docs.set("liveSpeakSubscriptions/u123",{
-    uid:"u123",remaining:8,plan:"basic",expiresAt:new Date(Date.now()+60_000).toISOString(),
+test("approved tester claims two sessions only once, even when repeatedly requested",async()=>{
+  const api=setup();
+  const first=await api.call("POST","/live-speak/pilot/claim",{sessions:999});
+  expect(first.code).toBe(200);
+  expect(first.payload.sessions).toBe(2);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+  const again=await api.call("POST","/live-speak/pilot/claim");
+  expect(again.code).toBe(409);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+});
+
+test("starting a session deducts one credit and the greeting uses natural AI TTS",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const first=await api.call("POST","/live-speak/session/start",{level:"A2"});
+  expect(first.payload.sessionId).toBe("unique-session-id");
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+  const resumed=await api.call("POST","/live-speak/session/start",{level:"B2"});
+  expect(resumed.payload.resumed).toBe(true);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+  const voice=await api.call("POST","/live-speak/session/turn",{sessionId:first.payload.sessionId,intro:true});
+  expect(voice.payload.reply).toMatch(/Hallo/);
+  expect(voice.payload.audioBase64).toBeTruthy();
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
+  expect(api.docs.get("liveSpeakSessions/u123").turnsUsed).toBe(1);
+  expect(api.docs.get("liveSpeakUsage/"+new Date().toISOString().slice(0,7)).turns).toBe(1);
+});
+
+test("the pilot cap prevents voice usage and a session expires on the server",async()=>{
+  const api=setup({LIVE_SPEAK_MONTHLY_TURN_CAP:"1"});
+  // First use a pre-approved test session to verify the cap on a real turn.
+  api.docs.set("liveSpeakSessions/u123",{
+    uid:"u123",sessionId:"session",level:"A1",expiresAt:new Date(Date.now()+90_000).toISOString(),
+    turnsUsed:0,inFlight:false,endedAt:null,
   });
-  const start=await server.call("POST","/live-speak/session/start",{level:"A2"});
-  expect(start.payload.sessionId).toBeTruthy();
-  expect(server.docs.get("liveSpeakSubscriptions/u123").remaining).toBe(7);
-  const again=await server.call("POST","/live-speak/session/start",{level:"A2"});
-  expect(again.payload.resumed).toBe(true);
-  expect(server.docs.get("liveSpeakSubscriptions/u123").remaining).toBe(7);
-  const intro=await server.call("POST","/live-speak/session/turn",{sessionId:start.payload.sessionId,intro:true});
-  expect(intro.payload.reply).toMatch(/Hallo/);
-  expect(intro.payload.audioBase64).toBeTruthy();
-  expect(server.docs.get("liveSpeakSessions/u123").turnsUsed).toBe(1);
-  expect(server.docs.get("liveSpeakUsage/"+new Date().toISOString().slice(0,7)).turns).toBe(1);
-  const expired=server.docs.get("liveSpeakSessions/u123");
-  server.docs.set("liveSpeakSessions/u123",{...expired,expiresAt:"2000-01-01T00:00:00.000Z"});
-  const denied=await server.call("POST","/live-speak/session/turn",{sessionId:start.payload.sessionId,intro:true});
-  expect(denied.code).toBe(409);
-  expect(server.docs.get("liveSpeakUsage/"+new Date().toISOString().slice(0,7)).turns).toBe(1);
+  const first=await api.call("POST","/live-speak/session/turn",{sessionId:"session",intro:true});
+  expect(first.code).toBe(200);
+  const blocked=await api.call("POST","/live-speak/session/turn",{sessionId:"session",intro:true});
+  expect(blocked.code).toBe(429);
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
+  api.docs.set("liveSpeakUsage/"+new Date().toISOString().slice(0,7),{turns:0});
+  api.docs.set("liveSpeakSessions/u123",{...api.docs.get("liveSpeakSessions/u123"),expiresAt:"2001-01-01T00:00:00Z"});
+  const expired=await api.call("POST","/live-speak/session/turn",{sessionId:"session",intro:true});
+  expect(expired.code).toBe(409);
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
 });
