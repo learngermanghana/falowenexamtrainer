@@ -28,7 +28,7 @@ describe("A1–B1 timed submission recovery",()=>{
   test("expired timer never requires extra draft write or minimum words on manual retry",()=>{
     expect(source).toContain('const saved = await persistSubmission({ statusLabel: "submitted" });');
     expect(source).toContain("timedAssignment?.expired && isWorkbookSubmissionContext");
-    expect(source).toContain("!retryAfterExpiry && submissionWordCount < minimumSubmissionWords");
+    expect(source).toMatch(/!retryAfterExpiry && (?:minimumSubmissionWords > 0 && )?submissionWordCount < minimumSubmissionWords/);
     expect(source).toContain("!retryAfterExpiry && !form.confirmed");
     expect(source).not.toContain('const draftSaved = await persistSubmission({ statusLabel: "draft" });');
     expect(source).toContain("getSubmissionSaveError(error)");
