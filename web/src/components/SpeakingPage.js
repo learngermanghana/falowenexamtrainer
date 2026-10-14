@@ -147,7 +147,7 @@ const SpeakingPage = ({
       id: "welcome-1",
       role: "coach",
       type: "text",
-      text: "Hallo! Pick a speaking prompt and send text or voice. I will coach you step by step.",
+      text: "Guten Tag! Wählen Sie einen Prüfungsteil und beginnen Sie mit der Aufgabe.",
       createdAt: new Date().toISOString(),
     },
   ]);
