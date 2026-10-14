@@ -16,7 +16,7 @@ describe("structured one-box resubmission lifecycle", () => {
     expect(page).toContain("previousStructuredSections: previousResubmissionSeed.sections || null");
     expect(page).toContain("changedSubmissionParts: structuredDiffForSubmit?.changedParts || []");
     expect(page).toContain('data-structured-resubmission-template="true"');
-    expect(page).toContain("Falowen checks changes Teil by Teil");
+    expect(page).toContain("Your previous TEIL answers are loaded below.");
   });
 
   test("resubmission callable persists structured metadata instead of dropping it", () => {

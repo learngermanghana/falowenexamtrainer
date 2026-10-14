@@ -48,11 +48,15 @@ replaceOnce(
   "route assignment resolution",
 );
 
-replaceOnce(
-  `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);`,
-  `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isWorkbookSubmissionContext = workbookSubmissionContext.locked;\n  const isAssignmentContextLocked = Boolean(\n    isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)\n  );`,
-  "workbook assignment lock",
-);
+// Allow safely extended workbook-submit state: the timed-assignment wrapper
+// already inserts its policy between the workbook lock and context lock.
+if (!source.includes("const isWorkbookSubmissionContext = workbookSubmissionContext.locked;")) {
+  replaceOnce(
+    `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);`,
+    `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isWorkbookSubmissionContext = workbookSubmissionContext.locked;\n  const isAssignmentContextLocked = Boolean(\n    isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)\n  );`,
+    "workbook assignment lock",
+  );
+}
 
 replaceOnce(
   `  const selectedCanonicalAssignmentKey = useMemo(\n    () =>\n      form.assignmentTitle\n        ? resolveAssignmentCanonicalKey({\n            level: selectedAssignmentLevel,\n            assignmentId: selectedAssignmentId,\n            assignmentTitle: form.assignmentTitle,\n          })\n        : "",\n    [form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel]\n  );`,
@@ -82,8 +86,8 @@ replaceOnce(
 
 if (!source.includes("Please answer every required section before submitting")) {
   replaceOnce(
-    `    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {`,
-    `    if (selectedSubmissionProfile && parsedStructuredSubmission) {\n      const incompleteParts = [\n        ...new Set([\n          ...parsedStructuredSubmission.missingHeadings,\n          ...parsedStructuredSubmission.unansweredParts,\n        ]),\n      ];\n      if (incompleteParts.length) {\n        setStatus({\n          loading: false,\n          error: \`Please answer every required section before submitting: \${formatMissingStructuredParts(incompleteParts)}. Keep the TEIL headings in the box and type your answers underneath them.\`,\n          success: "",\n        });\n        return;\n      }\n    }\n\n    if (submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {`,
+    `    if (!timedWorkbookSubmission && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {`,
+    `    if (!timedWorkbookSubmission && selectedSubmissionProfile && parsedStructuredSubmission) {\n      const incompleteParts = [\n        ...new Set([\n          ...parsedStructuredSubmission.missingHeadings,\n          ...parsedStructuredSubmission.unansweredParts,\n        ]),\n      ];\n      if (incompleteParts.length) {\n        setStatus({\n          loading: false,\n          error: \`Please answer every required section before submitting: \${formatMissingStructuredParts(incompleteParts)}. Keep the TEIL headings in the box and type your answers underneath them.\`,\n          success: "",\n        });\n        return;\n      }\n    }\n\n    if (!timedWorkbookSubmission && submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {`,
     "required structured section validation",
   );
 }
@@ -106,11 +110,15 @@ replaceOnce(
   "structured submission helper",
 );
 
-replaceOnce(
+// The timed-workflow branch can wrap WordProgress in a conditional, while
+// retaining the already-patched structured answer value.
+if (!source.includes("<WordProgress value={submissionAnswerText}")) {
+  replaceOnce(
   `              <WordProgress value={form.submissionText} minimumWords={minimumSubmissionWords} />`,
   `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />`,
   "structured answer progress",
 );
+}
 
 replaceOnce(
   `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>\n          <div\n            style={{\n              display: "grid",`,

@@ -34,6 +34,7 @@ import {
   serverTimestamp,
   setDoc,
   where,
+  writeBatch,
 } from "../firebase";
 import {
   DEFAULT_ASSIGNMENT_SUBMISSION_WORDS,
@@ -940,6 +941,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const lastAssignmentRef = useRef("");
   const autosaveTimerRef = useRef(null);
   const timedAutoSubmitStartedRef = useRef(false);
+  const timedAutoSubmitRetryCountRef = useRef(0);
+  const timedAutoSubmitRetryTimerRef = useRef(null);
+  useEffect(() => () => {
+    if (timedAutoSubmitRetryTimerRef.current) window.clearTimeout(timedAutoSubmitRetryTimerRef.current);
+  }, []);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
   const submissionTextRef = useRef(null);
   const resubmissionTextRef = useRef(null);
@@ -1012,6 +1018,10 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);
   const isWorkbookSubmissionContext = workbookSubmissionContext.locked;
+  const timedWorkbookSubmission = Boolean(timedAssignment?.enabled && isWorkbookSubmissionContext);
+  const timedSubmitAfterExpiry = Boolean(
+    timedWorkbookSubmission && (timedAssignment?.expired || timedAssignment?.timedAutoSubmit)
+  );
   const isAssignmentContextLocked = Boolean(
     isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)
   );
@@ -1183,26 +1193,23 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         return { ok: false, reason: "locked" };
       }
 
-      // Add submission history
-      await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
-
-      // Create lock deterministically
+      // Save the submitted answers and their lock atomically.
       const nowLocal = new Date();
-      await setDoc(
-        lockRef,
-        {
-          studentId: user?.uid || "",
-          studentEmail: user?.email || "",
-          studentCode,
-          level: selectedAssignmentLevel,
-          lockedAt: serverTimestamp(),
-          assignmentTitle: form.assignmentTitle,
-          day: selectedAssignmentDay,
-          chapter: selectedAssignmentChapter || "",
-          chapterKey: buildChapterKey(form.assignmentTitle),
-        },
-        { merge: true }
-      );
+      const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));
+      const batch = writeBatch(db);
+      batch.set(submissionRef, submissionPayload);
+      batch.set(lockRef, {
+        studentId: user?.uid || "",
+        studentEmail: user?.email || "",
+        studentCode,
+        level: selectedAssignmentLevel,
+        lockedAt: serverTimestamp(),
+        assignmentTitle: form.assignmentTitle,
+        day: selectedAssignmentDay,
+        chapter: selectedAssignmentChapter || "",
+        chapterKey: buildChapterKey(form.assignmentTitle),
+      }, { merge: true });
+      await batch.commit();
 
       const currentChapterKey = buildChapterKey(form.assignmentTitle);
       if (currentChapterKey) {
@@ -2024,7 +2031,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
+    if (!timedWorkbookSubmission && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
         error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
@@ -2034,7 +2041,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }
 
     const submissionWordCount = countWords(form.submissionText);
-    if (submissionWordCount < minimumSubmissionWords) {
+    if (!timedWorkbookSubmission && submissionWordCount < minimumSubmissionWords) {
       setStatus({
         loading: false,
         error: buildAssignmentSubmissionWordError({
@@ -2075,12 +2082,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (!form.confirmed) {
+    if (!form.confirmed && !timedSubmitAfterExpiry) {
       setStatus({ loading: false, error: "Please confirm that you are submitting the correct task.", success: "" });
       return;
     }
 
-    if (submissionCooldownRemainingMs > 0) {
+    if (submissionCooldownRemainingMs > 0 && !timedSubmitAfterExpiry) {
       setStatus({
         loading: false,
         error: `Your previous submission was received. You can submit another version in ${submissionCooldownLabel}.`,
@@ -2130,6 +2137,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
       // Refresh list
       if (user?.uid) {
+        try {
         const submissionsRef = collection(db, SUBMISSION_COLLECTION);
         const snapshot = await getDocs(
           query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
@@ -2142,6 +2150,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
             })
         );
+        } catch (refreshError) {
+          // The submission and lock are already committed. A missing query
+          // index or temporary network failure must never turn success into
+          // a misleading "could not submit" message.
+          console.warn("Submission saved, but recent-submissions refresh failed", refreshError);
+        }
       }
     } catch (error) {
       console.error("Failed to save submission", error);
@@ -2158,6 +2172,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
     if (!timedAutoSubmit) {
       timedAutoSubmitStartedRef.current = false;
+      timedAutoSubmitRetryCountRef.current = 0;
+      if (timedAutoSubmitRetryTimerRef.current) {
+        window.clearTimeout(timedAutoSubmitRetryTimerRef.current);
+        timedAutoSubmitRetryTimerRef.current = null;
+      }
       setTimedAutoSubmitCheck(0);
       return undefined;
     }
@@ -2217,6 +2236,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
         if (!saved.ok) throw new Error("The timed assignment could not be submitted.");
 
+        timedAutoSubmitRetryCountRef.current = 0;
         setStatus({
           loading: false,
           error: "",
@@ -2237,9 +2257,22 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         timedAssignment.onSubmissionVerified?.();
       } catch (error) {
         console.error("Timed automatic submission failed", error);
-        const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
+        const delays = [2000, 5000, 12000];
+        const attempt = timedAutoSubmitRetryCountRef.current;
+        const willRetry = attempt < delays.length;
+        const message = willRetry
+          ? "Time is up. Falowen is retrying your submission. Your draft is preserved; you may also press Submit assignment."
+          : "Time is up, but automatic submission could not finish. Your draft is preserved; press Submit assignment to retry.";
         setStatus({ loading: false, error: message, success: "" });
         timedAssignment.onSubmissionError?.(message);
+        if (willRetry) {
+          timedAutoSubmitRetryCountRef.current += 1;
+          timedAutoSubmitRetryTimerRef.current = window.setTimeout(() => {
+            timedAutoSubmitRetryTimerRef.current = null;
+            timedAutoSubmitStartedRef.current = false;
+            setTimedAutoSubmitCheck((value) => value + 1);
+          }, delays[attempt]);
+        }
       }
     };
 
@@ -2832,7 +2865,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
                 }
                 disabled={isSelectedLocked || !hasSelectedAssignment}
               />
-              <WordProgress value={form.submissionText} minimumWords={minimumSubmissionWords} />
+              {timedWorkbookSubmission ? (
+                <span role="note" style={styles.helperText}>Timed assignment: your available answers can be submitted even if they are shorter than the homework minimum.</span>
+              ) : <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />}
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
                 {GERMAN_SPECIAL_CHARACTERS.map((character) => (
@@ -2916,7 +2951,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
             <button
               type="submit"
               style={styles.primaryButton}
-              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || submissionCooldownRemainingMs > 0 || !hasSelectedAssignment}
+              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || (submissionCooldownRemainingMs > 0 && !timedSubmitAfterExpiry) || !hasSelectedAssignment}
             >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>

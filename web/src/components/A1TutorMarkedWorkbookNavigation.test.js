@@ -83,12 +83,12 @@ describe("A1 tutor-marked workbook navigation", () => {
     expect(result.current.activeTab).toBe("teil-1");
   });
 
-  test("removes the obsolete radio flag while preserving canonical A1 submit context", () => {
+  test("preserves Radio completion and canonical A1 submit context", () => {
     const cleaned = sanitizeA1WorkbookSearch(
       "?radio=done&assignmentKey=A1-0.2&assignmentId=A1-0.2&level=A1&workbookTab=submit",
     );
 
-    expect(cleaned.has("radio")).toBe(false);
+    expect(cleaned.get("radio")).toBe("done");
     expect(cleaned.get("assignmentKey")).toBe("A1-0.2");
     expect(cleaned.get("assignmentId")).toBe("A1-0.2");
     expect(cleaned.get("level")).toBe("A1");

@@ -243,7 +243,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     });
     setSubmissionGuardMessage("");
 
-    if (!completeness.ok && !timedAutoSubmit) {
+    if (!completeness.ok && !timedAutoSubmit && !timedMockExam.enabled) {
       event.preventDefault();
       event.stopPropagation();
       event.nativeEvent?.stopImmediatePropagation?.();
@@ -431,9 +431,10 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
           <VerifiedCloudDraftSubmissionPage
             compact
             onLockedChange={setSubmissionLocked}
-            allowIncompleteSubmission={timedMockExam.timedAutoSubmit}
-            onSubmissionVerified={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionVerified : null}
-            onSubmissionError={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionError : null}
+            allowIncompleteSubmission={timedMockExam.enabled}
+            allowUnconfirmedSubmission={timedMockExam.expired || timedMockExam.timedAutoSubmit}
+            onSubmissionVerified={timedMockExam.enabled ? timedMockExam.onSubmissionVerified : null}
+            onSubmissionError={timedMockExam.enabled ? timedMockExam.onSubmissionError : null}
             submissionContext={{
               level: "A1",
               day: assignment.day,

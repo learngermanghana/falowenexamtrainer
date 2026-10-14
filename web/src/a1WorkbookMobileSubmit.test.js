@@ -131,10 +131,11 @@ describe("A1 mobile workbook submission", () => {
     expect(source).toContain('const LOCK_COLLECTION = "submissionLocks";');
     expect(source).toContain("const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));");
     expect(source).toContain("submissionPath");
-    expect(source).toContain("await setDoc(submissionRef, payload);");
+    expect(source).toContain("finalBatch.set(submissionRef, payload);");
+    expect(source).toContain("await finalBatch.commit();");
     expect(source).toContain("const verifiedSubmission = await getDoc(submissionRef);");
     expect(source).toContain('reviewStatus: "pending_review"');
-    expect(source).toContain("await setDoc(lockRef, lockPayload, { merge: true });");
+    expect(source).toContain("finalBatch.set(lockRef, lockPayload, { merge: true });");
     expect(source).toContain("const verifiedLock = await getDoc(lockRef);");
     expect(source).toContain('source: "a1_react_owned_submission"');
   });

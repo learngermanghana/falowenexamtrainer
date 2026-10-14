@@ -51,16 +51,16 @@ replaceOnce(
 );
 
 replaceOnce(
-  `    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
-  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
+  `    if (!timedWorkbookSubmission && submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
+  `    if (!timedWorkbookSubmission && minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
   "inline word minimum submit validation",
 );
 
 const structuredWordDeclaration = "    const submissionWordCount = countWords(submissionAnswerText);";
 const plainWordDeclaration = "    const submissionWordCount = countWords(form.submissionText);";
 const wordDeclaration = source.includes(structuredWordDeclaration) ? structuredWordDeclaration : plainWordDeclaration;
-const structuredCharacterGuard = "    if (submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {";
-const plainCharacterGuard = "    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {";
+const structuredCharacterGuard = "    if (!timedWorkbookSubmission && submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {";
+const plainCharacterGuard = "    if (!timedWorkbookSubmission && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {";
 const characterGuard = source.includes(structuredCharacterGuard) ? structuredCharacterGuard : plainCharacterGuard;
 const dynamicLengthGuard = "    if (form.submissionText.trim().length > dynamicMaxSubmissionCharacters) {";
 
@@ -83,11 +83,41 @@ replaceOnce(
   "inline word feedback textarea ownership",
 );
 
+if (source.includes(') : <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />')) {
+  // A timed workbook hides the ordinary word target, but standard homework
+  // still needs its inline validation error after the conditional widget.
+  source = source.replace(
+    '              ) : <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />}',
+    `              ) : <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />}
+              {wordMinimumError ? (
+                <div
+                  id="assignment-word-minimum-error"
+                  role="alert"
+                  aria-live="assertive"
+                  data-submission-word-error="true"
+                  style={{
+                    marginTop: 8,
+                    border: "1px solid #fecaca",
+                    borderRadius: 10,
+                    background: "#fef2f2",
+                    color: "#991b1b",
+                    padding: "10px 12px",
+                    fontWeight: 700,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {wordMinimumError}
+                </div>
+              ) : null}`
+  );
+} else {
 replaceOnce(
   `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />`,
   `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />\n              {wordMinimumError ? (\n                <div\n                  id="assignment-word-minimum-error"\n                  role="alert"\n                  aria-live="assertive"\n                  data-submission-word-error="true"\n                  style={{\n                    marginTop: 8,\n                    border: "1px solid #fecaca",\n                    borderRadius: 10,\n                    background: "#fef2f2",\n                    color: "#991b1b",\n                    padding: "10px 12px",\n                    fontWeight: 700,\n                    lineHeight: 1.5,\n                  }}\n                >\n                  {wordMinimumError}\n                </div>\n              ) : null}`,
   "inline word error presentation",
 );
+
+}
 
 const requiredMarkers = [
   "buildAssignmentSubmissionWordProgressText,",
