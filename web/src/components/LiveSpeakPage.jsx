@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { backendUrl } from "../services/aiClient";
 import { styles } from "../styles";
+import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
 
 const MAX_RECORDING_SECONDS = 20;
 const MAX_AUDIO_BYTES = 350000;
@@ -49,6 +50,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const fixedLevel = embedded && /^(A1|A2|B1|B2|C1|C2)$/.test(contextualLevel) ? contextualLevel : "";
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
   const Container = embedded ? "section" : "main";
+  const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource };
+  // Status also carries the saved context while the learner is yet to resume.
+  const savedSession = session || details?.activeSession || null;
+  const displayContext = liveSpeakSessionContext(savedSession, requestedContext);
+  const hasChangedContext = isDifferentLiveSpeakSessionContext(savedSession, requestedContext);
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -208,8 +214,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setBusy(false);
       if (!result.resumed) await sendTurn(result, {intro:true});
       else setNotice(
-        result.source && practiceSource && result.source !== practiceSource
-          ? "Your existing voice session was started elsewhere. It keeps its original topic and level until you end it."
+        isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource})
+          ? "Your existing voice session is still using its original topic and level. End it before starting a conversation on the newly selected topic."
           : "Your ongoing speaking session has resumed. Continue speaking German."
       );
       refresh();
@@ -342,8 +348,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {" "}There are no payments or subscriptions during this test.
           </p>
           {embedded ? <p style={{margin:0,color:"#475569",fontSize:13}}>
-            <strong>Level:</strong> {safeLevel}{practiceTopic ? ` · Topic: ${practiceTopic}` : ""}
+            <strong>Level:</strong> {displayContext.level}{displayContext.topic ? ` · Topic: ${displayContext.topic}` : ""}
           </p> : null}
+          {embedded && hasChangedContext ? (
+            <p role="status" style={{margin:0,padding:"9px 11px",border:"1px solid #fbbf24",borderRadius:10,background:"#fffbeb",color:"#92400e",fontSize:13}}>
+              This voice conversation is still using {displayContext.topic ? `“${displayContext.topic}”` : "its original topic"} at {displayContext.level}.
+              End the active session to start the newly selected speaking topic or level.
+            </p>
+          ) : null}
           <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
           {!session && !fixedLevel ? <label style={{display:"grid",gap:5,maxWidth:245}}>
             <strong>German conversation level</strong>
@@ -374,7 +386,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0}}>German conversation · {session.level || safeLevel}</h2>
+              <h2 style={{margin:0}}>German conversation · {displayContext.level}</h2>
               <p style={{margin:"5px 0",color:"#475569"}}>The tutor will speak first, then listen to each response.</p>
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
