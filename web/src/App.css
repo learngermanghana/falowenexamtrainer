@@ -498,3 +498,6 @@
     background-position: 120px 0;
   }
 }
+
+/* Keep the live oral-exam recording controls unobstructed on phones. */
+body.falowen-speaking-session-active .study-buddy-bar { display: none !important; }
