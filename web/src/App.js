@@ -190,6 +190,7 @@ import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1Persoen
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
+import LiveSpeakPage from "./components/LiveSpeakPage";
 import MyExamFilePage from "./components/MyExamFilePage";
 import ExamsOverviewPage from "./components/ExamsOverviewPage";
 import MockExamLibraryPage from "./components/MockExamLibraryPage";
@@ -785,6 +786,7 @@ const AppShell = ({
           <Route path="/tutor-marking" element={<Navigate to="/campus/tutor-marking" replace />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
+          <Route path="/campus/live-speak" element={<LiveSpeakPage />} />
           <Route
             path="/campus/:section"
             element={

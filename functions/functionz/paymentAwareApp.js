@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerLiveSpeakRoutes, handleLiveSpeakWebhook } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
 
@@ -238,6 +239,9 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
   return null;
 };
 
+// Optional premium voice feature; registered before the tuition payment handler.
+registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, calculateSharedPaystackFee });
+
 app.post("/paystack/initialize", async (req, res) => {
   try {
     const authedUser = await getAuthedUser(req);
@@ -453,6 +457,16 @@ app.post("/paystack/webhook", async (req, res) => {
     if (!reference) return res.status(400).json({ error: "Missing Paystack reference" });
 
     const db = admin.firestore();
+    // Signed add-on payments never enter the tuition ledger or extend a course contract.
+    const speakingPayment = await handleLiveSpeakWebhook({ db, admin, data });
+    if (speakingPayment.handled) {
+      return res.status(speakingPayment.success ? 200 : 202).json({
+        status: speakingPayment.success ? "confirmed" : "rejected",
+        product: "falowen_live_speak_basic",
+        duplicate: Boolean(speakingPayment.duplicate),
+        reason: speakingPayment.reason || null,
+      });
+    }
     const payloadHash = crypto.createHash("sha256").update(rawBody).digest("hex");
     eventRef = db.collection("paystackWebhookEvents").doc(reference);
     let duplicate = false;

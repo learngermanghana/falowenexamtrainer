@@ -678,6 +678,7 @@ const AccountSettings = () => {
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/attendance")}>Attendance</button>
             <button type="button" style={styles.secondaryButton} onClick={() => selectAccountTab("participation")}>Class Participation</button>
             <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course")}>Course Book</button>
+            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/live-speak")}>Live Speak add-on</button>
           </div>
         </div>
 
@@ -788,6 +789,12 @@ const AccountSettings = () => {
             </span>
             <strong style={{ display: "block", marginTop: 2, fontSize: 15, lineHeight: 1.3 }}>{formatDate(accessUntil)}</strong>
           </div>
+        </div>
+
+        <div style={{border:"1px solid #bfdbfe", borderRadius:12, padding:"10px 12px", background:"#eff6ff", display:"grid", gap:6}}>
+          <strong>Live Speak · Optional voice add-on</strong>
+          <p style={{margin:0,fontSize:13,color:"#334155"}}>Eight natural German AI conversations for GH₵40, separate from tuition. Pilot access and payment availability are shown on the Live Speak page.</p>
+          <div><button type="button" style={styles.secondaryButton} onClick={()=>navigate("/campus/live-speak")}>View Live Speak</button></div>
         </div>
 
         {billingState.key !== "paid" ? (
