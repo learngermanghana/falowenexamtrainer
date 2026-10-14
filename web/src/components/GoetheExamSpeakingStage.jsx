@@ -14,7 +14,7 @@ export default function GoetheExamSpeakingStage({
   lastAudio, onReplay, pending, recognizedText, onTextChange,
   uncertain, studentAudioUrl, onConfirm, onRetry,
   onRecord, onStopRecording, onFinish, onEnd, feedbackBusy, expired,
-  errorMessage,
+  errorMessage, contextChanged = false,
 }) {
   const answered = Number(progress?.answered) || 0;
   const total = Number(progress?.maxAnswers) || 3;
@@ -33,6 +33,11 @@ export default function GoetheExamSpeakingStage({
   return (
     <section aria-label="Goethe AI speaking task" data-exam-speaking-stage="true"
       style={{display:"grid",gap:15,minWidth:0}}>
+      {contextChanged ? (
+        <p role="status" style={{margin:0,padding:11,borderRadius:10,background:"#fffbeb",color:"#92400e",fontSize:13}}>
+          Current task: {topic || "the previous topic"}. Finish it to change topics.
+        </p>
+      ) : null}
       <header style={{display:"grid",gap:11}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12,flexWrap:"wrap"}}>
           <div style={{display:"grid",gap:3}}>
