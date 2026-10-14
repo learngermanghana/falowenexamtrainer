@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { collection, db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
+import { collection, db, doc, getDoc, serverTimestamp, setDoc, writeBatch } from "../firebase";
 import { styles } from "../styles";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { findOwnedSubmissionDraft, findOwnedSubmissionLock } from "../services/submissionLockService";
@@ -87,6 +87,7 @@ const VerifiedCloudDraftSubmissionPage = ({
   compact = false,
   onLockedChange = null,
   allowIncompleteSubmission = false,
+  allowUnconfirmedSubmission = false,
   onSubmissionVerified = null,
   onSubmissionError = null,
 }) => {
@@ -681,7 +682,7 @@ const VerifiedCloudDraftSubmissionPage = ({
       });
       return;
     }
-    if (!confirmed && !compact) {
+    if (!confirmed && !compact && !allowUnconfirmedSubmission) {
       setStatus({
         loading: false,
         error: "Please confirm that this is the correct assignment.",
@@ -777,18 +778,6 @@ const VerifiedCloudDraftSubmissionPage = ({
         submittedAt: now,
       };
 
-      await setDoc(submissionRef, payload);
-      const verifiedSubmission = await getDoc(submissionRef);
-      const verifiedData = verifiedSubmission.exists() ? verifiedSubmission.data() || {} : null;
-      if (
-        !verifiedData ||
-        normalizeText(getDraftText(verifiedData)) !== submissionText ||
-        verifiedData.studentId !== user.uid ||
-        String(verifiedData.status || "").toLowerCase() !== "submitted"
-      ) {
-        throw new Error(`Final submission verification failed at /${submissionPath}.`);
-      }
-
       const lockPayload = {
         studentId: user.uid,
         userId: user.uid,
@@ -812,7 +801,23 @@ const VerifiedCloudDraftSubmissionPage = ({
         updatedAt: serverTimestamp(),
       };
 
-      await setDoc(lockRef, lockPayload, { merge: true });
+      // Both writes succeed or neither is visible to Admin marking.
+      const finalBatch = writeBatch(db);
+      finalBatch.set(submissionRef, payload);
+      finalBatch.set(lockRef, lockPayload, { merge: true });
+      await finalBatch.commit();
+      const verifiedSubmission = await getDoc(submissionRef);
+      const verifiedData = verifiedSubmission.exists() ? verifiedSubmission.data() || {} : null;
+      if (
+        !verifiedData ||
+        normalizeText(getDraftText(verifiedData)) !== submissionText ||
+        verifiedData.studentId !== user.uid ||
+        String(verifiedData.status || "").toLowerCase() !== "submitted"
+      ) {
+        throw new Error(`Final submission verification failed at /${submissionPath}.`);
+      }
+
+      // Lock was committed with the submission above.
       const verifiedLock = await getDoc(lockRef);
       if (!verifiedLock.exists() || verifiedLock.data()?.submissionId !== submissionRef.id) {
         throw new Error("The submission was saved, but its submission lock could not be verified.");
