@@ -13,6 +13,7 @@ test("A1 expired timer opens review and dispatches the final form even with shor
   expect(timer).toContain('data-draft-submit-ready');
   expect(panel).toContain("allowIncompleteSubmission={timedMockExam.enabled}");
   expect(panel).toContain("allowUnconfirmedSubmission={timedMockExam.expired || timedMockExam.timedAutoSubmit}");
+  expect(panel).toContain("!completeness.ok && !timedAutoSubmit && !timedMockExam.enabled");
   expect(form).toContain("if (!confirmed && !compact && !allowUnconfirmedSubmission)");
   expect(form).toContain("await finalBatch.commit()");
   expect(form).toContain("if (!allowIncompleteSubmission && submissionText.length < MIN_SUBMISSION_CHARACTERS)");
@@ -30,7 +31,7 @@ test("A2 and B1 timer expiry retains submission retry and only verifies a succes
   expect(submission).toContain('persistSubmission({ statusLabel: "submitted" })');
   expect(submission).toContain("timedAssignment.onSubmissionVerified?.()");
   expect(submission).toContain("timedAssignment.onSubmissionError?.(message)");
-  expect(submission).toContain("if (!timedWorkbookSubmission && submissionWordCount < minimumSubmissionWords)");
+  expect(submission).toMatch(/!timedWorkbookSubmission && (?:minimumSubmissionWords > 0 && )?submissionWordCount < minimumSubmissionWords/);
   expect(submission).toContain("if (!form.confirmed && !timedSubmitAfterExpiry)");
   expect(submission).toContain("await batch.commit()");
   expect(submission).toContain("timedAutoSubmitRetryCountRef.current += 1");
