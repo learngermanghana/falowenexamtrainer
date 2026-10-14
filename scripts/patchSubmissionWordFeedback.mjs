@@ -50,17 +50,19 @@ replaceOnce(
   "reset inline word error on submit",
 );
 
+const expiryPrefix = source.includes("const retryAfterExpiry = Boolean(") ? "!retryAfterExpiry && " : "";
+
 replaceOnce(
-  `    if (submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
-  `    if (minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
+  `    if (${expiryPrefix}submissionWordCount < minimumSubmissionWords) {\n      setStatus({\n        loading: false,\n        error: buildAssignmentSubmissionWordError({\n          wordCount: submissionWordCount,\n          minimumWords: minimumSubmissionWords,\n          level: selectedAssignmentLevel,\n          chapter: selectedAssignmentChapter,\n        }),\n        success: "",\n      });\n      return;\n    }`,
+  `    if (${expiryPrefix}minimumSubmissionWords > 0 && submissionWordCount < minimumSubmissionWords) {\n      const wordError = buildAssignmentSubmissionWordError({\n        wordCount: submissionWordCount,\n        minimumWords: minimumSubmissionWords,\n        level: selectedAssignmentLevel,\n        chapter: selectedAssignmentChapter,\n      });\n      setWordMinimumError(wordError);\n      setStatus({ loading: false, error: "", success: "" });\n      triggerInteractionFeedback({ sound: "error" });\n      window.requestAnimationFrame(() => {\n        const textarea = submissionTextRef.current;\n        textarea?.focus?.();\n        textarea?.scrollIntoView?.({ behavior: "smooth", block: "center" });\n      });\n      return;\n    }`,
   "inline word minimum submit validation",
 );
 
 const structuredWordDeclaration = "    const submissionWordCount = countWords(submissionAnswerText);";
 const plainWordDeclaration = "    const submissionWordCount = countWords(form.submissionText);";
 const wordDeclaration = source.includes(structuredWordDeclaration) ? structuredWordDeclaration : plainWordDeclaration;
-const structuredCharacterGuard = "    if (submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {";
-const plainCharacterGuard = "    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {";
+const structuredCharacterGuard = `    if (${expiryPrefix}submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {`;
+const plainCharacterGuard = `    if (${expiryPrefix}form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {`;
 const characterGuard = source.includes(structuredCharacterGuard) ? structuredCharacterGuard : plainCharacterGuard;
 const dynamicLengthGuard = "    if (form.submissionText.trim().length > dynamicMaxSubmissionCharacters) {";
 
