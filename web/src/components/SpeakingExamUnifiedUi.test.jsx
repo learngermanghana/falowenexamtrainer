@@ -112,7 +112,7 @@ test("iPhone and Android exam layout keeps microphone, task and menu usable at n
   const page = fs.readFileSync(path.resolve(__dirname, "./SpeakingPage.js"), "utf8");
   const voice = fs.readFileSync(path.resolve(__dirname, "./LiveSpeakPage.jsx"), "utf8");
   const cards = fs.readFileSync(path.resolve(__dirname, "./GoetheExamTaskCard.jsx"), "utf8");
-  expect(page).toContain('className="speaking-exam-grid"');
+  expect(page).toContain('"speaking-exam-grid is-live"');
   expect(page).toContain('className="speaking-exam-sidebar"');
   expect(page).toContain('className="speaking-exam-voice"');
   expect(cards).toContain('className="speaking-exam-task-card"');
