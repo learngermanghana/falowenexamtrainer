@@ -20,7 +20,7 @@ jobs:
         with:
           node-version: 22
       - run: npm install --prefix functions --no-audit --no-fund
-      - run: node --test functions/__tests__/studentSheetDelivery.test.cjs
+      - run: node --test functions/__tests__/studentSheetDelivery.test.cjs functions/__tests__/sheetCellValue.test.cjs
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'

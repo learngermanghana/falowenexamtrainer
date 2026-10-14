@@ -2,6 +2,7 @@
 "use strict";
 
 const { google } = require("googleapis");
+const { sheetCellValue } = require("../sheetCellValue");
 
 /**
  * Header-aware upsert into your Students Google Sheet.
@@ -381,7 +382,7 @@ async function upsertStudentToSheet(student) {
     if (colIdx0 === null || colIdx0 === undefined) return;
     const colA1 = colToA1(colIdx0);
     const a1 = `${tabName}!${colA1}${sheetRowNumber}`;
-    updates.push({ range: a1, values: [[value]] });
+    updates.push({ range: a1, values: [[sheetCellValue(value)]] });
   }
 
   if (sheetRowNumber) {
@@ -496,7 +497,7 @@ async function upsertStudentToSheet(student) {
     range: appendRange,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
-    requestBody: { values: [row] },
+    requestBody: { values: [row.map(sheetCellValue)] },
   });
 
   return { action: "appended" };
@@ -506,7 +507,7 @@ async function appendStudentToStudentsSheetSafely(student) {
   try {
     return await upsertStudentToSheet(student);
   } catch (err) {
-    console.error("appendStudentToStudentsSheetSafely error", err);
+    console.error("appendStudentToStudentsSheetSafely error", { message: err.message, status: err.response?.status || err.status || err.code });
     return {
       error: err.message || "Failed to sync student to sheet",
       errorStatus: Number(err.response?.status || err.status || (typeof err.code === "number" ? err.code : 0)),
