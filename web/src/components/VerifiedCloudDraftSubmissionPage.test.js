@@ -46,7 +46,7 @@ describe("VerifiedCloudDraftSubmissionPage", () => {
     expect(source).toContain("findOwnedSubmissionLock({ db, studentId: user.uid, lockId: draftDocId })");
     expect(source).not.toContain("await getDoc(doc(db, LOCK_COLLECTION, draftDocId))");
     expect(source).not.toContain("await getDoc(doc(db, DRAFT_COLLECTION, draftDocId))");
-    expect(source).not.toContain("await getDoc(draftRef);");
+    expect(source).not.toContain("const beforeSnapshot = await getDoc(draftRef);");
     // Verification after creating an owned document is still required.
     expect(source).toContain("const verifiedSnapshot = await getDoc(draftRef)");
     expect(source).toContain("const verifiedSubmission = await getDoc(submissionRef)");
