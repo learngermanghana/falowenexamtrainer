@@ -507,7 +507,11 @@ async function appendStudentToStudentsSheetSafely(student) {
     return await upsertStudentToSheet(student);
   } catch (err) {
     console.error("appendStudentToStudentsSheetSafely error", err);
-    return { error: err.message || "Failed to sync student to sheet" };
+    return {
+      error: err.message || "Failed to sync student to sheet",
+      errorStatus: Number(err.response?.status || err.status || (typeof err.code === "number" ? err.code : 0)),
+      errorReason: String(err.response?.data?.error?.errors?.[0]?.reason || ""),
+    };
   }
 }
 
