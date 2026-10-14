@@ -101,7 +101,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         sessionMinutes: 5, maxTurns: MAX_TURNS, ...info,
         capReached: (Number(usage?.data()?.turns) || 0) >= spendingCap(),
         activeSession: active && enabled() ? {
-          sessionId: running.sessionId, expiresAt: running.expiresAt, resumed: true,
+          sessionId: running.sessionId, expiresAt: running.expiresAt,
+          level: running.level || "A2", topic: running.topic || "",
+          source: running.source || "standalone", resumed: true,
         } : null,
       });
     } catch (err) {
