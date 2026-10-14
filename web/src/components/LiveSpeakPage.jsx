@@ -463,7 +463,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
             <div>
               <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
-                {busy ? "Starting…" : details.activeSession ? "Resume exam" : examinerEntry ? "Start exam" : "Start speaking"}
+                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start exam" : "Start speaking"}
               </button>
             </div>
           ) : (
@@ -514,7 +514,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 </span>
               </div>
               <div style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
-                <textarea lang="de" aria-label="Recognized German answer" rows={2}
+                <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
                   value={pending ? recognizedText : ""}
                   readOnly={!pending || (simulation && !recognitionCorrection)}
@@ -528,7 +528,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   style={{border:"none",borderRadius:14,width:56,minWidth:56,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:23,cursor:"pointer"}}>
                     {recording ? "■" : "🎙"}
                 </button>
-                <button type="button" aria-label="Confirm spoken answer" title="Confirm spoken answer"
+                <button type="button" aria-label="Confirm answer" title="Confirm spoken answer"
                   onClick={confirmTranscript}
                   disabled={!pending || busy || feedbackBusy || recognizedText.trim().length<2 || (expired && (!examinerSession || Date.now()>Date.parse(session.expiresAt)+300000))}
                   style={{border:"none",borderRadius:12,minWidth:44,padding:"0 10px",background:pending?"#2563eb":"#cbd5e1",color:pending?"#fff":"#475569",fontWeight:800,fontSize:20,cursor:pending?"pointer":"not-allowed"}}>
@@ -551,7 +551,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                 <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
                   disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "View feedback" : "Finish early & review"}
+                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "Finish task & see feedback" : "Finish early & review"}
                 </button>
                 <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>End without feedback</button>
               </div>
