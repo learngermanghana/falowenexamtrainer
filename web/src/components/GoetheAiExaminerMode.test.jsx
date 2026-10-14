@@ -40,8 +40,8 @@ test("selected real Goethe task flows to same voice engine with level and keywor
     task:{id:example.id,teil:"Teil 1",prompt:example.topicPrompt,
       keywords:example.keywordSubtopic,hint:example.hint},
   });
-  expect(screen.getByText(/feedback comes after you finish/i)).toBeInTheDocument();
-  expect(screen.getByText(/official Goethe exam score/i)).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"Goethe AI Examiner"})).toBeInTheDocument();
+  expect(screen.queryByText(/free voice pilot|payment|test access expires/i)).not.toBeInTheDocument();
 });
 
 test("no examiner is started when no speaking prompt has been selected",()=>{
