@@ -17,27 +17,15 @@ export default function ExamLiveSpeakPanel({
   } : null;
   return (
     <section aria-label="Goethe AI Examiner speaking practice" style={{background:"#f8fafc",padding:compact?12:20,display:"grid",gap:16}}>
-      <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"flex-start",flexWrap:"wrap"}}>
-        <div style={{display:"grid",gap:4}}>
-          <p style={{margin:0,fontSize:12,color:"#1d4ed8",fontWeight:800,letterSpacing:".04em",textTransform:"uppercase"}}>
-            Goethe AI Examiner · speaking simulation
-          </p>
-          <h2 style={{margin:0,fontSize:compact?21:24,color:"#0f172a"}}>Practise the Goethe speaking task aloud.</h2>
-          <p style={{margin:0,maxWidth:620,fontSize:13,lineHeight:1.6,color:"#475569"}}>
-            Choose an exam part and prompt. The AI Examiner introduces the task, listens and asks
-            appropriate follow-up questions. Review the transcript before continuing;
-            task feedback comes after you finish.
-          </p>
-        </div>
-        <span style={{fontSize:12,fontWeight:700,color:"#1e40af",background:"#dbeafe",padding:"7px 11px",borderRadius:999}}>
-          {level} · Free voice pilot
-        </span>
-      </div>
+      <header style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+        <h2 style={{margin:0,fontSize:compact?20:23,color:"#0f172a"}}>Goethe AI Examiner</h2>
+        <strong style={{fontSize:13,color:"#1d4ed8"}}>{level}</strong>
+      </header>
       <div style={{
         background:"#fff",border:"1px solid #e2e8f0",borderRadius:14,
         padding:compact?12:15,display:"grid",gap:11,
       }}>
-        <div style={{fontSize:14,fontWeight:750,color:"#0f172a"}}>Choose your Goethe exam task</div>
+        <div style={{fontSize:14,fontWeight:750,color:"#0f172a"}}>Sprechen – Select a task</div>
         <div style={{display:"grid",gridTemplateColumns:compact?"1fr":"minmax(115px, 1fr) minmax(0, 3fr)",gap:12}}>
           <label style={{display:"grid",gap:5,color:"#334155",fontSize:12,fontWeight:650}}>
             Exam part
@@ -64,20 +52,14 @@ export default function ExamLiveSpeakPanel({
             </select>
           </label>
         </div>
-        <p style={{fontSize:12,color:"#64748b",margin:0,lineHeight:1.5}}>
-          Changing the topic prepares your next session. If a conversation is already active,
-          it continues with its original topic until you end it.
-        </p>
+
       </div>
       {examinerTask ? (
         <LiveSpeakPage embedded initialLevel={level}
           practiceTopic={selectedTopic} practiceSource="exam-speaking-practice"
           examTask={examinerTask} />
       ) : <p role="status">Select a speaking task to start your AI Examiner.</p>}
-      <p style={{fontSize:12,lineHeight:1.5,color:"#64748b",margin:0}}>
-        The AI Examiner gives practice-only feedback after the task. It does not interrupt to correct
-        mistakes or produce an official Goethe exam score. Timed mocks and saved exam results are unchanged.
-      </p>
+
     </section>
   );
 }
