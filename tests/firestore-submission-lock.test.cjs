@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp } = require('firebase/firestore');
+const { collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp, writeBatch } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-falowen-locks', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync('firestore.rules', 'utf8') } });
@@ -147,5 +147,52 @@ for (const [level, key] of [['A1','A1-12.3'],['A2','A2-8.21'],['B1','B1-6.18']])
     const sent=await assertSucceeds(getDoc(ref));
     if(sent.data().status!=='submitted')throw new Error('Timer did not complete');
     await assertFails(setDoc(doc(other,'timedAssignmentAttempts',id),{status:'active'},{merge:true}));
+  });
+}
+
+// A failed second write must never leave the learner's final answer orphaned.
+for (const level of ['A1', 'A2', 'B1']) {
+  test(`${level} final work and submission lock commit atomically under owner rules`, async () => {
+    const uid = `atomic-${level.toLowerCase()}`;
+    const student = env.authenticatedContext(uid, { email: `${uid}@example.com` }).firestore();
+    const outsider = env.authenticatedContext(`${uid}-outsider`).firestore();
+    const submissionId = `${uid}-answer`;
+    const submissionRef = doc(student, 'submissions', submissionId);
+    const lockRef = doc(student, 'submissionLocks', submissionId);
+    const payload = {
+      studentId: uid,
+      uid,
+      userId: uid,
+      ownerUid: uid,
+      level,
+      assignmentKey: `${level}-1.1`,
+      submissionText: 'The student completed part of this timed task.',
+      status: 'submitted',
+    };
+    const batch = writeBatch(student);
+    batch.set(submissionRef, payload);
+    batch.set(lockRef, {
+      studentId: uid,
+      level,
+      assignmentKey: payload.assignmentKey,
+      submissionId,
+      status: 'submitted',
+    }, { merge: true });
+    await assertSucceeds(batch.commit());
+    const submitted = await assertSucceeds(getDoc(submissionRef));
+    const lock = await assertSucceeds(getDoc(lockRef));
+    if (!submitted.exists() || !lock.exists() || lock.data().submissionId !== submissionId) {
+      throw new Error('The confirmed answer and submission lock must both exist');
+    }
+    const failedBatch = writeBatch(outsider);
+    const deniedRef = doc(outsider, 'submissionLocks', submissionId);
+    const ownRef = doc(outsider, 'submissions', `${uid}-outsider-should-not-write`);
+    failedBatch.set(ownRef, { studentId: `${uid}-outsider`, status: 'submitted', level });
+    failedBatch.set(deniedRef, { studentId: uid, assignmentKey: payload.assignmentKey });
+    await assertFails(failedBatch.commit());
+    const ownStillMissing = await assertSucceeds(getDocs(query(
+      collection(outsider, 'submissions'), where('studentId', '==', `${uid}-outsider`)
+    )));
+    if (!ownStillMissing.empty) throw new Error('Rejected batch leaked a partial submission');
   });
 }
