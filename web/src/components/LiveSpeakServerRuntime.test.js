@@ -251,7 +251,7 @@ test("Goethe AI Examiner uses the selected A1 exam task and does not correct dur
   expect(start.payload.examTask).toEqual(expect.objectContaining(task));
   expect(api.docs.get("liveSpeakSessions/u123").source).toBe("exam-speaking-practice");
   const intro=await api.call("POST","/live-speak/session/turn",{sessionId:start.payload.sessionId,intro:true});
-  expect(intro.payload.reply).toContain("Stellen Sie sich kurz vor");
+  expect(intro.payload.reply).toContain("Stellen Sie sich bitte vor");
   const speech=await api.call("POST","/live-speak/session/turn",{
     sessionId:start.payload.sessionId,mimeType:"audio/webm",
     audioBase64:Buffer.from("hello".repeat(340)).toString("base64"),
@@ -262,10 +262,10 @@ test("Goethe AI Examiner uses the selected A1 exam task and does not correct dur
     transcript:"Ich heiße Mia und komme aus Ghana.",
   });
   expect(confirmed.code).toBe(200);
-  const request=api.fakeClient.chat.completions.create.mock.calls[0][0];
-  expect(request.messages[0].content).toMatch(/Do NOT correct grammar/);
-  expect(request.messages[0].content).toMatch(/ONE concise next question/);
-  expect(request.messages[0].content).toContain("Stellen Sie sich kurz vor");
+  expect(confirmed.payload.reply).toContain("beruflich");
+  expect(confirmed.payload.examProgress).toEqual({answered:1,maxAnswers:3,complete:false});
+  // The first A1 follow-up is scripted and needs no additional chat call.
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
   expect(api.docs.get("liveSpeakSessions/u123").answeredTurns).toBe(1);
 });
 
@@ -313,5 +313,61 @@ test("general conversation cannot call examiner feedback",async()=>{
     sessionId:start.payload.sessionId,answers:["Ich komme aus Ghana."],
   });
   expect(reply.code).toBe(409);
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+});
+
+test("A1 Goethe task follows three speaking answers, completes, and blocks extra speech",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const task={id:"a1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"};
+  const start=await api.call("POST","/live-speak/session/start",{
+    level:"A1",source:"exam-speaking-practice",topic:task.prompt,examTask:task,
+  });
+  expect(start.payload.examProgress).toEqual({answered:0,maxAnswers:3,complete:false});
+  const spoken=[];
+  for(let i=0;i<3;i++){
+    const response=await api.call("POST","/live-speak/session/turn",{
+      sessionId:start.payload.sessionId,mimeType:"audio/webm",
+      audioBase64:Buffer.from("hallo".repeat(360)).toString("base64"),
+    });
+    expect(response.code).toBe(200);
+    const confirmed=await api.call("POST","/live-speak/session/confirm",{
+      sessionId:start.payload.sessionId,pendingId:response.payload.pendingId,
+      transcript:"Ich heiße Mia. Ich spreche Deutsch.",
+    });
+    expect(confirmed.code).toBe(200);
+    spoken.push(confirmed.payload);
+  }
+  expect(spoken[1].reply).toContain("Sprachen");
+  expect(spoken[2].examProgress).toEqual({answered:3,maxAnswers:3,complete:true});
+  expect(spoken[2].reply).toMatch(/beendet/);
+  const blocked=await api.call("POST","/live-speak/session/turn",{
+    sessionId:start.payload.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.from("hallo".repeat(360)).toString("base64"),
+  });
+  expect(blocked.code).toBe(409);
+  expect(blocked.payload.code).toBe("task_complete");
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+});
+
+test("A2 Teil 3 guides planning instead of irrelevant corrections",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const task={id:"a2-plan",teil:"Teil 3",prompt:"Gemeinsam eine Reise planen"};
+  const start=await api.call("POST","/live-speak/session/start",{
+    level:"A2",source:"exam-speaking-practice",topic:task.prompt,examTask:task,
+  });
+  const opening=await api.call("POST","/live-speak/session/turn",{sessionId:start.payload.sessionId,intro:true});
+  expect(opening.payload.reply).toContain("Machen Sie bitte einen Vorschlag");
+  const audio=await api.call("POST","/live-speak/session/turn",{
+    sessionId:start.payload.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.from("hallo".repeat(360)).toString("base64"),
+  });
+  const confirmed=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:start.payload.sessionId,pendingId:audio.payload.pendingId,
+    transcript:"Wir könnten am Samstag nach Berlin fahren.",
+  });
+  expect(confirmed.code).toBe(200);
+  expect(confirmed.payload.reply).toContain("Wann und wo");
   expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
 });
