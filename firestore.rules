@@ -125,12 +125,11 @@ service cloud.firestore {
         && request.resource.data.durationSeconds > 0
         && request.resource.data.durationSeconds <= 7200;
 
-      // A student's first live listener sees a missing attempt document.
-      // Only the caller's own deterministic ID may be read before creation.
+      // Owner-only first-time check: the student watches this missing record
+      // before it can contain owner fields. No cross-student list/read/write.
       allow get: if signedIn()
         && resource == null
-        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
-      allow read: if ownsStudentResource() || isStaff();
+        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+
 
       allow update: if isStaff() || (
         ownsStudentResource()
@@ -150,6 +149,9 @@ service cloud.firestore {
 
       allow delete: if isStaff();
     }
+
+    // Shared, canonical A1-C1 course progress snapshot.
+    // Students own their own snapshot; staff can read it for Admin/email/reporting.
     match /courseCompletionSnapshots/{snapshotId} {
       allow create: if ownsStudentIncoming() || isStaff();
       allow read: if ownsStudentResource() || isStaff();
