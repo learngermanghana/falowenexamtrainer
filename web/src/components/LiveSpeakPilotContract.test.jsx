@@ -111,7 +111,7 @@ test("the embedded banner and resumed conversation retain backend topic after sa
 
   fireEvent.click(screen.getByRole("button", {name:"Resume speaking"}));
   await waitFor(() => expect(screen.getByText(/Your existing voice session is still using its original topic and level/)).toBeInTheDocument());
-  expect(screen.getByRole("heading",{name:"AI Examiner · B1"})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"Nachhaltige Mobilität"})).toBeInTheDocument();
 
   // Changing both lesson and level while active must never overwrite the saved context.
   rerender(
