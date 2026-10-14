@@ -106,3 +106,25 @@ test("mobile Exam Room uses one collapsible section menu; desktop stays unchange
   expect(css).toContain(".mobile-exam-menu__links");
   expect(css).toContain("falowen-speaking-session-active");
 });
+
+test("iPhone and Android exam layout keeps microphone, task and menu usable at narrow widths", () => {
+  const app = fs.readFileSync(path.resolve(__dirname, "../App.css"), "utf8");
+  const page = fs.readFileSync(path.resolve(__dirname, "./SpeakingPage.js"), "utf8");
+  const voice = fs.readFileSync(path.resolve(__dirname, "./LiveSpeakPage.jsx"), "utf8");
+  const cards = fs.readFileSync(path.resolve(__dirname, "./GoetheExamTaskCard.jsx"), "utf8");
+  expect(page).toContain('className="speaking-exam-grid"');
+  expect(page).toContain('className="speaking-exam-sidebar"');
+  expect(page).toContain('className="speaking-exam-voice"');
+  expect(cards).toContain('className="speaking-exam-task-card"');
+  expect(voice).toContain('className="speaking-exam-recorder-row"');
+  expect(voice).toContain('className="speaking-exam-session__answer"');
+  expect(app).toContain('@media (max-width: 900px)');
+  expect(app).toContain('@media (max-width: 640px)');
+  expect(app).toContain('@media (max-width: 360px)');
+  expect(app).toContain('grid-template-columns: minmax(0, 1fr) 52px 44px;');
+  expect(app).toContain('font-size: 16px !important; /* prevent Safari zoom on focus */');
+  expect(app).toContain('env(safe-area-inset-bottom, 0px)');
+  expect(app).toContain('max-height: min(34dvh, 300px)');
+  expect(app).toContain('.speaking-exam-page button:focus-visible');
+  expect(app).toContain('.mobile-exam-menu summary strong');
+});
