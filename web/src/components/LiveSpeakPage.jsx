@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { backendUrl } from "../services/aiClient";
 import { styles } from "../styles";
@@ -11,12 +11,6 @@ const friendlyTime = (value) => {
   const seconds = Math.max(0, Math.ceil(value / 1000));
   return String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
 };
-const allowedCheckout = (url) => {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "https:" && ["paystack.com", "checkout.paystack.com"].includes(parsed.hostname);
-  } catch (_err) { return false; }
-};
 const toBase64 = (blob) => new Promise((resolve, reject) => {
   const reader = new FileReader();
   reader.onerror = () => reject(new Error("Unable to read the recording."));
@@ -26,9 +20,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
 export default function LiveSpeakPage() {
-  const { user, idToken, studentProfile } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -95,23 +87,6 @@ export default function LiveSpeakPage() {
     return () => clearInterval(timer);
   }, [session]);
 
-  useEffect(() => {
-    const reference = new URLSearchParams(location.search).get("reference") ||
-      new URLSearchParams(location.search).get("trxref");
-    if (!reference || !idToken) return undefined;
-    let canceled = false;
-    setNotice("Checking your Live Speak payment with Paystack...");
-    api("/live-speak/payment/verify", "POST", {reference})
-      .then(result => {
-        if (canceled) return;
-        setNotice(result.paid ? "Payment confirmed. Your speaking sessions are ready." :
-          "Paystack has not confirmed your payment yet. Please refresh this page shortly.");
-        refresh();
-      }).catch(err => { if (!canceled) setErrorMessage(err.message); })
-      .finally(() => { if (!canceled) navigate("/campus/live-speak", {replace:true}); });
-    return () => { canceled = true; };
-  }, [api, idToken, location.search, navigate, refresh]);
-
   const stopAudio = () => {
     voiceRef.current?.pause();
     voiceRef.current = null;
@@ -162,12 +137,14 @@ export default function LiveSpeakPage() {
     try {
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel});
       setSession(result);
-      setMessages([]);
-      setLastAudio("");
+      if (!result.resumed) {
+        setMessages([]);
+        setLastAudio("");
+      }
       setNow(Date.now());
-      // Release busy before greeting turn; the greeting is a metered server call.
       setBusy(false);
-      await sendTurn(result, {intro:true});
+      if (!result.resumed) await sendTurn(result, {intro:true});
+      else setNotice("Your ongoing speaking session has resumed. Continue speaking German.");
       refresh();
     } catch (err) {
       setErrorMessage(err.message);
@@ -207,6 +184,7 @@ export default function LiveSpeakPage() {
       const chunks = [];
       recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
       recorder.onstop = async () => {
+        if (!mounted.current) return;
         if (recordingTicker.current) clearInterval(recordingTicker.current);
         setRecording(false);
         setRecordingSeconds(0);
@@ -241,78 +219,63 @@ export default function LiveSpeakPage() {
   };
   const stopRecording = () => { if (recorderRef.current?.state === "recording") recorderRef.current.stop(); };
 
-  const checkout = async () => {
+  const claimPilot = async () => {
+    if (busy || requestBusy.current) return;
     setBusy(true);
     setErrorMessage("");
     try {
-      const result = await api("/live-speak/checkout", "POST", {});
-      if (!allowedCheckout(result.authorization_url)) throw new Error("Unexpected payment destination.");
-      window.location.assign(result.authorization_url);
-    } catch (err) { setErrorMessage(err.message); setBusy(false); }
-  };
-  const claimTrial = async () => {
-    setBusy(true);
-    setErrorMessage("");
-    try {
-      await api("/live-speak/trial", "POST", {});
-      setNotice("Your two free trial sessions are available.");
+      await api("/live-speak/pilot/claim", "POST", {});
+      setNotice("Two free five-minute speaking sessions have been added for testing.");
       await refresh();
-    } catch (err) { setErrorMessage(err.message); }
-    finally { setBusy(false); }
+    } catch (err) {
+      setErrorMessage(err.message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const timeRemaining = session ? Math.max(0, Date.parse(session.expiresAt) - now) : 0;
   const expired = Boolean(session) && timeRemaining <= 0;
-  const sessionsAvailable = Number(details?.remaining) > 0 && !details?.capReached;
+  const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
   return (
     <main style={{ ...styles.container, maxWidth: 940, paddingBottom: 65, display:"grid", gap:16 }}>
       <Link to="/" style={{ color:"#1d4ed8", fontWeight:700, textDecoration:"none" }}>← Back to Falowen</Link>
       <section style={{ ...shell, background:"linear-gradient(135deg,#132f67,#145b8f)",color:"#fff" }}>
-        <p style={{ margin:0, letterSpacing:1, textTransform:"uppercase",fontSize:12 }}>Optional speaking add-on</p>
+        <p style={{ margin:0, letterSpacing:1, textTransform:"uppercase",fontSize:12 }}>Private German voice pilot · No payments</p>
         <h1 style={{ margin:"8px 0",color:"#fff",fontSize:"clamp(27px,6vw,39px)" }}>Falowen Live Speak</h1>
         <p style={{ margin:0,color:"#e0efff",lineHeight:1.6 }}>Speak German with a natural AI voice, hear a gentle correction after your turn, and keep the conversation going. Five-minute sessions. No continuous listening.</p>
       </section>
 
       {loading ? <section style={shell}>Checking your speaking allowance…</section> : null}
-      {!loading && details && !details.enabled ? (
+      {!loading && details && (!details.enabled || !details.approved) ? (
         <section style={{ ...shell, background:"#f8fafc" }}>
-          <h2 style={{ margin:0 }}>Live Speak pilot is being prepared</h2>
-          <p>This add-on is not accepting payments or generating premium audio yet. Existing Goethe Free Sprechen Chat and Speaking Trainer remain available with your course.</p>
+          <h2 style={{ margin:0 }}>Live Speak is in private testing</h2>
+          <p>The spoken German pilot is available only to approved testers while we check voice quality and costs. No payment is needed. Your existing speaking practice remains available.</p>
           <Link to="/campus/speaking" style={styles.secondaryButton}>Use existing speaking practice</Link>
         </section>
       ) : null}
 
-      {details?.enabled ? (
-        <>
-          <section style={shell}>
-            <h2 style={{ marginTop:0 }}>Your Live Speak access</h2>
-            <p style={{fontSize:16, margin:"6px 0"}}><strong>{details.remaining || 0}</strong> sessions remaining · 5 minutes each</p>
-            <p style={{color:"#475569",fontSize:13}}>
-              {details.expiresAt ? "Available until " + new Date(details.expiresAt).toLocaleDateString() + "." : "No active package."}
-              {" "}Each session supports up to 10 short speaking turns.
-            </p>
-            {details.capReached ? <p role="alert">The pilot's monthly AI spending limit has been reached. New speaking turns are paused.</p> : null}
-            {!session && sessionsAvailable ? (
-              <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
-                {busy ? "Starting..." : "Start 5-minute conversation"}
-              </button>
-            ) : null}
-          </section>
-
-          {!session && (!sessionsAvailable || !details.remaining) ? (
-            <section style={shell}>
-              <h2 style={{marginTop:0}}>Live Speak Basic</h2>
-              <p style={{fontSize:26,fontWeight:800,margin:"4px 0"}}>GH₵40 <span style={{fontSize:13,fontWeight:400}}>per 8-session package</span></p>
-              <p>Eight five-minute conversations to use within 30 days. One-time Paystack payment, no automatic renewal. A small shared transaction fee is shown at checkout.</p>
-              {details.trialAvailable ? (
-                <button type="button" style={styles.secondaryButton} onClick={claimTrial} disabled={busy}>Try 2 free sessions first</button>
-              ) : null}
-              <button type="button" style={{...styles.primaryButton, marginLeft:8}} onClick={checkout} disabled={busy || details.capReached}>
-                {busy ? "Please wait..." : "Buy 8 sessions"}
-              </button>
-            </section>
+      {details?.enabled && details?.approved ? (
+        <section style={{...shell, display:"grid",gap:10}}>
+          <h2 style={{margin:0}}>Your free voice test</h2>
+          <p style={{margin:0,color:"#334155"}}>Each approved tester can try <strong>two 5-minute spoken conversations</strong>. There are no payments or subscriptions during this test.</p>
+          <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
+          {details.expiresAt ? <p style={{margin:0,color:"#475569",fontSize:13}}>Test access expires {new Date(details.expiresAt).toLocaleDateString()}.</p> : null}
+          {details.capReached ? <p role="alert">The pilot's monthly AI-usage limit has been reached. Testing is temporarily paused.</p> : null}
+          {!session && details.pilotAvailable ? (
+            <div><button type="button" style={styles.primaryButton} onClick={claimPilot} disabled={busy || details.capReached}>
+              {busy ? "Please wait..." : "Activate 2 free test sessions"}
+            </button></div>
           ) : null}
-        </>
+          {!session && sessionsAvailable ? (
+            <div><button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
+              {busy ? "Starting..." : details.activeSession ? "Resume voice conversation" : "Start 5-minute conversation"}
+            </button></div>
+          ) : null}
+          {!session && !sessionsAvailable && details.pilotClaimed && !details.capReached ? (
+            <p role="status" style={{margin:0}}>You've used your available test sessions. Thanks for helping us check the German speaking experience.</p>
+          ) : null}
+        </section>
       ) : null}
 
       {session ? (
@@ -350,9 +313,9 @@ export default function LiveSpeakPage() {
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
       <section style={shell}>
-        <h2 style={{marginTop:0}}>What's included and what's not</h2>
-        <p>Live Speak is an optional premium voice add-on. Your usual course, Goethe Free Sprechen Chat and Speaking Trainer are not replaced or removed. AI corrections concern grammar and communication; this feature does not claim precise phonetic pronunciation scores.</p>
-        <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice. Natural German pronunciation can vary; please report any incorrect audio. No subscription renewal, no unexpected overage charges. Full session access and budget limits are verified by the server.</p>
+        <h2 style={{marginTop:0}}>About this private voice test</h2>
+        <p>This pilot tests whether our natural German AI voice, speech recognition and short corrections work well. Your usual course, Goethe Free Sprechen Chat and Speaking Trainer remain unchanged. Feedback covers grammar and communication, not precise phonetic pronunciation scores.</p>
+        <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice can make mistakes. Report unusual pronunciation or delays. There is no checkout, charge or subscription in this testing version. Server-side access and usage limits apply.</p>
       </section>
     </main>
   );
