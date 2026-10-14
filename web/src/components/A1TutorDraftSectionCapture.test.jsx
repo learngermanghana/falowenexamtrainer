@@ -30,7 +30,7 @@ test("Health Teil 1 exposes clickable radio choices and stores the selected answ
 
   expect(firstChoice).toBeChecked();
   expect(screen.getByText("1 of 5 answered")).toBeInTheDocument();
-  expect(readA1WorkbookDraft("A1-14.1").sections["teil-1"].answers[1]).toBe("Anzeige A");
+  expect(readA1WorkbookDraft("A1-14.1").sections["teil-1"].answers[1]).toBe("A");
 });
 
 test("visible workbook options become the A1 draft controls instead of a duplicate answer block", async () => {
