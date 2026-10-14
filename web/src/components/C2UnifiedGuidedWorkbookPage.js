@@ -2,6 +2,7 @@ import C2GrammarTeaching from "./C2GrammarTeaching";
 import React,{useEffect,useMemo,useRef,useState}from"react";
 import{useLocation,useNavigate}from"react-router-dom";
 import AppBackButton from"./navigation/AppBackButton";
+import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import{EmbeddedSpeechPracticePanel}from"./selfLearning/EmbeddedPracticePanels";
 import{AdvancedSelfLearningTabNav}from"./StandardWorkbookComponents";
 import{styles}from"../styles";
@@ -107,6 +108,7 @@ function Speak({standard,knowledge,day,completed,onCompleteChange}){
    {support!=="exam"?<div style={{display:"grid",gap:10}}>{branches.map(branch=><div key={branch.title} style={{...sub,background:"#eef2ff"}}><strong>{branch.title}</strong><div><strong>Ideen:</strong> {branch.ideas.join(" · ")}</div><div><strong>Leitfrage:</strong> {branch.prompt}</div>{support==="full"?<div style={{color:"#1e3a8a"}}><strong>C2-Satzanfang:</strong> {branch.starter}</div>:null}</div>)}</div>:<div style={{...sub,background:"#f0fdf4"}}><strong>Prüfungsmodus</strong><span>Entwickeln Sie Position, Begründung, Beispiel, Gegenargument und Synthese ohne Ideenbank.</span></div>}
    <textarea value={plan} onChange={e=>setPlan(e.target.value)} placeholder="Vortragsplan: Einleitung → Perspektiven → Beispiel → Gegenargument → Synthese" style={{minHeight:150,border:"1px solid #cbd5e1",borderRadius:12,padding:12,font:"inherit",lineHeight:1.7}}/>
    <EmbeddedSpeechPracticePanel/>
+   <LiveSpeakInlinePractice level="C2" topic={standard.title} source="c2-workbook" />
    <label style={{display:"flex",gap:8,alignItems:"center",fontWeight:700}}><input type="checkbox" checked={Boolean(completed)} onChange={e=>onCompleteChange?.(e.target.checked)}/>Ich habe den Vortrag durchgeführt und meine Position begründet.</label>
   </div>
  </Section>;
