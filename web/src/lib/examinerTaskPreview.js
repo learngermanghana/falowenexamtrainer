@@ -10,10 +10,16 @@ export const examinerTaskPreview = (level,task,mode="guided") => {
     const first=defaults.find(card=>card.word.toLocaleLowerCase("de-DE") === selected.toLocaleLowerCase("de-DE"))?.word || selected;
     cards=[...new Map([first,...defaults.map(card=>card.word)].map(word=>[word.toLocaleLowerCase("de-DE"),word])).values()].slice(0,key === "A1-2" ? 2 : 4);
   }
+  const requestCards = key === "A1-3" ? (() => {
+    const all = catalogue.a1RequestCards;
+    const first = all.find(card => card.word.toLocaleLowerCase("de-DE") === selected.toLocaleLowerCase("de-DE")) || {word:selected || "Buch bringen",symbol:"🗂️"};
+    return [first,...all.filter(card => card.word.toLocaleLowerCase("de-DE") !== first.word.toLocaleLowerCase("de-DE"))].slice(0,2)
+      .map(card => ({word:card.word,symbol:card.symbol}));
+  })() : [];
   const topicEntry=Object.entries(catalogue.a2TopicPoints).find(([topic])=>topic !== "default" && String(task?.prompt || "").toLowerCase().includes(topic.toLowerCase()));
   const supplied=String(task?.keywords || "").split(/[,;·]/).map(value=>value.trim()).filter(Boolean);
   return {key,title:profile.title,mode,topic:key === "B1-3" ? (/fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : task?.prompt || "Freizeit") : "",maxAnswers:profile.maxAnswers,role:profile.role,
-    cards,card:key === "A1-3" ? selected : "",studentCalendar:profile.studentCalendar || [],
+    cards,card:key === "A1-3" ? selected : "",requestCards,studentCalendar:profile.studentCalendar || [],
     points:key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : key === "B1-2" ? catalogue.presentationPoints : key === "B1-1" ? ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : key === "A2-2" ? (supplied.length>=4 ? supplied.slice(0,4) : topicEntry?.[1] || catalogue.a2TopicPoints.default) : [],
     hints:mode === "guided" ? profile.hints : [],
     scenario:key === "A2-3" ? `Sie möchten gemeinsam folgende Aktivität planen: ${String(task?.prompt || "ein Geschenk für einen Freund kaufen").slice(0,180)}. Finden Sie einen gemeinsamen Termin.` : "",
