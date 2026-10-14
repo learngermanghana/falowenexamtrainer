@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
-
-// This uses the SAME backend, free pilot credits and global cost cap everywhere.
 import LiveSpeakPage from "./LiveSpeakPage";
 
+// One speaking engine and allowance, reused by Course Book lessons and Exam Room.
 export default function LiveSpeakInlinePractice({
   level = "",
   topic = "",
@@ -12,44 +11,39 @@ export default function LiveSpeakInlinePractice({
   const [open, setOpen] = useState(false);
 
   return (
-    <section
-      data-live-speak-entry={source}
-      aria-label="Live German voice conversation practice"
+    <section data-live-speak-entry={source} aria-label="Live German voice conversation practice"
       style={{
-        border: "1px solid #bfdbfe", borderRadius: 14,
-        background: "#eff6ff", padding: "14px 16px",
-        display: "grid", gap: 9, minWidth: 0,
-      }}
-    >
-      <div style={{ display: "grid", gap: 5 }}>
-        <strong style={{ color: "#1e3a8a", fontSize: 16 }}>🎤 Live Speak · German voice conversation</strong>
-        <p style={{ margin: 0, color: "#334155", lineHeight: 1.55, fontSize: 13 }}>
-          Hear a natural German voice, speak your answer, review what the microphone heard,
-          and receive a spoken correction and follow-up. Uses your existing free Live Speak allowance.
-        </p>
-        {topic ? <p style={{ margin: 0, color: "#1e40af", fontSize: 13 }}><strong>Practice topic:</strong> {topic}</p> : null}
-        <small style={{ color: "#475569" }}>
-          Optional practice only. It does not answer, submit or alter timed or graded exam work.
-          No payment required.
-        </small>
-      </div>
-      <div>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, borderRadius: 10 }}
-          aria-expanded={open}
-          onClick={() => setOpen(value => !value)}
-        >
+        border: "1px solid #dbeafe", borderRadius: 14,
+        background: "#f8fbff", padding: "clamp(12px, 3vw, 17px)",
+        display: "grid", gap: 11, minWidth: 0,
+      }}>
+      <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+        <div style={{display:"grid",gap:5,flex:"1 1 220px",minWidth:0}}>
+          <span style={{fontSize:11,fontWeight:800,color:"#1d4ed8",letterSpacing:".04em",textTransform:"uppercase"}}>
+            Optional · German speaking practice
+          </span>
+          <h3 style={{margin:0,fontSize:18,color:"#0f172a"}}>🎤 Talk with your German AI partner</h3>
+          <p style={{margin:0,color:"#475569",lineHeight:1.55,fontSize:13}}>
+            Speak naturally, check what the microphone heard and get a spoken German reply.
+            Uses your existing free Live Speak allowance.
+          </p>
+          {topic ? <p style={{margin:"3px 0 0",color:"#1e40af",fontSize:12,overflowWrap:"anywhere"}}>
+            <strong>Lesson topic:</strong> {topic}
+          </p> : null}
+        </div>
+        <button type="button"
+          style={{...styles.secondaryButton,borderRadius:10,whiteSpace:"normal",minHeight:40,flex:"0 0 auto"}}
+          aria-expanded={open} onClick={() => setOpen(value => !value)}>
           {open ? "Hide Live Speak" : "Start live voice conversation"}
         </button>
       </div>
+      <p style={{margin:0,color:"#64748b",fontSize:11,lineHeight:1.5}}>
+        Optional, ungraded practice. Workbook answers, mock results and teacher marking are not changed. No payment required.
+      </p>
       {open ? (
-        <LiveSpeakPage
-            embedded
-            initialLevel={level}
-            practiceTopic={topic}
-            practiceSource={source}
-        />
+        <div style={{borderTop:"1px solid #dbeafe",paddingTop:12,minWidth:0}}>
+          <LiveSpeakPage embedded initialLevel={level} practiceTopic={topic} practiceSource={source} />
+        </div>
       ) : null}
     </section>
   );
