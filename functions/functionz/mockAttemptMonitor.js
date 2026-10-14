@@ -29,6 +29,24 @@ const iso = value => {
   const ms = toMillis(value);
   return ms ? new Date(ms).toISOString() : null;
 };
+// Expose only scores saved with the server-verified completed attempt.
+// Never infer missing values as zero or forward browser-reported scores.
+const finalVerifiedSectionScores = data => {
+  if (data?.status !== "completed") return null;
+  const overall = data?.verifiedOverall?.score;
+  if (overall === null || overall === undefined || overall === "" ||
+      !Number.isFinite(Number(overall))) return null;
+  const sections = data.sectionScores && typeof data.sectionScores === "object" ? data.sectionScores : {};
+  const verified = {};
+  for (const key of SECTIONS) {
+    const raw = sections[key];
+    if (raw === null || raw === undefined || raw === "") continue;
+    const value = Number(raw);
+    if (Number.isFinite(value) && value >= 0 && value <= 25) verified[key] = value;
+  }
+  return verified;
+};
+
 const normalizeMockAttempt = doc => {
   const path = String(doc.ref?.path || "");
   const parts = path.split("/");
@@ -60,6 +78,7 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
+    sectionScores: finalVerifiedSectionScores(data),
     overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
       ? Number(data.verifiedOverall.score) : null,
   };
@@ -208,4 +227,4 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
   return { attempts: await enrichStudentNames(db, attempts), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, finalVerifiedSectionScores, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
