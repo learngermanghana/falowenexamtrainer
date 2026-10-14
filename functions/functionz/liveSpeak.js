@@ -181,6 +181,16 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         return error(res, 409, "sessions_remaining", "Please use your remaining sessions before purchasing another package.");
       }
       const fee = calculateSharedPaystackFee(PRICE_GHS);
+      // Persist our reference before opening checkout: an immediate webhook cannot
+      // be mistaken for a tuition payment while the browser is redirecting.
+      const reference = "fsl_" + crypto.randomUUID().replace(/-/g, "");
+      await db().collection("liveSpeakPaymentIntents").doc(reference).create({
+        uid: student.auth.uid, email: normalizeEmail(student.auth.email),
+        status: "pending", product: "falowen_live_speak_basic",
+        checkoutPesewas: Math.round(fee.checkoutAmount * 100),
+        basePriceGhs: PRICE_GHS, studentFeeGhs: fee.studentFeeContribution,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
       // Callback destination is fixed on the server, never accepted from browser input.
       const callback = "https://www.falowen.app/campus/live-speak";
       const pay = await fetch("https://api.paystack.co/transaction/initialize", {
@@ -189,6 +199,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         body: JSON.stringify({
           email: normalizeEmail(student.auth.email), currency: "GHS",
           amount: Math.round(fee.checkoutAmount * 100), callback_url: callback,
+          reference,
           metadata: {
             product: "falowen_live_speak_basic", studentUid: student.auth.uid,
             sessions: BASIC_SESSIONS, planPriceGhs: PRICE_GHS,
@@ -197,19 +208,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         signal: AbortSignal.timeout(12000),
       });
       const response = await pay.json().catch(() => ({}));
-      const reference = String(response?.data?.reference || "");
+      const responseReference = String(response?.data?.reference || "");
       const checkoutUrl = String(response?.data?.authorization_url || "");
-      if (!pay.ok || !response?.status || !isValidReference(reference) ||
+      if (!pay.ok || !response?.status || responseReference !== reference ||
         !/^https:\/\/(checkout\.)?paystack\.com\//i.test(checkoutUrl)) {
         return error(res, 502, "checkout_failed", "Could not create the Live Speak checkout.");
       }
-      await db().collection("liveSpeakPaymentIntents").doc(reference).create({
-        uid: student.auth.uid, email: normalizeEmail(student.auth.email),
-        status: "pending", product: "falowen_live_speak_basic",
-        checkoutPesewas: Math.round(fee.checkoutAmount * 100),
-        basePriceGhs: PRICE_GHS, studentFeeGhs: fee.studentFeeContribution,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
       return res.json({
         authorization_url: checkoutUrl, reference,
         priceGhs: PRICE_GHS, feeGhs: fee.studentFeeContribution,
