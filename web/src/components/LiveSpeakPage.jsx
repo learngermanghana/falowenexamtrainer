@@ -46,6 +46,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingStarted = useRef(0);
   const voiceRef = useRef(null);
   const requestBusy = useRef(false);
+  const recordingStarting = useRef(false);
+  const [localRetry, setLocalRetry] = useState(false);
   const mounted = useRef(true);
   const level = String(studentProfile?.level || "A2").toUpperCase();
   const contextualLevel = String(initialLevel || "").toUpperCase();
@@ -53,12 +55,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
   const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
-  const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource };
+  const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource, examTask };
   // Status also carries the saved context while the learner is yet to resume.
   const savedSession = session || details?.activeSession || null;
   const displayContext = liveSpeakSessionContext(savedSession, requestedContext);
   const hasChangedContext = isDifferentLiveSpeakSessionContext(savedSession, requestedContext);
   const examinerSession = session?.source === "exam-speaking-practice";
+  const taskReady = examinerSession && (session.taskReady || Number(session.answeredTurns) >= (session.answerLimit || 2));
   const recordedAnswers = messages.filter(item => item.role === "user").map(item => item.text).filter(Boolean);
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
@@ -80,20 +83,29 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     if (!idToken) { setLoading(false); return; }
     try {
       const info = await api("/live-speak/status");
-      if (mounted.current) setDetails(info);
+      if (mounted.current) {
+        setDetails(info);
+        if (examinerEntry && info.lastExamResult) {
+          setExamFeedback(info.lastExamResult.feedback || "");
+          if (!info.activeSession) setMessages(info.lastExamResult.messages || []);
+        }
+      }
     } catch (err) {
       if (mounted.current) setErrorMessage(err.message);
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [api, idToken]);
+  }, [api, idToken, examinerEntry]);
 
   useEffect(() => {
     mounted.current = true;
     refresh();
     return () => {
       mounted.current = false;
-      if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+      if (recorderRef.current?.state === "recording") {
+        recorderRef.current.onstop = null;
+        recorderRef.current.stop();
+      }
       mediaRef.current?.getTracks().forEach(track => track.stop());
       if (recordingTicker.current) clearInterval(recordingTicker.current);
       voiceRef.current?.pause();
@@ -115,6 +127,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
   const playVoice = async (base64) => {
     stopAudio();
+    if (!base64) return;
     const audio = new Audio("data:audio/mpeg;base64," + base64);
     voiceRef.current = audio;
     setVoiceReady(true);
@@ -160,8 +173,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const confirmTranscript = async () => {
     if (!pending || !session || requestBusy.current || busy) return;
     const text = recognizedText.trim();
-    if (text.length < 2 || text.length > 600) {
-      setErrorMessage("Check the German transcript (2–600 characters) before continuing.");
+    if (text.length < 2 || text.length > (session.maxTranscriptChars || 600)) {
+      setErrorMessage("Check the German transcript before continuing.");
       return;
     }
     requestBusy.current = true;
@@ -174,6 +187,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",text:result.reply}]);
+      setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20} : old);
       setPending(null);
       setRecognizedText("");
       setLastAudio(result.audioBase64);
@@ -183,6 +197,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (mounted.current) {
         setErrorMessage(err.message);
         if (err.code === "transcript_missing") setPending(null);
+        if (examinerSession) {
+          // A response can be lost after the answer has already been saved.
+          try {
+            const info = await api("/live-speak/status");
+            const restored = info.activeSession;
+            if (mounted.current && restored?.sessionId === session.sessionId) {
+              setSession(restored);
+              setMessages(restored.messages || []);
+              setPending(restored.pending || null);
+              setRecognizedText(restored.pending?.transcript || "");
+            }
+          } catch (_restoreError) { /* Resume can recover saved text later. */ }
+        }
       }
     } finally {
       requestBusy.current = false;
@@ -203,7 +230,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   };
 
   const startSession = async () => {
-    if (busy || session) return;
+    if (busy || session || recording || recordingStarting.current) return;
     setBusy(true);
     setErrorMessage("");
     try {
@@ -213,8 +240,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null});
       setSession(result);
+      setLocalRetry(false);
       setExamFeedback("");
-      setPending(null);
+      setPending(result.pending || null);
+      setRecognizedText(result.pending?.transcript || "");
+      if (result.resumed) {
+        setMessages(result.messages || []);
+        setLastAudio("");
+      }
       clearRecording();
       if (!result.resumed) {
         setMessages([]);
@@ -224,7 +257,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setBusy(false);
       if (!result.resumed) await sendTurn(result, {intro:true});
       else setNotice(
-        isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource})
+        isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource,examTask})
           ? "Your existing voice session is still using its original topic and level. End it before starting a conversation on the newly selected topic."
           : "Your ongoing speaking session has resumed. Continue speaking German."
       );
@@ -239,7 +272,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const endSession = async () => {
     if (!session) return;
     stopAudio();
-    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+    if (recorderRef.current?.state === "recording") {
+      recorderRef.current.onstop = null;
+      recorderRef.current.stop();
+    }
+    mediaRef.current?.getTracks().forEach(track => track.stop());
+    if (recordingTicker.current) clearInterval(recordingTicker.current);
+    setRecording(false);
     const existing = session;
     setSession(null);
     setPending(null);
@@ -251,12 +290,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   };
 
   const finishExamTask = async () => {
-    if (!examinerSession || !session || pending || busy || feedbackBusy || !recordedAnswers.length || recording) return;
+    if (!examinerSession || !session || pending || busy || feedbackBusy || !recordedAnswers.length || recording || requestBusy.current) return;
+    requestBusy.current = true;
     setFeedbackBusy(true);
     setErrorMessage("");
     try {
       const result = await api("/live-speak/session/exam-feedback", "POST", {
-        sessionId: session.sessionId, answers: recordedAnswers,
+        sessionId: session.sessionId,
       });
       if (!mounted.current) return;
       stopAudio();
@@ -267,25 +307,30 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } catch (err) {
       if (mounted.current) setErrorMessage(err.message);
     } finally {
+      requestBusy.current = false;
       if (mounted.current) setFeedbackBusy(false);
     }
   };
 
-  const startRecording = async () => {
-    if (!session || busy || recording || pending || now >= Date.parse(session.expiresAt)) return;
+  const startRecording = async (localOnly = false) => {
+    if (recordingStarting.current || busy || feedbackBusy || recording || pending) return;
+    if (!localOnly && (!session || taskReady || now >= Date.parse(session.expiresAt))) return;
+    if (localOnly && !examFeedback) return;
     setErrorMessage("");
     if (typeof MediaRecorder === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setErrorMessage("Audio recording is not supported on this browser. Use a recent Chrome or Safari version.");
       return;
     }
+    recordingStarting.current = true;
     try {
       stopAudio();
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation:true, noiseSuppression:true, channelCount:1 },
       });
+      if (!mounted.current) { stream.getTracks().forEach(track => track.stop()); return; }
       mediaRef.current = stream;
       const mime = voiceTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
-      const recorder = new MediaRecorder(stream, mime ? {mimeType:mime} : undefined);
+      const recorder = new MediaRecorder(stream, {audioBitsPerSecond:32000, ...(mime ? {mimeType:mime} : {})});
       recorderRef.current = recorder;
       const chunks = [];
       recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
@@ -308,6 +353,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           const playableUrl = URL.createObjectURL(blob);
           recordedUrlRef.current = playableUrl;
           setStudentAudioUrl(playableUrl);
+          if (localOnly) { setLocalRetry(true); return; }
           const audioBase64 = await toBase64(blob);
           await sendTurn(session, {intro:false, audioBase64, mimeType:blob.type});
         } catch (err) { setErrorMessage(err.message); }
@@ -319,15 +365,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       recordingTicker.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - recordingStarted.current) / 1000);
         setRecordingSeconds(elapsed);
-        if ((elapsed >= MAX_RECORDING_SECONDS || Date.now() >= Date.parse(session.expiresAt)) &&
+        if ((elapsed >= (localOnly ? MAX_RECORDING_SECONDS : session.maxRecordingSeconds || MAX_RECORDING_SECONDS) || (!localOnly && Date.now() >= Date.parse(session.expiresAt))) &&
           recorder.state === "recording") recorder.stop();
       }, 300);
     } catch (err) {
       mediaRef.current?.getTracks().forEach(track => track.stop());
       setErrorMessage(err?.message || "Microphone permission was denied.");
+    } finally {
+      recordingStarting.current = false;
     }
   };
-  const stopRecording = () => { if (recorderRef.current?.state === "recording") recorderRef.current.stop(); };
+  const stopRecording = () => {
+    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+  };
 
   const timeRemaining = session ? Math.max(0, Date.parse(session.expiresAt) - now) : 0;
   const expired = Boolean(session) && timeRemaining <= 0;
@@ -349,6 +399,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
 
+      {examinerEntry && !session && !examFeedback ? (
+        <div style={{padding:12,background:"#eff6ff",borderRadius:10,display:"grid",gap:6}}>
+          <strong>Prepare → Answer → Follow-up → Feedback</strong>
+          <p style={{margin:0,lineHeight:1.5,fontSize:14}} lang="de">{examTask?.prompt}</p>
+          {examTask?.keywords ? <p style={{margin:0,fontSize:13}}>{examTask.keywords}</p> : null}
+          {examTask?.hint ? <p style={{margin:0,fontSize:13}}>{examTask.hint}</p> : null}
+          <small>Think about your answer first. You’ll answer the task and one follow-up before reviewing feedback.</small>
+        </div>
+      ) : null}
       {details?.enabled && !session ? (
         <div style={{display:"grid",gap:9,minWidth:0}}>
           {hasChangedContext ? (
@@ -364,11 +423,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {["A1","A2","B1","B2","C1","C2"].map(option=><option key={option} value={option}>{option}</option>)}
             </select>
           </label> : null}
-          {details.capReached ? (
+          {details.capReached && !details.activeSession ? (
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Speaking practice is temporarily unavailable.</p>
-          ) : (sessionsAvailable || details.pilotAvailable) ? (
+          ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
             <div>
-              <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
+              <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
                 {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start AI Examiner" : "Start speaking"}
               </button>
             </div>
@@ -391,6 +450,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
           </header>
+          {examinerSession ? <p role="status" style={{margin:0,fontSize:13}}>
+            {taskReady ? "Answers saved. You’re ready for feedback." : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : `Answer the selected task (up to ${session.maxRecordingSeconds || 20} seconds). Corrections come after you finish.`}
+          </p> : null}
           <div aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
             {messages.map((message,i) => (
               <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
@@ -407,24 +469,24 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {pending.uncertain ? <p style={{margin:0,fontSize:13}}>Audio unclear—check the words or record again.</p> : null}
             <label style={{display:"grid",gap:5}}>
               <span>What I said (you can edit this)</span>
-              <textarea lang="de" rows={3} value={recognizedText} maxLength={600}
+              <textarea lang="de" rows={3} value={recognizedText} maxLength={session.maxTranscriptChars || 600}
                 onChange={event=>setRecognizedText(event.target.value)}
                 style={{border:"1px solid #cbd5e1",borderRadius:10,padding:10,fontSize:16}}/>
             </label>
             {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}} /> : null}
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               <button type="button" style={styles.primaryButton}
-                disabled={busy || expired || recognizedText.trim().length < 2}
+                disabled={busy || feedbackBusy || (expired && (!examinerSession || Date.now() > Date.parse(session.expiresAt)+300000)) || recognizedText.trim().length < 2}
                 onClick={confirmTranscript}>Confirm answer</button>
               <button type="button" style={styles.secondaryButton}
                 disabled={busy} onClick={retryTranscript}>Record again</button>
             </div>
           </div> : null}
-          {expired ? <p role="status">Your five-minute session has ended. Your corrections remain visible here.</p> : null}
+          {expired ? <p role="status">Your five-minute session has ended. Your answers remain visible; finish the task to request feedback.</p> : null}
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
             <button type="button" style={styles.primaryButton}
-              onClick={recording?stopRecording:startRecording}
-              disabled={busy || expired || Boolean(pending)}>
+              onClick={recording?stopRecording:()=>startRecording(false)}
+              disabled={busy || feedbackBusy || expired || Boolean(pending) || taskReady || Boolean(session.feedbackStatus) || details?.capReached}>
               {recording ? "■ Stop & send (" + recordingSeconds + "s)" : "🎤 Speak German"}
             </button>
             {examinerSession ? (
@@ -433,7 +495,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
               </button>
             ) : null}
-            <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={feedbackBusy}>
+            <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>
               {examinerSession ? "End without feedback" : "End session"}
             </button>
           </div>
@@ -441,11 +503,29 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </section>
       ) : null}
 
+      {!session && !examFeedback && messages.some(message => message.role === "user") ? (
+        <section aria-label="Saved speaking answers" style={shell}>
+          <h2 style={{margin:0,fontSize:19}}>Your saved answers</h2>
+          {messages.filter(message => message.role === "user").map((message,i) => <p key={i} lang="de">{message.text}</p>)}
+        </section>
+      ) : null}
       {examFeedback ? (
         <section aria-label="Speaking exam practice feedback"
           style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
           <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
+          {details?.lastExamResult?.examTask?.prompt ? <p style={{margin:0,fontSize:13}}>{details.lastExamResult.level} · {details.lastExamResult.examTask.prompt}</p> : null}
+          {messages.filter(message => message.role === "user").length ? (
+            <details><summary>Your saved answers</summary>
+              {messages.filter(message => message.role === "user").map((message,i) => <p key={i} lang="de" style={{lineHeight:1.6}}>{message.text}</p>)}
+            </details>
+          ) : null}
           <p style={{margin:0,whiteSpace:"pre-wrap",lineHeight:1.65,fontSize:14}}>{examFeedback}</p>
+          <button type="button" style={styles.primaryButton}
+            onClick={recording ? stopRecording : () => {setLocalRetry(false); clearRecording(); startRecording(true);}}>
+            {recording ? "■ Stop recording (" + recordingSeconds + "s)" : "Try your improved answer"}
+          </button>
+          <small>Use the correction above, record again, and listen back. This recording stays on your device and uses no AI allowance.</small>
+          {localRetry && studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your improved answer" style={{width:"100%"}} /> : null}
           <small style={{color:"#64748b"}}>This is practice feedback from reviewed transcripts, not an official Goethe result. Pronunciation cannot be scored from these transcripts.</small>
         </section>
       ) : null}

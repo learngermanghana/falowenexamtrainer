@@ -24,3 +24,9 @@ test("empty saved topic stays empty instead of pretending to use a new lesson to
   expect(liveSpeakSessionContext(empty,{level:"B2",topic:"Klimaschutz",source:"standalone"}).topic).toBe("");
   expect(isDifferentLiveSpeakSessionContext(empty,{level:"B2",topic:"Klimaschutz",source:"standalone"})).toBe(true);
 });
+
+test("different examiner task IDs are detected even with identical topic labels", () => {
+  const saved = {level:"B1",topic:"Gesundheit",source:"exam-speaking-practice",examTask:{id:"card-1"}};
+  expect(isDifferentLiveSpeakSessionContext(saved,{...saved,examTask:{id:"card-2"}})).toBe(true);
+  expect(isDifferentLiveSpeakSessionContext(saved,{...saved})).toBe(false);
+});
