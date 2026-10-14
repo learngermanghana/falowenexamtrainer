@@ -551,7 +551,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                 <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
                   disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "Finish task & see feedback" : "Finish early & review"}
+                  {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
                 </button>
                 <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>End without feedback</button>
               </div>
