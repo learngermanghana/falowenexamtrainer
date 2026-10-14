@@ -2017,13 +2017,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    // A timed assignment must accept its last saved *partial* work after
-    // expiration, just as automatic submission does. Normal assignments
-    // retain all minimum-word and explicit confirmation requirements.
+    setStatus({ loading: true, error: "", success: "" });
+    // After a timer expires, accept partial answers just as auto-submit does.
+    // Normal assignments still require the full word and confirmation checks.
     const retryAfterExpiry = Boolean(
       timedAssignment?.enabled && timedAssignment?.expired && isWorkbookSubmissionContext
     );
-    setStatus({ loading: true, error: "", success: "" });
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
       setStatus({ loading: false, error: "Please select an assignment and enter your text.", success: "" });
