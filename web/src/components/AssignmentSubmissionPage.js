@@ -2867,7 +2867,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               />
               {timedWorkbookSubmission ? (
                 <span role="note" style={styles.helperText}>Timed assignment: your available answers can be submitted even if they are shorter than the homework minimum.</span>
-              ) : <WordProgress value={form.submissionText} minimumWords={minimumSubmissionWords} />}
+              ) : <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />}
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
                 {GERMAN_SPECIAL_CHARACTERS.map((character) => (
