@@ -49,6 +49,7 @@ function setup(overrides = {}, authOverride = {}) {
       if(name==="crypto")return {randomUUID:()=>"unique-session-id"};
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
+      if(name==="./goetheExamSpeakingSequence")return require("../../../functions/functionz/goetheExamSpeakingSequence");
       throw new Error("Unexpected require "+name);
     },
   },{filename:"liveSpeak.js"});
