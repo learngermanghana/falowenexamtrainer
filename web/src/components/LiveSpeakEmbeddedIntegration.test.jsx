@@ -20,10 +20,11 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 test("voice tutor stays closed until learner asks to speak and inherits current workbook topic", () => {
   render(<LiveSpeakInlinePractice level="A2" topic="Im Restaurant" source="course-workbook" />);
   expect(screen.queryByTestId("voice-tutor")).not.toBeInTheDocument();
-  expect(screen.getByText(/Uses your existing free Live Speak allowance/)).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Start live voice conversation" }));
+  expect(screen.getByRole("button",{name:/Practise speaking with AI/})).toBeInTheDocument();
+  expect(screen.queryByText(/free Live Speak allowance|No payment required|Optional, ungraded practice/)).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: /Practise speaking with AI/ }));
   expect(screen.getByTestId("voice-tutor")).toHaveTextContent("true|A2|Im Restaurant|course-workbook");
-  fireEvent.click(screen.getByRole("button", { name: "Hide Live Speak" }));
+  fireEvent.click(screen.getByRole("button", { name: "Close voice practice" }));
   expect(screen.queryByTestId("voice-tutor")).not.toBeInTheDocument();
 });
 
@@ -35,9 +36,15 @@ test("workbook and exam room reuse the same embedded voice component and existin
   const c2=read("web/src/components/C2UnifiedGuidedWorkbookPage.js");
   expect(workbookChat).toContain('source="course-workbook"');
   expect(workbookChat).toContain('data-goethe-free-chat="text-first"');
-  expect(exam).toContain('source="exam-speaking-practice"');
-  expect(exam).toContain("selectedQuestion?.topicPrompt");
-  expect(exam).toContain("window.location.pathname");
+  const examiner = read("web/src/components/ExamLiveSpeakPanel.jsx");
+  const picker = read("web/src/components/SpeakingPracticeModePicker.jsx");
+  expect(exam).toContain("SpeakingPracticeModePicker");
+  expect(exam).toContain("ExamLiveSpeakPanel");
+  expect(exam).toContain("liveConversationSelected");
+  expect(examiner).toContain('practiceSource="exam-speaking-practice"');
+  expect(examiner).toContain("examTask={examinerTask}");
+  expect(examiner).toContain("question?.topicPrompt");
+  expect(picker).toContain("Practise with AI Examiner");
   expect(b2).toContain('source="b2-workbook"');
   expect(c1).toContain('source="c1-workbook"');
   expect(c2).toContain('source="c2-workbook"');
