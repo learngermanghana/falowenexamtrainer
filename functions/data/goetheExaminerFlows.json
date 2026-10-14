@@ -4,20 +4,23 @@
     "A1-1": {
       "title": "Sich vorstellen",
       "role": "examiner",
-      "maxAnswers": 3,
+      "maxAnswers": 4,
       "seconds": [
         60,
         20,
-        20
+        20,
+        30
       ],
       "criteria": [
         "Introduce yourself using the personal details on the card",
         "Spell your family name",
-        "Say a telephone number or number sequence"
+        "Say a telephone number or number sequence",
+        "Answer one short personal follow-up based on the introduction"
       ],
       "hints": [
         "Name, Alter, Land, Wohnort, Sprachen, Beruf, Hobby",
-        "Ich heiße … / Ich komme aus …"
+        "Ich heiße … / Ich komme aus …",
+        "Give one personal detail when the examiner asks a follow-up"
       ],
       "opening": "Guten Tag. Stellen Sie sich bitte vor: Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby."
     },
@@ -44,20 +47,22 @@
     "A1-3": {
       "title": "Bitten formulieren und reagieren",
       "role": "partner",
-      "maxAnswers": 2,
+      "maxAnswers": 4,
       "seconds": [
+        30,
+        25,
         30,
         25
       ],
       "criteria": [
-        "Make a clear polite request for your card",
-        "Accept or politely refuse the partner's request"
+        "Make polite requests for two action cards",
+        "React appropriately to two different partner requests"
       ],
       "hints": [
-        "Können Sie bitte …?",
+        "Können Sie bitte …? / Machen Sie bitte …",
         "Ja, gern. / Tut mir leid, das geht leider nicht."
       ],
-      "opening": "Formulieren Sie bitte eine Bitte zu Ihrer Karte. Ich bin Ihr Gesprächspartner."
+      "opening": "Sie sehen eine Karte. Formulieren Sie bitte eine höfliche Bitte. Ich antworte und bitte Sie auch um etwas. Danach kommt eine zweite Karte."
     },
     "A2-1": {
       "title": "Fragen zur Person",
@@ -381,5 +386,107 @@
     "https://bfu.goethe.de/a1_sd1/sprechen.php",
     "https://bfu.goethe.de/a2_mod_2MX5/sprechen.php",
     "https://bfu.goethe.de/b1_mod/sprechen.php"
+  ],
+  "a1RequestCards": [
+    {
+      "word": "Radio anmachen",
+      "symbol": "📻",
+      "request": "Machen Sie bitte das Radio an."
+    },
+    {
+      "word": "Fenster zumachen",
+      "symbol": "🪟",
+      "request": "Machen Sie bitte das Fenster zu."
+    },
+    {
+      "word": "Licht anschalten",
+      "symbol": "💡",
+      "request": "Schalten Sie bitte das Licht ein."
+    },
+    {
+      "word": "Tür aufmachen",
+      "symbol": "🚪",
+      "request": "Machen Sie bitte die Tür auf."
+    },
+    {
+      "word": "Tisch sauber machen",
+      "symbol": "🧽",
+      "request": "Machen Sie bitte den Tisch sauber."
+    },
+    {
+      "word": "Hausaufgaben schicken",
+      "symbol": "📚",
+      "request": "Schicken Sie mir bitte die Hausaufgaben."
+    },
+    {
+      "word": "Buch bringen",
+      "symbol": "📖",
+      "request": "Bringen Sie mir bitte das Buch."
+    },
+    {
+      "word": "Handy ausmachen",
+      "symbol": "📱",
+      "request": "Machen Sie bitte das Handy aus."
+    },
+    {
+      "word": "Stuhl nehmen",
+      "symbol": "🪑",
+      "request": "Nehmen Sie bitte einen Stuhl."
+    },
+    {
+      "word": "Wasser holen",
+      "symbol": "💧",
+      "request": "Holen Sie mir bitte ein Glas Wasser."
+    },
+    {
+      "word": "Fenster öffnen",
+      "symbol": "🪟",
+      "request": "Öffnen Sie bitte das Fenster."
+    },
+    {
+      "word": "Musik leiser machen",
+      "symbol": "🎵",
+      "request": "Machen Sie bitte die Musik leiser."
+    },
+    {
+      "word": "Tafel sauber wischen",
+      "symbol": "🧽",
+      "request": "Wischen Sie bitte die Tafel sauber."
+    },
+    {
+      "word": "Kaffee kochen",
+      "symbol": "☕",
+      "request": "Kochen Sie bitte Kaffee."
+    },
+    {
+      "word": "Deutsch üben",
+      "symbol": "📚",
+      "request": "Üben Sie bitte mit mir Deutsch."
+    },
+    {
+      "word": "Auto waschen",
+      "symbol": "🚗",
+      "request": "Waschen Sie bitte das Auto."
+    },
+    {
+      "word": "Kind abholen",
+      "symbol": "🧒",
+      "request": "Holen Sie bitte das Kind ab."
+    },
+    {
+      "word": "Tisch decken",
+      "symbol": "🍽️",
+      "request": "Decken Sie bitte den Tisch."
+    },
+    {
+      "word": "Termin machen",
+      "symbol": "📅",
+      "request": "Machen Sie bitte einen Termin."
+    },
+    {
+      "word": "Nachricht schreiben",
+      "symbol": "💬",
+      "request": "Schreiben Sie mir bitte eine Nachricht."
+    }
   ]
 }
