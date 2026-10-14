@@ -40,4 +40,17 @@ describe("VerifiedCloudDraftSubmissionPage", () => {
     expect(source).toContain(">Progress</strong>");
     expect(source).not.toContain("Review stage — not submitted yet");
   });
+  test("first A1 submission checks missing drafts and locks with Firestore owner queries", () => {
+    const source = fs.readFileSync(path.join(__dirname, "VerifiedCloudDraftSubmissionPage.js"), "utf8");
+    expect(source).toContain("findOwnedSubmissionDraft({ db, studentId: user.uid, draftId: draftDocId })");
+    expect(source).toContain("findOwnedSubmissionLock({ db, studentId: user.uid, lockId: draftDocId })");
+    expect(source).not.toContain("await getDoc(doc(db, LOCK_COLLECTION, draftDocId))");
+    expect(source).not.toContain("await getDoc(doc(db, DRAFT_COLLECTION, draftDocId))");
+    expect(source).not.toContain("await getDoc(draftRef);");
+    // Verification after creating an owned document is still required.
+    expect(source).toContain("const verifiedSnapshot = await getDoc(draftRef)");
+    expect(source).toContain("const verifiedSubmission = await getDoc(submissionRef)");
+    expect(source).toContain("const verifiedLock = await getDoc(lockRef)");
+  });
+
 });
