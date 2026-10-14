@@ -236,3 +236,80 @@ test("workbook topic starts a real scoped voice session; Exam Room cannot silent
   expect(resumed.payload.topic).toBe("Nachhaltige Mobilität");
   expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
 });
+
+test("Goethe AI Examiner uses the selected A1 exam task and does not correct during the dialogue",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const task={id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor",
+    keywords:"Name, Alter, Wohnort, Beruf, Hobby",hint:"Sprechen Sie kurz über alle Punkte."};
+  const start=await api.call("POST","/live-speak/session/start",{
+    level:"A1",source:"exam-speaking-practice",topic:task.prompt,examTask:task,
+  });
+  expect(start.code).toBe(200);
+  expect(start.payload.examTask).toEqual(expect.objectContaining(task));
+  expect(api.docs.get("liveSpeakSessions/u123").source).toBe("exam-speaking-practice");
+  const intro=await api.call("POST","/live-speak/session/turn",{sessionId:start.payload.sessionId,intro:true});
+  expect(intro.payload.reply).toContain("Stellen Sie sich kurz vor");
+  const speech=await api.call("POST","/live-speak/session/turn",{
+    sessionId:start.payload.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.from("hello".repeat(340)).toString("base64"),
+  });
+  expect(speech.payload.needsConfirmation).toBe(true);
+  const confirmed=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:start.payload.sessionId,pendingId:speech.payload.pendingId,
+    transcript:"Ich heiße Mia und komme aus Ghana.",
+  });
+  expect(confirmed.code).toBe(200);
+  const request=api.fakeClient.chat.completions.create.mock.calls[0][0];
+  expect(request.messages[0].content).toMatch(/Do NOT correct grammar/);
+  expect(request.messages[0].content).toMatch(/ONE concise next question/);
+  expect(request.messages[0].content).toContain("Stellen Sie sich kurz vor");
+  expect(api.docs.get("liveSpeakSessions/u123").answeredTurns).toBe(1);
+});
+
+test("examiner feedback is metered, provided only after a confirmed answer, and cannot be replayed",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const task={id:"b1-teil-2",teil:"Teil 2",prompt:"Gesund und fit bleiben"};
+  const start=await api.call("POST","/live-speak/session/start",{
+    level:"B1",source:"exam-speaking-practice",topic:task.prompt,examTask:task,
+  });
+  const premature=await api.call("POST","/live-speak/session/exam-feedback",{
+    sessionId:start.payload.sessionId,answers:["Ich denke, dass Sport wichtig ist."],
+  });
+  expect(premature.code).toBe(400);
+  const audio=await api.call("POST","/live-speak/session/turn",{
+    sessionId:start.payload.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.from("hallo".repeat(360)).toString("base64"),
+  });
+  const confirm=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:start.payload.sessionId,pendingId:audio.payload.pendingId,
+    transcript:"Ich treibe Sport, weil ich gesund bleiben möchte.",
+  });
+  expect(confirm.code).toBe(200);
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{
+    sessionId:start.payload.sessionId,answers:["Ich treibe Sport, weil ich gesund bleiben möchte."],
+  });
+  expect(feedback.code).toBe(200);
+  expect(feedback.payload.practiceOnly).toBe(true);
+  const feedbackInput=api.fakeClient.chat.completions.create.mock.calls.at(-1)[0];
+  expect(feedbackInput.messages[0].content).toContain("not an official Goethe result");
+  expect(feedbackInput.messages[0].content).toContain("Do NOT assert a pronunciation score");
+  expect(api.docs.get("liveSpeakSessions/u123").feedbackRequested).toBe(true);
+  const retry=await api.call("POST","/live-speak/session/exam-feedback",{
+    sessionId:start.payload.sessionId,answers:["Ich treibe Sport."],
+  });
+  expect(retry.code).toBe(409);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(2);
+});
+
+test("general conversation cannot call examiner feedback",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const start=await api.call("POST","/live-speak/session/start",{level:"A2",topic:"Familie",source:"course-workbook"});
+  const reply=await api.call("POST","/live-speak/session/exam-feedback",{
+    sessionId:start.payload.sessionId,answers:["Ich komme aus Ghana."],
+  });
+  expect(reply.code).toBe(409);
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+});
