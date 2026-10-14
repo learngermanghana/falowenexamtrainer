@@ -202,3 +202,32 @@ test("AI refuses transcript confirmation without a preceding metered recording",
   expect(response.code).toBe(409);
   expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
 });
+
+test("workbook topic starts a real scoped voice session; Exam Room cannot silently replace it", async () => {
+  const api=setup();
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(200);
+  const started=await api.call("POST","/live-speak/session/start",{
+    level:"B2",topic:"Nachhaltige Mobilität",source:"b2-workbook",
+  });
+  expect(started.code).toBe(200);
+  expect(started.payload.topic).toBe("Nachhaltige Mobilität");
+  expect(started.payload.source).toBe("b2-workbook");
+  const record=api.docs.get("liveSpeakSessions/u123");
+  expect(record.level).toBe("B2");
+  expect(record.topic).toBe("Nachhaltige Mobilität");
+  const spoken=await api.call("POST","/live-speak/session/turn",{
+    sessionId:started.payload.sessionId,intro:true,
+  });
+  expect(spoken.code).toBe(200);
+  expect(spoken.payload.reply).toContain("Nachhaltige Mobilität");
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
+  const resumed=await api.call("POST","/live-speak/session/start",{
+    level:"A2",topic:"Im Restaurant",source:"exam-speaking-practice",
+  });
+  expect(resumed.code).toBe(200);
+  expect(resumed.payload.resumed).toBe(true);
+  expect(resumed.payload.level).toBe("B2");
+  expect(resumed.payload.topic).toBe("Nachhaltige Mobilität");
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+});
