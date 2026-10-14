@@ -14,6 +14,8 @@ jest.mock("./SharedTimedAssignment", () => ({
   __esModule: true,
   default: ({ children }) => typeof children === "function"
     ? children({ isTabLocked: () => false }) : children,
+  TimedAssignmentPanel: () => null,
+  useTimedAssignment: () => ({ enabled: false, isTabLocked: () => false }),
 }));
 jest.mock("./AssignmentSubmissionPage", () => () => <div>Submission</div>);
 jest.mock("./ContextualAssignmentSubmissionPage", () => () => <div>Submission</div>);
