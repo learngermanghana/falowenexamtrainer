@@ -4,20 +4,23 @@
     "A1-1": {
       "title": "Sich vorstellen",
       "role": "examiner",
-      "maxAnswers": 3,
+      "maxAnswers": 4,
       "seconds": [
         60,
         20,
-        20
+        20,
+        30
       ],
       "criteria": [
         "Introduce yourself using the personal details on the card",
         "Spell your family name",
-        "Say a telephone number or number sequence"
+        "Say a telephone number or number sequence",
+        "Answer one short personal follow-up based on the introduction"
       ],
       "hints": [
         "Name, Alter, Land, Wohnort, Sprachen, Beruf, Hobby",
-        "Ich heiße … / Ich komme aus …"
+        "Ich heiße … / Ich komme aus …",
+        "Give one personal detail when the examiner asks a follow-up"
       ],
       "opening": "Guten Tag. Stellen Sie sich bitte vor: Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby."
     },
@@ -44,20 +47,22 @@
     "A1-3": {
       "title": "Bitten formulieren und reagieren",
       "role": "partner",
-      "maxAnswers": 2,
+      "maxAnswers": 4,
       "seconds": [
+        30,
+        25,
         30,
         25
       ],
       "criteria": [
-        "Make a clear polite request for your card",
-        "Accept or politely refuse the partner's request"
+        "Make polite requests for two action cards",
+        "React appropriately to two different partner requests"
       ],
       "hints": [
-        "Können Sie bitte …?",
+        "Können Sie bitte …? / Machen Sie bitte …",
         "Ja, gern. / Tut mir leid, das geht leider nicht."
       ],
-      "opening": "Formulieren Sie bitte eine Bitte zu Ihrer Karte. Ich bin Ihr Gesprächspartner."
+      "opening": "Sie sehen eine Karte. Formulieren Sie bitte eine höfliche Bitte. Ich antworte und bitte Sie auch um etwas. Danach kommt eine zweite Karte."
     },
     "A2-1": {
       "title": "Fragen zur Person",
@@ -359,5 +364,87 @@
       "Mit wem verbringen Sie den Tag?",
       "Wie endet der Tag?"
     ]
-  }
+  },
+  "a1RequestCards": [
+    {
+      "word": "Radio anmachen",
+      "symbol": "📻"
+    },
+    {
+      "word": "Fenster zumachen",
+      "symbol": "🪟"
+    },
+    {
+      "word": "Licht anschalten",
+      "symbol": "💡"
+    },
+    {
+      "word": "Tür aufmachen",
+      "symbol": "🚪"
+    },
+    {
+      "word": "Tisch sauber machen",
+      "symbol": "🧽"
+    },
+    {
+      "word": "Hausaufgaben schicken",
+      "symbol": "📚"
+    },
+    {
+      "word": "Buch bringen",
+      "symbol": "📖"
+    },
+    {
+      "word": "Handy ausmachen",
+      "symbol": "📱"
+    },
+    {
+      "word": "Stuhl nehmen",
+      "symbol": "🪑"
+    },
+    {
+      "word": "Wasser holen",
+      "symbol": "💧"
+    },
+    {
+      "word": "Fenster öffnen",
+      "symbol": "🪟"
+    },
+    {
+      "word": "Musik leiser machen",
+      "symbol": "🎵"
+    },
+    {
+      "word": "Tafel sauber wischen",
+      "symbol": "🧽"
+    },
+    {
+      "word": "Kaffee kochen",
+      "symbol": "☕"
+    },
+    {
+      "word": "Deutsch üben",
+      "symbol": "📚"
+    },
+    {
+      "word": "Auto waschen",
+      "symbol": "🚗"
+    },
+    {
+      "word": "Kind abholen",
+      "symbol": "🧒"
+    },
+    {
+      "word": "Tisch decken",
+      "symbol": "🍽️"
+    },
+    {
+      "word": "Termin machen",
+      "symbol": "📅"
+    },
+    {
+      "word": "Nachricht schreiben",
+      "symbol": "💬"
+    }
+  ]
 }
