@@ -20,7 +20,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "" }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,6 +30,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [session, setSession] = useState(null);
   const [now, setNow] = useState(Date.now());
   const [messages, setMessages] = useState([]);
+  const [examFeedback, setExamFeedback] = useState("");
+  const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [pending, setPending] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
   const [studentAudioUrl, setStudentAudioUrl] = useState("");
@@ -49,12 +51,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const contextualLevel = String(initialLevel || "").toUpperCase();
   const fixedLevel = embedded && /^(A1|A2|B1|B2|C1|C2)$/.test(contextualLevel) ? contextualLevel : "";
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
+  const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
   const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource };
   // Status also carries the saved context while the learner is yet to resume.
   const savedSession = session || details?.activeSession || null;
   const displayContext = liveSpeakSessionContext(savedSession, requestedContext);
   const hasChangedContext = isDifferentLiveSpeakSessionContext(savedSession, requestedContext);
+  const examinerSession = session?.source === "exam-speaking-practice";
+  const recordedAnswers = messages.filter(item => item.role === "user").map(item => item.text).filter(Boolean);
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -202,8 +207,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setBusy(true);
     setErrorMessage("");
     try {
-      const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource});
+      const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null});
       setSession(result);
+      setExamFeedback("");
       setPending(null);
       clearRecording();
       if (!result.resumed) {
@@ -234,10 +240,31 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setSession(null);
     setPending(null);
     clearRecording();
-    setNotice("Your conversation has ended. Review your corrections and phrases below.");
+    setNotice(examinerSession ? "The examiner task was ended without feedback." : "Your conversation has ended. Review your corrections and phrases below.");
     try { await api("/live-speak/session/end", "POST", { sessionId: existing.sessionId }); }
     catch (_error) { /* The server expiry and quotas still apply. */ }
     refresh();
+  };
+
+  const finishExamTask = async () => {
+    if (!examinerSession || !session || pending || busy || feedbackBusy || !recordedAnswers.length || recording) return;
+    setFeedbackBusy(true);
+    setErrorMessage("");
+    try {
+      const result = await api("/live-speak/session/exam-feedback", "POST", {
+        sessionId: session.sessionId, answers: recordedAnswers,
+      });
+      if (!mounted.current) return;
+      stopAudio();
+      setExamFeedback(result.feedback);
+      setSession(null);
+      setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
+      await refresh();
+    } catch (err) {
+      if (mounted.current) setErrorMessage(err.message);
+    } finally {
+      if (mounted.current) setFeedbackBusy(false);
+    }
   };
 
   const startRecording = async () => {
@@ -343,7 +370,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <section style={{...shell, display:"grid",gap:10}}>
           <h2 style={{margin:0,fontSize:embedded?18:23}}>{embedded ? "Your voice session" : "Your free voice test"}</h2>
           <p style={{margin:0,color:"#334155"}}>
-            {embedded ? "Practise your current speaking lesson with a natural German AI voice." :
+            {examinerEntry ? "Practise your selected Goethe task with a spoken AI examiner. Feedback comes at the end, not during your answers." :
+              embedded ? "Practise your current speaking lesson with a natural German AI voice." :
               <>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice.</>}
             {" "}There are no payments or subscriptions during this test.
           </p>
@@ -373,7 +401,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           ) : null}
           {!session && sessionsAvailable ? (
             <div><button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
-              {busy ? "Starting..." : details.activeSession ? "Resume voice conversation" : "Start 5-minute conversation"}
+              {busy ? "Starting..." : details.activeSession ? "Resume speaking task" : examinerEntry ? "Start speaking exam simulation" : "Start 5-minute conversation"}
             </button></div>
           ) : null}
           {!session && !sessionsAvailable && details.pilotClaimed && !details.capReached ? (
@@ -386,19 +414,21 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0}}>German conversation · {displayContext.level}</h2>
-              <p style={{margin:"5px 0",color:"#475569"}}>The tutor will speak first, then listen to each response.</p>
+              <h2 style={{margin:0}}>{examinerSession ? "Goethe AI Examiner" : "German conversation"} · {displayContext.level}</h2>
+              <p style={{margin:"5px 0",color:"#475569"}}>{examinerSession
+                ? "The examiner asks questions without correcting you. Finish the task to receive practice feedback."
+                : "The tutor will speak first, then listen to each response."}</p>
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
           </header>
           <div aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
             {messages.map((message,i) => (
               <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
-                <strong>{message.role==="assistant"?"AI German tutor":"You"}</strong>
+                <strong>{message.role==="assistant"?(examinerSession?"AI Examiner":"AI German tutor"):"You"}</strong>
                 <p style={{margin:"7px 0 0",lineHeight:1.65}} lang="de">{message.text}</p>
               </div>
             ))}
-            {busy ? <p>{pending ? "Preparing the tutor’s spoken reply…" : "Processing your German recording…"}</p> : null}
+            {busy ? <p>{pending ? "Preparing the next examiner/tutor response…" : "Processing your German recording…"}</p> : null}
           </div>
           {lastAudio && voiceReady ? <button type="button" style={styles.secondaryButton} onClick={()=>playVoice(lastAudio)}>▶ Play AI voice again</button> : null}
           {pending ? <div role="group" aria-label="Review German speech recognition"
@@ -430,12 +460,28 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               disabled={busy || expired || Boolean(pending)}>
               {recording ? "■ Stop & send (" + recordingSeconds + "s)" : "🎤 Speak German"}
             </button>
-            <button type="button" style={styles.secondaryButton} onClick={endSession}>End session</button>
+            {examinerSession ? (
+              <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
+                disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
+                {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
+              </button>
+            ) : null}
+            <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={feedbackBusy}>
+              {examinerSession ? "End without feedback" : "End session"}
+            </button>
           </div>
           <small style={{color:"#475569"}}>Speak for 2–20 seconds. Review or correct what the microphone recognized before the tutor responds. Audio is temporary and is not saved to student results.</small>
         </section>
       ) : null}
 
+      {examFeedback ? (
+        <section aria-label="Speaking exam practice feedback"
+          style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
+          <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
+          <p style={{margin:0,whiteSpace:"pre-wrap",lineHeight:1.65,fontSize:14}}>{examFeedback}</p>
+          <small style={{color:"#64748b"}}>This is practice feedback from reviewed transcripts, not an official Goethe result. Pronunciation cannot be scored from these transcripts.</small>
+        </section>
+      ) : null}
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
       {!embedded ? (
