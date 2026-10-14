@@ -47,7 +47,7 @@ test("approved pilot offers two free test sessions without a payment control", a
 
 test("server restricts access to authenticated students with cost caps", () => {
   expect(backend).toContain('process.env.LIVE_SPEAK_ENABLED !== "false"');
-  expect(backend).toContain('process.env.LIVE_SPEAK_TESTER_UIDS');
+  expect(backend).not.toContain("LIVE_SPEAK_TESTER_UIDS");
   expect(backend).toContain('function registerLiveSpeakRoutes(');
   expect(backend).toContain('const student = await requireStudent(req, res)');
   expect(backend).toContain('process.env.LIVE_SPEAK_MONTHLY_TURN_CAP');
