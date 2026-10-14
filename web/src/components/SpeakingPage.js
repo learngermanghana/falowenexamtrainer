@@ -968,7 +968,7 @@ const SpeakingPage = ({
   const totalCount = baseFilteredQuestions.length;
 
   return (
-    <div className={isExamMode ? "speaking-exam-page" : undefined} style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
+    <div className={isExamMode ? (liveExaminerActive ? "speaking-exam-page speaking-exam-page--live" : "speaking-exam-page") : undefined} style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
       <div
         style={{
           ...styles.card,
@@ -1310,7 +1310,7 @@ const SpeakingPage = ({
 
 
         {!isCourseMode && activeSpeakingTab === "exam" ? (
-          <div className="speaking-exam-grid" style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
+          <div className={liveExaminerActive ? "speaking-exam-grid is-live" : "speaking-exam-grid"} style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
             <aside className="speaking-exam-sidebar" style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
               <div className="speaking-exam-part-picker" style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <strong style={{fontSize:13,color:"#1e40af"}}>Level {selectedLevel}</strong>
@@ -1350,14 +1350,14 @@ const SpeakingPage = ({
                   )}
                 </div>
               ) : null}
-              <section className="speaking-exam-guide" aria-label="Speaking exam instructions" style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
-                <strong style={{color:"#1e3a8a"}}>Teil {selectedTeil} · {examGuide.title}</strong>
+              <details className="speaking-exam-guide" aria-label="Speaking exam instructions" open={!liveExaminerActive || !isCompactViewport} style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
+                <summary style={{color:"#1e3a8a",fontWeight:800,cursor:"pointer",minHeight:36,display:"flex",alignItems:"center"}}>Teil {selectedTeil} · {examGuide.title} {liveExaminerActive && isCompactViewport ? " · Instructions" : ""}</summary>
                 <p lang="de" style={{margin:0,fontSize:14,lineHeight:1.55}}>{examGuide.german}</p>
                 <p style={{margin:0,fontSize:13,color:"#475569",lineHeight:1.5}}>{examGuide.english}</p>
                 <ol style={{margin:"2px 0 0",paddingLeft:20,fontSize:12,color:"#334155",lineHeight:1.6}}>
                   {examGuide.steps.map(step=><li key={step}>{step}</li>)}
                 </ol>
-              </section>
+              </details>
             </aside>
             <section className="speaking-exam-voice" style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
               {selectedQuestion ? (
