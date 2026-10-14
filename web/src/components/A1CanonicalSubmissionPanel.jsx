@@ -243,7 +243,7 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
     });
     setSubmissionGuardMessage("");
 
-    if (!completeness.ok && !timedAutoSubmit) {
+    if (!completeness.ok && !timedAutoSubmit && !timedMockExam.enabled) {
       event.preventDefault();
       event.stopPropagation();
       event.nativeEvent?.stopImmediatePropagation?.();
