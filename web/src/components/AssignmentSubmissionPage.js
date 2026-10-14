@@ -2017,6 +2017,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    // A timed assignment must accept its last saved *partial* work after
+    // expiration, just as automatic submission does. Normal assignments
+    // retain all minimum-word and explicit confirmation requirements.
+    const retryAfterExpiry = Boolean(
+      timedAssignment?.enabled && timedAssignment?.expired && isWorkbookSubmissionContext
+    );
     setStatus({ loading: true, error: "", success: "" });
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
@@ -2024,7 +2030,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
+    if (!retryAfterExpiry && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
         error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
@@ -2034,7 +2040,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }
 
     const submissionWordCount = countWords(form.submissionText);
-    if (submissionWordCount < minimumSubmissionWords) {
+    if (!retryAfterExpiry && submissionWordCount < minimumSubmissionWords) {
       setStatus({
         loading: false,
         error: buildAssignmentSubmissionWordError({
@@ -2075,7 +2081,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (!form.confirmed) {
+    if (!retryAfterExpiry && !form.confirmed) {
       setStatus({ loading: false, error: "Please confirm that you are submitting the correct task.", success: "" });
       return;
     }
