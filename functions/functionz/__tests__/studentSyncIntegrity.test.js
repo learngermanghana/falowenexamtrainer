@@ -128,7 +128,7 @@ describe("student sync integrity", () => {
     expect(index).toContain("exports.onStudentUpdated = onDocumentUpdated");
     expect(index).toContain("onStudentUpdated -> sheet sync result");
 
-    const appenderCalls = index.match(/getStudentAppender\(\)\(\{/g) || [];
+    const appenderCalls = index.match(/appendStudent: getStudentAppender\(\)/g) || [];
     expect(appenderCalls.length).toBeGreaterThanOrEqual(2);
   });
 
