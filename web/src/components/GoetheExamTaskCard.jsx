@@ -12,11 +12,25 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
   },[preparing,active,seconds]);
   if (!flow) return null;
   const cardIndex=Math.floor(((flow.step?.index || 1)-1)/2);
+  const requestRound=Math.min(cardIndex,(flow.requestCards?.length || 1)-1);
+  const requestCard=flow.key === "A1-3" ? flow.requestCards?.[requestRound] : null;
   return <section aria-label="Speaking task card" style={{padding:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:8}}>
     <strong>{flow.title} · {flow.mode === "simulation" ? "Exam simulation" : "Guided practice"}</strong>
     <p lang="de" style={{margin:0,lineHeight:1.6}}>{flow.scenario || flow.topic || topic}</p>
     {flow.cards?.length ? <div role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
       {flow.cards.map((card,index)=><span role="listitem" key={index} style={{padding:"8px 12px",border:active && index===cardIndex ? "2px solid #2563eb" : "1px solid #cbd5e1",borderRadius:8}}>{card}</span>)}
+    </div> : null}
+    {flow.key === "A1-1" ? <p style={{margin:0,fontSize:13,color:"#334155"}}>
+      Introduce yourself, spell your surname, say a number, then answer one personal follow-up.
+    </p> : null}
+    {requestCard ? <div role="group" aria-label="A1 request picture card"
+      style={{background:"#f8fafc",border:"1px solid #cbd5e1",borderRadius:12,padding:14,display:"grid",gap:8,justifyItems:"center"}}>
+      <small style={{color:"#334155",fontWeight:700}}>Teil 3 · Karte {requestRound+1} von {flow.requestCards.length}</small>
+      <span aria-hidden="true" style={{fontSize:42,lineHeight:1.2}}>{requestCard.symbol || "🗂️"}</span>
+      <strong lang="de" style={{fontSize:19,textAlign:"center"}}>{requestCard.word}</strong>
+      <small style={{color:"#475569",textAlign:"center"}}>{flow.step?.action === "respond-request"
+        ? "Listen to the partner's request and respond politely."
+        : "Ask the partner politely to do this action."}</small>
     </div> : null}
     {flow.card ? <strong lang="de">Karte: {flow.card}</strong> : null}
     {flow.points?.length ? <ol style={{margin:"0 0 0 20px",padding:0}}>{flow.points.map(point=><li key={point} lang="de">{point}</li>)}</ol> : null}
