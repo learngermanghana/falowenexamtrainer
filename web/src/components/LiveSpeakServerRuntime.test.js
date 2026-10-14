@@ -470,3 +470,13 @@ test("a recording finishing at time-up can upload and confirm during a short gra
   const late=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
   expect(late.payload.code).toBe("session_ended");
 });
+
+test("last answer reserves only transcription when one budget unit remains",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  api.docs.set(usageKey(),{turns:39});
+  const last=await answerExam(api,session,"Ich esse gern Gemüse.");
+  expect(last.code).toBe(200);
+  expect(last.payload.taskReady).toBe(true);
+  expect(api.docs.get(usageKey()).turns).toBe(40);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+});

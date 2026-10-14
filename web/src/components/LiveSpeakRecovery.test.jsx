@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import LiveSpeakPage from "./LiveSpeakPage";
 import { useAuth } from "../context/AuthContext";
@@ -66,16 +66,21 @@ test("pending transcription is recoverable and final confirmation goes directly 
   expect(screen.getByRole("button",{name:"Finish task & see feedback"})).toBeEnabled();
 });
 
-test("saved feedback survives reload and correction rehearsal stays entirely on device",async()=>{
+test.each([false,true])("saved feedback survives reload and local rehearsal stays on device (byte stop: %s)",async(autoStop)=>{
   global.fetch.mockResolvedValue(ok({enabled:true,remaining:0,lastExamResult:{...saved,feedback:"Practise the corrected sentence."}}));
   let currentTime=Date.now();
   jest.spyOn(Date,"now").mockImplementation(()=>currentTime);
   const stop=jest.fn();
   Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{getUserMedia:jest.fn(async()=>({getTracks:()=>[{stop}]}))}});
   const previousRecorder=global.MediaRecorder;
+  let capturedRecorder;
   global.MediaRecorder=class {
     static isTypeSupported(){return true;}
-    constructor(){this.state="inactive";this.mimeType="audio/webm";}
+    constructor(_stream,options){
+      expect(options.audioBitsPerSecond).toBe(24000);
+      capturedRecorder=this;
+      this.state="inactive";this.mimeType="audio/webm";
+    }
     start(){this.state="recording";this.ondataavailable({data:new Blob(["recorded audio"],{type:this.mimeType})});}
     stop(){this.state="inactive";this.onstop?.();}
   };
@@ -87,7 +92,9 @@ test("saved feedback survives reload and correction rehearsal stays entirely on 
     fireEvent.click(screen.getByRole("button",{name:"Try your improved answer"}));
     const stopButton=await screen.findByRole("button",{name:/Stop recording/});
     currentTime+=2100;
-    fireEvent.click(stopButton);
+    if (autoStop) {
+      act(()=>capturedRecorder.ondataavailable({data:new Blob([new Uint8Array(320000)],{type:"audio/webm"})}));
+    } else fireEvent.click(stopButton);
     await waitFor(()=>expect(screen.getByLabelText("Listen to your improved answer")).toHaveAttribute("src","blob:local-rehearsal"));
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(stop).toHaveBeenCalled();

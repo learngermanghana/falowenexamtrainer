@@ -322,7 +322,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > EXAM_AUDIO_BYTE_ALLOWANCE) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
         }
-        const reservedCalls = intro ? 1 : 2; // Transcribe now; reserve one response call for confirmation.
+        const finalExamAnswer = examiner(session) && Number(session.answeredTurns) >= EXAM_ANSWER_LIMIT - 1;
+        const reservedCalls = intro || finalExamAnswer ? 1 : 2; // Final answers only transcribe; other answers reserve a response.
         if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > spendingCap()) {
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
         }
