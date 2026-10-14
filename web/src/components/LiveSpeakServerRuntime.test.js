@@ -171,7 +171,7 @@ test("German speech is transcribed without inventing tutor corrections before co
   expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
   expect(api.fakeClient.audio.transcriptions.create).toHaveBeenCalledWith(expect.objectContaining({
     model:"gpt-4o-transcribe",language:"de",response_format:"json",include:["logprobs"],
-  }));
+  }), expect.objectContaining({maxRetries:0,timeout:45000}));
   expect(api.docs.get("liveSpeakSessions/u123").pendingId).toBe(speech.payload.pendingId);
   expect(api.docs.get("liveSpeakUsage/"+new Date().toISOString().slice(0,7)).turns).toBe(2);
   const confirmed=await api.call("POST","/live-speak/session/confirm",{
@@ -268,7 +268,7 @@ test("Goethe AI Examiner uses the selected A1 exam task and does not correct dur
   expect(api.docs.get("liveSpeakSessions/u123").answeredTurns).toBe(1);
 });
 
-test("examiner feedback is metered, provided only after a confirmed answer, and cannot be replayed",async()=>{
+test("examiner feedback is metered, provided only after a confirmed answer, and reuses saved feedback on retry",async()=>{
   const api=setup();
   await api.call("POST","/live-speak/pilot/claim");
   const task={id:"b1-teil-2",teil:"Teil 2",prompt:"Gesund und fit bleiben"};
@@ -300,7 +300,8 @@ test("examiner feedback is metered, provided only after a confirmed answer, and 
   const retry=await api.call("POST","/live-speak/session/exam-feedback",{
     sessionId:start.payload.sessionId,answers:["Ich treibe Sport."],
   });
-  expect(retry.code).toBe(409);
+  expect(retry.code).toBe(200);
+  expect(retry.payload.cached).toBe(true);
   expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(2);
 });
 
@@ -313,4 +314,159 @@ test("general conversation cannot call examiner feedback",async()=>{
   });
   expect(reply.code).toBe(409);
   expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+});
+
+const sessionKey = "liveSpeakSessions/u123";
+const usageKey = () => "liveSpeakUsage/"+new Date().toISOString().slice(0,7);
+const task = {id:"b1-teil-2",teil:"Teil 2",prompt:"Gesund bleiben",keywords:"Sport, Essen"};
+const audioPayload = {mimeType:"audio/webm",audioBase64:Buffer.from("a".repeat(1600)).toString("base64")};
+async function startExam(api) {
+  await api.call("POST","/live-speak/pilot/claim");
+  return (await api.call("POST","/live-speak/session/start",{
+    level:"B1",source:"exam-speaking-practice",examTask:task,
+  })).payload;
+}
+async function answerExam(api, session, text="Ich mache Sport, weil ich gesund bleiben möchte.") {
+  const audio = await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(audio.code).toBe(200);
+  return api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:audio.payload.pendingId,transcript:text});
+}
+
+test("reload restores recognition and confirmed answers; feedback ignores client answers",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const audio=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.activeSession.pending).toEqual(expect.objectContaining({pendingId:audio.payload.pendingId,transcript:"Ich gehen heute zum Markt."}));
+  await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:audio.payload.pendingId,transcript:"Ich gehe heute zum Markt."});
+  const resumed=await api.call("POST","/live-speak/session/start",{source:"exam-speaking-practice",examTask:task});
+  expect(resumed.payload.confirmedAnswers).toEqual(["Ich gehe heute zum Markt."]);
+  expect(resumed.payload.messages).toEqual(expect.arrayContaining([expect.objectContaining({role:"user",text:"Ich gehe heute zum Markt."})]));
+  await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId,answers:["FORGED ANSWER"]});
+  const input=api.fakeClient.chat.completions.create.mock.calls.at(-1)[0];
+  expect(input.messages.at(-1).content).toContain("Ich gehe heute zum Markt.");
+  expect(input.messages.at(-1).content).not.toContain("FORGED ANSWER");
+});
+
+test("two answers finish without buying another generated reply",async()=>{
+  const api=setup(); const session=await startExam(api);
+  expect(session.maxRecordingSeconds).toBe(90);
+  expect((await answerExam(api,session)).payload.maxRecordingSeconds).toBe(20);
+  expect((await answerExam(api,session,"Ich esse Gemüse.")).payload.taskReady).toBe(true);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
+  const blocked=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(blocked.payload.code).toBe("task_ready");
+  expect(api.fakeClient.audio.transcriptions.create).toHaveBeenCalledTimes(2);
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(200);
+  expect(JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content).studentTranscripts).toHaveLength(2);
+});
+
+test("failed feedback preserves answers; one metered retry is cached and restored by status",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  const before=api.docs.get(usageKey()).turns;
+  api.fakeClient.chat.completions.create.mockRejectedValueOnce(new Error("provider unavailable"));
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(503);
+  expect(api.docs.get(sessionKey)).toEqual(expect.objectContaining({feedbackStatus:"failed",endedAt:null,feedbackAttempts:1}));
+  expect((await api.call("GET","/live-speak/status")).payload.activeSession.confirmedAnswers).toHaveLength(1);
+  const retried=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(retried.code).toBe(200);
+  const cached=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(cached.payload.feedback).toBe(retried.payload.feedback);
+  expect(api.docs.get(usageKey()).turns).toBe(before+2);
+  expect((await api.call("GET","/live-speak/status")).payload.lastExamResult.feedback).toBe(retried.payload.feedback);
+});
+
+test("concurrent feedback retrieval does not launch another provider call",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  let release;
+  api.fakeClient.chat.completions.create.mockImplementationOnce(()=>new Promise(resolve=>{release=resolve}));
+  const first=api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  while(!release) await Promise.resolve();
+  const duplicate=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(duplicate.payload.code).toBe("feedback_processing");
+  release({choices:[{message:{content:"Saved feedback"}}]});
+  expect((await first).code).toBe(200);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(2);
+});
+
+test("repeated failure exhausts retry allowance without deleting answers",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  api.fakeClient.chat.completions.create.mockRejectedValue(new Error("provider failed"));
+  for(let i=0;i<2;i++) expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(503);
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).payload.code).toBe("feedback_retry_limit");
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(1);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(3);
+});
+
+test("lost reply speech keeps the answer and allows feedback without re-recording",async()=>{
+  const api=setup(); const session=await startExam(api);
+  api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("TTS unavailable"));
+  const confirmed=await answerExam(api,session);
+  expect(confirmed.code).toBe(200);
+  expect(confirmed.payload.taskReady).toBe(true);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(1);
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(200);
+});
+
+test("openings reuse audio; expired tasks can finish in the bounded grace period",async()=>{
+  const api=setup(); const session=await startExam(api);
+  await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  await answerExam(api,session);
+  api.docs.set(sessionKey,{...api.docs.get(sessionKey),expiresAt:new Date(Date.now()-1000).toISOString()});
+  expect((await api.call("GET","/live-speak/status")).payload.activeSession.sessionId).toBe(session.sessionId);
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(200);
+  const next=(await api.call("POST","/live-speak/session/start",{level:"B1",source:"exam-speaking-practice",examTask:task})).payload;
+  await api.call("POST","/live-speak/session/turn",{sessionId:next.sessionId,intro:true});
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(2);
+});
+
+test("feedback retry cannot bypass the global cap",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  api.docs.set(usageKey(),{turns:40});
+  expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).payload.code).toBe("budget_reached");
+  expect(api.docs.get(sessionKey).feedbackAttempts).toBe(0);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+});
+
+test("saved answers can be resumed and reviewed after the spending cap is reached",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  api.docs.set(usageKey(),{turns:40});
+  const resumed=await api.call("POST","/live-speak/session/start",{source:"exam-speaking-practice",examTask:task});
+  expect(resumed.code).toBe(200);
+  expect(resumed.payload.confirmedAnswers).toHaveLength(1);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+  api.docs.set(sessionKey,{...api.docs.get(sessionKey),expiresAt:new Date(Date.now()-11*60000).toISOString()});
+  const expired=await api.call("GET","/live-speak/status");
+  expect(expired.payload.activeSession).toBe(null);
+  expect(expired.payload.lastExamResult.confirmedAnswers).toHaveLength(1);
+});
+
+test("unconfirmed re-recordings have a server-enforced total byte allowance",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const large={...audioPayload,audioBase64:Buffer.alloc(350000,65).toString("base64")};
+  for(let i=0;i<2;i++) expect((await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...large})).code).toBe(200);
+  const blocked=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(blocked.payload.code).toBe("audio_limit");
+  expect(api.fakeClient.audio.transcriptions.create).toHaveBeenCalledTimes(2);
+});
+
+test("feedback from an older session cannot overwrite a replacement session",async()=>{
+  const api=setup(); const session=await startExam(api); await answerExam(api,session);
+  let release;
+  api.fakeClient.chat.completions.create.mockImplementationOnce(()=>new Promise(resolve=>{release=resolve}));
+  const request=api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  while(!release) await Promise.resolve();
+  api.docs.set(sessionKey,{sessionId:"new-session",level:"A1",confirmedAnswers:["New answer"]});
+  release({choices:[{message:{content:"Old feedback"}}]});
+  expect((await request).payload.code).toBe("task_changed");
+  expect(api.docs.get(sessionKey)).toEqual({sessionId:"new-session",level:"A1",confirmedAnswers:["New answer"]});
+});
+
+test("a recording finishing at time-up can upload and confirm during a short grace period",async()=>{
+  const api=setup(); const session=await startExam(api);
+  api.docs.set(sessionKey,{...api.docs.get(sessionKey),expiresAt:new Date(Date.now()-1000).toISOString()});
+  expect((await answerExam(api,session)).code).toBe(200);
+  api.docs.set(sessionKey,{...api.docs.get(sessionKey),expiresAt:new Date(Date.now()-20000).toISOString()});
+  const late=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(late.payload.code).toBe("session_ended");
 });

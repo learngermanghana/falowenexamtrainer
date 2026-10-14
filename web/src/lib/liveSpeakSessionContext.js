@@ -21,7 +21,8 @@ export const isDifferentLiveSpeakSessionContext = (savedSession, requested = {})
   if (!savedSession) return false;
   const current = liveSpeakSessionContext(savedSession);
   const next = liveSpeakSessionContext(null, requested);
-  return current.level !== next.level ||
+  return (savedSession.examTask?.id || "") !== (requested.examTask?.id || "") ||
+    current.level !== next.level ||
     current.topic !== next.topic ||
     current.source !== next.source;
 };
