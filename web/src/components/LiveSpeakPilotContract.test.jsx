@@ -55,6 +55,9 @@ test("server restricts access to authenticated students with cost caps", () => {
   expect(backend).toContain('const SESSION_MS = 5 * 60 * 1000;');
   expect(backend).toContain('db().collection("liveSpeakPilotCredits").doc(student.auth.uid)');
   expect(backend).toContain('app.post("/live-speak/pilot/claim"');
+  expect(backend).toContain('app.post("/live-speak/session/confirm"');
+  expect(backend).toContain('"gpt-4o-transcribe"');
+  expect(backend).toContain('germanTranscriptionPrompt(level)');
 });
 
 test("normal tuition Paystack route is untouched and no pilot checkout exists", () => {
@@ -65,4 +68,14 @@ test("normal tuition Paystack route is untouched and no pilot checkout exists", 
   expect(homepage).not.toContain('Explore Live Speak');
   expect(account).not.toContain('Live Speak add-on');
   expect(app).toContain('<Route path="/campus/live-speak" element={<LiveSpeakPage />} />');
+});
+
+// Regression: a misunderstood recording must not be silently corrected by the tutor.
+test("learner must review the microphone transcript before AI feedback", () => {
+  const source = fs.readFileSync(path.join(root, "web/src/components/LiveSpeakPage.jsx"), "utf8");
+  expect(source).toContain("Did Falowen hear you correctly?");
+  expect(source).toContain("/live-speak/session/confirm");
+  expect(source).toContain("Record again");
+  expect(source).toContain("Listen to your own recording");
+  expect(source).toContain("result.needsConfirmation");
 });
