@@ -227,7 +227,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         tx.update(sessionRef, {
           inFlight: true, turnsUsed: admin.firestore.FieldValue.increment(1),
-          pendingId: null, pendingTranscript: null,
+          pendingId: null,
         });
         tx.set(globalRef, {
           turns: admin.firestore.FieldValue.increment(reservedCalls),
@@ -258,7 +258,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         const pendingId = crypto.randomUUID();
         await sessionRef.update({
-          inFlight: false, pendingId, pendingTranscript: transcript,
+          inFlight: false, pendingId,
           pendingAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // Do not let the tutor judge grammar based on unconfirmed speech recognition.
@@ -315,14 +315,14 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (session.inFlight) {
           throw Object.assign(new Error("A spoken reply is already processing."), {status:409,code:"turn_in_progress"});
         }
-        if (!pendingId || pendingId !== session.pendingId || !session.pendingTranscript) {
+        if (!pendingId || pendingId !== session.pendingId) {
           throw Object.assign(new Error("Record your German answer again before continuing."), {status:409,code:"transcript_missing"});
         }
         level = cleanLevel(session.level);
         // Confirmation may be edited by the learner; it is allowed only after a
         // metered, authenticated audio transcription in the same session.
         tx.update(sessionRef, {
-          inFlight:true, pendingId:null, pendingTranscript:null,
+          inFlight:true, pendingId:null,
         });
         reserved = true;
       });
