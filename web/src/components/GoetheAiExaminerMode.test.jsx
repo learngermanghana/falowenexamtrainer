@@ -41,7 +41,7 @@ test("selected real Goethe task flows to same voice engine with level and keywor
       keywords:example.keywordSubtopic,hint:example.hint},
   });
   expect(screen.getByText(/feedback comes after you finish/i)).toBeInTheDocument();
-  expect(screen.getByText(/not a timed or graded Goethe mock exam/i)).toBeInTheDocument();
+  expect(screen.getByText(/official Goethe exam score/i)).toBeInTheDocument();
 });
 
 test("no examiner is started when no speaking prompt has been selected",()=>{
