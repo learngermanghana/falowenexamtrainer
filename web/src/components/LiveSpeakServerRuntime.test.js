@@ -229,6 +229,7 @@ test("workbook topic starts a real scoped voice session; Exam Room cannot silent
   expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
   const resumed=await api.call("POST","/live-speak/session/start",{
     level:"A2",topic:"Im Restaurant",source:"exam-speaking-practice",
+    examTask:{id:"a2-example",teil:"Teil 2",prompt:"Im Restaurant"},
   });
   expect(resumed.code).toBe(200);
   expect(resumed.payload.resumed).toBe(true);
