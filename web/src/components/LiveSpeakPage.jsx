@@ -402,6 +402,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <GoetheExamSpeakingStage
           session={session} level={displayContext.level} topic={displayContext.topic}
           messages={messages} progress={examStageProgress} time={friendlyTime(timeRemaining)}
+          contextChanged={hasChangedContext}
           recording={recording} recordingSeconds={recordingSeconds} busy={busy}
           audioPlaying={audioPlaying} expired={expired} feedbackBusy={feedbackBusy}
           lastAudio={lastAudio} onReplay={()=>playVoice(lastAudio)}
