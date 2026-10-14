@@ -1,0 +1,385 @@
+{
+  "version": 1,
+  "profiles": {
+    "A1-1": {
+      "title": "Sich vorstellen",
+      "role": "examiner",
+      "maxAnswers": 3,
+      "seconds": [
+        60,
+        20,
+        20
+      ],
+      "criteria": [
+        "Introduce yourself using the personal details on the card",
+        "Spell your family name",
+        "Say a telephone number or number sequence"
+      ],
+      "hints": [
+        "Name, Alter, Land, Wohnort, Sprachen, Beruf, Hobby",
+        "Ich heiße … / Ich komme aus …"
+      ],
+      "opening": "Guten Tag. Stellen Sie sich bitte vor: Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby."
+    },
+    "A1-2": {
+      "title": "Informationen erfragen und geben",
+      "role": "partner",
+      "maxAnswers": 4,
+      "seconds": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "criteria": [
+        "Ask a relevant question using each word card",
+        "Answer your partner's questions appropriately"
+      ],
+      "hints": [
+        "Form a question using the word on the card",
+        "Was …? / Wann …? / Wo …?"
+      ],
+      "opening": "Wir stellen einander Fragen. Sie beginnen. Stellen Sie mir eine Frage zum ersten Wort auf Ihrer Karte."
+    },
+    "A1-3": {
+      "title": "Bitten formulieren und reagieren",
+      "role": "partner",
+      "maxAnswers": 2,
+      "seconds": [
+        30,
+        25
+      ],
+      "criteria": [
+        "Make a clear polite request for your card",
+        "Accept or politely refuse the partner's request"
+      ],
+      "hints": [
+        "Können Sie bitte …?",
+        "Ja, gern. / Tut mir leid, das geht leider nicht."
+      ],
+      "opening": "Formulieren Sie bitte eine Bitte zu Ihrer Karte. Ich bin Ihr Gesprächspartner."
+    },
+    "A2-1": {
+      "title": "Fragen zur Person",
+      "role": "partner",
+      "maxAnswers": 8,
+      "seconds": [
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25,
+        25
+      ],
+      "criteria": [
+        "Ask four personal questions using the four cards",
+        "Answer the partner's four personal questions"
+      ],
+      "hints": [
+        "Ask one question per card",
+        "Give a relevant personal answer when your partner asks you"
+      ],
+      "opening": "Wir sprechen über uns. Sie haben vier Wortkarten. Stellen Sie mir zuerst eine Frage zur ersten Karte."
+    },
+    "A2-2": {
+      "title": "Von sich erzählen",
+      "role": "examiner",
+      "maxAnswers": 2,
+      "seconds": [
+        90,
+        30
+      ],
+      "criteria": [
+        "Talk about the topic and its four supporting points",
+        "Develop the answer with personal details",
+        "Answer a relevant follow-up question"
+      ],
+      "hints": [
+        "Cover the four points on your card",
+        "Add a reason or a personal example"
+      ],
+      "opening": "Erzählen Sie bitte über das Thema auf Ihrer Karte. Sprechen Sie über die vier Punkte. Ich höre zu."
+    },
+    "A2-3": {
+      "title": "Einen Termin finden",
+      "role": "partner",
+      "maxAnswers": 4,
+      "seconds": [
+        35,
+        35,
+        35,
+        35
+      ],
+      "minAnswers": 2,
+      "decisionPoints": [
+        "appointment"
+      ],
+      "criteria": [
+        "Suggest a day and time",
+        "Respond to the partner's availability",
+        "Agree on a time that is free in both calendars"
+      ],
+      "hints": [
+        "Hast du am … um … Zeit?",
+        "Am … kann ich leider nicht. Wie wäre es mit …?"
+      ],
+      "opening": "Wir möchten gemeinsam ein Geschenk für einen Freund kaufen. Finden wir einen Termin. Wann hast du Zeit?",
+      "studentCalendar": [
+        "Montag 17:00",
+        "Mittwoch 18:00",
+        "Samstag 10:00"
+      ],
+      "partnerCalendar": [
+        "Dienstag 17:00",
+        "Mittwoch 18:00",
+        "Freitag 16:00"
+      ]
+    },
+    "B1-1": {
+      "title": "Gemeinsam etwas planen",
+      "role": "partner",
+      "maxAnswers": 5,
+      "seconds": [
+        35,
+        35,
+        35,
+        35,
+        35
+      ],
+      "minAnswers": 2,
+      "decisionPoints": [
+        "time",
+        "place",
+        "transport",
+        "responsibilities"
+      ],
+      "criteria": [
+        "Make suggestions and respond to alternatives",
+        "Give reasons and negotiate",
+        "Agree when and where to meet, how to travel and who does what"
+      ],
+      "hints": [
+        "Ich schlage vor, dass …",
+        "Was hältst du davon? / Dann machen wir es so."
+      ],
+      "opening": "Wir planen gemeinsam etwas zum Thema auf Ihrer Aufgabenkarte. Entscheiden wir: wann und wo, wie wir hinkommen und wer was übernimmt. Was schlägst du vor?"
+    },
+    "B1-2": {
+      "title": "Ein Thema präsentieren",
+      "role": "examiner",
+      "maxAnswers": 1,
+      "seconds": [
+        180
+      ],
+      "criteria": [
+        "Introduce the topic and presentation structure",
+        "Describe a personal experience",
+        "Describe the situation in your home country with an example",
+        "Discuss advantages and disadvantages and give your opinion",
+        "Close the presentation and thank the audience"
+      ],
+      "hints": [
+        "Einleitung → persönliche Erfahrung → Heimatland → Vor-/Nachteile und Meinung → Abschluss",
+        "Speak freely using brief notes; do not read a model answer"
+      ],
+      "opening": "Präsentieren Sie bitte das Thema auf Ihrer Karte. Sie haben ungefähr drei Minuten. Ich unterbreche Sie nicht."
+    },
+    "B1-3": {
+      "title": "Über Präsentationen sprechen",
+      "role": "examiner",
+      "maxAnswers": 2,
+      "seconds": [
+        40,
+        45
+      ],
+      "criteria": [
+        "Answer the examiner's question about your topic",
+        "Give relevant feedback on the partner's presentation",
+        "Ask a relevant question about the partner's presentation"
+      ],
+      "hints": [
+        "Ich fand besonders interessant, dass …",
+        "Ich habe eine Frage: …"
+      ],
+      "opening": "Wir sprechen über das Thema auf Ihrer Karte. Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.",
+      "partnerTopic": "Online Deutsch lernen",
+      "partnerPresentation": "Ich möchte über das Thema Online Deutsch lernen sprechen. Zuerst berichte ich von meinen Erfahrungen. Ich lerne zweimal pro Woche online und übe am Wochenende mit einer Freundin. In meinem Heimatland nutzen viele junge Menschen ihr Handy zum Lernen, aber nicht alle haben eine gute Internetverbindung. Ein Vorteil ist, dass man zu Hause lernen und seine Zeit selbst einteilen kann. Ein Nachteil ist, dass persönliche Gespräche manchmal fehlen. Meiner Meinung nach ist eine Mischung aus Online-Unterricht und Treffen im Kurs am besten. Vielen Dank fürs Zuhören."
+    }
+  },
+  "personalCards": [
+    {
+      "word": "Geburtstag",
+      "question": "Wann haben Sie Geburtstag?"
+    },
+    {
+      "word": "Wohnort",
+      "question": "Wo wohnen Sie?"
+    },
+    {
+      "word": "Beruf",
+      "question": "Was machen Sie beruflich?"
+    },
+    {
+      "word": "Hobby",
+      "question": "Was machen Sie gern in Ihrer Freizeit?"
+    }
+  ],
+  "a1InformationCards": [
+    {
+      "word": "Frühstück",
+      "question": "Was essen Sie zum Frühstück?"
+    },
+    {
+      "word": "Wochenende",
+      "question": "Was machen Sie am Wochenende?"
+    }
+  ],
+  "presentationPoints": [
+    "Thema und Aufbau",
+    "Persönliche Erfahrung",
+    "Situation im Heimatland mit Beispiel",
+    "Vor- und Nachteile, Meinung mit Beispiel",
+    "Abschluss und Dank"
+  ],
+  "a2TopicPoints": {
+    "Geld": [
+      "Wofür geben Sie Geld aus?",
+      "Was bezahlen Sie jeden Monat?",
+      "Wofür sparen Sie?",
+      "Was möchten Sie sich kaufen?"
+    ],
+    "Wochenende": [
+      "Was machen Sie?",
+      "Mit wem verbringen Sie die Zeit?",
+      "Wo sind Sie gern?",
+      "Warum gefällt Ihnen das?"
+    ],
+    "Arbeit": [
+      "Was machen Sie beruflich?",
+      "Wann und wo arbeiten Sie?",
+      "Mit wem arbeiten Sie?",
+      "Was gefällt Ihnen an Ihrer Arbeit?"
+    ],
+    "Freizeit": [
+      "Was machen Sie gern?",
+      "Wann und wie oft?",
+      "Mit wem oder wo?",
+      "Warum gefällt Ihnen das?"
+    ],
+    "default": [
+      "Was machen Sie?",
+      "Wann und wie oft?",
+      "Mit wem oder wo?",
+      "Warum ist das für Sie wichtig?"
+    ],
+    "Urlaub": [
+      "Wohin fahren Sie?",
+      "Mit wem reisen Sie?",
+      "Was machen Sie dort?",
+      "Warum gefällt Ihnen dieser Urlaub?"
+    ],
+    "einkaufen": [
+      "Wo kaufen Sie ein?",
+      "Was kaufen Sie?",
+      "Wie oft gehen Sie einkaufen?",
+      "Warum kaufen Sie dort ein?"
+    ],
+    "Musik": [
+      "Welche Musik hören Sie?",
+      "Wann hören Sie Musik?",
+      "Mit wem oder wo?",
+      "Warum gefällt Ihnen diese Musik?"
+    ],
+    "Geburtstag": [
+      "Wo feiern Sie?",
+      "Wen laden Sie ein?",
+      "Was essen oder machen Sie?",
+      "Welche Geschenke bekommen Sie gern?"
+    ],
+    "Verkehrsmittel": [
+      "Welche Verkehrsmittel nutzen Sie?",
+      "Wann und wie oft?",
+      "Wohin fahren Sie?",
+      "Warum wählen Sie dieses Verkehrsmittel?"
+    ],
+    "gesund": [
+      "Was essen Sie?",
+      "Welchen Sport machen Sie?",
+      "Wie oft bewegen Sie sich?",
+      "Was hilft Ihnen bei Stress?"
+    ],
+    "Familie": [
+      "Mit wem verbringen Sie Zeit?",
+      "Was machen Sie zusammen?",
+      "Wann sehen Sie Ihre Familie?",
+      "Warum ist Ihnen das wichtig?"
+    ],
+    "Traumhaus": [
+      "Wo liegt es?",
+      "Welche Zimmer hat es?",
+      "Mit wem möchten Sie dort wohnen?",
+      "Was ist Ihnen besonders wichtig?"
+    ],
+    "Filme": [
+      "Welche Filme oder Serien sehen Sie?",
+      "Wann und wie oft?",
+      "Mit wem sehen Sie sie?",
+      "Warum gefallen sie Ihnen?"
+    ],
+    "Restaurant": [
+      "Wie oft gehen Sie ins Restaurant?",
+      "Mit wem gehen Sie?",
+      "Was bestellen Sie gern?",
+      "Was ist Ihnen im Restaurant wichtig?"
+    ],
+    "Feiertag": [
+      "Welchen Feiertag mögen Sie?",
+      "Wie feiern Sie?",
+      "Mit wem feiern Sie?",
+      "Warum ist dieser Tag besonders?"
+    ],
+    "morgens": [
+      "Wann stehen Sie auf?",
+      "Was machen Sie zuerst?",
+      "Was frühstücken Sie?",
+      "Wie kommen Sie zur Arbeit oder zum Kurs?"
+    ],
+    "schlafen": [
+      "Wann gehen Sie ins Bett?",
+      "Wie lange schlafen Sie?",
+      "Wann stehen Sie auf?",
+      "Was hilft Ihnen beim Einschlafen?"
+    ],
+    "Hobbys": [
+      "Welche Hobbys hatten Sie als Kind?",
+      "Mit wem haben Sie sie gemacht?",
+      "Wie oft haben Sie geübt?",
+      "Was machen Sie heute noch gern?"
+    ],
+    "Lieblingszimmer": [
+      "Welches Zimmer mögen Sie?",
+      "Wie sieht es aus?",
+      "Was machen Sie dort?",
+      "Warum gefällt es Ihnen?"
+    ],
+    "Lieblingsgeschäft": [
+      "Welches Geschäft mögen Sie?",
+      "Wo liegt es?",
+      "Was kaufen Sie dort?",
+      "Warum gehen Sie gern dorthin?"
+    ],
+    "perfekter Tag": [
+      "Was machen Sie morgens?",
+      "Was machen Sie am Nachmittag?",
+      "Mit wem verbringen Sie den Tag?",
+      "Wie endet der Tag?"
+    ]
+  },
+  "sourceReferences": [
+    "https://bfu.goethe.de/a1_sd1/sprechen.php",
+    "https://bfu.goethe.de/a2_mod_2MX5/sprechen.php",
+    "https://bfu.goethe.de/b1_mod/sprechen.php"
+  ]
+}

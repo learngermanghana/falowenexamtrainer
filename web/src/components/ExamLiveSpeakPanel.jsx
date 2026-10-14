@@ -1,12 +1,16 @@
-import React from "react";
+import React, {useCallback,useState} from "react";
 import LiveSpeakPage from "./LiveSpeakPage";
 
 // Exam Room voice practice is ungraded. Keep timed mock exam controls separate.
 export default function ExamLiveSpeakPanel({
   level, teil, onTeilChange, lockedTeil = "", selectedQuestionId,
   onQuestionChange, questions = [], question = null,
-  formatQuestion, compact = false,
+  formatQuestion, compact = false, onActivityChange,
 }) {
+  const [sessionActive,setSessionActive]=useState(false);
+  const [examMode,setExamMode]=useState("guided");
+  const handleActivity=useCallback(value=>{setSessionActive(value);onActivityChange?.(value);},[onActivityChange]);
+  const supported=["A1","A2","B1"].includes(level);
   const selectedTopic = question?.topicPrompt || question?.text || "Goethe speaking exam practice";
   const examinerTask = question ? {
     id: question.id,
@@ -32,7 +36,7 @@ export default function ExamLiveSpeakPanel({
             {lockedTeil ? (
               <span style={{border:"1px solid #cbd5e1",borderRadius:9,padding:"11px",background:"#f8fafc"}}>Teil {lockedTeil}</span>
             ) : (
-              <select aria-label="Live conversation exam part" value={teil} onChange={e=>onTeilChange(e.target.value)}
+              <select disabled={sessionActive} aria-label="Live conversation exam part" value={teil} onChange={e=>onTeilChange(e.target.value)}
                 style={{padding:"10px 11px",minWidth:0,borderRadius:9,border:"1px solid #cbd5e1",background:"#fff"}}>
                 <option value="all">All parts</option>
                 <option value="1">Teil 1</option>
@@ -44,7 +48,7 @@ export default function ExamLiveSpeakPanel({
           <label style={{display:"grid",gap:5,color:"#334155",fontSize:12,fontWeight:650,minWidth:0}}>
             Goethe speaking prompt
             <select aria-label="Live conversation speaking prompt" value={selectedQuestionId}
-              onChange={e=>onQuestionChange(e.target.value)} disabled={!questions.length}
+              onChange={e=>onQuestionChange(e.target.value)} disabled={sessionActive || !questions.length}
               style={{padding:"10px 11px",minWidth:0,width:"100%",borderRadius:9,border:"1px solid #cbd5e1",background:"#fff"}}>
               {questions.length ? questions.map(item=>(
                 <option key={item.id} value={item.id}>{formatQuestion(item)}</option>
@@ -54,10 +58,15 @@ export default function ExamLiveSpeakPanel({
         </div>
 
       </div>
+      {supported ? <div role="group" aria-label="Examiner practice style" style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+        <button type="button" disabled={sessionActive} aria-pressed={examMode === "guided"} onClick={()=>setExamMode("guided")}>Guided practice</button>
+        <button type="button" disabled={sessionActive} aria-pressed={examMode === "simulation"} onClick={()=>setExamMode("simulation")}>Exam simulation</button>
+      </div> : null}
+      {supported ? <small>Practise the selected exam part. Feedback comes after you finish.</small> : null}
       {examinerTask ? (
         <LiveSpeakPage embedded initialLevel={level}
           practiceTopic={selectedTopic} practiceSource="exam-speaking-practice"
-          examTask={examinerTask} />
+          examTask={examinerTask} examMode={examMode} onActivityChange={handleActivity} />
       ) : <p role="status">Select a speaking task to start your AI Examiner.</p>}
 
     </section>

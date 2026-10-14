@@ -125,6 +125,7 @@ const SpeakingPage = ({
 
   const [activeSpeakingTab, setActiveSpeakingTab] = useState(isCourseMode ? "custom" : "exam");
   const [speakingExperience, setSpeakingExperience] = useState("coach");
+  const [liveExaminerActive,setLiveExaminerActive]=useState(false);
   const showVoiceMode = isExamMode && typeof window !== "undefined" &&
     /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname);
   const liveConversationSelected = showVoiceMode && speakingExperience === "voice";
@@ -965,7 +966,7 @@ const SpeakingPage = ({
 
         {showVoiceMode ? (
           <SpeakingPracticeModePicker value={speakingExperience}
-            compact={isCompactViewport} disabled={isRecording}
+            compact={isCompactViewport} disabled={isRecording || liveExaminerActive}
             onChange={setSpeakingExperience} />
         ) : null}
 
@@ -980,6 +981,7 @@ const SpeakingPage = ({
             questions={filteredQuestions}
             question={selectedQuestion}
             formatQuestion={formatQuestionDisplay}
+            onActivityChange={setLiveExaminerActive}
             compact={isCompactViewport}
           />
         ) : null}

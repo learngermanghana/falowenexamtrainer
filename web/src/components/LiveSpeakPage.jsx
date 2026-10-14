@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { backendUrl } from "../services/aiClient";
+import GoetheExamTaskCard from "./GoetheExamTaskCard";
+import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
 
@@ -20,7 +22,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [pending, setPending] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
+  const [recognitionCorrection,setRecognitionCorrection]=useState(false);
   const [studentAudioUrl, setStudentAudioUrl] = useState("");
   const recordedUrlRef = useRef(null);
   const [selectedLevel, setSelectedLevel] = useState("");
@@ -55,7 +58,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
   const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
-  const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource, examTask };
+  const supportedExaminer=examinerEntry && ["A1","A2","B1"].includes(safeLevel);
+  const taskPreview=supportedExaminer ? examinerTaskPreview(safeLevel,examTask,examMode) : null;
+  const simulation=session?.examFlow?.mode === "simulation";
+  const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource, examTask, examMode };
   // Status also carries the saved context while the learner is yet to resume.
   const savedSession = session || details?.activeSession || null;
   const displayContext = liveSpeakSessionContext(savedSession, requestedContext);
@@ -113,6 +119,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     };
   }, [refresh]);
 
+  useEffect(()=>{onActivityChange?.(Boolean(session) || recording || busy);},[onActivityChange,session,recording,busy]);
+  useEffect(()=>()=>onActivityChange?.(false),[onActivityChange]);
+
   useEffect(() => {
     if (!session) return undefined;
     const timer = setInterval(() => setNow(Date.now()), 500);
@@ -149,8 +158,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       if (result.needsConfirmation) {
-        setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,uncertain:Boolean(result.uncertain)});
+        setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,transcript:result.transcript,uncertain:Boolean(result.uncertain)});
         setRecognizedText(result.transcript);
+        setRecognitionCorrection(false);
         setNotice(result.uncertain ? "The recording was unclear. Please listen, correct the transcript, or record again." :
           "Check what the AI heard before the tutor responds.");
         return;
@@ -158,7 +168,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setMessages(old => [
         ...old,
         ...(result.transcript ? [{role:"user",text:result.transcript}] : []),
-        {role:"assistant",text:result.reply},
+        {role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply},
       ]);
       setLastAudio(result.audioBase64);
       await playVoice(result.audioBase64);
@@ -183,11 +193,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     try {
       const history = messages.slice(-6).map(msg => ({role:msg.role,text:msg.text}));
       const result = await api("/live-speak/session/confirm", "POST", {
-        sessionId:session.sessionId,pendingId:pending.pendingId,transcript:text,history,
+        sessionId:session.sessionId,pendingId:pending.pendingId,transcript:text,history,recognitionCorrection,
       });
       if (!mounted.current) return;
-      setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",text:result.reply}]);
-      setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20} : old);
+      setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply}]);
+      setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20,maxTranscriptChars:result.maxTranscriptChars || old.maxTranscriptChars,...(result.examFlow ? {examFlow:result.examFlow} : {})} : old);
       setPending(null);
       setRecognizedText("");
       setLastAudio(result.audioBase64);
@@ -231,6 +241,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
   const startSession = async () => {
     if (busy || session || recording || recordingStarting.current) return;
+    if (supportedExaminer && !details?.activeSession && details?.examinerFlowVersion !== 1) {
+      setErrorMessage("Examiner practice is temporarily unavailable. Please try again shortly.");
+      return;
+    }
     setBusy(true);
     setErrorMessage("");
     try {
@@ -238,10 +252,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (details?.pilotAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
         await api("/live-speak/pilot/claim", "POST", {});
       }
-      const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null});
+      const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
       setSession(result);
       setLocalRetry(false);
       setExamFeedback("");
+      setRecognitionCorrection(false);
       setPending(result.pending || null);
       setRecognizedText(result.pending?.transcript || "");
       if (result.resumed) {
@@ -257,7 +272,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setBusy(false);
       if (!result.resumed) await sendTurn(result, {intro:true});
       else setNotice(
-        isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource,examTask})
+        isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource,examTask,examMode})
           ? "Your existing voice session is still using its original topic and level. End it before starting a conversation on the newly selected topic."
           : "Your ongoing speaking session has resumed. Continue speaking German."
       );
@@ -340,7 +355,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         recordedBytes += event.data.size;
         // Browsers may ignore the requested bitrate. Leave container/final-chunk
         // headroom and send the answer already recorded instead of discarding it.
-        if (recordedBytes >= MAX_AUDIO_BYTES - 32768 && recorder.state === "recording") {
+        if (recordedBytes >= (localOnly ? MAX_AUDIO_BYTES : session.maxAudioBytes || MAX_AUDIO_BYTES) - 32768 && recorder.state === "recording") {
           setNotice("Recording stopped to keep your answer ready to send.");
           recorder.stop();
         }
@@ -355,7 +370,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         const seconds = (Date.now() - recordingStarted.current) / 1000;
         if (seconds < 1.5) { setErrorMessage("Speak for at least two seconds."); return; }
         const blob = new Blob(chunks, { type:recorder.mimeType || "audio/webm" });
-        if (!blob.size || blob.size > MAX_AUDIO_BYTES) {
+        if (!blob.size || blob.size > (localOnly ? MAX_AUDIO_BYTES : session.maxAudioBytes || MAX_AUDIO_BYTES)) {
           setErrorMessage("Recording is too large. Try a shorter sentence.");
           return;
         }
@@ -410,7 +425,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
 
-      {examinerEntry && !session && !examFeedback ? (
+      {supportedExaminer && !examFeedback ? <GoetheExamTaskCard flow={session?.examFlow || taskPreview} topic={session?.examTask?.prompt || examTask?.prompt} active={Boolean(session)}/> : null}
+      {examinerEntry && !supportedExaminer && !session && !examFeedback ? (
         <div style={{padding:12,background:"#eff6ff",borderRadius:10,display:"grid",gap:6}}>
           <strong>Prepare → Answer → Follow-up → Feedback</strong>
           <p style={{margin:0,lineHeight:1.5,fontSize:14}} lang="de">{examTask?.prompt}</p>
@@ -462,12 +478,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
           </header>
           {examinerSession ? <p role="status" style={{margin:0,fontSize:13}}>
-            {taskReady ? "Answers saved. You’re ready for feedback." : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : `Answer the selected task (up to ${session.maxRecordingSeconds || 20} seconds). Corrections come after you finish.`}
+            {taskReady ? "Answers saved. You’re ready for feedback." : session.examFlow ? "Follow the task card and the current speaker. Corrections come at the end." : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : `Answer the selected task (up to ${session.maxRecordingSeconds || 20} seconds). Corrections come after you finish.`}
           </p> : null}
           <div aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
             {messages.map((message,i) => (
               <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
-                <strong>{message.role==="assistant"?(examinerSession?"AI Examiner":"AI German tutor"):"You"}</strong>
+                <strong>{message.role==="assistant"?(examinerSession ? message.speaker === "partner" ? "AI partner" : "AI Examiner" : "AI German tutor"):"You"}</strong>
                 <p style={{margin:"7px 0 0",lineHeight:1.65}} lang="de">{message.text}</p>
               </div>
             ))}
@@ -479,11 +495,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <strong>Did Falowen hear you correctly?</strong>
             {pending.uncertain ? <p style={{margin:0,fontSize:13}}>Audio unclear—check the words or record again.</p> : null}
             <label style={{display:"grid",gap:5}}>
-              <span>What I said (you can edit this)</span>
-              <textarea lang="de" rows={3} value={recognizedText} maxLength={session.maxTranscriptChars || 600}
+              <span>{simulation ? "Recognised speech" : "What I said (you can edit this)"}</span>
+              <textarea lang="de" rows={3} value={recognizedText} readOnly={simulation && !recognitionCorrection} maxLength={session.maxTranscriptChars || 600}
                 onChange={event=>setRecognizedText(event.target.value)}
                 style={{border:"1px solid #cbd5e1",borderRadius:10,padding:10,fontSize:16}}/>
             </label>
+            {simulation ? <label><input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/> Correct a speech-recognition mistake only</label> : null}
             {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}} /> : null}
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               <button type="button" style={styles.primaryButton}
@@ -493,7 +510,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 disabled={busy} onClick={retryTranscript}>Record again</button>
             </div>
           </div> : null}
-          {expired ? <p role="status">Your five-minute session has ended. Your answers remain visible; finish the task to request feedback.</p> : null}
+          {expired ? <p role="status">Your speaking session has ended. Your answers remain visible; finish the task to request feedback.</p> : null}
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
             <button type="button" style={styles.primaryButton}
               onClick={recording?stopRecording:()=>startRecording(false)}
@@ -503,7 +520,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {examinerSession ? (
               <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
                 disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
+                {feedbackBusy ? "Preparing feedback…" : session.examFlow && !taskReady && !expired ? "Finish early & review" : "Finish task & see feedback"}
               </button>
             ) : null}
             <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>
