@@ -125,10 +125,10 @@ service cloud.firestore {
         && request.resource.data.durationSeconds > 0
         && request.resource.data.durationSeconds <= 7200;
 
-      // Owner-only missing timed record lookup, not cross-student access.
+      // A missing first attempt has no owner fields: allow only own ID.
       allow get: if signedIn()
         && resource == null
-        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+ if ownsStudentResource() || isStaff(););
+        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+');
       allow read: if ownsStudentResource() || isStaff();
 
       allow update: if isStaff() || (
