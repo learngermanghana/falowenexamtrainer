@@ -985,6 +985,7 @@ const SpeakingPage = ({
         ) : null}
 
         {!liveConversationSelected ? (
+        <>
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
             <button
@@ -1520,6 +1521,7 @@ const SpeakingPage = ({
             </div>
           </section>
         </div>
+        </>
         ) : null}
       </div>
     </div>
