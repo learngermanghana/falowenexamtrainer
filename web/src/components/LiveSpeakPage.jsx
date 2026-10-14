@@ -201,11 +201,47 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setLastAudio(result.audioBase64);
       await playVoice(result.audioBase64);
     } catch (err) {
-      if (mounted.current) setErrorMessage(err.message);
+      if (mounted.current) {
+        if (payload.audioBase64 && !payload.intro) {
+          setAudioRetry({sessionId:currentSession.sessionId, payload:{intro:false,audioBase64:payload.audioBase64,mimeType:payload.mimeType}});
+          setErrorMessage("Could not send the recording. Your audio remains on this device. Retry sending, or record again.");
+        } else setErrorMessage(err.message);
+      }
     } finally {
       requestBusy.current = false;
       if (mounted.current) setBusy(false);
     }
+  };
+
+  const retryRecordingUpload = async () => {
+    if (!audioRetry || !session || busy || requestBusy.current) return;
+    setBusy(true);
+    setErrorMessage("");
+    let safeToResend = false;
+    try {
+      // Always reconcile first: a lost HTTP response can arrive after the
+      // server has already saved a pending or completed candidate turn.
+      const info = await api("/live-speak/status");
+      const active = info.activeSession;
+      if (!active || active.sessionId !== audioRetry.sessionId) {
+        setAudioRetry(null);
+        setErrorMessage("This exam session is no longer active. You can still replay your local recording.");
+      } else if (active.pending || Number(active.answeredTurns || 0) > Number(session.answeredTurns || 0)) {
+        setSession(active);
+        setMessages(active.messages || []);
+        setPending(active.pending || null);
+        setRecognizedText(active.pending?.transcript || "");
+        setAudioRetry(null);
+        setNotice("Your saved answer has been recovered. Review it before continuing.");
+      } else {
+        safeToResend = true;
+      }
+    } catch (_err) {
+      setErrorMessage("Unable to check if your answer was saved. Check your connection and retry. Nothing was uploaded again.");
+    } finally {
+      if (mounted.current) setBusy(false);
+    }
+    if (safeToResend) await sendTurn(session, audioRetry.payload);
   };
 
   const confirmTranscript = async () => {
