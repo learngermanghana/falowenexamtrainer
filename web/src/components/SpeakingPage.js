@@ -956,7 +956,7 @@ const SpeakingPage = ({
           </button>
         </div>
 
-        {isExamMode && typeof window !== "undefined" && /^\\/exams\\/(?:speaking|room)(?:\\/|$)/.test(window.location.pathname) ? (
+        {isExamMode && typeof window !== "undefined" && /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname) ? (
           <div style={{padding:"12px 16px",background:"#f8fafc"}}>
             <LiveSpeakInlinePractice
               level={selectedLevel}
