@@ -131,6 +131,16 @@ const SpeakingPage = ({
   const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
   const [selectedTeil, setSelectedTeil] = useState(initialSpeakingFilters.teil);
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
+  const previousExamLevelRef = useRef(examLevel);
+  useEffect(() => {
+    const nextLevel = normalizeLockedSpeakingLevel(examLevel);
+    if (!isExamMode || normalizedLockedLevel || !nextLevel || liveExaminerActive) return;
+    if (previousExamLevelRef.current === examLevel) return;
+    previousExamLevelRef.current = examLevel;
+    setSelectedLevel(nextLevel);
+    setSelectedTeil("all");
+    setShowLiveExaminer(false);
+  }, [examLevel, isExamMode, normalizedLockedLevel, liveExaminerActive]);
   const [chatMessages, setChatMessages] = useState([
     {
       id: "welcome-1",
