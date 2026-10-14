@@ -48,41 +48,61 @@ afterEach(() => {
   window.history.replaceState({}, "", "/");
 });
 
-test("original Exam Room coach remains visible, with no separate AI/coach or custom-chat tabs", () => {
+test("one Exam Room examiner replaces coach buttons and shows A1 Teil 1 instructions", () => {
   window.history.replaceState({}, "", "/exams/speaking");
   render(<SpeakingPage mode="exam" />);
-  expect(screen.getByRole("button", { name: /Start voice recording/i })).toBeInTheDocument();
-  expect(screen.getByPlaceholderText(/Type your German response/i)).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /Talk with the live examiner/i })).toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: /Practise with AI Examiner/i })).not.toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: /^Exam Coach$/i })).not.toBeInTheDocument();
-  expect(screen.queryByRole("button", { name: /^Custom chat$/i })).not.toBeInTheDocument();
-  expect(screen.queryByTestId("inline-live-examiner")).not.toBeInTheDocument();
+  expect(screen.getByRole("heading", {name:"Goethe Speaking Exam"})).toBeInTheDocument();
+  expect(screen.getByLabelText("Speaking exam instructions")).toHaveTextContent("Introduce yourself");
+  expect(screen.getByLabelText("Speaking exam instructions")).toHaveTextContent("Spell your surname");
+  expect(screen.queryByRole("button", {name:/Talk with the live examiner/i})).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", {name:/Start voice recording/i})).not.toBeInTheDocument();
+  expect(screen.queryByText(/Hallo! Pick a speaking prompt/i)).not.toBeInTheDocument();
+  expect(screen.getByTestId("inline-live-examiner")).toHaveAttribute("data-level","A1");
+  expect(screen.queryByLabelText("Choose speaking task")).not.toBeInTheDocument();
 });
 
-test("same original level, Teil and Question drive spoken examiner; selectors lock during live session", () => {
+test("Falowen assigns Teil 2 cards by default, with targeted topic choice and locked selectors", () => {
   window.history.replaceState({}, "", "/exams/speaking");
   render(<SpeakingPage mode="exam" />);
-  fireEvent.click(screen.getByRole("button", { name: /Talk with the live examiner/i }));
-  const examiner = screen.getByTestId("inline-live-examiner");
-  expect(examiner).toHaveAttribute("data-level", "A1");
-  expect(examiner).toHaveAttribute("data-source", "exam-speaking-practice");
-  expect(JSON.parse(examiner.getAttribute("data-task")).id).toBeTruthy();
-  expect(screen.queryByLabelText("Live conversation exam part")).not.toBeInTheDocument();
-  expect(screen.queryByLabelText("Live conversation speaking prompt")).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Simulate live speaking" }));
-  expect(screen.getByRole("button", { name: "Hide live examiner" })).toBeDisabled();
-  expect(screen.getAllByRole("combobox").every((select) => select.disabled)).toBe(true);
+  const part=screen.getByLabelText("Choose speaking exam part");
+  fireEvent.change(part,{target:{value:"2"}});
+  expect(screen.getByRole("button",{name:"Random task"})).toHaveAttribute("aria-pressed","true");
+  expect(screen.getByRole("button",{name:"Another random task"})).toBeInTheDocument();
+  const examiner=screen.getByTestId("inline-live-examiner");
+  expect(JSON.parse(examiner.getAttribute("data-task")).teil).toBe("Teil 2");
+  fireEvent.click(screen.getByRole("button",{name:"Another random task"}));
+  fireEvent.click(screen.getByRole("button",{name:"Choose topic"}));
+  const picker=screen.getByLabelText("Choose speaking task");
+  expect(picker).toBeInTheDocument();
+  expect(picker.options.length).toBeGreaterThan(1);
+  fireEvent.change(picker,{target:{value:picker.options[0].value}});
+  fireEvent.click(screen.getByRole("button",{name:"Simulate live speaking"}));
+  expect(part).toBeDisabled();
+  expect(screen.getByRole("button",{name:"Choose topic"})).toBeDisabled();
+  expect(picker).toBeDisabled();
+  expect(screen.queryByRole("button",{name:/Hide live examiner/i})).not.toBeInTheDocument();
 });
 
+test("speaking session has a red recorder beside recognized words and preserves the timing and feedback controls", () => {
+  const voice=fs.readFileSync(path.resolve(__dirname,"./LiveSpeakPage.jsx"),"utf8");
+  expect(voice).toContain('aria-label={recording ? "Stop and send recording" : "Record German answer"}');
+  expect(voice).toContain('background:recording?"#991b1b":"#dc2626"');
+  expect(voice).toContain('aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"}');
+  expect(voice).toContain('aria-label="Speaking time"');
+  expect(voice).toContain("Session time left");
+  expect(voice).toContain("recordingTimeLabel");
+  expect(voice).toContain("onClick={confirmTranscript}");
+});
 test("mobile Exam Room uses one collapsible section menu; desktop stays unchanged", () => {
   const app = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
   const css = fs.readFileSync(path.resolve(__dirname, "../App.css"), "utf8");
   expect(app).toContain('className="nav-row exam-nav-row"');
   expect(app).toContain('className="mobile-exam-menu"');
+  expect(app).toContain("Exam Room Menu");
   expect(app).toContain('aria-label="Exam Room sections"');
   expect(app).toContain('aria-current={examSection === tab.key ? "page" : undefined}');
   expect(css).toContain(".exam-nav-row {");
   expect(css).toContain("display: none !important;");
   expect(css).toContain(".mobile-exam-menu__links");
+  expect(css).toContain("falowen-speaking-session-active");
 });
