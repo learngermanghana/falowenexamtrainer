@@ -401,7 +401,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           ) : null}
           {!session && sessionsAvailable ? (
             <div><button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
-              {busy ? "Starting..." : details.activeSession ? "Resume speaking task" : examinerEntry ? "Start speaking exam simulation" : "Start 5-minute conversation"}
+              {busy ? "Starting..." : details.activeSession ? (examinerEntry ? "Resume speaking task" : "Resume voice conversation") : examinerEntry ? "Start speaking exam simulation" : "Start 5-minute conversation"}
             </button></div>
           ) : null}
           {!session && !sessionsAvailable && details.pilotClaimed && !details.capReached ? (
