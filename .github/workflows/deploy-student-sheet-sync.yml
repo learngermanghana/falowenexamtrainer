@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm ci --prefix functions --no-audit --no-fund
+      - run: npm install --prefix functions --no-audit --no-fund
       - run: node --test functions/__tests__/studentSheetDelivery.test.cjs
       - uses: google-github-actions/auth@v2
         with:
