@@ -431,7 +431,8 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
           <VerifiedCloudDraftSubmissionPage
             compact
             onLockedChange={setSubmissionLocked}
-            allowIncompleteSubmission={timedMockExam.timedAutoSubmit}
+            allowIncompleteSubmission={timedMockExam.enabled}
+            allowUnconfirmedSubmission={timedMockExam.expired || timedMockExam.timedAutoSubmit}
             onSubmissionVerified={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionVerified : null}
             onSubmissionError={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionError : null}
             submissionContext={{
