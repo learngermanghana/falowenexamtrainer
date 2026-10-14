@@ -417,7 +417,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
   return (
-    <Container data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
+    <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
       style={embedded
         ? { display:"grid", gap:12, maxWidth:"100%", minWidth:0, padding:"8px 0" }
         : { ...styles.container, maxWidth:940, paddingBottom:65, display:"grid", gap:16 }}>
@@ -475,8 +475,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       ) : null}
 
       {session ? (
-        <section style={{ ...shell, display:"grid", gap:14 }}>
-          <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
+        <section className={examinerSession ? "speaking-exam-session" : undefined} style={{ ...shell, display:"grid", gap:14 }}>
+          <header className={examinerSession ? "speaking-exam-session__header" : undefined} style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
 
             <div>
               <h2 style={{margin:0,fontSize:20}}>{examinerSession ? "AI Examiner" : "Speaking practice"} · {displayContext.level}</h2>
@@ -495,7 +495,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           {examinerSession ? <p role="status" style={{margin:0,fontSize:13}}>
             {taskReady ? "Answers saved. You’re ready for feedback." : session.examFlow ? "Follow the task card and the current speaker. Corrections come at the end." : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : `Answer the selected task (up to ${session.maxRecordingSeconds || 20} seconds). Corrections come after you finish.`}
           </p> : null}
-          <div aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
+          <div className={examinerSession ? "speaking-exam-session__conversation" : undefined} aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
             {messages.map((message,i) => (
               <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
                 <strong>{message.role==="assistant"?(examinerSession ? message.speaker === "partner" ? "AI partner" : "AI Examiner" : "AI German tutor"):"You"}</strong>
@@ -506,14 +506,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           </div>
           {lastAudio && voiceReady ? <button type="button" style={styles.secondaryButton} onClick={()=>playVoice(lastAudio)}>▶ Play AI voice again</button> : null}
           {examinerSession ? (
-            <div style={{borderTop:"1px solid #e2e8f0",paddingTop:12,display:"grid",gap:9}} aria-label="Speaking answer controls">
+            <div className="speaking-exam-session__answer" style={{borderTop:"1px solid #e2e8f0",paddingTop:12,display:"grid",gap:9}} aria-label="Speaking answer controls">
               <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <strong style={{fontSize:13}}>Your spoken answer</strong>
                 <span role="timer" aria-label="Speaking time" style={{fontVariantNumeric:"tabular-nums",fontSize:13,color:recording && speakingLimit-recordingSeconds<=10?"#b91c1c":"#334155",fontWeight:700}}>
                   {recording ? "Recording " : "Speaking time "}{recordingTimeLabel} / {speakingLimitLabel}
                 </span>
               </div>
-              <div style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
+              <div className="speaking-exam-recorder-row" style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
                   value={pending ? recognizedText : ""}
@@ -548,7 +548,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 </div>
               ) : <small style={{color:"#64748b"}}>Tap the red microphone to answer. Recording stops automatically at the time limit. Feedback comes after the task.</small>}
               {expired ? <p role="status">Your session time has ended. Your answers remain visible. Finish the task to review feedback.</p> : null}
-              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+              <div className="speaking-exam-session__actions" style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                 <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
                   disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
                   {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
