@@ -110,11 +110,15 @@ replaceOnce(
   "structured submission helper",
 );
 
-replaceOnce(
+// The timed-workflow branch can wrap WordProgress in a conditional, while
+// retaining the already-patched structured answer value.
+if (!source.includes("<WordProgress value={submissionAnswerText}")) {
+  replaceOnce(
   `              <WordProgress value={form.submissionText} minimumWords={minimumSubmissionWords} />`,
   `              <WordProgress value={submissionAnswerText} minimumWords={minimumSubmissionWords} />`,
   "structured answer progress",
 );
+}
 
 replaceOnce(
   `        <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>\n          <div\n            style={{\n              display: "grid",`,
