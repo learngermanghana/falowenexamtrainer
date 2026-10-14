@@ -1481,7 +1481,7 @@ const SpeakingPage = ({
                     ) : null}
                   </div>
                 );
-              })}
+              }) : null}
 
               {!showLiveExaminer && chatLoading ? (
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
