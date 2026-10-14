@@ -15,8 +15,11 @@ export const WorkbookSection = ({ sectionKey, children }) => (
 const contentError = (assignmentKey, message) =>
   new Error(`[A1 workbook ${assignmentKey}] ${message}`);
 
-export const sanitizeA1WorkbookSearch = (search = "") =>
-  new URLSearchParams(search || "");
+export const sanitizeA1WorkbookSearch = (search = "") => {
+  const params = new URLSearchParams(search || "");
+  params.delete("radio"); // Old course-completion flag must not affect workbook navigation.
+  return params;
+};
 
 const workbookSearchText = (params) => {
   const text = params.toString();
