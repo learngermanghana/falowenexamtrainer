@@ -40,7 +40,7 @@ function setup(overrides = {}, authOverride = {}) {
     chat:{completions:{create:jest.fn(async()=>({choices:[{message:{content:"Fast richtig: Ich gehe heute zum Markt. Und was kaufst du dort?"}}]}))}},
   };
   const moduleObj={exports:{}};
-  const env={LIVE_SPEAK_ENABLED:"true",LIVE_SPEAK_TESTER_UIDS:"u123",
+  const env={LIVE_SPEAK_ENABLED:"true",
     LIVE_SPEAK_MONTHLY_TURN_CAP:"40",OPENAI_API_KEY:"sk_test_fake",...overrides};
   vm.runInNewContext(source,{
     module:moduleObj,exports:moduleObj.exports, Buffer, Date, console,
@@ -88,20 +88,26 @@ test("the pilot is disabled by default without explicit server activation",async
   expect(api.docs.size).toBe(0);
 });
 
-test("student not in Firebase UID allowlist cannot claim or generate voice",async()=>{
-  const api=setup({LIVE_SPEAK_TESTER_UIDS:"another-user"});
+test("signed-in student can claim free pilot sessions without allowlisting",async()=>{
+  const api=setup({LIVE_SPEAK_ENABLED:"true"});
   const status=await api.call("GET","/live-speak/status");
-  expect(status.payload.approved).toBe(false);
+  expect(status.code).toBe(200);
+  expect(status.payload.pilotAvailable).toBe(true);
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+});
+
+test("mismatched student identity cannot access the speaking pilot",async()=>{
+  const api=setup({}, {uid:"other-user",email:"outsider@example.com"});
   const claim=await api.call("POST","/live-speak/pilot/claim");
   expect(claim.code).toBe(403);
-  const start=await api.call("POST","/live-speak/session/start");
+  const start=await api.call("POST","/live-speak/session/start",{level:"A1"});
   expect(start.code).toBe(403);
-  const turn=await api.call("POST","/live-speak/session/turn",{intro:true});
-  expect(turn.code).toBe(403);
   expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
 });
 
-test("approved tester claims two sessions only once, even when repeatedly requested",async()=>{
+test("student can claim two sessions only once, even when repeatedly requested",async()=>{
   const api=setup();
   const first=await api.call("POST","/live-speak/pilot/claim",{sessions:999});
   expect(first.code).toBe(200);

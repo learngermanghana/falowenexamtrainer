@@ -1,6 +1,6 @@
 /*
  * Falowen Live Speak voice-only pilot. NO PAYMENT INTEGRATION.
- * Access requires BOTH an explicit server feature flag and an approved Firebase UID.
+ * Signed-in students can access an unadvertised URL; server-side quotas control cost.
  * Session allowances and provider usage are verified on the server.
  */
 const crypto = require("crypto");
@@ -22,17 +22,8 @@ const GERMAN_OPENINGS = {
   C1: "Guten Tag! Welches aktuelle gesellschaftliche Thema beschäftigt dich besonders?",
   C2: "Guten Tag! Über welche komplexe Fragestellung würdest du heute gern diskutieren?",
 };
-const enabled = () => process.env.LIVE_SPEAK_ENABLED === "true";
-const normalizedAllowlist = (key, transform = (value) => value) =>
-  String(process.env[key] || "").split(",").map(value => transform(value.trim())).filter(Boolean);
-const approvedTester = (auth) => {
-  if (!auth || typeof auth !== "object" || !auth.uid) return false;
-  // UID approval is strongest. For email-based pilot approval, only trust
-  // Firebase's verified email claim from the authenticated ID token.
-  if (normalizedAllowlist("LIVE_SPEAK_TESTER_UIDS").includes(auth.uid)) return true;
-  return auth.email_verified === true &&
-    normalizedAllowlist("LIVE_SPEAK_TESTER_EMAILS", normalizeEmail).includes(normalizeEmail(auth.email));
-};
+// Direct-link beta can be stopped at once using LIVE_SPEAK_ENABLED=false.
+const enabled = () => process.env.LIVE_SPEAK_ENABLED !== "false";
 const spendingCap = () => {
   const configured = Number(process.env.LIVE_SPEAK_MONTHLY_TURN_CAP);
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 500 ? configured : 40;
@@ -68,11 +59,6 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     }
     return { auth, profile };
   };
-  const requireApprovedTester = (student, res) => {
-    if (approvedTester(student.auth)) return true;
-    error(res, 403, "not_approved", "This pilot is currently available only to approved testers.");
-    return false;
-  };
   const requireEnabled = (res) => {
     if (enabled()) return true;
     error(res, 503, "pilot_disabled", "Live Speak is not enabled yet. Existing free speaking practice is still available.");
@@ -83,7 +69,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       const student = await requireStudent(req, res);
       if (!student) return;
-      const approved = approvedTester(student.auth);
+      const approved = true; // Require signed-in student identity, not allowlisting.
       const pilot = approved
         ? await db().collection("liveSpeakPilotCredits").doc(student.auth.uid).get()
         : null;
@@ -95,7 +81,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const active = running.sessionId && !running.endedAt && Date.parse(running.expiresAt || "") > Date.now();
       const info = receiptStatus(pilot?.data());
       return res.json({
-        enabled: enabled(), approved, pilotAvailable: approved && enabled() && !info.pilotClaimed,
+        enabled: enabled(), pilotAvailable: enabled() && !info.pilotClaimed,
         sessionMinutes: 5, maxTurns: MAX_TURNS, ...info,
         capReached: (Number(usage?.data()?.turns) || 0) >= spendingCap(),
         activeSession: active && enabled() ? {
@@ -108,12 +94,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     }
   });
 
-  // A single short free allocation for explicitly allowlisted testers. No payments.
+  // Free test allocation for signed-in learners, behind quotas. No payments.
   app.post("/live-speak/pilot/claim", async (req, res) => {
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
-      if (!student || !requireApprovedTester(student, res)) return;
+      if (!student) return;
       if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The voice service is not configured.");
       const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
       if ((Number(usage.data()?.turns) || 0) + PILOT_SESSIONS * MAX_TURNS > spendingCap()) {
@@ -143,7 +129,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
-      if (!student || !requireApprovedTester(student, res)) return;
+      if (!student) return;
       if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The natural German voice service is not configured.");
       const level = cleanLevel(req.body?.level);
       const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
@@ -179,7 +165,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   app.post("/live-speak/session/end", async (req, res) => {
     try {
       const student = await requireStudent(req, res);
-      if (!student || !requireApprovedTester(student, res)) return;
+      if (!student) return;
       const ref = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const snap = await ref.get();
       if (!snap.exists || snap.data()?.sessionId !== req.body?.sessionId) return error(res, 404, "session_missing", "Session not found.");
@@ -195,7 +181,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
-      if (!student || !requireApprovedTester(student, res)) return;
+      if (!student) return;
       uid = student.auth.uid;
       const sessionId = String(req.body?.sessionId || "");
       const intro = req.body?.intro === true;
@@ -280,4 +266,4 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   });
 }
 
-module.exports = { registerLiveSpeakRoutes, approvedTester, MAX_TURNS, PILOT_SESSIONS };
+module.exports = { registerLiveSpeakRoutes, MAX_TURNS, PILOT_SESSIONS };

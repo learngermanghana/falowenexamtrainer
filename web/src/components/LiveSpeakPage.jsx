@@ -247,18 +247,18 @@ export default function LiveSpeakPage() {
       </section>
 
       {loading ? <section style={shell}>Checking your speaking allowance…</section> : null}
-      {!loading && details && (!details.enabled || !details.approved) ? (
+      {!loading && details && !details.enabled ? (
         <section style={{ ...shell, background:"#f8fafc" }}>
           <h2 style={{ margin:0 }}>Live Speak is in private testing</h2>
-          <p>The spoken German pilot is available only to approved testers while we check voice quality and costs. No payment is needed. Your existing speaking practice remains available.</p>
+          <p>The voice pilot is currently paused. Existing speaking practice remains available.</p>
           <Link to="/campus/speaking" style={styles.secondaryButton}>Use existing speaking practice</Link>
         </section>
       ) : null}
 
-      {details?.enabled && details?.approved ? (
+      {details?.enabled ? (
         <section style={{...shell, display:"grid",gap:10}}>
           <h2 style={{margin:0}}>Your free voice test</h2>
-          <p style={{margin:0,color:"#334155"}}>Each approved tester can try <strong>two 5-minute spoken conversations</strong>. There are no payments or subscriptions during this test.</p>
+          <p style={{margin:0,color:"#334155"}}>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice. There are no payments or subscriptions during this test.</p>
           <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
           {details.expiresAt ? <p style={{margin:0,color:"#475569",fontSize:13}}>Test access expires {new Date(details.expiresAt).toLocaleDateString()}.</p> : null}
           {details.capReached ? <p role="alert">The pilot's monthly AI-usage limit has been reached. Testing is temporarily paused.</p> : null}
