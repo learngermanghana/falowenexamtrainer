@@ -433,8 +433,8 @@ export default function A1CanonicalSubmissionPanel({ assignment, submitTitle, su
             onLockedChange={setSubmissionLocked}
             allowIncompleteSubmission={timedMockExam.enabled}
             allowUnconfirmedSubmission={timedMockExam.expired || timedMockExam.timedAutoSubmit}
-            onSubmissionVerified={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionVerified : null}
-            onSubmissionError={timedMockExam.timedAutoSubmit ? timedMockExam.onSubmissionError : null}
+            onSubmissionVerified={timedMockExam.enabled ? timedMockExam.onSubmissionVerified : null}
+            onSubmissionError={timedMockExam.enabled ? timedMockExam.onSubmissionError : null}
             submissionContext={{
               level: "A1",
               day: assignment.day,
