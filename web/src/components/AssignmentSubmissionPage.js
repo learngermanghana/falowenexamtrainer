@@ -34,6 +34,7 @@ import {
   serverTimestamp,
   setDoc,
   where,
+  writeBatch,
 } from "../firebase";
 import {
   DEFAULT_ASSIGNMENT_SUBMISSION_WORDS,
@@ -1183,26 +1184,25 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         return { ok: false, reason: "locked" };
       }
 
-      // Add submission history
-      await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
-
-      // Create lock deterministically
+      // The submission and its one-time lock must commit together. If the
+      // network or permissions reject either write, neither is saved; the
+      // learner can retry without a misleading "submitted" state or orphan.
+      const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));
+      const batch = writeBatch(db);
+      batch.set(submissionRef, submissionPayload);
       const nowLocal = new Date();
-      await setDoc(
-        lockRef,
-        {
-          studentId: user?.uid || "",
-          studentEmail: user?.email || "",
-          studentCode,
-          level: selectedAssignmentLevel,
-          lockedAt: serverTimestamp(),
-          assignmentTitle: form.assignmentTitle,
-          day: selectedAssignmentDay,
-          chapter: selectedAssignmentChapter || "",
-          chapterKey: buildChapterKey(form.assignmentTitle),
-        },
-        { merge: true }
-      );
+      batch.set(lockRef, {
+        studentId: user.uid,
+        studentEmail: user.email || "",
+        studentCode,
+        level: selectedAssignmentLevel,
+        lockedAt: serverTimestamp(),
+        assignmentTitle: form.assignmentTitle,
+        day: selectedAssignmentDay,
+        chapter: selectedAssignmentChapter || "",
+        chapterKey: buildChapterKey(form.assignmentTitle),
+      }, {merge:true});
+      await batch.commit();
 
       const currentChapterKey = buildChapterKey(form.assignmentTitle);
       if (currentChapterKey) {
