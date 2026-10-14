@@ -330,10 +330,21 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (!mounted.current) { stream.getTracks().forEach(track => track.stop()); return; }
       mediaRef.current = stream;
       const mime = voiceTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
-      const recorder = new MediaRecorder(stream, {audioBitsPerSecond:32000, ...(mime ? {mimeType:mime} : {})});
+      const recorder = new MediaRecorder(stream, {audioBitsPerSecond:24000, ...(mime ? {mimeType:mime} : {})});
       recorderRef.current = recorder;
       const chunks = [];
-      recorder.ondataavailable = event => { if (event.data?.size) chunks.push(event.data); };
+      let recordedBytes = 0;
+      recorder.ondataavailable = event => {
+        if (!event.data?.size) return;
+        chunks.push(event.data);
+        recordedBytes += event.data.size;
+        // Browsers may ignore the requested bitrate. Leave container/final-chunk
+        // headroom and send the answer already recorded instead of discarding it.
+        if (recordedBytes >= MAX_AUDIO_BYTES - 32768 && recorder.state === "recording") {
+          setNotice("Recording stopped to keep your answer ready to send.");
+          recorder.stop();
+        }
+      };
       recorder.onstop = async () => {
         if (!mounted.current) return;
         if (recordingTicker.current) clearInterval(recordingTicker.current);
