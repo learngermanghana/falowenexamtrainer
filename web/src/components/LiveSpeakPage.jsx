@@ -341,7 +341,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
       {details?.enabled ? (
         <section style={{...shell, display:"grid",gap:10}}>
-          <h2 style={{margin:0}}>Your free voice test</h2>
+          <h2 style={{margin:0,fontSize:embedded?18:23}}>{embedded ? "Your voice session" : "Your free voice test"}</h2>
           <p style={{margin:0,color:"#334155"}}>
             {embedded ? "Practise your current speaking lesson with a natural German AI voice." :
               <>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice.</>}
@@ -438,11 +438,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
-      <section style={shell}>
-        <h2 style={{marginTop:0}}>About this private voice test</h2>
-        <p>This pilot tests whether our natural German AI voice, speech recognition and short corrections work well. Your usual course, Goethe Free Sprechen Chat and Speaking Trainer remain unchanged. Feedback covers grammar and communication, not precise phonetic pronunciation scores.</p>
-        <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice can make mistakes. Report unusual pronunciation or delays. There is no checkout, charge or subscription in this testing version. Server-side access and usage limits apply.</p>
-      </section>
+      {!embedded ? (
+        <section style={shell}>
+          <h2 style={{marginTop:0}}>About this voice test</h2>
+          <p>This pilot tests natural German AI voice, speech recognition and short corrections. Your existing course and speaking tools remain unchanged. This does not provide a phonetic pronunciation score.</p>
+          <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice can make mistakes. No checkout or payment is required. Server-side usage limits apply.</p>
+        </section>
+      ) : null}
     </Container>
   );
 }
