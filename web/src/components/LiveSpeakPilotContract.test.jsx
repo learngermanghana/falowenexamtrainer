@@ -54,7 +54,7 @@ test("enabled pilot displays a separate paid package without changing tuition", 
 test("webhook verifies signed Paystack event before dispatching to speaking payments", () => {
   const signatureCheck = tuitionApi.indexOf("safeEqualHex(expectedSignature, signature)");
   const addonDispatch = tuitionApi.indexOf("handleLiveSpeakWebhook({ db, admin, data })");
-  const tuitionUpdate = tuitionApi.indexOf("const { tuitionFee, paidSoFar: priorPaid");
+  const tuitionUpdate = tuitionApi.indexOf("const checkoutAmountPaid = roundMoney(", addonDispatch);
   expect(signatureCheck).toBeGreaterThan(-1);
   expect(addonDispatch).toBeGreaterThan(signatureCheck);
   expect(tuitionUpdate).toBeGreaterThan(addonDispatch);
