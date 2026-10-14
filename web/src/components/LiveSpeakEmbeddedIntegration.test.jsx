@@ -35,9 +35,15 @@ test("workbook and exam room reuse the same embedded voice component and existin
   const c2=read("web/src/components/C2UnifiedGuidedWorkbookPage.js");
   expect(workbookChat).toContain('source="course-workbook"');
   expect(workbookChat).toContain('data-goethe-free-chat="text-first"');
-  expect(exam).toContain('source="exam-speaking-practice"');
-  expect(exam).toContain("selectedQuestion?.topicPrompt");
-  expect(exam).toContain("window.location.pathname");
+  const examiner = read("web/src/components/ExamLiveSpeakPanel.jsx");
+  const picker = read("web/src/components/SpeakingPracticeModePicker.jsx");
+  expect(exam).toContain("SpeakingPracticeModePicker");
+  expect(exam).toContain("ExamLiveSpeakPanel");
+  expect(exam).toContain("liveConversationSelected");
+  expect(examiner).toContain('practiceSource="exam-speaking-practice"');
+  expect(examiner).toContain("examTask={examinerTask}");
+  expect(examiner).toContain("question?.topicPrompt");
+  expect(picker).toContain("Practise with AI Examiner");
   expect(b2).toContain('source="b2-workbook"');
   expect(c1).toContain('source="c1-workbook"');
   expect(c2).toContain('source="c2-workbook"');
