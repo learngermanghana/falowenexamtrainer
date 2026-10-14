@@ -2137,6 +2137,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
       // Refresh list
       if (user?.uid) {
+        try {
         const submissionsRef = collection(db, SUBMISSION_COLLECTION);
         const snapshot = await getDocs(
           query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
@@ -2149,6 +2150,12 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
             })
         );
+        } catch (refreshError) {
+          // The submission and lock are already committed. A missing query
+          // index or temporary network failure must never turn success into
+          // a misleading "could not submit" message.
+          console.warn("Submission saved, but recent-submissions refresh failed", refreshError);
+        }
       }
     } catch (error) {
       console.error("Failed to save submission", error);
