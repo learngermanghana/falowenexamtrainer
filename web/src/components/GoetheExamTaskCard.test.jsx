@@ -54,7 +54,7 @@ test("the real examiner panel sends the selected mode and locks changes while ac
     onTeilChange={()=>{}} onQuestionChange={()=>{}} formatQuestion={q=>q.topicPrompt}/></MemoryRouter>);
   fireEvent.click(screen.getByRole("button",{name:"Exam simulation"}));
   expect(screen.queryByText("Practice hints")).not.toBeInTheDocument();
-  fireEvent.click(await screen.findByRole("button",{name:"Start AI Examiner"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
   await waitFor(()=>expect(screen.getByRole("button",{name:"Guided practice"})).toBeDisabled());
   expect(screen.getByLabelText("Live conversation exam part")).toBeDisabled();
   expect(screen.getByLabelText("Live conversation speaking prompt")).toBeDisabled();
@@ -66,7 +66,7 @@ test("a backend that has not received the examiner update cannot consume a new s
   const question={id:"a1",teilLabel:"Teil 1",topicPrompt:"Name"};
   render(<MemoryRouter><ExamLiveSpeakPanel level="A1" teil="1" selectedQuestionId="a1" questions={[question]} question={question}
     onTeilChange={()=>{}} onQuestionChange={()=>{}} formatQuestion={q=>q.topicPrompt}/></MemoryRouter>);
-  fireEvent.click(await screen.findByRole("button",{name:"Start AI Examiner"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
   expect(await screen.findByRole("alert")).toHaveTextContent("Examiner practice is temporarily unavailable.");
   expect(global.fetch).toHaveBeenCalledTimes(1);
 });
