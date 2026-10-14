@@ -1573,8 +1573,8 @@ const ExamArea = ({ onBack }) => {
           ))}
         </div>
         <details className="mobile-exam-menu" key={examSection}>
-          <summary aria-label="Open Exam Room navigation">
-            <span aria-hidden="true">☰</span> Exam Room
+          <summary aria-label="Open Exam Room Menu and other exam pages">
+            <span aria-hidden="true">☰</span> <span>Exam Room Menu</span>
             <strong>{tabs.find((tab) => tab.key === examSection)?.label || "Overview"}</strong>
             <span aria-hidden="true" className="mobile-exam-menu__chevron">⌄</span>
           </summary>
