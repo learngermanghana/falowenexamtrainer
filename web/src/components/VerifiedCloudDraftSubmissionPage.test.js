@@ -25,7 +25,7 @@ describe("VerifiedCloudDraftSubmissionPage", () => {
     expect(source).not.toContain("✓ Already submitted — this assignment has already been sent to your tutor.");
     expect(source).toContain('compact ? "Your answers *" : "Your text *"');
     expect(source).toContain('compact ? "1fr" : "repeat(auto-fit, minmax(180px, 1fr))"');
-    expect(source).toContain("if (!confirmed && !compact)");
+    expect(source).toContain("if (!confirmed && !compact && !allowUnconfirmedSubmission)");
   });
 
   test("A1 canonical submissions opt into compact review mode", () => {
