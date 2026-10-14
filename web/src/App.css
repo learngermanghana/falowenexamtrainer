@@ -661,9 +661,6 @@ body.falowen-speaking-session-active .study-buddy-bar { display: none !important
   .speaking-exam-picture-card {
     padding: 12px !important;
   }
-  .speaking-exam-live [data-no-mobile-overflow] {
-    min-width: 0;
-  }
   .speaking-exam-session {
     padding: 12px !important;
     gap: 10px !important;
@@ -775,5 +772,50 @@ body.falowen-speaking-session-active .study-buddy-bar { display: none !important
   .mobile-exam-menu summary {
     padding: 10px !important;
     font-size: 13px;
+  }
+}
+
+/* Landscape phones (641–900px) should use the obvious Exam Room menu too. */
+@media (min-width: 641px) and (max-width: 900px) {
+  .exam-nav-row { display: none !important; }
+  .mobile-exam-menu {
+    display: block;
+    border: 1px solid #dbeafe;
+    border-radius: 14px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .mobile-exam-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    min-height: 48px;
+    list-style: none;
+    cursor: pointer;
+    color: #1e3a8a;
+    font-weight: 800;
+  }
+  .mobile-exam-menu summary strong { margin-left: auto; }
+  .mobile-exam-menu summary::-webkit-details-marker { display: none; }
+  .mobile-exam-menu__links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .mobile-exam-menu__links button {
+    min-height: 44px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #334155;
+    cursor: pointer;
+  }
+  .mobile-exam-menu__links button[aria-current="page"] {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-color: #93c5fd;
   }
 }
