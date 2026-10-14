@@ -4,16 +4,16 @@ const MODES = [
   {
     key: "coach",
     icon: "📝",
-    title: "Goethe Exam Practice",
-    description: "Answer real speaking prompts by text or recording and get detailed exam feedback.",
+    title: "Exam Coach",
+    description: "Type or record answers to Goethe prompts and review coaching and corrections.",
     detail: "Exam prompts · Custom chat",
   },
   {
     key: "voice",
     icon: "🎙️",
-    title: "Live AI Conversation",
-    description: "Hear natural spoken German, answer aloud, review the transcript and continue speaking.",
-    detail: "5-minute conversations · Free pilot",
+    title: "Practise with AI Examiner",
+    description: "Hear Goethe-style questions, respond aloud and receive feedback after your task.",
+    detail: "Spoken exam simulation · Free pilot",
   },
 ];
 
