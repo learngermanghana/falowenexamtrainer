@@ -153,3 +153,52 @@ test("the pilot cap prevents voice usage and a session expires on the server",as
   expect(expired.code).toBe(409);
   expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
 });
+
+// Transcription must remain ungraded until student reviews the transcript.
+test("German speech is transcribed without inventing tutor corrections before confirmation",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const started=await api.call("POST","/live-speak/session/start",{level:"C2"});
+  const audioBase64=Buffer.from("a".repeat(1600)).toString("base64");
+  const speech=await api.call("POST","/live-speak/session/turn",{
+    sessionId:started.payload.sessionId,mimeType:"audio/webm",audioBase64,
+  });
+  expect(speech.code).toBe(200);
+  expect(speech.payload.needsConfirmation).toBe(true);
+  expect(speech.payload.transcript).toBe("Ich gehen heute zum Markt.");
+  expect(speech.payload.reply).toBeUndefined();
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+  expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
+  expect(api.fakeClient.audio.transcriptions.create).toHaveBeenCalledWith(expect.objectContaining({
+    model:"gpt-4o-transcribe",language:"de",response_format:"json",include:["logprobs"],
+  }));
+  expect(api.docs.get("liveSpeakSessions/u123").pendingId).toBe(speech.payload.pendingId);
+  expect(api.docs.get("liveSpeakUsage/"+new Date().toISOString().slice(0,7)).turns).toBe(2);
+  const confirmed=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:started.payload.sessionId,pendingId:speech.payload.pendingId,
+    transcript:"Ich gehe heute zum Markt.",history:[],
+  });
+  expect(confirmed.code).toBe(200);
+  expect(confirmed.payload.transcript).toBe("Ich gehe heute zum Markt.");
+  expect(confirmed.payload.reply).toMatch(/Fast richtig/);
+  expect(confirmed.payload.audioBase64).toBeTruthy();
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+  expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
+  const again=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:started.payload.sessionId,pendingId:speech.payload.pendingId,
+    transcript:"Ich gehe heute zum Markt.",
+  });
+  expect(again.code).toBe(409);
+  expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+});
+
+test("AI refuses transcript confirmation without a preceding metered recording",async()=>{
+  const api=setup();
+  await api.call("POST","/live-speak/pilot/claim");
+  const started=await api.call("POST","/live-speak/session/start",{level:"A2"});
+  const response=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:started.payload.sessionId,pendingId:"forged",transcript:"Ich spreche Deutsch.",
+  });
+  expect(response.code).toBe(409);
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+});
