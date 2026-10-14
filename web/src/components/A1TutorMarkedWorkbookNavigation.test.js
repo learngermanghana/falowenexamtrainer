@@ -88,7 +88,7 @@ describe("A1 tutor-marked workbook navigation", () => {
       "?radio=done&assignmentKey=A1-0.2&assignmentId=A1-0.2&level=A1&workbookTab=submit",
     );
 
-    expect(cleaned.has("radio")).toBe(false);
+    expect(cleaned.get("radio")).toBe("done");
     expect(cleaned.get("assignmentKey")).toBe("A1-0.2");
     expect(cleaned.get("assignmentId")).toBe("A1-0.2");
     expect(cleaned.get("level")).toBe("A1");
