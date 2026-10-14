@@ -62,7 +62,7 @@ test("pending transcription is recoverable and final confirmation goes directly 
   expect(await screen.findByRole("textbox",{name:/What I said/})).toHaveValue("Ich esse Gemüse.");
   fireEvent.click(screen.getByRole("button",{name:"Confirm answer"}));
   expect(await screen.findByText(/Answers saved. You’re ready for feedback/)).toBeInTheDocument();
-  expect(screen.getByRole("button",{name:/Speak German/})).toBeDisabled();
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
   expect(screen.getByRole("button",{name:"Finish task & see feedback"})).toBeEnabled();
 });
 

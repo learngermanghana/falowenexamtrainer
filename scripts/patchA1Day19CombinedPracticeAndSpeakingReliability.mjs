@@ -19,6 +19,11 @@ const write = (file, content) => fs.writeFileSync(file, content);
 
 const replaceOnce = (source, before, after, label) => {
   if (source.includes(after)) return source;
+  // The Exam Room now renders LiveSpeakPage directly. The former audio-message
+  // markup only exists in the retired coach UI; do not resurrect it in prebuild.
+  if (label === "exam audio transcript display" &&
+      source.includes('aria-label="Choose speaking exam part"') &&
+      source.includes('practiceSource="exam-speaking-practice"')) return source;
   if (!source.includes(before)) throw new Error(`Could not find ${label}.`);
   return source.replace(before, after);
 };
