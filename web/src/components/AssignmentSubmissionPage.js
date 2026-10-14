@@ -941,6 +941,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const lastAssignmentRef = useRef("");
   const autosaveTimerRef = useRef(null);
   const timedAutoSubmitStartedRef = useRef(false);
+  const timedAutoSubmitRetryCountRef = useRef(0);
+  const timedAutoSubmitRetryTimerRef = useRef(null);
+  useEffect(() => () => {
+    if (timedAutoSubmitRetryTimerRef.current) window.clearTimeout(timedAutoSubmitRetryTimerRef.current);
+  }, []);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
   const submissionTextRef = useRef(null);
   const resubmissionTextRef = useRef(null);
@@ -2160,6 +2165,11 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
     if (!timedAutoSubmit) {
       timedAutoSubmitStartedRef.current = false;
+      timedAutoSubmitRetryCountRef.current = 0;
+      if (timedAutoSubmitRetryTimerRef.current) {
+        window.clearTimeout(timedAutoSubmitRetryTimerRef.current);
+        timedAutoSubmitRetryTimerRef.current = null;
+      }
       setTimedAutoSubmitCheck(0);
       return undefined;
     }
@@ -2219,6 +2229,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
         if (!saved.ok) throw new Error("The timed assignment could not be submitted.");
 
+        timedAutoSubmitRetryCountRef.current = 0;
         setStatus({
           loading: false,
           error: "",
@@ -2239,9 +2250,22 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         timedAssignment.onSubmissionVerified?.();
       } catch (error) {
         console.error("Timed automatic submission failed", error);
-        const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
+        const delays = [2000, 5000, 12000];
+        const attempt = timedAutoSubmitRetryCountRef.current;
+        const willRetry = attempt < delays.length;
+        const message = willRetry
+          ? "Time is up. Falowen is retrying your submission. Your draft is preserved; you may also press Submit assignment."
+          : "Time is up, but automatic submission could not finish. Your draft is preserved; press Submit assignment to retry.";
         setStatus({ loading: false, error: message, success: "" });
         timedAssignment.onSubmissionError?.(message);
+        if (willRetry) {
+          timedAutoSubmitRetryCountRef.current += 1;
+          timedAutoSubmitRetryTimerRef.current = window.setTimeout(() => {
+            timedAutoSubmitRetryTimerRef.current = null;
+            timedAutoSubmitStartedRef.current = false;
+            setTimedAutoSubmitCheck((value) => value + 1);
+          }, delays[attempt]);
+        }
       }
     };
 
