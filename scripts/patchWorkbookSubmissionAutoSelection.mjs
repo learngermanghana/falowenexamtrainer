@@ -81,9 +81,10 @@ replaceOnce(
 );
 
 if (!source.includes("Please answer every required section before submitting")) {
+  const expiryPrefix = source.includes("    if (!retryAfterExpiry && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {") ? "!retryAfterExpiry && " : "";
   replaceOnce(
-    `    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {`,
-    `    if (selectedSubmissionProfile && parsedStructuredSubmission) {\n      const incompleteParts = [\n        ...new Set([\n          ...parsedStructuredSubmission.missingHeadings,\n          ...parsedStructuredSubmission.unansweredParts,\n        ]),\n      ];\n      if (incompleteParts.length) {\n        setStatus({\n          loading: false,\n          error: \`Please answer every required section before submitting: \${formatMissingStructuredParts(incompleteParts)}. Keep the TEIL headings in the box and type your answers underneath them.\`,\n          success: "",\n        });\n        return;\n      }\n    }\n\n    if (submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {`,
+    `    if (${expiryPrefix}form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {`,
+    `    if (${expiryPrefix}selectedSubmissionProfile && parsedStructuredSubmission) {\n      const incompleteParts = [\n        ...new Set([\n          ...parsedStructuredSubmission.missingHeadings,\n          ...parsedStructuredSubmission.unansweredParts,\n        ]),\n      ];\n      if (incompleteParts.length) {\n        setStatus({\n          loading: false,\n          error: \`Please answer every required section before submitting: \${formatMissingStructuredParts(incompleteParts)}. Keep the TEIL headings in the box and type your answers underneath them.\`,\n          success: "",\n        });\n        return;\n      }\n    }\n\n    if (${expiryPrefix}submissionAnswerText.length < MIN_SUBMISSION_CHARACTERS) {`,
     "required structured section validation",
   );
 }

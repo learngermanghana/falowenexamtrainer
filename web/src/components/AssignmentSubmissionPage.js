@@ -34,6 +34,7 @@ import {
   serverTimestamp,
   setDoc,
   where,
+  writeBatch,
 } from "../firebase";
 import {
   DEFAULT_ASSIGNMENT_SUBMISSION_WORDS,
@@ -1183,26 +1184,25 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         return { ok: false, reason: "locked" };
       }
 
-      // Add submission history
-      await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
-
-      // Create lock deterministically
+      // The submission and its one-time lock must commit together. If the
+      // network or permissions reject either write, neither is saved; the
+      // learner can retry without a misleading "submitted" state or orphan.
+      const submissionRef = doc(collection(db, SUBMISSION_COLLECTION));
+      const batch = writeBatch(db);
+      batch.set(submissionRef, submissionPayload);
       const nowLocal = new Date();
-      await setDoc(
-        lockRef,
-        {
-          studentId: user?.uid || "",
-          studentEmail: user?.email || "",
-          studentCode,
-          level: selectedAssignmentLevel,
-          lockedAt: serverTimestamp(),
-          assignmentTitle: form.assignmentTitle,
-          day: selectedAssignmentDay,
-          chapter: selectedAssignmentChapter || "",
-          chapterKey: buildChapterKey(form.assignmentTitle),
-        },
-        { merge: true }
-      );
+      batch.set(lockRef, {
+        studentId: user.uid,
+        studentEmail: user.email || "",
+        studentCode,
+        level: selectedAssignmentLevel,
+        lockedAt: serverTimestamp(),
+        assignmentTitle: form.assignmentTitle,
+        day: selectedAssignmentDay,
+        chapter: selectedAssignmentChapter || "",
+        chapterKey: buildChapterKey(form.assignmentTitle),
+      }, {merge:true});
+      await batch.commit();
 
       const currentChapterKey = buildChapterKey(form.assignmentTitle);
       if (currentChapterKey) {
@@ -2018,13 +2018,18 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
+    // After a timer expires, accept partial answers just as auto-submit does.
+    // Normal assignments still require the full word and confirmation checks.
+    const retryAfterExpiry = Boolean(
+      timedAssignment?.enabled && timedAssignment?.expired && isWorkbookSubmissionContext
+    );
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
       setStatus({ loading: false, error: "Please select an assignment and enter your text.", success: "" });
       return;
     }
 
-    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
+    if (!retryAfterExpiry && form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
       setStatus({
         loading: false,
         error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
@@ -2034,7 +2039,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
     }
 
     const submissionWordCount = countWords(form.submissionText);
-    if (submissionWordCount < minimumSubmissionWords) {
+    if (!retryAfterExpiry && submissionWordCount < minimumSubmissionWords) {
       setStatus({
         loading: false,
         error: buildAssignmentSubmissionWordError({
@@ -2075,7 +2080,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       return;
     }
 
-    if (!form.confirmed) {
+    if (!retryAfterExpiry && !form.confirmed) {
       setStatus({ loading: false, error: "Please confirm that you are submitting the correct task.", success: "" });
       return;
     }
@@ -2204,9 +2209,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       setStatus({ loading: true, error: "", success: "" });
 
       try {
-        const draftSaved = await persistSubmission({ statusLabel: "draft" });
-        if (!draftSaved.ok) throw new Error("The latest draft could not be saved.");
-
+        // Autosave and local backup already preserve drafts. Never make a
+        // second draft write a prerequisite for the final timed submission:
+        // submit the current editor snapshot directly in one atomic batch.
         const saved = await persistSubmission({ statusLabel: "submitted" });
 
         if (!saved.ok && saved.reason === "locked") {
@@ -2237,7 +2242,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         timedAssignment.onSubmissionVerified?.();
       } catch (error) {
         console.error("Timed automatic submission failed", error);
-        const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
+        const message = getSubmissionSaveError(error) +
+          " Time is up. Press Submit assignment to retry your saved work. If access is denied, contact your teacher.";
         setStatus({ loading: false, error: message, success: "" });
         timedAssignment.onSubmissionError?.(message);
       }

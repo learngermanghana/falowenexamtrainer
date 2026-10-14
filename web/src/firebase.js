@@ -33,6 +33,7 @@ import {
   deleteField,
   arrayUnion,
   runTransaction,
+  writeBatch,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 import { getFunctions, httpsCallable as firebaseHttpsCallable } from "firebase/functions";
@@ -659,6 +660,7 @@ export {
   deleteField,
   arrayUnion,
   runTransaction,
+  writeBatch,
   functions,
   httpsCallable,
 };

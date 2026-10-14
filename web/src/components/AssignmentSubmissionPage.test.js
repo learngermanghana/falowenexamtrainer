@@ -79,9 +79,13 @@ jest.mock("../firebase", () => ({
   getDocs: jest.fn(() => Promise.resolve({ docs: [], empty: true })),
   addDoc: jest.fn(() => Promise.resolve({ id: "id1" })),
   setDoc: jest.fn(() => Promise.resolve()),
+  writeBatch: jest.fn(() => ({
+    set: jest.fn(),
+    commit: jest.fn(() => Promise.resolve()),
+  })),
 }));
 
-import { addDoc, getDocs, getDoc } from "../firebase";
+import { writeBatch, getDocs, getDoc } from "../firebase";
 import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
 
 const renderPage = (initialEntries = ["/"]) =>
@@ -113,7 +117,8 @@ describe("AssignmentSubmissionPage", () => {
     });
     fireEvent.click(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
     fireEvent.click(screen.getByRole("button", { name: /^Submit assignment$/i }));
-    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    await waitFor(() => expect(writeBatch.mock.results[0].value.commit).toHaveBeenCalled());
+    expect(writeBatch.mock.results[0].value.set).toHaveBeenCalledTimes(2);
     expect(getDoc).not.toHaveBeenCalled();
     getDoc.mockReset().mockResolvedValue({ exists: () => false });
   });
@@ -321,9 +326,10 @@ Teil :4
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
 
-    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    await waitFor(() => expect(writeBatch.mock.results[0].value.commit).toHaveBeenCalled());
+    expect(writeBatch.mock.results[0].value.set).toHaveBeenCalledTimes(2);
 
-    const payload = addDoc.mock.calls[0][1];
+    const payload = writeBatch.mock.results[0].value.set.mock.calls[0][1];
     expect(payload.day).toBe(1);
     expect(payload.chapter).toBe("1.1");
     expect(payload.assignmentId).toBe("A1-1.1");

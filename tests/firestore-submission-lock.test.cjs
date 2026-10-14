@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, doc, getDoc, getDocs, query, where, setDoc } = require('firebase/firestore');
+const { addDoc, collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-falowen-locks', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync('firestore.rules', 'utf8') } });
@@ -89,4 +89,58 @@ test('owner-scoped lookup permits first submission and saving a draft without br
   const other = env.authenticatedContext('student-two').firestore();
   await assertFails(getDoc(doc(other, 'submissionLocks/first-lock')));
   await assertFails(getDocs(query(collection(other, 'submissionLocks'), where('studentId', '==', 'student-one'))));
+});
+
+test('A1, A2 and B1 can read a missing timed attempt, start, expire and submit while other students cannot', async () => {
+  for (const [level,key,seconds] of [
+    ['A1','A1-12.3',2100],['A2','A2-10.28',2700],['B1','B1-6.18',3300],
+  ]) {
+    const uid = 'student-' + level.toLowerCase();
+    const owner = env.authenticatedContext(uid, {email:uid+'@example.com'}).firestore();
+    const outsider = env.authenticatedContext('outsider-'+level.toLowerCase()).firestore();
+    const attemptId = 'timed__' + uid + '__' + key.toLowerCase();
+    const ref = doc(owner,'timedAssignmentAttempts',attemptId);
+    const absent = await assertSucceeds(getDoc(ref));
+    if (absent.exists()) throw new Error('First timed attempt must not be used');
+    await assertFails(getDoc(doc(outsider,'timedAssignmentAttempts',attemptId)));
+    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(),'timedAssignmentAttempts',attemptId)));
+    await assertFails(getDoc(doc(owner,'timedAssignmentAttempts','timed__other-owner__'+key.toLowerCase())));
+    await assertFails(getDoc(doc(owner,'timedAssignmentAttempts','not-an-attempt')));
+
+    await assertSucceeds(setDoc(ref, {
+      studentId:uid,studentEmail:uid+'@example.com',timerRecord:true,
+      assignmentKey:key,level,status:'active',startedAt:serverTimestamp(),
+      clientStartedAt:Date.now(),durationSeconds:seconds,
+      createdAt:serverTimestamp(),updatedAt:serverTimestamp(),
+    }));
+    const saved = await assertSucceeds(getDoc(ref));
+    if (saved.data().status !== 'active') throw new Error('Timed attempt did not start');
+    await assertSucceeds(setDoc(ref,{
+      status:'expired',expiredAt:serverTimestamp(),updatedAt:serverTimestamp(),
+    },{merge:true}));
+    await assertSucceeds(setDoc(ref,{
+      status:'submitted',submittedAt:serverTimestamp(),updatedAt:serverTimestamp(),
+    },{merge:true}));
+    const done = await assertSucceeds(getDoc(ref));
+    if (done.data().status !== 'submitted') throw new Error('Timed submission status not persisted');
+    await assertFails(getDoc(doc(outsider,'timedAssignmentAttempts',attemptId)));
+  }
+});
+
+test('A1–B1 first real submission can create a draft, submission and lock under owner rules',async()=>{
+  for(const level of ['A1','A2','B1']){
+    const uid='submit-'+level.toLowerCase();
+    const store=env.authenticatedContext(uid,{email:uid+'@example.com'}).firestore();
+    const answer={studentId:uid,studentEmail:uid+'@example.com',level,
+      assignmentKey:level+'-2.3',assignmentTitle:level+' Day 2',submissionText:'Ich lerne Deutsch und ich mache jeden Tag meine Aufgaben.',
+      createdAt:serverTimestamp(),updatedAt:serverTimestamp(),status:'draft'};
+    await assertSucceeds(setDoc(doc(store,'submissionDrafts',uid+'__day-2'),answer,{merge:true}));
+    const row=await assertSucceeds(addDoc(collection(store,'submissions'),{...answer,status:'submitted'}));
+    await assertSucceeds(setDoc(doc(store,'submissionLocks',uid+'__day-2'),{
+      studentId:uid,level,assignmentKey:answer.assignmentKey,assignmentTitle:answer.assignmentTitle,
+      lockedAt:serverTimestamp(),chapterKey:'day-2',
+    },{merge:true}));
+    const stored=await assertSucceeds(getDoc(row));
+    if(stored.data().status!=='submitted')throw new Error('Failed to persist first submission');
+  }
 });

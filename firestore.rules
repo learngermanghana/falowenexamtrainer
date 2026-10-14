@@ -118,6 +118,12 @@ service cloud.firestore {
     // Students may create their own attempt and move it forward only.
     // Staff may delete an attempt to explicitly reset it.
     match /timedAssignmentAttempts/{attemptId} {
+      // Permit only the owner to check their deterministic missing timer record.
+      // Existing attempt documents still require strict student ownership.
+      allow get: if signedIn()
+        && resource == null
+        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
+
       allow create: if ownsStudentIncoming()
         && request.resource.data.status == 'active'
         && request.resource.data.startedAt == request.time
