@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, doc, getDoc, getDocs, query, where, setDoc } = require('firebase/firestore');
+const { collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-falowen-locks', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync('firestore.rules', 'utf8') } });
@@ -119,5 +119,33 @@ for (const level of ['A1', 'A2', 'B1']) {
     const finalLocks = await assertSucceeds(getDocs(locksQuery));
     if (!finalLocks.docs.some(item=>item.id===draftId)) throw new Error('Final submission lock could not be found');
     await assertFails(getDocs(query(collection(outsider,'submissionLocks'),where('studentId','==',uid))));
+  });
+}
+
+for (const [level, key] of [['A1','A1-12.3'],['A2','A2-8.21'],['B1','B1-6.18']]) {
+  test(`${level} timed assignment first-use and expired-to-submitted transition remain writable by its owner`,async()=>{
+    const uid=`timer-student-${level.toLowerCase()}`;
+    const student=env.authenticatedContext(uid,{email:`${uid}@example.com`}).firestore();
+    const other=env.authenticatedContext(`${uid}-other`).firestore();
+    const id=`timed__${uid}__${key.toLowerCase()}`;
+    const ref=doc(student,'timedAssignmentAttempts',id);
+    const missing=await assertSucceeds(getDoc(ref));
+    if(missing.exists())throw new Error('New timed attempt must not already exist');
+    await assertFails(getDoc(doc(other,'timedAssignmentAttempts',id)));
+    const now=Date.now();
+    const base={studentId:uid,studentEmail:`${uid}@example.com`,
+      assignmentKey:key,level,status:'active',startedAt:serverTimestamp(),
+      clientStartedAt:now,durationSeconds:1800,createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()};
+    await assertSucceeds(setDoc(ref,base));
+    const started=await assertSucceeds(getDoc(ref));
+    if(!started.exists()||started.data().status!=='active')throw new Error('Timer failed to start');
+    await assertSucceeds(setDoc(ref,{status:'expired',expiredAt:serverTimestamp(),
+      updatedAt:serverTimestamp()},{merge:true}));
+    await assertSucceeds(setDoc(ref,{status:'submitted',submittedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()},{merge:true}));
+    const sent=await assertSucceeds(getDoc(ref));
+    if(sent.data().status!=='submitted')throw new Error('Timer did not complete');
+    await assertFails(setDoc(doc(other,'timedAssignmentAttempts',id),{status:'active'},{merge:true}));
   });
 }
