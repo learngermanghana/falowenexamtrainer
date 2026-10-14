@@ -111,6 +111,7 @@
 }
 
 .exam-room-mock-entry {
+  box-sizing: border-box;
   width: 100%;
   display: flex;
   align-items: center;
@@ -171,6 +172,10 @@
 }
 
 .exam-room-mock-copy .exam-room-mock-action {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
   display: inline-flex;
   align-items: center;
   gap: 8px;
