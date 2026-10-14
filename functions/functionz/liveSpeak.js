@@ -1,18 +1,15 @@
 /*
- * Falowen Live Speak: opt-in, metered voice practice.
- * Never mix these payment intents with tuition and never trust client-side credits.
- * LIVE_SPEAK_ENABLED must be explicitly true before checkout or AI spending is possible.
+ * Falowen Live Speak voice-only pilot. NO PAYMENT INTEGRATION.
+ * Access requires BOTH an explicit server feature flag and an approved Firebase UID.
+ * Session allowances and provider usage are verified on the server.
  */
 const crypto = require("crypto");
 const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");
 
-const PRICE_GHS = 40;
-const BASIC_SESSIONS = 8;
-const TRIAL_SESSIONS = 2;
+const PILOT_SESSIONS = 2;
 const SESSION_MS = 5 * 60 * 1000;
-const PERIOD_MS = 30 * 24 * 60 * 60 * 1000;
-const TRIAL_MS = 7 * 24 * 60 * 60 * 1000;
+const PILOT_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_TURNS = 10;
 const MAX_AUDIO_BYTES = 350000;
 const LEVELS = new Set(["A1", "A2", "B1", "B2", "C1", "C2"]);
@@ -26,13 +23,11 @@ const GERMAN_OPENINGS = {
   C2: "Guten Tag! Über welche komplexe Fragestellung würdest du heute gern diskutieren?",
 };
 const enabled = () => process.env.LIVE_SPEAK_ENABLED === "true";
-const trialEnabled = () => process.env.LIVE_SPEAK_TRIAL_ENABLED === "true";
+const approvedTester = (uid) => Boolean(uid) && String(process.env.LIVE_SPEAK_TESTER_UIDS || "").split(",").map(x=>x.trim()).filter(Boolean).includes(uid);
 const spendingCap = () => {
   const configured = Number(process.env.LIVE_SPEAK_MONTHLY_TURN_CAP);
-  return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100000 ? configured : 800;
+  return Number.isSafeInteger(configured) && configured >= 1 && configured <= 500 ? configured : 40;
 };
-const isValidReference = (value) => /^[a-zA-Z0-9_.-]{5,120}$/.test(String(value || ""));
-const asMoney = (value) => Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 const cleanLevel = (value) => {
@@ -43,58 +38,12 @@ const error = (res, status, code, message) => res.status(status).json({ error: m
 const addDays = (milliseconds) => new Date(Date.now() + milliseconds).toISOString();
 const withinWindow = (sub) => Boolean(sub && Date.parse(sub.expiresAt || "") > Date.now());
 const receiptStatus = (sub) => ({
-  plan: withinWindow(sub) ? sub.plan || "" : "",
   remaining: withinWindow(sub) ? Math.max(0, Number(sub.remaining) || 0) : 0,
   expiresAt: withinWindow(sub) ? sub.expiresAt : null,
-  trialGranted: Boolean(sub?.trialGranted),
+  pilotClaimed: Boolean(sub?.pilotClaimed),
 });
 
-async function applyVerifiedPayment({ db, admin, reference, payment }) {
-  if (!isValidReference(reference)) return { handled: false };
-  const intentRef = db.collection("liveSpeakPaymentIntents").doc(reference);
-  const intentSnap = await intentRef.get();
-  if (!intentSnap.exists) return { handled: false };
-
-  const intent = intentSnap.data() || {};
-  const email = normalizeEmail(payment?.customer?.email);
-  const paidAmount = Number(payment?.amount);
-  const valid =
-    String(payment?.status || "").toLowerCase() === "success" &&
-    String(payment?.currency || "").toUpperCase() === "GHS" &&
-    Number.isSafeInteger(paidAmount) &&
-    paidAmount === Number(intent.checkoutPesewas) &&
-    Boolean(email) && email === normalizeEmail(intent.email) &&
-    String(payment?.reference || "") === reference;
-
-  if (!valid) return { handled: true, success: false, reason: "payment_mismatch" };
-  const subRef = db.collection("liveSpeakSubscriptions").doc(intent.uid);
-  let duplicate = false;
-  await db.runTransaction(async (tx) => {
-    const [latestIntent, oldSubscription] = await Promise.all([tx.get(intentRef), tx.get(subRef)]);
-    if (latestIntent.data()?.status === "paid") { duplicate = true; return; }
-    if (latestIntent.data()?.status !== "pending") throw new Error("Payment intent is not pending.");
-    const previous = oldSubscription.data() || {};
-    const now = new Date();
-    // If two independently paid checkouts complete, never discard the first package.
-    const carry = withinWindow(previous) ? Math.max(0, Number(previous.remaining) || 0) : 0;
-    const start = withinWindow(previous) ? Math.max(now.getTime(), Date.parse(previous.expiresAt)) : now.getTime();
-    tx.set(subRef, {
-      uid: intent.uid, plan: "basic", remaining: carry + BASIC_SESSIONS,
-      expiresAt: new Date(start + PERIOD_MS).toISOString(),
-      trialGranted: Boolean(previous.trialGranted),
-      purchased: true,
-      lastPaymentReference: reference,
-      lastPaymentAmountGhs: PRICE_GHS,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    }, { merge: true });
-    tx.update(intentRef, {
-      status: "paid", confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-  });
-  return { handled: true, success: true, duplicate };
-}
-
-function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail, calculateSharedPaystackFee }) {
+function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail }) {
   const db = () => admin.firestore();
   const requireStudent = async (req, res) => {
     const auth = await getAuthedUser(req);
@@ -110,6 +59,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     }
     return { auth, profile };
   };
+  const requireApprovedTester = (student, res) => {
+    if (approvedTester(student.auth.uid)) return true;
+    error(res, 403, "not_approved", "This pilot is currently available only to approved testers.");
+    return false;
+  };
   const requireEnabled = (res) => {
     if (enabled()) return true;
     error(res, 503, "pilot_disabled", "Live Speak is not enabled yet. Existing free speaking practice is still available.");
@@ -120,136 +74,59 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       const student = await requireStudent(req, res);
       if (!student) return;
-      const sub = await db().collection("liveSpeakSubscriptions").doc(student.auth.uid).get();
-      const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
-      const data = sub.data() || {};
+      const approved = approvedTester(student.auth.uid);
+      const pilot = approved
+        ? await db().collection("liveSpeakPilotCredits").doc(student.auth.uid).get()
+        : null;
+      const usage = approved ? await db().collection("liveSpeakUsage").doc(currentMonth()).get() : null;
+      const currentSession = approved
+        ? await db().collection("liveSpeakSessions").doc(student.auth.uid).get()
+        : null;
+      const running = currentSession?.data() || {};
+      const active = running.sessionId && !running.endedAt && Date.parse(running.expiresAt || "") > Date.now();
+      const info = receiptStatus(pilot?.data());
       return res.json({
-        enabled: enabled(), trialEnabled: trialEnabled(), priceGhs: PRICE_GHS,
-        sessionsPerPurchase: BASIC_SESSIONS, sessionMinutes: 5, recurring: false,
-        ...receiptStatus(data),
-        trialAvailable: enabled() && trialEnabled() && !data.trialGranted && !data.purchased,
-        capReached: (Number(usage.data()?.turns) || 0) >= spendingCap(),
+        enabled: enabled(), approved, pilotAvailable: approved && enabled() && !info.pilotClaimed,
+        sessionMinutes: 5, maxTurns: MAX_TURNS, ...info,
+        capReached: (Number(usage?.data()?.turns) || 0) >= spendingCap(),
+        activeSession: active && enabled() ? {
+          sessionId: running.sessionId, expiresAt: running.expiresAt, resumed: true,
+        } : null,
       });
     } catch (err) {
       console.error("Live Speak status error", err?.message);
-      return error(res, 503, "status_unavailable", "Could not check Live Speak access.");
+      return error(res, 503, "status_unavailable", "Could not check Live Speak pilot access.");
     }
   });
 
-  app.post("/live-speak/trial", async (req, res) => {
+  // A single short free allocation for explicitly allowlisted testers. No payments.
+  app.post("/live-speak/pilot/claim", async (req, res) => {
     try {
       if (!requireEnabled(res)) return;
-      if (!trialEnabled()) return error(res, 403, "trial_closed", "The Live Speak free trial is not available.");
       const student = await requireStudent(req, res);
-      if (!student) return;
-      const ref = db().collection("liveSpeakSubscriptions").doc(student.auth.uid);
+      if (!student || !requireApprovedTester(student, res)) return;
+      if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The voice service is not configured.");
+      const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
+      if ((Number(usage.data()?.turns) || 0) + PILOT_SESSIONS * MAX_TURNS > spendingCap()) {
+        return error(res, 429, "budget_reached", "The pilot usage limit has been reached.");
+      }
+      const ref = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
       let claimed = false;
       await db().runTransaction(async (tx) => {
         const snap = await tx.get(ref);
-        const current = snap.data() || {};
-        if (current.trialGranted || current.purchased) return;
+        if (snap.data()?.pilotClaimed) return;
         tx.set(ref, {
-          uid: student.auth.uid, plan: "trial", remaining: TRIAL_SESSIONS,
-          expiresAt: addDays(TRIAL_MS), trialGranted: true, purchased: false,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        }, { merge: true });
+          uid: student.auth.uid, remaining: PILOT_SESSIONS,
+          expiresAt: addDays(PILOT_MS), pilotClaimed: true,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
         claimed = true;
       });
-      if (!claimed) return error(res, 409, "already_claimed", "Your trial has already been claimed.");
-      return res.json({ ok: true, sessions: TRIAL_SESSIONS });
+      if (!claimed) return error(res, 409, "already_claimed", "Your pilot sessions were already claimed.");
+      return res.json({ ok: true, sessions: PILOT_SESSIONS });
     } catch (err) {
-      console.error("Live Speak trial error", err?.message);
-      return error(res, 503, "trial_unavailable", "Could not activate your trial.");
-    }
-  });
-
-  app.post("/live-speak/checkout", async (req, res) => {
-    try {
-      if (!requireEnabled(res)) return;
-      const student = await requireStudent(req, res);
-      if (!student) return;
-      const secret = process.env.PAYSTACK_SECRET;
-      if (!secret) return error(res, 503, "payment_unavailable", "Live Speak payments are not configured.");
-      if (!student.auth.email) return error(res, 400, "missing_email", "A verified student email is required.");
-      const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
-      if ((Number(usage.data()?.turns) || 0) + BASIC_SESSIONS * MAX_TURNS > spendingCap()) {
-        return error(res, 429, "budget_reached", "The speaking pilot has reached its current capacity. No payment has been taken.");
-      }
-      if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The natural German voice service is not configured.");
-      const subscription = await db().collection("liveSpeakSubscriptions").doc(student.auth.uid).get();
-      if (withinWindow(subscription.data()) && Number(subscription.data()?.remaining) > 0) {
-        return error(res, 409, "sessions_remaining", "Please use your remaining sessions before purchasing another package.");
-      }
-      const fee = calculateSharedPaystackFee(PRICE_GHS);
-      // Persist our reference before opening checkout: an immediate webhook cannot
-      // be mistaken for a tuition payment while the browser is redirecting.
-      const reference = "fsl_" + crypto.randomUUID().replace(/-/g, "");
-      await db().collection("liveSpeakPaymentIntents").doc(reference).create({
-        uid: student.auth.uid, email: normalizeEmail(student.auth.email),
-        status: "pending", product: "falowen_live_speak_basic",
-        checkoutPesewas: Math.round(fee.checkoutAmount * 100),
-        basePriceGhs: PRICE_GHS, studentFeeGhs: fee.studentFeeContribution,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      // Callback destination is fixed on the server, never accepted from browser input.
-      const callback = "https://www.falowen.app/campus/live-speak";
-      const pay = await fetch("https://api.paystack.co/transaction/initialize", {
-        method: "POST",
-        headers: { Authorization: "Bearer " + secret, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: normalizeEmail(student.auth.email), currency: "GHS",
-          amount: Math.round(fee.checkoutAmount * 100), callback_url: callback,
-          reference,
-          metadata: {
-            product: "falowen_live_speak_basic", studentUid: student.auth.uid,
-            sessions: BASIC_SESSIONS, planPriceGhs: PRICE_GHS,
-          },
-        }),
-        signal: AbortSignal.timeout(12000),
-      });
-      const response = await pay.json().catch(() => ({}));
-      const responseReference = String(response?.data?.reference || "");
-      const checkoutUrl = String(response?.data?.authorization_url || "");
-      if (!pay.ok || !response?.status || responseReference !== reference ||
-        !/^https:\/\/(checkout\.)?paystack\.com\//i.test(checkoutUrl)) {
-        return error(res, 502, "checkout_failed", "Could not create the Live Speak checkout.");
-      }
-      return res.json({
-        authorization_url: checkoutUrl, reference,
-        priceGhs: PRICE_GHS, feeGhs: fee.studentFeeContribution,
-        checkoutAmountGhs: fee.checkoutAmount,
-      });
-    } catch (err) {
-      console.error("Live Speak checkout error", err?.message);
-      return error(res, 503, "checkout_unavailable", "Live Speak checkout is temporarily unavailable.");
-    }
-  });
-
-  app.post("/live-speak/payment/verify", async (req, res) => {
-    try {
-      const student = await requireStudent(req, res);
-      if (!student) return;
-      const reference = String(req.body?.reference || "");
-      if (!isValidReference(reference)) return error(res, 400, "invalid_reference", "Invalid payment reference.");
-      const intent = await db().collection("liveSpeakPaymentIntents").doc(reference).get();
-      if (!intent.exists || intent.data()?.uid !== student.auth.uid) {
-        return error(res, 404, "not_found", "Payment reference does not belong to this account.");
-      }
-      const secret = process.env.PAYSTACK_SECRET;
-      if (!secret) return error(res, 503, "payment_unavailable", "Payment verification is unavailable.");
-      const check = await fetch("https://api.paystack.co/transaction/verify/" + encodeURIComponent(reference), {
-        headers: { Authorization: "Bearer " + secret },
-        signal: AbortSignal.timeout(12000),
-      });
-      const result = await check.json().catch(() => ({}));
-      if (!check.ok || !result?.status) return error(res, 503, "verification_failed", "Paystack verification is temporarily unavailable.");
-      if (result.data?.status !== "success") return res.json({ ok: false, pending: true });
-      const applied = await applyVerifiedPayment({ db: db(), admin, reference, payment: result.data });
-      if (!applied.success) return error(res, 409, "payment_mismatch", "Payment information did not match the checkout.");
-      return res.json({ ok: true, paid: true, duplicate: Boolean(applied.duplicate) });
-    } catch (err) {
-      console.error("Live Speak verify error", err?.message);
-      return error(res, 503, "verification_unavailable", "Could not verify this payment yet.");
+      console.error("Live Speak pilot access error", err?.message);
+      return error(res, 503, "pilot_unavailable", "Could not activate pilot sessions.");
     }
   });
 
@@ -257,10 +134,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
-      if (!student) return;
+      if (!student || !requireApprovedTester(student, res)) return;
       if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The natural German voice service is not configured.");
       const level = cleanLevel(req.body?.level);
-      const subRef = db().collection("liveSpeakSubscriptions").doc(student.auth.uid);
+      const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
       const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
       let result;
@@ -275,7 +152,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           return;
         }
         const sub = subSnap.data() || {};
-        if (!withinWindow(sub) || Number(sub.remaining) <= 0) throw Object.assign(new Error("No active speaking sessions. Purchase a package or use your trial."),{status:402,code:"no_sessions"});
+        if (!withinWindow(sub) || Number(sub.remaining) <= 0) throw Object.assign(new Error("No pilot sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
         const sessionId = crypto.randomUUID();
         const expiresAt = addDays(SESSION_MS);
         tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
@@ -293,7 +170,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   app.post("/live-speak/session/end", async (req, res) => {
     try {
       const student = await requireStudent(req, res);
-      if (!student) return;
+      if (!student || !requireApprovedTester(student, res)) return;
       const ref = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const snap = await ref.get();
       if (!snap.exists || snap.data()?.sessionId !== req.body?.sessionId) return error(res, 404, "session_missing", "Session not found.");
@@ -305,11 +182,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   });
 
   app.post("/live-speak/session/turn", async (req, res) => {
-    let sessionRef, globalRef, accepted = false, uid = "";
+    let sessionRef, accepted = false, uid = "";
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
-      if (!student) return;
+      if (!student || !requireApprovedTester(student, res)) return;
       uid = student.auth.uid;
       const sessionId = String(req.body?.sessionId || "");
       const intro = req.body?.intro === true;
@@ -324,7 +201,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const audioBytes = intro ? null : Buffer.from(payload, "base64");
       if (audioBytes && audioBytes.length > MAX_AUDIO_BYTES) return error(res, 413, "audio_too_large", "Recording is too large.");
       sessionRef = db().collection("liveSpeakSessions").doc(uid);
-      globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
+      const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
       let level = "A2";
       await db().runTransaction(async (tx) => {
         const [sessionSnap, usageSnap] = await Promise.all([tx.get(sessionRef), tx.get(globalRef)]);
@@ -394,14 +271,4 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   });
 }
 
-async function handleLiveSpeakWebhook({ db, admin, data }) {
-  // Only signed, already-validated Paystack webhooks reach this handler.
-  if (data?.metadata?.product !== "falowen_live_speak_basic") return {handled:false};
-  return applyVerifiedPayment({db,admin,reference:String(data.reference || ""),payment:data});
-}
-module.exports = {
-  registerLiveSpeakRoutes,
-  handleLiveSpeakWebhook,
-  applyVerifiedPayment,
-  PRICE_GHS, BASIC_SESSIONS, MAX_TURNS,
-};
+module.exports = { registerLiveSpeakRoutes, approvedTester, MAX_TURNS, PILOT_SESSIONS };

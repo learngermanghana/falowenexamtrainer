@@ -323,11 +323,6 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
-      <section style={{ ...styles.card, display: "grid", gap: 8, border: "1px solid #dbeafe" }}>
-        <strong style={{fontSize:17}}>Falowen Live Speak · Optional AI voice tutor</strong>
-        <p style={{margin:0,color:"#475569",lineHeight:1.5}}>Practise real spoken German with natural AI replies and short corrections after each turn. Your existing course speaking practice remains included.</p>
-        <div><button type="button" style={styles.secondaryButton} onClick={()=>navigate("/campus/live-speak")}>Explore Live Speak</button></div>
-      </section>
       <FirstLessonGuide />
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
