@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
 import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
@@ -360,6 +361,7 @@ export default function C1SelfLearningCourse() {
             {dayState.tab === "practice" ? (
               <section style={{ display: "grid", gap: 10 }}>
                 <h3 style={{ margin: 0 }}>2) Practice with Falowen AI</h3>
+                <LiveSpeakInlinePractice level="C1" topic={entry.speakingTask || entry.title} source="c1-workbook" />
                 <div style={{ display: "grid", gap: 8 }}>
                   {[
                     ["Sprechen", entry.speakingTask, "/campus/speech"],
