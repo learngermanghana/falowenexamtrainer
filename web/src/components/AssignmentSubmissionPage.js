@@ -2210,9 +2210,9 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
       setStatus({ loading: true, error: "", success: "" });
 
       try {
-        const draftSaved = await persistSubmission({ statusLabel: "draft" });
-        if (!draftSaved.ok) throw new Error("The latest draft could not be saved.");
-
+        // Autosave and local backup already preserve drafts. Never make a
+        // second draft write a prerequisite for the final timed submission:
+        // submit the current editor snapshot directly in one atomic batch.
         const saved = await persistSubmission({ statusLabel: "submitted" });
 
         if (!saved.ok && saved.reason === "locked") {
@@ -2243,7 +2243,8 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         timedAssignment.onSubmissionVerified?.();
       } catch (error) {
         console.error("Timed automatic submission failed", error);
-        const message = "Time is up, but automatic submission could not finish. Your saved draft is preserved; press Submit assignment to retry.";
+        const message = getSubmissionSaveError(error) +
+          " Time is up. Press Submit assignment to retry your saved work. If access is denied, contact your teacher.";
         setStatus({ loading: false, error: message, success: "" });
         timedAssignment.onSubmissionError?.(message);
       }
