@@ -28,20 +28,20 @@ afterEach(() => jest.restoreAllMocks());
 
 test("direct-link pilot is unavailable when explicitly disabled", async () => {
   render(<MemoryRouter><LiveSpeakPage /></MemoryRouter>);
-  expect(screen.getByRole("heading",{name:"Falowen Live Speak"})).toBeInTheDocument();
-  await waitFor(()=>expect(screen.getByText("Live Speak is in private testing")).toBeInTheDocument());
-  expect(screen.queryByRole("button",{name:/Activate|Start 5-minute|Buy/})).not.toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"German speaking practice"})).toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByText("Speaking practice is temporarily unavailable.")).toBeInTheDocument());
+  expect(screen.queryByRole("button",{name:/Start speaking|Buy|Pay/})).not.toBeInTheDocument();
   expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/live-speak/status"),
     expect.objectContaining({headers:expect.objectContaining({Authorization:"Bearer fake-test-token"})}));
 });
 
-test("approved pilot offers two free test sessions without a payment control", async () => {
+test("free speaking begins with one action and hides pilot counters", async () => {
   global.fetch.mockResolvedValue({
     ok:true, json:async()=>({enabled:true, remaining:0, pilotAvailable:true, maxTurns:10, capReached:false}),
   });
   render(<MemoryRouter><LiveSpeakPage /></MemoryRouter>);
-  await waitFor(()=>expect(screen.getByRole("button",{name:"Activate 2 free test sessions"})).toBeInTheDocument());
-  expect(screen.getByText(/There are no payments or subscriptions during this test/)).toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByRole("button",{name:"Start speaking"})).toBeInTheDocument());
+  expect(screen.queryByText(/session.*remaining|test access expires|free voice test|about this voice test/i)).not.toBeInTheDocument();
   expect(screen.queryByRole("button",{name:/Buy|Pay|Subscribe|Checkout/i})).not.toBeInTheDocument();
 });
 
@@ -97,10 +97,9 @@ test("the embedded banner and resumed conversation retain backend topic after sa
     <MemoryRouter><LiveSpeakPage embedded initialLevel="B1"
       practiceTopic="Nachhaltige Mobilität" practiceSource="exam-speaking-practice" /></MemoryRouter>,
   );
-  await waitFor(() => expect(screen.getByRole("button", {name:"Resume voice conversation"})).toBeInTheDocument());
-  const activeBanner = () => screen.getByText((_, el) =>
-    el?.tagName === "P" && el.textContent.includes("Level: B1 · Topic: Nachhaltige Mobilität"));
-  expect(activeBanner()).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByRole("button", {name:"Resume speaking"})).toBeInTheDocument());
+  const activeNotice = () => screen.getByText(/Current task: Nachhaltige Mobilität/);
+  expect(screen.queryByText(/Current task:/)).not.toBeInTheDocument();
   expect(screen.queryByText(/This voice conversation is still using/)).not.toBeInTheDocument();
 
   // Change a selected exam prompt without changing source or remounting the component.
@@ -108,19 +107,16 @@ test("the embedded banner and resumed conversation retain backend topic after sa
     <MemoryRouter><LiveSpeakPage embedded initialLevel="B1"
       practiceTopic="Im Restaurant" practiceSource="exam-speaking-practice" /></MemoryRouter>,
   );
-  expect(activeBanner()).toBeInTheDocument();
-  expect(screen.getByText(/This voice conversation is still using/)).toHaveTextContent("Nachhaltige Mobilität");
+  expect(activeNotice()).toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole("button", {name:"Resume voice conversation"}));
+  fireEvent.click(screen.getByRole("button", {name:"Resume speaking"}));
   await waitFor(() => expect(screen.getByText(/Your existing voice session is still using its original topic and level/)).toBeInTheDocument());
-  expect(activeBanner()).toBeInTheDocument();
-  expect(screen.getByRole("heading",{name:"German conversation · B1"})).toBeInTheDocument();
+  expect(screen.getByRole("heading",{name:"AI Examiner · B1"})).toBeInTheDocument();
 
   // Changing both lesson and level while active must never overwrite the saved context.
   rerender(
     <MemoryRouter><LiveSpeakPage embedded initialLevel="A2"
       practiceTopic="Mein Urlaub" practiceSource="exam-speaking-practice" /></MemoryRouter>,
   );
-  expect(activeBanner()).toBeInTheDocument();
-  expect(screen.getByText(/This voice conversation is still using/)).toHaveTextContent("Nachhaltige Mobilität");
+  expect(activeNotice()).toBeInTheDocument();
 });
