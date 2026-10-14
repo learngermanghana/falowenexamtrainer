@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import LiveSpeakInlinePractice from "./LiveSpeakInlinePractice";
+import SpeakingPracticeModePicker from "./SpeakingPracticeModePicker";
+import ExamLiveSpeakPanel from "./ExamLiveSpeakPanel";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -123,6 +124,10 @@ const SpeakingPage = ({
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
   const [activeSpeakingTab, setActiveSpeakingTab] = useState(isCourseMode ? "custom" : "exam");
+  const [speakingExperience, setSpeakingExperience] = useState("coach");
+  const showVoiceMode = isExamMode && typeof window !== "undefined" &&
+    /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname);
+  const liveConversationSelected = showVoiceMode && speakingExperience === "voice";
   const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
   const [selectedTeil, setSelectedTeil] = useState(initialSpeakingFilters.teil);
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
@@ -951,21 +956,35 @@ const SpeakingPage = ({
               {contextLabel || `Speaking Exams${selectedLevel ? ` • Level ${selectedLevel}` : ""}${normalizedLockedTeil ? ` • Teil ${normalizedLockedTeil}` : ""}`}
             </p>
           </div>
-          <button style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
-            Clear conversation
-          </button>
+          {!liveConversationSelected ? (
+            <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
+              Clear conversation
+            </button>
+          ) : null}
         </div>
 
-        {isExamMode && typeof window !== "undefined" && /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname) ? (
-          <div style={{padding:"12px 16px",background:"#f8fafc"}}>
-            <LiveSpeakInlinePractice
-              level={selectedLevel}
-              topic={selectedQuestion?.topicPrompt || selectedQuestion?.question || "Goethe speaking exam practice"}
-              source="exam-speaking-practice"
-            />
-          </div>
+        {showVoiceMode ? (
+          <SpeakingPracticeModePicker value={speakingExperience}
+            compact={isCompactViewport} disabled={isRecording}
+            onChange={setSpeakingExperience} />
         ) : null}
 
+        {liveConversationSelected ? (
+          <ExamLiveSpeakPanel
+            level={selectedLevel}
+            teil={selectedTeil}
+            onTeilChange={setSelectedTeil}
+            lockedTeil={normalizedLockedTeil}
+            selectedQuestionId={selectedQuestionId}
+            onQuestionChange={setSelectedQuestionId}
+            questions={filteredQuestions}
+            question={selectedQuestion}
+            formatQuestion={formatQuestionDisplay}
+            compact={isCompactViewport}
+          />
+        ) : null}
+
+        {!liveConversationSelected ? (
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
             <button
@@ -991,7 +1010,7 @@ const SpeakingPage = ({
           ) : null}
         </div>
 
-        {activeSpeakingTab === "custom" ? (
+        {!liveConversationSelected && activeSpeakingTab === "custom" ? (
           <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
             <aside
               style={{
@@ -1271,7 +1290,7 @@ const SpeakingPage = ({
           </div>
         ) : null}
 
-        <div style={{ display: !isCourseMode && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+        <div style={{ display: !isCourseMode && !liveConversationSelected && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
           <aside
             style={{
               borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
@@ -1501,6 +1520,7 @@ const SpeakingPage = ({
             </div>
           </section>
         </div>
+        ) : null}
       </div>
     </div>
   );
