@@ -121,6 +121,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
   useEffect(()=>{onActivityChange?.(Boolean(session) || recording || busy);},[onActivityChange,session,recording,busy]);
   useEffect(()=>()=>onActivityChange?.(false),[onActivityChange]);
+  useEffect(() => {
+    if (!examinerEntry || typeof document === "undefined") return undefined;
+    document.body.classList.toggle("falowen-speaking-session-active", Boolean(session) || recording);
+    return () => document.body.classList.remove("falowen-speaking-session-active");
+  }, [examinerEntry, session, recording]);
 
   useEffect(() => {
     if (!session) return undefined;
@@ -407,6 +412,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
 
   const timeRemaining = session ? Math.max(0, Date.parse(session.expiresAt) - now) : 0;
   const expired = Boolean(session) && timeRemaining <= 0;
+  const speakingLimit = Number(session?.maxRecordingSeconds || MAX_RECORDING_SECONDS);
+  const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
+  const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
   return (
     <Container data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
@@ -455,7 +463,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
             <div>
               <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
-                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start AI Examiner" : "Start speaking"}
+                {busy ? "Starting…" : details.activeSession ? "Resume exam" : examinerEntry ? "Start exam" : "Start speaking"}
               </button>
             </div>
           ) : (
@@ -469,13 +477,20 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       {session ? (
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
+
             <div>
               <h2 style={{margin:0,fontSize:20}}>{examinerSession ? "AI Examiner" : "Speaking practice"} · {displayContext.level}</h2>
+              {examinerSession && session.examFlow ? <small style={{color:"#475569",fontWeight:600}}>
+                Teil {session.examFlow.key?.split("-")[1]} · Step {Math.min(Number(session.answeredTurns || 0)+1,session.answerLimit || 1)} of {session.answerLimit || 2}
+              </small> : null}
               {hasChangedContext ? <p role="status" style={{margin:"5px 0",color:"#92400e",fontSize:13}}>
                 Current task: {displayContext.topic || "the previous topic"}. Finish it to change topics.
               </p> : null}
             </div>
-            <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
+            <div style={{display:"grid",justifyItems:"end",gap:2}}>
+              <small style={{color:"#64748b"}}>Session time left</small>
+              <strong style={{fontSize:22,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
+            </div>
           </header>
           {examinerSession ? <p role="status" style={{margin:0,fontSize:13}}>
             {taskReady ? "Answers saved. You’re ready for feedback." : session.examFlow ? "Follow the task card and the current speaker. Corrections come at the end." : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : `Answer the selected task (up to ${session.maxRecordingSeconds || 20} seconds). Corrections come after you finish.`}
@@ -490,43 +505,74 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {busy ? <p>{pending ? "Preparing the next examiner/tutor response…" : "Processing your German recording…"}</p> : null}
           </div>
           {lastAudio && voiceReady ? <button type="button" style={styles.secondaryButton} onClick={()=>playVoice(lastAudio)}>▶ Play AI voice again</button> : null}
-          {pending ? <div role="group" aria-label="Review German speech recognition"
-            style={{background:"#fff7ed",border:"1px solid #fdba74",padding:14,borderRadius:12,display:"grid",gap:10}}>
-            <strong>Did Falowen hear you correctly?</strong>
-            {pending.uncertain ? <p style={{margin:0,fontSize:13}}>Audio unclear—check the words or record again.</p> : null}
-            <label style={{display:"grid",gap:5}}>
-              <span>{simulation ? "Recognised speech" : "What I said (you can edit this)"}</span>
-              <textarea lang="de" rows={3} value={recognizedText} readOnly={simulation && !recognitionCorrection} maxLength={session.maxTranscriptChars || 600}
-                onChange={event=>setRecognizedText(event.target.value)}
-                style={{border:"1px solid #cbd5e1",borderRadius:10,padding:10,fontSize:16}}/>
-            </label>
-            {simulation ? <label><input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/> Correct a speech-recognition mistake only</label> : null}
-            {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}} /> : null}
-            <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-              <button type="button" style={styles.primaryButton}
-                disabled={busy || feedbackBusy || (expired && (!examinerSession || Date.now() > Date.parse(session.expiresAt)+300000)) || recognizedText.trim().length < 2}
-                onClick={confirmTranscript}>Confirm answer</button>
-              <button type="button" style={styles.secondaryButton}
-                disabled={busy} onClick={retryTranscript}>Record again</button>
+          {examinerSession ? (
+            <div style={{borderTop:"1px solid #e2e8f0",paddingTop:12,display:"grid",gap:9}} aria-label="Speaking answer controls">
+              <div style={{display:"flex",justifyContent:"space-between",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <strong style={{fontSize:13}}>Your spoken answer</strong>
+                <span role="timer" aria-label="Speaking time" style={{fontVariantNumeric:"tabular-nums",fontSize:13,color:recording && speakingLimit-recordingSeconds<=10?"#b91c1c":"#334155",fontWeight:700}}>
+                  {recording ? "Recording " : "Speaking time "}{recordingTimeLabel} / {speakingLimitLabel}
+                </span>
+              </div>
+              <div style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
+                <textarea lang="de" aria-label="Recognized German answer" rows={2}
+                  placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
+                  value={pending ? recognizedText : ""}
+                  readOnly={!pending || (simulation && !recognitionCorrection)}
+                  maxLength={session.maxTranscriptChars || 600}
+                  onChange={event=>setRecognizedText(event.target.value)}
+                  style={{minWidth:0,minHeight:60,flex:1,resize:"vertical",border:"1px solid #cbd5e1",borderRadius:12,padding:10,fontSize:16,background:pending?"#fff":"#f8fafc"}}/>
+                <button type="button" aria-label={recording ? "Stop and send recording" : "Record German answer"}
+                  title={recording ? "Stop and send recording" : "Record your German answer"}
+                  onClick={recording ? stopRecording : () => startRecording(false)}
+                  disabled={busy || feedbackBusy || expired || Boolean(pending) || taskReady || Boolean(session.feedbackStatus) || details?.capReached}
+                  style={{border:"none",borderRadius:14,width:56,minWidth:56,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:23,cursor:"pointer"}}>
+                    {recording ? "■" : "🎙"}
+                </button>
+                <button type="button" aria-label="Confirm spoken answer" title="Confirm spoken answer"
+                  onClick={confirmTranscript}
+                  disabled={!pending || busy || feedbackBusy || recognizedText.trim().length<2 || (expired && (!examinerSession || Date.now()>Date.parse(session.expiresAt)+300000))}
+                  style={{border:"none",borderRadius:12,minWidth:44,padding:"0 10px",background:pending?"#2563eb":"#cbd5e1",color:pending?"#fff":"#475569",fontWeight:800,fontSize:20,cursor:pending?"pointer":"not-allowed"}}>
+                  ➤
+                </button>
+              </div>
+              {pending ? (
+                <div role="group" aria-label="Review German speech recognition" style={{display:"grid",gap:8}}>
+                  <p style={{margin:0,color:"#92400e",fontSize:13}}>Did Falowen hear you correctly? Review the words, then use the blue send arrow to confirm.</p>
+                  {pending.uncertain ? <small>Audio unclear. Review the words or record again.</small> : null}
+                  {simulation ? <label style={{fontSize:13}}>
+                    <input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/>
+                    Correct a speech-recognition mistake only
+                  </label> : null}
+                  {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}}/> : null}
+                  <button type="button" onClick={retryTranscript} disabled={busy} style={{...styles.secondaryButton,justifySelf:"start"}}>Record again</button>
+                </div>
+              ) : <small style={{color:"#64748b"}}>Tap the red microphone to answer. Recording stops automatically at the time limit. Feedback comes after the task.</small>}
+              {expired ? <p role="status">Your session time has ended. Your answers remain visible. Finish the task to review feedback.</p> : null}
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
+                  disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
+                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "View feedback" : "Finish early & review"}
+                </button>
+                <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>End without feedback</button>
+              </div>
             </div>
-          </div> : null}
-          {expired ? <p role="status">Your speaking session has ended. Your answers remain visible; finish the task to request feedback.</p> : null}
-          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            <button type="button" style={styles.primaryButton}
-              onClick={recording?stopRecording:()=>startRecording(false)}
-              disabled={busy || feedbackBusy || expired || Boolean(pending) || taskReady || Boolean(session.feedbackStatus) || details?.capReached}>
-              {recording ? "■ Stop & send (" + recordingSeconds + "s)" : "🎤 Speak German"}
-            </button>
-            {examinerSession ? (
-              <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
-                disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                {feedbackBusy ? "Preparing feedback…" : session.examFlow && !taskReady && !expired ? "Finish early & review" : "Finish task & see feedback"}
-              </button>
-            ) : null}
-            <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>
-              {examinerSession ? "End without feedback" : "End session"}
-            </button>
-          </div>
+          ) : (
+            <>
+              {pending ? <div role="group" aria-label="Review German speech recognition">
+                <label>What I said (you can edit this)
+                  <textarea lang="de" rows={3} value={recognizedText} maxLength={session.maxTranscriptChars||600} onChange={e=>setRecognizedText(e.target.value)}/>
+                </label>
+                <button type="button" onClick={confirmTranscript} disabled={busy || recognizedText.trim().length<2}>Confirm answer</button>
+                <button type="button" onClick={retryTranscript} disabled={busy}>Record again</button>
+              </div> : null}
+              {expired ? <p role="status">Your session has ended.</p> : null}
+              <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+                <button type="button" style={styles.primaryButton} onClick={recording?stopRecording:()=>startRecording(false)}
+                  disabled={busy || expired || Boolean(pending) || taskReady || details?.capReached}>{recording?"■ Stop & send":"🎤 Speak German"}</button>
+                <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording}>End session</button>
+              </div>
+            </>
+          )}
 
         </section>
       ) : null}
