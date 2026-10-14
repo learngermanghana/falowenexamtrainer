@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import SpeakingPracticeModePicker from "./SpeakingPracticeModePicker";
-import ExamLiveSpeakPanel from "./ExamLiveSpeakPanel";
+import LiveSpeakPage from "./LiveSpeakPage";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -124,11 +123,11 @@ const SpeakingPage = ({
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
   const [activeSpeakingTab, setActiveSpeakingTab] = useState(isCourseMode ? "custom" : "exam");
-  const [speakingExperience, setSpeakingExperience] = useState("coach");
-  const [liveExaminerActive,setLiveExaminerActive]=useState(false);
+  // One original speaking coach, with optional spoken examiner inside it.
+  const [showLiveExaminer, setShowLiveExaminer] = useState(false);
+  const [liveExaminerActive, setLiveExaminerActive] = useState(false);
   const showVoiceMode = isExamMode && typeof window !== "undefined" &&
     /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname);
-  const liveConversationSelected = showVoiceMode && speakingExperience === "voice";
   const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
   const [selectedTeil, setSelectedTeil] = useState(initialSpeakingFilters.teil);
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
@@ -957,37 +956,11 @@ const SpeakingPage = ({
               {contextLabel || `Speaking Exams${selectedLevel ? ` • Level ${selectedLevel}` : ""}${normalizedLockedTeil ? ` • Teil ${normalizedLockedTeil}` : ""}`}
             </p>
           </div>
-          {!liveConversationSelected ? (
-            <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
-              Clear conversation
-            </button>
-          ) : null}
+          <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
+            Clear conversation
+          </button>
         </div>
 
-        {showVoiceMode ? (
-          <SpeakingPracticeModePicker value={speakingExperience}
-            compact={isCompactViewport} disabled={isRecording || liveExaminerActive}
-            onChange={setSpeakingExperience} />
-        ) : null}
-
-        {liveConversationSelected ? (
-          <ExamLiveSpeakPanel
-            level={selectedLevel}
-            teil={selectedTeil}
-            onTeilChange={setSelectedTeil}
-            lockedTeil={normalizedLockedTeil}
-            selectedQuestionId={selectedQuestionId}
-            onQuestionChange={setSelectedQuestionId}
-            questions={filteredQuestions}
-            question={selectedQuestion}
-            formatQuestion={formatQuestionDisplay}
-            onActivityChange={setLiveExaminerActive}
-            compact={isCompactViewport}
-          />
-        ) : null}
-
-        {!liveConversationSelected ? (
-        <>
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
             <button
@@ -1013,7 +986,7 @@ const SpeakingPage = ({
           ) : null}
         </div>
 
-        {!liveConversationSelected && activeSpeakingTab === "custom" ? (
+        {activeSpeakingTab === "custom" ? (
           <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
             <aside
               style={{
@@ -1293,7 +1266,7 @@ const SpeakingPage = ({
           </div>
         ) : null}
 
-        <div style={{ display: !isCourseMode && !liveConversationSelected && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+        <div style={{ display: !isCourseMode && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
           <aside
             style={{
               borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
@@ -1335,7 +1308,7 @@ const SpeakingPage = ({
               {normalizedLockedTeil ? (
                 <div style={{ ...styles.input, background: "#EEF2FF", fontWeight: 700 }}>Teil {normalizedLockedTeil}</div>
               ) : (
-                <select style={styles.select} value={selectedTeil} onChange={(event) => setSelectedTeil(event.target.value)}>
+                <select style={styles.select} value={selectedTeil} disabled={liveExaminerActive} onChange={(event) => setSelectedTeil(event.target.value)}>
                   <option value="all">All</option>
                   <option value="1">Teil 1</option>
                   <option value="2">Teil 2</option>
@@ -1346,7 +1319,7 @@ const SpeakingPage = ({
 
             <div style={{ display: "grid", gap: 6 }}>
               <label style={styles.label}>Question</label>
-              <select style={styles.select} value={selectedQuestionId} onChange={(event) => setSelectedQuestionId(event.target.value)}>
+              <select style={styles.select} value={selectedQuestionId} disabled={liveExaminerActive} onChange={(event) => setSelectedQuestionId(event.target.value)}>
                 {filteredQuestions.map((question) => (
                   <option key={question.id} value={question.id}>
                     {formatQuestionDisplay(question)}
@@ -1358,11 +1331,19 @@ const SpeakingPage = ({
             <button
               style={styles.primaryButton}
               onClick={isRecording && recordingMode === "exam" ? stopRecording : () => startRecording("exam")}
-              disabled={!selectedQuestion || (isRecording && recordingMode !== "exam")}
+              disabled={!selectedQuestion || liveExaminerActive || (isRecording && recordingMode !== "exam")}
             >
               {isRecording && recordingMode === "exam" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
             </button>
             {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+            {showVoiceMode ? (
+              <button type="button" aria-expanded={showLiveExaminer} aria-controls="speaking-live-examiner"
+                style={{ ...styles.secondaryButton, borderColor: "#93c5fd", background: showLiveExaminer ? "#dbeafe" : "#eff6ff", fontWeight: 700 }}
+                onClick={() => setShowLiveExaminer((current) => !current)}
+                disabled={isRecording || liveExaminerActive}>
+                {showLiveExaminer ? "Hide live examiner" : "🔊 Talk with the live examiner"}
+              </button>
+            ) : null}
             <p style={{ ...styles.helperText, margin: 0 }}>
               Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds. Maximum {formatTime(recordingMaxSeconds)}; recording stops automatically.
             </p>
@@ -1383,9 +1364,29 @@ const SpeakingPage = ({
             </div>
           </aside>
 
-          <section style={{ background: "#E5E7EB", minHeight: isCompactViewport ? 480 : 580, display: "grid", gridTemplateRows: "1fr auto" }}>
-            <div style={{ padding: 16, overflowY: "auto", display: "grid", gap: 12 }}>
-              {chatMessages.map((message) => {
+          <section style={{ background: "#E5E7EB", minHeight: isCompactViewport ? 480 : 580, display: "grid", gridTemplateRows: "1fr auto", minWidth: 0 }}>
+            <div style={{ padding: isCompactViewport ? 10 : 16, overflowY: "auto", display: "grid", gap: 12, minWidth: 0 }}>
+              {showVoiceMode && showLiveExaminer && selectedQuestion ? (
+                <section id="speaking-live-examiner" aria-label="Live Goethe examiner"
+                  style={{ background: "#fff", border: "1px solid #bfdbfe", borderRadius: 14, padding: isCompactViewport ? 10 : 14, minWidth: 0 }}>
+                  <h2 style={{ margin: "0 0 5px", fontSize: 18 }}>Live Goethe examiner</h2>
+                  <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
+                    Choose Teil and Question using the original controls. The examiner speaks, listens and gives feedback when you finish.
+                  </p>
+                  <LiveSpeakPage embedded initialLevel={selectedLevel}
+                    practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
+                    practiceSource="exam-speaking-practice"
+                    examTask={{
+                      id: selectedQuestion.id,
+                      teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+                      prompt: selectedQuestion.topicPrompt || selectedQuestion.text || "",
+                      keywords: selectedQuestion.keywordSubtopic || "",
+                      hint: selectedQuestion.hint || "",
+                    }}
+                    examMode="guided" onActivityChange={setLiveExaminerActive} />
+                </section>
+              ) : null}
+              {!showLiveExaminer ? chatMessages.map((message) => {
                 const isStudent = message.role === "student";
                 return (
                   <div
@@ -1470,7 +1471,7 @@ const SpeakingPage = ({
                 );
               })}
 
-              {chatLoading ? (
+              {!showLiveExaminer && chatLoading ? (
                 <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                   <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#C7D2FE", display: "grid", placeItems: "center" }}>
                     🤖
@@ -1489,6 +1490,9 @@ const SpeakingPage = ({
                   {formatQuestionDisplay(selectedQuestion)}
                 </p>
               ) : null}
+              {showLiveExaminer ? <p style={{ margin: 0, fontSize: 12, color: "#1e40af" }}>
+                Use the microphone in the live examiner above. Hide it to return to your original text coach.
+              </p> : null}
 
               {lastRubric ? (
                 <p style={{ margin: 0, fontSize: 12, color: "#1E3A8A" }}>
@@ -1510,12 +1514,12 @@ const SpeakingPage = ({
                       sendMessage();
                     }
                   }}
-                  disabled={chatLoading}
+                  disabled={chatLoading || showLiveExaminer}
                 />
                 <button
                   style={{ ...styles.primaryButton, borderRadius: 12, minWidth: isCompactViewport ? "100%" : 88 }}
                   onClick={sendMessage}
-                  disabled={chatLoading || !selectedQuestion}
+                  disabled={chatLoading || showLiveExaminer || !selectedQuestion}
                 >
                   Send
                 </button>
@@ -1523,8 +1527,6 @@ const SpeakingPage = ({
             </div>
           </section>
         </div>
-        </>
-        ) : null}
       </div>
     </div>
   );
