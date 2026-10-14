@@ -4,6 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { backendUrl } from "../services/aiClient";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
+import GoetheExamSpeakingStage from "./GoetheExamSpeakingStage";
+import GoetheExamSpeakingResults from "./GoetheExamSpeakingResults";
 
 const MAX_RECORDING_SECONDS = 20;
 const MAX_AUDIO_BYTES = 350000;
@@ -31,6 +33,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [now, setNow] = useState(Date.now());
   const [messages, setMessages] = useState([]);
   const [examFeedback, setExamFeedback] = useState("");
+  const [examReport, setExamReport] = useState(null);
+  const [finishedExamContext, setFinishedExamContext] = useState(null);
+  const [audioPlaying, setAudioPlaying] = useState(false);
   const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [pending, setPending] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
@@ -60,6 +65,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const hasChangedContext = isDifferentLiveSpeakSessionContext(savedSession, requestedContext);
   const examinerSession = session?.source === "exam-speaking-practice";
   const recordedAnswers = messages.filter(item => item.role === "user").map(item => item.text).filter(Boolean);
+  const examStageProgress = session?.examProgress || {
+    answered:recordedAnswers.length, maxAnswers:safeLevel==="A1"||safeLevel==="A2"?3:4,
+    complete:recordedAnswers.length>=(safeLevel==="A1"||safeLevel==="A2"?3:4),
+  };
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -111,14 +120,17 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     voiceRef.current?.pause();
     voiceRef.current = null;
     setVoiceReady(false);
+    setAudioPlaying(false);
   };
 
   const playVoice = async (base64) => {
     stopAudio();
     const audio = new Audio("data:audio/mpeg;base64," + base64);
     voiceRef.current = audio;
+    audio.onended = () => { if (voiceRef.current === audio) setAudioPlaying(false); };
+    audio.onpause = () => { if (voiceRef.current === audio) setAudioPlaying(false); };
     setVoiceReady(true);
-    try { await audio.play(); } catch (_err) {
+    try { await audio.play(); setAudioPlaying(!audio.paused); } catch (_err) {
       setNotice("Your device blocked automatic playback. Tap Play AI voice to hear the reply.");
     }
   };
@@ -174,6 +186,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",text:result.reply}]);
+      if (result.examProgress) setSession(previous => previous?.sessionId === session.sessionId
+        ? {...previous, examProgress:result.examProgress} : previous);
       setPending(null);
       setRecognizedText("");
       setLastAudio(result.audioBase64);
@@ -214,6 +228,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null});
       setSession(result);
       setExamFeedback("");
+      setExamReport(null);
+      setFinishedExamContext(null);
       setPending(null);
       clearRecording();
       if (!result.resumed) {
@@ -261,8 +277,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (!mounted.current) return;
       stopAudio();
       setExamFeedback(result.feedback);
+      setExamReport(result.report || null);
+      setFinishedExamContext({level:session.level || safeLevel,topic:session.topic || practiceTopic});
       setSession(null);
-      setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
+      setNotice("");
       await refresh();
     } catch (err) {
       if (mounted.current) setErrorMessage(err.message);
@@ -349,7 +367,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
 
-      {details?.enabled && !session ? (
+      {details?.enabled && !session && !(examinerEntry && examFeedback) ? (
         <div style={{display:"grid",gap:9,minWidth:0}}>
           {hasChangedContext ? (
             <p role="status" style={{margin:0,padding:"9px 11px",border:"1px solid #fbbf24",borderRadius:9,background:"#fffbeb",color:"#92400e",fontSize:13}}>
@@ -380,7 +398,21 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </div>
       ) : null}
 
-      {session ? (
+      {session && examinerSession ? (
+        <GoetheExamSpeakingStage
+          session={session} level={displayContext.level} topic={displayContext.topic}
+          messages={messages} progress={examStageProgress} time={friendlyTime(timeRemaining)}
+          contextChanged={hasChangedContext}
+          recording={recording} recordingSeconds={recordingSeconds} busy={busy}
+          audioPlaying={audioPlaying} expired={expired} feedbackBusy={feedbackBusy}
+          lastAudio={lastAudio} onReplay={()=>playVoice(lastAudio)}
+          pending={pending} recognizedText={recognizedText} onTextChange={setRecognizedText}
+          uncertain={Boolean(pending?.uncertain)} studentAudioUrl={studentAudioUrl}
+          onConfirm={confirmTranscript} onRetry={retryTranscript}
+          onRecord={startRecording} onStopRecording={stopRecording}
+          onFinish={finishExamTask} onEnd={endSession} errorMessage={errorMessage}
+        />
+      ) : session ? (
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
@@ -442,15 +474,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       ) : null}
 
       {examFeedback ? (
-        <section aria-label="Speaking exam practice feedback"
-          style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
-          <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
-          <p style={{margin:0,whiteSpace:"pre-wrap",lineHeight:1.65,fontSize:14}}>{examFeedback}</p>
-          <small style={{color:"#64748b"}}>This is practice feedback from reviewed transcripts, not an official Goethe result. Pronunciation cannot be scored from these transcripts.</small>
-        </section>
+        <GoetheExamSpeakingResults report={examReport} feedback={examFeedback}
+          level={finishedExamContext?.level || safeLevel}
+          task={finishedExamContext?.topic || practiceTopic}
+          onNewTask={()=>{
+            setExamFeedback("");
+            setExamReport(null);
+            setFinishedExamContext(null);
+            setMessages([]);
+            setLastAudio("");
+          }} />
       ) : null}
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
-      {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
+      {!examinerSession && errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
 
     </Container>
   );
