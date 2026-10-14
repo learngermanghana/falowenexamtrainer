@@ -961,6 +961,7 @@ const SpeakingPage = ({
           </button>
         </div>
 
+        {!isExamMode ? (
         <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
           {visibleSpeakingTabs.map((tab) => (
             <button
@@ -985,6 +986,7 @@ const SpeakingPage = ({
             </a>
           ) : null}
         </div>
+        ) : null}
 
         {activeSpeakingTab === "custom" ? (
           <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
