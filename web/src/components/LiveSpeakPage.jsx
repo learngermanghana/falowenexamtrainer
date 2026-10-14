@@ -207,7 +207,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setNow(Date.now());
       setBusy(false);
       if (!result.resumed) await sendTurn(result, {intro:true});
-      else setNotice("Your ongoing speaking session has resumed. Continue speaking German.");
+      else setNotice(
+        result.source && practiceSource && result.source !== practiceSource
+          ? "Your existing voice session was started elsewhere. It keeps its original topic and level until you end it."
+          : "Your ongoing speaking session has resumed. Continue speaking German."
+      );
       refresh();
     } catch (err) {
       setErrorMessage(err.message);
@@ -370,7 +374,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0}}>German conversation · {safeLevel}</h2>
+              <h2 style={{margin:0}}>German conversation · {session.level || safeLevel}</h2>
               <p style={{margin:"5px 0",color:"#475569"}}>The tutor will speak first, then listen to each response.</p>
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
