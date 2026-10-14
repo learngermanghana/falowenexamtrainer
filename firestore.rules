@@ -124,7 +124,9 @@ service cloud.firestore {
       // Existing attempts continue to require owner checks below.
       allow get: if signedIn()
         && resource == null
-        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+
+        && attemptId.matches('^timed__' + request.auth.uid.lower() + '__[a-z0-9._-]+$');
+
+      allow create: if ownsStudentIncoming()
         && request.resource.data.status == 'active'
         && request.resource.data.startedAt == request.time
         && request.resource.data.durationSeconds is int
