@@ -75,9 +75,12 @@ async function applyVerifiedPayment({ db, admin, reference, payment }) {
     if (latestIntent.data()?.status !== "pending") throw new Error("Payment intent is not pending.");
     const previous = oldSubscription.data() || {};
     const now = new Date();
+    // If two independently paid checkouts complete, never discard the first package.
+    const carry = withinWindow(previous) ? Math.max(0, Number(previous.remaining) || 0) : 0;
+    const start = withinWindow(previous) ? Math.max(now.getTime(), Date.parse(previous.expiresAt)) : now.getTime();
     tx.set(subRef, {
-      uid: intent.uid, plan: "basic", remaining: BASIC_SESSIONS,
-      expiresAt: new Date(now.getTime() + PERIOD_MS).toISOString(),
+      uid: intent.uid, plan: "basic", remaining: carry + BASIC_SESSIONS,
+      expiresAt: new Date(start + PERIOD_MS).toISOString(),
       trialGranted: Boolean(previous.trialGranted),
       purchased: true,
       lastPaymentReference: reference,
@@ -168,6 +171,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const secret = process.env.PAYSTACK_SECRET;
       if (!secret) return error(res, 503, "payment_unavailable", "Live Speak payments are not configured.");
       if (!student.auth.email) return error(res, 400, "missing_email", "A verified student email is required.");
+      const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
+      if ((Number(usage.data()?.turns) || 0) + BASIC_SESSIONS * MAX_TURNS > spendingCap()) {
+        return error(res, 429, "budget_reached", "The speaking pilot has reached its current capacity. No payment has been taken.");
+      }
       const subscription = await db().collection("liveSpeakSubscriptions").doc(student.auth.uid).get();
       if (withinWindow(subscription.data()) && Number(subscription.data()?.remaining) > 0) {
         return error(res, 409, "sessions_remaining", "Please use your remaining sessions before purchasing another package.");
