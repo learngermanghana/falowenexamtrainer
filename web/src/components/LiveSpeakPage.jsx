@@ -207,6 +207,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setBusy(true);
     setErrorMessage("");
     try {
+      // One-click practice. The server still verifies credits and global cost caps.
+      if (details?.pilotAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
+        await api("/live-speak/pilot/claim", "POST", {});
+      }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null});
       setSession(result);
       setExamFeedback("");
@@ -325,21 +329,6 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   };
   const stopRecording = () => { if (recorderRef.current?.state === "recording") recorderRef.current.stop(); };
 
-  const claimPilot = async () => {
-    if (busy || requestBusy.current) return;
-    setBusy(true);
-    setErrorMessage("");
-    try {
-      await api("/live-speak/pilot/claim", "POST", {});
-      setNotice("Two free five-minute speaking sessions have been added for testing.");
-      await refresh();
-    } catch (err) {
-      setErrorMessage(err.message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
   const timeRemaining = session ? Math.max(0, Date.parse(session.expiresAt) - now) : 0;
   const expired = Boolean(session) && timeRemaining <= 0;
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
@@ -350,74 +339,55 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         : { ...styles.container, maxWidth:940, paddingBottom:65, display:"grid", gap:16 }}>
       {!embedded ? <Link to="/" style={{ color:"#1d4ed8", fontWeight:700, textDecoration:"none" }}>← Back to Falowen</Link> : null}
       {!embedded ? (
-        <section style={{ ...shell, background:"linear-gradient(135deg,#132f67,#145b8f)",color:"#fff" }}>
-          <p style={{ margin:0, letterSpacing:1, textTransform:"uppercase",fontSize:12 }}>German voice pilot · No payments</p>
-          <h1 style={{ margin:"8px 0",color:"#fff",fontSize:"clamp(27px,6vw,39px)" }}>Falowen Live Speak</h1>
-          <p style={{ margin:0,color:"#e0efff",lineHeight:1.6 }}>Speak German with a natural AI voice, hear a gentle correction after your turn, and keep the conversation going. Five-minute sessions. No continuous listening.</p>
-        </section>
+        <header style={{...shell,background:"linear-gradient(135deg,#132f67,#145b8f)",color:"#fff"}}>
+          <h1 style={{margin:0,color:"#fff",fontSize:27}}>German speaking practice</h1>
+        </header>
       ) : null}
 
-      {loading ? <section style={shell}>Checking your speaking allowance…</section> : null}
+      {loading ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Preparing speaking practice…</p> : null}
       {!loading && details && !details.enabled ? (
-        <section style={{ ...shell, background:"#f8fafc" }}>
-          <h2 style={{ margin:0 }}>Live Speak is in private testing</h2>
-          <p>The voice pilot is currently paused. Existing speaking practice remains available.</p>
-          <Link to="/campus/speaking" style={styles.secondaryButton}>Use existing speaking practice</Link>
-        </section>
+        <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
 
-      {details?.enabled ? (
-        <section style={{...shell, display:"grid",gap:10}}>
-          <h2 style={{margin:0,fontSize:embedded?18:23}}>{embedded ? "Your voice session" : "Your free voice test"}</h2>
-          <p style={{margin:0,color:"#334155"}}>
-            {examinerEntry ? "Practise your selected Goethe task with a spoken AI examiner. Feedback comes at the end, not during your answers." :
-              embedded ? "Practise your current speaking lesson with a natural German AI voice." :
-              <>Try <strong>two free 5-minute spoken conversations</strong> with a natural German AI voice.</>}
-            {" "}There are no payments or subscriptions during this test.
-          </p>
-          {embedded ? <p style={{margin:0,color:"#475569",fontSize:13}}>
-            <strong>Level:</strong> {displayContext.level}{displayContext.topic ? ` · Topic: ${displayContext.topic}` : ""}
-          </p> : null}
-          {embedded && hasChangedContext ? (
-            <p role="status" style={{margin:0,padding:"9px 11px",border:"1px solid #fbbf24",borderRadius:10,background:"#fffbeb",color:"#92400e",fontSize:13}}>
-              This voice conversation is still using {displayContext.topic ? `“${displayContext.topic}”` : "its original topic"} at {displayContext.level}.
-              End the active session to start the newly selected speaking topic or level.
+      {details?.enabled && !session ? (
+        <div style={{display:"grid",gap:9,minWidth:0}}>
+          {hasChangedContext ? (
+            <p role="status" style={{margin:0,padding:"9px 11px",border:"1px solid #fbbf24",borderRadius:9,background:"#fffbeb",color:"#92400e",fontSize:13}}>
+              Current task: {displayContext.topic || "the previous topic"} ({displayContext.level}).
+              Finish this session to change topics.
             </p>
           ) : null}
-          <p style={{margin:0}}><strong>{details.remaining || 0}</strong> sessions remaining · up to {details.maxTurns || 10} speaking turns per session</p>
-          {!session && !fixedLevel ? <label style={{display:"grid",gap:5,maxWidth:245}}>
-            <strong>German conversation level</strong>
+          {!fixedLevel ? <label style={{display:"grid",gap:5,maxWidth:215,fontSize:13,color:"#334155"}}>
+            Level
             <select value={safeLevel} onChange={e=>setSelectedLevel(e.target.value)}
               style={{padding:"10px 12px",border:"1px solid #cbd5e1",borderRadius:10,background:"#fff"}}>
               {["A1","A2","B1","B2","C1","C2"].map(option=><option key={option} value={option}>{option}</option>)}
             </select>
           </label> : null}
-          {details.expiresAt ? <p style={{margin:0,color:"#475569",fontSize:13}}>Test access expires {new Date(details.expiresAt).toLocaleDateString()}.</p> : null}
-          {details.capReached ? <p role="alert">The pilot's monthly AI-usage limit has been reached. Testing is temporarily paused.</p> : null}
-          {!session && details.pilotAvailable ? (
-            <div><button type="button" style={styles.primaryButton} onClick={claimPilot} disabled={busy || details.capReached}>
-              {busy ? "Please wait..." : "Activate 2 free test sessions"}
-            </button></div>
-          ) : null}
-          {!session && sessionsAvailable ? (
-            <div><button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
-              {busy ? "Starting..." : details.activeSession ? (examinerEntry ? "Resume speaking task" : "Resume voice conversation") : examinerEntry ? "Start speaking exam simulation" : "Start 5-minute conversation"}
-            </button></div>
-          ) : null}
-          {!session && !sessionsAvailable && details.pilotClaimed && !details.capReached ? (
-            <p role="status" style={{margin:0}}>You've used your available test sessions. Thanks for helping us check the German speaking experience.</p>
-          ) : null}
-        </section>
+          {details.capReached ? (
+            <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Speaking practice is temporarily unavailable.</p>
+          ) : (sessionsAvailable || details.pilotAvailable) ? (
+            <div>
+              <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy}>
+                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start AI Examiner" : "Start speaking"}
+              </button>
+            </div>
+          ) : (
+            <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>
+              Speaking practice is currently unavailable for this account.
+            </p>
+          )}
+        </div>
       ) : null}
 
       {session ? (
         <section style={{ ...shell, display:"grid", gap:14 }}>
           <header style={{display:"flex",gap:12,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}>
             <div>
-              <h2 style={{margin:0}}>{examinerSession ? "Goethe AI Examiner" : "German conversation"} · {displayContext.level}</h2>
-              <p style={{margin:"5px 0",color:"#475569"}}>{examinerSession
-                ? "The examiner asks questions without correcting you. Finish the task to receive practice feedback."
-                : "The tutor will speak first, then listen to each response."}</p>
+              <h2 style={{margin:0,fontSize:20}}>{examinerSession ? "AI Examiner" : "Speaking practice"} · {displayContext.level}</h2>
+              {hasChangedContext ? <p role="status" style={{margin:"5px 0",color:"#92400e",fontSize:13}}>
+                Current task: {displayContext.topic || "the previous topic"}. Finish it to change topics.
+              </p> : null}
             </div>
             <strong style={{fontSize:24,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
           </header>
@@ -434,10 +404,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           {pending ? <div role="group" aria-label="Review German speech recognition"
             style={{background:"#fff7ed",border:"1px solid #fdba74",padding:14,borderRadius:12,display:"grid",gap:10}}>
             <strong>Did Falowen hear you correctly?</strong>
-            <p style={{margin:0,fontSize:13}}>
-              {pending.uncertain ? "Recognition confidence is low. Listen to the recording and correct the text, or try again." :
-                "Please check the German words below. If a word is wrong, correct it before the tutor speaks."}
-            </p>
+            {pending.uncertain ? <p style={{margin:0,fontSize:13}}>Audio unclear—check the words or record again.</p> : null}
             <label style={{display:"grid",gap:5}}>
               <span>What I said (you can edit this)</span>
               <textarea lang="de" rows={3} value={recognizedText} maxLength={600}
@@ -448,7 +415,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
               <button type="button" style={styles.primaryButton}
                 disabled={busy || expired || recognizedText.trim().length < 2}
-                onClick={confirmTranscript}>Use this German answer</button>
+                onClick={confirmTranscript}>Confirm answer</button>
               <button type="button" style={styles.secondaryButton}
                 disabled={busy} onClick={retryTranscript}>Record again</button>
             </div>
@@ -470,7 +437,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {examinerSession ? "End without feedback" : "End session"}
             </button>
           </div>
-          <small style={{color:"#475569"}}>Speak for 2–20 seconds. Review or correct what the microphone recognized before the tutor responds. Audio is temporary and is not saved to student results.</small>
+
         </section>
       ) : null}
 
@@ -484,13 +451,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       ) : null}
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
-      {!embedded ? (
-        <section style={shell}>
-          <h2 style={{marginTop:0}}>About this voice test</h2>
-          <p>This pilot tests natural German AI voice, speech recognition and short corrections. Your existing course and speaking tools remain unchanged. This does not provide a phonetic pronunciation score.</p>
-          <p style={{marginBottom:0,color:"#475569",fontSize:13}}>AI-generated voice can make mistakes. No checkout or payment is required. Server-side usage limits apply.</p>
-        </section>
-      ) : null}
+
     </Container>
   );
 }
