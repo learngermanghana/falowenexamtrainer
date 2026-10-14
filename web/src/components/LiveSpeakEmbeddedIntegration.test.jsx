@@ -20,10 +20,11 @@ const read = (file) => fs.readFileSync(path.join(root, file), "utf8");
 test("voice tutor stays closed until learner asks to speak and inherits current workbook topic", () => {
   render(<LiveSpeakInlinePractice level="A2" topic="Im Restaurant" source="course-workbook" />);
   expect(screen.queryByTestId("voice-tutor")).not.toBeInTheDocument();
-  expect(screen.getByText(/Uses your existing free Live Speak allowance/)).toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button", { name: "Start live voice conversation" }));
+  expect(screen.getByRole("button",{name:/Practise speaking with AI/})).toBeInTheDocument();
+  expect(screen.queryByText(/free Live Speak allowance|No payment required|Optional, ungraded practice/)).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: /Practise speaking with AI/ }));
   expect(screen.getByTestId("voice-tutor")).toHaveTextContent("true|A2|Im Restaurant|course-workbook");
-  fireEvent.click(screen.getByRole("button", { name: "Hide Live Speak" }));
+  fireEvent.click(screen.getByRole("button", { name: "Close voice practice" }));
   expect(screen.queryByTestId("voice-tutor")).not.toBeInTheDocument();
 });
 
