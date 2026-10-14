@@ -48,11 +48,15 @@ replaceOnce(
   "route assignment resolution",
 );
 
-replaceOnce(
-  `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);`,
-  `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isWorkbookSubmissionContext = workbookSubmissionContext.locked;\n  const isAssignmentContextLocked = Boolean(\n    isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)\n  );`,
-  "workbook assignment lock",
-);
+// Allow safely extended workbook-submit state: the timed-assignment wrapper
+// already inserts its policy between the workbook lock and context lock.
+if (!source.includes("const isWorkbookSubmissionContext = workbookSubmissionContext.locked;")) {
+  replaceOnce(
+    `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);`,
+    `  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);\n  const isWorkbookSubmissionContext = workbookSubmissionContext.locked;\n  const isAssignmentContextLocked = Boolean(\n    isWorkbookSubmissionContext || (requestedAssignmentMatch && !assignmentSelectionUnlocked)\n  );`,
+    "workbook assignment lock",
+  );
+}
 
 replaceOnce(
   `  const selectedCanonicalAssignmentKey = useMemo(\n    () =>\n      form.assignmentTitle\n        ? resolveAssignmentCanonicalKey({\n            level: selectedAssignmentLevel,\n            assignmentId: selectedAssignmentId,\n            assignmentTitle: form.assignmentTitle,\n          })\n        : "",\n    [form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel]\n  );`,
