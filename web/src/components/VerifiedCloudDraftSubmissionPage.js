@@ -4,7 +4,7 @@ import { useToast } from "../context/ToastContext";
 import { collection, db, doc, getDoc, serverTimestamp, setDoc } from "../firebase";
 import { styles } from "../styles";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
-import { findOwnedSubmissionLock } from "../services/submissionLockService";
+import { findOwnedSubmissionDraft, findOwnedSubmissionLock } from "../services/submissionLockService";
 import { getInlineCourseAssignments } from "../utils/courseLessonAssignments";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import { InfoBox } from "./ui";
@@ -234,10 +234,10 @@ const VerifiedCloudDraftSubmissionPage = ({
           setCloudState((current) => ({ ...current, state: "checking", error: "", docId: draftDocId }));
         }
 
-        const snapshot = await getDoc(doc(db, DRAFT_COLLECTION, draftDocId));
+        const snapshot = await findOwnedSubmissionDraft({ db, studentId: user.uid, draftId: draftDocId });
         if (!mountedRef.current) return { ok: false, reason: "unmounted" };
 
-        if (!snapshot.exists()) {
+        if (!snapshot?.exists()) {
           knownRemoteVersionRef.current = 0;
           createdAtRef.current = null;
           setCloudState((current) => ({
@@ -327,8 +327,8 @@ const VerifiedCloudDraftSubmissionPage = ({
           }));
         }
 
-        const beforeSnapshot = await getDoc(draftRef);
-        const beforeData = beforeSnapshot.exists() ? beforeSnapshot.data() || {} : {};
+        const beforeSnapshot = await findOwnedSubmissionDraft({ db, studentId: user.uid, draftId: draftDocId });
+        const beforeData = beforeSnapshot?.exists() ? beforeSnapshot.data() || {} : {};
         const remoteText = getDraftText(beforeData);
         const remoteVersion = timestampToMillis(beforeData.updatedAt);
         const remoteChangedSinceLoad =
