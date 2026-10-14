@@ -407,11 +407,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     }
     recordingStarting.current = true;
     try {
-      stopAudio();
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: { echoCancellation:true, noiseSuppression:true, channelCount:1 },
       });
       if (!mounted.current) { stream.getTracks().forEach(track => track.stop()); return; }
+      // Do not discard the replayable German question until the phone has
+      // actually granted microphone access (iOS/Android permission prompts).
+      stopAudio();
       mediaRef.current = stream;
       const mime = voiceTypes.find(type => typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(type)) || "";
       const recorder = new MediaRecorder(stream, {audioBitsPerSecond:24000, ...(mime ? {mimeType:mime} : {})});
