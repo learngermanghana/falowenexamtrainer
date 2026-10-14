@@ -10,6 +10,10 @@ import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./A2Day26Gefu
 import A2Day27DigitaleKommunikationWorkbookPage from "./A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./A2Day28UeberDieZukunftSprechenWorkbookPage";
 
+// The workbook timer now reads student identity even in display-only tests.
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({ user: null, studentProfile: null }),
+}));
 jest.mock("./AssignmentSubmissionPage", () => () => <div>Submission</div>);
 jest.mock("./ContextualAssignmentSubmissionPage", () => () => <div>Submission</div>);
 jest.mock("./WorkbookReferenceAnswers", () => () => <div>References</div>);
