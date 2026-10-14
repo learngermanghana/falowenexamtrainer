@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, doc, getDoc, getDocs, query, where, setDoc } = require('firebase/firestore');
+const { collection, doc, getDoc, getDocs, query, where, setDoc, serverTimestamp } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({ projectId: 'demo-falowen-locks', firestore: { host: '127.0.0.1', port: 8080, rules: fs.readFileSync('firestore.rules', 'utf8') } });
@@ -90,3 +90,62 @@ test('owner-scoped lookup permits first submission and saving a draft without br
   await assertFails(getDoc(doc(other, 'submissionLocks/first-lock')));
   await assertFails(getDocs(query(collection(other, 'submissionLocks'), where('studentId', '==', 'student-one'))));
 });
+
+for (const level of ['A1', 'A2', 'B1']) {
+  test(`${level} first submission: ownership-filtered draft and lock reads, save and verification`, async () => {
+    const uid = `first-${level.toLowerCase()}`;
+    const student = env.authenticatedContext(uid, {email:`${uid}@example.com`}).firestore();
+    const outsider = env.authenticatedContext('unrelated-student').firestore();
+    const draftId = `${uid}__${level.toLowerCase()}__chapter`;
+    const draftRef = doc(student, 'submissionDrafts', draftId);
+    const lockRef = doc(student, 'submissionLocks', draftId);
+    const draftsQuery = query(collection(student, 'submissionDrafts'),where('studentId','==',uid));
+    const locksQuery = query(collection(student,'submissionLocks'),where('studentId','==',uid));
+    // The rules MUST reject unowned missing document gets. Only safe queries
+    // are used before creation. This mirrors first-time React submissions.
+    await assertFails(getDoc(draftRef));
+    await assertFails(getDoc(lockRef));
+    const firstDrafts = await assertSucceeds(getDocs(draftsQuery));
+    const firstLocks = await assertSucceeds(getDocs(locksQuery));
+    if (firstDrafts.docs.length || firstLocks.docs.length) throw new Error('Expected first submission to be empty');
+    const body = {studentId:uid,ownerUid:uid,uid,userId:uid,level,
+      assignmentKey:`${level}-1.1`,submissionText:'1. A 2. B 3. C',status:'draft'};
+    await assertSucceeds(setDoc(draftRef,body,{merge:true}));
+    const saved = await assertSucceeds(getDoc(draftRef));
+    if (!saved.exists() || saved.data().submissionText !== body.submissionText) throw new Error('Cloud draft failed');
+    await assertSucceeds(setDoc(doc(student,'submissions',draftId),{...body,status:'submitted'}));
+    await assertSucceeds(setDoc(lockRef,{studentId:uid,ownerUid:uid,assignmentKey:body.assignmentKey,
+      level,status:'submitted',submissionId:draftId},{merge:true}));
+    const finalLocks = await assertSucceeds(getDocs(locksQuery));
+    if (!finalLocks.docs.some(item=>item.id===draftId)) throw new Error('Final submission lock could not be found');
+    await assertFails(getDocs(query(collection(outsider,'submissionLocks'),where('studentId','==',uid))));
+  });
+}
+
+for (const [level, key] of [['A1','A1-12.3'],['A2','A2-8.21'],['B1','B1-6.18']]) {
+  test(`${level} timed assignment first-use and expired-to-submitted transition remain writable by its owner`,async()=>{
+    const uid=`timer-student-${level.toLowerCase()}`;
+    const student=env.authenticatedContext(uid,{email:`${uid}@example.com`}).firestore();
+    const other=env.authenticatedContext(`${uid}-other`).firestore();
+    const id=`timed__${uid}__${key.toLowerCase()}`;
+    const ref=doc(student,'timedAssignmentAttempts',id);
+    const missing=await assertSucceeds(getDoc(ref));
+    if(missing.exists())throw new Error('New timed attempt must not already exist');
+    await assertFails(getDoc(doc(other,'timedAssignmentAttempts',id)));
+    const now=Date.now();
+    const base={studentId:uid,studentEmail:`${uid}@example.com`,
+      assignmentKey:key,level,status:'active',startedAt:serverTimestamp(),
+      clientStartedAt:now,durationSeconds:1800,createdAt:serverTimestamp(),
+      updatedAt:serverTimestamp()};
+    await assertSucceeds(setDoc(ref,base));
+    const started=await assertSucceeds(getDoc(ref));
+    if(!started.exists()||started.data().status!=='active')throw new Error('Timer failed to start');
+    await assertSucceeds(setDoc(ref,{status:'expired',expiredAt:serverTimestamp(),
+      updatedAt:serverTimestamp()},{merge:true}));
+    await assertSucceeds(setDoc(ref,{status:'submitted',submittedAt:serverTimestamp(),
+      updatedAt:serverTimestamp()},{merge:true}));
+    const sent=await assertSucceeds(getDoc(ref));
+    if(sent.data().status!=='submitted')throw new Error('Timer did not complete');
+    await assertFails(setDoc(doc(other,'timedAssignmentAttempts',id),{status:'active'},{merge:true}));
+  });
+}
