@@ -129,7 +129,8 @@ const SpeakingPage = ({
   const showVoiceMode = isExamMode && typeof window !== "undefined" &&
     /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname);
   const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
-  const [selectedTeil, setSelectedTeil] = useState(initialSpeakingFilters.teil);
+  const [selectedTeil, setSelectedTeil] = useState(isExamMode && initialSpeakingFilters.teil === "all" ? "1" : initialSpeakingFilters.teil);
+  const [taskMode, setTaskMode] = useState("random");
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
   const previousExamLevelRef = useRef(examLevel);
   useEffect(() => {
@@ -138,7 +139,7 @@ const SpeakingPage = ({
     if (previousExamLevelRef.current === examLevel) return;
     previousExamLevelRef.current = examLevel;
     setSelectedLevel(nextLevel);
-    setSelectedTeil("all");
+    setSelectedTeil("1");
     setShowLiveExaminer(false);
   }, [examLevel, isExamMode, normalizedLockedLevel, liveExaminerActive]);
   const [chatMessages, setChatMessages] = useState([
@@ -351,7 +352,8 @@ const SpeakingPage = ({
       if (filteredQuestions.some((question) => question.id === currentId)) {
         return currentId;
       }
-      return filteredQuestions[0].id;
+      const options = filteredQuestions;
+      return options[Math.floor(Math.random() * options.length)].id;
     });
   }, [filteredQuestions]);
 
@@ -359,6 +361,34 @@ const SpeakingPage = ({
     () => filteredQuestions.find((question) => question.id === selectedQuestionId) || null,
     [filteredQuestions, selectedQuestionId]
   );
+
+  const chooseRandomQuestion = () => {
+    if (liveExaminerActive || !filteredQuestions.length) return;
+    const alternatives = filteredQuestions.filter(question => question.id !== selectedQuestionId);
+    const options = alternatives.length ? alternatives : filteredQuestions;
+    setSelectedQuestionId(options[Math.floor(Math.random() * options.length)].id);
+  };
+
+  const examSteps = {
+    A1: {
+      1: {title:"Sich vorstellen", german:"Guten Tag. Stellen Sie sich bitte vor.", english:"Introduce yourself: name, age, country, home, languages, work and hobbies.", steps:["Introduce yourself","Spell your surname","Say a number","Answer one personal follow-up"]},
+      2: {title:"Fragen stellen und antworten", german:"Stellen Sie eine Frage zu Ihrer Wortkarte.", english:"Use two word cards. Ask a question, listen to your partner and answer their question.", steps:["Ask a question using card 1","Answer the partner","Ask using card 2","Answer the partner"]},
+      3: {title:"Bitten formulieren und reagieren", german:"Formulieren Sie eine Bitte zu Ihrer Karte.", english:"Make a polite request and respond to your partner. Repeat with a second card.", steps:["Request using card 1","React to a request","Request using card 2","React to a request"]},
+    },
+    A2: {
+      1: {title:"Fragen zur Person", german:"Stellen Sie Fragen zu den Wortkarten.", english:"Ask and answer personal questions using the cards.", steps:["Ask and answer across four word cards"]},
+      2: {title:"Von sich erzählen", german:"Erzählen Sie bitte über das Thema auf Ihrer Karte. Ich höre zu.", english:"Speak about the assigned topic without interruption, then answer a relevant follow-up.", steps:["Talk about the four points","Answer the examiner's follow-up"]},
+      3: {title:"Einen Termin finden", german:"Finden Sie gemeinsam einen Termin.", english:"Discuss the schedules with your AI partner and agree on one possible time.", steps:["Suggest times","Negotiate","Agree on a meeting"]},
+    },
+    B1: {
+      1: {title:"Gemeinsam etwas planen", german:"Planen Sie bitte gemeinsam mit Ihrem Partner.", english:"Negotiate a realistic plan with the AI partner.", steps:["Make suggestions","Agree on time, place, travel and responsibilities"]},
+      2: {title:"Ein Thema präsentieren", german:"Präsentieren Sie bitte das Thema.", english:"Prepare your notes, then speak without interruption. Questions belong to Teil 3.", steps:["Prepare","Present your topic","Finish your presentation"]},
+      3: {title:"Über Präsentationen sprechen", german:"Stellen Sie Fragen zur Präsentation.", english:"Respond to the examiner and your partner's presentation.", steps:["Answer a question","React to the partner's presentation"]},
+    },
+  };
+  const examGuide = examSteps[selectedLevel]?.[selectedTeil] || {
+    title:"Speaking practice", german:"Bitte sprechen Sie über das Thema.", english:"Listen to the examiner, then give your answer in German.", steps:["Listen","Speak","Review feedback"]
+  };
 
   const quickTopics = useMemo(() => {
     const fromSheet = filteredQuestions.slice(0, 3).map((question) => question.topicPrompt);
@@ -951,7 +981,7 @@ const SpeakingPage = ({
           style={{
             background: "linear-gradient(120deg, #4f46e5, #8b5cf6, #a21caf)",
             color: "#ffffff",
-            padding: "18px 20px",
+            padding: isExamMode && isCompactViewport ? "14px 16px" : "18px 20px",
             display: "flex",
             justifyContent: "space-between",
             gap: 12,
@@ -960,15 +990,15 @@ const SpeakingPage = ({
           }}
         >
           <div>
-            <p style={{ margin: 0, opacity: 0.85, fontSize: 13 }}>Online • Ready to practice</p>
-            <h1 style={{ margin: "4px 0 0", fontSize: 28 }}>Goethe Speaking Exam Coach</h1>
+            <p style={{ margin: 0, opacity: 0.85, fontSize: 13 }}>{isExamMode ? "Falowen · Exam Room" : "Online • Ready to practice"}</p>
+            <h1 style={{ margin: "4px 0 0", fontSize: isExamMode && isCompactViewport ? 22 : 28 }}>{isExamMode ? "Goethe Speaking Exam" : "Goethe Speaking Exam Coach"}</h1>
             <p style={{ margin: "6px 0 0", opacity: 0.9, fontSize: 13 }}>
               {contextLabel || `Speaking Exams${selectedLevel ? ` • Level ${selectedLevel}` : ""}${normalizedLockedTeil ? ` • Teil ${normalizedLockedTeil}` : ""}`}
             </p>
           </div>
-          <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
+          {!isExamMode ? <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
             Clear conversation
-          </button>
+          </button> : null}
         </div>
 
         {!isExamMode ? (
@@ -1278,267 +1308,74 @@ const SpeakingPage = ({
           </div>
         ) : null}
 
-        <div style={{ display: !isCourseMode && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
-          <aside
-            style={{
-              borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
-              borderBottom: isCompactViewport ? "1px solid #E5E7EB" : "none",
-              background: "#F8FAFC",
-              padding: isCompactViewport ? 12 : 16,
-              display: "grid",
-              gap: 14,
-            }}
-          >
-            <span style={styles.badge}>
-              Progress: {Math.min(completedCount, totalCount)}/{totalCount}
-            </span>
 
-            <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Level</label>
-              {isExamMode ? (
-                <div style={{ ...styles.input, background: "#EEF2FF", fontWeight: 700 }}>{selectedLevel}</div>
-              ) : (
-                <select
-                  style={styles.select}
-                  value={selectedLevel}
-                  onChange={(event) => {
-                    setSelectedLevel(event.target.value);
-                    setSelectedTeil("all");
-                  }}
-                >
-                  {levelOptions.map((level) => (
-                    <option key={level} value={level}>
-                      {level}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Teil</label>
-              {normalizedLockedTeil ? (
-                <div style={{ ...styles.input, background: "#EEF2FF", fontWeight: 700 }}>Teil {normalizedLockedTeil}</div>
-              ) : (
-                <select style={styles.select} value={selectedTeil} disabled={liveExaminerActive} onChange={(event) => setSelectedTeil(event.target.value)}>
-                  <option value="all">All</option>
-                  <option value="1">Teil 1</option>
-                  <option value="2">Teil 2</option>
-                  <option value="3">Teil 3</option>
-                </select>
-              )}
-            </div>
-
-            <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Question</label>
-              <select style={styles.select} value={selectedQuestionId} disabled={liveExaminerActive} onChange={(event) => setSelectedQuestionId(event.target.value)}>
-                {filteredQuestions.map((question) => (
-                  <option key={question.id} value={question.id}>
-                    {formatQuestionDisplay(question)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              style={styles.primaryButton}
-              onClick={isRecording && recordingMode === "exam" ? stopRecording : () => startRecording("exam")}
-              disabled={!selectedQuestion || liveExaminerActive || (isRecording && recordingMode !== "exam")}
-            >
-              {isRecording && recordingMode === "exam" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
-            </button>
-            {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
-            {showVoiceMode ? (
-              <button type="button" aria-expanded={showLiveExaminer} aria-controls="speaking-live-examiner"
-                style={{ ...styles.secondaryButton, borderColor: "#93c5fd", background: showLiveExaminer ? "#dbeafe" : "#eff6ff", fontWeight: 700 }}
-                onClick={() => setShowLiveExaminer((current) => !current)}
-                disabled={isRecording || liveExaminerActive}>
-                {showLiveExaminer ? "Hide live examiner" : "🔊 Talk with the live examiner"}
-              </button>
-            ) : null}
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds. Maximum {formatTime(recordingMaxSeconds)}; recording stops automatically.
-            </p>
-
-            <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Quick practice topics</p>
-              <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {quickTopics.map((topic) => (
-                  <button
-                    key={topic}
-                    style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 12 }}
-                    onClick={() => setDraftMessage(`Zum Thema "${topic}": `)}
-                  >
-                    {topic.slice(0, 40)}{topic.length > 40 ? "…" : ""}
-                  </button>
-                ))}
+        {!isCourseMode && activeSpeakingTab === "exam" ? (
+          <div style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
+            <aside style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                <strong style={{fontSize:13,color:"#1e40af"}}>Level {selectedLevel}</strong>
+                <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
+                {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
+                  <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
+                    <option value="1">Teil 1</option><option value="2">Teil 2</option><option value="3">Teil 3</option>
+                  </select>
+                )}
               </div>
-            </div>
-          </aside>
-
-          <section style={{ background: "#E5E7EB", minHeight: isCompactViewport ? 480 : 580, display: "grid", gridTemplateRows: "1fr auto", minWidth: 0 }}>
-            <div style={{ padding: isCompactViewport ? 10 : 16, overflowY: "auto", display: "grid", gap: 12, minWidth: 0 }}>
-              {showVoiceMode && showLiveExaminer && selectedQuestion ? (
-                <section id="speaking-live-examiner" aria-label="Live Goethe examiner"
-                  style={{ background: "#fff", border: "1px solid #bfdbfe", borderRadius: 14, padding: isCompactViewport ? 10 : 14, minWidth: 0 }}>
-                  <h2 style={{ margin: "0 0 5px", fontSize: 18 }}>Live Goethe examiner</h2>
-                  <p style={{ margin: "0 0 12px", fontSize: 13, color: "#475569" }}>
-                    Choose Teil and Question using the original controls. The examiner speaks, listens and gives feedback when you finish.
-                  </p>
-                  <LiveSpeakPage embedded initialLevel={selectedLevel}
-                    practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
-                    practiceSource="exam-speaking-practice"
-                    examTask={{
-                      id: selectedQuestion.id,
-                      teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
-                      prompt: selectedQuestion.topicPrompt || selectedQuestion.text || "",
-                      keywords: selectedQuestion.keywordSubtopic || "",
-                      hint: selectedQuestion.hint || "",
-                    }}
-                    examMode="guided" onActivityChange={setLiveExaminerActive} />
-                </section>
-              ) : null}
-              {!showLiveExaminer ? chatMessages.map((message) => {
-                const isStudent = message.role === "student";
-                return (
-                  <div
-                    key={message.id}
-                    style={{
-                      display: "flex",
-                      justifyContent: isStudent ? "flex-end" : "flex-start",
-                      alignItems: "flex-start",
-                      gap: 10,
-                    }}
-                  >
-                    {!isStudent ? (
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#C7D2FE", display: "grid", placeItems: "center" }}>
-                        🤖
-                      </div>
-                    ) : null}
-                    <div
-                      style={{
-                        maxWidth: "78%",
-                        borderRadius: 18,
-                        padding: "10px 14px",
-                        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
-                        background: isStudent ? "linear-gradient(120deg, #4f46e5, #9333ea)" : "#ffffff",
-                        color: isStudent ? "#ffffff" : "#1f2937",
-                      }}
-                    >
-                      {message.type === "audio" ? (
-                        <div style={{ display: "grid", gap: 8 }}>
-                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <button
-                              style={{
-                                border: "none",
-                                borderRadius: "50%",
-                                width: 34,
-                                height: 34,
-                                cursor: "pointer",
-                                background: "rgba(255,255,255,0.25)",
-                                color: "#fff",
-                              }}
-                              onClick={() => toggleAudioPlayback(message.id)}
-                            >
-                              {playingMessageId === message.id ? "⏸" : "▶"}
-                            </button>
-                            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
-                              {waveHeights.map((height, index) => (
-                                <span
-                                  key={`${message.id}-wave-${index}`}
-                                  style={{
-                                    display: "inline-block",
-                                    width: 3,
-                                    height,
-                                    borderRadius: 999,
-                                    background: "rgba(255,255,255,0.55)",
-                                  }}
-                                />
-                              ))}
-                            </div>
-                            <span style={{ fontSize: 12, opacity: 0.95 }}>{formatTime(message.duration || 0)}</span>
-                          </div>
-                          <audio
-                            ref={(node) => {
-                              if (node) {
-                                audioRefs.current[message.id] = node;
-                                node.onended = () => setPlayingMessageId("");
-                                  node.onerror = () => { setPlayingMessageId(""); setPlaybackError("This device cannot play the recording format. Please record again."); };
-                              }
-                            }}
-                            src={message.audioUrl}
-                          />
-                        </div>
-                      ) : (
-                        <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
-                      )}
-                      <p style={{ margin: "6px 0 0", opacity: 0.75, fontSize: 11 }}>{formatClock(message.createdAt)}</p>
+              {selectedTeil !== "1" ? (
+                <div role="group" aria-label="Task selection" style={{display:"grid",gap:8}}>
+                  <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                    <button type="button" onClick={()=>setTaskMode("random")} disabled={liveExaminerActive}
+                      aria-pressed={taskMode==="random"} style={{...styles.secondaryButton,background:taskMode==="random"?"#dbeafe":"#fff",borderColor:taskMode==="random"?"#3b82f6":"#cbd5e1",padding:"8px 10px"}}>
+                      Random task
+                    </button>
+                    <button type="button" onClick={()=>setTaskMode("choose")} disabled={liveExaminerActive}
+                      aria-pressed={taskMode==="choose"} style={{...styles.secondaryButton,background:taskMode==="choose"?"#dbeafe":"#fff",borderColor:taskMode==="choose"?"#3b82f6":"#cbd5e1",padding:"8px 10px"}}>
+                      Choose topic
+                    </button>
+                  </div>
+                  {taskMode==="choose" ? (
+                    <label style={{display:"grid",gap:5,fontSize:13}}>
+                      Topic or task card
+                      <select aria-label="Choose speaking task" style={styles.select} disabled={liveExaminerActive} value={selectedQuestionId} onChange={event=>setSelectedQuestionId(event.target.value)}>
+                        {filteredQuestions.map(question=><option key={question.id} value={question.id}>{formatQuestionDisplay(question)}</option>)}
+                      </select>
+                    </label>
+                  ) : (
+                    <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
+                      <small style={{flex:1,minWidth:110,color:"#475569"}}>Falowen assigns the task cards.</small>
+                      <button type="button" style={{...styles.secondaryButton,padding:"8px 10px"}} disabled={liveExaminerActive || !selectedQuestion} onClick={chooseRandomQuestion}>
+                        Another random task
+                      </button>
                     </div>
-                    {isStudent ? (
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#E9D5FF", display: "grid", placeItems: "center" }}>
-                        👤
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              }) : null}
-
-              {!showLiveExaminer && chatLoading ? (
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#C7D2FE", display: "grid", placeItems: "center" }}>
-                    🤖
-                  </div>
-                  <div style={{ background: "#ffffff", borderRadius: 16, padding: "10px 14px", color: "#4B5563", fontSize: 13 }}>
-                    AI is typing…
-                  </div>
+                  )}
                 </div>
               ) : null}
-              <div ref={messagesEndRef} />
-            </div>
-
-            <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
+              <section aria-label="Speaking exam instructions" style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
+                <strong style={{color:"#1e3a8a"}}>Teil {selectedTeil} · {examGuide.title}</strong>
+                <p lang="de" style={{margin:0,fontSize:14,lineHeight:1.55}}>{examGuide.german}</p>
+                <p style={{margin:0,fontSize:13,color:"#475569",lineHeight:1.5}}>{examGuide.english}</p>
+                <ol style={{margin:"2px 0 0",paddingLeft:20,fontSize:12,color:"#334155",lineHeight:1.6}}>
+                  {examGuide.steps.map(step=><li key={step}>{step}</li>)}
+                </ol>
+              </section>
+            </aside>
+            <section style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
               {selectedQuestion ? (
-                <p style={{ margin: 0, fontSize: 12, color: "#4338CA" }}>
-                  {formatQuestionDisplay(selectedQuestion)}
-                </p>
-              ) : null}
-              {showLiveExaminer ? <p style={{ margin: 0, fontSize: 12, color: "#1e40af" }}>
-                Use the microphone in the live examiner above. Hide it to return to your original text coach.
-              </p> : null}
-
-              {lastRubric ? (
-                <p style={{ margin: 0, fontSize: 12, color: "#1E3A8A" }}>
-                  Latest score — Grammar: {lastRubric.grammar}/5 · Vocabulary: {lastRubric.vocabulary}/5 · Pronunciation: {lastRubric.pronunciationReadiness}/5 · Structure: {lastRubric.structure}/5
-                </p>
-              ) : null}
-
-              {chatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{chatError}</p> : null}
-
-              <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
-                <textarea
-                  style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
-                  placeholder="Type your German response and press Enter..."
-                  value={draftMessage}
-                  onChange={(event) => setDraftMessage(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                      event.preventDefault();
-                      sendMessage();
-                    }
+                <LiveSpeakPage key={selectedLevel+"-"+selectedQuestion.id} embedded initialLevel={selectedLevel}
+                  practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
+                  practiceSource="exam-speaking-practice"
+                  examTask={{
+                    id:selectedQuestion.id,
+                    teil:selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+                    prompt:selectedQuestion.topicPrompt || selectedQuestion.text || "",
+                    keywords:selectedQuestion.keywordSubtopic || "",
+                    hint:selectedQuestion.hint || "",
                   }}
-                  disabled={chatLoading || showLiveExaminer}
-                />
-                <button
-                  style={{ ...styles.primaryButton, borderRadius: 12, minWidth: isCompactViewport ? "100%" : 88 }}
-                  onClick={sendMessage}
-                  disabled={chatLoading || showLiveExaminer || !selectedQuestion}
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
+                  examMode="guided" onActivityChange={setLiveExaminerActive}/>
+              ) : <p role="status">Choose an exam part to begin.</p>}
+            </section>
+          </div>
+        ) : null}
       </div>
     </div>
   );
