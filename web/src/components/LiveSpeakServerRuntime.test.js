@@ -48,6 +48,7 @@ function setup(overrides = {}, authOverride = {}) {
     require:name=>{
       if(name==="crypto")return {randomUUID:()=>"unique-session-id"};
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
+      if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
       throw new Error("Unexpected require "+name);
     },
@@ -479,4 +480,100 @@ test("last answer reserves only transcription when one budget unit remains",asyn
   expect(last.payload.taskReady).toBe(true);
   expect(api.docs.get(usageKey()).turns).toBe(40);
   expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(1);
+});
+
+async function startTaskFlow(api,level,part,mode="guided",topic="Freizeit") {
+  await api.call("POST","/live-speak/pilot/claim");
+  api.fakeClient.chat.completions.create.mockImplementation(async request=>({choices:[{message:{content:request.response_format
+    ? JSON.stringify({reply:"Ja, gern. Was meinst du dazu?",decisions:[]}) : "Task completion: review the specific points."}}]}));
+  const started=await api.call("POST","/live-speak/session/start",{level,source:"exam-speaking-practice",examinerFlowVersion:1,examMode:mode,
+    examTask:{id:`${level}-${part}`,teil:`Teil ${part}`,prompt:topic}});
+  expect(started.code).toBe(200);
+  return started.payload;
+}
+
+test.each(["A1","A2","B1"].flatMap(level=>[1,2,3].map(part=>[level,part])))("%s Teil %s runs the complete server-owned flow and assesses saved evidence",async(level,part)=>{
+  const api=setup(); const session=await startTaskFlow(api,level,part);
+  await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  expect(session.examFlow.key).toBe(`${level}-${part}`);
+  for(let index=0;index<session.answerLimit;index++){
+    const answer=await answerExam(api,session,`Das ist meine Antwort Nummer ${index+1}.`);
+    expect(answer.code).toBe(200);
+    expect(Boolean(answer.payload.taskReady)).toBe(index===session.answerLimit-1);
+  }
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.activeSession.confirmedAnswers).toHaveLength(session.answerLimit);
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId,answers:["FORGED"]});
+  expect(feedback.code).toBe(200);
+  const input=JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content);
+  expect(input.studentTranscripts).toHaveLength(session.answerLimit);
+  expect(input.examContext.requiredCriteria.length).toBeGreaterThan(1);
+  expect(input.examContext.completedAllTurns).toBe(true);
+  expect(JSON.stringify(input)).not.toContain("FORGED");
+});
+
+test("B1 presentation accepts its larger recording but remains inside the original total audio allowance",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"B1",2);
+  expect(session.maxRecordingSeconds).toBe(180);
+  expect(session.maxAudioBytes).toBe(700000);
+  const recorded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,mimeType:"audio/webm",audioBase64:Buffer.alloc(550000,65).toString("base64")});
+  expect(recorded.code).toBe(200);
+  expect(api.docs.get(usageKey()).turns).toBe(2);
+  const done=await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:recorded.payload.pendingId,transcript:"Ich möchte über meine Ausbildung sprechen. ".repeat(55)});
+  expect(done.payload.taskReady).toBe(true);
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+  expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
+});
+
+test("simulation binds unedited answers to ASR; explicitly flagged recognition corrections are saved",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"A1",1,"simulation");
+  const recording=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:recording.payload.pendingId,transcript:"Unflagged rewritten answer"});
+  expect(api.docs.get(sessionKey).confirmedAnswers[0]).toBe("Ich gehen heute zum Markt.");
+  const next=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:next.payload.pendingId,transcript:"B A I D O O",recognitionCorrection:true});
+  expect(api.docs.get(sessionKey).confirmedAnswers[1]).toBe("B A I D O O");
+  expect(api.docs.get(sessionKey).recognitionReviews[1].corrected).toBe(true);
+});
+
+test("B2 retains the existing voice flow even if the client requests a new profile",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"B2",1);
+  expect(session.examFlow).toBe(null);
+  expect(session.answerLimit).toBe(2);
+});
+
+test("calendar negotiation can finish on a supported agreement before its turn ceiling",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"A2",3);
+  await answerExam(api,session,"Hast du am Montag um 17 Uhr Zeit?");
+  const text="Ja, Mittwoch um 18 Uhr passt.";
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify({reply:"Gut, dann Mittwoch um 18 Uhr.",decisions:[{point:"appointment",value:"Mittwoch 18:00",quote:text}]})}}]});
+  const agreed=await answerExam(api,session,text);
+  expect(agreed.payload.taskReady).toBe(true);
+  expect(api.docs.get(sessionKey).answeredTurns).toBe(2);
+  expect(api.fakeClient.chat.completions.create).not.toHaveBeenCalled();
+  expect(agreed.payload.examFlow.step).toBe(null);
+  expect(agreed.payload.examFlow.decisions).toEqual([{point:"appointment",value:"Mittwoch 18:00"}]);
+});
+
+test("B1 presentation discussion resumes the learner's preceding presentation topic",async()=>{
+  const api=setup(); const presentation=await startTaskFlow(api,"B1",2,"guided","Ausbildung");
+  await answerExam(api,presentation,"Heute spreche ich über meine Ausbildung.");
+  await api.call("POST","/live-speak/session/exam-feedback",{sessionId:presentation.sessionId});
+  const discussion=await startTaskFlow(api,"B1",3,"simulation","Fragen stellen zu einer Präsentation");
+  expect(discussion.examFlow.topic).toBe("Ausbildung");
+  expect(discussion.examFlow.step.instruction).toContain("Ausbildung");
+  expect(api.docs.get(sessionKey).examFlow.ownPresentation).toBe("Heute spreche ich über meine Ausbildung.");
+  expect(discussion.examFlow.partnerPresentation).toBe("");
+  const first=await answerExam(api,discussion,"Ich habe viel im Betrieb gelernt.");
+  expect(first.payload.speaker).toBe("partner");
+  expect(first.payload.examFlow.partnerPresentation).toContain("Online Deutsch lernen");
+});
+
+test("simulation and task limits cannot be replaced by client profile fields",async()=>{
+  const api=setup();await api.call("POST","/live-speak/pilot/claim");
+  const response=await api.call("POST","/live-speak/session/start",{level:"A1",source:"exam-speaking-practice",examinerFlowVersion:1,
+    examMode:"simulation",answerLimit:999,examFlow:{key:"B1-2",maxAnswers:999},examTask:{id:"x",teil:"Teil 1",prompt:"Name"}});
+  expect(response.payload.answerLimit).toBe(3);
+  expect(response.payload.maxRecordingSeconds).toBe(60);
+  expect(response.payload.examFlow.hints).toEqual([]);
 });

@@ -59,7 +59,7 @@ test("pending transcription is recoverable and final confirmation goes directly 
     return ok(pending);
   });
   show(); fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
-  expect(await screen.findByRole("textbox")).toHaveValue("Ich esse Gemüse.");
+  expect(await screen.findByRole("textbox",{name:/What I said/})).toHaveValue("Ich esse Gemüse.");
   fireEvent.click(screen.getByRole("button",{name:"Confirm answer"}));
   expect(await screen.findByText(/Answers saved. You’re ready for feedback/)).toBeInTheDocument();
   expect(screen.getByRole("button",{name:/Speak German/})).toBeDisabled();
@@ -104,4 +104,15 @@ test.each([false,true])("saved feedback survives reload and local rehearsal stay
     global.MediaRecorder=previousRecorder;
     URL.createObjectURL=createUrl;URL.revokeObjectURL=revokeUrl;
   }
+});
+
+test("simulation transcript needs an explicit recognition-correction flag before editing",async()=>{
+  const simulation={...saved,examFlow:{mode:"simulation",key:"B1-2",title:"Ein Thema präsentieren",hints:[],points:[],cards:[],step:{index:1,seconds:180,role:"examiner"},maxAnswers:1},
+    maxTranscriptChars:4800,pending:{pendingId:"asr",transcript:"Ich lerne heute Deutsch."}};
+  global.fetch.mockImplementation(async url=>ok(String(url).endsWith("/status") ? {enabled:true,activeSession:simulation} : simulation));
+  show();fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  const transcript=await screen.findByRole("textbox",{name:"Recognised speech"});
+  expect(transcript).toHaveAttribute("readonly");
+  fireEvent.click(screen.getByRole("checkbox",{name:"Correct a speech-recognition mistake only"}));
+  expect(transcript).not.toHaveAttribute("readonly");
 });

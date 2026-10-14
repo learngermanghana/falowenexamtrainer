@@ -21,7 +21,8 @@ export const isDifferentLiveSpeakSessionContext = (savedSession, requested = {})
   if (!savedSession) return false;
   const current = liveSpeakSessionContext(savedSession);
   const next = liveSpeakSessionContext(null, requested);
-  return (savedSession.examTask?.id || "") !== (requested.examTask?.id || "") ||
+  return (savedSession.examFlow && savedSession.examFlow.mode !== (requested.examMode || "guided")) ||
+    (savedSession.examTask?.id || "") !== (requested.examTask?.id || "") ||
     current.level !== next.level ||
     current.topic !== next.topic ||
     current.source !== next.source;

@@ -1,0 +1,72 @@
+import React from "react";
+import {act,fireEvent,render,screen,waitFor} from "@testing-library/react";
+import {MemoryRouter} from "react-router-dom";
+import GoetheExamTaskCard from "./GoetheExamTaskCard";
+import ExamLiveSpeakPanel from "./ExamLiveSpeakPanel";
+import {examinerTaskPreview} from "../lib/examinerTaskPreview";
+import {useAuth} from "../context/AuthContext";
+const flows=require("../../../functions/functionz/goetheExaminerFlow");
+jest.mock("../context/AuthContext",()=>({useAuth:jest.fn()}));
+const task={id:"b1-2",teil:"Teil 2",prompt:"Ausbildung"};
+afterEach(()=>{jest.restoreAllMocks();jest.useRealTimers();});
+
+test("B1 notes survive starting the section, with preparation outside the voice session",()=>{
+  jest.useFakeTimers();
+  const preview=examinerTaskPreview("B1",task);
+  const {rerender}=render(<GoetheExamTaskCard flow={preview} topic={task.prompt}/>);
+  fireEvent.change(screen.getByRole("textbox",{name:"Your brief notes"}),{target:{value:"Erfahrung, Heimatland, Vorteile"}});
+  fireEvent.click(screen.getByRole("button",{name:"Optional B1 preparation timer"}));
+  act(()=>jest.advanceTimersByTime(2000));
+  expect(screen.getByRole("timer")).toHaveTextContent("14:58");
+  const examFlow=flows.createExaminerFlow("B1",task);
+  rerender(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:0})} topic={task.prompt} active/>);
+  expect(screen.getByRole("textbox",{name:"Your brief notes"})).toHaveValue("Erfahrung, Heimatland, Vorteile");
+  expect(screen.queryByRole("timer")).not.toBeInTheDocument();
+  expect(screen.getByText(/up to 180s/)).toBeInTheDocument();
+});
+
+test("simulation hides coaching hints while retaining the actual exam card and calendar",()=>{
+  const flow=examinerTaskPreview("A2",{teil:"Teil 3",prompt:"Zusammen einkaufen"},"simulation");
+  render(<GoetheExamTaskCard flow={flow}/>);
+  expect(screen.queryByText("Practice hints")).not.toBeInTheDocument();
+  expect(screen.getByText("Mittwoch 18:00")).toBeInTheDocument();
+  expect(screen.queryByText("Dienstag 17:00")).not.toBeInTheDocument();
+  expect(screen.getByText(/Zusammen einkaufen/)).toBeInTheDocument();
+});
+
+test("the real examiner panel sends the selected mode and locks changes while active",async()=>{
+  useAuth.mockReturnValue({idToken:"test",studentProfile:{level:"A1"}});
+  const question={id:"a1",teilLabel:"Teil 1",topicPrompt:"Name"};
+  let active=null;
+  global.fetch=jest.fn(async (url,options)=>{
+    const body=options?.body ? JSON.parse(options.body) : {};
+    if(String(url).endsWith("/start")){
+      expect(body.examinerFlowVersion).toBe(1);
+      expect(body.examMode).toBe("simulation");
+      const examFlow=flows.createExaminerFlow("A1",{teil:"Teil 1",prompt:"Name"},body.examMode);
+      active={sessionId:"new",source:"exam-speaking-practice",level:"A1",topic:"Name",examTask:{id:"a1",teil:"Teil 1",prompt:"Name"},
+        expiresAt:new Date(Date.now()+600000).toISOString(),answerLimit:3,examFlow:flows.publicFlow({examFlow}),maxRecordingSeconds:60};
+      return {ok:true,json:async()=>active};
+    }
+    return {ok:true,json:async()=>String(url).endsWith("/status") ? {enabled:true,remaining:1,activeSession:active,examinerFlowVersion:1} : {reply:"Stellen Sie sich bitte vor.",audioBase64:""}};
+  });
+  render(<MemoryRouter><ExamLiveSpeakPanel level="A1" teil="1" selectedQuestionId="a1" questions={[question]} question={question}
+    onTeilChange={()=>{}} onQuestionChange={()=>{}} formatQuestion={q=>q.topicPrompt}/></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button",{name:"Exam simulation"}));
+  expect(screen.queryByText("Practice hints")).not.toBeInTheDocument();
+  fireEvent.click(await screen.findByRole("button",{name:"Start AI Examiner"}));
+  await waitFor(()=>expect(screen.getByRole("button",{name:"Guided practice"})).toBeDisabled());
+  expect(screen.getByLabelText("Live conversation exam part")).toBeDisabled();
+  expect(screen.getByLabelText("Live conversation speaking prompt")).toBeDisabled();
+});
+
+test("a backend that has not received the examiner update cannot consume a new session credit",async()=>{
+  useAuth.mockReturnValue({idToken:"test",studentProfile:{level:"A1"}});
+  global.fetch=jest.fn(async()=>({ok:true,json:async()=>({enabled:true,remaining:0,pilotAvailable:true})}));
+  const question={id:"a1",teilLabel:"Teil 1",topicPrompt:"Name"};
+  render(<MemoryRouter><ExamLiveSpeakPanel level="A1" teil="1" selectedQuestionId="a1" questions={[question]} question={question}
+    onTeilChange={()=>{}} onQuestionChange={()=>{}} formatQuestion={q=>q.topicPrompt}/></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button",{name:"Start AI Examiner"}));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Examiner practice is temporarily unavailable.");
+  expect(global.fetch).toHaveBeenCalledTimes(1);
+});
