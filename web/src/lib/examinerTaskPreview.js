@@ -5,10 +5,10 @@ export const examinerTaskPreview = (level,task,mode="guided") => {
   if (!profile) return null;
   const selected=String(task?.keywords || task?.prompt || "Freizeit").split(/[,;·]/)[0].trim().slice(0,120);
   let cards=[];
-  if (key === "A1-2") cards=[selected,catalogue.a1InformationCards[0].word];
-  if (key === "A2-1") {
-    const first=catalogue.personalCards.find(card=>selected.toLowerCase().includes(card.word.toLowerCase()));
-    cards=(first ? [first,...catalogue.personalCards.filter(card=>card !== first)] : catalogue.personalCards).map(card=>card.word);
+  if (key === "A1-2" || key === "A2-1") {
+    const defaults=key === "A1-2" ? catalogue.a1InformationCards : catalogue.personalCards;
+    const first=defaults.find(card=>card.word.toLocaleLowerCase("de-DE") === selected.toLocaleLowerCase("de-DE"))?.word || selected;
+    cards=[...new Map([first,...defaults.map(card=>card.word)].map(word=>[word.toLocaleLowerCase("de-DE"),word])).values()].slice(0,key === "A1-2" ? 2 : 4);
   }
   const topicEntry=Object.entries(catalogue.a2TopicPoints).find(([topic])=>topic !== "default" && String(task?.prompt || "").toLowerCase().includes(topic.toLowerCase()));
   const supplied=String(task?.keywords || "").split(/[,;·]/).map(value=>value.trim()).filter(Boolean);

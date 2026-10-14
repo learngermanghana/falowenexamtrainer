@@ -4,6 +4,14 @@ const clean = (value, length=1200) => String(value || "").replace(/[\r\n\t]/g," 
 const partNumber = task => String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1] || "";
 const profileFor = flow => catalogue.profiles[flow?.key] || null;
 const words = task => clean(task?.keywords || task?.prompt,120).split(/[,;·]/).map(x=>x.trim()).filter(Boolean);
+function selectedCards(word, defaults, count) {
+  const normalize = value => value.trim().toLocaleLowerCase("de-DE");
+  const match = defaults.find(card=>normalize(card.word) === normalize(word));
+  const questions = {tagesablauf:"Wie sieht Ihr Tagesablauf aus?",sprachen:"Welche Sprachen sprechen Sie?",haustiere:"Haben Sie Haustiere?"};
+  const first = match || {word,question:questions[normalize(word)] || `Was können Sie zum Thema „${word}“ über sich erzählen?`};
+  const seen = new Set();
+  return [first,...defaults].filter(card=>{const key=normalize(card.word);if(seen.has(key))return false;seen.add(key);return true;}).slice(0,count);
+}
 function createExaminerFlow(level, task, mode="guided") {
   const key = `${level}-${partNumber(task)}`;
   const profile = catalogue.profiles[key];
@@ -12,11 +20,9 @@ function createExaminerFlow(level, task, mode="guided") {
   if (key === "A2-3") flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
   if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
   const selectedWord = words(task)[0] || "Freizeit";
-  if (key === "A1-2") flow.cards = [{word:selectedWord,question:"Was machen Sie gern in Ihrer Freizeit?"},...catalogue.a1InformationCards].slice(0,2);
+  if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
   if (key === "A2-1") {
-    const personal = catalogue.personalCards;
-    const match = personal.find(card=>new RegExp(card.word,"i").test(selectedWord));
-    flow.cards = match ? [match,...personal.filter(card=>card !== match)] : personal;
+    flow.cards = selectedCards(selectedWord,catalogue.personalCards,4);
   }
   if (key === "A1-3") flow.card = selectedWord;
   if (key === "A2-2") {
@@ -46,6 +52,12 @@ function currentStep(flow, answered=0) {
 }
 const maxAnswers = session => profileFor(session.examFlow)?.maxAnswers || 2;
 const isReady = session => Boolean(session.taskReady) || Number(session.answeredTurns) >= maxAnswers(session);
+function isComplete(session) {
+  const profile=profileFor(session.examFlow);
+  if (!profile) return false;
+  if (profile.decisionPoints?.length) return Number(session.answeredTurns)>=profile.minAnswers && profile.decisionPoints.every(point=>(session.examFlow.decisions || []).some(d=>d.point === point));
+  return Number(session.answeredTurns)>=profile.maxAnswers;
+}
 function publicFlow(session) {
   const flow=session.examFlow, profile=profileFor(flow);
   if (!profile) return null;
@@ -127,4 +139,4 @@ function calendarResponse(session, transcript) {
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
-module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,responsePlan,partnerInstructions,mergeDecisions,calendarResponse};
+module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse};

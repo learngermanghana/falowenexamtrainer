@@ -73,3 +73,21 @@ test("calendar arithmetic needs no language-model call and accepts an explicit c
   expect(flows.calendarResponse(session,"Ja, das passt.").complete).toBe(true);
   expect(flows.calendarResponse({...session,answeredTurns:1},"Mittwoch um 18 Uhr passt.").complete).toBe(false);
 });
+
+test.each(["Tagesablauf","Sprachen","Haustiere"])("selected A2 card %s survives",word=>{
+ const task={teil:"Teil 1",prompt:word};const flow=flows.createExaminerFlow("A2",task);
+ expect(flow.cards[0].word).toBe(word);expect(new Set(flow.cards.map(c=>c.word)).size).toBe(4);
+ expect(examinerTaskPreview("A2",task).cards).toEqual(flow.cards.map(c=>c.word));
+});
+test("Frühstück has a distinct second card",()=>{
+ const task={teil:"Teil 2",prompt:"Frühstück"};const flow=flows.createExaminerFlow("A1",task);
+ expect(flow.cards.map(c=>c.word)).toEqual(["Frühstück","Wochenende"]);
+ expect(examinerTaskPreview("A1",task).cards).toEqual(["Frühstück","Wochenende"]);
+ expect(flow.cards[0].question).toBe("Was essen Sie zum Frühstück?");
+});
+
+test("feedback readiness alone does not complete interrupted tasks",()=>{
+ const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 1",prompt:"Sprachen"});
+ expect(flows.isReady({examFlow,answeredTurns:2,taskReady:true})).toBe(true);
+ expect(flows.isComplete({examFlow,answeredTurns:2,taskReady:true})).toBe(false);
+});

@@ -508,7 +508,8 @@ test.each(["A1","A2","B1"].flatMap(level=>[1,2,3].map(part=>[level,part])))("%s 
   const input=JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content);
   expect(input.studentTranscripts).toHaveLength(session.answerLimit);
   expect(input.examContext.requiredCriteria.length).toBeGreaterThan(1);
-  expect(input.examContext.completedAllTurns).toBe(true);
+  expect(input.examContext.reachedTurnLimit).toBe(true);
+  expect(input.examContext.taskComplete).toBe(!(level === "A2" && part === 3) && !(level === "B1" && part === 1));
   expect(JSON.stringify(input)).not.toContain("FORGED");
 });
 
@@ -576,4 +577,30 @@ test("simulation and task limits cannot be replaced by client profile fields",as
   expect(response.payload.answerLimit).toBe(3);
   expect(response.payload.maxRecordingSeconds).toBe(60);
   expect(response.payload.examFlow.hints).toEqual([]);
+});
+
+test("A2 eight-answer flow allows two failed recordings after the introduction",async()=>{
+ const api=setup();const session=await startTaskFlow(api,"A2",1);
+ expect(session.maxTurns).toBe(14);
+ await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+ api.fakeClient.audio.transcriptions.create.mockResolvedValueOnce({text:""}).mockResolvedValueOnce({text:""});
+ for(let i=0;i<2;i++)await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+ for(let i=0;i<8;i++)expect((await answerExam(api,session)).code).toBe(200);
+ expect(api.docs.get(sessionKey).answeredTurns).toBe(8);
+});
+test("successful early appointment is complete for assessment",async()=>{
+ const api=setup();const session=await startTaskFlow(api,"A2",3);
+ await answerExam(api,session,"Wann hast du Zeit?");
+ await answerExam(api,session,"Ja, Mittwoch um 18 Uhr passt.");
+ await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+ const input=JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content);
+ expect(input.examContext).toEqual(expect.objectContaining({taskComplete:true,completedAllTurns:true,reachedTurnLimit:false}));
+});
+
+test("A2 retry allowance remains bounded",async()=>{
+ const api=setup();const session=await startTaskFlow(api,"A2",1);
+ api.docs.set(sessionKey,{...api.docs.get(sessionKey),turnsUsed:14});
+ const blocked=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+ expect(blocked.payload.code).toBe("turn_limit");
+ expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
 });
