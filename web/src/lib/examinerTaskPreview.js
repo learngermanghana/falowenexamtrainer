@@ -19,7 +19,7 @@ export const examinerTaskPreview = (level,task,mode="guided") => {
   const topicEntry=Object.entries(catalogue.a2TopicPoints).find(([topic])=>topic !== "default" && String(task?.prompt || "").toLowerCase().includes(topic.toLowerCase()));
   const supplied=String(task?.keywords || "").split(/[,;·]/).map(value=>value.trim()).filter(Boolean);
   return {key,title:profile.title,mode,topic:key === "B1-3" ? (/fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : task?.prompt || "Freizeit") : "",maxAnswers:profile.maxAnswers,role:profile.role,
-    cards,card:key === "A1-3" ? selected : "",requestCards,studentCalendar:profile.studentCalendar || [],
+    cards,card:"",requestCards,studentCalendar:profile.studentCalendar || [],
     points:key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : key === "B1-2" ? catalogue.presentationPoints : key === "B1-1" ? ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : key === "A2-2" ? (supplied.length>=4 ? supplied.slice(0,4) : topicEntry?.[1] || catalogue.a2TopicPoints.default) : [],
     hints:mode === "guided" ? profile.hints : [],
     scenario:key === "A2-3" ? `Sie möchten gemeinsam folgende Aktivität planen: ${String(task?.prompt || "ein Geschenk für einen Freund kaufen").slice(0,180)}. Finden Sie einen gemeinsamen Termin.` : "",
