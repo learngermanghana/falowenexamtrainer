@@ -1,11 +1,22 @@
 import { collection, getDocs, query, where } from "../firebase";
 
-export const findOwnedSubmissionLock = async ({ db, studentId, lockId }) => {
-  // Rules can authorize this ownership-filtered query even when the student's
-  // first submission has no lock. A direct get of a missing lock is denied.
+// Firestore rules intentionally deny reading a missing student document by ID:
+// it has no owner fields until creation. An owner-filtered collection query
+// works for first submissions without weakening those security rules.
+export const findOwnedSubmissionDocument = async ({ db, studentId, collectionName, documentId }) => {
+  if (!db || !studentId || !documentId ||
+      !["submissionLocks", "submissionDrafts"].includes(collectionName)) {
+    throw new Error("Invalid student submission document lookup.");
+  }
   const snapshot = await getDocs(query(
-    collection(db, "submissionLocks"),
+    collection(db, collectionName),
     where("studentId", "==", studentId),
   ));
-  return snapshot.docs.find((entry) => entry.id === lockId) || null;
+  return snapshot.docs.find(entry => entry.id === documentId) || null;
 };
+
+export const findOwnedSubmissionLock = ({ db, studentId, lockId }) =>
+  findOwnedSubmissionDocument({ db, studentId, collectionName: "submissionLocks", documentId: lockId });
+
+export const findOwnedSubmissionDraft = ({ db, studentId, draftId }) =>
+  findOwnedSubmissionDocument({ db, studentId, collectionName: "submissionDrafts", documentId: draftId });
