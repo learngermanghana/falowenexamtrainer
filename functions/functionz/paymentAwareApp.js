@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
 
@@ -237,6 +238,9 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 
   return null;
 };
+
+// Voice-only test pilot. No payment routes or payment webhook integration.
+registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
 app.post("/paystack/initialize", async (req, res) => {
   try {
