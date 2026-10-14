@@ -7,6 +7,11 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 function patchSpeakingPage() {
   const file = path.join(root, "web/src/components/SpeakingPage.js");
   let source = fs.readFileSync(file, "utf8");
+  // The unified oral-exam UI already enforces level/Teil locks and must not
+  // be rewritten back into the former multi-button coach by this legacy patch.
+  if (source.includes('const [taskMode, setTaskMode] = useState("random");') &&
+      source.includes('aria-label="Choose speaking exam part"') &&
+      source.includes("normalizedLockedTeil")) return;
 
   const replaceOnce = (before, after, label) => {
     if (source.includes(after)) return;
