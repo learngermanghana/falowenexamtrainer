@@ -19,3 +19,21 @@ test('requires confirmed delivery and allows successful update',async()=>{
  for(const result of [undefined,{}, {action:'ignored'}])await assert.rejects(deliverCurrentStudentToSheet({snapshot:snapshot({}),appendStudent:async()=>result}));
  assert.equal((await deliverCurrentStudentToSheet({snapshot:snapshot({}),appendStudent:async()=>({action:'updated'})})).action,'updated');
 });
+
+test('permanent configuration and authorization failures finish without retry',async()=>{
+ for(const result of [
+  {error:'Missing STUDENTS_SHEET_ID env var.'},
+  {error:'Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64).'},
+  {error:'Students sheet is missing a StudentCode column header.'},
+  {error:'invalid_grant'},
+  {error:'denied',errorStatus:403,errorReason:'forbidden'},
+ ])assert.equal((await deliverCurrentStudentToSheet({snapshot:snapshot({}),appendStudent:async()=>result})).retryable,false);
+});
+test('transient Google API errors continue retrying including 403 rate limits',async()=>{
+ for(const result of [
+  {error:'temporary',errorStatus:503},
+  {error:'too many requests',errorStatus:429},
+  {error:'limit',errorStatus:403,errorReason:'rateLimitExceeded'},
+  {error:'ECONNRESET'},
+ ])await assert.rejects(deliverCurrentStudentToSheet({snapshot:snapshot({}),appendStudent:async()=>result}));
+});
