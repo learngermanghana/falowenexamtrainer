@@ -1,9 +1,8 @@
-import React, { Suspense, lazy, useState } from "react";
+import React, { useState } from "react";
 import { styles } from "../styles";
 
-// Load the existing voice tutor only after a learner asks to speak.
-// This uses the SAME backend, free trial credits and global cost cap everywhere.
-const LiveSpeakPage = lazy(() => import("./LiveSpeakPage"));
+// This uses the SAME backend, free pilot credits and global cost cap everywhere.
+import LiveSpeakPage from "./LiveSpeakPage";
 
 export default function LiveSpeakInlinePractice({
   level = "",
@@ -45,14 +44,12 @@ export default function LiveSpeakInlinePractice({
         </button>
       </div>
       {open ? (
-        <Suspense fallback={<p role="status">Preparing the German voice tutor…</p>}>
-          <LiveSpeakPage
+        <LiveSpeakPage
             embedded
             initialLevel={level}
             practiceTopic={topic}
             practiceSource={source}
-          />
-        </Suspense>
+        />
       ) : null}
     </section>
   );
