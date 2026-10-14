@@ -23,7 +23,16 @@ const GERMAN_OPENINGS = {
   C2: "Guten Tag! Über welche komplexe Fragestellung würdest du heute gern diskutieren?",
 };
 const enabled = () => process.env.LIVE_SPEAK_ENABLED === "true";
-const approvedTester = (uid) => Boolean(uid) && String(process.env.LIVE_SPEAK_TESTER_UIDS || "").split(",").map(x=>x.trim()).filter(Boolean).includes(uid);
+const normalizedAllowlist = (key, transform = (value) => value) =>
+  String(process.env[key] || "").split(",").map(value => transform(value.trim())).filter(Boolean);
+const approvedTester = (auth) => {
+  if (!auth || typeof auth !== "object" || !auth.uid) return false;
+  // UID approval is strongest. For email-based pilot approval, only trust
+  // Firebase's verified email claim from the authenticated ID token.
+  if (normalizedAllowlist("LIVE_SPEAK_TESTER_UIDS").includes(auth.uid)) return true;
+  return auth.email_verified === true &&
+    normalizedAllowlist("LIVE_SPEAK_TESTER_EMAILS", normalizeEmail).includes(normalizeEmail(auth.email));
+};
 const spendingCap = () => {
   const configured = Number(process.env.LIVE_SPEAK_MONTHLY_TURN_CAP);
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 500 ? configured : 40;
@@ -60,7 +69,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     return { auth, profile };
   };
   const requireApprovedTester = (student, res) => {
-    if (approvedTester(student.auth.uid)) return true;
+    if (approvedTester(student.auth)) return true;
     error(res, 403, "not_approved", "This pilot is currently available only to approved testers.");
     return false;
   };
@@ -74,7 +83,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       const student = await requireStudent(req, res);
       if (!student) return;
-      const approved = approvedTester(student.auth.uid);
+      const approved = approvedTester(student.auth);
       const pilot = approved
         ? await db().collection("liveSpeakPilotCredits").doc(student.auth.uid).get()
         : null;
