@@ -968,7 +968,7 @@ const SpeakingPage = ({
   const totalCount = baseFilteredQuestions.length;
 
   return (
-    <div style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
+    <div className={isExamMode ? "speaking-exam-page" : undefined} style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
       <div
         style={{
           ...styles.card,
@@ -977,7 +977,7 @@ const SpeakingPage = ({
           borderRadius: isCompactViewport ? 0 : styles.card.borderRadius,
         }}
       >
-        <div
+        <div className={isExamMode ? "speaking-exam-hero" : undefined}
           style={{
             background: "linear-gradient(120deg, #4f46e5, #8b5cf6, #a21caf)",
             color: "#ffffff",
@@ -1310,9 +1310,9 @@ const SpeakingPage = ({
 
 
         {!isCourseMode && activeSpeakingTab === "exam" ? (
-          <div style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
-            <aside style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
-              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+          <div className="speaking-exam-grid" style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
+            <aside className="speaking-exam-sidebar" style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
+              <div className="speaking-exam-part-picker" style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <strong style={{fontSize:13,color:"#1e40af"}}>Level {selectedLevel}</strong>
                 <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
                 {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
@@ -1322,7 +1322,7 @@ const SpeakingPage = ({
                 )}
               </div>
               {selectedTeil !== "1" ? (
-                <div role="group" aria-label="Task selection" style={{display:"grid",gap:8}}>
+                <div className="speaking-exam-task-picker" role="group" aria-label="Task selection" style={{display:"grid",gap:8}}>
                   <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                     <button type="button" onClick={()=>setTaskMode("random")} disabled={liveExaminerActive}
                       aria-pressed={taskMode==="random"} style={{...styles.secondaryButton,background:taskMode==="random"?"#dbeafe":"#fff",borderColor:taskMode==="random"?"#3b82f6":"#cbd5e1",padding:"8px 10px"}}>
@@ -1350,7 +1350,7 @@ const SpeakingPage = ({
                   )}
                 </div>
               ) : null}
-              <section aria-label="Speaking exam instructions" style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
+              <section className="speaking-exam-guide" aria-label="Speaking exam instructions" style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
                 <strong style={{color:"#1e3a8a"}}>Teil {selectedTeil} · {examGuide.title}</strong>
                 <p lang="de" style={{margin:0,fontSize:14,lineHeight:1.55}}>{examGuide.german}</p>
                 <p style={{margin:0,fontSize:13,color:"#475569",lineHeight:1.5}}>{examGuide.english}</p>
@@ -1359,7 +1359,7 @@ const SpeakingPage = ({
                 </ol>
               </section>
             </aside>
-            <section style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
+            <section className="speaking-exam-voice" style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
               {selectedQuestion ? (
                 <LiveSpeakPage key={selectedLevel+"-"+selectedQuestion.id} embedded initialLevel={selectedLevel}
                   practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
