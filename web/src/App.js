@@ -158,6 +158,7 @@ import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { useToast } from "./context/ToastContext";
+import { announceExamSuccess } from "./services/interactionFeedback";
 import { isFirebaseConfigured, listenForForegroundMessages } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
@@ -1555,6 +1556,12 @@ const ExamArea = ({ onBack }) => {
   };
   const activeExamHero = examHeroConfig[examSection];
 
+  const openExamSection = (tab) => {
+    if (examSection === tab.key && !sampleId) return;
+    announceExamSuccess(`${tab.label} opened successfully.`);
+    navigate(`/exams/${tab.key}`);
+  };
+
   return (
     <>
       <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
@@ -1566,7 +1573,7 @@ const ExamArea = ({ onBack }) => {
             <button
               key={tab.key}
               style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-              onClick={() => navigate(`/exams/${tab.key}`)}
+              onClick={() => openExamSection(tab)}
             >
               {tab.label}
             </button>
@@ -1582,7 +1589,7 @@ const ExamArea = ({ onBack }) => {
             <button type="button" onClick={onBack}>← {t("appNav.backHome")}</button>
             {tabs.map((tab) => (
               <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
-                onClick={() => navigate(`/exams/${tab.key}`)}>
+                onClick={() => openExamSection(tab)}>
                 {tab.label}
               </button>
             ))}
@@ -1613,6 +1620,7 @@ const ExamArea = ({ onBack }) => {
                 onClick={() => {
                   if (option === level) return;
                   setLevel(option);
+                  announceExamSuccess(`${option} exam level selected successfully.`);
                   // A sample URL contains its original CEFR level; leave it before switching.
                   if (sampleId) navigate(`/exams/${examSection}`);
                 }}
