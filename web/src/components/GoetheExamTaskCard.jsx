@@ -24,7 +24,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
       <div className="goethe-card-mat">
         <div className="goethe-card goethe-card--word" role="group" aria-label="A1 current word card">
           <PracticeCardHeader part={2}/>
-          <div className="goethe-card__theme" lang="de">Thema: {cardIndex === 0 ? topic || "Alltag" : ({"Frühstück":"Essen & Trinken","Wochenende":"Freizeit"}[flow.cards[cardIndex]] || topic || "Alltag")}</div>
+          <div className="goethe-card__theme" lang="de">Thema: {flow.cardThemes?.[Math.min(cardIndex,flow.cards.length-1)] || topic || "Alltag"}</div>
           <div className="goethe-card__keyword" lang="de">{flow.cards[Math.min(cardIndex,flow.cards.length-1)]}</div>
         </div>
         <small className="goethe-card__caption">Karte {Math.min(cardIndex+1,flow.cards.length)} von {flow.cards.length} · {flow.step?.action === "answer-question" ? "Answer your partner’s question." : "Ask your partner a question about this word."}</small>
@@ -44,7 +44,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
       <div className="goethe-card goethe-card--picture" role="group" aria-label="A1 request picture card">
         <PracticeCardHeader part={3}/>
         <div className="goethe-card__picture">
-          <span aria-hidden="true">{requestCard.symbol || "🗂️"}</span>
+          {requestCard.picture ? <img src={requestCard.picture} alt={requestCard.word} width="160" height="160"/> : <span aria-hidden="true">{requestCard.symbol || "🗂️"}</span>}
           <strong lang="de">{requestCard.word}</strong>
         </div>
       </div>

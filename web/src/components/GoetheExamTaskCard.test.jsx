@@ -86,19 +86,19 @@ test("A2 highlights each personal card and says whose question comes next",()=>{
 });
 
 test("A1 Teil 2 shows one theme and word at a time, advancing after the answer turn",()=>{
-  const task={teil:"Teil 2",prompt:"Geburtstag",keywords:"Geschenk"};
+  const task={teil:"Teil 2",prompt:"Essen und Trinken",keywords:"Lieblingsessen"};
   const examFlow=flows.createExaminerFlow("A1",task);
   const {rerender}=render(<GoetheExamTaskCard flow={examinerTaskPreview("A1",task)} topic={task.prompt}/>);
-  expect(screen.getByText("Thema: Geburtstag")).toBeInTheDocument();
-  expect(screen.getByText("Geschenk")).toBeInTheDocument();
+  expect(screen.getByText("Thema: Essen und Trinken")).toBeInTheDocument();
+  expect(screen.getByText("Lieblingsessen")).toBeInTheDocument();
   expect(screen.queryByText("Frühstück")).not.toBeInTheDocument();
   rerender(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:1})} topic={task.prompt} active/>);
-  expect(screen.getByText("Geschenk")).toBeInTheDocument();
+  expect(screen.getByText("Lieblingsessen")).toBeInTheDocument();
   expect(screen.queryByText("Frühstück")).not.toBeInTheDocument();
   rerender(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:2})} topic={task.prompt} active/>);
   expect(screen.getByText("Frühstück")).toBeInTheDocument();
-  expect(screen.getByText("Thema: Essen & Trinken")).toBeInTheDocument();
-  expect(screen.queryByText("Geschenk")).not.toBeInTheDocument();
+  expect(screen.getByText("Thema: Essen und Trinken")).toBeInTheDocument();
+  expect(screen.queryByText("Lieblingsessen")).not.toBeInTheDocument();
 });
 
 test("A1 Teil 1 uses the seven ruled personal prompts",()=>{
@@ -108,10 +108,10 @@ test("A1 Teil 1 uses the seven ruled personal prompts",()=>{
 });
 
 test("A1 Teil 3 frames only the current action picture",()=>{
-  const task={teil:"Teil 3",prompt:"Fenster zumachen"};
+  const task={teil:"Teil 3",prompt:"Fenster"};
   const examFlow=flows.createExaminerFlow("A1",task);
   render(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:0})} topic={task.prompt}/>);
   expect(screen.getByRole("group",{name:"A1 request picture card"})).toHaveTextContent("Sprechen Teil 3");
-  expect(screen.getByRole("group",{name:"A1 request picture card"})).toHaveTextContent("Fenster zumachen");
+  expect(screen.getByRole("group",{name:"A1 request picture card"})).toHaveTextContent("Fenster");
   expect(screen.queryByText(examFlow.requestCards[1].word)).not.toBeInTheDocument();
 });

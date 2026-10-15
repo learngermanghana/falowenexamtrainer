@@ -374,7 +374,7 @@ const SpeakingPage = ({
   const examSteps = {
     A1: {
       1: {title:"Sich vorstellen", german:"Guten Tag. Stellen Sie sich bitte vor.", english:"Introduce yourself: name, age, country, home, languages, work and hobbies.", steps:["Introduce yourself","Spell your surname","Say a number","Answer one personal follow-up"]},
-      2: {title:"Fragen stellen und antworten", german:"Stellen Sie eine Frage zu Ihrer Wortkarte.", english:"One theme and word card at a time. Ask a question, listen to your partner and answer their question.", steps:["Ask a question using card 1","Answer the partner","Ask using card 2","Answer the partner"]},
+      2: {title:"Fragen stellen und antworten", german:"Stellen Sie eine Frage zu Ihrer Wortkarte.", english:"One theme and word card at a time. Ask a question, listen to your partner and answer their question.", steps:["Ask about the current keyword","Answer the partner","Continue with the next keyword if shown"]},
       3: {title:"Bitten formulieren und reagieren", german:"Formulieren Sie eine Bitte zu Ihrer Karte.", english:"Make a polite request and respond to your partner. Repeat with a second card.", steps:["Request using card 1","React to a request","Request using card 2","React to a request"]},
     },
     A2: {

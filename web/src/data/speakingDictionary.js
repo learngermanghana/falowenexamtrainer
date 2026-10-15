@@ -11,117 +11,27 @@ export const speakingQuestionDictionary = [
     "hint": "Sprechen Sie kurz über alle Punkte in einer Antwort."
   },
   {
-    "id": "a1-teil-2-gesch-ft-9",
+    "id": "a1-teil-2-essen-und-trinken-lieblingsessen",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Geschäft",
-    "keywordSubtopic": "schließen",
-    "text": "Geschäft (schließen)",
-    "hint": "Stichwort: schließen"
+    "topicPrompt": "Essen und Trinken",
+    "keywordSubtopic": "Lieblingsessen",
+    "text": "Essen und Trinken (Lieblingsessen)",
+    "hint": "Stichwort: Lieblingsessen"
   },
   {
-    "id": "a1-teil-2-uhr-10",
+    "id": "a1-teil-2-essen-und-trinken-fruhstuck",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Uhr",
-    "keywordSubtopic": "Uhrzeit",
-    "text": "Uhr (Uhrzeit)",
-    "hint": "Stichwort: Uhrzeit"
+    "topicPrompt": "Essen und Trinken",
+    "keywordSubtopic": "Frühstück",
+    "text": "Essen und Trinken (Frühstück)",
+    "hint": "Stichwort: Frühstück"
   },
   {
-    "id": "a1-teil-2-rauchen-11",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Rauchen",
-    "keywordSubtopic": "Verboten",
-    "text": "Rauchen (Verboten)",
-    "hint": "Stichwort: Verboten"
-  },
-  {
-    "id": "a1-teil-2-essen-12",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Essen",
-    "keywordSubtopic": "Erlaubt",
-    "text": "Essen (Erlaubt)",
-    "hint": "Stichwort: Erlaubt"
-  },
-  {
-    "id": "a1-teil-2-arbeit-13",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Arbeit",
-    "keywordSubtopic": "Kollege",
-    "text": "Arbeit (Kollege)",
-    "hint": "Stichwort: Kollege"
-  },
-  {
-    "id": "a1-teil-2-hausaufgabe-14",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Hausaufgabe",
-    "keywordSubtopic": "machen",
-    "text": "Hausaufgabe (machen)",
-    "hint": "Stichwort: machen"
-  },
-  {
-    "id": "a1-teil-2-k-che-15",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Küche",
-    "keywordSubtopic": "kochen",
-    "text": "Küche (kochen)",
-    "hint": "Stichwort: kochen"
-  },
-  {
-    "id": "a1-teil-2-freizeit-16",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Freizeit",
-    "keywordSubtopic": "lesen",
-    "text": "Freizeit (lesen)",
-    "hint": "Stichwort: lesen"
-  },
-  {
-    "id": "a1-teil-2-telefon-17",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Telefon",
-    "keywordSubtopic": "anrufen",
-    "text": "Telefon (anrufen)",
-    "hint": "Stichwort: anrufen"
-  },
-  {
-    "id": "a1-teil-2-reise-18",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Reise",
-    "keywordSubtopic": "Hotel",
-    "text": "Reise (Hotel)",
-    "hint": "Stichwort: Hotel"
-  },
-  {
-    "id": "a1-teil-2-auto-19",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Auto",
-    "keywordSubtopic": "fahren",
-    "text": "Auto (fahren)",
-    "hint": "Stichwort: fahren"
-  },
-  {
-    "id": "a1-teil-2-einkaufen-20",
+    "id": "a1-teil-2-einkaufen-obst",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
@@ -131,187 +41,77 @@ export const speakingQuestionDictionary = [
     "hint": "Stichwort: Obst"
   },
   {
-    "id": "a1-teil-2-schule-21",
+    "id": "a1-teil-2-einkaufen-preis",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Schule",
-    "keywordSubtopic": "Lehrer",
-    "text": "Schule (Lehrer)",
-    "hint": "Stichwort: Lehrer"
+    "topicPrompt": "Einkaufen",
+    "keywordSubtopic": "Preis",
+    "text": "Einkaufen (Preis)",
+    "hint": "Stichwort: Preis"
   },
   {
-    "id": "a1-teil-2-geburtstag-22",
+    "id": "a1-teil-2-freizeit-sport",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Geburtstag",
-    "keywordSubtopic": "Geschenk",
-    "text": "Geburtstag (Geschenk)",
-    "hint": "Stichwort: Geschenk"
+    "topicPrompt": "Freizeit",
+    "keywordSubtopic": "Sport",
+    "text": "Freizeit (Sport)",
+    "hint": "Stichwort: Sport"
   },
   {
-    "id": "a1-teil-2-essen-23",
+    "id": "a1-teil-2-freizeit-wochenende",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Essen",
-    "keywordSubtopic": "Frühstück",
-    "text": "Essen (Frühstück)",
-    "hint": "Stichwort: Frühstück"
+    "topicPrompt": "Freizeit",
+    "keywordSubtopic": "Wochenende",
+    "text": "Freizeit (Wochenende)",
+    "hint": "Stichwort: Wochenende"
   },
   {
-    "id": "a1-teil-2-arzt-24",
+    "id": "a1-teil-2-wohnen-haus",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Arzt",
-    "keywordSubtopic": "Termin",
-    "text": "Arzt (Termin)",
-    "hint": "Stichwort: Termin"
+    "topicPrompt": "Wohnen",
+    "keywordSubtopic": "Haus",
+    "text": "Wohnen (Haus)",
+    "hint": "Stichwort: Haus"
   },
   {
-    "id": "a1-teil-2-zug-25",
+    "id": "a1-teil-2-wohnen-balkon",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Zug",
-    "keywordSubtopic": "Abfahrt",
-    "text": "Zug (Abfahrt)",
-    "hint": "Stichwort: Abfahrt"
+    "topicPrompt": "Wohnen",
+    "keywordSubtopic": "Balkon",
+    "text": "Wohnen (Balkon)",
+    "hint": "Stichwort: Balkon"
   },
   {
-    "id": "a1-teil-2-wetter-26",
+    "id": "a1-teil-2-tagesablauf-uhrzeit",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Wetter",
-    "keywordSubtopic": "Regen",
-    "text": "Wetter (Regen)",
-    "hint": "Stichwort: Regen"
+    "topicPrompt": "Tagesablauf",
+    "keywordSubtopic": "Uhrzeit",
+    "text": "Tagesablauf (Uhrzeit)",
+    "hint": "Stichwort: Uhrzeit"
   },
   {
-    "id": "a1-teil-2-buch-27",
+    "id": "a1-teil-2-tagesablauf-mittagessen",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Buch",
-    "keywordSubtopic": "lesen",
-    "text": "Buch (lesen)",
-    "hint": "Stichwort: lesen"
+    "topicPrompt": "Tagesablauf",
+    "keywordSubtopic": "Mittagessen",
+    "text": "Tagesablauf (Mittagessen)",
+    "hint": "Stichwort: Mittagessen"
   },
   {
-    "id": "a1-teil-2-computer-28",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Computer",
-    "keywordSubtopic": "E-Mail",
-    "text": "Computer (E-Mail)",
-    "hint": "Stichwort: E-Mail"
-  },
-  {
-    "id": "a1-teil-2-kind-29",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Kind",
-    "keywordSubtopic": "spielen",
-    "text": "Kind (spielen)",
-    "hint": "Stichwort: spielen"
-  },
-  {
-    "id": "a1-teil-2-wochenende-30",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Wochenende",
-    "keywordSubtopic": "Plan",
-    "text": "Wochenende (Plan)",
-    "hint": "Stichwort: Plan"
-  },
-  {
-    "id": "a1-teil-2-bank-31",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Bank",
-    "keywordSubtopic": "Geld",
-    "text": "Bank (Geld)",
-    "hint": "Stichwort: Geld"
-  },
-  {
-    "id": "a1-teil-2-sport-32",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Sport",
-    "keywordSubtopic": "laufen",
-    "text": "Sport (laufen)",
-    "hint": "Stichwort: laufen"
-  },
-  {
-    "id": "a1-teil-2-abend-33",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Abend",
-    "keywordSubtopic": "Fernsehen",
-    "text": "Abend (Fernsehen)",
-    "hint": "Stichwort: Fernsehen"
-  },
-  {
-    "id": "a1-teil-2-freunde-34",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Freunde",
-    "keywordSubtopic": "Besuch",
-    "text": "Freunde (Besuch)",
-    "hint": "Stichwort: Besuch"
-  },
-  {
-    "id": "a1-teil-2-bahn-35",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Bahn",
-    "keywordSubtopic": "Fahrkarte",
-    "text": "Bahn (Fahrkarte)",
-    "hint": "Stichwort: Fahrkarte"
-  },
-  {
-    "id": "a1-teil-2-stra-e-36",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Straße",
-    "keywordSubtopic": "Stau",
-    "text": "Straße (Stau)",
-    "hint": "Stichwort: Stau"
-  },
-  {
-    "id": "a1-teil-2-essen-gehen-37",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Essen gehen",
-    "keywordSubtopic": "Restaurant",
-    "text": "Essen gehen (Restaurant)",
-    "hint": "Stichwort: Restaurant"
-  },
-  {
-    "id": "a1-teil-2-hund-38",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Hund",
-    "keywordSubtopic": "Futter",
-    "text": "Hund (Futter)",
-    "hint": "Stichwort: Futter"
-  },
-  {
-    "id": "a1-teil-2-familie-39",
+    "id": "a1-teil-2-familie-kinder",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
@@ -321,414 +121,314 @@ export const speakingQuestionDictionary = [
     "hint": "Stichwort: Kinder"
   },
   {
-    "id": "a1-teil-2-post-40",
+    "id": "a1-teil-2-familie-sprachen",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Post",
-    "keywordSubtopic": "Brief",
-    "text": "Post (Brief)",
-    "hint": "Stichwort: Brief"
+    "topicPrompt": "Familie",
+    "keywordSubtopic": "Sprachen",
+    "text": "Familie (Sprachen)",
+    "hint": "Stichwort: Sprachen"
   },
   {
-    "id": "a1-teil-2-nachbarn-41",
+    "id": "a1-teil-2-arbeit-und-beruf-beruf",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Nachbarn",
-    "keywordSubtopic": "laut",
-    "text": "Nachbarn (laut)",
-    "hint": "Stichwort: laut"
+    "topicPrompt": "Arbeit und Beruf",
+    "keywordSubtopic": "Beruf",
+    "text": "Arbeit und Beruf (Beruf)",
+    "hint": "Stichwort: Beruf"
   },
   {
-    "id": "a1-teil-2-kleid-42",
+    "id": "a1-teil-2-arbeit-und-beruf-arbeitszeit",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Kleid",
-    "keywordSubtopic": "kaufen",
-    "text": "Kleid (kaufen)",
-    "hint": "Stichwort: kaufen"
+    "topicPrompt": "Arbeit und Beruf",
+    "keywordSubtopic": "Arbeitszeit",
+    "text": "Arbeit und Beruf (Arbeitszeit)",
+    "hint": "Stichwort: Arbeitszeit"
   },
   {
-    "id": "a1-teil-2-b-ro-43",
+    "id": "a1-teil-2-deutschkurs-schule-pause",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Büro",
-    "keywordSubtopic": "Chef",
-    "text": "Büro (Chef)",
-    "hint": "Stichwort: Chef"
+    "topicPrompt": "Deutschkurs / Schule",
+    "keywordSubtopic": "Pause",
+    "text": "Deutschkurs / Schule (Pause)",
+    "hint": "Stichwort: Pause"
   },
   {
-    "id": "a1-teil-2-urlaub-44",
+    "id": "a1-teil-2-deutschkurs-schule-hausaufgaben",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Urlaub",
-    "keywordSubtopic": "Strand",
-    "text": "Urlaub (Strand)",
-    "hint": "Stichwort: Strand"
+    "topicPrompt": "Deutschkurs / Schule",
+    "keywordSubtopic": "Hausaufgaben",
+    "text": "Deutschkurs / Schule (Hausaufgaben)",
+    "hint": "Stichwort: Hausaufgaben"
   },
   {
-    "id": "a1-teil-2-kino-45",
+    "id": "a1-teil-2-post-und-bank-briefmarke",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Kino",
-    "keywordSubtopic": "Film",
-    "text": "Kino (Film)",
-    "hint": "Stichwort: Film"
+    "topicPrompt": "Post und Bank",
+    "keywordSubtopic": "Briefmarke",
+    "text": "Post und Bank (Briefmarke)",
+    "hint": "Stichwort: Briefmarke"
   },
   {
-    "id": "a1-teil-2-internet-46",
+    "id": "a1-teil-2-post-und-bank-geld",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Internet",
-    "keywordSubtopic": "Seite",
-    "text": "Internet (Seite)",
-    "hint": "Stichwort: Seite"
+    "topicPrompt": "Post und Bank",
+    "keywordSubtopic": "Geld",
+    "text": "Post und Bank (Geld)",
+    "hint": "Stichwort: Geld"
   },
   {
-    "id": "a1-teil-2-bus-47",
+    "id": "a1-teil-2-verkehr-unterwegs-bus",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Bus",
-    "keywordSubtopic": "Abfahrt",
-    "text": "Bus (Abfahrt)",
-    "hint": "Stichwort: Abfahrt"
+    "topicPrompt": "Verkehr / Unterwegs",
+    "keywordSubtopic": "Bus",
+    "text": "Verkehr / Unterwegs (Bus)",
+    "hint": "Stichwort: Bus"
   },
   {
-    "id": "a1-teil-2-arztpraxis-48",
+    "id": "a1-teil-2-verkehr-unterwegs-fahrkarte",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Arztpraxis",
-    "keywordSubtopic": "Wartezeit",
-    "text": "Arztpraxis (Wartezeit)",
-    "hint": "Stichwort: Wartezeit"
+    "topicPrompt": "Verkehr / Unterwegs",
+    "keywordSubtopic": "Fahrkarte",
+    "text": "Verkehr / Unterwegs (Fahrkarte)",
+    "hint": "Stichwort: Fahrkarte"
   },
   {
-    "id": "a1-teil-2-kuchen-49",
+    "id": "a1-teil-2-reisen-urlaub-koffer",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Kuchen",
-    "keywordSubtopic": "backen",
-    "text": "Kuchen (backen)",
-    "hint": "Stichwort: backen"
+    "topicPrompt": "Reisen / Urlaub",
+    "keywordSubtopic": "Koffer",
+    "text": "Reisen / Urlaub (Koffer)",
+    "hint": "Stichwort: Koffer"
   },
   {
-    "id": "a1-teil-2-park-50",
+    "id": "a1-teil-2-reisen-urlaub-hotel",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Park",
-    "keywordSubtopic": "spazieren",
-    "text": "Park (spazieren)",
-    "hint": "Stichwort: spazieren"
+    "topicPrompt": "Reisen / Urlaub",
+    "keywordSubtopic": "Hotel",
+    "text": "Reisen / Urlaub (Hotel)",
+    "hint": "Stichwort: Hotel"
   },
   {
-    "id": "a1-teil-2-b-ckerei-51",
+    "id": "a1-teil-2-gesundheit-arzt-arzt",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Bäckerei",
-    "keywordSubtopic": "Brötchen",
-    "text": "Bäckerei (Brötchen)",
-    "hint": "Stichwort: Brötchen"
+    "topicPrompt": "Gesundheit / Arzt",
+    "keywordSubtopic": "Arzt",
+    "text": "Gesundheit / Arzt (Arzt)",
+    "hint": "Stichwort: Arzt"
   },
   {
-    "id": "a1-teil-2-geldautomat-52",
+    "id": "a1-teil-2-gesundheit-arzt-medikament",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Geldautomat",
-    "keywordSubtopic": "Karte",
-    "text": "Geldautomat (Karte)",
-    "hint": "Stichwort: Karte"
+    "topicPrompt": "Gesundheit / Arzt",
+    "keywordSubtopic": "Medikament",
+    "text": "Gesundheit / Arzt (Medikament)",
+    "hint": "Stichwort: Medikament"
   },
   {
-    "id": "a1-teil-2-buchladen-53",
+    "id": "a1-teil-2-sprachen-deutsch",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Buchladen",
-    "keywordSubtopic": "Roman",
-    "text": "Buchladen (Roman)",
-    "hint": "Stichwort: Roman"
+    "topicPrompt": "Sprachen",
+    "keywordSubtopic": "Deutsch",
+    "text": "Sprachen (Deutsch)",
+    "hint": "Stichwort: Deutsch"
   },
   {
-    "id": "a1-teil-2-fernseher-54",
+    "id": "a1-teil-2-kleidung-schuhe",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Fernseher",
-    "keywordSubtopic": "Programm",
-    "text": "Fernseher (Programm)",
-    "hint": "Stichwort: Programm"
+    "topicPrompt": "Kleidung",
+    "keywordSubtopic": "Schuhe",
+    "text": "Kleidung (Schuhe)",
+    "hint": "Stichwort: Schuhe"
   },
   {
-    "id": "a1-teil-2-tasche-55",
+    "id": "a1-teil-2-feste-und-einladungen-geburtstag",
     "level": "A1",
     "teilId": "teil-2",
     "teilLabel": "Teil 2",
-    "topicPrompt": "Tasche",
-    "keywordSubtopic": "vergessen",
-    "text": "Tasche (vergessen)",
-    "hint": "Stichwort: vergessen"
+    "topicPrompt": "Feste und Einladungen",
+    "keywordSubtopic": "Geburtstag",
+    "text": "Feste und Einladungen (Geburtstag)",
+    "hint": "Stichwort: Geburtstag"
   },
   {
-    "id": "a1-teil-2-stadtplan-56",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Stadtplan",
-    "keywordSubtopic": "finden",
-    "text": "Stadtplan (finden)",
-    "hint": "Stichwort: finden"
-  },
-  {
-    "id": "a1-teil-2-ticket-57",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Ticket",
-    "keywordSubtopic": "bezahlen",
-    "text": "Ticket (bezahlen)",
-    "hint": "Stichwort: bezahlen"
-  },
-  {
-    "id": "a1-teil-2-zahnarzt-58",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Zahnarzt",
-    "keywordSubtopic": "Schmerzen",
-    "text": "Zahnarzt (Schmerzen)",
-    "hint": "Stichwort: Schmerzen"
-  },
-  {
-    "id": "a1-teil-2-museum-59",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Museum",
-    "keywordSubtopic": "Öffnungszeiten",
-    "text": "Museum (Öffnungszeiten)",
-    "hint": "Stichwort: Öffnungszeiten"
-  },
-  {
-    "id": "a1-teil-2-handy-60",
-    "level": "A1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Handy",
-    "keywordSubtopic": "Akku leer",
-    "text": "Handy (Akku leer)",
-    "hint": "Stichwort: Akku leer"
-  },
-  {
-    "id": "a1-teil-3-radio-anmachen-61",
+    "id": "a1-teil-3-glas-wasser",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Radio anmachen",
+    "topicPrompt": "Glas Wasser",
     "keywordSubtopic": "",
-    "text": "Radio anmachen",
-    "hint": ""
+    "text": "Glas Wasser",
+    "hint": "Glass of water"
   },
   {
-    "id": "a1-teil-3-fenster-zumachen-62",
+    "id": "a1-teil-3-stift-kugelschreiber",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Fenster zumachen",
+    "topicPrompt": "Stift / Kugelschreiber",
     "keywordSubtopic": "",
-    "text": "Fenster zumachen",
-    "hint": ""
+    "text": "Stift / Kugelschreiber",
+    "hint": "Pen"
   },
   {
-    "id": "a1-teil-3-licht-anschalten-63",
+    "id": "a1-teil-3-buch",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Licht anschalten",
+    "topicPrompt": "Buch",
     "keywordSubtopic": "",
-    "text": "Licht anschalten",
-    "hint": ""
+    "text": "Buch",
+    "hint": "Book"
   },
   {
-    "id": "a1-teil-3-t-r-aufmachen-64",
+    "id": "a1-teil-3-schlussel",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Tür aufmachen",
+    "topicPrompt": "Schlüssel",
     "keywordSubtopic": "",
-    "text": "Tür aufmachen",
-    "hint": ""
+    "text": "Schlüssel",
+    "hint": "Key"
   },
   {
-    "id": "a1-teil-3-tisch-sauber-machen-65",
+    "id": "a1-teil-3-uhr",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Tisch sauber machen",
+    "topicPrompt": "Uhr",
     "keywordSubtopic": "",
-    "text": "Tisch sauber machen",
-    "hint": ""
+    "text": "Uhr",
+    "hint": "Clock"
   },
   {
-    "id": "a1-teil-3-hausaufgaben-schicken-66",
+    "id": "a1-teil-3-apfel",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Hausaufgaben schicken",
+    "topicPrompt": "Apfel",
     "keywordSubtopic": "",
-    "text": "Hausaufgaben schicken",
-    "hint": ""
+    "text": "Apfel",
+    "hint": "Apple"
   },
   {
-    "id": "a1-teil-3-buch-bringen-67",
+    "id": "a1-teil-3-tasse-kaffee",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Buch bringen",
+    "topicPrompt": "Tasse Kaffee",
     "keywordSubtopic": "",
-    "text": "Buch bringen",
-    "hint": ""
+    "text": "Tasse Kaffee",
+    "hint": "Cup of coffee"
   },
   {
-    "id": "a1-teil-3-handy-ausmachen-68",
+    "id": "a1-teil-3-rechnung-geld",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Handy ausmachen",
+    "topicPrompt": "Rechnung / Geld",
     "keywordSubtopic": "",
-    "text": "Handy ausmachen",
-    "hint": ""
+    "text": "Rechnung / Geld",
+    "hint": "Bill / Money"
   },
   {
-    "id": "a1-teil-3-stuhl-nehmen-69",
+    "id": "a1-teil-3-handy-telefon",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Stuhl nehmen",
+    "topicPrompt": "Handy / Telefon",
     "keywordSubtopic": "",
-    "text": "Stuhl nehmen",
-    "hint": ""
+    "text": "Handy / Telefon",
+    "hint": "Mobile phone"
   },
   {
-    "id": "a1-teil-3-wasser-holen-70",
+    "id": "a1-teil-3-nichtrauchen-schild",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Wasser holen",
+    "topicPrompt": "Nichtrauchen-Schild",
     "keywordSubtopic": "",
-    "text": "Wasser holen",
-    "hint": ""
+    "text": "Nichtrauchen-Schild",
+    "hint": "No smoking sign"
   },
   {
-    "id": "a1-teil-3-fenster-ffnen-71",
+    "id": "a1-teil-3-tur",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Fenster öffnen",
+    "topicPrompt": "Tür",
     "keywordSubtopic": "",
-    "text": "Fenster öffnen",
-    "hint": ""
+    "text": "Tür",
+    "hint": "Door"
   },
   {
-    "id": "a1-teil-3-musik-leiser-machen-72",
+    "id": "a1-teil-3-fenster",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Musik leiser machen",
+    "topicPrompt": "Fenster",
     "keywordSubtopic": "",
-    "text": "Musik leiser machen",
-    "hint": ""
+    "text": "Fenster",
+    "hint": "Window"
   },
   {
-    "id": "a1-teil-3-tafel-sauber-wischen-73",
+    "id": "a1-teil-3-fahrkarte",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Tafel sauber wischen",
+    "topicPrompt": "Fahrkarte",
     "keywordSubtopic": "",
-    "text": "Tafel sauber wischen",
-    "hint": ""
+    "text": "Fahrkarte",
+    "hint": "Ticket"
   },
   {
-    "id": "a1-teil-3-kaffee-kochen-74",
+    "id": "a1-teil-3-tasche-koffer",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Kaffee kochen",
+    "topicPrompt": "Tasche / Koffer",
     "keywordSubtopic": "",
-    "text": "Kaffee kochen",
-    "hint": ""
+    "text": "Tasche / Koffer",
+    "hint": "Bag / Suitcase"
   },
   {
-    "id": "a1-teil-3-deutsch-ben-75",
+    "id": "a1-teil-3-radio-musik",
     "level": "A1",
     "teilId": "teil-3",
     "teilLabel": "Teil 3",
-    "topicPrompt": "Deutsch üben",
+    "topicPrompt": "Radio / Musik",
     "keywordSubtopic": "",
-    "text": "Deutsch üben",
-    "hint": ""
-  },
-  {
-    "id": "a1-teil-3-auto-waschen-76",
-    "level": "A1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Auto waschen",
-    "keywordSubtopic": "",
-    "text": "Auto waschen",
-    "hint": ""
-  },
-  {
-    "id": "a1-teil-3-kind-abholen-77",
-    "level": "A1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Kind abholen",
-    "keywordSubtopic": "",
-    "text": "Kind abholen",
-    "hint": ""
-  },
-  {
-    "id": "a1-teil-3-tisch-decken-78",
-    "level": "A1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Tisch decken",
-    "keywordSubtopic": "",
-    "text": "Tisch decken",
-    "hint": ""
-  },
-  {
-    "id": "a1-teil-3-termin-machen-79",
-    "level": "A1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Termin machen",
-    "keywordSubtopic": "",
-    "text": "Termin machen",
-    "hint": ""
-  },
-  {
-    "id": "a1-teil-3-nachricht-schreiben-80",
-    "level": "A1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Nachricht schreiben",
-    "keywordSubtopic": "",
-    "text": "Nachricht schreiben",
-    "hint": ""
+    "text": "Radio / Musik",
+    "hint": "Radio / Music"
   },
   {
     "id": "a2-teil-1-wohnort-81",

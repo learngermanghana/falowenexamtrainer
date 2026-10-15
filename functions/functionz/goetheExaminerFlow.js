@@ -4,6 +4,7 @@ const clean = (value, length=1200) => String(value || "").replace(/[\r\n\t]/g," 
 const partNumber = task => String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1] || "";
 const profileFor = flow => {
   const profile = catalogue.profiles[flow?.key];
+  if (profile && flow.key === "A1-2" && flow.cards?.length) return {...profile,maxAnswers:flow.cards.length*2};
   return profile && flow.planningPoints ? {...profile, decisionPoints:flow.planningPoints.map(point=>point.id)} : profile || null;
 };
 const words = task => clean(task?.keywords || task?.prompt,120).split(/[,;·]/).map(x=>x.trim()).filter(Boolean);
@@ -13,6 +14,7 @@ function selectedCards(word, defaults, count) {
   const questions = {tagesablauf:"Wie sieht Ihr Tagesablauf aus?",sprachen:"Welche Sprachen sprechen Sie?",haustiere:"Haben Sie Haustiere?"};
   const first = match || {word,question:questions[normalize(word)] || `Was können Sie zum Thema „${word}“ über sich erzählen?`};
   const seen = new Set();
+  if (match?.theme) defaults = defaults.filter(card=>card.theme === match.theme);
   return [first,...defaults].filter(card=>{const key=normalize(card.word);if(seen.has(key))return false;seen.add(key);return true;}).slice(0,count);
 }
 function selectedRequestCards(word) {
@@ -24,7 +26,7 @@ function selectedRequestCards(word) {
   return cards.map(card => {
     const sourceIndex = all.findIndex(item => normalize(item.word) === normalize(card.word));
     const partnerCard = all[((sourceIndex < 0 ? 0 : sourceIndex) + 3) % all.length];
-    return {word:card.word,symbol:card.symbol,partnerRequest:partnerCard.request};
+    return {word:card.word,symbol:card.symbol,picture:card.picture,partnerRequest:partnerCard.request};
   });
 }
 function createExaminerFlow(level, task, mode="guided") {
@@ -93,7 +95,8 @@ function publicFlow(session) {
     maxAnswers:profile.maxAnswers,criteria:profile.criteria,stageGuide:profile.stageGuide || "",
     hints:flow.mode === "guided" ? profile.hints : [],
     cards:flow.cards?.map(card=>card.word) || [],card:flow.card || "",
-    requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol})) || [],
+    requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol,...(card.picture ? {picture:card.picture} : {})})) || [],
+    cardThemes:flow.cards?.map(card=>card.theme || "") || [],
     points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
     studentCalendar:profile.studentCalendar || [],
     scenario:flow.scenario || "",

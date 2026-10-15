@@ -239,12 +239,139 @@
   ],
   "a1InformationCards": [
     {
+      "theme": "Essen und Trinken",
+      "word": "Lieblingsessen",
+      "question": "Was essen Sie am liebsten?"
+    },
+    {
+      "theme": "Essen und Trinken",
       "word": "Frühstück",
       "question": "Was essen Sie zum Frühstück?"
     },
     {
+      "theme": "Einkaufen",
+      "word": "Obst",
+      "question": "Wo kaufen Sie Obst?"
+    },
+    {
+      "theme": "Einkaufen",
+      "word": "Preis",
+      "question": "Wie viel kostet das?"
+    },
+    {
+      "theme": "Freizeit",
+      "word": "Sport",
+      "question": "Welchen Sport machen Sie gern?"
+    },
+    {
+      "theme": "Freizeit",
       "word": "Wochenende",
       "question": "Was machen Sie am Wochenende?"
+    },
+    {
+      "theme": "Wohnen",
+      "word": "Haus",
+      "question": "Wohnen Sie in einem Haus?"
+    },
+    {
+      "theme": "Wohnen",
+      "word": "Balkon",
+      "question": "Haben Sie einen Balkon?"
+    },
+    {
+      "theme": "Tagesablauf",
+      "word": "Uhrzeit",
+      "question": "Wann stehen Sie auf?"
+    },
+    {
+      "theme": "Tagesablauf",
+      "word": "Mittagessen",
+      "question": "Wann essen Sie zu Mittag?"
+    },
+    {
+      "theme": "Familie",
+      "word": "Kinder",
+      "question": "Haben Sie Kinder?"
+    },
+    {
+      "theme": "Familie",
+      "word": "Sprachen",
+      "question": "Welche Sprachen spricht Ihre Familie?"
+    },
+    {
+      "theme": "Arbeit und Beruf",
+      "word": "Beruf",
+      "question": "Was machen Sie beruflich?"
+    },
+    {
+      "theme": "Arbeit und Beruf",
+      "word": "Arbeitszeit",
+      "question": "Wann arbeiten Sie?"
+    },
+    {
+      "theme": "Deutschkurs / Schule",
+      "word": "Pause",
+      "question": "Wann haben Sie Pause?"
+    },
+    {
+      "theme": "Deutschkurs / Schule",
+      "word": "Hausaufgaben",
+      "question": "Wann machen Sie Ihre Hausaufgaben?"
+    },
+    {
+      "theme": "Post und Bank",
+      "word": "Briefmarke",
+      "question": "Wo kaufen Sie Briefmarken?"
+    },
+    {
+      "theme": "Post und Bank",
+      "word": "Geld",
+      "question": "Wo holen Sie Geld?"
+    },
+    {
+      "theme": "Verkehr / Unterwegs",
+      "word": "Bus",
+      "question": "Fahren Sie oft mit dem Bus?"
+    },
+    {
+      "theme": "Verkehr / Unterwegs",
+      "word": "Fahrkarte",
+      "question": "Wo kaufen Sie eine Fahrkarte?"
+    },
+    {
+      "theme": "Reisen / Urlaub",
+      "word": "Koffer",
+      "question": "Was nehmen Sie im Koffer mit?"
+    },
+    {
+      "theme": "Reisen / Urlaub",
+      "word": "Hotel",
+      "question": "Wohnen Sie im Urlaub in einem Hotel?"
+    },
+    {
+      "theme": "Gesundheit / Arzt",
+      "word": "Arzt",
+      "question": "Wann gehen Sie zum Arzt?"
+    },
+    {
+      "theme": "Gesundheit / Arzt",
+      "word": "Medikament",
+      "question": "Wo kaufen Sie Medikamente?"
+    },
+    {
+      "theme": "Sprachen",
+      "word": "Deutsch",
+      "question": "Wie oft lernen Sie Deutsch?"
+    },
+    {
+      "theme": "Kleidung",
+      "word": "Schuhe",
+      "question": "Wo kaufen Sie Schuhe?"
+    },
+    {
+      "theme": "Feste und Einladungen",
+      "word": "Geburtstag",
+      "question": "Wann haben Sie Geburtstag?"
     }
   ],
   "presentationPoints": [
@@ -395,104 +522,94 @@
   ],
   "a1RequestCards": [
     {
-      "word": "Radio anmachen",
-      "symbol": "📻",
-      "request": "Machen Sie bitte das Radio an."
+      "word": "Glas Wasser",
+      "symbol": "💧",
+      "picture": "/images/speaking/a1/glas-wasser.svg",
+      "request": "Bringen Sie mir bitte ein Glas Wasser."
     },
     {
-      "word": "Fenster zumachen",
-      "symbol": "🪟",
-      "request": "Machen Sie bitte das Fenster zu."
+      "word": "Stift / Kugelschreiber",
+      "symbol": "🖊️",
+      "picture": "/images/speaking/a1/stift-kugelschreiber.svg",
+      "request": "Geben Sie mir bitte einen Stift."
     },
     {
-      "word": "Licht anschalten",
-      "symbol": "💡",
-      "request": "Schalten Sie bitte das Licht ein."
+      "word": "Buch",
+      "symbol": "📖",
+      "picture": "/images/speaking/a1/buch.svg",
+      "request": "Geben Sie mir bitte das Buch."
     },
     {
-      "word": "Tür aufmachen",
+      "word": "Schlüssel",
+      "symbol": "🔑",
+      "picture": "/images/speaking/a1/schlussel.svg",
+      "request": "Geben Sie mir bitte den Schlüssel."
+    },
+    {
+      "word": "Uhr",
+      "symbol": "🕒",
+      "picture": "/images/speaking/a1/uhr.svg",
+      "request": "Sagen Sie mir bitte die Uhrzeit."
+    },
+    {
+      "word": "Apfel",
+      "symbol": "🍎",
+      "picture": "/images/speaking/a1/apfel.svg",
+      "request": "Geben Sie mir bitte einen Apfel."
+    },
+    {
+      "word": "Tasse Kaffee",
+      "symbol": "☕",
+      "picture": "/images/speaking/a1/tasse-kaffee.svg",
+      "request": "Bringen Sie mir bitte eine Tasse Kaffee."
+    },
+    {
+      "word": "Rechnung / Geld",
+      "symbol": "💶",
+      "picture": "/images/speaking/a1/rechnung-geld.svg",
+      "request": "Bringen Sie mir bitte die Rechnung."
+    },
+    {
+      "word": "Handy / Telefon",
+      "symbol": "📱",
+      "picture": "/images/speaking/a1/handy-telefon.svg",
+      "request": "Geben Sie mir bitte Ihr Telefon."
+    },
+    {
+      "word": "Nichtrauchen-Schild",
+      "symbol": "🚭",
+      "picture": "/images/speaking/a1/nichtrauchen-schild.svg",
+      "request": "Rauchen Sie hier bitte nicht."
+    },
+    {
+      "word": "Tür",
       "symbol": "🚪",
+      "picture": "/images/speaking/a1/tur.svg",
       "request": "Machen Sie bitte die Tür auf."
     },
     {
-      "word": "Tisch sauber machen",
-      "symbol": "🧽",
-      "request": "Machen Sie bitte den Tisch sauber."
-    },
-    {
-      "word": "Hausaufgaben schicken",
-      "symbol": "📚",
-      "request": "Schicken Sie mir bitte die Hausaufgaben."
-    },
-    {
-      "word": "Buch bringen",
-      "symbol": "📖",
-      "request": "Bringen Sie mir bitte das Buch."
-    },
-    {
-      "word": "Handy ausmachen",
-      "symbol": "📱",
-      "request": "Machen Sie bitte das Handy aus."
-    },
-    {
-      "word": "Stuhl nehmen",
-      "symbol": "🪑",
-      "request": "Nehmen Sie bitte einen Stuhl."
-    },
-    {
-      "word": "Wasser holen",
-      "symbol": "💧",
-      "request": "Holen Sie mir bitte ein Glas Wasser."
-    },
-    {
-      "word": "Fenster öffnen",
+      "word": "Fenster",
       "symbol": "🪟",
+      "picture": "/images/speaking/a1/fenster.svg",
       "request": "Öffnen Sie bitte das Fenster."
     },
     {
-      "word": "Musik leiser machen",
-      "symbol": "🎵",
-      "request": "Machen Sie bitte die Musik leiser."
+      "word": "Fahrkarte",
+      "symbol": "🎫",
+      "picture": "/images/speaking/a1/fahrkarte.svg",
+      "request": "Geben Sie mir bitte eine Fahrkarte."
     },
     {
-      "word": "Tafel sauber wischen",
-      "symbol": "🧽",
-      "request": "Wischen Sie bitte die Tafel sauber."
+      "word": "Tasche / Koffer",
+      "symbol": "🧳",
+      "picture": "/images/speaking/a1/tasche-koffer.svg",
+      "request": "Helfen Sie mir bitte mit dem Koffer."
     },
     {
-      "word": "Kaffee kochen",
-      "symbol": "☕",
-      "request": "Kochen Sie bitte Kaffee."
-    },
-    {
-      "word": "Deutsch üben",
-      "symbol": "📚",
-      "request": "Üben Sie bitte mit mir Deutsch."
-    },
-    {
-      "word": "Auto waschen",
-      "symbol": "🚗",
-      "request": "Waschen Sie bitte das Auto."
-    },
-    {
-      "word": "Kind abholen",
-      "symbol": "🧒",
-      "request": "Holen Sie bitte das Kind ab."
-    },
-    {
-      "word": "Tisch decken",
-      "symbol": "🍽️",
-      "request": "Decken Sie bitte den Tisch."
-    },
-    {
-      "word": "Termin machen",
-      "symbol": "📅",
-      "request": "Machen Sie bitte einen Termin."
-    },
-    {
-      "word": "Nachricht schreiben",
-      "symbol": "💬",
-      "request": "Schreiben Sie mir bitte eine Nachricht."
+      "word": "Radio / Musik",
+      "symbol": "📻",
+      "picture": "/images/speaking/a1/radio-musik.svg",
+      "request": "Machen Sie bitte das Radio an."
     }
   ],
   "b1PlanningTasks": [
