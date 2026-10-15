@@ -4,6 +4,7 @@ import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresen
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
 import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
@@ -321,6 +322,8 @@ export default function A2FinalMockExamPage() {
   const saveTimerRef = useRef(null);
   const completionSaveRef = useRef("");
   const completionRetryCountRef = useRef(0);
+  const savedCompletionToastRef = useRef("");
+  const savedStageToastRef = useRef("");
   const completionRetryTimerRef = useRef(null);
   const [completionRetryNonce, setCompletionRetryNonce] = useState(0);
 
@@ -351,6 +354,12 @@ export default function A2FinalMockExamPage() {
         sectionScores: exam.sectionScores,
         status: "in_progress",
         overall: exam.overall,
+      }).then(() => {
+        const stageKey = `${exam.attemptInfo.attemptId}:${exam.stage}`;
+        if (savedStageToastRef.current !== stageKey) {
+          savedStageToastRef.current = stageKey;
+          announceExamSuccess("Mock progress saved successfully.");
+        }
       }).catch((saveError) => {
         console.error("Could not autosave A2 mock", saveError);
       });
@@ -383,6 +392,10 @@ export default function A2FinalMockExamPage() {
         if (cancelled) return;
         if (response?.completionSync && response.completionSync.ok === false) {
           throw new Error(response.completionSync.error || "Could not sync final A2 mock result.");
+        }
+        if (savedCompletionToastRef.current !== attemptId) {
+          savedCompletionToastRef.current = attemptId;
+          announceExamSuccess("A2 mock result saved successfully.");
         }
         completionRetryCountRef.current = 0;
         if (completionRetryTimerRef.current) {
@@ -437,6 +450,8 @@ export default function A2FinalMockExamPage() {
       sectionDeadlineMs: Date.now() + SECTION_DURATIONS[stage] * 1000,
     }));
     timeoutHandledRef.current = "";
+    const previousSection = { hoeren: "Lesen", schreiben: "Hören", sprechen: "Schreiben" }[stage];
+    if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -480,6 +495,7 @@ export default function A2FinalMockExamPage() {
             firstAttempt: response.firstAttempt,
           },
         });
+        announceExamSuccess("A2 mock resumed successfully.");
         return;
       }
 
@@ -493,6 +509,7 @@ export default function A2FinalMockExamPage() {
           firstAttempt: response.firstAttempt,
         },
       });
+      announceExamSuccess("A2 mock started successfully.");
     } catch (startError) {
       setError(startError?.response?.data?.error || startError?.message || "Could not start the A2 mock exam.");
     } finally {
@@ -571,6 +588,7 @@ export default function A2FinalMockExamPage() {
         completed: true,
       };
     });
+    announceExamSuccess("A2 mock completed! Saving your final result.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
