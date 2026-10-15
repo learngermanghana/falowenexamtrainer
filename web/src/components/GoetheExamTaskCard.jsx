@@ -87,7 +87,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
     {!flow.studentSchedule?.length && flow.studentCalendar?.length ? <div><strong>Ihr Kalender · freie Termine</strong><ul style={{margin:"5px 0"}}>{flow.studentCalendar.map(slot=><li key={slot} lang="de">{slot}</li>)}</ul><small>Finden Sie einen Termin, der auch Ihrem Partner passt.</small></div> : null}
     {flow.hints?.length ? <details><summary>Practice hints</summary>{flow.hints.map(hint=><p key={hint} style={{margin:"6px 0"}}>{hint}</p>)}</details> : null}
     {flow.preparationSeconds && !active ? <div style={{display:"grid",gap:7}}>
-      <button type="button" onClick={()=>setPreparing(value=>!value)}>{preparing ? "Pause preparation" : flow.key?.startsWith("B2-") ? "Optional B2 preparation timer" : "Preparation timer for "+flow.key?.split("-")[0]}</button>
+      <button type="button" onClick={()=>setPreparing(value=>!value)}>{preparing ? "Pause preparation" : flow.key?.startsWith("B2-") ? "Optional B2 preparation timer" : flow.key?.startsWith("B1-") ? "Optional B1 preparation timer" : "Preparation timer for "+flow.key?.split("-")[0]}</button>
       {preparing ? <span role="timer">{String(Math.floor(seconds/60)).padStart(2,"0")}:{String(seconds%60).padStart(2,"0")}</span> : null}
       <small>Preparation happens before the voice session starts.</small>
     </div> : null}
