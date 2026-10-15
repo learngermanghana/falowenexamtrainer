@@ -47,7 +47,7 @@ const sessionView = session => ({
   answeredTurns: Number(session.answeredTurns) || 0,
   answerLimit: examiner(session) ? answerLimit(session) : null,
   examFlow: taskFlows.publicFlow(session), assessment: session.assessment || null,
-  maxAudioBytes: session.examFlow?.key === "B1-2" ? audioAllowance(session) : session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES,
+  maxAudioBytes: recordingUploadLimit(session),
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
@@ -63,6 +63,10 @@ const MAX_FLOW_CHARS = 4800;
 const EXAM_AUDIO_BYTE_ALLOWANCE = 2 * MAX_AUDIO_BYTES;
 const MAX_LONG_AUDIO_BYTES = 1200000; // Up to five-minute C1/C2 presentations at 24 kbps.
 const stepAudioBytes = session => Math.min(MAX_LONG_AUDIO_BYTES, Math.max(MAX_AUDIO_BYTES, recordingSeconds(session)*3500));
+// Keep the recorder's advertised byte limit identical to the server upload check.
+// B1 Teil 2 retains its existing 700 kB presentation allowance.
+const recordingUploadLimit = session => session.examFlow?.key === "B1-2"
+  ? audioAllowance(session) : session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES;
 const recordingSeconds = session => {
   if (session.examFlow) return taskFlows.currentStep(session.examFlow,Number(session.answeredTurns)||0)?.seconds || 20;
   if (!examiner(session) || Number(session.answeredTurns)) return 20;
@@ -390,7 +394,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
         examFlow = session.examFlow || null;
         maxTranscriptChars=transcriptLimit(session);
-        const uploadLimit = session.examFlow?.key === "B1-2" ? audioAllowance(session) : session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES;
+        const uploadLimit = recordingUploadLimit(session);
         if (!intro && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
         if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
@@ -586,7 +590,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         await updateSession(sessionRef,sessionId,{inFlight:false,examFlow:nextSession.examFlow,taskReady:ready,
           messages:[...storedMessages,...additions].slice(-20)});
         return res.json({ok:true,transcript:confirmed,reply,speaker:replySpeaker,nextInstruction,taskReady:ready,examFlow:taskFlows.publicFlow(nextSession),
-          maxRecordingSeconds:recordingSeconds(nextSession),maxTranscriptChars:transcriptLimit(nextSession),maxAudioBytes:nextSession.examFlow?.key === "B1-2" ? audioAllowance(nextSession) : stepAudioBytes(nextSession),audioBase64:mp3 ? mp3.toString("base64") : ""});
+          maxRecordingSeconds:recordingSeconds(nextSession),maxTranscriptChars:transcriptLimit(nextSession),maxAudioBytes:recordingUploadLimit(nextSession),audioBase64:mp3 ? mp3.toString("base64") : ""});
       }
       if (examTask && answers.length >= EXAM_ANSWER_LIMIT) {
         await updateSession(sessionRef, sessionId, {inFlight:false});
