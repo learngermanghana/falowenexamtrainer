@@ -909,6 +909,24 @@ test("German transcription prompt handles naturally fast speech without inventin
   expect(opts.model).toBe("gpt-4o-transcribe");
 });
 
+test("one low-confidence German word flags an otherwise confident fast transcript for review",async()=>{
+  const api=setup();const session=await startExam(api);
+  api.fakeClient.audio.transcriptions.create.mockResolvedValueOnce({
+    text:"Ich nehme die Straßenbahn zur Universität.",
+    logprobs:[{logprob:-0.1},{logprob:-0.2},{logprob:-2.4},{logprob:-0.1},{logprob:-0.1}],
+  });
+  const recognised=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,...audioPayload,
+  });
+  expect(recognised.code).toBe(200);
+  expect(recognised.payload).toEqual(expect.objectContaining({
+    needsConfirmation:true,uncertain:true,
+    transcript:"Ich nehme die Straßenbahn zur Universität.",
+  }));
+  expect(api.docs.get(sessionKey).pendingUncertain).toBe(true);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toBeUndefined();
+});
+
 test("recent in-flight turns are not resent; stale timed-out locks may safely be recovered",async()=>{
   const api=setup(); const session=await startExam(api);
   const base=api.docs.get(sessionKey);
