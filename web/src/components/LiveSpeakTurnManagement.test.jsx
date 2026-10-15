@@ -171,14 +171,14 @@ test("completed Teil automatically saves feedback and offers continue instead of
    practiceTopic={examTask.prompt} examTask={examTask}
    onExamCompleted={completed} onContinueToNext={next}/></MemoryRouter>);
  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
- expect(await screen.findByRole("button",{name:"Continue to Teil 2"})).toBeInTheDocument();
+ expect(await screen.findByRole("button",{name:/Continue to Teil 2/})).toBeInTheDocument();
  expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/exam-feedback"))).toHaveLength(1);
  expect(completed).toHaveBeenCalledWith(expect.objectContaining({
    taskId:"a1-intro",level:"A1",teil:"Teil 1",feedback:expect.stringContaining("Task Completion")
  }));
  expect(screen.queryByRole("button",{name:"End without feedback"})).not.toBeInTheDocument();
  expect(screen.getByRole("button",{name:"View detailed feedback"})).toBeInTheDocument();
- fireEvent.click(screen.getByRole("button",{name:"Continue to Teil 2"}));
+ fireEvent.click(screen.getByRole("button",{name:/Continue to Teil 2/}));
  expect(next).toHaveBeenCalledTimes(1);
 });
 
