@@ -198,8 +198,10 @@ test("after an interrupted iPhone upload, checking status restores the saved tra
   try {
     expect(await screen.findByRole("group",{name:"Recover unsent speaking audio"})).toBeInTheDocument();
     expect(screen.getByLabelText("Listen to your own recording")).toHaveAttribute("src","blob:fast-german-answer");
+    expect(screen.getByRole("link",{name:"Save a copy of your unconfirmed recording"})).toHaveAttribute("href","blob:fast-german-answer");
     fireEvent.click(screen.getByRole("button",{name:"Check saved answer / retry"}));
     expect(await screen.findByRole("textbox",{name:"What I said (you can edit this)"})).toHaveValue("Ich mag Gemüse.");
+    expect(screen.getByRole("link",{name:"Save a copy of your unconfirmed recording"})).toHaveAttribute("href","blob:fast-german-answer");
     expect(x.uploadCount()).toBe(1);
     expect(screen.queryByRole("group",{name:"Recover unsent speaking audio"})).not.toBeInTheDocument();
   } finally {x.rendered.unmount();x.cleanup();}
