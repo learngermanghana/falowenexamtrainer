@@ -314,3 +314,61 @@ test("saved questions can request German audio on demand without replaying the o
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:examiner-replay");
   } finally {URL.revokeObjectURL=priorRevoke;}
 });
+
+test("Edit typed answer discards the exact server pending candidate before allowing a replacement turn",async()=>{
+  const saved={...session,resumed:true,answeredTurns:1,
+    messages:[{role:"assistant",text:"Warum lernen Sie Deutsch?"}],
+    pending:{pendingId:"first-typed",transcript:"Ich lerne Deutsch.",typed:true}};
+  let unblockDiscard;
+  global.fetch=jest.fn(async(url,options)=>{
+    if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,activeSession:saved});
+    if(String(url).endsWith("/start")) return ok(saved);
+    if(String(url).endsWith("/discard-pending")) return new Promise(resolve=>{unblockDiscard=resolve;});
+    if(String(url).endsWith("/turn")) return ok({needsConfirmation:true,typed:true,
+      pendingId:"replacement",transcript:JSON.parse(options.body).typedAnswer});
+    throw new Error("Unexpected "+url);
+  });
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Edit typed answer"}));
+  await waitFor(()=>expect(unblockDiscard).toBeDefined());
+  const request=global.fetch.mock.calls.find(([url])=>String(url).endsWith("/discard-pending"));
+  expect(JSON.parse(request[1].body)).toEqual({sessionId:"exam-turn",pendingId:"first-typed"});
+  expect(screen.getByRole("button",{name:"Confirm answer"})).toBeInTheDocument();
+  expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/turn"))).toBe(false);
+  await act(async()=>unblockDiscard(ok({ok:true,discarded:true})));
+  const editable=await screen.findByRole("textbox",{name:"Type your German answer"});
+  expect(editable).toHaveValue("Ich lerne Deutsch.");
+  fireEvent.change(editable,{target:{value:"Ich lerne Deutsch, weil ich in Berlin arbeiten möchte."}});
+  fireEvent.click(screen.getByRole("button",{name:"Send typed answer"}));
+  await waitFor(()=>expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/turn"))).toHaveLength(1));
+  expect(await screen.findByText("Check your typed answer, then confirm it.")).toBeInTheDocument();
+});
+
+test("Record again retains the original pending answer if the server discard fails",async()=>{
+  const saved={...session,resumed:true,answeredTurns:1,
+    messages:[{role:"assistant",text:"Was essen Sie gern?"}],
+    pending:{pendingId:"first-audio",transcript:"Ich esse gern Brot.",typed:false}};
+  let discards=0;
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,activeSession:saved});
+    if(String(url).endsWith("/start")) return ok(saved);
+    if(String(url).endsWith("/discard-pending")) {
+      discards++;
+      return discards===1
+        ? {ok:false,json:async()=>({code:"discard_unavailable",error:"Connection lost"})}
+        : ok({ok:true,discarded:true});
+    }
+    throw new Error("Unexpected "+url);
+  });
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Record again"}));
+  expect(await screen.findByRole("alert")).toHaveTextContent(/Could not discard your unfinished answer/);
+  expect(screen.getByRole("button",{name:"Confirm answer"})).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
+  fireEvent.click(screen.getByRole("button",{name:"Record again"}));
+  await waitFor(()=>expect(screen.queryByRole("button",{name:"Confirm answer"})).not.toBeInTheDocument());
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
+  expect(discards).toBe(2);
+});
