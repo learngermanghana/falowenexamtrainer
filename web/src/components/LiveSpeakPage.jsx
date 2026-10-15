@@ -354,8 +354,17 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setTypedAnswer("");
       if (replayUrlRef.current) {URL.revokeObjectURL(replayUrlRef.current);replayUrlRef.current="";}
       setLastAudio(result.audioBase64);
-      setNotice("");
-      await playVoice(result.audioBase64);
+      if (result.recovered && !result.audioBase64 && !result.taskReady) {
+        // A saved answer must remain part of this Teil even if voice generation
+        // fails. The scripted next question is on screen and can be requested
+        // via the same explicit speaker control used on iPhone Safari.
+        stopAudio();
+        setVoiceState("blocked");
+        setNotice("Your answer was saved. The next German question is ready as text; tap the speaker button to hear it.");
+      } else {
+        setNotice(result.recovered ? "Your answer was saved. Continue with the next examiner step." : "");
+        await playVoice(result.audioBase64);
+      }
     } catch (err) {
       if (mounted.current) {
         setErrorMessage(err.message);
@@ -931,6 +940,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   <small>Preview your recording</small>
                   <audio ref={studentPlaybackRef} src={studentAudioUrl} preload="metadata" controls
                     aria-label="Listen to your own recording"/>
+                  {(pending || audioRetry) && <div className="speaking-recording-safe-copy">
+                    <small>Keep this page open until Falowen confirms your answer. Your recording remains playable here.</small>
+                    <a href={studentAudioUrl} download="falowen-speaking-answer" aria-label="Save a copy of your unconfirmed recording">Save a copy</a>
+                  </div>}
                 </div> : null}
               </> : <div className="speaking-typed-answer">
                 <textarea lang="de" aria-label="Type your German answer" rows={3} placeholder="Schreibe deine Antwort auf Deutsch…"
