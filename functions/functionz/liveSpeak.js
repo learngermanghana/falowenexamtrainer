@@ -498,6 +498,49 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       return error(res, 503, "voice_unavailable", "Live Speak could not complete this turn. Please try again.");
     }
   });
+  // Retrying a pending answer must first clear it on the server. A matching
+  // pendingId prevents an old tab from deleting a newer recording/typed answer.
+  // Discarding never advances the exam or refunds already reserved AI usage.
+  app.post("/live-speak/session/discard-pending", async (req, res) => {
+    try {
+      if (!requireEnabled(res)) return;
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const sessionId = String(req.body?.sessionId || "");
+      const pendingId = String(req.body?.pendingId || "");
+      if (!sessionId || !pendingId) {
+        return error(res, 400, "invalid_pending_answer", "Choose the unfinished answer to discard.");
+      }
+      const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      await db().runTransaction(async tx => {
+        const snap = await tx.get(sessionRef);
+        const session = snap.data() || {};
+        if (session.sessionId !== sessionId || session.endedAt ||
+            Date.parse(session.expiresAt || "") <= Date.now()) {
+          throw Object.assign(new Error("This speaking session has ended."), {status:409,code:"session_ended"});
+        }
+        if (!examiner(session)) {
+          throw Object.assign(new Error("Only exam practice answers can be discarded."), {status:400,code:"discard_unavailable"});
+        }
+        if (session.inFlight) {
+          throw Object.assign(new Error("Finish the current response before retrying."), {status:409,code:"turn_in_progress"});
+        }
+        if (pendingId !== session.pendingId) {
+          throw Object.assign(new Error("This answer has changed. Reload to see the latest saved work."), {status:409,code:"transcript_missing"});
+        }
+        tx.update(sessionRef, {
+          pendingId:null, pendingTranscript:null, pendingUncertain:false,
+          pendingTyped:false, pendingAt:null,
+        });
+      });
+      return res.json({ok:true,discarded:true});
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code, err.message);
+      console.error("Live Speak discard error", err?.message);
+      return error(res, 503, "discard_unavailable", "Could not discard the previous answer. Try again.");
+    }
+  });
+
   app.post("/live-speak/session/confirm", async (req, res) => {
     let sessionRef, reserved = false, sessionId = "", examTask = null, storedMessages = [], answers = [], flowSession = null;
     try {
