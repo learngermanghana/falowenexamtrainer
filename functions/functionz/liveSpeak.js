@@ -393,7 +393,6 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("Your answers are saved. Finish the task to see feedback."), {status:409,code:"task_ready"});
         }
         if (session.inFlight) throw Object.assign(new Error("Finish the current reply first."), {status:409,code:"turn_in_progress"});
-        if (!intro && session.pendingId) throw Object.assign(new Error("Confirm or discard your pending answer first."), {status:409,code:"transcript_pending"});
         if (typedTurn && !examiner(session)) throw Object.assign(new Error("Typing is available only in speaking exam practice."), {status:400,code:"typing_unavailable"});
         if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
         if ((Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
