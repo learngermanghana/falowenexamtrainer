@@ -789,7 +789,7 @@ test("typed answer refuses invalid payload, oversized text and nonexam sessions 
   expect((await api.call("POST","/live-speak/session/turn",{
     sessionId:session.sessionId,typedAnswer:"Hallo",...audioPayload
   })).code).toBe(400);
-  expect(api.docs.get(usageKey()).turns).toBe(used);
+  expect(api.docs.get(usageKey())?.turns || 0).toBe(used);
   expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
   const normal=setup();
   await normal.call("POST","/live-speak/pilot/claim");
