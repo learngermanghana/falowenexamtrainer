@@ -691,7 +691,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <button type="button" aria-label={recording ? "Stop and send recording" : "Record German answer"}
                   title={recording ? "Stop and send recording" : "Record your German answer"}
                   onClick={recording ? stopRecording : () => startRecording(false)}
-                  disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) || voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) || details?.capReached}
+                  disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) || voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) || (details?.capReached && !session.examTryout)}
                   style={{border:"none",borderRadius:14,width:56,minWidth:56,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:23,cursor:"pointer"}}>
                     {recording ? "■" : "🎙"}
                 </button>
