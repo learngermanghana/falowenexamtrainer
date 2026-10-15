@@ -17,10 +17,10 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
   const cardIndex=Math.floor(((flow.step?.index || 1)-1)/2);
   const requestRound=Math.min(cardIndex,(flow.requestCards?.length || 1)-1);
   const requestCard=flow.key === "A1-3" ? flow.requestCards?.[requestRound] : null;
-  return <section className="speaking-exam-task-card" aria-label="Speaking task card" style={{padding:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:8}}>
+  return <section className="speaking-exam-task-card" aria-label="Speaking task card" style={{padding:active?9:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:active?5:8}}>
     <strong>{flow.title} · {flow.mode === "simulation" ? "Exam simulation" : "Guided practice"}</strong>
     {flow.presentationQuestion ? <p lang="de" style={{margin:0,fontWeight:700}}>{flow.presentationQuestion}</p> : null}
-    {flow.stageGuide ? <p style={{margin:0,fontSize:13,color:"#334155"}}>{flow.stageGuide}</p> : null}
+    {flow.stageGuide && !active ? <p style={{margin:0,fontSize:13,color:"#334155"}}>{flow.stageGuide}</p> : null}
     {flow.key === "A1-2" && flow.cards?.length ? (
       <div className="goethe-card-mat">
         <div className="goethe-card goethe-card--word" role="group" aria-label="A1 current word card">
@@ -85,17 +85,17 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
     </div> : null}
     {!["A1-1","A2-2"].includes(flow.key) && flow.points?.length ? <ol style={{margin:"0 0 0 20px",padding:0}}>{flow.points.map(point=><li key={point} lang="de">{point}</li>)}</ol> : null}
     {!flow.studentSchedule?.length && flow.studentCalendar?.length ? <div><strong>Ihr Kalender · freie Termine</strong><ul style={{margin:"5px 0"}}>{flow.studentCalendar.map(slot=><li key={slot} lang="de">{slot}</li>)}</ul><small>Finden Sie einen Termin, der auch Ihrem Partner passt.</small></div> : null}
-    {flow.hints?.length ? <details><summary>Practice hints</summary>{flow.hints.map(hint=><p key={hint} style={{margin:"6px 0"}}>{hint}</p>)}</details> : null}
+    {flow.hints?.length && !active ? <details><summary>Practice hints</summary>{flow.hints.map(hint=><p key={hint} style={{margin:"6px 0"}}>{hint}</p>)}</details> : null}
     {flow.preparationSeconds && !active ? <div style={{display:"grid",gap:7}}>
       <button type="button" onClick={()=>setPreparing(value=>!value)}>{preparing ? "Pause preparation" : flow.key?.startsWith("B2-") ? "Optional B2 preparation timer" : flow.key?.startsWith("B1-") ? "Optional B1 preparation timer" : "Preparation timer for "+flow.key?.split("-")[0]}</button>
       {preparing ? <span role="timer">{String(Math.floor(seconds/60)).padStart(2,"0")}:{String(seconds%60).padStart(2,"0")}</span> : null}
       <small>Preparation happens before the voice session starts.</small>
     </div> : null}
-    {flow.preparationSeconds ? <label style={{display:"grid",gap:5}}>
+    {flow.preparationSeconds && !active ? <label style={{display:"grid",gap:5}}>
       Your brief notes
       <textarea rows={2} maxLength={1500} value={notes} onChange={event=>setNotes(event.target.value)} placeholder="Stichwörter …"/>
     </label> : null}
-    {active && flow.step ? <p role="status" style={{margin:0,color:"#1d4ed8"}}>
+    {active && flow.step ? <p role="status" style={{margin:0,color:"#1d4ed8",fontSize:12}}>
       {flow.step.role === "partner" ? "AI partner" : "Examiner"} · Task {flow.step.index} of {flow.maxAnswers} · up to {flow.step.seconds}s
     </p> : null}
     {flow.partnerPresentation ? <details><summary>Partner presentation · {flow.partnerTopic}</summary><p lang="de">{flow.partnerPresentation}</p></details> : null}

@@ -22,6 +22,7 @@ import { logStudentActivity } from "../services/studyBuddyService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 import { freshTaskOptions, isPractised, nextExamTeil, recordExamPractice } from "../lib/speakingPracticeHistory";
+import {newFullSpeakingExam,finishFullSpeakingPart,fullExamSummary,validStoredFullExam,fullExamStorageKey} from "../lib/fullSpeakingExam";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
   SPEAKING_AUDIO_MIN_SECONDS as MIN_RECORDING_SECONDS,
@@ -140,6 +141,7 @@ const SpeakingPage = ({
     if (previousExamLevelRef.current === examLevel) return;
     previousExamLevelRef.current = examLevel;
     setSelectedLevel(nextLevel);
+    setFullExam(null);
     setSelectedTeil("1");
     setShowLiveExaminer(false);
   }, [examLevel, isExamMode, normalizedLockedLevel, liveExaminerActive]);
@@ -176,6 +178,8 @@ const SpeakingPage = ({
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [examPracticeHistory, setExamPracticeHistory] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
+  const [fullExam, setFullExam] = useState(null);
+  const [fullExamLoaded, setFullExamLoaded] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingMode, setRecordingMode] = useState("");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -499,10 +503,56 @@ const SpeakingPage = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (!isExamMode || !userId || typeof window === "undefined") { setFullExamLoaded(true); return; }
+    try {
+      const existing=JSON.parse(window.localStorage.getItem(fullExamStorageKey(userId)) || "null");
+      setFullExam(validStoredFullExam(existing));
+    } catch (_error) { setFullExam(null); }
+    setFullExamLoaded(true);
+  },[isExamMode,userId]);
+
+  useEffect(() => {
+    if (!fullExamLoaded || !isExamMode || !userId || typeof window === "undefined") return;
+    const key=fullExamStorageKey(userId);
+    if (fullExam) window.localStorage.setItem(key,JSON.stringify(fullExam));
+    else window.localStorage.removeItem(key);
+  },[fullExamLoaded,fullExam,isExamMode,userId]);
+
+  useEffect(() => {
+    if (!fullExamLoaded || !progressLoaded || !fullExam || fullExam.status!=="in_progress" ||
+      normalizedLockedTeil || normalizedLockedLevel && normalizedLockedLevel!==fullExam.level || liveExaminerActive) return;
+    if (selectedLevel !== fullExam.level) setSelectedLevel(fullExam.level);
+    if (selectedTeil !== fullExam.currentTeil) setSelectedTeil(fullExam.currentTeil);
+  },[fullExamLoaded,progressLoaded,fullExam,normalizedLockedTeil,normalizedLockedLevel,liveExaminerActive,selectedLevel,selectedTeil]);
+
   const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,assessment=null,words=[]}) => {
-    if (!taskId || !feedback || !progressLoaded) return;
-    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,assessment,words}));
-    setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
+    if (!taskId || !feedback) return;
+    if (progressLoaded) {
+      setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,assessment,words}));
+      setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
+    }
+    if (fullExam?.status === "in_progress" && fullExam.level===level) {
+      const updated=finishFullSpeakingPart(fullExam,{taskId,level,teil,topic,feedback,assessment});
+      if (updated!==fullExam) {
+        setFullExam(updated);
+        if (updated.status === "in_progress") {
+          setSelectedQuestionId("");
+          setSelectedTeil(updated.currentTeil);
+          setTaskMode("random");
+        }
+      }
+    }
+  };
+
+  const startFullSpeakingExam = () => {
+    if (liveExaminerActive || normalizedLockedTeil) return;
+    const created=newFullSpeakingExam(selectedLevel);
+    if (!created) return;
+    setFullExam(created);
+    setSelectedQuestionId("");
+    setTaskMode("random");
+    setSelectedTeil("1");
   };
 
   const continueExamToNextTeil = () => {
@@ -1002,6 +1052,7 @@ const SpeakingPage = ({
     return () => document.body.classList.remove("falowen-exam-speaking-page");
   }, [isExamMode]);
 
+  const fullExamResult=fullExamSummary(fullExam);
   const completedCount = useMemo(
     () => Object.values(completedQuestionIds).filter(Boolean).length,
     [completedQuestionIds]
@@ -1354,11 +1405,28 @@ const SpeakingPage = ({
         {!isCourseMode && activeSpeakingTab === "exam" ? (
           <div className={liveExaminerActive ? "speaking-exam-grid is-live" : "speaking-exam-grid"} style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
             <aside className="speaking-exam-sidebar" style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
+              {!normalizedLockedTeil ? <section aria-label="Full speaking exam controls" style={{display:"grid",gap:8,padding:10,border:"1px solid #bfdbfe",borderRadius:12,background:"#eff6ff"}}>
+                <strong style={{fontSize:14}}>Full speaking exam · {selectedLevel}</strong>
+                {fullExam?.level===selectedLevel && fullExam.status==="in_progress" ? <>
+                  <p role="status" style={{margin:0,fontSize:13}}>Teil {fullExam.currentTeil} is next · {fullExam.parts.length} part(s) finished. Complete this Teil to advance automatically.</p>
+                  <button type="button" onClick={()=>setFullExam(null)} disabled={liveExaminerActive} style={styles.secondaryButton}>Leave full exam mode</button>
+                </> : <button type="button" style={styles.primaryButton} disabled={liveExaminerActive} onClick={startFullSpeakingExam}>
+                  {fullExam?.status==="complete" && fullExam.level===selectedLevel ? "Start another full speaking exam" : "Start full speaking exam"}
+                </button>}
+                <small>Individual parts stay available. The next Teil is selected automatically; start its voice task when ready.</small>
+              </section> : null}
+              {fullExamResult.complete && fullExam?.level===selectedLevel ? <section aria-label="Full speaking exam results" style={{display:"grid",gap:8,padding:12,border:"1px solid #a7f3d0",borderRadius:12,background:"#fff"}}>
+                <strong>Full {selectedLevel} speaking practice results</strong>
+                {fullExamResult.percent === null ? <p style={{margin:0}}>Feedback saved; at least one part needs score review. No total was invented.</p>
+                  : <strong style={{fontSize:26}}>{fullExamResult.percent}% <small style={{fontSize:12}}>average across Teils</small></strong>}
+                {fullExamResult.parts.map(part=><details key={part.teil}><summary>Teil {part.teil} · {part.percent===null ? "Score pending" : part.percent+"%"}</summary><p style={{whiteSpace:"pre-wrap",fontSize:12}}>{part.feedback}</p></details>)}
+                <small>Falowen transcript-based practice scores, not official Goethe results.</small>
+              </section> : null}
               <div className="speaking-exam-part-picker" style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <strong style={{fontSize:13,color:"#1e40af"}}>Level {selectedLevel}</strong>
                 <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
                 {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
-                  <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
+                  <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive || Boolean(fullExam?.status==="in_progress")} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
                     <option value="1">Teil 1</option><option value="2">Teil 2</option>{!["B2","C1","C2"].includes(selectedLevel) ? <option value="3">Teil 3</option> : null}
                   </select>
                 )}
@@ -1429,7 +1497,7 @@ const SpeakingPage = ({
                   }}
                   examMode="guided" onActivityChange={setLiveExaminerActive}
                   onExamCompleted={handleExamPartCompleted}
-                  onContinueToNext={nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
+                  onContinueToNext={!fullExam || fullExam.status!=="in_progress" ? (nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined) : undefined}/>
               ) : <p role="status">Choose an exam part to begin.</p>}
             </section>
           </div>

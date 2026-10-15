@@ -87,6 +87,12 @@ test("speaking session has a red recorder beside recognized words and preserves 
   const voice=fs.readFileSync(path.resolve(__dirname,"./LiveSpeakPage.jsx"),"utf8");
   expect(voice).toContain('aria-label={recording ? "Stop and send recording" : "Record German answer"}');
   expect(voice).toContain('background:recording?"#991b1b":"#dc2626"');
+  expect(voice).toContain('aria-label="Reset Session"');
+  expect(voice).toContain('aria-label="Choose answer input"');
+  expect(voice).toContain('aria-label="Current examiner question"');
+  expect(voice).toContain('aria-label="Type your German answer"');
+  expect(voice).toContain('AI is preparing the question');
+  expect(voice).toContain('Optional: preview my recording');
   expect(voice).toContain('aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"}');
   expect(voice).toContain('aria-label="Speaking time"');
   expect(voice).toContain("Session time left");
