@@ -482,9 +482,9 @@ const SpeakingPage = ({
     };
   }, []);
 
-  const handleExamPartCompleted = ({taskId,level,teil,feedback,words=[]}) => {
+  const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,words=[]}) => {
     if (!taskId || !feedback || !progressLoaded) return;
-    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,feedback,words}));
+    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,words}));
     setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
   };
 
@@ -1383,7 +1383,7 @@ const SpeakingPage = ({
                   <summary style={{fontSize:12,cursor:"pointer",minHeight:36}}>Review completed tasks and feedback</summary>
                   <div style={{display:"grid",gap:8,marginTop:8,maxHeight:210,overflowY:"auto"}}>
                     {Object.values(examPracticeHistory).filter(item=>item.level===selectedLevel).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt))).map(item=><details key={item.taskId} style={{border:"1px solid #e2e8f0",borderRadius:8,padding:8}}>
-                      <summary style={{fontSize:12,cursor:"pointer"}}>{item.teil} · {item.taskId} · {new Date(item.completedAt).toLocaleDateString()}</summary>
+                      <summary style={{fontSize:12,cursor:"pointer"}}>{item.teil} · {item.topic || item.taskId} {item.keyword ? "("+item.keyword+")" : ""} · {new Date(item.completedAt).toLocaleDateString()}</summary>
                       <p style={{whiteSpace:"pre-wrap",fontSize:12,lineHeight:1.5}}>{item.feedback}</p>
                     </details>)}
                   </div>
