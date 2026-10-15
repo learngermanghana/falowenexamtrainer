@@ -161,7 +161,7 @@ function politeNextInstruction(session,plan,text) {
   const answered=Number(session?.answeredTurns)||0;
   if (!plan?.step || plan.ready || answered<1 ||
     !["A1-1","A1-2","A1-3","A2-1"].includes(session?.examFlow?.key) ||
-    /^(?:vielen dank|danke(?: schön)?|gut(?:, danke)?|okay)\\b/i.test(instruction)) return instruction;
+    /^(?:vielen dank|danke(?: schön)?|gut(?:, danke)?|okay)(?:[.!,: ]|$)/i.test(instruction)) return instruction;
   const acknowledgements=["Vielen Dank. ","Gut, danke. ","Danke schön. "];
   return acknowledgements[(answered-1)%acknowledgements.length]+instruction;
 }
