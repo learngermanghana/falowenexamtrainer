@@ -115,3 +115,28 @@ test("A1 Teil 3 frames only the current action picture",()=>{
   expect(screen.getByRole("group",{name:"A1 request picture card"})).toHaveTextContent("Fenster");
   expect(screen.queryByText(examFlow.requestCards[1].word)).not.toBeInTheDocument();
 });
+
+test("A2 Teil 1 displays four personal cards in the reference layout",()=>{
+  const task={teil:"Teil 1",prompt:"Wohnort"};
+  render(<GoetheExamTaskCard flow={examinerTaskPreview("A2",task)} topic={task.prompt}/>);
+  expect(screen.getByRole("list",{name:"A2 personal word cards"}).children).toHaveLength(4);
+  expect(screen.getByText("Wohnort?")).toBeInTheDocument();
+});
+
+test("A2 Teil 2 shows the central question and exactly four keywords",()=>{
+  const task={teil:"Teil 2",prompt:"Wofür geben Sie Ihr Geld aus?"};
+  render(<GoetheExamTaskCard flow={examinerTaskPreview("A2",task)} topic={task.prompt}/>);
+  expect(screen.getByRole("group",{name:"A2 topic and four keywords"})).toHaveTextContent(task.prompt);
+  expect(screen.getByRole("list",{name:"Four speaking keywords"}).children).toHaveLength(4);
+  for(const word of ["Kleidung","Lebensmittel / Miete","Sparen","Reisen"]) expect(screen.getByText(word)).toBeInTheDocument();
+});
+
+test("A2 Teil 3 displays the student's appointment calendar without the partner calendar",()=>{
+  const task={teil:"Teil 3",prompt:"Ein Geschenk kaufen"};
+  render(<GoetheExamTaskCard flow={examinerTaskPreview("A2",task)} topic={task.prompt}/>);
+  expect(screen.getByRole("group",{name:"Your planning calendar"})).toHaveTextContent("Samstag");
+  expect(screen.getByRole("table")).toBeInTheDocument();
+  expect(screen.getByText("Fahrrad abholen")).toBeInTheDocument();
+  expect(screen.getByText("13:00").closest("tr")).toHaveTextContent("frei");
+  expect(screen.getByText("08:00").closest("tr")).toHaveTextContent("Schlafen");
+});

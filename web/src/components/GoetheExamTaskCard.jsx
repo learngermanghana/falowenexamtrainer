@@ -1,7 +1,7 @@
 import React, {useEffect,useState} from "react";
 import "./GoetheExamTaskCard.css";
 
-const PracticeCardHeader = ({part}) => <><div className="goethe-card__header"><span>Deutsch A1 · Übung</span><strong>Sprechen Teil {part}</strong></div><div className="goethe-card__subheader">Falowen · Kandidatenkarte</div></>;
+const PracticeCardHeader = ({part,level="A1"}) => <><div className="goethe-card__header"><span>Deutsch {level} · Übung</span><strong>Sprechen Teil {part}</strong></div><div className="goethe-card__subheader">Falowen · Kandidatenkarte</div></>;
 
 export default function GoetheExamTaskCard({flow,topic,active=false}) {
   const [preparing,setPreparing]=useState(false);
@@ -30,7 +30,30 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
         <small className="goethe-card__caption">Karte {Math.min(cardIndex+1,flow.cards.length)} von {flow.cards.length} · {flow.step?.action === "answer-question" ? "Answer your partner’s question." : "Ask your partner a question about this word."}</small>
       </div>
     ) : flow.key === "A1-1" ? null : <p lang="de" style={{margin:0,lineHeight:1.6}}>{flow.scenario || flow.topic || topic}</p>}
-    {flow.key !== "A1-2" && flow.cards?.length ? <div className="speaking-exam-word-cards" role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
+    {flow.key === "A2-1" ? <div className="goethe-a2-personal" role="list" aria-label="A2 personal word cards">
+      {flow.cards?.map((card,index)=><div className="goethe-card" role="listitem" key={card} aria-current={active && index === cardIndex ? "step" : undefined}>
+        <PracticeCardHeader part={1} level="A2"/>
+        <div className="goethe-card__theme">Fragen zur Person</div>
+        <div className="goethe-card__keyword" lang="de">{card}?</div>
+      </div>)}
+    </div> : null}
+    {flow.key === "A2-2" ? <div className="goethe-card goethe-a2-topic" role="group" aria-label="A2 topic and four keywords">
+      <PracticeCardHeader part={2} level="A2"/>
+      <div className="goethe-card__theme">Von sich erzählen</div>
+      <div className="goethe-a2-mindmap">
+        <svg className="goethe-a2-mindmap__lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M20 15 40 42M80 15 60 42M20 85 40 58M80 85 60 58"/></svg>
+        <strong className="goethe-a2-mindmap__topic" lang="de">{flow.topic || topic}</strong>
+        <ul aria-label="Four speaking keywords">{flow.points?.slice(0,4).map(point=><li key={point} lang="de">{point}</li>)}</ul>
+      </div>
+    </div> : null}
+    {flow.key === "A2-3" && flow.studentSchedule?.length ? <div className="goethe-card goethe-a2-calendar" role="group" aria-label="Your planning calendar">
+      <PracticeCardHeader part={3} level="A2"/>
+      <div className="goethe-card__theme">Ihr Kalender · {flow.calendarDay}</div>
+      <table><caption>Finden Sie einen gemeinsamen Termin.</caption><thead><tr><th scope="col">Uhrzeit</th><th scope="col">Ihr Termin</th></tr></thead><tbody>
+        {flow.studentSchedule.map(slot=><tr key={slot.time}><th scope="row">{slot.time}</th><td lang="de" className={slot.activity ? "" : "goethe-a2-calendar__free"}>{slot.activity || "frei"}</td></tr>)}
+      </tbody></table>
+    </div> : null}
+    {!["A1-2","A2-1"].includes(flow.key) && flow.cards?.length ? <div className="speaking-exam-word-cards" role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
       {flow.cards.map((card,index)=><span role="listitem" key={index} aria-current={active && index===cardIndex ? "step" : undefined}
         style={{padding:"8px 12px",border:active && index===cardIndex ? "2px solid #2563eb" : "1px solid #cbd5e1",borderRadius:8}}>
         {flow.key === "A2-1" ? <small className="speaking-exam-word-label">WORTKARTE {index+1} / {flow.cards.length}</small> : null}
@@ -59,8 +82,8 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
     {flow.key === "A1-1" ? <div className="goethe-introduction" role="list" aria-label="Personal introduction card">
       {(flow.points?.length ? flow.points : ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"]).map(point=><div role="listitem" key={point} lang="de">{point.replace(/\?$/,"")}?</div>)}
     </div> : null}
-    {flow.key !== "A1-1" && flow.points?.length ? <ol style={{margin:"0 0 0 20px",padding:0}}>{flow.points.map(point=><li key={point} lang="de">{point}</li>)}</ol> : null}
-    {flow.studentCalendar?.length ? <div><strong>Ihr Kalender · freie Termine</strong><ul style={{margin:"5px 0"}}>{flow.studentCalendar.map(slot=><li key={slot} lang="de">{slot}</li>)}</ul><small>Finden Sie einen Termin, der auch Ihrem Partner passt.</small></div> : null}
+    {!["A1-1","A2-2"].includes(flow.key) && flow.points?.length ? <ol style={{margin:"0 0 0 20px",padding:0}}>{flow.points.map(point=><li key={point} lang="de">{point}</li>)}</ol> : null}
+    {!flow.studentSchedule?.length && flow.studentCalendar?.length ? <div><strong>Ihr Kalender · freie Termine</strong><ul style={{margin:"5px 0"}}>{flow.studentCalendar.map(slot=><li key={slot} lang="de">{slot}</li>)}</ul><small>Finden Sie einen Termin, der auch Ihrem Partner passt.</small></div> : null}
     {flow.hints?.length ? <details><summary>Practice hints</summary>{flow.hints.map(hint=><p key={hint} style={{margin:"6px 0"}}>{hint}</p>)}</details> : null}
     {flow.preparationSeconds && !active ? <div style={{display:"grid",gap:7}}>
       <button type="button" onClick={()=>setPreparing(value=>!value)}>{preparing ? "Pause preparation" : "Optional B1 preparation timer"}</button>

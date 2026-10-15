@@ -34,20 +34,25 @@ function createExaminerFlow(level, task, mode="guided") {
   const profile = catalogue.profiles[key];
   if (!profile) return null;
   const flow = {version:1,key,mode:mode === "simulation" ? "simulation" : "guided",decisions:[]};
-  if (key === "A2-3") flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
+  if (key === "A2-3") {
+    const planning=catalogue.a2PlanningTasks.find(item=>item.topic === clean(task?.prompt,180));
+    if (planning) {flow.calendar=planning;flow.scenario=planning.scenario;}
+  }
+  if (key === "A2-3" && !flow.scenario) flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
   if (key === "A2-2" || key === "B1-1" || key === "B1-2") flow.contextTopic = clean(task?.prompt,180);
   if (key === "B1-1") flow.planningPoints = catalogue.b1PlanningTasks.find(item=>clean(task?.prompt).toLowerCase().includes(item.match.toLowerCase()))?.points;
   if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
   const selectedWord = words(task)[0] || "Freizeit";
   if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
   if (key === "A2-1") {
-    flow.cards = selectedCards(selectedWord,catalogue.personalCards,4);
+    const index=catalogue.personalCards.findIndex(card=>card.word === selectedWord);
+    flow.cards = index >= 0 ? [...catalogue.personalCards.slice(index),...catalogue.personalCards.slice(0,index)].slice(0,4) : selectedCards(selectedWord,catalogue.personalCards,4);
   }
   if (key === "A1-3") flow.requestCards = selectedRequestCards(selectedWord);
   if (key === "A2-2") {
     const entry = Object.entries(catalogue.a2TopicPoints).find(([topic])=>topic !== "default" && new RegExp(topic,"i").test(task?.prompt || ""));
     const supplied = words({keywords:task?.keywords});
-    flow.points = supplied.length >= 4 ? supplied.slice(0,4) : entry?.[1] || catalogue.a2TopicPoints.default;
+    flow.points = supplied.length >= 4 ? supplied.slice(0,4) : catalogue.a2TopicCards.find(card=>card.topic === clean(task?.prompt,180))?.points || entry?.[1] || catalogue.a2TopicPoints.default;
   }
   return flow;
 }
@@ -98,7 +103,8 @@ function publicFlow(session) {
     requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol,...(card.picture ? {picture:card.picture} : {})})) || [],
     cardThemes:flow.cards?.map(card=>card.theme || "") || [],
     points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
-    studentCalendar:profile.studentCalendar || [],
+    studentCalendar:flow.calendar?.studentCalendar || profile.studentCalendar || [],
+    calendarDay:flow.calendar?.day || "",studentSchedule:flow.calendar?.studentSchedule || [],
     scenario:flow.scenario || "",
     partnerTopic:profile.partnerTopic || "",
     partnerPresentation:flow.key === "B1-3" && Number(session.answeredTurns)>=1 ? profile.partnerPresentation : "",
@@ -134,7 +140,7 @@ function partnerInstructions(session,plan) {
       "Record only decisions actually agreed in the student's latest words: {point, value, quote}; quote must be an exact substring of their transcript. " +
       "To withdraw a previous decision, return {point, quote, withdrawn:true}. " +
       "Allowed decision points: " + JSON.stringify(profile.decisionPoints) + ". " : "Use an empty decisions array. ") +
-    (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(profile.partnerCalendar) +
+    (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
     "State: " + JSON.stringify({task:session.examTask,role:plan.previous?.role,action:plan.previous?.action,
       planningPoints:flow.planningPoints,
@@ -151,8 +157,10 @@ function mergeDecisions(session, proposed, transcript) {
     if (!profile.decisionPoints?.includes(d?.point) || !clean(d.quote,250) || !transcript.includes(clean(d.quote,250))) continue;
     if (d.withdrawn === true) {accepted.delete(d.point);continue;}
     if (session.examFlow.key === "A2-3" && /\b(nein|nicht|leider|keine)\b/i.test(transcript.split(/\baber\b/i).at(-1))) continue;
-    if (session.examFlow.key === "A2-3" && !/mittwoch/i.test(d.value || "")) continue;
-    if (session.examFlow.key === "A2-3" && !/(?:18(?::00)?|sechs)/i.test(d.value || "")) continue;
+    if (session.examFlow.key === "A2-3") {
+      const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
+      if (!String(d.value || "").includes(`${target.day} ${target.hour}:00`)) continue;
+    }
     accepted.set(d.point,{point:d.point,value:clean(d.value,180),quote:clean(d.quote,250)});
   }
   const decisions=[...accepted.values()];
@@ -161,22 +169,25 @@ function mergeDecisions(session, proposed, transcript) {
   return {decisions,complete};
 }
 function calendarResponse(session, transcript) {
+  const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
+  const targetDay=target.day.toLowerCase(), targetHour=target.hour;
   const clause=transcript.split(/\baber\b/i).at(-1).trim();
   const declined=/\b(nein|nicht|leider|keine)\b/i.test(clause);
   const day=clause.match(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/i)?.[1]?.toLowerCase();
   const time=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
-  const targetTime=time ? Number(time[1])===18 && Number(time[2] || 0)===0 : /\bachtzehn\b/i.test(clause) || /\bsechs\b.*\babends\b/i.test(clause);
+  const hourWords={12:/\bzwölf\b/i,13:/\bdreizehn\b/i,15:/\bfünfzehn\b/i,17:/\bsiebzehn\b/i,18:/\bachtzehn\b/i,19:/\bneunzehn\b/i};
+  const targetTime=time ? Number(time[1])===targetHour && Number(time[2] || 0)===0 : Boolean(hourWords[targetHour]?.test(clause)) || (targetHour===18 && /\bsechs\b.*\babends\b/i.test(clause));
   const mentionsTime=Boolean(time) || /\b(uhr|halb|viertel|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
-  const contradiction=(day && day!=="mittwoch") || (mentionsTime && !targetTime);
-  const explicit=day === "mittwoch" && targetTime;
+  const contradiction=(day && day!==targetDay) || (mentionsTime && !targetTime);
+  const explicit=day === targetDay && targetTime;
   const previous=savedAssistant(session);
   const accepted=/\b(ja|passt|einverstanden|gut|gerne|gern|machen wir)\b/i.test(clause);
-  const proposed=/mittwoch/i.test(previous) && /(?:18|achtzehn|sechs)/i.test(previous);
+  const proposed=previous.toLowerCase().includes(targetDay) && previous.includes(String(targetHour));
   const agreed=Number(session.answeredTurns)>=2 && !declined && !contradiction && (explicit || (accepted && proposed));
-  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:"Mittwoch 18:00",quote:clause.slice(0,250)}] : [],transcript);
-  return {...merged,reply:merged.complete ? "Gut, dann treffen wir uns am Mittwoch um 18 Uhr. Bis dann!" :
+  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:`${target.day} ${targetHour}:00`,quote:clause.slice(0,250)}] : [],transcript);
+  return {...merged,reply:merged.complete ? `Gut, dann treffen wir uns am ${target.day} um ${targetHour} Uhr. Bis dann!` :
     Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet." :
-    "Wie wäre es mit Mittwoch um 18 Uhr? Passt dir dieser Termin?"};
+    `Wie wäre es mit ${target.day} um ${targetHour} Uhr? Passt dir dieser Termin?`};
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 

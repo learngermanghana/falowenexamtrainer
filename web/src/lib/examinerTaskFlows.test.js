@@ -221,3 +221,39 @@ test.each(["Deutsch","Schuhe","Geburtstag"])("single keyword %s ends after its q
   expect(flows.currentStep(examFlow,2)).toBe(null);
   expect(flows.isComplete({examFlow,answeredTurns:2})).toBe(true);
 });
+
+test("A2 curated bank has 8 personal topics, 10 four-keyword topics and 5 calendar tasks",()=>{
+  const fs=require("fs"),path=require("path");
+  const source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+  const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1)).filter(row=>row.level === "A2");
+  expect([1,2,3].map(part=>rows.filter(row=>row.teilId === `teil-${part}`).length)).toEqual([8,10,5]);
+  for(const row of rows){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt,keywords:row.keywordSubtopic};
+    const examFlow=flows.createExaminerFlow("A2",task), view=flows.publicFlow({examFlow}), preview=examinerTaskPreview("A2",task);
+    expect(preview.cards).toEqual(view.cards);
+    expect(preview.points).toEqual(view.points);
+    expect(preview.studentSchedule).toEqual(view.studentSchedule);
+    if(row.teilId === "teil-1")expect(new Set(view.cards).size).toBe(4);
+    if(row.teilId === "teil-2"){expect(view.points).toHaveLength(4);expect(view.points).toEqual(row.keywordSubtopic.split(", "));}
+    if(row.teilId === "teil-3"){
+      expect(view.studentSchedule).toHaveLength(15);
+      expect(view.studentCalendar).toEqual(preview.studentCalendar);
+      expect(JSON.stringify(view)).not.toContain('"agreement"');
+      expect(JSON.stringify(view)).not.toContain('"partnerCalendar"');
+    }
+  }
+  expect(JSON.stringify(publicCatalogue)).not.toContain('"agreement"');
+  expect(JSON.stringify(publicCatalogue)).not.toContain('"partnerCalendar"');
+});
+
+test.each(catalogue.a2PlanningTasks)("calendar agreement for $topic uses both partners' free time",task=>{
+  const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 3",prompt:task.topic});
+  const slot=`Samstag ${task.agreement.hour}:00`;
+  expect(task.studentCalendar).toContain(slot);
+  expect(task.partnerCalendar).toContain(slot);
+  const session={examFlow,answeredTurns:2,messages:[{role:"assistant",text:`Passt Samstag um ${task.agreement.hour} Uhr?`}]};
+  expect(flows.calendarResponse(session,"Ja, das passt.").complete).toBe(true);
+  expect(flows.calendarResponse(session,`Samstag um ${task.agreement.hour} Uhr passt.`).complete).toBe(true);
+  for(const reply of ["Samstag um 8 Uhr passt.","Nein, das geht nicht.","Sonntag um 13 Uhr passt."])
+    expect(flows.calendarResponse(session,reply).complete).toBe(false);
+});
