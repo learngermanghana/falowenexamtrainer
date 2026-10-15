@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import LiveSpeakPage from "./LiveSpeakPage";
+import SpeakingPracticeHome, { SpeakingRunResults } from "./SpeakingPracticeHome";
+import "./SpeakingExamDesign.css";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -131,6 +133,10 @@ const SpeakingPage = ({
     /^\/exams\/(?:speaking|room)(?:\/|$)/.test(window.location.pathname);
   const [selectedLevel, setSelectedLevel] = useState(initialSpeakingFilters.level);
   const [selectedTeil, setSelectedTeil] = useState(isExamMode && initialSpeakingFilters.teil === "all" ? "1" : initialSpeakingFilters.teil);
+  const [practiceStage, setPracticeStage] = useState("home");
+  const [fullExam, setFullExam] = useState(false);
+  const [runResults, setRunResults] = useState([]);
+  const [practiceAttempt, setPracticeAttempt] = useState(0);
   const [taskMode, setTaskMode] = useState("random");
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
   const previousExamLevelRef = useRef(examLevel);
@@ -139,6 +145,9 @@ const SpeakingPage = ({
     if (!isExamMode || normalizedLockedLevel || !nextLevel || liveExaminerActive) return;
     if (previousExamLevelRef.current === examLevel) return;
     previousExamLevelRef.current = examLevel;
+    setPracticeStage("home");
+    setFullExam(false);
+    setRunResults([]);
     setSelectedLevel(nextLevel);
     setSelectedTeil("1");
     setShowLiveExaminer(false);
@@ -441,7 +450,7 @@ const SpeakingPage = ({
       if (saved?.selectedLevel && shouldUseSavedLevel) {
         setSelectedLevel(String(saved.selectedLevel).toUpperCase());
       }
-      if (saved?.selectedTeil && !normalizedLockedTeil) setSelectedTeil(saved.selectedTeil);
+      if (saved?.selectedTeil && !normalizedLockedTeil) setSelectedTeil(saved.selectedTeil === "all" ? "1" : saved.selectedTeil);
       setProgressLoaded(true);
     };
 
@@ -499,10 +508,39 @@ const SpeakingPage = ({
     };
   }, []);
 
-  const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,assessment=null,words=[]}) => {
-    if (!taskId || !feedback || !progressLoaded) return;
-    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,assessment,words}));
-    setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
+  const beginSpeakingPractice = (wholeExam = false) => {
+    setFullExam(wholeExam);
+    setRunResults([]);
+    setPracticeAttempt(value=>value+1);
+    if (wholeExam) {
+      setSelectedTeil("1");
+      const firstTasks = speakingQuestionDictionary.filter(question=>question.level===selectedLevel && parseTeilNumber(question.teilLabel || question.teilId)==="1");
+      const options = freshTaskOptions(firstTasks,examPracticeHistory,selectedLevel);
+      setSelectedQuestionId(options.length ? options[Math.floor(Math.random()*options.length)].id : "");
+      setTaskMode("random");
+    }
+    setPracticeStage("practice");
+  };
+
+  const handleExamPartCompleted = (result) => {
+    const {taskId,level,teil,topic,keyword,feedback,assessment=null,words=[]} = result;
+    if (!taskId || !feedback) return;
+    if (progressLoaded) {
+      setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,assessment,words}));
+      setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
+    }
+    if (fullExam) {
+      setRunResults(previous=>[...previous.filter(item=>item.teil!==teil),result]);
+      const next = nextExamTeil(level,teil);
+      setLiveExaminerActive(false);
+      if (next) {
+        setSelectedQuestionId("");
+        setSelectedTeil(next);
+      } else {
+        setPracticeStage("results");
+        setFullExam(false);
+      }
+    }
   };
 
   const continueExamToNextTeil = () => {
@@ -1351,14 +1389,28 @@ const SpeakingPage = ({
         ) : null}
 
 
-        {!isCourseMode && activeSpeakingTab === "exam" ? (
+        {isExamMode && activeSpeakingTab === "exam" && practiceStage === "home" ? (
+          <SpeakingPracticeHome level={selectedLevel} teil={selectedTeil} guides={examSteps[selectedLevel]}
+            lockedTeil={normalizedLockedTeil} history={examPracticeHistory} ready={progressLoaded}
+            onSelectPart={part=>setSelectedTeil(part)}
+            onStart={beginSpeakingPractice}/>
+        ) : null}
+        {isExamMode && practiceStage === "results" ? (
+          <SpeakingRunResults level={selectedLevel} results={runResults} onReturn={()=>setPracticeStage("home")}/>
+        ) : null}
+        {isExamMode && practiceStage === "practice" ? <div className="speaking-practice-toolbar">
+          <button type="button" disabled={liveExaminerActive} onClick={()=>{setPracticeStage("home");setFullExam(false);}}>← Choose practice</button>
+          <strong>{fullExam ? "Full speaking exam" : "Individual practice"} · Teil {selectedTeil}</strong>
+          {fullExam ? <span role="status">{runResults.length} parts complete · continues automatically</span> : null}
+        </div> : null}
+        {!isCourseMode && activeSpeakingTab === "exam" && (!isExamMode || practiceStage === "practice") ? (
           <div className={liveExaminerActive ? "speaking-exam-grid is-live" : "speaking-exam-grid"} style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
             <aside className="speaking-exam-sidebar" style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
               <div className="speaking-exam-part-picker" style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
                 <strong style={{fontSize:13,color:"#1e40af"}}>Level {selectedLevel}</strong>
                 <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
                 {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
-                  <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
+                  <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive || fullExam} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
                     <option value="1">Teil 1</option><option value="2">Teil 2</option>{!["B2","C1","C2"].includes(selectedLevel) ? <option value="3">Teil 3</option> : null}
                   </select>
                 )}
@@ -1366,11 +1418,11 @@ const SpeakingPage = ({
               {selectedTeil !== "1" ? (
                 <div className="speaking-exam-task-picker" role="group" aria-label="Task selection" style={{display:"grid",gap:8}}>
                   <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                    <button type="button" onClick={()=>setTaskMode("random")} disabled={liveExaminerActive}
+                    <button type="button" onClick={()=>setTaskMode("random")} disabled={liveExaminerActive || fullExam}
                       aria-pressed={taskMode==="random"} style={{...styles.secondaryButton,background:taskMode==="random"?"#dbeafe":"#fff",borderColor:taskMode==="random"?"#3b82f6":"#cbd5e1",padding:"8px 10px"}}>
                       Random task
                     </button>
-                    <button type="button" onClick={()=>setTaskMode("choose")} disabled={liveExaminerActive}
+                    <button type="button" onClick={()=>setTaskMode("choose")} disabled={liveExaminerActive || fullExam}
                       aria-pressed={taskMode==="choose"} style={{...styles.secondaryButton,background:taskMode==="choose"?"#dbeafe":"#fff",borderColor:taskMode==="choose"?"#3b82f6":"#cbd5e1",padding:"8px 10px"}}>
                       Choose topic
                     </button>
@@ -1378,7 +1430,7 @@ const SpeakingPage = ({
                   {taskMode==="choose" ? (
                     <label style={{display:"grid",gap:5,fontSize:13}}>
                       Topic or task card
-                      <select aria-label="Choose speaking task" style={styles.select} disabled={liveExaminerActive} value={selectedQuestionId} onChange={event=>setSelectedQuestionId(event.target.value)}>
+                      <select aria-label="Choose speaking task" style={styles.select} disabled={liveExaminerActive || fullExam} value={selectedQuestionId} onChange={event=>setSelectedQuestionId(event.target.value)}>
                         {filteredQuestions.map(question=><option key={question.id} value={question.id}>{isPractised(examPracticeHistory,selectedLevel,question.id) ? "✓ Practised · " : ""}{formatQuestionDisplay(question)}</option>)}
                       </select>
                     </label>
@@ -1417,7 +1469,7 @@ const SpeakingPage = ({
             </aside>
             <section className="speaking-exam-voice" style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
               {selectedQuestion ? (
-                <LiveSpeakPage key={selectedLevel+"-"+selectedTeil+"-"+selectedQuestion.id} embedded initialLevel={selectedLevel}
+                <LiveSpeakPage key={selectedLevel+"-"+selectedTeil+"-"+selectedQuestion.id+"-"+practiceAttempt} embedded initialLevel={selectedLevel}
                   practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
                   practiceSource="exam-speaking-practice"
                   examTask={{
@@ -1427,9 +1479,9 @@ const SpeakingPage = ({
                     keywords:selectedQuestion.keywordSubtopic || "",
                     hint:selectedQuestion.hint || "",
                   }}
-                  examMode="guided" onActivityChange={setLiveExaminerActive}
+                  examMode="guided" autoStart={fullExam && runResults.length > 0} freshAttempt={practiceAttempt > 0} deferFeedback={fullExam} onActivityChange={setLiveExaminerActive}
                   onExamCompleted={handleExamPartCompleted}
-                  onContinueToNext={nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
+                  onContinueToNext={!fullExam && nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
               ) : <p role="status">Choose an exam part to begin.</p>}
             </section>
           </div>

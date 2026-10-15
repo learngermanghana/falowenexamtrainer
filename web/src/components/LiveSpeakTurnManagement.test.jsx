@@ -207,3 +207,22 @@ test("unfinished Teil needs confirmation before ending without feedback",async()
  fireEvent.click(screen.getByRole("button",{name:"Keep practising"}));
  expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
 });
+
+test("full-exam continuation starts exactly one session after status loads",async()=>{
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+    practiceTopic={examTask.prompt} examTask={examTask} autoStart freshAttempt /></MemoryRouter>);
+  await screen.findByRole("button",{name:"Record German answer"});
+  const starts=global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/start"));
+  expect(starts).toHaveLength(1);
+});
+
+test("deliberate repeat does not restore old feedback over the new attempt",async()=>{
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,examinerFlowVersion:1,lastExamResult:{level:"A1",examTask,feedback:"Old completed attempt"}});
+    throw new Error("Unexpected request "+url);
+  });
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+    practiceTopic={examTask.prompt} examTask={examTask} freshAttempt /></MemoryRouter>);
+  expect(await screen.findByRole("button",{name:"Start exam"})).toBeInTheDocument();
+  expect(screen.queryByText("Old completed attempt")).not.toBeInTheDocument();
+});

@@ -1,0 +1,66 @@
+/* Scoped to Exam Room; course practice retains its own layout. */
+.speaking-exam-page { --speaking-ink:#223e43; --speaking-muted:#50676a; --speaking-paper:#f4f8f1; --speaking-line:#c9d8d1; color:var(--speaking-ink); }
+.speaking-exam-page .speaking-exam-hero { background:#edf4ed !important; color:var(--speaking-ink) !important; border-bottom:1px solid var(--speaking-line); }
+.speaking-exam-page .speaking-exam-hero h1 { color:var(--speaking-ink); }
+.speaking-practice-home,.speaking-run-results { max-width:640px; margin:auto; padding:clamp(20px,4vw,36px); display:grid; gap:22px; background:var(--speaking-paper); }
+.speaking-eyebrow { font-size:11px; letter-spacing:.08em; font-weight:800; color:#46605d; }
+.speaking-practice-home h2,.speaking-run-results h2 { margin:12px 0; font-size:clamp(28px,5vw,40px); line-height:1.15; letter-spacing:-.035em; color:var(--speaking-ink); }
+.speaking-practice-home p,.speaking-run-results p { line-height:1.55; margin:8px 0 0; }
+.speaking-practice-home header p { color:var(--speaking-muted); }
+.speaking-full-exam { border-radius:22px; padding:24px; background:#29464b; color:#fff; box-shadow:0 8px 20px #223e4310; }
+.speaking-full-exam h3 { margin:0; font-size:23px; color:#fff; }
+.speaking-full-exam p { color:#e0eae4; font-size:14px; }
+.speaking-part-track { display:flex; justify-content:space-between; gap:10px; margin:24px 0 18px; font-size:14px; font-weight:700; }
+.speaking-full-exam button,.speaking-start-part { width:100%; min-height:52px; border:0; border-radius:14px; padding:14px 18px; font:inherit; font-weight:750; cursor:pointer; }
+.speaking-full-exam button { background:#d9ec99; color:#233c28; }
+.speaking-start-part { background:#29464b; color:#fff; }
+.speaking-section-label { display:flex; justify-content:space-between; gap:12px; align-items:center; }
+.speaking-section-label h3 { font-size:16px; margin:0; }
+.speaking-section-label>span { color:var(--speaking-muted); font-size:12px; }
+.speaking-part-cards { display:grid; gap:12px; }
+.speaking-part-cards button { display:flex; align-items:center; gap:14px; text-align:left; width:100%; padding:18px 16px; border:1px solid var(--speaking-line); border-radius:17px; background:#fffef8; color:var(--speaking-ink); cursor:pointer; font:inherit; }
+.speaking-part-cards button[aria-pressed=true] { border:2px solid #547d80; padding:17px 15px; background:#dfedeb; }
+.speaking-part-cards button>span:nth-child(2) { display:grid; gap:6px; flex:1; min-width:0; }
+.speaking-part-cards strong { font-size:15px; line-height:1.4; }
+.speaking-part-cards small { font-size:12px; line-height:1.5; color:var(--speaking-muted); }
+.speaking-part-icon { font-size:24px; color:#547d80; }
+.speaking-part-check { color:#345b5e; font-size:22px; }
+.speaking-part-cards .speaking-practised { color:#316041; font-weight:700; }
+.speaking-practice-footnote { text-align:center; color:var(--speaking-muted); line-height:1.5; }
+.speaking-practice-toolbar { display:flex; align-items:center; flex-wrap:wrap; gap:12px; padding:14px 20px; background:#edf4ed; border-bottom:1px solid var(--speaking-line); font-size:13px; }
+.speaking-practice-toolbar button { padding:10px 12px; border:1px solid var(--speaking-line); border-radius:10px; background:#fffef8; color:var(--speaking-ink); cursor:pointer; }
+.speaking-practice-toolbar span { color:var(--speaking-muted); }
+.speaking-exam-page .speaking-exam-sidebar { background:#edf4ed !important; }
+.speaking-exam-page .speaking-exam-voice { background:var(--speaking-paper) !important; }
+.speaking-exam-page .speaking-exam-task-card,.speaking-exam-page .speaking-exam-session,.speaking-exam-page .speaking-practice-feedback { background:#fffef8 !important; border:1px solid var(--speaking-line) !important; border-radius:18px !important; box-shadow:0 4px 15px #223e4308; }
+.speaking-exam-page .speaking-exam-task-card { padding:20px !important; }
+.speaking-exam-page .speaking-exam-turn-indicator { background:#e5eeea; border-color:var(--speaking-line); color:var(--speaking-ink); }
+.speaking-exam-page .speaking-exam-session__actions>button:first-child,.speaking-exam-page .speaking-exam-continue { background:#29464b !important; color:#fff !important; border-color:#29464b !important; }
+.speaking-recorder-visual { display:flex; align-items:center; justify-content:center; gap:4px; height:54px; overflow:hidden; color:#9aada6; }
+.speaking-recorder-visual span { width:4px; height:var(--bar-height); max-height:46px; background:currentColor; border-radius:4px; transform:scaleY(.35); }
+.speaking-recorder-visual.is-recording { color:#476e70; }
+.speaking-recorder-visual.is-recording span { animation:speaking-record-pulse .7s ease-in-out infinite alternate; }
+@keyframes speaking-record-pulse { to { transform:scaleY(1); } }
+.speaking-total-score { display:grid; gap:8px; border-radius:20px; padding:24px; background:#29464b; color:#fff; }
+.speaking-total-score strong { font-size:38px; }
+.speaking-result-part { border:1px solid var(--speaking-line); border-radius:16px; padding:20px; background:#fffef8; }
+.speaking-result-part h3 { margin:0; }
+.speaking-result-feedback { white-space:pre-wrap; font-size:14px; }
+.speaking-exam-page button:disabled { opacity:.55; cursor:not-allowed; }
+.speaking-exam-page button:focus-visible { outline:3px solid #537e80; outline-offset:4px; }
+@media(min-width:901px) { .speaking-exam-page .speaking-exam-grid { grid-template-columns:minmax(240px,300px) minmax(0,760px) !important; justify-content:center; background:var(--speaking-paper); } }
+@media(max-width:640px) { .speaking-practice-home,.speaking-run-results { padding:22px 16px; gap:18px; } .speaking-full-exam { padding:20px; } .speaking-section-label { flex-wrap:wrap; gap:5px; } }
+@media(prefers-reduced-motion:reduce) { .speaking-recorder-visual.is-recording span { animation:none; transform:scaleY(.75); } }
+.speaking-feedback-cards { display:grid; gap:14px; line-height:1.6; }
+.speaking-feedback-cards section { padding:16px; border-radius:14px; border:1px solid #c9d8d1; background:#fffef8; }
+.speaking-feedback-cards h3 { margin:0; font-size:14px; color:#223e43; }
+.speaking-feedback-cards p { margin:8px 0 0; font-size:14px; }
+.speaking-feedback-cards ol { margin:8px 0 0; padding-left:22px; font-size:14px; }
+.speaking-feedback-cards li+li { margin-top:10px; }
+.speaking-feedback-cards .speaking-feedback-strength { background:#dfedeb; }
+.speaking-feedback-cards .speaking-feedback-example { background:#eef5d9; }
+.speaking-result-part summary { cursor:pointer; padding:8px 0; font-size:13px; line-height:1.5; }
+.speaking-exam-page .speaking-exam-recorder-row { display:grid !important; grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr) !important; gap:12px !important; align-items:center !important; }
+.speaking-exam-page .speaking-exam-recorder-row textarea { grid-column:1 / -1; grid-row:2; width:100%; min-height:72px !important; }
+.speaking-exam-page .speaking-exam-recorder-row button:nth-child(2) { grid-column:2; grid-row:1; width:68px !important; height:68px !important; border-radius:50% !important; min-width:68px !important; font-size:27px !important; box-shadow:0 0 0 7px #e6eddf; }
+.speaking-exam-page .speaking-exam-recorder-row button:nth-child(3) { grid-column:3; grid-row:1; justify-self:start; width:48px; height:48px; min-width:48px; }

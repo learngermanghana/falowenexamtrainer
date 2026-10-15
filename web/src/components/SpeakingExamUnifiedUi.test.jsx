@@ -1,7 +1,7 @@
 import React from "react";
 import fs from "fs";
 import path from "path";
-import { fireEvent, render, screen, cleanup } from "@testing-library/react";
+import { fireEvent, render, screen, cleanup, waitFor } from "@testing-library/react";
 import SpeakingPage from "./SpeakingPage";
 
 jest.mock("../context/ExamContext", () => ({ useExam: () => ({ level: "A1" }) }));
@@ -29,8 +29,9 @@ jest.mock("./LiveSpeakPage", () => {
     default: (props) => React.createElement(
       "div",
       { "data-testid": "inline-live-examiner", "data-level": props.initialLevel,
-        "data-source": props.practiceSource, "data-task": JSON.stringify(props.examTask) },
+        "data-source": props.practiceSource, "data-autostart": String(props.autoStart), "data-task": JSON.stringify(props.examTask) },
       React.createElement("button", { type: "button", onClick: () => props.onActivityChange(true) }, "Simulate live speaking"),
+      React.createElement("button", { type: "button", onClick: () => props.onExamCompleted({taskId:props.examTask.id,level:props.initialLevel,teil:props.examTask.teil,topic:props.examTask.prompt,feedback:"Clear answer. Add a reason.",assessment:{score:7,maxScore:10,percent:70}}) }, "Complete part"),
     ),
   };
 });
@@ -48,9 +49,11 @@ afterEach(() => {
   window.history.replaceState({}, "", "/");
 });
 
-test("one Exam Room examiner replaces coach buttons and shows A1 Teil 1 instructions", () => {
+test("one Exam Room examiner replaces coach buttons and shows A1 Teil 1 instructions", async () => {
   window.history.replaceState({}, "", "/exams/speaking");
   render(<SpeakingPage mode="exam" />);
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Practise selected part/})).toBeEnabled());
+  fireEvent.click(screen.getByRole("button",{name:/Practise selected part/}));
   expect(screen.getByRole("heading", {name:"Goethe Speaking Exam"})).toBeInTheDocument();
   expect(screen.getByLabelText("Speaking exam instructions")).toHaveTextContent("Introduce yourself");
   expect(screen.getByLabelText("Speaking exam instructions")).toHaveTextContent("Spell your surname");
@@ -61,9 +64,11 @@ test("one Exam Room examiner replaces coach buttons and shows A1 Teil 1 instruct
   expect(screen.queryByLabelText("Choose speaking task")).not.toBeInTheDocument();
 });
 
-test("Falowen assigns Teil 2 cards by default, with targeted topic choice and locked selectors", () => {
+test("Falowen assigns Teil 2 cards by default, with targeted topic choice and locked selectors", async () => {
   window.history.replaceState({}, "", "/exams/speaking");
   render(<SpeakingPage mode="exam" />);
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Practise selected part/})).toBeEnabled());
+  fireEvent.click(screen.getByRole("button",{name:/Practise selected part/}));
   const part=screen.getByLabelText("Choose speaking exam part");
   fireEvent.change(part,{target:{value:"2"}});
   expect(screen.getByRole("button",{name:"Random task"})).toHaveAttribute("aria-pressed","true");
@@ -127,4 +132,47 @@ test("iPhone and Android exam layout keeps microphone, task and menu usable at n
   expect(app).toContain('max-height: min(34dvh, 300px)');
   expect(app).toContain('.speaking-exam-page button:focus-visible');
   expect(app).toContain('.mobile-exam-menu summary strong');
+});
+
+
+test("full exam advances through all parts and combines only the current run's scores", async () => {
+  window.history.replaceState({}, "", "/exams/speaking");
+  render(<SpeakingPage mode="exam" />);
+  expect(screen.queryByTestId("inline-live-examiner")).not.toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Start full speaking exam/})).toBeEnabled());
+  fireEvent.click(screen.getByRole("button",{name:/Start full speaking exam/}));
+  for (const part of [1,2,3]) {
+    await waitFor(()=>expect(JSON.parse(screen.getByTestId("inline-live-examiner").getAttribute("data-task")).teil).toBe(`Teil ${part}`));
+    if (part>1) expect(screen.getByTestId("inline-live-examiner")).toHaveAttribute("data-autostart","true");
+    expect(screen.getByLabelText("Choose speaking exam part")).toBeDisabled();
+    fireEvent.click(screen.getByRole("button",{name:"Complete part"}));
+  }
+  expect(screen.getByLabelText("Full speaking exam results")).toBeInTheDocument();
+  expect(screen.getByLabelText("Combined speaking practice score")).toHaveTextContent("21 / 30");
+  expect(screen.queryByTestId("inline-live-examiner")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button",{name:"Back to speaking practice"}));
+  expect(screen.getByLabelText("Choose speaking practice")).toBeInTheDocument();
+  expect(screen.getAllByText(/1 tasks practised/)).toHaveLength(3);
+});
+
+test("locked Teil practice offers only that part and no full exam", async () => {
+  window.history.replaceState({}, "", "/exams/speaking");
+  render(<SpeakingPage mode="exam" lockedLevel="A2" lockedTeil="2" />);
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Practise selected part/})).toBeEnabled());
+  expect(screen.queryByRole("button",{name:/Start full speaking exam/})).not.toBeInTheDocument();
+  expect(screen.getByRole("group",{name:"Choose an individual speaking part"}).querySelectorAll("button")).toHaveLength(1);
+});
+
+test.each(["B2","C1","C2"])("%s full exam ends after two parts",async(level)=>{
+  window.history.replaceState({}, "", "/exams/speaking");
+  render(<SpeakingPage mode="exam" lockedLevel={level}/>);
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Start full speaking exam/})).toBeEnabled());
+  expect(screen.getByRole("group",{name:"Choose an individual speaking part"}).querySelectorAll("button")).toHaveLength(2);
+  fireEvent.click(screen.getByRole("button",{name:/Start full speaking exam/}));
+  for (const part of [1,2]) {
+    await waitFor(()=>expect(JSON.parse(screen.getByTestId("inline-live-examiner").getAttribute("data-task")).teil).toBe(`Teil ${part}`));
+    fireEvent.click(screen.getByRole("button",{name:"Complete part"}));
+  }
+  expect(screen.getByLabelText("Combined speaking practice score")).toHaveTextContent("14 / 20");
+  expect(screen.getByLabelText("Full speaking exam results")).not.toHaveTextContent("Teil 3");
 });
