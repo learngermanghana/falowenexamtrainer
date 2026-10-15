@@ -31,7 +31,7 @@ export function freshTaskOptions(questions=[],history={},level="") {
   return novel.length ? novel : fresh;
 }
 export const nextExamTeil = (level,teil) => {
-  const parts={A1:3,A2:3,B1:3};
+  const parts={A1:3,A2:3,B1:3,B2:2};
   const max=parts[String(level||"").toUpperCase()] || 3;
   const current=Number(String(teil||"").match(/\d+/)?.[0]||0);
   return current>=1 && current<max ? String(current+1) : null;

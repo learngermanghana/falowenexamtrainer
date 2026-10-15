@@ -70,7 +70,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
   const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
-  const supportedExaminer=examinerEntry && ["A1","A2","B1"].includes(safeLevel);
+  const supportedExaminer=examinerEntry && ["A1","A2","B1","B2"].includes(safeLevel);
   const taskPreview=supportedExaminer ? examinerTaskPreview(safeLevel,examTask,examMode) : null;
   const simulation=session?.examFlow?.mode === "simulation";
   const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource, examTask, examMode };

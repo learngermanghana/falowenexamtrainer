@@ -382,6 +382,10 @@ const SpeakingPage = ({
       2: {title:"Von sich erzählen", german:"Erzählen Sie bitte über das Thema auf Ihrer Karte. Ich höre zu.", english:"Speak about the assigned topic without interruption, then answer a relevant follow-up.", steps:["Talk about the four points","Answer the examiner's follow-up"]},
       3: {title:"Einen Termin finden", german:"Finden Sie gemeinsam einen Termin.", english:"Discuss the schedules with your AI partner and agree on one possible time.", steps:["Suggest times","Negotiate","Agree on a meeting"]},
     },
+    B2: {
+      1: {title:"Vortrag halten",german:"Halten Sie einen strukturierten Vortrag und beantworten Sie anschließend eine Frage.",english:"Present alternatives, weigh advantages and disadvantages and explain one option in detail.",steps:["Prepare brief notes","Present for about four minutes","Answer the follow-up"]},
+      2: {title:"Diskussion führen",german:"Tauschen Sie Standpunkte und Argumente aus.",english:"Discuss the question with your partner and summarize your position.",steps:["State your position","Respond to counterarguments","Summarize"]},
+    },
     B1: {
       1: {title:"Gemeinsam etwas planen", german:"Planen Sie bitte gemeinsam mit Ihrem Partner.", english:"Negotiate a realistic plan with the AI partner.", steps:["Make suggestions","Agree on time, place, travel and responsibilities"]},
       2: {title:"Ein Thema präsentieren", german:"Präsentieren Sie bitte das Thema.", english:"Prepare your notes, then speak without interruption. Questions belong to Teil 3.", steps:["Prepare","Present your topic","Finish your presentation"]},
@@ -1342,7 +1346,7 @@ const SpeakingPage = ({
                 <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
                 {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
                   <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
-                    <option value="1">Teil 1</option><option value="2">Teil 2</option><option value="3">Teil 3</option>
+                    <option value="1">Teil 1</option><option value="2">Teil 2</option>{selectedLevel !== "B2" ? <option value="3">Teil 3</option> : null}
                   </select>
                 )}
               </div>
@@ -1376,8 +1380,8 @@ const SpeakingPage = ({
                 </div>
               ) : null}
               {isExamMode && <div className="speaking-exam-progress" aria-label="Goethe speaking exam progress" style={{display:"grid",gap:7,padding:"9px 10px",border:"1px solid #e2e8f0",borderRadius:11,background:"#fff"}}>
-                <strong style={{fontSize:13}}>Goethe {selectedLevel} · Teil {selectedTeil} of 3</strong>
-                <div style={{display:"flex",gap:5}} aria-hidden="true">{["1","2","3"].map(part=><span key={part} style={{height:6,borderRadius:6,flex:1,background:part===selectedTeil?"#2563eb":Object.values(examPracticeHistory).some(item=>item.level===selectedLevel && item.teil==="Teil "+part)?"#16a34a":"#e2e8f0"}} />)}</div>
+                <strong style={{fontSize:13}}>Goethe {selectedLevel} · Teil {selectedTeil} of {selectedLevel === "B2" ? 2 : 3}</strong>
+                <div style={{display:"flex",gap:5}} aria-hidden="true">{(selectedLevel === "B2" ? ["1","2"] : ["1","2","3"]).map(part=><span key={part} style={{height:6,borderRadius:6,flex:1,background:part===selectedTeil?"#2563eb":Object.values(examPracticeHistory).some(item=>item.level===selectedLevel && item.teil==="Teil "+part)?"#16a34a":"#e2e8f0"}} />)}</div>
                 <small style={{color:"#475569"}}>{filteredQuestions.filter(q=>isPractised(examPracticeHistory,selectedLevel,q.id)).length} of {filteredQuestions.length} tasks practised in this Teil</small>
                 {Object.values(examPracticeHistory).some(item=>item.level===selectedLevel) ? <details>
                   <summary style={{fontSize:12,cursor:"pointer",minHeight:36}}>Review completed tasks and feedback</summary>

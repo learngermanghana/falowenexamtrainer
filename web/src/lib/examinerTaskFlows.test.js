@@ -53,11 +53,11 @@ test("simulation hides hints and the partner's private calendar",()=>{
 
 test("public catalogue stays synchronized without private partner information",()=>{
   for(const [key,profile] of Object.entries(publicCatalogue.profiles))for(const [field,value] of Object.entries(profile))expect(value).toEqual(catalogue.profiles[key][field]);
-  expect(Object.keys(publicCatalogue.profiles)).toHaveLength(9);
+  expect(Object.keys(publicCatalogue.profiles)).toHaveLength(11);
 });
 
-test("B2 and invalid exam parts do not receive an A1-B1 flow",()=>{
-  expect(flows.createExaminerFlow("B2",{teil:"Teil 1"})).toBe(null);
+test("unsupported levels and invalid exam parts do not receive an examiner flow",()=>{
+  expect(flows.createExaminerFlow("C1",{teil:"Teil 1"})).toBe(null);
   expect(flows.createExaminerFlow("B1",{teil:"2026"})).toBe(null);
 });
 
@@ -275,4 +275,50 @@ test("B1 curated bank replaces old prompts with 8 tasks per part",()=>{
       expect(flows.currentStep(flow,1).instruction).toContain("Rückmeldung");
     }
   }
+});
+
+test("legacy split B1 task includes its complete subtopic in audio and preview",()=>{
+ const task={teil:"Teil 1",prompt:"Kulturelles Ereignis (Konzert",keywords:"Ausstellung) planen"};
+ const flow=flows.createExaminerFlow("B1",task);
+ expect(flow.contextTopic).toBe("Kulturelles Ereignis (Konzert, Ausstellung) planen");
+ expect(flows.currentStep(flow).instruction).toContain(flow.contextTopic);
+ expect(examinerTaskPreview("B1",task).topic).toBe(flow.contextTopic);
+ const plain={teil:"Teil 1",prompt:"Einen Ausflug planen",keywords:"Zeit, Ort"};
+ expect(flows.createExaminerFlow("B1",plain).contextTopic).toBe(plain.prompt);
+});
+
+test("B2 has exactly eight presentation topics and eight discussion topics",()=>{
+ const fs=require("fs"),path=require("path"),source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+ const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1)).filter(row=>row.level === "B2");
+ expect(rows.filter(row=>row.teilId === "teil-1")).toHaveLength(8);
+ expect(rows.filter(row=>row.teilId === "teil-2")).toHaveLength(8);
+ expect(rows.some(row=>row.teilId === "teil-3")).toBe(false);
+ for(const row of rows){
+  const task={teil:row.teilLabel,prompt:row.topicPrompt,hint:row.hint},flow=flows.createExaminerFlow("B2",task);
+  expect(flows.currentStep(flow).instruction).toContain(row.hint);
+  const preview=examinerTaskPreview("B2",task);
+  expect(preview.presentationQuestion).toBe(flow.presentationQuestion);
+  expect(preview.points).toEqual(flows.publicFlow({examFlow:flow}).points);
+  expect(preview.preparationSeconds).toBe(900);
+ }
+ expect(flows.createExaminerFlow("B2",{teil:"Teil 3"})).toBe(null);
+});
+
+test("B2 presentation asks one follow-up after an uninterrupted four-minute turn",()=>{
+ const examFlow=flows.createExaminerFlow("B2",{teil:"Teil 1",prompt:"Finanzierung des Studiums"});
+ expect(flows.currentStep(examFlow).seconds).toBe(240);
+ const session={examFlow,level:"B2",answeredTurns:1};
+ expect(flows.responsePlan(session).dynamic).toBe(true);
+ expect(flows.partnerInstructions(session,flows.responsePlan(session))).toContain("exactly one relevant B2 question");
+ expect(flows.responsePlan({...session,answeredTurns:2}).ready).toBe(true);
+});
+
+test("B2 discussion responds to arguments and finishes with a summary, without forced consensus",()=>{
+ const examFlow=flows.createExaminerFlow("B2",{teil:"Teil 2",prompt:"Bargeldabschaffung"});
+ expect(flows.currentStep(examFlow).instruction).toContain("Bargeld");
+ const session={examFlow,level:"B2",answeredTurns:3};const plan=flows.responsePlan(session);
+ expect(plan.dynamic).toBe(true);
+ expect(plan.step.instruction).toContain("Standpunkt zusammen");
+ expect(flows.partnerInstructions(session,plan)).toContain("Do not demand agreement");
+ expect(flows.responsePlan({...session,answeredTurns:4})).toEqual(expect.objectContaining({ready:true,dynamic:false}));
 });
