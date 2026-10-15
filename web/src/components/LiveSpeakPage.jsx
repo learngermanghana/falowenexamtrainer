@@ -431,7 +431,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setErrorMessage("");
     try {
       // One-click practice. The server still verifies credits and global cost caps.
-      if (!details?.openTesting && details?.pilotAvailable && !details?.examTryoutAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
+      if ((!examinerEntry || !details?.openTesting) && details?.pilotAvailable &&
+        !details?.examTryoutAvailable && !details?.activeSession &&
+        Number(!examinerEntry && details.actualRemaining != null ? details.actualRemaining : details.remaining) <= 0) {
         await api("/live-speak/pilot/claim", "POST", {});
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
@@ -703,8 +705,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const speakingLimit = Number(session?.maxRecordingSeconds || MAX_RECORDING_SECONDS);
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
-  const sessionsAvailable = Boolean(details?.openTesting) ||
-    ((Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached);
+  const sessionsAvailable = (examinerEntry && Boolean(details?.openTesting)) ||
+    ((Number(!examinerEntry && details?.actualRemaining != null ? details.actualRemaining : details?.remaining) > 0 ||
+      Boolean(details?.activeSession)) &&
+      !(examinerEntry ? details?.capReached : details?.actualCapReached ?? details?.capReached));
   // A real, server-bounded AI examiner tryout is available once per month when
   // normal pilot access is exhausted. No client-side quota override occurs.
   const aiTryoutAvailable = examinerEntry && Boolean(details?.examTryoutAvailable);
