@@ -25,28 +25,27 @@ test("resuming restores saved answers and the original examiner question",async(
   show();
   fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
   expect(await screen.findByText("Ich mache jeden Tag Sport.")).toBeInTheDocument();
-  expect(screen.getByText("Was essen Sie gern?")).toBeInTheDocument();
+  expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Was essen Sie gern?");
   expect(screen.getByText(/Follow-up: answer/)).toBeInTheDocument();
 });
 
-test("feedback failure keeps the session; retry sends only session ID and duplicate clicks share one request",async()=>{
+test("failed automatic feedback keeps saved answers and allows a retry",async()=>{
   let calls=0;
+  const finished={...saved,taskReady:true,answeredTurns:2};
   global.fetch.mockImplementation(async (url,options)=>{
-    if(String(url).endsWith("/status"))return ok({enabled:true,remaining:1,activeSession:saved});
+    if(String(url).endsWith("/status"))return ok({enabled:true,remaining:1,activeSession:finished});
     if(String(url).endsWith("/exam-feedback")){
       calls++;
       expect(JSON.parse(options.body)).toEqual({sessionId:"saved"});
       return calls===1 ? {ok:false,json:async()=>({code:"feedback_unavailable",error:"Your answers are saved. Try again."})}
         : ok({feedback:"Use weil with the verb at the end."});
     }
-    return ok(saved);
+    return ok(finished);
   });
   show(); fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
-  const finish=await screen.findByRole("button",{name:/Finish this Teil & see feedback/});
-  fireEvent.click(finish); fireEvent.click(finish);
   expect(await screen.findByRole("alert")).toHaveTextContent("Your answers are saved.");
   expect(calls).toBe(1);
-  fireEvent.click(screen.getByRole("button",{name:/Finish this Teil & see feedback/}));
+  fireEvent.click(screen.getByRole("button",{name:"Retry feedback"}));
   expect(await screen.findByText("Use weil with the verb at the end.")).toBeInTheDocument();
   expect(calls).toBe(2);
 });
