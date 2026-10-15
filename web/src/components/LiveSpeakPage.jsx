@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { backendUrl } from "../services/aiClient";
 import GoetheExamTaskCard from "./GoetheExamTaskCard";
+import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
@@ -25,7 +26,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -130,7 +131,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       const info = await api("/live-speak/status");
       if (mounted.current) {
         setDetails(info);
-        if (examinerEntry && matchingExamResult(info.lastExamResult,{
+        if (!freshAttempt && examinerEntry && matchingExamResult(info.lastExamResult,{
           level:safeLevel,taskId:examTask?.id
         })) {
           setExamFeedback(info.lastExamResult.feedback || "");
@@ -143,7 +144,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [api, idToken, examinerEntry, safeLevel, examTask?.id]);
+  }, [api, idToken, examinerEntry, safeLevel, examTask?.id, freshAttempt]);
 
   useEffect(() => {
     mounted.current = true;
@@ -416,6 +417,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     catch (_error) { /* The server expiry and quotas still apply. */ }
     refresh();
   };
+
+  const autoStartRequested = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStartRequested.current || loading || !details?.enabled || session || busy) return;
+    // A failed start leaves the ordinary Start/Resume control available for retry.
+    autoStartRequested.current = true;
+    startSession();
+  }, [autoStart, loading, details, session, busy]);
 
   const finishExamTask = async () => {
     if (!examinerSession || !session || pending || busy || feedbackBusy || !recordedAnswers.length || recording || requestBusy.current) return;
@@ -711,6 +720,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   {recording ? "Recording " : "Speaking time "}{recordingTimeLabel} / {speakingLimitLabel}
                 </span>
               </div>
+              <div className={recording ? "speaking-recorder-visual is-recording" : "speaking-recorder-visual"} aria-hidden="true">
+                {Array.from({length:32},(_,index)=><span key={index} style={{"--bar-height":`${12+((index*17)%32)}px`,animationDelay:`${index*35}ms`}}/>)}
+              </div>
               <div className="speaking-exam-recorder-row" style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
@@ -799,8 +811,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           {messages.filter(message => message.role === "user").map((message,i) => <p key={i} lang="de">{message.text}</p>)}
         </section>
       ) : null}
-      {examFeedback ? (
-        <section aria-label="Speaking exam practice feedback"
+      {examFeedback && !deferFeedback ? (
+        <section className="speaking-practice-feedback" aria-label="Speaking exam practice feedback"
           style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
           <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
           {examAssessment ? <div aria-label="Speaking practice score" style={{border:"1px solid #cbd5e1",borderRadius:12,padding:14,display:"grid",gap:8}}>
@@ -816,9 +828,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {messages.filter(message => message.role === "user").map((message,i) => <p key={i} lang="de" style={{lineHeight:1.6}}>{message.text}</p>)}
             </details>
           ) : null}
+          <SpeakingFeedback assessment={examAssessment} feedback={examFeedback}/>
           <div className="speaking-exam-feedback-summary" style={{display:"grid",gap:8}}>
             <strong style={{fontSize:14}}>Teil {String(examTask?.teil || details?.lastExamResult?.examTask?.teil || "").match(/\d+/)?.[0] || ""} complete · Feedback saved</strong>
-            <p style={{margin:0,fontSize:13,lineHeight:1.55}}>{examFeedback.split(/(?:\n|\*\*Strength:)/)[0].replace(/\*\*/g,"").slice(0,500)}</p>
+
             <button type="button" style={styles.secondaryButton} aria-expanded={showDetailedFeedback}
               onClick={()=>setShowDetailedFeedback(value=>!value)}>
               {showDetailedFeedback ? "Hide detailed feedback" : "View detailed feedback"}
