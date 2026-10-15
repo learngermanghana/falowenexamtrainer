@@ -756,3 +756,58 @@ test.each([
     expect(allotted/1000-requiredSpeechSeconds).toBeGreaterThan(12*60);
   }
 });
+
+test("typed Goethe answer is metered, confirmed and not sent to audio transcription",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const beforeUsage=api.docs.get(usageKey())?.turns || 0;
+  const sent=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich mache Sport, weil ich gesund bleiben möchte."
+  });
+  expect(sent.code).toBe(200);
+  expect(sent.payload).toEqual(expect.objectContaining({
+    needsConfirmation:true,typed:true,transcript:"Ich mache Sport, weil ich gesund bleiben möchte."
+  }));
+  expect(api.docs.get(sessionKey).pendingTranscript).toBe("Ich mache Sport, weil ich gesund bleiben möchte.");
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  expect(api.docs.get(usageKey()).turns).toBeGreaterThan(beforeUsage);
+  const done=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:session.sessionId,pendingId:sent.payload.pendingId,transcript:sent.payload.transcript
+  });
+  expect(done.code).toBe(200);
+  expect(api.docs.get(sessionKey).confirmedAnswers[0]).toBe(sent.payload.transcript);
+});
+
+test("typed answer refuses invalid payload, oversized text and nonexam sessions without provider calls",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const used=api.docs.get(usageKey())?.turns || 0;
+  for (const typedAnswer of ["", "x", "x".repeat(8001)]) {
+    const result=await api.call("POST","/live-speak/session/turn",{
+      sessionId:session.sessionId,typedAnswer
+    });
+    expect(result.code).toBe(400);
+  }
+  expect((await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Hallo",...audioPayload
+  })).code).toBe(400);
+  expect(api.docs.get(usageKey()).turns).toBe(used);
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  const normal=setup();
+  await normal.call("POST","/live-speak/pilot/claim");
+  const other=(await normal.call("POST","/live-speak/session/start",{level:"A2"})).payload;
+  const rejected=await normal.call("POST","/live-speak/session/turn",{
+    sessionId:other.sessionId,typedAnswer:"Ich lerne Deutsch."
+  });
+  expect(rejected.code).toBe(400);
+  expect(normal.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+});
+
+test("typed answers stop at the server quota and cannot bypass a spent cap",async()=>{
+  const api=setup(); const session=await startExam(api);
+  api.docs.set(usageKey(),{turns:40});
+  const response=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich lerne jeden Tag Deutsch."
+  });
+  expect(response.code).toBe(429);
+  expect(response.payload.code).toBe("budget_reached");
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(0);
+});
