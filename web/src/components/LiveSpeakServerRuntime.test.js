@@ -1161,7 +1161,7 @@ test("dynamic examiner dialogue asks at most one question in each turn",async()=
   expect(first.code).toBe(200);
   expect(first.payload.reply).toContain("Privatsphäre?");
   expect(first.payload.reply).not.toContain("Kosten");
-  expect((first.payload.reply.match(/\\?/g) || [])).toHaveLength(1);
+  expect(first.payload.reply.split("?")).toHaveLength(2);
   expect(first.payload.taskReady).toBe(false);
 });
 
