@@ -42,11 +42,11 @@ test("feedback failure keeps the session; retry sends only session ID and duplic
     return ok(saved);
   });
   show(); fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
-  const finish=await screen.findByRole("button",{name:"Finish task & see feedback"});
+  const finish=await screen.findByRole("button",{name:/Finish this Teil & see feedback/});
   fireEvent.click(finish); fireEvent.click(finish);
   expect(await screen.findByRole("alert")).toHaveTextContent("Your answers are saved.");
   expect(calls).toBe(1);
-  fireEvent.click(screen.getByRole("button",{name:"Finish task & see feedback"}));
+  fireEvent.click(screen.getByRole("button",{name:/Finish this Teil & see feedback/}));
   expect(await screen.findByText("Use weil with the verb at the end.")).toBeInTheDocument();
   expect(calls).toBe(2);
 });
@@ -56,14 +56,15 @@ test("pending transcription is recoverable and final confirmation goes directly 
   global.fetch.mockImplementation(async url=>{
     if(String(url).endsWith("/status"))return ok({enabled:true,activeSession:pending});
     if(String(url).endsWith("/confirm"))return ok({transcript:"Ich esse Gemüse.",reply:"Danke.",audioBase64:"",taskReady:true});
+    if(String(url).endsWith("/exam-feedback"))return ok({feedback:"Good attempt."});
     return ok(pending);
   });
   show(); fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
   expect(await screen.findByRole("textbox",{name:/What I said/})).toHaveValue("Ich esse Gemüse.");
   fireEvent.click(screen.getByRole("button",{name:"Confirm answer"}));
-  expect(await screen.findByText(/Answers saved. You’re ready for feedback/)).toBeInTheDocument();
-  expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
-  expect(screen.getByRole("button",{name:"Finish task & see feedback"})).toBeEnabled();
+  expect(await screen.findByText(/Good attempt/)).toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"Record German answer"})).not.toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:/Finish this Teil & see feedback/})).not.toBeInTheDocument();
 });
 
 test.each([false,true])("saved feedback survives reload and local rehearsal stays on device (byte stop: %s)",async(autoStop)=>{
