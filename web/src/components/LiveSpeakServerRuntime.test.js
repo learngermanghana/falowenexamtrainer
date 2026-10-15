@@ -50,6 +50,7 @@ function setup(overrides = {}, authOverride = {}) {
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
       if(name==="./chatModelConfig")return require("../../../functions/functionz/chatModelConfig");
       if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
+      if(name==="./speakingRubric")return require("../../../functions/functionz/speakingRubric");
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
       throw new Error("Unexpected require "+name);
     },
@@ -400,13 +401,16 @@ test("repeated failure exhausts retry allowance without deleting answers",async(
   expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(3);
 });
 
-test("lost reply speech keeps the answer and allows feedback without re-recording",async()=>{
+test("lost reply speech preserves confirmed answers and leaves unfinished exam open",async()=>{
   const api=setup(); const session=await startExam(api);
   api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("TTS unavailable"));
   const confirmed=await answerExam(api,session);
   expect(confirmed.code).toBe(200);
-  expect(confirmed.payload.taskReady).toBe(true);
+  expect(confirmed.payload.taskReady).toBe(false);
+  expect(confirmed.payload.voiceUnavailable).toBe(true);
   expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(1);
+  const following=await answerExam(api,session,"Ich esse gern Gemüse.");
+  expect(following.payload.taskReady).toBe(true);
   expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(200);
 });
 
@@ -755,4 +759,60 @@ test.each([
     // processing, transcript confirmation and examiner playback.
     expect(allotted/1000-requiredSpeechSeconds).toBeGreaterThan(12*60);
   }
+});
+
+test("A1 Teil 2 recovers the next question after a partner failure without repeating a saved answer",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const initialUsage=api.docs.get(usageKey())?.turns || 0;
+  api.fakeClient.chat.completions.create.mockRejectedValueOnce(new Error("LLM failed"));
+  const response=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  expect(response.code).toBe(200);
+  expect(response.payload.taskReady).toBe(false);
+  expect(response.payload.voiceUnavailable).toBe(true);
+  expect(response.payload.nextInstruction).toMatch(/\?/);
+  expect(response.payload.examFlow.step.action).toBe("answer-question");
+  const saved=api.docs.get(sessionKey);
+  expect(saved.confirmedAnswers).toHaveLength(1);
+  expect(saved.messages.filter(item=>item.role==="user")).toHaveLength(1);
+  expect(saved.answeredTurns).toBe(1);
+  expect(saved.taskReady).toBe(false);
+  expect(saved.inFlight).toBe(false);
+  expect(api.docs.get(usageKey()).turns-initialUsage).toBe(2);
+  const next=await answerExam(api,session,"Am Bahnhof.");
+  expect(next.code).toBe(200);
+  expect(next.payload.taskReady).toBe(false);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(2);
+});
+
+test("a valid multi-dimensional rubric produces weighted A1 feedback with transcript-backed corrections",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  for(const text of ["Wie viel kostet die Fahrkarte?","Die Fahrkarte kosten fünf Euro.","Wo kann ich Brot kaufen?","Im Supermarkt."]) {
+    expect((await answerExam(api,session,text)).code).toBe(200);
+  }
+  const response={
+    taskScores:[1,2,3,4].map(step=>({step,score:2,comment:"Action achieved"})),
+    rubric:{
+      taskCompletion:{score:4,evidence:"Both cards used"},
+      languageAccuracy:{score:2,evidence:"Verb conjugation error"},
+      vocabulary:{score:3,evidence:"Appropriate everyday words"},
+      interaction:{score:4,evidence:"Relevant exchanges"},
+      organization:{score:1,evidence:"Not scored in A1 question rounds"}
+    },
+    corrections:[
+      {original:"Die Fahrkarte kosten fünf Euro.",corrected:"Die Fahrkarte kostet fünf Euro.",explanation:"Singular verb agreement"},
+      {original:"Invented sentence",corrected:"Wrong",explanation:"Not supported by transcript"}
+    ],
+    summary:"Task actions achieved.",strength:"Clear questions",priority:"Verb agreement",
+    correctedExample:"Die Fahrkarte kostet fünf Euro.",nextPractice:"Review conjugation"
+  };
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify(response)}}]});
+  const finished=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(finished.code).toBe(200);
+  expect(finished.payload.assessment.rubric).toBeTruthy();
+  expect(finished.payload.assessment.rubric.dimensions.organization).toBeUndefined();
+  expect(finished.payload.assessment.corrections).toHaveLength(1);
+  expect(finished.payload.assessment.legacyTaskPercent).toBe(100);
+  expect(finished.payload.assessment.percent).toBe(83);
+  expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).assessment.percent).toBe(83);
+  expect(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages[0].content).toContain("rubric");
 });
