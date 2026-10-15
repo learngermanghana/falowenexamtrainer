@@ -62,11 +62,11 @@ test("blocked autoplay gives a replay option and actionable microphone permissio
     fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
     expect(await screen.findByText("Examiner audio needs a replay")).toBeInTheDocument();
     expect(screen.getByRole("status",{name:"Examiner audio requires a tap"})).toHaveTextContent(/On iPhone/);
-    expect(screen.getByRole("button",{name:"Tap to hear the AI examiner"})).toBeVisible();
+    expect(screen.getByRole("button",{name:/Tap to hear the AI examiner/})).toBeVisible();
     expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
     fireEvent.click(screen.getByRole("button",{name:"Record German answer"}));
     expect(await screen.findByRole("alert")).toHaveTextContent(/Allow microphone permission/);
-    fireEvent.click(screen.getByRole("button",{name:"Tap to hear the AI examiner"}));
+    fireEvent.click(screen.getByRole("button",{name:/Tap to hear the AI examiner/}));
     await waitFor(()=>expect(screen.getByText("Examiner speaking")).toBeInTheDocument());
     expect(screen.queryByRole("status",{name:"Examiner audio requires a tap"})).not.toBeInTheDocument();
     await act(async()=>voices[1].onended());
