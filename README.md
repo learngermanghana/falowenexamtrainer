@@ -66,7 +66,7 @@ Rules:
 
 ## Prerequisites
 - Node.js 18+ and npm
-- An OpenAI API key with access to the `gpt-4o-mini` family
+- An OpenAI API key with access to the `gpt-6-luna` family
 
 ## Configuration
 Create a `.env` file in the repository root for the backend:
