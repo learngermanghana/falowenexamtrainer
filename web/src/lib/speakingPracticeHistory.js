@@ -1,7 +1,7 @@
 // Shared between the original Speaking Coach picker and live examiner.
 // Completion is only recorded after the server returns actual task feedback.
 export const practiceKey = (level, taskId) => String(level || "").toUpperCase() + ":" + String(taskId || "");
-export function recordExamPractice(history={}, {level,taskId,teil,topic="",keyword="",feedback,words=[],completedAt=new Date().toISOString()}) {
+export function recordExamPractice(history={}, {level,taskId,teil,topic="",keyword="",feedback,assessment=null,words=[],completedAt=new Date().toISOString()}) {
   if (!level || !taskId || !String(feedback || "").trim()) return history;
   const key=practiceKey(level,taskId);
   const prior=history[key] || {};
@@ -10,7 +10,7 @@ export function recordExamPractice(history={}, {level,taskId,teil,topic="",keywo
     topic:String(topic || "").slice(0,140),keyword:String(keyword || "").slice(0,140),
     completedAt,attempts:Math.max(0,Number(prior.attempts)||0)+1,
     words:[...new Set([...((prior.words)||[]),...words].filter(Boolean))].slice(0,30),
-    feedback:String(feedback).slice(0,2200)
+    feedback:String(feedback).slice(0,2200),scorePercent:Number.isFinite(assessment?.percent) ? assessment.percent : null
   }};
 }
 export function isPractised(history,level,taskId) {
@@ -31,7 +31,7 @@ export function freshTaskOptions(questions=[],history={},level="") {
   return novel.length ? novel : fresh;
 }
 export const nextExamTeil = (level,teil) => {
-  const parts={A1:3,A2:3,B1:3,B2:2};
+  const parts={A1:3,A2:3,B1:3,B2:2,C1:2,C2:2};
   const max=parts[String(level||"").toUpperCase()] || 3;
   const current=Number(String(teil||"").match(/\d+/)?.[0]||0);
   return current>=1 && current<max ? String(current+1) : null;
