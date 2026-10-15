@@ -1179,5 +1179,85 @@ export const speakingQuestionDictionary = [
     "keywordSubtopic": "",
     "text": "Senkung des Wahlalters auf 16 Jahre",
     "hint": "Sollte das Wahlalter bei politischen Wahlen auf 16 Jahre gesenkt werden?"
+  },
+  {
+    "id": "c2-teil-1-digitale-selbstbestimmung",
+    "level": "C2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Digitale Selbstbestimmung im Zeitalter künstlicher Intelligenz",
+    "keywordSubtopic": "",
+    "text": "Digitale Selbstbestimmung im Zeitalter künstlicher Intelligenz",
+    "hint": "Differenzieren Sie Nutzen und Risiken und entwickeln Sie einen begründeten Ausblick."
+  },
+  {
+    "id": "c2-teil-1-globale-verantwortung",
+    "level": "C2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Globale Verantwortung und nationale Interessen",
+    "keywordSubtopic": "",
+    "text": "Globale Verantwortung und nationale Interessen",
+    "hint": "Stellen Sie gegensätzliche Sichtweisen präzise dar und begründen Sie Ihre Bewertung."
+  },
+  {
+    "id": "c2-teil-1-wissenschaft-und-ethik",
+    "level": "C2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Wissenschaftliche Freiheit und ethische Grenzen",
+    "keywordSubtopic": "",
+    "text": "Wissenschaftliche Freiheit und ethische Grenzen",
+    "hint": "Diskutieren Sie gesellschaftliche Folgen anhand konkreter Beispiele."
+  },
+  {
+    "id": "c2-teil-1-sprache-und-identitaet",
+    "level": "C2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Sprache, Identität und gesellschaftlicher Wandel",
+    "keywordSubtopic": "",
+    "text": "Sprache, Identität und gesellschaftlicher Wandel",
+    "hint": "Differenzieren Sie kulturpolitische Positionen und ihre Voraussetzungen."
+  },
+  {
+    "id": "c2-teil-2-automatisierung",
+    "level": "C2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Sollte der Staat den Einsatz künstlicher Intelligenz stärker regulieren?",
+    "keywordSubtopic": "",
+    "text": "Sollte der Staat den Einsatz künstlicher Intelligenz stärker regulieren?",
+    "hint": "Führen Sie ein Pro-und-Kontra-Gespräch und reagieren Sie auf Einwände."
+  },
+  {
+    "id": "c2-teil-2-bildung",
+    "level": "C2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Sollte universitäre Bildung grundsätzlich gebührenfrei sein?",
+    "keywordSubtopic": "",
+    "text": "Sollte universitäre Bildung grundsätzlich gebührenfrei sein?",
+    "hint": "Begründen Sie Ihre Position und widerlegen Sie Gegenargumente sachlich."
+  },
+  {
+    "id": "c2-teil-2-klimapolitik",
+    "level": "C2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Muss individueller Konsum stärker politisch gesteuert werden?",
+    "keywordSubtopic": "",
+    "text": "Muss individueller Konsum stärker politisch gesteuert werden?",
+    "hint": "Wägen Sie Freiheit und Verantwortung ab und überzeugen Sie Ihr Gegenüber."
+  },
+  {
+    "id": "c2-teil-2-oeffentlichkeit",
+    "level": "C2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Gefährdet die digitale Öffentlichkeit den demokratischen Diskurs?",
+    "keywordSubtopic": "",
+    "text": "Gefährdet die digitale Öffentlichkeit den demokratischen Diskurs?",
+    "hint": "Diskutieren Sie Gegenpositionen präzise und differenziert."
   }
 ];
