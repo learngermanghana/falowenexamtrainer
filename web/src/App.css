@@ -940,7 +940,6 @@ body.falowen-speaking-session-active .study-buddy-bar { display: none !important
 
 /* Speaking exam: remove duplicate page banners and expose phone navigation. */
 body.falowen-exam-speaking-page .study-buddy-bar { display: none !important; }
-.exam-speaking-quick-nav { display: none; }
 .speaking-exam-a1-topic {
   display: grid;
   gap: 5px;
@@ -1009,33 +1008,6 @@ body.falowen-exam-speaking-page .study-buddy-bar { display: none !important; }
   outline-offset: 2px;
 }
 @media (max-width: 900px) {
-  .exam-speaking-quick-nav {
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    padding: 1px 0 5px;
-    -webkit-overflow-scrolling: touch;
-  }
-  .exam-speaking-quick-nav button {
-    flex: 0 0 auto;
-    min-height: 40px;
-    padding: 8px 11px;
-    border: 1px solid #dbeafe;
-    background: #fff;
-    border-radius: 999px;
-    color: #1e40af;
-    font-size: 12px;
-    font-weight: 750;
-    white-space: nowrap;
-    cursor: pointer;
-  }
-  .exam-speaking-quick-nav button[aria-current="page"] {
-    background: #1d4ed8;
-    color: #fff;
-    border-color: #1d4ed8;
-  }
   .exam-room-level-picker--speaking {
     padding: 8px 10px !important;
     gap: 5px !important;
