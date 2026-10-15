@@ -31,6 +31,7 @@ jest.mock("./LiveSpeakPage", () => {
       { "data-testid": "inline-live-examiner", "data-level": props.initialLevel,
         "data-source": props.practiceSource, "data-autostart": String(props.autoStart), "data-task": JSON.stringify(props.examTask) },
       React.createElement("button", { type: "button", onClick: () => props.onActivityChange(true) }, "Simulate live speaking"),
+      React.createElement("button", { type: "button", onClick: props.onSessionReset }, "Simulate reset complete"),
       React.createElement("button", { type: "button", onClick: () => props.onExamCompleted({taskId:props.examTask.id,level:props.initialLevel,teil:props.examTask.teil,topic:props.examTask.prompt,feedback:"Clear answer. Add a reason.",assessment:{score:7,maxScore:10,percent:70}}) }, "Complete part"),
     ),
   };
@@ -168,3 +169,18 @@ test.each(["B2","C1","C2"])("%s full exam ends after two parts",async(level)=>{
   expect(screen.getByLabelText("Combined speaking practice score")).toHaveTextContent("14 / 20");
   expect(screen.getByLabelText("Full speaking exam results")).not.toHaveTextContent("Teil 3");
 });
+
+test("reset from the active full exam returns to selection without carrying stale parts",async()=>{
+  window.history.replaceState({}, "", "/exams/speaking");
+  render(<SpeakingPage mode="exam" />);
+  await waitFor(()=>expect(screen.getByRole("button",{name:/Start full speaking exam/})).toBeEnabled());
+  fireEvent.click(screen.getByRole("button",{name:/Start full speaking exam/}));
+  fireEvent.click(screen.getByRole("button",{name:"Simulate live speaking"}));
+  expect(screen.getByRole("button",{name:/Choose practice/})).toBeDisabled();
+  fireEvent.click(screen.getByRole("button",{name:"Simulate reset complete"}));
+  expect(screen.getByLabelText("Choose speaking practice")).toBeInTheDocument();
+  expect(screen.queryByLabelText("Full speaking exam results")).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button",{name:/Practise selected part/}));
+  expect(screen.getByLabelText("Speaking examination screen")).toBeInTheDocument();
+});
+
