@@ -52,13 +52,15 @@ describe("Exams Room section navigation", () => {
     expect(overviewSource).toContain("buildExamRoomCoach");
     expect(overviewSource).toContain("Exam skill practice coverage");
     expect(overviewSource).toContain("getMockExamsForLevel");
-    expect(overviewSource).toContain('onClick={() => navigate("/exams/mocks")}');
+    expect(overviewSource).toContain('onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}');
     expect(overviewSource).toContain('aria-label={"Practise " + skill.title}');
-    expect(overviewSource).toContain('onClick={() => navigate("/exams/question")}');
-    expect(overviewSource).toContain('onClick={() => navigate("/exams/file")}');
+    expect(overviewSource).toContain('onClick={() => openPractice("/exams/question", "Daily exam practice opened successfully.")}');
+    expect(overviewSource).toContain('onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}');
     expect(overviewSource).not.toContain("PRACTICE_SECTIONS");
     expect(appSource).toContain('role="group" aria-label="Choose exam practice level"');
     expect(appSource).toContain('accessibleLevels.map((option)');
     expect(appSource).toContain('aria-pressed={level === option}');
+    expect(appSource).toContain('onClick={() => openExamSection(tab)}');
+    expect(overviewSource).toContain('announceExamSuccess(message)');
   });
 });
