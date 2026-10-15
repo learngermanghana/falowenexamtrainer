@@ -41,7 +41,8 @@ function setup(overrides = {}, authOverride = {}) {
   };
   const moduleObj={exports:{}};
   const env={LIVE_SPEAK_ENABLED:"true",
-    LIVE_SPEAK_MONTHLY_TURN_CAP:"40",OPENAI_API_KEY:"sk_test_fake",...overrides};
+    LIVE_SPEAK_MONTHLY_TURN_CAP:"40",LIVE_SPEAK_TESTING_ACCESS:"false",
+    OPENAI_API_KEY:"sk_test_fake",...overrides};
   vm.runInNewContext(source,{
     module:moduleObj,exports:moduleObj.exports, Buffer, Date, console,
     process:{env},
@@ -931,4 +932,164 @@ test("recent in-flight turns are not resent; stale timed-out locks may safely be
   expect(resubmitted.payload.needsConfirmation).toBe(true);
   expect(api.docs.get(sessionKey).inFlight).toBe(false);
   expect(api.docs.get(sessionKey).pendingTranscript).toBe("Ich spreche jeden Tag Deutsch.");
+});
+
+
+test("open examiner testing restores real voice for a pilot-exhausted student at the shared cap",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const month=new Date().toISOString().slice(0,7);
+  api.docs.set("liveSpeakUsage/"+month,{turns:52});
+  api.docs.set("liveSpeakPilotCredits/u123",{
+    uid:"u123",pilotClaimed:true,remaining:0,expiresAt:"2025-01-01T00:00:00Z",
+  });
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.code).toBe(200);
+  expect(status.payload).toEqual(expect.objectContaining({
+    enabled:true,openTesting:true,capReached:false,
+    pilotAvailable:false,remaining:1,
+  }));
+  const task={id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"};
+  const started=await api.call("POST","/live-speak/session/start",{
+    level:"A1",source:"exam-speaking-practice",examTask:task,
+    examinerFlowVersion:1,examMode:"guided",
+  });
+  expect(started.code).toBe(200);
+  expect(started.payload.sessionId).toBeTruthy();
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(0);
+  const opening=await api.call("POST","/live-speak/session/turn",{
+    sessionId:started.payload.sessionId,intro:true,
+  });
+  expect(opening.code).toBe(200);
+  expect(opening.payload.audioBase64).toBeTruthy();
+  const sent=await api.call("POST","/live-speak/session/turn",{
+    sessionId:started.payload.sessionId,typedAnswer:"Ich heiße Anna und lerne Deutsch.",
+  });
+  expect(sent.code).toBe(200);
+  const confirmed=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:started.payload.sessionId,pendingId:sent.payload.pendingId,
+    transcript:sent.payload.transcript,
+  });
+  expect(confirmed.code).toBe(200);
+  expect(api.docs.get("liveSpeakSessions/u123").confirmedAnswers).toHaveLength(1);
+  const readyForFeedback=api.docs.get("liveSpeakSessions/u123");
+  api.docs.set("liveSpeakSessions/u123",{
+    ...readyForFeedback,taskReady:true,answeredTurns:readyForFeedback.answeredTurns,
+  });
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{
+    sessionId:started.payload.sessionId,
+  });
+  expect(feedback.code).toBe(200);
+  expect(api.docs.get("liveSpeakUsage/"+month).turns).toBeGreaterThan(52);
+});
+
+test("temporary tester can start again after ending an exam without new credits",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  api.docs.set("liveSpeakUsage/"+new Date().toISOString().slice(0,7),{turns:5000});
+  api.docs.set("liveSpeakPilotCredits/u123",{
+    pilotClaimed:true,remaining:0,expiresAt:"2025-01-01T00:00:00Z",
+  });
+  const startBody={
+    source:"exam-speaking-practice",level:"A1",
+    examTask:{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich vor"},
+    examinerFlowVersion:1,
+  };
+  const first=await api.call("POST","/live-speak/session/start",startBody);
+  expect(first.code).toBe(200);
+  const ended=await api.call("POST","/live-speak/session/end",{
+    sessionId:first.payload.sessionId,
+  });
+  expect(ended.code).toBe(200);
+  const second=await api.call("POST","/live-speak/session/start",startBody);
+  expect(second.code).toBe(200);
+  expect(second.payload.resumed).toBe(false);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(0);
+});
+
+test("open examiner testing cannot bypass authentication, emergency off switch, or per-session turns",async()=>{
+  const mismatched=setup({LIVE_SPEAK_TESTING_ACCESS:"true"},{
+    uid:"outsider",email:"outsider@example.com",
+  });
+  expect((await mismatched.call("POST","/live-speak/session/start",{
+    source:"exam-speaking-practice",level:"A1",
+  })).code).toBe(403);
+  const off=setup({LIVE_SPEAK_TESTING_ACCESS:"true",LIVE_SPEAK_ENABLED:"false"});
+  expect((await off.call("POST","/live-speak/session/start",{level:"A1"})).code).toBe(503);
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const started=await api.call("POST","/live-speak/session/start",{
+    level:"A1",source:"exam-speaking-practice",
+    examTask:{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"},
+    examinerFlowVersion:1,
+  });
+  expect(started.code).toBe(200);
+  api.docs.set("liveSpeakSessions/u123",{
+    ...api.docs.get("liveSpeakSessions/u123"),turnsUsed:10,
+  });
+  const blocked=await api.call("POST","/live-speak/session/turn",{
+    sessionId:started.payload.sessionId,intro:true,
+  });
+  expect(blocked.code).toBe(429);
+  expect(blocked.payload.code).toBe("turn_limit");
+});
+
+test("setting LIVE_SPEAK_TESTING_ACCESS=false restores the monthly and pilot restrictions",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"false"});
+  const month=new Date().toISOString().slice(0,7);
+  api.docs.set("liveSpeakUsage/"+month,{turns:52});
+  api.docs.set("liveSpeakPilotCredits/u123",{
+    pilotClaimed:true,remaining:0,expiresAt:"2025-01-01T00:00:00Z",
+  });
+  expect((await api.call("GET","/live-speak/status")).payload.capReached).toBe(true);
+  const start=await api.call("POST","/live-speak/session/start",{level:"A1"});
+  expect(start.code).toBe(429);
+  expect(start.payload.code).toBe("budget_reached");
+});
+
+
+test("open examiner testing does not unlock standalone, workbook or unstructured speaking use",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const month=new Date().toISOString().slice(0,7);
+  api.docs.set("liveSpeakUsage/"+month,{turns:52});
+  api.docs.set("liveSpeakPilotCredits/u123",{
+    pilotClaimed:true,remaining:0,expiresAt:"2025-01-01T00:00:00Z",
+  });
+  for(const source of ["standalone","course-workbook","a1-workbook","c2-workbook"]){
+    const request=await api.call("POST","/live-speak/session/start",{source,level:"A1"});
+    expect(request.code).toBe(429);
+    expect(request.payload.code).toBe("budget_reached");
+  }
+  const unstructured=await api.call("POST","/live-speak/session/start",{
+    source:"exam-speaking-practice",level:"A1",
+    examTask:{id:"legacy-exam",teil:"Teil 1",prompt:"Stellen Sie sich vor"},
+  });
+  expect(unstructured.code).toBe(429);
+  expect(api.docs.has("liveSpeakSessions/u123")).toBe(false);
+  // A previously started standalone session does not get the examiner's
+  // unlocked provider usage simply because open testing was enabled.
+  api.docs.set("liveSpeakSessions/u123",{
+    uid:"u123",sessionId:"standalone-old",source:"standalone",
+    expiresAt:new Date(Date.now()+100000).toISOString(),
+    turnsUsed:0,inFlight:false,endedAt:null,
+  });
+  const blocked=await api.call("POST","/live-speak/session/turn",{
+    sessionId:"standalone-old",intro:true,
+  });
+  expect(blocked.code).toBe(429);
+  expect(blocked.payload.code).toBe("budget_reached");
+  expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
+});
+
+test("open examiner mode preserves the old standalone credit-claim path",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.openTesting).toBe(true);
+  expect(status.payload.pilotAvailable).toBe(true);
+  expect(status.payload.actualRemaining).toBe(0);
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+  const session=await api.call("POST","/live-speak/session/start",{
+    level:"A2",source:"standalone",
+  });
+  expect(session.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
 });

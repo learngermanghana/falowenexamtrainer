@@ -1,7 +1,9 @@
 /*
- * Falowen Live Speak voice-only pilot. NO PAYMENT INTEGRATION.
- * Signed-in students can access an unadvertised URL; server-side quotas control cost.
- * Session allowances and provider usage are verified on the server.
+ * Falowen Live Speak — temporary signed-in examiner testing access.
+ * NO PAYMENT INTEGRATION. LIVE_SPEAK_TESTING_ACCESS=false restores the
+ * original pilot/shared-budget gates once school testing is complete.
+ * LIVE_SPEAK_ENABLED=false is the emergency stop. Per-session timer, turn,
+ * audio-size and feedback attempt limits remain enforced in both modes.
  */
 const crypto = require("crypto");
 const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
@@ -91,6 +93,11 @@ const GERMAN_OPENINGS = {
 };
 // Direct-link beta can be stopped at once using LIVE_SPEAK_ENABLED=false.
 const enabled = () => process.env.LIVE_SPEAK_ENABLED !== "false";
+// Temporary pilot rollout: students can complete real speaking examinations
+// repeatedly while the examiner is being verified. Enrollment validation,
+// session/audio safety limits and usage accounting are NOT bypassed.
+const openTesting = () => enabled() && process.env.LIVE_SPEAK_TESTING_ACCESS !== "false";
+const testingExamSession = session => openTesting() && examiner(session) && Boolean(session.examFlow);
 const spendingCap = () => {
   const configured = Number(process.env.LIVE_SPEAK_MONTHLY_TURN_CAP);
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 500 ? configured : 40;
@@ -210,6 +217,24 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         (Date.parse(running.expiresAt || "") > Date.now() || feedbackOpen(running));
       const info = receiptStatus(pilot?.data());
       const used = Number(usage?.data()?.turns) || 0;
+      if (openTesting()) {
+        // The old deployed client requires a positive "remaining" value to
+        // expose Start speaking, even though no pilot credit is spent here.
+        // Retain that one-value compatibility bridge until Vercel publishes
+        // the revised UI (which uses openTesting directly).
+        return res.json({
+          enabled:true, openTesting:true, pilotAvailable:enabled() && !info.pilotClaimed,
+          sessionMinutes:5, maxTurns:MAX_TURNS, examinerFlowVersion:1,
+          ...info,
+          // Existing Vercel Exam Room builds depend on these legacy flags.
+          // Keep the real entitlement fields separately for other clients.
+          remaining:Math.max(1,info.remaining), actualRemaining:info.remaining,
+          actualCapReached:used >= spendingCap(), capReached:false, examTryoutAvailable:false,
+          activeSession:active ? sessionView(running) : null,
+          lastExamResult:examiner(running) && (running.feedback || (!active && confirmedAnswers(running).length))
+            ? sessionView(running) : null,
+        });
+      }
       // Preserve the free two-session pilot whenever it can still be claimed.
       // Only spend the tiny tryout reserve when normal access is not usable.
       const canClaimPilot = !info.pilotClaimed &&
@@ -239,6 +264,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The voice service is not configured.");
+      // Keep claiming normal pilot credits for standalone and workbook modes.
+      // Examiner open testing never requires this endpoint.
       const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
       if ((Number(usage.data()?.turns) || 0) + PILOT_SESSIONS * MAX_TURNS > spendingCap()) {
         return error(res, 429, "budget_reached", "The pilot usage limit has been reached.");
@@ -282,6 +309,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
       const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
+      // Only the structured Exam Room examiner is available for repeated
+      // testing. Standalone and workbook AI retain their existing pilot rules.
+      const testing = openTesting() && source === "exam-speaking-practice" && Boolean(examFlow);
       let result;
       await db().runTransaction(async (tx) => {
         const [subSnap, sessionSnap, usageSnap] = await Promise.all([
@@ -296,11 +326,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const used = Number(usageSnap.data()?.turns) || 0;
         const sub = subSnap.data() || {};
         const hasPilotCredit = withinWindow(sub) && Number(sub.remaining) > 0;
-        const usePilot = hasPilotCredit && used < spendingCap();
-        const useExamTryout = !usePilot && eligibleForTryout({
+        const usePilot = !testing && hasPilotCredit && used < spendingCap();
+        const useExamTryout = !testing && !usePilot && eligibleForTryout({
           source, flow:examFlow, credit:sub, usage:used,
         });
-        if (!usePilot && !useExamTryout) {
+        if (!testing && !usePilot && !useExamTryout) {
           if (used >= spendingCap() || (source === "exam-speaking-practice" && used >= tryoutCeiling())) {
             throw Object.assign(new Error("Speaking usage safety limit reached."),{status:429,code:"budget_reached"});
           }
@@ -322,7 +352,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (useExamTryout) tx.set(subRef, {uid:student.auth.uid,
           examTryoutMonth:currentMonth(),
           updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
-        else tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+        else if (!testing) tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
         tx.set(sessionRef, { uid: student.auth.uid, sessionId, level, topic, source, examTask,
           examTryout:useExamTryout,
           ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
@@ -407,7 +437,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // adding cost outside the existing per-session/global quotas.
         if (typedTurn && !examiner(session)) throw Object.assign(new Error("Typing is available only in speaking exam practice."), {status:400,code:"typing_unavailable"});
         if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
-        if ((Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
+        if (!testingExamSession(session) && (Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
         level = cleanLevel(session.level);
         topic = cleanPracticeTopic(session.topic);
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
@@ -426,7 +456,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // per-session and global cost ceilings.
         const transcriptionUnits = !intro ? (typedTurn ? 1 : Math.max(1,Math.ceil(audioBytes.length / MAX_AUDIO_BYTES))) : 0;
         const reservedCalls = intro ? 1 : transcriptionUnits + (needsResponse ? 1 : 0);
-        if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > quotaForSession(session)) {
+        if (!testingExamSession(session) && (Number(usageSnap.data()?.turns) || 0) + reservedCalls > quotaForSession(session)) {
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
         }
         tx.update(sessionRef, {
@@ -766,7 +796,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
         }
-        if ((Number(usageSnap.data()?.turns) || 0) + 1 > quotaForSession(record)) {
+        if (!testingExamSession(record) && (Number(usageSnap.data()?.turns) || 0) + 1 > quotaForSession(record)) {
           throw Object.assign(new Error("The pilot feedback budget is reached."), {status:429,code:"budget_reached"});
         }
         task = record.examTask || {prompt:record.topic};
