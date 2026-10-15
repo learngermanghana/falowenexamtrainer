@@ -11,7 +11,9 @@ export const examinerTaskPreview = (level,task,mode="guided") => {
     const first=match?.word || selected;
     if (key === "A2-1" && match) {const index=defaults.indexOf(match);defaults=[...defaults.slice(index),...defaults.slice(0,index)];}
     // A1 information exchange must cover two different topics.
-    const otherTheme=key === "A1-2" && match?.theme ? defaults.filter(card=>card.theme !== match.theme) : defaults;
+    const position=defaults.indexOf(match);
+    const rotated=position < 0 ? defaults : [...defaults.slice(position+1),...defaults.slice(0,position)];
+    const otherTheme=key === "A1-2" && match?.theme ? rotated.filter(card=>card.theme !== match.theme) : defaults;
     cards=[...new Map([first,...otherTheme.map(card=>card.word),...defaults.map(card=>card.word)].map(word=>[word.toLocaleLowerCase("de-DE"),word])).values()].slice(0,key === "A1-2" ? 2 : 4);
   }
     cardThemes=cards.map(word=>key === "A1-2" ? catalogue.a1InformationCards.find(card=>card.word === word)?.theme || "" : "");
