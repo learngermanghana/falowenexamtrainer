@@ -924,7 +924,7 @@ test("one low-confidence German word flags an otherwise confident fast transcrip
     transcript:"Ich nehme die Straßenbahn zur Universität.",
   }));
   expect(api.docs.get(sessionKey).pendingUncertain).toBe(true);
-  expect(api.docs.get(sessionKey).confirmedAnswers).toBeUndefined();
+  expect(api.docs.get(sessionKey).confirmedAnswers).toEqual([]);
 });
 
 test("recent in-flight turns are not resent; stale timed-out locks may safely be recovered",async()=>{
