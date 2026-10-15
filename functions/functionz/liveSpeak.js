@@ -486,9 +486,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       sessionId = String(req.body?.sessionId || "");
+      const typed = req.body?.typed === true;
       const pendingId = String(req.body?.pendingId || "");
       let confirmed = String(req.body?.transcript || "").trim();
-      if (!pendingId || confirmed.length < 2 || confirmed.length > 8000) {
+      if ((!typed && !pendingId) || confirmed.length < 2 || confirmed.length > 8000) {
         return error(res, 400, "invalid_transcript", "Review the recognized words before continuing.");
       }
       sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
@@ -503,12 +504,26 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (session.inFlight) {
           throw Object.assign(new Error("A spoken reply is already processing."), {status:409,code:"turn_in_progress"});
         }
-        if (session.examFlow?.mode === "simulation" && req.body?.recognitionCorrection !== true) confirmed = String(session.pendingTranscript || "").trim();
+        if (typed && (!examiner(session) || !session.examFlow)) {
+          throw Object.assign(new Error("Typing is available only for Goethe speaking practice tasks."), {status:400,code:"typed_practice_unavailable"});
+        }
+        if (!typed && session.examFlow?.mode === "simulation" && req.body?.recognitionCorrection !== true) confirmed = String(session.pendingTranscript || "").trim();
         if (confirmed.length < 2 || confirmed.length > transcriptLimit(session)) {
           throw Object.assign(new Error("Keep the confirmed transcript within the recording limit."), {status:400,code:"invalid_transcript"});
         }
-        if (!pendingId || pendingId !== session.pendingId) {
-          throw Object.assign(new Error("Record your German answer again before continuing."), {status:409,code:"transcript_missing"});
+        if (typed ? Boolean(session.pendingId) : (!pendingId || pendingId !== session.pendingId)) {
+          throw Object.assign(new Error("Review or discard the existing recording before submitting another answer."), {status:409,code:"transcript_missing"});
+        }
+        if (typed) {
+          if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached."), {status:429,code:"turn_limit"});
+          const nextPlan=session.examFlow ? taskFlows.responsePlan({...session,answeredTurns:(Number(session.answeredTurns)||0)+1}) : null;
+          const units=nextPlan && (nextPlan.dynamic || nextPlan.scripted || !nextPlan.ready) ? 2 : 1;
+          const usageRef=db().collection("liveSpeakUsage").doc(currentMonth());
+          const usage=await tx.get(usageRef);
+          if ((Number(usage.data()?.turns)||0)+units > quotaForSession(session)) {
+            throw Object.assign(new Error("The shared AI practice allowance has been reached."), {status:429,code:"budget_reached"});
+          }
+          tx.set(usageRef,{turns:admin.firestore.FieldValue.increment(units),updatedAt:admin.firestore.FieldValue.serverTimestamp()},{merge:true});
         }
         level = cleanLevel(session.level);
         topic = cleanPracticeTopic(session.topic);
@@ -524,7 +539,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.update(sessionRef, {
           inFlight:true, pendingId:null, pendingTranscript:null,
           answeredTurns:admin.firestore.FieldValue.increment(1),
-          ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{step:flowSession.answeredTurns,original:session.pendingTranscript || "",confirmed,corrected:confirmed !== session.pendingTranscript}].slice(0,answerLimit(session))} : {}),
+          ...(typed ? {turnsUsed:admin.firestore.FieldValue.increment(1)} : {}),
+          ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{step:flowSession.answeredTurns,original:typed ? "" : session.pendingTranscript || "",confirmed,corrected:!typed && confirmed !== session.pendingTranscript,typed}].slice(0,answerLimit(session))} : {}),
           ...(examTask ? {confirmedAnswers:answers, messages:[...storedMessages,{role:"user",text:confirmed}].slice(-20)} : {}),
         });
         reserved = true;
