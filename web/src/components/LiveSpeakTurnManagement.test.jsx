@@ -71,3 +71,46 @@ test("blocked autoplay gives a replay option and actionable microphone permissio
     Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:previousMediaDevices});
   }
 });
+
+
+test("long examiner conversation scrolls within the old coach bubbles and keeps the red recorder below",async()=>{
+  const turns=Array.from({length:28},(_,i)=>({
+    role:i%2===0?"assistant":"user",
+    text:(i%2===0?"Bitte antworten Sie auf Deutsch. ":"Ich spreche gern Deutsch. ").repeat(8),
+    speaker:"examiner"
+  }));
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,examinerFlowVersion:1});
+    if(String(url).endsWith("/start")) return ok({...session,resumed:true,messages:turns});
+    throw new Error("Unexpected network request "+url);
+  });
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+  const log=await screen.findByRole("log",{name:"Examiner conversation"});
+  expect(log.querySelectorAll(".speaking-exam-message-bubble")).toHaveLength(28);
+  expect(log.querySelectorAll(".speaking-exam-message-row.is-student")).toHaveLength(14);
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeInTheDocument();
+  expect(log.compareDocumentPosition(screen.getByRole("button",{name:"Record German answer"})) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  Object.defineProperties(log,{
+    scrollHeight:{value:1200,configurable:true},
+    clientHeight:{value:240,configurable:true},
+    scrollTop:{value:200,writable:true,configurable:true}
+  });
+  fireEvent.scroll(log);
+  expect(screen.getByRole("button",{name:"↓ Latest message"})).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button",{name:"↓ Latest message"}));
+  expect(log.scrollTop).toBe(1200);
+  expect(screen.queryByRole("button",{name:"↓ Latest message"})).not.toBeInTheDocument();
+});
+
+test("mobile speaking CSS bounds the conversation independently from its sticky answer composer",()=>{
+  const fs=require("fs");
+  const path=require("path");
+  const css=fs.readFileSync(path.resolve(__dirname,"../App.css"),"utf8");
+  expect(css).toContain(".speaking-exam-chat-thread");
+  expect(css).toContain("height: clamp(220px, 38dvh, 380px)");
+  expect(css).toContain("height: clamp(190px, 36dvh, 300px)");
+  expect(css).toContain(".speaking-exam-session__answer");
+  expect(css).toContain("bottom: env(safe-area-inset-bottom, 0px)");
+  expect(css).toContain(".speaking-exam-message-row.is-student");
+});
