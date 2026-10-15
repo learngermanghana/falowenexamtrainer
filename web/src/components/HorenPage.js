@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
@@ -8,6 +9,10 @@ import ListeningPracticeSamplePage from "./ListeningPracticeSamplePage";
 const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const openListeningSample = (route, message = "Hören practice opened successfully.") => {
+    announceExamSuccess(message);
+    navigate(route);
+  };
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
@@ -24,7 +29,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
         return (
           <section style={{ ...styles.card, display: "grid", gap: 10 }}>
             <h2 style={{ margin: 0 }}>{normalizedLevel} Hören sample not found</h2>
-            <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/horen")}>
+            <button type="button" style={styles.secondaryButton} onClick={() => openListeningSample("/exams/horen", "Hören samples opened successfully.")}>
               Back to Hören samples
             </button>
           </section>
@@ -46,7 +51,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <div style={{ display: "grid", gap: 10 }}>
           <button
             type="button"
-            onClick={() => navigate(`/exams/horen/${normalizedLevel.toLowerCase()}/sample-1`)}
+            onClick={() => openListeningSample(`/exams/horen/${normalizedLevel.toLowerCase()}/sample-1`, "Hören Sample 1 opened successfully.")}
             style={{
               ...styles.secondaryButton,
               width: "100%",
@@ -69,7 +74,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
           {normalizedLevel === "A2" ? (
             <button
               type="button"
-              onClick={() => navigate("/exams/horen/a2/sample-2")}
+              onClick={() => openListeningSample("/exams/horen/a2/sample-2", "Hören Sample 2 opened successfully.")}
               style={{
                 ...styles.secondaryButton,
                 width: "100%",
@@ -90,7 +95,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             <>
               <button
                 type="button"
-                onClick={() => navigate("/exams/horen/a1/sample-2")}
+                onClick={() => openListeningSample("/exams/horen/a1/sample-2", "Hören Sample 2 opened successfully.")}
                 style={{
                   ...styles.secondaryButton,
                   width: "100%",
@@ -108,7 +113,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
 
               <button
                 type="button"
-                onClick={() => navigate("/exams/horen/a1/sample-3")}
+                onClick={() => openListeningSample("/exams/horen/a1/sample-3", "Hören Sample 3 opened successfully.")}
                 style={{
                   ...styles.secondaryButton,
                   width: "100%",
