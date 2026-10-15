@@ -120,3 +120,58 @@ test("the embedded banner and resumed conversation retain backend topic after sa
   );
   expect(activeNotice()).toBeInTheDocument();
 });
+
+
+test("an A1 learner with no live AI sessions can record and replay without API usage", async () => {
+  useAuth.mockReturnValue({idToken:"test",studentProfile:{level:"A1"}});
+  global.fetch.mockResolvedValue({ok:true,json:async()=>({enabled:true,remaining:0,pilotAvailable:false,pilotClaimed:true,capReached:false})});
+  const originalRecorder=global.MediaRecorder,originalMedia=navigator.mediaDevices;
+  const oldCreate=URL.createObjectURL,oldRevoke=URL.revokeObjectURL;
+  let clock=Date.now();
+  const spy=jest.spyOn(Date,"now").mockImplementation(()=>clock);
+  const stopTrack=jest.fn();
+  const chunks=new Blob(["German spoken answer"],{type:"audio/webm"});
+  global.MediaRecorder=class {
+    static isTypeSupported(){return true;}
+    constructor(stream){this.state="inactive";this.mimeType="audio/webm";}
+    start(){this.state="recording";this.ondataavailable?.({data:chunks});}
+    stop(){this.state="inactive";this.onstop?.();}
+  };
+  Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{getUserMedia:jest.fn(async()=>({getTracks:()=>[{stop:stopTrack}]}))}});
+  URL.createObjectURL=jest.fn(()=>"blob:local-test");
+  URL.revokeObjectURL=jest.fn();
+  try {
+    render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+      practiceTopic="Stellen Sie sich kurz vor"
+      examTask={{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"}} /></MemoryRouter>);
+    expect(await screen.findByText(/live AI examiner sessions are not currently available/i)).toBeInTheDocument();
+    expect(screen.queryByRole("button",{name:"Start exam"})).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox",{name:"Type optional speaking notes"})).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button",{name:"Record local speaking practice"}));
+    expect(await screen.findByRole("button",{name:"Stop local practice recording"})).toBeInTheDocument();
+    clock+=2400;
+    fireEvent.click(screen.getByRole("button",{name:"Stop local practice recording"}));
+    const audio=await screen.findByLabelText("Replay local speaking answer");
+    expect(audio).toHaveAttribute("src","blob:local-test");
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(stopTrack).toHaveBeenCalled();
+  } finally {
+    global.MediaRecorder=originalRecorder;
+    Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:originalMedia});
+    URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;
+    spy.mockRestore();
+  }
+});
+
+test("speaking page has visible navigation, a single banner, and distinct A1 topic and keyword cards",()=>{
+  const voice=fs.readFileSync(path.join(root,"web/src/components/LiveSpeakPage.jsx"),"utf8");
+  const cards=fs.readFileSync(path.join(root,"web/src/components/GoetheExamTaskCard.jsx"),"utf8");
+  const css=fs.readFileSync(path.join(root,"web/src/App.css"),"utf8");
+  expect(voice).toContain('aria-label={recording ? "Stop local practice recording" : "Record local speaking practice"}');
+  expect(cards).toContain('aria-label="A1 Teil 2 Thema"');
+  expect(cards).toContain("WORTKARTE");
+  expect(app).toContain('className="exam-speaking-quick-nav"');
+  expect(app).toContain('activeExamHero && examSection !== "speaking"');
+  expect(css).toContain("body.falowen-exam-speaking-page .study-buddy-bar");
+  expect(css).toContain(".speaking-exam-local-practice__recorder");
+});
