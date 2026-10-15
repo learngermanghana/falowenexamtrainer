@@ -223,7 +223,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // Retain that one-value compatibility bridge until Vercel publishes
         // the revised UI (which uses openTesting directly).
         return res.json({
-          enabled:true, openTesting:true, pilotAvailable:false,
+          enabled:true, openTesting:true, pilotAvailable:enabled() && !info.pilotClaimed,
           sessionMinutes:5, maxTurns:MAX_TURNS, examinerFlowVersion:1,
           ...info,
           // Existing Vercel Exam Room builds depend on these legacy flags.
@@ -264,7 +264,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       if (!process.env.OPENAI_API_KEY) return error(res, 503, "voice_unavailable", "The voice service is not configured.");
-      if (openTesting()) return res.json({ok:true,openTesting:true});
+      // Keep claiming normal pilot credits for standalone and workbook modes.
+      // Examiner open testing never requires this endpoint.
       const usage = await db().collection("liveSpeakUsage").doc(currentMonth()).get();
       if ((Number(usage.data()?.turns) || 0) + PILOT_SESSIONS * MAX_TURNS > spendingCap()) {
         return error(res, 429, "budget_reached", "The pilot usage limit has been reached.");
