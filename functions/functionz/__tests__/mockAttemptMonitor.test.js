@@ -1,4 +1,4 @@
-const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts, isAuthorizedMockMonitor } = require("../mockAttemptMonitor");
+const { normalizeMockAttempt, normalizeBrowserProgress, listMockAttempts, verifiedFinalMockScore, enrichPublishedMockScores, isAuthorizedMockMonitor } = require("../mockAttemptMonitor");
 
 test("mock monitor redacts student answers and preserves section timing", () => {
   const row = normalizeMockAttempt({
@@ -183,4 +183,66 @@ test("historical verified totals can display their saved section scores without 
       verifiedSectionScores:{lesen:26,hoeren:-1,schreiben:"",sprechen:"invalid"}})
   });
   expect(invalid.sectionScores).toEqual({lesen:null,hoeren:null,schreiben:null,sprechen:null});
+});
+
+
+test.each([
+ ["a1MockExamUsers","A1","a1_final_mock"],
+ ["a2MockExamUsers","A2","a2_final_mock"],
+ ["b1MockExamUsers","B1","b1_final_mock"],
+])("%s recovers real section marks from the archived final mock result",async(parent,level,source)=>{
+ const data={status:"completed",verifiedOverall:{score:70},
+   sectionScores:null,completionSync:{scoreDocId:"score-"+level}};
+ const raw={id:"attempt-20",ref:{path:parent+"/uid-20/attempts/attempt-20"},data:()=>data};
+ const output=normalizeMockAttempt(raw);
+ const published={uid:"uid-20",mockAttemptId:"attempt-20",level,
+   source,score:70,sectionScores:{lesen:20,hoeren:15,schreiben:16,sprechen:19}};
+ const db={
+   collection:name=>{
+     if(name!=="scores")throw Error("Unexpected collection");
+     return {doc:id=>({id}),where:()=>({get:async()=>({docs:[]})})};
+   },
+   getAll:async(...refs)=>refs.map(ref=>({exists:true,data:()=>published}))
+ };
+ const scored=await enrichPublishedMockScores(db,[output],[raw]);
+ expect(scored[0]).toMatchObject({
+   overallScore:70,sectionScores:{lesen:20,hoeren:15,schreiben:16,sprechen:19},
+   scoreSource:"published_final_result"
+ });
+ expect(JSON.stringify(scored[0])).not.toContain("scoreDocId");
+});
+
+test("archive score joins require exact attempt ownership, published source and consistent total",()=>{
+ const attempt={id:"A1:uid-2:attempt-a",level:"A1",mockId:"a1-mock-01",status:"completed",
+   overallScore:75,sectionScores:{lesen:null}};
+ const verified={uid:"uid-2",mockAttemptId:"attempt-a",level:"A1",mockId:"a1-mock-01",
+   source:"a1_final_mock",score:75,sectionScores:{lesen:20,hoeren:20,schreiben:15,sprechen:20}};
+ expect(verifiedFinalMockScore(attempt,verified)?.sections.lesen).toBe(20);
+ expect(verifiedFinalMockScore(attempt,{...verified,uid:"other"})).toBeNull();
+ expect(verifiedFinalMockScore(attempt,{...verified,mockAttemptId:"different"})).toBeNull();
+ expect(verifiedFinalMockScore(attempt,{...verified,source:"browser_import"})).toBeNull();
+ expect(verifiedFinalMockScore(attempt,{...verified,score:99})).toBeNull();
+ expect(verifiedFinalMockScore({...attempt,status:"in_progress"},verified)).toBeNull();
+ expect(verifiedFinalMockScore(attempt,{...verified,sectionScores:{...verified.sectionScores,sprechen:null}})).toBeNull();
+});
+
+test("historic attempts without a score pointer use a bounded indexed lookup and preserve genuine zeros",async()=>{
+ const level="B1",id="historic-"+Date.now();
+ const row={id:"B1:uid-legacy:"+id,status:"completed",level,mockId:"b1-mock-01",overallScore:0,
+   sectionScores:{lesen:null,hoeren:null,schreiben:null,sprechen:null}};
+ let queryKeys=[];
+ const db={collection:name=>({
+   where:(field,op,values)=>{
+     expect(name).toBe("scores"); expect(field).toBe("mockAttemptId");expect(op).toBe("in");
+     queryKeys=values;
+     return {get:async()=>({docs:[{data:()=>({
+       uid:"uid-legacy",mockAttemptId:id,level:"B1",source:"b1_final_mock",
+       score:0,sectionScores:{lesen:0,hoeren:0,schreiben:0,sprechen:0}
+     })}]})};
+   }
+ })};
+ const [out]=await enrichPublishedMockScores(db,[row]);
+ expect(queryKeys).toEqual([id]);
+ expect(out.sectionScores).toEqual({lesen:0,hoeren:0,schreiben:0,sprechen:0});
+ expect(out.overallScore).toBe(0);
 });
