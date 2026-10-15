@@ -684,6 +684,45 @@ test("previous examiner tryout use does not block repeat testing within the shar
   expect(started.sessionId).toBeTruthy();
 });
 
+test("A1 Teil 1 uses neutral spoken transitions and reads dictated surname and phone fairly",async()=>{
+  const api=setup();
+  const session=await startTaskFlow(api,"A1",1,"guided","Stellen Sie sich kurz vor");
+  const intro=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  expect(intro.code).toBe(200);
+  const introduction=await answerExam(api,session,"Ich heiße Felix Asadu. Ich komme aus Ghana.");
+  expect(introduction.payload.reply.startsWith("Vielen Dank.")).toBe(true);
+  expect(introduction.payload.reply).toContain("buchstabieren Sie Ihren Familiennamen");
+  const spelling=await answerExam(api,session,"a es a di u");
+  expect(spelling.payload.reply.startsWith("Gut, danke.")).toBe(true);
+  expect(spelling.payload.reply).toContain("Bitte nennen Sie eine Telefonnummer.");
+  const digits="Null, zwei, vier, fünf, null, zwei, zwei, sieben, vier, drei";
+  const phone=await answerExam(api,session,digits);
+  expect(phone.payload.reply.startsWith("Danke schön.")).toBe(true);
+  expect(phone.payload.reply.split("?")).toHaveLength(2);
+  const leisure=await answerExam(api,session,"Ich trinke gern Kaffee.");
+  expect(leisure.payload.taskReady).toBe(true);
+  const grades={taskScores:[1,2,3,4].map(step=>({step,score:2,comment:"A1 task achieved"})),
+    summary:"Good A1 answers.",strength:"All tasks completed.",priority:"Practice the next task.",
+    correctedExample:"Ich trinke gern Kaffee.",nextPractice:"Continue practising."};
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify(grades)}}]});
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(feedback.code).toBe(200);
+  expect(feedback.payload.assessment).toEqual(expect.objectContaining({score:8,maxScore:8}));
+  const request=api.fakeClient.chat.completions.create.mock.calls.at(-1)[0];
+  const assessmentInput=JSON.parse(request.messages.at(-1).content);
+  expect(request.messages[0].content).toContain("A-S-A-D-U");
+  expect(request.messages[0].content).toContain("Ich trinke gern Kaffee");
+  expect(request.messages[0].content).toContain("not proof of the actual surname");
+  expect(assessmentInput.studentTranscripts).toEqual([
+    "Ich heiße Felix Asadu. Ich komme aus Ghana.","a es a di u",digits,"Ich trinke gern Kaffee."
+  ]);
+  expect(assessmentInput.examContext.dictationEvidence).toEqual([
+    expect.objectContaining({step:2,action:"spell",possibleLetters:"A S A D U"}),
+    expect.objectContaining({step:3,action:"number",possibleDigits:"0245022743"}),
+  ]);
+  expect(assessmentInput.examContext.promptedSteps).toHaveLength(4);
+});
+
 test("A1 question receives a separate scripted next question and a persistent scored result",async()=>{
   const api=setup();
   const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
