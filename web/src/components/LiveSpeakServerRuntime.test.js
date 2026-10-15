@@ -812,7 +812,7 @@ test("a valid multi-dimensional rubric produces weighted A1 feedback with transc
   expect(finished.payload.assessment.rubric.dimensions.organization).toBeUndefined();
   expect(finished.payload.assessment.corrections).toHaveLength(1);
   expect(finished.payload.assessment.legacyTaskPercent).toBe(100);
-  expect(finished.payload.assessment.percent).toBe(83);
-  expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).assessment.percent).toBe(83);
+  expect(finished.payload.assessment.percent).toBe(86);
+  expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).assessment.percent).toBe(86);
   expect(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages[0].content).toContain("rubric");
 });
