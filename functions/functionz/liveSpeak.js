@@ -299,7 +299,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.set(sessionRef, { uid: student.auth.uid, sessionId, level, topic, source, examTask,
           examTryout:useExamTryout,
           ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
-        result = {...sessionView({sessionId, expiresAt, level, topic, source, examTask,examFlow:preparedFlow}),resumed:false};
+        result = {...sessionView({sessionId, expiresAt, level, topic, source, examTask,examFlow:preparedFlow,examTryout:useExamTryout}),resumed:false};
       });
       return res.json({ ok: true, ...result, answerLimit: result.answerLimit, maxTurns: result.examFlow?.key === "A2-1" ? 14 : MAX_TURNS });
     } catch (err) {
