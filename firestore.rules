@@ -259,6 +259,15 @@ service cloud.firestore {
         allow read, write: if signedIn();
       }
     }
+    // Goethe Speaking practice history is private to the signed-in learner.
+    // No wildcard access: only the authenticated owner's progress may be read
+    // or updated, regardless of the legacy student-code-based document ID.
+    match /speakingProgress/{progressId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, delete: if signedIn() && resource.data.userId == request.auth.uid;
+      allow update: if signedIn() && resource.data.userId == request.auth.uid
+        && request.resource.data.userId == request.auth.uid;
+    }
     match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
     match /writingScoreStats/{document=**} { allow read, write: if signedIn(); }
