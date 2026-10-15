@@ -19,7 +19,9 @@ function selectedCards(word, defaults, count) {
   const first = match || {word,question:questions[normalize(word)] || `Was können Sie zum Thema „${word}“ über sich erzählen?`};
   const seen = new Set();
   // Teil 2 uses two distinct themes, not two cards from the same theme.
-  const choices = count === 2 && first.theme ? defaults.filter(card => card.theme !== first.theme) : defaults;
+  const position = defaults.indexOf(match);
+  const rotated = position < 0 ? defaults : [...defaults.slice(position+1),...defaults.slice(0,position)];
+  const choices = count === 2 && first.theme ? rotated.filter(card => card.theme !== first.theme) : defaults;
   return [first,...choices,...defaults].filter(card=>{const key=normalize(card.word);if(seen.has(key))return false;seen.add(key);return true;}).slice(0,count);
 }
 function selectedRequestCards(word) {
