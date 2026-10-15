@@ -246,3 +246,31 @@ test("historic attempts without a score pointer use a bounded indexed lookup and
  expect(out.sectionScores).toEqual({lesen:0,hoeren:0,schreiben:0,sprechen:0});
  expect(out.overallScore).toBe(0);
 });
+
+
+test("completed mock progress uses verified section scores even if browser snapshot disagrees", () => {
+  for (const [parent,level] of [["a1MockExamUsers","A1"],["a2MockExamUsers","A2"],["b1MockExamUsers","B1"]]) {
+    const doc={id:"attempt-1",ref:{path:parent+"/uid123/attempts/attempt-1"},data:()=>({
+      uid:"uid123",status:"completed",
+      sectionScores:{lesen:25,hoeren:25,schreiben:25,sprechen:25},
+      verifiedOverall:{score:66,maxScore:100},
+      verifiedSectionScores:{lesen:18,hoeren:16,schreiben:20,sprechen:12}
+    })};
+    const row=normalizeMockAttempt(doc);
+    expect(row.level).toBe(level);
+    expect(row.sectionScores).toEqual({lesen:18,hoeren:16,schreiben:20,sprechen:12});
+    expect(row.completedSections).toEqual(["lesen","hoeren","schreiben","sprechen"]);
+    expect(row.scoreSource).toBe("verified_attempt");
+    expect(row.overallScore).toBe(66);
+  }
+});
+
+test("completed mocks with only verified section marks still show all four completed sections", () => {
+  const doc={id:"attempt-2",ref:{path:"a1MockExamUsers/uid123/attempts/attempt-2"},data:()=>({
+    uid:"uid123",status:"completed",verifiedOverall:{score:68,maxScore:100},
+    verifiedSectionScores:{lesen:20,hoeren:18,schreiben:16,sprechen:14}
+  })};
+  const row=normalizeMockAttempt(doc);
+  expect(row.progressCount).toBe(4);
+  expect(row.sectionScores).toEqual({lesen:20,hoeren:18,schreiben:16,sprechen:14});
+});
