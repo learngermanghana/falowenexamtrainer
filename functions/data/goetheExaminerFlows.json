@@ -217,6 +217,49 @@
       "partnerTopic": "Online Deutsch lernen",
       "partnerPresentation": "Ich möchte über das Thema Online Deutsch lernen sprechen. Zuerst berichte ich von meinen Erfahrungen. Ich lerne zweimal pro Woche online und übe am Wochenende mit einer Freundin. In meinem Heimatland nutzen viele junge Menschen ihr Handy zum Lernen, aber nicht alle haben eine gute Internetverbindung. Ein Vorteil ist, dass man zu Hause lernen und seine Zeit selbst einteilen kann. Ein Nachteil ist, dass persönliche Gespräche manchmal fehlen. Meiner Meinung nach ist eine Mischung aus Online-Unterricht und Treffen im Kurs am besten. Vielen Dank fürs Zuhören.",
       "stageGuide": "Listen to the short presentation and its follow-up question, then respond. Next, give feedback and ask your partner a question about what you heard."
+    },
+    "B2-1": {
+      "title": "Vortrag halten",
+      "role": "examiner",
+      "maxAnswers": 2,
+      "seconds": [
+        240,
+        45
+      ],
+      "criteria": [
+        "Structure a coherent presentation",
+        "Describe alternatives and weigh advantages and disadvantages",
+        "Explain one option in detail with an opinion and example",
+        "Answer the follow-up question"
+      ],
+      "hints": [
+        "Einleitung → Alternativen → Vor-/Nachteile → eine Möglichkeit → Meinung/Beispiel → Schluss"
+      ],
+      "stageGuide": "Give a presentation of about four minutes, then answer a relevant follow-up. Prepare brief notes before starting.",
+      "opening": "Halten Sie bitte Ihren Vortrag. Beschreiben Sie Alternativen, wägen Sie Vor- und Nachteile ab und erläutern Sie eine Möglichkeit genauer. Ich höre zu."
+    },
+    "B2-2": {
+      "title": "Diskussion führen",
+      "role": "partner",
+      "maxAnswers": 4,
+      "seconds": [
+        45,
+        45,
+        45,
+        45
+      ],
+      "criteria": [
+        "State and justify your position",
+        "React to the partner’s arguments",
+        "Discuss advantages and disadvantages",
+        "Summarize your position at the end"
+      ],
+      "hints": [
+        "Meiner Ansicht nach …",
+        "Dagegen spricht … / Ihr Argument verstehe ich, allerdings …"
+      ],
+      "stageGuide": "Discuss the question with the AI partner. Give reasons, respond to counterarguments and finish by summarizing your position.",
+      "opening": "Diskutieren wir die Frage. Welche Position vertreten Sie und warum?"
     }
   },
   "personalCards": [
@@ -1382,5 +1425,83 @@
       "presentation": "Wegen meines Arbeitsplans esse ich mittags manchmal Fastfood. Aber am Wochenende koche ich lieber frisch zu Hause, weil es gesünder ist und besser schmeckt.",
       "question": "Kochen Sie am Wochenende gerne selbst für Ihre Familie oder Freunde?"
     }
+  ],
+  "b2Topics": {
+    "1": [
+      {
+        "topic": "Finanzierung des Studiums",
+        "question": "Welche Möglichkeiten gibt es zur Finanzierung des Studiums, und was sind die Vor- und Nachteile von Nebenjobs, BAföG oder elterlicher Unterstützung?"
+      },
+      {
+        "topic": "Vegane und vegetarische Ernährung",
+        "question": "Welche Alternativen gibt es zur herkömmlichen Ernährung im Alltag, und wie wirken sich diese auf Gesundheit und Umwelt aus?"
+      },
+      {
+        "topic": "Plastikfreie Verpackungen im Alltag",
+        "question": "Welche Verpackungsalternativen gibt es beim Einkaufen, und wie realistisch ist ein komplett plastikfreier Alltag?"
+      },
+      {
+        "topic": "Frühes Sprachenlernen im Kindergarten",
+        "question": "Sollten Kinder schon im Kindergarten eine Fremdsprache lernen, und welche Vor- und Nachteile bringt das mit sich?"
+      },
+      {
+        "topic": "Sport und Fitness am Arbeitsplatz",
+        "question": "Welche Möglichkeiten bieten Unternehmen für die Gesundheit ihrer Mitarbeiter, und wie wichtig sind Sportangebote am Arbeitsplatz?"
+      },
+      {
+        "topic": "Wohnformen im Studium (WG vs. eigene Wohnung)",
+        "question": "Welche Vor- und Nachteile haben Wohngemeinschaften gegenüber einer eigenen Wohnung, und wie findet man bezahlbaren Wohnraum?"
+      },
+      {
+        "topic": "Politisches und soziales Engagement von Jugendlichen",
+        "question": "Wie können sich junge Menschen gesellschaftlich engagieren, und warum tun das viele Jugendliche heutzutage nicht?"
+      },
+      {
+        "topic": "Homeoffice und flexibles Arbeiten",
+        "question": "Welche Vor- und Nachteile hat die Arbeit im Homeoffice im Vergleich zur Präsenzarbeit im Büro?"
+      }
+    ],
+    "2": [
+      {
+        "topic": "Bargeldabschaffung",
+        "question": "Sollten wir Bargeld komplett abschaffen und nur noch digital bzw. bargeldlos bezahlen?"
+      },
+      {
+        "topic": "Bewertung von Lehrkräften durch Studierende/Schüler",
+        "question": "Sollten Schüler und Studierende ihre Lehrer und Professoren regelmäßig bewerten dürfen?"
+      },
+      {
+        "topic": "Einführung der 4-Tage-Woche",
+        "question": "Sollte eine 4-Tage-Arbeitswoche bei vollem Lohnausgleich gesetzlich eingeführt werden?"
+      },
+      {
+        "topic": "Kostenloses Hochschulstudium",
+        "question": "Sollte das Studium an Universitäten für alle Studierenden komplett kostenlos sein?"
+      },
+      {
+        "topic": "Pflicht zur Auslandserfahrung",
+        "question": "Sollte ein Auslandssemester oder eine Arbeitserfahrung im Ausland für alle Studierenden verpflichtend sein?"
+      },
+      {
+        "topic": "Bedeutung von Markenkleidung bei Jugendlichen",
+        "question": "Spielen Markenkleidung und Modetrends eine zu große Rolle bei Jugendlichen?"
+      },
+      {
+        "topic": "E-Books statt gedruckter Schulbücher",
+        "question": "Sollten gedruckte Schulbücher in Schulen vollständig durch Tablets und E-Books ersetzt werden?"
+      },
+      {
+        "topic": "Senkung des Wahlalters auf 16 Jahre",
+        "question": "Sollte das Wahlalter bei politischen Wahlen auf 16 Jahre gesenkt werden?"
+      }
+    ]
+  },
+  "b2PresentationPoints": [
+    "Einleitung",
+    "Mehrere Alternativen beschreiben",
+    "Vor- und Nachteile abwägen",
+    "Eine Möglichkeit genauer beschreiben",
+    "Persönliche Meinung und Beispiel",
+    "Schluss"
   ]
 }

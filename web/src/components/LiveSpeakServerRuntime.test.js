@@ -538,9 +538,10 @@ test("simulation binds unedited answers to ASR; explicitly flagged recognition c
   expect(api.docs.get(sessionKey).recognitionReviews[1].corrected).toBe(true);
 });
 
-test("B2 retains the existing voice flow even if the client requests a new profile",async()=>{
+test("B2 receives the four-minute presentation examiner profile",async()=>{
   const api=setup(); const session=await startTaskFlow(api,"B2",1);
-  expect(session.examFlow).toBe(null);
+  expect(session.examFlow.key).toBe("B2-1");
+  expect(session.maxRecordingSeconds).toBe(240);
   expect(session.answerLimit).toBe(2);
 });
 

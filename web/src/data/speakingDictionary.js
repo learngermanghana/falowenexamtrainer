@@ -661,126 +661,6 @@ export const speakingQuestionDictionary = [
     "hint": ""
   },
   {
-    "id": "b2-teil-1-sollten-smartphones-in-der-schule-erlaubt-sein-199",
-    "level": "B2",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Sollten Smartphones in der Schule erlaubt sein?",
-    "keywordSubtopic": "",
-    "text": "Sollten Smartphones in der Schule erlaubt sein?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-1-wie-wichtig-ist-umweltschutz-in-unserem-alltag-200",
-    "level": "B2",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Wie wichtig ist Umweltschutz in unserem Alltag?",
-    "keywordSubtopic": "",
-    "text": "Wie wichtig ist Umweltschutz in unserem Alltag?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-1-wie-beeinflusst-social-media-unser-leben-201",
-    "level": "B2",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Wie beeinflusst Social Media unser Leben?",
-    "keywordSubtopic": "",
-    "text": "Wie beeinflusst Social Media unser Leben?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-1-welche-rolle-spielt-sport-f-r-die-gesundheit-202",
-    "level": "B2",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Welche Rolle spielt Sport für die Gesundheit?",
-    "keywordSubtopic": "",
-    "text": "Welche Rolle spielt Sport für die Gesundheit?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-2-die-bedeutung-von-ehrenamt-203",
-    "level": "B2",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Die Bedeutung von Ehrenamt",
-    "keywordSubtopic": "",
-    "text": "Die Bedeutung von Ehrenamt",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-2-vorteile-und-nachteile-von-homeoffice-204",
-    "level": "B2",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Vorteile und Nachteile von Homeoffice",
-    "keywordSubtopic": "",
-    "text": "Vorteile und Nachteile von Homeoffice",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-2-auswirkungen-der-digitalisierung-auf-die-arbeitswelt-205",
-    "level": "B2",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Auswirkungen der Digitalisierung auf die Arbeitswelt",
-    "keywordSubtopic": "",
-    "text": "Auswirkungen der Digitalisierung auf die Arbeitswelt",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-2-mein-sch-nstes-reiseerlebnis-206",
-    "level": "B2",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Mein schönstes Reiseerlebnis",
-    "keywordSubtopic": "",
-    "text": "Mein schönstes Reiseerlebnis",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-3-sollte-man-in-der-stadt-oder-auf-dem-land-leben-207",
-    "level": "B2",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Sollte man in der Stadt oder auf dem Land leben?",
-    "keywordSubtopic": "",
-    "text": "Sollte man in der Stadt oder auf dem Land leben?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-3-sind-e-autos-die-zukunft-208",
-    "level": "B2",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Sind E-Autos die Zukunft?",
-    "keywordSubtopic": "",
-    "text": "Sind E-Autos die Zukunft?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-3-brauchen-wir-mehr-urlaubstage-209",
-    "level": "B2",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Brauchen wir mehr Urlaubstage?",
-    "keywordSubtopic": "",
-    "text": "Brauchen wir mehr Urlaubstage?",
-    "hint": ""
-  },
-  {
-    "id": "b2-teil-3-muss-schule-mehr-praktische-f-cher-anbieten-210",
-    "level": "B2",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Muss Schule mehr praktische Fächer anbieten?",
-    "keywordSubtopic": "",
-    "text": "Muss Schule mehr praktische Fächer anbieten?",
-    "hint": ""
-  },
-  {
     "id": "c1-teil-1-die-zukunft-der-k-nstlichen-intelligenz-211",
     "level": "C1",
     "teilId": "teil-1",
@@ -1139,5 +1019,165 @@ export const speakingQuestionDictionary = [
     "keywordSubtopic": "",
     "text": "Fastfood vs. Selbstkochen",
     "hint": ""
+  },
+  {
+    "id": "b2-teil-1-finanzierung-des-studiums",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Finanzierung des Studiums",
+    "keywordSubtopic": "",
+    "text": "Finanzierung des Studiums",
+    "hint": "Welche Möglichkeiten gibt es zur Finanzierung des Studiums, und was sind die Vor- und Nachteile von Nebenjobs, BAföG oder elterlicher Unterstützung?"
+  },
+  {
+    "id": "b2-teil-1-vegane-und-vegetarische-ernahrung",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Vegane und vegetarische Ernährung",
+    "keywordSubtopic": "",
+    "text": "Vegane und vegetarische Ernährung",
+    "hint": "Welche Alternativen gibt es zur herkömmlichen Ernährung im Alltag, und wie wirken sich diese auf Gesundheit und Umwelt aus?"
+  },
+  {
+    "id": "b2-teil-1-plastikfreie-verpackungen-im-alltag",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Plastikfreie Verpackungen im Alltag",
+    "keywordSubtopic": "",
+    "text": "Plastikfreie Verpackungen im Alltag",
+    "hint": "Welche Verpackungsalternativen gibt es beim Einkaufen, und wie realistisch ist ein komplett plastikfreier Alltag?"
+  },
+  {
+    "id": "b2-teil-1-fruhes-sprachenlernen-im-kindergarten",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Frühes Sprachenlernen im Kindergarten",
+    "keywordSubtopic": "",
+    "text": "Frühes Sprachenlernen im Kindergarten",
+    "hint": "Sollten Kinder schon im Kindergarten eine Fremdsprache lernen, und welche Vor- und Nachteile bringt das mit sich?"
+  },
+  {
+    "id": "b2-teil-1-sport-und-fitness-am-arbeitsplatz",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Sport und Fitness am Arbeitsplatz",
+    "keywordSubtopic": "",
+    "text": "Sport und Fitness am Arbeitsplatz",
+    "hint": "Welche Möglichkeiten bieten Unternehmen für die Gesundheit ihrer Mitarbeiter, und wie wichtig sind Sportangebote am Arbeitsplatz?"
+  },
+  {
+    "id": "b2-teil-1-wohnformen-im-studium-wg-vs-eigene-wohnung",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Wohnformen im Studium (WG vs. eigene Wohnung)",
+    "keywordSubtopic": "",
+    "text": "Wohnformen im Studium (WG vs. eigene Wohnung)",
+    "hint": "Welche Vor- und Nachteile haben Wohngemeinschaften gegenüber einer eigenen Wohnung, und wie findet man bezahlbaren Wohnraum?"
+  },
+  {
+    "id": "b2-teil-1-politisches-und-soziales-engagement-von-jugendlichen",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Politisches und soziales Engagement von Jugendlichen",
+    "keywordSubtopic": "",
+    "text": "Politisches und soziales Engagement von Jugendlichen",
+    "hint": "Wie können sich junge Menschen gesellschaftlich engagieren, und warum tun das viele Jugendliche heutzutage nicht?"
+  },
+  {
+    "id": "b2-teil-1-homeoffice-und-flexibles-arbeiten",
+    "level": "B2",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Homeoffice und flexibles Arbeiten",
+    "keywordSubtopic": "",
+    "text": "Homeoffice und flexibles Arbeiten",
+    "hint": "Welche Vor- und Nachteile hat die Arbeit im Homeoffice im Vergleich zur Präsenzarbeit im Büro?"
+  },
+  {
+    "id": "b2-teil-2-bargeldabschaffung",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Bargeldabschaffung",
+    "keywordSubtopic": "",
+    "text": "Bargeldabschaffung",
+    "hint": "Sollten wir Bargeld komplett abschaffen und nur noch digital bzw. bargeldlos bezahlen?"
+  },
+  {
+    "id": "b2-teil-2-bewertung-von-lehrkraften-durch-studierende-schuler",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Bewertung von Lehrkräften durch Studierende/Schüler",
+    "keywordSubtopic": "",
+    "text": "Bewertung von Lehrkräften durch Studierende/Schüler",
+    "hint": "Sollten Schüler und Studierende ihre Lehrer und Professoren regelmäßig bewerten dürfen?"
+  },
+  {
+    "id": "b2-teil-2-einfuhrung-der-4-tage-woche",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Einführung der 4-Tage-Woche",
+    "keywordSubtopic": "",
+    "text": "Einführung der 4-Tage-Woche",
+    "hint": "Sollte eine 4-Tage-Arbeitswoche bei vollem Lohnausgleich gesetzlich eingeführt werden?"
+  },
+  {
+    "id": "b2-teil-2-kostenloses-hochschulstudium",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Kostenloses Hochschulstudium",
+    "keywordSubtopic": "",
+    "text": "Kostenloses Hochschulstudium",
+    "hint": "Sollte das Studium an Universitäten für alle Studierenden komplett kostenlos sein?"
+  },
+  {
+    "id": "b2-teil-2-pflicht-zur-auslandserfahrung",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Pflicht zur Auslandserfahrung",
+    "keywordSubtopic": "",
+    "text": "Pflicht zur Auslandserfahrung",
+    "hint": "Sollte ein Auslandssemester oder eine Arbeitserfahrung im Ausland für alle Studierenden verpflichtend sein?"
+  },
+  {
+    "id": "b2-teil-2-bedeutung-von-markenkleidung-bei-jugendlichen",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Bedeutung von Markenkleidung bei Jugendlichen",
+    "keywordSubtopic": "",
+    "text": "Bedeutung von Markenkleidung bei Jugendlichen",
+    "hint": "Spielen Markenkleidung und Modetrends eine zu große Rolle bei Jugendlichen?"
+  },
+  {
+    "id": "b2-teil-2-e-books-statt-gedruckter-schulbucher",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "E-Books statt gedruckter Schulbücher",
+    "keywordSubtopic": "",
+    "text": "E-Books statt gedruckter Schulbücher",
+    "hint": "Sollten gedruckte Schulbücher in Schulen vollständig durch Tablets und E-Books ersetzt werden?"
+  },
+  {
+    "id": "b2-teil-2-senkung-des-wahlalters-auf-16-jahre",
+    "level": "B2",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Senkung des Wahlalters auf 16 Jahre",
+    "keywordSubtopic": "",
+    "text": "Senkung des Wahlalters auf 16 Jahre",
+    "hint": "Sollte das Wahlalter bei politischen Wahlen auf 16 Jahre gesenkt werden?"
   }
 ];

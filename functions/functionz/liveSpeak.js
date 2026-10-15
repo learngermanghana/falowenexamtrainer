@@ -25,8 +25,9 @@ const examiner = session => session.source === "exam-speaking-practice";
 const savedMessages = session => (Array.isArray(session.messages) ? session.messages : []).slice(-20);
 const answerLimit = session => session.examFlow ? taskFlows.maxAnswers(session) : EXAM_ANSWER_LIMIT;
 const turnLimit = session => session.examFlow?.key === "A2-1" ? 14 : MAX_TURNS;
+const audioAllowance = session => session.examFlow?.key === "B2-1" ? 3 * MAX_AUDIO_BYTES : EXAM_AUDIO_BYTE_ALLOWANCE;
 const transcriptLimit = session => session.examFlow
-  ? (recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
+  ? (session.examFlow?.key === "B2-1" ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
@@ -39,7 +40,7 @@ const sessionView = session => ({
   answeredTurns: Number(session.answeredTurns) || 0,
   answerLimit: examiner(session) ? answerLimit(session) : null,
   examFlow: taskFlows.publicFlow(session),
-  maxAudioBytes: session.examFlow?.key === "B1-2" ? EXAM_AUDIO_BYTE_ALLOWANCE : MAX_AUDIO_BYTES,
+  maxAudioBytes: ["B1-2","B2-1"].includes(session.examFlow?.key) ? audioAllowance(session) : MAX_AUDIO_BYTES,
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
@@ -255,7 +256,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
       const examFlow = examTask && req.body?.examinerFlowVersion === 1
         ? taskFlows.createExaminerFlow(level,examTask,req.body?.examMode) : null;
-      if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1"].includes(level)) {
+      if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2"].includes(level)) {
         return error(res,400,"invalid_exam_part","Choose Teil 1, 2 or 3 for this level.");
       }
       const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
@@ -374,9 +375,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
         examFlow = session.examFlow || null;
         maxTranscriptChars=transcriptLimit(session);
-        const uploadLimit = examFlow?.key === "B1-2" ? EXAM_AUDIO_BYTE_ALLOWANCE : MAX_AUDIO_BYTES;
+        const uploadLimit = ["B1-2","B2-1"].includes(examFlow?.key) ? audioAllowance(session) : MAX_AUDIO_BYTES;
         if (!intro && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
-        if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > EXAM_AUDIO_BYTE_ALLOWANCE) {
+        if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
         }
         const nextPlan = examFlow ? taskFlows.responsePlan({...session,answeredTurns:(Number(session.answeredTurns)||0)+1}) : null;
