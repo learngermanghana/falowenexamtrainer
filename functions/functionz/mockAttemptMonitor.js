@@ -37,8 +37,14 @@ const verifiedScore = value => {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 && parsed <= 25 ? parsed : null;
 };
+const hasVerifiedOverall = data => {
+  const value = data?.verifiedOverall?.score;
+  return data?.status === "completed" && value !== null && value !== undefined
+    && value !== "" && typeof value !== "boolean" && Number.isFinite(Number(value))
+    && Number(value) >= 0 && Number(value) <= 100;
+};
 const verifiedMockBreakdown = data => {
-  if (data?.status !== "completed" || !Number.isFinite(Number(data?.verifiedOverall?.score))) return null;
+  if (!hasVerifiedOverall(data)) return null;
   const source = data.verifiedSectionScores && typeof data.verifiedSectionScores === "object"
     ? data.verifiedSectionScores
     : data.sectionScores && typeof data.sectionScores === "object"
@@ -78,8 +84,7 @@ const normalizeMockAttempt = doc => {
     startedAt: iso(data.startedAt),
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
-    overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
-      ? Number(data.verifiedOverall.score) : null,
+    overallScore: hasVerifiedOverall(data) ? Number(data.verifiedOverall.score) : null,
     sectionScores: verifiedMockBreakdown(data),
   };
 };
