@@ -96,8 +96,8 @@ test("A1 Teil 2 shows one theme and word at a time, advancing after the answer t
   expect(screen.getByText("Lieblingsessen")).toBeInTheDocument();
   expect(screen.queryByText("Frühstück")).not.toBeInTheDocument();
   rerender(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:2})} topic={task.prompt} active/>);
-  expect(screen.getByText("Frühstück")).toBeInTheDocument();
-  expect(screen.getByText("Thema: Essen und Trinken")).toBeInTheDocument();
+  expect(screen.getByText("Obst")).toBeInTheDocument();
+  expect(screen.getByText("Thema: Einkaufen")).toBeInTheDocument();
   expect(screen.queryByText("Lieblingsessen")).not.toBeInTheDocument();
 });
 
