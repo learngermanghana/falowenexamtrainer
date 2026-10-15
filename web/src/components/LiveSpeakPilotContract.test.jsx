@@ -146,7 +146,7 @@ test("an A1 learner with no live AI sessions can record and replay without API u
       practiceTopic="Stellen Sie sich kurz vor"
       examTask={{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"}} /></MemoryRouter>);
     expect(await screen.findByText(/live AI examiner sessions are not currently available/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button",{name:"Start exam"})).not.toBeInTheDocument();
+    expect(screen.queryByRole("button",{name:"Start speaking"})).not.toBeInTheDocument();
     expect(screen.getByRole("textbox",{name:"Type optional speaking notes"})).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button",{name:"Record local speaking practice"}));
     expect(await screen.findByRole("button",{name:"Stop local practice recording"})).toBeInTheDocument();
@@ -192,7 +192,7 @@ test("the shared AI safety cap still exposes local recording when pilot claim is
     examTask={{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"}} /></MemoryRouter>);
   expect(await screen.findByRole("button",{name:"Record local speaking practice"})).toBeInTheDocument();
   expect(screen.getByText(/Live AI voice sessions are paused by the shared safety budget/i)).toBeInTheDocument();
-  expect(screen.queryByRole("button",{name:"Start exam"})).not.toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"Start speaking"})).not.toBeInTheDocument();
   expect(screen.getByRole("textbox",{name:"Type optional speaking notes"})).toBeInTheDocument();
   expect(global.fetch).toHaveBeenCalledTimes(1);
 });

@@ -37,16 +37,23 @@ export default function SpeakingPracticeHome({level,teil,guides={},lockedTeil,hi
   </section>;
 }
 
-export function SpeakingRunResults({level,results,onReturn}) {
+export function SpeakingRunResults({level,results,onReturn,onRepeat}) {
   const scored=results.filter(item=>Number.isFinite(item.assessment?.score) && Number.isFinite(item.assessment?.maxScore) && item.assessment.maxScore>0);
   const score=scored.reduce((sum,item)=>sum+item.assessment.score,0);
   const maximum=scored.reduce((sum,item)=>sum+item.assessment.maxScore,0);
-  return <section className="speaking-run-results" aria-label="Full speaking exam results">
-    <span className="speaking-eyebrow">{level} · SPEAKING PRACTICE COMPLETE</span><h2 lang="de">Gut gemacht. Weiter so.</h2>
+  return <section className="speaking-run-results" aria-label={results.length>1 ? "Full speaking exam results" : "Speaking practice results"}>
+    <header className="speaking-feedback-header"><button type="button" onClick={onReturn}>← Choose practice</button><strong>Your feedback</strong></header>
+    <span className="speaking-eyebrow">{level} · SPEAKING PRACTICE COMPLETE</span>
+    <div className="speaking-feedback-intro"><span aria-hidden="true">✓</span><h2 lang="de">Gut gemacht.<br/>Weiter so.</h2></div>
     <p>You completed {results.length} speaking parts. Your feedback is saved in Speaking progress.</p>
     {maximum>0 && scored.length===results.length ? <div className="speaking-total-score" aria-label="Combined speaking practice score"><strong>{score} / {maximum}</strong><span>{Math.round(score/maximum*100)}% · all parts combined</span></div> : <p role="status">A combined score is unavailable because a part has no numeric assessment. Review the feedback below.</p>}
-    {results.map(item=><section className="speaking-result-part" key={item.teil}><h3>{item.teil}{item.assessment ? ` · ${item.assessment.score} / ${item.assessment.maxScore}`:""}</h3><p lang="de">{item.topic}</p><SpeakingFeedback assessment={item.assessment} feedback={item.feedback}/></section>)}
-    <button type="button" className="speaking-start-part" onClick={onReturn}>Back to speaking practice</button>
+    <div className="speaking-results-parts" aria-label="Completed speaking parts">{results.map(item=><span key={item.teil}>✓ {item.teil}</span>)}</div>
+    {results.map(item=><details className="speaking-result-part" key={item.teil} open={results.length===1}>
+      <summary><strong>{item.teil}{item.assessment ? ` · ${item.assessment.score} / ${item.assessment.maxScore}`:""}</strong><span>View feedback</span></summary>
+      <p lang="de">{item.topic}</p><SpeakingFeedback assessment={item.assessment} feedback={item.feedback}/>
+    </details>)}
+    {onRepeat ? <button type="button" className="speaking-start-part" onClick={onRepeat}>Practise again</button> : null}
+    <button type="button" className="speaking-back-to-practice" onClick={onReturn}>Back to speaking practice</button>
     <small>Falowen practice assessment, not an official Goethe result. Transcript feedback does not assess pronunciation.</small>
   </section>;
 }

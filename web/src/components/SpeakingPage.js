@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import LiveSpeakPage from "./LiveSpeakPage";
+import SpeakingExaminationScreen from "./SpeakingExaminationScreen";
 import SpeakingPracticeHome, { SpeakingRunResults } from "./SpeakingPracticeHome";
 import "./SpeakingExamDesign.css";
 import { useExam } from "../context/ExamContext";
@@ -540,6 +541,10 @@ const SpeakingPage = ({
         setPracticeStage("results");
         setFullExam(false);
       }
+    } else {
+      setRunResults([result]);
+      setLiveExaminerActive(false);
+      setPracticeStage("results");
     }
   };
 
@@ -1047,8 +1052,26 @@ const SpeakingPage = ({
 
   const totalCount = baseFilteredQuestions.length;
 
+  const examVoicePractice = (
+    selectedQuestion ? (
+                <LiveSpeakPage key={selectedLevel+"-"+selectedTeil+"-"+selectedQuestion.id+"-"+practiceAttempt} embedded initialLevel={selectedLevel}
+                  practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
+                  practiceSource="exam-speaking-practice"
+                  examTask={{
+                    id:selectedQuestion.id,
+                    teil:selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+                    prompt:selectedQuestion.topicPrompt || selectedQuestion.text || "",
+                    keywords:selectedQuestion.keywordSubtopic || "",
+                    hint:selectedQuestion.hint || "",
+                  }}
+                  examMode="guided" autoStart={isExamMode && practiceAttempt>0} freshAttempt={practiceAttempt > 0} deferFeedback={fullExam} onActivityChange={setLiveExaminerActive}
+                  onExamCompleted={handleExamPartCompleted}
+                  onContinueToNext={!fullExam && nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
+              ) : <p role="status">Choose an exam part to begin.</p>
+  );
+
   return (
-    <div className={isExamMode ? (liveExaminerActive ? "speaking-exam-page speaking-exam-page--live" : "speaking-exam-page") : undefined} style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
+    <div className={isExamMode ? ["speaking-exam-page",liveExaminerActive ? "speaking-exam-page--live" : "",practiceStage === "practice" ? "speaking-exam-page--practice" : ""].filter(Boolean).join(" ") : undefined} style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
       <div
         style={{
           ...styles.card,
@@ -1396,14 +1419,15 @@ const SpeakingPage = ({
             onStart={beginSpeakingPractice}/>
         ) : null}
         {isExamMode && practiceStage === "results" ? (
-          <SpeakingRunResults level={selectedLevel} results={runResults} onReturn={()=>setPracticeStage("home")}/>
+          <SpeakingRunResults level={selectedLevel} results={runResults} onReturn={()=>setPracticeStage("home")} onRepeat={()=>beginSpeakingPractice(runResults.length>1)}/>
         ) : null}
-        {isExamMode && practiceStage === "practice" ? <div className="speaking-practice-toolbar">
-          <button type="button" disabled={liveExaminerActive} onClick={()=>{setPracticeStage("home");setFullExam(false);}}>← Choose practice</button>
-          <strong>{fullExam ? "Full speaking exam" : "Individual practice"} · Teil {selectedTeil}</strong>
-          {fullExam ? <span role="status">{runResults.length} parts complete · continues automatically</span> : null}
-        </div> : null}
-        {!isCourseMode && activeSpeakingTab === "exam" && (!isExamMode || practiceStage === "practice") ? (
+        {isExamMode && practiceStage === "practice" ? <SpeakingExaminationScreen
+          level={selectedLevel} teil={selectedTeil} parts={Object.keys(examSteps[selectedLevel] || {})}
+          fullExam={fullExam} completed={runResults.length} guide={examGuide} busy={liveExaminerActive}
+          onBack={()=>{setPracticeStage("home");setFullExam(false);}}>
+          {examVoicePractice}
+        </SpeakingExaminationScreen> : null}
+        {!isCourseMode && !isExamMode && activeSpeakingTab === "exam" ? (
           <div className={liveExaminerActive ? "speaking-exam-grid is-live" : "speaking-exam-grid"} style={{display:"grid",gridTemplateColumns:isCompactViewport?"minmax(0,1fr)":"minmax(260px,320px) minmax(0,1fr)",gap:0,minWidth:0}}>
             <aside className="speaking-exam-sidebar" style={{padding:isCompactViewport?12:16,background:"#f8fafc",borderRight:isCompactViewport?"none":"1px solid #e2e8f0",borderBottom:isCompactViewport?"1px solid #e2e8f0":"none",display:"grid",alignContent:"start",gap:12,minWidth:0}}>
               <div className="speaking-exam-part-picker" style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
@@ -1468,21 +1492,7 @@ const SpeakingPage = ({
               </details>
             </aside>
             <section className="speaking-exam-voice" style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
-              {selectedQuestion ? (
-                <LiveSpeakPage key={selectedLevel+"-"+selectedTeil+"-"+selectedQuestion.id+"-"+practiceAttempt} embedded initialLevel={selectedLevel}
-                  practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
-                  practiceSource="exam-speaking-practice"
-                  examTask={{
-                    id:selectedQuestion.id,
-                    teil:selectedQuestion.teilLabel || selectedQuestion.teilId || "",
-                    prompt:selectedQuestion.topicPrompt || selectedQuestion.text || "",
-                    keywords:selectedQuestion.keywordSubtopic || "",
-                    hint:selectedQuestion.hint || "",
-                  }}
-                  examMode="guided" autoStart={fullExam && runResults.length > 0} freshAttempt={practiceAttempt > 0} deferFeedback={fullExam} onActivityChange={setLiveExaminerActive}
-                  onExamCompleted={handleExamPartCompleted}
-                  onContinueToNext={!fullExam && nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
-              ) : <p role="status">Choose an exam part to begin.</p>}
+              {examVoicePractice}
             </section>
           </div>
         ) : null}
