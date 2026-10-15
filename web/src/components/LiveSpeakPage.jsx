@@ -9,7 +9,7 @@ import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
-import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
+import { microphoneFailureMessage, speakingTurnLabel, speakingRecordingBitrate } from "../lib/liveSpeakDevice";
 import { matchingExamResult, nextExamTeil } from "../lib/speakingPracticeHistory";
 
 const MAX_RECORDING_SECONDS = 20;
@@ -594,7 +594,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       const recorder = new MediaRecorder(stream, {
         // Higher fidelity for fast speech without increasing per-step/server
         // upload limits. Long presentations retain the economical bitrate.
-        audioBitsPerSecond: localOnly || (session?.maxRecordingSeconds || 20) > 75 ? 24000 : 32000,
+        audioBitsPerSecond: speakingRecordingBitrate({localOnly,maxRecordingSeconds:session?.maxRecordingSeconds}),
         ...(mime ? {mimeType:mime} : {}),
       });
       recorderRef.current = recorder;
@@ -844,7 +844,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <div className="speaking-voice-unlock" role="status" aria-label="Examiner audio requires a tap">
               <strong>🔊 The examiner is ready to speak</strong>
               <p>On iPhone, sound may need your permission. Tap below to hear the German question before recording.</p>
-              <button type="button" onClick={replayExaminer} disabled={busy || recording}>
+              <button type="button" aria-label="Tap to hear the AI examiner" onClick={replayExaminer} disabled={busy || recording}>
                 ▶ Tap to hear the AI examiner
               </button>
             </div>
