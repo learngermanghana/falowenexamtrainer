@@ -43,6 +43,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const autoFeedbackRequested = useRef(false);
   const [pending, setPending] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
+  const [answerMode,setAnswerMode] = useState("record");
+  const [typedAnswer,setTypedAnswer] = useState("");
   const [recognitionCorrection,setRecognitionCorrection]=useState(false);
   const [studentAudioUrl, setStudentAudioUrl] = useState("");
   const recordedUrlRef = useRef(null);
@@ -332,6 +334,52 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     }
   };
 
+  const sendTypedAnswer = async () => {
+    if (!examinerSession || !session || pending || recording || busy || feedbackBusy ||
+      taskReady || expired || requestBusy.current || voiceState === "playing") return;
+    const transcript=typedAnswer.trim();
+    if (transcript.length<2 || transcript.length>(session.maxTranscriptChars || 600)) {
+      setErrorMessage("Write a German answer within the permitted length.");return;
+    }
+    requestBusy.current=true;
+    setBusy(true);
+    setErrorMessage("");
+    setNotice("⏳ AI examiner is preparing the next question…");
+    try {
+      const result=await api("/live-speak/session/confirm","POST",{
+        sessionId:session.sessionId,typed:true,transcript,
+      });
+      if (!mounted.current) return;
+      setMessages(old=>[...old,{role:"user",text:result.transcript},
+        {role:"assistant",speaker:result.speaker || "examiner",text:result.reply},
+        ...(result.nextInstruction ? [{role:"assistant",speaker:result.examFlow?.step?.role || "examiner",text:result.nextInstruction}] : [])]);
+      setSession(old=>old ? {...old,answeredTurns:Number(old.answeredTurns || 0)+1,taskReady:Boolean(result.taskReady),
+        maxRecordingSeconds:result.maxRecordingSeconds || old.maxRecordingSeconds,
+        maxTranscriptChars:result.maxTranscriptChars || old.maxTranscriptChars,
+        maxAudioBytes:result.maxAudioBytes || old.maxAudioBytes,
+        ...(result.examFlow ? {examFlow:result.examFlow} : {})} : old);
+      setTypedAnswer("");
+      setLastAudio(result.audioBase64 || "");
+      setNotice(result.voiceUnavailable ? "Answer saved. The next examiner instruction is displayed as text." : "");
+      await playVoice(result.audioBase64);
+    } catch (err) {
+      if (mounted.current) {
+        setErrorMessage(err.message);
+        // The response might have been lost after the answer was committed.
+        // Always reconcile before accepting another typed submission.
+        try {
+          const info=await api("/live-speak/status");
+          if (mounted.current && info.activeSession?.sessionId===session.sessionId) {
+            setSession(info.activeSession);setMessages(info.activeSession.messages || []);
+          }
+        } catch (_error) { /* Saved session can be recovered on reload. */ }
+      }
+    } finally {
+      requestBusy.current=false;
+      if (mounted.current) setBusy(false);
+    }
+  };
+
   const clearRecording = () => {
     if (recordedUrlRef.current) URL.revokeObjectURL(recordedUrlRef.current);
     recordedUrlRef.current = null;
@@ -362,6 +410,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setSession(result);
       setAudioRetry(null);
       setVoiceState("idle");
+      setAnswerMode("record");
+      setTypedAnswer("");
+      setNotice("⏳ AI examiner is preparing the first question. Listen before recording.");
       setLocalRetry(false);
       setExamFeedback("");
       setExamAssessment(null);
@@ -396,7 +447,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   };
 
   const endSession = async () => {
-    if (!session) return;
+    const existing=session || details?.activeSession;
+    if (!existing || busy || feedbackBusy) return;
+    setBusy(true);
+    setErrorMessage("");
+    try { await api("/live-speak/session/end", "POST", { sessionId: existing.sessionId }); }
+    catch (err) { setBusy(false); setErrorMessage(err.message || "Could not reset the session. Please retry."); return; }
     stopAudio();
     if (recorderRef.current?.state === "recording") {
       recorderRef.current.onstop = null;
@@ -405,16 +461,21 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     mediaRef.current?.getTracks().forEach(track => track.stop());
     if (recordingTicker.current) clearInterval(recordingTicker.current);
     setRecording(false);
-    const existing = session;
     setSession(null);
+    setTypedAnswer("");
+    setAnswerMode("record");
+    setMessages([]);
+    setLastAudio("");
+    setExamFeedback("");
+    setExamAssessment(null);
+    autoFeedbackRequested.current=false;
     setExitConfirm(false);
     setPending(null);
     setAudioRetry(null);
     clearRecording();
-    setNotice(examinerSession ? "The examiner task was ended without feedback." : "Your conversation has ended. Review your corrections and phrases below.");
-    try { await api("/live-speak/session/end", "POST", { sessionId: existing.sessionId }); }
-    catch (_error) { /* The server expiry and quotas still apply. */ }
-    refresh();
+    setNotice("Session reset. Choose Start exam to begin a fresh task. Used voice credits are not refunded.");
+    setBusy(false);
+    await refresh();
   };
 
   const finishExamTask = async () => {
