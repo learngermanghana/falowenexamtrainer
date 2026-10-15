@@ -793,28 +793,27 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <small>Typed practice is evaluated from text, not speech or pronunciation.</small>
               </div> : null}
               {answerMode==="record" || pending ? <div className="speaking-exam-recorder-row" style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
-                <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
+                {pending ? <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
                   value={pending ? recognizedText : ""}
                   readOnly={!pending || (simulation && !recognitionCorrection)}
                   maxLength={session.maxTranscriptChars || 600}
                   onChange={event=>setRecognizedText(event.target.value)}
-                  style={{minWidth:0,minHeight:60,flex:1,resize:"vertical",border:"1px solid #cbd5e1",borderRadius:12,padding:10,fontSize:16,background:pending?"#fff":"#f8fafc"}}/>
+                  style={{minWidth:0,minHeight:60,flex:1,resize:"vertical",border:"1px solid #cbd5e1",borderRadius:12,padding:10,fontSize:16,background:pending?"#fff":"#f8fafc"}}/> : null}
                 <button type="button" aria-label={recording ? "Stop and send recording" : "Record German answer"}
                   title={recording ? "Stop and send recording" : "Record your German answer"}
                   onClick={recording ? stopRecording : () => startRecording(false)}
                   disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) || voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) || (details?.capReached && !session.examTryout)}
-                  style={{border:"none",borderRadius:14,width:56,minWidth:56,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:23,cursor:"pointer"}}>
-                    {recording ? "■" : "🎙"}
+                  style={{border:"none",borderRadius:14,minWidth:pending?56:180,minHeight:50,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:recording?16:17,cursor:"pointer"}}>
+                    {recording ? "■ Stop & send" : "🎙 Record answer"}
                 </button>
-                <button type="button" aria-label="Confirm answer" title="Confirm spoken answer"
+                {pending ? <button type="button" aria-label="Confirm answer" title="Confirm spoken answer"
                   onClick={confirmTranscript}
                   disabled={!pending || busy || feedbackBusy || recognizedText.trim().length<2 || (expired && (!examinerSession || Date.now()>Date.parse(session.expiresAt)+300000))}
                   style={{border:"none",borderRadius:12,minWidth:44,padding:"0 10px",background:pending?"#2563eb":"#cbd5e1",color:pending?"#fff":"#475569",fontWeight:800,fontSize:20,cursor:pending?"pointer":"not-allowed"}}>
                   ➤
-                </button>
-              </div>
-              {answerMode==="record" || pending ? </div> : null}
+                </button> : null}
+              </div> : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
                 <p role="alert">The recording is saved on this device, but the server has not confirmed it. Check your connection before retrying.</p>
                 <div className="speaking-exam-recovery__actions">
