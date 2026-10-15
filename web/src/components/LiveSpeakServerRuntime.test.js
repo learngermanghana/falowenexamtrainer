@@ -1093,3 +1093,87 @@ test("open examiner mode preserves the old standalone credit-claim path",async()
   expect(session.code).toBe(200);
   expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
 });
+
+
+test("a failed Goethe AI partner reply advances only to the next assigned step",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  api.fakeClient.chat.completions.create.mockRejectedValueOnce(new Error("temporary model outage"));
+  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  expect(first.code).toBe(200);
+  expect(first.payload.recovered).toBe(true);
+  expect(first.payload.taskReady).toBe(false);
+  expect(first.payload.nextInstruction).toMatch(/Fahrkarte/);
+  expect(first.payload.examFlow.step.index).toBe(2);
+  const persisted=api.docs.get(sessionKey);
+  expect(persisted.answeredTurns).toBe(1);
+  expect(persisted.taskReady).toBe(false);
+  expect(persisted.inFlight).toBe(false);
+  expect(persisted.confirmedAnswers).toEqual(["Wie viel kostet die Fahrkarte?"]);
+  expect(persisted.messages.at(-1).text).toBe(first.payload.nextInstruction);
+  const again=await answerExam(api,session,"Die Fahrkarte kostet fünf Euro.");
+  expect(again.code).toBe(200);
+  expect(again.payload.taskReady).toBe(false);
+  expect(again.payload.examFlow.step.index).toBe(3);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(2);
+});
+
+test("failed examiner TTS after a confirmed answer retains the next step without replaying audio",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("iPhone voice unavailable"));
+  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  expect(first.code).toBe(200);
+  expect(first.payload.recovered).toBe(true);
+  expect(first.payload.audioBase64).toBe("");
+  expect(first.payload.nextInstruction).toMatch(/Fahrkarte/);
+  expect(first.payload.taskReady).toBe(false);
+  const status=(await api.call("GET","/live-speak/status")).payload.activeSession;
+  expect(status.answeredTurns).toBe(1);
+  expect(status.examFlow.step.index).toBe(2);
+  expect(status.messages.at(-1).text).toBe(first.payload.nextInstruction);
+  expect(api.docs.get(sessionKey).inFlight).toBe(false);
+});
+
+test("dynamic examiner dialogue asks at most one question in each turn",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"B2",2,"guided","Digitalisierung");
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify({
+    reply:"Ich sehe das anders. Was ist mit der Privatsphäre? Und wie sieht es mit den Kosten aus?",
+    decisions:[],
+  })}}]});
+  const first=await answerExam(api,session,"Datenschutz ist für mich wichtig.");
+  expect(first.code).toBe(200);
+  expect(first.payload.reply).toContain("Privatsphäre?");
+  expect(first.payload.reply).not.toContain("Kosten");
+  expect((first.payload.reply.match(/\\?/g) || [])).toHaveLength(1);
+  expect(first.payload.taskReady).toBe(false);
+});
+
+test("feedback is grounded in actually prompted steps and incomplete sessions are marked partial",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const start=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  expect(start.code).toBe(200);
+  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  expect(first.payload.taskReady).toBe(false);
+  const original=api.docs.get(sessionKey);
+  expect(original.promptedSteps).toHaveLength(1);
+  expect(original.promptedSteps[0]).toEqual(expect.objectContaining({
+    step:1,action:"ask-question",source:"delivered",
+  }));
+  const review={taskScores:[{step:1,score:2,comment:"A clear relevant question."}],
+    summary:"Good question for this card.",strength:"Clear question.",priority:"Practise more.",
+    correctedExample:"Wie viel kostet eine Fahrkarte?",nextPractice:"More question cards."};
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify(review)}}]});
+  const result=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(result.code).toBe(200);
+  expect(result.payload.assessment).toEqual(expect.objectContaining({
+    partial:true,complete:false,score:2,maxScore:2,practiceOnly:true,
+  }));
+  expect(result.payload.feedback).toMatch(/Partial practice/);
+  expect(result.payload.assessment.tasks).toHaveLength(1);
+  expect(result.payload.assessment.tasks[0]).toEqual(expect.objectContaining({
+    action:"ask-question",askedPrompt:original.promptedSteps[0].prompt,
+  }));
+  const prompt=JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content);
+  expect(prompt.examContext.completedAllTurns).toBe(false);
+  expect(prompt.examContext.promptedSteps).toHaveLength(1);
+  expect(prompt.studentTranscripts).toHaveLength(1);
+});
