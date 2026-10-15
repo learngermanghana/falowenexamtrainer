@@ -59,7 +59,12 @@ function createExaminerFlow(level, task, mode="guided") {
     flow.presentationQuestion=catalogue.b2Topics[key.split("-")[1]].find(item=>item.topic === flow.contextTopic)?.question || clean(task?.hint,600);
   }
   const selectedWord = words(task)[0] || "Freizeit";
-  if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
+  if (key === "A1-2") {
+    const cards=selectedCards(selectedWord,catalogue.a1InformationCards,2);
+    // A standalone keyword is a single focused drill; selected dictionary prompts
+    // with an explicit theme retain the full two-theme, four-response exam round.
+    flow.cards = !clean(task?.prompt) && words(task).length === 1 ? cards.slice(0,1) : cards;
+  }
   if (key === "A2-1") {
     const index=catalogue.personalCards.findIndex(card=>card.word === selectedWord);
     flow.cards = index >= 0 ? [...catalogue.personalCards.slice(index),...catalogue.personalCards.slice(0,index)].slice(0,4) : selectedCards(selectedWord,catalogue.personalCards,4);
