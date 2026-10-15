@@ -748,12 +748,22 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               ) : <small style={{color:"#64748b"}}>{voiceState === "playing" ? "The examiner is speaking. The microphone becomes available when the question finishes." : "Tap the red microphone when it is your turn. Feedback comes after the task."}</small>}
               {expired ? <p role="status">Your session time has ended. Your answers remain visible. Finish the task to review feedback.</p> : null}
               <div className="speaking-exam-session__actions" style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                <button type="button" style={styles.secondaryButton} onClick={finishExamTask}
+                <button type="button" style={styles.primaryButton} onClick={finishExamTask}
                   disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                  {feedbackBusy ? "Preparing feedback…" : "Finish task & see feedback"}
+                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "Retry Teil feedback" : "Finish this Teil & see feedback"}
                 </button>
-                <button type="button" style={styles.secondaryButton} onClick={endSession} disabled={busy || recording || feedbackBusy}>End without feedback</button>
+                {!taskReady ? <button type="button" style={styles.secondaryButton} onClick={()=>setExitConfirm(true)}
+                  disabled={busy || recording || feedbackBusy}>Leave this Teil</button> : null}
               </div>
+              {exitConfirm ? <div role="alertdialog" aria-label="Leave unfinished speaking task" aria-modal="false"
+                style={{display:"grid",gap:9,padding:12,border:"1px solid #fbbf24",borderRadius:11,background:"#fffbeb"}}>
+                <strong>This Teil isn't complete yet.</strong>
+                <p style={{margin:0,fontSize:13}}>Your confirmed answers remain on the server, but you won't receive a completed-task mark or feedback if you leave now.</p>
+                <div style={{display:"flex",gap:9,flexWrap:"wrap"}}>
+                  <button type="button" style={styles.primaryButton} onClick={()=>setExitConfirm(false)}>Keep practising</button>
+                  <button type="button" style={styles.secondaryButton} onClick={endSession}>Leave without feedback</button>
+                </div>
+              </div> : null}
             </div>
           ) : (
             <>
@@ -792,8 +802,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {messages.filter(message => message.role === "user").map((message,i) => <p key={i} lang="de" style={{lineHeight:1.6}}>{message.text}</p>)}
             </details>
           ) : null}
-          <p style={{margin:0,whiteSpace:"pre-wrap",lineHeight:1.65,fontSize:14}}>{examFeedback}</p>
-          <button type="button" style={styles.primaryButton}
+          <div className="speaking-exam-feedback-summary" style={{display:"grid",gap:8}}>
+            <strong style={{fontSize:14}}>Teil {String(examTask?.teil || details?.lastExamResult?.examTask?.teil || "").match(/\\d+/)?.[0] || ""} complete · Feedback saved</strong>
+            <p style={{margin:0,fontSize:13,lineHeight:1.55}}>{examFeedback.split(/(?:\\n|\\*\\*Strength:)/)[0].replace(/\\*\\*/g,"").slice(0,500)}</p>
+            <button type="button" style={styles.secondaryButton} aria-expanded={showDetailedFeedback}
+              onClick={()=>setShowDetailedFeedback(value=>!value)}>
+              {showDetailedFeedback ? "Hide detailed feedback" : "View detailed feedback"}
+            </button>
+            {showDetailedFeedback ? <p style={{margin:0,whiteSpace:"pre-wrap",lineHeight:1.65,fontSize:13}}>{examFeedback}</p> : null}
+          </div>
+          {onContinueToNext ? <button type="button" style={styles.primaryButton} className="speaking-exam-continue"
+            onClick={onContinueToNext}>Continue to Teil {nextExamTeil(safeLevel,examTask?.teil)} →</button>
+          : examinerEntry ? <p role="status" style={{fontWeight:700,color:"#166534"}}>This was the final Teil. Review your completed practice in Speaking progress.</p> : null}
+          <button type="button" style={styles.secondaryButton}
             onClick={recording ? stopRecording : () => {setLocalRetry(false); clearRecording(); startRecording(true);}}>
             {recording ? "■ Stop recording (" + recordingSeconds + "s)" : "Try your improved answer"}
           </button>
