@@ -660,9 +660,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Live AI voice sessions are paused by the shared safety budget. You can still record and replay your own practice below.</p>
           ) : (details.activeSession || sessionsAvailable || aiTryoutAvailable || details.pilotAvailable) ? (
             <div>
-              <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
-                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : aiTryoutAvailable ? "Try AI examiner" : examinerEntry ? "Start exam" : "Start speaking"}
-              </button>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
+                  {busy ? "⏳ Preparing first question…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start exam" : "Start speaking"}
+                </button>
+                {examinerEntry && details.activeSession ? <button type="button" style={styles.secondaryButton} onClick={endSession}
+                  disabled={busy || feedbackBusy} aria-label="Reset Session">Reset Session</button> : null}
+              </div>
             </div>
           ) : (
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>
@@ -716,19 +720,17 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               <strong style={{fontSize:22,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
             </div>
           </header>
-          {examinerSession ? <div className="speaking-exam-turn-indicator" role="status" aria-live="polite" aria-atomic="true">
+          {examinerSession ? <div className="speaking-exam-turn-indicator" role="status" aria-live="polite" aria-busy={Boolean(busy || voiceState==="playing")} aria-atomic="true">
             <span className={recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
-            <strong>{examTurnState}</strong>
-            <small>{voiceState === "playing"
-              ? "Listen to the question before using the microphone."
-              : voiceState === "blocked"
-                ? "Tap Replay examiner audio, or read the German question."
-                : taskReady
-                  ? "Answers saved. You’re ready for feedback."
-                  : session.examFlow ? "Corrections come at the end of this exam task."
-                  : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : "Listen, then answer in German."}</small>
+            <strong>{recording ? "🔴 Recording your answer" : busy ? "⏳ AI is preparing the question…" : voiceState==="playing" ? "🔊 AI examiner is speaking…" : voiceState==="blocked" ? "Tap Replay to hear the question" : taskReady ? "✓ Answers saved" : "Your turn — Record or Type"}</strong>
+            <small>{recording ? "Tap Stop to send the recording." : busy ? "The next question is being prepared." : voiceState==="playing" ? "Listen first. The microphone unlocks after the examiner finishes." : "Read the question and answer in German."}</small>
+          </div> : null>
+          {examinerSession && messages.some(message=>message.role==="assistant") ? <div aria-label="Current examiner question" style={{display:"grid",gap:5,padding:12,background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:12}}>
+            <strong style={{fontSize:13,color:"#1d4ed8"}}>Current question</strong>
+            <p lang="de" style={{margin:0,fontSize:17,fontWeight:600,lineHeight:1.55}}>{messages.filter(message=>message.role==="assistant").at(-1)?.text}</p>
           </div> : null}
           <div className={examinerSession ? "speaking-exam-chat-shell" : undefined}>
+            {examinerSession ? <details><summary style={{fontSize:12,cursor:"pointer",color:"#475569"}}>Conversation history ({messages.length} messages)</summary> : null}
             <div ref={examinerSession ? examConversationRef : undefined}
               onScroll={examinerSession ? handleExamThreadScroll : undefined}
               className={examinerSession ? "speaking-exam-session__conversation speaking-exam-chat-thread" : undefined}
@@ -759,10 +761,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </div>
             {examinerSession && showLatest ? <button type="button" className="speaking-exam-chat-latest"
               onClick={jumpToLatestExamTurn}>↓ Latest message</button> : null}
+            {examinerSession ? </details> : null}
           </div>
           {lastAudio && voiceReady ? <button type="button" className={examinerSession ? "speaking-exam-replay" : undefined}
             style={styles.secondaryButton} disabled={busy || recording} onClick={()=>playVoice(lastAudio)}>
-            {examinerSession ? "▶ Replay examiner audio" : "▶ Play AI voice again"}
+            {examinerSession ? "▶ Replay question" : "▶ Play AI voice again"}
           </button> : null}
           {examinerSession ? (
             <div className="speaking-exam-session__answer" style={{borderTop:"1px solid #e2e8f0",paddingTop:12,display:"grid",gap:9}} aria-label="Speaking answer controls">
@@ -810,7 +813,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                     <input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/>
                     Correct a speech-recognition mistake only
                   </label> : null}
-                  {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}}/> : null}
+                  {studentAudioUrl ? <details><summary style={{fontSize:12,cursor:"pointer"}}>Optional: preview my recording</summary><audio controls src={studentAudioUrl} aria-label="Listen to your own recording" style={{width:"100%"}}/></details> : null}
                   <button type="button" onClick={retryTranscript} disabled={busy} style={{...styles.secondaryButton,justifySelf:"start"}}>Record again</button>
                 </div>
               ) : <small style={{color:"#64748b"}}>{voiceState === "playing" ? "The examiner is speaking. The microphone becomes available when the question finishes." : "Tap the red microphone when it is your turn. Feedback comes after the task."}</small>}
@@ -818,10 +821,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               <div className="speaking-exam-session__actions" style={{display:"flex",gap:8,flexWrap:"wrap"}}>
                 <button type="button" style={styles.primaryButton} onClick={finishExamTask}
                   disabled={feedbackBusy || busy || recording || Boolean(pending) || !recordedAnswers.length}>
-                  {feedbackBusy ? "Preparing feedback…" : taskReady ? "Retry Teil feedback" : "Finish this Teil & see feedback"}
+                  {feedbackBusy ? "⏳ Preparing results…" : "Finish & see results"}
                 </button>
-                {!taskReady ? <button type="button" style={styles.secondaryButton} onClick={()=>setExitConfirm(true)}
-                  disabled={busy || recording || feedbackBusy}>Leave this Teil</button> : null}
+                <button type="button" aria-label="Reset Session" style={styles.secondaryButton}
+                  onClick={endSession} disabled={busy || feedbackBusy || recording}>Reset Session</button>
               </div>
               {exitConfirm ? <div role="alertdialog" aria-label="Leave unfinished speaking task" aria-modal="false"
                 style={{display:"grid",gap:9,padding:12,border:"1px solid #fbbf24",borderRadius:11,background:"#fffbeb"}}>
