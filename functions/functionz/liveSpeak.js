@@ -132,6 +132,13 @@ const cleanLevel = (value) => {
   return LEVELS.has(level) ? level : "A2";
 };
 const error = (res, status, code, message) => res.status(status).json({ error: message, code });
+// Dynamic partners must never add a second question or an unassigned task.
+// The flow engine (not the language model) owns advancement to the next step.
+const oneExamQuestion = value => {
+  const reply=String(value || "").trim().slice(0,700);
+  const firstQuestion=reply.indexOf("?");
+  return firstQuestion < 0 ? reply : reply.slice(0,firstQuestion+1);
+};
 const transcriptUncertain = (recognition) => {
   const values = Array.isArray(recognition?.logprobs)
     ? recognition.logprobs.map(entry => Number(entry?.logprob)).filter(Number.isFinite)
@@ -584,7 +591,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
   });
 
   app.post("/live-speak/session/confirm", async (req, res) => {
-    let sessionRef, reserved = false, sessionId = "", examTask = null, storedMessages = [], answers = [], flowSession = null;
+    let sessionRef, reserved = false, sessionId = "", examTask = null, storedMessages = [], answers = [], flowSession = null, examRecovery = null;
     try {
       if (!requireEnabled(res)) return;
       const student = await requireStudent(req, res);
@@ -663,7 +670,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
                 ? "Welchen konkreten Aspekt Ihrer Argumentation halten Sie für besonders wichtig und warum?"
                 : plan.step?.instruction || "Können Sie das bitte genauer erklären?",decisions:[]};
           }
-          reply=String(content.reply || "").trim().slice(0,700);
+          reply=oneExamQuestion(content.reply);
           if ((["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question") ||
             (flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request")) {
             // This turn must contain only the partner's answer, never a second task.
@@ -686,6 +693,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const additions=[{role:"user",text:confirmed},{role:"assistant",speaker:replySpeaker,text:reply}];
         if (nextInstruction) additions.push({role:"assistant",speaker:plan.step.role || "examiner",text:nextInstruction});
         const nextSession={...flowSession,examFlow:{...flowSession.examFlow,decisions},taskReady:ready};
+        // Prepare the durable transcript and exact next step BEFORE generating
+        // audio. If TTS times out, a saved answer must not skip the exam.
+        examRecovery={reply,nextInstruction,replySpeaker,ready,nextSession,additions};
         let mp3=null;
         if (!ready || plan.dynamic || plan.scripted) {
           mp3=await speakOpening(client,{model:process.env.LIVE_SPEAK_TTS_MODEL || "gpt-4o-mini-tts",
@@ -749,10 +759,43 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         try { await updateSession(sessionRef, sessionId, {inFlight:false}); }
         catch (releaseError) { console.error("Live Speak confirm unlock error",releaseError?.message); }
       }
+      if (reserved && examTask && flowSession) {
+        // An answer was already committed. A failed model/TTS call must not
+        // advance the exam to feedback while later Goethe steps are unasked.
+        // Restore a scripted question for the next server-owned step and
+        // allow completion only if the actual flow is finished.
+        const plan=taskFlows.responsePlan(flowSession);
+        const ready=examRecovery ? examRecovery.ready : Boolean(plan.ready);
+        const reply=examRecovery?.reply || (ready ? "Danke. Dieser Prüfungsteil ist beendet." : "Danke.");
+        const nextInstruction=examRecovery?.nextInstruction || (!ready ? String(plan.step?.instruction || "") : "");
+        const replySpeaker=examRecovery?.replySpeaker || "examiner";
+        const additions=examRecovery?.additions || [
+          {role:"user",text:answers.at(-1)},
+          {role:"assistant",speaker:replySpeaker,text:reply},
+          ...(nextInstruction ? [{role:"assistant",speaker:plan.step?.role || "examiner",text:nextInstruction}] : []),
+        ];
+        const nextSession=examRecovery?.nextSession || {...flowSession,taskReady:ready};
+        try {
+          await updateSession(sessionRef,sessionId,{
+            inFlight:false,taskReady:ready,examFlow:nextSession.examFlow,
+            messages:[...storedMessages,...additions].slice(-20),
+          });
+          return res.json({ok:true,recovered:true,transcript:answers.at(-1),
+            reply,speaker:replySpeaker,nextInstruction,taskReady:ready,
+            examFlow:taskFlows.publicFlow(nextSession),
+            maxRecordingSeconds:recordingSeconds(nextSession),
+            maxTranscriptChars:transcriptLimit(nextSession),
+            maxAudioBytes:recordingUploadLimit(nextSession),audioBase64:""});
+        } catch (recoveryError) {
+          console.error("Live Speak flow recovery error",recoveryError?.message);
+          return error(res,503,"reply_recovery_pending",
+            "Your answer was saved, but the next examiner prompt could not be confirmed. Refresh to recover your session.");
+        }
+      }
       if (reserved && examTask) {
-        // The answer was already saved. Do not make the learner record/pay again.
-        await updateSession(sessionRef, sessionId, {taskReady:true});
-        return res.json({ok:true, transcript:answers.at(-1), reply:"Ihre Antwort ist gespeichert. Sie können jetzt Ihr Feedback ansehen.", taskReady:true, audioBase64:""});
+        // Legacy exam routes must not require another recording after saving.
+        await updateSession(sessionRef,sessionId,{taskReady:true});
+        return res.json({ok:true,transcript:answers.at(-1),reply:"Ihre Antwort ist gespeichert. Sie können jetzt Ihr Feedback ansehen.",taskReady:true,audioBase64:""});
       }
       if (err?.status) return error(res,err.status,err.code,err.message);
       console.error("Live Speak confirm error",err?.message);
