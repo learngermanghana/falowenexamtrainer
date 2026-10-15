@@ -25,9 +25,16 @@ const examiner = session => session.source === "exam-speaking-practice";
 const savedMessages = session => (Array.isArray(session.messages) ? session.messages : []).slice(-20);
 const answerLimit = session => session.examFlow ? taskFlows.maxAnswers(session) : EXAM_ANSWER_LIMIT;
 const turnLimit = session => session.examFlow?.key === "A2-1" ? 14 : MAX_TURNS;
-const audioAllowance = session => session.examFlow?.key === "B2-1" ? 3 * MAX_AUDIO_BYTES : EXAM_AUDIO_BYTE_ALLOWANCE;
+const audioAllowance = session => {
+  if (session.examFlow?.key === "B2-1") return 3 * MAX_AUDIO_BYTES;
+  if (/^C[12]-/.test(session.examFlow?.key || "")) {
+    const totalSeconds=(taskFlows.profileFor(session.examFlow)?.seconds || []).reduce((a,b)=>a+b,0);
+    return Math.min(3*MAX_LONG_AUDIO_BYTES,Math.max(EXAM_AUDIO_BYTE_ALLOWANCE,totalSeconds*3500));
+  }
+  return EXAM_AUDIO_BYTE_ALLOWANCE;
+};
 const transcriptLimit = session => session.examFlow
-  ? (session.examFlow?.key === "B2-1" ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
+  ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
@@ -39,8 +46,8 @@ const sessionView = session => ({
   messages: savedMessages(session), confirmedAnswers: confirmedAnswers(session),
   answeredTurns: Number(session.answeredTurns) || 0,
   answerLimit: examiner(session) ? answerLimit(session) : null,
-  examFlow: taskFlows.publicFlow(session),
-  maxAudioBytes: ["B1-2","B2-1"].includes(session.examFlow?.key) ? audioAllowance(session) : MAX_AUDIO_BYTES,
+  examFlow: taskFlows.publicFlow(session), assessment: session.assessment || null,
+  maxAudioBytes: session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES,
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
@@ -54,6 +61,8 @@ const MAX_CONFIRMED_CHARS = 600;
 const MAX_EXAM_CHARS = 1800;
 const MAX_FLOW_CHARS = 4800;
 const EXAM_AUDIO_BYTE_ALLOWANCE = 2 * MAX_AUDIO_BYTES;
+const MAX_LONG_AUDIO_BYTES = 1200000; // Up to five-minute C1/C2 presentations at 24 kbps.
+const stepAudioBytes = session => Math.min(MAX_LONG_AUDIO_BYTES, Math.max(MAX_AUDIO_BYTES, recordingSeconds(session)*3500));
 const recordingSeconds = session => {
   if (session.examFlow) return taskFlows.currentStep(session.examFlow,Number(session.answeredTurns)||0)?.seconds || 20;
   if (!examiner(session) || Number(session.answeredTurns)) return 20;
@@ -256,7 +265,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
       const examFlow = examTask && req.body?.examinerFlowVersion === 1
         ? taskFlows.createExaminerFlow(level,examTask,req.body?.examMode) : null;
-      if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2"].includes(level)) {
+      if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2","C1","C2"].includes(level)) {
         return error(res,400,"invalid_exam_part","Choose Teil 1, 2 or 3 for this level.");
       }
       const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
@@ -345,12 +354,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const payload = String(req.body?.audioBase64 || "");
       if (!intro) {
         if (!VALID_AUDIO.has(mime) || !/^[A-Za-z0-9+/]*={0,2}$/.test(payload) ||
-          payload.length < 1000 || payload.length > Math.ceil(EXAM_AUDIO_BYTE_ALLOWANCE * 4 / 3) + 4) {
+          payload.length < 1000 || payload.length > Math.ceil(MAX_LONG_AUDIO_BYTES * 4 / 3) + 4) {
           return error(res, 400, "invalid_audio", "Record a clear German response within this task’s time and size allowance.");
         }
       } else if (payload) return error(res, 400, "unexpected_audio", "The greeting does not require a recording.");
       const audioBytes = intro ? null : Buffer.from(payload, "base64");
-      if (audioBytes && audioBytes.length > EXAM_AUDIO_BYTE_ALLOWANCE) return error(res, 413, "audio_too_large", "Recording is too large.");
+      if (audioBytes && audioBytes.length > MAX_LONG_AUDIO_BYTES) return error(res, 413, "audio_too_large", "Recording is too large.");
       sessionRef = db().collection("liveSpeakSessions").doc(uid);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
       let level = "A2", topic = "", examTask = null, examFlow = null, maxTranscriptChars = MAX_CONFIRMED_CHARS;
@@ -375,7 +384,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
         examFlow = session.examFlow || null;
         maxTranscriptChars=transcriptLimit(session);
-        const uploadLimit = ["B1-2","B2-1"].includes(examFlow?.key) ? audioAllowance(session) : MAX_AUDIO_BYTES;
+        const uploadLimit = session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES;
         if (!intro && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
         if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
@@ -468,7 +477,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       sessionId = String(req.body?.sessionId || "");
       const pendingId = String(req.body?.pendingId || "");
       let confirmed = String(req.body?.transcript || "").trim();
-      if (!pendingId || confirmed.length < 2 || confirmed.length > MAX_FLOW_CHARS) {
+      if (!pendingId || confirmed.length < 2 || confirmed.length > 8000) {
         return error(res, 400, "invalid_transcript", "Review the recognized words before continuing.");
       }
       sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
@@ -534,17 +543,27 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           ready=ready || merged.complete;
           if (merged.complete) reply="Danke. Dann halten wir unseren gemeinsamen Plan so fest. Dieser Prüfungsteil ist beendet.";
         }
+        // A short partner answer and the next examiner instruction are distinct turns.
+        // A1/A2 question cards and A1 requests must never let the model invent a new task.
+        const separateNext=Boolean(!ready && plan.dynamic && plan.step &&
+          (["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question" ||
+           flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request"));
+        const nextInstruction=separateNext ? plan.step.instruction.trim() : "";
+        const speech=nextInstruction ? reply+"\n\n"+nextInstruction : reply;
+        const replySpeaker=(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner";
+        const additions=[{role:"user",text:confirmed},{role:"assistant",speaker:replySpeaker,text:reply}];
+        if (nextInstruction) additions.push({role:"assistant",speaker:plan.step.role || "examiner",text:nextInstruction});
         const nextSession={...flowSession,examFlow:{...flowSession.examFlow,decisions},taskReady:ready};
         let mp3=null;
         if (!ready || plan.dynamic || plan.scripted) {
           mp3=await speakOpening(client,{model:process.env.LIVE_SPEAK_TTS_MODEL || "gpt-4o-mini-tts",
-            voice:process.env.LIVE_SPEAK_TTS_VOICE || "marin",input:reply,response_format:"mp3",
+            voice:process.env.LIVE_SPEAK_TTS_VOICE || "marin",input:speech,response_format:"mp3",
             instructions:"Speak clear natural Standard German at CEFR " + flowSession.level + "."});
         }
         await updateSession(sessionRef,sessionId,{inFlight:false,examFlow:nextSession.examFlow,taskReady:ready,
-          messages:[...storedMessages,{role:"user",text:confirmed},{role:"assistant",speaker:(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner",text:reply}].slice(-20)});
-        return res.json({ok:true,transcript:confirmed,reply,speaker:(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner",taskReady:ready,examFlow:taskFlows.publicFlow(nextSession),
-          maxRecordingSeconds:recordingSeconds(nextSession),maxTranscriptChars:transcriptLimit(nextSession),audioBase64:mp3 ? mp3.toString("base64") : ""});
+          messages:[...storedMessages,...additions].slice(-20)});
+        return res.json({ok:true,transcript:confirmed,reply,speaker:replySpeaker,nextInstruction,taskReady:ready,examFlow:taskFlows.publicFlow(nextSession),
+          maxRecordingSeconds:recordingSeconds(nextSession),maxTranscriptChars:transcriptLimit(nextSession),maxAudioBytes:stepAudioBytes(nextSession),audioBase64:mp3 ? mp3.toString("base64") : ""});
       }
       if (examTask && answers.length >= EXAM_ANSWER_LIMIT) {
         await updateSession(sessionRef, sessionId, {inFlight:false});
