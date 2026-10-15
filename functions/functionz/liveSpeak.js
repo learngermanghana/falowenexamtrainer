@@ -301,7 +301,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           preparedFlow.ownPresentation=String(existing.confirmedAnswers[0]).slice(0,2400);
         }
         const sessionId = crypto.randomUUID();
-        const expiresAt = addDays(examFlow ? 10 * 60 * 1000 : SESSION_MS);
+        // Long C1/C2 presentations need time for the full answer, spoken
+        // follow-ups and transcript confirmation. Extend wall-clock time only;
+        // server-side per-turn audio, model-call and monthly spend caps still apply.
+        const longExam=/^C[12]-/.test(examFlow?.key || "");
+        const secondsNeeded=longExam ? taskFlows.profileFor(examFlow).seconds.reduce((sum,n)=>sum+n,0) : 0;
+        const examWindow=longExam ? Math.max(20*60,secondsNeeded+8*60)*1000 : 10*60*1000;
+        const expiresAt = addDays(examFlow ? examWindow : SESSION_MS);
         if (useExamTryout) tx.set(subRef, {uid:student.auth.uid,
           examTryoutMonth:currentMonth(),
           updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
