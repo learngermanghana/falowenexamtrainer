@@ -81,8 +81,8 @@ test.each(["Tagesablauf","Sprachen","Haustiere"])("selected A2 card %s survives"
 });
 test("Frühstück has a distinct second card",()=>{
  const task={teil:"Teil 2",prompt:"Frühstück"};const flow=flows.createExaminerFlow("A1",task);
- expect(flow.cards.map(c=>c.word)).toEqual(["Frühstück","Wochenende"]);
- expect(examinerTaskPreview("A1",task).cards).toEqual(["Frühstück","Wochenende"]);
+ expect(flow.cards.map(c=>c.word)).toEqual(["Frühstück","Lieblingsessen"]);
+ expect(examinerTaskPreview("A1",task).cards).toEqual(["Frühstück","Lieblingsessen"]);
  expect(flow.cards[0].question).toBe("Was essen Sie zum Frühstück?");
 });
 
@@ -111,19 +111,19 @@ test("A1 Teil 1 keeps spelling and numbers, then asks exactly one personal follo
 });
 
 test("A1 Teil 3 uses two picture/action cards and alternates requesting with reacting",()=>{
-  const task={teil:"Teil 3",prompt:"Fenster zumachen"};
+  const task={teil:"Teil 3",prompt:"Fenster"};
   const examFlow=flows.createExaminerFlow("A1",task);
   expect(flows.maxAnswers({examFlow})).toBe(4);
-  expect(examFlow.requestCards[0].word).toBe("Fenster zumachen");
+  expect(examFlow.requestCards[0].word).toBe("Fenster");
   expect(examFlow.requestCards[0].symbol).toBe("🪟");
-  expect(examFlow.requestCards[1].word).not.toBe("Fenster zumachen");
+  expect(examFlow.requestCards[1].word).not.toBe("Fenster");
   expect([0,1,2,3].map(i=>flows.currentStep(examFlow,i).action))
     .toEqual(["make-request","respond-request","make-request","respond-request"]);
   expect(flows.currentStep(examFlow,1).instruction).toMatch(/bitte/i);
   expect(flows.currentStep(examFlow,2).instruction).toContain(examFlow.requestCards[1].word);
   expect(flows.currentStep(examFlow,3).instruction).not.toBe(flows.currentStep(examFlow,1).instruction);
   for(const i of [1,3]) {
-    const session={level:"A1",examFlow,examTask:task,answeredTurns:i,confirmedAnswers:["Können Sie bitte das Fenster zumachen?"]};
+    const session={level:"A1",examFlow,examTask:task,answeredTurns:i,confirmedAnswers:["Können Sie bitte das Fenster?"]};
     const plan=flows.responsePlan(session);
     expect(plan).toEqual(expect.objectContaining({dynamic:true,ready:false}));
     expect(flows.partnerInstructions(session,plan)).toMatch(/React naturally to the candidate's actual polite request/);
@@ -139,11 +139,140 @@ test("A1 Teil 3 uses two picture/action cards and alternates requesting with rea
 test("A1 Teil 2 retains two word-card question-and-answer rounds",()=>{
   const task={teil:"Teil 2",prompt:"Essen",keywords:"Frühstück"};
   const examFlow=flows.createExaminerFlow("A1",task);
-  expect(examFlow.cards.map(card=>card.word)).toEqual(["Frühstück","Wochenende"]);
+  expect(examFlow.cards.map(card=>card.word)).toEqual(["Frühstück","Lieblingsessen"]);
   const steps=[0,1,2,3].map(i=>flows.currentStep(examFlow,i));
   expect(steps.map(step=>step.action)).toEqual(["ask-question","answer-question","ask-question","answer-question"]);
   expect(steps[0].instruction).toContain("Frühstück");
-  expect(steps[2].instruction).toContain("Wochenende");
+  expect(steps[2].instruction).toContain("Lieblingsessen");
   expect(flows.responsePlan({examFlow,answeredTurns:1}).dynamic).toBe(true);
   expect(flows.responsePlan({examFlow,answeredTurns:3}).dynamic).toBe(true);
+});
+
+test.each(catalogue.b1PlanningTasks)("B1 planning matches the selected task: $match", ({match,points})=>{
+  const task={teil:"Teil 1",prompt:match};
+  const examFlow=flows.createExaminerFlow("B1",task);
+  const session={examFlow,level:"B1",examTask:task,answeredTurns:2};
+  expect(flows.currentStep(examFlow).instruction).toContain(match);
+  expect(flows.publicFlow(session).points).toEqual(points.map(point=>point.text));
+  expect(examinerTaskPreview("B1",task).points).toEqual(points.map(point=>point.text));
+  const decisions=points.map(point=>({point:point.id,value:"vereinbart",quote:"Ja, das machen wir so."}));
+  expect(flows.mergeDecisions(session,decisions,"Ja, das machen wir so.").complete).toBe(true);
+  expect(flows.mergeDecisions(session,decisions.slice(1),"Ja, das machen wir so.").complete).toBe(false);
+});
+
+test("A2 personal rounds answer the selected card question before asking the candidate",()=>{
+  const task={teil:"Teil 1",prompt:"Wohnort"};
+  const examFlow=flows.createExaminerFlow("A2",task);
+  const session={examFlow,examTask:task,level:"A2",answeredTurns:1};
+  const instructions=flows.partnerInstructions(session,flows.responsePlan(session));
+  expect(instructions).toContain("First answer the candidate's question naturally");
+  expect(instructions).toContain('"Wohnort"');
+  expect(flows.currentStep(examFlow,1).action).toBe("answer-question");
+});
+
+test.each([["A2","Teil 2","Was machen Sie am Wochenende?"],["B1","Teil 2","Ausbildung"]])("%s main speaking task announces the selected topic",(level,teil,prompt)=>{
+  const task={teil,prompt};const examFlow=flows.createExaminerFlow(level,task);
+  expect(flows.currentStep(examFlow).instruction).toContain(prompt);
+  expect(flows.publicFlow({examFlow}).stageGuide).toBe(examinerTaskPreview(level,task).stageGuide);
+});
+
+test("B1 discussion passes the retained own presentation to the interlocutor without exposing it as a model answer",()=>{
+  const examFlow=flows.createExaminerFlow("B1",{teil:"Teil 3",prompt:"Fragen stellen"});
+  examFlow.ownPresentation="Ich mache eine Ausbildung im Hotel.";
+  const session={examFlow,level:"B1",answeredTurns:2};
+  expect(flows.partnerInstructions(session,flows.responsePlan(session))).toContain(examFlow.ownPresentation);
+  expect(JSON.stringify(flows.publicFlow(session))).not.toContain(examFlow.ownPresentation);
+});
+
+test("A1 dictionary uses exactly the supplied keyword and picture banks",()=>{
+  const fs=require("fs"),path=require("path");
+  const source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+  const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1));
+  const words=rows.filter(row=>row.level === "A1" && row.teilId === "teil-2");
+  expect(words).toHaveLength(27);
+  expect(new Set(words.map(row=>row.topicPrompt)).size).toBe(15);
+  for(const row of words){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt,keywords:row.keywordSubtopic};
+    const examFlow=flows.createExaminerFlow("A1",task);
+    const preview=examinerTaskPreview("A1",task);
+    expect(examFlow.cards[0].word).toBe(row.keywordSubtopic);
+    expect(examFlow.cards.every(card=>card.theme === row.topicPrompt)).toBe(true);
+    expect(preview.cards).toEqual(examFlow.cards.map(card=>card.word));
+    expect(preview.cardThemes).toEqual(flows.publicFlow({examFlow}).cardThemes);
+    expect(preview.maxAnswers).toBe(flows.maxAnswers({examFlow}));
+  }
+  const pictures=rows.filter(row=>row.level === "A1" && row.teilId === "teil-3");
+  expect(pictures).toHaveLength(15);
+  for(const row of pictures){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt};
+    const examFlow=flows.createExaminerFlow("A1",task);
+    const card=flows.publicFlow({examFlow}).requestCards[0];
+    expect(card.word).toBe(row.topicPrompt);
+    expect(card.picture).toMatch(/^\/images\/speaking\/a1\/[a-z-]+\.svg$/);
+    expect(fs.existsSync(path.resolve(__dirname,"../../public"+card.picture))).toBe(true);
+    expect(examinerTaskPreview("A1",task).requestCards).toEqual(flows.publicFlow({examFlow}).requestCards);
+  }
+});
+
+test.each(["Deutsch","Schuhe","Geburtstag"])("single keyword %s ends after its question and answer",keyword=>{
+  const examFlow=flows.createExaminerFlow("A1",{teil:"Teil 2",keywords:keyword});
+  expect(examFlow.cards).toHaveLength(1);
+  expect(flows.maxAnswers({examFlow})).toBe(2);
+  expect(flows.currentStep(examFlow,2)).toBe(null);
+  expect(flows.isComplete({examFlow,answeredTurns:2})).toBe(true);
+});
+
+test("A2 curated bank has 8 personal topics, 10 four-keyword topics and 5 calendar tasks",()=>{
+  const fs=require("fs"),path=require("path");
+  const source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+  const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1)).filter(row=>row.level === "A2");
+  expect([1,2,3].map(part=>rows.filter(row=>row.teilId === `teil-${part}`).length)).toEqual([8,10,5]);
+  for(const row of rows){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt,keywords:row.keywordSubtopic};
+    const examFlow=flows.createExaminerFlow("A2",task), view=flows.publicFlow({examFlow}), preview=examinerTaskPreview("A2",task);
+    expect(preview.cards).toEqual(view.cards);
+    expect(preview.points).toEqual(view.points);
+    expect(preview.studentSchedule).toEqual(view.studentSchedule);
+    if(row.teilId === "teil-1")expect(new Set(view.cards).size).toBe(4);
+    if(row.teilId === "teil-2"){expect(view.points).toHaveLength(4);expect(view.points).toEqual(row.keywordSubtopic.split(", "));}
+    if(row.teilId === "teil-3"){
+      expect(view.studentSchedule).toHaveLength(15);
+      expect(view.studentCalendar).toEqual(preview.studentCalendar);
+      expect(JSON.stringify(view)).not.toContain('"agreement"');
+      expect(JSON.stringify(view)).not.toContain('"partnerCalendar"');
+    }
+  }
+  expect(JSON.stringify(publicCatalogue)).not.toContain('"agreement"');
+  expect(JSON.stringify(publicCatalogue)).not.toContain('"partnerCalendar"');
+});
+
+test.each(catalogue.a2PlanningTasks)("calendar agreement for $topic uses both partners' free time",task=>{
+  const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 3",prompt:task.topic});
+  const slot=`Samstag ${task.agreement.hour}:00`;
+  expect(task.studentCalendar).toContain(slot);
+  expect(task.partnerCalendar).toContain(slot);
+  const session={examFlow,answeredTurns:2,messages:[{role:"assistant",text:`Passt Samstag um ${task.agreement.hour} Uhr?`}]};
+  expect(flows.calendarResponse(session,"Ja, das passt.").complete).toBe(true);
+  expect(flows.calendarResponse(session,`Samstag um ${task.agreement.hour} Uhr passt.`).complete).toBe(true);
+  for(const reply of ["Samstag um 8 Uhr passt.","Nein, das geht nicht.","Sonntag um 13 Uhr passt."])
+    expect(flows.calendarResponse(session,reply).complete).toBe(false);
+});
+
+test("B1 curated bank replaces old prompts with 8 tasks per part",()=>{
+  const fs=require("fs"),path=require("path"),source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+  const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1)).filter(row=>row.level === "B1");
+  expect([1,2,3].map(part=>rows.filter(row=>row.teilId === `teil-${part}`).length)).toEqual([8,8,8]);
+  for(const row of rows){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt};const flow=flows.createExaminerFlow("B1",task);
+    if(row.teilId === "teil-1")expect(flow.planningPoints).toHaveLength(4);
+    if(row.teilId === "teil-2"){expect(flows.currentStep(flow).instruction).toContain(row.hint);expect(examinerTaskPreview("B1",task).presentationQuestion).toBe(row.hint);}
+    if(row.teilId === "teil-3"){
+      expect(flow.discussion.presentation.length).toBeGreaterThan(100);
+      const opening=flows.currentStep(flow).instruction;
+      expect(opening).toContain(flow.discussion.presentation);
+      expect(opening).toContain(flow.discussion.question);
+      expect(flows.currentStep(flow,1).instruction).not.toContain(flow.discussion.presentation);
+      expect(flows.currentStep(flow,1).instruction).toContain("Rückmeldung");
+    }
+  }
 });

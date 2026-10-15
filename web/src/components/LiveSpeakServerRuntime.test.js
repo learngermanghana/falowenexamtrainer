@@ -631,20 +631,20 @@ test("A1 exam tryout makes a real German AI voice call after the pilot and share
   expect(voice.payload.audioBase64).toBeTruthy();
   expect(api.fakeClient.audio.speech.create).toHaveBeenCalledTimes(1);
   const updated=await api.call("GET","/live-speak/status");
-  expect(updated.payload.examTryoutAvailable).toBe(false);
+  expect(updated.payload.examTryoutAvailable).toBe(true);
   const second=await api.call("POST","/live-speak/session/start",{level:"A1",
     source:"exam-speaking-practice",examTask:task,examinerFlowVersion:1});
   expect(second.code).toBe(200);
   expect(second.payload.resumed).toBe(true);
 });
 
-test("AI tryout does not bypass student identity, one-use allowance, or the extra monthly safety ceiling",async()=>{
+test("AI tryout does not bypass student identity, or the extra monthly safety ceiling",async()=>{
   const api=setup();
   const month=new Date().toISOString().slice(0,7);
   const task={id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"};
   const body={level:"A1",source:"exam-speaking-practice",examTask:task,examinerFlowVersion:1};
   api.docs.set("liveSpeakPilotCredits/u123",{pilotClaimed:true,remaining:0,examTryoutMonth:month});
-  api.docs.set("liveSpeakUsage/"+month,{turns:40});
+  api.docs.set("liveSpeakUsage/"+month,{turns:44});
   const exhausted=await api.call("POST","/live-speak/session/start",body);
   expect(exhausted.code).toBe(429);
   expect(api.docs.has("liveSpeakSessions/u123")).toBe(false);
@@ -668,4 +668,14 @@ test("a new learner can claim original free sessions before scarce AI tryout res
   expect(claim.code).toBe(200);
   expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
   expect(api.docs.get("liveSpeakPilotCredits/u123").examTryoutMonth).toBeUndefined();
+});
+
+test("previous examiner tryout use does not block repeat testing within the shared budget",async()=>{
+  const api=setup(),month=new Date().toISOString().slice(0,7);
+  api.docs.set("liveSpeakPilotCredits/u123",{pilotClaimed:true,remaining:0,examTryoutMonth:month});
+  api.docs.set("liveSpeakUsage/"+month,{turns:0});
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.examTryoutAvailable).toBe(true);
+  const started=await startTaskFlow(api,"B1",3);
+  expect(started.sessionId).toBeTruthy();
 });

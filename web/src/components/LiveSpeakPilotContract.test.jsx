@@ -170,8 +170,8 @@ test("speaking page keeps one Exam Room menu, a single banner and distinct A1 to
   const cards=fs.readFileSync(path.join(root,"web/src/components/GoetheExamTaskCard.jsx"),"utf8");
   const css=fs.readFileSync(path.join(root,"web/src/App.css"),"utf8");
   expect(voice).toContain('aria-label={recording ? "Stop local practice recording" : "Record local speaking practice"}');
-  expect(cards).toContain('aria-label="A1 Teil 2 Thema"');
-  expect(cards).toContain("WORTKARTE");
+  expect(cards).toContain('aria-label="A1 current word card"');
+  expect(cards).toContain("goethe-card__keyword");
   expect(app).toContain('className="mobile-exam-menu"');
   expect(app).toContain("Exam Room Menu");
   expect(app).not.toContain('className="exam-speaking-quick-nav"');

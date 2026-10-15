@@ -10,7 +10,7 @@ const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");
 
 const PILOT_SESSIONS = 2;
-// One verified exam tryout per learner/month, bounded by a SMALL shared
+// Repeat examiner testing is bounded by a SMALL shared
 // supplemental usage pool. Does not reset pilot credits or disable quotas.
 const EXAM_TRYOUT_EXTRA_UNITS = 12;
 const EXAM_TRYOUT_RESERVE_UNITS = 10;
@@ -79,7 +79,6 @@ const spendingCap = () => {
 const tryoutCeiling = () => spendingCap() + EXAM_TRYOUT_EXTRA_UNITS;
 const eligibleForTryout = ({source,flow,credit,usage}) =>
   source === "exam-speaking-practice" && Boolean(flow) &&
-  credit?.examTryoutMonth !== currentMonth() &&
   usage + EXAM_TRYOUT_RESERVE_UNITS <= tryoutCeiling();
 const quotaForSession = session => session.examTryout ? tryoutCeiling() : spendingCap();
 const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
@@ -287,7 +286,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("No speaking sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
         }
         const preparedFlow = examFlow ? {...examFlow} : null;
-        if (preparedFlow?.key === "B1-3" && existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0]) {
+        if (preparedFlow?.key === "B1-3" && !preparedFlow.discussion && existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0]) {
           preparedFlow.contextTopic=existing.examTask.prompt;
           preparedFlow.ownPresentation=String(existing.confirmedAnswers[0]).slice(0,2400);
         }

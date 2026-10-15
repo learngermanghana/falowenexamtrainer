@@ -2,7 +2,11 @@
 const catalogue = require("../data/goetheExaminerFlows.json");
 const clean = (value, length=1200) => String(value || "").replace(/[\r\n\t]/g," ").trim().slice(0,length);
 const partNumber = task => String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1] || "";
-const profileFor = flow => catalogue.profiles[flow?.key] || null;
+const profileFor = flow => {
+  const profile = catalogue.profiles[flow?.key];
+  if (profile && flow.key === "A1-2" && flow.cards?.length) return {...profile,maxAnswers:flow.cards.length*2};
+  return profile && flow.planningPoints ? {...profile, decisionPoints:flow.planningPoints.map(point=>point.id)} : profile || null;
+};
 const words = task => clean(task?.keywords || task?.prompt,120).split(/[,;·]/).map(x=>x.trim()).filter(Boolean);
 function selectedCards(word, defaults, count) {
   const normalize = value => value.trim().toLocaleLowerCase("de-DE");
@@ -10,6 +14,7 @@ function selectedCards(word, defaults, count) {
   const questions = {tagesablauf:"Wie sieht Ihr Tagesablauf aus?",sprachen:"Welche Sprachen sprechen Sie?",haustiere:"Haben Sie Haustiere?"};
   const first = match || {word,question:questions[normalize(word)] || `Was können Sie zum Thema „${word}“ über sich erzählen?`};
   const seen = new Set();
+  if (match?.theme) defaults = defaults.filter(card=>card.theme === match.theme);
   return [first,...defaults].filter(card=>{const key=normalize(card.word);if(seen.has(key))return false;seen.add(key);return true;}).slice(0,count);
 }
 function selectedRequestCards(word) {
@@ -21,7 +26,7 @@ function selectedRequestCards(word) {
   return cards.map(card => {
     const sourceIndex = all.findIndex(item => normalize(item.word) === normalize(card.word));
     const partnerCard = all[((sourceIndex < 0 ? 0 : sourceIndex) + 3) % all.length];
-    return {word:card.word,symbol:card.symbol,partnerRequest:partnerCard.request};
+    return {word:card.word,symbol:card.symbol,picture:card.picture,partnerRequest:partnerCard.request};
   });
 }
 function createExaminerFlow(level, task, mode="guided") {
@@ -29,18 +34,27 @@ function createExaminerFlow(level, task, mode="guided") {
   const profile = catalogue.profiles[key];
   if (!profile) return null;
   const flow = {version:1,key,mode:mode === "simulation" ? "simulation" : "guided",decisions:[]};
-  if (key === "A2-3") flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
+  if (key === "A2-3") {
+    const planning=catalogue.a2PlanningTasks.find(item=>item.topic === clean(task?.prompt,180));
+    if (planning) {flow.calendar=planning;flow.scenario=planning.scenario;}
+  }
+  if (key === "A2-3" && !flow.scenario) flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
+  if (key === "A2-2" || key === "B1-1" || key === "B1-2") flow.contextTopic = clean(task?.prompt,180);
+  if (key === "B1-1") flow.planningPoints = catalogue.b1PlanningTasks.find(item=>clean(task?.prompt).toLowerCase().includes(item.match.toLowerCase()))?.points;
   if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
+  if (key === "B1-2") flow.presentationQuestion=catalogue.b1PresentationTopics.find(item=>item.topic === clean(task?.prompt,180))?.question || "";
+  if (key === "B1-3") flow.discussion=catalogue.b1DiscussionTasks.find(item=>item.topic === clean(task?.prompt,180));
   const selectedWord = words(task)[0] || "Freizeit";
   if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
   if (key === "A2-1") {
-    flow.cards = selectedCards(selectedWord,catalogue.personalCards,4);
+    const index=catalogue.personalCards.findIndex(card=>card.word === selectedWord);
+    flow.cards = index >= 0 ? [...catalogue.personalCards.slice(index),...catalogue.personalCards.slice(0,index)].slice(0,4) : selectedCards(selectedWord,catalogue.personalCards,4);
   }
   if (key === "A1-3") flow.requestCards = selectedRequestCards(selectedWord);
   if (key === "A2-2") {
     const entry = Object.entries(catalogue.a2TopicPoints).find(([topic])=>topic !== "default" && new RegExp(topic,"i").test(task?.prompt || ""));
     const supplied = words({keywords:task?.keywords});
-    flow.points = supplied.length >= 4 ? supplied.slice(0,4) : entry?.[1] || catalogue.a2TopicPoints.default;
+    flow.points = supplied.length >= 4 ? supplied.slice(0,4) : catalogue.a2TopicCards.find(card=>card.topic === clean(task?.prompt,180))?.points || entry?.[1] || catalogue.a2TopicPoints.default;
   }
   return flow;
 }
@@ -64,11 +78,12 @@ function currentStep(flow, answered=0) {
       ? `Formulieren Sie bitte eine höfliche Bitte zu Ihrer Karte: „${card.word}“.`
       : card.partnerRequest;
   }
-  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : profile.opening;}
+  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : `Zum Thema „${flow.contextTopic || "Alltag"}“: ${flow.presentationQuestion || ""} ${profile.opening}`;}
   if (flow.key === "A2-3" || flow.key === "B1-1") action="negotiate";
   if (flow.key === "A2-3") instruction=flow.scenario + " Wann hast du Zeit?";
-  if (flow.key === "B1-2") action="presentation";
-  if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
+  if (flow.key === "B1-1" && flow.contextTopic) instruction = `Planen Sie gemeinsam: ${flow.contextTopic}. Besprechen Sie: ${(flow.planningPoints || []).map(point=>point.text).join(" ") || "wann und wo, wie Sie hinkommen und wer was übernimmt"} Was schlägst du vor?`;
+  if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${flow.presentationQuestion || ""} ${profile.opening}`;}
+  if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${flow.discussion ? "" : profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : flow.discussion ? `${flow.discussion.presentation} ${flow.discussion.question}` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
   return {index:answered+1,action,role,instruction,seconds:profile.seconds[answered]};
 }
 const maxAnswers = session => profileFor(session.examFlow)?.maxAnswers || 2;
@@ -83,16 +98,18 @@ function publicFlow(session) {
   const flow=session.examFlow, profile=profileFor(flow);
   if (!profile) return null;
   const step=session.taskReady ? null : currentStep(flow,Number(session.answeredTurns)||0);
-  return {version:1,key:flow.key,mode:flow.mode,title:profile.title,topic:flow.contextTopic || "",role:step?.role || "examiner",step,
-    maxAnswers:profile.maxAnswers,criteria:profile.criteria,
+  return {version:1,key:flow.key,mode:flow.mode,title:profile.title,topic:flow.contextTopic || "",presentationQuestion:flow.presentationQuestion || "",role:step?.role || "examiner",step,
+    maxAnswers:profile.maxAnswers,criteria:profile.criteria,stageGuide:profile.stageGuide || "",
     hints:flow.mode === "guided" ? profile.hints : [],
     cards:flow.cards?.map(card=>card.word) || [],card:flow.card || "",
-    requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol})) || [],
-    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
-    studentCalendar:profile.studentCalendar || [],
+    requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol,...(card.picture ? {picture:card.picture} : {})})) || [],
+    cardThemes:flow.cards?.map(card=>card.theme || "") || [],
+    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
+    studentCalendar:flow.calendar?.studentCalendar || profile.studentCalendar || [],
+    calendarDay:flow.calendar?.day || "",studentSchedule:flow.calendar?.studentSchedule || [],
     scenario:flow.scenario || "",
-    partnerTopic:profile.partnerTopic || "",
-    partnerPresentation:flow.key === "B1-3" && Number(session.answeredTurns)>=1 ? profile.partnerPresentation : "",
+    partnerTopic:flow.discussion?.topic || profile.partnerTopic || "",
+    partnerPresentation:flow.key === "B1-3" && Number(session.answeredTurns)>=1 ? flow.discussion?.presentation || profile.partnerPresentation : "",
     decisions:(flow.decisions||[]).map(d=>({point:d.point,value:d.value})),
     preparationSeconds:flow.key.startsWith("B1-") ? 900 : 0};
 }
@@ -111,7 +128,7 @@ function partnerInstructions(session,plan) {
   const negotiation=plan.previous?.action === "negotiate";
   const a1Instruction = flow.key === "A1-1" && plan.previous?.action === "number"
     ? "The candidate has already introduced themselves, spelled their surname and said a number. Ask exactly ONE short, easy A1 personal follow-up grounded in their introduction (hobby, job, home or languages). No extra subquestions. Do not repeat the spelling or number task. "
-    : flow.key === "A1-2" && plan.previous?.action === "ask-question"
+    : (flow.key === "A1-2" || flow.key === "A2-1") && plan.previous?.action === "ask-question"
     ? "First answer the candidate's question naturally in one short sentence, then ask ONE simple question about the displayed word card: " + JSON.stringify(flow.cards[Math.floor((Number(session.answeredTurns)-1)/2)]?.word || "") + ". "
     : flow.key === "A1-3" && plan.previous?.action === "make-request"
     ? "React naturally to the candidate's actual polite request (agree or politely refuse), then make exactly ONE separate polite request using the nextInstruction. Do not combine both into one question. "
@@ -125,11 +142,13 @@ function partnerInstructions(session,plan) {
       "Record only decisions actually agreed in the student's latest words: {point, value, quote}; quote must be an exact substring of their transcript. " +
       "To withdraw a previous decision, return {point, quote, withdrawn:true}. " +
       "Allowed decision points: " + JSON.stringify(profile.decisionPoints) + ". " : "Use an empty decisions array. ") +
-    (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(profile.partnerCalendar) +
+    (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
     "State: " + JSON.stringify({task:session.examTask,role:plan.previous?.role,action:plan.previous?.action,
+      planningPoints:flow.planningPoints,
+      ownPresentation:flow.key === "B1-3" ? clean(flow.ownPresentation,2400) : undefined,
       candidateIntroduction:flow.key === "A1-1" ? clean(session.confirmedAnswers?.[0],450) : undefined,
-      nextInstruction:flow.key === "A2-2" ? "Ask ONE concise relevant neutral follow-up about the student's account in German." : plan.step?.instruction || "End the task politely.",partnerPresentation:flow.key === "B1-3" ? profile.partnerPresentation : undefined,
+      nextInstruction:flow.key === "A2-2" ? "Ask ONE concise relevant neutral follow-up about the student's account in German." : plan.step?.instruction || "End the task politely.",partnerPresentation:flow.key === "B1-3" ? flow.discussion?.presentation || profile.partnerPresentation : undefined,
       decisions:flow.decisions}) +
     ". After answering, use nextInstruction to give the student the correct next task. For negotiation, ask about one unresolved decision instead of repeating the opening.";
 }
@@ -140,8 +159,10 @@ function mergeDecisions(session, proposed, transcript) {
     if (!profile.decisionPoints?.includes(d?.point) || !clean(d.quote,250) || !transcript.includes(clean(d.quote,250))) continue;
     if (d.withdrawn === true) {accepted.delete(d.point);continue;}
     if (session.examFlow.key === "A2-3" && /\b(nein|nicht|leider|keine)\b/i.test(transcript.split(/\baber\b/i).at(-1))) continue;
-    if (session.examFlow.key === "A2-3" && !/mittwoch/i.test(d.value || "")) continue;
-    if (session.examFlow.key === "A2-3" && !/(?:18(?::00)?|sechs)/i.test(d.value || "")) continue;
+    if (session.examFlow.key === "A2-3") {
+      const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
+      if (!String(d.value || "").includes(`${target.day} ${target.hour}:00`)) continue;
+    }
     accepted.set(d.point,{point:d.point,value:clean(d.value,180),quote:clean(d.quote,250)});
   }
   const decisions=[...accepted.values()];
@@ -150,22 +171,25 @@ function mergeDecisions(session, proposed, transcript) {
   return {decisions,complete};
 }
 function calendarResponse(session, transcript) {
+  const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
+  const targetDay=target.day.toLowerCase(), targetHour=target.hour;
   const clause=transcript.split(/\baber\b/i).at(-1).trim();
   const declined=/\b(nein|nicht|leider|keine)\b/i.test(clause);
   const day=clause.match(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/i)?.[1]?.toLowerCase();
   const time=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
-  const targetTime=time ? Number(time[1])===18 && Number(time[2] || 0)===0 : /\bachtzehn\b/i.test(clause) || /\bsechs\b.*\babends\b/i.test(clause);
+  const hourWords={12:/\bzwölf\b/i,13:/\bdreizehn\b/i,15:/\bfünfzehn\b/i,17:/\bsiebzehn\b/i,18:/\bachtzehn\b/i,19:/\bneunzehn\b/i};
+  const targetTime=time ? Number(time[1])===targetHour && Number(time[2] || 0)===0 : Boolean(hourWords[targetHour]?.test(clause)) || (targetHour===18 && /\bsechs\b.*\babends\b/i.test(clause));
   const mentionsTime=Boolean(time) || /\b(uhr|halb|viertel|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
-  const contradiction=(day && day!=="mittwoch") || (mentionsTime && !targetTime);
-  const explicit=day === "mittwoch" && targetTime;
+  const contradiction=(day && day!==targetDay) || (mentionsTime && !targetTime);
+  const explicit=day === targetDay && targetTime;
   const previous=savedAssistant(session);
   const accepted=/\b(ja|passt|einverstanden|gut|gerne|gern|machen wir)\b/i.test(clause);
-  const proposed=/mittwoch/i.test(previous) && /(?:18|achtzehn|sechs)/i.test(previous);
+  const proposed=previous.toLowerCase().includes(targetDay) && previous.includes(String(targetHour));
   const agreed=Number(session.answeredTurns)>=2 && !declined && !contradiction && (explicit || (accepted && proposed));
-  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:"Mittwoch 18:00",quote:clause.slice(0,250)}] : [],transcript);
-  return {...merged,reply:merged.complete ? "Gut, dann treffen wir uns am Mittwoch um 18 Uhr. Bis dann!" :
+  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:`${target.day} ${targetHour}:00`,quote:clause.slice(0,250)}] : [],transcript);
+  return {...merged,reply:merged.complete ? `Gut, dann treffen wir uns am ${target.day} um ${targetHour} Uhr. Bis dann!` :
     Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet." :
-    "Wie wäre es mit Mittwoch um 18 Uhr? Passt dir dieser Termin?"};
+    `Wie wäre es mit ${target.day} um ${targetHour} Uhr? Passt dir dieser Termin?`};
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
