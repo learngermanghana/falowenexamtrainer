@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
 import { styles } from "../styles";
+import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
@@ -56,7 +57,7 @@ export default function MockExamLibraryPage() {
                     </p>
                   )}
                 </div>
-                <button type="button" style={styles.primaryButton} onClick={() => navigate(mock.route)}>
+                <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
                   {mock.mode === "full" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
