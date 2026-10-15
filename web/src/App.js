@@ -1566,7 +1566,7 @@ const ExamArea = ({ onBack }) => {
     <>
       <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
         <div className="nav-row exam-nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
-          <button style={styles.secondaryButton} onClick={onBack}>
+          <button style={styles.secondaryButton} onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>
             {t("appNav.backHome")}
           </button>
           {tabs.map((tab) => (
@@ -1586,7 +1586,7 @@ const ExamArea = ({ onBack }) => {
             <span aria-hidden="true" className="mobile-exam-menu__chevron">⌄</span>
           </summary>
           <nav className="mobile-exam-menu__links" aria-label="Exam Room sections">
-            <button type="button" onClick={onBack}>← {t("appNav.backHome")}</button>
+            <button type="button" onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>← {t("appNav.backHome")}</button>
             {tabs.map((tab) => (
               <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
                 onClick={() => openExamSection(tab)}>
