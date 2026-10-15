@@ -675,7 +675,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </header>
       ) : null}
 
-      {loading ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Preparing speaking practice…</p> : null}
+      {loading ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>{examinerEntry ? "Preparing the AI examiner. The AI will speak first; please wait and listen." : "Preparing speaking practice…"}</p> : null}
+      {examinerEntry && busy && !session ? <p role="status" className="speaking-opening-question">Preparing your German examiner’s voice… Please wait and listen before answering.</p> : null}
       {!loading && details && !details.enabled ? (
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
@@ -893,7 +894,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   <button type="button" onClick={retryRecordingUpload} disabled={busy || feedbackBusy}>Retry sending recording</button>
                   <button type="button" onClick={()=>{setAudioRetry(null);clearRecording();setErrorMessage("");setNotice("Record a new answer when you are ready.");}} disabled={busy}>Record again instead</button>
                 </div>
-                {studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Replay unsent recording" style={{maxWidth:"100%",width:"100%"}}/> : null}
+                {studentAudioUrl ? <small>Your recording remains available in Preview your recording above.</small> : null}
               </div> : null}
               {pending ? (
                 <div role="group" aria-label="Review German speech recognition" style={{display:"grid",gap:8}}>
