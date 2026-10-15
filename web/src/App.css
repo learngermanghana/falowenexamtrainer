@@ -936,3 +936,151 @@ body.falowen-speaking-session-active .study-buddy-bar { display: none !important
     scroll-margin-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
   }
 }
+
+
+/* Speaking exam: remove duplicate page banners and expose phone navigation. */
+body.falowen-exam-speaking-page .study-buddy-bar { display: none !important; }
+.exam-speaking-quick-nav { display: none; }
+.speaking-exam-a1-topic {
+  display: grid;
+  gap: 5px;
+  padding: 13px 14px;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  border-radius: 12px;
+}
+.speaking-exam-a1-topic__label, .speaking-exam-word-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: .06em;
+}
+.speaking-exam-a1-topic > strong { font-size: 22px; color: #1e3a8a; line-height: 1.2; }
+.speaking-exam-a1-topic > small { font-size: 12px; color: #475569; line-height: 1.5; }
+.speaking-exam-word-cards--a1 > span {
+  flex: 1 1 120px;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  background: #fff;
+}
+.speaking-exam-keyword { font-size: 19px; font-weight: 800; color: #0f172a; overflow-wrap: anywhere; }
+.speaking-exam-local-practice {
+  display: grid;
+  gap: 11px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid #fecaca;
+  background: #fff;
+}
+.speaking-exam-local-practice__heading { display: grid; gap: 3px; }
+.speaking-exam-local-practice__heading strong { font-size: 16px; color: #0f172a; }
+.speaking-exam-local-practice__heading small { font-size: 12px; color: #9a3412; }
+.speaking-exam-local-practice__recorder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 56px;
+  align-items: stretch;
+  gap: 9px;
+  min-width: 0;
+}
+.speaking-exam-local-practice__recorder textarea {
+  min-width: 0;
+  font-size: 16px;
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.speaking-exam-local-practice__mic {
+  min-width: 56px;
+  min-height: 56px;
+  border: none;
+  border-radius: 13px;
+  color: #fff;
+  background: #dc2626;
+  font-size: 23px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.speaking-exam-local-practice__mic.is-recording { background: #991b1b; }
+.speaking-exam-local-practice__mic:focus-visible {
+  outline: 3px solid #2563eb;
+  outline-offset: 2px;
+}
+@media (max-width: 900px) {
+  .exam-speaking-quick-nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    padding: 1px 0 5px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .exam-speaking-quick-nav button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 11px;
+    border: 1px solid #dbeafe;
+    background: #fff;
+    border-radius: 999px;
+    color: #1e40af;
+    font-size: 12px;
+    font-weight: 750;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .exam-speaking-quick-nav button[aria-current="page"] {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+  .exam-room-level-picker--speaking {
+    padding: 8px 10px !important;
+    gap: 5px !important;
+  }
+  .exam-room-level-picker--speaking > div:first-child small,
+  .exam-room-level-picker--speaking > small {
+    display: none;
+  }
+  .exam-room-level-picker--speaking [aria-label="Choose exam practice level"] {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 3px;
+    gap: 6px !important;
+  }
+  .exam-room-level-picker--speaking [aria-label="Choose exam practice level"] button {
+    flex: 0 0 auto;
+    min-width: 48px !important;
+    padding: 8px 10px !important;
+  }
+  .speaking-exam-page .speaking-exam-hero {
+    padding: 9px 13px !important;
+    min-height: 0;
+  }
+  .speaking-exam-page .speaking-exam-hero h1 {
+    font-size: 17px !important;
+    line-height: 1.2;
+    margin: 0 !important;
+  }
+  .speaking-exam-page .speaking-exam-hero p { display: none; }
+  .speaking-exam-page .speaking-exam-sidebar { padding: 9px 12px !important; }
+  .speaking-exam-page .speaking-exam-guide:not([open]) { padding: 3px 10px !important; }
+  .speaking-exam-page .speaking-exam-guide:not([open]) summary { min-height: 42px; }
+  .speaking-exam-page .speaking-exam-task-card { gap: 8px !important; }
+}
+@media (max-width: 640px) {
+  .speaking-exam-local-practice {
+    padding: 12px;
+    margin-bottom: max(6px, env(safe-area-inset-bottom, 0px));
+  }
+  .speaking-exam-a1-topic > strong { font-size: 21px; }
+  .speaking-exam-word-cards--a1 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .speaking-exam-word-cards--a1 > span { padding: 10px !important; }
+  .speaking-exam-keyword { font-size: 17px; }
+}

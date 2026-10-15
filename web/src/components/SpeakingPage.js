@@ -960,6 +960,12 @@ const SpeakingPage = ({
     if (typeof window !== "undefined") window.localStorage.setItem(AUTOPLAY_REPLIES_STORAGE_KEY, String(autoPlayRepliesEnabled));
   }, [autoPlayRepliesEnabled]);
 
+  useEffect(() => {
+    if (!isExamMode || typeof document === "undefined") return undefined;
+    document.body.classList.add("falowen-exam-speaking-page");
+    return () => document.body.classList.remove("falowen-exam-speaking-page");
+  }, [isExamMode]);
+
   const completedCount = useMemo(
     () => Object.values(completedQuestionIds).filter(Boolean).length,
     [completedQuestionIds]
@@ -1350,7 +1356,7 @@ const SpeakingPage = ({
                   )}
                 </div>
               ) : null}
-              <details className="speaking-exam-guide" aria-label="Speaking exam instructions" open={!liveExaminerActive || !isCompactViewport} style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
+              <details className="speaking-exam-guide" aria-label="Speaking exam instructions" open={!isCompactViewport && !liveExaminerActive} style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
                 <summary style={{color:"#1e3a8a",fontWeight:800,cursor:"pointer",minHeight:36,display:"flex",alignItems:"center"}}>Teil {selectedTeil} · {examGuide.title} {liveExaminerActive && isCompactViewport ? " · Instructions" : ""}</summary>
                 <p lang="de" style={{margin:0,fontSize:14,lineHeight:1.55}}>{examGuide.german}</p>
                 <p style={{margin:0,fontSize:13,color:"#475569",lineHeight:1.5}}>{examGuide.english}</p>

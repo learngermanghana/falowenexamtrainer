@@ -16,9 +16,19 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
   const requestCard=flow.key === "A1-3" ? flow.requestCards?.[requestRound] : null;
   return <section className="speaking-exam-task-card" aria-label="Speaking task card" style={{padding:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:8}}>
     <strong>{flow.title} · {flow.mode === "simulation" ? "Exam simulation" : "Guided practice"}</strong>
-    <p lang="de" style={{margin:0,lineHeight:1.6}}>{flow.scenario || flow.topic || topic}</p>
-    {flow.cards?.length ? <div className="speaking-exam-word-cards" role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
-      {flow.cards.map((card,index)=><span role="listitem" key={index} style={{padding:"8px 12px",border:active && index===cardIndex ? "2px solid #2563eb" : "1px solid #cbd5e1",borderRadius:8}}>{card}</span>)}
+    {flow.key === "A1-2" ? (
+      <div className="speaking-exam-a1-topic" role="group" aria-label="A1 Teil 2 Thema">
+        <span className="speaking-exam-a1-topic__label">THEMA</span>
+        <strong lang="de">{topic || "Alltag"}</strong>
+        <small>Look at the word card. Ask your partner a question about this theme, then answer their question.</small>
+      </div>
+    ) : <p lang="de" style={{margin:0,lineHeight:1.6}}>{flow.scenario || flow.topic || topic}</p>}
+    {flow.cards?.length ? <div className={flow.key === "A1-2" ? "speaking-exam-word-cards speaking-exam-word-cards--a1" : "speaking-exam-word-cards"} role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
+      {flow.cards.map((card,index)=><span role="listitem" key={index} aria-current={active && index===cardIndex ? "step" : undefined}
+        style={{padding:"8px 12px",border:active && index===cardIndex ? "2px solid #2563eb" : "1px solid #cbd5e1",borderRadius:8}}>
+        {flow.key === "A1-2" ? <small className="speaking-exam-word-label">WORTKARTE {index+1} / {flow.cards.length}</small> : null}
+        <strong lang="de" className={flow.key === "A1-2" ? "speaking-exam-keyword" : undefined}>{card}</strong>
+      </span>)}
     </div> : null}
     {flow.key === "A1-1" ? <p style={{margin:0,fontSize:13,color:"#334155"}}>
       Introduce yourself, spell your surname, say a number, then answer one personal follow-up.
