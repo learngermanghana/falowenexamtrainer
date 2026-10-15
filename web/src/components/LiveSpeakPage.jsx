@@ -346,7 +346,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setErrorMessage("");
     try {
       // One-click practice. The server still verifies credits and global cost caps.
-      if (details?.pilotAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
+      if (details?.pilotAvailable && !details?.examTryoutAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
         await api("/live-speak/pilot/claim", "POST", {});
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
@@ -514,11 +514,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
-  // Pilot eligibility and the shared budget cap are independent. A learner may
-  // still be eligible to claim a pilot while the shared cap blocks new AI turns.
-  // Keep the on-device recorder available without bypassing server-side limits.
+  // A real, server-bounded AI examiner tryout is available once per month when
+  // normal pilot access is exhausted. No client-side quota override occurs.
+  const aiTryoutAvailable = examinerEntry && Boolean(details?.examTryoutAvailable);
+  const canStartAiExaminer = sessionsAvailable || aiTryoutAvailable ||
+    (Boolean(details?.pilotAvailable) && !details?.capReached);
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
-    (!details?.enabled || details?.capReached || (!sessionsAvailable && !details?.pilotAvailable));
+    (!details?.enabled || !canStartAiExaminer);
   const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
@@ -562,12 +564,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {["A1","A2","B1","B2","C1","C2"].map(option=><option key={option} value={option}>{option}</option>)}
             </select>
           </label> : null}
-          {details.capReached && !details.activeSession ? (
+          {details.capReached && !details.activeSession && !aiTryoutAvailable ? (
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Live AI voice sessions are paused by the shared safety budget. You can still record and replay your own practice below.</p>
-          ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
+          ) : (details.activeSession || sessionsAvailable || aiTryoutAvailable || details.pilotAvailable) ? (
             <div>
               <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
-                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start exam" : "Start speaking"}
+                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : aiTryoutAvailable ? "Try AI examiner" : examinerEntry ? "Start exam" : "Start speaking"}
               </button>
             </div>
           ) : (
