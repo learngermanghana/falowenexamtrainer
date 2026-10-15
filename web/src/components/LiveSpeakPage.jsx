@@ -306,7 +306,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setAudioRetry(null);
       setRecognizedText("");
       setLastAudio(result.audioBase64);
-      setNotice("");
+      setNotice(result.voiceUnavailable ? "Your answer was saved. Voice playback is temporarily unavailable; follow the examiner's next written instruction." : "");
       await playVoice(result.audioBase64);
     } catch (err) {
       if (mounted.current) {
@@ -804,11 +804,26 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
           <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
           {examAssessment ? <div aria-label="Speaking practice score" style={{border:"1px solid #cbd5e1",borderRadius:12,padding:14,display:"grid",gap:8}}>
-            <strong style={{fontSize:24}}>{examAssessment.score} / {examAssessment.maxScore} points · {examAssessment.percent}%</strong>
-            <small>Falowen CEFR {examAssessment.level} practice assessment — not an official Goethe score.</small>
-            {(examAssessment.tasks || []).map(item=><div key={item.step} style={{display:"flex",justifyContent:"space-between",gap:10,fontSize:13}}>
-              <span>Task {item.step} · {item.comment || "Reviewed"}</span><strong style={{whiteSpace:"nowrap"}}>{item.score}/{item.maxScore}</strong>
-            </div>)}
+            <strong style={{fontSize:24}}>{examAssessment.percent}% · Practice result</strong>
+            <small>Falowen CEFR {examAssessment.level} transcript-based assessment — not an official Goethe score. Pronunciation is not graded.</small>
+            {examAssessment.rubric?.dimensions ? <div aria-label="Level-specific speaking rubric" style={{display:"grid",gap:8}}>
+              {Object.entries(examAssessment.rubric.dimensions).map(([key,item])=><div key={key} style={{display:"grid",gap:2,borderTop:"1px solid #e2e8f0",paddingTop:7}}>
+                <div style={{display:"flex",justifyContent:"space-between",gap:12,fontSize:13}}><strong>{item.label}</strong><span>{item.score}/{item.maxScore}</span></div>
+                {item.evidence ? <small style={{color:"#475569"}}>{item.evidence}</small> : null}
+              </div>)}
+            </div> : null}
+            <details><summary>Task-by-task assessment · {examAssessment.score}/{examAssessment.maxScore} actions points</summary>
+              {(examAssessment.tasks || []).map(item=><p key={item.step} style={{margin:"6px 0",fontSize:13}}>
+                Task {item.step} · {item.score}/{item.maxScore} · {item.comment || "Reviewed"}
+              </p>)}
+            </details>
+            {examAssessment.corrections?.length ? <div aria-label="Verified German corrections" style={{display:"grid",gap:7}}>
+              <strong>Corrections from your actual answer</strong>
+              {examAssessment.corrections.map((item,index)=><div key={index} style={{fontSize:13,lineHeight:1.5}}>
+                <p style={{margin:0}} lang="de"><s>{item.original}</s> → <strong>{item.corrected}</strong></p>
+                <small>{item.explanation}</small>
+              </div>)}
+            </div> : null}
           </div> : null}
           {details?.lastExamResult?.examTask?.prompt ? <p style={{margin:0,fontSize:13}}>{details.lastExamResult.level} · {details.lastExamResult.examTask.prompt}</p> : null}
           {messages.filter(message => message.role === "user").length ? (
