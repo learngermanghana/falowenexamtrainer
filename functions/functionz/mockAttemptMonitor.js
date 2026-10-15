@@ -164,9 +164,16 @@ const normalizeMockAttempt = doc => {
   const level = MOCK_PARENTS[parts[0]];
   if (!level) return null;
   const data = doc.data() || {};
-  const scores = data.sectionScores || {};
+  // Completed mocks must display the server-verified four-skill breakdown,
+  // never stale browser-supplied scores. This is also the authoritative source
+  // for completed-section progress (historical attempts may have only
+  // verifiedSectionScores and no sectionScores field).
+  const savedVerifiedScores = verifiedMockBreakdown(data);
+  const scores = savedVerifiedScores || data.sectionScores || {};
   const completedSections = SECTIONS.filter(section =>
-    scores[section] !== undefined && scores[section] !== null && Number.isFinite(Number(scores[section]))
+    scores[section] !== undefined && scores[section] !== null &&
+    Number.isFinite(Number(scores[section])) &&
+    (data.status !== "completed" || verifiedScore(scores[section]) !== null)
   );
   const state = data.state && typeof data.state === "object" ? data.state : {};
   const deadline = Number(state.sectionDeadlineMs);
@@ -189,7 +196,8 @@ const normalizeMockAttempt = doc => {
     updatedAt: iso(data.updatedAt),
     completedAt: iso(data.completedAt),
     overallScore: hasVerifiedOverall(data) ? Number(data.verifiedOverall.score) : null,
-    sectionScores: verifiedMockBreakdown(data),
+    sectionScores: savedVerifiedScores,
+    scoreSource: savedVerifiedScores ? "verified_attempt" : null,
   };
 };
 
