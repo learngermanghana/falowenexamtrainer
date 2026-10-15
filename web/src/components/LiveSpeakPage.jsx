@@ -296,6 +296,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         setSession(active);
         setMessages(active.messages || []);
         setPending(active.pending || null);
+        setAnswerMode(active.pending?.typed ? "type" : "record");
         setRecognizedText(active.pending?.transcript || "");
         setAudioRetry(null);
         setNotice("Your saved answer has been recovered. Review it before continuing.");
@@ -350,6 +351,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               setSession(restored);
               setMessages(restored.messages || []);
               setPending(restored.pending || null);
+              setAnswerMode(restored.pending?.typed ? "type" : "record");
               setRecognizedText(restored.pending?.transcript || "");
             }
           } catch (_restoreError) { /* Resume can recover saved text later. */ }
@@ -427,6 +429,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       autoFeedbackRequested.current=false;
       setRecognitionCorrection(false);
       setPending(result.pending || null);
+      setAnswerMode(result.pending?.typed ? "type" : "record");
       setRecognizedText(result.pending?.transcript || "");
       if (result.resumed) {
         setMessages(result.messages || []);
@@ -903,7 +906,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
                   value={pending ? recognizedText : ""}
-                  readOnly={!pending || (simulation && !recognitionCorrection)}
+                  readOnly={!pending || (simulation && !pending.typed && !recognitionCorrection)}
                   maxLength={session.maxTranscriptChars || 600}
                   onChange={event=>setRecognizedText(event.target.value)}
                   style={{minWidth:0,minHeight:60,flex:1,resize:"vertical",border:"1px solid #cbd5e1",borderRadius:12,padding:10,fontSize:16,background:pending?"#fff":"#f8fafc"}}/>
