@@ -85,7 +85,9 @@ function A2Mock2ExamHubAttempt(){
    if(i<0)return current;
    return {...current,stage:i===3?"result":ORDER[i+1]};
   });
-  announceExamSuccess(`${{ lesen: "Lesen", hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage] || "Mock"} completed. Continue to the next section.`);
+  announceExamSuccess(stage === "sprechen"
+    ? "A2 Mock 2 completed. Review your progress."
+    : `${{ lesen: "Lesen", hoeren: "Hören", schreiben: "Schreiben" }[stage] || "Mock"} completed. Continue to the next section.`);
   window.scrollTo({top:0,behavior:"smooth"});
  },[STORAGE, stage]);
  const start = () => {
