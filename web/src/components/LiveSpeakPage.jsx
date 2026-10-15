@@ -485,8 +485,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
+  // Pilot eligibility and the shared budget cap are independent. A learner may
+  // still be eligible to claim a pilot while the shared cap blocks new AI turns.
+  // Keep the on-device recorder available without bypassing server-side limits.
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
-    (!details?.enabled || (!sessionsAvailable && !details?.pilotAvailable));
+    (!details?.enabled || details?.capReached || (!sessionsAvailable && !details?.pilotAvailable));
   const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
