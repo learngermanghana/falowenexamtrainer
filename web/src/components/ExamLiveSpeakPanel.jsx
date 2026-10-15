@@ -10,7 +10,7 @@ export default function ExamLiveSpeakPanel({
   const [sessionActive,setSessionActive]=useState(false);
   const [examMode,setExamMode]=useState("guided");
   const handleActivity=useCallback(value=>{setSessionActive(value);onActivityChange?.(value);},[onActivityChange]);
-  const supported=["A1","A2","B1","B2"].includes(level);
+  const supported=["A1","A2","B1","B2","C1","C2"].includes(level);
   const selectedTopic = question?.topicPrompt || question?.text || "Goethe speaking exam practice";
   const examinerTask = question ? {
     id: question.id,
@@ -41,7 +41,7 @@ export default function ExamLiveSpeakPanel({
                 <option value="all">All parts</option>
                 <option value="1">Teil 1</option>
                 <option value="2">Teil 2</option>
-                {level !== "B2" ? <option value="3">Teil 3</option> : null}
+                {!["B2","C1","C2"].includes(level) ? <option value="3">Teil 3</option> : null}
               </select>
             )}
           </label>
