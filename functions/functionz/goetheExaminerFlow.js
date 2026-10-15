@@ -154,6 +154,37 @@ function responsePlan(session) {
     ((flow.key === "C1-2" || flow.key === "C2-2") && n > 0 && n < profile.maxAnswers);
   return {dynamic,scripted:flow.key === "A2-3",step,previous,reply:step?.instruction || "Danke. Dieser Prüfungsteil ist beendet. Ihre Antworten sind gespeichert.",ready:!step};
 }
+// These are *interpretation hints* for the transcript-based A1 assessor, not
+// replacements for what the student actually said. The audio is not rescored.
+// German ASR often writes spelled letters as their spoken names (es, de, ...).
+const spokenLetterNames={
+  a:"A",ah:"A",b:"B",be:"B",c:"C",tse:"C",d:"D",de:"D",di:"D",
+  e:"E",f:"F",ef:"F",eff:"F",g:"G",ge:"G",h:"H",ha:"H",i:"I",
+  j:"J",jot:"J",k:"K",ka:"K",l:"L",el:"L",m:"M",em:"M",n:"N",en:"N",
+  o:"O",p:"P",pe:"P",q:"Q",ku:"Q",r:"R",er:"R",s:"S",es:"S",ess:"S",
+  t:"T",te:"T",u:"U",v:"V",fau:"V",w:"W",we:"W",x:"X",iks:"X",
+  y:"Y",ypsilon:"Y",z:"Z",tset:"Z",zett:"Z",
+};
+const spokenDigitNames={
+  null:"0",nul:"0",zero:"0",eins:"1",ein:"1",eine:"1",zwei:"2",zwo:"2",
+  drei:"3",vier:"4",fünf:"5",fuenf:"5",sechs:"6",sieben:"7",acht:"8",neun:"9",
+};
+function a1DictationEvidence(answers=[]) {
+  const tokenize=value=>String(value||"").toLocaleLowerCase("de-DE")
+    .replace(/[.,;:!?-]/g," ").split(/\\s+/).filter(Boolean);
+  const evidence=[];
+  const letters=tokenize(answers[1]);
+  if (letters.length>=3 && letters.length<=30 && letters.every(token=>spokenLetterNames[token])) {
+    evidence.push({step:2,action:"spell",possibleLetters:letters.map(token=>spokenLetterNames[token]).join(" "),
+      note:"Phonetic ASR letter names; verify against the actual name if known; do not treat these as grammatical words."});
+  }
+  const digits=tokenize(answers[2]);
+  if (digits.length>=5 && digits.length<=20 && digits.every(token=>spokenDigitNames[token] || /^[0-9]$/.test(token))) {
+    evidence.push({step:3,action:"number",possibleDigits:digits.map(token=>spokenDigitNames[token] || token).join(""),
+      note:"Spoken German digits form a telephone number; written-out numbers are valid spoken responses."});
+  }
+  return evidence;
+}
 // Neutral, predictable hand-offs make A1/A2 feel like a polite real examiner.
 // Never introduce a new task: append the exact server-owned next instruction.
 function politeNextInstruction(session,plan,text) {
@@ -240,4 +271,4 @@ function calendarResponse(session, transcript) {
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
-module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,politeNextInstruction,partnerInstructions,mergeDecisions,calendarResponse};
+module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,politeNextInstruction,a1DictationEvidence,partnerInstructions,mergeDecisions,calendarResponse};
