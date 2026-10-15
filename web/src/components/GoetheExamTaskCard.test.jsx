@@ -70,3 +70,17 @@ test("a backend that has not received the examiner update cannot consume a new s
   expect(await screen.findByRole("alert")).toHaveTextContent("Examiner practice is temporarily unavailable.");
   expect(global.fetch).toHaveBeenCalledTimes(1);
 });
+
+test.each(["A2","B1"])("%s shows level-specific stage instructions on the existing card",level=>{
+  const task={teil:"Teil 2",prompt:"Freizeit"};
+  const preview=examinerTaskPreview(level,task);
+  render(<GoetheExamTaskCard flow={preview} topic={task.prompt}/>);
+  expect(screen.getByText(preview.stageGuide)).toBeInTheDocument();
+});
+
+test("A2 highlights each personal card and says whose question comes next",()=>{
+  const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 1",prompt:"Wohnort"});
+  render(<GoetheExamTaskCard flow={flows.publicFlow({examFlow,answeredTurns:3})} active/>);
+  expect(screen.getByText(/Card 2 of 4/)).toHaveTextContent("Answer your partner’s question.");
+  expect(screen.getAllByRole("listitem")[1]).toHaveAttribute("aria-current","step");
+});

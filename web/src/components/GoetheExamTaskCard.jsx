@@ -16,6 +16,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
   const requestCard=flow.key === "A1-3" ? flow.requestCards?.[requestRound] : null;
   return <section className="speaking-exam-task-card" aria-label="Speaking task card" style={{padding:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:8}}>
     <strong>{flow.title} · {flow.mode === "simulation" ? "Exam simulation" : "Guided practice"}</strong>
+    {flow.stageGuide ? <p style={{margin:0,fontSize:13,color:"#334155"}}>{flow.stageGuide}</p> : null}
     {flow.key === "A1-2" ? (
       <div className="speaking-exam-a1-topic" role="group" aria-label="A1 Teil 2 Thema">
         <span className="speaking-exam-a1-topic__label">THEMA</span>
@@ -26,7 +27,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
     {flow.cards?.length ? <div className={flow.key === "A1-2" ? "speaking-exam-word-cards speaking-exam-word-cards--a1" : "speaking-exam-word-cards"} role="list" aria-label="Word cards" style={{display:"flex",flexWrap:"wrap",gap:8}}>
       {flow.cards.map((card,index)=><span role="listitem" key={index} aria-current={active && index===cardIndex ? "step" : undefined}
         style={{padding:"8px 12px",border:active && index===cardIndex ? "2px solid #2563eb" : "1px solid #cbd5e1",borderRadius:8}}>
-        {flow.key === "A1-2" ? <small className="speaking-exam-word-label">WORTKARTE {index+1} / {flow.cards.length}</small> : null}
+        {["A1-2","A2-1"].includes(flow.key) ? <small className="speaking-exam-word-label">WORTKARTE {index+1} / {flow.cards.length}</small> : null}
         <strong lang="de" className={flow.key === "A1-2" ? "speaking-exam-keyword" : undefined}>{card}</strong>
       </span>)}
     </div> : null}
@@ -42,6 +43,9 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
         ? "Listen to the partner's request and respond politely."
         : "Ask the partner politely to do this action."}</small>
     </div> : null}
+    {active && flow.key === "A2-1" && flow.step ? <p role="status" style={{margin:0,color:"#1d4ed8"}}>
+      Card {cardIndex+1} of {flow.cards.length} · {flow.step.action === "ask-question" ? "Ask your partner a question." : "Answer your partner’s question."}
+    </p> : null}
     {flow.card ? <strong lang="de">Karte: {flow.card}</strong> : null}
     {flow.points?.length ? <ol style={{margin:"0 0 0 20px",padding:0}}>{flow.points.map(point=><li key={point} lang="de">{point}</li>)}</ol> : null}
     {flow.studentCalendar?.length ? <div><strong>Ihr Kalender · freie Termine</strong><ul style={{margin:"5px 0"}}>{flow.studentCalendar.map(slot=><li key={slot} lang="de">{slot}</li>)}</ul><small>Finden Sie einen Termin, der auch Ihrem Partner passt.</small></div> : null}

@@ -147,3 +147,39 @@ test("A1 Teil 2 retains two word-card question-and-answer rounds",()=>{
   expect(flows.responsePlan({examFlow,answeredTurns:1}).dynamic).toBe(true);
   expect(flows.responsePlan({examFlow,answeredTurns:3}).dynamic).toBe(true);
 });
+
+test.each(catalogue.b1PlanningTasks)("B1 planning matches the selected task: $match", ({match,points})=>{
+  const task={teil:"Teil 1",prompt:match};
+  const examFlow=flows.createExaminerFlow("B1",task);
+  const session={examFlow,level:"B1",examTask:task,answeredTurns:2};
+  expect(flows.currentStep(examFlow).instruction).toContain(match);
+  expect(flows.publicFlow(session).points).toEqual(points.map(point=>point.text));
+  expect(examinerTaskPreview("B1",task).points).toEqual(points.map(point=>point.text));
+  const decisions=points.map(point=>({point:point.id,value:"vereinbart",quote:"Ja, das machen wir so."}));
+  expect(flows.mergeDecisions(session,decisions,"Ja, das machen wir so.").complete).toBe(true);
+  expect(flows.mergeDecisions(session,decisions.slice(1),"Ja, das machen wir so.").complete).toBe(false);
+});
+
+test("A2 personal rounds answer the selected card question before asking the candidate",()=>{
+  const task={teil:"Teil 1",prompt:"Wohnort"};
+  const examFlow=flows.createExaminerFlow("A2",task);
+  const session={examFlow,examTask:task,level:"A2",answeredTurns:1};
+  const instructions=flows.partnerInstructions(session,flows.responsePlan(session));
+  expect(instructions).toContain("First answer the candidate's question naturally");
+  expect(instructions).toContain('"Wohnort"');
+  expect(flows.currentStep(examFlow,1).action).toBe("answer-question");
+});
+
+test.each([["A2","Teil 2","Was machen Sie am Wochenende?"],["B1","Teil 2","Ausbildung"]])("%s main speaking task announces the selected topic",(level,teil,prompt)=>{
+  const task={teil,prompt};const examFlow=flows.createExaminerFlow(level,task);
+  expect(flows.currentStep(examFlow).instruction).toContain(prompt);
+  expect(flows.publicFlow({examFlow}).stageGuide).toBe(examinerTaskPreview(level,task).stageGuide);
+});
+
+test("B1 discussion passes the retained own presentation to the interlocutor without exposing it as a model answer",()=>{
+  const examFlow=flows.createExaminerFlow("B1",{teil:"Teil 3",prompt:"Fragen stellen"});
+  examFlow.ownPresentation="Ich mache eine Ausbildung im Hotel.";
+  const session={examFlow,level:"B1",answeredTurns:2};
+  expect(flows.partnerInstructions(session,flows.responsePlan(session))).toContain(examFlow.ownPresentation);
+  expect(JSON.stringify(flows.publicFlow(session))).not.toContain(examFlow.ownPresentation);
+});

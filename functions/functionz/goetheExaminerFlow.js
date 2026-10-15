@@ -2,7 +2,10 @@
 const catalogue = require("../data/goetheExaminerFlows.json");
 const clean = (value, length=1200) => String(value || "").replace(/[\r\n\t]/g," ").trim().slice(0,length);
 const partNumber = task => String(task?.teil || "").match(/^(?:teil[-\s]*)?([123])$/i)?.[1] || "";
-const profileFor = flow => catalogue.profiles[flow?.key] || null;
+const profileFor = flow => {
+  const profile = catalogue.profiles[flow?.key];
+  return profile && flow.planningPoints ? {...profile, decisionPoints:flow.planningPoints.map(point=>point.id)} : profile || null;
+};
 const words = task => clean(task?.keywords || task?.prompt,120).split(/[,;·]/).map(x=>x.trim()).filter(Boolean);
 function selectedCards(word, defaults, count) {
   const normalize = value => value.trim().toLocaleLowerCase("de-DE");
@@ -30,6 +33,8 @@ function createExaminerFlow(level, task, mode="guided") {
   if (!profile) return null;
   const flow = {version:1,key,mode:mode === "simulation" ? "simulation" : "guided",decisions:[]};
   if (key === "A2-3") flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
+  if (key === "A2-2" || key === "B1-1" || key === "B1-2") flow.contextTopic = clean(task?.prompt,180);
+  if (key === "B1-1") flow.planningPoints = catalogue.b1PlanningTasks.find(item=>clean(task?.prompt).toLowerCase().includes(item.match.toLowerCase()))?.points;
   if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
   const selectedWord = words(task)[0] || "Freizeit";
   if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
@@ -64,10 +69,11 @@ function currentStep(flow, answered=0) {
       ? `Formulieren Sie bitte eine höfliche Bitte zu Ihrer Karte: „${card.word}“.`
       : card.partnerRequest;
   }
-  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : profile.opening;}
+  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : `Zum Thema „${flow.contextTopic || "Alltag"}“: ${profile.opening}`;}
   if (flow.key === "A2-3" || flow.key === "B1-1") action="negotiate";
   if (flow.key === "A2-3") instruction=flow.scenario + " Wann hast du Zeit?";
-  if (flow.key === "B1-2") action="presentation";
+  if (flow.key === "B1-1" && flow.contextTopic) instruction = `Planen Sie gemeinsam: ${flow.contextTopic}. Besprechen Sie: ${(flow.planningPoints || []).map(point=>point.text).join(" ") || "wann und wo, wie Sie hinkommen und wer was übernimmt"} Was schlägst du vor?`;
+  if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${profile.opening}`;}
   if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
   return {index:answered+1,action,role,instruction,seconds:profile.seconds[answered]};
 }
@@ -84,11 +90,11 @@ function publicFlow(session) {
   if (!profile) return null;
   const step=session.taskReady ? null : currentStep(flow,Number(session.answeredTurns)||0);
   return {version:1,key:flow.key,mode:flow.mode,title:profile.title,topic:flow.contextTopic || "",role:step?.role || "examiner",step,
-    maxAnswers:profile.maxAnswers,criteria:profile.criteria,
+    maxAnswers:profile.maxAnswers,criteria:profile.criteria,stageGuide:profile.stageGuide || "",
     hints:flow.mode === "guided" ? profile.hints : [],
     cards:flow.cards?.map(card=>card.word) || [],card:flow.card || "",
     requestCards:flow.requestCards?.map(card=>({word:card.word,symbol:card.symbol})) || [],
-    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
+    points:flow.key === "A1-1" ? ["Name","Alter","Land","Wohnort","Sprachen","Beruf","Hobby"] : flow.key === "B1-2" ? catalogue.presentationPoints : flow.key === "B1-1" ? flow.planningPoints?.map(point=>point.text) || ["Wann treffen wir uns?","Wo treffen wir uns?","Wie kommen wir hin?","Wer übernimmt was?"] : flow.points || [],
     studentCalendar:profile.studentCalendar || [],
     scenario:flow.scenario || "",
     partnerTopic:profile.partnerTopic || "",
@@ -111,7 +117,7 @@ function partnerInstructions(session,plan) {
   const negotiation=plan.previous?.action === "negotiate";
   const a1Instruction = flow.key === "A1-1" && plan.previous?.action === "number"
     ? "The candidate has already introduced themselves, spelled their surname and said a number. Ask exactly ONE short, easy A1 personal follow-up grounded in their introduction (hobby, job, home or languages). No extra subquestions. Do not repeat the spelling or number task. "
-    : flow.key === "A1-2" && plan.previous?.action === "ask-question"
+    : (flow.key === "A1-2" || flow.key === "A2-1") && plan.previous?.action === "ask-question"
     ? "First answer the candidate's question naturally in one short sentence, then ask ONE simple question about the displayed word card: " + JSON.stringify(flow.cards[Math.floor((Number(session.answeredTurns)-1)/2)]?.word || "") + ". "
     : flow.key === "A1-3" && plan.previous?.action === "make-request"
     ? "React naturally to the candidate's actual polite request (agree or politely refuse), then make exactly ONE separate polite request using the nextInstruction. Do not combine both into one question. "
@@ -128,6 +134,8 @@ function partnerInstructions(session,plan) {
     (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
     "State: " + JSON.stringify({task:session.examTask,role:plan.previous?.role,action:plan.previous?.action,
+      planningPoints:flow.planningPoints,
+      ownPresentation:flow.key === "B1-3" ? clean(flow.ownPresentation,2400) : undefined,
       candidateIntroduction:flow.key === "A1-1" ? clean(session.confirmedAnswers?.[0],450) : undefined,
       nextInstruction:flow.key === "A2-2" ? "Ask ONE concise relevant neutral follow-up about the student's account in German." : plan.step?.instruction || "End the task politely.",partnerPresentation:flow.key === "B1-3" ? profile.partnerPresentation : undefined,
       decisions:flow.decisions}) +
