@@ -171,7 +171,7 @@ const spokenDigitNames={
 };
 function a1DictationEvidence(answers=[]) {
   const tokenize=value=>String(value||"").toLocaleLowerCase("de-DE")
-    .replace(/[.,;:!?-]/g," ").split(/\\s+/).filter(Boolean);
+    .replace(/[.,;:!?-]/g," ").split(/\s+/).filter(Boolean);
   const evidence=[];
   const letters=tokenize(answers[1]);
   if (letters.length>=3 && letters.length<=30 && letters.every(token=>spokenLetterNames[token])) {
