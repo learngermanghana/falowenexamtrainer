@@ -189,9 +189,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         (Date.parse(running.expiresAt || "") > Date.now() || feedbackOpen(running));
       const info = receiptStatus(pilot?.data());
       const used = Number(usage?.data()?.turns) || 0;
-      const tryoutAvailable = enabled() && eligibleForTryout({
-        source:"exam-speaking-practice", flow:true, credit:pilot?.data() || {}, usage:used,
-      });
+      // Preserve the free two-session pilot whenever it can still be claimed.
+      // Only spend the tiny tryout reserve when normal access is not usable.
+      const canClaimPilot = !info.pilotClaimed &&
+        used + PILOT_SESSIONS * MAX_TURNS <= spendingCap();
+      const tryoutAvailable = enabled() &&
+        (used >= spendingCap() || (info.remaining <= 0 && !canClaimPilot)) &&
+        eligibleForTryout({
+          source:"exam-speaking-practice", flow:true, credit:pilot?.data() || {}, usage:used,
+        });
       return res.json({
         enabled: enabled(), pilotAvailable: enabled() && !info.pilotClaimed,
         sessionMinutes: 5, maxTurns: MAX_TURNS, examinerFlowVersion:1, ...info,
