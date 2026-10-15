@@ -1039,3 +1039,53 @@ test("setting LIVE_SPEAK_TESTING_ACCESS=false restores the monthly and pilot res
   expect(start.code).toBe(429);
   expect(start.payload.code).toBe("budget_reached");
 });
+
+
+test("open examiner testing does not unlock standalone, workbook or unstructured speaking use",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const month=new Date().toISOString().slice(0,7);
+  api.docs.set("liveSpeakUsage/"+month,{turns:52});
+  api.docs.set("liveSpeakPilotCredits/u123",{
+    pilotClaimed:true,remaining:0,expiresAt:"2025-01-01T00:00:00Z",
+  });
+  for(const source of ["standalone","course-workbook","a1-workbook","c2-workbook"]){
+    const request=await api.call("POST","/live-speak/session/start",{source,level:"A1"});
+    expect(request.code).toBe(429);
+    expect(request.payload.code).toBe("budget_reached");
+  }
+  const unstructured=await api.call("POST","/live-speak/session/start",{
+    source:"exam-speaking-practice",level:"A1",
+    examTask:{id:"legacy-exam",teil:"Teil 1",prompt:"Stellen Sie sich vor"},
+  });
+  expect(unstructured.code).toBe(429);
+  expect(api.docs.has("liveSpeakSessions/u123")).toBe(false);
+  // A previously started standalone session does not get the examiner's
+  // unlocked provider usage simply because open testing was enabled.
+  api.docs.set("liveSpeakSessions/u123",{
+    uid:"u123",sessionId:"standalone-old",source:"standalone",
+    expiresAt:new Date(Date.now()+100000).toISOString(),
+    turnsUsed:0,inFlight:false,endedAt:null,
+  });
+  const blocked=await api.call("POST","/live-speak/session/turn",{
+    sessionId:"standalone-old",intro:true,
+  });
+  expect(blocked.code).toBe(429);
+  expect(blocked.payload.code).toBe("budget_reached");
+  expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
+});
+
+test("open examiner mode preserves the old standalone credit-claim path",async()=>{
+  const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.openTesting).toBe(true);
+  expect(status.payload.pilotAvailable).toBe(true);
+  expect(status.payload.actualRemaining).toBe(0);
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+  const session=await api.call("POST","/live-speak/session/start",{
+    level:"A2",source:"standalone",
+  });
+  expect(session.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+});
