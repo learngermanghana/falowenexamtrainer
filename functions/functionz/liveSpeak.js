@@ -384,7 +384,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
         examFlow = session.examFlow || null;
         maxTranscriptChars=transcriptLimit(session);
-        const uploadLimit = session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES;
+        const uploadLimit = session.examFlow?.key === "B1-2" ? audioAllowance(session) : session.examFlow ? stepAudioBytes(session) : MAX_AUDIO_BYTES;
         if (!intro && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
         if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
