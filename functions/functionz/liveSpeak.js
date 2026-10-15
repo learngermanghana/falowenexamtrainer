@@ -144,7 +144,9 @@ const transcriptUncertain = (recognition) => {
     ? recognition.logprobs.map(entry => Number(entry?.logprob)).filter(Number.isFinite)
     : [];
   const average = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
-  return average !== null && average < -0.8;
+  // A single badly recognised word in rapid connected speech can be hidden
+  // by a confident sentence average. Flag it for human transcript review too.
+  return average !== null && (average < -0.8 || values.some(value => value < -1.75));
 };
 const germanTranscriptionPrompt = (level) =>
   "Dies ist eine Deutsch-Sprechübung auf Niveau " + level +
