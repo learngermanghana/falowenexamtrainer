@@ -5,6 +5,8 @@ import LiveSpeakPage from "./LiveSpeakPage";
 import {useAuth} from "../context/AuthContext";
 
 jest.mock("../context/AuthContext",()=>({useAuth:jest.fn()}));
+jest.mock("../services/presentationCoachService",()=>({requestCoachSpeech:jest.fn()}));
+import {requestCoachSpeech} from "../services/presentationCoachService";
 const examTask={id:"a1-intro",teil:"Teil 1",prompt:"Stellen Sie sich bitte vor"};
 const examFlow={key:"A1-1",mode:"guided",title:"Sich vorstellen",cards:[],points:[],hints:[],step:{index:1,role:"examiner",seconds:60},maxAnswers:4};
 const session={sessionId:"exam-turn",level:"A1",source:"exam-speaking-practice",examTask,topic:examTask.prompt,
@@ -24,14 +26,14 @@ beforeEach(()=>{
 });
 afterEach(()=>jest.restoreAllMocks());
 
-test("examiner automatically speaks German, then releases red microphone when audio finishes",async()=>{
+test("examiner automatically speaks German, then releases microphone when audio finishes",async()=>{
   const voices=[];
   global.Audio=jest.fn(()=>{
     const player={play:jest.fn(async()=>{}),pause:jest.fn(),onended:null,onerror:null};
     voices.push(player);return player;
   });
   mount();
-  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
   expect(await screen.findByText("Guten Tag. Stellen Sie sich bitte vor.")).toBeInTheDocument();
   expect(await screen.findByText("Examiner speaking")).toBeInTheDocument();
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
@@ -57,7 +59,7 @@ test("blocked autoplay gives a replay option and actionable microphone permissio
   }});
   try {
     mount();
-    fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+    fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
     expect(await screen.findByText("Examiner audio needs a replay")).toBeInTheDocument();
     expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
     fireEvent.click(screen.getByRole("button",{name:"Record German answer"}));
@@ -73,7 +75,7 @@ test("blocked autoplay gives a replay option and actionable microphone permissio
 });
 
 
-test("long examiner conversation scrolls within the old coach bubbles and keeps the red recorder below",async()=>{
+test("long examiner conversation scrolls within the old coach bubbles and keeps recording controls below",async()=>{
   const turns=Array.from({length:28},(_,i)=>({
     role:i%2===0?"assistant":"user",
     text:(i%2===0?"Bitte antworten Sie auf Deutsch. ":"Ich spreche gern Deutsch. ").repeat(8),
@@ -85,7 +87,7 @@ test("long examiner conversation scrolls within the old coach bubbles and keeps 
     throw new Error("Unexpected network request "+url);
   });
   mount();
-  fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
   const log=await screen.findByRole("log",{name:"Examiner conversation"});
   expect(log.querySelectorAll(".speaking-exam-message-bubble")).toHaveLength(28);
   expect(log.querySelectorAll(".speaking-exam-message-row.is-student")).toHaveLength(14);
@@ -134,9 +136,9 @@ test("an exhausted pilot starts a real AI examiner tryout instead of local-only 
     throw new Error("Unexpected network request "+url);
   });
   mount();
-  expect(await screen.findByRole("button",{name:"Try AI examiner"})).toBeInTheDocument();
+  expect(await screen.findByRole("button",{name:"Start speaking"})).toBeInTheDocument();
   expect(screen.queryByRole("button",{name:"Record local speaking practice"})).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button",{name:"Try AI examiner"}));
+  fireEvent.click(screen.getByRole("button",{name:"Start speaking"}));
   expect(await screen.findByText("Guten Tag. Stellen Sie sich bitte vor.")).toBeInTheDocument();
   expect(await screen.findByText("Examiner speaking")).toBeInTheDocument();
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
@@ -170,7 +172,7 @@ test("completed Teil automatically saves feedback and offers continue instead of
  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
    practiceTopic={examTask.prompt} examTask={examTask}
    onExamCompleted={completed} onContinueToNext={next}/></MemoryRouter>);
- fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+ fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
  expect(await screen.findByRole("button",{name:/Continue to Teil 2/})).toBeInTheDocument();
  expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/exam-feedback"))).toHaveLength(1);
  expect(completed).toHaveBeenCalledWith(expect.objectContaining({
@@ -200,7 +202,7 @@ test("unfinished Teil needs confirmation before ending without feedback",async()
    throw new Error("Unexpected "+url);
  });
  mount();
- fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+ fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
  fireEvent.click(await screen.findByRole("button",{name:"Leave this Teil"}));
  expect(screen.getByRole("alertdialog",{name:"Leave unfinished speaking task"})).toBeInTheDocument();
  expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/end"))).toBe(false);
@@ -223,6 +225,48 @@ test("deliberate repeat does not restore old feedback over the new attempt",asyn
   });
   render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
     practiceTopic={examTask.prompt} examTask={examTask} freshAttempt /></MemoryRouter>);
-  expect(await screen.findByRole("button",{name:"Start exam"})).toBeInTheDocument();
+  expect(await screen.findByRole("button",{name:"Start speaking"})).toBeInTheDocument();
   expect(screen.queryByText("Old completed attempt")).not.toBeInTheDocument();
+});
+
+
+test("an empty resumed session requests its missing spoken opening",async()=>{
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,examinerFlowVersion:1});
+    if(String(url).endsWith("/start")) return ok({...session,resumed:true,messages:[],answeredTurns:0});
+    if(String(url).endsWith("/turn")) return ok({reply:"Stellen Sie sich bitte vor.",audioBase64:"YXVkaW8="});
+    throw new Error("Unexpected request "+url);
+  });
+  global.Audio=jest.fn(()=>({play:jest.fn().mockResolvedValue(),pause:jest.fn()}));
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
+  expect(await screen.findByText("Stellen Sie sich bitte vor.")).toBeInTheDocument();
+  expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/turn"))).toHaveLength(1);
+  expect(screen.getByLabelText("Examiner audio player")).toBeInTheDocument();
+});
+
+test("recording does not remove the examiner replay button",async()=>{
+  global.Audio=jest.fn(()=>({play:jest.fn().mockResolvedValue(),pause:jest.fn()}));
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
+  const player=await screen.findByLabelText("Examiner audio player");
+  expect(player).toHaveAttribute("controls");
+  expect(screen.getByRole("button",{name:"Replay examiner audio"})).toBeInTheDocument();
+});
+
+test("saved questions can request German audio on demand without replaying the opening",async()=>{
+  const resume={...session,resumed:true,messages:[{role:"assistant",text:"Wie heißen Sie?"}],answeredTurns:1};
+  global.fetch=jest.fn(async(url)=>ok(String(url).endsWith("/status")?{enabled:true,activeSession:resume}:resume));
+  requestCoachSpeech.mockResolvedValue("blob:examiner-replay");
+  global.Audio=jest.fn(()=>({play:jest.fn().mockResolvedValue(),pause:jest.fn()}));
+  const priorRevoke=URL.revokeObjectURL;URL.revokeObjectURL=jest.fn();
+  try {
+    const view=mount();
+    fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+    fireEvent.click(await screen.findByRole("button",{name:"Replay examiner audio"}));
+    await waitFor(()=>expect(requestCoachSpeech).toHaveBeenCalledWith(expect.objectContaining({text:"Wie heißen Sie?",level:"A1",idToken:"token"})));
+    expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/turn"))).toBe(false);
+    view.unmount();
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:examiner-replay");
+  } finally {URL.revokeObjectURL=priorRevoke;}
 });
