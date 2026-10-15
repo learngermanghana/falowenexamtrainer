@@ -518,7 +518,9 @@ test("B1 presentation accepts its larger recording but remains inside the origin
   const api=setup(); const session=await startTaskFlow(api,"B1",2);
   expect(session.maxRecordingSeconds).toBe(180);
   expect(session.maxAudioBytes).toBe(700000);
-  const recorded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,mimeType:"audio/webm",audioBase64:Buffer.alloc(550000,65).toString("base64")});
+  // 675 kB is above the mistaken 630 kB estimate, but within the 700 kB
+  // presentation limit advertised by the client.
+  const recorded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,mimeType:"audio/webm",audioBase64:Buffer.alloc(675000,65).toString("base64")});
   expect(recorded.code).toBe(200);
   expect(api.docs.get(usageKey()).turns).toBe(2);
   const done=await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:recorded.payload.pendingId,transcript:"Ich möchte über meine Ausbildung sprechen. ".repeat(55)});
@@ -724,3 +726,33 @@ test.each([["C1",1,300,2],["C1",2,75,4],["C2",1,300,3],["C2",2,90,4]])(
     expect(started.maxAudioBytes).toBeGreaterThanOrEqual(350000);
   }
 );
+
+test("B1 Teil 2 rejects a recording above its advertised 700 kB upload limit",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"B1",2);
+  expect(session.maxAudioBytes).toBe(700000);
+  const rejected=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.alloc(700001,65).toString("base64"),
+  });
+  expect(rejected.code).toBe(413);
+  expect(rejected.payload.code).toBe("audio_too_large");
+  expect(api.docs.get(sessionKey).audioBytesUsed || 0).toBe(0);
+  expect(api.docs.get(usageKey())?.turns || 0).toBe(0);
+});
+
+test.each([
+  ["C1",1,420,20],["C1",2,300,20],
+  ["C2",1,450,20],["C2",2,360,20],
+  ["B1",2,180,10],
+])("%s Teil %s session lifetime covers %s seconds of speaking",async(level,part,requiredSpeechSeconds,minimumMinutes)=>{
+  const api=setup(); const session=await startTaskFlow(api,level,part);
+  const allotted=Date.parse(session.expiresAt)-Date.now();
+  expect(session.answerLimit).toBeGreaterThan(0);
+  expect(allotted).toBeGreaterThanOrEqual((minimumMinutes*60-3)*1000);
+  expect(allotted).toBeLessThanOrEqual((minimumMinutes*60+1)*1000);
+  if (level==="C2" && part===1) {
+    // 7m30s of speech, with at least 12m30s for three uploads,
+    // processing, transcript confirmation and examiner playback.
+    expect(allotted/1000-requiredSpeechSeconds).toBeGreaterThan(12*60);
+  }
+});
