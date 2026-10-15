@@ -6,7 +6,7 @@ import GoetheExamTaskCard from "./GoetheExamTaskCard";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
-import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
+import { microphoneFailureMessage } from "../lib/liveSpeakDevice";
 import { matchingExamResult, nextExamTeil } from "../lib/speakingPracticeHistory";
 
 const MAX_RECORDING_SECONDS = 20;
@@ -613,7 +613,6 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     (Boolean(details?.pilotAvailable) && !details?.capReached);
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
     (!details?.enabled || !canStartAiExaminer);
-  const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
       style={embedded
@@ -724,7 +723,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             <span className={recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
             <strong>{recording ? "🔴 Recording your answer" : busy ? "⏳ AI is preparing the question…" : voiceState==="playing" ? "🔊 AI examiner is speaking…" : voiceState==="blocked" ? "Tap Replay to hear the question" : taskReady ? "✓ Answers saved" : "Your turn — Record or Type"}</strong>
             <small>{recording ? "Tap Stop to send the recording." : busy ? "The next question is being prepared." : voiceState==="playing" ? "Listen first. The microphone unlocks after the examiner finishes." : "Read the question and answer in German."}</small>
-          </div> : null>
+          </div> : null}
           {examinerSession && messages.some(message=>message.role==="assistant") ? <div aria-label="Current examiner question" style={{display:"grid",gap:5,padding:12,background:"#eff6ff",border:"1px solid #bfdbfe",borderRadius:12}}>
             <strong style={{fontSize:13,color:"#1d4ed8"}}>Current question</strong>
             <p lang="de" style={{margin:0,fontSize:17,fontWeight:600,lineHeight:1.55}}>{messages.filter(message=>message.role==="assistant").at(-1)?.text}</p>
