@@ -694,12 +694,18 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           ready=ready || merged.complete;
           if (merged.complete) reply="Danke. Dann halten wir unseren gemeinsamen Plan so fest. Dieser Prüfungsteil ist beendet.";
         }
+        // Neutral acknowledgements belong to the server-owned next question,
+        // never to a partner's answer to the student's own question or request.
+        if (!ready && !plan.scripted && (flowSession.examFlow.key==="A1-1" || !plan.dynamic)) {
+          reply=taskFlows.politeNextInstruction(flowSession,plan,reply);
+        }
         // A short partner answer and the next examiner instruction are distinct turns.
         // A1/A2 question cards and A1 requests must never let the model invent a new task.
         const separateNext=Boolean(!ready && plan.dynamic && plan.step &&
           (["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question" ||
            flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request"));
-        const nextInstruction=separateNext ? plan.step.instruction.trim() : "";
+        const nextInstruction=separateNext
+          ? taskFlows.politeNextInstruction(flowSession,plan,plan.step.instruction) : "";
         const speech=nextInstruction ? reply+"\n\n"+nextInstruction : reply;
         const replySpeaker=(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner";
         const additions=[{role:"user",text:confirmed},{role:"assistant",speaker:replySpeaker,text:reply}];
@@ -779,7 +785,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const plan=taskFlows.responsePlan(flowSession);
         const ready=examRecovery ? examRecovery.ready : Boolean(plan.ready);
         const reply=examRecovery?.reply || (ready ? "Danke. Dieser Prüfungsteil ist beendet." : "Danke.");
-        const nextInstruction=examRecovery?.nextInstruction || (!ready ? String(plan.step?.instruction || "") : "");
+        const nextInstruction=examRecovery?.nextInstruction || (!ready
+          ? taskFlows.politeNextInstruction(flowSession,plan,plan.step?.instruction || "") : "");
         const replySpeaker=examRecovery?.replySpeaker || "examiner";
         const additions=examRecovery?.additions || [
           {role:"user",text:answers.at(-1)},
@@ -860,6 +867,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.examFlow?.key === "B1-3") task={...task,prompt:"Discuss presentations: " + record.examFlow.contextTopic};
         examContext = record.examFlow ? {flow:taskFlows.publicFlow(record),dialogue:savedMessages(record),
           promptedSteps:(record.promptedSteps || []).slice(0,confirmedAnswers(record).length),
+          ...(record.examFlow.key === "A1-1"
+            ? {dictationEvidence:taskFlows.a1DictationEvidence(confirmedAnswers(record))} : {}),
           requiredCriteria:taskFlows.profileFor(record.examFlow)?.criteria,
           ownPresentation:record.examFlow.ownPresentation || null,sectionEnded:taskFlows.isReady(record),completedAllTurns:taskFlows.isComplete(record),taskComplete:taskFlows.isComplete(record),reachedTurnLimit:Number(record.answeredTurns)>=answerLimit(record),
           recognitionCorrections:(record.recognitionReviews || []).filter(r=>r.corrected).length} : null;
@@ -883,7 +892,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           "Score 2 for a successfully achieved speaking action, 1 for partial achievement, 0 for not achieved. " +
           "Assess according to the supplied CEFR level, speaking act and task-specific criteria. " +
           "A1 simple questions and answers must not be judged as C1 essays; C2 must demonstrate precision and nuanced argumentation. " +
-          "Allow alternative valid German responses, not just one model answer. Do NOT invent facts or questions, " +
+          "Allow alternative valid German responses, not just one model answer. Do NOT invent facts or questions. " +
+          "In A1 Teil 1, recognise that spelling a surname may be transcribed phonetically as German letter names: " +
+          "for example 'a es a di u' can represent A-S-A-D-U. Treat separately spoken letters as spelling, not a sentence. " +
+          "Use any examContext.dictationEvidence only as a possible reading, not proof of the actual surname. " +
+          "A telephone number spoken as 'null, zwei, vier, fünf, null, zwei, zwei, sieben, vier, drei' " +
+          "is a valid sequence of digits; do not require the ASR transcript to show numerals. " +
+          "For a simple A1 free-time question, 'Ich trinke gern Kaffee' describes an activity and is a relevant answer; " +
+          "do not require stereotypical hobbies such as sport or reading. " +
+          "Only mention actual, supported learner errors, never infer pronunciation errors from ASR spellings. " +
           "Do NOT assert a pronunciation score, accent, fluency or intonation: only editable transcripts were provided. " +
           "For each step, use examContext.promptedSteps as the authoritative questions and actions actually presented. " +
           "Grade ONLY the student responses with a corresponding step; never deduct points for later steps that were not reached or asked. " +
