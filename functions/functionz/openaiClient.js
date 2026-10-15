@@ -1,4 +1,5 @@
 const OpenAI = require("openai");
+const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
 const { createLogger } = require("./logger");
 const { incrementCounter } = require("./metrics");
 
@@ -19,19 +20,19 @@ const getOpenAIClient = () => {
 
 const createChatCompletion = async (messages, options = {}, requestOptions = {}) => {
   const clientInstance = getOpenAIClient();
-  const model = options.model || process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const model = resolveChatModel(options.model || process.env.OPENAI_MODEL);
   const startedAt = Date.now();
 
   incrementCounter("openai_requests", model);
 
   try {
-    const response = await clientInstance.chat.completions.create({
+    const response = await clientInstance.chat.completions.create(buildChatRequest({
       model,
       temperature: 0.4,
       max_tokens: 750,
       messages,
       ...options,
-    }, requestOptions);
+    }), requestOptions);
 
     const reply = response?.choices?.[0]?.message?.content;
     if (!reply) {
