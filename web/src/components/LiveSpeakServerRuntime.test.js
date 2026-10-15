@@ -896,3 +896,39 @@ test("discard refuses stale candidates and in-flight work without clearing newer
   });
   expect(missing.code).toBe(400);
 });
+
+test("German transcription prompt handles naturally fast speech without inventing answers",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const r=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(r.code).toBe(200);
+  const opts=api.fakeClient.audio.transcriptions.create.mock.calls.at(-1)[0];
+  expect(opts.language).toBe("de");
+  expect(opts.prompt).toMatch(/sehr schnell/);
+  expect(opts.prompt).toMatch(/ohne Grammatikfehler zu verbessern/);
+  expect(opts.model).toBe("gpt-4o-transcribe");
+});
+
+test("recent in-flight turns are not resent; stale timed-out locks may safely be recovered",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const base=api.docs.get(sessionKey);
+  const currentTime=Date.now();
+  api.docs.set(sessionKey,{...base,inFlight:true,inFlightSince:currentTime-20_000});
+  const during=(await api.call("GET","/live-speak/status")).payload.activeSession;
+  expect(during.processingAnswer).toBe(true);
+  const blocked=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich spreche jeden Tag Deutsch."
+  });
+  expect(blocked.code).toBe(409);
+  expect(blocked.payload.code).toBe("turn_in_progress");
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  api.docs.set(sessionKey,{...base,inFlight:true,inFlightSince:currentTime-100_000});
+  const recovered=(await api.call("GET","/live-speak/status")).payload.activeSession;
+  expect(recovered.processingAnswer).toBe(false);
+  const resubmitted=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich spreche jeden Tag Deutsch."
+  });
+  expect(resubmitted.code).toBe(200);
+  expect(resubmitted.payload.needsConfirmation).toBe(true);
+  expect(api.docs.get(sessionKey).inFlight).toBe(false);
+  expect(api.docs.get(sessionKey).pendingTranscript).toBe("Ich spreche jeden Tag Deutsch.");
+});
