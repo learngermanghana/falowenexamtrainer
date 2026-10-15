@@ -46,9 +46,12 @@ test("examiner automatically speaks German, then releases microphone when audio 
 
 test("blocked autoplay gives a replay option and actionable microphone permission message",async()=>{
   const voices=[];
+  let playAttempts=0;
   global.Audio=jest.fn(()=>{
-    const player={play:jest.fn().mockRejectedValueOnce(new Error("Gesture required")).mockResolvedValue(undefined),
-      pause:jest.fn(),onended:null,onerror:null};
+    const player={play:jest.fn(()=>{
+      playAttempts++;
+      return playAttempts === 1 ? Promise.reject(new Error("Gesture required")) : Promise.resolve();
+    }),pause:jest.fn(),onended:null,onerror:null};
     voices.push(player);return player;
   });
   const previousMediaRecorder=global.MediaRecorder;
