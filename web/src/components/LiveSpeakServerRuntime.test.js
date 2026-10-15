@@ -816,3 +816,36 @@ test("a valid multi-dimensional rubric produces weighted A1 feedback with transc
   expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).assessment.percent).toBe(86);
   expect(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages[0].content).toContain("rubric");
 });
+
+test("typed A1 answers are charged and saved without a microphone, and Reset Session ends the attempt",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const used=api.docs.get(usageKey())?.turns || 0;
+  const written=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:session.sessionId,typed:true,transcript:"Wie viel kostet die Fahrkarte?"
+  });
+  expect(written.code).toBe(200);
+  expect(written.payload.taskReady).toBe(false);
+  expect(written.payload.nextInstruction).toBeTruthy();
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  expect(api.docs.get(usageKey()).turns).toBe(used+2);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toEqual(["Wie viel kostet die Fahrkarte?"]);
+  expect(api.docs.get(sessionKey).recognitionReviews[0].typed).toBe(true);
+  expect(api.docs.get(sessionKey).turnsUsed).toBe(1);
+  const finished=await api.call("POST","/live-speak/session/end",{sessionId:session.sessionId});
+  expect(finished.code).toBe(200);
+  expect(api.docs.get(sessionKey).endedAt).toBeTruthy();
+  const blocked=await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,typed:true,transcript:"Ich komme aus Ghana."});
+  expect(blocked.payload.code).toBe("session_ended");
+});
+
+test("typing cannot bypass an unconfirmed audio turn",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2);
+  const uploaded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,...audioPayload});
+  expect(uploaded.payload.pendingId).toBeTruthy();
+  const rejected=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:session.sessionId,typed:true,transcript:"Ich mag Reisen."
+  });
+  expect(rejected.code).toBe(409);
+  expect(rejected.payload.code).toBe("transcript_missing");
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(0);
+});
