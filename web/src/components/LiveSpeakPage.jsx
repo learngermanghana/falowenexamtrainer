@@ -9,7 +9,7 @@ import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
-import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
+import { microphoneFailureMessage, speakingTurnLabel, speakingRecordingBitrate } from "../lib/liveSpeakDevice";
 import { matchingExamResult, nextExamTeil } from "../lib/speakingPracticeHistory";
 
 const MAX_RECORDING_SECONDS = 20;
@@ -131,6 +131,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     if (!result.ok) {
       const err = new Error(data.error || "Live Speak is temporarily unavailable.");
       err.code = data.code;
+      err.status = result.status;
       throw err;
     }
     return data;
@@ -261,8 +262,19 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } catch (err) {
       if (mounted.current) {
         if (payload.audioBase64 && !payload.intro) {
-          setAudioRetry({sessionId:currentSession.sessionId, payload:{intro:false,audioBase64:payload.audioBase64,mimeType:payload.mimeType}});
-          setErrorMessage("Could not send the recording. Your audio remains on this device. Retry sending, or record again.");
+          // Only transport / transient failures are safe to resend. Expiry,
+          // quota, and size errors are definitive: a retry would fail again.
+          const terminalCodes = new Set(["session_ended","task_ready","audio_limit","audio_too_large",
+            "budget_reached","turn_limit","invalid_audio"]);
+          const retryable = !terminalCodes.has(err.code) && (
+            !err.status || err.status >= 500 || ["turn_in_progress","transcript_missing"].includes(err.code)
+          );
+          setAudioRetry(retryable
+            ? {sessionId:currentSession.sessionId,payload:{intro:false,audioBase64:payload.audioBase64,mimeType:payload.mimeType}}
+            : null);
+          setErrorMessage(retryable
+            ? "The upload was not confirmed. Your recording is still available below. Tap Check saved answer to recover it or retry safely."
+            : err.message + " Your recording is still available to preview below.");
         } else if (payload.intro && err.code === "intro_already_sent") {
           // A lost opening response must resume the server's saved question.
           const info = await api("/live-speak/status");
@@ -285,8 +297,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setErrorMessage("");
     let safeToResend = false;
     try {
-      // Always reconcile first: a lost HTTP response can arrive after the
-      // server has already saved a pending or completed candidate turn.
+      // A Vercel request can time out AFTER server acceptance. Ask Firestore
+      // first; do not charge for a duplicate transcript still processing.
       const info = await api("/live-speak/status");
       const active = info.activeSession;
       if (!active || active.sessionId !== audioRetry.sessionId) {
@@ -299,12 +311,18 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         setAnswerMode(active.pending?.typed ? "type" : "record");
         setRecognizedText(active.pending?.transcript || "");
         setAudioRetry(null);
-        setNotice("Your saved answer has been recovered. Review it before continuing.");
+        setNotice(active.pending
+          ? "Your answer reached Falowen. Please review and confirm the recovered transcript."
+          : "Your answer was already saved. Continue from the recovered examiner question.");
+      } else if (active.processingAnswer) {
+        setNotice("Falowen is still processing this recording. Please wait a moment, then tap Check saved answer again.");
       } else {
+        // Old in-flight locks can survive an interrupted serverless execution.
+        // Reconciliation must finish before any replacement /turn request.
         safeToResend = true;
       }
     } catch (_err) {
-      setErrorMessage("Unable to check if your answer was saved. Check your connection and retry. Nothing was uploaded again.");
+      setErrorMessage("Falowen cannot verify whether this answer reached the server. Check your connection and tap Check saved answer again. Your recording was not resent.");
     } finally {
       if (mounted.current) setBusy(false);
     }
@@ -573,7 +591,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       stopAudio();
       mediaRef.current = stream;
       const mime = voiceTypes.find(type => typeof MediaRecorder.isTypeSupported === "function" && MediaRecorder.isTypeSupported(type)) || "";
-      const recorder = new MediaRecorder(stream, {audioBitsPerSecond:24000, ...(mime ? {mimeType:mime} : {})});
+      const recorder = new MediaRecorder(stream, {
+        // Higher fidelity for fast speech without increasing per-step/server
+        // upload limits. Long presentations retain the economical bitrate.
+        audioBitsPerSecond: speakingRecordingBitrate({localOnly,maxRecordingSeconds:session?.maxRecordingSeconds}),
+        ...(mime ? {mimeType:mime} : {}),
+      });
       recorderRef.current = recorder;
       recorder.onerror = () => setErrorMessage("Recording was interrupted. Check microphone access and record again.");
       const chunks = [];
@@ -807,7 +830,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               : voiceState === "playing"
               ? "Please listen. Your microphone unlocks when the examiner finishes speaking."
               : voiceState === "blocked"
-                ? "Tap Listen to examiner, or read the German question."
+                ? "iPhone/Safari may require a tap to enable the examiner’s voice. Use the speaker button below."
                 : taskReady
                   ? "Answers saved. You’re ready for feedback."
                   : session.examFlow ? "Corrections come at the end of this exam task."
@@ -817,6 +840,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {session.examFlow?.step?.instruction || (busy ? "Die Frage wird vorbereitet …" : examTask?.prompt)}
           </p> : null}
           {openingFailed ? <button type="button" className="speaking-opening-retry" disabled={busy || recording} onClick={()=>sendTurn(session,{intro:true})}>Retry examiner opening</button> : null}
+          {examinerSession && voiceState === "blocked" && currentExaminerText ? (
+            <div className="speaking-voice-unlock" role="status" aria-label="Examiner audio requires a tap">
+              <strong>🔊 The examiner is ready to speak</strong>
+              <p>On iPhone, sound may need your permission. Tap below to hear the German question before recording.</p>
+              <button type="button" aria-label="Tap to hear the AI examiner" onClick={replayExaminer} disabled={busy || recording}>
+                ▶ Tap to hear the AI examiner
+              </button>
+            </div>
+          ) : null}
           {examinerSession && currentExaminerText ? <div className="speaking-current-question" aria-label="Current examiner question">
             <strong>AI question</strong>
             <p lang="de">{currentExaminerText}</p>
@@ -918,9 +950,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 </button> : null}
               </details> : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
-                <p role="alert">The recording is saved on this device, but the server has not confirmed it. Check your connection before retrying.</p>
+                <p role="alert">Your recording is safe on this device. Falowen is checking whether the answer already reached the examiner.</p>
                 <div className="speaking-exam-recovery__actions">
-                  <button type="button" onClick={retryRecordingUpload} disabled={busy || feedbackBusy}>Retry sending recording</button>
+                  <button type="button" onClick={retryRecordingUpload} disabled={busy || feedbackBusy}>Check saved answer / retry</button>
                   <button type="button" onClick={()=>{setAudioRetry(null);clearRecording();setErrorMessage("");setNotice("Record a new answer when you are ready.");}} disabled={busy}>Record again instead</button>
                 </div>
                 {studentAudioUrl ? <small>Your recording remains available in Preview your recording above.</small> : null}

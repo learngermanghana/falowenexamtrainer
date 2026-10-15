@@ -21,6 +21,10 @@ const EXAM_ANSWER_LIMIT = 2; // Main response, then one relevant follow-up.
 const FEEDBACK_GRACE_MS = 5 * 60 * 1000;
 const MAX_FEEDBACK_ATTEMPTS = 2;
 const PROVIDER_OPTIONS = { maxRetries: 0, timeout: 45000 };
+const IN_FLIGHT_LEASE_MS = 90 * 1000; // > provider timeout and Vercel's 60s execution limit.
+const hasStaleInFlight = session => Boolean(session?.inFlight) &&
+  Number(session.inFlightSince) > 0 &&
+  Date.now() - Number(session.inFlightSince) > IN_FLIGHT_LEASE_MS;
 const examiner = session => session.source === "exam-speaking-practice";
 const savedMessages = session => (Array.isArray(session.messages) ? session.messages : []).slice(-20);
 const answerLimit = session => session.examFlow ? taskFlows.maxAnswers(session) : EXAM_ANSWER_LIMIT;
@@ -52,6 +56,7 @@ const sessionView = session => ({
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
   pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain), typed:Boolean(session.pendingTyped) } : null,
+  processingAnswer:Boolean(session.inFlight) && !hasStaleInFlight(session),
   feedbackStatus: session.feedbackStatus || null,
   feedbackAttempts: Number(session.feedbackAttempts) || 0,
   feedback: session.feedback || "", examTryout: Boolean(session.examTryout), resumed: true,
@@ -129,8 +134,10 @@ const transcriptUncertain = (recognition) => {
 };
 const germanTranscriptionPrompt = (level) =>
   "Dies ist eine Deutsch-Sprechübung auf Niveau " + level +
-  ". Schreibe nur die tatsächlich gesprochenen Wörter auf Deutsch. " +
-  "Wenn die Aufnahme unklar ist, erfinde keine Wörter. Das Deutsch darf grammatische Fehler enthalten.";
+  ". Die Lernenden sprechen manchmal sehr schnell, mit natürlicher deutscher Aussprache " +
+  "und möglicherweise einem fremdsprachigen Akzent. Achte sorgfältig auf zusammengezogene " +
+  "Wörter und Satzgrenzen. Schreibe nur die tatsächlich gesprochenen Wörter auf Deutsch, " +
+  "ohne Grammatikfehler zu verbessern oder unklare Wörter zu erfinden.";
 const addDays = (milliseconds) => new Date(Date.now() + milliseconds).toISOString();
 const withinWindow = (sub) => Boolean(sub && Date.parse(sub.expiresAt || "") > Date.now());
 const receiptStatus = (sub) => ({
@@ -392,7 +399,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (examiner(session) && (session.taskReady || session.feedbackStatus || Number(session.answeredTurns) >= answerLimit(session))) {
           throw Object.assign(new Error("Your answers are saved. Finish the task to see feedback."), {status:409,code:"task_ready"});
         }
-        if (session.inFlight) throw Object.assign(new Error("Finish the current reply first."), {status:409,code:"turn_in_progress"});
+        if (session.inFlight && !hasStaleInFlight(session)) {
+          throw Object.assign(new Error("Your previous answer is still processing. Check your saved answer shortly."), {status:409,code:"turn_in_progress"});
+        }
+        // A timed-out serverless execution may leave inFlight=true. A lease
+        // older than the provider/Vercel timeouts may be reclaimed without
+        // adding cost outside the existing per-session/global quotas.
         if (typedTurn && !examiner(session)) throw Object.assign(new Error("Typing is available only in speaking exam practice."), {status:400,code:"typing_unavailable"});
         if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
         if ((Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
@@ -418,7 +430,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
         }
         tx.update(sessionRef, {
-          inFlight: true, turnsUsed: admin.firestore.FieldValue.increment(1),
+          inFlight: true, inFlightSince: Date.now(), turnsUsed: admin.firestore.FieldValue.increment(1),
           pendingId: null,
           ...(audioBytes && examiner(session) ? {audioBytesUsed:admin.firestore.FieldValue.increment(audioBytes.length)} : {}),
         });

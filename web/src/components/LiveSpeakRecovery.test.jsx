@@ -132,3 +132,100 @@ test("simulation transcript needs an explicit recognition-correction flag before
   fireEvent.click(screen.getByRole("checkbox",{name:"Correct a speech-recognition mistake only"}));
   expect(transcript).not.toHaveAttribute("readonly");
 });
+
+
+async function recordFailedExamAnswer({status=503,code="voice_unavailable",error="Temporary processing error",onStatus}={}) {
+  const active={...saved,resumed:true,answeredTurns:1,messages:[{role:"assistant",text:"Was essen Sie gern?"}]};
+  let lookups=0,uploadCalls=0;
+  global.fetch.mockImplementation(async url=>{
+    if(String(url).endsWith("/status")) {
+      lookups++;
+      return ok({enabled:true,activeSession:onStatus ? onStatus(lookups,active):active});
+    }
+    if(String(url).endsWith("/start")) return ok(active);
+    if(String(url).endsWith("/turn")) {
+      uploadCalls++;
+      return {ok:false,status,json:async()=>({code,error})};
+    }
+    throw new Error("Unexpected "+url);
+  });
+  let current=Date.now();
+  jest.spyOn(Date,"now").mockImplementation(()=>current);
+  const originalMediaRecorder=global.MediaRecorder,originalMedia=navigator.mediaDevices;
+  const originalObjectUrl=URL.createObjectURL,originalRevoke=URL.revokeObjectURL;
+  URL.createObjectURL=jest.fn(()=>"blob:fast-german-answer");
+  URL.revokeObjectURL=jest.fn();
+  let capturedRecorder;
+  const stop=jest.fn();
+  Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{
+    getUserMedia:jest.fn(async()=>({getTracks:()=>[{stop}]})),
+  }});
+  global.MediaRecorder=class {
+    static isTypeSupported(){return true;}
+    constructor(_stream,options) {
+      expect(options.audioBitsPerSecond).toBe(32000);
+      capturedRecorder=this;this.state="inactive";this.mimeType="audio/webm";
+    }
+    start(){
+      this.state="recording";
+      this.ondataavailable({data:new Blob([new Uint8Array(1800)],{type:"audio/webm"})});
+    }
+    stop(){this.state="inactive";this.onstop?.();}
+  };
+  const cleanup=()=>{
+    global.MediaRecorder=originalMediaRecorder;
+    Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:originalMedia});
+    URL.createObjectURL=originalObjectUrl;URL.revokeObjectURL=originalRevoke;
+  };
+  try {
+    const rendered=show();
+    fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+    fireEvent.click(await screen.findByRole("button",{name:"Record German answer"}));
+    await screen.findByRole("button",{name:"Stop and send recording"});
+    current+=2200;
+    fireEvent.click(screen.getByRole("button",{name:"Stop and send recording"}));
+    await waitFor(()=>expect(uploadCalls).toBe(1));
+    return {rendered,cleanup,uploadCount:()=>uploadCalls};
+  } catch(e) { cleanup();throw e; }
+}
+
+test("after an interrupted iPhone upload, checking status restores the saved transcript without sending twice",async()=>{
+  const x=await recordFailedExamAnswer({
+    onStatus:(lookup,active)=>lookup>=2
+      ? {...active,pending:{pendingId:"saved-pending",transcript:"Ich mag Gemüse.",typed:false}}
+      : active,
+  });
+  try {
+    expect(await screen.findByRole("group",{name:"Recover unsent speaking audio"})).toBeInTheDocument();
+    expect(screen.getByLabelText("Listen to your own recording")).toHaveAttribute("src","blob:fast-german-answer");
+    fireEvent.click(screen.getByRole("button",{name:"Check saved answer / retry"}));
+    expect(await screen.findByRole("textbox",{name:"What I said (you can edit this)"})).toHaveValue("Ich mag Gemüse.");
+    expect(x.uploadCount()).toBe(1);
+    expect(screen.queryByRole("group",{name:"Recover unsent speaking audio"})).not.toBeInTheDocument();
+  } finally {x.rendered.unmount();x.cleanup();}
+});
+
+test("a still-processing server keeps the device audio and does not create a duplicate turn",async()=>{
+  const x=await recordFailedExamAnswer({
+    code:"turn_in_progress",status:409,
+    onStatus:(lookup,active)=>lookup>=2 ? {...active,processingAnswer:true}:active,
+  });
+  try {
+    fireEvent.click(await screen.findByRole("button",{name:"Check saved answer / retry"}));
+    expect(await screen.findByText(/still processing this recording/)).toBeInTheDocument();
+    expect(x.uploadCount()).toBe(1);
+    expect(screen.getByRole("group",{name:"Recover unsent speaking audio"})).toBeInTheDocument();
+  } finally {x.rendered.unmount();x.cleanup();}
+});
+
+test("a rejected audio quota is reported honestly rather than as an internet failure",async()=>{
+  const x=await recordFailedExamAnswer({
+    status:429,code:"audio_limit",error:"The recording allowance is used. Finish with your saved answers.",
+  });
+  try {
+    expect(await screen.findByRole("alert")).toHaveTextContent("The recording allowance is used.");
+    expect(screen.queryByRole("group",{name:"Recover unsent speaking audio"})).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Listen to your own recording")).toHaveAttribute("src","blob:fast-german-answer");
+    expect(x.uploadCount()).toBe(1);
+  } finally {x.rendered.unmount();x.cleanup();}
+});

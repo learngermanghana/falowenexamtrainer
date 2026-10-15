@@ -46,9 +46,12 @@ test("examiner automatically speaks German, then releases microphone when audio 
 
 test("blocked autoplay gives a replay option and actionable microphone permission message",async()=>{
   const voices=[];
+  let playAttempts=0;
   global.Audio=jest.fn(()=>{
-    const player={play:jest.fn().mockRejectedValueOnce(new Error("Gesture required")).mockResolvedValue(undefined),
-      pause:jest.fn(),onended:null,onerror:null};
+    const player={play:jest.fn(()=>{
+      playAttempts++;
+      return playAttempts === 1 ? Promise.reject(new Error("Gesture required")) : Promise.resolve();
+    }),pause:jest.fn(),onended:null,onerror:null};
     voices.push(player);return player;
   });
   const previousMediaRecorder=global.MediaRecorder;
@@ -61,11 +64,14 @@ test("blocked autoplay gives a replay option and actionable microphone permissio
     mount();
     fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
     expect(await screen.findByText("Examiner audio needs a replay")).toBeInTheDocument();
+    expect(screen.getByRole("status",{name:"Examiner audio requires a tap"})).toHaveTextContent(/On iPhone/);
+    expect(screen.getByRole("button",{name:"Tap to hear the AI examiner"})).toBeVisible();
     expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
     fireEvent.click(screen.getByRole("button",{name:"Record German answer"}));
     expect(await screen.findByRole("alert")).toHaveTextContent(/Allow microphone permission/);
-    fireEvent.click(screen.getByRole("button",{name:/Listen to question again/}));
+    fireEvent.click(screen.getByRole("button",{name:"Tap to hear the AI examiner"}));
     await waitFor(()=>expect(screen.getByText("Examiner speaking")).toBeInTheDocument());
+    expect(screen.queryByRole("status",{name:"Examiner audio requires a tap"})).not.toBeInTheDocument();
     await act(async()=>voices[1].onended());
     expect(screen.getByText("Your turn to speak")).toBeInTheDocument();
   } finally {
