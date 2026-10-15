@@ -1589,7 +1589,7 @@ const ExamArea = ({ onBack }) => {
           </nav>
         </details>
         <div
-          className="exam-room-level-picker"
+          className={examSection === "speaking" ? "exam-room-level-picker exam-room-level-picker--speaking" : "exam-room-level-picker"}
           style={{
             ...styles.card,
             margin: 0,
@@ -1632,7 +1632,7 @@ const ExamArea = ({ onBack }) => {
           </small>
         </div>
 
-        {activeExamHero ? (
+        {activeExamHero && examSection !== "speaking" ? (
           <section
             style={{
               ...styles.card,
