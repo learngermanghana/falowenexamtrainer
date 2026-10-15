@@ -48,6 +48,7 @@ function setup(overrides = {}, authOverride = {}) {
     require:name=>{
       if(name==="crypto")return {randomUUID:()=>"unique-session-id"};
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
+      if(name==="./chatModelConfig")return require("../../../functions/functionz/chatModelConfig");
       if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
       throw new Error("Unexpected require "+name);
