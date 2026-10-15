@@ -870,7 +870,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                     voiceState==="playing" || taskReady || typedAnswer.trim().length<2}>
                   Send typed answer
                 </button>
-              </div>
+              </div>}
               {pending ? <details className="speaking-exam-transcript" aria-label="Review your words" open>
                 <summary>Your transcript</summary>
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
