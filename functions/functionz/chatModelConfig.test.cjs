@@ -1,13 +1,17 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
-test("retired defaults and environment overrides migrate, specialized models stay separate", () => {
-  for (const model of [undefined, " ", "gpt-4o-mini", "gpt-4o", "gpt-4.1", "gpt-4.1-mini-2025-04-14"])
-    assert.equal(resolveChatModel(model), "gpt-6-luna");
-  for (const model of ["gpt-4o-transcribe", "gpt-4o-mini-tts", "custom-model"])
-    assert.equal(resolveChatModel(model), model);
+const { DEFAULT_CHAT_MODEL, resolveChatModel, buildChatRequest } = require("./chatModelConfig");
+
+test("all Falowen text/chat requests are pinned to GPT-6 Luna despite previous overrides", () => {
+  assert.equal(DEFAULT_CHAT_MODEL, "gpt-6-luna");
+  for (const requested of [
+    undefined, "", " ", "gpt-4o", "gpt-4o-mini",
+    "gpt-4.1", "gpt-4.1-mini-2025-04-14",
+    "gpt-5.1", "gpt-5.5", "custom-model", "gpt-6-luna",
+  ]) assert.equal(resolveChatModel(requested), DEFAULT_CHAT_MODEL);
 });
-test("JSON contracts, messages, sampling and token budgets survive migration without reasoning spend", () => {
+
+test("text AI JSON contracts, sampling and token budgets survive the pin without reasoning spend", () => {
   const options = { model: "gpt-4o-mini", messages: [{ role: "user", content: "Hallo" }],
     temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } };
   const request = buildChatRequest(options);
@@ -20,7 +24,13 @@ test("JSON contracts, messages, sampling and token budgets survive migration wit
   assert.deepEqual(request.response_format, options.response_format);
   assert.equal(options.max_tokens, 2200);
 });
-test("explicit custom models retain their request contract", () => {
+
+test("even explicit per-call chat model overrides cannot leave GPT-6 Luna", () => {
   const options = { model: "custom-model", max_tokens: 160, temperature: 0.5 };
-  assert.deepEqual(buildChatRequest(options), options);
+  assert.deepEqual(buildChatRequest(options), {
+    model: "gpt-6-luna", max_completion_tokens: 160,
+    temperature: 0.5, reasoning_effort: "none",
+  });
+  assert.equal(options.model, "custom-model");
+  assert.equal(options.max_tokens, 160);
 });
