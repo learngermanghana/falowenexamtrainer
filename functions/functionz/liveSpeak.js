@@ -549,6 +549,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
                 : plan.step?.instruction || "Können Sie das bitte genauer erklären?",decisions:[]};
           }
           reply=String(content.reply || "").trim().slice(0,700);
+          if ((["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question") ||
+            (flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request")) {
+            // This turn must contain only the partner's answer, never a second task.
+            const sentence=reply.match(/^[^.!?]*[.!?]?/)?.[0]?.trim() || "";
+            reply=sentence && !sentence.includes("?") ? sentence : "Ja, natürlich.";
+          }
           const merged=taskFlows.mergeDecisions(flowSession,content.decisions,confirmed);
           decisions=merged.decisions;
           ready=ready || merged.complete;
