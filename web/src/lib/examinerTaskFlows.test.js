@@ -99,15 +99,15 @@ test("A1 polite transitions preserve the exact Goethe questions without duplicat
   const intro=flows.createExaminerFlow("A1",{teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"});
   const session={examFlow:intro,answeredTurns:1},plan=flows.responsePlan(session);
   const next=flows.politeNextInstruction(session,plan,plan.reply);
-  expect(next).toMatch(/^Vielen Dank\\./);
+  expect(next.startsWith("Vielen Dank.")).toBe(true);
   expect(next).toContain("buchstabieren Sie Ihren Familiennamen");
   expect(next).toContain(plan.reply);
   expect(next.split("Bitte buchstabieren Sie")).toHaveLength(2);
   expect(flows.politeNextInstruction(session,plan,"Vielen Dank. "+plan.reply)).toBe("Vielen Dank. "+plan.reply);
   const afterSpelling={...session,answeredTurns:2},spellingPlan=flows.responsePlan(afterSpelling);
-  expect(flows.politeNextInstruction(afterSpelling,spellingPlan,spellingPlan.reply)).toMatch(/^Gut, danke\\./);
+  expect(flows.politeNextInstruction(afterSpelling,spellingPlan,spellingPlan.reply).startsWith("Gut, danke.")).toBe(true);
   const afterNumber={...session,answeredTurns:3},numberPlan=flows.responsePlan(afterNumber);
-  expect(flows.politeNextInstruction(afterNumber,numberPlan,numberPlan.step.instruction)).toMatch(/^Danke schön\\./);
+  expect(flows.politeNextInstruction(afterNumber,numberPlan,numberPlan.step.instruction).startsWith("Danke schön.")).toBe(true);
   expect(flows.politeNextInstruction({...session,answeredTurns:4},flows.responsePlan({...session,answeredTurns:4}),"Danke.")).toBe("Danke.");
 });
 
