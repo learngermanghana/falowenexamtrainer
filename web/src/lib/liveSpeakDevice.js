@@ -28,3 +28,12 @@ export function speakingTurnLabel({recording=false,pending=false,busy=false,feed
   if (expired) return "Exam time has ended";
   return "Your turn to speak";
 }
+
+
+// Keep 90s answers within the 350,000-byte server limit, including the
+// recorder's 32KiB headroom. Higher quality applies to shorter replies only.
+// A 90s recording at 32kbps exceeds 350kB before container overhead.
+export function speakingRecordingBitrate({localOnly=false,maxRecordingSeconds=20}={}) {
+  const seconds=Number(maxRecordingSeconds)||20;
+  return localOnly || seconds>75 ? 24000 : 32000;
+}
