@@ -535,9 +535,20 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
             response_format:{type:"json_object"},max_tokens:220,temperature:0.3,
           }),PROVIDER_OPTIONS);
           reportUsage("exam_partner",resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),result?.usage || {});
-          const content=JSON.parse(result?.choices?.[0]?.message?.content || "{}");
+          // A malformed model message must not auto-complete or lose a saved answer.
+          // Keep the same task boundaries and fall back to a safe scripted response.
+          let content;
+          try { content=JSON.parse(result?.choices?.[0]?.message?.content || "{}"); }
+          catch { content=null; }
+          if (!content || typeof content.reply !== "string" || !content.reply.trim()) {
+            const action=plan.previous?.action;
+            content={reply:action === "ask-question" ? "Das kann unterschiedlich sein."
+              : action === "make-request" ? "Ja, gern."
+              : ["presentation","presentation-follow-up"].includes(action)
+                ? "Welchen konkreten Aspekt Ihrer Argumentation halten Sie für besonders wichtig und warum?"
+                : plan.step?.instruction || "Können Sie das bitte genauer erklären?",decisions:[]};
+          }
           reply=String(content.reply || "").trim().slice(0,700);
-          if (!reply) throw new Error("The exam partner could not reply.");
           const merged=taskFlows.mergeDecisions(flowSession,content.decisions,confirmed);
           decisions=merged.decisions;
           ready=ready || merged.complete;
