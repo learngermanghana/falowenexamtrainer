@@ -25,8 +25,9 @@ test("B1 presentation is uninterrupted for up to three minutes and has all five 
 
 test("A1 and A2 questions alternate candidate questions with candidate answers",()=>{
   for(const [level,count] of [["A1",4],["A2",8]]){
-    const flow=flows.createExaminerFlow(level,{teil:"Teil 2",prompt:"Freizeit"});
-    const questionFlow=level === "A1" ? flow : flows.createExaminerFlow(level,{teil:"Teil 1",prompt:"Wohnort"});
+    const questionFlow=flows.createExaminerFlow(level,level === "A1"
+      ? {teil:"Teil 2",prompt:"Essen und Trinken",keywords:"Frühstück"}
+      : {teil:"Teil 1",prompt:"Wohnort"});
     expect(Array.from({length:count},(_,i)=>flows.currentStep(questionFlow,i).action)).toEqual(Array.from({length:count},(_,i)=>i%2 ? "answer-question" : "ask-question"));
   }
 });
