@@ -93,7 +93,8 @@ const verifiedFinalMockScore = (attempt, scoreDoc = {}) => {
 };
 const needsPublishedScore = attempt => attempt.status === "completed" &&
   attempt.progressSource !== "browser_reported" &&
-  (attempt.overallScore === null || SECTIONS.some(section=>attempt.sectionScores?.[section] === null));
+  (attempt.overallScore === null || !attempt.sectionScores ||
+    SECTIONS.some(section=>attempt.sectionScores[section] === null || attempt.sectionScores[section] === undefined));
 const applyPublishedScore = (attempt,score) => score ? {
   ...attempt,overallScore:attempt.overallScore === null ? score.total : attempt.overallScore,
   sectionScores:score.sections,scoreSource:"published_final_result"
