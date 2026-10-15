@@ -7,6 +7,7 @@ import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
 import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../lib/liveSpeakSessionContext";
 import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
+import { matchingExamResult, nextExamTeil } from "../lib/speakingPracticeHistory";
 
 const MAX_RECORDING_SECONDS = 20;
 const LOCAL_PRACTICE_SECONDS = 75; // Bounded on-device recording, no backend usage.
@@ -24,7 +25,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [messages, setMessages] = useState([]);
   const [examFeedback, setExamFeedback] = useState("");
   const [feedbackBusy, setFeedbackBusy] = useState(false);
+  const [exitConfirm, setExitConfirm] = useState(false);
+  const [showDetailedFeedback, setShowDetailedFeedback] = useState(false);
+  const autoFeedbackRequested = useRef(false);
   const [pending, setPending] = useState(null);
   const [recognizedText, setRecognizedText] = useState("");
   const [recognitionCorrection,setRecognitionCorrection]=useState(false);
@@ -125,7 +129,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       const info = await api("/live-speak/status");
       if (mounted.current) {
         setDetails(info);
-        if (examinerEntry && info.lastExamResult) {
+        if (examinerEntry && matchingExamResult(info.lastExamResult,{
+          level:safeLevel,taskId:examTask?.id
+        })) {
           setExamFeedback(info.lastExamResult.feedback || "");
           if (!info.activeSession) setMessages(info.lastExamResult.messages || []);
         }
@@ -135,7 +141,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [api, idToken, examinerEntry]);
+  }, [api, idToken, examinerEntry, safeLevel, examTask?.id]);
 
   useEffect(() => {
     mounted.current = true;
@@ -355,6 +361,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setVoiceState("idle");
       setLocalRetry(false);
       setExamFeedback("");
+      setExitConfirm(false);
+      autoFeedbackRequested.current=false;
       setRecognitionCorrection(false);
       setPending(result.pending || null);
       setRecognizedText(result.pending?.transcript || "");
@@ -395,6 +403,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setRecording(false);
     const existing = session;
     setSession(null);
+    setExitConfirm(false);
     setPending(null);
     setAudioRetry(null);
     clearRecording();
@@ -417,6 +426,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       stopAudio();
       setExamFeedback(result.feedback);
       setSession(null);
+      setExitConfirm(false);
+      onExamCompleted?.({taskId:session.examTask?.id || examTask?.id,
+        level:session.level || safeLevel,
+        teil:session.examTask?.teil || examTask?.teil,
+        feedback:result.feedback,
+        words:session.examFlow?.cards || session.examFlow?.requestCards || []});
       setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
       await refresh();
     } catch (err) {
@@ -504,6 +519,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       recordingStarting.current = false;
     }
   };
+  // At a finished Teil, the server has already accepted every answer; request
+  // feedback once instead of asking the learner to end or lose the session.
+  useEffect(() => {
+    if (!examinerSession || !taskReady || !recordedAnswers.length ||
+      pending || busy || feedbackBusy || examFeedback || autoFeedbackRequested.current) return;
+    autoFeedbackRequested.current=true;
+    finishExamTask();
+  }, [examinerSession,taskReady,recordedAnswers.length,pending,busy,feedbackBusy,examFeedback]);
+
   const stopRecording = () => {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   };
