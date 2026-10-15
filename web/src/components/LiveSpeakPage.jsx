@@ -36,6 +36,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [now, setNow] = useState(Date.now());
   const [messages, setMessages] = useState([]);
   const [examFeedback, setExamFeedback] = useState("");
+  const [examAssessment, setExamAssessment] = useState(null);
   const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
   const [showDetailedFeedback, setShowDetailedFeedback] = useState(false);
@@ -70,7 +71,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const safeLevel = fixedLevel || selectedLevel || (/^(A1|A2|B1|B2|C1|C2)$/.test(level) ? level : "A2");
   const examinerEntry = embedded && practiceSource === "exam-speaking-practice";
   const Container = embedded ? "section" : "main";
-  const supportedExaminer=examinerEntry && ["A1","A2","B1","B2"].includes(safeLevel);
+  const supportedExaminer=examinerEntry && ["A1","A2","B1","B2","C1","C2"].includes(safeLevel);
   const taskPreview=supportedExaminer ? examinerTaskPreview(safeLevel,examTask,examMode) : null;
   const simulation=session?.examFlow?.mode === "simulation";
   const requestedContext = { level: safeLevel, topic: practiceTopic, source: practiceSource, examTask, examMode };
@@ -133,6 +134,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           level:safeLevel,taskId:examTask?.id
         })) {
           setExamFeedback(info.lastExamResult.feedback || "");
+          setExamAssessment(info.lastExamResult.assessment || null);
           if (!info.activeSession) setMessages(info.lastExamResult.messages || []);
         }
       }
@@ -297,8 +299,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         sessionId:session.sessionId,pendingId:pending.pendingId,transcript:text,history,recognitionCorrection,
       });
       if (!mounted.current) return;
-      setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply}]);
-      setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20,maxTranscriptChars:result.maxTranscriptChars || old.maxTranscriptChars,...(result.examFlow ? {examFlow:result.examFlow} : {})} : old);
+      setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply},
+        ...(result.nextInstruction ? [{role:"assistant",speaker:result.examFlow?.step?.role || "examiner",text:result.nextInstruction}] : [])]);
+      setSession(old => old ? {...old, answeredTurns:(Number(old.answeredTurns) || 0)+1, taskReady:Boolean(result.taskReady), maxRecordingSeconds:result.maxRecordingSeconds || 20,maxAudioBytes:result.maxAudioBytes || old.maxAudioBytes,maxTranscriptChars:result.maxTranscriptChars || old.maxTranscriptChars,...(result.examFlow ? {examFlow:result.examFlow} : {})} : old);
       setPending(null);
       setAudioRetry(null);
       setRecognizedText("");
@@ -361,6 +364,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setVoiceState("idle");
       setLocalRetry(false);
       setExamFeedback("");
+      setExamAssessment(null);
       setExitConfirm(false);
       autoFeedbackRequested.current=false;
       setRecognitionCorrection(false);
@@ -425,6 +429,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (!mounted.current) return;
       stopAudio();
       setExamFeedback(result.feedback);
+      setExamAssessment(result.assessment || null);
       setSession(null);
       setExitConfirm(false);
       onExamCompleted?.({taskId:session.examTask?.id || examTask?.id,
@@ -432,7 +437,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         teil:session.examTask?.teil || examTask?.teil,
         topic:session.examTask?.prompt || examTask?.prompt,
         keyword:session.examTask?.keywords || examTask?.keywords,
-        feedback:result.feedback,
+        feedback:result.feedback,assessment:result.assessment || null,
         words:session.examFlow?.cards || session.examFlow?.requestCards || []});
       setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
       await refresh();
@@ -798,6 +803,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <section aria-label="Speaking exam practice feedback"
           style={{...shell,border:"1px solid #bfdbfe",background:"#fff",display:"grid",gap:9}}>
           <h2 style={{margin:0,fontSize:19}}>Your speaking practice feedback</h2>
+          {examAssessment ? <div aria-label="Speaking practice score" style={{border:"1px solid #cbd5e1",borderRadius:12,padding:14,display:"grid",gap:8}}>
+            <strong style={{fontSize:24}}>{examAssessment.score} / {examAssessment.maxScore} points · {examAssessment.percent}%</strong>
+            <small>Falowen CEFR {examAssessment.level} practice assessment — not an official Goethe score.</small>
+            {(examAssessment.tasks || []).map(item=><div key={item.step} style={{display:"flex",justifyContent:"space-between",gap:10,fontSize:13}}>
+              <span>Task {item.step} · {item.comment || "Reviewed"}</span><strong style={{whiteSpace:"nowrap"}}>{item.score}/{item.maxScore}</strong>
+            </div>)}
+          </div> : null}
           {details?.lastExamResult?.examTask?.prompt ? <p style={{margin:0,fontSize:13}}>{details.lastExamResult.level} · {details.lastExamResult.examTask.prompt}</p> : null}
           {messages.filter(message => message.role === "user").length ? (
             <details><summary>Your saved answers</summary>
