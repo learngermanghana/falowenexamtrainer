@@ -28,7 +28,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -42,6 +42,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [examAssessment, setExamAssessment] = useState(null);
   const [feedbackBusy, setFeedbackBusy] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [answerMode, setAnswerMode] = useState("record");
+  const [typedAnswer, setTypedAnswer] = useState("");
   const [showDetailedFeedback, setShowDetailedFeedback] = useState(false);
   const autoFeedbackRequested = useRef(false);
   const [pending, setPending] = useState(null);
@@ -236,10 +240,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (!mounted.current) return;
       if (result.needsConfirmation) {
         setAudioRetry(null);
-        setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,transcript:result.transcript,uncertain:Boolean(result.uncertain)});
+        setPending({pendingId:result.pendingId,sessionId:currentSession.sessionId,transcript:result.transcript,uncertain:Boolean(result.uncertain),typed:Boolean(result.typed)});
         setRecognizedText(result.transcript);
         setRecognitionCorrection(false);
-        setNotice(result.uncertain ? "The recording was unclear. Please listen, correct the transcript, or record again." :
+        setNotice(result.typed ? "Confirm your typed German answer to continue." : result.uncertain ?
+          "The recording was unclear. Please listen, correct the transcript, or record again." :
           "Check what the AI heard before the tutor responds.");
         return;
       }
@@ -327,6 +332,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setPending(null);
       setAudioRetry(null);
       setRecognizedText("");
+      setTypedAnswer("");
       if (replayUrlRef.current) {URL.revokeObjectURL(replayUrlRef.current);replayUrlRef.current="";}
       setLastAudio(result.audioBase64);
       setNotice("");
@@ -389,6 +395,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setExamFeedback("");
       setExamAssessment(null);
       setExitConfirm(false);
+      setResetConfirm(false);
+      setTypedAnswer("");
       autoFeedbackRequested.current=false;
       setRecognitionCorrection(false);
       setPending(result.pending || null);
@@ -416,6 +424,40 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setErrorMessage(err.message);
       setBusy(false);
       refresh();
+    }
+  };
+
+  const resetExamSession = async () => {
+    if (resetting || feedbackBusy || recording) return;
+    const active = session || details?.activeSession;
+    setResetting(true);
+    setErrorMessage("");
+    try {
+      // Only return to selection after the server confirms this task ended.
+      if (active?.sessionId) await api("/live-speak/session/end", "POST", {sessionId:active.sessionId});
+      stopAudio();
+      if (recorderRef.current?.state === "recording") {
+        recorderRef.current.onstop = null;
+        recorderRef.current.stop();
+      }
+      mediaRef.current?.getTracks().forEach(track => track.stop());
+      if (recordingTicker.current) clearInterval(recordingTicker.current);
+      replayRequestRef.current?.abort();
+      setSession(null);
+      setPending(null);
+      setAudioRetry(null);
+      setMessages([]);
+      setExamFeedback("");
+      setExamAssessment(null);
+      setTypedAnswer("");
+      setResetConfirm(false);
+      clearRecording();
+      if (onSessionReset) onSessionReset();
+      else await refresh();
+    } catch (err) {
+      if (mounted.current) setErrorMessage("Could not reset the session. Your work is still available. Please retry. " + err.message);
+    } finally {
+      if (mounted.current) setResetting(false);
     }
   };
 
@@ -595,6 +637,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     }
   };
 
+  const submitTypedAnswer = async () => {
+    const answer = typedAnswer.trim();
+    if (!session || pending || audioRetry || busy || feedbackBusy || recording || requestBusy.current ||
+        voiceState === "playing" || taskReady || answer.length < 2 ||
+        answer.length > (session.maxTranscriptChars || 600)) return;
+    await sendTurn(session, {intro:false,typedAnswer:answer});
+  };
+
   const timeRemaining = session ? Math.max(0, Date.parse(session.expiresAt) - now) : 0;
   const expired = Boolean(session) && timeRemaining <= 0;
   const speakingLimit = Number(session?.maxRecordingSeconds || MAX_RECORDING_SECONDS);
@@ -608,7 +658,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     (Boolean(details?.pilotAvailable) && !details?.capReached);
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
     (!details?.enabled || !canStartAiExaminer);
-  const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
+  const waitingForOpening = examinerSession && busy && !messages.length && !pending;
+  const examTurnState = waitingForOpening
+    ? "AI examiner is preparing to speak"
+    : speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
       style={embedded
