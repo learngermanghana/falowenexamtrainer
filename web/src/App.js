@@ -1588,12 +1588,6 @@ const ExamArea = ({ onBack }) => {
             ))}
           </nav>
         </details>
-        {examSection === "speaking" ? <nav className="exam-speaking-quick-nav" aria-label="Quick Exam Room navigation">
-          {tabs.filter(tab => ["overview","mocks","lesen","horen","writing","speaking"].includes(tab.key)).map(tab => (
-            <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
-              onClick={() => navigate(`/exams/${tab.key}`)}>{tab.label}</button>
-          ))}
-        </nav> : null}
         <div
           className={examSection === "speaking" ? "exam-room-level-picker exam-room-level-picker--speaking" : "exam-room-level-picker"}
           style={{

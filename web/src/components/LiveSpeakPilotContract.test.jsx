@@ -165,15 +165,34 @@ test("an A1 learner with no live AI sessions can record and replay without API u
   }
 });
 
-test("speaking page has visible navigation, a single banner, and distinct A1 topic and keyword cards",()=>{
+test("speaking page keeps one Exam Room menu, a single banner and distinct A1 topic and keyword cards",()=>{
   const voice=fs.readFileSync(path.join(root,"web/src/components/LiveSpeakPage.jsx"),"utf8");
   const cards=fs.readFileSync(path.join(root,"web/src/components/GoetheExamTaskCard.jsx"),"utf8");
   const css=fs.readFileSync(path.join(root,"web/src/App.css"),"utf8");
   expect(voice).toContain('aria-label={recording ? "Stop local practice recording" : "Record local speaking practice"}');
   expect(cards).toContain('aria-label="A1 Teil 2 Thema"');
   expect(cards).toContain("WORTKARTE");
-  expect(app).toContain('className="exam-speaking-quick-nav"');
+  expect(app).toContain('className="mobile-exam-menu"');
+  expect(app).toContain("Exam Room Menu");
+  expect(app).not.toContain('className="exam-speaking-quick-nav"');
   expect(app).toContain('activeExamHero && examSection !== "speaking"');
   expect(css).toContain("body.falowen-exam-speaking-page .study-buddy-bar");
   expect(css).toContain(".speaking-exam-local-practice__recorder");
+});
+
+test("the shared AI safety cap still exposes local recording when pilot claim is available",async()=>{
+  useAuth.mockReturnValue({idToken:"test",studentProfile:{level:"A1"}});
+  // Shared cap and pilot claim availability are independent backend fields.
+  global.fetch.mockResolvedValue({
+    ok:true,
+    json:async()=>({enabled:true,remaining:0,pilotAvailable:true,capReached:true}),
+  });
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+    practiceTopic="Stellen Sie sich kurz vor"
+    examTask={{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"}} /></MemoryRouter>);
+  expect(await screen.findByRole("button",{name:"Record local speaking practice"})).toBeInTheDocument();
+  expect(screen.getByText(/Live AI voice sessions are paused by the shared safety budget/i)).toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"Start exam"})).not.toBeInTheDocument();
+  expect(screen.getByRole("textbox",{name:"Type optional speaking notes"})).toBeInTheDocument();
+  expect(global.fetch).toHaveBeenCalledTimes(1);
 });

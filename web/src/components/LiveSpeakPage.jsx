@@ -41,6 +41,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [recognitionCorrection,setRecognitionCorrection]=useState(false);
   const [studentAudioUrl, setStudentAudioUrl] = useState("");
   const recordedUrlRef = useRef(null);
+  const examConversationRef = useRef(null);
+  const followLatestRef = useRef(true);
+  const [showLatest, setShowLatest] = useState(false);
   const [selectedLevel, setSelectedLevel] = useState("");
   const [recording, setRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
@@ -74,6 +77,32 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const examinerSession = session?.source === "exam-speaking-practice";
   const taskReady = examinerSession && (session.taskReady || Number(session.answeredTurns) >= (session.answerLimit || 2));
   const recordedAnswers = messages.filter(item => item.role === "user").map(item => item.text).filter(Boolean);
+
+  // The old Speaking Coach keeps a dedicated scrolling conversation. Follow
+  // new examiner turns only if the learner is already near the latest message.
+  // Students reading an earlier answer must not be yanked back to the bottom.
+  useEffect(() => {
+    if (!examinerSession) return;
+    const thread = examConversationRef.current;
+    if (!thread || !followLatestRef.current) return;
+    thread.scrollTop = thread.scrollHeight;
+    setShowLatest(false);
+  }, [examinerSession, messages.length, busy]);
+
+  const handleExamThreadScroll = () => {
+    const thread = examConversationRef.current;
+    if (!thread) return;
+    const nearBottom = thread.scrollHeight - thread.scrollTop - thread.clientHeight < 72;
+    followLatestRef.current = nearBottom;
+    setShowLatest(!nearBottom);
+  };
+  const jumpToLatestExamTurn = () => {
+    const thread = examConversationRef.current;
+    if (!thread) return;
+    thread.scrollTop = thread.scrollHeight;
+    followLatestRef.current = true;
+    setShowLatest(false);
+  };
 
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
@@ -317,7 +346,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setErrorMessage("");
     try {
       // One-click practice. The server still verifies credits and global cost caps.
-      if (details?.pilotAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
+      if (details?.pilotAvailable && !details?.examTryoutAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
         await api("/live-speak/pilot/claim", "POST", {});
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
@@ -485,8 +514,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
+  // A real, server-bounded AI examiner tryout is available once per month when
+  // normal pilot access is exhausted. No client-side quota override occurs.
+  const aiTryoutAvailable = examinerEntry && Boolean(details?.examTryoutAvailable);
+  const canStartAiExaminer = sessionsAvailable || aiTryoutAvailable ||
+    (Boolean(details?.pilotAvailable) && !details?.capReached);
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
-    (!details?.enabled || (!sessionsAvailable && !details?.pilotAvailable));
+    (!details?.enabled || !canStartAiExaminer);
   const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
@@ -530,12 +564,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               {["A1","A2","B1","B2","C1","C2"].map(option=><option key={option} value={option}>{option}</option>)}
             </select>
           </label> : null}
-          {details.capReached && !details.activeSession ? (
+          {details.capReached && !details.activeSession && !aiTryoutAvailable ? (
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Live AI voice sessions are paused by the shared safety budget. You can still record and replay your own practice below.</p>
-          ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
+          ) : (details.activeSession || sessionsAvailable || aiTryoutAvailable || details.pilotAvailable) ? (
             <div>
               <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
-                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : examinerEntry ? "Start exam" : "Start speaking"}
+                {busy ? "Starting…" : details.activeSession ? "Resume speaking" : aiTryoutAvailable ? "Try AI examiner" : examinerEntry ? "Start exam" : "Start speaking"}
               </button>
             </div>
           ) : (
@@ -602,14 +636,37 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   : session.examFlow ? "Corrections come at the end of this exam task."
                   : Number(session.answeredTurns) ? "Follow-up: answer the examiner’s question." : "Listen, then answer in German."}</small>
           </div> : null}
-          <div className={examinerSession ? "speaking-exam-session__conversation" : undefined} aria-live="polite" style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
-            {messages.map((message,i) => (
-              <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
-                <strong>{message.role==="assistant"?(examinerSession ? message.speaker === "partner" ? "AI partner" : "AI Examiner" : "AI German tutor"):"You"}</strong>
-                <p style={{margin:"7px 0 0",lineHeight:1.65}} lang="de">{message.text}</p>
-              </div>
-            ))}
-            {busy ? <p>{pending ? "Preparing the next examiner/tutor response…" : "Processing your German recording…"}</p> : null}
+          <div className={examinerSession ? "speaking-exam-chat-shell" : undefined}>
+            <div ref={examinerSession ? examConversationRef : undefined}
+              onScroll={examinerSession ? handleExamThreadScroll : undefined}
+              className={examinerSession ? "speaking-exam-session__conversation speaking-exam-chat-thread" : undefined}
+              role={examinerSession ? "log" : undefined}
+              aria-label={examinerSession ? "Examiner conversation" : undefined}
+              aria-live="polite" aria-relevant="additions text"
+              style={{display:"grid",gap:10,maxHeight:430,overflowY:"auto"}}>
+              {messages.map((message,i) => (
+                examinerSession ? (
+                  <div key={i} className={message.role === "user" ? "speaking-exam-message-row is-student" : "speaking-exam-message-row is-examiner"}>
+                    {message.role !== "user" ? <span className="speaking-exam-message-avatar" aria-hidden="true">💬</span> : null}
+                    <div className="speaking-exam-message-bubble">
+                      <strong>{message.role === "user" ? "You" : message.speaker === "partner" ? "AI partner" : "AI Examiner"}</strong>
+                      <p lang="de">{message.text}</p>
+                    </div>
+                    {message.role === "user" ? <span className="speaking-exam-message-avatar is-student" aria-hidden="true">👤</span> : null}
+                  </div>
+                ) : (
+                  <div key={i} style={{background:message.role==="assistant"?"#eff6ff":"#f0fdf4",borderRadius:14,padding:13,marginLeft:message.role==="user"?30:0,marginRight:message.role==="assistant"?30:0}}>
+                    <strong>{message.role==="assistant"?"AI German tutor":"You"}</strong>
+                    <p style={{margin:"7px 0 0",lineHeight:1.65}} lang="de">{message.text}</p>
+                  </div>
+                )
+              ))}
+              {busy ? <p className={examinerSession ? "speaking-exam-message-waiting" : undefined}>
+                {pending ? "Preparing the next examiner/tutor response…" : "Processing your German recording…"}
+              </p> : null}
+            </div>
+            {examinerSession && showLatest ? <button type="button" className="speaking-exam-chat-latest"
+              onClick={jumpToLatestExamTurn}>↓ Latest message</button> : null}
           </div>
           {lastAudio && voiceReady ? <button type="button" className={examinerSession ? "speaking-exam-replay" : undefined}
             style={styles.secondaryButton} disabled={busy || recording} onClick={()=>playVoice(lastAudio)}>
@@ -634,7 +691,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <button type="button" aria-label={recording ? "Stop and send recording" : "Record German answer"}
                   title={recording ? "Stop and send recording" : "Record your German answer"}
                   onClick={recording ? stopRecording : () => startRecording(false)}
-                  disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) || voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) || details?.capReached}
+                  disabled={busy || feedbackBusy || expired || Boolean(pending) || Boolean(audioRetry) || voiceState === "playing" || taskReady || Boolean(session.feedbackStatus) || (details?.capReached && !session.examTryout)}
                   style={{border:"none",borderRadius:14,width:56,minWidth:56,background:recording?"#991b1b":"#dc2626",color:"#fff",fontWeight:800,fontSize:23,cursor:"pointer"}}>
                     {recording ? "■" : "🎙"}
                 </button>
