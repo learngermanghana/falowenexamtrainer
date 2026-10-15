@@ -140,8 +140,9 @@ test("an A1 learner with no live AI sessions can record and replay without API u
   Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:{getUserMedia:jest.fn(async()=>({getTracks:()=>[{stop:stopTrack}]}))}});
   URL.createObjectURL=jest.fn(()=>"blob:local-test");
   URL.revokeObjectURL=jest.fn();
+  let view;
   try {
-    render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+    view=render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
       practiceTopic="Stellen Sie sich kurz vor"
       examTask={{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"}} /></MemoryRouter>);
     expect(await screen.findByText(/live AI examiner sessions are not currently available/i)).toBeInTheDocument();
@@ -156,6 +157,7 @@ test("an A1 learner with no live AI sessions can record and replay without API u
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(stopTrack).toHaveBeenCalled();
   } finally {
+    view?.unmount();
     global.MediaRecorder=originalRecorder;
     Object.defineProperty(navigator,"mediaDevices",{configurable:true,value:originalMedia});
     URL.createObjectURL=oldCreate;URL.revokeObjectURL=oldRevoke;
