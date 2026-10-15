@@ -775,7 +775,24 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   {recording ? "Recording " : "Speaking time "}{recordingTimeLabel} / {speakingLimitLabel}
                 </span>
               </div>
-              <div className="speaking-exam-recorder-row" style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
+              <div role="group" aria-label="Choose answer input" style={{display:"flex",gap:7}}>
+                <button type="button" style={{...styles.secondaryButton,background:answerMode==="record"?"#dbeafe":"#fff",padding:"7px 14px"}}
+                  disabled={Boolean(pending) || recording || busy || taskReady}
+                  aria-pressed={answerMode==="record"} onClick={()=>setAnswerMode("record")}>🎙 Record</button>
+                <button type="button" style={{...styles.secondaryButton,background:answerMode==="type"?"#dbeafe":"#fff",padding:"7px 14px"}}
+                  disabled={Boolean(pending) || recording || busy || taskReady}
+                  aria-pressed={answerMode==="type"} onClick={()=>setAnswerMode("type")}>⌨ Type</button>
+              </div>
+              {answerMode==="type" && !pending ? <div style={{display:"grid",gap:7}}>
+                <textarea lang="de" aria-label="Type your German answer" rows={3}
+                  value={typedAnswer} maxLength={session.maxTranscriptChars || 600}
+                  onChange={e=>setTypedAnswer(e.target.value)}
+                  placeholder="Type your German answer…" style={{width:"100%",fontSize:16,padding:12,border:"1px solid #cbd5e1",borderRadius:10}}/>
+                <button type="button" style={{...styles.primaryButton,justifySelf:"start"}} onClick={sendTypedAnswer}
+                  disabled={busy || feedbackBusy || recording || expired || taskReady || voiceState==="playing" || typedAnswer.trim().length<2}>Send typed answer →</button>
+                <small>Typed practice is evaluated from text, not speech or pronunciation.</small>
+              </div> : null}
+              {answerMode==="record" || pending ? <div className="speaking-exam-recorder-row" style={{display:"flex",alignItems:"stretch",gap:8,minWidth:0}}>
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
                   placeholder={pending ? "Review what Falowen heard…" : "Your German words appear here after recording"}
                   value={pending ? recognizedText : ""}
@@ -797,6 +814,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   ➤
                 </button>
               </div>
+              {answerMode==="record" || pending ? </div> : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
                 <p role="alert">The recording is saved on this device, but the server has not confirmed it. Check your connection before retrying.</p>
                 <div className="speaking-exam-recovery__actions">
