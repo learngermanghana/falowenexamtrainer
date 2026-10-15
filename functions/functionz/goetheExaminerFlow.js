@@ -42,6 +42,8 @@ function createExaminerFlow(level, task, mode="guided") {
   if (key === "A2-2" || key === "B1-1" || key === "B1-2") flow.contextTopic = clean(task?.prompt,180);
   if (key === "B1-1") flow.planningPoints = catalogue.b1PlanningTasks.find(item=>clean(task?.prompt).toLowerCase().includes(item.match.toLowerCase()))?.points;
   if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
+  if (key === "B1-2") flow.presentationQuestion=catalogue.b1PresentationTopics.find(item=>item.topic === clean(task?.prompt,180))?.question || "";
+  if (key === "B1-3") flow.discussion=catalogue.b1DiscussionTasks.find(item=>item.topic === clean(task?.prompt,180));
   const selectedWord = words(task)[0] || "Freizeit";
   if (key === "A1-2") flow.cards = selectedCards(selectedWord,catalogue.a1InformationCards,2);
   if (key === "A2-1") {
@@ -76,12 +78,12 @@ function currentStep(flow, answered=0) {
       ? `Formulieren Sie bitte eine höfliche Bitte zu Ihrer Karte: „${card.word}“.`
       : card.partnerRequest;
   }
-  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : `Zum Thema „${flow.contextTopic || "Alltag"}“: ${profile.opening}`;}
+  if (flow.key === "A2-2") {action=answered ? "follow-up" : "monologue";instruction=answered ? "Warum ist das für Sie wichtig? Nennen Sie bitte ein Beispiel." : `Zum Thema „${flow.contextTopic || "Alltag"}“: ${flow.presentationQuestion || ""} ${profile.opening}`;}
   if (flow.key === "A2-3" || flow.key === "B1-1") action="negotiate";
   if (flow.key === "A2-3") instruction=flow.scenario + " Wann hast du Zeit?";
   if (flow.key === "B1-1" && flow.contextTopic) instruction = `Planen Sie gemeinsam: ${flow.contextTopic}. Besprechen Sie: ${(flow.planningPoints || []).map(point=>point.text).join(" ") || "wann und wo, wie Sie hinkommen und wer was übernimmt"} Was schlägst du vor?`;
-  if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${profile.opening}`;}
-  if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
+  if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${flow.presentationQuestion || ""} ${profile.opening}`;}
+  if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${flow.discussion ? "" : profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : flow.discussion ? `${flow.discussion.presentation} ${flow.discussion.question}` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
   return {index:answered+1,action,role,instruction,seconds:profile.seconds[answered]};
 }
 const maxAnswers = session => profileFor(session.examFlow)?.maxAnswers || 2;
@@ -96,7 +98,7 @@ function publicFlow(session) {
   const flow=session.examFlow, profile=profileFor(flow);
   if (!profile) return null;
   const step=session.taskReady ? null : currentStep(flow,Number(session.answeredTurns)||0);
-  return {version:1,key:flow.key,mode:flow.mode,title:profile.title,topic:flow.contextTopic || "",role:step?.role || "examiner",step,
+  return {version:1,key:flow.key,mode:flow.mode,title:profile.title,topic:flow.contextTopic || "",presentationQuestion:flow.presentationQuestion || "",role:step?.role || "examiner",step,
     maxAnswers:profile.maxAnswers,criteria:profile.criteria,stageGuide:profile.stageGuide || "",
     hints:flow.mode === "guided" ? profile.hints : [],
     cards:flow.cards?.map(card=>card.word) || [],card:flow.card || "",
@@ -106,8 +108,8 @@ function publicFlow(session) {
     studentCalendar:flow.calendar?.studentCalendar || profile.studentCalendar || [],
     calendarDay:flow.calendar?.day || "",studentSchedule:flow.calendar?.studentSchedule || [],
     scenario:flow.scenario || "",
-    partnerTopic:profile.partnerTopic || "",
-    partnerPresentation:flow.key === "B1-3" && Number(session.answeredTurns)>=1 ? profile.partnerPresentation : "",
+    partnerTopic:flow.discussion?.topic || profile.partnerTopic || "",
+    partnerPresentation:flow.key === "B1-3" && Number(session.answeredTurns)>=1 ? flow.discussion?.presentation || profile.partnerPresentation : "",
     decisions:(flow.decisions||[]).map(d=>({point:d.point,value:d.value})),
     preparationSeconds:flow.key.startsWith("B1-") ? 900 : 0};
 }
@@ -146,7 +148,7 @@ function partnerInstructions(session,plan) {
       planningPoints:flow.planningPoints,
       ownPresentation:flow.key === "B1-3" ? clean(flow.ownPresentation,2400) : undefined,
       candidateIntroduction:flow.key === "A1-1" ? clean(session.confirmedAnswers?.[0],450) : undefined,
-      nextInstruction:flow.key === "A2-2" ? "Ask ONE concise relevant neutral follow-up about the student's account in German." : plan.step?.instruction || "End the task politely.",partnerPresentation:flow.key === "B1-3" ? profile.partnerPresentation : undefined,
+      nextInstruction:flow.key === "A2-2" ? "Ask ONE concise relevant neutral follow-up about the student's account in German." : plan.step?.instruction || "End the task politely.",partnerPresentation:flow.key === "B1-3" ? flow.discussion?.presentation || profile.partnerPresentation : undefined,
       decisions:flow.decisions}) +
     ". After answering, use nextInstruction to give the student the correct next task. For negotiation, ask about one unresolved decision instead of repeating the opening.";
 }

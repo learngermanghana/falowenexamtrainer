@@ -216,7 +216,7 @@
       "opening": "Wir sprechen über das Thema auf Ihrer Karte. Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.",
       "partnerTopic": "Online Deutsch lernen",
       "partnerPresentation": "Ich möchte über das Thema Online Deutsch lernen sprechen. Zuerst berichte ich von meinen Erfahrungen. Ich lerne zweimal pro Woche online und übe am Wochenende mit einer Freundin. In meinem Heimatland nutzen viele junge Menschen ihr Handy zum Lernen, aber nicht alle haben eine gute Internetverbindung. Ein Vorteil ist, dass man zu Hause lernen und seine Zeit selbst einteilen kann. Ein Nachteil ist, dass persönliche Gespräche manchmal fehlen. Meiner Meinung nach ist eine Mischung aus Online-Unterricht und Treffen im Kurs am besten. Vielen Dank fürs Zuhören.",
-      "stageGuide": "Answer a question about your own presentation. Then listen to the partner presentation, give feedback and ask a relevant question. Continue from Teil 2 to use your presentation topic."
+      "stageGuide": "Listen to the short presentation and its follow-up question, then respond. Next, give feedback and ask your partner a question about what you heard."
     }
   },
   "personalCards": [
@@ -630,107 +630,170 @@
   ],
   "b1PlanningTasks": [
     {
-      "match": "Sommerfest",
+      "match": "Ein Geschenk für einen Kollegen / Freund kaufen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann findet das Fest statt?"
+          "id": "point1",
+          "text": "Wann kaufen wir das Geschenk?"
         },
         {
-          "id": "place",
-          "text": "Wo feiern wir?"
+          "id": "point2",
+          "text": "Was schenken wir und wie viel kostet es?"
         },
         {
-          "id": "materials",
-          "text": "Was brauchen wir für das Fest?"
+          "id": "point3",
+          "text": "Wo kaufen wir es?"
         },
         {
-          "id": "responsibilities",
+          "id": "point4",
+          "text": "Wer sammelt Geld und wer besorgt das Geschenk?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Ausflug am Wochenende organisieren",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wohin fahren wir?"
+        },
+        {
+          "id": "point2",
+          "text": "Wie kommen wir hin?"
+        },
+        {
+          "id": "point3",
+          "text": "Was nehmen wir mit?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert was?"
+        }
+      ]
+    },
+    {
+      "match": "Eine Abschiedsparty / Überraschungsparty planen",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo feiern wir?"
+        },
+        {
+          "id": "point2",
+          "text": "Wen laden wir ein?"
+        },
+        {
+          "id": "point3",
+          "text": "Was brauchen wir zum Essen und Trinken?"
+        },
+        {
+          "id": "point4",
           "text": "Wer übernimmt welche Aufgabe?"
         }
       ]
     },
     {
-      "match": "Reise",
+      "match": "Für die Deutschprüfung / B1-Prüfung lernen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann und wie lange reisen wir?"
+          "id": "point1",
+          "text": "Wann und wo treffen wir uns?"
         },
         {
-          "id": "transport",
-          "text": "Wie fahren wir nach Köln?"
+          "id": "point2",
+          "text": "Welche Prüfungsteile üben wir?"
         },
         {
-          "id": "activities",
-          "text": "Was möchten wir dort machen?"
+          "id": "point3",
+          "text": "Welche Materialien brauchen wir?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer organisiert Fahrkarten und Unterkunft?"
+          "id": "point4",
+          "text": "Wer bereitet welche Aufgaben vor?"
         }
       ]
     },
     {
-      "match": "Überraschungsparty",
+      "match": "Einen kranken Freund oder Lehrer besuchen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann feiern wir?"
+          "id": "point1",
+          "text": "Wann besuchen wir ihn?"
         },
         {
-          "id": "place",
-          "text": "Wo findet die Party statt?"
-        },
-        {
-          "id": "materials",
-          "text": "Was bringen wir mit?"
-        },
-        {
-          "id": "responsibilities",
-          "text": "Wer lädt die Gäste ein und bereitet etwas vor?"
-        }
-      ]
-    },
-    {
-      "match": "Kulturelles Ereignis",
-      "points": [
-        {
-          "id": "time",
-          "text": "Wann besuchen wir die Veranstaltung?"
-        },
-        {
-          "id": "event",
-          "text": "Welche Veranstaltung wählen wir?"
-        },
-        {
-          "id": "transport",
+          "id": "point2",
           "text": "Wie kommen wir hin?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer besorgt die Eintrittskarten?"
+          "id": "point3",
+          "text": "Welches kleine Geschenk bringen wir mit?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert den Besuch und die Hilfe?"
         }
       ]
     },
     {
-      "match": "Museumsbesuch",
+      "match": "Ein gemeinsames Abendessen kochen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann besuchen wir das Museum?"
+          "id": "point1",
+          "text": "Wann und wo kochen wir?"
         },
         {
-          "id": "place",
-          "text": "Welches Museum besuchen wir?"
+          "id": "point2",
+          "text": "Was möchten wir kochen?"
         },
         {
-          "id": "transport",
-          "text": "Wie kommen wir hin?"
+          "id": "point3",
+          "text": "Welche Zutaten brauchen wir?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer organisiert Eintrittskarten und die Gruppe?"
+          "id": "point4",
+          "text": "Wer kauft was ein?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Sporttag / eine Fahrradtour planen",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo treffen wir uns?"
+        },
+        {
+          "id": "point2",
+          "text": "Welche Strecke oder Sportart wählen wir?"
+        },
+        {
+          "id": "point3",
+          "text": "Welche Ausrüstung brauchen wir?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert was?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Flohmarktstand vorbereiten",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo ist der Flohmarkt?"
+        },
+        {
+          "id": "point2",
+          "text": "Was möchten wir verkaufen?"
+        },
+        {
+          "id": "point3",
+          "text": "Welche Preise und Materialien brauchen wir?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer transportiert die Sachen und betreut den Stand?"
         }
       ]
     }
@@ -1242,6 +1305,82 @@
         "day": "Samstag",
         "hour": 15
       }
+    }
+  ],
+  "b1PresentationTopics": [
+    {
+      "topic": "Einkaufen im Internet oder im Geschäft?",
+      "question": "Kaufen Sie lieber online oder im Supermarkt/Geschäft ein?"
+    },
+    {
+      "topic": "Kinder und Smartphones",
+      "question": "Brauchen Kinder eigene Smartphones, und ab welchem Alter?"
+    },
+    {
+      "topic": "Bio-Lebensmittel vs. Fastfood",
+      "question": "Sollte man nur noch Bio-Lebensmittel kaufen?"
+    },
+    {
+      "topic": "Leben auf dem Land oder in der Stadt?",
+      "question": "Wo lebt man besser: auf dem Land oder in der Großstadt?"
+    },
+    {
+      "topic": "Fremdsprachen lernen",
+      "question": "Sollte jeder Mensch mindestens zwei Fremdsprachen lernen?"
+    },
+    {
+      "topic": "Haustiere in der Wohnung",
+      "question": "Sollte man Haustiere in einer Stadtwohnung halten?"
+    },
+    {
+      "topic": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+      "question": "Braucht man in der Stadt noch ein eigenes Auto?"
+    },
+    {
+      "topic": "Urlaub am Meer oder in den Bergen?",
+      "question": "Wo und wie verbringen Sie am liebsten Ihren Urlaub?"
+    }
+  ],
+  "b1DiscussionTasks": [
+    {
+      "topic": "Kinder und Smartphones",
+      "presentation": "In meiner Heimat haben viele kleine Kinder ein Smartphone. Mein Neffe hat mit 8 Jahren eines bekommen, um Spiele zu spielen. Ich denke, Smartphones sind nützlich für die Sicherheit, aber die Bildschirmzeit sollte begrenzt werden.",
+      "question": "Ab welchem Alter finden Sie es richtig, dass Kinder ein eigenes Smartphone bekommen?"
+    },
+    {
+      "topic": "Einkaufen im Internet",
+      "presentation": "Ich kaufe Bücher und Kleidung im Internet, weil es Zeit spart und oft günstiger ist. In meinem Heimatland ist Online-Shopping sehr beliebt, aber kleine lokale Geschäfte schließen deshalb.",
+      "question": "Haben Sie schon einmal schlechte Erfahrungen mit Online-Bestellungen gemacht?"
+    },
+    {
+      "topic": "Haustiere in der Wohnung",
+      "presentation": "Ich liebe Tiere, aber einen großen Hund in einer kleinen Stadtwohnung zu halten, ist schwierig. Als Kind hatte ich ein Haus mit Garten und wir hatten eine Katze, was viel einfacher war.",
+      "question": "Welches Haustier ist Ihrer Meinung nach am besten für eine kleine Stadtwohnung geeignet?"
+    },
+    {
+      "topic": "Leben auf dem Land oder in der Stadt",
+      "presentation": "Ich wohne wegen meiner Arbeit und der öffentlichen Verkehrsmittel in einer Großstadt. Die Miete ist jedoch hoch und es ist laut. In Zukunft würde ich lieber in einem ruhigen Dorf wohnen.",
+      "question": "Was ist für Sie der größte Vorteil beim Leben auf dem Land?"
+    },
+    {
+      "topic": "Plastikmüll vermeiden",
+      "presentation": "In meinem Haushalt benutzen wir Stoffbeutel beim Einkaufen und kaufen Glasflaschen. In meinem Land wächst das Recycling, aber Supermärkte nutzen immer noch zu viel Plastikverpackungen.",
+      "question": "Finden Sie, dass Bio-Lebensmittel ohne Plastikverpackung im Supermarkt zu teuer sind?"
+    },
+    {
+      "topic": "Öffentliche Verkehrsmittel vs. Auto",
+      "presentation": "Ich fahre jeden Tag mit dem Bus zur Arbeit, weil das Parken in der Stadt teuer ist. Autos bieten Flexibilität, aber Staus verschwenden viel Zeit und verschmutzen die Luft.",
+      "question": "Wie könnte man den öffentlichen Nahverkehr in Ihrer Heimatstadt verbessern?"
+    },
+    {
+      "topic": "Fremdsprachen lernen",
+      "presentation": "Ich spreche Englisch und lerne jetzt Deutsch für meinen Beruf. In meiner Heimat lernen Kinder schon früh Sprachen. Ich glaube, Sprachen öffnen neue berufliche Chancen.",
+      "question": "Finden Sie es besser, eine Sprache im Sprachkurs oder mit einer App zu lernen?"
+    },
+    {
+      "topic": "Fastfood vs. Selbstkochen",
+      "presentation": "Wegen meines Arbeitsplans esse ich mittags manchmal Fastfood. Aber am Wochenende koche ich lieber frisch zu Hause, weil es gesünder ist und besser schmeckt.",
+      "question": "Kochen Sie am Wochenende gerne selbst für Ihre Familie oder Freunde?"
     }
   ]
 }

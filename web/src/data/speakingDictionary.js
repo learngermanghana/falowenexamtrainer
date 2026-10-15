@@ -661,586 +661,6 @@ export const speakingQuestionDictionary = [
     "hint": ""
   },
   {
-    "id": "b1-teil-1-mithilfe-beim-sommerfest-141",
-    "level": "B1",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Mithilfe beim Sommerfest",
-    "keywordSubtopic": "",
-    "text": "Mithilfe beim Sommerfest",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-1-eine-reise-nach-k-ln-planen-142",
-    "level": "B1",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Eine Reise nach Köln planen",
-    "keywordSubtopic": "",
-    "text": "Eine Reise nach Köln planen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-1-berraschungsparty-organisieren-143",
-    "level": "B1",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Überraschungsparty organisieren",
-    "keywordSubtopic": "",
-    "text": "Überraschungsparty organisieren",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-1-kulturelles-ereignis-konzert-144",
-    "level": "B1",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Kulturelles Ereignis (Konzert",
-    "keywordSubtopic": "Ausstellung) planen",
-    "text": "Kulturelles Ereignis (Konzert (Ausstellung) planen)",
-    "hint": "Stichwort: Ausstellung) planen"
-  },
-  {
-    "id": "b1-teil-1-museumsbesuch-organisieren-145",
-    "level": "B1",
-    "teilId": "teil-1",
-    "teilLabel": "Teil 1",
-    "topicPrompt": "Museumsbesuch organisieren",
-    "keywordSubtopic": "",
-    "text": "Museumsbesuch organisieren",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-ausbildung-146",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Ausbildung",
-    "keywordSubtopic": "",
-    "text": "Ausbildung",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-auslandsaufenthalt-147",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Auslandsaufenthalt",
-    "keywordSubtopic": "",
-    "text": "Auslandsaufenthalt",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-behinderten-sport-148",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Behinderten-Sport",
-    "keywordSubtopic": "",
-    "text": "Behinderten-Sport",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-berufst-tige-eltern-149",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Berufstätige Eltern",
-    "keywordSubtopic": "",
-    "text": "Berufstätige Eltern",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-berufswahl-150",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Berufswahl",
-    "keywordSubtopic": "",
-    "text": "Berufswahl",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-bio-essen-151",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Bio-Essen",
-    "keywordSubtopic": "",
-    "text": "Bio-Essen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-chatten-152",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Chatten",
-    "keywordSubtopic": "",
-    "text": "Chatten",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-computer-f-r-jeden-kursraum-153",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Computer für jeden Kursraum",
-    "keywordSubtopic": "",
-    "text": "Computer für jeden Kursraum",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-das-internet-154",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Das Internet",
-    "keywordSubtopic": "",
-    "text": "Das Internet",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-einkaufen-in-einkaufszentren-155",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Einkaufen in Einkaufszentren",
-    "keywordSubtopic": "",
-    "text": "Einkaufen in Einkaufszentren",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-einkaufen-im-internet-156",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Einkaufen im Internet",
-    "keywordSubtopic": "",
-    "text": "Einkaufen im Internet",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-extremsport-157",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Extremsport",
-    "keywordSubtopic": "",
-    "text": "Extremsport",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-facebook-158",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Facebook",
-    "keywordSubtopic": "",
-    "text": "Facebook",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-fertigessen-159",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Fertigessen",
-    "keywordSubtopic": "",
-    "text": "Fertigessen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-freiwillige-arbeit-160",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Freiwillige Arbeit",
-    "keywordSubtopic": "",
-    "text": "Freiwillige Arbeit",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-freundschaft-161",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Freundschaft",
-    "keywordSubtopic": "",
-    "text": "Freundschaft",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-gebrauchte-kleidung-162",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Gebrauchte Kleidung",
-    "keywordSubtopic": "",
-    "text": "Gebrauchte Kleidung",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-getrennter-unterricht-f-r-jungen-und-m-dchen-163",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Getrennter Unterricht für Jungen und Mädchen",
-    "keywordSubtopic": "",
-    "text": "Getrennter Unterricht für Jungen und Mädchen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-haushalt-164",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Haushalt",
-    "keywordSubtopic": "",
-    "text": "Haushalt",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-haustiere-165",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Haustiere",
-    "keywordSubtopic": "",
-    "text": "Haustiere",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-heiraten-166",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Heiraten",
-    "keywordSubtopic": "",
-    "text": "Heiraten",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-hotel-mama-167",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Hotel Mama",
-    "keywordSubtopic": "",
-    "text": "Hotel Mama",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-ich-bin-reich-genug-168",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Ich bin reich genug",
-    "keywordSubtopic": "",
-    "text": "Ich bin reich genug",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-informationen-im-internet-169",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Informationen im Internet",
-    "keywordSubtopic": "",
-    "text": "Informationen im Internet",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-kinder-und-fernsehen-170",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Kinder und Fernsehen",
-    "keywordSubtopic": "",
-    "text": "Kinder und Fernsehen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-kinder-und-handys-171",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Kinder und Handys",
-    "keywordSubtopic": "",
-    "text": "Kinder und Handys",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-kinos-sterben-172",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Kinos sterben",
-    "keywordSubtopic": "",
-    "text": "Kinos sterben",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-kreditkarten-173",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Kreditkarten",
-    "keywordSubtopic": "",
-    "text": "Kreditkarten",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt-174",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Leben auf dem Land oder in der Stadt",
-    "keywordSubtopic": "",
-    "text": "Leben auf dem Land oder in der Stadt",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-makeup-f-r-kinder-175",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Makeup für Kinder",
-    "keywordSubtopic": "",
-    "text": "Makeup für Kinder",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-marken-kleidung-176",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Marken-Kleidung",
-    "keywordSubtopic": "",
-    "text": "Marken-Kleidung",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-mode-177",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Mode",
-    "keywordSubtopic": "",
-    "text": "Mode",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-musikinstrument-lernen-178",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Musikinstrument lernen",
-    "keywordSubtopic": "",
-    "text": "Musikinstrument lernen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-musik-im-zeitalter-des-internets-179",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Musik im Zeitalter des Internets",
-    "keywordSubtopic": "",
-    "text": "Musik im Zeitalter des Internets",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-rauchen-180",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Rauchen",
-    "keywordSubtopic": "",
-    "text": "Rauchen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-reisen-181",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Reisen",
-    "keywordSubtopic": "",
-    "text": "Reisen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-schokolade-macht-gl-cklich-182",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Schokolade macht glücklich",
-    "keywordSubtopic": "",
-    "text": "Schokolade macht glücklich",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-sport-treiben-183",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Sport treiben",
-    "keywordSubtopic": "",
-    "text": "Sport treiben",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-sprachenlernen-184",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Sprachenlernen",
-    "keywordSubtopic": "",
-    "text": "Sprachenlernen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-sprachenlernen-mit-dem-internet-185",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Sprachenlernen mit dem Internet",
-    "keywordSubtopic": "",
-    "text": "Sprachenlernen mit dem Internet",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-stadtzentrum-ohne-autos-186",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Stadtzentrum ohne Autos",
-    "keywordSubtopic": "",
-    "text": "Stadtzentrum ohne Autos",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-studenten-und-arbeit-in-den-ferien-187",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Studenten und Arbeit in den Ferien",
-    "keywordSubtopic": "",
-    "text": "Studenten und Arbeit in den Ferien",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-studium-188",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Studium",
-    "keywordSubtopic": "",
-    "text": "Studium",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-tattoos-189",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Tattoos",
-    "keywordSubtopic": "",
-    "text": "Tattoos",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-teilzeitarbeit-190",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Teilzeitarbeit",
-    "keywordSubtopic": "",
-    "text": "Teilzeitarbeit",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-unsere-idole-191",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Unsere Idole",
-    "keywordSubtopic": "",
-    "text": "Unsere Idole",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-umweltschutz-192",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Umweltschutz",
-    "keywordSubtopic": "",
-    "text": "Umweltschutz",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-vegetarische-ern-hrung-193",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Vegetarische Ernährung",
-    "keywordSubtopic": "",
-    "text": "Vegetarische Ernährung",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-2-zeitungslesen-194",
-    "level": "B1",
-    "teilId": "teil-2",
-    "teilLabel": "Teil 2",
-    "topicPrompt": "Zeitungslesen",
-    "keywordSubtopic": "",
-    "text": "Zeitungslesen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-3-fragen-stellen-zu-einer-pr-sentation-195",
-    "level": "B1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Fragen stellen zu einer Präsentation",
-    "keywordSubtopic": "",
-    "text": "Fragen stellen zu einer Präsentation",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-3-positives-feedback-geben-196",
-    "level": "B1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Positives Feedback geben",
-    "keywordSubtopic": "",
-    "text": "Positives Feedback geben",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-3-etwas-berraschend-finden-oder-planen-197",
-    "level": "B1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Etwas überraschend finden oder planen",
-    "keywordSubtopic": "",
-    "text": "Etwas überraschend finden oder planen",
-    "hint": ""
-  },
-  {
-    "id": "b1-teil-3-weitere-details-erfragen-198",
-    "level": "B1",
-    "teilId": "teil-3",
-    "teilLabel": "Teil 3",
-    "topicPrompt": "Weitere Details erfragen",
-    "keywordSubtopic": "",
-    "text": "Weitere Details erfragen",
-    "hint": ""
-  },
-  {
     "id": "b2-teil-1-sollten-smartphones-in-der-schule-erlaubt-sein-199",
     "level": "B2",
     "teilId": "teil-1",
@@ -1478,6 +898,246 @@ export const speakingQuestionDictionary = [
     "topicPrompt": "Wie verändert sich die Familie?",
     "keywordSubtopic": "",
     "text": "Wie verändert sich die Familie?",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-ein-geschenk-fur-einen-kollegen-freund-kaufen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Ein Geschenk für einen Kollegen / Freund kaufen",
+    "keywordSubtopic": "",
+    "text": "Ein Geschenk für einen Kollegen / Freund kaufen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-einen-ausflug-am-wochenende-organisieren",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Einen Ausflug am Wochenende organisieren",
+    "keywordSubtopic": "",
+    "text": "Einen Ausflug am Wochenende organisieren",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-eine-abschiedsparty-uberraschungsparty-planen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Eine Abschiedsparty / Überraschungsparty planen",
+    "keywordSubtopic": "",
+    "text": "Eine Abschiedsparty / Überraschungsparty planen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-fur-die-deutschprufung-b1-prufung-lernen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Für die Deutschprüfung / B1-Prüfung lernen",
+    "keywordSubtopic": "",
+    "text": "Für die Deutschprüfung / B1-Prüfung lernen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-einen-kranken-freund-oder-lehrer-besuchen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Einen kranken Freund oder Lehrer besuchen",
+    "keywordSubtopic": "",
+    "text": "Einen kranken Freund oder Lehrer besuchen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-ein-gemeinsames-abendessen-kochen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Ein gemeinsames Abendessen kochen",
+    "keywordSubtopic": "",
+    "text": "Ein gemeinsames Abendessen kochen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-einen-sporttag-eine-fahrradtour-planen",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Einen Sporttag / eine Fahrradtour planen",
+    "keywordSubtopic": "",
+    "text": "Einen Sporttag / eine Fahrradtour planen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-1-einen-flohmarktstand-vorbereiten",
+    "level": "B1",
+    "teilId": "teil-1",
+    "teilLabel": "Teil 1",
+    "topicPrompt": "Einen Flohmarktstand vorbereiten",
+    "keywordSubtopic": "",
+    "text": "Einen Flohmarktstand vorbereiten",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-2-einkaufen-im-internet-oder-im-geschaft",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Einkaufen im Internet oder im Geschäft?",
+    "keywordSubtopic": "",
+    "text": "Einkaufen im Internet oder im Geschäft?",
+    "hint": "Kaufen Sie lieber online oder im Supermarkt/Geschäft ein?"
+  },
+  {
+    "id": "b1-teil-2-kinder-und-smartphones",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Kinder und Smartphones",
+    "keywordSubtopic": "",
+    "text": "Kinder und Smartphones",
+    "hint": "Brauchen Kinder eigene Smartphones, und ab welchem Alter?"
+  },
+  {
+    "id": "b1-teil-2-bio-lebensmittel-vs-fastfood",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Bio-Lebensmittel vs. Fastfood",
+    "keywordSubtopic": "",
+    "text": "Bio-Lebensmittel vs. Fastfood",
+    "hint": "Sollte man nur noch Bio-Lebensmittel kaufen?"
+  },
+  {
+    "id": "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Leben auf dem Land oder in der Stadt?",
+    "keywordSubtopic": "",
+    "text": "Leben auf dem Land oder in der Stadt?",
+    "hint": "Wo lebt man besser: auf dem Land oder in der Großstadt?"
+  },
+  {
+    "id": "b1-teil-2-fremdsprachen-lernen",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Fremdsprachen lernen",
+    "keywordSubtopic": "",
+    "text": "Fremdsprachen lernen",
+    "hint": "Sollte jeder Mensch mindestens zwei Fremdsprachen lernen?"
+  },
+  {
+    "id": "b1-teil-2-haustiere-in-der-wohnung",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Haustiere in der Wohnung",
+    "keywordSubtopic": "",
+    "text": "Haustiere in der Wohnung",
+    "hint": "Sollte man Haustiere in einer Stadtwohnung halten?"
+  },
+  {
+    "id": "b1-teil-2-offentliche-verkehrsmittel-vs-eigenes-auto",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+    "keywordSubtopic": "",
+    "text": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+    "hint": "Braucht man in der Stadt noch ein eigenes Auto?"
+  },
+  {
+    "id": "b1-teil-2-urlaub-am-meer-oder-in-den-bergen",
+    "level": "B1",
+    "teilId": "teil-2",
+    "teilLabel": "Teil 2",
+    "topicPrompt": "Urlaub am Meer oder in den Bergen?",
+    "keywordSubtopic": "",
+    "text": "Urlaub am Meer oder in den Bergen?",
+    "hint": "Wo und wie verbringen Sie am liebsten Ihren Urlaub?"
+  },
+  {
+    "id": "b1-teil-3-kinder-und-smartphones",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Kinder und Smartphones",
+    "keywordSubtopic": "",
+    "text": "Kinder und Smartphones",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-einkaufen-im-internet",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Einkaufen im Internet",
+    "keywordSubtopic": "",
+    "text": "Einkaufen im Internet",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-haustiere-in-der-wohnung",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Haustiere in der Wohnung",
+    "keywordSubtopic": "",
+    "text": "Haustiere in der Wohnung",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-leben-auf-dem-land-oder-in-der-stadt",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Leben auf dem Land oder in der Stadt",
+    "keywordSubtopic": "",
+    "text": "Leben auf dem Land oder in der Stadt",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-plastikmull-vermeiden",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Plastikmüll vermeiden",
+    "keywordSubtopic": "",
+    "text": "Plastikmüll vermeiden",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-offentliche-verkehrsmittel-vs-auto",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Öffentliche Verkehrsmittel vs. Auto",
+    "keywordSubtopic": "",
+    "text": "Öffentliche Verkehrsmittel vs. Auto",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-fremdsprachen-lernen",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Fremdsprachen lernen",
+    "keywordSubtopic": "",
+    "text": "Fremdsprachen lernen",
+    "hint": ""
+  },
+  {
+    "id": "b1-teil-3-fastfood-vs-selbstkochen",
+    "level": "B1",
+    "teilId": "teil-3",
+    "teilLabel": "Teil 3",
+    "topicPrompt": "Fastfood vs. Selbstkochen",
+    "keywordSubtopic": "",
+    "text": "Fastfood vs. Selbstkochen",
     "hint": ""
   }
 ];

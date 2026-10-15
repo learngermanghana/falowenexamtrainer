@@ -181,7 +181,7 @@
       "opening": "Präsentieren Sie bitte das Thema auf Ihrer Karte. Sie haben ungefähr drei Minuten. Ich unterbreche Sie nicht."
     },
     "B1-3": {
-      "stageGuide": "Answer a question about your own presentation. Then listen to the partner presentation, give feedback and ask a relevant question. Continue from Teil 2 to use your presentation topic.",
+      "stageGuide": "Listen to the short presentation and its follow-up question, then respond. Next, give feedback and ask your partner a question about what you heard.",
       "title": "Über Präsentationen sprechen",
       "role": "examiner",
       "maxAnswers": 2,
@@ -593,110 +593,217 @@
   },
   "b1PlanningTasks": [
     {
-      "match": "Sommerfest",
+      "match": "Ein Geschenk für einen Kollegen / Freund kaufen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann findet das Fest statt?"
+          "id": "point1",
+          "text": "Wann kaufen wir das Geschenk?"
         },
         {
-          "id": "place",
-          "text": "Wo feiern wir?"
+          "id": "point2",
+          "text": "Was schenken wir und wie viel kostet es?"
         },
         {
-          "id": "materials",
-          "text": "Was brauchen wir für das Fest?"
+          "id": "point3",
+          "text": "Wo kaufen wir es?"
         },
         {
-          "id": "responsibilities",
+          "id": "point4",
+          "text": "Wer sammelt Geld und wer besorgt das Geschenk?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Ausflug am Wochenende organisieren",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wohin fahren wir?"
+        },
+        {
+          "id": "point2",
+          "text": "Wie kommen wir hin?"
+        },
+        {
+          "id": "point3",
+          "text": "Was nehmen wir mit?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert was?"
+        }
+      ]
+    },
+    {
+      "match": "Eine Abschiedsparty / Überraschungsparty planen",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo feiern wir?"
+        },
+        {
+          "id": "point2",
+          "text": "Wen laden wir ein?"
+        },
+        {
+          "id": "point3",
+          "text": "Was brauchen wir zum Essen und Trinken?"
+        },
+        {
+          "id": "point4",
           "text": "Wer übernimmt welche Aufgabe?"
         }
       ]
     },
     {
-      "match": "Reise",
+      "match": "Für die Deutschprüfung / B1-Prüfung lernen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann und wie lange reisen wir?"
+          "id": "point1",
+          "text": "Wann und wo treffen wir uns?"
         },
         {
-          "id": "transport",
-          "text": "Wie fahren wir nach Köln?"
+          "id": "point2",
+          "text": "Welche Prüfungsteile üben wir?"
         },
         {
-          "id": "activities",
-          "text": "Was möchten wir dort machen?"
+          "id": "point3",
+          "text": "Welche Materialien brauchen wir?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer organisiert Fahrkarten und Unterkunft?"
+          "id": "point4",
+          "text": "Wer bereitet welche Aufgaben vor?"
         }
       ]
     },
     {
-      "match": "Überraschungsparty",
+      "match": "Einen kranken Freund oder Lehrer besuchen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann feiern wir?"
+          "id": "point1",
+          "text": "Wann besuchen wir ihn?"
         },
         {
-          "id": "place",
-          "text": "Wo findet die Party statt?"
-        },
-        {
-          "id": "materials",
-          "text": "Was bringen wir mit?"
-        },
-        {
-          "id": "responsibilities",
-          "text": "Wer lädt die Gäste ein und bereitet etwas vor?"
-        }
-      ]
-    },
-    {
-      "match": "Kulturelles Ereignis",
-      "points": [
-        {
-          "id": "time",
-          "text": "Wann besuchen wir die Veranstaltung?"
-        },
-        {
-          "id": "event",
-          "text": "Welche Veranstaltung wählen wir?"
-        },
-        {
-          "id": "transport",
+          "id": "point2",
           "text": "Wie kommen wir hin?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer besorgt die Eintrittskarten?"
+          "id": "point3",
+          "text": "Welches kleine Geschenk bringen wir mit?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert den Besuch und die Hilfe?"
         }
       ]
     },
     {
-      "match": "Museumsbesuch",
+      "match": "Ein gemeinsames Abendessen kochen",
       "points": [
         {
-          "id": "time",
-          "text": "Wann besuchen wir das Museum?"
+          "id": "point1",
+          "text": "Wann und wo kochen wir?"
         },
         {
-          "id": "place",
-          "text": "Welches Museum besuchen wir?"
+          "id": "point2",
+          "text": "Was möchten wir kochen?"
         },
         {
-          "id": "transport",
-          "text": "Wie kommen wir hin?"
+          "id": "point3",
+          "text": "Welche Zutaten brauchen wir?"
         },
         {
-          "id": "responsibilities",
-          "text": "Wer organisiert Eintrittskarten und die Gruppe?"
+          "id": "point4",
+          "text": "Wer kauft was ein?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Sporttag / eine Fahrradtour planen",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo treffen wir uns?"
+        },
+        {
+          "id": "point2",
+          "text": "Welche Strecke oder Sportart wählen wir?"
+        },
+        {
+          "id": "point3",
+          "text": "Welche Ausrüstung brauchen wir?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer organisiert was?"
+        }
+      ]
+    },
+    {
+      "match": "Einen Flohmarktstand vorbereiten",
+      "points": [
+        {
+          "id": "point1",
+          "text": "Wann und wo ist der Flohmarkt?"
+        },
+        {
+          "id": "point2",
+          "text": "Was möchten wir verkaufen?"
+        },
+        {
+          "id": "point3",
+          "text": "Welche Preise und Materialien brauchen wir?"
+        },
+        {
+          "id": "point4",
+          "text": "Wer transportiert die Sachen und betreut den Stand?"
         }
       ]
     }
+  ],
+  "b1PresentationTopics": [
+    {
+      "topic": "Einkaufen im Internet oder im Geschäft?",
+      "question": "Kaufen Sie lieber online oder im Supermarkt/Geschäft ein?"
+    },
+    {
+      "topic": "Kinder und Smartphones",
+      "question": "Brauchen Kinder eigene Smartphones, und ab welchem Alter?"
+    },
+    {
+      "topic": "Bio-Lebensmittel vs. Fastfood",
+      "question": "Sollte man nur noch Bio-Lebensmittel kaufen?"
+    },
+    {
+      "topic": "Leben auf dem Land oder in der Stadt?",
+      "question": "Wo lebt man besser: auf dem Land oder in der Großstadt?"
+    },
+    {
+      "topic": "Fremdsprachen lernen",
+      "question": "Sollte jeder Mensch mindestens zwei Fremdsprachen lernen?"
+    },
+    {
+      "topic": "Haustiere in der Wohnung",
+      "question": "Sollte man Haustiere in einer Stadtwohnung halten?"
+    },
+    {
+      "topic": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+      "question": "Braucht man in der Stadt noch ein eigenes Auto?"
+    },
+    {
+      "topic": "Urlaub am Meer oder in den Bergen?",
+      "question": "Wo und wie verbringen Sie am liebsten Ihren Urlaub?"
+    }
+  ],
+  "b1DiscussionTopics": [
+    "Kinder und Smartphones",
+    "Einkaufen im Internet",
+    "Haustiere in der Wohnung",
+    "Leben auf dem Land oder in der Stadt",
+    "Plastikmüll vermeiden",
+    "Öffentliche Verkehrsmittel vs. Auto",
+    "Fremdsprachen lernen",
+    "Fastfood vs. Selbstkochen"
   ],
   "a2TopicCards": [
     {

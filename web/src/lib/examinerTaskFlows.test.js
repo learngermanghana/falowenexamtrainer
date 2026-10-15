@@ -257,3 +257,22 @@ test.each(catalogue.a2PlanningTasks)("calendar agreement for $topic uses both pa
   for(const reply of ["Samstag um 8 Uhr passt.","Nein, das geht nicht.","Sonntag um 13 Uhr passt."])
     expect(flows.calendarResponse(session,reply).complete).toBe(false);
 });
+
+test("B1 curated bank replaces old prompts with 8 tasks per part",()=>{
+  const fs=require("fs"),path=require("path"),source=fs.readFileSync(path.resolve(__dirname,"../data/speakingDictionary.js"),"utf8");
+  const rows=JSON.parse(source.slice(source.indexOf("["),source.lastIndexOf("]")+1)).filter(row=>row.level === "B1");
+  expect([1,2,3].map(part=>rows.filter(row=>row.teilId === `teil-${part}`).length)).toEqual([8,8,8]);
+  for(const row of rows){
+    const task={teil:row.teilLabel,prompt:row.topicPrompt};const flow=flows.createExaminerFlow("B1",task);
+    if(row.teilId === "teil-1")expect(flow.planningPoints).toHaveLength(4);
+    if(row.teilId === "teil-2"){expect(flows.currentStep(flow).instruction).toContain(row.hint);expect(examinerTaskPreview("B1",task).presentationQuestion).toBe(row.hint);}
+    if(row.teilId === "teil-3"){
+      expect(flow.discussion.presentation.length).toBeGreaterThan(100);
+      const opening=flows.currentStep(flow).instruction;
+      expect(opening).toContain(flow.discussion.presentation);
+      expect(opening).toContain(flow.discussion.question);
+      expect(flows.currentStep(flow,1).instruction).not.toContain(flow.discussion.presentation);
+      expect(flows.currentStep(flow,1).instruction).toContain("Rückmeldung");
+    }
+  }
+});

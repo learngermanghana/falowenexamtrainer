@@ -19,6 +19,7 @@ export default function GoetheExamTaskCard({flow,topic,active=false}) {
   const requestCard=flow.key === "A1-3" ? flow.requestCards?.[requestRound] : null;
   return <section className="speaking-exam-task-card" aria-label="Speaking task card" style={{padding:14,border:"1px solid #cbd5e1",borderRadius:12,background:"#fff",display:"grid",gap:8}}>
     <strong>{flow.title} · {flow.mode === "simulation" ? "Exam simulation" : "Guided practice"}</strong>
+    {flow.presentationQuestion ? <p lang="de" style={{margin:0,fontWeight:700}}>{flow.presentationQuestion}</p> : null}
     {flow.stageGuide ? <p style={{margin:0,fontSize:13,color:"#334155"}}>{flow.stageGuide}</p> : null}
     {flow.key === "A1-2" && flow.cards?.length ? (
       <div className="goethe-card-mat">
