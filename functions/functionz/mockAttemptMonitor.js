@@ -29,6 +29,24 @@ const iso = value => {
   const ms = toMillis(value);
   return ms ? new Date(ms).toISOString() : null;
 };
+// The completed attempt already holds authoritative /25 scores from the
+// server-side A1/A2/B1 completion verifier. Never expose browser-submitted
+// in-progress scores as staff-verified results.
+const verifiedScore = value => {
+  if (value === null || value === undefined || value === "" || typeof value === "boolean") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 25 ? parsed : null;
+};
+const verifiedMockBreakdown = data => {
+  if (data?.status !== "completed" || !Number.isFinite(Number(data?.verifiedOverall?.score))) return null;
+  const source = data.verifiedSectionScores && typeof data.verifiedSectionScores === "object"
+    ? data.verifiedSectionScores
+    : data.sectionScores && typeof data.sectionScores === "object"
+      ? data.sectionScores // Historical completed attempts with a verified total.
+      : {};
+  return Object.fromEntries(SECTIONS.map(section => [section, verifiedScore(source[section])]));
+};
+
 const normalizeMockAttempt = doc => {
   const path = String(doc.ref?.path || "");
   const parts = path.split("/");
@@ -62,6 +80,7 @@ const normalizeMockAttempt = doc => {
     completedAt: iso(data.completedAt),
     overallScore: data.status === "completed" && Number.isFinite(Number(data.verifiedOverall?.score))
       ? Number(data.verifiedOverall.score) : null,
+    sectionScores: verifiedMockBreakdown(data),
   };
 };
 
