@@ -367,6 +367,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setStudentAudioUrl("");
   };
   const retryTranscript = () => {
+    if (pending?.typed) { setTypedAnswer(recognizedText); setAnswerMode("type"); }
     setAudioRetry(null);
     setPending(null);
     setRecognizedText("");
@@ -720,6 +721,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </div>
       ) : null}
 
+      {examinerEntry && !session && details?.activeSession ? <button type="button"
+        className="speaking-reset-session" onClick={()=>setResetConfirm(true)} disabled={resetting}>
+        Reset saved session
+      </button> : null}
       {localPracticeMode ? (
         <section className="speaking-exam-local-practice" aria-label="Record speaking practice without AI">
           <div className="speaking-exam-local-practice__heading">
@@ -759,16 +764,18 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 Current task: {displayContext.topic || "the previous topic"}. Finish it to change topics.
               </p> : null}
             </div>
-            <div style={{display:"grid",justifyItems:"end",gap:2}}>
-              <small style={{color:"#64748b"}}>Session time left</small>
-              <strong style={{fontSize:22,color:expired?"#b91c1c":"#145b8f"}} aria-live="off">{friendlyTime(timeRemaining)}</strong>
+            <div className="speaking-exam-session__utility">
+              <strong className="speaking-session-clock" aria-label="Session time left" aria-live="off">{friendlyTime(timeRemaining)}</strong>
+              {examinerSession ? <button type="button" className="speaking-reset-session"
+                onClick={()=>setResetConfirm(true)} disabled={resetting || recording}>Reset session</button> : null}
             </div>
           </header>
           {examinerSession ? <div className="speaking-exam-turn-indicator" role="status" aria-live="polite" aria-atomic="true">
-            <span className={recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
+            <span className={waitingForOpening ? "speaking-exam-turn-indicator__dot is-waiting" : recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
             <strong>{examTurnState}</strong>
-            <small>{voiceState === "playing"
-              ? "Listen to the question before using the microphone."
+            <small>{waitingForOpening ? "Please wait. The AI is preparing your German question and audio."
+              : voiceState === "playing"
+              ? "Please listen. Your microphone unlocks when the examiner finishes speaking."
               : voiceState === "blocked"
                 ? "Tap Listen to examiner, or read the German question."
                 : taskReady
@@ -780,7 +787,16 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             {session.examFlow?.step?.instruction || (busy ? "Die Frage wird vorbereitet …" : examTask?.prompt)}
           </p> : null}
           {openingFailed ? <button type="button" className="speaking-opening-retry" disabled={busy || recording} onClick={()=>sendTurn(session,{intro:true})}>Retry examiner opening</button> : null}
-          <div className={examinerSession ? "speaking-exam-chat-shell" : undefined}>
+          {examinerSession && currentExaminerText ? <div className="speaking-current-question" aria-label="Current examiner question">
+            <strong>AI question</strong>
+            <p lang="de">{currentExaminerText}</p>
+            <button type="button" onClick={replayExaminer}
+              disabled={busy || recording || feedbackBusy || resetting || !currentExaminerText}>
+              ▶ Listen to question again
+            </button>
+          </div> : null}
+          <details className={examinerSession ? "speaking-exam-chat-shell speaking-dialogue-history" : "speaking-exam-chat-shell"} open={!examinerSession ? true : undefined}>
+            {examinerSession ? <summary>Previous dialogue · {messages.length} messages</summary> : null}
             <div ref={examinerSession ? examConversationRef : undefined}
               onScroll={examinerSession ? handleExamThreadScroll : undefined}
               className={examinerSession ? "speaking-exam-session__conversation speaking-exam-chat-thread" : undefined}
@@ -811,8 +827,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </div>
             {examinerSession && showLatest ? <button type="button" className="speaking-exam-chat-latest"
               onClick={jumpToLatestExamTurn}>↓ Latest message</button> : null}
-          </div>
-          {examinerSession && lastAudio ? <details className="speaking-exam-audio-controls">
+          </details>
+          {examinerSession && lastAudio && voiceState === "blocked" ? <details className="speaking-exam-audio-controls">
             <summary>Examiner audio player</summary>
             <audio ref={nativeAudioRef} controls={!recording && !busy} preload="metadata" aria-label="Examiner audio player"
               src={"data:audio/mpeg;base64,"+lastAudio}
@@ -960,6 +976,16 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           <small style={{color:"#64748b"}}>This is practice feedback from reviewed transcripts, not an official Goethe result. Pronunciation cannot be scored from these transcripts.</small>
         </section>
       ) : null}
+      {examinerEntry && resetConfirm ? <div role="alertdialog" aria-label="Reset speaking session" aria-modal="false" className="speaking-reset-confirm">
+        <strong>Start this speaking part again?</strong>
+        <p>The unfinished session will end. Completed practice stays saved. A new AI session may use another allowance.</p>
+        <div>
+          <button type="button" onClick={()=>setResetConfirm(false)} disabled={resetting}>Keep practising</button>
+          <button type="button" onClick={resetExamSession} disabled={resetting || recording || feedbackBusy}>
+            {resetting ? "Resetting…" : "Reset session"}
+          </button>
+        </div>
+      </div> : null}
       {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
 
