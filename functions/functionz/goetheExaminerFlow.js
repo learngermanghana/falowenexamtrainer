@@ -18,6 +18,8 @@ function selectedCards(word, defaults, count) {
   const questions = {tagesablauf:"Wie sieht Ihr Tagesablauf aus?",sprachen:"Welche Sprachen sprechen Sie?",haustiere:"Haben Sie Haustiere?"};
   const first = match || {word,question:questions[normalize(word)] || `Was können Sie zum Thema „${word}“ über sich erzählen?`};
   const seen = new Set();
+  // Unknown single-word practice cards remain focused on that one word.
+  if (count === 2 && !match) return [first];
   // Teil 2 uses two distinct themes, not two cards from the same theme.
   const position = defaults.indexOf(match);
   const rotated = position < 0 ? defaults : [...defaults.slice(position+1),...defaults.slice(0,position)];
