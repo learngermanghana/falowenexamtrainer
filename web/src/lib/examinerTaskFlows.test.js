@@ -94,6 +94,38 @@ test("feedback readiness alone does not complete interrupted tasks",()=>{
  expect(flows.isComplete({examFlow,answeredTurns:2,taskReady:true})).toBe(false);
 });
 
+
+test("A1 polite transitions preserve the exact Goethe questions without duplicate thanks",()=>{
+  const intro=flows.createExaminerFlow("A1",{teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"});
+  const session={examFlow:intro,answeredTurns:1},plan=flows.responsePlan(session);
+  const next=flows.politeNextInstruction(session,plan,plan.reply);
+  expect(next).toMatch(/^Vielen Dank\\./);
+  expect(next).toContain("buchstabieren Sie Ihren Familiennamen");
+  expect(next).toContain(plan.reply);
+  expect(next.split("Bitte buchstabieren Sie")).toHaveLength(2);
+  expect(flows.politeNextInstruction(session,plan,"Vielen Dank. "+plan.reply)).toBe("Vielen Dank. "+plan.reply);
+  const afterSpelling={...session,answeredTurns:2},spellingPlan=flows.responsePlan(afterSpelling);
+  expect(flows.politeNextInstruction(afterSpelling,spellingPlan,spellingPlan.reply)).toMatch(/^Gut, danke\\./);
+  const afterNumber={...session,answeredTurns:3},numberPlan=flows.responsePlan(afterNumber);
+  expect(flows.politeNextInstruction(afterNumber,numberPlan,numberPlan.step.instruction)).toMatch(/^Danke schön\\./);
+  expect(flows.politeNextInstruction({...session,answeredTurns:4},flows.responsePlan({...session,answeredTurns:4}),"Danke.")).toBe("Danke.");
+});
+
+test("A1 surnames and telephone numbers survive phonetic German transcription without inventing words",()=>{
+  const rows=flows.a1DictationEvidence([
+    "Ich heiße Felix Asadu.",
+    "a es a di u",
+    "Null, zwei, vier, fünf, null, zwei, zwei, sieben, vier, drei",
+    "Ich trinke gern Kaffee.",
+  ]);
+  expect(rows).toEqual([
+    expect.objectContaining({step:2,action:"spell",possibleLetters:"A S A D U"}),
+    expect.objectContaining({step:3,action:"number",possibleDigits:"0245022743"}),
+  ]);
+  expect(flows.a1DictationEvidence(["Ich heiße Ama.","Meine Mutter heißt Ama.","Viele Grüße!"]))
+    .toEqual([]);
+});
+
 test("A1 Teil 1 keeps spelling and numbers, then asks exactly one personal follow-up",()=>{
   const task={teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"};
   const examFlow=flows.createExaminerFlow("A1",task);
