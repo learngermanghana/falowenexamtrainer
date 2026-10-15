@@ -228,7 +228,7 @@ test("failed reset keeps session visible so the learner can retry safely",async(
  });
  mount();
  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
- fireEvent.click(screen.getByRole("button",{name:"Reset session"}));
+ fireEvent.click(await screen.findByRole("button",{name:"Reset session"}));
  fireEvent.click(screen.getByRole("alertdialog",{name:"Reset speaking session"}).querySelector("button:last-child"));
  expect(await screen.findByRole("alert")).toHaveTextContent(/Could not reset the session/);
  expect(screen.getByRole("heading",{name:"AI Examiner · A1"})).toBeInTheDocument();
@@ -244,7 +244,7 @@ test("typed practice uses the metered answer route and confirms before the exami
  });
  mount();
  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
- fireEvent.click(screen.getByRole("button",{name:"⌨ Type"}));
+ fireEvent.click(await screen.findByRole("button",{name:"⌨ Type"}));
  fireEvent.change(screen.getByRole("textbox",{name:"Type your German answer"}),{target:{value:"Ich heiße Anna."}});
  fireEvent.click(screen.getByRole("button",{name:"Send typed answer"}));
  await screen.findByText("Check your typed answer, then confirm it.");
