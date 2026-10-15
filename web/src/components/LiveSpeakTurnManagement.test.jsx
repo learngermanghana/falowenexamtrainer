@@ -34,7 +34,7 @@ test("examiner automatically speaks German, then releases microphone when audio 
   });
   mount();
   fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
-  expect(await screen.findByText("Guten Tag. Stellen Sie sich bitte vor.")).toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Guten Tag. Stellen Sie sich bitte vor."));
   expect(await screen.findByText("Examiner speaking")).toBeInTheDocument();
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
   expect(screen.getByRole("button",{name:/Listen to question again/})).toBeEnabled();
@@ -141,7 +141,7 @@ test("an exhausted pilot starts a real AI examiner tryout instead of local-only 
   expect(await screen.findByRole("button",{name:"Start speaking"})).toBeInTheDocument();
   expect(screen.queryByRole("button",{name:"Record local speaking practice"})).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:"Start speaking"}));
-  expect(await screen.findByText("Guten Tag. Stellen Sie sich bitte vor.")).toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Guten Tag. Stellen Sie sich bitte vor."));
   expect(await screen.findByText("Examiner speaking")).toBeInTheDocument();
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
   await act(async()=>players[0].onended());
@@ -284,7 +284,7 @@ test("an empty resumed session requests its missing spoken opening",async()=>{
   global.Audio=jest.fn(()=>({play:jest.fn().mockResolvedValue(),pause:jest.fn()}));
   mount();
   fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
-  expect(await screen.findByText("Stellen Sie sich bitte vor.")).toBeInTheDocument();
+  await waitFor(()=>expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Stellen Sie sich bitte vor."));
   expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/turn"))).toHaveLength(1);
   expect(screen.getByRole("button",{name:/Listen to question again/})).toBeInTheDocument();
 });
@@ -293,8 +293,8 @@ test("recording does not remove the examiner replay button",async()=>{
   global.Audio=jest.fn(()=>({play:jest.fn().mockResolvedValue(),pause:jest.fn()}));
   mount();
   fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
-  const player=await screen.findByLabelText("Examiner audio player");
-  expect(player).toHaveAttribute("controls");
+  await screen.findByRole("button",{name:/Listen to question again/});
+  expect(screen.queryByLabelText("Examiner audio player")).not.toBeInTheDocument();
   expect(screen.getByRole("button",{name:/Listen to question again/})).toBeInTheDocument();
 });
 
