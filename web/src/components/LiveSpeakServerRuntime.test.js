@@ -1096,21 +1096,21 @@ test("open examiner mode preserves the old standalone credit-claim path",async()
 
 
 test("a failed Goethe AI partner reply advances only to the next assigned step",async()=>{
-  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
   api.fakeClient.chat.completions.create.mockRejectedValueOnce(new Error("temporary model outage"));
-  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
   expect(first.code).toBe(200);
   expect(first.payload.recovered).toBe(true);
   expect(first.payload.taskReady).toBe(false);
-  expect(first.payload.nextInstruction).toMatch(/Fahrkarte/);
+  expect(first.payload.nextInstruction).toMatch(/Frühstück/);
   expect(first.payload.examFlow.step.index).toBe(2);
   const persisted=api.docs.get(sessionKey);
   expect(persisted.answeredTurns).toBe(1);
   expect(persisted.taskReady).toBe(false);
   expect(persisted.inFlight).toBe(false);
-  expect(persisted.confirmedAnswers).toEqual(["Wie viel kostet die Fahrkarte?"]);
+  expect(persisted.confirmedAnswers).toEqual(["Was essen Sie zum Frühstück?"]);
   expect(persisted.messages.at(-1).text).toBe(first.payload.nextInstruction);
-  const again=await answerExam(api,session,"Die Fahrkarte kostet fünf Euro.");
+  const again=await answerExam(api,session,"Ich esse Brot zum Frühstück.");
   expect(again.code).toBe(200);
   expect(again.payload.taskReady).toBe(false);
   expect(again.payload.examFlow.step.index).toBe(3);
@@ -1118,13 +1118,13 @@ test("a failed Goethe AI partner reply advances only to the next assigned step",
 });
 
 test("failed examiner TTS after a confirmed answer retains the next step without replaying audio",async()=>{
-  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
   api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("iPhone voice unavailable"));
-  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
   expect(first.code).toBe(200);
   expect(first.payload.recovered).toBe(true);
   expect(first.payload.audioBase64).toBe("");
-  expect(first.payload.nextInstruction).toMatch(/Fahrkarte/);
+  expect(first.payload.nextInstruction).toMatch(/Frühstück/);
   expect(first.payload.taskReady).toBe(false);
   const status=(await api.call("GET","/live-speak/status")).payload.activeSession;
   expect(status.answeredTurns).toBe(1);
@@ -1148,10 +1148,10 @@ test("dynamic examiner dialogue asks at most one question in each turn",async()=
 });
 
 test("feedback is grounded in actually prompted steps and incomplete sessions are marked partial",async()=>{
-  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
   const start=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
   expect(start.code).toBe(200);
-  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
   expect(first.payload.taskReady).toBe(false);
   const original=api.docs.get(sessionKey);
   expect(original.promptedSteps).toHaveLength(1);
