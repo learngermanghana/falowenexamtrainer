@@ -129,3 +129,58 @@ test("mock monitor resolves legacy profiles keyed by UID and preserves email fal
   expect(result.attempts.map(row => row.studentName)).toEqual(["Nana Boateng", ""]);
   expect(result.attempts[1].studentEmail).toBe("missing@example.org");
 });
+
+
+test.each([
+  ["a1MockExamUsers", "A1"],
+  ["a2MockExamUsers", "A2"],
+  ["b1MockExamUsers", "B1"],
+])("%s finished attempts expose four server-verified skills and their total without answers", (collection, level) => {
+  const row = normalizeMockAttempt({
+    id:"mock-a",ref:{path:collection+"/learner-1/attempts/mock-a"},
+    data:()=>({
+      uid:"learner-1",status:"completed",mockId:level.toLowerCase()+"-mock-01",
+      sectionScores:{lesen:0,hoeren:0,schreiben:0,sprechen:0}, // Older browser snapshot must not overwrite verified marks.
+      verifiedSectionScores:{lesen:22.5,hoeren:0,schreiben:19,sprechen:25},
+      verifiedOverall:{score:66.5,maxScore:100},state:{schreibenText:"private student writing"},
+      rawAnswers:{password:"do not return"},
+    })
+  });
+  expect(row.level).toBe(level);
+  expect(row.sectionScores).toEqual({lesen:22.5,hoeren:0,schreiben:19,sprechen:25});
+  expect(row.overallScore).toBe(66.5);
+  expect(JSON.stringify(row)).not.toMatch(/private student writing|do not return/);
+});
+
+test("unverified in-progress skill scores never look like finalized marks",()=>{
+  const row=normalizeMockAttempt({
+    id:"start",ref:{path:"a1MockExamUsers/learner/attempts/start"},
+    data:()=>({status:"in_progress",sectionScores:{lesen:25,hoeren:0},
+      overall:{score:100}})
+  });
+  expect(row.completedSections).toEqual(["lesen","hoeren"]);
+  expect(row.sectionScores).toBeNull();
+  expect(row.overallScore).toBeNull();
+});
+
+test("historical verified totals can display their saved section scores without substituting zero for missing marks",()=>{
+  const completed=normalizeMockAttempt({
+    id:"legacy",ref:{path:"b1MockExamUsers/learner/attempts/legacy"},
+    data:()=>({status:"completed",verifiedOverall:{score:70},
+      sectionScores:{lesen:0,hoeren:20,schreiben:25,sprechen:null}})
+  });
+  expect(completed.sectionScores).toEqual({lesen:0,hoeren:20,schreiben:25,sprechen:null});
+  expect(completed.overallScore).toBe(70);
+  const missing=normalizeMockAttempt({
+    id:"invalid",ref:{path:"a2MockExamUsers/learner/attempts/invalid"},
+    data:()=>({status:"completed",sectionScores:{lesen:25},verifiedOverall:{score:null}})
+  });
+  expect(missing.overallScore).toBeNull();
+  expect(missing.sectionScores).toBeNull();
+  const invalid=normalizeMockAttempt({
+    id:"invalidscore",ref:{path:"a2MockExamUsers/learner/attempts/invalidscore"},
+    data:()=>({status:"completed",verifiedOverall:{score:50},
+      verifiedSectionScores:{lesen:26,hoeren:-1,schreiben:"",sprechen:"invalid"}})
+  });
+  expect(invalid.sectionScores).toEqual({lesen:null,hoeren:null,schreiben:null,sprechen:null});
+});
