@@ -51,7 +51,7 @@ const sessionView = session => ({
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
-  pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain) } : null,
+  pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain), typed:Boolean(session.pendingTyped) } : null,
   feedbackStatus: session.feedbackStatus || null,
   feedbackAttempts: Number(session.feedbackAttempts) || 0,
   feedback: session.feedback || "", examTryout: Boolean(session.examTryout), resumed: true,
@@ -435,7 +435,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const pendingId = crypto.randomUUID();
         await updateSession(sessionRef, sessionId, {
           inFlight:false, pendingId, pendingTranscript:typedAnswer,
-          pendingUncertain:false, pendingAt:admin.firestore.FieldValue.serverTimestamp(),
+          pendingUncertain:false, pendingTyped:true, pendingAt:admin.firestore.FieldValue.serverTimestamp(),
         });
         return res.json({ok:true,needsConfirmation:true,pendingId,transcript:typedAnswer,typed:true,uncertain:false});
       }
@@ -463,7 +463,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const pendingId = crypto.randomUUID();
         await updateSession(sessionRef, sessionId, {
           inFlight: false, pendingId, pendingTranscript: transcript,
-          pendingUncertain: transcriptUncertain(recognition),
+          pendingUncertain: transcriptUncertain(recognition), pendingTyped:false,
           pendingAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // Do not let the tutor judge grammar based on unconfirmed speech recognition.
@@ -541,7 +541,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // Confirmation may be edited by the learner; it is allowed only after a
         // metered, authenticated audio transcription in the same session.
         tx.update(sessionRef, {
-          inFlight:true, pendingId:null, pendingTranscript:null,
+          inFlight:true, pendingId:null, pendingTranscript:null, pendingTyped:false,
           answeredTurns:admin.firestore.FieldValue.increment(1),
           ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{step:flowSession.answeredTurns,original:session.pendingTranscript || "",confirmed,corrected:confirmed !== session.pendingTranscript}].slice(0,answerLimit(session))} : {}),
           ...(examTask ? {confirmedAnswers:answers, messages:[...storedMessages,{role:"user",text:confirmed}].slice(-20)} : {}),
