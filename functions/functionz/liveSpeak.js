@@ -9,6 +9,10 @@ const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");
 
 const PILOT_SESSIONS = 2;
+// One verified exam tryout per learner/month, bounded by a SMALL shared
+// supplemental usage pool. Does not reset pilot credits or disable quotas.
+const EXAM_TRYOUT_EXTRA_UNITS = 12;
+const EXAM_TRYOUT_RESERVE_UNITS = 10;
 const SESSION_MS = 5 * 60 * 1000;
 const PILOT_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_TURNS = 10;
@@ -41,7 +45,7 @@ const sessionView = session => ({
   pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain) } : null,
   feedbackStatus: session.feedbackStatus || null,
   feedbackAttempts: Number(session.feedbackAttempts) || 0,
-  feedback: session.feedback || "", resumed: true,
+  feedback: session.feedback || "", examTryout: Boolean(session.examTryout), resumed: true,
 });
 const MAX_AUDIO_BYTES = 350000;
 const MAX_CONFIRMED_CHARS = 600;
@@ -71,6 +75,12 @@ const spendingCap = () => {
   const configured = Number(process.env.LIVE_SPEAK_MONTHLY_TURN_CAP);
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 500 ? configured : 40;
 };
+const tryoutCeiling = () => spendingCap() + EXAM_TRYOUT_EXTRA_UNITS;
+const eligibleForTryout = ({source,flow,credit,usage}) =>
+  source === "exam-speaking-practice" && Boolean(flow) &&
+  credit?.examTryoutMonth !== currentMonth() &&
+  usage + EXAM_TRYOUT_RESERVE_UNITS <= tryoutCeiling();
+const quotaForSession = session => session.examTryout ? tryoutCeiling() : spendingCap();
 const normalizeEmail = (value) => String(value || "").trim().toLowerCase();
 const cleanPracticeTopic = (value) =>
   String(value || "").replace(/[\r\n\t]/g, " ").replace(/\s+/g, " ").trim().slice(0, 120);
@@ -178,10 +188,14 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const active = running.sessionId && !running.endedAt &&
         (Date.parse(running.expiresAt || "") > Date.now() || feedbackOpen(running));
       const info = receiptStatus(pilot?.data());
+      const used = Number(usage?.data()?.turns) || 0;
+      const tryoutAvailable = enabled() && eligibleForTryout({
+        source:"exam-speaking-practice", flow:true, credit:pilot?.data() || {}, usage:used,
+      });
       return res.json({
         enabled: enabled(), pilotAvailable: enabled() && !info.pilotClaimed,
         sessionMinutes: 5, maxTurns: MAX_TURNS, examinerFlowVersion:1, ...info,
-        capReached: (Number(usage?.data()?.turns) || 0) >= spendingCap(),
+        capReached: used >= spendingCap(), examTryoutAvailable:tryoutAvailable,
         activeSession: active && enabled() ? sessionView(running) : null,
         lastExamResult: examiner(running) && (running.feedback || (!active && confirmedAnswers(running).length)) ? sessionView(running) : null,
       });
@@ -252,9 +266,19 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           result = sessionView(existing);
           return;
         }
-        if ((Number(usageSnap.data()?.turns) || 0) >= spendingCap()) throw Object.assign(new Error("Pilot spending cap reached."),{status:429,code:"budget_reached"});
+        const used = Number(usageSnap.data()?.turns) || 0;
         const sub = subSnap.data() || {};
-        if (!withinWindow(sub) || Number(sub.remaining) <= 0) throw Object.assign(new Error("No pilot sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
+        const hasPilotCredit = withinWindow(sub) && Number(sub.remaining) > 0;
+        const usePilot = hasPilotCredit && used < spendingCap();
+        const useExamTryout = !usePilot && eligibleForTryout({
+          source, flow:examFlow, credit:sub, usage:used,
+        });
+        if (!usePilot && !useExamTryout) {
+          if (used >= spendingCap() || (source === "exam-speaking-practice" && used >= tryoutCeiling())) {
+            throw Object.assign(new Error("Speaking usage safety limit reached."),{status:429,code:"budget_reached"});
+          }
+          throw Object.assign(new Error("No speaking sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
+        }
         const preparedFlow = examFlow ? {...examFlow} : null;
         if (preparedFlow?.key === "B1-3" && existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0]) {
           preparedFlow.contextTopic=existing.examTask.prompt;
@@ -262,8 +286,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         const sessionId = crypto.randomUUID();
         const expiresAt = addDays(examFlow ? 10 * 60 * 1000 : SESSION_MS);
-        tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
-        tx.set(sessionRef, { uid: student.auth.uid, sessionId, level, topic, source, examTask, ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
+        if (useExamTryout) tx.set(subRef, {uid:student.auth.uid,
+          examTryoutMonth:currentMonth(),
+          updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
+        else tx.update(subRef, { remaining: admin.firestore.FieldValue.increment(-1), updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+        tx.set(sessionRef, { uid: student.auth.uid, sessionId, level, topic, source, examTask,
+          examTryout:useExamTryout,
+          ...(preparedFlow ? {examFlow:preparedFlow,recognitionReviews:[]} : {}), expiresAt, turnsUsed: 0, answeredTurns:0, confirmedAnswers:[], messages:[], feedbackAttempts:0, inFlight: false, endedAt: null, startedAt: admin.firestore.FieldValue.serverTimestamp() });
         result = {...sessionView({sessionId, expiresAt, level, topic, source, examTask,examFlow:preparedFlow}),resumed:false};
       });
       return res.json({ ok: true, ...result, answerLimit: result.answerLimit, maxTurns: result.examFlow?.key === "A2-1" ? 14 : MAX_TURNS });
@@ -333,7 +362,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         if (session.inFlight) throw Object.assign(new Error("Finish the current reply first."), {status:409,code:"turn_in_progress"});
         if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
-        if ((Number(usageSnap.data()?.turns) || 0) >= spendingCap()) throw Object.assign(new Error("Pilot spending limit reached."), {status:429,code:"budget_reached"});
+        if ((Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
         level = cleanLevel(session.level);
         topic = cleanPracticeTopic(session.topic);
         examTask = session.source === "exam-speaking-practice" ? session.examTask : null;
@@ -349,7 +378,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const needsResponse = nextPlan ? (nextPlan.dynamic || nextPlan.scripted || !nextPlan.ready) : !finalExamAnswer;
         const transcriptionUnits = !intro ? Math.max(1,Math.ceil(audioBytes.length / MAX_AUDIO_BYTES)) : 0;
         const reservedCalls = intro ? 1 : transcriptionUnits + (needsResponse ? 1 : 0);
-        if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > spendingCap()) {
+        if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > quotaForSession(session)) {
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
         }
         tx.update(sessionRef, {
@@ -609,7 +638,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
         }
-        if ((Number(usageSnap.data()?.turns) || 0) + 1 > spendingCap()) {
+        if ((Number(usageSnap.data()?.turns) || 0) + 1 > quotaForSession(record)) {
           throw Object.assign(new Error("The pilot feedback budget is reached."), {status:429,code:"budget_reached"});
         }
         task = record.examTask || {prompt:record.topic};
