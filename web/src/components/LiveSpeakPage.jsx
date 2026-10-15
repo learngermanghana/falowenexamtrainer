@@ -9,6 +9,7 @@ import { liveSpeakSessionContext, isDifferentLiveSpeakSessionContext } from "../
 import { microphoneFailureMessage, speakingTurnLabel } from "../lib/liveSpeakDevice";
 
 const MAX_RECORDING_SECONDS = 20;
+const LOCAL_PRACTICE_SECONDS = 75; // Bounded on-device recording, no backend usage.
 const MAX_AUDIO_BYTES = 350000;
 const shell = { ...styles.card, padding: "clamp(16px, 4vw, 28px)", borderRadius: 18 };
 const friendlyTime = (value) => {
@@ -54,6 +55,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const requestBusy = useRef(false);
   const recordingStarting = useRef(false);
   const [localRetry, setLocalRetry] = useState(false);
+  const [localAnswer, setLocalAnswer] = useState("");
   const mounted = useRef(true);
   const level = String(studentProfile?.level || "A2").toUpperCase();
   const contextualLevel = String(initialLevel || "").toUpperCase();
@@ -399,7 +401,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const startRecording = async (localOnly = false) => {
     if (recordingStarting.current || busy || feedbackBusy || recording || pending || audioRetry || voiceState === "playing") return;
     if (!localOnly && (!session || taskReady || now >= Date.parse(session.expiresAt))) return;
-    if (localOnly && !examFeedback) return;
+    if (localOnly && !examFeedback && !examinerEntry) return;
     setErrorMessage("");
     if (typeof MediaRecorder === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       setErrorMessage("Audio recording is not supported on this browser. Use a recent Chrome or Safari version.");
@@ -463,7 +465,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       recordingTicker.current = setInterval(() => {
         const elapsed = Math.floor((Date.now() - recordingStarted.current) / 1000);
         setRecordingSeconds(elapsed);
-        if ((elapsed >= (localOnly ? MAX_RECORDING_SECONDS : session.maxRecordingSeconds || MAX_RECORDING_SECONDS) || (!localOnly && Date.now() >= Date.parse(session.expiresAt))) &&
+        if ((elapsed >= (localOnly ? LOCAL_PRACTICE_SECONDS : session.maxRecordingSeconds || MAX_RECORDING_SECONDS) || (!localOnly && Date.now() >= Date.parse(session.expiresAt))) &&
           recorder.state === "recording") recorder.stop();
       }, 300);
     } catch (err) {
@@ -483,6 +485,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
   const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
+  const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
+    (!details?.enabled || (!sessionsAvailable && !details?.pilotAvailable));
   const examTurnState = speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
   return (
     <Container className={examinerEntry ? "speaking-exam-live" : undefined} data-live-speak-context={embedded ? "embedded-practice" : "standalone"}
@@ -527,7 +531,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </select>
           </label> : null}
           {details.capReached && !details.activeSession ? (
-            <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Speaking practice is temporarily unavailable.</p>
+            <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Live AI voice sessions are paused by the shared safety budget. You can still record and replay your own practice below.</p>
           ) : (details.activeSession || sessionsAvailable || details.pilotAvailable) ? (
             <div>
               <button type="button" style={styles.primaryButton} onClick={startSession} disabled={busy || recording}>
@@ -536,10 +540,36 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </div>
           ) : (
             <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>
-              Speaking practice is currently unavailable for this account.
+              Your live AI examiner sessions are not currently available. You can still record, write notes and replay your speaking locally below — without using an AI allowance.
             </p>
           )}
         </div>
+      ) : null}
+
+      {localPracticeMode ? (
+        <section className="speaking-exam-local-practice" aria-label="Record speaking practice without AI">
+          <div className="speaking-exam-local-practice__heading">
+            <strong>Record your speaking answer</strong>
+            <small>Device-only practice · no AI credits or upload</small>
+          </div>
+          <p style={{margin:0,fontSize:13,lineHeight:1.45,color:"#475569"}}>
+            The live examiner is unavailable for this account right now. Use this microphone to practise the task and listen back. This mode does not transcribe, grade or ask AI follow-up questions.
+          </p>
+          <div className="speaking-exam-local-practice__recorder">
+            <textarea lang="de" aria-label="Type optional speaking notes" rows={2}
+              value={localAnswer} maxLength={1400} onChange={event=>setLocalAnswer(event.target.value)}
+              placeholder="Optional: write your German answer or notes here…" />
+            <button type="button" aria-label={recording ? "Stop local practice recording" : "Record local speaking practice"}
+              title={recording ? "Stop and listen to your recording" : "Record speaking practice"}
+              onClick={recording ? stopRecording : () => {setLocalRetry(false);clearRecording();startRecording(true);}}
+              disabled={busy || feedbackBusy}
+              className={recording ? "speaking-exam-local-practice__mic is-recording" : "speaking-exam-local-practice__mic"}>
+              {recording ? "■" : "🎙"}
+            </button>
+          </div>
+          <small role="status">{recording ? "Recording " + recordingSeconds + "s / " + LOCAL_PRACTICE_SECONDS + "s" : "Tap the red microphone to begin. Tap again to stop."}</small>
+          {localRetry && studentAudioUrl ? <audio controls src={studentAudioUrl} aria-label="Replay local speaking answer" style={{width:"100%",maxWidth:"100%"}} /> : null}
+        </section>
       ) : null}
 
       {session ? (
