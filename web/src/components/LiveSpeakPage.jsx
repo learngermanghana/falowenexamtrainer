@@ -431,7 +431,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setErrorMessage("");
     try {
       // One-click practice. The server still verifies credits and global cost caps.
-      if (details?.pilotAvailable && !details?.examTryoutAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
+      if (!details?.openTesting && details?.pilotAvailable && !details?.examTryoutAvailable && !details?.activeSession && Number(details.remaining) <= 0) {
         await api("/live-speak/pilot/claim", "POST", {});
       }
       const result = await api("/live-speak/session/start", "POST", {level:safeLevel, topic:practiceTopic, source:practiceSource, examTask:examinerEntry ? examTask : null,...(supportedExaminer ? {examinerFlowVersion:1,examMode} : {})});
@@ -703,7 +703,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const speakingLimit = Number(session?.maxRecordingSeconds || MAX_RECORDING_SECONDS);
   const recordingTimeLabel = friendlyTime(recordingSeconds * 1000);
   const speakingLimitLabel = friendlyTime(speakingLimit * 1000);
-  const sessionsAvailable = (Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached;
+  const sessionsAvailable = Boolean(details?.openTesting) ||
+    ((Number(details?.remaining) > 0 || Boolean(details?.activeSession)) && !details?.capReached);
   // A real, server-bounded AI examiner tryout is available once per month when
   // normal pilot access is exhausted. No client-side quota override occurs.
   const aiTryoutAvailable = examinerEntry && Boolean(details?.examTryoutAvailable);
@@ -734,6 +735,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       ) : null}
 
       {supportedExaminer && !examFeedback ? <GoetheExamTaskCard flow={session?.examFlow || taskPreview} topic={session?.examTask?.prompt || examTask?.prompt} active={Boolean(session)}/> : null}
+      {examinerEntry && details?.openTesting && !session && !loading ? (
+        <p role="status" className="speaking-testing-access-note">
+          AI examiner testing is available. Start or repeat an exam without pilot credits.
+        </p>
+      ) : null}
       {examinerEntry && !supportedExaminer && !session && !examFeedback ? (
         <div style={{padding:12,background:"#eff6ff",borderRadius:10,display:"grid",gap:6}}>
           <strong>Prepare → Answer → Follow-up → Feedback</strong>
