@@ -803,8 +803,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             </details>
           ) : null}
           <div className="speaking-exam-feedback-summary" style={{display:"grid",gap:8}}>
-            <strong style={{fontSize:14}}>Teil {String(examTask?.teil || details?.lastExamResult?.examTask?.teil || "").match(/\\d+/)?.[0] || ""} complete · Feedback saved</strong>
-            <p style={{margin:0,fontSize:13,lineHeight:1.55}}>{examFeedback.split(/(?:\\n|\\*\\*Strength:)/)[0].replace(/\\*\\*/g,"").slice(0,500)}</p>
+            <strong style={{fontSize:14}}>Teil {String(examTask?.teil || details?.lastExamResult?.examTask?.teil || "").match(/\d+/)?.[0] || ""} complete · Feedback saved</strong>
+            <p style={{margin:0,fontSize:13,lineHeight:1.55}}>{examFeedback.split(/(?:\n|\*\*Strength:)/)[0].replace(/\*\*/g,"").slice(0,500)}</p>
             <button type="button" style={styles.secondaryButton} aria-expanded={showDetailedFeedback}
               onClick={()=>setShowDetailedFeedback(value=>!value)}>
               {showDetailedFeedback ? "Hide detailed feedback" : "View detailed feedback"}
