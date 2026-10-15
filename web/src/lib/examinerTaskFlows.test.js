@@ -25,8 +25,9 @@ test("B1 presentation is uninterrupted for up to three minutes and has all five 
 
 test("A1 and A2 questions alternate candidate questions with candidate answers",()=>{
   for(const [level,count] of [["A1",4],["A2",8]]){
-    const flow=flows.createExaminerFlow(level,{teil:"Teil 2",prompt:"Freizeit"});
-    const questionFlow=level === "A1" ? flow : flows.createExaminerFlow(level,{teil:"Teil 1",prompt:"Wohnort"});
+    const questionFlow=flows.createExaminerFlow(level,level === "A1"
+      ? {teil:"Teil 2",prompt:"Essen und Trinken",keywords:"Frühstück"}
+      : {teil:"Teil 1",prompt:"Wohnort"});
     expect(Array.from({length:count},(_,i)=>flows.currentStep(questionFlow,i).action)).toEqual(Array.from({length:count},(_,i)=>i%2 ? "answer-question" : "ask-question"));
   }
 });
@@ -53,11 +54,12 @@ test("simulation hides hints and the partner's private calendar",()=>{
 
 test("public catalogue stays synchronized without private partner information",()=>{
   for(const [key,profile] of Object.entries(publicCatalogue.profiles))for(const [field,value] of Object.entries(profile))expect(value).toEqual(catalogue.profiles[key][field]);
-  expect(Object.keys(publicCatalogue.profiles)).toHaveLength(11);
+  expect(Object.keys(publicCatalogue.profiles)).toHaveLength(15);
 });
 
 test("unsupported levels and invalid exam parts do not receive an examiner flow",()=>{
-  expect(flows.createExaminerFlow("C1",{teil:"Teil 1"})).toBe(null);
+  expect(flows.createExaminerFlow("C1",{teil:"Teil 1"})).not.toBe(null);
+  expect(flows.createExaminerFlow("C1",{teil:"Teil 3"})).toBe(null);
   expect(flows.createExaminerFlow("B1",{teil:"2026"})).toBe(null);
 });
 
@@ -81,8 +83,8 @@ test.each(["Tagesablauf","Sprachen","Haustiere"])("selected A2 card %s survives"
 });
 test("Frühstück has a distinct second card",()=>{
  const task={teil:"Teil 2",prompt:"Frühstück"};const flow=flows.createExaminerFlow("A1",task);
- expect(flow.cards.map(c=>c.word)).toEqual(["Frühstück","Lieblingsessen"]);
- expect(examinerTaskPreview("A1",task).cards).toEqual(["Frühstück","Lieblingsessen"]);
+ expect(flow.cards.map(c=>c.word)).toEqual(["Frühstück","Obst"]);
+ expect(examinerTaskPreview("A1",task).cards).toEqual(["Frühstück","Obst"]);
  expect(flow.cards[0].question).toBe("Was essen Sie zum Frühstück?");
 });
 
@@ -126,7 +128,7 @@ test("A1 Teil 3 uses two picture/action cards and alternates requesting with rea
     const session={level:"A1",examFlow,examTask:task,answeredTurns:i,confirmedAnswers:["Können Sie bitte das Fenster?"]};
     const plan=flows.responsePlan(session);
     expect(plan).toEqual(expect.objectContaining({dynamic:true,ready:false}));
-    expect(flows.partnerInstructions(session,plan)).toMatch(/React naturally to the candidate's actual polite request/);
+    expect(flows.partnerInstructions(session,plan)).toMatch(/React naturally ONLY to the candidate's actual polite request/);
   }
   expect(flows.responsePlan({examFlow,answeredTurns:4})).toEqual(expect.objectContaining({ready:true,dynamic:false}));
   const preview=examinerTaskPreview("A1",task);
@@ -139,11 +141,11 @@ test("A1 Teil 3 uses two picture/action cards and alternates requesting with rea
 test("A1 Teil 2 retains two word-card question-and-answer rounds",()=>{
   const task={teil:"Teil 2",prompt:"Essen",keywords:"Frühstück"};
   const examFlow=flows.createExaminerFlow("A1",task);
-  expect(examFlow.cards.map(card=>card.word)).toEqual(["Frühstück","Lieblingsessen"]);
+  expect(examFlow.cards.map(card=>card.word)).toEqual(["Frühstück","Obst"]);
   const steps=[0,1,2,3].map(i=>flows.currentStep(examFlow,i));
   expect(steps.map(step=>step.action)).toEqual(["ask-question","answer-question","ask-question","answer-question"]);
   expect(steps[0].instruction).toContain("Frühstück");
-  expect(steps[2].instruction).toContain("Lieblingsessen");
+  expect(steps[2].instruction).toContain("Obst");
   expect(flows.responsePlan({examFlow,answeredTurns:1}).dynamic).toBe(true);
   expect(flows.responsePlan({examFlow,answeredTurns:3}).dynamic).toBe(true);
 });
@@ -165,7 +167,7 @@ test("A2 personal rounds answer the selected card question before asking the can
   const examFlow=flows.createExaminerFlow("A2",task);
   const session={examFlow,examTask:task,level:"A2",answeredTurns:1};
   const instructions=flows.partnerInstructions(session,flows.responsePlan(session));
-  expect(instructions).toContain("First answer the candidate's question naturally");
+  expect(instructions).toContain("Answer ONLY the candidate's question naturally");
   expect(instructions).toContain('"Wohnort"');
   expect(flows.currentStep(examFlow,1).action).toBe("answer-question");
 });
@@ -196,7 +198,8 @@ test("A1 dictionary uses exactly the supplied keyword and picture banks",()=>{
     const examFlow=flows.createExaminerFlow("A1",task);
     const preview=examinerTaskPreview("A1",task);
     expect(examFlow.cards[0].word).toBe(row.keywordSubtopic);
-    expect(examFlow.cards.every(card=>card.theme === row.topicPrompt)).toBe(true);
+    expect(examFlow.cards[0].theme).toBe(row.topicPrompt);
+    expect(examFlow.cards[1].theme).not.toBe(row.topicPrompt);
     expect(preview.cards).toEqual(examFlow.cards.map(card=>card.word));
     expect(preview.cardThemes).toEqual(flows.publicFlow({examFlow}).cardThemes);
     expect(preview.maxAnswers).toBe(flows.maxAnswers({examFlow}));
@@ -309,7 +312,7 @@ test("B2 presentation asks one follow-up after an uninterrupted four-minute turn
  expect(flows.currentStep(examFlow).seconds).toBe(240);
  const session={examFlow,level:"B2",answeredTurns:1};
  expect(flows.responsePlan(session).dynamic).toBe(true);
- expect(flows.partnerInstructions(session,flows.responsePlan(session))).toContain("exactly one relevant B2 question");
+ expect(flows.partnerInstructions(session,flows.responsePlan(session))).toContain("exactly ONE new relevant question");
  expect(flows.responsePlan({...session,answeredTurns:2}).ready).toBe(true);
 });
 

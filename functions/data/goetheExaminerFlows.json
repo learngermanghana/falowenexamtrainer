@@ -1,6 +1,96 @@
 {
   "version": 1,
   "profiles": {
+      "C1-1": {
+        "title": "Vortrag und Rückfragen",
+        "role": "examiner",
+        "maxAnswers": 2,
+        "seconds": [
+          300,
+          75
+        ],
+        "criteria": [
+          "Present a coherent structured position on the assigned complex issue",
+          "Support arguments with relevant evidence, alternatives and qualifications",
+          "Respond substantively to a question about the presentation"
+        ],
+        "hints": [
+          "Formulate a central claim, weigh opposing arguments and support it with examples",
+          "Conclude with a nuanced perspective"
+        ],
+        "opening": "Halten Sie einen etwa fünfminütigen Vortrag zum Thema. Strukturieren Sie Ihre Argumentation und belegen Sie Ihre Position mit Beispielen.",
+        "stageGuide": "Deliver an uninterrupted complex presentation. Then answer one relevant question about what you said.",
+        "preparationSeconds": 1200
+      },
+      "C1-2": {
+        "title": "Kontroverse Diskussion",
+        "role": "partner",
+        "maxAnswers": 4,
+        "seconds": [
+          75,
+          75,
+          75,
+          75
+        ],
+        "criteria": [
+          "Formulate and substantiate a clear position",
+          "Respond spontaneously and respectfully to counterarguments",
+          "Weigh competing perspectives and reach a reasoned conclusion"
+        ],
+        "hints": [
+          "Stellen Sie Ihre Position differenziert dar",
+          "Greifen Sie das Gegenargument auf, bevor Sie es entkräften"
+        ],
+        "opening": "Diskutieren Sie die folgende Streitfrage mit Ihrem Gesprächspartner. Beginnen Sie mit Ihrer Position und begründen Sie sie.",
+        "stageGuide": "Four focused contributions: position, response to counterargument, deeper justification and conclusion.",
+        "preparationSeconds": 1200
+      },
+      "C2-1": {
+        "title": "Komplexer Vortrag und Nachfragen",
+        "role": "examiner",
+        "maxAnswers": 3,
+        "seconds": [
+          300,
+          75,
+          75
+        ],
+        "criteria": [
+          "Present a precise, coherent and sophisticated argument",
+          "Differentiate competing viewpoints and implicit assumptions with evidence",
+          "Explain complex points and defend nuanced conclusions in two follow-ups"
+        ],
+        "hints": [
+          "Stellen Sie einen differenzierten Gedankengang dar",
+          "Wägen Sie Gegenpositionen präzise ab und begründen Sie einen Ausblick"
+        ],
+        "opening": "Halten Sie einen etwa fünfminütigen Vortrag zum vorgegebenen komplexen Thema. Beleuchten Sie unterschiedliche Positionen mit Beispielen.",
+        "stageGuide": "Uninterrupted presentation, then two relevant examiner follow-ups.",
+        "preparationSeconds": 900
+      },
+      "C2-2": {
+        "title": "Pro-und-Kontra-Gespräch",
+        "role": "partner",
+        "maxAnswers": 4,
+        "seconds": [
+          90,
+          90,
+          90,
+          90
+        ],
+        "criteria": [
+          "Defend an intellectually sophisticated position with precision",
+          "Address objections and underlying assumptions directly",
+          "Persuade with appropriately nuanced and logically consistent argumentation",
+          "Conclude without caricaturing alternative perspectives"
+        ],
+        "hints": [
+          "Differenzieren Sie zwischen Voraussetzungen und Folgerungen",
+          "Reagieren Sie auf konkrete Einwände statt eine zweite Rede zu halten"
+        ],
+        "opening": "Führen Sie ein Pro-und-Kontra-Gespräch zum Thema. Vertreten Sie Ihre Position und setzen Sie sich mit kritischen Nachfragen auseinander.",
+        "stageGuide": "Four turns: position, counterargument, critical follow-up and synthesis.",
+        "preparationSeconds": 900
+      },
     "A1-1": {
       "title": "Sich vorstellen",
       "role": "examiner",

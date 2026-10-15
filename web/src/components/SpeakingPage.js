@@ -334,6 +334,11 @@ const SpeakingPage = ({
     return ordered.filter((level) => levels.has(level));
   }, []);
 
+  useEffect(()=>{
+    // C1/C2 and B2 have exactly two Goethe speaking parts, not a third.
+    if (["B2","C1","C2"].includes(selectedLevel) && selectedTeil === "3" && !normalizedLockedTeil && !liveExaminerActive) setSelectedTeil("1");
+  },[selectedLevel,selectedTeil,normalizedLockedTeil,liveExaminerActive]);
+
   const baseFilteredQuestions = useMemo(() => {
     return speakingQuestionDictionary.filter((question) => {
       const levelMatches = selectedLevel ? question.level === selectedLevel : true;
@@ -391,6 +396,14 @@ const SpeakingPage = ({
       2: {title:"Ein Thema präsentieren", german:"Präsentieren Sie bitte das Thema.", english:"Prepare your notes, then speak without interruption. Questions belong to Teil 3.", steps:["Prepare","Present your topic","Finish your presentation"]},
       3: {title:"Über Präsentationen sprechen", german:"Stellen Sie Fragen zur Präsentation.", english:"Respond to the examiner and your partner's presentation.", steps:["Answer a question","React to the partner's presentation"]},
     },
+  };
+  examSteps.C1 = {
+    1:{title:"Vortrag und Rückfragen",german:"Halten Sie einen strukturierten Vortrag. Beantworten Sie anschließend eine relevante Rückfrage.",english:"Present a complex topic, weigh arguments and respond to one grounded question.",steps:["Prepare a clear argument","Present without interruption","Answer a targeted follow-up"]},
+    2:{title:"Kontroverse Diskussion",german:"Diskutieren Sie die Streitfrage differenziert mit Ihrem Gesprächspartner.",english:"Defend a position, respond to counterarguments and conclude.",steps:["State and justify your position","Discuss counterarguments","Form a nuanced conclusion"]}
+  };
+  examSteps.C2 = {
+    1:{title:"Komplexer Vortrag",german:"Halten Sie einen differenzierten Vortrag und erläutern Sie Ihre Argumente auf Nachfrage.",english:"Present a sophisticated argument and respond precisely to two follow-up questions.",steps:["Build a coherent advanced argument","Present without interruption","Defend your reasoning in follow-ups"]},
+    2:{title:"Pro-und-Kontra-Gespräch",german:"Führen Sie ein anspruchsvolles Pro-und-Kontra-Gespräch.",english:"Respond to objections with precise, nuanced and persuasive reasoning.",steps:["Take a clear position","Analyse objections","Persuade and synthesize"]}
   };
   const examGuide = examSteps[selectedLevel]?.[selectedTeil] || {
     title:"Speaking practice", german:"Bitte sprechen Sie über das Thema.", english:"Listen to the examiner, then give your answer in German.", steps:["Listen","Speak","Review feedback"]
@@ -486,9 +499,9 @@ const SpeakingPage = ({
     };
   }, []);
 
-  const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,words=[]}) => {
+  const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,assessment=null,words=[]}) => {
     if (!taskId || !feedback || !progressLoaded) return;
-    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,words}));
+    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,assessment,words}));
     setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
   };
 
@@ -1346,7 +1359,7 @@ const SpeakingPage = ({
                 <span style={{fontSize:12,color:"#64748b"}}>Exam part</span>
                 {normalizedLockedTeil ? <strong>Teil {normalizedLockedTeil}</strong> : (
                   <select aria-label="Choose speaking exam part" style={{...styles.select,maxWidth:150,minHeight:42}} disabled={liveExaminerActive} value={selectedTeil} onChange={event=>setSelectedTeil(event.target.value)}>
-                    <option value="1">Teil 1</option><option value="2">Teil 2</option>{selectedLevel !== "B2" ? <option value="3">Teil 3</option> : null}
+                    <option value="1">Teil 1</option><option value="2">Teil 2</option>{!["B2","C1","C2"].includes(selectedLevel) ? <option value="3">Teil 3</option> : null}
                   </select>
                 )}
               </div>
@@ -1380,14 +1393,14 @@ const SpeakingPage = ({
                 </div>
               ) : null}
               {isExamMode && <div className="speaking-exam-progress" aria-label="Goethe speaking exam progress" style={{display:"grid",gap:7,padding:"9px 10px",border:"1px solid #e2e8f0",borderRadius:11,background:"#fff"}}>
-                <strong style={{fontSize:13}}>Goethe {selectedLevel} · Teil {selectedTeil} of {selectedLevel === "B2" ? 2 : 3}</strong>
-                <div style={{display:"flex",gap:5}} aria-hidden="true">{(selectedLevel === "B2" ? ["1","2"] : ["1","2","3"]).map(part=><span key={part} style={{height:6,borderRadius:6,flex:1,background:part===selectedTeil?"#2563eb":Object.values(examPracticeHistory).some(item=>item.level===selectedLevel && item.teil==="Teil "+part)?"#16a34a":"#e2e8f0"}} />)}</div>
+                <strong style={{fontSize:13}}>Goethe {selectedLevel} · Teil {selectedTeil} of {["B2","C1","C2"].includes(selectedLevel) ? 2 : 3}</strong>
+                <div style={{display:"flex",gap:5}} aria-hidden="true">{(["B2","C1","C2"].includes(selectedLevel) ? ["1","2"] : ["1","2","3"]).map(part=><span key={part} style={{height:6,borderRadius:6,flex:1,background:part===selectedTeil?"#2563eb":Object.values(examPracticeHistory).some(item=>item.level===selectedLevel && item.teil==="Teil "+part)?"#16a34a":"#e2e8f0"}} />)}</div>
                 <small style={{color:"#475569"}}>{filteredQuestions.filter(q=>isPractised(examPracticeHistory,selectedLevel,q.id)).length} of {filteredQuestions.length} tasks practised in this Teil</small>
                 {Object.values(examPracticeHistory).some(item=>item.level===selectedLevel) ? <details>
                   <summary style={{fontSize:12,cursor:"pointer",minHeight:36}}>Review completed tasks and feedback</summary>
                   <div style={{display:"grid",gap:8,marginTop:8,maxHeight:210,overflowY:"auto"}}>
                     {Object.values(examPracticeHistory).filter(item=>item.level===selectedLevel).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt))).map(item=><details key={item.taskId} style={{border:"1px solid #e2e8f0",borderRadius:8,padding:8}}>
-                      <summary style={{fontSize:12,cursor:"pointer"}}>{item.teil} · {item.topic || item.taskId} {item.keyword ? "("+item.keyword+")" : ""} · {new Date(item.completedAt).toLocaleDateString()}</summary>
+                      <summary style={{fontSize:12,cursor:"pointer"}}>{item.teil} · {item.topic || item.taskId} {item.keyword ? "("+item.keyword+")" : ""} · {new Date(item.completedAt).toLocaleDateString()}{Number.isFinite(item.scorePercent) ? " · "+item.scorePercent+"%" : ""}</summary>
                       <p style={{whiteSpace:"pre-wrap",fontSize:12,lineHeight:1.5}}>{item.feedback}</p>
                     </details>)}
                   </div>

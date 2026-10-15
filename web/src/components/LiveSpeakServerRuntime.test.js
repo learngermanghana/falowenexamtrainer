@@ -518,7 +518,9 @@ test("B1 presentation accepts its larger recording but remains inside the origin
   const api=setup(); const session=await startTaskFlow(api,"B1",2);
   expect(session.maxRecordingSeconds).toBe(180);
   expect(session.maxAudioBytes).toBe(700000);
-  const recorded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,mimeType:"audio/webm",audioBase64:Buffer.alloc(550000,65).toString("base64")});
+  // 675 kB is above the mistaken 630 kB estimate, but within the 700 kB
+  // presentation limit advertised by the client.
+  const recorded=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,mimeType:"audio/webm",audioBase64:Buffer.alloc(675000,65).toString("base64")});
   expect(recorded.code).toBe(200);
   expect(api.docs.get(usageKey()).turns).toBe(2);
   const done=await api.call("POST","/live-speak/session/confirm",{sessionId:session.sessionId,pendingId:recorded.payload.pendingId,transcript:"Ich möchte über meine Ausbildung sprechen. ".repeat(55)});
@@ -679,4 +681,78 @@ test("previous examiner tryout use does not block repeat testing within the shar
   expect(status.payload.examTryoutAvailable).toBe(true);
   const started=await startTaskFlow(api,"B1",3);
   expect(started.sessionId).toBeTruthy();
+});
+
+test("A1 question receives a separate scripted next question and a persistent scored result",async()=>{
+  const api=setup();
+  const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
+  expect(session.examFlow.cardThemes[0]).not.toBe(session.examFlow.cardThemes[1]);
+  const first=await answerExam(api,session,"Wie viel kostet die Fahrkarte?");
+  expect(first.code).toBe(200);
+  expect(first.payload.taskReady).toBe(false);
+  expect(first.payload.nextInstruction).toMatch(/\?/);
+  expect(first.payload.reply).not.toMatch(/\?/);
+  const saved=api.docs.get(sessionKey).messages;
+  expect(saved.at(-2).text).toBe(first.payload.reply);
+  expect(saved.at(-1).text).toBe(first.payload.nextInstruction);
+  expect((await answerExam(api,session,"Am Bahnhof.")).payload.taskReady).toBe(false);
+  expect((await answerExam(api,session,"Wo wohnen Sie?")).payload.taskReady).toBe(false);
+  expect((await answerExam(api,session,"In Accra.")).payload.taskReady).toBe(true);
+  const grades={taskScores:[1,2,3,4].map(step=>({step,score:2,comment:"Task achieved"})),
+    summary:"All four tasks completed.",strength:"Clear questions and answers.",
+    priority:"Check word order.",correctedExample:"Wo wohnen Sie?",nextPractice:"Practise more word cards."};
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({
+    choices:[{message:{content:JSON.stringify(grades)}}]});
+  const result=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(result.code).toBe(200);
+  expect(result.payload.assessment).toEqual(expect.objectContaining({percent:100,score:8,maxScore:8,practiceOnly:true}));
+  expect(result.payload.assessment.tasks).toHaveLength(4);
+  const persisted=api.docs.get("liveSpeakExamResults/"+session.sessionId);
+  expect(persisted.uid).toBe("u123");
+  expect(persisted.answers).toEqual(["Wie viel kostet die Fahrkarte?","Am Bahnhof.","Wo wohnen Sie?","In Accra."]);
+  expect(persisted.assessment.percent).toBe(100);
+  const cached=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(cached.payload.assessment.percent).toBe(100);
+});
+
+test.each([["C1",1,300,2],["C1",2,75,4],["C2",1,300,3],["C2",2,90,4]])(
+  "%s Teil %s supports long CEFR-level speaking tasks with fixed turn count",
+  async(level,part,seconds,turns)=>{
+    const api=setup();const started=await startTaskFlow(api,level,part);
+    expect(started.code).toBeUndefined(); // startTaskFlow returns the payload, not HTTP wrapper
+    expect(started.examFlow.key).toBe(level+"-"+part);
+    expect(started.maxRecordingSeconds).toBe(seconds);
+    expect(started.answerLimit).toBe(turns);
+    expect(started.maxAudioBytes).toBeGreaterThanOrEqual(350000);
+  }
+);
+
+test("B1 Teil 2 rejects a recording above its advertised 700 kB upload limit",async()=>{
+  const api=setup(); const session=await startTaskFlow(api,"B1",2);
+  expect(session.maxAudioBytes).toBe(700000);
+  const rejected=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,mimeType:"audio/webm",
+    audioBase64:Buffer.alloc(700001,65).toString("base64"),
+  });
+  expect(rejected.code).toBe(413);
+  expect(rejected.payload.code).toBe("audio_too_large");
+  expect(api.docs.get(sessionKey).audioBytesUsed || 0).toBe(0);
+  expect(api.docs.get(usageKey())?.turns || 0).toBe(0);
+});
+
+test.each([
+  ["C1",1,420,20],["C1",2,300,20],
+  ["C2",1,450,20],["C2",2,360,20],
+  ["B1",2,180,10],
+])("%s Teil %s session lifetime covers %s seconds of speaking",async(level,part,requiredSpeechSeconds,minimumMinutes)=>{
+  const api=setup(); const session=await startTaskFlow(api,level,part);
+  const allotted=Date.parse(session.expiresAt)-Date.now();
+  expect(session.answerLimit).toBeGreaterThan(0);
+  expect(allotted).toBeGreaterThanOrEqual((minimumMinutes*60-3)*1000);
+  expect(allotted).toBeLessThanOrEqual((minimumMinutes*60+1)*1000);
+  if (level==="C2" && part===1) {
+    // 7m30s of speech, with at least 12m30s for three uploads,
+    // processing, transcript confirmation and examiner playback.
+    expect(allotted/1000-requiredSpeechSeconds).toBeGreaterThan(12*60);
+  }
 });
