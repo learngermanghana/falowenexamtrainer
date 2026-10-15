@@ -430,6 +430,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       onExamCompleted?.({taskId:session.examTask?.id || examTask?.id,
         level:session.level || safeLevel,
         teil:session.examTask?.teil || examTask?.teil,
+        topic:session.examTask?.prompt || examTask?.prompt,
+        keyword:session.examTask?.keywords || examTask?.keywords,
         feedback:result.feedback,
         words:session.examFlow?.cards || session.examFlow?.requestCards || []});
       setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
