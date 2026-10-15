@@ -114,3 +114,34 @@ test("mobile speaking CSS bounds the conversation independently from its sticky 
   expect(css).toContain("bottom: env(safe-area-inset-bottom, 0px)");
   expect(css).toContain(".speaking-exam-message-row.is-student");
 });
+
+
+test("an exhausted pilot starts a real AI examiner tryout instead of local-only recording",async()=>{
+  const players=[];
+  global.Audio=jest.fn(()=>{
+    const player={play:jest.fn(async()=>{}),pause:jest.fn(),onended:null,onerror:null};
+    players.push(player);return player;
+  });
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).endsWith("/status")) return ok({
+      enabled:true,remaining:0,pilotClaimed:true,pilotAvailable:false,
+      capReached:true,examTryoutAvailable:true,examinerFlowVersion:1,
+    });
+    if(String(url).endsWith("/start")) return ok({...session,examTryout:true});
+    if(String(url).endsWith("/turn")) return ok({
+      reply:"Guten Tag. Stellen Sie sich bitte vor.",speaker:"examiner",audioBase64:"YXVkaW8=",
+    });
+    throw new Error("Unexpected network request "+url);
+  });
+  mount();
+  expect(await screen.findByRole("button",{name:"Try AI examiner"})).toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"Record local speaking practice"})).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button",{name:"Try AI examiner"}));
+  expect(await screen.findByText("Guten Tag. Stellen Sie sich bitte vor.")).toBeInTheDocument();
+  expect(await screen.findByText("Examiner speaking")).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
+  await act(async()=>players[0].onended());
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
+  expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/live-speak/pilot/claim"))).toBe(false);
+  expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/session/turn"))).toBe(true);
+});
