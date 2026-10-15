@@ -1015,7 +1015,11 @@ test("open examiner testing cannot bypass authentication, emergency off switch, 
   const off=setup({LIVE_SPEAK_TESTING_ACCESS:"true",LIVE_SPEAK_ENABLED:"false"});
   expect((await off.call("POST","/live-speak/session/start",{level:"A1"})).code).toBe(503);
   const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
-  const started=await api.call("POST","/live-speak/session/start",{level:"A2"});
+  const started=await api.call("POST","/live-speak/session/start",{
+    level:"A1",source:"exam-speaking-practice",
+    examTask:{id:"a1-teil-1-introduction",teil:"Teil 1",prompt:"Stellen Sie sich kurz vor"},
+    examinerFlowVersion:1,
+  });
   expect(started.code).toBe(200);
   api.docs.set("liveSpeakSessions/u123",{
     ...api.docs.get("liveSpeakSessions/u123"),turnsUsed:10,
