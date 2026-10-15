@@ -106,6 +106,22 @@ test.each([false,true])("saved feedback survives reload and local rehearsal stay
   }
 });
 
+test("resuming a typed simulation restores typing mode and keeps pending text editable",async()=>{
+  const typedPending={...saved,
+    examFlow:{mode:"simulation",key:"B1-2",title:"Ein Thema präsentieren",hints:[],points:[],cards:[],step:{index:1,seconds:180,role:"examiner"},maxAnswers:1},
+    maxTranscriptChars:4800,
+    pending:{pendingId:"typed-asr",transcript:"Ich übe Deutsch jeden Tag.",typed:true,uncertain:false}};
+  global.fetch.mockImplementation(async url=>ok(String(url).endsWith("/status")
+    ? {enabled:true,activeSession:typedPending} : typedPending));
+  show();
+  fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  expect(await screen.findByRole("button",{name:"⌨ Type"})).toHaveAttribute("aria-pressed","true");
+  const transcript=screen.getByRole("textbox",{name:"Recognised speech"});
+  expect(transcript).toHaveValue("Ich übe Deutsch jeden Tag.");
+  expect(transcript).not.toHaveAttribute("readonly");
+  expect(screen.getByRole("button",{name:"Edit typed answer"})).toBeInTheDocument();
+});
+
 test("simulation transcript needs an explicit recognition-correction flag before editing",async()=>{
   const simulation={...saved,examFlow:{mode:"simulation",key:"B1-2",title:"Ein Thema präsentieren",hints:[],points:[],cards:[],step:{index:1,seconds:180,role:"examiner"},maxAnswers:1},
     maxTranscriptChars:4800,pending:{pendingId:"asr",transcript:"Ich lerne heute Deutsch."}};
