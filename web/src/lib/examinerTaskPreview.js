@@ -16,6 +16,7 @@ export const examinerTaskPreview = (level,task,mode="guided") => {
     const otherTheme=key === "A1-2" && match?.theme ? rotated.filter(card=>card.theme !== match.theme) : defaults;
     cards=[...new Map([first,...otherTheme.map(card=>card.word),...defaults.map(card=>card.word)].map(word=>[word.toLocaleLowerCase("de-DE"),word])).values()].slice(0,key === "A1-2" ? 2 : 4);
   }
+    if (key === "A1-2" && !match) cards=cards.slice(0,1);
     cardThemes=cards.map(word=>key === "A1-2" ? catalogue.a1InformationCards.find(card=>card.word === word)?.theme || "" : "");
   const requestCards = key === "A1-3" ? (() => {
     const all = catalogue.a1RequestCards;
