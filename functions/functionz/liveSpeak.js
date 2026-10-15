@@ -645,9 +645,44 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         catch (releaseError) { console.error("Live Speak confirm unlock error",releaseError?.message); }
       }
       if (reserved && examTask) {
-        // The answer was already saved. Do not make the learner record/pay again.
-        await updateSession(sessionRef, sessionId, {taskReady:true});
-        return res.json({ok:true, transcript:answers.at(-1), reply:"Ihre Antwort ist gespeichert. Sie können jetzt Ihr Feedback ansehen.", taskReady:true, audioBase64:""});
+        // The student has ALREADY confirmed this answer. A provider/TTS failure
+        // must not terminate a multi-step exam or require another recording.
+        // Use a deterministic, free fallback for the next server-owned step.
+        try {
+          if (flowSession) {
+            const plan=taskFlows.responsePlan(flowSession);
+            const ready=Boolean(plan?.ready);
+            const focused=Boolean(!ready && plan?.step &&
+              ((["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question") ||
+               (flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request")));
+            const nextInstruction=focused ? plan.step.instruction.trim() : "";
+            const reply=ready ? "Danke. Dieser Prüfungsteil ist beendet."
+              : focused ? (plan.previous?.action === "make-request" ? "Ja, gern." : "Das ist unterschiedlich.")
+              : plan?.step?.instruction || "Bitte fahren Sie mit Ihrer Antwort fort.";
+            const nextSession={...flowSession,taskReady:ready};
+            await updateSession(sessionRef,sessionId,{inFlight:false,taskReady:ready,
+              messages:[...storedMessages,{role:"user",text:answers.at(-1)},
+                {role:"assistant",speaker:focused ? "partner" : "examiner",text:reply},
+                ...(nextInstruction ? [{role:"assistant",speaker:plan.step.role || "examiner",text:nextInstruction}] : [])].slice(-20)});
+            return res.json({ok:true,transcript:answers.at(-1),reply,nextInstruction,
+              speaker:focused ? "partner" : "examiner",taskReady:ready,
+              examFlow:taskFlows.publicFlow(nextSession),
+              maxRecordingSeconds:recordingSeconds(nextSession),maxTranscriptChars:transcriptLimit(nextSession),
+              maxAudioBytes:recordingUploadLimit(nextSession),audioBase64:"",voiceUnavailable:true});
+          }
+          // Legacy two-answer exam: the same answer limit still determines readiness.
+          const ready=answers.length>=EXAM_ANSWER_LIMIT;
+          const reply=ready ? "Danke. Dieser Prüfungsteil ist beendet." : "Können Sie das bitte näher erklären?";
+          await updateSession(sessionRef,sessionId,{inFlight:false,taskReady:ready,
+            messages:[...storedMessages,{role:"user",text:answers.at(-1)},{role:"assistant",speaker:"examiner",text:reply}].slice(-20)});
+          return res.json({ok:true,transcript:answers.at(-1),reply,taskReady:ready,
+            maxRecordingSeconds:20,audioBase64:"",voiceUnavailable:true});
+        } catch (recoveryError) {
+          console.error("Live Speak saved-answer recovery failed",recoveryError?.message);
+          // The confirmed answer is still saved. Client status recovery can
+          // reconcile it without resubmitting audio.
+          return error(res,503,"answer_saved_reply_unavailable","Your answer is saved. Reopen the task to continue; do not record this answer again.");
+        }
       }
       if (err?.status) return error(res,err.status,err.code,err.message);
       console.error("Live Speak confirm error",err?.message);
