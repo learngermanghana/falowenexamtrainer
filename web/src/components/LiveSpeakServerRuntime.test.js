@@ -656,3 +656,15 @@ test("AI tryout does not bypass student identity, one-use allowance, or the extr
   expect(standalone.code).toBe(429);
   expect(api.fakeClient.audio.speech.create).not.toHaveBeenCalled();
 });
+
+
+test("a new learner can claim original free sessions before scarce AI tryout reserve",async()=>{
+  const api=setup();
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.pilotAvailable).toBe(true);
+  expect(status.payload.examTryoutAvailable).toBe(false);
+  const claim=await api.call("POST","/live-speak/pilot/claim");
+  expect(claim.code).toBe(200);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(2);
+  expect(api.docs.get("liveSpeakPilotCredits/u123").examTryoutMonth).toBeUndefined();
+});
