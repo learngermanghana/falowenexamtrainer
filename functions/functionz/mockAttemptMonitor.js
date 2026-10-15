@@ -53,6 +53,109 @@ const verifiedMockBreakdown = data => {
   return Object.fromEntries(SECTIONS.map(section => [section, verifiedScore(source[section])]));
 };
 
+// Historic mock results are saved separately in /scores when completion sync
+// succeeds. Recover skills only from those server-published final-mock records,
+// never from unverified browser progress or an arbitrary overall score.
+const MOCK_SCORE_SOURCES = Object.freeze({A1:"a1_final_mock",A2:"a2_final_mock",B1:"b1_final_mock"});
+const SCORE_LOOKUP_LIMIT = 60;
+const scoreLookupCache = new Map(); // bounded in-memory, avoids new cloud reads on every staff poll
+const cacheDuration = result => result ? 10 * 60 * 1000 : 60 * 1000;
+const readScoreCache = key => {
+  const item=scoreLookupCache.get(key);
+  if (!item) return undefined;
+  if (item.until < Date.now()) {scoreLookupCache.delete(key);return undefined;}
+  return item.value;
+};
+const cacheScore = (key,result) => {
+  if (scoreLookupCache.size >= 250) scoreLookupCache.delete(scoreLookupCache.keys().next().value);
+  scoreLookupCache.set(key,{value:result,until:Date.now()+cacheDuration(result)});
+};
+const verifiedFinalMockScore = (attempt, scoreDoc = {}) => {
+  if (attempt?.status !== "completed" || attempt.progressSource === "browser_reported") return null;
+  const [,uid,attemptId]=String(attempt.id||"").split(":");
+  if (!uid || !attemptId || scoreDoc.uid !== uid ||
+      scoreDoc.mockAttemptId !== attemptId || scoreDoc.level !== attempt.level ||
+      scoreDoc.source !== MOCK_SCORE_SOURCES[attempt.level] ||
+      (scoreDoc.mockId && scoreDoc.mockId !== attempt.mockId)) return null;
+  const breakdown = Array.isArray(scoreDoc.scoreBreakdown) ? Object.fromEntries(
+    scoreDoc.scoreBreakdown.map(part=>[part?.key,part?.score])) : {};
+  const recorded=scoreDoc.sectionScores && typeof scoreDoc.sectionScores === "object"
+    ? scoreDoc.sectionScores : breakdown;
+  const sections=Object.fromEntries(SECTIONS.map(section=>[section,verifiedScore(recorded[section])]));
+  if (SECTIONS.some(section=>sections[section] === null)) return null;
+  const total=Number(scoreDoc.score ?? scoreDoc.finalScore);
+  const sum=Number(SECTIONS.reduce((n,section)=>n+sections[section],0).toFixed(1));
+  if (!Number.isFinite(total) || total < 0 || total > 100 || Math.abs(total-sum) > 0.11) return null;
+  // A missing section in a historical attempt may be restored, but a saved
+  // verified overall must agree with the separately published result.
+  if (attempt.overallScore !== null && Math.abs(attempt.overallScore-total)>0.11) return null;
+  return {total,sections};
+};
+const needsPublishedScore = attempt => attempt.status === "completed" &&
+  attempt.progressSource !== "browser_reported" &&
+  (attempt.overallScore === null || SECTIONS.some(section=>attempt.sectionScores?.[section] === null));
+const applyPublishedScore = (attempt,score) => score ? {
+  ...attempt,overallScore:attempt.overallScore === null ? score.total : attempt.overallScore,
+  sectionScores:score.sections,scoreSource:"published_final_result"
+} : attempt;
+const scoreIdentityKey = row=>row.id;
+const inBatchesOf = (array,size) => Array.from({length:Math.ceil(array.length/size)},(_,index)=>array.slice(index*size,(index+1)*size));
+async function enrichPublishedMockScores(db, attempts=[],sourceDocs=[]) {
+  const missing=attempts.filter(needsPublishedScore).slice(0,SCORE_LOOKUP_LIMIT);
+  if (!missing.length || typeof db.collection !== "function") return attempts;
+  const originals=new Map(sourceDocs.map(doc=>{
+    const row=normalizeMockAttempt(doc);return row ? [row.id,doc.data()||{}] : [null,null];
+  }).filter(([id])=>id));
+  const resolved=new Map();
+  for(const attempt of missing) {
+    const value=readScoreCache(scoreIdentityKey(attempt));
+    if(value !== undefined) resolved.set(attempt.id,value);
+  }
+  let pending=missing.filter(row=>!resolved.has(row.id));
+  // Prefer the exact score document pointer published at completion.
+  if(pending.length && typeof db.getAll==="function") {
+    const pointable=pending.map(row=>({row,docId:originals.get(row.id)?.completionSync?.scoreDocId}))
+      .filter(item=>typeof item.docId==="string" && item.docId.length<=220 && /^[a-zA-Z0-9_-]+$/.test(item.docId));
+    for(const batch of inBatchesOf(pointable,50)) {
+      try {
+        const refs=batch.map(item=>db.collection("scores").doc(item.docId));
+        const snapshots=await db.getAll(...refs);
+        snapshots.forEach((doc,i)=>{
+          const result=doc?.exists ? verifiedFinalMockScore(batch[i].row,doc.data()||{}) : null;
+          if(result) resolved.set(batch[i].row.id,result);
+        });
+      } catch (_error) { /* Older Firestore deployments may lack getAll; try indexed lookup. */ }
+    }
+  }
+  pending=pending.filter(row=>!resolved.has(row.id));
+  // One bounded indexed lookup for older attempts without a scoreDocId.
+  // Match UID + level + mockAttemptId + trusted source before using any marks.
+  if(pending.length) {
+    const byAttemptId=new Map();
+    for (const row of pending) {
+      const attemptId=row.id.split(":").slice(2).join(":");
+      if(!byAttemptId.has(attemptId))byAttemptId.set(attemptId,[]);
+      byAttemptId.get(attemptId).push(row);
+    }
+    for(const batch of inBatchesOf([...byAttemptId.keys()],30)) {
+      try {
+        const snap=await db.collection("scores").where("mockAttemptId","in",batch).get();
+        for(const doc of snap.docs||[]) {
+          const candidates=byAttemptId.get(doc.data()?.mockAttemptId)||[];
+          for(const row of candidates) {
+            const score=verifiedFinalMockScore(row,doc.data()||{});
+            if(score) resolved.set(row.id,score);
+          }
+        }
+      }catch (_error) { /* No verified fallback; never invent section marks. */ }
+    }
+  }
+  for (const row of missing) if(!scoreLookupCache.has(row.id) || !resolved.has(row.id)) {
+    cacheScore(row.id,resolved.get(row.id)||null);
+  }
+  return attempts.map(row=>applyPublishedScore(row,resolved.get(row.id) ?? readScoreCache(row.id)));
+}
+
 const normalizeMockAttempt = doc => {
   const path = String(doc.ref?.path || "");
   const parts = path.split("/");
@@ -229,7 +332,8 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
     .filter(Boolean)
     .sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
     .slice(0, Math.min(500, Math.max(1, Number(limit) || 200)));
-  return { attempts: await enrichStudentNames(db, attempts), partial };
+  const scored=await enrichPublishedMockScores(db,attempts,documents);
+  return { attempts: await enrichStudentNames(db, scored), partial };
 }
 
-module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames };
+module.exports = { listMockAttempts, normalizeMockAttempt, normalizeBrowserProgress, isAuthorizedMockMonitor, nameFromStudent, enrichStudentNames, verifiedFinalMockScore, enrichPublishedMockScores };
