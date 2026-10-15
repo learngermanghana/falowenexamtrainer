@@ -145,3 +145,65 @@ test("an exhausted pilot starts a real AI examiner tryout instead of local-only 
   expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/live-speak/pilot/claim"))).toBe(false);
   expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/session/turn"))).toBe(true);
 });
+
+
+test("completed Teil automatically saves feedback and offers continue instead of ending",async()=>{
+ const completed=jest.fn(),next=jest.fn();
+ const messages=[
+   {role:"assistant",text:"Stellen Sie sich vor."},
+   {role:"user",text:"Ich heiße Anna."},
+   {role:"assistant",text:"Buchstabieren Sie bitte."},
+   {role:"user",text:"A N N A"}
+ ];
+ const finished={...session,taskReady:true,answeredTurns:4,resumed:true,messages};
+ let hasFeedback=false;
+ global.fetch=jest.fn(async(url)=>{
+   if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,examinerFlowVersion:1,
+     ...(hasFeedback?{lastExamResult:{...finished,feedback:"Task Completion: Good introduction."}}:{})});
+   if(String(url).endsWith("/start")) return ok(finished);
+   if(String(url).endsWith("/exam-feedback")){
+     hasFeedback=true;
+     return ok({feedback:"**Task Completion:** Clear introduction.\\n**Strength:** Good sentences."});
+   }
+   throw new Error("Unexpected "+url);
+ });
+ render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+   practiceTopic={examTask.prompt} examTask={examTask}
+   onExamCompleted={completed} onContinueToNext={next}/></MemoryRouter>);
+ fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+ expect(await screen.findByRole("button",{name:/Continue to Teil 2/})).toBeInTheDocument();
+ expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/exam-feedback"))).toHaveLength(1);
+ expect(completed).toHaveBeenCalledWith(expect.objectContaining({
+   taskId:"a1-intro",level:"A1",teil:"Teil 1",feedback:expect.stringContaining("Task Completion")
+ }));
+ expect(screen.queryByRole("button",{name:"End without feedback"})).not.toBeInTheDocument();
+ expect(screen.getByRole("button",{name:"View detailed feedback"})).toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button",{name:/Continue to Teil 2/}));
+ expect(next).toHaveBeenCalledTimes(1);
+});
+
+test("old Teil feedback is not restored into a newly selected task",async()=>{
+ const past={level:"A1",examTask:{id:"a1-intro",teil:"Teil 1"},feedback:"Old task feedback",messages:[]};
+ global.fetch=jest.fn(async()=>ok({enabled:true,remaining:0,examinerFlowVersion:1,
+   pilotClaimed:true,capReached:true,lastExamResult:past}));
+ render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" practiceSource="exam-speaking-practice"
+   practiceTopic="Essen" examTask={{id:"a1-teil2-essen",teil:"Teil 2",prompt:"Essen"}} /></MemoryRouter>);
+ expect(await screen.findByRole("button",{name:"Record local speaking practice"})).toBeInTheDocument();
+ expect(screen.queryByText("Old task feedback")).not.toBeInTheDocument();
+});
+
+test("unfinished Teil needs confirmation before ending without feedback",async()=>{
+ global.fetch=jest.fn(async(url)=>{
+   if(String(url).endsWith("/status")) return ok({enabled:true,remaining:1,examinerFlowVersion:1});
+   if(String(url).endsWith("/start")) return ok({...session,resumed:true,messages:[]});
+   if(String(url).endsWith("/end")) return ok({ok:true});
+   throw new Error("Unexpected "+url);
+ });
+ mount();
+ fireEvent.click(await screen.findByRole("button",{name:"Start exam"}));
+ fireEvent.click(await screen.findByRole("button",{name:"Leave this Teil"}));
+ expect(screen.getByRole("alertdialog",{name:"Leave unfinished speaking task"})).toBeInTheDocument();
+ expect(global.fetch.mock.calls.some(([url])=>String(url).endsWith("/end"))).toBe(false);
+ fireEvent.click(screen.getByRole("button",{name:"Keep practising"}));
+ expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+});

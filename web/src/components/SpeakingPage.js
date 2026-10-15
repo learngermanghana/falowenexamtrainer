@@ -21,6 +21,7 @@ import {
 import { logStudentActivity } from "../services/studyBuddyService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
+import { freshTaskOptions, isPractised, nextExamTeil, recordExamPractice } from "../lib/speakingPracticeHistory";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
   SPEAKING_AUDIO_MIN_SECONDS as MIN_RECORDING_SECONDS,
@@ -173,6 +174,7 @@ const SpeakingPage = ({
   const [customSessionSecondsLeft, setCustomSessionSecondsLeft] = useState(CUSTOM_SPEAKING_CHAT_SESSION_SECONDS);
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
+  const [examPracticeHistory, setExamPracticeHistory] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingMode, setRecordingMode] = useState("");
@@ -352,10 +354,10 @@ const SpeakingPage = ({
       if (filteredQuestions.some((question) => question.id === currentId)) {
         return currentId;
       }
-      const options = filteredQuestions;
+      const options = freshTaskOptions(filteredQuestions, examPracticeHistory, selectedLevel);
       return options[Math.floor(Math.random() * options.length)].id;
     });
-  }, [filteredQuestions]);
+  }, [filteredQuestions, examPracticeHistory, selectedLevel]);
 
   const selectedQuestion = useMemo(
     () => filteredQuestions.find((question) => question.id === selectedQuestionId) || null,
@@ -364,8 +366,8 @@ const SpeakingPage = ({
 
   const chooseRandomQuestion = () => {
     if (liveExaminerActive || !filteredQuestions.length) return;
-    const alternatives = filteredQuestions.filter(question => question.id !== selectedQuestionId);
-    const options = alternatives.length ? alternatives : filteredQuestions;
+    const alternatives = freshTaskOptions(filteredQuestions, examPracticeHistory, selectedLevel).filter(question => question.id !== selectedQuestionId);
+    const options = alternatives.length ? alternatives : freshTaskOptions(filteredQuestions, examPracticeHistory, selectedLevel);
     setSelectedQuestionId(options[Math.floor(Math.random() * options.length)].id);
   };
 
@@ -417,6 +419,7 @@ const SpeakingPage = ({
       const saved = await loadSpeakingProgress({ userId, studentCode, mode });
       if (cancelled) return;
       setCompletedQuestionIds(saved?.completedQuestionIds || {});
+      setExamPracticeHistory(saved?.examPracticeHistory || {});
       const shouldUseSavedLevel = !normalizedLockedLevel && !(isExamMode && examLevel);
       if (saved?.selectedLevel && shouldUseSavedLevel) {
         setSelectedLevel(String(saved.selectedLevel).toUpperCase());
@@ -441,12 +444,13 @@ const SpeakingPage = ({
       mode,
       data: {
         completedQuestionIds,
+        examPracticeHistory,
         selectedLevel,
         selectedTeil,
         selectedQuestionId: selectedQuestionId || null,
       },
     });
-  }, [completedQuestionIds, mode, progressLoaded, selectedLevel, selectedQuestionId, selectedTeil, studentCode, userId]);
+  }, [completedQuestionIds, examPracticeHistory, mode, progressLoaded, selectedLevel, selectedQuestionId, selectedTeil, studentCode, userId]);
 
   const chatMessageCount = chatMessages.length;
   const customChatMessageCount = customChatMessages.length;
@@ -477,6 +481,21 @@ const SpeakingPage = ({
       objectUrls.clear();
     };
   }, []);
+
+  const handleExamPartCompleted = ({taskId,level,teil,topic,keyword,feedback,words=[]}) => {
+    if (!taskId || !feedback || !progressLoaded) return;
+    setExamPracticeHistory(previous=>recordExamPractice(previous,{taskId,level,teil,topic,keyword,feedback,words}));
+    setCompletedQuestionIds(previous=>({...previous,[taskId]:true}));
+  };
+
+  const continueExamToNextTeil = () => {
+    const next=nextExamTeil(selectedLevel,selectedTeil);
+    if (!next || normalizedLockedTeil) return;
+    setSelectedQuestionId("");
+    setSelectedTeil(next);
+    setTaskMode("random");
+    setShowLiveExaminer(false);
+  };
 
   const markPromptCompleted = () => {
     if (!selectedQuestion) return;
@@ -1343,12 +1362,12 @@ const SpeakingPage = ({
                     <label style={{display:"grid",gap:5,fontSize:13}}>
                       Topic or task card
                       <select aria-label="Choose speaking task" style={styles.select} disabled={liveExaminerActive} value={selectedQuestionId} onChange={event=>setSelectedQuestionId(event.target.value)}>
-                        {filteredQuestions.map(question=><option key={question.id} value={question.id}>{formatQuestionDisplay(question)}</option>)}
+                        {filteredQuestions.map(question=><option key={question.id} value={question.id}>{isPractised(examPracticeHistory,selectedLevel,question.id) ? "✓ Practised · " : ""}{formatQuestionDisplay(question)}</option>)}
                       </select>
                     </label>
                   ) : (
                     <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-                      <small style={{flex:1,minWidth:110,color:"#475569"}}>Falowen assigns the task cards.</small>
+                      <small style={{flex:1,minWidth:110,color:"#475569"}}>{filteredQuestions.some(question=>!isPractised(examPracticeHistory,selectedLevel,question.id)) ? "New, unpractised cards are assigned first." : "All available cards tried. You can repeat for revision."}</small>
                       <button type="button" style={{...styles.secondaryButton,padding:"8px 10px"}} disabled={liveExaminerActive || !selectedQuestion} onClick={chooseRandomQuestion}>
                         Another random task
                       </button>
@@ -1356,6 +1375,20 @@ const SpeakingPage = ({
                   )}
                 </div>
               ) : null}
+              {isExamMode && <div className="speaking-exam-progress" aria-label="Goethe speaking exam progress" style={{display:"grid",gap:7,padding:"9px 10px",border:"1px solid #e2e8f0",borderRadius:11,background:"#fff"}}>
+                <strong style={{fontSize:13}}>Goethe {selectedLevel} · Teil {selectedTeil} of 3</strong>
+                <div style={{display:"flex",gap:5}} aria-hidden="true">{["1","2","3"].map(part=><span key={part} style={{height:6,borderRadius:6,flex:1,background:part===selectedTeil?"#2563eb":Object.values(examPracticeHistory).some(item=>item.level===selectedLevel && item.teil==="Teil "+part)?"#16a34a":"#e2e8f0"}} />)}</div>
+                <small style={{color:"#475569"}}>{filteredQuestions.filter(q=>isPractised(examPracticeHistory,selectedLevel,q.id)).length} of {filteredQuestions.length} tasks practised in this Teil</small>
+                {Object.values(examPracticeHistory).some(item=>item.level===selectedLevel) ? <details>
+                  <summary style={{fontSize:12,cursor:"pointer",minHeight:36}}>Review completed tasks and feedback</summary>
+                  <div style={{display:"grid",gap:8,marginTop:8,maxHeight:210,overflowY:"auto"}}>
+                    {Object.values(examPracticeHistory).filter(item=>item.level===selectedLevel).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt))).map(item=><details key={item.taskId} style={{border:"1px solid #e2e8f0",borderRadius:8,padding:8}}>
+                      <summary style={{fontSize:12,cursor:"pointer"}}>{item.teil} · {item.topic || item.taskId} {item.keyword ? "("+item.keyword+")" : ""} · {new Date(item.completedAt).toLocaleDateString()}</summary>
+                      <p style={{whiteSpace:"pre-wrap",fontSize:12,lineHeight:1.5}}>{item.feedback}</p>
+                    </details>)}
+                  </div>
+                </details> : null}
+              </div>}
               <details className="speaking-exam-guide" aria-label="Speaking exam instructions" open={!isCompactViewport && !liveExaminerActive} style={{background:"#fff",border:"1px solid #dbeafe",borderRadius:12,padding:12,display:"grid",gap:7}}>
                 <summary style={{color:"#1e3a8a",fontWeight:800,cursor:"pointer",minHeight:36,display:"flex",alignItems:"center"}}>Teil {selectedTeil} · {examGuide.title} {liveExaminerActive && isCompactViewport ? " · Instructions" : ""}</summary>
                 <p lang="de" style={{margin:0,fontSize:14,lineHeight:1.55}}>{examGuide.german}</p>
@@ -1367,7 +1400,7 @@ const SpeakingPage = ({
             </aside>
             <section className="speaking-exam-voice" style={{minWidth:0,padding:isCompactViewport?"10px 12px 18px":16,background:"#fff"}}>
               {selectedQuestion ? (
-                <LiveSpeakPage key={selectedLevel+"-"+selectedQuestion.id} embedded initialLevel={selectedLevel}
+                <LiveSpeakPage key={selectedLevel+"-"+selectedTeil+"-"+selectedQuestion.id} embedded initialLevel={selectedLevel}
                   practiceTopic={selectedQuestion.topicPrompt || selectedQuestion.text || "Goethe speaking practice"}
                   practiceSource="exam-speaking-practice"
                   examTask={{
@@ -1377,7 +1410,9 @@ const SpeakingPage = ({
                     keywords:selectedQuestion.keywordSubtopic || "",
                     hint:selectedQuestion.hint || "",
                   }}
-                  examMode="guided" onActivityChange={setLiveExaminerActive}/>
+                  examMode="guided" onActivityChange={setLiveExaminerActive}
+                  onExamCompleted={handleExamPartCompleted}
+                  onContinueToNext={nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
               ) : <p role="status">Choose an exam part to begin.</p>}
             </section>
           </div>
