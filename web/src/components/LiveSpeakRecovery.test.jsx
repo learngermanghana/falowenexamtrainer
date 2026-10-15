@@ -25,28 +25,27 @@ test("resuming restores saved answers and the original examiner question",async(
   show();
   fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
   expect(await screen.findByText("Ich mache jeden Tag Sport.")).toBeInTheDocument();
-  expect(screen.getByText("Was essen Sie gern?")).toBeInTheDocument();
+  expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Was essen Sie gern?");
   expect(screen.getByText(/Follow-up: answer/)).toBeInTheDocument();
 });
 
-test("feedback failure keeps the session; retry sends only session ID and duplicate clicks share one request",async()=>{
+test("failed automatic feedback keeps saved answers and allows a retry",async()=>{
   let calls=0;
+  const finished={...saved,taskReady:true,answeredTurns:2};
   global.fetch.mockImplementation(async (url,options)=>{
-    if(String(url).endsWith("/status"))return ok({enabled:true,remaining:1,activeSession:saved});
+    if(String(url).endsWith("/status"))return ok({enabled:true,remaining:1,activeSession:finished});
     if(String(url).endsWith("/exam-feedback")){
       calls++;
       expect(JSON.parse(options.body)).toEqual({sessionId:"saved"});
       return calls===1 ? {ok:false,json:async()=>({code:"feedback_unavailable",error:"Your answers are saved. Try again."})}
         : ok({feedback:"Use weil with the verb at the end."});
     }
-    return ok(saved);
+    return ok(finished);
   });
   show(); fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
-  const finish=await screen.findByRole("button",{name:/Finish this Teil & see feedback/});
-  fireEvent.click(finish); fireEvent.click(finish);
   expect(await screen.findByRole("alert")).toHaveTextContent("Your answers are saved.");
   expect(calls).toBe(1);
-  fireEvent.click(screen.getByRole("button",{name:/Finish this Teil & see feedback/}));
+  fireEvent.click(screen.getByRole("button",{name:"Retry feedback"}));
   expect(await screen.findByText("Use weil with the verb at the end.")).toBeInTheDocument();
   expect(calls).toBe(2);
 });
@@ -105,6 +104,22 @@ test.each([false,true])("saved feedback survives reload and local rehearsal stay
     global.MediaRecorder=previousRecorder;
     URL.createObjectURL=createUrl;URL.revokeObjectURL=revokeUrl;
   }
+});
+
+test("resuming a typed simulation restores typing mode and keeps pending text editable",async()=>{
+  const typedPending={...saved,
+    examFlow:{mode:"simulation",key:"B1-2",title:"Ein Thema präsentieren",hints:[],points:[],cards:[],step:{index:1,seconds:180,role:"examiner"},maxAnswers:1},
+    maxTranscriptChars:4800,
+    pending:{pendingId:"typed-asr",transcript:"Ich übe Deutsch jeden Tag.",typed:true,uncertain:false}};
+  global.fetch.mockImplementation(async url=>ok(String(url).endsWith("/status")
+    ? {enabled:true,activeSession:typedPending} : typedPending));
+  show();
+  fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  expect(await screen.findByRole("button",{name:"⌨ Type"})).toHaveAttribute("aria-pressed","true");
+  const transcript=screen.getByRole("textbox",{name:"Recognised speech"});
+  expect(transcript).toHaveValue("Ich übe Deutsch jeden Tag.");
+  expect(transcript).not.toHaveAttribute("readonly");
+  expect(screen.getByRole("button",{name:"Edit typed answer"})).toBeInTheDocument();
 });
 
 test("simulation transcript needs an explicit recognition-correction flag before editing",async()=>{

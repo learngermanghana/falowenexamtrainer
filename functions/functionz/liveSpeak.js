@@ -51,7 +51,7 @@ const sessionView = session => ({
   maxRecordingSeconds: recordingSeconds(session),
   maxTranscriptChars: transcriptLimit(session),
   taskReady: examiner(session) && (Boolean(session.taskReady) || Number(session.answeredTurns) >= answerLimit(session)),
-  pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain) } : null,
+  pending: session.pendingId ? { pendingId: session.pendingId, transcript: session.pendingTranscript || "", uncertain: Boolean(session.pendingUncertain), typed:Boolean(session.pendingTyped) } : null,
   feedbackStatus: session.feedbackStatus || null,
   feedbackAttempts: Number(session.feedbackAttempts) || 0,
   feedback: session.feedback || "", examTryout: Boolean(session.examTryout), resumed: true,
@@ -362,13 +362,19 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const intro = req.body?.intro === true;
       const mime = String(req.body?.mimeType || "").split(";")[0].toLowerCase().trim();
       const payload = String(req.body?.audioBase64 || "");
-      if (!intro) {
+      const typedProvided = typeof req.body?.typedAnswer === "string";
+      const typedAnswer = typedProvided ? req.body.typedAnswer.trim() : "";
+      const typedTurn = !intro && typedProvided;
+      if (typedTurn && (typedAnswer.length < 2 || typedAnswer.length > 8000 || payload)) {
+        return error(res, 400, "invalid_typed_answer", "Type a short German answer without attaching audio.");
+      }
+      if (!intro && !typedTurn) {
         if (!VALID_AUDIO.has(mime) || !/^[A-Za-z0-9+/]*={0,2}$/.test(payload) ||
           payload.length < 1000 || payload.length > Math.ceil(MAX_LONG_AUDIO_BYTES * 4 / 3) + 4) {
           return error(res, 400, "invalid_audio", "Record a clear German response within this task’s time and size allowance.");
         }
-      } else if (payload) return error(res, 400, "unexpected_audio", "The greeting does not require a recording.");
-      const audioBytes = intro ? null : Buffer.from(payload, "base64");
+      } else if (intro && (payload || typedProvided)) return error(res, 400, "unexpected_audio", "The greeting does not require an answer.");
+      const audioBytes = intro || typedTurn ? null : Buffer.from(payload, "base64");
       if (audioBytes && audioBytes.length > MAX_LONG_AUDIO_BYTES) return error(res, 413, "audio_too_large", "Recording is too large.");
       sessionRef = db().collection("liveSpeakSessions").doc(uid);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
@@ -387,6 +393,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("Your answers are saved. Finish the task to see feedback."), {status:409,code:"task_ready"});
         }
         if (session.inFlight) throw Object.assign(new Error("Finish the current reply first."), {status:409,code:"turn_in_progress"});
+        if (typedTurn && !examiner(session)) throw Object.assign(new Error("Typing is available only in speaking exam practice."), {status:400,code:"typing_unavailable"});
         if (Number(session.turnsUsed) >= turnLimit(session)) throw Object.assign(new Error("Maximum turns reached for this session."), {status:429,code:"turn_limit"});
         if ((Number(usageSnap.data()?.turns) || 0) >= quotaForSession(session)) throw Object.assign(new Error("Speaking usage safety limit reached."), {status:429,code:"budget_reached"});
         level = cleanLevel(session.level);
@@ -395,14 +402,17 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         examFlow = session.examFlow || null;
         maxTranscriptChars=transcriptLimit(session);
         const uploadLimit = recordingUploadLimit(session);
-        if (!intro && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
-        if (!intro && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
+        if (typedTurn && typedAnswer.length > maxTranscriptChars) throw Object.assign(new Error("Your typed answer is too long for this exam task."), {status:400,code:"invalid_typed_answer"});
+        if (audioBytes && audioBytes.length > uploadLimit) throw Object.assign(new Error("This recording exceeds the task upload limit."), {status:413,code:"audio_too_large"});
+        if (audioBytes && examiner(session) && (Number(session.audioBytesUsed) || 0) + audioBytes.length > audioAllowance(session)) {
           throw Object.assign(new Error("The recording allowance is used. Finish with your saved answers."), {status:429,code:"audio_limit"});
         }
         const nextPlan = examFlow ? taskFlows.responsePlan({...session,answeredTurns:(Number(session.answeredTurns)||0)+1}) : null;
         const finalExamAnswer = examiner(session) && Number(session.answeredTurns) >= answerLimit(session) - 1;
         const needsResponse = nextPlan ? (nextPlan.dynamic || nextPlan.scripted || !nextPlan.ready) : !finalExamAnswer;
-        const transcriptionUnits = !intro ? Math.max(1,Math.ceil(audioBytes.length / MAX_AUDIO_BYTES)) : 0;
+        // Typed practice reserves a bounded unit as well; it never bypasses the
+        // per-session and global cost ceilings.
+        const transcriptionUnits = !intro ? (typedTurn ? 1 : Math.max(1,Math.ceil(audioBytes.length / MAX_AUDIO_BYTES))) : 0;
         const reservedCalls = intro ? 1 : transcriptionUnits + (needsResponse ? 1 : 0);
         if ((Number(usageSnap.data()?.turns) || 0) + reservedCalls > quotaForSession(session)) {
           throw Object.assign(new Error("Pilot usage limit reached."), {status:429,code:"budget_reached"});
@@ -410,7 +420,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.update(sessionRef, {
           inFlight: true, turnsUsed: admin.firestore.FieldValue.increment(1),
           pendingId: null,
-          ...(!intro && examiner(session) ? {audioBytesUsed:admin.firestore.FieldValue.increment(audioBytes.length)} : {}),
+          ...(audioBytes && examiner(session) ? {audioBytesUsed:admin.firestore.FieldValue.increment(audioBytes.length)} : {}),
         });
         tx.set(globalRef, {
           turns: admin.firestore.FieldValue.increment(reservedCalls),
@@ -419,6 +429,16 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         accepted = true;
       });
 
+      if (typedTurn) {
+        // Typed answers follow the same authenticated pending/confirm sequence
+        // as audio transcripts, without pretending an audio recording exists.
+        const pendingId = crypto.randomUUID();
+        await updateSession(sessionRef, sessionId, {
+          inFlight:false, pendingId, pendingTranscript:typedAnswer,
+          pendingUncertain:false, pendingTyped:true, pendingAt:admin.firestore.FieldValue.serverTimestamp(),
+        });
+        return res.json({ok:true,needsConfirmation:true,pendingId,transcript:typedAnswer,typed:true,uncertain:false});
+      }
       if (!process.env.OPENAI_API_KEY) throw new Error("Live Speak AI is not configured.");
       const client = getOpenAIClient();
       if (!intro) {
@@ -443,7 +463,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const pendingId = crypto.randomUUID();
         await updateSession(sessionRef, sessionId, {
           inFlight: false, pendingId, pendingTranscript: transcript,
-          pendingUncertain: transcriptUncertain(recognition),
+          pendingUncertain: transcriptUncertain(recognition), pendingTyped:false,
           pendingAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         // Do not let the tutor judge grammar based on unconfirmed speech recognition.
@@ -478,6 +498,49 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       return error(res, 503, "voice_unavailable", "Live Speak could not complete this turn. Please try again.");
     }
   });
+  // Retrying a pending answer must first clear it on the server. A matching
+  // pendingId prevents an old tab from deleting a newer recording/typed answer.
+  // Discarding never advances the exam or refunds already reserved AI usage.
+  app.post("/live-speak/session/discard-pending", async (req, res) => {
+    try {
+      if (!requireEnabled(res)) return;
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const sessionId = String(req.body?.sessionId || "");
+      const pendingId = String(req.body?.pendingId || "");
+      if (!sessionId || !pendingId) {
+        return error(res, 400, "invalid_pending_answer", "Choose the unfinished answer to discard.");
+      }
+      const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      await db().runTransaction(async tx => {
+        const snap = await tx.get(sessionRef);
+        const session = snap.data() || {};
+        if (session.sessionId !== sessionId || session.endedAt ||
+            Date.parse(session.expiresAt || "") <= Date.now()) {
+          throw Object.assign(new Error("This speaking session has ended."), {status:409,code:"session_ended"});
+        }
+        if (!examiner(session)) {
+          throw Object.assign(new Error("Only exam practice answers can be discarded."), {status:400,code:"discard_unavailable"});
+        }
+        if (session.inFlight) {
+          throw Object.assign(new Error("Finish the current response before retrying."), {status:409,code:"turn_in_progress"});
+        }
+        if (pendingId !== session.pendingId) {
+          throw Object.assign(new Error("This answer has changed. Reload to see the latest saved work."), {status:409,code:"transcript_missing"});
+        }
+        tx.update(sessionRef, {
+          pendingId:null, pendingTranscript:null, pendingUncertain:false,
+          pendingTyped:false, pendingAt:null,
+        });
+      });
+      return res.json({ok:true,discarded:true});
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code, err.message);
+      console.error("Live Speak discard error", err?.message);
+      return error(res, 503, "discard_unavailable", "Could not discard the previous answer. Try again.");
+    }
+  });
+
   app.post("/live-speak/session/confirm", async (req, res) => {
     let sessionRef, reserved = false, sessionId = "", examTask = null, storedMessages = [], answers = [], flowSession = null;
     try {
@@ -521,7 +584,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // Confirmation may be edited by the learner; it is allowed only after a
         // metered, authenticated audio transcription in the same session.
         tx.update(sessionRef, {
-          inFlight:true, pendingId:null, pendingTranscript:null,
+          inFlight:true, pendingId:null, pendingTranscript:null, pendingTyped:false,
           answeredTurns:admin.firestore.FieldValue.increment(1),
           ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{step:flowSession.answeredTurns,original:session.pendingTranscript || "",confirmed,corrected:confirmed !== session.pendingTranscript}].slice(0,answerLimit(session))} : {}),
           ...(examTask ? {confirmedAnswers:answers, messages:[...storedMessages,{role:"user",text:confirmed}].slice(-20)} : {}),

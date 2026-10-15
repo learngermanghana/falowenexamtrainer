@@ -2,19 +2,17 @@ import React from "react";
 import {render,screen,fireEvent} from "@testing-library/react";
 import SpeakingRecorder from "./SpeakingRecorder";
 
-test("recording exposes Stop and prevents simultaneous playback",()=>{
+test("the real microphone switches between record and stop",()=>{
   const stop=jest.fn();
-  render(<SpeakingRecorder recording disabled={false} listenDisabled replayDisabled onStop={stop}/>);
-  expect(screen.getByRole("button",{name:"Replay examiner audio"})).toBeDisabled();
-  expect(screen.getByRole("button",{name:"Play my last recording"})).toBeDisabled();
+  const {rerender}=render(<SpeakingRecorder recording={false} disabled={false} onStop={stop} onRecord={jest.fn()}/>);
+  expect(screen.getAllByRole("button")).toHaveLength(1);
+  rerender(<SpeakingRecorder recording disabled={false} onStop={stop}/>);
   fireEvent.click(screen.getByRole("button",{name:"Stop and send recording"}));
   expect(stop).toHaveBeenCalledTimes(1);
 });
 
-test("waiting for the examiner disables recording while keeping Listen available",()=>{
-  const listen=jest.fn();
-  render(<SpeakingRecorder disabled listenDisabled={false} replayDisabled onListen={listen}/>);
+test("examiner speaking disables the record button without decorative playback controls",()=>{
+  render(<SpeakingRecorder disabled onRecord={jest.fn()}/>);
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
-  fireEvent.click(screen.getByRole("button",{name:"Replay examiner audio"}));
-  expect(listen).toHaveBeenCalledTimes(1);
+  expect(screen.getAllByRole("button")).toHaveLength(1);
 });

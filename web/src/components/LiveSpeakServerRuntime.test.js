@@ -756,3 +756,143 @@ test.each([
     expect(allotted/1000-requiredSpeechSeconds).toBeGreaterThan(12*60);
   }
 });
+
+test("typed Goethe answer is metered, confirmed and not sent to audio transcription",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const beforeUsage=api.docs.get(usageKey())?.turns || 0;
+  const sent=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich mache Sport, weil ich gesund bleiben möchte."
+  });
+  expect(sent.code).toBe(200);
+  expect(sent.payload).toEqual(expect.objectContaining({
+    needsConfirmation:true,typed:true,transcript:"Ich mache Sport, weil ich gesund bleiben möchte."
+  }));
+  expect(api.docs.get(sessionKey).pendingTranscript).toBe("Ich mache Sport, weil ich gesund bleiben möchte.");
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  expect(api.docs.get(usageKey()).turns).toBeGreaterThan(beforeUsage);
+  const done=await api.call("POST","/live-speak/session/confirm",{
+    sessionId:session.sessionId,pendingId:sent.payload.pendingId,transcript:sent.payload.transcript
+  });
+  expect(done.code).toBe(200);
+  expect(api.docs.get(sessionKey).confirmedAnswers[0]).toBe(sent.payload.transcript);
+});
+
+test("typed answer refuses invalid payload, oversized text and nonexam sessions without provider calls",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const used=api.docs.get(usageKey())?.turns || 0;
+  for (const typedAnswer of ["", "x", "x".repeat(8001)]) {
+    const result=await api.call("POST","/live-speak/session/turn",{
+      sessionId:session.sessionId,typedAnswer
+    });
+    expect(result.code).toBe(400);
+  }
+  expect((await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Hallo",...audioPayload
+  })).code).toBe(400);
+  expect(api.docs.get(usageKey())?.turns || 0).toBe(used);
+  expect(api.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+  const normal=setup();
+  await normal.call("POST","/live-speak/pilot/claim");
+  const other=(await normal.call("POST","/live-speak/session/start",{level:"A2"})).payload;
+  const rejected=await normal.call("POST","/live-speak/session/turn",{
+    sessionId:other.sessionId,typedAnswer:"Ich lerne Deutsch."
+  });
+  expect(rejected.code).toBe(400);
+  expect(normal.fakeClient.audio.transcriptions.create).not.toHaveBeenCalled();
+});
+
+test("typed answers stop at the server quota and cannot bypass a spent cap",async()=>{
+  const api=setup(); const session=await startExam(api);
+  api.docs.set(usageKey(),{turns:40});
+  const response=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich lerne jeden Tag Deutsch."
+  });
+  expect(response.code).toBe(429);
+  expect(response.payload.code).toBe("budget_reached");
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(0);
+});
+
+test("discarding a pending audio answer survives reload without losing confirmed work or usage records",async()=>{
+  const api=setup(); const session=await startExam(api);
+  await answerExam(api,session,"Ich mache Sport.");
+  const recorded=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,...audioPayload,
+  });
+  expect(recorded.code).toBe(200);
+  const before=api.docs.get(usageKey()).turns;
+  const confirmedBefore=api.docs.get(sessionKey).confirmedAnswers;
+  const originalId=recorded.payload.pendingId;
+  expect((await api.call("GET","/live-speak/status")).payload.activeSession.pending.pendingId).toBe(originalId);
+  const discarded=await api.call("POST","/live-speak/session/discard-pending",{
+    sessionId:session.sessionId,pendingId:originalId,
+  });
+  expect(discarded.code).toBe(200);
+  expect(discarded.payload.discarded).toBe(true);
+  const persisted=api.docs.get(sessionKey);
+  expect(persisted.pendingId).toBe(null);
+  expect(persisted.pendingTranscript).toBe(null);
+  expect(persisted.pendingTyped).toBe(false);
+  expect(persisted.confirmedAnswers).toEqual(confirmedBefore);
+  expect(persisted.answeredTurns).toBe(1);
+  expect(api.docs.get(usageKey()).turns).toBe(before);
+  const status=await api.call("GET","/live-speak/status");
+  expect(status.payload.activeSession.pending).toBe(null);
+  expect((await api.call("POST","/live-speak/session/confirm",{
+    sessionId:session.sessionId,pendingId:originalId,transcript:"Old abandoned answer",
+  })).payload.code).toBe("transcript_missing");
+  const replaced=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich esse oft Gemüse.",
+  });
+  expect(replaced.code).toBe(200);
+  expect(replaced.payload.needsConfirmation).toBe(true);
+});
+
+test("discard pending typed answer without ending the exam or consuming extra quota",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const typed=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich lerne jeden Tag Deutsch.",
+  });
+  expect(typed.code).toBe(200);
+  expect((await api.call("GET","/live-speak/status")).payload.activeSession.pending.typed).toBe(true);
+  const usage=api.docs.get(usageKey()).turns;
+  const cleared=await api.call("POST","/live-speak/session/discard-pending",{
+    sessionId:session.sessionId,pendingId:typed.payload.pendingId,
+  });
+  expect(cleared.code).toBe(200);
+  expect(api.docs.get(usageKey()).turns).toBe(usage);
+  expect((await api.call("GET","/live-speak/status")).payload.activeSession.pending).toBe(null);
+  const retry=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Ich lese sehr gern Bücher.",
+  });
+  expect(retry.code).toBe(200);
+  expect(retry.payload.transcript).toBe("Ich lese sehr gern Bücher.");
+});
+
+test("discard refuses stale candidates and in-flight work without clearing newer answers",async()=>{
+  const api=setup(); const session=await startExam(api);
+  const first=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,typedAnswer:"Mein erstes Beispiel.",
+  });
+  expect(first.code).toBe(200);
+  // Simulate another browser already replacing the pending candidate.
+  const newest={...api.docs.get(sessionKey),
+    pendingId:"another-browser-candidate",pendingTranscript:"Neue Antwort",pendingTyped:true};
+  api.docs.set(sessionKey,newest);
+  const stale=await api.call("POST","/live-speak/session/discard-pending",{
+    sessionId:session.sessionId,pendingId:first.payload.pendingId,
+  });
+  expect(stale.code).toBe(409);
+  expect(stale.payload.code).toBe("transcript_missing");
+  expect(api.docs.get(sessionKey).pendingTranscript).toBe("Neue Antwort");
+  api.docs.set(sessionKey,{...api.docs.get(sessionKey),inFlight:true});
+  const blocked=await api.call("POST","/live-speak/session/discard-pending",{
+    sessionId:session.sessionId,pendingId:"another-browser-candidate",
+  });
+  expect(blocked.code).toBe(409);
+  expect(blocked.payload.code).toBe("turn_in_progress");
+  expect(api.docs.get(sessionKey).pendingId).toBe("another-browser-candidate");
+  const missing=await api.call("POST","/live-speak/session/discard-pending",{
+    sessionId:session.sessionId,
+  });
+  expect(missing.code).toBe(400);
+});

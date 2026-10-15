@@ -523,6 +523,13 @@ const SpeakingPage = ({
     setPracticeStage("practice");
   };
 
+  const handleSpeakingSessionReset = () => {
+    setLiveExaminerActive(false);
+    setFullExam(false);
+    setRunResults([]);
+    setPracticeStage("home");
+  };
+
   const handleExamPartCompleted = (result) => {
     const {taskId,level,teil,topic,keyword,feedback,assessment=null,words=[]} = result;
     if (!taskId || !feedback) return;
@@ -1065,7 +1072,8 @@ const SpeakingPage = ({
                     hint:selectedQuestion.hint || "",
                   }}
                   examMode="guided" autoStart={isExamMode && practiceAttempt>0} freshAttempt={practiceAttempt > 0} deferFeedback={fullExam} onActivityChange={setLiveExaminerActive}
-                  onExamCompleted={handleExamPartCompleted}
+                  onSessionReset={handleSpeakingSessionReset}
+                   onExamCompleted={handleExamPartCompleted}
                   onContinueToNext={!fullExam && nextExamTeil(selectedLevel,selectedTeil) && !normalizedLockedTeil ? continueExamToNextTeil : undefined}/>
               ) : <p role="status">Choose an exam part to begin.</p>
   );
