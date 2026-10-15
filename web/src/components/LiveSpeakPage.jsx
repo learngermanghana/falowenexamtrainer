@@ -594,7 +594,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       const recorder = new MediaRecorder(stream, {
         // Higher fidelity for fast speech without increasing per-step/server
         // upload limits. Long presentations retain the economical bitrate.
-        audioBitsPerSecond: !localOnly && (session?.maxRecordingSeconds || 20) > 90 ? 24000 : 32000,
+        audioBitsPerSecond: localOnly || (session?.maxRecordingSeconds || 20) > 90 ? 24000 : 32000,
         ...(mime ? {mimeType:mime} : {}),
       });
       recorderRef.current = recorder;
