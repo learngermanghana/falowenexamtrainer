@@ -366,13 +366,39 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     recordedUrlRef.current = null;
     setStudentAudioUrl("");
   };
-  const retryTranscript = () => {
-    if (pending?.typed) { setTypedAnswer(recognizedText); setAnswerMode("type"); }
-    setAudioRetry(null);
-    setPending(null);
-    setRecognizedText("");
-    setNotice("Record your answer again. The AI will not correct the previous transcript.");
-    clearRecording();
+  const retryTranscript = async () => {
+    if (!pending || !session || busy || requestBusy.current || recording) return;
+    // Do not unlock a replacement turn or clear the local preview until the
+    // server has atomically discarded this exact pending candidate.
+    requestBusy.current = true;
+    setBusy(true);
+    setErrorMessage("");
+    try {
+      await api("/live-speak/session/discard-pending", "POST", {
+        sessionId:session.sessionId, pendingId:pending.pendingId,
+      });
+      if (!mounted.current) return;
+      if (pending.typed) {
+        setTypedAnswer(recognizedText);
+        setAnswerMode("type");
+      }
+      setAudioRetry(null);
+      setPending(null);
+      setRecognizedText("");
+      setNotice(pending.typed
+        ? "Edit your German answer and send it again."
+        : "Record your answer again. Your previous unconfirmed answer was discarded.");
+      clearRecording();
+    } catch (err) {
+      if (mounted.current) {
+        // A failed/disconnected discard retains the original transcript so
+        // students can retry, confirm, or resume after refreshing.
+        setErrorMessage("Could not discard your unfinished answer. Please retry. " + err.message);
+      }
+    } finally {
+      requestBusy.current = false;
+      if (mounted.current) setBusy(false);
+    }
   };
 
   const startSession = async () => {
