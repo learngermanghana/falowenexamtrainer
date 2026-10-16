@@ -477,6 +477,595 @@
         "Bitte um Rückmeldung oder Gespräch"
       ]
     },
+    "a1-existing-letter-1": {
+      "id": "a1-existing-letter-1",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten im Sommer nach Berlin reisen und brauchen ein Hotelzimmer. Schreiben Sie eine E-Mail an das Hotel „Berliner Hof“.",
+      "whatToInclude": [
+        "Ankunftsdatum und Dauer: Wann kommen Sie an? Wie lange bleiben Sie?",
+        "Zimmerwunsch: Einzelzimmer oder Doppelzimmer mit Frühstück?",
+        "Preis: Fragen Sie nach dem Preis."
+      ]
+    },
+    "a1-existing-letter-2": {
+      "id": "a1-existing-letter-2",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Ihr Freund Michael feiert am Samstag Geburtstag und hat Sie eingeladen. Schreiben Sie eine E-Mail an Michael.",
+      "whatToInclude": [
+        "Zusage: Sagen Sie, dass Sie gerne zur Party kommen.",
+        "Geschenk: Fragen Sie, was Michael sich wünscht oder was Sie mitbringen sollen.",
+        "Uhrzeit: Fragen Sie, wann die Party beginnt."
+      ]
+    },
+    "a1-existing-letter-3": {
+      "id": "a1-existing-letter-3",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie sind krank und können am Donnerstag nicht zum Deutschkurs kommen. Schreiben Sie an Ihre Lehrerin, Frau Müller.",
+      "whatToInclude": [
+        "Grund: Sagen Sie, dass Sie krank sind.",
+        "Entschuldigung: Sagen Sie, dass Sie am Donnerstag fehlen.",
+        "Hausaufgaben: Fragen Sie nach den Hausaufgaben."
+      ]
+    },
+    "a1-existing-letter-4": {
+      "id": "a1-existing-letter-4",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten einen Deutschkurs bei der Sprachschule „Aktiv“ machen. Schreiben Sie eine E-Mail an die Sprachschule.",
+      "whatToInclude": [
+        "Kursstart: Fragen Sie, wann der nächste A1-Kurs beginnt.",
+        "Kurszeiten: Fragen Sie, ob es Abendkurse gibt.",
+        "Kosten: Fragen Sie, wie viel der Kurs kostet."
+      ]
+    },
+    "a1-existing-letter-5": {
+      "id": "a1-existing-letter-5",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten sich am Wochenende mit Ihrer Freundin Sarah in der Stadt treffen. Schreiben Sie an Sarah.",
+      "whatToInclude": [
+        "Vorschlag: Schlagen Sie ein Treffen am Samstag vor.",
+        "Aktivität: Schlagen Sie Kaffee trinken oder Kino vor.",
+        "Treffpunkt und Uhrzeit: Fragen oder sagen Sie, wo und wann Sie sich treffen."
+      ]
+    },
+    "a1-existing-letter-6": {
+      "id": "a1-existing-letter-6",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie planen eine Reise nach Hamburg. Schreiben Sie an die Touristeninformation Hamburg.",
+      "whatToInclude": [
+        "Stadtplan: Bitten Sie um einen Stadtplan.",
+        "Informationen: Fragen Sie nach Ausflugstipps oder einer Hafenrundfahrt.",
+        "Zuschicken: Bitten Sie darum, Prospekte per Post oder E-Mail zu senden."
+      ]
+    },
+    "a1-existing-letter-7": {
+      "id": "a1-existing-letter-7",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie haben im Internet ein gebrauchtes Fahrrad gesehen und möchten es kaufen. Schreiben Sie an den Verkäufer, Herrn Weber.",
+      "whatToInclude": [
+        "Interesse: Sagen Sie, dass Sie das Fahrrad kaufen möchten.",
+        "Zustand: Fragen Sie nach dem Alter oder Zustand des Fahrrads.",
+        "Termin: Fragen Sie nach einem Termin für eine Probefahrt."
+      ]
+    },
+    "a1-existing-letter-8": {
+      "id": "a1-existing-letter-8",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten im Sportverein „Fit & Aktiv“ Mitglied werden. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Probetraining: Fragen Sie nach einem kostenlosen Probetraining.",
+        "Öffnungszeiten: Fragen Sie nach den Öffnungszeiten am Wochenende.",
+        "Mitgliedsbeitrag: Fragen Sie, wie viel die Mitgliedschaft pro Monat kostet."
+      ]
+    },
+    "a1-existing-letter-9": {
+      "id": "a1-existing-letter-9",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Ihre Bekannte Lisa hat Sie für das Wochenende zu sich nach München eingeladen. Schreiben Sie an Lisa.",
+      "whatToInclude": [
+        "Dank: Bedanken Sie sich für die Einladung.",
+        "Ankunftszeit: Sagen Sie, wann Sie am Bahnhof ankommen.",
+        "Verkehrsmittel: Sagen Sie, wie Sie reisen, zum Beispiel mit dem Zug."
+      ]
+    },
+    "a1-existing-letter-10": {
+      "id": "a1-existing-letter-10",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Die Heizung in Ihrer Wohnung ist kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Problem: Sagen Sie, dass die Heizung nicht funktioniert und die Wohnung kalt ist.",
+        "Termin: Sagen Sie, wann Sie für den Handwerker zu Hause sind.",
+        "Rückruf: Bitten Sie um eine schnelle Reparatur oder einen Anruf."
+      ]
+    },
+    "a2-sms-01": {
+      "id": "a2-sms-01",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie sind unterwegs in der Stadt und verspäten sich zu einem Treffen mit Ihrer Freundin Anna. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Entschuldigen Sie sich für die Verspätung.",
+        "Nennen Sie den Grund.",
+        "Schlagen Sie einen neuen Treffpunkt und eine neue Uhrzeit vor."
+      ]
+    },
+    "a2-sms-02": {
+      "id": "a2-sms-02",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Ihr Kollege Markus hat Sie zu seiner Geburtstagsparty am Samstag eingeladen. Schreiben Sie ihm eine SMS.",
+      "whatToInclude": [
+        "Danken Sie für die Einladung und sagen Sie zu.",
+        "Fragen Sie, was Sie mitbringen können.",
+        "Fragen Sie nach der Uhrzeit."
+      ]
+    },
+    "a2-sms-03": {
+      "id": "a2-sms-03",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie wollten am Freitag mit Ihrem Freund Alex ins Kino gehen, aber Sie sind krank geworden. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Sagen Sie das Treffen ab.",
+        "Erklären Sie, warum Sie nicht kommen können.",
+        "Schlagen Sie einen Termin für nächste Woche vor."
+      ]
+    },
+    "a2-sms-04": {
+      "id": "a2-sms-04",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie ziehen am Wochenende in eine neue Wohnung um und brauchen Hilfe. Schreiben Sie eine SMS an Ihren Mitschüler David.",
+      "whatToInclude": [
+        "Informieren Sie über Ihren Umzug am Samstag.",
+        "Bitten Sie David um Hilfe.",
+        "Bieten Sie ein Essen oder Pizza als Dankeschön an."
+      ]
+    },
+    "a2-sms-05": {
+      "id": "a2-sms-05",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie möchten am Sonntag mit Ihrer Bekannten Sarah einen Ausflug zum See machen. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Schlagen Sie den Ausflug vor.",
+        "Fragen Sie nach dem Treffpunkt und der Abfahrtszeit.",
+        "Erwähnen Sie, was Sie für das Picknick mitbringen."
+      ]
+    },
+    "a2-email-01": {
+      "id": "a2-email-01",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie besuchen einen Deutschkurs bei Frau Weber. Morgen können Sie nicht zum Unterricht kommen, weil Sie einen Arzttermin haben. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Informieren Sie Frau Weber, dass Sie im Unterricht fehlen.",
+        "Nennen Sie den Grund: Arzttermin.",
+        "Bitten Sie um die Hausaufgaben für die nächste Stunde."
+      ]
+    },
+    "a2-email-02": {
+      "id": "a2-email-02",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "In Ihrer Mietwohnung ist seit gestern die Heizung kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Informieren Sie über das Problem mit der Heizung.",
+        "Bitten Sie um einen schnellen Reparaturtermin.",
+        "Nennen Sie Ihre Erreichbarkeit (Telefonnummer oder Uhrzeit)."
+      ]
+    },
+    "a2-email-03": {
+      "id": "a2-email-03",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie sind krank und können heute nicht zur Arbeit kommen. Schreiben Sie eine E-Mail an Ihre Chefin, Frau Müller.",
+      "whatToInclude": [
+        "Informieren Sie über Ihre Krankheit und Abwesenheit.",
+        "Nennen Sie die voraussichtliche Dauer.",
+        "Sagen Sie, dass das ärztliche Attest folgt."
+      ]
+    },
+    "a2-email-04": {
+      "id": "a2-email-04",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie möchten an der Volkshochschule einen B1-Deutschkurs besuchen. Schreiben Sie eine E-Mail an die Kursleitung, Herrn Braun.",
+      "whatToInclude": [
+        "Erklären Sie Ihr Interesse am B1-Kurs.",
+        "Fragen Sie nach den Kurstagen und Uhrzeiten.",
+        "Fragen Sie nach den Kursgebühren."
+      ]
+    },
+    "a2-email-05": {
+      "id": "a2-email-05",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie haben ein Zimmer im Hotel „Sonnhof“ gebucht, müssen aber Ihre Anreise um einen Tag verschieben. Schreiben Sie eine E-Mail an die Rezeption.",
+      "whatToInclude": [
+        "Nennen Sie Ihre Reservierung oder Ihren Namen.",
+        "Erklären Sie die Änderung: Anreise erst am Samstag statt Freitag.",
+        "Bitten Sie um eine kurze Bestätigung."
+      ]
+    },
+    "b1-invitation": {
+      "id": "b1-invitation",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Dein Freund Lukas hat dich zu seiner Geburtstagsfeier am Samstag eingeladen. Du kannst leider nicht kommen. Schreibe ihm eine E-Mail.",
+      "whatToInclude": [
+        "Entschuldige dich für deine Absage.",
+        "Erkläre, warum du nicht kommen kannst.",
+        "Schlage ein Treffen an einem anderen Tag vor."
+      ]
+    },
+    "b1-move": {
+      "id": "b1-move",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Du bist vor Kurzem umgezogen. Schreibe eine E-Mail an einen Freund.",
+      "whatToInclude": [
+        "Beschreibe deine neue Wohnung.",
+        "Erkläre, warum du umgezogen bist.",
+        "Lade deinen Freund zu einem Besuch ein."
+      ]
+    },
+    "b1-trip": {
+      "id": "b1-trip",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Deine Freundin möchte mit dir einen Ausflug machen. Antworte ihr.",
+      "whatToInclude": [
+        "Schlage ein Ziel vor.",
+        "Erkläre, was ihr dort machen könnt.",
+        "Vereinbare Treffpunkt und Zeit."
+      ]
+    },
+    "b1-online": {
+      "id": "b1-online",
+      "level": "B1",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 80 words",
+      "situation": "In einem Internetforum wird diskutiert: Ist Online-Lernen besser als Unterricht in einer Schule? Schreibe deine Meinung.",
+      "whatToInclude": [
+        "Nenne deine Meinung.",
+        "Begründe sie mit mindestens zwei Argumenten.",
+        "Gib ein Beispiel aus deiner Erfahrung."
+      ]
+    },
+    "b1-transport": {
+      "id": "b1-transport",
+      "level": "B1",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 80 words",
+      "situation": "Im Forum diskutieren die Mitglieder, ob mehr Menschen das Fahrrad benutzen sollten.",
+      "whatToInclude": [
+        "Äußere deine Meinung.",
+        "Nenne einen Vorteil und einen Nachteil.",
+        "Begründe deinen Standpunkt."
+      ]
+    },
+    "b1-cancel": {
+      "id": "b1-cancel",
+      "level": "B1",
+      "teil": "teil3",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 40 words",
+      "situation": "Du hast morgen einen Termin mit deiner Kursleiterin Frau Müller, kannst aber nicht kommen. Schreibe ihr.",
+      "whatToInclude": [
+        "Entschuldige dich.",
+        "Nenne einen Grund.",
+        "Bitte um einen neuen Termin."
+      ]
+    },
+    "b1-seminar": {
+      "id": "b1-seminar",
+      "level": "B1",
+      "teil": "teil3",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 40 words",
+      "situation": "Du möchtest an einem beruflichen Seminar teilnehmen. Schreibe dem Veranstalter.",
+      "whatToInclude": [
+        "Erkläre dein Interesse.",
+        "Frage nach den Terminen.",
+        "Bitte um Informationen zu den Kosten."
+      ]
+    },
+    "b2-homeoffice": {
+      "id": "b2-homeoffice",
+      "level": "B2",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 150 words",
+      "situation": "In einem Onlineforum wird über Homeoffice diskutiert. Schreiben Sie einen begründeten Beitrag.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Meinung.",
+        "Nennen Sie Gründe und Beispiele.",
+        "Gehen Sie auf Vor- und Nachteile ein.",
+        "Schlagen Sie Alternativen vor."
+      ]
+    },
+    "b2-environment": {
+      "id": "b2-environment",
+      "level": "B2",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 150 words",
+      "situation": "Diskutieren Sie in einem Forum Maßnahmen gegen Plastikmüll.",
+      "whatToInclude": [
+        "Formulieren Sie Ihre Position.",
+        "Beschreiben Sie Vorteile und Schwierigkeiten.",
+        "Nennen Sie eigene Erfahrungen.",
+        "Machen Sie Vorschläge."
+      ]
+    },
+    "b2-shift": {
+      "id": "b2-shift",
+      "level": "B2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 100 words",
+      "situation": "Sie möchten Ihre Arbeitszeit vorübergehend ändern. Schreiben Sie an Ihre Vorgesetzte.",
+      "whatToInclude": [
+        "Beschreiben Sie Ihre Situation.",
+        "Erklären Sie den Grund.",
+        "Schlagen Sie eine Lösung vor.",
+        "Bitten Sie um ein Gespräch."
+      ]
+    },
+    "b2-project": {
+      "id": "b2-project",
+      "level": "B2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 100 words",
+      "situation": "Eine Besprechung muss verschoben werden. Schreiben Sie an Ihre Kollegin.",
+      "whatToInclude": [
+        "Erläutern Sie den Anlass.",
+        "Begründen Sie die Verschiebung.",
+        "Schlagen Sie einen Ersatztermin vor.",
+        "Bitten Sie um Bestätigung."
+      ]
+    },
+    "c1-ai": {
+      "id": "c1-ai",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Diskutieren Sie Chancen und Grenzen des Einsatzes künstlicher Intelligenz an Schulen.",
+      "whatToInclude": [
+        "Stellen Sie unterschiedliche Positionen dar.",
+        "Begründen Sie Ihre eigene Haltung.",
+        "Berücksichtigen Sie Gegenargumente.",
+        "Ziehen Sie ein differenziertes Fazit."
+      ]
+    },
+    "c1-city": {
+      "id": "c1-city",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Verfassen Sie einen argumentativen Diskussionsbeitrag zur autofreien Innenstadt.",
+      "whatToInclude": [
+        "Erklären Sie die gesellschaftliche Bedeutung.",
+        "Wägen Sie Chancen und Risiken ab.",
+        "Beziehen Sie Beispiele ein.",
+        "Entwickeln Sie Ihre Position."
+      ]
+    },
+    "c1-application": {
+      "id": "c1-application",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Sie organisieren ein wissenschaftliches Projekt und möchten eine Institution um Unterstützung bitten.",
+      "whatToInclude": [
+        "Stellen Sie das Projekt vor.",
+        "Begründen Sie die Bedeutung.",
+        "Formulieren Sie Ihre Bitte präzise.",
+        "Schlagen Sie das weitere Vorgehen vor."
+      ]
+    },
+    "c1-policy": {
+      "id": "c1-policy",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Sie schreiben als Kurssprecherin oder Kurssprecher an die Leitung einer Weiterbildungseinrichtung.",
+      "whatToInclude": [
+        "Beschreiben Sie die Regelung.",
+        "Stellen Sie die Folgen dar.",
+        "Unterbreiten Sie einen Lösungsvorschlag.",
+        "Bitten Sie um Rückmeldung."
+      ]
+    },
+    "c2-transformations": {
+      "id": "c2-transformations",
+      "level": "C2",
+      "teil": "teil1",
+      "format": "transformation",
+      "register": null,
+      "wordTarget": null,
+      "situation": "Formulieren Sie die Sätze um. Die Bedeutung muss erhalten bleiben. Nutzen Sie das angegebene Schlüsselwort.",
+      "whatToInclude": [
+        "Achten Sie auf Bedeutung, Satzbau und Grammatik.",
+        "Tragen Sie jede Lösung in das zugehörige Feld ein."
+      ],
+      "transformations": [
+        {
+          "source": "Obwohl die Nachfrage gestiegen ist, bleiben die Preise stabil.",
+          "cue": "trotz"
+        },
+        {
+          "source": "Man kann davon ausgehen, dass die Zahlen weiter steigen.",
+          "cue": "dürften"
+        },
+        {
+          "source": "Die Expertin kritisierte, dass die Maßnahmen zu spät kamen.",
+          "cue": "Kritik"
+        },
+        {
+          "source": "Die Firma investiert, damit sie langfristig konkurrenzfähig bleibt.",
+          "cue": "um … zu"
+        }
+      ]
+    },
+    "c2-digital": {
+      "id": "c2-digital",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Verfassen Sie einen differenzierten argumentativen Text zum Spannungsverhältnis zwischen technologischem Fortschritt und gesellschaftlicher Verantwortung.",
+      "whatToInclude": [
+        "Entwickeln Sie eine nachvollziehbare These.",
+        "Erörtern Sie mehrere Perspektiven.",
+        "Berücksichtigen Sie ein Gegenargument.",
+        "Formulieren Sie einen eigenständigen Schluss."
+      ]
+    },
+    "c2-education": {
+      "id": "c2-education",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Erörtern Sie, welchen Beitrag staatliche Institutionen und Einzelpersonen zu lebenslangem Lernen leisten sollten.",
+      "whatToInclude": [
+        "Stellen Sie relevante Positionen gegenüber.",
+        "Analysieren Sie Zielkonflikte.",
+        "Beziehen Sie Beispiele ein.",
+        "Ziehen Sie eine begründete Schlussfolgerung."
+      ]
+    },
+    "c2-language": {
+      "id": "c2-language",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Untersuchen Sie den Zusammenhang zwischen Mehrsprachigkeit, kultureller Identität und gesellschaftlicher Teilhabe.",
+      "whatToInclude": [
+        "Beschreiben Sie das Spannungsfeld.",
+        "Beurteilen Sie verschiedene Argumente.",
+        "Belegen Sie Ihre Sichtweise.",
+        "Formulieren Sie eine Synthese."
+      ]
+    },
+    "c2-environment": {
+      "id": "c2-environment",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Erörtern Sie, wie sich wirksamer Klimaschutz zwischen Staat, Wirtschaft und einzelnen Menschen aufteilen lässt.",
+      "whatToInclude": [
+        "Stellen Sie unterschiedliche Verantwortlichkeiten dar.",
+        "Prüfen Sie Gegenargumente.",
+        "Nennen Sie konkrete Beispiele.",
+        "Entwickeln Sie eine differenzierte Position."
+      ]
+    },
     "a1-1": {
       "id": "a1-1",
       "level": "A1",

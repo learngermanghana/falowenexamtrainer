@@ -41,3 +41,26 @@ test('B2 grades only the selected canonical presentation theme', () => {
 test('rejects a stale speaking question', () => {
   expect(() => resolvePracticeTask('speaking', 'a1-teil-1-introduction', 'A1', { text: 'old question' })).toThrow(/changed/);
 });
+
+test('every new Exams Room writing task resolves and a mismatched situation is rejected', () => {
+  const workspaceIds = Object.keys(tasks.writing).filter(id =>
+    /^(?:a1-existing-letter-|a2-(?:sms|email)-|b1-(?:invitation|move|trip|online|transport|cancel|seminar)$|b2-(?:homeoffice|environment|shift|project)$|c1-(?:ai|city|application|policy)$|c2-)/.test(id)
+  );
+  expect(workspaceIds).toHaveLength(40);
+  for (const id of workspaceIds) {
+    const registered = tasks.writing[id];
+    expect(resolvePracticeTask('writing', id, registered.level, {
+      situation: registered.situation,
+      whatToInclude: registered.whatToInclude,
+      format: registered.format,
+      teil: registered.teil,
+    })).toEqual(registered);
+    expect(() => resolvePracticeTask('writing', id, registered.level, {
+      situation: 'Outdated or substituted question',
+      whatToInclude: registered.whatToInclude,
+    })).toThrow(/changed/);
+  }
+  expect(tasks.writing['a2-sms-01'].situation).toContain('Anna');
+  expect(tasks.writing['a2-email-05'].situation).toContain('Sonnhof');
+  expect(tasks.writing['c2-transformations'].transformations).toHaveLength(4);
+});
