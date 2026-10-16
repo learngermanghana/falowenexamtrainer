@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { writingLetters } from '../web/src/data/writingLetters.js';
 import { WRITING_PROMPTS } from '../web/src/data/writingExamPrompts.js';
+import { EXAM_WRITING_MODULES, toRegistryWritingTasks } from '../web/src/data/examWritingWorkspace.js';
 import { speakingQuestionDictionary } from '../web/src/data/speakingDictionary.js';
 import { A1_FINAL_MOCK_WRITING_TASK } from '../web/src/data/a1FinalMockWritingTask.js';
 import { A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from '../web/src/data/a1FinalMock2Data.js';
@@ -47,6 +48,7 @@ const registry = {
   },
   writing: Object.fromEntries([
     ...writingLetters,
+    ...toRegistryWritingTasks(EXAM_WRITING_MODULES),
     ...Object.entries(WRITING_PROMPTS).flatMap(([level, rows]) => rows.map((row, i) => ({
       id: `${level.toLowerCase()}-${i + 1}`, level, situation: row.Thema, whatToInclude: row.Punkte,
     }))),
