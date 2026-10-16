@@ -227,17 +227,18 @@ export const A2_LISTENING_TASKS = {
       { stem: "Was bekam Anna zusätzlich zu den Medikamenten?", options: ["A) Ein Rezept", "B) Proben von Produkten", "C) Eine Broschüre", "D) Ein neues Medikament"] },
     ],
   },
+
   18: {
     chapter: "7.18",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie das Gespräch über einen Anruf bei der Bank. Achten Sie auf Dokumente, Termin, Dauer des Gesprächs, Kontomodelle und Online-Formulare.",
-    audioUrl: "https://youtu.be/cHKVQOLWv7c",
+    task: "Hören Sie das Gespräch mit Herrn Keller bei der Bank. Wählen Sie für Aufgaben 1 bis 5 die richtige Lösung a, b oder c.",
+    audioKey: "a2/day-18/day-18.mp3",
     questions: [
-      { stem: "Welche Dokumente benötigen Sie, um ein Konto zu eröffnen?", options: ["A) Nur einen Reisepass", "B) Reisepass, Meldebescheinigung, Einkommensnachweis", "C) Nur einen Einkommensnachweis", "D) Keine Dokumente"] },
-      { stem: "Wie lange dauert das Beratungsgespräch?", options: ["A) 30 Minuten", "B) Eine Stunde", "C) Zwei Stunden", "D) 15 Minuten"] },
-      { stem: "Wie viele Kontomodelle bietet die Bank an?", options: ["A) Zwei", "B) Drei", "C) Vier", "D) Fünf"] },
-      { stem: "Welches Konto ist kostenlos?", options: ["A) Basiskonto", "B) Konto mit zusätzlichen Dienstleistungen", "C) Premium-Konto", "D) Geschäftskonto"] },
-      { stem: "Was können Sie tun, um Zeit zu sparen?", options: ["A) Die Formulare in der Bankfiliale ausfüllen", "B) Ohne Unterlagen kommen", "C) Einen Termin absagen", "D) Die Formulare vor dem Termin online ausfüllen"] },
+      { stem: "Warum ruft Herr Keller bei der Bank an?", options: ["A) Er hat sein Passwort vergessen.", "B) Er ist mit der Bank unzufrieden.", "C) Er möchte ein neues Konto eröffnen."] },
+      { stem: "Was ist mit der Kontogebühr passiert?", options: ["A) Sie wurde zweimal abgebucht.", "B) Sie war zu hoch.", "C) Sie wurde gar nicht abgebucht."] },
+      { stem: "Wie lange wartet Herr Keller schon auf seine Bankkarte?", options: ["A) Fünf Tage.", "B) Zwei Wochen.", "C) Einen Monat."] },
+      { stem: "Wie kann Herr Keller bis zur neuen Karte Geld bekommen?", options: ["A) Er geht mit dem Personalausweis zum Schalter in der Filiale.", "B) Er benutzt das Online-Banking.", "C) Er bekommt Geld per Post."] },
+      { stem: "Was bekommt Herr Keller als Entschuldigung?", options: ["A) Eine neue Karte gratis.", "B) Einen Brief vom Chef.", "C) Zehn Euro auf sein Konto."] },
     ],
   },
   19: {
