@@ -1,4 +1,6 @@
 import { WRITING_PROMPTS } from "./writingExamPrompts.js";
+import { C1_DISCUSSION_TASKS } from "./c1ExamDiscussionTasks.js";
+import { C1_FORMAL_EMAIL_TASKS } from "./c1ExamFormalEmailTasks.js";
 // Practice-specific writing tasks. These do not replace the graded Goethe mock tasks.
 const task = (id, title, situation, points, extra = {}) => ({ id, title, situation, points, ...extra });
 const part = (id, label, format, targetWords, tasks, description = "") => ({
@@ -223,30 +225,10 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   C1: {
     minutes: 75,
     parts: [
-      part("teil1", "Part 1 · Discussion", "argument", "about 230 words", [
-        task("c1-ai", "Künstliche Intelligenz im Unterricht",
-          "Diskutieren Sie Chancen und Grenzen des Einsatzes künstlicher Intelligenz an Schulen.",
-          ["Stellen Sie unterschiedliche Positionen dar.", "Begründen Sie Ihre eigene Haltung.", "Berücksichtigen Sie Gegenargumente.", "Ziehen Sie ein differenziertes Fazit."], {
-            category: "Bildung & Technologie",
-          }),
-        task("c1-city", "Städte ohne Autos",
-          "Verfassen Sie einen argumentativen Diskussionsbeitrag zur autofreien Innenstadt.",
-          ["Erklären Sie die gesellschaftliche Bedeutung.", "Wägen Sie Chancen und Risiken ab.", "Beziehen Sie Beispiele ein.", "Entwickeln Sie Ihre Position."], {
-            category: "Stadtentwicklung",
-          }),
-      ]),
-      part("teil2", "Part 2 · Formal Message", "email", "about 120 words", [
-        task("c1-application", "Bitte um Projektunterstützung",
-          "Sie organisieren ein wissenschaftliches Projekt und möchten eine Institution um Unterstützung bitten.",
-          ["Stellen Sie das Projekt vor.", "Begründen Sie die Bedeutung.", "Formulieren Sie Ihre Bitte präzise.", "Schlagen Sie das weitere Vorgehen vor."], {
-            category: "Projektarbeit", register: "formal",
-          }),
-        task("c1-policy", "Änderung einer Regelung",
-          "Sie schreiben als Kurssprecherin oder Kurssprecher an die Leitung einer Weiterbildungseinrichtung.",
-          ["Beschreiben Sie die Regelung.", "Stellen Sie die Folgen dar.", "Unterbreiten Sie einen Lösungsvorschlag.", "Bitten Sie um Rückmeldung."], {
-            category: "Bildung", register: "formal",
-          }),
-      ]),
+      part("teil1", "Part 1 · Discussion Post", "argument", "about 230 words",
+        C1_DISCUSSION_TASKS, "Write a factual, balanced German forum post covering all four points. Recommended practice time: 50 minutes."),
+      part("teil2", "Part 2 · Formal Email", "email", "about 120 words",
+        C1_FORMAL_EMAIL_TASKS, "Write a formal German email addressing all four required points. Recommended practice time: 25 minutes."),
     ],
   },
   C2: {
