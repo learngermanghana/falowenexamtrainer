@@ -8,6 +8,7 @@
 const crypto = require("crypto");
 const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
 const taskFlows = require("./goetheExaminerFlow");
+const { assignmentConfig, submitCourseSpeakingMock, courseSpeakingMockStatus } = require("./courseSpeakingMock");
 const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");
 
@@ -118,6 +119,8 @@ const cleanExamTask = (task) => ({
   prompt: String(task?.prompt || "").replace(/[\r\n\t]/g, " ").trim().slice(0, 1200),
   keywords: String(task?.keywords || "").replace(/[\r\n\t]/g, " ").slice(0, 170),
   hint: String(task?.hint || "").replace(/[\r\n\t]/g, " ").slice(0, 170),
+  courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
+    ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
 });
 const examOpening = (level, task) => {
   const part = task.teil ? task.teil + ". " : "";
@@ -858,6 +861,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         maxScore:taskScores.length*2,percent:Math.round(taskScores.reduce((sum,x)=>sum+x.score,0)*50/taskScores.length),
         tasks:taskScores,summary,strength,priority,correctedExample,nextPractice,practiceOnly:true,
       } : null;
+      if (assignmentConfig(task.courseAssignmentKey) && !assessment) {
+        throw new Error("The graded speaking assessment was incomplete. Retry feedback before continuing.");
+      }
       const feedback=assessment
         ? [summary,strength && "Strength: "+strength,priority && "Improve: "+priority,
           correctedExample && "Example: "+correctedExample,nextPractice && "Next practice: "+nextPractice].filter(Boolean).join("\n")
@@ -874,6 +880,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // An immutable per-attempt snapshot remains after the next live session starts.
         tx.set(resultRef,{uid:record.uid,sessionId,level,teil:task.teil || "",
           task,answers,dialogue:savedMessages(record),assessment,feedback,completed,
+          source:record.source,examFlowKey:record.examFlow?.key || "",
           practiceOnly:true,createdAt:admin.firestore.FieldValue.serverTimestamp()});
       });
       return res.json({ok:true,feedback,assessment,practiceOnly:true});
@@ -891,6 +898,41 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (err?.status && err?.code) return error(res,err.status,err.code,err.message);
       console.error("Live Speak examiner feedback failed",err?.message);
       return error(res,503,"feedback_unavailable","Your answers are saved. Try retrieving feedback again; no exam score was saved.");
+    }
+  });
+
+  // Complete coursework only from three immutable, verified examiner snapshots.
+  app.get("/live-speak/course-mock/status", async (req, res) => {
+    try {
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const assignmentId = String(req.query?.assignmentKey || "").trim().toUpperCase();
+      return res.json(await courseSpeakingMockStatus({
+        db: db(), uid: student.auth.uid, assignmentId,
+      }));
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code || "mock_error", err.message);
+      console.error("Course speaking mock status failed", err?.message);
+      return error(res, 503, "mock_status_unavailable", "Unable to load the speaking assignment result.");
+    }
+  });
+
+  app.post("/live-speak/course-mock/submit", async (req, res) => {
+    try {
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const assignmentId = String(req.body?.assignmentKey || "").trim().toUpperCase();
+      const result = await submitCourseSpeakingMock({
+        db: db(), admin, uid: student.auth.uid, profile: student.profile,
+        auth: student.auth, assignmentId,
+        sessionIds: req.body?.sessionIds,
+      });
+      return res.json(result);
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code || "mock_error", err.message);
+      console.error("Course speaking mock submission failed", err?.message);
+      return error(res, 503, "mock_submission_unavailable",
+        "Your speaking answers remain saved. Please retry score synchronization.");
     }
   });
 
