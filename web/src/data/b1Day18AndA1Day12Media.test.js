@@ -14,16 +14,15 @@ describe("requested B1 Day 18 and A1 Day 12 media", () => {
     ]);
   });
 
-  test("replaces the B1 Day 18 Teil 4 Hören source", () => {
+  test("keeps the uploaded protected B1 Day 18 audio and canonical listening questions", () => {
     expect(B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG.listening).toEqual(
       expect.objectContaining({
-        embedUrl: "https://www.youtube-nocookie.com/embed/t0OIJ3Upz18",
-        externalUrl: "https://youtu.be/t0OIJ3Upz18",
+        audioKey: "b1/day-18/day-18.mp3",
+        submitRequired: true,
       }),
     );
-    expect(B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG.listening.embedUrl).not.toContain(
-      "1PjAshI9u_u9BIaUg3Ff0lLOQ-OgmTZO_",
-    );
+    expect(B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG.listening.embedUrl).toBeFalsy();
+    expect(B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG.listening.questions).toHaveLength(5);
   });
 
   test("uses the requested A1 Day 12 Kapitel 8 Falowen Radio", () => {
