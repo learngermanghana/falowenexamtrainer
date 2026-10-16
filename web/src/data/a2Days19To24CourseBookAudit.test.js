@@ -52,10 +52,10 @@ describe("A2 Course Book continuation audit · Days 19–24", () => {
     expect(source).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
 
-  test("keeps Day 22 on weekly planning with the shared Submit flow", () => {
+  test("replaces Day 22 workbook with the three-part Goethe AI speaking mock", () => {
     const source = readComponent("A2Day22DieWochePlanungWorkbookPage.js");
-    expect(source).toContain("A2StandardTabbedWorkbookPage");
-    expect(source).toContain('chapter="8.22"');
+    expect(source).toContain("CourseSpeakingMockAssignment");
+    expect(source).toContain('assignmentKey="A2-8.22"');
     expect(A2_READING_TASKS[22].title).toBe("In der Touristeninformation Hamburg");
     expect(source).not.toMatch(/Gülcan|Willkommensführung|Literaturkurs/i);
     expect(source).not.toContain("Go to Submission Area");
