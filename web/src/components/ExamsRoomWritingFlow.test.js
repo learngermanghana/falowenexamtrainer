@@ -1,40 +1,47 @@
 import fs from "fs";
 import path from "path";
 
-const read = (relativePath) =>
-  fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
+const read = (file) => fs.readFileSync(path.resolve(__dirname, file), "utf8");
 
-describe("Exams Room simplified Schreiben flow", () => {
-  const writingPage = read("WritingPage.js");
-  const app = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
+describe("Exams Room Schreiben redesign", () => {
+  const app = read("../App.js");
+  const examRoom = read("ExamRoom.js");
+  const workspace = read("ExamWritingWorkspace.jsx");
+  const styles = read("ExamWritingWorkspace.css");
 
-  test("uses only the main marking surface in Exams Room", () => {
-    expect(app).toContain(
-      '<WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow />',
-    );
-    expect(writingPage).toContain("Choose a writing question");
-    expect(writingPage).toContain("isSimplifiedExamFlow");
-    expect(writingPage).toContain("return writingTasks.filter((task) => task.level === level)");
-    expect(writingPage).not.toContain("const letterPattern =");
+  test("both Exams Room routes use the same new writing workspace", () => {
+    expect(app).toContain('<ExamWritingWorkspace />');
+    expect(examRoom).toContain('<ExamWritingWorkspace />');
+    expect(app).not.toContain('<WritingPage mode="exam"');
+    expect(workspace).toContain('data-testid="exam-writing-workspace"');
   });
 
-  test("keeps every level prompt selectable and repairs an invalid selection", () => {
-    expect(writingPage).toContain("visibleWritingTasks.some");
-    expect(writingPage).toContain("setSelectedLetterId(visibleWritingTasks[0].id)");
-    expect(writingPage).toContain("Analyze my text");
+  test("features separate Teil tabs, persistent topic drafts and mobile task selection", () => {
+    expect(workspace).toContain('className="few-parts"');
+    expect(workspace).toContain("part.tasks.map(");
+    expect(workspace).toContain("window.localStorage.setItem(key, JSON.stringify(records))");
+    expect(workspace).toContain("onChange={(event) => changeDraft(event.target.value)}");
+    expect(workspace).toContain("few-mobile-list-toggle");
+    expect(styles).toContain("@media (max-width: 760px)");
   });
 
-  test("saves the marked original letter directly to tutor review", () => {
-    expect(writingPage).toContain('source: isSimplifiedExamFlow ? "exam-room-simple-writing" : "exam-room"');
-    expect(writingPage).toContain("Save marked letter for tutor");
-    expect(writingPage).toContain("Your original letter and AI feedback will be saved to the tutor review queue.");
-    expect(writingPage).toContain('revisedDraft: isSimplifiedExamFlow ? "" : revisedDraftText');
+  test("keeps AI assessment and tutor submission on the existing services", () => {
+    expect(workspace).toContain("markLetterWithAI({");
+    expect(workspace).toContain("saveExamLetterForTutorReview({");
+    expect(workspace).toContain("saveWritingAttempt({");
+    expect(workspace).toContain('source: "exam-room-simple-writing"');
+    expect(workspace).toContain("WritingFeedbackCard");
   });
 
-  test("does not require the improvement workflow for the simplified flow", () => {
-    expect(writingPage).toContain(
-      "if (!isSimplifiedExamFlow && (!revisionSummary.changed || !workflowComplete))",
-    );
-    expect(writingPage).toContain("markFeedback && isExamMode && !isSimplifiedExamFlow");
+  test("has distinct form and transformation fields and never exposes keys before checking", () => {
+    expect(workspace).toContain('part.format === "form"');
+    expect(workspace).toContain('part.format === "transformation"');
+    expect(workspace).toContain('className="few-answer-key"');
+    expect(workspace).toContain('feedback.type === "form"');
+  });
+
+  test("does not change existing full mocks or course writing", () => {
+    expect(read("WritingPage.js")).toContain("const WritingPage = ({");
+    expect(read("A1FinalMockExamPage.jsx")).toContain("Schreiben");
   });
 });
