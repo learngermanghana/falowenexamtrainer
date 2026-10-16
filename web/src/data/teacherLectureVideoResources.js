@@ -22,7 +22,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     11: [{ chapter: "4.11", topic: "Unterwegs: Verkehrsmittel vergleichen", tutor_lecture_video: "https://youtu.be/fgKqPTifKmk" }],
     12: [{ chapter: "5.12", topic: "Mein Traumberuf", tutor_lecture_video: "https://youtu.be/YY_Ba_vw6Po" }],
     13: [{ chapter: "5.13", topic: "Ein Vorstellungsgespräch", tutor_lecture_video: "https://youtu.be/eC8CgybIblo" }],
-    14: [{ chapter: "5.14", topic: "Beruf und Karriere", tutor_lecture_video: "https://youtu.be/hGK64aXtARk" }],
+    14: [{ chapter: "5.14", topic: "Beruf und Karriere", tutor_lecture_video: "https://youtu.be/peuEAMRsFKI" }],
     15: [{ chapter: "6.15", tutor_lecture_video: "" }],
     16: [{ chapter: "6.16", topic: "Wohlbefinden und Entspannung", tutor_lecture_video: "https://youtu.be/t_9HDdZbbEA" }],
     17: [{ chapter: "6.17", tutor_lecture_video: "" }],
