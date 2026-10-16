@@ -1,5 +1,15 @@
 // Interface copy only: exam situations, bullet points and form labels stay in German.
 const TITLES = {
+  "a1-existing-letter-1": "Ask About a Hotel Room",
+  "a1-existing-letter-2": "Reply to a Birthday Invitation",
+  "a1-existing-letter-3": "Absent from German Class",
+  "a1-existing-letter-4": "Ask About a German Course",
+  "a1-existing-letter-5": "Arrange a Meeting",
+  "a1-existing-letter-6": "Ask for Tourist Information",
+  "a1-existing-letter-7": "Buy a Used Bicycle",
+  "a1-existing-letter-8": "Join a Sports Club",
+  "a1-existing-letter-9": "Reply to a Weekend Invitation",
+  "a1-existing-letter-10": "Report a Heating Problem",
   "a1-course-registration": "German Course Registration",
   "a1-hotel-registration": "Hotel Registration",
   "a1-library-card": "Library Card Registration",
