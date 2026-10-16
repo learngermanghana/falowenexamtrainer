@@ -12,12 +12,12 @@ import {
 } from "./A2WritingWorkspaceSupport";
 
 const C1_TEMPLATE_LABELS = [
-  "Einleitung",
-  "Hauptargument / Kriterien",
-  "Beispiel",
-  "Einwand",
-  "Alternative",
-  "Schluss",
+  "Einleitung / Hook & Stance",
+  "Hauptargumentation & Kriterien",
+  "Konkretes Beispiel",
+  "Gegenargument & Relativierung",
+  "Alternative / Lösungssatz",
+  "Fazit",
 ];
 
 const syncC1OpinionTemplateSection = (sections = [], normalizedLevel = "") => {

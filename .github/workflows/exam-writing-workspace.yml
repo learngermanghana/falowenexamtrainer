@@ -6,6 +6,15 @@ on:
       - "web/src/components/ExamWritingWorkspace*"
       - "web/src/components/ExamsRoomWritingFlow.test.js"
       - "web/src/data/examWritingWorkspace*"
+      - "web/src/data/c1ExamDiscussionTasks.js"
+      - "web/src/data/c1ExamFormalEmailTasks.js"
+      - "web/src/data/c1FormalEmailTemplate.js"
+      - "web/src/data/c1ApprovedOpinionEssayTemplate.js"
+      - "web/src/data/c1WritingTemplatesAndTasks.test.js"
+      - "web/src/data/writingCheatSheets.js"
+      - "web/src/components/WritingCheatSheetTabs.js"
+      - "web/src/components/WritingCheatSheetTabs.c1Template.test.js"
+      - "web/src/data/c1Day9ApprovedTextboxTemplate.test.js"
       - "web/src/data/examWritingEnglishCopy.js"
       - "functions/data/assessmentTasks.json"
       - "functions/functionz/tests/assessmentTaskContext.test.js"
@@ -19,6 +28,15 @@ on:
       - "web/src/components/ExamWritingWorkspace*"
       - "web/src/components/ExamsRoomWritingFlow.test.js"
       - "web/src/data/examWritingWorkspace*"
+      - "web/src/data/c1ExamDiscussionTasks.js"
+      - "web/src/data/c1ExamFormalEmailTasks.js"
+      - "web/src/data/c1FormalEmailTemplate.js"
+      - "web/src/data/c1ApprovedOpinionEssayTemplate.js"
+      - "web/src/data/c1WritingTemplatesAndTasks.test.js"
+      - "web/src/data/writingCheatSheets.js"
+      - "web/src/components/WritingCheatSheetTabs.js"
+      - "web/src/components/WritingCheatSheetTabs.c1Template.test.js"
+      - "web/src/data/c1Day9ApprovedTextboxTemplate.test.js"
       - "web/src/data/examWritingEnglishCopy.js"
       - "functions/data/assessmentTasks.json"
       - "functions/functionz/tests/assessmentTaskContext.test.js"
@@ -52,6 +70,9 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/data/examWritingWorkspace.test.js
+          src/data/c1WritingTemplatesAndTasks.test.js
+          src/data/c1Day9ApprovedTextboxTemplate.test.js
+          src/components/WritingCheatSheetTabs.c1Template.test.js
           src/components/ExamWritingWorkspace.test.jsx
           src/components/ExamsRoomWritingFlow.test.js
 

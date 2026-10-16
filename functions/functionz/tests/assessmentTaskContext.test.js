@@ -44,9 +44,9 @@ test('rejects a stale speaking question', () => {
 
 test('every new Exams Room writing task resolves and a mismatched situation is rejected', () => {
   const workspaceIds = Object.keys(tasks.writing).filter(id =>
-    /^(?:a1-existing-letter-|a2-(?:sms|email)-|b1-(?:invitation|move|trip|online|transport|cancel|seminar)$|b2-(?:homeoffice|environment|shift|project)$|c1-(?:ai|city|application|policy)$|c2-)/.test(id)
+    /^(?:a1-existing-letter-|a2-(?:sms|email)-|b1-(?:invitation|move|trip|online|transport|cancel|seminar)$|b2-(?:homeoffice|environment|shift|project)$|c1-(?:discussion|email)-\d{2}$|c2-)/.test(id)
   );
-  expect(workspaceIds).toHaveLength(40);
+  expect(workspaceIds).toHaveLength(56);
   for (const id of workspaceIds) {
     const registered = tasks.writing[id];
     expect(resolvePracticeTask('writing', id, registered.level, {
@@ -63,4 +63,8 @@ test('every new Exams Room writing task resolves and a mismatched situation is r
   expect(tasks.writing['a2-sms-01'].situation).toContain('Anna');
   expect(tasks.writing['a2-email-05'].situation).toContain('Sonnhof');
   expect(tasks.writing['c2-transformations'].transformations).toHaveLength(4);
+  expect(tasks.writing['c1-discussion-01'].whatToInclude).toHaveLength(4);
+  expect(tasks.writing['c1-discussion-10'].situation).toContain('Großstadtfrust');
+  expect(tasks.writing['c1-email-01'].situation).toContain('Dr. Menzel');
+  expect(tasks.writing['c1-email-10'].whatToInclude).toHaveLength(4);
 });

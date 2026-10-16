@@ -1,11 +1,16 @@
-export const C1_APPROVED_OPINION_ESSAY_TEMPLATE = `In der heutigen Zeit wird oft über [Thema] diskutiert. Dieses Thema ist von großer Bedeutung, da es sowohl [Bereich 1] als auch [Bereich 2] betrifft. Ich vertrete die Ansicht, dass [eigene Meinung].
+// Shared C1 opinion scaffold: Course Book writing textbox and Cheat Sheet.
+// Six paragraphs mirror introduction, argument, concrete example, counterargument,
+// alternative and conclusion. Section headings live in the Cheat Sheet only.
+export const C1_APPROVED_OPINION_ESSAY_TEMPLATE = `Das Thema [Thema] gewinnt im öffentlichen Diskurs zunehmend an Bedeutung, da es tiefgreifende Auswirkungen auf [Bereich 1] sowie [Bereich 2] hat. Vor diesem Hintergrund vertrete ich die Auffassung, dass...
 
-Zunächst ist festzustellen, dass [Grund / Hauptargument].
+Zunächst lässt sich anführen, dass [Hauptargument]. Bei genauerer Betrachtung wird deutlich, dass [Detaillierte Erläuterung].
 
-Andererseits sollte berücksichtigt werden, dass [Gegenargument / Nachteil].
+Als anschauliches Beispiel hierfür lässt sich [konkretes Beispiel] heranziehen. Dies verdeutlicht, dass...
 
-Eine mögliche Lösung oder Alternative wäre, dass [Vorschlag / Alternative].
+Demgegenüber muss jedoch eingeräumt werden, dass [Gegenargument/Nachteil]. Nichtsdestoweniger wiegt dieser Aspekt weniger schwer, wenn man bedenkt, dass...
 
-Zusammenfassend lässt sich festhalten, dass [kurzes Fazit]. Ich bin der Auffassung, dass [eigene Position].`;
+Um dieser Herausforderung wirksam zu begegnen, bietet sich als zielführende Alternative an, dass [Vorschlag]...
+
+Zusammenfassend lässt sich festhalten, dass trotz der Einwände [eigene Position].`;
 
 export default C1_APPROVED_OPINION_ESSAY_TEMPLATE;
