@@ -842,15 +842,16 @@
     "sequence": 23,
     "day": 22,
     "chapter": "8.22",
-    "title": "Die Woche Planung 8.22",
+    "title": "Goethe A2 Speaking Mock",
     "assignmentId": "A2-8.22",
-    "assignmentType": "Lesen & Hören",
+    "assignmentType": "Goethe Speaking Mock",
     "grammarPage": "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-22-die-woche-planung-workbook",
     "video": "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published"
+    "contentStatus": "published",
+    "kind": "schreiben_sprechen"
   },
   {
     "id": "A2-9.23",
@@ -1298,13 +1299,14 @@
     "sequence": 24,
     "day": 23,
     "chapter": "7.23",
-    "title": "Erstes Date – Typische Situationen 7.23",
+    "title": "Goethe B1 Speaking Mock",
     "assignmentId": "B1-7.23",
-    "assignmentType": "Lesen & Hören",
+    "assignmentType": "Goethe Speaking Mock",
     "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "planned"
+    "contentStatus": "planned",
+    "kind": "schreiben_sprechen"
   },
   {
     "id": "B1-8.24",
