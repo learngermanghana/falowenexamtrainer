@@ -1,6 +1,7 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1TranslationTask from "./A1TranslationTask";
+import A1Day8ListeningPractice from "./A1Day8ListeningPractice";
 
 import { styles } from "../styles";
 
@@ -24,15 +25,6 @@ const listStyle = {
   margin: 0,
   paddingLeft: 20,
   lineHeight: 1.7,
-};
-
-const questionCardStyle = {
-  border: "1px solid #e5e7eb",
-  borderRadius: 10,
-  padding: 12,
-  background: "#fff",
-  display: "grid",
-  gap: 8,
 };
 
 const imageStyle = {
@@ -157,57 +149,8 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Teil 3 · Germany&apos;s Neighbors (Hören)</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Listen to the audio below and choose one correct answer.</p>
-        <p style={{ margin: 0 }}>
-          Audio Link:{" "}
-          <a href="https://drive.google.com/file/d/1qyrzaHyuB0mLOxRCidmvyj15P8LzeEft/view?usp=sharing" target="_blank" rel="noreferrer">
-            Open Hören audio
-          </a>
-        </p>
-
-        <div style={questionCardStyle}>
-          <strong>Fragen:</strong>
-          <ol style={listStyle}>
-            <li>
-              Wo war Anna letztes Jahr?
-              <ul style={listStyle}>
-                <li>a) In Spanien und Italien</li>
-                <li>b) In Frankreich und Deutschland</li>
-                <li>c) In Italien und Frankreich</li>
-                <li>d) In Italien und Spanien</li>
-              </ul>
-            </li>
-            <li>
-              Welche Stadt hat Anna in Italien besucht?
-              <ul style={listStyle}>
-                <li>a) Paris</li>
-                <li>b) Madrid</li>
-                <li>c) Rom</li>
-                <li>d) Berlin</li>
-              </ul>
-            </li>
-            <li>
-              Was hat Anna in Italien gefallen?
-              <ul style={listStyle}>
-                <li>a) Das Wetter</li>
-                <li>b) Das Essen</li>
-                <li>c) Der Eiffelturm</li>
-                <li>d) Das Meer</li>
-              </ul>
-            </li>
-            <li>
-              Wo war Anna in Frankreich?
-              <ul style={listStyle}>
-                <li>a) Rom</li>
-                <li>b) Paris</li>
-                <li>c) Barcelona</li>
-                <li>d) London</li>
-              </ul>
-            </li>
-            <li>Wohin möchte Anna nächstes Jahr?</li>
-          </ol>
-        </div>
+        <h2 style={sectionTitleStyle}>Teil 3 · Freunde sprechen über Herkunft und Sprachen (Hören)</h2>
+        <A1Day8ListeningPractice />
       </section>
     </A1TutorMarkedWorkbookShell>
   );
