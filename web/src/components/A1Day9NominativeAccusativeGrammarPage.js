@@ -146,56 +146,6 @@ const ArticleTable = ({ title, definite, indefinite }) => (
   </div>
 );
 
-const nominativeCoreExamples = [
-  {
-    id: "nom-core-1",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Der Mann</span> <span style={verbHighlightStyle}>ist</span> nett.
-      </>
-    ),
-    english: "The man is nice.",
-    gender: "Mann = masculine singular",
-    note: "Mann is the subject of the sentence, so nominative masculine uses der.",
-  },
-  {
-    id: "nom-core-2",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Die Frau</span> <span style={verbHighlightStyle}>arbeitet</span>.
-      </>
-    ),
-    english: "The woman works.",
-    gender: "Frau = feminine singular",
-    note: "Frau is the subject, so nominative feminine uses die.",
-  },
-  {
-    id: "nom-core-3",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>spielt</span>.
-      </>
-    ),
-    english: "The child plays.",
-    gender: "Kind = neuter singular",
-    note: "Kind is the subject, so nominative neuter uses das.",
-  },
-  {
-    id: "nom-core-4",
-    sentence: (
-      <>
-        <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Auto. /{" "}
-        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>ist</span> groß. /{" "}
-        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span> Lehrer.
-      </>
-    ),
-    english: "That is a car. / He is tall. / He becomes a teacher.",
-    gender: "Auto = neuter singular; Lehrer = masculine singular profession",
-    note:
-      "With sein (to be) and werden (to become), ask whether the word is the subject or the object. These beginner examples mainly describe the subject, so the article stays nominative.",
-  },
-];
-
 const nominativeMoreExamples = [
   {
     id: "nom-more-1",
@@ -396,6 +346,7 @@ const accusativeMoreExamples = [
 const knowledgeQuestions = [
   {
     id: "q1",
+    nounHint: "der Mann · masculine singular",
     prompt: "Ich sehe ____ Mann jeden Tag.",
     options: ["der", "den", "dem"],
     correctAnswer: "den",
@@ -404,6 +355,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q2",
+    nounHint: "die Frau · feminine singular",
     prompt: "____ Frau arbeitet im Büro.",
     options: ["die", "den", "dem"],
     correctAnswer: "die",
@@ -412,6 +364,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q3",
+    nounHint: "das Buch · neuter singular",
     prompt: "Wir kaufen ____ Buch.",
     options: ["das", "dem", "des"],
     correctAnswer: "das",
@@ -420,6 +373,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q4",
+    nounHint: "der Schüler · masculine singular",
     prompt: "Der Lehrer sieht ____ Schüler.",
     options: ["der", "den", "dem"],
     correctAnswer: "den",
@@ -428,6 +382,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q5",
+    nounHint: "das Kind · neuter singular",
     prompt: "____ Kind spielt im Garten.",
     options: ["das", "den", "dem"],
     correctAnswer: "das",
@@ -436,6 +391,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q6",
+    nounHint: "der Computer · masculine singular",
     prompt: "Wir brauchen ____ Computer.",
     options: ["der", "den", "dem"],
     correctAnswer: "den",
@@ -444,6 +400,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q7",
+    nounHint: "die Bücher · plural (singular: das Buch)",
     prompt: "____ Bücher sind interessant.",
     options: ["die", "den", "dem"],
     correctAnswer: "die",
@@ -452,6 +409,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q8",
+    nounHint: "die Bücher · plural (singular: das Buch)",
     prompt: "Ich lese ____ Bücher jeden Abend.",
     options: ["die", "den", "dem"],
     correctAnswer: "die",
@@ -617,7 +575,6 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           definite={["der", "die", "das", "die"]}
           indefinite={["ein", "eine", "ein", "keine"]}
         />
-        <ExampleList examples={nominativeCoreExamples} />
 
         <p style={{ margin: 0 }}>
           More nominative examples (subject-focused): in nominative-only patterns, highlight the{" "}
@@ -696,6 +653,12 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
                 </h3>
                 <p style={{ margin: 0, fontSize: 14, color: "#374151" }}>
                   <strong>English:</strong> {question.englishTranslation}
+                </p>
+                <p style={{ margin: 0, padding: "8px 10px", borderRadius: 9, background: "#f0fdf4", border: "1px solid #bbf7d0", fontSize: 14 }}>
+                  <strong>Noun tip:</strong> <span lang="de">{question.nounHint.split(" · ")[0]}</span> — {question.nounHint.split(" · ")[1]}
+                  <span style={{ display: "block", fontSize: 12, color: "#475569", marginTop: 3 }}>
+                    This is the dictionary article. Choose the article that fits the noun's role in the sentence.
+                  </span>
                 </p>
                 <div style={{ display: "grid", gap: 8 }}>
                   {question.options.map((option) => (

@@ -15,13 +15,21 @@ describe("A1 Day 8 Countries and Languages grammar notes", () => {
   test("teaches sprechen and man, three place questions, and short nach/in examples", () => {
     render(<FormingBasicStatementsPage />);
     expect(screen.getByRole("heading", { name: "Welche Sprachen sprichst du?" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "1. sprechen — an irregular verb" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "2. One useful expression: man spricht" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "3. sprechen — an irregular verb" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "4. One useful expression: man spricht" })).toBeInTheDocument();
     expect(screen.getByText("Do you speak German?")).toBeInTheDocument();
     expect(screen.getByText("People speak German in Germany.")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "3. Woher? Wo? Wohin? — understand the difference" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "4. nach or in? — going to a place" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "1. Woher? Wo? Wohin? — understand the difference" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "2. nach or in? — going to a place" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "6. Speak with a partner" })).toBeInTheDocument();
+    const headings = screen.getAllByRole("heading", { level: 2 }).map(node => node.textContent);
+    expect(headings.slice(0, 4)).toEqual([
+      "1. Woher? Wo? Wohin? — understand the difference",
+      "2. nach or in? — going to a place",
+      "3. sprechen — an irregular verb",
+      "4. One useful expression: man spricht",
+    ]);
+    expect(screen.queryByText("Eine Reise nach Deutschland")).not.toBeInTheDocument();
 
     const table = within(screen.getByTestId("a1-day8-where-questions")).getByRole("table");
     expect(within(table).getAllByRole("row")).toHaveLength(4);
@@ -52,8 +60,8 @@ describe("A1 Day 8 Countries and Languages grammar notes", () => {
     ]) {
       expect(rowContent).toContain(pronoun + verb);
     }
-    expect(within(rows[2]).getByText("sprichst")).toHaveStyle({ fontWeight: "800" });
-    expect(within(rows[3]).getByText("spricht")).toHaveStyle({ fontWeight: "800" });
+    expect(within(rows.find((row) => row.textContent === "dusprichst")).getByText("sprichst")).toHaveStyle({ fontWeight: "800" });
+    expect(within(rows.find((row) => row.textContent === "er / sie / esspricht")).getByText("spricht")).toHaveStyle({ fontWeight: "800" });
   });
 
   test("six short practice questions cover verbs, origin/location and both destination patterns", () => {
