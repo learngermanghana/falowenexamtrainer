@@ -915,64 +915,304 @@
         "Bitten Sie um Bestätigung."
       ]
     },
-    "c1-ai": {
-      "id": "c1-ai",
+    "c1-discussion-01": {
+      "id": "c1-discussion-01",
       "level": "C1",
       "teil": "teil1",
       "format": "argument",
       "register": null,
       "wordTarget": "about 230 words",
-      "situation": "Diskutieren Sie Chancen und Grenzen des Einsatzes künstlicher Intelligenz an Schulen.",
+      "situation": "Für das Internetforum „Karriere & Zukunft“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nStudieren – aber was? Für welches Studienfach sollte man sich entscheiden?\n\nSchreiben Sie circa 230 Wörter.",
       "whatToInclude": [
-        "Stellen Sie unterschiedliche Positionen dar.",
-        "Begründen Sie Ihre eigene Haltung.",
-        "Berücksichtigen Sie Gegenargumente.",
-        "Ziehen Sie ein differenziertes Fazit."
+        "Erklären Sie, nach welchen Kriterien sich die Wahl eines Studienfachs richten sollte.",
+        "Argumentieren Sie anhand eines konkreten Beispiels für ein bestimmtes Studienfach.",
+        "Nennen Sie Gründe, die gegen ein Hochschulstudium sprechen könnten.",
+        "Erläutern Sie eine sinnvolle Alternative zum klassischen Studium."
       ]
     },
-    "c1-city": {
-      "id": "c1-city",
+    "c1-discussion-02": {
+      "id": "c1-discussion-02",
       "level": "C1",
       "teil": "teil1",
       "format": "argument",
       "register": null,
       "wordTarget": "about 230 words",
-      "situation": "Verfassen Sie einen argumentativen Diskussionsbeitrag zur autofreien Innenstadt.",
+      "situation": "Für das Internetforum „Arbeitswelt im Wandel“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nMobiles Arbeiten: Fluch oder Segen für die Karriere?\n\nSchreiben Sie circa 230 Wörter.",
       "whatToInclude": [
-        "Erklären Sie die gesellschaftliche Bedeutung.",
-        "Wägen Sie Chancen und Risiken ab.",
-        "Beziehen Sie Beispiele ein.",
-        "Entwickeln Sie Ihre Position."
+        "Äußern Sie Ihre Meinung zur zunehmenden Verlegung des Arbeitsplatzes ins Homeoffice.",
+        "Nennen Sie Gründe oder Kriterien, warum viele Arbeitnehmer das flexible Arbeiten bevorzugen.",
+        "Argumentieren Sie anhand eines Beispiels für die Nachteile oder Risiken reiner Heimarbeit.",
+        "Schlagen Sie eine zielführende Lösung oder ein modernes Arbeitszeitmodell vor."
       ]
     },
-    "c1-application": {
-      "id": "c1-application",
+    "c1-discussion-03": {
+      "id": "c1-discussion-03",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Bildung & Digitales“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nKünstliche Intelligenz an Schulen und Universitäten\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie Ihre Haltung zum Einsatz von KI-Tools (wie Chatbots) im Unterricht und bei Hausarbeiten.",
+        "Nennen Sie Argumente und ein konkretes Beispiel für den Nutzen digitaler Assistenzsysteme im Lernalltag.",
+        "Führen Sie Bedenken an, die Lehrende gegenüber dieser Entwicklung äußern.",
+        "Erläutern Sie, wie Bildungseinrichtungen sinnvoll mit KI-Technologien umgehen sollten."
+      ]
+    },
+    "c1-discussion-04": {
+      "id": "c1-discussion-04",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Umwelt & Gesellschaft“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nMinimalismus und Konsumverzicht: Brauchen wir weniger Zeug?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Nehmen Sie Stellung zum Trend des bewussten Konsumverzichts im Alltag.",
+        "Nennen Sie Ursachen für das steigende Interesse an einem nachhaltigen Lebensstil.",
+        "Argumentieren Sie anhand eines Beispiels für Hürden, die einem minimalistischen Leben im Wege stehen.",
+        "Erläutern Sie eine Alternative, wie Bürger im Alltag einen Beitrag zum Umweltschutz leisten können."
+      ]
+    },
+    "c1-discussion-05": {
+      "id": "c1-discussion-05",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Finanzen & Alltag“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nAbschaffung des Bargeldes: Auf dem Weg zur digitalen Währung\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, welche Vor- und Nachteile das ausschließliche Zahlen mit Karte oder Smartphone hat.",
+        "Argumentieren Sie anhand eines Beispiels für die Risiken einer bargeldlosen Gesellschaft (z. B. Datenschutz, Ausfall von Systemen).",
+        "Nennen Sie Gründe, warum manche Bevölkerungsgruppen weiterhin am Bargeld festhalten.",
+        "Schlagen Sie einen Kompromiss für die zukünftige Gestaltung von Zahlungssystemen vor."
+      ]
+    },
+    "c1-discussion-06": {
+      "id": "c1-discussion-06",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Wirtschaft & Leben“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nWeniger arbeiten bei gleichem Gehalt: Ist die 4-Tage-Woche zukunftsfähig?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Meinung zur Einführung einer Vier-Tage-Woche in Unternehmen.",
+        "Nennen Sie Kriterien und Argumente, die aus Sicht der Beschäftigten für dieses Modell sprechen.",
+        "Argumentieren Sie anhand eines Beispiels (z. B. Pflege, Handwerk) für Branchen, in denen die Umsetzung schwierig ist.",
+        "Erläutern Sie eine alternative Möglichkeit zur Verbesserung der Work-Life-Balance."
+      ]
+    },
+    "c1-discussion-07": {
+      "id": "c1-discussion-07",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Familie & Medien“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nSoziale Medien und Jugendliche: Wie viel Bildschirmzeit ist gesund?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, welche Rolle soziale Netzwerke im Leben heutiger Jugendlicher spielen.",
+        "Argumentieren Sie anhand eines konkreten Beispiels für die positiven Aspekte digitaler Vernetzung.",
+        "Nennen Sie Risiken und Gefahren einer übermäßigen Nutzung sozialer Medien.",
+        "Schlagen Sie vor, welche Maßnahmen Eltern und Schulen ergreifen sollten."
+      ]
+    },
+    "c1-discussion-08": {
+      "id": "c1-discussion-08",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Reisen & Ökologie“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nKlimafreundliches Reisen: Fliegen neu überdenken?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Nehmen Sie Stellung zum Einfluss des internationalen Flugverkehrs auf das Klima.",
+        "Nennen Sie Gründe, warum Kurzstreckenflüge nach wie vor häufig genutzt werden.",
+        "Argumentieren Sie anhand eines Beispiels für die Vorzüge nachhaltiger Reisealternativen (z. B. Nachtzüge, Nahverkehr).",
+        "Erläutern Sie Maßnahmen, wie nachhaltiger Tourismus in Zukunft gefördert werden kann."
+      ]
+    },
+    "c1-discussion-09": {
+      "id": "c1-discussion-09",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Weiterbildung & Arbeitswelt“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nStändige Weiterbildung: Pflicht oder Chance für Arbeitnehmer?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, warum kontinuierliche Fortbildung im heutigen Berufsleben immer wichtiger wird.",
+        "Nennen Sie Vorteile, die sich für Beschäftigte durch regelmäßige Qualifizierungsmaßnahmen ergeben.",
+        "Argumentieren Sie anhand eines Beispiels für Schwierigkeiten bei der Vereinbarkeit von Beruf, Familie und Weiterbildung.",
+        "Schlagen Sie vor, wie Unternehmen ihre Mitarbeiter bei der Fortbildung unterstützen können."
+      ]
+    },
+    "c1-discussion-10": {
+      "id": "c1-discussion-10",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Stadt & Land“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nGroßstadtfrust oder Landliebe: Wo liegt die Zukunft des Wohnens?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Ansicht zur Attraktivität des Lebens in der Großstadt im Vergleich zum ländlichen Raum.",
+        "Nennen Sie Kriterien, die für junge Familien bei der Wahl des Wohnortes entscheidend sind.",
+        "Argumentieren Sie anhand eines Beispiels für die Herausforderungen ländlicher Regionen (z. B. Infrastruktur, Anbindung).",
+        "Erläutern Sie eine Lösung, wie das Leben außerhalb von Metropolen attraktiv gestaltet werden kann."
+      ]
+    },
+    "c1-email-01": {
+      "id": "c1-email-01",
       "level": "C1",
       "teil": "teil2",
       "format": "email",
       "register": "formal",
       "wordTarget": "about 120 words",
-      "situation": "Sie organisieren ein wissenschaftliches Projekt und möchten eine Institution um Unterstützung bitten.",
+      "situation": "Während Ihres Urlaubs ist Ihre Abteilung in ein neues Gebäude umgezogen. Nach Ihrer Rückkehr stellen Sie fest, dass Sie nicht mehr in einem Zweierbüro arbeiten, sondern in einem Großraumbüro mit acht Personen.\n\nEmpfänger/-in: Ihre Vorgesetzte, Frau Dr. Menzel\n\nSchreiben Sie eine formelle E-Mail.",
       "whatToInclude": [
-        "Stellen Sie das Projekt vor.",
-        "Begründen Sie die Bedeutung.",
-        "Formulieren Sie Ihre Bitte präzise.",
-        "Schlagen Sie das weitere Vorgehen vor."
+        "Eröffnen Sie Ihr Schreiben höflich und zeigen Sie Verständnis für organisatorische Notwendigkeiten.",
+        "Nennen Sie konkrete Tätigkeiten (z. B. vertrauliche Telefonate, Kundengespräche), die durch die Unruhe beeinträchtigt werden.",
+        "Beschreiben Sie Bedingungen, die für Sie akzeptabel wären.",
+        "Machen Sie einen konkreten Kompromissvorschlag (z. B. Trennwände, teilweise Nutzung eines Besprechungsraums)."
       ]
     },
-    "c1-policy": {
-      "id": "c1-policy",
+    "c1-email-02": {
+      "id": "c1-email-02",
       "level": "C1",
       "teil": "teil2",
       "format": "email",
       "register": "formal",
       "wordTarget": "about 120 words",
-      "situation": "Sie schreiben als Kurssprecherin oder Kurssprecher an die Leitung einer Weiterbildungseinrichtung.",
+      "situation": "Die Geschäftsführung hat kurzfristig beschlossen, die Anzahl der zulässigen Homeoffice-Tage von drei Tagen auf einen Tag pro Woche zu reduzieren.\n\nEmpfänger/-in: Der Leiter der Personalabteilung, Herr Dr. Weber\n\nSchreiben Sie eine formelle E-Mail.",
       "whatToInclude": [
-        "Beschreiben Sie die Regelung.",
-        "Stellen Sie die Folgen dar.",
-        "Unterbreiten Sie einen Lösungsvorschlag.",
-        "Bitten Sie um Rückmeldung."
+        "Zeigen Sie höflich Verständnis für das Anliegen der Geschäftsführung nach mehr Präsenz vor Ort.",
+        "Erläutern Sie die persönlichen oder beruflichen Schwierigkeiten, die diese spontane Umstellung verursacht.",
+        "Beschreiben Sie Bedingungen, unter denen eine erhöhte Präsenzzeit für Sie machbar wäre.",
+        "Schlagen Sie einen schrittweisen Übergang oder eine flexible Kernarbeitszeit als Kompromiss vor."
+      ]
+    },
+    "c1-email-03": {
+      "id": "c1-email-03",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "In Ihrer Abteilung wurde am Wochenende eine neue, komplexe Projektmanagement-Software eingeführt, ohne dass das Team vorab geschult wurde. Dadurch verzögern sich wichtige Kundenprojekte.\n\nEmpfänger/-in: Der IT-Projektleiter, Herr Becker\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Bedanken Sie sich höflich für die Modernisierung der IT-Infrastruktur.",
+        "Schildern Sie konkrete Arbeitsabläufe, die durch fehlende Einarbeitung ins Stocken geraten sind.",
+        "Formulieren Sie die Mindestanforderungen an eine funktionierende Arbeitsumgebung.",
+        "Schlagen Sie eine kompakte Eil-Schulung oder die temporäre Weiterbenutzung des Altsystems vor."
+      ]
+    },
+    "c1-email-04": {
+      "id": "c1-email-04",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Zwei für Ihren Studienabschluss obligatorische Modulprüfungen wurden vom Prüfungsamt auf denselben Tag und dieselbe Uhrzeit gelegt.\n\nEmpfänger/-in: Die Vorsitzende des Prüfungsamtes, Frau Prof. Dr. Neumann\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Drücken Sie Ihr Verständnis für den komplexen Koordinationsaufwand des Prüfungsamtes aus.",
+        "Stellen Sie die Überschneidung und die Konsequenzen für Ihren Studienverlauf dar.",
+        "Nennen Sie Rahmenbedingungen für eine faire Prüfungsteilnahme.",
+        "Unterbreiten Sie einen Kompromissvorschlag (z. B. Ausweichtermin oder mündliche Ersatzprüfung)."
+      ]
+    },
+    "c1-email-05": {
+      "id": "c1-email-05",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Die universitäre Zentralbibliothek hat kurz vor der Examensphase aus Energiespargründen die Öffnungszeiten am Wochenende drastisch verkürzt.\n\nEmpfänger/-in: Der Bibliotheksleiter, Herr Dr. Richter\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Äußern Sie höflich Verständnis für die Sparmaßnahmen der Universität.",
+        "Erläutern Sie, warum die verkürzten Zeiten Ihre Vorbereitung auf die Abschlussprüfung behindern.",
+        "Beschreiben Sie, welche Nutzungszeiten für Examenskandidaten essenziell sind.",
+        "Schlagen Sie eine pragmatische Lösung vor (z. B. Zugangsbeschränkung nur für Abschlussjahrgänge am Wochenende)."
+      ]
+    },
+    "c1-email-06": {
+      "id": "c1-email-06",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "In Ihrem Mietshaus finden unangekündigte, extrem laute Sanierungsarbeiten statt, die Ihr Arbeiten im Homeoffice massiv beeinträchtigen.\n\nEmpfänger/-in: Ihre Vermieterin, Frau Schneider\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Drücken Sie Verständnis für die Notwendigkeit von Instandhaltungsmaßnahmen aus.",
+        "Beschreiben Sie die konkreten Störungen Ihres Arbeitsalltags durch den Baulärm.",
+        "Nennen Sie Bedingungen, unter denen Sie die Arbeiten hinnehmen können.",
+        "Schlagen Sie eine temporäre Mietminderung oder die Vereinbarung fester Ruhezeiten vor."
+      ]
+    },
+    "c1-email-07": {
+      "id": "c1-email-07",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Ein von Ihnen seit Monaten gebuchter Fachkurs wurde von der Weiterbildungsakademie wegen Erkrankung des Dozenten kurzfristig abgesagt, ohne dass ein Ersatztermin angeboten wird.\n\nEmpfänger/-in: Die Studienleitung der Weiterbildungsakademie, Frau Keller\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Zeigen Sie höfliches Verständnis für krankheitsbedingte Ausfälle.",
+        "Erläutern Sie die beruflichen Nachteile, die Ihnen durch den Kursausfall entstehen.",
+        "Formulieren Sie Ihre Erwartungen an eine adäquate Fortbildung.",
+        "Schlagen Sie einen Kompromiss vor (z. B. ein Online-Ersatzmodul oder eine Gutschrift für das Folgesemester)."
+      ]
+    },
+    "c1-email-08": {
+      "id": "c1-email-08",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Das Ihnen bereits genehmigte Budget für die Teilnahme an einer internationalen Fachkonferenz wurde vom Abteilungsleiter kurz vor Anmeldeschluss um 50 % gekürzt.\n\nEmpfänger/-in: Ihr Abteilungsleiter, Herr Hoffmann\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Bedanken Sie sich für das bisherige Vertrauen und zeigen Sie Verständnis für aktuelle Budgeteinschränkungen.",
+        "Legen Sie dar, welche Präsentationen und Netzwerkmöglichkeiten durch die Kürzung gefährdet sind.",
+        "Beschreiben Sie, unter welchen Bedingungen eine Teilnahme dennoch gewinnbringend wäre.",
+        "Schlagen Sie eine Kofinanzierung oder die Beschränkung auf eine digitale Teilnahme vor."
+      ]
+    },
+    "c1-email-09": {
+      "id": "c1-email-09",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Lieferschwierigkeiten eines externen Partners machen es unmöglich, das internationale Kundenprojekt fristgerecht ohne Qualitätsverlust einzureichen.\n\nEmpfänger/-in: Der Gesamtprojektleiter, Herr Martinez\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Eröffnen Sie höflich und betonen Sie Ihr Engagement für das Projektziel.",
+        "Schildern Sie die externen Gründe, die die Einhaltung des Abgabetermins erschweren.",
+        "Erläutern Sie den Qualitätsstandard, den Sie für das Endergebnis anstreben.",
+        "Schlagen Sie einen realistischen Zwischenbericht sowie eine moderate Fristverlängerung vor."
+      ]
+    },
+    "c1-email-10": {
+      "id": "c1-email-10",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Während einer anhaltenden Hitzewelle fällt im Bürogebäude wiederholt die Klimaanlage aus, sodass die Raumtemperaturen auf über 30 °C steigen.\n\nEmpfänger/-in: Der Gebäudemanager, Herr Vogel\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Zeigen Sie Verständnis für die hohe Auslastung der Haustechnik bei extremen Wetterlagen.",
+        "Nennen Sie Tätigkeiten und gesundheitliche Belastungen, die durch die Hitze erschwert werden.",
+        "Beschreiben Sie akzeptable Temperaturbedingungen für konzentriertes Arbeiten.",
+        "Schlagen Sie eine temporäre Übergangslösung vor (z. B. Bereitstellung von Ventilatoren oder flexible Arbeitszeiten in den Frühstunden)."
       ]
     },
     "c2-transformations": {
