@@ -1,0 +1,289 @@
+import { WRITING_PROMPTS } from "./writingExamPrompts";
+// Practice-specific writing tasks. These do not replace the graded Goethe mock tasks.
+const task = (id, title, situation, points, extra = {}) => ({ id, title, situation, points, ...extra });
+const part = (id, label, format, targetWords, tasks, description = "") => ({
+  id, label, format, targetWords, tasks, description,
+});
+
+// Reuse the ten existing Falowen A1 Goethe Schreiben samples instead of duplicating them.
+const A1_LETTER_SAMPLES = WRITING_PROMPTS.A1.map((sample, index) => ({
+  id: "a1-existing-letter-" + String(index + 1),
+  title: ["Hotelzimmer anfragen","Zum Geburtstag antworten","Im Deutschkurs fehlen","Informationen zum Sprachkurs","Ein Treffen vereinbaren","Touristeninformation","Ein Fahrrad kaufen","Mitglied im Sportverein","Einladung nach München","Problem mit der Heizung"][index],
+  situation: sample.Thema,
+  points: sample.Punkte,
+  category: [true,false,true,true,false,true,true,true,false,true][index] ? "Formelle E-Mail" : "Informelle E-Mail",
+  register: [true,false,true,true,false,true,true,true,false,true][index] ? "formal" : "informal",
+}));
+
+export const EXAM_WRITING_MODULES = Object.freeze({
+  A1: {
+    minutes: 20,
+    parts: [
+      part("teil1", "Teil 1 · Formular", "form", null, [
+        task("a1-course-registration", "Anmeldung zum Deutschkurs",
+          "Ihre Kollegin Maria Garcia (28 Jahre) wohnt in 10115 Berlin, Hauptstraße 12. Sie möchte einen Intensivkurs Deutsch für Anfänger (A1) buchen. Der Kurs beginnt am 01.11.2026. Sie bezahlt mit Kreditkarte.",
+          ["Lesen Sie die Informationen genau.", "Ergänzen Sie nur die fünf nummerierten Lücken."], {
+            category: "Sprachschule Berlin — Anmeldung",
+            formFields: [
+              { key: "name", label: "Name, Vorname", fixed: "Garcia, Maria" },
+              { key: "geburt", label: "Geburtsdatum", fixed: "14.05.1998" },
+              { key: "wohnort", label: "Wohnort / PLZ", number: 1, answer: ["10115 Berlin", "Berlin"] },
+              { key: "kurstyp", label: "Kurstyp", number: 2, answer: ["Intensivkurs"] },
+              { key: "niveau", label: "Sprachniveau", fixed: "A1" },
+              { key: "beginn", label: "Kursbeginn", number: 3, answer: ["01.11.2026", "1.11.2026"] },
+              { key: "zahlung", label: "Bezahlungsart", number: 4, answer: ["Kreditkarte", "mit Kreditkarte"] },
+              { key: "personen", label: "Anzahl der Personen", number: 5, answer: ["1", "eine Person", "1 Person"] },
+            ],
+          }),
+        task("a1-hotel-registration", "Hotel-Anmeldung",
+          "Ihr Bekannter Thomas Novak reist vom 12.08. bis 15.08. mit seiner Frau nach München. Er bucht ein Doppelzimmer mit Frühstück im Hotel Gartenstadt. Er zahlt bar vor Ort.",
+          ["Ergänzen Sie die fünf fehlenden Angaben.", "Verwenden Sie die Informationen aus dem Text."], {
+            category: "Hotel Gartenstadt — Meldeschein",
+            formFields: [
+              { key: "name", label: "Name des Gastes", fixed: "Novak, Thomas" },
+              { key: "wohnort", label: "Wohnort", fixed: "Prag" },
+              { key: "gaeste", label: "Anzahl der Gäste", number: 1, answer: ["2", "zwei", "2 Personen"] },
+              { key: "zimmer", label: "Zimmertyp", number: 2, answer: ["Doppelzimmer", "ein Doppelzimmer"] },
+              { key: "fruehstueck", label: "Verpflegung (mit/ohne Frühstück)", number: 3, answer: ["mit Frühstück", "Frühstück"] },
+              { key: "abreise", label: "Abreisetag", number: 4, answer: ["15.08.", "15.08", "15. August"] },
+              { key: "zahlung", label: "Zahlungsweise", number: 5, answer: ["bar", "Barzahlung"] },
+            ],
+          }),
+        task("a1-library-card", "Bibliotheksausweis",
+          "Ihre Freundin Sarah Jenkins (Studentin) möchte sich in der Stadtbibliothek Köln anmelden. Sie wählt eine Jahreskarte. Ihre Adresse ist Kantstraße 44, 50667 Köln. Telefonnummer: 0176-5544332.",
+          ["Lesen Sie die Situation.", "Ergänzen Sie die vier nummerierten Felder."], {
+            category: "Stadtbibliothek Köln — Kundenkarte",
+            formFields: [
+              { key: "name", label: "Vor- und Nachname", fixed: "Sarah Jenkins" },
+              { key: "status", label: "Beruf / Status", number: 1, answer: ["Studentin"] },
+              { key: "ort", label: "PLZ / Ort", number: 2, answer: ["50667 Köln", "Köln"] },
+              { key: "strasse", label: "Straße, Hausnummer", fixed: "Kantstraße 44" },
+              { key: "telefon", label: "Telefonnummer", number: 3, answer: ["0176-5544332", "01765544332"] },
+              { key: "karte", label: "Kartenart (Monatskarte/Jahreskarte)", number: 4, answer: ["Jahreskarte"] },
+            ],
+          }),
+        task("a1-sports-club", "Beitrittserklärung Sportverein",
+          "Herr Jan Kowalski, geboren am 03.02.1990, möchte einen Tanzkurs im Sportverein Aktiv Halle besuchen. Der Kurs findet jeden Donnerstag statt. Er möchte für 6 Monate Mitglied bleiben. Die Gebühr wird per Bankeinzug (SEPA) bezahlt.",
+          ["Übertragen Sie die richtigen Angaben.", "Ergänzen Sie alle fünf Felder."], {
+            category: "Sportverein Aktiv Halle — Mitgliedsantrag",
+            formFields: [
+              { key: "name", label: "Name, Vorname", fixed: "Kowalski, Jan" },
+              { key: "geburt", label: "Geburtsdatum", number: 1, answer: ["03.02.1990", "3.2.1990"] },
+              { key: "kurs", label: "Sportart / Kurs", number: 2, answer: ["Tanzkurs", "Tanzen"] },
+              { key: "tag", label: "Kurstag", number: 3, answer: ["Donnerstag"] },
+              { key: "dauer", label: "Dauer der Mitgliedschaft", number: 4, answer: ["6 Monate", "sechs Monate"] },
+              { key: "zahlung", label: "Bezahlungsart", number: 5, answer: ["Bankeinzug", "SEPA", "SEPA-Bankeinzug"] },
+            ],
+          }),
+        task("a1-repair-form", "Reparaturauftrag Kundendienst",
+          "Frau Elena Rossi ruft beim Kundendienst an. Ihre Waschmaschine der Marke Bosch (Modell Maxx 6) ist kaputt. Der Techniker soll am 20.10.2026 am Nachmittag kommen. Kontakt per E-Mail: elena.rossi@email.com.",
+          ["Lesen Sie die Kundendaten.", "Ergänzen Sie die fünf fehlenden Angaben."], {
+            category: "Kundendienst Elektro — Reparaturauftrag",
+            formFields: [
+              { key: "name", label: "Kundenname", fixed: "Elena Rossi" },
+              { key: "email", label: "E-Mail-Adresse", number: 1, answer: ["elena.rossi@email.com"] },
+              { key: "geraet", label: "Gerät / Marke", number: 2, answer: ["Waschmaschine / Bosch", "Waschmaschine Bosch", "Bosch Waschmaschine"] },
+              { key: "modell", label: "Modellbezeichnung", number: 3, answer: ["Maxx 6"] },
+              { key: "datum", label: "Gewünschter Termin (Datum)", number: 4, answer: ["20.10.2026", "20.10.26"] },
+              { key: "tageszeit", label: "Tageszeit (Vormittag/Nachmittag)", number: 5, answer: ["Nachmittag", "am Nachmittag"] },
+            ],
+          }),
+      ], "Übertrage die Angaben aus dem Text in ein Formular."),
+      part("teil2", "Teil 2 · E-Mail", "email", "ca. 30 Wörter", A1_LETTER_SAMPLES,
+        "Schreibe etwa 30 Wörter mit Anrede, drei Inhaltspunkten, Gruß und Namen."),
+    ],
+  },
+  A2: {
+    minutes: 30,
+    parts: [
+      part("teil1", "Teil 1 · SMS", "message", "20–30 Wörter", [
+        task("a2-late", "Du kommst später",
+          "Du bist auf dem Weg zu deiner Freundin Sara. Leider kommst du später. Schreibe eine Nachricht.",
+          ["Entschuldige dich.", "Erkläre den Grund.", "Nenne eine neue Zeit und einen Treffpunkt."], {
+            category: "SMS", example: "Hallo Sara, tut mir leid, mein Bus hat Verspätung. Ich komme um 17 Uhr. Treffen wir uns vor dem Kino? Bis gleich!",
+          }),
+        task("a2-cinema", "Ein Treffen verschieben",
+          "Du kannst heute nicht mit deinem Freund ins Kino gehen. Schreibe eine SMS.",
+          ["Erkläre kurz, warum du nicht kommen kannst.", "Schlage einen anderen Tag vor.", "Bitte um Antwort."], {
+            category: "SMS", example: "Hi Ben, ich bin heute krank und kann leider nicht mitkommen. Hast du am Samstag Zeit? Schreib mir bitte kurz. Liebe Grüße!",
+          }),
+      ]),
+      part("teil2", "Teil 2 · E-Mail", "email", "ca. 40 Wörter", [
+        task("a2-course", "Informationen zum Sprachkurs",
+          "Du interessierst dich für einen Deutschkurs. Schreibe an die Sprachschule.",
+          ["Erkläre dein Interesse.", "Frage nach dem Beginn.", "Frage nach Kurszeiten und Kosten."], {
+            category: "Formelle E-Mail", register: "formal",
+            example: "Sehr geehrte Damen und Herren,\nich interessiere mich für Ihren Deutschkurs. Wann beginnt der nächste Kurs? Gibt es auch Abendunterricht? Wie viel kostet der Kurs?\nMit freundlichen Grüßen\nAma",
+          }),
+        task("a2-visit", "Ein Besuch bei einer Freundin",
+          "Deine Freundin Lea hat dich eingeladen. Antworte ihr per E-Mail.",
+          ["Bedanke dich.", "Erkläre deine Ankunft.", "Stelle eine Frage zum Besuch."], {
+            category: "Informelle E-Mail", register: "informal",
+            example: "Liebe Lea,\nvielen Dank für deine Einladung! Ich komme am Samstag um 15 Uhr mit dem Zug. Kannst du mich am Bahnhof abholen?\nLiebe Grüße\nKojo",
+          }),
+      ]),
+    ],
+  },
+  B1: {
+    minutes: 60,
+    parts: [
+      part("teil1", "Teil 1 · Persönliche E-Mail", "email", "ca. 80 Wörter", [
+        task("b1-invitation", "Eine Einladung absagen",
+          "Dein Freund Lukas hat dich zu seiner Geburtstagsfeier am Samstag eingeladen. Du kannst leider nicht kommen. Schreibe ihm eine E-Mail.",
+          ["Entschuldige dich für deine Absage.", "Erkläre, warum du nicht kommen kannst.", "Schlage ein Treffen an einem anderen Tag vor."], {
+            category: "Freundschaft & Alltag", register: "informal",
+            example: "Lieber Lukas,\nvielen Dank für deine Einladung! Leider muss ich am Samstag arbeiten, weil meine Kollegin krank ist. Deshalb kann ich nicht zur Feier kommen. Das tut mir sehr leid. Hast du am Sonntag Zeit? Wir könnten uns im Café treffen und deinen Geburtstag nachfeiern.\nLiebe Grüße\nAma",
+          }),
+        task("b1-move", "Die neue Wohnung",
+          "Du bist vor Kurzem umgezogen. Schreibe eine E-Mail an einen Freund.",
+          ["Beschreibe deine neue Wohnung.", "Erkläre, warum du umgezogen bist.", "Lade deinen Freund zu einem Besuch ein."], {
+            category: "Wohnen", register: "informal",
+          }),
+        task("b1-trip", "Ein gemeinsamer Ausflug",
+          "Deine Freundin möchte mit dir einen Ausflug machen. Antworte ihr.",
+          ["Schlage ein Ziel vor.", "Erkläre, was ihr dort machen könnt.", "Vereinbare Treffpunkt und Zeit."], {
+            category: "Freizeit & Reisen", register: "informal",
+          }),
+      ]),
+      part("teil2", "Teil 2 · Meinungsbeitrag", "argument", "ca. 80 Wörter", [
+        task("b1-online", "Online lernen oder im Kurs?",
+          "In einem Internetforum wird diskutiert: Ist Online-Lernen besser als Unterricht in einer Schule? Schreibe deine Meinung.",
+          ["Nenne deine Meinung.", "Begründe sie mit mindestens zwei Argumenten.", "Gib ein Beispiel aus deiner Erfahrung."], {
+            category: "Lernen & Bildung",
+            example: "Meiner Meinung nach ist Online-Lernen praktisch, weil man von zu Hause lernen kann. Außerdem spart man Zeit. Trotzdem finde ich Unterricht im Kurs wichtig, denn dort kann man direkt Fragen stellen. Ich lerne zum Beispiel neue Wörter besser, wenn ich mit anderen spreche. Deshalb ist für mich eine Kombination am besten.",
+          }),
+        task("b1-transport", "Fahrrad statt Auto?",
+          "Im Forum diskutieren die Mitglieder, ob mehr Menschen das Fahrrad benutzen sollten.",
+          ["Äußere deine Meinung.", "Nenne einen Vorteil und einen Nachteil.", "Begründe deinen Standpunkt."], {
+            category: "Umwelt & Verkehr",
+          }),
+      ]),
+      part("teil3", "Teil 3 · Formelle E-Mail", "email", "ca. 40 Wörter", [
+        task("b1-cancel", "Einen Termin absagen",
+          "Du hast morgen einen Termin mit deiner Kursleiterin Frau Müller, kannst aber nicht kommen. Schreibe ihr.",
+          ["Entschuldige dich.", "Nenne einen Grund.", "Bitte um einen neuen Termin."], {
+            category: "Formelle E-Mail", register: "formal",
+            example: "Sehr geehrte Frau Müller,\nleider kann ich morgen nicht zu unserem Termin kommen, weil ich krank bin. Das tut mir sehr leid. Wäre ein neuer Termin am Freitag möglich?\nMit freundlichen Grüßen\nAma Mensah",
+          }),
+        task("b1-seminar", "Informationen zum Seminar",
+          "Du möchtest an einem beruflichen Seminar teilnehmen. Schreibe dem Veranstalter.",
+          ["Erkläre dein Interesse.", "Frage nach den Terminen.", "Bitte um Informationen zu den Kosten."], {
+            category: "Beruf & Karriere", register: "formal",
+          }),
+      ]),
+    ],
+  },
+  B2: {
+    minutes: 75,
+    parts: [
+      part("teil1", "Teil 1 · Forumsbeitrag", "argument", "ca. 150 Wörter", [
+        task("b2-homeoffice", "Homeoffice: Chance oder Problem?",
+          "In einem Onlineforum wird über Homeoffice diskutiert. Schreiben Sie einen begründeten Beitrag.",
+          ["Äußern Sie Ihre Meinung.", "Nennen Sie Gründe und Beispiele.", "Gehen Sie auf Vor- und Nachteile ein.", "Schlagen Sie Alternativen vor."], {
+            category: "Arbeit & Gesellschaft",
+          }),
+        task("b2-environment", "Plastik im Alltag reduzieren",
+          "Diskutieren Sie in einem Forum Maßnahmen gegen Plastikmüll.",
+          ["Formulieren Sie Ihre Position.", "Beschreiben Sie Vorteile und Schwierigkeiten.", "Nennen Sie eigene Erfahrungen.", "Machen Sie Vorschläge."], {
+            category: "Umwelt",
+          }),
+      ]),
+      part("teil2", "Teil 2 · Formelle Nachricht", "email", "ca. 100 Wörter", [
+        task("b2-shift", "Arbeitszeit ändern",
+          "Sie möchten Ihre Arbeitszeit vorübergehend ändern. Schreiben Sie an Ihre Vorgesetzte.",
+          ["Beschreiben Sie Ihre Situation.", "Erklären Sie den Grund.", "Schlagen Sie eine Lösung vor.", "Bitten Sie um ein Gespräch."], {
+            category: "Beruf", register: "formal",
+          }),
+        task("b2-project", "Projektbesprechung verschieben",
+          "Eine Besprechung muss verschoben werden. Schreiben Sie an Ihre Kollegin.",
+          ["Erläutern Sie den Anlass.", "Begründen Sie die Verschiebung.", "Schlagen Sie einen Ersatztermin vor.", "Bitten Sie um Bestätigung."], {
+            category: "Organisation", register: "formal",
+          }),
+      ]),
+    ],
+  },
+  C1: {
+    minutes: 75,
+    parts: [
+      part("teil1", "Teil 1 · Diskussion", "argument", "ca. 230 Wörter", [
+        task("c1-ai", "Künstliche Intelligenz im Unterricht",
+          "Diskutieren Sie Chancen und Grenzen des Einsatzes künstlicher Intelligenz an Schulen.",
+          ["Stellen Sie unterschiedliche Positionen dar.", "Begründen Sie Ihre eigene Haltung.", "Berücksichtigen Sie Gegenargumente.", "Ziehen Sie ein differenziertes Fazit."], {
+            category: "Bildung & Technologie",
+          }),
+        task("c1-city", "Städte ohne Autos",
+          "Verfassen Sie einen argumentativen Diskussionsbeitrag zur autofreien Innenstadt.",
+          ["Erklären Sie die gesellschaftliche Bedeutung.", "Wägen Sie Chancen und Risiken ab.", "Beziehen Sie Beispiele ein.", "Entwickeln Sie Ihre Position."], {
+            category: "Stadtentwicklung",
+          }),
+      ]),
+      part("teil2", "Teil 2 · Formelle Nachricht", "email", "ca. 120 Wörter", [
+        task("c1-application", "Bitte um Projektunterstützung",
+          "Sie organisieren ein wissenschaftliches Projekt und möchten eine Institution um Unterstützung bitten.",
+          ["Stellen Sie das Projekt vor.", "Begründen Sie die Bedeutung.", "Formulieren Sie Ihre Bitte präzise.", "Schlagen Sie das weitere Vorgehen vor."], {
+            category: "Projektarbeit", register: "formal",
+          }),
+        task("c1-policy", "Änderung einer Regelung",
+          "Sie schreiben als Kurssprecherin oder Kurssprecher an die Leitung einer Weiterbildungseinrichtung.",
+          ["Beschreiben Sie die Regelung.", "Stellen Sie die Folgen dar.", "Unterbreiten Sie einen Lösungsvorschlag.", "Bitten Sie um Rückmeldung."], {
+            category: "Bildung", register: "formal",
+          }),
+      ]),
+    ],
+  },
+  C2: {
+    minutes: 80,
+    parts: [
+      part("teil1", "Teil 1 · Umformungen", "transformation", null, [
+        task("c2-transformations", "Sätze umformulieren",
+          "Formulieren Sie die Sätze um. Die Bedeutung muss erhalten bleiben. Nutzen Sie das angegebene Schlüsselwort.",
+          ["Achten Sie auf Bedeutung, Satzbau und Grammatik.", "Tragen Sie jede Lösung in das zugehörige Feld ein."], {
+            category: "Sprachliche Präzision",
+            transformations: [
+              { source: "Obwohl die Nachfrage gestiegen ist, bleiben die Preise stabil.", cue: "trotz", hint: "Beginnen Sie mit „Trotz …“." },
+              { source: "Man kann davon ausgehen, dass die Zahlen weiter steigen.", cue: "dürften", hint: "Verwenden Sie subjektive Modalität." },
+              { source: "Die Expertin kritisierte, dass die Maßnahmen zu spät kamen.", cue: "Kritik", hint: "Verwenden Sie eine Nominalisierung." },
+              { source: "Die Firma investiert, damit sie langfristig konkurrenzfähig bleibt.", cue: "um … zu", hint: "Drücken Sie den Zweck durch eine Infinitivkonstruktion aus." },
+            ],
+          }),
+      ]),
+      part("teil2", "Teil 2 · Längerer Text", "argument", "ca. 350 Wörter", [
+        task("c2-digital", "Die Grenzen der Digitalisierung",
+          "Verfassen Sie einen differenzierten argumentativen Text zum Spannungsverhältnis zwischen technologischem Fortschritt und gesellschaftlicher Verantwortung.",
+          ["Entwickeln Sie eine nachvollziehbare These.", "Erörtern Sie mehrere Perspektiven.", "Berücksichtigen Sie ein Gegenargument.", "Formulieren Sie einen eigenständigen Schluss."], {
+            category: "Gesellschaft & Technologie",
+          }),
+        task("c2-education", "Bildung als öffentliche Aufgabe",
+          "Erörtern Sie, welchen Beitrag staatliche Institutionen und Einzelpersonen zu lebenslangem Lernen leisten sollten.",
+          ["Stellen Sie relevante Positionen gegenüber.", "Analysieren Sie Zielkonflikte.", "Beziehen Sie Beispiele ein.", "Ziehen Sie eine begründete Schlussfolgerung."], {
+            category: "Bildung & Gesellschaft",
+          }),
+        task("c2-language", "Mehrsprachigkeit in einer globalen Welt",
+          "Untersuchen Sie den Zusammenhang zwischen Mehrsprachigkeit, kultureller Identität und gesellschaftlicher Teilhabe.",
+          ["Beschreiben Sie das Spannungsfeld.", "Beurteilen Sie verschiedene Argumente.", "Belegen Sie Ihre Sichtweise.", "Formulieren Sie eine Synthese."], {
+            category: "Sprache & Kultur",
+          }),
+        task("c2-environment", "Individuelle oder politische Verantwortung?",
+          "Erörtern Sie, wie sich wirksamer Klimaschutz zwischen Staat, Wirtschaft und einzelnen Menschen aufteilen lässt.",
+          ["Stellen Sie unterschiedliche Verantwortlichkeiten dar.", "Prüfen Sie Gegenargumente.", "Nennen Sie konkrete Beispiele.", "Entwickeln Sie eine differenzierte Position."], {
+            category: "Umwelt & Politik",
+          }),
+      ]),
+    ],
+  },
+});
+
+export const getExamWritingModule = (level) =>
+  EXAM_WRITING_MODULES[String(level || "").toUpperCase()] || EXAM_WRITING_MODULES.A1;
+
+export const normalizeWritingField = (value) =>
+  String(value || "").toLocaleLowerCase("de").replace(/[.,\s-]+/g, " ").trim();
+
+export const assessPracticeForm = (taskConfig, values = {}) => {
+  const fields = (taskConfig?.formFields || []).filter((field) => !field.fixed);
+  const checks = fields.map((field) => ({
+    key: field.key,
+    correct: field.answer.some((answer) => normalizeWritingField(answer) === normalizeWritingField(values[field.key])),
+  }));
+  return { correct: checks.filter((item) => item.correct).length, total: checks.length, checks };
+};
