@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { fetchA1AudioPlaybackUrl } from "../services/a1AudioService";
 
-export default function A1ProtectedAudioPlayer({ day, audioKey }) {
+export default function A1ProtectedAudioPlayer({ day, audioKey, fallbackUrl = "" }) {
   const { idToken } = useAuth();
   const [url, setUrl] = useState("");
+  const [usingFallback, setUsingFallback] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [revision, setRevision] = useState(0);
@@ -13,6 +14,7 @@ export default function A1ProtectedAudioPlayer({ day, audioKey }) {
   useEffect(() => {
     let cancelled = false;
     setUrl("");
+    setUsingFallback(false);
     setError("");
     setLoading(true);
     if (!idToken) {
@@ -23,18 +25,26 @@ export default function A1ProtectedAudioPlayer({ day, audioKey }) {
     fetchA1AudioPlaybackUrl({ day, key: audioKey, idToken })
       .then((playback) => { if (!cancelled) setUrl(playback.url); })
       .catch((failure) => {
-        if (!cancelled) setError(failure?.response?.data?.error || failure?.message || "Das Audio konnte nicht geladen werden.");
+        if (!cancelled) {
+          if (fallbackUrl) { setUrl(fallbackUrl); setUsingFallback(true); }
+          else setError(failure?.response?.data?.error || failure?.message || "Das Audio konnte nicht geladen werden.");
+        }
       })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [day, audioKey, idToken, revision]);
+  }, [day, audioKey, idToken, revision, fallbackUrl]);
 
   const reload = () => { retry.current = 0; setRevision((value) => value + 1); };
   const handleError = () => {
     if (!url) return;
+    if (usingFallback) { setError("Das Ersatz-Audio konnte nicht abgespielt werden."); return; }
     if (retry.current < 1) {
       retry.current += 1;
       setRevision((value) => value + 1);
+    } else if (fallbackUrl) {
+      setUrl(fallbackUrl);
+      setUsingFallback(true);
+      setError("");
     } else {
       setError("Das Audio konnte nicht abgespielt werden. Bitte laden Sie es erneut.");
     }
@@ -45,6 +55,7 @@ export default function A1ProtectedAudioPlayer({ day, audioKey }) {
       Ihr Browser unterstützt dieses Audio nicht.
     </audio>
     {loading ? <span role="status">Audio wird geladen …</span> : null}
+    {usingFallback && !error ? <span style={{ color: "#64748b", fontSize: 12 }}>Ersatz-Audioquelle aktiv.</span> : null}
     {error ? <div role="alert"><p>{error}</p><button type="button" onClick={reload}>Audio erneut laden</button></div> : null}
   </div>;
 }
