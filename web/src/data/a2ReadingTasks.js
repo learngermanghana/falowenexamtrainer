@@ -435,19 +435,11 @@ Daniel Koch`,
   },
   21: {
     chapter: "8.21",
-    format: "Wochenendplan",
-    title: "Unser Wochenende in Köln",
-    strategy: "Bei Plänen können Bedingungen etwas verändern. Achte besonders auf wenn und falls.",
-    text: `Mara und Daniel fahren am Samstagmorgen mit dem Zug nach Köln. Ihr Zug kommt um 10:15 Uhr an. Zuerst bringen sie ihre Taschen ins Hotel. Danach möchten sie am Rhein spazieren und den Dom besuchen. Falls es stark regnet, gehen sie stattdessen in ein Museum.
-
-Am Abend haben sie um 19 Uhr einen Tisch in einem Restaurant reserviert. Danach gehen sie zu einem Konzert. Am Sonntag frühstücken sie lange und kaufen noch kleine Geschenke. Ihr Zug nach Hause fährt um 17 Uhr.`,
-    questions: [
-      { stem: "Wie reisen Mara und Daniel nach Köln?", options: ["A) Mit dem Zug", "B) Mit dem Auto", "C) Mit dem Bus", "D) Mit dem Flugzeug"] },
-      { stem: "Was möchten sie nach dem Hotel zuerst machen?", options: ["A) Einkaufen", "B) Am Rhein spazieren", "C) Zum Konzert gehen", "D) Nach Hause fahren"] },
-      { stem: "Was machen sie am Samstagabend?", options: ["A) Museum und Hotel", "B) Restaurant und Konzert", "C) Shopping und Kino", "D) Nur einen Spaziergang"] },
-      { stem: "Was machen sie bei starkem Regen?", options: ["A) Sie gehen in ein Museum.", "B) Sie fahren sofort nach Hause.", "C) Sie bleiben am Bahnhof.", "D) Sie machen eine Fahrradtour."] },
-      { stem: "Wann fährt ihr Zug am Sonntag nach Hause?", options: ["A) Um 10:15 Uhr", "B) Um 14:00 Uhr", "C) Um 17:00 Uhr", "D) Um 19:00 Uhr"] },
-    ],
+    format: "Fünf Anzeigen · Richtig oder Falsch",
+    title: "Ein Wochenende planen (Anzeigen & Aushänge)",
+    strategy: "Lesen Sie die fünf Anzeigen und wählen Sie bei jeder Aussage Richtig oder Falsch.",
+    text: "Text 1 · Stadtführung „Berlin bei Nacht“\nEntdecken Sie Berlin am Samstagabend! Geführter Spaziergang durch die historische Innenstadt. Treffpunkt: Samstag, 20:00 Uhr an der Weltzeituhr (Alexanderplatz). Dauer: 2 Stunden. Preis: 15 Euro pro Person (Studenten zahlen nur 10 Euro). Keine Anmeldung erforderlich – einfach vorbeikommen!\n\nText 2 · Kanutour auf dem Waldsee\nMieten Sie Kanus für die ganze Familie. Öffnungszeiten am Wochenende: Samstag und Sonntag von 10:00 bis 18:00 Uhr. Schwimmwesten sind im Preis enthalten. Kinder unter 10 Jahren fahren kostenlos mit. Wegen hoher Nachfrage bitte mindestens 2 Tage vorher online reservieren!\n\nText 3 · Open-Air-Konzert im Stadtpark\nLive-Musik am Sonntagnachmittag! Die Band „Sommerwind“ spielt Jazz und Pop auf der großen Festwiese. Beginn: Sonntag um 15:00 Uhr. Eintritt frei! Bringen Sie gerne Picknickdecken und eigene Getränke mit. Bei Regen fällt das Konzert leider aus.\n\nText 4 · Töpfer-Workshop für Anfänger\nLernen Sie die Grundlagen des Töpferns im Kulturzentrum. Samstag von 10:00 bis 14:00 Uhr. Alle Ton-Materialien und Werkzeuge werden gestellt. Teilnahmegebühr: 45 Euro (inklusive Kaffee und Kuchen). Begrenzte Plätze – Anmeldung im Sekretariat erforderlich.\n\nText 5 · Wochenend-Special beim Fahrrad-Verleih Bahnhof\nMieten Sie ein E-Bike von Samstag bis Sonntag für insgesamt nur 30 Euro. Inklusive Helm und gedruckter Routenkarte. Rückgabe: Das Büro ist am Sonntagabend bis 20:00 Uhr geöffnet.",
+    questions: [{"stem":"Studenten bezahlen für die Stadtführung am Samstagabend weniger.","options":["A) Richtig","B) Falsch"]},{"stem":"Man muss die Kanutour für das Wochenende im Voraus im Internet buchen.","options":["A) Richtig","B) Falsch"]},{"stem":"Das Open-Air-Konzert findet auch bei schlechtem Wetter statt.","options":["A) Richtig","B) Falsch"]},{"stem":"Beim Töpfer-Workshop muss man eigene Werkzeuge und Materialien mitbringen.","options":["A) Richtig","B) Falsch"]},{"stem":"Man kann das gemietete E-Bike am Sonntagabend zurückgeben.","options":["A) Richtig","B) Falsch"]}],
   },
   22: {
     chapter: "8.22",

@@ -74,12 +74,12 @@ describe("shared A2 workbook regression", () => {
   it("keeps Day 21 weekend-focused while preserving its historical Teil 2 prompt", () => {
     expect(day21).toContain('title="Ein Wochenende planen"');
     expect(day21).toContain('chapter="8.21"');
-    expect(A2_READING_TASKS[21].title).toBe("Unser Wochenende in Köln");
+    expect(A2_READING_TASKS[21].title).toBe("Ein Wochenende planen (Anzeigen & Aushänge)");
     expect(day21).toContain("Schreiben Sie einen Brief an einen Freund oder eine Freundin");
     expect(day21).toContain("Beschreiben Sie Ihre Wochenendpläne und erklären Sie, warum sie besonders sind");
     expect(day21).toContain("Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann");
-    expect(A2_LISTENING_TASKS[21].audioUrl).toContain("Qg0tQFveI0M");
-    expect(A2_LISTENING_TASKS[21].mode).toBe(A2_LISTENING_MODES.SELF_CHECK);
+    expect(A2_LISTENING_TASKS[21].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[21].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(A2_LISTENING_TASKS[21].audioUrl).not.toContain("LlXsNA1a8lc");
     expect(day21).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });

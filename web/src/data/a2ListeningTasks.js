@@ -268,9 +268,9 @@ export const A2_LISTENING_TASKS = {
   },
   21: {
     chapter: "8.21",
-    mode: A2_LISTENING_MODES.SELF_CHECK,
-    task: "Dies ist eine separate Goethe-Hören-Übung für Teil 4. Hören Sie den Test aufmerksam und kontrollieren Sie Ihre Antworten anschließend mit der Lösung im Video. Falowen Radio gehört zur Vorbereitung vor dem Workbook und ist nicht Teil 4.",
-    audioUrl: "https://youtu.be/Qg0tQFveI0M",
+    mode: A2_LISTENING_MODES.NONE,
+    task: "",
+    audioUrl: "",
     questions: [],
   },
   22: {

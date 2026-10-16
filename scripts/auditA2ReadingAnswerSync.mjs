@@ -97,7 +97,7 @@ for (const day of days) {
   }
 
   questions.forEach((question, index) => {
-    const minimumOptions = day === 17 && index >= 3 ? 2 : 3;
+    const minimumOptions = day === 21 || (day === 17 && index >= 3) ? 2 : 3;
     if (!question?.stem || !Array.isArray(question.options) || question.options.length < minimumOptions) {
       fail(assignmentId, "question " + (index + 1) + " is missing a stem or usable options");
       return;

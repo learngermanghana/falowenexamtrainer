@@ -27,8 +27,8 @@ describe("A2 canonical assessment content guard", () => {
 
   test("keeps the approved A2 Hören mode split", () => {
     expect(A2_GRADED_LISTENING_DAYS).toHaveLength(23);
-    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([21]);
-    expect(A2_NO_LISTENING_DAYS).toEqual([14, 22, 23, 25]);
+    expect(A2_SELF_CHECK_LISTENING_DAYS).toEqual([]);
+    expect(A2_NO_LISTENING_DAYS).toEqual([14, 21, 22, 23, 25]);
   });
 
   test("graded Hören always has audio and questions", () => {

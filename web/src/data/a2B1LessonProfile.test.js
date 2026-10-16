@@ -91,7 +91,7 @@ describe("canonical A2/B1 lesson profiles", () => {
       assignmentKey: "A2-8.21",
       timer: {
         level: "A2",
-        durationMinutes: 40,
+        durationMinutes: 20,
         timedTabs: ["schreiben", "lesen"],
       },
     });
@@ -126,7 +126,7 @@ describe("canonical A2/B1 lesson profiles", () => {
   });
 
   test("critical late-course profiles no longer drift from lesson data", () => {
-    expect(getA2B1LessonProfile("A2", 21).sections.part4.mode).toBe("self-check");
+    expect(getA2B1LessonProfile("A2", 21).sections.part4.mode).toBe("none");
     expect(getA2B1LessonProfile("A2", 24).sections.part4.mode).toBe("graded");
     expect(getA2B1LessonProfile("A2", 25).sections.part4.visible).toBe(false);
     expect(getA2B1LessonProfile("A2", 26).sections.part4.mode).toBe("graded");

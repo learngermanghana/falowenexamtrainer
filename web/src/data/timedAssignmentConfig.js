@@ -109,7 +109,7 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   // A2 · Week 5 onward: every tutor-marked workbook is timed.
   "A2-8.21": timed({
     level: "A2",
-    durationMinutes: 40,
+    durationMinutes: 20,
     scope: "Teil 2 Schreiben and Teil 3 Lesen",
     timedTabs: ["schreiben", "lesen"],
     preparationLabel: A2_B1_PREP,
