@@ -34,6 +34,8 @@ function evaluateResults({ assignmentId, uid, snapshots }) {
     const score = Number(assessment.score);
     const maximum = Number(assessment.maxScore);
     if (item.uid !== uid || item.level !== config.level ||
+        item.source !== "exam-speaking-practice" ||
+        item.examFlowKey !== `${config.level}-${part.slice(-1)}` ||
         item.task?.courseAssignmentKey !== assignmentId ||
         item.completed !== true || !part || results.has(part) ||
         assessment.practiceOnly !== true || !Array.isArray(assessment.tasks) ||
@@ -173,7 +175,7 @@ async function synchronizeSheet({ db, admin, scoreRef, row }) {
 
 async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignmentId, sessionIds }) {
   const config = assignmentConfig(assignmentId);
-  if (!config || clean(assignmentId) !== config.level + "-" + assignmentId.split("-").slice(1).join("-")) {
+  if (!config || !Object.prototype.hasOwnProperty.call(COURSE_MOCKS, assignmentId)) {
     throw validationError("Unknown course speaking assignment.");
   }
   const scoreRef = db.collection("scores").doc(docIdFor(uid, assignmentId));
