@@ -305,3 +305,25 @@ export const assessPracticeForm = (taskConfig, values = {}) => {
   }));
   return { correct: checks.filter((item) => item.correct).length, total: checks.length, checks };
 };
+
+/** Exact, learner-visible question data for the server-side assessment registry.
+ * Do not transmit model answers or sample solutions to the marking prompt.
+ */
+export const toRegistryWritingTasks = (modules = EXAM_WRITING_MODULES) =>
+  Object.entries(modules).flatMap(([level, module]) =>
+    module.parts.flatMap((part) =>
+      part.tasks.filter((item) => part.format !== "form").map((item) => ({
+        id: item.id,
+        level,
+        teil: part.id,
+        format: part.format,
+        register: item.register || null,
+        wordTarget: part.targetWords || null,
+        situation: item.situation,
+        whatToInclude: item.points,
+        ...(item.transformations ? {
+          transformations: item.transformations.map(({ source, cue }) => ({ source, cue })),
+        } : {}),
+      }))
+    )
+  );
