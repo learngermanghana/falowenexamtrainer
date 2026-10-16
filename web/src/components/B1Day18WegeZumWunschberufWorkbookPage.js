@@ -2,6 +2,7 @@ import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
+import { getB1ListeningTask } from "../data/b1ListeningTasks";
 
 export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
   day: 18,
@@ -109,23 +110,8 @@ export const B1_DAY18_WEGE_ZUM_WUNSCHBERUF_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(18),
   reading: getB1ReadingTask(18),
-  listening: {
-    title: "Hören · Wege zum Wunschberuf",
-    instructions: "Hören Sie aufmerksam zu. Wählen Sie bei jeder Frage A, B, C oder D und reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Beratung zur Berufswahl",
-    audioKey: "b1/day-18/day-18.mp3",
-    videoTitle: "B1 Day 18 Wege zum Wunschberuf Hören",
-    submitRequired: true,
-    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
-    questions: [
-      { stem: "Was ist laut Ben der erste Schritt?", options: ["a) Eine Bewerbung schreiben", "b) Überlegen, was man gern macht und gut kann", "c) Ein Praktikum machen", "d) Auf eine Berufsmesse gehen"] },
-      { stem: "Wo kann man sich über Berufe informieren?", options: ["a) Nur bei Freunden", "b) Nur in der Schule", "c) Im Internet, bei der Agentur für Arbeit oder auf einer Berufsmesse", "d) Nur im Fernsehen"] },
-      { stem: "Wie lange dauert eine Ausbildung meistens?", options: ["a) Ein Jahr", "b) Zwei Jahre", "c) Drei Jahre", "d) Fünf Jahre"] },
-      { stem: "Was soll man machen, wenn man noch nicht sicher ist?", options: ["a) Sofort studieren", "b) Ein Praktikum machen", "c) Nichts tun", "d) Den Beruf wechseln"] },
-      { stem: "Was gehört zur Bewerbung?", options: ["a) Nur ein Foto", "b) Nur ein Anruf", "c) Lebenslauf, Anschreiben und Vorstellungsgespräch üben", "d) Nur ein Zeugnis"] },
-    ],
-  },
+  // Keep the learner page and answer-key-facing questions on one canonical source.
+  listening: getB1ListeningTask(18),
   submitListening: true,
   submitWritingDescription: "Paste your opinion about Wege zum Wunschberuf.",
   submitReadingDescription: "Paste your seven reading answer letters.",
