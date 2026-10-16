@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import SpeakingPage from "./SpeakingPage";
-import WritingPage from "./WritingPage";
+import ExamWritingWorkspace from "./ExamWritingWorkspace";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -100,7 +100,7 @@ const ExamRoom = () => {
   };
 
   const renderContent = () => {
-    if (activeTab === "schreiben") return <WritingPage mode="exam" />;
+    if (activeTab === "schreiben") return <ExamWritingWorkspace />;
 
     if (activeTab === "resources") {
       return (
