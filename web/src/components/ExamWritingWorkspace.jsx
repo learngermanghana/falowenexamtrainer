@@ -8,6 +8,7 @@ import { saveExamLetterForTutorReview, isTutorReviewCloudEnabled } from "../serv
 import { buildWritingHistoryRecord } from "./WritingHistorySection";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 import { assessPracticeForm, getExamWritingModule } from "../data/examWritingWorkspace";
+import { examWritingTitle, examWritingCategory } from "../data/examWritingEnglishCopy";
 import "./ExamWritingWorkspace.css";
 
 const CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
@@ -131,7 +132,7 @@ export default function ExamWritingWorkspace() {
     const attempt = buildWritingHistoryRecord({
       userId: user.uid, studentCode, level, lessonId: "exam-room-schreiben",
       workbookId: "exam-writing-" + level, taskId: checkedTask.id,
-      taskTitle: teil.label + " · " + checkedTask.title, text: original,
+      taskTitle: teil.label + " · " + examWritingTitle(checkedTask), text: original,
       data: result, context: "exam-room",
     });
     await saveWritingAttempt({ userId: user.uid, studentCode, mode: "exam",
@@ -200,7 +201,7 @@ export default function ExamWritingWorkspace() {
     try {
       await saveExamLetterForTutorReview({
         user, studentProfile, level, promptId: task.id,
-        promptTitle: part.label + " · " + task.title,
+        promptTitle: part.label + " · " + examWritingTitle(task),
         draft: record.checkedText || draft,
         aiFeedback: feedback.data.feedback || feedback.data.structuredFeedback?.summary || "",
         revisedDraft: "", reflection: "", source: "exam-room-simple-writing",
@@ -247,7 +248,7 @@ export default function ExamWritingWorkspace() {
     </nav>
     <div className="few-mobile-list-toggle"><button type="button"
       onClick={() => setShowMobileTasks(!showMobileTasks)}>
-      {showMobileTasks ? "Hide exercises" : "Choose an exercise"} · {task.title}
+      {showMobileTasks ? "Hide exercises" : "Choose an exercise"} · {examWritingTitle(task)}
     </button></div>
     <div className="few-columns">
       <aside className={showMobileTasks ? "few-sidebar mobile-open" : "few-sidebar"} aria-label="Exercises">
@@ -267,7 +268,7 @@ export default function ExamWritingWorkspace() {
             return <button type="button" key={item.id} onClick={() => changeTask(item.id)}
               aria-current={item.id === task.id ? "true" : undefined}
               className={item.id === task.id ? "few-task selected" : "few-task"}>
-              <strong>{item.title}</strong><span>{item.category}</span><small>{status}</small></button>;
+              <strong>{examWritingTitle(item)}</strong><span>{examWritingCategory(item)}</span><small>{status}</small></button>;
           })}
           {!visibleTasks.length && <p className="few-muted">No matching exercises.</p>}
         </div>
@@ -288,8 +289,8 @@ export default function ExamWritingWorkspace() {
           </div>
         </section>
         <section className="few-prompt">
-          <div className="few-prompt-label"><span>{level} · {part.label}</span><span>{task.category}</span></div>
-          <h2>{task.title}</h2><p>{task.situation}</p>
+          <div className="few-prompt-label"><span>{level} · {part.label}</span><span>{examWritingCategory(task)}</span></div>
+          <h2>{examWritingTitle(task)}</h2><p>{task.situation}</p>
           <ol>{task.points.map((point, i) => <li key={i}>{point}</li>)}</ol>
           <p className="few-muted">{part.description || ("Write " + (part.targetWords || "your response")
             + ". Cover every point in the German task and organise your answer clearly.")}</p>
