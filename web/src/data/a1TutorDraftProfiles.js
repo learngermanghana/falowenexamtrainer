@@ -69,10 +69,7 @@ const profiles = {
     sections: {
       "teil-1": section(shortItems(5, "Translate into German"), { label: "Translation", inlineAnswers: true }),
       "teil-2": section(choiceItems(7), { label: "Germany's neighbours" }),
-      "teil-3": section([
-        ...choiceItems(4),
-        { number: 5, type: "short", placeholder: "Write your answer" },
-      ], { label: "Hören" }),
+      "teil-3": section(choiceItems(5, ["A", "B", "C"]), { label: "Hören", inlineAnswers: true }),
     },
   },
   "A1-5": {

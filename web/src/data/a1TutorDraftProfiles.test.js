@@ -35,7 +35,8 @@ test("models A1-14.1 Health as two five-question reading parts + six listening c
 test("supports mixed question types in one Teil", () => {
   const countries = getA1TutorDraftProfile("A1-4");
   expect(countries.sections["teil-3"].items.slice(0, 4).every(({ type }) => type === "choice")).toBe(true);
-  expect(countries.sections["teil-3"].items[4]).toEqual(expect.objectContaining({ number: 5, type: "short" }));
+  expect(countries.sections["teil-3"].items[4]).toEqual(expect.objectContaining({ number: 5, type: "choice", choices: ["A", "B", "C"] }));
+  expect(countries.sections["teil-3"].inlineAnswers).toBe(true);
 
   const dative = getA1TutorDraftProfile("A1-12.2");
   expect(dative.sections["teil-1"].items.slice(0, 4).every(({ type }) => type === "short")).toBe(true);
