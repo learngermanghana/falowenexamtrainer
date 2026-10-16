@@ -154,7 +154,7 @@ import A1Day9NominativeAccusativeGrammarPage from "./components/A1Day9Nominative
 import A1Day11UnderstandingTimeWorkbookPage from "./components/A1Day11UnderstandingTimeWorkbookPage";
 import A1Day10ObjectsColorsPossessiveArticlesWorkbookPage from "./components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage";
 import A1Day8CountriesAndLanguagesWorkbookPage from "./components/A1Day8CountriesAndLanguagesWorkbookPage";
-import WritingPage from "./components/WritingPage";
+import ExamWritingWorkspace from "./components/ExamWritingWorkspace";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { useToast } from "./context/ToastContext";
@@ -1670,7 +1670,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "mocks" ? <MockExamLibraryPage /> : null}
       {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
-      {examSection === "writing" ? <WritingPage mode="exam" enabledTabs={["mark"]} hideTabList simplifiedExamFlow /> : null}
+      {examSection === "writing" ? <ExamWritingWorkspace /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
       {examSection === "lesen" ? <LesenPage practiceLevel={practiceLevel} sampleId={sampleId} /> : null}
