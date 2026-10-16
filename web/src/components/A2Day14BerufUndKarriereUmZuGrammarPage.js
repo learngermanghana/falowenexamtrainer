@@ -15,41 +15,67 @@ const formulaStyle = {
 const practiceQuestions = [
   {
     prompt: "Ich mache einen Computerkurs, um ...",
+    english: "I take a computer course to improve my computer skills.",
     options: [
-      "meine Computerkenntnisse zu verbessern.",
       "zu meine Computerkenntnisse verbessern.",
+      "meine Computerkenntnisse zu verbessern.",
       "meine Computerkenntnisse verbessern zu.",
     ],
-    correctIndex: 0,
+    correctIndex: 1,
+    explanation: "Place zu before verbessern (the infinitive), after the other words.",
   },
   {
-    prompt: "Wir schreiben viele Bewerbungen, um ...",
+    prompt: "Ich mache ein Praktikum, ...",
+    english: "I do an internship to gain work experience.",
     options: [
-      "eine gute Stelle zu finden.",
-      "zu eine gute Stelle finden.",
-      "eine gute Stelle finden zu.",
+      "um Berufserfahrung zu sammeln.",
+      "damit Berufserfahrung zu sammeln.",
+      "um ich Berufserfahrung sammle.",
     ],
     correctIndex: 0,
+    explanation: "The same person does the internship and gains experience: um ... zu works.",
+  },
+  {
+    prompt: "Die Chefin erklärt die Aufgaben, ...",
+    english: "The manager explains the tasks so that the employees understand them.",
+    options: [
+      "um die Mitarbeitenden die Aufgaben verstehen.",
+      "um die Mitarbeitenden zu verstehen.",
+      "damit die Mitarbeitenden die Aufgaben verstehen.",
+    ],
+    correctIndex: 2,
+    explanation: "Different subjects (Chefin / Mitarbeitende) require damit with the conjugated verb at the end.",
+  },
+  {
+    prompt: "Ich übe jeden Abend, um mich auf das Gespräch ...",
+    english: "I practise every evening to prepare for the interview.",
+    options: [
+      "zu vorbereiten.",
+      "vorbereiten zu.",
+      "vorzubereiten.",
+    ],
+    correctIndex: 2,
+    explanation: "With the separable verb vorbereiten: vor + zu + bereiten.",
   },
   {
     prompt: "Ich besuche eine Weiterbildung, um ...",
+    english: "I take further training to be able to take on more responsibility.",
     options: [
-      "mehr Verantwortung übernehmen zu können.",
-      "zu mehr Verantwortung können übernehmen.",
       "mehr Verantwortung zu können übernehmen.",
+      "mehr Verantwortung übernehmen zu können.",
+      "zu mehr Verantwortung übernehmen können.",
     ],
-    correctIndex: 0,
-  },
-  {
-    prompt: "Ich verbessere mein Deutsch, um ...",
-    options: [
-      "bessere Berufschancen zu haben.",
-      "zu bessere Berufschancen haben.",
-      "bessere Berufschancen haben zu.",
-    ],
-    correctIndex: 0,
+    correctIndex: 1,
+    explanation: "With a modal verb, the two infinitives end the phrase: übernehmen zu können.",
   },
 ];
+
+const Example = ({ german, english }) => (
+  <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, background: "#f8fafc", display: "grid", gap: 5, lineHeight: 1.6 }}>
+    <strong lang="de">{german}</strong>
+    <span lang="en" style={{ color: "#475569" }}>{english}</span>
+  </div>
+);
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -64,10 +90,13 @@ const MiniPractice = () => {
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Wähle die richtige Ergänzung. Das Ziel bleibt immer gleich:
-        <strong> um + ... + zu + Infinitiv</strong>.
+        Choose the correct German ending. The English meaning helps you understand the goal.
       </p>
 
+      <p aria-live="polite" style={{ margin: 0, color: "#475569" }}>
+        {Object.keys(answers).length} of {practiceQuestions.length} answered ·
+        {" "}{practiceQuestions.filter((q, index) => answers[index] === q.correctIndex).length} correct
+      </p>
       {practiceQuestions.map((question, questionIndex) => {
         const selectedIndex = answers[questionIndex];
         const hasAnswered = Number.isInteger(selectedIndex);
@@ -85,7 +114,8 @@ const MiniPractice = () => {
               background: "#fff",
             }}
           >
-            <strong>{questionIndex + 1}. {question.prompt}</strong>
+            <strong lang="de">{questionIndex + 1}. {question.prompt}</strong>
+            <span lang="en" style={{ fontSize: 14, color: "#475569" }}>Meaning: {question.english}</span>
             <div style={{ display: "grid", gap: 8 }} role="group" aria-label={`Question ${questionIndex + 1}`}>
               {question.options.map((option, optionIndex) => {
                 const selected = selectedIndex === optionIndex;
@@ -136,13 +166,17 @@ const MiniPractice = () => {
                 }}
               >
                 {isCorrect
-                  ? `Richtig: ${question.prompt} ${question.options[question.correctIndex]}`
-                  : "Noch nicht. Setze zu direkt vor den Infinitiv bzw. vor den Infinitivblock."}
+                  ? `Correct: ${question.prompt} ${question.options[question.correctIndex]}`
+                  : "Not quite. " + question.explanation + " Correct answer: " + question.options[question.correctIndex]}
               </p>
             ) : null}
           </div>
         );
       })}
+      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }}
+        onClick={() => setAnswers({})} disabled={Object.keys(answers).length === 0}>
+        Try again · Reset answers
+      </button>
     </div>
   );
 };
@@ -150,61 +184,131 @@ const MiniPractice = () => {
 const FocusedGrammarContent = () => (
   <div data-a2-day14-focused-grammar="true" style={{ display: "grid", gap: 14 }}>
     <header style={{ ...styles.card, display: "grid", gap: 10 }}>
-      <span style={{ ...styles.badge, width: "fit-content" }}>A2 · 5.14 · Grammatik</span>
+      <span style={{ ...styles.badge, width: "fit-content" }}>A2 · 5.14 · Grammar notes</span>
       <h1 style={{ margin: 0 }}>um ... zu + Infinitiv</h1>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        <strong>Meaning:</strong> <em>in order to</em>. Du benutzt <strong>um ... zu</strong>,
-        wenn du das Ziel einer Handlung erklärst.
+        <strong>Meaning:</strong> <em>in order to / to</em>. We use <strong>um ... zu</strong> to explain
+        the <strong>purpose</strong> (German: Ziel / Zweck) of an action.
+        Ask <strong>Wozu?</strong> — <em>What for?</em>
       </p>
-      <div style={formulaStyle}>Hauptsatz + , um + ... + zu + Infinitiv</div>
+      <div style={formulaStyle}>Main clause (action) + comma + um + other words + zu + infinitive (goal)</div>
+      <Example german="Ich lerne Deutsch, um in Deutschland zu arbeiten."
+        english="I am learning German in order to work in Germany." />
     </header>
 
-    <SectionCard title="1. Wann benutze ich um ... zu?">
+    <SectionCard title="1. Purpose: Why do we use um ... zu?">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Die Person im Hauptsatz und im um-zu-Teil ist dieselbe.
+        The first part says <strong>what you do</strong>; the phrase starting with
+        <strong> um</strong> says <strong>what you want to achieve</strong>.
+        Unlike <em>weil</em> (“because”), this is a <em>goal</em>, not a reason.
       </p>
-      <ul style={listStyle}>
-        <li>Ich lerne Deutsch, <strong>um in Deutschland zu arbeiten</strong>.</li>
-        <li>Sie macht ein Praktikum, <strong>um Erfahrung zu sammeln</strong>.</li>
-        <li>Wir besuchen einen Kurs, <strong>um bessere Bewerbungen zu schreiben</strong>.</li>
-      </ul>
+      <Example german="Ich mache eine Weiterbildung, um eine bessere Stelle zu finden."
+        english="I am taking further training to find a better position." />
+      <Example german="Sie macht ein Praktikum, um Berufserfahrung zu sammeln."
+        english="She is doing an internship to gain work experience." />
     </SectionCard>
 
-    <SectionCard title="2. Wortstellung">
+    <SectionCard title="2. Same person: When can we use um ... zu?">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        <strong>um</strong> beginnt den Zielteil. <strong>zu + Infinitiv</strong> steht am Ende.
+        The person doing the action and pursuing the goal must be the same —
+        <strong> gleiche Person</strong> (same subject). Do not repeat that subject after <em>um</em>.
       </p>
-      <div style={formulaStyle}>Ich mache einen Kurs, um meine Chancen zu verbessern.</div>
-      <ul style={listStyle}>
-        <li>✅ ..., um <strong>eine Stelle zu finden</strong>.</li>
-        <li>✅ ..., um <strong>mehr Verantwortung übernehmen zu können</strong>.</li>
-        <li>❌ ..., um <strong>zu eine Stelle finden</strong>.</li>
-      </ul>
+      <Example german="Ich lerne Deutsch. Ich möchte in Deutschland arbeiten."
+        english="I learn German. I want to work in Germany." />
+      <Example german="Ich lerne Deutsch, um in Deutschland zu arbeiten."
+        english="Combined: I learn German to work in Germany." />
+      <Example german="Wir üben Vorstellungsgespräche, um sicherer zu sprechen."
+        english="We practise job interviews to speak more confidently." />
+      <p style={{ margin: 0, color: "#475569" }}>
+        <strong>Incorrect:</strong> <span lang="de">um ich in Deutschland zu arbeiten</span>.
+        Do not use <em>ich</em> after <em>um</em>.
+      </p>
     </SectionCard>
 
-    <SectionCard title="3. Wann benutze ich damit?">
+    <SectionCard title="3. When should I use damit?">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Wenn die Personen verschieden sind, benutzt du normalerweise <strong>damit</strong>.
+        Use <strong>damit</strong> (<em>so that</em>) when there are
+        <strong> different subjects</strong>. The subordinate clause has its own subject and a
+        <strong> conjugated verb at the end</strong>.
       </p>
+      <Example german="Ich spreche langsam, damit der Kunde mich versteht."
+        english="I speak slowly so that the customer understands me." />
+      <Example german="Die Firma bietet Kurse an, damit die Mitarbeitenden neue Fähigkeiten lernen."
+        english="The company offers courses so that employees learn new skills." />
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        <strong>Important:</strong> <em>damit</em> can also be used with the <strong>same</strong> subject.
+        Only <em>um ... zu</em> requires the same subject.
+      </p>
+      <Example german="Ich lerne Deutsch, damit ich in Deutschland arbeiten kann."
+        english="I learn German so that I can work in Germany. (Same subject; damit is also correct.)" />
+      <div style={formulaStyle}>
+        Same subject → um ... zu (or damit) · Different subjects → damit
+      </div>
+    </SectionCard>
+
+    <SectionCard title="4. Word order: comma and infinitive position">
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Use a <strong>comma before um</strong>. Place <strong>zu + infinitive</strong> at the end
+        of the goal phrase; the other details usually go between <em>um</em> and <em>zu</em>.
+      </p>
+      <Example german="Ich bewerbe mich, um eine neue Stelle zu finden."
+        english="I am applying in order to find a new position." />
+      <div style={formulaStyle}>Ich bewerbe mich, | um | eine neue Stelle | zu finden.</div>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        <strong>With a modal verb:</strong> the action infinitive comes before <em>zu + modal infinitive</em>.
+      </p>
+      <Example german="Ich mache einen Kurs, um später mehr Verantwortung übernehmen zu können."
+        english="I am taking a course to be able to take on more responsibility later." />
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        <strong>With a separable verb:</strong> insert <em>zu</em> between the prefix and main verb.
+      </p>
+      <Example german="Ich übe Fragen, um mich auf das Vorstellungsgespräch vorzubereiten."
+        english="I practise questions to prepare for the interview. (vor + zu + bereiten)" />
+    </SectionCard>
+
+    <SectionCard title="5. Career vocabulary · German and English">
+      <div style={{ overflowX: "auto" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+          <thead>
+            <tr><th style={{ padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>German</th>
+              <th style={{ padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>English</th></tr>
+          </thead>
+          <tbody>
+            {[
+              ["eine Ausbildung machen", "to do vocational training / an apprenticeship"],
+              ["eine Weiterbildung machen", "to take further professional training"],
+              ["Berufserfahrung sammeln", "to gain work experience"],
+              ["sich um eine Stelle bewerben", "to apply for a position"],
+              ["eine Stelle finden", "to find a job / position"],
+              ["sich auf ein Vorstellungsgespräch vorbereiten", "to prepare for a job interview"],
+            ].map(([de, en]) => (
+              <tr key={de}>
+                <td lang="de" style={{ padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>{de}</td>
+                <td lang="en" style={{ padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>{en}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <Example german="Ich sammle Berufserfahrung, um später eine bessere Stelle zu finden."
+        english="I am gaining work experience to find a better job later." />
+    </SectionCard>
+
+    <SectionCard title="6. Common mistakes and quick checks">
       <ul style={listStyle}>
-        <li>Ich spreche langsam, <strong>damit der Kunde mich versteht</strong>.</li>
-        <li>Die Firma bietet Kurse an, <strong>damit die Mitarbeitenden neue Fähigkeiten lernen</strong>.</li>
+        <li><span lang="de">✗ um zu eine Stelle finden</span> → <strong lang="de">✓ um eine Stelle zu finden</strong>.
+          The infinitive follows <em>zu</em>.</li>
+        <li><span lang="de">✗ um ich mehr Geld verdienen kann</span> → <strong lang="de">✓ damit ich mehr Geld verdienen kann</strong>.
+          Use <em>damit</em> when you include your own subject and conjugated verb.</li>
+        <li><span lang="de">✗ um mich auf das Gespräch zu vorbereiten</span> → <strong lang="de">✓ um mich auf das Gespräch vorzubereiten</strong>.
+          Place <em>zu</em> between prefix <em>vor</em> and verb <em>bereiten</em>.</li>
       </ul>
       <p style={{ margin: 0, color: "#475569" }}>
-        Merksatz: gleiche Person → <strong>um ... zu</strong>; verschiedene Personen → oft <strong>damit</strong>.
+        Check: Is this a goal? Is the subject the same? Is there a comma? Is <em>zu</em> in the right place?
       </p>
     </SectionCard>
 
-    <SectionCard title="4. Beruf und Karriere · anwenden">
-      <ul style={listStyle}>
-        <li>Ich lerne jeden Tag, um mein Deutsch zu verbessern.</li>
-        <li>Ich mache eine Weiterbildung, um beruflich weiterzukommen.</li>
-        <li>Ich sammle Berufserfahrung, um später eine bessere Stelle zu finden.</li>
-        <li>Ich übe Präsentationen, um selbstbewusster sprechen zu können.</li>
-      </ul>
-    </SectionCard>
-
-    <SectionCard title="5. Kurz prüfen">
+    <SectionCard title="7. Quick practice · Check your understanding">
       <MiniPractice />
     </SectionCard>
   </div>
