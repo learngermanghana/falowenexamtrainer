@@ -321,6 +321,10 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                         : "Today: Sprechen in class, then Teil 3 · Lesen. Schreiben is not required for submission."))}
                   </p>
                   <SectionImage image={config.heroImage} alt={config.heroAlt} />
+
+                </div>
+          
+                <div data-b1-workbook-sticky-navigation="true" style={{ position: "sticky", top: 0, zIndex: 80, alignSelf: "start", padding: 8, background: "#fff", borderRadius: 14 }}>
                   <WorkbookTabNav
                     activeTab={resolvedActiveTab}
                     onChange={setActiveTab}
@@ -329,7 +333,6 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                     ariaLabel={`B1 Day ${config.day} workbook sections`}
                   />
                 </div>
-          
                 <A2B1WorkbookGuidance level="B1" />
           
                 {resolvedActiveTab === "grammar" && (
