@@ -1,4 +1,5 @@
 import { LETTER_PATTERNS } from "./consistentWritingPatterns";
+import { C1_FORMAL_EMAIL_TEMPLATE } from "./c1FormalEmailTemplate";
 
 export const C1_WRITING_CHEAT_SHEET = [
   {
@@ -71,16 +72,9 @@ export const C1_WRITING_CHEAT_SHEET = [
   },
   {
     id: "c1-formal-letter-template",
-    title: "FORMAL LETTER · Use this for complaints, enquiries, applications or official emails",
+    title: "FORMAL EMAIL · C1 Part 2 structure (about 120 words)",
     layout: "template",
-    items: [
-      { phrase: "Betreff", meaning: "Betreff: [präzises Anliegen]" },
-      { phrase: "Anrede", meaning: "Sehr geehrte Damen und Herren,\nSehr geehrte Frau [Name] / Sehr geehrter Herr [Name]," },
-      { phrase: "Einleitung", meaning: "hiermit wende ich mich an Sie, da [Anlass] aus meiner Sicht einer Klärung bedarf." },
-      { phrase: "Hauptteil", meaning: "Zunächst möchte ich darauf hinweisen, dass [Punkt 1]. Darüber hinaus ist zu berücksichtigen, dass [Punkt 2]." },
-      { phrase: "Bitte", meaning: "Ich bitte Sie daher höflich um [konkrete Bitte] und um eine zeitnahe Rückmeldung." },
-      { phrase: "Schluss", meaning: "Für Ihre Unterstützung danke ich Ihnen im Voraus.\n\nMit freundlichen Grüßen\n[Ihr Name]" },
-    ],
+    items: C1_FORMAL_EMAIL_TEMPLATE,
   },
 ];
 
