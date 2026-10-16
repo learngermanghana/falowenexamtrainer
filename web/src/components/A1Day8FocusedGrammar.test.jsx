@@ -60,8 +60,8 @@ describe("A1 Day 8 Countries and Languages grammar notes", () => {
     ]) {
       expect(rowContent).toContain(pronoun + verb);
     }
-    expect(within(rows[2]).getByText("sprichst")).toHaveStyle({ fontWeight: "800" });
-    expect(within(rows[3]).getByText("spricht")).toHaveStyle({ fontWeight: "800" });
+    expect(within(rows.find((row) => row.textContent === "dusprichst")).getByText("sprichst")).toHaveStyle({ fontWeight: "800" });
+    expect(within(rows.find((row) => row.textContent === "er / sie / esspricht")).getByText("spricht")).toHaveStyle({ fontWeight: "800" });
   });
 
   test("six short practice questions cover verbs, origin/location and both destination patterns", () => {
