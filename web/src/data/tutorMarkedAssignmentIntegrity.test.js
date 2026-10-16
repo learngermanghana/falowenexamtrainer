@@ -221,7 +221,7 @@ describe("all tutor-marked A1 through C1 assignments", () => {
 
       if (assignmentKey === "A2-8.22") {
         expect(source).toContain('<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />');
-        expect(readComponent("CourseSpeakingMockAssignment")).toContain("/live-speak/course-mock");
+        expect(readComponent("CourseSpeakingMockAssignment")).toContain("submitCourseSpeakingMock");
         return;
       }
       if (source.includes("A2StandardTabbedWorkbookPage")) {
