@@ -8,7 +8,10 @@
 const crypto = require("crypto");
 const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
 const taskFlows = require("./goetheExaminerFlow");
-const { assignmentConfig, submitCourseSpeakingMock, courseSpeakingMockStatus } = require("./courseSpeakingMock");
+// Keep this lightweight whitelist independent of the Sheets adapter. Existing
+// Live Speak route simulations must not load the score-sheet integration.
+const COURSE_MOCK_KEYS = new Set(["A2-8.22", "B1-7.23"]);
+const assignmentConfig = value => COURSE_MOCK_KEYS.has(String(value || "").trim().toUpperCase());
 const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");
 
@@ -918,6 +921,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       const assignmentId = String(req.query?.assignmentKey || "").trim().toUpperCase();
+      const { courseSpeakingMockStatus } = require("./courseSpeakingMock");
       return res.json(await courseSpeakingMockStatus({
         db: db(), uid: student.auth.uid, assignmentId,
       }));
@@ -933,6 +937,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       const assignmentId = String(req.body?.assignmentKey || "").trim().toUpperCase();
+      const { submitCourseSpeakingMock } = require("./courseSpeakingMock");
       const result = await submitCourseSpeakingMock({
         db: db(), admin, uid: student.auth.uid, profile: student.profile,
         auth: student.auth, assignmentId,
