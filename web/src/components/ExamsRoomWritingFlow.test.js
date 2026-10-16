@@ -18,7 +18,7 @@ describe("Exams Room Schreiben redesign", () => {
 
   test("features separate Teil tabs, persistent topic drafts and mobile task selection", () => {
     expect(workspace).toContain('className="few-parts"');
-    expect(workspace).toContain("part.tasks.map(");
+    expect(workspace).toContain("visibleTasks.map(");
     expect(workspace).toContain("window.localStorage.setItem(key, JSON.stringify(records))");
     expect(workspace).toContain("onChange={(event) => changeDraft(event.target.value)}");
     expect(workspace).toContain("few-mobile-list-toggle");
