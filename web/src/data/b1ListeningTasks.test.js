@@ -46,3 +46,25 @@ describe("B1 canonical listening registry", () => {
     expect(getB1ListeningTask(23).status).toBe("unavailable");
   });
 });
+
+
+describe("B1 Day 18 dialogue listening", () => {
+  test("asks only questions answered in the recording and keeps the answer order B B B C A", () => {
+    const task = getB1ListeningTask(18);
+    expect(task.questions.map(({ stem }) => stem)).toEqual([
+      "Was wollte der erste Sprecher als Kind werden?",
+      "Welche Berufe schlägt der erste Sprecher für jemanden vor, der Kunst liebt?",
+      "Welches Beispiel für ein Praktikum erwähnt der zweite Sprecher?",
+      "Welchen ungewöhnlichen Berufsweg erwähnt einer der Sprecher?",
+      "Womit wird Neugier bei der Berufswahl im Gespräch verglichen?",
+    ]);
+    expect(task.questions.map(({ options }) => options.map((option) => option.slice(0, 2)))).toEqual(
+      Array.from({ length: 5 }, () => ["A)", "B)", "C)", "D)"])
+    );
+    expect(task.questions[0].options[1]).toBe("B) Astronaut");
+    expect(task.questions[1].options[1]).toBe("B) Grafikdesigner, Innenarchitekt oder Kunsttherapeut");
+    expect(task.questions[2].options[1]).toBe("B) Ein Praktikum im Kinderheim");
+    expect(task.questions[3].options[2]).toBe("C) Ein Mann wollte Ingenieur werden, arbeitet aber heute als Koch");
+    expect(task.questions[4].options[0]).toBe("A) Mit einem Kompass für die Karriere");
+  });
+});
