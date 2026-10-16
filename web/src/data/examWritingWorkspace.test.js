@@ -98,7 +98,7 @@ describe("Schreiben per Goethe level", () => {
 
   test("every non-form workspace task is registered for authoritative server marking", () => {
     const records = toRegistryWritingTasks();
-    expect(records).toHaveLength(40);
+    expect(records).toHaveLength(56);
     const ids = records.map(({ id }) => id);
     expect(new Set(ids).size).toBe(ids.length);
     records.forEach((task) => {
@@ -107,6 +107,31 @@ describe("Schreiben per Goethe level", () => {
     expect(serverTasks.writing["c2-transformations"].transformations).toHaveLength(4);
     expect(serverTasks.writing["a2-sms-01"].whatToInclude).toHaveLength(3);
     expect(serverTasks.writing["a2-email-05"].situation).toContain("Sonnhof");
+  });
+
+  test("C1 includes all twenty requested German tasks with four content points", () => {
+    const c1 = getExamWritingModule("C1");
+    expect(c1.parts[0].tasks).toHaveLength(10);
+    expect(c1.parts[1].tasks).toHaveLength(10);
+    expect(c1.parts[0].targetWords).toBe("about 230 words");
+    expect(c1.parts[1].targetWords).toBe("about 120 words");
+    expect(c1.parts[0].description).toMatch(/50 minutes/);
+    expect(c1.parts[1].description).toMatch(/25 minutes/);
+    c1.parts.forEach((part) => part.tasks.forEach((task) => {
+      expect(task.points).toHaveLength(4);
+      expect(task.situation).toBeTruthy();
+      expect(task.example).toBeUndefined();
+      expect(serverTasks.writing[task.id]).toMatchObject({
+        id: task.id, level: "C1", teil: part.id,
+        situation: task.situation, whatToInclude: task.points,
+      });
+    }));
+    expect(c1.parts[0].tasks[0].situation).toContain("Karriere & Zukunft");
+    expect(c1.parts[0].tasks[9].situation).toContain("Großstadtfrust oder Landliebe");
+    expect(c1.parts[1].tasks[0].situation).toContain("Frau Dr. Menzel");
+    expect(c1.parts[1].tasks[9].situation).toContain("Herr Vogel");
+    expect(c1.parts[1].tasks.every((task) => task.register === "formal")).toBe(true);
+    expect(new Set(c1.parts.flatMap((part) => part.tasks.map((task) => task.id))).size).toBe(20);
   });
 
 });
