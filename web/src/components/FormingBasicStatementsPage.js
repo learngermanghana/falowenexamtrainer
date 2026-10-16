@@ -147,62 +147,15 @@ function FormingBasicStatementsPage() {
         <p style={muted}>What languages do you speak? Where are you from, where are you, and where are you going?</p>
         <div style={{ ...example, background: "#eff8f1", borderColor: "#b4dac0" }}>
           <strong>Today's goals: languages and places</strong>
-          <span>Use <em>sprechen</em> and <em>man spricht</em>, then tell the difference between <em>woher</em>, <em>wo</em> and <em>wohin</em>.</span>
+          <span>First tell the difference between <em>woher</em>, <em>wo</em> and <em>wohin</em>. Then use <em>sprechen</em> and <em>man spricht</em> to talk about languages.</span>
         </div>
         <p style={{ ...muted, fontSize: 14 }}>
           We use countries and languages you already know, so you can concentrate on the question words and short sentence patterns.
         </p>
       </header>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>1. sprechen — an irregular verb</h2>
-        <p style={muted}>
-          <strong>sprechen</strong> means <em>to speak</em>. It is irregular: the vowel changes
-          from <strong>e → i</strong> with <strong>du</strong> and <strong>er / sie / es</strong>.
-        </p>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 560 }}>
-            <thead><tr>
-              <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>Pronoun</th>
-              <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>sprechen</th>
-            </tr></thead>
-            <tbody>
-              {verbForms.map(([pronoun, form]) => (
-                <tr key={pronoun}>
-                  <td style={{ padding: "9px 12px", borderBottom: "1px solid #e2e8f0" }}>{pronoun}</td>
-                  <td lang="de" style={{ padding: "9px 12px", borderBottom: "1px solid #e2e8f0", fontWeight: pronoun === "du" || pronoun === "er / sie / es" ? 800 : 500, color: pronoun === "du" || pronoun === "er / sie / es" ? "#166534" : "inherit" }}>
-                    {form}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div style={{ display: "grid", gap: 8 }}>
-          {examples.map(([german, english]) => <GermanExample key={german} german={german} english={english} />)}
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>2. One useful expression: man spricht</h2>
-        <p style={muted}>
-          <strong>man</strong> means <strong>people in general</strong> (or <em>one / you in general</em>).
-          Use <strong>man spricht</strong> to describe what language people speak in a country.
-        </p>
-        <GermanExample german="In Deutschland spricht man Deutsch."
-          english="People speak German in Germany." />
-        <GermanExample german="In Ghana spricht man Englisch und viele andere Sprachen."
-          english="People speak English and many other languages in Ghana." />
-        <GermanExample german="In Spanien spricht man Spanisch."
-          english="People speak Spanish in Spain." />
-        <p style={{ ...muted, fontSize: 14 }}>
-          Remember: <strong>man spricht</strong>, not <s>man sprechen</s>.
-          <strong> man</strong> (people generally) is different from <strong>der Mann</strong> (the man).
-        </p>
-      </section>
-
       <section style={sectionStyle} data-testid="a1-day8-where-questions">
-        <h2 style={{ margin: 0 }}>3. Woher? Wo? Wohin? — understand the difference</h2>
+        <h2 style={{ margin: 0 }}>1. Woher? Wo? Wohin? — understand the difference</h2>
         <p style={muted}>
           All three questions ask about a place, but they mean different things.
           Remember <strong>from</strong> (origin), <strong>at/in</strong> (location), and
@@ -239,7 +192,7 @@ function FormingBasicStatementsPage() {
       </section>
 
       <section style={sectionStyle} data-testid="a1-day8-nach-in">
-        <h2 style={{ margin: 0 }}>4. nach or in? — going to a place</h2>
+        <h2 style={{ margin: 0 }}>2. nach or in? — going to a place</h2>
         <p style={muted}>
           To answer <strong>Wohin?</strong>, use <strong>nach</strong> with cities and
           countries that normally have <strong>no article</strong>. For countries
@@ -259,6 +212,53 @@ function FormingBasicStatementsPage() {
             You only need to recognise this exception today.
           </span>
         </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>3. sprechen — an irregular verb</h2>
+        <p style={muted}>
+          <strong>sprechen</strong> means <em>to speak</em>. It is irregular: the vowel changes
+          from <strong>e → i</strong> with <strong>du</strong> and <strong>er / sie / es</strong>.
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", maxWidth: 560 }}>
+            <thead><tr>
+              <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>Pronoun</th>
+              <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>sprechen</th>
+            </tr></thead>
+            <tbody>
+              {verbForms.map(([pronoun, form]) => (
+                <tr key={pronoun}>
+                  <td style={{ padding: "9px 12px", borderBottom: "1px solid #e2e8f0" }}>{pronoun}</td>
+                  <td lang="de" style={{ padding: "9px 12px", borderBottom: "1px solid #e2e8f0", fontWeight: pronoun === "du" || pronoun === "er / sie / es" ? 800 : 500, color: pronoun === "du" || pronoun === "er / sie / es" ? "#166534" : "inherit" }}>
+                    {form}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ display: "grid", gap: 8 }}>
+          {examples.map(([german, english]) => <GermanExample key={german} german={german} english={english} />)}
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>4. One useful expression: man spricht</h2>
+        <p style={muted}>
+          <strong>man</strong> means <strong>people in general</strong> (or <em>one / you in general</em>).
+          Use <strong>man spricht</strong> to describe what language people speak in a country.
+        </p>
+        <GermanExample german="In Deutschland spricht man Deutsch."
+          english="People speak German in Germany." />
+        <GermanExample german="In Ghana spricht man Englisch und viele andere Sprachen."
+          english="People speak English and many other languages in Ghana." />
+        <GermanExample german="In Spanien spricht man Spanisch."
+          english="People speak Spanish in Spain." />
+        <p style={{ ...muted, fontSize: 14 }}>
+          Remember: <strong>man spricht</strong>, not <s>man sprechen</s>.
+          <strong> man</strong> (people generally) is different from <strong>der Mann</strong> (the man).
+        </p>
       </section>
 
       <Day8QuickPractice />
