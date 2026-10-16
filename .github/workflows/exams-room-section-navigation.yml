@@ -16,6 +16,9 @@ on:
       - 'web/src/services/mockWritingSubmissionError.js'
       - 'web/src/services/mockWritingSubmissionError.test.js'
       - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/B1FinalMockSpeaking.jsx'
+      - 'web/src/components/B1FinalMockTimeout.test.jsx'
+      - 'web/src/components/B1FinalMockSpeakingTimeout.test.jsx'
       - 'web/src/components/A1FinalMockExamPage.jsx'
       - 'web/src/components/A2FinalMockExamPage.jsx'
       - 'web/src/components/B2FinalMockExamPage.jsx'
@@ -59,6 +62,9 @@ on:
       - 'web/src/services/mockWritingSubmissionError.js'
       - 'web/src/services/mockWritingSubmissionError.test.js'
       - 'web/src/components/B1FinalMockExamPage.jsx'
+      - 'web/src/components/B1FinalMockSpeaking.jsx'
+      - 'web/src/components/B1FinalMockTimeout.test.jsx'
+      - 'web/src/components/B1FinalMockSpeakingTimeout.test.jsx'
       - 'web/src/components/A1FinalMockExamPage.jsx'
       - 'web/src/components/A2FinalMockExamPage.jsx'
       - 'web/src/components/B2FinalMockExamPage.jsx'
@@ -105,7 +111,7 @@ jobs:
       - name: B1 Lesen and Hören practice regression
         run: npx jest --runInBand --runTestsByPath src/data/b1ReadingPracticeSamples.test.js src/components/B1ExamRoomNavigation.test.js
       - name: B1 four-module mock guidance and recovery regression
-        run: npx jest --runInBand --runTestsByPath src/utils/b1MockProgress.test.js
+        run: npx jest --runInBand --runTestsByPath src/utils/b1MockProgress.test.js src/components/B1FinalMockExamPage.test.jsx src/components/B1FinalMockTimeout.test.jsx src/components/B1FinalMockSpeakingTimeout.test.jsx
       - name: A1-C2 mock completion and availability regression
         run: npx jest --runInBand --runTestsByPath src/utils/fullMockProgress.test.js
       - name: Recoverable mock Schreiben error regression

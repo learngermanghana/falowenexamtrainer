@@ -5,6 +5,7 @@ const {
   LISTENING_ANSWER_KEY,
   assignmentIdForAttempt,
   buildVerifiedB1MockScore,
+  capB1SpeakingMarksToSubmittedAnswers,
   buildB1MockCompletionArtifacts,
 } = require("../b1MockCompletionSync");
 
@@ -37,6 +38,30 @@ describe("B1 final mock verified scoring and persistence", () => {
       "t2-12": "b",
     });
     expect(Object.keys(LISTENING_ANSWER_KEY)).toHaveLength(30);
+  });
+
+  test("never scores empty timed-out B1 speaking responses", () => {
+    const ai = {
+      parts: {
+        teil1: { score: 9, feedback: "positive but no audio" },
+        teil2: { score: 9, feedback: "submitted" },
+        teil3: { score: 6 },
+      },
+    };
+    const partial = capB1SpeakingMarksToSubmittedAnswers(ai, [
+      { id: "teil1", transcript: "" },
+      { id: "teil2", transcript: "Ich möchte einen Termin vereinbaren." },
+      { id: "teil3", transcript: "  " },
+    ]);
+    expect(partial.parts.teil1).toMatchObject({ score: 0, maxScore: 9 });
+    expect(partial.parts.teil2).toMatchObject({ score: 9, maxScore: 10 });
+    expect(partial.parts.teil3).toMatchObject({ score: 0, maxScore: 6 });
+    expect(partial.score).toBe(9);
+    expect(partial.passed).toBe(false);
+
+    const blank = capB1SpeakingMarksToSubmittedAnswers(ai, []);
+    expect(blank.score).toBe(0);
+    expect(blank.parts.teil2.score).toBe(0);
   });
 
   test("requires verified Schreiben and Sprechen to complete", () => {

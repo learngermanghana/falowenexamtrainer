@@ -98,6 +98,9 @@ export default function B1FinalMockSpeaking({
   const recordingSecondsRef = useRef(0);
   const timeoutAutoSubmitTaskIdRef = useRef("");
   const timeoutMarkTriggeredRef = useRef(false);
+  const timeoutMarkRetryTimerRef = useRef(null);
+  const timeoutMarkRetryCountRef = useRef(0);
+  const [timeoutMarkRetryNonce, setTimeoutMarkRetryNonce] = useState(0);
 
   const secondsLeft = Math.max(0, Number(externalSecondsLeft) || 0);
 
@@ -127,6 +130,7 @@ export default function B1FinalMockSpeaking({
   useEffect(
     () => () => {
       if (intervalRef.current) window.clearInterval(intervalRef.current);
+      if (timeoutMarkRetryTimerRef.current) window.clearTimeout(timeoutMarkRetryTimerRef.current);
       if (recorderRef.current?.state === "recording") {
         try { recorderRef.current.stop(); } catch (_error) {}
       }
@@ -373,7 +377,7 @@ export default function B1FinalMockSpeaking({
   };
 
   const markSpeaking = useCallback(async ({ force = false } = {}) => {
-    if ((!force && completedCount !== TASKS.length) || marking || result) return;
+    if ((!force && completedCount !== TASKS.length) || marking || result || hasUnsentRecording || hasInFlightSubmission) return;
     setMarking(true);
     setError("");
     setStatus("Falowen is marking your complete B1 Sprechen mock …");
@@ -389,16 +393,32 @@ export default function B1FinalMockSpeaking({
         attemptId,
         idToken,
       });
+      if (timeoutMarkRetryTimerRef.current) {
+        window.clearTimeout(timeoutMarkRetryTimerRef.current);
+        timeoutMarkRetryTimerRef.current = null;
+      }
+      timeoutMarkRetryCountRef.current = 0;
       setResult(assessment);
       setStatus("Speaking result ready.");
       onComplete?.(assessment);
     } catch (markError) {
       setError(markError?.message || "Could not mark the complete B1 speaking mock.");
       setStatus("");
+      if (secondsLeft <= 0 && timeoutMarkRetryCountRef.current < 3) {
+        const delay = [5000, 15000, 30000][timeoutMarkRetryCountRef.current];
+        timeoutMarkRetryCountRef.current += 1;
+        if (timeoutMarkRetryTimerRef.current) window.clearTimeout(timeoutMarkRetryTimerRef.current);
+        timeoutMarkRetryTimerRef.current = window.setTimeout(() => {
+          timeoutMarkRetryTimerRef.current = null;
+          timeoutMarkTriggeredRef.current = false;
+          setTimeoutMarkRetryNonce((value) => value + 1);
+        }, delay);
+      }
     } finally {
       setMarking(false);
     }
-  }, [attemptId, completedCount, idToken, marking, onComplete, result]);
+  }, [attemptId, completedCount, idToken, marking, onComplete, result, secondsLeft,
+    hasUnsentRecording, hasInFlightSubmission]);
 
   useEffect(() => {
     if (secondsLeft > 0 || result || marking || timeoutMarkTriggeredRef.current) return;
@@ -418,6 +438,9 @@ export default function B1FinalMockSpeaking({
       return;
     }
 
+    // Never grade an expired mock while unsent audio is still recoverable.
+    // If automatic transcription failed, the learner can retry sending it.
+    if (hasUnsentRecording) return;
     timeoutMarkTriggeredRef.current = true;
     markSpeaking({ force: true });
   }, [
@@ -427,6 +450,8 @@ export default function B1FinalMockSpeaking({
     recordingTaskId,
     hasInFlightSubmission,
     pendingRecordedTask,
+    hasUnsentRecording,
+    timeoutMarkRetryNonce,
     submitTask,
     markSpeaking,
   ]);
@@ -567,15 +592,26 @@ export default function B1FinalMockSpeaking({
         );
       })}
 
+      {secondsLeft === 0 && !result ? (
+        <p className="a1-sprechen-status" role="status">
+          Speaking time has ended. Falowen is submitting recorded answers and marking this section.
+          {hasUnsentRecording ? " A recording still needs to be sent; use Send answer to retry." :
+            " If marking fails, your saved transcripts remain available for retry."}
+        </p>
+      ) : null}
       {status ? <p className="a1-sprechen-status">{status}</p> : null}
       {error ? <p className="a1-sprechen-error">{error}</p> : null}
 
-      {completedCount === 3 && !result ? (
+      {(completedCount === 3 || secondsLeft === 0) && !result ? (
         <div className="a1-sprechen-final-action">
-          <h2>All speaking tasks are submitted.</h2>
-          <p>Falowen will mark all three B1 speaking tasks together.</p>
-          <button type="button" className="a1-sprechen-primary" onClick={markSpeaking} disabled={marking}>
-            {marking ? "Marking speaking …" : "Mark speaking"}
+          <h2>{secondsLeft === 0 ? "Sprechen time has ended." : "All speaking tasks are submitted."}</h2>
+          <p>{hasUnsentRecording
+            ? "Send the remaining recorded answer before Falowen can finalise Sprechen."
+            : "Falowen will mark all three speaking tasks together. Missing answers remain unanswered."}</p>
+          <button type="button" className="a1-sprechen-primary"
+            onClick={() => markSpeaking({ force: secondsLeft === 0 })}
+            disabled={marking || hasUnsentRecording || hasInFlightSubmission}>
+            {marking ? "Marking speaking …" : secondsLeft === 0 ? "Retry automatic Sprechen submission" : "Mark speaking"}
           </button>
         </div>
       ) : null}
