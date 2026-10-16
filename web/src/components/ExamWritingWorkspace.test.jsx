@@ -57,7 +57,7 @@ describe("Exams Room writing tasks", () => {
 
   test("renders the first supplied A1 form and checks only five blanks", async () => {
     render(<ExamWritingWorkspace />);
-    expect(screen.getByText("Sprachschule Berlin — Anmeldung")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Sprachschule Berlin — Anmeldung" })).toBeInTheDocument();
     expect(screen.getByText("Garcia, Maria")).toBeInTheDocument();
     expect(screen.getByText("14.05.1998")).toBeInTheDocument();
     const answers = [
@@ -83,7 +83,7 @@ describe("Exams Room writing tasks", () => {
       target: { value: "Berlin" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Teil 2 · E-Mail" }));
-    expect(screen.getByText("Hotelzimmer anfragen")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Hotelzimmer anfragen" })).toBeInTheDocument();
     const editor = screen.getByPlaceholderText("Beginne mit einer passenden Anrede ...");
     fireEvent.change(editor, { target: { value: "Sehr geehrte Damen und Herren," } });
     fireEvent.click(screen.getByRole("button", { name: "Teil 1 · Formular" }));
