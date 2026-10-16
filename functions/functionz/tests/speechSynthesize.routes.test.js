@@ -27,6 +27,7 @@ const app = require("../app");
 function makeDb({ currentTts = 0 } = {}) {
   return {
     collection: jest.fn((name) => {
+      if (name === "accountDeletionRequests") return { doc: () => ({ get: async () => ({ exists: false, data: () => ({}) }) }) };
       if (name === "aiAuditLogs") return { add: auditAdd };
       return { doc: jest.fn(() => ({ id: "quota" })) };
     }),
