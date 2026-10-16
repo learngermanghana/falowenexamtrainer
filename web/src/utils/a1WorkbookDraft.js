@@ -130,7 +130,7 @@ export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
       const body = section.text ? String(section.text).trim() : answerLines.join("\n");
       if (!body) return "";
       const exerciseVersion = String(assignment.assignmentKey || "").toUpperCase() === "A1-4" && key === "teil-3"
-        ? "A1-4-LISTENING-V2\\n"
+        ? "A1-4-LISTENING-V2\n"
         : "";
       return `TEIL ${number}\n${exerciseVersion}${body}`;
     })
