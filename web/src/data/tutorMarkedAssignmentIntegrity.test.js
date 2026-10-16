@@ -23,7 +23,7 @@ const b1ShellSource = fs.readFileSync(path.join(COMPONENTS, "B1StandardWorkbookP
 const workbookRouteIndex = buildWorkbookRouteIndex();
 
 const EXPECTED_COUNTS = { A1: 19, A2: 28, B1: 28, B2: 28, C1: 28 };
-const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 22, B2: 4, C1: 7 };
+const EXPECTED_PUBLISHED_COUNTS = { A1: 19, A2: 28, B1: 23, B2: 4, C1: 7 };
 
 const tutorAssignments = (level) =>
   getCurriculumEntriesForLevel(level).filter(
@@ -219,6 +219,11 @@ describe("all tutor-marked A1 through C1 assignments", () => {
       expect(componentFile).toBeTruthy();
       const source = collectWorkbookComponentSource(componentFile);
 
+      if (assignmentKey === "A2-8.22") {
+        expect(source).toContain('<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />');
+        expect(readComponent("CourseSpeakingMockAssignment")).toContain("/live-speak/course-mock");
+        return;
+      }
       if (source.includes("A2StandardTabbedWorkbookPage")) {
         expect(source).toContain("day={" + day + "}");
         expect(source).toContain('chapter="' + chapter + '"');
@@ -420,6 +425,11 @@ describe("all tutor-marked A1 through C1 assignments", () => {
       const source = collectWorkbookComponentSource(componentFile);
 
       expect(source).toContain(assignmentKey);
+      if (assignmentKey === "B1-7.23") {
+        expect(source).toContain('<CourseSpeakingMockAssignment assignmentKey="B1-7.23" />');
+        expect(readComponent("CourseSpeakingMockAssignment")).toContain("submitCourseSpeakingMock");
+        return;
+      }
       if (source.includes("B1StandardWorkbookPage")) {
         expect(source).toContain("day: " + day);
       } else {
