@@ -66,6 +66,28 @@ test("pending transcription is recoverable and final confirmation goes directly 
   expect(screen.queryByRole("button",{name:/Finish this Teil & see feedback/})).not.toBeInTheDocument();
 });
 
+test("saved audio answer advances to the next assigned question when the examiner's voice fails",async()=>{
+  const active={...saved,answeredTurns:1,answerLimit:4,
+    examFlow:{key:"B1-1",step:{index:2,seconds:60,role:"partner",instruction:"Was schlagen Sie vor?"}},
+    pending:{pendingId:"review-voice",transcript:"Wir können uns am Bahnhof treffen.",typed:false}};
+  global.fetch.mockImplementation(async url=>{
+    if(String(url).endsWith("/status"))return ok({enabled:true,activeSession:active});
+    if(String(url).endsWith("/confirm"))return ok({ok:true,recovered:true,
+      transcript:"Wir können uns am Bahnhof treffen.",reply:"Danke.",
+      nextInstruction:"Wer übernimmt die Fahrkarten?",taskReady:false,audioBase64:"",
+      examFlow:{...active.examFlow,step:{index:3,seconds:60,role:"partner",instruction:"Wer übernimmt die Fahrkarten?"}}});
+    return ok(active);
+  });
+  show();fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  fireEvent.click(await screen.findByRole("button",{name:"Confirm answer"}));
+  expect(await screen.findByRole("status",{name:"Examiner audio requires a tap"})).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Tap to hear the AI examiner"})).toBeVisible();
+  expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Wer übernimmt die Fahrkarten?");
+  expect(screen.getByText(/Your answer was saved/)).toBeInTheDocument();
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
+  expect(screen.queryByText(/Good attempt/)).not.toBeInTheDocument();
+});
+
 test.each([false,true])("saved feedback survives reload and local rehearsal stays on device (byte stop: %s)",async(autoStop)=>{
   global.fetch.mockResolvedValue(ok({enabled:true,remaining:0,lastExamResult:{...saved,feedback:"Practise the corrected sentence."}}));
   let currentTime=Date.now();
@@ -198,8 +220,10 @@ test("after an interrupted iPhone upload, checking status restores the saved tra
   try {
     expect(await screen.findByRole("group",{name:"Recover unsent speaking audio"})).toBeInTheDocument();
     expect(screen.getByLabelText("Listen to your own recording")).toHaveAttribute("src","blob:fast-german-answer");
+    expect(screen.getByRole("link",{name:"Save a copy of your unconfirmed recording"})).toHaveAttribute("href","blob:fast-german-answer");
     fireEvent.click(screen.getByRole("button",{name:"Check saved answer / retry"}));
     expect(await screen.findByRole("textbox",{name:"What I said (you can edit this)"})).toHaveValue("Ich mag Gemüse.");
+    expect(screen.getByRole("link",{name:"Save a copy of your unconfirmed recording"})).toHaveAttribute("href","blob:fast-german-answer");
     expect(x.uploadCount()).toBe(1);
     expect(screen.queryByRole("group",{name:"Recover unsent speaking audio"})).not.toBeInTheDocument();
   } finally {x.rendered.unmount();x.cleanup();}

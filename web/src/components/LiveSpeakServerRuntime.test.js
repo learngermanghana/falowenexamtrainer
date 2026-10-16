@@ -684,6 +684,45 @@ test("previous examiner tryout use does not block repeat testing within the shar
   expect(started.sessionId).toBeTruthy();
 });
 
+test("A1 Teil 1 uses neutral spoken transitions and reads dictated surname and phone fairly",async()=>{
+  const api=setup();
+  const session=await startTaskFlow(api,"A1",1,"guided","Stellen Sie sich kurz vor");
+  const intro=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  expect(intro.code).toBe(200);
+  const introduction=await answerExam(api,session,"Ich heiße Felix Asadu. Ich komme aus Ghana.");
+  expect(introduction.payload.reply.startsWith("Vielen Dank.")).toBe(true);
+  expect(introduction.payload.reply).toContain("buchstabieren Sie Ihren Familiennamen");
+  const spelling=await answerExam(api,session,"a es a di u");
+  expect(spelling.payload.reply.startsWith("Gut, danke.")).toBe(true);
+  expect(spelling.payload.reply).toContain("Bitte nennen Sie eine Telefonnummer.");
+  const digits="Null, zwei, vier, fünf, null, zwei, zwei, sieben, vier, drei";
+  const phone=await answerExam(api,session,digits);
+  expect(phone.payload.reply.startsWith("Danke schön.")).toBe(true);
+  expect(phone.payload.reply.split("?")).toHaveLength(2);
+  const leisure=await answerExam(api,session,"Ich trinke gern Kaffee.");
+  expect(leisure.payload.taskReady).toBe(true);
+  const grades={taskScores:[1,2,3,4].map(step=>({step,score:2,comment:"A1 task achieved"})),
+    summary:"Good A1 answers.",strength:"All tasks completed.",priority:"Practice the next task.",
+    correctedExample:"Ich trinke gern Kaffee.",nextPractice:"Continue practising."};
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify(grades)}}]});
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(feedback.code).toBe(200);
+  expect(feedback.payload.assessment).toEqual(expect.objectContaining({score:8,maxScore:8}));
+  const request=api.fakeClient.chat.completions.create.mock.calls.at(-1)[0];
+  const assessmentInput=JSON.parse(request.messages.at(-1).content);
+  expect(request.messages[0].content).toContain("A-S-A-D-U");
+  expect(request.messages[0].content).toContain("Ich trinke gern Kaffee");
+  expect(request.messages[0].content).toContain("not proof of the actual surname");
+  expect(assessmentInput.studentTranscripts).toEqual([
+    "Ich heiße Felix Asadu. Ich komme aus Ghana.","a es a di u",digits,"Ich trinke gern Kaffee."
+  ]);
+  expect(assessmentInput.examContext.dictationEvidence).toEqual([
+    expect.objectContaining({step:2,action:"spell",possibleLetters:"A S A D U"}),
+    expect.objectContaining({step:3,action:"number",possibleDigits:"0245022743"}),
+  ]);
+  expect(assessmentInput.examContext.promptedSteps).toHaveLength(4);
+});
+
 test("A1 question receives a separate scripted next question and a persistent scored result",async()=>{
   const api=setup();
   const session=await startTaskFlow(api,"A1",2,"guided","Fahrkarte");
@@ -909,6 +948,24 @@ test("German transcription prompt handles naturally fast speech without inventin
   expect(opts.model).toBe("gpt-4o-transcribe");
 });
 
+test("one low-confidence German word flags an otherwise confident fast transcript for review",async()=>{
+  const api=setup();const session=await startExam(api);
+  api.fakeClient.audio.transcriptions.create.mockResolvedValueOnce({
+    text:"Ich nehme die Straßenbahn zur Universität.",
+    logprobs:[{logprob:-0.1},{logprob:-0.2},{logprob:-2.4},{logprob:-0.1},{logprob:-0.1}],
+  });
+  const recognised=await api.call("POST","/live-speak/session/turn",{
+    sessionId:session.sessionId,...audioPayload,
+  });
+  expect(recognised.code).toBe(200);
+  expect(recognised.payload).toEqual(expect.objectContaining({
+    needsConfirmation:true,uncertain:true,
+    transcript:"Ich nehme die Straßenbahn zur Universität.",
+  }));
+  expect(api.docs.get(sessionKey).pendingUncertain).toBe(true);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toEqual([]);
+});
+
 test("recent in-flight turns are not resent; stale timed-out locks may safely be recovered",async()=>{
   const api=setup(); const session=await startExam(api);
   const base=api.docs.get(sessionKey);
@@ -1092,4 +1149,88 @@ test("open examiner mode preserves the old standalone credit-claim path",async()
   });
   expect(session.code).toBe(200);
   expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+});
+
+
+test("a failed Goethe AI partner reply advances only to the next assigned step",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
+  api.fakeClient.chat.completions.create.mockRejectedValueOnce(new Error("temporary model outage"));
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
+  expect(first.code).toBe(200);
+  expect(first.payload.recovered).toBe(true);
+  expect(first.payload.taskReady).toBe(false);
+  expect(first.payload.nextInstruction).toMatch(/Frühstück/);
+  expect(first.payload.examFlow.step.index).toBe(2);
+  const persisted=api.docs.get(sessionKey);
+  expect(persisted.answeredTurns).toBe(1);
+  expect(persisted.taskReady).toBe(false);
+  expect(persisted.inFlight).toBe(false);
+  expect(persisted.confirmedAnswers).toEqual(["Was essen Sie zum Frühstück?"]);
+  expect(persisted.messages.at(-1).text).toBe(first.payload.nextInstruction);
+  const again=await answerExam(api,session,"Ich esse Brot zum Frühstück.");
+  expect(again.code).toBe(200);
+  expect(again.payload.taskReady).toBe(false);
+  expect(again.payload.examFlow.step.index).toBe(3);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(2);
+});
+
+test("failed examiner TTS after a confirmed answer retains the next step without replaying audio",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
+  api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("iPhone voice unavailable"));
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
+  expect(first.code).toBe(200);
+  expect(first.payload.recovered).toBe(true);
+  expect(first.payload.audioBase64).toBe("");
+  expect(first.payload.nextInstruction).toMatch(/Frühstück/);
+  expect(first.payload.taskReady).toBe(false);
+  const status=(await api.call("GET","/live-speak/status")).payload.activeSession;
+  expect(status.answeredTurns).toBe(1);
+  expect(status.examFlow.step.index).toBe(2);
+  expect(status.messages.at(-1).text).toBe(first.payload.nextInstruction);
+  expect(api.docs.get(sessionKey).inFlight).toBe(false);
+});
+
+test("dynamic examiner dialogue asks at most one question in each turn",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"B2",2,"guided","Digitalisierung");
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify({
+    reply:"Ich sehe das anders. Was ist mit der Privatsphäre? Und wie sieht es mit den Kosten aus?",
+    decisions:[],
+  })}}]});
+  const first=await answerExam(api,session,"Datenschutz ist für mich wichtig.");
+  expect(first.code).toBe(200);
+  expect(first.payload.reply).toContain("Privatsphäre?");
+  expect(first.payload.reply).not.toContain("Kosten");
+  expect(first.payload.reply.split("?")).toHaveLength(2);
+  expect(first.payload.taskReady).toBe(false);
+});
+
+test("feedback is grounded in actually prompted steps and incomplete sessions are marked partial",async()=>{
+  const api=setup();const session=await startTaskFlow(api,"A1",2,"guided","Frühstück");
+  const start=await api.call("POST","/live-speak/session/turn",{sessionId:session.sessionId,intro:true});
+  expect(start.code).toBe(200);
+  const first=await answerExam(api,session,"Was essen Sie zum Frühstück?");
+  expect(first.payload.taskReady).toBe(false);
+  const original=api.docs.get(sessionKey);
+  expect(original.promptedSteps).toHaveLength(1);
+  expect(original.promptedSteps[0]).toEqual(expect.objectContaining({
+    step:1,action:"ask-question",source:"delivered",
+  }));
+  const review={taskScores:[{step:1,score:2,comment:"A clear relevant question."}],
+    summary:"Good question for this card.",strength:"Clear question.",priority:"Practise more.",
+    correctedExample:"Wie viel kostet eine Fahrkarte?",nextPractice:"More question cards."};
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{content:JSON.stringify(review)}}]});
+  const result=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+  expect(result.code).toBe(200);
+  expect(result.payload.assessment).toEqual(expect.objectContaining({
+    partial:true,complete:false,score:2,maxScore:2,practiceOnly:true,
+  }));
+  expect(result.payload.feedback).toMatch(/Partial practice/);
+  expect(result.payload.assessment.tasks).toHaveLength(1);
+  expect(result.payload.assessment.tasks[0]).toEqual(expect.objectContaining({
+    action:"ask-question",askedPrompt:original.promptedSteps[0].prompt,
+  }));
+  const prompt=JSON.parse(api.fakeClient.chat.completions.create.mock.calls.at(-1)[0].messages.at(-1).content);
+  expect(prompt.examContext.completedAllTurns).toBe(false);
+  expect(prompt.examContext.promptedSteps).toHaveLength(1);
+  expect(prompt.studentTranscripts).toHaveLength(1);
 });
