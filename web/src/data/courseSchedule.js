@@ -1000,9 +1000,9 @@ const RAW_COURSE_SCHEDULES = {
       day: 8,
       topic: "Countries and Languages",
       chapter: "4",
-      goal: "Ask which languages someone speaks, practise the irregular verb sprechen, and use man spricht for languages spoken in a country",
+      goal: "Ask where people come from, live and travel using woher, wo and wohin; practise nach/in and sprechen/man spricht",
       instruction: "Watch the video, review grammar, and complete your workbook.",
-      grammar_topic: "sprechen (spreche / sprichst / spricht); man spricht",
+      grammar_topic: "sprechen; man spricht; woher / wo / wohin; aus / in / nach",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/z5ClrkL4O3k",

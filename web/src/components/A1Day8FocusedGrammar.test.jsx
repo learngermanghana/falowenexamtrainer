@@ -11,26 +11,38 @@ jest.mock("./navigation/AppBackButton", () => ({
 
 const read = (file) => fs.readFileSync(path.resolve(__dirname, file), "utf8");
 
-describe("A1 Day 8 focused grammar notes", () => {
-  test("teaches only sprechen, with translated examples and one man spricht extension", () => {
+describe("A1 Day 8 Countries and Languages grammar notes", () => {
+  test("teaches sprechen and man, three place questions, and short nach/in examples", () => {
     render(<FormingBasicStatementsPage />);
     expect(screen.getByRole("heading", { name: "Welche Sprachen sprichst du?" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "1. sprechen — an irregular verb" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "2. One useful expression: man spricht" })).toBeInTheDocument();
     expect(screen.getByText("Do you speak German?")).toBeInTheDocument();
     expect(screen.getByText("People speak German in Germany.")).toBeInTheDocument();
-    expect(screen.getByText("People speak Spanish in Spain.")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "4. Speak with a partner" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "3. Woher? Wo? Wohin? — understand the difference" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "4. nach or in? — going to a place" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "6. Speak with a partner" })).toBeInTheDocument();
+
+    const table = within(screen.getByTestId("a1-day8-where-questions")).getByRole("table");
+    expect(within(table).getAllByRole("row")).toHaveLength(4);
+    expect(within(table).getByText("Woher kommst du? — Ich komme aus Ghana.")).toBeInTheDocument();
+    expect(within(table).getByText("Wo wohnst du? — Ich wohne in Accra.")).toBeInTheDocument();
+    expect(within(table).getByText("Wohin fährst du? — Ich fahre nach Deutschland.")).toBeInTheDocument();
+
+    const destination = screen.getByTestId("a1-day8-nach-in");
+    expect(within(destination).getByText("Ich fahre nach Berlin.")).toBeInTheDocument();
+    expect(within(destination).getByText("Wir fliegen nach Ghana.")).toBeInTheDocument();
+    expect(within(destination).getByText("Sie fährt in die Schweiz.")).toBeInTheDocument();
+    expect(destination).toHaveTextContent("Ich bin in der Schweiz.");
+    expect(destination).toHaveTextContent("Ich fahre in die Schweiz.");
     const source = read("FormingBasicStatementsPage.js");
     expect(source).not.toContain("Präteritum");
     expect(source).not.toContain("liegen = to be located");
-    expect(source).not.toContain("nach vs in");
-    expect(source).not.toContain("Woher kommst du?");
     expect(source).not.toContain("<img");
     expect(source).not.toContain("https://images.unsplash.com");
   });
 
-  test("presents all six sprechen forms and highlights the two irregular forms", () => {
+  test("presents six sprechen conjugations with du and er/sie/es highlighted", () => {
     render(<FormingBasicStatementsPage />);
     const rows = screen.getAllByRole("row");
     const rowContent = rows.map((row) => row.textContent);
@@ -44,29 +56,34 @@ describe("A1 Day 8 focused grammar notes", () => {
     expect(within(rows[3]).getByText("spricht")).toHaveStyle({ fontWeight: "800" });
   });
 
-  test("four short practice questions check speaking and man; answers can be reset", () => {
+  test("six short practice questions cover verbs, origin/location and both destination patterns", () => {
     render(<FormingBasicStatementsPage />);
     const practice = screen.getByTestId("a1-day8-quick-practice");
-    expect(within(practice).getByText(/0 of 4 answered/)).toBeInTheDocument();
-    const q1 = within(practice).getByRole("group", { name: "Question 1" });
-    fireEvent.click(within(q1).getByRole("button", { name: "spricht" }));
+    expect(within(practice).getByText(/0 of 6 answered/)).toBeInTheDocument();
+    const pick = (number, answer) => {
+      const group = within(practice).getByRole("group", { name: "Question " + number });
+      fireEvent.click(within(group).getByRole("button", { name: answer }));
+    };
+    pick(1, "spreche");
     expect(within(practice).getByText(/Try again\./)).toBeInTheDocument();
-    fireEvent.click(within(q1).getByRole("button", { name: "spreche" }));
-    expect(within(practice).getByText(/Correct!/)).toBeInTheDocument();
-    const q4 = within(practice).getByRole("group", { name: "Question 4" });
-    fireEvent.click(within(q4).getByRole("button", { name: "spricht" }));
-    expect(within(practice).getByText(/2 of 4 answered/)).toBeInTheDocument();
-    expect(within(practice).getByText(/2 correct/)).toBeInTheDocument();
+    pick(1, "sprichst");
+    pick(2, "spricht");
+    pick(3, "Woher");
+    pick(4, "Wo");
+    pick(5, "nach");
+    pick(6, "in die");
+    expect(within(practice).getByText(/6 of 6 answered/)).toBeInTheDocument();
+    expect(within(practice).getByText(/6 correct/)).toBeInTheDocument();
     fireEvent.click(within(practice).getByRole("button", { name: "Reset practice" }));
-    expect(within(practice).getByText(/0 of 4 answered/)).toBeInTheDocument();
+    expect(within(practice).getByText(/0 of 6 answered/)).toBeInTheDocument();
     expect(within(practice).queryByText(/Correct!/)).not.toBeInTheDocument();
   });
 
-  test("grammar route and both course schedules describe the same focused A1-4 lesson", () => {
+  test("A1-4 route and both schedules describe all three teaching points", () => {
     expect(read("A1WorkbookGrammarNotes.js")).toContain('"A1-4": FormingBasicStatementsPage');
     for (const file of ["../data/courseSchedule.js", "../../../functions/data/courseSchedule.js"]) {
       const schedule = read(file);
-      expect(schedule).toContain('grammar_topic: "sprechen (spreche / sprichst / spricht); man spricht"');
+      expect(schedule).toContain('grammar_topic: "sprechen; man spricht; woher / wo / wohin; aus / in / nach"');
       expect(schedule).not.toContain("Learn about schon mal, noch nie, irregular verbs, and man vs Mann");
     }
   });

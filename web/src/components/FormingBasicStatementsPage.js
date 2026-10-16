@@ -2,8 +2,8 @@ import React, { memo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
-// A1 Day 8 grammar has one core focus: the vowel change in sprechen.
-// "man spricht" is introduced as a useful, connected expression — not a second grammar unit.
+// Keep A1 Day 8 short: speaking languages, then origin/location/destination
+// with only the country prepositions needed for those three questions.
 const sectionStyle = {
   ...styles.card,
   display: "grid",
@@ -35,28 +35,40 @@ const verbForms = [
 ];
 const questions = [
   {
-    prompt: "Ich ___ Englisch und Twi.",
-    options: ["spreche", "sprichst", "spricht"],
-    answer: 0,
-    explanation: "Use ich spreche — there is no vowel change with ich.",
-  },
-  {
     prompt: "Welche Sprache ___ du?",
     options: ["spreche", "sprichst", "sprechen"],
     answer: 1,
     explanation: "With du, sprechen becomes sprichst (e → i).",
   },
   {
-    prompt: "Lukas ___ Deutsch.",
-    options: ["sprechen", "spricht", "sprichst"],
-    answer: 1,
-    explanation: "With er or a singular name, use spricht (e → i).",
-  },
-  {
     prompt: "In Spanien ___ man Spanisch.",
     options: ["sprechen", "sprichst", "spricht"],
     answer: 2,
-    explanation: "man uses the same verb form as er / sie / es: man spricht.",
+    explanation: "man takes the same verb form as er / sie / es: man spricht.",
+  },
+  {
+    prompt: "___ kommst du? — Aus Ghana.",
+    options: ["Wo", "Woher", "Wohin"],
+    answer: 1,
+    explanation: "Woher asks about origin: from where? The answer uses aus Ghana.",
+  },
+  {
+    prompt: "___ wohnst du? — In Berlin.",
+    options: ["Wo", "Woher", "Wohin"],
+    answer: 0,
+    explanation: "Wo asks about a location: where? The answer is in Berlin.",
+  },
+  {
+    prompt: "Wohin fährt Lukas? — Er fährt ___ Deutschland.",
+    options: ["in", "aus", "nach"],
+    answer: 2,
+    explanation: "Use nach for a destination with no article, such as Deutschland or Berlin.",
+  },
+  {
+    prompt: "Wohin fährt Anna? — Sie fährt ___ Schweiz.",
+    options: ["in die", "nach", "in der"],
+    answer: 0,
+    explanation: "Use in die Schweiz for movement to a country with the article die. Wo? in der Schweiz.",
   },
 ];
 
@@ -77,8 +89,8 @@ function Day8QuickPractice() {
   return (
     <section style={sectionStyle} data-testid="a1-day8-quick-practice">
       <div>
-        <h2 style={{ margin: "0 0 5px" }}>3. Quick practice</h2>
-        <p style={muted}>Choose the correct form of <strong>sprechen</strong>. You can try again.</p>
+        <h2 style={{ margin: "0 0 5px" }}>5. Quick practice</h2>
+        <p style={muted}>Choose the correct verb form, question word or country preposition. You can try again.</p>
       </div>
       <p style={{ ...muted, fontWeight: 700 }} role="status">
         {answered} of {questions.length} answered · {correct} correct
@@ -132,13 +144,13 @@ function FormingBasicStatementsPage() {
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span style={{ color: "#276749", fontWeight: 800, fontSize: 13 }}>A1 · Day 8 · Countries and Languages</span>
         <h1 style={{ ...styles.title, margin: 0 }}>Welche Sprachen sprichst du?</h1>
-        <p style={muted}>What languages do you speak?</p>
+        <p style={muted}>What languages do you speak? Where are you from, where are you, and where are you going?</p>
         <div style={{ ...example, background: "#eff8f1", borderColor: "#b4dac0" }}>
-          <strong>Today's one grammar focus: <em>sprechen</em> (to speak)</strong>
-          <span>Learn how to say which languages you and other people speak.</span>
+          <strong>Today's goals: languages and places</strong>
+          <span>Use <em>sprechen</em> and <em>man spricht</em>, then tell the difference between <em>woher</em>, <em>wo</em> and <em>wohin</em>.</span>
         </div>
         <p style={{ ...muted, fontSize: 14 }}>
-          Quick review, not a new grammar rule: <strong lang="de">Ich komme aus Ghana.</strong> — I come from Ghana.
+          We use countries and languages you already know, so you can concentrate on the question words and short sentence patterns.
         </p>
       </header>
 
@@ -189,20 +201,84 @@ function FormingBasicStatementsPage() {
         </p>
       </section>
 
+      <section style={sectionStyle} data-testid="a1-day8-where-questions">
+        <h2 style={{ margin: 0 }}>3. Woher? Wo? Wohin? — understand the difference</h2>
+        <p style={muted}>
+          All three questions ask about a place, but they mean different things.
+          Remember <strong>from</strong> (origin), <strong>at/in</strong> (location), and
+          <strong> to</strong> (destination).
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 440 }}>
+            <thead>
+              <tr>
+                <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>Question</th>
+                <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>German answer</th>
+                <th scope="col" style={{ textAlign: "left", padding: "10px 12px", borderBottom: "2px solid #cbd5e1" }}>English</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Woher? — from where?", "Woher kommst du? — Ich komme aus Ghana.", "Where are you from? — I come from Ghana."],
+                ["Wo? — where?", "Wo wohnst du? — Ich wohne in Accra.", "Where do you live? — I live in Accra."],
+                ["Wohin? — to where?", "Wohin fährst du? — Ich fahre nach Deutschland.", "Where are you going? — I am travelling to Germany."],
+              ].map(([question, german, english]) => (
+                <tr key={question}>
+                  <td style={{ padding: "10px 12px", borderBottom: "1px solid #e2e8f0", fontWeight: 700 }}>{question}</td>
+                  <td lang="de" style={{ padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>{german}</td>
+                  <td lang="en" style={{ padding: "10px 12px", borderBottom: "1px solid #e2e8f0", color: "#475569" }}>{english}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={{ ...example, background: "#eff8f1", borderColor: "#b4dac0" }}>
+          <strong>Think: Where FROM? Where AT? Where TO?</strong>
+          <span><strong>Woher?</strong> → <em>aus</em> · <strong>Wo?</strong> → <em>in</em> · <strong>Wohin?</strong> → <em>nach</em> (for most city and country names without an article).</span>
+        </div>
+      </section>
+
+      <section style={sectionStyle} data-testid="a1-day8-nach-in">
+        <h2 style={{ margin: 0 }}>4. nach or in? — going to a place</h2>
+        <p style={muted}>
+          To answer <strong>Wohin?</strong>, use <strong>nach</strong> with cities and
+          countries that normally have <strong>no article</strong>. For countries
+          that have an article, use <strong>in + the destination article</strong>.
+        </p>
+        <GermanExample german="Ich fahre nach Berlin." english="I am travelling to Berlin. (city → nach)" />
+        <GermanExample german="Wir fliegen nach Ghana." english="We are flying to Ghana. (country without an article → nach)" />
+        <GermanExample german="Sie fährt in die Schweiz." english="She is travelling to Switzerland. (die Schweiz → in die)" />
+        <div style={{ ...example, background: "#eff8f1", borderColor: "#b4dac0" }}>
+          <strong>Do not confuse destination with location:</strong>
+          <span lang="de"><strong>Wo?</strong> Ich bin <strong>in der Schweiz.</strong></span>
+          <span lang="en" style={muted}>Where? I am in Switzerland.</span>
+          <span lang="de"><strong>Wohin?</strong> Ich fahre <strong>in die Schweiz.</strong></span>
+          <span lang="en" style={muted}>To where? I am travelling to Switzerland.</span>
+          <span style={{ ...muted, fontSize: 14 }}>
+            Other countries with articles work similarly: <em>in die Türkei</em>, <em>in die USA</em>.
+            You only need to recognise this exception today.
+          </span>
+        </div>
+      </section>
+
       <Day8QuickPractice />
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4. Speak with a partner</h2>
-        <p style={muted}>Ask and answer. Then change the language or country and speak again.</p>
+        <h2 style={{ margin: 0 }}>6. Speak with a partner</h2>
+        <p style={muted}>Ask about language, origin, location and destination. Keep the answers short.</p>
         <div style={{ ...example, background: "#eff8f1", borderColor: "#b4dac0" }}>
           <strong lang="de">A: Welche Sprachen sprichst du?</strong>
           <span>I speak English and Twi: <strong lang="de">B: Ich spreche Englisch und Twi.</strong></span>
           <strong lang="de">A: Welche Sprache spricht man in Deutschland?</strong>
           <span>People speak German in Germany: <strong lang="de">B: In Deutschland spricht man Deutsch.</strong></span>
+          <strong lang="de">A: Woher kommst du? — B: Ich komme aus Ghana.</strong>
+          <strong lang="de">A: Wo wohnst du? — B: Ich wohne in Accra.</strong>
+          <strong lang="de">A: Wohin fährst du? — B: Ich fahre nach Berlin.</strong>
         </div>
         <p style={{ ...muted, fontSize: 14 }}>
-          Teacher tip: Practise the same two questions with three partners. There is no need
-          to introduce other irregular verbs, past tenses or destination grammar today.
+          Teacher tip: First ask students to point to <strong>from / at / to</strong>, then let pairs
+          practise the three place questions with a new city or country. Keep it to these patterns;
+          do not introduce past tenses or other irregular verbs today.
         </p>
       </section>
     </main>
