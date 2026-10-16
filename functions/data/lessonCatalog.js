@@ -1277,7 +1277,7 @@ const lessonCatalog = Object.freeze([
     "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "planned"
+    "contentStatus": "published"
   },
   {
     "id": "B1-8.24",
