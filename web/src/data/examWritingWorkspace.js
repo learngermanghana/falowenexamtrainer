@@ -1,8 +1,19 @@
+import { WRITING_PROMPTS } from "./writingExamPrompts";
 // Practice-specific writing tasks. These do not replace the graded Goethe mock tasks.
 const task = (id, title, situation, points, extra = {}) => ({ id, title, situation, points, ...extra });
 const part = (id, label, format, targetWords, tasks, description = "") => ({
   id, label, format, targetWords, tasks, description,
 });
+
+// Reuse the ten existing Falowen A1 Goethe Schreiben samples instead of duplicating them.
+const A1_LETTER_SAMPLES = WRITING_PROMPTS.A1.map((sample, index) => ({
+  id: "a1-existing-letter-" + String(index + 1),
+  title: ["Hotelzimmer anfragen","Zum Geburtstag antworten","Im Deutschkurs fehlen","Informationen zum Sprachkurs","Ein Treffen vereinbaren","Touristeninformation","Ein Fahrrad kaufen","Mitglied im Sportverein","Einladung nach München","Problem mit der Heizung"][index],
+  situation: sample.Thema,
+  points: sample.Punkte,
+  category: [true,false,true,true,false,true,true,true,false,true][index] ? "Formelle E-Mail" : "Informelle E-Mail",
+  register: [true,false,true,true,false,true,true,true,false,true][index] ? "formal" : "informal",
+}));
 
 export const EXAM_WRITING_MODULES = Object.freeze({
   A1: {
@@ -78,20 +89,8 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             ],
           }),
       ], "Übertrage die Angaben aus dem Text in ein Formular."),
-      part("teil2", "Teil 2 · E-Mail", "email", "ca. 30 Wörter", [
-        task("a1-birthday", "Zum Geburtstag einladen",
-          "Du möchtest deinen Freund Paul zu deiner Geburtstagsfeier einladen. Schreibe eine kurze E-Mail.",
-          ["Lade Paul ein.", "Nenne Tag und Uhrzeit.", "Nenne den Ort."], {
-            category: "Informelle E-Mail", register: "informal",
-            example: "Lieber Paul,\nich habe am Samstag Geburtstag. Kommst du um 16 Uhr zu mir? Wir feiern bei mir zu Hause.\nLiebe Grüße\nAma",
-          }),
-        task("a1-hotel", "Zimmer im Hotel anfragen",
-          "Du möchtest im Hotel Stadtblick ein Zimmer reservieren. Schreibe eine kurze E-Mail an das Hotel.",
-          ["Schreibe, wann du kommst.", "Bitte um ein Einzelzimmer.", "Frage nach dem Preis."], {
-            category: "Formelle E-Mail", register: "formal",
-            example: "Sehr geehrte Damen und Herren,\nich komme am Freitag nach Berlin. Haben Sie ein Einzelzimmer? Wie viel kostet es pro Nacht?\nMit freundlichen Grüßen\nKojo Mensah",
-          }),
-      ]),
+      part("teil2", "Teil 2 · E-Mail", "email", "ca. 30 Wörter", A1_LETTER_SAMPLES,
+        "Schreibe etwa 30 Wörter mit Anrede, drei Inhaltspunkten, Gruß und Namen."),
     ],
   },
   A2: {
