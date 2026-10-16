@@ -796,6 +796,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("Feedback could not be completed. Your answers remain saved for review."), {status:409,code:"feedback_retry_limit"});
         }
         answers = confirmedAnswers(record);
+        // Missing decision points are graded as a weaker answer, not as a
+        // technical failure. But every scheduled examiner response must be given.
+        if (assignmentConfig(record.examTask?.courseAssignmentKey)
+          && (!record.examFlow || Number(record.answeredTurns) < answerLimit(record))) {
+          throw Object.assign(new Error("Complete every examiner step before requesting graded feedback."),
+            {status:409,code:"course_mock_part_incomplete"});
+        }
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
         }
@@ -874,7 +881,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.sessionId !== sessionId || record.feedbackAttemptId !== attemptId) {
           throw Object.assign(new Error("This task changed. Reload to see its saved feedback."), {status:409,code:"task_changed"});
         }
-        const completed=record.examFlow ? taskFlows.isComplete(record) : Boolean(record.taskReady);
+        const completed=record.examFlow
+          ? (taskFlows.isComplete(record) ||
+            (Boolean(assignmentConfig(record.examTask?.courseAssignmentKey)) &&
+              Number(record.answeredTurns) >= answerLimit(record)))
+          : Boolean(record.taskReady);
         tx.update(sessionRef, {feedback,assessment, feedbackStatus:"complete", feedbackLeaseUntil:0,
           endedAt:admin.firestore.FieldValue.serverTimestamp()});
         // An immutable per-attempt snapshot remains after the next live session starts.
