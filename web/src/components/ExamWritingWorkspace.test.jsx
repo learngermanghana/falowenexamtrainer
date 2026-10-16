@@ -96,7 +96,7 @@ describe("Exams Room writing tasks", () => {
       target: { value: "Berlin" },
     });
     fireEvent.click(screen.getByRole("button", { name: "Part 2 · Email" }));
-    expect(screen.getByRole("heading", { name: "Hotelzimmer anfragen" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Ask About a Hotel Room" })).toBeInTheDocument();
     const editor = screen.getByPlaceholderText("Start with an appropriate German greeting ...");
     fireEvent.change(editor, { target: { value: "Sehr geehrte Damen und Herren," } });
     fireEvent.click(screen.getByRole("button", { name: "Part 1 · Form" }));
