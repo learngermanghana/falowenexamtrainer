@@ -5,6 +5,8 @@ on:
     paths:
       - "web/src/components/FormingBasicStatementsPage.js"
       - "web/src/components/A1Day8FocusedGrammar.test.jsx"
+      - "web/src/components/A1Day9NominativeAccusativeGrammarPage.js"
+      - "web/src/components/A1Day9CasesKnowledgeHints.test.jsx"
       - "web/src/data/courseSchedule.js"
       - "functions/data/courseSchedule.js"
       - "scripts/patchA1Day8TopicAlignment.mjs"
@@ -14,6 +16,8 @@ on:
     paths:
       - "web/src/components/FormingBasicStatementsPage.js"
       - "web/src/components/A1Day8FocusedGrammar.test.jsx"
+      - "web/src/components/A1Day9NominativeAccusativeGrammarPage.js"
+      - "web/src/components/A1Day9CasesKnowledgeHints.test.jsx"
       - "web/src/data/courseSchedule.js"
       - "functions/data/courseSchedule.js"
       - "scripts/patchA1Day8TopicAlignment.mjs"
@@ -44,4 +48,5 @@ jobs:
         run: >-
           npx jest --runInBand --runTestsByPath
           src/components/A1Day8FocusedGrammar.test.jsx
+          src/components/A1Day9CasesKnowledgeHints.test.jsx
           src/components/A1Day8TranslationLayout.test.jsx
