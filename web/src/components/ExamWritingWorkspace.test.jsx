@@ -70,11 +70,24 @@ describe("Exams Room writing tasks", () => {
     answers.forEach(([name, value]) => {
       fireEvent.change(screen.getByRole("textbox", { name }), { target: { value } });
     });
-    fireEvent.click(screen.getByRole("button", { name: "Formular prüfen" }));
-    expect(await screen.findByText("Richtige Angaben")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Check form" }));
+    expect(await screen.findByText("Correct fields")).toBeInTheDocument();
     expect(screen.getByText("5/5")).toBeInTheDocument();
-    expect(screen.getByText("1/5 erledigt")).toBeInTheDocument();
+    expect(screen.getByText("1/5 completed")).toBeInTheDocument();
     expect(mockSaveAttempt).toHaveBeenCalledTimes(1);
+  });
+
+  test("requires all numbered A1 fields before checking or saving", () => {
+    render(<ExamWritingWorkspace />);
+    fireEvent.change(screen.getByRole("textbox", { name: "(1) Wohnort / PLZ" }), {
+      target: { value: "Berlin" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Check form" }));
+    expect(mockSaveAttempt).not.toHaveBeenCalled();
+    expect(screen.getByText("0/5 completed")).toBeInTheDocument();
+    expect(mockShowToast).toHaveBeenCalledWith(
+      "Please complete every numbered form field before checking.", "info"
+    );
   });
 
   test("keeps separate form and letter drafts when switching Teil and tasks", () => {
@@ -82,30 +95,30 @@ describe("Exams Room writing tasks", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "(1) Wohnort / PLZ" }), {
       target: { value: "Berlin" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Teil 2 · E-Mail" }));
+    fireEvent.click(screen.getByRole("button", { name: "Part 2 · Email" }));
     expect(screen.getByRole("heading", { name: "Hotelzimmer anfragen" })).toBeInTheDocument();
-    const editor = screen.getByPlaceholderText("Beginne mit einer passenden Anrede ...");
+    const editor = screen.getByPlaceholderText("Start with an appropriate German greeting ...");
     fireEvent.change(editor, { target: { value: "Sehr geehrte Damen und Herren," } });
-    fireEvent.click(screen.getByRole("button", { name: "Teil 1 · Formular" }));
+    fireEvent.click(screen.getByRole("button", { name: "Part 1 · Form" }));
     expect(screen.getByRole("textbox", { name: "(1) Wohnort / PLZ" })).toHaveValue("Berlin");
-    fireEvent.click(screen.getByRole("button", { name: "Teil 2 · E-Mail" }));
-    expect(screen.getByPlaceholderText("Beginne mit einer passenden Anrede ..."))
+    fireEvent.click(screen.getByRole("button", { name: "Part 2 · Email" }));
+    expect(screen.getByPlaceholderText("Start with an appropriate German greeting ..."))
       .toHaveValue("Sehr geehrte Damen und Herren,");
   });
 
   test("uses the existing AI and tutor services for text exercises", async () => {
     render(<ExamWritingWorkspace />);
-    fireEvent.click(screen.getByRole("button", { name: "Teil 2 · E-Mail" }));
-    fireEvent.change(screen.getByPlaceholderText("Beginne mit einer passenden Anrede ..."), {
+    fireEvent.click(screen.getByRole("button", { name: "Part 2 · Email" }));
+    fireEvent.change(screen.getByPlaceholderText("Start with an appropriate German greeting ..."), {
       target: { value: "Sehr geehrte Damen und Herren, ich möchte ein Zimmer buchen." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Text analysieren" }));
+    fireEvent.click(screen.getByRole("button", { name: "Analyse my writing" }));
     await waitFor(() => expect(mockMark).toHaveBeenCalledTimes(1));
     await screen.findByTestId("writing-feedback");
     expect(mockMark.mock.calls[0][0]).toMatchObject({
       level: "A1", submissionContext: "exam-room", promptType: "email",
     });
-    fireEvent.click(screen.getByRole("button", { name: "Für Tutor speichern" }));
+    fireEvent.click(screen.getByRole("button", { name: "Send to tutor" }));
     await waitFor(() => expect(mockSaveForTutor).toHaveBeenCalledTimes(1));
     expect(mockSaveForTutor.mock.calls[0][0].source).toBe("exam-room-simple-writing");
   });
