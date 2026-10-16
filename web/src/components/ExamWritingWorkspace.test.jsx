@@ -122,4 +122,40 @@ describe("Exams Room writing tasks", () => {
     await waitFor(() => expect(mockSaveForTutor).toHaveBeenCalledTimes(1));
     expect(mockSaveForTutor.mock.calls[0][0].source).toBe("exam-room-simple-writing");
   });
+  test("C1 Part 2 offers the optional formal-email template with English controls and German content", () => {
+    mockSelectedLevel = "C1";
+    render(<ExamWritingWorkspace />);
+    expect(screen.getByRole("button", { name: "Part 1 · Discussion Post" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Part 2 · Formal Email" }));
+    expect(screen.getByRole("heading", { name: "Move to an Open-Plan Office" })).toBeInTheDocument();
+    const guide = screen.getByTestId("c1-formal-email-guide");
+    expect(guide).toHaveTextContent("Show C1 formal email template");
+    expect(guide).toHaveTextContent("Möglicherweise ließe sich die Situation");
+    expect(guide).toHaveTextContent("Mit freundlichen Grüßen");
+    expect(screen.getByText(/Empfänger\/-in: Ihre Vorgesetzte/)).toBeInTheDocument();
+    expect(screen.getByText(/organisatorische Notwendigkeiten/)).toBeInTheDocument();
+  });
+
+  test("C1 discussion and email tasks send their distinct registered IDs to AI marking", async () => {
+    mockSelectedLevel = "C1";
+    render(<ExamWritingWorkspace />);
+    fireEvent.change(screen.getByPlaceholderText("Write your opinion in German ..."), {
+      target: { value: "Ich bin der Auffassung, dass die Wahl eines Studiums von den eigenen Zielen abhängt." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Analyse my writing" }));
+    await waitFor(() => expect(mockMark).toHaveBeenCalledTimes(1));
+    expect(mockMark.mock.calls[0][0]).toMatchObject({
+      level: "C1", taskId: "c1-discussion-01", promptType: "argument",
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Part 2 · Formal Email" }));
+    fireEvent.change(screen.getByPlaceholderText("Start with an appropriate German greeting ..."), {
+      target: { value: "Sehr geehrte Frau Dr. Menzel, ich möchte eine Lösung vorschlagen." },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Analyse my writing" }));
+    await waitFor(() => expect(mockMark).toHaveBeenCalledTimes(2));
+    expect(mockMark.mock.calls[1][0]).toMatchObject({
+      level: "C1", taskId: "c1-email-01", promptType: "email",
+    });
+  });
+
 });
