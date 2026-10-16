@@ -1,4 +1,6 @@
-import { EXAM_WRITING_MODULES, getExamWritingModule, assessPracticeForm } from "./examWritingWorkspace";
+import { EXAM_WRITING_MODULES, getExamWritingModule, assessPracticeForm, toRegistryWritingTasks } from "./examWritingWorkspace";
+
+const serverTasks = require("../../../functions/data/assessmentTasks.json");
 
 describe("Schreiben per Goethe level", () => {
   test.each([
@@ -73,4 +75,38 @@ describe("Schreiben per Goethe level", () => {
     expect(c2.parts[0].tasks[0].transformations).toHaveLength(4);
     expect(c2.parts[1].tasks).toHaveLength(4);
   });
+  test("uses precisely the ten supplied A2 exercises, with no model answers", () => {
+    const a2 = getExamWritingModule("A2");
+    expect(a2.parts[0].tasks.map(({ id }) => id)).toEqual(
+      ["a2-sms-01", "a2-sms-02", "a2-sms-03", "a2-sms-04", "a2-sms-05"]
+    );
+    expect(a2.parts[1].tasks.map(({ id }) => id)).toEqual(
+      ["a2-email-01", "a2-email-02", "a2-email-03", "a2-email-04", "a2-email-05"]
+    );
+    expect(a2.parts[0].targetWords).toBe("20–30 words");
+    expect(a2.parts[1].targetWords).toBe("30–40 words");
+    a2.parts.forEach((part) => part.tasks.forEach((task) => {
+      expect(task.points).toHaveLength(3);
+      expect(task.example).toBeUndefined();
+      expect(task.situation).toMatch(/Schreiben Sie/);
+    }));
+    expect(a2.parts[0].tasks[0].situation).toContain("Anna");
+    expect(a2.parts[0].tasks[4].situation).toContain("Sarah");
+    expect(a2.parts[1].tasks[0].situation).toContain("Frau Weber");
+    expect(a2.parts[1].tasks[4].situation).toContain("Sonnhof");
+  });
+
+  test("every non-form workspace task is registered for authoritative server marking", () => {
+    const records = toRegistryWritingTasks();
+    expect(records).toHaveLength(40);
+    const ids = records.map(({ id }) => id);
+    expect(new Set(ids).size).toBe(ids.length);
+    records.forEach((task) => {
+      expect(serverTasks.writing[task.id]).toEqual(task);
+    });
+    expect(serverTasks.writing["c2-transformations"].transformations).toHaveLength(4);
+    expect(serverTasks.writing["a2-sms-01"].whatToInclude).toHaveLength(3);
+    expect(serverTasks.writing["a2-email-05"].situation).toContain("Sonnhof");
+  });
+
 });
