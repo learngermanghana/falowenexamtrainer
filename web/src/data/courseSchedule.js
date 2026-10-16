@@ -1000,9 +1000,9 @@ const RAW_COURSE_SCHEDULES = {
       day: 8,
       topic: "Countries and Languages",
       chapter: "4",
-      goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann",
+      goal: "Ask which languages someone speaks, practise the irregular verb sprechen, and use man spricht for languages spoken in a country",
       instruction: "Watch the video, review grammar, and complete your workbook.",
-      grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",
+      grammar_topic: "sprechen (spreche / sprichst / spricht); man spricht",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/z5ClrkL4O3k",
