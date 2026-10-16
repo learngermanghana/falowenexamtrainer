@@ -152,7 +152,7 @@ describe("teacher lecture media regressions", () => {
     expect(lesson.resources.teacherVideo).toEqual(
       expect.objectContaining({
         chapter: "5.14",
-        url: "https://youtu.be/hGK64aXtARk",
+        url: "https://youtu.be/peuEAMRsFKI",
       }),
     );
     expect(lesson.resources.aiVideo).toEqual(
@@ -162,10 +162,11 @@ describe("teacher lecture media regressions", () => {
     );
     expect(lesson.resources.videos).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ url: "https://youtu.be/hGK64aXtARk" }),
+        expect.objectContaining({ url: "https://youtu.be/peuEAMRsFKI" }),
         expect.objectContaining({ url: "https://youtu.be/qWy7yMgwmvQ" }),
       ]),
     );
+    expect(lesson.resources.videos.map((resource) => resource.url)).not.toContain("https://youtu.be/hGK64aXtARk");
   });
 
   test("registers the B1 Day 8 Kapitel 3.8 tutor lecture", () => {
@@ -261,7 +262,7 @@ describe("teacher lecture media regressions", () => {
       expect.objectContaining({
         chapter: "5.14",
         title: "Kapitel 5.14 · Teacher lecture video",
-        url: "https://youtu.be/hGK64aXtARk",
+        url: "https://youtu.be/peuEAMRsFKI",
       }),
     );
   });
