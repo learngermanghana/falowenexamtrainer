@@ -9,31 +9,73 @@ export const EXAM_WRITING_MODULES = Object.freeze({
     minutes: 20,
     parts: [
       part("teil1", "Teil 1 · Formular", "form", null, [
-        task("a1-registration", "Anmeldung zum Ausflug",
-          "Ana Neto möchte am Sonntag eine Busfahrt buchen. Sie reist mit ihrem Mann und zwei Kindern. Sie übernachtet im Hotel Seeblick in Seedorf und bezahlt bar.",
-          ["Lies den Informationstext.", "Trage die Angaben in die passenden Felder ein."], {
-            category: "Formular ausfüllen",
+        task("a1-course-registration", "Anmeldung zum Deutschkurs",
+          "Ihre Kollegin Maria Garcia (28 Jahre) wohnt in 10115 Berlin, Hauptstraße 12. Sie möchte einen Intensivkurs Deutsch für Anfänger (A1) buchen. Der Kurs beginnt am 01.11.2026. Sie bezahlt mit Kreditkarte.",
+          ["Lesen Sie die Informationen genau.", "Ergänzen Sie nur die fünf nummerierten Lücken."], {
+            category: "Sprachschule Berlin — Anmeldung",
             formFields: [
-              { key: "name", label: "Name", answer: ["Ana Neto", "Neto, Ana"] },
-              { key: "personen", label: "Anzahl der Personen", answer: ["4", "vier"] },
-              { key: "kinder", label: "Anzahl der Kinder", answer: ["2", "zwei"] },
-              { key: "ort", label: "Ort", answer: ["Seedorf"] },
-              { key: "zahlung", label: "Zahlungsart", answer: ["bar", "Bargeld"] },
+              { key: "name", label: "Name, Vorname", fixed: "Garcia, Maria" },
+              { key: "geburt", label: "Geburtsdatum", fixed: "14.05.1998" },
+              { key: "wohnort", label: "Wohnort / PLZ", number: 1, answer: ["10115 Berlin", "Berlin"] },
+              { key: "kurstyp", label: "Kurstyp", number: 2, answer: ["Intensivkurs"] },
+              { key: "niveau", label: "Sprachniveau", fixed: "A1" },
+              { key: "beginn", label: "Kursbeginn", number: 3, answer: ["01.11.2026", "1.11.2026"] },
+              { key: "zahlung", label: "Bezahlungsart", number: 4, answer: ["Kreditkarte", "mit Kreditkarte"] },
+              { key: "personen", label: "Anzahl der Personen", number: 5, answer: ["1", "eine Person", "1 Person"] },
             ],
-            example: "Beispiel: Name → Ana Neto. Suche die übrigen Informationen im Text.",
           }),
-        task("a1-language-course", "Anmeldung zum Deutschkurs",
-          "Ali Mensah wohnt in Accra. Er möchte ab Montag einen Deutschkurs besuchen. Der Unterricht soll am Abend stattfinden. Seine Telefonnummer ist 024 123 4567.",
-          ["Übertrage nur die Informationen, die im Text stehen.", "Ergänze alle fünf Formularfelder."], {
-            category: "Formular ausfüllen",
+        task("a1-hotel-registration", "Hotel-Anmeldung",
+          "Ihr Bekannter Thomas Novak reist vom 12.08. bis 15.08. mit seiner Frau nach München. Er bucht ein Doppelzimmer mit Frühstück im Hotel Gartenstadt. Er zahlt bar vor Ort.",
+          ["Ergänzen Sie die fünf fehlenden Angaben.", "Verwenden Sie die Informationen aus dem Text."], {
+            category: "Hotel Gartenstadt — Meldeschein",
             formFields: [
-              { key: "name", label: "Vor- und Nachname", answer: ["Ali Mensah"] },
-              { key: "wohnort", label: "Wohnort", answer: ["Accra"] },
-              { key: "beginn", label: "Kursbeginn", answer: ["Montag", "am Montag"] },
-              { key: "zeit", label: "Kurszeit", answer: ["abends", "Abend", "am Abend"] },
-              { key: "telefon", label: "Telefonnummer", answer: ["024 123 4567", "0241234567"] },
+              { key: "name", label: "Name des Gastes", fixed: "Novak, Thomas" },
+              { key: "wohnort", label: "Wohnort", fixed: "Prag" },
+              { key: "gaeste", label: "Anzahl der Gäste", number: 1, answer: ["2", "zwei", "2 Personen"] },
+              { key: "zimmer", label: "Zimmertyp", number: 2, answer: ["Doppelzimmer", "ein Doppelzimmer"] },
+              { key: "fruehstueck", label: "Verpflegung (mit/ohne Frühstück)", number: 3, answer: ["mit Frühstück", "Frühstück"] },
+              { key: "abreise", label: "Abreisetag", number: 4, answer: ["15.08.", "15.08", "15. August"] },
+              { key: "zahlung", label: "Zahlungsweise", number: 5, answer: ["bar", "Barzahlung"] },
             ],
-            example: "Beispiel: Wohnort → Accra.",
+          }),
+        task("a1-library-card", "Bibliotheksausweis",
+          "Ihre Freundin Sarah Jenkins (Studentin) möchte sich in der Stadtbibliothek Köln anmelden. Sie wählt eine Jahreskarte. Ihre Adresse ist Kantstraße 44, 50667 Köln. Telefonnummer: 0176-5544332.",
+          ["Lesen Sie die Situation.", "Ergänzen Sie die vier nummerierten Felder."], {
+            category: "Stadtbibliothek Köln — Kundenkarte",
+            formFields: [
+              { key: "name", label: "Vor- und Nachname", fixed: "Sarah Jenkins" },
+              { key: "status", label: "Beruf / Status", number: 1, answer: ["Studentin"] },
+              { key: "ort", label: "PLZ / Ort", number: 2, answer: ["50667 Köln", "Köln"] },
+              { key: "strasse", label: "Straße, Hausnummer", fixed: "Kantstraße 44" },
+              { key: "telefon", label: "Telefonnummer", number: 3, answer: ["0176-5544332", "01765544332"] },
+              { key: "karte", label: "Kartenart (Monatskarte/Jahreskarte)", number: 4, answer: ["Jahreskarte"] },
+            ],
+          }),
+        task("a1-sports-club", "Beitrittserklärung Sportverein",
+          "Herr Jan Kowalski, geboren am 03.02.1990, möchte einen Tanzkurs im Sportverein Aktiv Halle besuchen. Der Kurs findet jeden Donnerstag statt. Er möchte für 6 Monate Mitglied bleiben. Die Gebühr wird per Bankeinzug (SEPA) bezahlt.",
+          ["Übertragen Sie die richtigen Angaben.", "Ergänzen Sie alle fünf Felder."], {
+            category: "Sportverein Aktiv Halle — Mitgliedsantrag",
+            formFields: [
+              { key: "name", label: "Name, Vorname", fixed: "Kowalski, Jan" },
+              { key: "geburt", label: "Geburtsdatum", number: 1, answer: ["03.02.1990", "3.2.1990"] },
+              { key: "kurs", label: "Sportart / Kurs", number: 2, answer: ["Tanzkurs", "Tanzen"] },
+              { key: "tag", label: "Kurstag", number: 3, answer: ["Donnerstag"] },
+              { key: "dauer", label: "Dauer der Mitgliedschaft", number: 4, answer: ["6 Monate", "sechs Monate"] },
+              { key: "zahlung", label: "Bezahlungsart", number: 5, answer: ["Bankeinzug", "SEPA", "SEPA-Bankeinzug"] },
+            ],
+          }),
+        task("a1-repair-form", "Reparaturauftrag Kundendienst",
+          "Frau Elena Rossi ruft beim Kundendienst an. Ihre Waschmaschine der Marke Bosch (Modell Maxx 6) ist kaputt. Der Techniker soll am 20.10.2026 am Nachmittag kommen. Kontakt per E-Mail: elena.rossi@email.com.",
+          ["Lesen Sie die Kundendaten.", "Ergänzen Sie die fünf fehlenden Angaben."], {
+            category: "Kundendienst Elektro — Reparaturauftrag",
+            formFields: [
+              { key: "name", label: "Kundenname", fixed: "Elena Rossi" },
+              { key: "email", label: "E-Mail-Adresse", number: 1, answer: ["elena.rossi@email.com"] },
+              { key: "geraet", label: "Gerät / Marke", number: 2, answer: ["Waschmaschine / Bosch", "Waschmaschine Bosch", "Bosch Waschmaschine"] },
+              { key: "modell", label: "Modellbezeichnung", number: 3, answer: ["Maxx 6"] },
+              { key: "datum", label: "Gewünschter Termin (Datum)", number: 4, answer: ["20.10.2026", "20.10.26"] },
+              { key: "tageszeit", label: "Tageszeit (Vormittag/Nachmittag)", number: 5, answer: ["Nachmittag", "am Nachmittag"] },
+            ],
           }),
       ], "Übertrage die Angaben aus dem Text in ein Formular."),
       part("teil2", "Teil 2 · E-Mail", "email", "ca. 30 Wörter", [
@@ -239,7 +281,7 @@ export const normalizeWritingField = (value) =>
   String(value || "").toLocaleLowerCase("de").replace(/[.,\s-]+/g, " ").trim();
 
 export const assessPracticeForm = (taskConfig, values = {}) => {
-  const fields = taskConfig?.formFields || [];
+  const fields = (taskConfig?.formFields || []).filter((field) => !field.fixed);
   const checks = fields.map((field) => ({
     key: field.key,
     correct: field.answer.some((answer) => normalizeWritingField(answer) === normalizeWritingField(values[field.key])),
