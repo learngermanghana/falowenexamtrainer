@@ -845,13 +845,13 @@
     "title": "Goethe A2 Speaking Mock",
     "assignmentId": "A2-8.22",
     "assignmentType": "Goethe Speaking Mock",
+    "kind": "schreiben_sprechen",
     "grammarPage": "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
     "workbookRoute": "/campus/course/a2-day-22-die-woche-planung-workbook",
     "video": "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "published",
-    "kind": "schreiben_sprechen"
+    "contentStatus": "published"
   },
   {
     "id": "A2-9.23",
@@ -1302,11 +1302,11 @@
     "title": "Goethe B1 Speaking Mock",
     "assignmentId": "B1-7.23",
     "assignmentType": "Goethe Speaking Mock",
+    "kind": "schreiben_sprechen",
     "workbookRoute": "",
     "submissionRequired": true,
     "progressionEligible": true,
-    "contentStatus": "planned",
-    "kind": "schreiben_sprechen"
+    "contentStatus": "published"
   },
   {
     "id": "B1-8.24",
