@@ -9,6 +9,7 @@ import { buildWritingHistoryRecord } from "./WritingHistorySection";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 import { assessPracticeForm, getExamWritingModule } from "../data/examWritingWorkspace";
 import { examWritingTitle, examWritingCategory } from "../data/examWritingEnglishCopy";
+import { C1_FORMAL_EMAIL_TEMPLATE } from "../data/c1FormalEmailTemplate";
 import "./ExamWritingWorkspace.css";
 
 const CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
@@ -294,6 +295,18 @@ export default function ExamWritingWorkspace() {
           <ol>{task.points.map((point, i) => <li key={i}>{point}</li>)}</ol>
           <p className="few-muted">{part.description || ("Write " + (part.targetWords || "your response")
             + ". Cover every point in the German task and organise your answer clearly.")}</p>
+          {level === "C1" && part.id === "teil2" && (
+            <details className="few-sample" data-testid="c1-formal-email-guide">
+              <summary>Show C1 formal email template (optional practice help)</summary>
+              <p>Use this structure to cover all four German content points. Adapt or shorten the phrases to about 120 words; do not copy the entire example.</p>
+              {C1_FORMAL_EMAIL_TEMPLATE.map(({ phrase, meaning }) => (
+                <div key={phrase} className="few-template-section">
+                  <strong>{phrase}</strong>
+                  <pre lang="de">{meaning}</pre>
+                </div>
+              ))}
+            </details>
+          )}
           {task.example && part.format !== "form" && <details className="few-sample">
             <summary>Show sample answer (practice help)</summary>
             <p>Use this example to learn the format, not as your own answer.</p>
