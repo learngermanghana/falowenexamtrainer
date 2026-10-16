@@ -158,6 +158,7 @@ import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { useToast } from "./context/ToastContext";
+import { announceExamSuccess } from "./services/interactionFeedback";
 import { isFirebaseConfigured, listenForForegroundMessages } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
@@ -1555,18 +1556,24 @@ const ExamArea = ({ onBack }) => {
   };
   const activeExamHero = examHeroConfig[examSection];
 
+  const openExamSection = (tab) => {
+    if (examSection === tab.key && !sampleId) return;
+    announceExamSuccess(`${tab.label} opened successfully.`);
+    navigate(`/exams/${tab.key}`);
+  };
+
   return (
     <>
       <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
         <div className="nav-row exam-nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
-          <button style={styles.secondaryButton} onClick={onBack}>
+          <button style={styles.secondaryButton} onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>
             {t("appNav.backHome")}
           </button>
           {tabs.map((tab) => (
             <button
               key={tab.key}
               style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-              onClick={() => navigate(`/exams/${tab.key}`)}
+              onClick={() => openExamSection(tab)}
             >
               {tab.label}
             </button>
@@ -1579,10 +1586,10 @@ const ExamArea = ({ onBack }) => {
             <span aria-hidden="true" className="mobile-exam-menu__chevron">⌄</span>
           </summary>
           <nav className="mobile-exam-menu__links" aria-label="Exam Room sections">
-            <button type="button" onClick={onBack}>← {t("appNav.backHome")}</button>
+            <button type="button" onClick={() => { announceExamSuccess("Home opened successfully."); onBack(); }}>← {t("appNav.backHome")}</button>
             {tabs.map((tab) => (
               <button key={tab.key} type="button" aria-current={examSection === tab.key ? "page" : undefined}
-                onClick={() => navigate(`/exams/${tab.key}`)}>
+                onClick={() => openExamSection(tab)}>
                 {tab.label}
               </button>
             ))}
@@ -1613,6 +1620,7 @@ const ExamArea = ({ onBack }) => {
                 onClick={() => {
                   if (option === level) return;
                   setLevel(option);
+                  announceExamSuccess(`${option} exam level selected successfully.`);
                   // A sample URL contains its original CEFR level; leave it before switching.
                   if (sampleId) navigate(`/exams/${examSection}`);
                 }}

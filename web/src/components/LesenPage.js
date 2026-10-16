@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
@@ -74,6 +75,10 @@ const SampleList = ({ level, samples, onOpen }) => (
 
 const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const navigate = useNavigate();
+  const openReadingSample = (route, message = "Lesen practice opened successfully.") => {
+    announceExamSuccess(message);
+    navigate(route);
+  };
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
@@ -89,7 +94,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
       return (
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <h2 style={{ margin: 0 }}>C1 Lesen sample not found</h2>
-          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/lesen")}>
+          <button type="button" style={styles.secondaryButton} onClick={() => openReadingSample("/exams/lesen", "Lesen samples opened successfully.")}>
             Back to Lesen samples
           </button>
         </section>
@@ -101,7 +106,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <SampleList
           level="C1"
           samples={samples}
-          onOpen={(sample) => navigate(`/exams/lesen/c1/${sample.slug}`)}
+          onOpen={(sample) => openReadingSample(`/exams/lesen/c1/${sample.slug}`, `${sample.label} opened successfully.`)}
         />
       );
     }
@@ -129,7 +134,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <SampleList
           level={normalizedLevel}
           samples={samples}
-          onOpen={(sample) => navigate(`/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}`)}
+          onOpen={(sample) => openReadingSample(`/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}`, `${sample.label} opened successfully.`)}
         />
       );
     }

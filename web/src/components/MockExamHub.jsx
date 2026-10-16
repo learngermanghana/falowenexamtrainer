@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import "./MockExamHub.css";
 
 export default function MockExamHub({
@@ -45,7 +46,7 @@ export default function MockExamHub({
             <p>{section.description}</p>
             <div className="mock-exam-hub-actions">
               {(section.actions || []).map((action) => (
-                <Link key={action.to} to={action.to}>{action.label}</Link>
+                <Link key={action.to} to={action.to} onClick={() => announceExamSuccess(`${section.title} opened successfully.`)}>{action.label}</Link>
               ))}
             </div>
           </article>
@@ -58,7 +59,7 @@ export default function MockExamHub({
           Continue in the Exams Room for section practice, mock history and future question sets.
         </p>
         <div>
-          <Link to="/exams/overview">Open Exams Room</Link>
+          <Link to="/exams/overview" onClick={() => announceExamSuccess("Exam Room opened successfully.")}>Open Exams Room</Link>
           {exam.officialPracticeUrl ? (
             <a href={exam.officialPracticeUrl} target="_blank" rel="noreferrer">
               Official Goethe {exam.level} practice

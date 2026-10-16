@@ -103,6 +103,14 @@ export const playFeedbackSound = async (kind = "info") => {
   return true;
 };
 
+// Exams Room only: lightweight success feedback, not a push notification.
+// The mounted ToastProvider renders the toast and plays its existing success chime.
+export const announceExamSuccess = (message) => {
+  if (!message || typeof window === "undefined") return false;
+  window.dispatchEvent(new CustomEvent("falowen:exam-success", { detail: { message } }));
+  return true;
+};
+
 export const sendBrowserNotification = async ({ title, body, tag } = {}) => {
   if (typeof window === "undefined" || typeof Notification === "undefined") return false;
   let permission = Notification.permission;

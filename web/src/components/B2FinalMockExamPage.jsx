@@ -3,6 +3,7 @@ import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import WritingMistakeList from "./WritingMistakeList";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
@@ -1037,6 +1038,7 @@ function B2FinalMockExamPageAttempt() {
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [pageError, setPageError] = useState("");
+  const savedB2ResultToastRef = useRef("");
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
@@ -1077,6 +1079,10 @@ function B2FinalMockExamPageAttempt() {
     })
       .then((result) => {
         if (cancelled || !result?.scoreDocId) return;
+        if (savedB2ResultToastRef.current !== attemptId) {
+          savedB2ResultToastRef.current = attemptId;
+          announceExamSuccess("B2 mock result saved successfully.");
+        }
         setState((current) => ({
           ...current,
           completedAt: current.completedAt || completedAt,
@@ -1102,6 +1108,7 @@ function B2FinalMockExamPageAttempt() {
   }, [now, state.completed, state.deadlineMs, state.stage, state.started]);
 
   const start = () => {
+    announceExamSuccess(state.started ? "B2 mock resumed successfully." : "B2 mock started successfully.");
     setState((current) => {
       const stage = current.stage || "teil1";
       const duration = SECTION_DURATIONS[stage];
@@ -1226,6 +1233,7 @@ function B2FinalMockExamPageAttempt() {
       started: true,
       deadlineMs: Date.now() + SECTION_DURATIONS.teil2 * 1000,
     }));
+    announceExamSuccess("Lesen Teil 1 completed. Continue to Teil 2.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1236,6 +1244,7 @@ function B2FinalMockExamPageAttempt() {
       started: true,
       deadlineMs: Date.now() + SECTION_DURATIONS.teil3 * 1000,
     }));
+    announceExamSuccess("Lesen Teil 2 completed. Continue to Teil 3.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1247,6 +1256,7 @@ function B2FinalMockExamPageAttempt() {
       started: true,
       deadlineMs: Date.now() + SECTION_DURATIONS.teil4 * 1000,
     }));
+    announceExamSuccess("Lesen Teil 3 completed. Continue to Teil 4.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1259,6 +1269,7 @@ function B2FinalMockExamPageAttempt() {
       completed: false,
       deadlineMs: null,
     }));
+    announceExamSuccess("Lesen completed. Continue to Hören.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1271,6 +1282,7 @@ function B2FinalMockExamPageAttempt() {
       completed: false,
       deadlineMs: null,
     }));
+    announceExamSuccess("Hören Teil 1 completed. Continue to Teil 2.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1283,6 +1295,7 @@ function B2FinalMockExamPageAttempt() {
       completed: false,
       deadlineMs: null,
     }));
+    announceExamSuccess("Hören Teil 2 completed. Continue to Teil 3.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1295,6 +1308,7 @@ function B2FinalMockExamPageAttempt() {
       completed: false,
       deadlineMs: null,
     }));
+    announceExamSuccess("Hören Teil 3 completed. Continue to Teil 4.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1307,6 +1321,7 @@ function B2FinalMockExamPageAttempt() {
       completed: false,
       deadlineMs: Date.now() + SECTION_DURATIONS.schreiben * 1000,
     }));
+    announceExamSuccess("Hören completed. Continue to Schreiben.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1329,6 +1344,7 @@ function B2FinalMockExamPageAttempt() {
         completed: false,
         deadlineMs: Date.now() + SECTION_DURATIONS.sprechen * 1000,
       }));
+      announceExamSuccess("Schreiben completed successfully. Continue to Sprechen.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (markError) {
       setPageError(getMockWritingSubmissionError(markError));
@@ -1356,6 +1372,7 @@ function B2FinalMockExamPageAttempt() {
       completed: true,
       deadlineMs: null,
     }));
+    announceExamSuccess("B2 mock completed! Saving your final result.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 

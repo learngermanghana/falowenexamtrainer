@@ -4,6 +4,7 @@ import { arrangeMockChoices } from "../utils/mockChoicePresentation";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import { getMockWritingSubmissionError } from "../services/mockWritingSubmissionError";
 import { useAuth } from "../context/AuthContext";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
@@ -225,6 +226,8 @@ export default function B1FinalMockExamPage() {
   const timeoutHandledRef = useRef("");
   const completionSavedRef = useRef("");
   const completionRetryCountRef = useRef(0);
+  const savedCompletionToastRef = useRef("");
+  const savedStageToastRef = useRef("");
   const completionRetryTimerRef = useRef(null);
   const [completionRetryNonce, setCompletionRetryNonce] = useState(0);
 
@@ -252,6 +255,12 @@ export default function B1FinalMockExamPage() {
         sectionScores: exam.sectionScores,
         status: "in_progress",
         overall: exam.overall,
+      }).then(() => {
+        const stageKey = `${exam.attemptInfo.attemptId}:${exam.stage}`;
+        if (savedStageToastRef.current !== stageKey) {
+          savedStageToastRef.current = stageKey;
+          announceExamSuccess("Mock progress saved successfully.");
+        }
       }).catch((saveError) => {
         console.error("Could not autosave B1 mock", saveError);
       });
@@ -287,6 +296,10 @@ export default function B1FinalMockExamPage() {
           throw new Error(response.completionSync.error || "Could not sync final B1 mock result.");
         }
 
+        if (savedCompletionToastRef.current !== attemptId) {
+          savedCompletionToastRef.current = attemptId;
+          announceExamSuccess("B1 mock result saved successfully.");
+        }
         completionRetryCountRef.current = 0;
         if (completionRetryTimerRef.current) {
           window.clearTimeout(completionRetryTimerRef.current);
@@ -350,6 +363,8 @@ export default function B1FinalMockExamPage() {
       sectionDeadlineMs: Date.now() + SECTION_DURATIONS[stage] * 1000,
     }));
     timeoutHandledRef.current = "";
+    const previousSection = { hoeren: "Lesen", schreiben: "Hören", sprechen: "Schreiben" }[stage];
+    if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -393,6 +408,7 @@ export default function B1FinalMockExamPage() {
             firstAttempt: response.firstAttempt,
           },
         });
+        announceExamSuccess("B1 mock resumed successfully.");
         return;
       }
 
@@ -406,6 +422,7 @@ export default function B1FinalMockExamPage() {
           firstAttempt: response.firstAttempt,
         },
       });
+      announceExamSuccess("B1 mock started successfully.");
     } catch (startError) {
       setError(startError?.response?.data?.error || startError?.message || "Could not start the B1 mock.");
     } finally {
@@ -471,6 +488,7 @@ export default function B1FinalMockExamPage() {
         completed: true,
       };
     });
+    announceExamSuccess("B1 mock completed! Saving your final result.");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 

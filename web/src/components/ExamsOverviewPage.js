@@ -4,6 +4,7 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { EXAM_SKILLS, buildExamRoomCoach } from "../lib/examRoomCoach";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import { getReadingPracticeHistory, getReadingPracticeStudentKey } from "../services/readingPracticeHistory";
 import {
   getLocalDailyWarmup,
@@ -22,6 +23,10 @@ const readableDate = (value) => {
 
 export default function ExamsOverviewPage() {
   const navigate = useNavigate();
+  const openPractice = (path, message) => {
+    announceExamSuccess(message);
+    navigate(path);
+  };
   const { level } = useExam();
   const { user, idToken, studentProfile } = useAuth();
   const currentLevel = String(level || "A1").toUpperCase();
@@ -120,7 +125,7 @@ export default function ExamsOverviewPage() {
         type="button"
         className="exam-room-mock-entry"
         aria-label={hasFullMock ? "Start or resume a full mock exam" : "Browse available exam practice"}
-        onClick={() => navigate("/exams/mocks")}
+        onClick={() => openPractice("/exams/mocks", "Mock Exams opened successfully.")}
       >
         <span className="exam-room-mock-icon" aria-hidden="true">📝</span>
         <span className="exam-room-mock-copy">
@@ -149,7 +154,7 @@ export default function ExamsOverviewPage() {
                 type="button"
                 aria-label={"Practise " + skill.title}
                 className={"exam-room-skill" + (suggested ? " exam-room-skill-recommended" : "")}
-                onClick={() => navigate(skill.path)}
+                onClick={() => openPractice(skill.path, `${skill.title} practice opened successfully.`)}
               >
                 <span>
                   <span className="exam-room-skill-top">
@@ -184,7 +189,7 @@ export default function ExamsOverviewPage() {
                 ? "Your saved warm-up is waiting."
                 : "A short German task for your level."}</p>
           </div>
-          <button type="button" className="exam-room-text-action" onClick={() => navigate("/exams/question")}>
+          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/question", "Daily exam practice opened successfully.")}>
             {dailyDone ? "Review →" : localDaily.hasDraft ? "Continue →" : "Start →"}
           </button>
         </div>
@@ -193,7 +198,7 @@ export default function ExamsOverviewPage() {
             <h3>Your recent practice</h3>
             <p>Your latest recorded results.</p>
           </div>
-          <button type="button" className="exam-room-text-action" onClick={() => navigate("/exams/file")}>
+          <button type="button" className="exam-room-text-action" onClick={() => openPractice("/exams/file", "My Exam File opened successfully.")}>
             Exam File →
           </button>
         </div>

@@ -1,5 +1,6 @@
 import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
@@ -84,9 +85,13 @@ function A2Mock2ExamHubAttempt(){
    if(i<0)return current;
    return {...current,stage:i===3?"result":ORDER[i+1]};
   });
+  announceExamSuccess(stage === "sprechen"
+    ? "A2 Mock 2 completed. Review your progress."
+    : `${{ lesen: "Lesen", hoeren: "Hören", schreiben: "Schreiben" }[stage] || "Mock"} completed. Continue to the next section.`);
   window.scrollTo({top:0,behavior:"smooth"});
- },[STORAGE]);
+ },[STORAGE, stage]);
  const start = () => {
+  announceExamSuccess("A2 Mock 2 started successfully.");
   setFlow({stage:"lesen",startedAt:Date.now()});
   window.scrollTo({top:0,behavior:"smooth"});
  };
@@ -101,6 +106,7 @@ function A2Mock2ExamHubAttempt(){
    setFlow({ stage: "intro", startedAt: null });
    setProgress(getProgress(STORAGE));
    setResetError("");
+   announceExamSuccess("A2 Mock 2 is ready for a new attempt.");
   } catch (_) { setResetError("Der Verlauf konnte nicht gespeichert werden. Ihr bisheriger Versuch wurde nicht zurückgesetzt."); }
  };
  const screens = {
