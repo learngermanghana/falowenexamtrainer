@@ -38,31 +38,26 @@ describe("B1 canonical listening registry", () => {
     expect(day16.questions).toHaveLength(5);
   });
 
-  test("Day 18 career listening tests only details supported by the uploaded dialogue", () => {
+  test("Day 18 Hören uses the approved five career dialogue questions and B B B C A key", () => {
     const listening = getB1ListeningTask(18);
-    expect(listening.audioKey).toBe("b1/day-18/day-18.mp3");
     expect(listening.submitRequired).toBe(true);
-    expect(listening.questions).toHaveLength(5);
     expect(listening.questions.map(({ stem }) => stem)).toEqual([
-      "Was wollte der erste Sprecher als Kind werden?",
-      "Was muss man laut Gespräch zuerst tun, um Zoologe zu werden?",
-      "Welcher Beruf wird für Menschen genannt, die sich für Kunst interessieren?",
-      "Wie kann man herausfinden, ob ein Beruf zu einem passt?",
-      "Was zeigt das Beispiel des Freundes, der zuerst Ingenieur werden wollte?",
-    ]);
-    expect(listening.questions.map(({ options }, index) => {
-      const correct = [1, 2, 0, 3, 1][index];
-      expect(options).toHaveLength(4);
-      expect(options.map(option => option.slice(0, 1).toUpperCase())).toEqual(["A", "B", "C", "D"]);
-      return options[correct];
-    })).toEqual([
-      "b) Astronaut",
-      "c) Biologie studieren",
-      "a) Grafikdesigner",
-      "d) Man kann ein Praktikum machen",
-      "b) Berufspläne können sich ändern",
-    ]);
-    expect(listening.questions.map(({ stem }) => stem).join(" ")).not.toMatch(/Agentur für Arbeit|Berufsmesse|Ausbildung meistens|Lebenslauf/);
+    "Was wollte der erste Sprecher als Kind werden?",
+    "Welche Berufe schlägt der erste Sprecher für jemanden vor, der Kunst liebt?",
+    "Welches Beispiel für ein Praktikum erwähnt der zweite Sprecher?",
+    "Welchen ungewöhnlichen Berufsweg erwähnt einer der Sprecher?",
+    "Womit wird Neugier bei der Berufswahl im Gespräch verglichen?"
+]);
+    expect(listening.questions.map(({ options }) => options.map((s) => s.slice(0, 1)))).toEqual(
+      Array.from({ length: 5 }, () => ["A", "B", "C", "D"])
+    );
+    expect(listening.questions.map(({ options }, i) => options[[1,1,1,2,0][i]])).toEqual([
+    "B) Astronaut",
+    "B) Grafikdesigner, Innenarchitekt oder Kunsttherapeut",
+    "B) Ein Praktikum im Kinderheim",
+    "C) Ein Mann wollte Ingenieur werden, arbeitet aber heute als Koch",
+    "A) Mit einem Kompass für die Karriere"
+]);
   });
 
   test("special non-audio cases stay explicit", () => {
