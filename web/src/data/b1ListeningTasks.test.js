@@ -38,6 +38,33 @@ describe("B1 canonical listening registry", () => {
     expect(day16.questions).toHaveLength(5);
   });
 
+  test("Day 18 career listening tests only details supported by the uploaded dialogue", () => {
+    const listening = getB1ListeningTask(18);
+    expect(listening.audioKey).toBe("b1/day-18/day-18.mp3");
+    expect(listening.submitRequired).toBe(true);
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.questions.map(({ stem }) => stem)).toEqual([
+      "Was wollte der erste Sprecher als Kind werden?",
+      "Was muss man laut Gespräch zuerst tun, um Zoologe zu werden?",
+      "Welcher Beruf wird für Menschen genannt, die sich für Kunst interessieren?",
+      "Wie kann man herausfinden, ob ein Beruf zu einem passt?",
+      "Was zeigt das Beispiel des Freundes, der zuerst Ingenieur werden wollte?",
+    ]);
+    expect(listening.questions.map(({ options }, index) => {
+      const correct = [1, 2, 0, 3, 1][index];
+      expect(options).toHaveLength(4);
+      expect(options.map(option => option.slice(0, 1).toUpperCase())).toEqual(["A", "B", "C", "D"]);
+      return options[correct];
+    })).toEqual([
+      "b) Astronaut",
+      "c) Biologie studieren",
+      "a) Grafikdesigner",
+      "d) Man kann ein Praktikum machen",
+      "b) Berufspläne können sich ändern",
+    ]);
+    expect(listening.questions.map(({ stem }) => stem).join(" ")).not.toMatch(/Agentur für Arbeit|Berufsmesse|Ausbildung meistens|Lebenslauf/);
+  });
+
   test("special non-audio cases stay explicit", () => {
     expect(getB1ListeningTask(19).audioKey).toBe("b1/day-19/day-19.mp3");
     expect(getB1ListeningTask(19).submitRequired).toBe(true);
