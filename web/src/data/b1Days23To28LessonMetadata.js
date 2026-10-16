@@ -1,9 +1,9 @@
 const B1_DAYS23_TO28_METADATA = Object.freeze({
   23: Object.freeze({
     chapter: "7.23",
-    title: "Erstes Date – Typische Situationen",
-    goal: "Über typische Situationen beim ersten Date sprechen, Verhalten und Höflichkeit bewerten und eine klare B1-Meinung formulieren.",
-    instruction: "Open the Grammar notes, then complete Teil 1–3, Ref and Submit. Submit Schreiben and Lesen. This lesson intentionally has no Teil 4 · Hören.",
+    title: "Goethe B1 Speaking Mock",
+    goal: "Prüfen Sie Ihre B1-Sprechkompetenz in drei vollständigen Goethe-ähnlichen Aufgaben mit einem KI-Prüfer.",
+    instruction: "Review the grammar and lesson video, then complete Teil 1, Teil 2 and Teil 3 in the speaking mock. Falowen AI marks and saves the completed exam automatically.",
     workbookOnly: false,
   }),
   24: Object.freeze({
