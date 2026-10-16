@@ -1,4 +1,4 @@
-import { WRITING_PROMPTS } from "./writingExamPrompts";
+import { WRITING_PROMPTS } from "./writingExamPrompts.js";
 // Practice-specific writing tasks. These do not replace the graded Goethe mock tasks.
 const task = (id, title, situation, points, extra = {}) => ({ id, title, situation, points, ...extra });
 const part = (id, label, format, targetWords, tasks, description = "") => ({
