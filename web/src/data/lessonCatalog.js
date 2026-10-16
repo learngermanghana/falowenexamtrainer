@@ -1274,7 +1274,7 @@ const lessonCatalog = Object.freeze([
     "assignmentId": "B1-7.23",
     "assignmentType": "Goethe Speaking Mock",
     "kind": "schreiben_sprechen",
-    "workbookRoute": "",
+    "workbookRoute": "/campus/course/lesson/B1/23?view=workbook",
     "submissionRequired": true,
     "progressionEligible": true,
     "contentStatus": "published"
