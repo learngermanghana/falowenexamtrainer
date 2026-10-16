@@ -12,8 +12,8 @@ const read = (relative) => readFileSync(path.join(root, relative), "utf8");
 const page = read("web/src/components/FormingBasicStatementsPage.js");
 assert.ok(page.includes("Welche Sprachen sprichst du?"), "A1 Day 8 must focus on sprechen");
 assert.ok(page.includes("One useful expression: man spricht"), "A1 Day 8 must introduce man spricht");
-assert.ok(page.includes("3. Woher? Wo? Wohin?"), "A1 Day 8 must teach origin, place and destination");
-assert.ok(page.includes("4. nach or in?"), "A1 Day 8 must contrast nach and in");
+assert.ok(page.includes("1. Woher? Wo? Wohin?"), "A1 Day 8 must teach origin, place and destination");
+assert.ok(page.includes("2. nach or in?"), "A1 Day 8 must contrast nach and in");
 assert.ok(page.includes("in die Schweiz"), "A1 Day 8 must explain country-article destinations");
 for (const oldTopic of ["Präteritum", "liegen = to be located", "Four tenses"]) {
   assert.ok(!page.includes(oldTopic), "Old A1 Day 8 grammar topic returned: " + oldTopic);
