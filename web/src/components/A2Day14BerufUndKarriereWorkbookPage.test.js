@@ -36,7 +36,7 @@ describe("A2 Day 14 Beruf und Karriere workbook", () => {
     expect(screen.getByText(/gleiche Person/i)).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "3. When should I use damit?" })).toBeInTheDocument();
     expect(screen.getByText("I am learning German in order to work in Germany.")).toBeInTheDocument();
-    expect(screen.getByText(/to gain work experience/)).toBeInTheDocument();
+    expect(screen.getAllByText(/to gain work experience/).length).toBeGreaterThan(0);
     expect(screen.getByRole("heading", { name: "4. Word order: comma and infinitive position" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "5. Career vocabulary · German and English" })).toBeInTheDocument();
     expect(screen.getByText(/same subject; damit is also correct/i)).toBeInTheDocument();
