@@ -10,31 +10,26 @@ export const A1_DAY8_LISTENING_QUESTIONS = Object.freeze([
     number: 1,
     question: "Woher kommt die Frau?",
     choices: ["Aus Spanien", "Aus Italien", "Aus Deutschland"],
-    correct: "A",
   },
   {
     number: 2,
     question: "Wo wohnt der Mann?",
     choices: ["In Hamburg", "In Berlin", "In Madrid"],
-    correct: "B",
   },
   {
     number: 3,
     question: "Welche Sprachen spricht die Frau?",
     choices: ["Deutsch und Englisch", "Spanisch und ein bisschen Italienisch", "Französisch und Englisch"],
-    correct: "B",
   },
   {
     number: 4,
     question: "Wie oft übt die Frau Deutsch?",
     choices: ["Jeden Tag", "Jede Woche", "Nie"],
-    correct: "A",
   },
   {
     number: 5,
     question: "Was macht die Frau gern in ihrer Freizeit?",
     choices: ["Bücher lesen und spazieren gehen", "Fußball spielen und Musik hören", "Kochen und schwimmen"],
-    correct: "B",
   },
 ]);
 
