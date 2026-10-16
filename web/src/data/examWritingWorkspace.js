@@ -19,7 +19,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   A1: {
     minutes: 20,
     parts: [
-      part("teil1", "Teil 1 · Formular", "form", null, [
+      part("teil1", "Part 1 · Form", "form", null, [
         task("a1-course-registration", "Anmeldung zum Deutschkurs",
           "Ihre Kollegin Maria Garcia (28 Jahre) wohnt in 10115 Berlin, Hauptstraße 12. Sie möchte einen Intensivkurs Deutsch für Anfänger (A1) buchen. Der Kurs beginnt am 01.11.2026. Sie bezahlt mit Kreditkarte.",
           ["Lesen Sie die Informationen genau.", "Ergänzen Sie nur die fünf nummerierten Lücken."], {
@@ -88,15 +88,15 @@ export const EXAM_WRITING_MODULES = Object.freeze({
               { key: "tageszeit", label: "Tageszeit (Vormittag/Nachmittag)", number: 5, answer: ["Nachmittag", "am Nachmittag"] },
             ],
           }),
-      ], "Übertrage die Angaben aus dem Text in ein Formular."),
-      part("teil2", "Teil 2 · E-Mail", "email", "ca. 30 Wörter", A1_LETTER_SAMPLES,
-        "Schreibe etwa 30 Wörter mit Anrede, drei Inhaltspunkten, Gruß und Namen."),
+      ], "Copy the details from the German scenario into the form."),
+      part("teil2", "Part 2 · Email", "email", "about 30 words", A1_LETTER_SAMPLES,
+        "Write about 30 words in German with a greeting, all three points, a closing and your name."),
     ],
   },
   A2: {
     minutes: 30,
     parts: [
-      part("teil1", "Teil 1 · SMS", "message", "20–30 Wörter", [
+      part("teil1", "Part 1 · SMS", "message", "20–30 words", [
         task("a2-sms-01", "Verspätung beim Treffen",
           "Sie sind unterwegs in der Stadt und verspäten sich zu einem Treffen mit Ihrer Freundin Anna. Schreiben Sie eine SMS.",
           ["Entschuldigen Sie sich für die Verspätung.", "Nennen Sie den Grund.", "Schlagen Sie einen neuen Treffpunkt und eine neue Uhrzeit vor."],
@@ -118,7 +118,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
           ["Schlagen Sie den Ausflug vor.", "Fragen Sie nach dem Treffpunkt und der Abfahrtszeit.", "Erwähnen Sie, was Sie für das Picknick mitbringen."],
           { category: "SMS · Ausflug" }),
       ]),
-      part("teil2", "Teil 2 · E-Mail", "email", "30–40 Wörter", [
+      part("teil2", "Part 2 · Email", "email", "30–40 words", [
         task("a2-email-01", "Beim Deutschkurs fehlen",
           "Sie besuchen einen Deutschkurs bei Frau Weber. Morgen können Sie nicht zum Unterricht kommen, weil Sie einen Arzttermin haben. Schreiben Sie eine E-Mail.",
           ["Informieren Sie Frau Weber, dass Sie im Unterricht fehlen.", "Nennen Sie den Grund: Arzttermin.", "Bitten Sie um die Hausaufgaben für die nächste Stunde."],
@@ -145,7 +145,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   B1: {
     minutes: 60,
     parts: [
-      part("teil1", "Teil 1 · Persönliche E-Mail", "email", "ca. 80 Wörter", [
+      part("teil1", "Part 1 · Personal Email", "email", "about 80 words", [
         task("b1-invitation", "Eine Einladung absagen",
           "Dein Freund Lukas hat dich zu seiner Geburtstagsfeier am Samstag eingeladen. Du kannst leider nicht kommen. Schreibe ihm eine E-Mail.",
           ["Entschuldige dich für deine Absage.", "Erkläre, warum du nicht kommen kannst.", "Schlage ein Treffen an einem anderen Tag vor."], {
@@ -163,7 +163,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             category: "Freizeit & Reisen", register: "informal",
           }),
       ]),
-      part("teil2", "Teil 2 · Meinungsbeitrag", "argument", "ca. 80 Wörter", [
+      part("teil2", "Part 2 · Opinion Post", "argument", "about 80 words", [
         task("b1-online", "Online lernen oder im Kurs?",
           "In einem Internetforum wird diskutiert: Ist Online-Lernen besser als Unterricht in einer Schule? Schreibe deine Meinung.",
           ["Nenne deine Meinung.", "Begründe sie mit mindestens zwei Argumenten.", "Gib ein Beispiel aus deiner Erfahrung."], {
@@ -176,7 +176,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             category: "Umwelt & Verkehr",
           }),
       ]),
-      part("teil3", "Teil 3 · Formelle E-Mail", "email", "ca. 40 Wörter", [
+      part("teil3", "Part 3 · Formal Email", "email", "about 40 words", [
         task("b1-cancel", "Einen Termin absagen",
           "Du hast morgen einen Termin mit deiner Kursleiterin Frau Müller, kannst aber nicht kommen. Schreibe ihr.",
           ["Entschuldige dich.", "Nenne einen Grund.", "Bitte um einen neuen Termin."], {
@@ -194,7 +194,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   B2: {
     minutes: 75,
     parts: [
-      part("teil1", "Teil 1 · Forumsbeitrag", "argument", "ca. 150 Wörter", [
+      part("teil1", "Part 1 · Forum Post", "argument", "about 150 words", [
         task("b2-homeoffice", "Homeoffice: Chance oder Problem?",
           "In einem Onlineforum wird über Homeoffice diskutiert. Schreiben Sie einen begründeten Beitrag.",
           ["Äußern Sie Ihre Meinung.", "Nennen Sie Gründe und Beispiele.", "Gehen Sie auf Vor- und Nachteile ein.", "Schlagen Sie Alternativen vor."], {
@@ -206,7 +206,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             category: "Umwelt",
           }),
       ]),
-      part("teil2", "Teil 2 · Formelle Nachricht", "email", "ca. 100 Wörter", [
+      part("teil2", "Part 2 · Formal Message", "email", "about 100 words", [
         task("b2-shift", "Arbeitszeit ändern",
           "Sie möchten Ihre Arbeitszeit vorübergehend ändern. Schreiben Sie an Ihre Vorgesetzte.",
           ["Beschreiben Sie Ihre Situation.", "Erklären Sie den Grund.", "Schlagen Sie eine Lösung vor.", "Bitten Sie um ein Gespräch."], {
@@ -223,7 +223,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   C1: {
     minutes: 75,
     parts: [
-      part("teil1", "Teil 1 · Diskussion", "argument", "ca. 230 Wörter", [
+      part("teil1", "Part 1 · Discussion", "argument", "about 230 words", [
         task("c1-ai", "Künstliche Intelligenz im Unterricht",
           "Diskutieren Sie Chancen und Grenzen des Einsatzes künstlicher Intelligenz an Schulen.",
           ["Stellen Sie unterschiedliche Positionen dar.", "Begründen Sie Ihre eigene Haltung.", "Berücksichtigen Sie Gegenargumente.", "Ziehen Sie ein differenziertes Fazit."], {
@@ -235,7 +235,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             category: "Stadtentwicklung",
           }),
       ]),
-      part("teil2", "Teil 2 · Formelle Nachricht", "email", "ca. 120 Wörter", [
+      part("teil2", "Part 2 · Formal Message", "email", "about 120 words", [
         task("c1-application", "Bitte um Projektunterstützung",
           "Sie organisieren ein wissenschaftliches Projekt und möchten eine Institution um Unterstützung bitten.",
           ["Stellen Sie das Projekt vor.", "Begründen Sie die Bedeutung.", "Formulieren Sie Ihre Bitte präzise.", "Schlagen Sie das weitere Vorgehen vor."], {
@@ -252,7 +252,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
   C2: {
     minutes: 80,
     parts: [
-      part("teil1", "Teil 1 · Umformungen", "transformation", null, [
+      part("teil1", "Part 1 · Sentence Transformation", "transformation", null, [
         task("c2-transformations", "Sätze umformulieren",
           "Formulieren Sie die Sätze um. Die Bedeutung muss erhalten bleiben. Nutzen Sie das angegebene Schlüsselwort.",
           ["Achten Sie auf Bedeutung, Satzbau und Grammatik.", "Tragen Sie jede Lösung in das zugehörige Feld ein."], {
@@ -265,7 +265,7 @@ export const EXAM_WRITING_MODULES = Object.freeze({
             ],
           }),
       ]),
-      part("teil2", "Teil 2 · Längerer Text", "argument", "ca. 350 Wörter", [
+      part("teil2", "Part 2 · Extended Writing", "argument", "about 350 words", [
         task("c2-digital", "Die Grenzen der Digitalisierung",
           "Verfassen Sie einen differenzierten argumentativen Text zum Spannungsverhältnis zwischen technologischem Fortschritt und gesellschaftlicher Verantwortung.",
           ["Entwickeln Sie eine nachvollziehbare These.", "Erörtern Sie mehrere Perspektiven.", "Berücksichtigen Sie ein Gegenargument.", "Formulieren Sie einen eigenständigen Schluss."], {
