@@ -16,8 +16,8 @@ describe("A2 Day 14 bilingual um ... zu grammar notes", () => {
 
   test("shows modal and separable-verb word order as well as translated career vocabulary", () => {
     show();
-    expect(screen.getByText(/übernehmen zu können\./)).toBeInTheDocument();
-    expect(screen.getByText(/vorzubereiten\./)).toBeInTheDocument();
+    expect(screen.getAllByText(/übernehmen zu können\./).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/vorzubereiten\./).length).toBeGreaterThan(0);
     expect(screen.getByText("to take further professional training")).toBeInTheDocument();
     expect(screen.getByText("to apply for a position")).toBeInTheDocument();
   });
