@@ -16,6 +16,8 @@ import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import LegalFooter from "./LegalFooter";
 import { detectLevelKey } from "../lib/day0Workbook";
+import { getSessionHomeMotivation } from "../data/homeMotivationMessages";
+import "./GeneralHomeWelcome.css";
 
 const day0WorkbookByLevel = {
   A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
@@ -36,9 +38,16 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
   const levelKey = detectLevelKey(studentProfile);
   const courseLabel = levelKey ? `${levelKey} course` : "your course";
+  const learnerId = studentProfile?.uid || studentProfile?.id || studentProfile?.studentCode
+    || studentProfile?.studentcode || studentProfile?.email;
+  const motivation = useMemo(
+    () => getSessionHomeMotivation({ studentId: learnerId, level: levelKey }),
+    [learnerId, levelKey],
+  );
 
   return (
     <section
+      className="falowen-student-welcome"
       style={{
         ...styles.card,
         background: "linear-gradient(135deg, #312e81, #2563eb)",
@@ -50,37 +59,59 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
       }}
     >
       <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>{t("generalHome.welcome.eyebrow")}</p>
-      <h2 style={{ margin: 0, fontSize: 24, letterSpacing: -0.3 }}>
-        {t("generalHome.welcome.title", { studentName })}
+      <h2 data-testid="home-motivation-heading" className="falowen-welcome-heading" style={{ margin: 0, fontSize: "clamp(20px, 4vw, 26px)", lineHeight: 1.3, letterSpacing: -0.3, overflowWrap: "break-word" }}>
+        {motivation.id === "fallback"
+          ? t("generalHome.welcome.title", { studentName })
+          : `${studentName}, ${motivation.headline}`}
       </h2>
-      <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
+      <p className="falowen-welcome-description falowen-welcome-description--desktop" style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
         Your {courseLabel} is ready. Use Campus for daily learning, and use Exams Room for exam practice.
       </p>
+      <p className="falowen-welcome-description falowen-welcome-description--mobile" style={{ ...styles.helperText, color: "#e0e7ff", margin: 0 }}>
+        Your {courseLabel} is ready. Keep learning in Campus.
+      </p>
 
-      <PrimaryActionBar align="start" wrap>
+      <div className="falowen-welcome-actions">
         <button
           type="button"
+          className="falowen-welcome-primary"
           style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d", borderColor: "#bbf7d0" }}
           onClick={onContinueLearning}
         >
-          Open Campus
+          Continue learning
         </button>
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
-          onClick={onOpenAccount}
-        >
-          Account
-        </button>
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
-          onClick={onJoinZoom}
-        >
-          {t("generalHome.welcome.joinZoom")}
-        </button>
-        <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
-      </PrimaryActionBar>
+        <div className="falowen-welcome-secondary" role="group" aria-label="More student actions">
+          <button
+            type="button"
+            className="falowen-welcome-secondary-button"
+            style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+            onClick={onOpenAccount}
+          >
+            Account
+          </button>
+          <button
+            type="button"
+            className="falowen-welcome-secondary-button"
+            style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+            onClick={onJoinZoom}
+            aria-label={t("generalHome.welcome.joinZoom")}
+          >
+            <span className="falowen-welcome-zoom-desktop">{t("generalHome.welcome.joinZoom")}</span>
+            <span className="falowen-welcome-zoom-mobile" aria-hidden="true">Zoom</span>
+          </button>
+          <div className="falowen-welcome-exam-badge">
+            <ExamReadinessBadge variant="button" studentProfile={studentProfile} onOpenExamFile={onOpenExamFile} />
+          </div>
+          <button
+            type="button"
+            className="falowen-welcome-secondary-button falowen-welcome-mobile-exam"
+            style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+            onClick={onOpenExamFile}
+          >
+            Exam File
+          </button>
+        </div>
+      </div>
     </section>
   );
 };

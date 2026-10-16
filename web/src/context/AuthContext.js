@@ -30,6 +30,7 @@ import {
   GoogleAuthProvider,
 } from "../firebase";
 import { getBackendUrl } from "../services/backendUrl";
+import { clearHomeMotivationSession } from "../data/homeMotivationMessages";
 
 const AuthContext = createContext();
 
@@ -452,6 +453,9 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
       const nextUserId = firebaseUser?.uid ?? null;
       const userChanged = previousUserId.current !== nextUserId;
+      // A real sign-out ends the login's motivation rotation, including when
+      // authentication changes outside the homepage/logout button.
+      if (userChanged && !firebaseUser) clearHomeMotivationSession();
       if (userChanged) {
         setLoading(true);
         setStudentProfile(null);
@@ -998,6 +1002,7 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(
     async () => {
       if (!isFirebaseConfigured || !auth) {
+        clearHomeMotivationSession();
         setUser(null);
         setStudentProfile(null);
         setIdToken(null);
@@ -1011,6 +1016,7 @@ export const AuthProvider = ({ children }) => {
         }
       }
       await signOut(auth);
+      clearHomeMotivationSession();
       setMessagingToken(null);
       setNotificationStatus("idle");
       setStudentProfile(null);

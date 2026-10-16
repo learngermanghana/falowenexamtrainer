@@ -1,0 +1,99 @@
+/* Signed-in home only; keep the visitor landing page and Campus dashboard untouched. */
+.falowen-student-welcome { min-width: 0; }
+.falowen-welcome-description--mobile { display: none; }
+.falowen-welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+}
+.falowen-welcome-primary {
+  min-height: 44px;
+  padding: 10px 20px !important;
+  font-weight: 800 !important;
+}
+.falowen-welcome-secondary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-width: 0;
+}
+.falowen-welcome-secondary-button {
+  min-height: 44px;
+  padding: 10px 16px !important;
+}
+.falowen-welcome-mobile-exam { display: none; }
+.falowen-welcome-zoom-mobile { display: none; }
+.falowen-welcome-actions button:focus-visible {
+  outline: 3px solid #fef08a;
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .falowen-student-welcome {
+    padding: 12px 14px !important;
+    margin-bottom: 8px !important;
+    gap: 7px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.16) !important;
+  }
+  .falowen-student-welcome > p:first-child {
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+  .falowen-welcome-heading {
+    font-size: clamp(18px, 5vw, 21px) !important;
+    line-height: 1.22 !important;
+    overflow-wrap: anywhere;
+  }
+  .falowen-welcome-description--desktop { display: none !important; }
+  .falowen-welcome-description--mobile {
+    display: block;
+    font-size: 12px !important;
+    line-height: 1.35 !important;
+  }
+  .falowen-welcome-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+    width: 100%;
+  }
+  .falowen-welcome-primary {
+    display: block;
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 12px !important;
+    border-radius: 12px !important;
+    font-size: 15px !important;
+  }
+  .falowen-welcome-secondary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+  }
+  .falowen-welcome-secondary-button {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 4px !important;
+    border-radius: 10px !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
+  /* The desktop readiness status button contains a progress badge and is too
+     wide for a phone. Retain the destination as one clear, compact touch target. */
+  .falowen-welcome-zoom-desktop { display: none; }
+  .falowen-welcome-zoom-mobile { display: inline; }
+  .falowen-welcome-exam-badge { display: none; }
+  .falowen-welcome-mobile-exam {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

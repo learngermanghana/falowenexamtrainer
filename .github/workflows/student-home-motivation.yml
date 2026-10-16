@@ -1,0 +1,42 @@
+name: Signed-in home motivation
+
+on:
+  pull_request:
+    paths:
+      - "web/src/data/homeMotivationMessages.js"
+      - "web/src/data/homeMotivationMessages.test.js"
+      - "web/src/components/GeneralHome.js"
+      - "web/src/components/GeneralHomeWelcome.css"
+      - "web/src/components/GeneralHomeMobileWelcome.test.js"
+      - "web/src/context/AuthContext.js"
+      - ".github/workflows/student-home-motivation.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/data/homeMotivationMessages.js"
+      - "web/src/data/homeMotivationMessages.test.js"
+      - "web/src/components/GeneralHome.js"
+      - "web/src/components/GeneralHomeWelcome.css"
+      - "web/src/components/GeneralHomeMobileWelcome.test.js"
+      - "web/src/context/AuthContext.js"
+      - ".github/workflows/student-home-motivation.yml"
+
+jobs:
+  verify-home-motivation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install website dependencies
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+      - name: Verify session rotation and homepage regressions
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/data/homeMotivationMessages.test.js src/components/GeneralHomeMobileWelcome.test.js src/components/GeneralHomeClassIdentity.test.js src/components/HomeAndExamCopyCleanup.test.js src/components/SignedInHomeClassSchedule.test.jsx
+      - name: Build student website
+        working-directory: web
+        run: npx vite build
