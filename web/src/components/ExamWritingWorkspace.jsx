@@ -148,7 +148,7 @@ export default function ExamWritingWorkspace() {
       }
       const result = assessPracticeForm(selected, fieldValues);
       const summary = String(result.correct) + " von " + String(result.total) + " Feldern richtig ausgefüllt.";
-      changeRecord(selected.id, { feedback: { type: "form", ...result, summary }, completed: true });
+      changeRecord(selected.id, { feedback: { type: "form", ...result, summary }, completed: result.correct === result.total });
       const response = (selected.formFields || []).filter((f) => !f.fixed)
         .map((f) => String(f.number) + ". " + valueOf(fieldValues[f.key])).join("\n");
       void saveAttempt(selected, response, { score: result.correct, maxScore: result.total,
