@@ -62,6 +62,7 @@ function createDb({ session, existingCheckin = null }) {
     writes,
     tx,
     collection: jest.fn((name) => {
+      if (name === "accountDeletionRequests") return { doc: () => ({ get: async () => ({ exists: false, data: () => ({}) }) }) };
       if (name === "students") return { doc: () => ({ get: async () => studentSnap }), where: jest.fn() };
       if (name === "attendance") return { doc: () => ({ collection: () => ({ doc: () => sessionRef }) }) };
       throw new Error(`unexpected collection ${name}`);
