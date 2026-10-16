@@ -2,8 +2,8 @@ import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import ExamWritingWorkspace from "./ExamWritingWorkspace";
 
-let selectedLevel = "A1";
-const mockSetLevel = jest.fn((value) => { selectedLevel = value; });
+let mockSelectedLevel = "A1";
+const mockSetLevel = jest.fn((value) => { mockSelectedLevel = value; });
 const mockShowToast = jest.fn();
 const mockMark = jest.fn();
 const mockSaveAttempt = jest.fn();
@@ -11,7 +11,7 @@ const mockSaveForTutor = jest.fn();
 
 jest.mock("../context/ExamContext", () => ({
   useExam: () => ({
-    level: selectedLevel,
+    level: mockSelectedLevel,
     setLevel: mockSetLevel,
     accessibleLevels: ["A1", "A2", "B1", "B2", "C1", "C2"],
   }),
@@ -43,7 +43,7 @@ jest.mock("./WritingFeedbackCard", () => ({
 
 describe("Exams Room writing tasks", () => {
   beforeEach(() => {
-    selectedLevel = "A1";
+    mockSelectedLevel = "A1";
     window.localStorage.clear();
     jest.clearAllMocks();
     mockSaveAttempt.mockResolvedValue(true);
