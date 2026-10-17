@@ -1220,6 +1220,29 @@ describe("bounded, fair planning assessments", () => {
     expect(stored.assessment.score).toBe(0);
   });
 
+
+  test("B1 unproductive repeated acknowledgements finish and cannot receive a passing Teil mark",async()=>{
+    const api=setup();
+    const session=await startTaskFlow(api,"B1",1,"simulation","Einen kranken Freund oder Lehrer besuchen");
+    for(let i=0;i<5;i++){
+      const reply=await answerExam(api,session,"Ja.");
+      expect(reply.code).toBe(200);
+      expect(reply.payload.taskReady).toBe(i===4);
+    }
+    api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{
+      message:{content:JSON.stringify({
+        taskScores:[1,2,3,4,5].map(step=>({step,score:2,comment:"AI overly generous"})),
+        summary:"Little planning contribution",strength:"Polite tone",
+        priority:"Use meaningful German suggestions",
+      })},
+    }]});
+    const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+    expect(feedback.code).toBe(200);
+    expect(feedback.payload.assessment.percent).toBeLessThan(60);
+    expect(feedback.payload.assessment.participationAudit.lowInformationTurns).toBe(5);
+    expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).completed).toBe(true);
+  });
+
   test("stale or repeated Skip clicks never consume a second exam turn",async()=>{
     const api=setup();
     const session=await startTaskFlow(api,"A2",3);
