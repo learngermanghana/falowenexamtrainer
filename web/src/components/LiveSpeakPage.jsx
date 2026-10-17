@@ -28,7 +28,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset, gradedCourseMock = false }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -739,7 +739,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       ) : null}
 
       {supportedExaminer && !examFeedback ? <GoetheExamTaskCard flow={session?.examFlow || taskPreview} topic={session?.examTask?.prompt || examTask?.prompt} active={Boolean(session)}/> : null}
-      {examinerEntry && details?.openTesting && !session && !loading ? (
+      {examinerEntry && !gradedCourseMock && details?.openTesting && !session && !loading ? (
         <p role="status" className="speaking-testing-access-note">
           AI examiner testing is available. Start or repeat an exam without pilot credits.
         </p>
@@ -952,11 +952,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   maxLength={session.maxTranscriptChars || 600}
                   onChange={event=>setRecognizedText(event.target.value)}
                   style={{minWidth:0,minHeight:60,flex:1,resize:"vertical",border:"1px solid #cbd5e1",borderRadius:12,padding:10,fontSize:16,background:pending?"#fff":"#f8fafc"}}/>
-                {pending ? <button type="button" aria-label="Confirm answer" title="Send my answer"
+                {pending ? <button type="button" aria-label="Confirm answer" title="Confirm answer"
                   onClick={confirmTranscript}
                   disabled={!pending || busy || feedbackBusy || recognizedText.trim().length<2 || (expired && (!examinerSession || Date.now()>Date.parse(session.expiresAt)+300000))}
                   style={{border:"none",borderRadius:12,minWidth:44,padding:"0 10px",background:pending?"#194f49":"#cbd5e1",color:pending?"#fff":"#475569",fontWeight:800,fontSize:20,cursor:pending?"pointer":"not-allowed"}}>
-                  Send my answer
+                  Confirm answer
                 </button> : null}
               </details> : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
@@ -969,9 +969,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               </div> : null}
               {pending ? (
                 <div role="group" aria-label="Review German speech recognition" style={{display:"grid",gap:8}}>
-                  <p style={{margin:0,color:"#92400e",fontSize:13}}>{pending.typed ? "Check your typed answer, then confirm it." : "Did Falowen hear you correctly? Review the words, then use Send to confirm your answer."}</p>
+                  <p style={{margin:0,color:"#92400e",fontSize:13}}>{pending.typed ? "Check your typed answer, then confirm it." : "Check what Falowen heard. Confirm to continue."}</p>
                   {pending.uncertain ? <small>Audio unclear. Review the words or record again.</small> : null}
-                  {simulation ? <label style={{fontSize:13}}>
+                  {simulation && gradedCourseMock && !pending.typed ? <details className="speaking-mock-transcription-help">
+                     <summary>Transcription incorrect?</summary>
+                     <p>Correct only words Falowen misheard. Do not improve grammar after recording.</p>
+                     <label><input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/> Allow speech-to-text correction</label>
+                   </details> : simulation && !gradedCourseMock ? <label style={{fontSize:13}}>
                     <input type="checkbox" checked={recognitionCorrection} onChange={event=>{setRecognitionCorrection(event.target.checked);if(!event.target.checked)setRecognizedText(pending.transcript || recognizedText);}}/>
                     Correct a speech-recognition mistake only
                   </label> : null}
