@@ -1147,3 +1147,26 @@ test("P1: refuses to resume an older graded examiner session from another attemp
   expect(response.payload.code).toBe("different_mock_attempt_active");
   expect(api.docs.get("liveSpeakSessions/u123").sessionId).toBe("prior-attempt");
 });
+
+test("graded mock clears a false ready flag instead of trapping a saved unfinished Teil at Retry feedback", async () => {
+  const api=setup();
+  const sessionId="saved-but-early-stop";
+  const text="Wir treffen uns am Samstag im Park.";
+  api.docs.set("liveSpeakSessions/u123", {
+    uid:"u123",sessionId,level:"B1",source:"exam-speaking-practice",
+    examTask:{id:"b1-planning",teil:"Teil 1",prompt:"Gemeinsam planen",
+      courseAssignmentKey:"B1-7.23",mockAttemptId:"11111111-1111-4111-8111-111111111111"},
+    examFlow:{key:"B1-1",mode:"simulation",decisions:[{point:"time",value:"Samstag",quote:"Samstag"}]},
+    confirmedAnswers:[text,text],answeredTurns:2,taskReady:true,feedbackAttempts:2,
+    messages:[{role:"user",text},{role:"user",text}],
+    expiresAt:new Date(Date.now()-60*60*1000).toISOString(),endedAt:null,
+  });
+  const result=await api.call("POST","/live-speak/session/exam-feedback",{sessionId});
+  expect(result.code).toBe(409);
+  expect(result.payload.code).toBe("course_mock_part_incomplete");
+  const saved=api.docs.get("liveSpeakSessions/u123");
+  expect(saved.taskReady).toBe(false);
+  expect(saved.confirmedAnswers).toEqual([text,text]);
+  expect(new Date(saved.expiresAt).getTime()).toBeGreaterThan(Date.now());
+  expect(saved.feedbackAttempts).toBe(2);
+});
