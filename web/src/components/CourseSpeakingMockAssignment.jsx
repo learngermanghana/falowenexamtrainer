@@ -45,6 +45,10 @@ function readDraft(uid, assignmentKey) {
 function saveDraft(uid, assignmentKey, draft) {
   if (!uid || typeof window === "undefined") return;
   try {
+    const previous = readDraft(uid, assignmentKey);
+    if (previous?.results?.length && (!draft || previous.attemptId !== draft.attemptId)) {
+      preserveSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey), previous);
+    }
     if (draft) window.localStorage.setItem(cacheKey(uid, assignmentKey), JSON.stringify(draft));
     else window.localStorage.removeItem(cacheKey(uid, assignmentKey));
   } catch { /* Cloud results remain authoritative. */ }
@@ -77,9 +81,18 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     let cancelled = false;
     setStage("loading");
     setMessage("");
+    // Local work remains accessible even if the cloud is offline or already completed.
+    const localDraft = readDraft(uid, assignmentKey);
+    try {
+      setRecoveryCopies(localDraft?.results?.length
+        ? preserveSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey), localDraft)
+        : readSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey)));
+    } catch {
+      // Keep the original draft and expose an in-memory download if archiving is unavailable.
+      setRecoveryCopies(localDraft?.results?.length ? [{ savedAt: 'local', draft: localDraft }] : []);
+    }
     fetchCourseSpeakingMockStatus({ idToken, assignmentKey }).then(status => {
       if (cancelled) return;
-      setRecoveryCopies(readSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey)));
       if (status.completed) {
         setServerResult(status);
         setStage("complete");
@@ -90,10 +103,6 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       const serverAttemptId = status.attemptId || "";
       setAttemptId(serverAttemptId);
       const verifiedDraft = serverAttemptId && draft?.attemptId === serverAttemptId ? draft : null;
-      const copies = !verifiedDraft && draft?.results?.length
-        ? preserveSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey), draft)
-        : readSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey));
-      setRecoveryCopies(copies);
       // An old local draft did not have an attempt ID. Keep it for review,
       // never combine its parts with newer server-owned attempts.
       setLegacyParts(!verifiedDraft && draft?.results?.length ? draft.results.length : 0);

@@ -20,3 +20,10 @@ test('storage errors prevent archiving from silently losing older parts', () => 
   storage.setItem = () => { throw new Error('Storage full'); };
   expect(() => preserveSpeakingRecovery(storage, 'A2', { results: [{ sessionId: 's' }] })).toThrow('Storage full');
 });
+test('unreadable archives do not block cloud viewing but cannot be overwritten', () => {
+  const storage = memory(); storage.setItem('A2:recovery', 'broken JSON');
+  expect(readSpeakingRecovery(storage, 'A2')).toEqual([]);
+  expect(() => preserveSpeakingRecovery(storage, 'A2', { results: [{ sessionId: 's' }] })).toThrow();
+  expect(storage.getItem('A2:recovery')).toBe('broken JSON');
+  expect(readSpeakingRecovery({ getItem: () => { throw Error('Disabled'); } }, 'A2')).toEqual([]);
+});
