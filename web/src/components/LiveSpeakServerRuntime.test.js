@@ -1223,7 +1223,10 @@ describe("bounded, fair planning assessments", () => {
 
   test("B1 unproductive repeated acknowledgements finish and cannot receive a passing Teil mark",async()=>{
     const api=setup();
-    const session=await startTaskFlow(api,"B1",1,"simulation","Einen kranken Freund oder Lehrer besuchen");
+    // Guided mode lets this test supply the exact recognised transcript.
+    // Simulation deliberately replaces manually edited text with the mocked
+    // speech-to-text output, which would not test repeated "Ja." responses.
+    const session=await startTaskFlow(api,"B1",1,"guided","Einen kranken Freund oder Lehrer besuchen");
     for(let i=0;i<5;i++){
       const reply=await answerExam(api,session,"Ja.");
       expect(reply.code).toBe(200);
