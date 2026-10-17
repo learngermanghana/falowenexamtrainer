@@ -3,7 +3,7 @@ const B1_DAYS23_TO28_METADATA = Object.freeze({
     chapter: "7.23",
     title: "Goethe B1 Speaking Mock",
     goal: "Prüfen Sie Ihre B1-Sprechkompetenz in drei vollständigen Goethe-ähnlichen Aufgaben mit einem KI-Prüfer.",
-    instruction: "Review the grammar and lesson video, then complete Teil 1, Teil 2 and Teil 3 in the speaking mock. Falowen AI marks and saves the completed exam automatically.",
+    instruction: "Read the three-part speaking exam guide, then start the AI mock. Confirm your spoken answers as you go. Falowen saves your overall score after all three parts.",
     workbookOnly: false,
   }),
   24: Object.freeze({

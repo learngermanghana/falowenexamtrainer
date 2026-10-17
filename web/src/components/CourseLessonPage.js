@@ -451,6 +451,10 @@ export default function CourseLessonPage() {
   const query = new URLSearchParams(location.search);
   const requestedView = query.get("view");
   const normalizedWorkbookView = normalizeA2B1SectionView(requestedView || "");
+  const isSpeakingMock = (level === "A2" && day === 22) || (level === "B1" && day === 23);
+  if (isSpeakingMock && !requestedView) {
+    return <Navigate to={`/campus/course/lesson/${level}/${day}?view=workbook`} replace state={location.state} />;
+  }
   const requestedChapter = String(query.get("chapter") || "").trim();
 
   if ((level === "A1" || level === "A2") && requestedView && day > 0) {

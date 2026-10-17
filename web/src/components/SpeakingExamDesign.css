@@ -164,3 +164,60 @@
 
 /* Temporary signed-in examiner test access, without the pilot credit counter. */
 .speaking-testing-access-note { margin:0; border:1px solid #bed6c3; border-radius:12px; background:#eef8ee; color:#234c39; padding:10px 12px; font-size:13px; line-height:1.5; }
+
+
+/* Coursework mock: one uncluttered learner flow (intro, exam, final result). */
+.speaking-course-mock { box-sizing:border-box; width:100%; min-width:0; max-width:100%; overflow-wrap:anywhere; }
+.speaking-course-mock *, .speaking-course-mock *::before, .speaking-course-mock *::after { box-sizing:border-box; }
+.speaking-course-mock__heading { display:grid; gap:7px; margin-bottom:14px; }
+.speaking-course-mock__heading h1 { font-size:clamp(25px,5.5vw,36px); line-height:1.16; letter-spacing:-.035em; margin:0; color:#183f45; }
+.speaking-course-mock__heading p { margin:0; color:#51616d; font-size:14px; line-height:1.5; }
+.speaking-course-mock__back { font-size:13px; color:#235f6a; width:fit-content; }
+.speaking-course-mock__eyebrow { font-size:11px; font-weight:850; letter-spacing:.07em; color:#35677a; }
+.speaking-course-mock__intro { display:grid; gap:16px; border:1px solid #d9e4e7; border-radius:18px; background:#fff; padding:clamp(16px,3vw,26px); box-shadow:0 5px 24px #16475a0a; }
+.speaking-course-mock__intro-head h2 { margin:5px 0 7px; font-size:clamp(20px,4vw,27px); color:#173e45; }
+.speaking-course-mock__intro-head p, .speaking-course-mock__howto p { margin:0; font-size:14px; line-height:1.58; color:#475569; }
+.speaking-course-mock__part-guide { padding:0; margin:0; list-style:none; display:grid; gap:0; border:1px solid #dfebec; border-radius:13px; overflow:hidden; }
+.speaking-course-mock__part-guide li { display:flex; align-items:flex-start; gap:12px; padding:13px; }
+.speaking-course-mock__part-guide li + li { border-top:1px solid #e8eef0; }
+.speaking-course-mock__part-number { flex:0 0 29px; height:29px; display:grid; place-items:center; border-radius:9px; color:#fff; background:#1f565b; font-weight:800; }
+.speaking-course-mock__part-guide strong { display:block; color:#173e45; font-size:14px; line-height:1.4; }
+.speaking-course-mock__part-guide p { margin:4px 0 0; font-size:13px; color:#52616b; line-height:1.5; }
+.speaking-course-mock__howto { border-radius:13px; background:#f2f7f6; padding:14px; display:grid; gap:8px; }
+.speaking-course-mock__howto h3 { margin:0; font-size:15px; color:#173e45; }
+.speaking-course-mock__start { width:100%; min-height:52px; border:0; border-radius:13px; font-size:16px; font-weight:800; background:#194f49; color:white; cursor:pointer; }
+.speaking-course-mock__progress { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; margin:0 0 13px; }
+.speaking-course-mock__progress span { text-align:center; background:#e8eef0; color:#54666b; border-radius:8px; padding:9px 4px; font-size:12px; font-weight:750; }
+.speaking-course-mock__progress span.is-active { background:#194f49; color:#fff; }
+.speaking-course-mock__progress span.is-complete { background:#dff1e8; color:#165b45; }
+.speaking-course-mock__exam { min-width:0; padding:clamp(10px,3vw,22px); border:1px solid #dde5e7; border-radius:16px; background:#fff; }
+.speaking-course-mock .speaking-exam-live, .speaking-course-mock .speaking-exam-session,
+.speaking-course-mock .speaking-current-question, .speaking-course-mock .speaking-exam-task-card { min-width:0; max-width:100%; }
+.speaking-course-mock .speaking-exam-session__answer,
+.speaking-course-mock .speaking-recorder-controls,
+.speaking-course-mock .speaking-recorder-main { position:static !important; transform:none !important; bottom:auto !important; z-index:auto !important; }
+.speaking-course-mock .speaking-answer-heading { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px; }
+.speaking-course-mock .speaking-current-question p { overflow-wrap:anywhere; word-break:normal; }
+.speaking-course-mock .speaking-recorder-controls { display:flex; justify-content:center; width:100%; }
+.speaking-course-mock .speaking-recorder-main { max-width:100%; margin:0 auto; }
+.speaking-course-mock .speaking-exam-session__utility { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.speaking-course-mock .speaking-mock-transcription-help { font-size:12px; border-top:1px solid #e2e8f0; padding-top:8px; }
+.speaking-course-mock .speaking-mock-transcription-help summary { cursor:pointer; width:fit-content; color:#235f6a; font-weight:750; }
+.speaking-course-mock .speaking-mock-transcription-help p { margin:6px 0; color:#54616d; line-height:1.45; }
+.speaking-course-mock .speaking-mock-transcription-help label { display:flex; gap:8px; align-items:flex-start; }
+.speaking-course-mock .speaking-exam-task-card { gap:6px !important; }
+.speaking-course-mock .speaking-exam-task-card .goethe-card__keyword { font-size:clamp(20px,5vw,32px); }
+body.falowen-course-speaking-mock .study-buddy-bar,
+body.falowen-course-speaking-mock .study-buddy-reopen { display:none !important; }
+@media(max-width:640px) {
+  .speaking-course-mock { padding:10px !important; padding-bottom:28px !important; }
+  .speaking-course-mock__exam { padding:10px; }
+  .speaking-course-mock .speaking-exam-live { gap:8px !important; }
+  .speaking-course-mock .speaking-exam-task-card { padding:10px !important; }
+  .speaking-course-mock .speaking-exam-session { padding:11px !important; gap:10px !important; box-shadow:none !important; }
+  .speaking-course-mock .speaking-recorder-main>span { width:62px; height:62px; }
+  .speaking-course-mock .speaking-current-question { padding:12px !important; }
+  .speaking-course-mock .speaking-current-question p { font-size:16px; line-height:1.5; }
+  .speaking-course-mock .speaking-session-clock { font-size:14px; }
+  .speaking-course-mock .speaking-reset-session { font-size:12px; padding:7px 9px; }
+}

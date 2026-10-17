@@ -73,7 +73,8 @@ test("normal tuition Paystack route is untouched and no pilot checkout exists", 
 // Regression: a misunderstood recording must not be silently corrected by the tutor.
 test("learner must review the microphone transcript before AI feedback", () => {
   const source = fs.readFileSync(path.join(root, "web/src/components/LiveSpeakPage.jsx"), "utf8");
-  expect(source).toContain("Did Falowen hear you correctly?");
+  expect(source).toContain("Check what Falowen heard. Confirm to continue.");
+    expect(source).toContain("Transcription incorrect?");
   expect(source).toContain("/live-speak/session/confirm");
   expect(source).toContain("Record again");
   expect(source).toContain("Listen to your own recording");

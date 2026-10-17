@@ -62,6 +62,12 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
   const savingRef = useRef(false);
 
   useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.add("falowen-course-speaking-mock");
+    return () => document.body.classList.remove("falowen-course-speaking-mock");
+  }, []);
+
+  useEffect(() => {
     if (!config || !idToken || !uid) return undefined;
     let cancelled = false;
     setStage("loading");
@@ -145,49 +151,70 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     ), [serverResult, results]);
 
   if (!config) return <p role="alert">This speaking assignment is not configured.</p>;
-  return <main className="speaking-exam-page" style={{ maxWidth: 960, margin: "0 auto", padding: "16px" }}>
-    <section style={{ ...surface, display: "grid", gap: 14, marginBottom: 16, background: "#eff6ff" }}>
-      <Link to={`/campus/course/lesson/${config.level}/${config.day}`} style={{ fontSize: 13 }}>← Back to lesson</Link>
-      <div>
-        <span style={{ fontSize: 12, fontWeight: 800, color: "#1e40af" }}>{config.level} · DAY {config.day} · GRADED ASSIGNMENT</span>
-        <h1 style={{ margin: "6px 0" }}>{config.title}</h1>
-        <p style={{ margin: 0, color: "#475569" }}>Complete Teil 1, Teil 2 and Teil 3 with the Falowen AI examiner. Each part is assessed after your response; one combined score is saved to your course results.</p>
-      </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="Speaking mock parts">
-        {sectionNames[config.level].map((label, i) =>
-          <span key={i} aria-current={stage === "exam" && activePart === i ? "step" : undefined}
-            style={{ padding: "9px 12px", borderRadius: 10, background: i < results.length || stage === "complete" ? "#dcfce7" : i === activePart && stage === "exam" ? "#bfdbfe" : "#fff", fontSize: 13, fontWeight: 600 }}>
-            {i < results.length || stage === "complete" ? "✓ " : ""}Teil {i + 1} · {label}
-          </span>)}
-      </div>
-      <small>Falowen AI practice score, not an official Goethe-Institut result. Pronunciation is not graded from corrected transcripts.</small>
-    </section>
+  const examPartDetails = config.level === "A2" ? [
+    { title: "Fragen zur Person", description: "Ask and answer short questions about everyday life." },
+    { title: "Von sich erzählen", description: "Speak about a topic using the words on your card." },
+    { title: "Gemeinsam etwas planen", description: "Discuss suggestions and agree on a plan with your partner." },
+  ] : [
+    { title: "Gemeinsam etwas planen", description: "Make suggestions, respond to your partner and reach an agreement." },
+    { title: "Ein Thema präsentieren", description: "Present a topic with an introduction, examples and your opinion." },
+    { title: "Fragen beantworten", description: "React to feedback and answer questions about your presentation." },
+  ];
+
+  return <main className="speaking-exam-page speaking-course-mock" data-speaking-mock={config.level}
+    style={{ maxWidth: 900, margin: "0 auto", padding: "12px clamp(10px, 3vw, 22px)", minWidth: 0 }}>
+    <header className="speaking-course-mock__heading">
+      <Link to="/campus/course" className="speaking-course-mock__back">← Course Book</Link>
+      <span className="speaking-course-mock__eyebrow">{config.level} · DAY {config.day} · SPEAKING ASSESSMENT</span>
+      <h1>{config.title}</h1>
+      {stage === "intro" ? <p>Learn the format, then complete all three parts with the Falowen AI examiner.</p>
+        : stage === "exam" ? <p>Teil {activePart + 1} of 3 · {sectionNames[config.level][activePart]}</p> : null}
+    </header>
+    {(stage === "exam" || stage === "complete") ? <nav className="speaking-course-mock__progress" aria-label="Exam progress">
+      {sectionNames[config.level].map((part,i)=><span key={part}
+        className={i < results.length || stage === "complete" ? "is-complete" : i === activePart ? "is-active" : ""}
+        aria-current={stage === "exam" && activePart === i ? "step" : undefined}>
+        {i < results.length || stage === "complete" ? "✓ " : ""}Teil {i+1}
+      </span>)}
+    </nav> : null}
 
     {stage === "loading" ? <p role="status">Checking your assignment progress…</p> : null}
     {stage === "status-error" ? <section style={surface} role="alert">
       <p>{message}</p><button type="button" style={button} onClick={() => window.location.reload()}>Retry status check</button>
     </section> : null}
-    {stage === "intro" ? <section style={{ ...surface, display: "grid", gap: 14 }}>
-      <h2 style={{ margin: 0 }}>Ready for your speaking mock?</h2>
-      <p style={{ margin: 0 }}>Use a quiet place and allow microphone access. You must complete all three parts. Only the first verified complete submission is used as your coursework result.</p>
-      <button type="button" style={button} onClick={() => {
+    {stage === "intro" ? <section className="speaking-course-mock__intro">
+      <div className="speaking-course-mock__intro-head">
+        <span className="speaking-course-mock__eyebrow">BEFORE YOU START</span>
+        <h2>How the speaking exam works</h2>
+        <p>There are three parts. The AI examiner speaks in German, listens to your answers and moves you through the tasks.</p>
+      </div>
+      <ol className="speaking-course-mock__part-guide">
+        {examPartDetails.map((part,i)=><li key={part.title}>
+          <span className="speaking-course-mock__part-number">{i+1}</span>
+          <div><strong>Teil {i+1} · {part.title}</strong><p>{part.description}</p></div>
+        </li>)}
+      </ol>
+      <div className="speaking-course-mock__howto">
+        <h3>During your mock</h3>
+        <p><strong>Listen → Record → Confirm.</strong> Speak naturally in German. Check what the microphone heard; correct only speech-recognition errors. The AI assesses each Teil, then saves one combined score when you finish all three.</p>
+        <p>Choose a quiet place and allow microphone access. Your score is AI practice feedback, not an official Goethe-Institut result.</p>
+      </div>
+      <button type="button" className="speaking-course-mock__start" onClick={() => {
         const selectedTasks = chooseTasks(config.level);
         if (!selectedTasks) { setMessage("Speaking tasks are unavailable for one of the three parts."); return; }
         setTasks(selectedTasks); setResults([]); setActivePart(0); setMessage("");
         saveDraft(uid, assignmentKey, { tasks: selectedTasks, results: [] });
         setStage("exam");
-      }}>Start full speaking mock →</button>
+      }}>Start speaking mock →</button>
       {message ? <p role="alert">{message}</p> : null}
     </section> : null}
 
-    {stage === "exam" && selected ? <section style={{ ...surface, display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0 }}>Teil {activePart + 1} · {sectionNames[config.level][activePart]}</h2>
-      <p style={{ margin: 0, color: "#475569" }}>Speak to the examiner and confirm your responses. The next part opens automatically once feedback is verified.</p>
+    {stage === "exam" && selected ? <section className="speaking-course-mock__exam" aria-label={`Speaking Teil ${activePart + 1}`}>
       <LiveSpeakPage key={`${assignmentKey}-${activePart}-${selected.id}`}
         embedded initialLevel={config.level}
         practiceTopic={selected.topicPrompt || selected.text || config.title}
         practiceSource="exam-speaking-practice" examMode="simulation"
-        autoStart freshAttempt deferFeedback
+        autoStart freshAttempt deferFeedback gradedCourseMock
         examTask={{
           id: selected.id, teil: selected.teilLabel || selected.teilId,
           prompt: selected.topicPrompt || selected.text || "",

@@ -413,7 +413,10 @@ export default function BookPdfDownloadInjector() {
     [location.pathname]
   );
 
-  if (!isBookRoute) return null;
+  const isSpeakingMock = (a2B1Context?.level === "A2" && Number(a2B1Context.day) === 22)
+    || (a2B1Context?.level === "B1" && Number(a2B1Context.day) === 23);
+  // These are graded speaking exams, not print workbooks with chapter videos.
+  if (!isBookRoute || isSpeakingMock) return null;
 
   return (
     <>
