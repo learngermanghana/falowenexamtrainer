@@ -1,3 +1,5 @@
+import { getGradedTabDurationMinutes } from "./gradedTabTiming";
+
 const freezeTabs = (tabs) => Object.freeze(tabs);
 
 const timed = ({
@@ -20,7 +22,7 @@ const timed = ({
 
 const A2_B1_PREP = "Grammar, Teil 1 speaking practice and reference notes stay open before you start. Start the timer only when you have enough uninterrupted time.";
 
-export const A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
+const RAW_A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   "A2-8.21": timed({ level: "A2", durationMinutes: 40, scope: "Teil 2 Schreiben and Teil 3 Lesen", timedTabs: ["schreiben", "lesen"], preparationLabel: A2_B1_PREP }),
   "A2-8.22": timed({ level: "A2", durationMinutes: 30, scope: "Teil 2 Schreiben and Teil 3 Lesen", timedTabs: ["schreiben", "lesen"], preparationLabel: A2_B1_PREP }),
   "A2-9.23": timed({ level: "A2", durationMinutes: 10, scope: "Teil 3 Lesen", timedTabs: ["lesen"], preparationLabel: A2_B1_PREP }),
@@ -40,6 +42,26 @@ export const A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   "B1-10.27": timed({ level: "B1", durationMinutes: 55, scope: "Teil 2 Schreiben and Teil 3 Lesen", timedTabs: ["schreiben", "lesen"], preparationLabel: A2_B1_PREP, mode: "mock" }),
   "B1-10.28": timed({ level: "B1", durationMinutes: 60, scope: "Teil 2 Schreiben and Teil 3 Lesen", timedTabs: ["schreiben", "lesen"], preparationLabel: A2_B1_PREP, mode: "mock" }),
 });
+
+// Align the base registry too, so consumers never see stale 55-minute
+// workbook defaults while canonical lesson profiles refine graded sections.
+export const A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze(
+  Object.fromEntries(
+    Object.entries(RAW_A2_B1_BASE_TIMED_ASSIGNMENT_CONFIG).map(([assignmentKey, config]) => [
+      assignmentKey,
+      Object.freeze({
+        ...config,
+        durationMinutes: getGradedTabDurationMinutes({
+          level: config.level,
+          assignmentKey,
+          timedTabs: config.timedTabs,
+          mode: config.mode,
+          configuredDurationMinutes: config.durationMinutes,
+        }),
+      }),
+    ]),
+  ),
+);
 
 const normalizeAssignmentKey = (assignmentKey = "") =>
   String(assignmentKey || "").trim().toUpperCase();
