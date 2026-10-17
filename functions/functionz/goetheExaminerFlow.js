@@ -282,4 +282,4 @@ function calendarResponse(session, transcript) {
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
-module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse};
+module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse,appointmentIntent,agreesWithProposedSlot};
