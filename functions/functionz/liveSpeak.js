@@ -50,11 +50,11 @@ const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? s
 const coursePartFinished = session => Boolean(session?.examFlow) &&
   (taskFlows.isComplete(session) || Number(session.answeredTurns) >= answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
-  // A fully recorded graded part stays recoverable after its exam timer has
-  // expired. Marking must never require another recording after a provider
-  // error or a slow feedback response.
+  // Graded work, including an unconfirmed transcript, stays recoverable after
+  // expiry. Resume can renew an unfinished part; completed parts can retry
+  // marking without requiring another recording.
   ((assignmentConfig(session.examTask?.courseAssignmentKey) &&
-      confirmedAnswers(session).length > 0) ||
+      (confirmedAnswers(session).length > 0 || session.pendingId)) ||
     Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now());
 const sessionView = session => ({
   sessionId: session.sessionId, expiresAt: session.expiresAt,
@@ -380,7 +380,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
               "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
             ), {status:409,code:"different_mock_attempt_active"});
           }
-          result = sessionView(existing);
+          // Saved course work stays recoverable after expiry. Resume the same
+          // unfinished part with time to answer, without consuming a new session.
+          if (assignmentConfig(existing.examTask?.courseAssignmentKey) &&
+              !coursePartFinished(existing) &&
+              Date.parse(existing.expiresAt || "") <= Date.now()) {
+            const expiresAt = new Date(Date.now()+10*60*1000).toISOString();
+            tx.update(sessionRef, {expiresAt, taskReady:false});
+            result = sessionView({...existing, expiresAt, taskReady:false});
+          } else result = sessionView(existing);
           return;
         }
         const used = Number(usageSnap.data()?.turns) || 0;
@@ -930,7 +938,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           // Prior deployments could mark a partially answered Teil ready after
           // TTS/partner failure. Reopen that same session and saved transcript;
           // do not create a new attempt or silently grade fewer exam steps.
-          if (record.taskReady) {
+          if (record.taskReady || Date.parse(record.expiresAt || "") <= Date.now()) {
             tx.update(sessionRef, {taskReady:false,feedbackStatus:null,
               feedbackLeaseUntil:0,
               expiresAt:new Date(Date.now()+10*60*1000).toISOString()});

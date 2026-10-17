@@ -29,6 +29,25 @@ test("resuming restores saved answers and the original examiner question",async(
   expect(screen.getByText(/Follow-up: answer/)).toBeInTheDocument();
 });
 
+test.each(["A2", "B1"])("%s course mock can continue a session that expires while open", async level => {
+  const expired = {...saved, level, expiresAt:new Date(Date.now()-1000).toISOString()};
+  const resumed = {...expired, expiresAt:new Date(Date.now()+600000).toISOString()};
+  let starts = 0;
+  global.fetch.mockImplementation(async url => {
+    if (String(url).includes("/status")) return ok({enabled:true, activeSession:expired});
+    if (String(url).endsWith("/start")) return ok(++starts === 1 ? expired : resumed);
+    throw new Error("Unexpected request " + url);
+  });
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel={level} gradedCourseMock
+    practiceSource="exam-speaking-practice" practiceTopic={task.prompt} examTask={task}/></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button", {name:"Resume speaking"}));
+  fireEvent.click(await screen.findByRole("button", {name:"Continue saved speaking session"}));
+  await waitFor(() => expect(screen.queryByRole("button", {name:"Continue saved speaking session"})).not.toBeInTheDocument());
+  expect(starts).toBe(2);
+  expect(screen.getByLabelText("Current examiner question")).toHaveTextContent("Was essen Sie gern?");
+  expect(screen.getByText("Ich mache jeden Tag Sport.")).toBeInTheDocument();
+});
+
 test("failed automatic feedback keeps saved answers and allows a retry",async()=>{
   let calls=0;
   const finished={...saved,taskReady:true,answeredTurns:2};

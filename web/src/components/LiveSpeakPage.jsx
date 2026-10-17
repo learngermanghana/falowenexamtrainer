@@ -442,8 +442,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     }
   };
 
-  const startSession = async () => {
-    if (busy || session || recording || recordingStarting.current) return;
+  const startSession = async (resumeSaved = false) => {
+    if (busy || (session && resumeSaved !== true) || recording || recordingStarting.current) return;
     if (supportedExaminer && !details?.activeSession && details?.examinerFlowVersion !== 1) {
       setErrorMessage("Examiner practice is temporarily unavailable. Please try again shortly.");
       return;
@@ -1040,7 +1040,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   <button type="button" onClick={retryTranscript} disabled={busy} style={{...styles.secondaryButton,justifySelf:"start"}}>{pending.typed ? "Edit typed answer" : "Record again"}</button>
                 </div>
               ) : <small style={{color:"#64748b"}}>{voiceState === "playing" ? "The examiner is speaking. The microphone becomes available when the question finishes." : "Tap Record answer when it is your turn. Feedback comes after the task."}</small>}
-              {expired ? <p role="status">Your session time has ended. Your answers remain visible. Finish the task to review feedback.</p> : null}
+              {expired ? <p role="status">Your session time has ended. Your answers remain visible. {gradedCourseMock && !taskReady ? "Continue your saved session to finish this part." : "Finish the task to review feedback."}</p> : null}
+              {expired && gradedCourseMock && !taskReady ? <button type="button"
+                onClick={() => startSession(true)} disabled={busy || feedbackBusy || recording}>
+                Continue saved speaking session
+              </button> : null}
               {taskReady && !feedbackBusy && errorMessage ? <div className="speaking-exam-session__actions">
                 <button type="button" style={styles.primaryButton} onClick={finishExamTask}
                   disabled={busy || recording || Boolean(pending) || !recordedAnswers.length}>Retry feedback</button>
