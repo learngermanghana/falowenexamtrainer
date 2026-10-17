@@ -253,24 +253,32 @@ function mergeDecisions(session, proposed, transcript) {
 }
 function calendarResponse(session, transcript) {
   const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
-  const targetDay=target.day.toLowerCase(), targetHour=target.hour;
-  const clause=transcript.split(/\baber\b/i).at(-1).trim();
-  const declined=/\b(nein|nicht|leider|keine)\b/i.test(clause);
-  const day=clause.match(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/i)?.[1]?.toLowerCase();
-  const time=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
-  const hourWords={12:/\bzwölf\b/i,13:/\bdreizehn\b/i,15:/\bfünfzehn\b/i,17:/\bsiebzehn\b/i,18:/\bachtzehn\b/i,19:/\bneunzehn\b/i};
-  const targetTime=time ? Number(time[1])===targetHour && Number(time[2] || 0)===0 : Boolean(hourWords[targetHour]?.test(clause)) || (targetHour===18 && /\bsechs\b.*\babends\b/i.test(clause));
-  const mentionsTime=Boolean(time) || /\b(uhr|halb|viertel|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
-  const contradiction=(day && day!==targetDay) || (mentionsTime && !targetTime);
-  const explicit=day === targetDay && targetTime;
+  const targetDay=target.day.toLowerCase(),targetHour=target.hour;
+  const intent=appointmentIntent(transcript),clause=intent.clause;
+  const mentionedDays=[...clause.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/gi)].map(item=>item[1].toLowerCase());
+  const number=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
+  const hourWords={12:/\bzwölf\b/i,13:/\b(?:dreizehn|eins)\b/i,15:/\b(?:fünfzehn|drei)\b/i,
+    17:/\b(?:siebzehn|fünf)\b/i,18:/\b(?:achtzehn|sechs)\b/i,19:/\b(?:neunzehn|sieben)\b/i};
+  const targetTime=number ? Number(number[1])===targetHour && Number(number[2]||0)===0
+    : Boolean(hourWords[targetHour]?.test(clause)) &&
+      (targetHour===12 || targetHour===13 || /\b(?:uhr|nachmittags|abends)\b/i.test(clause));
+  const mentionsTime=Boolean(number) ||
+    /\b(uhr|halb|viertel|eins|zwei|drei|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
+  const contradiction=mentionedDays.some(day=>day!==targetDay) || (mentionsTime && !targetTime);
+  const explicit=mentionedDays.includes(targetDay) && targetTime;
   const previous=savedAssistant(session);
-  const accepted=/\b(ja|passt|einverstanden|gut|gerne|gern|machen wir)\b/i.test(clause);
-  const proposed=previous.toLowerCase().includes(targetDay) && previous.includes(String(targetHour));
-  const agreed=Number(session.answeredTurns)>=2 && !declined && !contradiction && (explicit || (accepted && proposed));
-  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:`${target.day} ${targetHour}:00`,quote:clause.slice(0,250)}] : [],transcript);
-  return {...merged,reply:merged.complete ? `Gut, dann treffen wir uns am ${target.day} um ${targetHour} Uhr. Bis dann!` :
-    Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet." :
-    `Wie wäre es mit ${target.day} um ${targetHour} Uhr? Passt dir dieser Termin?`};
+  const proposed=previous.toLowerCase().includes(targetDay) &&
+    new RegExp("\\b"+targetHour+"(?::00)?\\b").test(previous);
+  const agreed=Number(session.answeredTurns)>=2 && !intent.negative && !contradiction &&
+    (explicit || (intent.affirmative && proposed));
+  const merged=mergeDecisions(session,agreed ? [{
+    point:"appointment",value:target.day+" "+targetHour+":00",quote:clause.slice(0,250),
+  }] : [],transcript);
+  return {...merged,reply:merged.complete
+    ? "Gut, dann treffen wir uns am "+target.day+" um "+targetHour+" Uhr. Bis dann!"
+    : Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers
+      ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet."
+      : "Wie wäre es mit "+target.day+" um "+targetHour+" Uhr? Hast du da Zeit?"};
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
