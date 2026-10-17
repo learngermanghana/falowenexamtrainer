@@ -201,23 +201,17 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
 
       {activeTab === "lesen" && (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 3 · Lesen (Assignment)</h2>
-          <WorkbookTaskCard
-            eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Text Berlin und beantworten Sie alle fünf Fragen."
-            submissionNote="Submit only the answer letters in this format: 1D, 2B, 3D …"
-          >
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–D, for every question.</p>
+          <h2 style={sectionTitle}>Teil 3 · Lesen 1 (Assignment)</h2>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Beziehungen im Wandel: Online-Dating" submissionNote="Antworten unter Teil 3 abgeben: 1B, 2B, 3C.">
+            <p style={{ margin: 0 }}>Empfohlene Arbeitszeit: 15 Minuten. Lesen Sie den Text und die Aufgaben 1–3. Welche Lösung (a, b oder c) ist jeweils richtig?</p>
           </WorkbookTaskCard>
-
           <article style={contentCard}>
-            <h3 style={{ margin: 0 }}>Berlin</h3>
-            <p style={{ margin: 0 }}>Berlin ist nicht nur Weltmetropole und die Hauptstadt Deutschlands, sondern auch meine Heimatstadt. Jeden Morgen auf dem Weg zur Arbeit komme ich an vielen berühmten Sehenswürdigkeiten vorbei. Da ist zunächst der Große Tiergarten, welcher schon über 500 Jahre alt ist. Von hier ist es nicht weit bis zum Brandenburger Tor und der Siegessäule. Hier steige ich in die U-Bahn und fahre einige Stationen bis zum Alexanderplatz, wo sich die Weltzeituhr und das Wahrzeichen der Stadt, der Fernsehturm, befinden.</p>
-            <p style={{ margin: 0 }}>Von dort sind es nur wenige Minuten Fußweg bis zum Kurfürstendamm, der riesigen Einkaufsstraße mit zahlreichen Restaurants, Geschäften und Hotels.</p>
-            <p style={{ margin: 0 }}>Hier arbeite ich als Hotelfachfrau und betreue die zahlreichen Gäste des Hotels, welche als Touristen Berlin besichtigen. Als echte Berlinerin kann ich ihnen gute Tipps geben. Als besonderen Service bietet unser Hotel auch eigene Stadtrundfahrten an, die immer sehr gern gebucht werden.</p>
+            <h3 style={{ margin: 0 }}>Beziehungen im Wandel: Online-Dating</h3>
+            <p style={{ margin: 0 }}>Immer mehr Menschen in Deutschland lernen ihren Partner im Internet kennen. Während früher Kontaktanzeigen in Zeitungen populär waren, nutzen heute besonders junge Erwachsene Dating-Apps auf dem Smartphone.</p>
+            <p style={{ margin: 0 }}>Eine aktuelle Umfrage zeigt, dass sich fast ein Drittel aller Paare zwischen 20 und 35 Jahren online kennengelernt hat. Viele schüchterne Personen finden es einfacher, zuerst Nachrichten zu schreiben, bevor sie sich persönlich treffen. Auf diese Weise lässt sich schnell herausfinden, ob man gemeinsame Hobbys und Interessen teilt.</p>
+            <p style={{ margin: 0 }}>Allerdings gibt es auch Kritik am Online-Dating. Psychologen warnen davor, dass die riesige Auswahl an Profilen dazu führen kann, dass Menschen sich schneller wieder trennen oder niemanden mehr richtig schätzen lernen. Zudem vergleichen viele Nutzer die realen Personen mit perfekten Online-Fotos und sind nach dem ersten Treffen enttäuscht. Trotzdem glauben Experten, dass digitale Plattformen auch in Zukunft die beliebteste Methode bleiben werden, um eine Beziehung einzugehen.</p>
           </article>
-
-          <QuestionList questions={berlinQuestions} />
+          <QuestionList questions={[{"stem":"Wie lernen sich viele junge Erwachsene heute kennen?","options":["a) Sie suchen meistens über klassische Anzeigen in Zeitungen.","b) Sie nutzen dafür häufig Apps auf dem Smartphone.","c) Sie treffen sich hauptsächlich auf Partys im echten Leben."]},{"stem":"Warum ist Online-Dating für schüchterne Menschen hilfreich?","options":["a) Sie müssen vor dem ersten Treffen keine Nachrichten schreiben.","b) Sie können schnell feststellen, ob sie dieselben Interessen haben.","c) Sie müssen sich nie persönlich im echten Leben treffen."]},{"stem":"Welches Problem sehen Psychologen beim Online-Dating?","options":["a) Die Auswahl an möglichen Partnern ist viel zu klein.","b) Erste persönliche Treffen verlaufen immer enttäuschend.","c) Das große Angebot kann dazu führen, dass Beziehungen schneller beendet werden."]}]} />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </section>
@@ -225,34 +219,23 @@ export default function B1Day22BeziehungWichtigWorkbookPageV2() {
 
       {activeTab === "hoeren" && (
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 4 · Lesen (Assignment)</h2>
-          <WorkbookTaskCard
-            eyebrow="Your assignment · Reading"
-            title="Lesen Sie den Text Bewerbung und beantworten Sie alle fünf Fragen."
-            submissionNote="Submit only the answer letters in this format: 1D, 2B, 3D …"
-          >
-            <p style={{ margin: 0 }}>Read the complete text first. Then choose one answer, A–D, for every question.</p>
+          <h2 style={sectionTitle}>Teil 4 · Lesen 2 (Assignment)</h2>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Situationen und Anzeigen" submissionNote="Antworten unter Teil 4 abgeben: 1B, 2A, 3C.">
+            <p style={{ margin: 0 }}>Empfohlene Arbeitszeit: 15 Minuten. Lesen Sie die Situationen (1–3) und die Anzeigen (A–D). Welche Anzeige passt zu welcher Person? Eine Anzeige passt nicht.</p>
           </WorkbookTaskCard>
-
-          <article style={contentCard}>
-            <h3 style={{ margin: 0 }}>Bewerbung</h3>
-            <p style={{ margin: 0 }}>Der erste Schritt bei der Jobsuche ist, eine passende Stellenanzeige zu finden. Sehr viele offene Stellen kann man im Internet finden. Es gibt viele Webseiten, die diese Stellen sammeln. Dort kann man sich meistens direkt bewerben. Viele dieser Seiten sind auch für bestimmte Gruppen, zum Beispiel Studierende, Journalisten oder Handwerker. Stellenanzeigen findet man aber auch in Zeitungen.</p>
-            <p style={{ margin: 0 }}>Bei der Bewerbung gibt es einiges zu beachten. Zu Beginn stehen die wichtigsten Daten: Name, Alter, Wohnort, Nationalität und oft auch ein Bewerbungsfoto. Darunter schreibt man die Ausbildung. Sehr wichtig sind auch Berufserfahrung, Interessen und besondere Fähigkeiten wie Sprachen, Kurse oder Computerkenntnisse. Zu einer Bewerbung gehören neben dem Lebenslauf auch ein Anschreiben und Zeugnisse.</p>
-            <p style={{ margin: 0 }}>Wer Glück hat, bekommt eine Einladung zu einem Vorstellungsgespräch. Dort lernt man den Arbeitgeber kennen, erfährt mehr über die Arbeit und kann sich selbst präsentieren. Wer eine Absage bekommt, versucht es mit der nächsten offenen Stelle.</p>
-          </article>
-
-          <QuestionList questions={bewerbungQuestions} />
+          <div style={contentCard}>
+            <h3 style={{ margin: 0 }}>Situationen</h3>
+            <ol style={listSpacing}><li>Lukas (28) möchte beim Sport neue Leute kennenlernen, will aber keinen festen Vertrag in einem Fitnessstudio abschließen.</li><li>Elena (34) und Marco (36) suchen nach einer gemeinsamen Aktivität am Wochenende, um zusammen kochen zu lernen.</li><li>Sandra (42) ist Single und möchte am Wochenende in einer Gruppe draußen in der Natur unterwegs sein und neue Kontakte knüpfen.</li></ol>
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            <article style={contentCard}><strong>Anzeige A: Kochen für zwei!</strong><p style={{ margin: 0 }}>Unser exklusiver Wochenend-Kochkurs für Paare. Lernen Sie unter professioneller Anleitung leckere 3-Gänge-Menüs kennen. Samstags von 15 bis 19 Uhr. Anmeldung paarweise erforderlich unter www.kochstudio-praxis.de.</p></article>
+            <article style={contentCard}><strong>Anzeige B: Offener Lauftreff im Stadtpark!</strong><p style={{ margin: 0 }}>Jeden Dienstag und Donnerstag ab 18:00 Uhr. Wir laufen gemeinsam eine Stunde und unterhalten uns danach bei einem Getränk. Keine Vereinsmitgliedschaft, kostenlos und ohne Vertragsbindung!</p></article>
+            <article style={contentCard}><strong>Anzeige C: Single-Wandern in der Region:</strong><p style={{ margin: 0 }}>Entspannte Tageswanderungen am Samstag durch die Natur. Lernen Sie neue Leute in Ihrem Alter kennen, während Sie gemeinsam die Landschaft genießen. Busanreise inklusive.</p></article>
+            <article style={contentCard}><strong>Anzeige D: Tanzschule „Rhythmus“:</strong><p style={{ margin: 0 }}>Neue Tanzkurse für Paare jeden Sonntagabend. Lernen Sie Salsa, Walzer und Discofox in gemütlicher Atmosphäre. Jetzt Probestunde buchen!</p></article>
+          </div>
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </section>
-      )}
-
-      {activeTab === "references" && (
-        <WorkbookReferenceAnswers
-          level="B1"
-          lesson={{ title: "B1Day22BeziehungWichtig", level: "B1", day: 22, workbookId: "B1Day22BeziehungWichtig" }}
-          workbookId="B1Day22BeziehungWichtig"
-        />
       )}
 
       {activeTab === "submit" && (
