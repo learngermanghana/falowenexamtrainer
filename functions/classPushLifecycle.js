@@ -2,6 +2,7 @@ const { notificationsPaused, currentNotificationStudent } = require("./deletionN
 const admin = require("firebase-admin");
 const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { loadCandidateClassSessions } = require("./classSessionReminderQueries");
 
 const REGION = "europe-west1";
 const TIME_ZONE = "Africa/Accra";
@@ -284,10 +285,14 @@ const reminderKindDue = ({ session, nowMs }) => {
 
 const runClassReminderScan = async () => {
   const nowMs = Date.now();
-  const snapshot = await db().collection("classSessions").get();
+  const candidateDocs = await loadCandidateClassSessions({
+    collection: db().collection("classSessions"),
+    Timestamp: getAdmin().firestore.Timestamp,
+    nowMs,
+  });
   let considered = 0;
   let sent = 0;
-  for (const docSnap of snapshot.docs) {
+  for (const docSnap of candidateDocs) {
     const session = docSnap.data() || {};
     const startMs = getSessionStartMs(session);
     if (!startMs || startMs < nowMs - 3 * 60 * 60_000 || startMs > nowMs + 25 * 60 * 60_000 || !isSessionActive(session, nowMs)) continue;
@@ -297,7 +302,7 @@ const runClassReminderScan = async () => {
       if (result?.sent) sent += result.sent;
     }
   }
-  console.log("Class push lifecycle scan complete", { considered, sent });
+  console.log("Class push lifecycle scan complete", { candidates: candidateDocs.length, considered, sent });
 };
 
 const didStartChange = (before = {}, after = {}) => {
