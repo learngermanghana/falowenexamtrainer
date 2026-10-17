@@ -247,25 +247,32 @@ async function upsertMockScoreSheet(row) {
 
 async function synchronizeSheet({ db, admin, scoreRef, row }) {
   if (row.sheetSyncStatus === "complete") return { ok: true, cached: true };
-  const now = Date.now();
-  const lease = await db.runTransaction(async tx => {
-    const snap = await tx.get(scoreRef);
-    const existing = snap.data() || {};
-    if (existing.sheetSyncStatus === "complete") return false;
-    if (Number(existing.sheetSyncLeaseUntil) > now) return false;
-    tx.update(scoreRef, { sheetSyncStatus: "syncing", sheetSyncLeaseUntil: now + 120000 });
-    return true;
-  });
-  if (!lease) return { ok: false, pending: true, message: "Score-sheet synchronization is already in progress." };
-  let receipt;
-  try { receipt = await upsertMockScoreSheet(row); }
-  catch (error) { receipt = { ok: false, message: error?.message || "Score-sheet sync failed." }; }
-  await scoreRef.set({
-    sheetSyncStatus: receipt.ok ? "complete" : "pending",
-    sheetSyncError: receipt.ok ? "" : receipt.message,
-    sheetSyncLeaseUntil: 0, sheetSyncedAt: receipt.ok ? admin.firestore.FieldValue.serverTimestamp() : null,
-  }, { merge: true });
-  return receipt;
+  // Use the existing Firebase score-sync consumer and its verified webhook credentials.
+  // No student request needs direct access to Google Sheets or an additional secret.
+  const jobRef = db.collection("automaticScoreSync").doc(`speaking-${scoreRef.id}`);
+  try {
+    return await db.runTransaction(async tx => {
+      const [scoreSnap, jobSnap] = await Promise.all([tx.get(scoreRef), tx.get(jobRef)]);
+      const saved = scoreSnap.data() || row;
+      if (saved.sheetSyncStatus === "complete" || jobSnap.data()?.status === "synced") {
+        tx.set(scoreRef, { sheetSyncStatus: "complete", sheetSyncError: "" }, { merge: true });
+        return { ok: true };
+      }
+      if (!jobSnap.exists) {
+        // A separate dedupe suffix preserves historical workbook rows for the same lesson.
+        const updated = { ...saved, dedupe_id: `${saved.studentCode}__${saved.assignmentId}__course_speaking_mock`,
+          sheetSyncStatus: "pending", sheetSyncError: "" };
+        tx.set(scoreRef, updated, { merge: true });
+        tx.create(jobRef, { source: "course_speaking_mock", scorePath: scoreRef.path,
+          row: updated, status: "pending", attempts: 0 });
+      }
+      return { ok: false, pending: true };
+    });
+  } catch (error) {
+    console.error("Course speaking score sync could not be queued", { scoreId: scoreRef.id, error: error?.message });
+    // The authoritative score is already saved; never make students repeat an exam for an export failure.
+    return { ok: false, pending: true };
+  }
 }
 
 async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignmentId, sessionIds, attemptId }) {
@@ -322,10 +329,9 @@ async function courseSpeakingMockStatus({ db, uid, assignmentId }) {
   }
   return { ok: true, completed: true, assignmentId, score: row.score, passed: row.passed,
     sectionScores: row.sectionScores, speakingParts: row.speakingParts,
-    feedback: row.feedback, sheet: { ok: row.sheetSyncStatus === "complete",
-      pending: row.sheetSyncStatus !== "complete", message: row.sheetSyncError || "" } };
+    feedback: row.feedback, sheet: await synchronizeSheet({ db, scoreRef: snap.ref || db.collection("scores").doc(docIdFor(uid, assignmentId)), row }) };
 }
 
 module.exports = { COURSE_MOCKS, assignmentConfig, evaluateResults, buildScoreDocument,
   startCourseSpeakingAttempt, requireCourseSpeakingAttempt, submitCourseSpeakingMock,
-  courseSpeakingMockStatus, findSavedSpeakingParts, validAttemptId, upsertMockScoreSheet };
+  courseSpeakingMockStatus, findSavedSpeakingParts, validAttemptId, upsertMockScoreSheet, synchronizeSheet };
