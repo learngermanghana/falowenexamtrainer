@@ -5,7 +5,6 @@ import { getA2B1WorkbookSectionProfile } from "./a2B1WorkbookSectionProfile";
 const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
 
 const cleanedLateWorkbooks = [
-  [22, "A2Day22DieWochePlanungWorkbookPage.js", "8.22"],
   [23, "A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage.js", "9.23"],
   [24, "A2Day24EinenUrlaubPlanenWorkbookPage.js", "9.24"],
   [25, "A2Day25TagesablaufWorkbookPage.js", "9.25"],
@@ -47,6 +46,11 @@ describe("A2 Days 22-28 native workbook ownership", () => {
     expect(guidance).toContain("const usesNativeLateWorkbook =");
     expect(guidance).toContain("[22, 23, 24, 25, 26, 27, 28].includes(Number(workbookDay))");
     expect(guidance).toContain("usesNativeLateWorkbook || !showFallbackTabs");
+  });
+
+  test("Day 22 intentionally uses the Goethe speaking mock instead of the old workbook", () => {
+    const source = read("A2Day22DieWochePlanungWorkbookPage.js");
+    expect(source).toContain('<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />');
   });
 
   test.each(cleanedLateWorkbooks)(

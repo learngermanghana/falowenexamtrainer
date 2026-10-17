@@ -214,7 +214,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       <h2 style={{ margin: 0 }}>Your Teil scores</h2>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 10 }}>
         {[1,2,3].map(i => <div key={i} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 14 }}>
-          <strong>Teil {i}</strong><p style={{ margin: "8px 0 0", fontSize: 24, fontWeight: 800 }}>{scores[`teil${i}]}%</p>
+          <strong>Teil {i}</strong><p style={{ margin: "8px 0 0", fontSize: 24, fontWeight: 800 }}>{scores[`teil${i}`]}%</p>
         </div>)}
       </div>
       {[1,2,3].map(i => <details key={i} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>

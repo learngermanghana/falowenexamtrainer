@@ -26,7 +26,7 @@ const workbookFiles = new Map([
 ]);
 
 const expectedTitles = new Map([
-  [23, "Erstes Date – Typische Situationen"],
+  [23, "Goethe B1 Speaking Mock"],
   [24, "Konsum und Nachhaltigkeit"],
   [25, "Online einkaufen – Rechte und Risiken"],
   [26, "Reiseprobleme und Lösungen"],
@@ -104,7 +104,11 @@ describe("B1 Course Book cleanup · Days 23-28", () => {
       const source = componentSource(workbookFiles.get(day));
       expect(source).toContain(assignmentKey);
       expect(source).toContain(`day: ${day}`);
-      expect(source).toContain("B1StandardWorkbookPage");
+      if (day === 23) {
+        expect(source).toContain('<CourseSpeakingMockAssignment assignmentKey="B1-7.23" />');
+      } else {
+        expect(source).toContain("B1StandardWorkbookPage");
+      }
     });
   });
 
