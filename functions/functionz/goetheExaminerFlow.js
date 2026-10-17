@@ -117,11 +117,20 @@ function currentStep(flow, answered=0) {
 }
 const maxAnswers = session => profileFor(session.examFlow)?.maxAnswers || 2;
 const isReady = session => Boolean(session.taskReady) || Number(session.answeredTurns) >= maxAnswers(session);
+// Finishing a timed task is different from successfully achieving its goal.
+// Even if the candidate contributes little or no agreement is reached, all
+// speaking parts have a hard turn limit and must be assessable afterwards.
+function hasPlanningAgreement(session) {
+  const profile=profileFor(session.examFlow);
+  return Boolean(profile?.decisionPoints?.length) &&
+    Number(session.answeredTurns)>=profile.minAnswers &&
+    profile.decisionPoints.every(point=>(session.examFlow.decisions || []).some(d=>d.point === point));
+}
 function isComplete(session) {
   const profile=profileFor(session.examFlow);
   if (!profile) return false;
-  if (profile.decisionPoints?.length) return Number(session.answeredTurns)>=profile.minAnswers && profile.decisionPoints.every(point=>(session.examFlow.decisions || []).some(d=>d.point === point));
-  return Number(session.answeredTurns)>=profile.maxAnswers;
+  if (Number(session.answeredTurns)>=profile.maxAnswers) return true;
+  return hasPlanningAgreement(session);
 }
 function publicFlow(session) {
   const flow=session.examFlow, profile=profileFor(flow);
@@ -289,4 +298,4 @@ function calendarResponse(session, transcript) {
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
-module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse,appointmentIntent,agreesWithProposedSlot};
+module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,hasPlanningAgreement,responsePlan,partnerInstructions,mergeDecisions,calendarResponse,appointmentIntent,agreesWithProposedSlot};
