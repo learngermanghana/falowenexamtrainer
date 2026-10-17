@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
+import { mergeAutomaticResults } from "../utils/mergeAutomaticResults";
 import { collection, db, onSnapshot, query, where } from "../firebase";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
@@ -34,15 +35,10 @@ const StudentResultsPage = () => {
         .filter(entry => entry.source === "automatic_course_marking"));
     }, () => { /* Existing Sheet/API results remain available. */ });
   }, [user?.uid]);
-  const visibleResults = useMemo(() => {
-    const key = row => String(row.assignment_id || row.assignmentId || row.assignment || "").toUpperCase();
-    const merged = new Map(results.map(row => [key(row), row]));
-    automaticResults.forEach(row => {
-      const current = merged.get(key(row));
-      if (!current || (Date.parse(row.updatedAt || row.date) || 0) >= (Date.parse(current.updatedAt || current.date) || 0)) merged.set(key(row), row);
-    });
-    return [...merged.values()];
-  }, [results, automaticResults]);
+  const visibleResults = useMemo(
+    () => mergeAutomaticResults(results, automaticResults),
+    [results, automaticResults],
+  );
   const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
