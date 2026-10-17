@@ -10,6 +10,10 @@ on:
       - 'web/src/data/a2B1TimedAssignmentBase.js'
       - 'web/src/data/timedAssignmentConfig.js'
       - 'web/src/data/timedAssignmentConfig.test.js'
+      - 'web/src/components/SharedTimedAssignment.jsx'
+      - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/utils/timedAssignmentClock.js'
+      - 'web/src/utils/timedAssignmentClock.test.js'
       - '.github/workflows/graded-workbook-timers.yml'
   push:
     branches: [main]
@@ -21,6 +25,10 @@ on:
       - 'web/src/data/a2B1TimedAssignmentBase.js'
       - 'web/src/data/timedAssignmentConfig.js'
       - 'web/src/data/timedAssignmentConfig.test.js'
+      - 'web/src/components/SharedTimedAssignment.jsx'
+      - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/utils/timedAssignmentClock.js'
+      - 'web/src/utils/timedAssignmentClock.test.js'
       - '.github/workflows/graded-workbook-timers.yml'
 
 jobs:
@@ -37,7 +45,7 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
-      - name: Verify A2/B1/B2 tab-based timers and mock exceptions
+      - name: Verify graded timers, persisted attempt deadlines, and mock exceptions
         working-directory: web
         env:
           CI: true
@@ -47,3 +55,5 @@ jobs:
           src/data/timedAssignmentConfig.test.js
           src/data/a2B1LessonProfile.test.js
           src/data/a2B1LessonProfileTimerIntegration.test.js
+          src/utils/timedAssignmentClock.test.js
+          src/components/SharedTimedAssignment.test.jsx
