@@ -1,4 +1,5 @@
 const { deliverCurrentStudentToSheet } = require("./studentSheetDelivery");
+const { shouldSyncStudentSheet } = require("./studentSheetSyncDiff");
 const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
 const { _protectedOnCall: onCall } = require("./accountDeletion");
 const { setGlobalOptions } = require("firebase-functions/v2");
@@ -1064,6 +1065,13 @@ exports.onStudentUpdated = onDocumentUpdated(
       if (!identity || identity.customClaims?.systemDeletionTest === true) return null;
     }
     if (!student) return;
+
+    // Firestore changes for learning progress, activity and push tokens do not
+    // affect any column in the Students Sheet. Avoid expensive Sheets API work.
+    if (!shouldSyncStudentSheet(event.data?.before?.data(), student)) {
+      console.log("onStudentUpdated: sheet columns unchanged; skipping sync", event.params.studentCode);
+      return;
+    }
 
     process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
     process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
