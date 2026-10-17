@@ -853,6 +853,7 @@ exports.sendPushTestNotification = onCall(
   async (request) => {
     const authUid = request.auth?.uid || "";
     if (!authUid) {
+      console.warn("push_test_rejected", { reason: "unauthenticated" });
       throw new HttpsError("unauthenticated", "Please sign in before sending a test notification.");
     }
 
@@ -870,6 +871,7 @@ exports.sendPushTestNotification = onCall(
       token,
     });
     if (!owner) {
+      console.warn("push_test_rejected", { reason: "token_not_owned_by_current_account" });
       throw new HttpsError(
         "permission-denied",
         "This push token is not registered to your signed-in student account. Refresh this device and try again."
@@ -891,7 +893,10 @@ exports.sendPushTestNotification = onCall(
       route,
       sentAt: new Date().toISOString(),
     };
-    if (!await currentNotificationStudent(getFirestore(), owner.docId)) throw new HttpsError("permission-denied", "Notifications are paused during account deletion.");
+    if (!await currentNotificationStudent(getFirestore(), owner.docId)) {
+      console.warn("push_test_rejected", { reason: "notifications_paused" });
+      throw new HttpsError("permission-denied", "Notifications are paused during account deletion.");
+    }
     const response = await getAdmin().messaging().sendEachForMulticast({
       tokens: [token],
       notification: {
@@ -919,6 +924,11 @@ exports.sendPushTestNotification = onCall(
     if (!result?.success) {
       const errorCode = result?.error?.code || "messaging/unknown";
       const invalidReason = getInvalidTokenReason(errorCode);
+      // Log only the provider error code, never the device token.
+      console.error("push_test_delivery_failed", {
+        firebaseCode: errorCode,
+        staleToken: Boolean(invalidReason),
+      });
       if (invalidReason) {
         await cleanupInvalidTokens(
           new Map([[token, owner.docId]]),
@@ -935,6 +945,7 @@ exports.sendPushTestNotification = onCall(
       );
     }
 
+    console.info("push_test_delivered", { delaySeconds });
     return { ok: true, delaySeconds };
   }
 );

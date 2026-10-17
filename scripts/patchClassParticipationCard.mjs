@@ -86,7 +86,7 @@ const activeTabAfter = `  const location = useLocation();
     navigate(nextUrl, { replace: true });
   };`;
 
-if (account.includes("const activeTab = [\"studentData\", \"participation\", \"notifications\", \"billing\", \"upgrade\"].includes(requestedTab)")) {
+if (/const activeTab = \["studentData", "participation", "notifications", "billing", "upgrade"(?:, "deleteAccount")?\]\.includes\(requestedTab\)/.test(account)) {
   // The modern Account page already derives tab state from React Router.
 } else if (account.includes(previousActiveTabAfter)) {
   account = account.replace(previousActiveTabAfter, activeTabAfter);
