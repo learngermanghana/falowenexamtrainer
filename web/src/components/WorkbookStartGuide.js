@@ -146,7 +146,9 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
   const isGrammarMode = mode === "grammar";
   const isDuplicateA1WorkbookGuide = normalizeLevel(level) === "A1" && !isGrammarMode;
 
-  if (isDuplicateA1WorkbookGuide) return null;
+  const isSpeakingMock = (normalizeLevel(level) === "A2" && Number(day) === 22)
+    || (normalizeLevel(level) === "B1" && Number(day) === 23);
+  if (isDuplicateA1WorkbookGuide || isSpeakingMock) return null;
 
   return (
     <section style={guideStyle}>
