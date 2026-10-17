@@ -1008,10 +1008,50 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         return {step:index+1,score:skipped ? 0 : n,maxScore:2,answer,
           comment:skipped ? "No answer given for this planning step." : String(item.comment || "").slice(0,300)};
       });
+      // A planning simulation must not give a passing Teil merely for
+      // repeating one-word acknowledgements until the clock runs out.
+      // A brief genuine acceptance can still count, but if almost every
+      // response is filler, cap the result below the passing threshold.
+      const isPlanning=["A2-3","B1-1"].includes(examContext?.flow?.key);
+      const trivialAnswer=answer => /^(?:\\[Keine Antwort\\]|ja|nein|nö|ok|okay|klar|gut|passt|egal|sorry|entschuldigung|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung)[.!? ]*$/i
+        .test(String(answer || "").trim());
+      const noAnswer=answer => /^(?:\\[Keine Antwort\\]|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung|egal|sorry)[.!? ]*$/i
+        .test(String(answer || "").trim());
+      if (isPlanning) {
+        for (const step of taskScores) {
+          if (step && noAnswer(step.answer)) {
+            step.score=0;
+            step.comment="No relevant planning contribution provided.";
+          }
+        }
+      }
+      const unproductiveTurns=isPlanning ? answers.filter(trivialAnswer).length : 0;
+      const engagementCap=isPlanning && answers.length && unproductiveTurns / answers.length >= 0.75
+        ? Math.floor(taskScores.length * 2 * (unproductiveTurns===answers.length ? 0.30 : 0.45))
+        : null;
+      const originalModelScore=taskScores.every(Boolean)
+        ? taskScores.reduce((total,step)=>total+step.score,0) : null;
+      if (engagementCap != null && originalModelScore > engagementCap) {
+        let excess=originalModelScore-engagementCap;
+        // Remove unsupported filler credit first; preserve the learner's
+        // more informative replies whenever possible.
+        for (const step of [...taskScores.filter(step=>step && trivialAnswer(step.answer)),
+          ...taskScores.filter(step=>step && !trivialAnswer(step.answer))]) {
+          const deduction=Math.min(excess,step.score);
+          if (deduction) {
+            step.score-=deduction;
+            step.comment="Limited contribution to the planning discussion. "+step.comment;
+            excess-=deduction;
+          }
+          if (!excess) break;
+        }
+      }
       const assessment=taskScores.length && taskScores.every(Boolean) && summary && priority ? {
         version:1,level,teil:task.teil || "",score:taskScores.reduce((sum,x)=>sum+x.score,0),
         maxScore:taskScores.length*2,percent:Math.round(taskScores.reduce((sum,x)=>sum+x.score,0)*50/taskScores.length),
         tasks:taskScores,summary,strength,priority,correctedExample,nextPractice,practiceOnly:true,
+        ...(isPlanning ? {participationAudit:{lowInformationTurns:unproductiveTurns,
+          modelScore:originalModelScore,appliedMaximum:engagementCap}} : {}),
       } : null;
       if (assignmentConfig(task.courseAssignmentKey) && !assessment) {
         throw new Error("The graded speaking assessment was incomplete. Retry feedback before continuing.");
