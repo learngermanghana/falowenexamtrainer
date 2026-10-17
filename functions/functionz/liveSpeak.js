@@ -772,9 +772,33 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         catch (releaseError) { console.error("Live Speak confirm unlock error",releaseError?.message); }
       }
       if (reserved && examTask) {
-        // The answer was already saved. Do not make the learner record/pay again.
-        await updateSession(sessionRef, sessionId, {taskReady:true});
-        return res.json({ok:true, transcript:answers.at(-1), reply:"Ihre Antwort ist gespeichert. Sie können jetzt Ihr Feedback ansehen.", taskReady:true, audioBase64:""});
+        // A response/audio provider failure after the transcript is saved
+        // must not falsely end an unfinished speaking part.
+        const completed = flowSession
+          ? (taskFlows.isComplete(flowSession) ||
+              Number(flowSession.answeredTurns) >= answerLimit(flowSession))
+          : answers.length >= EXAM_ANSWER_LIMIT;
+        const nextStep = flowSession && !completed
+          ? taskFlows.responsePlan(flowSession)?.step : null;
+        const nextInstruction = nextStep?.instruction || "";
+        const reply = completed
+          ? "Ihre Antwort ist gespeichert. Dieser Prüfungsteil ist beendet."
+          : "Ihre Antwort ist gespeichert. Bitte fahren Sie mit der nächsten Frage fort.";
+        try {
+          await updateSession(sessionRef, sessionId, {
+            taskReady:completed, inFlight:false,
+            messages:[...storedMessages,{role:"user",text:answers.at(-1)},
+              {role:"assistant",speaker:"examiner",text:nextInstruction || reply}].slice(-20),
+          });
+        } catch (saveError) {
+          console.error("Live Speak saved-turn recovery update failed", saveError?.message);
+          return error(res,503,"saved_answer_recovery_pending",
+            "Your recording was saved. Refresh the examiner to restore the next step.");
+        }
+        return res.json({ok:true, transcript:answers.at(-1), reply,
+          nextInstruction, speaker:"examiner",taskReady:completed,
+          ...(flowSession ? {examFlow:taskFlows.publicFlow({...flowSession,taskReady:completed})} : {}),
+          audioBase64:""});
       }
       if (err?.status) return error(res,err.status,err.code,err.message);
       console.error("Live Speak confirm error",err?.message);
@@ -817,10 +841,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         answers = confirmedAnswers(record);
         // Missing decision points are graded as a weaker answer, not as a
         // technical failure. But every scheduled examiner response must be given.
+        // Planning parts can end before their maximum turns when all required
+        // decisions are reached. That is a legitimate completed exam part.
         if (assignmentConfig(record.examTask?.courseAssignmentKey)
-          && (!record.examFlow || Number(record.answeredTurns) < answerLimit(record))) {
-          throw Object.assign(new Error("Complete every examiner step before requesting graded feedback."),
-            {status:409,code:"course_mock_part_incomplete"});
+          && (!record.examFlow ||
+              (!taskFlows.isComplete(record) &&
+                Number(record.answeredTurns) < answerLimit(record)))) {
+          throw Object.assign(new Error(
+            "This Teil still has an unanswered examiner step. Resume the saved session to finish."
+          ), {status:409,code:"course_mock_part_incomplete"});
         }
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
@@ -864,7 +893,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       ];
       const response = await client.chat.completions.create(buildChatRequest({
         model:resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),
-        messages,response_format:{type:"json_object"},max_tokens:750,temperature:0.2,
+        messages,response_format:{type:"json_object"},max_tokens:Math.min(1800,700+answers.length*150),temperature:0.2,
       }), PROVIDER_OPTIONS);
       reportUsage("exam_feedback", resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL), response?.usage || {});
       const raw = String(response?.choices?.[0]?.message?.content || "").trim();
