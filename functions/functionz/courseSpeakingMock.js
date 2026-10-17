@@ -64,6 +64,47 @@ function evaluateResults({ assignmentId, uid, snapshots }) {
   return { config, parts, score };
 }
 
+
+// Recover already-graded examiner parts from Firestore rather than requiring
+// this browser's localStorage to survive navigation, updates or device resets.
+// The single-field uid query avoids requiring a new composite Firestore index.
+async function findSavedSpeakingParts({ db, uid, assignmentId }) {
+  const config = assignmentConfig(assignmentId);
+  if (!config) throw validationError("Unknown course speaking assignment.");
+  const query = await db.collection("liveSpeakExamResults").where("uid", "==", uid).limit(250).get();
+  const candidates = (query.docs || []).filter(snap => {
+    const item = snap.data() || {};
+    const part = normalizedPart(item.teil || item.task?.teil);
+    const assessment = item.assessment || {};
+    return item.uid === uid && item.level === config.level
+      && item.task?.courseAssignmentKey === assignmentId
+      && item.source === "exam-speaking-practice"
+      && part && item.examFlowKey === `${config.level}-${part.slice(-1)}`
+      && item.completed === true && assessment.practiceOnly === true
+      && Number.isFinite(Number(assessment.score))
+      && Number.isFinite(Number(assessment.maxScore))
+      && Number(assessment.maxScore) > 0
+      && Array.isArray(assessment.tasks) && assessment.tasks.length > 0;
+  });
+  candidates.sort((a, b) => {
+    const time = snap => snap.data()?.createdAt?.toMillis?.() || 0;
+    return time(b) - time(a);
+  });
+  const byPart = new Map();
+  for (const snap of candidates) {
+    const part = normalizedPart(snap.data().teil || snap.data().task?.teil);
+    if (!byPart.has(part)) byPart.set(part, snap);
+  }
+  const parts = ["teil1", "teil2", "teil3"].filter(key => byPart.has(key)).map(key => {
+    const snap = byPart.get(key);
+    const item = snap.data() || {};
+    return { sessionId: item.sessionId || snap.id, taskId: item.task?.id || "",
+      teil: item.teil || item.task?.teil || `Teil ${key.slice(-1)}`,
+      assessment: item.assessment };
+  });
+  return { parts, snapshots: ["teil1", "teil2", "teil3"].filter(key => byPart.has(key)).map(key => byPart.get(key)) };
+}
+
 function buildScoreDocument({ assignmentId, uid, profile = {}, auth = {}, outcome, date = new Date().toISOString() }) {
   const studentCode = clean(profile.studentCode || profile.studentcode || profile.student_code || profile.code || uid);
   const email = clean(profile.email || auth.email).toLowerCase();
@@ -131,7 +172,11 @@ async function upsertMockScoreSheet(row) {
       valueInputOption: "RAW", requestBody: { values: [old] },
     });
   }
-  const cells = new Array(Math.max(header.length, 9)).fill("");
+  // Preserve extra Admin columns (manual overrides, marking breakdowns,
+  // source audit fields) when the same result is synchronized again.
+  const cells = same.length
+    ? [...values[same[0] - 2]]
+    : new Array(Math.max(header.length, 9)).fill("");
   const data = { studentcode: row.studentCode, name: row.name, assignment: row.assignment,
     assignmentid: row.assignmentId, score: row.score, comments: row.comments,
     date: row.date, level: row.level, link: row.link };
@@ -181,12 +226,18 @@ async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignm
   const scoreRef = db.collection("scores").doc(docIdFor(uid, assignmentId));
   let existing = await scoreRef.get();
   if (!existing.exists) {
-    if (!Array.isArray(sessionIds) || sessionIds.length !== 3 ||
-        sessionIds.some(id => !/^[0-9a-f-]{36}$/i.test(clean(id))) ||
-        new Set(sessionIds).size !== 3) {
+    let snapshots;
+    if (Array.isArray(sessionIds) && sessionIds.length === 3 &&
+        sessionIds.every(id => /^[0-9a-f-]{36}$/i.test(clean(id))) &&
+        new Set(sessionIds).size === 3) {
+      snapshots = await Promise.all(sessionIds.map(id => db.collection("liveSpeakExamResults").doc(id).get()));
+    } else if (sessionIds === undefined || sessionIds === null) {
+      // A student may have closed the tab after all three parts were saved.
+      // Only fully graded server-owned parts are eligible for final submission.
+      snapshots = (await findSavedSpeakingParts({ db, uid, assignmentId })).snapshots;
+    } else {
       throw validationError("Three different completed exam session IDs are required.");
     }
-    const snapshots = await Promise.all(sessionIds.map(id => db.collection("liveSpeakExamResults").doc(id).get()));
     const outcome = evaluateResults({ assignmentId, uid, snapshots });
     const doc = buildScoreDocument({ assignmentId, uid, profile, auth, outcome });
     try { await scoreRef.create({ ...doc, createdAt: admin.firestore.FieldValue.serverTimestamp(), updatedAt: admin.firestore.FieldValue.serverTimestamp() }); }
@@ -209,7 +260,11 @@ async function courseSpeakingMockStatus({ db, uid, assignmentId }) {
   if (!assignmentConfig(assignmentId)) throw validationError("Unknown course speaking assignment.");
   const snap = await db.collection("scores").doc(docIdFor(uid, assignmentId)).get();
   const row = snap.data();
-  if (!row || row.uid !== uid || row.source !== "course_speaking_mock") return { ok: true, completed: false };
+  if (!row || row.uid !== uid || row.source !== "course_speaking_mock") {
+    const recovered = await findSavedSpeakingParts({ db, uid, assignmentId });
+    return { ok: true, completed: false, recovery: { parts: recovered.parts,
+      allPartsGraded: recovered.parts.length === 3 } };
+  }
   return { ok: true, completed: true, assignmentId, score: row.score, passed: row.passed,
     sectionScores: row.sectionScores, speakingParts: row.speakingParts,
     feedback: row.feedback, sheet: { ok: row.sheetSyncStatus === "complete",
@@ -217,4 +272,4 @@ async function courseSpeakingMockStatus({ db, uid, assignmentId }) {
 }
 
 module.exports = { COURSE_MOCKS, assignmentConfig, evaluateResults, buildScoreDocument,
-  submitCourseSpeakingMock, courseSpeakingMockStatus, upsertMockScoreSheet };
+  submitCourseSpeakingMock, courseSpeakingMockStatus, findSavedSpeakingParts, upsertMockScoreSheet };

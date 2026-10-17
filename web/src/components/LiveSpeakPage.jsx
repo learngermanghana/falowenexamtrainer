@@ -354,7 +354,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setTypedAnswer("");
       if (replayUrlRef.current) {URL.revokeObjectURL(replayUrlRef.current);replayUrlRef.current="";}
       setLastAudio(result.audioBase64);
-      setNotice("");
+      setNotice(gradedCourseMock
+        ? `✓ Answer ${Number(session.answeredTurns || 0) + 1} saved to Falowen. ${result.taskReady ? "All answers recorded; AI marking is starting." : "Continue with the examiner."}`
+        : "");
       await playVoice(result.audioBase64);
     } catch (err) {
       if (mounted.current) {
@@ -552,21 +554,35 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       });
       if (!mounted.current) return;
       stopAudio();
-      setExamFeedback(result.feedback);
-      setExamAssessment(result.assessment || null);
-      setSession(null);
-      setExitConfirm(false);
-      onExamCompleted?.({sessionId:session.sessionId,taskId:session.examTask?.id || examTask?.id,
+      if (gradedCourseMock && !result.assessment) {
+        throw new Error("Your answers are saved, but AI marking is incomplete. Tap Retry feedback.");
+      }
+      const accepted = onExamCompleted?.({sessionId:session.sessionId,taskId:session.examTask?.id || examTask?.id,
         level:session.level || safeLevel,
         teil:session.examTask?.teil || examTask?.teil,
         topic:session.examTask?.prompt || examTask?.prompt,
         keyword:session.examTask?.keywords || examTask?.keywords,
         feedback:result.feedback,assessment:result.assessment || null,
         words:session.examFlow?.cards || session.examFlow?.requestCards || []});
-      setNotice("Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
+      if (gradedCourseMock && accepted === false) {
+        throw new Error("Your exam answers are saved. Retry feedback to complete the mark.");
+      }
+      setExamFeedback(result.feedback);
+      setExamAssessment(result.assessment || null);
+      setSession(null);
+      setExitConfirm(false);
+      setNotice(gradedCourseMock
+        ? "✓ This speaking part has been marked and saved to Falowen."
+        : "Exam practice complete. Feedback is based on your reviewed transcripts, not a pronunciation assessment.");
       await refresh();
     } catch (err) {
-      if (mounted.current) setErrorMessage(err.message);
+      autoFeedbackRequested.current = false;
+      if (mounted.current) {
+        setErrorMessage(err.message);
+        setNotice(gradedCourseMock
+          ? "Your confirmed answers remain saved. Marking has not finished; use Retry feedback."
+          : "");
+      }
     } finally {
       requestBusy.current = false;
       if (mounted.current) setFeedbackBusy(false);
@@ -659,10 +675,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   // feedback once instead of asking the learner to end or lose the session.
   useEffect(() => {
     if (!examinerSession || !taskReady || !recordedAnswers.length ||
-      pending || busy || feedbackBusy || examFeedback || autoFeedbackRequested.current) return;
+      pending || busy || feedbackBusy || examFeedback || errorMessage || autoFeedbackRequested.current) return;
     autoFeedbackRequested.current=true;
     finishExamTask();
-  }, [examinerSession,taskReady,recordedAnswers.length,pending,busy,feedbackBusy,examFeedback]);
+  }, [examinerSession,taskReady,recordedAnswers.length,pending,busy,feedbackBusy,examFeedback,errorMessage]);
 
   const stopRecording = () => {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
@@ -915,6 +931,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 <strong>Your answer</strong>
                 <span role="timer" aria-label="Speaking time">{recording ? "● Recording " : ""}{recordingTimeLabel} / {speakingLimitLabel}</span>
               </div>
+              {gradedCourseMock && notice ? <p role="status" aria-live="polite" className="speaking-mock-saved-notice">{notice}</p> : null}
               <div className="speaking-answer-mode" role="group" aria-label="Choose how to answer">
                 <button type="button" aria-pressed={answerMode==="record"} disabled={recording || busy || Boolean(pending)}
                   onClick={()=>setAnswerMode("record")}>🎙 Record</button>
@@ -1074,7 +1091,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           </button>
         </div>
       </div> : null}
-      {notice ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
+      {notice && !gradedCourseMock ? <p role="status" style={{...shell,background:"#eff6ff",margin:0}}>{notice}</p> : null}
       {errorMessage ? <p role="alert" style={{...shell,background:"#fef2f2",color:"#991b1b",margin:0}}>{errorMessage}</p> : null}
 
     </Container>

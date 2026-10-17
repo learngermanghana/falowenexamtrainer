@@ -80,12 +80,46 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         return;
       }
       const draft = readDraft(uid, assignmentKey);
-      if (draft) {
+      // The server is authoritative. Recover completed parts even after a
+      // browser refresh, lost localStorage or interrupted final submission.
+      const cloudParts = status.recovery?.parts || [];
+      const completedParts = cloudParts.length >= (draft?.results?.length || 0)
+        ? cloudParts : draft.results;
+      const selectedTasks = draft?.tasks || chooseTasks(config.level);
+      if (selectedTasks && completedParts.length) {
+        const restoredTasks = selectedTasks.map((task, i) => {
+          const item = completedParts[i];
+          return item?.taskId ? speakingQuestionDictionary.find(q =>
+            q.level === config.level && q.id === item.taskId) || task : task;
+        });
+        setTasks(restoredTasks);
+        setResults(completedParts);
+        saveDraft(uid, assignmentKey, { tasks: restoredTasks, results: completedParts });
+        setActivePart(Math.min(2, completedParts.length));
+        if (completedParts.length === 3) {
+          setStage("submitting");
+          submitCourseSpeakingMock({
+            idToken, assignmentKey, sessionIds: completedParts.map(part => part.sessionId),
+          }).then(response => {
+            if (cancelled) return;
+            setServerResult(response);
+            setStage("complete");
+            saveDraft(uid, assignmentKey, null);
+          }).catch(error => {
+            if (cancelled) return;
+            setMessage(error?.response?.data?.error || error?.message ||
+              "Your three parts are graded. Your course score needs submission. Retry below.");
+            setStage("save-error");
+          });
+        } else {
+          setMessage(`✓ ${completedParts.length} speaking part${completedParts.length === 1 ? "" : "s"} recovered from Falowen.`);
+          setStage("exam");
+        }
+      } else if (draft) {
         setTasks(draft.tasks);
-        setResults(draft.results || []);
-        const length = draft.results?.length || 0;
-        setActivePart(Math.min(2, length));
-        setStage(length === 3 ? "save-error" : "exam");
+        setResults([]);
+        setActivePart(0);
+        setStage("exam");
       } else setStage("intro");
     }).catch(error => {
       if (!cancelled) {
@@ -122,22 +156,25 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     if (!result?.sessionId || !result?.assessment ||
         !Number.isFinite(Number(result.assessment.maxScore)) ||
         Number(result.assessment.maxScore) <= 0) {
-      setMessage("The examiner could not verify this part. Retry the assessment before continuing.");
-      return;
+      setMessage("Marking is still pending. Your recorded answers remain saved. Tap Retry feedback.");
+      return false;
     }
     const expectedTeil = `Teil ${activePart + 1}`;
     if (partNumber(result.teil) !== String(activePart + 1)) {
-      setMessage("The completed speaking part does not match the current exam.");
-      return;
+      setMessage("This part did not match the assigned exam. Your answers remain saved; retry feedback.");
+      return false;
     }
     const next = [...results.slice(0, activePart), { ...result, teil: expectedTeil }];
     setResults(next);
     saveDraft(uid, assignmentKey, { tasks, results: next });
-    if (activePart === 2) submit(next);
-    else {
-      setMessage("");
+    if (activePart === 2) {
+      setMessage("✓ All three parts marked. Saving your result…");
+      submit(next);
+    } else {
+      setMessage(`✓ Teil ${activePart + 1} marked and saved. Continue to Teil ${activePart + 2}.`);
       setActivePart(activePart + 1);
     }
+    return true;
   }, [activePart, assignmentKey, results, submit, tasks, uid]);
 
   const selected = tasks?.[activePart];
@@ -225,7 +262,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       {message ? <p role="alert" style={{ color: "#b91c1c" }}>{message}</p> : null}
     </section> : null}
 
-    {stage === "submitting" ? <section style={surface} role="status"><h2>Exam completed</h2><p>Saving your verified speaking score to Falowen and synchronizing the result sheet…</p></section> : null}
+    {stage === "submitting" ? <section style={surface} role="status" aria-live="polite"><h2>✓ All three speaking parts recorded and assessed</h2><p>Saving your final course score now. Keep this page open while we confirm storage and synchronization.</p></section> : null}
     {stage === "save-error" ? <section style={surface} role="alert">
       <h2>Submission needs a retry</h2>
       <p>{message}</p><p>Your three assessed parts are retained on this device and on the examiner server. Do not record them again.</p>
@@ -233,7 +270,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     </section> : null}
 
     {stage === "complete" && serverResult ? <section style={{ ...surface, display: "grid", gap: 16 }}>
-      <span style={{ fontWeight: 800, color: "#166534" }}>✓ Speaking assignment completed</span>
+      <span role="status" aria-live="polite" style={{ fontWeight: 800, color: "#166534" }}>✓ All three speaking parts assessed — course score saved in Falowen</span>
       <div className="speaking-total-score">
         <strong>{serverResult.score} / 100</strong>
         <span>{serverResult.passed ? "Course pass threshold met" : "Further speaking practice recommended"}</span>
@@ -249,8 +286,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         <SpeakingFeedback assessment={displayParts[`teil${i}`] || {}} feedback={displayParts[`teil${i}`]?.summary || ""}/>
       </details>)}
       {serverResult.sheet?.ok ? <p role="status" style={{ color: "#166534" }}>Score saved in Falowen and synchronized with the Google results sheet.</p>
-        : <div role="status" style={{ background: "#fffbeb", padding: 12, borderRadius: 12 }}>
-          <p style={{ marginTop: 0 }}>Your course score is saved in Falowen. Google Sheets synchronization is pending. {serverResult.sheet?.message || ""}</p>
+        : <div role="status" aria-live="polite" style={{ background: "#fffbeb", padding: 12, borderRadius: 12 }}>
+          <p style={{ marginTop: 0 }}>✓ Your course score is stored in Falowen. Google Sheets and Admin sheet synchronization is still pending. Your recording is not lost. {serverResult.sheet?.message || ""}</p>
           <button type="button" style={button} onClick={() => submit()}>Retry Google Sheets sync</button>
         </div>}
       <Link to="/campus/results">View all course results →</Link>

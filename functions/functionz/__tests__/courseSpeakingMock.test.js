@@ -1,4 +1,4 @@
-const { COURSE_MOCKS, evaluateResults, buildScoreDocument } = require("../courseSpeakingMock");
+const { COURSE_MOCKS, evaluateResults, buildScoreDocument, findSavedSpeakingParts, courseSpeakingMockStatus } = require("../courseSpeakingMock");
 
 const makeSnapshots = (level = "A2", assignmentId = "A2-8.22", uid = "student-uid") =>
   [1, 2, 3].map((part, index) => ({
@@ -76,5 +76,45 @@ describe("Graded Goethe-style speaking coursework", () => {
       snapshots: makeSnapshots().slice(0, 2) })).toThrow(/all three/i);
     expect(() => evaluateResults({ assignmentId: "B1-10.28", uid: "student-uid",
       snapshots: makeSnapshots("B1", "B1-10.28") })).toThrow(/not a graded speaking/i);
+  });
+});
+
+describe("Resume and score-sheet recovery", () => {
+  const firestore = rows => ({
+    collection: name => {
+      if (name === "scores") return { doc: () => ({ get: async () => ({ data: () => undefined }) }) };
+      if (name === "liveSpeakExamResults") return {
+        where: (key, op, uid) => {
+          expect([key, op, uid]).toEqual(["uid", "==", "student-uid"]);
+          return { limit: max => ({
+            get: async () => ({ docs: rows.slice(0, max) }),
+          }) };
+        },
+      };
+      throw new Error("Unexpected collection: " + name);
+    },
+  });
+  test("restores three scored parts from server when browser storage is lost", async () => {
+    const db = firestore(makeSnapshots());
+    const found = await findSavedSpeakingParts({ db, uid: "student-uid", assignmentId: "A2-8.22" });
+    expect(found.parts.map(part => part.teil)).toEqual(["Teil 1", "Teil 2", "Teil 3"]);
+    expect(found.snapshots).toHaveLength(3);
+    const status = await courseSpeakingMockStatus({ db, uid: "student-uid", assignmentId: "A2-8.22" });
+    expect(status).toMatchObject({ completed: false, recovery: { allPartsGraded: true } });
+    expect(status.recovery.parts).toHaveLength(3);
+  });
+  test("does not mark missing or unrelated parts as complete", async () => {
+    const others = makeSnapshots("B1", "B1-7.23");
+    const db = firestore([...makeSnapshots().slice(0, 2), ...others]);
+    const status = await courseSpeakingMockStatus({ db, uid: "student-uid", assignmentId: "A2-8.22" });
+    expect(status.recovery.parts).toHaveLength(2);
+    expect(status.recovery.allPartsGraded).toBe(false);
+  });
+  test("ignores scores belonging to another student or without completed AI assessment", async () => {
+    const parts = makeSnapshots();
+    parts[1].data = () => ({ ...makeSnapshots()[1].data(), completed: false });
+    parts[2].data = () => ({ ...makeSnapshots()[2].data(), uid: "another-account" });
+    const found = await findSavedSpeakingParts({ db: firestore(parts), uid: "student-uid", assignmentId: "A2-8.22" });
+    expect(found.parts.map(part => part.teil)).toEqual(["Teil 1"]);
   });
 });
