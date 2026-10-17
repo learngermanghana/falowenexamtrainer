@@ -51,6 +51,7 @@ function setup(overrides = {}, authOverride = {}) {
       if(name==="openai")return {toFile:async(_data,name)=>({name})};
       if(name==="./chatModelConfig")return require("../../../functions/functionz/chatModelConfig");
       if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
+      if(name==="./courseSpeakingMock")return {requireCourseSpeakingAttempt:async()=>({status:"in_progress"})};
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
       throw new Error("Unexpected require "+name);
     },
@@ -1092,4 +1093,57 @@ test("open examiner mode preserves the old standalone credit-claim path",async()
   });
   expect(session.code).toBe(200);
   expect(api.docs.get("liveSpeakPilotCredits/u123").remaining).toBe(1);
+});
+
+
+test("graded B1 planning finishes early and feedback survives expired timer", async () => {
+  const api=setup();
+  const sessionId="already-saved-course-exam";
+  const task={id:"b1-planning",teil:"Teil 1",prompt:"Gemeinsam planen",
+    courseAssignmentKey:"B1-7.23",mockAttemptId:"11111111-1111-4111-8111-111111111111"};
+  api.docs.set("liveSpeakSessions/u123",{
+    uid:"u123",sessionId,level:"B1",source:"exam-speaking-practice",
+    examTask:task,examFlow:{key:"B1-1",mode:"simulation",decisions:[
+      {point:"time",value:"Samstag",quote:"Samstag"},
+      {point:"place",value:"Park",quote:"Park"},
+      {point:"transport",value:"Bus",quote:"Bus"},
+      {point:"responsibilities",value:"Wir kaufen Essen",quote:"Essen"},
+    ]},
+    confirmedAnswers:["Wir treffen uns am Samstag im Park.","Wir fahren mit dem Bus. Ich kaufe Essen."],
+    answeredTurns:2,taskReady:true,feedbackAttempts:2,
+    messages:[{role:"user",text:"Wir treffen uns am Samstag im Park."},
+      {role:"user",text:"Wir fahren mit dem Bus. Ich kaufe Essen."}],
+    expiresAt:new Date(Date.now()-90*60*1000).toISOString(),endedAt:null,
+  });
+  api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{message:{
+    content:JSON.stringify({taskScores:[{step:1,score:2,comment:"Valid proposal"},
+      {step:2,score:2,comment:"Agreed"}],summary:"Clear plan",strength:"Suggestions",
+      priority:"More detail",correctedExample:"Wir treffen uns im Park.",nextPractice:"Plan another trip"})
+  }}]});
+  const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId});
+  expect(feedback.code).toBe(200);
+  expect(feedback.payload.assessment.score).toBe(4);
+  const stored=api.docs.get("liveSpeakExamResults/"+sessionId);
+  expect(stored.completed).toBe(true);
+  expect(stored.mockAttemptId).toBe(task.mockAttemptId);
+  expect(stored.ownerAssignment).toBe("u123:B1-7.23");
+});
+
+test("P1: refuses to resume an older graded examiner session from another attempt", async () => {
+  const api=setup();
+  api.docs.set("liveSpeakSessions/u123",{
+    uid:"u123",sessionId:"prior-attempt",level:"A2",source:"exam-speaking-practice",
+    examTask:{id:"old-task",teil:"Teil 1",courseAssignmentKey:"A2-8.22",
+      mockAttemptId:"11111111-1111-4111-8111-111111111111"},
+    expiresAt:new Date(Date.now()+60_000).toISOString(),endedAt:null,
+  });
+  const response=await api.call("POST","/live-speak/session/start",{
+    level:"A2",source:"exam-speaking-practice",topic:"Fragen zur Person",
+    examinerFlowVersion:1,examMode:"simulation",
+    examTask:{id:"new-task",teil:"Teil 1",prompt:"Fragen zur Person",
+      courseAssignmentKey:"A2-8.22",mockAttemptId:"22222222-2222-4222-8222-222222222222"},
+  });
+  expect(response.code).toBe(409);
+  expect(response.payload.code).toBe("different_mock_attempt_active");
+  expect(api.docs.get("liveSpeakSessions/u123").sessionId).toBe("prior-attempt");
 });
