@@ -50,7 +50,8 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("B1-6.18")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-6.19")).toBe(55 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.21")).toBe(55 * 60);
-    expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(55 * 60);
+    // Day 22 is an intentionally shorter two-part lesson, not the standard B1 timer.
+    expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(15 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.23")).toBe(55 * 60);
     expect(getTimedAssignmentConfig("B1-7.22")?.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-8.24")?.timedTabs).toEqual(["schreiben", "lesen"]);
