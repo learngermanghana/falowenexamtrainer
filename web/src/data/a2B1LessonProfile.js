@@ -1,3 +1,4 @@
+import { getGradedTabDurationMinutes } from "./gradedTabTiming";
 import { hasA2B1GrammarNotes } from "./a2B1GrammarAvailability";
 import { isA2WritingRequired } from "./a2WritingSchedule";
 import { isB1WritingRequired } from "./b1WritingSchedule";
@@ -229,6 +230,13 @@ const buildCanonicalTimer = ({ assignmentKey, requiredSubmissionParts }) => {
   return Object.freeze({
     ...raw,
     timedTabs,
+    durationMinutes: getGradedTabDurationMinutes({
+      level: raw.level,
+      assignmentKey,
+      timedTabs,
+      mode: raw.mode,
+      configuredDurationMinutes: raw.durationMinutes,
+    }),
     scope: joinPartLabels(requiredSubmissionParts) || raw.scope,
     source: "lesson-profile",
   });
