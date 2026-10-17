@@ -422,6 +422,17 @@ describe("Termin negotiation in shared course mocks and Exam Room", () => {
       expect(flows.mergeDecisions(session,[],reply).decisions).toHaveLength(0);
     });
 
+  test.each([
+    "Am Samstag um 15 Uhr kann ich leider nicht.",
+    "Wie wäre es mit Samstag um 15 Uhr oder Sonntag um 16 Uhr?",
+    "Am Samstag um 15 Uhr oder um 17 Uhr?",
+  ])("B1 refuses non-proposals and ambiguous alternatives from the partner: %s",previous=>{
+    const flow=flows.createExaminerFlow("B1",{teil:"Teil 1",
+      prompt:"Einen kranken Freund oder Lehrer besuchen"});
+    const session={examFlow:flow,answeredTurns:2,messages:[{role:"assistant",text:previous}]};
+    expect(flows.mergeDecisions(session,[],"Ich habe frei.").decisions).toHaveLength(0);
+  });
+
   test("B1 availability alone cannot claim a time never proposed by the partner",()=>{
     const flow=flows.createExaminerFlow("B1",{teil:"Teil 1",
       prompt:"Einen kranken Freund oder Lehrer besuchen"});
