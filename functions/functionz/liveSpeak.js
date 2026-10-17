@@ -335,6 +335,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const existing = sessionSnap.data() || {};
         if (existing.sessionId && !existing.endedAt &&
           (Date.parse(existing.expiresAt || "") > Date.now() || feedbackOpen(existing))) {
+          if (examTask?.courseAssignmentKey &&
+            (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
+              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) {
+            throw Object.assign(new Error(
+              "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
+            ), {status:409,code:"different_mock_attempt_active"});
+          }
           result = sessionView(existing);
           return;
         }
