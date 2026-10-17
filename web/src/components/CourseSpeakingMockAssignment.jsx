@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import LiveSpeakPage from "./LiveSpeakPage";
 import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
-import { fetchCourseSpeakingMockStatus, submitCourseSpeakingMock } from "../services/courseSpeakingMockService";
+import { fetchCourseSpeakingMockStatus, startCourseSpeakingMock, submitCourseSpeakingMock } from "../services/courseSpeakingMockService";
 import "./SpeakingExamDesign.css";
 
 const ASSIGNMENTS = Object.freeze({
@@ -56,6 +56,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
   const [stage, setStage] = useState("loading");
   const [tasks, setTasks] = useState(null);
   const [results, setResults] = useState([]);
+  const [attemptId, setAttemptId] = useState("");
+  const [legacyParts, setLegacyParts] = useState(0);
   const [activePart, setActivePart] = useState(0);
   const [serverResult, setServerResult] = useState(null);
   const [message, setMessage] = useState("");
@@ -80,12 +82,16 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         return;
       }
       const draft = readDraft(uid, assignmentKey);
-      // The server is authoritative. Recover completed parts even after a
-      // browser refresh, lost localStorage or interrupted final submission.
+      const serverAttemptId = status.attemptId || "";
+      setAttemptId(serverAttemptId);
+      const verifiedDraft = serverAttemptId && draft?.attemptId === serverAttemptId ? draft : null;
+      // An old local draft did not have an attempt ID. Keep it for review,
+      // never combine its parts with newer server-owned attempts.
+      setLegacyParts(!verifiedDraft && draft?.results?.length ? draft.results.length : 0);
       const cloudParts = status.recovery?.parts || [];
-      const completedParts = cloudParts.length >= (draft?.results?.length || 0)
-        ? cloudParts : draft.results;
-      const selectedTasks = draft?.tasks || chooseTasks(config.level);
+      const completedParts = cloudParts.length >= (verifiedDraft?.results?.length || 0)
+        ? cloudParts : verifiedDraft?.results || [];
+      const selectedTasks = verifiedDraft?.tasks || chooseTasks(config.level);
       if (selectedTasks && completedParts.length) {
         const restoredTasks = selectedTasks.map((task, i) => {
           const item = completedParts[i];
@@ -94,12 +100,13 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         });
         setTasks(restoredTasks);
         setResults(completedParts);
-        saveDraft(uid, assignmentKey, { tasks: restoredTasks, results: completedParts });
+        saveDraft(uid, assignmentKey, { tasks: restoredTasks, results: completedParts, attemptId: serverAttemptId });
         setActivePart(Math.min(2, completedParts.length));
         if (completedParts.length === 3) {
           setStage("submitting");
           submitCourseSpeakingMock({
-            idToken, assignmentKey, sessionIds: completedParts.map(part => part.sessionId),
+            idToken, assignmentKey, attemptId: serverAttemptId,
+            sessionIds: completedParts.map(part => part.sessionId),
           }).then(response => {
             if (cancelled) return;
             setServerResult(response);
@@ -115,8 +122,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
           setMessage(`✓ ${completedParts.length} speaking part${completedParts.length === 1 ? "" : "s"} recovered from Falowen.`);
           setStage("exam");
         }
-      } else if (draft) {
-        setTasks(draft.tasks);
+      } else if (verifiedDraft) {
+        setTasks(verifiedDraft.tasks);
         setResults([]);
         setActivePart(0);
         setStage("exam");
@@ -137,7 +144,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     setMessage("");
     try {
       const response = await submitCourseSpeakingMock({
-        idToken, assignmentKey,
+        idToken, assignmentKey, attemptId,
         sessionIds: parts?.map(part => part.sessionId),
       });
       setServerResult(response);
@@ -150,7 +157,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     } finally {
       savingRef.current = false;
     }
-  }, [idToken, assignmentKey, uid]);
+  }, [idToken, assignmentKey, uid, attemptId]);
 
   const onCompletedPart = useCallback(result => {
     if (!result?.sessionId || !result?.assessment ||
@@ -166,7 +173,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     }
     const next = [...results.slice(0, activePart), { ...result, teil: expectedTeil }];
     setResults(next);
-    saveDraft(uid, assignmentKey, { tasks, results: next });
+    saveDraft(uid, assignmentKey, { tasks, results: next, attemptId });
     if (activePart === 2) {
       setMessage("✓ All three parts marked. Saving your result…");
       submit(next);
@@ -175,7 +182,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       setActivePart(activePart + 1);
     }
     return true;
-  }, [activePart, assignmentKey, results, submit, tasks, uid]);
+  }, [activePart, assignmentKey, results, submit, tasks, uid, attemptId]);
 
   const selected = tasks?.[activePart];
   const scores = serverResult?.sectionScores || {};
@@ -236,12 +243,27 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         <p><strong>Listen → Record → Confirm.</strong> Speak naturally in German. Check what the microphone heard; correct only speech-recognition errors. The AI assesses each Teil, then saves one combined score when you finish all three.</p>
         <p>Choose a quiet place and allow microphone access. Your score is AI practice feedback, not an official Goethe-Institut result.</p>
       </div>
-      <button type="button" className="speaking-course-mock__start" onClick={() => {
+      {legacyParts ? <p role="status" style={{color:"#9a3412"}}>
+        {legacyParts} older speaking part(s) are saved on this device without a verified attempt ID.
+        They cannot be combined automatically. Ask Falowen Admin to review them before starting a new graded attempt.
+      </p> : null}
+      <button type="button" className="speaking-course-mock__start" onClick={async () => {
         const selectedTasks = chooseTasks(config.level);
         if (!selectedTasks) { setMessage("Speaking tasks are unavailable for one of the three parts."); return; }
-        setTasks(selectedTasks); setResults([]); setActivePart(0); setMessage("");
-        saveDraft(uid, assignmentKey, { tasks: selectedTasks, results: [] });
-        setStage("exam");
+        setStage("starting");
+        setMessage("");
+        try {
+          const started = await startCourseSpeakingMock({ idToken, assignmentKey });
+          if (!started.attemptId) throw new Error("Falowen did not confirm an exam attempt ID.");
+          setAttemptId(started.attemptId);
+          setTasks(selectedTasks); setResults([]); setActivePart(0);
+          saveDraft(uid, assignmentKey, { tasks: selectedTasks, results: [], attemptId: started.attemptId });
+          setLegacyParts(0);
+          setStage("exam");
+        } catch (err) {
+          setMessage(err?.response?.data?.error || err.message || "Could not start a verified speaking exam.");
+          setStage("intro");
+        }
       }}>Start speaking mock →</button>
       {message ? <p role="alert">{message}</p> : null}
     </section> : null}
@@ -256,12 +278,13 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
           id: selected.id, teil: selected.teilLabel || selected.teilId,
           prompt: selected.topicPrompt || selected.text || "",
           keywords: selected.keywordSubtopic || "", hint: selected.hint || "",
-          courseAssignmentKey: assignmentKey,
+          courseAssignmentKey: assignmentKey, mockAttemptId: attemptId,
         }}
         onExamCompleted={onCompletedPart} />
       {message ? <p role="alert" style={{ color: "#b91c1c" }}>{message}</p> : null}
     </section> : null}
 
+    {stage === "starting" ? <section style={surface} role="status">Opening your verified speaking exam…</section> : null}
     {stage === "submitting" ? <section style={surface} role="status" aria-live="polite"><h2>✓ All three speaking parts recorded and assessed</h2><p>Saving your final course score now. Keep this page open while we confirm storage and synchronization.</p></section> : null}
     {stage === "save-error" ? <section style={surface} role="alert">
       <h2>Submission needs a retry</h2>
