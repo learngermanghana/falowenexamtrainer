@@ -70,7 +70,7 @@ function setup(overrides = {}, authOverride = {}) {
     const fn=routes.get(method+" "+route);
     if(!fn)throw new Error("Missing route "+route);
     const res={code:200,payload:null,status(n){this.code=n;return this},json(p){this.payload=p;return this}};
-    await fn({body,headers:{authorization:"Bearer test"}},res);
+    await fn({body,query:method === "GET" ? body : {},headers:{authorization:"Bearer test"}},res);
     return res;
   };
   return {call,db,docs,routes,fakeClient};
@@ -1277,4 +1277,43 @@ describe("bounded, fair planning assessments", () => {
     expect(unsupported.code).toBe(400);
     expect(unsupported.payload.code).toBe("skip_unavailable");
   });
+});
+
+
+test("a B1 course mock ignores an A2 saved session, while the A2 chapter can still resume it",async()=>{
+ const api=setup({LIVE_SPEAK_TESTING_ACCESS:"true"});
+ const a2={uid:"u123",sessionId:"saved-a2",level:"A2",source:"exam-speaking-practice",
+  topic:"Deutsch lernen",examTask:{id:"a2-plan",teil:"Teil 3",courseAssignmentKey:"A2-8.22",mockAttemptId:"a2-attempt"},
+  expiresAt:new Date(Date.now()+60000).toISOString(),endedAt:null};
+ api.docs.set("liveSpeakSessions/u123",a2);
+ const before=await api.call("GET","/live-speak/status",{courseAssignmentKey:"B1-7.23"});
+ expect(before.payload.activeSession).toBeNull();
+ const b1=await api.call("POST","/live-speak/session/start",{
+  level:"B1",source:"exam-speaking-practice",topic:"Gemeinsam planen",examinerFlowVersion:1,examMode:"simulation",
+  examTask:{id:"b1-plan",teil:"Teil 1",prompt:"Gemeinsam planen",courseAssignmentKey:"B1-7.23",mockAttemptId:"b1-attempt"},
+ });
+ expect(b1.code).toBe(200);
+ expect(b1.payload.level).toBe("B1");
+ expect(api.docs.get("liveSpeakSessions/u123")).toEqual(a2);
+ const scoped=api.docs.get("liveSpeakSessions/u123__course__B1-7.23");
+ expect(scoped.examTask.courseAssignmentKey).toBe("B1-7.23");
+ const opening=await api.call("POST","/live-speak/session/turn",{courseAssignmentKey:"B1-7.23",sessionId:scoped.sessionId,intro:true});
+ expect(opening.code).toBe(200);
+ expect(api.docs.get("liveSpeakSessions/u123")).toEqual(a2);
+ const a2Status=await api.call("GET","/live-speak/status",{courseAssignmentKey:"A2-8.22"});
+ expect(a2Status.payload.activeSession.sessionId).toBe("saved-a2");
+ // The old deployed client sends only sessionId on subsequent requests.
+ const ended=await api.call("POST","/live-speak/session/end",{sessionId:scoped.sessionId});
+ expect(ended.code).toBe(200);
+ expect(api.docs.get("liveSpeakSessions/u123")).toEqual(a2);
+});
+
+test("course status and reset cannot access another assignment's scoped session",async()=>{
+ const api=setup();
+ api.docs.set("liveSpeakSessions/u123__course__A2-8.22",{sessionId:"a2-scoped",level:"A2",examTask:{courseAssignmentKey:"A2-8.22"},expiresAt:new Date(Date.now()+60000).toISOString()});
+ const wrong=await api.call("POST","/live-speak/session/end",{sessionId:"a2-scoped",courseAssignmentKey:"B1-7.23"});
+ expect(wrong.code).toBe(404);
+ expect(api.docs.get("liveSpeakSessions/u123__course__A2-8.22").endedAt).toBeUndefined();
+ const invalid=await api.call("GET","/live-speak/status",{courseAssignmentKey:"../another-student"});
+ expect(invalid.code).toBe(400);
 });

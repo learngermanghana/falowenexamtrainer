@@ -30,3 +30,11 @@ test("different examiner task IDs are detected even with identical topic labels"
   expect(isDifferentLiveSpeakSessionContext(saved,{...saved,examTask:{id:"card-2"}})).toBe(true);
   expect(isDifferentLiveSpeakSessionContext(saved,{...saved})).toBe(false);
 });
+
+
+test("identical topic and card names still distinguish course chapters and mock attempts",()=>{
+ const current={...saved,examTask:{id:"planning",courseAssignmentKey:"B1-7.23",mockAttemptId:"one"}};
+ expect(isDifferentLiveSpeakSessionContext(current,current)).toBe(false);
+ expect(isDifferentLiveSpeakSessionContext(current,{...current,examTask:{...current.examTask,courseAssignmentKey:"A2-8.22"}})).toBe(true);
+ expect(isDifferentLiveSpeakSessionContext(current,{...current,examTask:{...current.examTask,mockAttemptId:"two"}})).toBe(true);
+});

@@ -170,6 +170,33 @@ const receiptStatus = (sub) => ({
 
 function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail }) {
   const db = () => admin.firestore();
+  // Course mocks are independent per student + assignment (including level).
+  // Keep the legacy record resumable only from its original course chapter.
+  const sessionReference = async (uid, req) => {
+    const rawKey = req.body?.examTask?.courseAssignmentKey
+      ?? req.body?.courseAssignmentKey ?? req.query?.courseAssignmentKey ?? "";
+    const key = String(rawKey || "").trim().toUpperCase();
+    const legacy = db().collection("liveSpeakSessions").doc(uid);
+    if (!key) {
+      // Older deployed clients send only sessionId after starting a course mock.
+      // Resolve those requests within this student's known course records.
+      const id = String(req.body?.sessionId || "");
+      if (!id || (await legacy.get()).data()?.sessionId === id) return legacy;
+      for (const assignmentKey of COURSE_MOCK_KEYS) {
+        const candidate = db().collection("liveSpeakSessions").doc(`${uid}__course__${assignmentKey}`);
+        if ((await candidate.get()).data()?.sessionId === id) return candidate;
+      }
+      return legacy;
+    }
+    if (!assignmentConfig(key)) {
+      throw Object.assign(new Error("Unknown course speaking assignment."), {status:400,code:"invalid_course_assignment"});
+    }
+    const scoped = db().collection("liveSpeakSessions").doc(`${uid}__course__${key}`);
+    if ((await scoped.get()).exists) return scoped;
+    const previous = (await legacy.get()).data();
+    return previous?.examTask?.courseAssignmentKey === key ? legacy : scoped;
+  };
+
   // Bounded per-instance cache: reuse fixed task openings without paid storage.
   const openingAudio = new Map();
   const speakOpening = async (client, request) => {
@@ -225,7 +252,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         : null;
       const usage = approved ? await db().collection("liveSpeakUsage").doc(currentMonth()).get() : null;
       const currentSession = approved
-        ? await db().collection("liveSpeakSessions").doc(student.auth.uid).get()
+        ? await (await sessionReference(student.auth.uid, req)).get()
         : null;
       const running = currentSession?.data() || {};
       const active = running.sessionId && !running.endedAt &&
@@ -267,6 +294,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         lastExamResult: examiner(running) && (running.feedback || (!active && confirmedAnswers(running).length)) ? sessionView(running) : null,
       });
     } catch (err) {
+      if (err?.status) return error(res, err.status, err.code, err.message);
       console.error("Live Speak status error", err?.message);
       return error(res, 503, "status_unavailable", "Could not check Live Speak pilot access.");
     }
@@ -328,8 +356,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2","C1","C2"].includes(level)) {
         return error(res,400,"invalid_exam_part","Choose Teil 1, 2 or 3 for this level.");
       }
+      if (req.body?.courseAssignmentKey && req.body.courseAssignmentKey !== examTask?.courseAssignmentKey) {
+        return error(res,400,"invalid_course_assignment","The speaking assignment does not match the selected task.");
+      }
       const subRef = db().collection("liveSpeakPilotCredits").doc(student.auth.uid);
-      const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      const sessionRef = await sessionReference(student.auth.uid, req);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
       // Only the structured Exam Room examiner is available for repeated
       // testing. Standalone and workbook AI retain their existing pilot rules.
@@ -399,7 +430,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     try {
       const student = await requireStudent(req, res);
       if (!student) return;
-      const ref = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      const ref = await sessionReference(student.auth.uid, req);
       await db().runTransaction(async tx => {
         const snap = await tx.get(ref);
         if (!snap.exists || snap.data()?.sessionId !== req.body?.sessionId) {
@@ -442,7 +473,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       } else if (intro && (payload || typedProvided)) return error(res, 400, "unexpected_audio", "The greeting does not require an answer.");
       const audioBytes = intro || typedTurn ? null : Buffer.from(payload, "base64");
       if (audioBytes && audioBytes.length > MAX_LONG_AUDIO_BYTES) return error(res, 413, "audio_too_large", "Recording is too large.");
-      sessionRef = db().collection("liveSpeakSessions").doc(uid);
+      sessionRef = await sessionReference(uid, req);
       const globalRef = db().collection("liveSpeakUsage").doc(currentMonth());
       let level = "A2", topic = "", examTask = null, examFlow = null, maxTranscriptChars = MAX_CONFIRMED_CHARS;
       await db().runTransaction(async (tx) => {
@@ -582,7 +613,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (!sessionId || !pendingId) {
         return error(res, 400, "invalid_pending_answer", "Choose the unfinished answer to discard.");
       }
-      const sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      const sessionRef = await sessionReference(student.auth.uid, req);
       await db().runTransaction(async tx => {
         const snap = await tx.get(sessionRef);
         const session = snap.data() || {};
@@ -626,7 +657,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (!skipAnswer && (!pendingId || confirmed.length < 2 || confirmed.length > 8000)) {
         return error(res, 400, "invalid_transcript", "Review the recognized words before continuing.");
       }
-      sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      sessionRef = await sessionReference(student.auth.uid, req);
       let level = "A2", topic = "";
       await db().runTransaction(async tx => {
         const snap = await tx.get(sessionRef);
@@ -869,7 +900,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const student = await requireStudent(req, res);
       if (!student) return;
       sessionId = String(req.body?.sessionId || "");
-      sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
+      sessionRef = await sessionReference(student.auth.uid, req);
       const usageRef = db().collection("liveSpeakUsage").doc(currentMonth());
       let task, level, answers, cached, examContext = null, recoverRemainingStep = false;
       attemptId = crypto.randomUUID();
