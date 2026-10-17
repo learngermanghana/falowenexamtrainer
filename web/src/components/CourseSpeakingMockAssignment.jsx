@@ -6,6 +6,7 @@ import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { fetchCourseSpeakingMockStatus, startCourseSpeakingMock, submitCourseSpeakingMock } from "../services/courseSpeakingMockService";
 import "./SpeakingExamDesign.css";
+import { preserveSpeakingRecovery, readSpeakingRecovery } from "../lib/courseSpeakingRecovery";
 
 const ASSIGNMENTS = Object.freeze({
   "A2-8.22": { level: "A2", day: 22, title: "Goethe A2 Speaking Mock" },
@@ -58,6 +59,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
   const [results, setResults] = useState([]);
   const [attemptId, setAttemptId] = useState("");
   const [legacyParts, setLegacyParts] = useState(0);
+  const [recoveryCopies, setRecoveryCopies] = useState([]);
+  const [recoveryCheck, setRecoveryCheck] = useState(0);
   const [activePart, setActivePart] = useState(0);
   const [serverResult, setServerResult] = useState(null);
   const [message, setMessage] = useState("");
@@ -73,8 +76,10 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     if (!config || !idToken || !uid) return undefined;
     let cancelled = false;
     setStage("loading");
+    setMessage("");
     fetchCourseSpeakingMockStatus({ idToken, assignmentKey }).then(status => {
       if (cancelled) return;
+      setRecoveryCopies(readSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey)));
       if (status.completed) {
         setServerResult(status);
         setStage("complete");
@@ -85,6 +90,10 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       const serverAttemptId = status.attemptId || "";
       setAttemptId(serverAttemptId);
       const verifiedDraft = serverAttemptId && draft?.attemptId === serverAttemptId ? draft : null;
+      const copies = !verifiedDraft && draft?.results?.length
+        ? preserveSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey), draft)
+        : readSpeakingRecovery(window.localStorage, cacheKey(uid, assignmentKey));
+      setRecoveryCopies(copies);
       // An old local draft did not have an attempt ID. Keep it for review,
       // never combine its parts with newer server-owned attempts.
       setLegacyParts(!verifiedDraft && draft?.results?.length ? draft.results.length : 0);
@@ -135,7 +144,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       }
     });
     return () => { cancelled = true; };
-  }, [assignmentKey, config, idToken, uid]);
+  }, [assignmentKey, config, idToken, uid, recoveryCheck]);
 
   const submit = useCallback(async (parts) => {
     if (savingRef.current) return;
@@ -244,8 +253,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         <p>Choose a quiet place and allow microphone access. Your score is AI practice feedback, not an official Goethe-Institut result.</p>
       </div>
       {legacyParts ? <p role="status" style={{color:"#9a3412"}}>
-        {legacyParts} older speaking part(s) are saved on this device without a verified attempt ID.
-        They cannot be combined automatically. Ask Falowen Admin to review them before starting a new graded attempt.
+        {legacyParts} older speaking part(s) are saved on this device, but could not be matched to the current verified attempt.
+        A recovery copy is preserved below. Check cloud progress again before starting a new attempt.
       </p> : null}
       <button type="button" className="speaking-course-mock__start" onClick={async () => {
         const selectedTasks = chooseTasks(config.level);
@@ -264,8 +273,28 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
           setMessage(err?.response?.data?.error || err.message || "Could not start a verified speaking exam.");
           setStage("intro");
         }
-      }}>Start speaking mock →</button>
+      }}>{legacyParts ? 'Start a new mock · keep older work' : 'Start speaking mock →'}</button>
       {message ? <p role="alert">{message}</p> : null}
+    </section> : null}
+
+    {recoveryCopies.length > 0 ? <section style={{ ...surface, marginTop: 16 }} aria-label="Saved speaking recovery">
+      <h2>Saved speaking work</h2>
+      <p>Your older work is preserved on this device. It is not included in a new graded attempt unless Falowen verifies it belongs to that attempt.</p>
+      <button type="button" style={button} disabled={!['intro', 'status-error', 'complete'].includes(stage)} onClick={() => setRecoveryCheck(value => value + 1)}>Check cloud progress again</button>
+      <button type="button" style={{ ...button, margin: 8 }} onClick={() => {
+        const blob = new Blob([JSON.stringify({ assignmentKey, studentUid: uid, copies: recoveryCopies }, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a'); link.href = url; link.download = `${assignmentKey}-saved-speaking.json`;
+        link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+      }}>Download saved work for tutor review</button>
+      {recoveryCopies.map((copy, index) => <details key={`${copy.savedAt}-${index}`}>
+        <summary>Saved attempt {index + 1} · {copy.draft.results.length} part(s)</summary>
+        {copy.draft.results.map((part, partIndex) => <div key={part.sessionId || partIndex}>
+          <h3>{part.teil || `Teil ${partIndex + 1}`} · {part.assessment?.percent ?? '—'}%</h3>
+          <p style={{ whiteSpace: 'pre-wrap' }}>{part.assessment?.summary || part.feedback || 'Saved assessment available in the download.'}</p>
+          <p>Session: {part.sessionId || 'No session ID stored'}</p>
+        </div>)}
+      </details>)}
     </section> : null}
 
     {stage === "exam" && selected ? <section className="speaking-course-mock__exam" aria-label={`Speaking Teil ${activePart + 1}`}>
