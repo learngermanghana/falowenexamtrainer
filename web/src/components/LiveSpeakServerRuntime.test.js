@@ -516,7 +516,8 @@ test.each(["A1","A2","B1"].flatMap(level=>[1,2,3].map(part=>[level,part])))("%s 
   expect(input.studentTranscripts).toHaveLength(session.answerLimit);
   expect(input.examContext.requiredCriteria.length).toBeGreaterThan(1);
   expect(input.examContext.reachedTurnLimit).toBe(true);
-  expect(input.examContext.taskComplete).toBe(!(level === "A2" && part === 3) && !(level === "B1" && part === 1));
+  expect(input.examContext.taskComplete).toBe(true);
+  expect(input.examContext.planningGoalAchieved).toBe(false);
   expect(JSON.stringify(input)).not.toContain("FORGED");
 });
 
