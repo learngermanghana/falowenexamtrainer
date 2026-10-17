@@ -1017,9 +1017,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       // A brief genuine acceptance can still count, but if almost every
       // response is filler, cap the result below the passing threshold.
       const isPlanning=["A2-3","B1-1"].includes(examContext?.flow?.key);
-      const trivialAnswer=answer => /^(?:\\[Keine Antwort\\]|ja|nein|nö|ok|okay|klar|gut|passt|egal|sorry|entschuldigung|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung)[.!? ]*$/i
+      const trivialAnswer=answer => /^(?:\[Keine Antwort\]|ja|nein|nö|ok|okay|klar|gut|passt|egal|sorry|entschuldigung|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung)[.!? ]*$/i
         .test(String(answer || "").trim());
-      const noAnswer=answer => /^(?:\\[Keine Antwort\\]|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung|egal|sorry)[.!? ]*$/i
+      const noAnswer=answer => /^(?:\[Keine Antwort\]|(?:ich )?(?:weiß|weiss) (?:es )?nicht|keine ahnung|egal|sorry)[.!? ]*$/i
         .test(String(answer || "").trim());
       if (isPlanning) {
         for (const step of taskScores) {
