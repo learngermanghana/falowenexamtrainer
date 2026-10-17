@@ -748,7 +748,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           (["A1-2","A2-1"].includes(flowSession.examFlow.key) && plan.previous?.action === "ask-question" ||
            flowSession.examFlow.key === "A1-3" && plan.previous?.action === "make-request"));
         const nextInstruction=separateNext ? plan.step.instruction.trim() : "";
-        const speech=nextInstruction ? reply+"\n\n"+nextInstruction : reply;
+
         const replySpeaker=(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner";
         const additions=[{role:"user",text:confirmed},{role:"assistant",speaker:replySpeaker,text:reply}];
         if (nextInstruction) additions.push({role:"assistant",speaker:plan.step.role || "examiner",text:nextInstruction});
@@ -757,6 +757,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           reply="Danke. Dieser Prüfungsteil ist jetzt beendet. Wir haben nicht alle Planungspunkte vereinbart.";
           additions[1].text=reply;
         }
+        // Compute the audio only after the final exam closing has replaced
+        // the model's earlier reply. The spoken and visible text must agree.
+        const speech=nextInstruction ? reply+"\n\n"+nextInstruction : reply;
         const nextSession={...flowSession,examFlow:{...flowSession.examFlow,decisions},taskReady:ready};
         let mp3=null;
         if (!ready || plan.dynamic || plan.scripted) {
@@ -925,7 +928,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           requiredCriteria:taskFlows.profileFor(record.examFlow)?.criteria,
           ownPresentation:record.examFlow.ownPresentation || null,
           sectionEnded:taskFlows.isReady(record),completedAllTurns:taskFlows.isComplete(record),
-          taskComplete:taskFlows.isComplete(record),
+          taskComplete:["A2-3","B1-1"].includes(record.examFlow?.key)
+            ? taskFlows.hasPlanningAgreement(record) : taskFlows.isComplete(record),
           planningGoalAchieved:taskFlows.hasPlanningAgreement(record),
           planningDecisions:record.examFlow?.decisions || [],
           reachedTurnLimit:Number(record.answeredTurns)>=answerLimit(record),
