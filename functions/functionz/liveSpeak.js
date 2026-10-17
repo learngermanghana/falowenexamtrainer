@@ -47,8 +47,14 @@ const transcriptLimit = session => session.examFlow
   ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
+const coursePartFinished = session => Boolean(session?.examFlow) &&
+  (taskFlows.isComplete(session) || Number(session.answeredTurns) >= answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
-  Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now();
+  // A fully recorded graded part stays recoverable after its exam timer has
+  // expired. Marking must never require another recording after a provider
+  // error or a slow feedback response.
+  ((assignmentConfig(session.examTask?.courseAssignmentKey) && coursePartFinished(session)) ||
+    Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now());
 const sessionView = session => ({
   sessionId: session.sessionId, expiresAt: session.expiresAt,
   level: session.level || "A2", topic: session.topic || "",
@@ -835,8 +841,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.feedbackStatus === "processing" && Number(record.feedbackLeaseUntil) > Date.now()) {
           throw Object.assign(new Error("Feedback is still processing. Try again shortly to retrieve it."), {status:409,code:"feedback_processing"});
         }
-        if (Number(record.feedbackAttempts) >= MAX_FEEDBACK_ATTEMPTS) {
-          throw Object.assign(new Error("Feedback could not be completed. Your answers remain saved for review."), {status:409,code:"feedback_retry_limit"});
+        const feedbackAttemptLimit = assignmentConfig(record.examTask?.courseAssignmentKey)
+          ? Math.max(5, MAX_FEEDBACK_ATTEMPTS) : MAX_FEEDBACK_ATTEMPTS;
+        if (Number(record.feedbackAttempts) >= feedbackAttemptLimit) {
+          throw Object.assign(new Error(
+            "Your answers are safely stored, but automatic marking needs administrator review."
+          ), {status:409,code:"feedback_retry_limit"});
         }
         answers = confirmedAnswers(record);
         // Missing decision points are graded as a weaker answer, not as a
@@ -844,9 +854,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // Planning parts can end before their maximum turns when all required
         // decisions are reached. That is a legitimate completed exam part.
         if (assignmentConfig(record.examTask?.courseAssignmentKey)
-          && (!record.examFlow ||
-              (!taskFlows.isComplete(record) &&
-                Number(record.answeredTurns) < answerLimit(record)))) {
+          && !coursePartFinished(record)) {
           throw Object.assign(new Error(
             "This Teil still has an unanswered examiner step. Resume the saved session to finish."
           ), {status:409,code:"course_mock_part_incomplete"});
@@ -900,6 +908,28 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (!raw) throw new Error("The exam practice feedback was empty.");
       let parsed;
       try {parsed=JSON.parse(raw);} catch {parsed=null;}
+      const validMark = obj => String(obj?.summary || "").trim() &&
+        String(obj?.priority || "").trim() &&
+        answers.every((_answer,index) =>
+          (obj?.taskScores || []).some(item => Number(item?.step) === index + 1 &&
+            Number.isInteger(Number(item?.score)) && Number(item.score) >= 0 && Number(item.score) <= 2));
+      if (assignmentConfig(task.courseAssignmentKey) && !validMark(parsed)) {
+        // Re-ask once within this same feedback operation, not another
+        // learner-visible attempt. Missing JSON fields are model failures,
+        // never evidence that the learner has not completed the Teil.
+        const retry = await client.chat.completions.create(buildChatRequest({
+          model:resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),
+          messages:[...messages,{role:"system",content:
+            "Return ONLY a valid JSON object. Include exactly " + answers.length +
+            " taskScores entries, one for each 1-based step. Each score must be an integer 0, 1 or 2. " +
+            "Include nonempty summary, strength and priority. Do not invent transcript content or pronunciation scores."}],
+          response_format:{type:"json_object"},
+          max_tokens:Math.min(1800,750+answers.length*150),temperature:0,
+        }),PROVIDER_OPTIONS);
+        reportUsage("exam_feedback_retry",resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),retry?.usage || {});
+        try { parsed=JSON.parse(String(retry?.choices?.[0]?.message?.content || "{}")); }
+        catch { parsed=null; }
+      }
       const summary=String(parsed?.summary || "").trim().slice(0,800);
       const strength=String(parsed?.strength || "").trim().slice(0,500);
       const priority=String(parsed?.priority || "").trim().slice(0,500);
