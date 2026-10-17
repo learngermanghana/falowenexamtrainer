@@ -402,13 +402,17 @@ test("repeated failure exhausts retry allowance without deleting answers",async(
   expect(api.fakeClient.chat.completions.create).toHaveBeenCalledTimes(3);
 });
 
-test("lost reply speech keeps the answer and allows feedback without re-recording",async()=>{
+test("lost reply speech preserves the first answer and continues without re-recording it",async()=>{
   const api=setup(); const session=await startExam(api);
   api.fakeClient.audio.speech.create.mockRejectedValueOnce(new Error("TTS unavailable"));
   const confirmed=await answerExam(api,session);
   expect(confirmed.code).toBe(200);
-  expect(confirmed.payload.taskReady).toBe(true);
+  expect(confirmed.payload.taskReady).toBe(false);
   expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(1);
+  const finalAnswer=await answerExam(api,session,"Ich esse viel Gemüse.");
+  expect(finalAnswer.code).toBe(200);
+  expect(finalAnswer.payload.taskReady).toBe(true);
+  expect(api.docs.get(sessionKey).confirmedAnswers).toHaveLength(2);
   expect((await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId})).code).toBe(200);
 });
 
