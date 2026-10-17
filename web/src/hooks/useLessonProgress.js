@@ -142,12 +142,18 @@ const pickLatest = (rows = [], getMillis) => {
 };
 
 const buildBucketStatus = ({ assignmentId, submissions = [], results = [] }) => {
-  const latestSubmission = pickLatest(submissions, getSubmissionMillis);
-  const latestResult = pickLatest(results, getResultMillis);
+  // Replaced coursework: retain the historical workbook score for audit,
+  // but evaluate course completion from the new speaking mock when present.
+  const preferredResults = ["A2-8.22", "B1-7.23"].includes(normalizeKey(assignmentId))
+    && results.some(row => row?.source === "course_speaking_mock")
+    ? results.filter(row => row?.source === "course_speaking_mock") : results;
+  const latestSubmission = preferredResults.some(row => row?.source === "course_speaking_mock")
+    ? null : pickLatest(submissions, getSubmissionMillis);
+  const latestResult = pickLatest(preferredResults, getResultMillis);
   const latestSubmissionMillis = getSubmissionMillis(latestSubmission);
   const latestResultMillis = getResultMillis(latestResult);
 
-  const scoredResults = results
+  const scoredResults = preferredResults
     .map((row) => ({ row, score: toNumber(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade) }))
     .filter((entry) => typeof entry.score === "number");
 

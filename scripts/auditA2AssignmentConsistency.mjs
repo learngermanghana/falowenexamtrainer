@@ -83,7 +83,17 @@ for (const fileName of fs.readdirSync(COMPONENT_ROOT)) {
 }
 
 const expectedDays = Array.from({ length: 28 }, (_, index) => index + 1);
+// Day 22 intentionally swaps its graded Lesen/Schreiben workbook for an AI
+// speaking examination. All other days retain the standard shared wrapper.
+const COURSE_MOCK_DAY = 22;
+const speakingWrapperPath = path.join(COMPONENT_ROOT, "A2Day22DieWochePlanungWorkbookPage.js");
+const speakingWrapper = read(speakingWrapperPath);
+const speakingMockVerified = speakingWrapper.includes(
+  '<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />',
+);
+if (!speakingMockVerified) fail("Day 22", "must mount the assigned A2-8.22 speaking mock");
 for (const day of expectedDays) {
+  if (day === COURSE_MOCK_DAY) continue;
   if (!dayFiles.has(day)) fail(`Day ${day}`, "missing live A2 standard workbook wrapper");
 }
 
@@ -270,7 +280,7 @@ for (const day of expectedDays) {
   );
 }
 
-console.log(`A2 assignment consistency audit checked ${dayFiles.size}/28 live workbook wrappers.`);
+console.log(`A2 assignment consistency audit checked ${dayFiles.size}/27 live workbook wrappers and 1 graded speaking mock.`);
 for (const message of notes) console.log("- " + message);
 
 if (failures.length) {

@@ -129,6 +129,9 @@ for (const route of routeEntries) {
 
   const combinedSource = chain.map((entry) => entry.source).join("\n");
   const usesSharedShell = combinedSource.includes("B1StandardWorkbookPage");
+  const isGradedSpeakingMock = route.day === 23
+    && combinedSource.includes('<CourseSpeakingMockAssignment assignmentKey="B1-7.23" />')
+    && combinedSource.includes('assignmentKey: "B1-7.23"');
   const usesLegacyProxy = chain.length > 1 || /WorkbookPageLegacy|WorkbookPageV2/.test(chain[0].source);
   const usesDomPatch = /MutationObserver|useLayoutEffect|document\.querySelector|querySelectorAll/.test(combinedSource);
   const plannedCount = (combinedSource.match(/status\s*:\s*"planned"/g) || []).length;
@@ -160,10 +163,10 @@ for (const route of routeEntries) {
     }
   }
 
-  if (!usesSharedShell && !CUSTOM_BASELINE_DAYS.has(route.day)) {
+  if (!usesSharedShell && !isGradedSpeakingMock && !CUSTOM_BASELINE_DAYS.has(route.day)) {
     fail(`Day ${route.day}`, "new non-standard B1 workbook architecture detected");
   }
-  if (!usesSharedShell) {
+  if (!usesSharedShell && !isGradedSpeakingMock) {
     warn(`Day ${route.day}`, "still uses a custom workbook instead of B1StandardWorkbookPage");
   }
 
@@ -209,6 +212,7 @@ for (const route of routeEntries) {
     day: route.day,
     component: path.basename(filePath),
     shared: usesSharedShell,
+    speakingMock: isGradedSpeakingMock,
     legacy: usesLegacyProxy,
     domPatch: usesDomPatch,
     planned: plannedCount,
@@ -328,14 +332,14 @@ if (noObviousEnglishSupport.length) {
   note(`Grammar English-support heuristic: review Days ${noObviousEnglishSupport.join(", ")} manually; no obvious English support marker was detected.`);
 }
 
-const customDays = liveRows.filter((row) => !row.shared).map((row) => row.day);
+const customDays = liveRows.filter((row) => !row.shared && !row.speakingMock).map((row) => row.day);
 const legacyDays = liveRows.filter((row) => row.legacy).map((row) => row.day);
 const domPatchDays = liveRows.filter((row) => row.domPatch).map((row) => row.day);
 const plannedDays = liveRows.filter((row) => row.planned).map((row) => row.day);
 
 console.log("B1 Days 1–28 structural/content audit");
 console.log(`- routed workbooks: ${liveRows.length}/28`);
-console.log(`- shared-shell workbooks: ${liveRows.filter((row) => row.shared).length}/28`);
+console.log(`- shared-shell workbooks: ${liveRows.filter((row) => row.shared).length}/27 plus ${liveRows.filter((row) => row.speakingMock).length} graded speaking mock`);
 console.log(`- custom workbook days: ${customDays.join(", ") || "none"}`);
 console.log(`- legacy/V2 proxy days: ${legacyDays.join(", ") || "none"}`);
 console.log(`- DOM-patched days: ${domPatchDays.join(", ") || "none"}`);
@@ -345,7 +349,7 @@ console.log(`- missing answer-sheet-link assignments: ${missingSheetLinks.join("
 
 for (const row of liveRows) {
   console.log(
-    `  Day ${String(row.day).padStart(2, "0")} · ${row.assignmentId} · ${row.shared ? "shared" : "custom"}${row.legacy ? " · legacy-proxy" : ""}${row.domPatch ? " · DOM-patch" : ""} · Lesen ${row.readingAnswers} · Hören ${row.listeningAnswers}`,
+    `  Day ${String(row.day).padStart(2, "0")} · ${row.assignmentId} · ${row.speakingMock ? "Goethe speaking mock" : row.shared ? "shared" : "custom"}${row.legacy ? " · legacy-proxy" : ""}${row.domPatch ? " · DOM-patch" : ""} · Lesen ${row.readingAnswers} · Hören ${row.listeningAnswers}`,
   );
 }
 

@@ -8,12 +8,18 @@ const listeningPath = path.join(root, "web/src/data/a2ListeningTasks.js");
 const source = fs.readFileSync(targetPath, "utf8");
 const { A2_LISTENING_MODES, A2_LISTENING_TASKS } = await import(pathToFileURL(listeningPath).href);
 
-const requiredMarkers = [
-  'import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";',
-  'day={22}',
-  'chapter="8.22"',
-  'title="Die Woche planen"',
-];
+const isGradedSpeakingMock = source.includes('<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />');
+const requiredMarkers = isGradedSpeakingMock
+  ? [
+      'import CourseSpeakingMockAssignment from "./CourseSpeakingMockAssignment";',
+      '<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />',
+    ]
+  : [
+      'import A2StandardTabbedWorkbookPage from "./A2StandardTabbedWorkbookPage";',
+      'day={22}',
+      'chapter="8.22"',
+      'title="Die Woche planen"',
+    ];
 
 for (const marker of requiredMarkers) {
   if (!source.includes(marker)) {
@@ -51,4 +57,4 @@ if (String(listening.audioUrl || "") !== "" || (listening.questions || []).lengt
   throw new Error("A2 Day 22 no-Hören source must keep audio and questions empty.");
 }
 
-console.log("A2 Day 22 uses the shared shell with canonical Hamburg Lesen and no Teil 4 Hören.");
+console.log(isGradedSpeakingMock ? "A2 Day 22 uses the verified Goethe speaking assignment; old Lesen/Hören remain available as archival study data." : "A2 Day 22 uses the shared shell with canonical Hamburg Lesen and no Teil 4 Hören.");

@@ -19,7 +19,7 @@ const day26 = read("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
 const day27 = read("A2Day27DigitaleKommunikationWorkbookPage.js");
 const day28 = read("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
 
-const cleanedLateA2Days = [day20, day21, day22, day23, day24, day25, day26, day27, day28];
+const cleanedLateA2Days = [day20, day21, day23, day24, day25, day26, day27, day28];
 
 describe("shared A2 workbook regression", () => {
   it("keeps the shared workbook shell complete", () => {
@@ -54,7 +54,7 @@ describe("shared A2 workbook regression", () => {
     });
   });
 
-  it("uses the standard workbook shell throughout cleaned Days 20–28", () => {
+  it("uses the standard workbook shell for all remaining cleaned Days 20–28", () => {
     cleanedLateA2Days.forEach((source) => {
       expect(source).toContain("A2StandardTabbedWorkbookPage");
     });
@@ -84,8 +84,8 @@ describe("shared A2 workbook regression", () => {
     expect(day21).not.toMatch(/TV-Koch|Stefan Berger|Bremer Lokal/i);
   });
 
-  it("keeps Day 22 focused on weekly planning with contextual Submit", () => {
-    expect(day22).toContain('chapter="8.22"');
+  it("replaces Day 22 with a complete graded Goethe A2 speaking mock", () => {
+    expect(day22).toContain('<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />');
     expect(A2_READING_TASKS[22].title).toBe("In der Touristeninformation Hamburg");
     expect(A2_LISTENING_TASKS[22].mode).toBe(A2_LISTENING_MODES.NONE);
     expect(day22).not.toMatch(/Gülcan|Willkommensführung|Literaturkurs/i);

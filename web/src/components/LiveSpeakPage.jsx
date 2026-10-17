@@ -556,7 +556,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setExamAssessment(result.assessment || null);
       setSession(null);
       setExitConfirm(false);
-      onExamCompleted?.({taskId:session.examTask?.id || examTask?.id,
+      onExamCompleted?.({sessionId:session.sessionId,taskId:session.examTask?.id || examTask?.id,
         level:session.level || safeLevel,
         teil:session.examTask?.teil || examTask?.teil,
         topic:session.examTask?.prompt || examTask?.prompt,

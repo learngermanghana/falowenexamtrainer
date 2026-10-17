@@ -1,5 +1,5 @@
 import React from "react";
-import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import CourseSpeakingMockAssignment from "./CourseSpeakingMockAssignment";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 
@@ -110,5 +110,5 @@ export const B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG = {
 };
 
 export default function B1Day23ErstesDateWorkbookPage() {
-  return <B1StandardWorkbookPage config={B1_DAY23_ERSTES_DATE_WORKBOOK_CONFIG} />;
+  return <CourseSpeakingMockAssignment assignmentKey="B1-7.23" />;
 }
