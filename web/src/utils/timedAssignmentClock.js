@@ -1,3 +1,25 @@
+// The duration recorded when an attempt started is authoritative. Recalculating
+// it from today's lesson configuration would retroactively shorten (or extend)
+// attempts that were already in progress when the curriculum changed.
+export const resolveTimedAssignmentSessionDuration = (
+  persistedDurationSeconds,
+  configuredDurationSeconds,
+  localSession = null,
+) => {
+  const persisted = Number(persistedDurationSeconds);
+  if (Number.isFinite(persisted) && persisted > 0) return Math.floor(persisted);
+
+  // Older local sessions stored only timestamps; recover their original
+  // duration while the Firestore subscription is still loading.
+  const startedAt = Number(localSession?.startedAt) || 0;
+  const endsAt = Number(localSession?.endsAt) || 0;
+  if (startedAt > 0 && endsAt > startedAt) {
+    return Math.ceil((endsAt - startedAt) / 1000);
+  }
+
+  return Math.max(0, Math.floor(Number(configuredDurationSeconds) || 0));
+};
+
 export const normalizeTimedAssignmentSession = (
   session,
   durationSeconds,
