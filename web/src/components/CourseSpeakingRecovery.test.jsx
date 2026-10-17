@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import CourseSpeakingMockAssignment from './CourseSpeakingMockAssignment';
 import { fetchCourseSpeakingMockStatus } from '../services/courseSpeakingMockService';
+import { announceExamSuccess } from '../services/interactionFeedback';
+jest.mock('../services/interactionFeedback', () => ({ announceExamSuccess: jest.fn() }));
 
 jest.mock('../context/AuthContext', () => ({ useAuth: () => ({ idToken: 'token', user: { uid: 'learner' } }) }));
 jest.mock('react-router-dom', () => ({ Link: ({ children }) => <span>{children}</span> }));
@@ -38,4 +40,12 @@ test('malformed archive does not block completed cloud result or delete current 
   await screen.findByText('Your Teil scores');
   await waitFor(() => expect(localStorage.getItem(key)).toBe(JSON.stringify(draft)));
   expect(localStorage.getItem(`${key}:recovery`)).toBe('broken');
+});
+test('a saved score shows success without exposing Sheet permission errors to the student', async () => {
+  fetchCourseSpeakingMockStatus.mockResolvedValue({ ...completed, sheet: { ok: false, pending: true, message: 'The caller does not have permission' } });
+  render(<CourseSpeakingMockAssignment assignmentKey="A2-8.22" />);
+  await screen.findByText('Your Teil scores');
+  expect(announceExamSuccess).toHaveBeenCalledWith('Speaking mock completed. Your result is saved.');
+  expect(screen.queryByText(/Google Sheets|caller does not have permission|Retry Google/)).toBeNull();
+  expect(screen.getByText(/Your result is saved. Open Results/)).toBeTruthy();
 });

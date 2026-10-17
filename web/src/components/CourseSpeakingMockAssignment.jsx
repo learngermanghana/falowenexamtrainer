@@ -7,6 +7,7 @@ import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { fetchCourseSpeakingMockStatus, startCourseSpeakingMock, submitCourseSpeakingMock } from "../services/courseSpeakingMockService";
 import "./SpeakingExamDesign.css";
 import { preserveSpeakingRecovery, readSpeakingRecovery } from "../lib/courseSpeakingRecovery";
+import { announceExamSuccess } from "../services/interactionFeedback";
 
 const ASSIGNMENTS = Object.freeze({
   "A2-8.22": { level: "A2", day: 22, title: "Goethe A2 Speaking Mock" },
@@ -69,6 +70,13 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
   const [serverResult, setServerResult] = useState(null);
   const [message, setMessage] = useState("");
   const savingRef = useRef(false);
+  const completionAnnounced = useRef(false);
+  useEffect(() => {
+    if (stage === 'complete' && !completionAnnounced.current) {
+      completionAnnounced.current = true;
+      announceExamSuccess('Speaking mock completed. Your result is saved.');
+    }
+  }, [stage]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -323,7 +331,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     </section> : null}
 
     {stage === "starting" ? <section style={surface} role="status">Opening your verified speaking exam…</section> : null}
-    {stage === "submitting" ? <section style={surface} role="status" aria-live="polite"><h2>✓ All three speaking parts recorded and assessed</h2><p>Saving your final course score now. Keep this page open while we confirm storage and synchronization.</p></section> : null}
+    {stage === "submitting" ? <section style={surface} role="status" aria-live="polite"><h2>✓ All three speaking parts recorded and assessed</h2><p>Saving your result…</p></section> : null}
     {stage === "save-error" ? <section style={surface} role="alert">
       <h2>Submission needs a retry</h2>
       <p>{message}</p><p>Your three assessed parts are retained on this device and on the examiner server. Do not record them again.</p>
@@ -346,11 +354,7 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         <summary style={{ cursor: "pointer", fontWeight: 700 }}>Teil {i} · Feedback</summary>
         <SpeakingFeedback assessment={displayParts[`teil${i}`] || {}} feedback={displayParts[`teil${i}`]?.summary || ""}/>
       </details>)}
-      {serverResult.sheet?.ok ? <p role="status" style={{ color: "#166534" }}>Score saved in Falowen and synchronized with the Google results sheet.</p>
-        : <div role="status" aria-live="polite" style={{ background: "#fffbeb", padding: 12, borderRadius: 12 }}>
-          <p style={{ marginTop: 0 }}>✓ Your course score is stored in Falowen. Google Sheets and Admin sheet synchronization is still pending. Your recording is not lost. {serverResult.sheet?.message || ""}</p>
-          <button type="button" style={button} onClick={() => submit()}>Retry Google Sheets sync</button>
-        </div>}
+      <p role="status" style={{ color: "#166534" }}>Your result is saved. Open Results whenever you want to review it.</p>
       <Link to="/campus/results">View all course results →</Link>
     </section> : null}
   </main>;

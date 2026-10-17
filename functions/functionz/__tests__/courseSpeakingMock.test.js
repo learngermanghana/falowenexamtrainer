@@ -1,7 +1,33 @@
+jest.mock('../googleSheetsClient', () => ({ getSheetsClient: jest.fn() }));
 const {
   COURSE_MOCKS, evaluateResults, buildScoreDocument, findSavedSpeakingParts,
   courseSpeakingMockStatus, startCourseSpeakingAttempt, requireCourseSpeakingAttempt,
+  synchronizeSheet,
 } = require("../courseSpeakingMock");
+
+describe('speaking results use the shared background export', () => {
+  test('queues once, preserves workbook identity and retries without recording again', async () => {
+    const rows = new Map([['scores/mock', { studentCode: 'student', assignmentId: 'A2-8.22', score: 69, sheetSyncStatus: 'pending' }]]);
+    const ref = path => ({ path, id: path.split('/').at(-1) });
+    const db = { collection: name => ({ doc: id => ref(`${name}/${id}`) }), runTransaction: async work => {
+      const writes = [];
+      const result = await work({
+        get: async r => ({ exists: rows.has(r.path), data: () => rows.get(r.path) }),
+        set: (r, value, options) => writes.push(() => rows.set(r.path, options?.merge ? { ...rows.get(r.path), ...value } : value)),
+        create: (r, value) => writes.push(() => { expect(rows.has(r.path)).toBe(false); rows.set(r.path, value); }),
+      }); writes.forEach(write => write()); return result;
+    } };
+    const args = { db, scoreRef: ref('scores/mock'), row: rows.get('scores/mock') };
+    await synchronizeSheet(args); await synchronizeSheet(args);
+    expect(rows.size).toBe(2);
+    expect(rows.get('scores/mock').dedupe_id).toBe('student__A2-8.22__course_speaking_mock');
+    expect(rows.get('automaticScoreSync/speaking-mock').source).toBe('course_speaking_mock');
+    rows.get('automaticScoreSync/speaking-mock').status = 'synced';
+    expect(await synchronizeSheet(args)).toEqual({ ok: true });
+    expect(rows.get('scores/mock').sheetSyncStatus).toBe('complete');
+    expect(rows.get('scores/mock').score).toBe(69);
+  });
+});
 
 const ATTEMPT_A = "11111111-1111-4111-8111-111111111111";
 const ATTEMPT_B = "22222222-2222-4222-8222-222222222222";

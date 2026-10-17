@@ -92,6 +92,11 @@ jobs:
           node scripts/checkDeletionDeploymentPermissions.cjs
           node scripts/deployFirestoreRules.cjs
 
+      - name: Verify shared speaking score sync consumer before deploying its producer
+        run: |
+          node --test scripts/checkSpeakingSyncConsumer.test.cjs
+          node scripts/checkSpeakingSyncConsumer.cjs
+
       - name: Deploy exam trainer API and notification lifecycle
         shell: bash
         run: |
