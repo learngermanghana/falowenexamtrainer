@@ -172,7 +172,11 @@ async function upsertMockScoreSheet(row) {
       valueInputOption: "RAW", requestBody: { values: [old] },
     });
   }
-  const cells = new Array(Math.max(header.length, 9)).fill("");
+  // Preserve extra Admin columns (manual overrides, marking breakdowns,
+  // source audit fields) when the same result is synchronized again.
+  const cells = same.length
+    ? [...values[same[0] - 2]]
+    : new Array(Math.max(header.length, 9)).fill("");
   const data = { studentcode: row.studentCode, name: row.name, assignment: row.assignment,
     assignmentid: row.assignmentId, score: row.score, comments: row.comments,
     date: row.date, level: row.level, link: row.link };
