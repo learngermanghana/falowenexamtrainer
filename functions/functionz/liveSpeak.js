@@ -702,6 +702,23 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           const merged=taskFlows.mergeDecisions(flowSession,content.decisions,confirmed);
           decisions=merged.decisions;
           ready=ready || merged.complete;
+          // Availability is a meaningful answer even without the word
+          // "passen". Ask only for the outstanding Termin detail.
+          if (flowSession.examFlow.key === "B1-1" && !ready) {
+            const intent=taskFlows.appointmentIntent(confirmed);
+            const firstPoint=flowSession.examFlow.planningPoints?.[0];
+            const missingFirst=firstPoint && !decisions.some(d=>d.point===firstPoint.id);
+            if (intent.affirmative && intent.available && missingFirst &&
+                /\bwann\b/i.test(firstPoint.text)) {
+              if (merged.availabilityConfirmed) {
+                reply="Gut, zu dieser Zeit hast du frei. Wo genau sollen wir uns treffen?";
+              } else if (!/\b(?:\d{1,2}(?:[:.]\d{2})?\s*uhr|mittags|nachmittags|abends)\b/i.test(intent.clause)) {
+                reply=/\b(?:montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/i.test(intent.clause)
+                  ? "Prima, du hast an diesem Tag Zeit. Um wie viel Uhr können wir uns treffen?"
+                  : "Prima, dann hast du Zeit. An welchem Tag und um wie viel Uhr können wir uns treffen?";
+              }
+            }
+          }
           if (merged.complete) reply="Danke. Dann halten wir unseren gemeinsamen Plan so fest. Dieser Prüfungsteil ist beendet.";
         }
         // A short partner answer and the next examiner instruction are distinct turns.

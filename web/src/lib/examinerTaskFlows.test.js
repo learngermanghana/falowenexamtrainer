@@ -325,3 +325,119 @@ test("B2 discussion responds to arguments and finishes with a summary, without f
  expect(flows.partnerInstructions(session,plan)).toContain("Do not demand agreement");
  expect(flows.responsePlan({...session,answeredTurns:4})).toEqual(expect.objectContaining({ready:true,dynamic:false}));
 });
+
+
+describe("Termin negotiation in shared course mocks and Exam Room", () => {
+  const a2Session=(transcript,previous="Wie wäre es mit Mittwoch um 18 Uhr?") => {
+    const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 3"});
+    return flows.calendarResponse({examFlow,answeredTurns:2,
+      messages:[{role:"assistant",text:previous}]},transcript);
+  };
+
+  test.each([
+    "Ich habe frei.",
+    "Ja, ich habe frei.",
+    "Ich habe Zeit.",
+    "Da habe ich Zeit.",
+    "Da kann ich.",
+    "Am Mittwoch habe ich frei.",
+    "Mittwoch um 18 Uhr habe ich Zeit.",
+    "Mittwoch bin ich frei.",
+    "Das geht bei mir.",
+    "Ja, das klappt.",
+    "Das ist gut für mich.",
+    "Ich kann am Mittwoch.",
+  ])("A2 accepts a non-passen confirmation: %s",reply=>{
+    const result=a2Session(reply);
+    expect(result.complete).toBe(true);
+    expect(result.decisions).toEqual(expect.arrayContaining([
+      expect.objectContaining({point:"appointment",value:"Mittwoch 18:00"}),
+    ]));
+  });
+
+  test.each([
+    "Ich habe keine Zeit.",
+    "Nein, ich habe frei.",
+    "Leider habe ich keine Zeit.",
+    "Da kann ich nicht.",
+    "Mittwoch um 18 Uhr geht leider nicht.",
+    "Ja, das passt mir nicht.",
+    "Am Donnerstag habe ich frei.",
+    "Am Mittwoch um 19 Uhr habe ich Zeit.",
+    "Ja, am Mittwoch um 18:30 Uhr geht es.",
+    "Vielleicht habe ich Zeit.",
+    "Ja, aber ich muss arbeiten.",
+  ])("A2 does not invent agreement from refusal or conflicting time: %s",reply=>{
+    expect(a2Session(reply).complete).toBe(false);
+  });
+
+  test("A2 needs a real partner proposal before treating bare availability as agreement",()=>{
+    const result=a2Session("Ich habe frei.","Wann hast du Zeit?");
+    expect(result.complete).toBe(false);
+    expect(result.reply).toContain("Mittwoch um 18 Uhr");
+  });
+
+  test.each(catalogue.a2PlanningTasks)("A2 $topic can confirm its genuine shared calendar slot without passen",task=>{
+    const examFlow=flows.createExaminerFlow("A2",{teil:"Teil 3",prompt:task.topic});
+    const session={examFlow,answeredTurns:2,
+      messages:[{role:"assistant",text:"Wie wäre es mit Samstag um "+task.agreement.hour+" Uhr?"}]};
+    expect(flows.calendarResponse(session,"Da habe ich frei.").complete).toBe(true);
+    expect(flows.calendarResponse(session,"Ich kann leider nicht.").complete).toBe(false);
+  });
+
+  test("B1 time-only planning point accepts an availability confirmation without passen",()=>{
+    const task={teil:"Teil 1",prompt:"Einen kranken Freund oder Lehrer besuchen"};
+    const examFlow=flows.createExaminerFlow("B1",task);
+    const session={examFlow,answeredTurns:2,
+      messages:[{role:"assistant",text:"Wie wäre es mit Samstag um 15 Uhr?"}]};
+    const result=flows.mergeDecisions(session,[],"Da habe ich frei.");
+    expect(result.availabilityConfirmed).toEqual(expect.objectContaining({day:"Samstag",hour:15}));
+    expect(result.decisions).toContainEqual(expect.objectContaining({
+      point:"point1",value:"Samstag 15:00",quote:"Da habe ich frei.",
+    }));
+    expect(result.complete).toBe(false);
+  });
+
+  test("B1 combined wann-und-wo responds to free time without falsely claiming a location",()=>{
+    const task={teil:"Teil 1",prompt:"Einen Sporttag / eine Fahrradtour planen"};
+    const examFlow=flows.createExaminerFlow("B1",task);
+    const session={examFlow,answeredTurns:2,
+      messages:[{role:"assistant",text:"Wie wäre es mit Samstag um 15 Uhr?"}]};
+    const result=flows.mergeDecisions(session,[],"Ja, ich habe frei.");
+    expect(result.availabilityConfirmed?.slot).toBe("Samstag 15:00");
+    expect(result.decisions).toHaveLength(0);
+    expect(result.complete).toBe(false);
+    expect(flows.partnerInstructions({...session,level:"B1"},
+      {previous:{action:"negotiate"},step:{instruction:"Wo treffen wir uns?"}}))
+      .toContain("Ich habe frei");
+  });
+
+  test.each(["Ich habe keine Zeit.","Am Sonntag bin ich frei.",
+    "Ja, aber um 17 Uhr.", "Vielleicht habe ich frei.","Das passt mir nicht."])(
+    "B1 does not treat %s as agreement to a Saturday 15h suggestion",reply=>{
+      const examFlow=flows.createExaminerFlow("B1",{teil:"Teil 1",
+        prompt:"Einen kranken Freund oder Lehrer besuchen"});
+      const session={examFlow,answeredTurns:2,
+        messages:[{role:"assistant",text:"Wie wäre es mit Samstag um 15 Uhr?"}]};
+      expect(flows.mergeDecisions(session,[],reply).decisions).toHaveLength(0);
+    });
+
+  test.each([
+    "Am Samstag um 15 Uhr kann ich leider nicht.",
+    "Wie wäre es mit Samstag um 15 Uhr oder Sonntag um 16 Uhr?",
+    "Am Samstag um 15 Uhr oder um 17 Uhr?",
+  ])("B1 refuses non-proposals and ambiguous alternatives from the partner: %s",previous=>{
+    const flow=flows.createExaminerFlow("B1",{teil:"Teil 1",
+      prompt:"Einen kranken Freund oder Lehrer besuchen"});
+    const session={examFlow:flow,answeredTurns:2,messages:[{role:"assistant",text:previous}]};
+    expect(flows.mergeDecisions(session,[],"Ich habe frei.").decisions).toHaveLength(0);
+  });
+
+  test("B1 availability alone cannot claim a time never proposed by the partner",()=>{
+    const flow=flows.createExaminerFlow("B1",{teil:"Teil 1",
+      prompt:"Einen kranken Freund oder Lehrer besuchen"});
+    const session={examFlow:flow,answeredTurns:2,
+      messages:[{role:"assistant",text:"Wann hast du Zeit?"}]};
+    expect(flows.mergeDecisions(session,[],"Ich habe frei.").decisions).toHaveLength(0);
+  });
+});

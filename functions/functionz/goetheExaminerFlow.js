@@ -176,6 +176,7 @@ function partnerInstructions(session,plan) {
       "Record only decisions actually agreed in the student's latest words: {point, value, quote}; quote must be an exact substring of their transcript. " +
       "To withdraw a previous decision, return {point, quote, withdrawn:true}. " +
       "Allowed decision points: " + JSON.stringify(profile.decisionPoints) + ". " : "Use an empty decisions array. ") +
+    (flow.key === "B1-1" ? "German Termin intent: 'Ich habe frei', 'Da habe ich Zeit', 'Da kann ich', 'Samstag geht bei mir' and 'Das klappt' can affirm a concrete appointment proposed by the partner. Never require the word 'passen'. When the learner only expresses availability but no definite time and place has been agreed, ACKNOWLEDGE that availability and ask ONE specific question for the missing detail, without repeating the opening. 'Ich kann nicht', 'keine Zeit', 'leider', and a conflicting day or hour must never count as acceptance. A proposal by the student does not alone mean the partner has agreed. For 'wann und wo' both time and place are needed. " : "") +
     (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
     "State: " + JSON.stringify({task:session.examTask,role:plan.previous?.role,action:plan.previous?.action,
@@ -186,45 +187,106 @@ function partnerInstructions(session,plan) {
       decisions:flow.decisions}) +
     (focusedExchange ? ". Reply ONLY to the previous student turn; do not include nextInstruction or any new question." : ". After answering, use nextInstruction to give the student the correct next task. For negotiation, ask about one unresolved decision instead of repeating the opening.");
 }
+// A German appointment is an agreement, not a password containing "passen".
+// Prefer the learner's final correction after "aber ..." to an earlier "ja".
+function appointmentIntent(transcript) {
+  const clause=clean(transcript,1200).split(/\baber\b/i).at(-1).trim();
+  const negative=/(?:\b(?:nein|nö|keine?)\b|\bnicht\b(?!\s+(?:schlecht|nur)\b)|\b(?:leider|unmöglich|verhindert|besetzt)\b|\b(?:muss|müsste)\s+(?:arbeiten|lernen)\b)/i.test(clause);
+  const uncertain=/\b(?:vielleicht|eventuell|wahrscheinlich|möglicherweise|voraussichtlich|weiß nicht|weiss nicht|ich glaube)\b/i.test(clause);
+  const confirming=/(?:\b(?:ja|klar|okay|ok|einverstanden|abgemacht|passt|gerne|gern)\b|\b(?:das|es|der termin)\s+(?:geht|klappt|passt)\b|\bmachen wir\b|\btreffen wir uns\b|\b(?:ist|wäre)\s+(?:gut|super|perfekt|prima|in ordnung)\b)/i.test(clause);
+  const available=/(?:\bich\s+(?:habe|hab|bin)\b.{0,42}\b(?:frei|zeit|verfügbar)\b|\b(?:habe|hab|bin)\s+ich\b.{0,42}\b(?:frei|zeit|verfügbar)\b|\b(?:da|dann|dort)\s+(?:kann ich|habe ich zeit|hab ich zeit|bin ich frei)\b|\bich\s+kann\s+(?:da|dann|am|um|zu der zeit)\b|\b(?:samstag|sonntag|montag|dienstag|mittwoch|donnerstag|freitag)\b.{0,30}\b(?:geht|klappt|ist gut)\b)/i.test(clause);
+  return {clause,negative,uncertain,available,affirmative:!negative && !uncertain && (confirming || available)};
+}
+function appointmentFromPartner(session) {
+  const last=savedAssistant(session);
+  // A mentioned time is not a proposal if the partner is rejecting it or
+  // presenting competing alternatives. Do not fabricate mutual agreement.
+  if (appointmentIntent(last).negative || /\boder\b/i.test(last)) return null;
+  const mentionedDays=[...last.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/gi)]
+    .map(item=>item[1].toLowerCase());
+  if (new Set(mentionedDays).size > 1) return null;
+  const matches=[...last.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b.{0,36}?\b(?:um\s+)?(\d{1,2})(?:[:.](\d{2}))?\s*uhr\b/gi)];
+  if (matches.length !== 1) return null; // Two proposed alternatives are ambiguous.
+  const match=matches[0],hour=Number(match[2]),minute=Number(match[3] || 0);
+  if (hour>23 || minute>59) return null;
+  return {day:match[1],hour,minute,slot:match[1]+" "+String(hour).padStart(2,"0")+":"+String(minute).padStart(2,"0")};
+}
+function agreesWithProposedSlot(session, transcript) {
+  const intent=appointmentIntent(transcript), slot=appointmentFromPartner(session);
+  if (!intent.affirmative || !slot) return null;
+  const clause=intent.clause;
+  const days=[...clause.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/gi)].map(item=>item[1].toLowerCase());
+  const times=[...clause.matchAll(/\b(?:um\s+)?(\d{1,2})(?:[:.](\d{2}))?\s*uhr\b/gi)]
+    .map(item=>({hour:Number(item[1]),minute:Number(item[2]||0)}));
+  if (days.some(day=>day !== slot.day.toLowerCase())) return null;
+  if (times.some(time=>time.hour !== slot.hour || time.minute !== slot.minute)) return null;
+  return {slot,quote:clause};
+}
+
 function mergeDecisions(session, proposed, transcript) {
   const profile=profileFor(session.examFlow);
   const accepted=new Map((session.examFlow.decisions || []).map(d=>[d.point,d]));
   for (const d of Array.isArray(proposed) ? proposed.slice(0,4) : []) {
     if (!profile.decisionPoints?.includes(d?.point) || !clean(d.quote,250) || !transcript.includes(clean(d.quote,250))) continue;
     if (d.withdrawn === true) {accepted.delete(d.point);continue;}
-    if (session.examFlow.key === "A2-3" && /\b(nein|nicht|leider|keine)\b/i.test(transcript.split(/\baber\b/i).at(-1))) continue;
+    if (session.examFlow.key === "A2-3" && appointmentIntent(transcript).negative) continue;
     if (session.examFlow.key === "A2-3") {
       const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
       if (!String(d.value || "").includes(`${target.day} ${target.hour}:00`)) continue;
     }
     accepted.set(d.point,{point:d.point,value:clean(d.value,180),quote:clean(d.quote,250)});
   }
+  // A B1 learner may confirm a proposed Termin without "passen".
+  // For "wann und wo" do not prematurely award the combined point without
+  // its location; the examiner can instead ask the next missing detail.
+  let availabilityConfirmed=null;
+  if (session.examFlow.key === "B1-1") {
+    const confirmation=agreesWithProposedSlot(session,transcript);
+    if (confirmation) {
+      availabilityConfirmed=confirmation.slot;
+      const firstPoint=session.examFlow.planningPoints?.[0];
+      const needsPlace=/\bwo(?:hin)?\b/i.test(firstPoint?.text || "");
+      if (firstPoint && !needsPlace && !accepted.has(firstPoint.id)) {
+        accepted.set(firstPoint.id,{
+          point:firstPoint.id,value:confirmation.slot.slot,quote:confirmation.quote,
+        });
+      }
+    }
+  }
   const decisions=[...accepted.values()];
   const complete=Boolean(profile.decisionPoints?.length) && Number(session.answeredTurns)>=profile.minAnswers &&
     profile.decisionPoints.every(point=>accepted.has(point));
-  return {decisions,complete};
+  return {decisions,complete,availabilityConfirmed};
 }
 function calendarResponse(session, transcript) {
   const target=session.examFlow.calendar?.agreement || {day:"Mittwoch",hour:18};
-  const targetDay=target.day.toLowerCase(), targetHour=target.hour;
-  const clause=transcript.split(/\baber\b/i).at(-1).trim();
-  const declined=/\b(nein|nicht|leider|keine)\b/i.test(clause);
-  const day=clause.match(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/i)?.[1]?.toLowerCase();
-  const time=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
-  const hourWords={12:/\bzwölf\b/i,13:/\bdreizehn\b/i,15:/\bfünfzehn\b/i,17:/\bsiebzehn\b/i,18:/\bachtzehn\b/i,19:/\bneunzehn\b/i};
-  const targetTime=time ? Number(time[1])===targetHour && Number(time[2] || 0)===0 : Boolean(hourWords[targetHour]?.test(clause)) || (targetHour===18 && /\bsechs\b.*\babends\b/i.test(clause));
-  const mentionsTime=Boolean(time) || /\b(uhr|halb|viertel|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
-  const contradiction=(day && day!==targetDay) || (mentionsTime && !targetTime);
-  const explicit=day === targetDay && targetTime;
+  const targetDay=target.day.toLowerCase(),targetHour=target.hour;
+  const intent=appointmentIntent(transcript),clause=intent.clause;
+  const mentionedDays=[...clause.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/gi)].map(item=>item[1].toLowerCase());
+  const number=clause.match(/\b(\d{1,2})(?:[:.](\d{2}))?\b/);
+  const hourWords={12:/\bzwölf\b/i,13:/\b(?:dreizehn|eins)\b/i,15:/\b(?:fünfzehn|drei)\b/i,
+    17:/\b(?:siebzehn|fünf)\b/i,18:/\b(?:achtzehn|sechs)\b/i,19:/\b(?:neunzehn|sieben)\b/i};
+  const targetTime=number ? Number(number[1])===targetHour && Number(number[2]||0)===0
+    : Boolean(hourWords[targetHour]?.test(clause)) &&
+      (targetHour===12 || targetHour===13 || /\b(?:uhr|nachmittags|abends)\b/i.test(clause));
+  const mentionsTime=Boolean(number) ||
+    /\b(uhr|halb|viertel|eins|zwei|drei|fünf|sechs|sieben|acht|neun|zehn|elf|zwölf|dreizehn|vierzehn|fünfzehn|sechzehn|siebzehn|achtzehn|neunzehn|zwanzig)\b/i.test(clause);
+  const contradiction=mentionedDays.some(day=>day!==targetDay) || (mentionsTime && !targetTime);
+  const explicit=mentionedDays.includes(targetDay) && targetTime;
   const previous=savedAssistant(session);
-  const accepted=/\b(ja|passt|einverstanden|gut|gerne|gern|machen wir)\b/i.test(clause);
-  const proposed=previous.toLowerCase().includes(targetDay) && previous.includes(String(targetHour));
-  const agreed=Number(session.answeredTurns)>=2 && !declined && !contradiction && (explicit || (accepted && proposed));
-  const merged=mergeDecisions(session,agreed ? [{point:"appointment",value:`${target.day} ${targetHour}:00`,quote:clause.slice(0,250)}] : [],transcript);
-  return {...merged,reply:merged.complete ? `Gut, dann treffen wir uns am ${target.day} um ${targetHour} Uhr. Bis dann!` :
-    Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet." :
-    `Wie wäre es mit ${target.day} um ${targetHour} Uhr? Passt dir dieser Termin?`};
+  const proposed=previous.toLowerCase().includes(targetDay) &&
+    new RegExp("\\b"+targetHour+"(?::00)?\\b").test(previous);
+  const agreed=Number(session.answeredTurns)>=2 && !intent.negative && !contradiction &&
+    (explicit || (intent.affirmative && proposed));
+  const merged=mergeDecisions(session,agreed ? [{
+    point:"appointment",value:target.day+" "+targetHour+":00",quote:clause.slice(0,250),
+  }] : [],transcript);
+  return {...merged,reply:merged.complete
+    ? "Gut, dann treffen wir uns am "+target.day+" um "+targetHour+" Uhr. Bis dann!"
+    : Number(session.answeredTurns)>=profileFor(session.examFlow).maxAnswers
+      ? "Wir haben noch keinen gemeinsamen Termin vereinbart. Dieser Prüfungsteil ist jetzt beendet."
+      : "Wie wäre es mit "+target.day+" um "+targetHour+" Uhr? Hast du da Zeit?"};
 }
 function savedAssistant(session) {return (session.messages || []).filter(item=>item.role === "assistant").at(-1)?.text || "";}
 
-module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse};
+module.exports={createExaminerFlow,currentStep,publicFlow,profileFor,maxAnswers,isReady,isComplete,responsePlan,partnerInstructions,mergeDecisions,calendarResponse,appointmentIntent,agreesWithProposedSlot};
