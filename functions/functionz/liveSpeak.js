@@ -124,6 +124,8 @@ const cleanExamTask = (task) => ({
   hint: String(task?.hint || "").replace(/[\r\n\t]/g, " ").slice(0, 170),
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
+  mockAttemptId: assignmentConfig(task?.courseAssignmentKey)
+    ? String(task?.mockAttemptId || "").trim() : "",
 });
 const examOpening = (level, task) => {
   const part = task.teil ? task.teil + ". " : "";
@@ -307,6 +309,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const source = cleanPracticeSource(req.body?.source);
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
+      if (examTask?.courseAssignmentKey) {
+        // Course exam parts must reference an attempt created and owned by the
+        // signed-in student on the server before any new voice session begins.
+        const { requireCourseSpeakingAttempt } = require("./courseSpeakingMock");
+        await requireCourseSpeakingAttempt({ db: db(), uid: student.auth.uid,
+          assignmentId: examTask.courseAssignmentKey, attemptId: examTask.mockAttemptId });
+      }
       const examFlow = examTask && req.body?.examinerFlowVersion === 1
         ? taskFlows.createExaminerFlow(level,examTask,req.body?.examMode) : null;
       if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2","C1","C2"].includes(level)) {
@@ -893,6 +902,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           endedAt:admin.firestore.FieldValue.serverTimestamp()});
         // An immutable per-attempt snapshot remains after the next live session starts.
         tx.set(resultRef,{uid:record.uid,sessionId,level,teil:task.teil || "",
+          mockAttemptId: record.examTask?.mockAttemptId || "",
+          ownerAssignment: record.examTask?.courseAssignmentKey
+            ? `${record.uid}:${record.examTask.courseAssignmentKey}` : "",
           task,answers,dialogue:savedMessages(record),assessment,feedback,completed,
           source:record.source,examFlowKey:record.examFlow?.key || "",
           practiceOnly:true,createdAt:admin.firestore.FieldValue.serverTimestamp()});
@@ -912,6 +924,23 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (err?.status && err?.code) return error(res,err.status,err.code,err.message);
       console.error("Live Speak examiner feedback failed",err?.message);
       return error(res,503,"feedback_unavailable","Your answers are saved. Try retrieving feedback again; no exam score was saved.");
+    }
+  });
+
+  // The attempt ID is server-created and shared by all three Teils.
+  app.post("/live-speak/course-mock/start", async (req, res) => {
+    try {
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const assignmentId = String(req.body?.assignmentKey || "").trim().toUpperCase();
+      const { startCourseSpeakingAttempt } = require("./courseSpeakingMock");
+      return res.json(await startCourseSpeakingAttempt({
+        db: db(), admin, uid: student.auth.uid, assignmentId,
+      }));
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code || "mock_error", err.message);
+      console.error("Course speaking attempt start failed", err?.message);
+      return error(res, 503, "mock_start_unavailable", "Unable to start this graded exam safely.");
     }
   });
 
@@ -941,7 +970,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const result = await submitCourseSpeakingMock({
         db: db(), admin, uid: student.auth.uid, profile: student.profile,
         auth: student.auth, assignmentId,
-        sessionIds: req.body?.sessionIds,
+        sessionIds: req.body?.sessionIds, attemptId: req.body?.attemptId,
       });
       return res.json(result);
     } catch (err) {
