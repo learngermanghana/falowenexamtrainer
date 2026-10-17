@@ -27,8 +27,14 @@ import {
   reload,
   limit,
   addDoc,
+  runTransaction,
   GoogleAuthProvider,
 } from "../firebase";
+import {
+  getMessagingTokenForDevice,
+  mergeMessagingTokenForDevice,
+  removeMessagingTokenForDevice,
+} from "../utils/devicePushTokens";
 import { getBackendUrl } from "../services/backendUrl";
 
 const AuthContext = createContext();
@@ -53,13 +59,7 @@ const getDevicePlatform = () => {
   return navigator.platform || navigator.userAgent || "web";
 };
 
-const getMessagingTokenFromProfile = (profile, deviceId) => {
-  if (!profile) return null;
-  const tokens = Array.isArray(profile.messagingTokens) ? profile.messagingTokens : [];
-  const match = tokens.find((entry) => entry?.deviceId && entry.deviceId === deviceId);
-  if (match?.token) return match.token;
-  return profile.messagingToken || null;
-};
+const getMessagingTokenFromProfile = getMessagingTokenForDevice;
 
 const isServerTimestampValue = (value) =>
   Boolean(value && typeof value === "object" && value._methodName === "serverTimestamp");
@@ -336,49 +336,30 @@ export const AuthProvider = ({ children }) => {
   const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token || !deviceId) return;
     const studentRef = doc(db, "students", studentId);
-    const existingTokens = Array.isArray(studentProfile?.messagingTokens)
-      ? studentProfile.messagingTokens
-      : [];
-    const filteredTokens = existingTokens.filter(
-      (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token
-    );
-    const firestoreTokens = normalizeMessagingTokensForFirestore([
-      ...filteredTokens,
-      {
+    let mergedTokens = [];
+    // Read the freshest list inside a Firestore transaction. Otherwise a phone
+    // and computer enabling notifications at the same time can erase each other.
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(studentRef);
+      if (!snapshot.exists()) throw new Error("Student profile not found. Sign in again to enable notifications.");
+      mergedTokens = mergeMessagingTokenForDevice(snapshot.data()?.messagingTokens, {
         token,
         deviceId,
         platform: devicePlatform,
         lastSeen: Timestamp.now(),
-      },
-    ]);
-    const localTokens = normalizeMessagingTokensForState([
-      ...filteredTokens,
-      {
-        token,
-        deviceId,
-        platform: devicePlatform,
-        lastSeen: new Date().toISOString(),
-      },
-    ]);
-    await setDoc(
-      studentRef,
-      {
-        messagingToken: token,
+      });
+      transaction.set(studentRef, {
+        messagingToken: token, // Legacy compatibility for older push delivery jobs.
         messagingTokenUpdatedAt: serverTimestamp(),
-        messagingTokens: firestoreTokens,
-      },
-      { merge: true }
-    );
+        messagingTokens: normalizeMessagingTokensForFirestore(mergedTokens),
+      }, { merge: true });
+    });
     setStudentProfile((prev) =>
       prev?.id === studentId
-        ? {
-            ...prev,
-            messagingToken: token,
-            messagingTokens: localTokens,
-          }
+        ? { ...prev, messagingToken: token, messagingTokens: normalizeMessagingTokensForState(mergedTokens) }
         : prev
     );
-  }, [deviceId, devicePlatform, studentProfile?.messagingTokens]);
+  }, [deviceId, devicePlatform]);
 
   const logLoginSession = useCallback(
     async ({ uid, email, studentId, studentCode, provider, meta = {} }) => {
@@ -412,30 +393,35 @@ export const AuthProvider = ({ children }) => {
   const revokeMessagingToken = useCallback(async (studentId, token) => {
     if (!studentId || !deviceId) return;
     const studentRef = doc(db, "students", studentId);
-    const existingTokens = Array.isArray(studentProfile?.messagingTokens)
-      ? studentProfile.messagingTokens
-      : [];
-    const filteredTokens = existingTokens.filter(
-      (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token !== token
-    );
-    const updatePayload = {
-      messagingTokens: normalizeMessagingTokensForFirestore(filteredTokens),
-      messagingTokenUpdatedAt: serverTimestamp(),
-    };
-    if (studentProfile?.messagingToken && studentProfile.messagingToken === token) {
-      updatePayload.messagingToken = deleteField();
-    }
-    await updateDoc(studentRef, updatePayload);
+    let remainingTokens = [];
+    let legacyToken;
+    await runTransaction(db, async (transaction) => {
+      const snapshot = await transaction.get(studentRef);
+      if (!snapshot.exists()) return;
+      const current = snapshot.data() || {};
+      remainingTokens = removeMessagingTokenForDevice(current.messagingTokens, deviceId, token);
+      const updatePayload = {
+        messagingTokens: normalizeMessagingTokensForFirestore(remainingTokens),
+        messagingTokenUpdatedAt: serverTimestamp(),
+      };
+      if (current.messagingToken === token) {
+        legacyToken = remainingTokens[0]?.token;
+        updatePayload.messagingToken = legacyToken || deleteField();
+      } else {
+        legacyToken = current.messagingToken;
+      }
+      transaction.set(studentRef, updatePayload, { merge: true });
+    });
     setStudentProfile((prev) =>
       prev?.id === studentId
         ? {
             ...prev,
-            messagingToken: prev.messagingToken === token ? undefined : prev.messagingToken,
-            messagingTokens: normalizeMessagingTokensForState(filteredTokens),
+            messagingToken: legacyToken,
+            messagingTokens: normalizeMessagingTokensForState(remainingTokens),
           }
         : prev
     );
-  }, [deviceId, studentProfile?.messagingToken, studentProfile?.messagingTokens]);
+  }, [deviceId]);
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
