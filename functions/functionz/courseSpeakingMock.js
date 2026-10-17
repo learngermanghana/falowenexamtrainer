@@ -3,6 +3,7 @@
 // A graded course assignment is built exclusively from three completed,
 // server-stored Live Speak examiner results. The browser never supplies scores.
 const { getSheetsClient } = require("./googleSheetsClient");
+const crypto = require("crypto");
 
 const COURSE_MOCKS = Object.freeze({
   "A2-8.22": { level: "A2", day: 22, title: "Goethe A2 Speaking Mock" },
@@ -14,12 +15,53 @@ const assignmentConfig = value => COURSE_MOCKS[clean(value).toUpperCase()] || nu
 const validationError = (message, status = 400) =>
   Object.assign(new Error(message), { status, code: "invalid_course_speaking_mock" });
 const docIdFor = (uid, assignmentId) => `course-speaking-mock-${uid}-${assignmentId}`;
+const attemptRefFor = (db, uid, assignmentId) =>
+  db.collection("courseSpeakingMockAttempts").doc(docIdFor(uid, assignmentId));
+const validAttemptId = value =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clean(value));
+
+async function startCourseSpeakingAttempt({ db, admin, uid, assignmentId }) {
+  if (!assignmentConfig(assignmentId)) throw validationError("Unknown course speaking assignment.");
+  const ref = attemptRefFor(db, uid, assignmentId);
+  const scoreRef = db.collection("scores").doc(docIdFor(uid, assignmentId));
+  return db.runTransaction(async tx => {
+    const [attemptSnap, scoreSnap] = await Promise.all([tx.get(ref), tx.get(scoreRef)]);
+    const score = scoreSnap.data() || {};
+    if (score.uid === uid && score.source === "course_speaking_mock") {
+      throw validationError("This speaking assignment is already completed.", 409);
+    }
+    const prior = attemptSnap.data() || {};
+    if (prior.uid === uid && prior.assignmentId === assignmentId && validAttemptId(prior.attemptId)) {
+      return { ok: true, attemptId: prior.attemptId, resumed: true };
+    }
+    const attemptId = crypto.randomUUID();
+    tx.set(ref, { uid, assignmentId, attemptId, status: "in_progress",
+      createdAt: admin.firestore.FieldValue.serverTimestamp() });
+    return { ok: true, attemptId, resumed: false };
+  });
+}
+
+async function requireCourseSpeakingAttempt({ db, uid, assignmentId, attemptId }) {
+  if (!assignmentConfig(assignmentId) || !validAttemptId(attemptId)) {
+    throw validationError("Start the speaking mock from its lesson before recording.", 409);
+  }
+  const snap = await attemptRefFor(db, uid, assignmentId).get();
+  const row = snap.data() || {};
+  if (row.uid !== uid || row.assignmentId !== assignmentId ||
+      row.attemptId !== attemptId || row.status !== "in_progress") {
+    throw validationError("This recording belongs to another or expired speaking exam attempt.", 409);
+  }
+  return row;
+}
 const normalizedPart = value => {
   const part = clean(value).match(/(?:teil\s*)?([1-3])\b/i);
   return part ? `teil${part[1]}` : "";
 };
 
-function evaluateResults({ assignmentId, uid, snapshots }) {
+function evaluateResults({ assignmentId, uid, snapshots, attemptId }) {
+  if (!validAttemptId(attemptId)) {
+    throw validationError("A verified speaking mock attempt ID is required.", 409);
+  }
   const config = assignmentConfig(assignmentId);
   if (!config) throw validationError("This lesson is not a graded speaking mock.");
   if (!Array.isArray(snapshots) || snapshots.length !== 3) {
@@ -37,6 +79,8 @@ function evaluateResults({ assignmentId, uid, snapshots }) {
         item.source !== "exam-speaking-practice" ||
         item.examFlowKey !== `${config.level}-${part.slice(-1)}` ||
         item.task?.courseAssignmentKey !== assignmentId ||
+        item.mockAttemptId !== attemptId ||
+        item.task?.mockAttemptId !== attemptId ||
         item.completed !== true || !part || results.has(part) ||
         assessment.practiceOnly !== true || !Array.isArray(assessment.tasks) ||
         assessment.tasks.length === 0 || !Number.isFinite(score) ||
@@ -65,18 +109,23 @@ function evaluateResults({ assignmentId, uid, snapshots }) {
 }
 
 
-// Recover already-graded examiner parts from Firestore rather than requiring
-// this browser's localStorage to survive navigation, updates or device resets.
-// The single-field uid query avoids requiring a new composite Firestore index.
-async function findSavedSpeakingParts({ db, uid, assignmentId }) {
+// Query the assignment-specific top-level key so Firestore filters before
+// reading results. There is deliberately no arbitrary 250-document cutoff.
+// Legacy examiner snapshots lack an attempt identifier and cannot be reliably
+// joined across restarted runs; never turn such a mixed set into a grade.
+async function findSavedSpeakingParts({ db, uid, assignmentId, attemptId }) {
   const config = assignmentConfig(assignmentId);
   if (!config) throw validationError("Unknown course speaking assignment.");
-  const query = await db.collection("liveSpeakExamResults").where("uid", "==", uid).limit(250).get();
+  if (!validAttemptId(attemptId)) return { parts: [], snapshots: [] };
+  const query = await db.collection("liveSpeakExamResults")
+    .where("ownerAssignment", "==", `${uid}:${assignmentId}`).get();
   const candidates = (query.docs || []).filter(snap => {
     const item = snap.data() || {};
     const part = normalizedPart(item.teil || item.task?.teil);
     const assessment = item.assessment || {};
     return item.uid === uid && item.level === config.level
+      && item.mockAttemptId === attemptId
+      && item.task?.mockAttemptId === attemptId
       && item.task?.courseAssignmentKey === assignmentId
       && item.source === "exam-speaking-practice"
       && part && item.examFlowKey === `${config.level}-${part.slice(-1)}`
@@ -95,14 +144,15 @@ async function findSavedSpeakingParts({ db, uid, assignmentId }) {
     const part = normalizedPart(snap.data().teil || snap.data().task?.teil);
     if (!byPart.has(part)) byPart.set(part, snap);
   }
-  const parts = ["teil1", "teil2", "teil3"].filter(key => byPart.has(key)).map(key => {
+  const keys = ["teil1", "teil2", "teil3"];
+  const parts = keys.filter(key => byPart.has(key)).map(key => {
     const snap = byPart.get(key);
     const item = snap.data() || {};
     return { sessionId: item.sessionId || snap.id, taskId: item.task?.id || "",
       teil: item.teil || item.task?.teil || `Teil ${key.slice(-1)}`,
       assessment: item.assessment };
   });
-  return { parts, snapshots: ["teil1", "teil2", "teil3"].filter(key => byPart.has(key)).map(key => byPart.get(key)) };
+  return { parts, snapshots: keys.filter(key => byPart.has(key)).map(key => byPart.get(key)) };
 }
 
 function buildScoreDocument({ assignmentId, uid, profile = {}, auth = {}, outcome, date = new Date().toISOString() }) {
@@ -218,7 +268,7 @@ async function synchronizeSheet({ db, admin, scoreRef, row }) {
   return receipt;
 }
 
-async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignmentId, sessionIds }) {
+async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignmentId, sessionIds, attemptId }) {
   const config = assignmentConfig(assignmentId);
   if (!config || !Object.prototype.hasOwnProperty.call(COURSE_MOCKS, assignmentId)) {
     throw validationError("Unknown course speaking assignment.");
@@ -226,6 +276,7 @@ async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignm
   const scoreRef = db.collection("scores").doc(docIdFor(uid, assignmentId));
   let existing = await scoreRef.get();
   if (!existing.exists) {
+    await requireCourseSpeakingAttempt({ db, uid, assignmentId, attemptId });
     let snapshots;
     if (Array.isArray(sessionIds) && sessionIds.length === 3 &&
         sessionIds.every(id => /^[0-9a-f-]{36}$/i.test(clean(id))) &&
@@ -234,12 +285,12 @@ async function submitCourseSpeakingMock({ db, admin, uid, profile, auth, assignm
     } else if (sessionIds === undefined || sessionIds === null) {
       // A student may have closed the tab after all three parts were saved.
       // Only fully graded server-owned parts are eligible for final submission.
-      snapshots = (await findSavedSpeakingParts({ db, uid, assignmentId })).snapshots;
+      snapshots = (await findSavedSpeakingParts({ db, uid, assignmentId, attemptId })).snapshots;
     } else {
       throw validationError("Three different completed exam session IDs are required.");
     }
-    const outcome = evaluateResults({ assignmentId, uid, snapshots });
-    const doc = buildScoreDocument({ assignmentId, uid, profile, auth, outcome });
+    const outcome = evaluateResults({ assignmentId, uid, snapshots, attemptId });
+    const doc = { ...buildScoreDocument({ assignmentId, uid, profile, auth, outcome }), mockAttemptId: attemptId };
     try { await scoreRef.create({ ...doc, createdAt: admin.firestore.FieldValue.serverTimestamp(), updatedAt: admin.firestore.FieldValue.serverTimestamp() }); }
     catch (error) {
       if (error?.code !== 6 && error?.code !== "already-exists") throw error;
@@ -261,9 +312,13 @@ async function courseSpeakingMockStatus({ db, uid, assignmentId }) {
   const snap = await db.collection("scores").doc(docIdFor(uid, assignmentId)).get();
   const row = snap.data();
   if (!row || row.uid !== uid || row.source !== "course_speaking_mock") {
-    const recovered = await findSavedSpeakingParts({ db, uid, assignmentId });
-    return { ok: true, completed: false, recovery: { parts: recovered.parts,
-      allPartsGraded: recovered.parts.length === 3 } };
+    const attemptSnap = await attemptRefFor(db, uid, assignmentId).get();
+    const attempt = attemptSnap.data() || {};
+    const attemptId = attempt.uid === uid && attempt.assignmentId === assignmentId &&
+      validAttemptId(attempt.attemptId) ? attempt.attemptId : "";
+    const recovered = await findSavedSpeakingParts({ db, uid, assignmentId, attemptId });
+    return { ok: true, completed: false, attemptId, recovery: { parts: recovered.parts,
+      allPartsGraded: recovered.parts.length === 3, legacyAttemptsNotCombined: true } };
   }
   return { ok: true, completed: true, assignmentId, score: row.score, passed: row.passed,
     sectionScores: row.sectionScores, speakingParts: row.speakingParts,
@@ -272,4 +327,5 @@ async function courseSpeakingMockStatus({ db, uid, assignmentId }) {
 }
 
 module.exports = { COURSE_MOCKS, assignmentConfig, evaluateResults, buildScoreDocument,
-  submitCourseSpeakingMock, courseSpeakingMockStatus, findSavedSpeakingParts, upsertMockScoreSheet };
+  startCourseSpeakingAttempt, requireCourseSpeakingAttempt, submitCourseSpeakingMock,
+  courseSpeakingMockStatus, findSavedSpeakingParts, validAttemptId, upsertMockScoreSheet };
