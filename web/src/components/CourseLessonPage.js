@@ -43,6 +43,7 @@ import B1Day21LebensformenHeuteWorkbookPage from "./B1Day21LebensformenHeuteWork
 import B1Day22BeziehungWichtigWorkbookPage from "./B1Day22BeziehungWichtigWorkbookPage";
 import B1Day22BeziehungWichtigGrammarNotesPage from "./B1Day22BeziehungWichtigGrammarNotesPage";
 import B1Day23ErstesDateWorkbookPage from "./B1Day23ErstesDateWorkbookPage";
+import A2Day22DieWochePlanungWorkbookPage from "./A2Day22DieWochePlanungWorkbookPage";
 import B1Day23ErstesDateGrammarNotesPage from "./B1Day23ErstesDateGrammarNotesPage";
 import B1Day24KonsumNachhaltigkeitWorkbookPage from "./B1Day24KonsumNachhaltigkeitWorkbookPage";
 import B1Day24KonsumNachhaltigkeitGrammarNotesPage from "./B1Day24KonsumNachhaltigkeitGrammarNotesPage";
@@ -453,7 +454,20 @@ export default function CourseLessonPage() {
   const normalizedWorkbookView = normalizeA2B1SectionView(requestedView || "");
   const isSpeakingMock = (level === "A2" && day === 22) || (level === "B1" && day === 23);
   if (isSpeakingMock && !requestedView) {
-    return <Navigate to={`/campus/course/lesson/${level}/${day}?view=workbook`} replace state={location.state} />;
+    // Retain existing lesson and tracking parameters, including radio=done.
+    // Speaking mocks replace the original radio-first workbook assessment.
+    const params = new URLSearchParams(location.search);
+    params.set("view", "workbook");
+    params.set("radio", "done");
+    return <Navigate to={`${location.pathname}?${params.toString()}${location.hash || ""}`}
+      replace state={location.state} />;
+  }
+  if (isSpeakingMock && normalizedWorkbookView !== "grammar") {
+    // Avoid mounting RadioFirstWorkbookGate for either graded exam route,
+    // even when an old bookmarked link requests view=radio.
+    return level === "A2"
+      ? <A2Day22DieWochePlanungWorkbookPage />
+      : <B1Day23ErstesDateWorkbookPage />;
   }
   const requestedChapter = String(query.get("chapter") || "").trim();
 
