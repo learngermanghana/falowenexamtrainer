@@ -910,8 +910,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       try {parsed=JSON.parse(raw);} catch {parsed=null;}
       const validMark = obj => String(obj?.summary || "").trim() &&
         String(obj?.priority || "").trim() &&
+        Array.isArray(obj?.taskScores) &&
         answers.every((_answer,index) =>
-          (obj?.taskScores || []).some(item => Number(item?.step) === index + 1 &&
+          obj.taskScores.some(item => Number(item?.step) === index + 1 &&
             Number.isInteger(Number(item?.score)) && Number(item.score) >= 0 && Number(item.score) <= 2));
       if (assignmentConfig(task.courseAssignmentKey) && !validMark(parsed)) {
         // Re-ask once within this same feedback operation, not another
