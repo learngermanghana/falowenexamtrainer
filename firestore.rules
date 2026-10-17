@@ -93,10 +93,23 @@ service cloud.firestore {
       allow delete: if ownsStudentResource() || isStaff();
     }
 
+    // Scores and marking decisions are server/staff-owned even on student submissions.
+    function hasNoMarkingFields() {
+      return !request.resource.data.keys().hasAny([
+        'markingStatus', 'finalScore', 'aiFeedback', 'feedbackSentToStudent',
+        'automaticMarking', 'resultUrl', 'markingUpdatedAt'
+      ]);
+    }
+    function markingFieldsUnchanged() {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+        'markingStatus', 'finalScore', 'aiFeedback', 'feedbackSentToStudent',
+        'automaticMarking', 'resultUrl', 'markingUpdatedAt'
+      ]);
+    }
     match /submissions/{submissionId} {
-      allow create: if ownsStudentIncoming() || isStaff();
+      allow create: if (ownsStudentIncoming() && hasNoMarkingFields()) || isStaff();
       allow read: if ownsStudentResource() || isStaff();
-      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged()) || isStaff();
+      allow update: if (ownsStudentResource() && ownsStudentIncoming() && ownershipFieldsUnchanged() && markingFieldsUnchanged()) || isStaff();
       allow delete: if isStaff();
     }
 
@@ -240,7 +253,7 @@ service cloud.firestore {
     match /paystackWebhookEvents/{document=**} { allow read, write: if signedIn(); }
     match /presentationSessions/{document=**} { allow read, write: if signedIn(); }
     match /qa_posts/{document=**} { allow read, write: if signedIn(); }
-    match /scores/{document=**} { allow read, write: if signedIn(); }
+    match /scores/{document=**} { allow read: if signedIn(); allow write: if isStaff(); }
     match /sessions/{document=**} { allow read, write: if signedIn(); }
     match /studentActivityEvents/{document=**} { allow read, write: if signedIn(); }
     match /studentNotifications/{document=**} { allow read, write: if signedIn(); }
@@ -284,6 +297,7 @@ service cloud.firestore {
     }
     match /examTutorReviewQueue/{document=**} { allow read, write: if isStaff(); }
     match /ai_issue_reports/{document=**} { allow read, write: if isStaff(); }
+    match /automaticScoreSync/{document=**} { allow read, write: if isStaff(); }
     match /markingJobs/{document=**} { allow read, write: if isStaff(); }
     // Generated AI marking drafts are private staff records, not student scores.
     // The Admin marking screen writes these before a teacher approves the result.

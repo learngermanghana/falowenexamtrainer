@@ -8,6 +8,7 @@ import { SUBMISSION_COOLDOWN_MS, resolveSubmissionCooldownDeadline } from "../ut
 import { findOwnedSubmissionLock } from "../services/submissionLockService";
 import { getSubmissionSaveError } from "../utils/submissionSaveError";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import AutomaticMarkingStatus from "./AutomaticMarkingStatus";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
@@ -30,6 +31,7 @@ import {
   httpsCallable,
   limit,
   orderBy,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -877,6 +879,19 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
   });
 
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
+  const [automaticSubmissionId, setAutomaticSubmissionId] = useState("");
+  const [automaticResult, setAutomaticResult] = useState(null);
+  const [automaticResultDelayed, setAutomaticResultDelayed] = useState(false);
+  useEffect(() => {
+    if (!automaticSubmissionId || !db || !user?.uid) return undefined;
+    setAutomaticResult(null);
+    setAutomaticResultDelayed(false);
+    const timeout = setTimeout(() => setAutomaticResultDelayed(true), 90000);
+    const unsubscribe = onSnapshot(doc(db, SUBMISSION_COLLECTION, automaticSubmissionId), snapshot => {
+      if (snapshot.exists()) setAutomaticResult(snapshot.data());
+    }, () => setAutomaticResultDelayed(true));
+    return () => { clearTimeout(timeout); unsubscribe(); };
+  }, [automaticSubmissionId, user?.uid]);
   const [recentSubmissions, setRecentSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
   const [submissionDataLoaded, setSubmissionDataLoaded] = useState(false);
@@ -1210,6 +1225,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
         chapterKey: buildChapterKey(form.assignmentTitle),
       }, { merge: true });
       await batch.commit();
+      if (["A1", "A2", "B1"].includes(selectedAssignmentLevel)) setAutomaticSubmissionId(submissionRef.id);
 
       const currentChapterKey = buildChapterKey(form.assignmentTitle);
       if (currentChapterKey) {
@@ -2679,6 +2695,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
 
         {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
+        {automaticSubmissionId ? <AutomaticMarkingStatus result={automaticResult} delayed={automaticResultDelayed} /> : null}
 
         <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           {isWorkbookSubmissionContext ? (
@@ -2953,7 +2970,7 @@ const AssignmentSubmissionPage = ({ submissionContext = null } = {}) => {
               style={styles.primaryButton}
               disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || (submissionCooldownRemainingMs > 0 && !timedSubmitAfterExpiry) || !hasSelectedAssignment}
             >
-              {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
+              {status.loading ? "Submitting ..." : automaticSubmissionId && !["marked", "needs_review"].includes(automaticResult?.markingStatus) ? "Marking your work…" : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
 
             <span style={styles.helperText}>Your first confirmed submission is final.</span>

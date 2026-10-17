@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
+import { mergeAutomaticResults } from "../utils/mergeAutomaticResults";
+import { collection, db, onSnapshot, query, where } from "../firebase";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
@@ -21,9 +23,22 @@ const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
 
 const StudentResultsPage = () => {
   const { t } = useTranslation();
-  const { idToken, studentProfile } = useAuth();
+  const { idToken, studentProfile, user } = useAuth();
 
   const [results, setResults] = useState([]);
+  const [automaticResults, setAutomaticResults] = useState([]);
+  useEffect(() => {
+    setAutomaticResults([]);
+    if (!db || !user?.uid) return undefined;
+    return onSnapshot(query(collection(db, "scores"), where("studentId", "==", user.uid)), snapshot => {
+      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() }))
+        .filter(entry => entry.source === "automatic_course_marking"));
+    }, () => { /* Existing Sheet/API results remain available. */ });
+  }, [user?.uid]);
+  const visibleResults = useMemo(
+    () => mergeAutomaticResults(results, automaticResults),
+    [results, automaticResults],
+  );
   const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -153,19 +168,19 @@ const StudentResultsPage = () => {
   ]);
 
   const summary = useMemo(() => {
-    const scores = results
+    const scores = visibleResults
       .filter((r) => r.score !== null && r.score !== undefined && String(r.score).trim() !== "")
       .map((r) => Number(r.score))
       .filter((n) => Number.isFinite(n) && n >= 0 && n <= 100);
 
-    if (!scores.length) return { count: results.length, avg: null };
+    if (!scores.length) return { count: visibleResults.length, avg: null };
     const avg =
       Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
-    return { count: results.length, avg };
-  }, [results]);
+    return { count: visibleResults.length, avg };
+  }, [visibleResults]);
 
   const scoreInsight = useMemo(() => {
-    const scored = results
+    const scored = visibleResults
       .filter((row) => row.score !== null && row.score !== undefined && String(row.score).trim() !== "")
       .map((row) => ({ ...row, numericScore: Number(row.score) }))
       .filter((row) => Number.isFinite(row.numericScore) && row.numericScore >= 0 && row.numericScore <= 100);
@@ -184,14 +199,14 @@ const StudentResultsPage = () => {
         ? `${belowPass.length} recorded result${belowPass.length === 1 ? " is" : "s are"} below the ${PASS_MARK}% course pass mark. Open the result history below to review the feedback for those assignments.`
         : `All ${scored.length} recorded numeric score${scored.length === 1 ? " meets" : "s meet"} the ${PASS_MARK}% course pass mark. Review individual feedback below for specific improvements.`,
     };
-  }, [results]);
+  }, [visibleResults]);
 
   const assignmentProgress = useMemo(() => {
     const merged = mergeAssignmentProgress({
       curriculumEntries: [],
       firestoreDrafts: [],
       firestoreSubmissions: [],
-      sheetResults: results,
+      sheetResults: visibleResults,
       studentCode,
       passMark: PASS_MARK,
     }).filter((entry) => String(entry.assignmentId || "").startsWith(`${trackedLevel}-`));
@@ -200,7 +215,7 @@ const StudentResultsPage = () => {
     const failed = merged.filter((entry) => entry.status === "failed").length;
 
     return { completed, failed };
-  }, [results, studentCode, trackedLevel]);
+  }, [visibleResults, studentCode, trackedLevel]);
 
   const progressInsights = useMemo(() => {
     const buildProgress = (label, completed, total, failed = 0) => {
@@ -387,7 +402,7 @@ const StudentResultsPage = () => {
         {error ? <div style={styles.errorBox}>{error}</div> : null}
       </section>
 
-      {loading ? (
+      {loading && visibleResults.length === 0 ? (
         <section style={styles.card}>
           <p style={{ margin: 0 }}>Loading...</p>
         </section>
@@ -398,7 +413,7 @@ const StudentResultsPage = () => {
           </p>
         </section>
       ) : (
-        <ResultHistory results={results} />
+        <ResultHistory results={visibleResults} />
       )}
     </div>
   );
