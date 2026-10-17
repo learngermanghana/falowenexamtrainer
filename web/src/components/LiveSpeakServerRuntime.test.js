@@ -516,7 +516,10 @@ test.each(["A1","A2","B1"].flatMap(level=>[1,2,3].map(part=>[level,part])))("%s 
   expect(input.studentTranscripts).toHaveLength(session.answerLimit);
   expect(input.examContext.requiredCriteria.length).toBeGreaterThan(1);
   expect(input.examContext.reachedTurnLimit).toBe(true);
-  expect(input.examContext.taskComplete).toBe(true);
+  const isUnsuccessfulPlanning=(level === "A2" && part === 3) ||
+    (level === "B1" && part === 1);
+  // A timed section can end while the communication goal remains unmet.
+  expect(input.examContext.taskComplete).toBe(!isUnsuccessfulPlanning);
   expect(input.examContext.planningGoalAchieved).toBe(false);
   expect(JSON.stringify(input)).not.toContain("FORGED");
 });
@@ -1188,6 +1191,14 @@ describe("bounded, fair planning assessments", () => {
       expect(reply.code).toBe(200);
       expect(reply.payload.transcript).toBe("[Keine Antwort]");
       expect(reply.payload.taskReady).toBe(step===maxTurns-1);
+      if(step===maxTurns-1) {
+        const closing="Danke. Dieser Prüfungsteil ist jetzt beendet. Wir haben nicht alle Planungspunkte vereinbart.";
+        expect(reply.payload.reply).toBe(closing);
+        // The last German audio must use the final closing text, not the
+        // model's earlier question that has been replaced in the UI.
+        const spoken=api.fakeClient.audio.speech.create.mock.calls.at(-1)?.[0]?.input;
+        expect(spoken).toBe(closing);
+      }
       const state=api.docs.get(sessionKey);
       expect(state.answeredTurns).toBe(step+1);
       expect(state.confirmedAnswers).toHaveLength(step+1);
