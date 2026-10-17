@@ -1,0 +1,49 @@
+name: Graded workbook timer rules
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/data/gradedTabTiming.js'
+      - 'web/src/data/gradedTabTiming.test.js'
+      - 'web/src/data/a2B1LessonProfile.js'
+      - 'web/src/data/a2B1LessonProfile.test.js'
+      - 'web/src/data/a2B1TimedAssignmentBase.js'
+      - 'web/src/data/timedAssignmentConfig.js'
+      - 'web/src/data/timedAssignmentConfig.test.js'
+      - '.github/workflows/graded-workbook-timers.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/data/gradedTabTiming.js'
+      - 'web/src/data/gradedTabTiming.test.js'
+      - 'web/src/data/a2B1LessonProfile.js'
+      - 'web/src/data/a2B1LessonProfile.test.js'
+      - 'web/src/data/a2B1TimedAssignmentBase.js'
+      - 'web/src/data/timedAssignmentConfig.js'
+      - 'web/src/data/timedAssignmentConfig.test.js'
+      - '.github/workflows/graded-workbook-timers.yml'
+
+jobs:
+  timer-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Verify A2/B1/B2 tab-based timers and mock exceptions
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand
+          src/data/gradedTabTiming.test.js
+          src/data/timedAssignmentConfig.test.js
+          src/data/a2B1LessonProfile.test.js
+          src/data/a2B1LessonProfileTimerIntegration.test.js
