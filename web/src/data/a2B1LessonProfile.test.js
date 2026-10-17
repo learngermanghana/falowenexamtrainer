@@ -91,7 +91,7 @@ describe("canonical A2/B1 lesson profiles", () => {
       assignmentKey: "A2-8.21",
       timer: {
         level: "A2",
-        durationMinutes: 40,
+        durationMinutes: 20,
         timedTabs: ["schreiben", "lesen"],
       },
     });
@@ -112,6 +112,8 @@ describe("canonical A2/B1 lesson profiles", () => {
       },
     });
     expect(getA2B1LessonProfile("A2", 24).timer.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+    expect(getA2B1LessonProfile("A2", 24).timer.durationMinutes).toBe(30);
+    expect(getA2B1LessonProfile("A2", 27).timer.durationMinutes).toBe(45); // Mock exception
     expect(getA2B1LessonProfile("A2", 27).timer.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getA2B1LessonProfile("B1", 25).timer.timedTabs).toEqual(["lesen"]);
 
