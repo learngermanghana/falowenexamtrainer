@@ -646,6 +646,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("Confirm or discard your recorded answer first."),
             {status:409,code:"turn_in_progress"});
         }
+        if (skipAnswer && Number(req.body?.expectedAnsweredTurns) !== Number(session.answeredTurns || 0)) {
+          throw Object.assign(new Error("This question has already advanced. Refresh to restore your saved exam."),
+            {status:409,code:"turn_already_advanced"});
+        }
         if (!skipAnswer && session.examFlow?.mode === "simulation" && req.body?.recognitionCorrection !== true) confirmed = String(session.pendingTranscript || "").trim();
         if (confirmed.length < 2 || confirmed.length > transcriptLimit(session)) {
           throw Object.assign(new Error("Keep the confirmed transcript within the recording limit."), {status:400,code:"invalid_transcript"});
