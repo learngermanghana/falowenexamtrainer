@@ -53,7 +53,8 @@ const feedbackOpen = session => examiner(session) && !session.endedAt &&
   // A fully recorded graded part stays recoverable after its exam timer has
   // expired. Marking must never require another recording after a provider
   // error or a slow feedback response.
-  ((assignmentConfig(session.examTask?.courseAssignmentKey) && coursePartFinished(session)) ||
+  ((assignmentConfig(session.examTask?.courseAssignmentKey) &&
+      confirmedAnswers(session).length > 0) ||
     Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now());
 const sessionView = session => ({
   sessionId: session.sessionId, expiresAt: session.expiresAt,
@@ -823,7 +824,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       sessionId = String(req.body?.sessionId || "");
       sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const usageRef = db().collection("liveSpeakUsage").doc(currentMonth());
-      let task, level, answers, cached, examContext = null;
+      let task, level, answers, cached, examContext = null, recoverRemainingStep = false;
       attemptId = crypto.randomUUID();
       await db().runTransaction(async tx => {
         const [sessionSnap, usageSnap] = await Promise.all([tx.get(sessionRef), tx.get(usageRef)]);
@@ -855,9 +856,16 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // decisions are reached. That is a legitimate completed exam part.
         if (assignmentConfig(record.examTask?.courseAssignmentKey)
           && !coursePartFinished(record)) {
-          throw Object.assign(new Error(
-            "This Teil still has an unanswered examiner step. Resume the saved session to finish."
-          ), {status:409,code:"course_mock_part_incomplete"});
+          // Prior deployments could mark a partially answered Teil ready after
+          // TTS/partner failure. Reopen that same session and saved transcript;
+          // do not create a new attempt or silently grade fewer exam steps.
+          if (record.taskReady) {
+            tx.update(sessionRef, {taskReady:false,feedbackStatus:null,
+              feedbackLeaseUntil:0,
+              expiresAt:new Date(Date.now()+10*60*1000).toISOString()});
+          }
+          recoverRemainingStep = true;
+          return;
         }
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
@@ -880,6 +888,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.set(usageRef, {turns:admin.firestore.FieldValue.increment(1),
           updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
       });
+      if (recoverRemainingStep) return error(res,409,"course_mock_part_incomplete",
+        "Your saved answers are safe. The examiner has another step; continue your speaking task.");
       if (cached) return res.json({ok:true,...cached,practiceOnly:true,cached:true});
       reserved = true;
       const client = getOpenAIClient();
