@@ -221,3 +221,11 @@ body.falowen-course-speaking-mock .study-buddy-reopen { display:none !important;
   .speaking-course-mock .speaking-session-clock { font-size:14px; }
   .speaking-course-mock .speaking-reset-session { font-size:12px; padding:7px 9px; }
 }
+
+/* Graded mock: server-confirmed recording progress should stay visible next
+   to the answer controls instead of scrolling under the mobile bottom nav. */
+.speaking-course-mock .speaking-mock-saved-notice {
+  margin:0; padding:10px 12px; border:1px solid #b9dec6;
+  background:#ecfdf3; color:#166534; border-radius:10px;
+  font-size:13px; font-weight:700; line-height:1.45;
+}
