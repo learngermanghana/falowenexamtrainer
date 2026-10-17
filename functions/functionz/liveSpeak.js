@@ -47,8 +47,15 @@ const transcriptLimit = session => session.examFlow
   ? (["B2-1","C1-1","C2-1"].includes(session.examFlow?.key) ? 6400 : recordingSeconds(session)>=120 ? MAX_FLOW_CHARS : recordingSeconds(session)>=60 ? 2400 : 800)
   : examiner(session) ? MAX_EXAM_CHARS : MAX_CONFIRMED_CHARS;
 const confirmedAnswers = session => (Array.isArray(session.confirmedAnswers) ? session.confirmedAnswers : []).slice(0, answerLimit(session));
+const coursePartFinished = session => Boolean(session?.examFlow) &&
+  (taskFlows.isComplete(session) || Number(session.answeredTurns) >= answerLimit(session));
 const feedbackOpen = session => examiner(session) && !session.endedAt &&
-  Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now();
+  // A fully recorded graded part stays recoverable after its exam timer has
+  // expired. Marking must never require another recording after a provider
+  // error or a slow feedback response.
+  ((assignmentConfig(session.examTask?.courseAssignmentKey) &&
+      confirmedAnswers(session).length > 0) ||
+    Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now());
 const sessionView = session => ({
   sessionId: session.sessionId, expiresAt: session.expiresAt,
   level: session.level || "A2", topic: session.topic || "",
@@ -124,6 +131,8 @@ const cleanExamTask = (task) => ({
   hint: String(task?.hint || "").replace(/[\r\n\t]/g, " ").slice(0, 170),
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
+  mockAttemptId: assignmentConfig(task?.courseAssignmentKey)
+    ? String(task?.mockAttemptId || "").trim() : "",
 });
 const examOpening = (level, task) => {
   const part = task.teil ? task.teil + ". " : "";
@@ -307,6 +316,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const source = cleanPracticeSource(req.body?.source);
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
+      if (examTask?.courseAssignmentKey) {
+        // Course exam parts must reference an attempt created and owned by the
+        // signed-in student on the server before any new voice session begins.
+        const { requireCourseSpeakingAttempt } = require("./courseSpeakingMock");
+        await requireCourseSpeakingAttempt({ db: db(), uid: student.auth.uid,
+          assignmentId: examTask.courseAssignmentKey, attemptId: examTask.mockAttemptId });
+      }
       const examFlow = examTask && req.body?.examinerFlowVersion === 1
         ? taskFlows.createExaminerFlow(level,examTask,req.body?.examMode) : null;
       if (examTask && req.body?.examinerFlowVersion === 1 && !examFlow && ["A1","A2","B1","B2","C1","C2"].includes(level)) {
@@ -326,6 +342,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const existing = sessionSnap.data() || {};
         if (existing.sessionId && !existing.endedAt &&
           (Date.parse(existing.expiresAt || "") > Date.now() || feedbackOpen(existing))) {
+          if (examTask?.courseAssignmentKey &&
+            (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
+              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) {
+            throw Object.assign(new Error(
+              "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
+            ), {status:409,code:"different_mock_attempt_active"});
+          }
           result = sessionView(existing);
           return;
         }
@@ -756,9 +779,33 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         catch (releaseError) { console.error("Live Speak confirm unlock error",releaseError?.message); }
       }
       if (reserved && examTask) {
-        // The answer was already saved. Do not make the learner record/pay again.
-        await updateSession(sessionRef, sessionId, {taskReady:true});
-        return res.json({ok:true, transcript:answers.at(-1), reply:"Ihre Antwort ist gespeichert. Sie können jetzt Ihr Feedback ansehen.", taskReady:true, audioBase64:""});
+        // A response/audio provider failure after the transcript is saved
+        // must not falsely end an unfinished speaking part.
+        const completed = flowSession
+          ? (taskFlows.isComplete(flowSession) ||
+              Number(flowSession.answeredTurns) >= answerLimit(flowSession))
+          : answers.length >= EXAM_ANSWER_LIMIT;
+        const nextStep = flowSession && !completed
+          ? taskFlows.responsePlan(flowSession)?.step : null;
+        const nextInstruction = nextStep?.instruction || "";
+        const reply = completed
+          ? "Ihre Antwort ist gespeichert. Dieser Prüfungsteil ist beendet."
+          : "Ihre Antwort ist gespeichert. Bitte fahren Sie mit der nächsten Frage fort.";
+        try {
+          await updateSession(sessionRef, sessionId, {
+            taskReady:completed, inFlight:false,
+            messages:[...storedMessages,{role:"user",text:answers.at(-1)},
+              {role:"assistant",speaker:"examiner",text:nextInstruction || reply}].slice(-20),
+          });
+        } catch (saveError) {
+          console.error("Live Speak saved-turn recovery update failed", saveError?.message);
+          return error(res,503,"saved_answer_recovery_pending",
+            "Your recording was saved. Refresh the examiner to restore the next step.");
+        }
+        return res.json({ok:true, transcript:answers.at(-1), reply,
+          nextInstruction, speaker:"examiner",taskReady:completed,
+          ...(flowSession ? {examFlow:taskFlows.publicFlow({...flowSession,taskReady:completed})} : {}),
+          audioBase64:""});
       }
       if (err?.status) return error(res,err.status,err.code,err.message);
       console.error("Live Speak confirm error",err?.message);
@@ -766,8 +813,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     }
   });
 
-  // Return saved feedback for retries. Reserve each provider attempt once, with
-  // a strict two-attempt ceiling; automatic SDK retries are disabled.
+  // Return saved feedback for retries. Reserve each provider attempt once.
+  // Graded course exams allow a few more retries so a transient marking failure
+  // does not require a learner to re-record their answers.
   app.post("/live-speak/session/exam-feedback", async (req, res) => {
     let sessionRef, sessionId, attemptId, reserved = false;
     try {
@@ -777,7 +825,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       sessionId = String(req.body?.sessionId || "");
       sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
       const usageRef = db().collection("liveSpeakUsage").doc(currentMonth());
-      let task, level, answers, cached, examContext = null;
+      let task, level, answers, cached, examContext = null, recoverRemainingStep = false;
       attemptId = crypto.randomUUID();
       await db().runTransaction(async tx => {
         const [sessionSnap, usageSnap] = await Promise.all([tx.get(sessionRef), tx.get(usageRef)]);
@@ -795,19 +843,33 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.feedbackStatus === "processing" && Number(record.feedbackLeaseUntil) > Date.now()) {
           throw Object.assign(new Error("Feedback is still processing. Try again shortly to retrieve it."), {status:409,code:"feedback_processing"});
         }
-        if (Number(record.feedbackAttempts) >= MAX_FEEDBACK_ATTEMPTS) {
-          throw Object.assign(new Error("Feedback could not be completed. Your answers remain saved for review."), {status:409,code:"feedback_retry_limit"});
-        }
         answers = confirmedAnswers(record);
         // Missing decision points are graded as a weaker answer, not as a
         // technical failure. But every scheduled examiner response must be given.
+        // Planning parts can end before their maximum turns when all required
+        // decisions are reached. That is a legitimate completed exam part.
         if (assignmentConfig(record.examTask?.courseAssignmentKey)
-          && (!record.examFlow || Number(record.answeredTurns) < answerLimit(record))) {
-          throw Object.assign(new Error("Complete every examiner step before requesting graded feedback."),
-            {status:409,code:"course_mock_part_incomplete"});
+          && !coursePartFinished(record)) {
+          // Prior deployments could mark a partially answered Teil ready after
+          // TTS/partner failure. Reopen that same session and saved transcript;
+          // do not create a new attempt or silently grade fewer exam steps.
+          if (record.taskReady) {
+            tx.update(sessionRef, {taskReady:false,feedbackStatus:null,
+              feedbackLeaseUntil:0,
+              expiresAt:new Date(Date.now()+10*60*1000).toISOString()});
+          }
+          recoverRemainingStep = true;
+          return;
         }
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
+        }
+        const feedbackAttemptLimit = assignmentConfig(record.examTask?.courseAssignmentKey)
+          ? Math.max(5, MAX_FEEDBACK_ATTEMPTS) : MAX_FEEDBACK_ATTEMPTS;
+        if (Number(record.feedbackAttempts) >= feedbackAttemptLimit) {
+          throw Object.assign(new Error(
+            "Your answers are safely stored, but automatic marking needs administrator review."
+          ), {status:409,code:"feedback_retry_limit"});
         }
         if (!testingExamSession(record) && (Number(usageSnap.data()?.turns) || 0) + 1 > quotaForSession(record)) {
           throw Object.assign(new Error("The pilot feedback budget is reached."), {status:429,code:"budget_reached"});
@@ -827,6 +889,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.set(usageRef, {turns:admin.firestore.FieldValue.increment(1),
           updatedAt:admin.firestore.FieldValue.serverTimestamp()}, {merge:true});
       });
+      if (recoverRemainingStep) return error(res,409,"course_mock_part_incomplete",
+        "Your saved answers are safe. The examiner has another step; continue your speaking task.");
       if (cached) return res.json({ok:true,...cached,practiceOnly:true,cached:true});
       reserved = true;
       const client = getOpenAIClient();
@@ -848,13 +912,36 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       ];
       const response = await client.chat.completions.create(buildChatRequest({
         model:resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),
-        messages,response_format:{type:"json_object"},max_tokens:750,temperature:0.2,
+        messages,response_format:{type:"json_object"},max_tokens:Math.min(1800,700+answers.length*150),temperature:0.2,
       }), PROVIDER_OPTIONS);
       reportUsage("exam_feedback", resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL), response?.usage || {});
       const raw = String(response?.choices?.[0]?.message?.content || "").trim();
       if (!raw) throw new Error("The exam practice feedback was empty.");
       let parsed;
       try {parsed=JSON.parse(raw);} catch {parsed=null;}
+      const validMark = obj => String(obj?.summary || "").trim() &&
+        String(obj?.priority || "").trim() &&
+        Array.isArray(obj?.taskScores) &&
+        answers.every((_answer,index) =>
+          obj.taskScores.some(item => Number(item?.step) === index + 1 &&
+            Number.isInteger(Number(item?.score)) && Number(item.score) >= 0 && Number(item.score) <= 2));
+      if (assignmentConfig(task.courseAssignmentKey) && !validMark(parsed)) {
+        // Re-ask once within this same feedback operation, not another
+        // learner-visible attempt. Missing JSON fields are model failures,
+        // never evidence that the learner has not completed the Teil.
+        const retry = await client.chat.completions.create(buildChatRequest({
+          model:resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),
+          messages:[...messages,{role:"system",content:
+            "Return ONLY a valid JSON object. Include exactly " + answers.length +
+            " taskScores entries, one for each 1-based step. Each score must be an integer 0, 1 or 2. " +
+            "Include nonempty summary, strength and priority. Do not invent transcript content or pronunciation scores."}],
+          response_format:{type:"json_object"},
+          max_tokens:Math.min(1800,750+answers.length*150),temperature:0,
+        }),PROVIDER_OPTIONS);
+        reportUsage("exam_feedback_retry",resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),retry?.usage || {});
+        try { parsed=JSON.parse(String(retry?.choices?.[0]?.message?.content || "{}")); }
+        catch { parsed=null; }
+      }
       const summary=String(parsed?.summary || "").trim().slice(0,800);
       const strength=String(parsed?.strength || "").trim().slice(0,500);
       const priority=String(parsed?.priority || "").trim().slice(0,500);
@@ -893,6 +980,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           endedAt:admin.firestore.FieldValue.serverTimestamp()});
         // An immutable per-attempt snapshot remains after the next live session starts.
         tx.set(resultRef,{uid:record.uid,sessionId,level,teil:task.teil || "",
+          mockAttemptId: record.examTask?.mockAttemptId || "",
+          ownerAssignment: record.examTask?.courseAssignmentKey
+            ? `${record.uid}:${record.examTask.courseAssignmentKey}` : "",
           task,answers,dialogue:savedMessages(record),assessment,feedback,completed,
           source:record.source,examFlowKey:record.examFlow?.key || "",
           practiceOnly:true,createdAt:admin.firestore.FieldValue.serverTimestamp()});
@@ -912,6 +1002,23 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (err?.status && err?.code) return error(res,err.status,err.code,err.message);
       console.error("Live Speak examiner feedback failed",err?.message);
       return error(res,503,"feedback_unavailable","Your answers are saved. Try retrieving feedback again; no exam score was saved.");
+    }
+  });
+
+  // The attempt ID is server-created and shared by all three Teils.
+  app.post("/live-speak/course-mock/start", async (req, res) => {
+    try {
+      const student = await requireStudent(req, res);
+      if (!student) return;
+      const assignmentId = String(req.body?.assignmentKey || "").trim().toUpperCase();
+      const { startCourseSpeakingAttempt } = require("./courseSpeakingMock");
+      return res.json(await startCourseSpeakingAttempt({
+        db: db(), admin, uid: student.auth.uid, assignmentId,
+      }));
+    } catch (err) {
+      if (err?.status) return error(res, err.status, err.code || "mock_error", err.message);
+      console.error("Course speaking attempt start failed", err?.message);
+      return error(res, 503, "mock_start_unavailable", "Unable to start this graded exam safely.");
     }
   });
 
@@ -941,7 +1048,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const result = await submitCourseSpeakingMock({
         db: db(), admin, uid: student.auth.uid, profile: student.profile,
         auth: student.auth, assignmentId,
-        sessionIds: req.body?.sessionIds,
+        sessionIds: req.body?.sessionIds, attemptId: req.body?.attemptId,
       });
       return res.json(result);
     } catch (err) {

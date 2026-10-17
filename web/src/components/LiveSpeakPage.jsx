@@ -577,10 +577,24 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       await refresh();
     } catch (err) {
       autoFeedbackRequested.current = false;
+      if (gradedCourseMock && err.code === "course_mock_part_incomplete") {
+        try {
+          const status = await api("/live-speak/status");
+          const restored = status.activeSession;
+          if (mounted.current && restored?.sessionId === session.sessionId) {
+            setSession(restored);
+            setMessages(restored.messages || []);
+            setPending(restored.pending || null);
+            setNotice("✓ Your earlier answers are saved. The examiner has another step to finish.");
+            setErrorMessage("");
+            return;
+          }
+        } catch (_restoreError) { /* Keep the saved-answer retry available. */ }
+      }
       if (mounted.current) {
         setErrorMessage(err.message);
         setNotice(gradedCourseMock
-          ? "Your confirmed answers remain saved. Marking has not finished; use Retry feedback."
+          ? "Your confirmed answers remain saved. Marking is pending; use Retry feedback."
           : "");
       }
     } finally {

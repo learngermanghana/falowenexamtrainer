@@ -1,14 +1,21 @@
-const { COURSE_MOCKS, evaluateResults, buildScoreDocument, findSavedSpeakingParts, courseSpeakingMockStatus } = require("../courseSpeakingMock");
+const {
+  COURSE_MOCKS, evaluateResults, buildScoreDocument, findSavedSpeakingParts,
+  courseSpeakingMockStatus, startCourseSpeakingAttempt, requireCourseSpeakingAttempt,
+} = require("../courseSpeakingMock");
 
-const makeSnapshots = (level = "A2", assignmentId = "A2-8.22", uid = "student-uid") =>
+const ATTEMPT_A = "11111111-1111-4111-8111-111111111111";
+const ATTEMPT_B = "22222222-2222-4222-8222-222222222222";
+
+const makeSnapshots = (level = "A2", assignmentId = "A2-8.22", uid = "student-uid", attemptId = ATTEMPT_A) =>
   [1, 2, 3].map((part, index) => ({
     id: `11111111-1111-4111-8111-00000000000${part}`,
     exists: true,
     data: () => ({
       uid, level, source: "exam-speaking-practice", examFlowKey: `${level}-${part}`,
+      ownerAssignment: `${uid}:${assignmentId}`, mockAttemptId: attemptId,
       sessionId: `11111111-1111-4111-8111-00000000000${part}`,
       teil: `Teil ${part}`, completed: true,
-      task: { id: `${level}-task-${part}`, teil: `Teil ${part}`, courseAssignmentKey: assignmentId },
+      task: { id: `${level}-task-${part}`, teil: `Teil ${part}`, courseAssignmentKey: assignmentId, mockAttemptId: attemptId },
       answers: [`German answer ${part}`],
       feedback: `Part ${part} feedback`,
       assessment: { practiceOnly: true, score: [6, 7, 8][index], maxScore: 10,
@@ -17,9 +24,29 @@ const makeSnapshots = (level = "A2", assignmentId = "A2-8.22", uid = "student-ui
     }),
   }));
 
+function firestore(rows, { attemptId = ATTEMPT_A, uid = "student-uid", assignmentId = "A2-8.22" } = {}) {
+  const queries = [];
+  const db = {
+    collection: name => {
+      if (name === "scores") return { doc: () => ({ get: async () => ({ data: () => undefined }) }) };
+      if (name === "courseSpeakingMockAttempts") return { doc: () => ({
+        get: async () => ({ data: () => ({ uid, assignmentId, attemptId, status: "in_progress" }) }),
+      }) };
+      if (name === "liveSpeakExamResults") return {
+        where: (...args) => {
+          queries.push(args);
+          return { get: async () => ({ docs: rows.filter(snap => snap.data().ownerAssignment === args[2]) }) };
+        },
+      };
+      throw new Error("Unexpected collection: " + name);
+    },
+  };
+  return { db, queries };
+}
+
 describe("Graded Goethe-style speaking coursework", () => {
-  test.each([["A2-8.22", "A2"], ["B1-7.23", "B1"]])("%s uses verified three-part scores", (assignmentId, level) => {
-    const outcome = evaluateResults({ assignmentId, uid: "student-uid",
+  test.each([["A2-8.22", "A2"], ["B1-7.23", "B1"]])("%s verifies all three parts share one attempt", (assignmentId, level) => {
+    const outcome = evaluateResults({ assignmentId, uid: "student-uid", attemptId: ATTEMPT_A,
       snapshots: makeSnapshots(level, assignmentId) });
     expect(outcome.score).toBe(70);
     expect(outcome.config).toEqual(COURSE_MOCKS[assignmentId]);
@@ -35,86 +62,119 @@ describe("Graded Goethe-style speaking coursework", () => {
     });
   });
 
-  test("rejects any incomplete part", () => {
-    const parts = makeSnapshots();
-    parts[2].data = () => ({ ...makeSnapshots()[2].data(), completed: false });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: parts }))
-      .toThrow(/three complete/i);
+  test("rejects incomplete parts, incorrect ownership and a different exam flow", () => {
+    const cases = [
+      (item) => ({ ...item, completed: false }),
+      (item) => ({ ...item, uid: "other-uid" }),
+      (item) => ({ ...item, examFlowKey: "B1-2" }),
+      (item) => ({ ...item, task: { ...item.task, courseAssignmentKey: "B1-7.23" } }),
+    ];
+    for (const change of cases) {
+      const parts = makeSnapshots();
+      const second = parts[1].data();
+      parts[1].data = () => change(second);
+      expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
+        attemptId: ATTEMPT_A, snapshots: parts })).toThrow(/three complete/);
+    }
   });
 
-  test("rejects replacing another student's assessment", () => {
+  test("rejects combining Teil snapshots belonging to different attempts (P1)", () => {
     const parts = makeSnapshots();
-    parts[1].data = () => ({ ...makeSnapshots()[1].data(), uid: "not-this-student" });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: parts }))
-      .toThrow(/student/i);
+    parts[2] = makeSnapshots("A2", "A2-8.22", "student-uid", ATTEMPT_B)[2];
+    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
+      attemptId: ATTEMPT_A, snapshots: parts })).toThrow(/three complete/);
   });
 
-  test("rejects mismatched level, part source and assignment identity", () => {
-    const parts = makeSnapshots();
-    parts[1].data = () => ({ ...makeSnapshots()[1].data(), examFlowKey: "B1-2" });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: parts }))
-      .toThrow(/three complete/i);
-    const wrongAssignment = makeSnapshots();
-    wrongAssignment[1].data = () => ({ ...makeSnapshots()[1].data(), task: { courseAssignmentKey: "B1-7.23" } });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: wrongAssignment }))
-      .toThrow(/three complete/i);
-  });
-
-  test("rejects duplicate exam parts and missing verified assessments", () => {
+  test("rejects duplicate parts, absent assessments and missing attempt IDs", () => {
     const duplicate = makeSnapshots();
     duplicate[1].data = () => ({ ...makeSnapshots()[1].data(), teil: "Teil 1", examFlowKey: "A2-1" });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: duplicate }))
-      .toThrow(/three complete/i);
+    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
+      attemptId: ATTEMPT_A, snapshots: duplicate })).toThrow(/three complete/);
     const noAssessment = makeSnapshots();
     noAssessment[2].data = () => ({ ...makeSnapshots()[2].data(), assessment: null });
-    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid", snapshots: noAssessment }))
-      .toThrow(/three complete/i);
+    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
+      attemptId: ATTEMPT_A, snapshots: noAssessment })).toThrow(/three complete/);
+    expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
+      snapshots: makeSnapshots() })).toThrow(/attempt ID/);
   });
 
-  test("does not accept two-part submission or unknown assignment", () => {
+  test("rejects missing part and unknown assignment", () => {
     expect(() => evaluateResults({ assignmentId: "A2-8.22", uid: "student-uid",
-      snapshots: makeSnapshots().slice(0, 2) })).toThrow(/all three/i);
+      attemptId: ATTEMPT_A, snapshots: makeSnapshots().slice(0, 2) })).toThrow(/all three/i);
     expect(() => evaluateResults({ assignmentId: "B1-10.28", uid: "student-uid",
-      snapshots: makeSnapshots("B1", "B1-10.28") })).toThrow(/not a graded speaking/i);
+      attemptId: ATTEMPT_A, snapshots: makeSnapshots("B1", "B1-10.28") })).toThrow(/not a graded speaking/i);
   });
 });
 
-describe("Resume and score-sheet recovery", () => {
-  const firestore = rows => ({
-    collection: name => {
-      if (name === "scores") return { doc: () => ({ get: async () => ({ data: () => undefined }) }) };
-      if (name === "liveSpeakExamResults") return {
-        where: (key, op, uid) => {
-          expect([key, op, uid]).toEqual(["uid", "==", "student-uid"]);
-          return { limit: max => ({
-            get: async () => ({ docs: rows.slice(0, max) }),
-          }) };
-        },
-      };
-      throw new Error("Unexpected collection: " + name);
-    },
-  });
-  test("restores three scored parts from server when browser storage is lost", async () => {
-    const db = firestore(makeSnapshots());
-    const found = await findSavedSpeakingParts({ db, uid: "student-uid", assignmentId: "A2-8.22" });
-    expect(found.parts.map(part => part.teil)).toEqual(["Teil 1", "Teil 2", "Teil 3"]);
-    expect(found.snapshots).toHaveLength(3);
+describe("Secure attempt recovery", () => {
+  test("returns three parts from this student, assignment and attempt only", async () => {
+    const { db, queries } = firestore(makeSnapshots());
+    const recovered = await findSavedSpeakingParts({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: ATTEMPT_A });
+    expect(queries).toEqual([["ownerAssignment", "==", "student-uid:A2-8.22"]]);
+    expect(recovered.parts.map(part => part.teil)).toEqual(["Teil 1", "Teil 2", "Teil 3"]);
+    expect(recovered.snapshots).toHaveLength(3);
     const status = await courseSpeakingMockStatus({ db, uid: "student-uid", assignmentId: "A2-8.22" });
-    expect(status).toMatchObject({ completed: false, recovery: { allPartsGraded: true } });
-    expect(status.recovery.parts).toHaveLength(3);
+    expect(status).toMatchObject({ completed: false, attemptId: ATTEMPT_A,
+      recovery: { allPartsGraded: true } });
   });
-  test("does not mark missing or unrelated parts as complete", async () => {
-    const others = makeSnapshots("B1", "B1-7.23");
-    const db = firestore([...makeSnapshots().slice(0, 2), ...others]);
+
+  test("does not auto-combine most recent Teils from different abandoned attempts (P1)", async () => {
+    const first = makeSnapshots().slice(0, 2);
+    const second = makeSnapshots("A2", "A2-8.22", "student-uid", ATTEMPT_B).slice(2);
+    const { db } = firestore([...first, ...second]);
     const status = await courseSpeakingMockStatus({ db, uid: "student-uid", assignmentId: "A2-8.22" });
     expect(status.recovery.parts).toHaveLength(2);
     expect(status.recovery.allPartsGraded).toBe(false);
   });
-  test("ignores scores belonging to another student or without completed AI assessment", async () => {
-    const parts = makeSnapshots();
-    parts[1].data = () => ({ ...makeSnapshots()[1].data(), completed: false });
-    parts[2].data = () => ({ ...makeSnapshots()[2].data(), uid: "another-account" });
-    const found = await findSavedSpeakingParts({ db: firestore(parts), uid: "student-uid", assignmentId: "A2-8.22" });
-    expect(found.parts.map(part => part.teil)).toEqual(["Teil 1"]);
+
+  test("assignment-key query returns relevant parts despite 300 unrelated prior results (P2)", async () => {
+    const unrelated = Array.from({length: 300}, (_, i) => ({
+      id: "unrelated-" + i, exists: true,
+      data: () => ({ uid: "student-uid", ownerAssignment: "student-uid:A2-OLD",
+        mockAttemptId: ATTEMPT_A, teil: "Teil 1" }),
+    }));
+    const { db, queries } = firestore([...unrelated, ...makeSnapshots()]);
+    const found = await findSavedSpeakingParts({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: ATTEMPT_A });
+    expect(found.parts).toHaveLength(3);
+    expect(queries).toEqual([["ownerAssignment", "==", "student-uid:A2-8.22"]]);
+  });
+
+  test("legacy snapshots without an attempt ID are never auto-graded", async () => {
+    const old = makeSnapshots().map(snap => ({
+      ...snap, data: () => ({ ...snap.data(), mockAttemptId: "", task: {
+        ...snap.data().task, mockAttemptId: "" } }),
+    }));
+    const { db } = firestore(old);
+    const found = await findSavedSpeakingParts({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: ATTEMPT_A });
+    expect(found.parts).toHaveLength(0);
+    const noAttempt = await findSavedSpeakingParts({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: "" });
+    expect(noAttempt.parts).toHaveLength(0);
+  });
+
+  test("validates attempt ownership on new examiner sessions", async () => {
+    const { db } = firestore([]);
+    await expect(requireCourseSpeakingAttempt({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: ATTEMPT_A })).resolves.toMatchObject({ attemptId: ATTEMPT_A });
+    await expect(requireCourseSpeakingAttempt({ db, uid: "student-uid",
+      assignmentId: "A2-8.22", attemptId: ATTEMPT_B })).rejects.toThrow(/belongs to another/i);
+  });
+
+  test("server creates one stable attempt ID and resumes it rather than minting per part", async () => {
+    let stored = null;
+    const db = { collection: name => ({ doc: () => ({ kind: name }) }),
+      runTransaction: async fn => fn({
+        get: async ref => ({ data: () => ref.kind === "courseSpeakingMockAttempts" ? stored : null }),
+        set: (_ref, doc) => { stored = doc; },
+      }) };
+    const admin = { firestore: { FieldValue: { serverTimestamp: () => "timestamp" } } };
+    const first = await startCourseSpeakingAttempt({ db, admin, uid: "student-uid", assignmentId: "A2-8.22" });
+    const second = await startCourseSpeakingAttempt({ db, admin, uid: "student-uid", assignmentId: "A2-8.22" });
+    expect(first.attemptId).toEqual(second.attemptId);
+    expect(first.resumed).toBe(false);
+    expect(second.resumed).toBe(true);
   });
 });
