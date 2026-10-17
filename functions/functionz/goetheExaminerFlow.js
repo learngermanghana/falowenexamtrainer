@@ -191,10 +191,11 @@ function partnerInstructions(session,plan) {
 // Prefer the learner's final correction after "aber ..." to an earlier "ja".
 function appointmentIntent(transcript) {
   const clause=clean(transcript,1200).split(/\baber\b/i).at(-1).trim();
-  const negative=/(?:\b(?:keine?|nicht)\s+(?:frei|zeit)\b|\b(?:kann|habe|hab|bin|geht|passt|klappt|schaffe)\b.{0,42}\b(?:nicht|keine?)\b|\b(?:leider|unmöglich|verhindert|besetzt|doch nicht)\b|\b(?:muss|müsste)\s+(?:arbeiten|lernen)\b)/i.test(clause);
+  const negative=/(?:\b(?:nein|nö|keine?)\b|\bnicht\b(?!\s+(?:schlecht|nur)\b)|\b(?:leider|unmöglich|verhindert|besetzt)\b|\b(?:muss|müsste)\s+(?:arbeiten|lernen)\b)/i.test(clause);
+  const uncertain=/\b(?:vielleicht|eventuell|wahrscheinlich|möglicherweise|voraussichtlich|weiß nicht|weiss nicht|ich glaube)\b/i.test(clause);
   const confirming=/(?:\b(?:ja|klar|okay|ok|einverstanden|abgemacht|passt|gerne|gern)\b|\b(?:das|es|der termin)\s+(?:geht|klappt|passt)\b|\bmachen wir\b|\btreffen wir uns\b|\b(?:ist|wäre)\s+(?:gut|super|perfekt|prima|in ordnung)\b)/i.test(clause);
   const available=/(?:\bich\s+(?:habe|hab|bin)\b.{0,42}\b(?:frei|zeit|verfügbar)\b|\b(?:habe|hab|bin)\s+ich\b.{0,42}\b(?:frei|zeit|verfügbar)\b|\b(?:da|dann|dort)\s+(?:kann ich|habe ich zeit|hab ich zeit|bin ich frei)\b|\bich\s+kann\s+(?:da|dann|am|um|zu der zeit)\b|\b(?:samstag|sonntag|montag|dienstag|mittwoch|donnerstag|freitag)\b.{0,30}\b(?:geht|klappt|ist gut)\b)/i.test(clause);
-  return {clause,negative,affirmative:!negative && (confirming || available)};
+  return {clause,negative,uncertain,available,affirmative:!negative && !uncertain && (confirming || available)};
 }
 function appointmentFromPartner(session) {
   const last=savedAssistant(session);
