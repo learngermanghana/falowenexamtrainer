@@ -813,8 +813,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
     }
   });
 
-  // Return saved feedback for retries. Reserve each provider attempt once, with
-  // a strict two-attempt ceiling; automatic SDK retries are disabled.
+  // Return saved feedback for retries. Reserve each provider attempt once.
+  // Graded course exams allow a few more retries so a transient marking failure
+  // does not require a learner to re-record their answers.
   app.post("/live-speak/session/exam-feedback", async (req, res) => {
     let sessionRef, sessionId, attemptId, reserved = false;
     try {
@@ -842,13 +843,6 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.feedbackStatus === "processing" && Number(record.feedbackLeaseUntil) > Date.now()) {
           throw Object.assign(new Error("Feedback is still processing. Try again shortly to retrieve it."), {status:409,code:"feedback_processing"});
         }
-        const feedbackAttemptLimit = assignmentConfig(record.examTask?.courseAssignmentKey)
-          ? Math.max(5, MAX_FEEDBACK_ATTEMPTS) : MAX_FEEDBACK_ATTEMPTS;
-        if (Number(record.feedbackAttempts) >= feedbackAttemptLimit) {
-          throw Object.assign(new Error(
-            "Your answers are safely stored, but automatic marking needs administrator review."
-          ), {status:409,code:"feedback_retry_limit"});
-        }
         answers = confirmedAnswers(record);
         // Missing decision points are graded as a weaker answer, not as a
         // technical failure. But every scheduled examiner response must be given.
@@ -869,6 +863,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         }
         if (!answers.length) {
           throw Object.assign(new Error("Record and confirm at least one answer first."), {status:400,code:"no_answers"});
+        }
+        const feedbackAttemptLimit = assignmentConfig(record.examTask?.courseAssignmentKey)
+          ? Math.max(5, MAX_FEEDBACK_ATTEMPTS) : MAX_FEEDBACK_ATTEMPTS;
+        if (Number(record.feedbackAttempts) >= feedbackAttemptLimit) {
+          throw Object.assign(new Error(
+            "Your answers are safely stored, but automatic marking needs administrator review."
+          ), {status:409,code:"feedback_retry_limit"});
         }
         if (!testingExamSession(record) && (Number(usageSnap.data()?.turns) || 0) + 1 > quotaForSession(record)) {
           throw Object.assign(new Error("The pilot feedback budget is reached."), {status:429,code:"budget_reached"});
