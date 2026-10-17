@@ -62,3 +62,21 @@
   .speaking-exam-task-card .goethe-a2-mindmap li { font-size: 13px; }
   .speaking-exam-task-card .goethe-a2-mindmap__topic { left: 12%; width: 76%; font-size: 17px; }
 }
+
+
+/* Phone-sized A2 Teil 2: don't position the four keywords over the topic. */
+@media(max-width:540px) {
+ .speaking-course-mock .speaking-exam-task-card .goethe-a2-mindmap { min-height:0; padding:12px; display:grid; gap:12px; }
+ .speaking-course-mock .speaking-exam-task-card .goethe-a2-mindmap__lines { display:none; }
+ .speaking-course-mock .speaking-exam-task-card .goethe-a2-mindmap__topic {
+   position:static; width:100%; min-height:0; padding:10px; font-size:17px;
+   line-height:1.4; border-color:#ccd7da; border-radius:8px;
+ }
+ .speaking-course-mock .speaking-exam-task-card .goethe-a2-mindmap ul {
+   display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; width:100%;
+ }
+ .speaking-course-mock .speaking-exam-task-card .goethe-a2-mindmap li {
+   border:1px solid #d5e1e5; border-radius:8px; padding:9px 6px; font-size:14px;
+   text-align:center; line-height:1.45;
+ }
+}
