@@ -197,3 +197,15 @@ test("the shared AI safety cap still exposes local recording when pilot claim is
   expect(screen.getByRole("textbox",{name:"Type optional speaking notes"})).toBeInTheDocument();
   expect(global.fetch).toHaveBeenCalledTimes(1);
 });
+
+
+test("a B1 course page requests its own scope and does not show an A2 resume banner",async()=>{
+ global.fetch.mockResolvedValue({ok:true,json:async()=>({enabled:true,remaining:1,examinerFlowVersion:1,
+  activeSession:{sessionId:"saved-a2",level:"A2",topic:"Deutsch lernen",source:"exam-speaking-practice",examTask:{id:"a2-card",courseAssignmentKey:"A2-8.22"}},
+ })});
+ render(<MemoryRouter><LiveSpeakPage embedded initialLevel="B1" practiceSource="exam-speaking-practice"
+  practiceTopic="Gemeinsam planen" examTask={{id:"b1-card",teil:"Teil 1",courseAssignmentKey:"B1-7.23",mockAttemptId:"b1-attempt"}} /></MemoryRouter>);
+ await waitFor(()=>expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/live-speak/status?courseAssignmentKey=B1-7.23"),expect.anything()));
+ await waitFor(()=>expect(screen.queryByRole("button",{name:"Resume speaking"})).not.toBeInTheDocument());
+ expect(screen.queryByText(/Current task: Deutsch lernen/)).not.toBeInTheDocument();
+});

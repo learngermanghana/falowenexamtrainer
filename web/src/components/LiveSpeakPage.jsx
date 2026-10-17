@@ -121,11 +121,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     setShowLatest(false);
   };
 
+  const courseAssignmentKey = String(examTask?.courseAssignmentKey || "").trim().toUpperCase();
   const api = useCallback(async (path, method = "GET", body = undefined) => {
     const headers = { Authorization: "Bearer " + idToken };
     if (body !== undefined) headers["Content-Type"] = "application/json";
-    const result = await fetch(backendUrl + path, {
-      method, headers, body: body === undefined ? undefined : JSON.stringify(body),
+    const scopedPath = courseAssignmentKey && path === "/live-speak/status"
+      ? `${path}?courseAssignmentKey=${encodeURIComponent(courseAssignmentKey)}` : path;
+    const payload = body !== undefined && courseAssignmentKey ? { ...body, courseAssignmentKey } : body;
+    const result = await fetch(backendUrl + scopedPath, {
+      method, headers, body: payload === undefined ? undefined : JSON.stringify(payload),
     });
     const data = await result.json().catch(() => ({}));
     if (!result.ok) {
@@ -135,12 +139,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       throw err;
     }
     return data;
-  }, [idToken]);
+  }, [idToken, courseAssignmentKey]);
 
   const refresh = useCallback(async () => {
     if (!idToken) { setLoading(false); return; }
     try {
-      const info = await api("/live-speak/status");
+      const response = await api("/live-speak/status");
+      // Ignore an unrelated legacy response while frontend/backend releases roll out.
+      const info = courseAssignmentKey && response.activeSession?.examTask?.courseAssignmentKey !== courseAssignmentKey
+        ? { ...response, activeSession: null } : response;
       if (mounted.current) {
         setDetails(info);
         if (!freshAttempt && examinerEntry && matchingExamResult(info.lastExamResult,{
@@ -156,7 +163,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } finally {
       if (mounted.current) setLoading(false);
     }
-  }, [api, idToken, examinerEntry, safeLevel, examTask?.id, freshAttempt]);
+  }, [api, idToken, examinerEntry, safeLevel, examTask?.id, freshAttempt, courseAssignmentKey]);
 
   useEffect(() => {
     mounted.current = true;
