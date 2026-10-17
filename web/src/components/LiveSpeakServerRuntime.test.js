@@ -1174,3 +1174,69 @@ test("graded mock clears a false ready flag instead of trapping a saved unfinish
   expect(new Date(saved.expiresAt).getTime()).toBeGreaterThan(Date.now());
   expect(saved.feedbackAttempts).toBe(2);
 });
+
+describe("bounded, fair planning assessments", () => {
+  test.each([["A2",3,4],["B1",1,5]])("%s Teil %i: skips advance, finish, and score zero after %i turns", async(level,part,maxTurns)=>{
+    const api=setup();
+    const session=await startTaskFlow(api,level,part,"simulation","Einen kranken Freund oder Lehrer besuchen");
+    const sessionId=session.sessionId;
+    for(let step=0;step<maxTurns;step++){
+      const reply=await api.call("POST","/live-speak/session/confirm",{
+        sessionId,skipAnswer:true,expectedAnsweredTurns:step,
+      });
+      expect(reply.code).toBe(200);
+      expect(reply.payload.transcript).toBe("[Keine Antwort]");
+      expect(reply.payload.taskReady).toBe(step===maxTurns-1);
+      const state=api.docs.get(sessionKey);
+      expect(state.answeredTurns).toBe(step+1);
+      expect(state.confirmedAnswers).toHaveLength(step+1);
+    }
+    expect(api.docs.get(sessionKey).examFlow.decisions).toHaveLength(0);
+    api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{
+      message:{content:JSON.stringify({
+        taskScores:Array.from({length:maxTurns},(_,i)=>({step:i+1,score:2,comment:"Generous model"})),
+        summary:"Did not give responses.",strength:"No evidence",priority:"Practise appointment suggestions",
+      })},
+    }]});
+    const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId});
+    expect(feedback.code).toBe(200);
+    expect(feedback.payload.assessment.score).toBe(0);
+    expect(feedback.payload.assessment.percent).toBe(0);
+    expect(feedback.payload.assessment.tasks.every(x=>x.score===0)).toBe(true);
+    const stored=api.docs.get("liveSpeakExamResults/"+sessionId);
+    expect(stored.completed).toBe(true);
+    expect(stored.assessment.score).toBe(0);
+  });
+
+  test("stale or repeated Skip clicks never consume a second exam turn",async()=>{
+    const api=setup();
+    const session=await startTaskFlow(api,"A2",3);
+    const body={sessionId:session.sessionId,skipAnswer:true,expectedAnsweredTurns:0};
+    expect((await api.call("POST","/live-speak/session/confirm",body)).code).toBe(200);
+    const duplicate=await api.call("POST","/live-speak/session/confirm",body);
+    expect(duplicate.code).toBe(409);
+    expect(duplicate.payload.code).toBe("turn_already_advanced");
+    expect(api.docs.get(sessionKey).answeredTurns).toBe(1);
+  });
+
+  test("Skip cannot discard a pending recording or bypass nonplanning tasks",async()=>{
+    const api=setup();
+    const session=await startTaskFlow(api,"A2",3);
+    const transcribed=await api.call("POST","/live-speak/session/turn",{
+      sessionId:session.sessionId,...audioPayload,
+    });
+    expect(transcribed.code).toBe(200);
+    const blocked=await api.call("POST","/live-speak/session/confirm",{
+      sessionId:session.sessionId,skipAnswer:true,expectedAnsweredTurns:0,
+    });
+    expect(blocked.code).toBe(409);
+    expect(api.docs.get(sessionKey).answeredTurns).toBe(0);
+    const other=setup();
+    const b=await startTaskFlow(other,"B1",2);
+    const unsupported=await other.call("POST","/live-speak/session/confirm",{
+      sessionId:b.sessionId,skipAnswer:true,expectedAnsweredTurns:0,
+    });
+    expect(unsupported.code).toBe(400);
+    expect(unsupported.payload.code).toBe("skip_unavailable");
+  });
+});
