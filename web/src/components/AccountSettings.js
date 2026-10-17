@@ -55,7 +55,7 @@ const AccountSettings = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const requestedTab = new URLSearchParams(location.search).get("tab");
-  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade"].includes(requestedTab)
+  const activeTab = ["studentData", "participation", "notifications", "billing", "upgrade", "deleteAccount"].includes(requestedTab)
     ? requestedTab
     : "studentData";
 
@@ -690,6 +690,7 @@ const AccountSettings = () => {
           { key: "notifications", label: "Notifications" },
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
+          { key: "deleteAccount", label: "Delete account" },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -909,7 +910,7 @@ const AccountSettings = () => {
       </section>
       ) : null}
 
-      <AccountDeletionCard />
+      {activeTab === "deleteAccount" ? <AccountDeletionCard /> : null}
       {activeTab === "upgrade" ? (
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
