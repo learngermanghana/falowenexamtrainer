@@ -199,6 +199,12 @@ function appointmentIntent(transcript) {
 }
 function appointmentFromPartner(session) {
   const last=savedAssistant(session);
+  // A mentioned time is not a proposal if the partner is rejecting it or
+  // presenting competing alternatives. Do not fabricate mutual agreement.
+  if (appointmentIntent(last).negative || /\boder\b/i.test(last)) return null;
+  const mentionedDays=[...last.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b/gi)]
+    .map(item=>item[1].toLowerCase());
+  if (new Set(mentionedDays).size > 1) return null;
   const matches=[...last.matchAll(/\b(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag)\b.{0,36}?\b(?:um\s+)?(\d{1,2})(?:[:.](\d{2}))?\s*uhr\b/gi)];
   if (matches.length !== 1) return null; // Two proposed alternatives are ambiguous.
   const match=matches[0],hour=Number(match[2]),minute=Number(match[3] || 0);
