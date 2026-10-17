@@ -46,33 +46,42 @@ const statusCopy = {
   },
 };
 
+// Only show short Firebase error identifiers. Never expose push tokens, auth
+// credentials, request payloads, or arbitrary server details in the UI.
+const getFirebaseErrorCodes = (error) => {
+  const identifiers = [error?.code, error?.details?.code]
+    .map((value) => String(value || "").trim())
+    .filter((value) => /^[a-z0-9][a-z0-9/-]{1,95}$/i.test(value));
+  return [...new Set(identifiers)].join(" · ");
+};
+
+const withFirebaseCode = (message, error) => {
+  const codes = getFirebaseErrorCodes(error);
+  return codes ? `${message} (Firebase: ${codes})` : message;
+};
+
 const getPushTestErrorMessage = (error) => {
   const code = String(error?.code || "").toLowerCase();
   const message = String(error?.message || "").trim();
   const normalizedMessage = message.toLowerCase();
+  let guidance = message || "Could not send the background push test. Refresh this device and try again.";
 
-  if (
+  if (code.includes("unauthenticated")) {
+    guidance = "Your session expired. Sign in again, then retry the test notification.";
+  } else if (code.includes("permission-denied")) {
+    guidance = "This device is not linked to the signed-in account. Tap Refresh this device, then try again.";
+  } else if (code.includes("failed-precondition")) {
+    guidance = message || "The push token is invalid or expired. Refresh this device and try again.";
+  } else if (
     normalizedMessage === "internal" ||
     code.includes("internal") ||
     code.includes("not-found") ||
     code.includes("unavailable")
   ) {
-    return "The notification test failed. Tap Refresh this device, then try again. If it still fails, contact support so we can check the Firebase function logs.";
+    guidance = "The Firebase notification test failed. Refresh this device and retry. If it continues, share the Firebase error code with support.";
   }
 
-  if (code.includes("unauthenticated")) {
-    return "Your session expired. Sign in again, then retry the test notification.";
-  }
-
-  if (code.includes("permission-denied")) {
-    return "This device is not linked to the signed-in account. Tap Refresh this device, then try again.";
-  }
-
-  if (code.includes("failed-precondition")) {
-    return message || "This device token needs to be refreshed before testing notifications.";
-  }
-
-  return message || "Could not send the background push test. Refresh this device and try again.";
+  return withFirebaseCode(guidance, error);
 };
 
 const getToneStyle = (tone) => {
@@ -96,7 +105,7 @@ const NotificationSettingsCard = () => {
   const deviceCount = useMemo(() => {
     const tokens = Array.isArray(studentProfile?.messagingTokens) ? studentProfile.messagingTokens : [];
     const unique = new Set(tokens.map((entry) => entry?.token).filter(Boolean));
-    if (studentProfile?.messagingToken) unique.add(studentProfile.messagingToken);
+    if (!tokens.length && studentProfile?.messagingToken) unique.add(studentProfile.messagingToken);
     return unique.size;
   }, [studentProfile?.messagingToken, studentProfile?.messagingTokens]);
 
@@ -113,7 +122,7 @@ const NotificationSettingsCard = () => {
       );
     } catch (error) {
       setBrowserPermission(getBrowserPermission());
-      setMessage(error instanceof Error ? error.message : "Could not enable notifications. Please try again.");
+      setMessage(withFirebaseCode(error instanceof Error ? error.message : "Could not enable notifications. Please try again.", error));
     } finally {
       setIsEnabling(false);
     }
@@ -147,6 +156,7 @@ const NotificationSettingsCard = () => {
         "Test sent. If the screen was locked, you should receive a normal Falowen phone notification. If nothing appears, check Android notification and battery settings."
       );
     } catch (error) {
+      console.error("Falowen push test failed", { firebaseCode: getFirebaseErrorCodes(error) || "unavailable" });
       setTestMessage(getPushTestErrorMessage(error));
     } finally {
       setIsTesting(false);
