@@ -229,3 +229,14 @@ body.falowen-course-speaking-mock .study-buddy-reopen { display:none !important;
   background:#ecfdf3; color:#166534; border-radius:10px;
   font-size:13px; font-weight:700; line-height:1.45;
 }
+
+/* A deliberate zero-score skip for learners who cannot answer a Termin
+   question. Keep it secondary to the recording controls on phones. */
+.speaking-skip-question {
+  width:fit-content; max-width:100%; justify-self:start;
+  border:1px solid #cbd5e1; border-radius:10px; background:#fff;
+  color:#475569; padding:9px 12px; font:inherit; font-size:12px;
+  cursor:pointer; text-align:left;
+}
+.speaking-skip-question:disabled {opacity:.55;cursor:not-allowed;}
+.speaking-skip-question:not(:disabled):hover {border-color:#64748b;background:#f8fafc;}

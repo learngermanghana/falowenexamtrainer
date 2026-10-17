@@ -441,3 +441,24 @@ describe("Termin negotiation in shared course mocks and Exam Room", () => {
     expect(flows.mergeDecisions(session,[],"Ich habe frei.").decisions).toHaveLength(0);
   });
 });
+
+describe("No-dead-end grading when planning is unsuccessful", () => {
+  test.each([["A2",3,4],["B1",1,5]])("%s Teil %i finishes at turn %i even when nothing is agreed", (level,part,maximum) => {
+    const examFlow=flows.createExaminerFlow(level,{teil:`Teil ${part}`,prompt:"Einen kranken Freund oder Lehrer besuchen"});
+    const incomplete={examFlow,answeredTurns:maximum-1,taskReady:false};
+    expect(flows.hasPlanningAgreement(incomplete)).toBe(false);
+    expect(flows.isComplete(incomplete)).toBe(false);
+    const finished={...incomplete,answeredTurns:maximum};
+    expect(flows.hasPlanningAgreement(finished)).toBe(false);
+    expect(flows.isComplete(finished)).toBe(true);
+    expect(flows.responsePlan(finished).ready).toBe(true);
+  });
+
+  test.each([["A2",3,2],["B1",1,2]])("%s can finish before maximum only when the planning goal was met", (level,part,turns) => {
+    const flow=flows.createExaminerFlow(level,{teil:`Teil ${part}`,prompt:"Einen kranken Freund oder Lehrer besuchen"});
+    const decisions=(flows.profileFor(flow).decisionPoints||[]).map(point=>({point,value:"vereinbart",quote:"Ja, machen wir so."}));
+    const session={examFlow:{...flow,decisions},answeredTurns:turns};
+    expect(flows.hasPlanningAgreement(session)).toBe(true);
+    expect(flows.isComplete(session)).toBe(true);
+  });
+});

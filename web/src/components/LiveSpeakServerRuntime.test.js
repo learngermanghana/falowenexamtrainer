@@ -516,7 +516,11 @@ test.each(["A1","A2","B1"].flatMap(level=>[1,2,3].map(part=>[level,part])))("%s 
   expect(input.studentTranscripts).toHaveLength(session.answerLimit);
   expect(input.examContext.requiredCriteria.length).toBeGreaterThan(1);
   expect(input.examContext.reachedTurnLimit).toBe(true);
-  expect(input.examContext.taskComplete).toBe(!(level === "A2" && part === 3) && !(level === "B1" && part === 1));
+  const isUnsuccessfulPlanning=(level === "A2" && part === 3) ||
+    (level === "B1" && part === 1);
+  // A timed section can end while the communication goal remains unmet.
+  expect(input.examContext.taskComplete).toBe(!isUnsuccessfulPlanning);
+  expect(input.examContext.planningGoalAchieved).toBe(false);
   expect(JSON.stringify(input)).not.toContain("FORGED");
 });
 
@@ -1173,4 +1177,104 @@ test("graded mock clears a false ready flag instead of trapping a saved unfinish
   expect(saved.confirmedAnswers).toEqual([text,text]);
   expect(new Date(saved.expiresAt).getTime()).toBeGreaterThan(Date.now());
   expect(saved.feedbackAttempts).toBe(2);
+});
+
+describe("bounded, fair planning assessments", () => {
+  test.each([["A2",3,4],["B1",1,5]])("%s Teil %i: skips advance, finish, and score zero after %i turns", async(level,part,maxTurns)=>{
+    const api=setup();
+    const session=await startTaskFlow(api,level,part,"simulation","Einen kranken Freund oder Lehrer besuchen");
+    const sessionId=session.sessionId;
+    for(let step=0;step<maxTurns;step++){
+      const reply=await api.call("POST","/live-speak/session/confirm",{
+        sessionId,skipAnswer:true,expectedAnsweredTurns:step,
+      });
+      expect(reply.code).toBe(200);
+      expect(reply.payload.transcript).toBe("[Keine Antwort]");
+      expect(reply.payload.taskReady).toBe(step===maxTurns-1);
+      if(step===maxTurns-1) {
+        const closing="Danke. Dieser Prüfungsteil ist jetzt beendet. Wir haben nicht alle Planungspunkte vereinbart.";
+        expect(reply.payload.reply).toBe(closing);
+        // The last German audio must use the final closing text, not the
+        // model's earlier question that has been replaced in the UI.
+        const spoken=api.fakeClient.audio.speech.create.mock.calls.at(-1)?.[0]?.input;
+        expect(spoken).toBe(closing);
+      }
+      const state=api.docs.get(sessionKey);
+      expect(state.answeredTurns).toBe(step+1);
+      expect(state.confirmedAnswers).toHaveLength(step+1);
+    }
+    expect(api.docs.get(sessionKey).examFlow.decisions).toHaveLength(0);
+    api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{
+      message:{content:JSON.stringify({
+        taskScores:Array.from({length:maxTurns},(_,i)=>({step:i+1,score:2,comment:"Generous model"})),
+        summary:"Did not give responses.",strength:"No evidence",priority:"Practise appointment suggestions",
+      })},
+    }]});
+    const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId});
+    expect(feedback.code).toBe(200);
+    expect(feedback.payload.assessment.score).toBe(0);
+    expect(feedback.payload.assessment.percent).toBe(0);
+    expect(feedback.payload.assessment.tasks.every(x=>x.score===0)).toBe(true);
+    const stored=api.docs.get("liveSpeakExamResults/"+sessionId);
+    expect(stored.completed).toBe(true);
+    expect(stored.assessment.score).toBe(0);
+  });
+
+
+  test("B1 unproductive repeated acknowledgements finish and cannot receive a passing Teil mark",async()=>{
+    const api=setup();
+    // Guided mode lets this test supply the exact recognised transcript.
+    // Simulation deliberately replaces manually edited text with the mocked
+    // speech-to-text output, which would not test repeated "Ja." responses.
+    const session=await startTaskFlow(api,"B1",1,"guided","Einen kranken Freund oder Lehrer besuchen");
+    for(let i=0;i<5;i++){
+      const reply=await answerExam(api,session,"Ja.");
+      expect(reply.code).toBe(200);
+      expect(reply.payload.taskReady).toBe(i===4);
+    }
+    api.fakeClient.chat.completions.create.mockResolvedValueOnce({choices:[{
+      message:{content:JSON.stringify({
+        taskScores:[1,2,3,4,5].map(step=>({step,score:2,comment:"AI overly generous"})),
+        summary:"Little planning contribution",strength:"Polite tone",
+        priority:"Use meaningful German suggestions",
+      })},
+    }]});
+    const feedback=await api.call("POST","/live-speak/session/exam-feedback",{sessionId:session.sessionId});
+    expect(feedback.code).toBe(200);
+    expect(feedback.payload.assessment.percent).toBeLessThan(60);
+    expect(feedback.payload.assessment.participationAudit.lowInformationTurns).toBe(5);
+    expect(api.docs.get("liveSpeakExamResults/"+session.sessionId).completed).toBe(true);
+  });
+
+  test("stale or repeated Skip clicks never consume a second exam turn",async()=>{
+    const api=setup();
+    const session=await startTaskFlow(api,"A2",3);
+    const body={sessionId:session.sessionId,skipAnswer:true,expectedAnsweredTurns:0};
+    expect((await api.call("POST","/live-speak/session/confirm",body)).code).toBe(200);
+    const duplicate=await api.call("POST","/live-speak/session/confirm",body);
+    expect(duplicate.code).toBe(409);
+    expect(duplicate.payload.code).toBe("turn_already_advanced");
+    expect(api.docs.get(sessionKey).answeredTurns).toBe(1);
+  });
+
+  test("Skip cannot discard a pending recording or bypass nonplanning tasks",async()=>{
+    const api=setup();
+    const session=await startTaskFlow(api,"A2",3);
+    const transcribed=await api.call("POST","/live-speak/session/turn",{
+      sessionId:session.sessionId,...audioPayload,
+    });
+    expect(transcribed.code).toBe(200);
+    const blocked=await api.call("POST","/live-speak/session/confirm",{
+      sessionId:session.sessionId,skipAnswer:true,expectedAnsweredTurns:0,
+    });
+    expect(blocked.code).toBe(409);
+    expect(api.docs.get(sessionKey).answeredTurns).toBe(0);
+    const other=setup();
+    const b=await startTaskFlow(other,"B1",2);
+    const unsupported=await other.call("POST","/live-speak/session/confirm",{
+      sessionId:b.sessionId,skipAnswer:true,expectedAnsweredTurns:0,
+    });
+    expect(unsupported.code).toBe(400);
+    expect(unsupported.payload.code).toBe("skip_unavailable");
+  });
 });

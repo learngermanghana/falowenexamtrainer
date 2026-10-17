@@ -329,9 +329,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     if (safeToResend) await sendTurn(session, audioRetry.payload);
   };
 
-  const confirmTranscript = async () => {
-    if (!pending || !session || requestBusy.current || busy) return;
-    const text = recognizedText.trim();
+  const confirmTranscript = async (skip = false) => {
+    const skipAnswer = skip === true;
+    if ((!pending && !skipAnswer) || !session || requestBusy.current || busy) return;
+    if (skipAnswer && (!["A2-3","B1-1"].includes(session.examFlow?.key) ||
+        pending || taskReady || recording || feedbackBusy)) return;
+    const text = skipAnswer ? "[Keine Antwort]" : recognizedText.trim();
     if (text.length < 2 || text.length > (session.maxTranscriptChars || 600)) {
       setErrorMessage("Check the German transcript before continuing.");
       return;
@@ -342,7 +345,9 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     try {
       const history = messages.slice(-6).map(msg => ({role:msg.role,text:msg.text}));
       const result = await api("/live-speak/session/confirm", "POST", {
-        sessionId:session.sessionId,pendingId:pending.pendingId,transcript:text,history,recognitionCorrection,
+        sessionId:session.sessionId,pendingId:pending?.pendingId || "",transcript:text,history,
+        recognitionCorrection:!skipAnswer && recognitionCorrection,skipAnswer,
+        expectedAnsweredTurns:Number(session.answeredTurns || 0),
       });
       if (!mounted.current) return;
       setMessages(old => [...old,{role:"user",text:result.transcript},{role:"assistant",speaker:result.speaker || result.examFlow?.step?.role || "examiner",text:result.reply},
@@ -354,9 +359,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setTypedAnswer("");
       if (replayUrlRef.current) {URL.revokeObjectURL(replayUrlRef.current);replayUrlRef.current="";}
       setLastAudio(result.audioBase64);
-      setNotice(gradedCourseMock
-        ? `✓ Answer ${Number(session.answeredTurns || 0) + 1} saved to Falowen. ${result.taskReady ? "All answers recorded; AI marking is starting." : "Continue with the examiner."}`
-        : "");
+      setNotice(skipAnswer
+        ? "This question was skipped (0 points). " + (result.taskReady
+          ? "The examiner has finished this Teil and will mark it." : "Continue with the next question.")
+        : gradedCourseMock
+          ? `✓ Answer ${Number(session.answeredTurns || 0) + 1} saved to Falowen. ${result.taskReady ? "All answers recorded; AI marking is starting." : "Continue with the examiner."}`
+          : "");
       await playVoice(result.audioBase64);
     } catch (err) {
       if (mounted.current) {
@@ -373,6 +381,10 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               setPending(restored.pending || null);
               setAnswerMode(restored.pending?.typed ? "type" : "record");
               setRecognizedText(restored.pending?.transcript || "");
+              if (skipAnswer && Number(restored.answeredTurns || 0) > Number(session.answeredTurns || 0)) {
+                setNotice("✓ Your skipped answer was saved; the examiner advanced.");
+                setErrorMessage("");
+              }
             }
           } catch (_restoreError) { /* Resume can recover saved text later. */ }
         }
@@ -974,6 +986,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   Send typed answer
                 </button>
               </div>}
+              {!pending && !taskReady && ["A2-3","B1-1"].includes(session.examFlow?.key) &&
+                !recording && !audioRetry && !expired ? <button type="button"
+                  className="speaking-skip-question" onClick={()=>confirmTranscript(true)}
+                  disabled={busy || feedbackBusy || voiceState === "playing" || requestBusy.current}
+                  aria-label="Skip this planning question for zero points">
+                  I cannot answer — skip question (0 points)
+                </button> : null}
               {pending ? <details className="speaking-exam-transcript" aria-label="Review your words" open>
                 <summary>Your transcript</summary>
                 <textarea lang="de" aria-label={simulation ? "Recognised speech" : "What I said (you can edit this)"} rows={2}
