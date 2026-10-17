@@ -620,8 +620,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       if (!student) return;
       sessionId = String(req.body?.sessionId || "");
       const pendingId = String(req.body?.pendingId || "");
-      let confirmed = String(req.body?.transcript || "").trim();
-      if (!pendingId || confirmed.length < 2 || confirmed.length > 8000) {
+      const skipAnswer = req.body?.skipAnswer === true;
+      // Explicitly unanswered planning turns count as one attempt and score 0.
+      let confirmed = skipAnswer ? "[Keine Antwort]" : String(req.body?.transcript || "").trim();
+      if (!skipAnswer && (!pendingId || confirmed.length < 2 || confirmed.length > 8000)) {
         return error(res, 400, "invalid_transcript", "Review the recognized words before continuing.");
       }
       sessionRef = db().collection("liveSpeakSessions").doc(student.auth.uid);
@@ -636,11 +638,19 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (session.inFlight) {
           throw Object.assign(new Error("A spoken reply is already processing."), {status:409,code:"turn_in_progress"});
         }
-        if (session.examFlow?.mode === "simulation" && req.body?.recognitionCorrection !== true) confirmed = String(session.pendingTranscript || "").trim();
+        if (skipAnswer && !["A2-3","B1-1"].includes(session.examFlow?.key)) {
+          throw Object.assign(new Error("Skipping is supported only for appointment and planning questions."),
+            {status:400,code:"skip_unavailable"});
+        }
+        if (skipAnswer && session.pendingId) {
+          throw Object.assign(new Error("Confirm or discard your recorded answer first."),
+            {status:409,code:"turn_in_progress"});
+        }
+        if (!skipAnswer && session.examFlow?.mode === "simulation" && req.body?.recognitionCorrection !== true) confirmed = String(session.pendingTranscript || "").trim();
         if (confirmed.length < 2 || confirmed.length > transcriptLimit(session)) {
           throw Object.assign(new Error("Keep the confirmed transcript within the recording limit."), {status:400,code:"invalid_transcript"});
         }
-        if (!pendingId || pendingId !== session.pendingId) {
+        if (!skipAnswer && (!pendingId || pendingId !== session.pendingId)) {
           throw Object.assign(new Error("Record your German answer again before continuing."), {status:409,code:"transcript_missing"});
         }
         level = cleanLevel(session.level);
@@ -657,7 +667,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         tx.update(sessionRef, {
           inFlight:true, pendingId:null, pendingTranscript:null, pendingTyped:false,
           answeredTurns:admin.firestore.FieldValue.increment(1),
-          ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{step:flowSession.answeredTurns,original:session.pendingTranscript || "",confirmed,corrected:confirmed !== session.pendingTranscript}].slice(0,answerLimit(session))} : {}),
+          ...(flowSession ? {recognitionReviews:[...(session.recognitionReviews || []),{
+            step:flowSession.answeredTurns,original:skipAnswer ? "" : session.pendingTranscript || "",
+            confirmed,corrected:!skipAnswer && confirmed !== session.pendingTranscript,
+            skipped:skipAnswer,
+          }].slice(0,answerLimit(session))} : {}),
           ...(examTask ? {confirmedAnswers:answers, messages:[...storedMessages,{role:"user",text:confirmed}].slice(-20)} : {}),
         });
         reserved = true;
@@ -670,7 +684,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           const outcome=taskFlows.calendarResponse(flowSession,confirmed);
           reply=outcome.reply;decisions=outcome.decisions;ready=ready || outcome.complete;
         }
-        if (plan.dynamic) {
+        if (skipAnswer && flowSession.examFlow.key === "B1-1" && !ready) {
+          reply="Noch haben wir keinen gemeinsamen Plan. Bitte machen Sie einen konkreten Vorschlag zum nächsten Punkt.";
+        }
+        if (plan.dynamic && !skipAnswer) {
           const result=await client.chat.completions.create(buildChatRequest({
             model:resolveChatModel(process.env.LIVE_SPEAK_CHAT_MODEL),
             messages:[{role:"system",content:taskFlows.partnerInstructions(flowSession,plan)},
@@ -731,6 +748,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const replySpeaker=(plan.dynamic ? plan.previous?.role : plan.step?.role) || "examiner";
         const additions=[{role:"user",text:confirmed},{role:"assistant",speaker:replySpeaker,text:reply}];
         if (nextInstruction) additions.push({role:"assistant",speaker:plan.step.role || "examiner",text:nextInstruction});
+        if (ready && ["A2-3","B1-1"].includes(flowSession.examFlow.key) &&
+            !taskFlows.hasPlanningAgreement({...flowSession,examFlow:{...flowSession.examFlow,decisions}})) {
+          reply="Danke. Dieser Prüfungsteil ist jetzt beendet. Wir haben nicht alle Planungspunkte vereinbart.";
+          additions[1].text=reply;
+        }
         const nextSession={...flowSession,examFlow:{...flowSession.examFlow,decisions},taskReady:ready};
         let mp3=null;
         if (!ready || plan.dynamic || plan.scripted) {
@@ -897,7 +919,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (record.examFlow?.key === "B1-3") task={...task,prompt:"Discuss presentations: " + record.examFlow.contextTopic};
         examContext = record.examFlow ? {flow:taskFlows.publicFlow(record),dialogue:savedMessages(record),
           requiredCriteria:taskFlows.profileFor(record.examFlow)?.criteria,
-          ownPresentation:record.examFlow.ownPresentation || null,sectionEnded:taskFlows.isReady(record),completedAllTurns:taskFlows.isComplete(record),taskComplete:taskFlows.isComplete(record),reachedTurnLimit:Number(record.answeredTurns)>=answerLimit(record),
+          ownPresentation:record.examFlow.ownPresentation || null,
+          sectionEnded:taskFlows.isReady(record),completedAllTurns:taskFlows.isComplete(record),
+          taskComplete:taskFlows.isComplete(record),
+          planningGoalAchieved:taskFlows.hasPlanningAgreement(record),
+          planningDecisions:record.examFlow?.decisions || [],
+          reachedTurnLimit:Number(record.answeredTurns)>=answerLimit(record),
+          skippedSteps:(record.recognitionReviews || []).filter(r=>r.skipped).map(r=>r.step),
           recognitionCorrections:(record.recognitionReviews || []).filter(r=>r.corrected).length} : null;
         tx.update(sessionRef, {
           feedbackRequested:true, feedbackStatus:"processing", feedbackAttemptId:attemptId,
@@ -919,6 +947,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           "step is 1-based and score is an integer 0, 1 or 2), summary (English), strength (English), " +
           "priority (English, quote a real student mistake when present), correctedExample (German), nextPractice (English). " +
           "Score 2 for a successfully achieved speaking action, 1 for partial achievement, 0 for not achieved. " +
+          "For planning, reaching the final turn does NOT prove agreement was achieved. " +
+          "Use planningGoalAchieved and planningDecisions as evidence, without inventing unspoken contributions. " +
+          "Give zero for [Keine Antwort] skipped turns and little credit to repeated irrelevant answers without progress. " +
+          "Finishing a weak planning attempt must be possible, with a low or failing score. " +
           "Assess according to the supplied CEFR level, speaking act and task-specific criteria. " +
           "A1 simple questions and answers must not be judged as C1 essays; C2 must demonstrate precision and nuanced argumentation. " +
           "Allow alternative valid German responses, not just one model answer. Do NOT invent facts or questions, " +
@@ -968,7 +1000,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const item=Array.isArray(parsed?.taskScores) ? parsed.taskScores.find(x=>Number(x?.step)===index+1) : null;
         const n=Number(item?.score);
         if (!item || !Number.isInteger(n) || n<0 || n>2) return null;
-        return {step:index+1,score:n,maxScore:2,answer,comment:String(item.comment || "").slice(0,300)};
+        const skipped=answer === "[Keine Antwort]";
+        return {step:index+1,score:skipped ? 0 : n,maxScore:2,answer,
+          comment:skipped ? "No answer given for this planning step." : String(item.comment || "").slice(0,300)};
       });
       const assessment=taskScores.length && taskScores.every(Boolean) && summary && priority ? {
         version:1,level,teil:task.teil || "",score:taskScores.reduce((sum,x)=>sum+x.score,0),
