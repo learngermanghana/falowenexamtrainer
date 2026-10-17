@@ -1,6 +1,7 @@
 import {
   getTimedAssignmentRemainingSeconds,
   normalizeTimedAssignmentSession,
+  resolveTimedAssignmentSessionDuration,
 } from "./timedAssignmentClock";
 
 describe("timed assignment clock", () => {
@@ -60,4 +61,39 @@ describe("timed assignment clock", () => {
       getTimedAssignmentRemainingSeconds({ endsAt: now - 1000 }, 45 * 60, now),
     ).toBe(0);
   });
+
+  test("resumed attempts retain the original promised duration after a shorter policy ships", () => {
+    const start = 1_000_000;
+    const newAssignmentLimit = 20 * 60;
+    const oldPromisedLimit = 55 * 60;
+    const persistedDuration = resolveTimedAssignmentSessionDuration(oldPromisedLimit, newAssignmentLimit);
+    expect(persistedDuration).toBe(oldPromisedLimit);
+    const resumedSession = normalizeTimedAssignmentSession({
+      startedAt: start,
+      endsAt: start + oldPromisedLimit * 1000,
+    }, persistedDuration);
+    expect(getTimedAssignmentRemainingSeconds(
+      resumedSession, persistedDuration, start + 25 * 60 * 1000,
+    )).toBe(30 * 60);
+    expect(getTimedAssignmentRemainingSeconds(
+      resumedSession, persistedDuration, start + 55 * 60 * 1000,
+    )).toBe(0);
+  });
+
+  test("old local sessions without durationSeconds recover their original limit", () => {
+    const start = 1_000_000;
+    const legacySession = {
+      startedAt: start,
+      endsAt: start + 40 * 60 * 1000,
+    };
+    expect(resolveTimedAssignmentSessionDuration(undefined, 20 * 60, legacySession))
+      .toBe(40 * 60);
+  });
+
+  test("new starts use the latest duration and old shorter starts never get extended", () => {
+    expect(resolveTimedAssignmentSessionDuration(null, 20 * 60)).toBe(20 * 60);
+    expect(resolveTimedAssignmentSessionDuration(10 * 60, 20 * 60)).toBe(10 * 60);
+    expect(resolveTimedAssignmentSessionDuration(55 * 60, 20 * 60)).toBe(55 * 60);
+  });
+
 });
