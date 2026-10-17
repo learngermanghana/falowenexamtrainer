@@ -276,6 +276,7 @@ const alignTimedConfigWithLessonProfile = (assignmentKey, config) => {
     ...config,
     scope: joinTimedScope(requiredParts),
     timedTabs: freezeTabs(timedTabs),
+    durationMinutes: profile.timer?.durationMinutes ?? config.durationMinutes,
     lessonProfileVersion: profile.version,
   });
 };
