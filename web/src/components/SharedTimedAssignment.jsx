@@ -12,6 +12,7 @@ import {
 import {
   getTimedAssignmentRemainingSeconds,
   normalizeTimedAssignmentSession,
+  resolveTimedAssignmentSessionDuration,
 } from "../utils/timedAssignmentClock";
 import {
   isTimedAssignmentReviewUnlocked,
@@ -82,11 +83,16 @@ const readLocalSession = (assignmentKey, level, durationSeconds) => {
     const storageKey = buildTimedAssignmentStorageKey(assignmentKey, level);
     const raw = window.localStorage.getItem(storageKey);
     const value = JSON.parse(raw || "null");
-    const normalized = normalizeTimedAssignmentSession(value, durationSeconds);
-    if (normalized) {
-      window.localStorage.setItem(storageKey, JSON.stringify(normalized));
-    }
-    return normalized;
+    const savedDurationSeconds = resolveTimedAssignmentSessionDuration(
+      value?.durationSeconds,
+      durationSeconds,
+      value,
+    );
+    const normalized = normalizeTimedAssignmentSession(value, savedDurationSeconds);
+    if (!normalized) return null;
+    const savedSession = { ...normalized, durationSeconds: savedDurationSeconds };
+    window.localStorage.setItem(storageKey, JSON.stringify(savedSession));
+    return savedSession;
   } catch (_error) {
     return null;
   }
@@ -154,7 +160,9 @@ export default function SharedTimedAssignment({
   );
 
   const [session, setSession] = useState(localSession);
-  const [secondsLeft, setSecondsLeft] = useState(() => remainingSeconds(localSession, durationSeconds));
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    remainingSeconds(localSession, localSession?.durationSeconds || durationSeconds),
+  );
   const [attemptState, setAttemptState] = useState(() => (enabled ? (localSession ? "active" : "loading") : "disabled"));
   const [cloudState, setCloudState] = useState(() => (enabled && attemptRef ? "loading" : "local"));
   const [status, setStatus] = useState("");
@@ -214,18 +222,20 @@ export default function SharedTimedAssignment({
           timestampToMillis(data.startedAt) ||
           Number(data.clientStartedAt) ||
           timestampToMillis(data.createdAt);
-        const persistedDurationRaw = Math.max(1, Number(data.durationSeconds) || durationSeconds);
-        const persistedDuration =
-          durationSeconds > 0
-            ? Math.min(durationSeconds, persistedDurationRaw)
-            : persistedDurationRaw;
+        const persistedDuration = resolveTimedAssignmentSessionDuration(
+          data.durationSeconds,
+          durationSeconds,
+        );
         const rawEndsAt = startedAt
           ? startedAt + (persistedDuration * 1000)
           : timestampToMillis(data.endsAt) || Number(data.endsAt) || 0;
-        const nextSession = normalizeTimedAssignmentSession(
+        const normalizedSession = normalizeTimedAssignmentSession(
           rawEndsAt > 0 ? { startedAt, endsAt: rawEndsAt } : null,
-          durationSeconds,
+          persistedDuration,
         );
+        const nextSession = normalizedSession
+          ? { ...normalizedSession, durationSeconds: persistedDuration }
+          : null;
 
         setAttemptState(nextState);
         setSession(nextSession);
@@ -259,7 +269,10 @@ export default function SharedTimedAssignment({
         if (localSession) {
           setAttemptState("active");
           setSession(localSession);
-          setSecondsLeft(remainingSeconds(localSession, durationSeconds));
+          setSecondsLeft(remainingSeconds(
+            localSession,
+            localSession.durationSeconds || durationSeconds,
+          ));
         } else {
           setAttemptState("none");
         }
@@ -310,9 +323,13 @@ export default function SharedTimedAssignment({
 
   useEffect(() => {
     if (!enabled || attemptState !== "active" || !session) return undefined;
+    // A previous lesson's local session may already exceed the new default.
+    // Never expire/auto-submit it before the cloud's original limit is read.
+    if (attemptRef && cloudState === "loading") return undefined;
+    const activeDurationSeconds = session.durationSeconds || durationSeconds;
 
     const update = () => {
-      const next = remainingSeconds(session, durationSeconds);
+      const next = remainingSeconds(session, activeDurationSeconds);
       setSecondsLeft(next);
 
       const warning = warningForSeconds(next);
@@ -331,7 +348,7 @@ export default function SharedTimedAssignment({
     update();
     const timer = window.setInterval(update, 1000);
     return () => window.clearInterval(timer);
-  }, [attemptState, durationSeconds, enabled, markExpired, session]);
+  }, [attemptRef, attemptState, cloudState, durationSeconds, enabled, markExpired, session]);
 
   const start = useCallback(async () => {
     if (!enabled || !agreed || startBusy || attemptState !== "none" || reviewUnlocked) return;
@@ -344,6 +361,7 @@ export default function SharedTimedAssignment({
     const nextSession = {
       startedAt: now,
       endsAt: now + (durationSeconds * 1000),
+      durationSeconds,
     };
 
     setStartBusy(true);
@@ -513,6 +531,7 @@ export function TimedAssignmentPanel() {
     attemptState,
     cloudState,
     secondsLeft,
+    session,
     status,
     warningMessage,
     reviewUnlocked,
@@ -533,6 +552,9 @@ export function TimedAssignmentPanel() {
   const isMock = config.mode === "mock";
   const timedLabel = isMock ? "Timed mock exam" : "Timed practice";
   const activityNoun = isMock ? "mock" : "practice";
+  const shownDurationMinutes = attemptState === "active" && session?.durationSeconds
+    ? Math.ceil(session.durationSeconds / 60)
+    : config.durationMinutes;
 
   return (
     <section
@@ -556,7 +578,7 @@ export function TimedAssignmentPanel() {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 3 }}>
           <strong style={{ color: urgent ? "#9f1239" : "#1e3a8a" }}>
-            {timedLabel} · {config.durationMinutes} minutes
+            {timedLabel} · {shownDurationMinutes} minutes
           </strong>
           <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{config.scope}</span>
         </div>
