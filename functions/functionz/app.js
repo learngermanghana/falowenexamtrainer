@@ -25,7 +25,7 @@ const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3For
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
-const { isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
+const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
@@ -823,6 +823,14 @@ const studioMediaAccess = (level, authedUser, student) => {
   };
   return guards[level]?.({ authedUser, student }) || "invalid_level";
 };
+
+app.get("/course-media/studio/assignments", async (req, res) => {
+  const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+  if (!authedUser) return;
+  if (!isPublisherOwner(authedUser.uid)) return res.status(403).json({ error: "Owner access required." });
+  res.set("Cache-Control", "private, no-store");
+  return res.json({ ok: true, lessons: getPublishableLessons() });
+});
 
 app.post("/course-media/studio/publish", audioUpload, async (req, res) => {
   try {
