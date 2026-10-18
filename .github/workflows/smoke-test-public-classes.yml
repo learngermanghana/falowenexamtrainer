@@ -61,16 +61,28 @@ jobs:
               const fs = require("fs");
               const payload = JSON.parse(fs.readFileSync("/tmp/public-classes.json", "utf8"));
               if (!Array.isArray(payload.classes)) throw new Error("classes array missing");
-              const bonn = payload.classes.find((item) => item.slug === "a1-bonn-klasse");
-              if (!bonn) throw new Error("A1 Bonn Klasse missing from live API");
-              console.log("Found:", JSON.stringify(bonn));
+              // The upcoming-classes schedule changes frequently. An old named
+              // class must not be a permanent availability requirement.
+              if (!payload.classes.length) throw new Error("public classes catalogue is empty");
+              const slugs = new Set();
+              for (const item of payload.classes) {
+                if (!item || typeof item.slug !== "string" || !/^[a-z0-9-]+$/.test(item.slug)
+                    || typeof item.title !== "string" || !item.title.trim()
+                    || typeof item.level !== "string" || !item.level.trim()
+                    || typeof item.classUrl !== "string" || !item.classUrl.startsWith("/classes/")) {
+                  throw new Error("invalid public class record");
+                }
+                if (slugs.has(item.slug)) throw new Error("duplicate class slug: " + item.slug);
+                slugs.add(item.slug);
+              }
+              console.log("Verified live classes:", payload.classes.map(item => item.slug).join(", "));
             '; then
               success=true
               selected_endpoint="$endpoint"
               selected_status="$status"
               break
             else
-              last_error="${endpoint} returned 200 but A1 Bonn Klasse was missing"
+              last_error="${endpoint} returned 200 but class catalogue validation failed"
             fi
           done
 
