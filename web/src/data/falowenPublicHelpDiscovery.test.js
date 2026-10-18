@@ -75,8 +75,9 @@ describe("Falowen public help and AI discovery", () => {
   });
 
   test("publishes the generated A1-C2 lesson map with exact level rules", () => {
-    expect(courseMap.counts).toMatchObject({ A1: 28, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
-    expect(courseMap.lessons).toHaveLength(172);
+    expect(courseMap.counts).toMatchObject({ A1: 27, A2: 29, B1: 29, B2: 29, C1: 29, C2: 28 });
+    expect(courseMap.lessons).toHaveLength(171);
+    // Chapter 12.2 is a standalone resource, not a separate tutor-marked course-map assignment.
     const a1Days = courseMap.lessons.filter((lesson) => lesson.level === "A1").map((lesson) => lesson.day);
     expect(a1Days).toContain(0);
     expect(a1Days).toContain(23);
