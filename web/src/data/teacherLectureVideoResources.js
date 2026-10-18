@@ -59,7 +59,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     18: [{ chapter: "6.18", topic: "Wege zum Wunschberuf", tutor_lecture_video: "https://youtu.be/UxCX5OeuqVM" }],
     19: [{ chapter: "6.19", tutor_lecture_video: "https://youtu.be/Le_pW3eoBZA" }],
     20: [{ chapter: "6.20", tutor_lecture_video: "https://youtu.be/qqiF-0BoPCU" }],
-    21: [{ chapter: "7.21", tutor_lecture_video: "" }],
+    21: [{ chapter: "7.21", topic: "Lebensformen heute", tutor_lecture_video: "https://youtu.be/j-BLeB5eEKw" }],
     22: [{ chapter: "7.22", tutor_lecture_video: "" }],
     23: [{ chapter: "7.23", tutor_lecture_video: "" }],
     24: [{ chapter: "8.24", tutor_lecture_video: "" }],
