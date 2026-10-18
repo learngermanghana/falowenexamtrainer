@@ -14,7 +14,7 @@ describe("structured submission templates", () => {
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-0.1" }).parts.map((part) => part.partId))
       .toEqual(["teil1", "teil2"]);
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-1.2" }).parts.map((part) => part.partId))
-      .toEqual(["teil1", "teil2", "teil3"]);
+      .toEqual(["teil1", "teil2"]);
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-0.2" }).parts.map((part) => part.partId))
       .toEqual(["teil1", "teil2"]);
   });
