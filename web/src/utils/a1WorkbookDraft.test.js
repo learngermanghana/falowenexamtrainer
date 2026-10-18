@@ -161,3 +161,33 @@ test('new Chapter 3 grammar draft saves all six blanks and drops old hobby answe
   const text = buildA1WorkbookSubmissionText({ assignment, draft: readA1WorkbookDraft('A1-3') });
   expect(text).toContain('TEIL 3\n1. gern\n2. Magst\n3. gern\n4. mögen\n5. gern\n6. mag');
 });
+
+test.each([
+  ["A1-4", "a1-4-listening-v2", "teil-2", "teil-3"],
+  ["A1-8", "hamburg-message-and-berlin-train-5-each-v2", "teil-2", "teil-1"],
+  ["A1-11", "tourist-info-and-bahnhof-directions-5-each-v1", "teil-1", "teil-2"],
+])("%s removes obsolete answers but keeps untouched student work", (assignmentKey, revision, removed, retained) => {
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey(assignmentKey), JSON.stringify({
+    assignmentKey, readingRevision: revision, sections: {
+      [removed]: { answers: { 1: "OBSOLETE" } },
+      [retained]: { answers: { 1: "A", 5: "B", 6: "EXTRA" } },
+    },
+  }));
+  const migrated = readA1WorkbookDraft(assignmentKey);
+  expect(migrated.sections[removed]).toBeUndefined();
+  expect(migrated.sections[retained].answers).toEqual({ 1: "A", 5: "B" });
+});
+
+test.each([
+  ["A1-4", "teil-2", 1],
+  ["A1-8", "teil-2", 2],
+  ["A1-11", "teil-1", 3],
+])("%s serializes the speaking checkpoint in the original Teil without audio URL", (assignmentKey, part, exam) => {
+  const saved = saveA1WorkbookDraft({ assignmentKey, sections: {
+    [part]: { text: `GOETHE_A1_TUTOR_SPEAKING_V1\\nSpeaking exam part: ${exam}\\nScore: 7/10\\nFeedback: Clear answer` },
+  } });
+  const result = buildA1WorkbookSubmissionText({ assignment: getA1Assignment(assignmentKey), draft: saved });
+  expect(result).toContain(`TEIL ${part.slice(-1)}\\nGOETHE_A1_TUTOR_SPEAKING_V1`);
+  expect(result).toContain("Score: 7/10");
+  expect(result).not.toContain("audioUrl");
+});
