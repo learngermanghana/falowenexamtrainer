@@ -22,7 +22,7 @@ const hoeren = [
 
 // Cloudflare R2 private object name must match the uploaded MP3 exactly.
 // Set the verified key in the deployment configuration before enabling playback.
-const hoerenAudioKey = process.env.REACT_APP_A1_DAY10_AUDIO_KEY || "";
+const hoerenAudioKey = "a1/day-10/day-10.mp3";
 
 export default function A1Day10ObjectsColorsPossessiveArticlesWorkbookPage() {
   return (
