@@ -31,7 +31,6 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-9:teil-1",
       "A1-10:teil-1",
       "A1-12.1:teil-1",
-      "A1-12.1:teil-2",
       "A1-13:teil-1",
       "A1-13:teil-2",
       "A1-14.1:teil-1",
