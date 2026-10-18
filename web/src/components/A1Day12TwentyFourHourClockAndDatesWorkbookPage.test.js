@@ -2,25 +2,18 @@ import fs from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 
-const workbookSource = fs.readFileSync(new URL("../src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js", import.meta.url), "utf8");
-const draftSource = fs.readFileSync(new URL("../src/utils/a1WorkbookDraft.js", import.meta.url), "utf8");
+const source = fs.readFileSync(new URL("../src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js", import.meta.url), "utf8");
+const draft = fs.readFileSync(new URL("../src/utils/a1WorkbookDraft.js", import.meta.url), "utf8");
 
-test("A1 Day 12 uses the new five-question reading and listening sets", () => {
-  assert.match(workbookSource, /Nachricht von Thomas/);
-  assert.match(workbookSource, /Um wie viel Uhr beginnt die Schiffsfahrt am 10\. Oktober\?/);
-  assert.match(workbookSource, /Der Zug kommt um neunzehn Uhr zwanzig in Berlin an\./);
-  assert.match(workbookSource, /Script optional anzeigen/);
-  assert.match(workbookSource, /a1\/day-12\/day-12\.mp3/);
-  assert.match(workbookSource, /<A1ProtectedAudioPlayer day=\{12\}/);
-  assert.doesNotMatch(workbookSource, /Hören starten/);
-  assert.match(workbookSource, /Viertel vor drei \(nachmittags\)/);
-  assert.doesNotMatch(workbookSource, /Wie viele Tage hat der Februar in einem Schaltjahr/);
-  assert.doesNotMatch(workbookSource, /vm22NeVPFNA/);
+test("A1 Day 12 keeps Lesen and replaces existing Teil 2 with Sprechen", () => {
+  assert.match(source, /Nachricht von Thomas/);
+  assert.match(source, /Um wie viel Uhr beginnt die Schiffsfahrt am 10\\. Oktober\\?/);
+  assert.match(source, /Teil 2 · Sprechen: Fragen und Antworten/);
+  assert.match(source, /assignmentKey="A1-8"/);
+  assert.doesNotMatch(source, /A1ProtectedAudioPlayer/);
+  assert.doesNotMatch(source, /Teil 3 ·/);
 });
 
-test("A1 Day 12 invalidates old drafts for both replaced sections", () => {
-  assert.match(
-    draftSource,
-    /"A1-8": \{ revision: "hamburg-message-and-berlin-train-5-each-v2", sections: \{ "teil-1": 5, "teil-2": 5 \} \}/,
-  );
+test("A1 Day 12 invalidates outdated Teil 2 answers without dropping unrelated reading", () => {
+  assert.match(draft, /"A1-8": \\{ revision: "a1-8-sprechen-teil2-v3", sections: \\{ "teil-2": null \\} \\}/);
 });
