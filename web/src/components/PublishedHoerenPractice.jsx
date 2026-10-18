@@ -41,7 +41,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
     return () => { active = false; };
   }, [assignmentKey, idToken]);
 
-  const refreshAudio = useCallback(async ({ force = false } = {}) => {
+  const refreshAudio = useCallback(async ({ force = false, resume = false } = {}) => {
     const current = latestLessonRef.current;
     if (!current || !idToken || !assignmentKey) return false;
     if (refreshInFlightRef.current) return refreshInFlightRef.current;
@@ -53,7 +53,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
     const audio = audioRef.current;
     resumeRef.current = {
       time: Number.isFinite(audio?.currentTime) ? audio.currentTime : 0,
-      play: Boolean(audio && !audio.paused),
+      play: resume || Boolean(audio && !audio.paused),
     };
     if (audio && !audio.paused) audio.pause();
     lastRefreshRef.current = Date.now();
@@ -85,7 +85,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
   const handleAudioPlay = useCallback(event => {
     if (needsFreshSignedAudio(latestLessonRef.current?.audioUrl)) {
       event.currentTarget.pause();
-      refreshAudio();
+      refreshAudio({ resume: true });
     }
   }, [refreshAudio]);
 
