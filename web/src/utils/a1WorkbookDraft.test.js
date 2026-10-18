@@ -92,7 +92,7 @@ test("replaces legacy A1-7 Lesen and Hören drafts after both tasks changed", ()
   const draft = readA1WorkbookDraft("A1-7");
   expect(draft.sections["teil-1"]).toBeUndefined();
   expect(draft.sections["teil-2"]).toBeUndefined();
-  expect(draft.readingRevision).toBe("thomas-time-and-new-listening-5-each-v2");
+  expect(draft.readingRevision).toBe("five-opening-hours-signs-v3");
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft: legacy });
   expect(submission).not.toContain("TEIL 1");
   expect(submission).not.toContain("TEIL 2");
@@ -107,9 +107,24 @@ test("retains new A1-7 answers and drops obsolete numbers in both replaced secti
   expect(draft.sections["teil-1"].answers).toEqual({ 1: "B", 5: "B" });
   expect(draft.sections["teil-2"].answers).toEqual({ 1: "A", 5: "A" });
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-7"), draft });
-  expect(submission).toBe("TEIL 1\n1. B\n5. B\n\nTEIL 2\n1. A\n5. A");
+  expect(submission).toBe("TEIL 1\nA1-7-READING-V2\n1. B\n5. B\n\nTEIL 2\n1. A\n5. A");
 });
 
+
+test("A1-7 new signs reading clears stale reading but preserves compatible Hören draft", () => {
+  const saved = {
+    assignmentKey: "A1-7",
+    readingRevision: "thomas-time-and-new-listening-5-each-v2",
+    sections: {
+      "teil-1": { answers: { 1: "B", 2: "A" } },
+      "teil-2": { answers: { 1: "Richtig", 2: "Falsch", 5: "A", 8: "OLD" } },
+    },
+  };
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey("A1-7"), JSON.stringify(saved));
+  const updated = readA1WorkbookDraft("A1-7");
+  expect(updated.sections["teil-1"]).toBeUndefined();
+  expect(updated.sections["teil-2"].answers).toEqual({ 1: "Richtig", 2: "Falsch", 5: "A" });
+});
 
 test.each(["A1-13", "A1-14.1"])("new %s reading clears both former reading parts while retaining unchanged tasks", (assignmentKey) => {
   const unchangedKey = assignmentKey === "A1-13" ? "teil-4" : "teil-3";
