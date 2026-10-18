@@ -188,14 +188,15 @@ const lessonBlocks = {
     },
     {
       id: "d",
-      title: "D. Gern or mögen?",
+      title: "D. gern oder mögen? Ergänzen Sie die richtige Form.",
       prompts: [
-        "1. Ich ____ den Film.",
-        "2. Ich gehe ____ ins Kino.",
-        "3. Sie ____ Schokolade.",
-        "4. Er läuft ____.",
+        "1. Ich schwimme sehr ____________ (gern / mag).",
+        "2. ____________ (Gern / Magst) du Pizza?",
+        "3. Mein Bruder kocht ____________ (gern / mag) für die Familie.",
+        "4. Wir ____________ (mögen / gern) moderne Kunst.",
+        "5. Anna hört ____________ (gern / mag) Musik, aber sie ____________ (gern / mag) keinen Jazz.",
       ],
-      answers: "1) mag 2) gern 3) mag 4) gern",
+      answers: "1) gern 2) Magst 3) gern 4) mögen 5) gern, mag",
     },
   ],
 };

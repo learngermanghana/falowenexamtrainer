@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import { useAuth } from "../context/AuthContext";
 import { getA1Assignment } from "../data/a1AssignmentRegistry";
+import A1FamilyRecording from "./A1FamilyRecording";
 import { styles } from "../styles";
 import {
   buildA1WorkbookSubmissionText,
@@ -67,40 +68,6 @@ const familyIdeas = [
   "Wohnort: Wo wohnt deine Familie?",
 ];
 
-const hobbiesQuestions = [
-  "Spielst du gern Fußball?",
-  "Schwimmst du gern?",
-  "Liest du gern?",
-  "Malst du gern?",
-  "Hörst du gern Musik?",
-  "Kochst du gern?",
-  "Reist du gern?",
-  "Machst du gern Gartenarbeit?",
-  "Fährst du gern Rad?",
-  "Wanderst du gern?",
-];
-
-const hobbiesVocabulary = [
-  "Reading – Lesen",
-  "Swimming – Schwimmen",
-  "Playing football – Fußballspielen",
-  "Painting – Malen",
-  "Listening to music – Musik hören",
-  "Cooking – Kochen",
-  "Traveling – Reisen",
-  "Gardening – Gartenarbeit",
-  "Cycling – Radfahren",
-  "Hiking – Wandern",
-];
-
-const usefulPhrases = [
-  "Mein Hobby ist ...",
-  "Ich ... gern.",
-  "Ich mag ...",
-  "In meiner Freizeit ...",
-  "Nein, ich ... nicht gern.",
-];
-
 const normalizeStoredSections = (stored = {}) => ({
   "teil-1": {
     answers: stored?.["teil-1"]?.answers && typeof stored["teil-1"].answers === "object"
@@ -108,26 +75,22 @@ const normalizeStoredSections = (stored = {}) => ({
       : {},
   },
   "teil-2": {
-    text: String(stored?.["teil-2"]?.text || ""),
+    text: String(stored?.["teil-2"]?.recording?.transcript || ""),
+    recording: stored?.["teil-2"]?.recording || null,
   },
-  "teil-3": {
-    answers: stored?.["teil-3"]?.answers && typeof stored["teil-3"].answers === "object"
-      ? stored["teil-3"].answers
-      : {},
-  },
+
 });
 
 const hasDraftContent = (sections = {}) => {
   const part1 = Object.values(sections?.["teil-1"]?.answers || {}).some((value) => String(value || "").trim());
   const part2 = Boolean(String(sections?.["teil-2"]?.text || "").trim());
-  const part3 = Object.values(sections?.["teil-3"]?.answers || {}).some((value) => String(value || "").trim());
-  return part1 || part2 || part3;
+  return part1 || part2;
 };
 
 const DraftNotice = ({ savedAt = "", cloudStatus = "" }) => (
   <p role="status" aria-live="polite" style={draftNoticeStyle}>
-    {cloudStatus === "saving" ? "Saving draft… " : ""}
-    Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted to your tutor yet.</strong>
+    {cloudStatus === "error" ? "Cloud save failed. Your draft is saved on this device; try again before leaving. " : cloudStatus === "saving" ? "Saving draft… " : ""}
+    Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted for marking yet.</strong>
   </p>
 );
 
@@ -217,11 +180,11 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
   }, [assignment, cloudReady, sections, studentProfile, user?.uid]);
 
   const priceProgress = countCompletedA1Answers(sections["teil-1"].answers, priceQuestions.length);
-  const hobbiesProgress = countCompletedA1Answers(sections["teil-3"].answers, hobbiesQuestions.length);
-  const familyText = sections["teil-2"].text;
-  const familyComplete = Boolean(familyText.trim());
+  const familyRecording = sections["teil-2"].recording;
+  const familyText = familyRecording?.transcript || "";
+  const familyComplete = Boolean(familyText.trim() && /^https:\/\//i.test(familyRecording?.audioUrl || ""));
   const familyWordCount = familyText.trim() ? familyText.trim().split(/\s+/).filter(Boolean).length : 0;
-  const workbookComplete = priceProgress.complete && familyComplete && hobbiesProgress.complete;
+  const workbookComplete = priceProgress.complete && familyComplete;
 
   const updateNumberedAnswer = (sectionKey, number, value) => {
     setSections((current) => ({
@@ -236,10 +199,13 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
     }));
   };
 
-  const updateFamilyText = (value) => {
+  const updateFamilyRecording = (recording) => {
     setSections((current) => ({
       ...current,
-      "teil-2": { ...current["teil-2"], text: value },
+      "teil-2": {
+        recording,
+        text: recording.transcript,
+      },
     }));
   };
 
@@ -278,9 +244,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       fallbackAssignmentKey={ASSIGNMENT_KEY}
       title="A1 · Chapter 3 Workbook · Asking About Prices"
       subtitle="Day 7 · Chapter 3 · Tutor-marked assignment"
-      assignmentIntro="Answer all three Teile in the workbook. Falowen saves your work as a draft, but your tutor does not receive it until you open Review & Submit and press the final submit button."
+      assignmentIntro="Complete both Teile in the workbook. Falowen saves your work as a draft, but it is not marked until you open Review & Submit and press the final submit button."
       submitTitle="Review & Submit A1 · Chapter 3"
-      submitDescription="Review the mapped workbook draft below. It has not been sent to your tutor yet. The final Submit Assignment button sends it for tutor marking."
+      submitDescription="Review the mapped workbook draft below. It has not been submitted for marking yet. The final Submit Assignment button sends the complete assignment for automatic marking."
     >
       <div
         data-a1-chapter3-draft-guidance="true"
@@ -288,7 +254,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       >
         <strong>Workbook draft — not a submission</strong>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Type your answers directly in each Teil. They are saved automatically so you do not have to copy them later.
+          Enter the price answers and record your family description. They are saved automatically so you do not have to copy them later.
           Your work becomes final only after you open <strong>Review & Submit</strong> and press the final <strong>Submit Assignment</strong> button.
         </p>
       </div>
@@ -331,9 +297,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       </section>
 
       <section style={card}>
-        <h2 style={sectionTitle}>Teil 2: Writing About Family (Exercise 2)</h2>
+        <h2 style={sectionTitle}>Teil 2: Sprechen über die Familie (Exercise 2)</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Schreibe über deine Familie.</strong> Write one short connected text. Use the ideas below as support.
+          <strong>Sprich über deine Familie.</strong> Record a short description in German. Use the ideas below as support, then save your recording. AI marks the complete assignment after final submission.
         </p>
         <ol style={listSpacing}>
           {familyIdeas.map((item) => <li key={item}>{item}</li>)}
@@ -347,69 +313,8 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           </p>
         </div>
 
-        <label style={{ display: "grid", gap: 8 }}>
-          <strong>Your family text</strong>
-          <textarea
-            value={familyText}
-            onChange={(event) => updateFamilyText(event.target.value)}
-            aria-label="A1 Chapter 3 family writing draft"
-            placeholder="Meine Familie ..."
-            style={{ ...styles.textArea, minHeight: 190 }}
-          />
-          <span style={styles.helperText}>{familyWordCount} words · {familyComplete ? "Draft saved" : "Write your answer here"}</span>
-        </label>
+        <A1FamilyRecording value={familyRecording} onMarked={updateFamilyRecording} />
         <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
-      </section>
-
-      <section style={card}>
-        <h2 style={sectionTitle}>Teil 3: Hobbys (Exercise 3)</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Answer each question in a complete sentence using <strong>gern</strong>, <strong>nicht gern</strong> or <strong>mögen</strong>.
-        </p>
-
-        <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#f9fafb", display: "grid", gap: 6 }}>
-          <strong>How to answer</strong>
-          <span>Ja, ich spiele gern Fußball.</span>
-          <span>Ja, ich mag Fußball.</span>
-          <span>Nein, ich spiele nicht gern Fußball.</span>
-        </div>
-
-        <div style={{ display: "grid", gap: 12 }}>
-          {hobbiesQuestions.map((question, index) => {
-            const number = index + 1;
-            return (
-              <label
-                key={question}
-                style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}
-              >
-                <strong>{number}. {question}</strong>
-                <input
-                  type="text"
-                  value={sections["teil-3"].answers?.[number] || ""}
-                  onChange={(event) => updateNumberedAnswer("teil-3", number, event.target.value)}
-                  aria-label={`Teil 3 answer ${number}`}
-                  placeholder="Ihre Antwort ..."
-                  style={answerInputStyle}
-                  autoComplete="off"
-                />
-              </label>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "grid", gap: 10, borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
-          <h3 style={sectionTitle}>Useful vocabulary</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>{hobbiesVocabulary.join(" · ")}</p>
-          <h3 style={sectionTitle}>Useful phrases</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>{usefulPhrases.join(" · ")}</p>
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontWeight: 800 }}>
-          <span>{hobbiesProgress.completed} of {hobbiesProgress.total} answered</span>
-          <span>{hobbiesProgress.complete ? "Teil 3 complete" : `${hobbiesProgress.total - hobbiesProgress.completed} remaining`}</span>
-        </div>
-        <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
-
         <div
           data-a1-chapter3-workbook-completion="true"
           style={{
@@ -424,11 +329,10 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           <strong>{workbookComplete ? "Workbook complete" : "Finish the workbook before submitting"}</strong>
           <div style={{ display: "grid", gap: 5 }}>
             <span>Teil 1 · Preise: {priceProgress.complete ? "✓" : `${priceProgress.completed}/${priceProgress.total}`}</span>
-            <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words saved` : "Writing still required"}</span>
-            <span>Teil 3 · Hobbys: {hobbiesProgress.complete ? "✓" : `${hobbiesProgress.completed}/${hobbiesProgress.total}`}</span>
+            <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words · recording saved` : "Record and save your answer"}</span>
           </div>
           <p style={{ margin: 0, lineHeight: 1.6, fontWeight: 800 }}>
-            Your answers are saved as a draft. <strong>They have NOT been sent to your tutor.</strong>
+            Your answers are saved as a draft. <strong>They have NOT been submitted for marking.</strong>
           </p>
           <button
             type="button"

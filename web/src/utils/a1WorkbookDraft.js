@@ -141,7 +141,10 @@ export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
       const answerLines = sortedAnswerEntries(section.answers).map(
         ([answerNumber, value]) => `${answerNumber}. ${value}`,
       );
-      const body = section.text ? String(section.text).trim() : answerLines.join("\n");
+      const isRecordedFamily = String(assignment.assignmentKey || "").toUpperCase() === "A1-3" && key === "teil-2";
+      const body = isRecordedFamily
+        ? String(section.recording?.transcript || "").trim()
+        : section.text ? String(section.text).trim() : answerLines.join("\n");
       if (!body) return "";
       const normalizedAssignment = String(assignment.assignmentKey || "").toUpperCase();
       const exerciseVersion = normalizedAssignment === "A1-4" && key === "teil-3"

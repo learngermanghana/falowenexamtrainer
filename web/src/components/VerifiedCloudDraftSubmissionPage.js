@@ -1,3 +1,5 @@
+import { readA1WorkbookDraft } from "../utils/a1WorkbookDraft";
+import { buildA1RecordingSubmission } from "../utils/a1RecordingSubmission";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -738,7 +740,11 @@ const VerifiedCloudDraftSubmissionPage = ({
         chapterKey
       )}::${normalizeIdPart(submissionText.toLowerCase()).slice(0, 240)}`;
 
+      const recordingAttachments = buildA1RecordingSubmission({
+        assignmentKey, submissionText, draft: readA1WorkbookDraft(assignmentKey),
+      });
       const payload = {
+        ...recordingAttachments,
         submissionId: submissionRef.id,
         path: submissionPath,
         submissionPath,
