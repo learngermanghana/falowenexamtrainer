@@ -77,20 +77,19 @@ test("reports incomplete Health workbook until both reading parts and listening 
   );
 });
 
-test("blocks serialized final submission when a profiled required answer is missing", () => {
+test("blocks A1-8 until Teil 2 speaking has a scored response", () => {
   const incomplete = makeSerializedSections({
-    "teil-1": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-    "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig", "4. Falsch"],
-    "teil-3": ["1. A", "2. B", "3. C", "4. D", "5. A"],
+    "teil-1": ["1. A", "2. B", "3. C", "4. A", "5. A"],
+    "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig", "4. Falsch", "5. Richtig"],
   });
   const result = validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: incomplete });
   expect(result.ok).toBe(false);
-  expect(result.message).toContain("Teil 2 answers 5");
+  expect(result.message).toContain("Teil 2 speaking assessment");
 
   const complete = makeSerializedSections({
-    "teil-1": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-    "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig", "4. Falsch", "5. Richtig"],
-    "teil-3": ["1. A", "2. B", "3. C", "4. D", "5. A"],
+    "teil-1": ["1. A", "2. B", "3. C", "4. A", "5. A"],
+    "teil-2": ["SPEAKING_SCORE: 7/10", "STRENGTH: Good questions.", "IMPROVE: Word order."],
   });
-  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: complete })).toEqual({ ok: true, message: "" });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: complete }))
+    .toEqual({ ok: true, message: "" });
 });
