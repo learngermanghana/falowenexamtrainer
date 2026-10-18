@@ -57,10 +57,14 @@ describe("course attendance progress", () => {
       /Dative and Accusative Verbs|Conjunctions/i.test(String(entry.topic || entry.title || "")),
     )).toBe(false);
 
-    // Chapter 12.2 is still an active Day 18 Dative Prepositions assignment.
+    // Day 18's tutor-marked workbook is Kapitel 12.1. Kapitel 12.2
+    // is a standalone grammar resource, not a separate graded assignment.
+    expect(assignmentDictionary.some((entry) =>
+      String(entry.chapter || "") === "12.1" && Number(entry.day) === 18,
+    )).toBe(true);
     expect(assignmentDictionary.some((entry) =>
       String(entry.chapter || "") === "12.2" && Number(entry.day) === 18,
-    )).toBe(true);
+    )).toBe(false);
   });
 
   test("never invents an attended-over-attended denominator when a level is unknown", () => {
