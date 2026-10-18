@@ -72,6 +72,20 @@ const TopicImageBreak = ({ src, alt, title, subtitle }) => (
   </div>
 );
 
+const A1Day10GrammarFocus = () => (
+  <Section title="Lernziel: Possessivartikel im Alltag">
+    <p style={{ margin: 0 }}>Heute üben wir, wem ein Gegenstand gehört und welche Farbe er hat. Achten Sie auf <strong>der, die, das</strong> und auf die Endungen von <strong>mein, dein, sein, ihr</strong>.</p>
+    <div style={helperBoxStyle}>
+      <strong>Vergleichen Sie:</strong>
+      <div>der Stuhl → <strong>mein Stuhl</strong> · die Tasche → <strong>meine Tasche</strong></div>
+      <div>das Buch → <strong>mein Buch</strong> · die Schuhe → <strong>meine Schuhe</strong></div>
+      <div><strong>Das ist meine rote Tasche.</strong> Aber: <strong>Die Tasche ist rot.</strong></div>
+      <div><strong>Ich sehe meinen Stuhl.</strong> (Akkusativ: der → den)</div>
+    </div>
+    <p style={{ margin: 0 }}>Erst die Nominativformen üben. Danach den Akkusativ bei maskulinen Nomen vergleichen. Lesen und Hören testen anschließend die Gegenstände und Farben.</p>
+  </Section>
+);
+
 const possessiveColumns = ["Person", "Masculine / Neuter (der/das)", "Feminine / Plural (die)", "English"];
 const possessiveRows = [
   { key: "ich", cells: ["ich", "mein Tisch / mein Buch", "meine Tasche / meine Bücher", "my"] },
@@ -500,6 +514,7 @@ const ObjectsAndColorsPage = () => {
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }} aria-label="Objects and Colors Chapter">
+      <A1Day10GrammarFocus />
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Objects and Colors</h1>
