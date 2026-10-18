@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - run: npm install --package-lock=false --no-audit --no-fund
+      - run: npm install --prefix web --legacy-peer-deps --no-audit --no-fund --loglevel=error
       - run: npm run build --prefix web
         env:
           CI: false
