@@ -71,7 +71,7 @@ export default function PlacementFunnelNextStep({ result }) {
     setSaving(true);
     setStatus("Saving your placement result and contact details...");
     try {
-      await postPlacementEvent({
+      const saved = await postPlacementEvent({
         id:result.attemptId,action:"contact",name:normalizedName,email:normalizedEmail,
         phone:normalizedPhone,consent:true,
       });
@@ -103,9 +103,16 @@ export default function PlacementFunnelNextStep({ result }) {
         attribution: context,
       }).catch(()=>{ /* private record is saved; staff can follow up from Admin monitoring */ });
       trackPublicFunnelEvent("placement_contact_saved", { level: result.level });
-      setStatus("Your placement result and contact details are saved. You can now continue your registration.");
-    } catch (_error) {
-      setStatus("We could not save your contact details. You can still register or contact us on WhatsApp.");
+      const messages = {
+        sent: "Your placement result has been emailed to you. You can now continue your registration.",
+        already_sent: "Your placement result was already emailed to this address. You can continue your registration.",
+        not_configured: "Your result and contact details are saved. Automatic email delivery is not active yet; our admissions team can follow up.",
+        failed: "Your result and contact details are saved, but email delivery was unsuccessful. You can try saving again or contact admissions.",
+        no_email: "Your result and contact details are saved. Add an email address if you would like the result emailed to you."
+      };
+      setStatus(messages[saved.emailStatus] || "Your placement result and contact details are saved.");
+    } catch (error) {
+      setStatus(error?.message || "We could not save your contact details. You can still register or contact us on WhatsApp.");
     } finally {
       setSaving(false);
     }
@@ -127,14 +134,14 @@ export default function PlacementFunnelNextStep({ result }) {
 
       <form onSubmit={saveReminder} style={{ display: "grid", gap: 8, maxWidth: 560 }}>
         <strong>Save my result and get class guidance</strong>
-        <p style={{margin:0,color:"#475569",fontSize:13}}>Optional: leave your contact details so our admissions team can help you enrol at the right level. You can register without submitting this form.</p>
+        <p style={{margin:0,color:"#475569",fontSize:13}}>Optional: leave your contact details so our admissions team can help you enrol at the right level. If you provide an email address, Falowen can also send you your recommended level and score. You can register without this form.</p>
         <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
           <input type="text" aria-label="Your full name" autoComplete="name" required value={name} onChange={e=>setName(e.target.value)} placeholder="Full name" style={{flex:"1 1 220px",minHeight:44,borderRadius:10,border:"1px solid #cbd5e1",padding:"10px 12px",font:"inherit"}}/>
           <input type="tel" aria-label="Phone or WhatsApp (optional if email given)" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="Phone / WhatsApp" style={{flex:"1 1 220px",minHeight:44,borderRadius:10,border:"1px solid #cbd5e1",padding:"10px 12px",font:"inherit"}}/>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <input id="placement-reminder-email" aria-label="Email (optional if phone given)" type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="Email address" autoComplete="email" style={{ flex: "1 1 240px", minHeight: 44, borderRadius: 10, border: "1px solid #cbd5e1", padding: "10px 12px", font: "inherit" }} />
-          <button type="submit" disabled={saving} style={{ minHeight: 44, padding: "10px 14px", border: 0, borderRadius: 10, background: "#0f172a", color: "#fff", fontWeight: 900 }}>{saving ? "Saving..." : "Save result & contact"}</button>
+          <button type="submit" disabled={saving} style={{ minHeight: 44, padding: "10px 14px", border: 0, borderRadius: 10, background: "#0f172a", color: "#fff", fontWeight: 900 }}>{saving ? "Saving..." : (email.trim() ? "Save & email my result" : "Save result & contact")}</button>
         </div>
         <label style={{display:"flex",alignItems:"flex-start",gap:9,color:"#475569",fontSize:13}}>
           <input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} />
