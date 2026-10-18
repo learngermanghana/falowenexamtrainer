@@ -44,6 +44,11 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateA1AudioKey({ day: 8, key: "a1/day-08/notes.pdf" })).toBeNull();
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a1/day-12/day-12.mp3" });
     expect(validateA1AudioKey({ day: 17, key: "a1/day-17/day-17.mp3" })).toEqual({ day: 17, key: "a1/day-17/day-17.mp3" });
+    expect(validateA1AudioKey({ day: "18", key: "a1/day-18/day-18.mp3" })).toEqual({ day: 18, key: "a1/day-18/day-18.mp3" });
+    expect(validateA1AudioKey({ day: 18, key: "a1/day-17/day-17.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 17, key: "a1/day-18/day-18.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 18, key: "../day-18.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 18, key: "a1/day-18/notes.pdf" })).toBeNull();
     expect(validateA1AudioKey({ day: 21, key: "a1/day-21/day-21.mp3" })).toEqual({ day: 21, key: "a1/day-21/day-21.mp3" });
     expect(validateA1AudioKey({ day: 22, key: "a1/day-22/day-22.mp3" })).toEqual({ day: 22, key: "a1/day-22/day-22.mp3" });
     expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toBeNull();
@@ -51,6 +56,22 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
     expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 21, key: "a1/day-13/day-13.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 22, key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
+  });
+
+  test("generates a signed playback URL for the authenticated A1 Day 18 endpoint", async () => {
+    const result = await createA1AudioSignedUrl({
+      day: "18",
+      key: "a1/day-18/day-18.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+      },
+    });
+    expect(result.url).toContain("/a1/day-18/day-18.mp3");
+    expect(result.url).toContain("X-Amz-Signature=");
+    expect(result.key).toBe("a1/day-18/day-18.mp3");
   });
 
   test("accepts protected A1 mock Hören files without treating them as Course Book days", () => {
