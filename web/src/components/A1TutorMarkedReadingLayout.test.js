@@ -28,10 +28,8 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-6:teil-1",
       "A1-7:teil-1",
       "A1-8:teil-1",
-      "A1-8:teil-2",
       "A1-9:teil-1",
       "A1-10:teil-1",
-      "A1-11:teil-1",
       "A1-12.1:teil-1",
       "A1-12.1:teil-2",
       "A1-13:teil-1",
@@ -39,6 +37,7 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-14.1:teil-1",
       "A1-14.1:teil-2",
     ]));
+    expect(readingSections).not.toContain("A1-11:teil-1"); // Replaced with Sprechen.
     expect(readingSections).not.toContain("A1-11:teil-2"); // Chapter 11 Teil 2 is Hören.
 
     expect(isA1TutorReadingLabel("Teil 2 · Schreiben")).toBe(false);
