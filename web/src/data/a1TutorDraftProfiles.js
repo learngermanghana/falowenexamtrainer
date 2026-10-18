@@ -136,16 +136,6 @@ const profiles = {
       "teil-3": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Hören" }),
     },
   },
-  "A1-12.2": {
-    sections: {
-      "teil-1": section([
-        ...shortItems(4, "Write your answer"),
-        { number: 5, type: "choice", choices: ["A", "B"] },
-      ], { label: "Lesen" }),
-      "teil-2": section(choiceItems(5), { label: "Anzeigen" }),
-      "teil-3": section(choiceItems(5), { label: "Hören" }),
-    },
-  },
   "A1-12.3": {
     sections: {
       "teil-1": section([], { label: "Informal letter", embeddedWriting: true }),

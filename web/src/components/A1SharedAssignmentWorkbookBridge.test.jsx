@@ -8,7 +8,7 @@ import A1SharedAssignmentWorkbookBridge, {
 } from "./A1SharedAssignmentWorkbookBridge";
 import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
 
-const FORMER_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-10", "A1-12.1", "A1-12.2"];
+const FORMER_BRIDGE_ASSIGNMENT_KEYS = ["A1-2", "A1-10", "A1-12.1"];
 
 describe("A1SharedAssignmentWorkbookBridge", () => {
   beforeEach(() => {

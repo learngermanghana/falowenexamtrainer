@@ -87,9 +87,9 @@ describe("A1CanonicalChapterLessonRoute", () => {
     ).toBeInTheDocument();
   });
 
-  test("keeps grammar-only practice chapters on their dedicated destination", () => {
+  test("returns to the Course Book for an unlisted chapter", () => {
     expect(getA1CanonicalChapterDestination({ chapter: "14.2" })).toBe(
-      "/campus/course/dative-and-accusative-verbs-14-2",
+      "/campus/course",
     );
   });
 

@@ -79,6 +79,22 @@ describe("A1 unified tutor-marked workbook navigation", () => {
     ).toBeNull();
   });
 
+  it("keeps A1 Day 19 self-practice outside the injected tutor navigation", () => {
+    expect(
+      resolveA1UnifiedTutorWorkbookMatch({
+        pathname: "/campus/course/verboten-erlaubt-5-9",
+        search: "?radio=done&materials=done&workbookTab=section-1",
+      }),
+    ).toBeNull();
+
+    expect(
+      resolveA1UnifiedTutorWorkbookMatch({
+        pathname: "/campus/course/lesson/A1/19",
+        search: "?chapter=5.9&view=workbook",
+      }),
+    ).toBeNull();
+  });
+
   it("builds Overview with the combined Teil 1 and separate Teil 3 for Day 0.2", () => {
     document.body.innerHTML = `
       <main class="layout-main">

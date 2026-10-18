@@ -16,7 +16,7 @@ const normalizeAssignmentToken = (value) =>
     .toUpperCase();
 
 const getValidCanonicalIdsForLevel = (level) =>
-  new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
+  new Set([...(CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId), ...(level === "A1" ? ["A1-12.2"] : [])]);
 
 const collectCandidateChapterTokens = (value = "") => {
   const text = String(value || "").trim();

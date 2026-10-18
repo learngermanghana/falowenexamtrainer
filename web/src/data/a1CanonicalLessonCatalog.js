@@ -23,7 +23,7 @@ const ASSIGNMENT_LESSONS = Object.values(A1_ASSIGNMENT_REGISTRY).map((assignment
   day: assignment.day,
   title: assignment.title,
   destination: assignment.workbookRoute,
-  aliases: [normalizeA1Chapter(assignment.assignmentKey)],
+  aliases: [normalizeA1Chapter(assignment.assignmentKey), ...(assignment.chapter === "12.1" ? ["12.2", "A1-12.2"] : [])],
   assignmentKey: assignment.assignmentKey,
   kind: "assignment",
 }));
@@ -77,12 +77,6 @@ const PRACTICE_LESSONS = [
     destination: "/campus/course/speaking-exams-intro-4-7",
   }),
   practice({
-    chapter: "5.9",
-    day: 19,
-    title: "Verboten und erlaubt",
-    destination: "/campus/course/verboten-erlaubt-5-9",
-  }),
-  practice({
     chapter: "5.10",
     day: 23,
     title: "A1 Final Mock Exam",
@@ -131,7 +125,6 @@ export const A1_COURSE_LESSON_ORDER = Object.freeze([
   "10",
   "11",
   "12.1",
-  "12.2",
   "5.9",
   "12.3",
   "13",

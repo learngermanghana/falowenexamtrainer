@@ -34,8 +34,6 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-11:teil-1",
       "A1-12.1:teil-1",
       "A1-12.1:teil-2",
-      "A1-12.2:teil-1",
-      "A1-12.2:teil-2",
       "A1-13:teil-1",
       "A1-13:teil-2",
       "A1-14.1:teil-1",
@@ -65,7 +63,6 @@ describe("A1 tutor-marked Lesen exam layout", () => {
   test("multi-source tutor assignments use the shared source grid", () => {
     [
       "A1Day18Kapitel121WorkbookPage.js",
-      "A1Day18Kapitel122WorkbookPage.js",
       "A1Day21WeatherWorkbookPage.js",
       "A1Day22HealthBodyPartsWorkbookPage.js",
     ].forEach((fileName) => {

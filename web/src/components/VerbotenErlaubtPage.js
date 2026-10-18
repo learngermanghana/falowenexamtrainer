@@ -1,6 +1,6 @@
+import CourseSpeakingMockAssignment from "./CourseSpeakingMockAssignment";
 import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
-import A1ExamSpeakingPracticePanel from "./A1ExamSpeakingPracticePanel";
 import { styles } from "../styles";
 
 const palette = {
@@ -110,10 +110,10 @@ export default function VerbotenErlaubtPage() {
         </div>
         <div>
           <p style={{ margin: "0 0 8px", color: "#bfdbfe", fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.8, fontSize: 13 }}>Goethe A1 Sprechen · Prüfungstraining</p>
-          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 6vw, 3.8rem)", lineHeight: 1.04 }}>Are you ready for the A1 speaking exam?</h1>
+          <h1 style={{ margin: 0, fontSize: "clamp(2rem, 6vw, 3.8rem)", lineHeight: 1.04 }}>Goethe A1 Speaking Confidence Lab</h1>
         </div>
         <p style={{ margin: 0, color: "#e2e8f0", lineHeight: 1.7, fontSize: "clamp(1rem, 2.3vw, 1.16rem)", maxWidth: 820 }}>
-          This lesson is an exam-readiness lab. Practise Teil 1, Teil 2 and Teil 3 in exam order, then complete a mock speaking round with as little help as possible.
+          This is a required speaking assignment. Review the examples, complete Teil 1, Teil 2 and Teil 3 with the AI examiner, then submit the complete assessment to save your score and feedback.
         </p>
       </header>
 
@@ -204,7 +204,7 @@ export default function VerbotenErlaubtPage() {
         ]} />
       </Section>
 
-      <A1ExamSpeakingPracticePanel />
+      <CourseSpeakingMockAssignment assignmentKey="A1-5.9" />
 
       <Section eyebrow="Readiness" title="Can I do this tomorrow in the exam?" description="Use this checklist after the mock round.">
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>

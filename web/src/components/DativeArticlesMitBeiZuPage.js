@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import A1Day18Kapitel122WorkbookPage from "./A1Day18Kapitel122WorkbookPage";
 import { styles } from "../styles";
@@ -345,7 +345,7 @@ const DativeArticlesMitBeiZuPage = () => {
     return <A1Day18Kapitel122WorkbookPage />;
   }
 
-  return <DativeArticlesMitBeiZuGrammarNotes />;
+  return <Navigate replace to="/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=grammar" />;
 };
 
 export default DativeArticlesMitBeiZuPage;

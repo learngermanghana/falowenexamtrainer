@@ -10,6 +10,7 @@ import { preserveSpeakingRecovery, readSpeakingRecovery } from "../lib/courseSpe
 import { announceExamSuccess } from "../services/interactionFeedback";
 
 const ASSIGNMENTS = Object.freeze({
+  "A1-5.9": { level: "A1", day: 19, title: "Goethe A1 Speaking Confidence Lab" },
   "A2-8.22": { level: "A2", day: 22, title: "Goethe A2 Speaking Mock" },
   "B1-7.23": { level: "B1", day: 23, title: "Goethe B1 Speaking Mock" },
 });
@@ -17,6 +18,7 @@ const ASSIGNMENTS = Object.freeze({
 const partNumber = value => String(value || "").match(/teil\s*([1-3])/i)?.[1] || "";
 const cacheKey = (uid, assignmentKey) => `falowen:graded-speaking:${uid}:${assignmentKey}`;
 const sectionNames = {
+  A1: ["Sich vorstellen", "Fragen und Antworten", "Bitten und Reagieren"],
   A2: ["Fragen zur Person", "Von sich erzählen", "Gemeinsam etwas planen"],
   B1: ["Gemeinsam etwas planen", "Ein Thema präsentieren", "Fragen beantworten"],
 };
@@ -221,7 +223,11 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     ), [serverResult, results]);
 
   if (!config) return <p role="alert">This speaking assignment is not configured.</p>;
-  const examPartDetails = config.level === "A2" ? [
+  const examPartDetails = config.level === "A1" ? [
+    { title: "Sich vorstellen", description: "Introduce yourself, spell your name and say a number." },
+    { title: "Fragen und Antworten", description: "Ask and answer questions using everyday topic cards." },
+    { title: "Bitten und Reagieren", description: "Make polite requests and respond to your partner." },
+  ] : config.level === "A2" ? [
     { title: "Fragen zur Person", description: "Ask and answer short questions about everyday life." },
     { title: "Von sich erzählen", description: "Speak about a topic using the words on your card." },
     { title: "Gemeinsam etwas planen", description: "Discuss suggestions and agree on a plan with your partner." },

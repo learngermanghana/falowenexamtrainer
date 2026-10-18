@@ -16,16 +16,16 @@ describe("course schedule assignment metadata", () => {
       assignment: true,
       progressionEligible: true,
       assignmentDay: 3,
-      topic: "Introducing Yourself",
+      topic: "Personal Pronouns and Verb Conjugation",
     });
   });
 
-  test("keeps practical-only entries visible but not progression-eligible", () => {
+  test("makes the Day 19 speaking lab progression-eligible", () => {
     const practical = getCourseScheduleAssignmentMetadata({ level: "A1", assignmentId: "A1-5.9" });
 
     expect(practical).toMatchObject({
-      assignment: false,
-      progressionEligible: false,
+      assignment: true,
+      progressionEligible: true,
       assignmentDay: 19,
     });
   });

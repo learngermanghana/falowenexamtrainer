@@ -96,14 +96,14 @@ describe("progression sequence", () => {
         "A1-1.2",
         "A1-2",
         "A1-12.1",
-        "A1-12.2",
+        "A1-5.9",
         "A1-12.3",
         "A1-14.1",
       ])
     );
     expect(a1Progression).not.toContain("A1-1");
     expect(a1Progression).not.toContain("A1-1.1-practice");
-    expect(a1Progression).not.toContain("A1-5.9");
+    expect(a1Progression).not.toContain("A1-12.2");
   });
 
   test("A1/A2/B1/B2/C1 progression comes from the same curriculum manifest shape", () => {

@@ -13,7 +13,6 @@ const ROUTE_ENTRIES = [
   [16, "9", "/campus/course/food-and-negation-day-16-9-10"],
   [17, "11", "/campus/course/directions-imperative-11"],
   [18, "12.1", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18"],
-  [18, "12.2", "/campus/course/a1-12-2-dative-articles-mit-bei-zu"],
   [20, "12.3", "/campus/course/letter-writing-intro-12-3"],
   [21, "13", "/campus/course/weather-perfekt-letter-13"],
   [22, "14.1", "/campus/course/health-and-body-parts-14-1"],

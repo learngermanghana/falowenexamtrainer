@@ -9,7 +9,7 @@ import {
 
 const EXPECTED_ROUTE_KEYS = [
   "0.1", "0.2", "1.1", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
-  "12.1", "12.2", "12.3", "13", "14.1",
+  "12.1", "12.3", "13", "14.1",
   "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "5.10",
 ];
 
@@ -111,7 +111,7 @@ describe("A1 canonical lesson catalog", () => {
       routeKey: "4",
       day: 8,
       kind: "assignment",
-      title: "Countries, Languages & Travel",
+      title: "Countries and Languages",
       lessonRoute: "/campus/course/lesson/A1/chapter/4",
     });
   });

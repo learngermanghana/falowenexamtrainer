@@ -75,6 +75,8 @@ const remapDayAliasToCanonicalAssignmentId = ({ canonicalAssignmentId, level }) 
   const resolvedLevel = String(level || match[1] || "").trim().toUpperCase();
   const assignmentDay = Number(match[2] || 0);
   const taskIndex = Math.max(Number(match[3] || 1), 1);
+  // Old Day 18 task 2 scores belong to the retired 12.2 exercise forever.
+  if (resolvedLevel === "A1" && assignmentDay === 18 && taskIndex === 2) return "A1-12.2";
   if (!resolvedLevel || !assignmentDay) return canonicalToken;
 
   const tutorMarkedEntries = getCurriculumEntriesForLevel(resolvedLevel)
@@ -98,6 +100,7 @@ export const resolveAssignmentIdWithFallback = ({
   // - fallbackKey exists only to keep legacy records (missing assignmentId / assignmentKey) visible.
   // - once legacy backfill is complete, fallbackKey branches can be removed safely.
   (() => {
+    if (/^A1-DAY-18-TASK-2$/i.test(String(assignmentId || "").trim())) return "A1-12.2";
     const canonical = resolveAssignmentCanonicalKey({
       level,
       assignmentId,

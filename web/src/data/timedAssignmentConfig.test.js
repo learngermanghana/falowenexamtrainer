@@ -1,3 +1,4 @@
+import { getA1Assignment } from "./a1AssignmentRegistry";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import {
   getTimedAssignmentConfig,
@@ -108,6 +109,11 @@ describe("shared timed assignment configuration", () => {
 
     expect(required.length).toBeGreaterThan(0);
     required.forEach((assignmentKey) => {
+      // The speaking examiner owns its session timing, outside the written-workbook clock.
+      if (getA1Assignment(assignmentKey)?.layoutMode === "graded-speaking") {
+        expect(assignmentKey).toBe("A1-5.9");
+        return;
+      }
       expect(getTimedAssignmentConfig(assignmentKey)).not.toBeNull();
     });
   });

@@ -8,41 +8,28 @@ describe("authoritative A1 course-book cards", () => {
     );
     const assignmentIds = A1_COURSE_BOOK_CARDS.map((card) => card.assignmentId).filter(Boolean);
 
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(27);
     expect(new Set(dayChapters).size).toBe(dayChapters.length);
     expect(new Set(assignmentIds).size).toBe(assignmentIds.length);
   });
 
-  it("defines both Day 18 cards as tutor-marked assignments", () => {
+  it("defines a single Day 18 assignment covering both preposition topics", () => {
     const chapter121 = getA1CourseBookCard({ displayDay: 18, chapter: "12.1" });
     const chapter122 = getA1CourseBookCard({ displayDay: 18, chapter: "12.2" });
 
     expect(chapter121).toEqual(
       expect.objectContaining({
-        title: "Two Case Prepositions",
+        title: "Two-Way and Dative Prepositions",
         assignmentId: "A1-12.1",
         assessmentType: "tutor-marked",
         submissionRequired: true,
       })
     );
-    expect(chapter122).toEqual(
-      expect.objectContaining({
-        title: "Dative Prepositions",
-        assignmentId: "A1-12.2",
-        assessmentType: "tutor-marked",
-        submissionRequired: true,
-      })
-    );
+    expect(chapter122).toBeNull();
   });
 
-  it("adds the missing Day 18 12.2 assignment to the assignment dictionary", () => {
-    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-12.2" })).toEqual(
-      expect.objectContaining({
-        title: "Dative Prepositions",
-        assignment_id: "A1-12.2",
-        assignment: true,
-        submissionRequired: true,
-      })
-    );
+  it("replaces the retired 12.2 slot with the required speaking lab and keeps 19 assignments", () => {
+    expect(A1_COURSE_BOOK_CARDS.filter(card => card.submissionRequired)).toHaveLength(19);
+    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-5.9" })).toMatchObject({ assignment_id: "A1-5.9", submissionRequired: true });
   });
 });

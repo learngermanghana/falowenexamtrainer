@@ -48,7 +48,7 @@ const collectRouteFields = (value, routes = []) => {
 
 describe("A1 route integrity", () => {
   it("uses only internal registered routes on every displayed A1 Course Book card", () => {
-    expect(A1_COURSE_BOOK_CARDS).toHaveLength(28);
+    expect(A1_COURSE_BOOK_CARDS).toHaveLength(27);
 
     A1_COURSE_BOOK_CARDS.forEach((card) => {
       [card.grammarPage, card.workbookRoute].filter(Boolean).forEach((route) => {
@@ -88,9 +88,7 @@ describe("A1 route integrity", () => {
     expect(getA1CourseBookCard({ displayDay: 18, chapter: "12.1" })?.workbookRoute).toBe(
       "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook",
     );
-    expect(getA1CourseBookCard({ displayDay: 18, chapter: "12.2" })?.workbookRoute).toBe(
-      "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook",
-    );
+    expect(getA1CourseBookCard({ displayDay: 18, chapter: "12.2" })).toBeFalsy();
   });
 
   it("keeps A1 chapter 12.3 grammar notes separate from its two-question workbook", () => {

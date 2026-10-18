@@ -790,10 +790,10 @@ const courseSchedules = {
     {
       day: 18,
       topic: "Two Case Preposition",
-      chapter: "12.1_12.2",
+      chapter: "12.1",
       goal: "Learn about German professions and how to use two-way prepositions",
       instruction:
-        "Do the assignments for chapters 12.1 and 12.2 under Lesen & Hören.",
+        "Complete the combined Day 18 assignment A1-12.1: two-way and dative prepositions.",
       grammar_topic: "Two Case Preposition",
       lesen_hören: [
         {
@@ -804,14 +804,7 @@ const courseSchedules = {
           grammarbook_link: "https://www.falowen.app/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
           workbook_link: "https://drive.google.com/file/d/1A0NkFl1AG68jHeqSytI3ygJ0k7H74AEX/view?usp=sharing",
         },
-        {
-          chapter: "12.2",
-          video: "",
-          youtube_link: "",
-          assignment: true,
-          grammarbook_link: "https://www.falowen.app/campus/course/a1-12-2-dative-articles-mit-bei-zu",
-          workbook_link: "https://drive.google.com/file/d/1xojH7Tgb5LeJj3nzNSATUVppWnJgJLEF/view?usp=sharing",
-        },
+
       ],
     },
     {
@@ -820,12 +813,12 @@ const courseSchedules = {
       chapter: "5.9",
       goal: "Build speaking confidence for Goethe A1 with timed drills and exam-style prompts",
       instruction:
-        "This chapter has no assignment. Use the workbook notes and Goethe A1 speaking practice tips.",
+        "Required assignment A1-5.9: complete all three Goethe A1 speaking parts with the AI examiner and submit your combined score.",
       grammar_topic: "Goethe A1 Speaking Practice",
       schreiben_sprechen: {
         video: "https://youtu.be/ZfXw4fRQ0Tg",
         youtube_link: "https://youtu.be/ZfXw4fRQ0Tg",
-        assignment: false,
+        assignment: true,
         workbook_link: "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
       },
     },

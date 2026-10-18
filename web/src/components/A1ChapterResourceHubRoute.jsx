@@ -24,6 +24,13 @@ export default function A1ChapterResourceHubRoute({ fallback = null, level = "" 
   const params = useParams();
   const routeLevel = params.level || level || "A1";
 
+  const legacyQuery = new URLSearchParams(location.search);
+  if (routeLevel === "A1" && Number(params.day) === 18 && legacyQuery.get("chapter") === "12.2") {
+    legacyQuery.set("chapter", "12.1");
+    legacyQuery.delete("assignmentKey"); legacyQuery.delete("assignmentId");
+    return <Navigate replace to={`${location.pathname}?${legacyQuery.toString()}`} />;
+  }
+
   // The extracted resolver owns the hub contract: query.get("hub") === "1".
   const isResourceHubRequest = isA1ChapterResourceHubRequest({
     level: routeLevel,
