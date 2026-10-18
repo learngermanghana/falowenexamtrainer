@@ -832,11 +832,31 @@ app.get("/course-media/studio/assignments", async (req, res) => {
   return res.json({ ok: true, lessons: getPublishableLessons() });
 });
 
-app.post("/course-media/studio/publish", audioUpload, async (req, res) => {
+// Verify owner authentication before parsing a multipart file; unauthorised uploads
+// must never occupy memory or create objects in Cloudflare.
+const requireHoerenPublisher = async (req, res, next) => {
   try {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
     if (!authedUser) return;
     if (!isPublisherOwner(authedUser.uid)) return res.status(403).json({ error: "Owner access required." });
+    req.hoerenPublisherUid = authedUser.uid;
+    return next();
+  } catch (error) {
+    console.warn("Hören publisher authentication failed", error?.message);
+    return res.status(401).json({ error: "Owner authentication required." });
+  }
+};
+const studioMp3Upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 6 * 1024 * 1024, files: 1 },
+}).single("audio");
+app.post("/course-media/studio/publish", requireHoerenPublisher, (req, res, next) => {
+  studioMp3Upload(req, res, error => {
+    if (error) return res.status(400).json({ error: "Choose an MP3 under 6 MB." });
+    return next();
+  });
+}, async (req, res) => {
+  try {
     let metadata;
     try { metadata = JSON.parse(String(req.body?.metadata || "{}")); }
     catch { return res.status(400).json({ error: "Invalid publication metadata." }); }
@@ -846,7 +866,7 @@ app.post("/course-media/studio/publish", audioUpload, async (req, res) => {
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Course publication is unavailable." });
     const record = await publishHoerenLesson({
-      db, metadata, audio: req.file.buffer, uid: authedUser.uid,
+      db, metadata, audio: req.file.buffer, uid: req.hoerenPublisherUid,
     });
     res.set("Cache-Control", "no-store");
     return res.status(201).json({ ok: true, ...record });
