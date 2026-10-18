@@ -184,10 +184,10 @@ test.each([
   ["A1-11", "teil-1", 3],
 ])("%s serializes the speaking checkpoint in the original Teil without audio URL", (assignmentKey, part, exam) => {
   const saved = saveA1WorkbookDraft({ assignmentKey, sections: {
-    [part]: { text: `GOETHE_A1_TUTOR_SPEAKING_V1\\nSpeaking exam part: ${exam}\\nScore: 7/10\\nFeedback: Clear answer` },
+    [part]: { text: `GOETHE_A1_TUTOR_SPEAKING_V1\nSpeaking exam part: ${exam}\nScore: 7/10\nFeedback: Clear answer` },
   } });
   const result = buildA1WorkbookSubmissionText({ assignment: getA1Assignment(assignmentKey), draft: saved });
-  expect(result).toContain(`TEIL ${part.slice(-1)}\\nGOETHE_A1_TUTOR_SPEAKING_V1`);
+  expect(result).toContain(`TEIL ${part.slice(-1)}\nGOETHE_A1_TUTOR_SPEAKING_V1`);
   expect(result).toContain("Score: 7/10");
   expect(result).not.toContain("audioUrl");
 });
