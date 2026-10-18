@@ -10,6 +10,7 @@ import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
 import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
 import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
+import PublishedHoerenPractice from "./PublishedHoerenPractice";
 import A1TimedMockExam from "./A1TimedMockExam";
 import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
 import { getA1TutorDraftProfile } from "../data/a1TutorDraftProfiles";
@@ -180,6 +181,7 @@ const A1TutorMarkedWorkbookShell = ({
       {assignment.assignmentKey === "A1-13" ? <A1Day21WeatherResources /> : null}
       {isFirstA1Workbook ? firstWorkbookOverview : <A1TutorMarkedOverviewGuidance />}
       {overviewNodes}
+      <PublishedHoerenPractice assignmentKey={assignment.assignmentKey} />
     </div>
   );
 
