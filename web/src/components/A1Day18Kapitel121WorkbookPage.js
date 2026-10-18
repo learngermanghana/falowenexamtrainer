@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
 import { A1ReadingSourceCard, A1ReadingSourceGrid } from "./A1TutorMarkedReadingLayout";
 import { styles } from "../styles";
 
@@ -42,13 +43,17 @@ const readingSigns = [
   },
 ];
 
-const listeningTasks = [
-  "Der Supermarkt hat täglich geöffnet.",
-  "Die Theoriestunden in der Fahrschule sind dienstags und donnerstags.",
-  "Das Büro ist am Wochenende geschlossen.",
-  "Der Englischkurs findet dreimal pro Woche statt.",
-  "Das Fitnessstudio ist von 6 Uhr bis 22 Uhr geöffnet.",
-];
+// A1-12.1 · Bahnhof two-speaker dialogue (script-aligned version 3).
+// These statements match the text drafted for the owner-created listening exercise.
+// Confirm the uploaded recording against the same transcript before publishing grading.
+export const A1_12_1_LISTENING_AUDIO_KEY = "a1/day-18/day-18.mp3";
+export const A1_12_1_LISTENING_QUESTIONS_V3 = Object.freeze([
+  "Die Frau fährt mit ihrer Schwester nach Berlin.",
+  "Die Frau kauft ihre Fahrkarten am Automaten.",
+  "Die Frau geht zuerst in die Bahnhofshalle, um zum Gleis vier zu kommen.",
+  "Die Sitzplätze der Frau und ihrer Schwester sind im dritten Wagen.",
+  "Der Mitarbeiter sagt, dass der Koffer unter den Sitz gestellt werden soll.",
+]);
 
 const A1Day18Kapitel121WorkbookPage = () => (
   <A1TutorMarkedWorkbookShell
@@ -78,20 +83,15 @@ const A1Day18Kapitel121WorkbookPage = () => (
     <section style={card}>
       <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Watch the video, then decide whether each statement is Richtig or Falsch.
+        <strong>Eine Fahrkarte am Bahnhof kaufen.</strong> Hören Sie den Dialog zwischen einer Kundin und einem Bahnhofsmitarbeiter.
+        Sind die Aussagen 1–5 richtig oder falsch? Achten Sie besonders auf <strong>mit, bei, zu</strong> und <strong>in, auf, unter</strong>.
       </p>
-      <iframe
-        title="Kapitel 12.1 Hören"
-        src="https://www.youtube.com/embed/m07lKGJAoF8"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-        style={{ width: "100%", minHeight: 315, border: 0, borderRadius: 10 }}
-      />
-      {listeningTasks.map((question, index) => (
+      <A1ProtectedAudioPlayer day={18} audioKey={A1_12_1_LISTENING_AUDIO_KEY} />
+      {A1_12_1_LISTENING_QUESTIONS_V3.map((question, index) => (
         <article key={question} style={questionCard}>
           <strong>{index + 1}. {question}</strong>
-          <span>a) Richtig</span>
-          <span>b) Falsch</span>
+          <span>Richtig</span>
+          <span>Falsch</span>
         </article>
       ))}
     </section>
