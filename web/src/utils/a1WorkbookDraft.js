@@ -8,6 +8,7 @@ const normalizeAssignmentKey = (value = "") =>
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
   "A1-4": { revision: "a1-4-listening-v2", sections: { "teil-3": 5 } },
+  "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   "A1-7": { revision: "thomas-time-and-new-listening-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-8": { revision: "hamburg-message-and-berlin-train-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-11": { revision: "tourist-info-and-bahnhof-directions-5-each-v1", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
