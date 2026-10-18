@@ -63,8 +63,8 @@ const config = {
   submitListening: false,
   submitTitle: "Submit Teil 2 and Teil 3.",
   submitNote: "Teil 1 is group practice. There is no Teil 4 in this workbook.",
-  submitInstructions: "Paste your final 80–100 word opinion text and your five reading answer letters into the form below.",
-  submitWritingDescription: "Paste your final 80–100 word opinion text.",
+  submitInstructions: "Paste your final approximately 80-word opinion text and your five reading answer letters into the form below.",
+  submitWritingDescription: "Paste your final approximately 80-word opinion text.",
   submitReadingDescription: "Paste your five reading answer letters.",
 };
 
