@@ -17,17 +17,6 @@ const sectionTitleStyle = {
   fontSize: "1.1rem",
 };
 
-const subSectionTitleStyle = {
-  margin: 0,
-  fontSize: "1rem",
-};
-
-const listStyle = {
-  margin: 0,
-  paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
 const imageStyle = {
   width: "100%",
   maxHeight: 320,
