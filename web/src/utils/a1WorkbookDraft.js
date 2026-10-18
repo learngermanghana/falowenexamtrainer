@@ -8,12 +8,12 @@ const normalizeAssignmentKey = (value = "") =>
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
   "A1-12.1": { revision: "a1-12.1-bahn-auto-beruf-v2", sections: { "teil-1": 5, "teil-2": 0 } },
-  "A1-4": { revision: "a1-4-listening-v2", sections: { "teil-3": 5 } },
+  "A1-4": { revision: "a1-4-goethe-speaking-v3", sections: { "teil-2": 0, "teil-3": 5 } },
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   // Reading only changed again. Preserve saved listening answers (Teil 2).
   "A1-7": { revision: "five-opening-hours-signs-v3", sections: { "teil-1": 5 } },
-  "A1-8": { revision: "hamburg-message-and-berlin-train-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
-  "A1-11": { revision: "tourist-info-and-bahnhof-directions-5-each-v1", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
+  "A1-8": { revision: "hamburg-and-speaking-checkpoint-v3", sections: { "teil-1": 5, "teil-2": 0 } },
+  "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 0 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
 };
@@ -34,7 +34,7 @@ const sanitizeA1WorkbookDraft = (draft) => {
     if (draft.readingRevision !== config.revision) {
       delete sections[sectionKey];
     } else if (sections[sectionKey]) {
-      sections[sectionKey] = {
+      sections[sectionKey] = questionCount === 0 ? { text: String(sections[sectionKey].text || "").trim() } : {
         answers: Object.fromEntries(Object.entries(sections[sectionKey].answers || {})
           .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= questionCount)),
       };
