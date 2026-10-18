@@ -1,5 +1,16 @@
 import fs from "fs";
 import path from "path";
+import React from "react";
+import { render, screen, cleanup } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import A2Day12MeinTraumberufWorkbookPage from "./A2Day12MeinTraumberufWorkbookPage";
+import A2Day13VorstellungsgespraechWorkbookPage from "./A2Day13VorstellungsgespraechWorkbookPage";
+import A2Day14BerufUndKarriereWorkbookPage from "./A2Day14BerufUndKarriereWorkbookPage";
+import A2Day17InDieApothekeGehenWorkbookPage from "./A2Day17InDieApothekeGehenWorkbookPage";
+import { isA2WritingRequired } from "../data/a2WritingSchedule";
+
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, studentProfile: null }) }));
+afterEach(cleanup);
 import { getA2GoetheWritingTask, getA2GoetheWritingTasks } from "../data/a2GoetheWritingTasks";
 
 describe("A2 Goethe-style Teil 2 writing tasks", () => {
@@ -27,22 +38,40 @@ describe("A2 Goethe-style Teil 2 writing tasks", () => {
 });
 
 
-test("all A2 workbook surfaces route Teil 2 through the canonical Goethe card", () => {
-  const read = (relativePath) => fs.readFileSync(path.resolve(__dirname, relativePath), "utf8");
-  const shared = read("A2StandardTabbedWorkbookPage.js");
-  expect(shared).toContain("<A2GoetheWritingTaskCard day={day} />");
+test("the shared workbook shell owns the canonical Goethe writing card", () => {
+  const source = fs.readFileSync(path.resolve(__dirname, "A2StandardTabbedWorkbookPage.js"), "utf8");
+  expect(source).toContain("<A2GoetheWritingTaskCard day={day} />");
+  expect(source).toContain('writingRequired && displayedActiveTab === "schreiben"');
+});
 
-  // Day-specific workbooks now delegate to the shared shell instead of
-  // duplicating the Goethe card. Check that delegation and correct day wiring.
-  [
-    ["A2Day12MeinTraumberufWorkbookPage.js", 12],
-    ["A2Day13VorstellungsgespraechWorkbookPage.js", 13],
-    ["A2Day14BerufUndKarriereWorkbookPage.js", 14],
-    ["A2Day17InDieApothekeGehenWorkbookPage.js", 17],
-  ].forEach(([file, day]) => {
-    const source = read(file);
-    expect(source).toContain("A2StandardTabbedWorkbookPage");
-    expect(source).toContain(`day={${day}}`);
-    expect(source).not.toContain("<A2GoetheWritingTaskCard");
-  });
+test.each([
+  [12, A2Day12MeinTraumberufWorkbookPage],
+  [13, A2Day13VorstellungsgespraechWorkbookPage],
+])("Day %i really renders the three-point Goethe card on the Schreiben route", (day, Workbook) => {
+  expect(isA2WritingRequired(day)).toBe(true);
+  render(
+    <MemoryRouter initialEntries={[`/campus/course/a2-day-${day}-workbook?view=schreiben&radio=done`]}>
+      <Workbook />
+    </MemoryRouter>,
+  );
+  const task = getA2GoetheWritingTask(day);
+  expect(screen.getByRole("heading", { name: /Teil 2 · Schreiben \(Assignment\)/i })).toBeInTheDocument();
+  expect(screen.getByText(task.situation)).toBeInTheDocument();
+  expect(screen.getByText("Schreiben Sie zu allen drei Punkten:")).toBeInTheDocument();
+  for (const point of task.points) expect(screen.getByText(point)).toBeInTheDocument();
+});
+
+test.each([
+  [14, A2Day14BerufUndKarriereWorkbookPage],
+  [17, A2Day17InDieApothekeGehenWorkbookPage],
+])("Day %i deliberately excludes graded Schreiben and cannot render a hidden Goethe card", (day, Workbook) => {
+  expect(isA2WritingRequired(day)).toBe(false);
+  render(
+    <MemoryRouter initialEntries={[`/campus/course/a2-day-${day}-workbook?view=schreiben&radio=done`]}>
+      <Workbook />
+    </MemoryRouter>,
+  );
+  expect(screen.queryByRole("tab", { name: /^Teil 2/ })).not.toBeInTheDocument();
+  expect(screen.queryByText("Schreiben Sie zu allen drei Punkten:")).not.toBeInTheDocument();
+  expect(screen.queryByText(getA2GoetheWritingTask(day).situation)).not.toBeInTheDocument();
 });
