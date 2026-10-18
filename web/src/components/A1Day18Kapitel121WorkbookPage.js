@@ -18,54 +18,27 @@ const questionCard = {
   background: "#fff",
 };
 
-const readingQuestions = [
+const readingSigns = [
   {
-    stem: "Was ist Annas Beruf?",
-    options: ["a) Lehrerin", "b) Ärztin", "c) Krankenschwester", "d) Sekretärin"],
+    title: "Schild 1: Am Bahnhof (Bahn & Reisen)",
+    text: <>Hinweis für Fahrgäste: Der Zug nach Berlin fährt heute nicht von Gleis 1, sondern von Gleis 4. Fahrgäste <strong>mit</strong> Fahrkarte gehen bitte direkt <strong>zum</strong> Gleis 4. Fahrkarten kaufen Sie <strong>am</strong> Automaten <strong>im</strong> Bahnhofsgebäude.</>,
+    questions: [
+      [1, "Fahrgäste mit Fahrkarte müssen zum Gleis 4 gehen."],
+      [2, "Man kann die Fahrkarten direkt auf dem Gleis 4 kaufen."],
+    ],
   },
   {
-    stem: "Warum kann Anna oft nicht frühstücken?",
-    options: ["a) Weil sie keine Zeit hat.", "b) Weil sie keinen Hunger hat.", "c) Weil sie spät aufsteht.", "d) Weil sie keinen Kaffee mag."],
+    title: "Schild 2: Firmenparkplatz (Auto & Parken)",
+    text: <>Achtung Mitarbeiter der Firma Müller! Das Parken <strong>auf dem</strong> Firmenparkplatz ist nur <strong>mit</strong> Parkausweis erlaubt. Besucher parken bitte <strong>vor dem</strong> Hauptgebäude oder <strong>bei der</strong> Tankstelle. Parkausweise bekommen Sie <strong>bei</strong> Frau Meyer <strong>an der</strong> Rezeption.</>,
+    questions: [
+      [3, "Mitarbeiter dürfen ohne Parkausweis auf dem Firmenparkplatz parken."],
+      [4, "Parkausweise bekommt man bei Frau Meyer."],
+    ],
   },
   {
-    stem: "Wann beginnt Bens Arbeitstag?",
-    options: ["a) Um 7 Uhr", "b) Um 8 Uhr", "c) Um 9 Uhr", "d) Um 10 Uhr"],
-  },
-  {
-    stem: "Welche Fächer darf Ben unterrichten?",
-    options: ["a) Nur Mathematik", "b) Nur Deutsch", "c) Viele verschiedene Fächer", "d) Nur Sport"],
-  },
-  {
-    stem: "Was möchte Ben nächstes Jahr machen?",
-    options: ["a) Urlaub machen", "b) Ein neues Auto kaufen", "c) Einen Sprachkurs besuchen", "d) Ein Haus bauen"],
-  },
-];
-
-const adverts = [
-  {
-    title: "Einkaufen im Supermarkt",
-    text: "Unser Supermarkt hat jeden Tag von 8 Uhr bis 20 Uhr geöffnet. Sie finden frische Lebensmittel, Getränke, Haushaltswaren und vieles mehr. Kommen Sie vorbei und entdecken Sie unsere Angebote!",
-    question: "Der Supermarkt ist nur am Wochenende geöffnet.",
-  },
-  {
-    title: "Führerschein machen leicht gemacht",
-    text: "Unsere Fahrschule bietet Kurse für den Führerschein an. Die Theoriestunden finden dienstags und donnerstags statt. Die Praxisstunden können flexibel vereinbart werden.",
-    question: "Die Theoriestunden sind jeden Tag.",
-  },
-  {
-    title: "Arbeiten im modernen Büro",
-    text: "Unser Büro ist von Montag bis Freitag geöffnet. Die Arbeitszeiten sind von 9 Uhr bis 17 Uhr. Wir bieten eine angenehme Arbeitsumgebung und freundliche Kollegen.",
-    question: "Das Büro ist auch am Wochenende geöffnet.",
-  },
-  {
-    title: "Englisch lernen leicht gemacht",
-    text: "Unser Englischkurs findet dreimal pro Woche statt: montags, mittwochs und freitags. Der Kurs beginnt immer um 18 Uhr und dauert zwei Stunden.",
-    question: "Der Englischkurs ist zweimal pro Woche.",
-  },
-  {
-    title: "Fit bleiben im Fitnessstudio",
-    text: "Unser Fitnessstudio ist jeden Tag von 6 Uhr bis 22 Uhr geöffnet. Wir bieten verschiedene Kurse und moderne Geräte an, um Ihnen zu helfen, fit zu bleiben.",
-    question: "Das Fitnessstudio ist nur vormittags geöffnet.",
+    title: "Schild 3: Im Bürogebäude (Beruf & Arbeit)",
+    text: <>Information für das Team: Herr Weber ist heute nicht <strong>im</strong> Büro. Er ist <strong>mit dem</strong> Auto <strong>zu</strong> einem Kunden gefahren. <strong>Bei</strong> Fragen wenden Sie sich bitte <strong>an</strong> Frau Franke <strong>im</strong> Raum 102.</>,
+    questions: [[5, "Herr Weber ist heute im Büro."]],
   },
 ];
 
@@ -77,53 +50,26 @@ const listeningTasks = [
   "Das Fitnessstudio ist von 6 Uhr bis 22 Uhr geöffnet.",
 ];
 
-const QuestionList = ({ questions }) => (
-  <div style={{ display: "grid", gap: 10 }}>
-    {questions.map((question, index) => (
-      <div key={question.stem} style={questionCard}>
-        <strong>{index + 1}. {question.stem}</strong>
-        {question.options.map((option) => <span key={option}>{option}</span>)}
-      </div>
-    ))}
-  </div>
-);
-
 const A1Day18Kapitel121WorkbookPage = () => (
   <A1TutorMarkedWorkbookShell
     fallbackAssignmentKey="A1-12.1"
     title="A1 · Day 18 Workbook · Kapitel 12.1"
     subtitle="Two Case Prepositions · Tutor-marked assignment"
-    assignmentIntro="Complete all three Teile. Record your answers in the draft controls, then open Review & Submit to send the complete assignment."
+    assignmentIntro="Complete Lesen and Hören. Record your answers in the draft controls, then open Review & Submit to send the complete assignment."
     submitTitle="Review & Submit A1 · Day 18 · Kapitel 12.1"
     submitDescription="Review the mapped Lesen and Hören answers for A1-12.1, make any final edits, then press Submit Assignment."
   >
     <section style={card}>
-      <h2 style={{ margin: 0 }}>Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort</h2>
-      <h3 style={{ margin: 0 }}>Ein Tag im Leben von Anna und Ben</h3>
-      <p style={{ margin: 0, lineHeight: 1.75 }}>
-        Anna und Ben sind gute Freunde, und beide haben interessante Berufe. Anna ist Ärztin und arbeitet in einem großen Krankenhaus. Ben ist Lehrer und unterrichtet an einer Grundschule.
-      </p>
-      <p style={{ margin: 0, lineHeight: 1.75 }}>
-        Jeden Morgen muss Anna früh aufstehen, weil sie um 7 Uhr im Krankenhaus sein muss. Sie kann oft nicht frühstücken, weil sie so früh losfahren muss. Anna liebt ihren Beruf, weil sie Menschen helfen kann. Manchmal muss sie auch am Wochenende arbeiten, aber das stört sie nicht.
-      </p>
-      <p style={{ margin: 0, lineHeight: 1.75 }}>
-        Ben kann jeden Morgen etwas länger schlafen, weil die Schule erst um 8 Uhr beginnt. Er mag seinen Beruf, weil er gerne mit Kindern arbeitet. In der Schule darf Ben viele verschiedene Fächer unterrichten. Nach der Arbeit kann er oft Sport machen oder sich mit Freunden treffen.
-      </p>
-      <p style={{ margin: 0, lineHeight: 1.75 }}>
-        Beide, Anna und Ben, müssen sich gut organisieren, um ihre Arbeit und Freizeit in Einklang zu bringen. Anna möchte nächstes Jahr einen Urlaub machen, aber sie weiß noch nicht, wohin. Ben will vielleicht einen Sprachkurs besuchen, weil er seine Englischkenntnisse verbessern möchte.
-      </p>
-      <QuestionList questions={readingQuestions} />
-    </section>
-
-    <section style={card}>
-      <h2 style={{ margin: 0 }}>Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen</h2>
+      <h2 style={{ margin: 0 }}>Teil 1 · Lesen: Bahn, Auto &amp; Beruf</h2>
+      <p><strong>Aufgabe:</strong> Lesen Sie die Schilder/Aushänge 1–3 und die Aussagen 1–5. Ist die Aussage <strong>Richtig</strong> oder <strong>Falsch</strong>?</p>
       <A1ReadingSourceGrid>
-        {adverts.map((advert, index) => (
-          <A1ReadingSourceCard key={advert.title} label={`Anzeige ${index + 1}`} title={advert.title}>
-            <p style={{ margin: 0 }}>{advert.text}</p>
-            <strong>{index + 1}. {advert.question}</strong>
-            <span>a) Richtig</span>
-            <span>b) Falsch</span>
+        {readingSigns.map((sign, index) => (
+          <A1ReadingSourceCard key={sign.title} label={`Schild ${index + 1}`} title={sign.title}>
+            <p style={{ margin: 0, lineHeight: 1.75 }}>{sign.text}</p>
+            {sign.questions.map(([number, statement]) => <article key={number} style={questionCard}>
+              <strong>{number}. {statement}</strong>
+              <span>Richtig / Falsch</span>
+            </article>)}
           </A1ReadingSourceCard>
         ))}
       </A1ReadingSourceGrid>
