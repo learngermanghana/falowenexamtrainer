@@ -30,6 +30,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   const { user } = useAuth();
   const { draft, updateSectionText } = useA1TutorWorkbookDraft() || {};
   const saved = draft?.sections?.[sectionKey]?.text || "";
+  const alreadyAssessed = saved.startsWith("GOETHE_A1_TUTOR_SPEAKING_V1");
   const recorder = useRef(null);
   const stream = useRef(null);
   const [recording, setRecording] = useState(false);
@@ -51,6 +52,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
 
   const record = async () => {
     setError("");
+    if (alreadyAssessed) return;
     if (recording) {
       recorder.current?.stop();
       return;
@@ -78,7 +80,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   };
 
   const assess = async () => {
-    if (!blob || !user || busy || recording) return;
+    if (!blob || !user || busy || recording || alreadyAssessed) return;
     setBusy(true);
     setError("");
     try {
@@ -89,14 +91,17 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         question: task.instructions,
         idToken: await user.getIdToken(),
       });
-      const rawScore = result.score ?? result.assessment?.score ?? result.result?.score;
+      const rawScore = result.score ?? result.assessment?.score ?? result.result?.score ?? result.scores?.overall ?? result.rubric?.overall;
       const numeric = Number(rawScore);
       if (!Number.isFinite(numeric) || numeric < 0) {
         throw new Error("The speaking service did not return a score. Your recording remains here; retry.");
       }
-      const max = Number(result.maxScore ?? result.assessment?.maxScore ?? 10) || 10;
+      // Legacy speaking analysers may return percentages without maxScore.
+      const explicitMax = Number(result.maxScore ?? result.assessment?.maxScore);
+      const max = Number.isFinite(explicitMax) && explicitMax > 0 ? explicitMax : numeric > 10 ? 100 : 10;
       const score = Math.round(Math.max(0, Math.min(10, (numeric / max) * 10)) * 10) / 10;
-      const feedback = String(result.feedback ?? result.assessment?.feedback ?? result.summary ?? "").slice(0, 900);
+      const feedbackValue = result.feedback ?? result.assessment?.feedback ?? result.summary ?? "";
+      const feedback = (typeof feedbackValue === "string" ? feedbackValue : JSON.stringify(feedbackValue)).slice(0, 900);
       const storedText = [
         "GOETHE_A1_TUTOR_SPEAKING_V1",
         "Speaking exam part: " + task.examPart,
@@ -122,9 +127,9 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         {task.cards.map(card => <span key={card} style={{ border: "1px solid #cbd5e1", borderRadius: 9, padding: "10px 13px", fontWeight: 700 }}>{card}</span>)}
       </div>
       <p style={{ margin: 0, color: "#475569" }}>Read the task, speak naturally, and record your answer. There is no paid AI voice. You can replay and re-record before choosing Assess final recording.</p>
-      <button type="button" disabled={busy} onClick={record} style={{ padding: 12, borderRadius: 10, cursor: "pointer" }}>{recording ? "Stop recording" : blob ? "Record again" : "Start recording"}</button>
+      <button type="button" disabled={busy || alreadyAssessed} onClick={record} style={{ padding: 12, borderRadius: 10, cursor: "pointer" }}>{recording ? "Stop recording" : blob ? "Record again" : "Start recording"}</button>
       {preview ? <audio controls src={preview} aria-label="Preview your answer before assessment" /> : null}
-      {blob && !recording ? <button type="button" disabled={busy} onClick={assess} style={{ padding: 12, borderRadius: 10, background: "#1d4ed8", color: "white" }}>{busy ? "Assessing…" : "Assess final recording"}</button> : null}
+      {blob && !recording && !alreadyAssessed ? <button type="button" disabled={busy} onClick={assess} style={{ padding: 12, borderRadius: 10, background: "#1d4ed8", color: "white" }}>{busy ? "Assessing…" : "Assess final recording"}</button> : null}
       {error ? <p role="alert" style={{ color: "#b91c1c" }}>{error}</p> : null}
       {saved.includes("GOETHE_A1_TUTOR_SPEAKING_V1") ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace("GOETHE_A1_TUTOR_SPEAKING_V1", "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
     </div>
