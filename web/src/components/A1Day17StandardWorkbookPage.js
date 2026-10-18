@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
+import A1WorkbookSpeakingCheckpoint from "./A1WorkbookSpeakingCheckpoint";
 import { styles } from "../styles";
 
 const DAY17_AUDIO_KEY = "a1/day-17/day-17.mp3";
@@ -38,14 +39,6 @@ const questionStyle = {
   gap: 5,
 };
 
-const lesenQuestions = [
-  { stem: "1. Wo startet der Weg?", options: ["a) An den Landungsbrücken", "b) An der Touristeninformation", "c) Im Stadtpark"] },
-  { stem: "2. Wohin geht Thomas an der ersten Kreuzung?", options: ["a) Nach links", "b) Nach rechts", "c) Geradeaus"] },
-  { stem: "3. Was sieht Thomas nach 5 Minuten?", options: ["a) Das Hafenmuseum", "b) Die Elbphilharmonie", "c) Den Hafen und das Restaurant Seeblick"] },
-  { stem: "4. Wie lange dauert der Weg zu Fuß zu den Landungsbrücken?", options: ["a) 5 Minuten", "b) 10 Minuten", "c) Eine Stunde"] },
-  { stem: "5. Wo ist der Weg markiert?", options: ["a) Auf dem Stadtplan", "b) Auf der Fahrkarte", "c) Im Museum"] },
-];
-
 const hoerenQuestions = [
   { stem: "1. Anna sucht den Bahnhof.", options: ["a) Richtig", "b) Falsch"] },
   { stem: "2. An der Ampel geht man nach rechts.", options: ["a) Richtig", "b) Falsch"] },
@@ -76,31 +69,12 @@ export default function A1Day17StandardWorkbookPage() {
       fallbackAssignmentKey="A1-11"
       title="A1 · Day 17 Workbook · Instructions and Directions"
       subtitle="Chapter 11 · Tutor-marked assignment"
-      assignmentIntro="Complete the five Lesen questions and five Hören questions, then open Review & Submit."
+      assignmentIntro="Complete Sprechen Teil 1 and the five Hören questions in Teil 2, then open Review & Submit."
       submitTitle="Submit A1 · Day 17 · Chapter 11"
     >
       <section style={sectionStyle}>
-        <img
-          src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80"
-          alt="Street signs and roads in a city center for practising directions"
-          loading="lazy"
-          style={imageStyle}
-        />
-        <h2 style={{ margin: 0 }}>Teil 1 · Lesen: Der Weg von der Touristeninformation zum Schiff</h2>
-        <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Lies den Text und wähle bei jeder Aufgabe die richtige Antwort a, b oder c.
-        </p>
-        <div style={textStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Hallo Thomas,</strong> hier ist die Wegbeschreibung von der Touristeninformation zu den Landungsbrücken.
-            Geh zuerst <strong>geradeaus</strong> auf der Hauptstraße. An der ersten Kreuzung gehst du <strong>nach links</strong>.
-            Nach 5 Minuten siehst du den Hafen und das Restaurant <em>Seeblick</em>. Geh dort <strong>nach rechts</strong>.
-            Nach insgesamt <strong>10 Minuten zu Fuß</strong> bist du an den Landungsbrücken.
-            Dort startet das Schiff für die Hafenrundfahrt. Auf dem Stadtplan ist der Weg bereits rot markiert.
-            <strong> Gute Fahrt!</strong>
-          </p>
-        </div>
-        <QuestionList questions={lesenQuestions} />
+        <h2 style={{ margin: 0 }}>Teil 1 · Sprechen: Bitten und Reagieren</h2>
+        <A1WorkbookSpeakingCheckpoint assignmentKey="A1-11" />
       </section>
 
       <section style={sectionStyle}>
