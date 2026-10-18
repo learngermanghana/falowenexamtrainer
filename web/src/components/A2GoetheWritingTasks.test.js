@@ -10,6 +10,8 @@ import A2Day17InDieApothekeGehenWorkbookPage from "./A2Day17InDieApothekeGehenWo
 import { isA2WritingRequired } from "../data/a2WritingSchedule";
 
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, studentProfile: null }) }));
+// Day 14/17 mount the optional AI coach; it is unrelated to workbook writing visibility.
+jest.mock("./GoetheFreeChatPage", () => () => null);
 afterEach(cleanup);
 import { getA2GoetheWritingTask, getA2GoetheWritingTasks } from "../data/a2GoetheWritingTasks";
 
