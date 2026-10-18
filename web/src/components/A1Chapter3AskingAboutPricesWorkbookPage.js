@@ -60,6 +60,15 @@ const priceQuestions = [
   { prompt: "Wie viel kostet der Stuhl?", suffix: "kostet 50 Euro." },
 ];
 
+const GRAMMAR_REVISION = "a1-3-recorded-family-grammar-v2";
+const grammarQuestions = [
+  { before: "Ich schwimme sehr", after: ".", slots: [1], choices: ["gern", "mag"] },
+  { before: "", after: "du Pizza?", slots: [2], choices: ["Gern", "Magst"] },
+  { before: "Mein Bruder kocht", after: "für die Familie.", slots: [3], choices: ["gern", "mag"] },
+  { before: "Wir", after: "moderne Kunst.", slots: [4], choices: ["mögen", "gern"] },
+  { before: "Anna hört", after: "Musik, aber sie", end: "keinen Jazz.", slots: [5, 6], choices: ["gern", "mag"] },
+];
+
 const familyIdeas = [
   "Familienmitglieder: Wer gehört zu deiner Familie? (Mutter, Vater, Geschwister, etc.)",
   "Namen und Alter: Wie heißen deine Familienmitglieder und wie alt sind sie?",
@@ -78,13 +87,16 @@ const normalizeStoredSections = (stored = {}) => ({
     text: String(stored?.["teil-2"]?.recording?.transcript || ""),
     recording: stored?.["teil-2"]?.recording || null,
   },
-
+  "teil-3": {
+    revision: GRAMMAR_REVISION,
+    answers: stored?.["teil-3"]?.revision === GRAMMAR_REVISION ? stored["teil-3"].answers || {} : {},
+  },
 });
 
 const hasDraftContent = (sections = {}) => {
   const part1 = Object.values(sections?.["teil-1"]?.answers || {}).some((value) => String(value || "").trim());
   const part2 = Boolean(String(sections?.["teil-2"]?.text || "").trim());
-  return part1 || part2;
+  return part1 || part2 || Object.values(sections?.["teil-3"]?.answers || {}).some(value => String(value || "").trim());
 };
 
 const DraftNotice = ({ savedAt = "", cloudStatus = "" }) => (
@@ -184,7 +196,8 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
   const familyText = familyRecording?.transcript || "";
   const familyComplete = Boolean(familyText.trim() && /^https:\/\//i.test(familyRecording?.audioUrl || ""));
   const familyWordCount = familyText.trim() ? familyText.trim().split(/\s+/).filter(Boolean).length : 0;
-  const workbookComplete = priceProgress.complete && familyComplete;
+  const grammarProgress = countCompletedA1Answers(sections["teil-3"].answers, 6);
+  const workbookComplete = priceProgress.complete && familyComplete && grammarProgress.complete;
 
   const updateNumberedAnswer = (sectionKey, number, value) => {
     setSections((current) => ({
@@ -244,7 +257,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       fallbackAssignmentKey={ASSIGNMENT_KEY}
       title="A1 · Chapter 3 Workbook · Asking About Prices"
       subtitle="Day 7 · Chapter 3 · Tutor-marked assignment"
-      assignmentIntro="Complete both Teile in the workbook. Falowen saves your work as a draft, but it is not marked until you open Review & Submit and press the final submit button."
+      assignmentIntro="Complete all three Teile in the workbook. Falowen saves your work as a draft, but it is not marked until you open Review & Submit and press the final submit button."
       submitTitle="Review & Submit A1 · Chapter 3"
       submitDescription="Review the mapped workbook draft below. It has not been submitted for marking yet. The final Submit Assignment button sends the complete assignment for automatic marking."
     >
@@ -254,7 +267,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       >
         <strong>Workbook draft — not a submission</strong>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Enter the price answers and record your family description. They are saved automatically so you do not have to copy them later.
+          Enter the price answers, record your family description and complete the gern/mögen exercise. They are saved automatically so you do not have to copy them later.
           Your work becomes final only after you open <strong>Review & Submit</strong> and press the final <strong>Submit Assignment</strong> button.
         </p>
       </div>
@@ -315,6 +328,32 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
 
         <A1FamilyRecording value={familyRecording} onMarked={updateFamilyRecording} />
         <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
+      </section>
+
+      <section style={card}>
+        <h2 style={sectionTitle}>Teil 3: gern oder mögen? (Exercise 3)</h2>
+        <p><strong>gern oder mögen? Ergänzen Sie die richtige Form.</strong></p>
+        <ol style={listSpacing}>
+          {grammarQuestions.map((question, index) => (
+            <li key={index} style={{ marginBottom: 16 }}>
+              {question.before}{" "}
+              {question.slots.map((number, slotIndex) => (
+                <React.Fragment key={number}>
+                  {slotIndex > 0 ? <> {question.after} </> : null}
+                  <select aria-label={`Teil 3 blank ${number}`} value={sections["teil-3"].answers[number] || ""}
+                    onChange={event => updateNumberedAnswer("teil-3", number, event.target.value)}
+                    style={{ ...answerInputStyle, width: "auto", display: "inline-block" }}>
+                    <option value="">________</option>
+                    {question.choices.map(choice => <option key={choice} value={choice}>{choice}</option>)}
+                  </select>
+                </React.Fragment>
+              ))}
+              {" "}{question.end || question.after} ({question.choices.join(" / ")})
+            </li>
+          ))}
+        </ol>
+        <p>{grammarProgress.completed} of 6 blanks completed</p>
+        <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
         <div
           data-a1-chapter3-workbook-completion="true"
           style={{
@@ -330,6 +369,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           <div style={{ display: "grid", gap: 5 }}>
             <span>Teil 1 · Preise: {priceProgress.complete ? "✓" : `${priceProgress.completed}/${priceProgress.total}`}</span>
             <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words · recording saved` : "Record and save your answer"}</span>
+            <span>Teil 3 · gern oder mögen: {grammarProgress.complete ? "✓" : `${grammarProgress.completed}/6`}</span>
           </div>
           <p style={{ margin: 0, lineHeight: 1.6, fontWeight: 800 }}>
             Your answers are saved as a draft. <strong>They have NOT been submitted for marking.</strong>

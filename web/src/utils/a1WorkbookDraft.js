@@ -22,6 +22,11 @@ const readingRevision = (assignmentKey) => {
 };
 const sanitizeA1WorkbookDraft = (draft) => {
   const config = READING_REVISIONS[normalizeAssignmentKey(draft.assignmentKey)];
+  if (normalizeAssignmentKey(draft.assignmentKey) === "A1-3" && draft.sections?.["teil-3"]?.revision !== "a1-3-recorded-family-grammar-v2") {
+    const sections = { ...draft.sections };
+    delete sections["teil-3"];
+    draft = { ...draft, sections };
+  }
   if (!config) return draft;
   const sections = { ...(draft.sections || {}) };
   Object.entries(config.sections).forEach(([sectionKey, questionCount]) => {

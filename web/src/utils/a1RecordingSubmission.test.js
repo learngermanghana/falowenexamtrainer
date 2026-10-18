@@ -16,3 +16,8 @@ test("rejects missing audio or an edited transcript instead of silently dropping
 test("other assignments keep their existing payload", () => {
   expect(buildA1RecordingSubmission({ assignmentKey: "A1-4" })).toEqual({});
 });
+
+test('grammar revision is carried into the final immutable recording payload', () => {
+  const payload = buildA1RecordingSubmission({ ...args, draft: { sections: { ...draft.sections, 'teil-3': { revision: 'a1-3-recorded-family-grammar-v2' } } } });
+  expect(payload.workbookRevision).toBe('a1-3-recorded-family-grammar-v2');
+});
