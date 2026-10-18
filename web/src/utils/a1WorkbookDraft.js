@@ -7,7 +7,7 @@ const normalizeAssignmentKey = (value = "") =>
 // Changed reading exercises must not reuse answers to the former questions.
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
-  "A1-12.1": { revision: "a1-12.1-bahn-auto-beruf-v2", sections: { "teil-1": 5, "teil-2": 0 } },
+  "A1-12.1": { revision: "a1-12.1-bahnhof-hoeren-v3", sections: { "teil-1": 5, "teil-2": 0, "teil-3": 5 } },
   "A1-4": { revision: "a1-4-goethe-speaking-v3", sections: { "teil-2": 0, "teil-3": 5 } },
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   // Reading only changed again. Preserve saved listening answers (Teil 2).
@@ -20,6 +20,7 @@ const READING_REVISIONS = {
 // Previous homework revisions contain valid answers for the Teile that were
 // not replaced. Retain them instead of deleting students' Hören/Lesen work.
 const COMPATIBLE_UNCHANGED_SECTIONS = {
+  "A1-12.1": { from: "a1-12.1-bahn-auto-beruf-v2", keys: ["teil-1"] },
   "A1-4": { from: "a1-4-listening-v2", keys: ["teil-3"] },
   "A1-8": { from: "hamburg-message-and-berlin-train-5-each-v2", keys: ["teil-1"] },
   "A1-11": { from: "tourist-info-and-bahnhof-directions-5-each-v1", keys: ["teil-2"] },
@@ -163,7 +164,7 @@ export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
       if (!body) return "";
       const normalizedAssignment = String(assignment.assignmentKey || "").toUpperCase();
       const exerciseVersion = normalizedAssignment === "A1-12.1" && key === "teil-1"
-        ? "A1-12.1-READING-V2\n"
+        ? "A1-12.1-BAHNHOF-HOEREN-V3\n"
         : normalizedAssignment === "A1-4" && key === "teil-3"
         ? "A1-4-LISTENING-V2\n"
         : normalizedAssignment === "A1-6" && key === "teil-1"
