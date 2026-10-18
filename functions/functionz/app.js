@@ -25,6 +25,7 @@ const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3For
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
+const { isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
@@ -808,6 +809,101 @@ app.get("/metrics", (_req, res) => {
     metrics: snapshot,
     memory: process.memoryUsage(),
   });
+});
+
+// Published course-listening exercises have independent, server-graded practice scores.
+// They never overwrite canonical tutor-marked workbook answers or expose answer keys.
+const studioMediaAccess = (level, authedUser, student) => {
+  if (hasCourseMediaStaffAccess({ authedUser, student })) return "";
+  const guards = {
+    A1: getA1MediaAccessBlockReason,
+    A2: getA2MediaAccessBlockReason,
+    B1: getB1MediaAccessBlockReason,
+    B2: getB2MediaAccessBlockReason,
+  };
+  return guards[level]?.({ authedUser, student }) || "invalid_level";
+};
+
+app.post("/course-media/studio/publish", audioUpload, async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    if (!isPublisherOwner(authedUser.uid)) return res.status(403).json({ error: "Owner access required." });
+    let metadata;
+    try { metadata = JSON.parse(String(req.body?.metadata || "{}")); }
+    catch { return res.status(400).json({ error: "Invalid publication metadata." }); }
+    if (!req.file || req.file.size > 6 * 1024 * 1024) {
+      return res.status(400).json({ error: "Choose an MP3 smaller than 6 MB." });
+    }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Course publication is unavailable." });
+    const record = await publishHoerenLesson({
+      db, metadata, audio: req.file.buffer, uid: authedUser.uid,
+    });
+    res.set("Cache-Control", "no-store");
+    return res.status(201).json({ ok: true, ...record });
+  } catch (error) {
+    const bad = /valid|choose|review|question|quote|match|owner|MP3|script|approve|title|day|level|answer/i.test(error.message);
+    console.error("Course Hören studio publication failed", error.message);
+    return res.status(bad ? 400 : 502).json({ error: bad ? error.message : "Could not publish this lesson. No changes were made to the active lesson." });
+  }
+});
+
+app.get("/course-media/studio/lesson", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    let key;
+    try { key = normaliseAssignmentId(req.query?.assignmentKey); }
+    catch { return res.status(400).json({ error: "Invalid assignment." }); }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Course service unavailable." });
+    const snap = await db.collection("publishedHoerenLessons").doc(key).get();
+    if (!snap.exists || snap.data()?.status !== "published") return res.status(404).json({ error: "No published Hören practice for this lesson." });
+    const lesson = snap.data();
+    const matched = await findAuthedStudentProfile(db, authedUser);
+    const accessError = studioMediaAccess(lesson.level, authedUser, matched?.data || null);
+    if (accessError) return res.status(403).json({ error: "Course audio access is not available.", code: accessError });
+    res.set("Cache-Control", "private, no-store");
+    return res.json({ ok: true, lesson: toStudentLesson(lesson, signedStudioUrl({ method: "GET", key: lesson.objectKey })) });
+  } catch (error) {
+    console.error("Course Hören practice lookup failed", error.message);
+    return res.status(502).json({ error: "Could not load Hören practice." });
+  }
+});
+
+app.post("/course-media/studio/score", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+    let key;
+    try { key = normaliseAssignmentId(req.body?.assignmentKey); }
+    catch { return res.status(400).json({ error: "Invalid assignment." }); }
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Course service unavailable." });
+    const snap = await db.collection("publishedHoerenLessons").doc(key).get();
+    if (!snap.exists || snap.data()?.status !== "published") return res.status(404).json({ error: "Lesson unavailable." });
+    const lesson = snap.data();
+    const matched = await findAuthedStudentProfile(db, authedUser);
+    const accessError = studioMediaAccess(lesson.level, authedUser, matched?.data || null);
+    if (accessError) return res.status(403).json({ error: "Course audio access is not available." });
+    if (String(req.body?.revision || "") !== lesson.revision) return res.status(409).json({ error: "This listening practice has been updated. Refresh the page." });
+    let result;
+    try { result = scoreHoerenLesson(lesson, req.body?.answers); }
+    catch (error) { return res.status(400).json({ error: error.message }); }
+    await db.collection("hoerenPracticeResults").doc(`${authedUser.uid}_${key}`).set({
+      uid: authedUser.uid, assignmentKey: key, revision: lesson.revision,
+      ...result, scoredAt: new Date().toISOString(), source: "hoeren_studio_practice",
+    });
+    res.set("Cache-Control", "private, no-store");
+    return res.json({ ok: true, ...result,
+      correctAnswers: lesson.questions.map(q => lesson.kind === "richtig-falsch" ? q.answer : q.correctIndex),
+      evidence: lesson.questions.map(q => q.evidence),
+    });
+  } catch (error) {
+    console.error("Course Hören practice scoring failed", error.message);
+    return res.status(502).json({ error: "Could not score this listening practice." });
+  }
 });
 
 app.get("/course-media/a1/audio-url", async (req, res) => {
