@@ -6032,6 +6032,12 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) return res.status(429).json({ error: "Daily speaking analysis limit reached", code: "SPEAKING_QUOTA_REACHED" });
 
+    // Workbook recordings are graded with all answers after final submission.
+    // This path still requires authentication and consumes the speaking quota above.
+    if (req.body?.transcriptionOnly === true || req.body?.transcriptionOnly === "true") {
+      return res.json({ transcript, quotaRemaining: quota.remaining });
+    }
+
     const messages = [
       { role: "system", content: speakingPrompt({ teil, level, contextType, question: selectedTask?.text || question, interactionMode }) + (selectedTask ? "\n" + assessmentTaskPrompt(selectedTask) : "") },
       { role: "user", content: `User ${authedUser.uid || userId} speaking sample transcript: ${transcript}` },

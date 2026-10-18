@@ -62,12 +62,13 @@ export default function A1FamilyRecording({ value, onMarked }) {
     setError("");
     try {
       const result = await analyzeAudio({
-        audioBlob: blob, teil: "1", level: "A1", userId: user.uid,
+        transcriptionOnly: true, audioBlob: blob, teil: "1", level: "A1", userId: user.uid,
         idToken: await user.getIdToken(), contextType: "A1 Day 7 family speaking workbook",
         question: "Sprich über deine Familie: Familienmitglieder, Namen und Alter, Berufe, Hobbys und Wohnort. Assess this beginner A1 family description. Give a score out of 10, explain correct language and mistakes, and give a short corrected example. Do not penalize invented personal details.",
       });
-      if (!String(result.transcript || "").trim() || !String(result.feedback || "").trim()) throw new Error("No clear answer or feedback was received. Please try again.");
-      if (mounted.current) { onMarked({ transcript: result.transcript, feedback: result.feedback, audioUrl: result.audioUrl || "", markedAt: new Date().toISOString() }); setBlob(null); setUrl(""); }
+      if (!String(result.transcript || "").trim()) throw new Error("No clear answer was heard. Please try again.");
+      if (!/^https:\/\//i.test(result.audioUrl || "")) throw new Error("Your recording could not be saved online. Please retry; your recording is still available here.");
+      if (mounted.current) { onMarked({ transcript: result.transcript, audioUrl: result.audioUrl, savedAt: new Date().toISOString() }); setBlob(null); setUrl(""); }
     } catch (err) { if (mounted.current) setError(userFacingAudioError(err)); }
     finally { if (mounted.current) setPhase("idle"); }
   };
@@ -78,14 +79,14 @@ export default function A1FamilyRecording({ value, onMarked }) {
     </button>
     {url ? <audio controls src={url} aria-label="Your family recording" /> : null}
     {blob ? <button type="button" style={styles.primaryButton} disabled={!user || phase !== "idle"} onClick={mark}>
-      {phase === "marking" ? "AI is marking…" : "Send recording for AI marking"}
+      {phase === "marking" ? "Saving recording…" : "Save recording"}
     </button> : null}
-    {!user ? <p>Sign in to mark and save your answer.</p> : null}
+    {!user ? <p>Sign in to save your answer.</p> : null}
     {error ? <p role="alert">{error}</p> : null}
     {value ? <div style={{ whiteSpace: "pre-wrap" }}>
       {value.audioUrl ? <audio controls src={value.audioUrl} aria-label="Saved family recording" /> : null}
       <h3>Your spoken answer</h3><p>{value.transcript}</p>
-      <h3>AI feedback</h3><p>{value.feedback}</p>
+      <p>Your recording is saved. AI marks the complete assignment after final submission.</p>
     </div> : null}
   </div>;
 }

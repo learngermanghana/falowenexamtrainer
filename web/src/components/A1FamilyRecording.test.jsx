@@ -16,19 +16,28 @@ async function record() {
   fireEvent.click(screen.getByRole("button", { name: "Record family answer" }));
   await screen.findByRole("button", { name: "Stop recording" });
   fireEvent.click(screen.getByRole("button", { name: "Stop recording" }));
-  fireEvent.click(await screen.findByRole("button", { name: "Send recording for AI marking" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Save recording" }));
 }
-test("marks and saves transcript, feedback and durable audio in the workbook", async () => {
-  analyzeAudio.mockResolvedValue({ transcript: "Meine Mutter heißt Anna.", feedback: "8/10. Gut!", audioUrl: "https://example.com/saved.webm" });
+test("transcribes and saves transcript, durable audio in the workbook", async () => {
+  analyzeAudio.mockResolvedValue({ transcript: "Meine Mutter heißt Anna.", audioUrl: "https://example.com/saved.webm" });
   const onMarked = jest.fn(); render(<A1FamilyRecording onMarked={onMarked} />);
   await record();
-  await waitFor(() => expect(onMarked).toHaveBeenCalledWith(expect.objectContaining({ transcript: "Meine Mutter heißt Anna.", feedback: "8/10. Gut!", audioUrl: "https://example.com/saved.webm" })));
+  await waitFor(() => expect(onMarked).toHaveBeenCalledWith(expect.objectContaining({ transcript: "Meine Mutter heißt Anna.", audioUrl: "https://example.com/saved.webm" })));
 });
-test("failed marking retains the recording for retry without saving a completed answer", async () => {
+test("failed saving retains the recording for retry without saving a completed answer", async () => {
   analyzeAudio.mockRejectedValue(new Error("Please try again."));
   const onMarked = jest.fn(); render(<A1FamilyRecording onMarked={onMarked} />);
   await record();
   expect(await screen.findByRole("alert")).toHaveTextContent("Please try again.");
   expect(onMarked).not.toHaveBeenCalled();
-  expect(screen.getByRole("button", { name: "Send recording for AI marking" })).toBeEnabled();
+  expect(screen.getByRole("button", { name: "Save recording" })).toBeEnabled();
+});
+
+test("a multipart result without durable audio stays incomplete and can be retried", async () => {
+  analyzeAudio.mockResolvedValue({ transcript: "Meine Familie ist klein.", feedback: "8/10" });
+  const onMarked = jest.fn(); render(<A1FamilyRecording onMarked={onMarked} />);
+  await record();
+  expect(await screen.findByRole("alert")).toHaveTextContent("could not be saved online");
+  expect(onMarked).not.toHaveBeenCalled();
+  expect(screen.getByRole("button", { name: "Save recording" })).toBeEnabled();
 });

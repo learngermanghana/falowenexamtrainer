@@ -75,7 +75,7 @@ const normalizeStoredSections = (stored = {}) => ({
       : {},
   },
   "teil-2": {
-    text: String(stored?.["teil-2"]?.text || ""),
+    text: String(stored?.["teil-2"]?.recording?.transcript || ""),
     recording: stored?.["teil-2"]?.recording || null,
   },
 
@@ -90,7 +90,7 @@ const hasDraftContent = (sections = {}) => {
 const DraftNotice = ({ savedAt = "", cloudStatus = "" }) => (
   <p role="status" aria-live="polite" style={draftNoticeStyle}>
     {cloudStatus === "error" ? "Cloud save failed. Your draft is saved on this device; try again before leaving. " : cloudStatus === "saving" ? "Saving draft… " : ""}
-    Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted to your tutor yet.</strong>
+    Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted for marking yet.</strong>
   </p>
 );
 
@@ -182,7 +182,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
   const priceProgress = countCompletedA1Answers(sections["teil-1"].answers, priceQuestions.length);
   const familyRecording = sections["teil-2"].recording;
   const familyText = familyRecording?.transcript || "";
-  const familyComplete = Boolean(familyText.trim() && familyRecording?.feedback);
+  const familyComplete = Boolean(familyText.trim() && /^https:\/\//i.test(familyRecording?.audioUrl || ""));
   const familyWordCount = familyText.trim() ? familyText.trim().split(/\s+/).filter(Boolean).length : 0;
   const workbookComplete = priceProgress.complete && familyComplete;
 
@@ -204,7 +204,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       ...current,
       "teil-2": {
         recording,
-        text: `Recorded family answer\n${recording.transcript}\n\nAI feedback\n${recording.feedback}`,
+        text: recording.transcript,
       },
     }));
   };
@@ -244,9 +244,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       fallbackAssignmentKey={ASSIGNMENT_KEY}
       title="A1 · Chapter 3 Workbook · Asking About Prices"
       subtitle="Day 7 · Chapter 3 · Tutor-marked assignment"
-      assignmentIntro="Complete both Teile in the workbook. Falowen saves your work as a draft, but your tutor does not receive it until you open Review & Submit and press the final submit button."
+      assignmentIntro="Complete both Teile in the workbook. Falowen saves your work as a draft, but it is not marked until you open Review & Submit and press the final submit button."
       submitTitle="Review & Submit A1 · Chapter 3"
-      submitDescription="Review the mapped workbook draft below. It has not been sent to your tutor yet. The final Submit Assignment button sends it for tutor marking."
+      submitDescription="Review the mapped workbook draft below. It has not been submitted for marking yet. The final Submit Assignment button sends the complete assignment for automatic marking."
     >
       <div
         data-a1-chapter3-draft-guidance="true"
@@ -299,7 +299,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
       <section style={card}>
         <h2 style={sectionTitle}>Teil 2: Sprechen über die Familie (Exercise 2)</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Sprich über deine Familie.</strong> Record a short description in German. Use the ideas below as support, then send your recording for AI marking.
+          <strong>Sprich über deine Familie.</strong> Record a short description in German. Use the ideas below as support, then save your recording. AI marks the complete assignment after final submission.
         </p>
         <ol style={listSpacing}>
           {familyIdeas.map((item) => <li key={item}>{item}</li>)}
@@ -329,10 +329,10 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           <strong>{workbookComplete ? "Workbook complete" : "Finish the workbook before submitting"}</strong>
           <div style={{ display: "grid", gap: 5 }}>
             <span>Teil 1 · Preise: {priceProgress.complete ? "✓" : `${priceProgress.completed}/${priceProgress.total}`}</span>
-            <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words · AI feedback saved` : "Record and mark your answer"}</span>
+            <span>Teil 2 · Familie: {familyComplete ? `✓ ${familyWordCount} words · recording saved` : "Record and save your answer"}</span>
           </div>
           <p style={{ margin: 0, lineHeight: 1.6, fontWeight: 800 }}>
-            Your answers are saved as a draft. <strong>They have NOT been sent to your tutor.</strong>
+            Your answers are saved as a draft. <strong>They have NOT been submitted for marking.</strong>
           </p>
           <button
             type="button"

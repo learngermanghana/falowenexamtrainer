@@ -43,7 +43,7 @@ test("maps A1 Chapter 3 workbook responses into one canonical tutor submission",
   const assignment = getA1Assignment("A1-3");
   const sections = {
     "teil-1": { answers: { 1: "Es", 2: "Sie", 3: "Es", 4: "Er" } },
-    "teil-2": { text: "Meine Familie ist klein. Wir wohnen in Accra." },
+    "teil-2": { text: "Untrusted earlier feedback", recording: { transcript: "Meine Familie ist klein. Wir wohnen in Accra.", audioUrl: "https://example.com/audio.webm" } },
     "teil-3": {
       answers: {
         1: "Ja, ich spiele gern Fußball.",

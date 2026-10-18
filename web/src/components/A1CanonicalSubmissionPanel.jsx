@@ -80,13 +80,13 @@ export const validateA1CanonicalSubmissionCompleteness = ({ assignmentKey = "", 
     const missingTeil1 = missingRequiredNumbers(teil1Answers, 4);
     const familyText = (sections.get("teil-2") || []).join(" ").trim();
 
-    if (!missingTeil1.length && familyText.includes("Recorded family answer") && familyText.includes("AI feedback")) {
+    if (!missingTeil1.length && familyText) {
       return { ok: true, message: "" };
     }
 
     const missing = [];
     if (missingTeil1.length) missing.push(`Teil 1 answers ${missingTeil1.join(", ")}`);
-    if (!familyText.includes("Recorded family answer") || !familyText.includes("AI feedback")) missing.push("Teil 2 recorded family answer and AI feedback");
+    if (!familyText) missing.push("Teil 2 recorded family answer");
     return {
       ok: false,
       message: `Your Chapter 3 workbook is still incomplete. Return to the workbook and finish: ${missing.join("; ")}. Your saved draft has not been submitted.`,

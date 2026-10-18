@@ -63,6 +63,7 @@ export const analyzeAudio = async ({
   userId,
   idToken,
   timeoutMs = null,
+  transcriptionOnly = false,
 }) => {
   const numericTimeoutMs = Number(timeoutMs);
   const hasTimeout =
@@ -87,8 +88,10 @@ export const analyzeAudio = async ({
     : {};
 
   const runAnalysis = async () => {
+    let durableAudioUrl = "";
     const submitViaFirebaseUrl = async () => {
       const audioUrl = audioBlob ? await uploadSpeakingAudio(audioBlob) : "";
+      durableAudioUrl = audioUrl;
       const payload = {
         teil,
         level,
@@ -98,6 +101,7 @@ export const analyzeAudio = async ({
         interactionMode,
         userId: userId || "guest",
         audioUrl,
+        transcriptionOnly,
       };
 
       const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, payload, {
@@ -116,6 +120,7 @@ export const analyzeAudio = async ({
       const filename = audioBlob?.name || "recording.webm";
       formData.append("audio", audioBlob, filename);
       formData.append("teil", teil);
+      if (transcriptionOnly) formData.append("transcriptionOnly", "true");
       formData.append("level", level);
       formData.append("userId", userId || "guest");
 
@@ -133,7 +138,7 @@ export const analyzeAudio = async ({
         ...requestTimeoutConfig,
       });
 
-      return response.data;
+      return { ...response.data, audioUrl: durableAudioUrl || response.data?.audioUrl || "" };
     };
 
     if (!audioBlob) {
