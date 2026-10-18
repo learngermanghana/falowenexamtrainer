@@ -295,28 +295,26 @@ export const B1_READING_TASKS = Object.freeze({
     },
   } }),
   21: Object.freeze({ assignmentKey: "B1-7.21", ...{
-    title: "Lesen · Lebensformen heute",
-    instructions: "Lies den Text und die Aufgaben 1–7. Wähle bei jeder Aufgabe die richtige Lösung A, B oder C.",
+    title: "Lesen B1 – Zeitungstext: Wie wir heute wohnen: Neue Lebensformen im Trend",
+    instructions: "Empfohlene Arbeitszeit: ca. 12 Minuten. Lesen Sie den Text und die Aufgaben 1–5. Welche Lösung (a, b oder c) ist jeweils richtig?",
     image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "People discussing modern living arrangements",
     text: {
-      title: "Magazin „Gesellschaft & Leben“ – Wie wir heute leben",
+      title: "Wie wir heute wohnen: Neue Lebensformen im Trend",
       paragraphs: [
-        "Das klassische Familienmodell – Vater, Mutter und zwei Kinder – ist in Deutschland längst nicht mehr die einzige Form des Zusammenlebens. Immer mehr Menschen entscheiden sich für alternative Lebensformen, die besser zu ihrer persönlichen Situation oder ihren individuellen Lebensentwürfen passen.",
-        "Ein deutlicher Trend ist die Zunahme von Single-Haushalten. In vielen deutschen Großstädten lebt mittlerweile fast die Hälfte aller Menschen alleine. Gründe dafür sind nicht nur berufliche Flexibilität und der Wunsch nach Unabhängigkeit, sondern auch die Tatsache, dass viele junge Erwachsene erst später eine Familie gründen möchten. Dennoch bedeutet allein zu wohnen nicht automatisch, dass man einsam ist, da soziale Kontakte oft intensiv über Freunde, Nachbarn und Vereinsleben gepflegt werden.",
-        "Eine weitere weit verbreitete Lebensform ist die Patchwork-Familie. Wenn Eltern sich trennen und neue Partner finden, bringen sie oft Kinder aus früheren Beziehungen mit in die neue Gemeinschaft. Das Zusammenleben erfordert am Anfang viel Geduld, Toleranz und gegenseitige Rücksichtnahme, da sich alle Familienmitglieder erst an die veränderte Rollenverteilung gewöhnen müssen.",
-        "Auch im Alter verändern sich die Wohnformen spürbar. Immer mehr ältere Menschen möchten nach dem Auszug der Kinder nicht alleine in einer zu großen Wohnung bleiben oder in ein Seniorenheim ziehen. Sie entscheiden sich immer häufiger für eine Senioren-Wohngemeinschaft (WG) oder das sogenannte Mehrgenerationenwohnen. Dabei wohnen Jung und Alt unter einem Dach: Ältere Menschen unterstützen Familien beispielsweise bei der Kinderbetreuung, während die Jüngeren den Senioren bei Einkäufen oder technischen Problemen im Alltag helfen. So profitieren beide Seiten voneinander.",
+        "In Deutschland verändern sich die Lebensformen der Menschen immer schneller. Während früher das klassische Modell – Eltern und Kinder gemeinsam in einem Haus – der Standard war, entscheiden sich heute immer mehr Menschen für alternative Wohnformen.",
+        "Besonders bei jungen Erwachsenen ist das Wohnen in einer Wohngemeinschaft (WG) nach wie vor sehr beliebt. Studien zeigen, dass knapp die Hälfte der Studierenden und Auszubildenden in WGs lebt. Der Hauptgrund dafür sind die hohen Mietpreise in Großstädten: Ein WG-Zimmer ist deutlich günstiger als eine eigene Wohnung. Zudem lernt man schnell neue Leute kennen. Allerdings muss man auch Kompromisse bei der Sauberkeit und der Lautstärke eingehen.",
+        "Gleichzeitig steigt die Zahl der Single-Haushalte kontinuierlich an. Fast 40 Prozent aller Haushalte in Deutschland sind mittlerweile Einpersonenhaushalte. Viele Berufstätige schätzen die Unabhängigkeit und die Ruhe in den eigenen vier Wänden. Dennoch berichten einige Alleinwohnende über Einsamkeit, besonders an Wochenenden.",
+        "Ein neuer Trend sind sogenannte Mehrgenerationenhäuser. Hier wohnen junge Familien, Studierende und Senioren unter einem Dach. Jeder hat seine eigene Wohnung, aber es gibt gemeinsame Räume wie Küche oder Garten. So können sich die Bewohner im Alltag gegenseitig unterstützen – zum Beispiel bei der Kinderbetreuung oder beim Einkaufen. Soziologen glauben, dass dieses Modell in Zukunft noch wichtiger wird."
       ],
       questions: [
-        { stem: "Was wird im ersten Abschnitt über das klassische Familienmodell gesagt?", options: ["A) Es ist nach wie vor die einzig akzeptierte Wohnform in Deutschland.", "B) Es ist nicht mehr die einzige Art, wie Menschen zusammenleben.", "C) Es wird heutzutage von den meisten Menschen abgelehnt."] },
-        { stem: "Was ist ein Grund für die Zunahme von Single-Haushalten in Großstädten?", options: ["A) Der Wunsch nach beruflicher Flexibilität und Unabhängigkeit.", "B) Das Verbot von Familienwohnungen im Stadtzentrum.", "C) Das fehlende Interesse an sozialen Kontakten."] },
-        { stem: "Wie gestalten viele Alleinwohnende ihr soziales Leben?", options: ["A) Sie vermeiden jeden Kontakt zu Nachbarn und Bekannten.", "B) Sie pflegen soziale Kontakte über Freundschaften und Vereine.", "C) Sie suchen Kontakte ausschließlich über das Internet."] },
-        { stem: "Was kennzeichnet eine Patchwork-Familie?", options: ["A) Die Familie lebt nur für wenige Monate im Jahr zusammen.", "B) Neue Partner bringen Kinder aus früheren Beziehungen mit.", "C) Großeltern erziehen die Kinder ohne Hilfe der Eltern."] },
-        { stem: "Was ist am Anfang in einer Patchwork-Familie besonders wichtig?", options: ["A) Strenge finanzielle Regeln für alle Beteiligten.", "B) Geduld, Toleranz und gegenseitige Rücksichtnahme.", "C) Dass alle Kinder dieselbe Schule besuchen."] },
-        { stem: "Warum entscheiden sich manche ältere Menschen für eine Senioren-WG?", options: ["A) Weil sie nicht alleine wohnen oder ins Seniorenheim ziehen möchten.", "B) Weil sie dort rund um die Uhr medizinisch betreut werden müssen.", "C) Weil Seniorenheime in Deutschland geschlossen wurden."] },
-        { stem: "Wie funktioniert das Mehrgenerationenwohnen in der Praxis?", options: ["A) Die jüngere Generation bezahlt die gesamte Miete für die Senioren.", "B) Jung und Alt unterstützen sich gegenseitig im Alltag.", "C) Jede Generation lebt völlig getrennt und ohne Kontakt zueinander."] },
-      ],
-    },
+        { stem: "Warum entscheiden sich viele junge Menschen für eine WG?", options: ["a) Weil ein WG-Zimmer preiswerter ist als eine eigene Wohnung.", "b) Weil es in Großstädten keine freien Einzelwohnungen mehr gibt.", "c) Weil man in einer WG nicht selbst im Haushalt putzen muss."] },
+        { stem: "Was wird im Text als Nachteil des Alleinwohnens genannt?", options: ["a) Man hat nicht genug Ruhe für die Arbeit.", "b) Einige Menschen fühlen sich manchmal einsam.", "c) Die Nebenkosten für Single-Wohnungen sind zu hoch."] },
+        { stem: "Wie viel Prozent der Haushalte in Deutschland sind Einpersonenhaushalte?", options: ["a) Genau 50 Prozent.", "b) Fast 40 Prozent.", "c) Über 60 Prozent."] },
+        { stem: "Was zeichnet ein Mehrgenerationenhaus aus?", options: ["a) Alle Bewohner teilen sich ein einziges Schlafzimmer.", "b) Menschen unterschiedlichen Alters wohnen im selben Gebäude.", "c) Dort wohnen ausschließlich Senioren ohne Familien."] },
+        { stem: "Welchen Vorteil bietet das Mehrgenerationenhaus im Alltag?", options: ["a) Die Miete ist für alle Bewohner kostenlos.", "b) Niemand muss mehr selbst einkaufen gehen.", "c) Die Nachbarn helfen sich gegenseitig bei alltäglichen Aufgaben."] }
+      ]
+    }
   } }),
   23: Object.freeze({ assignmentKey: "B1-7.23", ...{
     title: "Lesen · Anzeigen – Erstes Date & Partnersuche",
