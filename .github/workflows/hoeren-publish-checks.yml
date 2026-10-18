@@ -1,0 +1,42 @@
+name: Hören Studio private publishing checks
+on:
+  pull_request:
+    paths:
+      - "functions/functionz/courseHoerenPublishing.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/__tests__/courseHoerenPublishing.test.js"
+      - "web/src/components/PublishedHoerenPractice.jsx"
+      - "web/src/services/publishedHoerenService.js"
+      - "web/src/components/A1TutorMarkedWorkbookShell.js"
+      - "web/src/components/A2StandardTabbedWorkbookPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - ".github/workflows/hoeren-publish-checks.yml"
+permissions:
+  contents: read
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm install --prefix functions --package-lock=false --no-audit --no-fund
+      - run: node --check functions/functionz/courseHoerenPublishing.js && node --check functions/functionz/app.js
+      - run: npx jest --runInBand functionz/__tests__/courseHoerenPublishing.test.js
+        working-directory: functions
+        env:
+          CI: true
+  web-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm install --package-lock=false --no-audit --no-fund
+      - run: npm run build --prefix web
+        env:
+          CI: false
