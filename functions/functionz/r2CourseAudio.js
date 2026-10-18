@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([8, 10, 12, 17, 18, 21, 22]),
@@ -122,8 +123,9 @@ const validateA1MockAudioKey = ({ mockId, part, key }) => {
 
   const expectedPrefix = `a1/mock-hoeren/${normalizedMockId}/`;
   const expectedKey = `${expectedPrefix}${normalizedPart}`;
-  if (!normalizedKey.startsWith(expectedKey)) return null;
-  if (!isAudioObjectKey(normalizedKey)) return null;
+  const existingFile = normalizedKey.startsWith(`${expectedKey}.`) && isAudioObjectKey(normalizedKey);
+  const canonicalFile = isCanonicalMockHoerenObjectKey({ level: "A1", mockId: normalizedMockId, part: normalizedPart, key: normalizedKey });
+  if (!existingFile && !canonicalFile) return null;
 
   return {
     level: "A1",
@@ -173,8 +175,13 @@ const validateA2MockAudioKey = ({ mockId, part, key }) => {
   const expectedKey = normalizedMockId === "mock-02"
     ? `a2/mock-horen-2/${normalizedPart}.mp3`
     : `a2/mock-hoeren/${normalizedMockId}/${normalizedPart}`;
-  if (normalizedMockId === "mock-02" ? normalizedKey !== expectedKey : !normalizedKey.startsWith(expectedKey)) return null;
-  if (!isAudioObjectKey(normalizedKey)) return null;
+  // Preserve Mock 2's uploaded legacy folder. New mock assets use the canonical
+  // <level>/mock-hoeren/mock-XX/teil-X.mp3 layout, without moving old objects.
+  const existingFile = normalizedMockId === "mock-02"
+    ? normalizedKey === expectedKey
+    : normalizedKey.startsWith(`${expectedKey}.`) && isAudioObjectKey(normalizedKey);
+  const canonicalFile = isCanonicalMockHoerenObjectKey({ level: "A2", mockId: normalizedMockId, part: normalizedPart, key: normalizedKey });
+  if (!existingFile && !canonicalFile) return null;
 
   return {
     level: "A2",
@@ -195,8 +202,11 @@ const validateB1MockAudioKey = ({ mockId, part, key }) => {
 
   const expectedPrefix = "b1/mock-hoeren-1/";
   const expectedKey = `${expectedPrefix}${normalizedPart}`;
-  if (!normalizedKey.startsWith(expectedKey)) return null;
-  if (!isAudioObjectKey(normalizedKey)) return null;
+  // Old mock-hoeren-1 is still supported. Only newly uploaded recordings
+  // should use the canonical mock-hoeren/mock-XX/teil-X.mp3 key.
+  const existingFile = normalizedKey.startsWith(`${expectedKey}.`) && isAudioObjectKey(normalizedKey);
+  const canonicalFile = isCanonicalMockHoerenObjectKey({ level: "B1", mockId: normalizedMockId, part: normalizedPart, key: normalizedKey });
+  if (!existingFile && !canonicalFile) return null;
 
   return {
     level: "B1",
@@ -217,8 +227,11 @@ const validateB2MockAudioKey = ({ mockId, part, key }) => {
 
   const expectedPrefix = "b2/mock-hoeren-1/";
   const expectedKey = `${expectedPrefix}${normalizedPart}`;
-  if (!normalizedKey.startsWith(expectedKey)) return null;
-  if (!isAudioObjectKey(normalizedKey)) return null;
+  // Old mock-hoeren-1 is still supported. Only newly uploaded recordings
+  // should use the canonical mock-hoeren/mock-XX/teil-X.mp3 key.
+  const existingFile = normalizedKey.startsWith(`${expectedKey}.`) && isAudioObjectKey(normalizedKey);
+  const canonicalFile = isCanonicalMockHoerenObjectKey({ level: "B2", mockId: normalizedMockId, part: normalizedPart, key: normalizedKey });
+  if (!existingFile && !canonicalFile) return null;
 
   return {
     level: "B2",
