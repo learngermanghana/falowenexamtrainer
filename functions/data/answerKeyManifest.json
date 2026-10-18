@@ -1808,14 +1808,12 @@
         "Answer4": "Er."
       },
       "teil3": {
-        "Answer1": "Ich spiele gern Fußball. / Ich spiele nicht gern Fußball.",
-        "Answer2": "Ich mag Schwimmen. / Ich mag nicht Schwimmen.",
-        "Answer3": "Ich mag Lesen. / Ich mag nicht Lesen.",
-        "Answer4": "Ich mag Malen. / Ich mag nicht Malen.",
-        "Answer5": "Ich mag Musik. / Ich mag nicht Musik.",
-        "Answer6": "Ich mag Kochen. / Ich mag nicht Kochen.",
-        "Answer7": "Ich mag Reisen. / Ich mag nicht Reisen.",
-        "Answer8": "Ich mag Gartenarbeit. / Ich mag nicht Gartenarbeit."
+        "Answer1": "gern",
+        "Answer2": "Magst",
+        "Answer3": "gern",
+        "Answer4": "mögen",
+        "Answer5": "gern",
+        "Answer6": "mag"
       }
     },
     "assignment_id": "A1-3"
