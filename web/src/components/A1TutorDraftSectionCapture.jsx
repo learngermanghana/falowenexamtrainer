@@ -335,7 +335,7 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
     };
   }, [choiceItems, savedSection.answers, sectionKey, sectionProfile, updateAnswer]);
 
-  if (!draftContext || !sectionProfile || sectionProfile.readOnly || sectionProfile.required === false) return null;
+  if (!draftContext || !sectionProfile || sectionProfile.readOnly || sectionProfile.required === false || sectionProfile.speaking) return null;
 
   const allChoiceItemsBound = choiceItems.length > 0 && choiceItems.every((item) => boundChoiceNumbers.includes(item.number));
   const choiceOnlySection = choiceItems.length > 0 && shortItems.length === 0 && !sectionProfile.writing && !sectionProfile.embeddedWriting;
