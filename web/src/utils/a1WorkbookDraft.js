@@ -33,6 +33,18 @@ const sanitizeA1WorkbookDraft = (draft) => {
       };
     }
   });
+  // A1-7's new five-sign reading does not replace the five-question
+  // listening recording. Preserve only listening from the prior V2 workbook.
+  if (normalizeAssignmentKey(draft.assignmentKey) === "A1-7") {
+    const compatibleListening = ["thomas-time-and-new-listening-5-each-v2", config.revision].includes(draft.readingRevision);
+    if (!compatibleListening) delete sections["teil-2"];
+    else if (sections["teil-2"]) {
+      sections["teil-2"] = {
+        answers: Object.fromEntries(Object.entries(sections["teil-2"].answers || {})
+          .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= 5)),
+      };
+    }
+  }
   return { ...draft, ...readingRevision(draft.assignmentKey), sections };
 };
 
