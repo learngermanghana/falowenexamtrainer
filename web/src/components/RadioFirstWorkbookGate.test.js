@@ -53,7 +53,6 @@ describe("A1 direct Radio destinations", () => {
     [9, "5", "A1-5", "/campus/course/a1-chapter-5-german-cases-workbook"],
     [16, "9", "A1-9", "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook"],
     [16, "10", "A1-10", "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook"],
-    [18, "12.2", "A1-12.2", "/campus/course/a1-12-2-dative-articles-mit-bei-zu"],
     [20, "12.3", "A1-12.3", "/campus/course/letter-writing-intro-german-a1-day-12-3"],
   ])("opens Day %s chapter %s with canonical tutor assignment identity", (day, chapter, assignmentKey, path) => {
     const href = buildCompletedRadioHref({
@@ -66,9 +65,22 @@ describe("A1 direct Radio destinations", () => {
     expect(url.searchParams.get("assignmentId")).toBe(assignmentKey);
     expect(url.searchParams.get("level")).toBe("A1");
     expect(url.searchParams.get("radio")).toBe("done");
-    if (assignmentKey === "A1-12.2" || assignmentKey === "A1-12.3") {
+    if (assignmentKey === "A1-12.3") {
       expect(url.searchParams.get("view")).toBe("workbook");
     }
+  });
+
+  test("chapter 12.2 opens its standalone Dative Prepositions resource, not a retired tutor assignment", () => {
+    const href = buildCompletedRadioHref({
+      pathname: "/campus/course/lesson/A1/18",
+      search: "?chapter=12.2&hub=1",
+    });
+    const url = new URL(href, "https://www.falowen.app");
+    expect(url.pathname).toBe("/campus/course/a1-12-2-dative-articles-mit-bei-zu");
+    expect(url.searchParams.get("radio")).toBe("done");
+    expect(url.searchParams.get("assignmentKey")).toBeNull();
+    expect(url.searchParams.get("assignmentId")).toBeNull();
+    expect(url.searchParams.get("view")).toBe("workbook");
   });
 
   test("returns an A1 grammar deep link to the grammar page after Radio", () => {
