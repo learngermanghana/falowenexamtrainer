@@ -71,10 +71,20 @@ export default function PlacementFunnelNextStep({ result }) {
     setSaving(true);
     setStatus("Saving your placement result and contact details...");
     try {
-      const saved = await postPlacementEvent({
+      const payload={
         id:result.attemptId,action:"contact",name:normalizedName,email:normalizedEmail,
         phone:normalizedPhone,consent:true,
-      });
+      };
+      let saved;
+      // Completion is written asynchronously. Retry only the known 409
+      // score-still-saving race, never retry arbitrary validation failures.
+      for(let attempt=0;attempt<4;attempt++){
+        try {saved=await postPlacementEvent(payload);break;}
+        catch(error){
+          if(error.status!==409 || attempt===3)throw error;
+          await new Promise(resolve=>setTimeout(resolve,500*(attempt+1)));
+        }
+      }
       // Preserve the existing admissions/Google Apps Script funnel. The Apps Script
       // request is opaque (no-cors), so success here means the private result is saved.
       void submitPublicLead({
