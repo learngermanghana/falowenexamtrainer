@@ -34,6 +34,21 @@ case must remain unchanged; Cloudflare R2 keys are case sensitive.
 | C1 exam sample | `c1/exam-horen-1/teil-1.mp3` | Keep (separate sample type) |
 | B1 speaking sample | `b1/mock-hoeren-1/sprechen-teil-1.mp3` | Keep (not a new listening part) |
 
+The API's R2 signed-URL validators recognize both the legacy names and
+canonical new names, but **canonical syntax alone never authorizes playback**.
+The signed-URL endpoints also call `publishedMockHoerenAccess.js` before signing.
+The already accessible A1/A2 Mock 1 MP3s have exact server-side allowlisted
+keys; other canonical recordings are denied unless an explicitly published
+server-side manifest matches the requested level, mock ID, Teil and exact key.
+
+To release a future mock recording, backend-controlled teacher publishing must
+write a Firestore document at `publishedMockHoerenAudio/{level-lowercase}-{mockId}`,
+with `status: "published"`, e.g. `level: "B1"`, `mockId: "mock-02"`
+and `parts: { "teil-1": "b1/mock-hoeren/mock-02/teil-1.mp3" }`.
+Draft, absent and mismatched manifests do **not** grant access. Do not allow
+students to create or edit release manifests. The request's own `key` is
+never proof that an audio file has been published.
+
 The R2 signed-URL validators explicitly accept both these legacy object names
 and the canonical *new* names. **Supporting a canonical key does not migrate,
 copy, rename or create that object in R2**. New code must upload to the
@@ -45,7 +60,7 @@ canonical key before referring to it.
    playback limits unchanged.
 2. Use `hoeren` for machine slugs, `Hören` for student display.
 3. Use `mock-01`, `mock-02`, ... and `teil-1.mp3`, etc. for future audio.
-4. Maintain exact object-key checks with protected signed GET links. Never
+4. Check the actual server-published manifest before issuing a signed URL for canonical new files. Maintain exact object-key checks with protected signed GET links. Never
    auto-deaccent, lowercase or rewrite an existing key at request time.
 5. Keep existing A1/A2/B1/B2 listening mock paths plus A1/C1 sample paths as
    compatibility fixtures in `mockHoerenObjectKeys.test.js`.
