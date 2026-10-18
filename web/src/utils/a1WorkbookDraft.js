@@ -7,6 +7,7 @@ const normalizeAssignmentKey = (value = "") =>
 // Changed reading exercises must not reuse answers to the former questions.
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
+  "A1-12.1": { revision: "a1-12.1-bahn-auto-beruf-v2", sections: { "teil-1": 5, "teil-2": 0 } },
   "A1-4": { revision: "a1-4-listening-v2", sections: { "teil-3": 5 } },
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   // Reading only changed again. Preserve saved listening answers (Teil 2).
@@ -152,7 +153,9 @@ export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
         : section.text ? String(section.text).trim() : answerLines.join("\n");
       if (!body) return "";
       const normalizedAssignment = String(assignment.assignmentKey || "").toUpperCase();
-      const exerciseVersion = normalizedAssignment === "A1-4" && key === "teil-3"
+      const exerciseVersion = normalizedAssignment === "A1-12.1" && key === "teil-1"
+        ? "A1-12.1-READING-V2\n"
+        : normalizedAssignment === "A1-4" && key === "teil-3"
         ? "A1-4-LISTENING-V2\n"
         : normalizedAssignment === "A1-6" && key === "teil-1"
           ? "A1-6-WORKBOOK-V2\n"

@@ -12,9 +12,9 @@ test('the active curriculum has 19 required assignments and one Day 18 exercise'
   expect(A1_ASSIGNMENT_ORDER).not.toContain('A1-12.2');
   expect(getA1CanonicalLesson('12.2').assignmentKey).toBe('A1-12.1');
 });
-test('12.1 still has its existing five questions per part', () => {
+test('12.1 has five reading and five unchanged listening questions', () => {
   const profile = getA1TutorDraftProfile('A1-12.1');
-  expect(Object.values(profile.sections).map(part => part.items.length)).toEqual([5,5,5]);
+  expect(Object.values(profile.sections).map(part => part.items.length)).toEqual([5,5]);
 });
 test('old 12.2 results remain historical and do not pass the new speaking assignment', () => {
   const rows = mergeAssignmentProgress({

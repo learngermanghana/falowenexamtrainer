@@ -131,8 +131,7 @@ const profiles = {
   },
   "A1-12.1": {
     sections: {
-      "teil-1": section(choiceItems(5), { label: "Lesen" }),
-      "teil-2": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Anzeigen" }),
+      "teil-1": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen" }),
       "teil-3": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Hören" }),
     },
   },

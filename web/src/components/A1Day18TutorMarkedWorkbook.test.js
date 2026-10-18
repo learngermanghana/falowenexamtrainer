@@ -19,8 +19,8 @@ describe("A1 Day 18 tutor-marked workbook ownership", () => {
         layoutMode: "native",
       }),
     );
-    expect(assignment.sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
-    expect(Object.keys(draftProfile.sections)).toEqual(["teil-1", "teil-2", "teil-3"]);
+    expect(assignment.sections.map(({ key }) => key)).toEqual(["teil-1", "teil-3"]);
+    expect(Object.keys(draftProfile.sections)).toEqual(["teil-1", "teil-3"]);
   });
 
   test("Kapitel 12.1 Grammar stays embedded through the canonical grammar component", () => {
