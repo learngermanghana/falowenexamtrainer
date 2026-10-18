@@ -12,7 +12,11 @@ const markSent=(key)=>{try{localStorage.setItem(SENT_PREFIX+key,"1");}catch(_){}
 export async function postPlacementEvent(payload){
   const response=await fetch(API_PATH,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload),cache:"no-store"});
   const result=await response.json().catch(()=>({}));
-  if(!response.ok||result.ok!==true)throw new Error(result.error||"Could not save your placement record");
+  if(!response.ok||result.ok!==true){
+    const error=new Error(result.error||"Could not save your placement record");
+    error.status=response.status;
+    throw error;
+  }
   return result;
 }
 export async function sendPlacementEventOnce(payload){

@@ -1,6 +1,7 @@
 // Low-cost placement monitoring: reuses existing Vercel + Sheets service account.
 // Data is encrypted before writing to the hidden PlacementAttempts tab of the existing Students workbook.
 const crypto = require("node:crypto");
+const { sendPlacementResultEmail } = require("./placement-result-email");
 
 const SHEET_TAB = "PlacementAttempts";
 const ANSWERS = [0,1,1,1,1,1,1,1,0,0,1,1,0,0,2,1,0,2,0,0,0,1,0,1,0,1,0,0,1,1];
@@ -117,11 +118,12 @@ async function readRecords() {
   const byId=new Map();
   for(const row of rows) {
     try {
-      const event=unseal(row[2]);if(!validId(event.id)||!["start","complete","contact"].includes(event.type))continue;
+      const event=unseal(row[2]);if(!validId(event.id)||!["start","complete","contact","email_sent"].includes(event.type))continue;
       const previous=byId.get(event.id)||{id:event.id,status:"started",startedAt:null,completedAt:null,contactedAt:null};
       if(event.type==="start"){previous.startedAt=event.at;previous.status=previous.completedAt?"completed":"in_progress";}
       if(event.type==="complete"){previous.completedAt=event.at;previous.status="completed";previous.score=event.score||null;previous.source=event.source||"placement-test";}
       if(event.type==="contact"){previous.contactedAt=event.at;previous.name=event.contact.name;previous.email=event.contact.email;previous.phone=event.contact.phone;previous.consent=true;previous.leadId=event.id;}
+      if(event.type==="email_sent"){previous.emailSentAt=event.at;}
       byId.set(event.id,previous);
     }catch(_){}
   }
@@ -175,6 +177,26 @@ async function handler(req,res){
     }
     if(body.action==="contact"){
       event.contact=normaliseContact(body);
+      // Never email a guessed attempt ID or ungraded result. A score must
+      // exist on the server, not just in the learner's browser.
+      const record=(await readRecords()).find(x=>x.id===body.id);
+      if(!record?.completedAt||!record.score)
+        throw Object.assign(new Error("Your result is still saving. Please wait a moment and try again."),{status:409});
+      if(record.emailSentAt) {
+        if(record.email && event.contact.email!==record.email)
+          throw Object.assign(new Error("Your result was already emailed. Contact Falowen to change the address."),{status:409});
+        return res.status(200).json({ok:true,id:event.id,emailStatus:"already_sent"});
+      }
+      await appendEvent(event);
+      if(!event.contact.email) return res.status(200).json({ok:true,id:event.id,emailStatus:"no_email"});
+      const sent=await sendPlacementResultEmail({id:event.id,contact:event.contact,score:record.score});
+      if(sent.status==="sent"){
+        // The Apps Script also uses a per-attempt delivery key, so retries
+        // cannot result in another email when a Sheet append briefly fails.
+        try{await appendEvent({id:event.id,type:"email_sent",at:new Date().toISOString()});}
+        catch(error){console.error("placement_mail_receipt_error",String(error?.message||"unknown"));}
+      }
+      return res.status(200).json({ok:true,id:event.id,emailStatus:sent.status});
     }
     await appendEvent(event);
     return res.status(200).json({ok:true,id:event.id,...(event.score?{score:event.score}:{})});
