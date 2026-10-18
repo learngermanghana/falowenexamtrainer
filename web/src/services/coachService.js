@@ -170,6 +170,23 @@ export const analyzeAudio = async ({
   }
 };
 
+
+// A1 tutor checkpoints use direct multipart assessment, never Firebase Storage.
+// Only the returned score and brief feedback are persisted in the workbook draft.
+export const assessA1TutorSpeaking = async ({ audioBlob, assignmentKey, examPart, question, idToken }) => {
+  const form = new FormData();
+  form.append("audio", audioBlob, "a1-tutor-speaking.webm");
+  form.append("level", "A1");
+  form.append("teil", String(examPart));
+  form.append("contextType", `A1 tutor checkpoint ${assignmentKey}`);
+  form.append("question", question);
+  const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, form, {
+    headers: authHeaders(idToken),
+    timeout: 45000,
+  });
+  return response.data || {};
+};
+
 export const scoreInteractionAudio = async ({
   audioBlob,
   initialTranscript,

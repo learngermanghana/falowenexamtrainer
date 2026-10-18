@@ -77,20 +77,38 @@ test("reports incomplete Health workbook until both reading parts and listening 
   );
 });
 
-test("blocks serialized final submission when a profiled required answer is missing", () => {
-  const incomplete = makeSerializedSections({
-    "teil-1": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-    "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig", "4. Falsch"],
-    "teil-3": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-  });
-  const result = validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: incomplete });
-  expect(result.ok).toBe(false);
-  expect(result.message).toContain("Teil 2 answers 5");
+test("replaces only the agreed A1 assignment sections with Goethe speaking", () => {
+  for (const [key, part, exam] of [
+    ["A1-4", "teil-2", "Sich vorstellen"],
+    ["A1-8", "teil-2", "Fragen und Antworten"],
+    ["A1-11", "teil-1", "Bitten und Reagieren"],
+  ]) {
+    const assignment = getA1Assignment(key);
+    const profile = getA1TutorDraftProfile(key);
+    expect(assignment.sections.map(({ key: sectionKey }) => sectionKey)).toEqual(Object.keys(profile.sections));
+    expect(profile.sections[part]).toEqual(expect.objectContaining({ speaking: true, label: expect.stringContaining(exam) }));
+    expect(profile.sections[part].items).toHaveLength(0);
+  }
+  expect(getA1Assignment("A1-8").sections).toHaveLength(2);
+});
 
-  const complete = makeSerializedSections({
+test("requires an assessed speaking result instead of obsolete objective answers", () => {
+  const base = {
     "teil-1": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-    "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig", "4. Falsch", "5. Richtig"],
-    "teil-3": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-  });
+  };
+  const noSpeaking = makeSerializedSections({ ...base, "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig"] });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: noSpeaking }).ok).toBe(false);
+  const fakeScore = makeSerializedSections({ ...base, "teil-2": ["Score: 20/10"] });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: fakeScore }).ok).toBe(false);
+  const complete = makeSerializedSections({ ...base, "teil-2": [
+    "GOETHE_A1_TUTOR_SPEAKING_V1",
+    "Speaking exam part: 2",
+    "Score: 7/10",
+    "Feedback: Ask complete questions.",
+  ] });
   expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: complete })).toEqual({ ok: true, message: "" });
+  expect(getA1TutorDraftProgress({ assignmentKey: "A1-8", draft: { sections: {
+    "teil-1": { answers: Object.fromEntries(Array.from({ length: 5 }, (_, index) => [index + 1, "A"])) },
+    "teil-2": { text: complete.get("teil-2").join("\n") },
+  } } })).toEqual(expect.objectContaining({ complete: true, total: 6, completed: 6 }));
 });

@@ -8,14 +8,21 @@ const normalizeAssignmentKey = (value = "") =>
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
   "A1-12.1": { revision: "a1-12.1-bahn-auto-beruf-v2", sections: { "teil-1": 5, "teil-2": 0 } },
-  "A1-4": { revision: "a1-4-listening-v2", sections: { "teil-3": 5 } },
+  "A1-4": { revision: "a1-4-goethe-speaking-v3", sections: { "teil-2": 0, "teil-3": 5 } },
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   // Reading only changed again. Preserve saved listening answers (Teil 2).
   "A1-7": { revision: "five-opening-hours-signs-v3", sections: { "teil-1": 5 } },
-  "A1-8": { revision: "hamburg-message-and-berlin-train-5-each-v2", sections: { "teil-1": 5, "teil-2": 5 } },
-  "A1-11": { revision: "tourist-info-and-bahnhof-directions-5-each-v1", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
+  "A1-8": { revision: "hamburg-and-speaking-checkpoint-v3", sections: { "teil-1": 5, "teil-2": 0 } },
+  "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 0 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
+};
+// Previous homework revisions contain valid answers for the Teile that were
+// not replaced. Retain them instead of deleting students' Hören/Lesen work.
+const COMPATIBLE_UNCHANGED_SECTIONS = {
+  "A1-4": { from: "a1-4-listening-v2", keys: ["teil-3"] },
+  "A1-8": { from: "hamburg-message-and-berlin-train-5-each-v2", keys: ["teil-1"] },
+  "A1-11": { from: "tourist-info-and-bahnhof-directions-5-each-v1", keys: ["teil-2"] },
 };
 const readingRevision = (assignmentKey) => {
   const config = READING_REVISIONS[normalizeAssignmentKey(assignmentKey)];
@@ -31,10 +38,12 @@ const sanitizeA1WorkbookDraft = (draft) => {
   if (!config) return draft;
   const sections = { ...(draft.sections || {}) };
   Object.entries(config.sections).forEach(([sectionKey, questionCount]) => {
-    if (draft.readingRevision !== config.revision) {
+    const compatible = COMPATIBLE_UNCHANGED_SECTIONS[normalizeAssignmentKey(draft.assignmentKey)];
+    const keepFromOlderRevision = compatible && draft.readingRevision === compatible.from && compatible.keys.includes(sectionKey);
+    if (draft.readingRevision !== config.revision && !keepFromOlderRevision) {
       delete sections[sectionKey];
     } else if (sections[sectionKey]) {
-      sections[sectionKey] = {
+      sections[sectionKey] = questionCount === 0 ? { text: String(sections[sectionKey].text || "").trim() } : {
         answers: Object.fromEntries(Object.entries(sections[sectionKey].answers || {})
           .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= questionCount)),
       };

@@ -17,6 +17,7 @@ const section = (items, options = {}) => ({
   items,
   label: options.label || "",
   writing: Boolean(options.writing),
+  speaking: Boolean(options.speaking),
   embeddedWriting: Boolean(options.embeddedWriting),
   readOnly: Boolean(options.readOnly),
   inlineAnswers: Boolean(options.inlineAnswers),
@@ -68,7 +69,7 @@ const profiles = {
   "A1-4": {
     sections: {
       "teil-1": section(shortItems(5, "Translate into German"), { label: "Translation", inlineAnswers: true }),
-      "teil-2": section(choiceItems(7), { label: "Germany's neighbours" }),
+      "teil-2": section([], { label: "Sprechen: Sich vorstellen", speaking: true }),
       "teil-3": section(choiceItems(5, ["A", "B", "C"]), { label: "Hören", inlineAnswers: true }),
     },
   },
@@ -98,8 +99,7 @@ const profiles = {
   "A1-8": {
     sections: {
       "teil-1": section(choiceItems(5), { label: "Lesen" }),
-      "teil-2": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Richtig oder Falsch" }),
-      "teil-3": section(choiceItems(5), { label: "Hörverstehen" }),
+      "teil-2": section([], { label: "Sprechen: Fragen und Antworten", speaking: true }),
     },
   },
   "A1-9": {
@@ -121,7 +121,7 @@ const profiles = {
   },
   "A1-11": {
     sections: {
-      "teil-1": section(choiceItems(5, ["A", "B", "C"]), { label: "Lesen" }),
+      "teil-1": section([], { label: "Sprechen: Bitten und Reagieren", speaking: true }),
       "teil-2": section([
         ...choiceItems(3, ["A", "B"]),
         { number: 4, type: "choice", choices: ["A", "B", "C"] },
@@ -174,9 +174,9 @@ export const getA1TutorDraftSectionProgress = ({ assignmentKey = "", sectionKey 
   }
 
   const savedSection = draft?.sections?.[sectionKey] || {};
-  if (sectionProfile.writing || sectionProfile.embeddedWriting) {
-    const complete = hasValue(savedSection.text);
-    return { complete, completed: complete ? 1 : 0, total: 1, missing: complete ? [] : ["writing"] };
+  if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
+    const complete = sectionProfile.speaking ? /^GOETHE_A1_TUTOR_SPEAKING_V1\s*\nSpeaking exam part: [123]\s*\nScore: (?:10(?:\.0+)?|[0-9](?:\.\d+)?)\/10\s*\nFeedback: \S/m.test(String(savedSection.text || "")) : hasValue(savedSection.text);
+    return { complete, completed: complete ? 1 : 0, total: 1, missing: complete ? [] : [sectionProfile.speaking ? "speaking assessment" : "writing"] };
   }
 
   const missing = sectionProfile.items
@@ -214,8 +214,8 @@ export const validateA1TutorDraftSubmissionSections = ({ assignmentKey = "", sec
   Object.entries(profile.sections).forEach(([sectionKey, sectionProfile]) => {
     if (sectionProfile.readOnly || sectionProfile.required === false) return;
     const serializedLines = sections.get(sectionKey) || [];
-    if (sectionProfile.writing || sectionProfile.embeddedWriting) {
-      if (!serializedLines.join(" ").trim()) missing.push(`${sectionKey.replace("teil-", "Teil ")} writing`);
+    if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
+      if (sectionProfile.speaking ? !/^GOETHE_A1_TUTOR_SPEAKING_V1\s*$/m.test(serializedLines.join("\n")) || !/^Score: (?:10(?:\.0+)?|[0-9](?:\.\d+)?)\/10\s*$/m.test(serializedLines.join("\n")) : !serializedLines.join(" ").trim()) missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking ? "speaking assessment" : "writing"}`);
       return;
     }
 
