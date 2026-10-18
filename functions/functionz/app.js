@@ -6027,9 +6027,19 @@ app.post("/speaking/a1-workbook-score", audioUpload, async (req, res) => {
     if (!task) return res.status(400).json({ error: "Unknown A1 speaking checkpoint." });
     if (!req.file?.buffer?.length) return res.status(400).json({ error: "A recorded answer is required." });
     if (req.file.size > 5 * 1024 * 1024) return res.status(413).json({ error: "Recording is too large." });
+    const database = getFirestoreSafe();
+    if (!database) return res.status(503).json({ error: "Speaking scores cannot be saved right now. Please try later." });
+    const scoreRef = database.collection("a1WorkbookSpeakingScores")
+      .doc(authedUser.uid + "_" + assignmentKey);
+    const prior = await scoreRef.get();
+    if (prior.exists && Number.isInteger(prior.data()?.score)) {
+      const previous = prior.data();
+      return res.json({
+        assignmentKey, score: previous.score, strength: previous.strength,
+        improvement: previous.improvement, alreadyScored: true,
+      });
+    }
     if (!ensureOpenAIConfigured(res)) return;
-    const transcript = String((await transcribeAudio(req.file)) || "").trim().slice(0, 4000);
-    if (!transcript) return res.status(422).json({ error: "No clear German speech detected. Please record again." });
     const quota = await enforceUserQuota({
       uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking,
     });
@@ -6037,6 +6047,8 @@ app.post("/speaking/a1-workbook-score", audioUpload, async (req, res) => {
       error: "Daily speaking assessment limit reached. Try again tomorrow.",
       code: "SPEAKING_QUOTA_REACHED",
     });
+    const transcript = String((await transcribeAudio(req.file)) || "").trim().slice(0, 4000);
+    if (!transcript) return res.status(422).json({ error: "No clear German speech detected. Please record again." });
     const rubric = [
       "You are a strict but supportive Goethe A1 speaking assessor.",
       "Assess only the learner transcript against the assigned task.",
@@ -6063,16 +6075,23 @@ app.post("/speaking/a1-workbook-score", audioUpload, async (req, res) => {
       !String(parsed?.strength || "").trim() || !String(parsed?.improvement || "").trim()) {
       return res.status(502).json({ error: "Speaking assessment was incomplete. Please retry." });
     }
-    auditAIRequest({
-      route: "/speaking/a1-workbook-score", uid: authedUser.uid, email: authedUser.email,
-      metadata: { assignmentKey, score: parsed.score, quotaRemaining: quota.remaining },
-    });
-    return res.json({
+    const score = {
       assignmentKey,
       score: parsed.score,
       strength: String(parsed.strength).trim().slice(0, 200),
       improvement: String(parsed.improvement).trim().slice(0, 200),
+    };
+    await scoreRef.set({
+      ...score,
+      uid: authedUser.uid,
+      scoredAt: admin.firestore.FieldValue.serverTimestamp(),
+      assessmentVersion: "a1-workbook-speaking-v1",
     });
+    auditAIRequest({
+      route: "/speaking/a1-workbook-score", uid: authedUser.uid, email: authedUser.email,
+      metadata: { assignmentKey, score: score.score, quotaRemaining: quota.remaining },
+    });
+    return res.json(score);
   } catch (err) {
     console.error("/speaking/a1-workbook-score error", err);
     auditAIRequest({
