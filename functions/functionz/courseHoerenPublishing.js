@@ -2,6 +2,7 @@
 // Private course-listening publishing. MP3 transfer and marking do not call Gemini.
 const crypto = require("node:crypto");
 const { getR2AudioConfig } = require("./r2CourseAudio");
+const { lessonCatalog } = require("../data/lessonCatalog");
 
 const OWNER_SHA256 = "e8bc09aac410e86216e384ab4c612d6ac6551273085f8344206b23f4004f90a1";
 const LEVELS = new Set(["A1", "A2", "B1"]);
@@ -14,6 +15,21 @@ function isPublisherOwner(uid, env = process.env) {
   if (configured) return uid === configured;
   const digest = crypto.createHash("sha256").update(String(uid || "")).digest();
   return crypto.timingSafeEqual(digest, Buffer.from(OWNER_SHA256, "hex"));
+}
+
+function getPublishableLessons() {
+  const byKey = new Map();
+  for (const entry of lessonCatalog) {
+    const level = String(entry.level || "").toUpperCase();
+    const assignmentKey = String(entry.assignmentId || "").toUpperCase();
+    const day = Number(entry.day);
+    if (!LEVELS.has(level) || !new RegExp("^" + level + "-[0-9]{1,2}(?:\\.[0-9]{1,2})?$").test(assignmentKey)
+      || !Number.isInteger(day) || day < 1 || day > 60 ||
+      !entry.workbookRoute || entry.contentStatus !== "published") continue;
+    const item = { level, day, assignmentKey, title: String(entry.title || ""), route: String(entry.workbookRoute || "") };
+    byKey.set(assignmentKey, item);
+  }
+  return [...byKey.values()].sort((a, b) => a.level.localeCompare(b.level) || a.day - b.day || a.assignmentKey.localeCompare(b.assignmentKey));
 }
 
 function normaliseAssignmentId(id) {
@@ -58,6 +74,9 @@ function validatePublication(input, audio) {
   if (!LEVELS.has(level) || !assignmentKey.startsWith(`${level}-`)) throw new Error("Assignment and level must match.");
   const day = Number(input.day);
   if (!Number.isInteger(day) || day < 1 || day > 60) throw new Error("Choose a valid Course Book day.");
+  if (!getPublishableLessons().some(item => item.level === level && item.day === day && item.assignmentKey === assignmentKey)) {
+    throw new Error("Select an existing published Falowen Course Book assignment and its correct day.");
+  }
   const title = String(input.title || "").trim();
   const script = String(input.script || "").trim();
   const kind = String(input.kind || "").trim();
@@ -145,4 +164,4 @@ function scoreHoerenLesson(lesson, submitted) {
   return { correct: normalized.filter(Boolean).length, total: 5, score: normalized.filter(Boolean).length * 20 };
 }
 
-module.exports = { isPublisherOwner, normaliseAssignmentId, validateQuestions, validatePublication, signedStudioUrl, publishHoerenLesson, toStudentLesson, scoreHoerenLesson };
+module.exports = { getPublishableLessons, isPublisherOwner, normaliseAssignmentId, validateQuestions, validatePublication, signedStudioUrl, publishHoerenLesson, toStudentLesson, scoreHoerenLesson };
