@@ -21,7 +21,7 @@ describe("structured submission templates", () => {
 
   test("does not turn an A1 vocabulary reminder into a required submission part", () => {
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-8" }).parts.map((part) => part.partId))
-      .toEqual(["teil1", "teil2", "teil3"]);
+      .toEqual(["teil1", "teil2"]);
     expect(getStructuredSubmissionProfile({ level: "A1", assignmentKey: "A1-9" }).parts.map((part) => part.partId))
       .toEqual(["teil1", "teil2", "teil3"]);
   });

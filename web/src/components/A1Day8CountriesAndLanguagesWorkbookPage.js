@@ -2,6 +2,7 @@ import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
 import A1TranslationTask from "./A1TranslationTask";
 import A1Day8ListeningPractice from "./A1Day8ListeningPractice";
+import A1WorkbookSpeakingCheckpoint from "./A1WorkbookSpeakingCheckpoint";
 
 import { styles } from "../styles";
 
@@ -16,29 +17,12 @@ const sectionTitleStyle = {
   fontSize: "1.1rem",
 };
 
-const subSectionTitleStyle = {
-  margin: 0,
-  fontSize: "1rem",
-};
-
-const listStyle = {
-  margin: 0,
-  paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
 const imageStyle = {
   width: "100%",
   maxHeight: 320,
   objectFit: "cover",
   borderRadius: 12,
 };
-
-const essayText = [
-  "Deutschland liegt in Europa. Es hat neun Nachbarländer. Diese sind: Dänemark, Polen, Tschechien, Österreich, die Schweiz, Frankreich, Luxemburg, Belgien und die Niederlande.",
-  "In Deutschland spricht man Deutsch. In Polen spricht man Polnisch. In Frankreich spricht man Französisch. In den Niederlanden spricht man Niederländisch. In Österreich und der Schweiz spricht man Deutsch. In der Schweiz spricht man auch Französisch und Italienisch.",
-  "Die Nachbarländer haben viele interessante Städte. Paris ist in Frankreich. Es ist eine sehr schöne Stadt. Amsterdam ist in den Niederlanden. Es hat viele Kanäle. In der Schweiz gibt es die Alpen. Sie sind sehr hoch.",
-];
 
 const A1Day8CountriesAndLanguagesWorkbookPage = () => {
   return (
@@ -73,79 +57,8 @@ const A1Day8CountriesAndLanguagesWorkbookPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>Teil 2 · Essay: Germany&apos;s Neighbors</h2>
-        {essayText.map((paragraph) => (
-          <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>
-            {paragraph}
-          </p>
-        ))}
-
-        <h3 style={subSectionTitleStyle}>Questions</h3>
-        <ol style={listStyle}>
-          <li>
-            Wie viele Nachbarländer hat Deutschland?
-            <ul style={listStyle}>
-              <li>a) Sieben</li>
-              <li>b) Acht</li>
-              <li>c) Neun</li>
-              <li>d) Zehn</li>
-            </ul>
-          </li>
-          <li>
-            Welche Sprache spricht man in Polen?
-            <ul style={listStyle}>
-              <li>a) Deutsch</li>
-              <li>b) Polnisch</li>
-              <li>c) Französisch</li>
-              <li>d) Niederländisch</li>
-            </ul>
-          </li>
-          <li>
-            Welche Sprache spricht man in den Niederlanden?
-            <ul style={listStyle}>
-              <li>a) Deutsch</li>
-              <li>b) Polnisch</li>
-              <li>c) Französisch</li>
-              <li>d) Niederländisch</li>
-            </ul>
-          </li>
-          <li>
-            Welche Sprache spricht man in Österreich?
-            <ul style={listStyle}>
-              <li>a) Deutsch</li>
-              <li>b) Polnisch</li>
-              <li>c) Französisch</li>
-              <li>d) Niederländisch</li>
-            </ul>
-          </li>
-          <li>
-            Welche Stadt ist in Frankreich?
-            <ul style={listStyle}>
-              <li>a) Berlin</li>
-              <li>b) Amsterdam</li>
-              <li>c) Paris</li>
-              <li>d) Wien</li>
-            </ul>
-          </li>
-          <li>
-            Welche Stadt hat viele Kanäle?
-            <ul style={listStyle}>
-              <li>a) Berlin</li>
-              <li>b) Amsterdam</li>
-              <li>c) Paris</li>
-              <li>d) Wien</li>
-            </ul>
-          </li>
-          <li>
-            Wo sind die Alpen?
-            <ul style={listStyle}>
-              <li>a) In Polen</li>
-              <li>b) In Frankreich</li>
-              <li>c) In der Schweiz</li>
-              <li>d) In Deutschland</li>
-            </ul>
-          </li>
-        </ol>
+        <h2 style={sectionTitleStyle}>Teil 2 · Sprechen: Sich vorstellen</h2>
+        <A1WorkbookSpeakingCheckpoint assignmentKey="A1-4" />
       </section>
 
       <section style={cardStyle}>

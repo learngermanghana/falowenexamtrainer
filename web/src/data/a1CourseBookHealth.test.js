@@ -93,7 +93,7 @@ describe("A1 Course Book health", () => {
 
   test("keeps Day 12 vocabulary as a reminder rather than a fourth assessed Teil", () => {
     const day12 = getA1Assignment("A1-8");
-    expect(day12.sections.map((section) => section.key)).toEqual(["teil-1", "teil-2", "teil-3"]);
+    expect(day12.sections.map((section) => section.key)).toEqual(["teil-1", "teil-2"]);
     expect(day12.sections.map((section) => section.label).join(" ")).not.toMatch(/Teil 4/i);
   });
 

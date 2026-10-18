@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
-import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
+import A1WorkbookSpeakingCheckpoint from "./A1WorkbookSpeakingCheckpoint";
 import { styles } from "../styles";
 
 const GRAMMAR_ROUTE = "/campus/course/a1-day-12-the-24-hour-clock-and-dates";
-const DAY12_AUDIO_KEY = "a1/day-12/day-12.mp3";
 
 const pageGrid = {
   display: "grid",
@@ -56,14 +55,6 @@ const teil1Questions = [
   { stem: "5. Wann ist der Flug am 12. Oktober?", options: ["a) Um 08:00 Uhr morgens", "b) Um 14:00 Uhr nachmittags", "c) Um 20:00 Uhr abends"] },
 ];
 
-const horenQuestions = [
-  { stem: "1. Der Zug nach Berlin fährt am Freitag ab.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "2. Der Zug kommt um neunzehn Uhr zwanzig in Berlin an.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "3. Es ist jetzt vierzehn Uhr zehn.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "4. Wann fährt der Zug nach Berlin ab?", options: ["a) Am 12. Mai um 14:45 Uhr.", "b) Am 14. Mai um 18:30 Uhr.", "c) Am 12. Mai um 19:20 Uhr."] },
-  { stem: "5. Wann fährt Anna zurück?", options: ["a) Am Freitag, den 12. Mai.", "b) Am Sonntag, den 14. Mai, um 18:30 Uhr.", "c) Am Sonntag, den 14. Mai, um 13:10 Uhr."] },
-];
-
 const QuestionList = ({ questions }) => (
   <div style={{ display: "grid", gap: 10 }}>
     {questions.map((question) => (
@@ -78,7 +69,6 @@ const QuestionList = ({ questions }) => (
 );
 
 export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
-  const [showScript, setShowScript] = useState(false);
 
 
   return (
@@ -98,7 +88,7 @@ export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
           </p>
           <h2 style={sectionTitle}>Start here</h2>
           <p style={paragraph}>
-            This assignment has two graded parts: Lesen and Hören. Complete five questions in each part, then submit your numbered answers.
+            This assignment has two graded parts: Lesen and Sprechen. Answer five reading questions and complete the recorded speaking checkpoint, then submit both Teile.
           </p>
           <a href={GRAMMAR_ROUTE} style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}>
             Review the grammar notes first
@@ -120,52 +110,8 @@ export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
         </section>
 
         <section style={card}>
-          <h2 style={sectionTitle}>Teil 2: Hören · Zug nach Berlin</h2>
-          <div style={instructionBox}>
-            Aufgaben 1–3: Richtig oder falsch? Aufgaben 4–5: Wählen Sie die richtige Antwort.
-          </div>
-
-          <div style={{ ...questionBlock, background: "#f8fafc" }}>
-            <A1ProtectedAudioPlayer day={12} audioKey={DAY12_AUDIO_KEY} />
-          </div>
-
-          <div style={{ display: "grid", gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => setShowScript((current) => !current)}
-              style={{ ...styles.secondaryButton, width: "fit-content" }}
-              aria-expanded={showScript}
-            >
-              {showScript ? "Script ausblenden" : "Script optional anzeigen"}
-            </button>
-            <p style={{ margin: 0, color: "#64748b" }}>
-              The script contains new travel vocabulary. Use it only if you need extra support after listening.
-            </p>
-          </div>
-
-          {showScript ? (
-            <div style={{ ...questionBlock, background: "#f8fafc" }}>
-              <p style={paragraph}><strong>Anna:</strong> Entschuldigung, wann fährt der Zug nach Berlin ab?</p>
-              <p style={paragraph}><strong>Tom:</strong> Guten Tag! Der Zug fährt am Freitag, den zwölften Mai, um vierzehn Uhr fünfundvierzig ab.</p>
-              <p style={paragraph}><strong>Anna:</strong> Und wann kommt der Zug in Berlin an?</p>
-              <p style={paragraph}><strong>Tom:</strong> Er kommt um neunzehn Uhr zwanzig an.</p>
-              <p style={paragraph}><strong>Anna:</strong> Danke! Und wie spät ist es jetzt?</p>
-              <p style={paragraph}><strong>Tom:</strong> Jetzt ist es dreizehn Uhr zehn.</p>
-              <p style={paragraph}><strong>Anna:</strong> Ich möchte auch zurückfahren. Geht ein Zug am Sonntag, den vierzehnten Mai?</p>
-              <p style={paragraph}><strong>Tom:</strong> Ja, am Sonntag fährt ein Zug um achtzehn Uhr dreißig ab.</p>
-              <p style={paragraph}><strong>Anna:</strong> Super, vielen Dank! Auf Wiedersehen!</p>
-              <p style={paragraph}><strong>Tom:</strong> Gern geschehen. Auf Wiedersehen!</p>
-            </div>
-          ) : null}
-
-          <QuestionList questions={horenQuestions} />
-
-          <div style={{ ...questionBlock, background: "#f8fafc" }}>
-            <p style={{ margin: 0 }}><strong>Zusatzaufgabe · nicht benotet</strong></p>
-            <p style={{ margin: 0 }}>
-              Schreiben Sie die Uhrzeit im 12-Stunden-Format: „vierzehn Uhr fünfundvierzig“ = <strong>Viertel vor drei (nachmittags)</strong>.
-            </p>
-          </div>
+          <h2 style={sectionTitle}>Teil 2 · Sprechen: Fragen und Antworten</h2>
+          <A1WorkbookSpeakingCheckpoint assignmentKey="A1-8" />
         </section>
 
         <section style={card}>
