@@ -320,21 +320,20 @@ export const B1_WRITING_TASKS = Object.freeze({
     template: "Ich finde Lenas Meinung sehr richtig. Es gibt nicht nur einen Weg zum Wunschberuf, weil jeder Mensch andere Stärken und Möglichkeiten hat. Manche brauchen ein Studium, andere erreichen ihr Ziel durch eine Ausbildung oder praktische Erfahrung. Praktika sind auch wichtig, weil man den Beruf besser kennenlernen kann. Meiner Meinung nach sollte jeder den Weg wählen, der zu seinen Interessen und Lebensumständen passt. Zusammenfassend denke ich, dass verschiedene Wege zum Wunschberuf möglich und sinnvoll sind.",
   } }),
   21: Object.freeze({ assignmentKey: "B1-7.21", ...{
-    title: "Welche Lebensform ist heute am besten – Familie, Wohngemeinschaft oder Singleleben?",
-    instructions: "Reagieren Sie auf Maras Meinung. Vergleichen Sie die Lebensformen, nennen Sie Vor- und Nachteile und begründen Sie Ihre eigene Meinung.",
+    title: "Verschiedene Lebensformen – Alleine wohnen oder in einer WG?",
+    instructions: "Sie haben im Leserforum eines Online-Magazins einen Beitrag zum Thema „Verschiedene Lebensformen – Alleine wohnen oder in einer WG?“ gelesen. Schreiben Sie nun Ihre Meinung zum Thema (ca. 80 Wörter).",
     image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
     imageAlt: "Student writing an opinion about modern living arrangements",
-    sourceTitle: "Meinung von Mara",
-    sourceText: "Heute gibt es viele verschiedene Lebensformen, und jede hat ihre Vorteile. Ich finde, dass die beste Lebensform von der persönlichen Situation abhängt. In einer Familie hat man oft viel Unterstützung und Nähe. In einer Wohngemeinschaft lebt man mit anderen zusammen und kann Kosten teilen. Das Singleleben bietet dagegen viel Freiheit und Unabhängigkeit. Dennoch kann es manchmal auch einsam sein. Ich denke, dass jeder selbst entscheiden sollte, welche Lebensform am besten zu ihm passt. Was denken Sie darüber?",
+    sourceTitle: "Leserbeitrag von Anton (23 Jahre)",
+    sourceText: "Ich wohne seit einem Jahr alleine in meiner eigenen Wohnung. Das ist zwar etwas teurer und man muss im Haushalt alles selbst machen, aber ich genieße die Unabhängigkeit und Ruhe sehr. Ich kann mir nicht mehr vorstellen, in einer WG oder bei den Eltern zu wohnen.",
     taskPoints: [
-      "Fassen Sie Maras Meinung kurz zusammen.",
-      "Vergleichen Sie Familie, WG und Singleleben.",
-      "Nennen Sie mindestens einen Vorteil und einen Nachteil.",
-      "Geben Sie ein persönliches Beispiel oder beschreiben Sie die Situation in Ihrem Heimatland.",
-      "Formulieren Sie einen klaren Schluss.",
+      "Reagieren Sie auf Antons Meinung zum Alleinwohnen.",
+      "Sagen Sie, ob Sie lieber alleine oder in einer WG wohnen würden.",
+      "Nennen Sie einen Vorteil und einen Nachteil und begründen Sie Ihre Meinung.",
+      "Geben Sie nach Möglichkeit ein Beispiel aus dem Alltag."
     ],
-    supportStructure: ["Einleitung zum Thema", "Reaktion auf Maras Meinung", "Vergleich mit Gründen und Beispiel", "Eigene Meinung", "Kurzer Schluss"],
-    vocabulary: ["zusammenleben", "Kosten teilen", "unabhängig sein", "Unterstützung bekommen", "Privatsphäre haben", "sich einsam fühlen"],
+    supportStructure: ["Kurze Einleitung", "Reaktion auf Antons Beitrag", "Eigene Meinung mit Gründen und Beispiel", "Kurzer Schluss"],
+    vocabulary: ["alleine wohnen", "in einer WG wohnen", "Miete teilen", "unabhängig sein", "Ruhe genießen", "Hausarbeit erledigen", "Kompromisse eingehen"]
   } }),
   23: Object.freeze({ assignmentKey: "B1-7.23", ...{
     title: "Ist das erste Date wirklich wichtig für eine Beziehung? Schreiben Sie Ihre Meinung.",
