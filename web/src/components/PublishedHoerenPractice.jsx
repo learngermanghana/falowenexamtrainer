@@ -15,10 +15,6 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
   const [error, setError] = useState("");
   const [audioError, setAudioError] = useState("");
   const [refreshingAudio, setRefreshingAudio] = useState(false);
-  const refreshInFlight = useRef(false);
-  const refreshAttempts = useRef(0);
-  const [audioError, setAudioError] = useState("");
-  const [refreshingAudio, setRefreshingAudio] = useState(false);
   const audioRef = useRef(null);
   const latestLessonRef = useRef(null);
   const refreshInFlightRef = useRef(null);
@@ -105,32 +101,6 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
       try { await audio.play(); } catch { /* browser may require another click */ }
     }
   }, []);
-
-  const refreshAudioUrl = async () => {
-    if (!idToken || !assignmentKey || refreshInFlight.current) return;
-    if (refreshAttempts.current >= 2) {
-      setAudioError("Die Aufnahme konnte nicht geladen werden. Bitte versuchen Sie es später erneut.");
-      return;
-    }
-    refreshInFlight.current = true;
-    refreshAttempts.current += 1;
-    setRefreshingAudio(true);
-    setAudioError("");
-    try {
-      const updated = await getPublishedHoerenLesson(assignmentKey, idToken);
-      setLesson(previous => previous && previous.revision === updated.revision
-        ? { ...previous, audioUrl: updated.audioUrl } : updated);
-      if (lesson?.revision && lesson.revision !== updated.revision) {
-        setAnswers({});
-        setResult(null);
-      }
-    } catch {
-      setAudioError("Die Aufnahme konnte nicht aktualisiert werden. Bitte erneut versuchen.");
-    } finally {
-      setRefreshingAudio(false);
-      refreshInFlight.current = false;
-    }
-  };
 
   if (!lesson && !error) return null;
   const complete = lesson?.questions.every((_, index) => Object.hasOwn(answers, index));
