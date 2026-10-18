@@ -19,6 +19,7 @@ import { getB1ListeningTask } from "../data/b1ListeningTasks";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
+import PublishedHoerenPractice from "./PublishedHoerenPractice";
 
 const card = {
   ...styles.card,
@@ -518,6 +519,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                 {resolvedActiveTab === "hoeren" && hasListeningTab && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 4 · Hören ({listeningRequiresSubmission ? "Assignment" : "Self-check"})</h2>
+                    <PublishedHoerenPractice assignmentKey={resolvedAssignmentKey} />
                     <WorkbookTaskCard
                       eyebrow={listeningRequiresSubmission ? "Your assignment · Listening" : "Listening · Self-check"}
                       title={listening.title || "Listening task will be added here."}
