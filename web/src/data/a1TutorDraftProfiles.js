@@ -17,6 +17,7 @@ const section = (items, options = {}) => ({
   items,
   label: options.label || "",
   writing: Boolean(options.writing),
+  speaking: Boolean(options.speaking),
   embeddedWriting: Boolean(options.embeddedWriting),
   readOnly: Boolean(options.readOnly),
   inlineAnswers: Boolean(options.inlineAnswers),
