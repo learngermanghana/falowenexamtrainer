@@ -30,7 +30,9 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
       const key = `a2/mock-horen-2/${part}.mp3`;
       expect(validateA2MockAudioKey({ mockId: "mock-02", part, key }))
         .toEqual({ level: "A2", mockId: "mock-02", part, key });
-      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` })).toBeNull();
+      // Newly uploaded Mock 2 audio can use the standard folder, while the already-uploaded legacy key continues to work.
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` }))
+        .toEqual({ level: "A2", mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` });
       expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-horen-2/${part}-other.mp3` })).toBeNull();
     }
     expect(validateA2MockAudioKey({

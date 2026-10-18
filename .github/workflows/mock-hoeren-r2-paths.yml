@@ -1,0 +1,25 @@
+name: Mock Hören R2 key compatibility
+on:
+  pull_request:
+    paths:
+      - "functions/functionz/mockHoerenObjectKeys.js"
+      - "functions/functionz/r2CourseAudio.js"
+      - "functions/functionz/__tests__/mockHoerenObjectKeys.test.js"
+      - "functions/functionz/__tests__/r2CourseAudio.test.js"
+      - ".github/workflows/mock-hoeren-r2-paths.yml"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - run: npm install --prefix functions --package-lock=false --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - run: node --check functions/functionz/mockHoerenObjectKeys.js && node --check functions/functionz/r2CourseAudio.js
+      - run: npx jest --runInBand functionz/__tests__/mockHoerenObjectKeys.test.js functionz/__tests__/r2CourseAudio.test.js functionz/__tests__/a1ExamHorenAudio.test.js
+        working-directory: functions
+        env:
+          CI: true
