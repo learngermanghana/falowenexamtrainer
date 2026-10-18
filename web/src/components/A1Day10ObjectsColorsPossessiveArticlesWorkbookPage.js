@@ -6,11 +6,11 @@ import { styles } from "../styles";
 const card = { ...styles.card, display: "grid", gap: 14 };
 const questionStyle = { padding: "12px", border: "1px solid #e2e8f0", borderRadius: 10, display: "grid", gap: 7 };
 const lesen = [
-  { statement: "Das Fahrrad ist schwarz.", answer: "Falsch" },
-  { statement: "Das Fahrrad kostet 45 Euro.", answer: "Richtig" },
-  { statement: "Claudias Buch ist rot.", answer: "Richtig" },
-  { statement: "Die Brille liegt auf einem braunen Stuhl.", answer: "Falsch" },
-  { statement: "Der Schlüssel im Fundbüro ist gelb.", answer: "Richtig" },
+  { statement: "Das Fahrrad ist schwarz." },
+  { statement: "Das Fahrrad kostet 45 Euro." },
+  { statement: "Claudias Buch ist rot." },
+  { statement: "Die Brille liegt auf einem braunen Stuhl." },
+  { statement: "Der Schlüssel im Fundbüro ist gelb." },
 ];
 const hoeren = [
   { question: "Welche Farbe hat Arias Lampe?", options: ["a) Grau", "b) Weiß", "c) Blau"] },
