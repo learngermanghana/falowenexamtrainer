@@ -34,18 +34,18 @@ if (!day9UsesNativeShell) {
   );
 }
 
-replaceOnce(
-  "web/src/components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js",
-  'title="A1 · Day 10 Workbook · Objects, Colors and Possessive Articles"',
-  'title="A1 · Day 10 Workbook · Objects and Colors"',
-  "Day 10 canonical title",
-);
-replaceOnce(
-  "web/src/components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js",
-  "Instructions: Complete the following exercises about an apartment. This assignment will help you practice your vocabulary\n          and sentence structures in German, focusing on rooms and furniture in an apartment.",
-  "Instructions: This fixed Chapter 6 assignment applies object vocabulary through rooms, furniture and apartment descriptions. Complete all three Teile, then submit the assignment once.",
-  "Day 10 assignment context",
-);
+// Redesigned Day 10 uses a native two-part workbook. Keep the new title
+// and do not rewrite the obsolete apartment assignment prompt during builds.
+const day10WorkbookPath = "web/src/components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js";
+const day10Source = fs.readFileSync(path.join(root, day10WorkbookPath), "utf8");
+if (!day10Source.includes('title="A1 · Day 10 · Gegenstände, Farben und Possessivartikel"')) {
+  replaceOnce(
+    day10WorkbookPath,
+    'title="A1 · Day 10 Workbook · Objects, Colors and Possessive Articles"',
+    'title="A1 · Day 10 · Gegenstände, Farben und Possessivartikel"',
+    "Day 10 canonical title",
+  );
+}
 
 replaceOnce(
   "web/src/components/A1Day11UnderstandingTimeWorkbookPage.js",
