@@ -60,11 +60,16 @@ replaceOnce(
   "<h2 style={sectionTitle}>Vocabulary reminder</h2>",
   "Day 12 unassessed vocabulary heading",
 );
+// Day 12 now has a scored Sprechen Teil 2 instead of the old Hören choices.
+// Keep this historical migration for older branches without rewriting the new contract.
+const day12Registry = fs.readFileSync(path.join(root, "web/src/data/a1AssignmentRegistry.js"), "utf8");
+if (!day12Registry.includes("Teil 2 · Sprechen: Fragen und Antworten")) {
 replaceOnce(
   "web/src/data/a1AssignmentRegistry.js",
   '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen", "Teil 4: Vocabulary reminder"]],',
   '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen"]],',
   "Day 12 assessed-section registry",
 );
+}
 
 console.log("Applied A1 Days 9–12 Course Book audit fixes.");
