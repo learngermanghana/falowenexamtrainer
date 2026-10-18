@@ -49,3 +49,12 @@ test('a saved score shows success without exposing Sheet permission errors to th
   expect(screen.queryByText(/Google Sheets|caller does not have permission|Retry Google/)).toBeNull();
   expect(screen.getByText(/Your result is saved. Open Results/)).toBeTruthy();
 });
+
+test('A1 Day 19 opens the required three-part A1 assessment with A1 instructions', async () => {
+  fetchCourseSpeakingMockStatus.mockResolvedValue({ completed: false, parts: [] });
+  render(<CourseSpeakingMockAssignment assignmentKey="A1-5.9" />);
+  expect(await screen.findByText('Goethe A1 Speaking Confidence Lab')).toBeTruthy();
+  expect(screen.getByText(/Sich vorstellen/)).toBeTruthy();
+  expect(screen.getByText(/Fragen und Antworten/)).toBeTruthy();
+  expect(screen.getByText(/Bitten und Reagieren/)).toBeTruthy();
+});

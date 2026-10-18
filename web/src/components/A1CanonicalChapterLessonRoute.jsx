@@ -23,6 +23,11 @@ const mergeSearchIntoDestination = (
 };
 
 export const getA1CanonicalChapterDestination = ({ chapter = "", search = "" } = {}) => {
+  if (["12.2", "A1-12.2"].includes(String(chapter).toUpperCase())) {
+    const params = new URLSearchParams(search);
+    params.delete("assignmentKey"); params.delete("assignmentId"); params.delete("chapter");
+    search = params.toString();
+  }
   const lesson = getA1CanonicalLesson(chapter);
   if (!lesson) return "/campus/course";
 

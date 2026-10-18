@@ -10,7 +10,7 @@ const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
 const taskFlows = require("./goetheExaminerFlow");
 // Keep this lightweight whitelist independent of the Sheets adapter. Existing
 // Live Speak route simulations must not load the score-sheet integration.
-const COURSE_MOCK_KEYS = new Set(["A2-8.22", "B1-7.23"]);
+const COURSE_MOCK_KEYS = new Set(["A1-5.9", "A2-8.22", "B1-7.23"]);
 const assignmentConfig = value => COURSE_MOCK_KEYS.has(String(value || "").trim().toUpperCase());
 const { toFile } = require("openai");
 const { getOpenAIClient } = require("./openaiClient");

@@ -106,7 +106,7 @@ const TwoCasePrepositionsPageLegacy = () => {
   const location = useLocation();
   const [answers, setAnswers] = useState({});
   const [showScore, setShowScore] = useState(false);
-  const workbookHref = `${location.pathname}?view=workbook`;
+  const workbookHref = "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook";
 
   const score = useMemo(
     () => quiz.reduce((total, question, index) => total + (answers[index] === question.answer ? 1 : 0), 0),
@@ -127,7 +127,7 @@ const TwoCasePrepositionsPageLegacy = () => {
         <span style={{ width: "fit-content", borderRadius: 999, padding: "6px 10px", background: "#e0e7ff", color: "#3730a3", fontWeight: 800, fontSize: 12 }}>
           A1.2 · Day 18 · Chapter 12.1
         </span>
-        <h1 style={{ ...styles.title, margin: 0 }}>Wechselpräpositionen: Wo? or Wohin?</h1>
+        <h1 style={{ ...styles.title, margin: 0 }}>Wechselpräpositionen und Dativpräpositionen</h1>
         <p style={{ margin: 0, lineHeight: 1.7, color: "#334155", maxWidth: 820 }}>
           The same preposition can use either Akkusativ or Dativ. The key is not memorising two random forms: first decide whether the sentence describes a destination or a position.
         </p>
@@ -144,15 +144,43 @@ const TwoCasePrepositionsPageLegacy = () => {
           </div>
           <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 14, padding: 14 }}>
             <strong>Wo? → Dativ</strong>
-            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>A person or object is already in a place. There is no change of position.</p>
+            <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>The sentence describes where something is or where an activity happens.</p>
           </div>
         </div>
       </Section>
 
+      <Section eyebrow="Choose the preposition first" title="Two different rules">
+        <p><strong>Two-way prepositions:</strong> in, an, auf, über, unter, vor, hinter, neben, zwischen. A destination (Wohin?) takes Akkusativ; a location (Wo?) takes Dativ.</p>
+        <p><strong>Dative prepositions:</strong> aus, bei, mit, nach, seit, von, zu, gegenüber. These take Dativ, including when the sentence describes travelling to a destination.</p>
+        <p><strong>Movement alone does not mean Akkusativ:</strong> Ich laufe im Park. (I run in the park: where?) Ich laufe in den Park. (I run into the park: where to?) Ich gehe zum Arzt. (I go to the doctor: zu always takes Dativ.)</p>
+      </Section>
+      <Section eyebrow="Articles" title="From Nominativ to Akkusativ and Dativ">
+        <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse" }}>
+          <thead><tr>{["Noun", "Nominativ", "Akkusativ", "Dativ"].map(label => <th key={label} style={{ textAlign: "left", padding: 8 }}>{label}</th>)}</tr></thead>
+          <tbody>{[
+            ["der Tisch", "der / ein", "den / einen", "dem / einem"],
+            ["die Schule", "die / eine", "die / eine", "der / einer"],
+            ["das Haus", "das / ein", "das / ein", "dem / einem"],
+            ["die Freunde", "die / keine", "die / keine", "den / keinen (+n)"],
+          ].map(row => <tr key={row[0]}>{row.map((cell, i) => <td key={i} style={{ padding: 8, borderTop: "1px solid #e2e8f0" }}>{cell}</td>)}</tr>)}</tbody>
+        </table></div>
+        <p>Plural Dativ usually adds -n to the noun: mit den Freunden, mit den Kindern. Do not add another -n to an existing -n/-en ending or to an -s plural: mit den Autos.</p>
+      </Section>
+      <Section eyebrow="Everyday German" title="mit, bei und zu">
+        {[
+          ["mit — with / by", "Ich fahre mit dem Bus. Ich lerne mit meiner Freundin.", "I travel by bus. I study with my friend."],
+          ["bei — at / with", "Ich bin beim Arzt. Sie arbeitet bei einer Firma.", "I am at the doctor's. She works at a company."],
+          ["zu — to", "Ich gehe zum Arzt. Wir fahren zur Arbeit.", "I go to the doctor. We travel to work."],
+        ].map(([title, de, en]) => <div key={title}><h3>{title}</h3><p>{de}</p><p>{en}</p></div>)}
+        <p><strong>Useful contractions:</strong> bei dem = beim; zu dem = zum; zu der = zur; in dem = im; in das = ins; an dem = am; an das = ans.</p>
+        <p>Other common examples: aus Ghana (from Ghana), nach dem Kurs (after the course), seit einem Jahr (for one year), von der Schule (from school), gegenüber der Bank (opposite the bank).</p>
+        <p>Compare: Ich bin <strong>bei meiner Mutter</strong> (at my mother's). Ich gehe <strong>zu meiner Mutter</strong> (to my mother's). Both use Dativ.</p>
+      </Section>
       <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
           <li>recognise the nine common two-case prepositions;</li>
           <li>choose Akkusativ after <strong>Wohin?</strong> and Dativ after <strong>Wo?</strong>;</li>
+          <li>use mit, bei and zu with Dativ, and recognise other common dative prepositions;</li>
           <li>use common movement/position verb pairs such as <strong>legen/liegen</strong>, <strong>stellen/stehen</strong> and <strong>setzen/sitzen</strong>.</li>
         </ol>
       </Section>

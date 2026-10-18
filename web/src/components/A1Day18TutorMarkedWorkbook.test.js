@@ -7,7 +7,6 @@ import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage
 describe("A1 Day 18 tutor-marked workbook ownership", () => {
   test.each([
     ["A1-12.1", "12.1"],
-    ["A1-12.2", "12.2"],
   ])("%s remains a canonical Day 18 tutor-marked assignment", (assignmentKey, chapter) => {
     const assignment = getA1Assignment(assignmentKey);
     const draftProfile = getA1TutorDraftProfile(assignmentKey);
@@ -28,7 +27,8 @@ describe("A1 Day 18 tutor-marked workbook ownership", () => {
     expect(getA1GrammarNotesComponent("A1-12.1")).toBe(TwoCasePrepositionsPageLegacy);
   });
 
-  test("Kapitel 12.2 Grammar stays embedded through the canonical grammar component", () => {
-    expect(getA1GrammarNotesComponent("A1-12.2")).toBe(DativeArticlesMitBeiZuGrammarNotes);
+  test("the separate 12.2 exercise is retired", () => {
+    expect(getA1Assignment("A1-12.2")).toBeNull();
+    expect(getA1TutorDraftProfile("A1-12.2")).toBeNull();
   });
 });

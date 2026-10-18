@@ -9,7 +9,7 @@ import {
   buildA1WorkbookContentGroups,
   findA1WorkbookTeilSections,
 } from "./A1WorkbookSectionTabs";
-import { findWorkbookPageRoot } from "./WorkbookInlineEnhancements";
+import { A1_TUTOR_MARKED_ASSIGNMENT_KEYS, findWorkbookPageRoot } from "./WorkbookInlineEnhancements";
 
 const NAV_MOUNT_ATTRIBUTE = "data-a1-unified-tutor-workbook-nav";
 const CREATED_SUBMISSION_HOST_ATTRIBUTE = "data-a1-unified-submission-host";
@@ -19,6 +19,7 @@ const NATIVE_TABS_DISPLAY_ATTRIBUTE = "data-a1-unified-native-tabs-display";
 const GROUP_DISPLAY_ATTRIBUTE = "data-a1-unified-group-display";
 const LEGACY_NAV_DISPLAY_ATTRIBUTE = "data-a1-unified-legacy-nav-display";
 const SHARED_VIEW_PARAM = "workbookTab";
+const A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET = new Set(A1_TUTOR_MARKED_ASSIGNMENT_KEYS);
 
 const A1_WORKBOOK_ROUTE_ALIASES = Object.freeze([
   Object.freeze({
@@ -74,6 +75,8 @@ const buildMatch = ({ day, chapter = "" } = {}) => {
   if (!selectedAssignment?.assignmentKey) return null;
 
   const assignmentKey = normalizeCourseAssignmentKey(selectedAssignment.assignmentKey);
+  if (!A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET.has(assignmentKey)) return null;
+
   return {
     level: "A1",
     day: Number(day),
@@ -103,6 +106,7 @@ const buildDynamicA1Match = ({ pathname = "", search = "" } = {}) => {
 };
 
 export const resolveA1UnifiedTutorWorkbookMatch = ({ pathname = "", search = "" } = {}) => {
+  if (pathname.includes("verboten-erlaubt-5-9") || (pathname.endsWith("/19") && new URLSearchParams(search).get("chapter") === "5.9")) return null;
   const normalizedPathname = normalizePath(pathname);
   const searchParams = new URLSearchParams(search || "");
 

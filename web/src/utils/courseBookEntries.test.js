@@ -1,3 +1,4 @@
+import { courseSchedules } from "../data/courseSchedule";
 import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
 import { A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE } from "../data/courseBookCurriculumCorrections";
 import { getCurriculumEntriesForLevel } from "../data/lessonCatalog";
@@ -79,8 +80,7 @@ describe("course book task entries", () => {
     ]);
 
     expect(byDay(18).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
-      ["12.1", "Two Case Prepositions"],
-      ["12.2", "Dative Prepositions"],
+      ["12.1", "Two-Way and Dative Prepositions"],
     ]);
   });
 
@@ -236,37 +236,11 @@ describe("course book task entries", () => {
     expect(entries.every((entry) => entry.tutorMarked && entry.submissionRequired)).toBe(true);
   });
 
-  it("corrects A1 Day 18 and makes both 12.1 and 12.2 assignments", () => {
-    const entries = expandCourseBookEntries([{
-      day: 18,
-      displayDay: 18,
-      chapter: "9",
-      topic: "Legacy Day 18",
-      lesen_hören: [
-        { chapter: "9", title: "The Imperative in German", assignment: true },
-        { chapter: "9", title: "Transport and Giving Directions", assignment: false },
-      ],
-    }], { level: "A1" });
-
-    const chapter121 = entries.find((entry) => entry.displayChapter === "12.1");
-    const chapter122 = entries.find((entry) => entry.displayChapter === "12.2");
-
-    expect(chapter121).toEqual(expect.objectContaining({
-      lessonTitle: "Two Case Prepositions",
-      assignmentId: "A1-12.1",
-      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
-      tutorMarked: true,
-      selfPractice: false,
-      submissionRequired: true,
-    }));
-    expect(chapter122).toEqual(expect.objectContaining({
-      lessonTitle: "Dative Prepositions",
-      assignmentId: "A1-12.2",
-      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
-      tutorMarked: true,
-      selfPractice: false,
-      submissionRequired: true,
-    }));
+  it("uses one required Day 18 assignment for both grammar topics", () => {
+    const lesson = courseSchedules.A1.find(row => row.day === 18);
+    const entries = expandCourseBookEntries([lesson], { level: "A1" });
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({ assignmentId: "A1-12.1", submissionRequired: true });
   });
 
   it("returns the corrected Day 3 titles from the assignment dictionary", () => {

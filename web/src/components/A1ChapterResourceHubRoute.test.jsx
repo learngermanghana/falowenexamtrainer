@@ -46,7 +46,7 @@ describe("A1ChapterResourceHubRoute completed Radio handoff", () => {
     renderHubRoute("/campus/course/lesson/A1/18?chapter=12.2&hub=1&radio=done");
 
     expect(screen.getByTestId("location")).toHaveTextContent(
-      "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook&radio=done",
+      "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook&radio=done",
     );
   });
 });

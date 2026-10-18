@@ -12,7 +12,7 @@ import {
 export const A1_ASSIGNMENT_ORDER = Object.freeze([
   "A1-0.1", "A1-0.2", "A1-1.1", "A1-1.2", "A1-2", "A1-3", "A1-4",
   "A1-5", "A1-6", "A1-7", "A1-8", "A1-9", "A1-10", "A1-11",
-  "A1-12.1", "A1-12.2", "A1-12.3", "A1-13", "A1-14.1",
+  "A1-12.1", "A1-5.9", "A1-12.3", "A1-13", "A1-14.1",
 ]);
 
 const section = (number, label) => Object.freeze({ key: `teil-${number}`, number, label });
@@ -57,8 +57,8 @@ const records = [
   ["A1-9", 16, "9", "Negation", "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook", "A1Day16FoodAndDailyLifeWorkbookPage", ["Teil 1 · Lesen", "Teil 2 · Hörverstehen", "Teil 3 · Schreiben"]],
   ["A1-10", 16, "10", "Food", "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook", "A1Day16FoodAndNegationKapitel10WorkbookPage", ["Teil 1 · Lesen / Schreiben", "Teil 2 · Hören"]],
   ["A1-11", 17, "11", "Instructions", "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook", "A1Day17InstructionsDirectionsKapitel11WorkbookPage", ["Teil 1 · Lesen: Der Weg von der Touristeninformation zum Schiff", "Teil 2 · Hören: Wegbeschreibung zum Bahnhof"]],
-  ["A1-12.1", 18, "12.1", "Two Case Prepositions", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook", "A1Day18Kapitel121WorkbookPage", ["Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort", "Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen", "Teil 3 · Hören"]],
-  ["A1-12.2", 18, "12.2", "Dative Prepositions", "/campus/course/a1-12-2-dative-articles-mit-bei-zu?view=workbook", "A1Day18Kapitel122WorkbookPage", ["Teil 1 · Lesen Sie den Aufsatz und schreiben Sie die richtige Antwort", "Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen", "Teil 3 · Hören"]],
+  ["A1-12.1", 18, "12.1", "Two-Way and Dative Prepositions", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook", "A1Day18Kapitel121WorkbookPage", ["Teil 1 · Lesen Sie den Aufsatz und wählen Sie die richtige Antwort", "Teil 2 · Lesen Sie die Anzeigen und beantworten Sie die Fragen", "Teil 3 · Hören"]],
+  ["A1-5.9", 19, "5.9", "Goethe A1 Speaking Confidence Lab", "/campus/course/verboten-erlaubt-5-9", "VerbotenErlaubtPage", ["Teil 1 · Sich vorstellen", "Teil 2 · Fragen und Antworten", "Teil 3 · Bitten und Reagieren"]],
   ["A1-12.3", 20, "12.3", "Introduction to Letter Writing", "/campus/course/letter-writing-intro-german-a1-day-12-3", "A1Day20LetterWritingWorkbookPage", ["Teil 1 · Informal letter: Birthday message", "Teil 2 · Formal letter: Enquiry to a language school"]],
   ["A1-13", 21, "13", "Weather", "/campus/course/a1-day-21-weather-workbook", "A1Day21WeatherWorkbookPage", ["Teil 1 · Anzeigen", "Teil 2 · Nachricht", "Teil 3 · Schreiben", "Teil 4 · Hören"]],
   ["A1-14.1", 22, "14.1", "Health", "/campus/course/a1-day-22-health-and-body-parts-workbook", "A1Day22HealthBodyPartsWorkbookPage", ["Teil 1 · Lesen: Anzeigen und Termine", "Teil 2 · Lesen: Ihr Termin", "Teil 3 · Hören"]],
@@ -84,7 +84,7 @@ export const A1_ASSIGNMENT_REGISTRY = Object.freeze(Object.fromEntries(records.m
       workbookRoute,
       ...routeParts,
       component,
-      layoutMode: NATIVE_SHARED_LAYOUT_COMPONENTS.has(component) ? "native" : "bridge",
+      layoutMode: assignmentKey === "A1-5.9" ? "graded-speaking" : NATIVE_SHARED_LAYOUT_COMPONENTS.has(component) ? "native" : "bridge",
       sections: Object.freeze(labels.map(recordSection)),
       submissionEnabled: true,
     })];

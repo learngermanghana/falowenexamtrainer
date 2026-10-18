@@ -71,7 +71,7 @@ function firestore(rows, { attemptId = ATTEMPT_A, uid = "student-uid", assignmen
 }
 
 describe("Graded Goethe-style speaking coursework", () => {
-  test.each([["A2-8.22", "A2"], ["B1-7.23", "B1"]])("%s verifies all three parts share one attempt", (assignmentId, level) => {
+  test.each([["A1-5.9", "A1"], ["A2-8.22", "A2"], ["B1-7.23", "B1"]])("%s verifies all three parts share one attempt", (assignmentId, level) => {
     const outcome = evaluateResults({ assignmentId, uid: "student-uid", attemptId: ATTEMPT_A,
       snapshots: makeSnapshots(level, assignmentId) });
     expect(outcome.score).toBe(70);

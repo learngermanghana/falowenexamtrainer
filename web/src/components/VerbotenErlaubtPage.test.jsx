@@ -3,7 +3,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import VerbotenErlaubtPage from "./VerbotenErlaubtPage";
 
-jest.mock("./A1ExamSpeakingPracticePanel", () => () => <div data-testid="a1-speaking-practice" />);
+jest.mock("./CourseSpeakingMockAssignment", () => ({ assignmentKey }) => <div data-testid="a1-speaking-practice">{assignmentKey}</div>);
 
 const renderPage = () => render(
   <MemoryRouter>
@@ -15,7 +15,7 @@ describe("A1 Day 19 Goethe speaking readiness", () => {
   test("presents the three speaking exam parts instead of a forbidden/allowed grammar lesson", () => {
     renderPage();
 
-    expect(screen.getByRole("heading", { name: /Are you ready for the A1 speaking exam/i })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Goethe A1 Speaking Confidence Lab/i })).toBeVisible();
     expect(screen.getByText(/Teil 1 · Sich vorstellen/i)).toBeVisible();
     expect(screen.getByText(/Teil 2 · Fragen und Antworten/i)).toBeVisible();
     expect(screen.getByText(/Teil 3 · Bitten und reagieren/i)).toBeVisible();

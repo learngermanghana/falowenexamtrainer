@@ -6,6 +6,7 @@ const { getSheetsClient } = require("./googleSheetsClient");
 const crypto = require("crypto");
 
 const COURSE_MOCKS = Object.freeze({
+  "A1-5.9": { level: "A1", day: 19, title: "Goethe A1 Speaking Confidence Lab" },
   "A2-8.22": { level: "A2", day: 22, title: "Goethe A2 Speaking Mock" },
   "B1-7.23": { level: "B1", day: 23, title: "Goethe B1 Speaking Mock" },
 });

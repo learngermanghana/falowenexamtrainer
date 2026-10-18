@@ -1,3 +1,4 @@
+import { A1_ASSIGNMENT_ORDER } from "../data/a1AssignmentRegistry";
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
@@ -211,8 +212,9 @@ const StudentResultsPage = () => {
       passMark: PASS_MARK,
     }).filter((entry) => String(entry.assignmentId || "").startsWith(`${trackedLevel}-`));
 
-    const completed = merged.filter((entry) => entry.status === "passed").length;
-    const failed = merged.filter((entry) => entry.status === "failed").length;
+    const active = trackedLevel === "A1" ? merged.filter((entry) => A1_ASSIGNMENT_ORDER.includes(entry.assignmentId)) : merged;
+    const completed = active.filter((entry) => entry.status === "passed").length;
+    const failed = active.filter((entry) => entry.status === "failed").length;
 
     return { completed, failed };
   }, [visibleResults, studentCode, trackedLevel]);
