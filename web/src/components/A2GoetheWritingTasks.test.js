@@ -32,12 +32,17 @@ test("all A2 workbook surfaces route Teil 2 through the canonical Goethe card", 
   const shared = read("A2StandardTabbedWorkbookPage.js");
   expect(shared).toContain("<A2GoetheWritingTaskCard day={day} />");
 
+  // Day-specific workbooks now delegate to the shared shell instead of
+  // duplicating the Goethe card. Check that delegation and correct day wiring.
   [
-    ["A2Day12MeinTraumberufWorkbookPageLegacy.js", 12],
-    ["A2Day13VorstellungsgespraechWorkbookPageLegacy.js", 13],
+    ["A2Day12MeinTraumberufWorkbookPage.js", 12],
+    ["A2Day13VorstellungsgespraechWorkbookPage.js", 13],
     ["A2Day14BerufUndKarriereWorkbookPage.js", 14],
     ["A2Day17InDieApothekeGehenWorkbookPage.js", 17],
   ].forEach(([file, day]) => {
-    expect(read(file)).toContain(`<A2GoetheWritingTaskCard day={${day}} />`);
+    const source = read(file);
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+    expect(source).toContain(`day={${day}}`);
+    expect(source).not.toContain("<A2GoetheWritingTaskCard");
   });
 });
