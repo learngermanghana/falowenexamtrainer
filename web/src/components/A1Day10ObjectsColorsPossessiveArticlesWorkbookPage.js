@@ -1,311 +1,83 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
-
+import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
 import { styles } from "../styles";
 
-const card = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-};
-
-const sectionTitle = {
-  margin: 0,
-  fontSize: "1.1rem",
-};
-
-const questionBlock = {
-  display: "grid",
-  gap: 6,
-  padding: "10px 12px",
-  border: "1px solid #e5e7eb",
-  borderRadius: 10,
-  background: "#fff",
-};
-
-const optionLine = {
-  margin: 0,
-  paddingLeft: 12,
-  lineHeight: 1.7,
-};
-
-const teil2Questions = [
-  {
-    stem: "1. Wie viele Zimmer hat die Wohnung?",
-    options: ["a) Drei", "b) Vier", "c) Fünf", "d) Sechs"],
-  },
-  {
-    stem: "2. Was steht im Wohnzimmer?",
-    options: [
-      "a) Ein Sofa und ein Fernseher",
-      "b) Ein Bett und ein Kleiderschrank",
-      "c) Ein Tisch und vier Stühle",
-      "d) Eine Dusche und eine Badewanne",
-    ],
-  },
-  {
-    stem: "3. Was gibt es in der Küche?",
-    options: [
-      "a) Ein Sofa und einen Fernseher",
-      "b) Einen Herd, einen Kühlschrank und einen Tisch mit vier Stühlen",
-      "c) Ein Bett und einen Kleiderschrank",
-      "d) Eine Dusche und eine Badewanne",
-    ],
-  },
-  {
-    stem: "4. Welches Möbelstück steht im Schlafzimmer?",
-    options: ["a) Ein Sofa", "b) Ein Herd", "c) Ein großes Bett", "d) Ein Fernseher"],
-  },
-  {
-    stem: "5. Was gibt es im Badezimmer?",
-    options: [
-      "a) Ein Sofa und einen Tisch",
-      "b) Einen Herd und einen Kühlschrank",
-      "c) Ein Bett und einen Kleiderschrank",
-      "d) Eine Dusche, eine Badewanne und ein Waschbecken",
-    ],
-  },
-  {
-    stem: "6. Wie ist der Balkon beschrieben?",
-    options: ["a) Groß und leer", "b) Klein und schön", "c) Groß und schön", "d) Klein und leer"],
-  },
-  {
-    stem: "7. Was gibt es auf dem Balkon?",
-    options: [
-      "a) Ein großes Bett",
-      "b) Einen Herd und einen Kühlschrank",
-      "c) Blumen und einen kleinen Tisch mit zwei Stühlen",
-      "d) Eine Dusche und eine Badewanne",
-    ],
-  },
+const card = { ...styles.card, display: "grid", gap: 14 };
+const questionStyle = { padding: "12px", border: "1px solid #e2e8f0", borderRadius: 10, display: "grid", gap: 7 };
+const lesen = [
+  { statement: "Das Fahrrad ist schwarz.", answer: "Falsch" },
+  { statement: "Das Fahrrad kostet 45 Euro.", answer: "Richtig" },
+  { statement: "Claudias Buch ist rot.", answer: "Richtig" },
+  { statement: "Die Brille liegt auf einem braunen Stuhl.", answer: "Falsch" },
+  { statement: "Der Schlüssel im Fundbüro ist gelb.", answer: "Richtig" },
+];
+const hoeren = [
+  { question: "Welche Farbe hat Arias Lampe?", options: ["a) Grau", "b) Weiß", "c) Blau"] },
+  { question: "Was gehört Marcus?", options: ["a) Ein grauer Stuhl", "b) Eine rote Tasche", "c) Eine weiße Lampe"] },
+  { question: "Welche Farbe hat Arias Schal?", options: ["a) Blau", "b) Grün", "c) Rot"] },
+  { question: "Was trinkt Aria meistens aus ihrer Tasse?", options: ["a) Tee", "b) Kaffee", "c) Wasser"] },
+  { question: "Welche Farbe hat Marcus' Notizbuch?", options: ["a) Gelb", "b) Schwarz", "c) Grün"] },
 ];
 
-const horenVideoUrl = "https://youtu.be/WiPw0t8Geh4";
-const horenVideoEmbedUrl = "https://www.youtube.com/embed/WiPw0t8Geh4";
+// Cloudflare R2 private object name must match the uploaded MP3 exactly.
+// Set the verified key in the deployment configuration before enabling playback.
+const hoerenAudioKey = process.env.REACT_APP_A1_DAY10_AUDIO_KEY || "";
 
-const horenAssignments = [
-  {
-    number: 1,
-    title: "Passage 1: Die Wohnung",
-    question: "Wie viele Zimmer hat die Wohnung?",
-    options: ["a) Drei", "b) Vier", "c) Fünf", "d) Sechs"],
-  },
-  {
-    number: 2,
-    title: "Passage 2: Das Wohnzimmer",
-    question: "Was steht im Wohnzimmer?",
-    options: [
-      "a) Ein Bett und ein Schrank",
-      "b) Ein Sofa und ein Fernseher",
-      "c) Ein Tisch und vier Stühle",
-      "d) Eine Dusche und eine Badewanne",
-    ],
-  },
-  {
-    number: 3,
-    title: "Passage 3: Die Küche",
-    question: "Was gibt es in der Küche?",
-    options: [
-      "a) Ein Sofa und einen Fernseher",
-      "b) Einen Herd, einen Kühlschrank und einen Tisch mit vier Stühlen",
-      "c) Ein Bett und einen Kleiderschrank",
-      "d) Eine Dusche und eine Badewanne",
-    ],
-  },
-  {
-    number: 4,
-    title: "Passage 4: Das Schlafzimmer",
-    question: "Welches Möbelstück steht im Schlafzimmer?",
-    options: ["a) Ein Sofa", "b) Ein Herd", "c) Ein großes Bett", "d) Ein Fernseher"],
-  },
-  {
-    number: 5,
-    title: "Passage 5: Das Badezimmer",
-    question: "Was gibt es im Badezimmer?",
-    options: [
-      "a) Ein Sofa und einen Tisch",
-      "b) Einen Herd und einen Kühlschrank",
-      "c) Ein Bett und einen Kleiderschrank",
-      "d) Eine Dusche, eine Badewanne und ein Waschbecken",
-    ],
-  },
-  {
-    number: 6,
-    title: "Passage 6: Der Balkon",
-    question: "Wie ist der Balkon beschrieben?",
-    options: ["a) Groß und leer", "b) Klein und schön", "c) Groß und schön", "d) Klein und leer"],
-    extraQuestion: {
-      stem: "7. Was gibt es auf dem Balkon?",
-      options: [
-        "a) Ein großes Bett",
-        "b) Einen Herd und einen Kühlschrank",
-        "c) Blumen und einen kleinen Tisch mit zwei Stühlen",
-        "d) Eine Dusche und eine Badewanne",
-      ],
-    },
-  },
-];
-
-const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
+export default function A1Day10ObjectsColorsPossessiveArticlesWorkbookPage() {
   return (
     <A1TutorMarkedWorkbookShell
       day={10}
       chapter="6"
       fallbackAssignmentKey="A1-6"
-      title="A1 · Day 10 Workbook · Objects, Colors and Possessive Articles"
-      subtitle="Chapter 6 · Tutor-marked assignment"
+      title="A1 · Day 10 · Gegenstände, Farben und Possessivartikel"
+      subtitle="Kapitel 6 · Grammar focus · Lesen & Hören"
       submitTitle="Submit A1 · Day 10 · Chapter 6"
+      submitDescription="Complete all five reading and five listening answers, then review and submit."
     >
-      <div style={card}>
-        <img
-          src="https://images.unsplash.com/photo-1493666438817-866a91353ca9?auto=format&fit=crop&w=1600&q=80"
-          alt="Cozy apartment living room with furniture and decor"
-          loading="lazy"
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            maxHeight: 280,
-            objectFit: "cover",
-          }}
-        />
-
-        <h2 style={sectionTitle}>Teil 1: Reading / Writing</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Assignment: Die Wohnung (The Apartment)</strong>
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Instructions: Complete the following exercises about an apartment. This assignment will help you practice your vocabulary
-          and sentence structures in German, focusing on rooms and furniture in an apartment.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Part 1: Vocabulary Matching</strong>
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Match the German words with their English meanings. Write the words and not just a, b, c, d. Also include both the
-          German word and the English meaning when submitting.
-        </p>
-
-        <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>das Wohnzimmer</li>
-          <li>die Küche</li>
-          <li>das Schlafzimmer</li>
-          <li>das Badezimmer</li>
-          <li>der Balkon</li>
-          <li>der Flur</li>
-          <li>das Bett</li>
-          <li>der Tisch</li>
-          <li>der Stuhl</li>
-          <li>der Schrank</li>
-        </ol>
-
-        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>a. the kitchen</li>
-          <li>b. the bedroom</li>
-          <li>c. the balcony</li>
-          <li>d. the bathroom</li>
-          <li>e. the hallway</li>
-          <li>f. the living room</li>
-          <li>g. the chair</li>
-          <li>h. the table</li>
-          <li>i. the bed</li>
-          <li>j. the wardrobe</li>
-        </ul>
-      </div>
-
-      <div style={card}>
-        <h2 style={sectionTitle}>Teil 2: Questions</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Passage: Die Wohnung</strong>
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Meine Wohnung ist sehr gemütlich. Sie hat vier Zimmer: ein Wohnzimmer, eine Küche, ein Schlafzimmer und ein Badezimmer.
-          Im Wohnzimmer steht ein großes Sofa und ein Fernseher. In der Küche gibt es einen Herd, einen Kühlschrank und einen Tisch
-          mit vier Stühlen. Das Schlafzimmer hat ein großes Bett und einen Kleiderschrank. Im Badezimmer gibt es eine Dusche, eine
-          Badewanne und ein Waschbecken. Der Balkon ist klein, aber schön. Ich habe dort Blumen und einen kleinen Tisch mit zwei
-          Stühlen.
-        </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Multiple-Choice Questions</strong>
-        </p>
-
-        {teil2Questions.map((question) => (
-          <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
-            {question.options.map((option) => (
-              <p key={option} style={optionLine}>
-                {option}
-              </p>
-            ))}
+      <section style={card}>
+        <h2>Teil 1 · Lesen: Gegenstände und Farben</h2>
+        <p>Lesen Sie die drei kurzen Texte und die Aufgaben 1–5. Ist die Aussage richtig oder falsch?</p>
+        <article style={questionStyle}>
+          <h3 style={{ margin: 0 }}>Text 1: Zettel am Schwarzen Brett</h3>
+          <p style={{ margin: 0 }}><strong>Verkaufe Fahrrad!</strong> Ich verkaufe mein altes Fahrrad. Es ist <strong>grün</strong> und hat einen <strong>schwarzen Korb</strong>. Es funktioniert sehr gut.</p>
+          <p style={{ margin: 0 }}><strong>Preis:</strong> 45 Euro · <strong>Telefon:</strong> 0176-443322 (ab 18 Uhr)</p>
+        </article>
+        <article style={questionStyle}>
+          <h3 style={{ margin: 0 }}>Text 2: E-Mail von Claudia</h3>
+          <p style={{ margin: 0 }}>Hallo Stefan,</p>
+          <p style={{ margin: 0 }}>ich suche meine Brille! Sie liegt auf dem <strong>braunen Tisch</strong> im Wohnzimmer. Neben der Brille liegt auch <strong>mein rotes Buch</strong>. Kannst du mir die Brille heute Abend mitbringen?</p>
+          <p style={{ margin: 0 }}>Vielen Dank!<br />Claudia</p>
+        </article>
+        <article style={questionStyle}>
+          <h3 style={{ margin: 0 }}>Text 3: Aushang im Sprachinstitut</h3>
+          <p style={{ margin: 0 }}><strong>Gefunden im Büro (Raum 12):</strong> Wir haben eine <strong>blau-weiße Tasche</strong> gefunden. In der Tasche liegen ein kleiner Regenschirm und ein <strong>gelber Schlüssel</strong>. Abholung: Montag bis Freitag von 9 bis 12 Uhr.</p>
+        </article>
+        <h3>Aufgaben 1–5: Richtig oder Falsch?</h3>
+        {lesen.map((item, index) => (
+          <div key={item.statement} style={questionStyle}>
+            <strong>{index + 1}. {item.statement}</strong>
+            <p style={{ margin: 0, color: "#475569" }}>Wählen Sie Richtig oder Falsch in der Antwortkarte unten.</p>
           </div>
         ))}
-      </div>
-
-      <div style={card}>
-        <h2 style={sectionTitle}>Teil 3: Hören</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Listen to the following short passages about an apartment. After listening, answer the multiple-choice questions that follow.
-        </p>
-        <div style={{ display: "grid", gap: 8 }}>
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              paddingTop: "56.25%",
-              borderRadius: 12,
-              overflow: "hidden",
-              background: "#111827",
-            }}
-          >
-            <iframe
-              src={horenVideoEmbedUrl}
-              title="Teil 3 Hören: Die Wohnung"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                border: 0,
-              }}
-            />
-          </div>
-          <a
-            href={horenVideoUrl}
-            target="_blank"
-            rel="noreferrer"
-            style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-          >
-            Open Hören video on YouTube
-          </a>
-        </div>
-
-        {horenAssignments.map((assignment) => (
-          <div key={assignment.number} style={questionBlock}>
-            <p style={{ margin: 0, fontWeight: 700 }}>{assignment.title}</p>
-            <p style={{ margin: 0, fontWeight: 700 }}>
-              {assignment.number}. {assignment.question}
-            </p>
-            {assignment.options.map((option) => (
-              <p key={option} style={optionLine}>
-                {option}
-              </p>
-            ))}
-            {assignment.extraQuestion && (
-              <>
-                <p style={{ margin: 0, fontWeight: 700 }}>{assignment.extraQuestion.stem}</p>
-                {assignment.extraQuestion.options.map((option) => (
-                  <p key={option} style={optionLine}>
-                    {option}
-                  </p>
-                ))}
-              </>
-            )}
+      </section>
+      <section style={card}>
+        <h2>Teil 2 · Hören: Aria und Marcus</h2>
+        <p>Hören Sie das Gespräch über Gegenstände und Farben. Wählen Sie a, b oder c. Sie können das Gespräch noch einmal hören.</p>
+        {hoerenAudioKey ? (
+          <A1ProtectedAudioPlayer day={10} audioKey={hoerenAudioKey} />
+        ) : (
+          <p role="status" style={{ padding: 12, background: "#fff7ed", borderRadius: 10 }}>
+            Die Audioaufnahme wird eingerichtet. Bitte fragen Sie Ihre Lehrkraft, wenn sie noch nicht verfügbar ist.
+          </p>
+        )}
+        {hoeren.map((item, index) => (
+          <div key={item.question} style={questionStyle}>
+            <strong>{index + 1}. {item.question}</strong>
+            {item.options.map((option) => <p key={option} style={{ margin: 0 }}>{option}</p>)}
           </div>
         ))}
-      </div>
+      </section>
     </A1TutorMarkedWorkbookShell>
   );
-};
-
-export default A1Day10ObjectsColorsPossessiveArticlesWorkbookPage;
+}
