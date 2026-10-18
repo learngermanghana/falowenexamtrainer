@@ -60,7 +60,9 @@ replaceOnce(
   "<h2 style={sectionTitle}>Vocabulary reminder</h2>",
   "Day 12 unassessed vocabulary heading",
 );
-replaceOnce(
+// Day 12 now intentionally has Lesen + Sprechen; legacy audit fixes must not undo it.
+const day12RegistrySource = fs.readFileSync(path.join(root, "web/src/data/a1AssignmentRegistry.js"), "utf8");
+if (!day12RegistrySource.includes("Teil 2: Sprechen · Fragen und Antworten")) replaceOnce(
   "web/src/data/a1AssignmentRegistry.js",
   '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen", "Teil 4: Vocabulary reminder"]],',
   '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen"]],',
