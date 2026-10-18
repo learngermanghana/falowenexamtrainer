@@ -6,7 +6,8 @@ export async function assessA1WorkbookSpeaking({ audioBlob, assignmentKey, idTok
   if (!audioBlob || !idToken) throw new Error("Sign in and record your answer before assessment.");
   if (audioBlob.size > 5 * 1024 * 1024) throw new Error("Recording is too large. Please use a shorter answer.");
   const form = new FormData();
-  form.append("audio", audioBlob, "a1-workbook-answer.webm");
+  const extension = /mp4|m4a/i.test(audioBlob.type || "") ? "m4a" : /ogg/i.test(audioBlob.type || "") ? "ogg" : "webm";
+  form.append("audio", audioBlob, "a1-workbook-answer." + extension);
   form.append("assignmentKey", assignmentKey);
   const api = getSpeakingApiUrl() || getBackendUrl();
   const response = await axios.post(api + "/speaking/a1-workbook-score", form, {
