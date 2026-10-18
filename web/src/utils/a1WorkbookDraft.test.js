@@ -153,3 +153,11 @@ test.each(["A1-13", "A1-14.1"])("new %s reading clears both former reading parts
   expect(submission).toContain("TEIL 2\n1. Richtig\n5. Falsch");
   expect(submission).not.toContain("OBSOLETE");
 });
+
+test('new Chapter 3 grammar draft saves all six blanks and drops old hobby answers', () => {
+  const assignment = getA1Assignment('A1-3');
+  const sections = { 'teil-3': { revision: 'a1-3-recorded-family-grammar-v2', answers: { 1: 'gern', 2: 'Magst', 3: 'gern', 4: 'mögen', 5: 'gern', 6: 'mag' } } };
+  saveA1WorkbookDraft({ assignmentKey: 'A1-3', sections });
+  const text = buildA1WorkbookSubmissionText({ assignment, draft: readA1WorkbookDraft('A1-3') });
+  expect(text).toContain('TEIL 3\n1. gern\n2. Magst\n3. gern\n4. mögen\n5. gern\n6. mag');
+});

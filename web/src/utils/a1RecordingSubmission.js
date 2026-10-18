@@ -12,7 +12,7 @@ export function buildA1RecordingSubmission({ assignmentKey, submissionText, draf
     throw new Error("Teil 2 must match your saved recording. Return to the workbook to restore it before submitting.");
   }
   return {
-    workbookRevision: "a1-3-recorded-family-v1",
+    workbookRevision: draft?.sections?.["teil-3"]?.revision === "a1-3-recorded-family-grammar-v2" ? "a1-3-recorded-family-grammar-v2" : "a1-3-recorded-family-v1",
     recordings: [{ sectionKey: "teil-2", audioUrl, transcript, savedAt: String(recording.savedAt || recording.markedAt || "") }],
     workbookSections: { "teil-2": { text: transcript, recording: { audioUrl, transcript } } },
   };
