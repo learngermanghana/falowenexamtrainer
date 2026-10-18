@@ -40,7 +40,7 @@ test("an expired signed MP3 refreshes after playback error without resetting que
   fireEvent.error(container.querySelector("audio"));
   await waitFor(() => expect(container.querySelector("audio").getAttribute("src")).toBe(fresh));
   expect(getPublishedHoerenLesson).toHaveBeenCalledTimes(2);
-  expect(screen.getByText("Aussage 0 stimmt?")).toBeTruthy();
+  expect(container.querySelectorAll("fieldset")).toHaveLength(5);
 });
 
 test("audio retry is available when signed URL renewal cannot reach the server", async () => {
