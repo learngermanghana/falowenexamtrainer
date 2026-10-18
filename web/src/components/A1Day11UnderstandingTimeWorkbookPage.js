@@ -46,12 +46,49 @@ const videoFrame = {
   border: 0,
 };
 
-const teil1Questions = [
-  { stem: "1. Wie lange bleibt Thomas in Hamburg?", options: ["a) Einen Tag", "b) Zwei Tage", "c) Eine Woche"] },
-  { stem: "2. Wie lange geht Thomas zu Fuß zum Schiff?", options: ["a) 10 Minuten", "b) Eine Stunde", "c) 20 Minuten"] },
-  { stem: "3. Wie lange dauert die Fahrt mit dem Schiff?", options: ["a) 10 Minuten", "b) Eine Stunde", "c) Zwei Tage"] },
-  { stem: "4. Wann beginnt das Konzert?", options: ["a) Um 10 Uhr", "b) Um 12 Uhr", "c) Um 20 Uhr"] },
-  { stem: "5. Wie lange dauert der Besuch im Museum?", options: ["a) 10 Minuten", "b) Zwei Stunden", "c) Den ganzen Tag"] },
+const lesenNotices = [
+  {
+    title: "Schild 1: Arztpraxis Dr. Weber",
+    details: [
+      { label: "Sprechzeiten", value: "Montag – Donnerstag: 08:00–12:00 Uhr" },
+      { value: "Freitag: 08:00–11:30 Uhr" },
+      { value: "Nachmittags geschlossen." },
+    ],
+    statement: "Sie können am Freitag um 14:00 Uhr zum Arzt gehen.",
+  },
+  {
+    title: "Schild 2: Bäckerei Schmidt",
+    details: [
+      { label: "Öffnungszeiten", value: "Dienstag bis Sonntag: 06:30–18:00 Uhr" },
+      { value: "Montag Ruhetag!" },
+    ],
+    statement: "Am Montag ist die Bäckerei geschlossen.",
+  },
+  {
+    title: "Schild 3: Stadtmuseum",
+    details: [
+      { label: "Eintritt", value: "Täglich ab 10:00 Uhr." },
+      { value: "Letzter Einlass: 17:30 Uhr." },
+      { value: "Schließung: 18:00 Uhr." },
+    ],
+    statement: "Sie können das Museum um 11:00 Uhr besuchen.",
+  },
+  {
+    title: "Schild 4: Supermarkt Express",
+    details: [
+      { label: "Öffnungszeiten", value: "Werktags (Montag bis Samstag): 07:00–20:00 Uhr" },
+      { value: "Sonn- und Feiertage: geschlossen" },
+    ],
+    statement: "Am Samstag um 19:00 Uhr kann man hier einkaufen.",
+  },
+  {
+    title: "Text 5: Busfahrplan Linie 10",
+    details: [
+      { label: "Abfahrt am Hauptbahnhof", value: "Montag – Freitag: alle 15 Minuten (ab 06:00 Uhr)" },
+      { value: "Samstag & Sonntag: erst ab 08:00 Uhr (alle 30 Minuten)" },
+    ],
+    statement: "Der Bus fährt am Sonntag schon um 06:30 Uhr.",
+  },
 ];
 
 const teil2Questions = [
@@ -73,31 +110,28 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       submitTitle="Submit A1 · Day 11 · Chapter 7"
       submitDescription="Submit your completed Chapter 7 answers here when both Teile are finished."
     >
-      <div style={card}>
-        <img
-          src="https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1600&q=80"
-          alt="Wall clock showing time for a daily routine lesson"
-          loading="lazy"
-          style={{ width: "100%", borderRadius: 10, maxHeight: 280, objectFit: "cover" }}
-        />
-        <h2 style={sectionTitle}>Teil 1 (Lesen): Thomas in Hamburg</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Goethe A1.1 · 5 einfache Fragen. Lesen Sie den Text und wählen Sie a, b oder c.</p>
+      <section style={card}>
+        <h2 style={sectionTitle}>Teil 1 · Lesen: Schilder und Öffnungszeiten</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Text:</strong> Hallo! Ich bin Thomas. Ich bin in Hamburg. Ich bleibe <strong>zwei Tage</strong>.
-          Ich gehe <strong>10 Minuten</strong> zu Fuß zum Schiff. Die Fahrt mit dem Schiff dauert <strong>eine Stunde</strong>.
-          Heute Abend gehe ich in ein Konzert. Das Konzert beginnt <strong>um 20 Uhr</strong>. Ich esse Fisch im Restaurant
-          <em> Seeblick</em>. Morgen gehe ich in ein Museum. Der Besuch dauert <strong>zwei Stunden</strong>.
+          Lesen Sie die Schilder und Aushänge und die Aussagen 1–5. Ist die Aussage <strong>richtig</strong> oder <strong>falsch</strong>?
+          Wählen Sie die Antworten im Antwortbereich unter den Texten.
         </p>
-
-        {teil1Questions.map((question) => (
-          <div key={question.stem} style={questionBlock}>
-            <p style={{ margin: 0 }}><strong>{question.stem}</strong></p>
-            {question.options.map((option) => (
-              <p key={option} style={optionLine}>{option}</p>
-            ))}
-          </div>
+        {lesenNotices.map((notice, index) => (
+          <article key={notice.title} style={questionBlock}>
+            <h3 style={{ margin: 0, fontSize: "1rem" }}>{notice.title}</h3>
+            <div style={{ padding: "10px 12px", borderRadius: 8, background: "#f8fafc", display: "grid", gap: 4 }}>
+              {notice.details.map((detail, rowIndex) => (
+                <p key={rowIndex} style={{ margin: 0, lineHeight: 1.6 }}>
+                  {detail.label ? <strong>{detail.label}: </strong> : null}
+                  {detail.value}
+                </p>
+              ))}
+            </div>
+            <p style={{ margin: 0, lineHeight: 1.7 }}><strong>{index + 1}.</strong> {notice.statement}</p>
+            <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>Richtig oder Falsch?</p>
+          </article>
         ))}
-      </div>
+      </section>
 
       <div style={card}>
         <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
@@ -132,12 +166,6 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
         </div>
       </div>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>Vokabeln</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>12-Stunden-Uhr:</strong> Uhr, morgens, mittags, nachmittags, abends, nachts, eine Stunde, halb, Viertel nach, Viertel vor, um, früh, spät.</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Präpositionen der Zeit:</strong> um, am, im, vor, nach, von ... bis, seit, ab.</p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Wochentage:</strong> Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag, Wochentag, Wochenende, heute, morgen, übermorgen, gestern, vorgestern.</p>
-      </div>
     </A1TutorMarkedWorkbookShell>
   );
 };
