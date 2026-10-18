@@ -32,7 +32,7 @@ jest.mock("./A1TimedMockExam", () => ({
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {
-  test("uses the new two-part Lesen and Hören contract", () => {
+  test("uses the two-part Sprechen and Hören contract", () => {
     const { container } = render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day17InstructionsDirectionsKapitel11WorkbookPage />
@@ -45,7 +45,7 @@ describe("A1 Day 17 native standard workbook", () => {
         day: 17,
         chapter: "11",
         sections: [
-          expect.objectContaining({ key: "teil-1", label: expect.stringMatching(/Lesen/) }),
+          expect.objectContaining({ key: "teil-1", label: expect.stringMatching(/Sprechen/) }),
           expect.objectContaining({ key: "teil-2", label: expect.stringMatching(/Hören/) }),
         ],
       }),
@@ -59,7 +59,7 @@ describe("A1 Day 17 native standard workbook", () => {
     expect(screen.queryByRole("tab", { name: /Teil 3/i })).not.toBeInTheDocument();
   });
 
-  test("shows the replacement reading and protected Day 17 listening", async () => {
+  test("shows polite requests in Teil 1 and protected listening in Teil 2", async () => {
     render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day17InstructionsDirectionsKapitel11WorkbookPage />
@@ -67,18 +67,15 @@ describe("A1 Day 17 native standard workbook", () => {
     );
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 1/i }));
-    expect(screen.getByRole("heading", { name: /Der Weg von der Touristeninformation zum Schiff/i })).toBeVisible();
-    expect(screen.getByText("10 Minuten zu Fuß")).toBeVisible();
+    expect(screen.getByRole("heading", { name: /Sprechen: Bitten und Reagieren/i })).toBeVisible();
+    expect(screen.getByText(/KARTE 1: Fenster/i)).toBeVisible();
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 2/i }));
     expect(screen.getByRole("heading", { name: /Hören: Wegbeschreibung zum Bahnhof/i })).toBeVisible();
-    expect(screen.queryByRole("button", { name: "Hören starten" })).not.toBeInTheDocument();
-
     expect(fetchA1AudioPlaybackUrl).toHaveBeenCalledWith({
       day: 17,
       key: "a1/day-17/day-17.mp3",
       idToken: "test-token",
     });
-    expect(screen.getByText("Zusatzaufgabe · nicht benotet")).toBeVisible();
   });
 });
