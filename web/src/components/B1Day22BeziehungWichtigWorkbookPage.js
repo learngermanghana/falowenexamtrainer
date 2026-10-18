@@ -199,18 +199,35 @@ const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
       {activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Lesen 2 (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Situationen und Anzeigen" submissionNote="Antworten unter Teil 4 abgeben: 1B, 2A, 3C.">
-            <p style={{ margin: 0 }}>Empfohlene Arbeitszeit: 15 Minuten. Lesen Sie die Situationen (1–3) und die Anzeigen (A–D). Welche Anzeige passt zu welcher Person? Eine Anzeige passt nicht.</p>
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Zukunft der Partnerschaft: Fernbeziehung und getrenntes Wohnen" submissionNote="Antworten unter Teil 4 abgeben: 1B, 2–0, 3A, 4C, 5A, 6–0, 7B.">
+            <p style={{ margin: 0 }}>Empfohlene Bearbeitungszeit: 15 Minuten. Lesen Sie drei Expertenbeiträge (Person A, B und C). Ordnen Sie die sieben Aussagen den Personen zu. Zwei Aussagen passen zu keiner Person: Markieren Sie dann 0.</p>
+            <p style={{ margin: 0 }}>Strategie: Lesen Sie zunächst die Aussagen 1–7 und markieren Sie Schlüsselbegriffe. Suchen Sie anschließend nach Synonymen und Paraphrasen in den Texten.</p>
           </WorkbookTaskCard>
+          <article style={contentCard}>
+            <h3 style={{ margin: 0 }}>Zukunft der Partnerschaft: Fernbeziehung und getrenntes Wohnen</h3>
+            <strong>Person A: Prof. Dr. Julian Hofmann (Beziehungssoziologe)</strong>
+            <p style={{ margin: 0 }}>Die Dynamik moderner Arbeitsmärkte zwingt immer mehr Paare zur beruflichen Flexibilität, woraus häufig geografische Distanzen resultieren. Digitale Medien ermöglichen zwar eine kontinuierliche Alltagskommunikation über Hunderte von Kilometern hinweg, sie ersetzen jedoch keinesfalls die verbindliche physische Präsenz. Eine Fernbeziehung kann auf Dauer nur dann bestehen, wenn beide Partner eine klare gemeinsame Perspektive für das Zusammenleben entwickeln. Fehlt dieser konkrete Zukunftshorizont, führt die zeitweise Trennung meist zu einer schleichenden Entfremdung, da reine Wortkommunikation das gemeinsame Erleben nicht dauerhaft kompensieren kann.</p>
+          </article>
+          <article style={contentCard}>
+            <strong>Person B: Dr. Claudia Seidel (Paartherapeutin)</strong>
+            <p style={{ margin: 0 }}>Die Distanz in einer Fernbeziehung birgt eine unterschätzte psychologische Gefahr: Partner neigen dazu, einander aus der Ferne zu idealisieren. Bei den seltenen Treffen am Wochenende steigt dadurch der Druck, unvergessliche Momente zu schaffen, was bei kleinsten Alltagsstörungen schnell in Enttäuschung umschlägt. Ein unterschätzter Pluspunkt liegt hingegen im Freiraum für die persönliche Entfaltung: Beide Partner behalten ihr eigenes soziales Umfeld und entgehen der Gefahr, in der Partnerschaft ihre eigene Identität aufzugeben. Dennoch erfordert dieses Modell ein außergewöhnlich hohes Maß an gegenseitigem Vertrauen.</p>
+          </article>
+          <article style={contentCard}>
+            <strong>Person C: Markus Lindner (Autor und Journalist)</strong>
+            <p style={{ margin: 0 }}>Das traditionelle Ideal der gemeinsamen Wohnung als einzig gültigem Beziehungsmodell ist längst überholt. Immer mehr Paare entscheiden sich bewusst für das Modell „Living Apart Together“ – also feste Partnerschaft in getrennten Wohnungen. Diese Lebensform bewahrt die Faszination und Leidenschaft der ersten Beziehungsphase, da der schleichende Beziehungsverschleiß durch alltägliche Routineaufgaben gar nicht erst entsteht. Man begegnet sich stets als Gast und schätzt die gemeinsam verbrachte Zeit viel bewusster. Für die individuelle Selbstbestimmung ist diese Wohnform ein echter Gewinn.</p>
+          </article>
           <div style={contentCard}>
-            <h3 style={{ margin: 0 }}>Situationen</h3>
-            <ol style={listSpacing}><li>Lukas (28) möchte beim Sport neue Leute kennenlernen, will aber keinen festen Vertrag in einem Fitnessstudio abschließen.</li><li>Elena (34) und Marco (36) suchen nach einer gemeinsamen Aktivität am Wochenende, um zusammen kochen zu lernen.</li><li>Sandra (42) ist Single und möchte am Wochenende in einer Gruppe draußen in der Natur unterwegs sein und neue Kontakte knüpfen.</li></ol>
-          </div>
-          <div style={{ display: "grid", gap: 10 }}>
-            <article style={contentCard}><strong>Anzeige A: Kochen für zwei!</strong><p style={{ margin: 0 }}>Unser exklusiver Wochenend-Kochkurs für Paare. Lernen Sie unter professioneller Anleitung leckere 3-Gänge-Menüs kennen. Samstags von 15 bis 19 Uhr. Anmeldung paarweise erforderlich unter www.kochstudio-praxis.de.</p></article>
-            <article style={contentCard}><strong>Anzeige B: Offener Lauftreff im Stadtpark!</strong><p style={{ margin: 0 }}>Jeden Dienstag und Donnerstag ab 18:00 Uhr. Wir laufen gemeinsam eine Stunde und unterhalten uns danach bei einem Getränk. Keine Vereinsmitgliedschaft, kostenlos und ohne Vertragsbindung!</p></article>
-            <article style={contentCard}><strong>Anzeige C: Single-Wandern in der Region:</strong><p style={{ margin: 0 }}>Entspannte Tageswanderungen am Samstag durch die Natur. Lernen Sie neue Leute in Ihrem Alter kennen, während Sie gemeinsam die Landschaft genießen. Busanreise inklusive.</p></article>
-            <article style={contentCard}><strong>Anzeige D: Tanzschule „Rhythmus“:</strong><p style={{ margin: 0 }}>Neue Tanzkurse für Paare jeden Sonntagabend. Lernen Sie Salsa, Walzer und Discofox in gemütlicher Atmosphäre. Jetzt Probestunde buchen!</p></article>
+            <h3 style={{ margin: 0 }}>Aussagen (1–7)</h3>
+            <p style={{ margin: 0 }}>Welche Person äußert das? Wählen Sie A, B, C oder 0 (passt zu keiner Person).</p>
+            <ol style={listSpacing}>
+              <li>Die Überhöhung des Partners aus der Distanz kann bei realen Begegnungen zu Konflikten und Enttäuschungen führen.</li>
+              <li>Der Staat sollte Paaren in Fernbeziehungen deutliche steuerliche Vergünstigungen für Fahrtkosten gewähren.</li>
+              <li>Ohne eine verbindliche Absicht zum späteren Zusammenziehen hat eine Distanzbeziehung langfristig kaum Bestand.</li>
+              <li>Das Wohnen in getrennten Wohnungen schützt die Beziehung vor den negativen Folgen des Alltagstrotts.</li>
+              <li>Der Hauptgrund für das Entstehen von Fernbeziehungen liegt in den Anforderungen des modernen Berufslebens.</li>
+              <li>Fernbeziehungen bieten den Vorteil, dass Paare ihre finanzielle Unabhängigkeit vollständig bewahren.</li>
+              <li>Das Leben auf Distanz ermöglicht es den Partnern, ihre individuelle Identität und Unabhängigkeit zu erhalten.</li>
+            </ol>
           </div>
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
@@ -228,7 +245,7 @@ const config = {
   assignmentKey: "B1-7.22",
   workbookId: "B1Day22BeziehungWichtig",
   title: "Was ist dir in einer Beziehung wichtig?",
-  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 22 assignments are preserved inside the shared B1 workbook shell.",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. Teil 3: Online-Dating. Teil 4: Expertenbeiträge über Fernbeziehungen und getrenntes Wohnen.",
   submitListening: true,
   listening: { submitRequired: true },
 };
