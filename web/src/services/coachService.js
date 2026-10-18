@@ -108,7 +108,7 @@ export const analyzeAudio = async ({
         ...requestTimeoutConfig,
       });
 
-      return response.data;
+      return { ...response.data, audioUrl };
     };
 
     const submitAsMultipartFallback = async () => {

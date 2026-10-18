@@ -66,8 +66,8 @@ test("maps A1 Chapter 3 workbook responses into one canonical tutor submission",
 
   expect(submissionText).toContain("TEIL 1\n1. Es\n2. Sie\n3. Es\n4. Er");
   expect(submissionText).toContain("TEIL 2\nMeine Familie ist klein. Wir wohnen in Accra.");
-  expect(submissionText).toContain("TEIL 3\n1. Ja, ich spiele gern Fußball.");
-  expect(submissionText).toContain("10. Ja, ich wandere gern.");
+  expect(submissionText).not.toContain("TEIL 3");
+  expect(submissionText).not.toContain("Ja, ich wandere gern.");
 });
 
 test("counts only non-empty required answers", () => {
