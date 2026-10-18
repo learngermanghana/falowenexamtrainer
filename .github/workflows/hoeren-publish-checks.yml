@@ -6,6 +6,9 @@ on:
       - "functions/functionz/app.js"
       - "functions/functionz/__tests__/courseHoerenPublishing.test.js"
       - "web/src/components/PublishedHoerenPractice.jsx"
+      - "web/src/components/PublishedHoerenPractice.audio.test.jsx"
+      - "web/src/utils/hoerenSignedAudio.js"
+      - "web/src/utils/hoerenSignedAudio.test.js"
       - "web/src/services/publishedHoerenService.js"
       - "web/src/components/A1TutorMarkedWorkbookShell.js"
       - "web/src/components/A2StandardTabbedWorkbookPage.js"
@@ -37,6 +40,11 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm install --prefix web --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Verify signed URL expiry and automatic audio retries
+        run: npx jest --runInBand --runTestsByPath src/utils/hoerenSignedAudio.test.js src/components/PublishedHoerenPractice.audio.test.jsx
+        working-directory: web
+        env:
+          CI: true
       - run: npm run build --prefix web
         env:
           CI: false
