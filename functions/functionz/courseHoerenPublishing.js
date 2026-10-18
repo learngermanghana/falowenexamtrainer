@@ -4,7 +4,7 @@ const crypto = require("node:crypto");
 const { getR2AudioConfig } = require("./r2CourseAudio");
 
 const OWNER_SHA256 = "e8bc09aac410e86216e384ab4c612d6ac6551273085f8344206b23f4004f90a1";
-const LEVELS = new Set(["A1", "A2", "B1", "B2"]);
+const LEVELS = new Set(["A1", "A2", "B1"]);
 const KINDS = new Set(["richtig-falsch", "multiple-choice"]);
 const MAX_AUDIO_BYTES = 6 * 1024 * 1024;
 const normalizeEvidence = value => String(value || "").normalize("NFKC").replace(/\s+/g, " ").trim().toLocaleLowerCase("de-DE");
@@ -74,7 +74,7 @@ const awsEncode = v => encodeURIComponent(String(v)).replace(/[!'()*]/g, c => `%
 const encodePath = value => value.split("/").map(awsEncode).join("/");
 const hmac = (key, value) => crypto.createHmac("sha256", key).update(value).digest();
 function signedStudioUrl({ method = "GET", key, env = process.env, now = new Date(), expires = 900 }) {
-  if (!/^(a1|a2|b1|b2)\/studio\/[a-z0-9.-]+\/[a-f0-9-]{36}\.mp3$/.test(key) || !["GET", "PUT"].includes(method)) {
+  if (!/^(a1|a2|b1)\/studio\/[a-z0-9.-]+\/[a-f0-9-]{36}\.mp3$/.test(key) || !["GET", "PUT"].includes(method)) {
     throw new Error("Invalid private studio object path.");
   }
   const { accountId, accessKeyId, secretAccessKey, bucket } = getR2AudioConfig(env);
