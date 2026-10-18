@@ -199,7 +199,7 @@ const B1Day22PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
       {activeTab === "hoeren" && (
         <section style={card}>
           <h2 style={sectionTitle}>Teil 4 · Lesen 2 (Assignment)</h2>
-          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Zukunft der Partnerschaft: Fernbeziehung und getrenntes Wohnen" submissionNote="Antworten unter Teil 4 abgeben: 1B, 2–0, 3A, 4C, 5A, 6–0, 7B.">
+          <WorkbookTaskCard eyebrow="Your assignment · Reading" title="Zukunft der Partnerschaft: Fernbeziehung und getrenntes Wohnen" submissionNote="Antworten unter Teil 4 abgeben: 1B, 2–0, 3A ... (alle sieben Aussagen).">
             <p style={{ margin: 0 }}>Empfohlene Bearbeitungszeit: 15 Minuten. Lesen Sie drei Expertenbeiträge (Person A, B und C). Ordnen Sie die sieben Aussagen den Personen zu. Zwei Aussagen passen zu keiner Person: Markieren Sie dann 0.</p>
             <p style={{ margin: 0 }}>Strategie: Lesen Sie zunächst die Aussagen 1–7 und markieren Sie Schlüsselbegriffe. Suchen Sie anschließend nach Synonymen und Paraphrasen in den Texten.</p>
           </WorkbookTaskCard>
