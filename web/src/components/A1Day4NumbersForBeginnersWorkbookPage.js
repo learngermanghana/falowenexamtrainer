@@ -1,142 +1,122 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
-
+import A1TutorSpeakingCheckpoint from "./A1TutorSpeakingCheckpoint";
 import { styles } from "../styles";
 
-const card = {
-  ...styles.card,
+// Day 4 / Kapitel 2 teaches numbers. The first task is deliberately a
+// supported copying task, not a Goethe-level free-form application exercise.
+const card = { ...styles.card, display: "grid", gap: 14 };
+const softCard = {
+  border: "1px solid #bfdbfe",
+  borderRadius: 12,
+  background: "#eff6ff",
+  padding: 14,
   display: "grid",
-  gap: 12,
+  gap: 8,
+  lineHeight: 1.75,
 };
-
-const sectionTitle = {
-  margin: 0,
-  fontSize: "1.1rem",
-};
-
-const optionLine = {
-  margin: 0,
-  paddingLeft: 12,
-  lineHeight: 1.7,
-};
-
-const questionBlock = {
-  display: "grid",
-  gap: 6,
-  padding: "10px 12px",
-  border: "1px solid #e5e7eb",
-  borderRadius: 10,
-  background: "#fff",
-};
-
-const teil2Questions = [
-  {
-    stem: "1. Wie heißt die Zahl 7 auf Deutsch?",
-    options: ["a) sieben", "b) sechs", "c) neun"],
-  },
-  {
-    stem: "2. Welche Zahl ist das? (3)",
-    options: ["a) vier", "b) drei", "c) zwei"],
-  },
-  {
-    stem: "3. Welche Zahl kommt nach fünf?",
-    options: ["a) vier", "b) sechs", "c) sieben"],
-  },
-  {
-    stem: "4. Wie heißt die Zahl 9 auf Deutsch?",
-    options: ["a) acht", "b) neun", "c) zehn"],
-  },
-  {
-    stem: "5. Wie viele Tage hat eine Woche?",
-    options: ["a) fünf", "b) sieben", "c) neun"],
-  },
-  {
-    stem: "6. Wie viele Finger hast du an einer Hand?",
-    options: ["a) drei", "b) sechs", "c) fünf"],
-  },
-  {
-    stem: "7. Wie heißt die Zahl 222 auf Deutsch?",
-    options: ["a) zweihundertzwanzig", "b) zweihundertzweiundzwanzig", "c) zweihundertneunundzwanzig"],
-  },
-  {
-    stem: "8. Wie heißt die Zahl 509 auf Deutsch?",
-    options: ["a) fünfhundertneun", "b) fünfhundertneunzehn", "c) fünfhundertfünfzig"],
-  },
-  {
-    stem: "9. Wie heißt die Zahl 2040 auf Deutsch?",
-    options: ["a) zweitausendvierzig", "b) zweitausendvier", "c) zweitausendvierhundert"],
-  },
-  {
-    stem: "10. Wie heißt die Zahl 5509 auf Deutsch?",
-    options: ["a) fünftausendfünfhundertneun", "b) fünftausendneunhundertfünf", "c) fünfhundertfünfundneunzig"],
-  },
+const tableCell = { borderBottom: "1px solid #e2e8f0", padding: "12px 10px", textAlign: "left", verticalAlign: "top" };
+const formFields = [
+  ["Alter", "1"],
+  ["Straße & Hausnummer", "2"],
+  ["Telefonnummer", "3"],
+  ["Kursdauer", "4", "Monate"],
+  ["Kursgebühr (Preis)", "5", "Euro"],
 ];
+const numberWords = [12, 16, 221, 3435, 70];
 
-const A1Day4NumbersForBeginnersWorkbookPage = () => (
-  <A1TutorMarkedWorkbookShell
-    fallbackAssignmentKey="A1-2"
-    title="A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses"
-    subtitle="Chapter 2 · Tutor-marked assignment"
-    assignmentIntro="Complete both workbook Teile. Your answers are saved as a draft until you open Review & Submit and send the assignment."
-    submitTitle="Review & Submit A1 · Day 4 · Chapter 2"
-    submitDescription="Review the mapped number answers below, make any final edits, then press Submit Assignment once."
-  >
-    <div style={card}>
-      <img
-        src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1600&q=80"
-        alt="Notebook page with numbers and study notes"
-        loading="lazy"
-        style={{
-          width: "100%",
-          borderRadius: 10,
-          maxHeight: 280,
-          objectFit: "cover",
-        }}
-      />
-
-      <h2 style={sectionTitle}>Teil 1: Reading / Writing</h2>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        <strong>Numbers for Beginners (A1.1) (Exercise).</strong> Instructions: Read each question carefully and choose
-        the correct answer (a, b, or c). Use a dictionary to look up any words you don&apos;t understand.
-      </p>
-
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Aufgabe (Writing Task): Schreiben Sie die folgenden Zahlen auf Deutsch. Benutzen Sie ein Wörterbuch,
-        wenn Sie ein Wort nicht verstehen.
-      </p>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Instructions: Write the following numbers in German. Use a dictionary if you don&apos;t understand a word.
-      </p>
-      <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-        <li>16</li>
-        <li>98</li>
-        <li>555</li>
-        <li>1020</li>
-        <li>8553</li>
-      </ol>
-
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Beispiel (Example): 25 – fünfundzwanzig. Extra note from today&apos;s material: zweitausendvier.
-      </p>
-    </div>
-
-    <div style={card}>
-      <h2 style={sectionTitle}>Teil 2: Questions</h2>
-
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        The questions progress from <strong>basic number recognition</strong> to <strong>numbers in context</strong> and then <strong>larger numbers</strong>. They all belong to this one Teil 2 section.
-      </p>
-
-      {teil2Questions.map((question) => (
-        <div key={question.stem} style={questionBlock}>
-          <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
-          {question.options.map((option) => (
-            <p key={option} style={optionLine}>{option}</p>
-          ))}
+export default function A1Day4NumbersForBeginnersWorkbookPage() {
+  return (
+    <A1TutorMarkedWorkbookShell
+      fallbackAssignmentKey="A1-2"
+      title="A1 · Day 4 Workbook · Zahlen und Telefonnummern"
+      subtitle="Kapitel 2 · Numbers · Tutor-marked assignment"
+      assignmentIntro="Complete all three Teile: copy five numbers into the form, write five German number words and record one short phone-number answer. Your answers remain a draft until you open Review & Submit."
+      submitTitle="Review & Submit · A1 Day 4 · Kapitel 2"
+      submitDescription="Check your five form entries, five written German numbers and saved speaking result before submitting."
+    >
+      <section style={card} data-a1-day4-teil1="simple-form">
+        <h2 style={{ margin: 0 }}>Teil 1 · Schreiben: Ein einfaches Formular</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          <strong>Aufgabe:</strong> Lesen Sie die Informationen über Elena.
+          Ergänzen Sie die <strong>fünf Zahlenangaben (1–5)</strong> im Formular.
+          Sie dürfen die Zahlen direkt aus dem Text übernehmen.
+        </p>
+        <p style={{ margin: 0, color: "#475569" }}>
+          <strong>English:</strong> Read the short text. Copy the five missing number details into the registration form.
+        </p>
+        <div style={softCard}>
+          <strong>Informationen zu Elena</strong>
+          <p style={{ margin: 0 }}>
+            Elena Popov ist <strong>26 Jahre</strong> alt.
+            Sie wohnt in der <strong>Müllerstraße 87</strong> in Berlin.
+            Ihre Telefonnummer ist <strong>0171 33 55 90</strong>.
+            Der Deutschkurs dauert <strong>3 Monate</strong>.
+            Er kostet <strong>240 Euro</strong>.
+          </p>
         </div>
-      ))}
-    </div>
-  </A1TutorMarkedWorkbookShell>
-);
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 320 }}>
+            <caption style={{ textAlign: "left", fontWeight: 800, paddingBottom: 9 }}>
+              Anmeldung · Sprachschule Berlin
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col" style={tableCell}>Feld</th>
+                <th scope="col" style={tableCell}>Eintrag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row" style={tableCell}>Name</th><td style={tableCell}>Popov</td></tr>
+              <tr><th scope="row" style={tableCell}>Vorname</th><td style={tableCell}>Elena</td></tr>
+              {formFields.map(([label, number, unit]) => (
+                <tr key={number}>
+                  <th scope="row" style={tableCell}>{label}</th>
+                  <td style={tableCell}><strong>({number})</strong> __________ {unit || ""}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p style={{ margin: 0, fontSize: 14, color: "#334155" }}>
+          Schreiben Sie Ihre Antworten <strong>1–5</strong> in die Felder für Teil 1 direkt unter der Aufgabe.
+        </p>
+      </section>
 
-export default A1Day4NumbersForBeginnersWorkbookPage;
+      <section style={card} data-a1-day4-teil2="number-writing">
+        <h2 style={{ margin: 0 }}>Teil 2 · Zahlen lesen und schreiben</h2>
+        <p style={{ margin: 0, lineHeight: 1.75 }}>
+          <strong>Aufgabe:</strong> Schreiben Sie die Zahlen <strong>als deutsche Wörter</strong>.
+          Schreiben Sie alle Teile der Zahl zusammen.
+        </p>
+        <div style={softCard}>
+          <strong>Beispiele und Hilfe</strong>
+          <span>25 → fünfundzwanzig</span>
+          <span>100 → hundert · 1.000 → tausend</span>
+          <span>Die letzte große Zahl ist eine Zusatzherausforderung innerhalb der fünf Aufgaben.</span>
+        </div>
+        <ol style={{ margin: 0, paddingLeft: 26, display: "grid", gap: 12, lineHeight: 1.7 }}>
+          {numberWords.map(number => (
+            <li key={number}>
+              <strong>{number.toLocaleString("de-DE")}</strong>
+              <span style={{ color: "#64748b" }}> → ______________________________</span>
+            </li>
+          ))}
+        </ol>
+        <p style={{ margin: 0, fontSize: 14, color: "#334155" }}>
+          Tragen Sie die fünf Antworten <strong>1–5</strong> in die Felder für Teil 2 ein.
+        </p>
+      </section>
+
+      <section style={card} data-a1-day4-teil3="phone-number-speaking">
+        <h2 style={{ margin: 0 }}>Teil 3 · Sprechen: Meine Telefonnummer</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Sprechen Sie Ihre Telefonnummer langsam und deutlich.
+          Sie können stattdessen eine <strong>erfundene Nummer</strong> verwenden.
+          Die Aufnahme wird nicht dauerhaft gespeichert.
+        </p>
+        <A1TutorSpeakingCheckpoint assignmentKey="A1-2" sectionKey="teil-3" />
+      </section>
+    </A1TutorMarkedWorkbookShell>
+  );
+}

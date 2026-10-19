@@ -8,6 +8,10 @@ on:
       - "web/src/components/A1SharedAssignmentWorkbookBridge.test.jsx"
       - "web/src/components/A1TutorMarkedOverviewGuidance.jsx"
       - "web/src/components/A1TutorMarkedWorkbookShell.js"
+      - "web/src/components/A1Day4NumbersForBeginnersWorkbookPage.js"
+      - "web/src/components/A1Day4NumbersForBeginnersWorkbookPage.test.js"
+      - "web/src/components/A1TutorSpeakingCheckpoint.jsx"
+      - "functions/data/answerKeyManifest.json"
       - "web/src/components/A1TutorMarkedWorkbookNavigation.test.js"
       - "web/src/components/A1TutorDraftSectionCapture.jsx"
       - "web/src/components/A1TutorDraftSectionCapture.test.jsx"
@@ -43,7 +47,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1TutorDraftSectionCapture.test.jsx src/utils/a1WorkbookDraft.test.js src/data/a1TutorDraftProfiles.test.js src/components/A1Day18BahnhofListeningV3.test.js
+        run: npm run test:ci -- --runTestsByPath src/components/A1TutorMarkedWorkbookNavigation.test.js src/components/A1SharedAssignmentWorkbookBridge.test.jsx src/components/A1TutorDraftSectionCapture.test.jsx src/utils/a1WorkbookDraft.test.js src/data/a1TutorDraftProfiles.test.js src/components/A1Day4NumbersForBeginnersWorkbookPage.test.js src/components/A1Day18BahnhofListeningV3.test.js
       - name: Reset lifecycle patches before production build
         run: git reset --hard HEAD
       - name: Build production web app

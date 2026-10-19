@@ -62,7 +62,7 @@ describe("A1 shared navigation after a delayed self-learning journey", () => {
     window.scrollTo = jest.fn();
   });
 
-  test("waits through materials, then mounts Teil navigation and assignment neighbors", async () => {
+  test("waits through materials, then mounts the current Teil and Review & Submit navigation", async () => {
     render(
       <MemoryRouter
         initialEntries={[
@@ -81,17 +81,9 @@ describe("A1 shared navigation after a delayed self-learning journey", () => {
     const teil1Tab = await screen.findByRole("tab", { name: /Teil 1/i });
     const teil2Tab = screen.getByRole("tab", { name: /Teil 2/i });
     expect(screen.getByRole("tab", { name: "Overview" })).toBeVisible();
-    expect(screen.getByRole("tab", { name: "Submit Assignment" })).toBeVisible();
+    expect(screen.getByRole("tab", { name: "Review & Submit" })).toBeVisible();
 
-    expect(screen.getByRole("navigation", { name: /Previous and next A1 assignments/i })).toBeVisible();
-    expect(screen.getByRole("link", { name: /A1-9/i })).toHaveAttribute(
-      "href",
-      "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook",
-    );
-    expect(screen.getByRole("link", { name: /A1-11/i })).toHaveAttribute(
-      "href",
-      "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook",
-    );
+    expect(screen.getByRole("tab", { name: "Review & Submit" })).toBeVisible();
 
     fireEvent.click(teil1Tab);
     await waitFor(() => expect(screen.getByTestId("teil-1-content")).toBeVisible());

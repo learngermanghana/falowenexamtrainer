@@ -5,6 +5,15 @@ import { assessA1TutorSpeaking } from "../services/coachService";
 import { buildRecordedAudioBlob, createSpeakingMediaRecorder, userFacingAudioError } from "../lib/speakingAudio";
 
 const TASKS = {
+  "A1-2": {
+    examPart: 1,
+    heading: "Telefonnummer sprechen",
+    instructions: "Sagen Sie: Meine Telefonnummer ist … Sprechen Sie die Ziffern langsam und deutlich. Sie können eine erfundene Nummer sagen, zum Beispiel 0171 33 55 90. Bewertet werden Klarheit und Aussprache der Zahlen, nicht eine bestimmte private Nummer.",
+    cards: ["Meine Telefonnummer ist …", "0 · null", "1 · eins", "7 · sieben", "9 · neun"],
+    assessmentMarker: "A1_NUMBERS_PHONE_SPEAKING_V1",
+    taskLine: "Speaking task: phone number",
+    label: "A1 · Zahlen sprechen",
+  },
   "A1-4": {
     examPart: 1,
     heading: "Sich vorstellen",
@@ -30,7 +39,8 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   const { user } = useAuth();
   const { draft, updateSectionText } = useA1TutorWorkbookDraft() || {};
   const saved = draft?.sections?.[sectionKey]?.text || "";
-  const alreadyAssessed = saved.startsWith("GOETHE_A1_TUTOR_SPEAKING_V1");
+  const marker = task?.assessmentMarker || "GOETHE_A1_TUTOR_SPEAKING_V1";
+  const alreadyAssessed = saved.startsWith(marker);
   const recorder = useRef(null);
   const stream = useRef(null);
   const [recording, setRecording] = useState(false);
@@ -103,8 +113,8 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
       const feedbackValue = result.feedback ?? result.assessment?.feedback ?? result.summary ?? "";
       const feedback = (typeof feedbackValue === "string" ? feedbackValue : JSON.stringify(feedbackValue)).slice(0, 900);
       const storedText = [
-        "GOETHE_A1_TUTOR_SPEAKING_V1",
-        "Speaking exam part: " + task.examPart,
+        marker,
+        task.taskLine || ("Speaking exam part: " + task.examPart),
         "Score: " + score + "/10",
         "Feedback: " + (feedback || "Speaking assessed; tutor may review the score."),
       ].join("\n");
@@ -120,7 +130,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   return (
     <div data-a1-tutor-speaking-checkpoint={assignmentKey} style={{ border: "1px solid #cbd5e1", borderRadius: 16, padding: 16, display: "grid", gap: 14 }}>
       <div>
-        <strong>Goethe A1 · Sprechen Teil {task.examPart} · {task.heading}</strong>
+        <strong>{task.label || `Goethe A1 · Sprechen Teil ${task.examPart}`} · {task.heading}</strong>
         <p>{task.instructions}</p>
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -131,7 +141,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
       {preview ? <audio controls src={preview} aria-label="Preview your answer before assessment" /> : null}
       {blob && !recording && !alreadyAssessed ? <button type="button" disabled={busy} onClick={assess} style={{ padding: 12, borderRadius: 10, background: "#1d4ed8", color: "white" }}>{busy ? "Assessing…" : "Assess final recording"}</button> : null}
       {error ? <p role="alert" style={{ color: "#b91c1c" }}>{error}</p> : null}
-      {saved.includes("GOETHE_A1_TUTOR_SPEAKING_V1") ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace("GOETHE_A1_TUTOR_SPEAKING_V1", "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
+      {saved.startsWith(marker) ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace(marker, "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
     </div>
   );
 }

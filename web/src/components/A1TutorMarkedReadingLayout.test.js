@@ -24,7 +24,6 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-0.1:teil-1",
       "A1-0.2:teil-1",
       "A1-1.2:teil-1",
-      "A1-2:teil-1",
       "A1-6:teil-1",
       "A1-7:teil-1",
       "A1-8:teil-1",
@@ -36,6 +35,7 @@ describe("A1 tutor-marked Lesen exam layout", () => {
       "A1-14.1:teil-1",
       "A1-14.1:teil-2",
     ]));
+    expect(readingSections).not.toContain("A1-2:teil-1"); // Day 4 now has a number-copying form, not a Lesen exam.
     expect(readingSections).not.toContain("A1-8:teil-2");
     expect(readingSections).not.toContain("A1-11:teil-1");
     expect(readingSections).not.toContain("A1-11:teil-2"); // Chapter 11 Teil 2 is Hören.

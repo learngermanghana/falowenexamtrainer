@@ -28,7 +28,7 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
     document.body.innerHTML = `
       <main>
         <div id="workbook">
-          <div id="header"><h1>Numbers</h1></div>
+          <div id="header"><h1>Food</h1></div>
           <div id="teil-one"><h2>Teil 1: Reading / Writing</h2></div>
           <div id="teil-two"><h2>Teil 2: Questions</h2></div>
           <div id="extra"><h2>Teil 3: Not part of this workbook</h2></div>
@@ -38,7 +38,7 @@ describe("A1SharedAssignmentWorkbookBridge", () => {
 
     const sections = discoverA1BridgeSections({
       pageRoot: document.querySelector("#workbook"),
-      assignment: getA1Assignment("A1-2"),
+      assignment: getA1Assignment("A1-10"),
     });
 
     expect(sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2"]);

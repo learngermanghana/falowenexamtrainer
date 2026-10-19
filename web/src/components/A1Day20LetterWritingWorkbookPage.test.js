@@ -2,6 +2,8 @@ import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
+jest.mock("./PublishedHoerenPractice", () => () => null);
+
 jest.mock("./A1CanonicalSubmissionPanel", () => ({ assignment }) => (
   <div data-testid="canonical-submit">Submit {assignment.assignmentKey}</div>
 ));
@@ -10,7 +12,7 @@ jest.mock("./A1TutorDraftSectionCapture", () => () => null);
 jest.mock("./A1TimedMockExam", () => ({
   __esModule: true,
   default: ({ children }) => children,
-  useA1TimedMockExam: () => ({ assignmentLocked: false }),
+  useA1TimedMockExam: () => ({ assignmentLocked: false, isTabLocked: () => false }),
 }));
 
 jest.mock("./A1CourseBookLetterPracticePanel", () => ({
