@@ -798,22 +798,21 @@ app.use(async (req, res, next) => {
     if (!identity) return res.status(401).json({ error: "Authentication required." });
     if (identity.examOnly !== true) return next();
     const path = req.path || "";
-    const levelMatch = path.match(/^\\/(?:a1|a2|b1|b2)-mock\\/|^\\/(?:writing|speaking)\\/(a1|a2|b1|b2)-mock-score$|^\\/course-media\\/(a1|a2|b1|b2)\\/(?:mock-audio-url|exam-hoeren-audio-url)$/i);
     const allowed = [
-      /^\\/(?:a1|a2|b1|b2)-mock\\/attempt\\/(?:start|save)$/,
-      /^\\/(?:writing|speaking)\\/(?:a1|a2|b1|b2)-mock-score$/,
-      /^\\/course-media\\/(?:a1|a2|b1|b2)\\/(?:mock-audio-url|exam-hoeren-audio-url)$/,
-      /^\\/exam-room\\/results$/,
-      /^\\/(?:scores|results\\/history|speech\\/synthesize)$/
+      /^\/(?:a1|a2|b1|b2)-mock\/attempt\/(?:start|save)$/,
+      /^\/(?:writing|speaking)\/(?:a1|a2|b1|b2)-mock-score$/,
+      /^\/course-media\/(?:a1|a2|b1|b2)\/(?:mock-audio-url|exam-hoeren-audio-url)$/,
+      /^\/exam-room\/results$/,
+      /^\/(?:scores|results\/history|speech\/synthesize)$/
     ].some(pattern => pattern.test(path));
     if (!allowed) return res.status(403).json({ error: "Exam-only accounts cannot use course services." });
     const purchases = await admin.firestore().collection("mockPurchases").where("uid", "==", identity.uid).get();
     const now = Date.now();
     const active = purchases.docs.map(doc => doc.data()).filter(p => p.status === "active" && p.expiresAtMs > now);
     if (!active.length) return res.status(403).json({ error: "Purchase an exam package before using this service." });
-    const requestedLevel = (path.match(/^\\/(a1|a2|b1|b2)-mock\\//i)?.[1]
-      || path.match(/^\\/(?:writing|speaking)\\/(a1|a2|b1|b2)-mock-score$/i)?.[1]
-      || path.match(/^\\/course-media\\/(a1|a2|b1|b2)\\//i)?.[1] || "").toUpperCase();
+    const requestedLevel = (path.match(/^\/(a1|a2|b1|b2)-mock\//i)?.[1]
+      || path.match(/^\/(?:writing|speaking)\/(a1|a2|b1|b2)-mock-score$/i)?.[1]
+      || path.match(/^\/course-media\/(a1|a2|b1|b2)\//i)?.[1] || "").toUpperCase();
     if (requestedLevel && !active.some(p => p.level === requestedLevel)) {
       return res.status(403).json({ error: "This exam level is not included in your package." });
     }
