@@ -176,6 +176,9 @@ export default function SharedTimedAssignment({
   useAssessmentRestriction(enabled && !reviewUnlocked);
   const resultStatus = String(assignmentProgress?.status || "").trim().toLowerCase();
   const expiryHandledRef = useRef(false);
+  // Firestore can take several seconds to acknowledge Start. Show the clock
+  // immediately and ignore stale snapshots until the start write is settled.
+  const startWritePendingRef = useRef(false);
   const expiryCallbackRef = useRef(onTimeExpired);
   // Workbook profiles are recreated on navigation. Keep cloud subscriptions
   // independent of their object identity so agreement and timer state survive.
@@ -202,6 +205,9 @@ export default function SharedTimedAssignment({
       attemptRef,
       (snapshot) => {
         setCloudState("ready");
+        // A pre-start/missing-document snapshot must not erase an optimistic
+        // active clock while the newly started attempt is being persisted.
+        if (startWritePendingRef.current) return;
 
         if (!snapshot.exists()) {
           writeLocalSession(assignmentKey, normalizedLevel, null);
@@ -297,11 +303,9 @@ export default function SharedTimedAssignment({
     expiryHandledRef.current = true;
     setAttemptState("expired");
     setSecondsLeft(0);
-    setStatus(
-      config?.autoSubmit
-        ? "Time is up. Your saved answers are being submitted automatically."
-        : "Time is up. The timed assignment sections are locked.",
-    );
+    // The expiry guidance is rendered by the panel. Reserve the status line
+    // for actionable errors, e.g. automatic submission failing.
+    setStatus("");
     writeLocalSession(assignmentKey, normalizedLevel, null);
 
     if (attemptRef) {
@@ -364,9 +368,19 @@ export default function SharedTimedAssignment({
       durationSeconds,
     };
 
+    startWritePendingRef.current = true;
     setStartBusy(true);
     setStatus("");
     setWarningMessage("");
+    // The student should see the countdown on the first click, not only after
+    // a slow cloud write resolves or the page is refreshed.
+    writeLocalSession(assignmentKey, normalizedLevel, nextSession);
+    expiryHandledRef.current = false;
+    warningThresholdsRef.current = new Set();
+    setSession(nextSession);
+    setSecondsLeft(durationSeconds);
+    setAttemptState("active");
+    setAgreed(false);
 
     try {
       if (attemptRef && currentUser?.uid) {
@@ -385,13 +399,6 @@ export default function SharedTimedAssignment({
         });
       }
 
-      writeLocalSession(assignmentKey, normalizedLevel, nextSession);
-      expiryHandledRef.current = false;
-      warningThresholdsRef.current = new Set();
-      setSession(nextSession);
-      setSecondsLeft(durationSeconds);
-      setAttemptState("active");
-      setAgreed(false);
     } catch (error) {
       console.error("Could not start timed assignment", error);
       writeLocalSession(assignmentKey, normalizedLevel, null);
@@ -400,6 +407,7 @@ export default function SharedTimedAssignment({
       setAttemptState("none");
       setStatus("This timed attempt could not be started. It may already have been used or Falowen is offline.");
     } finally {
+      startWritePendingRef.current = false;
       setStartBusy(false);
     }
   }, [
@@ -420,7 +428,9 @@ export default function SharedTimedAssignment({
   const onSubmissionVerified = useCallback(() => {
     setAttemptState("submitted");
     setSecondsLeft(0);
-    setStatus("Timed attempt submitted.");
+    // Submission state is already visible in the panel. Do not show a second
+    // contradictory/stale red status line below the final result message.
+    setStatus("");
     setWarningMessage("");
     expiryHandledRef.current = true;
     writeLocalSession(assignmentKey, normalizedLevel, null);
@@ -578,7 +588,7 @@ export function TimedAssignmentPanel() {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 3 }}>
           <strong style={{ color: urgent ? "#9f1239" : "#1e3a8a" }}>
-            {timedLabel} · {shownDurationMinutes} minutes
+            {used ? `${timedLabel} · attempt closed` : passedReview ? `${timedLabel} · review unlocked` : `${timedLabel} · ${shownDurationMinutes} minutes`}
           </strong>
           <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{config.scope}</span>
         </div>
