@@ -10,7 +10,7 @@ jest.mock("./A1TutorDraftSectionCapture", () => () => null);
 jest.mock("./A1TimedMockExam", () => ({
   __esModule: true,
   default: ({ children }) => children,
-  useA1TimedMockExam: () => ({ assignmentLocked: false }),
+  useA1TimedMockExam: () => ({ assignmentLocked: false, isTabLocked: () => false }),
 }));
 
 jest.mock("./A1CourseBookLetterPracticePanel", () => ({
