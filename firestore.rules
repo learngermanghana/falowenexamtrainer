@@ -261,12 +261,30 @@ service cloud.firestore {
       allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
       allow write: if false;
     }
+    // Marketplace purchases and entitlements are authoritative server records.
+    // Paystack webhooks use Admin SDK, which bypasses client security rules.
+    match /examPaymentIntents/{reference} {
+      allow read, write: if false;
+    }
+
+    match /examEntitlements/{userId} {
+      allow get: if isOwner(userId) || isStaff();
+      allow list: if isStaff();
+      allow create, update, delete: if false;
+    }
+
     match /students/{studentId} {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
       allow read: if signedIn() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
       allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
-      allow update: if signedIn() && (isStaff() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
+      // Exam-only status cannot be changed to a course account by a client.
+      // All other existing student update behavior is retained for legacy courses.
+      allow update: if signedIn() && (isStaff() || (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']) &&
+        resource.data.get('accountType', 'course') != 'exam_only' &&
+        request.resource.data.get('accountType', 'course') != 'exam_only'
+      ));
       allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid);
       match /{collectionId}/{documentId}/{nested=**} {
         allow read, write: if signedIn();
