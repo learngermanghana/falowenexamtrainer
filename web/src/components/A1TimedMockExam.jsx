@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { shouldDispatchA1TimedAutoSubmit } from "../utils/a1TimedAutoSubmitGate";
 import { useLocation, useNavigate } from "react-router-dom";
 import SharedTimedAssignment, {
   buildTimedAssignmentStorageKey,
@@ -50,7 +51,7 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
         window.clearInterval(timer);
         return;
       }
-      if (form && submitButton && !submitButton.disabled && cloudDraftReady && draftLoaded && !draftConflict && finalState !== "saving") {
+      if (shouldDispatchA1TimedAutoSubmit({ formAvailable: Boolean(form && submitButton), submitDisabled: submitButton?.disabled ?? true, cloudDraftReady, draftLoaded, draftConflict, finalState })) {
         if (autoSubmitStartedRef.current) {
           window.clearInterval(timer);
           return;
