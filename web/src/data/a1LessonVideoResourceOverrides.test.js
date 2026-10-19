@@ -50,10 +50,12 @@ test("A1 Day 8 uses the canonical Countries and Languages teacher video", () => 
       }),
     }),
   );
+  // The general Day 8 lesson video and the dedicated teacher lecture are
+  // intentionally different sources. Do not overwrite either to satisfy a stale test.
   expect(lesson.resources.teacherVideo).toEqual(
     expect.objectContaining({
       chapter: "4",
-      url: "https://youtu.be/z5ClrkL4O3k",
+      url: "https://youtu.be/_RZwWLwEzy4",
     }),
   );
 });
