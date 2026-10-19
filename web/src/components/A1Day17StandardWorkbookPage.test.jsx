@@ -32,7 +32,7 @@ jest.mock("./A1TimedMockExam", () => ({
 const route = "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook";
 
 describe("A1 Day 17 native standard workbook", () => {
-  test("uses the new two-part Sprechen and Hören contract", () => {
+  test("uses the three-part Sprechen, Hören and Lesen contract", () => {
     const { container } = render(
       <MemoryRouter initialEntries={[`${route}?radio=done`]}>
         <A1Day17InstructionsDirectionsKapitel11WorkbookPage />
@@ -47,6 +47,7 @@ describe("A1 Day 17 native standard workbook", () => {
         sections: [
           expect.objectContaining({ key: "teil-1", label: expect.stringMatching(/Sprechen/) }),
           expect.objectContaining({ key: "teil-2", label: expect.stringMatching(/Hören/) }),
+          expect.objectContaining({ key: "teil-3", label: expect.stringMatching(/Lesen/) }),
         ],
       }),
     );
@@ -56,7 +57,7 @@ describe("A1 Day 17 native standard workbook", () => {
     expect(navigation).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 1/i })).toBeVisible();
     expect(screen.getByRole("tab", { name: /Teil 2/i })).toBeVisible();
-    expect(screen.queryByRole("tab", { name: /Teil 3/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /Teil 3/i })).toBeVisible();
   });
 
   test("shows the speaking request checkpoint and protected Day 17 listening", async () => {
@@ -79,6 +80,9 @@ describe("A1 Day 17 native standard workbook", () => {
       key: "a1/day-17/day-17.mp3",
       idToken: "test-token",
     });
-    expect(screen.getByText("Zusatzaufgabe · nicht benotet")).toBeVisible();
+    expect(screen.queryByText("Zusatzaufgabe · nicht benotet")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /Teil 3/i }));
+    expect(screen.getByRole("heading", { name: /Lesen: Wegbeschreibung/i })).toBeVisible();
+    expect(screen.getByText(/Annas Haus steht direkt neben der Bäckerei/)).toBeVisible();
   });
 });

@@ -127,6 +127,7 @@ const profiles = {
         { number: 4, type: "choice", choices: ["A", "B", "C"] },
         { number: 5, type: "choice", choices: ["A", "B", "C"] },
       ], { label: "Hören" }),
+      "teil-3": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen: Wegbeschreibung" }),
     },
   },
   "A1-12.1": {
