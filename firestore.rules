@@ -257,8 +257,8 @@ service cloud.firestore {
     match /paystackWebhookEvents/{document=**} { allow read, write: if courseUser(); }
     match /presentationSessions/{document=**} { allow read, write: if courseUser(); }
     match /qa_posts/{document=**} { allow read, write: if courseUser(); }
-    match /scores/{document=**} { allow read: if signedIn(); allow write: if isStaff(); }
-    match /sessions/{document=**} { allow read, write: if signedIn(); }
+    match /scores/{document=**} { allow read: if courseUser(); allow write: if isStaff(); }
+    match /sessions/{document=**} { allow read, write: if courseUser(); }
     match /studentActivityEvents/{document=**} { allow read, write: if courseUser(); }
     match /studentNotifications/{document=**} { allow read, write: if courseUser(); }
     match /accountDeletionRequests/{uid} {
@@ -299,7 +299,7 @@ service cloud.firestore {
     match /studyBuddyUsage/{document=**} { allow read, write: if courseUser(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
     match /writingScoreStats/{document=**} { allow read, write: if courseUser(); }
-    match /writingSubmissions/{document=**} { allow read, write: if signedIn(); }
+    match /writingSubmissions/{document=**} { allow read, write: if courseUser(); }
 
 
     // Admin and staff marking/dashboard access, including collection-group queries.
