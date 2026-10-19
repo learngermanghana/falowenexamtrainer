@@ -219,3 +219,16 @@ test("Grammar study mode retains the visible countdown while a timed attempt is 
   expect(screen.getByLabelText("1500 seconds remaining")).toBeInTheDocument();
   expect(screen.getByTestId("lock")).toHaveTextContent("false");
 });
+
+test("Grammar study mode keeps the agreement and Start controls before the first A1-11 attempt", () => {
+  onSnapshot.mockImplementation((_ref, next) => {
+    snapshot = next;
+    next({ exists: () => false });
+    return unsubscribe;
+  });
+  render(<Harness level="A1" assignmentKey="A1-11" studyMode />);
+  expect(document.querySelector('[data-timed-assignment="A1-11"]')).toBeInTheDocument();
+  expect(screen.getByRole("checkbox")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+});
