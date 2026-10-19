@@ -31,9 +31,9 @@ describe("canonical A1 workbook experience", () => {
     ).toBe(true);
   });
 
-  test("uses the canonical bridge rather than pretending legacy pages are native", () => {
+  test("keeps the migrated Day 4 workbook on canonical native navigation", () => {
     const path = "/campus/course/a1-day-4-numbers-for-beginners-workbook";
-    expect(shouldUseNativeA1WorkbookExperience(path)).toBe(false);
+    expect(shouldUseNativeA1WorkbookExperience(path)).toBe(true);
     expect(shouldUseCanonicalA1WorkbookExperience(path)).toBe(true);
   });
 
