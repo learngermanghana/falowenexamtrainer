@@ -8,6 +8,7 @@ import App from './App';
 import AppStartupBoundary from './components/AppStartupBoundary';
 import PublicAuthRouteBridge from './components/PublicAuthRouteBridge';
 import PublicAuthMobileRecovery from './components/PublicAuthMobileRecovery';
+import MockOnlyRouteBoundary from './components/MockOnlyRouteBoundary';
 import FalowenRadioSeoPage from './components/FalowenRadioSeoPage';
 import RouteScopedAppServices from './components/RouteScopedAppServices';
 import RouteScopedBackgroundServices from './components/RouteScopedBackgroundServices';
@@ -71,7 +72,7 @@ const AuthenticatedAppRoutes = () => (
           <A1Day5FinalWorkbookOpenFix />
           <A1SharedPracticeWorkbookNavigation />
           <RequestedLessonAiVideoHeader />
-          <Routes>
+          <MockOnlyRouteBoundary><Routes>
             <Route path={A1_DAY0_TUTORIAL_ROUTE} element={<Navigate to={A1_DAY0_WORKBOOK_ROUTE} replace />} />
             <Route
               path="/campus/course/lesson/A1/chapter/:chapter"
@@ -109,7 +110,7 @@ const AuthenticatedAppRoutes = () => (
               element={<A2Day27DigitaleKommunikationGrammarPage />}
             />
             <Route path="*" element={<App />} />
-          </Routes>
+          </Routes></MockOnlyRouteBoundary>
         </A1ChapterSpecificLessonRouteBoundary>
       </ToastProvider>
     </AuthProvider>
