@@ -1,5 +1,5 @@
 import React from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import SharedTimedAssignment, { TimedAssignmentPanel, buildTimedAssignmentStorageKey } from "./SharedTimedAssignment";
 import { getTimedAssignmentConfig } from "../data/timedAssignmentConfig";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
@@ -181,7 +181,11 @@ test("a submitted A1 Day 17 attempt shows a closed heading without stale active 
   expect(screen.queryByLabelText(/seconds remaining/)).not.toBeInTheDocument();
   expect(screen.getByTestId("lock")).toHaveTextContent("true");
   expect(screen.queryByRole("button", { name: /^Start/ })).not.toBeInTheDocument();
-  expect(screen.queryByText("Timed attempt submitted.")).not.toBeInTheDocument();
+  const timedPanel = document.querySelector('[data-timed-assignment="A1-11"]');
+  expect(timedPanel).toBeInTheDocument();
+  // Scope status checks to the timed panel: Harness also renders an <output>
+  // with an implicit ARIA status role for its lock indicator.
+  expect(within(timedPanel).queryByRole("status")).not.toBeInTheDocument();
 });
 
 test("failed cloud acknowledgement rolls back the optimistic countdown without using another attempt", async () => {
