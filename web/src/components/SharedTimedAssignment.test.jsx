@@ -146,3 +146,55 @@ test("new attempts persist the newly configured 20-minute duration", async () =>
   );
   expect(screen.getByText(/Timed practice · 20 minutes/)).toBeInTheDocument();
 });
+
+test("A1 Day 17 starts counting immediately while the cloud write is pending", async () => {
+  let acknowledgeStart;
+  setDoc.mockImplementationOnce(() => new Promise(resolve => { acknowledgeStart = resolve; }));
+  render(<Harness level="A1" assignmentKey="A1-11" />);
+  expect(screen.getByText(/Timed practice · 25 minutes/)).toBeInTheDocument();
+  expect(screen.getByText("Teil 1 Sprechen, Teil 2 Hören and Teil 3 Lesen")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("checkbox"));
+  act(() => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
+  expect(screen.getByLabelText("1500 seconds remaining")).toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("false");
+
+  // A slow/stale Firestore snapshot must not erase the clock before Start saves.
+  act(() => snapshot({ exists: () => false }));
+  act(() => jest.advanceTimersByTime(2000));
+  expect(screen.getByLabelText("1498 seconds remaining")).toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("false");
+
+  await act(async () => acknowledgeStart());
+  expect(screen.getByLabelText("1498 seconds remaining")).toBeInTheDocument();
+  expect(setDoc).toHaveBeenCalledWith("ref", expect.objectContaining({
+    assignmentKey: "A1-11", status: "active", durationSeconds: 1500,
+  }));
+});
+
+test("a submitted A1 Day 17 attempt shows a closed heading without stale active timer or duplicate status", () => {
+  render(<Harness level="A1" assignmentKey="A1-11" />);
+  act(() => snapshot({ exists: () => true, data: () => ({
+    status: "submitted", clientStartedAt: Date.now() - 60_000, durationSeconds: 1500,
+  }) }));
+  expect(screen.getByText("Timed practice · attempt closed")).toBeInTheDocument();
+  expect(screen.queryByText("Timed practice · 25 minutes")).not.toBeInTheDocument();
+  expect(screen.queryByLabelText(/seconds remaining/)).not.toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  expect(screen.queryByRole("button", { name: /^Start/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+});
+
+test("failed cloud acknowledgement rolls back the optimistic countdown without using another attempt", async () => {
+  let rejectStart;
+  setDoc.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectStart = reject; }));
+  const log = jest.spyOn(console, "error").mockImplementation(() => {});
+  render(<Harness level="A1" assignmentKey="A1-11" />);
+  fireEvent.click(screen.getByRole("checkbox"));
+  act(() => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
+  expect(screen.getByLabelText("1500 seconds remaining")).toBeInTheDocument();
+  await act(async () => rejectStart(new Error("permission-denied")));
+  expect(screen.queryByLabelText(/seconds remaining/)).not.toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  expect(screen.getByText(/This timed attempt could not be started/)).toBeInTheDocument();
+  log.mockRestore();
+});
