@@ -44,7 +44,7 @@ describe("A1 workbook modernization", () => {
 
     expect(chapter02.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(true);
     expect(chapter02.some(({ url }) => url.includes("xyRogEAA9qM"))).toBe(false);
-    expect(chapter11.some(({ url }) => url.includes("AjsnO1hxDs4"))).toBe(true);
+    expect(chapter11.some(({ url }) => url.includes("xyRogEAA9qM"))).toBe(true);
     expect(chapter11.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(false);
   });
 
@@ -109,7 +109,7 @@ describe("A1 workbook modernization", () => {
     expect(sectionProgress).toHaveAttribute("aria-valuenow", "100");
     expect(screen.queryByRole("button", { name: /Save .* as PDF/ })).not.toBeInTheDocument();
 
-    expect(screen.getByRole("navigation", { name: "Previous and next A1 assignments" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Back to Course Book" })).toBeInTheDocument();
     printSpy.mockRestore();
   });
 });
