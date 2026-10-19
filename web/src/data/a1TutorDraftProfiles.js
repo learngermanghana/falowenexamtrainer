@@ -60,8 +60,9 @@ const profiles = {
   },
   "A1-2": {
     sections: {
-      "teil-1": section(shortItems(5, "Write the number in German"), { label: "Reading / Writing" }),
-      "teil-2": section(choiceItems(10, ["A", "B", "C"]), { label: "Questions" }),
+      "teil-1": section(shortItems(5, "Copy the number from Elena's information"), { label: "Formular ausfüllen" }),
+      "teil-2": section(shortItems(5, "Write the number as a German word"), { label: "Zahlen als Wörter" }),
+      "teil-3": section([], { label: "Sprechen: Telefonnummer", speaking: true }),
     },
   },
   // A1-3 is page-owned by the Chapter 3 pilot. Its draft structure remains
@@ -166,6 +167,19 @@ export const getA1TutorDraftProfile = (assignmentKey = "") =>
 
 const hasValue = (value) => Boolean(String(value || "").trim());
 
+const A1_PHONE_CHECKPOINT_MARKER = "A1_NUMBERS_PHONE_SPEAKING_V1";
+const PHONE_SCORE_LINE = /^Score: (?:10(?:\\.0+)?|[0-9](?:\\.\\d+)?)\\/10\\s*$/m;
+export const isA1TutorSpeakingAssessment = (sectionKey, assignmentKey, value) => {
+  const text = String(value || "");
+  const phoneTask = String(assignmentKey || "").trim().toUpperCase() === "A1-2" && sectionKey === "teil-3";
+  const marker = phoneTask ? A1_PHONE_CHECKPOINT_MARKER : "GOETHE_A1_TUTOR_SPEAKING_V1";
+  const heading = phoneTask ? "Speaking task: phone number" : "Speaking exam part: [123]";
+  const headingPattern = new RegExp("^" + heading + "$", "m");
+  return text.startsWith(marker + "\\n") && headingPattern.test(text) &&
+    PHONE_SCORE_LINE.test(text) && /^Feedback: \\S/m.test(text);
+};
+
+
 export const getA1TutorDraftSectionProgress = ({ assignmentKey = "", sectionKey = "", draft } = {}) => {
   const profile = getA1TutorDraftProfile(assignmentKey);
   const sectionProfile = profile?.sections?.[sectionKey];
@@ -176,7 +190,9 @@ export const getA1TutorDraftSectionProgress = ({ assignmentKey = "", sectionKey 
 
   const savedSection = draft?.sections?.[sectionKey] || {};
   if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
-    const complete = sectionProfile.speaking ? /^GOETHE_A1_TUTOR_SPEAKING_V1\s*\nSpeaking exam part: [123]\s*\nScore: (?:10(?:\.0+)?|[0-9](?:\.\d+)?)\/10\s*\nFeedback: \S/m.test(String(savedSection.text || "")) : hasValue(savedSection.text);
+    const complete = sectionProfile.speaking
+      ? isA1TutorSpeakingAssessment(sectionKey, assignmentKey, String(savedSection.text || ""))
+      : hasValue(savedSection.text);
     return { complete, completed: complete ? 1 : 0, total: 1, missing: complete ? [] : [sectionProfile.speaking ? "speaking assessment" : "writing"] };
   }
 
@@ -216,7 +232,10 @@ export const validateA1TutorDraftSubmissionSections = ({ assignmentKey = "", sec
     if (sectionProfile.readOnly || sectionProfile.required === false) return;
     const serializedLines = sections.get(sectionKey) || [];
     if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
-      if (sectionProfile.speaking ? !/^GOETHE_A1_TUTOR_SPEAKING_V1\s*$/m.test(serializedLines.join("\n")) || !/^Score: (?:10(?:\.0+)?|[0-9](?:\.\d+)?)\/10\s*$/m.test(serializedLines.join("\n")) : !serializedLines.join(" ").trim()) missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking ? "speaking assessment" : "writing"}`);
+      const response = serializedLines.join("\\n");
+      if (sectionProfile.speaking ? !isA1TutorSpeakingAssessment(sectionKey, assignmentKey, response) : !response.trim()) {
+        missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking ? "speaking assessment" : "writing"}`);
+      }
       return;
     }
 
