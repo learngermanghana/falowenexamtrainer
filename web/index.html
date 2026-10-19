@@ -91,6 +91,10 @@
       (function () {
         var host = window.location.hostname.toLowerCase();
         var path = window.location.pathname;
+        if ((host === "exams.falowen.app" || host === "www.exams.falowen.app") && (path === "/" || path === "")) {
+          window.location.replace("/exams-landing.html");
+          return;
+        }
         if ((host === "classes.falowen.app" || host === "www.classes.falowen.app") && (path === "/" || path === "")) {
           window.location.replace("/classes/");
         }
