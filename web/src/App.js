@@ -1,6 +1,7 @@
 import AccountDeletionBoundary from "./components/AccountDeletion";
 import { AssessmentRulesNotice, AssessmentStudySupport } from "./components/AssessmentSupport";
 import { isMockAssessmentRoute } from "./utils/assessmentRestrictions";
+import { MOCK_EXAM_CATALOG } from "./data/mockExamCatalog";
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,6 +13,7 @@ import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
+import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, isMockPortal } from "./components/MockExamCommerce";
 import LandingPage from "./components/LandingPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
@@ -516,6 +518,11 @@ function App() {
     return <PublicUpcomingClassesPage />;
   }
 
+  if (location.pathname === "/mock/register") return <MockExamSignupPage />;
+  if (location.pathname === "/mock/checkout" || location.pathname === "/mock/complete") {
+    return <MockExamCheckoutPage paymentReturn={location.pathname === "/mock/complete"} />;
+  }
+
   if (!user) {
     // Keep a direct protected mock URL intact through sign-in so the learner
     // arrives at the exam they selected instead of returning to the homepage.
@@ -554,8 +561,24 @@ function App() {
     );
   }
 
+  const isExamOnlyAccount = studentProfile?.accountType === "exam_only";
+  if (isExamOnlyAccount) {
+    return <MockExamOnlyGate><ExamProvider><AppShell
+      allowedSections={{ ...allowedSections, course: false, attendance: false, discussion: false, classMembers: false }}
+      availableTabs={[]} defaultCampusSection="account" enableNotifications={enableNotifications}
+      saveStudentProfile={saveStudentProfile} logout={logout} notificationStatus={notificationStatus}
+      studentProfile={studentProfile} tabStructure={tabStructure} tabStorageKey={tabStorageKey} user={user}
+    /></ExamProvider></MockExamOnlyGate>;
+  }
+
   if (awaitingPayment) {
     return <SetupCheckpoint />;
+  }
+
+  // All logins on the exams subdomain enter the shared Exams Room, not the Course Book.
+  if (isMockPortal() && !location.pathname.startsWith("/exams/") &&
+      !Object.values(MOCK_EXAM_CATALOG).some(mock => mock.route === location.pathname && mock.status === "ready")) {
+    return <Navigate to="/exams/overview" replace />;
   }
 
   return (
