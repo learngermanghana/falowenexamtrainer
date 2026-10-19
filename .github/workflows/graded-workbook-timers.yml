@@ -12,6 +12,8 @@ on:
       - 'web/src/data/timedAssignmentConfig.test.js'
       - 'web/src/components/SharedTimedAssignment.jsx'
       - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/a1SubmissionConsistencyRuntime.js'
+      - 'web/src/a1SubmissionConsistencyRuntime.test.js'
       - 'web/src/components/A1TimedMockExam.jsx'
       - 'web/src/components/A1TimedMockExam.test.jsx'
       - 'web/src/utils/a1TimedAutoSubmitGate.js'
@@ -31,6 +33,8 @@ on:
       - 'web/src/data/timedAssignmentConfig.test.js'
       - 'web/src/components/SharedTimedAssignment.jsx'
       - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/a1SubmissionConsistencyRuntime.js'
+      - 'web/src/a1SubmissionConsistencyRuntime.test.js'
       - 'web/src/components/A1TimedMockExam.jsx'
       - 'web/src/components/A1TimedMockExam.test.jsx'
       - 'web/src/utils/a1TimedAutoSubmitGate.js'
@@ -67,3 +71,4 @@ jobs:
           src/components/SharedTimedAssignment.test.jsx
           src/utils/a1TimedAutoSubmitGate.test.js
           src/components/A1TimedMockExam.test.jsx
+          src/a1SubmissionConsistencyRuntime.test.js
