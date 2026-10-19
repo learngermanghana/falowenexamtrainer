@@ -1493,6 +1493,12 @@ const ExamArea = ({ onBack }) => {
   const { section, practiceLevel = "", sampleId = "" } = useParams();
   const navigate = useNavigate();
   const { level, setLevel, accessibleLevels } = useExam();
+  const { studentProfile } = useAuth();
+  const examOnlyView = studentProfile?.accountType === "exam_only";
+  const permittedLevels = examOnlyView ? [String(studentProfile?.level || "A1").toUpperCase()] : accessibleLevels;
+  useEffect(() => {
+    if (examOnlyView && level !== permittedLevels[0]) setLevel(permittedLevels[0]);
+  }, [examOnlyView, level, permittedLevels[0], setLevel]);
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -1547,7 +1553,7 @@ const ExamArea = ({ onBack }) => {
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
-  ];
+  ].filter(tab => !examOnlyView || ["overview", "mocks", "file"].includes(tab.key));
 
   const examHeroConfig = {
     question: {
@@ -1637,7 +1643,7 @@ const ExamArea = ({ onBack }) => {
             </small>
           </div>
           <div role="group" aria-label="Choose exam practice level" style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {accessibleLevels.map((option) => (
+            {permittedLevels.map((option) => (
               <button
                 key={option}
                 type="button"
