@@ -60,8 +60,10 @@ const profiles = {
   },
   "A1-2": {
     sections: {
-      "teil-1": section(shortItems(5, "Write the number in German"), { label: "Reading / Writing" }),
-      "teil-2": section(choiceItems(10, ["A", "B", "C"]), { label: "Questions" }),
+      "teil-1": section(shortItems(5, "Copy the missing form information"), { label: "Formular ausfüllen" }),
+      "teil-2": section(shortItems(5, "Write this number in German"), { label: "Zahlen als Wörter" }),
+      // Voice is locally recorded/replayed. There is no audio upload or tutor scoring endpoint.
+      "teil-3": section([], { required: false, readOnly: true, label: "Sprechen: Meine Telefonnummer" }),
     },
   },
   // A1-3 is page-owned by the Chapter 3 pilot. Its draft structure remains
