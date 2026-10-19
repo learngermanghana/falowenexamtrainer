@@ -816,6 +816,32 @@ app.use(async (req, res, next) => {
     if (requestedLevel && !active.some(p => p.level === requestedLevel)) {
       return res.status(403).json({ error: "This exam level is not included in your package." });
     }
+    // The permitted purchase is a named mock, not every mock at its CEFR level.
+    // Map existing exam engine IDs to catalogue IDs used by the storefront.
+    const engineToCatalog = {
+      "a1-mock-01": "a1-final-01", "a1-mock-02": "a1-final-02", "a1-mock-03": "a1-final-03",
+      "a2-mock-01": "a2-final-01", "b1-mock-01": "b1-final-01", "b2-mock-01": "b2-final-01"
+    };
+    const ownsExam = (engineId) => active.some(p => (p.mockIds || []).includes(engineToCatalog[engineId]));
+    if (/^\\/(?:a1|a2|b1)-mock\\/attempt\\/(?:start|save)$/.test(path)) {
+      const level = path.slice(1, 3).toUpperCase();
+      const requestIsStart = path.endsWith("/start");
+      let engineId = requestIsStart ? String(req.body?.mockId || level.toLowerCase() + "-mock-01") : "";
+      if (!requestIsStart) {
+        const attemptId = String(req.body?.attemptId || "");
+        if (!attemptId || !/^[A-Za-z0-9_-]{1,130}$/.test(attemptId)) {
+          return res.status(400).json({ error: "Invalid exam attempt." });
+        }
+        const snapshot = await admin.firestore().collection(level.toLowerCase() + "MockExamUsers")
+          .doc(identity.uid).collection("attempts").doc(attemptId).get();
+        engineId = snapshot.exists ? String(snapshot.data()?.mockId || level.toLowerCase() + "-mock-01") : "";
+      }
+      if (!ownsExam(engineId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
+    }
+    if (/^\\/(?:writing|speaking)\\/a1-mock-score$/.test(path)) {
+      const examId = String(req.body?.mockId || "a1-mock-01");
+      if (!ownsExam(examId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
+    }
     return next();
   } catch (error) {
     console.error("Exam-only API gate failed", error);
