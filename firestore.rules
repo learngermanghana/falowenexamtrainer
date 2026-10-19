@@ -239,28 +239,28 @@ service cloud.firestore {
     // Existing Falowen collections that previously used the authenticated
     // fallback are listed explicitly so they cannot override private writing
     // and user-document rules.
-    match /aiAuditLogs/{document=**} { allow read, write: if signedIn(); }
-    match /announcements/{document=**} { allow read, write: if signedIn(); }
-    match /archived/{document=**} { allow read, write: if signedIn(); }
-    match /assignmentProgress/{document=**} { allow read, write: if signedIn(); }
-    match /attendance/{document=**} { allow read, write: if signedIn(); }
-    match /class_board/{document=**} { allow read, write: if signedIn(); }
-    match /class_lesson_notes/{document=**} { allow read, write: if signedIn(); }
-    match /grammarQuestions/{document=**} { allow read, write: if signedIn(); }
-    match /group_discussion/{document=**} { allow read, write: if signedIn(); }
-    match /language/{document=**} { allow read, write: if signedIn(); }
-    match /leadCaptures/{document=**} { allow read, write: if signedIn(); }
-    match /lessonProgress/{document=**} { allow read, write: if signedIn(); }
+    match /aiAuditLogs/{document=**} { allow read, write: if courseUser(); }
+    match /announcements/{document=**} { allow read, write: if courseUser(); }
+    match /archived/{document=**} { allow read, write: if courseUser(); }
+    match /assignmentProgress/{document=**} { allow read, write: if courseUser(); }
+    match /attendance/{document=**} { allow read, write: if courseUser(); }
+    match /class_board/{document=**} { allow read, write: if courseUser(); }
+    match /class_lesson_notes/{document=**} { allow read, write: if courseUser(); }
+    match /grammarQuestions/{document=**} { allow read, write: if courseUser(); }
+    match /group_discussion/{document=**} { allow read, write: if courseUser(); }
+    match /language/{document=**} { allow read, write: if courseUser(); }
+    match /leadCaptures/{document=**} { allow read, write: if courseUser(); }
+    match /lessonProgress/{document=**} { allow read, write: if courseUser(); }
     match /loginSessions/{document=**} { allow read, write: if signedIn(); }
     match /notifications/{document=**} { allow read, write: if signedIn(); }
-    match /paystackInitRequests/{document=**} { allow read, write: if signedIn(); }
-    match /paystackWebhookEvents/{document=**} { allow read, write: if signedIn(); }
-    match /presentationSessions/{document=**} { allow read, write: if signedIn(); }
-    match /qa_posts/{document=**} { allow read, write: if signedIn(); }
+    match /paystackInitRequests/{document=**} { allow read, write: if courseUser(); }
+    match /paystackWebhookEvents/{document=**} { allow read, write: if courseUser(); }
+    match /presentationSessions/{document=**} { allow read, write: if courseUser(); }
+    match /qa_posts/{document=**} { allow read, write: if courseUser(); }
     match /scores/{document=**} { allow read: if signedIn(); allow write: if isStaff(); }
     match /sessions/{document=**} { allow read, write: if signedIn(); }
-    match /studentActivityEvents/{document=**} { allow read, write: if signedIn(); }
-    match /studentNotifications/{document=**} { allow read, write: if signedIn(); }
+    match /studentActivityEvents/{document=**} { allow read, write: if courseUser(); }
+    match /studentNotifications/{document=**} { allow read, write: if courseUser(); }
     match /accountDeletionRequests/{uid} {
       allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
       allow write: if false;
@@ -296,9 +296,9 @@ service cloud.firestore {
       allow update: if signedIn() && resource.data.userId == request.auth.uid
         && request.resource.data.userId == request.auth.uid;
     }
-    match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
+    match /studyBuddyUsage/{document=**} { allow read, write: if courseUser(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
-    match /writingScoreStats/{document=**} { allow read, write: if signedIn(); }
+    match /writingScoreStats/{document=**} { allow read, write: if courseUser(); }
     match /writingSubmissions/{document=**} { allow read, write: if signedIn(); }
 
 
