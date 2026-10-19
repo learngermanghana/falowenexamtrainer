@@ -154,7 +154,7 @@ export function MockExamOnlyGate({ children }) {
   const active = state.active;
   if (!active.length) return <Navigate to="/mock/checkout" replace />;
   if (location.pathname === "/") return <Navigate to="/exams/overview" replace />;
-  const examArea = /^\\/exams\\/(overview|mocks|file)\\/?$/.test(location.pathname);
+  const examArea = /^\/exams\/(overview|mocks|file)\/?$/.test(location.pathname);
   const allowedMockRoutes = active.flatMap(p=>p.mockIds).map(id=>MOCK_EXAM_CATALOG[id]?.route).filter(Boolean);
   if (!examArea && !allowedMockRoutes.includes(location.pathname)) {
     return <Navigate to="/exams/overview" replace />;
