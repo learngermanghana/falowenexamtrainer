@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
+import { EXAMS_READY_FULL_MOCKS } from "../data/examMarketplace";
+import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
@@ -15,7 +17,11 @@ const statusLabel = (status, mock) => {
 export default function MockExamLibraryPage() {
   const navigate = useNavigate();
   const { level } = useExam();
-  const mocks = getMockExamsForLevel(level, { includeCourse: true });
+  const { studentProfile } = useAuth();
+  const allMocks = getMockExamsForLevel(level, { includeCourse: true });
+  const mocks = studentProfile?.accountType === "exam_only"
+    ? allMocks.filter((mock) => mock.status === "ready" && mock.mode === "full" && mock.route === EXAMS_READY_FULL_MOCKS[level])
+    : allMocks;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
