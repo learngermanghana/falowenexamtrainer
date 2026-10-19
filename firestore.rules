@@ -8,6 +8,10 @@ service cloud.firestore {
       );
     }
 
+    function courseUser() {
+      return signedIn() && request.auth.token.get('examOnly', false) != true;
+    }
+
     function isOwner(uid) {
       return signedIn() && request.auth.uid == uid;
     }
@@ -264,10 +268,11 @@ service cloud.firestore {
     match /students/{studentId} {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
-      allow read: if signedIn() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType']));
+      allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
+      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])));
       allow update: if signedIn() && (isStaff() || (
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])
+        (request.auth.token.get('examOnly', false) != true || resource.data.uid == request.auth.uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])
         && (resource.data.get('accountType', '') != 'exam_only' || (
           resource.data.uid == request.auth.uid
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
@@ -277,9 +282,9 @@ service cloud.firestore {
           ])
         ))
       ));
-      allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid && resource.data.get('accountType', '') != 'exam_only');
+      allow delete: if isStaff() || (courseUser() && resource.data.uid == request.auth.uid && resource.data.get('accountType', '') != 'exam_only');
       match /{collectionId}/{documentId}/{nested=**} {
-        allow read, write: if signedIn();
+        allow read, write: if courseUser() || (signedIn() && studentId == request.auth.uid);
       }
     }
     // Goethe Speaking practice history is private to the signed-in learner.
