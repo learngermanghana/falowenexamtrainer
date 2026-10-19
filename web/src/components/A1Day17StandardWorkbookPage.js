@@ -39,12 +39,42 @@ const questionStyle = {
   gap: 5,
 };
 
-const lesenQuestions = [
-  { stem: "1. Wo startet der Weg?", options: ["a) An den Landungsbrücken", "b) An der Touristeninformation", "c) Im Stadtpark"] },
-  { stem: "2. Wohin geht Thomas an der ersten Kreuzung?", options: ["a) Nach links", "b) Nach rechts", "c) Geradeaus"] },
-  { stem: "3. Was sieht Thomas nach 5 Minuten?", options: ["a) Das Hafenmuseum", "b) Die Elbphilharmonie", "c) Den Hafen und das Restaurant Seeblick"] },
-  { stem: "4. Wie lange dauert der Weg zu Fuß zu den Landungsbrücken?", options: ["a) 5 Minuten", "b) 10 Minuten", "c) Eine Stunde"] },
-  { stem: "5. Wo ist der Weg markiert?", options: ["a) Auf dem Stadtplan", "b) Auf der Fahrkarte", "c) Im Museum"] },
+const lesenTexts = [
+  {
+    title: "Text 1 · E-Mail von Anna",
+    paragraphs: [
+      "Hallo Markus,",
+      "meine Party ist am Samstag! Ich wohne in der Hauptstraße 12. Der Weg vom Bahnhof ist einfach: Geh zuerst geradeaus bis zur Ampel. An der Ampel biegst du rechts ab. Mein Haus ist auf der linken Seite, gegenüber von der Bäckerei.",
+      "Bis Samstag! Anna",
+    ],
+    questions: [
+      "1. An der Ampel muss Markus nach rechts abbiegen.",
+      "2. Annas Haus steht direkt neben der Bäckerei.",
+    ],
+  },
+  {
+    title: "Text 2 · Zettel von Ben",
+    paragraphs: [
+      "Liebe Sarah,",
+      "ich bin schon im Café Central. Du findest das Café ganz leicht: Geh vom Supermarkt nach links in die Goethestraße. Geh etwa 100 Meter geradeaus. Das Café liegt direkt neben der Post.",
+      "Ruf mich an, wenn du da bist! Ben",
+    ],
+    questions: [
+      "3. Sarah muss vom Supermarkt nach rechts gehen.",
+      "4. Das Café Central ist neben der Post.",
+    ],
+  },
+  {
+    title: "Text 3 · SMS von Lisa",
+    paragraphs: [
+      "Hi Tom,",
+      "wir treffen uns am Stadtpark. Nimm die Bus-Linie 5 und steig an der Haltestelle „Parkstraße“ aus. Der Park ist gleich hinter der Haltestelle. Du musst gar nicht weit laufen!",
+      "Bis gleich, Lisa",
+    ],
+    questions: [
+      "5. Tom muss von der Haltestelle sehr weit zum Park laufen.",
+    ],
+  },
 ];
 
 const hoerenQuestions = [
@@ -77,7 +107,7 @@ export default function A1Day17StandardWorkbookPage() {
       fallbackAssignmentKey="A1-11"
       title="A1 · Day 17 Workbook · Instructions and Directions"
       subtitle="Chapter 11 · Tutor-marked assignment"
-      assignmentIntro="Complete Sprechen Teil 1 and the five Hören questions in Teil 2, then open Review & Submit."
+      assignmentIntro="Complete Sprechen Teil 1, Hören Teil 2 and the five Richtig/Falsch questions in Lesen Teil 3, then open Review & Submit."
       submitTitle="Submit A1 · Day 17 · Chapter 11"
     >
       <section style={sectionStyle}>
@@ -121,11 +151,21 @@ export default function A1Day17StandardWorkbookPage() {
 
         <QuestionList questions={hoerenQuestions} />
 
-        <div style={{ ...questionStyle, background: "#f8fafc" }}>
-          <strong>Zusatzaufgabe · nicht benotet</strong>
-          <span>Ergänze: „An der Ampel ___ Sie links ___ (abbiegen).“</span>
-          <span>Lösung: <strong>biegen … ab</strong></span>
-        </div>
+      </section>
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Teil 3 · Lesen: Wegbeschreibung</h2>
+        <p style={{ margin: 0, lineHeight: 1.65 }}>
+          Lesen Sie die drei kurzen Nachrichten und die Aussagen 1–5. Ist die Aussage Richtig oder Falsch?
+        </p>
+        {lesenTexts.map((text) => (
+          <div key={text.title} style={{ display: "grid", gap: 10 }}>
+            <h3 style={{ margin: 0 }}>{text.title}</h3>
+            <div style={textStyle}>
+              {text.paragraphs.map((paragraph) => <p key={paragraph} style={{ margin: 0 }}>{paragraph}</p>)}
+            </div>
+            <QuestionList questions={text.questions.map((stem) => ({ stem, options: ["Richtig", "Falsch"] }))} />
+          </div>
+        ))}
       </section>
     </A1TutorMarkedWorkbookShell>
   );
