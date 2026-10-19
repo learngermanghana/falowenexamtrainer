@@ -823,7 +823,7 @@ app.use(async (req, res, next) => {
       "a2-mock-01": "a2-final-01", "b1-mock-01": "b1-final-01", "b2-mock-01": "b2-final-01"
     };
     const ownsExam = (engineId) => active.some(p => (p.mockIds || []).includes(engineToCatalog[engineId]));
-    if (/^\\/(?:a1|a2|b1)-mock\\/attempt\\/(?:start|save)$/.test(path)) {
+    if (/^\/(?:a1|a2|b1)-mock\/attempt\/(?:start|save)$/.test(path)) {
       const level = path.slice(1, 3).toUpperCase();
       const requestIsStart = path.endsWith("/start");
       let engineId = requestIsStart ? String(req.body?.mockId || level.toLowerCase() + "-mock-01") : "";
@@ -838,7 +838,7 @@ app.use(async (req, res, next) => {
       }
       if (!ownsExam(engineId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
     }
-    if (/^\\/(?:writing|speaking)\\/a1-mock-score$/.test(path)) {
+    if (/^\/(?:writing|speaking)\/a1-mock-score$/.test(path)) {
       const examId = String(req.body?.mockId || "a1-mock-01");
       if (!ownsExam(examId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
     }
