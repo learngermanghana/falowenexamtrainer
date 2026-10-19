@@ -564,7 +564,7 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
   const activityNoun = isMock ? "mock" : "practice";
   // Grammar is study material: show a running clock, but do not repeat
   // failed/submitted attempt banners while the learner is reviewing notes.
-  if (studyMode && !active) return null;
+  if (studyMode && used && !checking && !cloudError) return null;
   const shownDurationMinutes = attemptState === "active" && session?.durationSeconds
     ? Math.ceil(session.durationSeconds / 60)
     : config.durationMinutes;

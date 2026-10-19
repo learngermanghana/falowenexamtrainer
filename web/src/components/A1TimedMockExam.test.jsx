@@ -131,7 +131,8 @@ describe("A1 timed mock exam", () => {
     const draft = document.querySelector('[data-cloud-draft-persistence="react-owned"]');
     draft.setAttribute("data-draft-submit-ready", "true");
     draft.setAttribute("data-draft-loaded", "true");
-    draft.querySelector('button[type="submit"]').disabled = false;
+    // The manual checklist still disables the button after hydration.
+    expect(draft.querySelector('button[type="submit"]')).toBeDisabled();
     act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });

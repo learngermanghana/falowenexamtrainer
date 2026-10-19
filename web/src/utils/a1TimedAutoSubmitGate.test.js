@@ -6,7 +6,7 @@ const ready = { formAvailable: true, submitDisabled: false, cloudDraftReady: tru
 test("expiry submits only after a real form and a fully hydrated non-conflicting draft", () => {
   expect(shouldDispatchA1TimedAutoSubmit(ready)).toBe(true);
   for (const change of [
-    { formAvailable: false }, { submitDisabled: true }, { cloudDraftReady: false },
+    { formAvailable: false }, { cloudDraftReady: false },
     { draftLoaded: false }, { draftConflict: true },
     { finalState: "saving" }, { finalState: "verified" },
   ]) {
@@ -17,4 +17,8 @@ test("expiry submits only after a real form and a fully hydrated non-conflicting
 test("does not equate the timer being closed with a verified assignment receipt", () => {
   expect(shouldDispatchA1TimedAutoSubmit({ ...ready, finalState: "error" })).toBe(true);
   expect(shouldDispatchA1TimedAutoSubmit({ ...ready, finalState: "verified" })).toBe(false);
+});
+
+test("a disabled manual checklist does not block a ready timed submission", () => {
+  expect(shouldDispatchA1TimedAutoSubmit({ ...ready, submitDisabled: true })).toBe(true);
 });
