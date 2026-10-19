@@ -192,7 +192,7 @@ import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import { ExamMarketplaceLanding, ExamMarketplaceSignup, ExamMarketplaceAccess } from "./components/ExamMarketplace";
-import { isExamMarketplaceHost, EXAMS_READY_FULL_MOCKS } from "./data/examMarketplace";
+import { isExamMarketplaceHost, EXAMS_READY_FULL_MOCKS, canOpenExamOnlyPath } from "./data/examMarketplace";
 import LiveSpeakPage from "./components/LiveSpeakPage";
 import MyExamFilePage from "./components/MyExamFilePage";
 import ExamsOverviewPage from "./components/ExamsOverviewPage";
@@ -457,6 +457,9 @@ function App() {
       return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => navigate("/signup")} />;
     return <ExamMarketplaceLanding />;
   }
+  if (marketplaceHost && user && !studentProfile) {
+    return <div className="fex-access-page"><div className="fex-access-card"><h1>Falowen profile unavailable</h1><p>Your sign-in succeeded, but your student record could not be loaded. Contact Falowen support before attempting payment.</p><button type="button" onClick={logout} style={styles.secondaryButton}>Log out</button></div></div>;
+  }
   if (user && studentProfile && (marketplaceHost || examOnly)) {
     if (location.pathname === "/payment-complete") return <Navigate to="/exams/overview?payment=return" replace />;
     if (["/", "/signup", "/login"].includes(location.pathname)) return <Navigate to="/exams/overview" replace />;
@@ -606,7 +609,13 @@ export default function AccountProtectedApp() { return <AccountDeletionBoundary>
 const ExamOnlyShell = ({ logout, studentProfile }) => {
   const navigate = useNavigate();
   const { level } = useExam();
-  const readyRoute = EXAMS_READY_FULL_MOCKS[String(studentProfile?.level || "").toUpperCase()];
+  const location = useLocation();
+  const registeredLevel = String(studentProfile?.level || "").toUpperCase();
+  const examOnly = studentProfile?.accountType === "exam_only";
+  const readyRoute = EXAMS_READY_FULL_MOCKS[registeredLevel];
+  if (examOnly && !canOpenExamOnlyPath(location.pathname, registeredLevel)) {
+    return <Navigate to="/exams/overview" replace />;
+  }
   const routeFor = (target, element) => (
     <Route path={target} element={readyRoute === target ? element : <Navigate to="/exams/overview" replace />} />
   );
