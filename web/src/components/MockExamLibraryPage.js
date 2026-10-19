@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { getBackendUrl } from "../services/backendUrl";
 import { useNavigate } from "react-router-dom";
 import { useExam } from "../context/ExamContext";
 import { getMockExamsForLevel } from "../data/mockExamCatalog";
@@ -15,7 +17,28 @@ const statusLabel = (status, mock) => {
 export default function MockExamLibraryPage() {
   const navigate = useNavigate();
   const { level } = useExam();
-  const mocks = getMockExamsForLevel(level, { includeCourse: true });
+  const { user, studentProfile } = useAuth();
+  const examOnly = studentProfile?.accountType === "exam_only";
+  const [ownedMockIds, setOwnedMockIds] = useState([]);
+  const [loadingOwned, setLoadingOwned] = useState(examOnly);
+  useEffect(() => {
+    if (!examOnly || !user) return undefined;
+    let mounted = true;
+    setLoadingOwned(true);
+    user.getIdToken().then(token => fetch(`${getBackendUrl()}/mock/access`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })).then(async response => {
+      if (!response.ok) throw new Error("Access lookup failed");
+      return response.json();
+    }).then(data => {
+      if (mounted) setOwnedMockIds((data.active || []).flatMap(entry => entry.mockIds || []));
+    }).catch(() => { if (mounted) setOwnedMockIds([]); })
+      .finally(() => { if (mounted) setLoadingOwned(false); });
+    return () => { mounted = false; };
+  }, [examOnly, user]);
+  const mocks = getMockExamsForLevel(level, { includeCourse: !examOnly }).filter(
+    mock => !examOnly || (mock.status === "ready" && ownedMockIds.includes(mock.id))
+  );
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -27,7 +50,7 @@ export default function MockExamLibraryPage() {
         </p>
       </section>
 
-      {mocks.length ? (
+      {loadingOwned ? <section style={styles.card}>Checking your purchased exams…</section> : mocks.length ? (
         <section style={{ display: "grid", gap: 12 }}>
           {mocks.map((mock) => (
             <article key={mock.id} style={{ ...styles.card, margin: 0 }}>
@@ -67,7 +90,8 @@ export default function MockExamLibraryPage() {
       ) : (
         <section style={styles.card}>
           <strong>No full {level} mock is published yet.</strong>
-          <p style={styles.helperText}>Use the section practice while a full mock is not yet available.</p>
+          <p style={styles.helperText}>{examOnly ? "Your current package does not include a ready full mock at this level." : "Use the section practice while a full mock is not yet available."}</p>
+          {examOnly ? <a href="/mock/checkout">See available packages</a> : null}
         </section>
       )}
     </div>
