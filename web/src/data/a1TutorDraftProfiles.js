@@ -168,17 +168,15 @@ export const getA1TutorDraftProfile = (assignmentKey = "") =>
 const hasValue = (value) => Boolean(String(value || "").trim());
 
 const A1_PHONE_CHECKPOINT_MARKER = "A1_NUMBERS_PHONE_SPEAKING_V1";
-const PHONE_SCORE_LINE = /^Score: (?:10(?:\\.0+)?|[0-9](?:\\.\\d+)?)\\/10\\s*$/m;
+const SPEAKING_SCORE_LINE = /^Score: (?:10(?:\.0+)?|[0-9](?:\.\d+)?)\/10\s*$/m;
 export const isA1TutorSpeakingAssessment = (sectionKey, assignmentKey, value) => {
   const text = String(value || "");
   const phoneTask = String(assignmentKey || "").trim().toUpperCase() === "A1-2" && sectionKey === "teil-3";
   const marker = phoneTask ? A1_PHONE_CHECKPOINT_MARKER : "GOETHE_A1_TUTOR_SPEAKING_V1";
-  const heading = phoneTask ? "Speaking task: phone number" : "Speaking exam part: [123]";
-  const headingPattern = new RegExp("^" + heading + "$", "m");
-  return text.startsWith(marker + "\\n") && headingPattern.test(text) &&
-    PHONE_SCORE_LINE.test(text) && /^Feedback: \\S/m.test(text);
+  const heading = phoneTask ? /^Speaking task: phone number$/m : /^Speaking exam part: [123]$/m;
+  return text.startsWith(marker + "\n") && heading.test(text) &&
+    SPEAKING_SCORE_LINE.test(text) && /^Feedback: \S/m.test(text);
 };
-
 
 export const getA1TutorDraftSectionProgress = ({ assignmentKey = "", sectionKey = "", draft } = {}) => {
   const profile = getA1TutorDraftProfile(assignmentKey);
@@ -232,7 +230,7 @@ export const validateA1TutorDraftSubmissionSections = ({ assignmentKey = "", sec
     if (sectionProfile.readOnly || sectionProfile.required === false) return;
     const serializedLines = sections.get(sectionKey) || [];
     if (sectionProfile.writing || sectionProfile.embeddedWriting || sectionProfile.speaking) {
-      const response = serializedLines.join("\\n");
+      const response = serializedLines.join("\n");
       if (sectionProfile.speaking ? !isA1TutorSpeakingAssessment(sectionKey, assignmentKey, response) : !response.trim()) {
         missing.push(`${sectionKey.replace("teil-", "Teil ")} ${sectionProfile.speaking ? "speaking assessment" : "writing"}`);
       }
