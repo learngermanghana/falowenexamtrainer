@@ -34,12 +34,14 @@ describe("A1 Course Book Day 2 through Day 12 audit guardrails", () => {
     expect(source).not.toContain("heiBen");
   });
 
-  test("Day 4 keeps one real two-part workbook structure and the canonical lesson identity", () => {
+  test("Day 4 uses the current three-part numbers workbook and canonical identity", () => {
     const source = readComponent("A1Day4NumbersForBeginnersWorkbookPage.js");
 
-    expect(source).toContain("A1 · Day 4 Workbook · Numbers, Phone Numbers and Addresses");
-    expect(source).toContain("They all belong to this one Teil 2 section");
-    expect(source).not.toContain("Teil 1: Zahlen erkennen und benennen");
+    expect(source).toContain("A1 · Day 4 Workbook · Zahlen und Telefonnummern");
+    expect(source).toContain("Teil 1 · Schreiben: Ein einfaches Formular");
+    expect(source).toContain("Teil 2 · Zahlen lesen und schreiben");
+    expect(source).toContain("Teil 3 · Sprechen: Meine Telefonnummer");
+    expect(source).toContain('assignmentKey="A1-2" sectionKey="teil-3"');
   });
 
   test("Day 5 uses the canonical self-introduction identity and correct heißen spelling", () => {
