@@ -527,12 +527,14 @@ function App() {
     // Keep a direct protected mock URL intact through sign-in so the learner
     // arrives at the exam they selected instead of returning to the homepage.
     if (location.pathname.startsWith("/campus/course/") || location.pathname.startsWith("/exams/")) {
-      return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => setAuthMode("signup")} />;
+      return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => isMockPortal() ? navigate("/mock/register") : setAuthMode("signup")} />;
     }
+    if (authMode === "signup" && isMockPortal()) return <Navigate to="/mock/register" replace />;
     if (authMode === "signup") {
       return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
     }
 
+    if (authMode === "landing" && isMockPortal()) return <Navigate to="/login/" replace />;
     if (authMode === "landing") {
       return (
         <LandingPage
