@@ -113,7 +113,8 @@ describe("B1 workbook writing cheat sheet injector", () => {
     buttons.forEach((button) => button.click());
     expect(textarea.value).toContain("Heutzutage ist das Thema");
     expect(textarea.value).toContain("Sehr geehrte Damen und Herren");
-    expect(textarea.value).toContain("Liebe/r [Name]");
+    // The current informal template uses grammatically correct separate greetings.
+    expect(textarea.value).toContain("Hallo [Name], / Liebe [Name], / Lieber [Name]");
   });
 
   test("does not duplicate the React-owned B1 cheat sheet", () => {
