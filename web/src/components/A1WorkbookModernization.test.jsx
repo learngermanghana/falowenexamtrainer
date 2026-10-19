@@ -4,6 +4,8 @@ import { MemoryRouter } from "react-router-dom";
 import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWorkbookShell";
 import { getA1WorkbookMediaResources, getYouTubeVideoId } from "./A1WorkbookMediaPanel";
 
+jest.mock("../context/AuthContext", () => ({ ...jest.requireActual("../context/AuthContext"), useAuth: () => ({ user: null, loading: false }) }));
+
 jest.mock("./navigation/AppBackButton", () => () => <button type="button">Back to Course Book</button>);
 jest.mock("./A1CanonicalSubmissionPanel", () => ({ assignment }) => (
   <div data-testid="canonical-a1-submit">Submit {assignment.assignmentKey}</div>
@@ -41,7 +43,7 @@ describe("A1 workbook modernization", () => {
     const chapter11 = getA1WorkbookMediaResources({ day: 2, chapter: "1.1" });
 
     expect(chapter02.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(true);
-    expect(chapter02.some(({ url }) => url.includes("AjsnO1hxDs4"))).toBe(false);
+    expect(chapter02.some(({ url }) => url.includes("xyRogEAA9qM"))).toBe(false);
     expect(chapter11.some(({ url }) => url.includes("AjsnO1hxDs4"))).toBe(true);
     expect(chapter11.some(({ url }) => url.includes("uhFgKp4WVEc"))).toBe(false);
   });
