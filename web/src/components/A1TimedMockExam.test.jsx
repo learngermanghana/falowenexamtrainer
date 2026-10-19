@@ -76,7 +76,7 @@ describe("A1 timed mock exam", () => {
     expect(screen.queryByText(/Timed mock exam/)).not.toBeInTheDocument();
   });
 
-  test("restores an expired auto-submit and submits even when the minimum-word button is disabled", () => {
+  test("restores an expired auto-submit only when the form and cloud draft are fully ready", () => {
     window.localStorage.setItem(
       buildA1MockExamStorageKey("A1-12.3"),
       JSON.stringify({ endsAt: Date.now() - 1000 }),
@@ -87,8 +87,8 @@ describe("A1 timed mock exam", () => {
       <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
         <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
           <div data-a1-built-in-submission>
-            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="true">
-              <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="true" data-draft-loaded="true" data-draft-conflict="false">
+              <form onSubmit={handleSubmit}><button type="submit">Submit</button></form>
             </div>
           </div>
         </A1TimedMockExam>
@@ -111,7 +111,7 @@ describe("A1 timed mock exam", () => {
       <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
         <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
           <div data-a1-built-in-submission>
-            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="false">
+            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="false" data-draft-loaded="false" data-draft-conflict="false">
               <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
             </div>
           </div>
@@ -122,8 +122,10 @@ describe("A1 timed mock exam", () => {
     jest.advanceTimersByTime(200);
     expect(handleSubmit).not.toHaveBeenCalled();
 
-    document.querySelector('[data-cloud-draft-persistence="react-owned"]')
-      .setAttribute("data-draft-submit-ready", "true");
+    const draft = document.querySelector('[data-cloud-draft-persistence="react-owned"]');
+    draft.setAttribute("data-draft-submit-ready", "true");
+    draft.setAttribute("data-draft-loaded", "true");
+    draft.querySelector('button[type="submit"]').disabled = false;
     jest.advanceTimersByTime(200);
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
