@@ -28,7 +28,8 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
   const autoSubmitStartedRef = useRef(false);
 
   useEffect(() => {
-    if (!timedExam.enabled || !timedExam.timedAutoSubmit || !timedExam.session) return undefined;
+    // A stale timedAutoSubmit URL flag must not submit a still-running attempt.
+    if (!timedExam.enabled || !timedExam.timedAutoSubmit || !timedExam.session || !timedExam.expired) return undefined;
 
     let attempts = 0;
     const timer = window.setInterval(() => {
@@ -38,8 +39,18 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
       const cloudDraftRoot = form?.closest('[data-a1-built-in-submission]')
         ?.querySelector('[data-cloud-draft-persistence="react-owned"]');
       const cloudDraftReady = cloudDraftRoot?.getAttribute("data-draft-submit-ready") === "true";
-
-      if (form && submitButton && (!submitButton.disabled || cloudDraftReady)) {
+      const draftLoaded = cloudDraftRoot?.getAttribute("data-draft-loaded") === "true";
+      const draftConflict = cloudDraftRoot?.getAttribute("data-draft-conflict") === "true";
+      const finalState = cloudDraftRoot?.getAttribute("data-final-submission-state");
+      // Do not attempt the one-time final upload before the saved draft,
+      // textarea and conflict checks are ready. Previously the enabled
+      // button OR readiness check could fire too early, silently leaving
+      // the timer expired but the submission absent from Admin.
+      if (finalState === "verified") {
+        window.clearInterval(timer);
+        return;
+      }
+      if (form && submitButton && !submitButton.disabled && cloudDraftReady && draftLoaded && !draftConflict && finalState !== "saving") {
         if (autoSubmitStartedRef.current) {
           window.clearInterval(timer);
           return;
@@ -51,7 +62,7 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
       } else if (attempts >= 80) {
         window.clearInterval(timer);
         timedExam.onSubmissionError(
-          "Time is up. We could not reach the submission form. Your answers are saved—open Review & Submit to send them.",
+          "Time is up, but Falowen could not confirm a final submission. Your draft may still be saved. Open Review & Submit and submit manually; check for a verified receipt before leaving.",
         );
       }
     }, 150);
@@ -60,6 +71,7 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
   }, [
     location.search,
     timedExam.enabled,
+    timedExam.expired,
     timedExam.onSubmissionError,
     timedExam.session,
     timedExam.timedAutoSubmit,
