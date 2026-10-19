@@ -51,7 +51,7 @@ const A1TimedAutoSubmitBridge = ({ children }) => {
         window.clearInterval(timer);
         return;
       }
-      if (shouldDispatchA1TimedAutoSubmit({ formAvailable: Boolean(form && submitButton), submitDisabled: submitButton?.disabled ?? true, cloudDraftReady, draftLoaded, draftConflict, finalState })) {
+      if (shouldDispatchA1TimedAutoSubmit({ formAvailable: Boolean(form && submitButton), cloudDraftReady, draftLoaded, draftConflict, finalState })) {
         if (autoSubmitStartedRef.current) {
           window.clearInterval(timer);
           return;
