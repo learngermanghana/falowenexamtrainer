@@ -629,11 +629,11 @@ export const AuthProvider = ({ children }) => {
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
         status: profile.status || "pending",
-        trialStatus: isExamOnlySignup ? "none" : profile.trialStatus || "active",
-        trialStartedAt: isExamOnlySignup ? null : Timestamp.fromDate(trialStartedDate),
-        trialUsedAt: isExamOnlySignup ? null : Timestamp.fromDate(trialStartedDate),
-        trialEndsAt: isExamOnlySignup ? null : Timestamp.fromDate(trialEndsDate),
-        trialPurgeAt: isExamOnlySignup ? null : Timestamp.fromDate(trialPurgeDate),
+        trialStatus: profile.trialStatus || "active",
+        trialStartedAt: Timestamp.fromDate(trialStartedDate),
+        trialUsedAt: Timestamp.fromDate(trialStartedDate),
+        trialEndsAt: Timestamp.fromDate(trialEndsDate),
+        trialPurgeAt: Timestamp.fromDate(trialPurgeDate),
         initialPaymentAmount: profile.initialPaymentAmount ?? 0,
         tuitionFee: profile.tuitionFee ?? null,
         balanceDue: profile.balanceDue ?? null,
@@ -647,6 +647,17 @@ export const AuthProvider = ({ children }) => {
         updated_at: serverTimestamp(),
         syncedToSheets: false,
       };
+
+      if (isExamOnlySignup) {
+        // An exam-only purchase is never a course trial or tuition enrollment.
+        Object.assign(payload, {
+          trialStatus: "none",
+          trialStartedAt: null,
+          trialUsedAt: null,
+          trialEndsAt: null,
+          trialPurgeAt: null,
+        });
+      }
 
       if (studentCode) {
         payload.studentcode = studentCode;
