@@ -355,6 +355,9 @@ const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
 
 const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
   if (!student || hasStudentMadePayment(student)) return false;
+  // Exam-only customers buy independent mock packages, not tuition.
+  // Their accounts must not be removed by the unpaid-course cleanup job.
+  if (String(student.accountType || "").toLowerCase() === "exam_only") return false;
 
   // Trial accounts have their own lifecycle: 7 days of access plus a 30-day
   // recovery window. Never let the generic 7-day unpaid-signup cleanup remove them.
