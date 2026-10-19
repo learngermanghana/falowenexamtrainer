@@ -12,6 +12,10 @@ on:
       - 'web/src/data/timedAssignmentConfig.test.js'
       - 'web/src/components/SharedTimedAssignment.jsx'
       - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/components/A1TimedMockExam.jsx'
+      - 'web/src/components/A1TimedMockExam.test.jsx'
+      - 'web/src/utils/a1TimedAutoSubmitGate.js'
+      - 'web/src/utils/a1TimedAutoSubmitGate.test.js'
       - 'web/src/utils/timedAssignmentClock.js'
       - 'web/src/utils/timedAssignmentClock.test.js'
       - '.github/workflows/graded-workbook-timers.yml'
@@ -27,6 +31,10 @@ on:
       - 'web/src/data/timedAssignmentConfig.test.js'
       - 'web/src/components/SharedTimedAssignment.jsx'
       - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/components/A1TimedMockExam.jsx'
+      - 'web/src/components/A1TimedMockExam.test.jsx'
+      - 'web/src/utils/a1TimedAutoSubmitGate.js'
+      - 'web/src/utils/a1TimedAutoSubmitGate.test.js'
       - 'web/src/utils/timedAssignmentClock.js'
       - 'web/src/utils/timedAssignmentClock.test.js'
       - '.github/workflows/graded-workbook-timers.yml'
@@ -57,3 +65,5 @@ jobs:
           src/data/a2B1LessonProfileTimerIntegration.test.js
           src/utils/timedAssignmentClock.test.js
           src/components/SharedTimedAssignment.test.jsx
+          src/utils/a1TimedAutoSubmitGate.test.js
+          src/components/A1TimedMockExam.test.jsx
