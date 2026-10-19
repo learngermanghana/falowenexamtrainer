@@ -106,6 +106,27 @@ describe("A1 timed mock exam", () => {
     expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).toBeNull();
   });
 
+  test("expiry bypasses disabled completion checklist when cloud draft is hydrated", () => {
+    window.localStorage.setItem(
+      buildA1MockExamStorageKey("A1-12.3"),
+      JSON.stringify({ endsAt: Date.now() - 1000 }),
+    );
+    const handleSubmit = jest.fn(event => event.preventDefault());
+    render(
+      <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
+        <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
+          <div data-a1-built-in-submission>
+            <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="true" data-draft-loaded="true" data-draft-conflict="false">
+              <form onSubmit={handleSubmit}><button type="submit" disabled>Submit</button></form>
+            </div>
+          </div>
+        </A1TimedMockExam>
+      </MemoryRouter>,
+    );
+    act(() => jest.advanceTimersByTime(200));
+    expect(handleSubmit).toHaveBeenCalledTimes(1);
+  });
+
   test("waits for the cloud draft check before auto-submitting", () => {
     window.localStorage.setItem(
       buildA1MockExamStorageKey("A1-12.3"),
