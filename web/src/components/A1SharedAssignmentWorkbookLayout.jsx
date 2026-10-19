@@ -265,7 +265,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
             </button>
           );
         })}
-        <TimedAssignmentPanel />
+        <TimedAssignmentPanel studyMode={activeTab === "grammar"} />
       </nav>
 
       <div

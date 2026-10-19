@@ -11,10 +11,10 @@ jest.mock("../hooks/useAssessmentRestriction", () => ({ useAssessmentRestriction
 jest.mock("../services/interactionFeedback", () => ({ triggerInteractionFeedback: jest.fn(() => Promise.resolve()) }));
 let snapshot;
 let unsubscribe;
-function Harness({ level, assignmentKey, day, onTimeExpired }) {
+function Harness({ level, assignmentKey, day, onTimeExpired, studyMode = false }) {
   const config = day ? getA2B1LessonProfile(level, day).timer : getTimedAssignmentConfig(assignmentKey);
   return <SharedTimedAssignment assignmentKey={assignmentKey} level={level} configOverride={config} onTimeExpired={onTimeExpired}>
-    {(timed) => <><TimedAssignmentPanel /><output data-testid="lock">{String(timed.isTabLocked(config.timedTabs[0]))}</output></>}
+    {(timed) => <><TimedAssignmentPanel studyMode={studyMode} /><output data-testid="lock">{String(timed.isTabLocked(config.timedTabs[0]))}</output></>}
   </SharedTimedAssignment>;
 }
 beforeEach(() => {
@@ -201,4 +201,21 @@ test("failed cloud acknowledgement rolls back the optimistic countdown without u
   expect(screen.getByTestId("lock")).toHaveTextContent("true");
   expect(screen.getByText(/This timed attempt could not be started/)).toBeInTheDocument();
   log.mockRestore();
+});
+
+test("Grammar study mode hides a closed A1-11 timed attempt banner, without reopening assessed tabs", () => {
+  const active = { exists: () => true, data: () => ({ status: "submitted", clientStartedAt: Date.now() - 60_000, durationSeconds: 1500 }) };
+  onSnapshot.mockImplementation((_ref, next) => { snapshot = next; next(active); return unsubscribe; });
+  const view = render(<Harness level="A1" assignmentKey="A1-11" studyMode />);
+  expect(document.querySelector('[data-timed-assignment="A1-11"]')).not.toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  view.rerender(<Harness level="A1" assignmentKey="A1-11" studyMode={false} />);
+  expect(screen.getByText("Timed practice · attempt closed")).toBeInTheDocument();
+});
+test("Grammar study mode retains the visible countdown while a timed attempt is active", () => {
+  const active = { exists: () => true, data: () => ({ status: "active", clientStartedAt: Date.now(), durationSeconds: 1500 }) };
+  onSnapshot.mockImplementation((_ref, next) => { snapshot = next; next(active); return unsubscribe; });
+  render(<Harness level="A1" assignmentKey="A1-11" studyMode />);
+  expect(screen.getByLabelText("1500 seconds remaining")).toBeInTheDocument();
+  expect(screen.getByTestId("lock")).toHaveTextContent("false");
 });
