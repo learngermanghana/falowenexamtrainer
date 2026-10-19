@@ -15,6 +15,10 @@ test("the real A1 Day 17 Kapitel 11 grammar route uses the updated Wegbeschreibu
   expect(screen.getByText("4. Imperativ · du, ihr und Sie")).toBeInTheDocument();
   expect(screen.getByText("6. Kurz prüfen · Self-check")).toBeInTheDocument();
   expect(screen.queryByText(/Zusatzaufgabe/)).not.toBeInTheDocument();
+  expect(container.querySelector("iframe")).not.toBeInTheDocument();
+  expect(container.innerHTML).not.toContain("youtube.com");
+  expect(screen.getByText(/In this lesson you learn how to ask for directions/)).toBeInTheDocument();
+  expect(screen.getByText(/This grammar self-check is not graded/)).toBeInTheDocument();
 });
 
 test("teaches du, ihr and Sie including separable abbiegen and zum/zur", () => {
@@ -31,6 +35,6 @@ test("grammar self-check gives feedback without changing assessed workbook secti
   render(<A1Day17DirectionsGrammarNotes />);
   const answer = screen.getByLabelText("Gehen Sie geradeaus.");
   fireEvent.click(answer);
-  expect(screen.getByText(/Richtig! Für Sie: Infinitiv \+ Sie/)).toBeInTheDocument();
+  expect(screen.getByText(/Correct! \/ Richtig! Für Sie: Infinitiv \+ Sie/)).toBeInTheDocument();
   expect(screen.getByText(/Diese Grammatikübung ist nicht Teil der benoteten Hausaufgabe/)).toBeInTheDocument();
 });
