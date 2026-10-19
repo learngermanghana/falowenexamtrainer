@@ -50,7 +50,7 @@
     "sections": {
       "courseBook": "Livre de cours",
       "submit": "Soumettre un devoir",
-      "examFile": "Mon dossier d’examen",
+      "examFile": "Dossier d’examen et dates",
       "grammar": "Poser une question de grammaire",
       "grammarFrench": "Aide en grammaire française",
       "writing": "Entraînement à l’écriture",
@@ -71,7 +71,7 @@
       "horen": "Écoute",
       "lesen": "Lecture",
       "resources": "Ressources",
-      "file": "Mon dossier d’examen"
+      "file": "Dossier d’examen et dates"
     },
     "campusTabs": {
       "speech": "Entraînement à l’oral",
@@ -1304,7 +1304,7 @@
     "sessions": "sessions",
     "markedIdentifiers": "Identifiants marqués",
     "refresh": "Rafraîchir",
-    "openExamFile": "Ouvrir mon dossier d'examen",
+    "openExamFile": "Ouvrir le dossier d’examen et les dates",
     "errorMissingProfile": "Ajoutez votre classe et code étudiant pour activer le suivi.",
     "errorFirebase": "Connectez Firebase pour charger la préparation à l'examen.",
     "errorLoad": "Impossible de charger la préparation à l'examen maintenant.",
