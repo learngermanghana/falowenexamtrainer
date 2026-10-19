@@ -137,12 +137,15 @@ const ExamContext = createContext();
 export const ExamProvider = ({ children }) => {
   const { user, studentProfile } = useAuth();
   const profileExamLevel = studentProfile?.level || studentProfile?.className || "";
-  const accessibleLevels = useMemo(() => getExamPracticeLevels(profileExamLevel), [profileExamLevel]);
+  const examOnly = studentProfile?.accountType === "exam_only";
+  const accessibleLevels = useMemo(() => examOnly
+    ? [String(studentProfile?.level || "A1").toUpperCase()]
+    : getExamPracticeLevels(profileExamLevel), [examOnly, profileExamLevel, studentProfile?.level]);
   const [level, setLevelState] = useState(() =>
-    resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
+    examOnly ? String(studentProfile?.level || "A1").toUpperCase() : resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)));
   const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel(user?.uid)));
   const [teil, setTeil] = useState(() =>
-    getTasksForLevel(resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)))[0].label);
+    getTasksForLevel(examOnly ? String(studentProfile?.level || "A1").toUpperCase() : resolveExamPracticeLevel(profileExamLevel, loadPreferredLevel(user?.uid)))[0].label);
   const [result, setResult] = useState(null);
   const [resultHistory, setResultHistory] = useState([]);
   const [error, setError] = useState("");
@@ -166,9 +169,9 @@ export const ExamProvider = ({ children }) => {
     // Hydrate profile changes and saved exam preferences without editing enrollment.
     // Deliberately do not depend on "level": manual downward switches must persist.
     const storedLevel = loadPreferredLevel(user?.uid);
-    setLevelState(resolveExamPracticeLevel(profileExamLevel, storedLevel));
+    setLevelState(examOnly ? String(studentProfile?.level || "A1").toUpperCase() : resolveExamPracticeLevel(profileExamLevel, storedLevel));
     if (storedLevel) setLevelConfirmed(true);
-  }, [profileExamLevel, user?.uid]);
+  }, [examOnly, profileExamLevel, studentProfile?.level, user?.uid]);
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);
