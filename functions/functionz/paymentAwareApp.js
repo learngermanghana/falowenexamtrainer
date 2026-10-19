@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerExamMarketplacePayments, applyExamMarketplaceWebhook } = require("./examMarketplacePayments");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
@@ -241,6 +242,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
+registerExamMarketplacePayments(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
 app.post("/paystack/initialize", async (req, res) => {
   try {
@@ -452,6 +454,10 @@ app.post("/paystack/webhook", async (req, res) => {
     const payload = req.body || {};
     const { event, data = {} } = payload;
     if (event !== "charge.success") return res.json({ status: "ignored", event });
+    if (data?.metadata?.productType === "exam_package") {
+      const outcome = await applyExamMarketplaceWebhook({ data, admin });
+      return res.status(outcome.status).json(outcome.body);
+    }
 
     const reference = String(data.reference || "");
     if (!reference) return res.status(400).json({ error: "Missing Paystack reference" });
