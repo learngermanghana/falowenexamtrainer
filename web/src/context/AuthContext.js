@@ -602,6 +602,7 @@ export const AuthProvider = ({ children }) => {
       const studentCode = profile.studentCode;
       const studentId = studentCode || credential.user.uid;
       const studentsRef = doc(db, "students", studentId);
+      const isExamOnlySignup = profile.accountType === "exam_only";
       const trialStartedDate = new Date();
       const trialEndsDate = new Date(trialStartedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
       const trialPurgeDate = new Date(trialEndsDate.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -613,6 +614,8 @@ export const AuthProvider = ({ children }) => {
         email: normalizedEmail,
         authEmail: normalizedEmail,
         role: "student",
+        accountType: isExamOnlySignup ? "exam_only" : "course",
+        ...(isExamOnlySignup ? { onboardingCompleted: true } : {}),
         studentCode: studentId,
         about: "",
         level: (profile.level || "").toUpperCase(),
@@ -626,11 +629,11 @@ export const AuthProvider = ({ children }) => {
 
         emergencyContactPhone: profile.emergencyContactPhone || "",
         status: profile.status || "pending",
-        trialStatus: profile.trialStatus || "active",
-        trialStartedAt: Timestamp.fromDate(trialStartedDate),
-        trialUsedAt: Timestamp.fromDate(trialStartedDate),
-        trialEndsAt: Timestamp.fromDate(trialEndsDate),
-        trialPurgeAt: Timestamp.fromDate(trialPurgeDate),
+        trialStatus: isExamOnlySignup ? "none" : profile.trialStatus || "active",
+        trialStartedAt: isExamOnlySignup ? null : Timestamp.fromDate(trialStartedDate),
+        trialUsedAt: isExamOnlySignup ? null : Timestamp.fromDate(trialStartedDate),
+        trialEndsAt: isExamOnlySignup ? null : Timestamp.fromDate(trialEndsDate),
+        trialPurgeAt: isExamOnlySignup ? null : Timestamp.fromDate(trialPurgeDate),
         initialPaymentAmount: profile.initialPaymentAmount ?? 0,
         tuitionFee: profile.tuitionFee ?? null,
         balanceDue: profile.balanceDue ?? null,
