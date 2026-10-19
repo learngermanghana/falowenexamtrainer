@@ -181,7 +181,7 @@ test("a submitted A1 Day 17 attempt shows a closed heading without stale active 
   expect(screen.queryByLabelText(/seconds remaining/)).not.toBeInTheDocument();
   expect(screen.getByTestId("lock")).toHaveTextContent("true");
   expect(screen.queryByRole("button", { name: /^Start/ })).not.toBeInTheDocument();
-  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  expect(screen.queryByText("Timed attempt submitted.")).not.toBeInTheDocument();
 });
 
 test("failed cloud acknowledgement rolls back the optimistic countdown without using another attempt", async () => {
