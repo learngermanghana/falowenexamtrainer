@@ -531,7 +531,7 @@ export default function SharedTimedAssignment({
   );
 }
 
-export function TimedAssignmentPanel() {
+export function TimedAssignmentPanel({ studyMode = false } = {}) {
   const timed = useTimedAssignment();
   if (!timed.enabled || !timed.config) return null;
 
@@ -562,6 +562,9 @@ export function TimedAssignmentPanel() {
   const isMock = config.mode === "mock";
   const timedLabel = isMock ? "Timed mock exam" : "Timed practice";
   const activityNoun = isMock ? "mock" : "practice";
+  // Grammar is study material: show a running clock, but do not repeat
+  // failed/submitted attempt banners while the learner is reviewing notes.
+  if (studyMode && !active) return null;
   const shownDurationMinutes = attemptState === "active" && session?.durationSeconds
     ? Math.ceil(session.durationSeconds / 60)
     : config.durationMinutes;
