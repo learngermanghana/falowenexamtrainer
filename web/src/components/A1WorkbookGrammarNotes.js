@@ -11,7 +11,7 @@ import ObjectsAndColorsPage from "./ObjectsAndColorsPage";
 import TwelveHourClockPage from "./TwelveHourClockPage";
 import A1Day12TwentyFourHourClockDatesPage from "./A1Day12TwentyFourHourClockDatesPage";
 import A1Day16FoodAndNegationGrammarPage from "./A1Day16FoodAndNegationGrammarPage";
-import DirectionsImperativePage from "./DirectionsImperativePage";
+import A1Day17DirectionsGrammarNotes from "./A1Day17DirectionsGrammarNotes";
 import TwoCasePrepositionsPageLegacy from "./TwoCasePrepositionsPageLegacy";
 import { DativeArticlesMitBeiZuGrammarNotes } from "./DativeArticlesMitBeiZuPage";
 import WeatherPerfektLetterPage from "./WeatherPerfektLetterPage";
@@ -35,7 +35,7 @@ const A1_GRAMMAR_NOTES_BY_ASSIGNMENT = {
   "A1-7": TwelveHourClockPage,
   "A1-8": A1Day12TwentyFourHourClockDatesPage,
   "A1-9": A1Day16FoodAndNegationGrammarPage,
-  "A1-11": DirectionsImperativePage,
+  "A1-11": A1Day17DirectionsGrammarNotes,
   "A1-12.1": TwoCasePrepositionsPageLegacy,
   "A1-12.2": DativeArticlesMitBeiZuGrammarNotes,
   "A1-12.3": A1Day20GoetheWritingGrammarPage,
