@@ -223,7 +223,7 @@ test("A1 Day 4 current revision retains five new form and spelling answers only"
   expect(Object.keys(migrated.sections["teil-2"].answers)).toHaveLength(5);
   expect(saved.readingRevision).toBe("a1-day4-number-form-words-speaking-v2");
   const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-2"), draft: migrated });
-  expect(submission).toContain("TEIL 1\\n1. 26");
-  expect(submission).toContain("TEIL 2\\n1. zwölf");
+  expect(submission).toContain("TEIL 1\n1. 26");
+  expect(submission).toContain("TEIL 2\n1. zwölf");
   expect(submission).not.toContain("6. OLD");
 });
