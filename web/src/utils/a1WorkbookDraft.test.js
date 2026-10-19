@@ -191,3 +191,39 @@ test.each([
   expect(result).toContain("Score: 7/10");
   expect(result).not.toContain("audioUrl");
 });
+
+test("A1 Day 4 clears old number-word and multiple-choice drafts before new form tasks", () => {
+  const oldDraft = {
+    assignmentKey: "A1-2",
+    // Old assignment had five written words and ten multiple-choice answers.
+    sections: {
+      "teil-1": { answers: { 1: "zwölf", 2: "sechzehn", 3: "zweihunderteinundzwanzig", 4: "B", 5: "A" } },
+      "teil-2": { answers: Object.fromEntries(Array.from({ length: 10 }, (_, index) => [index + 1, "B"])) },
+    },
+  };
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey("A1-2"), JSON.stringify(oldDraft));
+  const migrated = readA1WorkbookDraft("A1-2");
+  expect(migrated.readingRevision).toBe("a1-day4-number-form-words-speaking-v2");
+  expect(migrated.sections["teil-1"]).toBeUndefined();
+  expect(migrated.sections["teil-2"]).toBeUndefined();
+  // Serialization must also reject an un-migrated draft passed directly.
+  expect(buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-2"), draft: oldDraft })).toBe("");
+});
+
+test("A1 Day 4 current revision retains five new form and spelling answers only", () => {
+  const saved = saveA1WorkbookDraft({
+    assignmentKey: "A1-2",
+    sections: {
+      "teil-1": { answers: { 1: "26", 2: "Müllerstraße 87", 3: "0171 33 55 90", 4: "3", 5: "240", 6: "OLD" } },
+      "teil-2": { answers: { 1: "zwölf", 2: "sechzehn", 3: "zweihunderteinundzwanzig", 4: "dreitausendvierhundertfünfunddreißig", 5: "siebzig", 6: "OLD" } },
+    },
+  });
+  const migrated = readA1WorkbookDraft("A1-2");
+  expect(Object.keys(migrated.sections["teil-1"].answers)).toHaveLength(5);
+  expect(Object.keys(migrated.sections["teil-2"].answers)).toHaveLength(5);
+  expect(saved.readingRevision).toBe("a1-day4-number-form-words-speaking-v2");
+  const submission = buildA1WorkbookSubmissionText({ assignment: getA1Assignment("A1-2"), draft: migrated });
+  expect(submission).toContain("TEIL 1\n1. 26");
+  expect(submission).toContain("TEIL 2\n1. zwölf");
+  expect(submission).not.toContain("6. OLD");
+});

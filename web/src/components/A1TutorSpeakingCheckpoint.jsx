@@ -43,6 +43,8 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   const alreadyAssessed = saved.startsWith(marker);
   const recorder = useRef(null);
   const stream = useRef(null);
+  const mountedRef = useRef(false);
+  const requestingMicrophoneRef = useRef(false);
   const [recording, setRecording] = useState(false);
   const [blob, setBlob] = useState(null);
   const [preview, setPreview] = useState("");
@@ -54,28 +56,42 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
     setPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [blob]);
-  useEffect(() => () => {
-    if (recorder.current?.state === "recording") recorder.current.stop();
-    stream.current?.getTracks().forEach((track) => track.stop());
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      // getUserMedia may still be waiting for permission at this point.
+      // Its continuation must stop any stream that resolves after unmount.
+      if (recorder.current?.state === "recording") recorder.current.stop();
+      stream.current?.getTracks().forEach((track) => track.stop());
+      stream.current = null;
+    };
   }, []);
   if (!task) return null;
 
   const record = async () => {
     setError("");
-    if (alreadyAssessed) return;
+    if (alreadyAssessed || requestingMicrophoneRef.current) return;
     if (recording) {
       recorder.current?.stop();
       return;
     }
+    requestingMicrophoneRef.current = true;
     try {
       const media = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!mountedRef.current) {
+        // A learner navigated away while the browser permission prompt was open.
+        media.getTracks().forEach((track) => track.stop());
+        return;
+      }
       stream.current = media;
       const next = createSpeakingMediaRecorder(media);
       const chunks = [];
       next.ondataavailable = (event) => { if (event.data.size) chunks.push(event.data); };
       next.onstop = () => {
         media.getTracks().forEach((track) => track.stop());
-        stream.current = null;
+        if (stream.current === media) stream.current = null;
+        if (!mountedRef.current) return;
         setBlob(buildRecordedAudioBlob(chunks, next));
         setRecording(false);
       };
@@ -84,8 +100,14 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
       next.start();
       setRecording(true);
     } catch (cause) {
-      setError(userFacingAudioError(cause));
-      setRecording(false);
+      stream.current?.getTracks().forEach((track) => track.stop());
+      stream.current = null;
+      if (mountedRef.current) {
+        setError(userFacingAudioError(cause));
+        setRecording(false);
+      }
+    } finally {
+      requestingMicrophoneRef.current = false;
     }
   };
 
