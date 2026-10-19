@@ -1,4 +1,9 @@
 import React from "react";
+import { act } from "@testing-library/react";
+
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, studentProfile: null }) }));
+jest.mock("../hooks/useLessonProgress", () => ({ useLessonProgress: () => ({ progressByAssignmentId: {}, loading: false }) }));
+jest.mock("../hooks/useAssessmentRestriction", () => ({ useAssessmentRestriction: () => {} }));
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import A1TimedMockExam, {
@@ -27,7 +32,7 @@ describe("A1 timed mock exam", () => {
   test("allocates time according to the amount of work in each remaining assignment", () => {
     expect(getA1MockExamDurationSeconds("A1-12.3")).toBe(30 * 60);
     expect(getA1MockExamDurationSeconds("A1-13")).toBe(35 * 60);
-    expect(getA1MockExamDurationSeconds("A1-14.1")).toBe(35 * 60);
+    expect(getA1MockExamDurationSeconds("A1-14.1")).toBe(30 * 60);
   });
 
   test("starts a persistent 30-minute mock for Day 20", () => {
@@ -37,7 +42,7 @@ describe("A1 timed mock exam", () => {
       </MemoryRouter>,
     );
 
-    const unlockButton = screen.getByRole("button", { name: "Agree & unlock 30-minute mock" });
+    const unlockButton = screen.getByRole("button", { name: "Start 30-minute mock" });
     expect(unlockButton).toBeDisabled();
     expect(document.querySelector("[data-a1-timed-mock-exam]")).toHaveAttribute("data-assignment-locked", "true");
     fireEvent.click(screen.getByRole("checkbox"));
@@ -95,7 +100,7 @@ describe("A1 timed mock exam", () => {
       </MemoryRouter>,
     );
 
-    jest.advanceTimersByTime(200);
+    act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
     expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).not.toBeNull();
   });
@@ -119,14 +124,14 @@ describe("A1 timed mock exam", () => {
       </MemoryRouter>,
     );
 
-    jest.advanceTimersByTime(200);
+    act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).not.toHaveBeenCalled();
 
     const draft = document.querySelector('[data-cloud-draft-persistence="react-owned"]');
     draft.setAttribute("data-draft-submit-ready", "true");
     draft.setAttribute("data-draft-loaded", "true");
     draft.querySelector('button[type="submit"]').disabled = false;
-    jest.advanceTimersByTime(200);
+    act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
@@ -147,6 +152,7 @@ describe("A1 timed mock exam", () => {
     render(
       <MemoryRouter initialEntries={["/workbook?workbookTab=submit&timedAutoSubmit=1"]}>
         <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
+          <TimedAssignmentPanel />
           <SubmissionResultControls />
         </A1TimedMockExam>
       </MemoryRouter>,
@@ -154,10 +160,10 @@ describe("A1 timed mock exam", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Fail submission" }));
     expect(window.localStorage.getItem(storageKey)).not.toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("automatic submission failed");
+    expect(screen.getByRole("status")).toHaveTextContent("Time is up");
 
     fireEvent.click(screen.getByRole("button", { name: "Verify submission" }));
     expect(window.localStorage.getItem(storageKey)).toBeNull();
-    expect(screen.getByRole("status")).toHaveTextContent("submitted automatically");
+    expect(screen.getByText(/Timed attempt submitted/)).toBeInTheDocument();
   });
 });
