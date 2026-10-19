@@ -56,7 +56,12 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       if (existing.exists) return res.status(409).json({ error: "This Falowen account already exists. Please sign in instead." });
       const byUid = await db().collection("students").where("uid", "==", uid).limit(1).get();
       if (!byUid.empty) return res.status(409).json({ error: "Existing account found. Sign in instead." });
-      await admin.auth().setCustomUserClaims(uid, { examOnly: true });
+      const authRecord = await admin.auth().getUser(uid);
+      const existingClaims = authRecord.customClaims || {};
+      if (existingClaims.admin || existingClaims.staff || ["admin", "tutor"].includes(existingClaims.role)) {
+        return res.status(403).json({ error: "Staff accounts must use the standard Falowen login." });
+      }
+      await admin.auth().setCustomUserClaims(uid, { ...existingClaims, examOnly: true });
       await studentRef.create({
         uid, name, fullName: name, email: user.email.toLowerCase(), authEmail: user.email.toLowerCase(),
         studentCode: uid, role: "student", accountType: "exam_only",
@@ -81,8 +86,14 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       if (!isReady(level, pkg)) return res.status(409).json({ error: "This package is not yet available at the selected level." });
       const studentByUid = await db().collection("students").where("uid", "==", user.uid).limit(1).get();
       const direct = await db().collection("students").doc(user.uid).get();
-      const student = direct.exists ? direct : studentByUid.docs[0];
-      if (!student || !student.exists || student.data().uid !== user.uid) {
+      const studentByEmail = !direct.exists && studentByUid.empty
+        ? await db().collection("students").where("email", "==", String(user.email || "").toLowerCase()).limit(1).get()
+        : null;
+      const student = direct.exists ? direct : (studentByUid.docs[0] || studentByEmail?.docs[0]);
+      const profile = student?.data() || {};
+      if (!student || !student.exists || !(
+        profile.uid === user.uid || (!profile.uid && String(profile.email || "").toLowerCase() === String(user.email || "").toLowerCase())
+      )) {
         return res.status(403).json({ error: "Finish Falowen registration before purchasing." });
       }
       const secret = process.env.PAYSTACK_SECRET;
