@@ -50,7 +50,7 @@
     "sections": {
       "courseBook": "Course Book",
       "submit": "Submit Work",
-      "examFile": "Exam File",
+      "examFile": "Exam File and Date",
       "grammar": "Ask Grammar Question",
       "grammarFrench": "French Grammar Help",
       "writing": "Writing Practice",
@@ -71,7 +71,7 @@
       "horen": "Listening",
       "lesen": "Reading",
       "resources": "Resources",
-      "file": "Exam File"
+      "file": "Exam File and Date"
     },
     "campusTabs": {
       "speech": "Speech trainer",
@@ -1415,7 +1415,7 @@
     "sessions": "sessions",
     "markedIdentifiers": "Marked identifiers",
     "refresh": "Refresh",
-    "openExamFile": "Open My Exam File",
+    "openExamFile": "Open Exam File and Date",
     "errorMissingProfile": "Add your class and student code to unlock readiness tracking.",
     "errorFirebase": "Connect Firebase to load exam readiness.",
     "errorLoad": "Could not load readiness right now.",
