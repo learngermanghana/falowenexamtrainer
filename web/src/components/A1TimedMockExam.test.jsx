@@ -102,7 +102,8 @@ describe("A1 timed mock exam", () => {
 
     act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
-    expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).not.toBeNull();
+    // The local countdown is cleared at expiry; Firestore tracks the closed attempt.
+    expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).toBeNull();
   });
 
   test("waits for the cloud draft check before auto-submitting", () => {
@@ -135,7 +136,7 @@ describe("A1 timed mock exam", () => {
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });
 
-  test("only clears the persisted timed session after verified submission", () => {
+  test("shows a retry error until final submission is explicitly verified", () => {
     const storageKey = buildA1MockExamStorageKey("A1-12.3");
     window.localStorage.setItem(storageKey, JSON.stringify({ endsAt: Date.now() - 1000 }));
 
@@ -143,7 +144,7 @@ describe("A1 timed mock exam", () => {
       const timedExam = useA1TimedMockExam();
       return (
         <>
-          <button type="button" onClick={timedExam.onSubmissionError}>Fail submission</button>
+          <button type="button" onClick={() => timedExam.onSubmissionError("Time is up, but automatic submission could not finish.")}>Fail submission</button>
           <button type="button" onClick={timedExam.onSubmissionVerified}>Verify submission</button>
         </>
       );
@@ -159,11 +160,9 @@ describe("A1 timed mock exam", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Fail submission" }));
-    expect(window.localStorage.getItem(storageKey)).not.toBeNull();
     expect(screen.getByRole("status")).toHaveTextContent("Time is up");
 
     fireEvent.click(screen.getByRole("button", { name: "Verify submission" }));
-    expect(window.localStorage.getItem(storageKey)).toBeNull();
     expect(screen.getByText(/Timed attempt submitted/)).toBeInTheDocument();
   });
 });
