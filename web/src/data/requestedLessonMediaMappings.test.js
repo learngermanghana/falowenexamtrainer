@@ -35,16 +35,8 @@ describe("requested lesson media mappings", () => {
     );
   });
 
-  test("adds the requested A1 Day 24 conjunctions clip as teacher video 2", () => {
-    expect(getA1TeacherVideoResources(24)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          chapter: "5.10",
-          videoNumber: 2,
-          url: "https://youtu.be/XpcC3uvBcwo",
-        }),
-      ]),
-    );
+  test("does not invent a Day 24 teacher lecture when none is configured", () => {
+    expect(getA1TeacherVideoResources(24)).toEqual([]);
   });
 
   test("replaces A1 Day 18 Chapter 12.1 with the requested teacher lecture", () => {
@@ -95,14 +87,8 @@ describe("requested lesson media mappings", () => {
     );
   });
 
-  test("maps B2 Day 5 to its requested Schreiben video", () => {
-    expect(getWritingVideoResource("B2", 5)).toEqual(
-      expect.objectContaining({
-        key: "b2-day5-bildung-lernen-writing-video",
-        chapter: "1.5",
-        url: "https://youtu.be/-6_zmU9ibJI?si=Mvlld1_jVP7nU1nL",
-      }),
-    );
+  test("does not render an unconfigured B2 Day 5 Schreiben video", () => {
+    expect(getWritingVideoResource("B2", 5)).toBeNull();
   });
 
   test("uses the approved C1 Day 10 Chapter 2.5 AI video in both lesson sources", () => {
@@ -117,22 +103,13 @@ describe("requested lesson media mappings", () => {
     );
   });
 
-  test("keeps B2 Falowen Radio slots but clears their old YouTube IDs", () => {
-    Object.values(B2_C1_LESSON_RADIO_OVERRIDES.B2).forEach((resource) => {
-      expect(resource.key).toContain("b2-day");
-      expect(resource.youtubeId).toBe("");
-    });
-
+  test("keeps B2 Radio empty without inventing a YouTube source", () => {
+    expect(Object.keys(B2_C1_LESSON_RADIO_OVERRIDES.B2)).toHaveLength(0);
     const b2Day11 = normalizeB2C1Lesson(
       { level: "B2", day: 11, chapter: "3.1", title: "Gesellschaft und Integration" },
       "B2",
     );
-    expect(b2Day11.resources.falowenRadio).toEqual(
-      expect.objectContaining({
-        key: "b2-day11-gesellschaft-integration-falowen-radio",
-        youtubeId: "",
-      }),
-    );
+    expect(b2Day11.resources.falowenRadio).toBeNull();
   });
 
   test("keeps B2 lesson-video slots but clears old grammar video URLs", () => {
