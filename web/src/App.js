@@ -191,6 +191,8 @@ import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1Persoen
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
+import { ExamMarketplaceLanding, ExamMarketplaceSignup, ExamMarketplaceAccess } from "./components/ExamMarketplace";
+import { isExamMarketplaceHost, EXAMS_READY_FULL_MOCKS } from "./data/examMarketplace";
 import LiveSpeakPage from "./components/LiveSpeakPage";
 import MyExamFilePage from "./components/MyExamFilePage";
 import ExamsOverviewPage from "./components/ExamsOverviewPage";
@@ -445,6 +447,26 @@ function App() {
     );
   }
 
+  // The Exams domain uses the existing Falowen authentication and Exams Room,
+  // never a second dashboard or tuition signup flow.
+  const marketplaceHost = isExamMarketplaceHost();
+  const examOnly = studentProfile?.accountType === "exam_only";
+  if (marketplaceHost && !user) {
+    if (location.pathname.startsWith("/signup")) return <ExamMarketplaceSignup />;
+    if (location.pathname.startsWith("/login") || location.pathname === "/payment-complete")
+      return <AuthGate initialMode="login" onBack={() => navigate("/")} onSwitchToSignup={() => navigate("/signup")} />;
+    return <ExamMarketplaceLanding />;
+  }
+  if (user && studentProfile && (marketplaceHost || examOnly)) {
+    if (location.pathname === "/payment-complete") return <Navigate to="/exams/overview?payment=return" replace />;
+    if (["/", "/signup", "/login"].includes(location.pathname)) return <Navigate to="/exams/overview" replace />;
+    const examRoom = (
+      <ExamProvider>
+        <ExamOnlyShell logout={logout} studentProfile={studentProfile} />
+      </ExamProvider>
+    );
+    return examOnly ? <ExamMarketplaceAccess>{examRoom}</ExamMarketplaceAccess> : examRoom;
+  }
   if (location.pathname === "/payment-complete") {
     return <PaymentComplete />;
   }
@@ -578,6 +600,43 @@ function App() {
 }
 
 export default function AccountProtectedApp() { return <AccountDeletionBoundary><App /></AccountDeletionBoundary>; }
+
+// Exam-only navigation is an allowlist. Course routes, tutor assignments and
+// the normal student dashboard never mount for customers on this track.
+const ExamOnlyShell = ({ logout, studentProfile }) => {
+  const navigate = useNavigate();
+  const { level } = useExam();
+  const readyRoute = EXAMS_READY_FULL_MOCKS[String(studentProfile?.level || "").toUpperCase()];
+  const routeFor = (target, element) => (
+    <Route path={target} element={readyRoute === target ? element : <Navigate to="/exams/overview" replace />} />
+  );
+  return (
+    <div className="app-shell" style={styles.container}>
+      <header className="app-header" style={{ ...styles.header, display:"flex", justifyContent:"space-between", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+        <div>
+          <h1 style={styles.title}>Falowen Exams</h1>
+          <p style={styles.subtitle}>Exam-only preparation · {level} · Lesen, Hören, Schreiben, Sprechen</p>
+        </div>
+        <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
+          <button type="button" style={styles.secondaryButton} onClick={()=>navigate("/exams/overview")}>Exams Room</button>
+          <button type="button" style={styles.dangerButton} onClick={logout}>Log out</button>
+        </div>
+      </header>
+      <main className="layout-main" style={{minWidth:0, marginTop:16}}>
+        <Routes>
+          <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
+          <Route path="/exams/:section/:practiceLevel/:sampleId" element={<ExamArea onBack={()=>navigate("/exams/overview")}/>} />
+          <Route path="/exams/:section" element={<ExamArea onBack={()=>navigate("/exams/overview")}/>} />
+          {routeFor("/campus/course/a1-final-mock-exam", <A1FinalMockExamPage />)}
+          {routeFor("/campus/course/a2-final-mock-exam", <A2FinalMockExamPage />)}
+          {routeFor("/campus/course/b1-final-mock-exam", <B1FinalMockExamPage />)}
+          {routeFor("/campus/course/b2-final-mock-exam", <B2FinalMockExamPage />)}
+          <Route path="*" element={<Navigate to="/exams/overview" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
 
 const AppShell = ({
   allowedSections,
