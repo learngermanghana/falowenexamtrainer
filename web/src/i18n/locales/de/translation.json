@@ -50,7 +50,7 @@
     "sections": {
       "courseBook": "Kursbuch",
       "submit": "Hausaufgabe einreichen",
-      "examFile": "Meine Prüfungsmappe",
+      "examFile": "Prüfungsakte und Termine",
       "grammar": "Grammatikfrage stellen",
       "grammarFrench": "Französische Grammatikhilfe",
       "writing": "Schreibtraining",
@@ -71,7 +71,7 @@
       "horen": "Hören",
       "lesen": "Lesen",
       "resources": "Ressourcen",
-      "file": "Meine Prüfungsmappe"
+      "file": "Prüfungsakte und Termine"
     },
     "campusTabs": {
       "speech": "Sprechtraining",
@@ -1301,7 +1301,7 @@
     "sessions": "Sitzungen",
     "markedIdentifiers": "Markierte Kennungen",
     "refresh": "Aktualisieren",
-    "openExamFile": "Meine Prüfungsakte öffnen",
+    "openExamFile": "Prüfungsakte und Termine öffnen",
     "errorMissingProfile": "Füge Klasse und Studentencode hinzu, um die Prüfungsbereitschaft zu sehen.",
     "errorFirebase": "Verbinde Firebase, um die Prüfungsbereitschaft zu laden.",
     "errorLoad": "Prüfungsbereitschaft kann gerade nicht geladen werden.",
