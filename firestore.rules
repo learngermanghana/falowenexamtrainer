@@ -266,7 +266,17 @@ service cloud.firestore {
       // student-code profile. Only the root profile is readable while paused.
       allow read: if signedIn() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
       allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType']));
-      allow update: if signedIn() && (isStaff() || (\n        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])\n        && (resource.data.get('accountType', '') != 'exam_only' || (\n          resource.data.uid == request.auth.uid\n          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([\n            'role', 'uid', 'studentCode', 'className', 'program', 'status', 'paymentStatus',\n            'paid', 'balanceDue', 'tuitionFee', 'contractStart', 'contractEnd',\n            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt'\n          ])\n        ))\n      ));
+      allow update: if signedIn() && (isStaff() || (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])
+        && (resource.data.get('accountType', '') != 'exam_only' || (
+          resource.data.uid == request.auth.uid
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'role', 'uid', 'studentCode', 'className', 'program', 'status', 'paymentStatus',
+            'paid', 'balanceDue', 'tuitionFee', 'contractStart', 'contractEnd',
+            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt'
+          ])
+        ))
+      ));
       allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid && resource.data.get('accountType', '') != 'exam_only');
       match /{collectionId}/{documentId}/{nested=**} {
         allow read, write: if signedIn();
