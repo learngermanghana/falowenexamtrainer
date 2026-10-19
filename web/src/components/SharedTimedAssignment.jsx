@@ -588,7 +588,7 @@ export function TimedAssignmentPanel() {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 3 }}>
           <strong style={{ color: urgent ? "#9f1239" : "#1e3a8a" }}>
-            {used ? `${timedLabel} · attempt closed` : passedReview ? `${timedLabel} · review unlocked` : `${timedLabel} · ${shownDurationMinutes} minutes`}
+            {passedReview ? `${timedLabel} · review unlocked` : used ? `${timedLabel} · attempt closed` : `${timedLabel} · ${shownDurationMinutes} minutes`}
           </strong>
           <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{config.scope}</span>
         </div>
