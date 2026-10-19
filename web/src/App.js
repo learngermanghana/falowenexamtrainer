@@ -447,6 +447,12 @@ function App() {
     );
   }
 
+  // Allow inspecting the storefront on a Vercel preview before assigning the new domain.
+  if (location.pathname === "/exams-landing-preview" &&
+      typeof window !== "undefined" && window.location.hostname.endsWith(".vercel.app")) {
+    return <ExamMarketplaceLanding />;
+  }
+
   // The Exams domain uses the existing Falowen authentication and Exams Room,
   // never a second dashboard or tuition signup flow.
   const marketplaceHost = isExamMarketplaceHost();
