@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
@@ -239,6 +240,9 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
   return null;
 };
 
+// Exam-only purchases reuse the same Paystack credentials and authenticated backend.
+registerMockCommerceRoutes(app, { admin, getAuthedUser });
+
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
@@ -452,6 +456,14 @@ app.post("/paystack/webhook", async (req, res) => {
     const payload = req.body || {};
     const { event, data = {} } = payload;
     if (event !== "charge.success") return res.json({ status: "ignored", event });
+
+    // Mock purchases NEVER flow through the tuition balance/contract updater.
+    // Only a signed Paystack event with an existing server-issued mock order
+    // can create an exam entitlement. Webhook retries are idempotent.
+    if (data?.metadata?.productType === "mock_package") {
+      const result = await processMockWebhook({ admin, data });
+      return res.status(result.status).json(result.body);
+    }
 
     const reference = String(data.reference || "");
     if (!reference) return res.status(400).json({ error: "Missing Paystack reference" });
