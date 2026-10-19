@@ -165,6 +165,37 @@ describe("A1 submission consistency runtime", () => {
     expect(validateA1SubmissionForm(form)).toBe("");
   });
 
+  test.each([0, 3, 19])("timed expiry with %i words reaches the final handler through document capture", (wordCount) => {
+    const { form } = renderA1Form({ wordCount, confirmed: false, teilChecked: false });
+    const cleanup = installA1SubmissionConsistencyRuntime();
+    const submit = jest.fn(event => event.preventDefault());
+    form.addEventListener("submit", submit);
+    try {
+      form.setAttribute("data-a1-timed-auto-submit", "true");
+      expect(validateA1SubmissionForm(form)).toBe("");
+      form.requestSubmit();
+      expect(submit).toHaveBeenCalledTimes(1);
+      expect(form.querySelector('[data-a1-submit-error]')?.hidden).not.toBe(false);
+    } finally {
+      cleanup();
+    }
+  });
+
+  test.each([null, "false"])("manual short answers remain blocked when timed marker is %s", (marker) => {
+    const { form } = renderA1Form({ wordCount: 3 });
+    if (marker !== null) form.setAttribute("data-a1-timed-auto-submit", marker);
+    const cleanup = installA1SubmissionConsistencyRuntime();
+    const submit = jest.fn(event => event.preventDefault());
+    form.addEventListener("submit", submit);
+    try {
+      form.requestSubmit();
+      expect(submit).not.toHaveBeenCalled();
+      expect(form.querySelector('[data-a1-submit-error]').textContent).toContain("17 more words required");
+    } finally {
+      cleanup();
+    }
+  });
+
   test("refreshes counter feedback after an umlaut quick-key click without an input event", () => {
     const { form, textarea } = renderA1Form({ wordCount: 13 });
     const quickKey = document.querySelector("#quick-keys button");

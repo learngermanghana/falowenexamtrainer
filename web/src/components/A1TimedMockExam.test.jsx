@@ -1,4 +1,5 @@
 import React from "react";
+import { installA1SubmissionConsistencyRuntime } from "../a1SubmissionConsistencyRuntime";
 import { act } from "@testing-library/react";
 
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: null, studentProfile: null }) }));
@@ -81,7 +82,7 @@ describe("A1 timed mock exam", () => {
     expect(screen.queryByText(/Timed mock exam/)).not.toBeInTheDocument();
   });
 
-  test("restores an expired auto-submit only when the form and cloud draft are fully ready", () => {
+  test("expired short answers pass the production capture guard once the cloud draft is ready", () => {
     window.localStorage.setItem(
       buildA1MockExamStorageKey("A1-12.3"),
       JSON.stringify({ endsAt: Date.now() - 1000 }),
@@ -93,15 +94,20 @@ describe("A1 timed mock exam", () => {
         <A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}>
           <div data-a1-built-in-submission>
             <div data-cloud-draft-persistence="react-owned" data-draft-submit-ready="true" data-draft-loaded="true" data-draft-conflict="false">
-              <form onSubmit={handleSubmit}><button type="submit">Submit</button></form>
+              <form onSubmit={handleSubmit}><textarea defaultValue="1 a" /><button type="submit" data-a1-final-submit-button>Submit</button></form>
             </div>
           </div>
         </A1TimedMockExam>
       </MemoryRouter>,
     );
 
-    act(() => jest.advanceTimersByTime(200));
-    expect(handleSubmit).toHaveBeenCalledTimes(1);
+    const cleanup = installA1SubmissionConsistencyRuntime();
+    try {
+      act(() => jest.advanceTimersByTime(200));
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+    } finally {
+      cleanup();
+    }
     // The local countdown is cleared at expiry; Firestore tracks the closed attempt.
     expect(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3"))).toBeNull();
   });
@@ -152,7 +158,8 @@ describe("A1 timed mock exam", () => {
     const draft = document.querySelector('[data-cloud-draft-persistence="react-owned"]');
     draft.setAttribute("data-draft-submit-ready", "true");
     draft.setAttribute("data-draft-loaded", "true");
-    draft.querySelector('button[type="submit"]').disabled = false;
+    // The manual checklist still disables the button after hydration.
+    expect(draft.querySelector('button[type="submit"]')).toBeDisabled();
     act(() => jest.advanceTimersByTime(200));
     expect(handleSubmit).toHaveBeenCalledTimes(1);
   });

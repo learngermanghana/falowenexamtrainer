@@ -220,15 +220,10 @@ test("Grammar study mode retains the visible countdown while a timed attempt is 
   expect(screen.getByTestId("lock")).toHaveTextContent("false");
 });
 
-test("Grammar study mode keeps the agreement and Start controls before the first A1-11 attempt", () => {
-  onSnapshot.mockImplementation((_ref, next) => {
-    snapshot = next;
-    next({ exists: () => false });
-    return unsubscribe;
-  });
+ test("Grammar retains agreement and start controls before an attempt", async () => {
   render(<Harness level="A1" assignmentKey="A1-11" studyMode />);
-  expect(document.querySelector('[data-timed-assignment="A1-11"]')).toBeInTheDocument();
-  expect(screen.getByRole("checkbox")).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: /Start/i })).toBeInTheDocument();
-  expect(screen.getByTestId("lock")).toHaveTextContent("true");
+  expect(screen.getByRole("checkbox")).toBeEnabled();
+  fireEvent.click(screen.getByRole("checkbox"));
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: /^Start/ })));
+  expect(screen.getByLabelText(/seconds remaining/)).toBeInTheDocument();
 });

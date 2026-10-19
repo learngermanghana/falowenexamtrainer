@@ -244,6 +244,10 @@ const applyMobileVisualOrder = (form, editor, quickKeys) => {
 
 export const validateA1SubmissionForm = (form) => {
   if (!isCanonicalA1Form(form)) return "";
+  // Timed expiry submits the answers available at 00:00, even if the manual
+  // word target or assignment confirmation is incomplete. Let the canonical
+  // React handler enforce cloud readiness, conflicts and final-save state.
+  if (form.getAttribute("data-a1-timed-auto-submit") === "true") return "";
   const textarea = form.querySelector("textarea");
   const wordCount = countA1SubmissionWords(textarea?.value || "");
   if (wordCount < A1_MINIMUM_WORDS) {

@@ -20,3 +20,7 @@ test("does not equate the timer being closed with a verified assignment receipt"
   expect(shouldDispatchA1TimedAutoSubmit({ ...ready, finalState: "error" })).toBe(true);
   expect(shouldDispatchA1TimedAutoSubmit({ ...ready, finalState: "verified" })).toBe(false);
 });
+
+test("a disabled manual checklist does not block a ready timed submission", () => {
+  expect(shouldDispatchA1TimedAutoSubmit({ ...ready, submitDisabled: true })).toBe(true);
+});
