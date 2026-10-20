@@ -1,6 +1,6 @@
 "use strict";
 
-const cards = require("../../shared/a1GoetheTeil3PictureCards.json");
+const cards = require("../data/a1GoetheTeil3PictureCards.json");
 const CRITERIA = Object.freeze({
   request: 4,
   politeness: 2,
