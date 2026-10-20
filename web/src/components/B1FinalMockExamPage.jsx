@@ -223,6 +223,7 @@ export default function B1FinalMockExamPage() {
   const [error, setError] = useState("");
   const [confirmIncompleteHoeren, setConfirmIncompleteHoeren] = useState(false);
   const saveTimerRef = useRef(null);
+  const lastAutosaveStageRef = useRef("");
   const timeoutHandledRef = useRef("");
   const completionSavedRef = useRef("");
   const completionRetryCountRef = useRef(0);
@@ -246,6 +247,9 @@ export default function B1FinalMockExamPage() {
     if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
 
+    const stageIdentity = `${exam.attemptInfo.attemptId}:${exam.stage}`;
+    const stageChanged = stageIdentity !== lastAutosaveStageRef.current;
+    lastAutosaveStageRef.current = stageIdentity;
     saveTimerRef.current = window.setTimeout(() => {
       saveB1MockAttempt({
         idToken,
@@ -264,7 +268,7 @@ export default function B1FinalMockExamPage() {
       }).catch((saveError) => {
         console.error("Could not autosave B1 mock", saveError);
       });
-    }, 900);
+    }, stageChanged ? 0 : 12000);
 
     return () => {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
