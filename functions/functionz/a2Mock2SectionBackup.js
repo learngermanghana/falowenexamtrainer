@@ -22,7 +22,7 @@ const answers = (value, max = 25) => {
 function validateBackup(mockId, section, input) {
   if (!MOCKS.includes(mockId) || !PARTS.includes(section)) throw fail("Unsupported mock backup");
   if (!input || typeof input !== "object" || Array.isArray(input)) throw fail("Invalid submitted section");
-  const at = Number(input.submittedAt);
+  const at = Number(input.submittedAt || (mockId === "a2-mock-02" && section !== "schreiben" ? input.completedAt : 0));
   if (!positiveTime(at)) throw fail("A completed section timestamp is required");
   if (section === "schreiben") {
     const fields = mockId === "a2-mock-02" ? ["sms", "email"] : ["teil1", "teil2"];
