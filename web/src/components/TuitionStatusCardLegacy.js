@@ -199,6 +199,15 @@ const TuitionStatusCard = ({
     paymentPurpose,
   ]);
 
+  // GHS always determines the Paystack charge. USD is a display estimate only.
+  const usdUnderPrice = (ghsAmount) => {
+    const amountUsd = approximateUsd(ghsAmount, fxQuote);
+    return amountUsd ? (
+      <small style={{ display: "block", textAlign: "right", color: "#64748b", fontSize: 12, fontWeight: 400 }}>
+        ≈ {amountUsd} USD
+      </small>
+    ) : null;
+  };
   const feeSummary = amountToPay > 0 ? (
     <div
       style={{
@@ -212,18 +221,18 @@ const TuitionStatusCard = ({
     >
       <div style={styles.metaRow}>
         <span style={{ color: "#64748b" }}>Tuition</span>
-        <strong>{formatCheckoutMoney(feeBreakdown.tuitionAmount)}</strong>
+        <strong>{formatCheckoutMoney(feeBreakdown.tuitionAmount)}{usdUnderPrice(feeBreakdown.tuitionAmount)}</strong>
       </div>
       <div style={styles.metaRow}>
         <span style={{ color: "#64748b" }}>Paystack fee share</span>
-        <strong>{formatCheckoutMoney(feeBreakdown.studentFeeContribution)}</strong>
+        <strong>{formatCheckoutMoney(feeBreakdown.studentFeeContribution)}{usdUnderPrice(feeBreakdown.studentFeeContribution)}</strong>
       </div>
       <div style={{ ...styles.metaRow, paddingTop: 6, borderTop: "1px solid #e2e8f0" }}>
         <span><strong>Total</strong></span>
-        <strong>{formatCheckoutMoney(feeBreakdown.checkoutAmount)}</strong>
+        <strong>{formatCheckoutMoney(feeBreakdown.checkoutAmount)}{usdUnderPrice(feeBreakdown.checkoutAmount)}</strong>
       </div>
       <p style={{ ...styles.helperText, margin: 0, fontSize: 11 }}>
-        Falowen covers the other half of the estimated Paystack fee.
+        Falowen covers the other half of the estimated Paystack fee. GHS is the payable amount; USD is an indicative conversion.
       </p>
     </div>
   ) : null;
@@ -376,7 +385,7 @@ const TuitionStatusCard = ({
               >
                 <div style={styles.metaRow}>
                   <span>{t("accountSettings.tuition.finalPayment")}</span>
-                  <strong>{formatMoney(maxPayable)}</strong>
+                  <strong>{formatMoney(maxPayable)}{usdUnderPrice(maxPayable)}</strong>
                 </div>
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
                   {t("accountSettings.tuition.finalPaymentHelp", {
