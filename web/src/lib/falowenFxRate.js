@@ -7,6 +7,7 @@ const RATE_CLIENT_TTL_MS = 60 * 60 * 1000;
 
 // One in-memory request per page session/hour; server caches the quote for a day.
 export const fetchFalowenUsdGhsRate = () => {
+  if (typeof fetch !== "function") return Promise.reject(new Error("FX API unavailable"));
   if (!ratePromise || Date.now() - quoteLoadedAt > RATE_CLIENT_TTL_MS) {
     quoteLoadedAt = Date.now();
     ratePromise = fetch(`${getBackendUrl()}/fx/usd-ghs`)
