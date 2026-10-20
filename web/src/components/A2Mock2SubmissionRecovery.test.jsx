@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import A2Mock2ExamHub from "./A2Mock2ExamHub";
 import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
@@ -74,4 +74,33 @@ test("all four submitted modules unlock final review even if both AI marking ser
   expect(screen.getByText("Schreiben · KI-Feedback / erneut bewerten")).toBeInTheDocument();
   expect(screen.getByText("Sprechen · KI-Feedback / erneut bewerten")).toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Das ist meine gespeicherte Antwort.");
+});
+
+test("completion tracker immediately counts Lesen and Hören without refreshing the page", async () => {
+  const confirm = jest.spyOn(window, "confirm").mockReturnValue(true);
+  try {
+    save("flow", { stage: "lesen", startedAt: Date.now() - 1000 });
+    mount();
+
+    // Reading can be submitted with unanswered questions (they count as wrong).
+    fireEvent.click(within(screen.getByRole("navigation", {name:"Prüfungsteile"}))
+      .getByRole("button", {name:/Teil 4/}));
+    fireEvent.click(screen.getByRole("button", {name:"Lesen abgeben"}));
+
+    await waitFor(() => expect(screen.getByText("1 von 4 Modulen abgeschlossen")).toBeInTheDocument());
+    expect(screen.getByText("Hören · Übungstest 2")).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(keys.lesen)).completedAt).toEqual(expect.any(Number));
+
+    fireEvent.click(within(screen.getByRole("navigation", {name:"Hören-Teile"}))
+      .getByRole("button", {name:/Teil 4/}));
+    fireEvent.click(screen.getByRole("button", {name:"Hören abgeben"}));
+
+    await waitFor(() => expect(screen.getByText("2 von 4 Modulen abgeschlossen")).toBeInTheDocument());
+    expect(screen.getByText("Mock 2 · Schreiben")).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem(keys.hoeren)).completedAt).toEqual(expect.any(Number));
+    expect(markLetterWithAI).not.toHaveBeenCalled();
+    expect(scoreA2MockSpeaking).not.toHaveBeenCalled();
+  } finally {
+    confirm.mockRestore();
+  }
 });

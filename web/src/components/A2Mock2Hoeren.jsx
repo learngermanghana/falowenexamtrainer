@@ -22,10 +22,11 @@ function A2Mock2HoerenAttempt({ embedded = false, onComplete, reviewReleased = f
   const player = useRef(null);
   const part = PARTS[exam.partIndex];
   const finished = Boolean(exam.completedAt);
-  useEffect(() => { if (embedded && finished && onComplete) onComplete(); }, [embedded, finished, onComplete]);
   const reveal = (!embedded || reviewReleased) && isA2Mock2ReviewReady(getA2Mock2StorageKeys(user?.uid));
   const correct = QUESTIONS.filter(q => String(exam.answers[q.number] || "") === q.answer).length;
+  // Save the completed Hören attempt before notifying the main mock tracker.
   useEffect(() => { localStorage.setItem(storageKey, JSON.stringify(exam)); }, [exam, storageKey]);
+  useEffect(() => { if (embedded && finished && onComplete) onComplete(); }, [embedded, finished, onComplete]);
   useEffect(() => { setAudioUrl(""); setError(""); }, [exam.partIndex]);
   const update = (number, answer) => { if (!finished) setExam(old => ({ ...old, answers: { ...old.answers, [number]: answer } })); };
   const changePart = (index) => {
