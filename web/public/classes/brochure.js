@@ -7,14 +7,19 @@ let brochureData = null;
 let brochureDataPromise = null;
 let selectedClassId = null;
 let brochureFxRate = null;
+let brochureFxUpdatedAt = null;
 
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
 const usdEstimate = amount => brochureFxRate && Number.isFinite(Number(amount))
   ? "≈ " + new Intl.NumberFormat("en-US", {style:"currency",currency:"USD"}).format(Number(amount)/brochureFxRate) + " USD"
   : "";
+const priceWithIndicativeUsd = amount => {
+  const estimate = usdEstimate(amount);
+  return formatMoney(amount) + (estimate ? ` (${estimate}, indicative)` : "");
+};
 const dualPriceMarkup = amount => {
   const usd = usdEstimate(amount);
-  return formatMoney(amount) + (usd ? `<small style="display:block;color:#63738b;font-size:12px;font-weight:500;margin-top:4px">${usd} · indicative</small>` : "");
+  return formatMoney(amount) + (usd ? `<small style="display:block;color:#63738b;font-size:12px;font-weight:500;margin-top:4px">${usd} · indicative${brochureFxUpdatedAt ? " · rate updated " + brochureFxUpdatedAt : ""}</small>` : "");
 };
 const formatDate = (iso) => {
   if (!iso) return "Always open";
@@ -602,8 +607,9 @@ function renderAgreement(course, firstPayment, balance) {
 
   intro.textContent = `This Payment Agreement is entered into on ${today} for ${course.title} students of Learn Language Education Academy and Felix Asadu (“Teacher”).`;
   const terms = [
-    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}.`,
-    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. The starter installment gives ${policy.installmentAccessMonths} month of access until the balance is due.`,
+    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}${usdEstimate(course.tuitionGhs) ? ` (approximately ${usdEstimate(course.tuitionGhs)})` : ""}.`,
+    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${priceWithIndicativeUsd(firstPayment)}, and the remaining balance of ${priceWithIndicativeUsd(balance)} is due one month after the first payment. The starter installment gives ${policy.installmentAccessMonths} month of access until the balance is due.`,
+    `<strong>Payment Currency:</strong> All contractual fees and Paystack payments are in Ghana cedis (GHS). USD conversions are informational estimates only, may change with exchange rates, and do not alter the agreed GHS amounts.`,
     `<strong>Learning Mode & Attendance Rights:</strong> Available learning modes are ${learningModes}. The student may choose the suitable mode for each scheduled session.`,
     `<strong>Class Duration & Contract Term:</strong> The taught course is approximately ${policy.courseDurationWeeks} weeks. Full payment gives ${policy.fullPaymentAccessMonths} months of Falowen access from enrollment, including revision time after the scheduled classes end.`,
     `<strong>Post-Contract Access:</strong> After ${policy.fullPaymentAccessMonths} months, continued access can be extended at GHS ${Number(policy.extensionGhsPerMonth || 0).toLocaleString("en-GH")}${usdEstimate(policy.extensionGhsPerMonth) ? ` (approximately ${usdEstimate(policy.extensionGhsPerMonth)})` : ""} per month or by enrolling in a new class at the current fee.`,
@@ -692,7 +698,7 @@ function render() {
   ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join(""));
   setHtml("highlights", (course.highlights || []).map((item) => `<li>${item}</li>`).join(""));
   const installmentAccessMonths = Number(brochureData?.coursePolicy?.installmentAccessMonths || 1);
-  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}.`);
+  setText("paymentSummary", `${course.title}: you can pay the full fee of ${priceWithIndicativeUsd(course.tuitionGhs)} or start with an installment of ${priceWithIndicativeUsd(firstPayment)}. The balance of ${priceWithIndicativeUsd(balance)} is due after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}. All Paystack charges are in GHS; USD is only a guide.`);
   setHref("payLink", paymentLink);
   setHref("payHero", "/signup/");
   setHref("shareLink", shareUrl);
@@ -710,7 +716,7 @@ function render() {
       : `<tr><td colspan="3">The next live-class schedule will be announced.</td></tr>`);
 
   const academyProfile = brochureData?.academyProfile || { establishedYear: 2022, examPassHeadline: "High exam pass rate", germanLevels: "A1–C2" };
-  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl || "To be announced"}`;
+  const copy = `${course.title}\nEstablished: ${academyProfile.establishedYear}\nExam performance: ${academyProfile.examPassHeadline}\nGerman learning: ${academyProfile.germanLevels}\nFull fee: ${priceWithIndicativeUsd(course.tuitionGhs)}\nInstallment option: ${priceWithIndicativeUsd(firstPayment)} first payment, balance ${priceWithIndicativeUsd(balance)} after ${installmentAccessMonths} month${installmentAccessMonths === 1 ? "" : "s"}\nMeeting times: ${getCourseMeetingLabel(course)}\nClass schedule: ${classScheduleUrl || "To be announced"}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
@@ -753,6 +759,8 @@ fetch("/api/fx/usd-ghs").then(response => response.ok ? response.json() : null)
     const rate = Number(quote?.usdToGhs);
     if (Number.isFinite(rate) && rate > 0) {
       brochureFxRate = rate;
+      const date = new Date(quote.fetchedAt);
+      brochureFxUpdatedAt = Number.isFinite(date.getTime()) ? date.toLocaleDateString("en-GB") : null;
       if (brochureData) render();
     }
   }).catch(() => {});
