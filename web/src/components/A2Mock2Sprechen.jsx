@@ -67,7 +67,7 @@ function A2Mock2SprechenAttempt({ embedded = false, onComplete, reviewReleased =
   try{
    // Process the recording once, in memory. Only the transcript is needed
    // for the later combined AI evaluation; no Firebase upload or per-clip LLM.
-   const response=await analyzeAudio({audioBlob:audio.blob,teil:task.teil,level:"A2",contextType:"A2 Mock 2 Sprechen — "+RUBRIC.assessmentIdentity,question:task.prompt,interactionMode:"single-candidate A2 mock-02 speaking task",userId:user?.uid||"guest",idToken,timeoutMs:TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS,persistAudio:false,transcriptionOnly:true});
+   const response=await analyzeAudio({audioBlob:audio.blob,teil:task.teil,level:"A2",contextType:"A2 Mock 2 Sprechen",question:task.prompt,interactionMode:"single-candidate A2 mock-02 speaking task",userId:user?.uid||"guest",idToken,timeoutMs:TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS,persistAudio:false,transcriptionOnly:true});
    const transcript=String(response?.transcript||"").trim();
    if(!transcript)throw new Error("Keine verständliche Aufnahme erkannt. Bitte erneut aufnehmen.");
    setAttempts(prev=>({...prev,[task.id]:{transcript,duration:elapsed}}));
