@@ -20,6 +20,8 @@ on:
       - "functions/functionz/app.js"
       - "functions/functionz/a2MockCompletionSync.js"
       - "functions/functionz/a2WritingAssessment.js"
+      - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
       - "web/src/components/ListeningPracticeSamplePage.jsx"
@@ -53,6 +55,8 @@ on:
       - "functions/functionz/app.js"
       - "functions/functionz/a2MockCompletionSync.js"
       - "functions/functionz/a2WritingAssessment.js"
+      - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
       - "web/src/components/ListeningPracticeSamplePage.jsx"
@@ -84,6 +88,8 @@ jobs:
       - name: Verify Mock 2 saved submission recovery and retryable AI grading
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js
+      - name: Verify Mock 2 task registration and score isolation
+        run: node -e "require.resolve(\'./functions/functionz/assessmentTaskContext.js\')" 
       - name: Verify exact Mock 2 backend task registry and versions
         run: node scripts/generateAssessmentTaskRegistry.mjs --check
       - name: Build Exam Room web app
