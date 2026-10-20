@@ -24,8 +24,8 @@ const getProgress = (STORAGE) => {
    score: A2_MOCK_2_LESEN_QUESTIONS.filter(q => l.answers?.[q.number] === q.answer).length * 1.25 },
   hoeren: { done: Boolean(h.completedAt), count: Object.values(h.answers || {}).filter(Boolean).length,
    score: A2_MOCK_2_HOEREN_QUESTIONS.filter(q => h.answers?.[q.number] === q.answer).length * 1.25 },
-  schreiben: { done: Boolean(w.submittedAt && w.aiFeedback?.length === 2), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
-  sprechen: { done: Boolean(s._mock2AiScored && ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
+  schreiben: { done: Boolean(w.submittedAt), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
+  sprechen: { done: Boolean(["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
  };
 };
 const initialize = (STORAGE) => {
@@ -142,14 +142,14 @@ function A2Mock2ExamHubAttempt(){
    </section>:null}
    {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
     <h2>Alle vier Module bearbeitet</h2>
-    <p>Vielen Dank. Ihre Antworten und KI-Übungsrückmeldungen bleiben auf diesem Gerät gespeichert.</p>
+    <p>Vielen Dank. Ihre Antworten bleiben auf diesem Gerät gespeichert. Die KI-Auswertung erfolgt separat und kann bei einem Fehler erneut gestartet werden, ohne den Mocktest zu wiederholen.</p>
     <p>Lesen: <strong>{progress.lesen.score.toFixed(1)}/25</strong> · Hören: <strong>{progress.hoeren.score.toFixed(1)}/25</strong></p>
     <button type="button" className="a2-mock2-primary" onClick={restart}>Neuen vollständigen Mocktest starten</button>
     {resetError ? <p role="alert">{resetError}</p> : null}
     <details><summary>Lesen · Antworten und Lösungen ansehen</summary><A2Mock2Lesen embedded reviewReleased /></details>
     <details><summary>Hören · Antworten und Lösungen ansehen</summary><A2Mock2Hoeren embedded reviewReleased /></details>
-    <details><summary>Schreiben · Feedback ansehen</summary><A2Mock2Schreiben embedded reviewReleased /></details>
-    <details><summary>Sprechen · Feedback ansehen</summary><A2Mock2Sprechen embedded reviewReleased /></details>
+    <details><summary>Schreiben · KI-Feedback / erneut bewerten</summary><A2Mock2Schreiben embedded reviewReleased /></details>
+    <details><summary>Sprechen · KI-Feedback / erneut bewerten</summary><A2Mock2Sprechen embedded reviewReleased /></details>
     <p>Ein verifiziertes Gesamtergebnis von 100 Punkten wird erst angezeigt, wenn die KI-Bewertungen von Schreiben und Sprechen sicher dem zweiten Mocktest zugeordnet werden können.</p>
    </section>:null}
  </main>;
