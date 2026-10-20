@@ -24,7 +24,7 @@ describe("B1 native Exams Room navigation and result sync", () => {
   });
 
   it("uses the B1 mock audio API for an independent, scored 30-question Hören sample", () => {
-    expect(horen).toContain('["A1", "A2", "B1", "C1"]');
+    expect(horen).toContain('["A1", "A2", "B1", "B2", "C1"]');
     expect(horen).toContain('return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} />;');
     expect(listening).toContain("B1_LISTENING");
     expect(listening).toContain("fetchB1MockAudioPlaybackUrl");
@@ -42,5 +42,23 @@ describe("B1 native Exams Room navigation and result sync", () => {
     expect(reading).toContain('level: "B1"');
     expect(reading).toContain('data-b1-reading-practice-samples');
     expect(reading).toContain("Check answers");
+  });
+});
+
+
+describe("B2 standalone Hören Sample 1", () => {
+  const horen = source("HorenPage.js");
+  const listening = source("ListeningPracticeSamplePage.jsx");
+
+  it("reuses all four original B2 mock recordings, questions and answer keys", () => {
+    expect(horen).toContain('["A1", "A2", "B1", "B2", "C1"]');
+    expect(listening).toContain('import { B2_LISTENING }');
+    expect(listening).toContain("Object.entries(B2_LISTENING)");
+    expect(listening).toContain("original.texts.flatMap(text => text.questions)");
+    expect(listening).toContain("original.speakers");
+    expect(listening).toContain('mockId: "mock-01"');
+    expect(listening).toContain("fetchB2MockAudioPlaybackUrl");
+    expect(listening).toContain('normalizedLevel === "B2"');
+    expect(listening).toContain('section: "hoeren"');
   });
 });
