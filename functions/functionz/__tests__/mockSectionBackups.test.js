@@ -1,4 +1,5 @@
-const test = require("node:test");
+// Share this regression suite between Firebase Jest and dependency-free Node CI.
+const test = globalThis.test || require("node:test");
 const assert = require("node:assert/strict");
 const {validateBackup, saveBackup, publicBackup} = require("../a2Mock2SectionBackup");
 const started = Date.now() - 60_000;
