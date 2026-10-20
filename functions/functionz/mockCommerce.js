@@ -1,8 +1,8 @@
 "use strict";
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 
-// Until catalogue publishing is connected to Admin, ONLY sell verified ready full mocks.
-// Do not silently expand to preview, unfinished or planned exams.
+// One level subscription provides access to all currently published mocks at that level.
+// Do not advertise a paid level until at least one complete mock is ready.
 const READY_MOCKS = Object.freeze({
   A1: ["a1-final-01", "a1-final-02", "a1-final-03"],
   A2: ["a2-final-01"],
@@ -12,12 +12,18 @@ const READY_MOCKS = Object.freeze({
   C2: [],
 });
 const PACKAGES = Object.freeze({
-  single: { id: "single", priceGhs: 49, fullMocks: 1, days: 14 },
-  ready: { id: "ready", priceGhs: 119, fullMocks: 3, days: 30 },
+  monthly: { id: "monthly", priceGhs: 99, days: 30, scope: "level" },
 });
 const LEVELS = Object.keys(READY_MOCKS);
 const euros = (n) => Math.round(Number(n) * 100);
-const isReady = (level, pkg) => LEVELS.includes(level) && Boolean(pkg) && READY_MOCKS[level].length >= pkg.fullMocks;
+const isReady = (level, pkg) => LEVELS.includes(level) && pkg?.id === "monthly" && READY_MOCKS[level].length > 0;
+const subscriptionKey = (uid, level) => uid + "_" + level;
+const activeSubscriptionsFor = async (db, uid) => {
+  const snap = await db.collection("mockSubscriptions").where("uid", "==", uid).get();
+  const now = Date.now();
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }))
+    .filter(s => s.status === "active" && Number(s.expiresAtMs) > now && LEVELS.includes(s.level));
+};
 const safeRedirect = (value) => {
   // Redirect is deliberately fixed; the client may not send an arbitrary callback.
   return "https://exams.falowen.app/mock/complete";
@@ -33,7 +39,7 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
   app.get("/mock/catalog", (_req, res) => res.json({
     levels: LEVELS.map((level) => ({ level, readyMockCount: READY_MOCKS[level].length,
       packages: Object.values(PACKAGES).filter((p) => isReady(level, p)).map((p) => ({
-        id: p.id, priceGhs: p.priceGhs, fullMocks: p.fullMocks, days: p.days
+        id: p.id, priceGhs: p.priceGhs, days: p.days, scope: p.scope
       }))
     }))
   }));
@@ -100,7 +106,7 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       if (!secret) return res.status(503).json({ error: "Payments are temporarily unavailable." });
       const amount = pkg.priceGhs; // fixed server-side; never use request.body.amount
       const fee = calculateSharedPaystackFee(amount);
-      const selectedMocks = READY_MOCKS[level].slice(0, pkg.fullMocks);
+      const selectedMocks = [...READY_MOCKS[level]];
       const response = await fetch("https://api.paystack.co/transaction/initialize", {
         method: "POST",
         headers: { Authorization: `Bearer ${secret}`, "Content-Type": "application/json" },
@@ -123,7 +129,7 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       await db().collection("mockOrders").doc(reference).create({
         uid: user.uid, email: user.email.toLowerCase(), studentId: student.id, level,
         packageId: pkg.id, amountGhs: amount, checkoutPesewas: euros(fee.checkoutAmount),
-        mockIds: selectedMocks, days: pkg.days, status: "pending", reference,
+        scope: "level", mockIds: selectedMocks, days: pkg.days, status: "pending", reference,
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       });
       return res.json({ ok: true, authorization_url: body.data.authorization_url, reference });
@@ -137,12 +143,10 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
     try {
       const user = await verified(req, res);
       if (!user) return;
-      const snap = await db().collection("mockPurchases").where("uid", "==", user.uid).get();
-      const now = Date.now();
-      const active = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter((purchase) => purchase.status === "active" && purchase.expiresAtMs > now);
-      return res.json({ ok: true, active: active.map(({ id, level, packageId, mockIds, expiresAtMs }) =>
-        ({ id, level, packageId, mockIds, expiresAtMs })) });
+      const active = await activeSubscriptionsFor(db(), user.uid);
+      res.set("Cache-Control", "private, no-store");
+      return res.json({ ok: true, active: active.map(({ id, level, packageId, expiresAtMs }) =>
+        ({ id, level, packageId, expiresAtMs, scope: "level", mockIds: [...READY_MOCKS[level]] })) });
     } catch (error) {
       console.error("Mock access lookup error", error);
       return res.status(500).json({ error: "Could not confirm mock access." });
@@ -159,6 +163,11 @@ async function processMockWebhook({ admin, data }) {
   const result = await admin.firestore().runTransaction(async (tx) => {
     const orderSnap = await tx.get(orderRef);
     const purchaseSnap = await tx.get(purchaseRef);
+    const existingOrder = orderSnap.exists ? orderSnap.data() : null;
+    const subscriptionRef = existingOrder
+      ? admin.firestore().collection("mockSubscriptions").doc(subscriptionKey(existingOrder.uid, existingOrder.level))
+      : null;
+    const subscriptionSnap = subscriptionRef ? await tx.get(subscriptionRef) : null;
     if (!orderSnap.exists) return { status: 202, body: { status: "rejected", reason: "order_not_found" } };
     const order = orderSnap.data();
     if (purchaseSnap.exists) return { status: 200, body: { status: "duplicate", reference } };
@@ -174,23 +183,30 @@ async function processMockWebhook({ admin, data }) {
       String(data.currency || "").toUpperCase() === "GHS" &&
       String(data.status || "").toLowerCase() === "success" &&
       String(data.customer?.email || "").toLowerCase() === order.email &&
-      Array.isArray(order.mockIds) && order.mockIds.length === packageConfig.fullMocks;
+      order.scope === "level" && isReady(order.level, packageConfig) && Array.isArray(order.mockIds) && order.mockIds.length > 0;
     if (!isCorrect) {
       tx.update(orderRef, { status: "rejected", updatedAt: admin.firestore.FieldValue.serverTimestamp() });
       return { status: 202, body: { status: "rejected", reason: "purchase_mismatch" } };
     }
     const now = Date.now();
-    const expiresAtMs = now + packageConfig.days * 86400000;
+    const previousExpiry = Number(subscriptionSnap?.data()?.expiresAtMs || 0);
+    const startsAtMs = Math.max(now, previousExpiry);
+    const expiresAtMs = startsAtMs + packageConfig.days * 86400000;
     tx.create(purchaseRef, {
       uid: order.uid, studentId: order.studentId, level: order.level,
-      packageId: order.packageId, mockIds: order.mockIds,
+      packageId: order.packageId, scope: "level", mockIds: order.mockIds,
       status: "active", reference, priceGhs: order.amountGhs,
-      startedMockIds: [], purchasedAtMs: now, expiresAtMs,
+      purchasedAtMs: now, startsAtMs, expiresAtMs,
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
+    tx.set(subscriptionRef, {
+      uid: order.uid, level: order.level, packageId: "monthly",
+      scope: "level", status: "active", startsAtMs, expiresAtMs,
+      lastPaymentReference: reference, updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
     tx.update(orderRef, { status: "paid", paidAtMs: now });
     return { status: 200, body: { status: "synced", reference } };
   });
   return result;
 }
-module.exports = { registerMockCommerceRoutes, processMockWebhook, READY_MOCKS, PACKAGES, isReady };
+module.exports = { registerMockCommerceRoutes, processMockWebhook, READY_MOCKS, PACKAGES, isReady, activeSubscriptionsFor, subscriptionKey };
