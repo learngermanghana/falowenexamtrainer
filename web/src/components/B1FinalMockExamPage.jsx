@@ -53,6 +53,7 @@ const emptyState = () => ({
   hoerenResult: null,
   sectionScores: {},
   overall: null,
+  writingPending: false,
   completed: false,
 });
 
@@ -244,7 +245,7 @@ export default function B1FinalMockExamPage() {
       window.localStorage.setItem(storageKey, JSON.stringify(persisted));
     }
 
-    if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
+    if (!exam.attemptInfo?.attemptId || !idToken || (exam.completed && !exam.writingPending)) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
 
     const stageIdentity = `${exam.attemptInfo.attemptId}:${exam.stage}`;
@@ -277,7 +278,7 @@ export default function B1FinalMockExamPage() {
 
   useEffect(() => {
     const attemptId = exam.attemptInfo?.attemptId;
-    if (!exam.completed || !attemptId || !idToken) return undefined;
+    if (!exam.completed || exam.writingPending || !attemptId || !idToken) return undefined;
 
     const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
     if (completionSavedRef.current === completionKey) return undefined;
@@ -462,14 +463,35 @@ export default function B1FinalMockExamPage() {
       });
       moveToSection("sprechen", {
         schreibenResult: result,
+        writingPending: false,
         sectionScores: { ...exam.sectionScores, schreiben: Number(result?.score || 0) },
       });
     } catch (markError) {
-      setError(getMockWritingSubmissionError(markError));
+      // Submission and grading are separate. The student keeps the text and
+      // moves to Sprechen; no final score is released until retry succeeds.
+      moveToSection("sprechen", { writingPending: true });
+      setError("");
     } finally {
       setBusy("");
     }
   }, [busy, exam.attemptInfo?.attemptId, exam.schreiben, exam.sectionScores, idToken, moveToSection]);
+
+  const retryPendingWriting = async () => {
+    if (busy || !exam.writingPending) return;
+    setBusy("schreiben"); setError("");
+    try {
+      const result = await scoreB1MockWriting({ ...exam.schreiben, attemptId: exam.attemptInfo?.attemptId || "", idToken });
+      setExam(current => {
+        const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
+        const total = Number(Object.values(sectionScores)
+          .reduce((sum, n) => sum + Number(n || 0), 0).toFixed(1));
+        return {...current, schreibenResult:result, writingPending:false, sectionScores,
+          overall:current.completed ? {score:total, maxScore:100, passed:total >= 60} : current.overall};
+      });
+    } catch (markError) {
+      setError(getMockWritingSubmissionError(markError));
+    } finally { setBusy(""); }
+  };
 
   const handleSpeakingProgress = useCallback((progress) => {
     setExam((current) => ({
@@ -524,6 +546,19 @@ export default function B1FinalMockExamPage() {
     submitHoeren();
   };
 
+  if (exam.stage === "result" && exam.writingPending) {
+    return <main className="b1-final-shell">
+      <AppBackButton label="Back to Exams Room" fallbackPath="/exams/overview" />
+      <section className="b1-final-rules">
+        <h2>All four modules submitted · Schreiben feedback pending</h2>
+        <p>Your writing answers are saved in your attempt. AI marking can be retried without repeating Lesen, Hören or Sprechen. Your overall mark will not be published until writing is graded.</p>
+        {error ? <p role="alert">{error}</p> : null}
+        <button type="button" disabled={busy==="schreiben"} onClick={retryPendingWriting}>
+          {busy==="schreiben" ? "Marking…" : "Retry Schreiben marking"}
+        </button>
+      </section>
+    </main>;
+  }
   if (exam.stage === "intro") {
     return (
       <main className="b1-final-shell">
