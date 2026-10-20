@@ -55,6 +55,11 @@ jobs:
       - name: Verify scoring-preserving choices and clean writing textareas
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/utils/mockChoicePresentation.test.js src/data/a2Mock2Lesen.test.js src/data/a2Mock2Hoeren.test.js src/components/A2Mock2Integration.test.js src/data/consistentWritingPatterns.test.jsx src/components/B1WritingWorkspace.test.jsx src/components/A1Day20GoetheWritingGrammarPage.test.jsx
+      - name: Verify Mock 2 saved submission recovery and retryable AI grading
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js
+      - name: Verify exact Mock 2 backend task registry and versions
+        run: node scripts/generateAssessmentTaskRegistry.mjs --check
       - name: Build Exam Room web app
         working-directory: web
         run: npx vite build
