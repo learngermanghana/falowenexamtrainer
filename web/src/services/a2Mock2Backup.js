@@ -1,74 +1,129 @@
 import { getBackendUrl } from "./backendUrl";
 
-// One small backup for each completed Lesen, Hören and Schreiben module.
-// Never upload draft answers, speaking recordings, transcripts or AI feedback.
-const SECTION_ORDER = ["lesen", "hoeren", "schreiben"];
-const BACKUP_KEY = uid => `falowen:a2:mock-02:backup-sync:${uid}`;
-const json = key => { try { return JSON.parse(localStorage.getItem(key) || "null") || {}; } catch { return {}; } };
-const submissionTime = (name, data) => Number(name === "schreiben" ? data?.submittedAt : data?.completedAt) || 0;
-const payloadFor = (name, data) => {
-  if (name === "schreiben") return { submittedAt: data.submittedAt, startedAt: data.startedAt || null, sms: data.sms || "", email: data.email || "" };
-  return { completedAt: data.completedAt, answers: data.answers || {} };
-};
-const request = async (path, token, options = {}) => {
-  const response = await fetch(`${getBackendUrl()}${path}`, {
-    ...options, cache: "no-store",
+// One backup write per submitted module (not per keypress), and no speaking media.
+const PARTS = ["lesen", "hoeren", "schreiben"];
+const MOCKS = ["a2-mock-02", "b2-final-mock"];
+const markerKey = (uid, mockId) => `falowen:mock-backup-sync:${mockId}:${uid}`;
+const readJson = key => { try { return JSON.parse(localStorage.getItem(key) || "null") || {}; } catch { return {}; } };
+const completedStamp = data => Number(data?.submittedAt || data?.completedAt) || 0;
+async function callBackup(mockId, token, options = {}) {
+  const response = await fetch(`${getBackendUrl()}/internal/mock-answer-backup${options.method ? "" : "?mockId=" + encodeURIComponent(mockId)}`, {
+    cache: "no-store", ...options,
     headers: { Authorization: `Bearer ${token}`, Accept: "application/json",
-      ...(options.body ? {"Content-Type":"application/json"} : {}) },
+      ...(options.body ? {"Content-Type": "application/json"} : {}) },
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok || result.ok !== true) throw new Error(result.error || "Mock backup unavailable");
+  if (!response.ok || !result.ok) throw new Error(result.error || "Mock backup unavailable");
   return result;
-};
-export async function readA2Mock2Backup(token) {
-  return request("/internal/a2-mock2-backup", token);
 }
+export const getMockAnswerBackup = (mockId, token) => callBackup(mockId, token);
+
+export async function uploadMockAnswerBackup(mockId, section, attemptStartedAtMs, data, token, uid) {
+  if (!MOCKS.includes(mockId) || !PARTS.includes(section) || !token || !uid || !completedStamp(data)) return false;
+  const ackKey = markerKey(uid, mockId);
+  const record = readJson(ackKey);
+  const ack = record.attemptStartedAtMs === attemptStartedAtMs ? record.sections || {} : {};
+  if (ack[section] === completedStamp(data)) return false;
+  await callBackup(mockId, token, {method:"POST", body:JSON.stringify({
+    mockId, section, attemptStartedAtMs, data,
+  })});
+  localStorage.setItem(ackKey, JSON.stringify({attemptStartedAtMs, sections: {...ack, [section]: completedStamp(data)}}));
+  return true;
+}
+
 export async function syncA2Mock2Backup(keys, attemptStartedAtMs, token, uid) {
-  if (!token || !uid || !Number.isSafeInteger(Number(attemptStartedAtMs)) || Number(attemptStartedAtMs) <= 0) return { saved: 0, pending: 0 };
-  const savedMarker = json(BACKUP_KEY(uid));
-  const acknowledged = savedMarker.attemptStartedAtMs === attemptStartedAtMs ? {...savedMarker.sections} : {};
-  let saved = 0;
-  for (const section of SECTION_ORDER) {
-    const data = json(keys[section]);
-    const completedAt = submissionTime(section, data);
-    if (!completedAt || Number(acknowledged[section]) === completedAt) continue;
-    await request("/internal/a2-mock2-backup", token, {
-      method: "POST",
-      body: JSON.stringify({ mockId: "a2-mock-02", attemptStartedAtMs,
-        section, data: payloadFor(section, data) }),
-    });
-    acknowledged[section] = completedAt;
-    localStorage.setItem(BACKUP_KEY(uid), JSON.stringify({ attemptStartedAtMs, sections: acknowledged }));
-    saved++;
+  if (!token || !uid || !attemptStartedAtMs) return;
+  for (const section of PARTS) {
+    const saved = readJson(keys[section]);
+    if (!completedStamp(saved)) continue;
+    const data = section === "schreiben" ? {
+      submittedAt: saved.submittedAt, sms: saved.sms || "", email: saved.email || "",
+    } : {submittedAt: saved.completedAt, answers: saved.answers || {}};
+    await uploadMockAnswerBackup("a2-mock-02", section, attemptStartedAtMs, data, token, uid);
   }
-  return { saved, pending: SECTION_ORDER.filter(section =>
-    submissionTime(section,json(keys[section])) && !acknowledged[section]).length };
 }
-export function restoreA2Mock2Backup(keys, cloud) {
-  const remote = cloud?.backup;
-  if (!remote?.attemptStartedAtMs || !remote?.sections) return false;
-  const localFlow = json(keys.flow);
-  const localStamp = Number(localFlow.startedAt) || 0;
-  // Avoid overwriting an active different attempt on this device.
-  if (localStamp && localStamp !== remote.attemptStartedAtMs &&
-      (localFlow.stage !== "intro" || SECTION_ORDER.some(section =>
-        submissionTime(section,json(keys[section]))))) return false;
-  let restored = false;
-  for (const section of SECTION_ORDER) {
-    const item = remote.sections[section];
-    if (!item || !submissionTime(section,item)) continue;
-    const local = json(keys[section]);
-    if (submissionTime(section,local)) continue; // local submitted responses always win
-    // Do not erase an active unfinished answer on this device.
-    if (section === "schreiben" && (local.sms || local.email)) continue;
-    if (section !== "schreiben" && Object.values(local.answers || {}).some(Boolean)) continue;
-    localStorage.setItem(keys[section], JSON.stringify(item));
-    restored = true;
+export function restoreA2Mock2Backup(keys, response) {
+  const cloud = response?.backup;
+  if (!cloud?.attemptStartedAtMs || !cloud?.sections) return false;
+  const localFlow = readJson(keys.flow);
+  // Refuse to replace an active, different attempt.
+  if (localFlow.startedAt && localFlow.startedAt !== cloud.attemptStartedAtMs &&
+      localFlow.stage !== "intro") return false;
+  let changed = false;
+  for (const part of PARTS) {
+    const remote = cloud.sections[part];
+    const local = readJson(keys[part]);
+    if (!remote || completedStamp(local)) continue;
+    if (part === "schreiben" && (local.sms || local.email)) continue;
+    if (part !== "schreiben" && Object.values(local.answers || {}).some(Boolean)) continue;
+    const restored = part === "schreiben" ? {...remote} :
+      {completedAt:remote.submittedAt, answers:remote.answers};
+    localStorage.setItem(keys[part], JSON.stringify(restored));
+    changed = true;
   }
-  if (restored) {
-    const completed = SECTION_ORDER.filter(section => submissionTime(section,json(keys[section])));
-    const next = SECTION_ORDER.find(section => !completed.includes(section)) || "sprechen";
-    localStorage.setItem(keys.flow, JSON.stringify({stage: next, startedAt: remote.attemptStartedAtMs}));
+  if (changed) {
+    const next = PARTS.find(part => !completedStamp(readJson(keys[part]))) || "sprechen";
+    localStorage.setItem(keys.flow, JSON.stringify({stage:next, startedAt:cloud.attemptStartedAtMs}));
   }
-  return restored;
+  return changed;
+}
+
+// B2 writes its already completed Lesen/Hören/Schreiben sections.
+// Only text and choice IDs, never the speakingProgress/recordings.
+export function submittedB2Sections(state = {}) {
+  const started = state.attemptStartedAtMs;
+  if (!started) return [];
+  const data = [];
+  if (state.teil4Completed) data.push(["lesen", {
+    submittedAt: Number(state.lesenSubmittedAt) || started,
+    teil1Answers: state.teil1Answers || {}, teil2Answers: state.teil2Answers || {},
+    teil3Answers: state.teil3Answers || {}, teil4Answers: state.teil4Answers || {},
+  }]);
+  if (state.hoeren4Completed) data.push(["hoeren", {
+    submittedAt: Number(state.hoerenSubmittedAt) || started,
+    hoeren1Answers: state.hoeren1Answers || {}, hoeren2Answers: state.hoeren2Answers || {},
+    hoeren3Answers: state.hoeren3Answers || {}, hoeren4Answers: state.hoeren4Answers || {},
+  }]);
+  if (state.schreibenCompleted) data.push(["schreiben", {
+    submittedAt: Number(state.schreibenSubmittedAt) || started,
+    schreiben: {teil1: state.schreiben?.teil1 || "", teil2: state.schreiben?.teil2 || ""},
+  }]);
+  return data;
+}
+export async function syncB2Backup(state, token, uid) {
+  if (!token || !uid) return;
+  for (const [section, data] of submittedB2Sections(state)) {
+    await uploadMockAnswerBackup("b2-final-mock", section, state.attemptStartedAtMs, data, token, uid);
+  }
+}
+export function restoreB2Backup(local, response) {
+  const cloud = response?.backup;
+  if (!cloud?.attemptStartedAtMs || !cloud.sections) return null;
+  if (local.attemptStartedAtMs && local.attemptStartedAtMs !== cloud.attemptStartedAtMs) return null;
+  if (local.teil4Completed || local.hoeren4Completed || local.schreibenCompleted ||
+      local.started || Object.keys(local.teil1Answers || {}).length) return null;
+  const copy = {...local, attemptStartedAtMs:cloud.attemptStartedAtMs};
+  for (const name of PARTS) {
+    const section = cloud.sections[name];
+    if (!section?.submittedAt) continue;
+    if (name === "lesen") {
+      ["teil1Answers","teil2Answers","teil3Answers","teil4Answers"].forEach(key => {copy[key] = section[key] || {}});
+      copy.teil4Completed = true;
+      copy.lesenSubmittedAt = section.submittedAt;
+      copy.stage = "hoeren-teil1";
+    }
+    if (name === "hoeren" && copy.teil4Completed) {
+      ["hoeren1Answers","hoeren2Answers","hoeren3Answers","hoeren4Answers"].forEach(key => {copy[key] = section[key] || {}});
+      copy.hoeren4Completed = true;
+      copy.hoerenSubmittedAt = section.submittedAt;
+      copy.stage = "schreiben";
+    }
+    if (name === "schreiben" && copy.hoeren4Completed) {
+      copy.schreiben = section.schreiben;
+      copy.schreibenCompleted = true;
+      copy.schreibenSubmittedAt = section.submittedAt;
+      copy.stage = "sprechen";
+    }
+  }
+  return copy.stage === local.stage ? null : {...copy, started:false, deadlineMs:null};
 }
