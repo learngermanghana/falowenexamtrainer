@@ -14,6 +14,8 @@ on:
       - "web/src/utils/mockReviewAccess.js"
       - "web/src/services/mockAssessmentRequest.js"
       - "web/src/services/coachService.js"
+      - "web/src/services/coachServiceAudioPersistence.test.js"
+      - "web/src/components/A2Mock2AiAssessmentContract.test.js"
       - "scripts/generateAssessmentTaskRegistry.mjs"
       - "functions/data/assessmentTasks.json"
       - "web/src/data/assessmentTaskVersions.json"
@@ -52,6 +54,8 @@ on:
       - "web/src/utils/mockReviewAccess.js"
       - "web/src/services/mockAssessmentRequest.js"
       - "web/src/services/coachService.js"
+      - "web/src/services/coachServiceAudioPersistence.test.js"
+      - "web/src/components/A2Mock2AiAssessmentContract.test.js"
       - "scripts/generateAssessmentTaskRegistry.mjs"
       - "functions/data/assessmentTasks.json"
       - "web/src/data/assessmentTaskVersions.json"
@@ -94,6 +98,9 @@ jobs:
       - name: Verify Mock 2 saved submission recovery and retryable AI grading
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js
+      - name: Verify Mock 2 ephemeral audio and transcript-only AI processing
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/services/coachServiceAudioPersistence.test.js src/components/A2Mock2AiAssessmentContract.test.js
       - name: Verify Mock 2 task registration and score isolation
         run: node --test functions/functionz/tests/a2Mock2AssessmentContracts.test.cjs functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs
       - name: Verify exact Mock 2 backend task registry and versions
