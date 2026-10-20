@@ -2406,7 +2406,7 @@ const a1MockSpeakingScorePrompt = ({ attempts = [], mockId = "a1-mock-01" }) => 
 };
 
 
-const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const a2MockSpeakingScorePrompt = ({ attempts = [], mockId = "a2-mock-01" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
@@ -2464,7 +2464,7 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    mockTaskPrompt("A2", "speaking"),
+    mockTaskPrompt("A2", "speaking", undefined, mockId),
     "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
@@ -6533,7 +6533,11 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2000),
     }));
 
-    const expectedIds = ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
+    const mockId = String(req.body?.mockId || "a2-mock-01");
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
+    const expectedIds = mockId === "a2-mock-02"
+      ? ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
+      : ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
     const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();
     const expectedSorted = [...expectedIds].sort();
     if (
@@ -6558,7 +6562,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: a2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "system", content: a2MockSpeakingScorePrompt({ attempts: normalizedAttempts, mockId }) },
       { role: "user", content: "Return the final A2 mock speaking assessment as the required JSON object." },
     ];
 
