@@ -1,76 +1,77 @@
 "use strict";
 
-// Cost-limited A2 Mock 2 recovery: one document per student and a maximum of
-// three completed text/choice sections. No drafts, speech, audio or AI payloads.
-const PARTS = Object.freeze(["lesen", "hoeren", "schreiben"]);
-const COLLECTION = "a2Mock2SectionBackups";
-function validateBackup(section, input, now = Date.now()) {
-  if (!PARTS.includes(section)) throw Object.assign(new Error("Unsupported backup section"), { status: 400 });
-  if (!input || typeof input !== "object" || Array.isArray(input)) throw Object.assign(new Error("Invalid submitted section"), { status: 400 });
-  const stampKey = section === "schreiben" ? "submittedAt" : "completedAt";
-  const stamp = Number(input[stampKey]);
-  if (!Number.isSafeInteger(stamp) || stamp < Date.UTC(2025,0,1) || stamp > now + 120000) {
-    throw Object.assign(new Error("A completed section timestamp is required"), { status: 400 });
+// Cost-limited mock answer recovery. One Firestore document per student/mock,
+// updated only when Lesen, Hören or Schreiben has been submitted.
+// Never store speech recordings, speech transcripts, model feedback or drafts.
+const COLLECTION = "mockSectionBackups";
+const PARTS = ["lesen", "hoeren", "schreiben"];
+const MOCKS = ["a2-mock-02", "b2-final-mock"];
+const fail = (message, status = 400, code = "INVALID_MOCK_BACKUP") =>
+  Object.assign(new Error(message), {status, code});
+const positiveTime = (value, now = Date.now()) =>
+  Number.isSafeInteger(Number(value)) && Number(value) >= Date.UTC(2025, 0, 1) && Number(value) <= now + 120000;
+const answers = (value, max = 25) => {
+  if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).length > max) throw fail("Invalid submitted answers");
+  const result = {};
+  for (const [key, choice] of Object.entries(value)) {
+    if (!/^[a-zA-Z0-9_-]{1,32}$/.test(key) || typeof choice !== "string" || !/^[a-zA-Z0-9_-]{0,32}$/.test(choice)) throw fail("Invalid answer choice");
+    result[key] = choice;
   }
+  return result;
+};
+function validateBackup(mockId, section, input) {
+  if (!MOCKS.includes(mockId) || !PARTS.includes(section)) throw fail("Unsupported mock backup");
+  if (!input || typeof input !== "object" || Array.isArray(input)) throw fail("Invalid submitted section");
+  const at = Number(input.submittedAt);
+  if (!positiveTime(at)) throw fail("A completed section timestamp is required");
   if (section === "schreiben") {
-    if (typeof input.sms !== "string" || typeof input.email !== "string" ||
-        input.sms.length > 3500 || input.email.length > 4500) {
-      throw Object.assign(new Error("Writing responses exceed backup limits"), { status: 400 });
+    const fields = mockId === "a2-mock-02" ? ["sms", "email"] : ["teil1", "teil2"];
+    const texts = mockId === "a2-mock-02" ? input : input.schreiben;
+    if (!texts || typeof texts !== "object") throw fail("Writing answers required");
+    const safe = {};
+    for (const field of fields) {
+      if (typeof texts[field] !== "string" || texts[field].length > 12000) throw fail("Writing answer too long");
+      safe[field] = texts[field];
     }
-    return { submittedAt: stamp, startedAt: Number(input.startedAt) || null, sms: input.sms, email: input.email };
+    return {submittedAt: at, ...(mockId === "a2-mock-02" ? safe : {schreiben:safe})};
   }
-  const answers = input.answers;
-  if (!answers || typeof answers !== "object" || Array.isArray(answers) || Object.keys(answers).length > 20) {
-    throw Object.assign(new Error("Invalid answer sheet"), { status: 400 });
-  }
-  const safe = {};
-  for (const [key, answer] of Object.entries(answers)) {
-    if (!/^(?:[1-9]|1\\d|20)$/.test(key) || typeof answer !== "string" ||
-        !/^[a-zA-Z0-9_-]{0,18}$/.test(answer)) {
-      throw Object.assign(new Error("Invalid answer sheet entry"), { status: 400 });
-    }
-    safe[key] = answer;
-  }
-  return { completedAt: stamp, answers: safe };
-}
-function attemptTime(value, now = Date.now()) {
-  const time = Number(value);
-  if (!Number.isSafeInteger(time) || time < Date.UTC(2025,0,1) || time > now + 120000) {
-    throw Object.assign(new Error("Invalid mock attempt start"), { status: 400 });
-  }
-  return time;
+  if (mockId === "a2-mock-02") return {submittedAt: at, answers: answers(input.answers,20)};
+  const names = section === "lesen" ? ["teil1Answers","teil2Answers","teil3Answers","teil4Answers"]
+    : ["hoeren1Answers","hoeren2Answers","hoeren3Answers","hoeren4Answers"];
+  return { submittedAt: at, ...Object.fromEntries(names.map(name => [name, answers(input[name] || {}, 25)])) };
 }
 function publicBackup(data = {}) {
-  return { mockId: "a2-mock-02", attemptStartedAtMs: data.attemptStartedAtMs || null,
-    sections: Object.fromEntries(PARTS.filter(key => data.sections?.[key]).map(key => [key, data.sections[key]])) };
+  return {
+    mockId: data.mockId,
+    attemptStartedAtMs: data.attemptStartedAtMs || null,
+    sections: Object.fromEntries(PARTS.filter(key => data.sections?.[key]).map(key => [key, data.sections[key]])),
+  };
 }
-async function saveBackup(db, admin, uid, email, { section, attemptStartedAtMs, data }) {
-  const stamp = attemptTime(attemptStartedAtMs);
-  const payload = validateBackup(section, data);
-  const document = db.collection(COLLECTION).doc(uid);
-  let result;
-  await db.runTransaction(async transaction => {
-    const snap = await transaction.get(document);
+async function saveBackup(db, admin, uid, email, {mockId, section, attemptStartedAtMs, data}) {
+  const started = Number(attemptStartedAtMs);
+  if (!positiveTime(started)) throw fail("Invalid attempt start time");
+  const sanitized = validateBackup(mockId, section, data);
+  const reference = db.collection(COLLECTION).doc(`${uid}:${mockId}`);
+  let outcome;
+  await db.runTransaction(async tx => {
+    const snap = await tx.get(reference);
     const old = snap.exists ? snap.data() || {} : {};
-    const previous = Number(old.attemptStartedAtMs) || 0;
-    if (previous > stamp) {
-      throw Object.assign(new Error("A newer mock attempt has already been backed up."), {status: 409, code: "MOCK_BACKUP_NEWER_ATTEMPT"});
-    }
-    const same = previous === stamp;
+    const oldStarted = Number(old.attemptStartedAtMs) || 0;
+    if (oldStarted > started) throw fail("A newer attempt already has a backup", 409, "MOCK_BACKUP_NEWER_ATTEMPT");
+    const same = oldStarted === started;
     const existing = same ? old.sections?.[section] : null;
-    const stampKey = section === "schreiben" ? "submittedAt" : "completedAt";
-    if (existing && Number(existing[stampKey]) >= Number(payload[stampKey])) {
-      result = {saved: true, unchanged: true};
+    if (existing && existing.submittedAt >= sanitized.submittedAt) {
+      outcome = {saved: true, unchanged: true};
       return;
     }
-    const sections = same ? {...old.sections, [section]: payload} : {[section]: payload};
-    transaction.set(document, {
-      uid, email: String(email || "").toLowerCase().slice(0,254),
-      mockId: "a2-mock-02", attemptStartedAtMs: stamp, sections,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    const sections = same ? {...old.sections, [section]:sanitized} : {[section]:sanitized};
+    tx.set(reference, {
+      uid, email: String(email || "").toLowerCase().slice(0,254), mockId,
+      attemptStartedAtMs:started, sections,
+      updatedAt:admin.firestore.FieldValue.serverTimestamp(),
     });
-    result = { saved: true, unchanged: false };
+    outcome = {saved:true, unchanged:false};
   });
-  return result;
+  return outcome;
 }
-module.exports = { COLLECTION, PARTS, validateBackup, attemptTime, publicBackup, saveBackup };
+module.exports = { COLLECTION, MOCKS, PARTS, validateBackup, publicBackup, saveBackup };
