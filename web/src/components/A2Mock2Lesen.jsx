@@ -29,12 +29,14 @@ function A2Mock2LesenAttempt({ embedded = false, onComplete, reviewReleased = fa
   const deadline = state.startedAt ? state.startedAt + DURATION : null;
   const expired = Boolean(deadline && now >= deadline);
   const finished = Boolean(state.completedAt || expired);
-  useEffect(() => { if (embedded && finished && state.completedAt && onComplete) onComplete(); }, [embedded, finished, state.completedAt, onComplete]);
   const answers = state.answers || {};
   const answered = Object.keys(answers).filter(key => answers[key]).length;
   const correct = A2_MOCK_2_LESEN_QUESTIONS.filter(q => answers[q.number] === q.answer).length;
 
+  // Persist the submitted section before the hub reads browser storage to
+  // update the completion tracker and open the next module.
   useEffect(() => { window.localStorage.setItem(storageKey, JSON.stringify(state)); }, [state, storageKey]);
+  useEffect(() => { if (embedded && finished && state.completedAt && onComplete) onComplete(); }, [embedded, finished, state.completedAt, onComplete]);
   useEffect(() => {
     if (!state.startedAt || state.completedAt) return undefined;
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
