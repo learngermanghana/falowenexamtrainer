@@ -750,7 +750,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             idToken={idToken}
           />
 
-          {part.data.example ? (
+          {part.data.example && !Array.isArray(part.data.example) && Array.isArray(part.data.example.options) ? (
             <div
               style={{
                 border: "1px solid #d1d5db",
