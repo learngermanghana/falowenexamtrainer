@@ -23,7 +23,10 @@ export const canReviewFullMock = (exam) => Boolean(exam?.completed &&
   ["lesen", "hoeren", "schreiben", "sprechen"].every(key => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key)));
 
 export const restoreFullMockReviewState = (exam) => {
-  if (exam.stage !== "result" || canReviewFullMock(exam)) return exam;
+  // A submitted writing response may still await AI grading after Sprechen.
+  // Preserve the final pending-review screen instead of rolling a learner back
+  // into Schreiben and making them repeat work.
+  if (exam.stage !== "result" || exam.writingPending === true || canReviewFullMock(exam)) return exam;
   const stage = ["lesen", "hoeren", "schreiben", "sprechen"].find(
     key => !Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key),
   ) || "sprechen";
