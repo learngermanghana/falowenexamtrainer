@@ -1122,7 +1122,8 @@ function B2FinalMockExamPageAttempt() {
       // Keep local responses and retry when the student next visits.
     });
   }, [idToken, user?.uid, state.teil4Completed, state.hoeren4Completed, state.schreibenCompleted,
-      state.attemptStartedAtMs, state.lesenSubmittedAt, state.hoerenSubmittedAt, state.schreibenSubmittedAt]);
+      state.attemptStartedAtMs, state.lesenSubmittedAt, state.hoerenSubmittedAt, state.schreibenSubmittedAt,
+      state.schreibenResult?.score]);
   useEffect(() => {
     if (state.attemptStartedAtMs || state.stage === "teil1" && !state.started) return;
     setState(current => current.attemptStartedAtMs ? current : {...current, attemptStartedAtMs:Date.now()});
