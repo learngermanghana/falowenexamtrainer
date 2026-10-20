@@ -69,8 +69,8 @@ test("all four submitted modules unlock final review even if both AI marking ser
 
   await waitFor(() => expect(screen.getByText("Alle vier Module bearbeitet")).toBeInTheDocument());
   expect(screen.getByText("4 von 4 Modulen abgeschlossen")).toBeInTheDocument();
-  await waitFor(() => expect(screen.getAllByText("Writing marking unavailable")).toHaveLength(1));
-  await waitFor(() => expect(screen.getAllByText("Speaking marking unavailable")).toHaveLength(1));
+  expect(markLetterWithAI).not.toHaveBeenCalled();
+  expect(scoreA2MockSpeaking).not.toHaveBeenCalled();
   expect(screen.getByText("Schreiben · KI-Feedback / erneut bewerten")).toBeInTheDocument();
   expect(screen.getByText("Sprechen · KI-Feedback / erneut bewerten")).toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Das ist meine gespeicherte Antwort.");
