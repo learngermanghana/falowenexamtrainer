@@ -7,7 +7,7 @@ import { isMockPortal, MockExamOnlyGate } from "./MockExamCommerce";
 // Top-level boundary also covers lesson routes owned by index.jsx outside App.js.
 // The server-side purchase lookup in MockExamOnlyGate is the second layer.
 export default function MockOnlyRouteBoundary({ children }) {
-  const { studentProfile } = useAuth();
+  const { user, studentProfile } = useAuth();
   const location = useLocation();
   const examOnly = studentProfile?.accountType === "exam_only";
   if (!examOnly && !isMockPortal()) return children;
@@ -18,6 +18,7 @@ export default function MockOnlyRouteBoundary({ children }) {
     (item) => item.status !== "planned" && item.id !== "a2-course-preview-01" && item.route === route
   );
   if (allowedMock) {
+    if (isMockPortal() && !user) return <Navigate to="/login/" replace />;
     if (examOnly) return <MockExamOnlyGate>{children}</MockExamOnlyGate>;
     return children;
   }
