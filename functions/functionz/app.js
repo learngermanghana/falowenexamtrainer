@@ -6535,6 +6535,11 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a2-mock-01");
     if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
+    // Mock 2 is a browser-local practice flow. Never persist its scores into a
+    // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
+    if (mockId === "a2-mock-02" && attemptId) {
+      return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
+    }
     const expectedIds = mockId === "a2-mock-02"
       ? ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
       : ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
