@@ -21,3 +21,22 @@ test("Mock 2 speaking evaluates its actual tasks with a separate version", () =>
   expect(mockTaskVersion("A2", "speaking", "a2-mock-01")).toBe(versions.A2.speaking);
   expect(versions.A2_MOCK_2.speaking).not.toBe(versions.A2.speaking);
 });
+
+test("Mock 2 scores cannot be persisted into a Mock 1 attempt", () => {
+  const { readFileSync } = require("node:fs");
+  const { join } = require("node:path");
+  const app = readFileSync(join(__dirname, "../app.js"), "utf8");
+  const routeStart = app.indexOf('app.post("/speaking/a2-mock-score"');
+  const routeEnd = app.indexOf('app.post("/speaking/b1-mock-score"', routeStart);
+  const route = app.slice(routeStart, routeEnd);
+  expect(route).toContain('mockId === "a2-mock-02" && attemptId');
+  expect(route.indexOf('mockId === "a2-mock-02" && attemptId')).toBeLessThan(route.indexOf('await persistVerifiedA2MockSection('));
+});
+
+test("Mock 2 registry excludes configuration metadata from writing tasks", () => {
+  expect(tasks.writing["a2-mock-02-schreiben-durationMinutes"]).toBeUndefined();
+  expect(Object.keys(tasks.writing).filter(id => id.startsWith("a2-mock-02-schreiben-"))).toEqual([
+    "a2-mock-02-schreiben-teil1",
+    "a2-mock-02-schreiben-teil2",
+  ]);
+});
