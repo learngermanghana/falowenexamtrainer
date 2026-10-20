@@ -803,6 +803,8 @@ app.use(async (req, res, next) => {
       /^\/(?:writing|speaking)\/(?:a1|a2|b1|b2)-mock-score$/,
       /^\/course-media\/(?:a1|a2|b1|b2)\/(?:mock-audio-url|exam-hoeren-audio-url)$/,
       /^\/exam-room\/results$/,
+      /^\/writing\/(?:mark|ideas)$/,
+      /^\/speaking\/(?:analyze|analyze-text|interaction-score)$/,
       /^\/(?:scores|results\/history|speech\/synthesize)$/
     ].some(pattern => pattern.test(path));
     if (!allowed) return res.status(403).json({ error: "Exam-only accounts cannot use course services." });
@@ -815,7 +817,11 @@ app.use(async (req, res, next) => {
     if (requestedLevel && !active.some(p => p.level === requestedLevel)) {
       return res.status(403).json({ error: "This exam level is not included in your package." });
     }
-    // The permitted purchase is a named mock, not every mock at its CEFR level.
+    const requestedBodyLevel = String(req.body?.level || req.body?.practiceLevel || "").trim().toUpperCase();
+    if (requestedBodyLevel && !active.some(p => p.level === requestedBodyLevel)) {
+      return res.status(403).json({ error: "Your subscription does not cover this requested level." });
+    }
+    // The monthly entitlement covers each published mock at the selected level.
     // Map existing exam engine IDs to catalogue IDs used by the storefront.
     const engineToCatalog = {
       "a1-mock-01": "a1-final-01", "a1-mock-02": "a1-final-02", "a1-mock-03": "a1-final-03",
