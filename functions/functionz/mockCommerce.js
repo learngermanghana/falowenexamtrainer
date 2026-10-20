@@ -2,7 +2,7 @@
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 
 // One level subscription provides access to all currently published mocks at that level.
-// Do not advertise a paid level until at least one complete mock is ready.
+// All six levels can subscribe; practice-only levels gain new mocks as they are published.
 const READY_MOCKS = Object.freeze({
   A1: ["a1-final-01", "a1-final-02", "a1-final-03"],
   A2: ["a2-final-01"],
