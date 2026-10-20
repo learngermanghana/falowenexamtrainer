@@ -12,6 +12,7 @@ import { useAuth } from "../context/AuthContext";
 import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
 import { scoreB2MockWriting } from "../services/b2FinalMockService";
 import { saveExamRoomResult } from "../services/examRoomResultService";
+import { getMockAnswerBackup, restoreB2Backup, syncB2Backup } from "../services/a2Mock2Backup";
 import B2FinalMockSpeaking from "./B2FinalMockSpeaking";
 import { B2_FINAL_MOCK_STORAGE_KEY, B2_LISTENING, B2_READING, B2_WRITING_TASKS } from "../data/b2FinalMockData";
 import "./B2FinalMockExamPage.css";
@@ -35,6 +36,7 @@ const formatTime = (seconds) => {
 const initialState = () => ({
   stage: "teil1",
   started: false,
+  attemptStartedAtMs: null,
   deadlineMs: null,
   teil1Answers: {},
   teil2Answers: {},
@@ -1038,6 +1040,7 @@ function B2FinalMockExamPageAttempt() {
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [pageError, setPageError] = useState("");
+  const [backupNotice, setBackupNotice] = useState("");
   const savedB2ResultToastRef = useRef("");
 
   useEffect(() => {
@@ -1054,7 +1057,7 @@ function B2FinalMockExamPageAttempt() {
   }, [state, storageKey]);
 
   useEffect(() => {
-    if (!state.completed || !idToken || state.resultSyncScoreDocId) return;
+    if (!state.completed || !state.schreibenResult || !idToken || state.resultSyncScoreDocId) return;
 
     const completedAt = state.completedAt || new Date().toISOString();
     const finalScore = buildFinalScore(state);
@@ -1098,6 +1101,33 @@ function B2FinalMockExamPageAttempt() {
     };
   }, [idToken, state]);
 
+  // One cloud read on entry, and one write after each submitted text/choice module.
+  // The local browser remains authoritative for an active unfinished attempt.
+  useEffect(() => {
+    if (!idToken || !user?.uid) return undefined;
+    let active = true;
+    getMockAnswerBackup("b2-final-mock", idToken).then(remote => {
+      if (!active) return;
+      setState(current => {
+        const restored = restoreB2Backup(current, remote);
+        if (restored) setBackupNotice("Previous completed modules restored. No speaking audio was saved.");
+        return restored || current;
+      });
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [idToken, user?.uid]);
+  useEffect(() => {
+    if (!idToken || !user?.uid || !state.attemptStartedAtMs) return;
+    syncB2Backup(state, idToken, user.uid).catch(() => {
+      // Keep local responses and retry when the student next visits.
+    });
+  }, [idToken, user?.uid, state.teil4Completed, state.hoeren4Completed, state.schreibenCompleted,
+      state.attemptStartedAtMs, state.lesenSubmittedAt, state.hoerenSubmittedAt, state.schreibenSubmittedAt,
+      state.schreibenResult?.score]);
+  useEffect(() => {
+    if (state.attemptStartedAtMs || state.stage === "teil1" && !state.started) return;
+    setState(current => current.attemptStartedAtMs ? current : {...current, attemptStartedAtMs:Date.now()});
+  }, [state.attemptStartedAtMs, state.stage, state.started]);
   const secondsLeft = useMemo(() => {
     const duration = SECTION_DURATIONS[state.stage];
     if (!duration) return null;
@@ -1115,6 +1145,7 @@ function B2FinalMockExamPageAttempt() {
       return {
         ...current,
         started: true,
+        attemptStartedAtMs:current.attemptStartedAtMs || Date.now(),
         stage,
         deadlineMs:
           duration && current.started && current.deadlineMs
@@ -1264,6 +1295,7 @@ function B2FinalMockExamPageAttempt() {
     setState((current) => ({
       ...current,
       teil4Completed: true,
+      lesenSubmittedAt:Date.now(),
       stage: "hoeren-teil1",
       started: false,
       completed: false,
@@ -1316,6 +1348,7 @@ function B2FinalMockExamPageAttempt() {
     setState((current) => ({
       ...current,
       hoeren4Completed: true,
+      hoerenSubmittedAt:Date.now(),
       stage: "schreiben",
       started: true,
       completed: false,
@@ -1339,6 +1372,7 @@ function B2FinalMockExamPageAttempt() {
         ...current,
         schreibenResult: result,
         schreibenCompleted: true,
+        schreibenSubmittedAt:Date.now(),
         stage: "sprechen",
         started: true,
         completed: false,
@@ -1347,10 +1381,28 @@ function B2FinalMockExamPageAttempt() {
       announceExamSuccess("Schreiben completed successfully. Continue to Sprechen.");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (markError) {
+      // Keep the actual submitted text and let speaking proceed. Marking can
+      // be retried later without incorrectly publishing a 0/25 final score.
       setPageError(getMockWritingSubmissionError(markError));
+      setState(current => ({
+        ...current, schreibenCompleted:true, schreibenSubmittedAt:Date.now(),
+        stage:"sprechen", started:true, deadlineMs:Date.now()+SECTION_DURATIONS.sprechen*1000,
+      }));
     } finally {
       setBusy("");
     }
+  };
+  const retrySchreibenMarking = async () => {
+    if (busy) return;
+    setBusy("schreiben");
+    setPageError("");
+    try {
+      const result = await scoreB2MockWriting({
+        teil1:state.schreiben.teil1, teil2:state.schreiben.teil2, idToken,
+      });
+      setState(current => ({...current, schreibenResult: result}));
+    } catch(error) { setPageError(getMockWritingSubmissionError(error)); }
+    finally { setBusy(""); }
   };
 
   const handleSpeakingProgress = useCallback((progress) => {
@@ -1392,6 +1444,20 @@ function B2FinalMockExamPageAttempt() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  if (state.completed && !state.schreibenResult) {
+    return <main className="b2-mock-shell">
+      <AppBackButton label="Back to course" fallbackPath="/campus/course" />
+      <section className="b2-mock-start">
+        <h1>All exam sections submitted</h1>
+        <p>Schreiben feedback is still pending. Your two writing texts remain saved locally and in the section backup. No final grade has been published.</p>
+        <p>You can retry the AI evaluation without repeating the exam.</p>
+        {pageError ? <p role="alert">{pageError}</p> : null}
+        <button type="button" disabled={busy === "schreiben"} onClick={retrySchreibenMarking}>
+          {busy === "schreiben" ? "Bewertung läuft …" : "Schreiben erneut bewerten"}
+        </button>
+      </section>
+    </main>;
+  }
   if (state.completed) {
     const finalScore = buildFinalScore(state);
     return (
@@ -1441,6 +1507,7 @@ function B2FinalMockExamPageAttempt() {
     <main className="b2-mock-shell">
       <AppBackButton label="Back to course" fallbackPath="/campus/course" />
       <SectionHeader stage={state.stage} secondsLeft={secondsLeft} />
+      {backupNotice ? <p role="status">{backupNotice}</p> : null}
       <FullMockGuide
         level="B2"
         stage={state.stage}

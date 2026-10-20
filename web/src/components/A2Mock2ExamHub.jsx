@@ -4,6 +4,7 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
+import { getMockAnswerBackup, restoreA2Mock2Backup, syncA2Mock2Backup } from "../services/a2Mock2Backup";
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
 import A2Mock2Schreiben from "./A2Mock2Schreiben";
@@ -24,8 +25,8 @@ const getProgress = (STORAGE) => {
    score: A2_MOCK_2_LESEN_QUESTIONS.filter(q => l.answers?.[q.number] === q.answer).length * 1.25 },
   hoeren: { done: Boolean(h.completedAt), count: Object.values(h.answers || {}).filter(Boolean).length,
    score: A2_MOCK_2_HOEREN_QUESTIONS.filter(q => h.answers?.[q.number] === q.answer).length * 1.25 },
-  schreiben: { done: Boolean(w.submittedAt && w.aiFeedback?.length === 2), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
-  sprechen: { done: Boolean(s._mock2AiScored && ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
+  schreiben: { done: Boolean(w.submittedAt), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
+  sprechen: { done: Boolean(["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
  };
 };
 const initialize = (STORAGE) => {
@@ -42,6 +43,7 @@ function A2Mock2ExamHubAttempt(){
  const [flow,setFlow] = useState(() => initialize(STORAGE));
  const [progress,setProgress] = useState(() => getProgress(STORAGE));
  const [resetError, setResetError] = useState("");
+ const [backupNotice,setBackupNotice] = useState("");
  const stage = flow.stage;
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
@@ -52,6 +54,24 @@ function A2Mock2ExamHubAttempt(){
   window.addEventListener("focus",sync); window.addEventListener("storage",sync);
   return ()=>{window.removeEventListener("focus",sync);window.removeEventListener("storage",sync)};
  },[refresh]);
+ // Fetch at mount only; preserve the local active attempt. Existing completed
+ // sections will be uploaded on the next step even if the student was offline.
+ useEffect(() => {
+  if (!idToken || !user?.uid) return undefined;
+  let alive = true;
+  getMockAnswerBackup("a2-mock-02", idToken).then(remote => {
+   if (!alive || !restoreA2Mock2Backup(STORAGE, remote)) return;
+   setProgress(getProgress(STORAGE));
+   setFlow(initialize(STORAGE));
+   setBackupNotice("Gespeicherte Antworten wiederhergestellt.");
+  }).catch(() => { /* Offline/browser answers remain available. */ });
+  return () => { alive = false; };
+ }, [idToken, user?.uid, STORAGE]);
+ useEffect(() => {
+  if (!idToken || !user?.uid || !flow.startedAt) return;
+  syncA2Mock2Backup(STORAGE, flow.startedAt, idToken, user.uid)
+   .catch(() => { /* Saved locally; next entry/section can retry without blocking. */ });
+ }, [idToken, user?.uid, flow.stage, flow.startedAt, progress, STORAGE]);
  // Lightweight staff monitoring signal: metadata only, never answers or audio.
  const reportProgress = useCallback(async () => {
   if (!idToken || stage === "intro") return;
@@ -75,7 +95,7 @@ function A2Mock2ExamHubAttempt(){
   if (stage === "intro") return undefined;
   reportProgress();
   if (stage === "result") return undefined;
-  const interval = window.setInterval(reportProgress, 60000);
+  const interval = window.setInterval(reportProgress, 300000);
   return () => window.clearInterval(interval);
  }, [reportProgress, stage]);
  const advance = useCallback(()=>{
@@ -123,7 +143,7 @@ function A2Mock2ExamHubAttempt(){
     <p>Lesen · Hören · Schreiben · Sprechen — ein Start, vier Prüfungsteile.</p>
    </header>
    <section className="a2-mock2-full-progress" aria-label="Fortschritt der vier Module">
-    <div className="a2-mock2-full-progress-head"><strong>Prüfungsfortschritt</strong><span>{completed} von 4 Modulen abgeschlossen</span></div>
+    <div className="a2-mock2-full-progress-head"><strong>Prüfungsfortschritt</strong><span>{completed} von 4 Modulen abgeschlossen</span></div>{backupNotice ? <p role="status">{backupNotice}</p> : null}
     <div className="a2-mock2-full-track"><div style={{width:`${completed*25}%`}}/></div>
     <div className="a2-mock2-full-stages">{ORDER.map((key,i)=><div key={key} className={progress[key].done?"complete":stage===key?"current":""}>
       <span aria-hidden="true">{progress[key].done?"✓":i+1}</span><strong>{LABELS[i]}</strong>
@@ -142,14 +162,14 @@ function A2Mock2ExamHubAttempt(){
    </section>:null}
    {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
     <h2>Alle vier Module bearbeitet</h2>
-    <p>Vielen Dank. Ihre Antworten und KI-Übungsrückmeldungen bleiben auf diesem Gerät gespeichert.</p>
+    <p>Vielen Dank. Ihre Antworten bleiben auf diesem Gerät gespeichert. Die KI-Auswertung erfolgt separat und kann bei einem Fehler erneut gestartet werden, ohne den Mocktest zu wiederholen.</p>
     <p>Lesen: <strong>{progress.lesen.score.toFixed(1)}/25</strong> · Hören: <strong>{progress.hoeren.score.toFixed(1)}/25</strong></p>
     <button type="button" className="a2-mock2-primary" onClick={restart}>Neuen vollständigen Mocktest starten</button>
     {resetError ? <p role="alert">{resetError}</p> : null}
     <details><summary>Lesen · Antworten und Lösungen ansehen</summary><A2Mock2Lesen embedded reviewReleased /></details>
     <details><summary>Hören · Antworten und Lösungen ansehen</summary><A2Mock2Hoeren embedded reviewReleased /></details>
-    <details><summary>Schreiben · Feedback ansehen</summary><A2Mock2Schreiben embedded reviewReleased /></details>
-    <details><summary>Sprechen · Feedback ansehen</summary><A2Mock2Sprechen embedded reviewReleased /></details>
+    <details><summary>Schreiben · KI-Feedback / erneut bewerten</summary><A2Mock2Schreiben embedded reviewReleased /></details>
+    <details><summary>Sprechen · KI-Feedback / erneut bewerten</summary><A2Mock2Sprechen embedded reviewReleased /></details>
     <p>Ein verifiziertes Gesamtergebnis von 100 Punkten wird erst angezeigt, wenn die KI-Bewertungen von Schreiben und Sprechen sicher dem zweiten Mocktest zugeordnet werden können.</p>
    </section>:null}
  </main>;

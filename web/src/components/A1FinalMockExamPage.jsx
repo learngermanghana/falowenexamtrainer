@@ -72,6 +72,7 @@ const emptyState = (mockId = A1_FINAL_MOCK_ID) => ({
   speakingResult: null,
   sectionScores: {},
   overall: null,
+  writingPending: false,
   completed: false,
 });
 
@@ -372,6 +373,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const [error, setError] = useState("");
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
+  const lastAutosaveStageRef = useRef("");
   const completionSaveRef = useRef("");
   const completionRetryCountRef = useRef(0);
   const savedCompletionToastRef = useRef("");
@@ -394,9 +396,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       window.localStorage.setItem(storageKey, JSON.stringify(persistedState));
     }
 
-    if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
+    if (!exam.attemptInfo?.attemptId || !idToken || (exam.completed && !exam.writingPending)) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
 
+    const stageIdentity = `${exam.attemptInfo.attemptId}:${exam.stage}`;
+    const stageChanged = stageIdentity !== lastAutosaveStageRef.current;
+    lastAutosaveStageRef.current = stageIdentity;
     saveTimerRef.current = window.setTimeout(() => {
       saveA1MockAttempt({
         idToken,
@@ -415,7 +420,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       }).catch((saveError) => {
         console.error("Could not autosave A1 mock", saveError);
       });
-    }, 900);
+    }, stageChanged ? 0 : 12000);
 
     return () => {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
@@ -424,7 +429,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
   useEffect(() => {
     const attemptId = exam.attemptInfo?.attemptId;
-    if (!exam.completed || !attemptId || !idToken) return undefined;
+    if (!exam.completed || exam.writingPending || !attemptId || !idToken) return undefined;
 
     const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
     if (completionSaveRef.current === completionKey) return undefined;
@@ -605,15 +610,36 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       });
       moveToSection("sprechen", {
         writingResult: result,
+        writingPending: false,
         sectionScores: { ...exam.sectionScores, schreiben: Number(result?.score || 0) },
         speakingProgress: exam.speakingProgress || { attempts: {} },
       });
     } catch (markError) {
-      setError(getMockWritingSubmissionError(markError));
+      // Submission and grading are separate. The student keeps the text and
+      // moves to Sprechen; no final score is released until retry succeeds.
+      moveToSection("sprechen", { writingPending: true });
+      setError("");
     } finally {
       setBusy("");
     }
   }, [busy, mockId, exam.attemptInfo?.attemptId, exam.schreibenForm, exam.schreibenText, exam.sectionScores, exam.speakingProgress, idToken, moveToSection]);
+
+  const retryPendingWriting = async () => {
+    if (busy || !exam.writingPending) return;
+    setBusy("schreiben"); setError("");
+    try {
+      const result = await scoreA1MockWriting({ mockId, formValues: exam.schreibenForm, text: exam.schreibenText, attemptId: exam.attemptInfo?.attemptId || "", idToken });
+      setExam(current => {
+        const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
+        const total = Number(Object.values(sectionScores)
+          .reduce((sum, n) => sum + Number(n || 0), 0).toFixed(1));
+        return {...current, writingResult:result, writingPending:false, sectionScores,
+          overall:current.completed ? {score:total, maxScore:100, passed:total >= 60} : current.overall};
+      });
+    } catch (markError) {
+      setError(getMockWritingSubmissionError(markError));
+    } finally { setBusy(""); }
+  };
 
   const finishExamWithSpeaking = useCallback((speakingResult) => {
     setExam((current) => {
@@ -1171,7 +1197,17 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           />
         </>
       ) : null}
-      {exam.stage === "result" && canReviewFullMock(exam) ? renderResult() : null}
+      {exam.stage === "result" && exam.writingPending ? (
+        <article className="a1-final-mock-intro">
+          <h2>All four modules submitted · Schreiben feedback pending</h2>
+          <p>Your writing has been submitted, but AI marking is unavailable. You do not need to repeat the exam. The overall score will be shown only after grading succeeds.</p>
+          {error ? <p role="alert">{error}</p> : null}
+          <button type="button" disabled={busy==="schreiben"} onClick={retryPendingWriting}>
+            {busy==="schreiben" ? "Marking…" : "Retry Schreiben marking"}
+          </button>
+        </article>
+      ) : null}
+      {exam.stage === "result" && !exam.writingPending && canReviewFullMock(exam) ? renderResult() : null}
     </main>
   );
 }

@@ -21,6 +21,7 @@ const bcrypt = require("bcryptjs");
 const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
+const { isA2SpeakingAttemptBindingSafe } = require("./a2MockSpeakingAttemptIdentity");
 const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
@@ -2406,7 +2407,7 @@ const a1MockSpeakingScorePrompt = ({ attempts = [], mockId = "a1-mock-01" }) => 
 };
 
 
-const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const a2MockSpeakingScorePrompt = ({ attempts = [], mockId = "a2-mock-01" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
@@ -2464,7 +2465,7 @@ const a2MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    mockTaskPrompt("A2", "speaking"),
+    mockTaskPrompt("A2", "speaking", undefined, mockId),
     "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
@@ -4988,6 +4989,48 @@ app.post("/internal/mock-progress", async (req, res) => {
   }
 });
 
+// Small section recovery for Mock 2 (A2) and B2; no drafts or speaking media.
+app.post("/internal/mock-answer-backup", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, {allowGuest:false});
+    if (!identity) return;
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Mock backup storage unavailable"});
+    const {saveBackup} = require("./a2Mock2SectionBackup");
+    const result = await saveBackup(db, admin, identity.uid, identity.email, req.body || {});
+    res.set("Cache-Control", "no-store, private");
+    return res.json({ok:true, ...result});
+  } catch(error) {
+    console.error("Mock backup failed", error?.code || error?.message);
+    return res.status(error?.status || 503).json({error:error?.message || "Could not save completed section", code:error?.code || null});
+  }
+});
+
+app.get("/internal/mock-answer-backup", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, {allowGuest:false});
+    if (!identity) return;
+    const {COLLECTION, MOCKS, publicBackup} = require("./a2Mock2SectionBackup");
+    const mockId = String(req.query?.mockId || "");
+    if (!MOCKS.includes(mockId)) return res.status(400).json({error:"Unsupported mock"});
+    const requestedUid = String(req.query?.uid || "").trim();
+    const uid = requestedUid || identity.uid;
+    if (uid !== identity.uid) {
+      const {isAuthorizedMockMonitor} = require("./mockAttemptMonitor");
+      if (!isAuthorizedMockMonitor(identity)) return res.status(403).json({error:"Staff access required"});
+    }
+    if (!/^[a-zA-Z0-9:_-]{1,128}$/.test(uid)) return res.status(400).json({error:"Invalid student identifier"});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Mock backup storage unavailable"});
+    const snap = await db.collection(COLLECTION).doc(uid + ":" + mockId).get();
+    res.set("Cache-Control", "no-store, private");
+    return res.json({ok:true, exists:snap.exists, backup:snap.exists ? publicBackup(snap.data()) : null});
+  } catch(error) {
+    console.error("Mock backup read failed", error?.code || error?.message);
+    return res.status(503).json({error:"Could not load mock answer backup"});
+  }
+});
+
 // Server-owned monitor for authenticated Falowen staff. No student response data.
 app.get("/internal/mock-attempts", async (req, res) => {
   try {
@@ -6533,7 +6576,16 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       analysisFeedback: String(attempt?.analysisFeedback || "").trim().slice(0, 2000),
     }));
 
-    const expectedIds = ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
+    const mockId = String(req.body?.mockId || "a2-mock-01");
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
+    // Mock 2 is a browser-local practice flow. Never persist its scores into a
+    // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
+    if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
+      return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
+    }
+    const expectedIds = mockId === "a2-mock-02"
+      ? ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
+      : ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
     const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();
     const expectedSorted = [...expectedIds].sort();
     if (
@@ -6558,7 +6610,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: a2MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+      { role: "system", content: a2MockSpeakingScorePrompt({ attempts: normalizedAttempts, mockId }) },
       { role: "user", content: "Return the final A2 mock speaking assessment as the required JSON object." },
     ];
 

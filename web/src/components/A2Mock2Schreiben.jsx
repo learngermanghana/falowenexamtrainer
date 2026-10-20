@@ -41,7 +41,9 @@ function A2Mock2SchreibenAttempt({ embedded = false, onComplete, reviewReleased 
     try {
       const grades = await Promise.all(["teil1", "teil2"].map(async (part, i) => {
         const t = TASK[part];
-        const result = await markLetterWithAI({text: i === 0 ? draft.sms : draft.email, level: "A2", idToken, taskId: `a2-mock-02-schreiben-${part}`, promptType: i === 0 ? "informal_message" : "formal_email", submissionContext: `A2 Mock 2 Schreiben ${part}`, taskContext: `${t.situation} ${t.instruction} ${t.points.join("; ")} Word target ${t.minWords}-${t.maxWords}. Assess whether all three required points and correct greeting/closing are present. Do not assess any A2 Mock 1 task.`});
+        const responseText = i === 0 ? draft.sms : draft.email;
+        if (!String(responseText || "").trim()) return { part, score: 0, maxScore: 0, feedback: "Keine Antwort eingereicht." };
+        const result = await markLetterWithAI({text: responseText, level: "A2", idToken, taskId: `a2-mock-02-schreiben-${part}`, promptType: i === 0 ? "informal_message" : "formal_email", submissionContext: `A2 Mock 2 Schreiben ${part}`, taskContext: { situation: t.situation, whatToInclude: t.points }});
         return { part, score: result.score, maxScore: result.maxScore, feedback: result.feedback, structuredFeedback: result.structuredFeedback };
       }));
       const completedDraft = {...draft, aiFeedback: grades};
@@ -50,10 +52,10 @@ function A2Mock2SchreibenAttempt({ embedded = false, onComplete, reviewReleased 
 
     } catch (e) { setMarkError(e?.response?.data?.error || e.message || "Bewertung derzeit nicht verfügbar."); }
     finally {setMarking(false);}
-  }, [done, marking, draft, idToken, embedded, onComplete, storageKey]);
-  useEffect(() => { if (embedded && draft.aiFeedback?.length === 2 && onComplete) onComplete(); }, [embedded, draft.aiFeedback, onComplete]);
+  }, [done, marking, draft, idToken, storageKey]);
+  useEffect(() => { if (embedded && draft.submittedAt && onComplete) onComplete(); }, [embedded, draft.submittedAt, onComplete]);
   const submit = () => { if (window.confirm("Beide Texte abgeben? Danach können Sie nichts mehr ändern.")) setDraft(old => ({ ...old, submittedAt: Date.now() })); };
-  useEffect(() => { if (embedded && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, done, draft.aiFeedback, marking, markError, mark]);
+  // AI grading is opt-in after submission to avoid unnecessary model charges.
   return <main className="a2-mock2-shell" lang="de">
     {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Schreiben</span></div> : null}
     {!draft.startedAt ? <section className="a2-mock2-intro"><p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Schreiben</h1><p>Sie haben 30 Minuten für zwei Aufgaben. Teil 1: etwa 10 Minuten, Teil 2: etwa 20 Minuten. Schreiben Sie zu allen drei Punkten und achten Sie auf Anrede und Gruß.</p><div className="a2-mock2-stat"><span>30 Minuten</span><span>2 Aufgaben</span><span>20–30 / 30–40 Wörter</span></div><p>Ihre Entwürfe werden auf diesem Gerät automatisch gespeichert. Die Uhr läuft weiter, wenn Sie die Seite verlassen.</p><button type="button" className="a2-mock2-primary" onClick={start}>Schreiben starten</button></section> : <>
@@ -64,7 +66,7 @@ function A2Mock2SchreibenAttempt({ embedded = false, onComplete, reviewReleased 
           {!done && draft[field] ? <button type="button" className="a2-mock2-clear-text" onClick={() => clearField(field)}>Antwortfeld leeren</button> : null}
           <WordCount value={draft[field]} task={task}/>
         </div></section>; })}
-        {done ? <section className="a2-mock2-results"><h2>Schreiben abgegeben</h2><p>Ihre Texte sind gespeichert. Nutzen Sie dieselbe Falowen-KI wie im ersten A2-Mock, mit den Aufgaben von Mock 2 als Bewertungskontext. Das Ergebnis ist Übungsfeedback, keine serververifizierte Abschlussnote.</p><button type="button" className="a2-mock2-primary" disabled={marking} onClick={mark}>{marking ? "KI bewertet …" : "Mit Falowen-KI auswerten"}</button>{markError?<p role="alert">{markError}</p>:null}{reveal ? draft.aiFeedback?.map(item=><div key={item.part}><h3>{item.part === "teil1" ? "Teil 1" : "Teil 2"} · KI-Feedback</h3><p>{item.feedback}</p>{Number.isFinite(Number(item.score)) && Number.isFinite(Number(item.maxScore)) ? <p>Übungspunkte: {item.score}/{item.maxScore}</p>:null}</div>) : <p>Feedback erscheint erst nach Abschluss aller vier Module.</p>}{!embedded ? <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Neuen Versuch starten? Der gespeicherte Entwurf wird ersetzt."))start();}}>Erneut üben</button> : null}</section> : <div className="a2-mock2-actions"><p>Beide Aufgaben abgeben · automatische Speicherung aktiv</p><button type="button" className="a2-mock2-primary" onClick={submit}>Schreiben abgeben</button></div>}
+        {done ? <section className="a2-mock2-results"><h2>Schreiben abgegeben</h2><p>Ihre Texte sind auf diesem Gerät gespeichert. Die KI-Auswertung ist unabhängig von der Abgabe und blockiert nicht das nächste Modul. Das Ergebnis ist Übungsfeedback, keine serververifizierte Abschlussnote.</p><button type="button" className="a2-mock2-primary" disabled={marking} onClick={mark}>{marking ? "KI bewertet …" : "Mit Falowen-KI auswerten"}</button>{markError?<p role="alert">{markError}</p>:null}{reveal ? draft.aiFeedback?.map(item=><div key={item.part}><h3>{item.part === "teil1" ? "Teil 1" : "Teil 2"} · KI-Feedback</h3><p>{item.feedback}</p>{Number.isFinite(Number(item.score)) && Number.isFinite(Number(item.maxScore)) ? <p>Übungspunkte: {item.score}/{item.maxScore}</p>:null}</div>) : <p>Feedback erscheint erst nach Abschluss aller vier Module.</p>}{!embedded ? <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Neuen Versuch starten? Der gespeicherte Entwurf wird ersetzt."))start();}}>Erneut üben</button> : null}</section> : <div className="a2-mock2-actions"><p>Beide Aufgaben abgeben · automatische Speicherung aktiv</p><button type="button" className="a2-mock2-primary" onClick={submit}>Schreiben abgeben</button></div>}
       </article>
     </>}
   </main>;

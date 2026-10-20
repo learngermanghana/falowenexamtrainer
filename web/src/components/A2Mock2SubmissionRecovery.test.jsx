@@ -1,0 +1,77 @@
+import React from "react";
+import { render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import A2Mock2ExamHub from "./A2Mock2ExamHub";
+import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReviewAccess";
+import { markLetterWithAI, scoreA2MockSpeaking } from "../services/coachService";
+
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "mock-2-recovery-student" }, idToken: "test-token" }) }));
+jest.mock("./navigation/AppBackButton", () => () => <div>Back</div>);
+jest.mock("../services/coachService", () => ({
+  markLetterWithAI: jest.fn(),
+  scoreA2MockSpeaking: jest.fn(),
+  analyzeAudio: jest.fn(),
+  TIMED_MOCK_SPEAKING_ANALYZE_TIMEOUT_MS: 30000,
+}));
+
+const keys = getA2Mock2StorageKeys("mock-2-recovery-student");
+const save = (key, value) => localStorage.setItem(keys[key], JSON.stringify(value));
+const completedFirstTwo = () => {
+  save("lesen", { completedAt: Date.now(), answers: { 1: "a" } });
+  save("hoeren", { completedAt: Date.now(), answers: { 1: "b" } });
+};
+const completeSpeech = () => Object.fromEntries(
+  ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
+    .map(key => [key, { transcript: "Das ist meine gespeicherte Antwort." }]),
+);
+const mount = () => render(<MemoryRouter><A2Mock2ExamHub /></MemoryRouter>);
+
+beforeEach(() => {
+  localStorage.clear();
+  window.scrollTo = jest.fn();
+  markLetterWithAI.mockReset().mockRejectedValue(new Error("Writing marking unavailable"));
+  scoreA2MockSpeaking.mockReset().mockRejectedValue(new Error("Speaking marking unavailable"));
+});
+
+test("an earlier submitted Schreiben advances to Sprechen even without AI feedback", async () => {
+  completedFirstTwo();
+  const text = { startedAt: Date.now() - 1000, submittedAt: Date.now(), sms: "Hallo Julia, ich bin krank.", email: "Sehr geehrte Damen und Herren, ich möchte reservieren." };
+  save("schreiben", text);
+  save("flow", { stage: "schreiben", startedAt: Date.now() - 90000 });
+  mount();
+
+  await waitFor(() => expect(screen.getByText("Sprechen · Übungstest 2")).toBeInTheDocument());
+  expect(screen.getByText("3 von 4 Modulen abgeschlossen")).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(keys.schreiben)).sms).toBe(text.sms);
+  expect(JSON.parse(localStorage.getItem(keys.schreiben)).email).toBe(text.email);
+  expect(markLetterWithAI).not.toHaveBeenCalled();
+});
+
+test("an expired Schreiben automatically submits and moves on without an AI response", async () => {
+  completedFirstTwo();
+  save("schreiben", { startedAt: Date.now() - 31 * 60 * 1000, sms: "Entwurf bleibt erhalten", email: "" });
+  save("flow", { stage: "schreiben", startedAt: Date.now() - 62 * 60 * 1000 });
+  mount();
+
+  await waitFor(() => expect(screen.getByText("Sprechen · Übungstest 2")).toBeInTheDocument());
+  const recovered = JSON.parse(localStorage.getItem(keys.schreiben));
+  expect(recovered.submittedAt).toEqual(expect.any(Number));
+  expect(recovered.sms).toBe("Entwurf bleibt erhalten");
+});
+
+test("all four submitted modules unlock final review even if both AI marking services fail", async () => {
+  completedFirstTwo();
+  save("schreiben", { startedAt: Date.now() - 9999, submittedAt: Date.now(), sms: "Hallo Julia", email: "Sehr geehrte Damen und Herren" });
+  save("sprechen", completeSpeech());
+  save("flow", { stage: "sprechen", startedAt: Date.now() - 500000 });
+  expect(isA2Mock2ReviewReady(keys)).toBe(true);
+  mount();
+
+  await waitFor(() => expect(screen.getByText("Alle vier Module bearbeitet")).toBeInTheDocument());
+  expect(screen.getByText("4 von 4 Modulen abgeschlossen")).toBeInTheDocument();
+  expect(markLetterWithAI).not.toHaveBeenCalled();
+  expect(scoreA2MockSpeaking).not.toHaveBeenCalled();
+  expect(screen.getByText("Schreiben · KI-Feedback / erneut bewerten")).toBeInTheDocument();
+  expect(screen.getByText("Sprechen · KI-Feedback / erneut bewerten")).toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Das ist meine gespeicherte Antwort.");
+});
