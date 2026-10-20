@@ -37,7 +37,7 @@ export async function syncA2Mock2Backup(keys, attemptStartedAtMs, token, uid) {
     const saved = readJson(keys[section]);
     if (!completedStamp(saved)) continue;
     const data = section === "schreiben" ? {
-      submittedAt: saved.submittedAt, sms: saved.sms || "", email: saved.email || "",
+      submittedAt: saved.submittedAt, startedAt:saved.startedAt || saved.submittedAt, sms: saved.sms || "", email: saved.email || "",
     } : {submittedAt: saved.completedAt, answers: saved.answers || {}};
     await uploadMockAnswerBackup("a2-mock-02", section, attemptStartedAtMs, data, token, uid);
   }
@@ -56,7 +56,7 @@ export function restoreA2Mock2Backup(keys, response) {
     if (!remote || completedStamp(local)) continue;
     if (part === "schreiben" && (local.sms || local.email)) continue;
     if (part !== "schreiben" && Object.values(local.answers || {}).some(Boolean)) continue;
-    const restored = part === "schreiben" ? {...remote} :
+    const restored = part === "schreiben" ? {...remote, startedAt:remote.startedAt || remote.submittedAt} :
       {completedAt:remote.submittedAt, answers:remote.answers};
     localStorage.setItem(keys[part], JSON.stringify(restored));
     changed = true;
@@ -87,6 +87,7 @@ export function submittedB2Sections(state = {}) {
   if (state.schreibenCompleted) data.push(["schreiben", {
     submittedAt: Number(state.schreibenSubmittedAt) || started,
     schreiben: {teil1: state.schreiben?.teil1 || "", teil2: state.schreiben?.teil2 || ""},
+    ...(Number.isFinite(Number(state.schreibenResult?.score)) && state.schreibenResult ? {score:Number(state.schreibenResult.score)} : {}),
   }]);
   return data;
 }
@@ -120,6 +121,7 @@ export function restoreB2Backup(local, response) {
     }
     if (name === "schreiben" && copy.hoeren4Completed) {
       copy.schreiben = section.schreiben;
+      if (Number.isFinite(Number(section.score))) copy.schreibenResult = {score:Number(section.score), maxScore:25};
       copy.schreibenCompleted = true;
       copy.schreibenSubmittedAt = section.submittedAt;
       copy.stage = "sprechen";
