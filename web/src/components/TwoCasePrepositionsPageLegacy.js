@@ -153,11 +153,6 @@ const TwoCasePrepositionsPageLegacy = () => {
         <p><strong>Two-way prepositions:</strong> in, an, auf, über, unter, vor, hinter, neben, zwischen. A destination (Wohin?) takes Akkusativ; a location (Wo?) takes Dativ.</p>
         <p><strong>Movement alone does not mean Akkusativ:</strong> Ich laufe im Park. (I run in the park: where?) Ich laufe in den Park. (I run into the park: where to?)</p>
       </Section>
-      <Section eyebrow="A small note for now" title="mit, bei und zu">
-        <p><strong>mit, bei and zu are dative prepositions, not two-way prepositions.</strong> After them, put the noun phrase (including its article) into the dative. There is no Wo?/Wohin? case choice.</p>
-        <p>mit <strong>dem Bus</strong> (by bus) · bei <strong>der Arbeit</strong> (at work) · zu <strong>dem Arzt</strong> (to the doctor)</p>
-        <p>You will study dative prepositions in more detail in A2. For now, just remember: mit, bei, zu → Dativ.</p>
-      </Section>
       <Section eyebrow="Today's targets" title="By the end of this lesson, you should be able to">
         <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
           <li>recognise the nine common two-case prepositions;</li>
@@ -323,6 +318,12 @@ const TwoCasePrepositionsPageLegacy = () => {
         <div style={{ borderLeft: "4px solid #4f46e5", background: "#eef2ff", padding: 12, borderRadius: 10, lineHeight: 1.65 }}>
           <strong>Tip:</strong> Focus on meaning first. Then check whether the sentence describes a location or a destination before choosing Dativ or Akkusativ.
         </div>
+      </Section>
+
+      <Section eyebrow="A small note for now" title="mit, bei und zu">
+        <p><strong>mit, bei and zu are dative prepositions, not two-way prepositions.</strong> After them, put the noun phrase (including its article) into the dative. There is no Wo?/Wohin? case choice.</p>
+        <p>mit <strong>dem Bus</strong> (by bus) · bei <strong>der Arbeit</strong> (at work) · zu <strong>dem Arzt</strong> (to the doctor)</p>
+        <p>You will study dative prepositions in more detail in A2. For now, just remember: mit, bei, zu → Dativ.</p>
       </Section>
 
       <section style={{ ...card, background: "#172554", color: "#fff" }}>
