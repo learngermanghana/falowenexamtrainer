@@ -67,7 +67,7 @@ function A2Mock2SprechenAttempt({ embedded = false, onComplete, reviewReleased =
   }catch(e){setError(userFacingAudioError(e,e.message||"Audio konnte nicht ausgewertet werden."))}
   finally{setBusy(false)}
  };
- useEffect(() => { if (embedded && attempts._mock2AiScored && onComplete) onComplete(); }, [embedded, attempts._mock2AiScored, onComplete]);
+ useEffect(() => { if (embedded && tasks.every(t => attempts[t.id]?.transcript) && onComplete) onComplete(); }, [embedded, attempts, onComplete]);
  const completed=tasks.filter(t=>attempts[t.id]?.transcript).length;
  const mark=async()=>{
   if(completed!==tasks.length||marking)return;
@@ -82,7 +82,7 @@ function A2Mock2SprechenAttempt({ embedded = false, onComplete, reviewReleased =
   } catch(e) {setError(e?.response?.data?.error||e.message||"Sprechen konnte nicht bewertet werden.");}
   finally {setMarking(false);}
  };
- useEffect(()=>{if(embedded && completed===5 && !marking && !assessment && !error && !attempts._mock2AiScored)mark();},[embedded,completed,marking,assessment,error,attempts._mock2AiScored]);
+ useEffect(()=>{if(embedded && reviewReleased && completed===5 && !marking && !assessment && !error && !attempts._mock2AiScored)mark();},[embedded,reviewReleased,completed,marking,assessment,error,attempts._mock2AiScored]);
   return <main className="a2-mock2-shell" lang="de" data-a2-mock2-sprechen>
   {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Sprechen</span></div> : null}
   <header className="a2-mock2-progress"><div><strong>Sprechen · Übungstest 2</strong><span>{completed}/5 Aufnahmen abgegeben</span></div><strong>Teil {task.teil}</strong></header>
