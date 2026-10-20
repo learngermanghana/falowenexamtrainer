@@ -88,8 +88,12 @@ jobs:
       - name: Verify Mock 2 saved submission recovery and retryable AI grading
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js
+      - name: Install mock backend test dependencies
+        working-directory: functions
+        run: npm ci --no-audit --no-fund
       - name: Verify Mock 2 task registration and score isolation
-        run: node -e "require.resolve(\'./functions/functionz/assessmentTaskContext.js\')" 
+        working-directory: functions
+        run: npx jest --runInBand --runTestsByPath functionz/__tests__/a2Mock2Registration.test.js
       - name: Verify exact Mock 2 backend task registry and versions
         run: node scripts/generateAssessmentTaskRegistry.mjs --check
       - name: Build Exam Room web app
