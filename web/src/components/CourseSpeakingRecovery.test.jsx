@@ -1,7 +1,7 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
-import CourseSpeakingMockAssignment from './CourseSpeakingMockAssignment';
-import { fetchCourseSpeakingMockStatus } from '../services/courseSpeakingMockService';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import CourseSpeakingMockAssignment, { contiguousVerifiedSpeakingParts } from './CourseSpeakingMockAssignment';
+import { fetchCourseSpeakingMockStatus, submitCourseSpeakingMock } from '../services/courseSpeakingMockService';
 import { announceExamSuccess } from '../services/interactionFeedback';
 jest.mock('../services/interactionFeedback', () => ({ announceExamSuccess: jest.fn() }));
 
@@ -57,4 +57,46 @@ test('A1 Day 19 opens the required three-part A1 assessment with A1 instructions
   expect(screen.getByText(/Sich vorstellen/)).toBeTruthy();
   expect(screen.getByText(/Fragen und Antworten/)).toBeTruthy();
   expect(screen.getByText(/Bitten und Reagieren/)).toBeTruthy();
+});
+
+test('only a consecutive set of verified Teils may advance the speaking exam', () => {
+  const part = i => ({sessionId: `session-${i}`, teil: `Teil ${i}`, assessment:{maxScore:10,score:6}});
+  expect(contiguousVerifiedSpeakingParts([part(2),part(3)])).toEqual([]);
+  expect(contiguousVerifiedSpeakingParts([part(2),part(1)])).toEqual([part(1),part(2)]);
+  expect(contiguousVerifiedSpeakingParts([part(1),{...part(2),assessment:null},part(3)])).toEqual([part(1)]);
+});
+
+test('A1 Day 19 recovers a finished Teil 2 from verified cloud scores instead of rerecording', async () => {
+  const attemptId = '11111111-1111-4111-8111-111111111111';
+  const tasks = [{id:'one',teilLabel:'Teil 1'}, {id:'two',teilLabel:'Teil 2'}, {id:'three',teilLabel:'Teil 3'}];
+  const parts = [1,2].map(i=>({sessionId:`saved-${i}`,teil:`Teil ${i}`,taskId:tasks[i-1].id,
+    assessment:{maxScore:10,score:7,practiceOnly:true}}));
+  const storageKey = 'falowen:graded-speaking:learner:A1-5.9';
+  localStorage.setItem(storageKey,JSON.stringify({tasks,results:[parts[0]],attemptId}));
+  fetchCourseSpeakingMockStatus
+    .mockResolvedValueOnce({completed:false,attemptId,recovery:{parts:[parts[0]]}})
+    .mockResolvedValueOnce({completed:false,attemptId,recovery:{parts}});
+  render(<CourseSpeakingMockAssignment assignmentKey="A1-5.9" />);
+  await screen.findByText(/Teil 2 of 3/);
+  fireEvent.click(screen.getByRole('button',{name:'Check completed speaking Teils'}));
+  await screen.findByText(/Teil 3 of 3/);
+  expect(screen.getByText(/Teil 2 recovered/)).toBeInTheDocument();
+  expect(submitCourseSpeakingMock).not.toHaveBeenCalled();
+  expect(JSON.parse(localStorage.getItem(storageKey)).results).toHaveLength(2);
+});
+
+test('checking A1 Day 19 verified progress never fabricates a missing first Teil', async () => {
+  const attemptId = '11111111-1111-4111-8111-111111111111';
+  const tasks=[{id:'one',teilLabel:'Teil 1'},{id:'two',teilLabel:'Teil 2'},{id:'three',teilLabel:'Teil 3'}];
+  const storageKey='falowen:graded-speaking:learner:A1-5.9';
+  localStorage.setItem(storageKey,JSON.stringify({tasks,results:[],attemptId}));
+  fetchCourseSpeakingMockStatus.mockResolvedValue({completed:false,attemptId,recovery:{
+    parts:[{sessionId:'later',teil:'Teil 2',assessment:{maxScore:10,score:10}}],
+  }});
+  render(<CourseSpeakingMockAssignment assignmentKey="A1-5.9" />);
+  await screen.findByText(/Teil 1 of 3/);
+  fireEvent.click(screen.getByRole('button',{name:'Check completed speaking Teils'}));
+  await screen.findByText(/No graded Teil was found yet/);
+  expect(screen.getByText(/Teil 1 of 3/)).toBeInTheDocument();
+  expect(submitCourseSpeakingMock).not.toHaveBeenCalled();
 });
