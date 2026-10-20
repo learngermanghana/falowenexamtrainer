@@ -4,6 +4,7 @@ import { auth, createUserWithEmailAndPassword } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
 import { MOCK_EXAM_CATALOG } from "../data/mockExamCatalog";
+import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const safeLevels = new Set(LEVELS);
@@ -79,6 +80,7 @@ export function MockExamSignupPage() {
 
 export function MockExamCheckoutPage({ paymentReturn = false }) {
   const { user, studentProfile } = useAuth();
+  const fxQuote = useFalowenUsdGhsRate();
   const [catalog, setCatalog] = useState([]);
   const [level, setLevel] = useState(String(studentProfile?.level || "A1").toUpperCase());
   const [access, setAccess] = useState([]);
@@ -126,12 +128,15 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
     {selectedPackage ? <div style={{ padding:22, border:"2px solid #0b776e", borderRadius:14, margin:"18px 0", background:"#f3fbf7" }}>
       <strong>One plan · {level} Monthly Access</strong>
       <div style={{fontSize:34,fontWeight:900,marginTop:10}}>{format(selectedPackage.priceGhs)} <small style={{fontSize:14,fontWeight:600}}>/ 30 days</small></div>
+      {approximateUsd(selectedPackage.priceGhs, fxQuote) && <p style={{color:"#52695e",margin:"6px 0",fontSize:15}}>
+        ≈ {approximateUsd(selectedPackage.priceGhs, fxQuote)} USD (indicative · rate checked {new Date(fxQuote.fetchedAt).toLocaleDateString("en-GB")})
+      </p>}
       <p style={{marginBottom:5}}>✓ Every published mock exam at {level}</p>
       <p style={{marginBottom:5}}>✓ Practise individual Teile and all four skills in any order</p>
       <p style={{marginBottom:5}}>✓ Results and saved progress where available</p>
       <p style={{fontSize:13,color:"#546b62"}}>Renew manually to extend your access. No automatic monthly charge. Newly published practice at your level is included during your active subscription.</p>
-    </div> : <p role="status">Complete paid mocks for {level} are not available yet, so we are not selling a monthly subscription at this level.</p>}
-    {selectedPackage && <p style={{fontSize:13,color:"#64748b"}}>A small Paystack fee contribution may be added and shown before payment.</p>}
+    </div> : <p role="status">Monthly practice for {level} is being prepared. Try again if the subscription plan has not loaded.</p>}
+    {selectedPackage && <p style={{fontSize:13,color:"#64748b"}}>Paystack charges in GHS. The USD figure is an estimate; your bank determines the final foreign-currency amount. Any Paystack fee contribution is shown before payment.</p>}
     {error && <p role="alert" style={{color:"#b42318"}}>{error}</p>}
     <button disabled={!selectedPackage || working} onClick={buy} style={{...button, opacity: !selectedPackage || working ? .55 : 1}}>
       {working ? "Opening secure checkout…" : selectedPackage ? `Subscribe for 30 days · ${format(selectedPackage.priceGhs)} + fees` : "Not yet available"}
