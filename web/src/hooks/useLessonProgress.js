@@ -122,11 +122,22 @@ const isSameLevel = (row = {}, level = "") => {
   return !rowLevel || rowLevel === "GENERAL" || rowLevel === expectedLevel;
 };
 
-const isSameStudent = (row = {}, studentCode = "") => {
-  const expected = normalizeLower(studentCode);
-  if (!expected) return true;
+// A valid authenticated owner ID is stronger than a legacy studentCode
+// field, which may contain a fallback UID if the profile was unavailable at
+// submission. Never accept another owner's result just because its code is
+// empty or happens to match.
+const isSameStudent = (row = {}, studentCode = "", userId = "", email = "") => {
+  const expectedUid = normalizeLower(userId);
+  const ownedUids = unique([row?.uid, row?.studentId, row?.userId, row?.authUid]).map(normalizeLower);
+  if (expectedUid && ownedUids.length) return ownedUids.includes(expectedUid);
+
+  const expectedEmail = normalizeLower(email);
+  const ownedEmails = unique([row?.email, row?.studentEmail]).map(normalizeLower);
+  if (expectedEmail && ownedEmails.length) return ownedEmails.includes(expectedEmail);
+
+  const expectedCode = normalizeLower(studentCode);
   const rowCode = normalizeLower(row?.studentCode || row?.studentcode || row?.student_code || row?.code || "");
-  return !rowCode || rowCode === expected;
+  return !expectedCode || !rowCode || rowCode === expectedCode;
 };
 
 const isSubmissionStatus = (row = {}) => {
@@ -202,7 +213,7 @@ const buildBucketStatus = ({ assignmentId, submissions = [], results = [] }) => 
   };
 };
 
-export const buildProgressByAssignmentId = ({ submissions = [], results = [], level = "", studentCode = "" } = {}) => {
+export const buildProgressByAssignmentId = ({ submissions = [], results = [], level = "", studentCode = "", userId = "", email = "" } = {}) => {
   const buckets = new Map();
 
   const ensureBucket = (assignmentId) => {
@@ -213,7 +224,7 @@ export const buildProgressByAssignmentId = ({ submissions = [], results = [], le
   };
 
   submissions
-    .filter((row) => isSameLevel(row, level) && isSameStudent(row, studentCode) && isSubmissionStatus(row))
+    .filter((row) => isSameLevel(row, level) && isSameStudent(row, studentCode, userId, email) && isSubmissionStatus(row))
     .forEach((row) => {
       const assignmentId = getAssignmentIdFromRow(row, level);
       const bucket = ensureBucket(assignmentId);
@@ -221,7 +232,7 @@ export const buildProgressByAssignmentId = ({ submissions = [], results = [], le
     });
 
   results
-    .filter((row) => isSameLevel(row, level) && isSameStudent(row, studentCode))
+    .filter((row) => isSameLevel(row, level) && isSameStudent(row, studentCode, userId, email))
     .forEach((row) => {
       const assignmentId = getAssignmentIdFromRow(row, level);
       const bucket = ensureBucket(assignmentId);
@@ -328,7 +339,7 @@ const loadFallbackProgress = async ({ studentCode, email, userId, normalizedLeve
     submissions: submissionRows,
     results: resultPayload?.results || [],
     level: normalizedLevel,
-    studentCode,
+    studentCode, userId, email,
   });
 };
 
@@ -415,7 +426,7 @@ export const useLessonProgress = ({ studentProfile, user, level } = {}) => {
                 const rows = new Map();
                 scoreRowsByQuery.forEach((entries) => entries.forEach((row) => rows.set(row.id, row)));
                 scoreProgress = buildProgressByAssignmentId({
-                  results: [...rows.values()], level: normalizedLevel, studentCode,
+                  results: [...rows.values()], level: normalizedLevel, studentCode, userId, email,
                 });
                 publish({ source: "scores" });
               },
