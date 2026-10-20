@@ -3,8 +3,10 @@ const normalizeTab = (value = "") => String(value || "").trim().toLowerCase();
 
 export const isTimedAssignmentReviewUnlocked = ({ attemptState = "", progress = null } = {}) => {
   const state = normalizeState(attemptState);
-  // A result must never bypass a new attempt's start gate after a teacher reset.
-  if (state === "active" || state === "none") return false;
+  // Never interrupt an active attempt. Keep the existing passed-review
+  // behavior even when the timer record is absent, as other lesson surfaces
+  // use it to open completed study work.
+  if (state === "active") return false;
 
   // Keep the previous pass-review flow, but also let students inspect marked
   // failed work. A failed score is not permission to start a second attempt.
