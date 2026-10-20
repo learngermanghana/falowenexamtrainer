@@ -8,6 +8,8 @@ import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioSe
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
 import { B1_LISTENING } from "../data/b1FinalMockData";
+import { B2_LISTENING } from "../data/b2FinalMockData";
+import { fetchB2MockAudioPlaybackUrl } from "../services/b2AudioService";
 import { A2_MOCK_2_HOEREN } from "../data/a2Mock2Hoeren";
 import { fetchC1ExamHorenAudioPlaybackUrl } from "../services/c1ExamHorenAudioService";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -89,6 +91,22 @@ const B1_PARTS = Object.freeze(B1_LISTENING.map((part, index) => ({
   },
 })));
 
+// Reuse the protected recordings and scoring keys from B2 Mock 01.
+const B2_PARTS = Object.freeze(Object.entries(B2_LISTENING).map(([key, original], index) => ({
+  key,
+  audioPart: original.id,
+  data: {
+    ...original,
+    title: `Teil ${index + 1}`,
+    instruction: original.intro,
+    responseInstruction: "Wählen Sie die richtige Antwort.",
+    plays: 1,
+    questions: index === 0 ? original.texts.flatMap(text => text.questions) : original.questions,
+    ...(index === 0 ? { example: original.example[0] } : {}),
+    ...(index === 2 ? { speakerOptions: original.speakers } : {}),
+  },
+})));
+
 const C1_PARTS = Object.freeze([
   { key: "teil1", audioPart: "teil-1", data: C1_EXAM_HOEREN_SAMPLE_1 },
   { key: "teil2", audioPart: "teil-2", data: C1_EXAM_HOEREN_SAMPLE_1_TEIL2 },
@@ -129,6 +147,13 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
               key: objectKey,
               idToken,
             })
+          : level === "B2"
+            ? await fetchB2MockAudioPlaybackUrl({
+                mockId: "mock-01",
+                part,
+                key: objectKey,
+                idToken,
+              })
           : level === "B1"
             ? await fetchB1MockAudioPlaybackUrl({
                 mockId: "mock-01",
@@ -392,10 +417,12 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
-  const normalizedLevel = ["A1", "A2", "B1", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
+  const normalizedLevel = ["A1", "A2", "B1", "B2", "C1"].includes(requestedLevel) ? requestedLevel : "A1";
   const isMock3 = normalizedLevel === "A1" && sampleId === "sample-3" && mockId === "a1-mock-03";
   const parts =
-    normalizedLevel === "B1"
+    normalizedLevel === "B2"
+      ? B2_PARTS
+      : normalizedLevel === "B1"
       ? B1_PARTS
       : normalizedLevel === "C1"
       ? C1_PARTS
@@ -660,7 +687,15 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             <p style={{ margin: "4px 0 0" }}>{prompt}</p>
           </div>
 
-          {isBinary ? (
+          {part.data.speakerOptions ? (
+            <ChoiceOptions
+              name={key}
+              options={part.data.speakerOptions}
+              value={answers[key] || ""}
+              onChange={(value) => setAnswer(key, value)}
+              disabled={submitted}
+            />
+          ) : isBinary ? (
             <BinaryOptions
               name={key}
               value={answers[key] || ""}
@@ -691,7 +726,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
         </button>
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
         <h2 style={{ margin: 0 }}>
-          {isMock3 ? "A1 Mock 3 · Hören" : `Hören ${sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}`}
+          {isMock3 ? "A1 Mock 3 · Hören" : normalizedLevel === "B2" ? "B2 Hören 1" : `Hören ${sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}`}
         </h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
           {isMock3 ? "Hören Sample 3 is reused here. Complete all 15 questions; this score belongs to Mock 3." : "Complete all listening parts, then check your answers at the end."}
@@ -715,7 +750,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             idToken={idToken}
           />
 
-          {part.data.example ? (
+          {part.data.example && !Array.isArray(part.data.example) && Array.isArray(part.data.example.options) ? (
             <div
               style={{
                 border: "1px solid #d1d5db",
