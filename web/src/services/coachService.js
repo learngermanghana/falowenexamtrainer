@@ -64,6 +64,7 @@ export const analyzeAudio = async ({
   idToken,
   timeoutMs = null,
   transcriptionOnly = false,
+  persistAudio = true,
 }) => {
   const numericTimeoutMs = Number(timeoutMs);
   const hasTimeout =
@@ -141,7 +142,9 @@ export const analyzeAudio = async ({
       return { ...response.data, audioUrl: durableAudioUrl || response.data?.audioUrl || "" };
     };
 
-    if (!audioBlob) {
+    // Ephemeral mock recordings go straight to the in-memory multipart handler.
+    // Never upload these to Firebase Storage, including when the request fails.
+    if (!audioBlob || !persistAudio) {
       return submitAsMultipartFallback();
     }
 
