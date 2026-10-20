@@ -6,6 +6,10 @@ on:
       - "web/src/data/courseCompletionJourney.js"
       - "web/src/data/courseCompletionJourney.test.js"
       - "web/src/hooks/useCourseCompletionProgress.js"
+      - "web/src/hooks/useLessonProgress.js"
+      - "web/src/hooks/useLessonProgress.test.js"
+      - "web/src/services/resultsService.js"
+      - "web/src/services/resultsService.courseOwnership.test.js"
       - "web/src/components/CourseCompletionProgressCard.jsx"
       - "web/src/components/HomeMetrics.js"
       - "web/src/components/CourseTab.js"
@@ -42,7 +46,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npm run test:ci -- --runTestsByPath src/data/courseCompletionJourney.test.js src/components/CourseCompletionProgressRegression.test.js src/__tests__/classParticipationNavigation.test.js
+        run: npm run test:ci -- --runTestsByPath src/data/courseCompletionJourney.test.js src/components/CourseCompletionProgressRegression.test.js src/__tests__/classParticipationNavigation.test.js src/hooks/useLessonProgress.test.js src/services/resultsService.courseOwnership.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
