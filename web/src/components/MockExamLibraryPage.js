@@ -19,7 +19,7 @@ export default function MockExamLibraryPage() {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
   const examOnly = studentProfile?.accountType === "exam_only";
-  const [ownedMockIds, setOwnedMockIds] = useState([]);
+  const [ownedLevels, setOwnedLevels] = useState([]);
   const [loadingOwned, setLoadingOwned] = useState(examOnly);
   useEffect(() => {
     if (!examOnly || !user) return undefined;
@@ -31,13 +31,14 @@ export default function MockExamLibraryPage() {
       if (!response.ok) throw new Error("Access lookup failed");
       return response.json();
     }).then(data => {
-      if (mounted) setOwnedMockIds((data.active || []).flatMap(entry => entry.mockIds || []));
-    }).catch(() => { if (mounted) setOwnedMockIds([]); })
+      if (mounted) setOwnedLevels((data.active || []).map(entry => entry.level));
+    }).catch(() => { if (mounted) setOwnedLevels([]); })
       .finally(() => { if (mounted) setLoadingOwned(false); });
     return () => { mounted = false; };
   }, [examOnly, user]);
-  const mocks = getMockExamsForLevel(level, { includeCourse: !examOnly }).filter(
-    mock => !examOnly || (mock.status === "ready" && ownedMockIds.includes(mock.id))
+  const mocks = getMockExamsForLevel(level, { includeCourse: true }).filter(mock =>
+    !examOnly || (ownedLevels.includes(mock.level) && mock.status !== "planned" &&
+      mock.id !== "a2-course-preview-01")
   );
 
   return (
@@ -50,7 +51,22 @@ export default function MockExamLibraryPage() {
         </p>
       </section>
 
-      {loadingOwned ? <section style={styles.card}>Checking your purchased exams…</section> : mocks.length ? (
+      {examOnly && ownedLevels.includes(level) && <section style={styles.card}>
+        <strong>Your {level} monthly access · practise in any order</strong>
+        <p style={{ ...styles.helperText, margin: "8px 0" }}>
+          All published exams and individual skills are included. There is no price per Teil.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {[
+            { label: "Lesen", route: "/exams/lesen" },
+            { label: "Hören", route: "/exams/horen" },
+            { label: "Schreiben", route: "/exams/writing" },
+            { label: "Sprechen", route: "/exams/speaking" },
+          ].map(skill => <button key={skill.label} type="button" style={styles.secondaryButton}
+            onClick={() => navigate(skill.route)}>{skill.label}</button>)}
+        </div>
+      </section>}
+      {loadingOwned ? <section style={styles.card}>Checking your monthly exam access…</section> : mocks.length ? (
         <section style={{ display: "grid", gap: 12 }}>
           {mocks.map((mock) => (
             <article key={mock.id} style={{ ...styles.card, margin: 0 }}>
@@ -90,8 +106,8 @@ export default function MockExamLibraryPage() {
       ) : (
         <section style={styles.card}>
           <strong>No full {level} mock is published yet.</strong>
-          <p style={styles.helperText}>{examOnly ? "Your current package does not include a ready full mock at this level." : "Use the section practice while a full mock is not yet available."}</p>
-          {examOnly ? <a href="/mock/checkout">See available packages</a> : null}
+          <p style={styles.helperText}>{examOnly ? "Your monthly subscription includes all published mocks and individual skill practice at this level." : "Use the section practice while a full mock is not yet available."}</p>
+          {examOnly ? <a href="/mock/checkout">See monthly access</a> : null}
         </section>
       )}
     </div>
