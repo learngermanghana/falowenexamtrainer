@@ -64,7 +64,7 @@ async function saveBackup(db, admin, uid, email, {mockId, section, attemptStarte
     if (oldStarted > started) throw fail("A newer attempt already has a backup", 409, "MOCK_BACKUP_NEWER_ATTEMPT");
     const same = oldStarted === started;
     const existing = same ? old.sections?.[section] : null;
-    if (existing && existing.submittedAt >= sanitized.submittedAt) {
+    if (existing && existing.submittedAt >= sanitized.submittedAt && !(section === "schreiben" && sanitized.score !== undefined && existing.score === undefined)) {
       outcome = {saved: true, unchanged: true};
       return;
     }
