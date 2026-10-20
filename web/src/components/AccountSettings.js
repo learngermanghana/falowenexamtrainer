@@ -11,6 +11,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
+import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 import { clearPaymentAttempt, getPaymentAttempt } from "../lib/paymentAttempt";
 import { getTrialLifecycleState } from "../lib/trialAccess";
@@ -32,6 +33,11 @@ const COURSE_COMPLETION_UPGRADE_LEVELS = new Set(["A1", "A2", "B1"]);
 const AccountSettings = () => {
   const { user, studentProfile, saveStudentProfile, refreshStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
+  const fxQuote = useFalowenUsdGhsRate();
+  const usdBelow = (value) => {
+    const estimated = approximateUsd(value, fxQuote);
+    return estimated ? <small style={{display:"block",fontWeight:400,fontSize:12,color:"#64748b",marginTop:3}}>≈ {estimated} USD</small> : null;
+  };
   const locale = i18n.language;
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const formatMoney = useCallback(
@@ -771,16 +777,16 @@ const AccountSettings = () => {
         >
           <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0", borderBottom: "1px solid #e2e8f0" }}>
             <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Tuition</span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(billingSummary.tuitionFee)}</strong>
+            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(billingSummary.tuitionFee)}{usdBelow(billingSummary.tuitionFee)}</strong>
           </div>
           <div style={{ minWidth: 0, padding: "10px 12px", borderBottom: "1px solid #e2e8f0" }}>
             <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Paid</span>
-            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(paidAmount)}</strong>
+            <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25 }}>{formatMoney(paidAmount)}{usdBelow(paidAmount)}</strong>
           </div>
           <div style={{ minWidth: 0, padding: "10px 12px", borderRight: "1px solid #e2e8f0" }}>
             <span style={{ ...styles.helperText, display: "block", fontSize: 12 }}>Balance</span>
             <strong style={{ display: "block", marginTop: 2, fontSize: 17, lineHeight: 1.25, color: balanceDue > 0 ? "#9a3412" : "#166534" }}>
-              {formatMoney(balanceDue)}
+              {formatMoney(balanceDue)}{usdBelow(balanceDue)}
             </strong>
           </div>
           <div style={{ minWidth: 0, padding: "10px 12px" }}>
@@ -898,7 +904,7 @@ const AccountSettings = () => {
                     gap: 4,
                   }}
                 >
-                  <div style={styles.metaRow}><span>{tx.date}</span><strong>{formatMoney(tx.amount)}</strong></div>
+                  <div style={styles.metaRow}><span>{tx.date}</span><strong style={{textAlign:"right"}}>{formatMoney(tx.amount)}{usdBelow(tx.amount)}</strong></div>
                   <div style={{ ...styles.metaRow, fontSize: 12 }}><span>{tx.channel}</span><span>{tx.status}</span></div>
                   <div style={{ ...styles.helperText, fontSize: 11, overflowWrap: "anywhere" }}>{tx.reference}</div>
                   {tx.receiptUrl ? <a href={tx.receiptUrl} target="_blank" rel="noreferrer">{t("accountSettings.billing.transaction.receipt")}</a> : null}
@@ -966,7 +972,7 @@ const AccountSettings = () => {
               >
                 <span style={{ ...styles.helperText, fontSize: 12 }}>Current balance</span>
                 <strong style={{ color: levelUpgrade.hasOutstandingBalance ? "#9a3412" : "#166534" }}>
-                  {levelUpgrade.hasOutstandingBalance ? formatMoney(balanceDue) : "Cleared"}
+                  {levelUpgrade.hasOutstandingBalance ? formatMoney(balanceDue) : "Cleared"}{levelUpgrade.hasOutstandingBalance ? usdBelow(balanceDue) : null}
                 </strong>
               </div>
             </div>
@@ -975,7 +981,7 @@ const AccountSettings = () => {
               {t("accountSettings.upgrade.description", {
                 currentLevel: levelUpgrade.currentLevel,
                 nextLevel: levelUpgrade.nextLevel,
-                amount: formatMoney(levelUpgrade.nextTuitionFee || getTuitionFeeForLevel(levelUpgrade.nextLevel)),
+                amount: `${formatMoney(levelUpgrade.nextTuitionFee || getTuitionFeeForLevel(levelUpgrade.nextLevel))}${approximateUsd(levelUpgrade.nextTuitionFee || getTuitionFeeForLevel(levelUpgrade.nextLevel), fxQuote) ? ` (≈ ${approximateUsd(levelUpgrade.nextTuitionFee || getTuitionFeeForLevel(levelUpgrade.nextLevel), fxQuote)} USD)` : ""}`,
               })}
             </p>
 
