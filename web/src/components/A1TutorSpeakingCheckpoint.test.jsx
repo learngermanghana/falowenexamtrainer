@@ -123,8 +123,8 @@ test("A1-11 starts with one face-down Goethe picture card, never three separate 
 
 test.each([
   [0, "der Stift"],
-  [0.4, "das Fenster"],
-  [0.9, "der Stadtplan"],
+  [0.06, "das Fenster"],
+  [0.12, "der Stadtplan"],
 ])("drawing %s produces only the %s speaking request", (randomValue, label) => {
   const random = jest.spyOn(Math, "random").mockReturnValue(randomValue);
   try {
@@ -138,7 +138,7 @@ test.each([
 });
 
 test("A1-11 assesses only the drawn card and saves the card name with the score", async () => {
-  const random = jest.spyOn(Math, "random").mockReturnValue(0.45);
+  const random = jest.spyOn(Math, "random").mockReturnValue(0.06);
   const originalCreateObjectURL = URL.createObjectURL;
   const originalRevokeObjectURL = URL.revokeObjectURL;
   URL.createObjectURL = jest.fn(() => "blob:falowen-preview");
@@ -167,15 +167,45 @@ test("A1-11 assesses only the drawn card and saves the card name with the score"
     });
     await waitFor(() => expect(assessA1TutorSpeaking).toHaveBeenCalledTimes(1));
     expect(assessA1TutorSpeaking).toHaveBeenCalledWith(expect.objectContaining({
-      assignmentKey: "A1-11", examPart: 3,
+      assignmentKey: "A1-11", examPart: 3, cardId:"fenster",
       question: expect.stringContaining("das Fenster"),
     }));
     expect(mockUpdateSectionText).toHaveBeenCalledWith("teil-1",
       expect.stringContaining("Drawn picture card: das Fenster"));
     expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Score: 8.5/10");
+    expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Corrected example: Können Sie bitte das Fenster öffnen?");
   } finally {
     random.mockRestore();
     URL.createObjectURL = originalCreateObjectURL;
     URL.revokeObjectURL = originalRevokeObjectURL;
+  }
+});
+
+test("optional response practice keeps graded recording and does not call paid AI", async () => {
+  const rand = jest.spyOn(Math, "random").mockReturnValue(0);
+  const originalCreate = URL.createObjectURL;
+  const originalRevoke = URL.revokeObjectURL;
+  URL.createObjectURL = jest.fn(() => "blob:local-practice");
+  URL.revokeObjectURL = jest.fn();
+  try {
+    const { media } = makeStream();
+    navigator.mediaDevices.getUserMedia.mockResolvedValue(media);
+    render(<A1TutorSpeakingCheckpoint assignmentKey="A1-11" sectionKey="teil-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    const practiceToggle = screen.getByRole("button", { name: /Zusatzübung: Auf eine Bitte reagieren/ });
+    fireEvent.click(practiceToggle);
+    expect(screen.getByText(/Können Sie mir bitte den Stadtplan geben/)).toBeVisible();
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Start recording" })); await Promise.resolve(); });
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Stop recording" })); await Promise.resolve(); });
+    expect(screen.getByText(/Ja, gern. Hier bitte/)).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Assess final recording" })).not.toBeInTheDocument();
+    expect(assessA1TutorSpeaking).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /Zurück zur Bildkarte/ }));
+    expect(screen.getByRole("button", { name: "Start recording" })).toBeEnabled();
+    expect(screen.getByText("der Stift")).toBeVisible();
+  } finally {
+    rand.mockRestore();
+    URL.createObjectURL = originalCreate;
+    URL.revokeObjectURL = originalRevoke;
   }
 });
