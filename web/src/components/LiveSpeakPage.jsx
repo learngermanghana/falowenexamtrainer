@@ -234,6 +234,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     }
   };
   const [lastAudio, setLastAudio] = useState("");
+  // iOS can leave an audio element in 'playing' after interruption or
+  // backgrounding. The written examiner prompt must remain usable without
+  // waiting indefinitely for an onended callback.
+  const continueWithWrittenQuestion = () => {
+    stopAudio();
+    setNotice("Examiner audio stopped. Read the German question above, then record your answer.");
+    setErrorMessage("");
+  };
 
   const sendTurn = async (currentSession, payload) => {
     if (requestBusy.current || !currentSession) return;
@@ -292,6 +300,64 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
           }
         } else {setOpeningFailed(Boolean(payload.intro));setErrorMessage(err.message);}
       }
+    } finally {
+      requestBusy.current = false;
+      if (mounted.current) setBusy(false);
+    }
+  };
+
+  // On-demand recovery uses the existing owner-scoped session status, not a
+  // new transcription/model request or persistent recording upload.
+  const recoverSavedSpeakingStep = async () => {
+    if (!gradedCourseMock || !session || recording || busy || feedbackBusy || requestBusy.current) return;
+    requestBusy.current = true;
+    setBusy(true);
+    setErrorMessage("");
+    try {
+      const info = await api("/live-speak/status");
+      const saved = info.activeSession;
+      if (saved?.sessionId === session.sessionId) {
+        stopAudio();
+        setSession(saved);
+        setMessages(saved.messages || []);
+        setPending(saved.pending || null);
+        setRecognizedText(saved.pending?.transcript || "");
+        setRecognitionCorrection(false);
+        setAnswerMode(saved.pending?.typed ? "type" : "record");
+        setNow(Date.now());
+        if (saved.pending || Number(saved.answeredTurns || 0) > Number(session.answeredTurns || 0)) {
+          setAudioRetry(null);
+        }
+        setNotice(saved.pending
+          ? "Your recording was recovered. Review and confirm the transcript below."
+          : saved.taskReady
+            ? "All answers were saved. Falowen can finish marking this Teil."
+            : saved.processingAnswer
+              ? "Falowen is still processing the recording. Check again shortly."
+              : "Saved progress restored. Continue from the examiner's current question.");
+        return;
+      }
+      const result = info.lastExamResult;
+      const samePart = result?.sessionId === session.sessionId &&
+        result?.examTask?.id === (session.examTask?.id || examTask?.id) &&
+        result?.examTask?.courseAssignmentKey === courseAssignmentKey &&
+        result?.examTask?.mockAttemptId === (session.examTask?.mockAttemptId || examTask?.mockAttemptId);
+      if (samePart && result?.assessment && Number(result.assessment.maxScore) > 0) {
+        const accepted = onExamCompleted?.({
+          sessionId: result.sessionId, taskId: result.examTask.id,
+          level: result.level || safeLevel, teil: result.examTask.teil,
+          topic: result.examTask.prompt, keyword: result.examTask.keywords,
+          feedback: result.feedback || "", assessment: result.assessment,
+          words: result.examFlow?.cards || result.examFlow?.requestCards || [],
+        });
+        if (accepted === false) {
+          setErrorMessage("This saved Teil could not be matched to your assignment. Check saved parts from the Course Book.");
+        }
+        return;
+      }
+      setErrorMessage("Falowen has not confirmed this recording yet. Your local preview remains available; retry the saved answer or contact your tutor.");
+    } catch (err) {
+      setErrorMessage(err?.message || "Saved speaking progress could not be checked. Try again.");
     } finally {
       requestBusy.current = false;
       if (mounted.current) setBusy(false);
@@ -908,6 +974,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               </button>
             </div>
           ) : null}
+          {examinerSession && voiceState === "playing" && !recording && !pending ? (
+            <div className="speaking-exam-audio-escape" role="status">
+              <p style={{margin:0,fontSize:13}}>Audio still playing or stuck? You can answer from the written German question without waiting.</p>
+              <button type="button" onClick={continueWithWrittenQuestion}
+                disabled={busy || feedbackBusy || recording}>
+                Continue with written question · unlock microphone
+              </button>
+            </div>
+          ) : null}
           {examinerSession && currentExaminerText ? <div className="speaking-current-question" aria-label="Current examiner question">
             <strong>AI question</strong>
             <p lang="de">{currentExaminerText}</p>
@@ -1016,6 +1091,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                   Confirm answer
                 </button> : null}
               </details> : null}
+              {gradedCourseMock && !recording ? (
+                <div className="speaking-exam-saved-step" style={{display:"grid",gap:5}}>
+                  <button type="button" onClick={recoverSavedSpeakingStep}
+                    disabled={busy || feedbackBusy || recording}>
+                    Check saved answer / speaking progress
+                  </button>
+                  <small>Recovers answers and completed Teils already saved to Falowen. No new recording or AI marking is charged.</small>
+                </div>
+              ) : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
                 <p role="alert">Your recording is safe on this device. Falowen is checking whether the answer already reached the examiner.</p>
                 <div className="speaking-exam-recovery__actions">
