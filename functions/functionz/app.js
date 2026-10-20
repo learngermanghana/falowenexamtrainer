@@ -4989,6 +4989,48 @@ app.post("/internal/mock-progress", async (req, res) => {
   }
 });
 
+// Completed A2 Mock 2 answer backup. Owner access for learners; staff can
+// retrieve a named student's backup on demand. No audio/transcripts stored.
+app.post("/internal/a2-mock2-backup", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!identity) return;
+    if (req.body?.mockId !== "a2-mock-02") return res.status(400).json({ error: "Unsupported mock" });
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Mock answer backup storage unavailable" });
+    const { saveBackup } = require("./a2Mock2SectionBackup");
+    const result = await saveBackup(db, admin, identity.uid, identity.email, req.body);
+    res.set("Cache-Control", "no-store");
+    return res.json({ ok: true, ...result });
+  } catch (error) {
+    console.error("Mock 2 section backup failed", error?.code || error?.message);
+    return res.status(error?.status || 503).json({code: error?.code || null, error: error?.message || "Could not back up submitted answers"});
+  }
+});
+
+app.get("/internal/a2-mock2-backup", async (req, res) => {
+  try {
+    const identity = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!identity) return;
+    const { COLLECTION, publicBackup } = require("./a2Mock2SectionBackup");
+    const requestedUid = String(req.query?.uid || "").trim();
+    const uid = requestedUid || identity.uid;
+    if (uid !== identity.uid) {
+      const { isAuthorizedMockMonitor } = require("./mockAttemptMonitor");
+      if (!isAuthorizedMockMonitor(identity)) return res.status(403).json({error:"Staff access required"});
+    }
+    if (!/^[a-zA-Z0-9:_-]{1,128}$/.test(uid)) return res.status(400).json({error:"Invalid student identifier"});
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({error:"Mock answer backup storage unavailable"});
+    const snap = await db.collection(COLLECTION).doc(uid).get();
+    res.set("Cache-Control", "no-store, private");
+    return res.json({ok:true, exists:snap.exists, backup:snap.exists ? publicBackup(snap.data()) : null});
+  } catch (error) {
+    console.error("Mock 2 backup read failed", error?.code || error?.message);
+    return res.status(503).json({error:"Could not load the submitted answer backup"});
+  }
+});
+
 // Server-owned monitor for authenticated Falowen staff. No student response data.
 app.get("/internal/mock-attempts", async (req, res) => {
   try {
