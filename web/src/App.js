@@ -1553,7 +1553,7 @@ const ExamArea = ({ onBack }) => {
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "file", label: t("appNav.examTabs.file") },
-  ].filter(tab => !examOnlyView || ["overview", "mocks", "file"].includes(tab.key));
+  ];
 
   const examHeroConfig = {
     question: {
