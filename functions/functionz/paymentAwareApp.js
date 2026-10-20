@@ -806,10 +806,9 @@ app.use(async (req, res, next) => {
       /^\/(?:scores|results\/history|speech\/synthesize)$/
     ].some(pattern => pattern.test(path));
     if (!allowed) return res.status(403).json({ error: "Exam-only accounts cannot use course services." });
-    const purchases = await admin.firestore().collection("mockPurchases").where("uid", "==", identity.uid).get();
-    const now = Date.now();
-    const active = purchases.docs.map(doc => doc.data()).filter(p => p.status === "active" && p.expiresAtMs > now);
-    if (!active.length) return res.status(403).json({ error: "Purchase an exam package before using this service." });
+    const { activeSubscriptionsFor, READY_MOCKS } = require("./mockCommerce");
+    const active = await activeSubscriptionsFor(admin.firestore(), identity.uid);
+    if (!active.length) return res.status(403).json({ error: "Activate a monthly exam subscription before using this service." });
     const requestedLevel = (path.match(/^\/(a1|a2|b1|b2)-mock\//i)?.[1]
       || path.match(/^\/(?:writing|speaking)\/(a1|a2|b1|b2)-mock-score$/i)?.[1]
       || path.match(/^\/course-media\/(a1|a2|b1|b2)\//i)?.[1] || "").toUpperCase();
@@ -822,7 +821,8 @@ app.use(async (req, res, next) => {
       "a1-mock-01": "a1-final-01", "a1-mock-02": "a1-final-02", "a1-mock-03": "a1-final-03",
       "a2-mock-01": "a2-final-01", "b1-mock-01": "b1-final-01", "b2-mock-01": "b2-final-01"
     };
-    const ownsExam = (engineId) => active.some(p => (p.mockIds || []).includes(engineToCatalog[engineId]));
+    const ownsExam = (engineId) => active.some(p =>
+      READY_MOCKS[p.level]?.includes(engineToCatalog[engineId]));
     if (/^\/(?:a1|a2|b1)-mock\/attempt\/(?:start|save)$/.test(path)) {
       const level = path.slice(1, 3).toUpperCase();
       const requestIsStart = path.endsWith("/start");
