@@ -556,7 +556,8 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
   const active = attemptState === "active" && secondsLeft > 0;
   const urgent = active && secondsLeft <= 5 * 60;
   const used = ["expired", "submitted"].includes(attemptState);
-  const passedReview = Boolean(reviewUnlocked);
+  const reviewOpen = Boolean(reviewUnlocked);
+  const failedReview = reviewOpen && resultStatus === "failed";
   const checking = cloudState === "loading";
   const cloudError = cloudState === "error";
   const isMock = config.mode === "mock";
@@ -573,16 +574,16 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
     <section
       data-timed-assignment={assignmentKey || config.level}
       data-a1-timed-mock-exam={config.level === "A1" ? "true" : undefined}
-      data-assignment-locked={!active && !passedReview ? "true" : "false"}
-      data-timed-review-unlocked={passedReview ? "true" : "false"}
+      data-assignment-locked={!active && !reviewOpen ? "true" : "false"}
+      data-timed-review-unlocked={reviewOpen ? "true" : "false"}
       data-timed-assignment-state={attemptState}
       style={{
         width: "100%",
         flex: "1 0 100%",
         boxSizing: "border-box",
-        border: `1px solid ${urgent ? "#fb7185" : active ? "#93c5fd" : passedReview ? "#86efac" : used ? "#cbd5e1" : "#fbbf24"}`,
+        border: `1px solid ${urgent ? "#fb7185" : active ? "#93c5fd" : reviewOpen ? "#86efac" : used ? "#cbd5e1" : "#fbbf24"}`,
         borderRadius: 14,
-        background: urgent ? "#fff1f2" : active ? "#eff6ff" : passedReview ? "#f0fdf4" : used ? "#f8fafc" : "#fffbeb",
+        background: urgent ? "#fff1f2" : active ? "#eff6ff" : reviewOpen ? "#f0fdf4" : used ? "#f8fafc" : "#fffbeb",
         padding: 12,
         display: "grid",
         gap: 9,
@@ -591,7 +592,7 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <div style={{ display: "grid", gap: 3 }}>
           <strong style={{ color: urgent ? "#9f1239" : "#1e3a8a" }}>
-            {passedReview ? `${timedLabel} · review unlocked` : used ? `${timedLabel} · attempt closed` : `${timedLabel} · ${shownDurationMinutes} minutes`}
+            {reviewOpen ? `${timedLabel} · review unlocked` : used ? `${timedLabel} · attempt closed` : `${timedLabel} · ${shownDurationMinutes} minutes`}
           </strong>
           <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{config.scope}</span>
         </div>
@@ -619,11 +620,15 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
             Warnings appear at 10, 5 and 1 minute. At 00:00 Falowen submits the latest saved work automatically.
           </span>
         </div>
-      ) : passedReview ? (
-        <div data-timed-review-mode="passed" style={{ display: "grid", gap: 4 }}>
-          <strong style={{ color: "#166534" }}>Passed · review unlocked</strong>
-          <span style={{ color: "#166534", lineHeight: 1.5 }}>
-            You can reopen the timed sections to cross-check your work. The timed attempt remains closed and the timer will not restart.
+      ) : reviewOpen ? (
+        <div data-timed-review-mode={failedReview ? "failed" : "passed"} style={{ display: "grid", gap: 4 }}>
+          <strong style={{ color: failedReview ? "#9a3412" : "#166534" }}>
+            {failedReview ? "Needs improvement · review unlocked" : "Passed · review unlocked"}
+          </strong>
+          <span style={{ color: failedReview ? "#9a3412" : "#166534", lineHeight: 1.5 }}>
+            {failedReview
+              ? "Your failed assignment is saved. Reopen the timed sections to review your work and feedback. This is review only: your score and closed timed attempt are preserved; a teacher must authorize another attempt."
+              : "You can reopen the timed sections to cross-check your work. The timed attempt remains closed and the timer will not restart."}
           </span>
         </div>
       ) : attemptState === "none" ? (
@@ -657,10 +662,10 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
       ) : attemptState === "submitted" ? (
         <p style={{ margin: 0, color: resultStatus === "failed" ? "#9f1239" : "#475569", fontWeight: 800, lineHeight: 1.5 }}>
           {resultStatus === "failed"
-            ? "This timed assignment has not passed. The timed sections stay locked until another attempt is reset and started."
+            ? "This assignment needs improvement. Falowen is waiting to verify the marked result before opening review. A teacher must authorize another timed attempt."
             : resultLoading
-              ? "Timed attempt submitted. Falowen is checking your latest result; timed sections stay locked until the assignment passes."
-              : "Timed attempt submitted. Timed sections stay locked while the result is pending. They reopen automatically after you pass."}
+              ? "Timed attempt submitted. Falowen is checking your latest result before opening review."
+              : "Timed attempt submitted. Timed sections stay locked while the result is pending; marked attempts reopen for review."}
         </p>
       ) : (
         <p style={{ margin: 0, color: "#475569", fontWeight: 700 }}>
@@ -668,7 +673,7 @@ export function TimedAssignmentPanel({ studyMode = false } = {}) {
         </p>
       )}
 
-      {status && !passedReview ? <p role="status" style={{ margin: 0, color: "#9f1239", fontWeight: 800 }}>{status}</p> : null}
+      {status && !reviewOpen ? <p role="status" style={{ margin: 0, color: "#9f1239", fontWeight: 800 }}>{status}</p> : null}
     </section>
   );
 }

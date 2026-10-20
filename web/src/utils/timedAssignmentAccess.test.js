@@ -48,13 +48,13 @@ describe("timed assignment review access", () => {
     })).toBe(true);
   });
 
-  test("failed timed work stays locked until another attempt is reset and started", () => {
+  test("verified failed work unlocks sections for review without reopening the timed attempt", () => {
     const reviewUnlocked = isTimedAssignmentReviewUnlocked({
       attemptState: "submitted",
-      progress: { status: "failed", passed: false, failed: true },
+      progress: { status: "failed", passed: false, failed: true, hasResult: true, bestScore: 40 },
     });
 
-    expect(reviewUnlocked).toBe(false);
+    expect(reviewUnlocked).toBe(true);
     expect(isTimedAssignmentTabLocked({
       enabled: true,
       timedTabs,
@@ -62,7 +62,17 @@ describe("timed assignment review access", () => {
       secondsLeft: 0,
       tabKey: "schreiben",
       reviewUnlocked,
-    })).toBe(true);
+    })).toBe(false);
+  });
+
+  test("unverified failures, expired unsubmitted work, and reset timers do not unlock review", () => {
+    const failed = { status: "failed", failed: true, passed: false, hasResult: true };
+    expect(isTimedAssignmentReviewUnlocked({
+      attemptState: "submitted", progress: { ...failed, hasResult: false },
+    })).toBe(false);
+    expect(isTimedAssignmentReviewUnlocked({ attemptState: "expired", progress: failed })).toBe(false);
+    expect(isTimedAssignmentReviewUnlocked({ attemptState: "none", progress: failed })).toBe(false);
+    expect(isTimedAssignmentReviewUnlocked({ attemptState: "active", progress: failed })).toBe(false);
   });
 
   test("active timed work remains open regardless of grade history", () => {
