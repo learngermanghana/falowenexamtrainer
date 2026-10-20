@@ -49,4 +49,16 @@ export const fetchA1MockAudioPlaybackUrl = async ({ mockId, part, key, idToken }
   };
 };
 
+// Dedicated public marketing audio: A1 Hören Sample 1 only.
+// No account token or caller-provided R2 object path is accepted by the backend.
+export const fetchFreeHoerenTrialAudio = async ({ part }) => {
+  const response = await axios.get(`${getBackendUrl()}/mock/free-hoeren/audio`, {
+    params: { part },
+    timeout: 12000,
+  });
+  const url = String(response?.data?.url || "");
+  if (!url.startsWith("https://")) throw new Error("Could not prepare free listening audio.");
+  return { url, expiresAt: response?.data?.expiresAt || "" };
+};
+
 export default fetchA1AudioPlaybackUrl;

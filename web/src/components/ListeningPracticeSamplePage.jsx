@@ -3,7 +3,7 @@ import { arrangeMockChoices, mockDisplayAnswer } from "../utils/mockChoicePresen
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
-import { fetchA1MockAudioPlaybackUrl } from "../services/a1AudioService";
+import { fetchA1MockAudioPlaybackUrl, fetchFreeHoerenTrialAudio } from "../services/a1AudioService";
 import { fetchA1ExamHorenAudioPlaybackUrl } from "../services/a1ExamHorenAudioService";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { fetchB1MockAudioPlaybackUrl } from "../services/b1AudioService";
@@ -129,7 +129,7 @@ const answerKeyForPart = (level, part) => {
   }));
 };
 
-const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
+const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken, freeTrial = false }) => {
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -140,7 +140,9 @@ const SampleAudio = ({ level, sampleId, part, objectKey, plays, idToken }) => {
     setError("");
     try {
       const result =
-        level === "A1" && ["sample-2", "sample-3"].includes(sampleId)
+        freeTrial
+          ? await fetchFreeHoerenTrialAudio({ part })
+          : level === "A1" && ["sample-2", "sample-3"].includes(sampleId)
           ? await fetchA1ExamHorenAudioPlaybackUrl({
               sampleId,
               part,
@@ -413,7 +415,7 @@ const BinaryOptions = ({ name, value, onChange, disabled, labels }) => (
   </div>
 );
 
-export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1", mockId = "" }) {
+export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "sample-1", mockId = "", freeTrial = false }) {
   const navigate = useNavigate();
   const { idToken } = useAuth();
   const requestedLevel = String(level || "A1").toUpperCase();
@@ -458,6 +460,12 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   const submitResults = async () => {
     if (submitted || answered !== questions.length) return;
     setSubmitted(true);
+    if (freeTrial) {
+      // Guests see the exact scored Hören Sample 1 locally. Nothing is written
+      // to paid student results, the course book or an unverified guest account.
+      setResultSyncStatus("trial");
+      return;
+    }
     setResultSyncStatus("saving");
 
     const sectionScores = Object.fromEntries(
@@ -721,15 +729,19 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
   return (
     <main style={{ display: "grid", gap: 12 }} data-hoeren-practice-sample>
       <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate(isMock3 ? "/campus/course/a1-final-mock-3" : "/exams/horen")}>
-          {isMock3 ? "← Back to A1 Mock 3 Lesen" : "Back to Hören samples"}
-        </button>
+        {freeTrial ? (
+          <a href="https://exams.falowen.app/" style={{ ...styles.secondaryButton, width:"fit-content", textDecoration:"none" }}>← Falowen Exams</a>
+        ) : (
+          <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate(isMock3 ? "/campus/course/a1-final-mock-3" : "/exams/horen")}>
+            {isMock3 ? "← Back to A1 Mock 3 Lesen" : "Back to Hören samples"}
+          </button>
+        )}
         <p style={{ ...styles.helperText, margin: 0 }}>{normalizedLevel} · Hören</p>
         <h2 style={{ margin: 0 }}>
-          {isMock3 ? "A1 Mock 3 · Hören" : normalizedLevel === "B2" ? "B2 Hören 1" : `Hören ${sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}`}
+          {freeTrial ? "Kostenlose A1 Hören-Prüfung · Sample 1" : isMock3 ? "A1 Mock 3 · Hören" : normalizedLevel === "B2" ? "B2 Hören 1" : `Hören ${sampleId === "sample-3" ? "Sample 3" : sampleId === "sample-2" ? "Sample 2" : "Sample 1"}`}
         </h2>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          {isMock3 ? "Hören Sample 3 is reused here. Complete all 15 questions; this score belongs to Mock 3." : "Complete all listening parts, then check your answers at the end."}
+          {freeTrial ? "Real Falowen A1 Hören Sample 1 from our Exams Room: all 15 questions across Teil 1–3. Listen and complete the exam before checking your results. Free · no account required." : isMock3 ? "Hören Sample 3 is reused here. Complete all 15 questions; this score belongs to Mock 3." : "Complete all listening parts, then check your answers at the end."}
         </p>
       </section>
 
@@ -748,6 +760,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
             objectKey={part.data.audioObjectKey}
             plays={part.data.plays}
             idToken={idToken}
+            freeTrial={freeTrial}
           />
 
           {part.data.example && !Array.isArray(part.data.example) && Array.isArray(part.data.example.options) ? (
@@ -787,6 +800,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
               <p style={{ margin: "5px 0 0" }}>
                 Result: <strong>{score}/{questions.length}</strong> · {percent}%
               </p>
+              {resultSyncStatus === "trial" ? <small>Your free sample result is displayed here; it is not saved to a Falowen account.</small> : null}
               {resultSyncStatus === "saving" ? <small>Saving result…</small> : null}
               {resultSyncStatus === "saved" ? <small>Result saved.</small> : null}
               {resultSyncStatus === "failed" ? <small>Result shown here, but email sync could not be confirmed.</small> : null}
@@ -800,7 +814,7 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
           <button type="button" style={styles.primaryButton} disabled={answered !== questions.length} onClick={submitResults}>
             Check answers
           </button>
-        ) : (
+        ) : freeTrial ? <strong style={{color:"#166534"}}>Hören trial completed ✓</strong> : (
           <button
             type="button"
             style={styles.secondaryButton}
@@ -815,6 +829,31 @@ export default function ListeningPracticeSamplePage({ level = "A1", sampleId = "
           </button>
         )}
       </section>
+      {freeTrial && submitted ? (
+        <section data-testid="free-hoeren-conversion" style={{ ...styles.card, display:"grid", gap:16, border:"2px solid #a7e0d5", background:"#f7fffc" }}>
+          <span style={{fontSize:12,fontWeight:800,color:"#0f766e",letterSpacing:1}}>YOUR FREE HÖREN RESULT</span>
+          <h2 style={{margin:0}}>You answered {score} of {questions.length} questions correctly ({percent}%).</h2>
+          <p style={{margin:0,color:"#475569"}}>{percent >= 75
+            ? "Good listening progress! The next step is practising the other exam skills."
+            : "Keep practising your listening and other language skills. This short sample cannot determine full Goethe exam readiness."}</p>
+          <h3 style={{margin:0}}>How would you like to continue?</h3>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
+            <article style={{background:"#fff",border:"1px solid #cbd5e1",borderRadius:14,padding:17,display:"grid",gap:9}}>
+              <strong style={{fontSize:19}}>Learn German with Falowen</strong>
+              <p style={{margin:0,color:"#475569"}}>Join a guided class, practise regularly and build your language skills with a teacher.</p>
+              <a href="https://www.falowen.app/classes/?source=exams-free-hoeren&level=A1" style={{...styles.primaryButton,textDecoration:"none",textAlign:"center"}}>Explore German classes →</a>
+            </article>
+            <article style={{background:"#fff",border:"1px solid #a7e0d5",borderRadius:14,padding:17,display:"grid",gap:9}}>
+              <strong style={{fontSize:19}}>Continue exam preparation</strong>
+              <p style={{margin:0,color:"#475569"}}>Unlock published Lesen, Hören, Schreiben and Sprechen practice and available mocks at your level.</p>
+              <strong>GH₵99 / 30 days · One level</strong>
+              <a href="/mock/register?level=A1&source=free-hoeren" style={{...styles.primaryButton,textDecoration:"none",textAlign:"center"}}>Unlock exam preparation →</a>
+              <small style={{color:"#64748b"}}>You will create or sign in to a Falowen account before payment.</small>
+            </article>
+          </div>
+          <p style={{margin:0,fontSize:13,color:"#64748b"}}>This is one Hören sample, not a full four-skill exam. Answer corrections are shown above. No payment is required to view them.</p>
+        </section>
+      ) : null}
     </main>
   );
 }

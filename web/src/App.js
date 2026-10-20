@@ -169,6 +169,7 @@ import GeneralHome from "./components/GeneralHome";
 import OnboardingChecklist from "./components/OnboardingChecklist";
 import SpeakingPage from "./components/SpeakingPage";
 import HorenPage from "./components/HorenPage";
+import ListeningPracticeSamplePage from "./components/ListeningPracticeSamplePage";
 import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
 import QuestionOfDayPage from "./components/QuestionOfDayPage";
@@ -518,6 +519,7 @@ function App() {
     return <PublicUpcomingClassesPage />;
   }
 
+  if (location.pathname === "/mock/free-hoeren") return <ListeningPracticeSamplePage level="A1" sampleId="sample-1" freeTrial />;
   if (location.pathname === "/mock/register") return <MockExamSignupPage />;
   if (location.pathname === "/mock/checkout" || location.pathname === "/mock/complete") {
     return <MockExamCheckoutPage paymentReturn={location.pathname === "/mock/complete"} />;
