@@ -16,7 +16,7 @@ const PACKAGES = Object.freeze({
 });
 const LEVELS = Object.keys(READY_MOCKS);
 const euros = (n) => Math.round(Number(n) * 100);
-const isReady = (level, pkg) => LEVELS.includes(level) && pkg?.id === "monthly" && READY_MOCKS[level].length > 0;
+const isReady = (level, pkg) => LEVELS.includes(level) && pkg?.id === "monthly";
 const subscriptionKey = (uid, level) => uid + "_" + level;
 const activeSubscriptionsFor = async (db, uid) => {
   const snap = await db.collection("mockSubscriptions").where("uid", "==", uid).get();
@@ -189,7 +189,7 @@ async function processMockWebhook({ admin, data }) {
       String(data.currency || "").toUpperCase() === "GHS" &&
       String(data.status || "").toLowerCase() === "success" &&
       String(data.customer?.email || "").toLowerCase() === order.email &&
-      order.scope === "level" && isReady(order.level, packageConfig) && Array.isArray(order.mockIds) && order.mockIds.length > 0;
+      order.scope === "level" && isReady(order.level, packageConfig) && Array.isArray(order.mockIds);
     if (!isCorrect) {
       tx.update(orderRef, { status: "rejected", updatedAt: admin.firestore.FieldValue.serverTimestamp() });
       return { status: 202, body: { status: "rejected", reason: "purchase_mismatch" } };
