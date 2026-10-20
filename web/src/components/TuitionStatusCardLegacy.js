@@ -5,6 +5,7 @@ import { computeTuitionStatus, MIN_INSTALLMENT_GHS } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../lib/formatters";
+import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 import { savePaymentAttempt } from "../lib/paymentAttempt";
 
@@ -55,6 +56,7 @@ const TuitionStatusCard = ({
   );
   const paymentsEnabled = isPaymentsEnabled();
   const { idToken, studentProfile, user } = useAuth();
+  const fxQuote = useFalowenUsdGhsRate();
 
   const summary = useMemo(
     () =>
@@ -306,17 +308,18 @@ const TuitionStatusCard = ({
           <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
             <div style={styles.metaRow}>
               <span>{t("accountSettings.tuition.tuition")}</span>
-              <strong>{formatMoney(summary.tuitionFee)}</strong>
+              <strong>{formatMoney(summary.tuitionFee)}{approximateUsd(summary.tuitionFee, fxQuote) && <small style={{display:"block",textAlign:"right",color:"#64748b",fontSize:12}}>≈ {approximateUsd(summary.tuitionFee, fxQuote)} USD</small>}</strong>
             </div>
             <div style={styles.metaRow}>
               <span>{t("accountSettings.tuition.paidSoFar")}</span>
-              <strong>{formatMoney(summary.paidAmount)}</strong>
+              <strong>{formatMoney(summary.paidAmount)}{approximateUsd(summary.paidAmount, fxQuote) && <small style={{display:"block",textAlign:"right",color:"#64748b",fontSize:12}}>≈ {approximateUsd(summary.paidAmount, fxQuote)} USD</small>}</strong>
             </div>
             <div style={styles.metaRow}>
               <span>{t("accountSettings.tuition.balanceRemaining")}</span>
-              <strong>{formatMoney(summary.balanceDue)}</strong>
+              <strong>{formatMoney(summary.balanceDue)}{approximateUsd(summary.balanceDue, fxQuote) && <small style={{display:"block",textAlign:"right",color:"#64748b",fontSize:12}}>≈ {approximateUsd(summary.balanceDue, fxQuote)} USD</small>}</strong>
             </div>
           </div>
+          {fxQuote && <p style={{ ...styles.helperText, margin:"7px 0 0", fontSize:12 }}>USD figures are indicative using the cached rate dated {new Date(fxQuote.fetchedAt).toLocaleDateString("en-GB")}. Paystack charges in GHS; card exchange rates may differ.</p>}
         </>
       ) : description ? (
         <p style={{ ...styles.helperText, margin: 0 }}>{description}</p>
