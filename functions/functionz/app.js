@@ -25,6 +25,7 @@ const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3For
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
+const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -6185,6 +6186,30 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     // This path still requires authentication and consumes the speaking quota above.
     if (req.body?.transcriptionOnly === true || req.body?.transcriptionOnly === "true") {
       return res.json({ transcript, quotaRemaining: quota.remaining });
+    }
+
+    // Day 17 tutor checkpoint needs a numeric 0–10 score. The regular speaking
+    // endpoint returns prose feedback only; do not silently leave this homework
+    // ungradable. Derive the question from a server-owned picture-card whitelist.
+    if (contextType === "A1 tutor checkpoint A1-11" && level === "A1" && String(teil) === "3") {
+      const card = getA1TutorRequestCard(req.body?.cardId);
+      if (!card) return res.status(400).json({ error: "Choose a valid Goethe A1 picture card before recording." });
+      if (!transcript.trim()) return res.status(422).json({ error: "No speech was recognized. Please record your request again." });
+      const evaluation = await createChatCompletion([
+        { role: "system", content: tutorRequestPrompt(card) },
+        { role: "user", content: "Learner's German speech transcript: " + transcript },
+      ], { temperature: 0.2, max_tokens: 380 });
+      let scored;
+      try { scored = parseA1TutorRequestScore(evaluation, card); }
+      catch (scoringError) {
+        console.warn("A1 tutor picture-card rubric invalid", scoringError.message);
+        return res.status(502).json({ error: "Could not validate the speaking score. Please retry assessment; your recording is still on this device." });
+      }
+      auditAIRequest({
+        route: "/speaking/analyze", uid: authedUser.uid, email: authedUser.email,
+        metadata: { teil: "3", level: "A1", task: "A1-11", cardId: card.id, quotaRemaining: quota.remaining },
+      });
+      return res.json({ ...scored, transcript, quotaRemaining: quota.remaining });
     }
 
     const messages = [
