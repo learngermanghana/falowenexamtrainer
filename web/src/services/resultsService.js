@@ -209,6 +209,14 @@ const buildResults = (scores = []) => {
         assignmentId: normalizeString(row.assignmentId || row.assignment_id || row.assignmentKey || canonicalAssignmentKey) || "",
         studentCode: normalizeString(row.studentcode || row.studentCode) || "",
         studentcode: normalizeString(row.studentcode || row.studentCode) || "",
+        // Preserve source ownership when projecting scores for Course Book
+        // progress. Student codes are historical labels, not proof of identity.
+        uid: normalizeString(row.uid) || "",
+        studentId: normalizeString(row.studentId) || "",
+        userId: normalizeString(row.userId) || "",
+        authUid: normalizeString(row.authUid) || "",
+        email: normalizeString(row.email) || "",
+        studentEmail: normalizeString(row.studentEmail) || "",
         studentName: normalizeString(row.name || row.studentName) || "",
         name: normalizeString(row.name || row.studentName) || "",
         level: (row.level || "").toUpperCase(),
