@@ -26,75 +26,29 @@ const Section = ({ title, eyebrow, children }) => (
 );
 
 const pairRows = [
-  {
-    preposition: "in",
-    wohin: "Ich gehe in die Schule.",
-    wo: "Ich bin in der Schule.",
-    note: "die Schule → Akkusativ: die / Dativ: der",
-  },
-  {
-    preposition: "auf",
-    wohin: "Ich lege das Buch auf den Tisch.",
-    wo: "Das Buch liegt auf dem Tisch.",
-    note: "der Tisch → Akkusativ: den / Dativ: dem",
-  },
-  {
-    preposition: "an",
-    wohin: "Ich hänge das Bild an die Wand.",
-    wo: "Das Bild hängt an der Wand.",
-    note: "die Wand → Akkusativ: die / Dativ: der",
-  },
-  {
-    preposition: "unter",
-    wohin: "Der Hund läuft unter den Tisch.",
-    wo: "Der Hund liegt unter dem Tisch.",
-    note: "der Tisch → Akkusativ: den / Dativ: dem",
-  },
-  {
-    preposition: "zwischen",
-    wohin: "Ich stelle den Stuhl zwischen die Tische.",
-    wo: "Der Stuhl steht zwischen den Tischen.",
-    note: "Plural: Akkusativ die / Dativ den (+n when needed)",
-  },
+  { preposition: "in", wohin: "Ich gehe in die Schule.", wohinEn: "I am going to school.", wo: "Ich bin in der Schule.", woEn: "I am at school.", note: "die Schule → Akkusativ: die / Dativ: der" },
+  { preposition: "auf", wohin: "Ich lege das Buch auf den Tisch.", wohinEn: "I put the book on the table.", wo: "Das Buch liegt auf dem Tisch.", woEn: "The book is lying on the table.", note: "der Tisch → Akkusativ: den / Dativ: dem · legen (put) / liegen (lie)" },
+  { preposition: "an", wohin: "Ich hänge das Bild an die Wand.", wohinEn: "I hang the picture on the wall.", wo: "Das Bild hängt an der Wand.", woEn: "The picture is hanging on the wall.", note: "die Wand → Akkusativ: die / Dativ: der" },
+  { preposition: "unter", wohin: "Der Hund läuft unter den Tisch.", wohinEn: "The dog runs under the table.", wo: "Der Hund liegt unter dem Tisch.", woEn: "The dog is lying under the table.", note: "der Tisch → Akkusativ: den / Dativ: dem" },
+  { preposition: "zwischen", wohin: "Ich stelle den Stuhl zwischen die Tische.", wohinEn: "I place the chair between the tables.", wo: "Der Stuhl steht zwischen den Tischen.", woEn: "The chair stands between the tables.", note: "Plural: Akkusativ die / Dativ den (+n when needed) · stellen (place) / stehen (stand)" },
 ];
 
 const quiz = [
-  {
-    prompt: "Ich gehe in ___ Park.",
-    options: ["den", "dem", "der"],
-    answer: "den",
-    explanation: "Wohin? There is movement to a destination, so use Akkusativ: der Park → den Park.",
-  },
-  {
-    prompt: "Ich bin in ___ Park.",
-    options: ["den", "dem", "der"],
-    answer: "dem",
-    explanation: "Wo? This is a location, so use Dativ: der Park → dem Park.",
-  },
-  {
-    prompt: "Sie hängt das Bild an ___ Wand.",
-    options: ["die", "der", "dem"],
-    answer: "die",
-    explanation: "Wohin? The picture is being moved onto the wall: die Wand stays die in Akkusativ.",
-  },
-  {
-    prompt: "Das Bild hängt an ___ Wand.",
-    options: ["die", "der", "dem"],
-    answer: "der",
-    explanation: "Wo? The picture is already there: die Wand → der Wand in Dativ.",
-  },
-  {
-    prompt: "Wir setzen uns neben ___ Lehrer.",
-    options: ["den", "dem", "der"],
-    answer: "den",
-    explanation: "Wohin? setzen shows a change of position: der Lehrer → den Lehrer.",
-  },
-  {
-    prompt: "Wir sitzen neben ___ Lehrer.",
-    options: ["den", "dem", "der"],
-    answer: "dem",
-    explanation: "Wo? sitzen describes position: der Lehrer → dem Lehrer.",
-  },
+  { prompt: "Which case? Ich lege das Buch auf den Tisch.", options: ["Akkusativ", "Dativ", "Nominativ"], answer: "Akkusativ", explanation: "Wohin? legen describes placing the book at a destination; auf den Tisch is accusative." },
+  { prompt: "Which case? Das Buch liegt auf dem Tisch.", options: ["Akkusativ", "Dativ", "Nominativ"], answer: "Dativ", explanation: "Wo? liegen describes position; auf dem Tisch is dative." },
+  { prompt: "Choose the verb: Ich ___ das Buch auf den Tisch.", options: ["lege", "liege", "liegt"], answer: "lege", explanation: "legen = to put or lay something somewhere (Wohin?)." },
+  { prompt: "Choose the verb: Das Buch ___ auf dem Tisch.", options: ["lege", "liegt", "stelle"], answer: "liegt", explanation: "liegen = to be lying in a position (Wo?)." },
+  { prompt: "Choose the verb: Ich ___ den Stuhl neben die Tür.", options: ["stehe", "steht", "stelle"], answer: "stelle", explanation: "stellen = to put something in an upright position (Wohin?)." },
+  { prompt: "Choose the verb: Der Stuhl ___ neben der Tür.", options: ["steht", "stellt", "stelle"], answer: "steht", explanation: "stehen = to stand in a location (Wo?)." },
+  { prompt: "What is the masculine definite article in Dativ?", options: ["den", "dem", "der"], answer: "dem", explanation: "der Tisch → auf dem Tisch (Dativ). Masculine accusative is den." },
+  { prompt: "What is the masculine definite article in Akkusativ?", options: ["den", "dem", "der"], answer: "den", explanation: "der Tisch → auf den Tisch (Akkusativ). Masculine dative is dem." },
+  { prompt: "Correct the destination sentence: Ich gehe in der Schule.", options: ["Ich gehe in die Schule.", "Ich gehe in dem Schule.", "Ich gehe in den Schule."], answer: "Ich gehe in die Schule.", explanation: "For going into/to school, Wohin? → Akkusativ: die Schule. 'Ich gehe in der Schule' can be grammatical if walking inside the school is intended." },
+  { prompt: "Correct the location sentence: Ich bin in die Schule.", options: ["Ich bin in der Schule.", "Ich bin in den Schule.", "Ich bin in das Schule."], answer: "Ich bin in der Schule.", explanation: "Wo? → Dativ: die Schule becomes der Schule." },
+  { prompt: "Ich hänge das Bild an ___ Wand.", options: ["die", "der", "dem"], answer: "die", explanation: "Wohin? → Akkusativ: feminine die remains die." },
+  { prompt: "Das Bild hängt an ___ Wand.", options: ["die", "der", "dem"], answer: "der", explanation: "Wo? → Dativ: die Wand becomes der Wand." },
+  { prompt: "Ich stelle den Stuhl zwischen ___ Tische.", options: ["die", "den", "dem"], answer: "die", explanation: "Wohin? → plural Akkusativ die Tische." },
+  { prompt: "Der Stuhl steht zwischen ___ Tischen.", options: ["die", "den", "dem"], answer: "den", explanation: "Wo? → plural Dativ den Tischen, including -n on the noun." },
+  { prompt: "Ich fahre mit ___ Bus.", options: ["den", "dem", "der"], answer: "dem", explanation: "mit always takes Dativ, even with movement: mit dem Bus." },
 ];
 
 const articles = [
@@ -240,8 +194,8 @@ const TwoCasePrepositionsPageLegacy = () => {
           {pairRows.map((pair) => (
             <article key={pair.preposition} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14, display: "grid", gap: 6 }}>
               <strong style={{ fontSize: 18 }}>{pair.preposition}</strong>
-              <div><strong>Wohin?</strong> {pair.wohin}</div>
-              <div><strong>Wo?</strong> {pair.wo}</div>
+              <div><strong>Wohin? · Akkusativ</strong> {pair.wohin}<div style={{ color: "#475569", fontSize: 14 }}>{pair.wohinEn}</div></div>
+              <div><strong>Wo? · Dativ</strong> {pair.wo}<div style={{ color: "#475569", fontSize: 14 }}>{pair.woEn}</div></div>
               <span style={{ color: "#64748b", fontSize: 14 }}>{pair.note}</span>
             </article>
           ))}
@@ -255,16 +209,16 @@ const TwoCasePrepositionsPageLegacy = () => {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
           <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
             <strong>an</strong>
-            <p style={{ margin: "5px 0 0" }}>Das Bild hängt <strong>an der Wand</strong>.</p>
+            <p style={{ margin: "5px 0 0" }}>Das Bild hängt <strong>an der Wand</strong>. (The picture is hanging on the wall.)</p>
           </div>
           <div style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12 }}>
             <strong>auf</strong>
-            <p style={{ margin: "5px 0 0" }}>Das Buch liegt <strong>auf dem Tisch</strong>.</p>
+            <p style={{ margin: "5px 0 0" }}>Das Buch liegt <strong>auf dem Tisch</strong>. (The book is lying on the table.)</p>
           </div>
         </div>
       </Section>
 
-      <Section eyebrow="Guided practice" title="Choose the correct article">
+      <Section eyebrow="Guided practice" title="Test cases, articles, verb pairs and error correction">
         <div style={{ display: "grid", gap: 12 }}>
           {quiz.map((question, index) => {
             const selected = answers[index];
@@ -306,7 +260,7 @@ const TwoCasePrepositionsPageLegacy = () => {
         </div>
         {showScore ? (
           <div style={{ border: "1px solid #cbd5e1", background: "#f8fafc", borderRadius: 12, padding: 12 }}>
-            <strong>{score}/{quiz.length} correct.</strong> {score >= 5 ? "You are ready for the workbook." : "Review Wo/Wohin and repeat the practice before continuing."}
+            <strong>{score}/{quiz.length} correct.</strong> {score >= Math.ceil(quiz.length * 0.8) ? "You are ready for the workbook." : "Review Wo/Wohin and repeat the practice before continuing."}
           </div>
         ) : null}
       </Section>
