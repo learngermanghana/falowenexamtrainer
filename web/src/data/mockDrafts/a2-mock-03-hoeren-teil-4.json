@@ -1,0 +1,44 @@
+{
+  "mockId": "a2-mock-03",
+  "module": "hoeren",
+  "examPart": "4",
+  "mode": "goethe",
+  "level": "A2",
+  "title": "Ein neuer Job",
+  "kind": "richtig-falsch",
+  "audioObjectKey": "mock-hoeren/mock-03/teil-4.mp3",
+  "audioVerification": "unverified: R2 object not checked",
+  "publicationStatus": "draft-only",
+  "questions": [
+    {
+      "question": "Stefan hat vor seiner Zeit in der Werbeagentur in einem Hotel gearbeitet.",
+      "evidence": "Sie haben vorher in der Gastronomie gearbeitet.",
+      "answer": "Falsch"
+    },
+    {
+      "question": "Stefan hat in seiner ersten Arbeitswoche abends einen Online-Kurs besucht.",
+      "evidence": "ich habe in der ersten Woche abends einen Online-Kurs gemacht.",
+      "answer": "Richtig"
+    },
+    {
+      "question": "Stefan sitzt jeden Tag von morgens bis abends im Großraumbüro.",
+      "evidence": "Nein, nur dienstags und donnerstags.",
+      "answer": "Falsch"
+    },
+    {
+      "question": "Der Arbeitsweg zur Agentur dauert für Stefan nun eine Stunde.",
+      "evidence": "Ich fahre jeden Tag eine ganze Stunde mit dem Bus und der S-Bahn.",
+      "answer": "Richtig"
+    },
+    {
+      "question": "Stefan möchte in Zukunft mit dem Fahrrad zur Arbeit fahren.",
+      "evidence": "Nein, das ist zu weit, die Strecke beträgt fast fünfzehn Kilometer.",
+      "answer": "Falsch"
+    }
+  ],
+  "reviewNotes": [
+    "Q1 needs human audio review: Gastronomie does not by itself exclude working in a hotel, so the provided evidence does not conclusively prove Falsch.",
+    "Listen to recording and verify verbatim evidence for all questions before publication.",
+    "Teil 4 audio is reported uploaded by the user but was not attached or confirmed in R2 in this turn."
+  ]
+}
