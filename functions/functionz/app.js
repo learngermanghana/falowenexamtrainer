@@ -27,6 +27,7 @@ const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } =
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
+const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
@@ -1035,6 +1036,43 @@ app.get("/course-media/a1/exam-hoeren-audio-url", async (req, res) => {
     }
     console.error("Failed to create A1 Hören practice audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this A1 Hören audio right now." });
+  }
+});
+
+// Public marketing sample: only the three already published A1 Hören Mock 01
+// recordings can be signed. All other mock audio stays behind account access.
+const freeHoerenTrialRate = new Map();
+app.get("/mock/free-hoeren/audio", async (req, res) => {
+  res.set("Cache-Control", "no-store, private");
+  res.set("Referrer-Policy", "no-referrer");
+  const requested = resolveTrialAudioRequest(req.query?.part);
+  if (!requested) return res.status(404).json({ error: "This free listening part is not published." });
+  // Best-effort per-instance throttle. Public signed playback remains limited
+  // to exactly the three explicitly released audio keys above.
+  const ip = String(req.ip || req.socket?.remoteAddress || "unknown");
+  const now = Date.now();
+  const counter = freeHoerenTrialRate.get(ip);
+  if (counter && counter.until > now && counter.count >= 60) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+  if (freeHoerenTrialRate.size > 3000) {
+    for (const [key, item] of freeHoerenTrialRate) {
+      if (item.until <= now) freeHoerenTrialRate.delete(key);
+    }
+    if (freeHoerenTrialRate.size > 3000) freeHoerenTrialRate.clear();
+  }
+  freeHoerenTrialRate.set(ip, counter && counter.until > now
+    ? { count: counter.count + 1, until: counter.until }
+    : { count: 1, until: now + 3600000 });
+  try {
+    const signed = await createA1MockAudioSignedUrl(requested);
+    return res.json({ url: signed.url, expiresAt: signed.expiresAt, level: "A1", sample: "sample-1", part: requested.part });
+  } catch (error) {
+    if (error?.code === "R2_AUDIO_NOT_CONFIGURED") {
+      return res.status(503).json({ error: "Free listening audio is temporarily unavailable." });
+    }
+    console.error("Free Hören trial audio signing failed", error);
+    return res.status(503).json({ error: "Could not load this listening recording. Please retry." });
   }
 });
 
