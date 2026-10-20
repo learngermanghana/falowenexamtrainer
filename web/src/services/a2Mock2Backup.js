@@ -23,11 +23,12 @@ export async function uploadMockAnswerBackup(mockId, section, attemptStartedAtMs
   const ackKey = markerKey(uid, mockId);
   const record = readJson(ackKey);
   const ack = record.attemptStartedAtMs === attemptStartedAtMs ? record.sections || {} : {};
-  if (ack[section] === completedStamp(data)) return false;
+  const stamp = String(completedStamp(data)) + (section === "schreiben" && data.score !== undefined ? ":" + data.score : "");
+  if (ack[section] === stamp) return false;
   await callBackup(mockId, token, {method:"POST", body:JSON.stringify({
     mockId, section, attemptStartedAtMs, data,
   })});
-  localStorage.setItem(ackKey, JSON.stringify({attemptStartedAtMs, sections: {...ack, [section]: completedStamp(data)}}));
+  localStorage.setItem(ackKey, JSON.stringify({attemptStartedAtMs, sections: {...ack, [section]: stamp}}));
   return true;
 }
 
