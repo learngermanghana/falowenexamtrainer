@@ -269,7 +269,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
           : "Read the task, speak naturally, and record your answer. There is no paid AI voice. You can replay and re-record before choosing Assess final recording."}
       </p>
       <div aria-label="Speaking recording controls" style={{display:"grid",gap:10}}>
-        <button type="button" disabled={!canRecord} onClick={record} style={{
+        <button type="button" aria-label={recording ? "Stop recording" : activeBlob ? "Record again" : "Start recording"} disabled={!canRecord} onClick={record} style={{
           padding:14,borderRadius:12,border:recording?"1px solid #fecaca":"1px solid #ccfbf1",
           background:recording?"#fef2f2":"#0f766e",color:recording?"#991b1b":"#fff",
           fontWeight:800,cursor:canRecord?"pointer":"not-allowed",
@@ -280,7 +280,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
           <audio controls src={preview} aria-label="Preview your answer before assessment" />
         </div>}
         {!practiceMode && blob && !recording && !alreadyAssessed &&
-          <button type="button" disabled={busy} onClick={assess} style={{
+          <button type="button" aria-label="Assess final recording" disabled={busy} onClick={assess} style={{
             padding:14,borderRadius:12,background:"#1d4ed8",border:0,
             color:"white",fontWeight:800,cursor:busy?"wait":"pointer",
           }}>{busy ? "Assessing…" : "✓ Assess final recording"}</button>}
