@@ -56,7 +56,7 @@ const registry = {
   writing: Object.fromEntries([
     ...writingLetters,
     ...toRegistryWritingTasks(EXAM_WRITING_MODULES),
-    ...Object.entries(A2_MOCK_2_SCHREIBEN).map(([part, task]) => ({
+    ...Object.entries(A2_MOCK_2_SCHREIBEN).filter(([part]) => part === 'teil1' || part === 'teil2').map(([part, task]) => ({
       id: `a2-mock-02-schreiben-${part}`, level: 'A2', situation: task.situation,
       whatToInclude: task.points, instruction: task.instruction, recipient: task.recipient,
       register: part === 'teil1' ? 'informal' : 'formal', wordTarget: `${task.minWords}-${task.maxWords}`,
