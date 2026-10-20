@@ -33,7 +33,11 @@ function validateBackup(mockId, section, input) {
       if (typeof texts[field] !== "string" || texts[field].length > 12000) throw fail("Writing answer too long");
       safe[field] = texts[field];
     }
-    return {submittedAt: at, ...(mockId === "a2-mock-02" ? safe : {schreiben:safe})};
+    const numeric = Number(input.score);
+    const score = Number.isFinite(numeric) && numeric >= 0 && numeric <= 25 ? numeric : null;
+    return {submittedAt: at, ...(mockId === "a2-mock-02"
+      ? {...safe, startedAt:positiveTime(input.startedAt) ? Number(input.startedAt) : at}
+      : {schreiben:safe, ...(score !== null ? {score} : {})})};
   }
   if (mockId === "a2-mock-02") return {submittedAt: at, answers: answers(input.answers,20)};
   const names = section === "lesen" ? ["teil1Answers","teil2Answers","teil3Answers","teil4Answers"]
