@@ -55,7 +55,7 @@ function A2Mock2SchreibenAttempt({ embedded = false, onComplete, reviewReleased 
   }, [done, marking, draft, idToken, storageKey]);
   useEffect(() => { if (embedded && draft.submittedAt && onComplete) onComplete(); }, [embedded, draft.submittedAt, onComplete]);
   const submit = () => { if (window.confirm("Beide Texte abgeben? Danach können Sie nichts mehr ändern.")) setDraft(old => ({ ...old, submittedAt: Date.now() })); };
-  useEffect(() => { if (embedded && reviewReleased && done && !draft.aiFeedback && !marking && !markError) mark(); }, [embedded, reviewReleased, done, draft.aiFeedback, marking, markError, mark]);
+  // AI grading is opt-in after submission to avoid unnecessary model charges.
   return <main className="a2-mock2-shell" lang="de">
     {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Schreiben</span></div> : null}
     {!draft.startedAt ? <section className="a2-mock2-intro"><p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Schreiben</h1><p>Sie haben 30 Minuten für zwei Aufgaben. Teil 1: etwa 10 Minuten, Teil 2: etwa 20 Minuten. Schreiben Sie zu allen drei Punkten und achten Sie auf Anrede und Gruß.</p><div className="a2-mock2-stat"><span>30 Minuten</span><span>2 Aufgaben</span><span>20–30 / 30–40 Wörter</span></div><p>Ihre Entwürfe werden auf diesem Gerät automatisch gespeichert. Die Uhr läuft weiter, wenn Sie die Seite verlassen.</p><button type="button" className="a2-mock2-primary" onClick={start}>Schreiben starten</button></section> : <>
