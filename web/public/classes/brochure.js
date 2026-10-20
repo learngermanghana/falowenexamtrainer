@@ -6,8 +6,16 @@ const LIVE_CATALOG_ENDPOINTS = [
 let brochureData = null;
 let brochureDataPromise = null;
 let selectedClassId = null;
+let brochureFxRate = null;
 
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
+const usdEstimate = amount => brochureFxRate && Number.isFinite(Number(amount))
+  ? "≈ " + new Intl.NumberFormat("en-US", {style:"currency",currency:"USD"}).format(Number(amount)/brochureFxRate) + " USD"
+  : "";
+const dualPriceMarkup = amount => {
+  const usd = usdEstimate(amount);
+  return formatMoney(amount) + (usd ? `<small style="display:block;color:#63738b;font-size:12px;font-weight:500;margin-top:4px">${usd} · indicative</small>` : "");
+};
 const formatDate = (iso) => {
   if (!iso) return "Always open";
   return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(`${iso}T00:00:00Z`));
@@ -678,9 +686,9 @@ function render() {
   setText("classTitle", course.title);
   setText("classFormat", course.format);
   setHtml("stats", [
-    ["Full course fee", formatMoney(course.tuitionGhs)],
-    ["Installment option", `${formatMoney(firstPayment)} first payment`],
-    ["Balance after installment", `${formatMoney(balance)} after 1 month`],
+    ["Full course fee", dualPriceMarkup(course.tuitionGhs)],
+    ["Installment option", dualPriceMarkup(firstPayment) + " first payment"],
+    ["Balance after installment", dualPriceMarkup(balance) + " after 1 month"],
   ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join(""));
   setHtml("highlights", (course.highlights || []).map((item) => `<li>${item}</li>`).join(""));
   const installmentAccessMonths = Number(brochureData?.coursePolicy?.installmentAccessMonths || 1);
@@ -737,6 +745,17 @@ async function copyBrochureText() {
 
 window.addEventListener("popstate", () => render());
 window.FalowenLoadClassCatalog = loadBrochureDataOnce;
+
+// Server caches the USD/GHS quote for a full day; every visitor receives the same
+// published rate. If unavailable, GHS course prices remain visible and payable.
+fetch("/api/fx/usd-ghs").then(response => response.ok ? response.json() : null)
+  .then(quote => {
+    const rate = Number(quote?.usdToGhs);
+    if (Number.isFinite(rate) && rate > 0) {
+      brochureFxRate = rate;
+      if (brochureData) render();
+    }
+  }).catch(() => {});
 
 loadBrochureDataOnce()
   .then((data) => {
