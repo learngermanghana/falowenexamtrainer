@@ -61,3 +61,42 @@ test.each(["A1", "A2", "B1"])("%s mirror scores arriving after submission update
   unmount();
   mockSubscriptions.forEach(({ stop }) => expect(stop).toHaveBeenCalledTimes(1));
 });
+
+test("A1 Day 19 speaking score belongs to the signed-in UID even when its historical code is a UID fallback", () => {
+  const progress = buildProgressByAssignmentId({
+    level: "A1", studentCode: "FAL-1234", userId: "firebase-josh", email: "josh@example.com",
+    results: [{ assignmentId: "A1-5.9", level: "A1", source:"course_speaking_mock",
+      uid:"firebase-josh", studentCode:"firebase-josh", score:82, passed:true }],
+  });
+  expect(progress["A1-5.9"]).toMatchObject({status:"passed", passed:true, bestScore:82});
+});
+
+test("foreign owned mock scores cannot unlock any student's Course Book", () => {
+  const progress = buildProgressByAssignmentId({
+    level:"A1", studentCode:"student-code", userId:"student-uid", email:"student@example.com",
+    results:[
+      {assignmentId:"A1-5.9",level:"A1",uid:"another-uid",studentCode:"student-code",score:99},
+      {assignmentId:"A1-12.2",level:"A1",uid:"another-uid",score:98},
+    ],
+  });
+  expect(progress["A1-5.9"]).toBeUndefined();
+  expect(progress["A1-12.2"]).toBeUndefined();
+});
+
+test("matching verified email allows recovery when a legacy result has no UID", () => {
+  const progress=buildProgressByAssignmentId({
+    level:"A1", studentCode:"FAL-1234", userId:"signed-in-uid", email:"student@example.com",
+    results:[{assignmentId:"A1-5.9",level:"A1",studentCode:"legacy-code",
+      email:"student@example.com",score:75}],
+  });
+  expect(progress["A1-5.9"].status).toBe("passed");
+});
+
+test("completed timed lock is not a fabricated Day 19 speaking score", () => {
+  const progress=buildProgressByAssignmentId({
+    level:"A1",studentCode:"FAL-1234",userId:"uid",
+    submissions:[{assignmentId:"A1-12.2",level:"A1",studentId:"uid",status:"submitted"}],
+  });
+  expect(progress["A1-12.2"].status).toBe("submitted");
+  expect(progress["A1-5.9"]).toBeUndefined();
+});
