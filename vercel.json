@@ -163,6 +163,32 @@
   "routes": [
     {
       "src": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-landing.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-landing.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/",
       "headers": {
         "Cache-Control": "no-store, no-cache, must-revalidate"
       },

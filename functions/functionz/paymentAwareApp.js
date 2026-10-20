@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerPublicFxRoutes } = require("./publicFxRates");
+const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
@@ -17,6 +19,7 @@ const PAYSTACK_MIN_INSTALLMENT_GHS = 2000;
 
 const app = express();
 app.use(cors({ origin: true }));
+registerPublicFxRoutes(app, { admin });
 app.use(
   express.json({
     limit: "1mb",
@@ -239,6 +242,9 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
   return null;
 };
 
+// Exam-only purchases reuse the same Paystack credentials and authenticated backend.
+registerMockCommerceRoutes(app, { admin, getAuthedUser });
+
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
@@ -452,6 +458,14 @@ app.post("/paystack/webhook", async (req, res) => {
     const payload = req.body || {};
     const { event, data = {} } = payload;
     if (event !== "charge.success") return res.json({ status: "ignored", event });
+
+    // Mock purchases NEVER flow through the tuition balance/contract updater.
+    // Only a signed Paystack event with an existing server-issued mock order
+    // can create an exam entitlement. Webhook retries are idempotent.
+    if (data?.metadata?.productType === "mock_package") {
+      const result = await processMockWebhook({ admin, data });
+      return res.status(result.status).json(result.body);
+    }
 
     const reference = String(data.reference || "");
     if (!reference) return res.status(400).json({ error: "Missing Paystack reference" });
@@ -774,6 +788,72 @@ app.get("/internal/marking-manifest", async (req, res) => {
   } catch (error) {
     console.error("Staff marking contract unavailable", { assignmentId, message: error?.message });
     return res.status(503).json({ error: "Marking contract temporarily unavailable" });
+  }
+});
+
+// Exam-only accounts cannot call course/tutor endpoints in the legacy API.
+// This guard complements the UI router and protects billable exam API calls.
+app.use(async (req, res, next) => {
+  try {
+    if (!req.headers.authorization) return next();
+    const identity = await getAuthedUser(req);
+    if (!identity) return res.status(401).json({ error: "Authentication required." });
+    if (identity.examOnly !== true) return next();
+    const path = req.path || "";
+    const allowed = [
+      /^\/(?:a1|a2|b1|b2)-mock\/attempt\/(?:start|save)$/,
+      /^\/(?:writing|speaking)\/(?:a1|a2|b1|b2)-mock-score$/,
+      /^\/course-media\/(?:a1|a2|b1|b2)\/(?:mock-audio-url|exam-hoeren-audio-url)$/,
+      /^\/exam-room\/results$/,
+      /^\/writing\/(?:mark|ideas)$/,
+      /^\/speaking\/(?:analyze|analyze-text|interaction-score)$/,
+      /^\/(?:scores|results\/history|speech\/synthesize)$/
+    ].some(pattern => pattern.test(path));
+    if (!allowed) return res.status(403).json({ error: "Exam-only accounts cannot use course services." });
+    const { activeSubscriptionsFor, READY_MOCKS } = require("./mockCommerce");
+    const active = await activeSubscriptionsFor(admin.firestore(), identity.uid);
+    if (!active.length) return res.status(403).json({ error: "Activate a monthly exam subscription before using this service." });
+    const requestedLevel = (path.match(/^\/(a1|a2|b1|b2)-mock\//i)?.[1]
+      || path.match(/^\/(?:writing|speaking)\/(a1|a2|b1|b2)-mock-score$/i)?.[1]
+      || path.match(/^\/course-media\/(a1|a2|b1|b2)\//i)?.[1] || "").toUpperCase();
+    if (requestedLevel && !active.some(p => p.level === requestedLevel)) {
+      return res.status(403).json({ error: "This exam level is not included in your package." });
+    }
+    const requestedBodyLevel = String(req.body?.level || req.body?.practiceLevel || "").trim().toUpperCase();
+    if (requestedBodyLevel && !active.some(p => p.level === requestedBodyLevel)) {
+      return res.status(403).json({ error: "Your subscription does not cover this requested level." });
+    }
+    // The monthly entitlement covers each published mock at the selected level.
+    // Map existing exam engine IDs to catalogue IDs used by the storefront.
+    const engineToCatalog = {
+      "a1-mock-01": "a1-final-01", "a1-mock-02": "a1-final-02", "a1-mock-03": "a1-final-03",
+      "a2-mock-01": "a2-final-01", "b1-mock-01": "b1-final-01", "b2-mock-01": "b2-final-01"
+    };
+    const ownsExam = (engineId) => active.some(p =>
+      READY_MOCKS[p.level]?.includes(engineToCatalog[engineId]));
+    if (/^\/(?:a1|a2|b1)-mock\/attempt\/(?:start|save)$/.test(path)) {
+      const level = path.slice(1, 3).toUpperCase();
+      const requestIsStart = path.endsWith("/start");
+      let engineId = requestIsStart ? String(req.body?.mockId || level.toLowerCase() + "-mock-01") : "";
+      if (!requestIsStart) {
+        const attemptId = String(req.body?.attemptId || "");
+        if (!attemptId || !/^[A-Za-z0-9_-]{1,130}$/.test(attemptId)) {
+          return res.status(400).json({ error: "Invalid exam attempt." });
+        }
+        const snapshot = await admin.firestore().collection(level.toLowerCase() + "MockExamUsers")
+          .doc(identity.uid).collection("attempts").doc(attemptId).get();
+        engineId = snapshot.exists ? String(snapshot.data()?.mockId || level.toLowerCase() + "-mock-01") : "";
+      }
+      if (!ownsExam(engineId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
+    }
+    if (/^\/(?:writing|speaking)\/a1-mock-score$/.test(path)) {
+      const examId = String(req.body?.mockId || "a1-mock-01");
+      if (!ownsExam(examId)) return res.status(403).json({ error: "This mock is not included in your purchase." });
+    }
+    return next();
+  } catch (error) {
+    console.error("Exam-only API gate failed", error);
+    return res.status(503).json({ error: "Could not validate exam access." });
   }
 });
 

@@ -16,6 +16,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import { formatCurrency } from "../lib/formatters";
+import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
   isFullName,
@@ -96,6 +97,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
+  const fxQuote = useFalowenUsdGhsRate();
   const locale = i18n.language;
   const formatMoney = useMemo(
     () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
@@ -798,12 +800,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
               },
               {
                 value: "full",
-                title: `Pay full fee now · ${formatMoney(tuitionFeeForLevel)}`,
+                title: `Pay full fee now · ${formatMoney(tuitionFeeForLevel)}${approximateUsd(tuitionFeeForLevel, fxQuote) ? ` (≈ ${approximateUsd(tuitionFeeForLevel, fxQuote)} USD)` : ""}`,
                 copy: "Create your account, then continue directly to secure Paystack checkout.",
               },
               {
                 value: "part",
-                title: `Part payment now · ${formatMoney(MIN_INITIAL_PAYMENT)}`,
+                title: `Part payment now · ${formatMoney(MIN_INITIAL_PAYMENT)}${approximateUsd(MIN_INITIAL_PAYMENT, fxQuote) ? ` (≈ ${approximateUsd(MIN_INITIAL_PAYMENT, fxQuote)} USD)` : ""}`,
                 copy: "Create your account, then continue directly to Paystack for the first installment.",
               },
             ].map((option) => {
@@ -860,9 +862,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             paystackLink={tuitionSummary.paystackLink}
             showPaymentAction={false}
             title="Tuition summary"
-            description={`For ${selectedLevel} tuition is ${formatMoney(
-              tuitionSummary.tuitionFee
-            )}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
+            description={`For ${selectedLevel} tuition is ${formatMoney(tuitionSummary.tuitionFee)}${approximateUsd(tuitionSummary.tuitionFee, fxQuote) ? ` (≈ ${approximateUsd(tuitionSummary.tuitionFee, fxQuote)} USD)` : ""}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
           />
 
           <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>

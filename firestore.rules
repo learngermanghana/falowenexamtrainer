@@ -8,6 +8,10 @@ service cloud.firestore {
       );
     }
 
+    function courseUser() {
+      return signedIn() && request.auth.token.get('examOnly', false) != true;
+    }
+
     function isOwner(uid) {
       return signedIn() && request.auth.uid == uid;
     }
@@ -235,28 +239,28 @@ service cloud.firestore {
     // Existing Falowen collections that previously used the authenticated
     // fallback are listed explicitly so they cannot override private writing
     // and user-document rules.
-    match /aiAuditLogs/{document=**} { allow read, write: if signedIn(); }
-    match /announcements/{document=**} { allow read, write: if signedIn(); }
-    match /archived/{document=**} { allow read, write: if signedIn(); }
-    match /assignmentProgress/{document=**} { allow read, write: if signedIn(); }
-    match /attendance/{document=**} { allow read, write: if signedIn(); }
-    match /class_board/{document=**} { allow read, write: if signedIn(); }
-    match /class_lesson_notes/{document=**} { allow read, write: if signedIn(); }
-    match /grammarQuestions/{document=**} { allow read, write: if signedIn(); }
-    match /group_discussion/{document=**} { allow read, write: if signedIn(); }
-    match /language/{document=**} { allow read, write: if signedIn(); }
-    match /leadCaptures/{document=**} { allow read, write: if signedIn(); }
-    match /lessonProgress/{document=**} { allow read, write: if signedIn(); }
+    match /aiAuditLogs/{document=**} { allow read, write: if courseUser(); }
+    match /announcements/{document=**} { allow read, write: if courseUser(); }
+    match /archived/{document=**} { allow read, write: if courseUser(); }
+    match /assignmentProgress/{document=**} { allow read, write: if courseUser(); }
+    match /attendance/{document=**} { allow read, write: if courseUser(); }
+    match /class_board/{document=**} { allow read, write: if courseUser(); }
+    match /class_lesson_notes/{document=**} { allow read, write: if courseUser(); }
+    match /grammarQuestions/{document=**} { allow read, write: if courseUser(); }
+    match /group_discussion/{document=**} { allow read, write: if courseUser(); }
+    match /language/{document=**} { allow read, write: if courseUser(); }
+    match /leadCaptures/{document=**} { allow read, write: if courseUser(); }
+    match /lessonProgress/{document=**} { allow read, write: if courseUser(); }
     match /loginSessions/{document=**} { allow read, write: if signedIn(); }
     match /notifications/{document=**} { allow read, write: if signedIn(); }
-    match /paystackInitRequests/{document=**} { allow read, write: if signedIn(); }
-    match /paystackWebhookEvents/{document=**} { allow read, write: if signedIn(); }
-    match /presentationSessions/{document=**} { allow read, write: if signedIn(); }
-    match /qa_posts/{document=**} { allow read, write: if signedIn(); }
-    match /scores/{document=**} { allow read: if signedIn(); allow write: if isStaff(); }
-    match /sessions/{document=**} { allow read, write: if signedIn(); }
-    match /studentActivityEvents/{document=**} { allow read, write: if signedIn(); }
-    match /studentNotifications/{document=**} { allow read, write: if signedIn(); }
+    match /paystackInitRequests/{document=**} { allow read, write: if courseUser(); }
+    match /paystackWebhookEvents/{document=**} { allow read, write: if courseUser(); }
+    match /presentationSessions/{document=**} { allow read, write: if courseUser(); }
+    match /qa_posts/{document=**} { allow read, write: if courseUser(); }
+    match /scores/{document=**} { allow read: if courseUser(); allow write: if isStaff(); }
+    match /sessions/{document=**} { allow read, write: if courseUser(); }
+    match /studentActivityEvents/{document=**} { allow read, write: if courseUser(); }
+    match /studentNotifications/{document=**} { allow read, write: if courseUser(); }
     match /accountDeletionRequests/{uid} {
       allow read: if isStaff() || (request.auth != null && request.auth.uid == uid);
       allow write: if false;
@@ -264,12 +268,23 @@ service cloud.firestore {
     match /students/{studentId} {
       // Recovery may look up a missing UID document before querying the legacy
       // student-code profile. Only the root profile is readable while paused.
-      allow read: if signedIn() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
-      allow create: if signedIn() && (isStaff() || !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
-      allow update: if signedIn() && (isStaff() || !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest']));
-      allow delete: if isStaff() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow read: if courseUser() || (request.auth != null && (studentId == request.auth.uid || resource.data.uid == request.auth.uid || resource.data.email == request.auth.token.email));
+      allow create: if signedIn() && (isStaff() || (request.auth.token.get('examOnly', false) != true && !request.resource.data.keys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])));
+      allow update: if signedIn() && (isStaff() || (
+        (request.auth.token.get('examOnly', false) != true || resource.data.uid == request.auth.uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['accountDeletionStatus', 'notificationsPausedForDeletion', 'systemDeletionTest', 'accountType'])
+        && (resource.data.get('accountType', '') != 'exam_only' || (
+          resource.data.uid == request.auth.uid
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'role', 'uid', 'studentCode', 'className', 'program', 'status', 'paymentStatus',
+            'paid', 'balanceDue', 'tuitionFee', 'contractStart', 'contractEnd',
+            'onboardingCompleted', 'trialStatus', 'trialStartedAt', 'trialEndsAt'
+          ])
+        ))
+      ));
+      allow delete: if isStaff() || (courseUser() && resource.data.uid == request.auth.uid && resource.data.get('accountType', '') != 'exam_only');
       match /{collectionId}/{documentId}/{nested=**} {
-        allow read, write: if signedIn();
+        allow read, write: if courseUser() || (signedIn() && studentId == request.auth.uid);
       }
     }
     // Goethe Speaking practice history is private to the signed-in learner.
@@ -281,10 +296,10 @@ service cloud.firestore {
       allow update: if signedIn() && resource.data.userId == request.auth.uid
         && request.resource.data.userId == request.auth.uid;
     }
-    match /studyBuddyUsage/{document=**} { allow read, write: if signedIn(); }
+    match /studyBuddyUsage/{document=**} { allow read, write: if courseUser(); }
     match /usageQuotas/{document=**} { allow read, write: if signedIn(); }
-    match /writingScoreStats/{document=**} { allow read, write: if signedIn(); }
-    match /writingSubmissions/{document=**} { allow read, write: if signedIn(); }
+    match /writingScoreStats/{document=**} { allow read, write: if courseUser(); }
+    match /writingSubmissions/{document=**} { allow read, write: if courseUser(); }
 
 
     // Admin and staff marking/dashboard access, including collection-group queries.

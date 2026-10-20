@@ -952,13 +952,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const refreshStudentProfile = useCallback(async () => {
-    if (!studentProfile?.id || !db) return null;
-    const snapshot = await getDoc(doc(db, "students", studentProfile.id));
+    const profileId = studentProfile?.id || user?.uid;
+    if (!profileId || !db) return null;
+    const snapshot = await getDoc(doc(db, "students", profileId));
     if (!snapshot.exists()) return null;
     const profile = { id: snapshot.id, ...snapshot.data() };
     setStudentProfile(profile);
     return profile;
-  }, [studentProfile?.id]);
+  }, [studentProfile?.id, user?.uid]);
 
   const resetPassword = useCallback(async (email) => {
     if (!isFirebaseConfigured || !auth) {
