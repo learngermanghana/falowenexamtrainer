@@ -102,6 +102,12 @@ function registerMockCommerceRoutes(app, { admin, getAuthedUser }) {
       )) {
         return res.status(403).json({ error: "Finish Falowen registration before purchasing." });
       }
+      if (profile.accountType === "exam_only" &&
+          String(profile.level || "").toUpperCase() !== level) {
+        return res.status(403).json({
+          error: "Your exam-only account is registered for a different level. Choose your registered level."
+        });
+      }
       const secret = process.env.PAYSTACK_SECRET;
       if (!secret) return res.status(503).json({ error: "Payments are temporarily unavailable." });
       const amount = pkg.priceGhs; // fixed server-side; never use request.body.amount
