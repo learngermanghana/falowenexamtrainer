@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const legacyApp = require("./app");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { getScoresForStudent } = require("./scoresSheet");
@@ -18,6 +19,7 @@ const PAYSTACK_MIN_INSTALLMENT_GHS = 2000;
 
 const app = express();
 app.use(cors({ origin: true }));
+registerPublicFxRoutes(app, { admin });
 app.use(
   express.json({
     limit: "1mb",
