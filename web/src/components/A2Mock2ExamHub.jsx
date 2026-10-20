@@ -4,7 +4,6 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
-import { syncA2Mock2Backup } from "../services/a2Mock2Backup";
 import { getMockAnswerBackup, restoreA2Mock2Backup, syncA2Mock2Backup } from "../services/a2Mock2Backup";
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
@@ -99,16 +98,6 @@ function A2Mock2ExamHubAttempt(){
   const interval = window.setInterval(reportProgress, 300000);
   return () => window.clearInterval(interval);
  }, [reportProgress, stage]);
- // Back up only completed text/choice modules, never speaking/audio.
- // Failures are best effort and must not interfere with the exam.
- useEffect(() => {
-  if (!idToken || !user?.uid || !flow.startedAt) return;
-  const eligible = ["lesen","hoeren","schreiben"].some(key => progress[key].done);
-  if (!eligible) return;
-  syncA2Mock2Backup(STORAGE, flow.startedAt, idToken, user.uid).catch(() => {
-   // The browser copy remains available; retry when progress changes.
-  });
- }, [idToken, user?.uid, flow.startedAt, progress, STORAGE]);
  const advance = useCallback(()=>{
   setProgress(getProgress(STORAGE));
   setFlow(current=>{
