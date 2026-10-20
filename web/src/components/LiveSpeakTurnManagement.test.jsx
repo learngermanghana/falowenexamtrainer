@@ -378,3 +378,49 @@ test("Record again retains the original pending answer if the server discard fai
   expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
   expect(discards).toBe(2);
 });
+
+test("stuck iPhone examiner playback can be stopped without another AI call or recording", async () => {
+  const player = {play:jest.fn().mockResolvedValue(),pause:jest.fn(),onended:null,onerror:null};
+  global.Audio=jest.fn(()=>player);
+  mount();
+  fireEvent.click(await screen.findByRole("button",{name:"Start speaking"}));
+  await screen.findByText("Examiner speaking");
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeDisabled();
+  const turnsBefore=global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/turn")).length;
+  fireEvent.click(screen.getByRole("button", {name:/Continue with written question · unlock microphone/}));
+  expect(screen.getByRole("button",{name:"Record German answer"})).toBeEnabled();
+  expect(screen.getByText(/Examiner audio stopped/)).toBeInTheDocument();
+  expect(player.pause).toHaveBeenCalled();
+  expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/turn"))).toHaveLength(turnsBefore);
+});
+
+test("A1 Day 19 resumes a server-graded Teil after lost feedback response without grading twice",async()=>{
+  const ownedTask={...examTask,courseAssignmentKey:"A1-5.9",
+    mockAttemptId:"11111111-1111-4111-8111-111111111111"};
+  const saved={...session,examTask:ownedTask,resumed:true,
+    messages:[{role:"assistant",text:"Wie heißen Sie?"},{role:"user",text:"Ich heiße Anna."}],
+    confirmedAnswers:["Ich heiße Anna."],answeredTurns:1};
+  const assessment={practiceOnly:true,score:7,maxScore:10,percent:70,
+    tasks:[{step:1,score:7,maxScore:10}],summary:"Good response"};
+  let released=false;
+  global.fetch=jest.fn(async(url)=>{
+    if(String(url).includes("/live-speak/status")) return ok(released
+      ? {enabled:true,activeSession:null,lastExamResult:{...saved,assessment,
+          feedback:"Saved speaking feedback"}}
+      : {enabled:true,activeSession:saved,examinerFlowVersion:1});
+    if(String(url).endsWith("/session/start"))return ok(saved);
+    throw new Error("Unexpected API call "+url);
+  });
+  const completed=jest.fn(()=>true);
+  render(<MemoryRouter><LiveSpeakPage embedded initialLevel="A1" gradedCourseMock
+    practiceSource="exam-speaking-practice" practiceTopic={ownedTask.prompt}
+    examTask={ownedTask} onExamCompleted={completed}/></MemoryRouter>);
+  fireEvent.click(await screen.findByRole("button",{name:"Resume speaking"}));
+  const recover=await screen.findByRole("button",{name:"Check saved answer / speaking progress"});
+  released=true;
+  fireEvent.click(recover);
+  await waitFor(()=>expect(completed).toHaveBeenCalledWith(expect.objectContaining({
+    sessionId:saved.sessionId,taskId:ownedTask.id,teil:"Teil 1",assessment,
+  })));
+  expect(global.fetch.mock.calls.filter(([url])=>String(url).endsWith("/exam-feedback"))).toHaveLength(0);
+});
