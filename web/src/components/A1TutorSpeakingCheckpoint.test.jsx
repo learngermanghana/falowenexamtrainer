@@ -1,11 +1,13 @@
 import React from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import A1TutorSpeakingCheckpoint from "./A1TutorSpeakingCheckpoint";
 import { createSpeakingMediaRecorder } from "../lib/speakingAudio";
+import { assessA1TutorSpeaking } from "../services/coachService";
 
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { getIdToken: jest.fn() } }) }));
+const mockUpdateSectionText = jest.fn();
 jest.mock("./A1TutorWorkbookDraftContext", () => ({
-  useA1TutorWorkbookDraft: () => ({ draft: { sections: {} }, updateSectionText: jest.fn() }),
+  useA1TutorWorkbookDraft: () => ({ draft: { sections: {} }, updateSectionText: mockUpdateSectionText }),
 }));
 jest.mock("../services/coachService", () => ({ assessA1TutorSpeaking: jest.fn() }));
 jest.mock("../lib/speakingAudio", () => ({
@@ -47,6 +49,9 @@ test.each(["A1-2", "A1-4", "A1-8", "A1-11"])(
     const { media, track } = makeStream();
     const view = render(<A1TutorSpeakingCheckpoint assignmentKey={assignmentKey} sectionKey="teil-3" />);
 
+    if (assignmentKey === "A1-11") {
+      fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    }
     fireEvent.click(screen.getByRole("button", { name: "Start recording" }));
     expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true });
 
@@ -92,4 +97,85 @@ test("stops a successfully opened microphone when navigating away during recordi
   expect(screen.getByRole("button", { name: "Stop recording" })).toBeInTheDocument();
   view.unmount();
   expect(track.stop).toHaveBeenCalled();
+});
+
+test("A1-11 starts with one face-down Goethe picture card, never three separate tasks", () => {
+  const random = jest.spyOn(Math, "random").mockReturnValue(0);
+  try {
+    render(<A1TutorSpeakingCheckpoint assignmentKey="A1-11" sectionKey="teil-1" />);
+    expect(screen.getByText("Verdeckte Bildkarte")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start recording" })).toBeDisabled();
+    expect(screen.queryByText("der Stift")).not.toBeInTheDocument();
+    expect(screen.queryByText("das Fenster")).not.toBeInTheDocument();
+    expect(screen.queryByText("der Stadtplan")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    expect(screen.getByRole("img", { name: "der Stift" })).toBeInTheDocument();
+    expect(screen.getByText("der Stift")).toBeInTheDocument();
+    expect(screen.queryByText("das Fenster")).not.toBeInTheDocument();
+    expect(screen.queryByText("der Stadtplan")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start recording" })).toBeEnabled();
+    expect(screen.queryByRole("button", { name: "Karte ziehen" })).not.toBeInTheDocument();
+    expect(screen.getByText(/one polite request using/i)).toBeVisible();
+  } finally {
+    random.mockRestore();
+  }
+});
+
+test.each([
+  [0, "der Stift"],
+  [0.4, "das Fenster"],
+  [0.9, "der Stadtplan"],
+])("drawing %s produces only the %s speaking request", (randomValue, label) => {
+  const random = jest.spyOn(Math, "random").mockReturnValue(randomValue);
+  try {
+    render(<A1TutorSpeakingCheckpoint assignmentKey="A1-11" sectionKey="teil-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    expect(screen.getByRole("img", { name: label })).toBeInTheDocument();
+    expect(screen.getByText(label)).toBeInTheDocument();
+  } finally {
+    random.mockRestore();
+  }
+});
+
+test("A1-11 assesses only the drawn card and saves the card name with the score", async () => {
+  const random = jest.spyOn(Math, "random").mockReturnValue(0.45);
+  const originalCreateObjectURL = URL.createObjectURL;
+  const originalRevokeObjectURL = URL.revokeObjectURL;
+  URL.createObjectURL = jest.fn(() => "blob:falowen-preview");
+  URL.revokeObjectURL = jest.fn();
+  try {
+    const { media } = makeStream();
+    navigator.mediaDevices.getUserMedia.mockResolvedValueOnce(media);
+    assessA1TutorSpeaking.mockResolvedValueOnce({
+      score: 8.5, maxScore: 10, feedback: "Höfliche Bitte mit Sie und bitte.",
+    });
+    render(<A1TutorSpeakingCheckpoint assignmentKey="A1-11" sectionKey="teil-1" />);
+    fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    expect(screen.getByText("das Fenster")).toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Start recording" }));
+      await Promise.resolve();
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Stop recording" }));
+      await Promise.resolve();
+    });
+    expect(screen.getByRole("button", { name: "Assess final recording" })).toBeEnabled();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "Assess final recording" }));
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(assessA1TutorSpeaking).toHaveBeenCalledTimes(1));
+    expect(assessA1TutorSpeaking).toHaveBeenCalledWith(expect.objectContaining({
+      assignmentKey: "A1-11", examPart: 3,
+      question: expect.stringContaining("das Fenster"),
+    }));
+    expect(mockUpdateSectionText).toHaveBeenCalledWith("teil-1",
+      expect.stringContaining("Drawn picture card: das Fenster"));
+    expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Score: 8.5/10");
+  } finally {
+    random.mockRestore();
+    URL.createObjectURL = originalCreateObjectURL;
+    URL.revokeObjectURL = originalRevokeObjectURL;
+  }
 });
