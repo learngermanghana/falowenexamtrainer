@@ -320,6 +320,7 @@ export default function A2FinalMockExamPage() {
   const [error, setError] = useState("");
   const timeoutHandledRef = useRef("");
   const saveTimerRef = useRef(null);
+  const lastAutosaveStageRef = useRef("");
   const completionSaveRef = useRef("");
   const completionRetryCountRef = useRef(0);
   const savedCompletionToastRef = useRef("");
@@ -345,6 +346,9 @@ export default function A2FinalMockExamPage() {
     if (!exam.attemptInfo?.attemptId || !idToken || exam.completed) return undefined;
     if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
 
+    const stageIdentity = `${exam.attemptInfo.attemptId}:${exam.stage}`;
+    const stageChanged = stageIdentity !== lastAutosaveStageRef.current;
+    lastAutosaveStageRef.current = stageIdentity;
     saveTimerRef.current = window.setTimeout(() => {
       saveA2MockAttempt({
         idToken,
@@ -363,7 +367,7 @@ export default function A2FinalMockExamPage() {
       }).catch((saveError) => {
         console.error("Could not autosave A2 mock", saveError);
       });
-    }, 900);
+    }, stageChanged ? 0 : 12000);
 
     return () => {
       if (saveTimerRef.current) window.clearTimeout(saveTimerRef.current);
