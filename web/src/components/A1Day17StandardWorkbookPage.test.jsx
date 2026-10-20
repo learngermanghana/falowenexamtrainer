@@ -69,7 +69,13 @@ describe("A1 Day 17 native standard workbook", () => {
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 1/i }));
     expect(screen.getByRole("heading", { name: /Sprechen: Bitten und Reagieren/i })).toBeVisible();
-    expect(screen.getByText(/Können Sie mir bitte den Stadtplan geben/i)).toBeVisible();
+    // The learner no longer sees three instructions or three nouns at once.
+    expect(screen.getByRole("button", { name: "Karte ziehen" })).toBeVisible();
+    expect(screen.getByText(/Verdeckte Bildkarte/i)).toBeVisible();
+    expect(screen.queryByText(/Können Sie mir bitte den Stadtplan geben/i)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
+    expect(screen.getByText(/Stellen Sie jetzt eine höfliche Bitte/i)).toBeVisible();
+    expect(screen.queryByRole("button", { name: "Karte ziehen" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: /Teil 2/i }));
     expect(screen.getByRole("heading", { name: /Hören: Wegbeschreibung zum Bahnhof/i })).toBeVisible();
