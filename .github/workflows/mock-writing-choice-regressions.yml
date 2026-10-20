@@ -21,6 +21,8 @@ on:
       - "functions/functionz/a2MockCompletionSync.js"
       - "functions/functionz/a2WritingAssessment.js"
       - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/a2MockSpeakingAttemptIdentity.js"
+      - "functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs"
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
@@ -56,6 +58,8 @@ on:
       - "functions/functionz/a2MockCompletionSync.js"
       - "functions/functionz/a2WritingAssessment.js"
       - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/a2MockSpeakingAttemptIdentity.js"
+      - "functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs"
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
@@ -94,6 +98,8 @@ jobs:
       - name: Verify Mock 2 task registration and score isolation
         working-directory: functions
         run: npx jest --runInBand --runTestsByPath functionz/__tests__/a2Mock2Registration.test.js
+      - name: Verify Mock 2 cannot persist its score into a Mock 1 attempt
+        run: node --test functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs
       - name: Verify exact Mock 2 backend task registry and versions
         run: node scripts/generateAssessmentTaskRegistry.mjs --check
       - name: Build Exam Room web app
