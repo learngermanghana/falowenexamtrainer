@@ -107,7 +107,7 @@ export default function A1Day17StandardWorkbookPage() {
       fallbackAssignmentKey="A1-11"
       title="A1 · Day 17 Workbook · Instructions and Directions"
       subtitle="Chapter 11 · Tutor-marked assignment"
-      assignmentIntro="Complete Sprechen Teil 1, Hören Teil 2 and the five Richtig/Falsch questions in Lesen Teil 3, then open Review & Submit."
+      assignmentIntro="In Workbook Teil 1, draw ONE picture card and record ONE polite Goethe A1 Teil 3 request. Then finish Hören Teil 2 and Lesen Teil 3 before opening Review & Submit."
       submitTitle="Submit A1 · Day 17 · Chapter 11"
     >
       <section style={sectionStyle}>
