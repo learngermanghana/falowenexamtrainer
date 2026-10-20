@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
 import { MOCK_EXAM_CATALOG } from "../data/mockExamCatalog";
 import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
+import { calculateSharedPaystackFee } from "../lib/paystackFeePolicy";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const safeLevels = new Set(LEVELS);
@@ -98,6 +99,7 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   }, [user, paymentReturn]);
   const packages = catalog.find(row => row.level === level)?.packages || [];
   const selectedPackage = packages[0];
+  const checkoutFees = selectedPackage ? calculateSharedPaystackFee(selectedPackage.priceGhs) : null;
   const examOnly = studentProfile?.accountType === "exam_only";
   const buy = async () => {
     if (!selectedPackage) return;
@@ -136,10 +138,10 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
       <p style={{marginBottom:5}}>✓ Results and saved progress where available</p>
       <p style={{fontSize:13,color:"#546b62"}}>Renew manually to extend your access. No automatic monthly charge. Newly published practice at your level is included during your active subscription.</p>
     </div> : <p role="status">Monthly practice for {level} is being prepared. Try again if the subscription plan has not loaded.</p>}
-    {selectedPackage && <p style={{fontSize:13,color:"#64748b"}}>Paystack charges in GHS. The USD figure is an estimate; your bank determines the final foreign-currency amount. Any Paystack fee contribution is shown before payment.</p>}
+    {selectedPackage && <p style={{fontSize:13,color:"#64748b"}}>Paystack charges in GHS. Your total including the shared processing-fee contribution is <strong>{format(checkoutFees?.checkoutAmount || 0)}</strong>{approximateUsd(checkoutFees?.checkoutAmount, fxQuote) ? ` (≈ ${approximateUsd(checkoutFees.checkoutAmount, fxQuote)} USD)` : ""}. Your bank determines the final foreign-currency charge.</p>}
     {error && <p role="alert" style={{color:"#b42318"}}>{error}</p>}
     <button disabled={!selectedPackage || working} onClick={buy} style={{...button, opacity: !selectedPackage || working ? .55 : 1}}>
-      {working ? "Opening secure checkout…" : selectedPackage ? `Subscribe for 30 days · ${format(selectedPackage.priceGhs)} + fees` : "Not yet available"}
+      {working ? "Opening secure checkout…" : selectedPackage ? `Subscribe for 30 days · ${format(checkoutFees.checkoutAmount)} total` : "Not yet available"}
     </button>
   </main>;
 }
