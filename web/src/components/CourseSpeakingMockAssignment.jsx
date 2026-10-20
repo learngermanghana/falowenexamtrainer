@@ -17,6 +17,19 @@ const ASSIGNMENTS = Object.freeze({
 
 const partNumber = value => String(value || "").match(/teil\s*([1-3])/i)?.[1] || "";
 const cacheKey = (uid, assignmentKey) => `falowen:graded-speaking:${uid}:${assignmentKey}`;
+
+// A recovered cloud response may contain Teil 2 or Teil 3 without all earlier
+// parts. Only a complete, ordered prefix can advance a student's assessment.
+export const contiguousVerifiedSpeakingParts = (parts = []) => {
+  const ordered = [];
+  for (let index = 1; index <= 3; index += 1) {
+    const item = parts.find(part => partNumber(part?.teil) === String(index)
+      && Boolean(part?.sessionId) && Number(part?.assessment?.maxScore) > 0);
+    if (!item) break;
+    ordered.push(item);
+  }
+  return ordered;
+};
 const sectionNames = {
   A1: ["Sich vorstellen", "Fragen und Antworten", "Bitten und Reagieren"],
   A2: ["Fragen zur Person", "Von sich erzählen", "Gemeinsam etwas planen"],
@@ -116,9 +129,9 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       // An old local draft did not have an attempt ID. Keep it for review,
       // never combine its parts with newer server-owned attempts.
       setLegacyParts(!verifiedDraft && draft?.results?.length ? draft.results.length : 0);
-      const cloudParts = status.recovery?.parts || [];
-      const completedParts = cloudParts.length >= (verifiedDraft?.results?.length || 0)
-        ? cloudParts : verifiedDraft?.results || [];
+      const cloudParts = contiguousVerifiedSpeakingParts(status.recovery?.parts || []);
+      const localParts = contiguousVerifiedSpeakingParts(verifiedDraft?.results || []);
+      const completedParts = cloudParts.length >= localParts.length ? cloudParts : localParts;
       const selectedTasks = verifiedDraft?.tasks || chooseTasks(config.level);
       if (selectedTasks && completedParts.length) {
         const restoredTasks = selectedTasks.map((task, i) => {
@@ -186,6 +199,53 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       savingRef.current = false;
     }
   }, [idToken, assignmentKey, uid, attemptId]);
+
+  // Owner-scoped verification can recover a graded Teil after a lost HTTP
+  // response. It is a read, not another transcription or AI evaluation.
+  const recoverCompletedParts = useCallback(async () => {
+    if (!idToken || !attemptId || savingRef.current) return;
+    setMessage("Checking Falowen for saved speaking assessments…");
+    try {
+      const status = await fetchCourseSpeakingMockStatus({idToken, assignmentKey});
+      if (status.completed) {
+        setServerResult(status);
+        setStage("complete");
+        saveDraft(uid, assignmentKey, null);
+        return;
+      }
+      if (status.attemptId !== attemptId) {
+        setMessage("A different speaking attempt is now active. Your saved work has not been changed.");
+        return;
+      }
+      const savedParts = contiguousVerifiedSpeakingParts(status.recovery?.parts || []);
+      if (savedParts.length <= results.length) {
+        setMessage(savedParts.length
+          ? `✓ ${savedParts.length} completed Teil(s) verified. Continue with the current step.`
+          : "No graded Teil was found yet. Confirm your transcript or retry feedback in the current Teil.");
+        return;
+      }
+      const restoredTasks = tasks.map((task, index) => {
+        const saved = savedParts[index];
+        return saved?.taskId
+          ? speakingQuestionDictionary.find(q => q.level === config.level && q.id === saved.taskId) || task
+          : task;
+      });
+      setTasks(restoredTasks);
+      setResults(savedParts);
+      saveDraft(uid, assignmentKey, {tasks:restoredTasks,results:savedParts,attemptId});
+      if (savedParts.length === 3) {
+        setStage("submitting");
+        await submit(savedParts);
+      } else {
+        setActivePart(savedParts.length);
+        setStage("exam");
+        setMessage(`✓ Teil ${savedParts.length} recovered. Continue to Teil ${savedParts.length+1}; no new recording was required.`);
+      }
+    } catch (error) {
+      setMessage(error?.response?.data?.error || error?.message ||
+        "Could not check saved speaking parts. Your current answers are unchanged.");
+    }
+  }, [idToken, attemptId, assignmentKey, uid, results.length, tasks, config, submit]);
 
   const onCompletedPart = useCallback(result => {
     if (!result?.sessionId || !result?.assessment ||
@@ -321,6 +381,11 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     </section> : null}
 
     {stage === "exam" && selected ? <section className="speaking-course-mock__exam" aria-label={`Speaking Teil ${activePart + 1}`}>
+      <div className="speaking-course-mock__recovery" style={{display:"grid",gap:5,marginBottom:12}}>
+        <button type="button" style={{...button,background:"#0f766e",justifySelf:"start"}}
+          onClick={recoverCompletedParts}>Check completed speaking Teils</button>
+        <small>If a marked Teil did not move forward, recover its saved result without recording or paying for AI again.</small>
+      </div>
       <LiveSpeakPage key={`${assignmentKey}-${activePart}-${selected.id}`}
         embedded initialLevel={config.level}
         practiceTopic={selected.topicPrompt || selected.text || config.title}
@@ -342,6 +407,8 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       <h2>Submission needs a retry</h2>
       <p>{message}</p><p>Your three assessed parts are retained on this device and on the examiner server. Do not record them again.</p>
       <button type="button" style={button} onClick={() => submit(results)}>Retry score submission</button>
+      <button type="button" style={{...button,marginLeft:8,background:"#0f766e"}}
+        onClick={recoverCompletedParts}>Check saved speaking results</button>
     </section> : null}
 
     {stage === "complete" && serverResult ? <section style={{ ...surface, display: "grid", gap: 16 }}>
