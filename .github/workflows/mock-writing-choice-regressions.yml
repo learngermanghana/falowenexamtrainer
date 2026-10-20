@@ -27,6 +27,10 @@ on:
       - "functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs"
       - "functions/functionz/tests/a2Mock2AssessmentContracts.test.cjs"
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
+      - "web/src/services/a2Mock2Backup.js"
+      - "web/src/services/a2Mock2Backup.test.js"
+      - "functions/functionz/a2Mock2SectionBackup.js"
+      - "functions/functionz/__tests__/mockSectionBackups.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
       - "web/src/components/ListeningPracticeSamplePage.jsx"
@@ -67,6 +71,10 @@ on:
       - "functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs"
       - "functions/functionz/tests/a2Mock2AssessmentContracts.test.cjs"
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
+      - "web/src/services/a2Mock2Backup.js"
+      - "web/src/services/a2Mock2Backup.test.js"
+      - "functions/functionz/a2Mock2SectionBackup.js"
+      - "functions/functionz/__tests__/mockSectionBackups.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
       - "web/src/components/B2FinalMockExamPage.jsx"
       - "web/src/components/ListeningPracticeSamplePage.jsx"
@@ -97,12 +105,12 @@ jobs:
         run: npx jest --runInBand --runTestsByPath src/utils/mockChoicePresentation.test.js src/data/a2Mock2Lesen.test.js src/data/a2Mock2Hoeren.test.js src/components/A2Mock2Integration.test.js src/data/consistentWritingPatterns.test.jsx src/components/B1WritingWorkspace.test.jsx src/components/A1Day20GoetheWritingGrammarPage.test.jsx
       - name: Verify Mock 2 saved submission recovery and retryable AI grading
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js src/services/a2Mock2Backup.test.js
       - name: Verify Mock 2 ephemeral audio and transcript-only AI processing
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/services/coachServiceAudioPersistence.test.js src/components/A2Mock2AiAssessmentContract.test.js
       - name: Verify Mock 2 task registration and score isolation
-        run: node --test functions/functionz/tests/a2Mock2AssessmentContracts.test.cjs functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs
+        run: node --test functions/functionz/tests/a2Mock2AssessmentContracts.test.cjs functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs functions/functionz/__tests__/mockSectionBackups.test.js
       - name: Verify exact Mock 2 backend task registry and versions
         run: node scripts/generateAssessmentTaskRegistry.mjs --check
       - name: Build Exam Room web app
