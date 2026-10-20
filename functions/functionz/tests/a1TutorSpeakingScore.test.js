@@ -2,8 +2,17 @@
 
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore, CRITERIA } = require("../a1TutorSpeakingScore");
 const cards = require("../../../shared/a1GoetheTeil3PictureCards.json");
+const packagedCards = require("../../data/a1GoetheTeil3PictureCards.json");
+const fs = require("node:fs");
+const path = require("node:path");
 
 describe("A1 Goethe tutor picture-card score contract", () => {
+  test("Firebase package includes the cards and mirrors the web catalogue", () => {
+    expect(packagedCards).toEqual(cards);
+    const scorer = fs.readFileSync(path.join(__dirname, "../a1TutorSpeakingScore.js"), "utf8");
+    expect(scorer).toContain('require("../data/a1GoetheTeil3PictureCards.json")');
+    expect(scorer).not.toContain("../../shared/");
+  });
   test("18 eligible Goethe Teil 3 cards share one server-owned catalogue", () => {
     expect(cards).toHaveLength(18);
     expect(new Set(cards.map(card => card.id)).size).toBe(18);
