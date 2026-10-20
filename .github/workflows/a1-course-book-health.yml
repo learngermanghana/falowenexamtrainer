@@ -69,11 +69,14 @@ jobs:
           CI: true
         run: npx jest --runInBand --forceExit --runTestsByPath src/components/A1WorkbookMediaPanel.regression.test.jsx
 
-      - name: Run A1 Day 17 navigation regression in isolation
+      - name: Run A1 Day 17 navigation and speaking-card regression in isolation
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --forceExit --runTestsByPath src/components/A1Day17StandardWorkbookPage.test.jsx
+        run: >-
+          npx jest --runInBand --forceExit --runTestsByPath
+          src/components/A1Day17StandardWorkbookPage.test.jsx
+          src/components/A1TutorSpeakingCheckpoint.test.jsx
 
       - name: Build production web app without mutation hooks
         working-directory: web
