@@ -90,7 +90,7 @@ function A2Mock2SprechenAttempt({ embedded = false, onComplete, reviewReleased =
   } catch(e) {setError(e?.response?.data?.error||e.message||"Sprechen konnte nicht bewertet werden.");}
   finally {setMarking(false);}
  };
- useEffect(()=>{if(embedded && reviewReleased && completed===5 && !marking && !assessment && !error && !attempts._mock2AiScored)mark();},[embedded,reviewReleased,completed,marking,assessment,error,attempts._mock2AiScored]);
+  // Final AI scoring is opt-in; opening the result page must never incur AI charges.
   return <main className="a2-mock2-shell" lang="de" data-a2-mock2-sprechen>
   {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Sprechen</span></div> : null}
   <header className="a2-mock2-progress"><div><strong>Sprechen · Übungstest 2</strong><span>{completed}/5 Antworten transkribiert · Audio nicht gespeichert</span></div><strong>Teil {task.teil}</strong></header>
