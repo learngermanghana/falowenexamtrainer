@@ -29,6 +29,7 @@ on:
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/services/a2Mock2Backup.js"
       - "web/src/services/a2Mock2Backup.test.js"
+      - "web/src/components/FullMockPendingWriting.test.js"
       - "functions/functionz/a2Mock2SectionBackup.js"
       - "functions/functionz/__tests__/mockSectionBackups.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
@@ -73,6 +74,7 @@ on:
       - "functions/functionz/__tests__/a2Mock2Registration.test.js"
       - "web/src/services/a2Mock2Backup.js"
       - "web/src/services/a2Mock2Backup.test.js"
+      - "web/src/components/FullMockPendingWriting.test.js"
       - "functions/functionz/a2Mock2SectionBackup.js"
       - "functions/functionz/__tests__/mockSectionBackups.test.js"
       - "web/src/components/B1FinalMockExamPage.jsx"
@@ -105,7 +107,7 @@ jobs:
         run: npx jest --runInBand --runTestsByPath src/utils/mockChoicePresentation.test.js src/data/a2Mock2Lesen.test.js src/data/a2Mock2Hoeren.test.js src/components/A2Mock2Integration.test.js src/data/consistentWritingPatterns.test.jsx src/components/B1WritingWorkspace.test.jsx src/components/A1Day20GoetheWritingGrammarPage.test.jsx
       - name: Verify Mock 2 saved submission recovery and retryable AI grading
         working-directory: web
-        run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js src/services/a2Mock2Backup.test.js
+        run: npx jest --runInBand --runTestsByPath src/components/A2Mock2SubmissionRecovery.test.jsx src/components/A2MockAnswerVisibility.test.jsx src/components/A2Mock2UnifiedFlow.test.js src/services/a2Mock2Backup.test.js src/components/FullMockPendingWriting.test.js
       - name: Verify Mock 2 ephemeral audio and transcript-only AI processing
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/services/coachServiceAudioPersistence.test.js src/components/A2Mock2AiAssessmentContract.test.js
