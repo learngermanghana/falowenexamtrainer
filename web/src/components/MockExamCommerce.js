@@ -81,7 +81,6 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   const { user, studentProfile } = useAuth();
   const [catalog, setCatalog] = useState([]);
   const [level, setLevel] = useState(String(studentProfile?.level || "A1").toUpperCase());
-  const [packageId, setPackageId] = useState("single");
   const [access, setAccess] = useState([]);
   const [working, setWorking] = useState(false);
   const [error, setError] = useState("");
@@ -96,13 +95,14 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
     return () => { active = false; };
   }, [user, paymentReturn]);
   const packages = catalog.find(row => row.level === level)?.packages || [];
-  const selectedPackage = packages.find(row => row.id === packageId) || packages[0];
+  const selectedPackage = packages[0];
+  const examOnly = studentProfile?.accountType === "exam_only";
   const buy = async () => {
     if (!selectedPackage) return;
     setWorking(true); setError("");
     try {
       const token = await user.getIdToken();
-      const data = await api("/mock/checkout", { method:"POST", token, body:{ level, packageId: selectedPackage.id } });
+      const data = await api("/mock/checkout", { method:"POST", token, body:{ level, packageId: "monthly" } });
       const destination = new URL(data.authorization_url);
       if (!["checkout.paystack.com", "paystack.com"].includes(destination.hostname) || destination.protocol !== "https:") {
         throw new Error("Unexpected payment gateway URL.");
@@ -113,26 +113,28 @@ export function MockExamCheckoutPage({ paymentReturn = false }) {
   if (!user) return <Navigate to="/login/" replace />;
   return <main style={card}>
     <a href="/" style={{ color: "#0b776e" }}>← Falowen Exams</a>
-    <h1>{paymentReturn ? "Payment confirmation" : "Choose your exam package"}</h1>
+    <h1>{paymentReturn ? "Monthly access confirmation" : "Your monthly exam subscription"}</h1>
     {paymentReturn && <p>Paystack has returned you to Falowen. Access appears below only after the signed payment notification is confirmed. Refresh this page if the payment is still processing.</p>}
     {access.length > 0 && <div style={{ padding: 14, background:"#e6f8f0", borderRadius:10 }}>
-      <strong>Your active exam purchases</strong>
-      {access.map(row=><p key={row.id}>{row.level} · {row.mockIds.length} mock(s) · until {new Date(row.expiresAtMs).toLocaleDateString()}</p>)}
+      <strong>Your active level subscriptions</strong>
+      {access.map(row=><p key={row.id}>{row.level} · All published mock exams and skill practice · expires {new Date(row.expiresAtMs).toLocaleDateString()}</p>)}
       <a href="/exams/overview" style={{ ...button, display:"inline-block", textDecoration:"none" }}>Open Exams Room →</a>
     </div>}
-    <p>Existing course students keep their course account; exam-only learners will see only purchased exam content.</p>
-    <label style={field}>Choose level<select style={input} value={level} onChange={e=>{setLevel(e.target.value);setPackageId("single");}}>{LEVELS.map(l=><option key={l}>{l}</option>)}</select></label>
-    {packages.length ? <div style={{ display:"grid", gap:12, margin:"18px 0" }}>
-      {packages.map(p => <label key={p.id} style={{ padding:17, border:"1px solid #dbe4ee", borderRadius:10, display:"flex", alignItems:"center", gap:10 }}>
-        <input type="radio" name="package" checked={(selectedPackage?.id === p.id)} onChange={()=>setPackageId(p.id)} />
-        <span><strong>{p.id === "ready" ? "Exam Ready" : "Single Full Mock"}</strong><br />{p.fullMocks} complete mock(s) · {p.days} days access</span>
-        <strong style={{ marginLeft:"auto" }}>{format(p.priceGhs)}</strong>
-      </label>)}
-    </div> : <p role="status">Complete paid mocks for {level} are not available yet. No payment will be taken for this level.</p>}
+    <p>Choose one German level and practise all available mocks, Lesen, Hören, Schreiben and Sprechen in any order for 30 days. No separate Teil purchases.</p>
+    <label style={field}>Subscription level<select style={input} value={level} disabled={examOnly} onChange={e=>setLevel(e.target.value)}>{LEVELS.map(l=><option key={l}>{l}</option>)}</select></label>
+    {examOnly && <p style={{fontSize:13,color:"#64748b"}}>Your exam-only account is registered at {level}. Your subscription covers this level.</p>}
+    {selectedPackage ? <div style={{ padding:22, border:"2px solid #0b776e", borderRadius:14, margin:"18px 0", background:"#f3fbf7" }}>
+      <strong>One plan · {level} Monthly Access</strong>
+      <div style={{fontSize:34,fontWeight:900,marginTop:10}}>{format(selectedPackage.priceGhs)} <small style={{fontSize:14,fontWeight:600}}>/ 30 days</small></div>
+      <p style={{marginBottom:5}}>✓ Every published mock exam at {level}</p>
+      <p style={{marginBottom:5}}>✓ Practise individual Teile and all four skills in any order</p>
+      <p style={{marginBottom:5}}>✓ Results and saved progress where available</p>
+      <p style={{fontSize:13,color:"#546b62"}}>Renew manually to extend your access. No automatic monthly charge. Newly published practice at your level is included during your active subscription.</p>
+    </div> : <p role="status">Complete paid mocks for {level} are not available yet, so we are not selling a monthly subscription at this level.</p>}
     {selectedPackage && <p style={{fontSize:13,color:"#64748b"}}>A small Paystack fee contribution may be added and shown before payment.</p>}
     {error && <p role="alert" style={{color:"#b42318"}}>{error}</p>}
     <button disabled={!selectedPackage || working} onClick={buy} style={{...button, opacity: !selectedPackage || working ? .55 : 1}}>
-      {working ? "Opening secure checkout…" : selectedPackage ? `Continue to Paystack · ${format(selectedPackage.priceGhs)} + fees` : "Not yet available"}
+      {working ? "Opening secure checkout…" : selectedPackage ? `Subscribe for 30 days · ${format(selectedPackage.priceGhs)} + fees` : "Not yet available"}
     </button>
   </main>;
 }
@@ -154,8 +156,11 @@ export function MockExamOnlyGate({ children }) {
   const active = state.active;
   if (!active.length) return <Navigate to="/mock/checkout" replace />;
   if (location.pathname === "/") return <Navigate to="/exams/overview" replace />;
-  const examArea = /^\/exams\/(overview|mocks|file)\/?$/.test(location.pathname);
-  const allowedMockRoutes = active.flatMap(p=>p.mockIds).map(id=>MOCK_EXAM_CATALOG[id]?.route).filter(Boolean);
+  const examArea = /^\/exams\/(overview|mocks|file|lesen|horen|writing|speaking|question|vocab)(?:\/.*)?$/.test(location.pathname);
+  const allowedMockRoutes = Object.values(MOCK_EXAM_CATALOG)
+    .filter(mock => active.some(p => p.level === mock.level) && mock.status !== "planned" &&
+      mock.id !== "a2-course-preview-01" && mock.route)
+    .map(mock => mock.route);
   if (!examArea && !allowedMockRoutes.includes(location.pathname)) {
     return <Navigate to="/exams/overview" replace />;
   }
