@@ -4,6 +4,7 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
+import { getMockAnswerBackup, restoreA2Mock2Backup, syncA2Mock2Backup } from "../services/a2Mock2Backup";
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
 import A2Mock2Schreiben from "./A2Mock2Schreiben";
@@ -42,6 +43,7 @@ function A2Mock2ExamHubAttempt(){
  const [flow,setFlow] = useState(() => initialize(STORAGE));
  const [progress,setProgress] = useState(() => getProgress(STORAGE));
  const [resetError, setResetError] = useState("");
+ const [backupNotice,setBackupNotice] = useState("");
  const stage = flow.stage;
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
@@ -52,6 +54,24 @@ function A2Mock2ExamHubAttempt(){
   window.addEventListener("focus",sync); window.addEventListener("storage",sync);
   return ()=>{window.removeEventListener("focus",sync);window.removeEventListener("storage",sync)};
  },[refresh]);
+ // Fetch at mount only; preserve the local active attempt. Existing completed
+ // sections will be uploaded on the next step even if the student was offline.
+ useEffect(() => {
+  if (!idToken || !user?.uid) return undefined;
+  let alive = true;
+  getMockAnswerBackup("a2-mock-02", idToken).then(remote => {
+   if (!alive || !restoreA2Mock2Backup(STORAGE, remote)) return;
+   setProgress(getProgress(STORAGE));
+   setFlow(initialize(STORAGE));
+   setBackupNotice("Gespeicherte Antworten wiederhergestellt.");
+  }).catch(() => { /* Offline/browser answers remain available. */ });
+  return () => { alive = false; };
+ }, [idToken, user?.uid, STORAGE]);
+ useEffect(() => {
+  if (!idToken || !user?.uid || !flow.startedAt) return;
+  syncA2Mock2Backup(STORAGE, flow.startedAt, idToken, user.uid)
+   .catch(() => { /* Saved locally; next entry/section can retry without blocking. */ });
+ }, [idToken, user?.uid, flow.stage, flow.startedAt, progress, STORAGE]);
  // Lightweight staff monitoring signal: metadata only, never answers or audio.
  const reportProgress = useCallback(async () => {
   if (!idToken || stage === "intro") return;
@@ -75,7 +95,7 @@ function A2Mock2ExamHubAttempt(){
   if (stage === "intro") return undefined;
   reportProgress();
   if (stage === "result") return undefined;
-  const interval = window.setInterval(reportProgress, 60000);
+  const interval = window.setInterval(reportProgress, 300000);
   return () => window.clearInterval(interval);
  }, [reportProgress, stage]);
  const advance = useCallback(()=>{
@@ -123,7 +143,7 @@ function A2Mock2ExamHubAttempt(){
     <p>Lesen · Hören · Schreiben · Sprechen — ein Start, vier Prüfungsteile.</p>
    </header>
    <section className="a2-mock2-full-progress" aria-label="Fortschritt der vier Module">
-    <div className="a2-mock2-full-progress-head"><strong>Prüfungsfortschritt</strong><span>{completed} von 4 Modulen abgeschlossen</span></div>
+    <div className="a2-mock2-full-progress-head"><strong>Prüfungsfortschritt</strong><span>{completed} von 4 Modulen abgeschlossen</span></div>{backupNotice ? <p role="status">{backupNotice}</p> : null}
     <div className="a2-mock2-full-track"><div style={{width:`${completed*25}%`}}/></div>
     <div className="a2-mock2-full-stages">{ORDER.map((key,i)=><div key={key} className={progress[key].done?"complete":stage===key?"current":""}>
       <span aria-hidden="true">{progress[key].done?"✓":i+1}</span><strong>{LABELS[i]}</strong>
