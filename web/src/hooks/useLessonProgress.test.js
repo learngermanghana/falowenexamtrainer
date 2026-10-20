@@ -33,12 +33,13 @@ test.each(["A1-14.1", "A2-3.6", "B1-5.17"])(
   }
 );
 
-test("failed scores stay locked and newer marked corrections take precedence", () => {
+test("failed scores unlock marked review and newer marked corrections take precedence", () => {
   const older = buildProgressByAssignmentId({ results: [{ assignmentId: "A1-14.1", score: 95, date: "2026-10-01" }] });
   const newer = buildProgressByAssignmentId({ results: [{ assignmentId: "A1-14.1", score: 40, date: "2026-10-02" }] });
   const progress = mergeLessonProgress(older, newer)["A1-14.1"];
   expect(progress.status).toBe("failed");
-  expect(isTimedAssignmentReviewUnlocked({ attemptState: "submitted", progress })).toBe(false);
+  expect(progress.hasResult).toBe(true);
+  expect(isTimedAssignmentReviewUnlocked({ attemptState: "submitted", progress })).toBe(true);
 });
 
 test.each(["A1", "A2", "B1"])("%s mirror scores arriving after submission update live progress", async (level) => {
