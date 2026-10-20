@@ -38,8 +38,22 @@ describe("Falowen Exams package inventory", () => {
     expect(isReady("A1", PACKAGES.monthly)).toBe(true);
     expect(isReady("A2", PACKAGES.monthly)).toBe(true);
     expect(isReady("B2", PACKAGES.monthly)).toBe(true);
-    expect(isReady("C1", PACKAGES.monthly)).toBe(false);
-    expect(isReady("C2", PACKAGES.monthly)).toBe(false);
+    expect(isReady("C1", PACKAGES.monthly)).toBe(true);
+    expect(isReady("C2", PACKAGES.monthly)).toBe(true);
+  });
+  test("C1/C2 monthly subscriptions work with practice-only catalogue entries", async () => {
+    for (const level of ["C1", "C2"]) {
+      const admin = fakeAdmin({
+        ...mockOrder(), level, mockIds: [], scope: "level",
+      });
+      const payload = {
+        ...signedPayload(),
+        metadata: { ...signedPayload().metadata, level },
+      };
+      const outcome = await processMockWebhook({ admin, data: payload });
+      expect(outcome.body.status).toBe("synced");
+      expect(admin.values.get(`mockSubscriptions/uid-123_${level}`)).toMatchObject({level, status:"active"});
+    }
   });
   test("prices and access are derived from server-side catalog, not checkout form", () => {
     expect(Object.keys(PACKAGES)).toEqual(["monthly"]);
