@@ -91,7 +91,7 @@ async function claimLegacyA2Mock2ExaminerSessions({db,uid,attemptId,sessionIds})
       const taskId=expectedTaskId(String(index+1),"a2-mock-02");
       if (!snap.exists || record.uid!==uid || record.sessionId!==sessionIds[index] ||
           record.task?.id!==taskId || record.level!=="A2" ||
-          String(record.teil || record.task?.teil || "").match(/\\d+/)?.[0]!==String(index+1) ||
+          String(record.teil || record.task?.teil || "").match(/\d+/)?.[0]!==String(index+1) ||
           record.source!=="exam-speaking-practice" || record.completed!==true ||
           (bound && bound!==attemptId) || !Number.isFinite(score) ||
           !Number.isFinite(max) || max<=0 || score<0 || score>max) {
