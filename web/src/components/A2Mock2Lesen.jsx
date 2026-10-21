@@ -55,8 +55,8 @@ function A2Mock2LesenAttempt({ embedded = false, onComplete, reviewReleased = fa
   return <main className="a2-mock2-shell" lang="en">
     {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks" /><span>A2 · Mock 2 · Lesen</span></div> : null}
     {!state.startedAt ? <section className="a2-mock2-intro">
-      <p className="a2-mock2-kicker">Übungstest 2</p><h1>A2 Lesen</h1>
-      <p>Vier Teile, 20 Aufgaben. Sie haben 30 Minuten Zeit. Lesen Sie alle Texte und wählen Sie die richtige Antwort.</p>
+      <p className="a2-mock2-kicker">Mock Exam 2</p><h1>A2 Lesen</h1>
+      <p>Four parts and 20 questions. You have 30 minutes. Read each German text and select the correct answer.</p>
       <div className="a2-mock2-stat"><span>30 Minuten</span><span>20 Aufgaben</span><span>4 Teile</span></div>
       <p>Your answers are saved on this device. The timer keeps running even if you leave. Correct answers are shown after all four modules are complete.</p>
       <button type="button" className="a2-mock2-primary" onClick={start}>Start reading</button>
@@ -71,10 +71,10 @@ function A2Mock2LesenAttempt({ embedded = false, onComplete, reviewReleased = fa
         </section>
         <footer className="a2-mock2-actions"><button type="button" disabled={active===0} onClick={()=>setActive(v=>v-1)}>Back</button>{active<3?<button type="button" className="a2-mock2-primary" onClick={()=>setActive(v=>v+1)}>Next: Teil {active+2}</button>:<button type="button" className="a2-mock2-primary" onClick={finish}>Submit reading</button>}</footer>
       </> : !reveal ? <p>Reading submitted. Correct answers appear after all four modules are complete.</p> : <section className="a2-mock2-results">
-        <p className="a2-mock2-kicker">Auswertung · {expired && !state.completedAt ? "Zeit abgelaufen" : "Abgegeben"}</p><h1>Ihr Lesen-Ergebnis</h1>
-        <p className="a2-mock2-score">{correct} / 20 <small>richtig · {Math.round(correct/20*100)}%</small></p>
-        <p>Lesen-Punktzahl (von 25): <strong>{(correct/20*25).toFixed(1)}</strong>. Dies ist nur das Lesen-Ergebnis, kein Gesamtergebnis für einen vollständigen Mocktest.</p>
-        {A2_MOCK_2_LESEN.map((p,i)=><section key={p.id}><h2>Teil {i+1}</h2>{p.questions.map(q=><div className="a2-mock2-review" key={q.number}><strong>{q.number}. {q.question}</strong><p>Ihre Antwort: {q.options.length ? mockDisplayAnswer(q.options, answers[q.number], `a2-mock2-lesen-${q.number}`) : String(answers[q.number]||"—").toUpperCase()} · Richtige Antwort: {q.options.length ? mockDisplayAnswer(q.options, q.answer, `a2-mock2-lesen-${q.number}`) : q.answer.toUpperCase()} {answers[q.number]===q.answer?"✓":"✗"}</p><p>{q.explanation}</p></div>)}</section>)}
+        <p className="a2-mock2-kicker">Auswertung · {expired && !state.completedAt ? "Zeit abgelaufen" : "Abgegeben"}</p><h1>Your reading result</h1>
+        <p className="a2-mock2-score">{correct} / 20 <small>correct · {Math.round(correct/20*100)}%</small></p>
+        <p>Lesen-Punktzahl (von 25): <strong>{(correct/20*25).toFixed(1)}</strong>. This is your reading score only, not the final score for the entire mock.</p>
+        {A2_MOCK_2_LESEN.map((p,i)=><section key={p.id}><h2>Teil {i+1}</h2>{p.questions.map(q=><div className="a2-mock2-review" key={q.number}><strong>{q.number}. {q.question}</strong><p>Your answer: {q.options.length ? mockDisplayAnswer(q.options, answers[q.number], `a2-mock2-lesen-${q.number}`) : String(answers[q.number]||"—").toUpperCase()} · Correct answer: {q.options.length ? mockDisplayAnswer(q.options, q.answer, `a2-mock2-lesen-${q.number}`) : q.answer.toUpperCase()} {answers[q.number]===q.answer?"✓":"✗"}</p><p>{q.explanation}</p></div>)}</section>)}
         {!embedded ? <button type="button" className="a2-mock2-primary" onClick={() => { if (window.confirm("Start another attempt? Your saved answers on this device will be replaced.")) start(); }}>Practise again</button> : null}
       </section>}
     </>}
