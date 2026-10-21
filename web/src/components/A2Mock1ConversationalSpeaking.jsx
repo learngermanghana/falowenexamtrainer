@@ -1,4 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { scoreA2MockSpeaking } from "../services/coachService";
 import { A2_GOETHE_SPEAKING_TEIL1 } from "./A2GoetheSpeakingMockTeil1Preview";
 import { A2_GOETHE_SPEAKING_TEIL2 } from "./A2GoetheSpeakingMockTeil2Preview";
 import { A2_GOETHE_SPEAKING_TEIL3 } from "./A2GoetheSpeakingMockTeil3Preview";
@@ -28,41 +30,37 @@ const MOCK_ONE_TASKS = [
   },
 ];
 
-const scoreFromVerifiedParts = (parts) => {
-  const rows = ["1","2","3"].map((number) => {
-    const result=parts[number];
-    const raw=Number(result?.assessment?.score);
-    const max=Number(result?.assessment?.maxScore);
-    if (!Number.isFinite(raw) || !Number.isFinite(max) || max<=0) return null;
-    return {number,score:raw/max*25/3,feedback_en:result.feedback||result.assessment?.summary||""};
-  });
-  if (rows.some(row => !row)) return null;
-  const score=Number(rows.reduce((sum,row)=>sum+row.score,0).toFixed(2));
-  return {
-    score,maxScore:25,
-    passed:score>=15,
-    overall_feedback_en:"AI examiner practice feedback based on three completed speaking parts. This is a Falowen practice estimate, not an official Goethe result.",
-    parts:Object.fromEntries(rows.map(row=>["teil"+row.number,{score:Number(row.score.toFixed(2)),maxScore:25/3,feedback_en:row.feedback_en}])),
-  };
-};
 
 export default function A2Mock1ConversationalSpeaking({
   initialAttempts = {}, attemptId = "", onProgress, onComplete, initialResult = null,
+  externalSecondsLeft = 0,
 }) {
+  const {idToken} = useAuth();
   const [parts, setParts] = useState(() => initialAttempts?.examinerParts || {});
   const tasks=useMemo(()=>MOCK_ONE_TASKS,[]);
   const save = useCallback((_teil,_result,updated)=>{
-    // The parent mock persists this alongside Lesen, Hören and Schreiben, so
-    // a reload resumes the exact completed Teils without a second AI call.
+    // The parent saves the immutable session IDs with this exact Mock 1 attempt.
     onProgress?.({attempts:{...initialAttempts,examinerParts:updated},completedCount:Object.keys(updated).length});
     setParts(updated);
     return true;
   },[initialAttempts,onProgress]);
-  const complete = useCallback(updated=>{
-    const total=scoreFromVerifiedParts(updated);
-    if (total) onComplete?.(total);
-  },[onComplete]);
+  const complete = useCallback(async updated=>{
+    if (!attemptId || !idToken) throw new Error("Sign in to verify your speaking result for this A2 Mock 1 attempt.");
+    // Score only the actual saved examiner sessions on the backend. Missing
+    // Teils are zero, not fabricated transcripts or client-awarded points.
+    const examinerSessionIds=["1","2","3"].map(part=>updated[part]?.sessionId || null);
+    const total=await scoreA2MockSpeaking({
+      idToken,attemptId,mockId:"a2-mock-01",examinerSessionIds,
+    });
+    if (total?.assessmentIdentity !== "a2-mock-01-examiner-verified" ||
+      total?.maxScore !== 25 || !Number.isFinite(Number(total?.score))) {
+      throw new Error("The server has not verified the final A2 speaking score. Retry verification without recording again.");
+    }
+    onComplete?.(total);
+    return true;
+  },[attemptId,idToken,onComplete]);
   if(initialResult) return <p role="status">The A2 speaking mock is complete. Review your saved results below.</p>;
   return <A2MockSpeakingExaminer mockId="a2-mock-01" attemptId={attemptId}
+    externalSecondsLeft={externalSecondsLeft}
     tasks={tasks} savedParts={parts} onSavePart={save} onComplete={complete}/>;
 }
