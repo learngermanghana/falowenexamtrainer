@@ -1,0 +1,28 @@
+.speaking-loading-status {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #93c5fd;
+  border-radius: 14px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  overflow-wrap: anywhere;
+}
+.speaking-loading-status strong { display: block; font-size: 16px; }
+.speaking-loading-status p { margin: 6px 0 0; font-size: 14px; line-height: 1.5; }
+.speaking-loading-status__spinner {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+  box-sizing: border-box;
+  border: 3px solid #bfdbfe;
+  border-top-color: #1d4ed8;
+  border-radius: 50%;
+  animation: speaking-loading-spin 0.9s linear infinite;
+}
+.speaking-loading-status__slow { font-weight: 600; }
+@keyframes speaking-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .speaking-loading-status__spinner { animation: none; }
+}
