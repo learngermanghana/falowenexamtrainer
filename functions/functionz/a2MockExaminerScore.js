@@ -1,10 +1,11 @@
 "use strict";
 
-// Immutable examiner results are the grading evidence for the three-part A2
-// Mock 1 conversation. Never accept scores or transcripts from the browser.
-const expectedTaskId = (part) => `a2-mock-01-speaking-teil-${part}`;
+// Immutable examiner results are evidence for either A2 mock.
+// Reject scores that do not belong to this student, mock and attempt.
+const expectedTaskId = (part, mockId) => `${mockId}-speaking-teil-${part}`;
 
-const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds}) => {
+const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds, mockId = "a2-mock-01"}) => {
+  if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unsupported A2 mock.");
   if (!String(attemptId || "").trim()) {
     throw Object.assign(new Error("The A2 mock attempt ID is required."), {status:400,code:"A2_MOCK_ATTEMPT_ID_REQUIRED"});
   }
@@ -34,7 +35,7 @@ const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds}) => {
     const teil=String(receipt?.teil || receipt?.task?.teil || "").match(/\d+/)?.[0];
     if (receipt?.uid !== uid || receipt?.sessionId !== sessionIds[i] ||
         receipt?.mockAttemptId !== attemptId ||
-        receipt?.task?.id !== expectedTaskId(String(i+1)) ||
+        receipt?.task?.id !== expectedTaskId(String(i+1), mockId) ||
         receipt?.level !== "A2" || teil !== String(i+1) ||
         receipt?.source !== "exam-speaking-practice" || receipt?.completed !== true ||
         !Number.isFinite(raw) || raw<0 || !Number.isFinite(max) || max<=0 || raw>max) {
@@ -49,7 +50,7 @@ const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds}) => {
   return {
     score,maxScore:25,passed:score>=15,parts,
     overall_feedback_en:"Falowen AI examiner result: three verified speaking parts. This is practice marking, not an official Goethe grade.",
-    assessmentIdentity:"a2-mock-01-examiner-verified",
+    assessmentIdentity:`${mockId}-examiner-verified`,
   };
 };
 
