@@ -23,7 +23,6 @@ const READING_REVISIONS = {
 const COMPATIBLE_UNCHANGED_SECTIONS = {
   "A1-12.1": { from: "a1-12.1-bahn-auto-beruf-v2", keys: ["teil-1"] },
   "A1-4": { from: "a1-4-listening-v2", keys: ["teil-3"] },
-  "A1-8": { from: "hamburg-message-and-berlin-train-5-each-v2", keys: ["teil-1"] },
   "A1-11": { from: "tourist-info-and-bahnhof-directions-5-each-v1", keys: ["teil-2"] },
 };
 const readingRevision = (assignmentKey) => {
