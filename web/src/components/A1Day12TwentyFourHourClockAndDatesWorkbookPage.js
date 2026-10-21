@@ -1,140 +1,56 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
-import A1TutorSpeakingCheckpoint from "./A1TutorSpeakingCheckpoint";
 import { styles } from "../styles";
 
+const card = { ...styles.card, display: "grid", gap: 12, marginBottom: 0 };
 const GRAMMAR_ROUTE = "/campus/course/a1-day-12-the-24-hour-clock-and-dates";
-const DAY12_AUDIO_KEY = "a1/day-12/day-12.mp3";
-
-const pageGrid = {
-  display: "grid",
-  gap: 16,
-  minHeight: 1,
-  width: "100%",
-};
-
-const card = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-  marginBottom: 0,
-};
-
-const sectionTitle = {
-  margin: 0,
-  fontSize: "1.1rem",
-};
-
-const paragraph = {
-  margin: 0,
-  lineHeight: 1.7,
-};
-
-const questionBlock = {
-  display: "grid",
-  gap: 7,
-  padding: "12px 14px",
-  border: "1px solid #dbeafe",
-  borderRadius: 12,
-  background: "#ffffff",
-};
-
-const instructionBox = {
-  background: "#eff6ff",
-  border: "1px solid #bfdbfe",
-  borderRadius: 12,
-  color: "#1e3a8a",
-  lineHeight: 1.65,
-  padding: "12px 14px",
-};
-
-const teil1Questions = [
-  { stem: "1. Um wie viel Uhr beginnt die Schiffsfahrt am 10. Oktober?", options: ["a) Um 08:00 Uhr", "b) Um 14:00 Uhr", "c) Um 20:00 Uhr"] },
-  { stem: "2. Wann treffen sie sich vor dem Restaurant?", options: ["a) Um 14:00 Uhr", "b) Um 18:30 Uhr", "c) Um 20:00 Uhr"] },
-  { stem: "3. Um wie viel Uhr fängt das Konzert an?", options: ["a) Um 14:00 Uhr", "b) Um 18:30 Uhr", "c) Um 20:00 Uhr"] },
-  { stem: "4. An welchem Datum fliegt Thomas zurück?", options: ["a) Am 10. Oktober", "b) Am 12. Oktober", "c) Am 20. Oktober"] },
-  { stem: "5. Wann ist der Flug am 12. Oktober?", options: ["a) Um 08:00 Uhr morgens", "b) Um 14:00 Uhr nachmittags", "c) Um 20:00 Uhr abends"] },
+const t1 = [
+  { title: "Text 1 · SMS von Sarah", content: <>Hallo David, unser Film im Kino beginnt heute um <strong>20:15 Uhr</strong>. Wir treffen uns um <strong>19:45 Uhr</strong> vor dem Kino. Bis später, Sarah</>,
+    questions: ["1. Der Film fängt um viertel nach acht abends an.", "2. David und Sarah treffen sich um viertel vor acht."] },
+  { title: "Text 2 · E-Mail von der Arztpraxis", content: <>Sehr geehrte Frau Rossi, Ihr Termin bei Dr. Weber ist am Donnerstag um <strong>15:30 Uhr</strong>. Bitte kommen Sie 10 Minuten früher (um <strong>15:20 Uhr</strong>). Mit freundlichen Grüßen, Ihr Praxisteam</>,
+    questions: ["3. Der Arzttermin ist um halb drei nachmittags."] },
+  { title: "Text 3 · Nachricht von Marco", content: <>Hi Alex, mein Zug kommt um <strong>18:45 Uhr</strong> am Hauptbahnhof an. Ich bin ab <strong>19:15 Uhr</strong> zu Hause. Du kannst ab viertel nach sieben zu mir kommen! Gruß, Marco</>,
+    questions: ["4. Marcos Zug kommt um viertel vor sieben abends an.", "5. Alex kann um 19:15 Uhr zu Marco kommen."] },
 ];
-
-const horenQuestions = [
-  { stem: "1. Der Zug nach Berlin fährt am Freitag ab.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "2. Der Zug kommt um neunzehn Uhr zwanzig in Berlin an.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "3. Es ist jetzt vierzehn Uhr zehn.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "4. Wann fährt der Zug nach Berlin ab?", options: ["a) Am 12. Mai um 14:45 Uhr.", "b) Am 14. Mai um 18:30 Uhr.", "c) Am 12. Mai um 19:20 Uhr."] },
-  { stem: "5. Wann fährt Anna zurück?", options: ["a) Am Freitag, den 12. Mai.", "b) Am Sonntag, den 14. Mai, um 18:30 Uhr.", "c) Am Sonntag, den 14. Mai, um 13:10 Uhr."] },
+const t2 = [
+  { title: "Schild 1 · Bahnhofs-Aushang", content: <>Gleis 3 – Zug nach München. Abfahrt geplant: <strong>14:00 Uhr</strong>. Neuer Abfahrtszeitpunkt: <strong>14:30 Uhr</strong> (30 Minuten Verspätung).</>,
+    question: "6. Wann fährt der Zug nach München ab?", options: ["a) Um zwei Uhr nachmittags.", "b) Um halb drei nachmittags.", "c) Um drei Uhr nachmittags."] },
+  { title: "Schild 2 · Öffnungszeiten Bäckerei", content: <>Bäckerei Becker – Öffnungszeiten. Montag bis Freitag: 06:30 Uhr – 18:30 Uhr. Samstag: 07:00 Uhr – 13:00 Uhr. Sonntag: geschlossen.</>,
+    question: "7. Wann schließt die Bäckerei am Mittwochabend?", options: ["a) Um halb sechs abends.", "b) Um sechs Uhr abends.", "c) Um halb sieben abends."] },
+  { title: "Schild 3 · Restaurant Mamma Mia", content: <>Küchenzeiten: Mittagstisch <strong>11:30–14:30 Uhr</strong>. Abendkarte <strong>17:30–22:00 Uhr</strong>.</>,
+    question: "8. Sie möchten um 15:00 Uhr etwas Warmes essen. Geht das?", options: ["a) Ja, das Restaurant hat durchgehend geöffnet.", "b) Nein, die Küche schließt um 14:30 Uhr.", "c) Ja, aber nur von der Abendkarte."] },
 ];
-
-const QuestionList = ({ questions }) => (
-  <div style={{ display: "grid", gap: 10 }}>
-    {questions.map((question) => (
-      <div key={question.stem} style={questionBlock}>
-        <p style={{ ...paragraph, fontWeight: 800 }}>{question.stem}</p>
-        {question.options.map((option) => (
-          <p key={option} style={paragraph}>{option}</p>
-        ))}
-      </div>
-    ))}
-  </div>
-);
-
+const Question = ({ text, options }) => <div style={{ padding: 12, border: "1px solid #dbeafe", borderRadius: 10, display: "grid", gap: 7 }}>
+  <strong>{text}</strong>
+  {(options || ["Richtig", "Falsch"]).map(option => <div key={option}>{option}</div>)}
+</div>;
 export default function A1Day12TwentyFourHourClockAndDatesWorkbookPage() {
-
-  return (
-    <A1TutorMarkedWorkbookShell
-      day={12}
-      chapter="8"
-      fallbackAssignmentKey="A1-8"
-      title="A1 · Day 12 Workbook · The 24-Hour Clock and Dates"
-      subtitle="Chapter 8 · Tutor-marked assignment"
-      assignmentIntro="Complete the Lesen questions and the Goethe speaking task, then review and submit both Teile."
-      submitTitle="Submit A1 · Day 12 · Chapter 8"
-    >
-      <div data-a1-day12-workbook-content="true" style={pageGrid}>
-        <section style={{ ...card, border: "1px solid #93c5fd", background: "linear-gradient(135deg, #eff6ff, #ffffff)" }}>
-          <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: ".05em", textTransform: "uppercase" }}>
-            Workbook content
-          </p>
-          <h2 style={sectionTitle}>Start here</h2>
-          <p style={paragraph}>
-            This assignment has two graded parts: Lesen and Sprechen. Answer the reading questions and complete the recorded speaking checkpoint.
-          </p>
-          <a href={GRAMMAR_ROUTE} style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}>
-            Review the grammar notes first
-          </a>
-        </section>
-
-        <section style={card}>
-          <h2 style={sectionTitle}>Teil 1: Lesen · Nachricht von Thomas</h2>
-          <div style={instructionBox}>
-            Wähle bei jeder Aufgabe die richtige Lösung <strong>a</strong>, <strong>b</strong> oder <strong>c</strong>.
-          </div>
-          <p style={paragraph}>
-            <strong>Hallo Maria!</strong> Ich bin in Hamburg. Mein Urlaub ist vom <strong>10. Oktober</strong> bis zum <strong>12. Oktober</strong>.
-            Heute ist der <strong>10. Oktober</strong>: Die Schiffsfahrt im Hafen beginnt um <strong>14:00 Uhr</strong>.
-            Wir treffen uns um <strong>18:30 Uhr</strong> vor dem Restaurant. Das Konzert in der Elbphilharmonie fängt um <strong>20:00 Uhr</strong> an.
-            Mein Flug zurück geht am <strong>12. Oktober</strong> um <strong>08:00 Uhr</strong> morgens.
-          </p>
-          <QuestionList questions={teil1Questions} />
-        </section>
-
-        <section style={card}>
-          <h2 style={sectionTitle}>Teil 2: Sprechen · Fragen und Antworten</h2>
-          <A1TutorSpeakingCheckpoint assignmentKey="A1-8" sectionKey="teil-2" />
-        </section>
-
-        <section style={card}>
-          <h2 style={sectionTitle}>Vocabulary reminder</h2>
-          <p style={paragraph}>
-            Time: vierzehn Uhr fünfundvierzig, neunzehn Uhr zwanzig, dreizehn Uhr zehn, achtzehn Uhr dreißig.
-          </p>
-          <p style={paragraph}>
-            Dates and days: Freitag, Sonntag, der zwölfte Mai, der vierzehnte Mai.
-          </p>
-          <p style={paragraph}>
-            Trennbare Verben: <strong>abfahren</strong>, <strong>ankommen</strong>, <strong>zurückfahren</strong>.
-          </p>
-        </section>
-      </div>
-    </A1TutorMarkedWorkbookShell>
-  );
+  return <A1TutorMarkedWorkbookShell fallbackAssignmentKey="A1-8"
+    title="A1 · Day 12 Workbook · The 24-Hour Clock and Dates" subtitle="Chapter 8 · Tutor-marked assignment"
+    assignmentIntro="Read the three messages and three signs. Complete all eight reading questions in two Teile."
+    submitTitle="Submit A1 · Day 12 · Chapter 8">
+    <div data-a1-day12-workbook-content="true" style={{ display: "grid", gap: 16 }}>
+      <section style={card}>
+        <h2>Start here</h2>
+        <p>This assignment has two Lesen parts. Complete questions 1–8 and save your answers under the matching Teil before submitting.</p>
+        <a href={GRAMMAR_ROUTE} style={{ ...styles.secondaryButton, width: "fit-content" }}>Review the 24-hour clock and dates</a>
+      </section>
+      <section style={card}>
+        <h2>Teil 1: E-Mails und SMS (Lesen Teil 1)</h2>
+        <p>Lesen Sie die Texte 1–3 und die Aussagen 1–5. Ist die Aussage <strong>Richtig</strong> oder <strong>Falsch</strong>?</p>
+        {t1.map(text => <article key={text.title} style={{ display: "grid", gap: 10 }}>
+          <h3>{text.title}</h3><p style={{ lineHeight: 1.7 }}>{text.content}</p>
+          {text.questions.map(q => <Question key={q} text={q} />)}
+        </article>)}
+      </section>
+      <section style={card}>
+        <h2>Teil 2: Schilder &amp; Fahrpläne (Lesen Teil 2 &amp; 3)</h2>
+        <p>Lesen Sie die Schilder und die Fragen 6–8. Wählen Sie die richtige Antwort a, b oder c.</p>
+        {t2.map(item => <article key={item.title} style={{ display: "grid", gap: 10 }}>
+          <h3>{item.title}</h3><p style={{ lineHeight: 1.7 }}>{item.content}</p>
+          <Question text={item.question} options={item.options} />
+        </article>)}
+      </section>
+    </div>
+  </A1TutorMarkedWorkbookShell>;
 }
