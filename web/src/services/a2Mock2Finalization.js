@@ -12,13 +12,13 @@ const read = (key) => {
 };
 
 // The server, not the browser's calculated score, owns the official marks.
-export function savedA2Mock2State(keys) {
+export function savedA2Mock2State(keys, stage = "result") {
   const lesen = read(keys.lesen);
   const hoeren = read(keys.hoeren);
   const schreiben = read(keys.schreiben);
   const sprechen = read(keys.sprechen);
   return {
-    stage: "result",
+    stage,
     clientSavedAtMs: Date.now(),
     lesenAnswers: lesen.answers || {},
     hoerenAnswers: hoeren.answers || {},
