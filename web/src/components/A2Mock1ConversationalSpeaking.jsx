@@ -5,6 +5,7 @@ import { A2_GOETHE_SPEAKING_TEIL1 } from "./A2GoetheSpeakingMockTeil1Preview";
 import { A2_GOETHE_SPEAKING_TEIL2 } from "./A2GoetheSpeakingMockTeil2Preview";
 import { A2_GOETHE_SPEAKING_TEIL3 } from "./A2GoetheSpeakingMockTeil3Preview";
 import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
+import LegacyA2FinalMockSpeaking from "./A2FinalMockSpeaking";
 
 const MOCK_ONE_TASKS = [
   {
@@ -59,6 +60,15 @@ export default function A2Mock1ConversationalSpeaking({
     onComplete?.(total);
     return true;
   },[attemptId,idToken,onComplete]);
+  // Preserve in-progress five-recording attempts created before this redesign.
+  // Their verified scoring endpoint still supports those original task IDs.
+  const priorRecordingIds = ["teil1_questions","teil1_answers","teil2_main","teil2_followup","teil3"];
+  const hasLegacyResponses = !initialAttempts?.examinerParts &&
+    priorRecordingIds.some(id=>initialAttempts?.[id]?.transcript || initialAttempts?.[id]?.submitted);
+  if (hasLegacyResponses) return <LegacyA2FinalMockSpeaking
+    externalSecondsLeft={externalSecondsLeft}
+    initialAttempts={initialAttempts} attemptId={attemptId}
+    onProgress={onProgress} onComplete={onComplete}/>;
   if(initialResult) return <p role="status">The A2 speaking mock is complete. Review your saved results below.</p>;
   return <A2MockSpeakingExaminer mockId="a2-mock-01" attemptId={attemptId}
     externalSecondsLeft={externalSecondsLeft}
