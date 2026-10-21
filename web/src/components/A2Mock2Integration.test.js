@@ -5,7 +5,8 @@ test("A2 Mock 2 has a unified route and four separate practice sections",()=>{
  const hub=getMockExam("a2-mock-02");
  expect(hub.route).toBe("/campus/course/a2-mock-2");
  expect(hub.sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
- expect(hub.mode).toBe("section-preview");
+ expect(hub.mode).toBe("full");
+ expect(hub.status).toBe("ready");
  ["lesen","hoeren","schreiben","sprechen"].forEach(key=>expect(getMockExam("a2-mock-02-"+key).route).toBeTruthy());
  expect(A2_MOCK_2_LESEN_QUESTIONS).toHaveLength(20);
  expect(A2_MOCK_2_HOEREN_QUESTIONS).toHaveLength(20);
