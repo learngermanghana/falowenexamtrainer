@@ -164,7 +164,6 @@ test('new Chapter 3 grammar draft saves all six blanks and drops old hobby answe
 
 test.each([
   ["A1-4", "a1-4-listening-v2", "teil-2", "teil-3"],
-  ["A1-8", "hamburg-message-and-berlin-train-5-each-v2", "teil-2", "teil-1"],
   ["A1-11", "tourist-info-and-bahnhof-directions-5-each-v1", "teil-1", "teil-2"],
 ])("%s removes obsolete answers but keeps untouched student work", (assignmentKey, revision, removed, retained) => {
   window.localStorage.setItem(buildA1WorkbookDraftStorageKey(assignmentKey), JSON.stringify({
@@ -180,7 +179,6 @@ test.each([
 
 test.each([
   ["A1-4", "teil-2", 1],
-  ["A1-8", "teil-2", 2],
   ["A1-11", "teil-1", 3],
 ])("%s serializes the speaking checkpoint in the original Teil without audio URL", (assignmentKey, part, exam) => {
   const saved = saveA1WorkbookDraft({ assignmentKey, sections: {
@@ -226,4 +224,21 @@ test("A1 Day 4 current revision retains five new form and spelling answers only"
   expect(submission).toContain("TEIL 1\n1. 26");
   expect(submission).toContain("TEIL 2\n1. zwölf");
   expect(submission).not.toContain("6. OLD");
+});
+
+
+test("A1-8 drops both replaced reading sections and preserves 6–8 in fresh drafts", () => {
+  const id = "A1-8";
+  window.localStorage.setItem(buildA1WorkbookDraftStorageKey(id), JSON.stringify({
+    assignmentKey: id, readingRevision: "hamburg-and-speaking-checkpoint-v3",
+    sections: { "teil-1": { answers: { 1: "B" } }, "teil-2": { text: "old speaking score" } },
+  }));
+  const migrated = readA1WorkbookDraft(id);
+  expect(migrated.sections["teil-1"]).toBeUndefined();
+  expect(migrated.sections["teil-2"]).toBeUndefined();
+  const fresh = saveA1WorkbookDraft({ assignmentKey: id, sections: {
+    "teil-1": { answers: { 1: "Richtig", 5: "Richtig" } },
+    "teil-2": { answers: { 6: "B", 7: "C", 8: "B", 1: "obsolete" } },
+  } });
+  expect(fresh.sections["teil-2"].answers).toEqual({ 6: "B", 7: "C", 8: "B" });
 });

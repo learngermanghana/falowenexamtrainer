@@ -1,26 +1,19 @@
 import fs from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
-
-const workbookSource = fs.readFileSync(new URL("../src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js", import.meta.url), "utf8");
-const draftSource = fs.readFileSync(new URL("../src/utils/a1WorkbookDraft.js", import.meta.url), "utf8");
-
-test("A1 Day 12 uses the new five-question reading and listening sets", () => {
-  assert.match(workbookSource, /Nachricht von Thomas/);
-  assert.match(workbookSource, /Um wie viel Uhr beginnt die Schiffsfahrt am 10\. Oktober\?/);
-  assert.match(workbookSource, /Der Zug kommt um neunzehn Uhr zwanzig in Berlin an\./);
-  assert.match(workbookSource, /Script optional anzeigen/);
-  assert.match(workbookSource, /a1\/day-12\/day-12\.mp3/);
-  assert.match(workbookSource, /<A1ProtectedAudioPlayer day=\{12\}/);
-  assert.doesNotMatch(workbookSource, /Hören starten/);
-  assert.match(workbookSource, /Viertel vor drei \(nachmittags\)/);
-  assert.doesNotMatch(workbookSource, /Wie viele Tage hat der Februar in einem Schaltjahr/);
-  assert.doesNotMatch(workbookSource, /vm22NeVPFNA/);
-});
-
-test("A1 Day 12 invalidates old drafts for both replaced sections", () => {
-  assert.match(
-    draftSource,
-    /"A1-8": \{ revision: "hamburg-message-and-berlin-train-5-each-v2", sections: \{ "teil-1": 5, "teil-2": 5 \} \}/,
-  );
+const source = fs.readFileSync(new URL("./A1Day12TwentyFourHourClockAndDatesWorkbookPage.js", import.meta.url), "utf8");
+const profiles = fs.readFileSync(new URL("../data/a1TutorDraftProfiles.js", import.meta.url), "utf8");
+const draft = fs.readFileSync(new URL("../utils/a1WorkbookDraft.js", import.meta.url), "utf8");
+test("A1-8 uses two new reading parts and no speaking", () => {
+  assert.match(source, /Teil 1: E-Mails und SMS/);
+  assert.match(source, /Teil 2: Schilder/);
+  assert.match(source, /20:15 Uhr/);
+  assert.match(source, /19:45 Uhr/);
+  assert.match(source, /14:30 Uhr/);
+  assert.match(source, /15:00 Uhr/);
+  assert.doesNotMatch(source, /A1TutorSpeakingCheckpoint|Nachricht von Thomas|Schiffsfahrt/);
+  assert.match(profiles, /"teil-1": section\(choiceItems\(5, \["Richtig", "Falsch"\]\)/);
+  assert.match(profiles, /"teil-2": section\(choiceItems\(3, \["A", "B", "C"\]\)/);
+  assert.match(draft, /day12-two-reading-parts-v4/);
+  assert.doesNotMatch(draft, /"A1-8": \{ from:/);
 });

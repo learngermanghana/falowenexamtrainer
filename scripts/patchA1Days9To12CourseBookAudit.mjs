@@ -54,19 +54,25 @@ replaceOnce(
   "Day 11 learner-facing submit description",
 );
 
-replaceOnce(
-  "web/src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js",
-  "<h2 style={sectionTitle}>Teil 4: Vocabulary reminder</h2>",
-  "<h2 style={sectionTitle}>Vocabulary reminder</h2>",
-  "Day 12 unassessed vocabulary heading",
-);
-// Day 12 now intentionally has Lesen + Sprechen; legacy audit fixes must not undo it.
-const day12RegistrySource = fs.readFileSync(path.join(root, "web/src/data/a1AssignmentRegistry.js"), "utf8");
-if (!day12RegistrySource.includes("Teil 2: Sprechen · Fragen und Antworten")) replaceOnce(
-  "web/src/data/a1AssignmentRegistry.js",
-  '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen", "Teil 4: Vocabulary reminder"]],',
-  '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen"]],',
-  "Day 12 assessed-section registry",
-);
+// A1-8 is now a two-reading-part workbook (October 2026).
+// Legacy transformations must never restore the removed speaking or Hören tasks.
+const day12WorkbookSource = fs.readFileSync(path.join(root, "web/src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js"), "utf8");
+const day12NewReading = day12WorkbookSource.includes("Teil 1: E-Mails und SMS")
+  && day12WorkbookSource.includes("Teil 2: Schilder");
+if (!day12NewReading) {
+  replaceOnce(
+    "web/src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js",
+    "<h2 style={sectionTitle}>Teil 4: Vocabulary reminder</h2>",
+    "<h2 style={sectionTitle}>Vocabulary reminder</h2>",
+    "Day 12 unassessed vocabulary heading",
+  );
+  const day12RegistrySource = fs.readFileSync(path.join(root, "web/src/data/a1AssignmentRegistry.js"), "utf8");
+  if (!day12RegistrySource.includes("Teil 2: Sprechen · Fragen und Antworten")) replaceOnce(
+    "web/src/data/a1AssignmentRegistry.js",
+    '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen", "Teil 4: Vocabulary reminder"]],',
+    '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen"]],',
+    "Day 12 assessed-section registry",
+  );
+}
 
 console.log("Applied A1 Days 9–12 Course Book audit fixes.");
