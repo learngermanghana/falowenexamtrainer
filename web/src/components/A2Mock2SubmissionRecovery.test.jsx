@@ -40,8 +40,8 @@ test("an earlier submitted Schreiben advances to Sprechen even without AI feedba
   save("flow", { stage: "schreiben", startedAt: Date.now() - 90000 });
   mount();
 
-  await waitFor(() => expect(screen.getByText("Sprechen · Übungstest 2")).toBeInTheDocument());
-  expect(screen.getByText("3 von 4 Modulen abgeschlossen")).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByText("Speaking · A2 Mock 2")).toBeInTheDocument());
+  expect(screen.getByText("3 of 4 modules completed")).toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(keys.schreiben)).sms).toBe(text.sms);
   expect(JSON.parse(localStorage.getItem(keys.schreiben)).email).toBe(text.email);
   expect(markLetterWithAI).not.toHaveBeenCalled();
@@ -53,7 +53,7 @@ test("an expired Schreiben automatically submits and moves on without an AI resp
   save("flow", { stage: "schreiben", startedAt: Date.now() - 62 * 60 * 1000 });
   mount();
 
-  await waitFor(() => expect(screen.getByText("Sprechen · Übungstest 2")).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByText("Speaking · A2 Mock 2")).toBeInTheDocument());
   const recovered = JSON.parse(localStorage.getItem(keys.schreiben));
   expect(recovered.submittedAt).toEqual(expect.any(Number));
   expect(recovered.sms).toBe("Entwurf bleibt erhalten");
@@ -67,12 +67,12 @@ test("all four submitted modules unlock final review even if both AI marking ser
   expect(isA2Mock2ReviewReady(keys)).toBe(true);
   mount();
 
-  await waitFor(() => expect(screen.getByText("Alle vier Module bearbeitet")).toBeInTheDocument());
-  expect(screen.getByText("4 von 4 Modulen abgeschlossen")).toBeInTheDocument();
+  await waitFor(() => expect(screen.getByText("All four modules completed")).toBeInTheDocument());
+  expect(screen.getByText("4 of 4 modules completed")).toBeInTheDocument();
   expect(markLetterWithAI).not.toHaveBeenCalled();
   expect(scoreA2MockSpeaking).not.toHaveBeenCalled();
-  expect(screen.getByText("Schreiben · KI-Feedback / erneut bewerten")).toBeInTheDocument();
-  expect(screen.getByText("Sprechen · KI-Feedback / erneut bewerten")).toBeInTheDocument();
+  expect(screen.getByText("Writing · AI feedback / retry marking")).toBeInTheDocument();
+  expect(screen.getByText("Speaking · AI examiner feedback")).toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Das ist meine gespeicherte Antwort.");
 });
 
@@ -87,7 +87,7 @@ test("completion tracker immediately counts Lesen and Hören without refreshing 
       .getByRole("button", {name:/Teil 4/}));
     fireEvent.click(screen.getByRole("button", {name:"Lesen abgeben"}));
 
-    await waitFor(() => expect(screen.getByText("1 von 4 Modulen abgeschlossen")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("1 of 4 modules completed")).toBeInTheDocument());
     expect(screen.getByText("Hören · Übungstest 2")).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem(keys.lesen)).completedAt).toEqual(expect.any(Number));
 
@@ -95,7 +95,7 @@ test("completion tracker immediately counts Lesen and Hören without refreshing 
       .getByRole("button", {name:/Teil 4/}));
     fireEvent.click(screen.getByRole("button", {name:"Hören abgeben"}));
 
-    await waitFor(() => expect(screen.getByText("2 von 4 Modulen abgeschlossen")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("2 of 4 modules completed")).toBeInTheDocument());
     expect(screen.getByText("Mock 2 · Schreiben")).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem(keys.hoeren)).completedAt).toEqual(expect.any(Number));
     expect(markLetterWithAI).not.toHaveBeenCalled();
