@@ -2593,7 +2593,7 @@ const b2MockSpeakingScorePrompt = ({ attempts = [], selectedTopicId = "" }) => {
   ].join("\n");
 };
 
-const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
+const a2MockWritingScorePrompt = ({ sms = "", email = "", mockId = "a2-mock-01" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
   "Feedback shown to the learner MUST be in English. German may appear in exact evidence quotes and short corrected examples.",
@@ -2609,7 +2609,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "Use the canonical word target. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
   "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
   "",
-  mockTaskPrompt("A2", "writing"),
+  mockTaskPrompt("A2", "writing", undefined, mockId),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
@@ -4421,6 +4421,21 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     const sms = String(req.body?.sms || "").trim().slice(0, 4000);
     const email = String(req.body?.email || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId = String(req.body?.mockId || "a2-mock-01");
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+      const snap = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+      if (!snap.exists || snap.data()?.mockId !== mockId) {
+        return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"The writing attempt belongs to another A2 mock."});
+      }
+      // Save any existing verified mark without another OpenAI request.
+      const existing = snap.data()?.verifiedSections?.schreiben;
+      if (existing?.verified && Number.isFinite(Number(existing.score))) {
+        return res.json({result:{score:Number(existing.score),maxScore:25,verified:true,reused:true}});
+      }
+    }
 
     let result;
     if (!sms && !email) {
@@ -4453,7 +4468,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
+          { role: "system", content: a2MockWritingScorePrompt({ sms, email, mockId }) },
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
@@ -4575,6 +4590,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           section: "schreiben",
           score: Number(result?.score || 0),
           source: "/writing/a2-mock-score",
+          mockId,
         });
         // The verified score is committed first. An audit-write failure must never
         // change a student's grade or trigger a second AI scoring request.
@@ -5224,6 +5240,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
             mockId,
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -5275,6 +5292,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
             mockId,
             state,
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           tx.set(
@@ -5413,6 +5431,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
+          mockId: attemptData.mockId || "a2-mock-01",
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
