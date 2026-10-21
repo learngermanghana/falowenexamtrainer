@@ -162,3 +162,7 @@ describe("Sheet result feedback presentation", () => {
   });
 
 });
+
+test("an authoritative admin correction is not replaced by old objective evidence", () => {
+  expect(resolveResultScore({score:92,finalScore:92,manualScoreOverride:true,objectiveScore:29,objectiveCorrect:2,objectiveTotal:7})).toBe(92);
+});
