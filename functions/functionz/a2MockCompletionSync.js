@@ -57,6 +57,57 @@ const LISTENING_ANSWER_KEY = Object.freeze({
   "t4-20": "ja",
 });
 
+
+// Mock 2 has its own immutable answer set. Do not reuse Mock 1 keys.
+const MOCK_2_READING_ANSWER_KEY = Object.freeze({
+  "1": "b",
+  "2": "a",
+  "3": "b",
+  "4": "c",
+  "5": "a",
+  "6": "b",
+  "7": "c",
+  "8": "b",
+  "9": "c",
+  "10": "a",
+  "11": "b",
+  "12": "a",
+  "13": "b",
+  "14": "b",
+  "15": "a",
+  "16": "d",
+  "17": "a",
+  "18": "c",
+  "19": "b",
+  "20": "x"
+});
+const MOCK_2_LISTENING_ANSWER_KEY = Object.freeze({
+  "1": "c",
+  "2": "b",
+  "3": "b",
+  "4": "a",
+  "5": "b",
+  "6": "a",
+  "7": "b",
+  "8": "c",
+  "9": "d",
+  "10": "e",
+  "11": "c",
+  "12": "b",
+  "13": "b",
+  "14": "b",
+  "15": "b",
+  "16": "ja",
+  "17": "nein",
+  "18": "nein",
+  "19": "nein",
+  "20": "ja"
+});
+const objectiveKeysForMock = (mockId) =>
+  mockId === "a2-mock-02"
+    ? { lesen: MOCK_2_READING_ANSWER_KEY, hoeren: MOCK_2_LISTENING_ANSWER_KEY }
+    : { lesen: READING_ANSWER_KEY, hoeren: LISTENING_ANSWER_KEY };
+
 const clean = (value = "") => String(value ?? "").trim();
 
 const normalizeObjectiveAnswer = (value) => clean(value).toLowerCase();
@@ -90,9 +141,11 @@ const verifiedSectionScore = (verifiedSections = {}, section) => {
   return Math.max(0, Math.min(25, score));
 };
 
-const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {} } = {}) => {
-  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, READING_ANSWER_KEY);
-  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, LISTENING_ANSWER_KEY);
+const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
+  if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unknown A2 mock answer set.");
+  const keys = objectiveKeysForMock(mockId);
+  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, keys.lesen);
+  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, keys.hoeren);
   const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
   const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
 
@@ -127,6 +180,7 @@ const persistVerifiedA2MockSection = async ({
   section,
   score,
   source,
+  mockId = "a2-mock-01",
 } = {}) => {
   if (!db || !admin) throw new Error("Firestore verification dependencies are unavailable.");
   if (!clean(uid) || !clean(attemptId)) {
@@ -154,6 +208,11 @@ const persistVerifiedA2MockSection = async ({
   }
 
   const attempt = snap.data() || {};
+  if (attempt.mockId && attempt.mockId !== mockId) {
+    const error = new Error("This verified grade belongs to a different A2 mock.");
+    error.code = "A2_MOCK_ATTEMPT_MISMATCH";
+    throw error;
+  }
   if (attempt.uid && attempt.uid !== clean(uid)) {
     const error = new Error("Mock attempt belongs to another account.");
     error.code = "A2_MOCK_ATTEMPT_FORBIDDEN";
@@ -241,8 +300,9 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
   };
 };
 
-const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false } = {}) => {
+const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "a2-mock-01" } = {}) => {
   const number = Math.max(1, Number(attemptNumber) || 1);
+  if (mockId === "a2-mock-02") return `A2-MOCK-02-ATTEMPT-${number}`;
   return firstAttempt || number === 1
     ? "A2-FINAL-MOCK"
     : `A2-FINAL-MOCK-PRACTICE-${number}`;
@@ -256,13 +316,19 @@ const buildA2MockCompletionArtifacts = ({
   firstAttempt = false,
   overall = {},
   sectionScores = {},
+  mockId = "a2-mock-01",
   now = new Date(),
 } = {}) => {
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
-  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt });
+  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
+  const isSecond = mockId === "a2-mock-02";
+  const mockTitle = isSecond ? "A2 Mock 2" : MOCK_TITLE;
+  const mockSource = isSecond ? "a2_mock_02" : "a2_final_mock";
+  const mockLink = isSecond ? "/campus/course/a2-mock-2" : "/campus/course/a2-final-mock-exam";
+  const mockDocPrefix = isSecond ? "a2-mock-02" : "a2-final-mock";
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1
     ? "First readiness attempt"
     : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
@@ -276,8 +342,8 @@ const buildA2MockCompletionArtifacts = ({
     `Overall: ${formatScore(score)}% — ${statusLabel} · ${breakdownText}. Practise next: ${weakest}.`;
   const timestamp = now instanceof Date ? now : new Date(now);
   const iso = Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString();
-  const scoreDocId = safeDocId(`a2-final-mock-${identity.studentCode || authedUser.uid}-${attemptId}`);
-  const notificationId = safeDocId(`a2-final-mock-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const scoreDocId = safeDocId(`${mockDocPrefix}-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const notificationId = safeDocId(`${mockDocPrefix}-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
 
   const scoreDocument = {
     studentCode: identity.studentCode,
@@ -287,7 +353,7 @@ const buildA2MockCompletionArtifacts = ({
     name: identity.name,
     studentName: identity.name,
     level: "A2",
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
     assignmentId,
     assignment_id: assignmentId,
     canonicalAssignmentKey: assignmentId,
@@ -300,7 +366,7 @@ const buildA2MockCompletionArtifacts = ({
     comments,
     feedback: comments,
     date: iso,
-    link: "/campus/course/a2-final-mock-exam",
+    link: mockLink,
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
     attemptLabel,
@@ -310,12 +376,12 @@ const buildA2MockCompletionArtifacts = ({
     scoreBreakdown: breakdown,
     strongestArea: strongest,
     practiseNext: weakest,
-    source: "a2_final_mock",
+    source: mockSource,
     certificateEligible: false,
     progressionEligible: false,
   };
 
-  const notificationTitle = firstAttempt
+  const notificationTitle = isSecond ? "Your A2 Mock 2 result is ready" : firstAttempt
     ? "Your A2 Final Mock result is ready"
     : "Your A2 Final Mock practice result is ready";
 
@@ -328,11 +394,11 @@ const buildA2MockCompletionArtifacts = ({
     timestamp: timestamp.getTime(),
     sentAt: iso,
     route: MOCK_ROUTE,
-    source: "a2_final_mock",
+    source: mockSource,
     studentCode: identity.studentCode,
     studentCodeOriginal: identity.studentCode,
     studentName: identity.name,
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
     assignmentId,
     level: "A2",
     score,
@@ -344,7 +410,7 @@ const buildA2MockCompletionArtifacts = ({
       attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
       category: "feedback",
       route: MOCK_ROUTE,
-      assignment: MOCK_TITLE,
+      assignment: mockTitle,
       assignmentId,
       level: "A2",
       score: String(score),
@@ -379,6 +445,7 @@ const syncA2MockCompletion = async ({
   firstAttempt,
   overall,
   sectionScores,
+  mockId = "a2-mock-01",
   now,
 } = {}) => {
   if (!db || !admin) throw new Error("Firestore sync dependencies are unavailable.");
@@ -392,6 +459,7 @@ const syncA2MockCompletion = async ({
     firstAttempt,
     overall,
     sectionScores,
+    mockId,
     now,
   });
 
@@ -448,6 +516,8 @@ module.exports = {
   MOCK_TITLE,
   READING_ANSWER_KEY,
   LISTENING_ANSWER_KEY,
+  MOCK_2_READING_ANSWER_KEY,
+  MOCK_2_LISTENING_ANSWER_KEY,
   scoreObjectiveAnswers,
   buildVerifiedA2MockScore,
   persistVerifiedA2MockSection,
