@@ -1,3 +1,4 @@
+import LearnerContactDetails from "./LearnerContactDetails";
 import { AccountDeletionCard } from "./AccountDeletion";
 import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -615,6 +616,7 @@ const AccountSettings = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <LearnerContactDetails />
       <section
         aria-label="Account overview"
         style={{
