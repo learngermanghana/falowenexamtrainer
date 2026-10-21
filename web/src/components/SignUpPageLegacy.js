@@ -106,6 +106,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const { showToast } = useToast();
   const paymentsEnabled = isPaymentsEnabled();
   const now = useMemo(() => new Date(), []);
+  const [step, setStep] = useState(1);
+  const stepHeadingRef = useRef(null);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -270,6 +272,43 @@ const SignUpPage = ({ onLogin, onBack }) => {
     }
   };
 
+  const stepForField = (field) => ["name", "email", "password", "confirmPassword"].includes(field)
+    ? 1 : ["selectedLevel", "learningMode", "selectedClass", "initialPaymentAmount"].includes(field) ? 2 : 3;
+
+  const showStepError = (issues) => {
+    const first = Object.keys(issues)[0];
+    if (!first) return false;
+    setFieldErrors(issues);
+    setAuthError(issues[first]);
+    setStep(stepForField(first));
+    window.requestAnimationFrame(() => focusField(first));
+    return true;
+  };
+
+  const accountIssues = () => {
+    const issues = {};
+    if (!isFullName(name)) issues.name = "Enter your first and last name for your certificates.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Enter a valid email address.";
+    if (password.length < 8 || !/[a-z]/i.test(password) || !/[0-9]/.test(password)) issues.password = "Use at least 8 characters, including a letter and a number.";
+    if (!confirmPassword || password !== confirmPassword) issues.confirmPassword = "Passwords do not match. Please check both fields.";
+    return issues;
+  };
+
+  const continueStep = () => {
+    const issues = step === 1 ? accountIssues() : {
+      ...(!learningMode ? { learningMode: "Choose how you plan to learn." } : {}),
+      ...(!selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
+    };
+    if (showStepError(issues)) return;
+    setAuthError("");
+    setFieldErrors({});
+    setStep((current) => Math.min(current + 1, 3));
+  };
+
+  useEffect(() => {
+    if (stepHeadingRef.current) stepHeadingRef.current.focus();
+  }, [step]);
+
   const interpretSignupError = (error) => {
     const code = error?.code || "";
     if (code.includes("email-already-in-use")) {
@@ -316,6 +355,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (step < 3) { continueStep(); return; }
     setAuthError("");
     setMessage("");
     setFieldErrors({});
@@ -328,7 +368,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     const cleanedLocation = normalizeWhitespace(location);
     const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
 
-    const validationIssues = {};
+    const validationIssues = accountIssues();
 
     if (paymentOption !== "trial" && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
       validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
@@ -389,7 +429,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
       setFieldErrors(validationIssues);
       const firstInvalidField = Object.keys(validationIssues)[0];
       if (firstInvalidField) {
-        focusField(firstInvalidField);
+        setStep(stepForField(firstInvalidField));
+        window.requestAnimationFrame(() => focusField(firstInvalidField));
       }
       const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
       setAuthError(summaryMessage);
@@ -481,6 +522,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const friendlyError = interpretSignupError(error);
       if (friendlyError.field) {
         setFieldError(friendlyError.field, friendlyError.message);
+        setStep(stepForField(friendlyError.field));
+        window.requestAnimationFrame(() => focusField(friendlyError.field));
       }
 
       const errorMessage = friendlyError.message;
@@ -526,7 +569,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             marginBottom: 12,
             border: "1px solid #dbeafe",
             position: "relative",
-            minHeight: 170,
+            minHeight: 120,
             backgroundImage:
               "linear-gradient(120deg, rgba(30,64,175,0.9), rgba(56,189,248,0.82)), url('/learning-space-hero.svg')",
             backgroundSize: "cover",
@@ -542,17 +585,29 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </p>
             <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
             <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
-              Create your account and start your 7-day trial immediately. You can explore before payment or pay right away if you prefer.
+              Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen.
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <label style={styles.label}>{t("signupPage.fields.name")}</label>
+        <form onSubmit={handleSubmit} noValidate data-signup-step={step} style={{ display: "grid", gap: 16 }}>
+          <nav aria-label="Signup progress">
+            <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {["Your account", "Your learning", "Contact details"].map((label, index) => <li key={label} aria-current={step === index + 1 ? "step" : undefined} style={{ borderTop: `4px solid ${step >= index + 1 ? "#2563eb" : "#e2e8f0"}`, paddingTop: 10, color: step === index + 1 ? "#1d4ed8" : "#64748b", fontSize: 13, fontWeight: step === index + 1 ? 700 : 500 }}>{index + 1}. {label}</li>)}
+            </ol>
+          </nav>
+          <div>
+            <p style={{ margin: "0 0 6px", color: "#64748b", fontSize: 13 }}>Step {step} of 3 · All details are collected before your account is created</p>
+            <h3 ref={stepHeadingRef} tabIndex={-1} style={{ margin: 0, color: "#0f172a", fontSize: 23 }}>{["Let’s create your account", "Choose how you’ll learn", "How can we reach you?"][step - 1]}</h3>
+            <p style={{ margin: "8px 0 0", color: "#475569", lineHeight: 1.6 }}>{["Use your full name and an email you can access.", "Choose your level, learning mode and class, then select trial or payment.", "We need your contact and emergency details before you begin. Going back keeps your answers."][step - 1]}</p>
+          </div>
+          <fieldset aria-label="Your account" disabled={step !== 1 || loading} hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 1 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-name" style={styles.label}>{t("signupPage.fields.name")}</label>
           <input
             type="text"
             required
             autoComplete="name"
+            id="signup-name"
             ref={(element) => {
               fieldRefs.current.name = element;
             }}
@@ -570,11 +625,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
             Please enter your full name (first and last). We use it to print certificates and transcripts.
           </p>
 
-          <label style={styles.label}>{t("signupPage.fields.email")}</label>
+          <label htmlFor="signup-email" style={styles.label}>{t("signupPage.fields.email")}</label>
           <input
             type="email"
             required
             autoComplete="email"
+            id="signup-email"
             ref={(element) => {
               fieldRefs.current.email = element;
             }}
@@ -589,13 +645,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
 
-          <label style={styles.label}>{t("signupPage.fields.password")}</label>
+          <label htmlFor="signup-password" style={styles.label}>{t("signupPage.fields.password")}</label>
           <div style={{ position: "relative" }}>
           <input
             type={showPasswords ? "text" : "password"}
             required
             minLength={8}
             autoComplete="new-password"
+            id="signup-password"
             ref={(element) => {
               fieldRefs.current.password = element;
             }}
@@ -621,13 +678,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
           <PasswordGuidance password={password} />
 
-          <label style={styles.label}>{t("signupPage.fields.confirmPassword")}</label>
+          <label htmlFor="signup-confirmPassword" style={styles.label}>{t("signupPage.fields.confirmPassword")}</label>
           <div style={{ position: "relative" }}>
           <input
             type={showPasswords ? "text" : "password"}
             required
             minLength={8}
             autoComplete="new-password"
+            id="signup-confirmPassword"
             ref={(element) => {
               fieldRefs.current.confirmPassword = element;
             }}
@@ -651,9 +709,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </div>
           {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
-          <label style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
+          </fieldset>
+          <fieldset aria-label="Your learning" disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-selectedLevel" style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
             required
+            id="signup-selectedLevel"
             ref={(element) => {
               fieldRefs.current.selectedLevel = element;
             }}
@@ -683,69 +744,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </a>
           </div>
 
-          <label style={styles.label}>{t("signupPage.fields.phone")}</label>
-          <input
-            type="tel"
-            required
-            autoComplete="tel"
-            ref={(element) => {
-              fieldRefs.current.phone = element;
-            }}
-            value={phone}
-            onChange={(e) => {
-              setPhone(e.target.value);
-              clearFieldError("phone");
-              setAuthError("");
-            }}
-            style={inputStyle}
-            placeholder="0176 12345678"
-          />
-          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
-
-          <p style={{ ...styles.helperText, marginTop: -4 }}>
-            We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
-            notified in urgent safety situations.
-          </p>
-
-          <label style={styles.label}>{t("signupPage.fields.address")}</label>
-          <textarea
-            required
-            autoComplete="street-address"
-            ref={(element) => {
-              fieldRefs.current.address = element;
-            }}
-            value={address}
-            onChange={(event) => {
-              setAddress(event.target.value);
-              clearFieldError("address");
-              setAuthError("");
-            }}
-            style={{ ...styles.textArea, minHeight: 80 }}
-            placeholder="House number, street, city, region"
-          />
-          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
-
-          <label style={styles.label}>{t("signupPage.fields.location")}</label>
-          <input
-            type="text"
-            required
-            autoComplete="address-level2"
-            ref={(element) => {
-              fieldRefs.current.location = element;
-            }}
-            value={location}
-            onChange={(e) => {
-              setLocation(e.target.value);
-              clearFieldError("location");
-            }}
-            style={inputStyle}
-            placeholder="Berlin"
-          />
-          {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
-
-          <label style={styles.label}>{t("signupPage.fields.learningMode")}</label>
+          <label htmlFor="signup-learningMode" style={styles.label}>{t("signupPage.fields.learningMode")}</label>
           <select
             required
+            id="signup-learningMode"
             ref={(element) => {
               fieldRefs.current.learningMode = element;
             }}
@@ -764,26 +766,95 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </select>
           {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
 
-          <label style={styles.label}>{t("signupPage.fields.emergencyContactPhone")}</label>
-          <input
-            type="tel"
-            required
-            autoComplete="tel-national"
+          <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>
+          <select
+            id="class-selection"
+            value={selectedClass}
             ref={(element) => {
-              fieldRefs.current.emergencyContactPhone = element;
+              fieldRefs.current.selectedClass = element;
             }}
-            value={emergencyContactPhone}
-            onChange={(e) => {
-              setEmergencyContactPhone(e.target.value);
-              clearFieldError("emergencyContactPhone");
+            onChange={(event) => {
+              setSelectedClass(event.target.value);
+              clearFieldError("selectedClass");
               setAuthError("");
             }}
-            style={inputStyle}
-            placeholder="0176 98765432"
-          />
-          {fieldErrors.emergencyContactPhone ? (
-            <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
-          ) : null}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <option value="">{t("signupPage.options.chooseClass")}</option>
+            {filteredClassOptions.map((classOption) => (
+              <option key={classOption.value} value={classOption.value}>
+                {classOption.label}
+              </option>
+            ))}
+          </select>
+
+          <div role="group" aria-label="Choose your class" tabIndex={-1} ref={(element) => { if (element) fieldRefs.current.selectedClass = element; }} style={{ display: "grid", gap: 10 }}>
+            {filteredClassOptions.map((classOption) => {
+              const selected = selectedClass === classOption.value;
+              const scheduleText = (classOption.schedule || [])
+                .map(({ day, startTime, endTime }) =>
+                  [day, startTime && ` ${startTime}`, endTime && `-${endTime}`].filter(Boolean).join("")
+                )
+                .join(" · ");
+              const startText = classOption.isSelfLearning
+                ? "Start anytime"
+                : classOption.startDate
+                  ? new Date(`${classOption.startDate}T00:00:00`).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "Schedule available";
+              return (
+                <button
+                  key={classOption.value}
+                  type="button"
+                  onClick={() => {
+                    setSelectedClass(classOption.value);
+                    clearFieldError("selectedClass");
+                    setAuthError("");
+                  }}
+                  aria-pressed={selected}
+                  style={{
+                    textAlign: "left",
+                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                    background: selected ? "#eff6ff" : "#fff",
+                    borderRadius: 12,
+                    padding: 14,
+                    display: "grid",
+                    gap: 7,
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <strong style={{ color: "#0f172a" }}>{classOption.value}</strong>
+                    {recommendedClass === classOption.value ? (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8" }}>Recommended for you</span>
+                    ) : null}
+                  </div>
+                  <span style={{ color: "#475569", fontSize: 13 }}>
+                    {classOption.isSelfLearning ? "Self-learning · Online" : `Starts ${startText}`}
+                  </span>
+                  {scheduleText ? <span style={{ color: "#475569", fontSize: 13 }}>{scheduleText} · Ghana time (GMT / UTC+0)</span> : null}
+                  {classOption.learningMode ? (
+                    <span style={{ color: "#64748b", fontSize: 12 }}>{classOption.learningMode}</span>
+                  ) : null}
+                </button>
+              );
+            })}
+            {!filteredClassOptions.length && publicClassesLoaded ? (
+              <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 12, padding: 12, color: "#92400e" }}>
+                No open {selectedLevel} class is currently listed. Please contact Falowen support for the next intake.
+              </div>
+            ) : null}
+          </div>
+          {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -2 }}>
+            Choose the class that fits your schedule. We only show open classes for {selectedLevel}.
+            {!publicClassesLoaded ? " Loading the latest class list…" : ""}
+          </p>
 
           <label style={styles.label}>How would you like to start?</label>
           <div
@@ -865,95 +936,92 @@ const SignUpPage = ({ onLogin, onBack }) => {
             description={`For ${selectedLevel} tuition is ${formatMoney(tuitionSummary.tuitionFee)}${approximateUsd(tuitionSummary.tuitionFee, fxQuote) ? ` (≈ ${approximateUsd(tuitionSummary.tuitionFee, fxQuote)} USD)` : ""}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
           />
 
-          <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>
-          <select
-            id="class-selection"
-            value={selectedClass}
+          </fieldset>
+          <fieldset aria-label="Contact details" disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-phone" style={styles.label}>{t("signupPage.fields.phone")}</label>
+          <input
+            type="tel"
+            required
+            autoComplete="tel"
+            id="signup-phone"
             ref={(element) => {
-              fieldRefs.current.selectedClass = element;
+              fieldRefs.current.phone = element;
             }}
-            onChange={(event) => {
-              setSelectedClass(event.target.value);
-              clearFieldError("selectedClass");
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              clearFieldError("phone");
               setAuthError("");
             }}
-            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
-            tabIndex={-1}
-            aria-hidden="true"
-          >
-            <option value="">{t("signupPage.options.chooseClass")}</option>
-            {filteredClassOptions.map((classOption) => (
-              <option key={classOption.value} value={classOption.value}>
-                {classOption.label}
-              </option>
-            ))}
-          </select>
+            style={inputStyle}
+            placeholder="0176 12345678"
+          />
+          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
 
-          <div style={{ display: "grid", gap: 10 }}>
-            {filteredClassOptions.map((classOption) => {
-              const selected = selectedClass === classOption.value;
-              const scheduleText = (classOption.schedule || [])
-                .map(({ day, startTime, endTime }) =>
-                  [day, startTime && ` ${startTime}`, endTime && `-${endTime}`].filter(Boolean).join("")
-                )
-                .join(" · ");
-              const startText = classOption.isSelfLearning
-                ? "Start anytime"
-                : classOption.startDate
-                  ? new Date(`${classOption.startDate}T00:00:00`).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  : "Schedule available";
-              return (
-                <button
-                  key={classOption.value}
-                  type="button"
-                  onClick={() => {
-                    setSelectedClass(classOption.value);
-                    clearFieldError("selectedClass");
-                    setAuthError("");
-                  }}
-                  aria-pressed={selected}
-                  style={{
-                    textAlign: "left",
-                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                    background: selected ? "#eff6ff" : "#fff",
-                    borderRadius: 12,
-                    padding: 14,
-                    display: "grid",
-                    gap: 7,
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                    <strong style={{ color: "#0f172a" }}>{classOption.value}</strong>
-                    {recommendedClass === classOption.value ? (
-                      <span style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8" }}>Recommended for you</span>
-                    ) : null}
-                  </div>
-                  <span style={{ color: "#475569", fontSize: 13 }}>
-                    {classOption.isSelfLearning ? "Self-learning · Online" : `Starts ${startText}`}
-                  </span>
-                  {scheduleText ? <span style={{ color: "#475569", fontSize: 13 }}>{scheduleText}</span> : null}
-                  {classOption.learningMode ? (
-                    <span style={{ color: "#64748b", fontSize: 12 }}>{classOption.learningMode}</span>
-                  ) : null}
-                </button>
-              );
-            })}
-            {!filteredClassOptions.length && publicClassesLoaded ? (
-              <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 12, padding: 12, color: "#92400e" }}>
-                No open {selectedLevel} class is currently listed. Please contact Falowen support for the next intake.
-              </div>
-            ) : null}
-          </div>
-          {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Choose the class that fits your schedule. We only show open classes for {selectedLevel}.
-            {!publicClassesLoaded ? " Loading the latest class list…" : ""}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
+            notified in urgent safety situations.
           </p>
+
+          <label htmlFor="signup-address" style={styles.label}>{t("signupPage.fields.address")}</label>
+          <textarea
+            required
+            autoComplete="street-address"
+            id="signup-address"
+            ref={(element) => {
+              fieldRefs.current.address = element;
+            }}
+            value={address}
+            onChange={(event) => {
+              setAddress(event.target.value);
+              clearFieldError("address");
+              setAuthError("");
+            }}
+            style={{ ...styles.textArea, minHeight: 80 }}
+            placeholder="House number, street, city, region"
+          />
+          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
+
+          <label htmlFor="signup-location" style={styles.label}>{t("signupPage.fields.location")}</label>
+          <input
+            type="text"
+            required
+            autoComplete="address-level2"
+            id="signup-location"
+            ref={(element) => {
+              fieldRefs.current.location = element;
+            }}
+            value={location}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              clearFieldError("location");
+            }}
+            style={inputStyle}
+            placeholder="Berlin"
+          />
+          {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
+
+          <label htmlFor="signup-emergencyContactPhone" style={styles.label}>{t("signupPage.fields.emergencyContactPhone")}</label>
+          <input
+            type="tel"
+            required
+            autoComplete="tel-national"
+            id="signup-emergencyContactPhone"
+            ref={(element) => {
+              fieldRefs.current.emergencyContactPhone = element;
+            }}
+            value={emergencyContactPhone}
+            onChange={(e) => {
+              setEmergencyContactPhone(e.target.value);
+              clearFieldError("emergencyContactPhone");
+              setAuthError("");
+            }}
+            style={inputStyle}
+            placeholder="0176 98765432"
+          />
+          {fieldErrors.emergencyContactPhone ? (
+            <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+          ) : null}
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
             <input
@@ -1025,12 +1093,19 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </p>
           </div>
 
+          </fieldset>
+          <div style={{ display: "flex", gap: 12, justifyContent: "space-between", flexWrap: "wrap" }}>
+            {step > 1 ? <button type="button" style={styles.secondaryButton} disabled={loading} onClick={() => { setAuthError(""); setStep((current) => current - 1); }}>Back</button> : null}
+            {step < 3 ? <button type="submit" style={{ ...styles.primaryButton, flex: 1 }} disabled={loading}>Continue to {step === 1 ? "your learning" : "contact details"} →</button> : null}
+          </div>
+          {step === 3 ? <>
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
           </button>
           <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
             Start your 7-day trial without payment, or pay immediately after signup if you prefer.
           </p>
+          </> : null}
         </form>
 
         {showConsentDetails && (
