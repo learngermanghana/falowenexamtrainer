@@ -33,6 +33,8 @@ jobs:
       - name: Test A2 speaking flow and saved results
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2MockSpeakingExaminerFlow.test.jsx
+      - name: Verify server-bound examiner receipts
+        run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs
       - name: Build web application
         working-directory: web
         run: npx vite build
