@@ -49,65 +49,17 @@ const LISTENING_ANSWER_KEY = Object.freeze({
   "t3-15": "a",
 });
 
-const normalizeObjectiveAnswer = (value) => String(value || "").trim().toLowerCase();
-
-const scoreObjectiveAnswers = (answers = {}, answerKey = {}) => {
-  const entries = Object.entries(answerKey);
-  const correct = entries.reduce(
-    (count, [key, expected]) =>
-      normalizeObjectiveAnswer(answers?.[key]) === normalizeObjectiveAnswer(expected)
-        ? count + 1
-        : count,
-    0,
-  );
-  return {
-    correct,
-    total: entries.length,
-    score: Number(((correct / Math.max(1, entries.length)) * 25).toFixed(1)),
-    maxScore: 25,
-  };
-};
-
-const verifiedSectionScore = (verifiedSections = {}, section) => {
-  const record = verifiedSections?.[section];
-  const score = Number(record?.score);
-  if (!record?.verified || !Number.isFinite(score)) {
-    const error = new Error(`Server-verified ${section} score is required before completion.`);
-    error.code = "A1_MOCK_SECTION_NOT_VERIFIED";
-    error.section = section;
-    throw error;
-  }
-  return Math.max(0, Math.min(25, score));
-};
+const {scoreObjectiveAnswers,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
 
 const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {}, mockId = "a1-mock-01" } = {}) => {
   const mockSet = getA1MockSet(mockId);
-  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, mockSet?.readingAnswerKey || READING_ANSWER_KEY);
-  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, mockSet?.listeningAnswerKey || LISTENING_ANSWER_KEY);
-  const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
-  const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
-
-  const sectionScores = {
-    lesen: lesen.score,
-    hoeren: hoeren.score,
-    schreiben,
-    sprechen,
-  };
-  const overallScore = Number(
-    Object.values(sectionScores)
-      .reduce((sum, value) => sum + Number(value || 0), 0)
-      .toFixed(1),
-  );
-
-  return {
-    sectionScores,
-    overall: {
-      score: overallScore,
-      maxScore: 100,
-      passed: overallScore >= 60,
+  return buildVerifiedFourSkillScore({
+    level:"A1",state,verifiedSections,
+    answerKeys:{
+      lesen:mockSet?.readingAnswerKey || READING_ANSWER_KEY,
+      hoeren:mockSet?.listeningAnswerKey || LISTENING_ANSWER_KEY,
     },
-    objective: { lesen, hoeren },
-  };
+  });
 };
 
 const persistVerifiedA1MockSection = async ({
