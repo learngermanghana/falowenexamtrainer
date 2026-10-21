@@ -13,7 +13,7 @@ const READING_REVISIONS = {
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   // Reading only changed again. Preserve saved listening answers (Teil 2).
   "A1-7": { revision: "five-opening-hours-signs-v3", sections: { "teil-1": 5 } },
-  "A1-8": { revision: "hamburg-and-speaking-checkpoint-v3", sections: { "teil-1": 5, "teil-2": 0 } },
+  "A1-8": { revision: "day12-two-reading-parts-v4", sections: { "teil-1": 5, "teil-2": 3 } },
   "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 0 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-14.1": { revision: "health-advertisements-and-appointment-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
