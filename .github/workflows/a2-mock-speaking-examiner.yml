@@ -7,6 +7,12 @@ on:
       - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
       - "web/src/components/A2FinalMockExamPage.jsx"
       - "web/src/components/A2Mock2ExamHub.jsx"
+      - "web/src/services/a2VerifiedMockEngine.js"
+      - "functions/functionz/a2MockRegistry.js"
+      - "functions/functionz/a2MockCompletionSync.js"
+      - "functions/functionz/a2MockExaminerScore.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/tests/a2RegisteredMockContract.test.cjs"
       - ".github/workflows/a2-mock-speaking-examiner.yml"
   push:
     branches: [main]
@@ -16,6 +22,12 @@ on:
       - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
       - "web/src/components/A2FinalMockExamPage.jsx"
       - "web/src/components/A2Mock2ExamHub.jsx"
+      - "web/src/services/a2VerifiedMockEngine.js"
+      - "functions/functionz/a2MockRegistry.js"
+      - "functions/functionz/a2MockCompletionSync.js"
+      - "functions/functionz/a2MockExaminerScore.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/tests/a2RegisteredMockContract.test.cjs"
       - ".github/workflows/a2-mock-speaking-examiner.yml"
 jobs:
   speaking:
@@ -34,7 +46,7 @@ jobs:
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2MockSpeakingExaminerFlow.test.jsx
       - name: Verify server-bound examiner receipts
-        run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs
+        run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs functions/functionz/tests/a2RegisteredMockContract.test.cjs
       - name: Build web application
         working-directory: web
         run: npx vite build
