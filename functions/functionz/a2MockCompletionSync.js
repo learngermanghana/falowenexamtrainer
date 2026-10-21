@@ -1,6 +1,7 @@
 "use strict";
 
 const MOCK_TITLE = "A2 Final Mock Exam";
+const {getA2MockDefinition} = require("./a2MockRegistry");
 const MOCK_ROUTE = "/campus/results";
 
 const SECTION_ORDER = ["lesen", "hoeren", "schreiben", "sprechen"];
@@ -90,9 +91,11 @@ const verifiedSectionScore = (verifiedSections = {}, section) => {
   return Math.max(0, Math.min(25, score));
 };
 
-const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {} } = {}) => {
-  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, READING_ANSWER_KEY);
-  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, LISTENING_ANSWER_KEY);
+const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
+  const config = getA2MockDefinition(mockId);
+  if (mockId !== "a2-mock-01" && !config) throw new Error("Unregistered A2 mock cannot be scored.");
+  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, config?.lesen || READING_ANSWER_KEY);
+  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, config?.hoeren || LISTENING_ANSWER_KEY);
   const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
   const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
 
@@ -127,6 +130,7 @@ const persistVerifiedA2MockSection = async ({
   section,
   score,
   source,
+  mockId = "a2-mock-01",
 } = {}) => {
   if (!db || !admin) throw new Error("Firestore verification dependencies are unavailable.");
   if (!clean(uid) || !clean(attemptId)) {
@@ -154,6 +158,11 @@ const persistVerifiedA2MockSection = async ({
   }
 
   const attempt = snap.data() || {};
+  if (attempt.mockId !== mockId) {
+    const error = new Error("Verified section belongs to a different A2 mock.");
+    error.code = "A2_MOCK_ATTEMPT_MISMATCH";
+    throw error;
+  }
   if (attempt.uid && attempt.uid !== clean(uid)) {
     const error = new Error("Mock attempt belongs to another account.");
     error.code = "A2_MOCK_ATTEMPT_FORBIDDEN";
@@ -249,6 +258,7 @@ const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false } = {}
 };
 
 const buildA2MockCompletionArtifacts = ({
+  mockId = "a2-mock-01",
   authedUser = {},
   studentProfile = null,
   attemptId,
@@ -258,11 +268,17 @@ const buildA2MockCompletionArtifacts = ({
   sectionScores = {},
   now = new Date(),
 } = {}) => {
+  const config = getA2MockDefinition(mockId);
+  if (mockId !== "a2-mock-01" && !config) throw new Error("Unregistered A2 mock result.");
+  const mockTitle = config?.title || MOCK_TITLE;
+  const mockRoute = config?.route || "/campus/course/a2-final-mock-exam";
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
-  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt });
+  const assignmentId = config
+    ? (Number(attemptNumber) === 1 ? config.assignmentId : `${config.assignmentId}-PRACTICE-${Math.max(1,Number(attemptNumber)||1)}`)
+    : assignmentIdForAttempt({ attemptNumber, firstAttempt });
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1
     ? "First readiness attempt"
     : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
@@ -276,8 +292,8 @@ const buildA2MockCompletionArtifacts = ({
     `Overall: ${formatScore(score)}% — ${statusLabel} · ${breakdownText}. Practise next: ${weakest}.`;
   const timestamp = now instanceof Date ? now : new Date(now);
   const iso = Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString();
-  const scoreDocId = safeDocId(`a2-final-mock-${identity.studentCode || authedUser.uid}-${attemptId}`);
-  const notificationId = safeDocId(`a2-final-mock-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const scoreDocId = safeDocId(`a2-${mockId}-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const notificationId = safeDocId(`a2-${mockId}-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
 
   const scoreDocument = {
     studentCode: identity.studentCode,
@@ -287,7 +303,7 @@ const buildA2MockCompletionArtifacts = ({
     name: identity.name,
     studentName: identity.name,
     level: "A2",
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
     assignmentId,
     assignment_id: assignmentId,
     canonicalAssignmentKey: assignmentId,
@@ -300,12 +316,13 @@ const buildA2MockCompletionArtifacts = ({
     comments,
     feedback: comments,
     date: iso,
-    link: "/campus/course/a2-final-mock-exam",
+    link: mockRoute,
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
     attemptLabel,
     attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
     mockAttemptId: clean(attemptId),
+    mockId,
     sectionScores: Object.fromEntries(breakdown.map((item) => [item.key, item.score])),
     scoreBreakdown: breakdown,
     strongestArea: strongest,
@@ -315,7 +332,7 @@ const buildA2MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = firstAttempt
+  const notificationTitle = config ? `Your ${mockTitle} result is ready` : firstAttempt
     ? "Your A2 Final Mock result is ready"
     : "Your A2 Final Mock practice result is ready";
 
@@ -327,12 +344,12 @@ const buildA2MockCompletionArtifacts = ({
     message: notificationBody,
     timestamp: timestamp.getTime(),
     sentAt: iso,
-    route: MOCK_ROUTE,
+    route: config ? mockRoute : MOCK_ROUTE,
     source: "a2_final_mock",
     studentCode: identity.studentCode,
     studentCodeOriginal: identity.studentCode,
     studentName: identity.name,
-    assignment: MOCK_TITLE,
+    assignment: mockTitle,
     assignmentId,
     level: "A2",
     score,
@@ -343,8 +360,8 @@ const buildA2MockCompletionArtifacts = ({
       attemptLabel,
       attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
       category: "feedback",
-      route: MOCK_ROUTE,
-      assignment: MOCK_TITLE,
+      route: config ? mockRoute : MOCK_ROUTE,
+      assignment: mockTitle,
       assignmentId,
       level: "A2",
       score: String(score),
@@ -375,6 +392,7 @@ const syncA2MockCompletion = async ({
   authedUser,
   studentProfile,
   attemptId,
+  mockId = "a2-mock-01",
   attemptNumber,
   firstAttempt,
   overall,
@@ -385,6 +403,7 @@ const syncA2MockCompletion = async ({
   if (!clean(attemptId)) throw new Error("attemptId is required for A2 mock completion sync.");
 
   const artifacts = buildA2MockCompletionArtifacts({
+    mockId,
     authedUser,
     studentProfile,
     attemptId,
