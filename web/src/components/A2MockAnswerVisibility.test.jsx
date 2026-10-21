@@ -44,7 +44,11 @@ test("an embedded finished listening module advances without flashing solutions"
 });
 test("solutions unlock only after all four modules, and retake archives the old answers", () => {
   complete();
-  localStorage.setItem(keys.flow, JSON.stringify({ stage: "result", startedAt: Date.now() }));
+  localStorage.setItem(keys.flow, JSON.stringify({
+    stage: "result", startedAt: Date.now(),
+    verifiedResult: {sectionScores:{lesen:25,hoeren:25,schreiben:15,sprechen:15},
+      overall:{score:80,maxScore:100,passed:true}},
+  }));
   jest.spyOn(window, "confirm").mockReturnValue(true);
   mount(<A2Mock2ExamHub />);
   expect(screen.getByText("All four modules completed")).toBeInTheDocument();
@@ -54,6 +58,15 @@ test("solutions unlock only after all four modules, and retake archives the old 
   expect(JSON.parse(localStorage.getItem(`${keys.flow}:history`))).toHaveLength(1);
   expect(localStorage.getItem(keys.hoeren)).toBeNull();
   window.confirm.mockRestore();
+});
+
+test("a pending score cannot be discarded by starting another full mock", () => {
+  complete();
+  localStorage.setItem(keys.flow,JSON.stringify({stage:"result",startedAt:Date.now()}));
+  mount(<A2Mock2ExamHub />);
+  expect(screen.getByText("All four modules completed")).toBeInTheDocument();
+  expect(screen.queryByRole("button",{name:"Start a new full mock"})).not.toBeInTheDocument();
+  expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Meine Antwort");
 });
 
 test("switching student accounts remounts Hören without copying selected answers", () => {
