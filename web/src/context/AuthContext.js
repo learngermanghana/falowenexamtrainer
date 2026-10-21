@@ -621,6 +621,7 @@ export const AuthProvider = ({ children }) => {
         location: profile.location || "",
         program: "german",
 
+        learningGoal: profile.learningGoal || "explore",
         learningMode: profile.learningMode || "", // already there ✅
         address: profile.address || "",            // ✅ NEW FIELD
 
