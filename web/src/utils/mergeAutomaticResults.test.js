@@ -27,3 +27,24 @@ test("Firestore timestamps compare correctly and stale automatic feedback cannot
  expect(resultTimestamp({seconds:10,nanoseconds:500000000})).toBe(10500);
  expect(resultTimestamp("not a date")).toBeNull();
 });
+test("a later background AI write cannot replace a tutor correction of the same submission", () => {
+ const corrected={...history[0],score:92,manuallyEdited:true,updatedAt:"2026-10-17T09:00:00Z"};
+ const ai={...history[0],score:49,updatedAt:"2026-10-17T10:00:00Z"};
+ expect(mergeAutomaticResults([corrected],[ai])[0].score).toBe(92);
+ expect(mergeAutomaticResults([ai],[corrected])[0].score).toBe(92);
+});
+test("the newest admin correction wins, including serialized Firestore timestamps", () => {
+ const corrected={...history[0],score:92,manualScoreOverride:true,updatedAt:{_seconds:100}};
+ const latest={...corrected,score:88,updatedAt:{seconds:110}};
+ expect(mergeAutomaticResults([corrected],[latest])[0].score).toBe(88);
+});
+test("a corrected legacy row replaces the same dated attempt even when its score changed", () => {
+ const old={assignment_id:"B1-7.21",date:"2026-10-21T16:00:00Z",score:49};
+ const corrected={...old,score:92,scoreOverrideAuthoritative:true};
+ expect(mergeAutomaticResults([old],[corrected])).toEqual([corrected]);
+});
+test("different submission IDs preserve retakes even when their container path matches", () => {
+ const first={...history[0],submissionId:"first",submissionPath:"submissions/B1/student",score:49};
+ const retake={...first,submissionId:"retake",score:92};
+ expect(mergeAutomaticResults([first],[retake])).toEqual([first,retake]);
+});

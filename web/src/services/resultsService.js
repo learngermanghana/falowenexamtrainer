@@ -1,4 +1,5 @@
 import { collection, db, doc, getDoc, getDocs, query, where } from "../firebase";
+import { resultTimestamp } from "../utils/mergeAutomaticResults";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 
 const normalizeString = (value) => value?.toString().trim();
@@ -43,6 +44,11 @@ const resolveWritingPercent = (row = {}) => {
 };
 
 const resolveFinalScore = (row = {}) => {
+  // Published totals, especially tutor corrections, own the final mark.
+  // Component fields may still contain evidence from the original AI assessment.
+  if (hasScoreValue(row.finalScore) || hasScoreValue(row.score)) {
+    return ceilScore(hasScoreValue(row.score) ? row.score : row.finalScore, null);
+  }
   const objectiveScore = hasScoreValue(row.objectiveScore)
     ? toNumber(row.objectiveScore, null)
     : null;
@@ -199,10 +205,15 @@ const buildResults = (scores = []) => {
 
       const key = `${normalizedCode}::${canonicalAssignmentKey || normalizedAssignment}`;
       attemptsTracker[key] = (attemptsTracker[key] || 0) + 1;
-      const attemptNumber = attemptsTracker[key];
+      const attemptNumber = row.attempt ?? row.attemptNumber ?? attemptsTracker[key];
       const resolvedFinalScore = resolveFinalScore(row);
 
       return {
+        id: row.id,
+        submissionId: row.submissionId || "",
+        submissionPath: row.submissionPath || "",
+        source: row.source || "",
+        reviewedByTutor: row.reviewedByTutor === true,
         assignment: normalizedAssignment,
         assignmentKey: canonicalAssignmentKey || normalizeString(row.assignmentKey || row.canonicalAssignmentKey) || "",
         assignment_id: normalizeString(row.assignment_id || row.assignmentId || row.assignmentKey || canonicalAssignmentKey) || "",
@@ -221,7 +232,7 @@ const buildResults = (scores = []) => {
         name: normalizeString(row.name || row.studentName) || "",
         level: (row.level || "").toUpperCase(),
         date: normalizeString(row.date || row.created_at || row.createdAt) || "",
-        updatedAt: normalizeString(row.updatedAt || row.manuallyEditedAt || row.date || row.created_at || row.createdAt) || "",
+        updatedAt: resultTimestamp(row.updatedAt) ?? resultTimestamp(row.manuallyEditedAt) ?? resultTimestamp(row.date || row.created_at || row.createdAt),
         status: normalizeString(row.status || row.result) || "",
         result: normalizeString(row.result || row.status) || "",
         passed: row.passed === true,

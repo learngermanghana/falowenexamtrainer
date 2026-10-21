@@ -1,5 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { onSnapshot } from "../firebase";
 import StudentResultsPage from "./StudentResultsPage";
 jest.mock("react-i18next", () => ({ useTranslation: () => ({ t: key => key }) }));
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: {uid:"u1"}, idToken:"token", studentProfile:{studentCode:"S1",level:"A1"} }) }));
@@ -17,4 +18,13 @@ test("shows a saved automatic result even when the Sheet/API has no rows yet",as
   render(<StudentResultsPage />);
   expect(await screen.findByText("Saved result: 85")).toBeInTheDocument();
   expect(screen.queryByText("No feedback has been recorded for your student code yet.")).not.toBeInTheDocument();
+});
+
+test("includes saved admin corrections even when their source is not automatic marking", async () => {
+  onSnapshot.mockImplementationOnce((_q, cb) => {
+    cb({docs:[{id:"admin-score",data:()=>({studentId:"u1",assignment_id:"B1-7.21",score:92,scoreOverrideAuthoritative:true,source:"tutor_marking"})}]});
+    return jest.fn();
+  });
+  render(<StudentResultsPage />);
+  expect(await screen.findByText("Saved result: 92")).toBeInTheDocument();
 });
