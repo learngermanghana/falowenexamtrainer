@@ -1,0 +1,40 @@
+name: A2 Mock Speaking Examiner Flow
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A2MockSpeakingExaminer*"
+      - "web/src/components/A2Mock1ConversationalSpeaking.jsx"
+      - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
+      - "web/src/components/A2FinalMockExamPage.jsx"
+      - "web/src/components/A2Mock2ExamHub.jsx"
+      - ".github/workflows/a2-mock-speaking-examiner.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/A2MockSpeakingExaminer*"
+      - "web/src/components/A2Mock1ConversationalSpeaking.jsx"
+      - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
+      - "web/src/components/A2FinalMockExamPage.jsx"
+      - "web/src/components/A2Mock2ExamHub.jsx"
+      - ".github/workflows/a2-mock-speaking-examiner.yml"
+jobs:
+  speaking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+      - name: Test A2 speaking flow and saved results
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/components/A2MockSpeakingExaminerFlow.test.jsx
+      - name: Verify server-bound examiner receipts
+        run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs
+      - name: Build web application
+        working-directory: web
+        run: npx vite build

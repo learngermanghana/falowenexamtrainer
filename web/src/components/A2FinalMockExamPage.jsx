@@ -23,7 +23,7 @@ import { A2_GOETHE_LISTENING_TEIL2 } from "./A2GoetheListeningMockTeil2Preview";
 import { A2_GOETHE_LISTENING_TEIL3 } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
 import { A2_GOETHE_WRITING_MOCK } from "./A2GoetheWritingMockPreview";
-import A2FinalMockSpeaking from "./A2FinalMockSpeaking";
+import A2FinalMockSpeaking from "./A2Mock1ConversationalSpeaking";
 import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheListeningMockPreview.css";
 import "./A1FinalMockExamPage.css";

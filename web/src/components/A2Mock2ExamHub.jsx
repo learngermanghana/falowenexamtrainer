@@ -8,7 +8,7 @@ import { getMockAnswerBackup, restoreA2Mock2Backup, syncA2Mock2Backup } from "..
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
 import A2Mock2Schreiben from "./A2Mock2Schreiben";
-import A2Mock2Sprechen from "./A2Mock2Sprechen";
+import A2Mock2Sprechen from "./A2Mock2ConversationalSpeaking";
 import { A2_MOCK_2_LESEN_QUESTIONS } from "../data/a2Mock2Lesen";
 import { A2_MOCK_2_HOEREN_QUESTIONS } from "../data/a2Mock2Hoeren";
 import "./A2Mock2Lesen.css";
@@ -26,7 +26,7 @@ const getProgress = (STORAGE) => {
   hoeren: { done: Boolean(h.completedAt), count: Object.values(h.answers || {}).filter(Boolean).length,
    score: A2_MOCK_2_HOEREN_QUESTIONS.filter(q => h.answers?.[q.number] === q.answer).length * 1.25 },
   schreiben: { done: Boolean(w.submittedAt), count: [w.sms,w.email].filter(x => String(x || "").trim()).length },
-  sprechen: { done: Boolean(["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
+  sprechen: { done: Boolean(["1","2","3"].every(k => s._examinerParts?.[k]?.sessionId && s._examinerParts?.[k]?.assessment) || ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].every(k => s[k]?.transcript)), count: ["1","2","3"].filter(k => s._examinerParts?.[k]?.sessionId && s._examinerParts?.[k]?.assessment).length || ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"].filter(k => s[k]?.transcript).length },
  };
 };
 const initialize = (STORAGE) => {
@@ -63,7 +63,7 @@ function A2Mock2ExamHubAttempt(){
    if (!alive || !restoreA2Mock2Backup(STORAGE, remote)) return;
    setProgress(getProgress(STORAGE));
    setFlow(initialize(STORAGE));
-   setBackupNotice("Gespeicherte Antworten wiederhergestellt.");
+   setBackupNotice("Saved answers restored.");
   }).catch(() => { /* Offline/browser answers remain available. */ });
   return () => { alive = false; };
  }, [idToken, user?.uid, STORAGE]);
@@ -116,7 +116,7 @@ function A2Mock2ExamHubAttempt(){
   window.scrollTo({top:0,behavior:"smooth"});
  };
  const restart = () => {
-  if (!isA2Mock2ReviewReady(STORAGE) || !window.confirm("Neuen vollständigen Mocktest starten? Ihr abgeschlossenes Ergebnis bleibt im Verlauf gespeichert.")) return;
+  if (!isA2Mock2ReviewReady(STORAGE) || !window.confirm("Start a new full mock? Ihr abgeschlossenes Ergebnis bleibt im Verlauf gespeichert.")) return;
   try {
    const historyKey = `${STORAGE.flow}:history`;
    const history = read(historyKey);
@@ -135,42 +135,42 @@ function A2Mock2ExamHubAttempt(){
   schreiben:<A2Mock2Schreiben embedded onComplete={advance}/>,
   sprechen:<A2Mock2Sprechen embedded onComplete={advance}/>,
  };
- return <main className="a2-mock2-full" lang="de">
-   <div className="a2-mock2-top"><AppBackButton label="Zurück zu den Mocktests" fallbackPath="/exams/mocks"/><span>A2 · Mockprüfung 2</span></div>
+ return <main className="a2-mock2-full" lang="en">
+   <div className="a2-mock2-top"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks"/><span>A2 · Full Mock Exam 2</span></div>
    <header className="a2-mock2-full-heading">
-    <p className="a2-mock2-kicker">A2 · Vollständiger Übungstest 2</p>
+    <p className="a2-mock2-kicker">A2 · Full Practice Exam 2</p>
     <h1>A2 Mock 2</h1>
-    <p>Lesen · Hören · Schreiben · Sprechen — ein Start, vier Prüfungsteile.</p>
+    <p>Reading · Listening · Writing · Speaking — one exam, four modules.</p>
    </header>
-   <section className="a2-mock2-full-progress" aria-label="Fortschritt der vier Module">
-    <div className="a2-mock2-full-progress-head"><strong>Prüfungsfortschritt</strong><span>{completed} von 4 Modulen abgeschlossen</span></div>{backupNotice ? <p role="status">{backupNotice}</p> : null}
+   <section className="a2-mock2-full-progress" aria-label="Progress across four exam modules">
+    <div className="a2-mock2-full-progress-head"><strong>Exam progress</strong><span>{completed} of 4 modules completed</span></div>{backupNotice ? <p role="status">{backupNotice}</p> : null}
     <div className="a2-mock2-full-track"><div style={{width:`${completed*25}%`}}/></div>
     <div className="a2-mock2-full-stages">{ORDER.map((key,i)=><div key={key} className={progress[key].done?"complete":stage===key?"current":""}>
       <span aria-hidden="true">{progress[key].done?"✓":i+1}</span><strong>{LABELS[i]}</strong>
-      <small>{progress[key].done?"Abgeschlossen":stage===key?"Aktuell":"Noch offen"}</small>
+      <small>{progress[key].done?"Completed":stage===key?"Current":"Not started"}</small>
     </div>)}</div>
    </section>
    {stage==="intro"?<section className="a2-mock2-full-intro">
-     <h2>Bereit für Ihren zweiten A2-Mocktest?</h2>
-     <p>Starten Sie einmal. Nach jeder Abgabe öffnet sich automatisch das nächste Modul. Wenn Sie diese Seite verlassen, können Sie dort weitermachen, wo Sie aufgehört haben. Ein laufender Timer wird nicht angehalten.</p>
-     <p>Lesen 30 Min. · Hören 30 Min. · Schreiben 30 Min. · Sprechen ca. 15 Min.</p>
-     <button type="button" className="a2-mock2-primary" onClick={start}>Gesamten Mocktest starten</button>
+     <h2>Ready for your second A2 mock exam?</h2>
+     <p>Start once. When you submit a module, the next one opens automatically. You can come back to the saved exam, but an active timer keeps running. In Speaking, the AI examiner asks questions in German; listen, then answer using the microphone.</p>
+     <p>Reading 30 min · Listening 30 min · Writing 30 min · Speaking approx. 15 min</p>
+     <button type="button" className="a2-mock2-primary" onClick={start}>Start full mock exam</button>
    </section>:null}
    {ORDER.includes(stage)?<section className="a2-mock2-full-current" key={stage}>
-     <div className="a2-mock2-full-module"><strong>Modul {index+1} von 4 · {LABELS[index]}</strong><p>Nach Abgabe wechseln Sie automatisch zum nächsten Modul.</p></div>
+     <div className="a2-mock2-full-module"><strong>Module {index+1} of 4 · {LABELS[index]}</strong><p>{stage==="sprechen" ? "Listen to your AI examiner and answer in German. Complete all three speaking parts to finish your mock exam." : "Submit this module to move automatically to the next one. Your answers are saved."}</p></div>
      {screens[stage]}
    </section>:null}
    {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
-    <h2>Alle vier Module bearbeitet</h2>
-    <p>Vielen Dank. Ihre Antworten bleiben auf diesem Gerät gespeichert. Die KI-Auswertung erfolgt separat und kann bei einem Fehler erneut gestartet werden, ohne den Mocktest zu wiederholen.</p>
+    <h2>All four modules completed</h2>
+    <p>Your submitted answers remain saved on this device. AI practice feedback is separate from submission; if marking fails, retry it without repeating the mock.</p>
     <p>Lesen: <strong>{progress.lesen.score.toFixed(1)}/25</strong> · Hören: <strong>{progress.hoeren.score.toFixed(1)}/25</strong></p>
-    <button type="button" className="a2-mock2-primary" onClick={restart}>Neuen vollständigen Mocktest starten</button>
+    <button type="button" className="a2-mock2-primary" onClick={restart}>Start a new full mock</button>
     {resetError ? <p role="alert">{resetError}</p> : null}
-    <details><summary>Lesen · Antworten und Lösungen ansehen</summary><A2Mock2Lesen embedded reviewReleased /></details>
-    <details><summary>Hören · Antworten und Lösungen ansehen</summary><A2Mock2Hoeren embedded reviewReleased /></details>
-    <details><summary>Schreiben · KI-Feedback / erneut bewerten</summary><A2Mock2Schreiben embedded reviewReleased /></details>
-    <details><summary>Sprechen · KI-Feedback / erneut bewerten</summary><A2Mock2Sprechen embedded reviewReleased /></details>
-    <p>Ein verifiziertes Gesamtergebnis von 100 Punkten wird erst angezeigt, wenn die KI-Bewertungen von Schreiben und Sprechen sicher dem zweiten Mocktest zugeordnet werden können.</p>
+    <details><summary>Reading · View answers and solutions</summary><A2Mock2Lesen embedded reviewReleased /></details>
+    <details><summary>Listening · View answers and solutions</summary><A2Mock2Hoeren embedded reviewReleased /></details>
+    <details><summary>Writing · AI feedback / retry marking</summary><A2Mock2Schreiben embedded reviewReleased /></details>
+    <details><summary>Speaking · AI examiner feedback</summary><A2Mock2Sprechen embedded reviewReleased /></details>
+    <p>A verified overall score out of 100 is shown only after the writing and speaking assessments have been validated for this Mock 2 attempt.</p>
    </section>:null}
  </main>;
 }

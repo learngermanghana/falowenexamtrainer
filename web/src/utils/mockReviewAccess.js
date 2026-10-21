@@ -17,7 +17,11 @@ export const readMockState = (key) => {
 export const isA2Mock2ReviewReady = (keys) => {
   const l = readMockState(keys.lesen), h = readMockState(keys.hoeren);
   const w = readMockState(keys.schreiben), s = readMockState(keys.sprechen);
-  return Boolean(l.completedAt && h.completedAt && w.submittedAt && ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"].every(k => s[k]?.transcript));
+  const conversationalComplete = ["1", "2", "3"].every(part =>
+    Boolean(s._examinerParts?.[part]?.sessionId && s._examinerParts?.[part]?.assessment));
+  const originalComplete = ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
+    .every(k => Boolean(s[k]?.transcript));
+  return Boolean(l.completedAt && h.completedAt && w.submittedAt && (conversationalComplete || originalComplete));
 };
 export const canReviewFullMock = (exam) => Boolean(exam?.completed &&
   ["lesen", "hoeren", "schreiben", "sprechen"].every(key => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key)));

@@ -6562,6 +6562,46 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
+    // Enforce Mock 1 / Mock 2 identity BEFORE any verified score write.
+    // Reapply this guard below for the original five-answer grading route.
+    {
+      const mockId = String(req.body?.mockId || "a2-mock-01");
+      const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
+        return res.status(400).json({
+          code:"A2_MOCK_ATTEMPT_MISMATCH",
+          error:"A2 Mock 2 scores cannot be saved to a Mock 1 attempt.",
+        });
+      }
+    }
+
+    // New conversational Mock 1: verify server-owned examiner results instead
+    // of accepting a client-computed score. No additional model call is needed.
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
+      if (String(req.body?.mockId || "a2-mock-01") !== "a2-mock-01") {
+        return res.status(400).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This examiner score is available only for A2 Mock 1."});
+      }
+      const attemptId=String(req.body?.attemptId || "").trim().slice(0,120);
+      const db=getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+      try {
+        const {scoreA2ExaminerSnapshots}=require("./a2MockExaminerScore");
+        const result=await scoreA2ExaminerSnapshots({
+          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+        });
+        await persistVerifiedA2MockSection({
+          db,admin,uid:authedUser.uid,attemptId,section:"sprechen",
+          score:result.score,source:"/speaking/a2-mock-score:verified-examiner",
+        });
+        return res.json({result});
+      } catch (err) {
+        return res.status(err?.status || (err?.code==="A2_MOCK_ALREADY_COMPLETED" ? 409 : 503)).json({
+          code:err?.code || "A2_MOCK_SPRECHEN_VERIFY_FAILED",
+          error:err?.message || "Could not verify the speaking exam. Your completed Teils remain saved.",
+        });
+      }
+    }
+
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     if (attempts.length !== 5) {

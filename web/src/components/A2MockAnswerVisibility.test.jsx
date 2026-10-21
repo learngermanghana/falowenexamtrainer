@@ -23,16 +23,16 @@ test("fresh Hören is blank even if a shared device has another student's comple
   localStorage.setItem(getA2Mock2StorageKeys("student-one").hoeren, JSON.stringify({ completedAt: 1, answers: { 1: "c" } }));
   const { container } = mount(<A2Mock2Hoeren />);
   expect(container.querySelectorAll('input[type="radio"]:checked')).toHaveLength(0);
-  expect(screen.queryByText(/Hören-Ergebnis/)).not.toBeInTheDocument();
-  expect(screen.queryByText(/· Lösung:/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Your listening result/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
   expect(localStorage.getItem(A2_MOCK_2_STORAGE.hoeren)).not.toBeNull();
 });
 test.each([["Hören", A2Mock2Hoeren, "hoeren"], ["Lesen", A2Mock2Lesen, "lesen"]])(
   "%s solutions stay hidden after that module is submitted, even on a direct module link", (_label, Component, key) => {
     localStorage.setItem(keys[key], JSON.stringify({ startedAt: Date.now(), completedAt: Date.now(), answers: { 1: "a" } }));
     mount(<Component />);
-    expect(screen.queryByText(/· (Lösung|Richtige Antwort):/)).not.toBeInTheDocument();
-    expect(screen.getByText(/erst nach Abschluss aller vier Module/)).toBeInTheDocument();
+    expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
+    expect(screen.getByText(/after all four modules are complete/)).toBeInTheDocument();
   },
 );
 test("an embedded finished listening module advances without flashing solutions", () => {
@@ -40,17 +40,17 @@ test("an embedded finished listening module advances without flashing solutions"
   const onComplete = jest.fn();
   mount(<A2Mock2Hoeren embedded onComplete={onComplete} />);
   expect(onComplete).toHaveBeenCalledTimes(1);
-  expect(screen.queryByText(/· Lösung:/)).not.toBeInTheDocument();
+  expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
 });
 test("solutions unlock only after all four modules, and retake archives the old answers", () => {
   complete();
   localStorage.setItem(keys.flow, JSON.stringify({ stage: "result", startedAt: Date.now() }));
   jest.spyOn(window, "confirm").mockReturnValue(true);
   mount(<A2Mock2ExamHub />);
-  expect(screen.getByText("Alle vier Module bearbeitet")).toBeInTheDocument();
-  expect(screen.getAllByText(/· Lösung:/)).toHaveLength(20);
-  fireEvent.click(screen.getByRole("button", { name: "Neuen vollständigen Mocktest starten" }));
-  expect(screen.queryByText(/· Lösung:/)).not.toBeInTheDocument();
+  expect(screen.getByText("All four modules completed")).toBeInTheDocument();
+  expect(screen.getAllByText(/Correct answer:/)).toHaveLength(40);
+  fireEvent.click(screen.getByRole("button", { name: "Start a new full mock" }));
+  expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(`${keys.flow}:history`))).toHaveLength(1);
   expect(localStorage.getItem(keys.hoeren)).toBeNull();
   window.confirm.mockRestore();

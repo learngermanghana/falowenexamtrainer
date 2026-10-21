@@ -76,5 +76,5 @@ test("all released full-mock writing textareas start without model answers or st
   }
   const a2 = fs.readFileSync(path.join(webRoot,"components","A2Mock2Schreiben.jsx"),"utf8");
   expect(a2).toContain('sms: "", email: ""');
-  expect(a2).toContain('Antwortfeld leeren');
+  expect(a2).toContain('Clear answer');
 });

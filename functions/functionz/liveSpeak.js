@@ -131,8 +131,9 @@ const cleanExamTask = (task) => ({
   hint: String(task?.hint || "").replace(/[\r\n\t]/g, " ").slice(0, 170),
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
-  mockAttemptId: assignmentConfig(task?.courseAssignmentKey)
-    ? String(task?.mockAttemptId || "").trim() : "",
+  mockAttemptId: assignmentConfig(task?.courseAssignmentKey) ||
+    (/^a2-mock-01-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
+    ? String(task?.mockAttemptId || "").trim().slice(0,120) : "",
 });
 const examOpening = (level, task) => {
   const part = task.teil ? task.teil + ". " : "";
