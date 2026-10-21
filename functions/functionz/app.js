@@ -6562,6 +6562,19 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
+    // Enforce Mock 1 / Mock 2 identity BEFORE any verified score write.
+    // Reapply this guard below for the original five-answer grading route.
+    {
+      const mockId = String(req.body?.mockId || "a2-mock-01");
+      const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
+        return res.status(400).json({
+          code:"A2_MOCK_ATTEMPT_MISMATCH",
+          error:"A2 Mock 2 scores cannot be saved to a Mock 1 attempt.",
+        });
+      }
+    }
+
     // New conversational Mock 1: verify server-owned examiner results instead
     // of accepting a client-computed score. No additional model call is needed.
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
