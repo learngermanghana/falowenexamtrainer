@@ -42,13 +42,25 @@ test("an embedded finished listening module advances without flashing solutions"
   expect(onComplete).toHaveBeenCalledTimes(1);
   expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
 });
-test("solutions unlock only after all four modules, and retake archives the old answers", () => {
+test("solutions unlock after all four modules, but retake waits for verified publication", () => {
   complete();
   localStorage.setItem(keys.flow, JSON.stringify({ stage: "result", startedAt: Date.now() }));
   jest.spyOn(window, "confirm").mockReturnValue(true);
   mount(<A2Mock2ExamHub />);
   expect(screen.getByText("All four modules completed")).toBeInTheDocument();
   expect(screen.getAllByText(/Correct answer:/)).toHaveLength(40);
+  expect(screen.queryByRole("button", { name: "Start a new full mock" })).not.toBeInTheDocument();
+  expect(localStorage.getItem(keys.hoeren)).not.toBeNull();
+  window.confirm.mockRestore();
+});
+
+test("a published server-verified result permits archival before retake", () => {
+  complete();
+  localStorage.setItem(keys.flow,JSON.stringify({stage:"result",startedAt:Date.now(),
+    verifiedResult:{overall:{score:70,passed:true},
+      sectionScores:{lesen:20,hoeren:20,schreiben:15,sprechen:15}}}));
+  jest.spyOn(window, "confirm").mockReturnValue(true);
+  mount(<A2Mock2ExamHub />);
   fireEvent.click(screen.getByRole("button", { name: "Start a new full mock" }));
   expect(screen.queryByText(/Correct answer:/)).not.toBeInTheDocument();
   expect(JSON.parse(localStorage.getItem(`${keys.flow}:history`))).toHaveLength(1);
