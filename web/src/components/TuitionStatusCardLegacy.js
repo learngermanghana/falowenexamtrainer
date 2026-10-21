@@ -447,7 +447,7 @@ const TuitionStatusCard = ({
             <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div>
           ) : null}
         </div>
-      ) : (
+      ) : showPaymentAction ? (
         <div
           style={{
             ...styles.errorBox,
@@ -462,7 +462,7 @@ const TuitionStatusCard = ({
             {t("accountSettings.tuition.webOnlyBody")}
           </p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
