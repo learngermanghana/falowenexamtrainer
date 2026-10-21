@@ -1,3 +1,4 @@
+import LearnerContactDetails from "./LearnerContactDetails";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -110,6 +111,9 @@ const OnboardingChecklist = ({ studentProfile, onSaveOnboarding }) => {
             Welcome to Falowen! I’ll be here whenever your tutor isn’t around. Ask me about your lessons, German practice, assignments, results, or where to find something in Falowen. Your tutor leads your classes, and I help between lessons. Where should we begin?
           </p>
         </div>
+
+        {trialLifecycle.active && Number.isFinite(trialLifecycle.endsAtMs) ? <p role="status" style={{ margin: 0 }}>Your trial ends on {new Date(trialLifecycle.endsAtMs).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}. Continue from Account & Billing when you’re ready.</p> : null}
+        <LearnerContactDetails reminder />
 
         <div role="group" aria-label="Choose your Falowen starting point" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
           <button type="button" style={{ ...styles.primaryButton, padding: 18, textAlign: "left" }} disabled={Boolean(savingAction)} onClick={() => finishAndGo(firstLessonPath, "orientation")}>
