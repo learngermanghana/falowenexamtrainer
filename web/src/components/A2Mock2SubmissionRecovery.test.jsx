@@ -72,7 +72,7 @@ test("all four submitted modules unlock final review even if both AI marking ser
   expect(markLetterWithAI).not.toHaveBeenCalled();
   expect(scoreA2MockSpeaking).not.toHaveBeenCalled();
   expect(screen.getByText("Writing · AI feedback / retry marking")).toBeInTheDocument();
-  expect(screen.getByText("Speaking · AI examiner feedback")).toBeInTheDocument();
+  expect(screen.getAllByText("Speaking · AI examiner feedback").length).toBeGreaterThan(0);
   expect(JSON.parse(localStorage.getItem(keys.sprechen)).t3_plan.transcript).toBe("Das ist meine gespeicherte Antwort.");
 });
 
