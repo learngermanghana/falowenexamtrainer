@@ -113,7 +113,7 @@ function A2Mock2ExamHubAttempt(){
   getMockAnswerBackup("a2-mock-02", idToken).then(remote => {
    if (!alive || !restoreA2Mock2Backup(STORAGE, remote)) return;
    setProgress(getProgress(STORAGE));
-   setFlow(initialize(STORAGE));
+   setFlow(current=>({...initialize(STORAGE),attemptInfo:current.attemptInfo || initialize(STORAGE).attemptInfo,verifiedResult:current.verifiedResult}));
    setBackupNotice("Saved answers restored.");
   }).catch(() => { /* Offline/browser answers remain available. */ });
   return () => { alive = false; };
