@@ -78,7 +78,7 @@ const bindLegacyMock2ExaminerReceipts = async ({db,admin,uid,attemptId,sessionId
       const receipt=snapshots[i].data();
       if (receipt?.mockAttemptId===attemptId) continue;
       const created=receipt?.createdAt?.toMillis?.() || 0;
-      const teil=String(receipt?.teil || receipt?.task?.teil || "").match(/\\d+/)?.[0];
+      const teil=String(receipt?.teil || receipt?.task?.teil || "").match(/\d+/)?.[0];
       if (receipt?.mockAttemptId || !created || created >= cutoff ||
           (started && created >= started) || receipt?.uid !== uid ||
           receipt?.sessionId !== sessionIds[i] || receipt?.level !== "A2" ||
