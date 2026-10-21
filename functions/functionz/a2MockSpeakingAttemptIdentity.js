@@ -1,8 +1,8 @@
 "use strict";
+const {isRegisteredA2Mock}=require("./a2MockRegistry");
 
-// Mock 2 is a browser-stored practice attempt, not a verified A2 Final Mock
-// attempt. Never let its score be persisted into a Mock 1 attempt ID.
-const isA2SpeakingAttemptBindingSafe = ({ mockId, attemptId } = {}) =>
-  mockId !== "a2-mock-02" || !String(attemptId || "").trim();
+// A server attempt is mandatory for verified scores; never confuse mock IDs.
+const isA2SpeakingAttemptBindingSafe = ({mockId,attemptId}={}) =>
+  isRegisteredA2Mock(mockId) && Boolean(String(attemptId||"").trim());
 
-module.exports = { isA2SpeakingAttemptBindingSafe };
+module.exports={isA2SpeakingAttemptBindingSafe};
