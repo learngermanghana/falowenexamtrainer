@@ -26,7 +26,7 @@ test("A2 Mock 2 keys are scored by the server and final results are mock-specifi
   assert.equal(score.sectionScores.hoeren,25);
   assert.throws(()=>buildVerifiedA2MockScore({mockId:"a2-mock-02",
     state:{lesenAnswers:MOCK_TWO.lesen,hoerenAnswers:MOCK_TWO.hoeren},
-    verifiedSections:{schreiben:{verified:true,score:16}}}),/server-verified sprechen/);
+    verifiedSections:{schreiben:{verified:true,score:16}}}),/Server-verified sprechen/);
   const output=buildA2MockCompletionArtifacts({mockId:"a2-mock-02",
     authedUser:{uid:"mock2-student",email:"student@example.org"},attemptId:"mock2-attempt",
     firstAttempt:true,attemptNumber:1,overall:score.overall,sectionScores:score.sectionScores});
