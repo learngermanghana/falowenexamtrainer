@@ -22,6 +22,7 @@ const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts"
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
 const { isA2SpeakingAttemptBindingSafe } = require("./a2MockSpeakingAttemptIdentity");
+const {isRegisteredA2Mock} = require("./a2MockRegistry");
 const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
@@ -2593,7 +2594,7 @@ const b2MockSpeakingScorePrompt = ({ attempts = [], selectedTopicId = "" }) => {
   ].join("\n");
 };
 
-const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
+const a2MockWritingScorePrompt = ({ sms = "", email = "", mockId = "a2-mock-01" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
   "Feedback shown to the learner MUST be in English. German may appear in exact evidence quotes and short corrected examples.",
@@ -2609,7 +2610,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "Use the canonical word target. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
   "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
   "",
-  mockTaskPrompt("A2", "writing"),
+  mockTaskPrompt("A2", "writing", undefined, mockId),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
@@ -4421,6 +4422,21 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     const sms = String(req.body?.sms || "").trim().slice(0, 4000);
     const email = String(req.body?.email || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId = String(req.body?.mockId || "a2-mock-01").trim();
+    if (!isRegisteredA2Mock(mockId)) return res.status(400).json({code:"A2_MOCK_UNKNOWN",error:"Unknown A2 mock."});
+    // Check identity and saved section BEFORE another billable OpenAI request.
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"Mock exam storage unavailable."});
+      const previous = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+      if (!previous.exists || previous.data()?.mockId !== mockId) {
+        return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This writing score does not belong to the selected mock."});
+      }
+      const verified = previous.data()?.verifiedSections?.schreiben;
+      if (verified?.verified && Number.isFinite(Number(verified.score))) {
+        return res.json({result:{score:Number(verified.score),maxScore:25,alreadyVerified:true}});
+      }
+    }
 
     let result;
     if (!sms && !email) {
@@ -4453,7 +4469,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
+          { role: "system", content: a2MockWritingScorePrompt({ sms, email, mockId }) },
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
@@ -4572,6 +4588,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           admin,
           uid: authedUser.uid,
           attemptId,
+          mockId,
           section: "schreiben",
           score: Number(result?.score || 0),
           source: "/writing/a2-mock-score",
@@ -5471,7 +5488,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    if (!isRegisteredA2Mock(mockId)) return res.status(400).json({error:"A2 mock is not registered for verified results.",code:"A2_MOCK_UNKNOWN"});
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5596,6 +5613,11 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
       }
 
       const existing = attemptSnap.data() || {};
+      const mockId = String(existing.mockId || "a2-mock-01");
+      if (!isRegisteredA2Mock(mockId)) {
+        saveOutcome = {forbidden: true};
+        return;
+      }
       if (existing.uid && existing.uid !== authedUser.uid) {
         saveOutcome = { forbidden: true };
         return;
@@ -5611,6 +5633,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
+            mockId,
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -5660,6 +5683,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state,
             verifiedSections: existing.verifiedSections || {},
+            mockId,
           });
         } catch (verificationError) {
           tx.set(
@@ -5793,6 +5817,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           studentProfile,
           attemptId,
           attemptNumber: Number(attemptData.attemptNumber || 1),
+          mockId: attemptData.mockId || "a2-mock-01",
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
