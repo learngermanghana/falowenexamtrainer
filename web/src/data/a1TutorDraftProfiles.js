@@ -100,7 +100,7 @@ const profiles = {
   "A1-8": {
     sections: {
       "teil-1": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen · E-Mails und SMS" }),
-      "teil-2": section(choiceItems(3, ["A", "B", "C"]), { label: "Lesen · Schilder und Fahrpläne" }),
+      "teil-2": section(choiceItems(3, ["A", "B", "C"]).map(item => ({ ...item, number: item.number + 5 })), { label: "Lesen · Schilder und Fahrpläne" }),
     },
   },
   "A1-9": {
