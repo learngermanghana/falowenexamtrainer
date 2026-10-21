@@ -5521,7 +5521,9 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
       }
 
       const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
-      const attemptNumber = attemptCount + 1;
+      const existingMockCounts = userData.mockAttemptCounts || {};
+      const mockCount = Math.max(0, Number(existingMockCounts[mockId] ?? (mockId === "a2-mock-01" ? attemptCount : 0)));
+      const attemptNumber = mockCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
       tx.set(
@@ -5529,7 +5531,8 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
+          attemptCount: attemptCount + 1,
+          mockAttemptCounts: { [mockId]: attemptNumber },
           activeAttemptId: newAttemptRef.id,
           updatedAt: now,
         },
