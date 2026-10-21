@@ -19,6 +19,10 @@ const normalize=(value)=>String(value ?? "").trim().toLowerCase();
 function scoreObjectiveAnswers(answers={},key={},maxScore=25) {
   if (!key || typeof key !== "object" || Array.isArray(key)) throw new Error("Server answer key is required.");
   const entries=Object.entries(key);
+  if(!entries.length || entries.some(([id,answer])=>!String(id).trim()||!normalize(answer))) {
+    throw new Error("Server answer key is empty or contains an invalid answer.");
+  }
+  if(!Number.isFinite(Number(maxScore))||Number(maxScore)<=0)throw new Error("Invalid objective section maximum.");
   const correct=entries.reduce((n,[id,answer])=> n+(normalize(answers?.[id])===normalize(answer)?1:0),0);
   return {correct,total:entries.length,score:Number((correct/Math.max(1,entries.length)*maxScore).toFixed(1)),maxScore};
 }
