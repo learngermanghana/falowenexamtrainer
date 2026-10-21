@@ -30,6 +30,25 @@ test("unverified or missing writing and speaking never generates completed grade
   ...fixture(keys,"A2"),verifiedSections:{...verified,sprechen:{verified:false,score:25}}
  }), e=>e.code==="A2_MOCK_SECTION_NOT_VERIFIED");
 });
+test("a zero-length or invalid server key blocks publication-grade scoring",()=>{
+ assert.throws(()=>scoreObjectiveAnswers({},{}),/answer key is empty/);
+ assert.throws(()=>scoreObjectiveAnswers({},{"1":""}),/invalid answer/);
+ assert.throws(()=>buildVerifiedFourSkillScore({
+  level:"A2",state:{},verifiedSections:verified,
+  answerKeys:{lesen:{},hoeren:{"1":"a"}},
+ }),/answer key is empty/);
+});
+test("the shared engine accepts explicit level-specific scoring without inventing C1/C2 defaults",()=>{
+ for(const level of ["B2","C1","C2"]){
+  const result=buildVerifiedFourSkillScore({
+    ...fixture({lesen:{"1":"a"},hoeren:{"1":"b"}},level),
+    policy:{sectionMax:20,passMark:65},
+  });
+  assert.equal(result.overall.maxScore,80);
+  assert.equal(result.overall.score,74);
+  assert.equal(result.overall.passed,true);
+ }
+});
 test("unconfigured B2, C1 and C2 scoring cannot silently inherit the A2 policy",()=>{
  const keys={lesen:{"1":"a"},hoeren:{"1":"b"}};
  for(const level of ["B2","C1","C2"]){
