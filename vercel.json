@@ -158,9 +158,70 @@
           "value": "no-store, no-cache, must-revalidate"
         }
       ]
+    },
+    {
+      "source": "/mock/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, follow"
+        }
+      ]
     }
   ],
   "routes": [
+    {
+      "src": "/robots\\.txt",
+      "has": [
+        {
+          "type": "host",
+          "value": "exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-robots.txt"
+    },
+    {
+      "src": "/sitemap\\.xml",
+      "has": [
+        {
+          "type": "host",
+          "value": "exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-sitemap.xml"
+    },
+    {
+      "src": "/robots\\.txt",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-robots.txt"
+    },
+    {
+      "src": "/sitemap\\.xml",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.exams.falowen.app"
+        }
+      ],
+      "dest": "/exams-sitemap.xml"
+    },
+    {
+      "src": "/german-a1-mock-test/?",
+      "dest": "/german-a1-mock-test.html"
+    },
+    {
+      "src": "/german-a2-mock-test/?",
+      "dest": "/german-a2-mock-test.html"
+    },
+    {
+      "src": "/a1-listening-practice/?",
+      "dest": "/a1-listening-practice.html"
+    },
     {
       "src": "/",
       "has": [
