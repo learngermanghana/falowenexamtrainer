@@ -274,3 +274,23 @@ test("completed mocks with only verified section marks still show all four compl
   expect(row.progressCount).toBe(4);
   expect(row.sectionScores).toEqual({lesen:20,hoeren:18,schreiben:16,sprechen:14});
 });
+
+test("verified Mock 2 replaces stale browser-reported 4/4 progress",async()=>{
+ const docs=[{id:"complete",ref:{path:"a2MockExamUsers/student-uid/attempts/complete"},
+   data:()=>({uid:"student-uid",mockId:"a2-mock-02",status:"completed",
+     verifiedOverall:{score:70},verifiedSectionScores:{lesen:20,hoeren:20,schreiben:15,sprechen:15}})}];
+ const browser=[{data:()=>({uid:"student-uid",mockId:"a2-mock-02",status:"in_progress",
+   completedSections:["lesen","hoeren","schreiben","sprechen"]})}];
+ const db={
+  collectionGroup:()=>({orderBy:()=>({limit:()=>({get:async()=>({docs,size:1})})})}),
+  collection:group=>{
+   if(group==="mockProgressMonitor")return {limit:()=>({get:async()=>({docs:browser,size:1})})};
+   if(group==="students")return {where:()=>({get:async()=>({docs:[]})})};
+   throw Error("Unexpected "+group);
+  },
+ };
+ const result=await listMockAttempts(db);
+ expect(result.attempts).toHaveLength(1);
+ expect(result.attempts[0].status).toBe("completed");
+ expect(result.attempts[0].overallScore).toBe(70);
+});
