@@ -6577,6 +6577,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
 
 app.post("/speaking/a2-mock-score", async (req, res) => {
   let authedUser;
+  let verifiedMockId = null;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -6586,31 +6587,40 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     {
       const mockId = String(req.body?.mockId || "a2-mock-01");
       const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
-      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
-        return res.status(400).json({
-          code:"A2_MOCK_ATTEMPT_MISMATCH",
-          error:"A2 Mock 2 scores cannot be saved to a Mock 1 attempt.",
-        });
+      if (attemptId) {
+        const db = getFirestoreSafe();
+        if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+        const snap = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+        if (!snap.exists) return res.status(404).json({code:"A2_MOCK_ATTEMPT_NOT_FOUND",error:"Mock attempt not found."});
+        verifiedMockId = snap.data()?.mockId || "a2-mock-01";
+        if (verifiedMockId !== mockId) {
+          return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This speaking result belongs to another A2 mock."});
+        }
+        const prior = snap.data()?.verifiedSections?.sprechen;
+        if (prior?.verified && Number.isFinite(Number(prior.score))) {
+          return res.json({result:{score:Number(prior.score),maxScore:25,assessmentIdentity:`${mockId}-examiner-verified`,verified:true,reused:true}});
+        }
+      }
+      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
+        return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"A2 mock attempt verification failed."});
       }
     }
 
-    // New conversational Mock 1: verify server-owned examiner results instead
-    // of accepting a client-computed score. No additional model call is needed.
+    // Verify authenticated, immutable examiner receipts for either A2 mock.
+    // No additional OpenAI marking call is required.
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
-      if (String(req.body?.mockId || "a2-mock-01") !== "a2-mock-01") {
-        return res.status(400).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This examiner score is available only for A2 Mock 1."});
-      }
+      const mockId = String(req.body?.mockId || "a2-mock-01");
       const attemptId=String(req.body?.attemptId || "").trim().slice(0,120);
       const db=getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
       try {
         const {scoreA2ExaminerSnapshots}=require("./a2MockExaminerScore");
         const result=await scoreA2ExaminerSnapshots({
-          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,mockId,
         });
         await persistVerifiedA2MockSection({
           db,admin,uid:authedUser.uid,attemptId,section:"sprechen",
-          score:result.score,source:"/speaking/a2-mock-score:verified-examiner",
+          score:result.score,source:"/speaking/a2-mock-score:verified-examiner",mockId,
         });
         return res.json({result});
       } catch (err) {
@@ -6639,7 +6649,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
     // Mock 2 is a browser-local practice flow. Never persist its scores into a
     // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
-    if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
+    if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
       return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
     }
     const expectedIds = mockId === "a2-mock-02"
@@ -6709,6 +6719,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
           section: "sprechen",
           score: numericScore,
           source: "/speaking/a2-mock-score",
+          mockId,
         });
       } catch (verificationError) {
         const code = String(verificationError?.code || "");
