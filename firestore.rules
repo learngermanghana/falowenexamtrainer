@@ -318,6 +318,22 @@ service cloud.firestore {
     // The Admin marking screen writes these before a teacher approves the result.
     match /markingResults/{document=**} { allow read, write: if isStaff(); }
     match /aiMarkingAudit/{document=**} { allow read, write: if isStaff(); }
+    // Staff-only mock authoring records. Never grant student access or allow
+    // a browser to mark a draft as a published full examination.
+    match /mockFactoryDrafts/{draftId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.id == draftId
+        && request.resource.data.level in ['A1','A2','B1','B2','C1','C2']
+        && request.resource.data.status in ['draft','review'];
+      allow update: if isStaff()
+        && resource.data.id == draftId
+        && request.resource.data.id == draftId
+        && request.resource.data.level == resource.data.level
+        && request.resource.data.status in ['draft','review'];
+      allow delete: if false;
+    }
+
     match /answerKeyRegistry/{document=**} { allow read, write: if isStaff(); }
     match /answerKeySyncRuns/{document=**} { allow read, write: if isStaff(); }
 
