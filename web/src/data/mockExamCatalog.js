@@ -86,9 +86,9 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   },
   "a2-mock-02": {
     id: "a2-mock-02", level: "A2", title: "A2 Mock 2", shortTitle: "A2 Mock 2",
-    description: "Your second A2 mock: complete Lesen, Hören, Schreiben and Sprechen from one exam dashboard. Final combined grading is being verified.",
-    durationLabel: "4 modules · saved progress", status: "preview",
-    route: "/campus/course/a2-mock-2", mode: "section-preview",
+    description: "Your second complete A2 mock: four modules, automatic OpenAI assessment and a verified final score out of 100.",
+    durationLabel: "4 modules · verified result", status: "ready",
+    route: "/campus/course/a2-mock-2", mode: "full",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a2-mock-02-lesen": {

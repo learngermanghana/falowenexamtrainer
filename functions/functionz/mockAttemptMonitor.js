@@ -337,7 +337,13 @@ async function listMockAttempts(db, { limit = 200 } = {}) {
       partial = true;
     }
   }
-  const attempts = [...documents.map(normalizeMockAttempt), ...browserAttempts]
+  // A recovered Mock 2 must appear once as a verified completed attempt,
+  // not alongside its older browser-only "in progress" monitoring signal.
+  const serverRows=documents.map(normalizeMockAttempt).filter(Boolean);
+  const published=new Set(serverRows.filter(row=>row.status==="completed")
+    .map(row=>row.uid+"::"+row.mockId));
+  const attempts = [...serverRows, ...browserAttempts.filter(row=>
+    !published.has(row.uid+"::"+row.mockId))]
     .filter(Boolean)
     .sort((a, b) => toMillis(b.updatedAt || b.startedAt) - toMillis(a.updatedAt || a.startedAt))
     .slice(0, Math.min(500, Math.max(1, Number(limit) || 200)));

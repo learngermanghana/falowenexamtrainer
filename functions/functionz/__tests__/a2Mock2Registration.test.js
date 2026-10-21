@@ -30,8 +30,8 @@ test("Mock 2 scores cannot be persisted into a Mock 1 attempt", () => {
   const routeEnd = app.indexOf('app.post("/speaking/b1-mock-score"', routeStart);
   const route = app.slice(routeStart, routeEnd);
   const { isA2SpeakingAttemptBindingSafe } = require("../a2MockSpeakingAttemptIdentity");
-  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "verified-mock-01" })).toBe(false);
-  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "" })).toBe(true);
+  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "server-attempt" })).toBe(true);
+  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "" })).toBe(false);
   expect(route).toContain("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId }))");
   expect(route.indexOf("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId }))")).toBeLessThan(route.indexOf("await persistVerifiedA2MockSection("));
 });

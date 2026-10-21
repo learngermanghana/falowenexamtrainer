@@ -47,6 +47,8 @@ export function restoreA2Mock2Backup(keys, response) {
   const cloud = response?.backup;
   if (!cloud?.attemptStartedAtMs || !cloud?.sections) return false;
   const localFlow = readJson(keys.flow);
+  // A verified archived attempt must never be rehydrated into a new retake.
+  if (Number(localFlow.archivedAttemptStartedAtMs) === Number(cloud.attemptStartedAtMs)) return false;
   // Refuse to replace an active, different attempt.
   if (localFlow.startedAt && localFlow.startedAt !== cloud.attemptStartedAtMs &&
       localFlow.stage !== "intro") return false;
