@@ -1,4 +1,4 @@
-import { assertA2FullMockReady } from "./a2FullMockContract";
+import { assertFullMockReady } from "./mockFactoryContract";
 const A2_SECTION_CARDS = Object.freeze([
   {
     key: "lesen",
@@ -226,7 +226,7 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
 
 // Fail closed when a future A2 mock is presented as a ready full exam
 // without the same verified scoring and persistence lifecycle as Mock 1.
-for (const exam of Object.values(MOCK_EXAM_CATALOG)) assertA2FullMockReady(exam);
+for (const exam of Object.values(MOCK_EXAM_CATALOG)) assertFullMockReady(exam);
 
 export const getMockExam = (id) => MOCK_EXAM_CATALOG[id] || null;
 
@@ -249,8 +249,8 @@ export const buildPracticeMockConfig = ({
   route,
   questionSetId,
   sections = ["Lesen", "Hören", "Schreiben", "Sprechen"],
-  status = "ready",
-} = {}) => ({
+  status = "preview",
+} = {}) => assertFullMockReady({
   id,
   level: String(level || "").toUpperCase(),
   title,
@@ -259,7 +259,7 @@ export const buildPracticeMockConfig = ({
   durationLabel,
   status,
   route,
-  mode: "full",
+  mode: status === "ready" ? "full" : "section-preview",
   questionSetId: questionSetId || id,
   sections,
 });
