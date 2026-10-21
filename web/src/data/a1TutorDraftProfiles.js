@@ -99,8 +99,8 @@ const profiles = {
   },
   "A1-8": {
     sections: {
-      "teil-1": section(choiceItems(5), { label: "Lesen" }),
-      "teil-2": section([], { label: "Sprechen: Fragen und Antworten", speaking: true }),
+      "teil-1": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen · E-Mails und SMS" }),
+      "teil-2": section(choiceItems(3, ["A", "B", "C"]), { label: "Lesen · Schilder und Fahrpläne" }),
     },
   },
   "A1-9": {
