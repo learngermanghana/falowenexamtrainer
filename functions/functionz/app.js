@@ -5240,7 +5240,6 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
             mockId,
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
-            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -5292,7 +5291,6 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
             mockId,
             state,
             verifiedSections: existing.verifiedSections || {},
-            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           tx.set(
@@ -5629,6 +5627,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -5678,6 +5677,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state,
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           tx.set(
