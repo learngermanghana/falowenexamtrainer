@@ -44,6 +44,7 @@ function A2Mock2ExamHubAttempt(){
  const [progress,setProgress] = useState(() => getProgress(STORAGE));
  const [resetError, setResetError] = useState("");
  const [backupNotice,setBackupNotice] = useState("");
+ const [progressSyncState,setProgressSyncState] = useState("idle");
  const stage = flow.stage;
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
@@ -81,14 +82,18 @@ function A2Mock2ExamHubAttempt(){
   const sectionDeadlineMs = ["lesen", "schreiben"].includes(stage) && rawStart > 0
     ? rawStart + 30 * 60 * 1000 : null;
   try {
-   await fetch(`${getBackendUrl()}/internal/mock-progress`, {
+   setProgressSyncState("sending");
+   const response = await fetch(`${getBackendUrl()}/internal/mock-progress`, {
     method: "POST",
     headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" },
     body: JSON.stringify({ mockId: "a2-mock-02", section: stage,
      completedSections, startedAtMs: flow.startedAt, sectionDeadlineMs }),
    });
+   if (!response.ok) throw new Error(`Progress reporting failed (${response.status})`);
+   setProgressSyncState("saved");
   } catch (_) {
-   // Monitoring must never block the learner's exam or submission.
+   setProgressSyncState("failed");
+   // Never erase answers because monitoring was temporarily unavailable.
   }
  }, [idToken, stage, progress, flow.startedAt, STORAGE]);
  useEffect(() => {
@@ -162,6 +167,9 @@ function A2Mock2ExamHubAttempt(){
    </section>:null}
    {stage==="result" && isA2Mock2ReviewReady(STORAGE)?<section className="a2-mock2-full-intro">
     <h2>All four modules completed</h2>
+    <p role="status"><strong>Final result not yet verified.</strong> All sections are finished, but a verified final score requires server-side assessment. Your answers are preserved.</p>
+    <p role="status">{progressSyncState === "sending" ? "Synchronising progress…" : progressSyncState === "saved" ? "Progress synchronised; final marking may still be pending." : progressSyncState === "failed" ? "Progress sync failed. Retry safely below." : "Checking progress sync…"}</p>
+    <button type="button" onClick={reportProgress} disabled={progressSyncState === "sending"}>Retry progress sync</button>
     <p>Your submitted answers remain saved on this device. AI practice feedback is separate from submission; if marking fails, retry it without repeating the mock.</p>
     <p>Lesen: <strong>{progress.lesen.score.toFixed(1)}/25</strong> · Hören: <strong>{progress.hoeren.score.toFixed(1)}/25</strong></p>
     <button type="button" className="a2-mock2-primary" onClick={restart}>Start a new full mock</button>
