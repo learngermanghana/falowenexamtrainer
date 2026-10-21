@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'functions/**'
+      - 'firestore.rules'
       - 'shared/a1GoetheTeil3PictureCards.json'
       - 'web/src/data/**'
       - 'web/src/components/**'
