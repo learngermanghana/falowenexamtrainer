@@ -16,8 +16,8 @@ const attempt = row => row.attempt ?? row.attemptNumber ?? row.attempt_number ??
 
 function sameAttempt(left, right) {
   if (assignmentKey(left) !== assignmentKey(right)) return false;
-  if (left.submissionPath && right.submissionPath) return left.submissionPath === right.submissionPath;
   if (left.submissionId && right.submissionId) return left.submissionId === right.submissionId;
+  if (left.submissionPath && right.submissionPath) return left.submissionPath === right.submissionPath;
   if (attempt(left) != null && attempt(right) != null) return String(attempt(left)) === String(attempt(right));
   // Older Sheet projections have no submission ID: an exact date + score identifies
   // the same published attempt without collapsing other attempts of this assignment.
