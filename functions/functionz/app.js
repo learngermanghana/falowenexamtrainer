@@ -5792,6 +5792,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     }
 
     let completionSync = null;
+    let verifiedResult = null;
     if (status === "completed" && saveOutcome?.ok) {
       try {
         const studentProfile = await findAuthedStudentProfile(db, authedUser);
@@ -5809,6 +5810,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         if (!verifiedOverall || !verifiedSectionScores) {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
+        verifiedResult = {overall: verifiedOverall, sectionScores: verifiedSectionScores};
 
         completionSync = await syncA2MockCompletion({
           db,
@@ -5866,6 +5868,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...(verifiedResult ? { verifiedResult } : {}),
     });
   } catch (err) {
     console.error("/a2-mock/attempt/save error", err);
