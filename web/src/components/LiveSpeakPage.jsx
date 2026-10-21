@@ -5,6 +5,7 @@ import { backendUrl } from "../services/aiClient";
 import { requestCoachSpeech } from "../services/presentationCoachService";
 import GoetheExamTaskCard from "./GoetheExamTaskCard";
 import SpeakingRecorder from "./SpeakingRecorder";
+import SpeakingLoadingStatus from "./SpeakingLoadingStatus";
 import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
@@ -832,6 +833,11 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
     (!details?.enabled || !canStartAiExaminer);
   const waitingForOpening = examinerSession && busy && !messages.length && !pending;
+  // Shared by A1–C2, including embedded mocks: keep the wait visible above
+  // the task card throughout status loading, session start and the first turn.
+  const loadingPhase = loading ? "connecting" : feedbackBusy ? "feedback"
+    : busy && voiceState !== "playing" ? (!session || waitingForOpening ? "opening" : "response")
+    : null;
   const examTurnState = waitingForOpening
     ? "AI examiner is preparing to speak"
     : speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
@@ -847,8 +853,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </header>
       ) : null}
 
-      {loading ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>{examinerEntry ? "Preparing the AI examiner. The AI will speak first; please wait and listen." : "Preparing speaking practice…"}</p> : null}
-      {examinerEntry && busy && !session ? <p role="status" className="speaking-opening-question">Preparing your German examiner’s voice… Please wait and listen before answering.</p> : null}
+      {loadingPhase ? <SpeakingLoadingStatus phase={loadingPhase} /> : null}
       {!loading && details && !details.enabled ? (
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
