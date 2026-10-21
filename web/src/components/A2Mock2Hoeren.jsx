@@ -34,12 +34,12 @@ function A2Mock2HoerenAttempt({ embedded = false, onComplete, reviewReleased = f
     setExam(old => ({ ...old, partIndex: index }));
   };
   const loadAudio = async () => {
-    if (!idToken) { setError("Bitte melden Sie sich erneut an."); return; }
+    if (!idToken) { setError("Please sign in again."); return; }
     setLoading(true); setError("");
     try {
       const result = await fetchA2MockAudioPlaybackUrl({ mockId: "mock-02", part: part.id, key: part.audioObjectKey, idToken });
       setAudioUrl(result.url);
-    } catch (e) { setError(e?.response?.data?.error || e?.message || "Audio noch nicht verfügbar. Bitte prüfen Sie die Datei und den Zugriff."); }
+    } catch (e) { setError(e?.response?.data?.error || e?.message || "This exam audio is unavailable. Please check your access."); }
     finally { setLoading(false); }
   };
   const selections = Object.values(exam.answers).filter(Boolean);
@@ -47,33 +47,33 @@ function A2Mock2HoerenAttempt({ embedded = false, onComplete, reviewReleased = f
   const pictureChoices = part.pictures
     ? arrangeMockChoices(part.pictures.map(([id, label, icon]) => ({id: id.toLowerCase(), label, icon})), "a2-mock2-picture-board")
     : [];
-  return <main className="a2-mock2-shell" lang="de" data-a2-mock2-hoeren>
-    {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Hören</span></div> : null}
+  return <main className="a2-mock2-shell" lang="en" data-a2-mock2-hoeren>
+    {!embedded ? <div className="a2-mock2-top"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks"/><span>A2 · Mock 2 · Hören</span></div> : null}
     {!finished ? <>
       <header className="a2-mock2-progress"><div><strong>Hören · Übungstest 2</strong><span>{selections.length}/20 beantwortet</span></div><strong>Teil {exam.partIndex+1}/4</strong></header>
       <nav className="a2-mock2-nav" aria-label="Hören-Teile">{PARTS.map((p,i)=><button type="button" key={p.id} className={i===exam.partIndex?"selected":""} onClick={()=>changePart(i)}>Teil {i+1}<small>{p.questions.filter(q=>exam.answers[q.number]).length}/5</small></button>)}</nav>
       <section className="a2-mock2-paper"><h1>Teil {exam.partIndex+1}</h1><p>{part.instruction}</p>
         <div className="a2-mock2-audio">
-          <strong>Prüfungsaudio · Teil {exam.partIndex+1}</strong>
-          <p>{part.plays === 2 ? "Der Text wird zweimal im Audio abgespielt." : "Der Text wird einmal abgespielt."} Die Fragen stehen auf dieser Seite.</p>
-          {!audioUrl ? <button type="button" onClick={loadAudio} disabled={loading}>{loading?"Audio wird geladen …":"Audio laden"}</button> :
+          <strong>Exam audio · Teil {exam.partIndex+1}</strong>
+          <p>{part.plays === 2 ? "The required repetition is included in the audio." : "This exam audio plays once."} The exam questions are shown below.</p>
+          {!audioUrl ? <button type="button" onClick={loadAudio} disabled={loading}>{loading?"Loading audio …":"Load audio"}</button> :
             <><audio ref={player} src={audioUrl} preload="metadata" controls={false}
               onEnded={()=>setEnded(old=>({...old,[part.id]:true}))}/>
-              <button type="button" onClick={()=>{if(player.current) { player.current.currentTime=0; player.current.play().then(()=>setStarted(old=>({...old,[part.id]:true}))).catch(e=>setError(e.message)); }}} disabled={Boolean(started[part.id])}>Audio einmal starten</button>
-              <span>{ended[part.id]?"Audio beendet":started[part.id]?"Audio läuft":"Noch nicht gestartet"}</span>
+              <button type="button" onClick={()=>{if(player.current) { player.current.currentTime=0; player.current.play().then(()=>setStarted(old=>({...old,[part.id]:true}))).catch(e=>setError(e.message)); }}} disabled={Boolean(started[part.id])}>Start audio</button>
+              <span>{ended[part.id]?"Audio finished":started[part.id]?"Audio playing":"Not started"}</span>
             </>}
           {error?<p role="alert">{error}</p>:null}
         </div>
-        {part.pictures ? <section><h2>Bilder A–I</h2><p>Wählen Sie jede Aktivität nur einmal. Die Auswahl erfolgt über die Bildbuchstaben.</p><div className="a2-mock2-image-grid">{pictureChoices.map(({id,displayId,label,icon})=><article key={id}><strong>{displayId.toUpperCase()}</strong><span className="a2-mock2-pictogram" aria-hidden="true">{icon}</span><span>{label}</span></article>)}</div></section>:null}
+        {part.pictures ? <section><h2>Bilder A–I</h2><p>Use each activity only once. Choose the corresponding picture letter.</p><div className="a2-mock2-image-grid">{pictureChoices.map(({id,displayId,label,icon})=><article key={id}><strong>{displayId.toUpperCase()}</strong><span className="a2-mock2-pictogram" aria-hidden="true">{icon}</span><span>{label}</span></article>)}</div></section>:null}
         {part.questions.map(q=><fieldset key={q.number} className="a2-mock2-question"><legend><strong>{q.number}.</strong> {q.question}</legend>
-          {part.pictures ? <select aria-label={`Antwort Aufgabe ${q.number}`} value={exam.answers[q.number]||""} onChange={e=>update(q.number,e.target.value)}><option value="">Bitte wählen</option>{pictureChoices.map(({id,displayId})=><option key={id} value={id} disabled={chosenPictureIds.has(id) && exam.answers[q.number]!==id}>{displayId.toUpperCase()}</option>)}</select> :
+          {part.pictures ? <select aria-label={`Antwort Aufgabe ${q.number}`} value={exam.answers[q.number]||""} onChange={e=>update(q.number,e.target.value)}><option value="">Please choose</option>{pictureChoices.map(({id,displayId})=><option key={id} value={id} disabled={chosenPictureIds.has(id) && exam.answers[q.number]!==id}>{displayId.toUpperCase()}</option>)}</select> :
           (q.options ? arrangeMockChoices(q.options, `a2-mock2-hoeren-${q.number}`) : [{id:"ja",displayId:"ja",label:"Ja"},{id:"nein",displayId:"nein",label:"Nein"}]).map(o=><label key={o.id} className={exam.answers[q.number]===o.id?"selected":""}><input type="radio" name={`mock2-hoeren-${q.number}`} checked={exam.answers[q.number]===o.id} onChange={()=>update(q.number,o.id)}/><strong>{o.displayId.toUpperCase()}</strong><span>{o.label}</span></label>)}
         </fieldset>)}
       </section>
-      <div className="a2-mock2-actions"><button type="button" disabled={exam.partIndex===0} onClick={()=>changePart(exam.partIndex-1)}>Zurück</button>{exam.partIndex!==3?<button type="button" className="a2-mock2-primary" onClick={()=>changePart(exam.partIndex+1)}>Weiter</button>:<button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Hören abgeben?"))setExam(old=>({...old,completedAt:Date.now()}));}}>Hören abgeben</button>}</div>
-    </>:!reveal ? <p>Hören abgegeben. Die Lösungen erscheinen erst nach Abschluss aller vier Module.</p> : <section className="a2-mock2-results"><h1>Hören-Ergebnis</h1><p className="a2-mock2-score">{correct}/20 <small>{Math.round(correct*5)}%</small></p><p>Lesen, Schreiben und Sprechen werden hier nicht bewertet. Hören-Punktzahl: {(correct*25/20).toFixed(1)}/25.</p>
+      <div className="a2-mock2-actions"><button type="button" disabled={exam.partIndex===0} onClick={()=>changePart(exam.partIndex-1)}>Back</button>{exam.partIndex!==3?<button type="button" className="a2-mock2-primary" onClick={()=>changePart(exam.partIndex+1)}>Next</button>:<button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Submit listening?"))setExam(old=>({...old,completedAt:Date.now()}));}}>Submit listening</button>}</div>
+    </>:!reveal ? <p>Listening submitted. Correct answers appear after all four modules are complete.</p> : <section className="a2-mock2-results"><h1>Hören-Ergebnis</h1><p className="a2-mock2-score">{correct}/20 <small>{Math.round(correct*5)}%</small></p><p>Lesen, Schreiben und Sprechen werden hier nicht bewertet. Hören-Punktzahl: {(correct*25/20).toFixed(1)}/25.</p>
       {PARTS.map((p,i)=><section key={p.id}><h2>Teil {i+1}</h2>{p.questions.map(q=><div className="a2-mock2-review" key={q.number}><strong>{q.number}. {q.question}</strong><p>Ihre Antwort: {(p.pictures ? mockDisplayAnswer(p.pictures.map(([id,label,icon]) => ({id:id.toLowerCase(),label,icon})), exam.answers[q.number], "a2-mock2-picture-board") : q.options ? mockDisplayAnswer(q.options, exam.answers[q.number], `a2-mock2-hoeren-${q.number}`) : (exam.answers[q.number]||"—").toUpperCase())} · Lösung: {p.pictures ? mockDisplayAnswer(p.pictures.map(([id,label,icon]) => ({id:id.toLowerCase(),label,icon})), q.answer, "a2-mock2-picture-board") : q.options ? mockDisplayAnswer(q.options, q.answer, `a2-mock2-hoeren-${q.number}`) : q.answer.toUpperCase()}</p></div>)}</section>)}
-      <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Neuen Versuch starten?")){setExam(START);setStarted({});setEnded({});}}}>Erneut üben</button>
+      <button type="button" className="a2-mock2-primary" onClick={()=>{if(window.confirm("Start another attempt?")){setExam(START);setStarted({});setEnded({});}}}>Practise again</button>
     </section>}
   </main>;
 }
