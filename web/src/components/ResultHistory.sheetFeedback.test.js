@@ -166,3 +166,6 @@ describe("Sheet result feedback presentation", () => {
 test("an authoritative admin correction is not replaced by old objective evidence", () => {
   expect(resolveResultScore({score:92,finalScore:92,manualScoreOverride:true,objectiveScore:29,objectiveCorrect:2,objectiveTotal:7})).toBe(92);
 });
+test("the admin-edited score takes precedence when a legacy finalScore remains stale", () => {
+ expect(resolveResultScore({score:92,finalScore:49,manualScoreOverride:true})).toBe(92);
+});
