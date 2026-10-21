@@ -13,12 +13,20 @@ import A2Mock2Schreiben from "./A2Mock2Schreiben";
 import A2Mock2Sprechen from "./A2Mock2ConversationalSpeaking";
 import { A2_MOCK_2_LESEN_QUESTIONS } from "../data/a2Mock2Lesen";
 import { A2_MOCK_2_HOEREN_QUESTIONS } from "../data/a2Mock2Hoeren";
+import { A2_MOCK_2_SPEAKING, A2_MOCK_2_SPEAKING_RUBRIC } from "../data/a2Mock2Speaking";
 import "./A2Mock2Lesen.css";
 import "./A1FinalMockExamPage.css";
 import "./A2Mock2ExamHub.css";
 
 const ORDER = ["lesen", "hoeren", "schreiben", "sprechen"];
 const LABELS = ["Lesen", "Hören", "Schreiben", "Sprechen"];
+const LEGACY_SPEAKING_TASKS=[
+ {id:"t1_questions",teil:"1",task:"Ask questions about "+A2_MOCK_2_SPEAKING.cards.map(x=>x.keyword).join(", ")},
+ {id:"t1_answers",teil:"1",task:"Respond to: "+A2_MOCK_2_SPEAKING.cards.map(x=>x.samplePartnerQuestion).join(" / ")},
+ {id:"t2_main",teil:"2",task:A2_MOCK_2_SPEAKING.teil2.topic+" "+A2_MOCK_2_SPEAKING.teil2.points.join("; ")},
+ {id:"t2_followups",teil:"2",task:A2_MOCK_2_SPEAKING.teil2.followups.join(" / ")},
+ {id:"t3_plan",teil:"3",task:A2_MOCK_2_SPEAKING.teil3.situation+" "+A2_MOCK_2_SPEAKING.teil3.points.join("; ")},
+];
 const read = key => { try { return JSON.parse(window.localStorage.getItem(key) || "null") || {}; } catch { return {}; } };
 const getProgress = (STORAGE) => {
  const l = read(STORAGE.lesen), h = read(STORAGE.hoeren), w = read(STORAGE.schreiben), s = read(STORAGE.sprechen);
@@ -83,6 +91,7 @@ function A2Mock2ExamHubAttempt(){
   try {
    const verified=await finalizeA2RegisteredMock({
     idToken,mockId:"a2-mock-02",attemptId,storageKeys:STORAGE,
+    legacySpeakingTasks:LEGACY_SPEAKING_TASKS,speakingRubric:A2_MOCK_2_SPEAKING_RUBRIC,
    });
    setFlow(current=>({...current,verifiedResult:verified}));
    setFinalStatus("completed");
