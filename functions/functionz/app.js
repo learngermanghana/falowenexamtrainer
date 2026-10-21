@@ -6617,7 +6617,12 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       const db=getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
       try {
-        const {scoreA2ExaminerSnapshots}=require("./a2MockExaminerScore");
+        const {scoreA2ExaminerSnapshots,bindLegacyMock2ExaminerReceipts}=require("./a2MockExaminerScore");
+        if (mockId === "a2-mock-02") {
+          await bindLegacyMock2ExaminerReceipts({
+            db,admin,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+          });
+        }
         const result=await scoreA2ExaminerSnapshots({
           db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,mockId,
         });
