@@ -91,7 +91,7 @@ const setAttributes = (element, attributes = {}) => {
   if (!element) return;
   Object.entries(attributes).forEach(([name, value]) => {
     if (value === undefined || value === null) return;
-    element.setAttribute(name, String(value));
+    if (element.getAttribute(name) !== String(value)) element.setAttribute(name, String(value));
   });
 };
 
@@ -342,7 +342,7 @@ export default function SignUpPage(props) {
         trackPublicFunnelEvent("account_created");
       }
     });
-    observer.observe(root, { childList: true, subtree: true, characterData: true });
+    observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["name"] });
 
     const saveCurrentDraft = () => {
       const form = root.querySelector("form");
@@ -363,6 +363,7 @@ export default function SignUpPage(props) {
     const handleSubmit = (event) => {
       const form = event.target;
       if (!form || !root.contains(form)) return;
+      if (form.dataset.signupStep && form.dataset.signupStep !== "3") return;
       window.clearTimeout(draftSaveTimer);
       const next = readFormDraft(form);
       writeDraft(next);
