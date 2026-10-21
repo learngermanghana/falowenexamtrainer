@@ -4,8 +4,8 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
-import { startA2MockAttempt } from "../services/a2FinalMockService";
-import { finalizeA2Mock2 } from "../services/a2Mock2Finalization";
+import { startA2MockAttempt, saveA2MockAttempt } from "../services/a2FinalMockService";
+import { finalizeA2Mock2, savedA2Mock2State } from "../services/a2Mock2Finalization";
 import { getMockAnswerBackup, restoreA2Mock2Backup, syncA2Mock2Backup } from "../services/a2Mock2Backup";
 import A2Mock2Lesen from "./A2Mock2Lesen";
 import A2Mock2Hoeren from "./A2Mock2Hoeren";
@@ -99,6 +99,20 @@ function A2Mock2ExamHubAttempt(){
   }).finally(() => { registrationInFlight.current = false; });
   return () => { cancelled = true; };
  }, [idToken,user?.uid,stage,flow.attemptInfo?.attemptId,attemptRetry]);
+
+ // Persist a compact server checkpoint when entering each exam section.
+ // The detailed submitted Lesen/Hören/Schreiben backup remains independently
+ // recoverable; this is the same attempt lifecycle used by Mock 1.
+ useEffect(() => {
+  const attemptId=flow.attemptInfo?.attemptId;
+  if (!attemptId || !idToken || stage === "intro" || stage === "result" || flow.verifiedResult) return;
+  saveA2MockAttempt({
+   idToken,attemptId,section:stage,status:"in_progress",
+   state:savedA2Mock2State(STORAGE,stage),
+  }).catch(error => {
+   setAttemptError(error?.response?.data?.error || error.message || "Could not save exam checkpoint.");
+  });
+ }, [idToken,flow.attemptInfo?.attemptId,flow.verifiedResult,stage,STORAGE]);
 
  // Save current answers and obtain the actual server-verified four-skill score.
  // A retry reuses previously persisted AI marks instead of paying to grade again.
