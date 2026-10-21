@@ -110,66 +110,15 @@ const objectiveKeysForMock = (mockId) =>
 
 const clean = (value = "") => String(value ?? "").trim();
 
-const normalizeObjectiveAnswer = (value) => clean(value).toLowerCase();
-
-const scoreObjectiveAnswers = (answers = {}, answerKey = {}) => {
-  const entries = Object.entries(answerKey);
-  const correct = entries.reduce(
-    (count, [key, expected]) =>
-      normalizeObjectiveAnswer(answers?.[key]) === normalizeObjectiveAnswer(expected)
-        ? count + 1
-        : count,
-    0,
-  );
-  return {
-    correct,
-    total: entries.length,
-    score: Number(((correct / Math.max(1, entries.length)) * 25).toFixed(1)),
-    maxScore: 25,
-  };
-};
-
-const verifiedSectionScore = (verifiedSections = {}, section) => {
-  const record = verifiedSections?.[section];
-  const score = Number(record?.score);
-  if (!record?.verified || !Number.isFinite(score)) {
-    const error = new Error(`Server-verified ${section} score is required before completion.`);
-    error.code = "A2_MOCK_SECTION_NOT_VERIFIED";
-    error.section = section;
-    throw error;
-  }
-  return Math.max(0, Math.min(25, score));
-};
+const {scoreObjectiveAnswers,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
 
 const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
   if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unknown A2 mock answer set.");
   const keys = objectiveKeysForMock(mockId);
-  const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {}, keys.lesen);
-  const hoeren = scoreObjectiveAnswers(state?.hoerenAnswers || {}, keys.hoeren);
-  const schreiben = verifiedSectionScore(verifiedSections, "schreiben");
-  const sprechen = verifiedSectionScore(verifiedSections, "sprechen");
-
-  const sectionScores = {
-    lesen: lesen.score,
-    hoeren: hoeren.score,
-    schreiben,
-    sprechen,
-  };
-  const overallScore = Number(
-    Object.values(sectionScores)
-      .reduce((sum, value) => sum + Number(value || 0), 0)
-      .toFixed(1),
-  );
-
-  return {
-    sectionScores,
-    overall: {
-      score: overallScore,
-      maxScore: 100,
-      passed: overallScore >= 60,
-    },
-    objective: { lesen, hoeren },
-  };
+  return buildVerifiedFourSkillScore({
+    level:"A2",state,verifiedSections,
+    answerKeys:keys,
+  });
 };
 
 const persistVerifiedA2MockSection = async ({

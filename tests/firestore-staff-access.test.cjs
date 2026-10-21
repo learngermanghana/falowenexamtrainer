@@ -1,7 +1,7 @@
 const { test, before, after } = require('node:test');
 const fs = require('node:fs');
 const { initializeTestEnvironment, assertSucceeds, assertFails } = require('@firebase/rules-unit-testing');
-const { collection, collectionGroup, doc, getDoc, getDocs, setDoc } = require('firebase/firestore');
+const { collection, collectionGroup, doc, getDoc, getDocs, setDoc, deleteDoc } = require('firebase/firestore');
 let env;
 before(async () => {
   env = await initializeTestEnvironment({
@@ -59,4 +59,34 @@ test('ordinary student and signed-out accounts cannot access staff panels or oth
 test('student submission ownership access is preserved', async () => {
   const db = env.authenticatedContext('student-owner', { email: 'owner@example.com' }).firestore();
   await assertSucceeds(getDoc(doc(db, 'submissions/flat')));
+});
+
+test('deployed canonical rules give real staff Mock Builder access without student exposure', async () => {
+  const operators=[
+    {email:'staff@falowen.app'},
+    {email:'moxflex@gmail.com'},
+    {admin:true},{staff:true},{role:'admin'},{role:'staff'},
+  ];
+  for(let i=0;i<operators.length;i++){
+    const database=env.authenticatedContext('draft-admin-'+i,operators[i]).firestore();
+    const id='b2-mock-'+(i+60);
+    const ref=doc(database,'mockFactoryDrafts',id);
+    await assertSucceeds(getDocs(collection(database,'mockFactoryDrafts')));
+    await assertSucceeds(setDoc(ref,{id,level:'B2',status:'draft'}));
+    await assertSucceeds(getDoc(ref));
+    await assertSucceeds(setDoc(ref,{id,level:'B2',status:'review'}));
+    await assertFails(setDoc(ref,{id,level:'B2',status:'published'}));
+    await assertFails(deleteDoc(ref));
+  }
+  for(const context of [
+    env.authenticatedContext('student-read',{email:'student@example.com',role:'student'}),
+    env.unauthenticatedContext()
+  ]){
+    const database=context.firestore();
+    await assertFails(getDocs(collection(database,'mockFactoryDrafts')));
+    await assertFails(getDoc(doc(database,'mockFactoryDrafts','b2-mock-60')));
+    await assertFails(setDoc(doc(database,'mockFactoryDrafts','c1-mock-01'),{
+      id:'c1-mock-01',level:'C1',status:'draft'
+    }));
+  }
 });
