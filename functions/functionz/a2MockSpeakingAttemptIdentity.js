@@ -1,8 +1,8 @@
 "use strict";
 
-// Mock 2 is a browser-stored practice attempt, not a verified A2 Final Mock
-// attempt. Never let its score be persisted into a Mock 1 attempt ID.
-const isA2SpeakingAttemptBindingSafe = ({ mockId, attemptId } = {}) =>
-  mockId !== "a2-mock-02" || !String(attemptId || "").trim();
+// Mock 2 can be graded only when a server-read attempt confirms the same mock.
+// A browser-supplied attemptId alone is not authoritative.
+const isA2SpeakingAttemptBindingSafe = ({ mockId, attemptId, verifiedMockId } = {}) =>
+  mockId !== "a2-mock-02" || !String(attemptId || "").trim() || verifiedMockId === mockId;
 
 module.exports = { isA2SpeakingAttemptBindingSafe };
