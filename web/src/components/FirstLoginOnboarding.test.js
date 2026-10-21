@@ -47,11 +47,11 @@ describe("lean first-login onboarding", () => {
       "studentProfile?.paymentStatus",
       "studentProfile?.balanceDue",
       "detectLevelKey(studentProfile)",
-      "getTrialAccessState(studentProfile)",
-      "Start learning",
-      "View class details",
-      "Pay now",
-      "What happens next?",
+      "getTrialLifecycleState(studentProfile)",
+      "Start orientation",
+      "View class and account details",
+      "Open billing",
+      "Where can I get help?",
     ].forEach((contract) => expect(source).toContain(contract));
 
     expect(source).not.toContain("LESSON_VIDEO_DICTIONARY");
@@ -62,6 +62,6 @@ describe("lean first-login onboarding", () => {
   test("onboarding completion remains the only profile write from the route", () => {
     const app = fs.readFileSync(path.resolve(__dirname, "../App.js"), "utf8");
     expect(app).toContain("onSaveOnboarding={() => saveStudentProfile({ onboardingCompleted: true })}");
-    expect(app).toContain("getTrialAccessState(studentProfile)");
+    expect(app).toContain("getTrialLifecycleState(studentProfile)");
   });
 });

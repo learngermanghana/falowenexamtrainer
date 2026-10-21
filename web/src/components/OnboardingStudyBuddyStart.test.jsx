@@ -32,7 +32,8 @@ test("hiding onboarding chat leaves starting actions and Course Book navigation"
     <Route path="/" element={<Home />} />
     <Route path="/campus/course" element={<h1>Course Book lessons</h1>} />
   </Routes></MemoryRouter>);
-  await act(async () => { await userEvent.click(screen.getByRole("button", { name: /Ask Study Buddy anything/ })); });
+  await userEvent.click(screen.getByText("Where can I get help?"));
+  await act(async () => { await userEvent.click(screen.getByRole("button", { name: "Ask Study Buddy" })); });
   expect(save).toHaveBeenCalledTimes(1);
   expect(await screen.findByRole("region", { name: "Your next step in Falowen" })).toBeInTheDocument();
   await waitFor(() => expect(document.body.querySelector(".study-buddy-bar")).toBeInTheDocument());

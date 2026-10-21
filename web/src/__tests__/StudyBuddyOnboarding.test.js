@@ -5,22 +5,14 @@ const onboarding = fs.readFileSync(path.join(process.cwd(), "src/components/Onbo
 const buddy = fs.readFileSync(path.join(process.cwd(), "src/components/StudyBuddyBar.js"), "utf8");
 
 describe("first-login Study Buddy onboarding", () => {
-  test("introduces Study Buddy and offers orientation, Day 1 and a live chat", () => {
-    expect(onboarding).toContain("I’m Study Buddy, your learning partner");
+  test("keeps a single orientation entry and moves Study Buddy under help", () => {
     expect(onboarding).toContain("learnerFirstName");
-    expect(onboarding).toContain("Show my getting started guide");
-    expect(onboarding).toContain("This is a guide, not a completion tracker.");
-    expect(onboarding).toContain("Start Orientation");
-    expect(onboarding).toContain("Day 1 Workbook");
-    expect(onboarding).toContain("Ask Study Buddy anything");
-    expect(onboarding).toContain('finishAndGo("/?studyBuddy=open&welcome=1", "ask")');
-  });
-
-  test("preserves the real Day 0 teacher-navigation entry and level-specific guarded lesson route", () => {
-    expect(onboarding).toContain("day0WorkbookByLevel[level]");
-    expect(onboarding).toContain('dayOnePath = level ? `/campus/course/lesson/${level}/1?view=workbook`');
-    expect(onboarding).toContain('finishAndGo(firstLessonPath, "video")');
-    expect(onboarding).toContain('finishAndGo(dayOnePath, "day1")');
+    expect(onboarding).toContain("Where can I get help?");
+    expect(onboarding).toContain("Ask Study Buddy");
+    expect(onboarding).not.toContain("showWorkbookGuide");
+    expect(onboarding).not.toContain("showGettingStarted");
+    expect(onboarding).toContain('finishAndGo(firstLessonPath, "orientation")');
+    expect(onboarding).toContain('finishAndGo("/campus/course", "course")');
     expect(onboarding).toContain("await onSaveOnboarding?.()");
   });
 
