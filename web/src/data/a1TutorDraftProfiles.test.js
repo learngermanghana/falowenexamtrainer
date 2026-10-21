@@ -80,7 +80,6 @@ test("reports incomplete Health workbook until both reading parts and listening 
 test("replaces only the agreed A1 assignment sections with Goethe speaking", () => {
   for (const [key, part, exam] of [
     ["A1-4", "teil-2", "Sich vorstellen"],
-    ["A1-8", "teil-2", "Fragen und Antworten"],
     ["A1-11", "teil-1", "Bitten und Reagieren"],
   ]) {
     const assignment = getA1Assignment(key);
@@ -92,23 +91,19 @@ test("replaces only the agreed A1 assignment sections with Goethe speaking", () 
   expect(getA1Assignment("A1-8").sections).toHaveLength(2);
 });
 
-test("requires an assessed speaking result instead of obsolete objective answers", () => {
-  const base = {
-    "teil-1": ["1. A", "2. B", "3. C", "4. D", "5. A"],
-  };
-  const noSpeaking = makeSerializedSections({ ...base, "teil-2": ["1. Richtig", "2. Falsch", "3. Richtig"] });
-  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: noSpeaking }).ok).toBe(false);
-  const fakeScore = makeSerializedSections({ ...base, "teil-2": ["Score: 20/10"] });
-  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: fakeScore }).ok).toBe(false);
-  const complete = makeSerializedSections({ ...base, "teil-2": [
-    "GOETHE_A1_TUTOR_SPEAKING_V1",
-    "Speaking exam part: 2",
-    "Score: 7/10",
-    "Feedback: Ask complete questions.",
-  ] });
+test("A1-8 requires five true/false and three a/b/c Lesen responses", () => {
+  const incomplete = makeSerializedSections({
+    "teil-1": ["1. Richtig", "2. Richtig", "3. Falsch", "4. Richtig", "5. Richtig"],
+    "teil-2": ["6. B", "7. C"],
+  });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: incomplete }).ok).toBe(false);
+  const complete = makeSerializedSections({
+    "teil-1": ["1. Richtig", "2. Richtig", "3. Falsch", "4. Richtig", "5. Richtig"],
+    "teil-2": ["6. B", "7. C", "8. B"],
+  });
   expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: complete })).toEqual({ ok: true, message: "" });
   expect(getA1TutorDraftProgress({ assignmentKey: "A1-8", draft: { sections: {
-    "teil-1": { answers: Object.fromEntries(Array.from({ length: 5 }, (_, index) => [index + 1, "A"])) },
-    "teil-2": { text: complete.get("teil-2").join("\n") },
-  } } })).toEqual(expect.objectContaining({ complete: true, total: 6, completed: 6 }));
+    "teil-1": { answers: { 1: "Richtig", 2: "Richtig", 3: "Falsch", 4: "Richtig", 5: "Richtig" } },
+    "teil-2": { answers: { 6: "B", 7: "C", 8: "B" } },
+  } } })).toEqual(expect.objectContaining({ complete: true, total: 8, completed: 8 }));
 });
