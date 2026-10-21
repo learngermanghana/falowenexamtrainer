@@ -6595,7 +6595,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
         return res.status(400).json({
           code:"A2_MOCK_ATTEMPT_MISMATCH",
-          error:"A2 Mock 2 scores cannot be saved to a Mock 1 attempt.",
+          error:"A verified A2 score requires a registered mock and its server attempt ID.",
         });
       }
     }
@@ -6603,19 +6603,17 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     // New conversational Mock 1: verify server-owned examiner results instead
     // of accepting a client-computed score. No additional model call is needed.
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
-      if (String(req.body?.mockId || "a2-mock-01") !== "a2-mock-01") {
-        return res.status(400).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This examiner score is available only for A2 Mock 1."});
-      }
+      const mockId=String(req.body?.mockId || "a2-mock-01");
       const attemptId=String(req.body?.attemptId || "").trim().slice(0,120);
       const db=getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
       try {
         const {scoreA2ExaminerSnapshots}=require("./a2MockExaminerScore");
         const result=await scoreA2ExaminerSnapshots({
-          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+          db,uid:authedUser.uid,attemptId,mockId,sessionIds:req.body.examinerSessionIds,
         });
         await persistVerifiedA2MockSection({
-          db,admin,uid:authedUser.uid,attemptId,section:"sprechen",
+          db,admin,uid:authedUser.uid,attemptId,mockId,section:"sprechen",
           score:result.score,source:"/speaking/a2-mock-score:verified-examiner",
         });
         return res.json({result});
@@ -6633,6 +6631,23 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
       return res.status(400).json({ error: "Five speaking responses are required for the complete A2 mock." });
     }
 
+    const mockIdForRequest = String(req.body?.mockId || "a2-mock-01");
+    const serverAttemptId = String(req.body?.attemptId || "").trim().slice(0,120);
+    if (!isA2SpeakingAttemptBindingSafe({mockId:mockIdForRequest,attemptId:serverAttemptId})) {
+      return res.status(400).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"A registered server attempt is required for speaking marking."});
+    }
+    const dbForAttempt = getFirestoreSafe();
+    if (!dbForAttempt) return res.status(503).json({error:"Mock storage unavailable."});
+    const savedAttempt = await dbForAttempt.collection("a2MockExamUsers").doc(authedUser.uid)
+      .collection("attempts").doc(serverAttemptId).get();
+    if (!savedAttempt.exists || savedAttempt.data()?.mockId !== mockIdForRequest) {
+      return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This speaking score belongs to another attempt."});
+    }
+    const existingScore=savedAttempt.data()?.verifiedSections?.sprechen;
+    if (existingScore?.verified && Number.isFinite(Number(existingScore.score))) {
+      return res.json({result:{score:Number(existingScore.score),maxScore:25,alreadyVerified:true}});
+    }
+
     const normalizedAttempts = attempts.map((attempt) => ({
       id: String(attempt?.id || "").trim(),
       teil: String(attempt?.teil || "").trim(),
@@ -6643,8 +6658,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a2-mock-01");
     if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
-    // Mock 2 is a browser-local practice flow. Never persist its scores into a
-    // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
+    // All A2 mocks now require attempt-bound verified results.
     if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
       return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
     }
@@ -6712,6 +6726,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
           admin,
           uid: authedUser.uid,
           attemptId,
+          mockId,
           section: "sprechen",
           score: numericScore,
           source: "/speaking/a2-mock-score",
