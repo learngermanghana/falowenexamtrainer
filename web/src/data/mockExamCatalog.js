@@ -1,3 +1,4 @@
+import { assertA2FullMockReady } from "./a2FullMockContract";
 const A2_SECTION_CARDS = Object.freeze([
   {
     key: "lesen",
@@ -222,6 +223,10 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     officialPracticeUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html",
   },
 });
+
+// Fail closed when a future A2 mock is presented as a ready full exam
+// without the same verified scoring and persistence lifecycle as Mock 1.
+for (const exam of Object.values(MOCK_EXAM_CATALOG)) assertA2FullMockReady(exam);
 
 export const getMockExam = (id) => MOCK_EXAM_CATALOG[id] || null;
 
