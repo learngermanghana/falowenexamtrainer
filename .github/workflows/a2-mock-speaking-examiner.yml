@@ -45,6 +45,8 @@ jobs:
       - name: Test A2 speaking flow and saved results
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2MockSpeakingExaminerFlow.test.jsx
+      - name: Verify A2 API and scorer syntax
+        run: node --check functions/functionz/app.js && node --check functions/functionz/a2MockCompletionSync.js && node --check functions/functionz/a2MockExaminerScore.js
       - name: Verify server-bound examiner receipts
         run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs functions/functionz/tests/a2MockSpeakingAttemptIdentity.test.cjs functions/functionz/tests/a2RegisteredMockContract.test.cjs
       - name: Build web application
