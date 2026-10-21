@@ -19,7 +19,7 @@ Every new A2 catalog entry starts as `preview` and `section-preview`.
 It becomes `status: "ready", mode: "full"` only after all five capability flags in
 `a2FullMockContract.js` are verified by the end-to-end suite and then explicitly enabled.
 
-**A2 Mock 2 remains preview:** It currently has submitted-answer backups and browser progress only. It must receive the server attempt, mock-specific objective keys, verified writing and speaking pipelines, and final synchronization before it is called a full exam. The publication guard intentionally does not fabricate these features.
+**A2 Mock 2 implementation:** The shared backend now accepts separate Mock 2 objective keys and mock identity. The front-end starts/resumes an attempt and automatically requests verified writing, speaking receipts, and final score synchronization. Earlier three-part receipts can be securely linked once if they match the authenticated learner and pre-upgrade evidence. Existing five-transcript submissions use the legacy grader. Promote only after the end-to-end suite and actual backend deployment are verified; do not mistake a Vercel frontend deployment for a Cloud Run backend deployment.
 
 ## Required tests before promotion
 
