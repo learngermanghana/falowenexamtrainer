@@ -38,7 +38,7 @@ test("A2 Mock 2 uses A1-style home, German AI voice, three Teils and preserves o
   localStorage.setItem(keys.schreiben,JSON.stringify({submittedAt:Date.now()}));
   localStorage.setItem(keys.sprechen,JSON.stringify({t1_questions:{transcript:"Saved previous format"}}));
   const done=jest.fn();
-  render(<A2Mock2ConversationalSpeaking embedded onComplete={done}/>);
+  render(<A2Mock2ConversationalSpeaking embedded attemptId="a2-mock2-attempt" onComplete={done}/>);
   expect(screen.getByText(/In Ruhe üben/)).toBeInTheDocument();
   expect(screen.getByRole("button",{name:/Start full speaking exam/})).toBeInTheDocument();
   expect(screen.getByText("Saved previous format")).not.toBeVisible();
