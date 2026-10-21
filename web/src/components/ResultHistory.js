@@ -123,7 +123,7 @@ const hasValue = (value) => value !== null && value !== undefined && value !== "
 
 export const resolveResultScore = (item = {}) => {
   const storedScore = toNumericScore(item.numericScore ?? item.score ?? item.finalScore);
-  if (isAuthoritativeScore(item)) return toNumericScore(item.finalScore ?? item.score ?? item.numericScore);
+  if (isAuthoritativeScore(item)) return toNumericScore(item.score ?? item.finalScore ?? item.numericScore);
   const objectiveTotal = Number(item.objectiveTotal || 0);
   const objectiveCorrect = Number(item.objectiveCorrect || 0);
   const explicitBreakdown = normalizeArray(item.scoreBreakdown);
