@@ -46,3 +46,11 @@ test("a foreign-owned projected score never fabricates a course completion", asy
   expect(progress["A1-5.9"]).toBeUndefined();
   expect(progress["A1-12.2"]).toMatchObject({status:"passed", bestScore:76});
 });
+
+test("keeps the saved admin final score instead of recalculating stale AI components", async () => {
+  mockScores.push({ id:"corrected", studentId:"student-uid", studentCode:"FAL-1234", level:"B1", assignmentId:"B1-7.21", finalScore:92, score:92, objectiveScore:29, writingScore:80, manuallyEdited:true, submissionId:"corrected-attempt", updatedAt:{seconds:100} });
+  try {
+    const {results} = await fetchResults({studentCode:"FAL-1234"});
+    expect(results.find(row => row.assignmentId === "B1-7.21")).toMatchObject({score:92,finalScore:92,submissionId:"corrected-attempt",manuallyEdited:true,updatedAt:100000});
+  } finally { mockScores.pop(); }
+});
