@@ -47,7 +47,7 @@ const resolveFinalScore = (row = {}) => {
   // Published totals, especially tutor corrections, own the final mark.
   // Component fields may still contain evidence from the original AI assessment.
   if (hasScoreValue(row.finalScore) || hasScoreValue(row.score)) {
-    return ceilScore(hasScoreValue(row.finalScore) ? row.finalScore : row.score, null);
+    return ceilScore(hasScoreValue(row.score) ? row.score : row.finalScore, null);
   }
   const objectiveScore = hasScoreValue(row.objectiveScore)
     ? toNumber(row.objectiveScore, null)
