@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
@@ -34,6 +34,13 @@ function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewR
   const savedParts = data._examinerParts || {};
   const tasks = useMemo(() => TASKS,[]);
   const completeParts = tasks.filter(task => savedParts[task.teil]?.sessionId && savedParts[task.teil]?.assessment).length;
+  const legacyComplete = ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
+    .every(key => Boolean(data[key]?.transcript));
+  useEffect(() => {
+    // Older completed five-recording attempts must still advance to the mock
+    // result. Never force a completed student to sit a new examiner exam.
+    if (embedded && !reviewReleased && (legacyComplete || completeParts === tasks.length)) onComplete?.();
+  }, [embedded, reviewReleased, legacyComplete, completeParts, onComplete, tasks.length]);
   const save = (_teil,_result,parts) => {
     const next = {...read(storageKey),...data,_examinerParts:parts};
     // Persist immediately, before the parent reads section completion.
