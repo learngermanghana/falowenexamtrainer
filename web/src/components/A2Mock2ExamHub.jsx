@@ -53,6 +53,8 @@ function A2Mock2ExamHubAttempt(){
  const [finalState,setFinalState] = useState({status:"idle",error:""});
  const registrationInFlight = useRef(false);
  const finalizationInFlight = useRef(false);
+ const mountedRef = useRef(true);
+ useEffect(() => () => { mountedRef.current = false; }, []);
  const stage = flow.stage;
  const index = ORDER.indexOf(stage);
  const completed = ORDER.filter(k=>progress[k].done).length;
@@ -85,19 +87,19 @@ function A2Mock2ExamHubAttempt(){
  // to pre-upgrade browser submissions without erasing the student's answers.
  useEffect(() => {
   if (!idToken || !user?.uid || stage === "intro" || flow.attemptInfo?.attemptId || registrationInFlight.current) return;
-  let cancelled = false;
   registrationInFlight.current = true;
   setAttemptError("");
   startA2MockAttempt({ idToken, mockId:"a2-mock-02" }).then(response => {
-   if (cancelled) return;
+   if (!mountedRef.current) return;
    if (!response?.attemptId) throw new Error("The server did not issue an exam attempt ID.");
    setFlow(old => ({...old, attemptInfo:{
     attemptId:response.attemptId,attemptNumber:response.attemptNumber,firstAttempt:response.firstAttempt,
    }}));
   }).catch(error => {
-   if (!cancelled) setAttemptError(error?.response?.data?.error || error.message || "Cannot connect to the mock exam server.");
+   if (mountedRef.current) setAttemptError(error?.response?.data?.error || error.message || "Cannot connect to the mock exam server.");
   }).finally(() => { registrationInFlight.current = false; });
-  return () => { cancelled = true; };
+  // Do not cancel registration when an already-submitted section advances.
+  // A transient stage change must not strand the attempt without a server ID.
  }, [idToken,user?.uid,stage,flow.attemptInfo?.attemptId,attemptRetry]);
 
  // Persist a compact server checkpoint when entering each exam section.
