@@ -170,7 +170,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           </a>
           <div className="falowen-home-nav-links">
             <a href="/classes">{copy.navClasses}</a>
-            <a href="/exam-practice">{copy.navExams}</a>
+            <a href="https://exams.falowen.app/">{copy.navExams}</a>
             <a href="/visitor-guide">{copy.navHelp}</a>
           </div>
           <div className="falowen-home-nav-actions">
