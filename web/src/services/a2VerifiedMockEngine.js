@@ -1,8 +1,6 @@
 import { saveA2MockAttempt, scoreA2MockWriting } from "./a2FinalMockService";
 import { scoreA2MockSpeaking } from "./coachService";
-import { A2_MOCK_2_SPEAKING_RUBRIC } from "../data/a2Mock2Speaking";
 
-const LEGACY_TASKS = ["t1_questions","t1_answers","t2_main","t2_followups","t3_plan"];
 const read = key => {
   try { return JSON.parse(localStorage.getItem(key) || "null") || {}; }
   catch { return {}; }
@@ -11,7 +9,7 @@ const read = key => {
 // Shared final-result contract. Register an A2 mock on the server before making
 // a new exam: all four scores are computed or validated by that server.
 export async function finalizeA2RegisteredMock({
-  mockId, attemptId, idToken, storageKeys,
+  mockId, attemptId, idToken, storageKeys, legacySpeakingTasks=[], speakingRubric=null,
 }) {
   if (!mockId || !attemptId || !idToken) throw new Error("Sign in and restore your saved mock attempt before final marking.");
   const lesen=read(storageKeys.lesen),hoeren=read(storageKeys.hoeren),
@@ -28,13 +26,12 @@ export async function finalizeA2RegisteredMock({
   const sessions=["1","2","3"].map(part=>sprechen._examinerParts?.[part]?.sessionId || null);
   if (sessions.every(Boolean)) {
     await scoreA2MockSpeaking({idToken,attemptId,mockId,examinerSessionIds:sessions});
-  } else if (LEGACY_TASKS.every(id=>Boolean(sprechen[id]?.transcript))) {
+  } else if (legacySpeakingTasks.length === 5 && legacySpeakingTasks.every(task=>Boolean(sprechen[task.id]?.transcript))) {
     // Recover old five-transcript exams. These transcripts were saved before
     // the live examiner replaced the recorder, so the assessment happens once.
-    await scoreA2MockSpeaking({idToken,attemptId,mockId,rubric:A2_MOCK_2_SPEAKING_RUBRIC,
-      attempts:LEGACY_TASKS.map(id=>({
-        id,teil:id.startsWith("t1")?"1":id.startsWith("t2")?"2":"3",
-        transcript:sprechen[id].transcript,task:id,analysisFeedback:"",
+    await scoreA2MockSpeaking({idToken,attemptId,mockId,rubric:speakingRubric,
+      attempts:legacySpeakingTasks.map(task=>({
+        ...task,transcript:sprechen[task.id].transcript,analysisFeedback:"",
       }))});
   } else {
     throw new Error("A saved speaking assessment is missing. Resume the speaking module; completed work will be retained.");
