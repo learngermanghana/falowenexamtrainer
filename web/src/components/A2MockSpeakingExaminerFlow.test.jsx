@@ -57,7 +57,7 @@ test("A2 Mock 2 uses A1-style home, German AI voice, three Teils and preserves o
 test("A2 Mock 1 keeps separate task identity and sums only real AI examiner marks", async () => {
   const update=jest.fn();
   const finished=jest.fn();
-  render(<A2Mock1ConversationalSpeaking attemptId="a2-mock1-attempt"
+  render(<A2Mock1ConversationalSpeaking externalSecondsLeft={900} attemptId="a2-mock1-attempt"
     onProgress={update} onComplete={finished}/>);
   fireEvent.click(screen.getByRole("button",{name:/Start full speaking exam/}));
   for(let part=1;part<=3;part++){
