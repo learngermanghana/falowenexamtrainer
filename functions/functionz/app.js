@@ -5431,7 +5431,6 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
-          mockId: attemptData.mockId || "a2-mock-01",
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
@@ -5787,6 +5786,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     }
 
     let completionSync = null;
+    let verifiedResult = null;
     if (status === "completed" && saveOutcome?.ok) {
       try {
         const studentProfile = await findAuthedStudentProfile(db, authedUser);
@@ -5804,6 +5804,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         if (!verifiedOverall || !verifiedSectionScores) {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
+        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
 
         completionSync = await syncA2MockCompletion({
           db,
@@ -5815,6 +5816,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
+          mockId: attemptData.mockId || "a2-mock-01",
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
@@ -5860,6 +5862,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...(verifiedResult && completionSync?.ok ? { verifiedResult } : {}),
     });
   } catch (err) {
     console.error("/a2-mock/attempt/save error", err);
