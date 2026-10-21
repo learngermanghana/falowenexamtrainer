@@ -76,7 +76,7 @@ function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewR
         </details>}
       <A2MockSpeakingExaminer mockId="a2-mock-02" tasks={tasks}
         attemptId={String(user?.uid || "guest")}
-        savedParts={savedParts} onSavePart={save} onComplete={()=>onComplete?.()}/>
+        savedParts={savedParts} onSavePart={save}/>
     </section>
   );
 }
