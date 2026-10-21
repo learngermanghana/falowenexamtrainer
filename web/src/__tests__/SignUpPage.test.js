@@ -53,64 +53,22 @@ jest.mock("../data/classCatalog", () => ({
   },
 }));
 
-describe("SignUpPage", () => {
-  beforeEach(() => {
-    mockSignup.mockResolvedValue({});
-    window.open = jest.fn();
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it("renders typed signup text with visible foreground and caret colors", async () => {
+describe("Short signup", () => {
+  beforeEach(() => { mockSignup.mockReset().mockResolvedValue({}); });
+  it("creates a trial without a class, phone, address or emergency contact", async () => {
     render(<SignUpPage onLogin={jest.fn()} />);
-
-    const nameInput = screen.getByPlaceholderText("Abigail Mensah");
-    await userEvent.type(nameInput, "Visible Student");
-
-    expect(nameInput).toHaveValue("Visible Student");
-    expect(nameInput).toHaveStyle({
-      backgroundColor: "#ffffff",
-      color: "#111827",
-      caretColor: "#111827",
-    });
-  });
-
-  it("defaults to the full fee and lists part payment second", () => {
-    render(<SignUpPage onLogin={jest.fn()} />);
-
-    const paymentOption = screen.getByLabelText(/Payment option/i);
-    expect(paymentOption).toHaveValue("full");
-    expect(Array.from(paymentOption.options).map((option) => option.value)).toEqual(["full", "part"]);
-    expect(paymentOption.options[0]).toHaveTextContent(/Full fee/i);
-    expect(paymentOption.options[1]).toHaveTextContent(/Part payment/i);
-  });
-
-  it("saves the full fee as the default payment intent when payments are disabled", async () => {
-    render(<SignUpPage onLogin={jest.fn()} />);
-
-    await userEvent.type(screen.getByPlaceholderText("Abigail Mensah"), "Test User");
+    await userEvent.type(screen.getByPlaceholderText("Abigail Mensah"), "Test Learner");
     await userEvent.type(screen.getByPlaceholderText("you@example.com"), "test@example.com");
-    await userEvent.type(
-      screen.getByPlaceholderText("At least 8 characters with letters and numbers"),
-      "password123"
-    );
+    await userEvent.type(screen.getByPlaceholderText("At least 8 characters with letters and numbers"), "password123");
     await userEvent.type(screen.getByPlaceholderText("Enter password again"), "password123");
-    await userEvent.type(screen.getByPlaceholderText("0176 12345678"), "0123456789");
-    await userEvent.type(screen.getByPlaceholderText("House number, street, city, region"), "1 Test St, Accra");
-    await userEvent.type(screen.getByPlaceholderText("Berlin"), "Berlin");
-    await userEvent.selectOptions(screen.getByLabelText(/Preferred learning mode/i), "Online");
-    await userEvent.type(screen.getByPlaceholderText("0176 98765432"), "0987654321");
-    await userEvent.selectOptions(screen.getByLabelText(/Which live class are you joining/i), "Evening A1");
     await userEvent.click(screen.getByRole("checkbox"));
-    await userEvent.click(screen.getByRole("button", { name: /sign up now/i }));
-
-    await waitFor(() => expect(mockSignup).toHaveBeenCalled());
-
-    const signupPayload = mockSignup.mock.calls[0][2];
-    expect(signupPayload.contractTermMonths).toBe(0);
-    expect(signupPayload.paymentIntentAmount).toBe(3000);
-    expect(window.open).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole("button", { name: "Create account & start 7-day trial" }));
+    await waitFor(() => expect(mockSignup).toHaveBeenCalledWith("test@example.com", "password123", expect.objectContaining({ trialStatus: "active", className: "", emergencyContactPhone: "", initialPaymentAmount: 0, learningGoal: "explore" })));
+  });
+  it("only asks for a class when the learner chooses live classes", async () => {
+    render(<SignUpPage onLogin={jest.fn()} />);
+    expect(screen.queryByText("Which live class are you joining?")).not.toBeInTheDocument();
+    await userEvent.selectOptions(screen.getByLabelText("What would you like to do?"), "live");
+    expect(screen.getByText("Which live class are you joining?")).toBeInTheDocument();
   });
 });
