@@ -5487,7 +5487,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5519,7 +5519,9 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const isSecondMock = mockId === "a2-mock-02";
+      const attemptCount = Math.max(0, Number(isSecondMock
+        ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -5528,7 +5530,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
+          ...(isSecondMock ? { attemptCountByMock: { [mockId]: attemptNumber } } : { attemptCount: attemptNumber }),
           activeAttemptId: newAttemptRef.id,
           updatedAt: now,
         },
