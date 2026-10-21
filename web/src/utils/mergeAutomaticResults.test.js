@@ -43,3 +43,8 @@ test("a corrected legacy row replaces the same dated attempt even when its score
  const corrected={...old,score:92,scoreOverrideAuthoritative:true};
  expect(mergeAutomaticResults([old],[corrected])).toEqual([corrected]);
 });
+test("different submission IDs preserve retakes even when their container path matches", () => {
+ const first={...history[0],submissionId:"first",submissionPath:"submissions/B1/student",score:49};
+ const retake={...first,submissionId:"retake",score:92};
+ expect(mergeAutomaticResults([first],[retake])).toEqual([first,retake]);
+});
