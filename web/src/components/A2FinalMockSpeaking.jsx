@@ -13,6 +13,7 @@ import {
   userFacingAudioError,
 } from "../lib/speakingAudio";
 import { A2_GOETHE_SPEAKING_TEIL1 } from "./A2GoetheSpeakingMockTeil1Preview";
+import MockExaminerAudio, { stopMockExaminerAudio } from "./MockExaminerAudio";
 import { A2_GOETHE_SPEAKING_TEIL2 } from "./A2GoetheSpeakingMockTeil2Preview";
 import { A2_GOETHE_SPEAKING_TEIL3 } from "./A2GoetheSpeakingMockTeil3Preview";
 import "./A1GoetheSpeakingMockPreview.css";
@@ -59,6 +60,23 @@ const TASKS = Object.freeze([
     maxRecordingSeconds: A2_GOETHE_SPEAKING_TEIL3.maxRecordingSeconds,
   },
 ]);
+
+export const getA2Mock1ExaminerPrompt = (taskId) => {
+  switch (taskId) {
+    case "teil1_questions":
+      return `Teil eins. Stellen Sie bitte vier Fragen. Benutzen Sie diese Wörter: ${A2_GOETHE_SPEAKING_TEIL1.keywords.join(". ")}.`;
+    case "teil1_answers":
+      return `Teil eins. Beantworten Sie bitte die Fragen. ${A2_GOETHE_SPEAKING_TEIL1.partnerQuestions.join(" ")}`;
+    case "teil2_main":
+      return `Teil zwei. Sprechen Sie bitte über Ihr Wochenende. ${A2_GOETHE_SPEAKING_TEIL2.prompt}`;
+    case "teil2_followup":
+      return `Teil zwei. Noch eine Frage: ${A2_GOETHE_SPEAKING_TEIL2.followUp}`;
+    case "teil3":
+      return `Teil drei. Planen wir bitte zusammen. ${A2_GOETHE_SPEAKING_TEIL3.partner} ${A2_GOETHE_SPEAKING_TEIL3.prompt}`;
+    default:
+      return "";
+  }
+};
 
 const formatTime = (seconds) => {
   const safe = Math.max(0, Number(seconds) || 0);
@@ -269,6 +287,7 @@ export default function A2FinalMockSpeaking({
   };
 
   const startRecording = async (task) => {
+    stopMockExaminerAudio();
     if (secondsLeft <= 0 || recordingTaskId || attempts[task.id]?.submitted) return;
     setError("");
     setStatus("");
@@ -481,7 +500,7 @@ export default function A2FinalMockSpeaking({
       <header className="a1-goethe-mock-header">
         <p className="a1-goethe-mock-kicker">A2 · Sprechen</p>
         <h1>Teil 1–3</h1>
-        <p>Record all five required responses in German. Feedback stays hidden until the full mock is complete.</p>
+        <p>Listen to the examiner in German, record each of your five answers, then stop and send each recording to unlock the next task. Feedback stays hidden until the full mock is complete.</p>
       </header>
 
       <div className="a1-sprechen-controlbar">
@@ -517,6 +536,7 @@ export default function A2FinalMockSpeaking({
             <div className="a1-sprechen-prompt">
               <strong>Task</strong>
               <TaskPrompt task={task} />
+              <MockExaminerAudio text={getA2Mock1ExaminerPrompt(task.id)} disabled={!unlocked || Boolean(recordingTaskId) || Boolean(attempt.submitting)} />
             </div>
 
             {!unlocked ? <p className="a1-sprechen-locked-note">Submit the previous response first.</p> : null}
