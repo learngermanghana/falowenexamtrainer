@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import SpeakingPracticeHome from "./SpeakingPracticeHome";
 import LiveSpeakPage from "./LiveSpeakPage";
 import "./SpeakingExamDesign.css";
@@ -7,6 +7,7 @@ import "./SpeakingExamDesign.css";
 // A1 Exam Room, with task identity and progress isolated for each A2 mock.
 export default function A2MockSpeakingExaminer({
   mockId, tasks, savedParts = {}, onSavePart, onComplete, attemptId = "",
+  externalSecondsLeft = null,
 }) {
   const [stage, setStage] = useState("home");
   const [selectedTeil, setSelectedTeil] = useState("1");
@@ -16,6 +17,9 @@ export default function A2MockSpeakingExaminer({
   const [error, setError] = useState("");
   const [run, setRun] = useState(0);
   const [sessionActive, setSessionActive] = useState(false);
+  const timeoutHandled = useRef(false);
+  const timed = externalSecondsLeft !== null && externalSecondsLeft !== undefined;
+  const timeExpired = timed && Number(externalSecondsLeft) <= 0;
   const activeTask = tasks.find(task => task.teil === selectedTeil) || tasks[0];
   const guides = useMemo(() => Object.fromEntries(tasks.map(task => [
     task.teil, { title: task.title, english: task.english },
@@ -23,12 +27,45 @@ export default function A2MockSpeakingExaminer({
   const finished = tasks.every(task => parts[task.teil]?.sessionId && parts[task.teil]?.assessment);
   const completedCount = tasks.filter(task => parts[task.teil]?.sessionId && parts[task.teil]?.assessment).length;
 
+  const finalize = async updated => {
+    setStage("verifying");
+    setError("");
+    try {
+      // A2 Mock 1 must wait until the server stores verifiedSections.sprechen.
+      // Never tell the parent that the mock is completed before this succeeds.
+      const accepted = await onComplete?.(updated);
+      if (accepted === false) throw new Error("Speaking verification did not finish. Retry without re-recording.");
+      setStage("results");
+      return true;
+    } catch (err) {
+      setError(err?.message || "Unable to verify your speaking result. Retry without recording again.");
+      setStage("verify-error");
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    if (!timeExpired || timeoutHandled.current) return;
+    timeoutHandled.current=true;
+    setFullExam(true);
+    setSessionActive(false);
+    // Stop the interactive examiner and its microphone immediately at 00:00.
+    // Persisted server receipts are graded; unfinished Teils receive zero.
+    finalize(parts);
+    // Timer expiry happens once per mounted timed exam.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [timeExpired]);
+
   const start = (wholeExam) => {
     setError("");
     setPracticeResult(null);
+    if (timeExpired) {
+      setError("Speaking time has ended. Your saved examiner answers are being verified.");
+      return;
+    }
     if (wholeExam && finished) {
-      setStage("results");
       setFullExam(true);
+      finalize(parts);
       return;
     }
     setFullExam(wholeExam);
@@ -38,6 +75,10 @@ export default function A2MockSpeakingExaminer({
   };
 
   const complete = (result) => {
+    if (timeExpired) {
+      setError("Speaking time is over. Only answers confirmed before the deadline count.");
+      return false;
+    }
     const expected = `${mockId}-speaking-teil-${activeTask.teil}`;
     const actualTeil = String(result?.teil || "").match(/\d+/)?.[0];
     if (result?.taskId !== expected || result?.level !== "A2" || actualTeil !== activeTask.teil ||
@@ -76,8 +117,7 @@ export default function A2MockSpeakingExaminer({
       setSelectedTeil(next.teil);
       setRun(value => value + 1);
     } else {
-      setStage("results");
-      onComplete?.(updated);
+      finalize(updated);
     }
     return true;
   };
@@ -85,6 +125,9 @@ export default function A2MockSpeakingExaminer({
   return (
     <section className="speaking-exam-page" data-a2-mock-ai-examiner={mockId}
       style={{maxWidth:880,margin:"0 auto",display:"grid",gap:16}}>
+      {timed ? <p role="timer" aria-live="off" style={{margin:0,fontWeight:700}}>
+        Speaking time left: {Math.floor(Math.max(0,Number(externalSecondsLeft))/60)}:{String(Math.max(0,Number(externalSecondsLeft))%60).padStart(2,"0")}
+      </p> : null}
       {stage === "home" ? <>
         {completedCount ? <p role="status" style={{margin:0}}>
           {completedCount} of {tasks.length} speaking parts are saved. You can resume the full exam without repeating completed parts.
@@ -129,6 +172,12 @@ export default function A2MockSpeakingExaminer({
           </details>
         ))}
         <button type="button" onClick={()=>setStage("home")}>Back to speaking practice</button>
+      </section> : null}
+      {stage === "verifying" ? <p role="status">Saving the verified speaking score. Please wait; do not record again.</p> : null}
+      {stage === "verify-error" ? <section role="alert" style={{display:"grid",gap:10}}>
+        <strong>Speaking result still needs verification</strong>
+        <p>Your completed examiner parts remain saved. You can retry server verification without recording again.</p>
+        <button type="button" onClick={() => finalize(parts)}>Retry speaking verification</button>
       </section> : null}
       {error ? <p role="alert" style={{color:"#9f1239"}}>{error}</p> : null}
     </section>
