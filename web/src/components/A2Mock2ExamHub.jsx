@@ -197,7 +197,7 @@ function A2Mock2ExamHubAttempt(){
    const completedAttempt = Object.fromEntries(Object.entries(STORAGE).map(([name, key]) => [name, read(key)]));
    localStorage.setItem(historyKey, JSON.stringify([...(Array.isArray(history) ? history : []), completedAttempt]));
    Object.values(STORAGE).forEach(key => localStorage.removeItem(key));
-   setFlow({ stage: "intro", startedAt: null });
+   setFlow({ stage: "intro", startedAt: null, archivedAttemptStartedAtMs: flow.startedAt });
    setFinalStatus("idle");setFinalError("");
    setProgress(getProgress(STORAGE));
    setResetError("");
