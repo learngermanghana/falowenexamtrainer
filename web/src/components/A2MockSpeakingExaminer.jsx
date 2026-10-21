@@ -155,7 +155,7 @@ export default function A2MockSpeakingExaminer({
             prompt:activeTask.prompt,
             keywords:activeTask.keywords || "",
             hint:activeTask.hint || "",
-            mockAttemptId:mockId === "a2-mock-01" ? attemptId : "",
+            mockAttemptId:attemptId,
           }}
           onActivityChange={setSessionActive}
           onExamCompleted={complete}
