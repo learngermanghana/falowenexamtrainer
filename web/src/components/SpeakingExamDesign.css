@@ -240,3 +240,27 @@ body.falowen-course-speaking-mock .study-buddy-reopen { display:none !important;
 }
 .speaking-skip-question:disabled {opacity:.55;cursor:not-allowed;}
 .speaking-skip-question:not(:disabled):hover {border-color:#64748b;background:#f8fafc;}
+
+/* Shared A1–C2 examiner connection, reply and marking status. */
+.speaking-ai-wait {
+  display:flex; align-items:center; gap:16px; min-width:0;
+  padding:17px 18px; border:1px solid #a9c9c9; border-radius:16px;
+  background:#eaf5f2; color:#163e43; box-shadow:0 6px 16px #16475a10;
+}
+.speaking-ai-wait__spinner {
+  flex:none; width:44px; height:44px; border-radius:50%;
+  border:5px solid #bfd9d4; border-top-color:#165c65;
+  animation:speaking-ai-spinner 850ms linear infinite;
+}
+.speaking-ai-wait__copy {min-width:0;display:grid;gap:5px;}
+.speaking-ai-wait__copy strong {font-size:16px;font-weight:800;line-height:1.35;}
+.speaking-ai-wait__copy p {font-size:13px;line-height:1.5;margin:0;}
+.speaking-ai-wait__patience {color:#475569;font-weight:650;}
+@keyframes speaking-ai-spinner {to {transform:rotate(360deg);}}
+@media (prefers-reduced-motion:reduce) {
+  .speaking-ai-wait__spinner {animation:none;border-top-color:#165c65;}
+}
+@media (max-width:480px) {
+  .speaking-ai-wait {gap:12px;padding:13px;}
+  .speaking-ai-wait__spinner {width:36px;height:36px;border-width:4px;}
+}

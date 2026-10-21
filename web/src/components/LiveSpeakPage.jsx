@@ -5,6 +5,7 @@ import { backendUrl } from "../services/aiClient";
 import { requestCoachSpeech } from "../services/presentationCoachService";
 import GoetheExamTaskCard from "./GoetheExamTaskCard";
 import SpeakingRecorder from "./SpeakingRecorder";
+import SpeakingAiLoadingStatus from "./SpeakingAiLoadingStatus";
 import { SpeakingFeedback } from "./SpeakingPracticeHome";
 import { examinerTaskPreview } from "../lib/examinerTaskPreview";
 import { styles } from "../styles";
@@ -832,6 +833,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
     (!details?.enabled || !canStartAiExaminer);
   const waitingForOpening = examinerSession && busy && !messages.length && !pending;
+  // Reuse the same loading experience across supported A1–C2 examiner flows.
+  const aiWaitPhase = examinerEntry
+    ? loading ? "connecting"
+      : feedbackBusy ? "feedback"
+        : busy ? (!session ? "connecting" : !messages.length ? "opening" : "reply")
+          : null
+    : null;
   const examTurnState = waitingForOpening
     ? "AI examiner is preparing to speak"
     : speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
@@ -847,8 +855,8 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </header>
       ) : null}
 
-      {loading ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>{examinerEntry ? "Preparing the AI examiner. The AI will speak first; please wait and listen." : "Preparing speaking practice…"}</p> : null}
-      {examinerEntry && busy && !session ? <p role="status" className="speaking-opening-question">Preparing your German examiner’s voice… Please wait and listen before answering.</p> : null}
+      {aiWaitPhase ? <SpeakingAiLoadingStatus phase={aiWaitPhase} /> : null}
+      {loading && !examinerEntry ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Preparing speaking practice…</p> : null}
       {!loading && details && !details.enabled ? (
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
