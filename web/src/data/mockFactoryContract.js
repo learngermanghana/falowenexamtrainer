@@ -30,7 +30,7 @@ export function assertFullMockReady(exam, registry = MOCK_RUNTIME_REGISTRY) {
   if (!exam || !MOCK_FACTORY_LEVELS.includes(exam.level)) return exam;
   if (exam.mode !== "full" || exam.status !== "ready") return exam;
   if (!MOCK_FACTORY_SECTIONS.every(section => exam.sections?.some(
-    name => String(name).toLowerCase() === section,
+    name => String(name).toLowerCase().replace(/ö/g, "oe") === section,
   ))) {
     throw new Error(`Mock ${exam.id} is missing one or more exam sections.`);
   }
