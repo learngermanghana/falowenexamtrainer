@@ -27,7 +27,7 @@ const TASKS = [
     hint:"Discuss time, place, gift, food and invitations with the German-speaking examiner." },
 ];
 
-function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewReleased=false}) {
+function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewReleased=false,attemptId=""}) {
   const {user} = useAuth();
   const storageKey = getStudentMockStorageKey(STORAGE_KEY,user?.uid);
   const [data,setData] = useState(() => read(storageKey));
@@ -61,6 +61,8 @@ function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewR
     </section>
   );
 
+  if (embedded && !attemptId) return <p role="status">Connecting your speaking exam to the verified mock attempt. Your previous answers are safe.</p>;
+
   return (
     <section data-a2-mock2-sprechen>
       {!embedded ? <h1>A2 Mock 2 · Speaking Exam</h1> : null}
@@ -75,7 +77,7 @@ function A2Mock2ConversationalSpeakingAttempt({embedded=false,onComplete,reviewR
             <p key={key}><strong>{key}:</strong> {data[key].transcript}</p>)}
         </details>}
       <A2MockSpeakingExaminer mockId="a2-mock-02" tasks={tasks}
-        attemptId={String(user?.uid || "guest")}
+        attemptId={attemptId || ""}
         savedParts={savedParts} onSavePart={save}/>
     </section>
   );
