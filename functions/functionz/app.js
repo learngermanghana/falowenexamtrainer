@@ -2593,7 +2593,7 @@ const b2MockSpeakingScorePrompt = ({ attempts = [], selectedTopicId = "" }) => {
   ].join("\n");
 };
 
-const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
+const a2MockWritingScorePrompt = ({ sms = "", email = "", mockId = "a2-mock-01" }) => [
   "You are a strict Goethe-style A2 writing examiner for a Falowen final mock exam.",
   "Assess the learner's two German writing responses exactly as submitted. Do not invent missing information or silently rewrite the response before scoring.",
   "Feedback shown to the learner MUST be in English. German may appear in exact evidence quotes and short corrected examples.",
@@ -2609,7 +2609,7 @@ const a2MockWritingScorePrompt = ({ sms = "", email = "" }) => [
   "Use the canonical word target. The email should use an appropriate greeting and closing. Missing both greeting and closing prevents a top-band score.",
   "For each Teil, return required_points_met as exactly three booleans in the same order as the required points, plus missing_required_points as short English labels.",
   "",
-  mockTaskPrompt("A2", "writing"),
+  mockTaskPrompt("A2", "writing", undefined, mockId),
   "Return JSON only, no markdown, using exactly this shape:",
   JSON.stringify({
     score: 0,
@@ -4421,6 +4421,21 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     const sms = String(req.body?.sms || "").trim().slice(0, 4000);
     const email = String(req.body?.email || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    const mockId = String(req.body?.mockId || "a2-mock-01");
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
+    if (attemptId) {
+      const db = getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+      const snap = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+      if (!snap.exists || snap.data()?.mockId !== mockId) {
+        return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"The writing attempt belongs to another A2 mock."});
+      }
+      // Save any existing verified mark without another OpenAI request.
+      const existing = snap.data()?.verifiedSections?.schreiben;
+      if (existing?.verified && Number.isFinite(Number(existing.score))) {
+        return res.json({result:{score:Number(existing.score),maxScore:25,verified:true,reused:true}});
+      }
+    }
 
     let result;
     if (!sms && !email) {
@@ -4453,7 +4468,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: a2MockWritingScorePrompt({ sms, email }) },
+          { role: "system", content: a2MockWritingScorePrompt({ sms, email, mockId }) },
           { role: "user", content: "Return the strict A2 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
@@ -4575,6 +4590,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
           section: "schreiben",
           score: Number(result?.score || 0),
           source: "/writing/a2-mock-score",
+          mockId,
         });
         // The verified score is committed first. An audit-write failure must never
         // change a student's grade or trigger a second AI scoring request.
@@ -5471,7 +5487,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5503,7 +5519,9 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const isSecondMock = mockId === "a2-mock-02";
+      const attemptCount = Math.max(0, Number(isSecondMock
+        ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -5512,7 +5530,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
+          ...(isSecondMock ? { attemptCountByMock: { [mockId]: attemptNumber } } : { attemptCount: attemptNumber }),
           activeAttemptId: newAttemptRef.id,
           updatedAt: now,
         },
@@ -5611,6 +5629,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           saveOutcome = {
@@ -5660,6 +5679,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           verifiedCompletion = buildVerifiedA2MockScore({
             state,
             verifiedSections: existing.verifiedSections || {},
+            mockId: existing.mockId || "a2-mock-01",
           });
         } catch (verificationError) {
           tx.set(
@@ -5768,6 +5788,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     }
 
     let completionSync = null;
+    let verifiedResult = null;
     if (status === "completed" && saveOutcome?.ok) {
       try {
         const studentProfile = await findAuthedStudentProfile(db, authedUser);
@@ -5785,6 +5806,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
         if (!verifiedOverall || !verifiedSectionScores) {
           throw new Error("Server-verified A2 mock totals are missing.");
         }
+        verifiedResult = { sectionScores: verifiedSectionScores, overall: verifiedOverall };
 
         completionSync = await syncA2MockCompletion({
           db,
@@ -5796,6 +5818,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
+          mockId: attemptData.mockId || "a2-mock-01",
           now:
             typeof attemptData.completedAt?.toDate === "function"
               ? attemptData.completedAt.toDate()
@@ -5841,6 +5864,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...(verifiedResult && completionSync?.ok ? { verifiedResult } : {}),
     });
   } catch (err) {
     console.error("/a2-mock/attempt/save error", err);
@@ -6558,6 +6582,7 @@ app.post("/speaking/a1-mock-score", async (req, res) => {
 
 app.post("/speaking/a2-mock-score", async (req, res) => {
   let authedUser;
+  let verifiedMockId = null;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
@@ -6567,31 +6592,45 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     {
       const mockId = String(req.body?.mockId || "a2-mock-01");
       const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
-      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
-        return res.status(400).json({
-          code:"A2_MOCK_ATTEMPT_MISMATCH",
-          error:"A2 Mock 2 scores cannot be saved to a Mock 1 attempt.",
-        });
+      if (attemptId) {
+        const db = getFirestoreSafe();
+        if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
+        const snap = await db.collection("a2MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+        if (!snap.exists) return res.status(404).json({code:"A2_MOCK_ATTEMPT_NOT_FOUND",error:"Mock attempt not found."});
+        verifiedMockId = snap.data()?.mockId || "a2-mock-01";
+        if (verifiedMockId !== mockId) {
+          return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This speaking result belongs to another A2 mock."});
+        }
+        const prior = snap.data()?.verifiedSections?.sprechen;
+        if (prior?.verified && Number.isFinite(Number(prior.score))) {
+          return res.json({result:{score:Number(prior.score),maxScore:25,assessmentIdentity:`${mockId}-examiner-verified`,verified:true,reused:true}});
+        }
+      }
+      if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
+        return res.status(409).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"A2 mock attempt verification failed."});
       }
     }
 
-    // New conversational Mock 1: verify server-owned examiner results instead
-    // of accepting a client-computed score. No additional model call is needed.
+    // Verify authenticated, immutable examiner receipts for either A2 mock.
+    // No additional OpenAI marking call is required.
     if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
-      if (String(req.body?.mockId || "a2-mock-01") !== "a2-mock-01") {
-        return res.status(400).json({code:"A2_MOCK_ATTEMPT_MISMATCH",error:"This examiner score is available only for A2 Mock 1."});
-      }
+      const mockId = String(req.body?.mockId || "a2-mock-01");
       const attemptId=String(req.body?.attemptId || "").trim().slice(0,120);
       const db=getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
       try {
-        const {scoreA2ExaminerSnapshots}=require("./a2MockExaminerScore");
+        const {scoreA2ExaminerSnapshots,bindLegacyMock2ExaminerReceipts}=require("./a2MockExaminerScore");
+        if (mockId === "a2-mock-02") {
+          await bindLegacyMock2ExaminerReceipts({
+            db,admin,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+          });
+        }
         const result=await scoreA2ExaminerSnapshots({
-          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,
+          db,uid:authedUser.uid,attemptId,sessionIds:req.body.examinerSessionIds,mockId,
         });
         await persistVerifiedA2MockSection({
           db,admin,uid:authedUser.uid,attemptId,section:"sprechen",
-          score:result.score,source:"/speaking/a2-mock-score:verified-examiner",
+          score:result.score,source:"/speaking/a2-mock-score:verified-examiner",mockId,
         });
         return res.json({result});
       } catch (err) {
@@ -6620,7 +6659,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
     // Mock 2 is a browser-local practice flow. Never persist its scores into a
     // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
-    if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId })) {
+    if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
       return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
     }
     const expectedIds = mockId === "a2-mock-02"
@@ -6690,6 +6729,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
           section: "sprechen",
           score: numericScore,
           source: "/speaking/a2-mock-score",
+          mockId,
         });
       } catch (verificationError) {
         const code = String(verificationError?.code || "");

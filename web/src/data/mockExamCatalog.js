@@ -1,3 +1,4 @@
+import { assertA2FullMockReady } from "./a2FullMockContract";
 const A2_SECTION_CARDS = Object.freeze([
   {
     key: "lesen",
@@ -86,9 +87,9 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   },
   "a2-mock-02": {
     id: "a2-mock-02", level: "A2", title: "A2 Mock 2", shortTitle: "A2 Mock 2",
-    description: "Your second A2 mock: complete Lesen, Hören, Schreiben and Sprechen from one exam dashboard. Final combined grading is being verified.",
-    durationLabel: "4 modules · saved progress", status: "preview",
-    route: "/campus/course/a2-mock-2", mode: "section-preview",
+    description: "Complete A2 mock with server-saved attempts, automatic verified OpenAI grading for Schreiben and Sprechen, and a final result out of 100.",
+    durationLabel: "about 1 hr 45 min", status: "ready",
+    route: "/campus/course/a2-mock-2", mode: "full",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a2-mock-02-lesen": {
@@ -222,6 +223,10 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     officialPracticeUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2/ueb.html",
   },
 });
+
+// Fail closed when a future A2 mock is presented as a ready full exam
+// without the same verified scoring and persistence lifecycle as Mock 1.
+for (const exam of Object.values(MOCK_EXAM_CATALOG)) assertA2FullMockReady(exam);
 
 export const getMockExam = (id) => MOCK_EXAM_CATALOG[id] || null;
 

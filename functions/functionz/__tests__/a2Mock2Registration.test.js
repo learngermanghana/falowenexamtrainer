@@ -22,7 +22,7 @@ test("Mock 2 speaking evaluates its actual tasks with a separate version", () =>
   expect(versions.A2_MOCK_2.speaking).not.toBe(versions.A2.speaking);
 });
 
-test("Mock 2 scores cannot be persisted into a Mock 1 attempt", () => {
+test("Mock 2 scores are persisted only into an attempt verified by the server as Mock 2", () => {
   const { readFileSync } = require("node:fs");
   const { join } = require("node:path");
   const app = readFileSync(join(__dirname, "../app.js"), "utf8");
@@ -32,8 +32,12 @@ test("Mock 2 scores cannot be persisted into a Mock 1 attempt", () => {
   const { isA2SpeakingAttemptBindingSafe } = require("../a2MockSpeakingAttemptIdentity");
   expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "verified-mock-01" })).toBe(false);
   expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "" })).toBe(true);
-  expect(route).toContain("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId }))");
-  expect(route.indexOf("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId }))")).toBeLessThan(route.indexOf("await persistVerifiedA2MockSection("));
+  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "verified-mock-02", verifiedMockId: "a2-mock-02" })).toBe(true);
+  expect(isA2SpeakingAttemptBindingSafe({ mockId: "a2-mock-02", attemptId: "verified-mock-01", verifiedMockId: "a2-mock-01" })).toBe(false);
+  expect(route).toContain('verifiedMockId = snap.data()?.mockId || "a2-mock-01"');
+  expect(route).toContain("if (verifiedMockId !== mockId)");
+  expect(route).toContain("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId }))");
+  expect(route.indexOf("if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId }))")).toBeLessThan(route.indexOf("await persistVerifiedA2MockSection("));
 });
 
 test("Mock 2 registry excludes configuration metadata from writing tasks", () => {

@@ -7,6 +7,13 @@ on:
       - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
       - "web/src/components/A2FinalMockExamPage.jsx"
       - "web/src/components/A2Mock2ExamHub.jsx"
+      - "web/src/services/a2Mock2Finalization*"
+      - "web/src/data/a2FullMockContract*"
+      - "functions/functionz/a2MockCompletionSync.js"
+      - "functions/functionz/a2MockExaminerScore.js"
+      - "functions/functionz/a2MockSpeakingAttemptIdentity.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/tests/a2Mock2VerifiedLifecycle.test.cjs"
       - ".github/workflows/a2-mock-speaking-examiner.yml"
   push:
     branches: [main]
@@ -16,6 +23,13 @@ on:
       - "web/src/components/A2Mock2ConversationalSpeaking.jsx"
       - "web/src/components/A2FinalMockExamPage.jsx"
       - "web/src/components/A2Mock2ExamHub.jsx"
+      - "web/src/services/a2Mock2Finalization*"
+      - "web/src/data/a2FullMockContract*"
+      - "functions/functionz/a2MockCompletionSync.js"
+      - "functions/functionz/a2MockExaminerScore.js"
+      - "functions/functionz/a2MockSpeakingAttemptIdentity.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/tests/a2Mock2VerifiedLifecycle.test.cjs"
       - ".github/workflows/a2-mock-speaking-examiner.yml"
 jobs:
   speaking:
@@ -33,8 +47,13 @@ jobs:
       - name: Test A2 speaking flow and saved results
         working-directory: web
         run: npx jest --runInBand --runTestsByPath src/components/A2MockSpeakingExaminerFlow.test.jsx
-      - name: Verify server-bound examiner receipts
-        run: node --test functions/functionz/tests/a2MockExaminerScore.test.cjs
+      - name: Verify server-bound examiner receipts and Mock 2 finalization
+        run: |
+          node --check functions/functionz/app.js
+          node --test functions/functionz/tests/a2MockExaminerScore.test.cjs functions/functionz/tests/a2Mock2VerifiedLifecycle.test.cjs
+      - name: Test shared Mock 2 results and lifecycle guard
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/services/a2Mock2Finalization.test.js src/data/a2FullMockContract.test.js src/components/A2Mock2SubmissionRecovery.test.jsx
       - name: Build web application
         working-directory: web
         run: npx vite build

@@ -6,6 +6,11 @@ import { getA2Mock2StorageKeys, isA2Mock2ReviewReady } from "../utils/mockReview
 import { markLetterWithAI, scoreA2MockSpeaking } from "../services/coachService";
 
 jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ user: { uid: "mock-2-recovery-student" }, idToken: "test-token" }) }));
+jest.mock("../services/a2FinalMockService", () => ({
+  startA2MockAttempt: jest.fn().mockResolvedValue({attemptId:"server-recovery-attempt",attemptNumber:1,firstAttempt:true}),
+  saveA2MockAttempt: jest.fn().mockResolvedValue({ok:true}),
+  scoreA2MockWriting: jest.fn().mockRejectedValue(new Error("AI writing unavailable")),
+}));
 jest.mock("./navigation/AppBackButton", () => () => <div>Back</div>);
 jest.mock("../services/coachService", () => ({
   markLetterWithAI: jest.fn(),
