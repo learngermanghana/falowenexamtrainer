@@ -46,7 +46,7 @@ const sanitizeA1WorkbookDraft = (draft) => {
     } else if (sections[sectionKey]) {
       sections[sectionKey] = questionCount === 0 ? { text: String(sections[sectionKey].text || "").trim() } : {
         answers: Object.fromEntries(Object.entries(sections[sectionKey].answers || {})
-          .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= questionCount)),
+          .filter(([number]) => /^\d+$/.test(number) && (normalizeAssignmentKey(draft.assignmentKey) === "A1-8" && sectionKey === "teil-2" ? Number(number) >= 6 && Number(number) <= 8 : Number(number) >= 1 && Number(number) <= questionCount))),
       };
     }
   });
