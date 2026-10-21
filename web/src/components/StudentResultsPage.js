@@ -32,8 +32,7 @@ const StudentResultsPage = () => {
     setAutomaticResults([]);
     if (!db || !user?.uid) return undefined;
     return onSnapshot(query(collection(db, "scores"), where("studentId", "==", user.uid)), snapshot => {
-      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() }))
-        .filter(entry => entry.source === "automatic_course_marking"));
+      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() })));
     }, () => { /* Existing Sheet/API results remain available. */ });
   }, [user?.uid]);
   const visibleResults = useMemo(
