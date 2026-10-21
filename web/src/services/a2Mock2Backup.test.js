@@ -62,3 +62,15 @@ test("reading backups is one on-demand authenticated request",async()=>{
   expect(fetch).toHaveBeenCalledTimes(1);
   expect(fetch.mock.calls[0][0]).toContain("mockId=b2-final-mock");
 });
+
+test("archived Mock 2 backup cannot overwrite a new retake",()=>{
+  const keys=getA2Mock2StorageKeys(uid);
+  localStorage.setItem(keys.flow,JSON.stringify({
+    stage:"intro",archivedAttemptStartedAtMs:start,startedAt:null,
+  }));
+  const remote={backup:{attemptStartedAtMs:start,sections:{
+    lesen:{submittedAt:submitted,answers:{"1":"c"}},
+  }}};
+  expect(restoreA2Mock2Backup(keys,remote)).toBe(false);
+  expect(localStorage.getItem(keys.lesen)).toBeNull();
+});
