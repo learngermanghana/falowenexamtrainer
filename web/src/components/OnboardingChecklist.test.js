@@ -1,84 +1,32 @@
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import React from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import OnboardingChecklist from "./OnboardingChecklist";
-
-jest.mock("../context/ToastContext", () => ({
-  useToast: () => ({ showToast: jest.fn() }),
-}));
-
-jest.mock("../lib/publicFunnelTracking", () => ({
-  getPublicFunnelContext: () => ({}),
-  trackPublicFunnelEvent: jest.fn(),
-}));
-
-jest.mock("./SetupCheckpoint", () => () => (
-  <div data-testid="payment-checkpoint">Payment required</div>
-));
-
-jest.mock("./YouTubeSubscribeButton", () => () => null);
-
-const renderChecklist = (studentProfile) =>
-  render(
-    <MemoryRouter>
-      <OnboardingChecklist studentProfile={studentProfile} onSaveOnboarding={jest.fn()} />
-    </MemoryRouter>
-  );
-
-describe("OnboardingChecklist payment gate", () => {
-  it("keeps an unpaid student on the payment checkpoint", () => {
-    renderChecklist({ level: "A1", paymentStatus: "pending", balanceDue: 3000 });
-
-    expect(screen.getByTestId("payment-checkpoint")).toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { name: /watch this before your dashboard opens/i })
-    ).not.toBeInTheDocument();
-  });
-
-  it("shows onboarding after a full payment is confirmed", () => {
-    renderChecklist({ level: "A1", paymentStatus: "paid", balanceDue: 0 });
-
-    expect(screen.queryByTestId("payment-checkpoint")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /watch this before your dashboard opens/i })
-    ).toBeInTheDocument();
-  });
-
-  it("shows onboarding after an accepted partial payment", () => {
-    renderChecklist({ level: "A1", paymentStatus: "partial", balanceDue: 1000 });
-
-    expect(screen.queryByTestId("payment-checkpoint")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /watch this before your dashboard opens/i })
-    ).toBeInTheDocument();
-  });
-
-  it("shows onboarding while a free trial is active without changing payment status", () => {
-    renderChecklist({
-      level: "A1",
-      paymentStatus: "pending",
-      balanceDue: 3000,
-      trialStartedAt: "2099-01-01T00:00:00.000Z",
-      trialEndsAt: "2099-01-08T00:00:00.000Z",
-    });
-
-    expect(screen.queryByTestId("payment-checkpoint")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /watch this before your dashboard opens/i })
-    ).toBeInTheDocument();
-  });
-
-  it("returns an unpaid student to the payment checkpoint after trial expiry", () => {
-    renderChecklist({
-      level: "A1",
-      paymentStatus: "pending",
-      balanceDue: 3000,
-      trialStartedAt: "2020-01-01T00:00:00.000Z",
-      trialEndsAt: "2020-01-08T00:00:00.000Z",
-    });
-
-    expect(screen.getByTestId("payment-checkpoint")).toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { name: /watch this before your dashboard opens/i })
-    ).not.toBeInTheDocument();
-  });
+const mockNavigate = jest.fn();
+const mockSave = jest.fn();
+const mockProfile = { name: "Ama Learner", level: "A1", tuitionFee: 3000, balanceDue: 3000, paymentStatus: "pending", trialStatus: "active", trialStartedAt: new Date().toISOString(), trialEndsAt: new Date(Date.now() + 7 * 86400000).toISOString() };
+jest.mock("react-router-dom", () => ({ useNavigate: () => mockNavigate }));
+jest.mock("../context/AuthContext", () => ({ useAuth: () => ({ studentProfile: mockProfile, logout: jest.fn(), saveStudentProfile: jest.fn() }) }));
+jest.mock("../context/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
+beforeEach(() => { mockSave.mockReset().mockResolvedValue({}); mockNavigate.mockReset(); });
+it("shows the trial end date and a skippable emergency contact reminder", () => {
+  render(<OnboardingChecklist studentProfile={mockProfile} onSaveOnboarding={mockSave} />);
+  expect(screen.getByRole("status")).toHaveTextContent("Your trial ends on");
+  fireEvent.click(screen.getByRole("button", { name: "Add later" }));
+  expect(screen.queryByRole("button", { name: "Add contact details" })).not.toBeInTheDocument();
+  expect(mockSave).not.toHaveBeenCalled();
+});
+it("lets learners start orientation without adding emergency details or paying", async () => {
+  render(<OnboardingChecklist studentProfile={mockProfile} onSaveOnboarding={mockSave} />);
+  fireEvent.click(screen.getByRole("button", { name: /Start Orientation/ }));
+  await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith("/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", { replace: true }));
+  expect(mockSave).toHaveBeenCalledTimes(1);
+});
+it("keeps onboarding available when completing setup fails", async () => {
+  mockSave.mockRejectedValueOnce(new Error("offline"));
+  const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+  render(<OnboardingChecklist studentProfile={mockProfile} onSaveOnboarding={mockSave} />);
+  fireEvent.click(screen.getByRole("button", { name: /Start Orientation/ }));
+  await waitFor(() => expect(screen.getByRole("button", { name: /Start Orientation/ })).toBeEnabled());
+  expect(mockNavigate).not.toHaveBeenCalled();
+  spy.mockRestore();
 });
