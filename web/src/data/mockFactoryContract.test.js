@@ -23,7 +23,7 @@ describe("one mock-factory publication contract for A1–C2",()=>{
   const draft=makeMockDraft("A2",3);
   let errs=validateMockDraft(draft);
   expect(errs.join(" ")).toMatch(/protected audio playback/);
-  expect(errs.join(" ")).toMatch(/answer key count/);
+  expect(errs.join(" ")).toMatch(/server answer key not verified/);
   expect(errs.join(" ")).toMatch(/scoring rubric/);
   expect(errs.join(" ")).toMatch(/submission recovery/);
   expect(errs.join(" ")).toMatch(/Backend production/);
