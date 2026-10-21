@@ -69,10 +69,10 @@ const rows = [
     "Fragen Sie nach dem Inhalt und den Terminen des Seminars.",
     "Fragen Sie nach den Kosten.",
   ]],
-  [15, "A2-6.15", "E-Mail an einen Sportverein", "Sie sind in Deutschland und möchten sich für einen Sportkurs anmelden. Schreiben Sie eine E-Mail an einen Sportverein oder ein Fitnessstudio.", [
-    "Fragen Sie, ob es noch freie Plätze gibt.",
-    "Beschreiben Sie Ihre Erfahrung oder Motivation.",
-    "Fragen Sie nach den Trainingszeiten und den Kosten.",
+  [15, "A2-6.15", "E-Mail an Jan: Mein Lieblingssport", "Ihr Freund Jan hat Sie in einer Nachricht gefragt, welchen Sport Sie gerne machen. Schreiben Sie eine kurze informelle E-Mail an Jan.", [
+    "Nennen Sie Ihren Lieblingssport und sagen Sie, wie oft Sie ihn machen.",
+    "Erklären Sie, warum Ihnen dieser Sport gefällt.",
+    "Laden Sie Jan ein, nächsten Samstag zusammen Sport zu machen.",
   ]],
   [16, "A2-6.16", "E-Mail an einen Arzt", "Sie möchten wegen Ihrer Gesundheit einen Arzt kontaktieren. Schreiben Sie eine E-Mail.", [
     "Fragen Sie nach einem Termin.",
