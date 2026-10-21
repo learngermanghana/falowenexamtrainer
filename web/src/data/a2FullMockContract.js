@@ -17,11 +17,11 @@ export const A2_MOCK_CAPABILITIES = Object.freeze({
     completedResultSync: true,
   }),
   "a2-mock-02": Object.freeze({
-    serverAttempt: false,
-    serverObjectiveScoring: false,
-    verifiedWriting: false,
-    verifiedSpeaking: false,
-    completedResultSync: false,
+    serverAttempt: true,
+    serverObjectiveScoring: true,
+    verifiedWriting: true,
+    verifiedSpeaking: true,
+    completedResultSync: true,
   }),
 });
 
