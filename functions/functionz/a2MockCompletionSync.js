@@ -158,7 +158,7 @@ const persistVerifiedA2MockSection = async ({
   }
 
   const attempt = snap.data() || {};
-  if (attempt.mockId !== mockId) {
+  if ((attempt.mockId || "a2-mock-01") !== mockId) {
     const error = new Error("Verified section belongs to a different A2 mock.");
     error.code = "A2_MOCK_ATTEMPT_MISMATCH";
     throw error;
@@ -292,8 +292,12 @@ const buildA2MockCompletionArtifacts = ({
     `Overall: ${formatScore(score)}% — ${statusLabel} · ${breakdownText}. Practise next: ${weakest}.`;
   const timestamp = now instanceof Date ? now : new Date(now);
   const iso = Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString();
-  const scoreDocId = safeDocId(`a2-${mockId}-${identity.studentCode || authedUser.uid}-${attemptId}`);
-  const notificationId = safeDocId(`a2-${mockId}-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const scoreDocId = safeDocId(config
+    ? `a2-${mockId}-${identity.studentCode || authedUser.uid}-${attemptId}`
+    : `a2-final-mock-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const notificationId = safeDocId(config
+    ? `a2-${mockId}-result-${identity.studentCode || authedUser.uid}-${attemptId}`
+    : `a2-final-mock-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
 
   const scoreDocument = {
     studentCode: identity.studentCode,
