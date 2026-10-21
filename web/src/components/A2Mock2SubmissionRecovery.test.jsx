@@ -85,7 +85,7 @@ test("completion tracker immediately counts Lesen and Hören without refreshing 
     // Reading can be submitted with unanswered questions (they count as wrong).
     fireEvent.click(within(screen.getByRole("navigation", {name:"Prüfungsteile"}))
       .getByRole("button", {name:/Teil 4/}));
-    fireEvent.click(screen.getByRole("button", {name:"Lesen abgeben"}));
+    fireEvent.click(screen.getByRole("button", {name:"Submit reading"}));
 
     await waitFor(() => expect(screen.getByText("1 of 4 modules completed")).toBeInTheDocument());
     expect(screen.getByText("Hören · Übungstest 2")).toBeInTheDocument();
@@ -93,7 +93,7 @@ test("completion tracker immediately counts Lesen and Hören without refreshing 
 
     fireEvent.click(within(screen.getByRole("navigation", {name:"Hören-Teile"}))
       .getByRole("button", {name:/Teil 4/}));
-    fireEvent.click(screen.getByRole("button", {name:"Hören abgeben"}));
+    fireEvent.click(screen.getByRole("button", {name:"Submit listening"}));
 
     await waitFor(() => expect(screen.getByText("2 of 4 modules completed")).toBeInTheDocument());
     expect(screen.getByText("Mock 2 · Schreiben")).toBeInTheDocument();
