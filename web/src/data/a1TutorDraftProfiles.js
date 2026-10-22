@@ -90,11 +90,7 @@ const profiles = {
   "A1-7": {
     sections: {
       "teil-1": section(choiceItems(5, ["Richtig", "Falsch"]), { label: "Lesen" }),
-      "teil-2": section([
-        ...choiceItems(3, ["Richtig", "Falsch"]),
-        { number: 4, type: "choice", choices: ["A", "B", "C"] },
-        { number: 5, type: "choice", choices: ["A", "B", "C"] },
-      ], { label: "Hören" }),
+      "teil-2": section(choiceItems(5, ["A", "B", "C"]), { label: "Hören" }),
     },
   },
   "A1-8": {
