@@ -9,6 +9,10 @@ on:
       - "web/src/context/AuthContext.js"
       - "web/src/components/SignUpPage.js"
       - "web/src/components/SignUpPageLegacy.js"
+      - "web/src/lib/signupAuthRecovery.js"
+      - "web/src/lib/publicFunnelTracking.js"
+      - "web/src/__tests__/signupAuthRecovery.test.js"
+      - "web/src/__tests__/SignUpPage.test.js"
       - "web/package.json"
       - ".github/workflows/public-signup-auth-recovery.yml"
 
@@ -29,6 +33,9 @@ jobs:
       - name: Install web dependencies
         working-directory: web
         run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test interrupted signup recovery and application form
+        working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/__tests__/signupAuthRecovery.test.js src/__tests__/SignUpPage.test.js
       - name: Build production web app
         working-directory: web
         run: npm run build
