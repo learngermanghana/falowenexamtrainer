@@ -33,12 +33,15 @@ authSource = replaceOnce(
   "signup authentication handoff in AuthContext.js",
 );
 
+// The form-aware support builder replaces the legacy attribution-based message.
+if (!signupSource.includes("buildApplicationSupportMessage")) {
 signupSource = replaceOnce(
   signupSource,
   `    }\${context.video ? \` I came from YouTube lesson \${context.video}.\` : ""} Please help me continue.\`\n`,
   `    }\${context.video ? \` I came from YouTube lesson \${context.video}.\` : ""} I need help with the application form or admissions process.\`\n`,
   "signup WhatsApp support message",
 );
+}
 
 signupSource = replaceOnce(
   signupSource,
