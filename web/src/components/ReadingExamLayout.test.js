@@ -52,7 +52,7 @@ describe("shared A2-C2 Lesen exam layout", () => {
 
   test("lettered offer parsing falls back on malformed source lists", () => {
     expect(parseLetteredOfferSources(
-      "SPORTVEREIN NORD\\n\\nA – Laufen\\nTraining\\n\\nC – Schwimmen\\nMittwoch\\n\\nD – Yoga\\nFreitag",
+      "SPORTVEREIN NORD\n\nA – Laufen\nTraining\n\nC – Schwimmen\nMittwoch\n\nD – Yoga\nFreitag",
       "Sportangebote zuordnen",
     )).toBeNull();
   });
