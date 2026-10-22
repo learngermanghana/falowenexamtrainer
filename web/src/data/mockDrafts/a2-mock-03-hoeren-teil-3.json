@@ -4,8 +4,9 @@
   "examPart": "3",
   "level": "A2",
   "mode": "goethe",
-  "title": "Fünf kurze Gespräche · Bilder auswählen",
-  "kind": "picture-multiple-choice",
+  "title": "Hören · Teil 3 · Fünf kurze Gespräche",
+  "kind": "mixed-picture-or-answer-multiple-choice",
+  "instruction": "Sie hören fünf kurze Gespräche. Sie hören jeden Text einmal. Wählen Sie für die Aufgaben 11 bis 15 jeweils die richtige Antwort a, b oder c.",
   "questionNumbers": [
     11,
     12,
@@ -14,154 +15,200 @@
     15
   ],
   "plays": 1,
+  "embeddedRepetitions": 1,
   "audioObjectKey": "a2/mock-hoeren/mock-03/teil-3.mp3",
-  "audioVerification": "unverified: only the teacher's supplied transcript is available, not the downloaded local MP3 or R2 object",
+  "audioVerification": "teacher-uploaded local teil-3.mp3 verified for format, duration, scene count and the supplied dialogue; corresponding Cloudflare R2 object and protected playback NOT verified",
   "publicationStatus": "draft-only",
+  "localAudioEvidence": {
+    "filename": "teil-3.mp3",
+    "bytes": 1279584,
+    "durationSeconds": 106.632,
+    "sampleRateHz": 24000,
+    "channels": 1,
+    "format": "mp3",
+    "sha256": "ae4afecadc051433c4c195230c5c46c241c6e81aa8df79bbbd8c46b986c783e7",
+    "audibleParts": 5,
+    "approximateBreaksSeconds": [
+      [
+        27.2,
+        31.98
+      ],
+      [
+        46.94,
+        51.3
+      ],
+      [
+        67.59,
+        72.1
+      ],
+      [
+        85.4,
+        90.02
+      ]
+    ],
+    "embeddedRepetitions": 1
+  },
   "transcriptEvidence": [
     {
-      "scene": 0,
-      "context": "Beispiel: Termin im Büro",
-      "dialogue": "Dienstag um zehn Uhr geht nicht; vierzehn Uhr passt.",
-      "assessed": false
-    },
-    {
       "scene": 1,
-      "context": "Bio-Äpfel",
-      "dialogue": "Die Bio-Äpfel liegen in der Obstabteilung vorne links neben den Birnen.",
+      "context": "Geschäft im Einkaufszentrum",
+      "dialogue": "Am Freitagabend schließt das Geschäft heute erst um zwanzig Uhr.",
       "assessed": true
     },
     {
       "scene": 2,
-      "context": "Supermarkt",
-      "dialogue": "Am Samstag schließt der Supermarkt um zwanzig Uhr, nicht um einundzwanzig Uhr.",
+      "context": "Kaffeetreffen in der Stadt",
+      "dialogue": "14:30 Uhr an der Haltestelle geht wegen des Arzttermins nicht. Beide einigen sich auf 15:00 Uhr.",
       "assessed": true
     },
     {
       "scene": 3,
-      "context": "Pullover zurückgeben",
-      "dialogue": "Der Pullover ist zu klein, der Kunde hat den Kassenbon.",
+      "context": "Kleidung umtauschen",
+      "dialogue": "Die Kundin möchte eine rote Jacke umtauschen. Sie ist zu groß; die Kundin braucht Größe 42.",
       "assessed": true
     },
     {
       "scene": 4,
-      "context": "Treffpunkt",
-      "dialogue": "Nicht morgen im Café am Markt, sondern Mittwoch im Park.",
+      "context": "Obstabteilung",
+      "dialogue": "Frische Bio-Äpfel liegen ganz hinten in der Obstabteilung neben den Birnen.",
       "assessed": true
     },
     {
       "scene": 5,
-      "context": "Tomaten",
-      "dialogue": "Ein Kilo kostet zwei Euro fünfzig; der Kunde nimmt zwei Kilo.",
+      "context": "Zahnarztpraxis",
+      "dialogue": "Am Mittwoch ist die Zahnarztpraxis nur bis 12:30 Uhr geöffnet.",
       "assessed": true
     }
   ],
   "questions": [
     {
       "number": 11,
-      "question": "Wo findet die Person Bio-Äpfel?",
+      "scene": 1,
+      "context": "Einkaufszentrum",
+      "displayMode": "answers",
+      "question": "Um wie viel Uhr schließt das Geschäft heute?",
       "options": [
         {
           "id": "a",
-          "photoSpec": "Obstabteilung mit Äpfeln neben Birnen"
+          "label": "Um 19:00 Uhr."
         },
         {
           "id": "b",
-          "photoSpec": "Brotregal"
+          "label": "Um 20:00 Uhr."
         },
         {
           "id": "c",
-          "photoSpec": "Getränkeabteilung"
+          "label": "Um 21:00 Uhr."
         }
       ],
-      "answer": "a",
-      "evidence": "in der Obstabteilung gleich vorne links neben den Birnen"
+      "answer": "b",
+      "evidence": "Wir machen heute erst um zwanzig Uhr zu, weil wir am Freitagabend länger geöffnet haben."
     },
     {
       "number": 12,
-      "question": "Wann schließt der Supermarkt heute?",
+      "scene": 2,
+      "context": "Kaffeetreffen",
+      "displayMode": "answers",
+      "question": "Wann treffen sich die beiden morgen?",
       "options": [
         {
           "id": "a",
-          "photoSpec": "Uhrzeit 19:00"
+          "label": "Um 14:00 Uhr."
         },
         {
           "id": "b",
-          "photoSpec": "Uhrzeit 20:00"
+          "label": "Um 14:30 Uhr."
         },
         {
           "id": "c",
-          "photoSpec": "Uhrzeit 21:00"
-        }
-      ],
-      "answer": "b",
-      "evidence": "da machen wir schon um zwanzig Uhr zu"
-    },
-    {
-      "number": 13,
-      "question": "Was möchte der Kunde zurückgeben?",
-      "options": [
-        {
-          "id": "a",
-          "photoSpec": "Jacke"
-        },
-        {
-          "id": "b",
-          "photoSpec": "Hose"
-        },
-        {
-          "id": "c",
-          "photoSpec": "Pullover"
+          "label": "Um 15:00 Uhr."
         }
       ],
       "answer": "c",
-      "evidence": "ich möchte diesen Pullover zurückgeben"
+      "evidence": "Geht es auch um fünfzehn Uhr? — Ja, das ist perfekt für mich."
     },
     {
-      "number": 14,
-      "question": "Wo wollen sich die Personen treffen?",
+      "number": 13,
+      "scene": 3,
+      "context": "Umtausch",
+      "displayMode": "pictures",
+      "question": "Was möchte die Kundin umtauschen?",
       "options": [
         {
           "id": "a",
-          "photoSpec": "Café"
+          "label": "Eine rote Jacke",
+          "photoSpec": "Rote Jacke auf einem neutralen Hintergrund"
         },
         {
           "id": "b",
-          "photoSpec": "Park"
+          "label": "Eine blaue Hose",
+          "photoSpec": "Blaue Hose auf einem neutralen Hintergrund"
         },
         {
           "id": "c",
-          "photoSpec": "Büro"
-        }
-      ],
-      "answer": "b",
-      "evidence": "Lieber am Mittwoch im Park"
-    },
-    {
-      "number": 15,
-      "question": "Was kostet ein Kilo Tomaten?",
-      "options": [
-        {
-          "id": "a",
-          "photoSpec": "Preisschild Tomaten €2,50 je kg"
-        },
-        {
-          "id": "b",
-          "photoSpec": "Preisschild Tomaten €3,50 je kg"
-        },
-        {
-          "id": "c",
-          "photoSpec": "Preisschild Tomaten €5,00 je kg"
+          "label": "Einen roten Pullover",
+          "photoSpec": "Roter Pullover auf einem neutralen Hintergrund"
         }
       ],
       "answer": "a",
-      "evidence": "Das Kilo kostet heute nur zwei Euro fünfzig"
+      "evidence": "Ich möchte diese rote Jacke gerne umtauschen. Sie ist mir leider viel zu groß."
+    },
+    {
+      "number": 14,
+      "scene": 4,
+      "context": "Im Supermarkt",
+      "displayMode": "pictures",
+      "question": "Wo findet man die Bio-Äpfel?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Vorne beim Eingang",
+          "photoSpec": "Äpfel direkt am Eingang des Supermarkts"
+        },
+        {
+          "id": "b",
+          "label": "Hinten in der Obstabteilung neben den Birnen",
+          "photoSpec": "Äpfel auf einem Regal ganz hinten in der Obstabteilung, direkt neben Birnen"
+        },
+        {
+          "id": "c",
+          "label": "An der Kasse",
+          "photoSpec": "Äpfel am Kassenbereich"
+        }
+      ],
+      "answer": "b",
+      "evidence": "Die Äpfel aus der Region liegen ganz hinten in der Obstabteilung, neben den Birnen."
+    },
+    {
+      "number": 15,
+      "scene": 5,
+      "context": "Zahnarztpraxis",
+      "displayMode": "answers",
+      "question": "Bis wann ist die Zahnarztpraxis am Mittwoch geöffnet?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Bis 12:00 Uhr."
+        },
+        {
+          "id": "b",
+          "label": "Bis 13:00 Uhr."
+        },
+        {
+          "id": "c",
+          "label": "Bis 12:30 Uhr."
+        }
+      ],
+      "answer": "c",
+      "evidence": "Am Mittwoch hat die Praxis nur bis zwölf Uhr dreißig geöffnet. Danach ist geschlossen."
     }
   ],
   "reviewNotes": [
-    "PROPOSED teacher-only questions are derived from the teacher-supplied Teil 3 transcript, not from a verified MP3 file. Teacher review and picture assets are required before publishing.",
-    "Prompt 'Dazu hören Sie drei Fotos' in supplied introduction is ungrammatical; should be 'Zu jeder Aufgabe sehen Sie drei Bilder.' Check/replace the recorded introduction if audible.",
-    "Options are photo briefs, not actual licensed image assets; supply three properly distinct images per question and confirm image-to-answer mapping.",
-    "Confirm that the MP3 contains one playback of each numbered conversation, not accidentally a second full repetition.",
-    "Do not assume the R2 dashboard prefix mock-hoeren/mock-03/ is the same as the canonical a2/mock-hoeren/mock-03/. Verify object, move/copy if needed, and publish a protected manifest server-side."
+    "This replaces the prior mismatching Teil 3 draft entirely. The uploaded recording has shopping-centre closing, meeting Julia at 15:00, red jacket size 42, organic apples by pears, and Wednesday dental closing at 12:30.",
+    "Teacher audio is ~1:46.6 long with one playback and pauses between five scenes. Do not repeat the MP3 automatically.",
+    "The audio introduction says 'Dazu hören Sie drei Bilder oder Antworten' (non-idiomatic). Suggested on-screen wording: 'Zu jeder Aufgabe sehen Sie drei Bilder oder Antworten.' Teacher can accept as a minor spoken slip or correct the intro before publication.",
+    "Tasks 13 and 14 require 3 properly licensed distinct picture choices; task options and photo briefs here are specifications, NOT created images.",
+    "The provided Cloudflare R2 dashboard URL points at mock-hoeren/mock-03/ without a2/. Verify the exact object and protected manifest; compare R2 MP3 SHA-256 to the local SHA-256 before publishing.",
+    "Still a teacher-only draft, with no final published manifest, live Mock 3 route, verified A2 Mock 3 server key, or full four-skill result integration."
   ]
 }
