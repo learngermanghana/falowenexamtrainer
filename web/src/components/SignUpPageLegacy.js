@@ -590,7 +590,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate data-signup-step={step} style={{ display: "grid", gap: 16 }}>
+        <form onSubmit={handleSubmit} noValidate data-signup-step={step} data-signup-error={authError} style={{ display: "grid", gap: 16 }}>
           <nav aria-label="Signup progress">
             <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
               {["Your account", "Your learning", "Contact details"].map((label, index) => <li key={label} aria-current={step === index + 1 ? "step" : undefined} style={{ borderTop: `4px solid ${step >= index + 1 ? "#2563eb" : "#e2e8f0"}`, paddingTop: 10, color: step === index + 1 ? "#1d4ed8" : "#64748b", fontSize: 13, fontWeight: step === index + 1 ? 700 : 500 }}>{index + 1}. {label}</li>)}
