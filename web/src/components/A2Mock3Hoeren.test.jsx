@@ -21,39 +21,57 @@ beforeEach(() => {
   fetchA2MockAudioPlaybackUrl.mockReset().mockResolvedValue({url:"https://example.com/test.mp3"});
 });
 
-test("Teil 3 has the newly recorded five dialogues, picture choices and no premature results", () => {
+test("A2 Mock 3 Hören has all four parts, each with five questions and a /20 score", () => {
   const { container } = mount();
-  expect(screen.getByText(/Hören Mock 3 — Teile 3 und 4/)).toBeInTheDocument();
-  expect(screen.getByText(/Um wie viel Uhr schließt das Geschäft heute/)).toBeInTheDocument();
-  expect(screen.getByText(/Wann treffen sich die beiden morgen/)).toBeInTheDocument();
+  expect(screen.getByText(/Hören Mock 3 — Teile 1 bis 4/)).toBeInTheDocument();
+  expect(screen.getByText(/0\/20 Aufgaben beantwortet/)).toBeInTheDocument();
+  expect(screen.getByText(/Was sollen die Fahrgäste der U-Bahn-Linie 2 tun/)).toBeInTheDocument();
+  expect(container.querySelectorAll("fieldset")).toHaveLength(5);
+  expect(screen.getByRole("button", { name: /Antworten zu allen vier Teilen prüfen/i })).toBeDisabled();
+  fireEvent.click(screen.getByRole("button", { name:/Teil 2/i }));
+  expect(screen.getByText(/Was macht Lukas am Montag um 18 Uhr/)).toBeInTheDocument();
+  expect(container.querySelectorAll("fieldset")).toHaveLength(5);
+  fireEvent.click(screen.getByRole("button", { name:/Teil 3/i }));
   expect(screen.getByText(/Was möchte die Kundin umtauschen/)).toBeInTheDocument();
   expect(screen.getByText(/Wo findet man die Bio-Äpfel/)).toBeInTheDocument();
-  expect(screen.getByText(/Bis wann ist die Zahnarztpraxis am Mittwoch geöffnet/)).toBeInTheDocument();
-  expect(container.querySelectorAll("fieldset")).toHaveLength(5);
   expect(container.querySelectorAll("img")).toHaveLength(6);
-  expect(screen.getByRole("button", { name: /Antworten zu Teile 3 und 4 prüfen/i })).toBeDisabled();
-  expect(screen.queryByText(/Übungsergebnis/)).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name:/Teil 4/i }));
+  expect(screen.getByText(/Stefan hat vor seiner Arbeit/)).toBeInTheDocument();
+  expect(container.querySelectorAll("fieldset")).toHaveLength(5);
+  expect(screen.queryByText(/Hören-Übungsergebnis/)).not.toBeInTheDocument();
 });
 
-test("Teil 4 has five independent Richtig/Falsch choices and fetches canonical R2 object", async () => {
+test.each(["teil-1","teil-2","teil-3","teil-4"])("%s fetches the matching canonical R2 audio object", async teil => {
   mount();
-  fireEvent.click(screen.getByRole("button", { name: /Teil 4/i }));
-  expect(screen.getByText(/Stefan hat vor seiner Arbeit/)).toBeInTheDocument();
+  const n = Number(teil.slice(-1));
+  if (n !== 1) fireEvent.click(screen.getByRole("button", { name: new RegExp(`Teil ${n}`) }));
   fireEvent.click(screen.getByRole("button", { name: "Audio laden" }));
   await waitFor(() => expect(fetchA2MockAudioPlaybackUrl).toHaveBeenCalledWith({
-    mockId: "mock-03", part: "teil-4",
-    key: "a2/mock-hoeren/mock-03/teil-4.mp3",
+    mockId: "mock-03", part: teil, key: `a2/mock-hoeren/mock-03/${teil}.mp3`,
     idToken: "secure-session-token",
   }));
-  expect(screen.getByText(/MP3 bereits zweimal enthalten/)).toBeInTheDocument();
+  if (teil === "teil-4") expect(screen.getByText(/MP3 bereits zweimal enthalten/)).toBeInTheDocument();
 });
 
-test("answers are isolated by student id and are not a verified full mock result", async () => {
+test("student-specific Teil 3 answers survive adding Teile 1 and 2", async () => {
+  localStorage.setItem(cache("a2-mock3-first"), JSON.stringify({11:"b",16:"richtig"}));
+  const { container } = mount();
+  expect(screen.getByText(/2\/20 Aufgaben beantwortet/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name:/Teil 3/i }));
+  expect(container.querySelectorAll("input:checked")).toHaveLength(1);
+  mockUid = "a2-mock3-second";
+  // A different login must not inherit this device's previous selections.
+  expect(localStorage.getItem(cache("a2-mock3-second"))).toBeNull();
+});
+
+test("four-part answers are isolated between students and remain a practice result", async () => {
   const { container, rerender } = mount();
-  fireEvent.click(container.querySelector('input[name="a2mock3-11"][type="radio"]'));
-  await waitFor(() => expect(JSON.parse(localStorage.getItem(cache("a2-mock3-first")))[11]).toBe("a"));
+  fireEvent.click(container.querySelector('input[name="a2mock3-1"][type="radio"]'));
+  await waitFor(() => expect(JSON.parse(localStorage.getItem(cache("a2-mock3-first")))[1]).toBe("a"));
   mockUid = "a2-mock3-second";
   rerender(<MemoryRouter><A2Mock3Hoeren /></MemoryRouter>);
-  await waitFor(() => expect(container.querySelectorAll('input[type="radio"]:checked')).toHaveLength(0));
-  expect(screen.getByText(/noch keine vollständige A2-Prüfung/i)).toBeInTheDocument();
+  await waitFor(() => expect(container.querySelectorAll("input:checked")).toHaveLength(0));
+  expect(screen.getByText(/noch kein offizielles/i)).not.toBeInTheDocument();
+  expect(screen.getByText(/keine vollständige A2-Prüfung/i)).not.toBeInTheDocument();
+  expect(screen.getByText(/kein offizielles/i)).toBeInTheDocument();
 });
