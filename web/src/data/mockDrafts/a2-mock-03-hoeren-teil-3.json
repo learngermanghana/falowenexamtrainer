@@ -1,0 +1,167 @@
+{
+  "mockId": "a2-mock-03",
+  "module": "hoeren",
+  "examPart": "3",
+  "level": "A2",
+  "mode": "goethe",
+  "title": "Fünf kurze Gespräche · Bilder auswählen",
+  "kind": "picture-multiple-choice",
+  "questionNumbers": [
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "plays": 1,
+  "audioObjectKey": "a2/mock-hoeren/mock-03/teil-3.mp3",
+  "audioVerification": "unverified: only the teacher's supplied transcript is available, not the downloaded local MP3 or R2 object",
+  "publicationStatus": "draft-only",
+  "transcriptEvidence": [
+    {
+      "scene": 0,
+      "context": "Beispiel: Termin im Büro",
+      "dialogue": "Dienstag um zehn Uhr geht nicht; vierzehn Uhr passt.",
+      "assessed": false
+    },
+    {
+      "scene": 1,
+      "context": "Bio-Äpfel",
+      "dialogue": "Die Bio-Äpfel liegen in der Obstabteilung vorne links neben den Birnen.",
+      "assessed": true
+    },
+    {
+      "scene": 2,
+      "context": "Supermarkt",
+      "dialogue": "Am Samstag schließt der Supermarkt um zwanzig Uhr, nicht um einundzwanzig Uhr.",
+      "assessed": true
+    },
+    {
+      "scene": 3,
+      "context": "Pullover zurückgeben",
+      "dialogue": "Der Pullover ist zu klein, der Kunde hat den Kassenbon.",
+      "assessed": true
+    },
+    {
+      "scene": 4,
+      "context": "Treffpunkt",
+      "dialogue": "Nicht morgen im Café am Markt, sondern Mittwoch im Park.",
+      "assessed": true
+    },
+    {
+      "scene": 5,
+      "context": "Tomaten",
+      "dialogue": "Ein Kilo kostet zwei Euro fünfzig; der Kunde nimmt zwei Kilo.",
+      "assessed": true
+    }
+  ],
+  "questions": [
+    {
+      "number": 11,
+      "question": "Wo findet die Person Bio-Äpfel?",
+      "options": [
+        {
+          "id": "a",
+          "photoSpec": "Obstabteilung mit Äpfeln neben Birnen"
+        },
+        {
+          "id": "b",
+          "photoSpec": "Brotregal"
+        },
+        {
+          "id": "c",
+          "photoSpec": "Getränkeabteilung"
+        }
+      ],
+      "answer": "a",
+      "evidence": "in der Obstabteilung gleich vorne links neben den Birnen"
+    },
+    {
+      "number": 12,
+      "question": "Wann schließt der Supermarkt heute?",
+      "options": [
+        {
+          "id": "a",
+          "photoSpec": "Uhrzeit 19:00"
+        },
+        {
+          "id": "b",
+          "photoSpec": "Uhrzeit 20:00"
+        },
+        {
+          "id": "c",
+          "photoSpec": "Uhrzeit 21:00"
+        }
+      ],
+      "answer": "b",
+      "evidence": "da machen wir schon um zwanzig Uhr zu"
+    },
+    {
+      "number": 13,
+      "question": "Was möchte der Kunde zurückgeben?",
+      "options": [
+        {
+          "id": "a",
+          "photoSpec": "Jacke"
+        },
+        {
+          "id": "b",
+          "photoSpec": "Hose"
+        },
+        {
+          "id": "c",
+          "photoSpec": "Pullover"
+        }
+      ],
+      "answer": "c",
+      "evidence": "ich möchte diesen Pullover zurückgeben"
+    },
+    {
+      "number": 14,
+      "question": "Wo wollen sich die Personen treffen?",
+      "options": [
+        {
+          "id": "a",
+          "photoSpec": "Café"
+        },
+        {
+          "id": "b",
+          "photoSpec": "Park"
+        },
+        {
+          "id": "c",
+          "photoSpec": "Büro"
+        }
+      ],
+      "answer": "b",
+      "evidence": "Lieber am Mittwoch im Park"
+    },
+    {
+      "number": 15,
+      "question": "Was kostet ein Kilo Tomaten?",
+      "options": [
+        {
+          "id": "a",
+          "photoSpec": "Preisschild Tomaten €2,50 je kg"
+        },
+        {
+          "id": "b",
+          "photoSpec": "Preisschild Tomaten €3,50 je kg"
+        },
+        {
+          "id": "c",
+          "photoSpec": "Preisschild Tomaten €5,00 je kg"
+        }
+      ],
+      "answer": "a",
+      "evidence": "Das Kilo kostet heute nur zwei Euro fünfzig"
+    }
+  ],
+  "reviewNotes": [
+    "PROPOSED teacher-only questions are derived from the teacher-supplied Teil 3 transcript, not from a verified MP3 file. Teacher review and picture assets are required before publishing.",
+    "Prompt 'Dazu hören Sie drei Fotos' in supplied introduction is ungrammatical; should be 'Zu jeder Aufgabe sehen Sie drei Bilder.' Check/replace the recorded introduction if audible.",
+    "Options are photo briefs, not actual licensed image assets; supply three properly distinct images per question and confirm image-to-answer mapping.",
+    "Confirm that the MP3 contains one playback of each numbered conversation, not accidentally a second full repetition.",
+    "Do not assume the R2 dashboard prefix mock-hoeren/mock-03/ is the same as the canonical a2/mock-hoeren/mock-03/. Verify object, move/copy if needed, and publish a protected manifest server-side."
+  ]
+}
