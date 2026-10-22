@@ -42,6 +42,8 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
 
   test("accepts protected A1 audio by visible course day", () => {
     expect(validateA1AudioKey({ day: 8, key: "a1/day-08/day-08.mp3" })).toEqual({ day: 8, key: "a1/day-08/day-08.mp3" });
+    expect(validateA1AudioKey({ day: 11, key: "a1/day-11/day-11.mp3" })).toEqual({ day: 11, key: "a1/day-11/day-11.mp3" });
+    expect(validateA1AudioKey({ day: 11, key: "a1/day-10/day-10.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 8, key: "a1/day-12/day-12.mp3" })).toBeNull();
     expect(validateA1AudioKey({ day: 8, key: "a1/day-08/notes.pdf" })).toBeNull();
     expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a1/day-12/day-12.mp3" });

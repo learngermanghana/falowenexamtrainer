@@ -618,67 +618,6 @@ const ObjectsAndColorsPage = () => {
         </div>
       </Section>
 
-      <Section title="Simple Adjective Note: zu, sehr, super">
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          These words come before an adjective. They change the strength of the adjective.
-        </p>
-        <SimpleTable
-          caption="A1 difference"
-          columns={["Word", "Meaning", "When to use it", "Example"]}
-          rows={[
-            {
-              key: "zu",
-              cells: [
-                <strong>zu</strong>,
-                "too",
-                "It is more than good or more than needed.",
-                <>
-                  <strong>Das Auto ist zu teuer.</strong> = The car is too expensive.
-                </>,
-              ],
-            },
-            {
-              key: "sehr",
-              cells: [
-                <strong>sehr</strong>,
-                "very",
-                "Normal and polite. Use it in class and exams.",
-                <>
-                  <strong>Das Buch ist sehr interessant.</strong> = The book is very interesting.
-                </>,
-              ],
-            },
-            {
-              key: "super",
-              cells: [
-                <strong>super</strong>,
-                "super / very",
-                "Friendly and informal. Use it when you are happy or excited.",
-                <>
-                  <strong>Das Essen ist super lecker.</strong> = The food is super delicious.
-                </>,
-              ],
-            },
-          ]}
-          minWidth={820}
-        />
-
-        <div style={helperBoxStyle}>
-          <strong>Same adjective, different feeling</strong>
-          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>
-              Das Haus ist <strong>zu groß</strong>. = It is too big. Maybe not good.
-            </li>
-            <li>
-              Das Haus ist <strong>sehr groß</strong>. = It is very big. Neutral.
-            </li>
-            <li>
-              Das Haus ist <strong>super groß</strong>. = It is super big. Informal and excited.
-            </li>
-          </ul>
-        </div>
-      </Section>
-
       <Section title="Practice: Choose the Correct Form">
         <PracticeBlock />
       </Section>

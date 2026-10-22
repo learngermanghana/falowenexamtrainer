@@ -11,8 +11,8 @@ const READING_REVISIONS = {
   "A1-12.1": { revision: "a1-12.1-bahnhof-hoeren-v3", sections: { "teil-1": 5, "teil-2": 0, "teil-3": 5 } },
   "A1-4": { revision: "a1-4-goethe-speaking-v3", sections: { "teil-2": 0, "teil-3": 5 } },
   "A1-6": { revision: "objects-and-colors-reading-listening-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
-  // Reading only changed again. Preserve saved listening answers (Teil 2).
-  "A1-7": { revision: "five-opening-hours-signs-v3", sections: { "teil-1": 5 } },
+  // The new listening replaces old Teil 2 choices; the five-sign reading is unchanged.
+  "A1-7": { revision: "five-opening-hours-signs-new-time-listening-v4", sections: { "teil-1": 5, "teil-2": 5 } },
   "A1-8": { revision: "day12-two-reading-parts-v4", sections: { "teil-1": 5, "teil-2": 3 } },
   "A1-11": { revision: "goethe-requests-and-bahnhof-listening-v2", sections: { "teil-1": 0, "teil-2": 5, "teil-3": 0 } },
   "A1-13": { revision: "weather-situations-and-radio-5-each-v1", sections: { "teil-1": 5, "teil-2": 5 } },
@@ -24,6 +24,7 @@ const COMPATIBLE_UNCHANGED_SECTIONS = {
   "A1-12.1": { from: "a1-12.1-bahn-auto-beruf-v2", keys: ["teil-1"] },
   "A1-4": { from: "a1-4-listening-v2", keys: ["teil-3"] },
   "A1-11": { from: "tourist-info-and-bahnhof-directions-5-each-v1", keys: ["teil-2"] },
+  "A1-7": { from: "five-opening-hours-signs-v3", keys: ["teil-1"] },
 };
 const readingRevision = (assignmentKey) => {
   const config = READING_REVISIONS[normalizeAssignmentKey(assignmentKey)];
@@ -50,18 +51,6 @@ const sanitizeA1WorkbookDraft = (draft) => {
       };
     }
   });
-  // A1-7's new five-sign reading does not replace the five-question
-  // listening recording. Preserve only listening from the prior V2 workbook.
-  if (normalizeAssignmentKey(draft.assignmentKey) === "A1-7") {
-    const compatibleListening = ["thomas-time-and-new-listening-5-each-v2", config.revision].includes(draft.readingRevision);
-    if (!compatibleListening) delete sections["teil-2"];
-    else if (sections["teil-2"]) {
-      sections["teil-2"] = {
-        answers: Object.fromEntries(Object.entries(sections["teil-2"].answers || {})
-          .filter(([number]) => /^\d+$/.test(number) && Number(number) >= 1 && Number(number) <= 5)),
-      };
-    }
-  }
   return { ...draft, ...readingRevision(draft.assignmentKey), sections };
 };
 
@@ -170,7 +159,7 @@ export const buildA1WorkbookSubmissionText = ({ assignment, draft } = {}) => {
         : normalizedAssignment === "A1-6" && key === "teil-1"
           ? "A1-6-WORKBOOK-V2\n"
           : normalizedAssignment === "A1-7" && key === "teil-1"
-            ? "A1-7-READING-V2\n"
+            ? "A1-7-READING-V2\nA1-7-HOEREN-V3\n"
             : "";
       return `TEIL ${number}\n${exerciseVersion}${body}`;
     })

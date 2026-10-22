@@ -1,5 +1,6 @@
 import React from "react";
 import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";
+import A1ProtectedAudioPlayer from "./A1ProtectedAudioPlayer";
 
 import { styles } from "../styles";
 
@@ -27,23 +28,6 @@ const optionLine = {
   margin: 0,
   paddingLeft: 12,
   lineHeight: 1.7,
-};
-
-const videoWrapper = {
-  position: "relative",
-  width: "100%",
-  paddingTop: "56.25%",
-  overflow: "hidden",
-  borderRadius: 12,
-  background: "#000",
-};
-
-const videoFrame = {
-  position: "absolute",
-  inset: 0,
-  width: "100%",
-  height: "100%",
-  border: 0,
 };
 
 const lesenNotices = [
@@ -92,12 +76,16 @@ const lesenNotices = [
 ];
 
 const teil2Questions = [
-  { stem: "1. Es ist Viertel nach drei.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "2. Der Deutschkurs fängt um fünf Uhr an.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "3. Anna steht um halb sieben auf.", options: ["a) Richtig", "b) Falsch"] },
-  { stem: "4. Wann macht der Supermarkt zu?", options: ["a) Um vier Uhr.", "b) Um sechs Uhr.", "c) Um acht Uhr."] },
-  { stem: "5. Wann ruft Tom Anna an, und was macht er dann?", options: ["a) Um Viertel vor sechs, er holt Anna ab.", "b) Um halb sieben, er kauft ein.", "c) Um acht Uhr, er sieht fern."] },
+  { stem: "1. Wann fängt der Deutschkurs an?", options: ["a) Um 14:00 Uhr", "b) Um 16:00 Uhr", "c) Um 18:00 Uhr"] },
+  { stem: "2. Um wie viel Uhr steht Anna morgens auf?", options: ["a) Um 6:00 Uhr", "b) Um 6:30 Uhr", "c) Um 7:00 Uhr"] },
+  { stem: "3. Was macht Tom abends um 8 Uhr (20:00 Uhr)?", options: ["a) Er kauft im Supermarkt ein.", "b) Er geht zum Deutschkurs.", "c) Er sieht fern."] },
+  { stem: "4. Wann schließt der Supermarkt nach dem Kurs?", options: ["a) Um 16:00 Uhr", "b) Um 18:00 Uhr", "c) Um 20:00 Uhr"] },
+  { stem: "5. Wer holt wen nach dem Einkauf ab?", options: ["a) Tom holt Anna ab.", "b) Anna holt Tom ab.", "c) Niemand, sie nehmen den Bus."] },
 ];
+
+// Day 11 uses the authenticated Cloudflare R2 player, not the withdrawn video.
+// The uploaded object name must exactly match this key.
+const hoerenAudioKey = "a1/day-11/day-11.mp3";
 
 const A1Day11UnderstandingTimeWorkbookPage = () => {
   return (
@@ -134,21 +122,12 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       </section>
 
       <div style={card}>
-        <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
+        <h2 style={sectionTitle}>Teil 2 · Hören: Tagesablauf &amp; Uhrzeiten</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Sehen und hören Sie das Video. Beantworten Sie die fünf Fragen. Aufgaben 1–3: Richtig oder falsch? Aufgaben 4–5: Wählen Sie die richtige Antwort.
+          Hören Sie das Gespräch über den Deutschkurs, Annas Tagesablauf, den Supermarkt und Tom.
+          Beantworten Sie die fünf Fragen. Wählen Sie jeweils a, b oder c.
         </p>
-
-        <div style={videoWrapper}>
-          <iframe
-            src="https://www.youtube-nocookie.com/embed/W0tEZWxndLo"
-            title="A1 Day 11 Hören – Understanding Time"
-            style={videoFrame}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
+        <A1ProtectedAudioPlayer day={11} audioKey={hoerenAudioKey} />
 
         {teil2Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
@@ -159,11 +138,6 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           </div>
         ))}
 
-        <div style={{ ...questionBlock, background: "#f8fafc" }}>
-          <p style={{ margin: 0 }}><strong>Zusatzaufgabe · trennbare Verben</strong></p>
-          <p style={{ margin: 0 }}>Ergänzen Sie: „Ich ___ um sieben Uhr ___ (aufstehen).“</p>
-          <p style={{ margin: 0, color: "#64748b" }}>Diese Zusatzaufgabe ist Übung und gehört nicht zu den fünf benoteten Hören-Fragen.</p>
-        </div>
       </div>
 
     </A1TutorMarkedWorkbookShell>
