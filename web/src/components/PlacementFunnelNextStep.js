@@ -54,7 +54,7 @@ export default function PlacementFunnelNextStep({ result }) {
     utm_content: "continue_application",
   });
   const whatsappText = encodeURIComponent(
-    `Hello Falowen, my placement-test result is ${result.level} (${result.correct}/${result.total}). Please help me choose a class.${video ? ` I came from YouTube lesson ${video}.` : ""}`
+    `Hello Falowen, my placement-test result is ${result.level} (${result.correct}/${result.total}). Please help me choose a class.`
   );
 
   const saveReminder = async (event) => {
