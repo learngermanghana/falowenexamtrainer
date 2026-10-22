@@ -44,6 +44,7 @@ import A2FinalMockExamPage from "./components/A2FinalMockExamPage";
 import A2Mock2Lesen from "./components/A2Mock2Lesen";
 import A2Mock2Schreiben from "./components/A2Mock2Schreiben";
 import A2Mock2Hoeren from "./components/A2Mock2Hoeren";
+import A2Mock3Hoeren from "./components/A2Mock3Hoeren";
 import A2Mock2Sprechen from "./components/A2Mock2Sprechen";
 import A2Mock2ExamHub from "./components/A2Mock2ExamHub";
 import B1FinalMockExamPage from "./components/B1FinalMockExamPage";
@@ -1042,6 +1043,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-mock-2-lesen" element={<A2Mock2Lesen />} />
           <Route path="/campus/course/a2-mock-2-schreiben" element={<A2Mock2Schreiben />} />
           <Route path="/campus/course/a2-mock-2-hoeren" element={<A2Mock2Hoeren />} />
+          <Route path="/campus/course/a2-mock-3-hoeren" element={<A2Mock3Hoeren />} />
           <Route path="/campus/course/a2-mock-2-sprechen" element={<A2Mock2Sprechen />} />
           <Route path="/campus/course/a2-mock-2" element={<A2Mock2ExamHub />} />
           <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
