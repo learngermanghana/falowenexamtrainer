@@ -33,12 +33,15 @@ test("Day 11 has five Lesen and five Hören questions with one clickable answer 
     expect(reading.getAllByRole("radiogroup")).toHaveLength(5);
     expect(listening.getAllByRole("radiogroup")).toHaveLength(5);
     expect(reading.getAllByRole("radio")).toHaveLength(15);
-    expect(listening.getAllByRole("radio")).toHaveLength(12);
+    expect(listening.getAllByRole("radio")).toHaveLength(15);
     expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
   });
 
   expect(reading.getByText(/Ich bin Thomas/)).toBeInTheDocument();
   expect(listening.queryByText(/Paul hat jeden Morgen um neun Uhr Deutschunterricht/)).not.toBeInTheDocument();
+  expect(listening.getByText(/Wann fängt der Deutschkurs an/)).toBeInTheDocument();
+  expect(listening.getByText(/Wann schließt der Supermarkt nach dem Kurs/)).toBeInTheDocument();
+  expect(listening.queryByText(/Es ist Viertel nach drei/)).not.toBeInTheDocument();
 
   for (const [scope, letters] of [[reading, ["B", "A", "B", "C", "B"]], [listening, ["A", "B", "A", "B", "A"]]]) {
     for (const [index, letter] of letters.entries()) {
