@@ -117,24 +117,6 @@ const sprechenContent = (
   </div>
 );
 
-const schreibenContent = (
-  <div style={sectionStyle}>
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      <strong>Aufgabenstellung (A2-Niveau):</strong> Sie möchten einen Arzt wegen Ihrer Gesundheit kontaktieren. Schreiben Sie
-      einen Brief oder eine E-Mail an den Arzt.
-    </p>
-    <ol style={listStyle}>
-      <li>Fragen Sie nach einem Termin, zum Beispiel wann Sie kommen können.</li>
-      <li>Fragen Sie nach den Kosten oder ob Ihre Versicherung die Behandlung abdeckt.</li>
-      <li>Fragen Sie nach möglichen Untersuchungen oder Behandlungen, die der Arzt vorschlägt.</li>
-    </ol>
-  </div>
-);
-
-
-
-
-
 export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
   return (
     <A2StandardTabbedWorkbookPage
@@ -144,9 +126,8 @@ export default function A2Day16WohlbefindenUndEntspannungWorkbookPage() {
       workbookId="A2Day16WohlbefindenUndEntspannung"
       topicPrompt="Was machen Sie für Ihr Wohlbefinden, Ihre Entspannung und Ihre Gesundheit?"
       sprechenContent={sprechenContent}
-      schreibenTask="E-Mail an einen Arzt wegen Ihrer Gesundheit"
-      schreibenContent={schreibenContent}
-      schreibenPlaceholder="Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ..."
+      schreibenTask="Informelle E-Mail an Markus: Entspannung und Einladung am Wochenende"
+      schreibenPlaceholder="Lieber Markus,\n\nzur Entspannung ... weil ... Hast du nächstes Wochenende Lust, ...?\n\nViele Grüße"
       showWorkbookGuidance={false}
     />
   );
