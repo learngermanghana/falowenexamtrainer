@@ -45,8 +45,14 @@ test("A1 Day 11 displays five current Hören questions with clickable A/B/C answ
 
   const answers = ["b", "b", "c", "b", "a"];
   for (const [index, answer] of answers.entries()) {
+    await waitFor(() => {
+      expect(listening.getByRole("radiogroup", { name: `Question ${index + 1}` })).toBeInTheDocument();
+    });
     const group = listening.getByRole("radiogroup", { name: `Question ${index + 1}` });
     fireEvent.click(within(group).getByRole("radio", { name: new RegExp(`^${answer}\\)`, "i") }));
+    await waitFor(() => {
+      expect(readA1WorkbookDraft("A1-7").sections?.["teil-2"]?.answers?.[index + 1]).toBe(answer.toUpperCase());
+    });
   }
 
   await waitFor(() => {
