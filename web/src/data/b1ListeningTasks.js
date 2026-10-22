@@ -97,7 +97,7 @@ export const B1_LISTENING_TASKS = Object.freeze({
     audioKey: "b1/day-06/day-06.mp3",
     videoTitle: "B1 Tag 6 · Stadt oder Land? · Gespräch",
     submitRequired: true,
-    submissionNote: "Reichen Sie nur die fünf Antwortbuchstaben im Submit-Tab ein, zum Beispiel: 1B, 2A, 3B, 4A, 5C.",
+    submissionNote: "Reichen Sie nur die fünf Antwortbuchstaben im Submit-Tab ein, zum Beispiel: 1A, 2C, 3B, 4C, 5A.",
     questions: B1_DAY6_LISTENING_QUESTIONS,
   }),
   7: task({
