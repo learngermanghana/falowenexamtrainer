@@ -10,11 +10,11 @@ test("each A2 Mock 2 section remains accessible within its exam", () => {
  });
 });
 
-test("A2 Mock 3 is clearly a ten-question listening practice, never a published four-skill exam", () => {
+test("A2 Mock 3 is clearly a 20-question listening practice, never a published four-skill exam", () => {
  const practice = getMockExam("a2-mock-03-hoeren");
  expect(practice.mode).toBe("practice");
  expect(practice.status).toBe("preview");
- expect(practice.sections).toEqual(["Hören · Teile 3 und 4"]);
+ expect(practice.sections).toEqual(["Hören · Teile 1 bis 4"]);
  expect(practice.route).toBe("/campus/course/a2-mock-3-hoeren");
  expect(getMockExam("a2-mock-03")).toBeNull();
 });
