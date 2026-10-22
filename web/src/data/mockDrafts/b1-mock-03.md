@@ -2,8 +2,8 @@
 
 **Status:** Draft in progress — do not publish or register as a ready full exam.
 **Interface:** Reuse the existing B1 Final Mock Exam template, including the same reading layouts, module navigation, timers, answer choices, autosave, student result and Admin result pipelines. Only the new questions/texts and mock-specific scoring/audio identities may change.
-**Completed:** Lesen Teil 1 (questions 1–6), Lesen Teil 2 Text 1 & Text 2 (questions 7–12), Lesen Teil 3 matching (questions 13–19).
-**Pending:** Lesen Teile 4–5, Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
+**Completed:** Entire Lesen module — Teil 1 (1–6), Teil 2 Text 1 & Text 2 (7–12), Teil 3 Anzeigen (13–19), Teil 4 Ja/Nein (20–26), Teil 5 VHS rules (27–30): 30 questions.
+**Pending:** Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
 
 ## Modul Lesen — Teil 1
 
@@ -180,6 +180,82 @@ Ihr Computer streikt? Wir reparieren Laptops und PCs schnell und zuverlässig di
 
 Wir kaufen Ihr gebrauchtes Smartphone oder Tablet! Kommen Sie einfach in unserer Filiale in der Innenstadt vorbei – Barauszahlung sofort vor Ort.
 
+## Modul Lesen — Teil 4
+
+**Prüfungszeit:** 15 Minuten (empfohlene Zeit innerhalb des bestehenden 65-Minuten-Lesen-Moduls; keinen zusätzlichen Timer erzeugen).
+
+**Anweisung:** Lesen Sie die Beiträge **20 bis 26** aus einem Online-Forum zum Thema **„Sollte der öffentliche Personennahverkehr (ÖPNV) für alle Bürger kostenlos sein?“**. Sind die Personen dafür (**Ja**) oder dagegen (**Nein**)?
+
+### Beispiel — nicht bewertete Aufgabe
+
+**0. Sandra (22):** „Ein kostenloser Bus- und Bahnverkehr wäre genial für Studierende wie mich, die nicht viel Geld haben.“
+
+**Beispielantwort:** Ja (fest vorgegeben, keine bewertete Frage).
+
+### Online-Forum: Sollte der öffentliche Personennahverkehr (ÖPNV) für alle Bürger kostenlos sein?
+
+**20. Lukas (35):** „Wenn Busse und Bahnen nichts mehr kosten, steigen endlich mehr Menschen vom eigenen Auto auf den ÖPNV um. Das schützt unser Klima nachhaltig und entlastet die Straßen.“
+
+**21. Martina (50):** „Kostenlos klingt zwar verlockend, aber irgendwer muss die Busfahrer, das Personal und die Wartung bezahlen. Am Ende werden dafür nur die Steuern für alle erhöht.“
+
+**22. Jan (19):** „Ich fahre täglich mit der Bahn zur Ausbildung. Ohne die teuren Monatskarten bliebe mir jeden Monat deutlich mehr Geld zum Leben übrig.“
+
+**23. Brigitte (61):** „Schon jetzt sind die Busse und Bahnen im Berufsverkehr völlig überfüllt. Bei kostenlosem ÖPNV gäbe es im Alltag nur noch Chaos, Ausfälle und Verspätungen.“
+
+**24. Florian (42):** „Anstatt Fahrkarten kostenlos zu machen, sollte die Politik das Geld lieber in sauberere Bahnhöfe, modernere Fahrzeuge und pünktlichere Verbindungen investieren.“
+
+**25. Elena (29):** „Für Alleinerziehende und Familien mit kleinem Einkommen wäre eine gebührenfreie Nutzung eine enorme finanzielle Hilfe im Alltag.“
+
+**26. Tobias (48):** „Ein kleiner, fairer Ticketpreis ist angemessen. Erfahrungsgemäß führen komplett kostenlose Angebote leider dazu, dass die Menschen die Qualität und Sauberkeit nicht mehr schätzen.“
+
+**Antwortformat:** Für jede Aufgabe 20–26 genau eine Antwort **Ja** oder **Nein** im vorhandenen B1-Mock-1-Layout wählen. Keine Lösungen vor Abgabe zeigen.
+
+## Modul Lesen — Teil 5
+
+**Prüfungszeit:** 10 Minuten (empfohlene Zeit innerhalb des bestehenden 65-Minuten-Lesen-Moduls; keinen zusätzlichen Timer erzeugen).
+
+**Anweisung:** Lesen Sie den Text und die Aufgaben **27 bis 30** dazu. Wählen Sie bei jeder Aufgabe die richtige Lösung **a**, **b** oder **c**.
+
+### Hausordnung und Nutzungsbedingungen der Volkshochschule (VHS)
+
+Sehr geehrte Kursteilnehmerinnen und Kursteilnehmer,
+
+um einen angenehmen und reibungslosen Ablauf aller Kurse zu gewährleisten, bitten wir Sie, die folgenden Regelungen zu beachten:
+
+**1. Anwesenheit und Bescheinigungen:** Für den Erhalt einer Teilnahmebescheinigung ist eine Anwesenheit von mindestens 80 % der Kurszeit erforderlich. Wenn Sie an einem Kurstag krank sind, informieren Sie bitte das Sekretariat per E-Mail vor Kursbeginn.
+
+**2. Nutzung der Unterrichtsräume:** In allen Unterrichtsräumen sowie im gesamten Gebäude ist das Rauchen (einschließlich E-Zigaretten) strengstens verboten. Das Essen ist in den Seminarräumen nicht gestattet. Kaltgetränke in verschlossenen Plastikflaschen dürfen mitgebracht und konsumiert werden.
+
+**3. Technische Geräte:** Während des Unterrichts sind Mobiltelefone auf stumm zu schalten oder auszuschalten. Ton- und Videoaufnahmen während der Kurse sind aus Datenschutzgründen grundsätzlich untersagt.
+
+**4. Parken und Wertsachen:** Fahrräder dürfen nur auf den gekennzeichneten Flächen im Innenhof abgestellt werden. Das Abstellen von Fahrrädern oder E-Scootern auf den Gehwegen vor dem Haupteingang ist untersagt. Für den Verlust oder die Beschädigung von Wertsachen übernimmt die Volkshochschule keine Haftung.
+
+### Aufgaben 27–30
+
+**27. Wann stellt die Volkshochschule eine Teilnahmebescheinigung aus?**
+
+- **a)** Wenn man bei jedem Fehltag ein ärztliches Attest vorlegt.
+- **b)** Wenn man an mindestens 80 % der Unterrichtszeit teilgenommen hat.
+- **c)** Wenn man das Sekretariat vor dem Kurs per E-Mail informiert hat.
+
+**28. Was ist bezüglich Essen und Trinken in den Seminarräumen erlaubt?**
+
+- **a)** Man darf kalte Getränke in verschlossenen Flaschen trinken.
+- **b)** Das Essen von kleinen Snacks ist während der Pausen gestattet.
+- **c)** Alle Arten von Getränken dürfen mit an den Platz genommen werden.
+
+**29. Welche Regel gilt für Mobiltelefone und Aufnahmen im Unterricht?**
+
+- **a)** Handys müssen vor Kursbeginn beim Kursleiter abgegeben werden.
+- **b)** Fotos und Videos dürfen nur für private Zwecke gemacht werden.
+- **c)** Das Telefon muss stummgeschaltet sein und Aufnahmen sind verboten.
+
+**30. Wo dürfen Fahrräder abgestellt werden?**
+
+- **a)** Auf dem Gehweg direkt vor dem Haupteingang der Volkshochschule.
+- **b)** Nur an den markierten Plätzen im Innenhof.
+- **c)** Im Flur des Erdgeschosses neben der Garderobe.
+
 ## Teacher-only answer key — NOT FOR STUDENT EXAM UI
 
 | Nummer | Lösung | Begründung |
@@ -203,14 +279,27 @@ Wir kaufen Ihr gebrauchtes Smartphone oder Tablet! Kommen Sie einfach in unserer
 | 17 | **0** | Keine Anzeige bietet eine sofort bezugsfreie 2-Zimmer-Mietwohnung mit Balkon in der Innenstadt (B: Kauf am Stadtrand, 4 Zimmer; F: Ferienhaus). |
 | 18 | **G** | Vegetarisches Restaurant mit Live-Jazz am Samstagabend. |
 | 19 | **D** | Kinderschwimmkurse ab 5 Jahren am Samstagnachmittag. |
+| 20 | **Ja** | Lukas sieht den Gratis-ÖPNV als Beitrag zum Klimaschutz und zur Straßenentlastung. |
+| 21 | **Nein** | Martina befürchtet Steuererhöhungen zur Finanzierung von Personal und Wartung. |
+| 22 | **Ja** | Jan würde jeden Monat den Preis für seine Monatskarte sparen. |
+| 23 | **Nein** | Brigitte erwartet Überfüllung, Chaos, Ausfälle und Verspätungen. |
+| 24 | **Nein** | Florian bevorzugt Investitionen in Sauberkeit, moderne Fahrzeuge und Pünktlichkeit statt Gratistickets. |
+| 25 | **Ja** | Elena betont die finanzielle Entlastung von Alleinerziehenden und Familien mit geringem Einkommen. |
+| 26 | **Nein** | Tobias bevorzugt einen fairen Ticketpreis; er befürchtet mangelnde Wertschätzung der Qualität und Sauberkeit. |
+| 27 | **b** | Eine Teilnahmebescheinigung setzt mindestens 80 % Anwesenheit voraus. |
+| 28 | **a** | Kaltgetränke sind in verschlossenen Plastikflaschen erlaubt, Essen nicht. |
+| 29 | **c** | Mobiltelefone müssen laut Regelwerk stummgeschaltet oder ausgeschaltet sein; Ton- und Videoaufnahmen sind verboten. |
+| 30 | **b** | Fahrräder dürfen nur auf markierten Flächen im Innenhof stehen. |
 
-**Validated answer sequence:** Teil 1: Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**). Teil 2: **a, b, b, b, a, b** (questions 7–12). Teil 3: **C, H, A, J, 0, G, D** (questions 13–19). Beispiel: **E**, not graded.
+**Validated answer sequence:** Teil 1: Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**). Teil 2: **a, b, b, b, a, b** (questions 7–12). Teil 3: **C, H, A, J, 0, G, D** (questions 13–19). Beispiel: **E**, not graded. Teil 4: **Ja, Nein, Ja, Nein, Nein, Ja, Nein** (questions 20–26), Beispiel Sandra: **Ja** (not graded). Teil 5: **b, a, c, b** (questions 27–30).
 
 ## Mock 03 integration requirements (when all parts are complete)
 
 - Keep the existing student-facing B1 reading template. No new visual design, buttons or exam mechanics are needed.
 - Set an independent Mock 03 ID (e.g. `b1-mock-03`), distinct server-owned answer keys and attempt storage; never reuse Mock 1/2 scores or browser state.
-- All nineteen drafted reading items must have unique stable answer IDs, map to the teacher-reviewed keys, and reveal no keys to students before verified submission.
+- All 30 reading questions must have unique stable answer IDs, map to the teacher-reviewed keys, and reveal no keys to students before verified submission.
 - Teil 3: example E is visible but locked/unselectable. Offer choices A–D, F–J and 0 for questions 13–19. A nonzero ad may be selected only once across the seven responses; the single no-match response is 0. Use the existing B1 Anzeigen-matching control, not a new layout.
-- Teil 1 and Teil 3 each have a 10-minute recommended allocation, and the 20-minute allocation applies jointly to Teil 2 Text 1 & Text 2. None creates an extra timer; the existing overall B1 Lesen module remains 65 minutes.
+- Lesen module totals 65 minutes: Teil 1 = 10 minutes; Teil 2 Text 1 & 2 combined = 20 minutes; Teil 3 = 10 minutes; Teil 4 = 15 minutes; Teil 5 = 10 minutes. Preserve the single existing 65-minute countdown; do not introduce per-part timers.
+- Teil 4: the example Sandra → Ja is displayed but not counted. Questions 20–26 each present Ja/Nein exactly once using the existing B1 forum layout.
+- Teil 5: reuse the existing B1 Hausordnung/Regeln layout and three-choice answer widget for questions 27–30.
 - This content file is an *unpublished teacher draft*. The mock must remain absent from the ready exam catalog until all four modules and protected Hören files are tested.
