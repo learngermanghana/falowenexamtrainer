@@ -618,6 +618,7 @@ export const AuthProvider = ({ children }) => {
         ? new Date(credential.user.metadata?.creationTime || "")
         : new Date();
       if (!Number.isFinite(trialStartedDate.getTime())) {
+        await signOut(auth).catch(() => {});
         throw new Error("Your previous sign-up needs support to verify its original date. Please contact admissions.");
       }
       const trialEndsDate = new Date(trialStartedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
