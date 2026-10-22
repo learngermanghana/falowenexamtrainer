@@ -137,17 +137,20 @@
         {
           "id": "a",
           "label": "Eine rote Jacke",
-          "photoSpec": "Rote Jacke auf einem neutralen Hintergrund"
+          "photoSpec": "Rote Jacke auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-a-rote-jacke.svg"
         },
         {
           "id": "b",
           "label": "Eine blaue Hose",
-          "photoSpec": "Blaue Hose auf einem neutralen Hintergrund"
+          "photoSpec": "Blaue Hose auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-b-blaue-hose.svg"
         },
         {
           "id": "c",
           "label": "Einen roten Pullover",
-          "photoSpec": "Roter Pullover auf einem neutralen Hintergrund"
+          "photoSpec": "Roter Pullover auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-c-roter-pullover.svg"
         }
       ],
       "answer": "a",
@@ -163,17 +166,20 @@
         {
           "id": "a",
           "label": "Vorne beim Eingang",
-          "photoSpec": "Äpfel direkt am Eingang des Supermarkts"
+          "photoSpec": "Äpfel direkt am Eingang des Supermarkts",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-a-eingang.svg"
         },
         {
           "id": "b",
           "label": "Hinten in der Obstabteilung neben den Birnen",
-          "photoSpec": "Äpfel auf einem Regal ganz hinten in der Obstabteilung, direkt neben Birnen"
+          "photoSpec": "Äpfel auf einem Regal ganz hinten in der Obstabteilung, direkt neben Birnen",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-b-obst-birnen.svg"
         },
         {
           "id": "c",
           "label": "An der Kasse",
-          "photoSpec": "Äpfel am Kassenbereich"
+          "photoSpec": "Äpfel am Kassenbereich",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-c-kasse.svg"
         }
       ],
       "answer": "b",
@@ -207,8 +213,9 @@
     "This replaces the prior mismatching Teil 3 draft entirely. The uploaded recording has shopping-centre closing, meeting Julia at 15:00, red jacket size 42, organic apples by pears, and Wednesday dental closing at 12:30.",
     "Teacher audio is ~1:46.6 long with one playback and pauses between five scenes. Do not repeat the MP3 automatically.",
     "The audio introduction says 'Dazu hören Sie drei Bilder oder Antworten' (non-idiomatic). Suggested on-screen wording: 'Zu jeder Aufgabe sehen Sie drei Bilder oder Antworten.' Teacher can accept as a minor spoken slip or correct the intro before publication.",
-    "Tasks 13 and 14 require 3 properly licensed distinct picture choices; task options and photo briefs here are specifications, NOT created images.",
+    "Tasks 13–14 now have six first-party vector image assets (non-photographic, exam-style illustrations) under /exams/a2/mock-03/. Verify contrast and comprehension at mobile size before release.",
     "The provided Cloudflare R2 dashboard URL points at mock-hoeren/mock-03/ without a2/. Verify the exact object and protected manifest; compare R2 MP3 SHA-256 to the local SHA-256 before publishing.",
     "Still a teacher-only draft, with no final published manifest, live Mock 3 route, verified A2 Mock 3 server key, or full four-skill result integration."
-  ]
+  ],
+  "visualAssets": "ready-for-teacher-review"
 }
