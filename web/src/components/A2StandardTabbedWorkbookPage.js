@@ -24,6 +24,7 @@ import A2GoetheWritingTaskCard from "./A2GoetheWritingTaskCard";
 import { getA2GoetheWritingTask } from "../data/a2GoetheWritingTasks";
 import A2ReadingTaskPanel from "./A2ReadingTaskPanel";
 import { getA2ListeningTask } from "../data/a2ListeningTasks";
+import { getTeacherLectureVideoResources } from "../data/teacherLectureVideoResources";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 import { useAuth } from "../context/AuthContext";
@@ -169,6 +170,12 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
+  // Day 16 links straight to the workbook; keep its teacher lecture available
+  // here as well as on the main lesson page, without replacing Hören or AI video.
+  const inlineTeacherLecture = Number(day) === 16
+    ? getTeacherLectureVideoResources("A2", day)[0] || null
+    : null;
+  const inlineTeacherVideoId = extractYouTubeId(inlineTeacherLecture?.url);
   const visibleTabs = tabs.filter((tab) => lessonProfile?.tabs?.[tab.key] !== false);
   const assignmentKey = lessonProfile?.assignmentKey || `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
@@ -221,6 +228,42 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
                 ariaLabel={`A2 Day ${day} workbook sections`}
                 renderLegacyGrammarPanel={false}
               /></div>
+            {inlineTeacherLecture ? (
+              <details
+                data-a2-day16-teacher-lecture="true"
+                style={{
+                  border: "1px solid #bfdbfe",
+                  borderRadius: 12,
+                  background: "#f8fbff",
+                  padding: "12px 14px",
+                }}
+              >
+                <summary style={{ cursor: "pointer", color: "#1e40af", fontWeight: 800 }}>
+                  Teacher lecture video · Wohlbefinden und Entspannung
+                </summary>
+                <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+                  <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+                    Watch the teacher explain this lesson before practising. Your AI grammar
+                    video and Hören exercises remain separate.
+                  </p>
+                  {inlineTeacherVideoId ? (
+                    <div style={{ width: "100%", aspectRatio: "16 / 9", position: "relative", background: "#000", borderRadius: 12, overflow: "hidden" }}>
+                      <iframe
+                        title="A2 Day 16 · Wohlbefinden und Entspannung · Teacher lecture"
+                        src={`https://www.youtube-nocookie.com/embed/${inlineTeacherVideoId}`}
+                        loading="lazy"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowFullScreen
+                        style={{ position: "absolute", inset: 0, height: "100%", width: "100%", border: 0 }}
+                      />
+                    </div>
+                  ) : null}
+                  <a href={inlineTeacherLecture.url} target="_blank" rel="noreferrer" style={{ color: "#1d4ed8", fontWeight: 700, width: "fit-content" }}>
+                    Watch teacher lecture on YouTube
+                  </a>
+                </div>
+              </details>
+            ) : null}
           </div>
           {showWorkbookGuidance && displayedActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
 
