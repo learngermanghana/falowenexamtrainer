@@ -2,8 +2,8 @@
 
 **Status:** Draft in progress — do not publish or register as a ready full exam.
 **Interface:** Reuse the existing B1 Final Mock Exam template, including the same reading layouts, module navigation, timers, answer choices, autosave, student result and Admin result pipelines. Only the new questions/texts and mock-specific scoring/audio identities may change.
-**Completed:** Lesen Teil 1 (questions 1–6), Lesen Teil 2 Text 1 & Text 2 (questions 7–12).
-**Pending:** Lesen Teile 3–5, Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
+**Completed:** Lesen Teil 1 (questions 1–6), Lesen Teil 2 Text 1 & Text 2 (questions 7–12), Lesen Teil 3 matching (questions 13–19).
+**Pending:** Lesen Teile 4–5, Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
 
 ## Modul Lesen — Teil 1
 
@@ -106,6 +106,80 @@ Einige Städte reagieren nun mit strengeren Regeln: In vielen Innenstädten wurd
 - **b)** Sie verpflichten die Nutzer dazu, E-Scooter nur an bestimmten Plätzen zu parken.
 - **c)** Sie bauen separate Straßen ausschließlich für E-Scooter.
 
+## Modul Lesen — Teil 3
+
+**Reguläre Prüfungszeit:** 10 Minuten (als empfohlene Zeit innerhalb des bestehenden 65-Minuten-Lesen-Moduls; keinen zusätzlichen Timer erzeugen). Abweichende Prüfungszeiten für behinderte Prüfungsteilnehmende richten sich nach den einschlägigen Durchführungsbestimmungen.
+
+**Anweisung:** Lesen Sie die Situationen **13 bis 19** und die Anzeigen **A bis J** aus verschiedenen deutschsprachigen Medien. Wählen Sie: Welche Anzeige passt zu welcher Situation? Schreiben Sie die richtige Antwort in das elektronische Eingabefeld.
+
+- Sie können jede Anzeige nur **einmal** verwenden.
+- Die Anzeige aus dem **Beispiel (E)** können Sie nicht mehr verwenden.
+- Für **eine** Situation gibt es **keine passende Anzeige**. In diesem Fall schreiben Sie **0**.
+
+### Beispiel — nicht bewertete Aufgabe
+
+**0.** Herr Müller möchte am Wochenende mit seinen zwei kleinen Kindern ein Theaterstück für Kinder besuchen.
+
+**Beispielantwort:** E (fest vorgegeben; keine auswählbare Antwort bei Fragen 13–19).
+
+### Situationen 13–19
+
+**13. Katrin** möchte in den Sommerferien Spanisch lernen, hat aber wegen ihrer Arbeit nur abends Zeit für einen Sprachkurs.
+
+**14. David** sucht für sein Wohnzimmer ein gebrauchtes Sofa und möchte, dass es ihm direkt nach Hause geliefert wird.
+
+**15. Frau Weber** fährt für zwei Wochen in den Urlaub und sucht eine gute Betreuung für ihren Hund während dieser Zeit.
+
+**16. Felix** möchte sein altes Smartphone verkaufen und sucht dafür ein Geschäft vor Ort, wo er direkt Bargeld bekommt.
+
+**17. Sarah** sucht eine kleine 2-Zimmer-Mietwohnung mit Balkon im Stadtzentrum, die ab sofort frei ist.
+
+**18. Lukas** möchte am Samstagabend mit Freunden essen gehen, Live-Musik hören und legt Wert auf vegetarische Gerichte.
+
+**19. Julia** sucht für ihren 6-jährigen Sohn einen Schwimmkurs, der samstags am Nachmittag stattfindet.
+
+### Anzeigen A–J
+
+**A) Hunderesort & Tierpension „Pfote“**
+
+Sie fahren in den Urlaub? Wir kümmern uns liebevoll um Ihren Vierbeiner! Großes Freigelände, erfahrene Betreuer und individuelle Verpflegung. Jetzt Sommertermine sichern!
+
+**B) Traumhafte 4-Zimmer-Wohnung zu verkaufen**
+
+Ruhige Lage am Stadtrand, 110 qm, großer Garten, Garagenstellplatz. Ideal für Familien. Kaufpreis: 380.000 €. Bezugsfrei ab nächstem Jahr.
+
+**C) Sprachschule Lingua – Sommer-Intensivkurse**
+
+Spanisch & Italienisch für Anfänger und Fortgeschrittene! Abendkurse im Juli und August, jeweils Dienstag und Donnerstag von 18:30 bis 20:30 Uhr.
+
+**D) Schwimmverein „Wasserspaß“**
+
+Kinderschwimmkurse für Anfänger (ab 5 Jahren). Jeden Samstag von 14:30 bis 15:30 Uhr im Hallenbad Nord. Noch freie Plätze für den neuen Kurs ab nächster Woche!
+
+**E) (Beispiel) Puppentheater Wunderland**
+
+Jeden Samstag und Sonntag um 15:00 Uhr: Spannende Theaterstücke für Kinder ab 4 Jahren. Spaß für die ganze Familie!
+
+**F) Ferienhaus am See zu vermieten**
+
+Gemütliches Holzhaus direkt am See für bis zu 4 Personen. Wochenend- und tageweise Vermietung für Ihren perfekten Erholungsurlaub.
+
+**G) Bio-Restaurant „Grün & Lecker“**
+
+100 % vegetarische und vegane Spezialitäten aus regionalem Anbau. Jeden Samstagabend ab 19:30 Uhr Live-Jazz mit wechselnden Bands!
+
+**H) Gebraucht-Möbelbörse „Zweite Chance“**
+
+Riesige Auswahl an gut erhaltenen Sofas, Tischen und Schränken. Günstige Preise! Inklusive kostenlosem Lieferservice innerhalb des Stadtgebiets.
+
+**I) PC & Laptop Notdienst**
+
+Ihr Computer streikt? Wir reparieren Laptops und PCs schnell und zuverlässig direkt bei Ihnen zu Hause oder in unserer Werkstatt.
+
+**J) Handy-Shop & Ankauf „Express“**
+
+Wir kaufen Ihr gebrauchtes Smartphone oder Tablet! Kommen Sie einfach in unserer Filiale in der Innenstadt vorbei – Barauszahlung sofort vor Ort.
+
 ## Teacher-only answer key — NOT FOR STUDENT EXAM UI
 
 | Nummer | Lösung | Begründung |
@@ -122,13 +196,21 @@ Einige Städte reagieren nun mit strengeren Regeln: In vielen Innenstädten wurd
 | 10 | **b** | E-Scooter ermöglichen kurze Wege schnell und unkompliziert. |
 | 11 | **a** | Falsch geparkte Roller werden für andere, vor allem Menschen mit Behinderung, zu Hindernissen. |
 | 12 | **b** | Städte richten feste Parkzonen ein und sanktionieren das Parken außerhalb dieser Zonen. |
+| 13 | **C** | Spanisch-Abendkurse im Juli und August, Dienstag und Donnerstag. |
+| 14 | **H** | Gebrauchte Sofas inklusive Lieferservice innerhalb des Stadtgebiets. |
+| 15 | **A** | Die Tierpension betreut Hunde während des Urlaubs. |
+| 16 | **J** | Gebrauchte Smartphones werden im Innenstadtgeschäft gegen sofortiges Bargeld angekauft. |
+| 17 | **0** | Keine Anzeige bietet eine sofort bezugsfreie 2-Zimmer-Mietwohnung mit Balkon in der Innenstadt (B: Kauf am Stadtrand, 4 Zimmer; F: Ferienhaus). |
+| 18 | **G** | Vegetarisches Restaurant mit Live-Jazz am Samstagabend. |
+| 19 | **D** | Kinderschwimmkurse ab 5 Jahren am Samstagnachmittag. |
 
-**Validated answer sequence:** Teil 1: Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**). Teil 2: **a, b, b, b, a, b** (questions 7–12).
+**Validated answer sequence:** Teil 1: Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**). Teil 2: **a, b, b, b, a, b** (questions 7–12). Teil 3: **C, H, A, J, 0, G, D** (questions 13–19). Beispiel: **E**, not graded.
 
 ## Mock 03 integration requirements (when all parts are complete)
 
 - Keep the existing student-facing B1 reading template. No new visual design, buttons or exam mechanics are needed.
 - Set an independent Mock 03 ID (e.g. `b1-mock-03`), distinct server-owned answer keys and attempt storage; never reuse Mock 1/2 scores or browser state.
-- All twelve drafted reading items must have unique stable answer IDs, map to the teacher-reviewed keys, and reveal no keys to students before verified submission.
-- The 10-minute label describes **Teil 1 suggested time** and the 20-minute label applies jointly to **Teil 2 Text 1 & Text 2**. Neither creates an extra timer; the existing overall B1 Lesen module remains 65 minutes.
+- All nineteen drafted reading items must have unique stable answer IDs, map to the teacher-reviewed keys, and reveal no keys to students before verified submission.
+- Teil 3: example E is visible but locked/unselectable. Offer choices A–D, F–J and 0 for questions 13–19. A nonzero ad may be selected only once across the seven responses; the single no-match response is 0. Use the existing B1 Anzeigen-matching control, not a new layout.
+- Teil 1 and Teil 3 each have a 10-minute recommended allocation, and the 20-minute allocation applies jointly to Teil 2 Text 1 & Text 2. None creates an extra timer; the existing overall B1 Lesen module remains 65 minutes.
 - This content file is an *unpublished teacher draft*. The mock must remain absent from the ready exam catalog until all four modules and protected Hören files are tested.
