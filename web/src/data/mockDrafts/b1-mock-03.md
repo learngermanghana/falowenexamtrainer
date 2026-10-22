@@ -2,8 +2,8 @@
 
 **Status:** Draft in progress — do not publish or register as a ready full exam.
 **Interface:** Reuse the existing B1 Final Mock Exam template, including the same reading layouts, module navigation, timers, answer choices, autosave, student result and Admin result pipelines. Only the new questions/texts and mock-specific scoring/audio identities may change.
-**Completed:** Entire Lesen module — Teil 1 (1–6), Teil 2 Text 1 & Text 2 (7–12), Teil 3 Anzeigen (13–19), Teil 4 Ja/Nein (20–26), Teil 5 VHS rules (27–30): 30 questions.
-**Pending:** Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
+**Completed:** Entire Lesen module — Teil 1 (1–6), Teil 2 Text 1 & Text 2 (7–12), Teil 3 Anzeigen (13–19), Teil 4 Ja/Nein (20–26), Teil 5 VHS rules (27–30): 30 questions. Schreiben content: Teile 1–3 (prompts complete; integration/marking unverified).
+**Pending:** Hören Teile 1–4 with verified R2 audio, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, Schreiben AI-marking verification, end-to-end checks.
 
 ## Modul Lesen — Teil 1
 
@@ -255,6 +255,64 @@ um einen angenehmen und reibungslosen Ablauf aller Kurse zu gewährleisten, bitt
 - **a)** Auf dem Gehweg direkt vor dem Haupteingang der Volkshochschule.
 - **b)** Nur an den markierten Plätzen im Innenhof.
 - **c)** Im Flur des Erdgeschosses neben der Garderobe.
+
+## Modul Schreiben — B1 Mock 03
+
+**Gesamtdauer:** 75 Minuten (shared existing B1 Mock 1 Schreiben module timer; do not create individual task timers).
+
+**Empfohlene Arbeitszeit:** Teil 1 ca. 20 Minuten, Teil 2 ca. 25 Minuten, Teil 3 ca. 15 Minuten; die übrigen 15 Minuten können für Planung und Korrektur genutzt werden. Die drei Aufgaben werden innerhalb einer einzigen 75-Minuten-Prüfung bearbeitet.
+
+### Teil 1 — Informelle E-Mail (ca. 20 Minuten / ca. 80 Wörter)
+
+**Aufgabenstellung**
+
+Ihr Freund **Felix** hat Sie nach Ihrem Wochenendausflug an den See gefragt, konnte Sie aber am Wochenende telefonisch nicht erreichen.
+
+**Schreiben Sie eine E-Mail an Felix:**
+
+- **Beschreiben Sie:** Wie war der Ausflug und was haben Sie dort gemacht?
+- **Begründen Sie:** Was hat Ihnen am besten gefallen und warum?
+- **Vorschlag:** Machen Sie einen Vorschlag für einen gemeinsamen Ausflug im nächsten Monat.
+
+**Student answer:** Freies Textfeld für eine informelle E-Mail mit ca. 80 Wörtern, unter Beibehaltung des vorhandenen Falowen-Schreiben-Editors und seiner Speicherung.
+
+### Teil 2 — Diskussionsbeitrag / Meinungsäußerung (ca. 25 Minuten / ca. 80 Wörter)
+
+**Aufgabenstellung**
+
+Sie haben im Fernsehen eine Diskussion zum Thema **„Einkaufen im Internet – Bequemlichkeit oder Gefahr für die Geschäfte?“** gesehen. Im Online-Gästebuch der Sendung lesen Sie folgende Meinung:
+
+> „Ich kaufe fast alles online. Es ist extrem bequem, spart viel Zeit und man hat eine riesige Auswahl. Dass dadurch immer mehr kleine Geschäfte in der Innenstadt schließen müssen, ist zwar schade, aber leider nicht zu verhindern.“ — **Svenja, 25 Jahre**
+
+**Schreiben Sie einen Diskussionsbeitrag für das Gästebuch (ca. 80 Wörter):**
+
+- Äußern Sie Ihre Meinung zum Online-Shopping.
+- Begründen Sie, warum Sie dafür oder dagegen sind.
+- Nennen Sie Alternativen oder persönliche Erfahrungen.
+
+**Student answer:** Freies Textfeld für einen zusammenhängenden Diskussionsbeitrag mit ca. 80 Wörtern.
+
+### Teil 3 — Formelle E-Mail / Mitteilung (ca. 15 Minuten / ca. 40 Wörter)
+
+**Aufgabenstellung**
+
+Sie besuchen einen B1-Deutschkurs. Nächsten Dienstag können Sie nicht am Unterricht teilnehmen, da Sie einen wichtigen Termin bei der Bank haben.
+
+**Schreiben Sie eine formelle Nachricht an Ihre Sprachlehrerin, Frau Dr. Keller:**
+
+- **Grund für Ihr Fehlen** höflich erklären.
+- **Nach den Hausaufgaben / dem Unterrichtsstoff** fragen.
+- **Formelle Anrede und Grußformel** verwenden (Sie-Form).
+
+**Student answer:** Freies Textfeld für eine höfliche formelle E-Mail mit ca. 40 Wörtern.
+
+### Schreiben — implementation and marking notes (teacher/developer only)
+
+- Preserve the existing B1 Mock 1 Schreiben paper, task order, text inputs, character/word-count display, autosave, submit-on-expiry logic, feedback and review experience. No new student interface or per-task timer.
+- Keep the tasks under separate stable keys `teil1`, `teil2`, `teil3` and mock-specific ID `b1-mock-03`; do **not** reuse Mock 1's submissions, attempts, prompts, or results.
+- For eventual scoring, evaluate **content fulfilment of each listed point**, coherence, appropriate vocabulary/grammar at B1 level, and register (friendly email, discussion post, Sie-formal email). Count words as guidance rather than blocking valid responses solely due to a small deviation.
+- Do not display teacher marking criteria as an answer template while the test is active. Verify the existing AI writing scorer receives all three Mock 03 prompts with distinct attempt identity and produces the established verified B1 result before publication.
+- These writing tasks are original practice content; they are not a claim of official Goethe-issued exam materials.
 
 ## Teacher-only answer key — NOT FOR STUDENT EXAM UI
 
