@@ -22,10 +22,16 @@ export async function createOrResumeSignupAccount({
     }
 
     // Fail closed on lookup errors; never overwrite or resurrect an existing profile.
-    const [profile, status] = await Promise.all([
-      findProfile(credential.user.uid, email),
-      deletionStatus(credential.user.uid),
-    ]);
+    let profile, status;
+    try {
+      [profile, status] = await Promise.all([
+        findProfile(credential.user.uid, email),
+        deletionStatus(credential.user.uid),
+      ]);
+    } catch (error) {
+      await signOutExisting?.();
+      throw error;
+    }
     if (profile || ["pending", "processing", "completed"].includes(String(status || "").toLowerCase())) {
       await signOutExisting?.();
       throw creationError;
