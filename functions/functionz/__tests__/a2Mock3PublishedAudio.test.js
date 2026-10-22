@@ -89,6 +89,7 @@ test("Teil 1 rejects an R2 object that is not MP3 despite correct object key and
    level:"A2", mockId:"mock-03", part:"teil-1",
    key:APPROVED_A2_MOCK_3_AUDIO["teil-1"].key,
    signedUrl: "https://falowen-course-audio.account.r2.cloudflarestorage.com/a2/mock-hoeren/mock-03/teil-1.mp3",
+   now: () => Date.now() + 20 * 60 * 1000, // bypass positive-case 15-min attestation cache
    fetchImpl: async () => ({
      ok: true, headers:{ get:()=>String(bytes.length) }, arrayBuffer:async()=>bytes,
    }),
