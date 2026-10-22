@@ -24,7 +24,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     13: [{ chapter: "5.13", topic: "Ein Vorstellungsgespräch", tutor_lecture_video: "https://youtu.be/eC8CgybIblo" }],
     14: [{ chapter: "5.14", topic: "Beruf und Karriere", tutor_lecture_video: "https://youtu.be/peuEAMRsFKI" }],
     15: [{ chapter: "6.15", tutor_lecture_video: "" }],
-    16: [{ chapter: "6.16", topic: "Wohlbefinden und Entspannung", tutor_lecture_video: "https://youtu.be/t_9HDdZbbEA" }],
+    16: [{ chapter: "6.16", topic: "Wohlbefinden und Entspannung", tutor_lecture_video: "https://youtu.be/WZVEQ9jRONw" }],
     17: [{ chapter: "6.17", tutor_lecture_video: "" }],
     18: [{ chapter: "7.18", tutor_lecture_video: "" }],
     19: [{ chapter: "7.19", tutor_lecture_video: "" }],
