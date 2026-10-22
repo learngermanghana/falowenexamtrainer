@@ -2,8 +2,8 @@
 
 **Status:** Draft in progress — do not publish or register as a ready full exam.
 **Interface:** Reuse the existing B1 Final Mock Exam template, including the same reading layouts, module navigation, timers, answer choices, autosave, student result and Admin result pipelines. Only the new questions/texts and mock-specific scoring/audio identities may change.
-**Completed:** Lesen Teil 1 (questions 1–6).
-**Pending:** Lesen Teile 2–5, Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
+**Completed:** Lesen Teil 1 (questions 1–6), Lesen Teil 2 Text 1 & Text 2 (questions 7–12).
+**Pending:** Lesen Teile 3–5, Hören Teile 1–4 with verified R2 audio, Schreiben Teile 1–3, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, end-to-end checks.
 
 ## Modul Lesen — Teil 1
 
@@ -38,6 +38,74 @@ Choose exactly one answer for each question: **Richtig** / **Falsch**. Use the s
 5. Im Dorfladen kann man am Samstagnachmittag einkaufen.
 6. Für Fahrten in die Stadt nutzt Markus sein eigenes Auto.
 
+## Modul Lesen — Teil 2
+
+**Prüfungszeit für Teil 2 (Text 1 & Text 2):** 20 Minuten insgesamt (Empfehlung innerhalb des bestehenden 65-Minuten-Lesen-Moduls; **keinen zusätzlichen Timer einbauen**).
+
+### Teil 2 — Text 1: Reparieren statt Wegwerfen – Der Erfolg der Repair-Cafés
+
+**Anweisung:** Lesen Sie den Text aus der Presse und die Aufgaben **7 bis 9** dazu. Wählen Sie bei jeder Aufgabe die richtige Lösung **a**, **b** oder **c**.
+
+#### Presseartikel: Reparieren statt Wegwerfen – Der Erfolg der Repair-Cafés
+
+In immer mehr deutschen Städten gibt es sogenannte „Repair-Cafés“. Das Prinzip ist einfach: Menschen bringen defekte Kaffeemaschinen, Fahrräder oder Kleidung mit und reparieren sie gemeinsam mit ehrenamtlichen Experten. Die Hilfe ist kostenlos, lediglich nötige Ersatzteile müssen die Besitzer selbst bezahlen.
+
+Gegründet wurde die Idee ursprünglich in den Niederlanden, um etwas gegen die wachsenden Müllberge zu tun. Heute gelten die Treffpunkte auch in Deutschland als großer Erfolg. Neben dem Umweltgedanken geht es den Veranstaltern aber auch um den sozialen Austausch. Während die Geräte repariert werden, trinken die Besucher Kaffee, essen Kuchen und unterhalten sich mit Menschen aus der Nachbarschaft.
+
+Besonders ältere Menschen nutzen das Angebot gerne, da sie dort nicht nur Hilfe bei technischen Problemen bekommen, sondern auch neue Kontakte knüpfen können. Aber auch viele junge Familien kommen vorbei, um Geld zu sparen und ihren Kindern zu zeigen, dass man kaputte Dinge nicht sofort entsorgen muss. Aufgrund des großen Andrangs bitten die meisten Repair-Cafés mittlerweile um eine vorherige Anmeldung im Internet.
+
+#### Aufgaben 7–9
+
+**7. Was zeichnet das Konzept der Repair-Cafés aus?**
+
+- **a)** Gegenstände werden zusammen repariert, um die Umwelt zu schonen.
+- **b)** Man kann dort alte Geräte gegen neue Produkte eintauschen.
+- **c)** Die Experten stellen alle Ersatzteile kostenfrei zur Verfügung.
+
+**8. Warum kommen viele Senioren in die Repair-Cafés?**
+
+- **a)** Sie möchten dort selbst als Reparatur-Experten arbeiten.
+- **b)** Sie bekommen Unterstützung und finden gesellschaftlichen Anschluss.
+- **c)** Sie schätzen vor allem das kostenlose Speisen- und Getränkeangebot.
+
+**9. Was sollten Besucher vor einem Besuch beachten?**
+
+- **a)** Sie müssen ihre Geräte vorher von einem Händler schätzen lassen.
+- **b)** Sie sollen sich vorab online einen Termin reservieren.
+- **c)** Sie dürfen nur Geräte mitbringen, die jünger als zwei Jahre sind.
+
+### Teil 2 — Text 2: E-Scooter in Städten – Umweltschonend oder Sicherheitsrisiko?
+
+**Anweisung:** Lesen Sie den Text aus der Presse und die Aufgaben **10 bis 12** dazu. Wählen Sie bei jeder Aufgabe die richtige Lösung **a**, **b** oder **c**.
+
+#### Presseartikel: E-Scooter in Städten – Umweltschonend oder Sicherheitsrisiko?
+
+E-Scooter gehören seit einigen Jahren fest zum Stadtbild vieler deutscher Großstädte. Besonders bei Jugendlichen und Touristen sind die elektrischen Tretroller beliebt, um kurze Strecken schnell und unkompliziert zurückzulegen. Doch die Kritik an den Fahrern und Verleihfirmen wächst.
+
+Ein Hauptproblem ist das falsche Parken. Oft werden die E-Scooter mitten auf Fußgängerwegen, vor Hauseingängen oder an Bushaltestellen abgestellt. Für Menschen mit Sehbehinderung oder Rollstuhlfahrer werden sie dadurch zu gefährlichen Hindernissen. Zudem kommt es immer häufiger zu Unfällen, weil Fahrer auf dem Gehweg statt auf dem Radweg unterwegs sind.
+
+Einige Städte reagieren nun mit strengeren Regeln: In vielen Innenstädten wurden feste Parkzonen eingerichtet. Wer seinen Roller außerhalb dieser Zonen abstellt, muss eine Strafe bezahlen oder kann die Miete über die Smartphone-App nicht beenden. Experten hoffen, dass sich dadurch die Sicherheit auf den Straßen deutlich verbessert.
+
+#### Aufgaben 10–12
+
+**10. Warum nutzen viele Menschen gerne E-Scooter?**
+
+- **a)** Sie sind das günstigste Verkehrsmittel im öffentlichen Nahverkehr.
+- **b)** Man kann mit ihnen kurze Strecken zügig und einfach bewältigen.
+- **c)** Sie dürfen ohne Geschwindigkeitsbegrenzung überall fahren.
+
+**11. Welches Problem wird im Text beschrieben?**
+
+- **a)** Unachtsam abgestellte Scooter behindern andere Verkehrsteilnehmer.
+- **b)** Die Akkus der E-Scooter müssen zu oft aufgeladen werden.
+- **c)** Die Preise für das Ausleihen sind in letzter Zeit stark gestiegen.
+
+**12. Wie reagieren manche Städte auf die Schwierigkeiten?**
+
+- **a)** Sie haben den Betrieb von E-Scootern komplett verboten.
+- **b)** Sie verpflichten die Nutzer dazu, E-Scooter nur an bestimmten Plätzen zu parken.
+- **c)** Sie bauen separate Straßen ausschließlich für E-Scooter.
+
 ## Teacher-only answer key — NOT FOR STUDENT EXAM UI
 
 | Nummer | Lösung | Begründung |
@@ -48,13 +116,19 @@ Choose exactly one answer for each question: **Richtig** / **Falsch**. Use the s
 | 4 | **Richtig** | Heute geht er spazieren oder fährt Fahrrad; früher saß er meist vor dem Fernseher. |
 | 5 | **Falsch** | Der Dorfladen schließt samstags schon **um 12:00 Uhr**. |
 | 6 | **Falsch** | Er hat bewusst kein Auto gekauft und nutzt den stündlich fahrenden Bus. |
+| 7 | **a** | Die Gegenstände werden gemeinsam repariert, um Müll zu vermeiden und die Umwelt zu schonen. |
+| 8 | **b** | Ältere Besucher bekommen technische Hilfe und können neue Kontakte knüpfen. |
+| 9 | **b** | Wegen des großen Andrangs bitten die meisten Repair-Cafés um eine vorherige Online-Anmeldung. |
+| 10 | **b** | E-Scooter ermöglichen kurze Wege schnell und unkompliziert. |
+| 11 | **a** | Falsch geparkte Roller werden für andere, vor allem Menschen mit Behinderung, zu Hindernissen. |
+| 12 | **b** | Städte richten feste Parkzonen ein und sanktionieren das Parken außerhalb dieser Zonen. |
 
-**Validated answer sequence:** Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**).
+**Validated answer sequence:** Teil 1: Falsch, Falsch, Richtig, Richtig, Falsch, Falsch (**F, F, R, R, F, F**). Teil 2: **a, b, b, b, a, b** (questions 7–12).
 
 ## Mock 03 integration requirements (when all parts are complete)
 
 - Keep the existing student-facing B1 reading template. No new visual design, buttons or exam mechanics are needed.
 - Set an independent Mock 03 ID (e.g. `b1-mock-03`), distinct server-owned answer keys and attempt storage; never reuse Mock 1/2 scores or browser state.
-- All six reading items must have unique stable answer IDs, map to the six teacher-reviewed keys, and reveal no keys to students before verified submission.
-- The 10-minute label describes **Teil 1 suggested time**, not an extra timer; the existing overall B1 Lesen module remains 65 minutes.
+- All twelve drafted reading items must have unique stable answer IDs, map to the teacher-reviewed keys, and reveal no keys to students before verified submission.
+- The 10-minute label describes **Teil 1 suggested time** and the 20-minute label applies jointly to **Teil 2 Text 1 & Text 2**. Neither creates an extra timer; the existing overall B1 Lesen module remains 65 minutes.
 - This content file is an *unpublished teacher draft*. The mock must remain absent from the ready exam catalog until all four modules and protected Hören files are tested.
