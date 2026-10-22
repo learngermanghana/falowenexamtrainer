@@ -55,6 +55,14 @@ describe("A2 Day 16 and Day 19 complete workbooks", () => {
     );
   });
 
+  it("makes the replacement teacher lecture accessible from the Day 16 direct workbook URL", () => {
+    expect(standardShell).toContain('data-a2-day16-teacher-lecture="true"');
+    expect(standardShell).toContain('getTeacherLectureVideoResources("A2", day)');
+    expect(standardShell).toContain("Watch teacher lecture on YouTube");
+    expect(standardShell).toContain("inlineTeacherLecture.url");
+    expect(standardShell).toContain("getA2ListeningTask(day)");
+  });
+
   it("keeps Day 16 speaking and the updated informal Markus writing assignment", () => {
     ["Körperliches Wohlbefinden", "Mentales Wohlbefinden", "Krankheiten &amp; Symptome", "E-Mail an Markus"].forEach((label) => {
       expect(day16).toContain(label);
