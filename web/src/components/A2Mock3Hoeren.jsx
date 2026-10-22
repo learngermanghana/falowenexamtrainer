@@ -8,7 +8,7 @@ import "./A2Mock2Hoeren.css";
 
 const PARTS = [
   { id: "teil-3", number: 3, label: "Fünf kurze Gespräche", data: teil3 },
-  { id: "teil-4", number: 4, label: "Karriere im Alltag", data: teil4 },
+  { id: "teil-4", number: 4, label: "Karriere im Alltag", data: { ...teil4, questions: teil4.questions.map((q, i) => ({ ...q, number: 16 + i })) } },
 ];
 const answersKey = uid => `falowen:a2:mock-03:hoeren-teile-3-4:${uid || "guest"}:v1`;
 const restore = uid => {
