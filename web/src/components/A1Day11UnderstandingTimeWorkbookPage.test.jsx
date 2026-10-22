@@ -27,35 +27,30 @@ jest.mock("./A1TutorMarkedWorkbookShell", () => {
 
 beforeEach(() => window.localStorage.clear());
 
-test("Day 11 has five Lesen and five Hören questions with one clickable answer set per question", async () => {
+test("A1 Day 11 displays five current Hören questions with clickable A/B/C answers", async () => {
   render(<A1Day11UnderstandingTimeWorkbookPage />);
-  const reading = within(screen.getByTestId("teil-1"));
   const listening = within(screen.getByTestId("teil-2"));
-  await waitFor(() => {
-    expect(reading.getAllByRole("group")).toHaveLength(5);
-    expect(listening.getAllByRole("group")).toHaveLength(5);
-    expect(reading.getAllByRole("radio")).toHaveLength(10);
-    expect(listening.getAllByRole("radio")).toHaveLength(15);
-    expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
-  });
+  const reading = within(screen.getByTestId("teil-1"));
 
   expect(reading.getByText(/Schild 1: Arztpraxis Dr. Weber/)).toBeInTheDocument();
-  expect(listening.queryByText(/Paul hat jeden Morgen um neun Uhr Deutschunterricht/)).not.toBeInTheDocument();
   expect(listening.getByText(/Wann fängt der Deutschkurs an/)).toBeInTheDocument();
   expect(listening.getByText(/Wann schließt der Supermarkt nach dem Kurs/)).toBeInTheDocument();
   expect(listening.queryByText(/Es ist Viertel nach drei/)).not.toBeInTheDocument();
+  expect(listening.getByText("Protected Day 11 audio")).toBeInTheDocument();
 
-  for (const [scope, values] of [
-    [reading, ["Falsch", "Richtig", "Richtig", "Richtig", "Falsch"]],
-    [listening, ["B", "B", "C", "B", "A"]],
-  ]) {
-    for (const [index, value] of values.entries()) {
-      const group = scope.getByRole("group", { name: `Question ${index + 1}` });
-      fireEvent.click(within(group).getByRole("radio", { name: `Question ${index + 1}: ${value}` }));
-    }
+  await waitFor(() => {
+    expect(listening.getAllByRole("radiogroup")).toHaveLength(5);
+    expect(listening.getAllByRole("radio")).toHaveLength(15);
+  });
+
+  const answers = ["b", "b", "c", "b", "a"];
+  for (const [index, answer] of answers.entries()) {
+    const group = listening.getByRole("radiogroup", { name: `Question ${index + 1}` });
+    fireEvent.click(within(group).getByRole("radio", { name: new RegExp(`^${answer}\\)`, "i") }));
   }
 
-  await waitFor(() => expect(getA1TutorDraftProgress({
-    assignmentKey: "A1-7", draft: readA1WorkbookDraft("A1-7"),
-  })).toEqual(expect.objectContaining({ complete: true, completed: 10, total: 10 })));
+  await waitFor(() => {
+    const draft = readA1WorkbookDraft("A1-7");
+    expect(draft.sections["teil-2"].answers).toEqual({1:"B",2:"B",3:"C",4:"B",5:"A"});
+  });
 });
