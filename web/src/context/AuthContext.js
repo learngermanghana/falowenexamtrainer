@@ -36,6 +36,7 @@ import {
   removeMessagingTokenForDevice,
 } from "../utils/devicePushTokens";
 import { getBackendUrl } from "../services/backendUrl";
+import { createOrResumeSignupAccount } from "../lib/signupAuthRecovery";
 
 const AuthContext = createContext();
 
@@ -590,11 +591,20 @@ export const AuthProvider = ({ children }) => {
       setAuthError("");
 
       const normalizedEmail = email.trim().toLowerCase();
-      const credential = await createUserWithEmailAndPassword(
-        auth,
-        normalizedEmail,
-        password
-      );
+      // A previous attempt may have created Firebase Auth successfully but failed
+      // before writing students/{studentCode}. Only the correct existing password
+      // may resume that incomplete account; existing profiles are never overwritten.
+      const { credential, resumed } = await createOrResumeSignupAccount({
+        email: normalizedEmail, password,
+        createAccount: (e, p) => createUserWithEmailAndPassword(auth, e, p),
+        signIn: (e, p) => signInWithEmailAndPassword(auth, e, p),
+        findProfile: async (uid, e) => (await fetchStudentProfileByUid(uid)) || (await fetchStudentProfileByEmail(e)),
+        deletionStatus: async uid => {
+          const snap = await getDoc(doc(db, "accountDeletionRequests", uid));
+          return snap.exists() ? snap.data()?.status || "" : "";
+        },
+        signOutExisting: () => signOut(auth),
+      });
 
       const token = await credential.user.getIdToken();
       setIdToken(token);
@@ -602,7 +612,14 @@ export const AuthProvider = ({ children }) => {
       const studentCode = profile.studentCode;
       const studentId = studentCode || credential.user.uid;
       const studentsRef = doc(db, "students", studentId);
-      const trialStartedDate = new Date();
+      // Do not award a new trial because a Firebase Auth-only account is recovered.
+      // Preserve the original Auth creation date and let the normal expiry rules apply.
+      const trialStartedDate = resumed
+        ? new Date(credential.user.metadata?.creationTime || "")
+        : new Date();
+      if (!Number.isFinite(trialStartedDate.getTime())) {
+        throw new Error("Your previous sign-up needs support to verify its original date. Please contact admissions.");
+      }
       const trialEndsDate = new Date(trialStartedDate.getTime() + 7 * 24 * 60 * 60 * 1000);
       const trialPurgeDate = new Date(trialEndsDate.getTime() + 30 * 24 * 60 * 60 * 1000);
 
@@ -649,7 +666,25 @@ export const AuthProvider = ({ children }) => {
         payload.studentcode = studentCode;
       }
 
-      await setDoc(studentsRef, payload, { merge: true });
+      try {
+        // Use a create-only transaction: a previously issued student code must not
+        // be silently reassigned when two signups happen to choose the same code.
+        await runTransaction(db, async transaction => {
+          const existing = await transaction.get(studentsRef);
+          if (existing.exists()) {
+            const conflict = new Error("This student code is already assigned. Please contact admissions to complete registration.");
+            conflict.code = "auth/student-code-conflict";
+            throw conflict;
+          }
+          transaction.set(studentsRef, payload);
+        });
+      } catch (writeError) {
+        await signOut(auth).catch(() => {});
+        if (writeError?.code === "auth/student-code-conflict") throw writeError;
+        const incomplete = new Error("Your sign-in was created but the student registration could not be saved. Retry this form with the same email and password to resume safely, or contact admissions.");
+        incomplete.code = "auth/profile-creation-incomplete";
+        throw incomplete;
+      }
       setStudentProfile({ id: studentsRef.id, ...payload });
       setNotificationStatus("idle");
       await logLoginSession({
