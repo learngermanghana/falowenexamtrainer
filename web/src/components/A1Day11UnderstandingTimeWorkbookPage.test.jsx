@@ -32,8 +32,8 @@ test("Day 11 has five Lesen and five Hören questions with one clickable answer 
   const reading = within(screen.getByTestId("teil-1"));
   const listening = within(screen.getByTestId("teil-2"));
   await waitFor(() => {
-    expect(reading.getAllByRole("radiogroup")).toHaveLength(5);
-    expect(listening.getAllByRole("radiogroup")).toHaveLength(5);
+    expect(reading.getAllByRole("group")).toHaveLength(5);
+    expect(listening.getAllByRole("group")).toHaveLength(5);
     expect(reading.getAllByRole("radio")).toHaveLength(10);
     expect(listening.getAllByRole("radio")).toHaveLength(15);
     expect(screen.queryByText("Assignment draft · Not submitted")).not.toBeInTheDocument();
