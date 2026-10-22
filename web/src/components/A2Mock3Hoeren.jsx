@@ -2,11 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
 import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
+import teil1 from "../data/mockDrafts/a2-mock-03-hoeren-teil-1.json";
+import teil2 from "../data/mockDrafts/a2-mock-03-hoeren-teil-2.json";
 import teil3 from "../data/mockDrafts/a2-mock-03-hoeren-teil-3.json";
 import teil4 from "../data/mockDrafts/a2-mock-03-hoeren-teil-4.json";
 import "./A2Mock2Hoeren.css";
 
 const PARTS = [
+  { id: "teil-1", number: 1, label: "Unterwegs in der Stadt", data: teil1 },
+  { id: "teil-2", number: 2, label: "Freizeit in der Woche", data: teil2 },
   { id: "teil-3", number: 3, label: "Fünf kurze Gespräche", data: teil3 },
   { id: "teil-4", number: 4, label: "Karriere im Alltag", data: { ...teil4, questions: teil4.questions.map((q, i) => ({ ...q, number: 16 + i })) } },
 ];
@@ -75,15 +79,16 @@ export default function A2Mock3Hoeren() {
       </div>
       <header className="a2-mock2-progress">
         <div>
-          <strong>Hören Mock 3 — Teile 3 und 4</strong>
-          <span>{answered}/10 Aufgaben beantwortet</span>
+          <strong>Hören Mock 3 — Teile 1 bis 4</strong>
+          <span>{answered}/20 Aufgaben beantwortet</span>
         </div>
         <strong>Teil {part.number}</strong>
       </header>
       <p role="note">
-        Dies ist die Hörübung zu Mock 3 (Teile 3 und 4). Sie ist noch keine
-        vollständige A2-Prüfung. Ihre Antworten bleiben auf diesem Gerät;
-        ein offizielles Prüfungsergebnis wird hier nicht gespeichert.
+        Dies ist die vollständige Hören-Übung zu Mock 3 (Teile 1 bis 4, 20 Aufgaben).
+        Lesen, Schreiben und Sprechen gehören zur separaten vollständigen A2-Prüfung.
+        Ihre Antworten bleiben auf diesem Gerät; hier wird kein offizielles
+        vierteiliges Prüfungsergebnis gespeichert.
       </p>
       <nav className="a2-mock2-nav" aria-label="Hören Teile">
         {PARTS.map((item, index) => (
@@ -95,14 +100,18 @@ export default function A2Mock3Hoeren() {
       </nav>
       <section className="a2-mock2-paper">
         <h1>Hören Teil {part.number}</h1>
-        <p>{part.number === 3
-          ? "Sie hören fünf kurze Gespräche einmal. Markieren Sie a, b oder c."
-          : "Sie hören ein Interview zweimal. Markieren Sie Richtig oder Falsch."}</p>
+        <p>{part.number === 4
+          ? "Sie hören ein Interview zweimal. Markieren Sie Richtig oder Falsch."
+          : part.number === 3
+            ? "Sie hören fünf kurze Gespräche einmal. Markieren Sie a, b oder c."
+            : part.number === 2
+              ? "Sie hören ein Gespräch über Freizeitaktivitäten. Markieren Sie a, b oder c."
+              : "Sie hören fünf kurze Ansagen oder Gespräche. Markieren Sie a, b oder c."}</p>
         <div className="a2-mock2-audio">
           <strong>Prüfungsaudio · Teil {part.number}</strong>
           <p>{part.number === 4
             ? "Das Interview ist in der MP3 bereits zweimal enthalten. Die Datei wird einmal abgespielt."
-            : "Sie hören jedes Gespräch einmal. Die Datei wird nicht wiederholt."}</p>
+            : "Die Datei wird einmal abgespielt, ohne eine zusätzliche automatische Wiederholung."}</p>
           {audioUrl ? (
             <>
               <audio ref={player} src={audioUrl} preload="metadata" controls={false}
@@ -123,7 +132,7 @@ export default function A2Mock3Hoeren() {
         {part.data.questions.map((question, index) => (
           <fieldset className="a2-mock2-question" key={question.number} disabled={submitted}>
             <legend><strong>{question.number || index + 16}.</strong> {question.question}</legend>
-            {(part.number === 3
+            {(part.number !== 4
               ? question.options
               : [{ id: "richtig", label: "Richtig" }, { id: "falsch", label: "Falsch" }]
             ).map(choice => (
@@ -131,7 +140,7 @@ export default function A2Mock3Hoeren() {
                 <input type="radio" name={`a2mock3-${question.number || index + 16}`}
                   checked={answers[question.number || index + 16] === choice.id}
                   onChange={() => update({ number: question.number || index + 16 }, choice.id)} />
-                <span><strong>{part.number === 3 ? `${choice.id})` : ""}</strong> {choice.label}</span>
+                <span><strong>{part.number !== 4 ? `${choice.id})` : ""}</strong> {choice.label}</span>
                 {choice.imagePath ? <img src={choice.imagePath} alt={choice.label}
                   width="160" height="109" loading="lazy" style={{ display: "block", maxWidth: "100%", marginTop: 8 }} /> : null}
               </label>
@@ -140,13 +149,13 @@ export default function A2Mock3Hoeren() {
         ))}
 
         {!submitted ? (
-          <button type="button" disabled={answered !== 10} onClick={() => setSubmitted(true)}>
-            Antworten zu Teile 3 und 4 prüfen
+          <button type="button" disabled={answered !== 20} onClick={() => setSubmitted(true)}>
+            Antworten zu allen vier Teilen prüfen
           </button>
         ) : (
           <section aria-live="polite">
-            <h2>Übungsergebnis: {score}/10</h2>
-            <p>Dies ist ausschließlich eine lokale Übungsauswertung, keine verifizierte Mock-Prüfungsnote.</p>
+            <h2>Hören-Übungsergebnis: {score}/20</h2>
+            <p>Dies ist ausschließlich die lokale Hören-Übungsauswertung für vier Teile, keine verifizierte viermodulige Mock-Prüfungsnote.</p>
             <button type="button" onClick={() => {
               setAnswers({}); setSubmitted(false); setStarted({}); setAudioUrl("");
             }}>Neu üben</button>

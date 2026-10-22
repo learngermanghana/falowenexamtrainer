@@ -1,0 +1,127 @@
+{
+  "mockId": "a2-mock-03",
+  "level": "A2",
+  "module": "hoeren",
+  "examPart": "1",
+  "mode": "goethe",
+  "title": "Unterwegs in der Stadt",
+  "kind": "multiple-choice",
+  "instruction": "Sie hören fünf kurze Ansagen oder Gespräche. Wählen Sie für die Aufgaben 1 bis 5 die richtige Antwort a, b oder c.",
+  "plays": 1,
+  "embeddedRepetitions": 1,
+  "audioObjectKey": "a2/mock-hoeren/mock-03/teil-1.mp3",
+  "audioVerification": "Teacher confirmed this R2 object is uploaded. Previously supplied question/evidence JSON recovered from October 19. Actual MP3 content/answer alignment has not been independently checked.",
+  "publicationStatus": "reviewed-practice-only",
+  "questions": [
+    {
+      "number": 1,
+      "question": "Was sollen die Fahrgäste der U-Bahn-Linie 2 tun?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Die Buslinie 45 nutzen"
+        },
+        {
+          "id": "b",
+          "label": "Auf den nächsten Zug warten"
+        },
+        {
+          "id": "c",
+          "label": "Zum Hauptbahnhof laufen"
+        }
+      ],
+      "answer": "a",
+      "evidence": "Bitte nutzen Sie alternativ die Buslinie 45.",
+      "displayMode": "answers"
+    },
+    {
+      "number": 2,
+      "question": "Was braucht Stefan am Südbahnhof?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Einen neuen Parkschein"
+        },
+        {
+          "id": "b",
+          "label": "Fünf Euro in Münzen"
+        },
+        {
+          "id": "c",
+          "label": "Hilfe bei der Parkplatzsuche"
+        }
+      ],
+      "answer": "b",
+      "evidence": "Ich habe nur Kleingeld dabei und brauche fünf Euro in Münzen.",
+      "displayMode": "answers"
+    },
+    {
+      "number": 3,
+      "question": "Was wurde im Fundbüro abgegeben?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Ein roter Regenschirm"
+        },
+        {
+          "id": "b",
+          "label": "Ein Personalausweis"
+        },
+        {
+          "id": "c",
+          "label": "Eine Tasche"
+        }
+      ],
+      "answer": "a",
+      "evidence": "Wir haben Ihren verlorenen roten Regenschirm gefunden.",
+      "displayMode": "answers"
+    },
+    {
+      "number": 4,
+      "question": "Welche Rabatte gibt es heute im Fahrradgeschäft?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Auf Fahrräder"
+        },
+        {
+          "id": "b",
+          "label": "Auf Schlösser und Helme"
+        },
+        {
+          "id": "c",
+          "label": "Auf Reparaturen"
+        }
+      ],
+      "answer": "b",
+      "evidence": "Auf alle Schlösser und Helme erhalten Sie im Rahmen unseres Frühlingsfests zwanzig Prozent Rabatt.",
+      "displayMode": "answers"
+    },
+    {
+      "number": 5,
+      "question": "Warum fällt die Führung im Stadtmuseum aus?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Wegen des Wetters"
+        },
+        {
+          "id": "b",
+          "label": "Wegen Krankheit"
+        },
+        {
+          "id": "c",
+          "label": "Wegen Umbauarbeiten"
+        }
+      ],
+      "answer": "b",
+      "evidence": "die heutige Führung durch die moderne Kunstausstellung wegen Krankheit leider ausfallen muss",
+      "displayMode": "answers"
+    }
+  ],
+  "reviewNotes": [
+    "Answer set recovered from the originally supplied October 19 Falowen A2 Hören Teil 1 question-key JSON; do not reuse questions from Mock 2.",
+    "Cloudflare R2 path is canonical; server must verify existence and MP3 metadata before authorizing a signed download.",
+    "Do not mark full a2-mock-03 exam or verified results ready based only on listening practice."
+  ]
+}
