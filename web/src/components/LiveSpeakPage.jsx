@@ -34,6 +34,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [activeOperation, setActiveOperation] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [notice, setNotice] = useState("");
   const [session, setSession] = useState(null);
@@ -247,6 +248,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const sendTurn = async (currentSession, payload) => {
     if (requestBusy.current || !currentSession) return;
     requestBusy.current = true;
+    setActiveOperation(payload.intro ? "opening" : payload.typedAnswer ? "submitting" : "transcribing");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -293,6 +295,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
             : err.message + " Your recording is still available to preview below.");
         } else if (payload.intro && err.code === "intro_already_sent") {
           // A lost opening response must resume the server's saved question.
+          setActiveOperation("recovering");
           const info = await api("/live-speak/status");
           if (mounted.current && info.activeSession?.sessionId === currentSession.sessionId) {
             setSession(info.activeSession);
@@ -303,7 +306,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
     } finally {
       requestBusy.current = false;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
   };
 
@@ -312,6 +315,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
   const recoverSavedSpeakingStep = async () => {
     if (!gradedCourseMock || !session || recording || busy || feedbackBusy || requestBusy.current) return;
     requestBusy.current = true;
+    setActiveOperation("recovering");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -361,12 +365,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setErrorMessage(err?.message || "Saved speaking progress could not be checked. Try again.");
     } finally {
       requestBusy.current = false;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
   };
 
   const retryRecordingUpload = async () => {
     if (!audioRetry || !session || busy || requestBusy.current) return;
+    setActiveOperation("recovering");
     setBusy(true);
     setErrorMessage("");
     let safeToResend = false;
@@ -398,7 +403,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } catch (_err) {
       setErrorMessage("Falowen cannot verify whether this answer reached the server. Check your connection and tap Check saved answer again. Your recording was not resent.");
     } finally {
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
     if (safeToResend) await sendTurn(session, audioRetry.payload);
   };
@@ -414,6 +419,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       return;
     }
     requestBusy.current = true;
+    setActiveOperation(skipAnswer ? "advancing" : "reply");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -447,6 +453,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         if (examinerSession) {
           // A response can be lost after the answer has already been saved.
           try {
+            setActiveOperation("recovering");
             const info = await api("/live-speak/status");
             const restored = info.activeSession;
             if (mounted.current && restored?.sessionId === session.sessionId) {
@@ -465,7 +472,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
     } finally {
       requestBusy.current = false;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
   };
 
@@ -479,6 +486,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     // Do not unlock a replacement turn or clear the local preview until the
     // server has atomically discarded this exact pending candidate.
     requestBusy.current = true;
+    setActiveOperation("discarding");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -505,7 +513,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
     } finally {
       requestBusy.current = false;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
   };
 
@@ -515,6 +523,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       setErrorMessage("Examiner practice is temporarily unavailable. Please try again shortly.");
       return;
     }
+    setActiveOperation(resumeSaved === true ? "recovering" : "connecting");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -550,6 +559,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       }
       setNow(Date.now());
       setBusy(false);
+      setActiveOperation(null);
       const needsOpening = !result.resumed || (!result.messages?.length && !result.pending && !Number(result.answeredTurns));
       if (result.resumed) setNotice(
         isDifferentLiveSpeakSessionContext(result, {level:safeLevel,topic:practiceTopic,source:practiceSource,examTask,examMode})
@@ -561,6 +571,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     } catch (err) {
       setErrorMessage(err.message);
       setBusy(false);
+      setActiveOperation(null);
       refresh();
     }
   };
@@ -793,6 +804,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     if (!currentExaminerText) return;
     const controller = new AbortController();
     replayRequestRef.current = controller;
+    setActiveOperation("replay");
     setBusy(true);
     setErrorMessage("");
     try {
@@ -804,7 +816,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
       if (mounted.current && err.name !== "AbortError") setErrorMessage("Examiner audio is unavailable. Read the German question, or tap Listen to examiner to retry.");
     } finally {
       replayRequestRef.current = null;
-      if (mounted.current) setBusy(false);
+      if (mounted.current) { setBusy(false); setActiveOperation(null); }
     }
   };
 
@@ -832,14 +844,12 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
     (Boolean(details?.pilotAvailable) && !details?.capReached);
   const localPracticeMode = examinerEntry && !session && !examFeedback && !loading &&
     (!details?.enabled || !canStartAiExaminer);
-  const waitingForOpening = examinerSession && busy && !messages.length && !pending;
-  // Reuse the same loading experience across supported A1–C2 examiner flows.
-  const aiWaitPhase = examinerEntry
-    ? loading ? "connecting"
-      : feedbackBusy ? "feedback"
-        : busy ? (!session ? "connecting" : !messages.length ? "opening" : "reply")
-          : null
-    : null;
+  const waitingForOpening = examinerSession && busy && activeOperation === "opening" && voiceState !== "playing";
+  // Busy also covers replay, recovery and discard. Only the actual request
+  // determines the copy; audio playback itself is no longer a loading state.
+  const playingResponse = voiceState === "playing" && ["opening", "reply", "advancing", "replay"].includes(activeOperation);
+  const aiWaitPhase = loading ? "loading" : feedbackBusy ? "feedback" : resetting ? "resetting"
+    : busy && !playingResponse ? activeOperation : null;
   const examTurnState = waitingForOpening
     ? "AI examiner is preparing to speak"
     : speakingTurnLabel({recording,pending,busy,feedbackBusy,voiceState,session,taskReady,expired});
@@ -855,8 +865,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         </header>
       ) : null}
 
-      {aiWaitPhase ? <SpeakingAiLoadingStatus phase={aiWaitPhase} /> : null}
-      {loading && !examinerEntry ? <p role="status" style={{margin:0,color:"#64748b",fontSize:13}}>Preparing speaking practice…</p> : null}
+      {aiWaitPhase ? <SpeakingAiLoadingStatus phase={aiWaitPhase} examiner={examinerEntry} /> : null}
       {!loading && details && !details.enabled ? (
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
