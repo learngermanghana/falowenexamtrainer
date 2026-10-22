@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import teil3 from "./mockDrafts/a2-mock-03-hoeren-teil-3.json";
 import teil4 from "./mockDrafts/a2-mock-03-hoeren-teil-4.json";
 import { assertFullMockReady } from "./mockFactoryContract";
@@ -16,6 +18,13 @@ describe("A2 Mock 03 Hören teacher drafts (NOT published)", () => {
     expect(teil3.localAudioEvidence.durationSeconds).toBeLessThan(108);
     expect(teil3.localAudioEvidence.bytes).toBe(1279584);
     expect(teil3.localAudioEvidence.sha256).toMatch(/^[0-9a-f]{64}$/);
+    for (const question of teil3.questions.filter(q => q.displayMode === "pictures")) {
+      for (const option of question.options) {
+        expect(option.imagePath).toMatch(/^\/exams\/a2\/mock-03\/[a-z0-9-]+\.svg$/);
+        const onDisk = path.resolve(process.cwd(), "public", option.imagePath.replace(/^\//, ""));
+        expect(fs.existsSync(onDisk)).toBe(true);
+      }
+    }
 
     for (const [i, question] of teil3.questions.entries()) {
       expect(question.scene).toBe(i+1);
@@ -44,6 +53,7 @@ describe("A2 Mock 03 Hören teacher drafts (NOT published)", () => {
     expect(teil4.questions.map(q => q.answer)).toEqual(["Richtig","Richtig","Falsch","Richtig","Falsch"]);
     expect(teil4.embeddedRepetitions).toBe(2);
     expect(teil4.plays).toBe(1);
+    expect(teil4.localAudioEvidence.sha256).toMatch(/^[0-9a-f]{64}$/);
     expect(teil4.questions[0].question).toContain("Gastronomie");
     expect(teil4.questions[0].question).not.toContain("Hotel");
   });
