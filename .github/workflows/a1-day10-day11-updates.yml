@@ -1,0 +1,50 @@
+name: A1 Day 10 grammar and Day 11 listening regressions
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/ObjectsAndColorsPage.js"
+      - "web/src/components/A1Day11UnderstandingTimeWorkbookPage.js"
+      - "web/src/components/A1Day11UnderstandingTimeWorkbookPage.test.jsx"
+      - "web/src/data/a1TutorDraftProfiles.js"
+      - "web/src/utils/a1WorkbookDraft.js"
+      - "web/src/utils/a1WorkbookDraft.test.js"
+      - "functions/data/answerKeyManifest.json"
+      - "functions/functionz/r2CourseAudio.js"
+      - "functions/functionz/__tests__/r2CourseAudio.test.js"
+      - ".github/workflows/a1-day10-day11-updates.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Check Day 10 adjective note is absent and Day 11 uses R2 instead of YouTube
+        run: |
+          node --input-type=module -e '
+            import fs from "node:fs";
+            const day10 = fs.readFileSync("web/src/components/ObjectsAndColorsPage.js", "utf8");
+            const day11 = fs.readFileSync("web/src/components/A1Day11UnderstandingTimeWorkbookPage.js", "utf8");
+            if (day10.includes("Simple Adjective Note: zu, sehr, super")) process.exit(1);
+            if (day11.includes("youtube-nocookie.com/embed/W0tEZWxndLo")) process.exit(1);
+            if (!day11.includes("a1/day-11/day-11.mp3")) process.exit(1);
+            const manifest = JSON.parse(fs.readFileSync("functions/data/answerKeyManifest.json", "utf8"));
+            const entry = Object.values(manifest).find(x => x.assignment_id === "A1-7");
+            if (Object.values(entry.answers["Teil 2"]).map(x => x[0]).join("") !== "BBCBA") process.exit(1);
+          '
+      - name: Test new listening choices and stored-draft versioning
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --forceExit --runTestsByPath src/components/A1Day11UnderstandingTimeWorkbookPage.test.jsx src/utils/a1WorkbookDraft.test.js
