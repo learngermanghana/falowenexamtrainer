@@ -1173,7 +1173,7 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
     // two teacher-approved Mock 3 files may enter the checksum verification
     // path; other future mocks still require a trusted published manifest.
     const isApprovedMock3Part = validated.mockId === "mock-03" &&
-      (validated.part === "teil-3" || validated.part === "teil-4");
+      ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
     if (!released && !isApprovedMock3Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
