@@ -66,6 +66,7 @@ import { courseSchedules } from "../data/courseSchedule";
 import { getConfiguredInAppWorkbookRoute, getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
 import CourseLessonPageLegacy, { LessonResourcesHub } from "./CourseLessonPageLegacy";
 import { mergeLessonSearchIntoRoute, normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
+import { resolveB1LessonSectionRoute } from "../utils/b1LessonSectionRoute";
 import {
   getPublicFunnelContext,
   trackPublicFunnelEvent,
@@ -506,34 +507,33 @@ export default function CourseLessonPage() {
 
   if (level === "B1") {
     const dayNumber = Number(day);
-    const chapterWorkbookRequested =
-      Boolean(B1_WORKBOOK_CHAPTER_LINKS[dayNumber]) && requestedChapter === B1_WORKBOOK_CHAPTER_LINKS[dayNumber];
+    const sectionRoute = resolveB1LessonSectionRoute({
+      day: dayNumber,
+      view: normalizedWorkbookView,
+      chapter: requestedChapter,
+      workbookChapter: B1_WORKBOOK_CHAPTER_LINKS[dayNumber],
+      hasWorkbook: Boolean(B1_WORKBOOK_PAGES[dayNumber]),
+      hasGrammar: Boolean(B1_GRAMMAR_PAGES[dayNumber]),
+    });
 
-    if (normalizedWorkbookView === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
-      const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
-      return (
-        <RadioFirstWorkbookGate level={level} day={dayNumber}>
-          <GrammarPage />
-        </RadioFirstWorkbookGate>
-      );
-    }
-
-    const workbookSectionRequested = new Set([
-      "workbook",
-      "radio",
-      "sprechen",
-      "schreiben",
-      "lesen",
-      "hoeren",
-      "references",
-      "submit",
-    ]).has(normalizedWorkbookView);
-
-    if ((workbookSectionRequested || chapterWorkbookRequested) && B1_WORKBOOK_PAGES[dayNumber]) {
+    // Grammar has the same workbook nav as Teil 1–4. Its notes are already
+    // rendered by B1StandardWorkbookPage via A2B1GrammarNotesTab.
+    if (sectionRoute === "workbook") {
       const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
       return (
         <RadioFirstWorkbookGate level={level} day={dayNumber}>
           <WorkbookPage />
+        </RadioFirstWorkbookGate>
+      );
+    }
+
+    // Preserve the dedicated Grammar route only for special speaking mocks or
+    // lessons without the regular B1 workbook.
+    if (sectionRoute === "grammar") {
+      const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
+      return (
+        <RadioFirstWorkbookGate level={level} day={dayNumber}>
+          <GrammarPage />
         </RadioFirstWorkbookGate>
       );
     }
