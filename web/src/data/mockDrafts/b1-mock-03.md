@@ -2,8 +2,8 @@
 
 **Status:** Draft in progress — do not publish or register as a ready full exam.
 **Interface:** Reuse the existing B1 Final Mock Exam template, including the same reading layouts, module navigation, timers, answer choices, autosave, student result and Admin result pipelines. Only the new questions/texts and mock-specific scoring/audio identities may change.
-**Completed:** Entire Lesen module — Teil 1 (1–6), Teil 2 Text 1 & Text 2 (7–12), Teil 3 Anzeigen (13–19), Teil 4 Ja/Nein (20–26), Teil 5 VHS rules (27–30): 30 questions. Schreiben content: Teile 1–3 (prompts complete; integration/marking unverified).
-**Pending:** Hören Teile 1–4 with verified R2 audio, Sprechen Teile 1–3, isolated Mock 03 attempt and server scoring, Schreiben AI-marking verification, end-to-end checks.
+**Completed:** Entire Lesen module — Teil 1 (1–6), Teil 2 Text 1 & Text 2 (7–12), Teil 3 Anzeigen (13–19), Teil 4 Ja/Nein (20–26), Teil 5 VHS rules (27–30): 30 questions. Schreiben content: Teile 1–3 (prompts complete; integration/marking unverified). Sprechen Teil 1, Teil 2 Thema A, Teil 3 source: [Sprechen draft](./b1-mock-03-sprechen.md) (not integrated).
+**Pending:** Hören Teile 1–4 with verified R2 audio, Sprechen Thema B plus examiner integration, isolated Mock 03 attempt and server scoring, Schreiben AI-marking verification, end-to-end checks.
 
 ## Modul Lesen — Teil 1
 
