@@ -1,3 +1,5 @@
+import teil1 from "./mockDrafts/a2-mock-03-hoeren-teil-1.json";
+import teil2 from "./mockDrafts/a2-mock-03-hoeren-teil-2.json";
 import fs from "fs";
 import path from "path";
 import teil3 from "./mockDrafts/a2-mock-03-hoeren-teil-3.json";
@@ -5,6 +7,19 @@ import teil4 from "./mockDrafts/a2-mock-03-hoeren-teil-4.json";
 import { assertFullMockReady } from "./mockFactoryContract";
 
 describe("A2 Mock 03 Hören teacher drafts (NOT published)", () => {
+  test("the earlier verified question-key JSON is restored for Teil 1 and Teil 2", () => {
+    for (const [part, n] of [[teil1, 1], [teil2, 2]]) {
+      expect(part.mockId).toBe("a2-mock-03");
+      expect(part.audioObjectKey).toBe(`a2/mock-hoeren/mock-03/teil-${n}.mp3`);
+      expect(part.questions.map(q => q.number)).toEqual(Array.from({length:5},(_,i)=>5*(n-1)+i+1));
+      expect(part.questions.every(q=>q.options.length === 3 && q.evidence && q.answer)).toBe(true);
+    }
+    expect(teil1.questions.map(q=>q.answer)).toEqual(["a","b","a","b","b"]);
+    expect(teil2.questions.map(q=>q.answer)).toEqual(["a","b","b","a","b"]);
+    expect(teil1.title).toBe("Unterwegs in der Stadt");
+    expect(teil2.title).toBe("Freizeit in der Woche");
+  });
+
   test("five distinct Teil 3 dialogues have five numbered questions and audio-grounded answers", () => {
     expect(teil3.mockId).toBe("a2-mock-03");
     expect(teil3.publicationStatus).toBe("draft-only");
