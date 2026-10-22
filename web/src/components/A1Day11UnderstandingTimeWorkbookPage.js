@@ -138,11 +138,6 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
           </div>
         ))}
 
-        <div style={{ ...questionBlock, background: "#f8fafc" }}>
-          <p style={{ margin: 0 }}><strong>Zusatzaufgabe · trennbare Verben</strong></p>
-          <p style={{ margin: 0 }}>Ergänzen Sie: „Ich ___ um sieben Uhr ___ (aufstehen).“</p>
-          <p style={{ margin: 0, color: "#64748b" }}>Diese Zusatzaufgabe ist Übung und gehört nicht zu den fünf benoteten Hören-Fragen.</p>
-        </div>
       </div>
 
     </A1TutorMarkedWorkbookShell>
