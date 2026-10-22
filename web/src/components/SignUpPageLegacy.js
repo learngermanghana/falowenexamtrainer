@@ -94,7 +94,7 @@ const staticClassOptions = (now) => Object.keys(classCatalog)
     source: "static",
   }));
 
-const SignUpPage = ({ onLogin, onBack }) => {
+const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { i18n, t } = useTranslation();
   const fxQuote = useFalowenUsdGhsRate();
@@ -314,10 +314,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
     if (code.includes("email-already-in-use")) {
       return {
         field: "email",
-        message: "That email is already registered. Try logging in or use a different email address.",
+        message: "That email is already registered. If you started this registration before, submit the same email and password to finish it. Otherwise, use Log in or Forgot password. Do not create another email account.",
       };
     }
 
+    if (code === "auth/profile-creation-incomplete") {
+      return { field: null, message: error.message };
+    }
+    if (code === "auth/student-code-conflict") {
+      return { field: null, message: "We could not safely reserve a unique student code. Please contact admissions instead of submitting again." };
+    }
     if (code.includes("invalid-email")) {
       return {
         field: "email",
@@ -470,7 +476,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             })
           : "";
 
-      await signup(cleanedEmail, password, {
+      const signupReceipt = await signup(cleanedEmail, password, {
         name: cleanedName,
         level: selectedLevel,
         studentCode,
@@ -493,6 +499,17 @@ const SignUpPage = ({ onLogin, onBack }) => {
         contractEnd: "",
         contractTermMonths: 0,
       });
+      // Send the lead only AFTER the Auth account and student profile were both
+      // confirmed. A failed attempt stays a draft, not a registered student.
+      try {
+        await onAccountCreated?.({
+          studentCode: signupReceipt?.studentCode || studentCode,
+          name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
+          level: selectedLevel, className: selectedClass, learningMode,
+        });
+      } catch (eventError) {
+        console.warn("Completed signup lead could not be recorded", eventError);
+      }
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(cleanedEmail, studentCode);
