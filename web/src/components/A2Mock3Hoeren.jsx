@@ -1,0 +1,158 @@
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import AppBackButton from "./navigation/AppBackButton";
+import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
+import teil3 from "../data/mockDrafts/a2-mock-03-hoeren-teil-3.json";
+import teil4 from "../data/mockDrafts/a2-mock-03-hoeren-teil-4.json";
+import "./A2Mock2Hoeren.css";
+
+const PARTS = [
+  { id: "teil-3", number: 3, label: "Fünf kurze Gespräche", data: teil3 },
+  { id: "teil-4", number: 4, label: "Karriere im Alltag", data: { ...teil4, questions: teil4.questions.map((q, i) => ({ ...q, number: 16 + i })) } },
+];
+const answersKey = uid => `falowen:a2:mock-03:hoeren-teile-3-4:${uid || "guest"}:v1`;
+const restore = uid => {
+  if (!uid) return {};
+  try { return JSON.parse(localStorage.getItem(answersKey(uid)) || "{}") || {}; }
+  catch { return {}; }
+};
+
+export default function A2Mock3Hoeren() {
+  const { idToken, user } = useAuth();
+  const [active, setActive] = useState(0);
+  const [answers, setAnswers] = useState(() => restore(user?.uid));
+  const [submitted, setSubmitted] = useState(false);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [audioError, setAudioError] = useState("");
+  const [started, setStarted] = useState({});
+  const player = useRef(null);
+  const part = PARTS[active];
+  const allQuestions = PARTS.flatMap(item => item.data.questions);
+  const answered = allQuestions.filter(q => answers[q.number]).length;
+  const score = allQuestions.filter(q => answers[q.number] === (
+    String(q.answer).toLowerCase() === "richtig" ? "richtig" :
+    String(q.answer).toLowerCase() === "falsch" ? "falsch" : q.answer
+  )).length;
+
+  useEffect(() => {
+    setAnswers(restore(user?.uid));
+    setSubmitted(false);
+  }, [user?.uid]);
+  useEffect(() => {
+    if (!user?.uid) return;
+    localStorage.setItem(answersKey(user.uid), JSON.stringify(answers));
+  }, [user?.uid, answers]);
+  useEffect(() => {
+    if (player.current) { player.current.pause(); player.current.currentTime = 0; }
+    setAudioUrl(""); setAudioError("");
+  }, [active]);
+
+  async function loadAudio() {
+    if (!idToken) { setAudioError("Bitte melden Sie sich erneut an."); return; }
+    if (loading) return;
+    setLoading(true); setAudioError("");
+    try {
+      const response = await fetchA2MockAudioPlaybackUrl({
+        mockId: "mock-03", part: part.id, key: part.data.audioObjectKey, idToken,
+      });
+      setAudioUrl(response.url);
+    } catch (error) {
+      setAudioError(error?.response?.data?.error || error?.message ||
+        "Die Aufnahme konnte noch nicht geladen werden. Bitte prüfen Sie die Cloudflare-Datei.");
+    } finally { setLoading(false); }
+  }
+
+  const update = (question, value) => {
+    if (!submitted) setAnswers(old => ({ ...old, [question.number]: value }));
+  };
+
+  return (
+    <main className="a2-mock2-shell" lang="de" data-a2-mock3-hoeren>
+      <div className="a2-mock2-top">
+        <AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" />
+        <span>A2 · Mock 3 · Hören</span>
+      </div>
+      <header className="a2-mock2-progress">
+        <div>
+          <strong>Hören Mock 3 — Teile 3 und 4</strong>
+          <span>{answered}/10 Aufgaben beantwortet</span>
+        </div>
+        <strong>Teil {part.number}</strong>
+      </header>
+      <p role="note">
+        Dies ist die Hörübung zu Mock 3 (Teile 3 und 4). Sie ist noch keine
+        vollständige A2-Prüfung. Ihre Antworten bleiben auf diesem Gerät;
+        ein offizielles Prüfungsergebnis wird hier nicht gespeichert.
+      </p>
+      <nav className="a2-mock2-nav" aria-label="Hören Teile">
+        {PARTS.map((item, index) => (
+          <button type="button" key={item.id} className={active === index ? "selected" : ""}
+            onClick={() => setActive(index)}>
+            Teil {item.number} <small>{item.data.questions.filter(q => answers[q.number]).length}/5</small>
+          </button>
+        ))}
+      </nav>
+      <section className="a2-mock2-paper">
+        <h1>Hören Teil {part.number}</h1>
+        <p>{part.number === 3
+          ? "Sie hören fünf kurze Gespräche einmal. Markieren Sie a, b oder c."
+          : "Sie hören ein Interview zweimal. Markieren Sie Richtig oder Falsch."}</p>
+        <div className="a2-mock2-audio">
+          <strong>Prüfungsaudio · Teil {part.number}</strong>
+          <p>{part.number === 4
+            ? "Das Interview ist in der MP3 bereits zweimal enthalten. Die Datei wird einmal abgespielt."
+            : "Sie hören jedes Gespräch einmal. Die Datei wird nicht wiederholt."}</p>
+          {audioUrl ? (
+            <>
+              <audio ref={player} src={audioUrl} preload="metadata" controls={false}
+                onError={() => setAudioError("Die R2-Datei konnte nicht abgespielt werden. Laden Sie die Aufnahme erneut.")} />
+              <button type="button" disabled={Boolean(started[part.id])}
+                onClick={() => player.current?.play().then(() =>
+                  setStarted(old => ({ ...old, [part.id]: true }))
+                ).catch(error => setAudioError(error.message))}>
+                Audio einmal starten
+              </button>
+            </>
+          ) : <button type="button" onClick={loadAudio} disabled={loading}>
+            {loading ? "Audio wird geprüft und geladen …" : "Audio laden"}
+          </button>}
+          {audioError ? <p role="alert">{audioError}</p> : null}
+        </div>
+
+        {part.data.questions.map((question, index) => (
+          <fieldset className="a2-mock2-question" key={question.number} disabled={submitted}>
+            <legend><strong>{question.number || index + 16}.</strong> {question.question}</legend>
+            {(part.number === 3
+              ? question.options
+              : [{ id: "richtig", label: "Richtig" }, { id: "falsch", label: "Falsch" }]
+            ).map(choice => (
+              <label key={choice.id} className={answers[question.number || index + 16] === choice.id ? "selected" : ""}>
+                <input type="radio" name={`a2mock3-${question.number || index + 16}`}
+                  checked={answers[question.number || index + 16] === choice.id}
+                  onChange={() => update({ number: question.number || index + 16 }, choice.id)} />
+                <span><strong>{part.number === 3 ? `${choice.id})` : ""}</strong> {choice.label}</span>
+                {choice.imagePath ? <img src={choice.imagePath} alt={choice.label}
+                  width="160" height="109" loading="lazy" style={{ display: "block", maxWidth: "100%", marginTop: 8 }} /> : null}
+              </label>
+            ))}
+          </fieldset>
+        ))}
+
+        {!submitted ? (
+          <button type="button" disabled={answered !== 10} onClick={() => setSubmitted(true)}>
+            Antworten zu Teile 3 und 4 prüfen
+          </button>
+        ) : (
+          <section aria-live="polite">
+            <h2>Übungsergebnis: {score}/10</h2>
+            <p>Dies ist ausschließlich eine lokale Übungsauswertung, keine verifizierte Mock-Prüfungsnote.</p>
+            <button type="button" onClick={() => {
+              setAnswers({}); setSubmitted(false); setStarted({}); setAudioUrl("");
+            }}>Neu üben</button>
+          </section>
+        )}
+      </section>
+    </main>
+  );
+}
