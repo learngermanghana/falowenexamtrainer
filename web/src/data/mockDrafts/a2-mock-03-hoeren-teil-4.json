@@ -42,7 +42,7 @@
     "Audio's claim 'jeden Tag ... eine ganze Stunde' is inconsistent with his working from home most other days; the question asks about commute duration and not daily attendance.",
     "The supplied Cloudflare dashboard prefix is mock-hoeren/mock-03/ (no level prefix); canonical future A2 key is a2/mock-hoeren/mock-03/teil-4.mp3. Confirm/copy the actual object and compare its bytes before manifest publication.",
     "Still a teacher-only draft. No Firestore published manifest, R2 access, actual exam runtime, or objective score verification has been completed.",
-    "The local MP3 repeats the same interview twice, with about 7 seconds of silence between the playbacks. Configure native audio playback once, not twice."
+    "The uploaded MP3 (SHA-256 d6ece1b3e214ef1d7571807b65d09bc395eb3f8f71c8ebaabe572a8247144fe4) repeats the same interview twice, with about 7 seconds of silence between the playbacks. Configure native audio playback once, not twice."
   ],
   "suggestedCanonicalAudioObjectKey": "a2/mock-hoeren/mock-03/teil-4.mp3",
   "localAudioEvidence": {
@@ -51,7 +51,8 @@
     "bytes": 2809728,
     "repetitions": 2,
     "approximateSecondPlayStartSeconds": 120,
-    "content": "Interview: Stefan Mayer, Werbeagentur, Gastronomie, Weiterbildung, Julia, Büro/Homeoffice, Arbeitsweg, Fahrrad"
+    "content": "Interview: Stefan Mayer, Werbeagentur, Gastronomie, Weiterbildung, Julia, Büro/Homeoffice, Arbeitsweg, Fahrrad",
+    "sha256": "d6ece1b3e214ef1d7571807b65d09bc395eb3f8f71c8ebaabe572a8247144fe4"
   },
   "plays": 1,
   "embeddedRepetitions": 2
