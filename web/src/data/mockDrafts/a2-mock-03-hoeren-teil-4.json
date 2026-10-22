@@ -41,7 +41,8 @@
     "Teacher-provided local Teil 4 MP3 and supplied transcript align with the five question facts. Audio has two playbacks, so the exam must play the file once only.",
     "Audio's claim 'jeden Tag ... eine ganze Stunde' is inconsistent with his working from home most other days; the question asks about commute duration and not daily attendance.",
     "The supplied Cloudflare dashboard prefix is mock-hoeren/mock-03/ (no level prefix); canonical future A2 key is a2/mock-hoeren/mock-03/teil-4.mp3. Confirm/copy the actual object and compare its bytes before manifest publication.",
-    "Still a teacher-only draft. No Firestore published manifest, R2 access, actual exam runtime, or objective score verification has been completed."
+    "Still a teacher-only draft. No Firestore published manifest, R2 access, actual exam runtime, or objective score verification has been completed.",
+    "The local MP3 repeats the same interview twice, with about 7 seconds of silence between the playbacks. Configure native audio playback once, not twice."
   ],
   "suggestedCanonicalAudioObjectKey": "a2/mock-hoeren/mock-03/teil-4.mp3",
   "localAudioEvidence": {
@@ -51,5 +52,7 @@
     "repetitions": 2,
     "approximateSecondPlayStartSeconds": 120,
     "content": "Interview: Stefan Mayer, Werbeagentur, Gastronomie, Weiterbildung, Julia, Büro/Homeoffice, Arbeitsweg, Fahrrad"
-  }
+  },
+  "plays": 1,
+  "embeddedRepetitions": 2
 }
