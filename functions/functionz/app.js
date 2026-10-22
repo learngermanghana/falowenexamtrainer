@@ -1169,15 +1169,20 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       });
     }
 
-    // Check the server-owned publication manifest, or the precisely
-    // teacher-approved Mock 3 recordings after verifying their actual R2
-    // bytes. This NEVER releases an arbitrary upload or folder prefix.
+    // Reject unreleased recordings BEFORE signing any private URL. Only the
+    // two teacher-approved Mock 3 files may enter the checksum verification
+    // path; other future mocks still require a trusted published manifest.
+    const isApprovedMock3Part = validated.mockId === "mock-03" &&
+      (validated.part === "teil-3" || validated.part === "teil-4");
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
+    if (!released && !isApprovedMock3Part) {
+      return res.status(404).json({ error: "Mock Hören recording is not published." });
+    }
     const signed = await createA2MockAudioSignedUrl(validated);
-    if (!released && !(await verifyTeacherApprovedA2Mock3Audio({
+    if (isApprovedMock3Part && !(await verifyTeacherApprovedA2Mock3Audio({
       ...validated, signedUrl: signed.url,
     }))) {
-      return res.status(404).json({ error: "This Mock Hören audio is not verified or published." });
+      return res.status(404).json({ error: "This Mock Hören recording does not match the approved audio." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
