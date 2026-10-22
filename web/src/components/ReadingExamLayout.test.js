@@ -1,7 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { getA2ReadingTask } from "../data/a2ReadingTasks";
 import {
   getReadingExamVariant,
+  parseLetteredOfferSources,
   readingSourceLabel,
   splitReadingSourceText,
 } from "./ReadingExamLayout";
@@ -27,6 +29,32 @@ describe("shared A2-C2 Lesen exam layout", () => {
     expect(getReadingExamVariant({ format: "Anzeigen zuordnen", sourceCount: sources.length })).toBe("sources");
     expect(readingSourceLabel(0)).toBe("Text A");
     expect(readingSourceLabel(2)).toBe("Text C");
+  });
+
+  test("A2 Day 15 uses the original Angebot A–E labels and a separate heading", () => {
+    const task = getA2ReadingTask(15);
+    const group = parseLetteredOfferSources(task.text, task.format);
+    expect(group.heading).toBe("SPORTVEREIN NORD – KURSE IM FRÜHLING");
+    expect(group.offers).toHaveLength(5);
+    expect(group.offers.map((offer) => offer.label)).toEqual([
+      "Angebot A", "Angebot B", "Angebot C", "Angebot D", "Angebot E",
+    ]);
+    expect(group.offers.map((offer) => offer.title)).toEqual([
+      "Laufgruppe", "Schwimmen", "Badminton", "Familienfitness",
+      "Fitnesskurs „Rücken & Bewegung“",
+    ]);
+    expect(group.offers[0].description).toContain("Keine Anmeldung nötig");
+    expect(group.offers[4].description).toContain("nach einer längeren Pause");
+    // Student answer choices remain A–D even when the correct offer is E.
+    expect(task.questions[0].options[3]).toBe("D) Angebot E");
+    expect(read("A2ReadingTaskPanel.js")).toContain("day15Offers ? source.label : readingSourceLabel(index)");
+  });
+
+  test("lettered offer parsing falls back on malformed source lists", () => {
+    expect(parseLetteredOfferSources(
+      "SPORTVEREIN NORD\\n\\nA – Laufen\\nTraining\\n\\nC – Schwimmen\\nMittwoch\\n\\nD – Yoga\\nFreitag",
+      "Sportangebote zuordnen",
+    )).toBeNull();
   });
 
   test("A2 uses adaptive document/source rendering from its canonical task format", () => {
