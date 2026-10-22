@@ -45,10 +45,13 @@ export const B1_DAY6_READING_QUESTIONS = [
   { stem: "5. Welchen Wohntrend beschreibt der Artikel am Ende?", options: ["A) Die meisten Menschen ziehen direkt ins hektische Stadtzentrum zurück.", "B) Viele ziehen an den Stadtrand oder in Orte mit guter Zugverbindung zur Stadt.", "C) Das Auto wird auf dem Land in Zukunft gar nicht mehr benötigt."] },
 ];
 
+// Original Lisa/Jonas dialogue: „Leben in der Stadt oder auf dem Land?“
+// Answer letters are B, A, B, A, C. Keep in sync with B1-2.6 answer manifest
+// and the linked „Answers — B1 2.6“ Google Sheet (Hören rows 11–15).
 export const B1_DAY6_LISTENING_QUESTIONS = [
-  { stem: "1. Was ist ein Vorteil des Lebens in einer WG?", options: ["A) Viel Privatsphäre", "B) Gemeinsame Nutzung von Haushaltsgeräten", "C) Keine gemeinsamen Regeln"] },
-  { stem: "2. Warum bevorzugen viele Familien Einfamilienhäuser?", options: ["A) Weil sie günstig sind", "B) Wegen der Privatsphäre und des Platzes", "C) Weil sie in der Stadt liegen"] },
-  { stem: "3. Was ist eine häufige Wohnform in Städten?", options: ["A) Tiny Houses", "B) Einfamilienhäuser", "C) Wohnungen in Mehrfamilienhäusern"] },
-  { stem: "4. Welche Wohnform wird immer beliebter, weil sie umweltfreundlich ist?", options: ["A) WG", "B) Mehrfamilienhäuser", "C) Passivhäuser"] },
-  { stem: "5. Was macht das Leben in einem Mehrfamilienhaus attraktiv?", options: ["A) Hohe Kosten", "B) Mischung aus Privatsphäre und sozialer Interaktion", "C) Viel Platz"] },
+  { stem: "1. Was gefällt Lisa besonders am Leben in der Stadt?", options: ["A) Die günstigeren Mieten", "B) Die vielen kulturellen Angebote und die kurzen Wege", "C) Die persönliche Nachbarschaft"] },
+  { stem: "2. Was sagt Jonas über die Nachbarschaft auf dem Land?", options: ["A) Sie ist persönlicher.", "B) Die Menschen bleiben meist anonym.", "C) Dort kennt niemand seine Nachbarn."] },
+  { stem: "3. Was ist laut Jonas gut für die Erholung?", options: ["A) Die tägliche Zugfahrt", "B) Die Natur direkt vor der Haustür", "C) Das kulturelle Angebot in der Stadt"] },
+  { stem: "4. Welches Problem hätte Lisa, wenn sie auf dem Land bleibt?", options: ["A) Sie müsste täglich eine Stunde mit dem Zug pendeln.", "B) Sie müsste eine viel höhere Miete bezahlen.", "C) Sie könnte ihre Nachbarn nicht kennenlernen."] },
+  { stem: "5. Was sagt Jonas über die Mieten auf dem Land?", options: ["A) Sie sind genauso hoch wie in der Stadt.", "B) Sie sind deutlich höher als in der Stadt.", "C) Sie sind deutlich günstiger als in der Stadt."] },
 ];

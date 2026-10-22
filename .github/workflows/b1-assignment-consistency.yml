@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "functions/data/answerKeyManifest.json"
+      - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
       - "scripts/auditB1AssignmentConsistency.mjs"
       - "web/src/components/B1*Workbook*.js"
       - "web/src/components/B1*GrammarNotesPage.js"
@@ -16,6 +17,7 @@ on:
       - main
     paths:
       - "functions/data/answerKeyManifest.json"
+      - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
       - "scripts/auditB1AssignmentConsistency.mjs"
       - "web/src/components/B1*Workbook*.js"
       - "web/src/components/B1*GrammarNotesPage.js"
@@ -35,3 +37,5 @@ jobs:
           node-version: 22
       - name: Audit B1 Days 1-28
         run: node scripts/auditB1AssignmentConsistency.mjs
+      - name: Check B1 Day 6 R2 audio and questions
+        run: node --test tests/b1-day6-stadt-land-r2-listening.test.mjs
