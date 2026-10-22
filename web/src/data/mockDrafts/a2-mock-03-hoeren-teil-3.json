@@ -1,0 +1,221 @@
+{
+  "mockId": "a2-mock-03",
+  "module": "hoeren",
+  "examPart": "3",
+  "level": "A2",
+  "mode": "goethe",
+  "title": "Hören · Teil 3 · Fünf kurze Gespräche",
+  "kind": "mixed-picture-or-answer-multiple-choice",
+  "instruction": "Sie hören fünf kurze Gespräche. Sie hören jeden Text einmal. Wählen Sie für die Aufgaben 11 bis 15 jeweils die richtige Antwort a, b oder c.",
+  "questionNumbers": [
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "plays": 1,
+  "embeddedRepetitions": 1,
+  "audioObjectKey": "a2/mock-hoeren/mock-03/teil-3.mp3",
+  "audioVerification": "teacher-uploaded local teil-3.mp3 verified for format, duration, scene count and the supplied dialogue; corresponding Cloudflare R2 object and protected playback NOT verified",
+  "publicationStatus": "draft-only",
+  "localAudioEvidence": {
+    "filename": "teil-3.mp3",
+    "bytes": 1279584,
+    "durationSeconds": 106.632,
+    "sampleRateHz": 24000,
+    "channels": 1,
+    "format": "mp3",
+    "sha256": "ae4afecadc051433c4c195230c5c46c241c6e81aa8df79bbbd8c46b986c783e7",
+    "audibleParts": 5,
+    "approximateBreaksSeconds": [
+      [
+        27.2,
+        31.98
+      ],
+      [
+        46.94,
+        51.3
+      ],
+      [
+        67.59,
+        72.1
+      ],
+      [
+        85.4,
+        90.02
+      ]
+    ],
+    "embeddedRepetitions": 1
+  },
+  "transcriptEvidence": [
+    {
+      "scene": 1,
+      "context": "Geschäft im Einkaufszentrum",
+      "dialogue": "Am Freitagabend schließt das Geschäft heute erst um zwanzig Uhr.",
+      "assessed": true
+    },
+    {
+      "scene": 2,
+      "context": "Kaffeetreffen in der Stadt",
+      "dialogue": "14:30 Uhr an der Haltestelle geht wegen des Arzttermins nicht. Beide einigen sich auf 15:00 Uhr.",
+      "assessed": true
+    },
+    {
+      "scene": 3,
+      "context": "Kleidung umtauschen",
+      "dialogue": "Die Kundin möchte eine rote Jacke umtauschen. Sie ist zu groß; die Kundin braucht Größe 42.",
+      "assessed": true
+    },
+    {
+      "scene": 4,
+      "context": "Obstabteilung",
+      "dialogue": "Frische Bio-Äpfel liegen ganz hinten in der Obstabteilung neben den Birnen.",
+      "assessed": true
+    },
+    {
+      "scene": 5,
+      "context": "Zahnarztpraxis",
+      "dialogue": "Am Mittwoch ist die Zahnarztpraxis nur bis 12:30 Uhr geöffnet.",
+      "assessed": true
+    }
+  ],
+  "questions": [
+    {
+      "number": 11,
+      "scene": 1,
+      "context": "Einkaufszentrum",
+      "displayMode": "answers",
+      "question": "Um wie viel Uhr schließt das Geschäft heute?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Um 19:00 Uhr."
+        },
+        {
+          "id": "b",
+          "label": "Um 20:00 Uhr."
+        },
+        {
+          "id": "c",
+          "label": "Um 21:00 Uhr."
+        }
+      ],
+      "answer": "b",
+      "evidence": "Wir machen heute erst um zwanzig Uhr zu, weil wir am Freitagabend länger geöffnet haben."
+    },
+    {
+      "number": 12,
+      "scene": 2,
+      "context": "Kaffeetreffen",
+      "displayMode": "answers",
+      "question": "Wann treffen sich die beiden morgen?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Um 14:00 Uhr."
+        },
+        {
+          "id": "b",
+          "label": "Um 14:30 Uhr."
+        },
+        {
+          "id": "c",
+          "label": "Um 15:00 Uhr."
+        }
+      ],
+      "answer": "c",
+      "evidence": "Geht es auch um fünfzehn Uhr? — Ja, das ist perfekt für mich."
+    },
+    {
+      "number": 13,
+      "scene": 3,
+      "context": "Umtausch",
+      "displayMode": "pictures",
+      "question": "Was möchte die Kundin umtauschen?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Eine rote Jacke",
+          "photoSpec": "Rote Jacke auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-a-rote-jacke.svg"
+        },
+        {
+          "id": "b",
+          "label": "Eine blaue Hose",
+          "photoSpec": "Blaue Hose auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-b-blaue-hose.svg"
+        },
+        {
+          "id": "c",
+          "label": "Einen roten Pullover",
+          "photoSpec": "Roter Pullover auf einem neutralen Hintergrund",
+          "imagePath": "/exams/a2/mock-03/teil-3-q13-c-roter-pullover.svg"
+        }
+      ],
+      "answer": "a",
+      "evidence": "Ich möchte diese rote Jacke gerne umtauschen. Sie ist mir leider viel zu groß."
+    },
+    {
+      "number": 14,
+      "scene": 4,
+      "context": "Im Supermarkt",
+      "displayMode": "pictures",
+      "question": "Wo findet man die Bio-Äpfel?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Vorne beim Eingang",
+          "photoSpec": "Äpfel direkt am Eingang des Supermarkts",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-a-eingang.svg"
+        },
+        {
+          "id": "b",
+          "label": "Hinten in der Obstabteilung neben den Birnen",
+          "photoSpec": "Äpfel auf einem Regal ganz hinten in der Obstabteilung, direkt neben Birnen",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-b-obst-birnen.svg"
+        },
+        {
+          "id": "c",
+          "label": "An der Kasse",
+          "photoSpec": "Äpfel am Kassenbereich",
+          "imagePath": "/exams/a2/mock-03/teil-3-q14-c-kasse.svg"
+        }
+      ],
+      "answer": "b",
+      "evidence": "Die Äpfel aus der Region liegen ganz hinten in der Obstabteilung, neben den Birnen."
+    },
+    {
+      "number": 15,
+      "scene": 5,
+      "context": "Zahnarztpraxis",
+      "displayMode": "answers",
+      "question": "Bis wann ist die Zahnarztpraxis am Mittwoch geöffnet?",
+      "options": [
+        {
+          "id": "a",
+          "label": "Bis 12:00 Uhr."
+        },
+        {
+          "id": "b",
+          "label": "Bis 13:00 Uhr."
+        },
+        {
+          "id": "c",
+          "label": "Bis 12:30 Uhr."
+        }
+      ],
+      "answer": "c",
+      "evidence": "Am Mittwoch hat die Praxis nur bis zwölf Uhr dreißig geöffnet. Danach ist geschlossen."
+    }
+  ],
+  "reviewNotes": [
+    "This replaces the prior mismatching Teil 3 draft entirely. The uploaded recording has shopping-centre closing, meeting Julia at 15:00, red jacket size 42, organic apples by pears, and Wednesday dental closing at 12:30.",
+    "Teacher audio is ~1:46.6 long with one playback and pauses between five scenes. Do not repeat the MP3 automatically.",
+    "The audio introduction says 'Dazu hören Sie drei Bilder oder Antworten' (non-idiomatic). Suggested on-screen wording: 'Zu jeder Aufgabe sehen Sie drei Bilder oder Antworten.' Teacher can accept as a minor spoken slip or correct the intro before publication.",
+    "Tasks 13–14 now have six first-party vector image assets (non-photographic, exam-style illustrations) under /exams/a2/mock-03/. Verify contrast and comprehension at mobile size before release.",
+    "The provided Cloudflare R2 dashboard URL points at mock-hoeren/mock-03/ without a2/. Verify the exact object and protected manifest; compare R2 MP3 SHA-256 to the local SHA-256 before publishing.",
+    "Still a teacher-only draft, with no final published manifest, live Mock 3 route, verified A2 Mock 3 server key, or full four-skill result integration."
+  ],
+  "visualAssets": "ready-for-teacher-review"
+}
