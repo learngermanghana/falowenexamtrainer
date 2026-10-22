@@ -5,7 +5,6 @@ import {
   trackPublicFunnelEvent,
 } from "../lib/publicFunnelTracking";
 
-const FREE_LESSON_VIDEO_ID = "CFkrrVxhdL4";
 const HOMEPAGE_REVIEWS_SCRIPT_ID = "falowen-homepage-reviews-script";
 
 export default function LandingPage(props) {
@@ -13,9 +12,8 @@ export default function LandingPage(props) {
     rememberPublicFunnelContext({
       lastStage: "landing",
       source: "homepage",
-      video: FREE_LESSON_VIDEO_ID,
     });
-    trackPublicFunnelEvent("landing_view", { video: FREE_LESSON_VIDEO_ID });
+    trackPublicFunnelEvent("landing_view");
   }, []);
 
   useEffect(() => {

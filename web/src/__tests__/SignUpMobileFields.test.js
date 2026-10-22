@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom";
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import SignUpPage from "../components/SignUpPage";
 
 jest.mock("../components/SignUpPageLegacy", () => () => (
@@ -75,4 +75,34 @@ describe("mobile signup field behaviour", () => {
     expect(screen.getByLabelText("Confirm password")).toHaveAttribute("type", "password");
     expect(screen.queryByRole("button", { name: "Show passwords" })).not.toBeInTheDocument();
   });
+});
+
+
+test("support link uses current form errors and step, not stale draft or video attribution", async () => {
+  window.localStorage.setItem("falowen:public-application-draft", JSON.stringify({name:"Earlier name",level:"A1"}));
+  const view = render(<SignUpPage />);
+  const link = await screen.findByRole("link", {name:/Admissions Support/});
+  const name = screen.getByLabelText("Full name");
+  const form = name.closest("form");
+  form.dataset.signupStep = "2";
+  form.dataset.signupError = "Please choose a class before continuing.";
+  fireEvent.change(name, {target:{value:"Augustina Tordzro"}});
+  fireEvent.change(screen.getByLabelText(/What do you need help/), {target:{value:"The class list is empty."}});
+  fireEvent.change(screen.getByLabelText("Password"), {target:{value:"secret-never-share"}});
+  fireEvent.click(link);
+  let message = new URL(link.href).searchParams.get("text");
+  expect(message).toContain("Name: Augustina Tordzro");
+  expect(message).toContain("Current step: 2 of 3 — Your learning");
+  expect(message).toContain("Error shown: Please choose a class before continuing.");
+  expect(message).toContain("Help needed: The class list is empty.");
+  expect(message).not.toMatch(/Earlier name|YouTube|CFkrrVxhdL4|secret-never-share/);
+  form.dataset.signupStep = "3";
+  form.dataset.signupError = "";
+  fireEvent.click(link);
+  message = new URL(link.href).searchParams.get("text");
+  expect(message).toContain("Current step: 3 of 3 — Contact details");
+  expect(message).toContain("No error message is currently displayed.");
+  expect(message).not.toContain("Please choose a class");
+  view.unmount();
+  window.localStorage.clear();
 });
