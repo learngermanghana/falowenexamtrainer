@@ -11,6 +11,7 @@ describe("A2 listening tasks", () => {
     [12, "5.12", "a2/day-12/day-12.mp3"],
     [13, "5.13", "a2/day-13/day-13.mp3"],
     [15, "6.15", "a2/day-15/day-15.mp3"],
+    [16, "6.16", "a2/day-16/day-16.mp3"],
     [24, "9.24", "a2/day-24/day-24.mp3"],
     [26, "10.26", "a2/day-26/day-26.mp3"],
     [27, "10.27", "a2/day-27/day-27.mp3"],
@@ -25,6 +26,20 @@ describe("A2 listening tasks", () => {
       audioUrl: "",
     });
     expect(task.questions).toHaveLength(5);
+  });
+
+  test("Day 16 five Lena–Max questions match the newly published listening answer choices", () => {
+    const task = getA2ListeningTask(16);
+    expect(task.questions.map((q) => q.stem)).toEqual([
+      "Warum sieht Lena müde aus?",
+      "Wann geht Max zum Yogakurs?",
+      "Wie viel kostet die erste Yogastunde für Lena?",
+      "Was macht Max, um abends besser zu schlafen?",
+      "Wo treffen sich Lena und Max am Samstag?",
+    ]);
+    const answerOptionIndexes = [1, 0, 2, 1, 0];
+    expect(task.questions.map((q, i) => q.options[answerOptionIndexes[i]].slice(0, 1))).toEqual(["B", "A", "C", "B", "A"]);
+    expect(task.task).toContain("Lena und Max");
   });
 
   test("Day 28 keeps the approved future-plans question set", () => {

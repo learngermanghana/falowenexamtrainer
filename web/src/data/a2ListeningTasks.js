@@ -204,14 +204,15 @@ export const A2_LISTENING_TASKS = {
   16: {
     chapter: "6.16",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie den Text über gesunde Ernährung, Bewegung, Fitness und regelmäßige Arztbesuche. Wählen Sie jeweils die richtige Antwort.",
-    audioUrl: "https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing",
+    task: "Hören Sie das Gespräch zwischen Lena und Max über Stress, Yoga, Schlaf und Entspannung zweimal. Wählen Sie zu jeder der fünf Fragen A, B oder C. Übertragen Sie Ihre Antworten in Teil 4 des Submit-Tabs.",
+    audioKey: "a2/day-16/day-16.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Was wird als ein einfacher Anfang für eine gesunde Ernährung empfohlen?", options: ["A) Mehr Fleisch essen", "B) Mehr Obst und Gemüse essen", "C) Mehr Fast Food essen"] },
-      { stem: "Wie lange sollte man täglich mindestens gehen oder sich bewegen?", options: ["A) 10 Minuten", "B) 20 Minuten", "C) 30 Minuten"] },
-      { stem: "Was kann motivierend sein, um fit zu bleiben?", options: ["A) Der Besuch eines Fitnessstudios", "B) Mehr zu schlafen", "C) Mehr Fernsehen schauen"] },
-      { stem: "Warum ist der regelmäßige Besuch beim Arzt wichtig?", options: ["A) Um neue Rezepte zu bekommen", "B) Um Krankheiten frühzeitig zu erkennen", "C) Um Medikamente zu kaufen"] },
-      { stem: "Welche Sportarten werden im Text als motivierend erwähnt?", options: ["A) Yoga und Pilates", "B) Schwimmen und Laufen", "C) Tanzen und Radfahren"] },
+      { stem: "Warum sieht Lena müde aus?", options: ["A) Sie treibt zu viel Sport.", "B) Sie arbeitet sehr viel und schläft schlecht.", "C) Sie hat am Wochenende keine Zeit."] },
+      { stem: "Wann geht Max zum Yogakurs?", options: ["A) Jeden Dienstag und Donnerstag nach der Arbeit.", "B) Jeden Samstag vor dem Schwimmbad.", "C) Jeden Abend vor dem Schlafen."] },
+      { stem: "Wie viel kostet die erste Yogastunde für Lena?", options: ["A) 10 Euro", "B) 80 Euro", "C) Sie ist kostenlos (gratis)."] },
+      { stem: "Was macht Max, um abends besser zu schlafen?", options: ["A) Er sieht abends im Bett Videos.", "B) Er trinkt nach 3 Uhr nachmittags keinen Kaffee mehr.", "C) Er geht jeden Abend in die Sauna."] },
+      { stem: "Wo treffen sich Lena und Max am Samstag?", options: ["A) Vor dem Schwimmbad.", "B) Im Park.", "C) Im Yogastudio."] },
     ],
   },
   17: {

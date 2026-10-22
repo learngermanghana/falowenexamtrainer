@@ -74,10 +74,10 @@ const rows = [
     "Erklären Sie, warum Ihnen dieser Sport gefällt.",
     "Laden Sie Jan ein, nächsten Samstag zusammen Sport zu machen.",
   ]],
-  [16, "A2-6.16", "E-Mail an einen Arzt", "Sie möchten wegen Ihrer Gesundheit einen Arzt kontaktieren. Schreiben Sie eine E-Mail.", [
-    "Fragen Sie nach einem Termin.",
-    "Fragen Sie nach den Kosten oder ob Ihre Versicherung die Behandlung bezahlt.",
-    "Fragen Sie nach möglichen Untersuchungen oder Behandlungen.",
+  [16, "A2-6.16", "E-Mail an Markus: Entspannung am Wochenende", "Ihr Freund Markus hat Sie gefragt, was Sie nach einer stressigen Arbeitswoche machen, um sich zu entspannen. Schreiben Sie eine kurze informelle E-Mail an Markus. Schreiben Sie 20–30 Wörter. Vergessen Sie nicht die passende Anrede und den Gruß am Ende.", [
+    "Sagen Sie, was Sie zur Entspannung machen (z. B. Sauna, Spaziergang, Yoga).",
+    "Erklären Sie, warum Ihnen diese Aktivität guttut.",
+    "Laden Sie Markus ein, nächstes Wochenende gemeinsam etwas zur Entspannung zu machen.",
   ]],
   [17, "A2-6.17", "E-Mail an eine Apotheke", "Sie möchten ein bestimmtes Medikament kaufen. Schreiben Sie eine E-Mail an eine Apotheke.", [
     "Erklären Sie kurz, warum Sie das Medikament benötigen.",

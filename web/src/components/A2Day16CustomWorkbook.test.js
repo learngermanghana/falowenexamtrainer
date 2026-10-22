@@ -26,7 +26,7 @@ describe("A2 Day 16 and Day 19 complete workbooks", () => {
   });
 
   it.each([
-    [16, "6.16", "Wohlbefinden und Entspannung", "1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G"],
+    [16, "6.16", "Wohlbefinden und Entspannung", "a2/day-16/day-16.mp3"],
     [19, "7.19", "Einkaufen? Wo und wie?", "1OsT5j6Y7a-rMdB0HlRJJ98gTgSvxm_LB"],
   ])("retains A2 Day %i reading, listening and marking through the canonical task banks", (day, chapter, title, audioId) => {
     const source = day === 16 ? day16 : day19;
@@ -41,7 +41,12 @@ describe("A2 Day 16 and Day 19 complete workbooks", () => {
     expect(reading.text.length).toBeGreaterThan(150);
     expect(reading.questions).toHaveLength(5);
     expect(listening).toMatchObject({ chapter, mode: A2_LISTENING_MODES.GRADED });
-    expect(listening.audioUrl).toContain(audioId);
+    if (day === 16) {
+      expect(listening.audioKey).toBe(audioId);
+      expect(listening.audioUrl).toBe("");
+    } else {
+      expect(listening.audioUrl).toContain(audioId);
+    }
     expect(listening.questions).toHaveLength(5);
     expect(profile.sections.reading).toMatchObject({ visible: true, submitRequired: true });
     expect(profile.sections.part4).toMatchObject({ visible: true, submitRequired: true, contentType: "listening" });
@@ -50,11 +55,13 @@ describe("A2 Day 16 and Day 19 complete workbooks", () => {
     );
   });
 
-  it("keeps Day 16 speaking and the doctor-writing assignment", () => {
-    ["Körperliches Wohlbefinden", "Mentales Wohlbefinden", "Krankheiten &amp; Symptome", "E-Mail an einen Arzt wegen Ihrer Gesundheit"].forEach((label) => {
+  it("keeps Day 16 speaking and the updated informal Markus writing assignment", () => {
+    ["Körperliches Wohlbefinden", "Mentales Wohlbefinden", "Krankheiten &amp; Symptome", "E-Mail an Markus"].forEach((label) => {
       expect(day16).toContain(label);
     });
     expect(getA2ReadingTask(16).text).toContain("Yoga am Abend");
+    expect(day16).toContain("Lieber Markus");
+    expect(day16).not.toContain("Sehr geehrte Damen und Herren");
   });
 
   it("keeps Day 19 shopping practice and consumption listening", () => {
