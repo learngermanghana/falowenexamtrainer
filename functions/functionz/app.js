@@ -28,6 +28,7 @@ const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } =
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
+const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -1168,13 +1169,16 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       });
     }
 
-    // Validate the exact released manifest before issuing a time-limited R2 URL.
-    // Existing legacy audio remains playable, but guessed future mock keys do not.
-    if (!(await isReleasedMockHoerenAudio({ db, ...validated }))) {
-      return res.status(404).json({ error: "Mock Hören recording is not published." });
-    }
-
+    // Check the server-owned publication manifest, or the precisely
+    // teacher-approved Mock 3 recordings after verifying their actual R2
+    // bytes. This NEVER releases an arbitrary upload or folder prefix.
+    const released = await isReleasedMockHoerenAudio({ db, ...validated });
     const signed = await createA2MockAudioSignedUrl(validated);
+    if (!released && !(await verifyTeacherApprovedA2Mock3Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "This Mock Hören audio is not verified or published." });
+    }
     res.set("Cache-Control", "private, no-store");
     return res.json({
       url: signed.url,
