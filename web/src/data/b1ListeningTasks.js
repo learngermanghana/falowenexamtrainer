@@ -92,12 +92,12 @@ export const B1_LISTENING_TASKS = Object.freeze({
     ],
   }),
   6: task({
-    title: "Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen.",
-    instructions: "Watch the embedded video and listen for information about WGs, family houses, city apartments and sustainable housing.",
-    embedUrl: "https://www.youtube.com/embed/6zpR_jF26l0",
-    videoTitle: "B1 Day 6 Hören video",
+    title: "Leben in der Stadt oder auf dem Land? · Hören",
+    instructions: "Lesen Sie zuerst die fünf Fragen. Hören Sie dann das Gespräch zwischen Lisa und Jonas zweimal. Achten Sie auf Kulturangebote, Nachbarschaft, Natur, Arbeitsweg und Mieten.",
+    audioKey: "b1/day-06/day-06.mp3",
+    videoTitle: "B1 Tag 6 · Stadt oder Land? · Gespräch",
     submitRequired: true,
-    submissionNote: "Submit only answer letters, for example: 1B, 2A, 3C.",
+    submissionNote: "Reichen Sie nur die fünf Antwortbuchstaben im Submit-Tab ein, zum Beispiel: 1B, 2A, 3B, 4A, 5C.",
     questions: B1_DAY6_LISTENING_QUESTIONS,
   }),
   7: task({
