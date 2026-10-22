@@ -97,9 +97,9 @@ const historicalPromptChecks = [
     day: 16,
     file: "A2Day16WohlbefindenUndEntspannungWorkbookPage.js",
     markers: [
-      "Sie möchten einen Arzt wegen Ihrer Gesundheit kontaktieren.",
-      "Fragen Sie nach einem Termin",
-      "Fragen Sie nach den Kosten oder ob Ihre Versicherung die Behandlung abdeckt.",
+      "E-Mail an Markus",
+      "Lieber Markus",
+      "Entspannung und Einladung am Wochenende",
     ],
   },
   {
