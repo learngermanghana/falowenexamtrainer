@@ -22,7 +22,7 @@ test("B1-2.6 Hören has exactly five dialogue-grounded questions and answers", (
   assert.deepEqual(Object.values(entry.answers.teil4), expected);
   assert.equal(Object.keys(entry.answers.teil3).length, 5, "Reading key is preserved");
   const source = read("../web/src/data/b1Day6WorkbookData.js");
-  assert.equal((source.match(/stem: "[1-5]\\. /g) || []).filter(() => true).length >= 5, true);
+  assert.equal((source.match(/stem: "/g) || []).length, 10, "five Lesen and five Hören questions remain");
   for (const answer of expected) assert.ok(source.includes(answer), `Question option absent: ${answer}`);
   assert.doesNotMatch(source, /Passivhäuser|Mehrfamilienhäusern|Haushaltsgeräten/);
 });
@@ -32,7 +32,7 @@ test("B1 Day 6 uses signed R2 media in the canonical workbook and removes YouTub
   assert.deepEqual(validateB1AudioKey({day:6,key}), {day:6,key});
   const task = read("../web/src/data/b1ListeningTasks.js");
   const day6 = task.slice(task.indexOf("  6: task({"), task.indexOf("  7: task({"));
-  assert.match(day6, /audioKey: "b1\\/day-06\\/day-06\\.mp3"/);
+  assert.ok(day6.includes('audioKey: "b1/day-06/day-06.mp3"'));
   assert.doesNotMatch(day6, /youtube|6zpR_jF26l0|embedUrl:/i);
   for(const file of ["B1Day6StadtOderLandWorkbookPage.js","B1Day6StadtOderLandWorkbookPageV2.js"]) {
     const source = read(`../web/src/components/${file}`);
