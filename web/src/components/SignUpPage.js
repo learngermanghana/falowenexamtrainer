@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { buildApplicationSupportMessage } from "../lib/applicationSupportMessage";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import SignUpPageLegacy from "./SignUpPageLegacy";
 import LegalFooter from "./LegalFooter";
@@ -225,15 +226,19 @@ const classNameFromQuery = () => {
   return enquiryMatch ? `${enquiryMatch[1].toUpperCase()} Upcoming live class` : "";
 };
 
-const ResumePanel = ({ draft }) => {
-  const context = useMemo(() => getPublicFunnelContext(), []);
-  const message = encodeURIComponent(
-    `Hello Falowen, I started an application but have not finished it.${
-      draft?.name ? ` My name is ${draft.name}.` : ""
-    }${draft?.level ? ` Level: ${draft.level}.` : ""}${
-      draft?.className ? ` Class: ${draft.className}.` : ""
-    }${context.video ? ` I came from YouTube lesson ${context.video}.` : ""} Please help me continue.`
-  );
+const ResumePanel = ({ draft, rootRef }) => {
+  const [problem, setProblem] = useState("");
+  const supportUrl = () => {
+    const form = rootRef.current?.querySelector("form");
+    const current = form ? readFormDraft(form) : draft;
+    return `https://wa.me/233205706589?text=${encodeURIComponent(buildApplicationSupportMessage({
+      ...current,
+      step: form?.dataset.signupStep,
+      error: form?.dataset.signupError,
+      problem,
+    }))}`;
+  };
+  const message = supportUrl().split("?text=")[1];
 
   return (
     <aside
@@ -251,15 +256,24 @@ const ResumePanel = ({ draft }) => {
       <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}>
         Your non-password details are saved on this device. Continue below or ask us to help you finish.
       </p>
+      <label style={{ display: "grid", gap: 6 }}>
+        What do you need help with? (optional)
+        <textarea value={problem} onChange={(event) => setProblem(event.target.value)}
+          maxLength={600} rows={2} placeholder="For example: I cannot choose a class, or Continue does not work. Do not include passwords."
+          style={{ padding: 10, border: "1px solid #cbd5e1", borderRadius: 8 }} />
+      </label>
       <a
         href={`https://wa.me/233205706589?text=${message}`}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() =>
+        onClick={(event) => {
+          // Read at click time: draft autosave can lag behind typing, validation
+          // errors and moving between steps.
+          event.currentTarget.href = supportUrl();
           trackPublicFunnelEvent("incomplete_application_whatsapp_click", {
-            level: draft?.level || context.level || "",
-          })
-        }
+            level: findLevelSelect(rootRef.current?.querySelector("form"))?.value || draft?.level || "",
+          });
+        }}
         style={{
           width: "fit-content",
           padding: "9px 12px",
@@ -270,7 +284,7 @@ const ResumePanel = ({ draft }) => {
           fontWeight: 900,
         }}
       >
-        Continue on WhatsApp
+        Contact Admissions Support on WhatsApp
       </a>
     </aside>
   );
@@ -413,7 +427,7 @@ export default function SignUpPage(props) {
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
       <SignUpPageLegacy {...props} />
-      {mount && draft ? createPortal(<ResumePanel draft={draft} />, mount) : null}
+      {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
   );
