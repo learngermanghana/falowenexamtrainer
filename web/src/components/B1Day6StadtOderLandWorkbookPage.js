@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
@@ -19,7 +20,6 @@ import {
 } from "../data/b1Day6WorkbookData";
 import { styles } from "../styles";
 
-const YOUTUBE_EMBED_URL = "https://www.youtube.com/embed/6zpR_jF26l0";
 const card = { ...styles.card, display: "grid", gap: 14 };
 const title = { margin: 0, fontSize: "1.15rem" };
 const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
@@ -113,16 +113,9 @@ const B1Day6PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
         <section style={card}>
           <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
           <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C.">
-            <p style={{ margin: 0 }}>Watch the embedded video and listen for information about WGs, family houses, city apartments and sustainable housing.</p>
+            <p style={{ margin: 0 }}>Hören Sie das Gespräch zwischen Lisa und Jonas. Achten Sie auf die Vor- und Nachteile von Stadt und Land.</p>
           </WorkbookTaskCard>
-          <iframe
-            src={YOUTUBE_EMBED_URL}
-            title="B1 Day 6 Hören video"
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 12 }}
-          />
+          <B1ProtectedAudioPlayer day={6} audioKey="b1/day-06/day-06.mp3" title="B1 · Stadt oder Land? · Gespräch" />
           <QuestionList items={B1_DAY6_LISTENING_QUESTIONS} />
           <WorkbookSubmissionReminder />
           <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
