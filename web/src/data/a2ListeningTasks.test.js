@@ -37,7 +37,8 @@ describe("A2 listening tasks", () => {
       "Was macht Max, um abends besser zu schlafen?",
       "Wo treffen sich Lena und Max am Samstag?",
     ]);
-    expect(task.questions.map((q, i) => q.options[({ B: 1, A: 0, C: 2 })["BACBA"[i]].slice(0, 1))).toEqual(["B", "A", "C", "B", "A"]);
+    const answerOptionIndexes = [1, 0, 2, 1, 0];
+    expect(task.questions.map((q, i) => q.options[answerOptionIndexes[i]].slice(0, 1))).toEqual(["B", "A", "C", "B", "A"]);
     expect(task.task).toContain("Lena und Max");
   });
 
