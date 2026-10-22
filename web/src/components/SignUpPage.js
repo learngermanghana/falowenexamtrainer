@@ -5,7 +5,6 @@ import SignUpPageLegacy from "./SignUpPageLegacy";
 import LegalFooter from "./LegalFooter";
 import { classCatalog } from "../data/classCatalog";
 import {
-  followUpIso,
   getPublicFunnelContext,
   rememberPublicFunnelContext,
   submitPublicLead,
@@ -382,28 +381,12 @@ export default function SignUpPage(props) {
       const next = readFormDraft(form);
       writeDraft(next);
       setDraft(next);
-      const context = getPublicFunnelContext();
+      // An attempted form submission is not a registered account.
+      // The confirmed-registration lead is sent by handleAccountCreated only.
       trackPublicFunnelEvent("application_submit", {
         level: next.level,
         className: next.className,
       });
-      submitPublicLead({
-        id: `application_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        createdAt: new Date().toISOString(),
-        source: "public-application",
-        status: "application_submitted",
-        name: next.name,
-        email: next.email,
-        phone: next.phone,
-        level: next.level,
-        className: next.className,
-        classSlug: slugify(next.className),
-        learningMode: next.learningMode,
-        paymentStatus: "pending",
-        followUpCount: 0,
-        nextFollowUpAt: followUpIso(24),
-        attribution: context,
-      }).catch(() => {});
     };
 
 
@@ -423,10 +406,39 @@ export default function SignUpPage(props) {
     };
   }, []);
 
+  const handleAccountCreated = (details = {}) => {
+    if (createdRef.current) return;
+    createdRef.current = true;
+    window.localStorage.removeItem(DRAFT_KEY);
+    setDraft(null);
+    trackPublicFunnelEvent("account_created");
+    // Do not label a failed submission as completed. This record is sent only
+    // once both Firebase Authentication and Firestore profile creation succeed.
+    // A no-cors lead request cannot prove remote storage success.
+    void submitPublicLead({
+      id: `application_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      createdAt: new Date().toISOString(),
+      source: "public-application",
+      status: "registered",
+      studentCode: details.studentCode,
+      name: details.name,
+      email: details.email,
+      phone: details.phone,
+      level: details.level,
+      className: details.className,
+      classSlug: slugify(details.className),
+      learningMode: details.learningMode,
+      paymentStatus: "pending",
+      followUpCount: 0,
+      nextFollowUpAt: "",
+      attribution: getPublicFunnelContext(),
+    }).catch(() => {});
+  };
+
   return (
     <div ref={rootRef} className="signup-page-mobile-safe">
       <style>{MOBILE_INPUT_CSS}</style>
-      <SignUpPageLegacy {...props} />
+      <SignUpPageLegacy {...props} onAccountCreated={handleAccountCreated} />
       {mount && draft ? createPortal(<ResumePanel draft={draft} rootRef={rootRef} />, mount) : null}
       <LegalFooter />
     </div>
