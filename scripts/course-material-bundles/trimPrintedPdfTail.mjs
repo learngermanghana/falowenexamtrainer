@@ -48,7 +48,7 @@ const renderPageToGrayscale = (file, pageNumber, cropInterior = false) => {
     execFileSync("pdftoppm", [
       "-f", String(pageNumber), "-l", String(pageNumber),
       "-scale-to", "420", "-gray", "-singlefile",
-      ...(cropInterior ? ["-x", "60", "-y", "100", "-W", "180", "-H", "220"] : []),
+      ...(cropInterior ? ["-x", "60", "-y", "140", "-W", "180", "-H", "180"] : []),
       file, prefix,
     ], { maxBuffer: 1024 * 1024, timeout: 20000 });
     return fs.readFileSync(prefix + ".pgm");
