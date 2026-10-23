@@ -86,10 +86,14 @@ test("A1-0.2 Teil 2 keeps five numbered listening answer blanks and no saved val
   const blank = capture.replacement;
   assert.equal(blank.getAttribute("data-a1-pdf-draft-answer-space"), "teil-2");
   assert.equal(blank.children.length, 6); // section heading + 5 question rows
+  assert.match(blank.style.cssText, /break-inside:avoid-page/);
+  assert.match(blank.style.cssText, /page-break-inside:avoid/);
+  assert.match(blank.style.cssText, /gap:6px/);
   assert.deepEqual(blank.children.slice(1).map((row) => row.children[0].textContent), [
     "Question 1", "Question 2", "Question 3", "Question 4", "Question 5",
   ]);
   assert.ok(blank.children.slice(1).every((row) => row.children[1].getAttribute("data-a1-pdf-answer-rule") === ""));
+  assert.ok(blank.children.slice(1).every((row) => /height:19px/.test(row.children[1].style.cssText)));
   assert.ok(inputs.every((input) => input.value === ""));
 });
 
@@ -128,4 +132,18 @@ test("Chapter 3 native selects clear selectedIndex, value and option selections"
   assert.equal(b.selected, false);
   assert.equal(b.defaultSelected, false);
   assert.equal(b.getAttribute("selected"), null);
+});
+
+
+test("Ten short answers retain pagination flexibility without losing individual blanks", () => {
+  const root = new Element("MAIN");
+  const capture = new Element("SECTION");
+  capture.setAttribute("data-a1-tutor-draft-capture", "teil-1");
+  const fields = Array.from({ length: 10 }, () => new Element("INPUT"));
+  capture.mapping['input[type="text"],input:not([type])'] = fields;
+  root.mapping['[data-a1-tutor-draft-capture]'] = [capture];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  const blank = capture.replacement;
+  assert.equal(blank.children.length, 11);
+  assert.doesNotMatch(blank.style.cssText, /page-break-inside:avoid/);
 });
