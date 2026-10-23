@@ -76,6 +76,14 @@ export const sanitizeA1PrintDocument = () => {
     }
   }
 
+  for (const control of root.querySelectorAll("input[type=checkbox],input[type=radio]")) {
+    control.checked = false;
+    control.removeAttribute("checked");
+  }
+  for (const prompt of root.querySelectorAll(".a1-day20-write-here__prompt span")) {
+    prompt.textContent = "Write your answer on the lines below.";
+  }
+
   for (const node of [...root.querySelectorAll("button,span,p,small,a")]) {
     if (node.children.length) continue;
     const value = normalize(node.textContent);
