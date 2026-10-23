@@ -25,7 +25,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     14: [{ chapter: "5.14", topic: "Beruf und Karriere", tutor_lecture_video: "https://youtu.be/peuEAMRsFKI" }],
     15: [{ chapter: "6.15", tutor_lecture_video: "" }],
     16: [{ chapter: "6.16", topic: "Wohlbefinden und Entspannung", tutor_lecture_video: "https://youtu.be/WZVEQ9jRONw" }],
-    17: [{ chapter: "6.17", tutor_lecture_video: "" }],
+    17: [{ chapter: "6.17", topic: "In die Apotheke gehen", tutor_lecture_video: "https://youtu.be/5pHPl8onjj0" }],
     18: [{ chapter: "7.18", tutor_lecture_video: "" }],
     19: [{ chapter: "7.19", tutor_lecture_video: "" }],
     20: [{ chapter: "7.20", tutor_lecture_video: "" }],
