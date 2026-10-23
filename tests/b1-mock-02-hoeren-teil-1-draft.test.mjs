@@ -19,3 +19,12 @@ test("Draft does not silently claim recorded audio has the revised instructions"
  assert.match(draft.audioVerification,/not independently checked/i);
  assert.ok(draft.issuesToResolveBeforeStudentPublication.some(x=>x.includes("introduction")));
 });
+
+test("uploaded recording QA is recorded but does not authorize student release",()=>{
+ assert.equal(draft.audioReview.durationSeconds,333.624);
+ assert.equal(draft.audioReview.fullSequenceRepetitionCount,2);
+ assert.equal(draft.audioReview.secondPassStartSecondsApprox,169.78);
+ assert.equal(draft.audioReview.playbackReadyForStudentRelease,false);
+ assert.match(draft.audioReview.observedRecordedIntroduction,/eine Aufgabe/);
+ assert.match(draft.audioReview.blocker,/mislead learners/);
+});
