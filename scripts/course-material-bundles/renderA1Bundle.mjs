@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
-import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage } from "./a1PdfAuthState.mjs";
+import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage, matchesA1PdfCourseRoute } from "./a1PdfAuthState.mjs";
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -110,24 +110,32 @@ const waitForAuthenticatedCoursePage = async (page, url, timeout = 16000) => {
   const expected = new URL(url);
   try {
     await page.waitForFunction(({ origin, pathname }) => {
-      const normalizePath = (value) => String(value || "").replace(/\/+$/, "");
+      const normalizePath = (value) => String(value || "/").replace(/\/+$/, "") || "/";
+      const current = new URL(window.location.href);
+      const intended = new URL(origin);
+      const allowed = new Set(["falowen.app", "www.falowen.app"]);
+      const sameOrigin = current.origin === intended.origin;
+      const sameCanonicalApp = current.protocol === "https:"
+        && intended.protocol === "https:"
+        && allowed.has(current.hostname)
+        && allowed.has(intended.hostname);
       const body = String(document.body?.innerText || "").replace(/\s+/g, " ").trim();
       const main = String(document.querySelector("main")?.innerText || "").replace(/\s+/g, " ").trim();
       const publicShell = /German and French learning in one place|Ready to start learning\?|Create your Falowen account|Connect with your account|Returning Falowen student|Email or student code/i;
       const badScreen = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i;
-      return window.location.origin === origin
-        && normalizePath(window.location.pathname) === normalizePath(pathname)
+      return (sameOrigin || sameCanonicalApp)
+        && normalizePath(current.pathname) === normalizePath(pathname)
         && main.length >= 120
         && !/^Loading the app[.…]*/i.test(main)
         && !publicShell.test(body)
         && !badScreen.test(body);
     }, { origin: expected.origin, pathname: expected.pathname }, { timeout });
-    return true;
+    // Node-side route classifier independently checks origin + path.
+    return matchesA1PdfCourseRoute(page.url(), url);
   } catch {
     return false;
   }
 };
-
 const waitForCourseHydration = async (page, day, kind) => {
   // For tab changes, we are already on an authenticated page. Confirm that
   // a panel still has readable content; the route opener checks authentication.
@@ -274,7 +282,8 @@ const ensureInternalPage = async (page, target, day) => {
 
     if (!isRetryableA1PdfCoursePage(state)) {
       throw new Error("A1 Day " + day + " " + target.kind + " course route cannot render: " +
-        state + " (path " + lastPath + ")");
+        state + " (requested " + new URL(url).origin + new URL(url).pathname +
+        ", resolved " + new URL(page.url()).origin + lastPath + ")");
     }
 
     // If a login form is still actually visible, re-authenticate only once.
