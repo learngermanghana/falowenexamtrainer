@@ -26,6 +26,36 @@ export const sanitizeA1PrintDocument = () => {
     return block;
   };
 
+  // Day 19's CourseSpeakingMockAssignment uses a separate [data-speaking-mock]
+  // root and can show recovered scores, transcripts, feedback and session IDs.
+  // Replace the entire mock (including its nested live session), never just
+  // individual result labels. Preserve independent, non-personal A1 prompts.
+  const speakingMock = root.matches?.("[data-speaking-mock]")
+    ? root : root.querySelector("[data-speaking-mock]");
+  if (speakingMock) {
+    speakingMock.replaceChildren();
+    speakingMock.setAttribute("data-a1-pdf-speaking-prompt", "true");
+    const heading = document.createElement("h1");
+    heading.textContent = "Goethe A1 · Sprechen üben";
+    const introduction = document.createElement("p");
+    introduction.textContent = "Partnerübung: Arbeiten Sie zu zweit. Stellen Sie Fragen, antworten Sie in ganzen Sätzen und üben Sie höfliche Bitten. Diese Druckversion zeigt keine persönlichen Prüfungsergebnisse oder gespeicherten Sitzungen.";
+    speakingMock.append(heading, introduction);
+    const prompts = [
+      ["Teil 1 · Sich vorstellen", "Sagen Sie Ihren Namen, Ihr Alter, Ihren Wohnort, Ihren Beruf und Ihre Sprachen. Buchstabieren Sie Ihren Familiennamen und nennen Sie eine Telefonnummer."],
+      ["Teil 2 · Fragen und Antworten", "Stellen Sie Fragen zu alltäglichen Themen wie Familie, Freizeit, Einkaufen oder Arbeit. Ihr Partner antwortet. Danach tauschen Sie die Rollen."],
+      ["Teil 3 · Bitten und Reagieren", "Bitten Sie Ihren Partner höflich um einen Gegenstand oder um Hilfe. Antworten Sie auf die Bitte mit einem ganzen Satz."],
+    ];
+    for (const [title, instruction] of prompts) {
+      const section = document.createElement("section");
+      section.style.cssText = "margin:14px 0;break-inside:avoid";
+      const h2 = document.createElement("h2"); h2.textContent = title;
+      const p = document.createElement("p"); p.textContent = instruction;
+      section.append(h2, p, makeWritingSpace("Stichwörter / Notizen", 3));
+      speakingMock.append(section);
+    }
+    return;
+  }
+
   // These panels load personal letters and marking feedback from Firestore.
   // Replace the complete widget; do not merely hide buttons or clear textarea.
   for (const panel of [...root.querySelectorAll('[data-a1-course-book-letter-practice]')]) {
@@ -33,9 +63,66 @@ export const sanitizeA1PrintDocument = () => {
     panel.replaceWith(makeWritingSpace(taskType === "formal" ? "Formeller Brief · Ihre Antwort" : "Informeller Brief · Ihre Antwort", 10));
   }
 
-  // Tutor draft widgets can display locally cached submissions and marks.
-  // The public workbook keeps the original question choices and prompts.
-  for (const panel of [...root.querySelectorAll('[data-a1-tutor-draft-capture]')]) remove(panel);
+  // Preserve printable response space for the real exercise. A1-0.2 Teil 2
+  // gets all five short-answer controls here; A1-1.1 Teil 2 gets its writing
+  // textarea here. Removing this whole panel would produce unanswerable pages.
+  // Reconstruct ONLY neutral labels, static option texts, and empty lines.
+  for (const panel of [...root.querySelectorAll('[data-a1-tutor-draft-capture]')]) {
+    const sectionKey = normalize(panel.getAttribute("data-a1-tutor-draft-capture"));
+    const label = /^teil-\d+$/i.test(sectionKey)
+      ? "Teil " + sectionKey.replace(/^teil-/i, "") : "Antworten";
+    const shortInputs = [...panel.querySelectorAll('input[type="text"],input:not([type])')];
+    const textareas = [...panel.querySelectorAll("textarea")];
+    const fallbackChoices = [...panel.querySelectorAll("fieldset")];
+
+    // A progress-only wrapper has no answer controls to preserve.
+    if (!shortInputs.length && !textareas.length && !fallbackChoices.length) {
+      remove(panel);
+      continue;
+    }
+
+    const printable = document.createElement("section");
+    printable.setAttribute("data-a1-pdf-draft-answer-space", sectionKey);
+    printable.style.cssText = "display:grid;gap:12px;margin:14px 0;padding:12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d";
+    const heading = document.createElement("h3");
+    heading.textContent = label + " · Antworten";
+    printable.append(heading);
+
+    for (const [index, input] of shortInputs.entries()) {
+      const sourceNumber = normalize(input.closest?.("label")?.querySelector("span")?.textContent);
+      const questionLabel = /^Question\s+\d+$/i.test(sourceNumber)
+        ? sourceNumber : "Question " + (index + 1);
+      const row = document.createElement("div");
+      row.style.cssText = "break-inside:avoid";
+      const prompt = document.createElement("strong");
+      prompt.textContent = questionLabel;
+      const rule = document.createElement("div");
+      rule.setAttribute("data-a1-pdf-answer-rule", "");
+      rule.style.cssText = "height:28px;border-bottom:1px solid #94a3b8";
+      row.append(prompt, rule);
+      printable.append(row);
+    }
+
+    for (const fieldset of fallbackChoices) {
+      const legendText = normalize(fieldset.querySelector("legend")?.textContent);
+      const headingText = /^Question\s+\d+$/i.test(legendText) ? legendText : "Choose one answer";
+      const row = document.createElement("div");
+      row.style.cssText = "break-inside:avoid";
+      const title = document.createElement("strong");
+      title.textContent = headingText;
+      const choices = document.createElement("p");
+      const optionTexts = [...fieldset.querySelectorAll('input[type="radio"]')]
+        .map((input) => normalize(input.getAttribute("value") || input.value))
+        .filter((value) => value.length > 0 && value.length <= 24);
+      choices.textContent = optionTexts.length
+        ? optionTexts.map((value) => "□ " + value).join("    ") : "□ A    □ B    □ C";
+      row.append(title, choices);
+      printable.append(row);
+    }
+
+    if (textareas.length) printable.append(makeWritingSpace(label + " · Schreiben", 8));
+    panel.replaceWith(printable);
+  }
 
   // Recording/checkpoint panels contain saved scores, private recordings,
   // personalised transcripts and live session controls, not printable prompts.
@@ -76,6 +163,25 @@ export const sanitizeA1PrintDocument = () => {
     }
   }
 
+  // Native select elements are printed by Chromium with the last controlled
+  // selected option unless reset explicitly. Clear both DOM state and markup.
+  for (const select of root.querySelectorAll("select")) {
+    for (const option of select.options) {
+      option.selected = false;
+      option.defaultSelected = false;
+      option.removeAttribute("selected");
+    }
+    select.selectedIndex = -1;
+    select.value = "";
+  }
+  // Some workbook choices are styled spans instead of form controls.
+  for (const choice of root.querySelectorAll('[data-a1-clickable-answer], [role="radio"]')) {
+    choice.setAttribute("aria-checked", "false");
+    choice.style?.setProperty("background", "#fff", "important");
+    choice.style?.setProperty("border-color", "#cbd5e1", "important");
+    choice.style?.setProperty("color", "#0f172a", "important");
+  }
+
   for (const control of root.querySelectorAll("input[type=checkbox],input[type=radio]")) {
     control.checked = false;
     control.removeAttribute("checked");
@@ -102,7 +208,7 @@ export const findA1PrintPrivacyLeaks = (text = "") => {
   const patterns = [
     ["class contributions", /Class contributions/i],
     ["class discussion save", /Save to class discussion/i],
-    ["saved speaking session", /Loading speaking practice|Check completed speaking Teils|speaking access and saved session/i],
+    ["saved speaking session", /Loading speaking practice|Check completed speaking Teils|speaking access and saved session|Saved speaking work|Your Teil scores|Session:\s*\S+|Download saved work for tutor review|Your result is saved/i],
     ["student draft or submission", /Assignment draft\s*[·•-]\s*Not submitted|Draft saved on this device|Use the Mark My Letter box above|saved into this assignment draft/i],
     ["interactive marking widget", /Mark My (?:Formal|Informal|Weather) Letter|Clear practice draft/i],
   ];
