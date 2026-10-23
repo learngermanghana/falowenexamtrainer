@@ -27,6 +27,12 @@ The A1 PDF renderer accepts only the exact requested lesson path on `www.falowen
 
 Day 18's outdated Chapter 12.2 and externally hosted PDFs were removed from the A1 render plan; the live merged Chapter 12.1 grammar and workbook are now printed from the canonical Course Book route.
 
+### Authenticated lesson readiness and listening in print
+
+Before printing each A1 target, the exporter now waits for visible lazy-loaded lesson panels to replace exact `Loading…` indicators, with up to three bounded page retries. If no lesson appears it **fails the job with the day and section**, rather than creating a misleading PDF. The completed PDF validator also rejects `Loading…` and `Audio wird geladen …` text.
+
+Printed audio widgets are replaced by a **QR code to the authenticated Falowen course lesson** (a sign-in is required). The generated link strips the print-only `radio=done` query parameter and never exposes expiring Cloudflare R2 URLs. This is a **student workbook companion link**, not a public audio product for Amazon. The PDF rendering pass also suppresses web-only video panels and draft-save UI, while preserving actual answer options and writing inputs.
+
 ### A1 export preflight
 
 The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
