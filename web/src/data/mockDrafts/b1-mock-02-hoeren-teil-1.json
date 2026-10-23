@@ -12,7 +12,7 @@
   "expectedPlaysPerText": 2,
   "scoredQuestionCount": 10,
   "audioObjectKey": "b1/mock-hoeren/mock-02/teil-1.mp3",
-  "audioVerification": "Teacher supplied R2 object details URL. MP3 content, introductions, repeated plays, and signed playback not independently checked.",
+  "audioVerification": "Uploaded MP3 independently checked for technical properties and an entire repeated second pass (5:33.624 total; second pass begins ~2:49.78). Exact spoken instruction remains inconsistent with ten draft questions; no live protected R2 playback test performed.",
   "example": {
     "recording": "Hallo Anna, hier ist Stefan. Du, ich habe gestern die Tickets für unseren Zug nach München am nächsten Freitag gebucht. Wir fahren doch um acht Uhr früh, oder? Ich muss nur noch wissen, ob wir uns direkt am Hauptbahnhof Gleis zwölf treffen oder ob ich dich vorher noch zu Hause abhole. Ruf mich bitte kurz zurück!",
     "questions": [
@@ -292,10 +292,24 @@
   ],
   "teacherReviewRequired": true,
   "issuesToResolveBeforeStudentPublication": [
-    "The already recorded introduction says one task per text and Richtig/Falsch only; the official B1 format requires two tasks per text and two plays. Re-record or correct the introduction and verify repetitions in the MP3.",
-    "The supplied source transcript contains the joined word 'Samstagnehmen'; check whether the generated audio pronounces 'Samstag nehmen' correctly.",
-    "The supplied example narration says 'Das Beispiel ist Falsch' but does not introduce the second sample question; confirm the example presentation is consistent.",
-    "Verify actual protected R2 playback and spoken content before any publishedMockHoerenAudio manifest release.",
-    "Register verified answers in the server-side mock scoring engine; a teacher draft does not create a student route or verified result."
-  ]
+    "The MP3's spoken introduction says one Richtig/Falsch task per text, and the worked example explains only Falsch. Record a corrected Goethe B1 two-task introduction/example before releasing this ten-question draft, or explicitly downgrade to five-question nonstandard practice rather than mislabeling it as a full B1 Teil 1.",
+    "The uploaded 5:33.624 MP3 repeats the entire sequence starting at ~2:49.78. Do not enable app-level repeated playback: it already plays twice.",
+    "Confirm the exact MP3 now uploaded to private R2 matches the supplied attachment and that protected, signed playback works end to end.",
+    "Have the teacher approve all ten item wordings, distractors, and answers after listening to the recording.",
+    "Register the verified key server-side as part of a separate B1 Mock 2 engine; no validated four-skill results or student route should be declared based on this draft."
+  ],
+  "audioReview": {
+    "source": "Teacher-provided MP3 attachment teil-1(1).mp3 and verbatim transcript, October 23, 2026",
+    "durationSeconds": 333.624,
+    "bitrateBitsPerSecond": 96000,
+    "fullSequenceRepetitionCount": 2,
+    "secondPassStartSecondsApprox": 169.78,
+    "repeatAnalysis": "A waveform correlation check confirms that the entire introduction + example + five recordings is repeated once after about 2:49.78; the second pass closely matches the first (Pearson correlation approx. 0.9997 across the overlapping audio).",
+    "observedRecordedIntroduction": "Sie hören fünf kurze Nachrichten und Ansagen. Zu jedem Text lösen Sie eine Aufgabe. Wählen Sie: Ist die Aussage richtig oder falsch?",
+    "recordedExampleExplanation": "Das Beispiel ist falsch.",
+    "draftQuestionFormat": "Two questions per text: one Richtig/Falsch and one multiple-choice.",
+    "playbackReadyForStudentRelease": false,
+    "blocker": "The audio tells learners to answer exactly one Richtig/Falsch question per text, and the spoken example addresses only one question. The 10-question Goethe-style draft would mislead learners unless the audio introduction and example are corrected (or a separate explicitly labelled practice format with five items is chosen). Protected R2 signed playback and exam scoring have not been verified.",
+    "recordingOrder": "The entire exam is repeated as a block, not each individual text immediately repeated. Do not repeat the whole MP3 again in the player."
+  }
 }
