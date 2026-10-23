@@ -23,6 +23,11 @@ on:
         required: true
         type: boolean
         default: true
+      press_preview:
+        description: Also create a Falowen Press editorial proof (NOT for sale)
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -76,6 +81,8 @@ jobs:
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/pdfNavigation.mjs
           node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
+          node --check scripts/course-material-bundles/validateA1RenderPlan.mjs
+          node --check scripts/course-material-bundles/buildPressProof.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
 
@@ -84,6 +91,7 @@ jobs:
         run: |
           npm install --no-save --package-lock=false pdf-lib@1.17.1
           node --test scripts/course-material-bundles/pdfNavigation.test.mjs
+          node --test scripts/course-material-bundles/buildPressProof.test.mjs
 
       - name: Build and validate manifest
         env:
@@ -219,6 +227,19 @@ jobs:
           path: artifacts/course-material-bundles/${{ inputs.level }}/Falowen-${{ inputs.level }}-Course-Materials.pdf
           if-no-files-found: error
           retention-days: 30
+
+      - name: Build Falowen Press editorial proof
+        if: ${{ inputs.build_pdf && inputs.press_preview }}
+        run: node scripts/course-material-bundles/buildPressProof.mjs "${{ inputs.level }}"
+
+      - name: Upload Falowen Press editorial proof
+        if: ${{ inputs.build_pdf && inputs.press_preview }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-${{ inputs.level }}-press-editorial-proof
+          path: artifacts/course-material-bundles/${{ inputs.level }}/Falowen-${{ inputs.level }}-Press-Editorial-Proof.pdf
+          if-no-files-found: error
+          retention-days: 14
 
       - name: Upload render diagnostics on failure
         if: ${{ failure() && inputs.build_pdf }}
