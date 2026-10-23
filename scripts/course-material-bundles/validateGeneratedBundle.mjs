@@ -3,6 +3,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
+import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -39,6 +40,13 @@ try {
   throw new Error(
     `Could not extract text from ${level} PDF with pdftotext: ${error instanceof Error ? error.message : String(error)}`,
   );
+}
+
+if (level === "A1") {
+  const audit = scanPdfPageContent(text, pdf.getPageCount());
+  if (audit.faults.length) {
+    throw new Error("A1 PDF preflight failed:\n" + audit.faults.join("\n"));
+  }
 }
 
 const forbidden = [
@@ -93,5 +101,5 @@ if (missing.length) {
 }
 
 console.log(
-  `${level} PDF validation passed: ${pdf.getPageCount()} pages, bookmarks present, clickable TOC present, no excluded UI text, expected section dividers present.`,
+  `${level} PDF validation passed: ${pdf.getPageCount()} pages, bookmarks present, clickable TOC present, no excluded UI text, expected section dividers present and page preflight checked.`,
 );
