@@ -22,7 +22,7 @@ test("current A1 print plan covers teaching Days 1–22 without final mock", () 
   const result = validateA1RenderPlan(plan, makeManifest());
   assert.equal(result.lessons, 22);
   assert.ok(result.targets >= 22);
-  assert.equal(result.externalPdfs, 2);
+  assert.equal(result.externalPdfs, 0);
 });
 
 test("rejects a final mock being treated as a printable Course Book lesson", () => {
@@ -54,4 +54,12 @@ test("allows only declared external PDF downloads from approved source pattern",
     url: "https://example.org/unverified.pdf",
   };
   assert.throws(() => validateA1RenderPlan(unsafe, makeManifest()), /unapproved external PDF/);
+});
+
+test("Day 18 exports live canonical Chapter 12.1 teaching and workbook", () => {
+  const lesson = plan.lessons.find((value) => value.day === 18);
+  assert.deepEqual(lesson.targets.map((target) => target.kind), ["grammar", "workbook"]);
+  assert.ok(lesson.targets.every((target) => target.url.includes("two-case-prepositions-wechselpraepositionen-day-18")));
+  assert.ok(lesson.targets.find((target) => target.kind === "workbook")?.url.includes("view=workbook"));
+  assert.ok(plan.lessons.every((item) => item.targets.every((target) => !/a1-12-2-dative-articles-mit-bei-zu/.test(target.url))));
 });
