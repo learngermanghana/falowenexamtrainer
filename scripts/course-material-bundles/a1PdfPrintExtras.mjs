@@ -1,7 +1,8 @@
 // This function runs inside Playwright's page.evaluate after the lesson's
 // required content has hydrated. It only changes the print page, not Falowen.
 export const prepareA1PrintDocument = ({ lessonUrl, qrDataUrl }) => {
-  const root = document.querySelector("main") || document.body;
+  const root = document.querySelector("[data-a1-speaking-confidence-lab]")
+    || document.querySelector("main") || document.body;
   const hide = (element) => element?.style?.setProperty("display", "none", "important");
   const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
 
