@@ -31,6 +31,8 @@ Day 18's outdated Chapter 12.2 and externally hosted PDFs were removed from the 
 
 The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
 
+The A1 printer inspects each just-rendered lesson section with `pdftotext` and low-resolution grayscale rasterization. Completely empty **trailing** print-overflow pages are removed before sections are merged, preserving bookmark and contents-page indices. Graphical pages and any interior blank pages are never deleted automatically. The web-only "Supporting materials", teacher-video actions and "Back to Course Book" navigation are hidden during PDF rendering, not removed from the student website.
+
 The final A1 PDF validator also rejects any page containing a React loading screen, application error, or footer-only/blank page. Do not distribute a PDF that fails this check. The existing PDF uploaded before this change is not repaired in place; regenerate using the GitHub workflow to obtain a new build.
 
 
