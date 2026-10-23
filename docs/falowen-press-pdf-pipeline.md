@@ -21,6 +21,13 @@ The A1 final mock must be managed independently in Exams Room. Do **not** invent
 4. Download the finished Falowen-LEVEL-course-materials-pdf artifact from the successful run.
 5. A1–B1 PDFs are checked for table-of-contents links, bookmarks, section dividers and excluded web UI. Failures upload diagnostic artifacts.
 
+### A1 export preflight
+
+The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
+
+The final A1 PDF validator also rejects any page containing a React loading screen, application error, or footer-only/blank page. Do not distribute a PDF that fails this check. The existing PDF uploaded before this change is not repaired in place; regenerate using the GitHub workflow to obtain a new build.
+
+
 Credentials are read from FALOWEN_PDF_EMAIL, FALOWEN_PDF_PASSWORD, or the supported session secret, never committed to this repo.
 
 ## Falowen Press editorial proof
