@@ -29,6 +29,8 @@ const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
+const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
+const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
 const { validateA1AudioKey, validateA1MockAudioKey, validateA1ExamHorenAudioKey, validateA2AudioKey, validateA2MockAudioKey, validateB1AudioKey, validateB1MockAudioKey, validateB2MockAudioKey, validateC1ExamHorenAudioKey, validateC2AudioKey, validateB2AudioKey, createA1AudioSignedUrl, createA1MockAudioSignedUrl, createA1ExamHorenAudioSignedUrl, createA2AudioSignedUrl, createA2MockAudioSignedUrl, createB1AudioSignedUrl, createB1MockAudioSignedUrl, createB2MockAudioSignedUrl, createC1ExamHorenAudioSignedUrl, createC2AudioSignedUrl, createB2AudioSignedUrl, hasCourseMediaStaffAccess, hasCourseMediaLevelAccess } = require("./r2CourseAudio");
@@ -1334,13 +1336,21 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
       });
     }
 
-    // Validate the exact released manifest before issuing a time-limited R2 URL.
-    // Existing legacy audio remains playable, but guessed future mock keys do not.
-    if (!(await isReleasedMockHoerenAudio({ db, ...validated }))) {
+    // B1 Mock 2 Hören-only practice uses four exact teacher-approved keys,
+    // verified against R2 before returning the student a signed URL.
+    const isApprovedMock2Part = validated.mockId === "mock-02" &&
+      B1_MOCK2_AUDIO[validated.part] === validated.key;
+    const released = await isReleasedMockHoerenAudio({ db, ...validated });
+    if (!released && !isApprovedMock2Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
 
     const signed = await createB1MockAudioSignedUrl(validated);
+    if (isApprovedMock2Part && !(await verifyB1Mock2Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "This B1 Mock 2 recording is not available yet." });
+    }
     res.set("Cache-Control", "private, no-store");
     return res.json({
       url: signed.url,
@@ -1358,6 +1368,72 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
     }
     console.error("Failed to create B1 mock audio playback URL", error);
     return res.status(500).json({ error: "Could not prepare this B1 mock audio right now." });
+  }
+});
+
+
+/**
+ * Private B1 Mock 2 listening practice. The ten Teil 1 items and twenty
+ * teacher-supplied items are scored against server-owned answer keys.
+ * Deliberately does not certify or finalize a four-skill B1 mock.
+ */
+async function requireB1Mock2PracticeAccess(req, res) {
+  const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+  if (!authedUser) return null;
+  const db = getFirestoreSafe();
+  if (!db) {
+    res.status(503).json({ error: "Student access service is unavailable." });
+    return null;
+  }
+  const student = (await findAuthedStudentProfile(db, authedUser))?.data || null;
+  const block = getB1MediaAccessBlockReason({ authedUser, student });
+  if (block) {
+    res.status(403).json({ error: "B1 mock practice is unavailable for this account.", code: block });
+    return null;
+  }
+  return { db, authedUser };
+}
+
+app.get("/b1-mock-02/hoeren/questions", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    res.set("Cache-Control", "private, no-store");
+    return res.json(publicB1Mock2Hoeren());
+  } catch (error) {
+    console.error("B1 Mock 2 Hören questions error", error);
+    return res.status(500).json({ error: "Could not load listening questions." });
+  }
+});
+
+app.post("/b1-mock-02/hoeren/score", async (req, res) => {
+  try {
+    const access = await requireB1Mock2PracticeAccess(req, res);
+    if (!access) return;
+    let result;
+    try { result = markB1Mock2Hoeren(req.body?.answers); }
+    catch { return res.status(400).json({ error: "Complete all 30 listening questions before submitting." }); }
+
+    const answers = Object.fromEntries(
+      Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b))
+    );
+    const attemptId = crypto.createHash("sha256")
+      .update(access.authedUser.uid + ":" + JSON.stringify(answers)).digest("hex").slice(0,40);
+    const ref = access.db.collection("b1Mock2HoerenResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId);
+    await ref.set({
+      uid:access.authedUser.uid,
+      email:access.authedUser.email ? String(access.authedUser.email).toLowerCase() : null,
+      level:"B1",mockId:"b1-mock-02",section:"hoeren",practiceOnly:true,
+      answers,correct:result.correct,total:result.total,percentage:result.percentage,
+      perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
+      submittedAt:admin.firestore.FieldValue.serverTimestamp()
+    },{merge:true});
+    res.set("Cache-Control", "private, no-store");
+    return res.json({...result,attemptId,practiceOnly:true,saved:true});
+  } catch (error) {
+    console.error("B1 Mock 2 Hören score error", error);
+    return res.status(503).json({ error: "Could not save the score. Your answers remain on this device; please retry." });
   }
 });
 
