@@ -230,6 +230,13 @@ const waitForA1PrintableContent = async (page, day, kind) => {
 const printA1Page = async (page, file, day, kind, lessonUrl) => {
   const printStyle = await injectPrintMode(page, kind);
   try {
+    // The Confidence Lab is a <div> containing a nested <main> for the
+    // live speaking mock. Wait for the outer lesson and use it as print root.
+    if (day === 19 && kind === "workbook") {
+      await page.locator('[data-a1-speaking-confidence-lab="true"]').waitFor({
+        state: "visible", timeout: 30000,
+      });
+    }
     // Remove private, asynchronous UI before the content-ready check. A live
     // saved speaking session must never block or enter a printable snapshot.
     await page.evaluate(sanitizeA1PrintDocument);
@@ -242,14 +249,16 @@ const printA1Page = async (page, file, day, kind, lessonUrl) => {
     companionUrl.searchParams.delete("radio");
     const qrDataUrl = audioCount ? await QRCode.toDataURL(companionUrl.toString(), { width: 132, margin: 1 }) : "";
     await page.evaluate(prepareA1PrintDocument, { lessonUrl: companionUrl.toString(), qrDataUrl });
-    const visibleText = await page.locator("main").first().innerText().catch(() => "");
+    const printRoot = page.locator('[data-a1-speaking-confidence-lab="true"]').first();
+    const lessonRoot = await printRoot.count() ? printRoot : page.locator("main").first();
+    const visibleText = await lessonRoot.innerText().catch(() => "");
     const leaked = findA1PrintPrivacyLeaks(visibleText);
     if (leaked.length) {
       // Fail closed; a PDF should never include other students' work.
       throw new Error("A1 Day " + day + " " + kind +
         " print privacy check failed: " + leaked.join(", "));
     }
-    const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
+    const mainText = String(visibleText).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
     }
