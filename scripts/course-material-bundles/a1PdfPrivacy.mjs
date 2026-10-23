@@ -83,7 +83,16 @@ export const sanitizeA1PrintDocument = () => {
 
     const printable = document.createElement("section");
     printable.setAttribute("data-a1-pdf-draft-answer-space", sectionKey);
-    printable.style.cssText = "display:grid;gap:12px;margin:14px 0;padding:12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d";
+    // The five Hören answers in A1-0.2 were orphaned across a page boundary:
+    // questions 1–4 on page 27 and question 5 alone on page 28. Keep modest
+    // short-answer groups together, with compact ruled lines; preserve larger
+    // mixed/ten-question groups' ability to span multiple pages.
+    const keepShortAnswersTogether = shortInputs.length > 0 && shortInputs.length <= 7
+      && !textareas.length && !fallbackChoices.length;
+    printable.style.cssText = "display:grid;gap:6px;margin:8px 0;padding:8px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#172b4d"
+      + (keepShortAnswersTogether
+        ? ";break-inside:avoid-page;page-break-inside:avoid;-webkit-column-break-inside:avoid"
+        : "");
     const heading = document.createElement("h3");
     heading.textContent = label + " · Antworten";
     printable.append(heading);
@@ -93,12 +102,12 @@ export const sanitizeA1PrintDocument = () => {
       const questionLabel = /^Question\s+\d+$/i.test(sourceNumber)
         ? sourceNumber : "Question " + (index + 1);
       const row = document.createElement("div");
-      row.style.cssText = "break-inside:avoid";
+      row.style.cssText = "break-inside:avoid;page-break-inside:avoid;display:grid;gap:2px;margin:0";
       const prompt = document.createElement("strong");
       prompt.textContent = questionLabel;
       const rule = document.createElement("div");
       rule.setAttribute("data-a1-pdf-answer-rule", "");
-      rule.style.cssText = "height:28px;border-bottom:1px solid #94a3b8";
+      rule.style.cssText = "height:19px;border-bottom:1px solid #94a3b8";
       row.append(prompt, rule);
       printable.append(row);
     }
