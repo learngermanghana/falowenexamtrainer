@@ -99,7 +99,7 @@ export default function VerbotenErlaubtPage() {
   const [revealedTeil3, setRevealedTeil3] = useState({});
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 18, maxWidth: 1100 }}>
+    <div data-a1-speaking-confidence-lab="true" style={{ ...styles.container, display: "grid", gap: 18, maxWidth: 1100 }}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
       <header style={{ borderRadius: 26, padding: "clamp(24px, 5vw, 48px)", background: "linear-gradient(135deg, #0f172a, #1e3a8a, #4338ca)", color: "#fff", display: "grid", gap: 14 }}>

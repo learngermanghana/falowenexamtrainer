@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { sanitizeA1PrintDocument, findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
+import { inspectA1PrintDocument, isA1PrintContentReady } from "./a1PdfContentReadiness.mjs";
 
 class Element {
   constructor(tag = "DIV", content = "") {
@@ -27,11 +28,13 @@ class Element {
   closest() { return null; }
 }
 
-const withDocument = (root, run) => {
+const withDocument = (root, run, nestedMain = root) => {
   const oldDocument = globalThis.document;
   globalThis.document = {
     body: root,
-    querySelector: (selector) => selector === "main" ? root : null,
+    querySelector: (selector) => selector === "[data-a1-speaking-confidence-lab]"
+      ? (root.getAttribute("data-a1-speaking-confidence-lab") ? root : null)
+      : selector === "main" ? nestedMain : null,
     createElement: (tag) => new Element(tag),
   };
   try { run(); }
@@ -146,4 +149,55 @@ test("Ten short answers retain pagination flexibility without losing individual 
   const blank = capture.replacement;
   assert.equal(blank.children.length, 11);
   assert.doesNotMatch(blank.style.cssText, /page-break-inside:avoid/);
+});
+
+
+test("Day 19 sanitizer keeps the whole Confidence Lab when a nested main contains the private mock", () => {
+  const lab = new Element("DIV");
+  lab.setAttribute("data-a1-speaking-confidence-lab", "true");
+  const staticLesson = new Element("SECTION", "Teil 1 Sich vorstellen; Teil 2 Fragekarten; Teil 3 höfliche Bitten");
+  const mock = new Element("MAIN");
+  mock.setAttribute("data-speaking-mock", "A1");
+  mock.children = [new Element("SECTION", "Private assessment Session: uid-123 100%")];
+  lab.children = [staticLesson, mock];
+  lab.mapping["[data-speaking-mock]"] = [mock];
+
+  withDocument(lab, () => sanitizeA1PrintDocument(), mock);
+  assert.equal(lab.children[0], staticLesson);
+  assert.equal(staticLesson.textContent, "Teil 1 Sich vorstellen; Teil 2 Fragekarten; Teil 3 höfliche Bitten");
+  assert.equal(mock.getAttribute("data-a1-pdf-speaking-prompt"), "true");
+  assert.equal(mock.children.length, 5);
+});
+
+test("Day 19 readiness inspects the lesson wrapper, not the short nested speaking main", () => {
+  const lab = new Element("DIV");
+  lab.setAttribute("data-a1-speaking-confidence-lab", "true");
+  lab.innerText = "Goethe A1 Speaking Confidence Lab. ".repeat(16);
+  const mock = new Element("MAIN");
+  mock.innerText = "Checking your speaking progress.";
+  const headings = Array.from({ length: 4 }, () => ({
+    getClientRects: () => [1],
+  }));
+  lab.mapping["h1,h2,h3"] = headings;
+  const oldWindow = globalThis.window;
+  const oldNodeFilter = globalThis.NodeFilter;
+  withDocument(lab, () => {
+    globalThis.window = { getComputedStyle: () => ({ display: "block", visibility: "visible" }) };
+    globalThis.NodeFilter = { SHOW_TEXT: 4 };
+    const oldWalker = globalThis.document.createTreeWalker;
+    globalThis.document.createTreeWalker = () => ({ nextNode: () => null });
+    try {
+      const state = inspectA1PrintDocument();
+      assert.equal(state.sectionHeadings, 4);
+      assert.ok(state.textLength > 160);
+      assert.equal(isA1PrintContentReady(state), true);
+      assert.equal(mock.innerText.length < 160, true);
+    } finally {
+      globalThis.document.createTreeWalker = oldWalker;
+      if (oldWindow === undefined) delete globalThis.window;
+      else globalThis.window = oldWindow;
+      if (oldNodeFilter === undefined) delete globalThis.NodeFilter;
+      else globalThis.NodeFilter = oldNodeFilter;
+    }
+  }, mock);
 });
