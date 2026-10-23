@@ -79,6 +79,8 @@ jobs:
         run: |
           node --check scripts/course-material-bundles/renderLevelBundleV2.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
+          node --check scripts/course-material-bundles/a1PdfAuthState.mjs
+          node --test scripts/course-material-bundles/a1PdfAuthState.test.mjs
           node --check scripts/course-material-bundles/pdfNavigation.mjs
           node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
           node --check scripts/course-material-bundles/validateA1RenderPlan.mjs
