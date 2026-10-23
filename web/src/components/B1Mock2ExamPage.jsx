@@ -745,7 +745,9 @@ export default function B1Mock2ExamPage() {
       ) : null}
 
       {exam.stage === "hoeren" ? (
-        <B1Mock2Hoeren embedded onProgress={updateHoerenProgress}
+        <B1Mock2Hoeren embedded attemptId={exam.attemptInfo?.attemptId||""}
+          initialAnswers={Object.fromEntries(Object.entries(exam.hoerenAnswers||{}).map(([key,value])=>[key.split("-").pop(),value]))}
+          onProgress={updateHoerenProgress}
           onComplete={onMock2HoerenComplete} expired={secondsLeft<=0}/>
       ) : null}
 
