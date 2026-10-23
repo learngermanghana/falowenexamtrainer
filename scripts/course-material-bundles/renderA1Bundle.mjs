@@ -10,6 +10,7 @@ import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage, matchesA1PdfCourse
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
 import { inspectA1PrintDocument, isA1PrintContentReady } from "./a1PdfContentReadiness.mjs";
 import { prepareA1PrintDocument } from "./a1PdfPrintExtras.mjs";
+import { sanitizeA1PrintDocument, findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -24,7 +25,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 13, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 14, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -229,14 +230,25 @@ const waitForA1PrintableContent = async (page, day, kind) => {
 const printA1Page = async (page, file, day, kind, lessonUrl) => {
   const printStyle = await injectPrintMode(page, kind);
   try {
+    // Remove private, asynchronous UI before the content-ready check. A live
+    // saved speaking session must never block or enter a printable snapshot.
+    await page.evaluate(sanitizeA1PrintDocument);
     await waitForA1PrintableContent(page, day, kind);
     await hideA1WebOnlyControls(page);
+    await page.evaluate(sanitizeA1PrintDocument);
     // Never embed short-lived R2 tokens: QR points to the authenticated lesson.
     const audioCount = await page.locator("main audio").count();
     const companionUrl = new URL(lessonUrl);
     companionUrl.searchParams.delete("radio");
     const qrDataUrl = audioCount ? await QRCode.toDataURL(companionUrl.toString(), { width: 132, margin: 1 }) : "";
     await page.evaluate(prepareA1PrintDocument, { lessonUrl: companionUrl.toString(), qrDataUrl });
+    const visibleText = await page.locator("main").first().innerText().catch(() => "");
+    const leaked = findA1PrintPrivacyLeaks(visibleText);
+    if (leaked.length) {
+      // Fail closed; a PDF should never include other students' work.
+      throw new Error("A1 Day " + day + " " + kind +
+        " print privacy check failed: " + leaked.join(", "));
+    }
     const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
