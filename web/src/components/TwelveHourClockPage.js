@@ -83,6 +83,66 @@ const separableRows = [
   ["anrufen", "to call", "Ich rufe meine Mutter an."],
 ];
 
+// Inline A1-7 grammar checks: unscored and intentionally separate from the
+// workbook's graded Lesen/Hören assignment.
+const timeKnowledgeChecks = [
+  {
+    number: 1,
+    prompt: "In German, what time does „halb zehn“ mean?",
+    options: ["10:30", "9:30", "9:15"],
+    answer: "9:30",
+    explanation: "In German, halb refers to the next hour. Halb zehn means halfway to ten, or 9:30.",
+    incorrectExplanation: "Remember: German halb refers to the next hour, not the hour before.",
+  },
+  {
+    number: 2,
+    prompt: "A German speaker says: „Ich lerne Deutsch um acht Uhr abends.“ What time is the German lesson?",
+    options: ["8:00 AM", "6:00 PM", "8:00 PM"],
+    answer: "8:00 PM",
+    explanation: "Acht Uhr means eight o'clock. Abends means in the evening, so it is 8:00 PM (20:00).",
+    incorrectExplanation: "Look carefully at abends: it tells you whether the speaker means morning or evening.",
+  },
+  {
+    number: 3,
+    prompt: "Which option correctly matches the German time expressions with their meanings?",
+    options: [
+      "vormittags = before noon, mittags = around noon, nachmittags = in the afternoon",
+      "vormittags = in the evening, mittags = in the morning, nachmittags = at night",
+      "vormittags = in the afternoon, mittags = in the evening, nachmittags = before noon",
+    ],
+    answer: "vormittags = before noon, mittags = around noon, nachmittags = in the afternoon",
+    explanation: "Vormittags is before midday, mittags is around midday, and nachmittags is in the afternoon.",
+    incorrectExplanation: "Think about the sequence of the day: before noon, midday, then afternoon.",
+  },
+];
+
+const separableKnowledgeChecks = [
+  {
+    number: 4,
+    prompt: "Which German sentence correctly means “I get up at seven o'clock”?",
+    options: ["Ich stehe um sieben Uhr auf.", "Ich aufstehe um sieben Uhr.", "Ich steht um sieben Uhr auf."],
+    answer: "Ich stehe um sieben Uhr auf.",
+    explanation: "Aufstehen separates: stehe is the conjugated verb, and the prefix auf goes to the end.",
+    incorrectExplanation: "The subject is ich. Check the verb form and where the prefix auf appears.",
+  },
+  {
+    number: 5,
+    prompt: "Which sentence correctly says “Paul goes shopping in the afternoon”?",
+    options: ["Nachmittags Paul kauft ein.", "Nachmittags kauft Paul ein.", "Nachmittags kauft Paul einkaufen."],
+    answer: "Nachmittags kauft Paul ein.",
+    explanation: "The time phrase takes the first position, kauft is second, and the prefix ein goes to the end.",
+    incorrectExplanation: "After Nachmittags at the start, the conjugated verb comes next. Check the prefix, too.",
+  },
+  {
+    number: 6,
+    prompt: "Which sentence correctly means “The mother picks up Ali at 4 PM”?",
+    options: ["Die Mutter abholt Ali um 16 Uhr.", "Die Mutter holt Ali um 16 Uhr ab.", "Die Mutter holt ab Ali um 16 Uhr."],
+    answer: "Die Mutter holt Ali um 16 Uhr ab.",
+    explanation: "Abholen separates in a main clause: holt is the verb, and ab moves to the end.",
+    incorrectExplanation: "With abholen, check where the conjugated verb and the prefix ab belong.",
+  },
+];
+
 const lessonChecks = [
   {
     prompt: "What time is halb acht?",
@@ -110,34 +170,83 @@ const lessonChecks = [
   },
 ];
 
-function PracticeQuestion({ prompt, options, answer, explanation }) {
+function PracticeQuestion({
+  number,
+  prompt,
+  options,
+  answer,
+  explanation,
+  incorrectExplanation,
+}) {
   const [selected, setSelected] = useState("");
   const [checked, setChecked] = useState(false);
+  const correct = checked && selected === answer;
+  const wrong = checked && selected !== answer;
+
   return (
     <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, display: "grid", gap: 10 }}>
-      <strong>{prompt}</strong>
-      {options.map((option) => (
+      <strong>{number ? `${number}. ${prompt}` : prompt}</strong>
+      {options.map((option, index) => (
         <button
           key={option}
           type="button"
+          aria-pressed={selected === option}
           style={{
             ...styles.secondaryButton,
             textAlign: "left",
             justifyContent: "flex-start",
+            whiteSpace: "normal",
+            height: "auto",
             borderColor: selected === option ? "#2563eb" : undefined,
+            background: selected === option ? "#eff6ff" : undefined,
           }}
           onClick={() => { setSelected(option); setChecked(false); }}
-        >{option}</button>
+        >{String.fromCharCode(65 + index)}. {option}</button>
       ))}
-      <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} disabled={!selected} onClick={() => setChecked(true)}>
-        Check
+      <button
+        type="button"
+        style={{ ...styles.primaryButton, width: "fit-content" }}
+        disabled={!selected || checked}
+        onClick={() => setChecked(true)}
+      >
+        Check answer
       </button>
       {checked ? (
-        <div role="status" style={{ lineHeight: 1.7 }}>
-          <strong>{selected === answer ? "Correct." : "Not quite."} Answer: {answer}</strong>
-          <p style={paragraph}>{explanation}</p>
+        <div role="status" aria-live="polite" style={{
+          lineHeight: 1.7,
+          borderRadius: 10,
+          padding: "10px 12px",
+          background: correct ? "#ecfdf5" : "#fff7ed",
+          border: `1px solid ${correct ? "#a7f3d0" : "#fed7aa"}`,
+        }}>
+          <strong>{correct ? "Correct!" : "Not quite. Try again."}</strong>
+          <p style={paragraph}>{wrong ? (incorrectExplanation || explanation) : explanation}</p>
+          {wrong ? (
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, marginTop: 8 }}
+              onClick={() => { setSelected(""); setChecked(false); }}
+            >
+              Try again
+            </button>
+          ) : null}
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function KnowledgeTest({ title, questions }) {
+  return (
+    <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+      <h3 style={{ margin: 0 }}>{title}</h3>
+      <p style={paragraph}>
+        Choose A, B or C, then select <strong>Check answer</strong>.
+        You can try again. This is practice only; it does not affect your assignment score.
+      </p>
+      {questions.map((question) => (
+        <PracticeQuestion key={question.number} {...question} />
+      ))}
     </div>
   );
 }
@@ -184,6 +293,7 @@ export const WeekTimeSeparableGrammarBook = () => (
       <p style={paragraph}>Both <strong>am Morgen</strong> and <strong>morgens</strong> are useful. You can also say am Vormittag / vormittags, am Mittag / mittags, am Nachmittag / nachmittags and am Abend / abends.</p>
       <p style={paragraph}>Words ending in <strong>-s</strong> often describe regular or repeated activities: <strong>Ich lerne vormittags Deutsch.</strong> — I study German in the mornings.</p>
       <p style={paragraph}><strong>Spelling:</strong> morgen = tomorrow; morgens = in the mornings; Mittag = midday (noun); mittags = at midday (adverb).</p>
+      <KnowledgeTest title="Knowledge Test 1 — Time and Time Expressions" questions={timeKnowledgeChecks} />
     </Section>
 
     <Section title="4. Trennbare Verben — Separable Verbs in Daily Life" subtitle="The prefix moves to the end of a simple present-tense main clause.">
@@ -195,6 +305,7 @@ export const WeekTimeSeparableGrammarBook = () => (
         <div>Yes/no question: <strong>Stehst du um 6 Uhr auf?</strong></div>
       </Note>
       <p style={paragraph}><strong>Do not confuse:</strong> ab in <strong>ab 10 Uhr</strong> means starting at ten. The <strong>ab-</strong> in <strong>abholen</strong> is a separable verb prefix.</p>
+      <KnowledgeTest title="Knowledge Test 2 — Separable Verbs" questions={separableKnowledgeChecks} />
     </Section>
 
     <Section title="5. Mein Tagesablauf — Putting Everything Together" subtitle="Read Anna's daily routine, then check the most important lesson rules.">
