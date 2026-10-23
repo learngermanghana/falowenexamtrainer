@@ -17,6 +17,14 @@ export const scanPdfPageContent = (extractedText, expectedCount) => {
     if (/\bLoading the app(?:\b|[.…])/i.test(normalized)) {
       faults.push("Page " + (index + 1) + " contains a React loading screen");
     }
+    // React Suspense and protected-audio placeholders have printable headers
+    // around them, so a page-length check alone cannot catch these failures.
+    if (/^\s*Loading\s*(?:…|\.{2,3})\s*$/mi.test(rawPage)) {
+      faults.push("Page " + (index + 1) + " contains an unresolved lesson Loading placeholder");
+    }
+    if (/Audio wird geladen\s*(?:…|\.{2,3})?/i.test(rawPage)) {
+      faults.push("Page " + (index + 1) + " contains an unresolved audio-loading placeholder");
+    }
     if (/Unexpected Application Error|404 Not Found|Page not found|Loading failed/i.test(normalized)) {
       faults.push("Page " + (index + 1) + " contains an application error");
     }
