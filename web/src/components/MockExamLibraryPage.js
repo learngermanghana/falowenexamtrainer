@@ -9,6 +9,7 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
+  if (mock?.id === "b1-mock-02") return "4-module mock · verified result required";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";
@@ -86,6 +87,10 @@ export default function MockExamLibraryPage() {
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
                       Finish all four modules for your final result. You can resume an unfinished attempt; running timers do not pause.
                     </p>
+                  ) : mock.id === "b1-mock-02" ? (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                      All four modules are included. Falowen will release the final score only after the server verifies Lesen, Hören, Schreiben and Sprechen.
+                    </p>
                   ) : mock.id === "a2-mock-02" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                       All four modules are inside this mock. Your progress is saved on this device; verified final scores are not available yet.
@@ -97,7 +102,7 @@ export default function MockExamLibraryPage() {
                   )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
-                  {mock.mode === "full" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                  {mock.mode === "full" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.id === "b1-mock-02" ? "Open B1 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>
