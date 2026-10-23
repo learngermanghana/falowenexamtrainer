@@ -87,6 +87,9 @@ jobs:
           node --check scripts/course-material-bundles/buildPressProof.mjs
           node --check scripts/course-material-bundles/a1PrintHelpers.mjs
           node --check scripts/course-material-bundles/pdfPageAudit.mjs
+          node --check scripts/course-material-bundles/a1PdfContentReadiness.mjs
+          node --check scripts/course-material-bundles/a1PdfPrintExtras.mjs
+          node --test scripts/course-material-bundles/a1PdfContentReadiness.test.mjs
           node --check scripts/course-material-bundles/trimPrintedPdfTail.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/runA1BundleCleanPdf.mjs
@@ -202,7 +205,7 @@ jobs:
 
       - name: Install PDF rendering dependencies
         if: ${{ inputs.build_pdf }}
-        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
 
       - name: Install Chromium
         if: ${{ inputs.build_pdf }}
