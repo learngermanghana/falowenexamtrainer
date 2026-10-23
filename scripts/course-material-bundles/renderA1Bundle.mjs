@@ -2,11 +2,14 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage, matchesA1PdfCourseRoute } from "./a1PdfAuthState.mjs";
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
+import { inspectA1PrintDocument, isA1PrintContentReady } from "./a1PdfContentReadiness.mjs";
+import { prepareA1PrintDocument } from "./a1PdfPrintExtras.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -21,7 +24,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 12, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 13, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -202,10 +205,36 @@ const hideA1WebOnlyControls = async (page) => {
   });
 };
 
-const printA1Page = async (page, file, day, kind) => {
+const waitForA1PrintableContent = async (page, day, kind) => {
+  let inspection = { unresolved: [], textLength: 0, sectionHeadings: 0 };
+  // The authenticated course shell often displays a full lesson header while
+  // React.lazy's actual grammar/workbook panel still says "Loading…".
+  // Poll for the *visible section content*, not just a minimum main text length.
+  for (let round = 0; round < 24; round++) {
+    inspection = await page.evaluate(inspectA1PrintDocument);
+    if (isA1PrintContentReady(inspection)) {
+      await page.waitForTimeout(450);
+      const settled = await page.evaluate(inspectA1PrintDocument);
+      if (isA1PrintContentReady(settled)) return;
+      inspection = settled;
+    }
+    await page.waitForTimeout(800);
+  }
+  throw new Error("A1 PDF content did not hydrate for Day " + day + " " + kind +
+    "; unresolved placeholders: " + (inspection.unresolved.join(" | ") || "none") +
+    "; visible characters: " + inspection.textLength +
+    "; visible headings: " + inspection.sectionHeadings);
+};
+
+const printA1Page = async (page, file, day, kind, lessonUrl) => {
   const printStyle = await injectPrintMode(page, kind);
   try {
+    await waitForA1PrintableContent(page, day, kind);
     await hideA1WebOnlyControls(page);
+    // Never embed short-lived R2 tokens: QR points to the authenticated lesson.
+    const audioCount = await page.locator("main audio").count();
+    const qrDataUrl = audioCount ? await QRCode.toDataURL(lessonUrl, { width: 132, margin: 1 }) : "";
+    await page.evaluate(prepareA1PrintDocument, { lessonUrl, qrDataUrl });
     const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
@@ -235,7 +264,7 @@ const captureA1WorkbookSections = async (page, lesson, index, source) => {
   const base = String(lesson.day).padStart(2, "0") + "-" + String(index + 1).padStart(2, "0") + "-workbook";
   const finalFile = path.join(renderDir, base + ".pdf");
   if (plan.mode !== "click-tabs") {
-    await printA1Page(page, finalFile, lesson.day, "workbook");
+    await printA1Page(page, finalFile, lesson.day, "workbook", source);
     return { kind: "workbook", source, file: finalFile, captureMode: plan.mode, sections: plan.count };
   }
 
@@ -257,7 +286,7 @@ const captureA1WorkbookSections = async (page, lesson, index, source) => {
     }
     await waitForCourseHydration(page, lesson.day, label);
     const partFile = path.join(renderDir, base + "-section-" + (tabIndex + 1) + ".pdf");
-    await printA1Page(page, partFile, lesson.day, label);
+    await printA1Page(page, partFile, lesson.day, label, source);
     parts.push(partFile);
   }
   const output = await PDFDocument.create();
@@ -340,14 +369,24 @@ const ensureInternalPage = async (page, target, day) => {
     ", last path " + lastPath + "). Verify PDF account access and session persistence.");
 };
 const renderInternalTarget = async (page, lesson, target, index) => {
-  const url = await ensureInternalPage(page, target, lesson.day);
-  if (target.kind === "workbook") return captureA1WorkbookSections(page, lesson, index, url);
-  const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" +
-    String(index + 1).padStart(2, "0") + "-" + target.kind + ".pdf");
-  await printA1Page(page, file, lesson.day, target.kind);
-  return { kind: target.kind, source: url, file, captureMode: "single-page" };
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const url = await ensureInternalPage(page, target, lesson.day);
+    try {
+      if (target.kind === "workbook") return await captureA1WorkbookSections(page, lesson, index, url);
+      const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" +
+        String(index + 1).padStart(2, "0") + "-" + target.kind + ".pdf");
+      await printA1Page(page, file, lesson.day, target.kind, url);
+      return { kind: target.kind, source: url, file, captureMode: "single-page" };
+    } catch (error) {
+      // A lazy lesson chunk may succeed after a new authenticated navigation.
+      // Never downgrade this to a successful PDF with a loading placeholder.
+      if (!/A1 PDF content did not hydrate/.test(String(error)) || attempt === 3) throw error;
+      console.warn("A1 Day " + lesson.day + " " + target.kind +
+        " did not hydrate: retrying authenticated lesson (attempt " + (attempt + 1) + "/3)");
+    }
+  }
+  throw new Error("A1 printable lesson was not rendered");
 };
-
 const driveIdFromUrl = (url) => String(url).match(/\/d\/([^/]+)/)?.[1] || "";
 
 const downloadExternalPdf = async (lesson, target, index) => {
