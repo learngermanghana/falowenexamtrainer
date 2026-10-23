@@ -5552,7 +5552,6 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           studentProfile,
           attemptId,
           attemptNumber: Number(attemptData.attemptNumber || 1),
-          mockId:attemptData.mockId,
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
@@ -5627,7 +5626,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String((userData.activeAttemptByMock || {})[mockId] || (mockId==="b1-mock-01" ? userData.activeAttemptId : "") || "").trim();
+      const activeAttemptId = String(userData.activeAttemptId || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -6023,7 +6022,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      const activeAttemptId = String(userData.activeAttemptByMock?.[mockId] || (mockId==="b1-mock-01" ? userData.activeAttemptId : "") || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -6177,12 +6176,19 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         );
 
         const completedUserPatch = {
-          lastCompletedAttemptId: attemptId,
-          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
-          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
-          updatedAt: now,
+          ...(existing.mockId==="b1-mock-01" ? {
+            lastCompletedAttemptId:attemptId,
+            lastCompletedScore:Number(verifiedCompletion.overall.score||0),
+            lastCompletedPassed:Boolean(verifiedCompletion.overall.passed)
+          } : {}),
+          lastCompletedByMock:{...(userData.lastCompletedByMock||{}),[existing.mockId]:{
+            attemptId,score:Number(verifiedCompletion.overall.score||0),
+            passed:Boolean(verifiedCompletion.overall.passed)
+          }},
+          activeAttemptByMock:{...(userData.activeAttemptByMock||{}),[existing.mockId]:null},
+          updatedAt:now,
         };
-        if (String(userData.activeAttemptId || "") === attemptId) {
+        if (existing.mockId==="b1-mock-01" && String(userData.activeAttemptId || "") === attemptId) {
           completedUserPatch.activeAttemptId = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
@@ -6243,15 +6249,19 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         );
 
         const completedUserPatch = {
-          lastCompletedAttemptId: attemptId,
-          lastCompletedScore: Number(verifiedCompletion.overall.score || 0),
-          lastCompletedPassed: Boolean(verifiedCompletion.overall.passed),
-          updatedAt: now,
+          ...(existing.mockId==="b1-mock-01" ? {
+            lastCompletedAttemptId:attemptId,
+            lastCompletedScore:Number(verifiedCompletion.overall.score||0),
+            lastCompletedPassed:Boolean(verifiedCompletion.overall.passed)
+          } : {}),
+          lastCompletedByMock:{...(userData.lastCompletedByMock||{}),[existing.mockId]:{
+            attemptId,score:Number(verifiedCompletion.overall.score||0),
+            passed:Boolean(verifiedCompletion.overall.passed)
+          }},
+          activeAttemptByMock:{...(userData.activeAttemptByMock||{}),[existing.mockId]:null},
+          updatedAt:now,
         };
-        if (
-          !userData.activeAttemptId ||
-          String(userData.activeAttemptId) === attemptId
-        ) {
+        if (existing.mockId==="b1-mock-01" && (!userData.activeAttemptId || String(userData.activeAttemptId)===attemptId)) {
           completedUserPatch.activeAttemptId = null;
         }
         tx.set(userRef, completedUserPatch, { merge: true });
@@ -6283,11 +6293,9 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         { merge: true },
       );
 
-      const progressUserPatch = { updatedAt: now };
-      if (
-        !userData.activeAttemptId ||
-        String(userData.activeAttemptId) === attemptId
-      ) {
+      const progressUserPatch = { updatedAt: now,
+        activeAttemptByMock:{...(userData.activeAttemptByMock||{}),[existing.mockId]:attemptId} };
+      if (existing.mockId==="b1-mock-01" && (!userData.activeAttemptId || String(userData.activeAttemptId)===attemptId)) {
         progressUserPatch.activeAttemptId = attemptId;
       }
       tx.set(userRef, progressUserPatch, { merge: true });
@@ -6335,6 +6343,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
           studentProfile,
           attemptId,
           attemptNumber: Number(attemptData.attemptNumber || 1),
+          mockId:attemptData.mockId,
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
@@ -6344,6 +6353,11 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
               : new Date(),
         });
 
+        saveOutcome = {
+          ...saveOutcome,
+          verifiedSectionScores,
+          verifiedOverall,
+        };
         await attemptRef.set(
           {
             completionSync: {
