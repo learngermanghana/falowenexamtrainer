@@ -30,6 +30,8 @@ const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = 
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
+const { READING_ANSWER_KEY_02 } = require("./b1MockCompletionSync");
+const { scoreObjectiveAnswers: scoreB1Mock02Reading } = require("./verifiedFourSkillMockScore");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
@@ -1393,6 +1395,27 @@ async function requireB1Mock2PracticeAccess(req, res) {
   }
   return { db, authedUser };
 }
+
+app.post("/b1-mock-02/lesen/score", async (req, res) => {
+  try {
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    const answers=req.body?.answers;
+    if(!answers||typeof answers!=="object"||Array.isArray(answers))return res.status(400).json({error:"Invalid Lesen answers."});
+    const valid=new Set(Object.keys(READING_ANSWER_KEY_02));
+    if(Object.keys(answers).some(key=>!valid.has(key)))return res.status(400).json({error:"Unknown Lesen question."});
+    for(const key of Object.keys(answers)){
+      const value=String(answers[key]||"").toLowerCase();
+      if(!["richtig","falsch","ja","nein","0","a","b","c","d","f","h"].includes(value))return res.status(400).json({error:"Invalid Lesen choice."});
+    }
+    const result=scoreB1Mock02Reading(answers,READING_ANSWER_KEY_02,25);
+    res.set("Cache-Control","private, no-store");
+    return res.json({...result,percentage:Math.round(100*result.correct/result.total),mockId:"b1-mock-02"});
+  }catch(error){
+    console.error("B1 Mock 2 Lesen scoring error",error);
+    return res.status(503).json({error:"Could not mark B1 Mock 2 Lesen."});
+  }
+});
 
 app.get("/b1-mock-02/hoeren/questions", async (req, res) => {
   try {
@@ -5511,6 +5534,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           studentProfile,
           attemptId,
           attemptNumber: Number(attemptData.attemptNumber || 1),
+          mockId:attemptData.mockId,
           firstAttempt: Boolean(attemptData.firstAttempt),
           overall: verifiedOverall,
           sectionScores: verifiedSectionScores,
@@ -5585,7 +5609,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
       const userSnap = await tx.get(userRef);
       const userData = userSnap.exists ? userSnap.data() || {} : {};
 
-      const activeAttemptId = String(userData.activeAttemptId || "").trim();
+      const activeAttemptId = String((userData.activeAttemptByMock || {})[mockId] || (mockId==="b1-mock-01" ? userData.activeAttemptId : "") || "").trim();
       if (activeAttemptId) {
         const activeRef = userRef.collection("attempts").doc(activeAttemptId);
         const activeSnap = await tx.get(activeRef);
@@ -5705,6 +5729,10 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
+      if(!["b1-mock-01","b1-mock-02"].includes(existing.mockId) || state.mockId !== existing.mockId){
+        saveOutcome={forbidden:true};
+        return;
+      }
 
       // Completion is monotonic, but a completed record is only publishable when
       // all four section scores can be reconstructed from server-trusted data.
@@ -5964,7 +5992,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "b1-mock-01").trim().slice(0, 80);
-    if (!mockId) return res.status(400).json({ error: "mockId is required" });
+    if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported B1 mock identity." });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5996,7 +6024,7 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const attemptCount = Math.max(0, Number(userData.attemptCount || 0));
+      const attemptCount = Math.max(0, Number(mockId==="b1-mock-01" ? userData.attemptCount || 0 : userData.attemptCountByMock?.[mockId] || 0));
       const attemptNumber = attemptCount + 1;
       const now = admin.firestore.FieldValue.serverTimestamp();
 
@@ -6005,8 +6033,9 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
         {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
-          attemptCount: attemptNumber,
-          activeAttemptId: newAttemptRef.id,
+          ...(mockId==="b1-mock-01"?{attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}:{}),
+          [`attemptCountByMock.${mockId}`]:attemptNumber,
+          [`activeAttemptByMock.${mockId}`]:newAttemptRef.id,
           updatedAt: now,
         },
         { merge: true },
@@ -6102,6 +6131,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         let verifiedCompletion;
         try {
           verifiedCompletion = buildVerifiedB1MockScore({
+            mockId:existing.mockId,
             state: existing.state || {},
             verifiedSections: existing.verifiedSections || {},
           });
@@ -6151,6 +6181,7 @@ app.post("/b1-mock/attempt/save", async (req, res) => {
         let verifiedCompletion;
         try {
           verifiedCompletion = buildVerifiedB1MockScore({
+            mockId:existing.mockId,
             state,
             verifiedSections: existing.verifiedSections || {},
           });
