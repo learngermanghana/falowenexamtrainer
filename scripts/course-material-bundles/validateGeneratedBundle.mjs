@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
+import { findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -43,6 +44,8 @@ try {
 }
 
 if (level === "A1") {
+  const privacyLeaks = findA1PrintPrivacyLeaks(text);
+  if (privacyLeaks.length) throw new Error("A1 PDF PRIVACY preflight failed: " + privacyLeaks.join(", "));
   const audit = scanPdfPageContent(text, pdf.getPageCount());
   if (audit.faults.length) {
     throw new Error("A1 PDF preflight failed:\n" + audit.faults.join("\n"));

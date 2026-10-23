@@ -41,13 +41,15 @@ export const isVisuallyEmptyPgm = (pgm, threshold = 220) => {
   return true;
 };
 
-const renderPageToGrayscale = (file, pageNumber) => {
+const renderPageToGrayscale = (file, pageNumber, cropInterior = false) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "falowen-pdf-blank-check-"));
   try {
     const prefix = path.join(dir, "page");
     execFileSync("pdftoppm", [
       "-f", String(pageNumber), "-l", String(pageNumber),
-      "-scale-to", "420", "-gray", "-singlefile", file, prefix,
+      "-scale-to", "420", "-gray", "-singlefile",
+      ...(cropInterior ? ["-x", "60", "-y", "140", "-W", "180", "-H", "180"] : []),
+      file, prefix,
     ], { maxBuffer: 1024 * 1024, timeout: 20000 });
     return fs.readFileSync(prefix + ".pgm");
   } finally {
@@ -76,9 +78,25 @@ export const trimPrintedPdfTail = async (file, { description = "" } = {}) => {
     pdf.removePage(index);
     removed++;
   }
+  // The Day 14 video/lesson shell previously generated a page containing
+  // only the Falowen masthead and a white empty card (printed page 191).
+  // Remove ONLY that known shell, and ONLY if its central raster is blank.
+  // Never suppress pages containing a lesson image, text or exercise content.
+  let removedChrome = 0;
+  if (description === "Day 14 workbook") {
+    for (let index = pageCount - removed - 1; index >= 0; index--) {
+      const loneHeader = textPages[index].replace(/\s+/g, " ").trim();
+      if (!/^Falowen\s*(?:🔔\s*)?(?:FA)?$/i.test(loneHeader)) continue;
+      if (pdf.getPageCount() <= 1) break;
+      if (!isVisuallyEmptyPgm(renderPageToGrayscale(file, index + 1, true))) continue;
+      pdf.removePage(index);
+      removedChrome++;
+    }
+  }
+  removed += removedChrome;
   if (removed) {
     fs.writeFileSync(file, await pdf.save());
-    console.log("A1 PDF: removed " + removed + " visually empty trailing print page(s) from " + description);
+    console.log("A1 PDF: removed " + removed + " empty overflow / chrome-only page(s) from " + description);
   }
   return { before: pageCount, after: pageCount - removed, removed };
 };

@@ -33,6 +33,14 @@ Before printing each A1 target, the exporter now waits for visible lazy-loaded l
 
 Printed audio widgets are replaced by a **QR code to the authenticated Falowen course lesson** (a sign-in is required). The generated link strips the print-only `radio=done` query parameter and never exposes expiring Cloudflare R2 URLs. This is a **student workbook companion link**, not a public audio product for Amazon. The PDF rendering pass also suppresses web-only video panels and draft-save UI, while preserving actual answer options and writing inputs.
 
+### Privacy-safe print preparation (A1)
+
+The GitHub renderer must never distribute live classroom discussion posts, student names, submissions, saved draft letters, marking feedback, speaking transcripts, grades, or voice sessions. The **export-only sanitizer** removes live Day 13 contribution blocks and their class controls, replaces letter-marking widgets with blank ruled writing space, strips draft-capture panels, and replaces speaking-recording widgets with neutral partner-practice lines. The original live Course Book remains interactive for signed-in students.
+
+A privacy preflight checks each printable snapshot and the completed PDF for known leaked classroom, saved-session, and marking-widget text. Any finding **fails the run**. It is not a guarantee against all possible personally identifiable text: editorial review is mandatory before any distributed edition, especially if new student-content components are introduced later.
+
+The Day 14 empty masthead shell is removed from the source PDF only when its entire extracted text matches the known Falowen header and its centre raster contains no teaching artwork. This occurs before document assembly so the table of contents and bookmarks remain consistent.
+
 ### A1 export preflight
 
 The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
