@@ -72,7 +72,7 @@ export default function A1FamilyRecording({ value, onMarked }) {
     } catch (err) { if (mounted.current) setError(userFacingAudioError(err)); }
     finally { if (mounted.current) setPhase("idle"); }
   };
-  return <div style={{ display: "grid", gap: 12 }}>
+  return <div data-a1-family-recorder="true" style={{ display: "grid", gap: 12 }}>
     <button type="button" style={styles.secondaryButton} disabled={phase === "starting" || phase === "marking"}
       onClick={() => phase === "recording" ? recorder.current?.stop() : start()}>
       {phase === "recording" ? "Stop recording" : phase === "starting" ? "Opening microphone…" : "Record family answer"}
