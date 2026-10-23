@@ -56,12 +56,24 @@ export const createPdfNavigation = async (output, { level }) => {
     });
 
     const title = String(lesson.title || "").trim();
-    const titleLines = title.length > 58
-      ? [title.slice(0, 58).trimEnd(), title.slice(58, 116).trim()]
-      : [title];
+    const titleLines = [];
+    let current = "";
+    for (const word of title.split(/\s+/).filter(Boolean)) {
+      const nextLine = current ? current + " " + word : word;
+      if (current && bold.widthOfTextAtSize(nextLine, 23) > 486) {
+        titleLines.push(current);
+        current = word;
+      } else {
+        current = nextLine;
+      }
+    }
+    if (current) titleLines.push(current);
+    if (titleLines.length > 3) {
+      throw new Error("PDF chapter divider title is too long to fit: " + title);
+    }
     let titleY = 625;
-    for (const line of titleLines.filter(Boolean)) {
-      page.drawText(line, { x: 54, y: titleY, size: 24, font: bold });
+    for (const line of titleLines) {
+      page.drawText(line, { x: 54, y: titleY, size: 23, font: bold });
       titleY -= 32;
     }
 
