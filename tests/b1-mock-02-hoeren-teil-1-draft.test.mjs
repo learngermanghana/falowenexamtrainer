@@ -16,7 +16,7 @@ test("B1 Mock 2 Teil 1 has five original recordings and ten unambiguous paired t
  }
 });
 test("Draft does not silently claim recorded audio has the revised instructions",()=>{
- assert.match(draft.audioVerification,/not independently checked/i);
+ assert.match(draft.audioVerification,/no live protected R2 playback test performed/i);
  assert.ok(draft.issuesToResolveBeforeStudentPublication.some(x=>x.includes("introduction")));
 });
 
