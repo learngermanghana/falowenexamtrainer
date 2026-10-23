@@ -425,7 +425,7 @@ const addCover = async (output) => {
   cover.drawText("FALOWEN", { x: 54, y: 755, size: 28, font: bold, color: rgb(0.08, 0.25, 0.65) });
   cover.drawText("A1 Grammar Notes & Workbook", { x: 54, y: 670, size: 28, font: bold });
   cover.drawText("Grammar notes and workbook practice", { x: 54, y: 625, size: 15, font });
-  cover.drawText("Generated for administration", { x: 54, y: 110, size: 11, font });
+  cover.drawText("Editorial review copy - not for sale", { x: 54, y: 110, size: 11, font });
 };
 
 const appendPdfFile = async (output, file) => {
