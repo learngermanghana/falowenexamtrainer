@@ -90,7 +90,9 @@ jobs:
           node --check scripts/course-material-bundles/a1PdfContentReadiness.mjs
           node --check scripts/course-material-bundles/a1PdfPrintExtras.mjs
           node --check scripts/course-material-bundles/a1PdfPrivacy.mjs
+          node --check scripts/course-material-bundles/a1PdfPrintChrome.mjs
           node --test scripts/course-material-bundles/a1PdfPrivacy.test.mjs
+          node --test scripts/course-material-bundles/a1PdfPrintChrome.test.mjs
           node --test scripts/course-material-bundles/a1PdfPrivacy.review.test.mjs
           node --test scripts/course-material-bundles/a1PdfContentReadiness.test.mjs
           node --check scripts/course-material-bundles/trimPrintedPdfTail.mjs
