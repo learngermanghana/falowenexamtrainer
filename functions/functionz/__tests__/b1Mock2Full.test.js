@@ -30,7 +30,7 @@ test("only server-verified writing and speaking complete Mock 2",()=>{
     sectionScores:{lesen:25,hoeren:25,schreiben:21,sprechen:23}
   });
   expect(()=>buildVerifiedB1MockScore({state,verifiedSections:{schreiben:{verified:true,score:21}},mockId:"b1-mock-02"}))
-    .toThrow(/server-verified sprechen/);
+    .toThrow(/server-verified sprechen/i);
   expect(buildVerifiedB1MockScore({state,verifiedSections,mockId:"b1-mock-01"}).objective.lesen.correct).toBeLessThan(30);
 });
 
