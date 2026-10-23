@@ -2597,7 +2597,7 @@ const b1MockSpeakingScorePrompt = ({ attempts = [], mockId = "b1-mock-01", selec
     "SCORING — total 25 points:",
     "Teil 1: 9 points. Joint planning: make and react to suggestions, cover every canonical planning point, and move toward agreement.",
     "Teil 2: 10 points. Structured presentation addressing all canonical Teil 2 points. Reward connected B1 speech and useful linking language.",
-    "Teil 3: 6 points. React appropriately to the canonical partner statement, state agreement/disagreement, and justify the reaction with a relevant reason or example.",
+    mockId === "b1-mock-02" ? "Teil 3: 6 points. Give presentation feedback, ask a relevant partner follow-up question, and answer a question about one\'s own presentation. Reward task relevance, interaction and clear B1 speech." : "Teil 3: 6 points. React appropriately to the canonical partner statement, state agreement/disagreement, and justify the reaction with a relevant reason or example.",
     "Pass mark for this Sprechen mock: 15/25.",
     "",
     "Required JSON only, no markdown:",
