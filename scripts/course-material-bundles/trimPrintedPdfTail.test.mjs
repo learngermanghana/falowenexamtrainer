@@ -64,3 +64,36 @@ test("never silently discards blank interior pages or all pages", async () => {
     assert.equal(result.after, 3);
   });
 });
+
+
+test("Day 14 removes only its first white chrome-only page, preserving exercises", async () => {
+  await withFixture(async (pdf, font) => {
+    const chrome = pdf.addPage([595.28, 841.89]);
+    chrome.drawText("Falowen FA", { x: 38, y: 780, font });
+    chrome.drawRectangle({
+      x: 50, y: 80, width: 495, height: 590,
+      color: rgb(1, 1, 1), borderColor: rgb(0.93, 0.94, 0.96), borderWidth: 1,
+    });
+    const lesson = pdf.addPage([595.28, 841.89]);
+    lesson.drawText("A1 Day 14 Modalverben workbook: Write five sentences", { x: 60, y: 690, font });
+  }, async (filename) => {
+    const trimmed = await trimPrintedPdfTail(filename, { description: "Day 14 workbook" });
+    assert.equal(trimmed.removed, 1);
+    assert.equal(trimmed.after, 1);
+    const output = await PDFDocument.load(fs.readFileSync(filename));
+    assert.equal(output.getPageCount(), 1);
+  });
+});
+
+test("Day 14 preserves graphical-only worksheet pages with real central artwork", async () => {
+  await withFixture(async (pdf, font) => {
+    const card = pdf.addPage([595.28, 841.89]);
+    card.drawText("Falowen FA", { x: 38, y: 780, font });
+    card.drawRectangle({ x: 120, y: 200, width: 170, height: 290, color: rgb(0.02, 0.1, 0.2) });
+    pdf.addPage().drawText("Complete the exercise", { x: 50, y: 700, font });
+  }, async (filename) => {
+    const result = await trimPrintedPdfTail(filename, { description: "Day 14 workbook" });
+    assert.equal(result.removed, 0);
+    assert.equal(result.after, 2);
+  });
+});
