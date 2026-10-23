@@ -58,6 +58,7 @@ const emptyState = () => ({
   overall: null,
   writingPending: false,
   completed: false,
+  completionVerified: false,
 });
 
 const formatTime = (seconds) => {
@@ -209,7 +210,7 @@ export default function B1Mock2ExamPage() {
 
   useEffect(() => {
     const attemptId = exam.attemptInfo?.attemptId;
-    if (!exam.completed || exam.writingPending || !attemptId || !idToken) return undefined;
+    if (!exam.completed || exam.writingPending || exam.completionVerified || !attemptId || !idToken) return undefined;
 
     const completionKey = `${attemptId}:${Number(exam.overall?.score || 0)}:${completionRetryNonce}`;
     if (completionSavedRef.current === completionKey) return undefined;
@@ -231,6 +232,13 @@ export default function B1Mock2ExamPage() {
         if (response?.completionSync && response.completionSync.ok === false) {
           throw new Error(response.completionSync.error || "Could not sync final B1 mock result.");
         }
+        if(!response?.verifiedOverall || !response?.verifiedSectionScores || response.status!=="completed"){
+          throw new Error("Waiting for authoritative server-verified B1 Mock 2 results.");
+        }
+        setExam(current=>({
+          ...current,completionVerified:true,overall:response.verifiedOverall,
+          sectionScores:response.verifiedSectionScores,
+        }));
 
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
@@ -272,6 +280,7 @@ export default function B1Mock2ExamPage() {
     exam,
     exam.attemptInfo?.attemptId,
     exam.completed,
+    exam.completionVerified,
     exam.overall,
     exam.sectionScores,
     idToken,
@@ -545,7 +554,18 @@ export default function B1Mock2ExamPage() {
     );
   }
 
-  if (exam.stage === "result" && canReviewFullMock(exam)) {
+  if (exam.stage === "result" && !exam.writingPending && !exam.completionVerified) {
+    return <main className="b1-final-shell">
+      <AppBackButton label="Back to Exams Room" fallbackPath="/exams/overview" />
+      <section className="b1-final-rules">
+        <h2>Verifying your B1 Mock 2 result</h2>
+        <p>All four sections are submitted. Falowen will show a final result only after the server has verified the objective keys and both AI-marked sections.</p>
+        {error ? <p role="alert">{error}</p> : null}
+        <button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry verification</button>
+      </section>
+    </main>;
+  }
+  if (exam.stage === "result" && exam.completionVerified && canReviewFullMock(exam)) {
     const entries = Object.entries(exam.sectionScores || {});
     const sorted = [...entries].sort((a, b) => Number(b[1]) - Number(a[1]));
     const recommendations = getB1MockPracticeRecommendations(exam.sectionScores);
