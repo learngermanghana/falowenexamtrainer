@@ -233,8 +233,10 @@ const printA1Page = async (page, file, day, kind, lessonUrl) => {
     await hideA1WebOnlyControls(page);
     // Never embed short-lived R2 tokens: QR points to the authenticated lesson.
     const audioCount = await page.locator("main audio").count();
-    const qrDataUrl = audioCount ? await QRCode.toDataURL(lessonUrl, { width: 132, margin: 1 }) : "";
-    await page.evaluate(prepareA1PrintDocument, { lessonUrl, qrDataUrl });
+    const companionUrl = new URL(lessonUrl);
+    companionUrl.searchParams.delete("radio");
+    const qrDataUrl = audioCount ? await QRCode.toDataURL(companionUrl.toString(), { width: 132, margin: 1 }) : "";
+    await page.evaluate(prepareA1PrintDocument, { lessonUrl: companionUrl.toString(), qrDataUrl });
     const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
