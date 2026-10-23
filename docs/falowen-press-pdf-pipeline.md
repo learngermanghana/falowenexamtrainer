@@ -41,6 +41,14 @@ A privacy preflight checks each printable snapshot and the completed PDF for kno
 
 The Day 14 empty masthead shell is removed from the source PDF only when its entire extracted text matches the known Falowen header and its centre raster contains no teaching artwork. This occurs before document assembly so the table of contents and bookmarks remain consistent.
 
+### Final print-only editorial cleanup
+
+The A1 PDF generator removes online-only lesson controls **after loading the actual lesson**, and before printing its source PDF. The cleanup uses explicit `data-a1-pdf-hide-ui` markers for Day 7 draft notifications, progress and submit-summary widgets; for the Day 14 knowledge-test action bar; and for Day 19 `Show model` toggles. The Day 7 family audio recorder (including any recovered learner transcript) is replaced with **neutral, blank speaking notes**.
+
+Legacy unmarked UI is handled only when the wording clearly indicates an online-only action. The real multiple-choice options, exercises, grammar explanation, QR-code listening links, and answer spaces are preserved. The final text preflight rejects leftover draft timestamps, unprintable model and recording buttons, and a page consisting only of Day 14's online test actions. A page containing a valid educational prompt is **not removed merely for having white space**.
+
+The print-only changes do not alter classroom interactions. Never distribute an older PDF that contains saved learner responses. Generate a new edition and visually inspect its page flow and privacy before publication.
+
 ### A1 export preflight
 
 The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
