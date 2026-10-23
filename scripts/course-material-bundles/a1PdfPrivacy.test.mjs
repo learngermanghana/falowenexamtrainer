@@ -26,6 +26,7 @@ test("print DOM sanitizer removes private contribution widgets and replaces load
     replaceWith(node) { this.replacement = node; this.removed = true; }
     matches(selector) { return selector === "[contenteditable=true]" ? Boolean(this.editable) : false; }
     querySelectorAll() { return []; }
+    querySelector() { return null; }
   }
   const contribution = new Node("DIV", "Class contributions Student A: private answer");
   const controls = new Node("DIV", "Save to class discussion, Class A1");
