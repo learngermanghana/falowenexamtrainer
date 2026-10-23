@@ -4,7 +4,7 @@ const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([8, 10, 11, 12, 17, 18, 21, 22]),
   A2: new Set([6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 24, 26, 27, 28]),
-  B1: new Set([6, 15, 16, 17, 18, 19, 20]),
+  B1: new Set([6, 15, 16, 17, 18, 19, 20, 25]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
@@ -98,7 +98,14 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   if (normalizedLevel === "B1") {
     const legacyFlatStem = `audio/day_${normalizedDay}.`;
     const folderPrefix = `b1/day-${String(normalizedDay).padStart(2, "0")}/day-${String(normalizedDay).padStart(2, "0")}.`;
-    if (!normalizedKey.startsWith(legacyFlatStem) && !normalizedKey.startsWith(folderPrefix)) return null;
+    // Only this curated classroom recording uses a named key instead of
+    // the older b1/day-NN/day-NN.mp3 convention. Do not expand the
+    // general B1 signing policy or expose arbitrary R2 objects.
+    const curatedDay25 = normalizedDay === 25
+      && normalizedKey === "b1/day-25/online-shopping-verbraucherservice.mp3";
+    if (!normalizedKey.startsWith(legacyFlatStem)
+      && !normalizedKey.startsWith(folderPrefix)
+      && !curatedDay25) return null;
   } else if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) {
     return null;
   }
