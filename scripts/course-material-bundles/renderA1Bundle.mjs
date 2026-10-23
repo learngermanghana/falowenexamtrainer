@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage, matchesA1PdfCourseRoute } from "./a1PdfAuthState.mjs";
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
 
@@ -168,9 +169,43 @@ const getA1WorkbookCapturePlan = async (page) => {
   return { mode: "single-page", count: 1 };
 };
 
+const hideA1WebOnlyControls = async (page) => {
+  await page.evaluate(() => {
+    const hide = (node) => node?.style?.setProperty("display", "none", "important");
+    const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
+
+    // These are navigation/actions for Falowen's website, not book content.
+    for (const node of document.querySelectorAll("a, button")) {
+      const label = normalize(node.textContent);
+      if (/^(?:←\s*)?Back to Course Book$/i.test(label)
+        || /^Back to workbook\s*›?$/i.test(label)
+        || /^Watch teacher video$/i.test(label)
+        || /^Watch AI video$/i.test(label)
+        || /^Download this grammar book as PDF$/i.test(label)) hide(node);
+    }
+
+    // Hide the whole "Supporting materials" widget, not just its heading.
+    // Never hide a large enclosing grammar lesson or its exercises.
+    for (const node of document.querySelectorAll("h1,h2,h3,h4,strong")) {
+      if (normalize(node.textContent) !== "Supporting materials") continue;
+      let parent = node;
+      let candidate = null;
+      for (let depth = 0; depth < 5 && parent; depth++, parent = parent.parentElement) {
+        const contents = normalize(parent.textContent);
+        if (contents.length > 1600) break;
+        if (/Watch teacher video|Watch AI video|Download this grammar book as PDF/i.test(contents)) {
+          candidate = parent;
+        }
+      }
+      hide(candidate || node);
+    }
+  });
+};
+
 const printA1Page = async (page, file, day, kind) => {
   const printStyle = await injectPrintMode(page, kind);
   try {
+    await hideA1WebOnlyControls(page);
     const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
@@ -189,6 +224,7 @@ const printA1Page = async (page, file, day, kind) => {
       }
     }
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    await trimPrintedPdfTail(file, { description: "Day " + day + " " + kind });
   } finally {
     await resetPrintMode(page, printStyle);
   }
