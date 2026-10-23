@@ -2,7 +2,10 @@
 // Execute in Playwright's page.evaluate and NEVER publish a PDF containing
 // classroom contributions, saved submissions or a live speaking session.
 export const sanitizeA1PrintDocument = () => {
-  const root = document.querySelector("main") || document.body;
+  // Day 19 wraps a nested <main data-speaking-mock> in a <div> lesson.
+  // Choose the whole lesson before isolating and redacting the private mock.
+  const root = document.querySelector("[data-a1-speaking-confidence-lab]")
+    || document.querySelector("main") || document.body;
   const normalize = (text) => String(text || "").replace(/\s+/g, " ").trim();
   const remove = (node) => node?.remove();
 
