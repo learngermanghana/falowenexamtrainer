@@ -45,6 +45,10 @@ export const sanitizeA1PrintDocument = () => {
     panel.replaceWith(makeWritingSpace("Sprechen · Partnerübung: Notieren Sie Stichwörter", 3));
   }
 
+  for (const sensitive of [...root.querySelectorAll(
+    '[data-a1-live-contributions], [data-a1-live-discussion-controls]'
+  )]) remove(sensitive);
+
   // Day 13 shows actual class posts (authors, dates and submitted sentences).
   // Keep the static numbered exercise ABOVE this block; remove the entire
   // contribution list, not just the title or author's name.
