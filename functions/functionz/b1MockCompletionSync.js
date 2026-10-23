@@ -34,13 +34,24 @@ const LISTENING_ANSWER_KEY = Object.freeze({
   "t4-27": "c", "t4-28": "b", "t4-29": "a", "t4-30": "c",
 });
 
+const { QUESTIONS: B1_MOCK_02_LISTENING } = require("./b1Mock2Hoeren");
+const READING_ANSWER_KEY_02 = Object.freeze({
+  "t1-1":"richtig","t1-2":"falsch","t1-3":"falsch","t1-4":"falsch","t1-5":"falsch","t1-6":"richtig",
+  "t2-7":"b","t2-8":"c","t2-9":"a","t2-10":"b","t2-11":"a","t2-12":"b",
+  "t3-13":"c","t3-14":"f","t3-15":"0","t3-16":"d","t3-17":"a","t3-18":"b","t3-19":"h",
+  "t4-20":"nein","t4-21":"ja","t4-22":"nein","t4-23":"ja","t4-24":"nein","t4-25":"ja","t4-26":"nein",
+  "t5-27":"b","t5-28":"b","t5-29":"a","t5-30":"b"
+});
+const LISTENING_ANSWER_KEY_02 = Object.freeze(Object.fromEntries(
+  B1_MOCK_02_LISTENING.map(item=>[`t${item.part}-${item.number}`,item.answer])
+));
 const clean = (value = "") => String(value ?? "").trim();
 const {scoreObjectiveAnswers,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
 
-const buildVerifiedB1MockScore = ({ state = {}, verifiedSections = {} } = {}) =>
+const buildVerifiedB1MockScore = ({ state = {}, verifiedSections = {}, mockId = "b1-mock-01" } = {}) =>
   buildVerifiedFourSkillScore({
     level:"B1",state,verifiedSections,
-    answerKeys:{lesen:READING_ANSWER_KEY,hoeren:LISTENING_ANSWER_KEY},
+    answerKeys:mockId==="b1-mock-02" ? {lesen:READING_ANSWER_KEY_02,hoeren:LISTENING_ANSWER_KEY_02} : {lesen:READING_ANSWER_KEY,hoeren:LISTENING_ANSWER_KEY},
   });
 
 const persistVerifiedB1MockSection = async ({ db, admin, uid, attemptId, section, score, source } = {}) => {
@@ -128,20 +139,21 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
   return { student, studentDocId, studentCode, email, name };
 };
 
-const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false } = {}) => {
+const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "b1-mock-01" } = {}) => {
   const number = Math.max(1, Number(attemptNumber) || 1);
+  if(mockId==="b1-mock-02")return number===1?"B1-MOCK-02":`B1-MOCK-02-PRACTICE-${number}`;
   return firstAttempt || number === 1 ? "B1-FINAL-MOCK" : `B1-FINAL-MOCK-PRACTICE-${number}`;
 };
 
 const buildB1MockCompletionArtifacts = ({
   authedUser = {}, studentProfile = null, attemptId, attemptNumber = 1,
-  firstAttempt = false, overall = {}, sectionScores = {}, now = new Date(),
+  firstAttempt = false, overall = {}, sectionScores = {}, now = new Date(), mockId = "b1-mock-01",
 } = {}) => {
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
-  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt });
+  const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1 ? "First readiness attempt" : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
   const breakdownText = breakdown.map((item) => `${item.label} ${formatScore(item.score)}/25`).join(" · ");
   const statusLabel = passed ? "PASS" : "NEEDS MORE PRACTICE";
@@ -149,35 +161,35 @@ const buildB1MockCompletionArtifacts = ({
   const notificationBody = `Overall: ${formatScore(score)}% — ${statusLabel} · ${breakdownText}. Practise next: ${weakest}.`;
   const timestamp = now instanceof Date ? now : new Date(now);
   const iso = Number.isNaN(timestamp.getTime()) ? new Date().toISOString() : timestamp.toISOString();
-  const scoreDocId = safeDocId(`b1-final-mock-${identity.studentCode || authedUser.uid}-${attemptId}`);
-  const notificationId = safeDocId(`b1-final-mock-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const scoreDocId = safeDocId(`${mockId === "b1-mock-02" ? "b1-mock-02" : "b1-final-mock"}-${identity.studentCode || authedUser.uid}-${attemptId}`);
+  const notificationId = safeDocId(`${mockId === "b1-mock-02" ? "b1-mock-02" : "b1-final-mock"}-result-${identity.studentCode || authedUser.uid}-${attemptId}`);
 
   const scoreDocument = {
     studentCode: identity.studentCode, studentcode: identity.studentCode, uid: clean(authedUser.uid),
     email: identity.email, name: identity.name, studentName: identity.name, level: "B1",
-    assignment: MOCK_TITLE, assignmentId, assignment_id: assignmentId, canonicalAssignmentKey: assignmentId,
+    assignment: mockId === "b1-mock-02" ? "B1 Mock 2" : MOCK_TITLE, assignmentId, assignment_id: assignmentId, canonicalAssignmentKey: assignmentId,
     score, finalScore: score, status: passed ? "passed" : "needs_more_practice",
     result: passed ? "passed" : "needs_more_practice", passed, failed: !passed, comments, feedback: comments,
-    date: iso, link: "/campus/course/b1-final-mock-exam",
+    date: iso, link: mockId==="b1-mock-02" ? "/campus/course/b1-mock-2" : "/campus/course/b1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1), firstAttempt: Boolean(firstAttempt),
     attemptLabel, attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
     mockAttemptId: clean(attemptId),
     sectionScores: Object.fromEntries(breakdown.map((item) => [item.key, item.score])),
     scoreBreakdown: breakdown, strongestArea: strongest, practiseNext: weakest,
-    source: "b1_final_mock", certificateEligible: false, progressionEligible: false,
+    source: mockId==="b1-mock-02" ? "b1_mock_02" : "b1_final_mock", certificateEligible: false, progressionEligible: false,
   };
 
   const notificationDocument = {
     type: "Scores", category: "feedback",
-    title: firstAttempt ? "Your B1 Final Mock result is ready" : "Your B1 Final Mock practice result is ready",
+    title: mockId==="b1-mock-02" ? "Your B1 Mock 2 result is ready" : firstAttempt ? "Your B1 Final Mock result is ready" : "Your B1 Final Mock practice result is ready",
     body: notificationBody, message: notificationBody, timestamp: timestamp.getTime(), sentAt: iso,
-    route: MOCK_ROUTE, source: "b1_final_mock", studentCode: identity.studentCode,
-    studentCodeOriginal: identity.studentCode, studentName: identity.name, assignment: MOCK_TITLE,
+    route: MOCK_ROUTE, source: mockId==="b1-mock-02" ? "b1_mock_02" : "b1_final_mock", studentCode: identity.studentCode,
+    studentCodeOriginal: identity.studentCode, studentName: identity.name, assignment: mockId==="b1-mock-02" ? "B1 Mock 2" : MOCK_TITLE,
     assignmentId, level: "B1", score, status: passed ? "passed" : "needs_improvement", read: false,
     data: {
       type: "marked_assignment", attemptLabel,
       attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
-      category: "feedback", route: MOCK_ROUTE, assignment: MOCK_TITLE, assignmentId, level: "B1",
+      category: "feedback", route: MOCK_ROUTE, assignment: mockId==="b1-mock-02" ? "B1 Mock 2" : MOCK_TITLE, assignmentId, level: "B1",
       score: String(score), status: passed ? "passed" : "needs_improvement",
       attempt: String(Math.max(1, Number(attemptNumber) || 1)), strongestArea: strongest, practiseNext: weakest,
       lesen: formatScore(sectionScores?.lesen), hoeren: formatScore(sectionScores?.hoeren),
@@ -191,13 +203,13 @@ const buildB1MockCompletionArtifacts = ({
 
 const syncB1MockCompletion = async ({
   db, admin, authedUser, studentProfile, attemptId, attemptNumber,
-  firstAttempt, overall, sectionScores, now,
+  firstAttempt, overall, sectionScores, now, mockId = "b1-mock-01",
 } = {}) => {
   if (!db || !admin) throw new Error("Firestore sync dependencies are unavailable.");
   if (!clean(attemptId)) throw new Error("attemptId is required for B1 mock completion sync.");
 
   const artifacts = buildB1MockCompletionArtifacts({
-    authedUser, studentProfile, attemptId, attemptNumber, firstAttempt, overall, sectionScores, now,
+    authedUser, studentProfile, attemptId, attemptNumber, firstAttempt, overall, sectionScores, now, mockId,
   });
   const batch = db.batch();
   const serverTimestamp = admin.firestore.FieldValue.serverTimestamp();
@@ -220,7 +232,7 @@ const syncB1MockCompletion = async ({
 };
 
 module.exports = {
-  MOCK_TITLE, READING_ANSWER_KEY, LISTENING_ANSWER_KEY, scoreObjectiveAnswers,
+  MOCK_TITLE, READING_ANSWER_KEY, LISTENING_ANSWER_KEY, READING_ANSWER_KEY_02, LISTENING_ANSWER_KEY_02, scoreObjectiveAnswers,
   buildVerifiedB1MockScore, persistVerifiedB1MockSection, buildSectionBreakdown,
   deriveMockInsights, resolveStudentIdentity, assignmentIdForAttempt,
   buildB1MockCompletionArtifacts, syncB1MockCompletion,
