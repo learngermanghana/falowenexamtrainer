@@ -62,7 +62,7 @@ jobs:
       - name: Validate committed functions source
         working-directory: functions
         run: |
-          node --test __tests__/accountDeletion.test.cjs __tests__/deletionNotifications.test.cjs functionz/tests/a1TutorCardsBundle.test.cjs
+          node --test __tests__/accountDeletion.test.cjs __tests__/deletionNotifications.test.cjs functionz/tests/a1TutorCardsBundle.test.cjs functionz/tests/b1Day25ClassAudio.test.js
           node --check accountDeletion.js
           node --check deletionNotifications.js
           node --check index.js
