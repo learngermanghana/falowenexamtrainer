@@ -2579,7 +2579,7 @@ const a2MockSpeakingScorePrompt = ({ attempts = [], mockId = "a2-mock-01" }) => 
   ].join("\n");
 };
 
-const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
+const b1MockSpeakingScorePrompt = ({ attempts = [], mockId = "b1-mock-01", selectedTopicId = "a" }) => {
   const safeAttempts = attempts.map((attempt) => ({
     id: String(attempt?.id || "").trim(),
     teil: String(attempt?.teil || "").trim(),
@@ -2591,7 +2591,7 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
     "Assess ONLY what the learner actually said in the supplied speech-to-text transcripts. Never invent missing content.",
     "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
     "Judge at CEFR B1 standard. Because the source is a transcript, do not claim to measure accent or exact pronunciation.",
-    "Teil 1 was recorded while a simulated partner audio played. Ignore obvious partner/instruction fragments if they appear in the transcript and score the learner's meaningful planning contributions.",
+    mockId === "b1-mock-02" ? "Mock 2 has no prerecorded partner voice. Judge only learner speech, do not assume genuine partner responses and do not score pronunciation from transcripts." : "Teil 1 was recorded while a simulated partner audio played. Ignore obvious partner/instruction fragments if they appear in the transcript and score the learner's meaningful planning contributions.",
     "If a task transcript is empty, treat that task as no response and award 0 points for that task.",
     "",
     "SCORING — total 25 points:",
@@ -2638,7 +2638,12 @@ const b1MockSpeakingScorePrompt = ({ attempts = [] }) => {
       }
     }),
     "",
-    mockTaskPrompt("B1", "speaking"),
+    mockId === "b1-mock-02" ? [
+      "B1 MOCK 2 — CANONICAL TEACHER TASKS (not client-authored):",
+      "Teil 1: Plan a surprise celebration in the course room for Frau Keller's 10-year work anniversary: date/place, whom to invite, gift and budget, food/drinks/decorations responsibilities.",
+      selectedTopicId === "b" ? "Teil 2 topic B: Verreisen: Lieber alleine oder in einer Gruppe? Introduction, personal travel experience, home-country practices, advantages and disadvantages of solo and group travel, opinion and conclusion." : "Teil 2 topic A: Sollte man im Alltag mehr Bio-Produkte kaufen? Introduction, personal experience, home-country practices, advantages and disadvantages of organic products including price and environmental impact, opinion and conclusion.",
+      "Teil 3: Give feedback on partner presentation, ask relevant extra question and answer partner's question. No prerecorded partner exists.",
+    ].join("\n") : mockTaskPrompt("B1", "speaking"),
     "Student attempts (client task descriptions are not authoritative; match each id/Teil to the task data above):",
     JSON.stringify(safeAttempts),
   ].join("\n");
@@ -2828,7 +2833,7 @@ const b2MockWritingScorePrompt = ({ teil1 = "", teil2 = "" }) => [
   `Teil 2 formelle Nachricht:\n${String(teil2 || "").trim()}`,
 ].join("\n");
 
-const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
+const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "", mockId = "b1-mock-01" }) => [
   "You are a strict Goethe-style B1 writing examiner for a Falowen final mock exam.",
   "Assess the learner's three German writing responses exactly as submitted. Never invent missing content.",
   "Feedback shown to the learner MUST be in English. German may appear only in short corrected examples.",
@@ -2844,7 +2849,12 @@ const b1MockWritingScorePrompt = ({ teil1 = "", teil2 = "", teil3 = "" }) => [
   "AUFGABE 3 — formal email, 5 points; use the canonical word target.",
   "Use formal address/register and an appropriate closing.",
   "",
-  mockTaskPrompt("B1", "writing"),
+  mockId === "b1-mock-02" ? [
+    "B1 MOCK 2 — CANONICAL TEACHER TASKS, not Mock 1:",
+    "Teil 1 ~80 words, informal email to Julian: thank for invitation to next Saturday's birthday party; decline with reason; suggest another meeting date; greeting and closing.",
+    "Teil 2 ~80 words, online discussion on 'Brauchen wir bargeldloses Bezahlen überall?'. Respond to Laura (26), who prefers card and smartphone and thinks cash is obsolete. Own opinion, reasons, personal experiences or situation in home country.",
+    "Teil 3 ~40 words, formal message to Frau Sommer, head of customer service at Volkshochschule: learner forgot their library card in course room yesterday. Say what and where, request search and to leave it at reception, formal Sie form and greeting/closing.",
+  ].join("\n") : mockTaskPrompt("B1", "writing"),
   "Return JSON only, no markdown, using this shape:",
   JSON.stringify({
     score: 0,
@@ -4775,6 +4785,14 @@ app.post("/writing/b1-mock-score", async (req, res) => {
     const teil2 = String(req.body?.teil2 || "").trim().slice(0, 8000);
     const teil3 = String(req.body?.teil3 || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    let b1WritingMockId="b1-mock-01";
+    if(attemptId){
+      const db=getFirestoreSafe();
+      if(!db)return res.status(503).json({error:"Mock exam storage unavailable."});
+      const snap=await db.collection("b1MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+      if(!snap.exists || !["b1-mock-01","b1-mock-02"].includes(snap.data()?.mockId))return res.status(404).json({error:"B1 mock attempt not found."});
+      b1WritingMockId=snap.data().mockId;
+    }
 
     let result;
     if (!teil1 && !teil2 && !teil3) {
@@ -4808,7 +4826,7 @@ app.post("/writing/b1-mock-score", async (req, res) => {
 
       const reply = await createMockAssessment(
         [
-          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3 }) },
+          { role: "system", content: b1MockWritingScorePrompt({ teil1, teil2, teil3, mockId:b1WritingMockId }) },
           { role: "user", content: "Return the strict B1 mock writing result as JSON only." },
         ],
         { temperature: 0.1, max_tokens: 2200, response_format: { type: "json_object" } },
@@ -6034,8 +6052,8 @@ app.post("/b1-mock/attempt/start", async (req, res) => {
           uid: authedUser.uid,
           email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
           ...(mockId==="b1-mock-01"?{attemptCount:attemptNumber,activeAttemptId:newAttemptRef.id}:{}),
-          [`attemptCountByMock.${mockId}`]:attemptNumber,
-          [`activeAttemptByMock.${mockId}`]:newAttemptRef.id,
+          attemptCountByMock:{...(userData.attemptCountByMock||{}),[mockId]:attemptNumber},
+          activeAttemptByMock:{...(userData.activeAttemptByMock||{}),[mockId]:newAttemptRef.id},
           updatedAt: now,
         },
         { merge: true },
@@ -6898,6 +6916,14 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
 
     const attempts = Array.isArray(req.body?.attempts) ? req.body.attempts : [];
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
+    let b1SpeakingMockId="b1-mock-01";
+    if(attemptId){
+      const db=getFirestoreSafe();
+      if(!db)return res.status(503).json({error:"Mock exam storage unavailable."});
+      const snap=await db.collection("b1MockExamUsers").doc(authedUser.uid).collection("attempts").doc(attemptId).get();
+      if(!snap.exists || !["b1-mock-01","b1-mock-02"].includes(snap.data()?.mockId))return res.status(404).json({error:"B1 mock attempt not found."});
+      b1SpeakingMockId=snap.data().mockId;
+    }
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking responses are required for the complete B1 mock." });
     }
@@ -6933,7 +6959,7 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
 
     const reply = await createMockAssessment(
       [
-        { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts }) },
+        { role: "system", content: b1MockSpeakingScorePrompt({ attempts: normalizedAttempts, mockId:b1SpeakingMockId, selectedTopicId:req.body?.selectedTopicId==="b"?"b":"a" }) },
         { role: "user", content: "Return the final B1 mock speaking assessment as the required JSON object." },
       ],
       { temperature: 0.1, max_tokens: 1100 },
