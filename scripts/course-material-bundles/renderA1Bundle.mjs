@@ -11,6 +11,7 @@ import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHel
 import { inspectA1PrintDocument, isA1PrintContentReady } from "./a1PdfContentReadiness.mjs";
 import { prepareA1PrintDocument } from "./a1PdfPrintExtras.mjs";
 import { sanitizeA1PrintDocument, findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
+import { cleanA1PrintChrome, findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -249,9 +250,15 @@ const printA1Page = async (page, file, day, kind, lessonUrl) => {
     companionUrl.searchParams.delete("radio");
     const qrDataUrl = audioCount ? await QRCode.toDataURL(companionUrl.toString(), { width: 132, margin: 1 }) : "";
     await page.evaluate(prepareA1PrintDocument, { lessonUrl: companionUrl.toString(), qrDataUrl });
+    await page.evaluate(cleanA1PrintChrome);
     const printRoot = page.locator('[data-a1-speaking-confidence-lab="true"]').first();
     const lessonRoot = await printRoot.count() ? printRoot : page.locator("main").first();
     const visibleText = await lessonRoot.innerText().catch(() => "");
+    const printUiLeaks = findA1PrintChromeLeaks(visibleText);
+    if (printUiLeaks.length) {
+      throw new Error("A1 Day " + day + " " + kind +
+        " still contains website-only controls: " + printUiLeaks.join(", "));
+    }
     const leaked = findA1PrintPrivacyLeaks(visibleText);
     if (leaked.length) {
       // Fail closed; a PDF should never include other students' work.

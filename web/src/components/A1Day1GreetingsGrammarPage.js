@@ -299,7 +299,7 @@ const A1Day1GreetingsGrammarPage = () => {
         <div style={{ ...infoCardStyle, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <strong>Knowledge test:</strong>
           <span>10 questions are placed under the grammar section they test.</span>
-          <span><strong>Score: {knowledgeScore}/10</strong></span>
+          <span data-a1-pdf-hide-ui="knowledge-score"><strong>Score: {knowledgeScore}/10</strong></span>
         </div>
       </header>
 

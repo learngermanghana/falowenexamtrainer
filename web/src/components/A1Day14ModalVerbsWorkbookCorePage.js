@@ -621,7 +621,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             );
           })}
         </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div data-a1-pdf-hide-ui="knowledge-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button type="button" style={primaryBtn} disabled={answeredCount < knowledgeQuestions.length} onClick={() => setTestSubmitted(true)}>
             Check knowledge test
           </button>

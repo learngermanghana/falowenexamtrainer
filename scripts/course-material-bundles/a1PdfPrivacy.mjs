@@ -66,6 +66,12 @@ export const sanitizeA1PrintDocument = () => {
     panel.replaceWith(makeWritingSpace(taskType === "formal" ? "Formeller Brief · Ihre Antwort" : "Informeller Brief · Ihre Antwort", 10));
   }
 
+  // The live Day 7 family recorder may contain a learner's spoken transcript,
+  // signed audio link and personalised feedback. Print a neutral practice area.
+  for (const panel of [...root.querySelectorAll('[data-a1-family-recorder]')]) {
+    panel.replaceWith(makeWritingSpace("Sprechen · Meine Familie: Stichwörter", 4));
+  }
+
   // Preserve printable response space for the real exercise. A1-0.2 Teil 2
   // gets all five short-answer controls here; A1-1.1 Teil 2 gets its writing
   // textarea here. Removing this whole panel would produce unanswerable pages.

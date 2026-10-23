@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 import { findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
+import { findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -44,6 +45,8 @@ try {
 }
 
 if (level === "A1") {
+  const chromeLeaks = findA1PrintChromeLeaks(text);
+  if (chromeLeaks.length) throw new Error("A1 PDF web-only UI preflight failed: " + chromeLeaks.join(", "));
   const privacyLeaks = findA1PrintPrivacyLeaks(text);
   if (privacyLeaks.length) throw new Error("A1 PDF PRIVACY preflight failed: " + privacyLeaks.join(", "));
   const audit = scanPdfPageContent(text, pdf.getPageCount());

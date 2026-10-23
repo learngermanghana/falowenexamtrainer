@@ -161,7 +161,7 @@ export default function VerbotenErlaubtPage() {
                   <strong style={{ fontSize: 24, color: palette.indigo }}>{keyword}</strong>
                 </div>
                 <p style={{ margin: 0, color: palette.muted }}>Stelle deinem Partner mit dem Stichwort eine passende Frage.</p>
-                <button type="button" onClick={() => setRevealedTeil2((current) => ({ ...current, [cardKey]: !open }))} style={styles.secondaryButton}>
+                <button data-a1-pdf-hide-ui="model-toggle" type="button" onClick={() => setRevealedTeil2((current) => ({ ...current, [cardKey]: !open }))} style={styles.secondaryButton}>
                   {open ? "Hide model" : "Show model"}
                 </button>
                 {open ? <Callout><strong>Model</strong><span>{model}</span></Callout> : null}
@@ -185,7 +185,7 @@ export default function VerbotenErlaubtPage() {
                 <span style={{ color: palette.muted, fontSize: 12, fontWeight: 900 }}>KARTE</span>
                 <strong style={{ fontSize: 22, color: palette.green }}>{keyword}</strong>
                 <p style={{ margin: 0, color: palette.muted }}>Formuliere eine höfliche Bitte.</p>
-                <button type="button" onClick={() => setRevealedTeil3((current) => ({ ...current, [keyword]: !open }))} style={styles.secondaryButton}>
+                <button data-a1-pdf-hide-ui="model-toggle" type="button" onClick={() => setRevealedTeil3((current) => ({ ...current, [keyword]: !open }))} style={styles.secondaryButton}>
                   {open ? "Hide model" : "Show model"}
                 </button>
                 {open ? <Callout tone="green"><strong>Bitte</strong><span>{request}</span><strong>Reaktion</strong><span>{reaction}</span></Callout> : null}

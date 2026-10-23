@@ -100,7 +100,7 @@ const hasDraftContent = (sections = {}) => {
 };
 
 const DraftNotice = ({ savedAt = "", cloudStatus = "" }) => (
-  <p role="status" aria-live="polite" style={draftNoticeStyle}>
+  <p data-a1-pdf-hide-ui="draft-notice" role="status" aria-live="polite" style={draftNoticeStyle}>
     {cloudStatus === "error" ? "Cloud save failed. Your draft is saved on this device; try again before leaving. " : cloudStatus === "saving" ? "Saving draft… " : ""}
     Saved to your assignment draft{savedAt ? ` · ${new Date(savedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. <strong>Not submitted for marking yet.</strong>
   </p>
@@ -302,7 +302,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             );
           })}
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontWeight: 800 }}>
+        <div data-a1-pdf-hide-ui="progress" style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", fontWeight: 800 }}>
           <span>{priceProgress.completed} of {priceProgress.total} answered</span>
           <span>{priceProgress.complete ? "Teil 1 complete" : `${priceProgress.total - priceProgress.completed} remaining`}</span>
         </div>
@@ -352,10 +352,11 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             </li>
           ))}
         </ol>
-        <p>{grammarProgress.completed} of 6 blanks completed</p>
+        <p data-a1-pdf-hide-ui="progress">{grammarProgress.completed} of 6 blanks completed</p>
         <DraftNotice savedAt={savedAt} cloudStatus={cloudStatus} />
         <div
           data-a1-chapter3-workbook-completion="true"
+          data-a1-pdf-hide-ui="completion"
           style={{
             ...styles.card,
             border: `2px solid ${workbookComplete ? "#22c55e" : "#fbbf24"}`,
