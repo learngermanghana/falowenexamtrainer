@@ -77,6 +77,7 @@ jobs:
           node --check scripts/course-material-bundles/pdfNavigation.mjs
           node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
+          if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
 
       - name: Runtime-test PDF navigation objects
         if: ${{ matrix.level == 'A1' }}
@@ -92,6 +93,7 @@ jobs:
           EXPECTED_LESSON_COUNT: ${{ matrix.lesson_count }}
         run: |
           node scripts/course-material-bundles/buildLevelManifest.mjs "$LEVEL"
+          if [ "$LEVEL" = "A1" ]; then node scripts/course-material-bundles/validateA1RenderPlan.mjs; fi
           node --input-type=module <<'NODE'
           import fs from "node:fs";
 
@@ -139,7 +141,9 @@ jobs:
           node-version: 22
 
       - name: Build ordered level manifest
-        run: node scripts/course-material-bundles/buildLevelManifest.mjs "${{ inputs.level }}"
+        run: |
+          node scripts/course-material-bundles/buildLevelManifest.mjs "${{ inputs.level }}"
+          if [ "${{ inputs.level }}" = "A1" ]; then node scripts/course-material-bundles/validateA1RenderPlan.mjs; fi
 
       - name: Validate and show manifest summary
         run: |
