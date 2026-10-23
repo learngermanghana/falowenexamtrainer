@@ -25,6 +25,6 @@ test("only the verified A2 Day 20 Reklamation MP3 can be signed", async () => {
   });
   assert.equal(signed.level,"A2");
   assert.equal(signed.key,key);
-  assert.match(signed.url,/a2\\/day-20\\/reklamation-falsches-hemd\\.mp3\\?/);
+  assert.ok(signed.url.includes("a2/day-20/reklamation-falsches-hemd.mp3?"));
   assert.match(signed.url,/X-Amz-Signature=/);
 });
