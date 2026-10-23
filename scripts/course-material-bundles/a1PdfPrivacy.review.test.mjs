@@ -1,0 +1,131 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { sanitizeA1PrintDocument, findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
+
+class Element {
+  constructor(tag = "DIV", content = "") {
+    this.tagName = tag.toUpperCase();
+    this.textContent = content;
+    this.children = [];
+    this.attributes = {};
+    this.style = { setProperty(key, val) { this[key] = val; } };
+    this.mapping = {};
+    this.removed = false;
+    this.replacement = null;
+    this.value = "";
+  }
+  setAttribute(key, value) { this.attributes[key] = String(value); }
+  getAttribute(key) { return this.attributes[key] ?? null; }
+  removeAttribute(key) { delete this.attributes[key]; }
+  append(...nodes) { this.children.push(...nodes); }
+  replaceChildren(...nodes) { this.children = [...nodes]; this.textContent = ""; }
+  replaceWith(node) { this.replacement = node; this.removed = true; }
+  remove() { this.removed = true; }
+  matches(query) { return query === "[data-speaking-mock]" && Boolean(this.getAttribute("data-speaking-mock")); }
+  querySelector(query) { return this.querySelectorAll(query)[0] || null; }
+  querySelectorAll(query) { return this.mapping[query] || []; }
+  closest() { return null; }
+}
+
+const withDocument = (root, run) => {
+  const oldDocument = globalThis.document;
+  globalThis.document = {
+    body: root,
+    querySelector: (selector) => selector === "main" ? root : null,
+    createElement: (tag) => new Element(tag),
+  };
+  try { run(); }
+  finally {
+    if (oldDocument === undefined) delete globalThis.document;
+    else globalThis.document = oldDocument;
+  }
+};
+
+test("Day 19 speaking-mock root removes recovered feedback, session IDs and scores", () => {
+  const mock = new Element("MAIN");
+  mock.setAttribute("data-speaking-mock", "A1");
+  const recovered = new Element("SECTION", "Teil 1: 100% · Session: private-id · private transcript");
+  mock.children = [recovered];
+  withDocument(mock, () => sanitizeA1PrintDocument());
+  assert.equal(mock.getAttribute("data-a1-pdf-speaking-prompt"), "true");
+  assert.equal(mock.children.length, 5); // heading + introduction + three static Teils
+  const printed = mock.children.flatMap((node) => [node.textContent, ...node.children.map((child) => child.textContent)]).join(" ");
+  assert.match(printed, /Teil 1 · Sich vorstellen/);
+  assert.match(printed, /Teil 2 · Fragen und Antworten/);
+  assert.match(printed, /Teil 3 · Bitten und Reagieren/);
+  assert.doesNotMatch(printed, /private-id|private transcript|100%/);
+  assert.ok(findA1PrintPrivacyLeaks("Your Teil scores").includes("saved speaking session"));
+  assert.ok(findA1PrintPrivacyLeaks("Session: abc123").includes("saved speaking session"));
+});
+
+test("nested speaking-mock component also gets a safe static replacement", () => {
+  const root = new Element("MAIN");
+  const mock = new Element("MAIN");
+  mock.setAttribute("data-speaking-mock", "A1");
+  mock.children = [new Element("SECTION", "Private feedback")];
+  root.mapping["[data-speaking-mock]"] = [mock];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(mock.getAttribute("data-a1-pdf-speaking-prompt"), "true");
+  assert.equal(mock.children.length, 5);
+});
+
+test("A1-0.2 Teil 2 keeps five numbered listening answer blanks and no saved values", () => {
+  const root = new Element("MAIN");
+  const capture = new Element("SECTION");
+  capture.setAttribute("data-a1-tutor-draft-capture", "teil-2");
+  const inputs = Array.from({ length: 5 }, (_, n) => {
+    const input = new Element("INPUT");
+    input.value = "PRIVATE ANSWER " + (n + 1);
+    return input;
+  });
+  capture.mapping['input[type="text"],input:not([type])'] = inputs;
+  root.mapping['[data-a1-tutor-draft-capture]'] = [capture];
+  root.mapping['textarea, input:not([type=checkbox]):not([type=radio]), [contenteditable=true]'] = inputs;
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.ok(capture.removed);
+  const blank = capture.replacement;
+  assert.equal(blank.getAttribute("data-a1-pdf-draft-answer-space"), "teil-2");
+  assert.equal(blank.children.length, 6); // section heading + 5 question rows
+  assert.deepEqual(blank.children.slice(1).map((row) => row.children[0].textContent), [
+    "Question 1", "Question 2", "Question 3", "Question 4", "Question 5",
+  ]);
+  assert.ok(blank.children.slice(1).every((row) => row.children[1].getAttribute("data-a1-pdf-answer-rule") === ""));
+  assert.ok(inputs.every((input) => input.value === ""));
+});
+
+test("A1-1.1 Teil 2 keeps blank writing lines instead of a saved draft", () => {
+  const root = new Element("MAIN");
+  const capture = new Element("SECTION");
+  capture.setAttribute("data-a1-tutor-draft-capture", "teil-2");
+  const textarea = new Element("TEXTAREA", "PRIVATE DRAFT");
+  textarea.value = "PRIVATE DRAFT";
+  capture.mapping["textarea"] = [textarea];
+  root.mapping['[data-a1-tutor-draft-capture]'] = [capture];
+  root.mapping['textarea, input:not([type=checkbox]):not([type=radio]), [contenteditable=true]'] = [textarea];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  const section = capture.replacement;
+  assert.equal(section.getAttribute("data-a1-pdf-draft-answer-space"), "teil-2");
+  const ruled = section.children[1];
+  assert.equal(ruled.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(ruled.children.filter((child) => child.getAttribute("data-a1-pdf-answer-rule") === "").length, 8);
+  assert.equal(textarea.value, "");
+  assert.equal(textarea.textContent, "");
+});
+
+test("Chapter 3 native selects clear selectedIndex, value and option selections", () => {
+  const root = new Element("MAIN");
+  const select = new Element("SELECT");
+  select.value = "gern"; select.selectedIndex = 1;
+  const a = new Element("OPTION"), b = new Element("OPTION");
+  a.selected = false; a.defaultSelected = false;
+  b.selected = true; b.defaultSelected = true;
+  b.setAttribute("selected", "");
+  select.options = [a, b];
+  root.mapping["select"] = [select];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(select.value, "");
+  assert.equal(select.selectedIndex, -1);
+  assert.equal(b.selected, false);
+  assert.equal(b.defaultSelected, false);
+  assert.equal(b.getAttribute("selected"), null);
+});
