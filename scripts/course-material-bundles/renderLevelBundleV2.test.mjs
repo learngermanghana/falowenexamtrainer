@@ -47,8 +47,10 @@ test("A1 render plan contains only grammar and workbook targets", () => {
   const externalTargets = plan.lessons
     .flatMap((lesson) => lesson.targets)
     .filter((target) => target.sourceType === "external-pdf");
-  assert.ok(externalTargets.length > 0);
-  assert.ok(externalTargets.every((target) => target.kind === "workbook"));
+  assert.equal(externalTargets.length, 0, "A1 PDF uses current live Course Book pages, not obsolete external PDFs");
+  const day18 = plan.lessons.find((lesson) => lesson.day === 18);
+  assert.deepEqual(day18.targets.map((target) => target.kind), ["grammar", "workbook"]);
+  assert.ok(day18.targets.every((target) => target.url.includes("two-case-prepositions-wechselpraepositionen-day-18")));
 });
 
 

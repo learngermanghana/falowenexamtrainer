@@ -21,6 +21,12 @@ The A1 final mock must be managed independently in Exams Room. Do **not** invent
 4. Download the finished Falowen-LEVEL-course-materials-pdf artifact from the successful run.
 5. A1–B1 PDFs are checked for table-of-contents links, bookmarks, section dividers and excluded web UI. Failures upload diagnostic artifacts.
 
+### Canonical A1 course redirects
+
+The A1 PDF renderer accepts only the exact requested lesson path on `www.falowen.app` or `falowen.app` over HTTPS, ignoring harmless trailing slashes. It still rejects login screens, off-domain redirects, unrelated course routes and app errors. The diagnostics on failure report both URL origins and paths without printing credentials or session tokens.
+
+Day 18's outdated Chapter 12.2 and externally hosted PDFs were removed from the A1 render plan; the live merged Chapter 12.1 grammar and workbook are now printed from the canonical Course Book route.
+
 ### A1 export preflight
 
 The A1 renderer now prints each native workbook Teil panel instead of the default Overview. For other tutor or practice navigators, it visits each available Teil/Section tab and merges their printouts. Exercise option buttons remain visible; previous/next navigation, score/submission controls and video cards are suppressed. Rendering waits for real React lesson text; if a target is still loading, the build stops instead of producing an incomplete PDF.
@@ -37,7 +43,7 @@ If press_preview is enabled, the workflow adds a branded editorial proof before 
 Before selling **any** converted book, the editorial team must:
 
 1. Review questions, answers, example letters, diagrams and pagination.
-2. Confirm ownership/licences for any existing external material, including the two Google Drive PDF targets on A1 Day 18.
+2. Confirm ownership/licences for any existing external material. The A1 Day 18 exporter now uses the live Chapter 12.1 material instead of the outdated Google Drive PDF sources.
 3. Replace app-specific UI and instructions with reader-appropriate book content.
 4. Curate original exam-style practice with verified solutions and listening transcripts.
 5. Link to properly licensed audio and validate every QR code.
