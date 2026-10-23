@@ -1,0 +1,54 @@
+name: B1 Mock 2 four-skill publishing gate
+on:
+  pull_request:
+    paths:
+      - "web/src/components/B1Mock2*"
+      - "web/src/data/b1Mock2Data.js"
+      - "web/src/App.js"
+      - "web/src/data/mockExamCatalog.js"
+      - "web/src/services/coachService.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/b1MockCompletionSync.js"
+      - "functions/functionz/__tests__/b1Mock2Full.test.js"
+      - ".github/workflows/b1-mock-02-publishing.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/B1Mock2*"
+      - "web/src/data/b1Mock2Data.js"
+      - "web/src/App.js"
+      - "functions/functionz/app.js"
+      - "functions/functionz/b1MockCompletionSync.js"
+      - ".github/workflows/b1-mock-02-publishing.yml"
+permissions:
+  contents: read
+jobs:
+  backend-scoring:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Verify syntax and isolated four-module scoring
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/b1MockCompletionSync.js
+          npm run test:backend -- --runInBand functions/functionz/__tests__/b1Mock2Full.test.js functions/functionz/__tests__/b1MockCompletionSync.test.js functions/functionz/__tests__/b1Mock2Hoeren.test.js
+  student-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --prefix web --no-audit --no-fund
+      - name: Compile new student exam and prevent unresolved imports
+        run: npm run build --prefix web
+        env:
+          CI: true
