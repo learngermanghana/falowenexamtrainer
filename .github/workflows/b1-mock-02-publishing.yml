@@ -32,7 +32,7 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: package-lock.json
-      - run: npm ci --no-audit --no-fund
+      - run: npm install --no-audit --no-fund --loglevel=error
       - name: Verify syntax and isolated four-module scoring
         run: |
           node --check functions/functionz/app.js
