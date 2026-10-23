@@ -12,7 +12,8 @@ export const scanA1PrintText = (value = "") =>
 // An exact visible leaf text node is important: a whole-page 'Loading...'
 // substring would incorrectly reject lessons discussing loading or audio.
 export const inspectA1PrintDocument = () => {
-  const root = document.querySelector("main") || document.body;
+  const root = document.querySelector("[data-a1-speaking-confidence-lab]")
+    || document.querySelector("main") || document.body;
   const visible = (element) => {
     if (!element || !element.getClientRects().length) return false;
     const style = window.getComputedStyle(element);
