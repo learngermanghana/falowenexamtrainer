@@ -1346,7 +1346,7 @@ app.get("/course-media/b1/mock-audio-url", async (req, res) => {
     }
 
     const signed = await createB1MockAudioSignedUrl(validated);
-    if (isApprovedMock2Part && !(await verifyB1Mock2Audio({
+    if (isApprovedMock2Part && !released && !(await verifyB1Mock2Audio({
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "This B1 Mock 2 recording is not available yet." });
