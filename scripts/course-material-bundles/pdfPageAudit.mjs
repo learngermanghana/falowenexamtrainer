@@ -30,8 +30,8 @@ export const scanPdfPageContent = (extractedText, expectedCount) => {
     }
     // Known UI-only print overflow (previous A1 Day 14 p.186) must never
     // count as a meaningful exercise page.
-    const uiOnlyText = normalized.replace(/Falowen Learning Hub\\s+\\d+\\s*\\/\\s*\\d+/gi, "").trim();
-    if (/^(?:Check knowledge test\\s+Reset test|Reset test\\s+Check knowledge test)$/i.test(uiOnlyText)) {
+    const uiOnlyText = normalized.replace(/Falowen Learning Hub\s+\d+\s*\/\s*\d+/gi, "").trim();
+    if (/^(?:Check knowledge test\s+Reset test|Reset test\s+Check knowledge test)$/i.test(uiOnlyText)) {
       faults.push("Page " + (index + 1) + " contains only online knowledge-test buttons");
     }
     const withoutFooter = normalized
