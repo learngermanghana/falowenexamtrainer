@@ -56,7 +56,7 @@ describe("A2 Day 16 and Day 19 complete workbooks", () => {
   });
 
   it("makes the replacement teacher lecture accessible from the Day 16 direct workbook URL", () => {
-    expect(standardShell).toContain('data-a2-day16-teacher-lecture="true"');
+    expect(standardShell).toContain('data-a2-day16-teacher-lecture={Number(day) === 16 ? "true" : undefined}');
     expect(standardShell).toContain('getTeacherLectureVideoResources("A2", day)');
     expect(standardShell).toContain("Watch teacher lecture on YouTube");
     expect(standardShell).toContain("inlineTeacherLecture.url");
