@@ -25,13 +25,22 @@ const normalizeDay = (value) => {
   return Number.isFinite(number) && number >= 0 ? number : null;
 };
 
-const classifyPrintableLesson = (level, day) => {
+const classifyPrintableLesson = (level, day, title = "") => {
   if (level === "A1") {
     if (day === 0) {
       return {
         printKind: "excluded",
         status: "excluded-from-course-book",
         exclusionReason: "Orientation and platform tutorial",
+      };
+    }
+
+    // The final mock belongs in Exams Room, not in the teaching Course Book PDF.
+    if (/final mock exam/i.test(title)) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Final mock examination belongs to Exams Room",
       };
     }
 
@@ -130,7 +139,7 @@ const lessons = [...byDay.values()]
       : lesson.sourceUrl.startsWith("/")
         ? lesson.sourceUrl
         : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
-    const classification = classifyPrintableLesson(requestedLevel, lesson.day);
+    const classification = classifyPrintableLesson(requestedLevel, lesson.day, lesson.title);
 
     return {
       ...lesson,
