@@ -87,6 +87,7 @@ jobs:
           node --check scripts/course-material-bundles/buildPressProof.mjs
           node --check scripts/course-material-bundles/a1PrintHelpers.mjs
           node --check scripts/course-material-bundles/pdfPageAudit.mjs
+          node --check scripts/course-material-bundles/trimPrintedPdfTail.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/runA1BundleCleanPdf.mjs
           node --test scripts/course-material-bundles/a1PrintHelpers.test.mjs
@@ -96,9 +97,14 @@ jobs:
       - name: Runtime-test PDF navigation objects
         if: ${{ matrix.level == 'A1' }}
         run: |
+          if ! command -v pdftotext >/dev/null || ! command -v pdftoppm >/dev/null; then
+            sudo apt-get update -qq
+            sudo apt-get install -y poppler-utils
+          fi
           npm install --no-save --package-lock=false pdf-lib@1.17.1
           node --test scripts/course-material-bundles/pdfNavigation.test.mjs
           node --test scripts/course-material-bundles/buildPressProof.test.mjs
+          node --test scripts/course-material-bundles/trimPrintedPdfTail.test.mjs
 
       - name: Build and validate manifest
         env:
