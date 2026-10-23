@@ -87,9 +87,9 @@ const loginOnce = async (page) => {
   }
 };
 
-const injectPrintMode = async (page) => {
+const injectPrintMode = async (page, kind) => {
   await page.emulateMedia({ media: "print" });
-  return page.addStyleTag({ content: a1PrintCss() });
+  return page.addStyleTag({ content: a1PrintCss(kind) });
 };
 
 const resetPrintMode = async (page, printStyle) => {
@@ -133,7 +133,7 @@ const getA1WorkbookCapturePlan = async (page) => {
 };
 
 const printA1Page = async (page, file, day, kind) => {
-  const printStyle = await injectPrintMode(page);
+  const printStyle = await injectPrintMode(page, kind);
   try {
     const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
     if (!isA1PdfReadyText(mainText)) {
