@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage } from "./a1PdfAuthState.mjs";
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -19,7 +20,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 11, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 12, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -74,17 +75,23 @@ const loginOnce = async (page) => {
   const submit = loginForm.getByRole("button", { name: /^Log in$/i }).first();
   await submit.click({ timeout: 10000 });
 
-  await page.waitForFunction(
-    () => !document.body?.innerText?.includes("Returning Falowen student"),
-    undefined,
-    { timeout: 25000 },
-  ).catch(() => {});
-  await waitForStablePage(page);
-
-  const authText = await getBodyText(page);
-  if (/Password mismatch|could not find an account|cannot log in right now|permission denied/i.test(authText)) {
-    throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
+  // Submitting the login form is not proof that Firebase finished signing in.
+  // Wait for the authenticated shell, and let Firebase persist its session
+  // before the next hard navigation to a protected course route.
+  let formDismissed = true;
+  try {
+    await loginForm.waitFor({ state: "hidden", timeout: 30000 });
+  } catch {
+    formDismissed = false;
   }
+  const authText = await getBodyText(page);
+  if (/Password mismatch|could not find an account|cannot log in right now|permission denied|Login blocked|too many login attempts/i.test(authText)) {
+    throw new Error("Falowen PDF account login was rejected. Check the dedicated account's access and GitHub credentials.");
+  }
+  if (!formDismissed) {
+    throw new Error("Falowen PDF login form remained visible after signing in; refusing to render public Course Book content.");
+  }
+  await page.waitForTimeout(1300);
 };
 
 const injectPrintMode = async (page, kind) => {
@@ -97,21 +104,42 @@ const resetPrintMode = async (page, printStyle) => {
   await page.emulateMedia({ media: "screen" });
 };
 
-const waitForCourseHydration = async (page, day, kind) => {
-  // DOMContentLoaded can precede React/Firebase hydration. Never print loaders.
+// React route, Firebase authentication, and profile hydration complete at
+// different times. Do not confuse the transient public/home shell with a lesson.
+const waitForAuthenticatedCoursePage = async (page, url, timeout = 16000) => {
+  const expected = new URL(url);
   try {
-    await page.waitForFunction(() => {
-      const text = String(document.querySelector("main")?.innerText || document.body?.innerText || "")
-        .replace(/\s+/g, " ").trim();
-      return text.length >= 120 && !/^Loading the app[.…]*/i.test(text);
-    }, undefined, { timeout: 30000 });
+    await page.waitForFunction(({ origin, pathname }) => {
+      const normalizePath = (value) => String(value || "").replace(/\/+$/, "");
+      const body = String(document.body?.innerText || "").replace(/\s+/g, " ").trim();
+      const main = String(document.querySelector("main")?.innerText || "").replace(/\s+/g, " ").trim();
+      const publicShell = /German and French learning in one place|Ready to start learning\?|Create your Falowen account|Connect with your account|Returning Falowen student|Email or student code/i;
+      const badScreen = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i;
+      return window.location.origin === origin
+        && normalizePath(window.location.pathname) === normalizePath(pathname)
+        && main.length >= 120
+        && !/^Loading the app[.…]*/i.test(main)
+        && !publicShell.test(body)
+        && !badScreen.test(body);
+    }, { origin: expected.origin, pathname: expected.pathname }, { timeout });
+    return true;
   } catch {
-    throw new Error("A1 Day " + day + " " + kind +
-      " did not hydrate to readable content: " + (await getBodyText(page)).slice(0, 250));
+    return false;
   }
-  await page.waitForTimeout(400);
 };
 
+const waitForCourseHydration = async (page, day, kind) => {
+  // For tab changes, we are already on an authenticated page. Confirm that
+  // a panel still has readable content; the route opener checks authentication.
+  try {
+    await page.waitForFunction(() => {
+      const text = String(document.querySelector("main")?.innerText || "").replace(/\s+/g, " ").trim();
+      return text.length >= 120 && !/^Loading the app[.…]*/i.test(text);
+    }, undefined, { timeout: 20000 });
+  } catch {
+    throw new Error("A1 Day " + day + " " + kind + " has not hydrated to readable course content");
+  }
+};
 const A1_TAB_SELECTORS = [
   '[data-a1-unified-tutor-workbook-nav] [role="tablist"] button',
   '[aria-label="A1 shared self-practice sections"] button',
@@ -218,37 +246,54 @@ const hasVisibleRadioGate = async (page) => {
 
 const ensureInternalPage = async (page, target, day) => {
   const url = getInternalRenderUrl(target);
-  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
-  await waitForStablePage(page);
-  await waitForCourseHydration(page, day, target.kind);
+  let lastState = "loading";
+  let lastPath = "";
 
-  if (await isPublicOrLogin(page)) {
-    throw new Error(`Day ${day} ${target.kind} route is not authenticated: ${url}`);
+  // A hard navigation can temporarily show the public shell while IndexedDB
+  // restores Firebase authentication. Wait for actual lesson content and retry
+  // a bounded number of times rather than rejecting the first public frame.
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.locator("body").waitFor({ state: "visible", timeout: 15000 });
+
+    const ready = await waitForAuthenticatedCoursePage(page, url, attempt === 1 ? 16000 : 11000);
+    const bodyText = await getBodyText(page);
+    const mainText = await page.locator("main").first().innerText().catch(() => "");
+    const state = classifyA1PdfCoursePage({
+      url: page.url(), expectedUrl: url, text: bodyText, mainText,
+    });
+    lastState = state;
+    lastPath = new URL(page.url()).pathname;
+
+    if (ready && state === "ready") {
+      if (target.kind === "workbook" && await hasVisibleRadioGate(page)) {
+        throw new Error("A1 Day " + day + " workbook stopped on the Falowen Radio gate.");
+      }
+      return url;
+    }
+
+    if (!isRetryableA1PdfCoursePage(state)) {
+      throw new Error("A1 Day " + day + " " + target.kind + " course route cannot render: " +
+        state + " (path " + lastPath + ")");
+    }
+
+    // If a login form is still actually visible, re-authenticate only once.
+    // Otherwise allow Firebase's restored session to hydrate on a fresh visit.
+    if (attempt === 2) {
+      const form = page.locator("form").filter({ hasText: /Email or student code/i }).first();
+      if (await form.isVisible().catch(() => false)) {
+        console.warn("A1 Day " + day + ": login screen still visible; renewing dedicated PDF session once.");
+        await loginOnce(page);
+      }
+    }
+    console.warn("A1 Day " + day + " " + target.kind + ": auth/content state " +
+      lastState + " on attempt " + attempt + "/3; retrying protected route.");
   }
 
-  const currentUrl = new URL(page.url());
-  const expectedUrl = new URL(url);
-  const text = await getBodyText(page);
-  const fatalShell = /Unexpected Application Error|404 Not Found|Page not found|Loading failed/i.test(text);
-  const radioGate = WORKBOOK_KINDS.has(target.kind) ? await hasVisibleRadioGate(page) : false;
-  const isFalowenCoursePage = currentUrl.origin === expectedUrl.origin && currentUrl.pathname.startsWith("/campus/course/");
-
-  if (!isFalowenCoursePage) {
-    throw new Error(`Day ${day} ${target.kind} left the expected Falowen course route: ${page.url()}`);
-  }
-  if (fatalShell) {
-    throw new Error(`Day ${day} ${target.kind} rendered an error page: ${url}`);
-  }
-  if (radioGate) {
-    throw new Error(`Day ${day} ${target.kind} stopped on the visible Falowen Radio gate instead of workbook content: ${url}`);
-  }
-  if (!isA1PdfReadyText(text)) {
-    throw new Error(`Day ${day} ${target.kind} rendered an empty or loading page: ${url}`);
-  }
-
-  return url;
+  throw new Error("A1 Day " + day + " " + target.kind +
+    " never reached authenticated course content after 3 checks (" + lastState +
+    ", last path " + lastPath + "). Verify PDF account access and session persistence.");
 };
-
 const renderInternalTarget = async (page, lesson, target, index) => {
   const url = await ensureInternalPage(page, target, lesson.day);
   if (target.kind === "workbook") return captureA1WorkbookSections(page, lesson, index, url);
