@@ -1406,7 +1406,7 @@ app.post("/b1-mock-02/lesen/score", async (req, res) => {
     if(Object.keys(answers).some(key=>!valid.has(key)))return res.status(400).json({error:"Unknown Lesen question."});
     for(const key of Object.keys(answers)){
       const value=String(answers[key]||"").toLowerCase();
-      if(!["richtig","falsch","ja","nein","0","a","b","c","d","f","h"].includes(value))return res.status(400).json({error:"Invalid Lesen choice."});
+      if(!["richtig","falsch","ja","nein","0","a","b","c","d","f","g","h","i","j"].includes(value))return res.status(400).json({error:"Invalid Lesen choice."});
     }
     const result=scoreB1Mock02Reading(answers,READING_ANSWER_KEY_02,25);
     res.set("Cache-Control","private, no-store");
