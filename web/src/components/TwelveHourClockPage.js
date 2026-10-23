@@ -2,574 +2,226 @@ import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
-const pageWrap = {
-  ...styles.container,
-  display: "grid",
-  gap: 16,
-};
-
-const card = {
-  ...styles.card,
-  display: "grid",
-  gap: 12,
-};
-
-const paragraph = {
-  margin: 0,
-  lineHeight: 1.7,
-};
-
-const listStyle = {
-  margin: 0,
-  paddingLeft: 22,
-  lineHeight: 1.8,
-};
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  minWidth: 560,
-};
-
+// Day 11 / A1-7 grammar notes. The Lesen/Hören assignment is intentionally
+// kept separate and unchanged.
+const pageWrap = { ...styles.container, display: "grid", gap: 16 };
+const card = { ...styles.card, display: "grid", gap: 12 };
+const paragraph = { margin: 0, lineHeight: 1.7 };
+const tableStyle = { width: "100%", borderCollapse: "collapse", minWidth: 420 };
 const cellStyle = {
   borderBottom: "1px solid #e5e7eb",
-  padding: "10px 8px",
+  padding: "10px 9px",
   textAlign: "left",
   verticalAlign: "top",
   lineHeight: 1.6,
 };
-
-const chipStyle = {
-  border: "1px solid #dbeafe",
-  borderRadius: 999,
-  padding: "6px 10px",
+const noteStyle = {
+  border: "1px solid #bfdbfe",
+  borderRadius: 12,
+  padding: "12px 14px",
   background: "#eff6ff",
-  color: "#1d4ed8",
-  fontWeight: 700,
-  fontSize: 13,
-};
-
-const miniBox = {
-  border: "1px solid #e5e7eb",
-  borderRadius: 14,
-  padding: 12,
-  background: "#ffffff",
-  display: "grid",
-  gap: 8,
-};
-
-const prefixBadgeStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  padding: "3px 8px",
-  borderRadius: 999,
-  border: "1px solid #f59e0b",
-  background: "#fffbeb",
-  color: "#92400e",
-  fontWeight: 900,
-};
-
-const stemBadgeStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  padding: "3px 8px",
-  borderRadius: 999,
-  border: "1px solid #60a5fa",
-  background: "#eff6ff",
-  color: "#1d4ed8",
-  fontWeight: 900,
-};
-
-const splitWordStyle = {
-  display: "inline-flex",
-  alignItems: "center",
-  gap: 4,
-  flexWrap: "wrap",
-};
-
-const calloutStyles = {
-  default: {
-    border: "1px solid #d1d5db",
-    background: "#f9fafb",
-    color: "#111827",
-  },
-  warning: {
-    border: "1px solid #fed7aa",
-    background: "#fff7ed",
-    color: "#7c2d12",
-  },
-  success: {
-    border: "1px solid #bbf7d0",
-    background: "#f0fdf4",
-    color: "#14532d",
-  },
-  accent: {
-    border: "1px solid #bfdbfe",
-    background: "#eff6ff",
-    color: "#1e3a8a",
-  },
+  lineHeight: 1.7,
 };
 
 const Section = ({ title, subtitle, children }) => (
   <section style={card}>
-    <div style={{ display: "grid", gap: 6 }}>
-      <h2 style={{ margin: 0, fontSize: "1.25rem" }}>{title}</h2>
-      {subtitle ? <p style={{ ...paragraph, color: "#475569" }}>{subtitle}</p> : null}
-    </div>
+    <h2 style={{ margin: 0, fontSize: "1.25rem" }}>{title}</h2>
+    {subtitle ? <p style={{ ...paragraph, color: "#475569" }}>{subtitle}</p> : null}
     {children}
   </section>
 );
 
-const Callout = ({ title, children, variant = "default" }) => {
-  const tone = calloutStyles[variant] || calloutStyles.default;
-  return (
-    <div
-      style={{
-        ...tone,
-        borderRadius: 14,
-        padding: 14,
-        display: "grid",
-        gap: 8,
-        lineHeight: 1.7,
-      }}
-    >
-      {title ? <strong>{title}</strong> : null}
-      <div>{children}</div>
-    </div>
-  );
-};
+const Note = ({ children }) => <div style={noteStyle}>{children}</div>;
 
 const Table = ({ headers, rows }) => (
-  <div style={{ overflowX: "auto" }}>
+  <div style={{ overflowX: "auto", maxWidth: "100%" }}>
     <table style={tableStyle}>
       <thead>
-        <tr>
-          {headers.map((header) => (
-            <th key={header} style={{ ...cellStyle, fontWeight: 900, color: "#0f172a" }}>
-              {header}
-            </th>
-          ))}
-        </tr>
+        <tr>{headers.map((header) => <th key={header} style={{ ...cellStyle, fontWeight: 800 }}>{header}</th>)}</tr>
       </thead>
-      <tbody>
-        {rows.map((row, rowIndex) => (
-          <tr key={rowIndex}>
-            {row.map((cell, cellIndex) => (
-              <td key={`${rowIndex}-${cellIndex}`} style={cellStyle}>
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
+      <tbody>{rows.map((row, index) => (
+        <tr key={index}>{row.map((value, cell) => <td key={cell} style={cellStyle}>{value}</td>)}</tr>
+      ))}</tbody>
     </table>
   </div>
 );
 
-const ChipRow = ({ items }) => (
-  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-    {items.map((item) => (
-      <span key={item} style={chipStyle}>{item}</span>
-    ))}
-  </div>
-);
-
-const SplitVerb = ({ stem, prefix }) => (
-  <span style={splitWordStyle}>
-    <span style={stemBadgeStyle}>{stem}</span>
-    <span style={prefixBadgeStyle}>{prefix}</span>
-  </span>
-);
-
-const PracticeQuestion = ({ prompt, options, answer, explanation }) => {
-  const [selected, setSelected] = useState("");
-  const [checked, setChecked] = useState(false);
-  const correct = selected === answer;
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, display: "grid", gap: 10, background: "#fff" }}>
-      <strong>{prompt}</strong>
-      <div style={{ display: "grid", gap: 8 }}>
-        {options.map((option) => (
-          <button
-            key={option}
-            type="button"
-            onClick={() => {
-              setSelected(option);
-              setChecked(false);
-            }}
-            style={{
-              ...styles.secondaryButton,
-              justifyContent: "flex-start",
-              textAlign: "left",
-              borderColor: selected === option ? "#2563eb" : undefined,
-            }}
-          >
-            {option}
-          </button>
-        ))}
-      </div>
-      <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => setChecked(true)}>
-        Check
-      </button>
-      {checked ? (
-        <Callout variant={correct ? "success" : "warning"} title={correct ? "Correct" : "Not quite"}>
-          <div><strong>Answer:</strong> {answer}</div>
-          {explanation ? <div>{explanation}</div> : null}
-        </Callout>
-      ) : null}
-    </div>
-  );
-};
-
-const daysRows = [
-  ["Montag", "Monday", "am Montag"],
-  ["Dienstag", "Tuesday", "am Dienstag"],
-  ["Mittwoch", "Wednesday", "am Mittwoch"],
-  ["Donnerstag", "Thursday", "am Donnerstag"],
-  ["Freitag", "Friday", "am Freitag"],
-  ["Samstag", "Saturday", "am Samstag"],
-  ["Sonntag", "Sunday", "am Sonntag"],
+const clockRows = [
+  ["06:00", "Es ist sechs Uhr."],
+  ["06:15", "Es ist Viertel nach sechs."],
+  ["06:30", "Es ist halb sieben."],
+  ["06:45", "Es ist Viertel vor sieben."],
+  ["07:00", "Es ist sieben Uhr."],
+  ["07:30", "Es ist halb acht."],
+  ["07:45", "Es ist Viertel vor acht."],
 ];
 
-const timeRows = [
-  ["1:00", "ein Uhr", "one o'clock"],
-  ["2:00", "zwei Uhr", "two o'clock"],
-  ["1:15", "Viertel nach eins", "quarter past one"],
-  ["1:30", "halb zwei", "30 minutes before two = 1:30"],
-  ["1:45", "Viertel vor zwei", "quarter to two"],
-  ["6:30", "halb sieben", "30 minutes before seven = 6:30"],
-  ["7:30", "halb acht", "30 minutes before eight = 7:30"],
-  ["8:45", "Viertel vor neun", "quarter before nine = 8:45"],
+const timeExpressionRows = [
+  ["um", "at an exact time", "Der Unterricht beginnt um 9 Uhr."],
+  ["ab", "from / starting at", "Das Museum ist ab 10 Uhr geöffnet."],
+  ["von … bis", "from … to", "Ich arbeite von 8 bis 12 Uhr."],
+  ["bis", "until", "Der Laden ist bis 18 Uhr geöffnet."],
+  ["vor", "before", "Ich komme vor 9 Uhr."],
+  ["nach", "after", "Ich komme nach 9 Uhr."],
+];
+
+const daypartRows = [
+  ["morgens", "in the morning", "Ich frühstücke morgens."],
+  ["vormittags", "before noon / in the late morning", "Vormittags lerne ich Deutsch."],
+  ["mittags", "at midday", "Mittags esse ich."],
+  ["nachmittags", "in the afternoon", "Nachmittags mache ich Hausaufgaben."],
+  ["abends", "in the evening", "Abends sehe ich fern."],
+  ["nachts", "at night", "Nachts schlafe ich."],
 ];
 
 const separableRows = [
-  ["aufstehen", "to get up", "Ich stehe um sechs Uhr auf."],
-  ["einkaufen", "to shop", "Wir kaufen am Samstag ein."],
-  ["anrufen", "to call", "Ich rufe meine Mutter am Abend an."],
-  ["fernsehen", "to watch TV", "Er sieht am Abend fern."],
-  ["aufmachen", "to open", "Ich mache das Fenster auf."],
-  ["zumachen", "to close", "Sie macht die Tür zu."],
-  ["aufräumen", "to tidy up", "Wir räumen am Sonntag auf."],
-  ["mitkommen", "to come along", "Kommst du am Freitag mit?"],
-  ["anfangen", "to begin", "Der Kurs fängt um acht Uhr an."],
-  ["mitbringen", "to bring along", "Ich bringe mein Buch mit."],
+  ["aufstehen", "to get up", "Ich stehe um 6 Uhr auf."],
+  ["anfangen", "to begin", "Der Kurs fängt um 9 Uhr an."],
+  ["einkaufen", "to shop", "Ich kaufe nachmittags ein."],
+  ["fernsehen", "to watch TV", "Ich sehe abends fern."],
+  ["abholen", "to pick up", "Ich hole Anna um 16 Uhr ab."],
+  ["anrufen", "to call", "Ich rufe meine Mutter an."],
 ];
 
-const separablePrefixRows = [
-  ["ab-", "away / off", "abfahren, abholen"],
-  ["an-", "on / at / start", "anrufen, anfangen"],
-  ["auf-", "up / open", "aufstehen, aufmachen"],
-  ["aus-", "out / off", "ausgehen, ausschalten"],
-  ["ein-", "in / into", "einkaufen, einsteigen"],
-  ["fern-", "far / TV context", "fernsehen"],
-  ["los-", "away / start", "losgehen, losfahren"],
-  ["mit-", "with / along", "mitkommen, mitbringen"],
-  ["nach-", "after / towards", "nachfragen, nachdenken"],
-  ["vor-", "before / forward", "vorlesen, vorstellen"],
-  ["weg-", "away", "weggehen, wegwerfen"],
-  ["zu-", "closed / to", "zumachen, zuhören"],
-  ["zurück-", "back", "zurückkommen, zurückrufen"],
-];
-
-const splitVerbRows = [
-  ["aufstehen", <SplitVerb stem="Ich stehe" prefix="auf" />, "Ich stehe um sechs Uhr auf."],
-  ["einkaufen", <SplitVerb stem="wir kaufen" prefix="ein" />, "Wir kaufen am Samstag ein."],
-  ["anrufen", <SplitVerb stem="ich rufe" prefix="an" />, "Ich rufe meine Mutter an."],
-  ["fernsehen", <SplitVerb stem="er sieht" prefix="fern" />, "Er sieht am Abend fern."],
-  ["zumachen", <SplitVerb stem="sie macht" prefix="zu" />, "Sie macht die Tür zu."],
-  ["mitbringen", <SplitVerb stem="ich bringe" prefix="mit" />, "Ich bringe mein Buch mit."],
-];
-
-const timePractice = [
+const lessonChecks = [
   {
-    prompt: "What is 7:30 in spoken German?",
-    options: ["halb sieben", "halb acht", "Viertel nach sieben"],
-    answer: "halb acht",
-    explanation: "7:30 is 30 minutes before 8:00, so German says halb acht.",
-  },
-  {
-    prompt: "What does halb sieben mean?",
-    options: ["7:30", "6:30", "7:00"],
-    answer: "6:30",
-    explanation: "halb sieben means 30 minutes before seven, so it is 6:30.",
-  },
-  {
-    prompt: "What is Viertel vor neun?",
-    options: ["8:15", "8:45", "9:15"],
-    answer: "8:45",
-    explanation: "Viertel vor neun means quarter before nine, so it is 8:45.",
-  },
-];
-
-const knowledgeTest = [
-  {
-    prompt: "1) Which phrase means 'on Monday'?",
-    options: ["in Montag", "am Montag", "um Montag"],
-    answer: "am Montag",
-    explanation: "Use am with days of the week: am Montag, am Dienstag, am Freitag.",
-  },
-  {
-    prompt: "2) How do you say 1:00 in German?",
-    options: ["eins Uhr", "ein Uhr", "eine Uhr"],
-    answer: "ein Uhr",
-    explanation: "For 1:00, German says ein Uhr.",
-  },
-  {
-    prompt: "3) What does halb acht mean?",
+    prompt: "What time is halb acht?",
     options: ["8:30", "7:30", "8:00"],
     answer: "7:30",
-    explanation: "halb acht means 30 minutes before eight.",
+    explanation: "halb refers to the NEXT hour. Halb acht is halfway to eight.",
   },
   {
-    prompt: "4) What is 6:30 in spoken German?",
-    options: ["halb sechs", "halb sieben", "Viertel nach sechs"],
-    answer: "halb sieben",
-    explanation: "6:30 is 30 minutes before seven, so it is halb sieben.",
+    prompt: "The museum opens ab 10 Uhr. Which visit is possible?",
+    options: ["9:00", "8:30", "10:30"],
+    answer: "10:30",
+    explanation: "ab 10 Uhr means starting at 10 o'clock.",
   },
   {
-    prompt: "5) What is Viertel nach acht?",
-    options: ["8:15", "7:45", "8:45"],
-    answer: "8:15",
-    explanation: "Viertel nach acht means quarter after eight.",
+    prompt: "Which expression fits 16:00?",
+    options: ["nachmittags", "vormittags", "nachts"],
+    answer: "nachmittags",
+    explanation: "16:00 is in the afternoon.",
   },
   {
-    prompt: "6) What is Viertel vor acht?",
-    options: ["8:15", "7:45", "8:45"],
-    answer: "7:45",
-    explanation: "Viertel vor acht means quarter before eight.",
-  },
-  {
-    prompt: "7) Choose the correct sentence with aufstehen.",
-    options: ["Ich aufstehe um sechs Uhr.", "Ich stehe um sechs Uhr auf.", "Ich stehe auf um sechs Uhr."],
-    answer: "Ich stehe um sechs Uhr auf.",
-    explanation: "In a simple present-tense sentence, the prefix goes to the end.",
-  },
-  {
-    prompt: "8) Choose the correct sentence with anrufen.",
-    options: ["Ich anrufe meine Mutter.", "Ich rufe meine Mutter an.", "Ich rufe an meine Mutter."],
-    answer: "Ich rufe meine Mutter an.",
-    explanation: "anrufen splits: Ich rufe ... an.",
-  },
-  {
-    prompt: "9) Which sentence combines day, time and separable verb correctly?",
-    options: ["Am Montag ich stehe halb sieben auf.", "Am Montag stehe ich um halb sieben auf.", "Montag stehe ich halb sieben auf."],
-    answer: "Am Montag stehe ich um halb sieben auf.",
-    explanation: "Use am + day, um + time, and put the separable prefix at the end.",
-  },
-  {
-    prompt: "10) What is the correct order in a simple separable-verb sentence?",
-    options: ["Subject + conjugated verb + information + prefix", "Subject + prefix + conjugated verb", "Prefix + subject + infinitive"],
-    answer: "Subject + conjugated verb + information + prefix",
-    explanation: "Example: Ich stehe um sechs Uhr auf.",
-  },
-  {
-    prompt: "11) In 'Ich rufe meine Mutter an', which part is the separable prefix?",
-    options: ["rufe", "Mutter", "an"],
-    answer: "an",
-    explanation: "The infinitive is anrufen. In the sentence, rufe is the conjugated verb and an goes to the end.",
-  },
-  {
-    prompt: "12) Which prefix often means 'with / along'?",
-    options: ["mit-", "weg-", "zu-"],
-    answer: "mit-",
-    explanation: "mit- often means with or along, as in mitkommen and mitbringen.",
+    prompt: "Which sentence uses the separable verb correctly?",
+    options: ["Ich aufstehe um 6 Uhr.", "Ich stehe um 6 Uhr auf.", "Ich um 6 Uhr aufstehe."],
+    answer: "Ich stehe um 6 Uhr auf.",
+    explanation: "The conjugated verb is in position two; auf moves to the end.",
   },
 ];
+
+function PracticeQuestion({ prompt, options, answer, explanation }) {
+  const [selected, setSelected] = useState("");
+  const [checked, setChecked] = useState(false);
+  return (
+    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, display: "grid", gap: 10 }}>
+      <strong>{prompt}</strong>
+      {options.map((option) => (
+        <button
+          key={option}
+          type="button"
+          style={{
+            ...styles.secondaryButton,
+            textAlign: "left",
+            justifyContent: "flex-start",
+            borderColor: selected === option ? "#2563eb" : undefined,
+          }}
+          onClick={() => { setSelected(option); setChecked(false); }}
+        >{option}</button>
+      ))}
+      <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} disabled={!selected} onClick={() => setChecked(true)}>
+        Check
+      </button>
+      {checked ? (
+        <div role="status" style={{ lineHeight: 1.7 }}>
+          <strong>{selected === answer ? "Correct." : "Not quite."} Answer: {answer}</strong>
+          <p style={paragraph}>{explanation}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export const WeekTimeSeparableGrammarBook = () => (
   <main style={pageWrap}>
-    <div style={card}>
+    <header style={card}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 Grammar Book: Meine Woche, die Uhrzeit und trennbare Verben</h1>
-      <p style={paragraph}>
-        Learn days of the week, the 12-hour clock in German, <strong>halb</strong>, <strong>Viertel</strong>, and simple separable verbs for daily routines.
-      </p>
-      <ChipRow items={["Wochentage", "12-hour clock", "halb", "Viertel", "trennbare Verben", "knowledge test"]} />
-    </div>
+      <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Kapitel 7 — Die Uhrzeit und der Tagesablauf</h1>
+      <p style={paragraph}>Understanding time and daily routines: clock times, useful time words, parts of the day and separable verbs.</p>
+    </header>
 
-    <Section title="1) Days of the week" subtitle="Days of the week are nouns in German, so they begin with a capital letter.">
-      <Table headers={["German", "English", "Useful phrase"]} rows={daysRows} />
-      <Callout title='Important note: use "am" with days'>
-        <ul style={listStyle}>
-          <li><strong>am Montag</strong> = on Monday</li>
-          <li><strong>am Freitag</strong> = on Friday</li>
-          <li>Example: <strong>Am Montag lerne ich Deutsch.</strong></li>
-        </ul>
-      </Callout>
+    <Section title="1. Die Uhrzeit — Telling the Time" subtitle="Wie spät ist es? / Wie viel Uhr ist es? — What time is it?">
+      <p style={paragraph}>Answer with <strong>Es ist …</strong> to say what time it is.</p>
+      <Table headers={["Time", "German"]} rows={clockRows} />
+      <Note>
+        <strong>Three rules:</strong> <strong>nach</strong> means past (Viertel nach sechs = 6:15);
+        <strong> halb</strong> means halfway to the next hour (halb sieben = 6:30, NOT 7:30);
+        <strong> vor</strong> means before/to (Viertel vor sieben = 6:45).
+        <div>For 1:00, say <strong>ein Uhr</strong>, not eins Uhr.</div>
+      </Note>
+      <p style={paragraph}><strong>Wann beginnt der Kurs?</strong> — When does the course begin?</p>
+      <p style={paragraph}><strong>Der Kurs beginnt um sieben Uhr.</strong> — The course begins at seven. Use <strong>um</strong> for an exact clock time.</p>
     </Section>
 
-    <Section title="2) The 12-hour clock in German" subtitle="In everyday spoken German, people often use the 12-hour system.">
-      <Table headers={["Time", "German", "Meaning"]} rows={timeRows} />
-      <Callout title='A1 note: say "ein Uhr"' variant="warning">
-        For <strong>1:00</strong>, say <strong>ein Uhr</strong>, not <strong>eins Uhr</strong>.
-      </Callout>
-      <Callout title="Useful speaking pattern" variant="accent">
-        Use <strong>um</strong> before the time: <strong>um sieben Uhr</strong>, <strong>um halb acht</strong>, <strong>um Viertel nach acht</strong>.
-      </Callout>
+    <Section title="2. Zeitangaben — Important Time Expressions" subtitle="These words help you understand schedules, opening hours and appointments.">
+      <Table headers={["German", "Meaning", "Example"]} rows={timeExpressionRows} />
+      <Note>
+        <strong>Compare:</strong> um 8 Uhr = at eight; ab 8 Uhr = starting at eight;
+        von 8 bis 10 Uhr = from eight to ten; bis 10 Uhr = until ten;
+        vor 8 Uhr = before eight; nach 8 Uhr = after eight.
+      </Note>
+      <p style={paragraph}>Die Bibliothek ist <strong>von 9 bis 17 Uhr</strong> geöffnet. — The library is open from 9 a.m. to 5 p.m. You can visit at 11:00, but it is closed at 18:00.</p>
+      <p style={paragraph}><strong>Important:</strong> Viertel vor acht means exactly 7:45. But vor 8 Uhr can mean any time before eight.</p>
+      <p style={paragraph}>With days: <strong>am Montag</strong> = on Monday; <strong>ab Montag</strong> = starting Monday; <strong>von Montag bis Freitag</strong> = Monday to Friday; <strong>bis Freitag</strong> = until Friday.</p>
+      <p style={paragraph}>Use <strong>am</strong> with weekdays and <strong>um</strong> with exact clock times.</p>
     </Section>
 
-    <Section title="3) The clear halb rule" subtitle="This is the most important time rule in this lesson.">
-      <Callout title='Rule: "halb + hour" means 30 minutes before the named hour' variant="accent">
-        <div style={{ display: "grid", gap: 8 }}>
-          <div>The hour after <strong>halb</strong> is the target hour. You are moving toward that hour.</div>
-          <div><strong>halb sieben</strong> = 30 minutes before seven = <strong>6:30</strong></div>
-          <div><strong>halb acht</strong> = 30 minutes before eight = <strong>7:30</strong></div>
-          <div><strong>halb zwei</strong> = 30 minutes before two = <strong>1:30</strong></div>
-        </div>
-      </Callout>
-
-      <Callout title="Simple memory formula" variant="success">
-        <strong>halb + 7 = 6:30</strong>. The number after <strong>halb</strong> is the hour you are moving toward, not the hour you are already in.
-      </Callout>
-
-      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <div style={miniBox}>
-          <strong>Think in English</strong>
-          <span>halb sieben = halfway to seven = 6:30</span>
-        </div>
-        <div style={miniBox}>
-          <strong>Think in German</strong>
-          <span>Es ist halb sieben. = It is 6:30.</span>
-        </div>
-        <div style={miniBox}>
-          <strong>Daily routine example</strong>
-          <span>Ich stehe um halb sieben auf. = I get up at 6:30.</span>
-        </div>
-      </div>
+    <Section title="3. Tageszeiten — Parts of the Day" subtitle="Describe when something normally happens.">
+      <Table headers={["German", "Meaning", "Example"]} rows={daypartRows} />
+      <Note>
+        <strong>Times are approximate, not fixed:</strong> 10:00 is vormittags, 12:30 is mittags and 16:00 is nachmittags.
+      </Note>
+      <p style={paragraph}>Both <strong>am Morgen</strong> and <strong>morgens</strong> are useful. You can also say am Vormittag / vormittags, am Mittag / mittags, am Nachmittag / nachmittags and am Abend / abends.</p>
+      <p style={paragraph}>Words ending in <strong>-s</strong> often describe regular or repeated activities: <strong>Ich lerne vormittags Deutsch.</strong> — I study German in the mornings.</p>
+      <p style={paragraph}><strong>Spelling:</strong> morgen = tomorrow; morgens = in the mornings; Mittag = midday (noun); mittags = at midday (adverb).</p>
     </Section>
 
-    <Section title="4) Viertel nach and Viertel vor" subtitle="These two are easier because they work like quarter past and quarter to.">
-      <Table
-        headers={["German", "Meaning", "Time"]}
-        rows={[
-          ["Viertel nach acht", "quarter after eight", "8:15"],
-          ["Viertel vor acht", "quarter before eight", "7:45"],
-          ["Viertel nach sechs", "quarter after six", "6:15"],
-          ["Viertel vor neun", "quarter before nine", "8:45"],
-        ]}
-      />
-      <Callout title="Small difference" variant="accent">
-        <strong>nach</strong> means after/past. <strong>vor</strong> means before/to. Example: <strong>Viertel nach acht</strong> = 8:15, but <strong>Viertel vor acht</strong> = 7:45.
-      </Callout>
+    <Section title="4. Trennbare Verben — Separable Verbs in Daily Life" subtitle="The prefix moves to the end of a simple present-tense main clause.">
+      <Table headers={["Verb", "Meaning", "Example"]} rows={separableRows} />
+      <Note>
+        <strong>Pattern:</strong> subject + conjugated verb + other information + separable prefix.
+        <div><strong>Ich stehe um 6 Uhr auf.</strong> — I get up at 6 o'clock.</div>
+        <div>Start with a time phrase: <strong>Am Montag stehe ich um 6 Uhr auf.</strong></div>
+        <div>Yes/no question: <strong>Stehst du um 6 Uhr auf?</strong></div>
+      </Note>
+      <p style={paragraph}><strong>Do not confuse:</strong> ab in <strong>ab 10 Uhr</strong> means starting at ten. The <strong>ab-</strong> in <strong>abholen</strong> is a separable verb prefix.</p>
     </Section>
 
-    <Section title="5) Separable verbs" subtitle="Some German daily routine verbs split in simple present-tense sentences.">
-      <Table headers={["Infinitive", "Meaning", "Example sentence"]} rows={separableRows} />
-      <Callout title="Main rule" variant="accent">
-        In a simple present-tense sentence, the main verb is conjugated in position 2, and the separable prefix goes to the end.
-      </Callout>
-      <Callout title="Common separable prefixes" variant="success">
-        The prefix is the small part at the beginning of the infinitive. In a sentence, it often moves to the end. Learn these common prefixes first.
-      </Callout>
-      <Table headers={["Prefix", "Basic idea", "Example verbs"]} rows={separablePrefixRows} />
-      <Callout title="See the split: blue = verb stem, orange = prefix" variant="accent">
-        First learn the full verb, then watch how the verb separates in the sentence.
-      </Callout>
-      <Table headers={["Infinitive", "Separated form", "Full sentence"]} rows={splitVerbRows} />
-      <Table
-        headers={["Step", "Example"]}
-        rows={[
-          ["Infinitive", "aufstehen = to get up"],
-          ["Conjugated verb", "ich stehe"],
-          ["Extra information", "um sechs Uhr"],
-          ["Prefix at the end", "auf"],
-          ["Full sentence", "Ich stehe um sechs Uhr auf."],
-        ]}
-      />
-      <Callout title="Questions with separable verbs" variant="success">
-        In a yes/no question, the conjugated verb comes first and the prefix still goes to the end: <strong>Stehst du um sechs Uhr auf?</strong> / <strong>Kommst du am Freitag mit?</strong>
-      </Callout>
-    </Section>
-
-    <Section title="6) Put everything together" subtitle="Use day + time + separable verb.">
-      <Table
-        headers={["Sentence", "Meaning"]}
-        rows={[
-          ["Am Montag stehe ich um halb sieben auf.", "On Monday I get up at 6:30."],
-          ["Am Dienstag rufe ich meine Mutter um Viertel nach acht an.", "On Tuesday I call my mother at 8:15."],
-          ["Am Samstag kaufen wir um vier Uhr ein.", "On Saturday we shop at 4:00."],
-          ["Am Sonntag räume ich mein Zimmer auf.", "On Sunday I tidy my room."],
-          ["Der Deutschkurs fängt um halb neun an.", "The German course starts at 8:30."],
-        ]}
-      />
-      <Callout title="Sentence pattern" variant="accent">
-        <strong>Am + day</strong> + conjugated verb + subject + <strong>um + time</strong> + other words + separable prefix.
-        <br />Example: <strong>Am Montag stehe ich um halb sieben auf.</strong>
-      </Callout>
-    </Section>
-
-    <Section title="7) Mini practice" subtitle="Check if the halb rule is clear now.">
-      <div style={{ display: "grid", gap: 14 }}>
-        {timePractice.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
-      </div>
-    </Section>
-
-    <Section title="8) Knowledge test" subtitle="Answer these questions after studying the lesson.">
-      <div style={{ display: "grid", gap: 14 }}>
-        {knowledgeTest.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
-      </div>
-    </Section>
-
-    <Section title="9) Final summary">
-      <Callout title="Remember" variant="success">
-        <ul style={listStyle}>
-          <li>Use <strong>am</strong> with days: <strong>am Montag</strong>.</li>
-          <li>Use <strong>um</strong> with time: <strong>um sieben Uhr</strong>, <strong>um halb acht</strong>.</li>
-          <li><strong>halb sieben = 6:30</strong>, not 7:30.</li>
-          <li><strong>halb acht = 7:30</strong>, not 8:30.</li>
-          <li><strong>Viertel vor acht = 7:45</strong>.</li>
-          <li>Common separable prefixes include <strong>auf-, an-, ein-, mit-, zu-, zurück-</strong>.</li>
-          <li>Separable verbs split: <strong>Ich stehe ... auf.</strong></li>
-          <li>Full pattern: <strong>Am Montag stehe ich um halb sieben auf.</strong></li>
-        </ul>
-      </Callout>
+    <Section title="5. Mein Tagesablauf — Putting Everything Together" subtitle="Read Anna's daily routine, then check the most important lesson rules.">
+      <p style={paragraph}><strong>Mein Name ist Anna. Ich lerne Deutsch.</strong></p>
+      <p style={paragraph}>Morgens stehe ich um halb sieben auf. Von 8 bis 10 Uhr habe ich Deutschunterricht. Der Unterricht fängt um 8 Uhr an. Nach dem Unterricht gehe ich nach Hause. Mittags esse ich mit meiner Familie. Nachmittags kaufe ich ein. Abends sehe ich fern. Um 22 Uhr gehe ich schlafen.</p>
+      <Note>
+        <strong>English:</strong> My name is Anna. I study German. In the morning, I get up at 6:30.
+        I have German lessons from 8 to 10. The lesson begins at 8. After class, I go home.
+        At midday, I eat with my family. In the afternoon, I go shopping.
+        In the evening, I watch TV. At 10 p.m., I go to sleep.
+      </Note>
+      <p style={paragraph}><strong>Merke dir:</strong> um = at; ab = starting at; von … bis = from … to; vor = before; nach = after. Halb acht = 7:30; Viertel vor acht = 7:45.</p>
+      <p style={paragraph}>Use morgens, vormittags, mittags, nachmittags, abends and nachts for parts of the day. With separable verbs: <strong>Ich stehe morgens um 7 Uhr auf.</strong></p>
     </Section>
   </main>
 );
 
+// The separate self-practice route remains available, without duplicating the
+// explanations across multiple chapters of the main grammar notes.
 export const WeekTimeSeparablePracticeBook = () => (
   <main style={pageWrap}>
-    <div style={card}>
+    <section style={card}>
       <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-      <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 Practice Check: Meine Woche, Uhrzeit und trennbare Verben</h1>
-      <p style={paragraph}>Use this short practice to check the important A1 rules.</p>
-    </div>
-
-    <Section title="Quick practice">
-      <div style={{ display: "grid", gap: 14 }}>
-        <PracticeQuestion
-          prompt='Which one means "on Monday"?'
-          options={["in Montag", "am Montag", "um Montag"]}
-          answer="am Montag"
-          explanation='Use "am" with days of the week.'
-        />
-        <PracticeQuestion
-          prompt="What is 7:30 in common spoken German?"
-          options={["halb sieben", "halb acht", "Viertel nach sieben"]}
-          answer="halb acht"
-          explanation="German says 30 minutes before eight. That is halb acht."
-        />
-        <PracticeQuestion
-          prompt="What does halb sieben mean?"
-          options={["7:30", "6:30", "7:00"]}
-          answer="6:30"
-          explanation="halb sieben means 30 minutes before seven."
-        />
-        <PracticeQuestion
-          prompt='Choose the correct sentence with "aufstehen".'
-          options={["Ich aufstehe um sechs Uhr.", "Ich stehe um sechs Uhr auf.", "Ich stehe auf um sechs Uhr."]}
-          answer="Ich stehe um sechs Uhr auf."
-          explanation="In a simple sentence, the separable prefix goes to the end."
-        />
-      </div>
-    </Section>
-
-    <Section title="Knowledge test">
-      <div style={{ display: "grid", gap: 14 }}>
-        {knowledgeTest.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
-      </div>
-    </Section>
+      <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Kapitel 7 — Quick Practice</h1>
+      <p style={paragraph}>Choose the answer, then reveal the explanation. This is unscored practice, not the A1-7 assignment.</p>
+    </section>
+    {lessonChecks.map((question) => <PracticeQuestion key={question.prompt} {...question} />)}
   </main>
 );
 
