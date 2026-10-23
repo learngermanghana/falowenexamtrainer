@@ -139,6 +139,19 @@ const printA1Page = async (page, file, day, kind) => {
     if (!isA1PdfReadyText(mainText)) {
       throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
     }
+    if (kind === "workbook") {
+      const nativeSections = await page.evaluate(() => {
+        const root = document.querySelector("[data-a1-shared-workbook]");
+        if (!root) return null;
+        const panels = [...root.querySelectorAll('[data-workbook-panel^="teil-"], [data-workbook-panel^="section-"]')];
+        return { total: panels.length, visible: panels.filter((panel) =>
+          panel.getClientRects().length > 0 && getComputedStyle(panel).display !== "none").length };
+      });
+      if (nativeSections?.total && nativeSections.visible !== nativeSections.total) {
+        throw new Error("A1 Day " + day + " PDF would omit " +
+          (nativeSections.total - nativeSections.visible) + " native workbook exercise panel(s)");
+      }
+    }
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
     await resetPrintMode(page, printStyle);
@@ -160,6 +173,16 @@ const captureA1WorkbookSections = async (page, lesson, index, source) => {
     const candidate = page.locator(plan.selector).filter({ hasText: exact }).first();
     if (!(await candidate.count())) throw new Error("A1 Day " + lesson.day + " missing workbook tab: " + label);
     await candidate.click({ timeout: 15000 });
+    if (await candidate.getAttribute("role") === "tab" ||
+        await candidate.getAttribute("aria-selected") !== null ||
+        await candidate.getAttribute("data-active") !== null) {
+      await page.waitForFunction(({ selector, label }) => {
+        const normalize = (text) => String(text || "").replace(/\s+/g, " ").trim();
+        return [...document.querySelectorAll(selector)].some((item) =>
+          normalize(item.textContent) === label &&
+          (item.getAttribute("aria-selected") === "true" || item.getAttribute("data-active") === "true"));
+      }, { selector: plan.selector, label }, { timeout: 10000 });
+    }
     await waitForCourseHydration(page, lesson.day, label);
     const partFile = path.join(renderDir, base + "-section-" + (tabIndex + 1) + ".pdf");
     await printA1Page(page, partFile, lesson.day, label);
