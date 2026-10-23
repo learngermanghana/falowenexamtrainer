@@ -11,7 +11,7 @@ function loadLocal(uid){
   try{return JSON.parse(localStorage.getItem(storageKey(uid))||"{}")||{}}
   catch{return {}}
 }
-export default function B1Mock2Hoeren(){
+export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expired=false}){
   const {idToken,user}=useAuth();
   const [exam,setExam]=useState(null);
   const [active,setActive]=useState(0);
@@ -39,7 +39,8 @@ export default function B1Mock2Hoeren(){
   },[idToken]);
   useEffect(()=>{
     if(user?.uid&&!result)localStorage.setItem(storageKey(user.uid),JSON.stringify(answers));
-  },[user?.uid,answers,result]);
+    onProgress?.(answers);
+  },[user?.uid,answers,result,onProgress]);
   useEffect(()=>{
     if(audioRef.current){audioRef.current.pause();audioRef.current.currentTime=0;}
     setAudioUrl("");setAudioError("");
@@ -57,7 +58,7 @@ export default function B1Mock2Hoeren(){
     }finally{setAudioBusy(false)}
   };
   const playAudio=()=>{
-    if(!audioRef.current||!part||played[part.part])return;
+    if(!audioRef.current||!part||played[part.part]||expired)return;
     audioRef.current.play().then(()=>setPlayed(prev=>({...prev,[part.part]:true})))
       .catch(()=>setAudioError("Der Browser konnte die Aufnahme nicht starten. Bitte erneut tippen."));
   };
@@ -68,6 +69,7 @@ export default function B1Mock2Hoeren(){
       const scored=await scoreB1Mock2Hoeren({idToken,answers});
       if(!scored.saved||!scored.practiceOnly)throw new Error("Der Server hat das Ergebnis nicht bestätigt.");
       setResult(scored);
+      onComplete?.({answers,result:scored});
     }catch(e){setError(e?.response?.data?.error||e.message||"Ergebnis konnte nicht gespeichert werden.");}
     finally{setBusy(false)}
   };
@@ -76,28 +78,29 @@ export default function B1Mock2Hoeren(){
     if(user?.uid)localStorage.removeItem(storageKey(user.uid));
   };
   return <main className="a2-mock2-shell" lang="de" data-b1-mock2-hoeren>
-    <div className="a2-mock2-top">
+    {!embedded?<div className="a2-mock2-top">
       <AppBackButton label="Zurück zu den Probeprüfungen" fallbackPath="/exams/mocks"/>
       <span>B1 · Mock 2 · Hören</span>
-    </div>
+    </div>:null}
     <header className="a2-mock2-progress">
       <div><strong>B1 Mock 2 – Hören Teile 1 bis 4</strong>
         <span>{answered}/{total} Aufgaben beantwortet</span></div>
       <strong>Teil {part?.part||1}</strong>
     </header>
-    <p role="note">
+    {!embedded?<p role="note">
       Hören-Übung mit vier Teilen. Die Auswertung wird nach der Abgabe serverseitig
       gespeichert. Das Ergebnis ist noch kein vollständiges B1-Mock-Ergebnis
       für Lesen, Hören, Schreiben und Sprechen.
-    </p>
+    </p>:null}
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Prüfungsaufgaben werden geladen …</p>:null}
     {exam&&part?<><nav className="a2-mock2-nav" aria-label="Hören Teile">
       {parts.map((p,i)=><button key={p.part} type="button" className={i===active?"selected":""}
-        onClick={()=>setActive(i)}>
+        disabled={expired || Boolean(result)} onClick={()=>setActive(i)}>
         Teil {p.part} <small>{p.questions.filter(q=>answers[q.number]).length}/{p.count}</small>
       </button>)}
     </nav>
+    {expired?<p role="alert">Die Hören-Zeit ist abgelaufen. Nicht beantwortete Fragen werden als falsch gewertet.</p>:null}
     <section className="a2-mock2-paper">
       <h1>Hören Teil {part.part}: {part.label}</h1>
       {part.part===1?<p role="note">
@@ -112,10 +115,10 @@ export default function B1Mock2Hoeren(){
         {audioUrl?<><audio ref={audioRef} src={audioUrl} preload="metadata" controls={false}
           onError={()=>setAudioError("Audio konnte nicht abgespielt werden.")}
           onEnded={()=>setPlayed(prev=>({...prev,[part.part]:"ended"}))}/>
-          <button type="button" disabled={Boolean(played[part.part])} onClick={playAudio}>
+          <button type="button" disabled={Boolean(played[part.part])||expired} onClick={playAudio}>
             {played[part.part]?"Aufnahme gestartet":"Audio starten"}
           </button>
-        </>:<button type="button" disabled={audioBusy} onClick={prepareAudio}>
+        </>:<button type="button" disabled={audioBusy||expired} onClick={prepareAudio}>
           {audioBusy?"Audio wird geladen …":"Audio laden"}
         </button>}
         {audioError?<p role="alert">{audioError}{" "}
@@ -123,7 +126,7 @@ export default function B1Mock2Hoeren(){
             Erneut laden
           </button></p>:null}
       </div>
-      {part.questions.map(q=><fieldset className="a2-mock2-question" key={q.number} disabled={Boolean(result)}>
+      {part.questions.map(q=><fieldset className="a2-mock2-question" key={q.number} disabled={Boolean(result)||expired}>
         <legend><strong>{q.number}.</strong> {q.question}</legend>
         {q.options.map(o=><label key={o.id} className={answers[q.number]===o.id?"selected":""}>
           <input type="radio" name={`b1mock2-${q.number}`} value={o.id}
@@ -131,7 +134,7 @@ export default function B1Mock2Hoeren(){
           <span>{q.kind==="multiple-choice"?`${o.id}) `:""}{o.label}</span>
         </label>)}
       </fieldset>)}
-      {!result?<button type="button" disabled={busy||answered!==total} onClick={submit}>
+      {!result?<button type="button" disabled={busy||answered!==total||expired} onClick={submit}>
         {busy?"Wird bewertet und gespeichert …":`Alle ${total} Antworten einreichen`}
       </button>:<section role="status" aria-live="polite">
         <h2>Hören-Ergebnis: {result.correct}/{result.total} ({result.percentage} %)</h2>
