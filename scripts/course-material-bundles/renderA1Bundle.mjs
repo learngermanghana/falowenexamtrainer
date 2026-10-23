@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -18,7 +19,7 @@ fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
 const plan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-const diagnostics = { level: "A1", rendererVersion: 9, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level: "A1", rendererVersion: 11, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const firstLesson = plan.lessons?.[0];
@@ -88,17 +89,91 @@ const loginOnce = async (page) => {
 
 const injectPrintMode = async (page) => {
   await page.emulateMedia({ media: "print" });
-  await page.addStyleTag({ content: `
-    @page { size: A4; margin: 12mm 10mm 15mm; }
-    html, body { background: #fff !important; }
-    body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    nav, [role="navigation"], .book-print-stamp, .book-pdf-download-action,
-    iframe, button, input[type="checkbox"],
-    [class*="study-buddy" i], [class*="floating" i], [class*="chat" i],
-    [aria-label*="Study Buddy" i], [aria-label*="download" i] { display: none !important; }
-    [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
-    section, article, table, pre, blockquote { break-inside: avoid; }
-  ` });
+  return page.addStyleTag({ content: a1PrintCss() });
+};
+
+const resetPrintMode = async (page, printStyle) => {
+  await printStyle?.evaluate((style) => style.remove()).catch(() => {});
+  await page.emulateMedia({ media: "screen" });
+};
+
+const waitForCourseHydration = async (page, day, kind) => {
+  // DOMContentLoaded can precede React/Firebase hydration. Never print loaders.
+  try {
+    await page.waitForFunction(() => {
+      const text = String(document.querySelector("main")?.innerText || document.body?.innerText || "")
+        .replace(/\s+/g, " ").trim();
+      return text.length >= 120 && !/^Loading the app[.…]*/i.test(text);
+    }, undefined, { timeout: 30000 });
+  } catch {
+    throw new Error("A1 Day " + day + " " + kind +
+      " did not hydrate to readable content: " + (await getBodyText(page)).slice(0, 250));
+  }
+  await page.waitForTimeout(400);
+};
+
+const A1_TAB_SELECTORS = [
+  '[data-a1-unified-tutor-workbook-nav] [role="tablist"] button',
+  '[aria-label="A1 shared self-practice sections"] button',
+  '[data-a1-teil-navigation="true"] button',
+];
+
+const getA1WorkbookCapturePlan = async (page) => {
+  const native = page.locator("[data-a1-shared-workbook]").first();
+  if (await native.count()) {
+    const parts = await native.locator('[data-workbook-panel^="teil-"], [data-workbook-panel^="section-"]').count();
+    if (parts > 0) return { mode: "native-panels", count: parts };
+  }
+  for (const selector of A1_TAB_SELECTORS) {
+    const labels = await page.locator(selector).allTextContents();
+    const printable = printableA1TabLabels(labels);
+    if (printable.length) return { mode: "click-tabs", selector, labels: printable };
+  }
+  return { mode: "single-page", count: 1 };
+};
+
+const printA1Page = async (page, file, day, kind) => {
+  const printStyle = await injectPrintMode(page);
+  try {
+    const mainText = String(await page.locator("main").first().innerText().catch(() => "")).replace(/\s+/g, " ").trim();
+    if (!isA1PdfReadyText(mainText)) {
+      throw new Error("A1 Day " + day + " " + kind + " has no printable lesson body: " + mainText.slice(0, 180));
+    }
+    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+  } finally {
+    await resetPrintMode(page, printStyle);
+  }
+};
+
+const captureA1WorkbookSections = async (page, lesson, index, source) => {
+  const plan = await getA1WorkbookCapturePlan(page);
+  const base = String(lesson.day).padStart(2, "0") + "-" + String(index + 1).padStart(2, "0") + "-workbook";
+  const finalFile = path.join(renderDir, base + ".pdf");
+  if (plan.mode !== "click-tabs") {
+    await printA1Page(page, finalFile, lesson.day, "workbook");
+    return { kind: "workbook", source, file: finalFile, captureMode: plan.mode, sections: plan.count };
+  }
+
+  const parts = [];
+  for (const [tabIndex, label] of plan.labels.entries()) {
+    const exact = new RegExp("^\\s*" + label.replace(/[^a-z0-9\s-]/gi, "\\$&") + "\\s*$", "i");
+    const candidate = page.locator(plan.selector).filter({ hasText: exact }).first();
+    if (!(await candidate.count())) throw new Error("A1 Day " + lesson.day + " missing workbook tab: " + label);
+    await candidate.click({ timeout: 15000 });
+    await waitForCourseHydration(page, lesson.day, label);
+    const partFile = path.join(renderDir, base + "-section-" + (tabIndex + 1) + ".pdf");
+    await printA1Page(page, partFile, lesson.day, label);
+    parts.push(partFile);
+  }
+  const output = await PDFDocument.create();
+  for (const part of parts) {
+    const sourcePdf = await PDFDocument.load(fs.readFileSync(part));
+    const pages = await output.copyPages(sourcePdf, sourcePdf.getPageIndices());
+    pages.forEach((item) => output.addPage(item));
+  }
+  fs.writeFileSync(finalFile, await output.save());
+  parts.forEach((part) => fs.rmSync(part, { force: true }));
+  return { kind: "workbook", source, file: finalFile, captureMode: plan.mode, sections: plan.labels };
 };
 
 const WORKBOOK_KINDS = new Set(["workbook"]);
@@ -122,6 +197,7 @@ const ensureInternalPage = async (page, target, day) => {
   const url = getInternalRenderUrl(target);
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 45000 });
   await waitForStablePage(page);
+  await waitForCourseHydration(page, day, target.kind);
 
   if (await isPublicOrLogin(page)) {
     throw new Error(`Day ${day} ${target.kind} route is not authenticated: ${url}`);
@@ -143,8 +219,8 @@ const ensureInternalPage = async (page, target, day) => {
   if (radioGate) {
     throw new Error(`Day ${day} ${target.kind} stopped on the visible Falowen Radio gate instead of workbook content: ${url}`);
   }
-  if (!text) {
-    throw new Error(`Day ${day} ${target.kind} rendered an empty page: ${url}`);
+  if (!isA1PdfReadyText(text)) {
+    throw new Error(`Day ${day} ${target.kind} rendered an empty or loading page: ${url}`);
   }
 
   return url;
@@ -152,10 +228,11 @@ const ensureInternalPage = async (page, target, day) => {
 
 const renderInternalTarget = async (page, lesson, target, index) => {
   const url = await ensureInternalPage(page, target, lesson.day);
-  await injectPrintMode(page);
-  const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${String(index + 1).padStart(2, "0")}-${target.kind}.pdf`);
-  await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
-  return { kind: target.kind, source: url, file };
+  if (target.kind === "workbook") return captureA1WorkbookSections(page, lesson, index, url);
+  const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" +
+    String(index + 1).padStart(2, "0") + "-" + target.kind + ".pdf");
+  await printA1Page(page, file, lesson.day, target.kind);
+  return { kind: target.kind, source: url, file, captureMode: "single-page" };
 };
 
 const driveIdFromUrl = (url) => String(url).match(/\/d\/([^/]+)/)?.[1] || "";
@@ -217,7 +294,7 @@ try {
         day: lesson.day,
         title: lesson.title,
         status: "rendered",
-        targets: outputs.map(({ kind, source }) => ({ kind, source })),
+        targets: outputs.map(({ kind, source, captureMode, sections }) => ({ kind, source, captureMode, sections })),
         durationSeconds: Math.round((Date.now() - started) / 1000),
       });
     } catch (error) {
