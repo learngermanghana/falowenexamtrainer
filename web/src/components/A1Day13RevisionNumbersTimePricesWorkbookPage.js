@@ -498,7 +498,7 @@ function StatementContributionSection() {
         />
       </label>
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <div data-a1-live-discussion-controls="true" style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" style={darkBtn} onClick={handleSave} disabled={isSaving || !draft.trim()}>
           {isSaving ? "Saving..." : "Save to class discussion"}
         </button>
@@ -508,7 +508,7 @@ function StatementContributionSection() {
       {savedMessage ? <div style={{ ...contributionBox, color: "#166534" }}>{savedMessage}</div> : null}
       {error ? <div style={{ ...styles.errorBox, margin: 0 }}>{error}</div> : null}
 
-      <div style={{ display: "grid", gap: 10 }}>
+      <div data-a1-live-contributions="true" style={{ display: "grid", gap: 10 }}>
         <h3 style={{ margin: 0 }}>Class contributions</h3>
         {contributions.length === 0 ? (
           <div style={contributionBox}>No contribution yet. Be the first student in your class to share one.</div>
