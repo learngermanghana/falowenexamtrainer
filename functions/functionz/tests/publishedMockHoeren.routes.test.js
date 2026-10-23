@@ -22,6 +22,12 @@ jest.mock("../r2CourseAudio", () => ({
   createB2MockAudioSignedUrl: mockSignerB2,
 }));
 
+jest.mock("../b1Mock2PublishedAudio", () => ({
+  ...jest.requireActual("../b1Mock2PublishedAudio"),
+  verifyB1Mock2Audio: jest.fn(async () => false),
+}));
+const { verifyB1Mock2Audio } = require("../b1Mock2PublishedAudio");
+
 const admin = require("firebase-admin");
 admin.firestore.FieldValue = { serverTimestamp: jest.fn(() => "SERVER_TIME") };
 const app = require("../app");
@@ -53,6 +59,7 @@ function request(level, mockId, part, key) {
 
 beforeEach(() => {
   mockPublishedDoc = null;
+  verifyB1Mock2Audio.mockReset().mockResolvedValue(false);
   for (const fn of [mockSignerA1, mockSignerA2, mockSignerB1, mockSignerB2]) fn.mockClear();
   mockDb = {
     collection: name => ({
@@ -78,7 +85,7 @@ test.each([
   expect(result.status).toBe(404);
   expect(result.body).not.toHaveProperty("url");
   const signer = { A1: mockSignerA1, A2: mockSignerA2, B1: mockSignerB1, B2: mockSignerB2 }[level];
-  expect(signer).not.toHaveBeenCalled();
+  expect(signer).toHaveBeenCalledTimes(level === "B1" ? 1 : 0);
 });
 
 test("published B1 manifest permits only the exact approved recording", async () => {
@@ -89,11 +96,11 @@ test("published B1 manifest permits only the exact approved recording", async ()
   expect(mockSignerB1).toHaveBeenCalledTimes(1);
   const pending = await getJson(request("B1", "mock-02", "teil-2", "b1/mock-hoeren/mock-02/teil-2.mp3"));
   expect(pending.status).toBe(404);
-  expect(mockSignerB1).toHaveBeenCalledTimes(1);
+  expect(mockSignerB1).toHaveBeenCalledTimes(2);
   mockPublishedDoc.status = "draft";
   const draft = await getJson(request("B1", "mock-02", "teil-1", mockPublishedDoc.parts["teil-1"]));
   expect(draft.status).toBe(404);
-  expect(mockSignerB1).toHaveBeenCalledTimes(1);
+  expect(mockSignerB1).toHaveBeenCalledTimes(3);
 });
 
 test.each([
@@ -106,4 +113,15 @@ test.each([
   const result = await getJson(request(level, id, part, key));
   expect(result.status).toBe(200);
   expect(result.body.url).toContain(key);
+});
+
+test("B1 Mock 2 exact teacher key plays when the R2 verifier confirms the asset", async () => {
+  verifyB1Mock2Audio.mockResolvedValueOnce(true);
+  const key = "b1/mock-hoeren/mock-02/teil-1.mp3";
+  const response = await getJson(request("B1", "mock-02", "teil-1", key));
+  expect(response.status).toBe(200);
+  expect(response.body.url).toContain(key);
+  expect(verifyB1Mock2Audio).toHaveBeenCalledTimes(1);
+  const denied = await getJson(request("B1", "mock-03", "teil-1", "b1/mock-hoeren/mock-03/teil-1.mp3"));
+  expect(denied.status).toBe(404);
 });
