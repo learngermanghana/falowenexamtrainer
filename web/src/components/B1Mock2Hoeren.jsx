@@ -5,17 +5,17 @@ import {fetchB1MockAudioPlaybackUrl} from "../services/b1AudioService";
 import {getB1Mock2HoerenQuestions,scoreB1Mock2Hoeren} from "../services/b1Mock2HoerenService";
 import "./A2Mock2Hoeren.css";
 
-const storageKey=uid=>`falowen:b1-mock-02:hoeren:${uid}:v1`;
-function loadLocal(uid){
+const storageKey=(uid,attemptId="")=>`falowen:b1-mock-02:hoeren:${uid}:v1${attemptId?":"+attemptId:""}`;
+function loadLocal(uid,attemptId=""){
   if(!uid)return {};
-  try{return JSON.parse(localStorage.getItem(storageKey(uid))||"{}")||{}}
+  try{return JSON.parse(localStorage.getItem(storageKey(uid,attemptId))||"{}")||{}}
   catch{return {}}
 }
-export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expired=false}){
+export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expired=false,attemptId="",initialAnswers={}}){
   const {idToken,user}=useAuth();
   const [exam,setExam]=useState(null);
   const [active,setActive]=useState(0);
-  const [answers,setAnswers]=useState(()=>loadLocal(user?.uid));
+  const [answers,setAnswers]=useState(()=>({...initialAnswers,...loadLocal(user?.uid,attemptId)}));
   const [result,setResult]=useState(null);
   const [error,setError]=useState("");
   const [audioError,setAudioError]=useState("");
@@ -28,7 +28,7 @@ export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expi
   const part=parts[active];
   const total=Number(exam?.questionCount||30);
   const answered=parts.flatMap(p=>p.questions).filter(q=>typeof answers[q.number]==="string").length;
-  useEffect(()=>{setAnswers(loadLocal(user?.uid));setResult(null);},[user?.uid]);
+  useEffect(()=>{setAnswers({...initialAnswers,...loadLocal(user?.uid,attemptId)});setResult(null);},[user?.uid,attemptId]);
   useEffect(()=>{
     let cancelled=false;
     if(!idToken){setExam(null);return;}
@@ -38,9 +38,9 @@ export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expi
     return()=>{cancelled=true};
   },[idToken]);
   useEffect(()=>{
-    if(user?.uid&&!result)localStorage.setItem(storageKey(user.uid),JSON.stringify(answers));
+    if(user?.uid&&!result)localStorage.setItem(storageKey(user.uid,attemptId),JSON.stringify(answers));
     onProgress?.(answers);
-  },[user?.uid,answers,result,onProgress]);
+  },[user?.uid,attemptId,answers,result,onProgress]);
   useEffect(()=>{
     if(audioRef.current){audioRef.current.pause();audioRef.current.currentTime=0;}
     setAudioUrl("");setAudioError("");
@@ -75,7 +75,7 @@ export default function B1Mock2Hoeren({embedded=false,onProgress,onComplete,expi
   };
   const reset=()=>{
     setAnswers({});setResult(null);setPlayed({});setActive(0);setAudioUrl("");setError("");
-    if(user?.uid)localStorage.removeItem(storageKey(user.uid));
+    if(user?.uid)localStorage.removeItem(storageKey(user.uid,attemptId));
   };
   return <main className="a2-mock2-shell" lang="de" data-b1-mock2-hoeren>
     {!embedded?<div className="a2-mock2-top">
