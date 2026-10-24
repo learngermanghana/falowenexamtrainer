@@ -7,6 +7,7 @@ const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
+const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { registerStaffSpeakingReviewRoutes } = require("./staffSpeakingReview");
 const { getScoresForStudent } = require("./scoresSheet");
@@ -245,6 +246,7 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 
 // Exam-only purchases reuse the same Paystack credentials and authenticated backend.
 registerMockCommerceRoutes(app, { admin, getAuthedUser });
+registerBookCommerceRoutes(app, { admin });
 
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
@@ -462,6 +464,12 @@ app.post("/paystack/webhook", async (req, res) => {
     const payload = req.body || {};
     const { event, data = {} } = payload;
     if (event !== "charge.success") return res.json({ status: "ignored", event });
+
+    // Book payments are separated from tuition balances and exam entitlements.
+    if (data?.metadata?.productType === "falowen_book") {
+      const result = await processBookWebhook({ admin, data });
+      return res.status(result.status).json(result.body);
+    }
 
     // Mock purchases NEVER flow through the tuition balance/contract updater.
     // Only a signed Paystack event with an existing server-issued mock order
