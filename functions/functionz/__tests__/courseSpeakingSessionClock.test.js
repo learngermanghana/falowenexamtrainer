@@ -34,7 +34,7 @@ describe("graded B1 course speaking clock", () => {
   });
 
   test("A1/A2 and ordinary B1 examiner sessions retain their own timing", () => {
-    for (const key of ["A1-5.9", "A2-8.22", undefined]) {
+    for (const key of ["A1-5.9", "A2-8.22", null]) {
       const ordinary = session(70, 3, key);
       expect(sessionDeadline(ordinary)).toBe(Date.parse(ordinary.expiresAt));
     }
