@@ -247,7 +247,14 @@ export const sanitizeA1PrintDocument = () => {
       printable.append(row);
     }
 
-    if (textareas.length) printable.append(makeWritingSpace(label + " · Schreiben", 8));
+    // Day 2 Kapitel 1.1 writing already begins on a dedicated print sheet.
+    // Use that sheet for meaningful handwriting practice instead of leaving
+    // only eight short rules at the top of an otherwise blank page.
+    const day2Writing = /\/a1-day-2-kapitel-1-1-workbook\/?$/
+      .test(String(document.location?.pathname || ""));
+    if (textareas.length) {
+      printable.append(makeWritingSpace(label + " · Schreiben", day2Writing ? 18 : 8));
+    }
     panel.replaceWith(printable);
   }
 

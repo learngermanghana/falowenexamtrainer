@@ -276,3 +276,70 @@ test("A1 print does not hide long instructional panels or short exercise headers
   assert.equal(long.display, undefined);
   assert.equal(answer.removed, false);
 });
+
+
+const runWithPath = (root, pathname, action) => {
+  const previous = globalThis.document;
+  globalThis.document = {
+    body: root,
+    location: { pathname },
+    querySelector: (selector) => selector === "main" ? root : null,
+  };
+  try { action(); } finally {
+    if (previous === undefined) delete globalThis.document;
+    else globalThis.document = previous;
+  }
+};
+
+test("A1 print removes only the repeated Day 5 badge and compacts its self-check", () => {
+  const root = new Node("MAIN");
+  const first = new Node("DIV", "A1 · Day 5");
+  const repeat = new Node("SPAN", "A1 · Day 5");
+  const heading = new Node("H2", "Self-check");
+  const checklist = new Node("DIV", "Self-check: I can build W-questions.");
+  heading.parentElement = checklist;
+  checklist.setAttribute = (key, value) => { checklist[key] = value; };
+  root.mapping.set("div,span,small,p,strong", [first, repeat]);
+  root.mapping.set("h1,h2,h3,strong", [heading]);
+  runWithPath(root, "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook", cleanA1PrintChrome);
+  assert.equal(first.removed, false);
+  assert.equal(repeat.removed, true);
+  assert.equal(checklist["data-a1-pdf-day5-selfcheck"], "true");
+  assert.equal(heading.removed, false);
+});
+
+test("A1 print identifies only Day 6 hobbies self-check for compact answer cards", () => {
+  const root = new Node("MAIN");
+  const heading = new Node("STRONG", "Hobbies self-check");
+  const quiz = new Node("DIV", "Three multiple-choice questions");
+  heading.parentElement = quiz;
+  quiz.setAttribute = (key, value) => { quiz[key] = value; };
+  root.mapping.set("strong", [heading]);
+  root.mapping.set("button,a", [new Node("BUTTON", "A) Ich lese gern.")]);
+  runWithPath(root, "/campus/course/a1-day-6-family-and-hobbies-workbook", cleanA1PrintChrome);
+  assert.equal(quiz["data-a1-pdf-day6-hobby-quiz"], "true");
+  assert.equal(root.mapping.get("button,a")[0].removed, false);
+});
+
+test("A1 print identifies Day 7 gern oder mögen section without hiding blanks", () => {
+  const root = new Node("MAIN");
+  const heading = new Node("H2", "Teil 3: gern oder mögen? (Exercise 3)");
+  const section = new Node("SECTION", "Five grammar questions");
+  heading.closest = selector => selector === "section" ? section : null;
+  section.setAttribute = (key, value) => { section[key] = value; };
+  const blank = new Node("SELECT", "gern");
+  root.mapping.set("h1,h2,h3,strong", [heading]);
+  runWithPath(root, "/campus/course/a1-chapter-3-asking-about-prices-workbook", cleanA1PrintChrome);
+  assert.equal(section["data-a1-pdf-day7-grammar-quiz"], "true");
+  assert.equal(blank.removed, false);
+});
+
+test("A1 print leaves normal lessons unchanged even when they share Day 5 vocabulary", () => {
+  const root = new Node("MAIN");
+  const first = new Node("DIV", "A1 · Day 5");
+  const second = new Node("SPAN", "A1 · Day 5");
+  root.mapping.set("div,span,small,p,strong", [first,second]);
+  runWithPath(root, "/campus/course/a1-day-7-asking-about-prices-and-preferences", cleanA1PrintChrome);
+  assert.equal(first.removed, false);
+  assert.equal(second.removed, false);
+});
