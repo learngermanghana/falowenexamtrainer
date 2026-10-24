@@ -31,7 +31,8 @@ const sampleMetaForLevel = (level) => {
     id: sample.id,
     slug: `sample-${index + 1}`,
     label: `Lesen Sample ${index + 1}`,
-    detail: `${questionCount} questions · Teil 1–${partCount}`,
+    detail: sample.availability === "needs_revision" ? "Under review · duplicate source content" : `${questionCount} questions · Teil 1–${partCount}`,
+    unavailable: sample.availability === "needs_revision",
   }));
 };
 
@@ -50,8 +51,11 @@ const SampleList = ({ level, samples, onOpen }) => (
           key={sample.id}
           type="button"
           onClick={() => onOpen(sample)}
+          disabled={Boolean(sample.unavailable)}
           style={{
             ...styles.secondaryButton,
+            opacity: sample.unavailable ? 0.55 : 1,
+            cursor: sample.unavailable ? "not-allowed" : "pointer",
             width: "100%",
             textAlign: "left",
             display: "grid",
@@ -121,6 +125,10 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
           </button>
         </section>
       );
+    }
+
+    if (selected?.unavailable) {
+      return <section style={{...styles.card,display:"grid",gap:10}}><h2>B2 Lesen Sample under review</h2><p>This uploaded source repeats the text and questions of Test 1 under a different title. It has been held back from scoring until a distinct question set is available.</p><button type="button" onClick={()=>navigate("/exams/lesen")}>Back to Lesen samples</button></section>;
     }
 
     if (!selected) {
