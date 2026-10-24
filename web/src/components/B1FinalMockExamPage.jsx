@@ -19,6 +19,7 @@ import { B1_LISTENING, B1_READING, B1_WRITING_TASKS } from "../data/b1FinalMockD
 import { B1_MOCK2_READING, B1_MOCK2_WRITING_TASKS, B1_MOCK2_SPEAKING } from "../data/b1Mock2ExamContent";
 import B1Mock2Hoeren from "./B1Mock2Hoeren";
 import B1FinalMockSpeaking from "./B1FinalMockSpeaking";
+import B1MockConversationalSpeaking from "./B1MockConversationalSpeaking";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
 import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { B1_MOCK_STEPS, getB1MockProgress, getB1MockPracticeRecommendations } from "../utils/b1MockProgress";
@@ -879,7 +880,19 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
         </>
       ) : null}
 
-      {exam.stage === "sprechen" ? (
+      {exam.stage === "sprechen" && (isSecond || !Object.entries(exam.speakingProgress?.attempts || {})
+        .some(([key,part])=>/^teil[123]$/.test(key) && Boolean(part?.transcript))) ? (
+        <B1MockConversationalSpeaking
+          mockId={mockId}
+          externalSecondsLeft={secondsLeft}
+          initialAttempts={exam.speakingProgress?.attempts || {}}
+          attemptId={exam.attemptInfo?.attemptId || ""}
+          onProgress={handleSpeakingProgress}
+          onComplete={finishSpeaking}
+        />
+      ) : null}
+      {exam.stage === "sprechen" && !isSecond && Object.entries(exam.speakingProgress?.attempts || {})
+        .some(([key,part])=>/^teil[123]$/.test(key) && Boolean(part?.transcript)) ? (
         <B1FinalMockSpeaking
           mockId={mockId}
           speakingData={speakingData}
