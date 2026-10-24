@@ -50,13 +50,18 @@ async function resolveStudent({ admin, findStudentByCodeOrEmail, input }) {
     const db=admin.firestore();
     // Exact-name lookup only, no large collection scans. Ambiguous names
     // require a UID or email so staff never view the wrong student's work.
+    const matches=new Map();
     for(const field of ["name","fullName","studentName"]){
-      const match=await db.collection("students").where(field,"==",value).limit(2).get();
-      if(match.docs.length>1) {
-        const e=new Error("More than one student has this name. Search by login email or UID.");
-        e.status=409;throw e;
-      }
-      if(match.docs.length===1){record={snap:match.docs[0],ref:match.docs[0].ref};break;}
+      const snapshot=await db.collection("students").where(field,"==",value).limit(2).get();
+      for(const doc of snapshot.docs||[])matches.set(doc.id,doc);
+    }
+    if(matches.size>1){
+      const e=new Error("More than one student has this name. Search by login email or UID.");
+      e.status=409;throw e;
+    }
+    if(matches.size===1){
+      const snap=[...matches.values()][0];
+      record={snap,ref:snap.ref};
     }
   }
   const row=record?.snap?.data?.() || {};
@@ -95,12 +100,12 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
       const db=admin.firestore();
       // This query occurs ONLY when staff explicitly opens a student review.
       // Bounded reads and no background subscriptions, timers, or AI costs.
-      const snapshots=await db.collection("liveSpeakExamResults")
-        .where("uid","==",student.uid).limit(60).get();
-      const results=(snapshots.docs||[]).map(normalize).filter(Boolean)
-        .filter(row=>!level||level==="ALL"||row.level===level)
-        .sort((a,b)=>Date.parse(b.createdAt||0)-Date.parse(a.createdAt||0))
-        .slice(0,30);
+      let query=db.collection("liveSpeakExamResults")
+        .where("uid","==",student.uid)
+        .where("source","==","exam-speaking-practice");
+      if(level&&level!=="ALL")query=query.where("level","==",level);
+      const snapshots=await query.orderBy("createdAt","desc").limit(30).get();
+      const results=(snapshots.docs||[]).map(normalize).filter(Boolean);
       const course=await Promise.all(COURSE_KEYS
         .filter(k=>!level||level==="ALL"||k.startsWith(level+"-"))
         .map(async assignmentKey=>{
@@ -123,7 +128,7 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
           };
         }));
       return res.json({ok:true,student,results,course:course.filter(Boolean),
-        limited:snapshots.size>=60,checkedAt:new Date().toISOString(),
+        limited:snapshots.size>=30,checkedAt:new Date().toISOString(),
         note:"Read-only confirmed Live AI examiner transcripts and scored snapshots. Original microphone recordings were not retained; this page cannot replay them. Other legacy speaking modes may use separate records."});
     }catch(error){
       if(error.status)return res.status(error.status).json({ok:false,error:error.message});
