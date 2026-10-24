@@ -88,7 +88,9 @@ module.exports=function registerB1Mock3SpeakingRoutes(app,{admin,requireAccess})
         const verified=verifyReceipt(receiptSnap.data(),{
           uid,attemptId,teil,choice:attempt.topicChoice,sessionId});
         // Nested Firestore merge keeps completed Teils 1 and 2 intact.
-        tx.set(ref,{parts:{[teil]:verified},
+        tx.set(ref,{parts:{[teil]:{...verified,teil:"Teil "+teil,level:"B1",
+          taskId:"b1-mock-03-speaking-teil-"+teil,
+          feedback:verified.feedback_en,assessment:receiptSnap.data().assessment}},
           updatedAt:admin.firestore.FieldValue.serverTimestamp()},{merge:true});
       });
       noCache(res);
