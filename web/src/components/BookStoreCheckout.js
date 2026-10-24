@@ -78,7 +78,7 @@ export default function BookStoreCheckout({ completed = false }) {
         `Paystack reference: ${order.reference}`,
         `Amount: ${money(order.priceGhs)}`,
         `Status: ${order.status === "paid" ? "Verified by Falowen" : "Not yet verified"}`,
-      ].join("\\n"));
+      ].join("\n"));
     } catch (_) { setError("Could not copy the details. You can select the Paystack reference displayed above."); }
   };
   const selected = books.find(b => b.id === bookId);
