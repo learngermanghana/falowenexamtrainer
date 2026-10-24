@@ -52,6 +52,8 @@ import B1Mock2Hoeren from "./components/B1Mock2Hoeren";
 import B1Mock3Hoeren from "./components/B1Mock3Hoeren";
 import B1Mock3Speaking from "./components/B1Mock3Speaking";
 import B1Mock3Lesen from "./components/B1Mock3Lesen";
+import B1Mock3Schreiben from "./components/B1Mock3Schreiben";
+import B1Mock3Hub from "./components/B1Mock3Hub";
 import B2FinalMockExamPage from "./components/B2FinalMockExamPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
@@ -1058,6 +1060,8 @@ const AppShell = ({
           <Route path="/campus/course/b1-mock-3-hoeren" element={<B1Mock3Hoeren />} />
           <Route path="/campus/course/b1-mock-3-sprechen" element={<B1Mock3Speaking />} />
           <Route path="/campus/course/b1-mock-3-lesen" element={<B1Mock3Lesen />} />
+          <Route path="/campus/course/b1-mock-3-schreiben" element={<B1Mock3Schreiben />} />
+          <Route path="/campus/course/b1-mock-3" element={<B1Mock3Hub />} />
           <Route path="/campus/course/b2-mock-practice-preview" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b2-final-mock-exam" element={<B2FinalMockExamPage />} />
           <Route path="/campus/course/b1-day-29-goethe-exam-orientation" element={<B1FinalMockExamPage />} />
