@@ -40,22 +40,47 @@ export default function BookStoreCheckout({ completed = false }) {
     }).catch(e => { if (active) setError(e.message); });
     return () => { active = false; };
   }, [completed]);
+  const orderLookup = `/books/order?order=${encodeURIComponent(orderId || "")}&key=${encodeURIComponent(key || "")}`;
   async function refreshOrder() {
-    if (!orderId || !key) return setError("This payment return link is incomplete. Contact Falowen with your Paystack receipt.");
+    if (!orderId || !key) return setError("This payment return link is incomplete. Keep your Paystack receipt and contact Falowen.");
     setBusy(true); setError("");
     try {
-      const result = await request(`/books/order?order=${encodeURIComponent(orderId)}&key=${encodeURIComponent(key)}`);
-      setOrder(result);
-    } catch (e) { setError(e.message); } finally { setBusy(false); }
+      await request("/books/verify", { method: "POST", body: JSON.stringify({ order: orderId, key }) });
+      setOrder(await request(orderLookup));
+    } catch (e) {
+      // The saved order may still have been paid by the signed webhook.
+      try { setOrder(await request(orderLookup)); } catch (_) { /* keep the first error */ }
+      setError(e.message);
+    } finally { setBusy(false); }
   }
   useEffect(() => {
     if (!completed || !orderId || !key) return;
     let active = true;
-    request(`/books/order?order=${encodeURIComponent(orderId)}&key=${encodeURIComponent(key)}`)
+    // Paystack recommends server-side transaction verification on return.
+    request("/books/verify", { method: "POST", body: JSON.stringify({ order: orderId, key }) })
+      .catch(() => null)
+      .then(() => request(orderLookup))
       .then(data => { if (active) setOrder(data); })
       .catch(e => { if (active) setError(e.message); });
     return () => { active = false; };
   }, [completed, orderId, key]);
+  const copyReceipt = async () => {
+    if (!order || !navigator.clipboard?.writeText) {
+      setError("Copy is unavailable on this device. You can select the order and Paystack reference displayed above.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText([
+        "Falowen A1 book payment details",
+        `Book: ${order.title}`,
+        `Edition: ${order.format}`,
+        `Order: ${order.orderId}`,
+        `Paystack reference: ${order.reference}`,
+        `Amount: ${money(order.priceGhs)}`,
+        `Status: ${order.status === "paid" ? "Verified by Falowen" : "Not yet verified"}`,
+      ].join("\\n"));
+    } catch (_) { setError("Could not copy the details. You can select the Paystack reference displayed above."); }
+  };
   const selected = books.find(b => b.id === bookId);
   const buy = async e => {
     e.preventDefault();
@@ -86,9 +111,17 @@ export default function BookStoreCheckout({ completed = false }) {
         {order && <><h2 style={{ marginTop: 0 }}>{order.title}</h2>
           <p><strong>Order:</strong> {order.orderId}</p>
           <p><strong>Price:</strong> {money(order.priceGhs)}</p>
-          <p><strong>Payment:</strong> {order.status === "paid" ? "Confirmed" : order.status === "rejected" ? "Needs review" : "Awaiting secure confirmation"}</p>
-          {order.status === "paid" ? <p>Payment confirmed. Falowen will contact you regarding fulfilment. No download or print order has been issued automatically.</p> :
-            <p>Returning from Paystack does not mean payment succeeded. If you have paid, check again once Paystack has confirmed the transaction.</p>}
+          <p><strong>Paystack transaction reference:</strong> <code style={{ overflowWrap: "anywhere" }}>{order.reference}</code></p>
+          <p><strong>Payment:</strong> {order.status === "paid" ? "Verified with Paystack" : order.status === "rejected" ? "Needs manual review" : "Awaiting Paystack confirmation"}</p>
+          {order.status === "paid" ? <div>
+            <p>Payment verified. Save your Paystack email receipt and this reference for your records.</p>
+            <p>{order.format === "printed"
+              ? "Your printed copy will be arranged manually; delivery is charged separately."
+              : "Falowen will arrange your digital PDF manually. There is no automatic download yet."}</p>
+            <p>For delivery or access enquiries, provide the Paystack reference shown above so the payment can be matched in the Paystack Dashboard.</p>
+          </div> :
+            <p>Returning from Paystack does not mean payment succeeded. If money has been deducted, do not pay a second time. Keep your Paystack receipt and check again shortly.</p>}
+          <button type="button" style={{ ...styles.button, marginRight: 10, marginBottom: 10, background: "#334155" }} onClick={copyReceipt}>Copy order and receipt details</button>
         </>}
         {error ? <p role="alert" style={{ color: "#ae2525" }}>{error}</p> : null}
         <button type="button" style={styles.button} disabled={busy} onClick={refreshOrder}>{busy ? "Checking…" : "Check payment status"}</button>
@@ -117,7 +150,7 @@ export default function BookStoreCheckout({ completed = false }) {
             </label>)}
             {selected && <p style={{ padding: "12px 0", fontWeight: 750 }}>Book price: {money(selected.priceGhs)} {selected.format === "printed" ? "· Delivery not included" : ""}</p>}
             <p style={{ color: "#637486", fontSize: 13 }}>
-              Payment uses Paystack. The book will not be sent or printed automatically; Falowen will arrange fulfilment separately.
+              Paystack will process your payment securely. Keep the Paystack receipt and transaction reference; Falowen will arrange the book manually after verification. Delivery for printed orders is charged separately.
             </p>
             {error ? <p role="alert" style={{ color: "#ae2525" }}>{error}</p> : null}
             <button type="submit" style={{ ...styles.button, opacity: !enabled || !selected || busy ? .55 : 1, cursor: !enabled ? "not-allowed" : "pointer" }}
