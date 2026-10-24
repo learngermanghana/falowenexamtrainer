@@ -642,7 +642,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
         <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={4}
    onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
    onNext={() => setPartKey("teil"+Math.min(4,Number(partKey.slice(-1))+1))}>
-   answered/20 answered
+   {answered}/20 answered
   </ReadingPartFooter>
   <footer className="a2-reading-practice-footer">
           {!submitted ? (
