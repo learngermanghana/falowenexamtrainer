@@ -12,7 +12,7 @@
 
 ## Teacher QA required before release (blocking)
 1. **Teil 1:** The spoken instructions say *one Richtig/Falsch statement per short text*, but the question file contains **two questions per text** (Richtig/Falsch plus a/b/c). Re-record the instruction or get teacher approval of an explicit on-screen clarification.
-2. **Teil 3:** The recording labels Anna's Thursday departure as *Beispiel Nummer 0*, but supplied **scored question 16** tests that example. The recording's *Nummer 5* about the replacement pizzeria is not tested. Align the seven recorded numbering cues to scored questions before release. **Do not silently replace the teacher's answer key.**
+2. **Teil 3 — resolved in code:** Beispiel Nummer 0 is unscored, and the seven questions now follow recordings Nummer 1–7 (weather, chain, hotel, fish restaurant, pizzeria, oversleeping, Travemünde). Their server-only keys were updated against the provided recording. Verify with the teacher during final playback QA.
 3. **Teil 4:** The discussion introduces speaker C as Claudia Weber and D as Thomas Klein, but later changes which voice appears to discuss travelling vs. staying at home. Re-record or reassign consistent voices and review questions 23–30.
 
 ## Cloudflare R2 upload
