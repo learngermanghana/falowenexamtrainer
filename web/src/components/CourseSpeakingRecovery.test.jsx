@@ -129,3 +129,58 @@ test('B1 uses a single in-exam recovery control to advance to the next saved Tei
   expect(submitCourseSpeakingMock).not.toHaveBeenCalled();
   expect(JSON.parse(localStorage.getItem(storageKey)).results).toHaveLength(2);
 });
+
+const B1_ATTEMPT = '11111111-1111-4111-8111-111111111111';
+const B1_TASKS = [1,2,3].map(i=>({id:`b1-task-${i}`,level:'B1',teilLabel:`Teil ${i}`,topicPrompt:`B1 task ${i}`}));
+const B1_PARTS = [1,2,3].map(i=>({
+  sessionId:`b1-saved-${i}`,teil:`Teil ${i}`,taskId:`b1-task-${i}`,
+  assessment:{maxScore:10,score:7,percent:70,practiceOnly:true},
+}));
+const B1_SAVED_RESULT = {
+  completed:true,score:70,passed:true,
+  sectionScores:{teil1:70,teil2:70,teil3:70},sheet:{ok:true},
+};
+const B1_DRAFT_KEY = 'falowen:graded-speaking:learner:B1-7.23';
+
+test('B1 Day 23: Teil 3 already marked in the cloud finalizes automatically from the last-step recovery button',async()=>{
+  localStorage.setItem(B1_DRAFT_KEY,JSON.stringify({
+    attemptId:B1_ATTEMPT,tasks:B1_TASKS,results:B1_PARTS.slice(0,2),
+  }));
+  fetchCourseSpeakingMockStatus
+    .mockResolvedValueOnce({completed:false,attemptId:B1_ATTEMPT,recovery:{parts:B1_PARTS.slice(0,2)}})
+    .mockResolvedValueOnce({completed:false,attemptId:B1_ATTEMPT,recovery:{parts:B1_PARTS}});
+  submitCourseSpeakingMock.mockResolvedValue(B1_SAVED_RESULT);
+  render(<CourseSpeakingMockAssignment assignmentKey='B1-7.23'/>);
+  expect(await screen.findByText(/Teil 3 of 3/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button',{name:'Check saved Teil 3 and finalize score'}));
+  expect(await screen.findByText(/All three speaking parts assessed — course score saved/)).toBeInTheDocument();
+  expect(submitCourseSpeakingMock).toHaveBeenCalledTimes(1);
+  expect(submitCourseSpeakingMock).toHaveBeenCalledWith(expect.objectContaining({
+    assignmentKey:'B1-7.23',attemptId:B1_ATTEMPT,
+    sessionIds:['b1-saved-1','b1-saved-2','b1-saved-3'],
+  }));
+  expect(localStorage.getItem(B1_DRAFT_KEY)).toBeNull();
+});
+
+test('B1 Day 23: all three Teils saved locally and in cloud retry final score when first submission fails',async()=>{
+  localStorage.setItem(B1_DRAFT_KEY,JSON.stringify({
+    attemptId:B1_ATTEMPT,tasks:B1_TASKS,results:B1_PARTS,
+  }));
+  fetchCourseSpeakingMockStatus.mockResolvedValue({
+    completed:false,attemptId:B1_ATTEMPT,recovery:{parts:B1_PARTS,allPartsGraded:true},
+  });
+  submitCourseSpeakingMock
+    .mockRejectedValueOnce(new Error('Temporary score write failure'))
+    .mockResolvedValueOnce(B1_SAVED_RESULT);
+  render(<CourseSpeakingMockAssignment assignmentKey='B1-7.23'/>);
+  expect(await screen.findByText('Submission needs a retry')).toBeInTheDocument();
+  expect(screen.getByText(/Temporary score write failure/)).toBeInTheDocument();
+  // Recovery is a status read plus a score-write retry, not an examiner retry.
+  expect(submitCourseSpeakingMock).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole('button',{name:'Check saved speaking results'}));
+  expect(await screen.findByText(/All three speaking parts assessed — course score saved/)).toBeInTheDocument();
+  expect(submitCourseSpeakingMock).toHaveBeenCalledTimes(2);
+  expect(submitCourseSpeakingMock.mock.calls.every(([v])=>v.attemptId===B1_ATTEMPT
+    && v.sessionIds.join(',')==='b1-saved-1,b1-saved-2,b1-saved-3')).toBe(true);
+  expect(localStorage.getItem(B1_DRAFT_KEY)).toBeNull();
+});
