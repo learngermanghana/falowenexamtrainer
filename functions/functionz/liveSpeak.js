@@ -133,7 +133,7 @@ const cleanExamTask = (task) => ({
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
   mockAttemptId: assignmentConfig(task?.courseAssignmentKey) ||
-    (/^a2-mock-01-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
+    (/^(?:a2-mock-01|b1-mock-03)-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
     ? String(task?.mockAttemptId || "").trim().slice(0,120) : "",
 });
 const examOpening = (level, task) => {
@@ -347,6 +347,27 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const source = cleanPracticeSource(req.body?.source);
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
+      if (/^b1-mock-03-speaking-teil-[123]$/.test(examTask?.id || "")) {
+        if (process.env.B1_MOCK3_SPEAKING_RELEASED !== "true")
+          return error(res,404,"b1_mock3_not_released","B1 Mock 3 speaking is not published yet.");
+        if (level !== "B1") return error(res,400,"wrong_mock_level","B1 Mock 3 requires a B1 examiner.");
+        if (!examTask?.mockAttemptId)
+          return error(res,400,"mock_attempt_required","Start a saved B1 Mock 3 speaking attempt first.");
+        const attemptSnap=await db().collection("b1Mock3SpeakingUsers").doc(student.auth.uid)
+          .collection("attempts").doc(examTask.mockAttemptId).get();
+        const attempt=attemptSnap.data() || {};
+        if (!attemptSnap.exists || attempt.uid!==student.auth.uid ||
+            attempt.mockId!=="b1-mock-03" || attempt.status!=="in_progress") {
+          return error(res,403,"mock_attempt_mismatch","This speaking part is not linked to your active B1 Mock 3 attempt.");
+        }
+        const {speakingTasks}=require("./b1Mock3Speaking");
+        const part=Number(examTask.id.match(/teil-([123])$/)?.[1]);
+        const expected=speakingTasks(attempt.topicChoice)[part-1];
+        if (examTask.teil!==`Teil ${part}` || examTask.prompt!==expected.prompt ||
+            examTask.keywords!==expected.keywords) {
+          return error(res,400,"mock_task_mismatch","B1 Mock 3 speaking requires the assigned, unmodified exam task.");
+        }
+      }
       if (examTask?.courseAssignmentKey) {
         // Course exam parts must reference an attempt created and owned by the
         // signed-in student on the server before any new voice session begins.
@@ -377,9 +398,12 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         if (existing.sessionId && !existing.endedAt &&
           (sessionDeadline(existing) > Date.now() || feedbackOpen(existing) ||
             (assignmentConfig(existing.examTask?.courseAssignmentKey) && !coursePartFinished(existing)))) {
-          if (examTask?.courseAssignmentKey &&
+          if ((examTask?.courseAssignmentKey &&
             (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
-              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) {
+              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
+            (/^b1-mock-03-speaking-teil-[123]$/.test(examTask?.id || "") &&
+              (existing.examTask?.id !== examTask.id ||
+               existing.examTask?.mockAttemptId !== examTask.mockAttemptId))) {
             throw Object.assign(new Error(
               "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
             ), {status:409,code:"different_mock_attempt_active"});
@@ -413,8 +437,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("No speaking sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
         }
         const preparedFlow = examFlow ? {...examFlow} : null;
-        if (preparedFlow?.key === "B1-3" && !preparedFlow.discussion && existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0]) {
-          preparedFlow.contextTopic=existing.examTask.prompt;
+        if (preparedFlow?.key === "B1-3" &&
+            existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0] &&
+            existing.examTask?.mockAttemptId === examTask?.mockAttemptId) {
+          preparedFlow.contextTopic=String(existing.examTask?.keywords || existing.examTask?.prompt || "").slice(0,180);
           preparedFlow.ownPresentation=String(existing.confirmedAnswers[0]).slice(0,2400);
         }
         const sessionId = crypto.randomUUID();
