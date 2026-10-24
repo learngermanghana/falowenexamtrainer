@@ -176,7 +176,7 @@ test("speaking page keeps one Exam Room menu, a single banner and distinct A1 to
   expect(app).toContain('className="mobile-exam-menu"');
   expect(app).toContain("Exam Room Menu");
   expect(app).not.toContain('className="exam-speaking-quick-nav"');
-  expect(app).toContain('activeExamHero && examSection !== "speaking"');
+  expect(app).toContain('activeExamHero && !["speaking", "lesen"].includes(examSection)');
   expect(css).toContain("body.falowen-exam-speaking-page .study-buddy-bar");
   expect(css).toContain(".speaking-exam-local-practice__recorder");
 });
