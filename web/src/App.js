@@ -15,6 +15,7 @@ import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, isMockPortal } from "./components/MockExamCommerce";
 import LandingPage from "./components/LandingPage";
+import FalowenBooksPage from "./components/FalowenBooksPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
@@ -415,6 +416,12 @@ function App() {
     Boolean(studentProfile) &&
     !isStaff &&
     !(hasActiveContract || hasActivePartialPaymentAccess || hasActiveTrial || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
+
+  // Public bookstore and paid-book library must bypass class enrolment gates.
+  // Purchase/download authorization is verified by the backend, never this route.
+  if (/^\/books\/?$/.test(location.pathname)) return <FalowenBooksPage mode="catalog" />;
+  if (/^\/books\/a1\/?$/.test(location.pathname)) return <FalowenBooksPage mode="product" />;
+  if (/^\/books\/a1\/sample\/?$/.test(location.pathname)) return <FalowenBooksPage mode="sample" />;
 
   if (location.pathname === "/visitor-guide" || location.pathname === "/visitor-guide/") {
     return <PublicAdmissionsVisitorGuidePage />;
