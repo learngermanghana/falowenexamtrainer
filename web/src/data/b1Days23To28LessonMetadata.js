@@ -16,8 +16,8 @@ const B1_DAYS23_TO28_METADATA = Object.freeze({
   25: Object.freeze({
     chapter: "8.25",
     title: "Online einkaufen – Rechte und Risiken",
-    goal: "Vorteile und Risiken des Online-Shoppings erklären, Verbraucherrechte anwenden und formell auf Probleme reagieren.",
-    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben and Lesen; Teil 4 · Hören is self-check practice and is not submitted.",
+    goal: "Vorteile und Risiken des Online-Shoppings erklären, Verbraucherrechte anwenden und eine begründete Meinung zu Risiken und Verbraucherrechten schreiben.",
+    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben and Lesen; the new seven-question Hören is pending a matching recording and is not submitted yet.",
     workbookOnly: false,
   }),
   26: Object.freeze({

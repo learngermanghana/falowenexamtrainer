@@ -1,7 +1,7 @@
 export const B1_REQUIRED_WRITING_DAYS = Object.freeze([
   1, 3, 4, 6, 8, 9,
   12, 13, 14, 16, 18,
-  20, 21, 23, 24, 26, 27, 28,
+  20, 21, 23, 24, 25, 26, 27, 28,
 ]);
 
 const requiredWritingDays = new Set(B1_REQUIRED_WRITING_DAYS);

@@ -571,8 +571,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                     ) : listening.transcript ? (
                       <>
                         <PlaceholderCard
-                          title="Podcast audio pending"
-                          text="The matching Anna/Ben podcast audio still needs to be added. The old mismatched listening video has been removed."
+                          title="Passendes Hör-Audio noch nicht verfügbar"
+                          text="Die Fragen sind vorbereitet. Die neue Aufnahme muss noch unter dem bestätigten R2-Objektnamen verknüpft werden; die alte, thematisch falsche Aufnahme wird nicht abgespielt."
                         />
                         {listening.selfCheckText ? <p style={{ margin: 0 }}>{listening.selfCheckText}</p> : null}
                         <QuestionList questions={listening.questions || []} />

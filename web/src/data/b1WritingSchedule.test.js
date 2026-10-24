@@ -5,11 +5,11 @@ import {
 } from "./b1WritingSchedule";
 
 describe("B1 writing cadence", () => {
-  test("keeps 18 required Schreiben days across the 28-day course", () => {
+  test("keeps 19 required Schreiben days across the 28-day course", () => {
     expect(B1_REQUIRED_WRITING_DAYS).toEqual([
-      1, 3, 4, 6, 8, 9, 12, 13, 14, 16, 18, 20, 21, 23, 24, 26, 27, 28,
+      1, 3, 4, 6, 8, 9, 12, 13, 14, 16, 18, 20, 21, 23, 24, 25, 26, 27, 28,
     ]);
-    expect(B1_NO_WRITING_DAYS).toEqual([2, 5, 7, 10, 11, 15, 17, 19, 22, 25]);
+    expect(B1_NO_WRITING_DAYS).toEqual([2, 5, 7, 10, 11, 15, 17, 19, 22]);
   });
 
   test("marks only the selected days as required writing", () => {

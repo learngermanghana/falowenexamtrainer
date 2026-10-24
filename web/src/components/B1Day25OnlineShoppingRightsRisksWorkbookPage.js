@@ -45,17 +45,8 @@ const config = {
   },
   writing: getB1WritingTask(25),
   reading: getB1ReadingTask(25),
-  listening: {
-    title: "Bearbeiten Sie den Goethe-standard Hören-Test und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Complete the listening task without checking the solutions first. Listen a second time where necessary.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for listening practice",
-    videoId: "iyydRu3oY4I",
-    externalUrl: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
-    selfCheckText: "The solutions are provided in the listening resource. Mark your own score. Only Lesen and Schreiben are submitted for tutor evaluation.",
-  },
-  submitWritingDescription: "Paste your final formal complaint letter.",
-  submitReadingDescription: "Paste your seven reading answer letters.",
+  submitWritingDescription: "Write your approx. 80-word opinion for the online-shopping discussion.",
+  submitReadingDescription: "Submit the seven reading letters in the form 1A, 2B, 3C …",
 };
 
 export default function B1Day25OnlineShoppingRightsRisksWorkbookPage() {
