@@ -16,7 +16,10 @@ import {
   startB1MockAttempt,
 } from "../services/b1FinalMockService";
 import { B1_LISTENING, B1_READING, B1_WRITING_TASKS } from "../data/b1FinalMockData";
+import { B1_MOCK2_READING, B1_MOCK2_WRITING_TASKS, B1_MOCK2_SPEAKING } from "../data/b1Mock2ExamContent";
+import B1Mock2Hoeren from "./B1Mock2Hoeren";
 import B1FinalMockSpeaking from "./B1FinalMockSpeaking";
+import B1MockConversationalSpeaking from "./B1MockConversationalSpeaking";
 import { FullMockGuide, FullMockRecovery } from "./FullMockGuidance";
 import { FULL_MOCK_SKILLS } from "../utils/fullMockProgress";
 import { B1_MOCK_STEPS, getB1MockProgress, getB1MockPracticeRecommendations } from "../utils/b1MockProgress";
@@ -36,9 +39,9 @@ const SECTION_LABELS = Object.freeze({
   sprechen: "Sprechen",
 });
 
-const emptyState = () => ({
+const emptyState = (mockId = B1_FINAL_MOCK_ID) => ({
   version: 1,
-  mockId: B1_FINAL_MOCK_ID,
+  mockId,
   stage: "intro",
   sectionDeadlineMs: null,
   attemptInfo: null,
@@ -55,6 +58,7 @@ const emptyState = () => ({
   overall: null,
   writingPending: false,
   completed: false,
+  serverConfirmed: false,
 });
 
 const formatTime = (seconds) => {
@@ -80,13 +84,13 @@ const scoreObjective = (answers, questions) => {
   return { correct, total: questions.length, score: normalizeScore(correct, questions.length), maxScore: 25 };
 };
 
-const lesenQuestions = [
-  ...B1_READING.teil1.questions.map((q) => ({ ...q, key: `t1-${q.number}` })),
-  ...B1_READING.teil2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
-  ...B1_READING.teil2.text2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
-  ...B1_READING.teil3.situations.map((q) => ({ ...q, question: q.text, key: `t3-${q.number}` })),
-  ...B1_READING.teil4.comments.map((q) => ({ ...q, question: q.person, key: `t4-${q.number}` })),
-  ...B1_READING.teil5.questions.map((q) => ({ ...q, key: `t5-${q.number}` })),
+const buildLesenQuestions = (reading) => [
+  ...reading.teil1.questions.map((q) => ({ ...q, key: `t1-${q.number}` })),
+  ...reading.teil2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
+  ...reading.teil2.text2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
+  ...reading.teil3.situations.map((q) => ({ ...q, question: q.text, key: `t3-${q.number}` })),
+  ...reading.teil4.comments.map((q) => ({ ...q, question: q.person, key: `t4-${q.number}` })),
+  ...reading.teil5.questions.map((q) => ({ ...q, key: `t5-${q.number}` })),
 ];
 
 const hoerenQuestions = B1_LISTENING.flatMap((part, index) =>
@@ -95,13 +99,13 @@ const hoerenQuestions = B1_LISTENING.flatMap((part, index) =>
 
 const wordCount = (text) => String(text || "").trim().split(/\s+/).filter(Boolean).length;
 
-const readStoredState = (key) => {
-  if (typeof window === "undefined") return emptyState();
+const readStoredState = (key, mockId = B1_FINAL_MOCK_ID) => {
+  if (typeof window === "undefined") return emptyState(mockId);
   try {
     const parsed = JSON.parse(window.localStorage.getItem(key) || "null");
-    return parsed?.mockId === B1_FINAL_MOCK_ID ? restoreFullMockReviewState({ ...emptyState(), ...parsed }) : emptyState();
+    return parsed?.mockId === mockId ? restoreFullMockReviewState({ ...emptyState(mockId), ...parsed }) : emptyState(mockId);
   } catch (_error) {
-    return emptyState();
+    return emptyState(mockId);
   }
 };
 
@@ -214,11 +218,16 @@ const ReadingPart = ({ children, title, time }) => (
   </section>
 );
 
-export default function B1FinalMockExamPage() {
+export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
+  const isSecond = mockId === "b1-mock-02";
+  const reading = isSecond ? B1_MOCK2_READING : B1_READING;
+  const writingTasks = isSecond ? B1_MOCK2_WRITING_TASKS : B1_WRITING_TASKS;
+  const speakingData = isSecond ? B1_MOCK2_SPEAKING : undefined;
+  const lesenQuestions = buildLesenQuestions(reading);
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
-  const storageKey = `${B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
-  const [exam, setExam] = useState(() => readStoredState(storageKey));
+  const storageKey = `${isSecond ? "falowen:b1-mock-02:full:v1" : B1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
+  const [exam, setExam] = useState(() => readStoredState(storageKey,mockId));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -304,6 +313,15 @@ export default function B1FinalMockExamPage() {
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
           announceExamSuccess("B1 mock result saved successfully.");
+        }
+        if(isSecond && response?.verifiedOverall && response?.verifiedSectionScores) {
+          setExam(current=>current.serverConfirmed ? current : ({
+            ...current, serverConfirmed:true,
+            overall:response.verifiedOverall,
+            sectionScores:response.verifiedSectionScores,
+            lesenResult:{...(current.lesenResult||{}),score:response.verifiedSectionScores.lesen},
+            hoerenResult:{...(current.hoerenResult||{}),score:response.verifiedSectionScores.hoeren}
+          }));
         }
         completionRetryCountRef.current = 0;
         if (completionRetryTimerRef.current) {
@@ -394,7 +412,7 @@ export default function B1FinalMockExamPage() {
         window.localStorage.removeItem(storageKey);
       }
 
-      const response = await startB1MockAttempt({ idToken, mockId: B1_FINAL_MOCK_ID });
+      const response = await startB1MockAttempt({ idToken, mockId });
       if (response?.resumed && response?.state && !forceNew) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
@@ -405,7 +423,7 @@ export default function B1FinalMockExamPage() {
             : response.state;
 
         setExam({
-          ...emptyState(),
+          ...emptyState(mockId),
           ...newestState,
           attemptInfo: {
             attemptId: response.attemptId,
@@ -418,7 +436,7 @@ export default function B1FinalMockExamPage() {
       }
 
       setExam({
-        ...emptyState(),
+        ...emptyState(mockId),
         stage: "lesen",
         sectionDeadlineMs: Date.now() + SECTION_DURATIONS.lesen * 1000,
         attemptInfo: {
@@ -436,7 +454,7 @@ export default function B1FinalMockExamPage() {
   };
 
   const submitLesen = useCallback(() => {
-    const result = scoreObjective(exam.lesenAnswers, lesenQuestions);
+    const result = isSecond ? {correct:null,total:30,score:0,maxScore:25,pendingServerVerification:true} : scoreObjective(exam.lesenAnswers, lesenQuestions);
     moveToSection("hoeren", {
       lesenResult: result,
       sectionScores: { ...exam.sectionScores, lesen: result.score },
@@ -444,7 +462,7 @@ export default function B1FinalMockExamPage() {
   }, [exam.lesenAnswers, exam.sectionScores, moveToSection]);
 
   const submitHoeren = useCallback(() => {
-    const result = scoreObjective(exam.hoerenAnswers, hoerenQuestions);
+    const result = isSecond ? {correct:null,total:30,score:0,maxScore:25,pendingServerVerification:true} : scoreObjective(exam.hoerenAnswers, hoerenQuestions);
     moveToSection("schreiben", {
       hoerenResult: result,
       sectionScores: { ...exam.sectionScores, hoeren: result.score },
@@ -458,6 +476,7 @@ export default function B1FinalMockExamPage() {
     try {
       const result = await scoreB1MockWriting({
         ...exam.schreiben,
+        mockId,
         attemptId: exam.attemptInfo?.attemptId || "",
         idToken,
       });
@@ -480,7 +499,7 @@ export default function B1FinalMockExamPage() {
     if (busy || !exam.writingPending) return;
     setBusy("schreiben"); setError("");
     try {
-      const result = await scoreB1MockWriting({ ...exam.schreiben, attemptId: exam.attemptInfo?.attemptId || "", idToken });
+      const result = await scoreB1MockWriting({ ...exam.schreiben, mockId, attemptId: exam.attemptInfo?.attemptId || "", idToken });
       setExam(current => {
         const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
         const total = Number(Object.values(sectionScores)
@@ -564,8 +583,8 @@ export default function B1FinalMockExamPage() {
       <main className="b1-final-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <header className="b1-final-hero">
-          <p>B1 · Day 29 · Complete mock</p>
-          <h1>GOETHE-ZERTIFIKAT B1 Mock 1</h1>
+          <p>{isSecond ? "B1 · Mock 2" : "B1 · Day 29 · Complete mock"}</p>
+          <h1>GOETHE-ZERTIFIKAT B1 Mock {isSecond ? 2 : 1}</h1>
           <p>This is <strong>one four-section exam</strong>, not four separate short mocks. You must finish Lesen, Hören, Schreiben <strong>and</strong> Sprechen to receive your final result.</p>
         </header>
         <section className="b1-final-rules">
@@ -579,7 +598,7 @@ export default function B1FinalMockExamPage() {
           </div>
           <p><strong>How it works:</strong> Finish Lesen (1 of 4), then Hören (2 of 4), Schreiben (3 of 4), and Sprechen (4 of 4). Hören contains four audio Teile, and Sprechen has three speaking tasks.</p>
           <p><strong>If you leave early:</strong> Your answers are saved. Return to this mock to continue your unfinished attempt; the section timer is <strong>not paused</strong> while you are away. An unfinished mock is not a failed mock.</p>
-          <p>Audio parts can only be started once in the active attempt. The speaking partner audio already contains the response windows.</p>
+          <p>Audio parts can only be started once in the active attempt. {isSecond ? "For the speaking planning task, record your own contributions; there is no prerecorded partner for this new scenario." : "The speaking partner audio already contains the response windows."}</p>
           <button type="button" className="b1-final-primary" onClick={() => startExam()} disabled={busy === "start"}>
             {busy === "start" ? "Opening mock …" : "Start or resume complete B1 mock"}
           </button>
@@ -589,7 +608,7 @@ export default function B1FinalMockExamPage() {
     );
   }
 
-  if (exam.stage === "result" && canReviewFullMock(exam)) {
+  if (exam.stage === "result" && (!isSecond || exam.serverConfirmed) && canReviewFullMock(exam)) {
     const entries = Object.entries(exam.sectionScores || {});
     const sorted = [...entries].sort((a, b) => Number(b[1]) - Number(a[1]));
     const recommendations = getB1MockPracticeRecommendations(exam.sectionScores);
@@ -598,7 +617,7 @@ export default function B1FinalMockExamPage() {
       <main className="b1-final-shell">
         <AppBackButton label="Back to Exams Room" fallbackPath="/exams/overview" />
         <header className="b1-final-hero">
-          <p>B1 Mock 1 · All four sections completed</p>
+          <p>B1 Mock {isSecond ? 2 : 1} · All four sections completed</p>
           <h1>{exam.overall?.score || 0}%</h1>
           <p className={exam.overall?.passed ? "b1-final-pass" : "b1-final-needs-work"}>
             {exam.overall?.passed ? "PASS" : "NEEDS MORE PRACTICE"}
@@ -632,6 +651,7 @@ export default function B1FinalMockExamPage() {
     );
   }
 
+  if(isSecond && exam.stage==="result" && !exam.serverConfirmed && !exam.writingPending) return <main className="b1-final-shell"><section className="b1-final-rules"><h2>Verifying B1 Mock 2 results</h2><p>Your four modules are submitted. The official /100 result will appear only after server-side verification and Results synchronization.</p>{error ? <p role="alert">{error}</p> : null}<button type="button" onClick={()=>setCompletionRetryNonce(n=>n+1)}>Retry result verification</button></section></main>;
   return (
     <main className="b1-final-shell">
       <AppBackButton label="Leave mock (answers saved; timer continues)" fallbackPath="/campus/course" />
@@ -648,15 +668,15 @@ export default function B1FinalMockExamPage() {
           <header className="b1-final-module-header"><p>GOETHE-ZERTIFIKAT B1</p><h1>Lesen</h1></header>
 
           <ReadingPart title="Teil 1" time="10 Minuten">
-            <p>{B1_READING.teil1.intro}</p>
+            <p>{reading.teil1.intro}</p>
             <div className="b1-final-reading-text">
-              <h3>{B1_READING.teil1.heading}</h3>
-              <em>{B1_READING.teil1.subheading}</em>
-              <strong>{B1_READING.teil1.date}</strong>
-              {B1_READING.teil1.paragraphs.map((p) => <p key={p}>{p}</p>)}
-              <p>Bis bald,<br /><em>eure Susanne</em></p>
+              <h3>{reading.teil1.heading}</h3>
+              <em>{reading.teil1.subheading}</em>
+              <strong>{reading.teil1.date}</strong>
+              {reading.teil1.paragraphs.map((p) => <p key={p}>{p}</p>)}
+              {!isSecond?<p>Bis bald,<br /><em>eure Susanne</em></p>:null}
             </div>
-            {B1_READING.teil1.questions.map((q) => (
+            {reading.teil1.questions.map((q) => (
               <div className="b1-final-question" key={q.number}>
                 <strong>{q.number}. {q.question}</strong>
                 <ChoiceList
@@ -672,10 +692,10 @@ export default function B1FinalMockExamPage() {
           <ReadingPart title="Teil 2 · Text 1" time="20 Minuten · gesamter Teil 2">
             <div className="b1-final-press-text">
               <small>Text aus der Presse</small>
-              <h3>{B1_READING.teil2.heading}</h3>
-              {B1_READING.teil2.paragraphs.map((p) => <p key={p}>{p}</p>)}
+              <h3>{reading.teil2.heading}</h3>
+              {reading.teil2.paragraphs.map((p) => <p key={p}>{p}</p>)}
             </div>
-            {B1_READING.teil2.questions.map((q) => (
+            {reading.teil2.questions.map((q) => (
               <div className="b1-final-question" key={q.number}>
                 <strong>{q.number}. {q.question}</strong>
                 <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
@@ -685,16 +705,16 @@ export default function B1FinalMockExamPage() {
             ))}
 
             <div className="b1-final-text-divider">
-              <strong>{B1_READING.teil2.text2.title}</strong>
+              <strong>{reading.teil2.text2.title}</strong>
               <span>Aufgaben 10–12</span>
             </div>
-            <p>{B1_READING.teil2.text2.intro}</p>
+            <p>{reading.teil2.text2.intro}</p>
             <div className="b1-final-press-text">
               <small>Text aus der Presse</small>
-              <h3>{B1_READING.teil2.text2.heading}</h3>
-              {B1_READING.teil2.text2.paragraphs.map((p) => <p key={p}>{p}</p>)}
+              <h3>{reading.teil2.text2.heading}</h3>
+              {reading.teil2.text2.paragraphs.map((p) => <p key={p}>{p}</p>)}
             </div>
-            {B1_READING.teil2.text2.questions.map((q) => (
+            {reading.teil2.text2.questions.map((q) => (
               <div className="b1-final-question" key={q.number}>
                 <strong>{q.number}. {q.question}</strong>
                 <ChoiceList name={`lesen-t2-${q.number}`} options={q.options}
@@ -704,19 +724,20 @@ export default function B1FinalMockExamPage() {
             ))}
           </ReadingPart>
 
-          <ReadingPart title="Teil 3">
-            <p>{B1_READING.teil3.context}</p>
+          <ReadingPart title="Teil 3" time="10 Minuten">
+            <p>{reading.teil3.context}</p>
+            {isSecond?<p>{reading.teil3.example}</p>:null}
             <div className="b1-final-ads">
-              {B1_READING.teil3.ads.map(([letter, title, copy]) => (
-                <article key={letter} className={letter === "C" ? "example" : ""}>
-                  <span>Anzeige {letter}{letter === "C" ? " · Beispiel" : ""}</span>
+              {reading.teil3.ads.map(([letter, title, copy]) => (
+                <article key={letter} className={letter === (isSecond ? "E" : "C") ? "example" : ""}>
+                  <span>Anzeige {letter}{letter === (isSecond ? "E" : "C") ? " · Beispiel" : ""}</span>
                   <h3>{title}</h3>
                   <p>{copy}</p>
                 </article>
               ))}
             </div>
             <div className="b1-final-situations">
-              {B1_READING.teil3.situations.map((q) => (
+              {reading.teil3.situations.map((q) => (
                 <label key={q.number}>
                   <span><strong>{q.number}.</strong> {q.text}</span>
                   <select
@@ -725,7 +746,7 @@ export default function B1FinalMockExamPage() {
                   >
                     <option value="">Anzeige wählen</option>
                     <option value="0">0 · keine passende Anzeige</option>
-                    {"ABCDEFGHIJ".split("").filter((letter) => letter !== "C").map((letter) => (
+                    {"ABCDEFGHIJ".split("").filter((letter) => letter !== (isSecond ? "E" : "C")).map((letter) => (
                       <option value={letter.toLowerCase()} key={letter}>{letter}</option>
                     ))}
                   </select>
@@ -735,8 +756,8 @@ export default function B1FinalMockExamPage() {
           </ReadingPart>
 
           <ReadingPart title="Teil 4" time="15 Minuten">
-            <p>{B1_READING.teil4.context}</p>
-            {B1_READING.teil4.comments.map((q) => (
+            <p>{reading.teil4.context}</p>
+            {reading.teil4.comments.map((q) => (
               <div className="b1-final-comment" key={q.number}>
                 <p><strong>{q.number}. {q.person}:</strong> „{q.text}“</p>
                 <ChoiceList name={`lesen-t4-${q.number}`} options={[["ja","Ja"],["nein","Nein"]]}
@@ -747,14 +768,14 @@ export default function B1FinalMockExamPage() {
           </ReadingPart>
 
           <ReadingPart title="Teil 5" time="10 Minuten">
-            <p>{B1_READING.teil5.context}</p>
+            <p>{reading.teil5.context}</p>
             <div className="b1-final-reading-text">
-              <h3>{B1_READING.teil5.heading}</h3>
-              {B1_READING.teil5.sections.map(([title, copy]) => (
+              <h3>{reading.teil5.heading}</h3>
+              {reading.teil5.sections.map(([title, copy]) => (
                 <div key={title}><h4>{title}</h4><p>{copy}</p></div>
               ))}
             </div>
-            {B1_READING.teil5.questions.map((q) => (
+            {reading.teil5.questions.map((q) => (
               <div className="b1-final-question" key={q.number}>
                 <strong>{q.number}. {q.question}</strong>
                 <ChoiceList name={`lesen-t5-${q.number}`} options={q.options}
@@ -768,7 +789,11 @@ export default function B1FinalMockExamPage() {
         </>
       ) : null}
 
-      {exam.stage === "hoeren" ? (
+      {exam.stage === "hoeren" && isSecond ? <B1Mock2Hoeren embedded
+        onAnswersChange={(number,value,part)=>setExam(current=>({...current,hoerenAnswers:{...current.hoerenAnswers,[`t${part}-${number}`]:value}}))}
+        onComplete={({answers,result})=>{const sectionScore=Number((result.correct/Math.max(1,result.total)*25).toFixed(1));const hoerenAnswers=Object.fromEntries(Object.entries(answers).map(([number,value])=>{const n=Number(number);const part=n<=10?1:n<=15?2:n<=22?3:4;return [`t${part}-${number}`,value];}));moveToSection("schreiben",{hoerenAnswers,hoerenResult:{...result,score:sectionScore,maxScore:25},sectionScores:{...exam.sectionScores,hoeren:sectionScore}});}}
+      /> : null}
+      {exam.stage === "hoeren" && !isSecond ? (
         <>
           <header className="b1-final-module-header">
             <p>GOETHE-ZERTIFIKAT B1 · Module 2 of 4</p>
@@ -826,7 +851,7 @@ export default function B1FinalMockExamPage() {
             <p>GOETHE-ZERTIFIKAT B1</p><h1>Schreiben</h1>
             <span>Gesamtdauer: 75 Minuten · Keine Wörterbücher oder Mobiltelefone.</span>
           </header>
-          {B1_WRITING_TASKS.map((task) => {
+          {writingTasks.map((task) => {
             const text = exam.schreiben?.[task.id] || "";
             return (
               <section className="b1-final-writing-task" key={task.id}>
@@ -855,8 +880,22 @@ export default function B1FinalMockExamPage() {
         </>
       ) : null}
 
-      {exam.stage === "sprechen" ? (
+      {exam.stage === "sprechen" && (isSecond || !Object.entries(exam.speakingProgress?.attempts || {})
+        .some(([key,part])=>/^teil[123]$/.test(key) && Boolean(part?.transcript))) ? (
+        <B1MockConversationalSpeaking
+          mockId={mockId}
+          externalSecondsLeft={secondsLeft}
+          initialAttempts={exam.speakingProgress?.attempts || {}}
+          attemptId={exam.attemptInfo?.attemptId || ""}
+          onProgress={handleSpeakingProgress}
+          onComplete={finishSpeaking}
+        />
+      ) : null}
+      {exam.stage === "sprechen" && !isSecond && Object.entries(exam.speakingProgress?.attempts || {})
+        .some(([key,part])=>/^teil[123]$/.test(key) && Boolean(part?.transcript)) ? (
         <B1FinalMockSpeaking
+          mockId={mockId}
+          speakingData={speakingData}
           externalSecondsLeft={secondsLeft}
           initialAttempts={exam.speakingProgress?.attempts || {}}
           initialResult={exam.speakingResult}

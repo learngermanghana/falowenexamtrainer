@@ -226,7 +226,7 @@ export const scoreInteractionAudio = async ({
 export const scoreA1MockSpeaking = async ({ attempts, attemptId, mockId = "a1-mock-01", idToken }) => {
   const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/a1-mock-score`,
-    { attempts, attemptId, mockId },
+    { ...(examinerSessionIds !== undefined ? {examinerSessionIds} : {attempts}), attemptId, mockId },
     { headers: authHeaders(idToken) }
   );
 
@@ -243,10 +243,10 @@ export const scoreA2MockSpeaking = async ({ attempts, attemptId, idToken, mockId
   return response.data?.result || response.data;
 };
 
-export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
+export const scoreB1MockSpeaking = async ({ attempts, examinerSessionIds, attemptId, idToken, mockId = "b1-mock-01" }) => {
   const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/b1-mock-score`,
-    { attempts, attemptId },
+    { attempts, attemptId, mockId },
     { headers: authHeaders(idToken) }
   );
 

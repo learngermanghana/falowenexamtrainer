@@ -174,7 +174,15 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     questionSetId: "b1-final-01",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "b1-mock-02": {
+    id:"b1-mock-02",level:"B1",title:"B1 Mock 2",shortTitle:"B1 Mock 2",
+    description:"Second B1 four-module mock with 30 Lesen questions, protected Hören recordings, three Schreiben tasks, and three Sprechen tasks. Server-verification tests and production release remain gated.",
+    durationLabel:"about 3 hr 20 min · 4 modules",
+    status:"preview",route:"/campus/course/b1-mock-2",
+    mode:"practice",questionSetId:"b1-mock-02",sections:["Lesen","Hören","Schreiben","Sprechen"],
+  },
   "b1-mock-02-hoeren": {
+    showInMockLibrary:false,
     id: "b1-mock-02-hoeren",
     level: "B1",
     title: "B1 Mock 2 · Hören Teile 1–4",
