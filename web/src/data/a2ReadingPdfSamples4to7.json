@@ -1,0 +1,1938 @@
+[
+  {
+    "id": "a2-reading-practice-04",
+    "label": "Lesen Sample 4",
+    "teil1": {
+      "title": "Teil 1",
+      "instruction": [
+        "Lesen Sie den Zeitungsartikel.",
+        "Wählen Sie für die Aufgaben 1 bis 5 a, b oder c."
+      ],
+      "article": {
+        "title": "Flexible Arbeitszeiten: Das Modell der Firma TechSüd",
+        "subtitle": "",
+        "paragraphs": [
+          "Die IT-Firma TechSüd in Stuttgart hat seit sechs Monaten ein neues Arbeitszeitmodell eingeführt. Alle 40 Mitarbeiter dürfen ihre Arbeitszeit völlig flexibel gestalten. Es gibt keine Pflicht mehr, jeden Tag von 8 bis 17 Uhr im Büro zu sein. Wer möchte, kann von zu Hause arbeiten oder die Wochenarbeitszeit an vier Tagen erledigen. Geschäftsführer Markus Weber erklärt: 'Wir vertrauen unseren Mitarbeitern. Hauptsache, die Projekte werden pünktlich fertig.' Bisher sind die Erfahrungen sehr positiv: Die Mitarbeiter sind zufriedener und seltener krank. Allerdings betonen viele, dass gute Absprachen im Team nötig sind, damit immer jemand für Kunden erreichbar ist."
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "Im Text genannte Information"
+          },
+          {
+            "id": "b",
+            "label": "Eine andere Aussage"
+          },
+          {
+            "id": "c",
+            "label": "Eine dritte Aussage"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 1,
+          "question": "Bei der Firma TechSüd...",
+          "options": [
+            {
+              "id": "a",
+              "label": "müssen alle Mitarbeiter im Büro arbeiten."
+            },
+            {
+              "id": "b",
+              "label": "können die Mitarbeiter ihre Arbeitszeit selbst wählen."
+            },
+            {
+              "id": "c",
+              "label": "arbeiten die Mitarbeiter jetzt jeden Tag neun Stunden."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 2,
+          "question": "Der Chef Markus Weber findet wichtig, dass...",
+          "options": [
+            {
+              "id": "a",
+              "label": "die Projekte pünktlich abgeschlossen werden."
+            },
+            {
+              "id": "b",
+              "label": "alle Mitarbeiter um 8 Uhr anfangen."
+            },
+            {
+              "id": "c",
+              "label": "die Mitarbeiter weniger arbeiten."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 3,
+          "question": "Seit der Einführung des Modells...",
+          "options": [
+            {
+              "id": "a",
+              "label": "gibt es mehr kranke Mitarbeiter."
+            },
+            {
+              "id": "b",
+              "label": "ist die Mitarbeiterzufriedenheit gestiegen."
+            },
+            {
+              "id": "c",
+              "label": "suchen viele Mitarbeiter neue Stellen."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 4,
+          "question": "Eine Herausforderung des Modells ist,...",
+          "options": [
+            {
+              "id": "a",
+              "label": "dass die Kunden mehr bezahlen müssen."
+            },
+            {
+              "id": "b",
+              "label": "dass das Büro zu klein geworden ist."
+            },
+            {
+              "id": "c",
+              "label": "dass sich die Teams gut absprechen müssen."
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 5,
+          "question": "Das Modell existiert bei TechSüd seit...",
+          "options": [
+            {
+              "id": "a",
+              "label": "einem Jahr."
+            },
+            {
+              "id": "b",
+              "label": "sechs Monaten."
+            },
+            {
+              "id": "c",
+              "label": "vier Wochen."
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    "teil2": {
+      "title": "Teil 2",
+      "instruction": [
+        "Lesen Sie die Informationstafel.",
+        "Wählen Sie für die Aufgaben 6 bis 10 a, b oder c."
+      ],
+      "store": {
+        "title": "Digital- & Dienstleistungszentrum City-Tower",
+        "floors": [
+          [
+            "EG",
+            "Empfang, Fundbüro, Poststelle & Cafeteria"
+          ],
+          [
+            "1. Stock",
+            "Kundenberater Mobilfunk, Internetverträge & Reparatur-Service"
+          ],
+          [
+            "2. Stock",
+            "IT-Schulungen, Programmierkurse & Weiterbildung"
+          ],
+          [
+            "3. Stock",
+            "Personalabteilung, Bewerbermanagement & Jobvermittlung"
+          ],
+          [
+            "4. Stock",
+            "Geschäftsführung, Buchhaltung & Rechnungsstelle"
+          ]
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "EG"
+          },
+          {
+            "id": "b",
+            "label": "1. Stock"
+          },
+          {
+            "id": "c",
+            "label": "2. Stock"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 6,
+          "question": "Sie möchten einen neuen Internetvertrag abschließen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 7,
+          "question": "Sie suchen Informationen zu EDV- und Programmierkursen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "1. Stock"
+            },
+            {
+              "id": "b",
+              "label": "2. Stock"
+            },
+            {
+              "id": "c",
+              "label": "3. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 8,
+          "question": "Sie haben Ihr Passwort verloren und müssen zur Personalabteilung.",
+          "options": [
+            {
+              "id": "a",
+              "label": "2. Stock"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 9,
+          "question": "Sie möchten eine Rechnung bezahlen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 10,
+          "question": "Sie möchten eine verloren gegangene Tasche abholen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "3. Stock"
+            }
+          ],
+          "answer": "a"
+        }
+      ]
+    },
+    "teil3": {
+      "title": "Teil 3",
+      "instruction": [
+        "Lesen Sie die E-Mail.",
+        "Wählen Sie für die Aufgaben 11 bis 15 a, b oder c."
+      ],
+      "email": {
+        "to": "",
+        "subject": "Erfahrungen in meinem neuen Job als Webentwicklerin",
+        "greeting": "",
+        "paragraphs": [
+          "Liebe Sarah, ich hoffe, es geht dir gut! Ich bin jetzt seit drei Wochen in Hamburg und arbeite bei der Agentur MediaDesign. Die erste Woche war sehr anstrengend, weil ich viele neue Programme lernen musste. Aber das Team ist super nett und hilft mir immer. Mein Kollege Jan zeigt mir die wichtigsten Systeme. Mein Chef hat mir schon ein eigenes Projekt gegeben: Ich darf die Website für ein bekanntes Restaurant gestalten! Die Arbeitszeiten sind gut, aber der Arbeitsweg dauert fast 45 Minuten mit der S-Bahn. Am Wochenende suche ich deshalb eine Wohnung, die näher an der Firma liegt. Hast du nächste Woche Zeit für ein Telefonat? Liebe Grüße, Elena"
+        ],
+        "closing": []
+      },
+      "questions": [
+        {
+          "number": 11,
+          "question": "Elena arbeitet seit drei Wochen...",
+          "options": [
+            {
+              "id": "a",
+              "label": "in Stuttgart."
+            },
+            {
+              "id": "b",
+              "label": "in Hamburg."
+            },
+            {
+              "id": "c",
+              "label": "in Berlin."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 12,
+          "question": "Die erste Arbeitswoche war anstrengend, weil...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Elena viele neue Programme lernen musste."
+            },
+            {
+              "id": "b",
+              "label": "die Kollegen unfreundlich waren."
+            },
+            {
+              "id": "c",
+              "label": "Elena jeden Tag Überstunden machen musste."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 13,
+          "question": "Elena hat bereits...",
+          "options": [
+            {
+              "id": "a",
+              "label": "gekündigt."
+            },
+            {
+              "id": "b",
+              "label": "ein eigenes Projekt bekommen."
+            },
+            {
+              "id": "c",
+              "label": "eine neue Wohnung gefunden."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 14,
+          "question": "Elena sucht am Wochenende eine neue Wohnung, weil...",
+          "options": [
+            {
+              "id": "a",
+              "label": "ihre jetzige Wohnung zu teuer ist."
+            },
+            {
+              "id": "b",
+              "label": "sie mehr Platz braucht."
+            },
+            {
+              "id": "c",
+              "label": "ihr Weg zur Arbeit aktuell 45 Minuten dauert."
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 15,
+          "question": "Elena möchte mit Sarah...",
+          "options": [
+            {
+              "id": "a",
+              "label": "nächste Woche telefonieren."
+            },
+            {
+              "id": "b",
+              "label": "am Wochenende ins Restaurant gehen."
+            },
+            {
+              "id": "c",
+              "label": "zusammen nach Hamburg fahren."
+            }
+          ],
+          "answer": "a"
+        }
+      ]
+    },
+    "teil4": {
+      "title": "Teil 4",
+      "instruction": [
+        "Fünf Personen suchen passende Angebote.",
+        "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
+      ],
+      "example": {
+        "number": 0,
+        "person": "Beispiel: Finden Sie die passende Anzeige.",
+        "answer": "a"
+      },
+      "people": [
+        {
+          "number": 16,
+          "person": "Tim sucht einen Abendkurs, um Grundkenntnisse im Programmieren zu lernen.",
+          "answer": "c"
+        },
+        {
+          "number": 17,
+          "person": "Klara möchte ein günstiges, geprüftes Notebook mit Garantie kaufen.",
+          "answer": "b"
+        },
+        {
+          "number": 18,
+          "person": "Stefan hat seinen Bildschirm am Smartphone beschädigt und braucht eine schnelle Reparatur.",
+          "answer": "a"
+        },
+        {
+          "number": 19,
+          "person": "Monika sucht günstige gebrauchte Schreibtische für ihr neues Arbeitszimmer.",
+          "answer": "d"
+        },
+        {
+          "number": 20,
+          "person": "David sucht einen Experten, der seine alte Videokassette digitalisieren kann.",
+          "answer": "X"
+        }
+      ],
+      "ads": [
+        {
+          "id": "a",
+          "url": "",
+          "title": "Anzeige a",
+          "body": [
+            "IT-Reparatur-Notdienst: Wir reparieren Laptops, PCs und Smartphones schnell und günstig. Termine vor Ort oder im Laden."
+          ]
+        },
+        {
+          "id": "b",
+          "url": "",
+          "title": "Anzeige b",
+          "body": [
+            "Gebrauchte Laptops & Tablets ab 150 €! Alle Geräte geprüft mit 1 Jahr Garantie. WebShop: tech-second.de"
+          ]
+        },
+        {
+          "id": "c",
+          "url": "",
+          "title": "Anzeige c",
+          "body": [
+            "Programmierkurs für Anfänger: Lernen Sie Python & HTML in 4 Wochen. Abendkurse ab 18:00 Uhr. Zertifikat inklusive."
+          ]
+        },
+        {
+          "id": "d",
+          "url": "",
+          "title": "Anzeige d",
+          "body": [
+            "Büromöbel günstig abzugeben: Schreibtische, Bürostühle und Regale sehr gut erhalten. Nur Selbstabholung."
+          ]
+        },
+        {
+          "id": "e",
+          "url": "",
+          "title": "Anzeige e",
+          "body": [
+            "Foto- & Videoausrüstung zu vermieten: Professionelle Kameras, Stative und Lichter für Videoprojekte."
+          ]
+        },
+        {
+          "id": "f",
+          "url": "",
+          "title": "Anzeige f",
+          "body": [
+            "Highspeed-Glasfaser-Internet für Zuhause: Bester Tarif für 19,99 €/Monat im ersten Jahr."
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "a2-reading-practice-05",
+    "label": "Lesen Sample 5",
+    "teil1": {
+      "title": "Teil 1",
+      "instruction": [
+        "Lesen Sie den Zeitungsartikel.",
+        "Wählen Sie für die Aufgaben 1 bis 5 a, b oder c."
+      ],
+      "article": {
+        "title": "Gesunde Ernährung im Schulalltag: Das Projekt 'Bio-Kantine'",
+        "subtitle": "",
+        "paragraphs": [
+          "An der Goethe-Schule in Frankfurt gibt es seit Beginn des Schuljahres ein neues Verpflegungskonzept. Statt Fast-Food und zuckerhaltigen Snacks bietet die Schulkantine nun jeden Tag frisch gekochte Bio-Gerichte an. Das Projekt wird von der Stadt Frankfurt gefördert, sodass die Mahlzeiten für Schüler nur 3,50 Euro kosten. Ein regionales Küchenteam bereitet täglich zwei verschiedene Menüs zu, darunter immer eine vegetarische Option. Auch die Schüler wirken mit: In einer Arbeitsgruppe wählen sie monatlich Lieblingsgerichte aus. Die Schulleiterin Fr. Dr. Neumann berichtet: 'Die Schüler sind im Nachmittagsunterricht viel konzentrierter.'"
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "Im Text genannte Information"
+          },
+          {
+            "id": "b",
+            "label": "Eine andere Aussage"
+          },
+          {
+            "id": "c",
+            "label": "Eine dritte Aussage"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 1,
+          "question": "Das neue Kantinenkonzept an der Goethe-Schule bietet...",
+          "options": [
+            {
+              "id": "a",
+              "label": "kostenloses Essen für alle."
+            },
+            {
+              "id": "b",
+              "label": "täglich frisch gekochtes Bio-Essen."
+            },
+            {
+              "id": "c",
+              "label": "hauptsächlich Fast-Food an."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 2,
+          "question": "Ein Mittagessen für Schüler kostet...",
+          "options": [
+            {
+              "id": "a",
+              "label": "3,50 Euro."
+            },
+            {
+              "id": "b",
+              "label": "5,00 Euro."
+            },
+            {
+              "id": "c",
+              "label": "gar nichts."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 3,
+          "question": "Jeden Tag gibt es...",
+          "options": [
+            {
+              "id": "a",
+              "label": "nur ein festes Gericht."
+            },
+            {
+              "id": "b",
+              "label": "zwei Menüs, davon eines vegetarisch."
+            },
+            {
+              "id": "c",
+              "label": "nur kalte Salate."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 4,
+          "question": "Die Schüler dürfen...",
+          "options": [
+            {
+              "id": "a",
+              "label": "selbst in der Küche kochen."
+            },
+            {
+              "id": "b",
+              "label": "monatlich Lieblingsgerichte mit auswählen."
+            },
+            {
+              "id": "c",
+              "label": "das Essen nach Hause mitnehmen."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 5,
+          "question": "Nach Aussage der Schulleiterin sind die Schüler...",
+          "options": [
+            {
+              "id": "a",
+              "label": "nachmittags konzentrierter."
+            },
+            {
+              "id": "b",
+              "label": "oft müde nach dem Essen."
+            },
+            {
+              "id": "c",
+              "label": "unzufrieden mit den Preisen."
+            }
+          ],
+          "answer": "a"
+        }
+      ]
+    },
+    "teil2": {
+      "title": "Teil 2",
+      "instruction": [
+        "Lesen Sie die Informationstafel.",
+        "Wählen Sie für die Aufgaben 6 bis 10 a, b oder c."
+      ],
+      "store": {
+        "title": "Gesundheitszentrum & Fachärztehaus Park-Klinik",
+        "floors": [
+          [
+            "EG",
+            "Apotheke, Sanitätshaus & Bistro Sanus"
+          ],
+          [
+            "1. Stock",
+            "Allgemeinmedizin, Kinderheilkunde & Blutentnahme"
+          ],
+          [
+            "2. Stock",
+            "Zahnmedizin, Kieferorthopädie & Prophylaxe"
+          ],
+          [
+            "3. Stock",
+            "Physiotherapie, Krankengymnastik & Rücken-Zentrum"
+          ],
+          [
+            "4. Stock",
+            "Augenheilkunde, Hautarzt & Allergie-Labor"
+          ]
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "EG"
+          },
+          {
+            "id": "b",
+            "label": "1. Stock"
+          },
+          {
+            "id": "c",
+            "label": "2. Stock"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 6,
+          "question": "Sie müssen zur Blutuntersuchung.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 7,
+          "question": "Ihr Kind hat Zahnschmerzen und braucht eine Kontrolle.",
+          "options": [
+            {
+              "id": "a",
+              "label": "1. Stock"
+            },
+            {
+              "id": "b",
+              "label": "2. Stock"
+            },
+            {
+              "id": "c",
+              "label": "3. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 8,
+          "question": "Sie benötigen Krankengymnastik wegen Rückenschmerzen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "2. Stock"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 9,
+          "question": "Sie möchten rezeptfreie Medikamente kaufen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 10,
+          "question": "Sie haben einen Termin beim Hautarzt.",
+          "options": [
+            {
+              "id": "a",
+              "label": "2. Stock"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "c"
+        }
+      ]
+    },
+    "teil3": {
+      "title": "Teil 3",
+      "instruction": [
+        "Lesen Sie die E-Mail.",
+        "Wählen Sie für die Aufgaben 11 bis 15 a, b oder c."
+      ],
+      "email": {
+        "to": "",
+        "subject": "Einladung zum gemeinsamen Kochabend!",
+        "greeting": "",
+        "paragraphs": [
+          "Hallo zusammen, wie besprochen möchte ich euch herzlich zu einem italienischen Kochabend bei mir zu Hause einladen! Wir treffen uns nächsten Samstag um 18:00 Uhr in meiner Wohnung in der Gartenstraße 12. Ich kaufe alle Zutaten für die Pasta und das Dessert ein. Bringt bitte einfach gute Laune und eure Lieblingsgetränke mit. Wenn jemand Allergien hat oder vegetarisch isst, gebt mir bitte bis Donnerstag Bescheid, damit ich das beim Einkaufen berücksichtigen kann. Ich freue mich schon sehr auf einen gemütlichen Abend mit euch! Liebe Grüße, Marco"
+        ],
+        "closing": []
+      },
+      "questions": [
+        {
+          "number": 11,
+          "question": "Marco lädt ein zu...",
+          "options": [
+            {
+              "id": "a",
+              "label": "einem Restaurantbesuch."
+            },
+            {
+              "id": "b",
+              "label": "einem Kochabend bei sich zu Hause."
+            },
+            {
+              "id": "c",
+              "label": "einer Party im Garten."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 12,
+          "question": "Das Treffen findet statt am...",
+          "options": [
+            {
+              "id": "a",
+              "label": "nächsten Samstag um 18:00 Uhr."
+            },
+            {
+              "id": "b",
+              "label": "diesen Donnerstag um 18:00 Uhr."
+            },
+            {
+              "id": "c",
+              "label": "Sonntagmittag."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 13,
+          "question": "Marco kümmert sich um...",
+          "options": [
+            {
+              "id": "a",
+              "label": "die Getränke."
+            },
+            {
+              "id": "b",
+              "label": "den Einkauf der Lebensmittel."
+            },
+            {
+              "id": "c",
+              "label": "die Musik."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 14,
+          "question": "Die Gäste sollen mitbringen: ...",
+          "options": [
+            {
+              "id": "a",
+              "label": "eigene Teller und Besteck."
+            },
+            {
+              "id": "b",
+              "label": "Nachspeisen."
+            },
+            {
+              "id": "c",
+              "label": "ihre Lieblingsgetränke."
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 15,
+          "question": "Gäste mit Allergien sollen Bescheid sagen bis...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Samstagvormittag."
+            },
+            {
+              "id": "b",
+              "label": "Donnerstag."
+            },
+            {
+              "id": "c",
+              "label": "Freitagabend."
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    "teil4": {
+      "title": "Teil 4",
+      "instruction": [
+        "Fünf Personen suchen passende Angebote.",
+        "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
+      ],
+      "example": {
+        "number": 0,
+        "person": "Beispiel: Finden Sie die passende Anzeige.",
+        "answer": "a"
+      },
+      "people": [
+        {
+          "number": 16,
+          "person": "Julia sucht einen Kochkurs für das Wochenende, um asiatisch kochen zu lernen.",
+          "answer": "c"
+        },
+        {
+          "number": 17,
+          "person": "Markus möchte frisches Bio-Gemüse direkt nach Hause geliefert bekommen.",
+          "answer": "b"
+        },
+        {
+          "number": 18,
+          "person": "Sabine sucht eine professionelle Ernährungsberatung wegen einer Laktoseintoleranz.",
+          "answer": "e"
+        },
+        {
+          "number": 19,
+          "person": "Sven möchte abends im Freien Yoga machen.",
+          "answer": "a"
+        },
+        {
+          "number": 20,
+          "person": "Anna sucht eine Babysitterin für ein gesundes Kleinkind am Wochenende.",
+          "answer": "X"
+        }
+      ],
+      "ads": [
+        {
+          "id": "a",
+          "url": "",
+          "title": "Anzeige a",
+          "body": [
+            "Yoga & Pilates im Park: Jeden Dienstag und Donnerstag outdoor. Entspannung und Kraft für Anfänger."
+          ]
+        },
+        {
+          "id": "b",
+          "url": "",
+          "title": "Anzeige b",
+          "body": [
+            "Bio-Lieferservice FrischeKiste: Wöchentlich frisches Bio-Gemüse und Obst direkt vom Bauern nach Hause geliefert."
+          ]
+        },
+        {
+          "id": "c",
+          "url": "",
+          "title": "Anzeige c",
+          "body": [
+            "Kochschule Spezial: Wochenend-Kochkurse für asiatische und mediterrane Küche. Inklusive aller Zutaten."
+          ]
+        },
+        {
+          "id": "d",
+          "url": "",
+          "title": "Anzeige d",
+          "body": [
+            "Fitnessstudio FitLife: 24 Stunden geöffnet, moderner Ausdauerbereich und Sauna. Testmonat 15 €."
+          ]
+        },
+        {
+          "id": "e",
+          "url": "",
+          "title": "Anzeige e",
+          "body": [
+            "Ernährungsberatung Praxis Dr. Weiß: Individuelle Beratung bei Unverträglichkeiten und Gewichtsreduktion."
+          ]
+        },
+        {
+          "id": "f",
+          "url": "",
+          "title": "Anzeige f",
+          "body": [
+            "Massage & Wellness Oase: Medizinische Massagen und Schmerztherapie von ausgebildeten Physiotherapeuten."
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "a2-reading-practice-06",
+    "label": "Lesen Sample 6",
+    "teil1": {
+      "title": "Teil 1",
+      "instruction": [
+        "Lesen Sie den Zeitungsartikel.",
+        "Wählen Sie für die Aufgaben 1 bis 5 a, b oder c."
+      ],
+      "article": {
+        "title": "Urlaub auf dem Bauernhof: Ein neuer Trend bei Familien",
+        "subtitle": "",
+        "paragraphs": [
+          "Immer mehr Familien mit Kindern entscheiden sich für Urlaub auf einem Bauernhof in Deutschland statt für Flugreisen ins Ausland. Familie Krüger aus Berlin hat eine Woche auf einem Bio-Bauernhof im Allgäu verbracht. Vater Thomas erzählt: 'Für die Kinder war es ein fantastisches Erlebnis. Sie durften morgens im Stall mithelfen, Kühe füttern und frische Eier sammeln.' Der Hof bietet moderne Ferienwohnungen mit eigener Küche, sodass sich Gäste selbst verpflegen können. Neben den Tieren gibt es Spielplätze und Fahrräder zum Ausleihen. Die Besitzer stellen fest, dass viele Familien jedes Jahr wiederkommen."
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "Im Text genannte Information"
+          },
+          {
+            "id": "b",
+            "label": "Eine andere Aussage"
+          },
+          {
+            "id": "c",
+            "label": "Eine dritte Aussage"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 1,
+          "question": "Urlaub auf dem Bauernhof...",
+          "options": [
+            {
+              "id": "a",
+              "label": "wird bei Familien immer beliebter."
+            },
+            {
+              "id": "b",
+              "label": "ist teurer als Flugreisen."
+            },
+            {
+              "id": "c",
+              "label": "buchen nur alleinstehende Personen."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 2,
+          "question": "Familie Krüger verbrachte ihren Urlaub...",
+          "options": [
+            {
+              "id": "a",
+              "label": "an der Nordsee."
+            },
+            {
+              "id": "b",
+              "label": "auf einem Hof im Allgäu."
+            },
+            {
+              "id": "c",
+              "label": "in Österreich."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 3,
+          "question": "Die Kinder durften...",
+          "options": [
+            {
+              "id": "a",
+              "label": "den Traktor selbst fahren."
+            },
+            {
+              "id": "b",
+              "label": "im Stall mithelfen und Eier sammeln."
+            },
+            {
+              "id": "c",
+              "label": "für alle Gäste das Abendessen kochen."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 4,
+          "question": "Die Ferienwohnungen auf dem Hof haben...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Vollpension im Preis inkludiert."
+            },
+            {
+              "id": "b",
+              "label": "eine eigene Küche zur Selbstverpflegung."
+            },
+            {
+              "id": "c",
+              "label": "keine Badezimmer."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 5,
+          "question": "Die Hofbesitzer merken, dass...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Gäste selten zufrieden sind."
+            },
+            {
+              "id": "b",
+              "label": "Stammgäste regelmäßig wiederkommen."
+            },
+            {
+              "id": "c",
+              "label": "Kinder keine Tiere mögen."
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    "teil2": {
+      "title": "Teil 2",
+      "instruction": [
+        "Lesen Sie die Informationstafel.",
+        "Wählen Sie für die Aufgaben 6 bis 10 a, b oder c."
+      ],
+      "store": {
+        "title": "Einkaufs- & Freizeitzentrum City-Passage",
+        "floors": [
+          [
+            "UG",
+            "Supermarkt, Bäckerei, Schuhreparatur & Schlüsseldienst"
+          ],
+          [
+            "EG",
+            "Damen- & Herrenmode, Parfümerie, Buchhandlung & Café"
+          ],
+          [
+            "1. Stock",
+            "Sportartikel, Kindermode, Spielwaren & Radsport-Center"
+          ],
+          [
+            "2. Stock",
+            "Elektronikfachmarkt, Haushaltsgeräte & Fotostudio"
+          ],
+          [
+            "3. Stock",
+            "Multiplex-Kino, Fitnessstudio & Bowling-Arena"
+          ]
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "EG"
+          },
+          {
+            "id": "b",
+            "label": "1. Stock"
+          },
+          {
+            "id": "c",
+            "label": "2. Stock"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 6,
+          "question": "Sie möchten neue Laufschuhe und Sportbekleidung kaufen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 7,
+          "question": "Sie müssen einen Ersatzschlüssel nachmachen lassen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Untergeschoss"
+            },
+            {
+              "id": "b",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "c",
+              "label": "1. Stock"
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 8,
+          "question": "Sie suchen ein Geburtstagsgeschenk in einer Buchhandlung.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Untergeschoss"
+            },
+            {
+              "id": "b",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 9,
+          "question": "Sie möchten am Abend einen Kinofilm anschauen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "1. Stock"
+            },
+            {
+              "id": "b",
+              "label": "2. Stock"
+            },
+            {
+              "id": "c",
+              "label": "3. Stock"
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 10,
+          "question": "Sie möchten eine neue Waschmaschine oder einen Fernseher kaufen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "c"
+        }
+      ]
+    },
+    "teil3": {
+      "title": "Teil 3",
+      "instruction": [
+        "Lesen Sie die E-Mail.",
+        "Wählen Sie für die Aufgaben 11 bis 15 a, b oder c."
+      ],
+      "email": {
+        "to": "",
+        "subject": "Umzug geschafft! Einladung zur Einweihungsparty",
+        "greeting": "",
+        "paragraphs": [
+          "Liebe Freunde, endlich geschafft! Wir sind letztes Wochenende in unsere neue 3-Zimmer-Wohnung in Mainz gezogen. Die Wohnung hat einen großen Balkon und liegt direkt am Park. Fast alle Kartons sind ausgepackt, und jetzt möchten wir feiern! Dazu laden wir euch herzlich am Freitag, den 15. November ab 19:00 Uhr ein. Für Essen und Musik ist gesorgt. Bringt bitte nur eure Lieblingsgetränke mit. Gebt uns bitte bis nächsten Dienstag Bescheid, ob ihr kommen könnt. Wir freuen uns sehr darauf, euch unser neues Zuhause zu zeigen! Herzliche Grüße, Jan und Lisa"
+        ],
+        "closing": []
+      },
+      "questions": [
+        {
+          "number": 11,
+          "question": "Jan und Lisa sind umgezogen nach...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Frankfurt."
+            },
+            {
+              "id": "b",
+              "label": "Mainz."
+            },
+            {
+              "id": "c",
+              "label": "Wiesbaden."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 12,
+          "question": "Die neue Wohnung hat...",
+          "options": [
+            {
+              "id": "a",
+              "label": "einen Balkon und liegt am Park."
+            },
+            {
+              "id": "b",
+              "label": "einen eigenen Garten."
+            },
+            {
+              "id": "c",
+              "label": "nur zwei kleine Zimmer."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 13,
+          "question": "Die Einweihungsparty ist am...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Freitag, 15. November ab 19:00 Uhr."
+            },
+            {
+              "id": "b",
+              "label": "Samstagmittag."
+            },
+            {
+              "id": "c",
+              "label": "nächsten Dienstag."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 14,
+          "question": "Die Gäste müssen...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Essen mitbringen."
+            },
+            {
+              "id": "b",
+              "label": "Stühle mitbringen."
+            },
+            {
+              "id": "c",
+              "label": "nur ihre Lieblingsgetränke mitbringen."
+            }
+          ],
+          "answer": "c"
+        },
+        {
+          "number": 15,
+          "question": "Jan und Lisa bitten um Rückmeldung bis...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Freitag."
+            },
+            {
+              "id": "b",
+              "label": "nächsten Dienstag."
+            },
+            {
+              "id": "c",
+              "label": "zum Wochenende."
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    "teil4": {
+      "title": "Teil 4",
+      "instruction": [
+        "Fünf Personen suchen passende Angebote.",
+        "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
+      ],
+      "example": {
+        "number": 0,
+        "person": "Beispiel: Finden Sie die passende Anzeige.",
+        "answer": "a"
+      },
+      "people": [
+        {
+          "number": 16,
+          "person": "Laura möchte für zwei Monate eine möblierte Wohnung mieten.",
+          "answer": "a"
+        },
+        {
+          "number": 17,
+          "person": "Peter sucht Hilfe beim Transport von Möbeln für seinen Umzug.",
+          "answer": "e"
+        },
+        {
+          "number": 18,
+          "person": "Claudia möchte am Wochenende mit dem Fahrrad einen Ausflug machen und ein E-Bike leihen.",
+          "answer": "b"
+        },
+        {
+          "number": 19,
+          "person": "Michael sucht einen Salsa-Tanzkurs für Anfänger.",
+          "answer": "c"
+        },
+        {
+          "number": 20,
+          "person": "Felix sucht einen Klavierlehrer für wöchentlichen Einzelunterricht.",
+          "answer": "X"
+        }
+      ],
+      "ads": [
+        {
+          "id": "a",
+          "url": "",
+          "title": "Anzeige a",
+          "body": [
+            "Möblierte 2-Zimmer-Wohnung auf Zeit: Hell, zentral, Balkon und WLAN inklusive. Ideal für Berufstätige. 850 € warm."
+          ]
+        },
+        {
+          "id": "b",
+          "url": "",
+          "title": "Anzeige b",
+          "body": [
+            "Fahrradverleih & Werkstatt VeloBlitz: E-Bikes, Citybikes und Kinderanhänger. Reparatur innerhalb von 24 Stunden."
+          ]
+        },
+        {
+          "id": "c",
+          "url": "",
+          "title": "Anzeige c",
+          "body": [
+            "Tanzschule Rhythmus: Salsa, Bachata und Standardtänze für Anfänger. Neue Kurse ab nächstem Monat."
+          ]
+        },
+        {
+          "id": "d",
+          "url": "",
+          "title": "Anzeige d",
+          "body": [
+            "Campingplatz Seeblick: Stellplätze für Wohnmobile und Zelte direkt am Baggersee. Kiosk und Duschen."
+          ]
+        },
+        {
+          "id": "e",
+          "url": "",
+          "title": "Anzeige e",
+          "body": [
+            "Möbel-Transportservice QuickMove: Umzugshelfer mit Kleintransporter. Stundenweise oder Festpreis."
+          ]
+        },
+        {
+          "id": "f",
+          "url": "",
+          "title": "Anzeige f",
+          "body": [
+            "Fotografie-Workshop Natur & Landschaft: Wochenendkurs im Grünen. Eigene Kamera erforderlich."
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "id": "a2-reading-practice-07",
+    "label": "Lesen Sample 7",
+    "teil1": {
+      "title": "Teil 1",
+      "instruction": [
+        "Lesen Sie den Zeitungsartikel.",
+        "Wählen Sie für die Aufgaben 1 bis 5 a, b oder c."
+      ],
+      "article": {
+        "title": "Sprachen lernen im Ausland: Die Erfolgsgeschichte der Sprachschule 'Globus'",
+        "subtitle": "",
+        "paragraphs": [
+          "Sprachreisen liegen bei jungen Erwachsenen im Trend. Die Münchner Sprachschule 'Globus' organisiert seit zehn Jahren Intensivsprachkurse in Spanien, Frankreich und Italien. Neben täglichem Unterricht bei Muttersprachlern wohnen die Teilnehmer in Gastfamilien. Dadurch wenden sie die Sprache sofort im Alltag an. Die Kursleiterin Carmen Gomez berichtet: 'Nach zwei Wochen sprechen die Teilnehmer viel flüssiger und haben keine Angst mehr vor Fehlern.' Am Nachmittag stehen Kulturreisen, Kochkurse und Sportausflüge auf dem Programm. Ein besonderes Plus: Das Zertifikat wird europäisch anerkannt."
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "Im Text genannte Information"
+          },
+          {
+            "id": "b",
+            "label": "Eine andere Aussage"
+          },
+          {
+            "id": "c",
+            "label": "Eine dritte Aussage"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 1,
+          "question": "Die Sprachschule Globus bietet seit zehn Jahren...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Online-Sprachkurse an."
+            },
+            {
+              "id": "b",
+              "label": "Sprachreisen ins Ausland an."
+            },
+            {
+              "id": "c",
+              "label": "Tanzreisen nach Amerika an."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 2,
+          "question": "Die Kursteilnehmer wohnen...",
+          "options": [
+            {
+              "id": "a",
+              "label": "im Hotel."
+            },
+            {
+              "id": "b",
+              "label": "bei Gastfamilien."
+            },
+            {
+              "id": "c",
+              "label": "auf dem Schulgelände."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 3,
+          "question": "Durch das Leben in den Gastfamilien...",
+          "options": [
+            {
+              "id": "a",
+              "label": "wenden die Kursteilnehmer die Sprache direkt an."
+            },
+            {
+              "id": "b",
+              "label": "müssen die Teilnehmer selbst kochen."
+            },
+            {
+              "id": "c",
+              "label": "lernen sie wenig Grammatik."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 4,
+          "question": "Nach zwei Wochen...",
+          "options": [
+            {
+              "id": "a",
+              "label": "haben die Sprachschüler das Niveau C2."
+            },
+            {
+              "id": "b",
+              "label": "sprechen Teilnehmer flüssiger und ohne Angst."
+            },
+            {
+              "id": "c",
+              "label": "fahren alle wieder nach Hause."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 5,
+          "question": "Am Nachmittag gibt es...",
+          "options": [
+            {
+              "id": "a",
+              "label": "nur Prüfungen."
+            },
+            {
+              "id": "b",
+              "label": "Freizeit- und Kulturangebote."
+            },
+            {
+              "id": "c",
+              "label": "Ruhestunden im Hotel."
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    "teil2": {
+      "title": "Teil 2",
+      "instruction": [
+        "Lesen Sie die Informationstafel.",
+        "Wählen Sie für die Aufgaben 6 bis 10 a, b oder c."
+      ],
+      "store": {
+        "title": "Volkshochschule & Bildungszentrum Zukunft",
+        "floors": [
+          [
+            "EG",
+            "Anmeldung, Information, Kasse & Sprachprüfungszentrum"
+          ],
+          [
+            "1. Stock",
+            "Sprachkurse (Deutsch, Englisch, Spanisch, Französisch)"
+          ],
+          [
+            "2. Stock",
+            "EDV-Labore, Computerkurse & Digitale Medien"
+          ],
+          [
+            "3. Stock",
+            "Kreativwerkstatt, Malerei, Fotografie & Töpfern"
+          ],
+          [
+            "4. Stock",
+            "Gesundheitskurse, Yoga-Studio & Entspannungsräume"
+          ]
+        ]
+      },
+      "example": {
+        "number": 0,
+        "question": "Beispiel",
+        "options": [
+          {
+            "id": "a",
+            "label": "EG"
+          },
+          {
+            "id": "b",
+            "label": "1. Stock"
+          },
+          {
+            "id": "c",
+            "label": "2. Stock"
+          }
+        ],
+        "answer": "a"
+      },
+      "questions": [
+        {
+          "number": 6,
+          "question": "Sie möchten sich für einen A2-Deutschkurs anmelden und bezahlen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "2. Stock"
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 7,
+          "question": "Ihr Unterricht im Fach Spanisch für Anfänger beginnt.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "1. Stock"
+            },
+            {
+              "id": "c",
+              "label": "3. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 8,
+          "question": "Sie besuchen einen Excel- und Computerkurs.",
+          "options": [
+            {
+              "id": "a",
+              "label": "1. Stock"
+            },
+            {
+              "id": "b",
+              "label": "2. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 9,
+          "question": "Sie interessieren sich für Töpfern und Aquarelle malen.",
+          "options": [
+            {
+              "id": "a",
+              "label": "2. Stock"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 10,
+          "question": "Sie machen abends einen Yoga-Entspannungskurs.",
+          "options": [
+            {
+              "id": "a",
+              "label": "Erdgeschoss"
+            },
+            {
+              "id": "b",
+              "label": "3. Stock"
+            },
+            {
+              "id": "c",
+              "label": "4. Stock"
+            }
+          ],
+          "answer": "c"
+        }
+      ]
+    },
+    "teil3": {
+      "title": "Teil 3",
+      "instruction": [
+        "Lesen Sie die E-Mail.",
+        "Wählen Sie für die Aufgaben 11 bis 15 a, b oder c."
+      ],
+      "email": {
+        "to": "",
+        "subject": "Erinnerung: Unser Wochenendausflug nach Heidelberg",
+        "greeting": "",
+        "paragraphs": [
+          "Hallo zusammen, hier noch einmal alle wichtigen Infos für unseren Ausflug am nächsten Samstag nach Heidelberg! Wir treffen uns um 08:15 Uhr am Hauptbahnhof am Gleis 4. Der Zug fährt pünktlich um 08:30 Uhr ab. Bitte kauft eure Fahrkarten vorher online oder am Schalter, da das Gruppenticket schon ausverkauft ist. In Heidelberg besuchen wir zuerst das Schloss und machen nachmittags eine Schifffahrt auf dem Neckar. Denkt an bequeme Schuhe und Regenkleidung, da das Wetter wechselhaft werden könnte. Bei Fragen ruft mich einfach an! Viele Grüße, Christian"
+        ],
+        "closing": []
+      },
+      "questions": [
+        {
+          "number": 11,
+          "question": "Der Wochenendausflug geht nach...",
+          "options": [
+            {
+              "id": "a",
+              "label": "Heidelberg."
+            },
+            {
+              "id": "b",
+              "label": "München."
+            },
+            {
+              "id": "c",
+              "label": "Stuttgart."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 12,
+          "question": "Das Treffen ist am Hauptbahnhof um...",
+          "options": [
+            {
+              "id": "a",
+              "label": "08:15 Uhr."
+            },
+            {
+              "id": "b",
+              "label": "08:30 Uhr."
+            },
+            {
+              "id": "c",
+              "label": "09:00 Uhr."
+            }
+          ],
+          "answer": "a"
+        },
+        {
+          "number": 13,
+          "question": "Die Teilnehmer müssen ihre Fahrkarten...",
+          "options": [
+            {
+              "id": "a",
+              "label": "bei Christian abholen."
+            },
+            {
+              "id": "b",
+              "label": "vorher selbst kaufen."
+            },
+            {
+              "id": "c",
+              "label": "im Zug bezahlen."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 14,
+          "question": "In Heidelberg steht am Nachmittag...",
+          "options": [
+            {
+              "id": "a",
+              "label": "ein Ausflug ins Museum."
+            },
+            {
+              "id": "b",
+              "label": "eine Schifffahrt auf dem Neckar."
+            },
+            {
+              "id": "c",
+              "label": "ein Restaurantbesuch."
+            }
+          ],
+          "answer": "b"
+        },
+        {
+          "number": 15,
+          "question": "Christian empfiehlt mitzubringen: ...",
+          "options": [
+            {
+              "id": "a",
+              "label": "ein Klapprad."
+            },
+            {
+              "id": "b",
+              "label": "ein Buch."
+            },
+            {
+              "id": "c",
+              "label": "bequeme Schuhe und Regenkleidung."
+            }
+          ],
+          "answer": "c"
+        }
+      ]
+    },
+    "teil4": {
+      "title": "Teil 4",
+      "instruction": [
+        "Fünf Personen suchen passende Angebote.",
+        "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
+      ],
+      "example": {
+        "number": 0,
+        "person": "Beispiel: Finden Sie die passende Anzeige.",
+        "answer": "a"
+      },
+      "people": [
+        {
+          "number": 16,
+          "person": "Martin möchte Spanisch bequem von zu Hause per Online-Einzelunterricht lernen.",
+          "answer": "b"
+        },
+        {
+          "number": 17,
+          "person": "Sabine möchte einen Wochenendtrip nach Prag buchen.",
+          "answer": "a"
+        },
+        {
+          "number": 18,
+          "person": "Frank möchte Töpfern lernen und eigene Tassen herstellen.",
+          "answer": "c"
+        },
+        {
+          "number": 19,
+          "person": "Tanja sucht eine geführte Wandertour im Schwarzwald.",
+          "answer": "d"
+        },
+        {
+          "number": 20,
+          "person": "Oliver sucht einen privaten Gitarrenlehrer für Rockmusik.",
+          "answer": "X"
+        }
+      ],
+      "ads": [
+        {
+          "id": "a",
+          "url": "",
+          "title": "Anzeige a",
+          "body": [
+            "Geführte Städtereisen & Wochenendtrips: Berlin, Prag und Wien inklusive Busfahrt und 3-Sterne-Hotel mit Frühstück."
+          ]
+        },
+        {
+          "id": "b",
+          "url": "",
+          "title": "Anzeige b",
+          "body": [
+            "Online-Sprachschule Acento: Einzelunterricht in Spanisch und Italienisch via Zoom. Flexible Zeiten ab 15 €/Stunde."
+          ]
+        },
+        {
+          "id": "c",
+          "url": "",
+          "title": "Anzeige c",
+          "body": [
+            "Kreativwerkstatt Keramik: Töpferkurse für Anfänger und Fortgeschrittene. Gestalten Sie Tassen und Teller."
+          ]
+        },
+        {
+          "id": "d",
+          "url": "",
+          "title": "Anzeige d",
+          "body": [
+            "Wanderführer Schwarzwald: Geführte Tagestouren durch Schluchten und Berge mit zertifiziertem Naturführer."
+          ]
+        },
+        {
+          "id": "e",
+          "url": "",
+          "title": "Anzeige e",
+          "body": [
+            "Segelschule Bodensee: Einsteigerkurs zum Segelschein in 5 Tagen. Theorie und Praxis."
+          ]
+        },
+        {
+          "id": "f",
+          "url": "",
+          "title": "Anzeige f",
+          "body": [
+            "Kameraverleih & Fotostudio: Profi-Spiegelreflexkameras und Objektive günstig tagesweise mieten."
+          ]
+        }
+      ]
+    }
+  }
+]
