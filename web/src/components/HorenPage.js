@@ -71,6 +71,26 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             </span>
           </button>
 
+          {normalizedLevel === "B1" ? (
+            <button
+              type="button"
+              onClick={() => openListeningSample("/campus/course/b1-mock-2-hoeren", "B1 Hören Sample 2 opened successfully.")}
+              style={{
+                ...styles.secondaryButton,
+                width: "100%",
+                textAlign: "left",
+                display: "grid",
+                gap: 4,
+                padding: "14px 16px",
+              }}
+            >
+              <strong>Hören Sample 2</strong>
+              <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                30 questions · Teil 1–4 · From B1 Mock 2 · server-graded
+              </span>
+            </button>
+          ) : null}
+
           {normalizedLevel === "A2" ? (
             <button
               type="button"
