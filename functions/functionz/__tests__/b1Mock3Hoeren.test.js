@@ -51,9 +51,10 @@ test("rejects missing items, forged answer labels and extra item numbers",()=>{
   expect(()=>markB1Mock3Hoeren({...good,31:"a"})).toThrow(/30/);
 });
 test("content QA and release flag are required before anyone can enter Mock 3",()=>{
-  expect(QA_WARNINGS).toHaveLength(2);
-  expect(QA_WARNINGS[0]).toMatch(/Beispiel Nummer 0/);
-  expect(QA_WARNINGS[1]).toMatch(/roles C and D/);
+  expect(QA_WARNINGS).toHaveLength(3);
+  expect(QA_WARNINGS[0]).toMatch(/one statement per short text/);
+  expect(QA_WARNINGS[1]).toMatch(/Beispiel Nummer 0/);
+  expect(QA_WARNINGS[2]).toMatch(/roles C and D/);
   const app=fs.readFileSync(path.resolve(__dirname,"../app.js"),"utf8");
   expect(app).toContain('process.env.B1_MOCK3_HOEREN_RELEASED==="true"');
   expect(app).toContain('app.get("/b1-mock-03/hoeren/questions"');
