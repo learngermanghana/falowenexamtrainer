@@ -1,0 +1,78 @@
+import fs from "fs";
+import path from "path";
+import { getA2GrammarRoute } from "./a2GrammarRoutes";
+import { A2_READING_TASKS } from "./a2ReadingTasks";
+import { A2_LISTENING_MODES, A2_LISTENING_TASKS } from "./a2ListeningTasks";
+
+const componentRoot = path.resolve(__dirname, "../components");
+const readComponent = (fileName) => fs.readFileSync(path.join(componentRoot, fileName), "utf8");
+
+describe("A2 Course Book final audit · Days 25–28", () => {
+  test("keeps late-A2 workbooks on their canonical chapters", () => {
+    const expectations = [
+      ["A2Day25TagesablaufWorkbookPage.js", 25, "9.25"],
+      ["A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js", 26, "10.26"],
+      ["A2Day27DigitaleKommunikationWorkbookPage.js", 27, "10.27"],
+      ["A2Day28UeberDieZukunftSprechenWorkbookPage.js", 28, "10.28"],
+    ];
+
+    expectations.forEach(([fileName, day, chapter]) => {
+      const source = readComponent(fileName);
+      expect(source).toContain("A2StandardTabbedWorkbookPage");
+      expect(source).toContain(`day={${day}}`);
+      expect(source).toContain(`chapter=\"${chapter}\"`);
+    });
+  });
+
+  test("keeps Day 25 on canonical Lesen with no Hören assignment", () => {
+    const source = readComponent("A2Day25TagesablaufWorkbookPage.js");
+    expect(A2_READING_TASKS[25].title).toBe("Mein Tagesablauf in Hamburg");
+    expect(A2_LISTENING_TASKS[25].mode).toBe(A2_LISTENING_MODES.NONE);
+    expect(source).not.toMatch(/Familie Meyer|Berghotel|Schweiz aus dem Zug/i);
+    expect(A2_LISTENING_TASKS[25].audioUrl).toBe("");
+  });
+
+  test("keeps Day 26 fully focused on feelings", () => {
+    const source = readComponent("A2Day26GefuehleInVerschiedenenSituationenWorkbookPage.js");
+    expect(A2_READING_TASKS[26].title).toBe("Gefühle und Reaktionen im Gespräch");
+    expect(A2_LISTENING_TASKS[26].audioKey).toBe("a2/day-26/day-26.mp3");
+    expect(A2_LISTENING_TASKS[26].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[26].mode).toBe(A2_LISTENING_MODES.GRADED);
+    expect(source).not.toMatch(/Schwangerschaft|Mutterschutz|Elterngeld|Kinderarzt/i);
+  });
+
+  test("preserves the already-clean Day 27 digital communication workbook", () => {
+    const source = readComponent("A2Day27DigitaleKommunikationWorkbookPage.js");
+    expect(source).toContain("Digitale Kommunikation");
+    expect(A2_READING_TASKS[27].title).toBe("Digitale Mitteilungen & Online-Anzeigen");
+    expect(source).toContain("A2StandardTabbedWorkbookPage");
+  });
+
+  test("moves Day 28 to the standard shell with future-focused reading and grammar", () => {
+    const source = readComponent("A2Day28UeberDieZukunftSprechenWorkbookPage.js");
+    expect(A2_READING_TASKS[28].title).toBe("Reisepläne für Hamburg");
+    expect(A2_LISTENING_TASKS[28].audioKey).toBe("a2/day-28/day-28.mp3");
+    expect(A2_LISTENING_TASKS[28].audioUrl).toBe("");
+    expect(A2_LISTENING_TASKS[28].mode).toBe(A2_LISTENING_MODES.GRADED);
+    expect(source).not.toMatch(/Pass und Visum|Ausländerbehörde|Aufenthaltstitel/i);
+
+    const grammarRoute = getA2GrammarRoute({ day: 28, chapter: "10.28" });
+    expect(grammarRoute).toMatch(/^\/campus\/course\//);
+    expect(grammarRoute).not.toMatch(/drive\.google\.com|docs\.google\.com/i);
+  });
+
+  test("keeps late-A2 grammar focused on each day-specific grammar page", () => {
+    const grammarSource = readComponent("A2B1WorkbookGrammarNotesContent.js");
+    [
+      "A2Day25TagesablaufGrammarPage",
+      "A2Day26GefuehleGrammarPage",
+      "A2Day27DigitaleKommunikationGrammarPage",
+      "A2Day28UeberDieZukunftSprechenGrammarPage",
+    ].forEach((componentName) => expect(grammarSource).toContain(componentName));
+
+    expect(grammarSource).not.toContain("A2Days22To28ThinkingFirstGrammarGuide");
+    expect(grammarSource).not.toContain("A2SituationIntroduction");
+    expect(readComponent("A2B1WorkbookGrammarNotes.js")).not.toContain("A2TopicCollocationPractice");
+    expect(readComponent("A2B1WorkbookGrammarNotes.js")).not.toContain("A2SecondStageGrammarUpgrade");
+  });
+});

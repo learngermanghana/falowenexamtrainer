@@ -1,0 +1,60 @@
+const c1Day5QuestionWritingBuilder = {
+  level: "C1",
+  day: 5,
+  title: "C1 Day 5 guided writing: Berufliche Entwicklung",
+  taskType: "Formal letter / E-Mail",
+  targetWords: 230,
+  questions: [
+    {
+      id: "opening",
+      section: "Betreff, Anlass und Ziel",
+      question: "Welche Weiterbildung möchten Sie besuchen, und welches berufliche Ziel verfolgen Sie damit?",
+      help: "Beginnen Sie höflich, nennen Sie den Kurs oder das Programm und formulieren Sie den Zweck klar.",
+      starter: "Ich möchte Sie höflich um Unterstützung bei ... bitten, um ...",
+      minimumWords: 40,
+    },
+    {
+      id: "conditions",
+      section: "Notwendige Bedingungen",
+      question: "Welche zeitlichen, finanziellen oder organisatorischen Bedingungen wären für Ihre Teilnahme notwendig?",
+      help: "Nutzen Sie mindestens eine konditionale Struktur mit falls, sofern, vorausgesetzt, dass oder sollten.",
+      starter: "Sofern ..., könnte ich ...",
+      minimumWords: 45,
+    },
+    {
+      id: "benefit",
+      section: "Nutzen für Aufgaben und Unternehmen",
+      question: "Welchen konkreten Nutzen hätte die Weiterbildung für Ihre aktuellen Aufgaben, Ihr Team oder das Unternehmen?",
+      help: "Nennen Sie konkrete Kompetenzen und zeigen Sie, wie das Wissen praktisch eingesetzt werden könnte.",
+      starter: "Das erworbene Wissen könnte unmittelbar eingesetzt werden, damit ...",
+      minimumWords: 45,
+    },
+    {
+      id: "compromise",
+      section: "Organisation und Kompromiss",
+      question: "Welchen realistischen Vorschlag machen Sie zu Arbeitszeit, Vertretung oder Kostenaufteilung?",
+      help: "Formulieren Sie eine Lösung, die Ihre Interessen und die betrieblichen Anforderungen berücksichtigt.",
+      starter: "Als Kompromiss könnte ich mir vorstellen, dass ...",
+      minimumWords: 45,
+    },
+    {
+      id: "closing",
+      section: "Höflicher Abschluss",
+      question: "Wie bitten Sie höflich um Prüfung, ein Gespräch oder eine Rückmeldung?",
+      help: "Beenden Sie die E-Mail verbindlich, professionell und mit einer passenden Grußformel.",
+      starter: "Ich wäre Ihnen dankbar, wenn ...",
+      minimumWords: 35,
+    },
+  ],
+  checklist: [
+    "Ich habe einen passenden Betreff und eine höfliche Anrede verwendet.",
+    "Ich habe Weiterbildung und berufliches Ziel klar genannt.",
+    "Ich habe notwendige Bedingungen sachlich beschrieben.",
+    "Ich habe den Nutzen für Aufgaben, Team oder Unternehmen erklärt.",
+    "Ich habe einen realistischen Kompromiss vorgeschlagen.",
+    "Ich habe mindestens zwei konditionale oder finale Strukturen korrekt verwendet.",
+    "Ich habe höflich um ein Gespräch oder eine Rückmeldung gebeten.",
+  ],
+};
+
+export default c1Day5QuestionWritingBuilder;

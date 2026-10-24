@@ -1,0 +1,255 @@
+const B2_LESSON_CONTENT_ALIGNMENT = Object.freeze({
+  1: Object.freeze({
+    day: 1,
+    chapter: "1.1",
+    title: "Umweltschutz im Alltag – Müll vermeiden",
+    lessonTopic: "Abfall vermeiden, Alltagshandeln und konkrete Umweltmaßnahmen",
+    goal: "Konkrete Maßnahmen zur Müllvermeidung erklären, begründen und ihre Folgen bewerten.",
+    grammar_topic: "indem / dadurch, dass · um ... zu / damit · wodurch / sodass",
+  }),
+  2: Object.freeze({
+    day: 2,
+    chapter: "1.2",
+    title: "Mülltrennung, Recycling und Kreislaufwirtschaft",
+    lessonTopic: "Recyclingprozesse, Wiederverwendung und Kreislaufwirtschaft",
+    goal: "Recyclingprozesse und Wiederverwendung sachlich beschreiben und bewerten.",
+    grammar_topic: "Passiv und Modalpassiv · Nominalisierung",
+  }),
+  3: Object.freeze({
+    day: 3,
+    chapter: "1.3",
+    title: "Lebensmittelverschwendung und nachhaltiger Konsum",
+    lessonTopic: "Lebensmittel retten, Konsum planen und Verschwendung reduzieren",
+    goal: "Ursachen und Lösungen für Lebensmittelverschwendung differenziert diskutieren.",
+    grammar_topic: "je ... desto · obwohl / trotz · ohne ... zu / statt ... zu",
+  }),
+  4: Object.freeze({
+    day: 4,
+    chapter: "1.4",
+    title: "Plastik, Verpackungen und bewusster Einkauf",
+    lessonTopic: "Verpackungsmüll, Mehrweg und bewusste Kaufentscheidungen",
+    goal: "Alternativen zu Einwegverpackungen vergleichen und ihre Vorteile begründen.",
+    grammar_topic: "ohne ... zu / statt ... zu · nicht nur ... sondern auch · indem / dadurch, dass",
+  }),
+  5: Object.freeze({
+    day: 5,
+    chapter: "1.5",
+    title: "Nachhaltige Mobilität und öffentlicher Verkehr",
+    lessonTopic: "Bus, Bahn, Fahrrad, Auto und nachhaltige Stadtmobilität",
+    goal: "Verkehrsmittel vergleichen und Maßnahmen für nachhaltige Mobilität begründen.",
+    grammar_topic: "während / wohingegen · je ... desto · Konjunktiv II",
+  }),
+  6: Object.freeze({
+    day: 6,
+    chapter: "2.1",
+    title: "Energie sparen und erneuerbare Energien",
+    lessonTopic: "Energieverbrauch, erneuerbare Energien und praktische Einsparmaßnahmen",
+    goal: "Energiepolitik, Verbrauch und erneuerbare Lösungen sachlich diskutieren.",
+    grammar_topic: "Passiv und Modalpassiv · falls / sofern · wodurch / sodass",
+  }),
+  7: Object.freeze({
+    day: 7,
+    chapter: "2.2",
+    title: "Klimafreundliches Wohnen und grüne Städte",
+    lessonTopic: "Energieeffiziente Gebäude, Grünflächen und nachhaltige Stadtentwicklung",
+    goal: "Klimafreundliches Wohnen beschreiben und realistische Stadtmaßnahmen vorschlagen.",
+    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · wodurch / sodass",
+  }),
+  8: Object.freeze({
+    day: 8,
+    chapter: "2.3",
+    title: "Bildungsgerechtigkeit und Zugang zu Bildung",
+    lessonTopic: "Chancengleichheit, Förderung und Zugang zu Schule und Hochschule",
+    goal: "Ungleiche Bildungschancen erklären und konkrete Fördermaßnahmen begründen.",
+    grammar_topic: "um ... zu / damit · Passiv und Modalpassiv · Nominalisierung",
+  }),
+  9: Object.freeze({
+    day: 9,
+    chapter: "2.4",
+    title: "Schulpflicht, Leistung und Verantwortung der Schule",
+    lessonTopic: "Schulpflicht, Leistungsbewertung, Förderung und Verantwortung",
+    goal: "Pflichten, Leistungsbewertung und schulische Unterstützung ausgewogen diskutieren.",
+    grammar_topic: "Modalpassiv · falls / sofern · obwohl / dennoch",
+  }),
+  10: Object.freeze({
+    day: 10,
+    chapter: "2.5",
+    title: "Kindergarten und frühkindliche Bildung",
+    lessonTopic: "Kinderbetreuung, frühe Förderung und Vereinbarkeit von Familie und Beruf",
+    goal: "Frühkindliche Bildung, Betreuung und Förderung mit Beispielen bewerten.",
+    grammar_topic: "Relativsätze · damit / um ... zu · je ... desto",
+  }),
+  11: Object.freeze({
+    day: 11,
+    chapter: "3.1",
+    title: "Digitale Bildung – Unterricht mit und ohne Technologie",
+    lessonTopic: "Digitale Lernplattformen, Präsenzunterricht und Medienkompetenz",
+    goal: "Digitale und traditionelle Lernformen vergleichen und sinnvolle Lösungen vorschlagen.",
+    grammar_topic: "während / wohingegen · indem / dadurch, dass · Konjunktiv II",
+  }),
+  12: Object.freeze({
+    day: 12,
+    chapter: "3.2",
+    title: "Studium, Studiengebühren und lebenslanges Lernen",
+    lessonTopic: "Hochschulzugang, Finanzierung, Weiterbildung und Chancengleichheit",
+    goal: "Studienfinanzierung und Weiterbildung mit Vor- und Nachteilen argumentativ bewerten.",
+    grammar_topic: "zwar ... jedoch · je ... desto · obwohl / trotz · Konjunktiv II",
+  }),
+  13: Object.freeze({
+    day: 13,
+    chapter: "3.3",
+    title: "Wissenschaft und Forschung im Alltag",
+    lessonTopic: "Forschungsergebnisse, medizinische Studien und wissenschaftlicher Nutzen",
+    goal: "Forschungsprozesse und wissenschaftliche Erkenntnisse sachlich erklären.",
+    grammar_topic: "Passiv · Nominalisierung · laut / zufolge / nach Angaben",
+  }),
+  14: Object.freeze({
+    day: 14,
+    chapter: "3.4",
+    title: "Wissenschaft, Desinformation und verlässliche Quellen",
+    lessonTopic: "Quellen prüfen, Forschung einordnen und Desinformation erkennen",
+    goal: "Quellen und wissenschaftliche Aussagen kritisch einordnen und Einschränkungen formulieren.",
+    grammar_topic: "indirekte Rede und Quellenangaben · obwohl / zwar ... jedoch",
+  }),
+  15: Object.freeze({
+    day: 15,
+    chapter: "3.5",
+    title: "Wohnraummangel, hohe Mieten und soziale Gerechtigkeit",
+    lessonTopic: "Bezahlbarer Wohnraum, Mietbelastung und städtische Lösungen",
+    goal: "Wohnraummangel und hohe Mieten differenziert beschreiben und Lösungen vorschlagen.",
+    grammar_topic: "Relativsätze mit Präpositionen · Konjunktiv II · aufgrund / trotz / obwohl",
+  }),
+  16: Object.freeze({
+    day: 16,
+    chapter: "4.1",
+    title: "Stadt oder Land – Lebensqualität und Infrastruktur",
+    lessonTopic: "Wohnort, Infrastruktur, Dienstleistungen und Lebensqualität",
+    goal: "Stadt- und Landleben differenziert vergleichen und Zusammenhänge erklären.",
+    grammar_topic: "während / wohingegen · je ... desto · obwohl / dennoch",
+  }),
+  17: Object.freeze({
+    day: 17,
+    chapter: "4.2",
+    title: "Familie, Kinderbetreuung und Vereinbarkeit mit dem Beruf",
+    lessonTopic: "Betreuungsmodelle, Arbeitszeiten und Familienorganisation",
+    goal: "Vereinbarkeit von Familie und Beruf erklären und praktische Alternativen bewerten.",
+    grammar_topic: "um ... zu / damit · während / wohingegen · ohne ... zu / statt ... zu",
+  }),
+  18: Object.freeze({
+    day: 18,
+    chapter: "4.3",
+    title: "Arbeitswelt, Fachkräftemangel und Weiterbildung",
+    lessonTopic: "Qualifikation, Weiterbildung, Fachkräfte und Wandel am Arbeitsmarkt",
+    goal: "Fachkräftemangel und Weiterbildung mit Ursachen, Folgen und Maßnahmen diskutieren.",
+    grammar_topic: "je ... desto · Passiv und Modalpassiv · Nominalisierung",
+  }),
+  19: Object.freeze({
+    day: 19,
+    chapter: "4.4",
+    title: "Homeoffice, ständige Erreichbarkeit und Work-Life-Balance",
+    lessonTopic: "Flexible Arbeit, Grenzen, Erholung und digitale Erreichbarkeit",
+    goal: "Homeoffice und Erreichbarkeit ausgewogen bewerten und gesunde Grenzen begründen.",
+    grammar_topic: "um ... zu / damit / ohne ... zu / statt ... zu · obwohl / trotzdem · je ... desto",
+  }),
+  20: Object.freeze({
+    day: 20,
+    chapter: "4.5",
+    title: "Soziale Medien, Privatsphäre und öffentliche Identität",
+    lessonTopic: "Datenschutz, Selbstdarstellung und Folgen öffentlicher Beiträge",
+    goal: "Privatsphäre und öffentliche Identität differenziert vergleichen und Folgen erklären.",
+    grammar_topic: "Relativsätze mit Präpositionen · während / wohingegen · wodurch / sodass",
+  }),
+  21: Object.freeze({
+    day: 21,
+    chapter: "5.1",
+    title: "Künstliche Intelligenz in Schule und Universität",
+    lessonTopic: "KI beim Lernen, Regeln, Quellenprüfung und akademische Verantwortung",
+    goal: "Chancen und Grenzen von KI in Bildung begründen und sinnvolle Regeln vorschlagen.",
+    grammar_topic: "falls / sofern · Passiv und Modalpassiv · Konjunktiv II · indem / dadurch, dass",
+  }),
+  22: Object.freeze({
+    day: 22,
+    chapter: "5.2",
+    title: "Künstliche Intelligenz, Automatisierung und Arbeitsplätze",
+    lessonTopic: "Automatisierung, Arbeitsplatzwandel, Weiterbildung und neue Kompetenzen",
+    goal: "Auswirkungen von KI auf Arbeit erklären und Bedingungen für einen fairen Wandel diskutieren.",
+    grammar_topic: "Passiv und Modalpassiv · je ... desto · sofern / falls · wodurch",
+  }),
+  23: Object.freeze({
+    day: 23,
+    chapter: "5.3",
+    title: "Datenschutz, Algorithmen und personalisierte Werbung",
+    lessonTopic: "Datenerhebung, Algorithmen, Werbung und digitale Selbstbestimmung",
+    goal: "Personalisierte Werbung und Datenverarbeitung kritisch und präzise bewerten.",
+    grammar_topic: "Passiv · Relativsätze mit Präpositionen · wodurch / sodass · obwohl",
+  }),
+  24: Object.freeze({
+    day: 24,
+    chapter: "5.4",
+    title: "Digitale Gesundheit, Telemedizin und medizinische Technologie",
+    lessonTopic: "Gesundheitsdaten, Telemedizin, Versorgung und digitale Systeme",
+    goal: "Digitale Gesundheitsangebote mit Chancen, Bedingungen und Risiken diskutieren.",
+    grammar_topic: "Passiv und Modalpassiv · indem / dadurch, dass · sofern · wodurch / sodass",
+  }),
+  25: Object.freeze({
+    day: 25,
+    chapter: "5.5",
+    title: "Reisen, Massentourismus und nachhaltiger Tourismus",
+    lessonTopic: "Tourismusfolgen, lokale Wirtschaft und nachhaltige Reiseentscheidungen",
+    goal: "Massentourismus und nachhaltiges Reisen mit Zielkonflikten und Alternativen bewerten.",
+    grammar_topic: "während / wohingegen · indem / dadurch, dass · obwohl / trotz",
+  }),
+  26: Object.freeze({
+    day: 26,
+    chapter: "6.1",
+    title: "Migration, Integration und Sprache",
+    lessonTopic: "Spracherwerb, Anerkennung, Teilhabe und Integration",
+    goal: "Integration und Sprache differenziert diskutieren und unterschiedliche Erfahrungen vergleichen.",
+    grammar_topic: "obwohl / obgleich / trotz · während / wohingegen · Relativsätze mit Präpositionen",
+  }),
+  27: Object.freeze({
+    day: 27,
+    chapter: "6.2",
+    title: "Gleichstellung, Diskriminierung und gesellschaftlicher Zusammenhalt",
+    lessonTopic: "Chancengleichheit, Diskriminierung, Verfahren und gesellschaftliche Teilhabe",
+    goal: "Diskriminierung und Gleichstellung mit konkreten Maßnahmen und Folgen diskutieren.",
+    grammar_topic: "nicht nur ... sondern auch / sowohl ... als auch · obwohl / trotz · indem / dadurch, dass",
+  }),
+  28: Object.freeze({
+    day: 28,
+    chapter: "6.3",
+    title: "Gesellschaft im Wandel – B2 Prüfungstraining",
+    lessonTopic: "B2-Prüfungstraining mit Bildung, Umwelt, Wohnen, Arbeit, Technologie und Gesellschaft",
+    goal: "Die zentralen B2-Themen mit abwechslungsreichen Strukturen prüfungsnah argumentieren.",
+    grammar_topic: "Ursache, Folge, Gegensatz, Einräumung, Ziel und Methode · Passiv · Relativsätze · Nominalisierung · Konjunktiv II",
+  }),
+});
+
+const getB2LessonContentAlignment = (day) =>
+  B2_LESSON_CONTENT_ALIGNMENT[Number(day)] || null;
+
+const alignB2CurriculumEntry = (entry = {}) => {
+  const level = String(entry.level || "").trim().toUpperCase();
+  if (level !== "B2") return entry;
+
+  const patch = getB2LessonContentAlignment(entry.day ?? entry.assignmentDay);
+  if (!patch) return entry;
+
+  return {
+    ...entry,
+    ...patch,
+    topic: patch.title,
+    lessonTitle: patch.title,
+    assignmentTitle: patch.title,
+  };
+};
+
+const alignB2CurriculumEntries = (entries = []) =>
+  entries.map((entry) => alignB2CurriculumEntry(entry));
+
+export {
+  B2_LESSON_CONTENT_ALIGNMENT,
+  getB2LessonContentAlignment,
+  alignB2CurriculumEntry,
+  alignB2CurriculumEntries,
+};

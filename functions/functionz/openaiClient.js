@@ -1,0 +1,65 @@
+const OpenAI = require("openai");
+const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
+const { createLogger } = require("./logger");
+const { incrementCounter } = require("./metrics");
+
+let client;
+const log = createLogger({ scope: "openai" });
+
+const getOpenAIClient = () => {
+  if (client) return client;
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("OPENAI_API_KEY is not configured");
+  }
+
+  client = new OpenAI({ apiKey });
+  return client;
+};
+
+const createChatCompletion = async (messages, options = {}, requestOptions = {}) => {
+  const clientInstance = getOpenAIClient();
+  const model = resolveChatModel(options.model || process.env.OPENAI_MODEL);
+  const startedAt = Date.now();
+
+  incrementCounter("openai_requests", model);
+
+  try {
+    const response = await clientInstance.chat.completions.create(buildChatRequest({
+      model,
+      temperature: 0.4,
+      max_tokens: 750,
+      messages,
+      ...options,
+    }), requestOptions);
+
+    const reply = response?.choices?.[0]?.message?.content;
+    if (!reply) {
+      throw Object.assign(new Error("OpenAI response missing content"), { code: "OPENAI_EMPTY_RESPONSE" });
+    }
+
+    incrementCounter("openai_success", model);
+    log.info("openai.completion.success", {
+      model,
+      durationMs: Date.now() - startedAt,
+      usage: response?.usage || null,
+    });
+
+    return reply;
+  } catch (err) {
+    incrementCounter("openai_errors", err?.code || err?.status || "unknown");
+    log.error("openai.completion.error", {
+      model,
+      durationMs: Date.now() - startedAt,
+      errorMessage: err?.message || "unknown",
+      errorCode: err?.code || err?.status || "unknown",
+    });
+    throw err;
+  }
+};
+
+module.exports = {
+  createChatCompletion,
+  getOpenAIClient,
+};

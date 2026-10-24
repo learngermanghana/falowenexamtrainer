@@ -1,0 +1,78 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+const replaceOnce = (relativePath, before, after, label) => {
+  const targetPath = path.join(root, relativePath);
+  let source = fs.readFileSync(targetPath, "utf8");
+  if (source.includes(after)) return;
+  if (!source.includes(before)) throw new Error(`Could not find ${label} anchor in ${relativePath}.`);
+  source = source.replace(before, after);
+  fs.writeFileSync(targetPath, source, "utf8");
+};
+
+const day9WorkbookPath = "web/src/components/A1Chapter5GermanCasesWorkbookPage.js";
+const day9WorkbookSource = fs.readFileSync(path.join(root, day9WorkbookPath), "utf8");
+const day9UsesNativeShell =
+  day9WorkbookSource.includes('fallbackAssignmentKey="A1-5"')
+  && day9WorkbookSource.includes('title="A1 · Day 9 Workbook · German Cases"');
+
+if (!day9UsesNativeShell) {
+  replaceOnce(
+    day9WorkbookPath,
+    "A1 · Chapter 5 Workbook · Nominative & Akkusative, Definite & Indefinite Articles",
+    "A1 · Chapter 5 Workbook · German Cases: Nominative and Accusative",
+    "Day 9 workbook title",
+  );
+  replaceOnce(
+    day9WorkbookPath,
+    "German Cases · Chapter 5. This workbook is now organized on one page,\n          so complete Teil 1, Teil 2, and Teil 3 from top to bottom.",
+    "German Cases · Chapter 5. This assignment practises definite articles in the nominative and accusative. Complete Teil 1, Teil 2 and Teil 3 from top to bottom.",
+    "Day 9 scope description",
+  );
+}
+
+// Redesigned Day 10 uses a native two-part workbook. Keep the new title
+// and do not rewrite the obsolete apartment assignment prompt during builds.
+const day10WorkbookPath = "web/src/components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage.js";
+const day10Source = fs.readFileSync(path.join(root, day10WorkbookPath), "utf8");
+if (!day10Source.includes('title="A1 · Day 10 · Gegenstände, Farben und Possessivartikel"')) {
+  replaceOnce(
+    day10WorkbookPath,
+    'title="A1 · Day 10 Workbook · Objects, Colors and Possessive Articles"',
+    'title="A1 · Day 10 · Gegenstände, Farben und Possessivartikel"',
+    "Day 10 canonical title",
+  );
+}
+
+replaceOnce(
+  "web/src/components/A1Day11UnderstandingTimeWorkbookPage.js",
+  'submitDescription="This submission box is locked to A1-7, so students can send their final Chapter 7 answers from this workbook."',
+  'submitDescription="Submit your completed Chapter 7 answers here when both Teile are finished."',
+  "Day 11 learner-facing submit description",
+);
+
+// A1-8 is now a two-reading-part workbook (October 2026).
+// Legacy transformations must never restore the removed speaking or Hören tasks.
+const day12WorkbookSource = fs.readFileSync(path.join(root, "web/src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js"), "utf8");
+const day12NewReading = day12WorkbookSource.includes("Teil 1: E-Mails und SMS")
+  && day12WorkbookSource.includes("Teil 2: Schilder");
+if (!day12NewReading) {
+  replaceOnce(
+    "web/src/components/A1Day12TwentyFourHourClockAndDatesWorkbookPage.js",
+    "<h2 style={sectionTitle}>Teil 4: Vocabulary reminder</h2>",
+    "<h2 style={sectionTitle}>Vocabulary reminder</h2>",
+    "Day 12 unassessed vocabulary heading",
+  );
+  const day12RegistrySource = fs.readFileSync(path.join(root, "web/src/data/a1AssignmentRegistry.js"), "utf8");
+  if (!day12RegistrySource.includes("Teil 2: Sprechen · Fragen und Antworten")) replaceOnce(
+    "web/src/data/a1AssignmentRegistry.js",
+    '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen", "Teil 4: Vocabulary reminder"]],',
+    '["A1-8", 12, "8", "24 Hour Clock", "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook", "A1Day12TwentyFourHourClockAndDatesWorkbookPage", ["Teil 1: Lesen · Multiple Choice", "Teil 2: Lesen · Richtig oder Falsch", "Teil 3: Hörverstehen"]],',
+    "Day 12 assessed-section registry",
+  );
+}
+
+console.log("Applied A1 Days 9–12 Course Book audit fixes.");

@@ -1,0 +1,28 @@
+name: A1 tutor card bundle parity
+
+on:
+  pull_request:
+    paths:
+      - 'shared/a1GoetheTeil3PictureCards.json'
+      - 'functions/data/a1GoetheTeil3PictureCards.json'
+      - 'functions/functionz/a1TutorSpeakingScore.js'
+      - 'functions/functionz/tests/a1TutorCardsBundle.test.cjs'
+      - '.github/workflows/a1-tutor-card-parity.yml'
+      - '.github/workflows/deploy-functions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-card-parity:
+    name: Verify canonical and Firebase A1 card parity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Reject mismatched or unpackaged A1 speaking cards
+        run: node --test functions/functionz/tests/a1TutorCardsBundle.test.cjs

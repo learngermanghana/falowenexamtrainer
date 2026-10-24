@@ -1,0 +1,423 @@
+import { A1_ASSIGNMENT_ORDER } from "../data/a1AssignmentRegistry";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
+import ResultHistory from "./ResultHistory";
+import { mergeAutomaticResults } from "../utils/mergeAutomaticResults";
+import { collection, db, onSnapshot, query, where } from "../firebase";
+import { fetchStudentResultsHistory } from "../services/resultsApi";
+import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
+import { fetchResults } from "../services/resultsService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
+import ExamReadinessBadge from "./ExamReadinessBadge";
+import { mergeAssignmentProgress, PASS_MARK } from "../utils/assignmentProgress";
+
+const norm = (v) => String(v || "").trim().toLowerCase();
+const TOTAL_ASSIGNMENTS = {
+  A1: 19,
+  A2: 28,
+  B1: 28,
+  B2: 28,
+};
+const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
+
+const StudentResultsPage = () => {
+  const { t } = useTranslation();
+  const { idToken, studentProfile, user } = useAuth();
+
+  const [results, setResults] = useState([]);
+  const [automaticResults, setAutomaticResults] = useState([]);
+  useEffect(() => {
+    setAutomaticResults([]);
+    if (!db || !user?.uid) return undefined;
+    return onSnapshot(query(collection(db, "scores"), where("studentId", "==", user.uid)), snapshot => {
+      setAutomaticResults(snapshot.docs.map(entry => ({ id: entry.id, ...entry.data() })));
+    }, () => { /* Existing Sheet/API results remain available. */ });
+  }, [user?.uid]);
+  const visibleResults = useMemo(
+    () => mergeAutomaticResults(results, automaticResults),
+    [results, automaticResults],
+  );
+  const [leaderboard, setLeaderboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const studentCode =
+    studentProfile?.studentCode ||
+    studentProfile?.studentcode ||
+    studentProfile?.id ||
+    "";
+  const studentLevel = String(studentProfile?.level || studentProfile?.course || "")
+    .trim()
+    .toUpperCase();
+  const trackedLevel = TRACKED_LEVELS.includes(studentLevel) ? studentLevel : "A1";
+  const studentEmail = studentProfile?.email || "";
+  const useSheetResults = ["A1", "A2", "B1"].includes(studentLevel);
+  const useFirestoreResults = ["B2", "C1"].includes(studentLevel);
+
+  // Put your sheet URL here via env (CSV or edit URL):
+  // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
+  // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/<sheetId>/edit
+  const SHEET_CSV_URL = process.env.REACT_APP_RESULTS_SHEET_CSV_URL || "";
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadFromSheet = async () => {
+      const all = await fetchResultsFromPublishedSheet(SHEET_CSV_URL);
+
+      // Filter ONLY this student’s rows (privacy + correctness)
+      const mine = all.filter((r) => norm(r.studentcode) === norm(studentCode));
+
+      return { mine, all };
+    };
+
+    const loadFromApi = async () => {
+      const rows = await fetchStudentResultsHistory({ idToken, studentCode });
+      return Array.isArray(rows) ? rows : [];
+    };
+
+    const loadFromResultsStore = async () => {
+      const response = await fetchResults({ studentCode, email: studentEmail });
+      if (!Array.isArray(response?.results)) return [];
+      return response.results.map((entry) => ({
+        ...entry,
+        studentcode: entry.studentcode || entry.studentCode || "",
+        name: entry.name || entry.studentName || "",
+      }));
+    };
+
+    const loadLeaderboardFromSummary = async () => {
+      if (!studentCode) return null;
+      try {
+        const response = await fetchScoreSummary({ idToken, studentCode });
+        return response?.leaderboard || null;
+      } catch (summaryError) {
+        return null;
+      }
+    };
+
+    const load = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        if (!studentCode) {
+          if (!mounted) return;
+          setResults([]);
+          setLeaderboard(null);
+          return;
+        }
+
+        const summaryLeaderboard = await loadLeaderboardFromSummary();
+
+        if (useFirestoreResults) {
+          const rows = await loadFromResultsStore();
+          if (!mounted) return;
+          setResults(rows);
+          setLeaderboard(summaryLeaderboard);
+          return;
+        }
+
+        // Prefer sheet for A1/A2/B1 if configured
+        if (useSheetResults && SHEET_CSV_URL) {
+          const sheetResponse = await loadFromSheet();
+          const { mine } = sheetResponse;
+          if (!mounted) return;
+          setResults(mine);
+          setLeaderboard(summaryLeaderboard);
+          return;
+        }
+
+        // Otherwise fall back to API
+        if (idToken) {
+          const rows = await loadFromApi();
+          if (!mounted) return;
+          setResults(rows);
+          setLeaderboard(summaryLeaderboard);
+          return;
+        }
+
+        // Not enough info to load
+        if (!mounted) return;
+        setResults([]);
+        setLeaderboard(null);
+      } catch (e) {
+        if (!mounted) return;
+        setError(e?.message || "Failed to load results.");
+        setResults([]);
+        setLeaderboard(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, [
+    idToken,
+    studentCode,
+    studentLevel,
+    useFirestoreResults,
+    useSheetResults,
+    studentEmail,
+    SHEET_CSV_URL,
+  ]);
+
+  const summary = useMemo(() => {
+    const scores = visibleResults
+      .filter((r) => r.score !== null && r.score !== undefined && String(r.score).trim() !== "")
+      .map((r) => Number(r.score))
+      .filter((n) => Number.isFinite(n) && n >= 0 && n <= 100);
+
+    if (!scores.length) return { count: visibleResults.length, avg: null };
+    const avg =
+      Math.round((scores.reduce((a, b) => a + b, 0) / scores.length) * 10) / 10;
+    return { count: visibleResults.length, avg };
+  }, [visibleResults]);
+
+  const scoreInsight = useMemo(() => {
+    const scored = visibleResults
+      .filter((row) => row.score !== null && row.score !== undefined && String(row.score).trim() !== "")
+      .map((row) => ({ ...row, numericScore: Number(row.score) }))
+      .filter((row) => Number.isFinite(row.numericScore) && row.numericScore >= 0 && row.numericScore <= 100);
+    if (!scored.length) return null;
+    const belowPass = scored.filter((row) => row.numericScore < PASS_MARK);
+    const mostRecent = scored.reduce((latest, row) => {
+      const date = Date.parse(row.date || row.created_at || row.markedAt || row.createdAt || "");
+      return Number.isFinite(date) && date > latest.date ? { date, row } : latest;
+    }, { date: -Infinity, row: null }).row;
+    const recentLabel = mostRecent?.assignment || mostRecent?.assignmentTitle || mostRecent?.assignmentId || "";
+    return {
+      total: scored.length,
+      belowPass: belowPass.length,
+      latest: mostRecent ? `Latest recorded score: ${mostRecent.numericScore}%${recentLabel ? ` · ${recentLabel}` : ""}.` : "",
+      guidance: belowPass.length
+        ? `${belowPass.length} recorded result${belowPass.length === 1 ? " is" : "s are"} below the ${PASS_MARK}% course pass mark. Open the result history below to review the feedback for those assignments.`
+        : `All ${scored.length} recorded numeric score${scored.length === 1 ? " meets" : "s meet"} the ${PASS_MARK}% course pass mark. Review individual feedback below for specific improvements.`,
+    };
+  }, [visibleResults]);
+
+  const assignmentProgress = useMemo(() => {
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [],
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: visibleResults,
+      studentCode,
+      passMark: PASS_MARK,
+    }).filter((entry) => String(entry.assignmentId || "").startsWith(`${trackedLevel}-`));
+
+    const active = trackedLevel === "A1" ? merged.filter((entry) => A1_ASSIGNMENT_ORDER.includes(entry.assignmentId)) : merged;
+    const completed = active.filter((entry) => entry.status === "passed").length;
+    const failed = active.filter((entry) => entry.status === "failed").length;
+
+    return { completed, failed };
+  }, [visibleResults, studentCode, trackedLevel]);
+
+  const progressInsights = useMemo(() => {
+    const buildProgress = (label, completed, total, failed = 0) => {
+      const safeCompleted = Math.max(0, Math.min(completed, total));
+      const percent = total > 0 ? Math.round((safeCompleted / total) * 100) : 0;
+      const remaining = Math.max(total - safeCompleted, 0);
+
+      let milestoneCopy;
+      if (remaining === 0) {
+        milestoneCopy = "Milestone reached: this level is complete 🎉";
+      } else if (safeCompleted === 0) {
+        milestoneCopy = "Next milestone: complete your first assignment.";
+      } else if (remaining <= 3) {
+        milestoneCopy = `Next milestone: ${remaining} more assignment${remaining === 1 ? "" : "s"} to finish ${label}.`;
+      } else {
+        milestoneCopy = `Next milestone: complete ${Math.min(5, remaining)} more assignment${Math.min(5, remaining) === 1 ? "" : "s"} in ${label}.`;
+      }
+
+      if (failed > 0) {
+        milestoneCopy += ` Retry ${failed} assignment${failed === 1 ? "" : "s"} below ${PASS_MARK}%.`;
+      }
+
+      return {
+        label,
+        completed: safeCompleted,
+        total,
+        percent,
+        failed,
+        milestoneCopy,
+      };
+    };
+
+    return [
+      buildProgress(
+        trackedLevel,
+        assignmentProgress.completed,
+        TOTAL_ASSIGNMENTS[trackedLevel],
+        assignmentProgress.failed
+      ),
+    ];
+  }, [assignmentProgress, trackedLevel]);
+
+  const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
+  const qualificationMinimum = Number(leaderboard?.qualificationMinimum || 3);
+  const myLeaderboardEntry = useMemo(() => {
+    const normalizedCode = norm(studentCode);
+    return leaderboardRows.find((row) => norm(row.studentCode || row.studentcode) === normalizedCode) || null;
+  }, [leaderboardRows, studentCode]);
+  const leaderboardTotal = leaderboardRows.length;
+
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <section
+        style={{
+          ...styles.card,
+          display: "grid",
+          gap: 10,
+          padding: 0,
+          overflow: "hidden",
+          border: "1px solid #dbeafe",
+        }}
+      >
+        <div
+          style={{
+            minHeight: 200,
+            padding: 18,
+            display: "grid",
+            alignContent: "end",
+            gap: 8,
+            backgroundImage:
+              "linear-gradient(120deg, rgba(15,23,42,0.7), rgba(37,99,235,0.45)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <h3 style={{ ...styles.sectionTitle, margin: 0, color: "#eff6ff" }}>
+            {t("examReadiness.certificate.title")}
+          </h3>
+          <p style={{ ...styles.helperText, margin: 0, color: "#dbeafe" }}>
+            Your readiness status is based on your recorded course progress.
+          </p>
+        </div>
+        <div style={{ padding: "0 18px 16px" }}>
+          <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
+        </div>
+      </section>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Results</h2>
+
+        <p style={styles.helperText}>
+          {loading
+            ? "Loading your results..."
+            : error
+            ? "Could not load results."
+            : summary.count === 0
+            ? "No marked results yet. Once your work is graded, your scores and feedback will appear here."
+            : `You have ${summary.count} recorded result${summary.count === 1 ? "" : "s"}${
+                summary.avg !== null ? ` · Avg score: ${summary.avg}` : ""
+              }`}
+        </p>
+
+        {!loading && !error && scoreInsight ? (
+          <div role="status" style={{ background: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: 12, padding: "12px 14px", marginTop: 8 }}>
+            <strong>Your marked-work overview</strong>
+            {scoreInsight.latest ? <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{scoreInsight.latest}</p> : null}
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{scoreInsight.guidance}</p>
+          </div>
+        ) : null}
+
+        {!loading && !error ? (
+          <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
+            {progressInsights.map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  background: "#f9fafb",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {item.label}
+                  </p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    {item.completed}/{item.total}
+                  </p>
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    marginTop: 8,
+                    width: "100%",
+                    height: 8,
+                    borderRadius: 999,
+                    overflow: "hidden",
+                    background: "#e5e7eb",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${item.percent}%`,
+                      height: "100%",
+                      background: "linear-gradient(90deg, #2563eb 0%, #14b8a6 100%)",
+                    }}
+                  />
+                </div>
+                <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
+                  {item.percent}% complete · {item.milestoneCopy}
+                </p>
+                <p style={{ ...styles.helperText, margin: "6px 0 0 0", color: "#6b7280" }}>
+                  Completion counts passed assignments (score ≥ {PASS_MARK}%).
+                  {item.failed > 0 ? ` ${item.failed} need${item.failed === 1 ? "s" : ""} a retry.` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
+        {!loading && !error ? (
+          <>
+            <p style={{ ...styles.helperText, marginTop: 12 }}>
+              <strong>Leaderboard position:</strong>{" "}
+              {myLeaderboardEntry?.rank
+                ? `${myLeaderboardEntry.rank} of ${leaderboardTotal} (${leaderboard?.level || studentLevel || "Level"})`
+                : leaderboard
+                ? `Not ranked yet (${leaderboard?.level || studentLevel || "Level"})`
+                : "Not available yet"}
+            </p>
+            <p style={{ ...styles.helperText, marginTop: 4 }}>
+              {leaderboard && myLeaderboardEntry
+                ? `This compares your total score${
+                    myLeaderboardEntry.totalScore !== null ? ` (${myLeaderboardEntry.totalScore})` : ""
+                  } and completed assignments (${myLeaderboardEntry.completedCount || 0}) with ${leaderboardTotal} qualified students. Rank is based on total marks first, then completed assignments as tie-breaker. Minimum ${qualificationMinimum} completed assignments are required to qualify.`
+                : leaderboard
+                ? `You need at least ${qualificationMinimum} completed assignments to qualify for ranking.`
+                : "We’ll show your leaderboard position once we have enough class scores to compare."}
+            </p>
+          </>
+        ) : null}
+
+        {error ? <div style={styles.errorBox}>{error}</div> : null}
+      </section>
+
+      {loading && visibleResults.length === 0 ? (
+        <section style={styles.card}>
+          <p style={{ margin: 0 }}>Loading...</p>
+        </section>
+      ) : summary.count === 0 ? (
+        <section style={styles.card}>
+          <p style={{ margin: 0 }}>
+            No feedback has been recorded for your student code yet.
+          </p>
+        </section>
+      ) : (
+        <ResultHistory results={visibleResults} />
+      )}
+    </div>
+  );
+};
+
+export default StudentResultsPage;

@@ -1,0 +1,475 @@
+const {
+  validateA1AudioKey,
+  validateA1MockAudioKey,
+  validateA2AudioKey,
+  validateA2MockAudioKey,
+  validateB1AudioKey,
+  validateB1MockAudioKey,
+  validateC2AudioKey,
+  validateB2AudioKey,
+  validateB2MockAudioKey,
+  validateCourseAudioKey,
+  getR2AudioConfig,
+  createA1AudioSignedUrl,
+  createA1MockAudioSignedUrl,
+  createA2AudioSignedUrl,
+  createB1AudioSignedUrl,
+  createB1MockAudioSignedUrl,
+  createC2AudioSignedUrl,
+  createB2AudioSignedUrl,
+  createB2MockAudioSignedUrl,
+  getCourseMediaStaffEmails,
+  hasCourseMediaStaffAccess,
+  hasCourseMediaLevelAccess,
+} = require("../r2CourseAudio");
+
+describe("A1/A2/B1/B2/C2 R2 course audio", () => {
+  test("A2 Mock 2 resolves the four uploaded falowen-course-audio files", () => {
+    for (let number = 1; number <= 4; number += 1) {
+      const part = `teil-${number}`;
+      const key = `a2/mock-horen-2/${part}.mp3`;
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key }))
+        .toEqual({ level: "A2", mockId: "mock-02", part, key });
+      // Newly uploaded Mock 2 audio can use the standard folder, while the already-uploaded legacy key continues to work.
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` }))
+        .toEqual({ level: "A2", mockId: "mock-02", part, key: `a2/mock-hoeren/mock-02/${part}.mp3` });
+      expect(validateA2MockAudioKey({ mockId: "mock-02", part, key: `a2/mock-horen-2/${part}-other.mp3` })).toBeNull();
+    }
+    expect(validateA2MockAudioKey({
+      mockId: "mock-01", part: "teil-1", key: "a2/mock-hoeren/mock-01/teil-1.mp3",
+    })).toMatchObject({ mockId: "mock-01", part: "teil-1" });
+  });
+
+  test("accepts protected A1 audio by visible course day", () => {
+    expect(validateA1AudioKey({ day: 8, key: "a1/day-08/day-08.mp3" })).toEqual({ day: 8, key: "a1/day-08/day-08.mp3" });
+    expect(validateA1AudioKey({ day: 11, key: "a1/day-11/day-11.mp3" })).toEqual({ day: 11, key: "a1/day-11/day-11.mp3" });
+    expect(validateA1AudioKey({ day: 11, key: "a1/day-10/day-10.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 8, key: "a1/day-12/day-12.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 8, key: "a1/day-08/notes.pdf" })).toBeNull();
+    expect(validateA1AudioKey({ day: 12, key: "a1/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a1/day-12/day-12.mp3" });
+    expect(validateA1AudioKey({ day: 17, key: "a1/day-17/day-17.mp3" })).toEqual({ day: 17, key: "a1/day-17/day-17.mp3" });
+    expect(validateA1AudioKey({ day: "18", key: "a1/day-18/day-18.mp3" })).toEqual({ day: 18, key: "a1/day-18/day-18.mp3" });
+    expect(validateA1AudioKey({ day: 18, key: "a1/day-17/day-17.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 17, key: "a1/day-18/day-18.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 18, key: "../day-18.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 18, key: "a1/day-18/notes.pdf" })).toBeNull();
+    expect(validateA1AudioKey({ day: 21, key: "a1/day-21/day-21.mp3" })).toEqual({ day: 21, key: "a1/day-21/day-21.mp3" });
+    expect(validateA1AudioKey({ day: 22, key: "a1/day-22/day-22.mp3" })).toEqual({ day: 22, key: "a1/day-22/day-22.mp3" });
+    expect(validateA1AudioKey({ day: 13, key: "a1/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 17, key: "a1/day-11/day-11.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: "14.1", key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 21, key: "a1/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA1AudioKey({ day: 22, key: "a1/day-14-1/day-14-1.mp3" })).toBeNull();
+  });
+
+  test("generates a signed playback URL for the authenticated A1 Day 18 endpoint", async () => {
+    const result = await createA1AudioSignedUrl({
+      day: "18",
+      key: "a1/day-18/day-18.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+      },
+    });
+    expect(result.url).toContain("/a1/day-18/day-18.mp3");
+    expect(result.url).toContain("X-Amz-Signature=");
+    expect(result.key).toBe("a1/day-18/day-18.mp3");
+  });
+
+  test("accepts protected A1 mock Hören files without treating them as Course Book days", () => {
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+    })).toEqual({
+      level: "A1",
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+    });
+
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "a1/mock-hoeren/mock-01/teil-4.wav",
+    })).toBeNull();
+
+    expect(validateA1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/day-13/day-13.mp3",
+    })).toBeNull();
+  });
+  test("accepts protected A2 Day 6–13, Day 15–16, Day 24 and Day 26–28 audio folders", () => {
+    expect(validateA2AudioKey({ day: 15, key: "a2/day-15/day-15.mp3" })).toEqual({ day: 15, key: "a2/day-15/day-15.mp3" });
+    expect(validateA2AudioKey({ day: 16, key: "a2/day-16/day-16.mp3" })).toEqual({ day: 16, key: "a2/day-16/day-16.mp3" });
+    expect(validateA2AudioKey({ day: 16, key: "a2/day-15/day-15.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 15, key: "a2/day-13/day-13.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 13, key: "a2/day-13/day-13.mp3" })).toEqual({ day: 13, key: "a2/day-13/day-13.mp3" });
+    expect(validateA2AudioKey({ day: 13, key: "a2/day-12/day-12.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 12, key: "a2/day-12/day-12.mp3" })).toEqual({ day: 12, key: "a2/day-12/day-12.mp3" });
+    expect(validateA2AudioKey({ day: 12, key: "a2/day-11/day-11.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 11, key: "a2/day-11/day-11.mp3" })).toEqual({ day: 11, key: "a2/day-11/day-11.mp3" });
+    expect(validateA2AudioKey({ day: 11, key: "a2/day-10/day-10.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 10, key: "a2/day-10/day-10.mp3" })).toEqual({ day: 10, key: "a2/day-10/day-10.mp3" });
+    expect(validateA2AudioKey({ day: 10, key: "a2/day-09/day-09.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 6, key: "a2/day-06/day-06.mp3" })).toEqual({ day: 6, key: "a2/day-06/day-06.mp3" });
+    expect(validateA2AudioKey({ day: 6, key: "a2/day-07/day-07.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-09/day-09.mp3" })).toEqual({ day: 9, key: "a2/day-09/day-09.mp3" });
+    expect(validateA2AudioKey({ day: 9, key: "a2/day-08/day-08.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 7, key: "a2/day-07/day-07.mp3" })).toEqual({ day: 7, key: "a2/day-07/day-07.mp3" });
+    expect(validateA2AudioKey({ day: 7, key: "a2/day-08/day-08.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 8, key: "a2/day-08/day-08.mp3" })).toEqual({ day: 8, key: "a2/day-08/day-08.mp3" });
+    expect(validateA2AudioKey({ day: 8, key: "a2/day-24/day-24.mp3" })).toBeNull();
+    expect(
+      validateA2AudioKey({ day: 28, key: "a2/day-28/day-28.mp3" }),
+    ).toEqual({ day: 28, key: "a2/day-28/day-28.mp3" });
+
+    expect(validateA2AudioKey({ day: 24, key: "a2/day-24/day-24.mp3" })).toEqual({ day: 24, key: "a2/day-24/day-24.mp3" });
+    expect(validateA2AudioKey({ day: 26, key: "a2/day-26/day-26.mp3" })).toEqual({ day: 26, key: "a2/day-26/day-26.mp3" });
+    expect(validateA2AudioKey({ day: 27, key: "a2/day-27/day-27.mp3" })).toEqual({ day: 27, key: "a2/day-27/day-27.mp3" });
+    expect(validateA2AudioKey({ day: 25, key: "a2/day-25/day-25.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 28, key: "b2/day-28/day-28.mp3" })).toBeNull();
+    expect(validateA2AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
+  });
+  test("accepts the protected B1 final mock listening and speaking objects", () => {
+    expect(validateB1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b1/mock-hoeren-1/teil-1.mp3",
+    })).toEqual({
+      level: "B1",
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b1/mock-hoeren-1/teil-1.mp3",
+    });
+    expect(validateB1MockAudioKey({
+      mockId: "mock-01",
+      part: "sprechen-teil-1",
+      key: "b1/mock-hoeren-1/sprechen-teil-1.mp3",
+    })).toEqual({
+      level: "B1",
+      mockId: "mock-01",
+      part: "sprechen-teil-1",
+      key: "b1/mock-hoeren-1/sprechen-teil-1.mp3",
+    });
+    expect(validateB1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-5",
+      key: "b1/mock-hoeren-1/teil-5.mp3",
+    })).toBeNull();
+    expect(validateB1MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b1/day-15/day-15.mp3",
+    })).toBeNull();
+  });
+
+  test("accepts legacy flat B1 keys and newer Cloudflare folder keys", () => {
+    expect(validateB1AudioKey({ day: 15, key: "audio/day_15.mp3" })).toEqual({
+      day: 15,
+      key: "audio/day_15.mp3",
+    });
+    expect(validateB1AudioKey({ day: 16, key: "audio/day_16.mp3" })).toEqual({
+      day: 16,
+      key: "audio/day_16.mp3",
+    });
+    expect(validateB1AudioKey({ day: 17, key: "b1/day-17/day-17.mp3" })).toEqual({
+      day: 17,
+      key: "b1/day-17/day-17.mp3",
+    });
+    expect(validateB1AudioKey({ day: 18, key: "b1/day-18/day-18.mp3" })).toEqual({
+      day: 18,
+      key: "b1/day-18/day-18.mp3",
+    });
+    expect(validateB1AudioKey({ day: 19, key: "b1/day-19/day-19.mp3" })).toEqual({
+      day: 19,
+      key: "b1/day-19/day-19.mp3",
+    });
+    expect(validateB1AudioKey({ day: 20, key: "b1/day-20/day-20.mp3" })).toEqual({
+      day: 20,
+      key: "b1/day-20/day-20.mp3",
+    });
+    expect(validateB1AudioKey({ day: 15, key: "audio/day_16.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 14, key: "audio/day_14.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 17, key: "audio/day_16.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 18, key: "b1/day-17/day-17.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 19, key: "b1/day-18/day-18.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 15, key: "../day_15.mp3" })).toBeNull();
+  });
+
+  test("accepts only audio objects inside the matching C2 listening day folder", () => {
+    expect(
+      validateC2AudioKey({ day: 2, key: "c2/day-02/listening.mp3" }),
+    ).toEqual({ day: 2, key: "c2/day-02/listening.mp3" });
+
+    expect(validateC2AudioKey({ day: 2, key: "c2/day-06/listening.mp3" })).toBeNull();
+    expect(validateC2AudioKey({ day: 1, key: "c2/day-01/listening.mp3" })).toBeNull();
+    expect(validateC2AudioKey({ day: 2, key: "../secret.mp3" })).toBeNull();
+    expect(validateC2AudioKey({ day: 2, key: "c2/day-02/notes.pdf" })).toBeNull();
+  });
+
+  test("accepts protected B2 mock Hören objects in the mock-hoeren-1 folder", () => {
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+    })).toEqual({
+      level: "B2",
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+    });
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "b2/mock-hoeren-1/teil-4.mp3",
+    })).toEqual({
+      level: "B2",
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "b2/mock-hoeren-1/teil-4.mp3",
+    });
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-5",
+      key: "b2/mock-hoeren-1/teil-5.mp3",
+    })).toBeNull();
+
+    expect(validateB2MockAudioKey({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/day-02/listening.mp3",
+    })).toBeNull();
+  });
+
+  test("accepts only audio objects inside matching B2 listening day folders", () => {
+    expect(
+      validateB2AudioKey({ day: 2, key: "b2/day-02/listening.m4a" }),
+    ).toEqual({ day: 2, key: "b2/day-02/listening.m4a" });
+
+    expect(validateB2AudioKey({ day: 2, key: "c2/day-02/listening.m4a" })).toBeNull();
+    expect(validateB2AudioKey({ day: 1, key: "b2/day-01/listening.m4a" })).toBeNull();
+    expect(validateCourseAudioKey({ level: "B2", day: 6, key: "b2/day-06/audio.mp3" })).toEqual({
+      level: "B2",
+      day: 6,
+      key: "b2/day-06/audio.mp3",
+    });
+  });
+
+  test("requires the four server-side R2 settings and clamps expiry", () => {
+    expect(() => getR2AudioConfig({})).toThrow("Missing R2 audio configuration");
+
+    const config = getR2AudioConfig({
+      R2_ACCOUNT_ID: "account",
+      R2_ACCESS_KEY_ID: "access",
+      R2_SECRET_ACCESS_KEY: "secret",
+      R2_AUDIO_BUCKET: "falowen-course-audio",
+      R2_AUDIO_URL_EXPIRES_SECONDS: "30",
+    });
+
+    expect(config.bucket).toBe("falowen-course-audio");
+    expect(config.expiresIn).toBe(60);
+  });
+
+  test("recognizes authenticated Falowen staff without requiring a student profile", () => {
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "staff@falowen.app" },
+      student: null,
+      env: {},
+    })).toBe(true);
+
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "other@example.com" },
+      student: { role: "teacher" },
+      env: {},
+    })).toBe(true);
+
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "other@example.com" },
+      student: null,
+      env: {},
+    })).toBe(false);
+  });
+
+  test("allows learners to use earlier-level protected audio through normal course progression", () => {
+    expect(hasCourseMediaLevelAccess({
+      student: { currentLevel: "B2" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { level: "C1" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { className: "C2 Advanced Klasse" },
+      requiredLevel: "B2",
+    })).toBe(true);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { courseLevel: "B1" },
+      requiredLevel: "B2",
+    })).toBe(false);
+
+    expect(hasCourseMediaLevelAccess({
+      student: { currentLevel: "C1" },
+      requiredLevel: "C2",
+    })).toBe(false);
+  });
+
+  test("supports a configurable protected-course staff email allowlist", () => {
+    const env = { COURSE_MEDIA_STAFF_EMAILS: "audio-admin@example.com, tutor@example.com" };
+    expect(Array.from(getCourseMediaStaffEmails(env))).toEqual([
+      "audio-admin@example.com",
+      "tutor@example.com",
+    ]);
+    expect(hasCourseMediaStaffAccess({
+      authedUser: { email: "TUTOR@example.com" },
+      student: null,
+      env,
+    })).toBe(true);
+  });
+
+  test("creates A1, A2, B1, C2 and B2 R2 presigned GET URLs without contacting R2", async () => {
+    const a1 = await createA1AudioSignedUrl({
+      day: 22,
+      key: "a1/day-22/day-22.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(a1.url).toContain("/a1/day-22/day-22.mp3");
+    expect(a1.url).toContain("X-Amz-Signature=");
+    expect(a1.level).toBe("A1");
+
+    const a1Mock = await createA1MockAudioSignedUrl({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "a1/mock-hoeren/mock-01/teil-1.wav",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(a1Mock.url).toContain("/a1/mock-hoeren/mock-01/teil-1.wav");
+    expect(a1Mock.url).toContain("X-Amz-Signature=");
+    expect(a1Mock.mockId).toBe("mock-01");
+    expect(a1Mock.part).toBe("teil-1");
+
+    const a2 = await createA2AudioSignedUrl({
+      day: 28,
+      key: "a2/day-28/day-28.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(a2.url).toContain("/a2/day-28/day-28.mp3");
+    expect(a2.url).toContain("X-Amz-Signature=");
+    expect(a2.level).toBe("A2");
+
+    const b1 = await createB1AudioSignedUrl({
+      day: 16,
+      key: "audio/day_16.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b1.url).toContain("/audio/day_16.mp3");
+    expect(b1.url).toContain("X-Amz-Signature=");
+    expect(b1.level).toBe("B1");
+
+    const b1Mock = await createB1MockAudioSignedUrl({
+      mockId: "mock-01",
+      part: "teil-4",
+      key: "b1/mock-hoeren-1/teil-4.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b1Mock.url).toContain("/b1/mock-hoeren-1/teil-4.mp3");
+    expect(b1Mock.url).toContain("X-Amz-Signature=");
+    expect(b1Mock.mockId).toBe("mock-01");
+    expect(b1Mock.part).toBe("teil-4");
+
+    const result = await createC2AudioSignedUrl({
+      day: 2,
+      key: "c2/day-02/listening.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(result.url).toContain("r2.cloudflarestorage.com");
+    expect(result.url).toContain("X-Amz-Signature=");
+    expect(result.expiresIn).toBe(3600);
+
+    const b2Mock = await createB2MockAudioSignedUrl({
+      mockId: "mock-01",
+      part: "teil-1",
+      key: "b2/mock-hoeren-1/teil-1.mp3",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b2Mock.url).toContain("/b2/mock-hoeren-1/teil-1.mp3");
+    expect(b2Mock.url).toContain("X-Amz-Signature=");
+    expect(b2Mock.level).toBe("B2");
+    expect(b2Mock.mockId).toBe("mock-01");
+    expect(b2Mock.part).toBe("teil-1");
+
+    const b2 = await createB2AudioSignedUrl({
+      day: 2,
+      key: "b2/day-02/listening.m4a",
+      env: {
+        R2_ACCOUNT_ID: "1234567890abcdef",
+        R2_ACCESS_KEY_ID: "test-access",
+        R2_SECRET_ACCESS_KEY: "test-secret",
+        R2_AUDIO_BUCKET: "falowen-course-audio",
+        R2_AUDIO_URL_EXPIRES_SECONDS: "3600",
+      },
+    });
+
+    expect(b2.url).toContain("/b2/day-02/listening.m4a");
+    expect(b2.url).toContain("X-Amz-Signature=");
+    expect(b2.level).toBe("B2");
+  });
+});

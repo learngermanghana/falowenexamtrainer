@@ -1,0 +1,3 @@
+Falowen production redeploy trigger
+Date: 2026-08-03 20:26 +01:00
+Purpose: deploy latest main, including A2 Day 0 orientation video update from PR #2343.

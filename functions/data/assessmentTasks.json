@@ -1,0 +1,3353 @@
+{
+  "mockSets": {
+    "a2-mock-02": {
+      "level": "A2",
+      "writing": {
+        "durationMinutes": 30,
+        "teil1": {
+          "title": "Teil 1 · Informelle Nachricht",
+          "minutes": 10,
+          "minWords": 20,
+          "maxWords": 30,
+          "recipient": "Julia",
+          "situation": "Sie haben sich für Samstagabend mit Ihrer Freundin Julia zum Kino verabredet. Leider können Sie nicht kommen, weil Sie krank geworden sind.",
+          "instruction": "Schreiben Sie eine Nachricht an Ihre Freundin Julia. Schreiben Sie zu allen drei Punkten. Vergessen Sie nicht die Anrede und den Gruß!",
+          "points": [
+            "Sagen Sie, dass Sie am Samstag nicht ins Kino kommen können.",
+            "Erklären Sie, warum Sie absagen müssen.",
+            "Schlagen Sie einen neuen Termin für nächste Woche vor."
+          ]
+        },
+        "teil2": {
+          "title": "Teil 2 · Formelle E-Mail",
+          "minutes": 20,
+          "minWords": 30,
+          "maxWords": 40,
+          "recipient": "Hotel „Alpenblick“, München",
+          "subject": "Zimmeranfrage",
+          "situation": "Sie möchten im nächsten Monat für ein langes Wochenende nach München reisen und suchen ein Hotelzimmer.",
+          "instruction": "Schreiben Sie eine formelle E-Mail an das Hotel „Alpenblick“ in München. Schreiben Sie zu allen drei Punkten. Vergessen Sie nicht die passende Anrede und den Gruß!",
+          "points": [
+            "Schreiben Sie, dass Sie ein Zimmer reservieren möchten oder Informationen benötigen.",
+            "Nennen Sie den Zeitraum, die Anzahl der Personen und die Anzahl der Nächte.",
+            "Fragen Sie nach dem Preis oder nach dem Frühstück."
+          ]
+        }
+      },
+      "speaking": {
+        "mockId": "a2-mock-02",
+        "level": "A2",
+        "title": "A2 Mock 2 · Sprechen",
+        "cards": [
+          {
+            "theme": "Wohnen",
+            "keyword": "Balkon",
+            "samplePartnerQuestion": "Haben Sie einen Balkon?"
+          },
+          {
+            "theme": "Freizeit",
+            "keyword": "Wochenende",
+            "samplePartnerQuestion": "Was machen Sie am Wochenende?"
+          },
+          {
+            "theme": "Arbeit / Beruf",
+            "keyword": "Arbeitszeiten",
+            "samplePartnerQuestion": "Wie sind Ihre Arbeitszeiten?"
+          },
+          {
+            "theme": "Sprachen",
+            "keyword": "Deutschkurs",
+            "samplePartnerQuestion": "Wann haben Sie Deutschkurs?"
+          }
+        ],
+        "teil2": {
+          "topic": "Was machen Sie an einem freien Nachmittag?",
+          "instruction": "Sprechen Sie ca. 1–2 Minuten und gehen Sie auf alle vier Punkte ein.",
+          "points": [
+            "Was machen Sie gern? (Aktivitäten / Hobbys)",
+            "Mit wem verbringen Sie die Zeit? (allein, mit Familie, mit Freunden)",
+            "Wo sind Sie am liebsten? (zu Hause, im Park, in der Stadt)",
+            "Wie oft haben Sie frei?"
+          ],
+          "followups": [
+            "Was machen Sie an einem freien Nachmittag, wenn das Wetter schlecht ist?",
+            "Gehen Sie an freien Tagen lieber in die Natur oder in die Stadt?"
+          ]
+        },
+        "teil3": {
+          "situation": "Ein gemeinsamer Freund aus Ihrem Deutschkurs, Thomas, hat Geburtstag. Sie möchten für ihn eine Überraschungsparty organisieren. Planen Sie die Party zusammen.",
+          "points": [
+            "Wann und wo soll die Party stattfinden?",
+            "Geschenk: Was wollen Sie kaufen und wie viel Geld gibt jeder aus?",
+            "Essen und Trinken: Wer bringt was mit?",
+            "Einladungen: Wie und wann informieren Sie die anderen Kursteilnehmer?"
+          ],
+          "partnerOpening": "Wir möchten für Thomas eine Überraschungsparty organisieren. Wann und wo wollen wir feiern?",
+          "partnerFollowup": "Gute Idee! Was kaufen wir als Geschenk, und wie viel Geld geben wir beide aus?",
+          "partnerLast": "Wer bringt Essen und Getränke mit, und wann laden wir die anderen aus dem Kurs ein?"
+        },
+        "rubric": {
+          "assessmentIdentity": "A2 Mock 2 Sprechen — never grade against A2 Mock 1 topics",
+          "teil1": "Assess four meaningful, grammatically intelligible questions that relate respectively to Balkon, Wochenende, Arbeitszeiten, Deutschkurs, and responses to four matching partner questions. Accept diverse correct A2 formulations.",
+          "teil2": "Assess a 1–2 minute personal response covering activity, company, preferred place, frequency of free time, plus meaningful answers to weather and nature-vs-city followups. Do not require a specific personal preference.",
+          "teil3": "Assess interaction and collaboration: time and place, gift and contributions, food/drink responsibilities, and invitation channels/timing. Reward proposals, partner response, negotiation and a shared plan, not merely monologue.",
+          "global": "Focus on task completion, comprehensibility, appropriate A2 grammar/vocabulary, interaction and pronunciation evidenced by the recording. Do not penalize accents or alternate legitimate responses. Never assume missing transcript text was spoken; do not hallucinate partner turns."
+        }
+      }
+    },
+    "a1-mock-02": {
+      "level": "A1",
+      "writing": {
+        "id": "a1-mock-02-housewarming",
+        "title": "Einladung zur Einweihungsparty",
+        "register": "Informal",
+        "recipient": "Markus",
+        "wordTarget": 30,
+        "situation": "Sie haben eine neue Wohnung gefunden und möchten eine kleine Einweihungsparty (Housewarming Party) feiern. Laden Sie Ihren Freund Markus ein.",
+        "instruction": "Schreiben Sie eine kurze E-Mail an Ihren Freund Markus. Schreiben Sie zu allen drei Punkten (ca. 30 Wörter). Vergessen Sie nicht die Anrede und den Gruß!",
+        "points": [
+          "Grund des Schreibens: Einladung zur Party.",
+          "Wann und wo? Tag, Uhrzeit, Adresse.",
+          "Mitbringen: Was soll Markus mitbringen?"
+        ],
+        "contentKeys": [
+          "invitation",
+          "when_where",
+          "bring"
+        ],
+        "form": {
+          "scenario": [
+            "Ihre Bekannte, Frau Elena Rossi, möchte an einem Sprachkurs in Berlin teilnehmen. Sie füllen für sie das Anmeldeformular aus.",
+            "Ihre Bekannte, Elena Rossi, kommt aus Italien (Rom). Sie ist 26 Jahre alt und möchte im August einen Deutschkurs an der Sprachschule Berlin besuchen. Sie reist mit ihrem Ehemann und zwei Kindern nach Berlin. Während des Kurses wohnt die Familie im Hotel Central, Hauptstraße 14, 10117 Berlin. Frau Rossi hat bereits Deutsch gelernt und hat das Sprachniveau A1. Sie möchte die Kursgebühr bar vor Ort bezahlen."
+          ],
+          "instruction": "Schreiben Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Formular.",
+          "formRows": [
+            {
+              "kind": "prefilled",
+              "label": "Familienname",
+              "value": "Rossi"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Vorname",
+              "value": "Elena"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Heimatland",
+              "value": "Italien"
+            },
+            {
+              "kind": "input",
+              "number": 1,
+              "label": "Anzahl der mitreisenden Familienmitglieder",
+              "answer": "3",
+              "alternatives": [
+                "drei"
+              ],
+              "explanation": "Ehemann + 2 Kinder = 3 mitreisende Familienmitglieder. Elena selbst zählt hier nicht mit."
+            },
+            {
+              "kind": "input",
+              "number": 2,
+              "label": "Adresse in Berlin",
+              "answer": "Hotel Central, Hauptstraße 14, 10117 Berlin",
+              "alternatives": [
+                "Hotel Central, Hauptstraße 14"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 3,
+              "label": "Deutschkenntnisse (Niveau)",
+              "answer": "A1",
+              "alternatives": [
+                "Grundkenntnisse"
+              ]
+            },
+            {
+              "kind": "input",
+              "number": 4,
+              "label": "Wunschmonat für den Kurs",
+              "answer": "August",
+              "alternatives": []
+            },
+            {
+              "kind": "input",
+              "number": 5,
+              "label": "Bezahlung (wie?)",
+              "answer": "Bar",
+              "alternatives": [
+                "Barzahlung"
+              ]
+            }
+          ]
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich anhand der Stichpunkte auf der Karte vor. Der Prüfer stellt Ihnen danach noch 1–2 Fragen (z. B. Buchstabieren oder eine Zahl nennen).",
+          "card": [
+            "Name?",
+            "Alter?",
+            "Land?",
+            "Wohnort?",
+            "Sprachen?",
+            "Beruf?",
+            "Hobby?"
+          ],
+          "followUp": "Prüferfragen für diese Aufnahme: Wie buchstabieren Sie Ihren Familiennamen? Wie lautet Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen."
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Informationen erfragen und geben",
+          "context": "Thema: Einkaufen",
+          "maxRecordingSeconds": 60,
+          "prompt": "Sie ziehen eine Karte mit einem Thema und einem Wort. Stellen Sie Ihrem Partner eine Frage und antworten Sie auf die Frage Ihres Partners.",
+          "keyword": "Bäckerei",
+          "followUp": "Stellen Sie zuerst Ihre Frage zum Thema Einkaufen mit dem Wort „Bäckerei“. Beantworten Sie danach diese Partnerfrage: Was kaufen Sie in der Bäckerei?"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Bitten formulieren und darauf reagieren",
+          "context": "Höfliche Bitte",
+          "maxRecordingSeconds": 60,
+          "prompt": "Sie ziehen eine Karte mit einem Bild. Formulieren Sie eine höfliche Bitte an Ihren Partner. Der Partner reagiert darauf.",
+          "picture": "pencil",
+          "pictureAlt": "Ein Bleistift",
+          "followUp": "Formulieren Sie zuerst eine höfliche Bitte zum Bild. Reagieren Sie danach auf diese Partnerbitte: Können Sie mir bitte einen Stift geben?"
+        }
+      ],
+      "readingAnswerKey": {
+        "t1-1": "falsch",
+        "t1-2": "richtig",
+        "t1-3": "richtig",
+        "t1-4": "richtig",
+        "t1-5": "falsch",
+        "t2-6": "a",
+        "t2-7": "b",
+        "t2-8": "b",
+        "t2-9": "a",
+        "t2-10": "b",
+        "t3-11": "falsch",
+        "t3-12": "richtig",
+        "t3-13": "richtig",
+        "t3-14": "richtig",
+        "t3-15": "falsch"
+      },
+      "listeningAnswerKey": {
+        "t1-1": "b",
+        "t1-2": "b",
+        "t1-3": "c",
+        "t1-4": "a",
+        "t1-5": "a",
+        "t2-6": "b",
+        "t2-7": "b",
+        "t2-8": "c",
+        "t2-9": "b",
+        "t2-10": "c",
+        "t3-11": "b",
+        "t3-12": "c",
+        "t3-13": "b",
+        "t3-14": "c",
+        "t3-15": "a"
+      }
+    },
+    "a1-mock-03": {
+      "level": "A1",
+      "writing": {
+        "id": "a1-mock-03-anna-dinner",
+        "title": "Einladung zum Essen",
+        "register": "Informal",
+        "recipient": "Anna",
+        "wordTarget": 30,
+        "situation": "Sie möchten Ihre Freundin Anna am Wochenende zum Essen zu sich nach Hause einladen.",
+        "instruction": "Schreiben Sie eine kurze E-Mail an Ihre Freundin Anna. Schreiben Sie ca. 30 Wörter und gehen Sie auf alle drei Punkte ein. Vergessen Sie nicht die Anrede und den Gruß!",
+        "points": [
+          "Grund des Schreibens: Einladung zum Essen.",
+          "Wann? Nennen Sie einen Tag am Wochenende und eine Uhrzeit.",
+          "Mitbringen: Fragen Sie Anna, ob sie ein Dessert oder Getränke mitbringen kann."
+        ],
+        "contentKeys": [
+          "invitation",
+          "when",
+          "bring"
+        ],
+        "form": {
+          "scenario": [
+            "Ihre Bekannte Eva Miller möchte an einer Sprachschule einen Deutschkurs besuchen. Helfen Sie ihr und tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+            "Eva Miller kommt aus Kanada und wohnt seit zwei Wochen in Berlin (Postleitzahl: 10115, Hauptstraße 12). Sie ist 28 Jahre alt und arbeitet als Architektin. Sie möchte ab dem 1. November einen Abendkurs für Deutsch auf der Stufe A1 besuchen. Sie bezahlt die Kursgebühr in bar."
+          ],
+          "instruction": "Tragen Sie die 5 fehlenden Informationen (Aufgaben 1–5) in das Anmeldeformular ein.",
+          "formRows": [
+            {
+              "kind": "prefilled",
+              "label": "Familienname",
+              "value": "Miller"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Vorname",
+              "value": "Eva"
+            },
+            {
+              "kind": "prefilled",
+              "label": "Straße, Hausnummer",
+              "value": "Hauptstraße 12"
+            },
+            {
+              "kind": "input",
+              "number": 1,
+              "label": "Wohnort / PLZ",
+              "answer": "10115 Berlin",
+              "alternatives": [
+                "Berlin 10115"
+              ],
+              "explanation": "Eva wohnt in Berlin mit der Postleitzahl 10115."
+            },
+            {
+              "kind": "input",
+              "number": 2,
+              "label": "Herkunftsland",
+              "answer": "Kanada",
+              "alternatives": [
+                "Canada"
+              ],
+              "explanation": "Eva kommt aus Kanada."
+            },
+            {
+              "kind": "input",
+              "number": 3,
+              "label": "Beruf",
+              "answer": "Architektin",
+              "alternatives": [],
+              "explanation": "Eva arbeitet als Architektin."
+            },
+            {
+              "kind": "choice",
+              "number": 4,
+              "label": "Gewünschter Kurs",
+              "answer": "Abendkurs",
+              "options": [
+                {
+                  "value": "Vormittagskurs",
+                  "label": "Vormittagskurs"
+                },
+                {
+                  "value": "Abendkurs",
+                  "label": "Abendkurs"
+                }
+              ],
+              "explanation": "Eva möchte einen Deutschkurs am Abend."
+            },
+            {
+              "kind": "input",
+              "number": 5,
+              "label": "Gewünschte Sprachstufe",
+              "answer": "A1",
+              "alternatives": [
+                "A 1"
+              ],
+              "explanation": "Eva möchte den Deutschkurs auf der Stufe A1 besuchen."
+            }
+          ]
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich anhand der folgenden Stichpunkte vor. Antworten Sie danach auf die möglichen Prüferfragen.",
+          "card": [
+            "Name?",
+            "Alter?",
+            "Land?",
+            "Wohnort?",
+            "Sprachen?",
+            "Beruf?",
+            "Hobby?"
+          ],
+          "followUp": "Mögliche Prüferfragen: 1. Können Sie Ihren Familiennamen bitte buchstabieren? 2. Wie ist Ihre Telefonnummer? Sie können eine erfundene Telefonnummer nennen."
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Um Informationen bitten und Informationen geben",
+          "context": "Thema: Einkaufen",
+          "maxRecordingSeconds": 60,
+          "prompt": "Stellen Sie Ihrem Partner / Ihrer Partnerin eine Frage zu der folgenden Karte. Thema: Einkaufen. Wort: Brot.",
+          "keyword": "Brot"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Bitten formulieren und darauf reagieren",
+          "context": "Eine höfliche Bitte",
+          "maxRecordingSeconds": 60,
+          "prompt": "Formulieren Sie eine passende höfliche Bitte zur Bildkarte: Ein Glas Wasser.",
+          "picture": "glass-water",
+          "pictureAlt": "Ein Glas Wasser"
+        }
+      ],
+      "readingAnswerKey": {
+        "t1-1": "richtig",
+        "t1-2": "falsch",
+        "t1-3": "richtig",
+        "t1-4": "falsch",
+        "t1-5": "richtig",
+        "t2-6": "a",
+        "t2-7": "a",
+        "t2-8": "b",
+        "t2-9": "a",
+        "t2-10": "a",
+        "t3-11": "falsch",
+        "t3-12": "richtig",
+        "t3-13": "richtig",
+        "t3-14": "falsch",
+        "t3-15": "falsch"
+      },
+      "listeningAnswerKey": {
+        "t1-1": "b",
+        "t1-2": "a",
+        "t1-3": "b",
+        "t1-4": "a",
+        "t1-5": "b",
+        "t1-6": "b",
+        "t2-7": "a",
+        "t2-8": "c",
+        "t2-9": "b",
+        "t2-10": "b",
+        "t3-11": "b",
+        "t3-12": "c",
+        "t3-13": "c",
+        "t3-14": "b",
+        "t3-15": "b"
+      }
+    }
+  },
+  "writing": {
+    "a1-apartment-note": {
+      "id": "a1-apartment-note",
+      "letter": "A1: Notiz an die Mitbewohnerin",
+      "level": "A1",
+      "tags": [
+        "note",
+        "household"
+      ],
+      "durationMinutes": 15,
+      "situation": "Du musst früher zur Arbeit und hinterlässt eine kurze Nachricht für deine Mitbewohnerin.",
+      "whatToInclude": [
+        "Grund der Nachricht (früher weg, Termin)",
+        "Bitte, den Müll rauszubringen oder das Fenster zu schließen",
+        "Wo du den Schlüssel lässt",
+        "Höflicher Abschluss"
+      ]
+    },
+    "a1-birthday-invite": {
+      "id": "a1-birthday-invite",
+      "letter": "A1: Einladung zum Geburtstag",
+      "level": "A1",
+      "tags": [
+        "birthday",
+        "invitation"
+      ],
+      "durationMinutes": 15,
+      "situation": "Du lädst eine Freundin oder einen Freund zu deinem Geburtstag ein.",
+      "whatToInclude": [
+        "Wann und wo die Feier ist",
+        "Was ihr machen wollt",
+        "Bitte um Antwort",
+        "Freundlicher Abschluss"
+      ]
+    },
+    "a2-library-email": {
+      "id": "a2-library-email",
+      "letter": "A2: E-Mail an die Bibliothek",
+      "level": "A2",
+      "tags": [
+        "reservation",
+        "request"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du möchtest ein deutsches Buch verlängern und fragst nach Kursmaterialien.",
+      "whatToInclude": [
+        "Buchtitel und Datum der Ausleihe",
+        "Bitte um Verlängerung und neue Rückgabefrist",
+        "Frage nach einfachen Deutschkurs-Materialien",
+        "Kontakt und Dank"
+      ]
+    },
+    "a2-course-feedback": {
+      "id": "a2-course-feedback",
+      "letter": "A2: Rückmeldung zum Sprachkurs",
+      "level": "A2",
+      "tags": [
+        "feedback",
+        "course"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du schreibst deiner Sprachschule, was dir hilft und was dir noch schwer fällt.",
+      "whatToInclude": [
+        "Welche Übungen gefallen dir? (z. B. Dialoge, Hörtexte)",
+        "Welche Themen sind schwer? (z. B. Grammatik, Aussprache)",
+        "Konkreter Wunsch für den Unterricht",
+        "Bitte um Antwort"
+      ]
+    },
+    "b1-job-application": {
+      "id": "b1-job-application",
+      "letter": "B1: Bewerbung auf einen Minijob",
+      "level": "B1",
+      "tags": [
+        "application",
+        "job"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du bewirbst dich für einen Minijob im Café deiner Stadt.",
+      "whatToInclude": [
+        "Wer du bist und wo du Deutsch lernst",
+        "Warum dich der Job interessiert",
+        "Welche Erfahrung du hast (Service, Kundenkontakt)",
+        "Wann du arbeiten kannst und Bitte um Rückmeldung"
+      ]
+    },
+    "b1-complaint-delivery": {
+      "id": "b1-complaint-delivery",
+      "letter": "B1: Beschwerde an einen Lieferdienst",
+      "level": "B1",
+      "tags": [
+        "complaint",
+        "service"
+      ],
+      "durationMinutes": 20,
+      "situation": "Die letzte Lieferung kam zu spät und war unvollständig.",
+      "whatToInclude": [
+        "Bestellnummer, Datum und was gefehlt hat",
+        "Welche Probleme entstanden sind",
+        "Was du als Lösung möchtest (Rückerstattung, erneute Lieferung)",
+        "Höflicher Abschluss mit Kontakt"
+      ]
+    },
+    "b2-opinion-digital": {
+      "id": "b2-opinion-digital",
+      "letter": "B2: Meinung zum digitalen Lernen",
+      "level": "B2",
+      "tags": [
+        "opinion",
+        "article"
+      ],
+      "durationMinutes": 20,
+      "situation": "Ein Magazin bittet dich um einen kurzen Artikel über digitales Lernen.",
+      "whatToInclude": [
+        "Deine Erfahrung mit Onlinekursen",
+        "Vorteile und Nachteile (Beispiele nennen)",
+        "Empfehlungen für Lernende",
+        "Schluss mit eigener Position"
+      ]
+    },
+    "b2-formal-request": {
+      "id": "b2-formal-request",
+      "letter": "B2: Anfrage an das Rathaus",
+      "level": "B2",
+      "tags": [
+        "appointment",
+        "formal request"
+      ],
+      "durationMinutes": 20,
+      "situation": "Du planst ein Nachbarschaftsprojekt und bittest die Stadt um Unterstützung.",
+      "whatToInclude": [
+        "Kurze Vorstellung des Projekts und Ziels",
+        "Welche Unterstützung du brauchst (Raum, Material, Werbung)",
+        "Zeitraum und Nutzen für die Stadt",
+        "Bitte um Rückmeldung oder Gespräch"
+      ]
+    },
+    "a1-existing-letter-1": {
+      "id": "a1-existing-letter-1",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten im Sommer nach Berlin reisen und brauchen ein Hotelzimmer. Schreiben Sie eine E-Mail an das Hotel „Berliner Hof“.",
+      "whatToInclude": [
+        "Ankunftsdatum und Dauer: Wann kommen Sie an? Wie lange bleiben Sie?",
+        "Zimmerwunsch: Einzelzimmer oder Doppelzimmer mit Frühstück?",
+        "Preis: Fragen Sie nach dem Preis."
+      ]
+    },
+    "a1-existing-letter-2": {
+      "id": "a1-existing-letter-2",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Ihr Freund Michael feiert am Samstag Geburtstag und hat Sie eingeladen. Schreiben Sie eine E-Mail an Michael.",
+      "whatToInclude": [
+        "Zusage: Sagen Sie, dass Sie gerne zur Party kommen.",
+        "Geschenk: Fragen Sie, was Michael sich wünscht oder was Sie mitbringen sollen.",
+        "Uhrzeit: Fragen Sie, wann die Party beginnt."
+      ]
+    },
+    "a1-existing-letter-3": {
+      "id": "a1-existing-letter-3",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie sind krank und können am Donnerstag nicht zum Deutschkurs kommen. Schreiben Sie an Ihre Lehrerin, Frau Müller.",
+      "whatToInclude": [
+        "Grund: Sagen Sie, dass Sie krank sind.",
+        "Entschuldigung: Sagen Sie, dass Sie am Donnerstag fehlen.",
+        "Hausaufgaben: Fragen Sie nach den Hausaufgaben."
+      ]
+    },
+    "a1-existing-letter-4": {
+      "id": "a1-existing-letter-4",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten einen Deutschkurs bei der Sprachschule „Aktiv“ machen. Schreiben Sie eine E-Mail an die Sprachschule.",
+      "whatToInclude": [
+        "Kursstart: Fragen Sie, wann der nächste A1-Kurs beginnt.",
+        "Kurszeiten: Fragen Sie, ob es Abendkurse gibt.",
+        "Kosten: Fragen Sie, wie viel der Kurs kostet."
+      ]
+    },
+    "a1-existing-letter-5": {
+      "id": "a1-existing-letter-5",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten sich am Wochenende mit Ihrer Freundin Sarah in der Stadt treffen. Schreiben Sie an Sarah.",
+      "whatToInclude": [
+        "Vorschlag: Schlagen Sie ein Treffen am Samstag vor.",
+        "Aktivität: Schlagen Sie Kaffee trinken oder Kino vor.",
+        "Treffpunkt und Uhrzeit: Fragen oder sagen Sie, wo und wann Sie sich treffen."
+      ]
+    },
+    "a1-existing-letter-6": {
+      "id": "a1-existing-letter-6",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie planen eine Reise nach Hamburg. Schreiben Sie an die Touristeninformation Hamburg.",
+      "whatToInclude": [
+        "Stadtplan: Bitten Sie um einen Stadtplan.",
+        "Informationen: Fragen Sie nach Ausflugstipps oder einer Hafenrundfahrt.",
+        "Zuschicken: Bitten Sie darum, Prospekte per Post oder E-Mail zu senden."
+      ]
+    },
+    "a1-existing-letter-7": {
+      "id": "a1-existing-letter-7",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie haben im Internet ein gebrauchtes Fahrrad gesehen und möchten es kaufen. Schreiben Sie an den Verkäufer, Herrn Weber.",
+      "whatToInclude": [
+        "Interesse: Sagen Sie, dass Sie das Fahrrad kaufen möchten.",
+        "Zustand: Fragen Sie nach dem Alter oder Zustand des Fahrrads.",
+        "Termin: Fragen Sie nach einem Termin für eine Probefahrt."
+      ]
+    },
+    "a1-existing-letter-8": {
+      "id": "a1-existing-letter-8",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Sie möchten im Sportverein „Fit & Aktiv“ Mitglied werden. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Probetraining: Fragen Sie nach einem kostenlosen Probetraining.",
+        "Öffnungszeiten: Fragen Sie nach den Öffnungszeiten am Wochenende.",
+        "Mitgliedsbeitrag: Fragen Sie, wie viel die Mitgliedschaft pro Monat kostet."
+      ]
+    },
+    "a1-existing-letter-9": {
+      "id": "a1-existing-letter-9",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 30 words",
+      "situation": "Ihre Bekannte Lisa hat Sie für das Wochenende zu sich nach München eingeladen. Schreiben Sie an Lisa.",
+      "whatToInclude": [
+        "Dank: Bedanken Sie sich für die Einladung.",
+        "Ankunftszeit: Sagen Sie, wann Sie am Bahnhof ankommen.",
+        "Verkehrsmittel: Sagen Sie, wie Sie reisen, zum Beispiel mit dem Zug."
+      ]
+    },
+    "a1-existing-letter-10": {
+      "id": "a1-existing-letter-10",
+      "level": "A1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 30 words",
+      "situation": "Die Heizung in Ihrer Wohnung ist kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Problem: Sagen Sie, dass die Heizung nicht funktioniert und die Wohnung kalt ist.",
+        "Termin: Sagen Sie, wann Sie für den Handwerker zu Hause sind.",
+        "Rückruf: Bitten Sie um eine schnelle Reparatur oder einen Anruf."
+      ]
+    },
+    "a2-sms-01": {
+      "id": "a2-sms-01",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie sind unterwegs in der Stadt und verspäten sich zu einem Treffen mit Ihrer Freundin Anna. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Entschuldigen Sie sich für die Verspätung.",
+        "Nennen Sie den Grund.",
+        "Schlagen Sie einen neuen Treffpunkt und eine neue Uhrzeit vor."
+      ]
+    },
+    "a2-sms-02": {
+      "id": "a2-sms-02",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Ihr Kollege Markus hat Sie zu seiner Geburtstagsparty am Samstag eingeladen. Schreiben Sie ihm eine SMS.",
+      "whatToInclude": [
+        "Danken Sie für die Einladung und sagen Sie zu.",
+        "Fragen Sie, was Sie mitbringen können.",
+        "Fragen Sie nach der Uhrzeit."
+      ]
+    },
+    "a2-sms-03": {
+      "id": "a2-sms-03",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie wollten am Freitag mit Ihrem Freund Alex ins Kino gehen, aber Sie sind krank geworden. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Sagen Sie das Treffen ab.",
+        "Erklären Sie, warum Sie nicht kommen können.",
+        "Schlagen Sie einen Termin für nächste Woche vor."
+      ]
+    },
+    "a2-sms-04": {
+      "id": "a2-sms-04",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie ziehen am Wochenende in eine neue Wohnung um und brauchen Hilfe. Schreiben Sie eine SMS an Ihren Mitschüler David.",
+      "whatToInclude": [
+        "Informieren Sie über Ihren Umzug am Samstag.",
+        "Bitten Sie David um Hilfe.",
+        "Bieten Sie ein Essen oder Pizza als Dankeschön an."
+      ]
+    },
+    "a2-sms-05": {
+      "id": "a2-sms-05",
+      "level": "A2",
+      "teil": "teil1",
+      "format": "message",
+      "register": null,
+      "wordTarget": "20–30 words",
+      "situation": "Sie möchten am Sonntag mit Ihrer Bekannten Sarah einen Ausflug zum See machen. Schreiben Sie eine SMS.",
+      "whatToInclude": [
+        "Schlagen Sie den Ausflug vor.",
+        "Fragen Sie nach dem Treffpunkt und der Abfahrtszeit.",
+        "Erwähnen Sie, was Sie für das Picknick mitbringen."
+      ]
+    },
+    "a2-email-01": {
+      "id": "a2-email-01",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie besuchen einen Deutschkurs bei Frau Weber. Morgen können Sie nicht zum Unterricht kommen, weil Sie einen Arzttermin haben. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Informieren Sie Frau Weber, dass Sie im Unterricht fehlen.",
+        "Nennen Sie den Grund: Arzttermin.",
+        "Bitten Sie um die Hausaufgaben für die nächste Stunde."
+      ]
+    },
+    "a2-email-02": {
+      "id": "a2-email-02",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "In Ihrer Mietwohnung ist seit gestern die Heizung kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Informieren Sie über das Problem mit der Heizung.",
+        "Bitten Sie um einen schnellen Reparaturtermin.",
+        "Nennen Sie Ihre Erreichbarkeit (Telefonnummer oder Uhrzeit)."
+      ]
+    },
+    "a2-email-03": {
+      "id": "a2-email-03",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie sind krank und können heute nicht zur Arbeit kommen. Schreiben Sie eine E-Mail an Ihre Chefin, Frau Müller.",
+      "whatToInclude": [
+        "Informieren Sie über Ihre Krankheit und Abwesenheit.",
+        "Nennen Sie die voraussichtliche Dauer.",
+        "Sagen Sie, dass das ärztliche Attest folgt."
+      ]
+    },
+    "a2-email-04": {
+      "id": "a2-email-04",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie möchten an der Volkshochschule einen B1-Deutschkurs besuchen. Schreiben Sie eine E-Mail an die Kursleitung, Herrn Braun.",
+      "whatToInclude": [
+        "Erklären Sie Ihr Interesse am B1-Kurs.",
+        "Fragen Sie nach den Kurstagen und Uhrzeiten.",
+        "Fragen Sie nach den Kursgebühren."
+      ]
+    },
+    "a2-email-05": {
+      "id": "a2-email-05",
+      "level": "A2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "30–40 words",
+      "situation": "Sie haben ein Zimmer im Hotel „Sonnhof“ gebucht, müssen aber Ihre Anreise um einen Tag verschieben. Schreiben Sie eine E-Mail an die Rezeption.",
+      "whatToInclude": [
+        "Nennen Sie Ihre Reservierung oder Ihren Namen.",
+        "Erklären Sie die Änderung: Anreise erst am Samstag statt Freitag.",
+        "Bitten Sie um eine kurze Bestätigung."
+      ]
+    },
+    "b1-invitation": {
+      "id": "b1-invitation",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Dein Freund Lukas hat dich zu seiner Geburtstagsfeier am Samstag eingeladen. Du kannst leider nicht kommen. Schreibe ihm eine E-Mail.",
+      "whatToInclude": [
+        "Entschuldige dich für deine Absage.",
+        "Erkläre, warum du nicht kommen kannst.",
+        "Schlage ein Treffen an einem anderen Tag vor."
+      ]
+    },
+    "b1-move": {
+      "id": "b1-move",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Du bist vor Kurzem umgezogen. Schreibe eine E-Mail an einen Freund.",
+      "whatToInclude": [
+        "Beschreibe deine neue Wohnung.",
+        "Erkläre, warum du umgezogen bist.",
+        "Lade deinen Freund zu einem Besuch ein."
+      ]
+    },
+    "b1-trip": {
+      "id": "b1-trip",
+      "level": "B1",
+      "teil": "teil1",
+      "format": "email",
+      "register": "informal",
+      "wordTarget": "about 80 words",
+      "situation": "Deine Freundin möchte mit dir einen Ausflug machen. Antworte ihr.",
+      "whatToInclude": [
+        "Schlage ein Ziel vor.",
+        "Erkläre, was ihr dort machen könnt.",
+        "Vereinbare Treffpunkt und Zeit."
+      ]
+    },
+    "b1-online": {
+      "id": "b1-online",
+      "level": "B1",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 80 words",
+      "situation": "In einem Internetforum wird diskutiert: Ist Online-Lernen besser als Unterricht in einer Schule? Schreibe deine Meinung.",
+      "whatToInclude": [
+        "Nenne deine Meinung.",
+        "Begründe sie mit mindestens zwei Argumenten.",
+        "Gib ein Beispiel aus deiner Erfahrung."
+      ]
+    },
+    "b1-transport": {
+      "id": "b1-transport",
+      "level": "B1",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 80 words",
+      "situation": "Im Forum diskutieren die Mitglieder, ob mehr Menschen das Fahrrad benutzen sollten.",
+      "whatToInclude": [
+        "Äußere deine Meinung.",
+        "Nenne einen Vorteil und einen Nachteil.",
+        "Begründe deinen Standpunkt."
+      ]
+    },
+    "b1-cancel": {
+      "id": "b1-cancel",
+      "level": "B1",
+      "teil": "teil3",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 40 words",
+      "situation": "Du hast morgen einen Termin mit deiner Kursleiterin Frau Müller, kannst aber nicht kommen. Schreibe ihr.",
+      "whatToInclude": [
+        "Entschuldige dich.",
+        "Nenne einen Grund.",
+        "Bitte um einen neuen Termin."
+      ]
+    },
+    "b1-seminar": {
+      "id": "b1-seminar",
+      "level": "B1",
+      "teil": "teil3",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 40 words",
+      "situation": "Du möchtest an einem beruflichen Seminar teilnehmen. Schreibe dem Veranstalter.",
+      "whatToInclude": [
+        "Erkläre dein Interesse.",
+        "Frage nach den Terminen.",
+        "Bitte um Informationen zu den Kosten."
+      ]
+    },
+    "b2-homeoffice": {
+      "id": "b2-homeoffice",
+      "level": "B2",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 150 words",
+      "situation": "In einem Onlineforum wird über Homeoffice diskutiert. Schreiben Sie einen begründeten Beitrag.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Meinung.",
+        "Nennen Sie Gründe und Beispiele.",
+        "Gehen Sie auf Vor- und Nachteile ein.",
+        "Schlagen Sie Alternativen vor."
+      ]
+    },
+    "b2-environment": {
+      "id": "b2-environment",
+      "level": "B2",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 150 words",
+      "situation": "Diskutieren Sie in einem Forum Maßnahmen gegen Plastikmüll.",
+      "whatToInclude": [
+        "Formulieren Sie Ihre Position.",
+        "Beschreiben Sie Vorteile und Schwierigkeiten.",
+        "Nennen Sie eigene Erfahrungen.",
+        "Machen Sie Vorschläge."
+      ]
+    },
+    "b2-shift": {
+      "id": "b2-shift",
+      "level": "B2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 100 words",
+      "situation": "Sie möchten Ihre Arbeitszeit vorübergehend ändern. Schreiben Sie an Ihre Vorgesetzte.",
+      "whatToInclude": [
+        "Beschreiben Sie Ihre Situation.",
+        "Erklären Sie den Grund.",
+        "Schlagen Sie eine Lösung vor.",
+        "Bitten Sie um ein Gespräch."
+      ]
+    },
+    "b2-project": {
+      "id": "b2-project",
+      "level": "B2",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 100 words",
+      "situation": "Eine Besprechung muss verschoben werden. Schreiben Sie an Ihre Kollegin.",
+      "whatToInclude": [
+        "Erläutern Sie den Anlass.",
+        "Begründen Sie die Verschiebung.",
+        "Schlagen Sie einen Ersatztermin vor.",
+        "Bitten Sie um Bestätigung."
+      ]
+    },
+    "c1-discussion-01": {
+      "id": "c1-discussion-01",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Karriere & Zukunft“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nStudieren – aber was? Für welches Studienfach sollte man sich entscheiden?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, nach welchen Kriterien sich die Wahl eines Studienfachs richten sollte.",
+        "Argumentieren Sie anhand eines konkreten Beispiels für ein bestimmtes Studienfach.",
+        "Nennen Sie Gründe, die gegen ein Hochschulstudium sprechen könnten.",
+        "Erläutern Sie eine sinnvolle Alternative zum klassischen Studium."
+      ]
+    },
+    "c1-discussion-02": {
+      "id": "c1-discussion-02",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Arbeitswelt im Wandel“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nMobiles Arbeiten: Fluch oder Segen für die Karriere?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Meinung zur zunehmenden Verlegung des Arbeitsplatzes ins Homeoffice.",
+        "Nennen Sie Gründe oder Kriterien, warum viele Arbeitnehmer das flexible Arbeiten bevorzugen.",
+        "Argumentieren Sie anhand eines Beispiels für die Nachteile oder Risiken reiner Heimarbeit.",
+        "Schlagen Sie eine zielführende Lösung oder ein modernes Arbeitszeitmodell vor."
+      ]
+    },
+    "c1-discussion-03": {
+      "id": "c1-discussion-03",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Bildung & Digitales“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nKünstliche Intelligenz an Schulen und Universitäten\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie Ihre Haltung zum Einsatz von KI-Tools (wie Chatbots) im Unterricht und bei Hausarbeiten.",
+        "Nennen Sie Argumente und ein konkretes Beispiel für den Nutzen digitaler Assistenzsysteme im Lernalltag.",
+        "Führen Sie Bedenken an, die Lehrende gegenüber dieser Entwicklung äußern.",
+        "Erläutern Sie, wie Bildungseinrichtungen sinnvoll mit KI-Technologien umgehen sollten."
+      ]
+    },
+    "c1-discussion-04": {
+      "id": "c1-discussion-04",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Umwelt & Gesellschaft“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nMinimalismus und Konsumverzicht: Brauchen wir weniger Zeug?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Nehmen Sie Stellung zum Trend des bewussten Konsumverzichts im Alltag.",
+        "Nennen Sie Ursachen für das steigende Interesse an einem nachhaltigen Lebensstil.",
+        "Argumentieren Sie anhand eines Beispiels für Hürden, die einem minimalistischen Leben im Wege stehen.",
+        "Erläutern Sie eine Alternative, wie Bürger im Alltag einen Beitrag zum Umweltschutz leisten können."
+      ]
+    },
+    "c1-discussion-05": {
+      "id": "c1-discussion-05",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Finanzen & Alltag“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nAbschaffung des Bargeldes: Auf dem Weg zur digitalen Währung\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, welche Vor- und Nachteile das ausschließliche Zahlen mit Karte oder Smartphone hat.",
+        "Argumentieren Sie anhand eines Beispiels für die Risiken einer bargeldlosen Gesellschaft (z. B. Datenschutz, Ausfall von Systemen).",
+        "Nennen Sie Gründe, warum manche Bevölkerungsgruppen weiterhin am Bargeld festhalten.",
+        "Schlagen Sie einen Kompromiss für die zukünftige Gestaltung von Zahlungssystemen vor."
+      ]
+    },
+    "c1-discussion-06": {
+      "id": "c1-discussion-06",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Wirtschaft & Leben“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nWeniger arbeiten bei gleichem Gehalt: Ist die 4-Tage-Woche zukunftsfähig?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Meinung zur Einführung einer Vier-Tage-Woche in Unternehmen.",
+        "Nennen Sie Kriterien und Argumente, die aus Sicht der Beschäftigten für dieses Modell sprechen.",
+        "Argumentieren Sie anhand eines Beispiels (z. B. Pflege, Handwerk) für Branchen, in denen die Umsetzung schwierig ist.",
+        "Erläutern Sie eine alternative Möglichkeit zur Verbesserung der Work-Life-Balance."
+      ]
+    },
+    "c1-discussion-07": {
+      "id": "c1-discussion-07",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Familie & Medien“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nSoziale Medien und Jugendliche: Wie viel Bildschirmzeit ist gesund?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, welche Rolle soziale Netzwerke im Leben heutiger Jugendlicher spielen.",
+        "Argumentieren Sie anhand eines konkreten Beispiels für die positiven Aspekte digitaler Vernetzung.",
+        "Nennen Sie Risiken und Gefahren einer übermäßigen Nutzung sozialer Medien.",
+        "Schlagen Sie vor, welche Maßnahmen Eltern und Schulen ergreifen sollten."
+      ]
+    },
+    "c1-discussion-08": {
+      "id": "c1-discussion-08",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Reisen & Ökologie“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nKlimafreundliches Reisen: Fliegen neu überdenken?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Nehmen Sie Stellung zum Einfluss des internationalen Flugverkehrs auf das Klima.",
+        "Nennen Sie Gründe, warum Kurzstreckenflüge nach wie vor häufig genutzt werden.",
+        "Argumentieren Sie anhand eines Beispiels für die Vorzüge nachhaltiger Reisealternativen (z. B. Nachtzüge, Nahverkehr).",
+        "Erläutern Sie Maßnahmen, wie nachhaltiger Tourismus in Zukunft gefördert werden kann."
+      ]
+    },
+    "c1-discussion-09": {
+      "id": "c1-discussion-09",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Weiterbildung & Arbeitswelt“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nStändige Weiterbildung: Pflicht oder Chance für Arbeitnehmer?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Erklären Sie, warum kontinuierliche Fortbildung im heutigen Berufsleben immer wichtiger wird.",
+        "Nennen Sie Vorteile, die sich für Beschäftigte durch regelmäßige Qualifizierungsmaßnahmen ergeben.",
+        "Argumentieren Sie anhand eines Beispiels für Schwierigkeiten bei der Vereinbarkeit von Beruf, Familie und Weiterbildung.",
+        "Schlagen Sie vor, wie Unternehmen ihre Mitarbeiter bei der Fortbildung unterstützen können."
+      ]
+    },
+    "c1-discussion-10": {
+      "id": "c1-discussion-10",
+      "level": "C1",
+      "teil": "teil1",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 230 words",
+      "situation": "Für das Internetforum „Stadt & Land“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:\n\nGroßstadtfrust oder Landliebe: Wo liegt die Zukunft des Wohnens?\n\nSchreiben Sie circa 230 Wörter.",
+      "whatToInclude": [
+        "Äußern Sie Ihre Ansicht zur Attraktivität des Lebens in der Großstadt im Vergleich zum ländlichen Raum.",
+        "Nennen Sie Kriterien, die für junge Familien bei der Wahl des Wohnortes entscheidend sind.",
+        "Argumentieren Sie anhand eines Beispiels für die Herausforderungen ländlicher Regionen (z. B. Infrastruktur, Anbindung).",
+        "Erläutern Sie eine Lösung, wie das Leben außerhalb von Metropolen attraktiv gestaltet werden kann."
+      ]
+    },
+    "c1-email-01": {
+      "id": "c1-email-01",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Während Ihres Urlaubs ist Ihre Abteilung in ein neues Gebäude umgezogen. Nach Ihrer Rückkehr stellen Sie fest, dass Sie nicht mehr in einem Zweierbüro arbeiten, sondern in einem Großraumbüro mit acht Personen.\n\nEmpfänger/-in: Ihre Vorgesetzte, Frau Dr. Menzel\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Eröffnen Sie Ihr Schreiben höflich und zeigen Sie Verständnis für organisatorische Notwendigkeiten.",
+        "Nennen Sie konkrete Tätigkeiten (z. B. vertrauliche Telefonate, Kundengespräche), die durch die Unruhe beeinträchtigt werden.",
+        "Beschreiben Sie Bedingungen, die für Sie akzeptabel wären.",
+        "Machen Sie einen konkreten Kompromissvorschlag (z. B. Trennwände, teilweise Nutzung eines Besprechungsraums)."
+      ]
+    },
+    "c1-email-02": {
+      "id": "c1-email-02",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Die Geschäftsführung hat kurzfristig beschlossen, die Anzahl der zulässigen Homeoffice-Tage von drei Tagen auf einen Tag pro Woche zu reduzieren.\n\nEmpfänger/-in: Der Leiter der Personalabteilung, Herr Dr. Weber\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Zeigen Sie höflich Verständnis für das Anliegen der Geschäftsführung nach mehr Präsenz vor Ort.",
+        "Erläutern Sie die persönlichen oder beruflichen Schwierigkeiten, die diese spontane Umstellung verursacht.",
+        "Beschreiben Sie Bedingungen, unter denen eine erhöhte Präsenzzeit für Sie machbar wäre.",
+        "Schlagen Sie einen schrittweisen Übergang oder eine flexible Kernarbeitszeit als Kompromiss vor."
+      ]
+    },
+    "c1-email-03": {
+      "id": "c1-email-03",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "In Ihrer Abteilung wurde am Wochenende eine neue, komplexe Projektmanagement-Software eingeführt, ohne dass das Team vorab geschult wurde. Dadurch verzögern sich wichtige Kundenprojekte.\n\nEmpfänger/-in: Der IT-Projektleiter, Herr Becker\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Bedanken Sie sich höflich für die Modernisierung der IT-Infrastruktur.",
+        "Schildern Sie konkrete Arbeitsabläufe, die durch fehlende Einarbeitung ins Stocken geraten sind.",
+        "Formulieren Sie die Mindestanforderungen an eine funktionierende Arbeitsumgebung.",
+        "Schlagen Sie eine kompakte Eil-Schulung oder die temporäre Weiterbenutzung des Altsystems vor."
+      ]
+    },
+    "c1-email-04": {
+      "id": "c1-email-04",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Zwei für Ihren Studienabschluss obligatorische Modulprüfungen wurden vom Prüfungsamt auf denselben Tag und dieselbe Uhrzeit gelegt.\n\nEmpfänger/-in: Die Vorsitzende des Prüfungsamtes, Frau Prof. Dr. Neumann\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Drücken Sie Ihr Verständnis für den komplexen Koordinationsaufwand des Prüfungsamtes aus.",
+        "Stellen Sie die Überschneidung und die Konsequenzen für Ihren Studienverlauf dar.",
+        "Nennen Sie Rahmenbedingungen für eine faire Prüfungsteilnahme.",
+        "Unterbreiten Sie einen Kompromissvorschlag (z. B. Ausweichtermin oder mündliche Ersatzprüfung)."
+      ]
+    },
+    "c1-email-05": {
+      "id": "c1-email-05",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Die universitäre Zentralbibliothek hat kurz vor der Examensphase aus Energiespargründen die Öffnungszeiten am Wochenende drastisch verkürzt.\n\nEmpfänger/-in: Der Bibliotheksleiter, Herr Dr. Richter\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Äußern Sie höflich Verständnis für die Sparmaßnahmen der Universität.",
+        "Erläutern Sie, warum die verkürzten Zeiten Ihre Vorbereitung auf die Abschlussprüfung behindern.",
+        "Beschreiben Sie, welche Nutzungszeiten für Examenskandidaten essenziell sind.",
+        "Schlagen Sie eine pragmatische Lösung vor (z. B. Zugangsbeschränkung nur für Abschlussjahrgänge am Wochenende)."
+      ]
+    },
+    "c1-email-06": {
+      "id": "c1-email-06",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "In Ihrem Mietshaus finden unangekündigte, extrem laute Sanierungsarbeiten statt, die Ihr Arbeiten im Homeoffice massiv beeinträchtigen.\n\nEmpfänger/-in: Ihre Vermieterin, Frau Schneider\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Drücken Sie Verständnis für die Notwendigkeit von Instandhaltungsmaßnahmen aus.",
+        "Beschreiben Sie die konkreten Störungen Ihres Arbeitsalltags durch den Baulärm.",
+        "Nennen Sie Bedingungen, unter denen Sie die Arbeiten hinnehmen können.",
+        "Schlagen Sie eine temporäre Mietminderung oder die Vereinbarung fester Ruhezeiten vor."
+      ]
+    },
+    "c1-email-07": {
+      "id": "c1-email-07",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Ein von Ihnen seit Monaten gebuchter Fachkurs wurde von der Weiterbildungsakademie wegen Erkrankung des Dozenten kurzfristig abgesagt, ohne dass ein Ersatztermin angeboten wird.\n\nEmpfänger/-in: Die Studienleitung der Weiterbildungsakademie, Frau Keller\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Zeigen Sie höfliches Verständnis für krankheitsbedingte Ausfälle.",
+        "Erläutern Sie die beruflichen Nachteile, die Ihnen durch den Kursausfall entstehen.",
+        "Formulieren Sie Ihre Erwartungen an eine adäquate Fortbildung.",
+        "Schlagen Sie einen Kompromiss vor (z. B. ein Online-Ersatzmodul oder eine Gutschrift für das Folgesemester)."
+      ]
+    },
+    "c1-email-08": {
+      "id": "c1-email-08",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Das Ihnen bereits genehmigte Budget für die Teilnahme an einer internationalen Fachkonferenz wurde vom Abteilungsleiter kurz vor Anmeldeschluss um 50 % gekürzt.\n\nEmpfänger/-in: Ihr Abteilungsleiter, Herr Hoffmann\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Bedanken Sie sich für das bisherige Vertrauen und zeigen Sie Verständnis für aktuelle Budgeteinschränkungen.",
+        "Legen Sie dar, welche Präsentationen und Netzwerkmöglichkeiten durch die Kürzung gefährdet sind.",
+        "Beschreiben Sie, unter welchen Bedingungen eine Teilnahme dennoch gewinnbringend wäre.",
+        "Schlagen Sie eine Kofinanzierung oder die Beschränkung auf eine digitale Teilnahme vor."
+      ]
+    },
+    "c1-email-09": {
+      "id": "c1-email-09",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Lieferschwierigkeiten eines externen Partners machen es unmöglich, das internationale Kundenprojekt fristgerecht ohne Qualitätsverlust einzureichen.\n\nEmpfänger/-in: Der Gesamtprojektleiter, Herr Martinez\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Eröffnen Sie höflich und betonen Sie Ihr Engagement für das Projektziel.",
+        "Schildern Sie die externen Gründe, die die Einhaltung des Abgabetermins erschweren.",
+        "Erläutern Sie den Qualitätsstandard, den Sie für das Endergebnis anstreben.",
+        "Schlagen Sie einen realistischen Zwischenbericht sowie eine moderate Fristverlängerung vor."
+      ]
+    },
+    "c1-email-10": {
+      "id": "c1-email-10",
+      "level": "C1",
+      "teil": "teil2",
+      "format": "email",
+      "register": "formal",
+      "wordTarget": "about 120 words",
+      "situation": "Während einer anhaltenden Hitzewelle fällt im Bürogebäude wiederholt die Klimaanlage aus, sodass die Raumtemperaturen auf über 30 °C steigen.\n\nEmpfänger/-in: Der Gebäudemanager, Herr Vogel\n\nSchreiben Sie eine formelle E-Mail.",
+      "whatToInclude": [
+        "Zeigen Sie Verständnis für die hohe Auslastung der Haustechnik bei extremen Wetterlagen.",
+        "Nennen Sie Tätigkeiten und gesundheitliche Belastungen, die durch die Hitze erschwert werden.",
+        "Beschreiben Sie akzeptable Temperaturbedingungen für konzentriertes Arbeiten.",
+        "Schlagen Sie eine temporäre Übergangslösung vor (z. B. Bereitstellung von Ventilatoren oder flexible Arbeitszeiten in den Frühstunden)."
+      ]
+    },
+    "c2-transformations": {
+      "id": "c2-transformations",
+      "level": "C2",
+      "teil": "teil1",
+      "format": "transformation",
+      "register": null,
+      "wordTarget": null,
+      "situation": "Formulieren Sie die Sätze um. Die Bedeutung muss erhalten bleiben. Nutzen Sie das angegebene Schlüsselwort.",
+      "whatToInclude": [
+        "Achten Sie auf Bedeutung, Satzbau und Grammatik.",
+        "Tragen Sie jede Lösung in das zugehörige Feld ein."
+      ],
+      "transformations": [
+        {
+          "source": "Obwohl die Nachfrage gestiegen ist, bleiben die Preise stabil.",
+          "cue": "trotz"
+        },
+        {
+          "source": "Man kann davon ausgehen, dass die Zahlen weiter steigen.",
+          "cue": "dürften"
+        },
+        {
+          "source": "Die Expertin kritisierte, dass die Maßnahmen zu spät kamen.",
+          "cue": "Kritik"
+        },
+        {
+          "source": "Die Firma investiert, damit sie langfristig konkurrenzfähig bleibt.",
+          "cue": "um … zu"
+        }
+      ]
+    },
+    "c2-digital": {
+      "id": "c2-digital",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Verfassen Sie einen differenzierten argumentativen Text zum Spannungsverhältnis zwischen technologischem Fortschritt und gesellschaftlicher Verantwortung.",
+      "whatToInclude": [
+        "Entwickeln Sie eine nachvollziehbare These.",
+        "Erörtern Sie mehrere Perspektiven.",
+        "Berücksichtigen Sie ein Gegenargument.",
+        "Formulieren Sie einen eigenständigen Schluss."
+      ]
+    },
+    "c2-education": {
+      "id": "c2-education",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Erörtern Sie, welchen Beitrag staatliche Institutionen und Einzelpersonen zu lebenslangem Lernen leisten sollten.",
+      "whatToInclude": [
+        "Stellen Sie relevante Positionen gegenüber.",
+        "Analysieren Sie Zielkonflikte.",
+        "Beziehen Sie Beispiele ein.",
+        "Ziehen Sie eine begründete Schlussfolgerung."
+      ]
+    },
+    "c2-language": {
+      "id": "c2-language",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Untersuchen Sie den Zusammenhang zwischen Mehrsprachigkeit, kultureller Identität und gesellschaftlicher Teilhabe.",
+      "whatToInclude": [
+        "Beschreiben Sie das Spannungsfeld.",
+        "Beurteilen Sie verschiedene Argumente.",
+        "Belegen Sie Ihre Sichtweise.",
+        "Formulieren Sie eine Synthese."
+      ]
+    },
+    "c2-environment": {
+      "id": "c2-environment",
+      "level": "C2",
+      "teil": "teil2",
+      "format": "argument",
+      "register": null,
+      "wordTarget": "about 350 words",
+      "situation": "Erörtern Sie, wie sich wirksamer Klimaschutz zwischen Staat, Wirtschaft und einzelnen Menschen aufteilen lässt.",
+      "whatToInclude": [
+        "Stellen Sie unterschiedliche Verantwortlichkeiten dar.",
+        "Prüfen Sie Gegenargumente.",
+        "Nennen Sie konkrete Beispiele.",
+        "Entwickeln Sie eine differenzierte Position."
+      ]
+    },
+    "a2-mock-02-schreiben-teil1": {
+      "id": "a2-mock-02-schreiben-teil1",
+      "level": "A2",
+      "situation": "Sie haben sich für Samstagabend mit Ihrer Freundin Julia zum Kino verabredet. Leider können Sie nicht kommen, weil Sie krank geworden sind.",
+      "whatToInclude": [
+        "Sagen Sie, dass Sie am Samstag nicht ins Kino kommen können.",
+        "Erklären Sie, warum Sie absagen müssen.",
+        "Schlagen Sie einen neuen Termin für nächste Woche vor."
+      ],
+      "instruction": "Schreiben Sie eine Nachricht an Ihre Freundin Julia. Schreiben Sie zu allen drei Punkten. Vergessen Sie nicht die Anrede und den Gruß!",
+      "recipient": "Julia",
+      "register": "informal",
+      "wordTarget": "20-30"
+    },
+    "a2-mock-02-schreiben-teil2": {
+      "id": "a2-mock-02-schreiben-teil2",
+      "level": "A2",
+      "situation": "Sie möchten im nächsten Monat für ein langes Wochenende nach München reisen und suchen ein Hotelzimmer.",
+      "whatToInclude": [
+        "Schreiben Sie, dass Sie ein Zimmer reservieren möchten oder Informationen benötigen.",
+        "Nennen Sie den Zeitraum, die Anzahl der Personen und die Anzahl der Nächte.",
+        "Fragen Sie nach dem Preis oder nach dem Frühstück."
+      ],
+      "instruction": "Schreiben Sie eine formelle E-Mail an das Hotel „Alpenblick“ in München. Schreiben Sie zu allen drei Punkten. Vergessen Sie nicht die passende Anrede und den Gruß!",
+      "recipient": "Hotel „Alpenblick“, München",
+      "register": "formal",
+      "wordTarget": "30-40"
+    },
+    "a1-1": {
+      "id": "a1-1",
+      "level": "A1",
+      "situation": "Sie möchten im Sommer nach Berlin reisen und brauchen ein Hotelzimmer. Schreiben Sie eine E-Mail an das Hotel „Berliner Hof“.",
+      "whatToInclude": [
+        "Ankunftsdatum und Dauer: Wann kommen Sie an? Wie lange bleiben Sie?",
+        "Zimmerwunsch: Einzelzimmer oder Doppelzimmer mit Frühstück?",
+        "Preis: Fragen Sie nach dem Preis."
+      ]
+    },
+    "a1-2": {
+      "id": "a1-2",
+      "level": "A1",
+      "situation": "Ihr Freund Michael feiert am Samstag Geburtstag und hat Sie eingeladen. Schreiben Sie eine E-Mail an Michael.",
+      "whatToInclude": [
+        "Zusage: Sagen Sie, dass Sie gerne zur Party kommen.",
+        "Geschenk: Fragen Sie, was Michael sich wünscht oder was Sie mitbringen sollen.",
+        "Uhrzeit: Fragen Sie, wann die Party beginnt."
+      ]
+    },
+    "a1-3": {
+      "id": "a1-3",
+      "level": "A1",
+      "situation": "Sie sind krank und können am Donnerstag nicht zum Deutschkurs kommen. Schreiben Sie an Ihre Lehrerin, Frau Müller.",
+      "whatToInclude": [
+        "Grund: Sagen Sie, dass Sie krank sind.",
+        "Entschuldigung: Sagen Sie, dass Sie am Donnerstag fehlen.",
+        "Hausaufgaben: Fragen Sie nach den Hausaufgaben."
+      ]
+    },
+    "a1-4": {
+      "id": "a1-4",
+      "level": "A1",
+      "situation": "Sie möchten einen Deutschkurs bei der Sprachschule „Aktiv“ machen. Schreiben Sie eine E-Mail an die Sprachschule.",
+      "whatToInclude": [
+        "Kursstart: Fragen Sie, wann der nächste A1-Kurs beginnt.",
+        "Kurszeiten: Fragen Sie, ob es Abendkurse gibt.",
+        "Kosten: Fragen Sie, wie viel der Kurs kostet."
+      ]
+    },
+    "a1-5": {
+      "id": "a1-5",
+      "level": "A1",
+      "situation": "Sie möchten sich am Wochenende mit Ihrer Freundin Sarah in der Stadt treffen. Schreiben Sie an Sarah.",
+      "whatToInclude": [
+        "Vorschlag: Schlagen Sie ein Treffen am Samstag vor.",
+        "Aktivität: Schlagen Sie Kaffee trinken oder Kino vor.",
+        "Treffpunkt und Uhrzeit: Fragen oder sagen Sie, wo und wann Sie sich treffen."
+      ]
+    },
+    "a1-6": {
+      "id": "a1-6",
+      "level": "A1",
+      "situation": "Sie planen eine Reise nach Hamburg. Schreiben Sie an die Touristeninformation Hamburg.",
+      "whatToInclude": [
+        "Stadtplan: Bitten Sie um einen Stadtplan.",
+        "Informationen: Fragen Sie nach Ausflugstipps oder einer Hafenrundfahrt.",
+        "Zuschicken: Bitten Sie darum, Prospekte per Post oder E-Mail zu senden."
+      ]
+    },
+    "a1-7": {
+      "id": "a1-7",
+      "level": "A1",
+      "situation": "Sie haben im Internet ein gebrauchtes Fahrrad gesehen und möchten es kaufen. Schreiben Sie an den Verkäufer, Herrn Weber.",
+      "whatToInclude": [
+        "Interesse: Sagen Sie, dass Sie das Fahrrad kaufen möchten.",
+        "Zustand: Fragen Sie nach dem Alter oder Zustand des Fahrrads.",
+        "Termin: Fragen Sie nach einem Termin für eine Probefahrt."
+      ]
+    },
+    "a1-8": {
+      "id": "a1-8",
+      "level": "A1",
+      "situation": "Sie möchten im Sportverein „Fit & Aktiv“ Mitglied werden. Schreiben Sie eine E-Mail.",
+      "whatToInclude": [
+        "Probetraining: Fragen Sie nach einem kostenlosen Probetraining.",
+        "Öffnungszeiten: Fragen Sie nach den Öffnungszeiten am Wochenende.",
+        "Mitgliedsbeitrag: Fragen Sie, wie viel die Mitgliedschaft pro Monat kostet."
+      ]
+    },
+    "a1-9": {
+      "id": "a1-9",
+      "level": "A1",
+      "situation": "Ihre Bekannte Lisa hat Sie für das Wochenende zu sich nach München eingeladen. Schreiben Sie an Lisa.",
+      "whatToInclude": [
+        "Dank: Bedanken Sie sich für die Einladung.",
+        "Ankunftszeit: Sagen Sie, wann Sie am Bahnhof ankommen.",
+        "Verkehrsmittel: Sagen Sie, wie Sie reisen, zum Beispiel mit dem Zug."
+      ]
+    },
+    "a1-10": {
+      "id": "a1-10",
+      "level": "A1",
+      "situation": "Die Heizung in Ihrer Wohnung ist kaputt. Schreiben Sie eine E-Mail an Ihren Vermieter, Herrn Schneider.",
+      "whatToInclude": [
+        "Problem: Sagen Sie, dass die Heizung nicht funktioniert und die Wohnung kalt ist.",
+        "Termin: Sagen Sie, wann Sie für den Handwerker zu Hause sind.",
+        "Rückruf: Bitten Sie um eine schnelle Reparatur oder einen Anruf."
+      ]
+    },
+    "a2-1": {
+      "id": "a2-1",
+      "level": "A2",
+      "situation": "Schreiben Sie eine Beschwerde an eine Firma über einen defekten Fernseher.",
+      "whatToInclude": [
+        "Was haben Sie gekauft?",
+        "Was ist das Problem?",
+        "Was erwarten Sie?"
+      ]
+    },
+    "a2-2": {
+      "id": "a2-2",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Sprachschule und informieren Sie sich über einen Kurs.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wann möchten Sie beginnen?",
+        "Was möchten Sie wissen?"
+      ]
+    },
+    "a2-3": {
+      "id": "a2-3",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Brief an Ihren Freund und erzählen Sie von Ihrem neuen Hobby.",
+      "whatToInclude": [
+        "Was ist Ihr Hobby?",
+        "Wie oft machen Sie es?",
+        "Warum mögen Sie es?"
+      ]
+    },
+    "a2-4": {
+      "id": "a2-4",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an Ihren Chef und erklären Sie, warum Sie heute zu spät kommen.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Was ist passiert?",
+        "Wann kommen Sie zur Arbeit?"
+      ]
+    },
+    "a2-5": {
+      "id": "a2-5",
+      "level": "A2",
+      "situation": "Schreiben Sie eine Nachricht an Ihren Nachbarn, Sie feiern am Samstag eine Party.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wann beginnt die Party?",
+        "Worauf sollen die Nachbarn achten?"
+      ]
+    },
+    "a2-6": {
+      "id": "a2-6",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Universität und bitten Sie um Informationen zum Studium.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welchen Studiengang möchten Sie?",
+        "Welche Fragen haben Sie?"
+      ]
+    },
+    "a2-7": {
+      "id": "a2-7",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Blogbeitrag über Ihren letzten Urlaub.",
+      "whatToInclude": [
+        "Wohin sind Sie gefahren?",
+        "Was haben Sie erlebt?",
+        "Würden Sie wieder dorthin fahren?"
+      ]
+    },
+    "a2-8": {
+      "id": "a2-8",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an einen Freund und bitten Sie ihn, Ihre Pflanzen zu gießen.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Wie lange sind Sie weg?",
+        "Was soll Ihr Freund noch machen?"
+      ]
+    },
+    "a2-9": {
+      "id": "a2-9",
+      "level": "A2",
+      "situation": "Schreiben Sie eine E-Mail an eine Wohnungsgesellschaft und fragen Sie nach einer Wohnung.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welche Wohnung suchen Sie?",
+        "Wann möchten Sie einziehen?"
+      ]
+    },
+    "a2-10": {
+      "id": "a2-10",
+      "level": "A2",
+      "situation": "Schreiben Sie einen Brief an Ihren Sportlehrer und melden Sie sich zum Kurs an.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Für welchen Kurs?",
+        "Wann können Sie teilnehmen?"
+      ]
+    },
+    "b1-1": {
+      "id": "b1-1",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Leserbrief an eine Zeitung über die Umweltverschmutzung in Ihrer Stadt.",
+      "whatToInclude": [
+        "Warum schreiben Sie?",
+        "Welche Probleme sehen Sie?",
+        "Was schlagen Sie vor?"
+      ]
+    },
+    "b1-2": {
+      "id": "b1-2",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an einen Reiseveranstalter und beschweren Sie sich über Ihren Urlaub.",
+      "whatToInclude": [
+        "Wohin sind Sie gereist?",
+        "Was hat Ihnen nicht gefallen?",
+        "Was erwarten Sie als Entschädigung?"
+      ]
+    },
+    "b1-3": {
+      "id": "b1-3",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Bericht für Ihren Chef über ein erfolgreiches Projekt.",
+      "whatToInclude": [
+        "Welches Projekt?",
+        "Was waren die Ergebnisse?",
+        "Was empfehlen Sie für die Zukunft?"
+      ]
+    },
+    "b1-4": {
+      "id": "b1-4",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an Ihren Professor und bitten Sie um eine Verlängerung der Abgabefrist.",
+      "whatToInclude": [
+        "Warum brauchen Sie mehr Zeit?",
+        "Wie lange brauchen Sie?",
+        "Wie bedanken Sie sich?"
+      ]
+    },
+    "b1-5": {
+      "id": "b1-5",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Artikel für den Schulblog über gesunde Ernährung.",
+      "whatToInclude": [
+        "Warum ist das Thema wichtig?",
+        "Welche Tipps haben Sie?",
+        "Was ist Ihr persönlicher Rat?"
+      ]
+    },
+    "b1-6": {
+      "id": "b1-6",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an einen Freund und erzählen Sie von Ihrem Umzug in eine andere Stadt.",
+      "whatToInclude": [
+        "Warum sind Sie umgezogen?",
+        "Wie gefällt es Ihnen dort?",
+        "Was vermissen Sie?"
+      ]
+    },
+    "b1-7": {
+      "id": "b1-7",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Brief an Ihre Gemeinde und schlagen Sie ein neues Sportzentrum vor.",
+      "whatToInclude": [
+        "Warum wäre es wichtig?",
+        "Wo sollte es stehen?",
+        "Wer würde es nutzen?"
+      ]
+    },
+    "b1-8": {
+      "id": "b1-8",
+      "level": "B1",
+      "situation": "Schreiben Sie eine E-Mail an eine Firma und bewerben Sie sich um ein Praktikum.",
+      "whatToInclude": [
+        "Was studieren Sie?",
+        "Warum interessieren Sie sich für die Firma?",
+        "Was können Sie anbieten?"
+      ]
+    },
+    "b1-9": {
+      "id": "b1-9",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Kommentar in einem Forum über die Nutzung von Smartphones.",
+      "whatToInclude": [
+        "Was ist Ihre Meinung?",
+        "Welche Vorteile sehen Sie?",
+        "Welche Nachteile gibt es?"
+      ]
+    },
+    "b1-10": {
+      "id": "b1-10",
+      "level": "B1",
+      "situation": "Schreiben Sie einen Brief an einen Freund und erzählen Sie von einem kulturellen Erlebnis.",
+      "whatToInclude": [
+        "Was haben Sie erlebt?",
+        "Mit wem waren Sie dort?",
+        "Wie haben Sie sich gefühlt?"
+      ]
+    },
+    "b2-1": {
+      "id": "b2-1",
+      "level": "B2",
+      "situation": "Schreiben Sie einen Bericht an Ihren Vorgesetzten über die Ergebnisse einer Marktanalyse.",
+      "whatToInclude": [
+        "Welche Ziele hatte die Analyse?",
+        "Welche wichtigsten Ergebnisse haben Sie gefunden?",
+        "Welche nächsten Schritte empfehlen Sie?"
+      ]
+    },
+    "b2-2": {
+      "id": "b2-2",
+      "level": "B2",
+      "situation": "Verfassen Sie eine formelle E-Mail an einen Geschäftspartner, um eine Verzögerung im Projekt zu erklären.",
+      "whatToInclude": [
+        "Warum gibt es die Verzögerung?",
+        "Welche Auswirkungen hat sie?",
+        "Wie möchten Sie weiter vorgehen?"
+      ]
+    },
+    "b2-3": {
+      "id": "b2-3",
+      "level": "B2",
+      "situation": "Schreiben Sie eine Stellungnahme für die Personalabteilung zur Verbesserung der Arbeitsbedingungen.",
+      "whatToInclude": [
+        "Welche Probleme haben Sie beobachtet?",
+        "Welche Vorschläge haben Sie?",
+        "Wie profitieren Mitarbeiter und Unternehmen?"
+      ]
+    },
+    "b2-4": {
+      "id": "b2-4",
+      "level": "B2",
+      "situation": "Erstellen Sie eine Einladung zu einem Workshop für Mitarbeiter über digitales Marketing.",
+      "whatToInclude": [
+        "Warum wird der Workshop veranstaltet?",
+        "Welche Themen werden behandelt?",
+        "Wie können sich Mitarbeiter anmelden?"
+      ]
+    },
+    "b2-5": {
+      "id": "b2-5",
+      "level": "B2",
+      "situation": "Schreiben Sie einen Bericht über die Ergebnisse einer Kundenumfrage für die Geschäftsleitung.",
+      "whatToInclude": [
+        "Wie wurde die Umfrage durchgeführt?",
+        "Welche Trends zeigen die Ergebnisse?",
+        "Welche Maßnahmen schlagen Sie vor?"
+      ]
+    },
+    "c1-1": {
+      "id": "c1-1",
+      "level": "C1",
+      "situation": "Verfassen Sie eine Analyse für ein Fachjournal über die Auswirkungen der Globalisierung auf mittelständische Unternehmen.",
+      "whatToInclude": [
+        "Welche Aspekte der Globalisierung betrachten Sie?",
+        "Welche Chancen und Risiken sehen Sie?",
+        "Welche Handlungsempfehlungen geben Sie?"
+      ]
+    },
+    "c1-2": {
+      "id": "c1-2",
+      "level": "C1",
+      "situation": "Schreiben Sie ein Gutachten für eine Kommune zur Integration erneuerbarer Energien in die städtische Infrastruktur.",
+      "whatToInclude": [
+        "Welche Technologien schlagen Sie vor?",
+        "Wie sollen sie finanziert werden?",
+        "Welche langfristigen Vorteile erwarten Sie?"
+      ]
+    },
+    "c1-3": {
+      "id": "c1-3",
+      "level": "C1",
+      "situation": "Erstellen Sie eine Rede für eine Konferenz zum Thema digitale Ethik.",
+      "whatToInclude": [
+        "Welche Hauptpunkte möchten Sie hervorheben?",
+        "Welche Beispiele unterstützen Ihre Argumente?",
+        "Welche Fragen stellen Sie dem Publikum?"
+      ]
+    },
+    "c1-4": {
+      "id": "c1-4",
+      "level": "C1",
+      "situation": "Verfassen Sie einen Kommentar für eine Zeitung über die Bedeutung lebenslangen Lernens in der modernen Arbeitswelt.",
+      "whatToInclude": [
+        "Warum ist lebenslanges Lernen wichtig?",
+        "Welche Herausforderungen gibt es?",
+        "Welche Lösungen schlagen Sie vor?"
+      ]
+    },
+    "c1-5": {
+      "id": "c1-5",
+      "level": "C1",
+      "situation": "Schreiben Sie einen Projektvorschlag für eine internationale Kooperation in der Forschung.",
+      "whatToInclude": [
+        "Welches Ziel verfolgt das Projekt?",
+        "Wer sind die beteiligten Partner?",
+        "Wie wird der Erfolg gemessen?"
+      ]
+    }
+  },
+  "speaking": {
+    "a1-teil-1-introduction": {
+      "id": "a1-teil-1-introduction",
+      "level": "A1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Stellen Sie sich kurz vor",
+      "keywordSubtopic": "Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby",
+      "text": "Stellen Sie sich kurz vor (Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby)",
+      "hint": "Sprechen Sie kurz über alle Punkte in einer Antwort."
+    },
+    "a1-teil-2-essen-und-trinken-lieblingsessen": {
+      "id": "a1-teil-2-essen-und-trinken-lieblingsessen",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Essen und Trinken",
+      "keywordSubtopic": "Lieblingsessen",
+      "text": "Essen und Trinken (Lieblingsessen)",
+      "hint": "Stichwort: Lieblingsessen"
+    },
+    "a1-teil-2-essen-und-trinken-fruhstuck": {
+      "id": "a1-teil-2-essen-und-trinken-fruhstuck",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Essen und Trinken",
+      "keywordSubtopic": "Frühstück",
+      "text": "Essen und Trinken (Frühstück)",
+      "hint": "Stichwort: Frühstück"
+    },
+    "a1-teil-2-einkaufen-obst": {
+      "id": "a1-teil-2-einkaufen-obst",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen",
+      "keywordSubtopic": "Obst",
+      "text": "Einkaufen (Obst)",
+      "hint": "Stichwort: Obst"
+    },
+    "a1-teil-2-einkaufen-preis": {
+      "id": "a1-teil-2-einkaufen-preis",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen",
+      "keywordSubtopic": "Preis",
+      "text": "Einkaufen (Preis)",
+      "hint": "Stichwort: Preis"
+    },
+    "a1-teil-2-freizeit-sport": {
+      "id": "a1-teil-2-freizeit-sport",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freizeit",
+      "keywordSubtopic": "Sport",
+      "text": "Freizeit (Sport)",
+      "hint": "Stichwort: Sport"
+    },
+    "a1-teil-2-freizeit-wochenende": {
+      "id": "a1-teil-2-freizeit-wochenende",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Freizeit",
+      "keywordSubtopic": "Wochenende",
+      "text": "Freizeit (Wochenende)",
+      "hint": "Stichwort: Wochenende"
+    },
+    "a1-teil-2-wohnen-haus": {
+      "id": "a1-teil-2-wohnen-haus",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wohnen",
+      "keywordSubtopic": "Haus",
+      "text": "Wohnen (Haus)",
+      "hint": "Stichwort: Haus"
+    },
+    "a1-teil-2-wohnen-balkon": {
+      "id": "a1-teil-2-wohnen-balkon",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wohnen",
+      "keywordSubtopic": "Balkon",
+      "text": "Wohnen (Balkon)",
+      "hint": "Stichwort: Balkon"
+    },
+    "a1-teil-2-tagesablauf-uhrzeit": {
+      "id": "a1-teil-2-tagesablauf-uhrzeit",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Tagesablauf",
+      "keywordSubtopic": "Uhrzeit",
+      "text": "Tagesablauf (Uhrzeit)",
+      "hint": "Stichwort: Uhrzeit"
+    },
+    "a1-teil-2-tagesablauf-mittagessen": {
+      "id": "a1-teil-2-tagesablauf-mittagessen",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Tagesablauf",
+      "keywordSubtopic": "Mittagessen",
+      "text": "Tagesablauf (Mittagessen)",
+      "hint": "Stichwort: Mittagessen"
+    },
+    "a1-teil-2-familie-kinder": {
+      "id": "a1-teil-2-familie-kinder",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Familie",
+      "keywordSubtopic": "Kinder",
+      "text": "Familie (Kinder)",
+      "hint": "Stichwort: Kinder"
+    },
+    "a1-teil-2-familie-sprachen": {
+      "id": "a1-teil-2-familie-sprachen",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Familie",
+      "keywordSubtopic": "Sprachen",
+      "text": "Familie (Sprachen)",
+      "hint": "Stichwort: Sprachen"
+    },
+    "a1-teil-2-arbeit-und-beruf-beruf": {
+      "id": "a1-teil-2-arbeit-und-beruf-beruf",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Arbeit und Beruf",
+      "keywordSubtopic": "Beruf",
+      "text": "Arbeit und Beruf (Beruf)",
+      "hint": "Stichwort: Beruf"
+    },
+    "a1-teil-2-arbeit-und-beruf-arbeitszeit": {
+      "id": "a1-teil-2-arbeit-und-beruf-arbeitszeit",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Arbeit und Beruf",
+      "keywordSubtopic": "Arbeitszeit",
+      "text": "Arbeit und Beruf (Arbeitszeit)",
+      "hint": "Stichwort: Arbeitszeit"
+    },
+    "a1-teil-2-deutschkurs-schule-pause": {
+      "id": "a1-teil-2-deutschkurs-schule-pause",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Deutschkurs / Schule",
+      "keywordSubtopic": "Pause",
+      "text": "Deutschkurs / Schule (Pause)",
+      "hint": "Stichwort: Pause"
+    },
+    "a1-teil-2-deutschkurs-schule-hausaufgaben": {
+      "id": "a1-teil-2-deutschkurs-schule-hausaufgaben",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Deutschkurs / Schule",
+      "keywordSubtopic": "Hausaufgaben",
+      "text": "Deutschkurs / Schule (Hausaufgaben)",
+      "hint": "Stichwort: Hausaufgaben"
+    },
+    "a1-teil-2-post-und-bank-briefmarke": {
+      "id": "a1-teil-2-post-und-bank-briefmarke",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Post und Bank",
+      "keywordSubtopic": "Briefmarke",
+      "text": "Post und Bank (Briefmarke)",
+      "hint": "Stichwort: Briefmarke"
+    },
+    "a1-teil-2-post-und-bank-geld": {
+      "id": "a1-teil-2-post-und-bank-geld",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Post und Bank",
+      "keywordSubtopic": "Geld",
+      "text": "Post und Bank (Geld)",
+      "hint": "Stichwort: Geld"
+    },
+    "a1-teil-2-verkehr-unterwegs-bus": {
+      "id": "a1-teil-2-verkehr-unterwegs-bus",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Verkehr / Unterwegs",
+      "keywordSubtopic": "Bus",
+      "text": "Verkehr / Unterwegs (Bus)",
+      "hint": "Stichwort: Bus"
+    },
+    "a1-teil-2-verkehr-unterwegs-fahrkarte": {
+      "id": "a1-teil-2-verkehr-unterwegs-fahrkarte",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Verkehr / Unterwegs",
+      "keywordSubtopic": "Fahrkarte",
+      "text": "Verkehr / Unterwegs (Fahrkarte)",
+      "hint": "Stichwort: Fahrkarte"
+    },
+    "a1-teil-2-reisen-urlaub-koffer": {
+      "id": "a1-teil-2-reisen-urlaub-koffer",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Reisen / Urlaub",
+      "keywordSubtopic": "Koffer",
+      "text": "Reisen / Urlaub (Koffer)",
+      "hint": "Stichwort: Koffer"
+    },
+    "a1-teil-2-reisen-urlaub-hotel": {
+      "id": "a1-teil-2-reisen-urlaub-hotel",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Reisen / Urlaub",
+      "keywordSubtopic": "Hotel",
+      "text": "Reisen / Urlaub (Hotel)",
+      "hint": "Stichwort: Hotel"
+    },
+    "a1-teil-2-gesundheit-arzt-arzt": {
+      "id": "a1-teil-2-gesundheit-arzt-arzt",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Gesundheit / Arzt",
+      "keywordSubtopic": "Arzt",
+      "text": "Gesundheit / Arzt (Arzt)",
+      "hint": "Stichwort: Arzt"
+    },
+    "a1-teil-2-gesundheit-arzt-medikament": {
+      "id": "a1-teil-2-gesundheit-arzt-medikament",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Gesundheit / Arzt",
+      "keywordSubtopic": "Medikament",
+      "text": "Gesundheit / Arzt (Medikament)",
+      "hint": "Stichwort: Medikament"
+    },
+    "a1-teil-2-sprachen-deutsch": {
+      "id": "a1-teil-2-sprachen-deutsch",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sprachen",
+      "keywordSubtopic": "Deutsch",
+      "text": "Sprachen (Deutsch)",
+      "hint": "Stichwort: Deutsch"
+    },
+    "a1-teil-2-kleidung-schuhe": {
+      "id": "a1-teil-2-kleidung-schuhe",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kleidung",
+      "keywordSubtopic": "Schuhe",
+      "text": "Kleidung (Schuhe)",
+      "hint": "Stichwort: Schuhe"
+    },
+    "a1-teil-2-feste-und-einladungen-geburtstag": {
+      "id": "a1-teil-2-feste-und-einladungen-geburtstag",
+      "level": "A1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Feste und Einladungen",
+      "keywordSubtopic": "Geburtstag",
+      "text": "Feste und Einladungen (Geburtstag)",
+      "hint": "Stichwort: Geburtstag"
+    },
+    "a1-teil-3-glas-wasser": {
+      "id": "a1-teil-3-glas-wasser",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Glas Wasser",
+      "keywordSubtopic": "",
+      "text": "Glas Wasser",
+      "hint": "Glass of water"
+    },
+    "a1-teil-3-stift-kugelschreiber": {
+      "id": "a1-teil-3-stift-kugelschreiber",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Stift / Kugelschreiber",
+      "keywordSubtopic": "",
+      "text": "Stift / Kugelschreiber",
+      "hint": "Pen"
+    },
+    "a1-teil-3-buch": {
+      "id": "a1-teil-3-buch",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Buch",
+      "keywordSubtopic": "",
+      "text": "Buch",
+      "hint": "Book"
+    },
+    "a1-teil-3-schlussel": {
+      "id": "a1-teil-3-schlussel",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Schlüssel",
+      "keywordSubtopic": "",
+      "text": "Schlüssel",
+      "hint": "Key"
+    },
+    "a1-teil-3-uhr": {
+      "id": "a1-teil-3-uhr",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Uhr",
+      "keywordSubtopic": "",
+      "text": "Uhr",
+      "hint": "Clock"
+    },
+    "a1-teil-3-apfel": {
+      "id": "a1-teil-3-apfel",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Apfel",
+      "keywordSubtopic": "",
+      "text": "Apfel",
+      "hint": "Apple"
+    },
+    "a1-teil-3-tasse-kaffee": {
+      "id": "a1-teil-3-tasse-kaffee",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tasse Kaffee",
+      "keywordSubtopic": "",
+      "text": "Tasse Kaffee",
+      "hint": "Cup of coffee"
+    },
+    "a1-teil-3-rechnung-geld": {
+      "id": "a1-teil-3-rechnung-geld",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Rechnung / Geld",
+      "keywordSubtopic": "",
+      "text": "Rechnung / Geld",
+      "hint": "Bill / Money"
+    },
+    "a1-teil-3-handy-telefon": {
+      "id": "a1-teil-3-handy-telefon",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Handy / Telefon",
+      "keywordSubtopic": "",
+      "text": "Handy / Telefon",
+      "hint": "Mobile phone"
+    },
+    "a1-teil-3-nichtrauchen-schild": {
+      "id": "a1-teil-3-nichtrauchen-schild",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Nichtrauchen-Schild",
+      "keywordSubtopic": "",
+      "text": "Nichtrauchen-Schild",
+      "hint": "No smoking sign"
+    },
+    "a1-teil-3-tur": {
+      "id": "a1-teil-3-tur",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tür",
+      "keywordSubtopic": "",
+      "text": "Tür",
+      "hint": "Door"
+    },
+    "a1-teil-3-fenster": {
+      "id": "a1-teil-3-fenster",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fenster",
+      "keywordSubtopic": "",
+      "text": "Fenster",
+      "hint": "Window"
+    },
+    "a1-teil-3-fahrkarte": {
+      "id": "a1-teil-3-fahrkarte",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fahrkarte",
+      "keywordSubtopic": "",
+      "text": "Fahrkarte",
+      "hint": "Ticket"
+    },
+    "a1-teil-3-tasche-koffer": {
+      "id": "a1-teil-3-tasche-koffer",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Tasche / Koffer",
+      "keywordSubtopic": "",
+      "text": "Tasche / Koffer",
+      "hint": "Bag / Suitcase"
+    },
+    "a1-teil-3-radio-musik": {
+      "id": "a1-teil-3-radio-musik",
+      "level": "A1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Radio / Musik",
+      "keywordSubtopic": "",
+      "text": "Radio / Musik",
+      "hint": "Radio / Music"
+    },
+    "a2-teil-1-wohnort": {
+      "id": "a2-teil-1-wohnort",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wohnort",
+      "keywordSubtopic": "",
+      "text": "Wohnort",
+      "hint": ""
+    },
+    "a2-teil-1-wohnung-haus": {
+      "id": "a2-teil-1-wohnung-haus",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wohnung / Haus",
+      "keywordSubtopic": "",
+      "text": "Wohnung / Haus",
+      "hint": ""
+    },
+    "a2-teil-1-beruf": {
+      "id": "a2-teil-1-beruf",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Beruf",
+      "keywordSubtopic": "",
+      "text": "Beruf",
+      "hint": ""
+    },
+    "a2-teil-1-ausbildung-studium": {
+      "id": "a2-teil-1-ausbildung-studium",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Ausbildung / Studium",
+      "keywordSubtopic": "",
+      "text": "Ausbildung / Studium",
+      "hint": ""
+    },
+    "a2-teil-1-familie": {
+      "id": "a2-teil-1-familie",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Familie",
+      "keywordSubtopic": "",
+      "text": "Familie",
+      "hint": ""
+    },
+    "a2-teil-1-geburtstag-alter": {
+      "id": "a2-teil-1-geburtstag-alter",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Geburtstag / Alter",
+      "keywordSubtopic": "",
+      "text": "Geburtstag / Alter",
+      "hint": ""
+    },
+    "a2-teil-1-hobby-freizeit": {
+      "id": "a2-teil-1-hobby-freizeit",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Hobby / Freizeit",
+      "keywordSubtopic": "",
+      "text": "Hobby / Freizeit",
+      "hint": ""
+    },
+    "a2-teil-1-sprachen": {
+      "id": "a2-teil-1-sprachen",
+      "level": "A2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sprachen",
+      "keywordSubtopic": "",
+      "text": "Sprachen",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-gern-in-ihrer-freizeit": {
+      "id": "a2-teil-2-was-machen-sie-gern-in-ihrer-freizeit",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie gern in Ihrer Freizeit?",
+      "keywordSubtopic": "Hobbys, Sport, Mit wem?, Wann?",
+      "text": "Was machen Sie gern in Ihrer Freizeit?",
+      "hint": ""
+    },
+    "a2-teil-2-wofur-geben-sie-ihr-geld-aus": {
+      "id": "a2-teil-2-wofur-geben-sie-ihr-geld-aus",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wofür geben Sie Ihr Geld aus?",
+      "keywordSubtopic": "Kleidung, Lebensmittel / Miete, Sparen, Reisen",
+      "text": "Wofür geben Sie Ihr Geld aus?",
+      "hint": ""
+    },
+    "a2-teil-2-welches-verkehrsmittel-benutzen-sie-meistens": {
+      "id": "a2-teil-2-welches-verkehrsmittel-benutzen-sie-meistens",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welches Verkehrsmittel benutzen Sie meistens?",
+      "keywordSubtopic": "Arbeit / Schule, Freizeit, Kosten, Vorteile",
+      "text": "Welches Verkehrsmittel benutzen Sie meistens?",
+      "hint": ""
+    },
+    "a2-teil-2-was-bedeutet-das-internet-fur-sie": {
+      "id": "a2-teil-2-was-bedeutet-das-internet-fur-sie",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was bedeutet das Internet für Sie?",
+      "keywordSubtopic": "Lernen, Kontakt, Einkaufen, Zeit im Internet",
+      "text": "Was bedeutet das Internet für Sie?",
+      "hint": ""
+    },
+    "a2-teil-2-wo-kaufen-sie-am-liebsten-ein": {
+      "id": "a2-teil-2-wo-kaufen-sie-am-liebsten-ein",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wo kaufen Sie am liebsten ein?",
+      "keywordSubtopic": "Geschäfte, Lebensmittel, Kleidung, Preise",
+      "text": "Wo kaufen Sie am liebsten ein?",
+      "hint": ""
+    },
+    "a2-teil-2-was-machen-sie-oft-am-freitagabend": {
+      "id": "a2-teil-2-was-machen-sie-oft-am-freitagabend",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was machen Sie oft am Freitagabend?",
+      "keywordSubtopic": "Mit wem?, Zu Hause, Ausgehen, Uhrzeit",
+      "text": "Was machen Sie oft am Freitagabend?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-und-wohin-machen-sie-gerne-urlaub": {
+      "id": "a2-teil-2-wie-und-wohin-machen-sie-gerne-urlaub",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie und wohin machen Sie gerne Urlaub?",
+      "keywordSubtopic": "Reiseziel, Verkehrsmittel, Unterkunft, Aktivitäten",
+      "text": "Wie und wohin machen Sie gerne Urlaub?",
+      "hint": ""
+    },
+    "a2-teil-2-was-sind-ihre-plane-fur-die-zukunft": {
+      "id": "a2-teil-2-was-sind-ihre-plane-fur-die-zukunft",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was sind Ihre Pläne für die Zukunft?",
+      "keywordSubtopic": "Beruf, Deutsch lernen, Wohnen, Familie",
+      "text": "Was sind Ihre Pläne für die Zukunft?",
+      "hint": ""
+    },
+    "a2-teil-2-wie-wohnen-sie-und-wie-gefallt-ihnen-ihre-wohnung": {
+      "id": "a2-teil-2-wie-wohnen-sie-und-wie-gefallt-ihnen-ihre-wohnung",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Wie wohnen Sie und wie gefällt Ihnen Ihre Wohnung?",
+      "keywordSubtopic": "Lage, Zimmer, Mit wem?, Lieblingsplatz",
+      "text": "Wie wohnen Sie und wie gefällt Ihnen Ihre Wohnung?",
+      "hint": ""
+    },
+    "a2-teil-2-was-ist-ihr-lieblingsessen-oder-was-kochen-sie-gerne": {
+      "id": "a2-teil-2-was-ist-ihr-lieblingsessen-oder-was-kochen-sie-gerne",
+      "level": "A2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Was ist Ihr Lieblingsessen oder was kochen Sie gerne?",
+      "keywordSubtopic": "Gericht, Zutaten, Wie oft?, Mit wem?",
+      "text": "Was ist Ihr Lieblingsessen oder was kochen Sie gerne?",
+      "hint": ""
+    },
+    "a2-teil-3-ein-geschenk-kaufen": {
+      "id": "a2-teil-3-ein-geschenk-kaufen",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Ein Geschenk kaufen",
+      "keywordSubtopic": "",
+      "text": "Ein Geschenk kaufen",
+      "hint": ""
+    },
+    "a2-teil-3-eine-party-ein-fest-organisieren": {
+      "id": "a2-teil-3-eine-party-ein-fest-organisieren",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Eine Party / ein Fest organisieren",
+      "keywordSubtopic": "",
+      "text": "Eine Party / ein Fest organisieren",
+      "hint": ""
+    },
+    "a2-teil-3-einen-ausflug-machen": {
+      "id": "a2-teil-3-einen-ausflug-machen",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einen Ausflug machen",
+      "keywordSubtopic": "",
+      "text": "Einen Ausflug machen",
+      "hint": ""
+    },
+    "a2-teil-3-zusammen-kochen-essen-gehen": {
+      "id": "a2-teil-3-zusammen-kochen-essen-gehen",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Zusammen kochen / essen gehen",
+      "keywordSubtopic": "",
+      "text": "Zusammen kochen / essen gehen",
+      "hint": ""
+    },
+    "a2-teil-3-deutsch-lernen-fur-die-prufung-lernen": {
+      "id": "a2-teil-3-deutsch-lernen-fur-die-prufung-lernen",
+      "level": "A2",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Deutsch lernen / für die Prüfung lernen",
+      "keywordSubtopic": "",
+      "text": "Deutsch lernen / für die Prüfung lernen",
+      "hint": ""
+    },
+    "c1-teil-1-die-zukunft-der-k-nstlichen-intelligenz-211": {
+      "id": "c1-teil-1-die-zukunft-der-k-nstlichen-intelligenz-211",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Die Zukunft der künstlichen Intelligenz",
+      "keywordSubtopic": "",
+      "text": "Die Zukunft der künstlichen Intelligenz",
+      "hint": ""
+    },
+    "c1-teil-1-internationale-migration-herausforderungen-und-chancen-212": {
+      "id": "c1-teil-1-internationale-migration-herausforderungen-und-chancen-212",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Internationale Migration: Herausforderungen und Chancen",
+      "keywordSubtopic": "",
+      "text": "Internationale Migration: Herausforderungen und Chancen",
+      "hint": ""
+    },
+    "c1-teil-1-wandel-der-arbeitswelt-im-21-jahrhundert-213": {
+      "id": "c1-teil-1-wandel-der-arbeitswelt-im-21-jahrhundert-213",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wandel der Arbeitswelt im 21. Jahrhundert",
+      "keywordSubtopic": "",
+      "text": "Wandel der Arbeitswelt im 21. Jahrhundert",
+      "hint": ""
+    },
+    "c1-teil-1-digitalisierung-und-datenschutz-214": {
+      "id": "c1-teil-1-digitalisierung-und-datenschutz-214",
+      "level": "C1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Digitalisierung und Datenschutz",
+      "keywordSubtopic": "",
+      "text": "Digitalisierung und Datenschutz",
+      "hint": ""
+    },
+    "c1-teil-2-sollten-universit-ten-studiengeb-hren-verlangen-215": {
+      "id": "c1-teil-2-sollten-universit-ten-studiengeb-hren-verlangen-215",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sollten Universitäten Studiengebühren verlangen?",
+      "keywordSubtopic": "",
+      "text": "Sollten Universitäten Studiengebühren verlangen?",
+      "hint": ""
+    },
+    "c1-teil-2-welchen-einfluss-haben-soziale-medien-auf-die-demokratie-216": {
+      "id": "c1-teil-2-welchen-einfluss-haben-soziale-medien-auf-die-demokratie-216",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Welchen Einfluss haben soziale Medien auf die Demokratie?",
+      "keywordSubtopic": "",
+      "text": "Welchen Einfluss haben soziale Medien auf die Demokratie?",
+      "hint": ""
+    },
+    "c1-teil-2-ist-lebenslanges-lernen-notwendig-217": {
+      "id": "c1-teil-2-ist-lebenslanges-lernen-notwendig-217",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Ist lebenslanges Lernen notwendig?",
+      "keywordSubtopic": "",
+      "text": "Ist lebenslanges Lernen notwendig?",
+      "hint": ""
+    },
+    "c1-teil-2-die-bedeutung-von-nachhaltigkeit-in-der-wirtschaft-218": {
+      "id": "c1-teil-2-die-bedeutung-von-nachhaltigkeit-in-der-wirtschaft-218",
+      "level": "C1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Die Bedeutung von Nachhaltigkeit in der Wirtschaft",
+      "keywordSubtopic": "",
+      "text": "Die Bedeutung von Nachhaltigkeit in der Wirtschaft",
+      "hint": ""
+    },
+    "c1-teil-3-die-wichtigsten-kompetenzen-f-r-die-zukunft-219": {
+      "id": "c1-teil-3-die-wichtigsten-kompetenzen-f-r-die-zukunft-219",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Die wichtigsten Kompetenzen für die Zukunft",
+      "keywordSubtopic": "",
+      "text": "Die wichtigsten Kompetenzen für die Zukunft",
+      "hint": ""
+    },
+    "c1-teil-3-vor-und-nachteile-globaler-zusammenarbeit-220": {
+      "id": "c1-teil-3-vor-und-nachteile-globaler-zusammenarbeit-220",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Vor- und Nachteile globaler Zusammenarbeit",
+      "keywordSubtopic": "",
+      "text": "Vor- und Nachteile globaler Zusammenarbeit",
+      "hint": ""
+    },
+    "c1-teil-3-welchen-einfluss-hat-technik-auf-unser-leben-221": {
+      "id": "c1-teil-3-welchen-einfluss-hat-technik-auf-unser-leben-221",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Welchen Einfluss hat Technik auf unser Leben?",
+      "keywordSubtopic": "",
+      "text": "Welchen Einfluss hat Technik auf unser Leben?",
+      "hint": ""
+    },
+    "c1-teil-3-wie-ver-ndert-sich-die-familie-222": {
+      "id": "c1-teil-3-wie-ver-ndert-sich-die-familie-222",
+      "level": "C1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Wie verändert sich die Familie?",
+      "keywordSubtopic": "",
+      "text": "Wie verändert sich die Familie?",
+      "hint": ""
+    },
+    "b1-teil-1-ein-geschenk-fur-einen-kollegen-freund-kaufen": {
+      "id": "b1-teil-1-ein-geschenk-fur-einen-kollegen-freund-kaufen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Ein Geschenk für einen Kollegen / Freund kaufen",
+      "keywordSubtopic": "",
+      "text": "Ein Geschenk für einen Kollegen / Freund kaufen",
+      "hint": ""
+    },
+    "b1-teil-1-einen-ausflug-am-wochenende-organisieren": {
+      "id": "b1-teil-1-einen-ausflug-am-wochenende-organisieren",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Einen Ausflug am Wochenende organisieren",
+      "keywordSubtopic": "",
+      "text": "Einen Ausflug am Wochenende organisieren",
+      "hint": ""
+    },
+    "b1-teil-1-eine-abschiedsparty-uberraschungsparty-planen": {
+      "id": "b1-teil-1-eine-abschiedsparty-uberraschungsparty-planen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Eine Abschiedsparty / Überraschungsparty planen",
+      "keywordSubtopic": "",
+      "text": "Eine Abschiedsparty / Überraschungsparty planen",
+      "hint": ""
+    },
+    "b1-teil-1-fur-die-deutschprufung-b1-prufung-lernen": {
+      "id": "b1-teil-1-fur-die-deutschprufung-b1-prufung-lernen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Für die Deutschprüfung / B1-Prüfung lernen",
+      "keywordSubtopic": "",
+      "text": "Für die Deutschprüfung / B1-Prüfung lernen",
+      "hint": ""
+    },
+    "b1-teil-1-einen-kranken-freund-oder-lehrer-besuchen": {
+      "id": "b1-teil-1-einen-kranken-freund-oder-lehrer-besuchen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Einen kranken Freund oder Lehrer besuchen",
+      "keywordSubtopic": "",
+      "text": "Einen kranken Freund oder Lehrer besuchen",
+      "hint": ""
+    },
+    "b1-teil-1-ein-gemeinsames-abendessen-kochen": {
+      "id": "b1-teil-1-ein-gemeinsames-abendessen-kochen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Ein gemeinsames Abendessen kochen",
+      "keywordSubtopic": "",
+      "text": "Ein gemeinsames Abendessen kochen",
+      "hint": ""
+    },
+    "b1-teil-1-einen-sporttag-eine-fahrradtour-planen": {
+      "id": "b1-teil-1-einen-sporttag-eine-fahrradtour-planen",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Einen Sporttag / eine Fahrradtour planen",
+      "keywordSubtopic": "",
+      "text": "Einen Sporttag / eine Fahrradtour planen",
+      "hint": ""
+    },
+    "b1-teil-1-einen-flohmarktstand-vorbereiten": {
+      "id": "b1-teil-1-einen-flohmarktstand-vorbereiten",
+      "level": "B1",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Einen Flohmarktstand vorbereiten",
+      "keywordSubtopic": "",
+      "text": "Einen Flohmarktstand vorbereiten",
+      "hint": ""
+    },
+    "b1-teil-2-einkaufen-im-internet-oder-im-geschaft": {
+      "id": "b1-teil-2-einkaufen-im-internet-oder-im-geschaft",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einkaufen im Internet oder im Geschäft?",
+      "keywordSubtopic": "",
+      "text": "Einkaufen im Internet oder im Geschäft?",
+      "hint": "Kaufen Sie lieber online oder im Supermarkt/Geschäft ein?"
+    },
+    "b1-teil-2-kinder-und-smartphones": {
+      "id": "b1-teil-2-kinder-und-smartphones",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kinder und Smartphones",
+      "keywordSubtopic": "",
+      "text": "Kinder und Smartphones",
+      "hint": "Brauchen Kinder eigene Smartphones, und ab welchem Alter?"
+    },
+    "b1-teil-2-bio-lebensmittel-vs-fastfood": {
+      "id": "b1-teil-2-bio-lebensmittel-vs-fastfood",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bio-Lebensmittel vs. Fastfood",
+      "keywordSubtopic": "",
+      "text": "Bio-Lebensmittel vs. Fastfood",
+      "hint": "Sollte man nur noch Bio-Lebensmittel kaufen?"
+    },
+    "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt": {
+      "id": "b1-teil-2-leben-auf-dem-land-oder-in-der-stadt",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Leben auf dem Land oder in der Stadt?",
+      "keywordSubtopic": "",
+      "text": "Leben auf dem Land oder in der Stadt?",
+      "hint": "Wo lebt man besser: auf dem Land oder in der Großstadt?"
+    },
+    "b1-teil-2-fremdsprachen-lernen": {
+      "id": "b1-teil-2-fremdsprachen-lernen",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Fremdsprachen lernen",
+      "keywordSubtopic": "",
+      "text": "Fremdsprachen lernen",
+      "hint": "Sollte jeder Mensch mindestens zwei Fremdsprachen lernen?"
+    },
+    "b1-teil-2-haustiere-in-der-wohnung": {
+      "id": "b1-teil-2-haustiere-in-der-wohnung",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Haustiere in der Wohnung",
+      "keywordSubtopic": "",
+      "text": "Haustiere in der Wohnung",
+      "hint": "Sollte man Haustiere in einer Stadtwohnung halten?"
+    },
+    "b1-teil-2-offentliche-verkehrsmittel-vs-eigenes-auto": {
+      "id": "b1-teil-2-offentliche-verkehrsmittel-vs-eigenes-auto",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+      "keywordSubtopic": "",
+      "text": "Öffentliche Verkehrsmittel vs. eigenes Auto",
+      "hint": "Braucht man in der Stadt noch ein eigenes Auto?"
+    },
+    "b1-teil-2-urlaub-am-meer-oder-in-den-bergen": {
+      "id": "b1-teil-2-urlaub-am-meer-oder-in-den-bergen",
+      "level": "B1",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Urlaub am Meer oder in den Bergen?",
+      "keywordSubtopic": "",
+      "text": "Urlaub am Meer oder in den Bergen?",
+      "hint": "Wo und wie verbringen Sie am liebsten Ihren Urlaub?"
+    },
+    "b1-teil-3-kinder-und-smartphones": {
+      "id": "b1-teil-3-kinder-und-smartphones",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Kinder und Smartphones",
+      "keywordSubtopic": "",
+      "text": "Kinder und Smartphones",
+      "hint": ""
+    },
+    "b1-teil-3-einkaufen-im-internet": {
+      "id": "b1-teil-3-einkaufen-im-internet",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Einkaufen im Internet",
+      "keywordSubtopic": "",
+      "text": "Einkaufen im Internet",
+      "hint": ""
+    },
+    "b1-teil-3-haustiere-in-der-wohnung": {
+      "id": "b1-teil-3-haustiere-in-der-wohnung",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Haustiere in der Wohnung",
+      "keywordSubtopic": "",
+      "text": "Haustiere in der Wohnung",
+      "hint": ""
+    },
+    "b1-teil-3-leben-auf-dem-land-oder-in-der-stadt": {
+      "id": "b1-teil-3-leben-auf-dem-land-oder-in-der-stadt",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Leben auf dem Land oder in der Stadt",
+      "keywordSubtopic": "",
+      "text": "Leben auf dem Land oder in der Stadt",
+      "hint": ""
+    },
+    "b1-teil-3-plastikmull-vermeiden": {
+      "id": "b1-teil-3-plastikmull-vermeiden",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Plastikmüll vermeiden",
+      "keywordSubtopic": "",
+      "text": "Plastikmüll vermeiden",
+      "hint": ""
+    },
+    "b1-teil-3-offentliche-verkehrsmittel-vs-auto": {
+      "id": "b1-teil-3-offentliche-verkehrsmittel-vs-auto",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Öffentliche Verkehrsmittel vs. Auto",
+      "keywordSubtopic": "",
+      "text": "Öffentliche Verkehrsmittel vs. Auto",
+      "hint": ""
+    },
+    "b1-teil-3-fremdsprachen-lernen": {
+      "id": "b1-teil-3-fremdsprachen-lernen",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fremdsprachen lernen",
+      "keywordSubtopic": "",
+      "text": "Fremdsprachen lernen",
+      "hint": ""
+    },
+    "b1-teil-3-fastfood-vs-selbstkochen": {
+      "id": "b1-teil-3-fastfood-vs-selbstkochen",
+      "level": "B1",
+      "teilId": "teil-3",
+      "teilLabel": "Teil 3",
+      "topicPrompt": "Fastfood vs. Selbstkochen",
+      "keywordSubtopic": "",
+      "text": "Fastfood vs. Selbstkochen",
+      "hint": ""
+    },
+    "b2-teil-1-finanzierung-des-studiums": {
+      "id": "b2-teil-1-finanzierung-des-studiums",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Finanzierung des Studiums",
+      "keywordSubtopic": "",
+      "text": "Finanzierung des Studiums",
+      "hint": "Welche Möglichkeiten gibt es zur Finanzierung des Studiums, und was sind die Vor- und Nachteile von Nebenjobs, BAföG oder elterlicher Unterstützung?"
+    },
+    "b2-teil-1-vegane-und-vegetarische-ernahrung": {
+      "id": "b2-teil-1-vegane-und-vegetarische-ernahrung",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Vegane und vegetarische Ernährung",
+      "keywordSubtopic": "",
+      "text": "Vegane und vegetarische Ernährung",
+      "hint": "Welche Alternativen gibt es zur herkömmlichen Ernährung im Alltag, und wie wirken sich diese auf Gesundheit und Umwelt aus?"
+    },
+    "b2-teil-1-plastikfreie-verpackungen-im-alltag": {
+      "id": "b2-teil-1-plastikfreie-verpackungen-im-alltag",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Plastikfreie Verpackungen im Alltag",
+      "keywordSubtopic": "",
+      "text": "Plastikfreie Verpackungen im Alltag",
+      "hint": "Welche Verpackungsalternativen gibt es beim Einkaufen, und wie realistisch ist ein komplett plastikfreier Alltag?"
+    },
+    "b2-teil-1-fruhes-sprachenlernen-im-kindergarten": {
+      "id": "b2-teil-1-fruhes-sprachenlernen-im-kindergarten",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Frühes Sprachenlernen im Kindergarten",
+      "keywordSubtopic": "",
+      "text": "Frühes Sprachenlernen im Kindergarten",
+      "hint": "Sollten Kinder schon im Kindergarten eine Fremdsprache lernen, und welche Vor- und Nachteile bringt das mit sich?"
+    },
+    "b2-teil-1-sport-und-fitness-am-arbeitsplatz": {
+      "id": "b2-teil-1-sport-und-fitness-am-arbeitsplatz",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sport und Fitness am Arbeitsplatz",
+      "keywordSubtopic": "",
+      "text": "Sport und Fitness am Arbeitsplatz",
+      "hint": "Welche Möglichkeiten bieten Unternehmen für die Gesundheit ihrer Mitarbeiter, und wie wichtig sind Sportangebote am Arbeitsplatz?"
+    },
+    "b2-teil-1-wohnformen-im-studium-wg-vs-eigene-wohnung": {
+      "id": "b2-teil-1-wohnformen-im-studium-wg-vs-eigene-wohnung",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wohnformen im Studium (WG vs. eigene Wohnung)",
+      "keywordSubtopic": "",
+      "text": "Wohnformen im Studium (WG vs. eigene Wohnung)",
+      "hint": "Welche Vor- und Nachteile haben Wohngemeinschaften gegenüber einer eigenen Wohnung, und wie findet man bezahlbaren Wohnraum?"
+    },
+    "b2-teil-1-politisches-und-soziales-engagement-von-jugendlichen": {
+      "id": "b2-teil-1-politisches-und-soziales-engagement-von-jugendlichen",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Politisches und soziales Engagement von Jugendlichen",
+      "keywordSubtopic": "",
+      "text": "Politisches und soziales Engagement von Jugendlichen",
+      "hint": "Wie können sich junge Menschen gesellschaftlich engagieren, und warum tun das viele Jugendliche heutzutage nicht?"
+    },
+    "b2-teil-1-homeoffice-und-flexibles-arbeiten": {
+      "id": "b2-teil-1-homeoffice-und-flexibles-arbeiten",
+      "level": "B2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Homeoffice und flexibles Arbeiten",
+      "keywordSubtopic": "",
+      "text": "Homeoffice und flexibles Arbeiten",
+      "hint": "Welche Vor- und Nachteile hat die Arbeit im Homeoffice im Vergleich zur Präsenzarbeit im Büro?"
+    },
+    "b2-teil-2-bargeldabschaffung": {
+      "id": "b2-teil-2-bargeldabschaffung",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bargeldabschaffung",
+      "keywordSubtopic": "",
+      "text": "Bargeldabschaffung",
+      "hint": "Sollten wir Bargeld komplett abschaffen und nur noch digital bzw. bargeldlos bezahlen?"
+    },
+    "b2-teil-2-bewertung-von-lehrkraften-durch-studierende-schuler": {
+      "id": "b2-teil-2-bewertung-von-lehrkraften-durch-studierende-schuler",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bewertung von Lehrkräften durch Studierende/Schüler",
+      "keywordSubtopic": "",
+      "text": "Bewertung von Lehrkräften durch Studierende/Schüler",
+      "hint": "Sollten Schüler und Studierende ihre Lehrer und Professoren regelmäßig bewerten dürfen?"
+    },
+    "b2-teil-2-einfuhrung-der-4-tage-woche": {
+      "id": "b2-teil-2-einfuhrung-der-4-tage-woche",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Einführung der 4-Tage-Woche",
+      "keywordSubtopic": "",
+      "text": "Einführung der 4-Tage-Woche",
+      "hint": "Sollte eine 4-Tage-Arbeitswoche bei vollem Lohnausgleich gesetzlich eingeführt werden?"
+    },
+    "b2-teil-2-kostenloses-hochschulstudium": {
+      "id": "b2-teil-2-kostenloses-hochschulstudium",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Kostenloses Hochschulstudium",
+      "keywordSubtopic": "",
+      "text": "Kostenloses Hochschulstudium",
+      "hint": "Sollte das Studium an Universitäten für alle Studierenden komplett kostenlos sein?"
+    },
+    "b2-teil-2-pflicht-zur-auslandserfahrung": {
+      "id": "b2-teil-2-pflicht-zur-auslandserfahrung",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Pflicht zur Auslandserfahrung",
+      "keywordSubtopic": "",
+      "text": "Pflicht zur Auslandserfahrung",
+      "hint": "Sollte ein Auslandssemester oder eine Arbeitserfahrung im Ausland für alle Studierenden verpflichtend sein?"
+    },
+    "b2-teil-2-bedeutung-von-markenkleidung-bei-jugendlichen": {
+      "id": "b2-teil-2-bedeutung-von-markenkleidung-bei-jugendlichen",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Bedeutung von Markenkleidung bei Jugendlichen",
+      "keywordSubtopic": "",
+      "text": "Bedeutung von Markenkleidung bei Jugendlichen",
+      "hint": "Spielen Markenkleidung und Modetrends eine zu große Rolle bei Jugendlichen?"
+    },
+    "b2-teil-2-e-books-statt-gedruckter-schulbucher": {
+      "id": "b2-teil-2-e-books-statt-gedruckter-schulbucher",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "E-Books statt gedruckter Schulbücher",
+      "keywordSubtopic": "",
+      "text": "E-Books statt gedruckter Schulbücher",
+      "hint": "Sollten gedruckte Schulbücher in Schulen vollständig durch Tablets und E-Books ersetzt werden?"
+    },
+    "b2-teil-2-senkung-des-wahlalters-auf-16-jahre": {
+      "id": "b2-teil-2-senkung-des-wahlalters-auf-16-jahre",
+      "level": "B2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Senkung des Wahlalters auf 16 Jahre",
+      "keywordSubtopic": "",
+      "text": "Senkung des Wahlalters auf 16 Jahre",
+      "hint": "Sollte das Wahlalter bei politischen Wahlen auf 16 Jahre gesenkt werden?"
+    },
+    "c2-teil-1-digitale-selbstbestimmung": {
+      "id": "c2-teil-1-digitale-selbstbestimmung",
+      "level": "C2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Digitale Selbstbestimmung im Zeitalter künstlicher Intelligenz",
+      "keywordSubtopic": "",
+      "text": "Digitale Selbstbestimmung im Zeitalter künstlicher Intelligenz",
+      "hint": "Differenzieren Sie Nutzen und Risiken und entwickeln Sie einen begründeten Ausblick."
+    },
+    "c2-teil-1-globale-verantwortung": {
+      "id": "c2-teil-1-globale-verantwortung",
+      "level": "C2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Globale Verantwortung und nationale Interessen",
+      "keywordSubtopic": "",
+      "text": "Globale Verantwortung und nationale Interessen",
+      "hint": "Stellen Sie gegensätzliche Sichtweisen präzise dar und begründen Sie Ihre Bewertung."
+    },
+    "c2-teil-1-wissenschaft-und-ethik": {
+      "id": "c2-teil-1-wissenschaft-und-ethik",
+      "level": "C2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Wissenschaftliche Freiheit und ethische Grenzen",
+      "keywordSubtopic": "",
+      "text": "Wissenschaftliche Freiheit und ethische Grenzen",
+      "hint": "Diskutieren Sie gesellschaftliche Folgen anhand konkreter Beispiele."
+    },
+    "c2-teil-1-sprache-und-identitaet": {
+      "id": "c2-teil-1-sprache-und-identitaet",
+      "level": "C2",
+      "teilId": "teil-1",
+      "teilLabel": "Teil 1",
+      "topicPrompt": "Sprache, Identität und gesellschaftlicher Wandel",
+      "keywordSubtopic": "",
+      "text": "Sprache, Identität und gesellschaftlicher Wandel",
+      "hint": "Differenzieren Sie kulturpolitische Positionen und ihre Voraussetzungen."
+    },
+    "c2-teil-2-automatisierung": {
+      "id": "c2-teil-2-automatisierung",
+      "level": "C2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sollte der Staat den Einsatz künstlicher Intelligenz stärker regulieren?",
+      "keywordSubtopic": "",
+      "text": "Sollte der Staat den Einsatz künstlicher Intelligenz stärker regulieren?",
+      "hint": "Führen Sie ein Pro-und-Kontra-Gespräch und reagieren Sie auf Einwände."
+    },
+    "c2-teil-2-bildung": {
+      "id": "c2-teil-2-bildung",
+      "level": "C2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Sollte universitäre Bildung grundsätzlich gebührenfrei sein?",
+      "keywordSubtopic": "",
+      "text": "Sollte universitäre Bildung grundsätzlich gebührenfrei sein?",
+      "hint": "Begründen Sie Ihre Position und widerlegen Sie Gegenargumente sachlich."
+    },
+    "c2-teil-2-klimapolitik": {
+      "id": "c2-teil-2-klimapolitik",
+      "level": "C2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Muss individueller Konsum stärker politisch gesteuert werden?",
+      "keywordSubtopic": "",
+      "text": "Muss individueller Konsum stärker politisch gesteuert werden?",
+      "hint": "Wägen Sie Freiheit und Verantwortung ab und überzeugen Sie Ihr Gegenüber."
+    },
+    "c2-teil-2-oeffentlichkeit": {
+      "id": "c2-teil-2-oeffentlichkeit",
+      "level": "C2",
+      "teilId": "teil-2",
+      "teilLabel": "Teil 2",
+      "topicPrompt": "Gefährdet die digitale Öffentlichkeit den demokratischen Diskurs?",
+      "keywordSubtopic": "",
+      "text": "Gefährdet die digitale Öffentlichkeit den demokratischen Diskurs?",
+      "hint": "Diskutieren Sie Gegenpositionen präzise und differenziert."
+    }
+  },
+  "mocks": {
+    "A1": {
+      "writing": {
+        "situation": "Sie möchten einen Kochkurs besuchen. Schreiben Sie eine E-Mail an die Kochschule „GenussZeit“.",
+        "points": [
+          "Melden Sie sich für den Kurs „Italienische Küche“ an.",
+          "Fragen Sie, wann der nächste Kurs beginnt.",
+          "Fragen Sie nach dem Preis."
+        ],
+        "instruction": "Schreiben Sie ungefähr 30 Wörter."
+      },
+      "speaking": [
+        {
+          "id": "teil1",
+          "teil": "1",
+          "title": "Teil 1 · Sich vorstellen",
+          "context": "Persönliche Vorstellung",
+          "maxRecordingSeconds": 90,
+          "prompt": "Stellen Sie sich kurz vor. Sprechen Sie über Name, Alter, Land, Wohnort, Sprachen, Beruf und Hobby. Buchstabieren Sie am Ende Ihren Familiennamen.",
+          "card": [
+            "Name",
+            "Alter",
+            "Land",
+            "Wohnort",
+            "Sprachen",
+            "Beruf",
+            "Hobby",
+            "Familienname buchstabieren"
+          ]
+        },
+        {
+          "id": "teil2",
+          "teil": "2",
+          "title": "Teil 2 · Um Informationen bitten",
+          "context": "Thema: Freizeit",
+          "maxRecordingSeconds": 45,
+          "prompt": "Thema: Freizeit. Ihr Wort ist „Wochenende“. Stellen Sie eine passende A1-Frage mit diesem Wort.",
+          "keyword": "Wochenende"
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Eine Bitte formulieren",
+          "context": "Bitte im Alltag",
+          "maxRecordingSeconds": 45,
+          "prompt": "Karte: Fenster. Ihnen ist warm. Bitten Sie die andere Person höflich, das Fenster zu öffnen.",
+          "keyword": "Fenster"
+        }
+      ]
+    },
+    "A2": {
+      "writing": {
+        "teil1": {
+          "title": "Teil 1",
+          "situation": "Sie sind unterwegs in der Stadt und schreiben eine SMS an Ihre Freundin Mila.",
+          "points": [
+            "Entschuldigen Sie sich, dass Sie zu spät kommen.",
+            "Schreiben Sie, warum Sie sich verspäten.",
+            "Nennen Sie einen neuen Treffpunkt und eine neue Uhrzeit."
+          ],
+          "instruction": "Schreiben Sie 20–30 Wörter.",
+          "reminder": "Schreiben Sie zu allen drei Punkten."
+        },
+        "teil2": {
+          "title": "Teil 2",
+          "situation": "Ihre Kursleiterin, Frau Becker, hat Sie zu einem Sommerfest der Sprachschule eingeladen. Schreiben Sie Frau Becker eine E-Mail.",
+          "points": [
+            "Bedanken Sie sich für die Einladung und sagen Sie, dass Sie kommen.",
+            "Informieren Sie, dass Sie eine Person mitbringen.",
+            "Fragen Sie, wie Sie zum Fest kommen."
+          ],
+          "instruction": "Schreiben Sie 30–40 Wörter.",
+          "reminder": "Schreiben Sie zu allen drei Punkten."
+        }
+      },
+      "speaking": [
+        {
+          "id": "teil1_questions",
+          "teil": "1",
+          "title": "Teil 1 · Ask four questions",
+          "prompt": "Use the four keywords Wohnort, Familie, Hobby, Beruf. Ask one suitable A2 question for each keyword.",
+          "maxRecordingSeconds": 90
+        },
+        {
+          "id": "teil1_answers",
+          "teil": "1",
+          "title": "Teil 1 · Answer your partner",
+          "prompt": "Answer all four partner questions in complete German sentences: Wo wohnst du? Und wie gefällt es dir dort? | Hast du Geschwister? Erzähl mir ein bisschen von deiner Familie. | Was machst du in deiner Freizeit? Wie oft machst du das? | Was bist du von Beruf, oder was lernst du gerade? Was möchtest du später machen?",
+          "maxRecordingSeconds": 120
+        },
+        {
+          "id": "teil2_main",
+          "teil": "2",
+          "title": "Teil 2 · Wochenende",
+          "prompt": "Erzählen Sie etwas über Ihr Wochenende. Sprechen Sie zu jedem Stichwort ein paar Sätze. Stichwörter: aufstehen (Wann?), Aktivität (Was?), Personen (Mit wem?), Essen (Wo?)",
+          "maxRecordingSeconds": 120
+        },
+        {
+          "id": "teil2_followup",
+          "teil": "2",
+          "title": "Teil 2 · Nachfrage",
+          "prompt": "Was machst du am liebsten am Sonntag?",
+          "maxRecordingSeconds": 45
+        },
+        {
+          "id": "teil3",
+          "teil": "3",
+          "title": "Teil 3 · Gemeinsam planen",
+          "prompt": "Sie möchten am Samstag mit Ihrem Freund oder Ihrer Freundin etwas unternehmen. Partner: Am Samstag habe ich ab 15 Uhr Zeit. Ins Schwimmbad möchte ich nicht. Ich würde gern etwas machen und danach zusammen essen. Planen Sie den Nachmittag. Reagieren Sie auf Ihren Partner und machen Sie einen gemeinsamen Plan. Punkte: Aktivität – Was möchten Sie machen? | Uhrzeit – Wann? | Treffpunkt – Wo treffen Sie sich? | Essen – Wo oder was möchten Sie essen? Reagieren Sie auf die Idee Ihres Partners, machen Sie einen Vorschlag und nennen Sie am Ende einen gemeinsamen Plan.",
+          "maxRecordingSeconds": 90
+        }
+      ]
+    },
+    "B1": {
+      "writing": [
+        {
+          "id": "teil1",
+          "title": "Aufgabe 1 · Informelle E-Mail",
+          "meta": "Empfohlene Arbeitszeit: 20 Minuten · ca. 80 Wörter",
+          "prompt": "Sie haben vor Kurzem eine neue Wohnung bezogen und am Wochenende eine Einweihungsparty gefeiert. Ihr Freund Jan konnte leider nicht kommen. Schreiben Sie eine E-Mail an Ihren Freund Jan.",
+          "points": [
+            "Beschreiben Sie: Wie war die Party?",
+            "Begründen Sie: Warum war der Umzug in die neue Wohnung eine gute Wahl?",
+            "Machen Sie einen Vorschlag: Schlagen Sie ein Treffen vor, um Jan die Wohnung persönlich zu zeigen."
+          ],
+          "target": 80
+        },
+        {
+          "id": "teil2",
+          "title": "Aufgabe 2 · Diskussionsbeitrag",
+          "meta": "Empfohlene Arbeitszeit: 25 Minuten · ca. 80 Wörter",
+          "prompt": "Thema: „Brauchen wir bargeldloses Bezahlen oder sollen wir weiter mit Bargeld bezahlen?“ Lara (24): „Ich zahle fast alles nur noch mit dem Smartphone oder mit der Karte. Das geht super schnell und ich muss nicht mehr ständig zum Geldautomaten laufen. Bargeld braucht heutzutage doch kein Mensch mehr!“",
+          "points": [
+            "Äußern Sie Ihre Meinung zum Thema Kartenzahlung vs. Bargeld.",
+            "Nennen Sie Gründe für Ihre Haltung.",
+            "Führen Sie Vor- oder Nachteile an."
+          ],
+          "target": 80
+        },
+        {
+          "id": "teil3",
+          "title": "Aufgabe 3 · Formelle E-Mail",
+          "meta": "Empfohlene Arbeitszeit: 15 Minuten · ca. 40 Wörter",
+          "prompt": "Sie besuchen einen Deutschkurs. Nächste Woche können Sie an einem Tag nicht am Unterricht teilnehmen, weil Sie einen wichtigen Arzttermin haben. Schreiben Sie eine formelle E-Mail an Ihre Kursleiterin, Frau Schneider.",
+          "points": [
+            "Entschuldigen Sie Ihr Fehlen im Unterricht.",
+            "Nennen Sie den Grund für Ihr Fehlen.",
+            "Bitten Sie um die Hausaufgaben / Kursunterlagen für diesen Tag."
+          ],
+          "target": 40
+        }
+      ],
+      "speaking": {
+        "teil1": {
+          "id": "teil1",
+          "title": "Aufgabe 1 · Gemeinsam planen",
+          "audioObjectKey": "b1/mock-hoeren-1/sprechen-teil-1.mp3",
+          "situation": "Sie möchten mit Ihrem Partner für eine gute Freundin eine Überraschungsparty zum Geburtstag organisieren.",
+          "points": [
+            "Wo?",
+            "Wann?",
+            "Essen und Trinken",
+            "Einladung der Gäste",
+            "Geschenk",
+            "Wer macht was?"
+          ],
+          "instruction": "Machen Sie Vorschläge und reagieren Sie auf die Vorschläge Ihrer Partnerin. Die Partneraufnahme enthält sechs Antwortfenster. Ihr Mikrofon bleibt für das ganze Gespräch aktiv.",
+          "maxRecordingSeconds": 240
+        },
+        "teil2": {
+          "id": "teil2",
+          "title": "Aufgabe 2 · Präsentation",
+          "topic": "Brauchen wir noch gedruckte Bücher oder lernen wir nur noch digital?",
+          "points": [
+            "Persönliche Erfahrungen: Wie lernen Sie lieber – mit Büchern aus Papier oder mit Smartphone/Tablet/Laptop?",
+            "Rolle im Heimatland: Wie wird in den Schulen und Universitäten in Ihrem Heimatland gelernt?",
+            "Vor- und Nachteile: Welche Vorteile haben digitale Medien gegenüber klassischen Lehrbüchern (und umgekehrt)?",
+            "Ihre Meinung: Wie sieht die Zukunft des Lernens aus?"
+          ],
+          "prepSeconds": 300,
+          "maxRecordingSeconds": 180
+        },
+        "teil3": {
+          "id": "teil3",
+          "title": "Aufgabe 3 · Reagieren",
+          "prompt": "Ihr Gesprächspartner sagt: „Digitale Medien sind praktisch, aber mit einem gedruckten Buch kann ich mich besser konzentrieren.“ Reagieren Sie auf die Aussage. Sagen Sie, ob Sie zustimmen, und begründen Sie kurz Ihre Meinung.",
+          "maxRecordingSeconds": 90
+        }
+      }
+    },
+    "B2": {
+      "writing": [
+        {
+          "id": "teil1",
+          "title": "Teil 1 · Forumsbeitrag",
+          "meta": "Empfohlene Arbeitszeit: 50 Minuten · ca. 150 Wörter",
+          "topic": "Homeoffice – Arbeiten von zu Hause aus",
+          "prompt": "Sie schreiben einen Beitrag für ein Online-Forum zum Thema „Homeoffice – Arbeiten von zu Hause aus“.",
+          "points": [
+            "Äußern Sie Ihre Meinung zum Thema Arbeiten im Homeoffice.",
+            "Nennen Sie Gründe, warum dieses Arbeitsmodell heutzutage immer beliebter wird.",
+            "Nennen Sie Möglichkeiten, wie Unternehmen ihre Mitarbeiter im Homeoffice gut unterstützen können.",
+            "Nennen Sie Vor- und Nachteile der Arbeit im Büro als Alternative zum Homeoffice."
+          ],
+          "guidance": "Denken Sie an eine getrennte Einleitung und einen passenden Schlusssatz. Verbinden Sie die Punkte zu einem zusammenhängenden Text.",
+          "target": 150
+        },
+        {
+          "id": "teil2",
+          "title": "Teil 2 · Formelle Nachricht",
+          "meta": "Empfohlene Arbeitszeit: 25 Minuten · ca. 100 Wörter",
+          "topic": "Projektseminar und Dienstreise",
+          "prompt": "Sie nehmen zurzeit an einer beruflichen Weiterbildung teil. Nächste Woche soll ein wichtiges Projektseminar stattfinden, an dem Sie wegen einer unaufschiebbaren Dienstreise nicht teilnehmen können. Schreiben Sie eine formelle Nachricht an die Seminarleiterin, Frau Dr. Weber.",
+          "points": [
+            "Schreiben Sie den Grund für Ihre Nachricht und entschuldigen Sie Ihr Fehlen.",
+            "Erklären Sie, warum die Dienstreise dringend erforderlich ist.",
+            "Machen Sie einen Vorschlag, wie Sie den verpassten Seminarstoff nachholen können.",
+            "Bitten Sie um Zusendung der Unterlagen oder Präsentationen."
+          ],
+          "guidance": "Achten Sie auf eine passende formelle Anrede, einen klaren Aufbau und einen angemessenen Schluss.",
+          "target": 100
+        }
+      ],
+      "speaking": {
+        "teil1": {
+          "id": "teil1",
+          "title": "Teil 1 · Präsentation",
+          "prepSeconds": 900,
+          "maxRecordingSeconds": 240,
+          "instruction": "Wählen Sie eines der beiden Themen. Strukturieren Sie Ihre Präsentation klar und sprechen Sie zusammenhängend. Nennen Sie Beispiele, begründen Sie Ihre Position und schließen Sie mit einem kurzen Fazit.",
+          "themes": [
+            {
+              "id": "thema1",
+              "title": "Konsumverhalten – Kaufen wir zu viele unnötige Dinge?",
+              "prompt": "Sprechen Sie über das Kaufverhalten in der heutigen Gesellschaft und Möglichkeiten, bewusster einzukaufen."
+            },
+            {
+              "id": "thema2",
+              "title": "Weiterbildung im Beruf – Pflicht oder Eigenverantwortung?",
+              "prompt": "Sprechen Sie über Möglichkeiten und die Bedeutung von lebenslangem Lernen und beruflicher Fortbildung."
+            }
+          ]
+        },
+        "teil2": {
+          "id": "teil2",
+          "title": "Teil 2 · Diskutieren / Standpunkte austauschen",
+          "maxRecordingSeconds": 300,
+          "topic": "Soll der öffentliche Personennahverkehr (ÖPNV) für alle Bürger komplett kostenlos sein?",
+          "points": [
+            "Tauschen Sie Ihre Argumente aus: Nennen Sie Vor- und Nachteile eines kostenlosen Bus- und Bahnverkehrs, zum Beispiel Umwelt, Finanzierung, Qualität und Verkehrsbelastung.",
+            "Gehen Sie auf Gegenargumente ein: Stimmen Sie einer anderen Position zu oder widersprechen Sie höflich und begründen Sie Ihre Reaktion.",
+            "Erreichen Sie ein Fazit: Versuchen Sie am Ende, eine gemeinsame Position oder eine klare Zusammenfassung zu formulieren."
+          ],
+          "simulationNote": "Da in diesem Mock kein Partner-Audio vorgegeben ist, simulieren Sie beide Seiten der Diskussion: Nennen Sie mindestens ein Gegenargument ausdrücklich und reagieren Sie darauf."
+        }
+      }
+    }
+  }
+}

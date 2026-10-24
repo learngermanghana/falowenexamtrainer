@@ -1,0 +1,35 @@
+name: A1 Day 20 Goethe writing grammar
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A1Day20GoetheWritingGrammarPage.jsx"
+      - "web/src/components/A1Day20GoetheWritingGrammarPage.test.jsx"
+      - "web/src/components/A1WorkbookGrammarNotes.js"
+      - "web/src/components/LetterWritingIntroPage.js"
+      - "web/src/components/LetterWritingIntroPage.test.js"
+      - "web/package.json"
+      - "web/package-lock.json"
+      - ".github/workflows/a1-day20-goethe-writing.yml"
+
+jobs:
+  goethe-writing-grammar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test form filling and formal-informal samples
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day20GoetheWritingGrammarPage.test.jsx
+      - name: Build production web app
+        working-directory: web
+        run: npm run build

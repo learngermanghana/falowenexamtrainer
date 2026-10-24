@@ -1,0 +1,66 @@
+name: Progress snapshot and draft resilience
+
+on:
+  pull_request:
+    paths:
+      - "web/src/hooks/useCourseCompletionProgress.js"
+      - "web/src/services/courseCompletionSnapshotService.js"
+      - "web/src/services/courseCompletionSnapshotService.test.js"
+      - "web/src/utils/submissionLocalDraftCache.js"
+      - "web/src/utils/submissionLocalDraftCache.test.js"
+      - "web/src/components/AssignmentSubmissionPage.js"
+      - "web/src/components/ProgressSnapshotDraftResilience.test.js"
+      - "scripts/patchCanonicalCourseCompletionProgress.mjs"
+      - "scripts/patchCourseCompletionSnapshotPersistence.mjs"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "scripts/patchLocalSubmissionDraftResilience.mjs"
+      - "firestore.rules"
+      - ".github/workflows/progress-snapshot-draft-resilience.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "web/src/hooks/useCourseCompletionProgress.js"
+      - "web/src/services/courseCompletionSnapshotService.js"
+      - "web/src/utils/submissionLocalDraftCache.js"
+      - "scripts/patchCanonicalCourseCompletionProgress.mjs"
+      - "scripts/patchWorkbookSubmissionAutoSelection.mjs"
+      - "firestore.rules"
+      - ".github/workflows/progress-snapshot-draft-resilience.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Apply structured submission lifecycle twice
+        run: |
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+          node scripts/patchWorkbookSubmissionAutoSelection.mjs
+      - name: Apply canonical completion lifecycle twice
+        run: |
+          node scripts/patchCanonicalCourseCompletionProgress.mjs
+          node scripts/patchCanonicalCourseCompletionProgress.mjs
+      - name: Test completion snapshots and draft recovery
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand
+          src/services/courseCompletionSnapshotService.test.js
+          src/utils/submissionLocalDraftCache.test.js
+          src/components/CourseCompletionProgressRegression.test.js
+          src/components/ProgressSnapshotDraftResilience.test.js
+          src/components/StructuredSubmissionLifecycle.test.js
+          src/components/StructuredResubmissionLifecycle.test.js
+      - name: Build production web app
+        working-directory: web
+        run: npm run build

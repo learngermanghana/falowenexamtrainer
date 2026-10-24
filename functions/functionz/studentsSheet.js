@@ -1,0 +1,632 @@
+// functions/functionz/studentsSheet.js
+"use strict";
+
+const { google } = require("googleapis");
+const { sheetCellValue } = require("../sheetCellValue");
+
+/**
+ * Header-aware upsert into your Students Google Sheet.
+ * - Reads row 1 for headers
+ * - Finds existing row by StudentCode (preferred), else by uid/email
+ * - Updates ONLY the matching cells (safe for Apps Script + formulas)
+ * - Appends a new row if not found
+ *
+ * ENV expected:
+ * - STUDENTS_SHEET_ID
+ * - STUDENTS_SHEET_TAB (default: "students")
+ * - GOOGLE_SERVICE_ACCOUNT_JSON (recommended, JSON string)
+ *    OR GOOGLE_SERVICE_ACCOUNT_JSON_B64 (base64 of JSON string)
+ */
+
+function normalizeHeader(h) {
+  return String(h || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "")
+    .replace(/[()]/g, "");
+}
+
+function colToA1(colIdx0) {
+  // 0 => A, 25 => Z, 26 => AA
+  let n = colIdx0 + 1;
+  let s = "";
+  while (n > 0) {
+    const r = (n - 1) % 26;
+    s = String.fromCharCode(65 + r) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
+
+function getServiceAccountFromEnv() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (raw && raw.trim().startsWith("{")) {
+    return JSON.parse(raw);
+  }
+
+  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
+  if (b64) {
+    const decoded = Buffer.from(b64, "base64").toString("utf8");
+    return JSON.parse(decoded);
+  }
+
+  throw new Error(
+    "Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64)."
+  );
+}
+
+async function getSheetsClient() {
+  const sa = getServiceAccountFromEnv();
+  const projectId =
+    sa.project_id ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    (process.env.FIREBASE_CONFIG
+      ? (() => {
+          try {
+            const cfg = JSON.parse(process.env.FIREBASE_CONFIG);
+            return cfg.projectId || null;
+          } catch (e) {
+            return null;
+          }
+        })()
+      : null);
+
+  const auth = new google.auth.JWT({
+    email: sa.client_email,
+    key: sa.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    projectId,
+  });
+
+  const sheets = google.sheets({ version: "v4", auth });
+  return sheets;
+}
+
+async function loadHeaderMap(sheets, sheetId, tabName) {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!1:1`,
+  });
+
+  const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
+  const headerMap = new Map(); // normalized header -> colIdx0
+
+  headers.forEach((h, idx) => {
+    const key = normalizeHeader(h);
+    // Keep the first occurrence so duplicate headers farther right (e.g. AH, AI...)
+    // do not override canonical columns at the start of the sheet.
+    if (key && !headerMap.has(key)) headerMap.set(key, idx);
+  });
+
+  return { headers, headerMap };
+}
+
+async function ensureHeaders(sheets, sheetId, tabName, requiredHeaders = []) {
+  let loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  const missing = requiredHeaders.filter(
+    (header) => !loaded.headerMap.has(normalizeHeader(header))
+  );
+
+  if (!missing.length) return loaded;
+
+  const startCol = loaded.headers.length;
+  const endCol = startCol + missing.length - 1;
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colToA1(startCol)}1:${colToA1(endCol)}1`,
+    valueInputOption: "RAW",
+    requestBody: { values: [missing] },
+  });
+
+  loaded = await loadHeaderMap(sheets, sheetId, tabName);
+  return loaded;
+}
+
+function findCol(headerMap, ...candidates) {
+  for (const c of candidates) {
+    const idx = headerMap.get(normalizeHeader(c));
+    if (idx !== undefined) return idx;
+  }
+  return null;
+}
+
+async function getColumnValues(sheets, sheetId, tabName, colIdx0) {
+  const colA1 = colToA1(colIdx0);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colA1}2:${colA1}`,
+  });
+
+  const values = res.data.values || [];
+  // values is [["x"],["y"]...]
+  return values.map((r) => (r && r[0] ? String(r[0]).trim() : ""));
+}
+
+async function getTabSheetId(sheets, spreadsheetId, tabName) {
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets(properties(sheetId,title))",
+  });
+  const sheet = (meta.data.sheets || []).find(
+    (entry) => entry?.properties?.title === tabName
+  );
+  if (!sheet?.properties?.sheetId && sheet?.properties?.sheetId !== 0) {
+    throw new Error(`Sheet tab "${tabName}" not found in spreadsheet.`);
+  }
+  return sheet.properties.sheetId;
+}
+
+async function deleteDuplicateRows(sheets, spreadsheetId, tabName, rowNumbers) {
+  const uniqueSorted = Array.from(new Set(rowNumbers || []))
+    .filter((n) => Number.isInteger(n) && n > 1)
+    .sort((a, b) => b - a);
+  if (!uniqueSorted.length) return 0;
+
+  const tabSheetId = await getTabSheetId(sheets, spreadsheetId, tabName);
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: uniqueSorted.map((rowNumber) => ({
+        deleteDimension: {
+          range: {
+            sheetId: tabSheetId,
+            dimension: "ROWS",
+            startIndex: rowNumber - 1,
+            endIndex: rowNumber,
+          },
+        },
+      })),
+    },
+  });
+
+  return uniqueSorted.length;
+}
+
+function collectMatchingRows({ studentCodes = [], uids = [], emails = [], targetStudentCode = "", targetUid = "", targetEmail = "" }) {
+  const matches = new Set();
+
+  if (targetStudentCode) {
+    studentCodes.forEach((v, idx) => {
+      if (v === targetStudentCode) matches.add(idx + 2);
+    });
+  }
+
+  if (targetUid && uids.length) {
+    uids.forEach((v, idx) => {
+      if (v === targetUid) matches.add(idx + 2);
+    });
+  }
+
+  if (targetEmail && emails.length) {
+    const targetEmailLc = targetEmail.toLowerCase();
+    emails.forEach((v, idx) => {
+      if (String(v || "").toLowerCase() === targetEmailLc) matches.add(idx + 2);
+    });
+  }
+
+  return Array.from(matches).sort((a, b) => a - b);
+}
+
+function resolvePaidValue(student = {}) {
+  return student.initialPaymentAmount ?? student.paidAmount ?? student.paid ?? "";
+}
+
+function resolveBalanceValue(student = {}) {
+  const explicitBalance = student.balanceDue ?? student.balance;
+  const explicitNumeric = Number(explicitBalance);
+  const hasExplicitBalance = explicitBalance !== null && explicitBalance !== undefined && `${explicitBalance}` !== "";
+
+  const tuitionNumeric = Number(student.tuitionFee);
+  const paidNumeric = Number(resolvePaidValue(student));
+  const hasDerivedInputs = Number.isFinite(tuitionNumeric) && Number.isFinite(paidNumeric);
+
+  if (!hasExplicitBalance && !hasDerivedInputs) return "";
+  if (!hasExplicitBalance) return Math.max(tuitionNumeric - paidNumeric, 0);
+  if (!hasDerivedInputs) return explicitBalance;
+  if (!Number.isFinite(explicitNumeric)) return Math.max(tuitionNumeric - paidNumeric, 0);
+
+  return Math.min(Math.max(explicitNumeric, 0), Math.max(tuitionNumeric - paidNumeric, 0));
+}
+
+async function upsertStudentToSheet(student) {
+  const sheetId = process.env.STUDENTS_SHEET_ID;
+  const tabName = process.env.STUDENTS_SHEET_TAB || "students";
+
+  if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
+
+  const sheets = await getSheetsClient();
+  const hasTrialMetadata = [
+    student.trialStartedAt,
+    student.trialEndsAt,
+    student.trialPurgeAt,
+    student.trialUsedAt,
+    student.trialConvertedAt,
+  ].some((value) => value !== undefined && value !== null && String(value).trim() !== "");
+
+  const { headers, headerMap } = hasTrialMetadata
+    ? await ensureHeaders(sheets, sheetId, tabName, [
+        "TrialStartedAt",
+        "TrialEndsAt",
+        "TrialPurgeAt",
+        "TrialUsedAt",
+        "TrialConvertedAt",
+      ])
+    : await loadHeaderMap(sheets, sheetId, tabName);
+
+  // Find important columns by header names (supports variations)
+  const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
+  const colUid = findCol(headerMap, "uid", "UID", "User Id", "UserID", "User ID");
+  const colEmail = findCol(headerMap, "Email", "email");
+  const colName = findCol(headerMap, "Name", "name", "Full Name", "Student Name", "StudentName");
+  const colPhone = findCol(headerMap, "Phone", "phone");
+  const colLocation = findCol(headerMap, "Location", "location");
+  const colLevel = findCol(headerMap, "Level", "level");
+  const colClassName = findCol(headerMap, "ClassName", "Class Name", "classname");
+  const colStatus = findCol(headerMap, "Status", "status");
+  const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
+  const colPaid = findCol(headerMap, "Paid", "InitialPayment", "Initial Payment");
+  const colBalance = findCol(headerMap, "Balance", "BalanceDue", "Balance Due");
+  const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
+  const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
+  const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colTrialStartedAt = findCol(headerMap, "TrialStartedAt", "Trial Started At");
+  const colTrialEndsAt = findCol(headerMap, "TrialEndsAt", "Trial Ends At");
+  const colTrialPurgeAt = findCol(headerMap, "TrialPurgeAt", "Trial Purge At");
+  const colTrialUsedAt = findCol(headerMap, "TrialUsedAt", "Trial Used At");
+  const colTrialConvertedAt = findCol(headerMap, "TrialConvertedAt", "Trial Converted At");
+  const colEmergencyPhone = findCol(
+    headerMap,
+    "Emergency Contact (Phone Number)",
+    "Emergency Contact",
+    "Emergency Contact Phone"
+  );
+  const colDailyLimit = findCol(headerMap, "Daily_Limit", "Daily Limit", "DailyLimit");
+  const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
+  const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
+  const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
+  const colEnrollmentSent = findCol(headerMap, "EnrollmentSent", "Enrollment Sent");
+  const colLastPaidRecorded = findCol(headerMap, "LastPaidRecorded", "Last Paid Recorded");
+  const colBalanceGraceNoticeSent = findCol(
+    headerMap,
+    "BalanceGraceNoticeSent",
+    "Balance Grace Notice Sent"
+  );
+  const colPaymentReminderLastSent = findCol(
+    headerMap,
+    "PaymentReminderLastSent",
+    "Payment Reminder Last Sent"
+  );
+  const colPaymentReminderCount = findCol(
+    headerMap,
+    "PaymentReminderCount",
+    "Payment Reminder Count"
+  );
+  const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
+  const colAddress = findCol(headerMap, "Address", "Home Address", "address", "homeaddress");
+  const colContractMergeMode = findCol(
+    headerMap,
+    "ContractMergeMode",
+    "Contract Merge Mode",
+    "contractMergeMode"
+  );
+  const colUpgradeCarryoverUntil = findCol(
+    headerMap,
+    "UpgradeCarryoverUntil",
+    "Upgrade Carryover Until",
+    "upgradeCarryoverUntil"
+  );
+  const colUpgradeFromLevel = findCol(
+    headerMap,
+    "UpgradeFromLevel",
+    "Upgrade From Level",
+    "upgradeFromLevel"
+  );
+  const colUpgradeToLevel = findCol(
+    headerMap,
+    "UpgradeToLevel",
+    "Upgrade To Level",
+    "upgradeToLevel"
+  );
+  const colUpgradeQueuedAt = findCol(
+    headerMap,
+    "UpgradeQueuedAt",
+    "Upgrade Queued At",
+    "upgradeQueuedAt"
+  );
+
+  if (colStudentCode === null) {
+    const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
+    throw new Error(
+      `Students sheet is missing a StudentCode column header. Found headers: ${headerNames}`
+    );
+  }
+
+  // Build indexes to locate existing rows (only by columns that exist)
+  const studentCodes = await getColumnValues(sheets, sheetId, tabName, colStudentCode);
+
+  let uids = [];
+  if (colUid !== null) uids = await getColumnValues(sheets, sheetId, tabName, colUid);
+
+  let emails = [];
+  if (colEmail !== null) emails = await getColumnValues(sheets, sheetId, tabName, colEmail);
+
+  // Row number in sheet (1-based; row 1 is header). Data rows start at row 2.
+  const targetStudentCode = String(student.studentCode || student.studentcode || "").trim();
+  const targetUid = String(student.uid || "").trim();
+  const targetEmail = String(student.email || "").trim();
+  const enrollDateValue = student.enrollDate || student.joined_at || "";
+
+  const matchedRows = collectMatchingRows({
+    studentCodes,
+    uids,
+    emails,
+    targetStudentCode,
+    targetUid,
+    targetEmail,
+  });
+
+  let sheetRowNumber = matchedRows.length ? matchedRows[0] : null;
+
+  // If duplicates already exist (e.g. same student saved multiple times),
+  // keep the first row and remove the extra rows so future upserts stay stable.
+  if (matchedRows.length > 1) {
+    const duplicateRows = matchedRows.slice(1);
+    await deleteDuplicateRows(sheets, sheetId, tabName, duplicateRows);
+  }
+
+  // Prepare cell updates (ONLY update columns that exist)
+  const updates = [];
+  function pushCell(colIdx0, value) {
+    if (colIdx0 === null || colIdx0 === undefined) return;
+    const colA1 = colToA1(colIdx0);
+    const a1 = `${tabName}!${colA1}${sheetRowNumber}`;
+    updates.push({ range: a1, values: [[sheetCellValue(value)]] });
+  }
+
+  if (sheetRowNumber) {
+    // Update existing row safely
+    pushCell(colStudentCode, targetStudentCode || "");
+    pushCell(colUid, targetUid || "");
+    pushCell(colEmail, targetEmail || "");
+    pushCell(colName, student.name || "");
+    pushCell(colPhone, student.phone || "");
+    pushCell(colLocation, student.location || "");
+    pushCell(colLevel, student.level || "");
+    pushCell(colClassName, student.className || "");
+    pushCell(colStatus, student.status || "");
+    pushCell(colEnrollDate, enrollDateValue);
+    pushCell(colPaid, resolvePaidValue(student));
+    pushCell(colBalance, resolveBalanceValue(student));
+    pushCell(colPaymentStatus, student.paymentStatus || "");
+    pushCell(colContractStart, student.contractStart || "");
+    pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colTrialStartedAt, student.trialStartedAt || "");
+    pushCell(colTrialEndsAt, student.trialEndsAt || "");
+    pushCell(colTrialPurgeAt, student.trialPurgeAt || "");
+    pushCell(colTrialUsedAt, student.trialUsedAt || "");
+    pushCell(colTrialConvertedAt, student.trialConvertedAt || "");
+    pushCell(colLearningMode, student.learningMode || "");
+    pushCell(colAddress, student.address || "");
+    pushCell(colContractMergeMode, student.contractMergeMode || "");
+    pushCell(colUpgradeCarryoverUntil, student.upgradeCarryoverUntil || "");
+    pushCell(colUpgradeFromLevel, student.upgradeFromLevel || "");
+    pushCell(colUpgradeToLevel, student.upgradeToLevel || "");
+    pushCell(colUpgradeQueuedAt, student.upgradeQueuedAt || "");
+    pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
+    pushCell(colDailyLimit, student.dailyLimit ?? "");
+    pushCell(colUsesToday, student.usesToday ?? "");
+    pushCell(colLastDate, student.lastDate || "");
+    pushCell(colReminderSent, student.reminderSent || "");
+    pushCell(colEnrollmentSent, student.enrollmentSent || "");
+    pushCell(colLastPaidRecorded, student.lastPaidRecorded || "");
+    pushCell(colBalanceGraceNoticeSent, student.balanceGraceNoticeSent || "");
+    pushCell(colPaymentReminderLastSent, student.paymentReminderLastSent || "");
+    pushCell(colPaymentReminderCount, student.paymentReminderCount ?? "");
+
+    if (updates.length) {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: {
+          valueInputOption: "USER_ENTERED",
+          data: updates,
+        },
+      });
+    }
+
+    return { action: "updated", row: sheetRowNumber };
+  }
+
+  // Append new row: create an array aligned to header length
+  // Note: we only fill known columns; everything else stays empty.
+  const maxCol = headerMap.size ? Math.max(...Array.from(headerMap.values())) : 0;
+  const row = Array(maxCol + 1).fill("");
+
+  row[colStudentCode] = targetStudentCode || "";
+  if (colUid !== null) row[colUid] = targetUid || "";
+  if (colEmail !== null) row[colEmail] = targetEmail || "";
+  if (colName !== null) row[colName] = student.name || "";
+  if (colPhone !== null) row[colPhone] = student.phone || "";
+  if (colLocation !== null) row[colLocation] = student.location || "";
+  if (colLevel !== null) row[colLevel] = student.level || "";
+  if (colClassName !== null) row[colClassName] = student.className || "";
+  if (colStatus !== null) row[colStatus] = student.status || "";
+  if (colEnrollDate !== null) row[colEnrollDate] = enrollDateValue;
+  if (colPaid !== null) row[colPaid] = resolvePaidValue(student);
+  if (colBalance !== null) row[colBalance] = resolveBalanceValue(student);
+  if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
+  if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
+  if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colTrialStartedAt !== null) row[colTrialStartedAt] = student.trialStartedAt || "";
+  if (colTrialEndsAt !== null) row[colTrialEndsAt] = student.trialEndsAt || "";
+  if (colTrialPurgeAt !== null) row[colTrialPurgeAt] = student.trialPurgeAt || "";
+  if (colTrialUsedAt !== null) row[colTrialUsedAt] = student.trialUsedAt || "";
+  if (colTrialConvertedAt !== null) row[colTrialConvertedAt] = student.trialConvertedAt || "";
+  if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
+  if (colAddress !== null) row[colAddress] = student.address || "";
+  if (colContractMergeMode !== null)
+    row[colContractMergeMode] = student.contractMergeMode || "";
+  if (colUpgradeCarryoverUntil !== null)
+    row[colUpgradeCarryoverUntil] = student.upgradeCarryoverUntil || "";
+  if (colUpgradeFromLevel !== null)
+    row[colUpgradeFromLevel] = student.upgradeFromLevel || "";
+  if (colUpgradeToLevel !== null)
+    row[colUpgradeToLevel] = student.upgradeToLevel || "";
+  if (colUpgradeQueuedAt !== null)
+    row[colUpgradeQueuedAt] = student.upgradeQueuedAt || "";
+  if (colEmergencyPhone !== null)
+    row[colEmergencyPhone] = student.emergencyContactPhone || "";
+  if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";
+  if (colUsesToday !== null) row[colUsesToday] = student.usesToday ?? "";
+  if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
+  if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
+  if (colEnrollmentSent !== null) row[colEnrollmentSent] = student.enrollmentSent || "";
+  if (colLastPaidRecorded !== null) row[colLastPaidRecorded] = student.lastPaidRecorded || "";
+  if (colBalanceGraceNoticeSent !== null)
+    row[colBalanceGraceNoticeSent] = student.balanceGraceNoticeSent || "";
+  if (colPaymentReminderLastSent !== null)
+    row[colPaymentReminderLastSent] = student.paymentReminderLastSent || "";
+  if (colPaymentReminderCount !== null)
+    row[colPaymentReminderCount] = student.paymentReminderCount ?? "";
+
+  const appendRange = `${tabName}!A:${colToA1(maxCol)}`;
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: appendRange,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [row.map(sheetCellValue)] },
+  });
+
+  return { action: "appended" };
+}
+
+async function appendStudentToStudentsSheetSafely(student) {
+  try {
+    return await upsertStudentToSheet(student);
+  } catch (err) {
+    console.error("appendStudentToStudentsSheetSafely error", { message: err.message, status: err.response?.status || err.status || err.code });
+    return {
+      error: err.message || "Failed to sync student to sheet",
+      errorStatus: Number(err.response?.status || err.status || (typeof err.code === "number" ? err.code : 0)),
+      errorReason: String(err.response?.data?.error?.errors?.[0]?.reason || ""),
+    };
+  }
+}
+
+function extractSpreadsheetIdFromUrl(value) {
+  const match = String(value || "").match(/\/spreadsheets\/d\/([^/]+)/i);
+  return match ? match[1] : "";
+}
+
+async function purgeStudentFromSheets({
+  studentCode = "",
+  uid = "",
+  email = "",
+  scoresSpreadsheetId = "",
+  scoresSpreadsheetUrl = "",
+  scoresTabName = "scores_backup",
+} = {}) {
+  const studentsSpreadsheetId = process.env.STUDENTS_SHEET_ID;
+  const studentsTabName = process.env.STUDENTS_SHEET_TAB || "students";
+  if (!studentsSpreadsheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
+
+  const normalizedCode = String(studentCode || "").trim().toLowerCase();
+  const normalizedUid = String(uid || "").trim();
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedCode && !normalizedUid && !normalizedEmail) {
+    throw new Error("Student code, uid or email is required for sheet purge.");
+  }
+
+  const sheets = await getSheetsClient();
+
+  const studentHeaderData = await loadHeaderMap(sheets, studentsSpreadsheetId, studentsTabName);
+  const studentCodeCol = findCol(studentHeaderData.headerMap, "StudentCode", "Student Code", "studentcode");
+  const uidCol = findCol(studentHeaderData.headerMap, "uid", "UID", "User Id", "UserID", "User ID");
+  const emailCol = findCol(studentHeaderData.headerMap, "Email", "email");
+
+  const codeValues = studentCodeCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, studentCodeCol);
+  const uidValues = uidCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, uidCol);
+  const emailValues = emailCol === null
+    ? []
+    : await getColumnValues(sheets, studentsSpreadsheetId, studentsTabName, emailCol);
+
+  const studentRows = new Set();
+  codeValues.forEach((value, index) => {
+    if (normalizedCode && String(value || "").trim().toLowerCase() === normalizedCode) studentRows.add(index + 2);
+  });
+  uidValues.forEach((value, index) => {
+    if (normalizedUid && String(value || "").trim() === normalizedUid) studentRows.add(index + 2);
+  });
+  emailValues.forEach((value, index) => {
+    if (normalizedEmail && String(value || "").trim().toLowerCase() === normalizedEmail) studentRows.add(index + 2);
+  });
+
+  const studentRowsDeleted = await deleteDuplicateRows(
+    sheets,
+    studentsSpreadsheetId,
+    studentsTabName,
+    Array.from(studentRows)
+  );
+
+  const resolvedScoresSpreadsheetId =
+    String(scoresSpreadsheetId || "").trim() ||
+    extractSpreadsheetIdFromUrl(scoresSpreadsheetUrl);
+
+  let scoreRowsDeleted = 0;
+  if (resolvedScoresSpreadsheetId && normalizedCode) {
+    const scoreHeaderData = await loadHeaderMap(
+      sheets,
+      resolvedScoresSpreadsheetId,
+      scoresTabName
+    );
+    const scoreCodeCol = findCol(
+      scoreHeaderData.headerMap,
+      "StudentCode",
+      "Student Code",
+      "studentcode",
+      "student_code"
+    );
+
+    if (scoreCodeCol !== null) {
+      const scoreCodes = await getColumnValues(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreCodeCol
+      );
+      const scoreRows = [];
+      scoreCodes.forEach((value, index) => {
+        if (String(value || "").trim().toLowerCase() === normalizedCode) {
+          scoreRows.push(index + 2);
+        }
+      });
+      scoreRowsDeleted = await deleteDuplicateRows(
+        sheets,
+        resolvedScoresSpreadsheetId,
+        scoresTabName,
+        scoreRows
+      );
+    }
+  }
+
+  return { studentRowsDeleted, scoreRowsDeleted };
+}
+
+module.exports = {
+  upsertStudentToSheet,
+  appendStudentToStudentsSheetSafely,
+  purgeStudentFromSheets,
+  __testables: {
+    collectMatchingRows,
+    resolvePaidValue,
+    resolveBalanceValue,
+    normalizeHeader,
+  },
+};

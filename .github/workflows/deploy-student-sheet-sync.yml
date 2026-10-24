@@ -1,0 +1,55 @@
+name: Deploy and repair student sheet sync
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-student-sheet-sync.yml']
+  workflow_dispatch:
+concurrency:
+  group: student-sheet-sync-release
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      GOOGLE_CLOUD_PROJECT: falowen-examiner-trainer
+      GCLOUD_PROJECT: falowen-examiner-trainer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --prefix functions --no-audit --no-fund
+      - run: node --test functions/__tests__/studentSheetDelivery.test.cjs functions/__tests__/sheetCellValue.test.cjs
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: falowen-examiner-trainer
+      - run: npm install -g firebase-tools
+      - name: Deploy only existing student sheet triggers
+        run: firebase deploy --project falowen-examiner-trainer --only functions:falowenexamtrainer:onStudentCreated,functions:falowenexamtrainer:onStudentUpdated --non-interactive --force
+      - name: Verify trigger state
+        run: |
+          gcloud functions describe onStudentCreated --gen2 --region=europe-west1 --format='value(name,state,eventTrigger.retryPolicy)'
+          gcloud functions describe onStudentUpdated --gen2 --region=europe-west1 --format='value(name,state,eventTrigger.retryPolicy)'
+      - name: Repair Jerry's missing student row from current Firestore data
+        run: |
+          node <<'JS'
+          const {execFileSync}=require('node:child_process');
+          const admin=require('./functions/node_modules/firebase-admin');
+          const secret=name=>execFileSync('gcloud',['secrets','versions','access','latest','--secret='+name,'--project=falowen-examiner-trainer'],{encoding:'utf8'}).trim();
+          (async()=>{
+            admin.initializeApp({projectId:'falowen-examiner-trainer'});
+            const code='JerryKweigyah022';
+            const rows=await admin.firestore().collection('students').where('studentCode','==',code).limit(2).get();
+            if(rows.size!==1)throw Error('Expected one Jerry student record, found '+rows.size);
+            const student=rows.docs[0].data();
+            if(String(student.email||'').trim().toLowerCase()!=='jerrykweigyah01@gmail.com')throw Error('Student email does not match the requested repair.');
+            if(['deleted','purged'].includes(String(student.status||'').toLowerCase()))throw Error('Student is deleted; refusing repair.');
+            const env={...process.env,GOOGLE_SERVICE_ACCOUNT_JSON_B64:secret('GOOGLE_SERVICE_ACCOUNT_JSON_B64'),STUDENTS_SHEET_ID:secret('STUDENTS_SHEET_ID'),STUDENTS_SHEET_TAB:secret('STUDENTS_SHEET_TAB')};
+            execFileSync('node',['functions/scripts/repairStudentSheetSync.cjs',code],{env,stdio:'inherit'});
+            execFileSync('node',['functions/scripts/repairStudentSheetSync.cjs',code,'--apply'],{env,stdio:'inherit'});
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
+          JS

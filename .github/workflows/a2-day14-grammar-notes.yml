@@ -1,0 +1,41 @@
+name: A2 Day 14 bilingual grammar notes
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/A2Day14BerufUndKarriereUmZuGrammarPage.js"
+      - "web/src/components/A2Day14BerufUndKarriereWorkbookPage.test.js"
+      - "web/src/components/A2Day14BerufUndKarriereGrammarNotes.test.jsx"
+      - ".github/workflows/a2-day14-grammar-notes.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/A2Day14BerufUndKarriereUmZuGrammarPage.js"
+      - "web/src/components/A2Day14BerufUndKarriereWorkbookPage.test.js"
+      - "web/src/components/A2Day14BerufUndKarriereGrammarNotes.test.jsx"
+      - ".github/workflows/a2-day14-grammar-notes.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  day14-grammar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Check Day 14 grammar explanations, bilingual examples and workbook tabs
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/components/A2Day14BerufUndKarriereGrammarNotes.test.jsx
+          src/components/A2Day14BerufUndKarriereWorkbookPage.test.js

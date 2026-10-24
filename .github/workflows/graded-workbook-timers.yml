@@ -1,0 +1,74 @@
+name: Graded workbook timer rules
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/data/gradedTabTiming.js'
+      - 'web/src/data/gradedTabTiming.test.js'
+      - 'web/src/data/a2B1LessonProfile.js'
+      - 'web/src/data/a2B1LessonProfile.test.js'
+      - 'web/src/data/a2B1TimedAssignmentBase.js'
+      - 'web/src/data/timedAssignmentConfig.js'
+      - 'web/src/data/timedAssignmentConfig.test.js'
+      - 'web/src/components/SharedTimedAssignment.jsx'
+      - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/a1SubmissionConsistencyRuntime.js'
+      - 'web/src/a1SubmissionConsistencyRuntime.test.js'
+      - 'web/src/components/A1TimedMockExam.jsx'
+      - 'web/src/components/A1TimedMockExam.test.jsx'
+      - 'web/src/utils/a1TimedAutoSubmitGate.js'
+      - 'web/src/utils/a1TimedAutoSubmitGate.test.js'
+      - 'web/src/utils/timedAssignmentClock.js'
+      - 'web/src/utils/timedAssignmentClock.test.js'
+      - '.github/workflows/graded-workbook-timers.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/data/gradedTabTiming.js'
+      - 'web/src/data/gradedTabTiming.test.js'
+      - 'web/src/data/a2B1LessonProfile.js'
+      - 'web/src/data/a2B1LessonProfile.test.js'
+      - 'web/src/data/a2B1TimedAssignmentBase.js'
+      - 'web/src/data/timedAssignmentConfig.js'
+      - 'web/src/data/timedAssignmentConfig.test.js'
+      - 'web/src/components/SharedTimedAssignment.jsx'
+      - 'web/src/components/SharedTimedAssignment.test.jsx'
+      - 'web/src/a1SubmissionConsistencyRuntime.js'
+      - 'web/src/a1SubmissionConsistencyRuntime.test.js'
+      - 'web/src/components/A1TimedMockExam.jsx'
+      - 'web/src/components/A1TimedMockExam.test.jsx'
+      - 'web/src/utils/a1TimedAutoSubmitGate.js'
+      - 'web/src/utils/a1TimedAutoSubmitGate.test.js'
+      - 'web/src/utils/timedAssignmentClock.js'
+      - 'web/src/utils/timedAssignmentClock.test.js'
+      - '.github/workflows/graded-workbook-timers.yml'
+
+jobs:
+  timer-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Verify graded timers, persisted attempt deadlines, and mock exceptions
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand
+          src/data/gradedTabTiming.test.js
+          src/data/timedAssignmentConfig.test.js
+          src/data/a2B1LessonProfile.test.js
+          src/data/a2B1LessonProfileTimerIntegration.test.js
+          src/utils/timedAssignmentClock.test.js
+          src/components/SharedTimedAssignment.test.jsx
+          src/utils/a1TimedAutoSubmitGate.test.js
+          src/components/A1TimedMockExam.test.jsx
+          src/a1SubmissionConsistencyRuntime.test.js

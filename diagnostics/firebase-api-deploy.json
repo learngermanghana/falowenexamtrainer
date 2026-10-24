@@ -1,0 +1,15 @@
+{
+  "checkedAt": "2026-06-30T18:27:00.000Z",
+  "success": true,
+  "deploymentStep": "success",
+  "verificationStep": "success",
+  "deployedCommit": "077f78323b5623cb3035e612404bc33426b65597",
+  "workflowRunId": "28466769125",
+  "function": "falowenexamtrainer:api",
+  "project": "falowen-examiner-trainer",
+  "webhook": "https://api-awc2au65xa-ew.a.run.app/paystack/webhook",
+  "policy": "shared_50_50",
+  "paystackFeeRate": 0.0195,
+  "studentFeeShareRate": 0.5,
+  "tuitionAccounting": "tuition_only"
+}

@@ -1,0 +1,1 @@
+Redeploy Falowen production so A1 Day 19 Teil 2 shows separate THEMA and STICHWORT / KEYWORD cards from merge 0610b81220f218ec0724237de89368cdda3b985d.

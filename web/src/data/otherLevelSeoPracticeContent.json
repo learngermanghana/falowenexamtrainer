@@ -1,0 +1,157 @@
+{
+  "A2": {
+    "intro": "Prepare for Goethe-Zertifikat A2 with free original reading, writing and speaking questions and model answers. Try the interactive A2 Lesen test without an account; full mocks and protected audio require student access.",
+    "reading": {
+      "text": "Wegen einer technischen Störung fährt die S-Bahn S3 heute nicht bis zum Hauptbahnhof. Fahrgäste steigen am Ostbahnhof in die U-Bahn um. Rechnen Sie mit etwa 20 Minuten Verspätung.",
+      "question": "Was sollen Fahrgäste am Ostbahnhof machen?",
+      "options": [
+        "Auf einen Ersatzbus warten.",
+        "Mit der U-Bahn weiterfahren.",
+        "Ein neues Ticket kaufen."
+      ],
+      "answer": "B – Mit der U-Bahn weiterfahren",
+      "explanation": "„steigen am Ostbahnhof in die U-Bahn um“ tells passengers to change to the underground."
+    },
+    "writing": {
+      "task": "Sie kommen morgen zu spät zu Ihrem Deutschkurs. Schreiben Sie Ihrer Lehrerin: Entschuldigen Sie sich, erklären Sie den Grund und nennen Sie die Ankunftszeit.",
+      "answer": "Guten Tag Frau Weber,\nleider komme ich morgen etwas später, weil ich einen Arzttermin habe. Es tut mir leid. Ich bin um 10.30 Uhr im Kurs.\nViele Grüße\nSamira Ali",
+      "tip": "Include an apology, a reason, the arrival time and a suitable closing."
+    },
+    "speaking": {
+      "task": "Sie möchten mit einer Freundin am Samstag etwas unternehmen. Schlagen Sie einen Ort und eine Uhrzeit vor und fragen Sie nach ihrer Meinung.",
+      "answer": "Hast du am Samstag Zeit? Wir können um 14 Uhr ins Museum gehen. Was meinst du? Danach können wir etwas essen.",
+      "tip": "Propose a time and place and ask the other person a question."
+    },
+    "status": "Free interactive A2 Lesen is available without login. Full mock exams and listening audio require student access.",
+    "titles": {
+      "landing": "Goethe A2 Practice Materials with Answers | Falowen",
+      "landingDescription": "Free Goethe A2 practice: interactive Lesen, writing tasks and speaking model answers. Full student mocks are available on Falowen.",
+      "practice": "Free Goethe A2 Exam Practice – Lesen | Falowen",
+      "practiceDescription": "Practise free Goethe-style A2 exam Lesen tasks with Falowen. Complete 20 reading questions across four parts and get an instant score."
+    }
+  },
+  "B1": {
+    "intro": "Prepare for Goethe-Zertifikat B1 with a free reading-comprehension check, formal email model and speaking opinion practice. Full timed B1 mock exams are available only to signed-in students.",
+    "reading": {
+      "text": "Die Stadtbibliothek verlängert ab Januar ihre Öffnungszeiten. Berufstätige können künftig an drei Wochentagen bis 20 Uhr Bücher ausleihen. Samstags bleibt die Bibliothek wie bisher nur bis 14 Uhr geöffnet. Außerdem wird das Angebot an digitalen Medien erweitert.",
+      "question": "Welche Änderung wird angekündigt?",
+      "options": [
+        "Die Bibliothek öffnet künftig auch sonntags.",
+        "An einigen Wochentagen ist die Bibliothek länger geöffnet.",
+        "Samstags schließt die Bibliothek erst um 20 Uhr."
+      ],
+      "answer": "B – An einigen Wochentagen ist die Bibliothek länger geöffnet",
+      "explanation": "Three weekdays are extended to 20:00; Saturday closing time is unchanged."
+    },
+    "writing": {
+      "task": "Sie haben sich für einen Sprachkurs angemeldet, können aber wegen einer Erkrankung eine Woche lang nicht teilnehmen. Schreiben Sie an die Schule: Erklären Sie die Situation, fragen Sie nach Lernmaterialien und schlagen Sie eine Lösung vor.",
+      "answer": "Sehr geehrte Damen und Herren,\nleider bin ich krank und kann nächste Woche nicht am B1-Kurs teilnehmen. Könnten Sie mir bitte die Materialien per E-Mail schicken? Ich würde die Aufgaben gern zu Hause bearbeiten und danach wieder am Unterricht teilnehmen.\nVielen Dank für Ihre Hilfe.\nMit freundlichen Grüßen\nMariam Owusu",
+      "tip": "Answer all three points using formal language and a proper greeting and closing."
+    },
+    "speaking": {
+      "task": "Diskutieren Sie: Sollten Schulen mehr digitale Lernmaterialien verwenden? Nennen Sie einen Vorteil, einen Nachteil und Ihre Meinung.",
+      "answer": "Meiner Meinung nach sind digitale Materialien eine gute Ergänzung. Sie sind leicht verfügbar und man kann zu Hause üben. Allerdings haben nicht alle Lernenden einen guten Internetzugang. Deshalb sollten Schulen digitale und gedruckte Materialien kombinieren.",
+      "tip": "Give your opinion, an argument and a counterargument."
+    },
+    "status": "The complete B1 mock is a protected student exam; these public questions do not create a score.",
+    "titles": {
+      "landing": "Goethe B1 Practice Materials with Answers | Falowen",
+      "landingDescription": "Free Goethe B1 reading questions, formal email models and speaking prompts with answers. Access the full B1 student mock on Falowen.",
+      "practice": "Goethe B1 Exam Preparation and Mock Tests | Falowen",
+      "practiceDescription": "Try free B1 reading, writing and speaking examples with answers. Sign in to Falowen for the full Goethe-style B1 mock."
+    }
+  },
+  "B2": {
+    "intro": "Prepare for Goethe-Zertifikat B2 with a nuanced reading question, argument-writing model and discussion prompt. Full B2 mock exams are available to signed-in Falowen students.",
+    "reading": {
+      "text": "Eine Befragung unter Beschäftigten ergab, dass Personen mit flexiblen Arbeitszeiten ihre Zufriedenheit häufiger als hoch bewerteten. Die Forschenden weisen jedoch darauf hin, dass aus diesem Zusammenhang nicht geschlossen werden kann, flexible Arbeitszeiten seien allein die Ursache. Auch Führungskultur und persönliche Lebensumstände könnten eine Rolle spielen.",
+      "question": "Welche Aussage entspricht dem Text?",
+      "options": [
+        "Flexible Arbeitszeiten sind nachweislich die einzige Ursache höherer Zufriedenheit.",
+        "Der beobachtete Zusammenhang lässt keine eindeutige Aussage über die Ursache zu.",
+        "Führungskultur hat laut Studie keinerlei Einfluss."
+      ],
+      "answer": "B – Der Zusammenhang beweist keine eindeutige Ursache",
+      "explanation": "The text distinguishes correlation from causation."
+    },
+    "writing": {
+      "task": "Verfassen Sie einen kurzen argumentativen Beitrag zum Thema Homeoffice. Nehmen Sie Stellung, nennen Sie Chancen und Schwierigkeiten und ziehen Sie ein Fazit.",
+      "answer": "Homeoffice ermöglicht vielen Beschäftigten, Beruf und Privatleben besser zu vereinbaren. Zudem entfallen lange Arbeitswege. Allerdings kann die Zusammenarbeit leiden, wenn persönlicher Austausch fehlt. Entscheidend ist deshalb nicht, möglichst viele Tage zu Hause zu arbeiten, sondern klare Absprachen zu treffen. Meiner Ansicht nach ist ein flexibles Modell sinnvoll, sofern die Bedürfnisse des Teams berücksichtigt werden.",
+      "tip": "Use a balanced argument and a conclusion. This is an illustrative short paragraph, not a complete marked exam essay."
+    },
+    "speaking": {
+      "task": "Diskutieren Sie, ob öffentliche Verkehrsmittel in Städten kostenlos sein sollten. Berücksichtigen Sie soziale und finanzielle Aspekte.",
+      "answer": "Ein kostenloser Nahverkehr könnte Menschen mit geringem Einkommen entlasten und den Autoverkehr reduzieren. Andererseits müsste der Betrieb finanziert werden. Ich halte deshalb günstige Tickets und gezielte Unterstützung für sinnvoller als ein pauschales Versprechen ohne Finanzierung.",
+      "tip": "Weigh advantages against financing and explain your position."
+    },
+    "status": "Full B2 mock exams are available to signed-in students. Public exercises are independent Goethe-style examples.",
+    "titles": {
+      "landing": "Goethe B2 Practice Materials with Answers | Falowen",
+      "landingDescription": "Free Goethe B2 reading practice, argumentative writing and speaking examples with answers. Full B2 mock exams require Falowen student access.",
+      "practice": "Goethe B2 Practice Questions and Answers | Falowen",
+      "practiceDescription": "Free Goethe-style B2 reading, writing and speaking samples with model answers. Full B2 mocks are available to Falowen students."
+    }
+  },
+  "C1": {
+    "intro": "Prepare for Goethe-Zertifikat C1 with free advanced reading, argument-writing and presentation samples. Falowen currently offers student C1 reading-only practice, not a full four-module mock.",
+    "reading": {
+      "text": "Städtische Begrünung wird häufig als wirksames Mittel gegen sommerliche Hitze dargestellt. Fachleute betonen allerdings, dass ihre Wirkung von der Auswahl geeigneter Baumarten, der Wasserversorgung und der Gestaltung benachbarter Flächen abhängt. Ein isoliertes Pflanzprogramm könne deshalb keine umfassende Anpassungsstrategie ersetzen.",
+      "question": "Welche Schlussfolgerung legt der Text nahe?",
+      "options": [
+        "Baumpflanzungen machen weitere Maßnahmen überflüssig.",
+        "Begrünung muss Teil einer umfassenderen Strategie sein.",
+        "Die Auswahl der Baumarten ist bedeutungslos."
+      ],
+      "answer": "B – Begrünung gehört in eine umfassendere Strategie",
+      "explanation": "The text stresses context and complementary measures."
+    },
+    "writing": {
+      "task": "Erörtern Sie Chancen und Grenzen digitalen Lernens an Hochschulen. Berücksichtigen Sie Flexibilität, Zugangsgerechtigkeit und die Qualität des Austauschs.",
+      "answer": "Digitale Lehre erlaubt eine flexible Studiengestaltung, insbesondere für Berufstätige. Diese Vorteile dürfen jedoch nicht darüber hinwegtäuschen, dass technische Ausstattung und stabile Internetverbindungen ungleich verteilt sind. Zudem lässt sich intensiver fachlicher Austausch nicht immer vollständig ins Digitale übertragen. Eine überzeugende Hochschulstrategie sollte daher digitale Formate gezielt einsetzen, ohne Präsenzlehre pauschal abzuwerten.",
+      "tip": "Balance arguments and qualify claims. This is a short illustrative paragraph, not a full C1 exam submission."
+    },
+    "speaking": {
+      "task": "Halten Sie einen kurzen Standpunktvortrag: Inwiefern sollten Städte private Autos im Zentrum einschränken? Gehen Sie auf Umwelt, Mobilität und soziale Folgen ein.",
+      "answer": "Weniger Autoverkehr könnte die Luftqualität verbessern und öffentlichen Raum zurückgewinnen. Voraussetzung ist allerdings, dass verlässliche Alternativen geschaffen werden. Sonst würden Menschen benachteiligt, die auf ihr Fahrzeug angewiesen sind. Ich plädiere daher für einen schrittweisen Ausbau des Nahverkehrs vor weitreichenden Verboten.",
+      "tip": "Use nuanced transitions and acknowledge counterarguments."
+    },
+    "status": "C1 student practice is currently reading-only. A complete C1 four-module mock is not yet published.",
+    "titles": {
+      "landing": "Goethe C1 Practice Materials with Answers | Falowen",
+      "landingDescription": "Free Goethe C1 reading, advanced writing and speaking samples with answers. Student C1 reading-only practice is available on Falowen.",
+      "practice": "Goethe C1 Practice Questions and Answers | Falowen",
+      "practiceDescription": "Free Goethe-style C1 reading, writing and speaking exercises with answers. Falowen offers reading-only C1 student practice, not a full mock."
+    }
+  },
+  "C2": {
+    "intro": "Prepare for Goethe-Zertifikat C2 with free original advanced interpretation, precise writing and discussion examples. A complete four-module C2 mock is not yet published.",
+    "reading": {
+      "text": "Wenn wissenschaftliche Leistung überwiegend anhand quantifizierbarer Kennzahlen bewertet wird, droht die methodische Sorgfalt zum bloßen Mittel der Kennzahlenoptimierung zu verkommen. Daraus folgt keineswegs, dass messbare Kriterien grundsätzlich untauglich wären; fragwürdig ist vielmehr ihr Anspruch, die Vielschichtigkeit wissenschaftlicher Qualität erschöpfend abzubilden.",
+      "question": "Welche Position vertritt der Text?",
+      "options": [
+        "Quantitative Kriterien müssen vollständig abgeschafft werden.",
+        "Messbare Indikatoren können nützlich sein, erfassen Qualität aber nicht vollständig.",
+        "Methodische Sorgfalt ist Kennzahlen grundsätzlich unterzuordnen."
+      ],
+      "answer": "B – Kennzahlen bilden Qualität nicht vollständig ab",
+      "explanation": "The passage warns against exclusive reliance on metrics without rejecting all measures."
+    },
+    "writing": {
+      "task": "Formulieren Sie eine differenzierte Stellungnahme zur Frage, ob technische Effizienz das oberste Ziel gesellschaftlicher Entscheidungen sein darf.",
+      "answer": "Dass technische Verfahren Abläufe beschleunigen und Ressourcen einsparen können, steht außer Frage. Problematisch wird die Orientierung an Effizienz jedoch, sobald sich ihr normative Ziele widerspruchslos unterordnen müssen. Weder gesellschaftliche Teilhabe noch individuelle Rechte lassen sich ausschließlich in Produktivitätskennzahlen übersetzen. Effizienz sollte daher als Instrument verantwortungsvoller Gestaltung verstanden werden, nicht als deren letztgültiger Maßstab.",
+      "tip": "Differentiate concepts carefully; this is a short model excerpt, not a complete C2 exam essay."
+    },
+    "speaking": {
+      "task": "Erörtern Sie, ob algorithmische Entscheidungssysteme öffentliche Verwaltungen gerechter machen können. Berücksichtigen Sie Transparenz, Verantwortung und mögliche Verzerrungen.",
+      "answer": "Algorithmische Systeme versprechen einheitliche Maßstäbe und könnten willkürliche Entscheidungen begrenzen. Zugleich übernehmen sie möglicherweise Verzerrungen der Daten. Ihre Legitimität hängt daher von überprüfbaren Kriterien, nachvollziehbaren Einspruchswegen und klarer menschlicher Verantwortung ab. Gerechtigkeit entsteht nicht allein durch Automatisierung, sondern durch die Kontrolle ihrer Folgen.",
+      "tip": "Contrast apparent neutrality with procedural fairness and justify your claims."
+    },
+    "status": "C2 preparation is available, but no complete four-module C2 mock or full-mock score is published.",
+    "titles": {
+      "landing": "Goethe C2 Practice Materials with Answers | Falowen",
+      "landingDescription": "Free Goethe C2 reading, advanced writing and speaking practice with original model answers. No complete C2 mock is currently published.",
+      "practice": "Goethe C2 Practice Questions and Answers | Falowen",
+      "practiceDescription": "Free Goethe-style C2 reading, writing and speaking samples with answers. Full C2 mock exams are not yet published."
+    }
+  }
+}

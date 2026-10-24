@@ -1,0 +1,153 @@
+/*
+ * Responsive fixes for the shared course Goethe Free Sprechen Chat.
+ * The component is used by A2/B1 workbook Teil 1 and B2/C1 Speak pages.
+ * Its React markup intentionally stays shared; these rules only change layout.
+ */
+[data-goethe-free-chat="text-first"] {
+  width: 100% !important;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+[data-goethe-free-chat="text-first"] > header,
+[data-goethe-free-chat="text-first"] > header > div,
+[data-goethe-free-chat="text-first"] > div,
+[data-goethe-free-chat="text-first"] > div > aside,
+[data-goethe-free-chat="text-first"] > div > section,
+[data-goethe-free-chat="text-first"] > div > section > div {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+[data-goethe-free-chat="text-first"] > header strong,
+[data-goethe-free-chat="text-first"] > header p,
+[data-goethe-free-chat="text-first"] > div > aside,
+[data-goethe-free-chat="text-first"] > div > aside button,
+[data-goethe-free-chat="text-first"] > div > section p {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+[data-goethe-free-chat="text-first"] > header button,
+[data-goethe-free-chat="text-first"] > div > aside button {
+  max-width: 100%;
+  white-space: normal;
+}
+
+@media (max-width: 720px) {
+  [data-goethe-free-chat="text-first"] {
+    border-radius: 16px !important;
+    overflow-x: hidden !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > header {
+    padding: 14px 12px !important;
+    align-items: flex-start !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > header > div {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  [data-goethe-free-chat="text-first"] > header strong {
+    display: block;
+    max-width: 100%;
+    font-size: 18px !important;
+    line-height: 1.25;
+  }
+
+  [data-goethe-free-chat="text-first"] > header button {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Stack the desktop sidebar above the conversation instead of squeezing chat. */
+  [data-goethe-free-chat="text-first"] > div {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > aside {
+    width: 100%;
+    padding: 12px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > aside button {
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section {
+    width: 100%;
+    min-height: 480px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:first-child {
+    padding: 12px 10px !important;
+  }
+
+  /* Give coach/student bubbles nearly the full phone width. */
+  [data-goethe-free-chat="text-first"] > div > section > div:first-child > div > div {
+    max-width: 94% !important;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:last-child {
+    padding: 12px 10px !important;
+  }
+
+  /* The final composer row becomes textarea above a full-width Send button. */
+  [data-goethe-free-chat="text-first"] > div > section > div:last-child > div:last-child {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    gap: 8px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:last-child > div:last-child textarea {
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0 !important;
+    box-sizing: border-box;
+    flex: none !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:last-child > div:last-child > button {
+    width: 100%;
+    min-width: 0 !important;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 420px) {
+  [data-goethe-free-chat="text-first"] > header {
+    padding: 12px 10px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > header strong {
+    font-size: 17px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > aside {
+    padding: 10px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:first-child,
+  [data-goethe-free-chat="text-first"] > div > section > div:last-child {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  [data-goethe-free-chat="text-first"] > div > section > div:first-child > div > div {
+    max-width: 96% !important;
+  }
+}

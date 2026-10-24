@@ -1,0 +1,136 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const read = (relativePath) => fs.readFileSync(path.join(root, relativePath), "utf8");
+
+const requiredMarkers = {
+  "web/src/data/a2ListeningTasks.js": [
+    'audioUrl: "https://youtu.be/z0hve7zCDEo"',
+  ],
+  "web/src/data/selfLearningLessons/c1/day11EngagementUndEhrenamt.js": [
+    'url: "https://youtu.be/F67RRmGNK1c"',
+  ],
+  "web/src/data/b2C1LessonMediaOverrides.js": [
+    'key: "c1-day16-technologie-alltag-ai-video"',
+    'url: "https://youtu.be/H4mPDTiMkwg"',
+    'key: "c1-day17-umwelt-verantwortung-ai-video"',
+    'url: "https://youtu.be/g-HaC_4ogaQ"',
+    'key: "c1-day18-gesellschaft-zusammenhalt-ai-video"',
+    'url: "https://youtu.be/ULtTH3LmWBo"',
+  ],
+  "web/src/components/WritingCheatSheetTabs.js": [
+    'writingVideo.badge || "Watch before writing · Essay Ideas"',
+    'writingVideo.heading || "Get ideas for this exact essay"',
+  ],
+  "web/src/data/lessonVideoDictionary.js": [
+    'https://youtu.be/7h0XURhtGFg',
+    'url: "https://youtu.be/PP38eObAMh8"',
+  ],
+  "web/src/components/ObjectsAndColorsPage.js": [
+    'stem: "5) Das sind ___ Bücher."',
+  ],
+  "web/src/data/a1TeacherVideoResources.js": [
+    '[11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],',
+  ],
+  "web/src/components/Day0StudentWorkflowUpgrade.js": [
+    'id: "PP38eObAMh8"',
+    'url: "https://youtu.be/PP38eObAMh8"',
+  ],
+  "web/src/components/A2StandardTabbedWorkbookPage.js": [
+    '<SpeakingMindMap config={getA2SpeakingMindMap(day)} />',
+  ],
+  "web/src/data/speakingMindMaps/a2/index.js": [
+    '[2, "a2-day-2-personen-beschreiben", "Deine Beschreibung", "Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?"',
+  ],
+  "web/src/data/speakingMindMaps/a2/personenBeschreiben.js": [
+    'id: "aussehen"',
+    'id: "charakter"',
+    'id: "kleidung"',
+    'id: "besondere-merkmale"',
+  ],
+};
+
+const forbiddenMarkers = {
+  "web/src/data/a2ListeningTasks.js": [
+    "https://youtu.be/Ml50uHYxBx8",
+  ],
+  "web/src/data/courseSchedule.js": [
+    'video: "https://youtu.be/AWEHnJd1o3M"',
+    'youtube_link: "https://youtu.be/AWEHnJd1o3M"',
+  ],
+  "web/src/data/b2C1LessonMediaOverrides.js": [
+    "b2-day11-gesellschaft-integration-falowen-radio",
+    "b2-day13-chapter-3-3-ai-video",
+    "b2-day16-digitalisierung-alltag-ai-video",
+    "LjxT4I6BmFw",
+    "hxB5dwtbo6Q",
+    "kVvR1zgJE-s",
+    "AWEHnJd1o3M",
+    "juDa8R56Mtc",
+    "9LLc7AAqrOc",
+    "BdO8p8C-aSs",
+    "RjRBspPCmCY",
+    "-JeT2wS94uk",
+    "vRgpiPZ5AAw",
+    "TC85wRlhtCc",
+    "foXp2VHEf1I",
+    "MGtC8QQrdSs",
+    "Hqowo8xhrpw",
+    "5fdtLPqHe7A",
+    "ioHsbvDoLag",
+    "i167ok5kIFg",
+  ],
+  "web/src/data/lessonRadioDictionary.js": [
+    "b2-day1-persoenliche-identitaet-falowen-radio",
+    "b2-day11-gesellschaft-integration-falowen-radio",
+    "0lTNin1NTgc",
+    "OdfuQzJ_etM",
+    "wYwEi4myS2A",
+    "0rBDjwRe9UY",
+    "2-SRhPEQdNU",
+  ],
+  "web/src/data/additionalLessonVideoResources.js": [
+    "b2-day3-kontrast-konzession-ai-grammar-video",
+    "cmKLSjWi4S0",
+  ],
+  "web/src/data/writingVideoResources.js": [
+    "b2-day1-persoenliche-identitaet-writing-video",
+    "b2-day4-bildung-lernen-writing-video",
+  ],
+  "web/src/data/selfLearningLessons/b2/day1PersoenlicheIdentitaet.js": ["HhUUkc8zgEc"],
+  "web/src/data/selfLearningLessons/b2/day2AlltagUndZeitmanagement.js": ["ZfCAaLGV2c4"],
+  "web/src/data/selfLearningLessons/b2/day4BildungUndLernen.js": ["coQ8W5vynsI"],
+  "web/src/data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden.js": ["DiUEWUBJBio"],
+  "web/src/data/selfLearningLessons/b2/day6MigrationUndIntegration.js": ["LORxwfzaAyU"],
+  "shared/curriculumCanonical.json": ["a9LxkxNdnEg", "ZfCAaLGV2c4"],
+  "web/src/data/lessonCatalog.js": ["a9LxkxNdnEg", "ZfCAaLGV2c4"],
+  "web/src/components/A2Day2SmallTalkWorkbookEnhancedPage.js": [
+    'data-a2-small-talk-teacher-lecture="true"',
+    "wlaJt0xsdP0",
+  ],
+  "web/src/data/teacherLectureVideoResources.js": [
+    "70AgN5VKeqc",
+  ],
+};
+
+for (const [file, markers] of Object.entries(requiredMarkers)) {
+  const source = read(file);
+  for (const marker of markers) {
+    if (!source.includes(marker)) {
+      throw new Error(`Permanent source marker missing in ${file}: ${marker}`);
+    }
+  }
+}
+
+for (const [file, markers] of Object.entries(forbiddenMarkers)) {
+  const source = read(file);
+  for (const marker of markers) {
+    if (source.includes(marker)) {
+      throw new Error(`Obsolete source marker returned in ${file}: ${marker}`);
+    }
+  }
+}
+
+console.log("Course media and A2 speaking source audit passed without modifying files.");

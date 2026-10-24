@@ -1,0 +1,194 @@
+name: Deploy Falowen Exam Trainer API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'functions/**'
+      - 'firestore.rules'
+      - 'shared/a1GoetheTeil3PictureCards.json'
+      - 'web/src/data/**'
+      - 'web/src/components/**'
+      - 'scripts/generateAssessmentTaskRegistry.mjs'
+      - 'scripts/generateFunctionMarkingTasks.mjs'
+      - 'scripts/patchResubmissionReviewGate.mjs'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/deploy-functions.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: falowenexamtrainer-firebase-api
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      FIREBASE_PROJECT_ID: falowen-examiner-trainer
+      GOOGLE_CLOUD_PROJECT: falowen-examiner-trainer
+      GCLOUD_PROJECT: falowen-examiner-trainer
+      CLOUD_RUN_SERVICE: api
+      CLOUD_RUN_REGION: europe-west1
+      HEALTH_URL: https://api-awc2au65xa-ew.a.run.app/health
+      PAYSTACK_POLICY_URL: https://api-awc2au65xa-ew.a.run.app/paystack/webhook
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm install --no-audit --no-fund
+
+      - name: Package latest canonical learner writing tasks for Firebase
+        run: |
+          node scripts/generateFunctionMarkingTasks.mjs
+          node scripts/generateAssessmentTaskRegistry.mjs
+          node scripts/verifyAdminMarkingFeed.mjs
+
+      - name: Apply resubmission review gate
+        run: node scripts/patchResubmissionReviewGate.mjs
+
+      - name: Validate committed functions source
+        working-directory: functions
+        run: |
+          node --test __tests__/accountDeletion.test.cjs __tests__/deletionNotifications.test.cjs functionz/tests/a1TutorCardsBundle.test.cjs functionz/tests/b1Day25ClassAudio.test.js functionz/tests/a2Day18BankAudio.test.js functionz/tests/a2Day20ReklamationAudio.test.js
+          node --check accountDeletion.js
+          node --check deletionNotifications.js
+          node --check index.js
+          node --check index.entry.js
+          node --check index.notifications.js
+          node --check classPushLifecycle.js
+          node --check resubmission.js
+          node --check functionz/app.js
+          node --check functionz/paymentAwareApp.js
+          node --check functionz/paystackFeePolicy.js
+          node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); if (!exported.sendPushTestNotification) throw new Error("Push test callable export was not discovered"); if (!exported.sendClassPushLifecycleReminders) throw new Error("Class push reminder scheduler export was not discovered"); if (!exported.onClassSessionPushLifecycleUpdated) throw new Error("Class push lifecycle Firestore trigger export was not discovered"); console.log("Firebase API, resubmission, push test and class push lifecycle exports discovered");'
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
+
+      - name: Setup Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: '${{ env.FIREBASE_PROJECT_ID }}'
+
+      - name: Verify account deletion rules deployment permissions
+        run: |
+          gcloud auth list --filter=status:ACTIVE --format='value(account)'
+          node scripts/checkDeletionDeploymentPermissions.cjs
+          node scripts/deployFirestoreRules.cjs
+
+      - name: Verify shared speaking score sync consumer before deploying its producer
+        run: |
+          node --test scripts/checkSpeakingSyncConsumer.test.cjs
+          node scripts/checkSpeakingSyncConsumer.cjs
+
+      - name: Deploy exam trainer API and notification lifecycle
+        shell: bash
+        run: |
+          set +e
+          firebase deploy \
+            --project "$FIREBASE_PROJECT_ID" \
+            --only functions:falowenexamtrainer:api,functions:falowenexamtrainer:submitAssignmentResubmission,functions:falowenexamtrainer:sendPushTestNotification,functions:falowenexamtrainer:sendClassPushLifecycleReminders,functions:falowenexamtrainer:onClassSessionPushLifecycleUpdated \
+            --debug > firebase-deploy.log 2>&1
+          status=$?
+          tail -n 180 firebase-deploy.log || true
+          exit "$status"
+
+      - name: Deploy account deletion and notification safeguards in small batches
+        shell: bash
+        run: |
+          set -euo pipefail
+          batches=(
+            "requestAccountDeletion,cancelAccountDeletion"
+            "cleanupExpiredTrials,cleanupStaleUnpaidSignups"
+            "cleanupExpiredStudentContracts,submitHistoricalAssignmentResubmission"
+            "sendPaymentReminders,onMarkedAssignmentNotificationCreated"
+            "onClassLessonNoteCreated,onClassBoardPostCreated"
+            "onAnnouncementCreated,onQaPostCreated"
+            "onQaPostUpdated,onScoreCreated"
+            "onAttendanceSessionUpdated,onExamTutorReviewCreated"
+            "onExamTutorReviewUpdated,onStudentCreated"
+            "onStudentUpdated"
+          )
+          for batch in "${batches[@]}"; do
+            targets=""
+            IFS=',' read -ra names <<< "$batch"
+            for name in "${names[@]}"; do
+              targets="${targets:+$targets,}functions:falowenexamtrainer:$name"
+            done
+            firebase deploy --project "$FIREBASE_PROJECT_ID" --only "$targets" --non-interactive
+          done
+
+      - name: Verify account deletion and recovery against live Firebase
+        run: node scripts/testLiveAccountDeletion.cjs
+
+      - name: Apply API runtime capacity
+        shell: bash
+        run: |
+          gcloud run services update "$CLOUD_RUN_SERVICE" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --region "$CLOUD_RUN_REGION" \
+            --cpu 1 \
+            --concurrency 20 \
+            --max 2 \
+            --quiet
+
+      - name: Verify API health
+        shell: bash
+        run: |
+          response=''
+          for attempt in $(seq 1 18); do
+            response=$(curl --fail --silent --show-error --max-time 15 "$HEALTH_URL" || true)
+            if [ -n "$response" ]; then
+              echo "Falowen API health endpoint is reachable"
+              echo "$response"
+              exit 0
+            fi
+            echo "Health check attempt $attempt failed; retrying..."
+            sleep 10
+          done
+          echo "Falowen API health endpoint did not recover. Last response: $response"
+          exit 1
+
+      - name: Verify Paystack fee policy
+        shell: bash
+        run: |
+          response=''
+          for attempt in $(seq 1 18); do
+            response=$(curl --fail --silent --show-error --max-time 15 "$PAYSTACK_POLICY_URL" || true)
+            if echo "$response" | grep -q 'shared_50_50'; then
+              echo "Verified shared_50_50 Paystack policy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "Expected shared_50_50 response was not received. Last response: $response"
+          exit 1
+
+      - name: Upload Firebase deployment diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firebase-api-deploy-diagnostics-${{ github.run_id }}
+          path: |
+            firebase-deploy.log
+            firebase-debug.log
+          if-no-files-found: warn
+          retention-days: 7

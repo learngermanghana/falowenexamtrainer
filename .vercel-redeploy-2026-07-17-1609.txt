@@ -1,0 +1,2 @@
+Vercel production redeploy trigger for PR #2168.
+Created 2026-07-17.

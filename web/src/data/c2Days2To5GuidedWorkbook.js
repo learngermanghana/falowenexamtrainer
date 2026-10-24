@@ -1,0 +1,68 @@
+export const C2_DAYS_2_TO_5_GUIDED_WORKBOOK = {
+  2: {
+    thinkTitle: "Information focus · Decide what the listener should notice first",
+    thinkIntro: "At C2, good information structure is a thinking decision before it is a grammar decision. First decide what is already known, what is new, and which idea deserves the strongest position.",
+    learnSteps: [
+      ["Meaning", "What is the core message? Say it first in one simple sentence."],
+      ["Known vs new", "Which information is already established, and what is the new point?"],
+      ["Focus", "What should appear in the Vorfeld or be named as the decisive condition?"],
+      ["Weight", "Which detail can stay secondary so the sentence does not become overloaded?"],
+      ["Naturalness", "Does the focus sound deliberate, or only artificially inverted?"],
+    ],
+    speakQuestion: "Soll Bildung vor allem Faktenwissen vermitteln oder selbstständiges Lernen fördern?",
+    speakPlan: ["Position", "two criteria", "one example", "reorder one sentence to change focus", "conclusion"],
+    writeTask: "Schreiben Sie einen argumentativen Beitrag darüber, ob Bildung Faktenwissen oder selbstständiges Lernen priorisieren sollte. Steuern Sie Thema, Rhema und Vorfeld bewusst.",
+    writingSteps: ["Write the position simply", "identify the key condition", "choose what belongs first", "vary the Vorfeld intentionally", "check whether the information flow remains clear"],
+    targetWords: "180–220",
+  },
+  3: {
+    thinkTitle: "Nominal or verbal? · Choose compression only when it helps",
+    thinkIntro: "C2 does not mean turning every verb into a noun. First decide whether you need a process, an actor, or a compact result. Then choose verbal or nominal style.",
+    learnSteps: [
+      ["Process", "Do I want to show who does what? Prefer a verbal structure."],
+      ["Result", "Do I want to compress a known process into one concept? A nominalisation may help."],
+      ["Actor", "Would nominalisation hide the responsible person or institution?"],
+      ["Density", "Can the reader still understand the sentence on the first reading?"],
+      ["Revision", "If a noun chain becomes heavy, unpack it back into verbs."],
+    ],
+    speakQuestion: "Warum klingt wissenschaftliche Sprache oft nominaler, und wann wird dieser Stil unnötig schwer?",
+    speakPlan: ["define the difference", "give one useful nominal example", "give one overloaded example", "explain when verbal style is clearer", "conclusion"],
+    writeTask: "Schreiben Sie einen kurzen wissenschaftsnahen Text darüber, wie Forschungsergebnisse verständlich dargestellt werden sollten. Nutzen Sie Nominalstil gezielt, aber vermeiden Sie überladene Nominalketten.",
+    writingSteps: ["Write the process in verbs", "decide what can be compressed", "keep the actor visible where important", "limit noun chains", "revise for readability"],
+    targetWords: "180–220",
+  },
+  4: {
+    thinkTitle: "Source distance · Separate fact, reported claim and evaluation",
+    thinkIntro: "Before choosing Konjunktiv I, decide the evidence status. Ask: Is this verified, reported by someone else, disputed, or my own evaluation?",
+    learnSteps: [
+      ["Source", "Who says this? Name the source before changing the verb form."],
+      ["Status", "Is the statement verified, alleged, disputed or uncertain?"],
+      ["Distance", "Do I want to report neutrally or signal doubt?"],
+      ["Grammar", "Use indirect speech only after the source relationship is clear."],
+      ["Evaluation", "Keep your own judgement separate from the reported claim."],
+    ],
+    speakQuestion: "Wie sollten Medien mit umstrittenen Aussagen umgehen, ohne sie als gesicherte Tatsachen darzustellen?",
+    speakPlan: ["verified information", "reported claim", "source", "own evaluation", "recommendation"],
+    writeTask: "Verfassen Sie eine kurze Medienanalyse. Trennen Sie verifizierte Information, fremde Behauptungen und Ihre eigene Bewertung klar voneinander.",
+    writingSteps: ["mark facts", "mark sources", "choose Konjunktiv or reporting verb", "add evaluation separately", "check that no allegation sounds like a fact"],
+    targetWords: "180–220",
+  },
+  5: {
+    thinkTitle: "Evidence strength · Decide how certain the statement really is",
+    thinkIntro: "Subjective modal verbs are useful only when you know whose claim is being represented and how certain you are. Start with evidence strength, not with the modal verb.",
+    learnSteps: [
+      ["Source", "Is this the speaker's own claim, another person's report, or your inference?"],
+      ["Certainty", "How strong is the evidence: possible, probable, highly probable, or reported only?"],
+      ["Function", "Do you need sollen, wollen, dürfte, muss or kann?"],
+      ["Form", "Check whether the infinitive perfect is needed for a past claim."],
+      ["Responsibility", "Avoid presenting speculation as fact."],
+    ],
+    speakQuestion: "Wie kann man über politische Behauptungen sprechen, ohne unbelegte Aussagen als Fakten zu präsentieren?",
+    speakPlan: ["source", "certainty", "one reported claim", "one inference", "one cautious conclusion"],
+    writeTask: "Schreiben Sie einen kurzen politischen Analysebeitrag, in dem Sie Selbstaussagen, Fremdberichte, Wahrscheinlichkeiten und gesicherte Tatsachen sprachlich unterscheiden.",
+    writingSteps: ["label the source", "rank certainty", "choose the modal meaning", "use perfect form where needed", "review for overstatement"],
+    targetWords: "180–220",
+  },
+};
+
+export const getC2GuidedWorkbookConfig = (day) => C2_DAYS_2_TO_5_GUIDED_WORKBOOK[Number(day)] || null;

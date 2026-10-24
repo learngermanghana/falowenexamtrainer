@@ -1,0 +1,164 @@
+.a2-sprechen-t3-exam {
+  background: #efe5ed;
+}
+
+.a2-sprechen-t3-situation,
+.a2-sprechen-t3-partner,
+.a2-sprechen-t3-task,
+.a2-sprechen-t3-recorder {
+  margin-top: 22px;
+  padding: 22px 24px;
+  background: #fff;
+  border: 1px solid #cbb8c5;
+}
+
+.a2-sprechen-t3-situation > span,
+.a2-sprechen-t3-partner > span {
+  color: #6f354e;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+.a2-sprechen-t3-situation h2 {
+  margin: 8px 0 0;
+  font: 700 23px/1.4 Georgia, "Times New Roman", serif;
+}
+
+.a2-sprechen-t3-partner blockquote {
+  margin: 13px 0 0;
+  padding: 18px 20px;
+  background: #f3eef1;
+  border-left: 5px solid #6f354e;
+  font: 700 20px/1.5 Georgia, "Times New Roman", serif;
+}
+
+.a2-sprechen-t3-task h2 {
+  margin: 0 0 18px;
+  font-size: 21px;
+}
+
+.a2-sprechen-t3-points {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.a2-sprechen-t3-points > div {
+  position: relative;
+  min-height: 60px;
+  padding: 15px 15px 15px 52px;
+  border: 1px solid #aaa;
+  background: #f7f7f7;
+  display: grid;
+  align-content: center;
+}
+
+.a2-sprechen-t3-points span {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 27px;
+  height: 27px;
+  border: 1px solid #6f354e;
+  border-radius: 50%;
+  background: #efe2eb;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+}
+
+.a2-sprechen-t3-final {
+  margin: 18px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid #d8cdd4;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.a2-sprechen-t3-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.a2-sprechen-t3-record,
+.a2-sprechen-t3-primary,
+.a2-sprechen-t3-secondary {
+  border: 1px solid #6f354e;
+  padding: 10px 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.a2-sprechen-t3-record,
+.a2-sprechen-t3-primary {
+  background: #6f354e;
+  color: #fff;
+}
+
+.a2-sprechen-t3-record.recording {
+  background: #7f1d1d;
+  border-color: #7f1d1d;
+}
+
+.a2-sprechen-t3-secondary {
+  background: #fff;
+  color: #6f354e;
+}
+
+.a2-sprechen-t3-recorder audio {
+  width: min(540px, 100%);
+  margin-top: 14px;
+}
+
+.a2-sprechen-t3-primary {
+  display: inline-block;
+  margin-top: 14px;
+}
+
+.a2-sprechen-t3-submitted {
+  margin-top: 15px;
+  padding: 15px;
+  background: #f2faf3;
+  border: 1px solid #9cbea1;
+}
+
+.a2-sprechen-t3-submitted p {
+  margin: 5px 0 0;
+  line-height: 1.5;
+}
+
+.a2-sprechen-t3-error {
+  margin: 14px 0 0;
+  padding: 12px;
+  background: #fff0f0;
+  border: 1px solid #b66;
+  color: #8b1f1f;
+}
+
+.a2-sprechen-t3-grading {
+  margin-top: 22px;
+  padding: 17px 20px;
+  background: #fff;
+  border: 1px dashed #a28c99;
+}
+
+.a2-sprechen-t3-grading ul {
+  margin: 10px 0 0;
+  padding-left: 22px;
+}
+
+.a2-sprechen-t3-grading li {
+  margin: 6px 0;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .a2-sprechen-t3-points {
+    grid-template-columns: 1fr;
+  }
+}

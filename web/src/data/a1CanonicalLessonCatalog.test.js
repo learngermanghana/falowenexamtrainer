@@ -1,0 +1,145 @@
+import {
+  A1_CANONICAL_LESSON_CATALOG,
+  A1_COURSE_LESSON_ORDER,
+  getA1CanonicalLesson,
+  getA1CourseLessonNeighbors,
+  getA1CanonicalLessonForLegacyRoute,
+  getA1CanonicalLessonsForChapter,
+} from "./a1CanonicalLessonCatalog";
+
+const EXPECTED_ROUTE_KEYS = [
+  "0.1", "0.2", "1.1", "1.2", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
+  "12.1", "12.3", "13", "14.1",
+  "1.1-practice", "1.2-practice", "1.3", "2.3", "3.5", "3.6", "4.7", "5.9", "5.10",
+];
+
+describe("A1 canonical lesson catalog", () => {
+  test("gives every current A1 Course Book chapter resource a permanent route", () => {
+    expect(A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey).sort()).toEqual(
+      [...EXPECTED_ROUTE_KEYS].sort(),
+    );
+    expect(new Set(A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey)).size).toBe(
+      A1_CANONICAL_LESSON_CATALOG.length,
+    );
+    expect(
+      A1_CANONICAL_LESSON_CATALOG.every(
+        (lesson) => lesson.lessonRoute === `/campus/course/lesson/A1/chapter/${lesson.routeKey}`,
+      ),
+    ).toBe(true);
+    expect(A1_CANONICAL_LESSON_CATALOG.every((lesson) => lesson.destination.startsWith("/campus/course/"))).toBe(true);
+  });
+
+  test("keeps graded Kapitel 1.1 and its later self-practice resource separate", () => {
+    expect(getA1CanonicalLesson("1.1")).toMatchObject({
+      routeKey: "1.1",
+      day: 2,
+      assignmentKey: "A1-1.1",
+      destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLesson("A1-1.1-PRACTICE")).toMatchObject({
+      routeKey: "1.1-practice",
+      day: 3,
+      assignmentKey: null,
+      destination: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLessonsForChapter("1.1")).toHaveLength(2);
+  });
+
+  test("keeps tutor-marked Kapitel 1.2 and its self-practice route separate", () => {
+    expect(getA1CanonicalLesson("1.2")).toMatchObject({
+      routeKey: "1.2",
+      day: 3,
+      assignmentKey: "A1-1.2",
+      destination: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+    });
+    expect(getA1CanonicalLesson("2.3")).toMatchObject({
+      day: 6,
+      kind: "practice",
+      singlePage: true,
+      destination: "/campus/course/a1-day-6-family-and-hobbies-workbook",
+    });
+    expect(getA1CanonicalLesson("A1-1.2-PRACTICE")).toMatchObject({
+      routeKey: "1.2-practice",
+      day: 3,
+      assignmentKey: null,
+      destination: "/campus/course/a1-day-3-kapitel-1-2-workbook",
+    });
+    expect(getA1CanonicalLessonsForChapter("1.2")).toHaveLength(2);
+  });
+
+  test("uses the legacy day and explicit PRACTICE identity to disambiguate split resources", () => {
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 2, identity: "1.1" })).toMatchObject({
+      routeKey: "1.1",
+      destination: "/campus/course/a1-day-2-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1" })).toMatchObject({
+      routeKey: "1.1-practice",
+      destination: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.1-PRACTICE" })).toMatchObject({
+      routeKey: "1.1-practice",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "A1-1.2" })).toMatchObject({
+      routeKey: "1.2",
+      assignmentKey: "A1-1.2",
+    });
+    expect(getA1CanonicalLessonForLegacyRoute({ day: 3, identity: "1.2-PRACTICE" })).toMatchObject({
+      routeKey: "1.2-practice",
+      assignmentKey: null,
+    });
+  });
+
+  test("course sequence includes assignments and self-practice exactly once", () => {
+    expect(A1_COURSE_LESSON_ORDER).toHaveLength(A1_CANONICAL_LESSON_CATALOG.length);
+    expect(new Set(A1_COURSE_LESSON_ORDER).size).toBe(A1_COURSE_LESSON_ORDER.length);
+    expect([...A1_COURSE_LESSON_ORDER].sort()).toEqual(
+      A1_CANONICAL_LESSON_CATALOG.map((lesson) => lesson.routeKey).sort(),
+    );
+  });
+
+  test("Day 7 Asking About Prices navigates back to Day 6 self-practice instead of the previous tutor assignment", () => {
+    const neighbors = getA1CourseLessonNeighbors("A1-3");
+
+    expect(neighbors.previous).toMatchObject({
+      routeKey: "2.3",
+      day: 6,
+      kind: "practice",
+      title: "Family and Hobbies",
+      lessonRoute: "/campus/course/lesson/A1/chapter/2.3",
+    });
+    expect(neighbors.next).toMatchObject({
+      routeKey: "4",
+      day: 8,
+      kind: "assignment",
+      title: "Countries and Languages",
+      lessonRoute: "/campus/course/lesson/A1/chapter/4",
+    });
+  });
+
+  test("assignment footer sequence crosses self-learning days in both directions", () => {
+    expect(getA1CourseLessonNeighbors("A1-2").next).toMatchObject({
+      routeKey: "1.3",
+      day: 5,
+      kind: "practice",
+    });
+    expect(getA1CourseLessonNeighbors("A1-14.1").next).toMatchObject({
+      routeKey: "5.10",
+      day: 23,
+      kind: "practice",
+      destination: "/campus/course/a1-final-mock-exam",
+    });
+  });
+
+  test("resolves every permanent route identity to one deterministic catalog entry", () => {
+    [
+      ["0.2", "/campus/course/a1-day-2-german-alphabet-reviewing-workbook"],
+      ["1.1", "/campus/course/a1-day-2-kapitel-1-1-workbook"],
+      ["1.1-PRACTICE", "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"],
+      ["1.2-PRACTICE", "/campus/course/a1-day-3-kapitel-1-2-workbook"],
+      ["1.3", "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"],
+      ["5.10", "/campus/course/a1-final-mock-exam"],
+    ].forEach(([identity, destination]) => {
+      expect(getA1CanonicalLesson(identity)?.destination).toBe(destination);
+    });
+  });
+});

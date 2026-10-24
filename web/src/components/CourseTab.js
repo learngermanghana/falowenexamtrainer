@@ -1,0 +1,1465 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
+import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
+import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
+import { courseSchedulesByName } from "../data/courseSchedules";
+import { classCatalog } from "../data/classCatalog";
+import { getAssignmentDisplayTitle, getAssignmentDisplayType } from "../data/germanAssignmentCatalog";
+import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
+import ClassMembersTab from "./ClassMembersTab";
+import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import CourseCompletionConclusion from "./CourseCompletionConclusion";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { expandCourseBookEntries } from "../utils/courseBookEntries";
+import { getNextCourseBookEntry, isCourseBookEntryComplete } from "../utils/courseBookProgression";
+import { buildCourseCompletionProgress, findCourseBookEntryForRequirement, readSelfLearningProgressByDay } from "../data/courseCompletionJourney";
+import { persistCourseCompletionSnapshot } from "../services/courseCompletionSnapshotService";
+import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
+import { db, doc, serverTimestamp, setDoc } from "../firebase";
+import { useLessonProgress } from "../hooks/useLessonProgress";
+import { useC2CourseProgress } from "../hooks/useC2CourseProgress";
+import { getC2SkillLabel } from "../data/c2SkillCycle";
+import { getB2SkillLabel } from "../data/b2SkillCycle";
+import { getTimedAssignmentConfig, getTimedAssignmentPhase } from "../data/timedAssignmentConfig";
+import { getA2B1WorkbookIncludedSectionLabels } from "./a2B1WorkbookSectionProfile";
+import "./CourseTabResponsive.css";
+
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const normalizeLevel = (level) => normalizeCourseLevel(level);
+const normalizeKey = (value) => String(value || "").trim().toUpperCase();
+const normalizeStatus = (value) => String(value || "").trim().toLowerCase();
+
+const ASSIGNMENT_STATUSES = {
+  notStarted: { key: "Not started", color: "#64748b", background: "#f8fafc", border: "#cbd5e1" },
+  inProgress: { key: "In progress", color: "#2563eb", background: "#eff6ff", border: "#bfdbfe" },
+  passed: { key: "Passed", color: "#0f766e", background: "#ecfdf5", border: "#99f6e4" },
+  failed: { key: "Needs improvement", color: "#c2410c", background: "#fff7ed", border: "#fed7aa" },
+  submitted: { key: "Submitted", color: "#2563eb", background: "#eff6ff", border: "#bfdbfe" },
+  resubmitted: { key: "Resubmitted", color: "#7c3aed", background: "#f5f3ff", border: "#ddd6fe" },
+  milestoneComplete: { key: "Complete", color: "#0f766e", background: "#ecfdf5", border: "#99f6e4" },
+  practiceOnly: { key: "Practice only", color: "#475569", background: "#f8fafc", border: "#e2e8f0" },
+  selfMarkedComplete: { key: "Self-marked complete", color: "#0f766e", background: "#ecfdf5", border: "#99f6e4" },
+};
+
+const COURSE_BOOK_FILTERS = [
+  { key: "all", label: "All lessons" },
+  { key: "next", label: "Next lesson" },
+  { key: "assignments", label: "Assignments" },
+  { key: "selfLearning", label: "Self-learning" },
+];
+
+// Presentation sections within A1; these are not enrollment or assessment levels.
+const A1_COURSE_BOOK_SECTIONS = [
+  { key: "orientation", title: "Orientation", days: "Day 0", firstDay: 0, lastDay: 0 },
+  { key: "a1-1", title: "A1.1 – Foundations", days: "Days 1–12", firstDay: 1, lastDay: 12 },
+  { key: "a1-2", title: "A1.2 – Application and Readiness", days: "Days 13–22", firstDay: 13, lastDay: 22 },
+  { key: "a1-exam", title: "A1 Final Mock", days: "Day 23", firstDay: 23, lastDay: 23 },
+];
+
+const getA1CourseBookSection = (entry) => {
+  const day = Number(entry.displayDay ?? entry.day);
+  return A1_COURSE_BOOK_SECTIONS.find(({ firstDay, lastDay }) => day >= firstDay && day <= lastDay);
+};
+
+const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1", "C2"]);
+const LEVEL_FALLBACK_RESOURCES = {
+  A2: {
+    video: "https://youtu.be/a1-day0-tutorial",
+    grammarbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    workbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    instructionNote: "Course book links use the A2 class folder until the full A2 course book dictionary is loaded.",
+  },
+};
+
+const PRACTICE_CLUSTER_BADGES = [
+  { key: "foundation-speaker", label: "🧩 Foundation Speaker", days: [5, 6] },
+];
+
+const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
+const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
+
+const hasTutorMarkedWork = (entry) => {
+  if (entry?.assignment) return true;
+  return (
+    toLessonArray(entry?.lesen_hören).some((lesson) => lesson?.assignment) ||
+    toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
+  );
+};
+
+const isTutorMarkedEntry = (entry, level) => {
+  if (SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(level))) return false;
+  return hasTutorMarkedWork(entry);
+};
+
+const lookupScheduleDictionaryEntry = (params) => {
+  if (typeof getCourseScheduleDictionaryEntry !== "function") return null;
+  return getCourseScheduleDictionaryEntry(params);
+};
+
+const buildLevelSchedules = () => {
+  const derivedSchedules = {};
+  const derivedLevels = new Set();
+
+  Object.values(courseSchedulesByName || {}).forEach((schedule) => {
+    const level = normalizeLevel(schedule.course);
+    if (!level || courseSchedules[level] || derivedSchedules[level]) return;
+
+    derivedLevels.add(level);
+    const fallback = LEVEL_FALLBACK_RESOURCES[level] || {};
+
+    derivedSchedules[level] = (schedule.days || []).map((day) => {
+      const sessions = day.sessions || [];
+      const primarySession = sessions[0] || {};
+      let usedFallbackResource = false;
+
+      const lessonList = sessions.map((session, index) => {
+        const dictionaryEntry = lookupScheduleDictionaryEntry({
+          level,
+          assignmentId: session.assignmentId,
+          chapter: session.chapter,
+        });
+        const video = session.video || session.youtube_link || fallback.video || null;
+        const grammarbook_link = session.grammarbook_link ?? fallback.grammarbook_link ?? null;
+        const workbook_link = session.workbook_link ?? fallback.workbook_link ?? null;
+
+        usedFallbackResource =
+          usedFallbackResource ||
+          (!session.video && !session.youtube_link && Boolean(fallback.video)) ||
+          (!session.grammarbook_link && Boolean(fallback.grammarbook_link)) ||
+          (!session.workbook_link && Boolean(fallback.workbook_link));
+
+        return {
+          chapter: dictionaryEntry?.chapter || session.chapter || session.title || `Session ${index + 1}`,
+          assignmentId: dictionaryEntry?.assignment_id || session.assignmentId || session.chapter || null,
+          title: session.title || getAssignmentDisplayTitle(dictionaryEntry, { preferEnglish: true }),
+          assignment: Boolean(session.assignment),
+          note: session.note,
+          type: session.type || getAssignmentDisplayType(dictionaryEntry),
+          video,
+          youtube_link: session.youtube_link || session.video || fallback.video || null,
+          grammarbook_link,
+          workbook_link,
+        };
+      });
+
+      const notes = lessonList.map((lesson) => lesson.note).filter(Boolean);
+      const instructionNote = usedFallbackResource && fallback.instructionNote ? ` ${fallback.instructionNote}` : "";
+
+      return {
+        day: day.dayNumber,
+        topic:
+          primarySession.title ||
+          getAssignmentDisplayTitle(
+            lookupScheduleDictionaryEntry({
+              level,
+              assignmentId: primarySession.assignmentId,
+              chapter: primarySession.chapter,
+            }),
+            { preferEnglish: true }
+          ) ||
+          primarySession.chapter ||
+          `Day ${day.dayNumber}`,
+        chapter: primarySession.chapter || primarySession.title || null,
+        instruction: notes.length > 0 ? `${notes.join(" • ")}${instructionNote}` : `${schedule.generatedNote || `Class plan for ${schedule.className}`}${instructionNote}`,
+        grammar_topic: primarySession.type || null,
+        lesen_hören: lessonList,
+      };
+    });
+  });
+
+  return { schedules: { ...courseSchedules, ...derivedSchedules }, derivedLevels };
+};
+
+const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
+
+export const dedupeCourseBookEntries = (entries = []) => {
+  const seen = new Set();
+
+  return entries.filter((entry) => {
+    const key =
+      entry.id ||
+      entry.assignmentId ||
+      entry.assignment_id ||
+      `${entry.level}-${entry.day}-${entry.chapter}-${entry.kind}`;
+
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
+
+const getCourseBookSchedule = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+
+  if (normalizedLevel === "A1") {
+    return getCurriculumEntriesForLevel("A1");
+  }
+
+  return mergedCourseSchedules[normalizedLevel] || [];
+};
+
+export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
+  resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || entry?.chapter,
+    assignmentTitle: `Day ${entry?.day}${occurrence > 1 ? ` Task ${occurrence}` : ""} ${entry?.topic || entry?.chapter || ""}`,
+  }) || `${String(level || "GENERAL").toUpperCase()}-DAY-${entry?.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
+
+const buildEntryLabel = (entry) => entry?.topic || entry?.title || entry?.chapter || `Day ${entry?.day}`;
+
+const getCourseBookDisplayDay = (entry = {}) => entry.displayDay || entry.day;
+
+const getCourseBookDayLabel = (entry = {}, dayTaskCounts = {}) => {
+  const day = getCourseBookDisplayDay(entry);
+  const chapter = String(entry.displayChapter || entry.chapter || "").trim();
+  const taskCount = Number(dayTaskCounts[String(day)] || 0);
+  return chapter && taskCount > 1 ? `Day ${day} ${chapter}` : `Day ${day}`;
+};
+
+const getCourseBookEntryTitle = (entry = {}) =>
+  String(entry.lessonTitle || entry.topic || entry.title || entry.chapter || `Day ${getCourseBookDisplayDay(entry)}`).trim();
+
+export const getA2B1CourseBookIncludedSections = (level, entry = {}) =>
+  getA2B1WorkbookIncludedSectionLabels(level, getCourseBookDisplayDay(entry));
+
+const formatCourseBookInstruction = (instruction = "") =>
+  String(instruction || "")
+    .replace(/^\s*(?:📝\s*)?Instruction\s*:\s*/i, "")
+    .trim();
+
+const shouldShowGrammarChip = (entry = {}) => {
+  const grammarTopic = String(entry.grammar_topic || "").trim();
+  if (!grammarTopic) return false;
+  const topic = String(entry.topic || "").trim();
+  return grammarTopic.toLowerCase() !== topic.toLowerCase();
+};
+
+const getEntryAssignmentId = (entry, level, occurrence = 1) => {
+  if (!entry) return "";
+  const normalizedLevel = normalizeLevel(level);
+  if (entry?.courseBookTaskSection && !hasTutorMarkedWork(entry)) {
+    const displayDay = getCourseBookDisplayDay(entry);
+    const chapterToken = String(entry.displayChapter || entry.chapter || occurrence)
+      .trim()
+      .replace(/[^a-z0-9._-]/gi, "-");
+    return `${normalizedLevel || "GENERAL"}-DAY-${displayDay}-PRACTICE-${chapterToken || occurrence}`;
+  }
+  const dictionaryMatch =
+    lookupScheduleDictionaryEntry({
+      level: normalizedLevel,
+      assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey,
+      chapter: entry.chapter,
+      assignmentDay: entry.day,
+    }) || lookupScheduleDictionaryEntry({ level: normalizedLevel, chapter: entry.chapter, assignmentDay: entry.day });
+
+  if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
+
+  const direct = resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey || entry.chapter,
+    assignmentTitle: buildEntryLabel(entry),
+  });
+  if (direct) return direct;
+
+  return getEntryAssignmentKey(entry, level, occurrence);
+};
+
+const collectTutorAssignmentLessons = (entry) => {
+  const lessons = [
+    ...toLessonArray(entry?.lesen_hören),
+    ...toLessonArray(entry?.schreiben_sprechen),
+  ].filter((lesson) => lesson?.assignment || lesson?.assignmentId || lesson?.assignment_id || lesson?.assignmentKey);
+
+  if (lessons.length) {
+    return lessons.map((lesson) => ({
+      ...lesson,
+      day: entry.day,
+      topic: lesson.topic || lesson.title || entry.topic,
+      chapter: lesson.chapter || lesson.assignmentId || lesson.assignment_id || entry.chapter,
+    }));
+  }
+
+  return entry?.assignment ? [entry] : [];
+};
+
+const uniqueAssignmentIds = (ids) => [...new Set(ids.map(normalizeKey).filter(Boolean))];
+
+export const getRequiredAssignmentIdsForEntry = (entry, level, occurrence = 1) => {
+  const lessons = collectTutorAssignmentLessons(entry);
+  if (!lessons.length) {
+    const assignmentId = getEntryAssignmentId(entry, level, occurrence);
+    return assignmentId ? [normalizeKey(assignmentId)] : [];
+  }
+
+  return uniqueAssignmentIds(
+    lessons.map((lesson, index) => getEntryAssignmentId(lesson, level, lessons.length > 1 ? index + 1 : occurrence))
+  );
+};
+
+const toCourseTabStatus = (status = "") => {
+  switch (normalizeStatus(status)) {
+    case "passed":
+      return "passed";
+    case "failed":
+    case "needs_correction":
+      return "failed";
+    case "resubmitted":
+      return "resubmitted";
+    case "submitted":
+      return "submitted";
+    case "in_progress":
+    case "inprogress":
+    case "in-progress":
+      return "inProgress";
+    case "milestonecomplete":
+      return "milestoneComplete";
+    default:
+      return "notStarted";
+  }
+};
+
+const statusFromProgressRecord = (record = {}) => {
+  const statusFromStatusField = toCourseTabStatus(record.status || record.value || record.state);
+  let statusFromFlags = "notStarted";
+  if (record.passed === true) statusFromFlags = "passed";
+  else if (record.failed === true) statusFromFlags = "failed";
+  else if (record.submitted === true) statusFromFlags = toCourseTabStatus(record.status) === "resubmitted" ? "resubmitted" : "submitted";
+  else if (record.inProgress === true || record.hasDraft === true) statusFromFlags = "inProgress";
+
+  const finalStatus = statusFromFlags !== "notStarted" ? statusFromFlags : statusFromStatusField;
+  return { statusFromStatusField, statusFromFlags, finalStatus };
+};
+
+const getProgressRecord = (progressByAssignmentId = {}, assignmentId) => {
+  const key = normalizeKey(assignmentId);
+  return progressByAssignmentId[key] || progressByAssignmentId[assignmentId] || null;
+};
+
+export const getStatusForEntry = (progressByAssignmentId = {}, entry, level, occurrence = 1) => {
+  const statusInfo = getAutoStatusForEntry({ progressByAssignmentId, entry, level, occurrence });
+  return statusInfo.finalStatus;
+};
+
+export const getAutoStatusForEntry = ({ progressByAssignmentId = {}, entry, level, occurrence = 1 } = {}) => {
+  const assignmentId = normalizeKey(getEntryAssignmentId(entry, level, occurrence));
+  if (isMilestoneEntry(entry)) {
+    return { status: "milestoneComplete", finalStatus: "milestoneComplete", assignmentId, requiredAssignmentIds: [assignmentId].filter(Boolean) };
+  }
+
+  const requiredAssignmentIds = getRequiredAssignmentIdsForEntry(entry, level, occurrence);
+  const records = requiredAssignmentIds
+    .map((requiredId) => ({ assignmentId: requiredId, record: getProgressRecord(progressByAssignmentId, requiredId) }))
+    .filter((item) => item.record);
+
+  if (!requiredAssignmentIds.length || !records.length) {
+    const fallbackRecord = getProgressRecord(progressByAssignmentId, assignmentId);
+    if (!fallbackRecord) {
+      return {
+        status: "notStarted",
+        finalStatus: "notStarted",
+        assignmentId,
+        requiredAssignmentIds: requiredAssignmentIds.length ? requiredAssignmentIds : [assignmentId].filter(Boolean),
+        statusDebug: { finalStatus: "notStarted" },
+      };
+    }
+    const statusParts = statusFromProgressRecord(fallbackRecord);
+    return {
+      status: statusParts.statusFromStatusField,
+      finalStatus: statusParts.finalStatus,
+      assignmentId,
+      requiredAssignmentIds: [assignmentId].filter(Boolean),
+      statusDebug: { mergedStatus: fallbackRecord.status, ...statusParts },
+    };
+  }
+
+  const statuses = records.map(({ record }) => statusFromProgressRecord(record).finalStatus);
+  const allRequiredHaveRecords = records.length === requiredAssignmentIds.length;
+
+  let finalStatus = "notStarted";
+  if (allRequiredHaveRecords && statuses.every((status) => status === "passed")) {
+    finalStatus = "passed";
+  } else if (allRequiredHaveRecords && statuses.some((status) => status === "failed")) {
+    finalStatus = "failed";
+  } else if (allRequiredHaveRecords && statuses.every((status) => ["passed", "submitted", "resubmitted"].includes(status))) {
+    finalStatus = statuses.includes("resubmitted") ? "resubmitted" : "submitted";
+  } else if (statuses.some((status) => status !== "notStarted")) {
+    finalStatus = "inProgress";
+  }
+
+  const primaryRecord = records[0]?.record || {};
+  const statusParts = statusFromProgressRecord(primaryRecord);
+  return {
+    status: statusParts.statusFromStatusField,
+    finalStatus,
+    assignmentId: requiredAssignmentIds[0] || assignmentId,
+    requiredAssignmentIds,
+    statusDebug: {
+      mergedStatus: primaryRecord.status,
+      mergedPassed: primaryRecord.passed,
+      mergedFailed: primaryRecord.failed,
+      mergedSubmitted: primaryRecord.submitted,
+      mergedInProgress: primaryRecord.inProgress,
+      ...statusParts,
+      finalStatus,
+    },
+  };
+};
+
+export const getScoreBadgeForEntry = ({ statusInfo = {}, progressByAssignmentId = {} } = {}) => {
+  const requiredAssignmentIds = statusInfo.requiredAssignmentIds?.length
+    ? statusInfo.requiredAssignmentIds
+    : [statusInfo.assignmentId].filter(Boolean);
+  const records = requiredAssignmentIds.map((id) => getProgressRecord(progressByAssignmentId, id)).filter(Boolean);
+
+  const scoredRecords = records
+    .filter((record) => typeof (record.bestScore ?? record.latestScore) === "number")
+    .sort((left, right) => new Date(right.lastUpdatedAt || 0).getTime() - new Date(left.lastUpdatedAt || 0).getTime());
+
+  if (scoredRecords.length) {
+    const score = scoredRecords[0].bestScore ?? scoredRecords[0].latestScore;
+    return { tone: "scored", text: `Best score: ${score}/100` };
+  }
+
+  if (["submitted", "resubmitted"].includes(statusInfo.finalStatus || statusInfo.status)) {
+    return { tone: "awaiting", text: "Awaiting score" };
+  }
+
+  return null;
+};
+
+const toUpdatedMillis = (record = {}) => {
+  const value = record.updatedAt || record.lastUpdatedAt || record.submittedAt || record.markedAt || record.createdAt || 0;
+  const parsed = new Date(value).getTime();
+  if (Number.isFinite(parsed)) return parsed;
+  return Number(value) || 0;
+};
+
+export const mergeCourseProgressStatuses = (localStatuses = {}, profileStatuses = {}) => {
+  const merged = { ...(profileStatuses || {}) };
+  Object.entries(localStatuses || {}).forEach(([key, value]) => {
+    const existing = merged[key];
+    if (!existing || toUpdatedMillis(value) >= toUpdatedMillis(existing)) {
+      merged[key] = value;
+    }
+  });
+  return merged;
+};
+
+export const collectUnresolvedTutorAssignmentDiagnostics = (entries = [], level = "") =>
+  entries
+    .filter((entry) => isTutorMarkedEntry(entry, level))
+    .map((entry) => {
+      const assignmentId = getEntryAssignmentId(entry, level, entry.occurrence || 1);
+      const isSynthetic = /-DAY-\d+/i.test(assignmentId);
+      return isSynthetic
+        ? {
+            issue: "missingCanonicalAssignmentId",
+            level,
+            day: entry.day,
+            occurrence: entry.occurrence || 1,
+            chapter: entry.chapter || "",
+            topic: entry.topic || "",
+            fallbackAssignmentId: assignmentId,
+            fallbackReason: "syntheticAssignmentId",
+            tutorLessons: collectTutorAssignmentLessons(entry),
+          }
+        : null;
+    })
+    .filter(Boolean);
+
+export const aggregateUnresolvedTutorDiagnostics = (diagnostics = []) => {
+  const grouped = new Map();
+  diagnostics.forEach((item) => {
+    const key = `${item.level}-${item.day}-${item.chapter}-${item.fallbackReason}`;
+    if (!grouped.has(key)) {
+      grouped.set(key, {
+        ...item,
+        occurrences: 0,
+        fallbackAssignmentIds: [],
+        fallbackReasonCounts: {},
+      });
+    }
+    const current = grouped.get(key);
+    current.occurrences += 1;
+    if (item.fallbackAssignmentId && !current.fallbackAssignmentIds.includes(item.fallbackAssignmentId)) {
+      current.fallbackAssignmentIds.push(item.fallbackAssignmentId);
+    }
+    current.fallbackReasonCounts[item.fallbackReason] = (current.fallbackReasonCounts[item.fallbackReason] || 0) + 1;
+  });
+  return [...grouped.values()];
+};
+
+const TimedPhaseNotice = ({ phase, level }) => {
+  if (!phase) return null;
+  return (
+    <div
+      data-timed-phase-intro={level}
+      style={{
+        border: "1px solid #f59e0b",
+        background: "#fffbeb",
+        borderRadius: 16,
+        padding: 14,
+        display: "grid",
+        gap: 6,
+      }}
+    >
+      <strong style={{ color: "#92400e" }}>{phase.title}</strong>
+      <p style={{ margin: 0, color: "#78350f", lineHeight: 1.6 }}>{phase.message}</p>
+      <p style={{ margin: 0, color: "#92400e", fontSize: 13, fontWeight: 700 }}>
+        You can open the lesson, review Grammar and preparation material first, and start the clock only when you are ready.
+      </p>
+    </div>
+  );
+};
+
+const courseBookStyles = {
+  hero: {
+    borderRadius: 24,
+    padding: 20,
+    background: "linear-gradient(135deg, #172554 0%, #2563eb 54%, #38bdf8 100%)",
+    color: "#f8fafc",
+    boxShadow: "0 22px 50px rgba(37, 99, 235, 0.28)",
+    display: "grid",
+    gap: 16,
+  },
+  heroHeader: { display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", flexWrap: "wrap" },
+  heroEyebrow: { margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: 0.6 },
+  heroTitle: { margin: "4px 0 6px", fontSize: 28, lineHeight: 1.08, letterSpacing: -0.6 },
+  heroText: { margin: 0, color: "#dbeafe", fontSize: 14, lineHeight: 1.5, maxWidth: 640 },
+  heroActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
+  heroSelect: { ...styles.select, minWidth: 110, background: "rgba(255,255,255,0.96)", border: "1px solid rgba(255,255,255,0.35)" },
+  statGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 },
+  statCard: { border: "1px solid rgba(255,255,255,0.18)", background: "rgba(255,255,255,0.12)", borderRadius: 16, padding: 12, backdropFilter: "blur(8px)" },
+  statLabel: { margin: 0, color: "#bfdbfe", fontSize: 12, fontWeight: 700 },
+  statValue: { margin: "4px 0 0", color: "#ffffff", fontSize: 20, fontWeight: 900 },
+  progressShell: { height: 10, borderRadius: 999, background: "rgba(255,255,255,0.22)", overflow: "hidden", border: "1px solid rgba(255,255,255,0.18)" },
+  progressFill: { height: "100%", borderRadius: 999, background: "linear-gradient(90deg, #dcfce7, #86efac)" },
+  toolbar: { ...styles.card, marginBottom: 0, display: "grid", gap: 12, borderRadius: 18, padding: 14 },
+  toolbarTop: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" },
+  filterRow: { display: "flex", gap: 8, flexWrap: "wrap" },
+  filterButton: { ...styles.secondaryButton, padding: "8px 12px", fontWeight: 700, background: "#ffffff" },
+  filterButtonActive: { ...styles.primaryButton, padding: "8px 12px", boxShadow: "0 8px 18px rgba(37, 99, 235, 0.22)" },
+  searchInput: { ...styles.input, minHeight: 42, borderRadius: 14, background: "#f8fafc" },
+  nextCard: { border: "1px solid #bfdbfe", background: "linear-gradient(135deg, #eff6ff, #ffffff)", borderRadius: 18, padding: 14, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" },
+  weekSection: { display: "grid", gap: 10 },
+  weekHeader: { display: "flex", alignItems: "center", gap: 10, margin: "6px 0 0" },
+  weekTitle: { margin: 0, fontSize: 14, color: "#1e3a8a", fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.5 },
+  weekLine: { height: 1, background: "#dbeafe", flex: 1 },
+  lessonCard: { background: "#ffffff", border: "1px solid #e5e7eb", borderRadius: 18, padding: 14, boxShadow: "0 10px 24px rgba(15, 23, 42, 0.05)", display: "grid", gap: 10 },
+  lessonCardCurrent: { border: "1px solid #2563eb", background: "linear-gradient(135deg, #eff6ff, #ffffff 60%)", boxShadow: "0 18px 34px rgba(37, 99, 235, 0.16)" },
+  lessonTop: { display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" },
+  lessonMain: { display: "flex", gap: 12, flex: "1 1 320px", minWidth: 0 },
+  dayBubble: { minWidth: 72, minHeight: 48, padding: "6px 8px", borderRadius: 16, background: "#eff6ff", border: "1px solid #bfdbfe", color: "#1d4ed8", display: "grid", placeItems: "center", flexShrink: 0, fontWeight: 900, lineHeight: 1.1, textAlign: "center", fontSize: 12 },
+  lessonTitle: { margin: 0, fontSize: 17, lineHeight: 1.25, color: "#0f172a" },
+  lessonMeta: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 8 },
+  includedRow: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 8 },
+  includedLabel: { color: "#64748b", fontSize: 12, fontWeight: 800 },
+  includedChip: { display: "inline-flex", alignItems: "center", borderRadius: 999, padding: "4px 8px", background: "#f8fafc", border: "1px solid #dbeafe", color: "#1e3a8a", fontSize: 11, fontWeight: 800 },
+  chip: { display: "inline-flex", alignItems: "center", gap: 4, borderRadius: 999, padding: "5px 9px", background: "#f8fafc", border: "1px solid #e2e8f0", color: "#475569", fontSize: 12, fontWeight: 700 },
+  statusChip: { display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" },
+  lessonActions: { display: "flex", gap: 8, alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" },
+  floatingSubmitButton: {
+    position: "fixed",
+    right: "max(18px, env(safe-area-inset-right))",
+    bottom: "max(18px, env(safe-area-inset-bottom))",
+    zIndex: 40,
+    alignItems: "center",
+    background: "linear-gradient(135deg,#2563eb,#1d4ed8)",
+    border: "1px solid rgba(255,255,255,0.5)",
+    borderRadius: 999,
+    boxShadow: "0 18px 36px rgba(37,99,235,0.35)",
+    color: "#ffffff",
+    cursor: "pointer",
+    display: "inline-flex",
+    fontWeight: 900,
+    gap: 8,
+    minHeight: 54,
+    padding: "0 20px",
+  },
+  submitOverlay: {
+    position: "fixed",
+    inset: 0,
+    zIndex: 70,
+  },
+  submitBackdrop: {
+    position: "absolute",
+    inset: 0,
+    background: "rgba(15,23,42,0.42)",
+  },
+  submitPanel: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: "min(920px, 100%)",
+    overflowY: "auto",
+    background: "#f8fafc",
+    boxShadow: "-24px 0 48px rgba(15,23,42,0.24)",
+    padding: "clamp(14px, 3vw, 24px)",
+  },
+  submitPanelHeader: {
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    alignItems: "center",
+    background: "rgba(248,250,252,0.96)",
+    borderBottom: "1px solid #e2e8f0",
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 12,
+    marginBottom: 12,
+    padding: "8px 0 12px",
+  },
+  practiceControls: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", marginTop: 8 },
+  emptyState: { ...styles.card, marginBottom: 0, textAlign: "center", borderRadius: 18, padding: 24 },
+};
+
+const normalizeSearchText = (value) => String(value || "").trim().toLowerCase();
+
+const lessonMatchesSearch = (entry, searchTerm) => {
+  const query = normalizeSearchText(searchTerm);
+  if (!query) return true;
+  const haystack = [
+    getCourseBookEntryTitle(entry),
+    entry.topic,
+    entry.chapter,
+    entry.grammar_topic,
+    entry.goal,
+    entry.instruction,
+  ]
+    .map((value) => String(value || "").toLowerCase())
+    .join(" ");
+  return haystack.includes(query);
+};
+
+const groupLessonsByWeek = (entries) =>
+  entries.reduce((groups, entry, index) => {
+    const numericDay = Number(getCourseBookDisplayDay(entry) || entry.day || index + 1);
+    const weekNumber = Math.max(1, Math.ceil(numericDay / 5));
+    const key = `Week ${weekNumber}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(entry);
+    return groups;
+  }, {});
+
+const getPracticeStorageKey = ({ studentCode, level }) => `coursePracticeProgress:${studentCode || "student"}:${level || "course"}`;
+
+const readPracticeProgress = (key) => {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(window.localStorage.getItem(key) || "{}");
+  } catch {
+    return {};
+  }
+};
+
+const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { studentProfile, user } = useAuth();
+  const resolvedStudentLevel = normalizeLevel(studentProfile?.level) || normalizeLevel(studentProfile?.className);
+  const resolvedDefaultLevel = resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
+  const isFrenchProgram = program === "french";
+  const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
+
+  const { schedules, resolvedDerivedLevels } = useMemo(() => {
+    if (isFrenchProgram) return { schedules: { A1: FRENCH_A1_SCHEDULE }, resolvedDerivedLevels: new Set() };
+    return { schedules: mergedCourseSchedules, resolvedDerivedLevels: derivedLevels };
+  }, [isFrenchProgram]);
+
+  const levels = useMemo(() => {
+    const baseLevels = Object.keys(schedules);
+    const normalizedDefault = resolvedDefaultLevel;
+    const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
+    const allowedLevels = getAccessibleLevels(normalizedDefault, merged);
+    return allowedLevels.sort((a, b) => {
+      const aIndex = LEVEL_ORDER.indexOf(a);
+      const bIndex = LEVEL_ORDER.indexOf(b);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a.localeCompare(b);
+    });
+  }, [resolvedDefaultLevel, schedules]);
+
+  const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
+    const normalizedDefault = resolvedDefaultLevel;
+    if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
+    return levels[0] || "";
+  });
+  const [activeSubTab, setActiveSubTab] = useState("courseBook");
+  const [courseSubmitOpen, setCourseSubmitOpen] = useState(false);
+
+  const query = useMemo(() => new URLSearchParams(location.search || ""), [location.search]);
+  const showLegacySubmitRedirectMessage = query.get("legacySubmitRedirect") === "1";
+
+  useEffect(() => {
+    if (query.get("submitWork") === "1") {
+      setActiveSubTab("courseBook");
+      setCourseSubmitOpen(true);
+      return;
+    }
+    if (query.get("classMembers") === "1") {
+      setActiveSubTab("classMembers");
+      setCourseSubmitOpen(false);
+      return;
+    }
+    setActiveSubTab("courseBook");
+  }, [query]);
+
+  useEffect(() => {
+    if (String(selectedCourseLevel || "").toUpperCase() === "A1") {
+      setCourseSubmitOpen(false);
+    }
+  }, [selectedCourseLevel]);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [practiceProgress, setPracticeProgress] = useState({});
+
+  useEffect(() => {
+    if (!selectedCourseLevel && levels[0]) setSelectedCourseLevel(levels[0]);
+  }, [levels, selectedCourseLevel]);
+
+  const practiceStorageKey = useMemo(
+    () => getPracticeStorageKey({ studentCode, level: selectedCourseLevel }),
+    [selectedCourseLevel, studentCode]
+  );
+
+  useEffect(() => {
+    setPracticeProgress(readPracticeProgress(practiceStorageKey));
+  }, [practiceStorageKey]);
+
+  const { progressByAssignmentId, loading: loadingLessonProgress, error: lessonProgressError } = useLessonProgress({
+    studentProfile,
+    user,
+    level: selectedCourseLevel,
+  });
+  const isC2Selected = String(selectedCourseLevel || "").toUpperCase() === "C2";
+  const { byDay: c2ProgressByDay, summary: c2SkillSummary, loading: loadingC2Progress } = useC2CourseProgress({
+    enabled: isC2Selected,
+  });
+
+  const schedule = useMemo(() => {
+    const seenByDay = {};
+    const sourceEntries = isFrenchProgram ? schedules[selectedCourseLevel] || [] : getCourseBookSchedule(selectedCourseLevel);
+    const expandedEntries = dedupeCourseBookEntries(expandCourseBookEntries(sourceEntries, { level: selectedCourseLevel }));
+    return sortByDay(
+      expandedEntries.map((entry) => {
+        const dayKey = String(getCourseBookDisplayDay(entry) || "");
+        seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+        return { ...entry, occurrence: seenByDay[dayKey] };
+      })
+    );
+  }, [isFrenchProgram, schedules, selectedCourseLevel]);
+
+  const dayTaskCounts = useMemo(
+    () =>
+      schedule.reduce((counts, entry) => {
+        const dayKey = String(getCourseBookDisplayDay(entry) || "");
+        counts[dayKey] = (counts[dayKey] || 0) + 1;
+        return counts;
+      }, {}),
+    [schedule]
+  );
+
+  const decoratedSchedule = useMemo(
+    () =>
+      schedule.map((entry) => {
+        const milestoneEntry = isMilestoneEntry(entry);
+        const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
+        const statusInfo = getAutoStatusForEntry({ progressByAssignmentId, entry, level: selectedCourseLevel, occurrence: entry.occurrence });
+        const status = milestoneEntry ? "milestoneComplete" : statusInfo.finalStatus;
+        const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentId(entry, selectedCourseLevel, entry.occurrence);
+        const scoreBadge = getScoreBadgeForEntry({ statusInfo, progressByAssignmentId });
+        return {
+          ...entry,
+          assignmentKey: entryAssignmentKey,
+          requiredAssignmentIds: statusInfo.requiredAssignmentIds,
+          isMilestone: milestoneEntry,
+          isTutorMarked,
+          status,
+          statusInfo,
+          scoreBadge,
+          timedConfig: getTimedAssignmentConfig(entryAssignmentKey),
+          statusMeta: ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted,
+        };
+      }),
+    [progressByAssignmentId, schedule, selectedCourseLevel]
+  );
+
+  const normalizedSelectedCourseLevel = String(selectedCourseLevel || "").toUpperCase();
+  const timedPhase = getTimedAssignmentPhase(normalizedSelectedCourseLevel);
+  const isA1CourseBook = normalizedSelectedCourseLevel === "A1";
+  const usesSharedA2B1Design = normalizedSelectedCourseLevel === "A2" || normalizedSelectedCourseLevel === "B1";
+  const isCourseConclusionLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(normalizedSelectedCourseLevel);
+  const isSelfLearningLevel = SELF_LEARNING_ONLY_LEVELS.has(normalizedSelectedCourseLevel);
+  const canShowCourseSubmit = !isA1CourseBook && !isSelfLearningLevel;
+  const isDerivedLevel = resolvedDerivedLevels.has(selectedCourseLevel);
+  const courseLessons = decoratedSchedule.filter((entry) => !entry.isMilestone);
+  const isB2CourseBook = normalizedSelectedCourseLevel === "B2";
+  const isC2CourseBook = normalizedSelectedCourseLevel === "C2";
+  const courseCompletion = useMemo(
+    () =>
+      isC2CourseBook
+        ? null
+        : buildCourseCompletionProgress({
+            level: normalizedSelectedCourseLevel,
+            progressByAssignmentId,
+            selfLearningProgressByDay: readSelfLearningProgressByDay(normalizedSelectedCourseLevel),
+          }),
+    [isC2CourseBook, normalizedSelectedCourseLevel, practiceProgress, progressByAssignmentId],
+  );
+  const effectivePracticeProgress = useMemo(() => {
+    if (!isC2CourseBook) return practiceProgress;
+    const next = { ...practiceProgress };
+    courseLessons.forEach((entry) => {
+      const day = Number(getCourseBookDisplayDay(entry) || entry.day || 0);
+      const cloud = c2ProgressByDay[day];
+      next[entry.assignmentKey] = {
+        ...(next[entry.assignmentKey] || {}),
+        completed: Boolean(cloud?.dayComplete),
+        confidence: cloud?.confidence || "",
+        source: "c2-cloud-progress",
+      };
+    });
+    return next;
+  }, [c2ProgressByDay, courseLessons, isC2CourseBook, practiceProgress]);
+  const assignmentCount = isC2CourseBook
+    ? courseLessons.filter((entry) => entry.isTutorMarked).length
+    : (courseCompletion?.total || 0);
+  const completedCount = isC2CourseBook
+    ? courseLessons.filter((entry) => isCourseBookEntryComplete(entry, effectivePracticeProgress)).length
+    : (courseCompletion?.completed || 0);
+  const progressPercent = isC2CourseBook
+    ? (courseLessons.length ? Math.round((completedCount / courseLessons.length) * 100) : 0)
+    : (courseCompletion?.completionPercent || 0);
+  const nextLesson = isC2CourseBook
+    ? getNextCourseBookEntry(courseLessons, effectivePracticeProgress)
+    : findCourseBookEntryForRequirement(courseLessons, courseCompletion?.next);
+  const nextLessonIndex = nextLesson ? courseLessons.findIndex((entry) => entry.assignmentKey === nextLesson.assignmentKey) : -1;
+  const followingLesson = nextLessonIndex >= 0
+    ? courseLessons.slice(nextLessonIndex + 1).find((entry) =>
+        isC2CourseBook
+          ? !isCourseBookEntryComplete(entry, effectivePracticeProgress)
+          : Number(entry.day) === Number(courseCompletion?.states?.find((state) =>
+              !state.completed && Number(state.requirement?.day) > Number(nextLesson?.day)
+            )?.requirement?.day)
+      ) || null
+    : null;
+  const nextLessonTitle = nextLesson ? getCourseBookEntryTitle(nextLesson) : "";
+  const followingLessonTitle = followingLesson ? getCourseBookEntryTitle(followingLesson) : "";
+  const nextPracticeState = nextLesson ? effectivePracticeProgress[nextLesson.assignmentKey] || {} : {};
+  const passedAssignmentCount = isC2CourseBook ? 0 : (courseCompletion?.passed || 0);
+  const courseIsComplete = isCourseConclusionLevel && (
+    isC2CourseBook
+      ? courseLessons.length > 0 && completedCount === courseLessons.length
+      : Boolean(courseCompletion?.courseWorkCompleted)
+  );
+
+  useEffect(() => {
+    if (isC2CourseBook || loadingLessonProgress || !user?.uid || !courseCompletion?.total) return undefined;
+    const timer = setTimeout(() => {
+      persistCourseCompletionSnapshot({
+        progress: courseCompletion,
+        level: normalizedSelectedCourseLevel,
+        user,
+        studentProfile,
+      }).catch((error) => {
+        console.warn("Could not sync Course Book completion snapshot", error);
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [courseCompletion, isC2CourseBook, loadingLessonProgress, normalizedSelectedCourseLevel, studentProfile, user]);
+
+  const practiceEntries = useMemo(() => decoratedSchedule.filter((entry) => !entry.isTutorMarked && !entry.isMilestone), [decoratedSchedule]);
+  const practicalCompletedCount = practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).length;
+  const completedPracticeDays = new Set(
+    practiceEntries.filter((entry) => effectivePracticeProgress[entry.assignmentKey]?.completed).map((entry) => Number(entry.day))
+  );
+  const earnedBadges = isC2CourseBook ? [] : PRACTICE_CLUSTER_BADGES.filter((badge) => badge.days.every((day) => completedPracticeDays.has(day)));
+
+  const visibleLessons = useMemo(
+    () =>
+      decoratedSchedule.filter((entry) => {
+        if (isCourseConclusionLevel && entry.isMilestone) return false;
+        if (!lessonMatchesSearch(entry, searchTerm)) return false;
+        if (activeFilter === "next") return entry.assignmentKey === nextLesson?.assignmentKey;
+        if (activeFilter === "assignments") return entry.isTutorMarked;
+        if (activeFilter === "selfLearning") return !entry.isTutorMarked;
+        return true;
+      }),
+    [decoratedSchedule, searchTerm, activeFilter, nextLesson, isCourseConclusionLevel]
+  );
+
+  const groupedLessons = useMemo(() => {
+    if (!isA1CourseBook) return groupLessonsByWeek(visibleLessons);
+    return visibleLessons.reduce((groups, entry) => {
+      const section = getA1CourseBookSection(entry);
+      const key = section?.key || "Course completion";
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(entry);
+      return groups;
+    }, {});
+  }, [isA1CourseBook, visibleLessons]);
+  const weekEntries = Object.entries(groupedLessons).map(([label, lessons]) => [
+    label,
+    lessons,
+    isA1CourseBook ? A1_COURSE_BOOK_SECTIONS.find(({ key }) => key === label) : null,
+  ]);
+
+  const persistPracticeProgress = async (entry, nextValue) => {
+    const assignmentKey = entry?.assignmentKey;
+    if (!db || !studentCode || !assignmentKey) return;
+    const docId = `${String(studentCode).toLowerCase()}_${String(selectedCourseLevel).toLowerCase()}_${String(assignmentKey).toLowerCase().replace(/[^a-z0-9._-]/g, "_")}`;
+    await setDoc(
+      doc(db, "coursePracticeProgress", docId),
+      {
+        studentCode,
+        level: selectedCourseLevel,
+        assignmentKey,
+        entryId: entry.assignmentId || entry.assignment_id || null,
+        displayDay: getCourseBookDisplayDay(entry),
+        chapter: entry.displayChapter || entry.chapter || null,
+        lessonTitle: getCourseBookEntryTitle(entry),
+        ...nextValue,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  };
+
+  const updatePracticeEntry = (entry, updates) => {
+    const assignmentKey = entry.assignmentKey;
+    setPracticeProgress((prev) => {
+      const nextValue = { ...(prev[assignmentKey] || {}), ...updates, updatedAt: new Date().toISOString() };
+      const next = { ...prev, [assignmentKey]: nextValue };
+      if (typeof window !== "undefined") window.localStorage.setItem(practiceStorageKey, JSON.stringify(next));
+      persistPracticeProgress(entry, nextValue).catch((error) => console.warn("Could not save practice progress", error));
+      return next;
+    });
+  };
+
+  const getLessonHref = (entry) => {
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "A2" &&
+      Number(entry?.day) === 29
+    ) {
+      return entry?.workbook_link || "/campus/course/a2-mock-practice-preview";
+    }
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "B1" &&
+      Number(entry?.day) === 29
+    ) {
+      return "/campus/course/b1-mock-practice-preview";
+    }
+
+    if (
+      String(selectedCourseLevel || "").toUpperCase() === "B2" &&
+      Number(entry?.day) === 29
+    ) {
+      return "/campus/course/b2-final-mock-exam";
+    }
+
+    const chapter = String(entry?.displayChapter || entry?.chapter || "").trim();
+    const search = chapter ? `?chapter=${encodeURIComponent(chapter)}` : "";
+    return `/campus/course/lesson/${selectedCourseLevel}/${entry?.day}${search}`;
+  };
+
+  const openLesson = (entry) => {
+    navigate(getLessonHref(entry), {
+      state: {
+        level: selectedCourseLevel,
+        day: entry.day,
+        entry,
+        assignmentKey: entry.assignmentKey,
+        status: entry.status,
+        scoreText: entry.scoreBadge?.text || "",
+      },
+    });
+  };
+
+  const handleLessonLinkClick = (event, entry) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    openLesson(entry);
+  };
+
+  return (
+    <div
+      data-a1-coursebook={isA1CourseBook ? "true" : undefined}
+      data-a2-b1-coursebook={usesSharedA2B1Design ? "true" : undefined}
+      className={usesSharedA2B1Design ? "course-book a2-b1-course-book" : "course-book"}
+      style={{ display: "grid", gap: 14, paddingBottom: 80 }}
+    >
+      {activeSubTab === "classMembers" ? (
+        isSelfLearningLevel ? (
+          <section role="status" style={{ ...styles.card, borderColor: "#bfdbfe", background: "#eff6ff", color: "#1e3a8a", padding: 14 }}>
+            <strong>Class Members is available for tutor-guided classes.</strong>
+            <p style={{ margin: "4px 0 0", color: "#1d4ed8" }}>
+              Your self-learning course does not include a class roster. Use the Course Book to continue your workbook lessons.
+            </p>
+          </section>
+        ) : (
+          <ClassMembersTab />
+        )
+      ) : null}
+
+      {showLegacySubmitRedirectMessage ? (
+        <section
+          role="status"
+          style={{
+            ...styles.card,
+            borderColor: "#bfdbfe",
+            background: "#eff6ff",
+            color: "#1e3a8a",
+            padding: 14,
+          }}
+        >
+          <strong>Assignments are now submitted inside the Course Book.</strong>
+          <p style={{ margin: "4px 0 0", color: "#1d4ed8" }}>
+            We kept your old Submit Assignment link working and brought you here so you can continue from the correct workbook lesson.
+          </p>
+        </section>
+      ) : null}
+
+      {activeSubTab === "courseBook" ? (
+        <>
+          <section className="course-book-hero" style={courseBookStyles.hero}>
+            <div data-a1-coursebook-hero-header="true" style={courseBookStyles.heroHeader}>
+              <div>
+                <p style={courseBookStyles.heroEyebrow}>{selectedCourseLevel || "Course"} learning journey</p>
+                <h2 style={courseBookStyles.heroTitle}>Course Book</h2>
+                <p style={courseBookStyles.heroText}>
+                  {isC2CourseBook
+                    ? "Follow the 28-day C2 rotation. Grammar/Learn and the daily main skill sync automatically across your devices."
+                    : "Follow the lessons in order. Your badges now use real submissions and marked scores from Falowen."}
+                  {loadingLessonProgress || (isC2CourseBook && loadingC2Progress) ? " Syncing progress..." : ""}
+                </p>
+                {lessonProgressError ? <p style={{ margin: "6px 0 0", color: "#fee2e2", fontSize: 13 }}>{lessonProgressError}</p> : null}
+              </div>
+              <div data-a1-coursebook-hero-actions="true" style={courseBookStyles.heroActions}>
+                <label style={{ display: "grid", gap: 4, minWidth: 120 }}>
+                  <span style={{ color: "#dbeafe", fontSize: 12, fontWeight: 800 }}>Level</span>
+                  <select style={courseBookStyles.heroSelect} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
+                    {levels.map((level) => (
+                      <option key={level} value={level}>{level}</option>
+                    ))}
+                  </select>
+                </label>
+                <button type="button" style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d" }} onClick={() => nextLesson && openLesson(nextLesson)}>
+                  Continue learning
+                </button>
+                {canShowCourseSubmit ? (
+                  <button type="button" style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)", fontWeight: 800 }} onClick={() => setCourseSubmitOpen(true)}>
+                    Submit work
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="course-book-stat-grid" style={courseBookStyles.statGrid}>
+              <div style={courseBookStyles.statCard}>
+                <p style={courseBookStyles.statLabel}>Lessons</p>
+                <p style={courseBookStyles.statValue}>{decoratedSchedule.length}</p>
+              </div>
+              <div style={courseBookStyles.statCard}>
+                <p style={courseBookStyles.statLabel}>Progress</p>
+                <p style={courseBookStyles.statValue}>{progressPercent}%</p>
+              </div>
+              {isC2CourseBook ? (
+                <>
+                  {[
+                    ["lesen", "Lesen"],
+                    ["hoeren", "Hören"],
+                    ["speak", "Sprechen"],
+                    ["write", "Schreiben"],
+                  ].map(([key, label]) => (
+                    <div key={key} style={courseBookStyles.statCard}>
+                      <p style={courseBookStyles.statLabel}>{label}</p>
+                      <p style={{ ...courseBookStyles.statValue, fontSize: 18 }}>
+                        {c2SkillSummary[key]?.completed || 0}/{c2SkillSummary[key]?.total || 7}
+                      </p>
+                      {key === "hoeren" && c2SkillSummary[key]?.waitingForSource ? (
+                        <p style={{ margin: "4px 0 0", color: "#dbeafe", fontSize: 11 }}>
+                          {c2SkillSummary[key].waitingForSource} source{c2SkillSummary[key].waitingForSource === 1 ? "" : "s"} pending
+                        </p>
+                      ) : null}
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Required work</p>
+                    <p style={courseBookStyles.statValue}>{assignmentCount}</p>
+                  </div>
+                  <div style={courseBookStyles.statCard}>
+                    <p style={courseBookStyles.statLabel}>Mastery</p>
+                    <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>
+                      {courseCompletion.masteryAvailable ? `${courseCompletion.masteryPercent ?? 0}% passed` : "Self-learning"}
+                    </p>
+                  </div>
+                </>
+              )}
+              <div style={courseBookStyles.statCard}>
+                <p style={courseBookStyles.statLabel}>Mode</p>
+                <p style={{ ...courseBookStyles.statValue, fontSize: 16 }}>{isSelfLearningLevel ? "Self-learning" : isDerivedLevel ? "Class plan" : "Tutor guided"}</p>
+              </div>
+            </div>
+
+            {earnedBadges.length ? (
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {earnedBadges.map((badge) => (
+                  <span key={badge.key} style={{ ...courseBookStyles.chip, background: "rgba(255,255,255,0.92)", color: "#14532d" }}>{badge.label}</span>
+                ))}
+              </div>
+            ) : null}
+
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={courseBookStyles.progressShell}>
+                <div style={{ ...courseBookStyles.progressFill, width: `${progressPercent}%` }} />
+              </div>
+              <p style={{ margin: 0, color: "#dbeafe", fontSize: 13 }}>{isC2CourseBook ? `${completedCount} of ${courseLessons.length} days completed` : `${completedCount} of ${courseCompletion?.total || 0} required ${courseCompletion?.mode === "self-learning" ? "lessons" : "assignments"} completed`}</p>
+            </div>
+          </section>
+
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <YouTubeSubscribeButton />
+          </div>
+
+          {canShowCourseSubmit ? (
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={courseSubmitOpen}
+              onClick={() => setCourseSubmitOpen(true)}
+              className="course-book-floating-submit"
+              style={courseBookStyles.floatingSubmitButton}
+            >
+              <span style={{ fontSize: 18 }} aria-hidden="true">✍️</span>
+              <span>Submit</span>
+            </button>
+          ) : null}
+
+          {canShowCourseSubmit && courseSubmitOpen ? (
+            <div role="dialog" aria-modal="true" aria-label={`${selectedCourseLevel} assignment submit`} style={courseBookStyles.submitOverlay}>
+              <div style={courseBookStyles.submitBackdrop} onClick={() => setCourseSubmitOpen(false)} />
+              <section className="course-book-submit-sheet" style={courseBookStyles.submitPanel}>
+                <div style={courseBookStyles.submitPanelHeader}>
+                  <div>
+                    <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: ".04em", textTransform: "uppercase" }}>
+                      {selectedCourseLevel} assignment submit
+                    </p>
+                    <h3 style={{ margin: "3px 0 0", color: "#0f172a" }}>Submit your workbook answers</h3>
+                  </div>
+                  <button type="button" style={styles.secondaryButton} onClick={() => setCourseSubmitOpen(false)}>
+                    Close
+                  </button>
+                </div>
+                <div style={{ display: "grid", gap: 12 }}>
+                  <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+                    Submissions now live inside each workbook in the Course Book. Open the assignment workbook for your lesson, then use its
+                    <strong> Submit</strong> tab. Falowen will automatically select the correct assignment number so you only type your final answers and submit.
+                  </p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button type="button" style={styles.primaryButton} onClick={() => nextLesson && openLesson(nextLesson)}>
+                      Open next lesson
+                    </button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => { setActiveFilter("assignments"); setCourseSubmitOpen(false); }}>
+                      Show assignment lessons
+                    </button>
+                  </div>
+                </div>
+              </section>
+            </div>
+          ) : null}
+
+          {nextLesson ? (
+              <section data-a1-coursebook-next-card="true" style={courseBookStyles.nextCard}>
+                <div style={{ display: "grid", gap: 5, minWidth: 0 }}>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#1d4ed8", fontWeight: 900 }}>
+                    {nextLesson.isTutorMarked ? "Next assignment" : "Next self-study lesson"}
+                  </p>
+                  <h3 style={{ margin: 0, color: "#0f172a" }}>
+                    {getCourseBookDayLabel(nextLesson, dayTaskCounts)}: {nextLessonTitle}
+                  </h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    {nextLesson.isTutorMarked
+                      ? nextLesson.goal || nextLesson.grammar_topic || "Open this assignment and submit the required work."
+                      : isC2CourseBook
+                        ? `Complete Grammar/Learn and today’s ${getC2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Progress syncs automatically across devices.`
+                        : isB2CourseBook
+                          ? `Complete Grammar/Learn and today’s ${getB2SkillLabel(nextLesson.day)?.label || "main skill"} inside the lesson. Review is revision only.`
+                          : isSelfLearningLevel
+                            ? "Complete Learn, Speak and Write, then use Finish inside the lesson. Videos and Ref do not increase course completion."
+                          : `Complete this lesson, then mark it complete here to unlock ${followingLessonTitle ? `“${followingLessonTitle}”` : "the next course item"}.`}
+                  </p>
+                  {!nextLesson.isTutorMarked && !isSelfLearningLevel ? (
+                    <label style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, color: "#334155", fontWeight: 800 }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(nextPracticeState.completed)}
+                        onChange={(event) => updatePracticeEntry(nextLesson, { completed: event.target.checked })}
+                      />
+                      Mark “{nextLessonTitle}” as complete
+                    </label>
+                  ) : null}
+                </div>
+                <a
+                  href={getLessonHref(nextLesson)}
+                  style={{ ...styles.primaryButton, textDecoration: "none" }}
+                  aria-label={`Open ${nextLessonTitle}`}
+                  onClick={(event) => handleLessonLinkClick(event, nextLesson)}
+                >
+                  Open: {nextLessonTitle}
+                </a>
+              </section>
+            ) : (
+              <section data-a1-coursebook-next-card="true" style={courseBookStyles.nextCard}>
+                <div>
+                  <p style={{ ...styles.helperText, margin: 0, color: "#0f766e", fontWeight: 900 }}>Course Book complete</p>
+                  <h3 style={{ margin: "4px 0 3px", color: "#0f172a" }}>You have completed every available lesson.</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Review earlier lessons or continue to exam preparation.</p>
+                </div>
+              </section>
+            )}
+
+          <section className="course-book-toolbar" style={courseBookStyles.toolbar}>
+            <div style={courseBookStyles.toolbarTop}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: 18 }}>Lessons</h3>
+                <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{visibleLessons.length} shown from {decoratedSchedule.length}</p>
+              </div>
+              <div className="course-book-filter-row" data-a1-coursebook-tabs="true" role="group" aria-label="Course Book lesson filters" style={courseBookStyles.filterRow}>
+                {COURSE_BOOK_FILTERS.map((filter) => (
+                  <button key={filter.key} type="button" style={activeFilter === filter.key ? courseBookStyles.filterButtonActive : courseBookStyles.filterButton} onClick={() => setActiveFilter(filter.key)}>
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} placeholder="Search by day, topic, chapter or grammar point..." style={courseBookStyles.searchInput} />
+          </section>
+
+          {weekEntries.length ? (
+            <div style={{ display: "grid", gap: 14 }}>
+              {weekEntries.map(([weekLabel, lessons, section]) => (
+                <details
+                  key={weekLabel}
+                  className="course-book-week"
+                  data-a1-course-section={section?.key}
+                  open={!usesSharedA2B1Design || !lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress))}
+                  style={courseBookStyles.weekSection}
+                >
+                  <summary className={`course-book-week-summary${section ? " course-book-section-summary" : ""}`} style={courseBookStyles.weekHeader}>
+                    <h3 style={courseBookStyles.weekTitle}>{section?.title || weekLabel}</h3>
+                    <div style={courseBookStyles.weekLine} />
+                    {section ? <span className="course-book-section-days">{section.days}</span> : null}
+                    {usesSharedA2B1Design && lessons.every((entry) => isCourseBookEntryComplete(entry, practiceProgress)) ? (
+                      <span className="course-book-week-complete">Completed · tap to review</span>
+                    ) : null}
+                  </summary>
+                  {section?.key === "a1-2" && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === 13) ? (
+                    <div className="course-book-section-intro">
+                      <h4>Welcome to A1.2</h4>
+                      <p>
+                        Day 13 begins the second half of your A1 course with revision of numbers, time and prices.
+                        Build on the foundations from Days 1–12, combine your vocabulary and grammar, and practise
+                        communicating more independently as you prepare for the A1 exam and future A2 study.
+                      </p>
+                      <p>
+                        After the final Conjunctions lesson on Day 24, continue to Day 25 for official Goethe exam practice directly from the Course Book.
+                      </p>
+                    </div>
+                  ) : null}
+                  {!isA1CourseBook && timedPhase && lessons.some((entry) => Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay) ? (
+                    <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
+                  ) : null}
+                  {lessons.map((entry) => {
+                    const isCurrent = entry.assignmentKey === nextLesson?.assignmentKey;
+                    const includedSections = usesSharedA2B1Design
+                      ? getA2B1CourseBookIncludedSections(normalizedSelectedCourseLevel, entry)
+                      : [];
+                    const practiceState = practiceProgress[entry.assignmentKey] || {};
+                    const canonicalSelfLearningState = !isC2CourseBook && isSelfLearningLevel
+                      ? courseCompletion?.states?.find((item) => Number(item.requirement?.day) === Number(entry.day)) || null
+                      : null;
+                    const canonicalSelfLearningComplete = Boolean(canonicalSelfLearningState?.completed);
+                    const practiceMeta = isSelfLearningLevel
+                      ? (canonicalSelfLearningComplete ? ASSIGNMENT_STATUSES.milestoneComplete : ASSIGNMENT_STATUSES.inProgress)
+                      : (practiceState.completed ? ASSIGNMENT_STATUSES.selfMarkedComplete : ASSIGNMENT_STATUSES.practiceOnly);
+                    const instruction = formatCourseBookInstruction(entry.instruction);
+                    return (
+                      <React.Fragment key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`}>
+                        {isA1CourseBook && timedPhase && Number(getCourseBookDisplayDay(entry)) === timedPhase.startDay ? (
+                          <TimedPhaseNotice phase={timedPhase} level={normalizedSelectedCourseLevel} />
+                        ) : null}
+                      <article className="course-book-lesson-card" style={{ ...courseBookStyles.lessonCard, ...(isCurrent ? courseBookStyles.lessonCardCurrent : {}) }}>
+                        <div style={courseBookStyles.lessonTop}>
+                          <div style={courseBookStyles.lessonMain}>
+                            <div style={courseBookStyles.dayBubble}>{getCourseBookDayLabel(entry, dayTaskCounts)}</div>
+                            <div style={{ minWidth: 0 }}>
+                              <h3 style={courseBookStyles.lessonTitle}>{getCourseBookEntryTitle(entry)}</h3>
+                              <div style={courseBookStyles.lessonMeta}>
+                                {isCurrent ? <span style={{ ...courseBookStyles.chip, background: "#dbeafe", borderColor: "#93c5fd", color: "#1d4ed8" }}>Current</span> : null}
+                                {isC2CourseBook ? <span style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getC2SkillLabel(entry.day)?.label}</span> : null}
+                                {isB2CourseBook ? <span data-b2-main-skill={getB2SkillLabel(entry.day)?.label || ""} style={{ ...courseBookStyles.chip, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>Main: {getB2SkillLabel(entry.day)?.label}</span> : null}
+                                {entry.chapter ? <span style={courseBookStyles.chip}>Chapter {entry.chapter}</span> : null}
+                                {shouldShowGrammarChip(entry) ? <span style={courseBookStyles.chip}>{entry.grammar_topic}</span> : null}
+                                {entry.isTutorMarked ? <span style={courseBookStyles.chip}>Tutor-marked</span> : <span style={courseBookStyles.chip}>Self-learning</span>}
+                                {entry.timedConfig ? (
+                                  <span
+                                    data-timed-coursebook-chip={entry.assignmentKey}
+                                    style={{ ...courseBookStyles.chip, background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" }}
+                                  >
+                                    {entry.timedConfig.mode === "mock" ? "Timed mock" : "Timed practice"} · {entry.timedConfig.durationMinutes} min
+                                  </span>
+                                ) : null}
+                              </div>
+                              {includedSections.length ? (
+                                <div
+                                  className="course-book-included"
+                                  data-coursebook-included={includedSections.join("|")}
+                                  style={courseBookStyles.includedRow}
+                                  aria-label={`Included in this day: ${includedSections.join(", ")}`}
+                                >
+                                  <span style={courseBookStyles.includedLabel}>Included:</span>
+                                  {includedSections.map((section) => (
+                                    <span key={section} style={courseBookStyles.includedChip}>{section}</span>
+                                  ))}
+                                </div>
+                              ) : null}
+                              {!entry.isTutorMarked ? (
+                                isC2CourseBook ? (() => {
+                                  const dayProgress = c2ProgressByDay[Number(entry.day)] || {};
+                                  const skill = getC2SkillLabel(entry.day)?.label || "Skill";
+                                  return (
+                                    <div style={courseBookStyles.practiceControls}>
+                                      <span style={{ ...courseBookStyles.chip, background: dayProgress.learnDone ? "#f0fdf4" : "#f8fafc", color: dayProgress.learnDone ? "#166534" : "#475569" }}>
+                                        Grammar {dayProgress.learnDone ? "✓" : "pending"}
+                                      </span>
+                                      <span style={{ ...courseBookStyles.chip, background: dayProgress.skillDone ? "#f0fdf4" : dayProgress.waitingForListeningSource ? "#fffbeb" : "#f8fafc", color: dayProgress.skillDone ? "#166534" : dayProgress.waitingForListeningSource ? "#92400e" : "#475569" }}>
+                                        {skill} {dayProgress.skillDone ? "✓" : dayProgress.waitingForListeningSource ? "source pending" : "pending"}
+                                      </span>
+                                      {dayProgress.readingFirstAttemptScore ? (
+                                        <span style={courseBookStyles.chip}>
+                                          First try {dayProgress.readingFirstAttemptScore.correct}/{dayProgress.readingFirstAttemptScore.total}
+                                        </span>
+                                      ) : null}
+                                      <span style={{ ...courseBookStyles.statusChip, color: dayProgress.dayComplete ? "#166534" : "#475569", border: `1px solid ${dayProgress.dayComplete ? "#86efac" : "#cbd5e1"}`, background: dayProgress.dayComplete ? "#f0fdf4" : "#f8fafc" }}>
+                                        {dayProgress.dayComplete ? "Day complete" : "In progress"}
+                                      </span>
+                                    </div>
+                                  );
+                                })() : (
+                                  <div style={courseBookStyles.practiceControls}>
+                                    <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "#334155", fontWeight: 700 }}>
+                                      <input
+                                        type="checkbox"
+                                        disabled={isSelfLearningLevel}
+                                        checked={isSelfLearningLevel ? canonicalSelfLearningComplete : Boolean(practiceState.completed)}
+                                        onChange={(e) => updatePracticeEntry(entry, { completed: e.target.checked })}
+                                      />
+                                      {isSelfLearningLevel ? "Complete inside lesson" : "Completed"}
+                                    </label>
+                                    {!isSelfLearningLevel ? (
+                                      <select value={practiceState.confidence || ""} onChange={(e) => updatePracticeEntry(entry, { confidence: e.target.value })} style={{ ...styles.select, minHeight: 34, padding: "4px 8px" }}>
+                                        <option value="">Confidence</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                      </select>
+                                    ) : null}
+                                    <span style={{ ...courseBookStyles.statusChip, color: practiceMeta.color, border: `1px solid ${practiceMeta.border}`, background: practiceMeta.background }}>
+                                      {practiceMeta.key}
+                                    </span>
+                                  </div>
+                                )
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="course-book-lesson-actions" style={courseBookStyles.lessonActions}>
+                            {entry.isTutorMarked ? (
+                              <>
+                                <span style={{ ...courseBookStyles.statusChip, color: entry.statusMeta.color, border: `1px solid ${entry.statusMeta.border}`, background: entry.statusMeta.background }}>
+                                  {entry.statusMeta.key}
+                                </span>
+                                {entry.scoreBadge ? (
+                                  <span style={{ ...courseBookStyles.chip, background: entry.scoreBadge.tone === "awaiting" ? "#fffbeb" : "#ecfdf5", borderColor: entry.scoreBadge.tone === "awaiting" ? "#fde68a" : "#a7f3d0", color: entry.scoreBadge.tone === "awaiting" ? "#92400e" : "#065f46" }}>
+                                    {entry.scoreBadge.text}
+                                  </span>
+                                ) : null}
+                              </>
+                            ) : null}
+                            <a
+                              href={getLessonHref(entry)}
+                              style={{ ...styles.primaryButton, textDecoration: "none" }}
+                              onClick={(event) => handleLessonLinkClick(event, entry)}
+                            >
+                              Open Lesson
+                            </a>
+                          </div>
+                        </div>
+                        {entry.goal ? <p style={{ margin: 0, fontSize: 14, color: "#475569", lineHeight: 1.45 }}>{entry.goal}</p> : null}
+                        {instruction ? (
+                          <p style={{ margin: 0, fontSize: 14, color: "#334155", lineHeight: 1.5 }}>
+                            <strong>Instruction:</strong> {instruction}
+                          </p>
+                        ) : null}
+                      </article>
+                      </React.Fragment>
+                    );
+                  })}
+                </details>
+              ))}
+            </div>
+          ) : (
+            <section style={courseBookStyles.emptyState}>
+              <h3 style={{ marginTop: 0 }}>No lessons found</h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>Try another search word or choose a different filter.</p>
+            </section>
+          )}
+
+          {isCourseConclusionLevel ? (
+            <CourseCompletionConclusion
+              level={normalizedSelectedCourseLevel}
+              isComplete={courseIsComplete}
+              completedRequirements={completedCount}
+              totalRequirements={isC2CourseBook ? courseLessons.length : (courseCompletion?.total || 0)}
+              passedAssignments={passedAssignmentCount}
+              totalAssignments={isC2CourseBook ? 0 : assignmentCount}
+              needsImprovement={isC2CourseBook ? 0 : (courseCompletion?.needsImprovement || 0)}
+              awaitingReview={isC2CourseBook ? 0 : (courseCompletion?.awaitingReview || 0)}
+            />
+          ) : null}
+
+          {usesSharedA2B1Design ? (
+            <nav className="course-book-mobile-actions" aria-label="Course Book actions">
+              <button type="button" disabled={!nextLesson} onClick={() => nextLesson && openLesson(nextLesson)}>
+                Continue
+              </button>
+              <button type="button" onClick={() => setCourseSubmitOpen(true)}>
+                Submit
+              </button>
+            </nav>
+          ) : null}
+        </>
+      ) : null}
+    </div>
+  );
+};
+
+export default CourseTab;
