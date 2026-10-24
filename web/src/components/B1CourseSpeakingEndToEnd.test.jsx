@@ -129,6 +129,14 @@ test("B1 student records every step, confirms transcripts, completes all three T
 
   for (let index = 0; index < limits.length; index += 1) {
     await waitFor(() => expect(starts).toBe(index + 1));
+    if (index === 1) {
+      const presentationGuide = await screen.findByRole("region", { name: "B1 presentation stages" });
+      for (const stage of [
+        "Thema und Aufbau", "Persönliche Erfahrung", "Situation im Heimatland mit Beispiel",
+        "Vor- und Nachteile, Meinung mit Beispiel", "Abschluss und Dank",
+      ]) expect(presentationGuide).toHaveTextContent(stage);
+      expect(screen.queryByText("Your brief notes")).not.toBeInTheDocument();
+    }
     for (let step = 0; step < limits[index]; step += 1) {
       const record = await screen.findByRole("button", { name: "Record German answer" });
       await waitFor(() => expect(record).toBeEnabled());
