@@ -98,7 +98,7 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
   writing: getB1WritingTask(26),
   reading: getB1ReadingTask(26),
   submitWritingDescription: "Write your approx. 80-word reply to Markus in the travel-problems forum.",
-  submitReadingDescription: "Submit the four matching answers for Lesen (1A, 2C, 3B, 4E).",
+  submitReadingDescription: "Submit your chosen matching letter (A–E) or 0 for each of the four reading situations.",
 };
 
 export default function B1Day26ReiseproblemeLoesungenWorkbookPage() {

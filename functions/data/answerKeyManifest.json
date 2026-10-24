@@ -1813,15 +1813,23 @@
   "B1 8.25 Online einkaufen ? Rechte und Risiken": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Sie ist selbstständig und verdient mehr.",
-        "Answer2": "C) Weil Service und Beratung gut sind.",
-        "Answer3": "B) Sie trennt Müll und spart Energie.",
-        "Answer4": "C) Licht und elektrische Geräte werden ausgeschaltet.",
-        "Answer5": "B) Beratung zu Konsum, Verträgen und Ernährung",
-        "Answer6": "C) Durch staatliche Unterstützung und teilweise Kundenzahlungen",
-        "Answer7": "B) Broschüren mit Informationen"
+        "Answer1": "B) Weil man bequem von zu Hause aus eine große Auswahl bestellen kann.",
+        "Answer2": "B) Sie verlangen Geld per Vorkasse, schicken die Ware aber nie ab.",
+        "Answer3": "B) Dass vertrauliche Daten und Kreditkartendaten missbraucht werden.",
+        "Answer4": "A) Ein 14-tägiges Widerrufsrecht ohne Angabe von Gründen.",
+        "Answer5": "A) Er kann den Vertrag stornieren und die Ware zurückschicken.",
+        "Answer6": "A) Man sollte das Impressum prüfen und Kundenbewertungen lesen.",
+        "Answer7": "C) Den Kauf auf Rechnung sowie etablierte Bezahldienste."
       },
-      "teil4": {}
+      "teil4": {
+        "Answer1": "B) Ihr Rucksack war kaputt und sie hatte keine Tasche dabei.",
+        "Answer2": "C) Zwei oder drei stabile Jutebeutel.",
+        "Answer3": "A) Sie vergisst sie beim spontanen Einkauf nach der Arbeit.",
+        "Answer4": "B) Einen zusammengefalteten Beutel in der Jacken- oder Arbeitstasche aufbewahren.",
+        "Answer5": "A) Sie verwendet waschbare Stoffnetze oder kauft unverpacktes Obst.",
+        "Answer6": "C) Dort gibt es viele unverpackte Produkte aus der Region.",
+        "Answer7": "B) Am Samstag um zehn Uhr vor dem Rathaus."
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1qD3fjXMprCDY-5Xz1-msUH1DgA9_V8KbwxTInF0I0AE/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1qD3fjXMprCDY-5Xz1-msUH1DgA9_V8KbwxTInF0I0AE/edit",
@@ -1831,15 +1839,18 @@
   "B1 9.26 Reiseprobleme und Lösungen": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Mecklenburg-Vorpommern",
-        "Answer2": "A) Die Zugspitze",
-        "Answer3": "A) Rügen und Usedom",
-        "Answer4": "B) Städte wie Berlin, Hamburg, Köln und München",
-        "Answer5": "B) Das Oktoberfest",
-        "Answer6": "A) Neuschwanstein, Herrenchiemsee und Linderhof",
-        "Answer7": "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"
+        "Answer1": "A) Flug-Recht24 – Kofferverlust und Entschädigung",
+        "Answer2": "C) EuroPannenschutz – Autopanne in Europa",
+        "Answer3": "B) ZugPlus App – Entschädigung bei Zugverspätung",
+        "Answer4": "E) SicherReisen – Reiserücktritt wegen Krankheit"
       },
-      "teil4": {}
+      "teil4": {
+        "Answer1": "A) Richtig",
+        "Answer2": "B) Falsch",
+        "Answer3": "B) Falsch",
+        "Answer4": "B) Falsch",
+        "Answer5": "A) Richtig"
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1o3axSLfa47e16kvcL2zJP5FdtYXTbOwYAEzQ4Xen1VI/gviz/tq?tqx=out:html&sheet=Key",
     "sheet_url": "https://docs.google.com/spreadsheets/d/1o3axSLfa47e16kvcL2zJP5FdtYXTbOwYAEzQ4Xen1VI/edit",

@@ -46,7 +46,7 @@ const config = {
   writing: getB1WritingTask(25),
   reading: getB1ReadingTask(25),
   submitWritingDescription: "Write your approx. 80-word opinion for the online-shopping discussion.",
-  submitReadingDescription: "Submit the seven reading letters in the form 1A, 2B, 3C …",
+  submitReadingDescription: "Submit one selected letter (A, B or C) for each of the seven reading questions.",
 };
 
 export default function B1Day25OnlineShoppingRightsRisksWorkbookPage() {
