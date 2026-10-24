@@ -346,6 +346,15 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
       if (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "")) {
+        if (level !== "B1") return error(res,400,"invalid_exam_level","B1 mocks require the B1 live examiner.");
+        if (examTask.id.startsWith("b1-mock-02-")) {
+          const part=examTask.id.match(/teil-([123])$/)?.[1];
+          const prompt=examTask.prompt;
+          const matches=part==="1" ? prompt.includes("Frau Keller") && prompt.includes("Firmenjubiläum")
+            : part==="2" ? /Bio-Produkte|Verreisen: Lieber alleine/.test(prompt)
+            : /Feedback/.test(prompt) && /Präsentation/.test(prompt);
+          if (!matches) return error(res,400,"invalid_mock_task","Use the assigned B1 Mock 2 speaking task.");
+        }
         // A full B1 mock cannot start an unbound or cross-mock speaking
         // session. The immutable examiner receipt must carry its server ID.
         const requestedMock=examTask.id.slice(0,10);
