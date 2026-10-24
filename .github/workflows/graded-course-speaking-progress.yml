@@ -5,6 +5,9 @@ on:
     paths:
       - "web/src/components/LiveSpeakPage.jsx"
       - "web/src/components/LiveSpeakTurnManagement.test.jsx"
+      - "web/src/components/B1CourseSpeakingEndToEnd.test.jsx"
+      - "functions/functionz/courseSpeakingSessionClock.js"
+      - "functions/functionz/__tests__/courseSpeakingSessionClock.test.js"
       - "web/src/components/CourseSpeakingMockAssignment.jsx"
       - "web/src/components/CourseSpeakingRecovery.test.jsx"
       - "web/src/services/courseSpeakingMockService.js"
@@ -41,7 +44,24 @@ jobs:
         working-directory: web
         env:
           CI: "true"
-        run: npx jest --runInBand --runTestsByPath src/components/LiveSpeakTurnManagement.test.jsx src/components/CourseSpeakingRecovery.test.jsx src/components/LiveSpeakRecovery.test.jsx
+        run: npx jest --runInBand --runTestsByPath src/components/LiveSpeakTurnManagement.test.jsx src/components/CourseSpeakingRecovery.test.jsx src/components/LiveSpeakRecovery.test.jsx src/components/B1CourseSpeakingEndToEnd.test.jsx
       - name: Build Falowen
         working-directory: web
         run: npx vite build
+
+  b1-session-timing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+      - name: Install function test dependencies
+        working-directory: functions
+        run: npm install --no-audit --no-fund --loglevel=error
+      - name: Verify 20-minute B1 expiry and legacy-session caps
+        working-directory: functions
+        run: npx jest --runInBand --runTestsByPath functionz/__tests__/courseSpeakingSessionClock.test.js
