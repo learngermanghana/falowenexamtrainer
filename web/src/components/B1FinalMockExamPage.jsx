@@ -790,7 +790,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
 
       {exam.stage === "hoeren" && isSecond ? <B1Mock2Hoeren embedded
         onAnswersChange={(number,value,part)=>setExam(current=>({...current,hoerenAnswers:{...current.hoerenAnswers,[`t${part}-${number}`]:value}}))}
-        onComplete={({answers,result})=>{const sectionScore=Number((result.correct/Math.max(1,result.total)*25).toFixed(1));moveToSection("schreiben",{hoerenResult:{...result,score:sectionScore,maxScore:25},sectionScores:{...exam.sectionScores,hoeren:sectionScore}});}}
+        onComplete={({answers,result})=>{const sectionScore=Number((result.correct/Math.max(1,result.total)*25).toFixed(1));const hoerenAnswers=Object.fromEntries(Object.entries(answers).map(([number,value])=>{const n=Number(number);const part=n<=10?1:n<=15?2:n<=22?3:4;return [`t${part}-${number}`,value];}));moveToSection("schreiben",{hoerenAnswers,hoerenResult:{...result,score:sectionScore,maxScore:25},sectionScores:{...exam.sectionScores,hoeren:sectionScore}});}}
       /> : null}
       {exam.stage === "hoeren" && !isSecond ? (
         <>
