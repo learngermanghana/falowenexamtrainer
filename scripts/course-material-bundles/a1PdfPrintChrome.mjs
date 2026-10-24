@@ -16,7 +16,7 @@ export const cleanA1PrintChrome = () => {
 
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
-  const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|← Back)$/i;
+  const actionText = /^(?:Show model|Hide model|Show answer|Hide answer|Show answers|Hide answers|Reveal answer|Show solution|Check answer|Check answers|Reset|Reset answers|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|← Back)$/i;
   for (const element of [...root.querySelectorAll("button,a")]) {
     if (actionText.test(normalize(element.textContent))) remove(element);
   }
@@ -91,7 +91,7 @@ export const findA1PrintChromeLeaks = (text = "") => {
     ["draft-only submission status", /Your answers are saved as a draft|NOT been submitted for marking|Complete every required answer above to unlock Review/i],
     ["online completion progress", /^\s*\d+\s+of\s+\d+\s+(?:blanks completed|sentences written|questions answered)\s*$/mi],
     ["unprintable model buttons", /^\s*(?:Show model|Hide model)\s*$/mi],
-    ["knowledge-test action buttons", /^\s*(?:Check knowledge test|Reset test)\s*$/mi],
+    ["knowledge-test action buttons", /^\s*(?:Check knowledge test|Reset test|Show answers?|Hide answers?|Reveal answer|Show solution|Check answers?|Reset(?: answers)?)\s*$/mi],
     ["live recording controls", /^\s*(?:Record family answer|Save recording|Stop recording)\s*$/mi],
   ];
   return issues.filter(([, rx]) => rx.test(t)).map(([label]) => label);

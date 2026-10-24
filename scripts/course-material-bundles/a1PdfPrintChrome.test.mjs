@@ -133,3 +133,17 @@ test("explicitly marked notices are hidden even outside the first main element",
     else globalThis.document = original;
   }
 });
+
+
+test("paper PDF removes answer action controls, never answer choices", () => {
+  const root = new Node("MAIN");
+  const controls = ["Show answer", "Check answers", "Reset", "Show solution"].map(label => new Node("BUTTON", label));
+  const answers = ["A. Die Praxis anrufen", "B. Einfach am Montag kommen", "C. Eine E-Mail schreiben"].map(label => new Node("BUTTON", label));
+  root.mapping.set("button,a", [...controls, ...answers]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.ok(controls.every(control => control.removed));
+  assert.ok(answers.every(answer => !answer.removed));
+  for (const action of ["Show answer", "Check answers", "Reset", "Show solution"]) {
+    assert.ok(findA1PrintChromeLeaks(action).includes("knowledge-test action buttons"), action);
+  }
+});
