@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import additionalA1Samples from "../data/a1ReadingAdditionalSamples.json";
 import additionalA1SamplesPart2 from "../data/a1ReadingAdditionalSamplesPart2.json";
+import a1ReadingSample8 from "../data/a1ReadingSample8.json";
 import { useNavigate } from "react-router-dom";
 import {
   getReadingPracticeStudentKey,
@@ -361,6 +362,7 @@ export const A1_READING_PRACTICE_SAMPLES = Object.freeze([
   },
   ...additionalA1Samples,
   ...additionalA1SamplesPart2,
+  a1ReadingSample8,
 ]);
 
 const formatTime = (seconds) => {
