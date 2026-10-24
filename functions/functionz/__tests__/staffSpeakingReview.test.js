@@ -15,11 +15,24 @@ function harness({identity={role:"tutor"},results=[frozen]}={}){
   const snapshots=results.map((row,i)=>({id:"session-"+(i+1),data:()=>row}));
   const db={
     collection(name){
-      if(name==="liveSpeakExamResults")return {where(field,op,value){
-        expect([field,op,value]).toEqual(["uid","==",UID]);
-        return {limit(n){expect(n).toBeLessThanOrEqual(60);return{get:async()=>{
-          dbReads+=1;return{docs:snapshots,size:snapshots.length};}};}};
-      }};
+      if(name==="liveSpeakExamResults"){
+        const clauses=[];
+        const query={
+          where(field,op,value){clauses.push([field,op,value]);return query;},
+          orderBy(field,direction){expect([field,direction]).toEqual(["createdAt","desc"]);return query;},
+          limit(n){expect(n).toBeLessThanOrEqual(30);return query;},
+          async get(){
+            dbReads+=1;
+            expect(clauses).toContainEqual(["uid","==",UID]);
+            expect(clauses).toContainEqual(["source","==","exam-speaking-practice"]);
+            const level=clauses.find(c=>c[0]==="level")?.[2];
+            const docs=snapshots.filter(doc=>!level||doc.data().level===level)
+              .sort((a,b)=>b.data().createdAt.toDate()-a.data().createdAt.toDate());
+            return {docs,size:docs.length};
+          },
+        };
+        return query;
+      }
       if(name==="courseSpeakingMockAttempts"||name==="scores")return{
         doc(){return {get:async()=>{dbReads+=1;return {exists:false,data:()=>undefined}}};},
       };
@@ -73,4 +86,28 @@ test("Level filter and legacy snapshots stay safely bounded",async()=>{
   const r=await h.invoke({student:"learner@example.com",level:"B1"});
   expect(r.body.results).toHaveLength(1);
   expect(r.body.results[0].level).toBe("B1");
+});
+
+test("Level-specific Firestore query orders by date before limiting",async()=>{
+  const h=harness({results:[frozen,{...frozen,level:"A2"},{
+    ...frozen,level:"B1",createdAt:{toDate:()=>new Date("2026-10-24T10:00:00Z")},sessionId:"recent",
+  }]});
+  const response=await h.invoke({student:"learner@example.com",level:"B1"});
+  expect(response.statusCode).toBe(200);
+  expect(response.body.results.map(x=>x.sessionId)).toEqual(["recent","session-1"]);
+});
+test("Exact name lookup rejects different students matched through different name fields",async()=>{
+  const {resolveStudent}=require("../staffSpeakingReview");
+  const doc=id=>({id,ref:{id},data:()=>({uid:id,name:"Matched learner"})});
+  const lookup={name:[doc("first-learner")],fullName:[doc("second-learner")],studentName:[]};
+  const admin={firestore:()=>({collection:()=>({where(field){return{limit(){return{get:async()=>({docs:lookup[field]})}}}}})})};
+  await expect(resolveStudent({admin,findStudentByCodeOrEmail:async()=>null,input:"Matched learner"}))
+    .rejects.toMatchObject({status:409});
+});
+test("Matching same student under multiple name aliases is not incorrectly rejected",async()=>{
+  const {resolveStudent}=require("../staffSpeakingReview");
+  const doc={id:UID,ref:{id:UID},data:()=>({uid:UID,name:"Matched learner"})};
+  const admin={firestore:()=>({collection:()=>({where(){return{limit(){return{get:async()=>({docs:[doc]})}}}}})})};
+  const found=await resolveStudent({admin,findStudentByCodeOrEmail:async()=>null,input:"Matched learner"});
+  expect(found.uid).toBe(UID);
 });
