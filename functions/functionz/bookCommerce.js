@@ -1,6 +1,7 @@
 "use strict";
 
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
+const { BOOK_OBJECT_KEY, isBooksR2Configured, checkBookR2Object, createBookR2SignedUrl } = require("./bookStorageR2");
 
 // Separate from enrolment and mock subscriptions. The paid PDF is never a public asset.
 const BOOK = Object.freeze({
@@ -12,28 +13,21 @@ const BOOK = Object.freeze({
   priceGhs: 99,
   edition: "2026-10",
 });
-const STORAGE_KEY = "books/private/falowen-a1-grammar-workbook-v1.pdf";
-const DOWNLOAD_FILENAME = "Falowen-A1-Grammar-Notes-and-Workbook.pdf";
+const STORAGE_KEY = BOOK_OBJECT_KEY;
 const BOOK_CALLBACK_URL = "https://www.falowen.app/books/a1?payment=return";
 const bookEntitlementId = (uid, productId = BOOK.id) => uid + "_" + productId;
 const priceInPesewas = (amount) => Math.round(Number(amount) * 100);
 const salesConfigured = (env = process.env) =>
   env.FALOWEN_BOOKS_SALES_ENABLED === "true" &&
-  Boolean(env.FALOWEN_BOOKS_PRIVATE_BUCKET) &&
+  isBooksR2Configured(env) &&
   Boolean(env.PAYSTACK_SECRET);
 
-async function getBookFile(admin, env = process.env) {
-  if (!salesConfigured(env)) return null;
-  const file = admin.storage().bucket(env.FALOWEN_BOOKS_PRIVATE_BUCKET).file(STORAGE_KEY);
-  const [exists] = await file.exists();
-  return exists ? file : null;
-}
-
-async function isBookReady(admin, env = process.env) {
+async function isBookReady(_admin, env = process.env) {
+  if (!salesConfigured(env)) return false;
   try {
-    return Boolean(await getBookFile(admin, env));
+    return await checkBookR2Object({ env });
   } catch (error) {
-    console.error("Falowen Books: private PDF availability check failed", error);
+    console.error("Falowen Books: private R2 PDF availability check failed", error);
     return false;
   }
 }
@@ -146,7 +140,8 @@ function registerBookCommerceRoutes(app, { admin, getAuthedUser }) {
     }
   });
 
-  // Only owners receive a five-minute signed GCS URL, never a public bucket URL.
+  // Only owners receive a five-minute signed PRIVATE R2 URL. The bucket must
+  // have both r2.dev access and custom-domain public access disabled.
   app.post("/books/download", async (req, res) => {
     try {
       const identity = await verified(req, res);
@@ -155,18 +150,12 @@ function registerBookCommerceRoutes(app, { admin, getAuthedUser }) {
       if (!snap.exists || snap.data()?.status !== "active") {
         return res.status(403).json({ error: "Please purchase the A1 workbook before downloading." });
       }
-      const file = await getBookFile(admin);
-      if (!file) {
+      if (!await isBookReady(admin)) {
         return res.status(503).json({ error: "Your book is temporarily unavailable. Your purchase remains saved." });
       }
-      const [url] = await file.getSignedUrl({
-        version: "v4",
-        action: "read",
-        expires: Date.now() + 5 * 60 * 1000,
-        responseDisposition: 'attachment; filename="' + DOWNLOAD_FILENAME + '"',
-      });
+      const signed = createBookR2SignedUrl({ method: "GET" });
       res.set("Cache-Control", "private, no-store");
-      return res.json({ downloadUrl: url, expiresInSeconds: 300 });
+      return res.json({ downloadUrl: signed.url, expiresInSeconds: signed.expiresInSeconds });
     } catch (error) {
       console.error("Falowen Books private download failed", error);
       return res.status(503).json({ error: "Download could not start. Please retry from your library." });
