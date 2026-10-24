@@ -5,6 +5,7 @@ import {saveExamRoomResult} from "../services/examRoomResultService";
 import {getReadingPracticeStudentKey,getReadingReadinessLabel,getWeakestReadingSection,saveReadingPracticeAttempt} from "../services/readingPracticeHistory";
 import tests from "../data/c1ReadingPdfTests1to8.json";
 import "./B1FinalMockExamPage.css";
+import "./AdvancedReadingPractice.css";
 
 export const C1_READING_PRACTICE_SAMPLES=tests;
 const PARTS=[{from:1,to:8},{from:9,to:15},{from:16,to:23},{from:24,to:30}];
