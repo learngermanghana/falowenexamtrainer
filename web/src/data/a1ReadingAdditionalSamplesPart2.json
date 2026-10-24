@@ -1,0 +1,558 @@
+[
+  {
+    "id": "a1-reading-sample-06",
+    "label": "Lesen Sample 6",
+    "parts": {
+      "teil1": {
+        "title": "Teil 1",
+        "instruction": "Lesen Sie die beiden Texte und die Aufgaben 1 bis 5.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "texts": [
+          {
+            "id": 1,
+            "title": "E-Mail von Martin an Markus",
+            "body": [
+              "Hallo Markus,",
+              "hast du Lust, am Freitagabend mit ins Kino zu gehen? Der neue Film von Christopher Nolan läuft um 20:15 Uhr.",
+              "Wir können uns vorher um 19:30 Uhr vor dem Kino 'Gloria' treffen und noch eine Cola trinken.",
+              "Sag mir Bescheid, ob du Zeit hast!",
+              "Gruß,",
+              "Martin"
+            ]
+          },
+          {
+            "id": 2,
+            "title": "Mitteilung des Studierendenwerks an Studierende",
+            "body": [
+              "Liebe Studierende,",
+              "die Mensa am Campus Nord ist wegen Umbauarbeiten vom 10. bis 22. November geschlossen.",
+              "In dieser Zeit steht Ihnen die Mensa am Campus Süd zur Verfügung.",
+              "Diese bietet montags bis freitags von 11:30 bis 14:30 Uhr warmes Essen an.",
+              "Vielen Dank für Ihr Verständnis!"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "number": 1,
+            "statement": "Der Film beginnt um 19:30 Uhr.",
+            "answer": "falsch",
+            "text": 1
+          },
+          {
+            "number": 2,
+            "statement": "Martin schlägt vor, sich vor dem Film zu treffen.",
+            "answer": "richtig",
+            "text": 1
+          },
+          {
+            "number": 3,
+            "statement": "Die Mensa am Campus Nord ist im November geöffnet.",
+            "answer": "falsch",
+            "text": 2
+          },
+          {
+            "number": 4,
+            "statement": "In der Mensa am Campus Süd kann man mittags warm essen.",
+            "answer": "richtig",
+            "text": 2
+          },
+          {
+            "number": 5,
+            "statement": "Die Mensa Campus Süd hat auch am Wochenende geöffnet.",
+            "answer": "falsch",
+            "text": 2
+          }
+        ]
+      },
+      "teil2": {
+        "title": "Teil 2",
+        "instruction": "Lesen Sie die Situationen und die Anzeigen.",
+        "strong": "Welche Anzeige passt? Kreuzen Sie an: a oder b.",
+        "questions": [
+          {
+            "number": 6,
+            "statement": "Sie wollen mit dem Schiff eine Rundfahrt auf der Elbe machen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.dampfschiff-dresden.de",
+                "title": "Sächsische Dampfschifffahrt",
+                "subtitle": "",
+                "lines": [
+                  "Panoramarundfahrten auf der Elbe in Dresden.",
+                  "Täglich ab 10:00 Uhr."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.kanu-elbtal.de",
+                "title": "Kanu-Verleih Elbtal",
+                "subtitle": "",
+                "lines": [
+                  "Mieten Sie ein Kanu für sportliche Touren."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "statement": "Sie möchten Konzertkarten für eine klassische Musikaufführung buchen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.philharmonie-tickets.de",
+                "title": "Philharmonie Ticket-Portal",
+                "subtitle": "",
+                "lines": [
+                  "Karten für Klassikkonzerte & Symphonien online kaufen."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.rock-festival.de",
+                "title": "Rock & Pop Open Air",
+                "subtitle": "",
+                "lines": [
+                  "Festivaltickets für Rock- und Popkonzerte im Sommer."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "statement": "Sie suchen einen Schwimmkurs für Ihren 6-jährigen Sohn.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.seepferdchen-schwimmen.de",
+                "title": "Schwimmschule 'Seepferdchen'",
+                "subtitle": "",
+                "lines": [
+                  "Anfängerschwimmkurse für Kinder ab 5 Jahren.",
+                  "Erfahrene Schwimmlehrer."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.tauchclub-tiefblau.de",
+                "title": "Taucherclub 'Tiefblau'",
+                "subtitle": "",
+                "lines": [
+                  "Gerätetauchen und Tauchscheine für Jugendliche und Erwachsene."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "statement": "Sie suchen günstige gebrauchte Bücher auf Deutsch.",
+            "answer": "b",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.schmoeker-buch.de",
+                "title": "Buchhandlung 'Schmöker'",
+                "subtitle": "",
+                "lines": [
+                  "Neuerscheinungen, Bestseller und Fachbücher."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.gebrauchte-buecher-kaufen.de",
+                "title": "Online-Antiquariat & Buch-Auktion",
+                "subtitle": "",
+                "lines": [
+                  "Gebrauchte Roman-Klassiker & Lehrbücher ab 1,50 €."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "statement": "Sie möchten am Sonntag ein Museum in München besuchen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.pinakothek.de",
+                "title": "Pinakothek der Moderne",
+                "subtitle": "",
+                "lines": [
+                  "Sonntags nur 1 Euro Eintritt!",
+                  "Geöffnet von 10:00 bis 18:00 Uhr."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.muenchen-bibliothek.de",
+                "title": "Stadtbibliothek München",
+                "subtitle": "",
+                "lines": [
+                  "Bücher und Medien ausleihen.",
+                  "Sonntags geschlossen."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "teil3": {
+        "title": "Teil 3",
+        "instruction": "Lesen Sie die Texte und die Aufgaben 11 bis 15.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "questions": [
+          {
+            "number": 11,
+            "location": "Im Hotelgarten",
+            "statement": "Gäste dürfen auf der Terrasse nach 22:00 Uhr nicht mehr draußen sitzen.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Nachtruhe ab 22:00 Uhr!",
+              "lines": [
+                "Aus Rücksicht auf Anwohner bitten wir unsere Gäste, ab 22:00 Uhr drinnen zu sitzen."
+              ]
+            }
+          },
+          {
+            "number": 12,
+            "location": "An der Schultür",
+            "statement": "Der Eingang zur Sprachschule befindet sich heute hinten im Hof.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Vordereingang defekt!",
+              "lines": [
+                "Bitte nutzen Sie den Hofeingang auf der Rückseite."
+              ]
+            }
+          },
+          {
+            "number": 13,
+            "location": "Am Bahnhof",
+            "statement": "Sie können Ihr Gepäck kostenlos am Bahnhof einschließen.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Gepäckschließfächer",
+              "lines": [
+                "Kleine Fächer: 3,00 € / 24 Std.",
+                "Große Fächer: 5,00 € / 24 Std."
+              ]
+            }
+          },
+          {
+            "number": 14,
+            "location": "In der Kunstgalerie",
+            "statement": "Fotos machen mit Blitz ist in der Kunstgalerie erlaubt.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Fotografieren",
+              "lines": [
+                "Fotografieren ohne Blitz gestattet.",
+                "Blitzen ist zum Schutz der Gemälde verboten!"
+              ]
+            }
+          },
+          {
+            "number": 15,
+            "location": "Im Fitnessstudio",
+            "statement": "Das Fitnessstudio schließt am Feiertag früher.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Öffnungszeiten am 3. Oktober",
+              "lines": [
+                "09:00 bis 16:00 Uhr (statt bis 22:00 Uhr)."
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "a1-reading-sample-07",
+    "label": "Lesen Sample 7",
+    "parts": {
+      "teil1": {
+        "title": "Teil 1",
+        "instruction": "Lesen Sie die beiden Texte und die Aufgaben 1 bis 5.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "texts": [
+          {
+            "id": 1,
+            "title": "E-Mail von Sabine an Familie Lehmann",
+            "body": [
+              "Liebe Familie Lehmann,",
+              "vielen Dank für die Einladung zur Konfirmation von Lukas am nächsten Sonntag!",
+              "Wir kommen gerne zu dritt (mein Mann, meine Tochter und ich). Ist das Essen im Restaurant 'Lindenhof'?",
+              "Bitte gebt uns Bescheid, wann die Feier beginnt.",
+              "Herzliche Grüße,",
+              "Sabine"
+            ]
+          },
+          {
+            "id": 2,
+            "title": "E-Mail von Dr. Med. Wagner an Frau Fischer",
+            "body": [
+              "Sehr geehrte Frau Fischer,",
+              "hiermit erinnern wir Sie an Ihren Termin zur Vorsorgeuntersuchung am Donnerstag, 14. April, um 09:00 Uhr.",
+              "Sollten Sie den Termin nicht wahrnehmen können, sagen Sie bitte mindestens 24 Stunden vorher telefonisch ab.",
+              "Bringt bitte Ihre Krankenversicherungskarte mit.",
+              "Mit freundlichen Grüßen,",
+              "Praxisteam Dr. Wagner"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "number": 1,
+            "statement": "Sabine kommt allein zur Feier.",
+            "answer": "falsch",
+            "text": 1
+          },
+          {
+            "number": 2,
+            "statement": "Sabine fragt nach der Uhrzeit für den Beginn der Feier.",
+            "answer": "richtig",
+            "text": 1
+          },
+          {
+            "number": 3,
+            "statement": "Frau Fischer hat am 14. April einen Arzttermin.",
+            "answer": "richtig",
+            "text": 2
+          },
+          {
+            "number": 4,
+            "statement": "Frau Fischer kann den Termin nicht mehr absagen.",
+            "answer": "falsch",
+            "text": 2
+          },
+          {
+            "number": 5,
+            "statement": "Frau Fischer soll ihre Versichertenkarte mitbringen.",
+            "answer": "richtig",
+            "text": 2
+          }
+        ]
+      },
+      "teil2": {
+        "title": "Teil 2",
+        "instruction": "Lesen Sie die Situationen und die Anzeigen.",
+        "strong": "Welche Anzeige passt? Kreuzen Sie an: a oder b.",
+        "questions": [
+          {
+            "number": 6,
+            "statement": "Sie möchten für Ihr Wohnzimmer ein gebrauchtes Sofa kaufen.",
+            "answer": "b",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.moebelix.de",
+                "title": "Möbelix Kaufhaus",
+                "subtitle": "",
+                "lines": [
+                  "Neue Ledersofas und Polstergarnituren ab 599 €. "
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.bremen-gebrauchtmoebel.de",
+                "title": "Bremer Gebrauchtwaren-Börse",
+                "subtitle": "",
+                "lines": [
+                  "Gut erhaltene 3-Sitzer Sofas & Sessel günstig abzugeben."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "statement": "Sie suchen ein Ferienhaus an der Ostsee für Ihren Familienurlaub im Sommer.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.ostsee-urlaub-haus.de",
+                "title": "Ostsee-Ferienhäuser privat",
+                "subtitle": "",
+                "lines": [
+                  "Ferienhäuser direkt am Strand für 4-6 Personen frei."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.ostsee-kreuzfahrt.de",
+                "title": "Ostsee-Kreuzfahrten",
+                "subtitle": "",
+                "lines": [
+                  "Schiffsreisen auf der Ostsee nach Tallinn & Helsinki."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "statement": "Sie suchen ein Geschenk und möchten einen Gutschein für eine Massage kaufen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.wellness-lotus.de",
+                "title": "Wellness-Oase 'Lotus'",
+                "subtitle": "",
+                "lines": [
+                  "Entspannungsmassagen, Thai-Massage & Gutscheine."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.parfumerie-flakon.de",
+                "title": "Parfümerie 'Flakon'",
+                "subtitle": "",
+                "lines": [
+                  "Parfüms, Kosmetik und Pflegeprodukte aller Marken."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "statement": "Sie wollen Ihr Auto verkaufen und suchen einen Gebrauchtwagenhändler.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.auto-ankauf-bayern.de",
+                "title": "Auto-Ankauf Bayern",
+                "subtitle": "",
+                "lines": [
+                  "Wir kaufen Ihren Gebrauchtwagen gegen Barauszahlung!",
+                  "Alle Marken."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.sixtus-mietwagen.de",
+                "title": "Autovermietung 'Sixtus'",
+                "subtitle": "",
+                "lines": [
+                  "Mietwagen & Transporter günstig buchen."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "statement": "Sie suchen einen Babysitter für Freitagabend.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.babysitter-kaenguru.de",
+                "title": "Kinderbetreuung 'Känguru'",
+                "subtitle": "",
+                "lines": [
+                  "Erfahrene Babysitter für Abende & Wochenenden buchen."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.kita-sonnenschein.de",
+                "title": "Kindergarten 'Sonnenschein'",
+                "subtitle": "",
+                "lines": [
+                  "Ganztagsbetreuung für Kinder von 1 bis 6 Jahren (Mo-Fr 07-17 Uhr)."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "teil3": {
+        "title": "Teil 3",
+        "instruction": "Lesen Sie die Texte und die Aufgaben 11 bis 15.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "questions": [
+          {
+            "number": 11,
+            "location": "An der U-Bahn-Tür",
+            "statement": "Fahrgäste mit Kinderwagen dürfen hier vorrangig einsteigen.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Vorrang beim Einsteigen",
+              "lines": [
+                "Rollstuhlfahrer und Fahrgäste mit Kinderwagen bitte vorrangig einsteigen lassen!"
+              ]
+            }
+          },
+          {
+            "number": 12,
+            "location": "An der Apotheke",
+            "statement": "Die Apotheke schließt am Mittwochnachmittag um 12:30 Uhr.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Öffnungszeiten",
+              "lines": [
+                "Mo, Di, Do, Fr: 08:30 – 18:30 Uhr",
+                "Mittwoch: 08:30 – 12:30 Uhr (Nachmittags geschlossen)"
+              ]
+            }
+          },
+          {
+            "number": 13,
+            "location": "Am Supermarkt-Pfandautomaten",
+            "statement": "Kunden können am Pfandautomaten auch Leergutflaschen aus Glas zurückgeben.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "ACHTUNG!",
+              "lines": [
+                "Dieser Automat nimmt nur Plastikflaschen (PET) und Dosen an.",
+                "Glasflaschen bitte an Kasse 1 abgeben!"
+              ]
+            }
+          },
+          {
+            "number": 14,
+            "location": "Am Kinderspielplatz",
+            "statement": "Der Spielplatz ist auch für Jugendliche ab 16 Jahren geöffnet.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Kinderspielplatz der Stadt",
+              "lines": [
+                "Nutzung nur für Kinder bis 12 Jahre gestattet!",
+                "Öffnungszeiten 08:00–20:00 Uhr."
+              ]
+            }
+          },
+          {
+            "number": 15,
+            "location": "Am Fundbüro am Bahnhof",
+            "statement": "Der Schalter für die Fundsachen hat auch samstags geöffnet.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Fundbüro Öffnungszeiten",
+              "lines": [
+                "Montag bis Freitag von 09:00 bis 17:00 Uhr.",
+                "Samstag & Sonntag geschlossen."
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+]
