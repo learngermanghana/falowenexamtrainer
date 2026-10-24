@@ -1,0 +1,113 @@
+/* Shared B2/C1 Lesen presentation: app styles remain the source of brand colors. */
+[data-b2-reading-practice],
+[data-c1-reading-practice] {
+  --reading-ink: #17243b;
+  --reading-line: #dbe3ed;
+  --reading-paper: #fff;
+  --reading-muted: #50617a;
+  max-width: 1120px;
+  width: min(100%, 1120px);
+  margin: 20px auto 48px;
+  padding: clamp(12px, 2vw, 24px);
+  color: var(--reading-ink);
+  box-sizing: border-box;
+}
+[data-b2-reading-practice] .b1-final-module-header,
+[data-c1-reading-practice] .b1-final-module-header {
+  border-radius: 16px;
+  border: 1px solid var(--reading-line);
+  padding: clamp(20px, 3vw, 32px);
+  background: linear-gradient(115deg, #f4f7ff 0%, #fff 70%);
+}
+[data-b2-reading-practice] .b1-final-module-header h1,
+[data-c1-reading-practice] .b1-final-module-header h1 {
+  font-size: clamp(1.55rem, 3vw, 2.2rem);
+  line-height: 1.2;
+  margin: 8px 0;
+}
+[data-b2-reading-practice] .b1-final-paper,
+[data-c1-reading-practice] .b1-final-paper {
+  background: var(--reading-paper);
+  border: 1px solid var(--reading-line);
+  box-shadow: 0 3px 18px rgba(17, 33, 58, 0.045);
+  border-radius: 16px;
+  padding: clamp(15px, 2.7vw, 28px);
+  margin-block: 16px;
+}
+[data-b2-reading-practice] .b1-final-reading-text,
+[data-c1-reading-practice] .b1-final-reading-text {
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.85 !important;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 78ch;
+  margin: 20px auto 24px;
+  padding: clamp(16px, 3vw, 30px);
+  background: #fafbfe;
+  border: 1px solid #e4e9f2;
+  border-left: 4px solid #2e60d6;
+  border-radius: 12px;
+}
+[data-b2-reading-practice] fieldset,
+[data-c1-reading-practice] fieldset {
+  background: #fff;
+  border: 1px solid var(--reading-line) !important;
+  padding: 18px !important;
+  margin: 14px 0 !important;
+  border-radius: 12px !important;
+  min-width: 0;
+}
+[data-b2-reading-practice] fieldset legend,
+[data-c1-reading-practice] fieldset legend {
+  font-weight: 750;
+  color: #1b386b;
+  padding-inline: 8px;
+}
+[data-b2-reading-practice] fieldset p,
+[data-c1-reading-practice] fieldset p {
+  line-height: 1.65;
+  font-size: 15px;
+}
+[data-b2-reading-practice] .b1-final-choices,
+[data-c1-reading-practice] .b1-final-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+[data-b2-reading-practice] .b1-final-choices label,
+[data-c1-reading-practice] .b1-final-choices label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 14px;
+  border: 1px solid #cbd6e6;
+  border-radius: 10px;
+  cursor: pointer;
+  background: white;
+  font-weight: 650;
+  min-height: 44px;
+}
+[data-b2-reading-practice] .b1-final-choices label.selected,
+[data-c1-reading-practice] .b1-final-choices label.selected {
+  background: #edf3ff;
+  border-color: #2e60d6;
+  color: #163f97;
+}
+[data-b2-reading-practice] button,
+[data-c1-reading-practice] button {
+  min-height: 40px;
+  font-size: 14px;
+  border-radius: 9px;
+}
+[data-b2-reading-practice] nav,
+[data-c1-reading-practice] nav { gap: 9px; flex-wrap: wrap; }
+@media(max-width: 600px) {
+ [data-b2-reading-practice],
+ [data-c1-reading-practice] { padding: 8px; }
+ [data-b2-reading-practice] .b1-final-reading-text,
+ [data-c1-reading-practice] .b1-final-reading-text { padding: 14px; }
+ [data-b2-reading-practice] .b1-final-choices,
+ [data-c1-reading-practice] .b1-final-choices { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
