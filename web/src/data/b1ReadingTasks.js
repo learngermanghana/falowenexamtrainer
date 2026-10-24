@@ -399,7 +399,7 @@ export const B1_READING_TASKS = Object.freeze({
   25: Object.freeze({ assignmentKey: "B1-8.25", ...{
     title: "Modul Lesen · Teil 2 (7 Aufgaben · 20 Minuten)",
     instructions: "Lesen Sie den Presseartikel und die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
-    submissionNote: "Reichen Sie sieben Antworten in dieser Form ein: 1A, 2B, 3C …",
+    submissionNote: "Notieren Sie für jede der sieben Aufgaben die Aufgabennummer und Ihren gewählten Buchstaben (A, B oder C).",
     imageAlt: "Presseartikel über Verbraucherrechte und Sicherheit beim Online-Shopping",
     text: {
       title: "Online-Shopping – Welche Rechte und Risiken Verbraucher kennen sollten",
@@ -419,7 +419,7 @@ export const B1_READING_TASKS = Object.freeze({
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
     title: "Lesen · Situationen und Anzeigen zuordnen (4 Aufgaben)",
     instructions: "Lesen Sie die Situationen 1–4 und die Anzeigen A–E. Welche Anzeige passt zu welcher Person? Wählen Sie pro Aufgabe A, B, C, D, E oder 0, falls keine Anzeige passt.",
-    submissionNote: "Tragen Sie vier Buchstaben ein, zum Beispiel 1A, 2C, 3B, 4E.",
+    submissionNote: "Geben Sie zu jeder der vier Situationen Ihre gewählte Anzeige (A–E) oder 0 ein. Eine Lösung ist pro Situation erlaubt.",
     imageAlt: "Passende Reisehilfe-Anzeigen finden",
     text: {
       title: "Reiseprobleme und Lösungen · Situationen und Anzeigen",
