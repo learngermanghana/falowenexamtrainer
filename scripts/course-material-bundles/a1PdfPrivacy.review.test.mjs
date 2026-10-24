@@ -252,3 +252,65 @@ test("final PDF privacy guard blocks exact leakage types seen on pages 46–47, 
   }
   assert.deepEqual(findA1PrintPrivacyLeaks("Teil 2 · Hören: Schreiben Sie fünf Antworten auf die Linien."), []);
 });
+
+
+test("Day 5 legacy class biographies without privacy markers are removed", () => {
+  const root = new Element("MAIN");
+  const form = new Element("FORM", "Saved biography for learner");
+  const textarea = new Element("TEXTAREA", "Saved personal introduction");
+  textarea.closest = (selector) => selector === "form" ? form : null;
+  form.closest = () => null;
+  const classTitle = new Element("STRONG", "A1 Berlin Klasse introductions");
+  const section = new Element("SECTION", "A1 Berlin Klasse introductions 2 Student A Personal Biography");
+  section.mapping["article"] = [new Element("ARTICLE", "Student A biography")];
+  classTitle.closest = (selector) => selector === "section" ? section : null;
+  root.mapping['textarea[aria-label="Meine Vorstellung"]'] = [textarea];
+  root.mapping["strong"] = [classTitle];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(form.removed, true);
+  assert.equal(form.replacement.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(section.removed, true);
+});
+
+test("Day 5 legacy class shared sentences are replaced without removing exercises", () => {
+  const root = new Element("MAIN");
+  const form = new Element("FORM");
+  const textarea = new Element("TEXTAREA");
+  const wrapper = new Element("DIV", "Your corrected sentences Post to group discussion A1 Berlin Klasse answers Student A private work");
+  form.parentElement = wrapper;
+  wrapper.mapping["textarea"] = [textarea];
+  const title = new Element("STRONG", "Your corrected sentences");
+  title.closest = (selector) => selector === "form" ? form : null;
+  root.mapping["strong"] = [title];
+  const staticPrompt = new Element("SECTION", "Rearrange these 11 German sentences");
+  root.mapping["section"] = [staticPrompt];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(wrapper.removed, true);
+  assert.equal(wrapper.replacement.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(wrapper.replacement.children.filter(node => node.getAttribute("data-a1-pdf-answer-rule") === "").length, 11);
+  assert.equal(staticPrompt.removed, false);
+});
+
+test("legacy class discussion family writing is replaced with blank lines", () => {
+  const root = new Element("MAIN");
+  const section = new Element("SECTION", "Write your paragraph here. This saves to Group Discussion only.");
+  section.mapping["textarea"] = [new Element("TEXTAREA", "Private saved writing")];
+  const heading = new Element("STRONG", "Write your paragraph here");
+  heading.closest = (selector) => selector === "section" ? section : null;
+  root.mapping["strong"] = [heading];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(section.removed, true);
+  assert.equal(section.replacement.children.filter(node => node.getAttribute("data-a1-pdf-answer-rule") === "").length, 9);
+});
+
+test("legacy selectors do not remove ordinary static writing instructions", () => {
+  const root = new Element("MAIN");
+  const title = new Element("STRONG", "Your corrected sentences");
+  const lesson = new Element("SECTION", "Correct the grammar sentences below");
+  title.closest = () => null; // no online sharing form
+  root.mapping["strong"] = [title];
+  root.mapping["section"] = [lesson];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(lesson.removed, false);
+  assert.deepEqual(findA1PrintPrivacyLeaks("Write your own sentences. Correct the questions."), []);
+});
