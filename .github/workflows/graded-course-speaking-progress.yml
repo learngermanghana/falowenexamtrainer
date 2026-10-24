@@ -61,7 +61,7 @@ jobs:
           cache-dependency-path: functions/package-lock.json
       - name: Install function test dependencies
         working-directory: functions
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund --loglevel=error
       - name: Verify 20-minute B1 expiry and legacy-session caps
         working-directory: functions
         run: npx jest --runInBand --runTestsByPath functionz/__tests__/courseSpeakingSessionClock.test.js
