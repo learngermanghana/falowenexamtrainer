@@ -105,3 +105,11 @@
  .reading-standard-split {margin:6px 0 22px}
  .reading-standard-answers .b1-final-question:first-child {border-top:1px solid #e1e7ef}
 }
+.reading-standard-part-instructions {padding:15px 18px;margin:0 0 12px;border-bottom:1px solid #e1e8f1;background:#fbfcfe}
+.reading-standard-part-instructions h2 {margin:0 0 6px;font-size:20px;color:#203a52}
+.reading-standard-part-instructions p {margin:0 0 4px;color:#586e82}
+[data-reading-standard="C1"].c1-mock-shell {width:min(1200px,calc(100% - 24px));display:grid;gap:14px}
+[data-reading-standard="C1"] .c1-mock-start,
+[data-reading-standard="C1"] .c1-mock-article,
+[data-reading-standard="C1"] .c1-mock-tasks {background:#fff!important;color:#1c2b3d;border:1px solid #e0e7ef;border-radius:14px;margin-top:6px}
+[data-reading-standard="C1"] .c1-mock-instruction {border-color:#e4e9ef}
