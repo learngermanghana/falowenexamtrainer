@@ -16,7 +16,7 @@ export const cleanA1PrintChrome = () => {
 
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
-  const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils)$/i;
+  const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|← Back)$/i;
   for (const element of [...root.querySelectorAll("button,a")]) {
     if (actionText.test(normalize(element.textContent))) remove(element);
   }
