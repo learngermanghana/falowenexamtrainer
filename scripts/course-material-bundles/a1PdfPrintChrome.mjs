@@ -39,6 +39,34 @@ export const cleanA1PrintChrome = () => {
     candidate.style?.setProperty("display", "none", "important");
   }
 
+
+  // Print-only page-efficiency hints for the four known A1 paper orphans.
+  // These are scoped to the authenticated route, never the live Course Book.
+  const pathname = String(document.location?.pathname || "");
+  const flag = (node, name) => node?.setAttribute?.(name, "true");
+  const matchingHeading = (value, selector = "h1,h2,h3,strong") =>
+    [...root.querySelectorAll(selector)].find((node) => normalize(node.textContent) === value);
+
+  if (/\/a1-day-5-introducing-yourself-and-articles-workbook\/?$/.test(pathname)) {
+    // Day 5 has the same A1/Day 5 badge in both the shell and lesson header.
+    const dayBadges = [...root.querySelectorAll("div,span,small,p,strong")]
+      .filter((node) => !node.children?.length
+        && /^A1\s*[·•-]\s*Day\s*5$/i.test(normalize(node.textContent)));
+    for (const badge of dayBadges.slice(1)) remove(badge);
+    flag(matchingHeading("Self-check")?.parentElement, "data-a1-pdf-day5-selfcheck");
+  }
+
+  if (/\/a1-day-6-family-and-hobbies-workbook\/?$/.test(pathname)) {
+    flag(matchingHeading("Hobbies self-check", "strong")?.parentElement,
+      "data-a1-pdf-day6-hobby-quiz");
+  }
+
+  if (/\/a1-chapter-3-asking-about-prices-workbook\/?$/.test(pathname)) {
+    const heading = matchingHeading("Teil 3: gern oder mögen? (Exercise 3)");
+    flag(heading?.closest?.("section") || heading?.parentElement,
+      "data-a1-pdf-day7-grammar-quiz");
+  }
+
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
   const actionText = /^(?:Show model|Hide model|Show answer|Hide answer|Show answers|Hide answers|Reveal answer|Show solution|Check answer|Check answers|Reset|Reset answers|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|←\s*Back)$/i;
