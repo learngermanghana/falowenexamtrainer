@@ -1,185 +1,115 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { announceExamSuccess } from "../services/interactionFeedback";
-import { styles } from "../styles";
-import { useExam } from "../context/ExamContext";
-import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
-import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
+import {useNavigate} from "react-router-dom";
+import {useExam} from "../context/ExamContext";
+import {useAuth} from "../context/AuthContext";
+import {announceExamSuccess} from "../services/interactionFeedback";
+import {
+  getReadingPracticeHistory,getReadingPracticeStudentKey
+} from "../services/readingPracticeHistory";
+import {readingLevelConfig,ReadingPracticeSampleList} from "./ReadingPracticeShell";
+import A1ReadingPracticeSamples,{A1_READING_PRACTICE_SAMPLES} from "./A1ReadingPracticeSamples";
+import A2ReadingPracticeSamples,{A2_READING_PRACTICE_SAMPLES} from "./A2ReadingPracticeSamples";
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
-import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
+import {B1_READING_PRACTICE_SAMPLES} from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
+import "./ReadingPracticeShell.css";
 
-const lesenLevels = [
-  {
-    level: "B2",
-    description: "PDF coming soon.",
-    url: null,
-  },
-
-];
-
-const C1_READING_PRACTICE_SAMPLES = Object.freeze([
-  {
-    id: "c1-reading-01",
-    slug: "sample-1",
-    label: "C1 Lesen Sample 1",
-    detail: "30 questions · Teil 1–4",
-  },
-]);
-
-const sampleMetaForLevel = (level) => {
-  const samples = level === "B1" ? B1_READING_PRACTICE_SAMPLES :
-    level === "A2" ? A2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
-  const questionCount = level === "B1" ? 30 : level === "A2" ? 20 : 15;
-  const partCount = level === "B1" ? 5 : level === "A2" ? 4 : 3;
-
-  return samples.map((sample, index) => ({
-    id: sample.id,
-    slug: `sample-${index + 1}`,
-    label: `Lesen Sample ${index + 1}`,
-    detail: `${questionCount} questions · Teil 1–${partCount}`,
+const LEVELS=["A1","A2","B1","B2","C1","C2"];
+const C1_SAMPLES=Object.freeze([{
+  id:"c1-reading-01",slug:"sample-1",label:"Lesen Sample 1",
+  detail:"30 questions · 4 Teile · reading practice"
+}]);
+const samplesForLevel=level=>{
+  if(level==="C1")return C1_SAMPLES;
+  const sets=level==="B1"?B1_READING_PRACTICE_SAMPLES
+    :level==="A2"?A2_READING_PRACTICE_SAMPLES:A1_READING_PRACTICE_SAMPLES;
+  const config=readingLevelConfig[level];
+  return sets.map((sample,index)=>({
+    id:sample.id,slug:`sample-${index+1}`,label:`Lesen Sample ${index+1}`,
+    detail:`${config.questions} questions · ${config.parts} Teile · ${config.minutes} minutes`,
   }));
 };
-
-const SampleList = ({ level, samples, onOpen }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <div>
-      <h2 style={{ margin: 0 }}>{level} Lesen practice</h2>
-      <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-        Choose a reading sample to practise.
-      </p>
-    </div>
-
-    <div style={{ display: "grid", gap: 10 }}>
-      {samples.map((sample) => (
-        <button
-          key={sample.id}
-          type="button"
-          onClick={() => onOpen(sample)}
-          style={{
-            ...styles.secondaryButton,
-            width: "100%",
-            textAlign: "left",
-            display: "grid",
-            gap: 4,
-            padding: "14px 16px",
-          }}
-        >
-          <strong>{sample.label}</strong>
-          <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>{sample.detail}</span>
-        </button>
-      ))}
-    </div>
-  </section>
-);
-
-const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
-  const navigate = useNavigate();
-  const openReadingSample = (route, message = "Lesen practice opened successfully.") => {
-    announceExamSuccess(message);
-    navigate(route);
-  };
-  const { level } = useExam();
-  const profileLevel = String(level || "A1").toUpperCase();
-  const routeLevel = String(practiceLevel || "").toUpperCase();
-  const normalizedLevel = ["A1", "A2", "B1", "B2", "C1"].includes(routeLevel)
-    ? routeLevel
-    : profileLevel;
-
-  if (normalizedLevel === "C1") {
-    const samples = C1_READING_PRACTICE_SAMPLES;
-    const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
-
-    if (sampleId && !selected) {
-      return (
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <h2 style={{ margin: 0 }}>C1 Lesen sample not found</h2>
-          <button type="button" style={styles.secondaryButton} onClick={() => openReadingSample("/exams/lesen", "Lesen samples opened successfully.")}>
-            Back to Lesen samples
-          </button>
-        </section>
-      );
-    }
-
-    if (!selected) {
-      return (
-        <SampleList
-          level="C1"
-          samples={samples}
-          onOpen={(sample) => openReadingSample(`/exams/lesen/c1/${sample.slug}`, `${sample.label} opened successfully.`)}
-        />
-      );
-    }
-
-    return <C1FinalMockExamPage />;
-  }
-
-  if (["A1", "A2", "B1"].includes(normalizedLevel)) {
-    const samples = sampleMetaForLevel(normalizedLevel);
-    const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
-
-    if (sampleId && !selected) {
-      return (
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <h2 style={{ margin: 0 }}>{normalizedLevel} Lesen sample not found</h2>
-          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/exams/lesen")}>
-            Back to Lesen samples
-          </button>
-        </section>
-      );
-    }
-
-    if (!selected) {
-      return (
-        <SampleList
-          level={normalizedLevel}
-          samples={samples}
-          onOpen={(sample) => openReadingSample(`/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}`, `${sample.label} opened successfully.`)}
-        />
-      );
-    }
-
-    return normalizedLevel === "B1" ? (
-      <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
-    ) : normalizedLevel === "A2" ? (
-      <A2ReadingPracticeSamples initialSampleId={selected.id} standalone />
-    ) : (
-      <A1ReadingPracticeSamples initialSampleId={selected.id} standalone />
-    );
-  }
-
-  const resource = lesenLevels.find((item) => item.level === normalizedLevel);
-
-  return (
-    <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div>
-        <h2 style={{ margin: 0 }}>Lesen samples</h2>
-        <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-          Reading resources for level <strong>{normalizedLevel}</strong>.
-        </p>
-      </div>
-      {resource ? (
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
-          <div>
-            <h3 style={{ margin: 0 }}>{resource.level}</h3>
-            <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{resource.description}</p>
-          </div>
-          {resource.url ? (
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noreferrer"
-              style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}
-            >
-              {resource.actionLabel}
-            </a>
-          ) : (
-            <span style={{ fontSize: 14, color: "#9ca3af" }}>Available soon</span>
-          )}
-        </div>
-      ) : null}
-    </section>
-  );
+const progressFor=(level,studentKey)=>{
+  if(!["A1","A2","B1"].includes(level)||typeof window==="undefined")return {};
+  try{
+    const saved=JSON.parse(window.localStorage.getItem(
+      `falowen:exams:lesen:${level.toLowerCase()}:three-samples:${studentKey||"guest"}`
+    )||"null");
+    return saved&&typeof saved==="object"?saved:{};
+  }catch{return {};}
 };
-
-export default LesenPage;
+export default function LesenPage({practiceLevel="",sampleId=""}){
+  const navigate=useNavigate();
+  const {level,setLevel,accessibleLevels=[]}=useExam();
+  const {studentProfile,user}=useAuth();
+  const examOnly=studentProfile?.accountType==="exam_only";
+  const availableLevels=examOnly?[String(studentProfile?.level||"A1").toUpperCase()]:accessibleLevels;
+  const routeLevel=String(practiceLevel||"").toUpperCase();
+  const currentLevel=String(level||"A1").toUpperCase();
+  const requested=LEVELS.includes(routeLevel)?routeLevel:currentLevel;
+  const permitted=availableLevels.includes(requested);
+  const normalizedLevel=permitted?requested:currentLevel;
+  const studentKey=getReadingPracticeStudentKey({studentProfile,user});
+  const open=(item)=>{
+    announceExamSuccess(`${normalizedLevel} ${item.label} opened.`);
+    navigate(`/exams/lesen/${normalizedLevel.toLowerCase()}/${item.slug}`);
+  };
+  const selectLevel=next=>{
+    if(!availableLevels.includes(next))return;
+    setLevel(next);
+    navigate(`/exams/lesen/${next.toLowerCase()}`);
+  };
+  const cfg=readingLevelConfig[normalizedLevel];
+  const samples=cfg?.available?samplesForLevel(normalizedLevel):[];
+  const selected=sampleId?samples.find(item=>item.slug===sampleId):null;
+  if(sampleId && selected && cfg?.available){
+    if(normalizedLevel==="C1")return <C1FinalMockExamPage/>;
+    if(normalizedLevel==="B1")return <B1ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
+    if(normalizedLevel==="A2")return <A2ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
+    return <A1ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
+  }
+  const progress=progressFor(normalizedLevel,studentKey);
+  const history=getReadingPracticeHistory(normalizedLevel,studentKey);
+  const enriched=samples.map(sample=>({
+    ...sample,
+    status:progress.submittedBySample?.[sample.id]||history.some(row=>row.setId===sample.id)
+      ?"Completed":Object.keys(progress.answersBySample?.[sample.id]||{}).length?"In progress":"Not started",
+  }));
+  return <main className="reading-standard-hub" data-reading-level={normalizedLevel}>
+    <header className="reading-standard-hub-header">
+      <p>FALOWEN · EXAMS ROOM</p>
+      <h1>Lesen Practice</h1>
+      <span>Choose your level, select a reading sample, then practise each Teil using the same navigation.</span>
+    </header>
+    <nav className="reading-standard-levels" aria-label="Choose Lesen level">
+      {LEVELS.map(item=>{
+        const allowed=availableLevels.includes(item);
+        const ready=readingLevelConfig[item].available;
+        return <button type="button" key={item} disabled={!allowed}
+          aria-current={item===normalizedLevel?"page":undefined}
+          className={item===normalizedLevel?"is-active":""}
+          aria-label={`${item} Lesen${!allowed?", level locked":!ready?", practice coming soon":""}`}
+          onClick={()=>selectLevel(item)}>
+          <strong>{item}</strong>
+          <small>{!allowed?"Locked":ready?"Practice":"Coming soon"}</small>
+        </button>;
+      })}
+    </nav>
+    {!permitted?<p role="status" className="reading-standard-notice">
+      This level is not included in your current exam access. Showing your available level instead.
+    </p>:null}
+    {sampleId&&!selected?<p role="alert" className="reading-standard-notice">
+      That reading sample was not found. Choose one of the available samples below.
+    </p>:null}
+    {cfg?.available ? <ReadingPracticeSampleList level={normalizedLevel}
+      samples={enriched} results={history} onOpen={open}/> :
+      <section className="reading-standard-library" role="status">
+        <h2>{normalizedLevel} · Lesen samples</h2>
+        <p>A complete interactive practice sample has not been published for this level yet.
+          We will show the same Lesen interface here when the question bank is ready.</p>
+        <button type="button" className="reading-standard-back" onClick={()=>navigate("/exams/overview")}>
+          ← Back to Exams Room
+        </button>
+      </section>}
+  </main>;
+}
