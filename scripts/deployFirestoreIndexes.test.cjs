@@ -20,3 +20,14 @@ test("Firestore-generated __name__ field does not create duplicate indexes",()=>
   const server={...index,fields:[...index.fields,{fieldPath:"__name__",order:"DESCENDING"}],state:"READY"};
   assert.equal(signature(server),sig);
 });
+
+test("IAM advice is gated on explicit PERMISSION_DENIED from reconcile step",()=>{
+  const yaml=fs.readFileSync(path.resolve(__dirname,"../.github/workflows/deploy-firestore-indexes.yml"),"utf8");
+  const client=fs.readFileSync(path.resolve(__dirname,"deployFirestoreIndexes.cjs"),"utf8");
+  assert.match(yaml,/id: reconcile/);
+  assert.match(yaml,/steps\.reconcile\.outcome == 'failure'/);
+  assert.match(yaml,/steps\.reconcile\.outputs\.permission_denied == 'true'/);
+  assert.match(client,/status===403 && providerStatus==="PERMISSION_DENIED"/);
+  const rules=fs.readFileSync(path.resolve(__dirname,"../.github/workflows/deploy-firestore-rules.yml"),"utf8");
+  assert.doesNotMatch(rules,/node scripts\/deploySpeakingIndexes\.cjs/);
+});
