@@ -24,13 +24,13 @@ const ITEMS=[
   [M,"Warum sollte man den Fahrstuhl am Querbahnsteig nutzen?",["Weil die Rolltreppe wegen Wartungsarbeiten gesperrt ist.","Weil der Fahrstuhl schneller ist.","Weil die Treppen überlastet sind."]],
   [M,"Welche Zwischenhalte entfallen beim Ersatzzug nach Hannover?",["Bremen und Hamburg.","Wolfsburg und Gifhorn.","Kassel und Göttingen."]],
   [M,"Wo befindet sich das Abteil für die erste Klasse im Ersatzzug?",["Im Wagen Nummer eins.","Im Wagen Nummer zwei.","Im Wagen Nummer drei."]],
-  [R,"Anna konnte die Radtour schon am Donnerstag beginnen."],
-  [R,"Entgegen der Wettervorhersage schien am Freitag die Sonne."],
-  [R,"Toms Fahrrad hatte auf der Strecke keine technischen Probleme."],
-  [R,"Die Fahrräder konnten im Innenhof des Hotels abgestellt werden."],
-  [R,"Das empfohlene Fischrestaurant hatte wegen einer Feier geschlossen."],
-  [R,"Am Samstagmorgen wachte Tom pünktlich durch seinen Wecker auf."],
-  [R,"Die Gruppe erreichte trotz starken Gegenwinds das Ziel in Travemünde."],
+  [R,"Am Freitag schien entgegen der Wettervorhersage den ganzen Tag die Sonne."],
+  [R,"Toms Fahrrad hatte während der Radtour keine technischen Probleme."],
+  [R,"Die Gruppe konnte ihre Fahrräder sicher im Innenhof des Hotels abstellen."],
+  [R,"Das empfohlene Fischrestaurant war wegen einer geschlossenen Gesellschaft nicht geöffnet."],
+  [R,"In der Pizzeria wurden die Gäste besonders schnell bedient."],
+  [R,"Tom verschlief am Samstag, weil er seinen klingelnden Wecker wieder ausschaltete."],
+  [R,"Die Gruppe erreichte trotz starken Gegenwinds den Strand in Travemünde."],
   [M,"Wer wollte im Urlaub vor allem keinen Wecker stellen und keinen Koffer packen?",["Markus Baumann","Claudia Weber","Thomas Klein"]],
   [M,"Wer braucht unbedingt neue Landschaften und andere Kulturen zum Abschalten?",["Markus Baumann","Claudia Weber","Thomas Klein"]],
   [M,"Wer weist darauf hin, dass Verreisen oft mit Stau und verspäteten Zügen verbunden ist?",["Markus Baumann","Claudia Weber","Thomas Klein"]],
@@ -43,7 +43,7 @@ const ITEMS=[
 const ANSWER_KEY=Object.freeze([
   "richtig","b","falsch","a","richtig","c","falsch","b","richtig","a",
   "b","c","a","b","c",
-  "falsch","richtig","falsch","richtig","richtig","falsch","richtig",
+  "richtig","falsch","richtig","richtig","falsch","richtig","richtig",
   "b","c","a","c","b","a","b","c",
 ]);
 const RF_OPTIONS=Object.freeze([{id:"richtig",label:"Richtig"},{id:"falsch",label:"Falsch"}]);
@@ -56,7 +56,6 @@ const QUESTIONS=Object.freeze(ITEMS.map(([kind,question,choices],index)=>{
 }));
 const QA_WARNINGS=Object.freeze([
   "Teil 1 audio introduction says there is one statement per short text, but the supplied test contains two questions per short text (Richtig/Falsch plus multiple choice). Teacher should verify this mismatch.",
-  "Teil 3 question 16 tests the recorded Beispiel Nummer 0, and the recorded Nummer 5 (Pizzeria) is not separately tested. Confirm with the teacher before release.",
   "Teil 4 roles C and D change implied speaker identity in the middle of the discussion. Regenerate/re-record the affected dialogue before release.",
 ]);
 function publicB1Mock3Hoeren(){
