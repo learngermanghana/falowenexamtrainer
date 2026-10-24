@@ -45,3 +45,23 @@ test("PDF preflight rejects pages containing only a footer or loading screen", (
 test("PDF preflight detects page-count mismatches", () => {
   assert.match(scanPdfPageContent("One page\f", 2).faults[0], /Expected 2 PDF pages/);
 });
+
+
+test("printed A1 lesson removes app chrome and shrinks only decorative cover photos", () => {
+  const css = a1PrintCss("workbook");
+  assert.match(css, /\.app-header, \.app-header-meta \{ display: none !important/);
+  assert.match(css, /data-a1-day13-revision-hero\] > img/);
+  assert.match(css, /img\[alt='Train journey through Germany'\]/);
+  assert.match(css, /height: 140px !important/);
+  assert.doesNotMatch(css, /img \{ max-width: 100% !important; height: auto !important/);
+  assert.match(css, /img \{ max-width: 100% !important/);
+});
+
+test("printed A1 Day 22 preserves whole listening question cards and Day 19 prompt lines", () => {
+  const css = a1PrintCss("workbook");
+  assert.match(css, /data-a1-day22-health-teil='3'/);
+  assert.match(css, /div:has\(> strong\)/);
+  assert.match(css, /break-inside: avoid-page !important/);
+  assert.match(css, /data-a1-pdf-speaking-prompt/);
+  assert.match(css, /data-a1-pdf-answer-rule/);
+});
