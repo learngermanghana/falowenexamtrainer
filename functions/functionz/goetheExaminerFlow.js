@@ -50,10 +50,20 @@ function createExaminerFlow(level, task, mode="guided") {
   if (key === "A2-3" && !flow.scenario) flow.scenario = `Sie möchten gemeinsam folgende Aktivität planen: ${clean(task?.prompt,180) || "ein Geschenk für einen Freund kaufen"}. Finden Sie einen gemeinsamen Termin.`;
   if (key === "A2-2" || key === "B1-1" || key === "B1-2") flow.contextTopic = clean(key === "B1-1" ? planningTopic(task) : task?.prompt,180);
   if (key === "B1-1") flow.planningPoints = catalogue.b1PlanningTasks.find(item=>clean(task?.prompt).toLowerCase().includes(item.match.toLowerCase()))?.points;
-  if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
+  if (key === "B1-1" && task?.id === "b1-mock-03-speaking-teil-1") {
+    flow.planningPoints=require("./b1Mock3Speaking").PLAN_POINTS.map(p=>({...p}));
+  }
+  if (key === "B1-3" && task?.id === "b1-mock-03-speaking-teil-3") {
+    const {PARTNER_PRESENTATION}=require("./b1Mock3Speaking");
+    flow.contextTopic=clean(task?.keywords,180);
+    flow.discussion={topic:"Digitale Bücher oder gedruckte Bücher?",presentation:PARTNER_PRESENTATION};
+    flow.mockPresentationFeedback=true;
+  } else if (key === "B1-3") {
+    flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
+  }
   if (key === "B1-2") flow.presentationQuestion=catalogue.b1PresentationTopics.find(item=>item.topic === clean(task?.prompt,180))?.question || "";
   if (/^C[12]-/.test(key)) flow.contextTopic = clean(task?.prompt,180) || "Gesellschaft und Wandel";
-  if (key === "B1-3") flow.discussion=catalogue.b1DiscussionTasks.find(item=>item.topic === clean(task?.prompt,180));
+  if (key === "B1-3" && !flow.mockPresentationFeedback) flow.discussion=catalogue.b1DiscussionTasks.find(item=>item.topic === clean(task?.prompt,180));
   if (key.startsWith("B2-")) {
     flow.contextTopic=clean(task?.prompt,180);
     flow.presentationQuestion=catalogue.b2Topics[key.split("-")[1]].find(item=>item.topic === flow.contextTopic)?.question || clean(task?.hint,600);
@@ -102,7 +112,21 @@ function currentStep(flow, answered=0) {
   if (flow.key === "A2-3") instruction=flow.scenario + " Wann hast du Zeit?";
   if (flow.key === "B1-1" && flow.contextTopic) instruction = `Planen Sie gemeinsam: ${flow.contextTopic}. Besprechen Sie: ${(flow.planningPoints || []).map(point=>point.text).join(" ") || "wann und wo, wie Sie hinkommen und wer was übernimmt"} Was schlägst du vor?`;
   if (flow.key === "B1-2") {action="presentation";instruction=`Ihr Thema ist „${flow.contextTopic || "Alltag"}“. ${flow.presentationQuestion || ""} ${profile.opening}`;}
-  if (flow.key === "B1-3") {action=answered ? "feedback-and-question" : "answer-examiner";role=answered ? "partner" : "examiner";instruction=answered ? `${flow.discussion ? "" : profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.` : flow.discussion ? `${flow.discussion.presentation} ${flow.discussion.question}` : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;}
+  if (flow.key === "B1-3") {
+    if (flow.mockPresentationFeedback) {
+      action=answered ? "answer-examiner" : "feedback-and-question";
+      role=answered ? "examiner" : "partner";
+      instruction=answered
+        ? `Beantworten Sie eine Frage zu Ihrem eigenen Präsentationsthema „${flow.contextTopic}“. Nennen Sie ein Beispiel.`
+        : `${flow.discussion.presentation} Geben Sie bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.`;
+    } else {
+      action=answered ? "feedback-and-question" : "answer-examiner";
+      role=answered ? "partner" : "examiner";
+      instruction=answered ? `${flow.discussion ? "" : profile.partnerPresentation} Geben Sie mir bitte eine Rückmeldung und stellen Sie eine Frage zu meiner Präsentation.`
+        : flow.discussion ? `${flow.discussion.presentation} ${flow.discussion.question}`
+        : `Zum Thema „${flow.contextTopic}“: Welche persönliche Erfahrung haben Sie damit gemacht? Bitte nennen Sie ein Beispiel.`;
+    }
+  }
   if (flow.key === "B2-1") {action=answered ? "follow-up" : "presentation";instruction=answered ? "Welche Möglichkeit halten Sie persönlich für besonders sinnvoll und warum?" : `Ihr Thema ist „${flow.contextTopic}“. ${flow.presentationQuestion} ${profile.opening}`;}
   if (flow.key === "B2-2") {action="discuss";instruction=answered === 3 ? "Fassen Sie bitte abschließend Ihren Standpunkt zusammen." : `${flow.presentationQuestion} ${profile.opening}`;}
   if (flow.key === "C1-1" || flow.key === "C2-1") {
@@ -185,6 +209,8 @@ function partnerInstructions(session,plan) {
       "Record only decisions actually agreed in the student's latest words: {point, value, quote}; quote must be an exact substring of their transcript. " +
       "To withdraw a previous decision, return {point, quote, withdrawn:true}. " +
       "Allowed decision points: " + JSON.stringify(profile.decisionPoints) + ". " : "Use an empty decisions array. ") +
+    (flow.key === "B1-3" && flow.mockPresentationFeedback ?
+      "First answer the candidate's actual question about your printed-versus-digital-books presentation, then ask EXACTLY ONE new question about the candidate's own topic: " + JSON.stringify(flow.contextTopic) + ". Do not repeat your whole presentation. " : "") +
     (flow.key === "B1-1" ? "German Termin intent: 'Ich habe frei', 'Da habe ich Zeit', 'Da kann ich', 'Samstag geht bei mir' and 'Das klappt' can affirm a concrete appointment proposed by the partner. Never require the word 'passen'. When the learner only expresses availability but no definite time and place has been agreed, ACKNOWLEDGE that availability and ask ONE specific question for the missing detail, without repeating the opening. 'Ich kann nicht', 'keine Zeit', 'leider', and a conflicting day or hour must never count as acceptance. A proposal by the student does not alone mean the partner has agreed. For 'wann und wo' both time and place are needed. " : "") +
     (flow.key === "A2-3" ? "Your private free times are " + JSON.stringify(flow.calendar?.partnerCalendar || profile.partnerCalendar) +
       ". You cannot meet outside those times. The student's card is separate. Do not reveal your whole calendar. " : "") +
