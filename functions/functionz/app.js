@@ -6887,6 +6887,34 @@ app.post("/speaking/b1-mock-score", async (req, res) => {
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId=String(req.body?.mockId || "b1-mock-01");
     if (!["b1-mock-01","b1-mock-02"].includes(mockId)) return res.status(400).json({error:"Unsupported B1 mock"});
+    if (Object.prototype.hasOwnProperty.call(req.body || {}, "examinerSessionIds")) {
+      // Same immutable-snapshot verification used by A2. Never charge for
+      // a second AI grading pass; the examiner has already marked each Teil.
+      const db=getFirestoreSafe();
+      if (!db) return res.status(503).json({error:"B1 mock storage is unavailable."});
+      try {
+        const {scoreB1ExaminerSnapshots}=require("./b1MockExaminerScore");
+        const result=await scoreB1ExaminerSnapshots({
+          db,uid:authedUser.uid,attemptId,mockId,sessionIds:req.body.examinerSessionIds,
+        });
+        await persistVerifiedB1MockSection({
+          db,admin,uid:authedUser.uid,attemptId,mockId,section:"sprechen",
+          score:result.score,source:"/speaking/b1-mock-score:verified-examiner",
+        });
+        res.set("Cache-Control","private, no-store");
+        return res.json({result,saved:true,verified:true});
+      } catch(err) {
+        return res.status(err?.status || (err?.code==="B1_MOCK_ALREADY_COMPLETED" ? 409 : 503))
+          .json({code:err?.code || "B1_MOCK_EXAMINER_VERIFY_FAILED",
+            error:err?.message || "Could not verify your saved B1 speaking parts. Retry verification."});
+      }
+    }
+    // Mock 2 requires real examiner receipts, not unbound user-supplied
+    // transcripts. Mock 1 retains its legacy recorder scoring for saved work.
+    if (mockId==="b1-mock-02") return res.status(400).json({
+      code:"B1_MOCK_EXAMINER_REQUIRED",
+      error:"Use the three saved AI examiner sessions for B1 Mock 2.",
+    });
     if (attempts.length !== 3) {
       return res.status(400).json({ error: "Three speaking responses are required for the complete B1 mock." });
     }
