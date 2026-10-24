@@ -100,3 +100,36 @@ test("print cleanup does not discard the last short educational speaking prompt"
   runWithDoc(root, cleanA1PrintChrome);
   assert.equal(finalPrompt.removed, false);
 });
+
+
+test("Day 7 nested strong draft notice is removed but real price questions remain", () => {
+  const root = new Node("MAIN");
+  const question = new Node("SECTION", "1. Wie viel kostet das Buch? ________");
+  const savedNotice = new Node("P", "Saved to your assignment draft · 05:51 PM. Not submitted for marking yet.");
+  savedNotice.children = [new Node("STRONG", "Not submitted for marking yet.")];
+  savedNotice.querySelector = () => null;
+  root.mapping.set("p[role='status'],p[aria-live]", [savedNotice]);
+  root.mapping.set("div,section,aside", [question]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(savedNotice.removed, true);
+  assert.equal(question.removed, false);
+});
+
+test("explicitly marked notices are hidden even outside the first main element", () => {
+  const root = new Node("MAIN");
+  const status = new Node("P", "Saved to your assignment draft · 05:51 PM. Not submitted for marking yet.");
+  const original = globalThis.document;
+  globalThis.document = {
+    body: root,
+    querySelector: selector => selector === "main" ? root : null,
+    querySelectorAll: selector => selector === '[data-a1-pdf-hide-ui], [data-a1-chapter3-draft-guidance]'
+      ? [status] : [],
+  };
+  try {
+    cleanA1PrintChrome();
+    assert.equal(status.removed, true);
+  } finally {
+    if (original === undefined) delete globalThis.document;
+    else globalThis.document = original;
+  }
+});
