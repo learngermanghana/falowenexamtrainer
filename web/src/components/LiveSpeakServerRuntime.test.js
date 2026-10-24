@@ -52,6 +52,7 @@ function setup(overrides = {}, authOverride = {}) {
       if(name==="./chatModelConfig")return require("../../../functions/functionz/chatModelConfig");
       if(name==="./goetheExaminerFlow")return require("../../../functions/functionz/goetheExaminerFlow");
       if(name==="./courseSpeakingMock")return {requireCourseSpeakingAttempt:async()=>({status:"in_progress"})};
+      if(name==="./courseSpeakingSessionClock")return require("../../../functions/functionz/courseSpeakingSessionClock");
       if(name==="./openaiClient")return {getOpenAIClient:()=>fakeClient};
       throw new Error("Unexpected require "+name);
     },
