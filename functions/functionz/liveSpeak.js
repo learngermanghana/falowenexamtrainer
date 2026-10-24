@@ -8,6 +8,7 @@
 const crypto = require("crypto");
 const { resolveChatModel, buildChatRequest } = require("./chatModelConfig");
 const taskFlows = require("./goetheExaminerFlow");
+const { B1_COURSE_SPEAKING_MS, B1_COURSE_ASSIGNMENT, sessionDeadline, visibleExpiry } = require("./courseSpeakingSessionClock");
 // Keep this lightweight whitelist independent of the Sheets adapter. Existing
 // Live Speak route simulations must not load the score-sheet integration.
 const COURSE_MOCK_KEYS = new Set(["A1-5.9", "A2-8.22", "B1-7.23"]);
@@ -55,9 +56,9 @@ const feedbackOpen = session => examiner(session) && !session.endedAt &&
   // marking without requiring another recording.
   ((assignmentConfig(session.examTask?.courseAssignmentKey) &&
       (confirmedAnswers(session).length > 0 || session.pendingId)) ||
-    Date.parse(session.expiresAt || "") + FEEDBACK_GRACE_MS > Date.now());
+    sessionDeadline(session) + FEEDBACK_GRACE_MS > Date.now());
 const sessionView = session => ({
-  sessionId: session.sessionId, expiresAt: session.expiresAt,
+  sessionId: session.sessionId, expiresAt: visibleExpiry(session),
   level: session.level || "A2", topic: session.topic || "",
   source: session.source || "standalone", examTask: session.examTask || null,
   messages: savedMessages(session), confirmedAnswers: confirmedAnswers(session),
@@ -257,7 +258,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         : null;
       const running = currentSession?.data() || {};
       const active = running.sessionId && !running.endedAt &&
-        (Date.parse(running.expiresAt || "") > Date.now() || feedbackOpen(running));
+        (sessionDeadline(running) > Date.now() || feedbackOpen(running) ||
+          (assignmentConfig(running.examTask?.courseAssignmentKey) && !coursePartFinished(running)));
       const info = receiptStatus(pilot?.data());
       const used = Number(usage?.data()?.turns) || 0;
       if (openTesting()) {
@@ -373,7 +375,8 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         ]);
         const existing = sessionSnap.data() || {};
         if (existing.sessionId && !existing.endedAt &&
-          (Date.parse(existing.expiresAt || "") > Date.now() || feedbackOpen(existing))) {
+          (sessionDeadline(existing) > Date.now() || feedbackOpen(existing) ||
+            (assignmentConfig(existing.examTask?.courseAssignmentKey) && !coursePartFinished(existing)))) {
           if (examTask?.courseAssignmentKey &&
             (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
               existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) {
@@ -385,10 +388,14 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           // unfinished part with time to answer, without consuming a new session.
           if (assignmentConfig(existing.examTask?.courseAssignmentKey) &&
               !coursePartFinished(existing) &&
-              Date.parse(existing.expiresAt || "") <= Date.now()) {
-            const expiresAt = new Date(Date.now()+10*60*1000).toISOString();
-            tx.update(sessionRef, {expiresAt, taskReady:false});
-            result = sessionView({...existing, expiresAt, taskReady:false});
+              sessionDeadline(existing) <= Date.now()) {
+            const windowMs = existing.examTask?.courseAssignmentKey === B1_COURSE_ASSIGNMENT
+              ? B1_COURSE_SPEAKING_MS : 10 * 60 * 1000;
+            const windowStartedAt = new Date();
+            const expiresAt = new Date(windowStartedAt.getTime() + windowMs).toISOString();
+            tx.update(sessionRef, {expiresAt, taskReady:false,
+              windowStartedAt:admin.firestore.FieldValue.serverTimestamp()});
+            result = sessionView({...existing, expiresAt, windowStartedAt, taskReady:false});
           } else result = sessionView(existing);
           return;
         }
@@ -416,7 +423,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         // server-side per-turn audio, model-call and monthly spend caps still apply.
         const longExam=/^C[12]-/.test(examFlow?.key || "");
         const secondsNeeded=longExam ? taskFlows.profileFor(examFlow).seconds.reduce((sum,n)=>sum+n,0) : 0;
-        const examWindow=longExam ? Math.max(20*60,secondsNeeded+8*60)*1000 : 10*60*1000;
+        const examWindow=examTask?.courseAssignmentKey === B1_COURSE_ASSIGNMENT
+          ? B1_COURSE_SPEAKING_MS
+          : longExam ? Math.max(20*60,secondsNeeded+8*60)*1000 : 10*60*1000;
         const expiresAt = addDays(examFlow ? examWindow : SESSION_MS);
         if (useExamTryout) tx.set(subRef, {uid:student.auth.uid,
           examTryoutMonth:currentMonth(),
@@ -489,7 +498,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const [sessionSnap, usageSnap] = await Promise.all([tx.get(sessionRef), tx.get(globalRef)]);
         const session = sessionSnap.data() || {};
         if (session.sessionId !== sessionId || !sessionId || session.endedAt ||
-          Date.parse(session.expiresAt || "") + (examiner(session) && !intro ? 15000 : 0) <= Date.now()) {
+          sessionDeadline(session) + (examiner(session) && !intro ? 15000 : 0) <= Date.now()) {
           throw Object.assign(new Error("Speaking session has ended."), {status:409,code:"session_ended"});
         }
         if (intro && examiner(session) && savedMessages(session).length) {
@@ -627,7 +636,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const snap = await tx.get(sessionRef);
         const session = snap.data() || {};
         if (session.sessionId !== sessionId || session.endedAt ||
-            Date.parse(session.expiresAt || "") <= Date.now()) {
+            sessionDeadline(session) <= Date.now()) {
           throw Object.assign(new Error("This speaking session has ended."), {status:409,code:"session_ended"});
         }
         if (!examiner(session)) {
@@ -672,7 +681,7 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const snap = await tx.get(sessionRef);
         const session = snap.data() || {};
         if (!sessionId || session.sessionId !== sessionId || session.endedAt ||
-          (Date.parse(session.expiresAt || "") <= Date.now() && !feedbackOpen(session))) {
+          (sessionDeadline(session) <= Date.now() && !feedbackOpen(session))) {
           throw Object.assign(new Error("The speaking session has ended."), {status:409,code:"session_ended"});
         }
         if (session.inFlight) {
@@ -939,10 +948,13 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           // Prior deployments could mark a partially answered Teil ready after
           // TTS/partner failure. Reopen that same session and saved transcript;
           // do not create a new attempt or silently grade fewer exam steps.
-          if (record.taskReady || Date.parse(record.expiresAt || "") <= Date.now()) {
+          if (record.taskReady || sessionDeadline(record) <= Date.now()) {
             tx.update(sessionRef, {taskReady:false,feedbackStatus:null,
               feedbackLeaseUntil:0,
-              expiresAt:new Date(Date.now()+10*60*1000).toISOString()});
+              expiresAt:new Date(Date.now()+
+                (record.examTask?.courseAssignmentKey === B1_COURSE_ASSIGNMENT
+                  ? B1_COURSE_SPEAKING_MS : 10*60*1000)).toISOString(),
+              windowStartedAt:admin.firestore.FieldValue.serverTimestamp()});
           }
           recoverRemainingStep = true;
           return;
