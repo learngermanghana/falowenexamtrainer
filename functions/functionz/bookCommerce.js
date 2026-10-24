@@ -101,11 +101,94 @@ function registerBookCommerceRoutes(app, { admin }) {
       return res.json({
         orderId: id, title: order.title, format: order.format, priceGhs: order.priceGhs,
         status: order.status === "paid" ? "paid" : order.status === "rejected" ? "rejected" : "pending",
+        reference: order.reference, // private lookup key required before exposing receipt reference
         deliveryIncluded: false,
       });
     } catch (error) {
       console.error("Book order status error", error);
       return res.status(503).json({ error: "Order status is temporarily unavailable." });
+    }
+  });
+
+  // Private receipt reconciliation: never trust a screenshot, return URL or
+  // client-submitted payment amount. Look up the server-created Paystack reference
+  // and verify it directly with Paystack before recording a successful payment.
+  app.post("/books/verify", async (req, res) => {
+    res.set("Cache-Control", "private, no-store");
+    const id = String(req.body?.order || "");
+    const key = String(req.body?.key || "");
+    if (!/^[0-9a-f-]{36}$/i.test(id) || !/^[0-9a-f]{48}$/i.test(key)) {
+      return res.status(400).json({ error: "Invalid receipt confirmation link." });
+    }
+    try {
+      const orderRef = db().collection("bookOrders").doc(id);
+      const snapshot = await orderRef.get();
+      if (!snapshot.exists) return res.status(404).json({ error: "Order not found." });
+      const order = snapshot.data();
+      const expected = String(order.lookupKeyHash || "");
+      if (!/^[0-9a-f]{64}$/i.test(expected) ||
+        !crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(sha256(key), "hex"))) {
+        return res.status(403).json({ error: "Invalid receipt confirmation link." });
+      }
+      if (order.status === "paid") {
+        return res.json({ status: "paid", reference: order.reference });
+      }
+      if (!process.env.PAYSTACK_SECRET) {
+        return res.status(503).json({ error: "Secure Paystack verification is temporarily unavailable." });
+      }
+      const now = Date.now();
+      let recentlyChecked = false;
+      // Per-order cooldown makes this public buyer action safe to retry without
+      // generating unlimited Paystack verification requests.
+      await db().runTransaction(async tx => {
+        const recent = await tx.get(orderRef);
+        if (!recent.exists) return;
+        const value = recent.data();
+        if (value.status === "paid" || now - Number(value.lastVerifyAttemptAtMs || 0) < 30000) {
+          recentlyChecked = true;
+          return;
+        }
+        tx.update(orderRef, { lastVerifyAttemptAtMs: now });
+      });
+      if (recentlyChecked) {
+        const latest = await orderRef.get();
+        return res.json({
+          status: latest.data()?.status === "paid" ? "paid" : "pending",
+          reference: order.reference,
+          retryAfterSeconds: latest.data()?.status === "paid" ? 0 : 30,
+        });
+      }
+      const response = await fetch(
+        `https://api.paystack.co/transaction/verify/${encodeURIComponent(String(order.reference || ""))}`,
+        {
+          method: "GET",
+          headers: { Authorization: `Bearer ${process.env.PAYSTACK_SECRET}` },
+          signal: AbortSignal.timeout(12000),
+        }
+      );
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok || payload.status !== true || !payload.data) {
+        return res.status(502).json({ error: "Paystack could not confirm this payment yet. Try again shortly." });
+      }
+      const transaction = payload.data;
+      if (transaction.status !== "success") {
+        return res.json({
+          status: "pending",
+          gatewayStatus: String(transaction.status || "unknown"),
+          reference: order.reference,
+        });
+      }
+      const checked = await processBookWebhook({ admin, data: transaction });
+      if (checked.status === 200 &&
+          ["synced", "duplicate"].includes(checked.body?.status)) {
+        return res.json({ status: "paid", reference: order.reference });
+      }
+      return res.status(409).json({
+        error: "Paystack reports a transaction, but its order details require manual review. Do not pay again.",
+      });
+    } catch (error) {
+      console.error("Book receipt confirmation failed", { orderId: id, message: error.message });
+      return res.status(503).json({ error: "Receipt confirmation is temporarily unavailable. Keep your Paystack reference." });
     }
   });
 }
