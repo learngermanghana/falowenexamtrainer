@@ -173,7 +173,7 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
           <h1 style={{ ...styles.title, margin: 0, lineHeight: 1.25 }}>Personal Information, Articles, Adjectives and W-Questions</h1>
           <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.3 · Interactive workbook</p>
           <p style={{ margin: 0, color: "#4b5563" }}>Articles · Adjectives · Personal information · Dialogues · W-questions · Sentence building</p>
-          <div style={infoBoxStyle}>
+          <div data-a1-pdf-hide-ui="day5-live-progress" style={infoBoxStyle}>
             <strong>Progress</strong>
             <div style={{ lineHeight: 1.7 }}>
               <div>Article genders: {articleScore}/{articleWords.length}</div>
