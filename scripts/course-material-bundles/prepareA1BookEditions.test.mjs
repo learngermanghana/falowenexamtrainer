@@ -34,7 +34,8 @@ test("A1 sample is based on the actual Day 1 notes and workbook, not the complet
   assert.match(renderer, /sample\.getPageCount\(\) !== 14/);
   assert.match(renderer, /PRIVATE, NOT YET LICENSE-CLEARED/);
   assert.match(renderer, /Editorial review copy - not for sale/);
-  assert.match(renderer, /\/web\/public\|public\|web\/dist/);
+  assert.match(renderer, /assertSafeDestinations/);
+  assert.match(renderer, /web\\\/public/);
 });
 
 test("all other course levels keep their established PDF uploads", () => {
