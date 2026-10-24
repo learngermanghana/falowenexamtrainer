@@ -46,7 +46,7 @@ async function scoreB1ExaminerSnapshots({
        receipt?.mockAttemptId!==attemptId ||
        receipt?.task?.id!==`${mockId}-speaking-teil-${i+1}` ||
        receipt?.level!=="B1" || teil!==String(i+1) ||
-       receipt?.source!=="exam-speaking-practice" || receipt?.completed!==true ||
+       receipt?.source!=="exam-speaking-practice" || receipt?.examFlowKey!==`B1-${i+1}` || receipt?.completed!==true ||
        !promptMatches || !Number.isFinite(raw) || raw<0 ||
        !Number.isFinite(max) || max<=0 || raw>max) {
       throw rejected(`Teil ${i+1} has no valid saved AI examiner assessment for this B1 mock attempt.`);
