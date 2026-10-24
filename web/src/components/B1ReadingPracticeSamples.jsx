@@ -179,7 +179,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       <header className="b1-final-module-header">
         <p>B1 · Lesen · Exams Room</p>
         <h1>{sample.label}</h1>
-        <p>Three independent reading samples · 30 questions in five Teile · 65 minutes each.</p>
+        <p>30 questions in five Teile · 65 minutes per sample.</p>
         <button type="button" onClick={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
           {standalone ? "Back to Lesen samples" : "Back to Exams Room"}
         </button>
@@ -219,7 +219,13 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
 
       <section className="b1-final-paper">
         <h2>{sample[partKey].title}</h2>
-        {partKey === "teil1" ? (
+        {sample.pdfText ? (
+          <>
+            <div className="b1-final-reading-text" style={{whiteSpace:"pre-wrap",lineHeight:1.7}}>{sample.pdfText[B1_READING_PART_KEYS.indexOf(partKey)]}</div>
+            {renderQuestions(partQuestions[partKey],partKey)}
+          </>
+        ) : null}
+        {!sample.pdfText && partKey === "teil1" ? (
           <>
             <p>{sample.teil1.intro}</p>
             <div className="b1-final-reading-text">
@@ -230,7 +236,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           </>
         ) : null}
 
-        {partKey === "teil2" ? (
+        {!sample.pdfText && partKey === "teil2" ? (
           <>
             <p>Lesen Sie die beiden Artikel und wählen Sie a, b oder c.</p>
             <div className="b1-final-press-text">
@@ -246,7 +252,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           </>
         ) : null}
 
-        {partKey === "teil3" ? (
+        {!sample.pdfText && partKey === "teil3" ? (
           <>
             <p>{sample.teil3.context}</p>
             <div className="b1-final-ads">
@@ -284,7 +290,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           </>
         ) : null}
 
-        {partKey === "teil4" ? (
+        {!sample.pdfText && partKey === "teil4" ? (
           <>
             <p>{sample.teil4.context}</p>
             {sample.teil4.comments.map((comment) => (
@@ -302,7 +308,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           </>
         ) : null}
 
-        {partKey === "teil5" ? (
+        {!sample.pdfText && partKey === "teil5" ? (
           <>
             <p>{sample.teil5.context}</p>
             <div className="b1-final-reading-text">
