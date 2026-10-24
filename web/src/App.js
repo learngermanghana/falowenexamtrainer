@@ -1678,7 +1678,7 @@ const ExamArea = ({ onBack }) => {
           </small>
         </div>
 
-        {activeExamHero && examSection !== "speaking" ? (
+        {activeExamHero && !["speaking", "lesen"].includes(examSection) ? (
           <section
             style={{
               ...styles.card,
