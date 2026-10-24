@@ -17,6 +17,26 @@ const cleanSourceText = text => String(text || "")
  .replace(/Seite \d+[^\n]*/g, "")
  .replace(/\n[ \t]{4,}/g, "\n")
  .replace(/\n{4,}/g, "\n\n").trim();
+const splitSection = (source, from, to, part) => {
+ const cleaned=cleanSourceText(source);
+ if(part===1)return {passage:cleaned,questions:[]};
+ const normalized=cleaned.replace(/<\\/?b>/gi,"");
+ const startPattern=new RegExp("(?:^|\\n)\\s*"+from+"\\.\\s+","i");
+ const found=startPattern.exec(normalized);
+ if(!found)return {passage:cleaned,questions:[]};
+ const passage=normalized.slice(0,found.index).trim();
+ const questionText=normalized.slice(found.index).trim();
+ const questions=Array.from({length:to-from+1},(_,i)=>{
+  const num=from+i;
+  const here=new RegExp("(?:^|\\n)\\s*"+num+"\\.\\s+","i").exec(questionText);
+  if(!here)return "";
+  const next=new RegExp("(?:^|\\n)\\s*"+(num+1)+"\\.\\s+","i").exec(questionText.slice(here.index+here[0].length));
+  const start=here.index+here[0].length;
+  const end=next?start+next.index:questionText.length;
+  return questionText.slice(start,end).replace(/\\[\\s*\\]/g,"").trim();
+ });
+ return {passage,questions};
+};
 const labelOf=value=>({a:"A",b:"B",c:"C",d:"D",e:"E",f:"F",g:"G",h:"H"})[value]||value.toUpperCase();
 const optionsFor=n=>n<=9?["a","b","c","d"]:n<=15?["a","b","c","d","e","f","g","h"]:["a","b","c"];
 const format=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
@@ -59,6 +79,7 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
  };
  const reset=()=>{setTimerOn(false);setStarted(v=>({...v,[sample.id]:false}));setTime(v=>({...v,[sample.id]:DURATION}));setAttempts(v=>({...v,[sample.id]:{answers:{},submitted:false}}));setSync(v=>({...v,[sample.id]:"idle"}));setPart(0)};
  const bounds=PARTS[part];
+ const display=splitSection(sample.sectionTexts[part],bounds.from,bounds.to,part);
  return <main className="b1-final-shell" data-b2-reading-practice>
   {sourceBlocked ? <section className="b1-final-paper" role="alert"><h2>This sample is under review</h2><p>The supplied PDF repeats material from Test 1, so this sample cannot be counted as a distinct graded test until corrected content is available.</p><button type="button" onClick={()=>navigate("/exams/lesen")}>Back to Lesen samples</button></section> : null}
   <header className="b1-final-module-header">
@@ -79,10 +100,11 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
   </section>
   <section className="b1-final-paper">
    <h2>Teil {part+1}</h2>
-   <div className="b1-final-reading-text" style={{whiteSpace:"pre-wrap",lineHeight:1.7}}>{cleanSourceText(sample.sectionTexts[part])}</div>
+   <div className="b1-final-reading-text" style={{whiteSpace:"pre-wrap",lineHeight:1.7}}>{display.passage}</div>
    <h3>Antwortbogen</h3>
    {Array.from({length:bounds.to-bounds.from+1},(_,j)=>bounds.from+j).map(n=><fieldset key={n} style={{padding:12,margin:"12px 0",border:"1px solid #d6dbe5",borderRadius:9}}>
     <legend><strong>Aufgabe {n}</strong></legend>
+    {display.questions[n-bounds.from] ? <p style={{whiteSpace:"pre-wrap",lineHeight:1.6}}>{display.questions[n-bounds.from]}</p> : null}
     <div className="b1-final-choices" role="radiogroup" aria-label={"Aufgabe "+n}>
      {optionsFor(n).map(val=><label key={val} className={answers[n]===val?"selected":""}>
        <input type="radio" name={sample.id+"-"+n} checked={answers[n]===val} disabled={submitted||remaining===0} onChange={()=>answer(n,val)}/>
