@@ -49,6 +49,58 @@ export const sanitizeA1PrintDocument = () => {
       remove(privateNode);
     }
   }
+  // The full PDF workflow renders the deployed Falowen website, which can
+  // lag behind a just-merged GitHub change. Older lesson builds do not yet
+  // contain data-a1-print-private attributes. Recognize ONLY the exact legacy
+  // Firestore widgets by their field labels and structure; retain static
+  // exercise prompts elsewhere in the workbook.
+  for (const input of [...root.querySelectorAll('textarea[aria-label="Meine Vorstellung"]')]) {
+    const form = input.closest?.("form");
+    if (form && !form.closest?.("[data-a1-print-private]")) {
+      form.replaceWith(makeWritingSpace("Meine Vorstellung · Schreiben Sie 4–6 Sätze über sich.", 6));
+    }
+  }
+
+  for (const title of [...root.querySelectorAll("strong")]) {
+    const label = normalize(title.textContent);
+    // Only this widget owns a <section> containing student introduction
+    // cards. Never remove the enclosing Course Book lesson or its models.
+    if (/^(?:Class introductions|.{1,100}\s+introductions)$/i.test(label)) {
+      const section = title.closest?.("section");
+      if (section && section !== root &&
+        (section.querySelector?.("article") ||
+          /(?:No introductions from this class yet|Loading class member introductions|Class introductions)/i.test(normalize(section.textContent)) ||
+          section.querySelector?.("span"))) {
+        remove(section);
+      }
+    }
+
+    if (label === "Your corrected sentences") {
+      const form = title.closest?.("form");
+      const wrapper = form?.parentElement;
+      const text = normalize(wrapper?.textContent);
+      if (wrapper && wrapper !== root && wrapper.querySelector?.("textarea") &&
+          /Post to group discussion|Update my answers|Post your own answers to unlock the answer key|No answers posted in this class yet/i.test(text)) {
+        wrapper.replaceWith(makeWritingSpace("Satzbau · Schreiben Sie Ihre korrigierten Sätze.", 11));
+      }
+    }
+
+    if (label === "Write your paragraph here") {
+      const section = title.closest?.("section");
+      if (section && section !== root && section.querySelector?.("textarea") &&
+          /This saves to Group Discussion only/i.test(normalize(section.textContent))) {
+        section.replaceWith(makeWritingSpace("Meine Familie · Schreiben Sie 6–8 Sätze.", 9));
+      }
+    }
+  }
+
+  for (const note of [...root.querySelectorAll("span,p")]) {
+    if (note.children.length) continue;
+    if (/classmates['’] introductions appear here too/i.test(normalize(note.textContent))) {
+      note.textContent = "Schreiben Sie Ihre Vorstellung auf die Linien unten.";
+    }
+  }
+
   // The Day 3 live response questions are static outside these portal
   // mounts. Remove only the Firestore-backed response widgets.
   for (const node of [...root.querySelectorAll(
