@@ -526,6 +526,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
         }))}/>
       <article className="a2-mock-exam">
         <section className="a2-mock-part">
+          <TeilHeading data={sample[partKey]} />
           {partKey === "teil1" ? (
             <>
               <article className="a2-mock-newspaper">
