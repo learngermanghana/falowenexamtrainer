@@ -33,6 +33,16 @@ function harness({identity={role:"tutor"},results=[frozen]}={}){
         };
         return query;
       }
+      if(name==="liveSpeakSessions")return {
+        orderBy(field,order){expect([field,order]).toEqual(["startedAt","desc"]);return {
+          limit(n){expect(n).toBe(80);return {get:async()=>{dbReads++;return {docs:[{
+            id:"user-1",data:()=>({uid:UID,source:"exam-speaking-practice",level:"B1",
+              startedAt:{toDate:()=>new Date("2026-10-24T09:00:00Z")},
+              expiresAt:"2099-01-01T00:00:00.000Z",turnsUsed:4,answeredTurns:3,
+              examTask:{courseAssignmentKey:"B1-7.23"},inFlight:true})}],size:1};}};}
+        };},
+      };
+      if(name==="liveSpeakUsage")return {doc(){return {get:async()=>{dbReads++;return {data:()=>({turns:12})}}}}};
       if(name==="courseSpeakingMockAttempts"||name==="scores")return{
         doc(){return {get:async()=>{dbReads+=1;return {exists:false,data:()=>undefined}}};},
       };
@@ -57,19 +67,19 @@ function harness({identity={role:"tutor"},results=[frozen]}={}){
 test("No Firestore read occurs before staff explicitly invokes review",()=>{
   const h=harness();expect(h.dbReads).toBe(0);
 });
-test("Staff sees actual confirmed answers with grading but no invented playable audio",async()=>{
+test("Staff sees grade and activity metadata without words or recordings",async()=>{
   const h=harness();
   const r=await h.invoke();
   expect(r.statusCode).toBe(200);
   expect(r.body.results).toHaveLength(1);
   expect(r.body.results[0]).toMatchObject({
-    source:"course_book",answers:frozen.answers,score:85,audioAvailable:false,
+    source:"course_book",score:85,answeredQuestions:2,costUsd:null,
   });
-  expect(JSON.stringify(r.body)).not.toContain("audioBase64");
+  for(const secret of ["audioBase64","Ich schlage","Hallo, ich komme","A good discussion"]) expect(JSON.stringify(r.body)).not.toContain(secret);
   expect(h.dbReads).toBe(7);
   expect(h.aiCalls).toBe(0);
 });
-test("Non-staff requests cannot read student voice transcripts",async()=>{
+test("Non-staff requests cannot read student speaking activity",async()=>{
   const h=harness({identity:{uid:"random-learner"}});
   const r=await h.invoke();expect(r.statusCode).toBe(403);expect(h.dbReads).toBe(0);
 });
@@ -110,4 +120,20 @@ test("Matching same student under multiple name aliases is not incorrectly rejec
   const admin={firestore:()=>({collection:()=>({where(){return{limit(){return{get:async()=>({docs:[doc]})}}}}})})};
   const found=await resolveStudent({admin,findStudentByCodeOrEmail:async()=>null,input:"Matched learner"});
   expect(found.uid).toBe(UID);
+});
+
+test("Activity overview loads only on a staff request and shows usage without USD invention",async()=>{
+  const h=harness();
+  const r=await h.invoke({view:"activity",level:"B1"});
+  expect(r.statusCode).toBe(200);
+  expect(r.body.view).toBe("activity");
+  expect(r.body.activity).toHaveLength(1);
+  expect(r.body.activity[0]).toMatchObject({
+    level:"B1",source:"course_book",state:"processing",practiceTurns:4,
+    answeredQuestions:3,costUsd:null
+  });
+  expect(r.body.usage.reservedAiCallUnits).toBe(12);
+  expect(r.body.usage.costUsd).toBeNull();
+  expect(h.dbReads).toBe(2);
+  expect(JSON.stringify(r.body)).not.toContain("Ich schlage");
 });
