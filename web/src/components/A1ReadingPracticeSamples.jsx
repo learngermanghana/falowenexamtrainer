@@ -739,7 +739,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
         <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={3}
    onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
    onNext={() => setPartKey("teil"+Math.min(3,Number(partKey.slice(-1))+1))}>
-   answeredCount/15 answered
+   {answeredCount}/15 answered
   </ReadingPartFooter>
   <footer className="a1-reading-practice-footer">
           <div>
