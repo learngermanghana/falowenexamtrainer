@@ -63,7 +63,7 @@ export default function LesenPage({practiceLevel="",sampleId=""}){
   const samples=cfg?.available?samplesForLevel(normalizedLevel):[];
   const selected=sampleId?samples.find(item=>item.slug===sampleId):null;
   if(sampleId && selected && cfg?.available){
-    if(normalizedLevel==="C1")return <C1FinalMockExamPage/>;
+    if(normalizedLevel==="C1")return <C1FinalMockExamPage readingPractice/>;
     if(normalizedLevel==="B1")return <B1ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
     if(normalizedLevel==="A2")return <A2ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
     return <A1ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
