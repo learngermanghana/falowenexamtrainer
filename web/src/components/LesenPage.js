@@ -6,6 +6,8 @@ import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
 import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
+import B1PdfReadingPractice from "./B1PdfReadingPractice";
+import B1UploadedTests from "../data/b1ReadingPdfTests1to8.json";
 import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
 
@@ -33,7 +35,8 @@ const sampleMetaForLevel = (level) => {
   const questionCount = level === "B1" ? 30 : level === "A2" ? 20 : 15;
   const partCount = level === "B1" ? 5 : level === "A2" ? 4 : 3;
 
-  return samples.map((sample, index) => ({
+  const combinedSamples = level === "B1" ? [...samples, ...B1UploadedTests] : samples;
+  return combinedSamples.map((sample, index) => ({
     id: sample.id,
     slug: `sample-${index + 1}`,
     label: `Lesen Sample ${index + 1}`,
@@ -139,7 +142,9 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
       );
     }
 
-    return normalizedLevel === "B1" ? (
+    return normalizedLevel === "B1" && selected.id.startsWith("b1-reading-pdf-") ? (
+      <B1PdfReadingPractice initialSampleId={selected.id} standalone />
+    ) : normalizedLevel === "B1" ? (
       <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
     ) : normalizedLevel === "A2" ? (
       <A2ReadingPracticeSamples initialSampleId={selected.id} standalone />
