@@ -49,7 +49,7 @@ test("Private server grading accepts exact answers and rejected forged labels",(
 test("Release gate, protected attempt and deadline are server-owned",()=>{
  const app=fs.readFileSync(path.resolve(__dirname,"../app.js"),"utf8");
  const routes=fs.readFileSync(path.resolve(__dirname,"../b1Mock3LesenRoutes.js"),"utf8");
- expect(app).toContain("registerB1Mock3LesenRoutes");
+ expect(app).toContain('require("./b1Mock3LesenRoutes")');
  expect(routes).toContain('B1_MOCK3_LESEN_RELEASED==="true"');
  expect(routes).toContain("Date.now()+65*60*1000");
  expect(routes).toContain("b1Mock3LesenUsers");
