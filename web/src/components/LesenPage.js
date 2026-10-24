@@ -8,24 +8,15 @@ import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2Readi
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
 import B2ReadingPracticeSamples, { B2_READING_PRACTICE_SAMPLES } from "./B2ReadingPracticeSamples";
 import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
-import C1FinalMockExamPage from "./C1FinalMockExamPage";
+import C1ReadingPracticeSamples, { C1_READING_PRACTICE_SAMPLES } from "./C1ReadingPracticeSamples";
 
 const lesenLevels = [];
 
-const C1_READING_PRACTICE_SAMPLES = Object.freeze([
-  {
-    id: "c1-reading-01",
-    slug: "sample-1",
-    label: "C1 Lesen Sample 1",
-    detail: "30 questions · Teil 1–4",
-  },
-]);
-
 const sampleMetaForLevel = (level) => {
   const samples = level === "B1" ? B1_READING_PRACTICE_SAMPLES :
-    level === "A2" ? A2_READING_PRACTICE_SAMPLES : level === "B2" ? B2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
-  const questionCount = ["B1", "B2"].includes(level) ? 30 : level === "A2" ? 20 : 15;
-  const partCount = ["B1", "B2"].includes(level) ? 5 : level === "A2" ? 4 : 3;
+    level === "A2" ? A2_READING_PRACTICE_SAMPLES : level === "B2" ? B2_READING_PRACTICE_SAMPLES : level === "C1" ? C1_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
+  const questionCount = ["B1", "B2", "C1"].includes(level) ? 30 : level === "A2" ? 20 : 15;
+  const partCount = level === "C1" ? 4 : ["B1", "B2"].includes(level) ? 5 : level === "A2" ? 4 : 3;
 
   return samples.map((sample, index) => ({
     id: sample.id,
@@ -84,35 +75,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
     ? routeLevel
     : profileLevel;
 
-  if (normalizedLevel === "C1") {
-    const samples = C1_READING_PRACTICE_SAMPLES;
-    const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
-
-    if (sampleId && !selected) {
-      return (
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <h2 style={{ margin: 0 }}>C1 Lesen sample not found</h2>
-          <button type="button" style={styles.secondaryButton} onClick={() => openReadingSample("/exams/lesen", "Lesen samples opened successfully.")}>
-            Back to Lesen samples
-          </button>
-        </section>
-      );
-    }
-
-    if (!selected) {
-      return (
-        <SampleList
-          level="C1"
-          samples={samples}
-          onOpen={(sample) => openReadingSample(`/exams/lesen/c1/${sample.slug}`, `${sample.label} opened successfully.`)}
-        />
-      );
-    }
-
-    return <C1FinalMockExamPage />;
-  }
-
-  if (["A1", "A2", "B1", "B2"].includes(normalizedLevel)) {
+  if (["A1", "A2", "B1", "B2", "C1"].includes(normalizedLevel)) {
     const samples = sampleMetaForLevel(normalizedLevel);
     const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
 
@@ -141,7 +104,9 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
       );
     }
 
-    return normalizedLevel === "B2" ? (
+    return normalizedLevel === "C1" ? (
+      <C1ReadingPracticeSamples initialSampleId={selected.id} standalone />
+    ) : normalizedLevel === "B2" ? (
       <B2ReadingPracticeSamples initialSampleId={selected.id} standalone />
     ) : normalizedLevel === "B1" ? (
       <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
