@@ -10,7 +10,7 @@ export const B2_READING_PRACTICE_SAMPLES=tests;
 const PARTS=[{from:1,to:9},{from:10,to:15},{from:16,to:21},{from:22,to:27},{from:28,to:30}];
 const DURATION=65*60;
 const labelOf=value=>({a:"A",b:"B",c:"C",d:"D",e:"E",f:"F",g:"G",h:"H"})[value]||value.toUpperCase();
-const optionsFor=n=>n<=9||n>=22&&n<=27?["a","b","c","d"]:n<=15?["a","b","c","d","e","f","g","h"]:["a","b","c"];
+const optionsFor=n=>n<=9?["a","b","c","d"]:n<=15?["a","b","c","d","e","f","g","h"]:["a","b","c"];
 const format=s=>String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 
 export default function B2ReadingPracticeSamples({initialSampleId="",standalone=false}){
@@ -43,7 +43,7 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
   setAttempts(v=>({...v,[sample.id]:{...v[sample.id],submitted:true,attemptNumber:attempt?.attemptNumber}}));
   if(idToken&&attempt){
    setSync(v=>({...v,[sample.id]:"saving"}));
-   void saveExamRoomResult({idToken,level:"B2",section:"lesen",setId:sample.id,title:"B2 "+sample.label,score,total:30,percent:pct,passed:pct>=60,attemptId:attempt.id,attemptNumber:attempt.attemptNumber,resultType:"practice",route:"/exams/lesen/b2/sample-"+tests.indexOf(sample).toString(),sectionScores:Object.fromEntries(sectionScores.map(x=>[x.label.toLowerCase().replace(/\\s/g,""),x.score]))}).then(()=>setSync(v=>({...v,[sample.id]:"saved"}))).catch(()=>setSync(v=>({...v,[sample.id]:"failed"})));
+   void saveExamRoomResult({idToken,level:"B2",section:"lesen",setId:sample.id,title:"B2 "+sample.label,score,total:30,percent:pct,passed:pct>=60,attemptId:attempt.id,attemptNumber:attempt.attemptNumber,resultType:"practice",route:"/exams/lesen/b2/sample-"+(tests.indexOf(sample)+1),sectionScores:Object.fromEntries(sectionScores.map(x=>[x.label.toLowerCase().replace(/\\s/g,""),x.score]))}).then(()=>setSync(v=>({...v,[sample.id]:"saved"}))).catch(()=>setSync(v=>({...v,[sample.id]:"failed"})));
   }
  };
  const reset=()=>{setTimerOn(false);setTime(v=>({...v,[sample.id]:DURATION}));setAttempts(v=>({...v,[sample.id]:{answers:{},submitted:false}}));setSync(v=>({...v,[sample.id]:"idle"}));setPart(0)};
