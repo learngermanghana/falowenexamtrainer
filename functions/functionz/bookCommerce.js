@@ -21,6 +21,7 @@ function registerBookCommerceRoutes(app, { admin }) {
         checkoutTotalGhs: priceGhs,
       })),
       paymentsEnabled: paymentsEnabled(),
+      receiptConfirmationAvailable: true,
     });
   });
 
@@ -58,6 +59,11 @@ function registerBookCommerceRoutes(app, { admin }) {
           metadata: {
             productType: "falowen_book", orderId, bookId: book.id, priceGhs: book.priceGhs,
             format: book.format,
+            custom_fields: [
+              { display_name: "Product", variable_name: "product", value: book.title },
+              { display_name: "Edition", variable_name: "edition", value: book.format },
+              { display_name: "Falowen order ID", variable_name: "order_id", value: orderId },
+            ],
           }
         }),
       });
