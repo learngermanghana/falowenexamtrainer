@@ -87,3 +87,16 @@ test("A1 Day 22 PDF begins the complete Hören section on one page with a smalle
   assert.match(css, /break-inside: avoid-page !important/);
   assert.doesNotMatch(css, /data-a1-day22-health-teil='3'\][^{]*\{[^}]*display: none/);
 });
+
+
+test("A1 print compresses only Day 5 checklist, Day 6 hobbies quiz and Day 7 grammar quiz", () => {
+  const css = a1PrintCss("workbook");
+  assert.match(css, /\[data-a1-pdf-day5-selfcheck\] > div/);
+  assert.match(css, /line-height: 1\.25 !important; font-size: 12px !important/);
+  assert.match(css, /\[data-a1-pdf-day6-hobby-quiz\] button/);
+  assert.match(css, /break-inside: avoid-page !important; page-break-inside: avoid !important/);
+  assert.match(css, /\[data-a1-pdf-day7-grammar-quiz\] select/);
+  assert.match(css, /min-height: 26px !important; height: 26px !important/);
+  assert.doesNotMatch(css, /button\s*\{\s*display:\s*none/);
+  assert.match(css, /\[data-a1-day22-health-teil='3'\]/);
+});
