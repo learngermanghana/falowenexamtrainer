@@ -274,7 +274,7 @@ export default function ScrambledSentencesContributionBox({
   };
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
+    <div data-a1-print-private="scrambled-class-contribution" style={{ display: "grid", gap: 16 }}>
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
         <label style={{ display: "grid", gap: 8 }}>
           <strong>Your corrected sentences</strong>

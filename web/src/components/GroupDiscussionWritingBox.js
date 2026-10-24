@@ -262,7 +262,7 @@ export default function GroupDiscussionWritingBox({
   };
 
   return (
-    <section style={{ border: "1px solid #bfdbfe", borderRadius: 14, background: "#eff6ff", padding: 14, display: "grid", gap: 12 }}>
+    <section data-a1-print-private="family-group-discussion" style={{ border: "1px solid #bfdbfe", borderRadius: 14, background: "#eff6ff", padding: 14, display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 4 }}>
         <strong style={{ color: "#1d4ed8" }}>Write your paragraph here</strong>
         <span style={{ color: "#475569", fontSize: 14 }}>

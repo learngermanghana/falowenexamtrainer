@@ -587,8 +587,8 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="9) Final knowledge check">
         <p style={{ margin: 0 }}>Four final questions: three about separable verbs and one about the departure board in Section 6. Answer all four before checking.</p>
-        <p role="status" style={{ margin: 0, fontWeight: 700 }}>{answeredCount} of {knowledgeQuestions.length} questions answered</p>
-        <progress aria-label="Knowledge test completion" max={knowledgeQuestions.length} value={answeredCount} style={{ width: "100%", height: 12 }} />
+        <p data-a1-pdf-hide-ui="knowledge-progress" role="status" style={{ margin: 0, fontWeight: 700 }}>{answeredCount} of {knowledgeQuestions.length} questions answered</p>
+        <progress data-a1-pdf-hide-ui="knowledge-progress" aria-label="Knowledge test completion" max={knowledgeQuestions.length} value={answeredCount} style={{ width: "100%", height: 12 }} />
         <div style={{ display: "grid", gap: 14 }}>
           {knowledgeQuestions.map((question, index) => {
             const selected = selectedAnswers[question.id];

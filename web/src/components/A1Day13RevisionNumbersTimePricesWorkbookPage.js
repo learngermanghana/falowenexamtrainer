@@ -533,7 +533,7 @@ export default function A1RevisionOriginalContentPage() {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.page}>
-        <section style={heroCard}>
+        <section data-a1-day13-revision-hero="true" style={heroCard}>
           <img
             src={heroImage}
             alt="German revision lesson"

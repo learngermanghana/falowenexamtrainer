@@ -145,7 +145,7 @@ export default function LiveClassResponsePanel({
 
   return (
     <div
-      data-live-class-response="true"
+      data-live-class-response="true" data-a1-print-private="live-class-response"
       style={{
         marginTop: 8,
         border: "1px solid #dbeafe",

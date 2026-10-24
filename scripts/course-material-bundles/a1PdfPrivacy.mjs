@@ -29,6 +29,32 @@ export const sanitizeA1PrintDocument = () => {
     return block;
   };
 
+  // Real Firestore biographies and class answers occur in multiple A1 days,
+  // not only Day 13. Redact whole marked subtrees before resetting form fields:
+  // otherwise author names / posted sentences can survive DOM text extraction.
+  for (const privateNode of [...root.querySelectorAll("[data-a1-print-private]")]) {
+    const role = normalize(privateNode.getAttribute("data-a1-print-private"));
+    if (role === "biography-editor") {
+      privateNode.replaceWith(makeWritingSpace("Meine Vorstellung · Schreiben Sie 4–6 Sätze über sich.", 6));
+    } else if (role === "scrambled-class-contribution") {
+      privateNode.replaceWith(makeWritingSpace("Satzbau · Schreiben Sie Ihre korrigierten Sätze.", 11));
+    } else if (role === "family-group-discussion") {
+      privateNode.replaceWith(makeWritingSpace("Meine Familie · Schreiben Sie 6–8 Sätze.", 9));
+    } else if (role === "biography-online-explanation") {
+      privateNode.textContent = "Schreiben Sie Ihre Vorstellung auf die Linien unten.";
+      privateNode.removeAttribute("data-a1-print-private");
+    } else {
+      // Includes class introductions and anonymous-looking live result
+      // bars. These may contain actual learner answers and identities.
+      remove(privateNode);
+    }
+  }
+  // The Day 3 live response questions are static outside these portal
+  // mounts. Remove only the Firestore-backed response widgets.
+  for (const node of [...root.querySelectorAll(
+    "[data-live-class-response-mount], [data-live-class-response], [data-a1-day3-class-biography] [data-a1-print-private]"
+  )]) remove(node);
+
   // Day 19's CourseSpeakingMockAssignment uses a separate [data-speaking-mock]
   // root and can show recovered scores, transcripts, feedback and session IDs.
   // Replace the entire mock (including its nested live session), never just
@@ -225,6 +251,10 @@ export const sanitizeA1PrintDocument = () => {
 export const findA1PrintPrivacyLeaks = (text = "") => {
   const patterns = [
     ["class contributions", /Class contributions/i],
+    ["classmate biographies", /(?:Class introductions|class member introductions|introductions\s+\d+|This updates the same biography shown on the Class Members page|classmates' introductions appear here too)/i],
+    ["class-shared writing", /(?:What Your Classmates Shared|No classmates have shared an answer|Save and Share with Class|Only students in .{1,80} see this list|Post to group discussion|Class answers|No answers posted in this class yet)/i],
+    ["live class results", /(?:Class response\s*[·•-]\s*not graded|View classmates|class responses?|Saved to Group Discussion)/i],
+
     ["class discussion save", /Save to class discussion/i],
     ["saved speaking session", /Loading speaking practice|Check completed speaking Teils|speaking access and saved session|Saved speaking work|Your Teil scores|Session:\s*\S+|Download saved work for tutor review|Your result is saved/i],
     ["student draft or submission", /Assignment draft\s*[·•-]\s*Not submitted|Draft saved on this device|Use the Mark My Letter box above|saved into this assignment draft/i],

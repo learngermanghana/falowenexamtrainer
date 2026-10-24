@@ -16,7 +16,7 @@ export const cleanA1PrintChrome = () => {
 
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
-  const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils)$/i;
+  const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|← Back)$/i;
   for (const element of [...root.querySelectorAll("button,a")]) {
     if (actionText.test(normalize(element.textContent))) remove(element);
   }
@@ -37,6 +37,7 @@ export const cleanA1PrintChrome = () => {
     /^Not submitted for marking yet\.?$/i,
     /^\d+ of \d+ blanks completed$/i,
     /^\d+ of \d+ answered$/i,
+    /^\d+ of \d+ questions answered$/i,
     /^\d+ of \d+ sentences written$/i,
     /^Finish the workbook before submitting$/i,
     /^Your answers are saved as a draft\./i,
@@ -88,7 +89,7 @@ export const findA1PrintChromeLeaks = (text = "") => {
   const issues = [
     ["saved draft timestamp", /Saved to your assignment draft(?:\s*[·•-]\s*\d{1,2}:\d{2}\s*[AP]M)?/i],
     ["draft-only submission status", /Your answers are saved as a draft|NOT been submitted for marking|Complete every required answer above to unlock Review/i],
-    ["online completion progress", /^\s*\d+\s+of\s+\d+\s+(?:blanks completed|sentences written)\s*$/mi],
+    ["online completion progress", /^\s*\d+\s+of\s+\d+\s+(?:blanks completed|sentences written|questions answered)\s*$/mi],
     ["unprintable model buttons", /^\s*(?:Show model|Hide model)\s*$/mi],
     ["knowledge-test action buttons", /^\s*(?:Check knowledge test|Reset test)\s*$/mi],
     ["live recording controls", /^\s*(?:Record family answer|Save recording|Stop recording)\s*$/mi],
