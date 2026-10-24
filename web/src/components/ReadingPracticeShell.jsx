@@ -6,7 +6,7 @@ export const readingLevelConfig = Object.freeze({
   A2: {questions:20,parts:4,minutes:30,available:true},
   B1: {questions:30,parts:5,minutes:65,available:true},
   B2: {available:false},
-  C1: {questions:30,parts:4,minutes:65,available:true},
+  C1: {questions:26,parts:4,minutes:65,available:true},
   C2: {available:false},
 });
 export const formatReadingTime = value => {
@@ -19,13 +19,14 @@ export const readingProgressPercent = (answered,total) => total>0
 export function ReadingPracticeHeader({
   level, sampleLabel, total, partCount, durationSeconds, secondsLeft,
   answered, onBack, timerRunning=false, onToggleTimer, submitted=false,
+  timerPolicy="pausable", timerLabel="Time remaining",
 }) {
   return <header className="reading-standard-header">
     <div className="reading-standard-breadcrumb">
       <button type="button" className="reading-standard-back" onClick={onBack}>
         <span aria-hidden="true">←</span> All Lesen samples
       </button>
-      <span className="reading-standard-mode">Practice mode · Timer can be paused</span>
+      <span className="reading-standard-mode">{timerPolicy==="continuous"?"Timed practice · Timer continues while away":"Practice mode · Timer can be paused"}</span>
     </div>
     <div className="reading-standard-intro">
       <div>
@@ -36,12 +37,12 @@ export function ReadingPracticeHeader({
         </p>
       </div>
       <div className="reading-standard-clock" aria-label="Reading practice time remaining">
-        <span>Time remaining</span>
+        <span>{timerLabel}</span>
         <strong aria-live="off">{formatReadingTime(secondsLeft)}</strong>
         {onToggleTimer && !submitted ? <button type="button"
           disabled={secondsLeft===0} onClick={onToggleTimer}>
           {timerRunning?"Pause timer":secondsLeft===durationSeconds?"Start timer":"Resume timer"}
-        </button> : <small>{submitted?"Completed":"Readiness practice"}</small>}
+        </button> : <small>{submitted?"Completed":timerPolicy==="continuous"?"Exam-style clock":"Readiness practice"}</small>}
       </div>
     </div>
     <div className="reading-standard-progress-row">
@@ -56,25 +57,26 @@ export function ReadingPracticeHeader({
   </header>;
 }
 
-export function ReadingPracticeParts({level,parts,activePart,onSelect}) {
+export function ReadingPracticeParts({level,parts,activePart,onSelect,readOnly=false}) {
   const current=parts.findIndex(p=>p.id===activePart);
+  const PartTag=readOnly?"div":"button";
   return <nav className="reading-standard-parts" aria-label={`${level} Lesen part selector`}>
     <div className="reading-standard-parts-track">
-      {parts.map((p,i)=><button key={p.id} type="button"
+      {parts.map((p,i)=><PartTag key={p.id} type={readOnly?undefined:"button"}
         className={`reading-standard-part${p.id===activePart?" is-current":""}${p.answered===p.total?" is-complete":""}`}
         aria-current={p.id===activePart?"step":undefined}
-        onClick={()=>onSelect(p.id)}>
+        onClick={readOnly?undefined:()=>onSelect(p.id)}>
         <span>Teil {i+1}</span>
         <small>{p.answered}/{p.total} answered</small>
-      </button>)}
+      </PartTag>)}
     </div>
-    <div className="reading-standard-step-actions">
+    {!readOnly ? <div className="reading-standard-step-actions">
       <button type="button" disabled={current<=0}
         onClick={()=>onSelect(parts[current-1].id)}>← Previous Teil</button>
       <span>Teil {current+1} of {parts.length}</span>
       <button type="button" disabled={current<0||current===parts.length-1}
         onClick={()=>onSelect(parts[current+1].id)}>Next Teil →</button>
-    </div>
+    </div> : <div className="reading-standard-step-actions"><span>Teil {current+1} of {parts.length} · Continue in order</span></div>}
   </nav>;
 }
 
