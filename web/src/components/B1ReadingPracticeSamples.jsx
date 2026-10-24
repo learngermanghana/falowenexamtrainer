@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -14,6 +14,7 @@ import {
   getB1ReadingQuestions,
 } from "../data/b1ReadingPracticeSamples";
 import "./B1FinalMockExamPage.css";
+import { ReadingPracticeHeader, ReadingPracticeParts } from "./ReadingPracticeShell";
 
 const DURATION_SECONDS = 65 * 60;
 const timeLabel = (seconds) => {
@@ -68,6 +69,8 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   const [syncBySample, setSyncBySample] = useState({});
   const [timeBySample, setTimeBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
+  const [hydratedStorageKey, setHydratedStorageKey] = useState("");
+  const submittedForExpiry = useRef({});
 
   const sample = B1_READING_PRACTICE_SAMPLES.find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
   const partQuestions = useMemo(() => getB1ReadingQuestions(sample), [sample]);
@@ -85,6 +88,39 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   }));
   const weakest = getWeakestReadingSection(sectionScores);
   const studentKey = getReadingPracticeStudentKey({ user, studentProfile });
+  const storageKey = `falowen:exams:lesen:b1:three-samples:${studentKey || "guest"}`;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
+      if (!saved || typeof saved !== "object") return;
+      if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
+      if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
+      if (saved.timeBySample) setTimeBySample(saved.timeBySample);
+      if (!initialSampleId && B1_READING_PRACTICE_SAMPLES.some(item => item.id === saved.selectedId)) {
+        setSelectedId(saved.selectedId);
+      }
+      if (B1_READING_PART_KEYS.includes(saved.partKey)) setPartKey(saved.partKey);
+    } catch (_error) {
+      // A damaged local cache cannot prevent reading practice.
+    } finally {
+      setHydratedStorageKey(storageKey);
+    }
+  }, [initialSampleId, storageKey]);
+
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify({
+        selectedId, partKey, answersBySample, submittedBySample, timeBySample,
+        updatedAt: new Date().toISOString(),
+      }));
+    } catch (_error) {
+      // Storage limits must not prevent learners from answering.
+    }
+  }, [hydratedStorageKey,storageKey,selectedId,partKey,answersBySample,submittedBySample,timeBySample]);
+
 
   useEffect(() => {
     if (!timerRunning || submitted || secondsLeft <= 0) return undefined;
@@ -102,15 +138,17 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   }, [secondsLeft]);
 
   const onAnswer = (number, value) => {
-    if (submitted) return;
+    if (submitted || secondsLeft <= 0 || hydratedStorageKey !== storageKey) return;
     setAnswersBySample((current) => ({
       ...current,
       [sample.id]: { ...(current[sample.id] || {}), [number]: value },
     }));
   };
 
-  const submit = () => {
-    if (submitted || answeredCount !== allQuestions.length) return;
+  const submit = (allowPartial = false) => {
+    if (submitted || hydratedStorageKey !== storageKey || (!allowPartial && answeredCount !== allQuestions.length)) return;
+    if (submittedForExpiry.current[sample.id]) return;
+    submittedForExpiry.current[sample.id] = true;
     setTimerRunning(false);
     const attempt = saveReadingPracticeAttempt({
       level: "B1",
@@ -149,7 +187,13 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       });
   };
 
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey || submitted || secondsLeft !== 0) return;
+    submit(true); // Practice timeout: unanswered questions count as incorrect.
+  }, [hydratedStorageKey, storageKey, submitted, secondsLeft, sample.id]);
+
   const reset = () => {
+    submittedForExpiry.current[sample.id] = false;
     setTimerRunning(false);
     setAnswersBySample((current) => ({ ...current, [sample.id]: {} }));
     setSubmittedBySample((current) => ({ ...current, [sample.id]: false }));
@@ -175,16 +219,14 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   ));
 
   return (
-    <main className="b1-final-shell" data-b1-reading-practice-samples>
-      <header className="b1-final-module-header">
-        <p>B1 · Lesen · Exams Room</p>
-        <h1>{sample.label}</h1>
-        <p>Three independent reading samples · 30 questions in five Teile · 65 minutes each.</p>
-        <button type="button" onClick={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
-          {standalone ? "Back to Lesen samples" : "Back to Exams Room"}
-        </button>
-      </header>
-
+    <main className="b1-final-shell" data-b1-reading-practice-samples data-reading-standard="B1">
+      <ReadingPracticeHeader
+        level="B1" sampleLabel={sample.label} total={30} partCount={5}
+        durationSeconds={DURATION_SECONDS} secondsLeft={secondsLeft} answered={answeredCount}
+        timerRunning={timerRunning} submitted={submitted}
+        onToggleTimer={() => setTimerRunning(value => !value)}
+        onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}
+      />
       {!standalone ? (
         <nav aria-label="B1 reading sample selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {B1_READING_PRACTICE_SAMPLES.map((item, index) => (
@@ -194,29 +236,11 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           ))}
         </nav>
       ) : null}
-
-      <section className="b1-final-paper" style={{ display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", justifyContent: "space-between" }}>
-          <strong>Time left: {timeLabel(secondsLeft)}</strong>
-          <button type="button" disabled={submitted || secondsLeft === 0} onClick={() => setTimerRunning((value) => !value)}>
-            {timerRunning ? "Pause timer" : secondsLeft === DURATION_SECONDS ? "Start timer" : "Resume timer"}
-          </button>
-          <span>{answeredCount}/30 answered</span>
-        </div>
-        <nav aria-label="B1 reading Teil selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {B1_READING_PART_KEYS.map((key, index) => (
-            <button
-              key={key}
-              type="button"
-              disabled={partKey === key}
-              onClick={() => setPartKey(key)}
-            >
-              Teil {index + 1} · {partQuestions[key].filter((q) => answers[q.number]).length}/{PART_COUNT[key]}
-            </button>
-          ))}
-        </nav>
-      </section>
-
+      <ReadingPracticeParts level="B1" activePart={partKey} onSelect={setPartKey}
+        parts={B1_READING_PART_KEYS.map((key, index) => ({
+          id:key,label:`Teil ${index+1}`,total:PART_COUNT[key],
+          answered:partQuestions[key].filter(question => answers[question.number]).length,
+        }))}/>
       <section className="b1-final-paper">
         <h2>{sample[partKey].title}</h2>
         {partKey === "teil1" ? (
@@ -317,8 +341,8 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       <footer className="b1-final-paper">
         {!submitted ? (
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
-            <span>Complete every Teil before checking your answers ({answeredCount}/30).</span>
-            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30} onClick={submit}>
+            <span>{secondsLeft === 0 ? "Time expired. Unanswered tasks are scored as incorrect." : `Complete every Teil before checking your answers (${answeredCount}/30).`}</span>
+            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30 || submitted} onClick={() => submit(false)}>
               Check answers
             </button>
           </div>
