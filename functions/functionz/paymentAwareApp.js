@@ -7,6 +7,7 @@ const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
+const { registerBookCommerceRoutes, processBookWebhook } = require("./bookCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
 const { registerStaffSpeakingReviewRoutes } = require("./staffSpeakingReview");
 const { getScoresForStudent } = require("./scoresSheet");
@@ -246,6 +247,9 @@ const findStudentByCodeOrEmail = async ({ studentCode = "", email = "", uid = ""
 // Exam-only purchases reuse the same Paystack credentials and authenticated backend.
 registerMockCommerceRoutes(app, { admin, getAuthedUser });
 
+// Standalone ebooks have separate purchase entitlements, never tuition access.
+registerBookCommerceRoutes(app, { admin, getAuthedUser });
+
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
@@ -468,6 +472,11 @@ app.post("/paystack/webhook", async (req, res) => {
     // can create an exam entitlement. Webhook retries are idempotent.
     if (data?.metadata?.productType === "mock_package") {
       const result = await processMockWebhook({ admin, data });
+      return res.status(result.status).json(result.body);
+    }
+    // A signed ebook purchase is not a tuition payment or mock subscription.
+    if (data?.metadata?.productType === "book_pdf") {
+      const result = await processBookWebhook({ admin, data });
       return res.status(result.status).json(result.body);
     }
 
