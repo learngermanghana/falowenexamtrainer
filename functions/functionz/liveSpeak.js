@@ -421,10 +421,10 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("No speaking sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
         }
         const preparedFlow = examFlow ? {...examFlow} : null;
-        if (preparedFlow?.key === "B1-3" && !preparedFlow.discussion &&
+        if (preparedFlow?.key === "B1-3" &&
             existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0] &&
             existing.examTask?.mockAttemptId === examTask?.mockAttemptId) {
-          preparedFlow.contextTopic=existing.examTask.prompt;
+          preparedFlow.contextTopic=String(existing.examTask.keywords || existing.examTask.prompt).slice(0,180);
           preparedFlow.ownPresentation=String(existing.confirmedAnswers[0]).slice(0,2400);
         }
         const sessionId = crypto.randomUUID();
