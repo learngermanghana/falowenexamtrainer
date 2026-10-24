@@ -243,10 +243,10 @@ export const scoreA2MockSpeaking = async ({ attempts, attemptId, idToken, mockId
   return response.data?.result || response.data;
 };
 
-export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken }) => {
+export const scoreB1MockSpeaking = async ({ attempts, attemptId, idToken, mockId = "b1-mock-01" }) => {
   const response = await postMockAssessment(
     `${speakingApiUrl}/speaking/b1-mock-score`,
-    { attempts, attemptId },
+    { attempts, attemptId, mockId },
     { headers: authHeaders(idToken) }
   );
 
