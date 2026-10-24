@@ -28,10 +28,19 @@ function speakingTasks(choice="a"){
 }
 const err=(message,code="B1_MOCK3_SPEAKING_UNVERIFIED",status=409)=>
   Object.assign(new Error(message),{code,status});
-function verifyReceipt(receipt,{uid,attemptId,teil,choice="a",sessionId}){
+function verifyReceipt(receipt,{uid,attemptId,teil,choice="a",sessionId,deadlineMs=null}){
   const expected=speakingTasks(choice)[Number(teil)-1];
   if(!expected)throw err("Unexpected B1 Mock 3 speaking Teil","B1_MOCK3_SPEAKING_PART_INVALID",400);
   const score=Number(receipt?.assessment?.score),max=Number(receipt?.assessment?.maxScore);
+  // An attempt may only count a speaking part whose final immutable examiner
+  // receipt was saved before the exam deadline. One minute tolerates provider
+  // feedback/network finalization without restarting expired assignments.
+  const recordedAt=typeof receipt?.createdAt?.toMillis==="function"
+    ? receipt.createdAt.toMillis()
+    : receipt?.createdAt?.seconds ? Number(receipt.createdAt.seconds)*1000 : NaN;
+  if(deadlineMs!=null&&(!Number.isFinite(recordedAt)||recordedAt>Number(deadlineMs)+60*1000))
+    throw err("This speaking result was submitted after the mock deadline.");
+
   if(!receipt || receipt.uid!==uid || receipt.sessionId!==sessionId ||
     receipt.mockAttemptId!==attemptId || receipt.level!=="B1" ||
     receipt.task?.id!==MOCK_ID+"-speaking-teil-"+teil ||
