@@ -57,7 +57,7 @@ if(require.main===module){
     const message=String(err.response?.data?.error?.message||err.message||"");
     const isPermissionDenied=status===403 && providerStatus==="PERMISSION_DENIED";
     if(isPermissionDenied && process.env.GITHUB_OUTPUT){
-      fs.appendFileSync(process.env.GITHUB_OUTPUT,"permission_denied=true\\n");
+      fs.appendFileSync(process.env.GITHUB_OUTPUT,"permission_denied=true\n");
     }
     console.error("Firestore index reconciliation failed:",status||err.code||"unknown",
       message.slice(0,300));
