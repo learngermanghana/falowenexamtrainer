@@ -1395,6 +1395,9 @@ async function requireB1Mock2PracticeAccess(req, res) {
   return { db, authedUser };
 }
 
+// B1 Mock 3 Sprechen reuses the authenticated B1 practice access rules.
+require("./b1Mock3SpeakingRoutes")(app,{admin,requireAccess:requireB1Mock2PracticeAccess});
+
 app.get("/b1-mock-02/hoeren/questions", async (req, res) => {
   try {
     const access = await requireB1Mock2PracticeAccess(req, res);
