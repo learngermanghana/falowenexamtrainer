@@ -78,9 +78,10 @@ jobs:
       - name: Test index comparison and creation payload
         run: node --test scripts/deployFirestoreIndexes.test.cjs
       - name: Reconcile indexes through Firestore API without Firestore Rules validation
+        id: reconcile
         run: node scripts/deployFirestoreIndexes.cjs
       - name: Explain one-time index deployment IAM permission if blocked
-        if: failure()
+        if: ${{ failure() && steps.reconcile.outcome == 'failure' && steps.reconcile.outputs.permission_denied == 'true' }}
         shell: bash
         run: |
           account="$(node -e 'const fs=require("fs");const path=process.env.GOOGLE_APPLICATION_CREDENTIALS;try{console.log(JSON.parse(fs.readFileSync(path,"utf8")).client_email||"unknown")}catch{console.log("unknown")}' )"
