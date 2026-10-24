@@ -24,6 +24,7 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
  const [time,setTime]=useState({});
  const sample=useMemo(()=>tests.find(x=>x.id===selected)||tests[0],[selected]);
  const answers=attempts[sample.id]?.answers||{};
+ const sourceBlocked=sample.availability==="needs_revision";
  const submitted=Boolean(attempts[sample.id]?.submitted);
  const remaining=time[sample.id]??DURATION;
  const count=Object.values(answers).filter(Boolean).length;
@@ -37,28 +38,29 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
  useEffect(()=>{if(remaining===0)setTimerOn(false)},[remaining]);
  const answer=(n,value)=>{if(!submitted)setAttempts(v=>({...v,[sample.id]:{...v[sample.id],answers:{...v[sample.id]?.answers,[n]:value}}}))};
  const submit=()=>{
-  if(submitted||count!==30)return;
+  if(submitted||count!==30||sourceBlocked||remaining===0)return;
   setTimerOn(false);
   const attempt=saveReadingPracticeAttempt({level:"B2",setId:sample.id,score,total:30,elapsedSeconds:DURATION-remaining,sectionScores,studentKey});
   setAttempts(v=>({...v,[sample.id]:{...v[sample.id],submitted:true,attemptNumber:attempt?.attemptNumber}}));
   if(idToken&&attempt){
    setSync(v=>({...v,[sample.id]:"saving"}));
-   void saveExamRoomResult({idToken,level:"B2",section:"lesen",setId:sample.id,title:"B2 "+sample.label,score,total:30,percent:pct,passed:pct>=60,attemptId:attempt.id,attemptNumber:attempt.attemptNumber,resultType:"practice",route:"/exams/lesen/b2/sample-"+(tests.indexOf(sample)+1),sectionScores:Object.fromEntries(sectionScores.map(x=>[x.label.toLowerCase().replace(/\\s/g,""),x.score]))}).then(()=>setSync(v=>({...v,[sample.id]:"saved"}))).catch(()=>setSync(v=>({...v,[sample.id]:"failed"})));
+   void saveExamRoomResult({idToken,level:"B2",section:"lesen",setId:sample.id,title:"B2 "+sample.label,score,total:30,percent:pct,passed:pct>=60,attemptId:attempt.id,attemptNumber:attempt.attemptNumber,resultType:"practice",route:"/exams/lesen/b2/sample-"+(tests.indexOf(sample)+1),sectionScores:Object.fromEntries(sectionScores.map(x=>[x.label.toLowerCase().replace(/\s/g,""),x.score]))}).then(()=>setSync(v=>({...v,[sample.id]:"saved"}))).catch(()=>setSync(v=>({...v,[sample.id]:"failed"})));
   }
  };
  const reset=()=>{setTimerOn(false);setTime(v=>({...v,[sample.id]:DURATION}));setAttempts(v=>({...v,[sample.id]:{answers:{},submitted:false}}));setSync(v=>({...v,[sample.id]:"idle"}));setPart(0)};
  const bounds=PARTS[part];
  return <main className="b1-final-shell" data-b2-reading-practice>
+  {sourceBlocked ? <section className="b1-final-paper" role="alert"><h2>This sample is under review</h2><p>The supplied PDF repeats material from Test 1, so this sample cannot be counted as a distinct graded test until corrected content is available.</p><button type="button" onClick={()=>navigate("/exams/lesen")}>Back to Lesen samples</button></section> : null}
   <header className="b1-final-module-header">
    <p>B2 · Lesen · Exams Room</p><h1>{sample.label}</h1>
    <p>30 Aufgaben · Fünf Teile · 65 Minuten</p>
    <button type="button" onClick={()=>navigate(standalone?"/exams/lesen":"/exams/overview")}>Back to Lesen samples</button>
   </header>
-  {!standalone?<nav aria-label="B2 reading sample selector">{tests.map((x,i)=><button type="button" key={x.id} onClick={()=>{setSelected(x.id);setPart(0);setTimerOn(false)}}>Lesen Sample {i+1}</button>)}</nav>:null}
+  {!standalone?<nav aria-label="B2 reading sample selector">{tests.map((x,i)=><button type="button" key={x.id} disabled={x.availability==="needs_revision"} onClick={()=>{setSelected(x.id);setPart(0);setTimerOn(false)}}>Lesen Sample {i+1}</button>)}</nav>:null}
   <section className="b1-final-paper">
    <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
     <strong>Time left: {format(remaining)}</strong>
-    <button type="button" disabled={submitted||remaining===0} onClick={()=>setTimerOn(v=>!v)}>{timerOn?"Pause timer":remaining===DURATION?"Start timer":"Resume timer"}</button>
+    <button type="button" disabled={submitted||remaining===0||sourceBlocked} onClick={()=>setTimerOn(v=>!v)}>{timerOn?"Pause timer":remaining===DURATION?"Start timer":"Resume timer"}</button>
     <span>{count}/30 answered</span>
    </div>
    <nav aria-label="B2 Lesen Teil selector" style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:14}}>
@@ -81,7 +83,7 @@ export default function B2ReadingPracticeSamples({initialSampleId="",standalone=
    </fieldset>)}
   </section>
   <footer className="b1-final-paper">
-   {!submitted?<><p>Complete all 30 questions before checking your answers.</p><button className="b1-final-primary" type="button" disabled={count!==30} onClick={submit}>Check answers ({count}/30)</button></>:
+   {!submitted?<><p>Complete all 30 questions before checking your answers.</p><button className="b1-final-primary" type="button" disabled={count!==30||remaining===0||sourceBlocked} onClick={submit}>Check answers ({count}/30)</button></>:
    <div role="status"><h2>Result: {score}/30 · {pct}% · {getReadingReadinessLabel(pct)}</h2><p>{weakest?"Practise next: "+weakest.label:""}</p><p>{sectionScores.map(x=>x.label+": "+x.score+"/"+x.total).join(" · ")}</p><p>{sync[sample.id]==="saved"?"Your result is synced.":sync[sample.id]==="saving"?"Syncing result…":sync[sample.id]==="failed"?"Cloud sync not confirmed.":"Practice submitted."}</p><button type="button" onClick={reset}>Try again</button></div>}
   </footer>
  </main>;
