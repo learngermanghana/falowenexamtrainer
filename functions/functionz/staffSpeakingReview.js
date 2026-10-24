@@ -60,11 +60,14 @@ async function resolveStudent({ admin, findStudentByCodeOrEmail, input }) {
     }
   }
   const row=record?.snap?.data?.() || {};
-  let uid=clean(row.uid || row.authUid || row.firebaseUid || row.firebaseAuthUid);
-  if (!uid && value.includes("@")) {
-    try { uid=(await admin.auth().getUserByEmail(value.toLowerCase())).uid; }
-    catch { /* Missing Auth account is not evidence of completed practice. */ }
+  let uid=clean(row.uid || row.authUid || row.firebaseUid || row.firebaseAuthUid || row.studentUID);
+  const associatedEmail=clean(row.email || (value.includes("@") ? value.toLowerCase() : "")).toLowerCase();
+  if (!uid && associatedEmail) {
+    try { uid=(await admin.auth().getUserByEmail(associatedEmail)).uid; }
+    catch { /* An unlinked account is not evidence of recorded practice. */ }
   }
+  const docId=clean(record?.ref?.id);
+  if (!uid && /^[A-Za-z0-9_-]{20,128}$/.test(docId)) uid=docId;
   if (!uid && !value.includes("@") && /^[A-Za-z0-9_-]{20,128}$/.test(value)) uid=value;
   if (!uid) {
     const e=new Error("Student UID not found. Search using the registered login email or Firebase UID.");
