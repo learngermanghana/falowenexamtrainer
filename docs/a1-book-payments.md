@@ -15,7 +15,7 @@ This adds a separate book-payment checkout to the **existing** Falowen frontend 
 ## Safe launch gate
 Book checkout is **OFF by default**. The initial fulfilment process is manual, using Paystack's customer receipt and verified transaction reference. To enable it after final PDF review, configure `FALOWEN_BOOK_PAYMENTS_ENABLED=true` in the deployed Firebase Functions environment. The existing `PAYSTACK_SECRET` is used by the shared backend. Do not add payment secrets to the browser, Git repository, or Vercel frontend.
 
-The public book page still displays editions/prices while checkout is disabled. Never switch payments on until there is a reliable process for fulfilling paid orders and contacting buyers.
+The public book page displays editions/prices while checkout is disabled. On production API deployment, the release workflow verifies that the receipt-verification API is live and both prices are correct, then sets `FALOWEN_BOOK_PAYMENTS_ENABLED=true` in the existing Cloud Run service. If deployment or those checks fail, book payments stay off. To suspend payments, set the same Cloud Run environment variable to `false` and review the release workflow before the next deployment.
 
 ## Verified payment flow
 1. Buyer enters name, email, phone and selects an edition.
@@ -43,5 +43,6 @@ No automated PDF delivery, admin tracking, or printing workflow is included.
 - [ ] Turn on Paystack customer email receipts and merchant receipt notifications in Dashboard.
 - [ ] Use Paystack test credentials in a non-production Functions environment; verify valid and invalid webhooks and retries.
 - [ ] Check buyer return works on mobile (success, pending, declined).
-- [ ] Configure the enable flag only when fulfilment is operational.
+- [ ] Check the activation step in the Firebase API deployment and confirm `GET /books/catalog` reports `paymentsEnabled: true`.
+- [ ] Test one end-to-end live Paystack receipt and confirm the Paystack Dashboard reference matches the Falowen order.
 - [ ] Add PDF access, admin fulfillment, and delivery integration as separate follow-up work.
