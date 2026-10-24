@@ -73,7 +73,7 @@ jobs:
           node --check functionz/app.js
           node --check functionz/paymentAwareApp.js
           node --check functionz/bookCommerce.js
-          node --test __tests__/bookCommerce.test.js
+          node --test __tests__/bookCommerce.test.js __tests__/bookReceiptVerification.test.js
           node --check functionz/paystackFeePolicy.js
           node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); if (!exported.sendPushTestNotification) throw new Error("Push test callable export was not discovered"); if (!exported.sendClassPushLifecycleReminders) throw new Error("Class push reminder scheduler export was not discovered"); if (!exported.onClassSessionPushLifecycleUpdated) throw new Error("Class push lifecycle Firestore trigger export was not discovered"); console.log("Firebase API, resubmission, push test and class push lifecycle exports discovered");'
 
@@ -112,6 +112,55 @@ jobs:
           status=$?
           tail -n 180 firebase-deploy.log || true
           exit "$status"
+
+      - name: Activate verified A1 book checkout after API deployment
+        shell: bash
+        run: |
+          set -euo pipefail
+          catalog_url="https://api-awc2au65xa-ew.a.run.app/books/catalog"
+          ready=false
+          for attempt in $(seq 1 18); do
+            catalog="$(curl --fail --silent --show-error --max-time 12 "$catalog_url" || true)"
+            if echo "$catalog" | jq -e '
+              .receiptConfirmationAvailable == true
+              and ([.books[] | select(.id == "a1-digital" and .priceGhs == 99)] | length) == 1
+              and ([.books[] | select(.id == "a1-printed" and .priceGhs == 800)] | length) == 1
+            ' >/dev/null 2>&1; then
+              ready=true
+              break
+            fi
+            echo "A1 receipt checkout is not on the live API yet (attempt $attempt)"
+            sleep 10
+          done
+          if [ "$ready" != "true" ]; then
+            echo "::error::Refusing to enable book payments without verified receipt checkout and correct prices."
+            exit 1
+          fi
+          if echo "$catalog" | jq -e '.paymentsEnabled == true' >/dev/null 2>&1; then
+            echo "A1 book checkout already enabled. No Cloud Run update required."
+            exit 0
+          fi
+          # Safe manual fulfilment: Paystack email receipt/reference is the buyer's
+          # proof; Falowen independently verifies every transaction before fulfilment.
+          gcloud run services update "$CLOUD_RUN_SERVICE" \
+            --project "$FIREBASE_PROJECT_ID" \
+            --region "$CLOUD_RUN_REGION" \
+            --update-env-vars FALOWEN_BOOK_PAYMENTS_ENABLED=true \
+            --quiet
+          enabled=false
+          for attempt in $(seq 1 18); do
+            catalog="$(curl --fail --silent --show-error --max-time 12 "$catalog_url" || true)"
+            if echo "$catalog" | jq -e '.receiptConfirmationAvailable == true and .paymentsEnabled == true' >/dev/null 2>&1; then
+              enabled=true
+              break
+            fi
+            sleep 10
+          done
+          if [ "$enabled" != "true" ]; then
+            echo "::error::Book receipt checkout activation could not be confirmed."
+            exit 1
+          fi
+          echo "Receipt-based A1 checkout is enabled at https://www.falowen.app/books"
 
       - name: Deploy account deletion and notification safeguards in small batches
         shell: bash

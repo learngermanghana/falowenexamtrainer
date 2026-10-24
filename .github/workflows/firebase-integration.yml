@@ -43,7 +43,7 @@ jobs:
       - name: Validate A1 book payment order reconciliation
         run: |
           node --check functions/functionz/bookCommerce.js
-          node --test functions/__tests__/bookCommerce.test.js
+          node --test functions/__tests__/bookCommerce.test.js functions/__tests__/bookReceiptVerification.test.js
 
       - name: Run Firebase emulator integration tests
         run: npm run test:integration
