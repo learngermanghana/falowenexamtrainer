@@ -87,9 +87,7 @@ export default function B1Mock2Hoeren({embedded=false,onComplete,onAnswersChange
       <strong>Teil {part?.part||1}</strong>
     </header>
     <p role="note">
-      Hören-Übung mit vier Teilen. Die Auswertung wird nach der Abgabe serverseitig
-      gespeichert. Das Ergebnis ist noch kein vollständiges B1-Mock-Ergebnis
-      für Lesen, Hören, Schreiben und Sprechen.
+      {embedded ? "Modul 2 von 4. Schließen Sie alle vier Hörteile ab; danach öffnet sich Schreiben." : "Hören-Übung mit vier Teilen. Dies allein ist kein vollständiges vierteiliges B1-Mock-Ergebnis."}
     </p>
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Prüfungsaufgaben werden geladen …</p>:null}
