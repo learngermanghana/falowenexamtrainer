@@ -246,34 +246,34 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         {partKey === "teil1" ? (
           <>
             <p>{sample.teil1.intro}</p>
-            <div className="b1-final-reading-text">
+            <div className="reading-standard-split"><div className="reading-standard-source"><div className="b1-final-reading-text">
               <h3>{sample.teil1.heading}</h3><em>{sample.teil1.subheading}</em><p>{sample.teil1.date}</p>
               {sample.teil1.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-            </div>
-            {renderQuestions(partQuestions.teil1, "teil1")}
+            </div></div>
+            <div className="reading-standard-answers">{renderQuestions(partQuestions.teil1, "teil1")}</div></div>
           </>
         ) : null}
 
         {partKey === "teil2" ? (
           <>
             <p>Lesen Sie die beiden Artikel und wählen Sie a, b oder c.</p>
-            <div className="b1-final-press-text">
+            <div className="reading-standard-split"><div className="reading-standard-source"><div className="b1-final-press-text">
               <h3>{sample.teil2.heading}</h3>
               {sample.teil2.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-            </div>
-            {renderQuestions(sample.teil2.questions, "teil2")}
-            <div className="b1-final-press-text">
+            </div></div>
+            <div className="reading-standard-answers">{renderQuestions(sample.teil2.questions, "teil2")}</div></div>
+            <div className="reading-standard-split"><div className="reading-standard-source"><div className="b1-final-press-text">
               <h3>{sample.teil2.text2.heading}</h3>
               {sample.teil2.text2.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
-            </div>
-            {renderQuestions(sample.teil2.text2.questions, "teil2")}
+            </div></div>
+            <div className="reading-standard-answers">{renderQuestions(sample.teil2.text2.questions, "teil2")}</div></div>
           </>
         ) : null}
 
         {partKey === "teil3" ? (
           <>
             <p>{sample.teil3.context}</p>
-            <div className="b1-final-ads">
+            <div className="reading-standard-split"><div className="reading-standard-source"><div className="b1-final-ads">
               {sample.teil3.ads.map(([letter, title, description]) => (
                 <article key={letter}>
                   <strong>Anzeige {letter}{letter === "C" ? " · Beispiel" : ""}</strong>
@@ -281,7 +281,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
                 </article>
               ))}
             </div>
-            <div className="b1-final-situations">
+            </div><div className="reading-standard-answers"><div className="b1-final-situations">
               {sample.teil3.situations.map((question) => (
                 <label key={question.number}>
                   <span><strong>Aufgabe {question.number}.</strong> {question.text}</span>
@@ -304,7 +304,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
                   ) : null}
                 </label>
               ))}
-            </div>
+            </div></div></div>
           </>
         ) : null}
 
@@ -329,11 +329,11 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         {partKey === "teil5" ? (
           <>
             <p>{sample.teil5.context}</p>
-            <div className="b1-final-reading-text">
+            <div className="reading-standard-split"><div className="reading-standard-source"><div className="b1-final-reading-text">
               <h3>{sample.teil5.heading}</h3>
               {sample.teil5.sections.map(([heading, paragraph]) => <section key={heading}><h4>{heading}</h4><p>{paragraph}</p></section>)}
-            </div>
-            {renderQuestions(partQuestions.teil5, "teil5")}
+            </div></div>
+            <div className="reading-standard-answers">{renderQuestions(partQuestions.teil5, "teil5")}</div></div>
           </>
         ) : null}
       </section>
