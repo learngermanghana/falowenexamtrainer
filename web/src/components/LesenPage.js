@@ -12,6 +12,8 @@ import A2ReadingPracticeSamples,{A2_READING_PRACTICE_SAMPLES} from "./A2ReadingP
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
 import {B1_READING_PRACTICE_SAMPLES} from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
+import {C1_READING_PRACTICE_STORAGE_KEY} from "../data/c1FinalMockData";
+import {getStudentMockStorageKey} from "../utils/mockReviewAccess";
 import "./ReadingPracticeShell.css";
 
 const LEVELS=["A1","A2","B1","B2","C1","C2"];
@@ -29,8 +31,20 @@ const samplesForLevel=level=>{
     detail:`${config.questions} questions · ${config.parts} Teile · ${config.minutes} minutes`,
   }));
 };
-const progressFor=(level,studentKey)=>{
-  if(!["A1","A2","B1"].includes(level)||typeof window==="undefined")return {};
+const progressFor=(level,studentKey,userId)=>{
+  if(typeof window==="undefined")return {};
+  if(level==="C1"){
+    try{
+      const c1=JSON.parse(window.localStorage.getItem(
+        getStudentMockStorageKey(C1_READING_PRACTICE_STORAGE_KEY,userId))||"null");
+      if(!c1)return {};
+      const keys=["teil1Answers","teil2Answers","teil3Answers","teil4Answers"];
+      const responses=Object.assign({},...keys.map(key=>c1[key]||{}));
+      return {submittedBySample:{"c1-reading-01":Boolean(c1.completed)},
+        answersBySample:{"c1-reading-01":responses}};
+    }catch{return {};}
+  }
+  if(!["A1","A2","B1"].includes(level))return {};
   try{
     const saved=JSON.parse(window.localStorage.getItem(
       `falowen:exams:lesen:${level.toLowerCase()}:three-samples:${studentKey||"guest"}`
@@ -68,7 +82,7 @@ export default function LesenPage({practiceLevel="",sampleId=""}){
     if(normalizedLevel==="A2")return <A2ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
     return <A1ReadingPracticeSamples initialSampleId={selected.id} standalone/>;
   }
-  const progress=progressFor(normalizedLevel,studentKey);
+  const progress=progressFor(normalizedLevel,studentKey,user?.uid);
   const history=getReadingPracticeHistory(normalizedLevel,studentKey);
   const enriched=samples.map(sample=>({
     ...sample,
