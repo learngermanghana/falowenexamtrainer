@@ -32,7 +32,8 @@ const requiredMarkers = {
     'stem: "5) Das sind ___ Bücher."',
   ],
   "web/src/data/a1TeacherVideoResources.js": [
-    '[11, "7", "Understanding Time", "https://youtu.be/8FnvD8LQEu0"],',
+    '[11, "7", "Understanding Time", "https://youtu.be/I_bDa_Vz4JE"],',
+    '[12, "8", "The 24-Hour Clock", "https://youtu.be/O10ziTyE3Ww"],',
   ],
   "web/src/components/Day0StudentWorkflowUpgrade.js": [
     'id: "PP38eObAMh8"',
