@@ -128,6 +128,7 @@ const PARTS = Object.freeze([
       {
         "title": "Text 1 · Carsharing in einer Kleinstadt",
         "isReconstructed": true,
+        "reconstructionApprovedByTeacher": true,
         "paragraphs": [
           "Carsharing gibt es längst nicht mehr nur in großen Städten. Ein Pilotprojekt in der Kleinstadt Menden zeigt nun, dass das gemeinsame Nutzen von Autos auch außerhalb der Metropolen erfolgreich sein kann. Statt selbst einen Wagen zu besitzen, können Bürger für einzelne Fahrten ein Fahrzeug ausleihen.",
           "Die Bürger können die Autos per Smartphone-App buchen und stundenweise mieten. Auf der App sehen sie, wann ein Wagen frei ist und wo er abgeholt werden kann. Besonders Menschen, die nur gelegentlich ein Auto brauchen, finden dieses Angebot praktisch.",
@@ -880,7 +881,7 @@ const PARTS = Object.freeze([
   }
 ]);
 const QA_NOTES=Object.freeze([
-  "Text 1 in Lesen Teil 2 was provided only through answer rationales; its Menden Carsharing passage and questions 7–9 were reconstructed to match those rationales and require teacher approval.",
+  "Text 1 in Lesen Teil 2 was reconstructed from the teacher-supplied Menden Carsharing answer rationales with permission on 24 October 2026; questions 7–9 and their answer key are preserved.",
   "Lesen Teil 4 supplied only six numbered comments 21–26 and a Niko example. To retain exactly seven scored items, the supplied Niko example is numbered question 20 (not an unscored example)."
 ]);
 const QUESTIONS=Object.freeze(PARTS.flatMap(part=>part.questions.map(item=>({...item,part:part.part}))));
