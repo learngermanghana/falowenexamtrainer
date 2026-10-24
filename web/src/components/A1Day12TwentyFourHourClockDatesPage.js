@@ -3,129 +3,56 @@ import AppBackButton from "./navigation/AppBackButton";
 import { styles } from "../styles";
 
 const WORKBOOK_ROUTE = "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook";
-const KNOWLEDGE_TEST_PASS_MARK = 9;
+const KNOWLEDGE_TEST_PASS_MARK = 4;
 
 const KNOWLEDGE_TEST_QUESTIONS = Object.freeze([
   {
     id: "time-1",
     topic: "24-hour clock",
-    prompt: "How do you say 18:45 formally in German?",
-    options: [
-      "achtzehn Uhr fünfundvierzig",
-      "acht Uhr fünfundvierzig",
-      "neunzehn Uhr fünfzehn",
-      "Viertel nach achtzehn",
-    ],
-    answer: "achtzehn Uhr fünfundvierzig",
-    explanation: "Formal 24-hour time follows: hour + Uhr + minutes.",
+    prompt: "What is 7:00 PM in the German 24-hour clock?",
+    options: ["17:00", "07:00", "19:00"],
+    answer: "19:00",
+    explanation: "Seven in the evening is 19:00. Add 12 to the hour after noon.",
   },
   {
     id: "time-2",
-    topic: "24-hour clock",
-    prompt: "What time is halb neun?",
-    options: ["08:30", "09:30", "08:09", "20:30"],
-    answer: "08:30",
-    explanation: "halb neun means halfway to nine, so it is 08:30.",
+    topic: "Exact minutes",
+    prompt: "How do you say 14:21 in German?",
+    options: ["vierzehn Uhr zwölf", "vierzehn Uhr einundzwanzig", "vier Uhr einundzwanzig"],
+    answer: "vierzehn Uhr einundzwanzig",
+    explanation: "Say the hour + Uhr + minutes: vierzehn Uhr einundzwanzig.",
   },
   {
     id: "time-3",
-    topic: "24-hour clock",
-    prompt: "Which 24-hour time means 2:15 PM?",
-    options: ["02:15", "12:15", "14:15", "22:15"],
-    answer: "14:15",
-    explanation: "For afternoon times, add 12 to the hour: 2 PM becomes 14:00.",
+    topic: "12-hour clock",
+    prompt: "What does „acht Uhr abends“ mean?",
+    options: ["20:00", "08:00", "18:00"],
+    answer: "20:00",
+    explanation: "Acht Uhr abends is eight in the evening: 20:00.",
   },
   {
-    id: "time-4",
-    topic: "24-hour clock",
-    prompt: "A train leaves at 21:05. Which formal German time is correct?",
-    options: [
-      "einundzwanzig Uhr fünf",
-      "neun Uhr fünf",
-      "einundzwanzig Uhr fünfzig",
-      "fünf nach einundzwanzig Uhr abends",
-    ],
-    answer: "einundzwanzig Uhr fünf",
-    explanation: "Say the hour first, then Uhr, then the minutes.",
-  },
-  {
-    id: "time-5",
-    topic: "24-hour clock",
-    prompt: "What does 00:00 mean?",
-    options: ["Mittag", "Mitternacht", "halb null", "zwölf Uhr nachmittags"],
-    answer: "Mitternacht",
-    explanation: "00:00 is midnight: Mitternacht or null Uhr.",
-  },
-  {
-    id: "time-6",
-    topic: "24-hour clock",
-    prompt: "Which time is Viertel vor zehn?",
-    options: ["09:15", "09:45", "10:15", "10:45"],
-    answer: "09:45",
-    explanation: "Viertel vor zehn means fifteen minutes before ten.",
+    id: "month-1",
+    topic: "Months",
+    prompt: "Which month comes after März?",
+    options: ["Mai", "Januar", "April"],
+    answer: "April",
+    explanation: "März is March, and April comes next.",
   },
   {
     id: "date-1",
     topic: "Dates",
-    prompt: "Complete: Heute ist ___ . (3 February)",
-    options: [
-      "der dritte Februar",
-      "am dritten Februar",
-      "der drei Februar",
-      "den dritten Februar",
-    ],
-    answer: "der dritte Februar",
-    explanation: "After Heute ist, use der + ordinal number + month.",
+    prompt: "How do you say 5. Juli in German when giving today's date?",
+    options: ["der fünf Juli", "der fünfte Juli", "der fünfzehnte Juli"],
+    answer: "der fünfte Juli",
+    explanation: "The fifth takes the ordinal form fünfte.",
   },
   {
     id: "date-2",
     topic: "Dates",
-    prompt: "Complete: Ich habe ___ Geburtstag. (5 May)",
-    options: ["der fünfte Mai", "am fünften Mai", "im fünften Mai", "am fünf Mai"],
-    answer: "am fünften Mai",
-    explanation: "After am, the ordinal adjective takes the ending -en.",
-  },
-  {
-    id: "date-3",
-    topic: "Dates",
-    prompt: "How do you say 25 December as a date?",
-    options: [
-      "der fünfundzwanzigste Dezember",
-      "der fünfundzwanzig Dezember",
-      "am fünfundzwanzigste Dezember",
-      "der fünfundzwanzigsten Dezember",
-    ],
-    answer: "der fünfundzwanzigste Dezember",
-    explanation: "Numbers from 20 to 31 normally form the date ordinal with -ste.",
-  },
-  {
-    id: "date-4",
-    topic: "Dates",
-    prompt: "How is 7 August 2026 written in German numerical format?",
-    options: ["08.07.2026", "07.08.2026", "2026.08.07", "07/08/26"],
-    answer: "07.08.2026",
-    explanation: "German numerical dates normally follow day.month.year.",
-  },
-  {
-    id: "date-5",
-    topic: "Dates",
-    prompt: "Which ordinal form is correct for the number 8 in a date?",
-    options: ["achte", "achtte", "achtste", "achten"],
-    answer: "achte",
-    explanation: "The special date form is achte: der achte August.",
-  },
-  {
-    id: "date-6",
-    topic: "Dates",
-    prompt: "Complete: Der Kurs beginnt ___ . (20 June)",
-    options: [
-      "der zwanzigste Juni",
-      "am zwanzigsten Juni",
-      "im zwanzigsten Juni",
-      "am zwanzigste Juni",
-    ],
-    answer: "am zwanzigsten Juni",
-    explanation: "A date after beginnen is commonly introduced with am + ordinal ending -en.",
+    prompt: "How do you say 23. Oktober in German when giving today's date?",
+    options: ["der dreiundzwanzigste Oktober", "der dreiundzwanzig Oktober", "der dreizehnte Oktober"],
+    answer: "der dreiundzwanzigste Oktober",
+    explanation: "From the 20th onward, ordinal day numbers normally take -ste.",
   },
 ]);
 
@@ -255,162 +182,115 @@ const A1Day12TwentyFourHourClockDatesPage = () => {
         <p style={{ margin: 0, color: "#1d4ed8", fontSize: 12, fontWeight: 900, letterSpacing: ".06em", textTransform: "uppercase" }}>
           A1 · Day 12 · Chapter 8 · Grammar Notes
         </p>
-        <h1 style={{ ...styles.title, margin: 0 }}>The 24-Hour Clock and Dates</h1>
+        <h1 style={{ ...styles.title, margin: 0 }}>Uhrzeit und Datum · The 24-Hour Clock and Dates</h1>
         <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-          First learn how to read the 24-hour clock. Then learn the basic German date pattern with a month and an ordinal number.
+          Learn to change AM and PM into German time, read exact minutes, name the twelve months and say the day and month of a date.
         </p>
         <div style={noteStyle}>
-          <strong>Date focus for this chapter:</strong> say the date with <strong>der + ordinal number + month</strong>, for example <strong>der dritte Februar</strong>. You will practise dates again in the next chapter through more sentence-building activities.
+          <strong>Today:</strong> clock times, months and dates with the day and month only. We will learn years and revise time prepositions in the next chapter.
         </div>
       </header>
 
-      <Section title="Part 1: The 24-hour clock">
-        <SubSection title="1. Why German uses 24-hour time">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Timetables, appointments, train information and official announcements often use numbers from 00:00 to 23:59. There is no AM or PM.
-          </p>
-          <Table
-            headers={["English idea", "24-hour time", "German"]}
-            rows={[
-              ["midnight", "00:00", "null Uhr / Mitternacht"],
-              ["8 AM", "08:00", "acht Uhr"],
-              ["2 PM", "14:00", "vierzehn Uhr"],
-              ["8 PM", "20:00", "zwanzig Uhr"],
-            ]}
-          />
-        </SubSection>
-
-        <SubSection title="2. Say the exact time">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In formal 24-hour time, say the hour first, then <strong>Uhr</strong>, then the minutes.
-          </p>
-          <Table
-            headers={["Time", "German"]}
-            rows={[
-              ["07:15", "sieben Uhr fünfzehn"],
-              ["14:20", "vierzehn Uhr zwanzig"],
-              ["16:35", "sechzehn Uhr fünfunddreißig"],
-              ["21:45", "einundzwanzig Uhr fünfundvierzig"],
-            ]}
-          />
-          <div style={tipStyle}>
-            Do not use <strong>halb</strong> for every time. For 14:20, say <strong>vierzehn Uhr zwanzig</strong>.
-          </div>
-        </SubSection>
-
-        <SubSection title="3. Everyday spoken time">
-          <Table
-            headers={["Time", "Formal", "Everyday spoken German"]}
-            rows={[
-              ["07:30", "sieben Uhr dreißig", "halb acht"],
-              ["09:15", "neun Uhr fünfzehn", "Viertel nach neun"],
-              ["09:45", "neun Uhr fünfundvierzig", "Viertel vor zehn"],
-              ["13:10", "dreizehn Uhr zehn", "zehn nach eins"],
-            ]}
-          />
-          <div style={noteStyle}>
-            <strong>halb acht</strong> means halfway to eight, so it is <strong>7:30</strong>, not 8:30.
-          </div>
-        </SubSection>
+      <Section title="1. From AM / PM to 24-hour time">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          English often uses AM and PM. German timetables and appointments usually use the 24-hour clock.
+          In everyday spoken German, you can say <strong>morgens</strong> (in the morning) or <strong>abends</strong> (in the evening) to make a 12-hour time clear.
+        </p>
+        <Table
+          headers={["English", "24-hour clock", "Spoken German"]}
+          rows={[
+            ["6:00 AM", "06:00", "sechs Uhr morgens"],
+            ["6:00 PM", "18:00", "sechs Uhr abends"],
+            ["9:00 AM", "09:00", "neun Uhr morgens"],
+            ["9:00 PM", "21:00", "neun Uhr abends"],
+            ["12:00 PM (noon)", "12:00", "zwölf Uhr mittags"],
+            ["12:00 AM (midnight)", "00:00", "null Uhr / Mitternacht"],
+          ]}
+        />
+        <div style={tipStyle}>
+          <strong>Rule:</strong> For 1 PM to 11 PM, add 12 to the hour: 3 PM → 15:00.
+          For example, 18:00 can be read as <strong>achtzehn Uhr</strong> or <strong>sechs Uhr abends</strong>.
+        </div>
       </Section>
 
-      <Section title="Part 2: How to say dates in German">
-        <SubSection title="1. Learn the months">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            The month comes after the ordinal number when you say a date.
-          </p>
-          <Table
-            headers={["1–4", "5–8", "9–12"]}
-            rows={[
-              ["Januar", "Mai", "September"],
-              ["Februar", "Juni", "Oktober"],
-              ["März", "Juli", "November"],
-              ["April", "August", "Dezember"],
-            ]}
-          />
-        </SubSection>
+      <Section title="2. Read exact minutes">
+        <div style={noteStyle}>
+          <strong>Hour + Uhr + minutes.</strong> Say the minutes as one number, not digit by digit:
+          43 = <strong>dreiundvierzig</strong>, 21 = <strong>einundzwanzig</strong>.
+        </div>
+        <Table
+          headers={["Time", "German"]}
+          rows={[
+            ["13:43", "dreizehn Uhr dreiundvierzig"],
+            ["02:21", "zwei Uhr einundzwanzig"],
+            ["14:21", "vierzehn Uhr einundzwanzig"],
+            ["07:05", "sieben Uhr fünf"],
+            ["16:30", "sechzehn Uhr dreißig"],
+            ["19:47", "neunzehn Uhr siebenundvierzig"],
+            ["23:58", "dreiundzwanzig Uhr achtundfünfzig"],
+          ]}
+        />
+        <div style={exampleStyle}>
+          <strong>A:</strong> Wie spät ist es? (What time is it?)<br />
+          <strong>B:</strong> Es ist dreizehn Uhr dreiundvierzig. (It is 1:43 PM.)
+        </div>
+      </Section>
 
-        <SubSection title="2. Build ordinal numbers">
-          <div style={noteStyle}>
-            Numbers 1–19 usually take <strong>-te</strong>. Numbers 20–31 usually take <strong>-ste</strong>.
-          </div>
-          <Table
-            headers={["Number", "Ordinal for a date", "Example"]}
-            rows={[
-              ["1.", "erste", "der erste Januar"],
-              ["2.", "zweite", "der zweite März"],
-              ["3.", "dritte", "der dritte Februar"],
-              ["5.", "fünfte", "der fünfte Mai"],
-              ["7.", "siebte", "der siebte Juni"],
-              ["8.", "achte", "der achte August"],
-              ["20.", "zwanzigste", "der zwanzigste April"],
-              ["25.", "fünfundzwanzigste", "der fünfundzwanzigste Dezember"],
-              ["31.", "einunddreißigste", "der einunddreißigste Oktober"],
-            ]}
-          />
-          <div style={tipStyle}>
-            Important special forms: <strong>erste, dritte, siebte, achte</strong>.
-          </div>
-        </SubSection>
+      <Section title="3. Die Monate · The 12 months">
+        <p style={{ margin: 0 }}>German month names always begin with a capital letter.</p>
+        <Table
+          headers={["English", "Deutsch"]}
+          rows={[
+            ["January", "Januar"], ["February", "Februar"], ["March", "März"],
+            ["April", "April"], ["May", "Mai"], ["June", "Juni"],
+            ["July", "Juli"], ["August", "August"], ["September", "September"],
+            ["October", "Oktober"], ["November", "November"], ["December", "Dezember"],
+          ]}
+        />
+      </Section>
 
-        <SubSection title="3. The basic spoken date pattern">
-          <div style={exampleStyle}>
-            <strong>Welches Datum haben wir heute?</strong><br />
-            Heute ist <strong>der dritte Februar</strong>.
-          </div>
-          <div style={exampleStyle}>
-            <strong>Wann ist dein Geburtstag?</strong><br />
-            Mein Geburtstag ist <strong>der fünfte Mai</strong>.
-          </div>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Use <strong>der + ordinal number + month</strong> after <strong>Heute ist ...</strong> or <strong>Mein Geburtstag ist ...</strong>.
-          </p>
-        </SubSection>
-
-        <SubSection title="4. Dates with am">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            After <strong>am</strong>, the ending changes to <strong>-en</strong>.
-          </p>
-          <Table
-            headers={["Without am", "With am"]}
-            rows={[
-              ["der dritte Februar", "am dritten Februar"],
-              ["der fünfte Mai", "am fünften Mai"],
-              ["der zwanzigste Juni", "am zwanzigsten Juni"],
-            ]}
-          />
-          <div style={exampleStyle}>
-            Der Kurs beginnt <strong>am dritten Februar</strong>.<br />
-            Ich habe <strong>am fünften Mai</strong> Geburtstag.
-          </div>
-        </SubSection>
-
-        <SubSection title="5. Writing the date">
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            German normally writes the date as <strong>day.month.year</strong>.
-          </p>
-          <Table
-            headers={["Written", "Said"]}
-            rows={[
-              ["03.02.2024", "der dritte Februar zweitausendvierundzwanzig"],
-              ["05.05.2025", "der fünfte Mai zweitausendfünfundzwanzig"],
-              ["25.12.2026", "der fünfundzwanzigste Dezember zweitausendsechsundzwanzig"],
-            ]}
-          />
-          <div style={tipStyle}>
-            The main goal now is to say the day and month correctly. You will practise full date sentences again in the next chapter.
-          </div>
-        </SubSection>
+      <Section title="4. Das Datum · Day and month">
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Write the <strong>day first, then the month</strong>: 3. Mai, 12. August, 25. Dezember.
+          When saying the date, use an <strong>ordinal number</strong> (first, second, third).
+        </p>
+        <div style={noteStyle}>
+          Most day numbers from <strong>4 to 19</strong> use <strong>-te</strong>.
+          From <strong>20 to 31</strong>, use <strong>-ste</strong>.
+          Remember special forms: <strong>erste, dritte, siebte, achte</strong>.
+        </div>
+        <Table
+          headers={["Day", "Spoken date form"]}
+          rows={[
+            ["1.", "der erste"], ["2.", "der zweite"], ["3.", "der dritte"],
+            ["4.", "der vierte"], ["5.", "der fünfte"], ["7.", "der siebte"],
+            ["8.", "der achte"], ["10.", "der zehnte"], ["15.", "der fünfzehnte"],
+            ["20.", "der zwanzigste"], ["21.", "der einundzwanzigste"],
+            ["30.", "der dreißigste"], ["31.", "der einunddreißigste"],
+          ]}
+        />
+        <Table
+          headers={["Written date", "Spoken German"]}
+          rows={[
+            ["01.01.", "der erste Januar"], ["03.05.", "der dritte Mai"],
+            ["12.08.", "der zwölfte August"],
+            ["21.09.", "der einundzwanzigste September"],
+            ["31.12.", "der einunddreißigste Dezember"],
+          ]}
+        />
+        <div style={exampleStyle}>
+          <strong>A:</strong> Welches Datum ist heute? (What is today's date?)<br />
+          <strong>B:</strong> Heute ist der dritte Mai. (Today is 3 May.)
+        </div>
       </Section>
 
       <Section title="What to remember">
         <ul style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.7 }}>
-          <li>Formal time: hour + Uhr + minutes.</li>
-          <li><strong>halb acht</strong> means 7:30.</li>
-          <li>Learn the twelve German month names.</li>
-          <li>Say dates with <strong>der + ordinal number + month</strong>.</li>
-          <li>After <strong>am</strong>, use forms such as <strong>am dritten</strong> and <strong>am fünften</strong>.</li>
-          <li>You will practise dates again in the next chapter.</li>
+          <li>6 AM = sechs Uhr morgens; 6 PM = sechs Uhr abends / 18:00.</li>
+          <li>Exact minutes: hour + Uhr + minute number (13:43 → dreizehn Uhr dreiundvierzig).</li>
+          <li>Learn all twelve German month names.</li>
+          <li>Say the day with an ordinal: Heute ist der dritte Mai.</li>
+          <li>Years and time-preposition revision come in the next chapter.</li>
         </ul>
         <a href={WORKBOOK_ROUTE} style={{ ...styles.primaryButton, textDecoration: "none", width: "fit-content" }}>
           Open the Day 12 workbook
@@ -419,8 +299,8 @@ const A1Day12TwentyFourHourClockDatesPage = () => {
 
       <Section title="Knowledge test: 24-hour clock and dates">
         <div style={noteStyle}>
-          <strong>12 questions · Pass mark: {KNOWLEDGE_TEST_PASS_MARK}/12</strong>
-          <div>Answer all six clock questions and all six date questions before checking your score. Answers are not shown inside the question fields.</div>
+          <strong>6 questions · Pass mark: {KNOWLEDGE_TEST_PASS_MARK}/6</strong>
+          <div>Answer all six multiple-choice questions before checking your score. Answers are not shown inside the question fields.</div>
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", justifyContent: "space-between" }}>
