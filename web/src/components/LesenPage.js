@@ -17,7 +17,7 @@ import "./ReadingPracticeShell.css";
 const LEVELS=["A1","A2","B1","B2","C1","C2"];
 const C1_SAMPLES=Object.freeze([{
   id:"c1-reading-01",slug:"sample-1",label:"Lesen Sample 1",
-  detail:"30 questions · 4 Teile · reading practice"
+  detail:"26 current tasks · 4 Teile · reading practice"
 }]);
 const samplesForLevel=level=>{
   if(level==="C1")return C1_SAMPLES;
