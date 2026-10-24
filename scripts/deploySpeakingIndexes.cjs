@@ -39,5 +39,5 @@ async function run(){
     }
   }
 }
-if(require.main===module)run().catch(err=>{console.error("Speaking index provisioning failed:",err.response?.status||err.message);process.exitCode=1;});
+if(require.main===module)run().catch(err=>{console.error("Speaking index provisioning failed:",err.response?.status||err.message, String(err.response?.data?.error?.message||err.response?.data?.message||"").slice(0,600));process.exitCode=1;});
 module.exports={canonical,run};
