@@ -201,3 +201,54 @@ test("Day 19 readiness inspects the lesson wrapper, not the short nested speakin
     }
   }, mock);
 });
+
+
+test("Classmate biographies on Days 3 and 5 are excluded, but blank writing space remains", () => {
+  const root = new Element("MAIN");
+  const editor = new Element("FORM");
+  editor.setAttribute("data-a1-print-private", "biography-editor");
+  editor.textContent = "Private saved introduction";
+  const classmates = new Element("SECTION");
+  classmates.setAttribute("data-a1-print-private", "class-introductions");
+  classmates.textContent = "Class introductions · Student A · their real biography";
+  const instruction = new Element("SPAN", "Your work saves to Class Members");
+  instruction.setAttribute("data-a1-print-private", "biography-online-explanation");
+  const live = new Element("DIV", "Class response · real classmates");
+  live.setAttribute("data-a1-print-private", "live-class-response");
+  root.mapping["[data-a1-print-private]"] = [editor, classmates, instruction, live];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(classmates.removed, true);
+  assert.equal(live.removed, true);
+  assert.equal(editor.replacement.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(editor.replacement.children.length, 8); // heading, instructions, 6 blank ruled lines
+  assert.equal(instruction.getAttribute("data-a1-print-private"), null);
+  assert.equal(instruction.textContent, "Schreiben Sie Ihre Vorstellung auf die Linien unten.");
+});
+
+test("Days 5 and 6 class-shared writing is replaced with printable ruled answers", () => {
+  const root = new Element("MAIN");
+  const scrambled = new Element("DIV", "Private class sentences and member names");
+  scrambled.setAttribute("data-a1-print-private", "scrambled-class-contribution");
+  const family = new Element("SECTION", "Private family answers");
+  family.setAttribute("data-a1-print-private", "family-group-discussion");
+  root.mapping["[data-a1-print-private]"] = [scrambled, family];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.ok(scrambled.removed && family.removed);
+  assert.equal(scrambled.replacement.children.filter(x => x.getAttribute("data-a1-pdf-answer-rule") === "").length, 11);
+  assert.equal(family.replacement.children.filter(x => x.getAttribute("data-a1-pdf-answer-rule") === "").length, 9);
+});
+
+test("final PDF privacy guard blocks exact leakage types seen on pages 46–47, 74–75, 78, 84–85", () => {
+  const samples = [
+    ["A1 Berlin Klasse introductions   1", "classmate biographies"],
+    ["What Your Classmates Shared", "class-shared writing"],
+    ["No classmates have shared an answer yet.", "class-shared writing"],
+    ["This updates the same biography shown on the Class Members page", "classmate biographies"],
+    ["Class response · not graded", "live class results"],
+    ["Saved to Group Discussion", "live class results"],
+  ];
+  for (const [source, category] of samples) {
+    assert.ok(findA1PrintPrivacyLeaks(source).includes(category), source);
+  }
+  assert.deepEqual(findA1PrintPrivacyLeaks("Teil 2 · Hören: Schreiben Sie fünf Antworten auf die Linien."), []);
+});
