@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getReadingPracticeStudentKey,
@@ -445,6 +445,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
+  const submittedForExpiry = useRef({});
   const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
@@ -546,7 +547,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
   };
 
   const answer = (number, value) => {
-    if (submitted) return;
+    if (submitted || remainingSeconds <= 0) return;
     setAnswersBySample((current) => ({
       ...current,
       [sample.id]: {
@@ -556,8 +557,9 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
     }));
   };
 
-  const submit = () => {
-    if (!allAnswered || submitted) return;
+  const submit = (allowPartial = false) => {
+    if (submitted || submittedForExpiry.current[sample.id] || (!allowPartial && !allAnswered) || hydratedStorageKey !== storageKey) return;
+    submittedForExpiry.current[sample.id] = true;
     setTimerRunning(false);
     const attempt = saveReadingPracticeAttempt({
       level: "A1",
@@ -594,7 +596,13 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
     setSubmittedBySample((current) => ({ ...current, [sample.id]: true }));
   };
 
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey || submitted || remainingSeconds !== 0) return;
+    submit(true); // Unanswered questions count as incorrect when practice time ends.
+  }, [remainingSeconds, submitted, sample.id, hydratedStorageKey, storageKey]);
+
   const resetSample = () => {
+    submittedForExpiry.current[sample.id] = false;
     setTimerRunning(false);
     setAnswersBySample((current) => ({ ...current, [sample.id]: {} }));
     setSubmittedBySample((current) => ({ ...current, [sample.id]: false }));
@@ -707,7 +715,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
             <span>Complete all three Teile before checking your answers.</span>
           </div>
           {!submitted ? (
-            <button type="button" disabled={!allAnswered} onClick={submit}>Check answers</button>
+            <button type="button" disabled={!allAnswered} onClick={() => submit(false)}>Check answers</button>
           ) : (
             <div className="a1-reading-practice-result">
               <strong>Result: {score}/15 · {percent}% · {getReadingReadinessLabel(percent)}</strong>
