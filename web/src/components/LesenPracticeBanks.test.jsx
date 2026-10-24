@@ -21,7 +21,7 @@ describe("Exams Room Lesen practice banks", () => {
   );
 
   test("routes A1 directly into the dedicated three-sample reading experience", () => {
-    expect(lesenPageSource).toContain("return <A1ReadingPracticeSamples />");
+    expect(lesenPageSource).toContain("<A1ReadingPracticeSamples initialSampleId={selected.id} standalone/>");
     expect(lesenPageSource).not.toContain("A1_READING_PRACTICE_SET_01");
     expect(a1PracticeSource).toContain("Lesen Sample 1");
     expect(a1PracticeSource).toContain("Lesen Sample 2");
@@ -53,8 +53,8 @@ describe("Exams Room Lesen practice banks", () => {
     expect(a1PracticeSource).toContain("a1-goethe-mock-paper");
     expect(a1PracticeSource).toContain("a1-goethe-mock-website-grid");
     expect(a1PracticeSource).toContain("a1-goethe-mock-notice-card");
-    expect(a1PracticeSource).toContain('aria-label="A1 Lesen sample selector"');
-    expect(a1PracticeSource).toContain('aria-label="A1 Lesen part selector"');
+    expect(a1PracticeSource).toContain('<ReadingPracticeSampleList level="A1"');
+    expect(a1PracticeSource).toContain('<ReadingPracticeParts level="A1"');
   });
 
   test("keeps all A1 Exams Room sample texts different from the Final Mock", () => {
@@ -94,13 +94,13 @@ describe("Exams Room Lesen practice banks", () => {
   });
 
   test("routes A2 directly into the selectable four-part sample experience", () => {
-    expect(lesenPageSource).toContain("<A2ReadingPracticeSamples />");
+    expect(lesenPageSource).toContain("<A2ReadingPracticeSamples initialSampleId={selected.id} standalone/>");
     const source = fs.readFileSync(
       path.resolve(__dirname, "A2ReadingPracticeSamples.jsx"),
       "utf8",
     );
-    expect(source).toContain('aria-label="A2 Lesen sample selector"');
-    expect(source).toContain('aria-label="A2 Lesen part selector"');
+    expect(source).toContain('<ReadingPracticeSampleList level="A2"');
+    expect(source).toContain('<ReadingPracticeParts level="A2"');
     expect(source).toContain("Lesen Sample 1");
     expect(source).toContain("Lesen Sample 2");
     expect(source).toContain("Lesen Sample 3");
