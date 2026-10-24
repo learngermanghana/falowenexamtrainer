@@ -1,0 +1,482 @@
+{
+  "id": "a2-reading-practice-08",
+  "label": "Lesen Sample 8",
+  "teil1": {
+    "title": "Teil 1",
+    "instruction": [
+      "Lesen Sie den Zeitungsartikel.",
+      "Wählen Sie bei jeder Aufgabe (1–5) die richtige Lösung a, b oder c."
+    ],
+    "article": {
+      "title": "Mehr Fahrräder, weniger Autos: Wie Freiburg den Verkehr umgestaltet",
+      "subtitle": "",
+      "paragraphs": [
+        "In Freiburg im Breisgau entscheiden sich immer mehr Bürgerinnen und Bürger gegen das Auto und für das Fahrrad oder öffentliche Verkehrsmittel. Die Stadtverwaltung hat in den letzten drei Jahren zahlreiche neue Radwege gebaut und viele Straßen in der Innenstadt für den Autoverkehr komplett gesperrt. Besonders Studierende und junge Familien schätzen die sicheren und schnellen Verbindungen.",
+        "Einige Geschäftsinhaber im Zentrum machten sich zuerst Sorgen, dass wegen der fehlenden Parkplätze weniger Kunden kommen würden. Doch eine aktuelle Umfrage zeigt das Gegenteil: Die Fußgängerzonen sind belebter als je zuvor, und die Umsätze der Geschäfte sind sogar leicht gestiegen. Im kommenden Jahr plant die Stadt ein neues Ticket-System: Das 'Klima-Abo' soll nur 29 Euro pro Monat kosten und gilt für alle Busse und Straßenbahnen in der Region. Damit möchte man besonders Auszubildende und Seniorinnen unterstützen."
+      ]
+    },
+    "example": {
+      "number": 0,
+      "question": "In Freiburg fahren die Menschen heute öfter mit dem Rad als früher.",
+      "options": [
+        {
+          "id": "a",
+          "label": "Richtig"
+        },
+        {
+          "id": "b",
+          "label": "Falsch"
+        }
+      ],
+      "answer": "a"
+    },
+    "questions": [
+      {
+        "number": 1,
+        "question": "Wie hat sich die Innenstadt von Freiburg in den letzten Jahren verändert?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Es gibt mehr kostenlose Parkplätze."
+          },
+          {
+            "id": "b",
+            "label": "Viele Straßen wurden für Autos gesperrt."
+          },
+          {
+            "id": "c",
+            "label": "Radwege wurden geschlossen."
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 2,
+        "question": "Was zeigt die aktuelle Befragung der Geschäftsinhaber?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Die Geschäfte haben weniger Kunden als früher."
+          },
+          {
+            "id": "b",
+            "label": "Die Kunden kommen trotz fehlender Parkplätze gerne."
+          },
+          {
+            "id": "c",
+            "label": "Die Händler fordern mehr Parkplätze."
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 3,
+        "question": "Wie haben sich die Einnahmen (Umsätze) der Geschäfte verändert?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Sie sind ein wenig gestiegen."
+          },
+          {
+            "id": "b",
+            "label": "Sie sind stark gesunken."
+          },
+          {
+            "id": "c",
+            "label": "Sie sind gleich geblieben."
+          }
+        ],
+        "answer": "a"
+      },
+      {
+        "number": 4,
+        "question": "Was ist das Besondere am geplanten 'Klima-Abo'?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Es kostet 29 Euro im Monat für Bus und Bahn."
+          },
+          {
+            "id": "b",
+            "label": "Es gilt nur für Fahrräder."
+          },
+          {
+            "id": "c",
+            "label": "Es gilt nur an Wochenenden."
+          }
+        ],
+        "answer": "a"
+      },
+      {
+        "number": 5,
+        "question": "Wer soll durch das neue Ticket-System besonders gefördert werden?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Autofahrer aus anderen Städten."
+          },
+          {
+            "id": "b",
+            "label": "Azubis und ältere Menschen (Senioren)."
+          },
+          {
+            "id": "c",
+            "label": "Nur Touristen."
+          }
+        ],
+        "answer": "b"
+      }
+    ]
+  },
+  "teil2": {
+    "title": "Teil 2",
+    "instruction": [
+      "Lesen Sie die Informationstafel im Einkaufs- und Servicezentrum.",
+      "Wählen Sie für die Aufgaben 6 bis 10 a, b oder c."
+    ],
+    "store": {
+      "title": "Europa-Galerie",
+      "floors": [
+        [
+          "3. OG",
+          "Restaurant-Park, Fahrrad-Werkstatt & E-Bike-Verleih, Fundbüro & Reparatur-Service"
+        ],
+        [
+          "2. OG",
+          "Elektronikmarkt, Buchhandlung, Kundenservice & Garantie, Lesecafé"
+        ],
+        [
+          "1. OG",
+          "Damen- & Herrenmode, Schuhgeschäft, Reisebüro Süd-Sonne, Optiker"
+        ],
+        [
+          "EG",
+          "Supermarkt Bio-Frisch, Bäckerei & Stehcafé, Stadt-Information, Geldautomat"
+        ],
+        [
+          "KG",
+          "Tiefgarage (PKW & Motorrad), Schließfächer, Autowaschanlage, Toiletten"
+        ]
+      ]
+    },
+    "example": {
+      "number": 0,
+      "question": "Sie suchen ein neues Sommerkleid.",
+      "options": [
+        {
+          "id": "a",
+          "label": "EG"
+        },
+        {
+          "id": "b",
+          "label": "1. OG"
+        },
+        {
+          "id": "c",
+          "label": "2. OG"
+        }
+      ],
+      "answer": "b"
+    },
+    "questions": [
+      {
+        "number": 6,
+        "question": "Ihr Fahrrad hat ein Problem mit der Kette und muss repariert werden.",
+        "options": [
+          {
+            "id": "a",
+            "label": "3. OG"
+          },
+          {
+            "id": "b",
+            "label": "EG"
+          },
+          {
+            "id": "c",
+            "label": "KG"
+          }
+        ],
+        "answer": "a"
+      },
+      {
+        "number": 7,
+        "question": "Sie möchten einen Beratungstermin für Ihren nächsten Urlaub buchen.",
+        "options": [
+          {
+            "id": "a",
+            "label": "2. OG"
+          },
+          {
+            "id": "b",
+            "label": "1. OG"
+          },
+          {
+            "id": "c",
+            "label": "EG"
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 8,
+        "question": "Sie wollen Ihr schweres Gepäck für einige Stunden sicher aufbewahren.",
+        "options": [
+          {
+            "id": "a",
+            "label": "KG"
+          },
+          {
+            "id": "b",
+            "label": "EG"
+          },
+          {
+            "id": "c",
+            "label": "3. OG"
+          }
+        ],
+        "answer": "a"
+      },
+      {
+        "number": 9,
+        "question": "Sie suchen ein Wörterbuch und einen Reiseführer über Deutschland.",
+        "options": [
+          {
+            "id": "a",
+            "label": "1. OG"
+          },
+          {
+            "id": "b",
+            "label": "2. OG"
+          },
+          {
+            "id": "c",
+            "label": "3. OG"
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 10,
+        "question": "Sie möchten frisches Gemüse und Brot für das Abendessen einkaufen.",
+        "options": [
+          {
+            "id": "a",
+            "label": "EG"
+          },
+          {
+            "id": "b",
+            "label": "1. OG"
+          },
+          {
+            "id": "c",
+            "label": "KG"
+          }
+        ],
+        "answer": "a"
+      }
+    ]
+  },
+  "teil3": {
+    "title": "Teil 3",
+    "instruction": [
+      "Lesen Sie die E-Mail.",
+      "Wählen Sie für die Aufgaben 11 bis 15 a, b oder c."
+    ],
+    "email": {
+      "to": "Dennis",
+      "subject": "Unser Kanu-Ausflug am Wochenende!",
+      "greeting": "Hallo Dennis,",
+      "paragraphs": [
+        "ich freue mich schon riesig auf unseren Ausflug am Samstag! Wie besprochen fahren wir mit dem Zug nach Cochem und leihen dort zwei Kanus für eine Tour auf der Mosel.",
+        "Mein Bruder Florian kommt leider doch nicht mit, weil er am Freitag lange arbeiten muss und am Samstag lernen muss.",
+        "Wir treffen uns am Samstagmorgen um 08:15 Uhr am Hauptbahnhof vor der Bäckerei. Bitte denk daran, eine wasserfeste Jacke und etwas zu trinken mitzubringen. Das Mittagessen bestellen wir in einem kleinen Restaurant am Flussufer. Wenn das Wetter am Sonntag schlecht wird, fahren wir nachmittags mit dem Bus zurück nach Hause.",
+        "Sag mir bitte bis heute Abend Bescheid, ob die Uhrzeit für dich passt!"
+      ],
+      "closing": [
+        "Viele Grüße,",
+        "Lukas"
+      ]
+    },
+    "questions": [
+      {
+        "number": 11,
+        "question": "Warum begleitet Florian die beiden Freunde nicht?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Er ist krank geworden."
+          },
+          {
+            "id": "b",
+            "label": "Er muss am Wochenende lernen und arbeiten."
+          },
+          {
+            "id": "c",
+            "label": "Er hat kein Fahrrad."
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 12,
+        "question": "Wo treffen sich Lukas und Dennis am Samstagmorgen?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Am Kanu-Verleih in Cochem."
+          },
+          {
+            "id": "b",
+            "label": "Vor der Bäckerei am Hauptbahnhof."
+          },
+          {
+            "id": "c",
+            "label": "Im Restaurant am Fluss."
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 13,
+        "question": "Was soll Dennis unbedingt zum Ausflug mitbringen?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Eine regenfeste/wasserfeste Jacke."
+          },
+          {
+            "id": "b",
+            "label": "Ein eigenes Mittagessen."
+          },
+          {
+            "id": "c",
+            "label": "Einen Helm."
+          }
+        ],
+        "answer": "a"
+      },
+      {
+        "number": 14,
+        "question": "Wo möchten die beiden zu Mittag essen?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Sie machen ein Picknick im Kanu."
+          },
+          {
+            "id": "b",
+            "label": "In einem Restaurant am Flussufer."
+          },
+          {
+            "id": "c",
+            "label": "In der Bäckerei am Bahnhof."
+          }
+        ],
+        "answer": "b"
+      },
+      {
+        "number": 15,
+        "question": "Was wollen die Freunde tun, wenn das Wetter am Sonntag schlecht ist?",
+        "options": [
+          {
+            "id": "a",
+            "label": "Sie fahren am Nachmittag mit dem Bus heim."
+          },
+          {
+            "id": "b",
+            "label": "Sie bleiben bis Montag in Cochem."
+          },
+          {
+            "id": "c",
+            "label": "Sie leihen ein Auto."
+          }
+        ],
+        "answer": "a"
+      }
+    ]
+  },
+  "teil4": {
+    "title": "Teil 4",
+    "instruction": [
+      "Lesen Sie die Situationen 16 bis 20 und die Anzeigen A–F.",
+      "Ordnen Sie die passende Anzeige zu. Eine Situation hat keine passende Anzeige: Wählen Sie X."
+    ],
+    "people": [
+      {
+        "number": 16,
+        "person": "Sie suchen einen preiswerten gebrauchten Motorroller für den Weg zur Arbeit.",
+        "answer": "a"
+      },
+      {
+        "number": 17,
+        "person": "Ihre 10-jährige Tochter möchte in den Sommerferien das Reiten lernen.",
+        "answer": "b"
+      },
+      {
+        "number": 18,
+        "person": "Sie möchten am Wochenende an einer geführten Nacht-Wanderung im Wald teilnehmen.",
+        "answer": "X"
+      },
+      {
+        "number": 19,
+        "person": "Sie suchen eine preiswerte Mitfahrgelegenheit für eine Fahrt von Berlin nach Hamburg.",
+        "answer": "c"
+      },
+      {
+        "number": 20,
+        "person": "Sie möchten Ihr altes Auto schnell verkaufen und direkt Geld in bar erhalten.",
+        "answer": "d"
+      }
+    ],
+    "ads": [
+      {
+        "id": "a",
+        "title": "Gebraucht-Fahrzeuge & Roller-Zentrale",
+        "body": [
+          "Große Auswahl an gebrauchten Motorrollern, Mofas und E-Scootern ab 250 €. Alle Fahrzeuge geprüft und sofort fahrbereit! Tel: 030-887722"
+        ],
+        "url": ""
+      },
+      {
+        "id": "b",
+        "title": "Reitverein 'Grüne Wiese'",
+        "body": [
+          "Sommerferien-Kurse für Kinder und Jugendliche! Reitunterricht für Anfänger und Fortgeschrittene. Täglich von 09:00 bis 15:00 Uhr. Infos: reiten-ferien.de"
+        ],
+        "url": ""
+      },
+      {
+        "id": "c",
+        "title": "Mitfahrzentrale Online Express",
+        "body": [
+          "Günstige Mitfahrgelegenheiten täglich auf den Strecken Berlin – Hamburg – Bremen. Fahrten ab 12 €. Buchen über App oder Telefon."
+        ],
+        "url": ""
+      },
+      {
+        "id": "d",
+        "title": "Auto-Ankauf Sofort-Bar",
+        "body": [
+          "Wir kaufen Ihren gebrauchten PKW, Transporter oder Unfallwagen gegen sofortige Barzahlung! Kostenlose Abholung vor Ort. Tel: 0171-998877"
+        ],
+        "url": ""
+      },
+      {
+        "id": "e",
+        "title": "Fahrradverleih & E-Bike-Service",
+        "body": [
+          "Tages- und Wochenverleih von E-Bikes und Tourenrädern. Inklusive Helm und Schlosssystem. Gruppenrabatte möglich! rad-verleih.de"
+        ],
+        "url": ""
+      },
+      {
+        "id": "f",
+        "title": "Tanzschule & Fitness-Club Express",
+        "body": [
+          "Abendkurse für Salsa, Yoga und Pilates. Starten Sie fit in den Frühling! Probetraining kostenlos. Anmelden: tanz-fitness.de"
+        ],
+        "url": ""
+      }
+    ]
+  }
+}
