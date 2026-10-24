@@ -130,9 +130,12 @@ test("B1 student records every step, confirms transcripts, completes all three T
   for (let index = 0; index < limits.length; index += 1) {
     await waitFor(() => expect(starts).toBe(index + 1));
     for (let step = 0; step < limits[index]; step += 1) {
-      fireEvent.click(await screen.findByRole("button", { name: "Record German answer" }));
-      fireEvent.click(await screen.findByRole("button", { name: "Stop and send recording" }));
+      const record = await screen.findByRole("button", { name: "Record German answer" });
+      await waitFor(() => expect(record).toBeEnabled());
+      fireEvent.click(record);
+      const stop = await screen.findByRole("button", { name: "Stop and send recording" });
       now += 2300; // More than the 1.5-second minimum on real microphone recordings.
+      fireEvent.click(stop);
       // Repeating the step with the same recording is forbidden. Transcript
       // confirmation must be the only operation that advances it.
       fireEvent.click(await screen.findByRole("button", { name: "Confirm answer" }));
