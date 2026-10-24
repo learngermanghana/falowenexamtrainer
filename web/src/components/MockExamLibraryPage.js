@@ -9,6 +9,7 @@ import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
+  if (mock?.id === "b1-mock-02") return "4-module mock · publishing checks pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
   return "Full mock not published";
