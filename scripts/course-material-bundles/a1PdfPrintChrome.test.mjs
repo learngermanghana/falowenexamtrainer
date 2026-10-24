@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cleanA1PrintChrome, findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
+import { cleanA1PrintChrome, findA1PrintChromeLeaks, findA1PdfLayoutFaults } from "./a1PdfPrintChrome.mjs";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 
 class Node {
@@ -227,4 +227,24 @@ test("A1 PDF retains lesson headings, answer choices and brand mentions below ma
   assert.equal(teaching["data-a1-pdf-hide-ui"], undefined);
   assert.equal(footer["data-a1-pdf-hide-ui"], undefined);
   assert.equal(answer.removed, false);
+});
+
+
+test("final PDF audit catches the remaining v7 masthead and Day 22 QR-page split", () => {
+  const pdf = [
+    "Falowen                  🔔  FA\nA1 Basic Greetings\nFalowen Learning Hub 5 / 255",
+    "Teil 3 · Hören\nHören: Audio im Falowen Course Book\nFalowen Learning Hub 254 / 255",
+    "1. Welche Beschwerden hat Herr Braun?\n6. Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?\nFalowen Learning Hub 255 / 255",
+  ].join("\f") + "\f";
+  const faults = findA1PdfLayoutFaults(pdf);
+  assert.match(faults.join("; "), /website masthead/);
+  assert.match(faults.join("; "), /QR instructions are separated/);
+});
+
+test("final PDF audit accepts masthead-free Day 22 Hören with QR and all six choices", () => {
+  const content = "Teil 3 · Hören\nHören: Audio im Falowen Course Book\n" +
+    "1. Welche Beschwerden hat Herr Braun?\n" +
+    "6. Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?\n" +
+    "Falowen Learning Hub 255 / 255";
+  assert.deepEqual(findA1PdfLayoutFaults(content + "\f"), []);
 });
