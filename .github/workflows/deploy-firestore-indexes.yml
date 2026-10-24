@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - 'firestore.indexes.json'
+      - 'scripts/deployFirestoreIndexes.cjs'
+      - 'scripts/deployFirestoreIndexes.test.cjs'
       - 'firebase.json'
       - '.github/workflows/deploy-firestore-indexes.yml'
   workflow_dispatch:
@@ -54,12 +56,14 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-      - name: Deploy committed indexes automatically
-        run: firebase deploy --project "$FIREBASE_PROJECT_ID" --only firestore:indexes --non-interactive
+      - name: Install Firebase Admin deployment dependencies
+        run: npm install --prefix functions --no-audit --no-fund
+      - name: Test index comparison and creation payload
+        run: node --test scripts/deployFirestoreIndexes.test.cjs
+      - name: Reconcile indexes through Firestore API without Firestore Rules validation
+        run: node scripts/deployFirestoreIndexes.cjs
       - name: Deployment note
         run: |
           echo '### Firestore indexes submitted' >> "$GITHUB_STEP_SUMMARY"
-          echo 'All index declarations were deployed to falowen-examiner-trainer.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Missing indexes were submitted to falowen-examiner-trainer using the Firestore index API.' >> "$GITHUB_STEP_SUMMARY"
           echo 'Firebase may continue building indexes after deployment; check query readiness separately.' >> "$GITHUB_STEP_SUMMARY"
