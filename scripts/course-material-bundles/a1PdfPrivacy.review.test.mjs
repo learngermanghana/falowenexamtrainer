@@ -28,10 +28,11 @@ class Element {
   closest() { return null; }
 }
 
-const withDocument = (root, run, nestedMain = root) => {
+const withDocument = (root, run, nestedMain = root, pathname = "") => {
   const oldDocument = globalThis.document;
   globalThis.document = {
     body: root,
+    location: { pathname },
     querySelector: (selector) => selector === "[data-a1-speaking-confidence-lab]"
       ? (root.getAttribute("data-a1-speaking-confidence-lab") ? root : null)
       : selector === "main" ? nestedMain : null,
@@ -386,4 +387,23 @@ test("workbook privacy fallback cannot delete an unrelated writing input", () =>
   withDocument(root, () => sanitizeA1PrintDocument());
   assert.equal(lesson.removed, false);
   assert.equal(lesson.replacement, null);
+});
+
+
+test("Day 2 Kapitel 1.1 PDF provides a full writing sheet without exposing a draft", () => {
+  const root = new Element("MAIN");
+  const capture = new Element("SECTION");
+  capture.setAttribute("data-a1-tutor-draft-capture", "teil-2");
+  const textarea = new Element("TEXTAREA", "PRIVATE DRAFT TEXT");
+  textarea.value = "PRIVATE DRAFT TEXT";
+  capture.mapping["textarea"] = [textarea];
+  root.mapping["[data-a1-tutor-draft-capture]"] = [capture];
+  root.mapping['textarea, input:not([type=checkbox]):not([type=radio]), [contenteditable=true]'] = [textarea];
+  withDocument(root, () => sanitizeA1PrintDocument(), root,
+    "/campus/course/a1-day-2-kapitel-1-1-workbook");
+  const ruled = capture.replacement.children[1];
+  assert.equal(ruled.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(ruled.children.filter(node => node.getAttribute("data-a1-pdf-answer-rule") === "").length, 18);
+  assert.equal(textarea.value, "");
+  assert.equal(textarea.textContent, "");
 });
