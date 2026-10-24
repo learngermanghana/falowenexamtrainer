@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { ReadingPracticeHeader, ReadingPartNavigation, ReadingPartFooter } from "./ReadingPracticeShell";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -68,13 +69,18 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   const [syncBySample, setSyncBySample] = useState({});
   const [timeBySample, setTimeBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
+  const [deadlineBySample, setDeadlineBySample] = useState({});
+  const [hydratedKey, setHydratedKey] = useState("");
 
   const sample = B1_READING_PRACTICE_SAMPLES.find((item) => item.id === selectedId) || B1_READING_PRACTICE_SAMPLES[0];
   const partQuestions = useMemo(() => getB1ReadingQuestions(sample), [sample]);
   const allQuestions = B1_READING_PART_KEYS.flatMap((key) => partQuestions[key]);
   const answers = answersBySample[sample.id] || {};
   const submitted = Boolean(submittedBySample[sample.id]);
-  const secondsLeft = timeBySample[sample.id] ?? DURATION_SECONDS;
+  const deadlineMs = deadlineBySample[sample.id];
+  const secondsLeft = deadlineMs
+    ? Math.max(0, Math.ceil((deadlineMs - Date.now()) / 1000))
+    : (timeBySample[sample.id] ?? DURATION_SECONDS);
   const answeredCount = allQuestions.filter((question) => Boolean(answers[question.number])).length;
   const score = allQuestions.filter((question) => answers[question.number] === question.answer).length;
   const percent = Math.round((score / allQuestions.length) * 100);
@@ -86,32 +92,70 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
   const weakest = getWeakestReadingSection(sectionScores);
   const studentKey = getReadingPracticeStudentKey({ user, studentProfile });
 
+  // Preserve draft answers for the current student, level and sample.
+  const storageKey = `falowen:exams:lesen:b1:three-samples:${studentKey || "guest"}`;
   useEffect(() => {
-    if (!timerRunning || submitted || secondsLeft <= 0) return undefined;
-    const handle = window.setInterval(() => {
-      setTimeBySample((current) => ({
-        ...current,
-        [sample.id]: Math.max(0, (current[sample.id] ?? DURATION_SECONDS) - 1),
-      }));
-    }, 1000);
-    return () => window.clearInterval(handle);
-  }, [sample.id, secondsLeft, submitted, timerRunning]);
+    setHydratedKey("");
+    try {
+      const saved = JSON.parse(window.localStorage.getItem(storageKey) || "null");
+      if (saved && typeof saved === "object") {
+        if (saved.answersBySample) setAnswersBySample(saved.answersBySample);
+        if (saved.submittedBySample) setSubmittedBySample(saved.submittedBySample);
+        if (saved.timeBySample) setTimeBySample(saved.timeBySample);
+        if (saved.deadlineBySample) setDeadlineBySample(saved.deadlineBySample);
+        if (!initialSampleId && B1_READING_PRACTICE_SAMPLES.some(item => item.id === saved.selectedId))
+          setSelectedId(saved.selectedId);
+        if (B1_READING_PART_KEYS.includes(saved.partKey)) setPartKey(saved.partKey);
+      }
+    } catch { /* Invalid drafts cannot block an exam. */ }
+    setHydratedKey(storageKey);
+  }, [storageKey, initialSampleId]);
 
   useEffect(() => {
-    if (secondsLeft === 0) setTimerRunning(false);
-  }, [secondsLeft]);
+    if (hydratedKey !== storageKey) return;
+    window.localStorage.setItem(storageKey, JSON.stringify({
+      selectedId, partKey, answersBySample, submittedBySample, timeBySample,
+      deadlineBySample, updatedAt: new Date().toISOString(),
+    }));
+  }, [storageKey, hydratedKey, selectedId, partKey, answersBySample,
+      submittedBySample, timeBySample, deadlineBySample]);
+
+  useEffect(() => {
+    if (!timerRunning || submitted) return undefined;
+    const timer = window.setInterval(() => setTimeBySample(current => ({
+      ...current, [sample.id]: Math.max(0, (current[sample.id] ?? DURATION_SECONDS) - 1),
+    })), 1000);
+    return () => window.clearInterval(timer);
+  }, [timerRunning, submitted, sample.id]);
+
+  useEffect(() => {
+    if (secondsLeft === 0 && timerRunning) setTimerRunning(false);
+  }, [secondsLeft, timerRunning]);
+
+  const toggleTimer = () => {
+    if (submitted || secondsLeft === 0) return;
+    if (timerRunning) {
+      setTimeBySample(current => ({...current,[sample.id]:secondsLeft}));
+      setDeadlineBySample(current => ({...current,[sample.id]:null}));
+      setTimerRunning(false);
+    } else {
+      setDeadlineBySample(current => ({...current,[sample.id]:Date.now() + secondsLeft * 1000}));
+      setTimerRunning(true);
+    }
+  };
 
   const onAnswer = (number, value) => {
-    if (submitted) return;
+    if (submitted || secondsLeft === 0) return;
     setAnswersBySample((current) => ({
       ...current,
       [sample.id]: { ...(current[sample.id] || {}), [number]: value },
     }));
   };
 
-  const submit = () => {
-    if (submitted || answeredCount !== allQuestions.length) return;
+  const submit = (expired = false) => {
+    if (submitted || (!expired && answeredCount !== allQuestions.length)) return;
     setTimerRunning(false);
+    setDeadlineBySample(current => ({...current,[sample.id]:null}));
     const attempt = saveReadingPracticeAttempt({
       level: "B1",
       setId: sample.id,
@@ -156,6 +200,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
     setSavedBySample((current) => ({ ...current, [sample.id]: null }));
     setSyncBySample((current) => ({ ...current, [sample.id]: "idle" }));
     setTimeBySample((current) => ({ ...current, [sample.id]: DURATION_SECONDS }));
+    setDeadlineBySample(current => ({...current,[sample.id]:null}));
     setPartKey("teil1");
   };
   const selectSample = (nextId) => {
@@ -163,6 +208,11 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
     setSelectedId(nextId);
     setPartKey("teil1");
   };
+  useEffect(() => {
+    if (hydratedKey === storageKey && secondsLeft === 0 && !submitted) submit(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydratedKey, storageKey, secondsLeft, submitted, sample.id]);
+
   const renderQuestions = (list, key) => list.map((q) => (
     <Question
       key={q.number}
@@ -176,6 +226,12 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
 
   return (
     <main className="b1-final-shell" data-b1-reading-practice-samples>
+      <ReadingPracticeHeader level="B1" sampleLabel={sample.label} part={Number(partKey.slice(-1))} partCount={5}
+   answered={answeredCount} total={30} secondsLeft={secondsLeft}
+   onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
+   <button type="button" className="reading-unified-back" disabled={submitted}
+    onClick={toggleTimer}>{timerRunning ? "Pause" : "Start / resume"}</button>
+  </ReadingPracticeHeader>
       <header className="b1-final-module-header">
         <p>B1 · Lesen · Exams Room</p>
         <h1>{sample.label}</h1>
@@ -198,23 +254,15 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       <section className="b1-final-paper" style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", justifyContent: "space-between" }}>
           <strong>Time left: {timeLabel(secondsLeft)}</strong>
-          <button type="button" disabled={submitted || secondsLeft === 0} onClick={() => setTimerRunning((value) => !value)}>
+          <button type="button" disabled={submitted || secondsLeft === 0} onClick={toggleTimer}>
             {timerRunning ? "Pause timer" : secondsLeft === DURATION_SECONDS ? "Start timer" : "Resume timer"}
           </button>
           <span>{answeredCount}/30 answered</span>
         </div>
-        <nav aria-label="B1 reading Teil selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {B1_READING_PART_KEYS.map((key, index) => (
-            <button
-              key={key}
-              type="button"
-              disabled={partKey === key}
-              onClick={() => setPartKey(key)}
-            >
-              Teil {index + 1} · {partQuestions[key].filter((q) => answers[q.number]).length}/{PART_COUNT[key]}
-            </button>
-          ))}
-        </nav>
+        <ReadingPartNavigation
+   parts={B1_READING_PART_KEYS.map(key => ({id:key,answered:partQuestions[key].filter(q=>answers[q.number]).length,total:partQuestions[key].length}))}
+   active={Number(partKey.slice(-1))-1}
+   onSelect={index => setPartKey("teil"+(index+1))}/>
       </section>
 
       <section className="b1-final-paper">
@@ -314,11 +362,16 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         ) : null}
       </section>
 
-      <footer className="b1-final-paper">
+      <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={5}
+   onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
+   onNext={() => setPartKey("teil"+Math.min(5,Number(partKey.slice(-1))+1))}>
+   {answeredCount}/30 answered
+  </ReadingPartFooter>
+  <footer className="b1-final-paper">
         {!submitted ? (
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
             <span>Complete every Teil before checking your answers ({answeredCount}/30).</span>
-            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30} onClick={submit}>
+            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30} onClick={() => submit()}>
               Check answers
             </button>
           </div>

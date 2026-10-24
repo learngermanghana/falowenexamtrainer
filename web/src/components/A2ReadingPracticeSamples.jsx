@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { ReadingPracticeHeader, ReadingPartNavigation, ReadingPartFooter } from "./ReadingPracticeShell";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -497,6 +498,12 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
 
   return (
     <main className="a2-mock-shell a2-reading-practice-shell" data-a2-reading-practice-samples>
+      <ReadingPracticeHeader level="A2" sampleLabel={sample.label} part={Number(partKey.slice(-1))} partCount={4}
+   answered={answered} total={20} secondsLeft={remainingSeconds}
+   onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
+   <button type="button" className="reading-unified-back" disabled={submitted}
+    onClick={() => setTimerRunning(v => !v)}>{timerRunning ? "Pause" : "Start / resume"}</button>
+  </ReadingPracticeHeader>
       <div className="a2-mock-topbar a2-reading-practice-topbar">
         <div>
           <strong>A2 Lesen · Exams Room</strong>
@@ -532,18 +539,10 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
           </div>
         </header>
 
-        <nav className="a2-reading-part-selector" aria-label="A2 Lesen part selector">
-          {["teil1", "teil2", "teil3", "teil4"].map((key, index) => {
-            const partItems = key === "teil4" ? sample[key].people : sample[key].questions;
-            const partAnswered = partItems.filter((item) => answers[item.number]).length;
-            return (
-              <button key={key} type="button" className={partKey === key ? "is-active" : ""} onClick={() => setPartKey(key)}>
-                Teil {index + 1}
-                <small>{partAnswered}/5 answered</small>
-              </button>
-            );
-          })}
-        </nav>
+        <ReadingPartNavigation
+   parts={["teil1", "teil2", "teil3", "teil4"].map(key => ({id:key,answered:(key === "teil4" ? sample[key].people : sample[key].questions).filter(q=>answers[q.number]).length,total:(key === "teil4" ? sample[key].people : sample[key].questions).length}))}
+   active={Number(partKey.slice(-1))-1}
+   onSelect={index => setPartKey("teil"+(index+1))}/>
 
         <section className="a2-mock-part">
           <TeilHeading data={sample[partKey]} />
@@ -640,7 +639,12 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
           ) : null}
         </section>
 
-        <footer className="a2-reading-practice-footer">
+        <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={4}
+   onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
+   onNext={() => setPartKey("teil"+Math.min(4,Number(partKey.slice(-1))+1))}>
+   {answered}/20 answered
+  </ReadingPartFooter>
+  <footer className="a2-reading-practice-footer">
           {!submitted ? (
             <>
               <div><strong>{answered}/20 answered</strong><span>Complete all four Teile before checking your answers.</span></div>

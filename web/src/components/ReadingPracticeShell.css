@@ -1,0 +1,29 @@
+.reading-unified-header{background:#fff;border:1px solid #dce3eb;border-radius:18px;padding:20px;display:grid;gap:14px;box-shadow:0 6px 18px rgba(15,23,42,.04)}.reading-unified-title{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}.reading-unified-title h1{font-size:clamp(23px,3vw,30px);color:#162236;margin:4px 0 6px}.reading-unified-title p{color:#64748b;margin:0}.reading-unified-eyebrow{font-size:12px!important;font-weight:800;letter-spacing:.06em;color:#465a73!important}.reading-unified-back{background:white;border:1px solid #cad5e2;border-radius:10px;padding:10px 14px;cursor:pointer;color:#334155;font-weight:700}.reading-unified-status{display:flex;flex-wrap:wrap;gap:16px;align-items:center}.reading-unified-status>div{display:grid;gap:3px;min-width:115px}.reading-unified-status span{font-size:12px;color:#64748b}.reading-unified-status strong{font-size:17px;color:#1e293b}.reading-unified-timeout{color:#b91c1c!important}.reading-unified-track{height:7px;background:#e5eaf1;border-radius:20px;overflow:hidden}.reading-unified-track div{height:100%;background:#264d67;transition:width .2s}.reading-unified-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:8px;margin:14px 0 18px}.reading-unified-parts button{background:#fff;color:#334155;border:1px solid #d5dfe9;border-radius:11px;padding:11px 12px;text-align:left;display:grid;gap:3px;cursor:pointer;font:inherit}.reading-unified-parts button span{font-weight:800}.reading-unified-parts button small{font-size:11px;color:#64748b}.reading-unified-parts button.is-active{background:#23455e;border-color:#23455e;color:white}.reading-unified-parts button.is-active small{color:#d4e3ed}.reading-unified-parts button.is-complete:not(.is-active){border-color:#92b4a1}.reading-unified-footer{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #e1e7ef;border-radius:13px;padding:12px;margin:16px 0}.reading-unified-footer>button{background:#f7fafc;border:1px solid #cbd5e1;color:#27455f;border-radius:9px;font-weight:700;padding:10px 14px;cursor:pointer}.reading-unified-footer>button:disabled{opacity:.45;cursor:not-allowed}.reading-unified-footer>div{font-size:13px;color:#64748b}.reading-unified-landing{max-width:1080px;margin:0 auto;padding:16px;display:grid;gap:18px}.reading-unified-landing h1{font-size:clamp(28px,4vw,38px);margin:0}.reading-unified-levels{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.reading-unified-levels button{padding:12px;border:1px solid #d8e1e9;background:#fff;border-radius:10px;cursor:pointer;font-weight:800;color:#334155}.reading-unified-levels button[aria-pressed=true]{background:#23455e;color:#fff}.reading-unified-samples{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.reading-unified-sample{background:#fff;border:1px solid #dbe3ed;padding:20px;border-radius:15px;display:grid;gap:9px;text-align:left;cursor:pointer;font:inherit;color:#26384e}.reading-unified-sample strong{font-size:18px}.reading-unified-sample small{color:#64748b}@media(max-width:680px){.reading-unified-header{padding:14px}.reading-unified-title{flex-direction:column}.reading-unified-levels{grid-template-columns:repeat(3,minmax(0,1fr))}.reading-unified-footer{justify-content:space-between}.reading-unified-status{gap:10px}}
+/* Consolidate old level-specific chrome into one hierarchy. Retain the actual
+   reading passages, examples, questions, and their Goethe-specific layouts. */
+.a1-reading-practice-shell .a1-reading-practice-topbar,
+.a2-reading-practice-shell .a2-reading-practice-topbar,
+[data-b1-reading-practice-samples] > .b1-final-module-header,
+.a1-reading-practice-shell .a1-reading-practice-timer,
+.a2-reading-practice-shell .a2-reading-practice-timer{
+  /* The shared ReadingPracticeHeader owns title, back, timing and progress. */
+  display:none;
+}
+[data-b1-reading-practice-samples] .b1-final-paper{
+  background:#fff;
+  border:1px solid #dce3ed;
+  border-radius:16px;
+  box-shadow:0 5px 15px rgba(15,23,42,.035);
+}
+[data-b1-reading-practice-samples] .b1-final-reading-text,
+[data-b1-reading-practice-samples] .b1-final-press-text {
+  background:#f9fbfd;
+  border-color:#e0e7ef;
+}
+[data-b1-reading-practice-samples] .b1-final-question {
+  border-color:#e1e7ed!important;
+}
+.a1-reading-practice-shell .a1-goethe-mock-exam,
+.a2-reading-practice-shell .a2-mock-exam{
+  margin-top:14px;
+}
