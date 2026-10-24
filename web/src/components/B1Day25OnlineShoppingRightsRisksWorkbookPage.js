@@ -54,8 +54,8 @@ const config = {
     externalUrl: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
     selfCheckText: "The solutions are provided in the listening resource. Mark your own score. Only Lesen and Schreiben are submitted for tutor evaluation.",
   },
-  submitWritingDescription: "Paste your final formal complaint letter.",
-  submitReadingDescription: "Paste your seven reading answer letters.",
+  submitWritingDescription: "Write your approx. 80-word opinion for the online-shopping discussion.",
+  submitReadingDescription: "Submit your seven online-shopping reading answers (1B, 2B, 3B, 4A, 5A, 6A, 7C).",
 };
 
 export default function B1Day25OnlineShoppingRightsRisksWorkbookPage() {
