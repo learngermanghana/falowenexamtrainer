@@ -16,27 +16,39 @@ const isStaff = identity => Boolean(identity && (
   identity.role === "tutor" || identity.email === "moxflex@gmail.com"
 ));
 const text = (value, size=4000) => clean(value).slice(0,size);
-const normalize = (snap) => {
+const safeCount=value=>Math.max(0,Math.min(100000,Number(value)||0));
+const normalize = snap => {
   const r=snap.data() || {};
   if (!LEVELS.has(r.level) || r.source !== "exam-speaking-practice") return null;
   return {
-    id:snap.id, uid:r.uid, sessionId:r.sessionId || snap.id,
-    level:r.level,teil:text(r.teil || r.task?.teil,80),
+    id:snap.id, level:r.level,
+    teil:text(r.teil || r.task?.teil,80),
     assignmentKey:text(r.task?.courseAssignmentKey,45),
     mockAttemptId:text(r.mockAttemptId,90),
-    taskTitle:text(r.task?.topicPrompt || r.task?.prompt || r.task?.text || r.task?.id,220),
     source:r.task?.courseAssignmentKey ? "course_book" : "exams_room",
-    completed:r.completed === true,
-    createdAt:timestamp(r.createdAt),
-    answers:Array.isArray(r.answers) ? r.answers.slice(0,16).map(x=>text(x,1500)) : [],
-    dialogue:Array.isArray(r.dialogue) ? r.dialogue.slice(-20).map(row=>({
-      role:row.role === "user" ? "student" : "examiner",
-      text:text(row.text,1000),
-    })) : [],
+    completed:r.completed === true, createdAt:timestamp(r.createdAt),
     score:Number.isFinite(Number(r.assessment?.percent)) ? Number(r.assessment.percent) : null,
-    feedback:text(r.feedback,2000),
-    // Important: these are real confirmed student words, NOT playable voice files.
-    audioAvailable:false,
+    answeredQuestions:Array.isArray(r.answers) ? r.answers.length : 0,
+    // Current provider cost is not recorded per student. Never infer USD from
+    // a transcript, unpriced audio size or number of practice sessions.
+    costUsd:null,
+  };
+};
+const normalizeActivity = (snap, now=Date.now()) => {
+  const r=snap.data() || {};
+  if (!LEVELS.has(r.level) || r.source !== "exam-speaking-practice") return null;
+  const expires=Date.parse(timestamp(r.expiresAt)||r.expiresAt||"");
+  const open=!r.endedAt && Number.isFinite(expires) && expires>now;
+  return {
+    uid:text(r.uid,130),level:r.level,
+    source:r.examTask?.courseAssignmentKey?"course_book":"exams_room",
+    assignmentKey:text(r.examTask?.courseAssignmentKey,45),
+    startedAt:timestamp(r.startedAt),
+    state:open?(r.inFlight?"processing":"session_open"):"ended",
+    answeredQuestions:safeCount(r.answeredTurns),
+    practiceTurns:safeCount(r.turnsUsed),
+    recordedBytes:safeCount(r.audioBytesUsed),
+    costUsd:null,
   };
 };
 async function resolveStudent({ admin, findStudentByCodeOrEmail, input }) {
@@ -92,10 +104,26 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
     if(!isStaff(identity))return res.status(403).json({ok:false,error:"Staff access required."});
     const input=clean(req.query?.student);
     const level=clean(req.query?.level).toUpperCase();
-    if(input.length<3||input.length>150||!["","ALL",...LEVELS].includes(level)){
-      return res.status(400).json({ok:false,error:"Provide a student email, exact full name, student code or UID, and optional A1–B2 level."});
+    const overview=clean(req.query?.view)==="activity";
+    if((!overview&&(input.length<3||input.length>150))||!["","ALL",...LEVELS].includes(level)){
+      return res.status(400).json({ok:false,error:"Select activity overview or provide an exact student email, code or UID, and optional A1–B2 level."});
     }
     try{
+      if(overview){
+        // One bounded snapshot when staff presses Refresh. No subscriptions,
+        // background polling, microphone recordings, or model/API calls.
+        const db=admin.firestore();
+        const snaps=await db.collection("liveSpeakSessions").orderBy("startedAt","desc").limit(80).get();
+        const activity=(snaps.docs||[]).map(snap=>normalizeActivity(snap))
+          .filter(Boolean).filter(row=>!level||level==="ALL"||row.level===level)
+          .slice(0,60);
+        const ym=new Date().toISOString().slice(0,7);
+        const usage=await db.collection("liveSpeakUsage").doc(ym).get();
+        return res.json({ok:true,view:"activity",checkedAt:new Date().toISOString(),
+          activity,limited:snaps.size>=80,
+          usage:{month:ym,reservedAiCallUnits:safeCount(usage.data()?.turns),costUsd:null},
+          note:"Activity means an examiner session is open, not confirmed live microphone use. Dollar cost per learner is not metered in the stored data. Usage counts are units, not billing totals. No audio or transcripts are returned."});
+      }
       const student=await resolveStudent({admin,findStudentByCodeOrEmail,input});
       const db=admin.firestore();
       // This query occurs ONLY when staff explicitly opens a student review.
@@ -129,7 +157,7 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
         }));
       return res.json({ok:true,student,results,course:course.filter(Boolean),
         limited:snapshots.size>=30,checkedAt:new Date().toISOString(),
-        note:"Read-only confirmed Live AI examiner transcripts and scored snapshots. Original microphone recordings were not retained; this page cannot replay them. Other legacy speaking modes may use separate records."});
+        note:"Read-only speaking result metadata. No microphone recordings, transcripts or answers are returned. USD cost is not available in existing records."});
     }catch(error){
       if(error.status)return res.status(error.status).json({ok:false,error:error.message});
       console.error("Staff speaking review lookup failed:",error?.code||error?.message);
@@ -137,4 +165,4 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
     }
   });
 }
-module.exports={registerStaffSpeakingReviewRoutes,normalize,resolveStudent,isStaff};
+module.exports={registerStaffSpeakingReviewRoutes,normalize,normalizeActivity,resolveStudent,isStaff};
