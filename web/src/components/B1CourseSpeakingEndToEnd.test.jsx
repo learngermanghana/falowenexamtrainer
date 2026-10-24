@@ -124,7 +124,7 @@ test("B1 student records every step, confirms transcripts, completes all three T
   expect(screen.queryByText(/Exam simulation/)).not.toBeInTheDocument();
   expect(screen.queryByText(/Your brief notes/)).not.toBeInTheDocument();
   expect(screen.getByLabelText("Session time left")).toHaveTextContent(/^20:0[0-1]$/);
-  expect(screen.getByRole("button", { name: "Check saved speaking progress" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Check saved answer / speaking progress" })).toBeInTheDocument();
   expect(screen.getByText("View planning points")).toBeInTheDocument();
 
   for (let index = 0; index < limits.length; index += 1) {
