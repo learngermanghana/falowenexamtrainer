@@ -29,7 +29,7 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
 
-export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset, gradedCourseMock = false }) {
+export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, onRecoverCompletedParts, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset, gradedCourseMock = false }) {
   const { idToken, studentProfile } = useAuth();
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -870,7 +870,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
         <p role="status" style={{margin:0,color:"#64748b"}}>Speaking practice is temporarily unavailable.</p>
       ) : null}
 
-      {supportedExaminer && !examFeedback ? <GoetheExamTaskCard flow={session?.examFlow || taskPreview} topic={session?.examTask?.prompt || examTask?.prompt} active={Boolean(session)}/> : null}
+      {supportedExaminer && !examFeedback && !(gradedCourseMock && safeLevel === "B1") ? <GoetheExamTaskCard flow={session?.examFlow || taskPreview} topic={session?.examTask?.prompt || examTask?.prompt} active={Boolean(session)}/> : null}
       {examinerEntry && !gradedCourseMock && details?.openTesting && !session && !loading ? (
         <p role="status" className="speaking-testing-access-note">
           AI examiner testing is available. Start or repeat an exam without pilot credits.
@@ -965,6 +965,14 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                 onClick={()=>setResetConfirm(true)} disabled={resetting || recording}>Reset session</button> : null}
             </div>
           </header>
+          {gradedCourseMock && safeLevel === "B1" && session?.examFlow?.key === "B1-1"
+            && session.examFlow.points?.length ? (
+            <details className="speaking-exam-inline-task">
+              <summary>View planning points</summary>
+              <p lang="de">{session.examTask?.prompt || examTask?.prompt}</p>
+              <ol>{session.examFlow.points.map((point, index) => <li key={`${index}-${point}`} lang="de">{point}</li>)}</ol>
+            </details>
+          ) : null}
           {examinerSession ? <div className="speaking-exam-turn-indicator" role="status" aria-live="polite" aria-atomic="true">
             <span className={waitingForOpening ? "speaking-exam-turn-indicator__dot is-waiting" : recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
             <strong>{examTurnState}</strong>
@@ -1110,11 +1118,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               </details> : null}
               {gradedCourseMock && !recording ? (
                 <div className="speaking-exam-saved-step" style={{display:"grid",gap:5}}>
-                  <button type="button" onClick={recoverSavedSpeakingStep}
-                    disabled={busy || feedbackBusy || recording}>
-                    Check saved answer / speaking progress
+                  <button type="button" onClick={async () => {
+                    await recoverSavedSpeakingStep();
+                    // The course assessment owns cross-Teil recovery. Both checks read
+                    // saved results only; neither transcribes or grades again.
+                    await onRecoverCompletedParts?.();
+                  }} disabled={busy || feedbackBusy || recording}>
+                    Check saved speaking progress
                   </button>
-                  <small>Recovers answers and completed Teils already saved to Falowen. No new recording or AI marking is charged.</small>
+                  <small>Restore saved answers or completed Teile without recording or paying for AI again.</small>
                 </div>
               ) : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
