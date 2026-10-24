@@ -345,3 +345,45 @@ test("Day 6 print privacy leaves other lesson writing tasks and family examples 
   assert.equal(unrelated.removed, false);
   assert.equal(unrelated.replacement, null);
 });
+
+
+test("legacy workbook class-share box replaces posted learner answers with blank writing lines", () => {
+  const root = new Element("MAIN");
+  const lessonPrompt = new Element("SECTION", "Meine Familie · Das ist mein Vater.");
+  const box = new Element("DIV", "Private learner's family answer and identity");
+  const inputGroup = new Element("DIV");
+  const input = new Element("TEXTAREA", "Private saved paragraph");
+  input.parentElement = inputGroup;
+  inputGroup.parentElement = box;
+  box.parentElement = root;
+  box.mapping["strong"] = [
+    new Element("STRONG", "Write and share with your class"),
+    new Element("STRONG", "What Your Classmates Shared"),
+  ];
+  root.mapping['textarea[id^="workbook-share-"]'] = [input];
+  root.mapping["section"] = [lessonPrompt];
+
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(box.removed, true);
+  assert.equal(box.replacement.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(box.replacement.children.filter(node =>
+    node.getAttribute("data-a1-pdf-answer-rule") === "").length, 9);
+  assert.equal(lessonPrompt.removed, false);
+  const replacementText = box.replacement.children.map(node => node.textContent).join(" ");
+  assert.deepEqual(findA1PrintPrivacyLeaks(replacementText), []);
+  assert.doesNotMatch(replacementText, /private learner|shared|classmates/i);
+});
+
+test("workbook privacy fallback cannot delete an unrelated writing input", () => {
+  const root = new Element("MAIN");
+  const lesson = new Element("SECTION", "Write a paragraph using these phrases");
+  const input = new Element("TEXTAREA", "Learner input");
+  input.parentElement = lesson;
+  lesson.parentElement = root;
+  lesson.mapping["strong"] = [new Element("STRONG", "Writing task")];
+  root.mapping['textarea[id^="workbook-share-"]'] = [input];
+
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(lesson.removed, false);
+  assert.equal(lesson.replacement, null);
+});

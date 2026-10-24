@@ -41,6 +41,25 @@ export const sanitizeA1PrintDocument = () => {
     mount.replaceWith(makeWritingSpace("Meine Familie · Schreiben Sie 6–8 Sätze.", 9));
   }
 
+  // Legacy A1 workbooks can also mount ClassWorkbookShareBox independently
+  // of Day 6's discussion portal. Its live Firestore cards contain classmates'
+  // names and answers, so redact the *whole* box (including the shared list),
+  // not only the textarea or save button. The stable workbook-share field ID
+  // works on deployed builds that have no print-private marker yet.
+  for (const field of [...root.querySelectorAll('textarea[id^="workbook-share-"]')]) {
+    let container = field.parentElement;
+    for (let depth = 0; depth < 5 && container && container !== root; depth += 1) {
+      const titles = [...container.querySelectorAll("strong")]
+        .map((node) => normalize(node.textContent));
+      if (titles.includes("Write and share with your class")
+        && titles.includes("What Your Classmates Shared")) {
+        container.replaceWith(makeWritingSpace("Schreiben · Schreiben Sie 6–8 Sätze.", 9));
+        break;
+      }
+      container = container.parentElement;
+    }
+  }
+
   // Real Firestore biographies and class answers occur in multiple A1 days,
   // not only Day 13. Redact whole marked subtrees before resetting form fields:
   // otherwise author names / posted sentences can survive DOM text extraction.
