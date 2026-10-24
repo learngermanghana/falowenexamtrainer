@@ -20,18 +20,17 @@ const cleanSourceText = text => String(text || "")
  .replace(/\n{4,}/g, "\n\n").trim();
 const splitSection = (source, from, to, part) => {
  const cleaned=cleanSourceText(source);
- if(part===1)return {passage:cleaned,questions:[]};
  const normalized=cleaned.replace(/<\\/?b>/gi,"");
- const startPattern=new RegExp("(?:^|\\n)\\s*"+from+"\\.\\s+","i");
+ const startPattern=new RegExp("(?:^|\\n)\\s*"+from+"(?:\\.|\\s{2,})\\s+","i");
  const found=startPattern.exec(normalized);
  if(!found)return {passage:cleaned,questions:[]};
  const passage=normalized.slice(0,found.index).trim();
  const questionText=normalized.slice(found.index).trim();
  const questions=Array.from({length:to-from+1},(_,i)=>{
   const num=from+i;
-  const here=new RegExp("(?:^|\\n)\\s*"+num+"\\.\\s+","i").exec(questionText);
+  const here=new RegExp("(?:^|\\n)\\s*"+num+"(?:\\.|\\s{2,})\\s+","i").exec(questionText);
   if(!here)return "";
-  const next=new RegExp("(?:^|\\n)\\s*"+(num+1)+"\\.\\s+","i").exec(questionText.slice(here.index+here[0].length));
+  const next=new RegExp("(?:^|\\n)\\s*"+(num+1)+"(?:\\.|\\s{2,})\\s+","i").exec(questionText.slice(here.index+here[0].length));
   const start=here.index+here[0].length;
   const end=next?start+next.index:questionText.length;
   return questionText.slice(start,end).replace(/\\[\\s*\\]/g,"").trim();
