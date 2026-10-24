@@ -1,6 +1,13 @@
 name: Deploy Falowen Firestore Indexes
 
 on:
+  pull_request:
+    paths:
+      - 'firestore.indexes.json'
+      - 'firebase.json'
+      - 'scripts/deployFirestoreIndexes.cjs'
+      - 'scripts/deployFirestoreIndexes.test.cjs'
+      - '.github/workflows/deploy-firestore-indexes.yml'
   push:
     branches: [main]
     paths:
@@ -19,7 +26,17 @@ permissions:
   contents: read
 
 jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test scripts/deployFirestoreIndexes.test.cjs
   deploy:
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
