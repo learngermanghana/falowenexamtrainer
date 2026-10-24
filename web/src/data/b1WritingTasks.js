@@ -425,33 +425,24 @@ export const B1_WRITING_TASKS = Object.freeze({
     vocabulary: ["der Fake-Shop", "das Widerrufsrecht", "das Risiko", "die Verbraucherrechte", "der Kundenservice", "die Bewertung", "auf Rechnung bezahlen"],
   } }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
-    title: "Schreibaufgabe: Informeller Brief – Reiseprobleme und Lösungen",
-    instructions:
-      "Du hast eine Reise gemacht, aber es gab ein paar Probleme. Schreibe deinem Freund Max oder deiner Freundin Lisa einen Brief.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an informal letter about travel problems",
+    title: "Goethe-Zertifikat B1 · Schreiben Teil 2 · Reiseprobleme und Lösungen",
+    instructions: "Arbeitszeit: ca. 25 Minuten. Schreiben Sie einen Forumsbeitrag von ca. 80 Wörtern. Sie haben im Internet einen Beitrag von Markus zum Thema „Reiseprobleme und Lösungen“ gelesen. Reagieren Sie darauf.",
+    imageAlt: "Forumsbeitrag zu Reiseproblemen und Lösungen",
+    sourceTitle: "Markus schreibt",
+    sourceText: "„Letzten Sommer hatte mein Zug drei Stunden Verspätung und mein Koffer ist am Flughafen verloren gegangen. Reisen kann heutzutage wirklich stressig sein! Ich finde, man sollte lieber öfter zu Hause bleiben oder nur kurze Ausflüge in der Region machen, anstatt weit weg zu fahren.“",
     taskPoints: [
-      "Wohin du gefahren bist und wie du gereist bist, zum Beispiel mit dem Zug oder Flugzeug.",
-      "Was genau passiert ist, zum Beispiel Verspätung, Hotel geschlossen oder Gepäck verloren.",
-      "Was du gemacht hast, um das Problem zu lösen, zum Beispiel umgebucht oder Kundenservice kontaktiert.",
+      "Meinung: Äußern Sie Ihre Meinung zu Markus' Aussage.",
+      "Erfahrung/Gründe: Berichten Sie von eigenen Erfahrungen mit Reiseproblemen oder nennen Sie Gründe dafür.",
+      "Lösungen: Machen Sie Vorschläge, wie man Stress oder Probleme beim Reisen vermeiden oder lösen kann."
     ],
     supportStructure: [
-      "Anrede: Lieber Max / Liebe Lisa,",
-      "Kurz erzählen, wohin du gereist bist.",
-      "Das Reiseproblem genau beschreiben.",
-      "Erklären, wie du reagiert hast.",
-      "Sagen, wie die Reise am Ende war.",
-      "Grußformel und Name.",
+      "Reagieren Sie kurz auf Markus' Beitrag (zustimmen / widersprechen).",
+      "Begründen Sie Ihre Meinung und erzählen Sie von einer Erfahrung oder nennen Sie Gründe.",
+      "Nennen Sie ein oder zwei konkrete Lösungen oder Vorbereitungstipps.",
+      "Schließen Sie mit Ihrer eigenen Einschätzung."
     ],
-    vocabulary: [
-      "die Verspätung",
-      "das Gepäck",
-      "die Reservierung",
-      "umbuchen",
-      "sich beschweren",
-      "den Kundenservice kontaktieren",
-      "eine Lösung finden",
-    ],
+    template: "Ich habe Markus' Beitrag gelesen. Ich kann ihn gut verstehen, aber ... Meiner Meinung nach ... Ich habe einmal erlebt, dass ... Deshalb sollte man ... Außerdem könnte man ...",
+    vocabulary: ["die Verspätung", "das Gepäck", "ein Anschlusszug", "die Entschädigung", "umbuchen", "eine Alternative suchen", "Pufferzeit einplanen", "sich an den Kundenservice wenden"]
   } }),
   27: Object.freeze({ assignmentKey: "B1-10.27", ...{
     title: "Kann jeder Mensch umweltfreundlich leben? Schreiben Sie Ihre Meinung.",

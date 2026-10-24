@@ -417,29 +417,21 @@ export const B1_READING_TASKS = Object.freeze({
     },
   } }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
-    title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
-    instructions: "Lesen Sie zuerst den vollständigen Text. Wählen Sie danach bei jeder Frage genau eine Antwort.",
-    image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Travel destinations in Germany",
+    title: "Lesen · Situationen und Anzeigen zuordnen (4 Aufgaben)",
+    instructions: "Lesen Sie die Situationen 1–4 und die Anzeigen A–E. Welche Anzeige passt zu welcher Person? Wählen Sie pro Aufgabe A, B, C, D, E oder 0, falls keine Anzeige passt.",
+    submissionNote: "Tragen Sie vier Buchstaben ein, zum Beispiel 1A, 2C, 3B, 4E.",
+    imageAlt: "Passende Reisehilfe-Anzeigen finden",
     text: {
-      title: "Urlaubsland Deutschland",
-      questionTitle: "Fragen zum Text",
-      paragraphs: [
-        "Die Auswahl an Attraktionen erscheint fast unbegrenzt, was Deutschland auch bei den eigenen Einwohnern zum populären Urlaubsland macht. Die Deutschen verreisen gerne – und das auch innerhalb ihres Landes, zum Beispiel in das Bundesland Mecklenburg-Vorpommern: Im Sommer wünschen sich viele einen Strandurlaub, und dazu bieten die Ostsee und ihre bekannten Inseln Rügen und Usedom eine wunderschöne Gelegenheit. Die Mecklenburgische Seenplatte mit ihren mehr als 1.000 Seen lockt Wassersportler und Wanderfans – was die Deutschen sehr häufig sind.",
-        "Das Bundesland Bayern, ebenfalls ein beliebtes Reiseziel, hat zwar keine Meeresküste, aber zahlreiche andere Attraktionen: Die Alpen beispielsweise begeistern Wanderer, Biker, Wintersportler und andere Aktivurlauber. Die Zugspitze, höchster Berg der Republik, der Watzmann am Königssee und die weltbekannten Schlösser des „Märchenkönigs“ Ludwig II., wie Neuschwanstein, Herrenchiemsee oder Linderhof – das sind nur einige Beispiele für die Angebotsvielfalt im deutschen Süden.",
-        "Eine Entwicklung, über die sich die deutsche Tourismusbranche besonders freut: Auch internationale Touristen wählen Deutschland immer öfter als Ziel für eine Reise. Häufig kommt der Besuch aus europäischen Nachbarländern, aber auch aus den USA, Asien und den arabischen Golfstaaten. Für die ausländischen Gäste gehört zum Deutschland-Trip natürlich oft ein Besuch in der Hauptstadt Berlin. Auch Hamburg, Köln und Dresden sind sehr beliebt – oder München, das allein mit dem weltberühmten Oktoberfest im Herbst Besucher aus aller Welt anzieht. Als weitere Sightseeing-Klassiker unter den Urlaubszielen gelten bei den ausländischen Touristen etwa auch der Schwarzwald, der Bodensee und der Vergnügungspark Rust in Baden-Württemberg.",
-        "Urlaubsland Deutschland – da gäbe es noch viel zu erzählen. Wer perfektes Sommerwetter ohne Ausnahme als sonnig und warm definiert, wird hier allerdings nicht immer glücklich, weshalb auch viele Deutsche – oft kurzfristig – doch noch eine Reise ins Ausland buchen.",
-      ],
+      title: "Reiseprobleme und Lösungen · Situationen und Anzeigen",
+      questionTitle: "Aufgaben 1–4 · Welche Anzeige passt?",
+      paragraphs: ["Situation 1 · Katrin ist aus dem Urlaub zurückgekehrt, aber ihr Koffer ist am Flughafen verschwunden. Sie sucht professionelle Hilfe, um Entschädigung von der Fluggesellschaft zu bekommen.","Situation 2 · Markus plant eine Autoreise durch Europa und möchte für den Fall einer Autopanne im Ausland abgesichert sein.","Situation 3 · Elena fährt oft mit dem Zug zur Arbeit und in den Urlaub. Bei Verspätungen möchte sie ohne viel Papierkram ihr Geld zurückerhalten.","Situation 4 · Familie Becker sucht eine Versicherung, die die Kosten übernimmt, falls jemand vor der Reise krank wird und nicht mitfahren kann.","Anzeigen A–E","Anzeige A · Flug-Recht24 – Ihr Partner bei Flugproblemen! — Flug gecancelt? Koffer verloren oder beschädigt? Wir setzen Ihre Ansprüche gegenüber der Airline durch – schnell, unkompliziert und ohne finanzielles Risiko. Sie zahlen nur im Erfolgsfall!","Anzeige B · ZugPlus App – Entschädigung per Klick — Zugverspätung gehabt? Mit unserer App reichen Sie Ihren Entschädigungsantrag bei der Bahn in unter 2 Minuten ein. Automatische Auszahlung direkt auf Ihr Konto.","Anzeige C · EuroPannenschutz – Rund um die Uhr sicher unterwegs — Egal ob Motorschaden, Reifenschaden oder Unfall: Unser 24-Stunden-Pannendienst hilft Ihnen in über 30 europäischen Ländern schnell vor Ort oder organisiert einen Ersatzwagen.","Anzeige D · City-Hotel Terminal – Direkt am Flughafen — Flug verpasst oder Ausfall wegen Streik? Übernachten Sie komfortabel und günstig direkt am Flughafen. Kostenloser Shuttle-Service rund um die Uhr.","Anzeige E · SicherReisen Reiserücktrittsversicherung — Plötzlich krank vor dem Urlaub? Schützen Sie sich vor hohen Stornogebühren. Unsere Tarife passen sich flexibel an Einzelpersonen und Familien an."],
       questions: [
-        { stem: "Eine Familie sucht Strandurlaub an der Ostsee und möchte in Deutschland bleiben. Welches Bundesland passt laut Text?", options: ["A) Bayern", "B) Mecklenburg-Vorpommern", "C) Baden-Württemberg"] },
-        { stem: "Welches Ziel in Bayern nennt der Text ausdrücklich als höchsten Berg Deutschlands?", options: ["A) Die Zugspitze", "B) Der Bodensee", "C) Der Watzmann"] },
-        { stem: "Welche Antwort nennt genau die beiden Ostseeinseln, die der Text als bekannte Reiseziele in Mecklenburg-Vorpommern erwähnt?", options: ["A) Rügen und Usedom", "B) Sylt und Föhr", "C) Mallorca und Ibiza"] },
-        { stem: "Welche Aussage zeigt am besten, dass internationale Gäste nicht nur wegen eines einzigen Ortes nach Deutschland kommen?", options: ["A) Nur die Hauptstadt Berlin", "B) Städte wie Berlin, Hamburg, Köln und München", "C) Nur die Berge in Bayern"] },
-        { stem: "Welches Ereignis erklärt im Text besonders Münchens internationale Anziehungskraft im Herbst?", options: ["A) Die Berlinale", "B) Das Oktoberfest", "C) Der Weihnachtsmarkt"] },
-        { stem: "Welche Antwort nennt ausschließlich Schlösser, die im Text mit Ludwig II. verbunden werden?", options: ["A) Neuschwanstein, Herrenchiemsee und Linderhof", "B) Der Schwarzwald und der Bodensee", "C) Das Miniatur Wunderland in Hamburg"] },
-        { stem: "Welche Schlussfolgerung erklärt, warum manche Deutsche trotz vieler Reiseziele im eigenen Land kurzfristig ins Ausland fahren?", options: ["A) Wegen des perfekten Sommerwetters", "B) Wegen der hohen Temperaturen im Sommer", "C) Weil das Wetter in Deutschland nicht immer sonnig und warm ist"] },
-      ],
-    },
+        { stem: "Welche Anzeige passt zu Katrin?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
+        { stem: "Welche Anzeige passt zu Markus?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
+        { stem: "Welche Anzeige passt zu Elena?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
+        { stem: "Welche Anzeige passt zu Familie Becker?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] }
+      ]
+    }
   } }),
   27: Object.freeze({ assignmentKey: "B1-10.27", ...{
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",

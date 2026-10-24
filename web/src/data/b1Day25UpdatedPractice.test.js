@@ -25,15 +25,14 @@ describe("B1 Day 25 · original updated exam practice", () => {
     expect(writing.title).toContain("80 Wörter");
     expect(writing.title).not.toContain("Beschwerdebrief");
   });
-  test("Hören has seven questions from the sustainable-shopping dialogue without playing old mismatched media", () => {
+  test("Hören has seven questions from the sustainable-shopping dialogue with the matching R2 recording", () => {
     const listening = getB1ListeningTask(25);
     expect(listening.questions).toHaveLength(7);
     expect(listening.questions.every(q => q.options.length === 3)).toBe(true);
     expect(listening.transcript).toContain("Wochenmarkt");
     expect(listening.transcript).toContain("Rathaus");
-    expect(listening.audioKey || listening.videoId || listening.embedUrl).toBeFalsy();
-    expect(listening.status).toBe("audio-pending");
-    expect(listening.submitRequired).toBe(false);
-    expect(getB1Days23To28LessonMetadata(25).instruction).toContain("matching recording");
+    expect(listening.audioKey).toBe("b1/day-25/day-25.mp3");
+    expect(listening.submitRequired).toBe(true);
+    expect(getB1Days23To28LessonMetadata(25).instruction).toContain("seven-question Hören");
   });
 });

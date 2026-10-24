@@ -97,18 +97,8 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(26),
   reading: getB1ReadingTask(26),
-  listening: {
-    title: "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Bearbeiten Sie den vollständigen Hörtest zuerst ohne die Lösungen anzusehen. Kontrollieren und markieren Sie Ihre Antworten anschließend selbst.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for travel listening comprehension",
-    videoId: "0sZVT9XAEBc",
-    externalUrl: "https://youtu.be/0sZVT9XAEBc",
-    selfCheckText:
-      "Please note that this is a Goethe-standard Hörverstehen (listening comprehension) test, and the answers are provided in the YouTube video. You are responsible for checking your own answers. The only parts that will be officially evaluated by the school are Lesen (reading) and Schreiben (writing). You must mark your own Hörverstehen results. This process will require a lot of motivation and self-discipline on your part to be effective. Thank you, and good luck!",
-  },
-  submitWritingDescription: "Paste your final informal letter to Max or Lisa.",
-  submitReadingDescription: "Paste your seven reading answer letters.",
+  submitWritingDescription: "Write your approx. 80-word reply to Markus in the travel-problems forum.",
+  submitReadingDescription: "Submit the four matching answers for Lesen (1A, 2C, 3B, 4E).",
 };
 
 export default function B1Day26ReiseproblemeLoesungenWorkbookPage() {

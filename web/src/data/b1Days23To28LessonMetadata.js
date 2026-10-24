@@ -17,14 +17,14 @@ const B1_DAYS23_TO28_METADATA = Object.freeze({
     chapter: "8.25",
     title: "Online einkaufen – Rechte und Risiken",
     goal: "Vorteile und Risiken des Online-Shoppings erklären, Verbraucherrechte anwenden und eine begründete Meinung zu Risiken und Verbraucherrechten schreiben.",
-    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben and Lesen; the new seven-question Hören is pending a matching recording and is not submitted yet.",
+    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben and Lesen; submit the seven-question Hören using the confirmed Day 25 recording.",
     workbookOnly: false,
   }),
   26: Object.freeze({
     chapter: "9.26",
     title: "Reiseprobleme und Lösungen",
-    goal: "Typische Reiseprobleme beschreiben, passende Lösungen vorschlagen und Beschwerden oder Reaktionen klar formulieren.",
-    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben and Lesen; Teil 4 · Hören is self-check practice and is not submitted.",
+    goal: "Auf Reiseprobleme reagieren, passende Hilfe-Anzeigen zuordnen und einen eigenen Forumsbeitrag mit Lösungsvorschlägen schreiben.",
+    instruction: "Open the Grammar notes, then complete Teil 1–4, Ref and Submit. Submit Schreiben, Lesen (four matching tasks) and Hören (five true/false statements) using the course recording.",
     workbookOnly: false,
   }),
   27: Object.freeze({
