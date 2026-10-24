@@ -71,7 +71,7 @@ function createExaminerFlow(level, task, mode="guided") {
     };
     flow.mockPresentationFeedback=true;
   }
-  if (key === "B1-3") flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
+  if (key === "B1-3" && !flow.mockPresentationFeedback) flow.contextTopic = /fragen|feedback|rückmeldung|präsentation|details/i.test(task?.prompt || "") ? "Freizeit" : clean(task?.prompt,180) || "Freizeit";
   if (key === "B1-2") flow.presentationQuestion=catalogue.b1PresentationTopics.find(item=>item.topic === clean(task?.prompt,180))?.question || "";
   if (/^C[12]-/.test(key)) flow.contextTopic = clean(task?.prompt,180) || "Gesellschaft und Wandel";
   if (key === "B1-3" && !flow.mockPresentationFeedback) flow.discussion=catalogue.b1DiscussionTasks.find(item=>item.topic === clean(task?.prompt,180));
