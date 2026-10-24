@@ -1,0 +1,91 @@
+.falowen-books-shell{--book-ink:#17233f;--book-purple:#4c328e;--book-cream:#faf7f2;min-height:100vh;background:var(--book-cream);color:var(--book-ink);font-family:inherit;padding:0 22px 38px}
+.falowen-books-shell a{text-decoration:none}
+.falowen-books-nav{max-width:1190px;margin:0 auto;min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.falowen-books-nav a{color:#243456;font-weight:700}
+.falowen-books-nav>div{display:flex;gap:26px;flex-wrap:wrap;font-size:14px}
+.falowen-books-logo{display:inline-flex;align-items:center;gap:10px;font-size:19px;letter-spacing:-.025em}
+.falowen-books-logo span{background:#553a9b;color:white;border-radius:12px;width:33px;height:33px;display:grid;place-items:center;font-weight:900}
+.falowen-books-shell main,.falowen-books-shell>footer{max-width:1190px;margin-left:auto;margin-right:auto}
+.falowen-books-hero{background:radial-gradient(circle at 75% 30%,#aa8acc 0,#52358d 33%,#33215f 85%);border-radius:28px;color:white;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,0.75fr);align-items:center;min-height:520px;overflow:hidden;padding:60px clamp(22px,6vw,72px);gap:38px;position:relative}
+.falowen-books-hero:before{content:"";position:absolute;width:260px;height:260px;right:-160px;top:-130px;border:1px solid #ffffff4a;border-radius:50%;box-shadow:0 0 0 70px #ffffff0b,0 0 0 135px #ffffff08;pointer-events:none}
+.falowen-books-eyebrow{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#5f469f}
+.falowen-books-hero .falowen-books-eyebrow{color:#dfd0ff}
+.falowen-books-hero h1{font-family:Georgia,serif;font-size:clamp(36px,4.8vw,63px);letter-spacing:-.035em;line-height:1.1;margin:20px 0;max-width:600px}
+.falowen-books-hero-copy>p{font-size:16px;line-height:1.8;color:#f5effe;max-width:590px}
+.falowen-books-hero-actions{display:flex;gap:13px;flex-wrap:wrap;margin-top:30px}
+.falowen-books-button{border:1px solid transparent;border-radius:12px;padding:14px 20px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;font-weight:800;text-align:center;cursor:pointer;transition:transform .15s,background .15s}
+.falowen-books-button:hover:not(:disabled){transform:translateY(-1px)}
+.falowen-books-button:focus-visible,.falowen-books-nav a:focus-visible,.falowen-books-link-button:focus-visible{outline:3px solid #caa5ff;outline-offset:3px}
+.falowen-books-button.primary{background:#f9d281;color:#302348}
+.falowen-books-button.secondary{border-color:#ffffff79;color:white;background:transparent}
+.falowen-books-button:disabled{opacity:.55;cursor:not-allowed}
+.falowen-books-hero-facts{margin-top:34px;display:flex;gap:18px;flex-wrap:wrap;color:#e9dcff;font-weight:600;font-size:12px}
+.falowen-books-hero-art{position:relative;display:flex;align-items:center;justify-content:center;min-height:370px;perspective:1500px}
+.falowen-book-cover{background:linear-gradient(155deg,#fefcf7 0%,#e9dff0 68%,#c4b5da 100%);color:#2c2451;border-radius:5px 13px 13px 5px;border-left:12px solid #30215e;box-shadow:17px 19px 0 -8px #e6d5ba,26px 26px 35px #170e3788;min-height:372px;width:min(280px,100%);padding:24px;display:flex;flex-direction:column;transform:rotate(7deg);position:relative;z-index:2}
+.falowen-cover-top{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11px;font-weight:900;letter-spacing:.09em}
+.falowen-cover-top span{font-size:7px;color:#624b84}
+.falowen-cover-level{font-size:70px;font-family:Georgia,serif;line-height:1;margin-top:30px;color:#4b318d}
+.falowen-cover-accent{width:48px;height:5px;background:#dea9bf;border-radius:99px;margin:10px 0 16px}
+.falowen-cover-title{font-family:Georgia,serif;font-size:25px;font-weight:700;line-height:1.14}
+.falowen-cover-de{font-size:10px;line-height:1.65;color:#635879;margin-top:19px}
+.falowen-cover-bottom{display:flex;justify-content:space-between;border-top:1px solid #a895c3;margin-top:auto;padding-top:10px;font-size:8px;font-weight:900;letter-spacing:.06em;color:#4f4781}
+.falowen-books-cover-shadow{position:absolute;bottom:5px;width:270px;height:35px;background:#150e3090;filter:blur(23px);border-radius:50%}
+.falowen-books-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:28px 0 58px}
+.falowen-books-feature-grid article{background:#fff;border:1px solid #eae4ea;padding:23px;border-radius:17px}
+.falowen-books-feature-icon{display:grid;place-items:center;width:42px;height:42px;background:#f2e9ff;color:#6542a2;border-radius:12px;font-weight:900;font-size:18px}
+.falowen-books-feature-grid h2{font-size:17px;margin:15px 0 8px}
+.falowen-books-feature-grid p{font-size:14px;color:#566178;line-height:1.7;margin:0}
+.falowen-books-product-panel{display:grid;grid-template-columns:1.1fr .9fr;gap:45px;align-items:start;margin:12px 0 60px}
+.falowen-books-product-details h2{font-family:Georgia,serif;font-size:clamp(29px,3vw,42px);line-height:1.15;max-width:540px;margin:13px 0}
+.falowen-books-product-details>p{line-height:1.75;color:#4d5670;max-width:630px}
+.falowen-books-product-details ul{padding-left:20px;line-height:2.15;color:#263a55}
+.falowen-books-product-details li::marker{color:#765cb9}
+.falowen-books-audio-note{font-size:12px;border-left:3px solid #ad93d3;padding:8px 14px;background:#f4edf8;border-radius:0 8px 8px 0}
+.falowen-books-preview-link{color:#4f328f;font-weight:800}
+.falowen-books-purchase{background:#fff;border:1px solid #ded4e8;box-shadow:0 16px 34px #25174711;border-radius:19px;padding:28px;display:grid;gap:15px}
+.falowen-books-status{width:fit-content;background:#f5ecff;color:#6c3eaa;font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:900;padding:9px 12px;border-radius:99px}
+.falowen-books-price{font-family:Georgia,serif;font-weight:700;font-size:42px;color:#392561}
+.falowen-books-price span{font-family:inherit;font-size:13px;color:#5e6878;font-weight:500}
+.falowen-books-purchase p{margin:0;line-height:1.7;font-size:13px}
+.falowen-books-purchase .falowen-books-button{width:100%}
+.falowen-books-purchase small{color:#667085;line-height:1.6}
+.falowen-books-fee{color:#52617b}
+.falowen-books-owned{background:#e4f7eb;border-radius:10px;padding:10px;color:#1c6c43;font-weight:800}
+.falowen-books-notice{background:#f7f3fc;border:1px solid #e3d8f5;padding:13px;border-radius:10px;color:#64478b}
+.falowen-books-error{background:#fff1f1;border:1px solid #f7c4c4;color:#ad2525;padding:12px;border-radius:9px}
+.falowen-books-quiet-link{font-size:13px;color:#5e417f;font-weight:700;text-align:center}
+.falowen-books-safe{text-align:center;color:#74798c;font-size:11px!important}
+.falowen-books-owner{color:#576178;overflow-wrap:anywhere}
+.falowen-book-account{display:grid;gap:12px}
+.falowen-book-account h3{margin:0;font-size:18px}
+.falowen-book-account label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#374157}
+.falowen-book-account input{border:1px solid #c8c7d2;border-radius:10px;padding:13px;font:inherit}
+.falowen-books-link-button{border:none;background:none;color:#6243a3;font:inherit;font-size:12px;font-weight:800;cursor:pointer;padding:5px}
+.falowen-books-next-step{background:#eee8f7;border-radius:20px;padding:32px 38px;display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:36px}
+.falowen-books-next-step h2{font-size:26px;margin:12px 0}
+.falowen-books-next-step p{color:#5a6074;line-height:1.65;max-width:630px;margin-bottom:0}
+.falowen-books-next-step .secondary{background:#4b328e;color:white;white-space:nowrap}
+.falowen-books-sample{max-width:830px;margin:24px auto 54px}
+.falowen-books-sample>h1{font-family:Georgia,serif;font-size:clamp(32px,4vw,48px);margin:12px 0 20px}
+.falowen-books-sample>p{color:#525d71;line-height:1.7}
+.falowen-books-lesson{background:#fff;border:1px solid #e7dfed;padding:30px;border-radius:16px;margin-top:22px}
+.falowen-books-lesson h2{font-size:23px;margin:0 0 14px;color:#352861}
+.falowen-books-lesson p{line-height:1.8;color:#35455c}
+.falowen-books-greeting-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+.falowen-books-greeting-grid>div{padding:16px;border:1px solid #e2dbe9;border-radius:13px;background:#fbf9fc}
+.falowen-books-greeting-grid h3{margin:0 0 8px;color:#51398e}
+.falowen-books-greeting-grid p{font-size:13px;margin:6px 0}
+.falowen-books-greeting-grid small{color:#69758a}
+.falowen-books-options{border:0;padding:0;display:grid;gap:10px;margin:16px 0}
+.falowen-books-options label{padding:13px 15px;border:1px solid #d6cfdf;border-radius:10px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.falowen-books-options .is-selected{border-color:#6647b1;background:#f0eafa}
+.falowen-sample-correct{color:#1c7244!important;font-weight:800}
+.falowen-sample-try{color:#9c5e14!important;font-weight:800}
+.falowen-books-screen-reader{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.falowen-books-sample-cta{background:#322259;color:white;border-radius:20px;padding:27px 30px;margin-top:22px;display:flex;justify-content:space-between;align-items:center;gap:25px}
+.falowen-books-sample-cta h2{margin:0;font-size:21px}
+.falowen-books-sample-cta p{color:#e7d9fa;line-height:1.7}
+.falowen-books-sample-cta .falowen-books-button{white-space:nowrap}
+@media(max-width:850px){.falowen-books-hero{grid-template-columns:1fr;min-height:auto;padding:40px 28px}.falowen-books-hero-art{min-height:300px}.falowen-book-cover{min-height:310px;width:220px;padding:17px}.falowen-cover-level{font-size:55px;margin-top:24px}.falowen-cover-title{font-size:21px}.falowen-books-product-panel{grid-template-columns:1fr;gap:22px}.falowen-books-feature-grid{grid-template-columns:1fr}.falowen-books-next-step{flex-direction:column;align-items:start}}
+@media(max-width:520px){.falowen-books-shell{padding:0 12px 28px}.falowen-books-nav{flex-wrap:wrap;padding:15px 2px;min-height:88px}.falowen-books-nav>div{gap:12px;font-size:12px}.falowen-books-hero{border-radius:18px;padding:30px 21px}.falowen-books-hero h1{font-size:38px}.falowen-books-hero-facts{gap:9px}.falowen-books-greeting-grid{grid-template-columns:1fr}.falowen-books-lesson{padding:18px}.falowen-books-purchase{padding:20px}.falowen-books-next-step{padding:24px 18px}.falowen-books-sample-cta{flex-direction:column;align-items:stretch;padding:22px}.falowen-books-sample-cta .falowen-books-button{white-space:normal}}
+@media(prefers-reduced-motion:reduce){.falowen-books-button{transition:none}}

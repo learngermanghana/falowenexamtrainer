@@ -1,0 +1,42 @@
+name: A1 Books commerce safety
+
+on:
+  pull_request:
+    paths:
+      - 'functions/functionz/bookCommerce.js'
+      - 'functions/functionz/bookStorageR2.js'
+      - 'functions/functionz/tests/bookCommerce.test.js'
+      - 'functions/functionz/tests/bookStorageR2.test.js'
+      - 'functions/functionz/paymentAwareApp.js'
+      - 'web/src/components/FalowenBooksPage.js'
+      - 'web/src/components/FalowenBooksPage.css'
+      - 'web/src/App.js'
+      - '.github/workflows/a1-books-commerce.yml'
+  workflow_dispatch:
+
+jobs:
+  ebook-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate isolated book payment handler syntax
+        run: |
+          node --check functions/functionz/bookCommerce.js
+          node --check functions/functionz/bookStorageR2.js
+          node --check functions/functionz/paymentAwareApp.js
+      - name: Install backend dependencies
+        working-directory: functions
+        run: npm install --no-package-lock --no-audit --no-fund
+      - name: Test payment authorization, price, idempotency and disabled sales
+        working-directory: functions
+        run: npx jest --runInBand functionz/tests/bookCommerce.test.js functionz/tests/bookStorageR2.test.js
+      - name: Install web build tools
+        working-directory: web
+        run: npm ci --no-audit --no-fund
+      - name: Parse A1 Books React component independent of unrelated lesson routes
+        working-directory: web
+        run: npx esbuild src/components/FalowenBooksPage.js --loader:.js=jsx --outfile=/tmp/falowen-books-parse.js

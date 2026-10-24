@@ -9,7 +9,7 @@ import "./LandingPageMarketing.css";
 const COPY = {
   en: {
     language: "Language", login: "Log in", signup: "Sign up", returning: "Already signed up?",
-    navClasses: "Live classes", navExams: "Exam practice", navHelp: "How Falowen works",
+    navClasses: "Live classes", navExams: "Exam practice", navBooks: "Books", navHelp: "How Falowen works",
     classScheduleAction: "View full class schedule",
     eyebrow: "GERMAN LEARNING THAT FITS YOUR LIFE",
     title: "Learn German your way.",
@@ -39,7 +39,7 @@ const COPY = {
   },
   de: {
     language: "Sprache", login: "Anmelden", signup: "Registrieren", returning: "Schon registriert?",
-    navClasses: "Live-Kurse", navExams: "Prüfungsvorbereitung", navHelp: "So funktioniert Falowen",
+    navClasses: "Live-Kurse", navExams: "Prüfungsvorbereitung", navBooks: "Bücher", navHelp: "So funktioniert Falowen",
     classScheduleAction: "Vollständigen Kursplan ansehen",
     eyebrow: "DEUTSCH LERNEN, WIE ES ZU DIR PASST",
     title: "Lerne Deutsch auf deine Weise.",
@@ -74,7 +74,7 @@ const COPY = {
   },
   fr: {
     language: "Langue", login: "Se connecter", signup: "S'inscrire", returning: "Déjà inscrit ?",
-    navClasses: "Cours en direct", navExams: "Examens blancs", navHelp: "Comment fonctionne Falowen",
+    navClasses: "Cours en direct", navExams: "Examens blancs", navBooks: "Livres", navHelp: "Comment fonctionne Falowen",
     classScheduleAction: "Voir le calendrier complet des cours",
     eyebrow: "APPRENDRE L'ALLEMAND À VOTRE RYTHME",
     title: "Apprenez l'allemand à votre façon.",
@@ -112,6 +112,7 @@ const COPY = {
 const FOOTER_LINKS = [
   { href: "/courses/", labelKey: "footerCourses" },
   { href: "/exam-practice", labelKey: "footerExam" },
+  { href: "/books", labelKey: "navBooks" },
   { href: "/reviews/", labelKey: "footerReviews" },
   { href: "/visitor-guide", labelKey: "footerHelp" },
 ];
@@ -170,6 +171,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           </a>
           <div className="falowen-home-nav-links">
             <a href="/classes">{copy.navClasses}</a>
+            <a href="/books">{copy.navBooks}</a>
             <a href="https://exams.falowen.app/">{copy.navExams}</a>
             <a href="/visitor-guide">{copy.navHelp}</a>
           </div>

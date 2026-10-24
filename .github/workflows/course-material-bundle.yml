@@ -98,6 +98,8 @@ jobs:
           node --check scripts/course-material-bundles/trimPrintedPdfTail.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/runA1BundleCleanPdf.mjs
+          node --check scripts/course-material-bundles/prepareA1BookEditions.mjs
+          node --test scripts/course-material-bundles/prepareA1BookEditions.test.mjs
           node --test scripts/course-material-bundles/a1PrintHelpers.test.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
@@ -240,8 +242,25 @@ jobs:
         if: ${{ inputs.build_pdf && (inputs.level == 'A1' || inputs.level == 'A2' || inputs.level == 'B1') }}
         run: node scripts/course-material-bundles/validateGeneratedBundle.mjs "${{ inputs.level }}"
 
-      - name: Upload consolidated level PDF
-        if: ${{ inputs.build_pdf }}
+      # The A1 PDF is a paid book candidate. A PUBLIC GitHub repository must
+      # never publish its entire 250-page PDF in an Actions artifact.
+      # A1 creates only a small sample artifact; the retail edition stays on
+      # this ephemeral runner until a private release upload is configured.
+      - name: Prepare public sample and private candidate from validated A1 PDF
+        if: ${{ inputs.build_pdf && inputs.level == 'A1' }}
+        run: node scripts/course-material-bundles/prepareA1BookEditions.mjs
+
+      - name: Upload free A1 Day 1 PDF sample only
+        if: ${{ inputs.build_pdf && inputs.level == 'A1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A1-free-Day1-sample
+          path: artifacts/course-material-bundles/A1/Falowen-A1-Free-Day1-Sample.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload consolidated PDF for other levels (not the paid A1 book)
+        if: ${{ inputs.build_pdf && inputs.level != 'A1' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-course-materials-pdf
@@ -254,7 +273,9 @@ jobs:
         run: node scripts/course-material-bundles/buildPressProof.mjs "${{ inputs.level }}"
 
       - name: Upload Falowen Press editorial proof
-        if: ${{ inputs.build_pdf && inputs.press_preview }}
+        # A1 proof contains the same full commercial content: never upload it
+        # to an artifact in the public repository.
+        if: ${{ inputs.build_pdf && inputs.press_preview && inputs.level != 'A1' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-press-editorial-proof
@@ -262,8 +283,17 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload render diagnostics on failure
-        if: ${{ failure() && inputs.build_pdf }}
+      - name: Upload A1 render diagnostics on failure (metadata only)
+        if: ${{ failure() && inputs.build_pdf && inputs.level == 'A1' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A1-render-diagnostics
+          path: artifacts/course-material-bundles/A1/render-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload non-A1 render diagnostics on failure
+        if: ${{ failure() && inputs.build_pdf && inputs.level != 'A1' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-render-diagnostics
