@@ -6,17 +6,11 @@ import { useExam } from "../context/ExamContext";
 import A1ReadingPracticeSamples, { A1_READING_PRACTICE_SAMPLES } from "./A1ReadingPracticeSamples";
 import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2ReadingPracticeSamples";
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
+import B2ReadingPracticeSamples, { B2_READING_PRACTICE_SAMPLES } from "./B2ReadingPracticeSamples";
 import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
 
-const lesenLevels = [
-  {
-    level: "B2",
-    description: "PDF coming soon.",
-    url: null,
-  },
-
-];
+const lesenLevels = [];
 
 const C1_READING_PRACTICE_SAMPLES = Object.freeze([
   {
@@ -29,9 +23,9 @@ const C1_READING_PRACTICE_SAMPLES = Object.freeze([
 
 const sampleMetaForLevel = (level) => {
   const samples = level === "B1" ? B1_READING_PRACTICE_SAMPLES :
-    level === "A2" ? A2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
-  const questionCount = level === "B1" ? 30 : level === "A2" ? 20 : 15;
-  const partCount = level === "B1" ? 5 : level === "A2" ? 4 : 3;
+    level === "A2" ? A2_READING_PRACTICE_SAMPLES : level === "B2" ? B2_READING_PRACTICE_SAMPLES : A1_READING_PRACTICE_SAMPLES;
+  const questionCount = ["B1", "B2"].includes(level) ? 30 : level === "A2" ? 20 : 15;
+  const partCount = ["B1", "B2"].includes(level) ? 5 : level === "A2" ? 4 : 3;
 
   return samples.map((sample, index) => ({
     id: sample.id,
@@ -114,7 +108,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
     return <C1FinalMockExamPage />;
   }
 
-  if (["A1", "A2", "B1"].includes(normalizedLevel)) {
+  if (["A1", "A2", "B1", "B2"].includes(normalizedLevel)) {
     const samples = sampleMetaForLevel(normalizedLevel);
     const selected = sampleId ? samples.find((item) => item.slug === sampleId) : null;
 
@@ -139,7 +133,9 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
       );
     }
 
-    return normalizedLevel === "B1" ? (
+    return normalizedLevel === "B2" ? (
+      <B2ReadingPracticeSamples initialSampleId={selected.id} standalone />
+    ) : normalizedLevel === "B1" ? (
       <B1ReadingPracticeSamples initialSampleId={selected.id} standalone />
     ) : normalizedLevel === "A2" ? (
       <A2ReadingPracticeSamples initialSampleId={selected.id} standalone />
