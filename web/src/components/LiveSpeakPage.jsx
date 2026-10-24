@@ -28,6 +28,14 @@ const toBase64 = (blob) => new Promise((resolve, reject) => {
   reader.readAsDataURL(blob);
 });
 const voiceTypes = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg"];
+const B1_PRESENTATION_STAGES = [
+  "Thema und Aufbau",
+  "Persönliche Erfahrung",
+  "Situation im Heimatland mit Beispiel",
+  "Vor- und Nachteile, Meinung mit Beispiel",
+  "Abschluss und Dank",
+];
+
 
 export default function LiveSpeakPage({ embedded = false, initialLevel = "", practiceTopic = "", practiceSource = "", examTask = null, examMode = "guided", onActivityChange, onExamCompleted, onContinueToNext, onRecoverCompletedParts, autoStart = false, freshAttempt = false, deferFeedback = false, onSessionReset, gradedCourseMock = false }) {
   const { idToken, studentProfile } = useAuth();
@@ -972,6 +980,15 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
               <p lang="de">{session.examTask?.prompt || examTask?.prompt}</p>
               <ol>{session.examFlow.points.map((point, index) => <li key={`${index}-${point}`} lang="de">{point}</li>)}</ol>
             </details>
+          ) : null}
+          {gradedCourseMock && safeLevel === "B1" && session?.examFlow?.key === "B1-2" ? (
+            <section className="speaking-exam-inline-task" aria-label="B1 presentation stages">
+              <h3 style={{margin:"0 0 6px"}}>Teil 2 · Your five presentation stages</h3>
+              <p style={{margin:"0 0 8px"}} lang="de">{session.examTask?.prompt || examTask?.prompt}</p>
+              <ol>{(session.examFlow.points?.length === 5
+                ? session.examFlow.points : B1_PRESENTATION_STAGES).map((point,index) =>
+                  <li key={`${index}-${point}`} lang="de">{point}</li>)}</ol>
+            </section>
           ) : null}
           {examinerSession ? <div className="speaking-exam-turn-indicator" role="status" aria-live="polite" aria-atomic="true">
             <span className={waitingForOpening ? "speaking-exam-turn-indicator__dot is-waiting" : recording ? "speaking-exam-turn-indicator__dot is-recording" : "speaking-exam-turn-indicator__dot"} aria-hidden="true"/>
