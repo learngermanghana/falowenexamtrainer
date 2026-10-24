@@ -26,7 +26,7 @@ export const cleanA1PrintChrome = () => {
   // ignored those paragraphs, so their timestamps leaked into the PDF.
   for (const notice of [...root.querySelectorAll("p[role='status'],p[aria-live]")]) {
     const copy = normalize(notice.textContent);
-    if (/^Saved to your assignment draft(?:\\s*[·•-]\\s*\\d{1,2}:\\d{2}\\s*[AP]M)?\\.\\s*Not submitted for marking yet\\.?$/i.test(copy)
+    if (/^Saved to your assignment draft(?:\s*[·•-]\s*\d{1,2}:\d{2}\s*[AP]M)?\.\s*Not submitted for marking yet\.?$/i.test(copy)
       && !notice.querySelector("input,textarea,fieldset,select")) remove(notice);
   }
 
