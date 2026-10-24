@@ -125,3 +125,29 @@ export const findA1PrintChromeLeaks = (text = "") => {
   ];
   return issues.filter(([, rx]) => rx.test(t)).map(([label]) => label);
 };
+
+
+// Full PDF text check: inspect what Chromium actually printed, not just the
+// stylesheet or DOM mocks. Fail rather than publish an A1 PDF with a leftover
+// authenticated masthead or the Day 22 QR stranded on another sheet.
+export const findA1PdfLayoutFaults = (pdfText = "") => {
+  const pages = String(pdfText).split("\f").filter((page) => page.trim());
+  const faults = [];
+  for (const [index, page] of pages.entries()) {
+    if (/^\s*(?:F\s+)?Falowen\s+(?:🔔\s*)?FA\s*$/mi.test(page)) {
+      faults.push("Page " + (index + 1) + " still contains the website masthead");
+    }
+  }
+  const stem = "Welche Beschwerden hat Herr Braun?";
+  const hearingPage = pages.findIndex((page) => page.includes(stem));
+  if (hearingPage >= 0) {
+    const hearing = pages[hearingPage];
+    if (!hearing.includes("Hören: Audio im Falowen Course Book")) {
+      faults.push("Day 22 Hören QR instructions are separated from its question sheet");
+    }
+    if (!hearing.includes("Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?")) {
+      faults.push("Day 22 Hören questions 1–6 do not fit on one sheet");
+    }
+  }
+  return faults;
+};
