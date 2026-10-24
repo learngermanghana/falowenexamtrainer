@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getReadingPracticeStudentKey,
@@ -12,6 +12,7 @@ import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheReadingMockTeil2Preview.css";
 import "./A1GoetheReadingMockTeil3Preview.css";
 import "./A1ReadingPracticeSamples.css";
+import { ReadingPracticeHeader, ReadingPracticeParts, ReadingPracticeSampleList } from "./ReadingPracticeShell";
 
 const SAMPLE_DURATION_SECONDS = 25 * 60;
 
@@ -444,6 +445,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
+  const submittedForExpiry = useRef({});
   const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
@@ -545,7 +547,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
   };
 
   const answer = (number, value) => {
-    if (submitted) return;
+    if (submitted || remainingSeconds <= 0) return;
     setAnswersBySample((current) => ({
       ...current,
       [sample.id]: {
@@ -555,8 +557,9 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
     }));
   };
 
-  const submit = () => {
-    if (!allAnswered || submitted) return;
+  const submit = (allowPartial = false) => {
+    if (submitted || submittedForExpiry.current[sample.id] || (!allowPartial && !allAnswered) || hydratedStorageKey !== storageKey) return;
+    submittedForExpiry.current[sample.id] = true;
     setTimerRunning(false);
     const attempt = saveReadingPracticeAttempt({
       level: "A1",
@@ -593,7 +596,13 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
     setSubmittedBySample((current) => ({ ...current, [sample.id]: true }));
   };
 
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey || submitted || remainingSeconds !== 0) return;
+    submit(true); // Unanswered questions count as incorrect when practice time ends.
+  }, [remainingSeconds, submitted, sample.id, hydratedStorageKey, storageKey]);
+
   const resetSample = () => {
+    submittedForExpiry.current[sample.id] = false;
     setTimerRunning(false);
     setAnswersBySample((current) => ({ ...current, [sample.id]: {} }));
     setSubmittedBySample((current) => ({ ...current, [sample.id]: false }));
@@ -615,61 +624,29 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
   };
 
   return (
-    <main className="a1-goethe-mock-shell a1-reading-practice-shell" data-a1-reading-practice-samples>
-      <div className="a1-goethe-mock-topbar a1-reading-practice-topbar">
-        <div>
-          <strong>A1 Lesen · Exams Room</strong>
-          <span>Three complete Goethe-style practice samples · 15 questions each</span>
-        </div>
-        <button type="button" className="a1-reading-practice-back" onClick={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>{standalone ? "Back to Lesen samples" : "Back to Exams Room"}</button>
-      </div>
-
-      {!standalone ? (
-        <div className="a1-reading-sample-selector" aria-label="A1 Lesen sample selector">
-          {A1_READING_PRACTICE_SAMPLES.map((item, index) => (
-            <button
-              key={item.id}
-              type="button"
-              className={item.id === sample.id ? "is-active" : ""}
-              onClick={() => selectSample(item.id)}
-            >
-              Lesen Sample {index + 1}
-              <small>15 questions · Teil 1–3</small>
-            </button>
-          ))}
-        </div>
-      ) : null}
-
+    <main className="a1-goethe-mock-shell a1-reading-practice-shell" data-a1-reading-practice-samples data-reading-standard="A1">
+      <ReadingPracticeHeader
+        level="A1" sampleLabel={sample.label} total={15} partCount={3}
+        durationSeconds={SAMPLE_DURATION_SECONDS} secondsLeft={remainingSeconds} answered={answeredCount}
+        submitted={submitted} timerRunning={timerRunning}
+        onToggleTimer={() => setTimerRunning(value => !value)}
+        onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}
+      />
+      {!standalone ? <ReadingPracticeSampleList level="A1"
+        samples={A1_READING_PRACTICE_SAMPLES.map((item,index)=>({
+          id:item.id,label:item.label,detail:"15 questions · 3 Teile · 25 minutes",
+          status:submittedBySample[item.id]?"Completed":Object.keys(answersBySample[item.id]||{}).length?"In progress":"Not started"
+        }))} onOpen={item => selectSample(item.id)}/> : null}
+      <ReadingPracticeParts level="A1" activePart={partKey} onSelect={setPartKey}
+        parts={["teil1","teil2","teil3"].map((key,index)=>({
+          id:key,total:5,answered:sample.parts[key].questions.filter(q=>answers[q.number]).length
+        }))}/>
       <article className="a1-goethe-mock-exam">
-        <header className="a1-goethe-mock-header a1-reading-practice-header">
-          <div>
-            <p className="a1-goethe-mock-kicker">A1 · Lesen · {sample.label}</p>
-            <h1>{selectedPart.title}</h1>
-            <p>{selectedPart.instruction}</p>
-            <p><strong>{selectedPart.strong}</strong></p>
-          </div>
-          <div className="a1-reading-practice-timer">
-            <span>25-minute sample</span>
-            <strong>{formatTime(remainingSeconds)}</strong>
-            <button type="button" onClick={() => setTimerRunning((value) => !value)} disabled={submitted}>
-              {timerRunning ? "Pause" : remainingSeconds === SAMPLE_DURATION_SECONDS ? "Start timer" : "Resume"}
-            </button>
-          </div>
+        <header className="reading-standard-part-instructions">
+          <h2>{selectedPart.title}</h2>
+          <p>{selectedPart.instruction}</p>
+          {selectedPart.strong ? <strong>{selectedPart.strong}</strong> : null}
         </header>
-
-        <nav className="a1-reading-part-selector" aria-label="A1 Lesen part selector">
-          {["teil1", "teil2", "teil3"].map((key, index) => {
-            const questions = sample.parts[key].questions;
-            const answered = questions.filter((question) => answers[question.number]).length;
-            return (
-              <button key={key} type="button" className={partKey === key ? "is-active" : ""} onClick={() => setPartKey(key)}>
-                Teil {index + 1}
-                <small>{answered}/5 answered</small>
-              </button>
-            );
-          })}
-        </nav>
-
         {partKey === "teil1" ? (
           <div>
             {selectedPart.texts.map((textItem) => {
@@ -743,7 +720,7 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
             <span>Complete all three Teile before checking your answers.</span>
           </div>
           {!submitted ? (
-            <button type="button" disabled={!allAnswered} onClick={submit}>Check answers</button>
+            <button type="button" disabled={!allAnswered} onClick={() => submit(false)}>Check answers</button>
           ) : (
             <div className="a1-reading-practice-result">
               <strong>Result: {score}/15 · {percent}% · {getReadingReadinessLabel(percent)}</strong>

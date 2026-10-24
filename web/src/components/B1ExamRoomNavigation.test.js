@@ -15,8 +15,8 @@ describe("B1 native Exams Room navigation and result sync", () => {
 
   it("lists three B1 Lesen samples and routes to a separate interactive page", () => {
     expect(lesen).toContain("B1_READING_PRACTICE_SAMPLES");
-    expect(lesen).toContain("<B1ReadingPracticeSamples initialSampleId={selected.id} standalone />");
-    expect(lesen).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}');
+    expect(lesen).toContain("<B1ReadingPracticeSamples initialSampleId={selected.id} standalone/>");
+    expect(lesen).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${item.slug}');
     expect(lesen).not.toContain("Lesen sample PDF.");
     expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(3);
     expect(B1_READING_PRACTICE_SAMPLES.every((sample) =>

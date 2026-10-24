@@ -1,6 +1,8 @@
 import { useAuth } from "../context/AuthContext";
 import { getStudentMockStorageKey } from "../utils/mockReviewAccess";
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ReadingPracticeHeader, ReadingPracticeParts } from "./ReadingPracticeShell";
 import AppBackButton from "./navigation/AppBackButton";
 import { useAssessmentRestriction } from "../hooks/useAssessmentRestriction";
 import {
@@ -421,7 +423,8 @@ const Teil4 = ({ answers, onChoose, secondsLeft, onFinish }) => {
   );
 };
 
-function C1FinalMockExamPageAttempt() {
+function C1FinalMockExamPageAttempt({ readingPractice = false }) {
+  const navigate = useNavigate();
   useAssessmentRestriction();
   const { user } = useAuth();
   const storageKey = getStudentMockStorageKey(C1_READING_PRACTICE_STORAGE_KEY, user?.uid);
@@ -454,6 +457,16 @@ function C1FinalMockExamPageAttempt() {
     if (!state.started || !state.deadlineMs || state.completed) return duration;
     return Math.max(0, Math.ceil((state.deadlineMs - now) / 1000));
   }, [now, state.completed, state.deadlineMs, state.stage, state.started]);
+
+  const readingPartKeys=["teil1","teil2","teil3","teil4"];
+  const readingPartTotals={teil1:6,teil2:6,teil3:6,teil4:8};
+  const readingAnswered=readingPartKeys.reduce((total,key)=>
+    total+Object.keys(state[`${key}Answers`]||{}).filter(n=>state[`${key}Answers`][n]).length,0);
+  const readingParts=readingPartKeys.map(key=>({
+    id:key,total:readingPartTotals[key],
+    answered:Object.keys(state[`${key}Answers`]||{}).filter(n=>state[`${key}Answers`][n]).length
+  }));
+  const returnToReading=()=>navigate("/exams/lesen/c1");
 
   const start = () => {
     setState((current) => {
@@ -549,8 +562,12 @@ function C1FinalMockExamPageAttempt() {
 
   if (state.completed) {
     return (
-      <main className="c1-mock-shell">
-        <AppBackButton label="Back to course" fallbackPath="/campus/course" />
+      <main className="c1-mock-shell" data-reading-standard={readingPractice?"C1":undefined}>
+        {readingPractice ? <ReadingPracticeHeader level="C1" sampleLabel="Lesen Sample 1"
+          total={26} partCount={4} durationSeconds={65*60} secondsLeft={0}
+          answered={readingAnswered} submitted timerPolicy="continuous"
+          onBack={returnToReading}/> :
+          <AppBackButton label="Back to course" fallbackPath="/campus/course"/>}
         <section className="c1-mock-start">
           <p className="c1-mock-kicker">GOETHE-ZERTIFIKAT C1 · LESEN</p>
           <h1>C1 Lesen Sample 1 abgeschlossen</h1>
@@ -567,7 +584,16 @@ function C1FinalMockExamPageAttempt() {
   }
 
   return (
-    <main className="c1-mock-shell">
+    <main className="c1-mock-shell" data-reading-standard={readingPractice?"C1":undefined}>
+      {readingPractice ? <>
+        <ReadingPracticeHeader level="C1" sampleLabel="Lesen Sample 1"
+          total={26} partCount={4} durationSeconds={65*60} secondsLeft={secondsLeft}
+          answered={readingAnswered} timerPolicy="continuous"
+          timerLabel={`Teil ${readingPartKeys.indexOf(state.stage)+1} time remaining`}
+          onBack={returnToReading}/>
+        <ReadingPracticeParts level="C1" activePart={state.stage} parts={readingParts} readOnly/>
+        <div className="reading-standard-notice"><strong>{config.title}: </strong>{config.intro}</div>
+      </> : <>
       <AppBackButton label="Back to course" fallbackPath="/campus/course" />
 
       <header className="c1-mock-header">
@@ -585,6 +611,7 @@ function C1FinalMockExamPageAttempt() {
         <p className="c1-mock-instruction">{config.intro}</p>
         <p className="c1-mock-instruction"><strong>C1 Lesen: Teil {Math.max(1, ["teil1", "teil2", "teil3", "teil4"].indexOf(state.stage) + 1)} von 4.</strong> Nur Leseübungen – dies ist kein vollständiger vierteiliger C1-Mock mit Hören, Schreiben und Sprechen. Ihre Antworten werden auf diesem Gerät gespeichert; der Timer läuft während einer Unterbrechung weiter.</p>
       </header>
+      </>}
 
       {!state.started ? (
         <section className="c1-mock-start">

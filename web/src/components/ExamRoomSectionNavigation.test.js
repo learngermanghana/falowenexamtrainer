@@ -20,18 +20,21 @@ describe("Exams Room section navigation", () => {
     expect(appSource).toContain('<LesenPage practiceLevel={practiceLevel} sampleId={sampleId} />');
   });
 
-  test("Lesen uses a vertical sample list and opens A1/A2 samples on their own URLs", () => {
-    expect(lesenSource).toContain('display: "grid"');
-    expect(lesenSource).toContain('slug: `sample-${index + 1}`');
-    expect(lesenSource).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}');
+  test("Lesen uses one shared sample library and opens protected A1/A2/B1 level URLs", () => {
+    expect(lesenSource).toContain('ReadingPracticeSampleList');
+    expect(lesenSource).toContain('slug:`sample-${index+1}`');
+    expect(lesenSource).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${item.slug}');
     expect(lesenSource).toContain('A1_READING_PRACTICE_SAMPLES');
     expect(lesenSource).toContain('A2_READING_PRACTICE_SAMPLES');
+    expect(lesenSource).toContain('B1_READING_PRACTICE_SAMPLES');
+    expect(lesenSource).toContain('availableLevels.includes(next)');
+    expect(appSource).toContain('/exams/:section/:practiceLevel');
     expect(a1ReadingSource).toContain('initialSampleId = ""');
     expect(a1ReadingSource).toContain('standalone = false');
-    expect(a1ReadingSource).toContain('{!standalone ? (');
+    expect(a1ReadingSource).toContain('<ReadingPracticeSampleList level="A1"');
     expect(a2ReadingSource).toContain('initialSampleId = ""');
     expect(a2ReadingSource).toContain('standalone = false');
-    expect(a2ReadingSource).toContain('{!standalone ? (');
+    expect(a2ReadingSource).toContain('<ReadingPracticeSampleList level="A2"');
   });
 
   test("Hören Sample 1 reuses the final mock question banks and protected audio", () => {

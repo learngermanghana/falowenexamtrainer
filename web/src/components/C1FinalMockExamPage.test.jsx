@@ -97,9 +97,12 @@ describe("C1 Lesen practice", () => {
   });
 
   test("publishes C1 as Lesen practice in the Exams Room, not as a mock route", () => {
-    expect(lesenPage).toContain('label: "C1 Lesen Sample 1"');
-    expect(lesenPage).toContain('detail: "30 questions · Teil 1–4"');
-    expect(lesenPage).toContain('navigate(`/exams/lesen/c1/${sample.slug}`)');
+    expect(lesenPage).toContain('id:"c1-reading-01"');
+    expect(lesenPage).toContain('detail:"26 current tasks · 4 Teile · reading practice"');
+    expect(lesenPage).toContain('navigate(`/exams/lesen/${normalizedLevel.toLowerCase()}/${item.slug}`)');
+    expect(lesenPage).toContain('<C1FinalMockExamPage readingPractice/>');
+    expect(page).toContain('<ReadingPracticeParts level="C1"');
+    expect(page).toContain('timerPolicy="continuous"');
     expect(app).not.toContain('path="/campus/course/c1-mock-practice-preview"');
   });
 
