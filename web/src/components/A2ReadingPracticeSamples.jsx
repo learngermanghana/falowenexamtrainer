@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -324,6 +324,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
   const [savedAttemptBySample, setSavedAttemptBySample] = useState({});
   const [remainingBySample, setRemainingBySample] = useState({});
   const [timerRunning, setTimerRunning] = useState(false);
+  const submittedForExpiry = useRef({});
   const [hydratedStorageKey, setHydratedStorageKey] = useState("");
 
   const sample = useMemo(
@@ -418,7 +419,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
   };
 
   const setAnswer = (number, value) => {
-    if (submitted) return;
+    if (submitted || remainingSeconds <= 0) return;
     setAnswersBySample((current) => ({
       ...current,
       [sample.id]: {
@@ -428,8 +429,9 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
     }));
   };
 
-  const submitAttempt = () => {
-    if (answered !== 20 || submitted) return;
+  const submitAttempt = (allowPartial = false) => {
+    if (submitted || submittedForExpiry.current[sample.id] || (!allowPartial && answered !== 20) || hydratedStorageKey !== storageKey) return;
+    submittedForExpiry.current[sample.id] = true;
     setTimerRunning(false);
     const attempt = saveReadingPracticeAttempt({
       level: "A2",
@@ -466,7 +468,13 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
     setSubmittedBySample((current) => ({ ...current, [sample.id]: true }));
   };
 
+  useEffect(() => {
+    if (hydratedStorageKey !== storageKey || submitted || remainingSeconds !== 0) return;
+    submitAttempt(true); // A missing answer is a zero, not a stuck expired practice.
+  }, [remainingSeconds, submitted, sample.id, hydratedStorageKey, storageKey]);
+
   const resetSample = () => {
+    submittedForExpiry.current[sample.id] = false;
     setTimerRunning(false);
     setAnswersBySample((current) => ({ ...current, [sample.id]: {} }));
     setSubmittedBySample((current) => ({ ...current, [sample.id]: false }));
@@ -614,7 +622,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
           {!submitted ? (
             <>
               <div><strong>{answered}/20 answered</strong><span>Complete all four Teile before checking your answers.</span></div>
-              <button type="button" disabled={answered !== 20} onClick={submitAttempt}>Check answers</button>
+              <button type="button" disabled={answered !== 20} onClick={() => submitAttempt(false)}>Check answers</button>
             </>
           ) : (
             <div className="a2-reading-practice-result">
