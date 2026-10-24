@@ -1,0 +1,269 @@
+{
+  "id": "a1-reading-sample-08",
+  "label": "Lesen Sample 8",
+  "parts": {
+    "teil1": {
+      "title": "Teil 1",
+      "instruction": "Lesen Sie die beiden Texte und die Aufgaben 1 bis 5.",
+      "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+      "texts": [
+        {
+          "id": 1,
+          "title": "Nachricht von Elena an Sarah",
+          "body": [
+            "Liebe Sarah,",
+            "ich bin jetzt in Berlin! Meine neue Wohnung ist sehr schön und hell. Am Samstag mache ich eine kleine Einweihungsparty um 18:00 Uhr. Hast du Zeit? Du kannst gerne deinen Freund Markus mitbringen. Meine Adresse ist Blumenstraße 14. Sag mir bitte bis Donnerstag Bescheid!",
+            "Liebe Grüße,",
+            "Elena"
+          ]
+        },
+        {
+          "id": 2,
+          "title": "Nachricht vom Kundenservice Sport Müller",
+          "body": [
+            "Sehr geehrter Herr Meyer,",
+            "vielen Dank für Ihre Bestellung im Sportshop Müller. Ihre neuen Sportschuhe sind abfahrtbereit und werden morgen geliefert. Bitte halten Sie den Betrag von 89,00 Euro in bar bereit, da der Paketbote keine Kartenzahlung akzeptiert.",
+            "Mit freundlichen Grüßen,",
+            "Ihr Kundenservice Sport Müller"
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "number": 1,
+          "statement": "Die Party beginnt am Samstagabend.",
+          "answer": "richtig",
+          "text": 1
+        },
+        {
+          "number": 2,
+          "statement": "Markus darf nicht zur Party kommen.",
+          "answer": "falsch",
+          "text": 1
+        },
+        {
+          "number": 3,
+          "statement": "Sarah soll bis Donnerstag antworten.",
+          "answer": "richtig",
+          "text": 1
+        },
+        {
+          "number": 4,
+          "statement": "Herr Meyer muss die Schuhe mit Kreditkarte bezahlen.",
+          "answer": "falsch",
+          "text": 2
+        },
+        {
+          "number": 5,
+          "statement": "Die Lieferung kommt am nächsten Tag.",
+          "answer": "richtig",
+          "text": 2
+        }
+      ]
+    },
+    "teil2": {
+      "title": "Teil 2",
+      "instruction": "Lesen Sie die Situationen und die Anzeigen.",
+      "strong": "Welche Anzeige passt? Kreuzen Sie an: a oder b.",
+      "questions": [
+        {
+          "number": 6,
+          "statement": "Sie möchten am Wochenende mit Freunden Tennis spielen und einen Platz reservieren.",
+          "answer": "a",
+          "options": [
+            {
+              "id": "a",
+              "url": "www.tennis-club-nord.de",
+              "title": "www.tennis-club-nord.de",
+              "subtitle": "",
+              "lines": [
+                "Plätze für Gäste online buchen. Sa & So 08:00–22:00 Uhr."
+              ]
+            },
+            {
+              "id": "b",
+              "url": "www.sport-trikot-shop.de",
+              "title": "www.sport-trikot-shop.de",
+              "subtitle": "",
+              "lines": [
+                "Tennisbekleidung und Schläger günstig kaufen. Schneller Versand."
+              ]
+            }
+          ]
+        },
+        {
+          "number": 7,
+          "statement": "Sie suchen eine kleine Mietwohnung im Zentrum von München.",
+          "answer": "a",
+          "options": [
+            {
+              "id": "a",
+              "url": "www.immobilien-muenchen.de",
+              "title": "www.immobilien-muenchen.de",
+              "subtitle": "",
+              "lines": [
+                "1- und 2-Zimmer-Wohnungen im Stadtzentrum zu vermieten."
+              ]
+            },
+            {
+              "id": "b",
+              "url": "www.hotel-bayern-zentrum.de",
+              "title": "www.hotel-bayern-zentrum.de",
+              "subtitle": "",
+              "lines": [
+                "Übernachtung im Herzen Münchens ab 79 € pro Nacht inkl. Frühstück."
+              ]
+            }
+          ]
+        },
+        {
+          "number": 8,
+          "statement": "Sie wollen Abends Deutsch lernen, weil Sie tagsüber arbeiten.",
+          "answer": "a",
+          "options": [
+            {
+              "id": "a",
+              "url": "www.vhs-sprachen.de/abendkurs",
+              "title": "www.vhs-sprachen.de/abendkurs",
+              "subtitle": "",
+              "lines": [
+                "Deutsch A1/A2 Intensivkurse immer Dienstag & Donnerstag 18:30–20:30 Uhr."
+              ]
+            },
+            {
+              "id": "b",
+              "url": "www.deutsch-sommerschule.de",
+              "title": "www.deutsch-sommerschule.de",
+              "subtitle": "",
+              "lines": [
+                "Ganztagskurse für Studenten von Juli bis August (09:00–15:00 Uhr)."
+              ]
+            }
+          ]
+        },
+        {
+          "number": 9,
+          "statement": "Sie suchen ein gebrauchtes Fahrrad für den täglichen Weg zur Arbeit.",
+          "answer": "b",
+          "options": [
+            {
+              "id": "a",
+              "url": "www.rad-reparatur-express.de",
+              "title": "www.rad-reparatur-express.de",
+              "subtitle": "",
+              "lines": [
+                "Wir reparieren Ihr Fahrrad innerhalb von 24 Stunden."
+              ]
+            },
+            {
+              "id": "b",
+              "url": "www.flohmarkt-fahrrad.de",
+              "title": "www.flohmarkt-fahrrad.de",
+              "subtitle": "",
+              "lines": [
+                "Große Auswahl an gebrauchten Damen- und Herrenrädern ab 50 €."
+              ]
+            }
+          ]
+        },
+        {
+          "number": 10,
+          "statement": "Sie möchten mit dem Zug nach Wien fahren und Fahrkarten buchen.",
+          "answer": "a",
+          "options": [
+            {
+              "id": "a",
+              "url": "www.bahn-reise-service.de",
+              "title": "www.bahn-reise-service.de",
+              "subtitle": "",
+              "lines": [
+                "Zugverbindungen vergleichen und Spartickets online buchen."
+              ]
+            },
+            {
+              "id": "b",
+              "url": "www.wien-tourismus.info",
+              "title": "www.wien-tourismus.info",
+              "subtitle": "",
+              "lines": [
+                "Die besten Sehenswürdigkeiten, Museen und Restaurants in Wien."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "teil3": {
+      "title": "Teil 3",
+      "instruction": "Lesen Sie die Texte und die Aufgaben 11 bis 15.",
+      "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+      "questions": [
+        {
+          "number": 11,
+          "location": "Hinweis am Schwimmbad",
+          "statement": "Sie können am Nachmittag um 16:00 Uhr schwimmen gehen.",
+          "answer": "falsch",
+          "notice": {
+            "kind": "notice",
+            "heading": "Hallenbad",
+            "lines": [
+              "Wegen Reinigungsarbeiten bleibt das Hallenbad heute ab 14:00 Uhr geschlossen."
+            ]
+          }
+        },
+        {
+          "number": 12,
+          "location": "Am Aufzug im Einkaufszentrum",
+          "statement": "Der Aufzug funktioniert zurzeit nicht.",
+          "answer": "richtig",
+          "notice": {
+            "kind": "notice",
+            "heading": "Aufzug außer Betrieb",
+            "lines": [
+              "Bitte benutzen Sie die Rolltreppe auf der rechten Seite."
+            ]
+          }
+        },
+        {
+          "number": 13,
+          "location": "Am Eingang eines Restaurants",
+          "statement": "Am Sonntag kann man hier bis 14 Uhr frühstücken.",
+          "answer": "richtig",
+          "notice": {
+            "kind": "notice",
+            "heading": "Sonntagsbrunch",
+            "lines": [
+              "Sehr geehrte Gäste, sonntags bieten wir von 10:00 bis 14:00 Uhr unseren beliebten Frühstücksbrunch an."
+            ]
+          }
+        },
+        {
+          "number": 14,
+          "location": "Am Bahnsteig 3",
+          "statement": "Der Zug nach Frankfurt fährt wie gewohnt von Bahnsteig 3.",
+          "answer": "falsch",
+          "notice": {
+            "kind": "notice",
+            "heading": "Achtung!",
+            "lines": [
+              "Der Regionalzug nach Frankfurt fährt heute von Bahnsteig 5 ab."
+            ]
+          }
+        },
+        {
+          "number": 15,
+          "location": "In einer Arztpraxis",
+          "statement": "Man muss Rezepte einen Tag vor der Abholung bestellen.",
+          "answer": "richtig",
+          "notice": {
+            "kind": "notice",
+            "heading": "Rezeptbestellungen",
+            "lines": [
+              "Bitte mindestens 24 Stunden vorher telefonisch anmelden."
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
