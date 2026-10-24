@@ -371,7 +371,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         {!submitted ? (
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
             <span>Complete every Teil before checking your answers ({answeredCount}/30).</span>
-            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30} onClick={submit}>
+            <button type="button" className="b1-final-primary" disabled={answeredCount !== 30} onClick={() => submit()}>
               Check answers
             </button>
           </div>
