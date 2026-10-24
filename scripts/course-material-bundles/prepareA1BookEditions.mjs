@@ -60,10 +60,6 @@ async function drawCover(pdf, { free }) {
   rect(49, 106, 500, 1, muted);
   line("Learn Language Education Academy", 49, 85, 10);
   line("falowen.app/books/a1", 49, 60, 12, { bold: true, color: gold });
-  page.node.set(
-    pdf.context.obj("Annots"),
-    page.node.Annots() || pdf.context.obj([])
-  );
   return page;
 }
 
