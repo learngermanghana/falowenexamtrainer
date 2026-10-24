@@ -173,13 +173,11 @@ export default function A1Day5IntroducingYourselfArticlesWorkbookPage() {
           <h1 style={{ ...styles.title, margin: 0, lineHeight: 1.25 }}>Personal Information, Articles, Adjectives and W-Questions</h1>
           <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.3 · Interactive workbook</p>
           <p style={{ margin: 0, color: "#4b5563" }}>Articles · Adjectives · Personal information · Dialogues · W-questions · Sentence building</p>
-          <div data-a1-pdf-hide-ui="day5-live-progress" style={infoBoxStyle}>
+          <div data-a1-pdf-hide-ui="day5-live-progress" style={{ ...infoBoxStyle, padding: 10, gap: 6 }}>
             <strong>Progress</strong>
-            <div style={{ lineHeight: 1.7 }}>
-              <div>Article genders: {articleScore}/{articleWords.length}</div>
-              <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
-              <div>Your introduction in Teil 3 is saved to your class profile and class discussion.</div>
-              <div>Your Teil 6 sentences are saved for your tutor and class after you post them.</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 16px", color: "#334155" }}>
+              <span>Articles: {articleScore}/{articleWords.length}</span>
+              <span>W-words: {wWordScore}/{wWordQuestions.length}</span>
             </div>
           </div>
         </div>
