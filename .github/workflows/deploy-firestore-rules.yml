@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'firestore.rules'
+      - 'firestore.indexes.json'
+      - 'scripts/deploySpeakingIndexes.cjs'
       - 'scripts/deployFirestoreRules.cjs'
       - 'firebase.json'
       - '.firebaserc'
@@ -48,6 +50,12 @@ jobs:
           set -o pipefail
           node scripts/deployFirestoreRules.cjs 2>&1 | tee firebase-rules-deploy.log
 
+      - name: Provision speaking review indexes without deleting other indexes
+        shell: bash
+        run: |
+          set -o pipefail
+          node scripts/deploySpeakingIndexes.cjs 2>&1 | tee firestore-speaking-indexes.log
+
       - name: Verify legacy-profile deletion recovery
         run: node scripts/testLiveAccountDeletion.cjs
 
@@ -58,6 +66,7 @@ jobs:
           name: firestore-rules-deploy-diagnostics-${{ github.run_id }}
           path: |
             firebase-rules-deploy.log
+            firestore-speaking-indexes.log
             firebase-debug.log
           if-no-files-found: warn
           retention-days: 7
