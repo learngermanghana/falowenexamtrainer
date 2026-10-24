@@ -33,6 +33,31 @@ export const splitReadingSourceText = (text = "", format = "") => {
   return blocks.length > 1 ? blocks : [value];
 };
 
+// The sport matching workbook presents an introduction followed by explicitly
+// lettered A–E offers. Preserve those source labels rather than inventing
+// Text A–F labels (the introduction is not a separate answer choice).
+export const parseLetteredOfferSources = (text = "", format = "") => {
+  const blocks = splitReadingSourceText(text, format);
+  const offerPattern = /^([A-E])\s*[–—-]\s*([^\r\n]+)(?:\r?\n([\s\S]*))?$/i;
+  if (blocks.length < 3) return null;
+
+  const firstBlockIsOffer = offerPattern.test(blocks[0]);
+  const candidateBlocks = firstBlockIsOffer ? blocks : blocks.slice(1);
+  if (candidateBlocks.length < 3 || candidateBlocks.length > 5) return null;
+
+  const offers = candidateBlocks.map((block, index) => {
+    const match = block.match(offerPattern);
+    if (!match || match[1].toUpperCase() !== String.fromCharCode(65 + index)) return null;
+    return {
+      label: `Angebot ${match[1].toUpperCase()}`,
+      title: match[2].trim(),
+      description: (match[3] || "").trim(),
+    };
+  });
+  if (offers.some((offer) => !offer)) return null;
+  return { heading: firstBlockIsOffer ? "" : blocks[0], offers };
+};
+
 export const readingSourceLabel = (index) =>
   `Text ${String.fromCharCode(65 + Number(index || 0))}`;
 
