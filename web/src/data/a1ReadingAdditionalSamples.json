@@ -1,0 +1,567 @@
+[
+  {
+    "id": "a1-reading-sample-04",
+    "label": "Lesen Sample 4",
+    "parts": {
+      "teil1": {
+        "title": "Teil 1",
+        "instruction": "Lesen Sie die beiden Texte und die Aufgaben 1 bis 5.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "texts": [
+          {
+            "id": 1,
+            "title": "E-Mail von Anna an Thomas",
+            "body": [
+              "Lieber Thomas,",
+              "wie geht es dir? Mein Zug aus Berlin kommt morgen um 14:15 Uhr am Hauptbahnhof München an.",
+              "Können wir uns um 15:00 Uhr vor dem Café 'Kranzler' treffen? Ich bringe auch das Buch für Maria mit.",
+              "Gib mir bitte kurz Bescheid, ob das klappt!",
+              "Liebe Grüße,",
+              "Anna"
+            ]
+          },
+          {
+            "id": 2,
+            "title": "E-Mail von Herrn Berger (Hausverwaltung)",
+            "body": [
+              "Sehr geehrte Mieterinnen und Mieter,",
+              "am kommenden Donnerstag, den 15. Oktober, wird im gesamten Haus von 08:00 bis 12:00 Uhr das Wasser abgestellt.",
+              "Grund dafür sind Reparaturarbeiten an den Wasserleitungen.",
+              "Bitte schließen Sie alle Wasserhähne sorgfältig.",
+              "Mit freundlichen Grüßen,",
+              "Hausverwaltung Berger"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "number": 1,
+            "statement": "Annas Zug kommt am Vormittag in München an.",
+            "answer": "falsch",
+            "text": 1
+          },
+          {
+            "number": 2,
+            "statement": "Anna möchte Thomas um 15:00 Uhr im Café treffen.",
+            "answer": "richtig",
+            "text": 1
+          },
+          {
+            "number": 3,
+            "statement": "Am Donnerstag gibt es morgens vier Stunden lang kein Wasser im Haus.",
+            "answer": "richtig",
+            "text": 2
+          },
+          {
+            "number": 4,
+            "statement": "Die Arbeiten dauern den ganzen Tag bis 18:00 Uhr.",
+            "answer": "falsch",
+            "text": 2
+          },
+          {
+            "number": 5,
+            "statement": "Herr Berger bittet die Mieter, die Wasserhähne zuzumachen.",
+            "answer": "richtig",
+            "text": 2
+          }
+        ]
+      },
+      "teil2": {
+        "title": "Teil 2",
+        "instruction": "Lesen Sie die Situationen und die Anzeigen.",
+        "strong": "Welche Anzeige passt? Kreuzen Sie an: a oder b.",
+        "questions": [
+          {
+            "number": 6,
+            "statement": "Sie möchten am Samstagabend in Köln italienisch essen gehen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.bella-italia-koeln.de",
+                "title": "Ristorante 'Bella Italia'",
+                "subtitle": "",
+                "lines": [
+                  "Authentische Pizza & Pasta in Köln-Zentrum.",
+                  "Samstag von 17:00 bis 23:00 Uhr geöffnet."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.kulinaria-koeln.de",
+                "title": "Kochschule 'Kulinaria'",
+                "subtitle": "",
+                "lines": [
+                  "Lernen Sie italienisch kochen! Kurse jeden Samstag.",
+                  "Anmeldung erforderlich."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "statement": "Sie suchen eine kleine Mietwohnung in Hamburg.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.immo-hamburg-mieten.de",
+                "title": "Immobilien Kontor",
+                "subtitle": "",
+                "lines": [
+                  "1- und 2-Zimmer-Wohnungen in Hamburg zu vermieten.",
+                  "Miete ab 450 € kalt."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.hotel-elbblick.de",
+                "title": "Hotel 'Elbblick'",
+                "subtitle": "",
+                "lines": [
+                  "Komfortable Zimmer für Ihren Urlaub in Hamburg.",
+                  "Zentral gelegen nahe Landungsbrücken."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "statement": "Sie wollen Informationen über Zugverbindungen von Frankfurt nach Berlin.",
+            "answer": "b",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.vgf-ffm.de",
+                "title": "Stadtwerke Frankfurt",
+                "subtitle": "",
+                "lines": [
+                  "Fahrpläne für Busse und Straßenbahnen in Frankfurt.",
+                  "Tickets & Monatskarten online buchen."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.bahn.de",
+                "title": "Deutsche Bahn Auskunft",
+                "subtitle": "",
+                "lines": [
+                  "Zugverbindungen, Fahrpläne und IC/ICE-Tickets im Fernverkehr.",
+                  "Direkt nach Berlin."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "statement": "Sie möchten am Sonntagmorgen frische Brötchen kaufen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.baeckerei-goldkrume.de",
+                "title": "Bäckerei Goldkrume",
+                "subtitle": "",
+                "lines": [
+                  "Frische Brötchen, Brot und Kuchen.",
+                  "Sonntags geöffnete Filiale am Bahnhof von 07:00 bis 12:00 Uhr."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.bio-supermarkt-gruen.de",
+                "title": "Bio-Supermarkt 'Grün'",
+                "subtitle": "",
+                "lines": [
+                  "Biologische Lebensmittel aus der Region.",
+                  "Öffnungszeiten: Montag bis Samstag 08:00 bis 20:00 Uhr."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "statement": "Sie suchen einen Intensiv-Deutschkurs am Abend.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.vhs-deutsch-lernen.de",
+                "title": "Volkshochschule VHS",
+                "subtitle": "",
+                "lines": [
+                  "Abendkurse Deutsch als Fremdsprache A1 bis B2.",
+                  "Dienstag & Donnerstag 18:00-20:30 Uhr."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.sprachtandem.de",
+                "title": "Tandem Sprachpartner",
+                "subtitle": "",
+                "lines": [
+                  "Finde einen Partner zum Sprachenlernen im Café.",
+                  "Kostenlose Registrierung."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "teil3": {
+        "title": "Teil 3",
+        "instruction": "Lesen Sie die Texte und die Aufgaben 11 bis 15.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "questions": [
+          {
+            "number": 11,
+            "location": "Am Museumseingang",
+            "statement": "Sie müssen für den Eintritt im Museum heute nichts bezahlen.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Internationaler Museumstag",
+              "lines": [
+                "Heute freier Eintritt für alle Besucher!"
+              ]
+            }
+          },
+          {
+            "number": 12,
+            "location": "Am Bibliothekseingang",
+            "statement": "Sie können Ihr Fahrrad hier abstellen.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "FAHRRÄDER UND ROLLER",
+              "lines": [
+                "ABSTELLEN VON FAHRRÄDERN UND ROLLERN VERBOTEN!",
+                "Bitte nutzen Sie den Fahrradständer am Parkplatz."
+              ]
+            }
+          },
+          {
+            "number": 13,
+            "location": "Praxisschild Dr. Med. Hoffmann",
+            "statement": "Die Arztpraxis ist am Freitagnachmittag geöffnet.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Sprechzeiten",
+              "lines": [
+                "Mo – Do: 08:00 – 12:00 Uhr und 15:00 – 18:00 Uhr",
+                "Fr: 08:00 – 13:00 Uhr (nachmittags geschlossen)"
+              ]
+            }
+          },
+          {
+            "number": 14,
+            "location": "Im Stadtbus",
+            "statement": "Fahrgäste sollen hier im Bus beim Fahrer einsteigen.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Hinweis",
+              "lines": [
+                "Bitte vorne beim Fahrer einsteigen und die Fahrkarte vorzeigen!"
+              ]
+            }
+          },
+          {
+            "number": 15,
+            "location": "An der Postfiliale",
+            "statement": "Sie können bei der Post auch am Samstag Geld abheben.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Öffnungszeiten Geldautomat",
+              "lines": [
+                "Montag bis Samstag durchgehend von 06:00 bis 22:00 Uhr geöffnet."
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "a1-reading-sample-05",
+    "label": "Lesen Sample 5",
+    "parts": {
+      "teil1": {
+        "title": "Teil 1",
+        "instruction": "Lesen Sie die beiden Texte und die Aufgaben 1 bis 5.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "texts": [
+          {
+            "id": 1,
+            "title": "E-Mail von Claudia an Stefan",
+            "body": [
+              "Hallo Stefan,",
+              "vielen Dank für die Einladung zu deinem Geburtstag am Samstag!",
+              "Ich komme sehr gerne. Bringt Katja den Salat mit? Dann kann ich einen Kuchen backen.",
+              "Soll ich auch Getränke kaufen?",
+              "Bis Samstag,",
+              "Claudia"
+            ]
+          },
+          {
+            "id": 2,
+            "title": "E-Mail von Firma Schulze an Herrn Meier",
+            "body": [
+              "Sehr geehrter Herr Meier,",
+              "wir bestätigen Ihren Termin für das Vorstellungsgespräch am Dienstag, 22. November, um 10:30 Uhr.",
+              "Bitte kommen Sie ins Hauptgebäude im 2. Stock, Raum 204.",
+              "Bringen Sie bitte Ihren Personalausweis mit.",
+              "Mit freundlichen Grüßen,",
+              "Personalabteilung Schulze GmbH"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "number": 1,
+            "statement": "Claudia kann am Samstag nicht zur Party kommen.",
+            "answer": "falsch",
+            "text": 1
+          },
+          {
+            "number": 2,
+            "statement": "Claudia möchte einen Kuchen für die Feier mitbringen.",
+            "answer": "richtig",
+            "text": 1
+          },
+          {
+            "number": 3,
+            "statement": "Herr Meier hat am Dienstag einen Termin für ein Jobinterview.",
+            "answer": "richtig",
+            "text": 2
+          },
+          {
+            "number": 4,
+            "statement": "Das Gespräch findet am Nachmittag statt.",
+            "answer": "falsch",
+            "text": 2
+          },
+          {
+            "number": 5,
+            "statement": "Herr Meier muss seinen Ausweis mitbringen.",
+            "answer": "richtig",
+            "text": 2
+          }
+        ]
+      },
+      "teil2": {
+        "title": "Teil 2",
+        "instruction": "Lesen Sie die Situationen und die Anzeigen.",
+        "strong": "Welche Anzeige passt? Kreuzen Sie an: a oder b.",
+        "questions": [
+          {
+            "number": 6,
+            "statement": "Sie suchen ein gebrauchtes Herrenfahrrad für die Stadt.",
+            "answer": "b",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.radsport-profi.de",
+                "title": "Radsport Fachgeschäft",
+                "subtitle": "",
+                "lines": [
+                  "Neue Mountainbikes und E-Bikes ab 799 €."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.dresden-gebrauchtrad.de",
+                "title": "Dresden Bike Börse",
+                "subtitle": "",
+                "lines": [
+                  "Gebrauchte Fahrräder top gepflegt ab 80 €.",
+                  "Große Auswahl an Herren- & Damenrädern."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 7,
+            "statement": "Sie möchten am Wochenende in den Bergen wandern und suchen eine Unterkunft.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.alpenhotel-sonnhof.de",
+                "title": "Alpenhotel 'Sonnhof'",
+                "subtitle": "",
+                "lines": [
+                  "Gemütliche Zimmer im Allgäu mit Bergblick.",
+                  "Ideal für Wanderer."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.verleih-schulze.de",
+                "title": "Ski- & Wanderausrüstung Schulze",
+                "subtitle": "",
+                "lines": [
+                  "Verleih von Wanderschuhen und Rucksäcken."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 8,
+            "statement": "Sie wollen Spanisch lernen und suchen einen Online-Sprachkurs.",
+            "answer": "b",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.cervantes-berlin.de",
+                "title": "Instituto Cervantes Berlin",
+                "subtitle": "",
+                "lines": [
+                  "Präsenzkurse für Spanisch in Berlin-Mitte."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.hispania-online.es",
+                "title": "Hispania Online Academy",
+                "subtitle": "",
+                "lines": [
+                  "Spanischkurse bequem per Videocall von zu Hause aus.",
+                  "Flexible Zeiten."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 9,
+            "statement": "Sie suchen einen Nebenjob am Wochenende als Kellner/in.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.cafe-central-jobs.de",
+                "title": "Café Central",
+                "subtitle": "",
+                "lines": [
+                  "Aushilfe für Service gesucht (Sa/So).",
+                  "Guter Stundenlohn + Trinkgeld. Melde dich!"
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.blitz-reinigung.de",
+                "title": "Reinigungsservice Blitz",
+                "subtitle": "",
+                "lines": [
+                  "Reinigungskräfte für Büros von Mo bis Fr gesucht."
+                ]
+              }
+            ]
+          },
+          {
+            "number": 10,
+            "statement": "Sie möchten mit Kindern ins Schwimmbad gehen.",
+            "answer": "a",
+            "options": [
+              {
+                "id": "a",
+                "url": "www.aquafun-erlebnisbad.de",
+                "title": "Familienbad 'AquaFun'",
+                "subtitle": "",
+                "lines": [
+                  "Erlebnisbad mit Kinderbecken, Wasserrutsche & Sauna.",
+                  "Täglich geöffnet."
+                ]
+              },
+              {
+                "id": "b",
+                "url": "www.shape-fitness.de",
+                "title": "Fitness-Studio 'Shape'",
+                "subtitle": "",
+                "lines": [
+                  "Moderne Geräte, Kurse & Krafttraining für Erwachsene ab 18 Jahren."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "teil3": {
+        "title": "Teil 3",
+        "instruction": "Lesen Sie die Texte und die Aufgaben 11 bis 15.",
+        "strong": "Kreuzen Sie an: Richtig oder Falsch.",
+        "questions": [
+          {
+            "number": 11,
+            "location": "Im Stadtpark",
+            "statement": "Sie dürfen im Park die Hunde ohne Leine laufen lassen.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Achtung!",
+              "lines": [
+                "Im gesamten Stadtpark gilt Leinenpflicht für alle Hunde!"
+              ]
+            }
+          },
+          {
+            "number": 12,
+            "location": "An der Sprachschule",
+            "statement": "Das Sprachinstitut hat in den Sommerferien geschlossen.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Mitteilung der Sprachschule",
+              "lines": [
+                "Sommerpause vom 1. bis 31. August.",
+                "Ab 1. September sind wir wieder für Sie da!"
+              ]
+            }
+          },
+          {
+            "number": 13,
+            "location": "Bei der Post",
+            "statement": "Sie können Ihr Paket an diesem Schalter abholen.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Schalter 1",
+              "lines": [
+                "Nur Briefmarken und Paketabgabe.",
+                "Paketabholung bitte an Schalter 3!"
+              ]
+            }
+          },
+          {
+            "number": 14,
+            "location": "Im Bibliothekslesesaal",
+            "statement": "Im Lesesaal der Bibliothek darf man essen und trinken.",
+            "answer": "falsch",
+            "notice": {
+              "kind": "notice",
+              "heading": "Regel im Lesesaal",
+              "lines": [
+                "Essen und Trinken (außer Wasser in Plastikflaschen) im Lesesaal streng verboten!"
+              ]
+            }
+          },
+          {
+            "number": 15,
+            "location": "Sonnen-Apotheke",
+            "statement": "Die Apotheke hat am Sonntag Notdienst.",
+            "answer": "richtig",
+            "notice": {
+              "kind": "notice",
+              "heading": "Sonntags-Notdienst",
+              "lines": [
+                "Heute von 08:00 bis Montag 08:00 Uhr durchgehend geöffnet."
+              ]
+            }
+          }
+        ]
+      }
+    }
+  }
+]
