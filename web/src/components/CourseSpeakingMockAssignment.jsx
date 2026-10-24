@@ -381,6 +381,11 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     </section> : null}
 
     {stage === "exam" && selected ? <section className="speaking-course-mock__exam" aria-label={`Speaking Teil ${activePart + 1}`}>
+      {config.level !== "B1" ? <div className="speaking-course-mock__recovery" style={{display:"grid",gap:5,marginBottom:12}}>
+        <button type="button" style={{...button,background:"#0f766e",justifySelf:"start"}}
+          onClick={recoverCompletedParts}>Check completed speaking Teils</button>
+        <small>If a marked Teil did not move forward, recover its saved result without recording or paying for AI again.</small>
+      </div> : null}
       <LiveSpeakPage key={`${assignmentKey}-${activePart}-${selected.id}`}
         embedded initialLevel={config.level}
         practiceTopic={selected.topicPrompt || selected.text || config.title}
