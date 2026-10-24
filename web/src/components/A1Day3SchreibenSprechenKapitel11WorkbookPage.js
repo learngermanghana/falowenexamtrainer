@@ -277,7 +277,7 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
               <div style={{ display: "grid", gap: 5 }}>
                 <strong>Write your introduction</strong>
                 <p style={{ margin: 0, lineHeight: 1.7, color: "#475569" }}>
-                  Type your German introduction below. Your work saves automatically to the same biography used on the Class Members page, and classmates&apos; introductions appear here too.
+                  <span data-a1-print-private="biography-online-explanation">Type your German introduction below. Your work saves automatically to the same biography used on the Class Members page, and classmates&apos; introductions appear here too.</span>
                 </p>
               </div>
               <PersonalInformationContributionBox
