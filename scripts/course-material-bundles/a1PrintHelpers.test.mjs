@@ -10,6 +10,9 @@ test("print CSS shows native Teil panels without deleting choice buttons", () =>
   assert.match(css, /button:not\(\[type="submit"\]\):not\(\[role="tab"\]\)/);
   assert.doesNotMatch(css, /,\s*button,\s*input\[type="checkbox"\]/);
   assert.match(css, /data-workbook-panel="overview"/);
+  assert.match(css, /\[data-a1-pdf-hide-ui\]/);
+  assert.match(css, /\[data-a1-chapter3-draft-guidance\]/);
+  assert.match(css, /display: none !important/);
   const grammarCss = a1PrintCss("grammar");
   assert.match(grammarCss, /data-workbook-panel="grammar"\] \{ display: block !important/);
   assert.match(grammarCss, /data-workbook-panel\^="teil-"\]/);
