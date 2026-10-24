@@ -7,13 +7,20 @@ import { B1_READING, B1_LISTENING } from "./b1FinalMockData";
 
 const expectedCounts = { teil1: 6, teil2: 6, teil3: 7, teil4: 7, teil5: 4 };
 
+// The first three banks have the original complete text/ad model. The eight
+// uploaded-PDF additions use a different presentation model and are checked separately.
+const originalSamples = B1_READING_PRACTICE_SAMPLES.slice(0, 3);
+
 describe("B1 Exams Room native Lesen and Hören materials", () => {
   it("publishes three independent B1 reading samples with the same five-part structure", () => {
-    expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(3);
+    expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(11);
+    expect(originalSamples).toHaveLength(3);
+    expect(B1_READING_PRACTICE_SAMPLES.slice(3).every((sample) =>
+      Object.values(getB1ReadingQuestions(sample)).flat().length === 30)).toBe(true);
     expect(B1_READING_PART_KEYS).toEqual(Object.keys(expectedCounts));
-    expect(new Set(B1_READING_PRACTICE_SAMPLES.map((set) => set.id)).size).toBe(3);
+    expect(new Set(originalSamples.map((set) => set.id)).size).toBe(3);
 
-    B1_READING_PRACTICE_SAMPLES.forEach((sample) => {
+    originalSamples.forEach((sample) => {
       const parts = getB1ReadingQuestions(sample);
       const questions = Object.values(parts).flat();
       expect(questions).toHaveLength(30);
@@ -29,7 +36,7 @@ describe("B1 Exams Room native Lesen and Hören materials", () => {
   });
 
   it("ensures every marked answer is a choice the student can actually select", () => {
-    B1_READING_PRACTICE_SAMPLES.forEach((sample) => {
+    originalSamples.forEach((sample) => {
       const parts = getB1ReadingQuestions(sample);
       parts.teil1.forEach((q) => expect(["richtig", "falsch"]).toContain(q.answer));
       parts.teil2.concat(parts.teil5).forEach((q) => {
@@ -45,7 +52,7 @@ describe("B1 Exams Room native Lesen and Hören materials", () => {
   });
 
   it("has distinct reading texts and questions instead of reusing the mock or each other", () => {
-    const textFingerprints = B1_READING_PRACTICE_SAMPLES.map((s) =>
+    const textFingerprints = originalSamples.map((s) =>
       [s.teil1.paragraphs.join(" "), s.teil2.paragraphs.join(" "),
         s.teil2.text2.paragraphs.join(" "), s.teil4.context, s.teil5.heading].join(" "));
     expect(new Set(textFingerprints).size).toBe(3);
@@ -55,7 +62,7 @@ describe("B1 Exams Room native Lesen and Hören materials", () => {
   });
 
   it("changes Teil 1 true/false patterns between all practice banks and the final mock", () => {
-    const patterns = B1_READING_PRACTICE_SAMPLES.map((sample) =>
+    const patterns = originalSamples.map((sample) =>
       sample.teil1.questions.map((question) => question.answer).join(","));
     const mockPattern = B1_READING.teil1.questions.map((question) => question.answer).join(",");
     expect(new Set([...patterns, mockPattern]).size).toBe(4);
@@ -80,7 +87,7 @@ describe("B1 Exams Room native Lesen and Hören materials", () => {
         "Erfolgreich präsentieren", "Erste Hilfe für Betriebe",
         "Tabellen für den Beruf", "Berufstreff im Bürgerhaus"],
     ];
-    const sequences = B1_READING_PRACTICE_SAMPLES.map((sample, index) => {
+    const sequences = originalSamples.map((sample, index) => {
       const ads = new Map(sample.teil3.ads.map(([letter, title]) => [letter.toLowerCase(), title]));
       expect([...ads.keys()]).toEqual("abcdefghij".split(""));
       expect(sample.teil3.situations.map((situation) => situation.answer)
@@ -100,10 +107,10 @@ describe("B1 Exams Room native Lesen and Hören materials", () => {
     expect(new Set([...sequences,
       B1_READING.teil3.situations.map((situation) => situation.answer).join(",")]).size)
       .toBe(4);
-    expect(new Set(B1_READING_PRACTICE_SAMPLES.map((sample) =>
+    expect(new Set(originalSamples.map((sample) =>
       sample.teil3.situations.findIndex((situation) => situation.answer === "0"))).size)
       .toBe(3);
-    expect(new Set(B1_READING_PRACTICE_SAMPLES.map((sample) =>
+    expect(new Set(originalSamples.map((sample) =>
       sample.teil3.ads.find(([letter]) => letter === "A")[1])).size).toBe(3);
   });
 
