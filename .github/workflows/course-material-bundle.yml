@@ -98,6 +98,8 @@ jobs:
           node --check scripts/course-material-bundles/trimPrintedPdfTail.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/runA1BundleCleanPdf.mjs
+          node --check scripts/course-material-bundles/prepareA1BookEditions.mjs
+          node --test scripts/course-material-bundles/prepareA1BookEditions.test.mjs
           node --test scripts/course-material-bundles/a1PrintHelpers.test.mjs
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
