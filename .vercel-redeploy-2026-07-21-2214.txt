@@ -1,2 +1,0 @@
-Production redeploy trigger for latest main commit after the Vercel build-rate window.
-Application code is unchanged.

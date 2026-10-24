@@ -1,1 +1,0 @@
-throw new Error('shared/curriculumCanonical.json is the only manually edited curriculum source; this legacy reverse-build script is disabled. Use npm run sync:curriculum to regenerate projections from the canonical JSON.');
