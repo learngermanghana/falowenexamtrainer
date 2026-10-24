@@ -8,6 +8,7 @@ const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 const { registerPublicFxRoutes } = require("./publicFxRates");
 const { registerMockCommerceRoutes, processMockWebhook } = require("./mockCommerce");
 const { registerLiveSpeakRoutes } = require("./liveSpeak");
+const { registerStaffSpeakingReviewRoutes } = require("./staffSpeakingReview");
 const { getScoresForStudent } = require("./scoresSheet");
 const { getCanonicalTutorAssignmentSet } = require("./routes/scoresSummaryCoursePlan");
 
@@ -247,6 +248,9 @@ registerMockCommerceRoutes(app, { admin, getAuthedUser });
 
 // Voice-only test pilot. No payment routes or payment webhook integration.
 registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
+
+// Staff review is read-only and fetches saved speaking snapshots on demand.
+registerStaffSpeakingReviewRoutes(app, { admin, getAuthedUser, findStudentByCodeOrEmail });
 
 app.post("/paystack/initialize", async (req, res) => {
   try {
