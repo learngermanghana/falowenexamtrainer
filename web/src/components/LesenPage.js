@@ -8,6 +8,8 @@ import A2ReadingPracticeSamples, { A2_READING_PRACTICE_SAMPLES } from "./A2Readi
 import B1ReadingPracticeSamples from "./B1ReadingPracticeSamples";
 import { B1_READING_PRACTICE_SAMPLES } from "../data/b1ReadingPracticeSamples";
 import C1FinalMockExamPage from "./C1FinalMockExamPage";
+import { READING_LEVELS } from "./ReadingPracticeShell";
+import "./ReadingPracticeShell.css";
 
 const lesenLevels = [
   {
@@ -41,36 +43,40 @@ const sampleMetaForLevel = (level) => {
   }));
 };
 
-const SampleList = ({ level, samples, onOpen }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <div>
-      <h2 style={{ margin: 0 }}>{level} Lesen practice</h2>
-      <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-        Choose a reading sample to practise.
+const SampleList = ({ level, samples, onOpen, onLevelChange }) => (
+  <main className="reading-unified-landing">
+    <header>
+      <p style={{ fontWeight: 800, fontSize: 12, letterSpacing: ".08em", color: "#64748b", marginBottom: 4 }}>FALOWEN · EXAMS ROOM</p>
+      <h1>Lesen Practice</h1>
+      <p style={{ color: "#526579", margin: "8px 0 0" }}>Choose your level, open a reading sample, and continue your progress.</p>
+    </header>
+    <nav aria-label="Lesen level selector" className="reading-unified-levels">
+      {Object.keys(READING_LEVELS).map((item) => <button type="button" key={item}
+        aria-pressed={level === item}
+        onClick={() => onLevelChange(item)}>{item}</button>)}
+    </nav>
+    <section aria-labelledby="lesen-sample-heading">
+      <h2 id="lesen-sample-heading" style={{ marginBottom: 6 }}>{level} Reading Samples</h2>
+      <p style={{ color: "#64748b", marginTop: 0 }}>
+        {READING_LEVELS[level].samples
+          ? `${READING_LEVELS[level].questions} questions · ${READING_LEVELS[level].parts} Teile · ${READING_LEVELS[level].minutes} minutes`
+          : "Interactive samples are not yet published at this level."}
       </p>
-    </div>
-
-    <div style={{ display: "grid", gap: 10 }}>
-      {samples.map((sample) => (
-        <button
-          key={sample.id}
-          type="button"
-          onClick={() => onOpen(sample)}
-          style={{
-            ...styles.secondaryButton,
-            width: "100%",
-            textAlign: "left",
-            display: "grid",
-            gap: 4,
-            padding: "14px 16px",
-          }}
-        >
+      <div className="reading-unified-samples">
+        {samples.map((sample, i) => <button type="button" className="reading-unified-sample"
+          key={sample.id} onClick={() => onOpen(sample)}>
+          <span style={{ fontSize: 12, color: "#64748b" }}>SAMPLE {i + 1}</span>
           <strong>{sample.label}</strong>
-          <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>{sample.detail}</span>
-        </button>
-      ))}
-    </div>
-  </section>
+          <small>{sample.detail}</small>
+          <span style={{ fontWeight: 800, color: "#23455e" }}>Open practice →</span>
+        </button>)}
+        {!samples.length ? <section role="status" style={{ padding: 22, background: "#fff", border: "1px solid #dbe3ed", borderRadius: 15 }}>
+          <strong>Reading samples coming soon</strong>
+          <p style={{ marginBottom: 0, color: "#64748b" }}>No interactive sample is published for {level} yet. You can choose another level above.</p>
+        </section> : null}
+      </div>
+    </section>
+  </main>
 );
 
 const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
@@ -82,9 +88,11 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { level } = useExam();
   const profileLevel = String(level || "A1").toUpperCase();
   const routeLevel = String(practiceLevel || "").toUpperCase();
-  const normalizedLevel = ["A1", "A2", "B1", "B2", "C1"].includes(routeLevel)
+  const normalizedLevel = ["A1", "A2", "B1", "B2", "C1", "C2"].includes(routeLevel)
     ? routeLevel
     : profileLevel;
+
+  const changeLevel = (nextLevel) => navigate(`/exams/lesen/${nextLevel.toLowerCase()}`);
 
   if (normalizedLevel === "C1") {
     const samples = C1_READING_PRACTICE_SAMPLES;
@@ -106,6 +114,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <SampleList
           level="C1"
           samples={samples}
+          onLevelChange={changeLevel}
           onOpen={(sample) => openReadingSample(`/exams/lesen/c1/${sample.slug}`, `${sample.label} opened successfully.`)}
         />
       );
@@ -134,6 +143,7 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
         <SampleList
           level={normalizedLevel}
           samples={samples}
+          onLevelChange={changeLevel}
           onOpen={(sample) => openReadingSample(`/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}`, `${sample.label} opened successfully.`)}
         />
       );
@@ -148,38 +158,10 @@ const LesenPage = ({ practiceLevel = "", sampleId = "" }) => {
     );
   }
 
-  const resource = lesenLevels.find((item) => item.level === normalizedLevel);
-
-  return (
-    <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div>
-        <h2 style={{ margin: 0 }}>Lesen samples</h2>
-        <p style={{ margin: "6px 0 0", color: "#4b5563" }}>
-          Reading resources for level <strong>{normalizedLevel}</strong>.
-        </p>
-      </div>
-      {resource ? (
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
-          <div>
-            <h3 style={{ margin: 0 }}>{resource.level}</h3>
-            <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{resource.description}</p>
-          </div>
-          {resource.url ? (
-            <a
-              href={resource.url}
-              target="_blank"
-              rel="noreferrer"
-              style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}
-            >
-              {resource.actionLabel}
-            </a>
-          ) : (
-            <span style={{ fontSize: 14, color: "#9ca3af" }}>Available soon</span>
-          )}
-        </div>
-      ) : null}
-    </section>
-  );
+  // Keep unavailable B2/C2 visible in the same progression, without
+  // inventing samples or silently routing students to a different level.
+  return <SampleList level={normalizedLevel} samples={[]} onLevelChange={changeLevel}
+    onOpen={() => {}} />;
 };
 
 export default LesenPage;
