@@ -14,11 +14,38 @@ export const cleanA1PrintChrome = () => {
   const marked = document.querySelectorAll?.(markedSelector) ?? root.querySelectorAll(markedSelector);
   for (const element of [...marked]) remove(element);
 
+  // The compact website masthead can be a set of nested divs rather than
+  // .app-header. Remove the smallest strip that contains the exact "Falowen"
+  // brand and the FA avatar, without touching workbook or lesson headings.
+  const mastheadNodes = document.querySelectorAll?.("a,span,strong,b,div")
+    ?? root.querySelectorAll("a,span,strong,b,div");
+  for (const brand of [...mastheadNodes]) {
+    if (normalize(brand.textContent) !== "Falowen") continue;
+    let candidate = brand.parentElement;
+    for (let depth = 0; depth < 7 && candidate && candidate !== document.body
+      && candidate !== root; depth += 1, candidate = candidate.parentElement) {
+      const words = normalize(candidate.textContent);
+      if (words.length > 180) break;
+      if (/^Falowen\b/i.test(words) && /\bFA$/i.test(words)
+          && !/Grammar Notes|Workbook|Day\s*\d/i.test(words)) {
+        remove(candidate);
+        break;
+      }
+    }
+  }
+
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
-  const actionText = /^(?:Show model|Hide model|Show answer|Hide answer|Show answers|Hide answers|Reveal answer|Show solution|Check answer|Check answers|Reset|Reset answers|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|← Back)$/i;
+  const actionText = /^(?:Show model|Hide model|Show answer|Hide answer|Show answers|Hide answers|Reveal answer|Show solution|Check answer|Check answers|Reset|Reset answers|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils|Back|←\s*Back)$/i;
   for (const element of [...root.querySelectorAll("button,a")]) {
     if (actionText.test(normalize(element.textContent))) remove(element);
+  }
+
+  // Online completion tracking is not a question or an answer choice.
+  for (const label of [...root.querySelectorAll("label,button")]) {
+    if (/^I practised this section\.?$/i.test(normalize(label.textContent))) {
+      remove(label);
+    }
   }
 
   // Older variants of Day 7 render the notice as a paragraph containing a

@@ -65,3 +65,14 @@ test("printed A1 Day 22 preserves whole listening question cards and Day 19 prom
   assert.match(css, /data-a1-pdf-speaking-prompt/);
   assert.match(css, /data-a1-pdf-answer-rule/);
 });
+
+
+test("A1 Day 22 printed Hören options are compact and cannot split from their stem", () => {
+  const css = a1PrintCss("workbook");
+  assert.match(css, /data-a1-day22-health-teil='3'\] > div:has\(> strong\) > span/);
+  assert.match(css, /padding: 4px 8px !important/);
+  assert.match(css, /min-height: 0 !important/);
+  assert.match(css, /font-size: 13px !important; line-height: 1\.25 !important/);
+  assert.match(css, /break-inside: avoid-page !important/);
+  assert.doesNotMatch(css, /\[data-a1-day22-health-teil='3'\][^{]*\{[^}]*display: none/);
+});
