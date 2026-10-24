@@ -218,6 +218,22 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         return;
       }
       const savedParts = contiguousVerifiedSpeakingParts(status.recovery?.parts || []);
+      // Three verified cloud parts must be submitted even when all three are
+      // already present locally. Previously the <= comparison returned early
+      // and left a fully marked student stuck at Teil 3 without a final score.
+      if (savedParts.length === 3) {
+        const restoredTasks = tasks.map((task, index) => {
+          const saved = savedParts[index];
+          return saved?.taskId
+            ? speakingQuestionDictionary.find(q => q.level === config.level && q.id === saved.taskId) || task
+            : task;
+        });
+        setTasks(restoredTasks);
+        setResults(savedParts);
+        saveDraft(uid, assignmentKey, {tasks:restoredTasks,results:savedParts,attemptId});
+        await submit(savedParts);
+        return;
+      }
       if (savedParts.length <= results.length) {
         setMessage(savedParts.length
           ? `✓ ${savedParts.length} completed Teil(s) verified. Continue with the current step.`
@@ -233,14 +249,9 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
       setTasks(restoredTasks);
       setResults(savedParts);
       saveDraft(uid, assignmentKey, {tasks:restoredTasks,results:savedParts,attemptId});
-      if (savedParts.length === 3) {
-        setStage("submitting");
-        await submit(savedParts);
-      } else {
-        setActivePart(savedParts.length);
-        setStage("exam");
-        setMessage(`✓ Teil ${savedParts.length} recovered. Continue to Teil ${savedParts.length+1}; no new recording was required.`);
-      }
+      setActivePart(savedParts.length);
+      setStage("exam");
+      setMessage(`✓ Teil ${savedParts.length} recovered. Continue to Teil ${savedParts.length+1}; no new recording was required.`);
     } catch (error) {
       setMessage(error?.response?.data?.error || error?.message ||
         "Could not check saved speaking parts. Your current answers are unchanged.");
@@ -271,6 +282,15 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
     }
     return true;
   }, [activePart, assignmentKey, results, submit, tasks, uid, attemptId]);
+
+  // Protect against an interrupted last-part callback or a React state race:
+  // if three verified local Teile are visible but the final submission screen
+  // never opened, submit the existing session IDs without re-marking audio.
+  useEffect(() => {
+    if (stage === "exam" && attemptId && results.length === 3 && !savingRef.current) {
+      submit(results);
+    }
+  }, [stage, attemptId, results, submit]);
 
   const selected = tasks?.[activePart];
   const scores = serverResult?.sectionScores || {};
@@ -385,6 +405,10 @@ export default function CourseSpeakingMockAssignment({ assignmentKey }) {
         <button type="button" style={{...button,background:"#0f766e",justifySelf:"start"}}
           onClick={recoverCompletedParts}>Check completed speaking Teils</button>
         <small>If a marked Teil did not move forward, recover its saved result without recording or paying for AI again.</small>
+      </div> : activePart === 2 ? <div className="speaking-course-mock__recovery" style={{display:"grid",gap:5,marginBottom:12}}>
+        <button type="button" style={{...button,background:"#0f766e",justifySelf:"start"}}
+          onClick={recoverCompletedParts}>Check saved Teil 3 and finalize score</button>
+        <small>If Teil 3 has finished but the final result is missing, check the saved assessments and complete score submission without recording or paying for AI again.</small>
       </div> : null}
       <LiveSpeakPage key={`${assignmentKey}-${activePart}-${selected.id}`}
         embedded initialLevel={config.level}
