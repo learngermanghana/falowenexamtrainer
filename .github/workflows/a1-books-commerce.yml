@@ -27,7 +27,7 @@ jobs:
           node --check functions/functionz/paymentAwareApp.js
       - name: Install backend dependencies
         working-directory: functions
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-package-lock --no-audit --no-fund
       - name: Test payment authorization, price, idempotency and disabled sales
         working-directory: functions
         run: npx jest --runInBand functionz/tests/bookCommerce.test.js
