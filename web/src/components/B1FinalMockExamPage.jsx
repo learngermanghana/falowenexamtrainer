@@ -83,7 +83,7 @@ const scoreObjective = (answers, questions) => {
   return { correct, total: questions.length, score: normalizeScore(correct, questions.length), maxScore: 25 };
 };
 
-const buildLesenQuestions = (B1_READING) => [
+const buildLesenQuestions = (reading) => [
   ...reading.teil1.questions.map((q) => ({ ...q, key: `t1-${q.number}` })),
   ...reading.teil2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
   ...reading.teil2.text2.questions.map((q) => ({ ...q, key: `t2-${q.number}` })),
@@ -582,7 +582,7 @@ export default function B1FinalMockExamPage({mockId = B1_FINAL_MOCK_ID}) {
       <main className="b1-final-shell">
         <AppBackButton label="Back to course" fallbackPath="/campus/course" />
         <header className="b1-final-hero">
-          <p>B1 · Day 29 · Complete mock</p>
+          <p>{isSecond ? "B1 · Mock 2" : "B1 · Day 29 · Complete mock"}</p>
           <h1>GOETHE-ZERTIFIKAT B1 Mock {isSecond ? 2 : 1}</h1>
           <p>This is <strong>one four-section exam</strong>, not four separate short mocks. You must finish Lesen, Hören, Schreiben <strong>and</strong> Sprechen to receive your final result.</p>
         </header>
