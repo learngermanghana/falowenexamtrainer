@@ -1,0 +1,56 @@
+name: Homepage and Exams Room Copy Cleanup
+
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/LegalFooter.js'
+      - 'web/src/components/MockExamLibraryPage.js'
+      - 'web/src/components/MyExamFilePage.js'
+      - 'web/src/components/WritingPage.js'
+      - 'web/src/components/*Mock*Preview.jsx'
+      - 'web/src/components/*FinalMockExamPage.jsx'
+      - 'web/src/components/HorenPage.js'
+      - 'web/src/components/LesenPage.js'
+      - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/HomeAndExamCopyCleanup.test.js'
+      - '.github/workflows/homepage-exam-copy-cleanup.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'web/src/components/GeneralHome.js'
+      - 'web/src/components/ClassCalendarCardV2.js'
+      - 'web/src/components/NextLiveClassCard.js'
+      - 'web/src/components/LegalFooter.js'
+      - 'web/src/components/MockExamLibraryPage.js'
+      - 'web/src/components/MyExamFilePage.js'
+      - 'web/src/components/WritingPage.js'
+      - 'web/src/components/*Mock*Preview.jsx'
+      - 'web/src/components/*FinalMockExamPage.jsx'
+      - 'web/src/components/HorenPage.js'
+      - 'web/src/components/LesenPage.js'
+      - 'web/src/components/ListeningPracticeSamplePage.jsx'
+      - 'web/src/components/HomeAndExamCopyCleanup.test.js'
+      - '.github/workflows/homepage-exam-copy-cleanup.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Homepage and exam copy regression
+        run: npx jest --runInBand --runTestsByPath src/components/HomeAndExamCopyCleanup.test.js
+      - name: Direct web compile
+        run: npx vite build

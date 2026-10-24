@@ -1,0 +1,163 @@
+export const ADDITIONAL_A2_RADIO_ENTRIES = {
+  1: {
+    key: "a2-day1-small-talk-falowen-radio",
+    title: "Small Talk 1.1",
+    youtubeId: "_AHBm9nw_bA",
+    duration: "",
+    instruction:
+      "Höre aufmerksam zu und stimme dich auf Begrüßungen, persönliche Informationen und einfache Small-Talk-Fragen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  2: {
+    key: "a2-day2-personen-beschreiben-falowen-radio",
+    title: "Personen beschreiben 1.2",
+    youtubeId: "5UGb1ENJ8Cs",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Personen beschreiben ein. Danach gehst du weiter zu Teil 1.",
+  },
+  3: {
+    key: "a2-day3-dinge-personen-vergleichen-falowen-radio",
+    title: "Dinge und Personen vergleichen 1.3",
+    youtubeId: "wpGj-ZcZVv0",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Dinge und Personen vergleichen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  4: {
+    key: "a2-day4-wo-moechten-wir-uns-treffen-falowen-radio",
+    title: "Wo möchten wir uns treffen? 2.4",
+    youtubeId: "JsZBblW70C8",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Treffen vereinbaren ein. Danach gehst du weiter zu Teil 1.",
+  },
+  5: {
+    key: "a2-day5-freizeit-falowen-radio",
+    title: "Was machst du in deiner Freizeit? 2.5",
+    youtubeId: "NWRCe0wCSb4",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Freizeit ein. Danach gehst du weiter zu Teil 1.",
+  },
+  6: {
+    key: "a2-day6-moebel-und-raeume-falowen-radio",
+    title: "Möbel und Räume kennenlernen 3.6",
+    youtubeId: "ql8aR2F6tfU",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Möbel und Räume ein. Danach gehst du weiter zu Teil 1.",
+  },
+
+  7: {
+    key: "a2-day7-eine-wohnung-suchen-falowen-radio",
+    title: "Eine Wohnung suchen (Übung) 3.7",
+    youtubeId: "P1so4g9y3Ao",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Wohnung suchen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  8: {
+    key: "a2-day8-rezepte-und-essen-falowen-radio",
+    title: "Rezepte und Essen (Exercise) 3.8",
+    youtubeId: "dC8nKSyCE8g",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Rezepte und Essen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  10: {
+    key: "a2-day10-tourismus-traditionelle-feste-falowen-radio",
+    title: "Tourismus und Traditionelle Feste 4.10",
+    youtubeId: "vpSwGAtqIlU",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Tourismus und traditionelle Feste ein. Danach gehst du weiter zu Teil 1.",
+  },
+  12: {
+    key: "a2-day12-mein-traumberuf-falowen-radio",
+    title: "Mein Traumberuf 5.12",
+    youtubeId: "0_iGhcuysag",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Mein Traumberuf ein. Danach gehst du weiter zu Teil 1.",
+  },
+  13: {
+    key: "a2-day13-vorstellungsgespraech-falowen-radio",
+    title: "Ein Vorstellungsgespräch 5.13",
+    youtubeId: "rfGmsNqDrUg",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Vorstellungsgespräch ein. Danach gehst du weiter zu Teil 1.",
+  },
+  18: {
+    key: "a2-day18-die-bank-anrufen-falowen-radio",
+    title: "Die Bank anrufen 7.18",
+    youtubeId: "_R16CSTUnuk",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Die Bank anrufen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  19: {
+    key: "a2-day19-einkaufen-wo-und-wie-falowen-radio",
+    title: "Einkaufen? Wo und wie? 7.19",
+    youtubeId: "EfFSseqcaCw",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Einkaufen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  20: {
+    key: "a2-day20-typische-reklamationssituationen-falowen-radio",
+    title: "Typische Reklamationssituationen üben 7.20",
+    youtubeId: "5CtL1P74sW8",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf typische Reklamationssituationen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  21: {
+    key: "a2-day21-ein-wochenende-planen-falowen-radio",
+    title: "Ein Wochenende planen 8.21",
+    youtubeId: "LlXsNA1a8lc",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Ein Wochenende planen ein. Danach gehst du weiter zu Teil 1.",
+  },
+  22: {
+    key: "a2-day22-die-woche-planung-falowen-radio",
+    title: "Die Woche Planung 8.22",
+    youtubeId: "KR2oT-mujmI",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Wochenplanung ein. Danach gehst du weiter zu Teil 1.",
+  },
+  23: {
+    key: "a2-day23-schule-arbeit-falowen-radio",
+    title: "Wie kommst du zur Schule / zur Arbeit? 9.23",
+    youtubeId: "LtARwiCljLY",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf Wege zur Schule und zur Arbeit ein. Danach gehst du weiter zu Teil 1.",
+  },
+  24: {
+    key: "a2-day24-einen-urlaub-planen-falowen-radio",
+    title: "Einen Urlaub planen 9.24",
+    youtubeId: "UXiBiiXwqwY",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Thema Urlaubsplanung ein. Danach gehst du weiter zu Teil 1.",
+  },
+  25: {
+    key: "a2-day25-tagesablauf-exercise-falowen-radio",
+    title: "Tagesablauf (Exercise) 9.25",
+    youtubeId: "m7nP2qE9gNg",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf die Tagesablauf-Übung ein. Danach gehst du weiter zu Teil 1.",
+  },
+  28: {
+    key: "a2-day28-ueber-die-zukunft-sprechen-falowen-radio",
+    title: "Über die Zukunft sprechen 10.28",
+    youtubeId: "ftnD96p9Ncg",
+    duration: "",
+    instruction:
+      "Höre einfach zu und stimme dich auf das Sprechen über die Zukunft ein. Danach gehst du weiter zu Teil 1.",
+  },
+};

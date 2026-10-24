@@ -1,0 +1,1 @@
+Trigger production deployment for C2 Course Book visibility and 28-lesson schedule on 2026-08-13.

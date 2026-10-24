@@ -1,0 +1,1705 @@
+{
+  "common": {
+    "open": "Öffnen",
+    "minute_one": "{{formattedCount}} Minute",
+    "minute_other": "{{formattedCount}} Minuten",
+    "hour_one": "{{formattedCount}} Stunde",
+    "hour_other": "{{formattedCount}} Stunden",
+    "day_one": "{{formattedCount}} Tag",
+    "day_other": "{{formattedCount}} Tage"
+  },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)"
+  },
+  "programLanguages": {
+    "german": "Deutsch",
+    "french": "Französisch"
+  },
+  "interfaceLanguage": {
+    "label": "Interface-Sprache ändern",
+    "shortLabel": "Interface-Sprache",
+    "helper": "Menüs und Anleitungen bleiben in der gewählten Sprache, unabhängig von deiner Lernsprache.",
+    "ariaLabel": "Interface-Sprache ändern",
+    "optionAria": "Interface-Sprache auf {{language}} umstellen"
+  },
+  "appStatus": {
+    "authLoading": "Die App wird geladen…"
+  },
+  "appNav": {
+    "title": "Falowen Learning Hub",
+    "signedInAs": "Angemeldet als {{email}}",
+    "logout": "Abmelden",
+    "backHome": "Zurück zur Startseite",
+    "subtitle": {
+      "campus": "Campus: Kursbuch, Abgaben, Community",
+      "exams": "Prüfungsraum: Sprechen, Schreiben, Ressourcen",
+      "default": "Wähle Campus oder den Prüfungsraum"
+    },
+    "tabs": {
+      "course": "Mein Kurs",
+      "ai": "Falowen A.I",
+      "aiFrench": "Falowen A.I (Französisch)",
+      "results": "Ergebnisse",
+      "discussion": "Klassendiskussion",
+      "account": "Konto",
+      "attendance": "Anwesenheit",
+      "classMembers": "Klassenmitglieder"
+    },
+    "sections": {
+      "courseBook": "Kursbuch",
+      "submit": "Hausaufgabe einreichen",
+      "examFile": "Prüfungsakte und Termine",
+      "grammar": "Grammatikfrage stellen",
+      "grammarFrench": "Französische Grammatikhilfe",
+      "writing": "Schreibtraining",
+      "writingFrench": "Französisches Schreibtraining",
+      "speech": "Sprechtraining",
+      "speechFrench": "Französisches Sprechtraining",
+      "vocab": "Vokabeltraining",
+      "vocabFrench": "Französisches Vokabeltraining",
+      "attendance": "Anwesenheit",
+      "classMembers": "Klassenmitglieder"
+    },
+    "examTabs": {
+      "overview": "Überblick",
+      "question": "Frage des Tages",
+      "speaking": "Sprechen",
+      "writing": "Schreiben",
+      "vocab": "Vokabeln",
+      "horen": "Hören",
+      "lesen": "Lesen",
+      "resources": "Ressourcen",
+      "file": "Prüfungsakte und Termine"
+    },
+    "campusTabs": {
+      "speech": "Sprechtraining",
+      "account": "Konto & Zahlungen"
+    }
+  },
+  "studyBuddy": {
+    "ariaLabel": "Study Buddy",
+    "title": "Study Buddy",
+    "subtitle": "Schnellzugriff auf Falowen A.I, Kalender und tägliche Aufgaben.",
+    "tags": {
+      "results": "Ergebnisse",
+      "attendance": "Anwesenheit",
+      "quickQa": "Kurzfragen"
+    },
+    "shortcuts": {
+      "ariaLabel": "Study Buddy Schnellzugriffe",
+      "course": "Kursbuch",
+      "submit": "Aufgabe senden",
+      "ai": "Falowen A.I",
+      "calendar": "Lernkalender",
+      "exams": "Prüfungsraum"
+    },
+    "actions": {
+      "collapse": "Details ausblenden",
+      "expand": "Details anzeigen",
+      "dismiss": "Leiste ausblenden",
+      "reopen": "Study Buddy",
+      "reopenAria": "Study Buddy-Leiste wieder öffnen",
+      "contrastOn": "Hoher Kontrast",
+      "contrastOff": "Standardkontrast",
+      "showProgressDetails": "Fortschrittsdetails anzeigen",
+      "hideProgressDetails": "Fortschrittsdetails ausblenden"
+    },
+    "insights": {
+      "nextUp": "Als Nächstes",
+      "results": "Letztes Ergebnis",
+      "attendance": "Anwesenheit",
+      "progressDetails": "Fortschrittsdetails"
+    },
+    "data": {
+      "title": "Datenquellen",
+      "description": "Die Vorschläge basieren auf deinen Falowen-Profildaten. GitHub-Kalender oder Stundenpläne werden zuerst in die App oder API synchronisiert."
+    },
+    "metrics": {
+      "latestResult": "Letztes Ergebnis",
+      "attendance": "Anwesenheit",
+      "latestHelper": "Behalte deinen Fortschritt nach jeder Korrektur im Blick.",
+      "attendanceHelper": "Bleib regelmäßig dran, so machst du schneller Fortschritte.",
+      "scoreValue": "{{score}}/100",
+      "noResults": "Noch keine Ergebnisse",
+      "attendancePercent": "{{percent}}%",
+      "attendanceSessions": "{{count}} Termine",
+      "notSynced": "Nicht synchronisiert"
+    },
+    "suggestions": {
+      "title": "Vorschläge",
+      "lowScore": "Konzentriere dich auf die letzte Aufgabe und korrigiere sie, bevor du etwas Neues startest.",
+      "lowAttendance": "Versuche, die nächsten zwei Termine zu besuchen, um stabil zu bleiben.",
+      "paymentReminder": "Zahlungserinnerung: {{amount}} fällig in {{time}}. Öffne dein Konto, um eingeschrieben zu bleiben.",
+      "default": "Sag mir dein aktuelles Ziel, dann erstelle ich einen kurzen Wochenplan."
+    },
+    "qa": {
+      "jumpButton": "KI fragen",
+      "helper": "Kurz und konkret formulieren, damit der Tipp schneller kommt.",
+      "title": "Kurze Frage stellen",
+      "placeholder": "z. B. Was soll ich für die nächste Stunde wiederholen?",
+      "send": "Senden",
+      "loading": "Antwort wird geladen ...",
+      "error": "Sorry, Study Buddy kann gerade nicht antworten. Bitte versuche es erneut."
+    },
+    "quickReply": {
+      "keywords": {
+        "attendance": [
+          "anwesenheit",
+          "fehlend",
+          "abwesend",
+          "abwesenheit"
+        ],
+        "results": [
+          "ergebnis",
+          "ergebnisse",
+          "punkte",
+          "note",
+          "bewertung"
+        ],
+        "assignment": [
+          "aufgabe",
+          "hausaufgabe",
+          "arbeitsauftrag"
+        ],
+        "grammar": [
+          "grammatik"
+        ],
+        "vocab": [
+          "wortschatz",
+          "vokabel",
+          "vokabeln"
+        ],
+        "exam": [
+          "prüfung",
+          "test",
+          "klausur",
+          "examen"
+        ],
+        "greeting": [
+          "hallo",
+          "hi",
+          "hey",
+          "guten tag",
+          "servus"
+        ]
+      },
+      "attendance": {
+        "synced": "Du liegst aktuell bei {{attendance}}. Nimm die nächste Stunde mit, um dranzubleiben.",
+        "notSynced": "Deine Anwesenheit ist noch nicht synchronisiert. Bitte deine Lehrkraft um Bestätigung."
+      },
+      "results": {
+        "synced": "Dein letztes Ergebnis ist {{results}}. Soll ich daraus einen Übungsplan ableiten?",
+        "noResults": "Sobald die erste Aufgabe korrigiert ist, fasse ich den Trend zusammen."
+      },
+      "assignment": {
+        "recommended": "Als Nächstes: {{assignment}}. Ich helfe dir gern beim Planen.",
+        "awaiting": "Noch keine Empfehlung. Sag mir, in welchem Kapitel du bist."
+      },
+      "grammar": "Für Grammatik: Wähle eine Regel und schreibe 3 kurze Sätze dazu.",
+      "vocab": "Baue heute 5 neue Wörter in kurze Sätze ein. Ich kann dich abfragen.",
+      "examTips": "Prüfungstipp: Übe mit Timer und notiere einen Fehler pro Aufgabe.",
+      "greeting": "Hallo! Sag mir, wobei du Hilfe brauchst: Ergebnisse, Anwesenheit, Aufgaben, Grammatik, Wortschatz oder Prüfungen.",
+      "default": "Alles klar! Sag mir, woran du gerade arbeitest."
+    },
+    "weeklyPlan": {
+      "title": "Wochenplan",
+      "description": "Automatisch aus deinen Schwächen und dem Prüfungsdatum erstellt. Hake Aufgaben nach Abschluss ab.",
+      "progress": "{{done}}/{{total}} erledigt",
+      "items": {
+        "grammarRepair": "1 Grammatik-Repair-Sprint (15 Min.)",
+        "attendanceReset": "Nächste Live-Klasse planen und teilnehmen",
+        "redoFailed": "{{assignment}} wiederholen und Schwachstellen verbessern",
+        "writingPractice": "Eine Schreibaufgabe unter Zeitvorgabe schreiben",
+        "examSimulation": "Eine Mini-Prüfungssimulation durchführen",
+        "vocabRecall": "Gezieltes Wortschatz-Set wiederholen"
+      },
+      "helpers": {
+        "grammarRepair": "Nutze die Falowen-A.I-Grammatikseite mit einem echten Satz aus dem Unterricht.",
+        "attendanceReset": "Regelmäßigkeit verbessert Sicherheit und Prüfungsreife.",
+        "redoFailed": "Achte auf klarere Struktur und weniger Grammatikfehler.",
+        "writingPractice": "Mit Prüfungszeit üben und vor dem Abgeben Korrektur lesen.",
+        "examSimulation": "Prüfung in {{days}} Tagen – diese Woche einmal unter Druck üben.",
+        "vocabRecall": "Wähle ein Thema und teste deinen Abruf laut."
+      },
+      "nudges": {
+        "allDone": "Stark — Wochenplan geschafft. Nächste Woche dranbleiben.",
+        "oneLeft": "Nur noch eine Aufgabe diese Woche. Du bist fast durch.",
+        "pending": "Diese Woche sind noch {{count}} Aufgaben offen. Starte jetzt mit einer."
+      }
+    }
+  },
+  "signup": {
+    "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die Benutzeroberfläche ist auf Englisch verfügbar.",
+    "programs": {
+      "german": "Deutsch",
+      "french": "Französisch"
+    }
+  },
+  "homeActions": {
+    "title": "Was möchtest du heute machen?",
+    "badge": "Schnellstart",
+    "description": "Wähle eine der beiden Hauptaufgaben für heute: im Kursbuch lernen oder eine Prüfungssimulation starten. Einfaches Deutsch hilft allen, besonders A1-Lernenden.",
+    "buttons": {
+      "course": "Kursbuch öffnen",
+      "exam": "Zur Prüfungssimulation",
+      "discussion": "Zur Klassendiskussion",
+      "account": "Konto, Vertrag & Zahlungen"
+    }
+  },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Teilnehmer",
+      "classFallback": "deinem Kurs",
+      "eyebrow": "Willkommen zurück",
+      "title": "{{studentName}}, dein Campus ist bereit.",
+      "subtitle": "Personalisierte Tipps, Anwesenheit und Aufgaben für {{className}} – spring direkt in den Bereich, den du heute brauchst.",
+      "streakBadge": "Halte deine Serie am Leben",
+      "joinZoom": "Auf Zoom beitreten"
+    },
+    "paymentAlert": {
+      "badge": "Zahlungserinnerung",
+      "endsToday": "Dein Zugang endet heute und du schuldest noch {{amount}}. Bitte bezahle, um den Zugang zu behalten.",
+      "endsSoon": "Du schuldest noch {{amount}} und hast {{time}} Zeit. Bitte bezahle, um den Zugang zu behalten.",
+      "cta": "Zahlungen prüfen"
+    },
+    "announcements": {
+      "eyebrow": "Updates",
+      "title": "Neueste Blogbeiträge",
+      "subtitle": "Aktuelle Beiträge von blog.falowen.app.",
+      "loading": "Neueste Blogbeiträge werden geladen…",
+      "error": "Die neuesten Blogbeiträge können gerade nicht geladen werden. Bitte aktualisiere bald.",
+      "empty": "Noch keine Blogbeiträge. Schau später für neue Updates vorbei.",
+      "ariaLabel": "Neueste Blogbeiträge",
+      "readMore": "Mehr lesen",
+      "showLess": "Weniger anzeigen",
+      "openUpdate": "Beitrag öffnen"
+    },
+    "learningSpace": {
+      "eyebrow": "Willkommen zurück",
+      "title": "Wähle deinen Lernbereich",
+      "subtitle": "Wähle den Bereich, der zu deinem Fokus heute passt. Alle Anweisungen bleiben auf Englisch, damit du schnell navigieren und mehr Zeit zum Üben hast."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Kurse, Kursbuch und KI-Helfer",
+      "badgePrimary": "Hier starten",
+      "badgeSecondary": "Tägliche Arbeit",
+      "points": [
+        "Zugriff auf Kursbuch, Aufgabenabgabe und Ergebnisse.",
+        "Grammatik-Q&A, Sprechtraining und der ursprüngliche Schreibcoach.",
+        "Klassendiskussion und deine Kontoeinstellungen."
+      ],
+      "helper": "Starte im Campus für tägliche Arbeit; nutze den Prüfungsraum für Prüfungssimulationen.",
+      "cta": "Campus betreten"
+    },
+    "exams": {
+      "eyebrow": "Prüfungsraum",
+      "title": "Sprechen, Schreiben-Trainer, Ressourcen",
+      "badge": "Prüfungsmodus",
+      "points": [
+        "Sprechübungen nach Level sortiert.",
+        "Schreiben-Trainer mit Zeitlimit und Ideengenerator.",
+        "Goethe Lesen/Hören-Links und kurze Prüfungstipps."
+      ],
+      "helper": "Starte im Campus für tägliche Arbeit; nutze den Prüfungsraum für Prüfungssimulationen.",
+      "cta": "Zum Prüfungsraum"
+    },
+    "more": {
+      "summary": "Mehr für dich",
+      "helper": "Verfolge deine Anwesenheitsserie, behalte die nächsten Kurstermine im Blick und prüfe den Kalender, damit du keine Stunde verpasst."
+    }
+  },
+  "courseTab": {
+    "instructionLabel": "Anleitung",
+    "title": "Kursbuch",
+    "subtitle": "Prüfe den aktualisierten Kursplan und setze dein nächstes Pflicht-Assignment fort.",
+    "level": "Kursniveau:",
+    "submit": "Assignment abgeben",
+    "todayTask": "Heutige Aufgabe",
+    "metrics": {
+      "days": "Abgeschlossene Tage: {{completed}}/{{total}}",
+      "assignments": "Eingereichte Assignments: {{submitted}}/{{total}}",
+      "streak": "Aktuelle Serie: {{count}}",
+      "lastActivity": "Letzte Aktivität: {{date}}"
+    },
+    "searchLabel": "Nach Tag, Thema oder Grammatikfokus suchen",
+    "searchPlaceholder": "z. B. Day 4 oder Pronouns",
+    "assignmentsOnly": "Nur mit Assignment",
+    "unfinishedOnly": "Nur unfertige",
+    "filterBySkill": "Nach Skill filtern",
+    "filterByChapter": "Nach Kapitel filtern",
+    "all": "Alle",
+    "jump": {
+      "week1": "Day 1–7",
+      "week2": "Day 8–14",
+      "revision": "Revision",
+      "assignmentDue": "Assignment fällig"
+    },
+    "continueAssignment": "Nächstes Pflicht-Assignment fortsetzen",
+    "chapter": "Kapitel",
+    "tutorMarked": "Tutor-bewertetes Assignment",
+    "selfPractice": "Nur Selbstübung",
+    "fromClassSchedule": "Aus dem Klassenplan",
+    "expand": "Tag ausklappen",
+    "collapse": "Tag einklappen",
+    "noResults": "Keine Kurstage passen zu deinen Filtern. Suche anpassen oder Filter deaktivieren.",
+    "assignment": "Assignment",
+    "resources": "Ressourcen",
+    "status": {
+      "notStarted": "Nicht begonnen",
+      "inProgress": "In Bearbeitung",
+      "passed": "Bestanden",
+      "failed": "Nicht bestanden",
+      "submitted": "Eingereicht",
+      "needsRedo": "Neu bearbeiten",
+      "milestoneComplete": "Meilenstein abgeschlossen"
+    },
+    "nav": {
+      "courseBook": "Kursbuch",
+      "classMembers": "Klassenmitglieder"
+    },
+    "completion": {
+      "message": "Glückwunsch zum Abschluss deines {{level}}-Kurses. Wähle deinen nächsten Schritt und bleib dran.",
+      "actions": {
+        "openExams": "Prüfungsseite öffnen",
+        "downloadStudyCalendar": "Lernkalender herunterladen"
+      }
+    }
+  },
+  "planPage": {
+    "meta": {
+      "title": "Dein Plan · Falowen Exam Coach",
+      "description": "Wähle zwischen Kursbuch und Prüfungssimulation, um deine nächste Session zu starten."
+    },
+    "title": "Zwei Wege für heute",
+    "badge": "Login nötig",
+    "intro": "Halte die Startseite schlank: Entscheide dich zwischen Kursbuch und Prüfungssimulation. Alle weiteren Inhalte erreichst du später innerhalb dieser Bereiche.",
+    "courseCard": {
+      "title": "Kursbuch",
+      "description": "Öffne dein Kursmaterial und arbeite die Lektionen oder Hausaufgaben durch.",
+      "points": [
+        "Alle PDFs, Videos und Worksheets an einem Ort.",
+        "Roter Faden über die nächsten Aufgaben im Kurs.",
+        "Nach dem Login direkt in das aktuelle Modul springen."
+      ],
+      "cta": "Zum Kursbuch"
+    },
+    "examCard": {
+      "title": "Prüfungen",
+      "description": "Starte eine Prüfungssimulation mit klaren Aufgaben und Timer.",
+      "points": [
+        "Direkt in die nächste Speaking- oder Writing-Session springen.",
+        "Fragen und Prompts erscheinen erst nach Login.",
+        "Feedback und Score werden nach jeder Runde gespeichert."
+      ],
+      "cta": "Zur Prüfung"
+    }
+  },
+  "examRoom": {
+    "headingLabel": "Prüfungsraum",
+    "title": "Wähle dein Prüfungsformat",
+    "levelBadge": "Level: {{level}}",
+    "tabs": {
+      "speaking": "Sprechen",
+      "writing": "Schreiben",
+      "resources": "Ressourcen"
+    },
+    "resources": {
+      "title": "Ressourcen für Lesen & Hören",
+      "subtitle": "Offizielle Goethe-Beispiele ({{level}}) – übe mit Originalmaterial.",
+      "badge": "Externe Links",
+      "links": {
+        "reading": {
+          "label": "Lesen (Goethe Übungssätze)",
+          "description": "Öffnet die offiziellen Goethe-Leseverstehen-Übungen in einem neuen Tab."
+        },
+        "listening": {
+          "label": "Hören (Goethe Hörverstehen)",
+          "description": "Original-Audioaufgaben mit Lösungen direkt von der Goethe-Webseite."
+        }
+      }
+    }
+  },
+  "resourcePage": {
+    "meta": {
+      "title": "Ressourcen · Falowen Exam Coach",
+      "description": "Strategien und geprüfte Links für Lesen, Hören und Prüfungsvorbereitung."
+    },
+    "title": "Ressourcen",
+    "subtitle": "Sichere Materialsammlung mit klaren Strategien und Links statt kopierter Prüfungsaufgaben.",
+    "badge": "Lesen/Hören inklusive",
+    "sections": [
+      {
+        "title": "Lesen & Hören als Skill Lab",
+        "points": [
+          "Strategie-Only Drills (Skimming, Scanning, Keyword-Spotting, Notizen).",
+          "User-Provided Content: Text einkopieren oder Audio-Link einfügen → Verständnisfragen & Feedback.",
+          "Keine gehosteten Prüfungsaufgaben; stattdessen Links zu verlässlichen Quellen (DW, Goethe, telc/ÖSD Beispiele)."
+        ]
+      },
+      {
+        "title": "Checklisten & Strategien",
+        "points": [
+          "'Teil 2 meistern' – Schritt-für-Schritt-Checklisten für Sprechen/Schreiben.",
+          "Konnektoren- und Redemittel-Layer pro Niveau (A1–B2).",
+          "Aussprache-Kurzlisten: häufige Stolpersteine + Beispielaudio (eigene Assets)."
+        ]
+      },
+      {
+        "title": "Offizielle Materialien verlinken",
+        "points": [
+          "Direkte Links zu Übungssätzen von Goethe, telc, ÖSD und Deutsche Welle.",
+          "Hinweis, dass Originalaufgaben nicht kopiert werden – Nutzer:innen üben direkt auf den offiziellen Seiten.",
+          "Kurze Begleittexte: Worauf achten? Welche Teile sind relevant für A1/A2/B1/B2?"
+        ]
+      }
+    ]
+  },
+  "vocabPage": {
+    "title": "Vokabel-Booster",
+    "intro": "🧠 Nutze diese Mini-Listen als Schnellhilfe für deine Antworten. Lies sie laut vor und bau sie in deine Beispiele ein.",
+    "exerciseTitle": "Mini-Übung",
+    "exerciseIntro": "Wähle zwei Ausdrücke aus den Listen oben und schreibe oder spreche einen kurzen Dialog. Kombiniere mindestens eine Frage und eine Bitte.",
+    "prompts": [
+      "Beschreibe dich selbst mit 5–6 Sätzen (Name, Herkunft, Beruf, Hobbys).",
+      "Stelle drei Fragen zu einem Thema deiner Wahl (z. B. Urlaub, Arbeit, Familie).",
+      "Mache höfliche Bitten für ein Gruppenprojekt (Treffpunkt, Aufgaben, Zeitplan)."
+    ]
+  },
+  "landing": {
+    "meta": {
+      "title": "Falowen Exam Coach · Deutsch- & Französischtraining",
+      "description": "Falowen unterstützt dich beim Deutsch- und Französischlernen in Ghana mit Live-Klassen, täglicher Praxis und Tutor-Feedback."
+    },
+    "badge": "Falowen · Exam Coach",
+    "heroTitle": "Deutsch- und Französisch-Prüfungstraining aus Ghana.",
+    "heroSubtitle": "Falowen begleitet dich vor allem auf dem Weg zur deutschen Prüfung: mit täglicher Praxis, Tutor-Feedback und strukturierten Live-Klassen. Französisch ist als ergänzendes A1-Modul verfügbar.",
+    "cta": {
+      "join": "Einer Kohorte beitreten",
+      "login": "Einloggen",
+      "getApp": "App herunterladen",
+      "seeHow": "So funktioniert es ↓"
+    },
+    "heroBadges": [
+      "Tägliche Praxis",
+      "Tutor-Feedback",
+      "Live-Klassen",
+      "Prüfungssimulationen",
+      "Deutsch- & Französischkohorten"
+    ],
+    "languageChooser": {
+      "title": "Wähle deine Lernsprache",
+      "subtitle": "Wähle, ob du Deutsch oder Französisch lernen möchtest. Deine Interface-Sprache stellst du separat ein.",
+      "interfaceNote": "Die Programme unterrichten Deutsch oder Französisch – die Oberfläche ist standardmäßig auf Englisch verfügbar.",
+      "studyGerman": "Deutsch lernen",
+      "studyFrench": "Französisch lernen",
+      "current": "Aktuelle Auswahl: {{language}}",
+      "ariaLabel": "Sprachauswahl für das Lernprogramm",
+      "optionAria": "{{language}}-Programm auswählen"
+    },
+    "programs": {
+      "german": {
+        "label": "Deutsch (DE)",
+        "shortLabel": "Deutsch",
+        "description": "Strukturiertes Prüfungstraining mit täglichen Aufgaben und Tutor-Feedback.",
+        "focus": "Kernprogramm für Goethe-orientierte Prüfungsvorbereitung.",
+        "details": [
+          "Tägliche Übungen mit klaren Prüfungsformaten.",
+          "Tutor-Feedback in Live-Klassen und Aufgabenrunden.",
+          "Fokus auf Sprechen, Schreiben, Lesen und Hören für A1–B1."
+        ]
+      },
+      "french": {
+        "label": "Français (FR)",
+        "shortLabel": "Français",
+        "description": "Französisch A1-Routinen mit wöchentlicher Struktur und Begleitmaterial.",
+        "focus": "Optionales Modul für grundlegende A1-Kommunikation.",
+        "details": [
+          "Wöchentliche Struktur mit kurzen täglichen Routinen.",
+          "Geführte Wortschatz- und Satzbaustein-Listen.",
+          "Ergänzt das deutsche Kernprogramm, ersetzt es nicht."
+        ]
+      }
+    },
+    "programComparison": {
+      "title": "Programme im Vergleich",
+      "subtitle": "Deutsch bleibt der Fokus. Französisch ist ein optionales A1-Modul für zusätzliche Routine.",
+      "germanTitle": "Deutsches Prüfungsprogramm (Kernangebot)",
+      "frenchTitle": "Französisches A1-Modul (optional)",
+      "germanPoints": [
+        "Strukturierte Prüfungsvorbereitung mit täglichen Aufgaben.",
+        "Tutor-Feedback und Live-Klassen für klare Fortschritte.",
+        "Ausgerichtet auf Goethe-orientierte Prüfungsformate."
+      ],
+      "frenchPoints": [
+        "A1-Routinen mit wöchentlicher Struktur.",
+        "Kurze Übungen für Alltagssituationen.",
+        "Ergänzung für Lernende, die zusätzlich Französisch brauchen."
+      ]
+    },
+    "path": {
+      "title": "Wähle deinen Weg",
+      "subtitle": "Neu beim Lernen oder prüfungsorientiert? Wähle die Option, die zu deinem nächsten Schritt passt.",
+      "newLearner": {
+        "title": "Ich bin neu in {{language}}",
+        "description": "Tritt der nächsten Kohorte bei und starte im passenden Level (A1+).",
+        "cta": "Einer Kohorte beitreten →"
+      },
+      "examReady": {
+        "title": "Ich bereite mich auf Prüfungen vor",
+        "description": "Melde dich an, um Sprechen und Schreiben mit Prüfungsaufgaben zu üben.",
+        "cta": "Einloggen →"
+      }
+    },
+    "howItWorks": {
+      "title": "So meldest du dich an und startest",
+      "subtitle": "Schließe deine Bewerbung ab, wähle eine Kohorte und schalte den Zugang per Zahlung frei. Danach erhältst du deine Onboarding-Checkliste und Klassenlinks.",
+      "benefits": [
+        "✅ Du bekommst: tägliche Übungstools, Tutor-Feedback und Live-Klassensupport.",
+        "✅ Ideal für: Lernende, die sich auf Goethe-orientierte Sprech- und Schreibaufgaben vorbereiten."
+      ],
+      "cta": "Bereit? Einer Kohorte beitreten →",
+      "steps": [
+        {
+          "title": "Anmeldeformular öffnen",
+          "description": "Klicke auf „Einer Kohorte beitreten“, um deine Bewerbung zu starten."
+        },
+        {
+          "title": "Daten ausfüllen",
+          "description": "Teile deinen Namen, Kontaktinfos und Lernziele, damit wir dich richtig einordnen."
+        },
+        {
+          "title": "Level/Klasse wählen",
+          "description": "Wähle die Kohorte (z. B. A1/A2/B1) nach Zeitplan und Verfügbarkeit."
+        },
+        {
+          "title": "Zahlung abschließen",
+          "description": "Nach der Auswahl der Kohorte schließt du die Zahlung ab, um vollen Zugriff zu erhalten."
+        },
+        {
+          "title": "Onboarding erhalten",
+          "description": "Wir senden dir Checkliste, Klassenlinks und die nächsten Schritte."
+        }
+      ]
+    },
+    "selfLearning": {
+      "title": "Self-Learning-Tracks für Deutsch & Französisch",
+      "description": "Du lernst lieber unabhängig? Deutsch-Lernende erhalten B2/C1-Self-Learning-Flows mit Goethe-orientierten Aufgaben und KI-Scoring. Französisch-Lernende erhalten A1-Routinen mit täglichen Prompts und geführten Vokabel-Checklisten.",
+      "cta": "Zum Start einloggen →",
+      "imageAlt": "Werbeanzeige für Deutsch B2/C1 und Französisch A1 Self-Learning"
+    },
+    "features": [
+      {
+        "icon": "📱",
+        "title": "Tägliche Praxis + Live-Klassen",
+        "description": "Übe täglich am Handy oder Laptop und wende das Gelernte in tutorierten Klassen an."
+      },
+      {
+        "icon": "👩🏽‍🏫",
+        "title": "Tutoriertes Feedback",
+        "description": "Deine Sprech- und Schreibaufgaben werden überprüft und im Unterricht besprochen."
+      },
+      {
+        "icon": "🗣️",
+        "title": "Prüfungsnahe Übungen",
+        "description": "Arbeite mit realistischen Aufgaben, die dich sicher auf A1–B1-Prüfungen vorbereiten."
+      }
+    ],
+    "updates": {
+      "title": "Aktuelle Updates",
+      "subtitle": "Neue Funktionen, damit dein Prüfungstraining strukturiert und persönlich bleibt.",
+      "items": [
+        {
+          "title": "Lernkalender-Routinen",
+          "description": "Plane wöchentliche Aufgaben mit einem Lernkalender, der Sprechen, Schreiben und Wortschatz stabil hält.",
+          "tag": "Neu"
+        },
+        {
+          "title": "My-Exam-File-Tracker",
+          "description": "Sammle Prüfungs-Prompts, persönliche Notizen und Tutor-Feedback an einem Ort.",
+          "tag": "Aktualisiert"
+        },
+        {
+          "title": "Sprechen + Schreiben",
+          "description": "Trainiere mit prüfungsnahen Prompts und erhalte Feedback, das du vor dem Unterricht wiederholen kannst.",
+          "tag": "Verbessert"
+        },
+        {
+          "title": "Aufgaben-Abgaben",
+          "description": "Reiche Hausaufgaben ein, verfolge Feedback und bleibe an den Wochenzielen dran.",
+          "tag": "Live"
+        }
+      ]
+    },
+    "photos": [
+      {
+        "caption": "Geführte Übungseinheiten mit Lernenden und Tutor:innen."
+      },
+      {
+        "caption": "Praxisnahes Schreib- und Sprechtraining für jedes Level."
+      }
+    ],
+    "reviews": {
+      "title": "Was unsere Lernenden sagen",
+      "subtitle": "Feedback von Lernenden.",
+      "starRating_one": "{{count}}-Sterne-Bewertung",
+      "starRating_other": "{{count}}-Sterne-Bewertung",
+      "items": [
+        {
+          "name": "Ama",
+          "country": "Ghana",
+          "level": "A1",
+          "stars": 5,
+          "text": "Die Sprechübungen sind klar und leicht nachzuvollziehen. Ich frage jetzt viel sicherer."
+        },
+        {
+          "name": "Samuel",
+          "country": "Nigeria",
+          "level": "A2",
+          "stars": 5,
+          "text": "Ich mag das Tutor-Feedback. Es zeigt genau, was ich im Schreiben verbessern muss."
+        },
+        {
+          "name": "Amina",
+          "country": "Kenia",
+          "level": "A1",
+          "stars": 4,
+          "text": "Der Unterricht ist strukturiert. Die tägliche Praxis hält mich dran, auch wenn ich viel zu tun habe."
+        },
+        {
+          "name": "Fatou",
+          "country": "Senegal",
+          "level": "A2",
+          "stars": 5,
+          "text": "Die Aufgaben wirken wie echte Prüfungen. Ich verstehe jetzt Teil 1, 2 und 3 fürs Sprechen."
+        },
+        {
+          "name": "Youssef",
+          "country": "Marokko",
+          "level": "B1",
+          "stars": 5,
+          "text": "Die Schreibschritte helfen mir, Ideen zu ordnen. Meine Briefe sind jetzt viel professioneller."
+        },
+        {
+          "name": "Lerato",
+          "country": "Südafrika",
+          "level": "A1",
+          "stars": 4,
+          "text": "Einfache Anweisungen und hilfreiche Korrekturen. Die Plattform ist leicht zu nutzen."
+        },
+        {
+          "name": "Kofi",
+          "country": "Ghana",
+          "level": "A2",
+          "stars": 5,
+          "text": "Ich habe meine Aussprache verbessert, weil ich regelmäßig aufnehme und Feedback bekomme."
+        },
+        {
+          "name": "Mariam",
+          "country": "Tansania",
+          "level": "A1",
+          "stars": 5,
+          "text": "Der Stundenplan und die täglichen Aufgaben machen das Lernen planbar und weniger stressig."
+        },
+        {
+          "name": "Ibrahim",
+          "country": "Ägypten",
+          "level": "B1",
+          "stars": 4,
+          "text": "Gute Übungsmaterialien. Mir gefällt, dass der Fokus auf echten Prüfungsgesprächen liegt."
+        },
+        {
+          "name": "Chiamaka",
+          "country": "Nigeria",
+          "level": "A1",
+          "stars": 5,
+          "text": "Ich hatte Angst vor dem Sprechen. Jetzt kann ich mich vorstellen und höflich bitten."
+        },
+        {
+          "name": "Hawa",
+          "country": "Mali",
+          "level": "A2",
+          "stars": 4,
+          "text": "Die Tutor-Reviews sind stark. Ich verstehe meine Fehler viel schneller."
+        },
+        {
+          "name": "Patrick",
+          "country": "Uganda",
+          "level": "A1",
+          "stars": 5,
+          "text": "Kurze tägliche Praxis funktioniert. Schon 10 Minuten halten mich aktiv."
+        }
+      ]
+    },
+    "darkCta": {
+      "title": "So unterstützt Falowen deine Prüfungsziele",
+      "subtitle": "Falowen trainiert genau die Fähigkeiten, die du für den Prüfungserfolg brauchst: höfliche Bitten, korrekte Fragen und sicheres Gespräch. Übe täglich und erhalte Tutor-Feedback in Live-Klassen.",
+      "ctaTitle": "Bereit zum Start?",
+      "ctaSubtitle": "Erstelle dein Profil, um Übungstools, Stundenpläne und Tutor-Feedback zu nutzen.",
+      "ctaJoin": "Einer Kohorte beitreten",
+      "ctaLogin": "Schon dabei? Einloggen →",
+      "contactTitle": "Bleib verbunden",
+      "contactPhone": "Anruf oder WhatsApp:",
+      "contactEmail": "E-Mail:",
+      "contactChat": "Live-Chat während der Klassen mit Tutor-Monitoring und Feedback."
+    },
+    "footer": {
+      "quickLinksTitle": "Quick Links",
+      "followTitle": "Folge Falowen",
+      "stayTitle": "Warum Lernende bleiben",
+      "stayPoints": [
+        "Blended Learning macht die Klassenzeit produktiv.",
+        "Tutor:innen begleiten deine Sprech- und Schreibpraxis.",
+        "Prüfungsnahe Aufgaben bauen schnell Vertrauen auf."
+      ]
+    },
+    "quickLinks": [
+      {
+        "label": "Über uns",
+        "href": "https://register.falowen.app/#about-us"
+      },
+      {
+        "label": "Datenschutz",
+        "href": "https://register.falowen.app/#privacy-policy"
+      },
+      {
+        "label": "Kontakt",
+        "href": "https://register.falowen.app/#contact"
+      },
+      {
+        "label": "AGB",
+        "href": "https://register.falowen.app/#terms-of-service"
+      },
+      {
+        "label": "FAQ",
+        "href": "https://register.falowen.app/#faq"
+      },
+      {
+        "label": "Blog",
+        "href": "https://blog.falowen.app/feed"
+      }
+    ],
+    "socialLinks": [
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/lleaghana"
+      },
+      {
+        "label": "YouTube",
+        "href": "https://www.youtube.com/@LLEAGhana"
+      },
+      {
+        "label": "Facebook",
+        "href": "https://web.facebook.com/lleaghana"
+      }
+    ]
+  },
+  "examResources": {
+    "meta": {
+      "title": "Prüfungsressourcen · Falowen Exam Coach",
+      "description": "Goethe-Links und kurze Strategien für Lesen, Hören, Sprechen und Schreiben."
+    }
+  },
+  "classCalendar": {
+    "heading": "Live-Kurszugang",
+    "zoomReady": "Zoom bereit",
+    "helper": "Wähle deine Kohorte, um den offiziellen Zoom-Link, Unterlagen und einen downloadbaren Kalender zu erhalten. Die ICS-Datei funktioniert auf iPhone, Android (Import in Google Calendar) und Desktop-Kalendern.",
+    "labels": {
+      "class": "Deine Klasse",
+      "zoomMeeting": "Zoom-Meeting",
+      "courseDocs": "Full class calendar",
+      "classDates": "Kurstermine",
+      "timeline": "Zeitplan"
+    },
+    "actions": {
+      "joinZoom": "Zoom-Meeting beitreten",
+      "openMaterials": "Open full class calendar",
+      "joinNow": "Jetzt beitreten",
+      "addToCalendar": "Zum Kalender hinzufügen",
+      "downloadCalendar": "Kalender herunterladen (.ics)"
+    },
+    "zoomDetails": "Meeting-ID: {{meetingId}} · Passwort: {{passcode}}",
+    "status": {
+      "startsIn": "Start in {{time}}",
+      "timeLeft": "{{time}} übrig",
+      "courseFinished": "Kurs beendet"
+    },
+    "badge": {
+      "startingNow": "Startet jetzt",
+      "timeLeft": "{{time}} übrig"
+    },
+    "detail": {
+      "startingNow": "Startet jetzt",
+      "startsIn": "Start in {{time}}"
+    },
+    "timeline": {
+      "untilKickoff": "{{time}} bis zum Start",
+      "untilGraduation": "{{time}} bis zum Abschluss",
+      "finished": "Dieser Kurs ist beendet."
+    },
+    "percentDone": "{{percent}} erledigt",
+    "today": {
+      "title": "Heutige Stunde",
+      "badge": "Heute",
+      "chapters": "Kapitel: {{chapters}}",
+      "sessionActive": "Sitzung läuft heute."
+    },
+    "next": {
+      "title": "Nächster Live-Kurs",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Deine lokale Zeit: {{time}}",
+      "chapters": "Kapitel: {{chapters}}"
+    },
+    "empty": "Keine kommenden Termine für diese Klasse gefunden. Wähle eine andere Klasse, um den Zeitplan zu aktualisieren.",
+    "downloadHelper": "Fügt Termine aus dem veröffentlichten Stundenplan mit dem Zoom-Link in deinen Kalender ein. Feiertage oder Ausfälle sind ggf. nicht berücksichtigt. Android/Desktop-Nutzer können die ICS-Datei in Google Calendar importieren."
+  },
+  "letterPractice": {
+    "minuteTarget": "Zielzeit: {{time}}"
+  },
+  "grammarQuestionTab": {
+    "title": "Stelle eine {{language}}-Grammatikfrage",
+    "description": "Der Grammatik-Coach gibt jetzt eine kurze Erklärung plus 1–2 kurze {{language}}-Beispiele mit englischen Glossen. Stelle konkrete Fragen ({{examplePrompt}}).",
+    "examplePrompt": {
+      "german": "z. B. „Wann benutze ich seit vs. für?“ oder „Wie bilde ich das Perfekt mit Modalverben?“",
+      "french": "z. B. „Quand est-ce que vs. quand“ oder „Wie benutze ich ne…pas?“"
+    },
+    "levelLabel": "Stufe (optional)",
+    "questionLabel": "Deine Frage",
+    "questionPlaceholder": "Frage nach Wortstellung, Zeiten oder anderen {{language}}-Grammatikthemen...",
+    "submit": "Coach fragen",
+    "submitLoading": "Frage läuft...",
+    "waiting": "Warte auf KI-Antwort...",
+    "answerHeading": "Antwort des Coaches",
+    "previousHeading": "Vorherige Fragen",
+    "filterLevelLabel": "Nach Stufe filtern",
+    "filterLevelAll": "Alle Stufen",
+    "searchLabel": "Suche",
+    "searchPlaceholder": "Stichwort in Frage oder Antwort",
+    "sortLabel": "Sortieren",
+    "sortNewest": "Neueste zuerst",
+    "sortOldest": "Älteste zuerst",
+    "entryLevel": "Stufe: {{level}}",
+    "entryQuestion": "F: {{question}}",
+    "entryAnswerPrefix": "A",
+    "reask": "Erneut fragen",
+    "pendingResponse": "(Antwort ausstehend)",
+    "askedAt": "Gefragt am {{date}}",
+    "loadMore": "Mehr laden",
+    "loadingMore": "Lädt...",
+    "noHistory": "Noch keine Fragen vorhanden.",
+    "fetchingHistory": "Verlauf wird geladen...",
+    "notAvailable": "k. A.",
+    "time": {
+      "justNow": "Gerade eben"
+    },
+    "errors": {
+      "missingQuestion": "Bitte gib eine Grammatikfrage ein, die du dem Coach stellen möchtest.",
+      "askFailed": "Der Grammatik-Coach konnte nicht erreicht werden.",
+      "signInToViewHistory": "Bitte melde dich an, um deine bisherigen Grammatikfragen zu sehen.",
+      "historyLoad": "Deine bisherigen Grammatikfragen konnten nicht geladen werden."
+    }
+  },
+  "letterWritingIntro": {
+    "backToCourse": "Zurück zum Kurs",
+    "title": "Einführung in das Briefeschreiben 12.3",
+    "subtitle": "Nutze diese Anleitung, um formelle und informelle Briefe zu strukturieren, bevor du deine Aufgabe abgibst.",
+    "languageNote": "Beispiele sind auf Deutsch; die Anleitung ist auf Englisch.",
+    "toc": {
+      "label": "Direkt zu:",
+      "formal": "Formeller Aufbau",
+      "informal": "Informeller Aufbau",
+      "informalAssignment": "Informelle Aufgabe",
+      "formalAssignment": "Formelle Aufgabe"
+    },
+    "formalTitle": "Aufbau eines formellen Briefes",
+    "formal": {
+      "salutations": [
+        "Sehr geehrte Frau + Name – für eine Frau.",
+        "Sehr geehrter Herr + Name – für einen Mann.",
+        "Sehr geehrte Damen und Herren – wenn der Empfänger unbekannt ist (z. B. Schule oder Reisebüro)."
+      ],
+      "openingLine": "<strong>Einleitung:</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [Grund]. Wenn du <em>weil</em> verwendest, steht das Verb oder Modalverb am Ende.",
+      "openingExamples": [
+        "Beispiel 1: Ich kann nicht kommen... Ich schreibe Ihnen, weil ich nicht kommen kann.",
+        "Beispiel 2: Ich komme nicht... Ich schreibe Ihnen, weil ich nicht komme.",
+        "Tipp: Beginne mit „Ich“ und ende mit „möchte“ wegen „weil“. Beispiel: Ich schreibe Ihnen, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Hauptteil:</strong> Verwende einfache A1-Sätze und die Konjunktion <em>weil</em>. Halte die Sätze kurz, klar und gut strukturiert.",
+      "conclusion": "<strong>Schluss:</strong> Ich freue mich im Voraus auf Ihre Antwort. (Nicht ändern.) Mit freundlichen Grüßen, <strong>[Dein vollständiger Name]</strong>."
+    },
+    "informalTitle": "Aufbau eines informellen Briefes",
+    "informal": {
+      "salutations": [
+        "Hallo [für männlich und weiblich],",
+        "Liebe (weiblich) / Lieber (männlich) [Vorname des Empfängers],"
+      ],
+      "openingLine": "<strong>Einleitung:</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [Grund]. Wenn du <em>weil</em> verwendest, steht das Verb oder Modalverb am Ende.",
+      "openingExamples": [
+        "Beispiel 1: Ich kann nicht kommen... Ich schreibe dir, weil ich nicht kommen kann.",
+        "Beispiel 2: Ich komme nicht... Ich schreibe dir, weil ich nicht komme.",
+        "Tipp: Beginne mit „Ich“ und ende mit „möchte“ wegen „weil“. Beispiel: Ich schreibe dir, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Hauptteil:</strong> Verwende einfache A1-Sätze und die Konjunktion <em>weil</em>. Halte die Sätze kurz, klar und gut strukturiert.",
+      "conclusion": "<strong>Schluss:</strong> Ich freue mich im Voraus auf deine Antwort. (Nicht ändern.) Liebe Grüße oder Viele Grüße. <strong>[Dein Vorname]</strong>."
+    },
+    "annotatedSamplesTitle": "Kommentierte Beispielbriefe",
+    "annotatedSamples": {
+      "formal": {
+        "title": "Formelles Beispiel",
+        "items": [
+          {
+            "label": "Anrede",
+            "text": "Sehr geehrte Frau Müller,"
+          },
+          {
+            "label": "Grund",
+            "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte."
+          },
+          {
+            "label": "Bitte",
+            "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?"
+          },
+          {
+            "label": "Schluss",
+            "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber"
+          }
+        ]
+      },
+      "informal": {
+        "title": "Informelles Beispiel",
+        "items": [
+          {
+            "label": "Begrüßung",
+            "text": "Hallo Tom,"
+          },
+          {
+            "label": "Grund",
+            "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte."
+          },
+          {
+            "label": "Details",
+            "text": "Die Feier ist am Samstag um 18 Uhr bei mir."
+          },
+          {
+            "label": "Schluss",
+            "text": "Liebe Grüße, Sara"
+          }
+        ]
+      }
+    },
+    "informalAssignmentTitle": "Aufgabe: informeller Brief (Geburtstagsbrief-Fragenbuch)",
+    "informalAssignment": {
+      "intro": "Schreibe einen Brief an deine Freundin oder deinen Freund, der/die Geburtstag hat. Folge diesen Schritten:",
+      "steps": [
+        "Beginne mit einer informellen Begrüßung.",
+        "Erkläre, warum du schreibst.",
+        "Wünsche alles Gute zum Geburtstag.",
+        "Frage, ob eine Feier geplant ist.",
+        "Schließe den Brief höflich ab."
+      ],
+      "sampleQuestion": "<strong>Beispielfrage:</strong> Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund: • Warum schreiben Sie? • Gratulieren Sie ihm. • Fragen Sie, ob er eine Feier plant?",
+      "afterWriting": "Nach dem Schreiben: Gehe zum Schreiben-Trainer, füge die Frage in den Ideen-Generator ein und folge dem Prompt, um den Brief zu schreiben. Reiche ihn wie gewohnt ein."
+    },
+    "formalAssignmentTitle": "Aufgabe: formeller Brief (Formeller-Brief-Fragenbuch)",
+    "formalAssignment": {
+      "intro": "Schreibe einen formellen Brief an eine Sprachschule, weil du einen Deutschkurs besuchen möchtest. Folge diesen Schritten:",
+      "steps": [
+        "Beginne mit einer formellen Begrüßung.",
+        "Erkläre, warum du schreibst.",
+        "Bitte um Informationen über die Kurse.",
+        "Frage nach Kursterminen, Preisen und Zahlungsoptionen.",
+        "Schließe den Brief höflich ab."
+      ],
+      "sampleQuestion": "<strong>Beispielfrage:</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+      "afterWriting": "Nach dem Schreiben: Nutze dasselbe Vorgehen (Schreiben-Trainer → Ideen-Generator → wie gewohnt einreichen)."
+    },
+    "cta": {
+      "startWriting": "Jetzt schreiben",
+      "openIdeas": "Ideen-Generator öffnen"
+    }
+  },
+  "examFile": {
+    "modulePrice": "{{price}} pro Modul"
+  },
+  "studyCalendar": {
+    "meta": {
+      "title": "Lernkalender · Falowen Exam Coach",
+      "description": "Plane deinen Goethe-Lernkalender und lade die Termine als Kalenderdatei herunter."
+    },
+    "hero": {
+      "kicker": "Lernkalender-Generator",
+      "title": "Erstelle deinen Goethe-Lernkalender",
+      "subtitle": "Wähle dein Prüfungsdatum, lege deine Lernfrequenz fest und lade eine Kalenderdatei für dein Handy herunter."
+    },
+    "required": {
+      "title": "Pflicht: Erinnerungen festlegen",
+      "subtitle": "Dein Kurs ist abgeschlossen, deshalb laden wir automatisch einen Lernkalender herunter. Passe die Termine unten an und lade ihn erneut, wenn du möchtest."
+    },
+    "form": {
+      "examLevel": "Prüfungsniveau",
+      "examDate": "Prüfungsdatum",
+      "examDateHelp": "Kein Datum dabei? Trage dein Wunschdatum manuell ein.",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "studyDays": "Lerntage",
+      "studyDayLabel": "Lerntag {{day}}",
+      "studyTime": "Uhrzeit",
+      "sessionLength": "Sitzungslänge",
+      "reminder": "Erinnerung",
+      "incomplete": "Wähle Daten und mindestens einen Lerntag, um deinen Kalender zu erzeugen."
+    },
+    "days": {
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa",
+      "sun": "So"
+    },
+    "cta": {
+      "required": "Lernkalender herunterladen (Pflicht)",
+      "standard": "Lernkalender herunterladen (.ics)"
+    },
+    "reminder": {
+      "title": "So funktionieren Erinnerungen",
+      "items": [
+        "Füge die heruntergeladene Datei zu Google Kalender, iOS Kalender oder Outlook hinzu.",
+        "Jede Lernsitzung erhält eine Erinnerung basierend auf deiner Vorlaufzeit.",
+        "Du kannst Termine später in deiner Kalender-App bearbeiten oder löschen."
+      ],
+      "none": "Keine Erinnerung",
+      "before": "{{time}} vorher"
+    }
+  },
+  "homeMetrics": {
+    "section": {
+      "eyebrow": "Progress snapshot",
+      "title": "Home metrics",
+      "refreshCta": "Refresh data",
+      "courseCompleter": "Course complete",
+      "refreshing": "Refreshing"
+    },
+    "refreshError": "Unable to refresh right now.",
+    "attendance": {
+      "label": "Attendance",
+      "sessions": "{{count}} sessions",
+      "hours": "{{count}} hours"
+    },
+    "nextRecommendation": {
+      "label": "Next recommendation",
+      "redoFirst": "Redo {{item}}",
+      "redoFailed": "Redo a failed task",
+      "allCaughtUp": "You're all caught up",
+      "startDayOne": "Start day 1",
+      "blocked": "Complete failed tasks to unlock the next recommendation.",
+      "blockedWithIds": "Complete failed tasks ({{items}}) to unlock the next recommendation.",
+      "goal": "{{goal}}",
+      "defaultHelper": "Keep going with your next recommended task.",
+      "selfStudyHelper": "Schließe diese Selbstlernlektion ab und markiere sie im Kursbuch als abgeschlossen, um den nächsten Inhalt freizuschalten."
+    },
+    "missed": {
+      "label": "Missed items",
+      "helper": "Frühere Tutor-Aufgaben oder Selbstlernlektionen, die du in der sichtbaren Kursbuch-Reihenfolge übersprungen hast."
+    },
+    "failed": {
+      "label": "Failed items",
+      "helper": "Revisit failed tasks to keep momentum."
+    },
+    "list": {
+      "none": "None",
+      "two": "{{first}} and {{second}}",
+      "many": "{{items}}, and {{last}}",
+      "more": "{{items}}, and {{count}} more"
+    },
+    "weeklySummary": "This week: {{assignments}} assignments, {{attempts}} attempts, {{retries}} retries, {{streak}}-day streak. Last completed: {{last}}.",
+    "courseComplete": {
+      "eyebrow": "Course completed",
+      "title": "You're ready for the exam study plan",
+      "helper": "Download your study calendar to keep momentum toward your exam date.",
+      "cta": "Download study calendar"
+    },
+    "tutorComments": {
+      "view": "View tutor comments"
+    },
+    "leaderboard": {
+      "view": "View leaderboard",
+      "hide": "Hide leaderboard",
+      "updated": "Updated {{date}}",
+      "none": "No leaderboard data yet.",
+      "summarySelf": "You are #{{rank}} of {{total}} · {{passed}} passed / {{expected}} expected · {{points}} points",
+      "summaryOther": "{{total}} learners qualified this week.",
+      "details": "Level {{level}} · minimum {{minimum}} completed tasks to qualify.",
+      "levelFallback": "your level",
+      "joinSoon": "Complete {{minimum}} tasks to join the leaderboard.",
+      "detailSelf": "You are #{{rank}} of {{total}} · {{passed}} passed / {{expected}} expected · {{failed}} failed · {{points}} points ({{expectedPoints}} expected).",
+      "qualifiedCount": "{{total}} learners qualified this week.",
+      "studentFallback": "Student",
+      "headers": {
+        "rank": "Rank",
+        "name": "Name",
+        "passed": "Passed",
+        "failed": "Failed",
+        "totalScore": "Total score",
+        "expectedPoints": "Expected points"
+      }
+    },
+    "day0": {
+      "eyebrow": "Start here",
+      "title": "Day 0 Orientation Workbook",
+      "cta": "Open {{level}} Day 0",
+      "helper": "New here? Learn how to use Falowen first, then continue with your class work.",
+      "noMetricsHelper": "Home metrics are currently available for A1, A2, and B1. B2 and C1 students should start with Day 0 above."
+    }
+  },
+  "personalization": {
+    "eyebrow": "Personalisierter Lernpfad",
+    "title": "Deine nächsten drei empfohlenen Aufgaben",
+    "subtitle": "Basierend auf deinen Ergebnissen, Schreibfortschritt, Anwesenheit und Profildaten.",
+    "feedbackLabel": "Adaptives Feedback",
+    "highlightsLabel": "Heute im Fokus",
+    "fallback": "Füge mehr Ergebnisse oder Schreibübungen hinzu, um Empfehlungen freizuschalten."
+  },
+  "resultHistory": {
+    "title": "Ergebnisverlauf",
+    "subtitle": "Vergangene Versuche, Feedback und Ergebnisse prüfen.",
+    "loading": "Ergebnisse werden geladen…",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "errors": {
+      "title": "Ergebnisse nicht verfügbar",
+      "load": "Die Ergebnisse konnten nicht geladen werden. Bitte versuche es erneut."
+    },
+    "studentFallback": "Lernende",
+    "assignmentKeyFallback": "Aufgabe",
+    "assignmentFallback": "Unbenannte Aufgabe",
+    "filters": {
+      "searchLabel": "Suche",
+      "searchPlaceholder": "Name, Aufgabe, Feedback oder Code",
+      "levelLabel": "Niveau",
+      "allLevels": "Alle Niveaus",
+      "minScoreLabel": "Mindestpunktzahl",
+      "minScorePlaceholder": "z. B. 60",
+      "reset": "Filter zurücksetzen",
+      "showing": "Zeige {{filtered}} von {{total}}"
+    },
+    "status": {
+      "passed": "Bestanden",
+      "failed": "Unter der Bestehensgrenze ({{mark}})",
+      "score": "Punktzahl",
+      "completedByRetake": "Nach Wiederholung abgeschlossen"
+    },
+    "attempt": "Versuch {{attempt}} von {{total}}",
+    "attemptSingle": "Erster Versuch",
+    "bestScoreMet": "Beste Punktzahl {{score}} (≥ {{mark}})",
+    "bestScoreNeeded": "Beste Punktzahl {{score}} (< {{mark}})",
+    "belowPassMark": "Unter der Bestehensgrenze ({{mark}})",
+    "openObjective": "Aufgaben und Antworten überprüfen",
+    "objectiveReviewTitle": "Objektive Antworten überprüfen",
+    "objectiveReviewHelp": "Öffne die ursprüngliche Übung, vergleiche die Antworten mit den Fragen und wiederhole deine Fehler.",
+    "feedbackTitle": "Feedback",
+    "showDetails": "Feedback und Details anzeigen",
+    "hideDetails": "Feedback und Details ausblenden",
+    "empty": {
+      "title": "Noch keine Ergebnisse",
+      "description": "Versuche eine andere Suche oder schließe eine Prüfung ab, um Ergebnisse zu sehen.",
+      "reset": "Filter zurücksetzen"
+    },
+    "completionGuide": {
+      "title": "Regel für abgeschlossene Wiederholung",
+      "description": "Wenn du für eine Aufgabe mehrere Versuche gebraucht hast, gilt die Aufgabe mit einem späteren Bestehen (≥ {{mark}}) als abgeschlossen. Du musst sie nicht erneut bearbeiten, nur weil ein früherer Versuch unter der Bestehensgrenze lag."
+    }
+  },
+  "placementPage": {
+    "meta": {
+      "title": "Deutsch-Einstufungstest · Falowen",
+      "description": "Mache einen kurzen Deutsch-Einstufungstest und erhalte eine CEFR-Level-Empfehlung mit nächstem Lernschritt."
+    },
+    "badge": "Neu hier?",
+    "title": "Einstufungstest (paraphrasierte prüfungsnahe Aufgaben)",
+    "subtitle": "Noch unsicher beim Niveau? Beantworte die Fragen unten. Du bekommst zuerst eine Level-Empfehlung und danach die vollständige Auswertung.",
+    "backHome": "Zurück zur Startseite",
+    "answeredStatus": "Beantwortet {{answered}} / {{total}}",
+    "resultSummary": "Gewichtete Punktzahl: {{score}} / {{total}} · Empfohlenes Niveau: {{level}}",
+    "finishPrompt": "Beantworte alle Fragen, um deine Level-Empfehlung zu sehen.",
+    "answerKeyTitle": "Lösungsübersicht",
+    "answerReviewLocked": "Die Lösungsübersicht ist zur Sicherung der Einstufung zunächst gesperrt. Nutze zuerst dein Level-Feedback.",
+    "unlockAnswerReview": "Lernauswertung freischalten",
+    "levelCta": "Nächsten Schritt für {{level}} anzeigen",
+    "feedback": {
+      "A1": "Starte mit Grundlagenkursen: Begrüßungen, Basisgrammatik und häufige Wörter.",
+      "A2": "Du beherrschst Alltagssituationen. Baue Sicherheit mit angeleitetem Sprechen und kurzen Schreibaufgaben aus.",
+      "B1": "Du bist bereit für kommunikatives Mittelstufentraining und strukturierte prüfungsnahe Übungen.",
+      "B2": "Du kommst mit komplexeren Texten und nuancierter Kommunikation zurecht. Fokus auf fortgeschrittene Prüfungsstrategien.",
+      "C1": "Sehr gutes Niveau erkannt. Weiter mit Feinschliff, Prüfungssimulation und präzisem Feedback."
+    }
+  },
+  "signupPage": {
+    "title": "Konto erstellen",
+    "backToOverview": "Zurück zur Übersicht",
+    "orientation": "Verschaffe dir schnell einen Überblick – öffne die Abschnitte unten und lies das Wichtigste.",
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "currentLevel": "Dein aktuelles Niveau",
+      "phone": "Telefonnummer",
+      "address": "Adresse",
+      "location": "Standort",
+      "learningMode": "Bevorzugter Lernmodus",
+      "emergencyContactPhone": "Notfallkontakt (Telefon)",
+      "initialPayment": "Erste Zahlung (GHS)",
+      "classSelection": "Welchem Live-Kurs trittst du bei? (erforderlich)"
+    },
+    "options": {
+      "chooseOne": "Bitte wählen",
+      "inPerson": "Vor Ort",
+      "online": "Online",
+      "hybrid": "Hybrid",
+      "chooseClass": "Kurs auswählen"
+    },
+    "consent": {
+      "agreePrefix": "Ich stimme den",
+      "and": "und der",
+      "period": ".",
+      "keyPoints": "Wichtige Punkte:",
+      "viewSummary": "Zusammenfassung ansehen",
+      "fullDetails": "Du willst alle Details? Öffne die Zusammenfassung oder die Links oben, ohne das Formular zu verlassen.",
+      "dialogAria": "Highlights zu AGB und Datenschutz",
+      "dialogTitle": "Highlights zu AGB und Datenschutz",
+      "dialogIntro": "Hier ist eine kurze Zusammenfassung dessen, was du bei der Fortsetzung akzeptierst.",
+      "readFull": "Lies die vollständigen",
+      "withoutLosingProgress": "jederzeit, ohne deinen Fortschritt zu verlieren.",
+      "highlights": [
+        "Wir erfassen deine Kontaktdaten, um dein Konto zu erstellen und zu betreuen, Kursupdates zu teilen und Zahlungserinnerungen zu senden.",
+        "Du kannst Vertragsbedingungen wechseln oder künftige Verlängerungen kündigen, indem du den Support vor dem nächsten Abbuchungsdatum kontaktierst.",
+        "Zahlungen werden sicher verarbeitet; offene Gebühren müssen beglichen werden, damit du vollen Zugriff auf Live-Kurse und Materialien behältst.",
+        "Wir verkaufen deine Daten nie und teilen sie nur mit Partnern, die bei der Bereitstellung des Dienstes helfen (z. B. Zahlungen und Nachrichten)."
+      ]
+    },
+    "actions": {
+      "creating": "Wird erstellt ...",
+      "signUp": "Jetzt registrieren",
+      "close": "Schließen",
+      "goToLogin": "Zum Login"
+    },
+    "alreadyRegistered": "Bereits registriert?"
+  },
+  "payments": {
+    "notice": {
+      "nonRefundable": "Zahlungen sind nicht erstattungsfähig. Lies unseren Vertrag hier",
+      "contractLink": "Vertragsdetails",
+      "emailReminder": "Bitte prüfe direkt nach der Zahlung deine E-Mail auf Beleg, Einschreibebestätigung und weitere wichtige Informationen."
+    }
+  },
+  "examReadiness": {
+    "title": "Prüfungsbereitschaft",
+    "attendanceTitle": "Anwesenheit",
+    "sessions": "Sitzungen",
+    "markedIdentifiers": "Markierte Kennungen",
+    "refresh": "Aktualisieren",
+    "openExamFile": "Prüfungsakte und Termine öffnen",
+    "errorMissingProfile": "Füge Klasse und Studentencode hinzu, um die Prüfungsbereitschaft zu sehen.",
+    "errorFirebase": "Verbinde Firebase, um die Prüfungsbereitschaft zu laden.",
+    "errorLoad": "Prüfungsbereitschaft kann gerade nicht geladen werden.",
+    "certificate": {
+      "title": "Zertifikatsbereitschaft",
+      "submitHelper": "Vor jeder Abgabe sichtbar, damit du verpasste oder nicht bestandene Aufgaben früh siehst.",
+      "resultsHelper": "Immer bei deinen Ergebnissen sichtbar, damit du den Zertifikatsfortschritt vor Kursende prüfst.",
+      "resolveNow": "Jetzt lösen",
+      "stateChecking": "Prüfe...",
+      "stateNeedsSync": "Synchronisierung nötig",
+      "stateBlocked": "Blockiert",
+      "stateIncomplete": "Unvollständig",
+      "stateReady": "Bereit",
+      "detailLoading": "Aufgabenfortschritt wird geladen",
+      "detailNeedsSync": "Noch keine Zusammenfassung verfügbar",
+      "failedCount": "{{count}} fehlgeschlagene Aufgabe",
+      "detailBlockedWithItem": "{{countLabel}}: {{item}}",
+      "detailBlocked": "{{countLabel}}. Schließe fehlgeschlagene Aufgaben ab, um das Zertifikat freizuschalten.",
+      "detailIncompleteWithItem": "{{count}} verpasste Aufgaben: {{item}}",
+      "detailIncomplete": "{{count}} verpasste Aufgaben. Schließe sie ab, um das Zertifikat freizuschalten.",
+      "detailReady": "Keine fehlgeschlagenen oder verpassten Aufgaben",
+      "failedCount_plural": "{{count}} fehlgeschlagene Aufgaben"
+    },
+    "examStatusLabel": "Prüfungen",
+    "statusFallback": "Status",
+    "states": {
+      "ready": {
+        "text": "Bereit für das Prüfungsfenster",
+        "detail": "Konstante Ergebnisse (Durchschnitt {{averageScore}}/100, {{passRate}}% bestanden) mit {{completionDetail}} und stabiler Anwesenheit.",
+        "statusLabel": "Bereit"
+      },
+      "almost": {
+        "text": "Puffer weiter ausbauen",
+        "detail": "Arbeite weiter auf 75+/100 in den letzten Aufgaben hin und schließe mindestens 5 markierte Kennungen für den grünen Status ab.",
+        "detailWithTotal": "Arbeite weiter auf 75+/100 in den letzten Aufgaben hin und erreiche {{readyTarget}}/{{plannedTotal}} Aufgaben für den grünen Status.",
+        "statusLabel": "Fast bereit"
+      },
+      "notReady": {
+        "text": "Noch nicht bereit",
+        "detail": "Reiche weitere bewertete Aufgaben ein, um die Bereitschaftsverfolgung zu aktivieren.",
+        "detailWithTotal": "Schließe mindestens {{almostTarget}}/{{plannedTotal}} Aufgaben mit Bewertungen und {{evidenceTarget}} bewertete Einträge ab, um die Bereitschaftsverfolgung zu aktivieren.",
+        "statusLabel": "Nicht bereit"
+      }
+    }
+  },
+  "navigationGuide": {
+    "message": "Nutze die Dashboard-Karten unten, um schnell zwischen Klassen, Aufgaben und deiner Prüfungsakte zu wechseln."
+  },
+  "accountSettings": {
+    "noProfile": "Wir konnten noch keine Kontodaten finden. Bitte versuche es bald erneut.",
+    "overview": {
+      "title": "Kontoübersicht",
+      "subtitle": "Schneller Überblick über deine wichtigsten Daten.",
+      "renewal": "Nächste Verlängerung: {{date}}"
+    },
+    "profile": {
+      "title": "Kontoeinstellungen",
+      "adminManaged": "Dein Name und deine Login-E-Mail werden vom Admin verwaltet. Nutze den Support für Profiländerungen.",
+      "requestChange": "Profiländerung anfragen",
+      "supportSubject": "Anfrage zur Profiländerung",
+      "supportBody": "Hallo Falowen-Team,%0D%0A%0D%0ABitte helft mir bei der Aktualisierung meiner Profildaten.%0D%0AName: {{name}}%0D%0AE-Mail: {{email}}%0D%0ASchülercode: {{studentCode}}%0D%0A%0D%0ADanke.",
+      "biographyLabel": "Klassenbiografie",
+      "biographyPlaceholder": "Schreibe 2–4 Sätze über Arbeit, Ziele oder Hobbys.",
+      "correcting": "KI optimiert ...",
+      "correctCta": "Mit KI korrigieren",
+      "saving": "Speichern ...",
+      "save": "Änderungen speichern",
+      "lastSaved": "Zuletzt gespeichert: {{time}}",
+      "bioSaved": "Biografie erfolgreich gespeichert.",
+      "bioError": "Profil konnte nicht gespeichert werden.",
+      "bioEmpty": "Bitte füge zuerst eine kurze Biografie hinzu.",
+      "bioAiApplied": "KI-Vorschläge wurden übernommen.",
+      "bioCorrectError": "Biografie konnte nicht korrigiert werden."
+    },
+    "billing": {
+      "title": "Abo & Abrechnung",
+      "subtitle": "Wichtige Zahlungsinfos auf einen Blick.",
+      "balanceTitle": "Saldo & Kursgebühr",
+      "email": "Rechnungs-E-Mail: {{email}}",
+      "addEmail": "E-Mail hinzufügen",
+      "statusActive": "Aktiv",
+      "statusPending": "Ausstehend",
+      "paymentMethodWeb": "Web-Portal",
+      "nextRenewal": "Nächste Verlängerung",
+      "countdown": "Countdown zur Verlängerung",
+      "inDays": "in {{count}} Tagen",
+      "dueNow": "jetzt fällig",
+      "renewalMode": "Verlängerungsmodus",
+      "autoRenew": "Automatisch",
+      "manualRenew": "Manuell",
+      "policySummary": "Verlängerungen richten sich nach deiner Vertragslaufzeit. Für Änderungen oder Stoppen künftiger Verlängerungen kontaktiere den Support vor dem Verlängerungsdatum.",
+      "alertToday": "Dein Zugang endet heute und es fehlen noch {{amount}}. Bitte zahle, um den Zugang zu behalten.",
+      "alertDays": "Es fehlen noch {{amount}} und du hast noch {{daysLabel}} Zeit. Bitte zahle, um den Zugang zu behalten.",
+      "contract": {
+        "sixMonth": "6-Monats-Vertrag",
+        "oneMonth": "1-Monat-Zugang",
+        "paymentRequired": "Zahlung erforderlich"
+      },
+      "transaction": {
+        "title": "Transaktionsverlauf",
+        "empty": "Noch keine Transaktionen.",
+        "channel": "Kanal",
+        "reference": "Referenz",
+        "status": "Status",
+        "statusCompleted": "abgeschlossen",
+        "receipt": "Beleg öffnen"
+      }
+    },
+    "tuition": {
+      "tuition": "Kursgebühr",
+      "paidSoFar": "Bereits bezahlt",
+      "balanceRemaining": "Restbetrag",
+      "noBalance": "Kein offener Betrag.",
+      "finalTopUp": "Letzte Nachzahlung: Mit {{amount}} ist deine Kursgebühr vollständig bezahlt und du erhältst {{access}} Zugang.",
+      "enterAmount": "Betrag eingeben (mind. {{min}} oder Restbetrag zahlen).",
+      "minimumRule": "Mindestens {{min}}, außer du zahlst den Restbetrag von {{remaining}}.",
+      "afterPayment": "Nach dieser Zahlung: Zugang für {{access}}. Restbetrag: {{remaining}}.",
+      "graceEnded": "Zahlungsfrist ist abgelaufen.",
+      "graceDays": "Zahlungsfenster: noch {{count}} Tag.",
+      "graceDays_plural": "Zahlungsfenster: noch {{count}} Tage.",
+      "graceBody": "Zahle vor Ende deiner Testphase, damit dein Zugang ohne Unterbrechung weiterläuft. Nach Ablauf bleibt dein Lernfortschritt 30 Tage lang wiederherstellbar.",
+      "finalPayment": "Abschlusszahlung",
+      "finalPaymentHelp": "Dein Restbetrag liegt unter der Mindestrate von {{min}}, daher kannst du den exakten Restbetrag zahlen.",
+      "opening": "Paystack wird geöffnet ...",
+      "payToFinish": "{{amount}} zahlen und abschließen",
+      "amountNow": "Jetzt zu zahlender Betrag",
+      "amountPlaceholder": "Mind. {{min}} (oder Restbetrag)",
+      "payOutstanding": "Offenen Betrag jetzt zahlen ({{amount}})",
+      "payOnline": "Kursgebühr online zahlen",
+      "webOnlyTitle": "Zahlungen sind nur in der Web-App verfügbar.",
+      "webOnlyBody": "Für Zahlung oder Vertragsverlängerung nutze bitte die Web-App. In der Android-App sind Zahlungen wegen Play-Store-Regeln ausgeblendet."
+    },
+    "upgrade": {
+      "title": "Level-Fortschritt",
+      "description": "{{currentLevel}} abgeschlossen? Wechsle zu {{nextLevel}}. Kursgebühr für das nächste Level: {{amount}}.",
+      "button": "Auf {{nextLevel}} upgraden",
+      "upgrading": "Upgrade läuft ...",
+      "success": "Du bist jetzt auf {{level}}. Bitte zahle, um den Zugang freizuschalten.",
+      "queued": "Upgrade zu {{level}} wurde vorgemerkt. Wir stellen dein Level um, sobald die vollständige Zahlung bestätigt ist.",
+      "pending": "Upgrade zu {{level}} wartet auf Zahlung.",
+      "cancel": "Ausstehendes Upgrade abbrechen",
+      "cancelled": "Ausstehendes Upgrade abgebrochen und dein vorheriges Profil wurde wiederhergestellt.",
+      "error": "Level-Upgrade fehlgeschlagen.",
+      "maxedOut": "Du bist bereits auf dem höchsten verfügbaren Level.",
+      "clearBalance": "Bitte begleiche zuerst deinen offenen Betrag."
+    },
+    "tabs": {
+      "overview": "Übersicht",
+      "studentData": "Studentendaten",
+      "billing": "Abrechnung",
+      "upgrade": "Upgrade"
+    },
+    "studentData": {
+      "title": "Studentendaten",
+      "subtitle": "Diese Daten sind in deinem Studentenprofil gespeichert.",
+      "fields": {
+        "name": "Name",
+        "phone": "Telefonnummer",
+        "email": "E-Mail",
+        "studentCode": "Studentencode",
+        "className": "Klasse",
+        "level": "Niveau",
+        "location": "E-Mail-Standort"
+      }
+    }
+  },
+  "speechTrainer": {
+    "title": "Class presentation chat coach",
+    "levelBadge": "Level {{level}}",
+    "welcome": "Welcome {{studentName}}. You are chatting with {{tutorName}}.",
+    "mode": {
+      "a1a2": "Simple German + English support mode.",
+      "default": "6-step preparation flow with corrections, upgrades, and final speaking scripts."
+    },
+    "beforeStartTitle": "Before you begin",
+    "beforeStartDescription": "You will answer six guided prompts. After each reply, your coach gives feedback and asks the next question. Aim for clear structure, varied vocabulary, and complete sentences.",
+    "contextsTitle": "Presentation contexts",
+    "recorderDescription": "You can stay here for chat practice, or open the recorder if you want to submit an audio recording.",
+    "recorderButton": "Open recorder link",
+    "recorderAriaLabel": "Open speech recorder link",
+    "progress": "Progress: {{answersDone}}/{{turnLimit}} • Current step: {{currentStepLabel}}",
+    "progressAria": "Six-step coaching progress",
+    "whyUpgrade": "Why this upgrade",
+    "applyUpgrades": "Apply selected upgrades",
+    "applyUpgradesAria": "Apply selected upgrade options",
+    "upgrading": "Upgrading...",
+    "rubricTitle": "Rubric-based feedback (1–5)",
+    "rubricScoresAria": "Rubric scores",
+    "outputTitle": "Speaking-ready output block",
+    "scriptLabels": {
+      "short": "Short (45 sec):",
+      "medium": "Medium (90 sec):",
+      "long": "Long (2 min):"
+    },
+    "placeholderA1A2": "Write simple German. You may add small English support words...",
+    "placeholder": "Type your answer in German...",
+    "charCounter": "{{charsCount}}/{{minLength}} characters minimum",
+    "send": "Send",
+    "sendAria": "Send message",
+    "sending": "{{tutorName}} is thinking...",
+    "reset": "Reset chat",
+    "resetAria": "Reset chat and clear messages",
+    "relogin": "Re-login",
+    "reloginAria": "Log in again",
+    "retry": "Retry",
+    "retryAria": "Retry last message",
+    "completedMessage": "Great! You completed all 6 answers. Your final speaking scripts are ready above.",
+    "sessionHistoryTitle": "Session history",
+    "filterByTopic": "Filter by topic",
+    "filterByTopicAria": "Filter session history by topic",
+    "filterByLevelAria": "Filter session history by level",
+    "allLevels": "All levels",
+    "noSessions": "No saved presentation sessions yet.",
+    "status": "Status: {{status}}",
+    "unknown": "unknown",
+    "finalScript": "Final script: {{finalScript}}",
+    "rubricHistory": "Rubric — Grammar: {{grammar}}/5, Vocabulary: {{vocabulary}}/5, Structure: {{structure}}/5",
+    "continue": "Continue",
+    "continueAria": "Continue incomplete session",
+    "studentFallbackName": "Student",
+    "tutorName": "Coach Felix",
+    "customTopic": "Custom topic",
+    "confirmReset": "Are you sure you want to reset? Your current chat will be cleared.",
+    "topicSelectedA1A2": "Topic selected: {{presetTopic}}. Please start with easy German + short English help for A1/A2 learner.",
+    "topicSelected": "Topic selected: {{presetTopic}}. Please start the 6-step coaching flow with the first German question.",
+    "upgradeResult": "Upgrade ({{label}}):\n{{upgraded}}",
+    "coachStyleA1A2": "Coach style: use easy German (A1/A2), short sentences, and brief English support for difficult words.",
+    "grammarAndFeedbackTitle": "Grammar and Feedback",
+    "moreHelpA1A2": "Open more help (tips + examples)",
+    "moreHelp": "Show more coaching tips and suggestions",
+    "moreHelpDescription": "Here you can find extra sentence ideas, vocabulary, and short examples.",
+    "topicPresets": [
+      "My hometown",
+      "My studies",
+      "A cultural festival",
+      "An environmental problem + solution"
+    ],
+    "flowSteps": {
+      "default": [
+        "Describe your topic",
+        "Explain your situation",
+        "Present your solution",
+        "Give supporting details",
+        "Use richer vocabulary and structure",
+        "Deliver your final presentation"
+      ],
+      "a1a2": [
+        "Say your topic",
+        "Talk about your situation",
+        "Say your idea or solution",
+        "Give one simple example",
+        "Use linking words",
+        "Say your final presentation"
+      ]
+    },
+    "upgradeOptions": [
+      {
+        "label": "Make it A2/B1",
+        "mode": "a2-b1",
+        "description": "Targets clear A2/B1 grammar and natural exam-ready phrasing."
+      },
+      {
+        "label": "Make it more formal",
+        "mode": "formal",
+        "description": "Emphasises politeness, formality, and clearer sentence patterns."
+      },
+      {
+        "label": "Add linking words",
+        "mode": "linking",
+        "description": "Adds connectors like zuerst, dann, außerdem, deshalb, and zum Schluss."
+      }
+    ],
+    "dynamicHelper": {
+      "0": "Start with a clear topic introduction and one key point.",
+      "1": "Great start. Now expand vocabulary range and vary your sentence structure.",
+      "2": "Add a concrete example so your explanation is persuasive.",
+      "3": "Link ideas with connectors and show cause/effect clearly.",
+      "4": "Refine grammar and make your conclusion concise and confident.",
+      "5": "Final step: deliver a fluent full response with strong structure."
+    },
+    "errors": {
+      "auth": "Your session expired. Please log in again to continue.",
+      "transient": "Temporary network issue. Please retry in a moment.",
+      "generic": "Could not reach the presentation coach. Please try again.",
+      "upgrade": "Could not upgrade your answer right now.",
+      "minLength": "Please write at least {{minLength}} characters so {{tutorName}} can coach you better."
+    },
+    "initialCoachMessage": {
+      "a1a2": "Hallo! I am Coach Felix 👋. We practise simple German with short English help. Pick a topic and we begin.",
+      "default": "Hallo! I am Coach Felix, your presentation coach. First choose a context or write your own topic, then we begin."
+    },
+    "tags": {
+      "nextQuestion": "Next question",
+      "feedback": "Grammar and Feedback",
+      "motivation": "Motivation",
+      "vocabulary": "Vocabulary",
+      "progress": "Progress",
+      "closing": "Closing",
+      "presentation": "Presentation",
+      "shortScript": "Short script",
+      "mediumScript": "Medium script",
+      "longScript": "Long script",
+      "errorIntelligence": "Error intelligence",
+      "rubric": "Rubric"
+    },
+    "rubric": {
+      "grammar": "Grammar",
+      "vocabulary": "Vocabulary range",
+      "structure": "Structure"
+    },
+    "answerWorkspaceTitle": "Antwortbereich",
+    "answerWorkspaceDescription": "Nutze einen Bereich für deine Antwort: Tippe in das Feld und/oder nimm unten deine Stimme auf.",
+    "deleteSessionAria": "Sitzung löschen",
+    "deletingSession": "Löschen…",
+    "deleteSession": "Löschen",
+    "confirmDeleteSession": "Diese Übungssitzung löschen? Du kannst die Aktion für kurze Zeit rückgängig machen.",
+    "deleteSessionError": "Sitzung konnte gerade nicht gelöscht werden.",
+    "sessionDeletePending": "Sitzung gelöscht. Rückgängig?",
+    "sessionDeleteUndone": "Löschen rückgängig gemacht.",
+    "deleteAllSessions": "Alle Sitzungen löschen",
+    "deletingAllSessions": "Alle werden gelöscht…",
+    "confirmDeleteAllSessions": "Wirklich den gesamten Sitzungsverlauf löschen?",
+    "deleteAllSuccess": "Gesamter Sitzungsverlauf gelöscht.",
+    "deleteAllError": "Verlauf konnte nicht vollständig gelöscht werden.",
+    "loadMore": "Mehr laden",
+    "loadingMore": "Lädt…",
+    "undoDelete": "Löschen rückgängig",
+    "composerSendMessage": "Nachricht senden",
+    "composerSendRecording": "Aufnahme senden",
+    "composerSendTextAndRecording": "Text + Aufnahme senden",
+    "composerStatusHint": "Status: Schreibe Text und/oder nimm Audio auf, dann sende alles über den Hauptbutton.",
+    "audioSendingStatus": "Aufnahme wird an den Coach gesendet…",
+    "audioReadyStatus": "Audio-Feedback ist im Chat verfügbar.",
+    "audioFallbackError": "Coach ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",
+    "audioTranscriptLabel": "Transkript",
+    "audioFeedbackLabel": "Feedback",
+    "audioNextStepsLabel": "Nächste Schritte",
+    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Sende sie, um den Chat mit deinem Text oder Transkript fortzusetzen.",
+    "ideaBuilder": {
+      "title": "Ideen-Builder",
+      "description": "Nutze diese Ideen vor der Aufnahme, damit deine Antwort klar strukturiert und sprachlich stärker ist.",
+      "focus": "Fokusthema: {{topic}}",
+      "talkingPointsTitle": "Schnelle Sprechpunkte",
+      "point1": "Führe {{topic}} in einem Satz ein und erkläre, warum es wichtig ist.",
+      "point2": "Beschreibe ein konkretes Beispiel oder eine Erfahrung zu {{topic}}.",
+      "point3": "Gib deine Meinung und einen praktischen nächsten Schritt zu {{topic}}.",
+      "sentenceStartersTitle": "Satzanfänge",
+      "startersA1A2": [
+        "Ich denke, dass…",
+        "In meiner Stadt…",
+        "Zum Beispiel…"
+      ],
+      "startersDefault": [
+        "Meiner Meinung nach…",
+        "Ein wichtiger Aspekt ist…",
+        "Zusammenfassend kann man sagen…"
+      ],
+      "usefulWordsTitle": "Nützliche Wörter",
+      "words": [
+        "zuerst",
+        "außerdem",
+        "deshalb",
+        "zum Schluss"
+      ],
+      "fallbackTopic": "dein Thema"
+    }
+  },
+  "attendanceTab": {
+    "helper": {
+      "withLevel": "Sitzungen für Niveau {{level}} werden angezeigt.",
+      "allLevels": "Alle verfügbaren Sitzungen werden angezeigt."
+    },
+    "loading": "Anwesenheit wird geladen...",
+    "present": "Anwesend ({{count}})",
+    "notPresent": "Nicht anwesend / ausstehend ({{count}})",
+    "empty": {
+      "present": "Noch keine als anwesend markierten Sitzungen.",
+      "notPresent": "Super! Keine Fehlzeiten oder ausstehenden Markierungen."
+    },
+    "alerts": {
+      "lowAttendance": "Deine Anwesenheit liegt bei {{percent}}%. Versuche die nächste Stunde zu besuchen, um aufzuholen.",
+      "multipleMissed": "{{count}} Sitzungen sind abwesend oder ausstehend. Kontaktiere deine Lehrkraft für einen Nachholplan."
+    },
+    "export": {
+      "pdf": "📄 Zusammenfassung herunterladen (PDF)",
+      "pdfTitle": "Anwesenheitsübersicht",
+      "sessionCount": "Sitzungen",
+      "attendanceRate": "Anwesenheitsquote"
+    },
+    "errors": {
+      "missingProfile": "Füge in deinem Konto Klasse und Studentencode hinzu, um die Anwesenheit zu sehen.",
+      "firebase": "Verbinde Firebase, um die Anwesenheit zu laden.",
+      "load": "Die Anwesenheit konnte gerade nicht geladen werden."
+    },
+    "sessionBadge": "{{count}} Sitzungen",
+    "fallback": {
+      "session": "Sitzung",
+      "pending": "Ausstehend"
+    }
+  }
+}

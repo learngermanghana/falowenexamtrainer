@@ -1,0 +1,163 @@
+import { buildGhanaDateTime } from "../services/classCalendar";
+import { GHANA_TIMEZONE } from "./liveClassCardPresentation";
+
+const CANCELLED_STATUS = "cancelled";
+export const COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE = "data-course-book-next-class-slot";
+
+const normalizeText = (value = "") => String(value || "").replace(/\s+/g, " ").trim().toLowerCase();
+
+const asDate = (value) => {
+  if (!value) return null;
+  if (typeof value?.toDate === "function") return value.toDate();
+  if (typeof value?.seconds === "number") return new Date(value.seconds * 1000);
+  const parsed = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+export const resolveLevel = (studentProfile = {}) => {
+  const profile = studentProfile || {};
+  const source = `${profile.level || ""} ${profile.classLevel || ""} ${profile.className || ""}`.toUpperCase();
+  return source.match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
+};
+
+export const findCourseBookStatGrid = (root = typeof document !== "undefined" ? document : null) => {
+  if (!root?.querySelectorAll) return null;
+  const heading = Array.from(root.querySelectorAll("h2")).find(
+    (element) => normalizeText(element.textContent) === "course book"
+  );
+  const hero = heading?.closest("section");
+  if (!hero) return null;
+
+  const lessonsLabel = Array.from(hero.querySelectorAll("p")).find(
+    (element) => normalizeText(element.textContent) === "lessons"
+  );
+  return lessonsLabel?.parentElement?.parentElement || null;
+};
+
+export const findOrCreateCourseBookNextClassMount = (
+  root = typeof document !== "undefined" ? document : null,
+  level = ""
+) => {
+  const statGrid = findCourseBookStatGrid(root);
+  if (!statGrid || String(level || "").trim().toUpperCase() !== "A1") return statGrid;
+
+  const hero = statGrid.closest("section");
+  const parent = hero?.parentElement;
+  if (!hero || !parent) return statGrid;
+
+  const existing = Array.from(parent.children).find(
+    (element) => element.getAttribute?.(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE) === "true"
+  );
+  if (existing) return existing;
+
+  const ownerDocument = hero.ownerDocument || (root?.createElement ? root : null);
+  if (!ownerDocument?.createElement) return statGrid;
+
+  const slot = ownerDocument.createElement("div");
+  slot.setAttribute(COURSE_BOOK_NEXT_CLASS_SLOT_ATTRIBUTE, "true");
+  slot.setAttribute("aria-label", "Next class information");
+  Object.assign(slot.style, {
+    display: "grid",
+    justifySelf: "end",
+    minWidth: "0",
+    width: "min(100%, 560px)",
+  });
+  hero.insertAdjacentElement("afterend", slot);
+  return slot;
+};
+
+const sessionStatus = (session = {}) => normalizeText(session.status || "scheduled");
+
+const resolveSessionDateKey = (session = {}) => {
+  const explicitDate = String(session.date || session.sessionDate || session.classDate || "").trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(explicitDate)) return explicitDate;
+
+  const start = asDate(session.startsAt || session.startDateTime);
+  if (!start) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: GHANA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(start);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
+const resolveSessionTime = (session = {}, field, fallbackField) => {
+  const value = String(session[field] || "").trim();
+  if (/^\d{1,2}:\d{2}$/.test(value)) return value.padStart(5, "0");
+
+  const fallback = asDate(session[fallbackField]);
+  if (!fallback) return "";
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: GHANA_TIMEZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(fallback);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.hour}:${values.minute}`;
+};
+
+const sessionDateTimeFromGhanaFields = (session = {}, timeField, fallbackField) => {
+  const dateKey = resolveSessionDateKey(session);
+  const time = resolveSessionTime(session, timeField, fallbackField);
+  if (!dateKey || !time) return null;
+  return buildGhanaDateTime(dateKey, time);
+};
+
+// Canonical Firestore timestamps are the authority after a class is moved.
+// The separate date/startTime fields are retained only as a legacy fallback;
+// they can legitimately lag behind a reschedule and must not override startsAt.
+const sessionStart = (session = {}) =>
+  asDate(session.startsAt || session.startDateTime)
+  || sessionDateTimeFromGhanaFields(session, "startTime", "startsAt");
+const sessionEnd = (session = {}) =>
+  asDate(session.endsAt || session.endDateTime)
+  || sessionDateTimeFromGhanaFields(session, "endTime", "endsAt");
+
+export const findCurrentOrNextSession = (sessions = [], now = new Date()) => {
+  const nowMs = now.getTime();
+  return [...sessions]
+    .filter((session) => {
+      const status = sessionStatus(session);
+      if (status === CANCELLED_STATUS) return false;
+      const start = sessionStart(session)?.getTime() || 0;
+      const end = sessionEnd(session)?.getTime() || 0;
+      if (end && end < nowMs) return false;
+      if (status === "live") return true;
+      return Boolean(start && (start >= nowMs || end >= nowMs));
+    })
+    .sort((left, right) => (sessionStart(left)?.getTime() || 0) - (sessionStart(right)?.getTime() || 0))[0] || null;
+};
+
+export const formatClassCountdown = (session, now = new Date()) => {
+  const start = sessionStart(session);
+  if (!start) return "Schedule unavailable";
+  const end = sessionEnd(session);
+  const nowMs = now.getTime();
+  const startMs = start.getTime();
+  const endMs = end?.getTime() || startMs + 2 * 60 * 60 * 1000;
+
+  if (nowMs > endMs) return "Class has ended";
+  if (sessionStatus(session) === "live" || (nowMs >= startMs && nowMs <= endMs)) return "Class is live now";
+
+  const totalMinutes = Math.max(0, Math.ceil((startMs - nowMs) / 60000));
+  if (totalMinutes === 0) return "Starting now";
+  if (totalMinutes < 60) return `Starts in ${totalMinutes} minute${totalMinutes === 1 ? "" : "s"}`;
+
+  const totalHours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+  if (totalHours < 24) {
+    const hoursLabel = `${totalHours} hour${totalHours === 1 ? "" : "s"}`;
+    const minutesLabel = remainingMinutes ? ` ${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}` : "";
+    return `Starts in ${hoursLabel}${minutesLabel}`;
+  }
+
+  const days = Math.floor(totalHours / 24);
+  const remainingHours = totalHours % 24;
+  const daysLabel = `${days} day${days === 1 ? "" : "s"}`;
+  const hoursLabel = remainingHours ? ` ${remainingHours} hour${remainingHours === 1 ? "" : "s"}` : "";
+  return `Starts in ${daysLabel}${hoursLabel}`;
+};

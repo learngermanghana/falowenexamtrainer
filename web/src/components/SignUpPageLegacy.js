@@ -1,0 +1,1232 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
+import { ALLOWED_LEVELS } from "../context/ExamContext";
+import { savePreferredLevel } from "../services/levelStorage";
+import { rememberStudentCodeForEmail } from "../services/submissionService";
+import { generateStudentCode } from "../services/studentCode";
+import { classCatalog } from "../data/classCatalog";
+import { findPublicClassName, loadPublicClasses, publicClassLabel } from "../services/publicClassCatalogService";
+import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
+import { buildPaystackCheckoutLink } from "../lib/paystack";
+import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
+import TuitionStatusCard from "./TuitionStatusCard";
+import { isPaymentsEnabled } from "../lib/featureFlags";
+import { useToast } from "../context/ToastContext";
+import PasswordGuidance from "./PasswordGuidance";
+import { formatCurrency } from "../lib/formatters";
+import { useFalowenUsdGhsRate, approximateUsd } from "../lib/falowenFxRate";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import {
+  isFullName,
+  isLikelyPhoneNumber,
+  normalizeEmail,
+  normalizePersonName,
+  normalizePhone,
+  normalizeWhitespace,
+} from "../lib/signupDataQuality";
+
+const MIN_INITIAL_PAYMENT = 2000;
+
+const ENQUIRY_LEVELS = new Set(["A1", "A2", "B1"]);
+
+const signupQueryContext = () => {
+  if (typeof window === "undefined") return { level: "", enquiry: false };
+  const params = new URLSearchParams(window.location.search);
+  const requestedClass = String(params.get("class") || "").trim().toLowerCase();
+  const slugMatch = requestedClass.match(/^(a1|a2|b1)-(?:next|upcoming)-live-class$/);
+  const queryLevel = String(params.get("level") || "").trim().toUpperCase();
+  const level = ENQUIRY_LEVELS.has(queryLevel)
+    ? queryLevel
+    : slugMatch
+      ? slugMatch[1].toUpperCase()
+      : "";
+  const enquiry = params.get("enquiry") === "1" || Boolean(slugMatch);
+  return { level, enquiry };
+};
+
+const enquiryClassName = (level) =>
+  ENQUIRY_LEVELS.has(level) ? `${level} Upcoming live class` : "";
+
+const formatClassLabel = (className) => {
+  const details = classCatalog[className];
+  if (!details) return className;
+  if (details.isSelfLearning || details.availability === "always") {
+    return `${className} — self-learning (always available)`;
+  }
+
+  const startLabel = details.startDate
+    ? new Date(details.startDate).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Schedule";
+
+  const timeLabel = Array.isArray(details.schedule)
+    ? details.schedule
+        .map(({ day, startTime, endTime }) =>
+          [day, startTime && ` ${startTime}`, endTime && `-${endTime}`]
+            .filter(Boolean)
+            .join("")
+        )
+        .join(" · ")
+    : "";
+
+  return timeLabel
+    ? `${className} — starts ${startLabel} — ${timeLabel}`
+    : `${className} — starts ${startLabel}`;
+};
+
+const staticClassOptions = (now) => Object.keys(classCatalog)
+  .filter((className) => {
+    const details = classCatalog[className];
+    if (!details) return false;
+    if (details.isSelfLearning || details.availability === "always") return true;
+    if (!details.startDate) return false;
+    const startDate = new Date(`${details.startDate}T00:00:00`);
+    return startDate > now;
+  })
+  .map((className) => ({
+    value: className,
+    label: formatClassLabel(className),
+    source: "static",
+  }));
+
+const SignUpPage = ({ onLogin, onBack, onAccountCreated }) => {
+  const { signup, authError, setAuthError } = useAuth();
+  const { i18n, t } = useTranslation();
+  const fxQuote = useFalowenUsdGhsRate();
+  const locale = i18n.language;
+  const formatMoney = useMemo(
+    () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+    [locale]
+  );
+  const { showToast } = useToast();
+  const paymentsEnabled = isPaymentsEnabled();
+  const now = useMemo(() => new Date(), []);
+  const [step, setStep] = useState(1);
+  const stepHeadingRef = useRef(null);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswords, setShowPasswords] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const requestedSignup = useMemo(() => signupQueryContext(), []);
+  const [selectedLevel, setSelectedLevel] = useState(
+    requestedSignup.level || "A1"
+  );
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
+  const [learningMode, setLearningMode] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [paymentOption, setPaymentOption] = useState("trial");
+  const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
+  const [publicClasses, setPublicClasses] = useState([]);
+  const [publicClassesLoaded, setPublicClassesLoaded] = useState(false);
+  const [hasConsented, setHasConsented] = useState(false);
+  const [showConsentDetails, setShowConsentDetails] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const fieldRefs = useRef({});
+
+  const consentHighlights = t("signupPage.consent.highlights", { returnObjects: true });
+
+  useEffect(() => {
+    let active = true;
+    loadPublicClasses()
+      .then((rows) => {
+        if (!active) return;
+        setPublicClasses(rows);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (active) setPublicClassesLoaded(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const classOptions = useMemo(() => {
+    const liveOptions = publicClasses.map((course) => ({
+      value: course.title,
+      label: publicClassLabel(course),
+      source: "firestore",
+      level: String(course.level || course.title?.split(" ")[0] || "").toUpperCase(),
+      startDate: course.startDate || "",
+      schedule: course.meetingDays || [],
+      learningMode: course.city === "Online" || course.availability === "always" ? "Online" : "",
+      isSelfLearning: course.availability === "always" || course.isSelfLearning === true,
+    }));
+    const liveTokens = new Set(liveOptions.map((option) => option.value));
+    const fallbackOptions = staticClassOptions(now)
+      .filter((option) => !liveTokens.has(option.value))
+      .map((option) => {
+        const details = classCatalog[option.value] || {};
+        return {
+          ...option,
+          level: String(option.value.split(" ")[0] || "").toUpperCase(),
+          startDate: details.startDate || "",
+          schedule: details.schedule || [],
+          learningMode: details.isSelfLearning || details.availability === "always" ? "Online" : "",
+          isSelfLearning: details.isSelfLearning || details.availability === "always",
+        };
+      });
+    const baseOptions = publicClassesLoaded ? [...liveOptions, ...fallbackOptions] : fallbackOptions;
+    const hasRequestedLevel = requestedSignup.level
+      ? baseOptions.some((option) => option.level === requestedSignup.level)
+      : false;
+    const enquiryOptions =
+      requestedSignup.enquiry && requestedSignup.level && !hasRequestedLevel
+        ? [{
+            value: enquiryClassName(requestedSignup.level),
+            label: `${requestedSignup.level} Upcoming live class — date to be announced`,
+            source: "enquiry",
+            level: requestedSignup.level,
+            startDate: "",
+            schedule: [],
+            learningMode: "",
+            isSelfLearning: false,
+          }]
+        : [];
+    return [...baseOptions, ...enquiryOptions];
+  }, [now, publicClasses, publicClassesLoaded, requestedSignup]);
+
+  const filteredClassOptions = useMemo(
+    () => classOptions.filter((option) => option.level === selectedLevel),
+    [classOptions, selectedLevel]
+  );
+
+  const recommendedClass = filteredClassOptions.length === 1 ? filteredClassOptions[0].value : "";
+
+  useEffect(() => {
+    if (!publicClassesLoaded || !selectedClass) return;
+    const availableValues = new Set(filteredClassOptions.map((option) => option.value));
+    if (!availableValues.has(selectedClass)) {
+      setSelectedClass("");
+    }
+  }, [filteredClassOptions, publicClassesLoaded, selectedClass]);
+
+  useEffect(() => {
+    if (!publicClassesLoaded || selectedClass || typeof window === "undefined") return;
+    const requested = new URLSearchParams(window.location.search).get("class");
+    const requestedName = requested ? findPublicClassName(publicClasses, requested) : "";
+    if (requestedName) setSelectedClass(requestedName);
+  }, [publicClasses, publicClassesLoaded, selectedClass]);
+
+  useEffect(() => {
+    if (!requestedSignup.enquiry || !requestedSignup.level) return;
+    if (selectedLevel !== requestedSignup.level) {
+      setSelectedLevel(requestedSignup.level);
+      return;
+    }
+
+    const selectedStillAvailable = filteredClassOptions.some(
+      (option) => option.value === selectedClass
+    );
+    if (selectedStillAvailable) return;
+
+    const preferred =
+      filteredClassOptions.find((option) => option.source === "firestore") ||
+      filteredClassOptions.find((option) => option.source === "static") ||
+      filteredClassOptions.find((option) => option.source === "enquiry");
+
+    if (preferred?.value) setSelectedClass(preferred.value);
+  }, [
+    filteredClassOptions,
+    requestedSignup,
+    selectedClass,
+    selectedLevel,
+  ]);
+
+  const tuitionFeeForLevel = useMemo(
+    () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }).tuitionFee,
+    [selectedLevel]
+  );
+
+  const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
+
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const setFieldError = (field, message) => {
+    setFieldErrors((prev) => ({ ...prev, [field]: message }));
+  };
+
+  const focusField = (field) => {
+    const element = fieldRefs.current[field];
+    if (!element) return;
+    element.focus();
+    if (typeof element.scrollIntoView === "function") {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  };
+
+  const stepForField = (field) => ["name", "email", "password", "confirmPassword"].includes(field)
+    ? 1 : ["selectedLevel", "learningMode", "selectedClass", "initialPaymentAmount"].includes(field) ? 2 : 3;
+
+  const showStepError = (issues) => {
+    const first = Object.keys(issues)[0];
+    if (!first) return false;
+    setFieldErrors(issues);
+    setAuthError(issues[first]);
+    setStep(stepForField(first));
+    window.requestAnimationFrame(() => focusField(first));
+    return true;
+  };
+
+  const accountIssues = () => {
+    const issues = {};
+    if (!isFullName(name)) issues.name = "Enter your first and last name for your certificates.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) issues.email = "Enter a valid email address.";
+    if (password.length < 8 || !/[a-z]/i.test(password) || !/[0-9]/.test(password)) issues.password = "Use at least 8 characters, including a letter and a number.";
+    if (!confirmPassword || password !== confirmPassword) issues.confirmPassword = "Passwords do not match. Please check both fields.";
+    return issues;
+  };
+
+  const continueStep = () => {
+    const issues = step === 1 ? accountIssues() : {
+      ...(!learningMode ? { learningMode: "Choose how you plan to learn." } : {}),
+      ...(!selectedClass ? { selectedClass: "Choose a class that fits your schedule." } : {}),
+    };
+    if (showStepError(issues)) return;
+    setAuthError("");
+    setFieldErrors({});
+    setStep((current) => Math.min(current + 1, 3));
+  };
+
+  useEffect(() => {
+    if (stepHeadingRef.current) stepHeadingRef.current.focus();
+  }, [step]);
+
+  const interpretSignupError = (error) => {
+    const code = error?.code || "";
+    if (code.includes("email-already-in-use")) {
+      return {
+        field: "email",
+        message: "That email is already registered. If you started this registration before, submit the same email and password to finish it. Otherwise, use Log in or Forgot password. Do not create another email account.",
+      };
+    }
+
+    if (code === "auth/profile-creation-incomplete") {
+      return { field: null, message: error.message };
+    }
+    if (code === "auth/student-code-conflict") {
+      return { field: null, message: "We could not safely reserve a unique student code. Please contact admissions instead of submitting again." };
+    }
+    if (code.includes("invalid-email")) {
+      return {
+        field: "email",
+        message: "This email looks invalid. Check for typos or try another address.",
+      };
+    }
+
+    if (code.includes("weak-password")) {
+      return {
+        field: "password",
+        message: "Password is too weak. Use at least 8 characters with a mix of letters and numbers.",
+      };
+    }
+
+    if (code.includes("network-request-failed") || error?.message?.toLowerCase().includes("network")) {
+      return {
+        field: null,
+        message: "We could not reach the signup service. Check your connection and try again.",
+      };
+    }
+
+    return {
+      field: null,
+      message:
+        "We couldn't create your account right now. Please try again in a moment or contact info@falowen.app for help.",
+    };
+  };
+
+  const initialPaymentAmount = paymentOption === "trial" ? 0 : paymentOption === "part" ? MIN_INITIAL_PAYMENT : tuitionFeeForLevel;
+
+  const tuitionSummary = computeTuitionStatus({
+    level: selectedLevel,
+    paidAmount: 0,
+  });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (step < 3) { continueStep(); return; }
+    setAuthError("");
+    setMessage("");
+    setFieldErrors({});
+
+    const numericInitialPayment = Number(initialPaymentAmount);
+    const cleanedName = normalizePersonName(name);
+    const cleanedEmail = normalizeEmail(email);
+    const cleanedPhone = normalizePhone(phone);
+    const cleanedAddress = normalizeWhitespace(address);
+    const cleanedLocation = normalizeWhitespace(location);
+    const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
+
+    const validationIssues = accountIssues();
+
+    if (paymentOption !== "trial" && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
+      validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} to start a paid account.`;
+    }
+
+    if (paymentOption !== "trial" && numericInitialPayment < 0) {
+      validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
+    }
+
+    if (paymentOption !== "trial" && (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT)) {
+      validationIssues.initialPaymentAmount = `Enter ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} or more to reserve your class.`;
+    }
+
+    if (!isFullName(name)) {
+      validationIssues.name =
+        "Use your full name (first and last). This will appear on certificates and transcripts.";
+    }
+
+    if (!selectedClass) {
+      validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
+    }
+
+    if (!isLikelyPhoneNumber(cleanedPhone)) {
+      validationIssues.phone = "Enter a valid contact phone number (7–15 digits) so we can reach you.";
+    }
+
+    if (!cleanedAddress) {
+      validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
+    }
+
+    if (!cleanedLocation) {
+      validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
+    }
+
+    if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
+      validationIssues.emergencyContactPhone =
+        "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
+    }
+
+    if (!learningMode) {
+      validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
+    }
+
+    if (password !== confirmPassword) {
+      validationIssues.confirmPassword = "Passwords do not match. Re-enter both fields to continue.";
+    }
+
+    if (!hasConsented) {
+      validationIssues.consent = "Agree to the terms and privacy policy to continue. You can open the summary above first.";
+    }
+
+    const validationMessages = Object.values(validationIssues);
+    if (validationMessages.length) {
+      setFieldErrors(validationIssues);
+      const firstInvalidField = Object.keys(validationIssues)[0];
+      if (firstInvalidField) {
+        setStep(stepForField(firstInvalidField));
+        window.requestAnimationFrame(() => focusField(firstInvalidField));
+      }
+      const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
+      setAuthError(summaryMessage);
+      showToast(summaryMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const tuitionFee = tuitionSummary.tuitionFee;
+      // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
+      const intendedPaymentAmount = paymentOption === "trial"
+        ? 0
+        : Math.max(Number(numericInitialPayment) || 0, 0);
+      const paidAmount = 0;
+      const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
+      const paymentStatus = "pending";
+      const studentCode = generateStudentCode({ name: cleanedName });
+      // Store the base Paystack link, but create the actual checkout URL on-demand
+      // via the backend so we can validate amounts and attach clear metadata.
+      const paystackLink = paystackLinkForLevel(selectedLevel);
+      const immediateCheckoutLink =
+        paymentOption !== "trial" && paymentsEnabled
+          ? buildPaystackCheckoutLink({
+              baseLink: paystackLink,
+              amount: intendedPaymentAmount,
+              redirectUrl: "https://www.falowen.app/payment-complete",
+              metadata: {
+                studentCode,
+                email: cleanedEmail,
+                level: selectedLevel,
+                className: selectedClass,
+                paymentChoice: paymentOption,
+              },
+              allowedRedirectOrigins: ["https://www.falowen.app"],
+            })
+          : "";
+
+      const signupReceipt = await signup(cleanedEmail, password, {
+        name: cleanedName,
+        level: selectedLevel,
+        studentCode,
+        className: selectedClass,
+        phone: cleanedPhone,
+        location: cleanedLocation,
+        address: cleanedAddress,
+        learningMode,
+        emergencyContactPhone: cleanedEmergencyPhone,
+        program: "german",
+        initialPaymentAmount: paidAmount,
+        tuitionFee,
+        balanceDue,
+        paymentStatus,
+        paystackLink,
+        paymentIntentAmount: intendedPaymentAmount || null,
+        status: "pending",
+        trialStatus: "active",
+        contractStart: "",
+        contractEnd: "",
+        contractTermMonths: 0,
+      });
+      // Send the lead only AFTER the Auth account and student profile were both
+      // confirmed. A failed attempt stays a draft, not a registered student.
+      try {
+        await onAccountCreated?.({
+          studentCode: signupReceipt?.studentCode || studentCode,
+          name: cleanedName, email: cleanedEmail, phone: cleanedPhone,
+          level: selectedLevel, className: selectedClass, learningMode,
+        });
+      } catch (eventError) {
+        console.warn("Completed signup lead could not be recorded", eventError);
+      }
+      savePreferredLevel(selectedLevel);
+      savePreferredClass(selectedClass);
+      rememberStudentCodeForEmail(cleanedEmail, studentCode);
+      const balanceText = balanceDue > 0 ? ` Your tuition balance is ${formatMoney(balanceDue)}.` : "";
+      if (immediateCheckoutLink) {
+        showToast("Account created. Opening secure Paystack checkout…", "success");
+        window.location.assign(immediateCheckoutLink);
+        return;
+      }
+
+      const amountCopy =
+        paymentOption === "trial"
+          ? "No payment was required to start your trial."
+          : `You selected ${formatMoney(intendedPaymentAmount)} as your intended payment.`;
+      const paymentInstruction =
+        paymentOption === "trial"
+          ? "You can pay at any time from Account & Billing."
+          : paymentsEnabled
+            ? "Open Account & Billing to complete Paystack payment."
+            : "Sign in on the web app and open Account & Billing to complete payment.";
+      const successMessage = `Account created! Your 7-day Falowen trial is active now. Your student code is ${studentCode}. ${amountCopy} ${paymentInstruction}${balanceText}`;
+      setMessage(successMessage);
+      showToast(`Your 7-day trial is active. Start learning now.`, "success");
+      triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
+    } catch (error) {
+      console.error(error);
+      const friendlyError = interpretSignupError(error);
+      if (friendlyError.field) {
+        setFieldError(friendlyError.field, friendlyError.message);
+        setStep(stepForField(friendlyError.field));
+        window.requestAnimationFrame(() => focusField(friendlyError.field));
+      }
+
+      const errorMessage = friendlyError.message;
+      const nextStep = friendlyError.field
+        ? "Review the highlighted field and try again."
+        : "Try again shortly. If it keeps failing, contact info@falowen.app.";
+      const combinedMessage = `${errorMessage} ${nextStep}`;
+      setAuthError(combinedMessage);
+      showToast(combinedMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
+      <div
+        style={{
+          ...styles.card,
+          width: "100%",
+          maxWidth: 660,
+          position: "relative",
+          padding: 20,
+          gap: 8,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>{t("signupPage.title")}</h2>
+          {onBack && (
+            <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
+              {t("signupPage.backToOverview")}
+            </button>
+          )}
+        </div>
+        <p style={{ ...styles.helperText, marginTop: -2 }}>
+          {t("signup.interfaceNote", { program: t("signup.programs.german") })}
+        </p>
+        <div
+          style={{
+            borderRadius: 14,
+            overflow: "hidden",
+            marginBottom: 12,
+            border: "1px solid #dbeafe",
+            position: "relative",
+            minHeight: 120,
+            backgroundImage:
+              "linear-gradient(120deg, rgba(30,64,175,0.9), rgba(56,189,248,0.82)), url('/learning-space-hero.svg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: "#fff",
+            display: "flex",
+            alignItems: "flex-end",
+          }}
+        >
+          <div style={{ padding: 16, background: "linear-gradient(0deg, rgba(2,6,23,0.55), rgba(2,6,23,0.05))", width: "100%" }}>
+            <p style={{ margin: 0, fontSize: 12, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.95 }}>
+              Welcome to Falowen
+            </p>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
+            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
+              Three simple steps to get ready. Choose a 7-day trial or pay immediately, then start learning with Falowen.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} noValidate data-signup-step={step} data-signup-error={authError} style={{ display: "grid", gap: 16 }}>
+          <nav aria-label="Signup progress">
+            <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+              {["Your account", "Your learning", "Contact details"].map((label, index) => <li key={label} aria-current={step === index + 1 ? "step" : undefined} style={{ borderTop: `4px solid ${step >= index + 1 ? "#2563eb" : "#e2e8f0"}`, paddingTop: 10, color: step === index + 1 ? "#1d4ed8" : "#64748b", fontSize: 13, fontWeight: step === index + 1 ? 700 : 500 }}>{index + 1}. {label}</li>)}
+            </ol>
+          </nav>
+          <div>
+            <p style={{ margin: "0 0 6px", color: "#64748b", fontSize: 13 }}>Step {step} of 3 · All details are collected before your account is created</p>
+            <h3 ref={stepHeadingRef} tabIndex={-1} style={{ margin: 0, color: "#0f172a", fontSize: 23 }}>{["Let’s create your account", "Choose how you’ll learn", "How can we reach you?"][step - 1]}</h3>
+            <p style={{ margin: "8px 0 0", color: "#475569", lineHeight: 1.6 }}>{["Use your full name and an email you can access.", "Choose your level, learning mode and class, then select trial or payment.", "We need your contact and emergency details before you begin. Going back keeps your answers."][step - 1]}</p>
+          </div>
+          <fieldset aria-label="Your account" disabled={step !== 1 || loading} hidden={step !== 1} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 1 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-name" style={styles.label}>{t("signupPage.fields.name")}</label>
+          <input
+            type="text"
+            required
+            autoComplete="name"
+            id="signup-name"
+            ref={(element) => {
+              fieldRefs.current.name = element;
+            }}
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+              clearFieldError("name");
+              setAuthError("");
+            }}
+            style={inputStyle}
+            placeholder="Abigail Mensah"
+          />
+          {fieldErrors.name ? <p style={styles.fieldError}>{fieldErrors.name}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            Please enter your full name (first and last). We use it to print certificates and transcripts.
+          </p>
+
+          <label htmlFor="signup-email" style={styles.label}>{t("signupPage.fields.email")}</label>
+          <input
+            type="email"
+            required
+            autoComplete="email"
+            id="signup-email"
+            ref={(element) => {
+              fieldRefs.current.email = element;
+            }}
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clearFieldError("email");
+              setAuthError("");
+            }}
+            style={inputStyle}
+            placeholder="you@example.com"
+          />
+          {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
+
+          <label htmlFor="signup-password" style={styles.label}>{t("signupPage.fields.password")}</label>
+          <div style={{ position: "relative" }}>
+          <input
+            type={showPasswords ? "text" : "password"}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            id="signup-password"
+            ref={(element) => {
+              fieldRefs.current.password = element;
+            }}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearFieldError("password");
+              setAuthError("");
+            }}
+            style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
+            placeholder="At least 8 characters with letters and numbers"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPasswords((value) => !value)}
+            aria-pressed={showPasswords}
+            style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
+          >
+            {showPasswords ? "Hide" : "Show"}
+          </button>
+          </div>
+          {fieldErrors.password ? <p style={styles.fieldError}>{fieldErrors.password}</p> : null}
+
+          <PasswordGuidance password={password} />
+
+          <label htmlFor="signup-confirmPassword" style={styles.label}>{t("signupPage.fields.confirmPassword")}</label>
+          <div style={{ position: "relative" }}>
+          <input
+            type={showPasswords ? "text" : "password"}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            id="signup-confirmPassword"
+            ref={(element) => {
+              fieldRefs.current.confirmPassword = element;
+            }}
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              clearFieldError("confirmPassword");
+              setAuthError("");
+            }}
+            style={{ ...inputStyle, width: "100%", paddingRight: 72 }}
+            placeholder="Enter password again"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPasswords((value) => !value)}
+            aria-pressed={showPasswords}
+            style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: 0, background: "transparent", color: "#1d4ed8", fontWeight: 700, cursor: "pointer", padding: "6px 8px" }}
+          >
+            {showPasswords ? "Hide" : "Show"}
+          </button>
+          </div>
+          {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
+
+          </fieldset>
+          <fieldset aria-label="Your learning" disabled={step !== 2 || loading} hidden={step !== 2} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 2 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-selectedLevel" style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
+          <select
+            required
+            id="signup-selectedLevel"
+            ref={(element) => {
+              fieldRefs.current.selectedLevel = element;
+            }}
+            value={selectedLevel}
+            onChange={(event) => {
+              setSelectedLevel(event.target.value);
+              setSelectedClass("");
+              clearFieldError("selectedClass");
+            }}
+            style={styles.select}
+          >
+            {ALLOWED_LEVELS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap", marginTop: -2 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              We load speaking and writing tasks that match your level.
+            </p>
+            <a
+              href="/placement-test"
+              style={{ color: "#1d4ed8", fontWeight: 700, fontSize: 13, textDecoration: "none" }}
+            >
+              Not sure of your level? Take the placement test
+            </a>
+          </div>
+
+          <label htmlFor="signup-learningMode" style={styles.label}>{t("signupPage.fields.learningMode")}</label>
+          <select
+            required
+            id="signup-learningMode"
+            ref={(element) => {
+              fieldRefs.current.learningMode = element;
+            }}
+            value={learningMode}
+            onChange={(event) => {
+              setLearningMode(event.target.value);
+              clearFieldError("learningMode");
+              setAuthError("");
+            }}
+            style={styles.select}
+          >
+            <option value="">{t("signupPage.options.chooseOne")}</option>
+            <option value="In-person">{t("signupPage.options.inPerson")}</option>
+            <option value="Online">{t("signupPage.options.online")}</option>
+            <option value="Hybrid">{t("signupPage.options.hybrid")}</option>
+          </select>
+          {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
+
+          <label style={styles.label}>{t("signupPage.fields.classSelection")}</label>
+          <select
+            id="class-selection"
+            value={selectedClass}
+            ref={(element) => {
+              fieldRefs.current.selectedClass = element;
+            }}
+            onChange={(event) => {
+              setSelectedClass(event.target.value);
+              clearFieldError("selectedClass");
+              setAuthError("");
+            }}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <option value="">{t("signupPage.options.chooseClass")}</option>
+            {filteredClassOptions.map((classOption) => (
+              <option key={classOption.value} value={classOption.value}>
+                {classOption.label}
+              </option>
+            ))}
+          </select>
+
+          <div role="group" aria-label="Choose your class" tabIndex={-1} ref={(element) => { if (element) fieldRefs.current.selectedClass = element; }} style={{ display: "grid", gap: 10 }}>
+            {filteredClassOptions.map((classOption) => {
+              const selected = selectedClass === classOption.value;
+              const scheduleText = (classOption.schedule || [])
+                .map(({ day, startTime, endTime }) =>
+                  [day, startTime && ` ${startTime}`, endTime && `-${endTime}`].filter(Boolean).join("")
+                )
+                .join(" · ");
+              const startText = classOption.isSelfLearning
+                ? "Start anytime"
+                : classOption.startDate
+                  ? new Date(`${classOption.startDate}T00:00:00`).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : "Schedule available";
+              return (
+                <button
+                  key={classOption.value}
+                  type="button"
+                  onClick={() => {
+                    setSelectedClass(classOption.value);
+                    clearFieldError("selectedClass");
+                    setAuthError("");
+                  }}
+                  aria-pressed={selected}
+                  style={{
+                    textAlign: "left",
+                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                    background: selected ? "#eff6ff" : "#fff",
+                    borderRadius: 12,
+                    padding: 14,
+                    display: "grid",
+                    gap: 7,
+                    cursor: "pointer",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <strong style={{ color: "#0f172a" }}>{classOption.value}</strong>
+                    {recommendedClass === classOption.value ? (
+                      <span style={{ fontSize: 12, fontWeight: 700, color: "#1d4ed8" }}>Recommended for you</span>
+                    ) : null}
+                  </div>
+                  <span style={{ color: "#475569", fontSize: 13 }}>
+                    {classOption.isSelfLearning ? "Self-learning · Online" : `Starts ${startText}`}
+                  </span>
+                  {scheduleText ? <span style={{ color: "#475569", fontSize: 13 }}>{scheduleText} · Ghana time (GMT / UTC+0)</span> : null}
+                  {classOption.learningMode ? (
+                    <span style={{ color: "#64748b", fontSize: 12 }}>{classOption.learningMode}</span>
+                  ) : null}
+                </button>
+              );
+            })}
+            {!filteredClassOptions.length && publicClassesLoaded ? (
+              <div style={{ border: "1px solid #fde68a", background: "#fffbeb", borderRadius: 12, padding: 12, color: "#92400e" }}>
+                No open {selectedLevel} class is currently listed. Please contact Falowen support for the next intake.
+              </div>
+            ) : null}
+          </div>
+          {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -2 }}>
+            Choose the class that fits your schedule. We only show open classes for {selectedLevel}.
+            {!publicClassesLoaded ? " Loading the latest class list…" : ""}
+          </p>
+
+          <label style={styles.label}>How would you like to start?</label>
+          <div
+            ref={(element) => {
+              fieldRefs.current.initialPaymentAmount = element;
+            }}
+            style={{ display: "grid", gap: 10 }}
+          >
+            {[
+              {
+                value: "trial",
+                title: "Start 7-day trial",
+                copy: "Start learning now without payment. You can pay later from Account & Billing.",
+              },
+              {
+                value: "full",
+                title: `Pay full fee now · ${formatMoney(tuitionFeeForLevel)}${approximateUsd(tuitionFeeForLevel, fxQuote) ? ` (≈ ${approximateUsd(tuitionFeeForLevel, fxQuote)} USD)` : ""}`,
+                copy: "Create your account, then continue directly to secure Paystack checkout.",
+              },
+              {
+                value: "part",
+                title: `Part payment now · ${formatMoney(MIN_INITIAL_PAYMENT)}${approximateUsd(MIN_INITIAL_PAYMENT, fxQuote) ? ` (≈ ${approximateUsd(MIN_INITIAL_PAYMENT, fxQuote)} USD)` : ""}`,
+                copy: "Create your account, then continue directly to Paystack for the first installment.",
+              },
+            ].map((option) => {
+              const selected = paymentOption === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => {
+                    setPaymentOption(option.value);
+                    clearFieldError("initialPaymentAmount");
+                    setAuthError("");
+                  }}
+                  aria-pressed={selected}
+                  style={{
+                    textAlign: "left",
+                    border: selected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                    background: selected ? "#eff6ff" : "#fff",
+                    borderRadius: 12,
+                    padding: 14,
+                    cursor: "pointer",
+                    display: "grid",
+                    gap: 4,
+                  }}
+                >
+                  <strong style={{ color: "#0f172a" }}>{option.title}</strong>
+                  <span style={{ color: "#475569", fontSize: 13, lineHeight: 1.45 }}>{option.copy}</span>
+                </button>
+              );
+            })}
+          </div>
+          <select
+            id="initial-payment-amount"
+            value={paymentOption}
+            onChange={(event) => setPaymentOption(event.target.value)}
+            style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+            tabIndex={-1}
+            aria-hidden="true"
+          >
+            <option value="trial">trial</option>
+            <option value="full">full</option>
+            <option value="part">part</option>
+          </select>
+          {fieldErrors.initialPaymentAmount ? (
+            <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
+          ) : null}
+
+          <TuitionStatusCard
+            level={selectedLevel}
+            // This card is a preview only... actual payment is confirmed via Paystack webhook.
+            paidAmount={0}
+            balanceDue={tuitionSummary.tuitionFee}
+            tuitionFee={tuitionSummary.tuitionFee}
+            paystackLink={tuitionSummary.paystackLink}
+            showPaymentAction={false}
+            title="Tuition summary"
+            description={`For ${selectedLevel} tuition is ${formatMoney(tuitionSummary.tuitionFee)}${approximateUsd(tuitionSummary.tuitionFee, fxQuote) ? ` (≈ ${approximateUsd(tuitionSummary.tuitionFee, fxQuote)} USD)` : ""}. You may begin with the 7-day trial or choose immediate Paystack payment above.`}
+          />
+
+          </fieldset>
+          <fieldset aria-label="Contact details" disabled={step !== 3 || loading} hidden={step !== 3} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: step === 3 ? "grid" : "none", gap: 12 }}>
+          <label htmlFor="signup-phone" style={styles.label}>{t("signupPage.fields.phone")}</label>
+          <input
+            type="tel"
+            required
+            autoComplete="tel"
+            id="signup-phone"
+            ref={(element) => {
+              fieldRefs.current.phone = element;
+            }}
+            value={phone}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              clearFieldError("phone");
+              setAuthError("");
+            }}
+            style={inputStyle}
+            placeholder="0176 12345678"
+          />
+          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
+
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
+            notified in urgent safety situations.
+          </p>
+
+          <label htmlFor="signup-address" style={styles.label}>{t("signupPage.fields.address")}</label>
+          <textarea
+            required
+            autoComplete="street-address"
+            id="signup-address"
+            ref={(element) => {
+              fieldRefs.current.address = element;
+            }}
+            value={address}
+            onChange={(event) => {
+              setAddress(event.target.value);
+              clearFieldError("address");
+              setAuthError("");
+            }}
+            style={{ ...styles.textArea, minHeight: 80 }}
+            placeholder="House number, street, city, region"
+          />
+          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
+
+          <label htmlFor="signup-location" style={styles.label}>{t("signupPage.fields.location")}</label>
+          <input
+            type="text"
+            required
+            autoComplete="address-level2"
+            id="signup-location"
+            ref={(element) => {
+              fieldRefs.current.location = element;
+            }}
+            value={location}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              clearFieldError("location");
+            }}
+            style={inputStyle}
+            placeholder="Berlin"
+          />
+          {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
+
+          <label htmlFor="signup-emergencyContactPhone" style={styles.label}>{t("signupPage.fields.emergencyContactPhone")}</label>
+          <input
+            type="tel"
+            required
+            autoComplete="tel-national"
+            id="signup-emergencyContactPhone"
+            ref={(element) => {
+              fieldRefs.current.emergencyContactPhone = element;
+            }}
+            value={emergencyContactPhone}
+            onChange={(e) => {
+              setEmergencyContactPhone(e.target.value);
+              clearFieldError("emergencyContactPhone");
+              setAuthError("");
+            }}
+            style={inputStyle}
+            placeholder="0176 98765432"
+          />
+          {fieldErrors.emergencyContactPhone ? (
+            <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+          ) : null}
+
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
+            <input
+              type="checkbox"
+              checked={hasConsented}
+              ref={(element) => {
+                fieldRefs.current.consent = element;
+              }}
+              onChange={(event) => {
+                setHasConsented(event.target.checked);
+                clearFieldError("consent");
+                setAuthError("");
+              }}
+              required
+              style={{ width: 18, height: 18 }}
+            />
+            <span>
+              {t("signupPage.consent.agreePrefix")}
+              {" "}
+              <a
+                href="https://register.falowen.app/#terms-of-service"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#1d4ed8", fontWeight: 600 }}
+              >
+                terms
+              </a>
+              {" "}
+              {t("signupPage.consent.and")}
+              {" "}
+              <a
+                href="https://register.falowen.app/#privacy-policy"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#1d4ed8", fontWeight: 600 }}
+              >
+                privacy policy
+              </a>
+              {t("signupPage.consent.period")}
+            </span>
+          </label>
+          {fieldErrors.consent ? <p style={styles.fieldError}>{fieldErrors.consent}</p> : null}
+          <div style={{ marginLeft: 26, marginTop: 6, color: "#4b5563", fontSize: 13 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <strong style={{ fontWeight: 600 }}>{t("signupPage.consent.keyPoints")}</strong>
+              <button
+                type="button"
+                onClick={() => setShowConsentDetails(true)}
+                style={{
+                  ...styles.secondaryButton,
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  height: "auto",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                {t("signupPage.consent.viewSummary")}
+              </button>
+            </div>
+            <ul style={{ marginTop: 6, paddingLeft: 18, lineHeight: 1.5 }}>
+              {consentHighlights.slice(0, 2).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p style={{ marginTop: 4 }}>
+              {t("signupPage.consent.fullDetails")}
+            </p>
+          </div>
+
+          </fieldset>
+          <div style={{ display: "flex", gap: 12, justifyContent: "space-between", flexWrap: "wrap" }}>
+            {step > 1 ? <button type="button" style={styles.secondaryButton} disabled={loading} onClick={() => { setAuthError(""); setStep((current) => current - 1); }}>Back</button> : null}
+            {step < 3 ? <button type="submit" style={{ ...styles.primaryButton, flex: 1 }} disabled={loading}>Continue to {step === 1 ? "your learning" : "contact details"} →</button> : null}
+          </div>
+          {step === 3 ? <>
+          <button style={styles.primaryButton} type="submit" disabled={loading}>
+            {loading ? t("signupPage.actions.creating") : "Create account & start 7-day trial"}
+          </button>
+          <p style={{ ...styles.helperText, margin: "-4px 0 0", textAlign: "center" }}>
+            Start your 7-day trial without payment, or pay immediately after signup if you prefer.
+          </p>
+          </> : null}
+        </form>
+
+        {showConsentDetails && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+              zIndex: 20,
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label={t("signupPage.consent.dialogAria")}
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 12,
+                maxWidth: 520,
+                width: "100%",
+                boxShadow: "0 10px 35px rgba(0,0,0,0.12)",
+                padding: 20,
+                color: "#111827",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{t("signupPage.consent.dialogTitle")}</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowConsentDetails(false)}
+                  style={{ ...styles.secondaryButton, padding: "6px 12px", fontSize: 12 }}
+                >
+                  {t("signupPage.actions.close")}
+                </button>
+              </div>
+              <p style={{ marginTop: 12, marginBottom: 10 }}>
+                {t("signupPage.consent.dialogIntro")}
+              </p>
+              <ul style={{ marginTop: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+                {consentHighlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p style={{ marginTop: 10, color: "#4b5563" }}>
+                {t("signupPage.consent.readFull")}
+                {" "}
+                <a
+                  href="https://register.falowen.app/#terms-of-service"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  terms
+                </a>
+                {" "}
+                {t("signupPage.consent.and")}
+                {" "}
+                <a
+                  href="https://register.falowen.app/#privacy-policy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  privacy policy
+                </a>
+                {" "}
+                {t("signupPage.consent.withoutLosingProgress")}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {authError && <div style={styles.errorBox}>{authError}</div>}
+        {message && (
+          <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#166534", borderColor: "#22c55e", display: "grid", gap: 12 }}>
+            <strong style={{ fontSize: 16 }}>Your Falowen account is ready</strong>
+            <span>{message}</span>
+            <button
+              type="button"
+              onClick={() => { window.location.href = "/campus"; }}
+              style={{ ...styles.primaryButton, width: "100%" }}
+            >
+              Start learning
+            </button>
+          </div>
+        )}
+
+        <div style={{ marginTop: 10, fontSize: 13, color: "#4b5563" }}>
+          {t("signupPage.alreadyRegistered")} {" "}
+          <button
+            type="button"
+            onClick={onLogin}
+            style={{ ...styles.secondaryButton, padding: "6px 12px" }}
+          >
+            {t("signupPage.actions.goToLogin")}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SignUpPage;

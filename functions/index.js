@@ -1,0 +1,2250 @@
+const { deliverCurrentStudentToSheet } = require("./studentSheetDelivery");
+const { shouldSyncStudentSheet } = require("./studentSheetSyncDiff");
+const { notificationsPaused, currentNotificationStudent } = require("./deletionNotifications");
+const { _protectedOnCall: onCall } = require("./accountDeletion");
+const { setGlobalOptions } = require("firebase-functions/v2");
+const { HttpsError, onRequest } = require("firebase-functions/v2/https");
+const {
+  onDocumentCreated,
+  onDocumentUpdated,
+  onDocumentWritten,
+} = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
+const admin = require("firebase-admin");
+const { absolutePushLink } = require("./pushLinks");
+const { FieldValue, FieldPath } = require("firebase-admin/firestore");
+
+const getAdmin = () => {
+  if (!admin.apps.length) {
+    admin.initializeApp();
+  }
+  return admin;
+};
+
+// Keep the aggregate Cloud Run CPU reservation low enough for projects with
+// constrained regional CPU quota. Firebase v2 defaults each function to 1 CPU;
+// using the gen 1 CPU profile gives lightweight background triggers fractional
+// CPU, and limiting instances prevents deployment from reserving 10 CPUs per
+// function across the full codebase.
+setGlobalOptions({ cpu: "gcf_gen1", maxInstances: 2 });
+
+const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON_B64");
+const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
+const STUDENTS_SHEET_TAB = defineSecret("STUDENTS_SHEET_TAB");
+const RESULTS_SHEET_PUBLISHED_CSV_URL = defineSecret("RESULTS_SHEET_PUBLISHED_CSV_URL");
+const ZOOM_WEBHOOK_SECRET = defineSecret("ZOOM_WEBHOOK_SECRET");
+
+let appInstance;
+let appendStudentToStudentsSheetSafely;
+let purgeStudentFromSheets;
+
+const getApp = () => {
+  if (!appInstance) {
+    // Lazy-load the Express app so deployment initialization stays fast.
+    appInstance = require("./functionz/app");
+  }
+  return appInstance;
+};
+
+const getStudentAppender = () => {
+  if (!appendStudentToStudentsSheetSafely) {
+    // Lazy-load the Sheets helper to avoid importing googleapis during cold start.
+    ({ appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet"));
+  }
+  return appendStudentToStudentsSheetSafely;
+};
+
+const getStudentSheetPurger = () => {
+  if (!purgeStudentFromSheets) {
+    ({ purgeStudentFromSheets } = require("./functionz/studentsSheet"));
+  }
+  return purgeStudentFromSheets;
+};
+
+
+const MAX_RESUBMISSION_TRIES = 2;
+const MAX_TOTAL_SUBMISSION_ATTEMPTS = 1 + MAX_RESUBMISSION_TRIES;
+const PASS_THRESHOLD_SCORE = 60;
+const RESUBMISSION_COOLDOWN_MS = 10 * 60 * 1000;
+const RESUBMISSION_ATTEMPT_STATUSES = new Set(["submitted", "resubmitted", "pending_review", "pending", "awaiting_review", "passed", "failed"]);
+const PASS_STATUSES = new Set(["approved", "pass", "passed", "complete", "completed"]);
+
+const normalizeCallableText = (value, maxLength = 12000) => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return "";
+  return String(value).trim().slice(0, maxLength);
+};
+
+const FALOWEN_UI_TEXT_PHRASES = [
+  "resubmission unlocked",
+  "resubmissions left",
+  "first submission is #1",
+  "you can resubmit",
+  "corrected text",
+  "submitted preview",
+  "review details",
+];
+
+const appearsToContainFalowenUiText = (value) => {
+  const normalized = normalizeCallableText(value).toLowerCase();
+  if (!normalized) return false;
+  return FALOWEN_UI_TEXT_PHRASES.filter((phrase) => normalized.includes(phrase)).length >= 2;
+};
+
+
+const timestampToMillis = (value) => {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (typeof value.toDate === "function") {
+    const date = value.toDate();
+    return Number.isFinite(date?.getTime?.()) ? date.getTime() : 0;
+  }
+  if (Number.isFinite(value.seconds)) return Number(value.seconds) * 1000 + Math.floor(Number(value.nanoseconds || 0) / 1000000);
+  if (value instanceof Date) return Number.isFinite(value.getTime()) ? value.getTime() : 0;
+  if (typeof value === "number") return value > 100000000000 ? value : value * 1000;
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getSubmissionTimestampMillis = (data = {}) =>
+  Math.max(
+    timestampToMillis(data.resubmittedAt),
+    timestampToMillis(data.submittedAt),
+    timestampToMillis(data.createdAt),
+    timestampToMillis(data.updatedAt),
+    timestampToMillis(data.timestamp)
+  );
+
+const buildCooldownError = ({ latestSubmissionMillis, nowMillis = Date.now() }) => {
+  const nextAllowedMillis = latestSubmissionMillis + RESUBMISSION_COOLDOWN_MS;
+  const remainingSeconds = Math.max(0, Math.ceil((nextAllowedMillis - nowMillis) / 1000));
+  return new HttpsError("resource-exhausted", "Please wait before submitting again.", {
+    success: false,
+    code: "RESUBMISSION_COOLDOWN",
+    message: "Please wait before submitting again.",
+    nextAllowedAt: new Date(nextAllowedMillis).toISOString(),
+    remainingSeconds,
+  });
+};
+
+const isFirestoreServerTimestampSentinel = (value) =>
+  Boolean(
+    value &&
+    typeof value === "object" &&
+    (value._methodName === "serverTimestamp" ||
+      value._delegate?._methodName === "serverTimestamp" ||
+      value.methodName === "serverTimestamp")
+  );
+
+const normalizeClientTimestamp = (value) => {
+  if (!value || isFirestoreServerTimestampSentinel(value)) return null;
+  if (typeof value === "string" || typeof value === "number") return value;
+  if (typeof value === "object" && Number.isFinite(value.seconds)) {
+    return {
+      seconds: Number(value.seconds),
+      nanoseconds: Number(value.nanoseconds || 0),
+    };
+  }
+  return null;
+};
+
+const countSubmissionAttemptDoc = (data = {}) => {
+  const status = normalizeValue(data.status || data.reviewStatus || data.result);
+  return RESUBMISSION_ATTEMPT_STATUSES.has(status) || Number(data.attempt || data.attemptNumber || 0) > 0;
+};
+
+const getScoreValue = (data = {}) => {
+  const raw = data.score ?? data.percentage ?? data.mark ?? data.previousScore;
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string") {
+    const match = raw.match(/-?\d+(?:\.\d+)?/);
+    if (match) {
+      const parsed = Number(match[0]);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+  }
+  return null;
+};
+
+const isPassedSubmissionDoc = (data = {}) => {
+  const score = getScoreValue(data);
+  if (typeof score === "number") return score >= PASS_THRESHOLD_SCORE;
+  return PASS_STATUSES.has(normalizeValue(data.reviewStatus || data.result || data.status));
+};
+
+const buildAttemptCounterId = ({ studentId, canonicalAssignmentKey }) =>
+  `${String(studentId || "").replace(/[^a-zA-Z0-9._-]/g, "_")}__${String(canonicalAssignmentKey || "").replace(/[^a-zA-Z0-9._-]/g, "_")}`.slice(0, 300);
+
+const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+const NOTIFICATION_BATCH_SIZE = 500;
+const UNPAID_SIGNUP_GRACE_DAYS = 7;
+const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
+const TRIAL_DURATION_DAYS = 7;
+const TRIAL_DURATION_MS = TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000;
+const TRIAL_RETENTION_DAYS = 30;
+const TRIAL_RETENTION_MS = TRIAL_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+const CONTRACT_EXPIRY_GRACE_DAYS = 30;
+const CONTRACT_EXPIRY_GRACE_MS = CONTRACT_EXPIRY_GRACE_DAYS * 24 * 60 * 60 * 1000;
+
+const safeTruncate = (text = "", maxLength = 140) => {
+  const str = String(text || "").trim();
+  if (str.length <= maxLength) return str;
+  return `${str.slice(0, Math.max(1, maxLength - 1))}…`;
+};
+
+const normalizeValue = (value) => String(value || "").trim().toLowerCase();
+
+const normalizeStudentCode = (value) => String(value || "").trim().toLowerCase();
+
+const toBooleanLike = (value) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value > 0;
+  if (typeof value === "string") {
+    const normalized = normalizeValue(value);
+    if (["present", "p", "yes", "y", "true", "1", "attended", "late"].includes(normalized)) {
+      return true;
+    }
+    if (["absent", "a", "no", "n", "false", "0", "missed"].includes(normalized)) {
+      return false;
+    }
+  }
+  if (value && typeof value === "object") {
+    if ("present" in value) return toBooleanLike(value.present);
+    if ("attended" in value) return toBooleanLike(value.attended);
+    if ("status" in value) return toBooleanLike(value.status);
+  }
+  return false;
+};
+
+const extractAttendanceMap = (sessionData = {}) => {
+  const map = sessionData.attendance || sessionData.students || sessionData.participants;
+  if (!map || typeof map !== "object") return {};
+  return map;
+};
+
+const getPresentCodesFromAttendanceSession = (sessionData = {}) => {
+  const map = extractAttendanceMap(sessionData);
+  return new Set(
+    Object.entries(map)
+      .filter(([, value]) => toBooleanLike(value))
+      .map(([studentCode]) => normalizeStudentCode(studentCode))
+      .filter(Boolean)
+  );
+};
+
+const getNewlyPresentCodes = ({ before = {}, after = {} } = {}) => {
+  const beforeSet = getPresentCodesFromAttendanceSession(before);
+  const afterSet = getPresentCodesFromAttendanceSession(after);
+  return Array.from(afterSet).filter((code) => !beforeSet.has(code));
+};
+
+const { CURRICULUM_BY_LEVEL, normalizeLevel: normalizeCurriculumLevel } = require("./data/curriculumManifest");
+
+const ASSIGNMENT_LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
+
+const normalizeAssignmentToken = (value = "") =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/_/g, "-")
+    .replace(/[^a-z0-9.-]/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toUpperCase();
+
+const normalizeAssignmentLevel = (value = "") => normalizeCurriculumLevel(value);
+
+const getValidCanonicalIdsForLevel = (level) =>
+  new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
+
+const toCanonicalAssignmentId = ({ assignmentId, level }) => {
+  const token = normalizeAssignmentToken(assignmentId);
+  const normalizedLevel = normalizeAssignmentLevel(level);
+  if (!token || !normalizedLevel) return "";
+
+  const canonical = ASSIGNMENT_LEVEL_PREFIX.test(token) ? token : `${normalizedLevel}-${token}`;
+  return getValidCanonicalIdsForLevel(normalizedLevel).has(canonical) ? canonical : "";
+};
+
+const resolveAssignmentCanonicalKey = ({ level, assignmentId } = {}) =>
+  toCanonicalAssignmentId({ assignmentId, level });
+
+const getMillisFromTimestampLike = (value) => {
+  if (!value) return Number.NaN;
+  if (typeof value?.toMillis === "function") {
+    return value.toMillis();
+  }
+  if (typeof value === "string" || value instanceof Date || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+  return Number.NaN;
+};
+
+const getContractEndMillis = (value) => {
+  if (!value) return Number.NaN;
+  if (typeof value?.toMillis === "function") {
+    return value.toMillis();
+  }
+  if (typeof value?.toDate === "function") {
+    const parsed = value.toDate();
+    if (parsed instanceof Date) {
+      const ms = parsed.getTime();
+      return Number.isFinite(ms) ? ms : Number.NaN;
+    }
+  }
+  if (typeof value === "string" || value instanceof Date || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+  return Number.NaN;
+};
+
+const hasStudentMadePayment = (student = {}) => {
+  const paymentStatus = normalizeValue(student.paymentStatus);
+  if (["paid", "partial"].includes(paymentStatus)) return true;
+
+  const confirmedPaidFields = [student.paid, student.paidAmount];
+  return confirmedPaidFields.some((value) => Number(value) > 0);
+};
+
+const getTrialStartMillis = (student = {}) => {
+  const startedAtMs = getMillisFromTimestampLike(student.trialStartedAt);
+  if (Number.isFinite(startedAtMs)) return startedAtMs;
+
+  const usedAtMs = getMillisFromTimestampLike(student.trialUsedAt);
+  return Number.isFinite(usedAtMs) ? usedAtMs : Number.NaN;
+};
+
+const getTrialEndMillis = (student = {}) => {
+  const explicitEndMs = getMillisFromTimestampLike(student.trialEndsAt);
+  if (Number.isFinite(explicitEndMs)) return explicitEndMs;
+
+  if (normalizeValue(student.trialStatus) !== "active") return Number.NaN;
+  const startedAtMs = getTrialStartMillis(student);
+  return Number.isFinite(startedAtMs)
+    ? startedAtMs + TRIAL_DURATION_MS
+    : Number.NaN;
+};
+
+const getTrialPurgeMillis = (student = {}) => {
+  const explicit = getMillisFromTimestampLike(student.trialPurgeAt);
+  if (Number.isFinite(explicit)) return explicit;
+
+  const trialEndMs = getTrialEndMillis(student);
+  return Number.isFinite(trialEndMs)
+    ? trialEndMs + TRIAL_RETENTION_MS
+    : Number.NaN;
+};
+
+const getTrialLifecycleState = (student = {}, nowMs = Date.now()) => {
+  const trialEndMs = getTrialEndMillis(student);
+  if (!Number.isFinite(trialEndMs)) return { state: "not_trial" };
+  if (hasStudentMadePayment(student)) {
+    return { state: "converted", trialEndMs, purgeAtMs: getTrialPurgeMillis(student) };
+  }
+
+  const purgeAtMs = getTrialPurgeMillis(student);
+  if (nowMs < trialEndMs) return { state: "active", trialEndMs, purgeAtMs };
+  if (!Number.isFinite(purgeAtMs) || nowMs < purgeAtMs) {
+    return { state: "expired", trialEndMs, purgeAtMs };
+  }
+  return { state: "purge_due", trialEndMs, purgeAtMs };
+};
+
+const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
+  if (!student || hasStudentMadePayment(student)) return false;
+
+  // Trial accounts have their own lifecycle: 7 days of access plus a 30-day
+  // recovery window. Never let the generic 7-day unpaid-signup cleanup remove them.
+  if (Number.isFinite(getTrialEndMillis(student))) return false;
+
+  const joinedAtMs = getMillisFromTimestampLike(student.joined_at);
+  if (!Number.isFinite(joinedAtMs)) return false;
+
+  return joinedAtMs < cutoffMs;
+};
+
+const deleteFirestoreScoresForStudent = async (db, studentCode) => {
+  const raw = String(studentCode || "").trim();
+  if (!raw) return 0;
+
+  const codeVariants = Array.from(new Set([raw, raw.toUpperCase(), raw.toLowerCase()]));
+  const scoreRefs = new Map();
+
+  for (const field of ["studentcode", "studentCode"]) {
+    const snapshot = await db
+      .collection("scores")
+      .where(field, "in", codeVariants)
+      .get();
+    snapshot.docs.forEach((docSnap) => scoreRefs.set(docSnap.ref.path, docSnap.ref));
+  }
+
+  const refs = Array.from(scoreRefs.values());
+  let deleted = 0;
+  for (let offset = 0; offset < refs.length; offset += 400) {
+    const batch = db.batch();
+    refs.slice(offset, offset + 400).forEach((ref) => batch.delete(ref));
+    await batch.commit();
+    deleted += Math.min(400, refs.length - offset);
+  }
+  return deleted;
+};
+
+const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
+  const params = new URLSearchParams();
+  if (level) params.set("level", level);
+  if (className) params.set("className", className);
+  if (postId) params.set("postId", postId);
+  const query = params.toString();
+  return `/campus/discussion${query ? `?${query}` : ""}`;
+};
+
+const resolveNotificationRoute = (data = {}) => {
+  if (data.route) return data.route;
+  const type = String(data.type || "").toLowerCase();
+  if (data.postId || type.includes("discussion") || type.includes("class")) {
+    return buildDiscussionRoute(data);
+  }
+  if (type.includes("score") || type.includes("assignment")) {
+    return "/campus/results";
+  }
+  return "/";
+};
+
+const getFirestore = () => getAdmin().firestore();
+
+const normalizeTutorReviewStatus = (value) => {
+  const normalized = normalizeValue(value);
+  if (["approved", "approve", "done", "pass"].includes(normalized)) return "approved";
+  if (["needs_improvement", "needs-improvement", "improve", "revision"].includes(normalized)) {
+    return "needs_improvement";
+  }
+  if (["redo_required", "redo-required", "redo", "resubmit", "resubmission"].includes(normalized)) {
+    return "redo_required";
+  }
+  if (["pending", "queued", "new"].includes(normalized)) return "pending";
+  return normalized || "pending";
+};
+
+const isQuestionOfDayReview = (data = {}) =>
+  data.source === "exam-warm-up" || String(data.promptId || "").startsWith("exam-warmup");
+
+const getLatestTutorFeedback = (data = {}) => {
+  const latestTutorResponse = Array.isArray(data.tutorResponses)
+    ? data.tutorResponses[data.tutorResponses.length - 1]
+    : null;
+
+  return String(
+    latestTutorResponse?.tutorFeedback ||
+      latestTutorResponse?.message ||
+      latestTutorResponse?.text ||
+      data.tutorFeedback ||
+      data.reviewComment ||
+      ""
+  ).trim();
+};
+
+const hasReviewPhraseMistakes = (data = {}) => {
+  const { phraseMistakes } = data;
+  if (Array.isArray(phraseMistakes)) return phraseMistakes.length > 0;
+  if (phraseMistakes && typeof phraseMistakes === "object") return Object.keys(phraseMistakes).length > 0;
+  return Boolean(String(phraseMistakes || "").trim());
+};
+
+const notifyQuestionOfDaySubmissionCreated = async ({ reviewId, afterData = {} }) => {
+  if (!isQuestionOfDayReview(afterData)) return null;
+
+  const studentCode = afterData.studentCode || afterData.studentcode || afterData.ownerKey || "";
+  const tokenInfo = await fetchStudentMessagingToken(studentCode);
+  if (!tokenInfo?.tokens?.length) {
+    console.log(`notifyQuestionOfDaySubmissionCreated: no messaging token for ${studentCode}`);
+    return null;
+  }
+
+  const route = "/campus/question-of-day?tab=feedback";
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification: {
+      title: "Question of the Day submitted",
+      body: "Your answer was sent to your tutor. Feedback will appear in Teacher Feedback.",
+    },
+    data: {
+      type: "question_of_day_submitted",
+      reviewId: reviewId || "",
+      studentCode: String(studentCode || ""),
+      level: afterData.level || "",
+      route,
+    },
+    tokenOwners,
+  });
+
+  return null;
+};
+
+const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterData = {} }) => {
+  const beforeStatus = normalizeTutorReviewStatus(beforeData.reviewStatus || beforeData.status);
+  const afterStatus = normalizeTutorReviewStatus(afterData.reviewStatus || afterData.status);
+  const feedbackBefore = getLatestTutorFeedback(beforeData);
+  const feedbackAfter = getLatestTutorFeedback(afterData);
+  const feedbackAdded = !feedbackBefore && Boolean(feedbackAfter);
+  const statusChangedFromPending =
+    beforeStatus === "pending" && ["approved", "needs_improvement", "redo_required"].includes(afterStatus);
+  const phraseMistakesAdded = !hasReviewPhraseMistakes(beforeData) && hasReviewPhraseMistakes(afterData);
+
+  if (!statusChangedFromPending && !feedbackAdded && !phraseMistakesAdded) {
+    return null;
+  }
+
+  const studentCode =
+    afterData.studentCode || afterData.studentcode || afterData.ownerKey || beforeData.studentCode || "";
+
+  const tokenInfo = await fetchStudentMessagingToken(studentCode);
+  if (!tokenInfo?.tokens?.length) {
+    console.log(`notifyTutorReviewStatusUpdate: no messaging token for ${studentCode}`);
+    return null;
+  }
+
+  const questionOfDay = isQuestionOfDayReview(afterData);
+  const route = questionOfDay
+    ? "/campus/question-of-day?tab=feedback"
+    : afterData.source === "campus-writing"
+      ? "/campus/writing?tab=tutor"
+      : "/exams/writing?tab=tutor";
+  const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
+  const notification = questionOfDay
+    ? {
+        title:
+          afterStatus === "approved"
+            ? "Tutor approved your Question of the Day"
+            : ["needs_improvement", "redo_required"].includes(afterStatus)
+              ? "Tutor requested corrections"
+              : "Tutor feedback is ready",
+        body: "Your Question of the Day has been marked. Open Teacher Feedback to read it.",
+      }
+    : {
+        title:
+          afterStatus === "approved"
+            ? "Tutor approved your exam letter"
+            : ["needs_improvement", "redo_required"].includes(afterStatus)
+              ? "Tutor requested improvements"
+              : "New tutor feedback is available",
+        body: safeTruncate(
+          feedbackAfter ||
+            (afterStatus === "approved"
+              ? `${reviewLabel} is approved. Great work!`
+              : `${reviewLabel} has tutor feedback. Please review and revise.`),
+          140
+        ),
+      };
+
+  const data = questionOfDay
+    ? {
+        type: "question_of_day_feedback",
+        reviewId: reviewId || "",
+        studentCode: String(studentCode || ""),
+        level: afterData.level || "",
+        route,
+      }
+    : {
+        type: "exam_tutor_review",
+        reviewId: reviewId || "",
+        reviewStatus: afterStatus,
+        studentCode: String(studentCode || ""),
+        level: afterData.level || "",
+        route,
+      };
+
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification,
+    data,
+    tokenOwners,
+  });
+
+  return null;
+};
+
+const getTokensFromStudentData = (data = {}) => {
+  if (notificationsPaused(data)) return [];
+  const tokens = new Set();
+  if (data.messagingToken) {
+    tokens.add(data.messagingToken);
+  }
+  if (Array.isArray(data.messagingTokens)) {
+    data.messagingTokens.forEach((entry) => {
+      if (entry?.token) {
+        tokens.add(entry.token);
+      }
+    });
+  }
+  return Array.from(tokens);
+};
+
+const fetchStudentMessagingToken = async (studentCode) => {
+  if (!studentCode) return null;
+
+  const db = getFirestore();
+  const normalized = String(studentCode).trim();
+  const candidates = Array.from(
+    new Set([normalized, normalized.toLowerCase(), normalized.toUpperCase()])
+  ).filter(Boolean);
+
+  for (const id of candidates) {
+    const snap = await db.collection("students").doc(id).get();
+    if (!snap.exists) continue;
+
+    const data = snap.data() || {};
+    const tokens = getTokensFromStudentData(data);
+    if (!tokens.length) continue;
+
+    return { tokens, data, docId: snap.id };
+  }
+
+  const lookupFields = ["studentCode", "studentcode", "uid"];
+
+  for (const field of lookupFields) {
+    const snapshot = await db
+      .collection("students")
+      .where(field, "in", candidates)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) continue;
+
+    const docSnap = snapshot.docs[0];
+    const data = docSnap.data() || {};
+    const tokens = getTokensFromStudentData(data);
+    if (!tokens.length) continue;
+
+    return { tokens, data, docId: docSnap.id };
+  }
+
+  return null;
+};
+
+const findOwnedMessagingToken = async ({ authUid, authEmail = "", token }) => {
+  if (!authUid || !token) return null;
+
+  const db = getFirestore();
+  const candidates = new Map();
+  const addSnapshot = (snapshot) => {
+    if (!snapshot?.exists) return;
+    candidates.set(snapshot.id, snapshot);
+  };
+  const addQuerySnapshot = (snapshot) => {
+    snapshot?.docs?.forEach((docSnap) => candidates.set(docSnap.id, docSnap));
+  };
+
+  const directSnapshot = await db.collection("students").doc(authUid).get();
+  addSnapshot(directSnapshot);
+
+  const uidSnapshot = await db
+    .collection("students")
+    .where("uid", "==", authUid)
+    .limit(5)
+    .get();
+  addQuerySnapshot(uidSnapshot);
+
+  const normalizedEmail = String(authEmail || "").trim().toLowerCase();
+  if (normalizedEmail) {
+    for (const field of ["email", "authEmail", "loginEmail"]) {
+      const emailSnapshot = await db
+        .collection("students")
+        .where(field, "==", normalizedEmail)
+        .limit(5)
+        .get();
+      addQuerySnapshot(emailSnapshot);
+    }
+  }
+
+  for (const docSnap of candidates.values()) {
+    const data = docSnap.data() || {};
+    if (getTokensFromStudentData(data).includes(token)) {
+      return { docId: docSnap.id, data };
+    }
+  }
+
+  return null;
+};
+
+const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new Set() }) => {
+  const db = getFirestore();
+  const snapshot = await db
+    .collection("students")
+    .where("level", "==", level)
+    .where("className", "==", className)
+    .get();
+
+  const tokens = new Set();
+  const tokenOwners = new Map();
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data() || {};
+    const studentCode = String(data.studentcode || docSnap.id || "").toLowerCase();
+
+    if (excludeCodes.has(studentCode)) return;
+
+    const docTokens = getTokensFromStudentData(data);
+    docTokens.forEach((token) => {
+      if (!token) return;
+      tokens.add(token);
+      tokenOwners.set(token, docSnap.id);
+    });
+  });
+
+  return { tokens: Array.from(tokens), tokenOwners };
+};
+
+const fetchAnnouncementTokens = async ({ className, program } = {}) => {
+  const db = getFirestore();
+  const baseRef = db.collection("students");
+  const programFields = program ? ["program", "language", "lang"] : [null];
+  const snapshots = await Promise.all(
+    programFields.map((field) => {
+      let queryRef = baseRef;
+      if (className) {
+        queryRef = queryRef.where("className", "==", className);
+      }
+      if (program && field) {
+        queryRef = queryRef.where(field, "==", program);
+      }
+      return queryRef.get();
+    })
+  );
+
+  const tokens = new Set();
+  const tokenOwners = new Map();
+
+  snapshots.forEach((snapshot) => {
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      const docTokens = getTokensFromStudentData(data);
+      docTokens.forEach((token) => {
+        if (!token) return;
+        tokens.add(token);
+        tokenOwners.set(token, docSnap.id);
+      });
+    });
+  });
+
+  return { tokens: Array.from(tokens), tokenOwners };
+};
+
+const mergeTokenResults = (current, next) => {
+  next.tokens.forEach((token) => {
+    current.tokens.add(token);
+    if (next.tokenOwners.has(token) && !current.tokenOwners.has(token)) {
+      current.tokenOwners.set(token, next.tokenOwners.get(token));
+    }
+  });
+  return current;
+};
+
+const getInvalidTokenReason = (code = "") => {
+  return [
+    "messaging/invalid-registration-token",
+    "messaging/registration-token-not-registered",
+  ].includes(code)
+    ? code
+    : null;
+};
+
+const cleanupInvalidTokens = async (tokenOwners, invalidTokens) => {
+  if (!invalidTokens.length) return null;
+  const db = getFirestore();
+  const updates = new Map();
+
+  invalidTokens.forEach((token) => {
+    const docId = tokenOwners.get(token);
+    if (!docId) return;
+    if (!updates.has(docId)) {
+      updates.set(docId, new Set());
+    }
+    updates.get(docId).add(token);
+  });
+
+  if (!updates.size) return null;
+
+  await Promise.all(
+    Array.from(updates.entries()).map(async ([docId, tokensToRemove]) => {
+      const docRef = db.collection("students").doc(docId);
+      const snap = await docRef.get();
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      const existing = Array.isArray(data.messagingTokens) ? data.messagingTokens : [];
+      const filtered = existing.filter((entry) => !tokensToRemove.has(entry?.token));
+      const updatesPayload = { messagingTokens: filtered };
+      if (data.messagingToken && tokensToRemove.has(data.messagingToken)) {
+        updatesPayload.messagingToken = FieldValue.delete();
+      }
+      await docRef.set(updatesPayload, { merge: true });
+    })
+  );
+
+  return null;
+};
+
+const sendNotifications = async ({
+  tokens = [],
+  notification = {},
+  data = {},
+  tokenOwners = new Map(),
+}) => {
+  const allowedOwners = new Set();
+  for (const id of new Set(tokenOwners.values())) if (await currentNotificationStudent(getFirestore(), id)) allowedOwners.add(id);
+  tokens = tokens.filter(token => allowedOwners.has(tokenOwners.get(token)));
+  if (!tokens.length) return null;
+
+  const messaging = getAdmin().messaging();
+  const chunks = [];
+  const invalidTokens = new Set();
+  const webpushOptions = {
+    headers: {
+      TTL: "86400",
+      Urgency: "high",
+    },
+    notification: {
+      title: notification.title || "Falowen",
+      body: notification.body || "You have a new Falowen update.",
+      icon: "/logo192.png",
+      actions: [{ action: "open", title: "Open" }],
+      data: { ...data },
+    },
+    fcmOptions: data?.route ? { link: absolutePushLink(data.route) } : undefined,
+  };
+
+  for (let i = 0; i < tokens.length; i += NOTIFICATION_BATCH_SIZE) {
+    chunks.push(tokens.slice(i, i + NOTIFICATION_BATCH_SIZE));
+  }
+
+  for (const chunk of chunks) {
+    const response = await messaging.sendEachForMulticast({
+      tokens: chunk,
+      notification,
+      data,
+      webpush: webpushOptions,
+    });
+    response.responses.forEach((result, index) => {
+      if (result.success) return;
+      const reason = getInvalidTokenReason(result.error?.code);
+      if (!reason) return;
+      invalidTokens.add(chunk[index]);
+    });
+  }
+
+  if (invalidTokens.size) {
+    await cleanupInvalidTokens(tokenOwners, Array.from(invalidTokens));
+  }
+
+  return null;
+};
+
+exports.sendPushTestNotification = onCall(
+  { region: "europe-west1", timeoutSeconds: 30 },
+  async (request) => {
+    const authUid = request.auth?.uid || "";
+    if (!authUid) {
+      console.warn("push_test_rejected", { reason: "unauthenticated" });
+      throw new HttpsError("unauthenticated", "Please sign in before sending a test notification.");
+    }
+
+    const token = normalizeCallableText(request.data?.token, 4096);
+    if (!token) {
+      throw new HttpsError(
+        "invalid-argument",
+        "This device does not have an active push token. Refresh this device first."
+      );
+    }
+
+    const owner = await findOwnedMessagingToken({
+      authUid,
+      authEmail: request.auth?.token?.email || "",
+      token,
+    });
+    if (!owner) {
+      console.warn("push_test_rejected", { reason: "token_not_owned_by_current_account" });
+      throw new HttpsError(
+        "permission-denied",
+        "This push token is not registered to your signed-in student account. Refresh this device and try again."
+      );
+    }
+
+    const requestedDelay = Number(request.data?.delaySeconds);
+    const delaySeconds = Number.isFinite(requestedDelay)
+      ? Math.min(Math.max(Math.round(requestedDelay), 0), 15)
+      : 8;
+
+    if (delaySeconds > 0) {
+      await new Promise((resolve) => setTimeout(resolve, delaySeconds * 1000));
+    }
+
+    const route = "/campus/account";
+    const data = {
+      type: "push_test",
+      route,
+      sentAt: new Date().toISOString(),
+    };
+    if (!await currentNotificationStudent(getFirestore(), owner.docId)) {
+      console.warn("push_test_rejected", { reason: "notifications_paused" });
+      throw new HttpsError("permission-denied", "Notifications are paused during account deletion.");
+    }
+    const response = await getAdmin().messaging().sendEachForMulticast({
+      tokens: [token],
+      notification: {
+        title: "Falowen background test",
+        body: "Background push is working on this device.",
+      },
+      data,
+      webpush: {
+        headers: {
+          TTL: "300",
+          Urgency: "high",
+        },
+        notification: {
+          title: "Falowen background test",
+          body: "Background push is working on this device.",
+          icon: "/logo192.png",
+          actions: [{ action: "open", title: "Open" }],
+          data: { ...data },
+        },
+        fcmOptions: { link: absolutePushLink(route) },
+      },
+    });
+
+    const result = response.responses[0];
+    if (!result?.success) {
+      const errorCode = result?.error?.code || "messaging/unknown";
+      const invalidReason = getInvalidTokenReason(errorCode);
+      // Log only the provider error code, never the device token.
+      console.error("push_test_delivery_failed", {
+        firebaseCode: errorCode,
+        staleToken: Boolean(invalidReason),
+      });
+      if (invalidReason) {
+        await cleanupInvalidTokens(
+          new Map([[token, owner.docId]]),
+          [token]
+        );
+      }
+
+      throw new HttpsError(
+        "failed-precondition",
+        invalidReason
+          ? "This device token is stale. Tap Refresh this device, then try the screen-off test again."
+          : "Falowen could not send the test push. Please try again.",
+        { code: errorCode }
+      );
+    }
+
+    console.info("push_test_delivered", { delaySeconds });
+    return { ok: true, delaySeconds };
+  }
+);
+
+const getThreadMetadata = async (threadId) => {
+  const db = getFirestore();
+
+  const snapshot = await db
+    .collectionGroup("posts")
+    .where(FieldPath.documentId(), "==", threadId)
+    .limit(1)
+    .get();
+
+  if (snapshot.empty) return null;
+
+  const docSnap = snapshot.docs[0];
+  const data = docSnap.data() || {};
+  const classDocRef = docSnap.ref.parent.parent;
+  const levelDocRef = classDocRef?.parent?.parent;
+
+  return {
+    ...data,
+    level: levelDocRef?.id || data.level,
+    className: classDocRef?.id || data.className,
+  };
+};
+
+exports.api = onRequest(
+  {
+    region: "europe-west1",
+    cors: true,
+    secrets: [
+      "OPENAI_API_KEY",
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      "PAYSTACK_SECRET",
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+      RESULTS_SHEET_PUBLISHED_CSV_URL,
+      ZOOM_WEBHOOK_SECRET,
+    ],
+  },
+  (req, res) => {
+    process.env.RESULTS_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
+    process.env.SCORES_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
+    return getApp()(req, res);
+  }
+);
+
+// When a student doc is created in Firestore, append to Students sheet (safe header-mapped append)
+exports.onStudentCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "students/{studentCode}",
+    retry: true,
+    secrets: [
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+    ],
+  },
+  async (event) => {
+    console.log("onStudentCreated fired for", event.params.studentCode);
+
+    const snap = event.data;
+    if (!snap) return;
+
+    const student = snap.data();
+    if (student.systemDeletionTest && String(student.uid || "").startsWith("e2e-account-delete-")) {
+      const identity = await getAdmin().auth().getUser(student.uid).catch(error => {
+        if (error.code === "auth/user-not-found") return null;
+        throw error;
+      });
+      if (!identity || identity.customClaims?.systemDeletionTest === true) return null;
+    }
+    if (!student) return;
+
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
+
+    const result = await deliverCurrentStudentToSheet({
+      snapshot: snap,
+      appendStudent: getStudentAppender(),
+      studentCode,
+    });
+
+    console.log("onStudentCreated -> sheet sync result:", result);
+  }
+);
+
+
+// Keep Students sheet in sync when student records change (e.g., payment webhooks)
+exports.onStudentUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "students/{studentCode}",
+    retry: true,
+    secrets: [
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+    ],
+  },
+  async (event) => {
+    const after = event.data?.after;
+    if (!after?.exists) return;
+
+    const student = after.data();
+    if (student.systemDeletionTest && String(student.uid || "").startsWith("e2e-account-delete-")) {
+      const identity = await getAdmin().auth().getUser(student.uid).catch(error => {
+        if (error.code === "auth/user-not-found") return null;
+        throw error;
+      });
+      if (!identity || identity.customClaims?.systemDeletionTest === true) return null;
+    }
+    if (!student) return;
+
+    // Firestore changes for learning progress, activity and push tokens do not
+    // affect any column in the Students Sheet. Avoid expensive Sheets API work.
+    if (!shouldSyncStudentSheet(event.data?.before?.data(), student)) {
+      console.log("onStudentUpdated: sheet columns unchanged; skipping sync", event.params.studentCode);
+      return;
+    }
+
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
+    const result = await deliverCurrentStudentToSheet({
+      snapshot: after,
+      appendStudent: getStudentAppender(),
+      studentCode,
+    });
+
+    console.log("onStudentUpdated -> sheet sync result:", result);
+  }
+);
+
+exports.archiveOldThreads = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every 24 hours",
+    timeZone: "Etc/UTC",
+  },
+  async () => {
+    const db = getFirestore();
+    const cutoff = getAdmin().firestore.Timestamp.fromMillis(Date.now() - THIRTY_DAYS_IN_MS);
+    const snapshot = await db.collectionGroup("posts").where("createdAt", "<", cutoff).get();
+
+    if (snapshot.empty) {
+      console.log("archiveOldThreads: no threads older than cutoff");
+      return null;
+    }
+
+    const batches = [];
+    let batch = db.batch();
+    let batchWriteCount = 0;
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const level = data.level;
+      const className = data.className;
+
+      if (!level || !className) {
+        console.warn(`archiveOldThreads: missing class metadata for post ${docSnap.id}`);
+        return;
+      }
+
+      const archiveRef = db
+        .collection("class_board")
+        .doc(level)
+        .collection("classes")
+        .doc(className)
+        .collection("archived")
+        .doc(docSnap.id);
+
+      batch.set(archiveRef, {
+        ...data,
+        status: "archived",
+        archivedAt: FieldValue.serverTimestamp(),
+      });
+      batch.delete(docSnap.ref);
+      batchWriteCount += 2;
+
+      if (batchWriteCount >= 400) {
+        batches.push(batch.commit());
+        batch = db.batch();
+        batchWriteCount = 0;
+      }
+    });
+
+    if (batchWriteCount > 0) {
+      batches.push(batch.commit());
+    }
+
+    await Promise.all(batches);
+    console.log(`archiveOldThreads: archived ${snapshot.size} threads`);
+
+    return null;
+  }
+);
+
+
+exports.cleanupExpiredTrials = onSchedule(
+  {
+    region: "europe-west1",
+    timeoutSeconds: 540,
+    schedule: "every day 02:45",
+    timeZone: "Etc/UTC",
+    secrets: [
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+      RESULTS_SHEET_PUBLISHED_CSV_URL,
+    ],
+  },
+  async () => {
+    const db = getFirestore();
+    const auth = getAdmin().auth();
+    const nowMs = Date.now();
+
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    await require("./accountDeletion")._purgeDueAccounts({
+      db, auth,
+      purgeSheets: (identity) => getStudentSheetPurger()({ ...identity, scoresSpreadsheetUrl: RESULTS_SHEET_PUBLISHED_CSV_URL.value(), scoresTabName: "scores_backup" }),
+    });
+
+    const snapshot = await db.collection("students").get();
+    if (snapshot.empty) {
+      console.log("cleanupExpiredTrials: no student records found");
+      return null;
+    }
+
+    let trialRecords = 0;
+    let markedActive = 0;
+    let markedExpired = 0;
+    let converted = 0;
+    let purged = 0;
+    let scoreDocsDeleted = 0;
+    let sheetStudentRowsDeleted = 0;
+    let sheetScoreRowsDeleted = 0;
+    let failed = 0;
+
+    for (const docSnap of snapshot.docs) {
+      const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
+      const lifecycle = getTrialLifecycleState(student, nowMs);
+      if (lifecycle.state === "not_trial") continue;
+      trialRecords += 1;
+
+      const currentStatus = normalizeValue(student.status);
+      const expectedTrialEndIso = Number.isFinite(lifecycle.trialEndMs)
+        ? new Date(lifecycle.trialEndMs).toISOString()
+        : "";
+      const expectedPurgeIso = Number.isFinite(lifecycle.purgeAtMs)
+        ? new Date(lifecycle.purgeAtMs).toISOString()
+        : "";
+
+      if (lifecycle.state === "converted") {
+        const updates = {
+          trialRetentionStatus: "converted",
+          updated_at: FieldValue.serverTimestamp(),
+        };
+        if (currentStatus === "trial_active" || currentStatus === "trial_expired") {
+          updates.status = "Active";
+        }
+        if (!student.trialConvertedAt) {
+          updates.trialConvertedAt = FieldValue.serverTimestamp();
+        }
+        if (student.trialPurgeAt) {
+          updates.trialPurgeAt = FieldValue.delete();
+        }
+        await docSnap.ref.set(updates, { merge: true });
+        converted += 1;
+        continue;
+      }
+
+      if (lifecycle.state === "active") {
+        const updates = {};
+        if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso;
+        if (currentStatus !== "trial_active") updates.status = "trial_active";
+        if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
+          updates.trialPurgeAt = expectedPurgeIso;
+        }
+        if (student.trialRetentionStatus !== "active") updates.trialRetentionStatus = "active";
+        if (Object.keys(updates).length) {
+          updates.updated_at = FieldValue.serverTimestamp();
+          await docSnap.ref.set(updates, { merge: true });
+        }
+        markedActive += 1;
+        continue;
+      }
+
+      if (lifecycle.state === "expired") {
+        const updates = {};
+        if (!student.trialEndsAt && expectedTrialEndIso) updates.trialEndsAt = expectedTrialEndIso;
+        if (currentStatus !== "trial_expired") updates.status = "trial_expired";
+        if (expectedPurgeIso && String(student.trialPurgeAt || "") !== expectedPurgeIso) {
+          updates.trialPurgeAt = expectedPurgeIso;
+        }
+        if (student.trialRetentionStatus !== "retained") updates.trialRetentionStatus = "retained";
+        if (!student.trialExpiredAt) updates.trialExpiredAt = FieldValue.serverTimestamp();
+        if (Object.keys(updates).length) {
+          updates.updated_at = FieldValue.serverTimestamp();
+          await docSnap.ref.set(updates, { merge: true });
+        }
+        markedExpired += 1;
+        continue;
+      }
+
+      const studentCode = String(
+        student.studentCode || student.studentcode || docSnap.id || ""
+      ).trim();
+      const uid = String(student.uid || "").trim();
+      const email = String(student.email || "").trim();
+
+      try {
+        const sheetResult = await getStudentSheetPurger()({
+          studentCode,
+          uid,
+          email,
+          scoresSpreadsheetUrl: RESULTS_SHEET_PUBLISHED_CSV_URL.value(),
+          scoresTabName: "scores_backup",
+        });
+        sheetStudentRowsDeleted += Number(sheetResult?.studentRowsDeleted || 0);
+        sheetScoreRowsDeleted += Number(sheetResult?.scoreRowsDeleted || 0);
+
+        scoreDocsDeleted += await deleteFirestoreScoresForStudent(db, studentCode);
+
+        if (uid) {
+          try {
+            await auth.deleteUser(uid);
+          } catch (error) {
+            if (error?.code !== "auth/user-not-found") throw error;
+          }
+        }
+
+        if (typeof db.recursiveDelete === "function") {
+          await db.recursiveDelete(docSnap.ref);
+        } else {
+          await docSnap.ref.delete();
+        }
+        purged += 1;
+      } catch (error) {
+        failed += 1;
+        console.error("cleanupExpiredTrials: purge failed", {
+          studentId: docSnap.id,
+          studentCode,
+          errorMessage: error?.message || String(error),
+          code: error?.code,
+        });
+        await docSnap.ref.set(
+          {
+            status: "trial_expired",
+            trialRetentionStatus: "purge_failed",
+            purgeStatus: "failed",
+            purgeError: String(error?.message || "unknown"),
+            purgeFailedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
+    }
+
+    console.log("cleanupExpiredTrials: completed", {
+      scanned: snapshot.size,
+      trialRecords,
+      markedActive,
+      markedExpired,
+      converted,
+      purged,
+      scoreDocsDeleted,
+      sheetStudentRowsDeleted,
+      sheetScoreRowsDeleted,
+      failed,
+      retentionDays: TRIAL_RETENTION_DAYS,
+    });
+
+    return null;
+  }
+);
+
+exports.cleanupStaleUnpaidSignups = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every day 02:30",
+    timeZone: "Etc/UTC",
+  },
+  async () => {
+    const db = getFirestore();
+    const auth = getAdmin().auth();
+    const cutoffMs = Date.now() - UNPAID_SIGNUP_GRACE_MS;
+
+    const pendingSnapshot = await db
+      .collection("students")
+      .where("paymentStatus", "==", "pending")
+      .get();
+
+    if (pendingSnapshot.empty) {
+      console.log("cleanupStaleUnpaidSignups: no pending signup records found");
+      return null;
+    }
+
+    const staleDocs = pendingSnapshot.docs.filter((docSnap) =>
+      isStaleUnpaidSignup(docSnap.data() || {}, cutoffMs)
+    );
+
+    if (!staleDocs.length) {
+      console.log("cleanupStaleUnpaidSignups: no stale unpaid signups eligible for deletion");
+      return null;
+    }
+
+    let deletedDocs = 0;
+    let deletedAuthUsers = 0;
+
+    for (const docSnap of staleDocs) {
+      const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
+      const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
+      const uid = String(student.uid || "").trim();
+
+      if (uid) {
+        try {
+          await auth.deleteUser(uid);
+          deletedAuthUsers += 1;
+        } catch (error) {
+          if (error?.code !== "auth/user-not-found") {
+            console.error("cleanupStaleUnpaidSignups: failed to delete auth user", {
+              studentCode,
+              uid,
+              errorMessage: error?.message,
+              code: error?.code,
+            });
+            continue;
+          }
+        }
+      }
+
+      await docSnap.ref.delete();
+      deletedDocs += 1;
+    }
+
+    console.log("cleanupStaleUnpaidSignups: completed", {
+      scannedPending: pendingSnapshot.size,
+      staleCandidates: staleDocs.length,
+      deletedDocs,
+      deletedAuthUsers,
+      graceDays: UNPAID_SIGNUP_GRACE_DAYS,
+    });
+
+    return null;
+  }
+);
+
+exports.cleanupExpiredStudentContracts = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every day 03:00",
+    timeZone: "Etc/UTC",
+  },
+  async () => {
+    const db = getAdmin().firestore();
+    const auth = getAdmin().auth();
+    const nowMs = Date.now();
+
+    let scanned = 0;
+    let deletedDocs = 0;
+    let deletedAuthUsers = 0;
+    let missingAuthUsers = 0;
+    let skippedWithinGrace = 0;
+    let skippedInvalid = 0;
+    let skippedNonStudent = 0;
+    let skippedFailed = 0;
+    let firestoreFailed = 0;
+
+    let lastDoc = null;
+    while (true) {
+      let query = db
+        .collection("students")
+        .where("contractEnd", ">", "")
+        .orderBy("contractEnd")
+        .limit(50);
+
+      if (lastDoc) {
+        query = query.startAfter(lastDoc);
+      }
+
+      const snapshot = await query.get();
+      if (snapshot.empty) break;
+
+      lastDoc = snapshot.docs[snapshot.docs.length - 1];
+
+      for (const docSnap of snapshot.docs) {
+        scanned += 1;
+        const student = docSnap.data() || {};
+      const deletionUid = String(student.uid || docSnap.id);
+      if (require("./accountDeletion")._isBlocked((await db.collection("accountDeletionRequests").doc(deletionUid).get()).data())) continue;
+
+        if (student.purgeStatus === "failed") {
+          skippedFailed += 1;
+          continue;
+        }
+
+        if (student.role && student.role !== "student") {
+          skippedNonStudent += 1;
+          continue;
+        }
+
+        const contractEndMs = getContractEndMillis(student.contractEnd);
+        if (!Number.isFinite(contractEndMs)) {
+          skippedInvalid += 1;
+          continue;
+        }
+
+        if (contractEndMs + CONTRACT_EXPIRY_GRACE_MS >= nowMs) {
+          skippedWithinGrace += 1;
+          continue;
+        }
+
+        const uid = String(student.uid || "").trim();
+        if (uid) {
+          try {
+            await auth.deleteUser(uid);
+            deletedAuthUsers += 1;
+          } catch (error) {
+            if (error?.code === "auth/user-not-found") {
+              missingAuthUsers += 1;
+            } else {
+              console.error("cleanupExpiredStudentContracts: failed to delete auth user", {
+                studentId: docSnap.id,
+                uid,
+                errorMessage: error?.message,
+                code: error?.code,
+              });
+            }
+          }
+        }
+
+        try {
+          if (typeof db.recursiveDelete === "function") {
+            await db.recursiveDelete(docSnap.ref);
+          } else {
+            await docSnap.ref.delete();
+          }
+          deletedDocs += 1;
+        } catch (error) {
+          firestoreFailed += 1;
+          console.error("cleanupExpiredStudentContracts: failed to delete firestore doc", {
+            studentId: docSnap.id,
+            errorMessage: error?.message,
+          });
+
+          await docSnap.ref.set(
+            {
+              purgeStatus: "failed",
+              purgeError: String(error?.message || "unknown"),
+              purgeFailedAt: FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
+        }
+      }
+    }
+
+    console.log("cleanupExpiredStudentContracts: completed", {
+      scanned,
+      deletedDocs,
+      deletedAuthUsers,
+      missingAuthUsers,
+      skippedWithinGrace,
+      skippedInvalid,
+      skippedNonStudent,
+      skippedFailed,
+      firestoreFailed,
+      graceDays: CONTRACT_EXPIRY_GRACE_DAYS,
+    });
+
+    return null;
+  }
+);
+
+const getNewResponses = (beforeData = {}, afterData = {}) => {
+  const beforeResponses = Array.isArray(beforeData.responses)
+    ? beforeData.responses
+    : [];
+  const afterResponses = Array.isArray(afterData.responses) ? afterData.responses : [];
+
+  if (afterResponses.length <= beforeResponses.length) {
+    return [];
+  }
+
+  return afterResponses.slice(beforeResponses.length);
+};
+
+const notifyNewReply = async ({ threadId, beforeData = {}, afterData = {} }) => {
+  const newResponses = getNewResponses(beforeData, afterData);
+  if (!newResponses.length) return null;
+
+  const latest = newResponses[newResponses.length - 1];
+  const thread = await getThreadMetadata(threadId);
+
+  if (!thread?.level || !thread?.className) {
+    console.warn(`notifyNewReply: missing thread metadata for ${threadId}`);
+    return null;
+  }
+
+  const excludeCodes = new Set();
+  if (latest.responderCode) {
+    excludeCodes.add(String(latest.responderCode).toLowerCase());
+  }
+
+  const { tokens, tokenOwners } = await fetchClassMessagingTokens({
+    level: thread.level,
+    className: thread.className,
+    excludeCodes,
+  });
+
+  if (!tokens.length) {
+    console.log(`notifyNewReply: no tokens for ${thread.level}/${thread.className}`);
+    return null;
+  }
+
+  const notification = {
+    title: `New reply from ${latest.responder || "a classmate"}`,
+    body:
+      safeTruncate(latest.text, 140) ||
+      safeTruncate(thread.question || thread.questionTitle || "There's a new reply."),
+  };
+
+  const data = {
+    level: thread.level || "",
+    className: thread.className || "",
+    postId: threadId,
+    responseId: String(latest.id || latest.responderCode || latest.responder || ""),
+  };
+  data.route = resolveNotificationRoute(data);
+
+  await sendNotifications({ tokens, notification, data, tokenOwners });
+  return null;
+};
+
+const notifyAssignmentScore = async ({ attemptId, attempt }) => {
+  const studentCode =
+    attempt.studentCode || attempt.studentcode || attempt.student_code || attempt.student || "";
+
+  const tokenInfo = await fetchStudentMessagingToken(studentCode);
+  if (!tokenInfo?.tokens?.length) {
+    console.log(`notifyAssignmentScore: no messaging token for ${studentCode}`);
+    return null;
+  }
+
+  const assignmentLabel =
+    attempt.assignmentText || attempt.assignment || attempt.assignmentId || "your assignment";
+
+  const notification = {
+    title: "Your assignment has been marked",
+    body: safeTruncate(
+      typeof attempt.score === "number"
+        ? `${assignmentLabel}: you scored ${attempt.score}`
+        : `${assignmentLabel} has new feedback.`,
+      140
+    ),
+  };
+
+  const data = {
+    type: "score_update",
+    studentCode: String(studentCode || ""),
+    assignmentId: String(attempt.assignmentId || ""),
+    attemptId: attemptId || "",
+    level: attempt.level || "",
+  };
+  data.route = resolveNotificationRoute(data);
+
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification,
+    data,
+    tokenOwners,
+  });
+  return null;
+};
+
+exports.onClassBoardPostCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "class_board/{level}/classes/{className}/posts/{postId}",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return null;
+
+    const data = snap.data();
+    const { level, className, postId } = event.params;
+
+    if (!data || !level || !className) return null;
+
+    const { tokens, tokenOwners } = await fetchClassMessagingTokens({ level, className });
+
+    if (!tokens.length) {
+      console.log(`onClassBoardPostCreated: no tokens for ${level}/${className}`);
+      return null;
+    }
+
+    const notification = {
+      title: data.questionTitle || data.topic || "New class discussion",
+      body:
+        safeTruncate(data.question, 140) ||
+        safeTruncate(data.instructions, 140) ||
+        "A new class discussion thread was posted.",
+    };
+
+    const payload = {
+      level: level || "",
+      className: className || "",
+      postId: postId || "",
+    };
+    payload.route = resolveNotificationRoute(payload);
+
+    await sendNotifications({ tokens, notification, data: payload, tokenOwners });
+    return null;
+  }
+);
+
+exports.onAnnouncementCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "announcements/{announcementId}",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return null;
+
+    const data = snap.data() || {};
+    const announcementId = event.params.announcementId;
+
+    const audience = normalizeValue(data.audience || data.scope || data.target || "");
+    const className =
+      data.className || data.class || data.classname || "";
+    const language = normalizeValue(data.language || data.program || data.lang || "");
+    const languages = Array.isArray(data.languages)
+      ? data.languages.map(normalizeValue).filter(Boolean)
+      : [];
+
+    const requestedLanguages = [];
+    if (language && language !== "all") {
+      requestedLanguages.push(language);
+    } else if (languages.length) {
+      requestedLanguages.push(...languages.filter((value) => value !== "all"));
+    }
+
+    const targetClassName = className && audience !== "all" ? className : className || "";
+
+    const tokenResult = { tokens: new Set(), tokenOwners: new Map() };
+
+    if (requestedLanguages.length) {
+      for (const program of requestedLanguages) {
+        const result = await fetchAnnouncementTokens({
+          className: targetClassName,
+          program,
+        });
+        mergeTokenResults(tokenResult, result);
+      }
+    } else {
+      const result = await fetchAnnouncementTokens({
+        className: targetClassName,
+        program: "",
+      });
+      mergeTokenResults(tokenResult, result);
+    }
+
+    const tokens = Array.from(tokenResult.tokens);
+    if (!tokens.length) {
+      console.log("onAnnouncementCreated: no messaging tokens found");
+      return null;
+    }
+
+    const notification = {
+      title: data.title || data.headline || "New announcement",
+      body:
+        safeTruncate(data.message, 140) ||
+        safeTruncate(data.body, 140) ||
+        safeTruncate(data.description, 140) ||
+        "A new announcement is available.",
+    };
+
+    const linkUrl = data.linkUrl || data.link || data.url || "";
+
+    const payload = {
+      type: "announcement",
+      announcementId,
+      className: className || "",
+      language: language || "",
+    };
+    if (linkUrl) {
+      payload.route = linkUrl;
+    }
+
+    await sendNotifications({
+      tokens,
+      notification,
+      data: payload,
+      tokenOwners: tokenResult.tokenOwners,
+    });
+    return null;
+  }
+);
+
+exports.onQaPostCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "qa_posts/{threadId}",
+  },
+  async (event) => {
+    const afterData = event.data?.data() || {};
+    await notifyNewReply({ threadId: event.params.threadId, beforeData: {}, afterData });
+  }
+);
+
+exports.onQaPostUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "qa_posts/{threadId}",
+  },
+  async (event) => {
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+
+    await notifyNewReply({ threadId: event.params.threadId, beforeData, afterData });
+  }
+);
+
+exports.onScoreCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "scores/{attemptId}",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return null;
+
+    const attempt = snap.data() || {};
+    await notifyAssignmentScore({ attemptId: event.params.attemptId, attempt });
+  }
+);
+
+exports.onAttendanceSessionUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "attendance/{className}/sessions/{sessionId}",
+  },
+  async (event) => {
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+    const newlyPresentCodes = getNewlyPresentCodes({ before: beforeData, after: afterData });
+
+    if (!newlyPresentCodes.length) return null;
+
+    const { className = "", sessionId = "" } = event.params;
+    const level = afterData.level || beforeData.level || "";
+    const topic =
+      afterData.sessionLabel ||
+      afterData.topic ||
+      afterData.title ||
+      afterData.chapter ||
+      beforeData.sessionLabel ||
+      beforeData.topic ||
+      beforeData.title ||
+      beforeData.chapter ||
+      "Class session";
+
+    await Promise.all(
+      newlyPresentCodes.map(async (studentCode) => {
+        const tokenInfo = await fetchStudentMessagingToken(studentCode);
+        if (!tokenInfo?.tokens?.length) return null;
+
+        const notification = {
+          title: "Attendance updated",
+          body: safeTruncate(`You were marked present for ${topic}.`, 140),
+        };
+
+        const data = {
+          type: "attendance_update",
+          status: "present",
+          studentCode,
+          className,
+          level,
+          sessionId,
+          topic,
+          route: "/campus",
+        };
+
+        const tokenOwners = tokenInfo.docId
+          ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+          : new Map();
+
+        await sendNotifications({
+          tokens: tokenInfo.tokens,
+          notification,
+          data,
+          tokenOwners,
+        });
+        return null;
+      })
+    );
+
+    return null;
+  }
+);
+
+
+exports.onAttendanceCheckinWritten = onDocumentWritten(
+  {
+    region: "europe-west1",
+    document: "attendance/{classId}/sessions/{sessionId}/checkins/{checkinId}",
+  },
+  async (event) => {
+    const afterData = event.data?.after?.data() || {};
+    if (!event.data?.after?.exists) return null;
+
+    const { classId = "", sessionId = "", checkinId = "" } = event.params;
+    const db = getFirestore();
+
+    const sessionRef = db.collection("attendance").doc(classId).collection("sessions").doc(sessionId);
+    const sessionSnap = await sessionRef.get();
+    const sessionData = sessionSnap.exists ? sessionSnap.data() || {} : {};
+
+    const assignmentId = String(afterData.assignmentId || sessionData.assignmentId || "").trim();
+    if (!assignmentId) return null;
+
+    const level =
+      String(afterData.level || sessionData.level || "")
+        .trim()
+        .toUpperCase() || "";
+    const canonicalAssignmentKey = resolveAssignmentCanonicalKey({ level, assignmentId });
+    if (!canonicalAssignmentKey) return null;
+
+    const studentCode = normalizeStudentCode(
+      afterData.studentCode ||
+        afterData.studentcode ||
+        sessionData.studentCode ||
+        sessionData.studentcode ||
+        checkinId
+    );
+    if (!studentCode) return null;
+
+    const progressRef = db
+      .collection("students")
+      .doc(studentCode)
+      .collection("assignmentProgress")
+      .doc(canonicalAssignmentKey);
+
+    await progressRef.set(
+      {
+        assignmentId,
+        canonicalAssignmentKey,
+        completed: true,
+        completedAt: FieldValue.serverTimestamp(),
+        source: "attendance_checkin",
+        classId,
+        sessionId,
+        checkinId,
+        level,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return null;
+  }
+);
+
+
+exports.onExamTutorReviewCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "examTutorReviewQueue/{reviewId}",
+  },
+  async (event) => {
+    const afterData = event.data?.data() || {};
+    await notifyQuestionOfDaySubmissionCreated({
+      reviewId: event.params.reviewId,
+      afterData,
+    });
+    return null;
+  }
+);
+
+
+const REQUIRED_RESUBMISSION_STRING_FIELDS = [
+  "canonicalAssignmentKey",
+  "assignmentKey",
+  "assignmentId",
+  "level",
+  "submissionText",
+  "improvementSummary",
+];
+const FORBIDDEN_CLIENT_TIMESTAMP_FIELDS = ["createdAt", "updatedAt", "submittedAt", "resubmittedAt"];
+
+const isPlainObject = (value) => value && typeof value === "object" && !Array.isArray(value);
+
+const hasFirestoreSentinelLikeValue = (value, seen = new Set()) => {
+  if (!value || typeof value !== "object") return false;
+  if (seen.has(value)) return false;
+  seen.add(value);
+  if (isFirestoreServerTimestampSentinel(value)) return true;
+  if (typeof value._methodName === "string" || typeof value.methodName === "string") return true;
+  return Object.values(value).some((entry) => hasFirestoreSentinelLikeValue(entry, seen));
+};
+
+const requireNonEmptyString = (data, fieldName, maxLength = 12000) => {
+  if (typeof data[fieldName] !== "string" || !data[fieldName].trim()) {
+    throw new HttpsError("invalid-argument", `${fieldName} must be a non-empty string.`);
+  }
+  return normalizeCallableText(data[fieldName], maxLength);
+};
+
+
+const requireString = (data, fieldName, maxLength = 12000) => {
+  if (typeof data[fieldName] !== "string") {
+    throw new HttpsError("invalid-argument", `${fieldName} must be a string.`);
+  }
+  return normalizeCallableText(data[fieldName], maxLength);
+};
+
+const requireFiniteNumber = (data, fieldName) => {
+  if (data[fieldName] === null || data[fieldName] === undefined || String(data[fieldName]).trim?.() === "") {
+    throw new HttpsError("invalid-argument", `${fieldName} is required.`);
+  }
+  const parsed = Number(data[fieldName]);
+  if (!Number.isFinite(parsed)) {
+    throw new HttpsError("invalid-argument", `${fieldName} must be a finite number.`);
+  }
+  return parsed;
+};
+
+const validateResubmissionPayload = (data = {}) => {
+  if (!isPlainObject(data)) {
+    throw new HttpsError("invalid-argument", "Resubmission payload must be an object.");
+  }
+  if (hasFirestoreSentinelLikeValue(data)) {
+    throw new HttpsError("invalid-argument", "Resubmission payload cannot contain Firestore sentinel values.");
+  }
+  REQUIRED_RESUBMISSION_STRING_FIELDS.forEach((fieldName) => requireNonEmptyString(data, fieldName, fieldName === "improvementSummary" ? 2000 : 12000));
+  FORBIDDEN_CLIENT_TIMESTAMP_FIELDS.forEach((fieldName) => {
+    if (data[fieldName] !== undefined) {
+      throw new HttpsError("invalid-argument", `${fieldName} is generated by the server and must not be supplied.`);
+    }
+  });
+  if (data.originalSubmittedAt !== undefined && isPlainObject(data.originalSubmittedAt) && !Number.isFinite(data.originalSubmittedAt.seconds)) {
+    throw new HttpsError("invalid-argument", "originalSubmittedAt must be a serializable timestamp value.");
+  }
+
+  const day = requireFiniteNumber(data, "day");
+  const previousScore = requireFiniteNumber(data, "previousScore");
+  const attempt = data.attempt === undefined ? null : requireFiniteNumber(data, "attempt");
+  const attemptNumber = data.attemptNumber === undefined ? null : requireFiniteNumber(data, "attemptNumber");
+
+  return {
+    canonicalAssignmentKey: requireNonEmptyString(data, "canonicalAssignmentKey", 160),
+    assignmentKey: requireNonEmptyString(data, "assignmentKey", 160),
+    selectedAssignmentId: requireNonEmptyString(data, "assignmentId", 160),
+    correctedText: requireNonEmptyString(data, "submissionText"),
+    improvementSummary: requireNonEmptyString(data, "improvementSummary", 2000),
+    previousScore,
+    requestedAttempt: attempt,
+    requestedAttemptNumber: attemptNumber,
+    day,
+    level: requireNonEmptyString(data, "level", 20).toUpperCase(),
+    className: requireString(data, "className", 200),
+  };
+};
+
+const toFiniteNumberOrNull = (value) => {
+  if (value === null || value === undefined || String(value).trim?.() === "") return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const omitUndefinedFields = (object) => Object.fromEntries(
+  Object.entries(object).filter(([, value]) => value !== undefined)
+);
+
+exports.submitAssignmentResubmission = onCall(
+  { region: "europe-west1" },
+  async (request) => {
+    const authUid = request.auth?.uid || "";
+    const data = request.data || {};
+
+    try {
+      if (!authUid) {
+        throw new HttpsError("unauthenticated", "Please sign in before resubmitting work.");
+      }
+
+      const {
+        canonicalAssignmentKey,
+        selectedAssignmentId,
+        correctedText,
+        improvementSummary,
+        previousScore,
+        requestedAttempt,
+        requestedAttemptNumber,
+        day,
+        level,
+        className,
+      } = validateResubmissionPayload(data);
+
+      if (!correctedText) {
+        throw new HttpsError("invalid-argument", "Corrected text is required.");
+      }
+      if (appearsToContainFalowenUiText(correctedText)) {
+        throw new HttpsError("invalid-argument", "Corrected text appears to include page instructions. Submit only the corrected answer text.");
+      }
+      if (correctedText.length < 80) {
+        throw new HttpsError("invalid-argument", "Corrected text is too short.");
+      }
+      if (!improvementSummary || improvementSummary.length < 25) {
+        throw new HttpsError("invalid-argument", "Please explain what you improved in this resubmission.");
+      }
+      if (previousScore === null) {
+        throw new HttpsError("failed-precondition", "A reviewed score is required before resubmitting.");
+      }
+      if (previousScore >= PASS_THRESHOLD_SCORE) {
+        throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
+      }
+
+      const db = getAdmin().firestore();
+      const counterRef = db.collection("submissionAttemptCounters").doc(
+        buildAttemptCounterId({ studentId: authUid, canonicalAssignmentKey })
+      );
+      const submissionsRef = db.collection("submissions");
+      const now = FieldValue.serverTimestamp();
+
+      const result = await db.runTransaction(async (transaction) => {
+        const counterSnap = await transaction.get(counterRef);
+        let attempts = Number(counterSnap.data()?.attempts || 0);
+        let passed = counterSnap.data()?.passed === true;
+        let hasSubmittedOrLockedAssignment = attempts > 0;
+        let hasMatchingFailedScore = false;
+
+        const existingSnap = await transaction.get(
+          submissionsRef
+            .where("studentId", "==", authUid)
+            .where("canonicalAssignmentKey", "==", canonicalAssignmentKey)
+            .limit(50)
+        );
+
+        if (!counterSnap.exists) {
+          attempts = 0;
+          passed = false;
+        }
+
+        let latestSubmissionMillis = 0;
+
+        existingSnap.forEach((docSnap) => {
+          const existing = docSnap.data() || {};
+          if (countSubmissionAttemptDoc(existing)) {
+            hasSubmittedOrLockedAssignment = true;
+            latestSubmissionMillis = Math.max(latestSubmissionMillis, getSubmissionTimestampMillis(existing));
+            if (!counterSnap.exists) attempts += 1;
+          }
+          const score = getScoreValue(existing);
+          if (typeof score === "number") {
+            if (score >= PASS_THRESHOLD_SCORE) passed = true;
+            if (score === previousScore && score < PASS_THRESHOLD_SCORE) hasMatchingFailedScore = true;
+          }
+          if (isPassedSubmissionDoc(existing)) passed = true;
+          const existingFingerprint = normalizeCallableText(existing.submissionFingerprint, 400);
+          const incomingFingerprint = normalizeCallableText(data.submissionFingerprint, 400);
+          if (incomingFingerprint && existingFingerprint && incomingFingerprint === existingFingerprint) {
+            throw new HttpsError("failed-precondition", "This corrected text has already been submitted for this assignment.");
+          }
+        });
+
+        if (!hasSubmittedOrLockedAssignment) {
+          throw new HttpsError("failed-precondition", "Submit and receive review for this assignment before resubmitting.");
+        }
+        if (passed) {
+          throw new HttpsError("failed-precondition", "This assignment is already passed, so resubmission is disabled.");
+        }
+        if (!hasMatchingFailedScore) {
+          throw new HttpsError("failed-precondition", "The reviewed score does not match this assignment.");
+        }
+
+        if (attempts >= MAX_TOTAL_SUBMISSION_ATTEMPTS) {
+          transaction.set(counterRef, {
+            attempts,
+            updatedAt: now,
+          }, { merge: true });
+          throw new HttpsError("resource-exhausted", "You have used all resubmissions for this assignment.");
+        }
+
+        if (latestSubmissionMillis > 0 && Date.now() < latestSubmissionMillis + RESUBMISSION_COOLDOWN_MS) {
+          throw buildCooldownError({ latestSubmissionMillis });
+        }
+
+        const nextAttempt = attempts + 1;
+        const submissionRef = submissionsRef.doc();
+        const submissionDocument = omitUndefinedFields({
+          title: normalizeCallableText(data.title, 500),
+          assignmentTitle: normalizeCallableText(data.assignmentTitle, 500),
+          assignmentKey: canonicalAssignmentKey,
+          canonicalAssignmentKey,
+          assignmentId: selectedAssignmentId,
+          assignment_id: selectedAssignmentId,
+          chapter: normalizeCallableText(data.chapter, 80),
+          chapterKey: normalizeCallableText(data.chapterKey, 160),
+          day,
+          level,
+          className,
+          studentId: authUid,
+          studentEmail: normalizeCallableText(data.studentEmail, 320),
+          studentCode: normalizeCallableText(data.studentCode, 120),
+          studentName: normalizeCallableText(data.studentName, 200),
+          studentScopeKey: normalizeCallableText(data.studentScopeKey, 300),
+          submissionFingerprint: normalizeCallableText(data.submissionFingerprint, 400),
+          submissionText: correctedText,
+          answer: correctedText,
+          workContent: correctedText,
+          improvementSummary,
+          previousSubmissionText: normalizeCallableText(data.previousSubmissionText),
+          previousScore,
+          // Callable clients must not provide Firestore sentinels. Persist only
+          // simple timestamp snapshots, and always create write timestamps here.
+          originalSubmittedAt: normalizeClientTimestamp(data.originalSubmittedAt),
+          attempt: requestedAttempt || nextAttempt,
+          attemptNumber: requestedAttemptNumber || requestedAttempt || nextAttempt,
+          isResubmission: true,
+          reviewStatus: "pending_review",
+          status: "resubmitted",
+          createdAt: now,
+          updatedAt: now,
+          submittedAt: now,
+          resubmittedAt: now,
+        });
+
+        transaction.set(submissionRef, submissionDocument);
+        transaction.set(counterRef, {
+          studentId: authUid,
+          canonicalAssignmentKey,
+          assignmentId: selectedAssignmentId,
+          level,
+          attempts: nextAttempt,
+          passed: false,
+          lastSubmissionId: submissionRef.id,
+          updatedAt: now,
+          createdAt: counterSnap.exists ? counterSnap.data()?.createdAt || now : now,
+        }, { merge: true });
+
+        return {
+          submissionId: submissionRef.id,
+          attempt: nextAttempt,
+          maxAttempts: MAX_TOTAL_SUBMISSION_ATTEMPTS,
+        };
+      });
+
+      return result;
+    } catch (error) {
+      console.error("submitAssignmentResubmission error", {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
+        studentId: authUid,
+        assignmentKey: data?.canonicalAssignmentKey || data?.assignmentKey,
+      });
+      if (error instanceof HttpsError) throw error;
+
+      throw new HttpsError(
+        "internal",
+        "Could not save your resubmission. Please try again."
+      );
+    }
+  }
+);
+
+exports.onExamTutorReviewUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "examTutorReviewQueue/{reviewId}",
+  },
+  async (event) => {
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+    await notifyTutorReviewStatusUpdate({
+      reviewId: event.params.reviewId,
+      beforeData,
+      afterData,
+    });
+    return null;
+  }
+);

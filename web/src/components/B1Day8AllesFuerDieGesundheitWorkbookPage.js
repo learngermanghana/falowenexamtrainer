@@ -1,0 +1,89 @@
+import React, { useState } from "react";
+import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
+import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ReadingTask } from "../data/b1ReadingTasks";
+import AppBackButton from "./navigation/AppBackButton";
+import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import { STANDARD_WORKBOOK_TABS, WorkbookTabNav, WorkbookTaskCard } from "./StandardWorkbookComponents";
+import { B1_DAY8_HEALTH_NOTES, B1_DAY8_LISTENING_QUESTIONS, B1_DAY8_READING_PARAGRAPHS, B1_DAY8_READING_QUESTIONS } from "../data/b1Day8WorkbookData";
+import { styles } from "../styles";
+
+const AUDIO_FILE_ID = "1Ob1312L9Cp2z5-sHGVfAKhoCWc-oFI6-";
+const card = { ...styles.card, display: "grid", gap: 14 };
+const title = { margin: 0, fontSize: "1.15rem" };
+const list = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+const box = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 13, background: "#fff", display: "grid", gap: 7 };
+
+const QuestionList = ({ items }) => <div style={{ display: "grid", gap: 10 }}>{items.map((item) => <div key={item.stem} style={box}><strong>{item.stem}</strong>{item.options.map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
+const Prepared = ({ checked, onChange }) => <label style={{ display: "inline-flex", gap: 8, alignItems: "center", fontWeight: 700 }}><input type="checkbox" checked={checked} onChange={onChange} /> I prepared this part.</label>;
+
+const B1Day8PreservedSections = ({ activeTab, prepared, setPreparedFor }) => {
+  const reading = getB1ReadingTask(8);
+  const writing = getB1WritingTask(8);
+  const mark = setPreparedFor;
+  return (
+    <>
+      {activeTab === "sprechen" && <section style={card}>
+      <h2 style={title}>Teil 1 · Sprechen (Class Preparation)</h2>
+      <WorkbookTaskCard eyebrow="Question of the Day · Speaking" title="Wie wichtig ist eine gesunde Lebensweise für dich?" practiceOnly submissionNote="Speak for 1–2 minutes. Teil 1 is class preparation and is not submitted.">
+        <p style={{ margin: 0 }}>Diskutieren Sie, was Sie tun, um fit und gesund zu bleiben. Sprechen Sie über Ernährung, Sport, Stress und Arztbesuche. Nutzen Sie Modalverben und Redemittel wie „Man sollte ...“, „Ich glaube, dass ...“ und „Meiner Meinung nach ...“.</p>
+      </WorkbookTaskCard>
+      <p style={{ margin: 0, color: "#475569" }}>The notes below are idea banks. You do not need to answer them one by one.</p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>{B1_DAY8_HEALTH_NOTES.map((note) => <article key={note.title} style={{ ...box, background: "#f8fafc" }}><h3 style={{ margin: 0 }}>{note.title}</h3><ul style={list}>{note.items.map((item) => <li key={item}>{item}</li>)}</ul></article>)}</div>
+      <div style={{ ...box, background: "#f0fdf4", borderColor: "#bbf7d0" }}><strong>Suggested speaking structure</strong><ol style={list}><li>Einleitung: Ein gesundes Leben bedeutet für mich ...</li><li>Ernährung und Bewegung: Ich sollte / man sollte ...</li><li>Mentale Gesundheit und Stress: Wenn ich Stress habe, ...</li><li>Gesundheitsvorsorge: Arztbesuche sind wichtig, weil ...</li><li>Schluss: In Zukunft möchte ich ... verbessern.</li></ol></div>
+      <div style={box}><strong>Useful phrases</strong><ul style={list}><li>Ich glaube, dass Bewegung eine große Rolle spielt, weil ...</li><li>Meiner Meinung nach ist es wichtig, genug Wasser zu trinken.</li><li>Man sollte darauf achten, dass man weniger Zucker isst.</li><li>Stress ist ein ernstes Problem, weil ...</li><li>Die richtige Ernährung ist entscheidend für die Gesundheit.</li></ul></div>
+      <CourseInlinePracticePanel type="speaking" />
+      <Prepared checked={prepared.sprechen} onChange={mark("sprechen")} />
+    </section>}
+
+    {activeTab === "schreiben" && <section style={card}>
+      <h2 style={title}>Teil 2 · Schreiben (Assignment)</h2>
+      <WorkbookTaskCard eyebrow="Your assignment · Writing" title={writing.title} submissionNote={writing.submissionNote}>
+        <p style={{ margin: 0 }}>{writing.instructions}</p>
+      </WorkbookTaskCard>
+      <div style={{ ...box, background: "#eff6ff" }}><strong>Max</strong><p style={{ margin: 0 }}>Regelmäßige Sporteinheiten helfen, fit zu bleiben und das Immunsystem zu stärken. Ich stimme dem zu, denn Bewegung reduziert das Risiko für viele Krankheiten wie Herzprobleme oder Diabetes. Dennoch ist auch eine ausgewogene Ernährung wichtig, um gesund zu bleiben. Ich finde, dass jeder eine Sportart finden sollte, die ihm Spaß macht, damit Bewegung langfristig Teil des Alltags wird. Was denken Sie darüber?</p></div>
+      <div style={box}><strong>Writing support</strong><ol style={list}><li>Einleitung: Thema nennen.</li><li>Auf Max reagieren: zustimmen oder teilweise widersprechen.</li><li>Sport und Ernährung begründen.</li><li>Eigene Gewohnheiten und Verbesserung nennen.</li><li>Kurzer Schluss.</li></ol></div>
+      <CourseInlinePracticePanel type="writing" />
+      <WorkbookSubmissionReminder />
+      <Prepared checked={prepared.schreiben} onChange={mark("schreiben")} />
+    </section>}
+
+    {activeTab === "lesen" && <section style={card}>
+      <h2 style={title}>Teil 3 · Lesen (Assignment)</h2>
+      <WorkbookTaskCard eyebrow="Your assignment · Reading" title={reading.title} submissionNote={reading.submissionNote}><p style={{ margin: 0 }}>{reading.instructions}</p></WorkbookTaskCard>
+      <h3 style={{ margin: 0 }}>Ein moderner Held in der Medizinwelt</h3>
+      {B1_DAY8_READING_PARAGRAPHS.map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.75 }}>{paragraph}</p>)}
+      <QuestionList items={B1_DAY8_READING_QUESTIONS} />
+      <WorkbookSubmissionReminder />
+      <Prepared checked={prepared.lesen} onChange={mark("lesen")} />
+    </section>}
+
+    {activeTab === "hoeren" && <section style={card}>
+      <h2 style={title}>Teil 4 · Hören (Assignment)</h2>
+      <WorkbookTaskCard eyebrow="Your assignment · Listening" title="Hören Sie den Beitrag zweimal und beantworten Sie 5 Fragen." submissionNote="Submit only answer letters, for example: 1B, 2A, 3C."><p style={{ margin: 0 }}>Listen for Herr Webers daily work, attitude, calm problem-solving, emotional support and how patients and colleagues see him.</p></WorkbookTaskCard>
+      <iframe src={`https://drive.google.com/file/d/${AUDIO_FILE_ID}/preview`} title="B1 Day 8 Hören" allow="autoplay" style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 12 }} />
+      <QuestionList items={B1_DAY8_LISTENING_QUESTIONS} />
+      <WorkbookSubmissionReminder />
+      <Prepared checked={prepared.hoeren} onChange={mark("hoeren")} />
+    </section>}
+    </>
+  );
+};
+
+const config = {
+  day: 8,
+  chapter: "3.8",
+  assignmentKey: "B1-3.8",
+  workbookId: "B1Day8AllesFuerDieGesundheit",
+  title: "Alles für die Gesundheit",
+  subtitle: "Select Grammar, Teil 1–4, Ref or Submit. The existing Day 8 assignments are preserved inside the shared B1 workbook shell.",
+  submitListening: true,
+  listening: { submitRequired: true },
+};
+
+export default function B1Day8AllesFuerDieGesundheitWorkbookPage() {
+  return <B1StandardWorkbookPage config={config} renderSections={B1Day8PreservedSections} />;
+}

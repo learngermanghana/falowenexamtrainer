@@ -1,0 +1,97 @@
+import { makeLesson } from "../buildSelfLearningLesson";
+
+const b2Day5GesundheitUndWohlbefinden = makeLesson({
+  level: "B2",
+  day: 5,
+  chapter: "1.5",
+  title: "Bildung und Lernen",
+  topic: "Nominalisierung von Verben",
+  heroImage: "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80",
+  grammarFocus: "Nominalisierung von Verben für sachliche und formelle B2-Sätze",
+  objectives: [
+    "Ich kann Verben in passende Nomen umwandeln.",
+    "Ich kann aus einfachen Verb-Sätzen sachlichere Nominalstil-Sätze bilden.",
+    "Ich kann über Bildung, Lernen und Weiterbildung auf B2-Niveau sprechen.",
+    "Ich kann nominalisierte Strukturen in einem B2-Meinungsbeitrag verwenden.",
+  ],
+  explanation: [
+    "Bildung und Lernen sind wichtige B2-Themen, weil man nicht nur persönliche Erfahrungen beschreibt, sondern auch Lernformen, Weiterbildung und Chancen sachlich diskutiert.",
+    "Mit Nominalisierung kannst du aus einem einfachen Verb einen formelleren Ausdruck machen. Das hilft besonders in Meinungsbeiträgen, Berichten und Prüfungstexten.",
+    "Heute übst du, Verben wie lernen, prüfen, verbessern, anmelden oder teilnehmen in Nomen wie das Lernen, die Prüfung, die Verbesserung, die Anmeldung und die Teilnahme umzuwandeln.",
+  ],
+  topicQuestions: [
+    "Welche Lernmethode hilft dir am meisten?",
+    "Warum ist Weiterbildung im Berufsleben wichtig?",
+    "Welche Vorteile hat Online-Lernen im Vergleich zum Präsenzunterricht?",
+    "Wie kann Nominalisierung einen Text formeller machen?",
+  ],
+  grammarLesson: {
+    title: "Nominalisierung von Verben",
+    explanation: [
+      "Nominalisierung bedeutet: Aus einem Verb wird ein Nomen. Dadurch klingt ein Satz oft sachlicher, formeller und dichter. Beispiel: Viele Menschen lernen online. → Das Online-Lernen ist für viele Menschen praktisch.",
+      "Bei vielen Verben kann man den Infinitiv als neutrales Nomen benutzen: lernen → das Lernen, lesen → das Lesen, sprechen → das Sprechen. Das Nomen wird großgeschrieben und bekommt meistens den Artikel das.",
+      "Andere Verben bilden feste Nomen mit Endungen wie -ung, -e, -tion oder -nahme: verbessern → die Verbesserung, prüfen → die Prüfung, organisieren → die Organisation, teilnehmen → die Teilnahme.",
+      "Auf B2 solltest du Nominalisierung nicht übertreiben. Gute Texte verbinden klare Verben mit einigen nominalisierten Ausdrücken, besonders in Einleitungen, Argumenten und Zusammenfassungen.",
+    ],
+    rules: [
+      "Schreibe nominalisierte Verben groß: das Lernen, das Lesen, das Wiederholen.",
+      "Nutze oft den Artikel das, wenn der Infinitiv zum Nomen wird.",
+      "Achte auf feste Nomenformen: verbessern → die Verbesserung, anmelden → die Anmeldung.",
+      "Nominalstil passt gut zu formellen Texten, Berichten und Meinungsbeiträgen.",
+      "Vermeide zu viele Nomen hintereinander, damit der Text verständlich bleibt.",
+    ],
+    examples: [
+      "Viele Menschen lernen online. → Das Online-Lernen wird immer beliebter.",
+      "Die Schule prüft die Fortschritte regelmäßig. → Die regelmäßige Prüfung der Fortschritte ist wichtig.",
+      "Man sollte seine Lernstrategie verbessern. → Die Verbesserung der Lernstrategie hilft bei der Prüfungsvorbereitung.",
+      "Viele Erwachsene bilden sich weiter. → Die Weiterbildung vieler Erwachsener ist für den Arbeitsmarkt wichtig.",
+      "Die Lernenden nehmen am Kurs teil. → Die Teilnahme am Kurs verbessert die Sprachpraxis.",
+    ],
+    miniExercise: "Formuliere acht Sätze zum Thema Bildung um: Schreibe zuerst einen Satz mit Verb und danach eine Version mit Nominalisierung.",
+    knowledgeTest: [
+      { question: "Welche Nominalisierung passt? viele Menschen lernen online", options: ["das Online-Lernen", "die Online-Lernt", "der Online-lernen"], answer: "das Online-Lernen", explanation: "Der Infinitiv kann als neutrales Nomen benutzt werden: das Lernen." },
+      { question: "Welche Form ist richtig? verbessern", options: ["die Verbesserung", "das Verbesser", "der Verbesserung"], answer: "die Verbesserung", explanation: "Das feste Nomen zu verbessern ist die Verbesserung." },
+      { question: "Welche Version klingt formeller?", options: ["Viele Menschen lernen weiter.", "Die Weiterbildung vieler Menschen ist wichtig.", "Menschen machen Lernen weiter."], answer: "Die Weiterbildung vieler Menschen ist wichtig.", explanation: "Die Nominalisierung Weiterbildung macht den Satz sachlicher und formeller." },
+      { question: "Welche feste Nominalisierung gehört zu teilnehmen?", options: ["das Teilnehmen", "die Teilnahme", "der Teilnehmer"], answer: "die Teilnahme", explanation: "Zu teilnehmen gehört im formellen Sprachgebrauch häufig das feste Nomen die Teilnahme." },
+    ],
+  },
+  speakingTaskType: "Education and learning discussion",
+  speakingTopic: "Sprechen: Erkläre, warum Bildung und Weiterbildung wichtig sind, und nutze mindestens drei Nominalisierungen.",
+  speakingBuilder: {
+    branches: [
+      { id: "lernformen", title: "Lernformen", keywords: ["Online-Lernen", "Präsenzunterricht", "Selbstlernen", "Lerngruppe", "digital", "flexibel"] },
+      { id: "weiterbildung", title: "Weiterbildung", keywords: ["Beruf", "Arbeitsmarkt", "neue Kompetenzen", "Karriere", "Qualifikation", "Zukunft"] },
+      { id: "strategie", title: "Lernstrategie", keywords: ["Wiederholung", "Planung", "Prüfungsvorbereitung", "Feedback", "Motivation", "Fortschritt"] },
+      { id: "nominalisierung", title: "Nominalisierung", keywords: ["das Lernen", "die Weiterbildung", "die Verbesserung", "die Teilnahme", "die Prüfung", "die Anmeldung"] },
+      { id: "meinung", title: "Eigene Meinung", keywords: ["meiner Meinung nach", "ein Vorteil", "ein Nachteil", "besonders wichtig", "zum Beispiel", "zusammenfassend"] },
+    ],
+  },
+  writingTaskType: "B2 opinion essay / Meinungsbeitrag",
+  writingTopic: "Schreiben: Bildung und Lernen. Verfassen Sie einen B2-Meinungsbeitrag zu diesem Thema: Welche Lernform unterstützt Lernende am besten? Bearbeiten Sie alle Punkte: Äußern Sie Ihre Meinung dazu, ob Online-Lernen eine gute Alternative zum Präsenzunterricht ist. Nennen Sie Gründe, warum Weiterbildung immer wichtiger wird. Nennen Sie andere Möglichkeiten, Lernen effektiv zu organisieren. Nennen Sie Vorteile flexibler Lernangebote.",
+  writingBuilder: {
+    structure: [
+      "Einleitung: Stellen Sie das Thema Bildung und Lernen kurz vor.",
+      "Meinung: Äußern Sie klar Ihre Meinung zu Online-Lernen und Präsenzunterricht.",
+      "Gründe: Erklären Sie, warum Weiterbildung immer wichtiger wird.",
+      "Andere Möglichkeiten / Alternativen: Beschreiben Sie Lernstrategien, Kurse oder Lerngruppen.",
+      "Vorteile: Erklären Sie die Vorteile flexibler Lernangebote.",
+      "Schluss: Fassen Sie Ihre Meinung kurz zusammen.",
+    ],
+    usefulLines: [
+      "In der heutigen Zeit spielen Bildung und Weiterbildung eine wichtige Rolle.",
+      "Meiner Meinung nach kann Online-Lernen eine sinnvolle Ergänzung zum Präsenzunterricht sein.",
+      "Ein Grund dafür ist, dass die Weiterbildung im Berufsleben immer wichtiger wird.",
+      "Außerdem erleichtert die flexible Organisation des Lernens vielen Menschen die Teilnahme an Kursen.",
+      "Eine andere Möglichkeit wäre, Online-Phasen mit regelmäßigen Präsenztreffen zu verbinden.",
+      "Ein Vorteil dieser Alternative besteht darin, dass Lernende flexibel bleiben und trotzdem persönliche Unterstützung erhalten.",
+      "Zusammenfassend lässt sich sagen, dass erfolgreiches Lernen klare Ziele, gute Planung und regelmäßige Wiederholung braucht.",
+    ],
+  },
+  phrases: ["das Lernen", "die Weiterbildung", "die Verbesserung", "die Teilnahme", "die Prüfungsvorbereitung", "die Anmeldung", "Kenntnisse erweitern", "Fortschritte machen"],
+  tasks: { speaking: "Sprich 2–3 Minuten über Bildung, Lernen und Weiterbildung. Nutze mindestens drei Nominalisierungen.", writing: "Schreibe 180–220 Wörter als B2-Meinungsbeitrag. Verwende mindestens fünf nominalisierte Ausdrücke.", reading: "Lies einen Artikel über Bildung, Lernen oder Weiterbildung. Notiere Hauptaussage, 5 Wörter und 3 Nominalisierungen.", listening: "Höre einen kurzen Beitrag über Lernen oder Weiterbildung. Fasse ihn in 4 Sätzen zusammen." },
+  readingResource: { title: "Welt.de Suche: Bildung, Lernen, Weiterbildung", description: "Open the search and choose one article about education, learning or further training. Focus on the main idea and nominalized expressions.", url: "https://www.welt.de/suche?q=Bildung%20Lernen%20Weiterbildung", tasks: ["Write the title of the article you chose.", "Write the main idea in one German sentence.", "Find 5 useful expressions connected to learning or education.", "Find 3 nominalized expressions and explain their verb base if possible."] },
+  listeningResource: { title: "DW Deutsch lernen search: Bildung und Lernen", description: "Choose one short DW audio/video connected to education or learning. Listen twice and focus on the key points.", url: "https://www.dw.com/de/suche/s-100853?searchNavigationId=9097&item=Bildung%20Lernen", tasks: ["Listen once and write the topic.", "Listen again and write 3 important points.", "Write 3 useful education-related expressions you heard.", "Record yourself summarising the audio in 60 seconds."] },
+  vocabulary: ["Bildung", "Weiterbildung", "Lernstrategie", "Prüfungsvorbereitung", "Online-Lernen", "Präsenzunterricht", "Teilnahme", "Verbesserung"],
+});
+
+export default b2Day5GesundheitUndWohlbefinden;

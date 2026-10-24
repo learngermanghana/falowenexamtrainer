@@ -1,0 +1,52 @@
+name: A1 Day 8 focused grammar
+
+on:
+  pull_request:
+    paths:
+      - "web/src/components/FormingBasicStatementsPage.js"
+      - "web/src/components/A1Day8FocusedGrammar.test.jsx"
+      - "web/src/components/A1Day9NominativeAccusativeGrammarPage.js"
+      - "web/src/components/A1Day9CasesKnowledgeHints.test.jsx"
+      - "web/src/data/courseSchedule.js"
+      - "functions/data/courseSchedule.js"
+      - "scripts/patchA1Day8TopicAlignment.mjs"
+      - ".github/workflows/a1-day8-focused-grammar.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/components/FormingBasicStatementsPage.js"
+      - "web/src/components/A1Day8FocusedGrammar.test.jsx"
+      - "web/src/components/A1Day9NominativeAccusativeGrammarPage.js"
+      - "web/src/components/A1Day9CasesKnowledgeHints.test.jsx"
+      - "web/src/data/courseSchedule.js"
+      - "functions/data/courseSchedule.js"
+      - "scripts/patchA1Day8TopicAlignment.mjs"
+      - ".github/workflows/a1-day8-focused-grammar.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  focused-day8:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund --loglevel=error
+      - name: Verify the retired Day 8 migration is safe and idempotent
+        run: node scripts/patchA1Day8TopicAlignment.mjs
+      - name: Check A1 Day 8 grammar and unchanged assignment
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npx jest --runInBand --runTestsByPath
+          src/components/A1Day8FocusedGrammar.test.jsx
+          src/components/A1Day9CasesKnowledgeHints.test.jsx
+          src/components/A1Day8TranslationLayout.test.jsx

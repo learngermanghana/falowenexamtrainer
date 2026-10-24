@@ -1,0 +1,267 @@
+import { courseSchedules } from "../data/courseSchedule";
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import { A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE } from "../data/courseBookCurriculumCorrections";
+import { getCurriculumEntriesForLevel } from "../data/lessonCatalog";
+import {
+  COURSE_BOOK_ASSESSMENT_TYPES,
+  COURSE_BOOK_RESOURCE_TYPES,
+  expandCourseBookEntries,
+  findCourseBookEntry,
+  normalizeCourseBookEntry,
+} from "./courseBookEntries";
+
+describe("course book task entries", () => {
+  const combinedDay = {
+    day: 2,
+    topic: "German Alphabet + Personal Pronouns",
+    chapter: "0.2_1.1",
+    lesen_hören: [
+      { chapter: "0.2", title: "German Alphabet", assignment: true, assignmentId: "A1-0.2" },
+      { chapter: "1.1", title: "Personal Pronouns", assignment: true, assignmentId: "A1-1.1" },
+    ],
+  };
+
+  it("creates one standardized card per task on a multi-task day", () => {
+    const entries = expandCourseBookEntries([combinedDay]);
+    expect(entries).toHaveLength(2);
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Basic Verb Conjugation",
+    ]);
+    expect(entries.map((entry) => entry.topic)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Basic Verb Conjugation",
+    ]);
+    expect(entries.every((entry) => entry.day === 2 && entry.displayDay === 2)).toBe(true);
+    expect(entries.every((entry) => entry.resourceType === COURSE_BOOK_RESOURCE_TYPES.readingListening)).toBe(true);
+    expect(entries.every((entry) => entry.assessmentType === COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked)).toBe(true);
+    expect(entries.map((entry) => entry.assignment_id)).toEqual(["A1-0.2", "A1-1.1"]);
+  });
+
+  it("gives inherited A1 Day 2 child cards their individual titles", () => {
+    const entries = expandCourseBookEntries(
+      [{
+        day: 2,
+        topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
+        chapter: "0.2_1.1",
+        lesen_hören: [
+          { chapter: "0.2", assignment: true },
+          { chapter: "1.1", assignment: true },
+        ],
+      }],
+      { level: "A1" }
+    );
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["0.2", "1.1"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Basic Verb Conjugation",
+    ]);
+    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-0.2", "A1-1.1"]);
+    expect(entries.map((entry) => entry.topic)).toEqual([
+      "German Alphabet",
+      "Personal Pronouns and Basic Verb Conjugation",
+    ]);
+  });
+
+  it("keeps generated A1 catalog cards separated by chapter and title", () => {
+    const entries = expandCourseBookEntries(getCurriculumEntriesForLevel("A1"), { level: "A1" });
+    const byDay = (day) => entries.filter((entry) => Number(entry.displayDay) === Number(day));
+
+    expect(byDay(2).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["0.2", "German Alphabet"],
+      ["1.1", "Personal Pronouns and Basic Verb Conjugation"],
+    ]);
+
+    expect(byDay(16).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["9", "Negation"],
+      ["10", "Food"],
+    ]);
+
+    expect(byDay(18).map((entry) => [entry.displayChapter, entry.lessonTitle])).toEqual([
+      ["12.1", "Two-Way and Dative Prepositions"],
+    ]);
+  });
+
+  it("keeps a single-task day as one card while adding canonical fields", () => {
+    const day4 = { day: 4, topic: "Numbers", chapter: "2", assignment: true, assignmentId: "A1-2" };
+    const entries = expandCourseBookEntries([day4]);
+
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).not.toBe(day4);
+    expect(entries[0]).toEqual(expect.objectContaining({
+      day: 4,
+      displayDay: 4,
+      chapter: "2",
+      displayChapter: "2",
+      assignmentId: "A1-2",
+      assignment_id: "A1-2",
+      lessonTitle: "Numbers",
+      resourceType: COURSE_BOOK_RESOURCE_TYPES.lesson,
+      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
+      tutorMarked: true,
+      selfPractice: false,
+      submissionRequired: true,
+    }));
+  });
+
+  it("normalizes legacy aliases without losing backwards compatibility", () => {
+    const entry = normalizeCourseBookEntry({
+      assignmentDay: "6",
+      displayDay: "4",
+      displayChapter: "2",
+      assignment_id: "A1-2",
+      title: "German Numbers",
+      assignment: true,
+      lesen_hören: { workbook_link: "/numbers", assignment: true },
+    });
+
+    expect(entry).toEqual(expect.objectContaining({
+      day: 6,
+      displayDay: 4,
+      chapter: "2",
+      displayChapter: "2",
+      assignmentId: "A1-2",
+      assignment_id: "A1-2",
+      lessonTitle: "Numbers",
+      resourceType: COURSE_BOOK_RESOURCE_TYPES.readingListening,
+    }));
+  });
+
+  it("marks B2 and C1 entries as self-practice even when legacy data says assignment", () => {
+    const entry = normalizeCourseBookEntry(
+      { day: 1, chapter: "1.1", topic: "Identity", assignment: true },
+      { level: "B2" }
+    );
+    expect(entry).toEqual(expect.objectContaining({
+      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
+      tutorMarked: false,
+      selfPractice: true,
+      submissionRequired: false,
+    }));
+  });
+
+  it("removes stale B2 Radio, video and grammar-link fields from Course Book cards", () => {
+    const entry = normalizeCourseBookEntry(
+      {
+        day: 2,
+        chapter: "1.2",
+        topic: "Legacy B2",
+        grammarPage: "https://drive.google.com/wrong-grammar",
+        grammarbook_link: "https://drive.google.com/wrong-grammar",
+        grammar_link: "https://drive.google.com/wrong-grammar",
+        video: "https://youtu.be/wrong-video",
+        youtube_link: "https://youtu.be/wrong-video",
+        ai_grammar_video: "https://youtu.be/wrong-ai",
+        falowenRadio: { youtubeId: "wrong-radio" },
+        workbook_link: "/campus/course/lesson/B2/2?view=workbook",
+      },
+      { level: "B2" }
+    );
+
+    expect(entry.grammarPage).toBe("");
+    expect(entry.grammarbook_link).toBeNull();
+    expect(entry.grammar_link).toBeNull();
+    expect(entry.video).toBeNull();
+    expect(entry.youtube_link).toBeNull();
+    expect(entry.ai_grammar_video).toBeNull();
+    expect(entry.falowenRadio).toBeNull();
+    expect(entry.workbook_link).toBe("/campus/course/lesson/B2/2?view=workbook");
+  });
+
+  it("corrects the A1 Day 3 titles and separates practice from assignment", () => {
+    const entries = expandCourseBookEntries([{
+      day: 3,
+      displayDay: 3,
+      chapter: "1.1",
+      topic: "Personal Pronouns and Verb Conjugation",
+      assignmentId: "A1-1.1",
+      schreiben_sprechen: {
+        chapter: "1.1",
+        title: "Personal Pronouns and Verb Conjugation",
+        assignment: false,
+        assignmentId: "A1-1.1",
+        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
+        workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+      },
+      lesen_hören: {
+        chapter: "1.2",
+        title: "Personal Information, Articles, Adjectives and W-Questions",
+        assignment: true,
+        assignmentId: "A1-1.2",
+        grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
+        workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
+      },
+    }], { level: "A1" });
+
+    const chapter11 = entries.find((entry) => entry.chapter === "1.1");
+    const chapter12 = entries.find((entry) => entry.chapter === "1.2");
+
+    expect(chapter11).toEqual(expect.objectContaining({
+      lessonTitle: "Personal Information, Articles, Adjectives and W-Questions",
+      topic: "Personal Information, Articles, Adjectives and W-Questions",
+      assignmentId: "A1-1.1-practice",
+      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.selfPractice,
+      tutorMarked: false,
+      submissionRequired: false,
+      grammarbook_link: null,
+    }));
+    expect(chapter12).toEqual(expect.objectContaining({
+      lessonTitle: "Present-Tense Verb Conjugation Practice",
+      topic: "Present-Tense Verb Conjugation Practice",
+      assignmentId: "A1-1.2",
+      assessmentType: COURSE_BOOK_ASSESSMENT_TYPES.tutorMarked,
+      tutorMarked: true,
+      submissionRequired: true,
+      grammarbook_link: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
+    }));
+  });
+
+  it("corrects A1 Day 16 to chapter 9 Negation and chapter 10 Food", () => {
+    const entries = expandCourseBookEntries([{
+      day: 16,
+      displayDay: 16,
+      chapter: "7",
+      topic: "Legacy Day 16",
+      lesen_hören: [
+        { chapter: "7", title: "Basic Prepositions", assignment: true },
+        { chapter: "7", title: "Separable Verbs", assignment: true },
+      ],
+    }], { level: "A1" });
+
+    expect(entries.map((entry) => entry.displayChapter)).toEqual(["9", "10"]);
+    expect(entries.map((entry) => entry.lessonTitle)).toEqual(["Negation", "Food"]);
+    expect(entries.map((entry) => entry.assignmentId)).toEqual(["A1-9", "A1-10"]);
+    expect(entries.every((entry) => entry.tutorMarked && entry.submissionRequired)).toBe(true);
+  });
+
+  it("uses one required Day 18 assignment for both grammar topics", () => {
+    const lesson = courseSchedules.A1.find(row => row.day === 18);
+    const entries = expandCourseBookEntries([lesson], { level: "A1" });
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({ assignmentId: "A1-12.1", submissionRequired: true });
+  });
+
+  it("returns the corrected Day 3 titles from the assignment dictionary", () => {
+    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.1-practice" })).toEqual(
+      expect.objectContaining({
+        assignment_id: "A1-1.1-practice",
+        title: "Personal Information, Articles, Adjectives and W-Questions",
+        grammarPage: "",
+      })
+    );
+    expect(getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-1.2" })).toEqual(
+      expect.objectContaining({
+        assignment_id: "A1-1.2",
+        title: "Present-Tense Verb Conjugation Practice",
+        grammarPage: A1_DAY3_FULL_PRONOUNS_GRAMMAR_ROUTE,
+      })
+    );
+  });
+
+  it("finds an exact card by day and chapter instead of returning the first task", () => {
+    expect(findCourseBookEntry({ entries: [combinedDay], day: 2, chapter: "1.1", level: "A1" }))
+      .toEqual(expect.objectContaining({ displayChapter: "1.1", assignmentId: "A1-1.1" }));
+  });
+});

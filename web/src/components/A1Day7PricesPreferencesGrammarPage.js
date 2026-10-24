@@ -1,0 +1,421 @@
+import React, { useMemo, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
+import { styles } from "../styles";
+
+const cardStyle = {
+  ...styles.card,
+  display: "grid",
+  gap: 12,
+};
+
+const sectionTitleStyle = {
+  margin: 0,
+  fontSize: "1.1rem",
+  fontWeight: 700,
+};
+
+const splitGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: 12,
+};
+
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  fontSize: 14,
+  minWidth: 560,
+};
+
+const thTdStyle = {
+  border: "1px solid #d1d5db",
+  padding: "8px 10px",
+  textAlign: "left",
+  verticalAlign: "top",
+};
+
+const noteCardStyle = {
+  padding: 12,
+  borderRadius: 12,
+  background: "#f8fafc",
+  border: "1px solid #e2e8f0",
+  display: "grid",
+  gap: 6,
+};
+
+const formulaCardStyle = {
+  ...noteCardStyle,
+  background: "#eff6ff",
+  border: "1px solid #93c5fd",
+  color: "#1e3a8a",
+};
+
+const practiceCardStyle = {
+  padding: 12,
+  borderRadius: 12,
+  background: "#fffbeb",
+  border: "1px solid #fcd34d",
+  display: "grid",
+  gap: 8,
+};
+
+const lessonBlocks = {
+  kostenCards: [
+    {
+      title: "Kostet — singular (one item)",
+      lines: [
+        "Use kostet when you ask about one item.",
+        "Wie viel kostet der Apfel? (How much does the apple cost?)",
+        "Der Apfel kostet 1 Euro. (The apple costs 1 euro.)",
+      ],
+    },
+    {
+      title: "Kosten — plural (more than one item)",
+      lines: [
+        "Use kosten when you ask about two or more items.",
+        "Wie viel kosten die Äpfel? (How much do the apples cost?)",
+        "Die Äpfel kosten 3 Euro. (The apples cost 3 euros.)",
+      ],
+    },
+  ],
+  kostenConjugation: [
+    { pronoun: "ich", form: "koste", translation: "I cost" },
+    { pronoun: "du", form: "kostest", translation: "you cost (informal singular)" },
+    { pronoun: "er/sie/es", form: "kostet", translation: "he/she/it costs" },
+    { pronoun: "wir", form: "kosten", translation: "we cost" },
+    { pronoun: "ihr", form: "kostet", translation: "you cost (informal plural)" },
+    { pronoun: "sie/Sie", form: "kosten", translation: "they cost / you cost (formal)" },
+  ],
+  mogenConjugation: [
+    { pronoun: "ich", form: "mag", translation: "I like" },
+    { pronoun: "du", form: "magst", translation: "you like (informal singular)" },
+    { pronoun: "er/sie/es", form: "mag", translation: "he/she/it likes" },
+    { pronoun: "wir", form: "mögen", translation: "we like" },
+    { pronoun: "ihr", form: "mögt", translation: "you like (informal plural)" },
+    { pronoun: "sie/Sie", form: "mögen", translation: "they like / you like (formal)" },
+  ],
+  pronouns: [
+    {
+      gender: "Masculine",
+      article: "der",
+      pronoun: "er",
+      example: "Der Apfel kostet 3 Euro. Er kostet 3 Euro. (The apple costs 3 euros. It costs 3 euros.)",
+    },
+    {
+      gender: "Feminine",
+      article: "die",
+      pronoun: "sie",
+      example: "Die Banane kostet 2 Euro. Sie kostet 2 Euro. (The banana costs 2 euros. It costs 2 euros.)",
+    },
+    {
+      gender: "Neuter",
+      article: "das",
+      pronoun: "es",
+      example: "Das Buch kostet 10 Euro. Es kostet 10 Euro. (The book costs 10 euros. It costs 10 euros.)",
+    },
+    {
+      gender: "Plural",
+      article: "die",
+      pronoun: "sie",
+      example: "Die Äpfel kosten 3 Euro. Sie kosten 3 Euro. (The apples cost 3 euros. They cost 3 euros.)",
+    },
+  ],
+  gernLieber: [
+    {
+      title: "gern = like doing",
+      lines: [
+        "Ich spiele gern Fußball. (I like playing football/soccer.)",
+        "Er schwimmt gern. (He likes swimming.)",
+      ],
+    },
+    {
+      title: "lieber = prefer",
+      lines: [
+        "Ich spiele gern Fußball, aber ich spiele lieber Basketball. (I like playing football, but I prefer playing basketball.)",
+        "Er schwimmt gern, aber er fährt lieber Fahrrad. (He likes swimming, but he prefers cycling.)",
+      ],
+    },
+  ],
+  gernVsMogen: [
+    {
+      title: "mögen (verb) + noun",
+      lines: [
+        "Ich mag Pizza. (I like pizza.)",
+        "Er mag Hunde. (He likes dogs.)",
+        "Wir mögen den Film. (We like the movie.)",
+      ],
+    },
+    {
+      title: "gern (adverb) + action",
+      lines: [
+        "Ich lese gern. (I like reading.)",
+        "Er kocht gern. (He likes cooking.)",
+        "Sie tanzt gern. (She likes dancing.)",
+      ],
+    },
+  ],
+  practice: [
+    {
+      id: "a",
+      title: "A. Fill in: kosten or kostet",
+      prompts: [
+        "1. Wie viel ____ der Apfel?",
+        "2. Die Bücher ____ 20 Euro.",
+        "3. Das Eis ____ 2 Euro.",
+        "4. Wie viel ____ die Bananen?",
+      ],
+      answers: "1) kostet 2) kosten 3) kostet 4) kosten",
+    },
+    {
+      id: "b",
+      title: "B. Write complete price answers",
+      prompts: [
+        "1. Wie viel kostet der Stuhl? (20 Euro)",
+        "2. Wie viel kosten die Äpfel? (3 Euro)",
+        "3. Wie viel kostet das Auto? (5.000 Euro)",
+      ],
+      answers:
+        "Sample answers: Der Stuhl kostet 20 Euro. Die Äpfel kosten 3 Euro. Das Auto kostet 5.000 Euro.",
+    },
+    {
+      id: "c",
+      title: "C. Gern or lieber?",
+      prompts: [
+        "1. Ich schwimme ____, aber ich spiele Tennis ____.",
+        "2. Er trinkt Wasser ____, aber er trinkt Cola ____.",
+      ],
+      answers: "1) gern, lieber 2) gern, lieber",
+    },
+    {
+      id: "d",
+      title: "D. gern oder mögen? Ergänzen Sie die richtige Form.",
+      prompts: [
+        "1. Ich schwimme sehr ____________ (gern / mag).",
+        "2. ____________ (Gern / Magst) du Pizza?",
+        "3. Mein Bruder kocht ____________ (gern / mag) für die Familie.",
+        "4. Wir ____________ (mögen / gern) moderne Kunst.",
+        "5. Anna hört ____________ (gern / mag) Musik, aber sie ____________ (gern / mag) keinen Jazz.",
+      ],
+      answers: "1) gern 2) Magst 3) gern 4) mögen 5) gern, mag",
+    },
+  ],
+};
+
+const ConjugationTable = ({ rows, verb }) => (
+  <div style={{ overflowX: "auto" }}>
+    <table style={tableStyle}>
+      <thead>
+        <tr>
+          <th style={thTdStyle}>Pronoun</th>
+          <th style={thTdStyle}>{verb} in Präsens</th>
+          <th style={thTdStyle}>English meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr key={row.pronoun}>
+            <td style={thTdStyle}>{row.pronoun}</td>
+            <td style={thTdStyle}>
+              <strong>{row.pronoun} {row.form}</strong>
+            </td>
+            <td style={thTdStyle}>{row.translation}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
+const A1Day7PricesPreferencesGrammarPage = () => {
+  const [openAnswers, setOpenAnswers] = useState({});
+  const isMobile = typeof window !== "undefined" ? window.innerWidth < 640 : false;
+  const practiceBlocks = useMemo(() => lessonBlocks.practice, []);
+
+  const toggleAnswer = (id) => {
+    setOpenAnswers((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  return (
+    <main style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <header style={cardStyle}>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+
+        <div style={{ borderRadius: 14, overflow: "hidden" }}>
+          <img
+            src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?auto=format&fit=crop&w=1400&q=80"
+            alt="Shopping and prices in a market"
+            style={{
+              width: "100%",
+              height: isMobile ? 170 : 260,
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </div>
+
+        <h1 style={{ ...styles.title, margin: 0 }}>A1 Day 7 • Asking About Prices and Preferences</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Learn how to ask and answer price questions with <strong>kostet/kosten</strong>, replace items with
+          <strong> er/sie/es</strong>, and express preferences with <strong>gern</strong>, <strong>lieber</strong>, and
+          <strong> mögen</strong>.
+        </p>
+      </header>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>1) How to ask about a price</h2>
+
+        <div style={formulaCardStyle}>
+          <strong>Question formula</strong>
+          <div style={{ fontSize: "1.05rem" }}>
+            <strong>Wie viel + kostet/kosten + item?</strong>
+          </div>
+          <div>
+            First decide whether the item is <strong>singular</strong> or <strong>plural</strong>. Then choose
+            <strong> kostet</strong> or <strong>kosten</strong>.
+          </div>
+        </div>
+
+        <div style={splitGridStyle}>
+          {lessonBlocks.kostenCards.map((block) => (
+            <div key={block.title} style={noteCardStyle}>
+              <strong>{block.title}</strong>
+              {block.lines.map((line) => (
+                <div key={line}>{line}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div style={noteCardStyle}>
+          <strong>How to answer</strong>
+          <div><strong>Singular with the item:</strong> Der Apfel kostet 1 Euro. (The apple costs 1 euro.)</div>
+          <div><strong>Singular short answer:</strong> Das kostet 5 Euro. (It costs 5 euros.)</div>
+          <div><strong>Plural with the items:</strong> Die Äpfel kosten 3 Euro. (The apples cost 3 euros.)</div>
+          <div><strong>Plural short answer:</strong> Die kosten 10 Euro. (They cost 10 euros.)</div>
+        </div>
+
+        <div style={formulaCardStyle}>
+          <strong>Remember</strong>
+          <div><strong>One item:</strong> Wie viel <u>kostet</u> der Apfel? → Der Apfel <u>kostet</u> 1 Euro.</div>
+          <div><strong>More than one item:</strong> Wie viel <u>kosten</u> die Äpfel? → Die Äpfel <u>kosten</u> 3 Euro.</div>
+        </div>
+
+        <div style={noteCardStyle}>
+          <strong>Conjugation of kosten (Präsens)</strong>
+          <p style={{ margin: 0 }}>
+            For price questions, the most important forms are <strong>er/sie/es kostet</strong> for one item and
+            <strong> sie kosten</strong> for plural items.
+          </p>
+          <ConjugationTable rows={lessonBlocks.kostenConjugation} verb="kosten" />
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>2) Pronouns with gender</h2>
+        <div style={noteCardStyle}>
+          To replace a noun with a pronoun, use <strong>er</strong>, <strong>sie</strong>, or <strong>es</strong> based on the
+          noun&apos;s grammatical gender: masculine (<strong>der → er</strong>), feminine (<strong>die → sie</strong>), neuter
+          (<strong>das → es</strong>). For plural nouns, use <strong>sie</strong>.
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Gender</th>
+                <th style={thTdStyle}>Article</th>
+                <th style={thTdStyle}>Pronoun</th>
+                <th style={thTdStyle}>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {lessonBlocks.pronouns.map((row) => (
+                <tr key={row.gender}>
+                  <td style={thTdStyle}>{row.gender}</td>
+                  <td style={thTdStyle}>{row.article}</td>
+                  <td style={thTdStyle}>{row.pronoun}</td>
+                  <td style={thTdStyle}>{row.example}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>3) Gern and Lieber</h2>
+        <div style={splitGridStyle}>
+          {lessonBlocks.gernLieber.map((block) => (
+            <div key={block.title} style={noteCardStyle}>
+              <strong>{block.title}</strong>
+              {block.lines.map((line) => (
+                <div key={line}>{line}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>4) Gern vs. Mögen</h2>
+        <div style={noteCardStyle}>
+          <strong>Quick difference:</strong>
+          <div>
+            <strong>Ich mag Fußball.</strong> means “I like football.” Use <strong>mögen + noun</strong>.
+          </div>
+          <div>
+            <strong>Ich spiele gern Fußball.</strong> means “I like playing football.” Use an action verb +
+            <strong> gern</strong>.
+          </div>
+          <div>
+            <strong>gern</strong> comes after the conjugated action verb. <strong>mögen</strong> is itself the main verb.
+          </div>
+        </div>
+
+        <div style={splitGridStyle}>
+          {lessonBlocks.gernVsMogen.map((block) => (
+            <div key={block.title} style={noteCardStyle}>
+              <strong>{block.title}</strong>
+              {block.lines.map((line) => (
+                <div key={line}>{line}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <div style={noteCardStyle}>
+          <strong>Mögen conjugation (Präsens)</strong>
+          <ConjugationTable rows={lessonBlocks.mogenConjugation} verb="mögen" />
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>5) Practice</h2>
+        {practiceBlocks.map((block) => (
+          <div key={block.id} style={practiceCardStyle}>
+            <strong>{block.title}</strong>
+            {block.prompts.map((prompt) => (
+              <div key={prompt}>{prompt}</div>
+            ))}
+
+            <button
+              style={{ ...styles.secondaryButton, width: "fit-content" }}
+              onClick={() => toggleAnswer(block.id)}
+              aria-expanded={Boolean(openAnswers[block.id])}
+              aria-controls={`answer-${block.id}`}
+            >
+              {openAnswers[block.id] ? "Hide answer" : "Show answer"}
+            </button>
+
+            {openAnswers[block.id] && (
+              <div id={`answer-${block.id}`} style={{ ...noteCardStyle, marginTop: 2 }}>
+                <em>{block.answers}</em>
+              </div>
+            )}
+          </div>
+        ))}
+      </section>
+    </main>
+  );
+};
+
+export default A1Day7PricesPreferencesGrammarPage;

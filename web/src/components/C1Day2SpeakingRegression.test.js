@@ -1,0 +1,2 @@
+import guide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
+test("C1 Day 2 speaking branches, prompts, keywords and examples remain available", () => { expect(guide.speaking.branches.length).toBeGreaterThan(0); guide.speaking.branches.forEach((branch) => { expect(branch.title).toBeTruthy(); expect(branch.prompt).toBeTruthy(); expect(branch.keywords.length).toBeGreaterThan(0); expect(branch.example).toBeTruthy(); }); });

@@ -1,0 +1,479 @@
+import React from "react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+
+const TUTOR_ASSIGNMENT_LABEL = "A1 • Day 1: Tutor Assignment • Chapter 1.1";
+
+jest.mock("../context/AuthContext", () => ({
+  useAuth: () => ({
+    user: { uid: "u1", email: "student@example.com" },
+    studentProfile: {
+      className: "A1 Demo",
+      level: "A1",
+      studentCode: "ST-1",
+      assignmentTitle: "Day 0 · Orientation",
+      assignmentTitles: ["Day 0 · Orientation", "Day 1 · Tutor Assignment"],
+      assignments: ["Day 0 · Orientation", "Day 1 · Tutor Assignment"],
+      name: "Ada Student",
+    },
+  }),
+}));
+
+jest.mock("../context/ToastContext", () => ({
+  useToast: () => ({ showToast: jest.fn() }),
+}));
+
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key) => key,
+    i18n: { resolvedLanguage: "en", language: "en" },
+  }),
+}));
+
+jest.mock("../data/courseSchedule", () => ({
+  courseSchedules: {
+    A1: [
+      { day: 0, topic: "Orientation", assignment: false, chapter: "0" },
+      { day: 1, topic: "Tutor Assignment", assignment: true, chapter: "1.1", assignmentId: "A1-1.1" },
+    ],
+  },
+}));
+
+jest.mock("../data/germanAssignmentCatalog", () => ({
+  getCurriculumEntriesForLevel: jest.fn(() => [
+    { assignmentDay: 1, topic: "Tutor Assignment", assignment: true, chapter: "1.1", assignment_id: "A1-1.1" },
+  ]),
+}));
+
+jest.mock("../utils/assignmentIdentity", () => ({
+  resolveAssignmentCanonicalKey: jest.fn(({ assignmentId, assignmentTitle }) => assignmentId || assignmentTitle || ""),
+}));
+
+jest.mock("../utils/assignmentProgress", () => ({
+  mergeAssignmentProgress: jest.fn(() => []),
+}));
+
+jest.mock("../services/answerKeyRegistryService", () => ({
+  fetchAnswerKeyRegistry: jest.fn(() => Promise.resolve(new Map())),
+  resolveAnswerKeySource: jest.fn(() => null),
+}));
+
+jest.mock("../services/interactionFeedback", () => ({
+  triggerInteractionFeedback: jest.fn(),
+}));
+
+jest.mock("./ExamReadinessBadge", () => () => <div>badge</div>);
+
+jest.mock("../firebase", () => ({
+  db: {},
+  functions: {},
+  httpsCallable: jest.fn(() => jest.fn(() => Promise.resolve({ data: { attempt: 2 } }))),
+  serverTimestamp: jest.fn(() => ({ seconds: 1 })),
+  collection: jest.fn(() => ({})),
+  query: jest.fn(() => ({})),
+  where: jest.fn(() => ({})),
+  orderBy: jest.fn(() => ({})),
+  limit: jest.fn(() => ({})),
+  doc: jest.fn(() => ({})),
+  getDoc: jest.fn(() => Promise.resolve({ exists: () => false })),
+  getDocs: jest.fn(() => Promise.resolve({ docs: [], empty: true })),
+  addDoc: jest.fn(() => Promise.resolve({ id: "id1" })),
+  writeBatch: jest.fn(() => ({
+    set: jest.fn(),
+    commit: jest.fn(() => Promise.resolve()),
+  })),
+  setDoc: jest.fn(() => Promise.resolve()),
+}));
+
+import { addDoc, getDocs, getDoc, writeBatch } from "../firebase";
+import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
+
+const renderPage = (initialEntries = ["/"]) =>
+  render(
+    <MemoryRouter initialEntries={initialEntries}>
+      <AssignmentSubmissionPage />
+    </MemoryRouter>
+  );
+
+describe("AssignmentSubmissionPage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("groups the assignment confirmation beside the required-answer checklist slot", () => {
+    renderPage();
+    const group = screen.getByRole("group", { name: "Confirm your submission" });
+    expect(group).toContainElement(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
+    expect(group.querySelector('[data-submission-consent-slot="true"]')).toBeInTheDocument();
+  });
+
+  it("saves a student's first submission without reading a missing lock document", async () => {
+    getDocs.mockResolvedValue({ docs: [], empty: true });
+    getDoc.mockRejectedValueOnce(Object.assign(new Error("Missing or insufficient permissions"), { code: "permission-denied" }));
+    renderPage(["/campus/submit?level=A1&assignmentKey=A1-1.1"]);
+    await waitFor(() => expect(screen.getByRole("textbox", { name: /Your text/i })).not.toBeDisabled());
+    fireEvent.change(screen.getByRole("textbox", { name: /Your text/i }), {
+      target: { value: "Meine Antwort beschreibt meine Familie und meinen Alltag. Ich lerne Deutsch und übe jeden Tag mit meinen Freunden in unserer Klasse." },
+    });
+    fireEvent.click(screen.getByRole("checkbox", { name: "I checked that this is the correct assignment." }));
+    fireEvent.click(screen.getByRole("button", { name: /^Submit assignment$/i }));
+    await waitFor(() => expect(writeBatch).toHaveBeenCalled());
+    expect(getDoc).not.toHaveBeenCalled();
+    getDoc.mockReset().mockResolvedValue({ exists: () => false });
+  });
+
+  it("requires an explicit assignment selection and excludes orientation from options", async () => {
+    renderPage();
+
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeInTheDocument());
+
+    const select = screen.getByRole("combobox");
+    const options = screen.getAllByRole("option").map((option) => option.textContent);
+
+    expect(select).toHaveValue("");
+    expect(options.some((text) => /Day 0 · Orientation/i.test(text || ""))).toBe(false);
+    expect(options.some((text) => /Tutor Assignment/i.test(text || ""))).toBe(true);
+    expect(screen.getByText("Canonical ID: –")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /submit assignment/i })).toBeDisabled();
+  });
+
+  it("locks the exact assignment when opened from a course/workbook assignment link", async () => {
+    renderPage([
+      {
+        pathname: "/campus/submit",
+        search: "?assignmentKey=A1-1.1",
+      },
+    ]);
+
+    await waitFor(() => expect(screen.getByRole("combobox")).toHaveValue(TUTOR_ASSIGNMENT_LABEL));
+
+    expect(screen.getByRole("combobox")).toBeDisabled();
+    expect(screen.getByText(/Opened from course\/workbook link/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /choose a different assignment instead/i })).toBeInTheDocument();
+  });
+
+  it("lets a student delete all text from a loaded draft", async () => {
+    const loadedDraft = "This draft contains an error that the student needs to remove.";
+    getDocs.mockResolvedValue({
+      empty: false,
+      docs: [
+        {
+          id: "draft-1",
+          data: () => ({
+            assignmentTitle: TUTOR_ASSIGNMENT_LABEL,
+            assignmentKey: "A1-1.1",
+            level: "A1",
+            submissionText: loadedDraft,
+          }),
+        },
+      ],
+    });
+
+    renderPage();
+
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeInTheDocument());
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: TUTOR_ASSIGNMENT_LABEL },
+    });
+
+    const editor = await screen.findByPlaceholderText(/type your answer here or paste it in/i);
+    await waitFor(() => expect(editor).toHaveValue(loadedDraft));
+
+    fireEvent.change(editor, { target: { value: "" } });
+
+    expect(editor).toHaveValue("");
+  });
+
+
+  it("compares objective answers by section and ignores free-text numbered responses", () => {
+    const previousSubmission = `Teil 2:
+1. B
+2. C
+3. A
+4. C
+5. B
+6. B
+7. A
+8. C
+9. C
+10. B
+
+Teil 3:
+1. A
+2. A
+3. D
+4. A
+5. C
+
+Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const currentSubmission = `Teil 2: chapter 9
+1. B
+2. D
+3. A
+4. C
+5. B
+6. C
+7. B
+8. C
+9. C
+10. B
+
+Teil 3:
+1. A
+2. A
+3. D
+4. A
+5. C
+
+Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff).toMatchObject({
+      mode: "objective",
+      changedAnswers: 3,
+      overlappingQuestions: 15,
+    });
+    expect(diff.changedCharacters).toBeGreaterThan(0);
+    expect(diff.newWordsCount).toBeGreaterThan(0);
+  });
+
+  it("falls back to text mode when numbered responses contain full-sentence answers", () => {
+    const previousSubmission = `Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const currentSubmission = `Teil :4
+1. Ich esse gerne brot und suppe
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff.mode).toBe("text");
+    expect(diff.changedCharacters).toBeGreaterThan(0);
+  });
+
+  it("counts repeated added words when short answers are expanded with fuller text", () => {
+    const previousSubmission = `Teil 2:
+1. B
+2. C
+3. A
+4. C
+5. B
+6. B
+7. A
+8. C
+9. C
+10. B`;
+
+    const currentSubmission = `Teil 2: chapter 9
+1. B Apfel und Karotten
+2. C Karotten
+3. A Weil er brot mag
+4. C
+5. B
+6. B
+7. B
+8. C
+9. C
+10. B`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff.mode).toBe("text");
+    expect(diff.changedCharacters).toBeGreaterThanOrEqual(40);
+    expect(diff.newWordsCount).toBeGreaterThanOrEqual(8);
+  });
+
+  it("stores the true chapter and canonical id in the submission payload", async () => {
+    renderPage();
+
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeInTheDocument());
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: TUTOR_ASSIGNMENT_LABEL },
+    });
+
+    expect(screen.getByText("Chapter: 1.1")).toBeInTheDocument();
+    expect(screen.getByText("Canonical ID: A1-1.1")).toBeInTheDocument();
+    expect(screen.getByLabelText(/I confirm I am submitting Chapter 1.1 \(A1-1.1\)\./i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), {
+      target: {
+        value:
+          "This is a long enough practice submission for the chapter routing test. It includes enough detail to pass the minimum character requirement.",
+      },
+    });
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+
+    await waitFor(() => expect(writeBatch).toHaveBeenCalled());
+
+    const payload = writeBatch.mock.results[0].value.set.mock.calls[0][1];
+    expect(writeBatch.mock.results[0].value.set).toHaveBeenCalledTimes(2);
+    expect(payload.day).toBe(1);
+    expect(payload.chapter).toBe("1.1");
+    expect(payload.assignmentId).toBe("A1-1.1");
+    expect(payload.assignmentKey).toBe("A1-1.1");
+    expect(payload.canonicalAssignmentKey).toBe("A1-1.1");
+    expect(payload.assignment_id).toBe("A1-1.1");
+    expect(payload.reviewStatus).toBe("pending_review");
+    expect(payload.isResubmission).toBe(false);
+    expect(payload.attempt).toBe(1);
+    expect(payload.attemptNumber).toBe(1);
+    expect(payload.submittedAt).toEqual({ seconds: 1 });
+    expect(payload.answer).toBe(payload.submissionText);
+    expect(payload.workContent).toBe(payload.submissionText);
+  });
+
+  it("builds queue-compatible metadata for a failed assignment resubmission without client timestamps", () => {
+    const metadata = __TESTING__.buildAttemptMetadata({
+      attempt: 2,
+      isResubmission: true,
+      previousScore: 42,
+    });
+
+    expect(metadata).toEqual({
+      attempt: 2,
+      attemptNumber: 2,
+      isResubmission: true,
+      reviewStatus: "pending_review",
+      previousScore: 42,
+    });
+    expect(metadata).not.toHaveProperty("submittedAt");
+    expect(metadata).not.toHaveProperty("resubmittedAt");
+  });
+
+  it("uses the latest marked score when deciding whether resubmission is allowed", () => {
+    const latestScore = __TESTING__.getLatestSubmissionScore([
+      { assignmentId: "A1-1.1", score: 75, markedAt: "2026-01-01T00:00:00.000Z" },
+      { assignmentId: "A1-1.1", score: "42%", scoredAt: "2026-02-01T00:00:00.000Z" },
+      { assignmentId: "A1-2.1", score: 90, markedAt: "2026-03-01T00:00:00.000Z" },
+    ], (entry) => entry.assignmentId === "A1-1.1");
+
+    expect(latestScore).toBe(42);
+    expect(latestScore).toBeLessThan(60);
+  });
+
+  it("normalizes previous scores for resubmission eligibility and metadata", () => {
+    expect(__TESTING__.getSubmissionScore({ score: "59%" })).toBe(59);
+    expect(__TESTING__.getSubmissionScore({ previousScore: 45 })).toBe(45);
+    expect(__TESTING__.getSubmissionScore({ score: "not marked" })).toBeNull();
+  });
+
+  it("derives resubmission visibility from only the selected assignment score", () => {
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: null, isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: false,
+      isAwaitingSelectedAssignmentReview: true,
+      selectedAssignmentFailed: false,
+      canAccessResubmission: false,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: "", isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: false,
+      isAwaitingSelectedAssignmentReview: true,
+      selectedAssignmentFailed: false,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: 45, isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: true,
+      selectedAssignmentFailed: true,
+      canAccessResubmission: true,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: "45", isSelectedLocked: true })).toMatchObject({
+      hasSelectedAssignmentScore: true,
+      selectedAssignmentFailed: true,
+      canAccessResubmission: true,
+    });
+    expect(__TESTING__.deriveResubmissionAccessState({ rawSelectedScore: 60, isSelectedLocked: true })).toMatchObject({
+      selectedAssignmentPassed: true,
+      canAccessResubmission: false,
+    });
+  });
+
+  it("keeps corrected text payload fields free from Falowen page helper text", () => {
+    const correctedText = "Meine korrigierte Antwort enthält nur die neue Schülerantwort und keine Seitentexte.";
+    const payload = {
+      submissionText: correctedText,
+      answer: correctedText,
+      workContent: correctedText,
+      submissionFingerprint: __TESTING__.buildSubmissionFingerprint({
+        assignmentTitle: TUTOR_ASSIGNMENT_LABEL,
+        chapterKey: "chapter-1.1",
+        submissionText: correctedText,
+      }),
+      ...__TESTING__.buildAttemptMetadata({ attempt: 2, isResubmission: true, previousScore: 45 }),
+    };
+
+    ["Resubmission unlocked", "Resubmissions left", "First submission is #1", "You can resubmit", "Corrected text", "Submitted preview", "Review details"].forEach((phrase) => {
+      expect(payload.submissionText).not.toContain(phrase);
+      expect(payload.answer).not.toContain(phrase);
+      expect(payload.workContent).not.toContain(phrase);
+    });
+    expect(payload).not.toHaveProperty("createdAt");
+    expect(payload).not.toHaveProperty("updatedAt");
+    expect(payload).not.toHaveProperty("submittedAt");
+    expect(payload).not.toHaveProperty("resubmittedAt");
+  });
+
+  it("strips exact Falowen helper lines and null characters before callable resubmission payloads", () => {
+    expect(__TESTING__.stripFalowenUiTextAndNulls("Resubmission unlocked\nMeine Antwort\u0000\nCorrected text")).toBe("Meine Antwort");
+  });
+
+  it("detects accidental pasted Falowen interface text", () => {
+    expect(__TESTING__.appearsToContainFalowenUiText("Resubmission unlocked\nCorrected text\nReview details")).toBe(true);
+    expect(__TESTING__.appearsToContainFalowenUiText("Meine richtige Antwort steht hier.")).toBe(false);
+  });
+
+  it("normalizes Firestore timestamps before callable payloads", () => {
+    expect(__TESTING__.normalizeSerializableTimestamp({ seconds: 10, nanoseconds: 5 })).toEqual({ seconds: 10, nanoseconds: 5 });
+    expect(__TESTING__.normalizeSerializableTimestamp({ toMillis: () => 1234 })).toBe(1234);
+    expect(__TESTING__.normalizeSerializableTimestamp({ _methodName: "serverTimestamp" })).toBeNull();
+  });
+
+  it("falls back to auth display name when student profile name is missing", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: {},
+      userDisplayName: "Moreen Display",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("Moreen Display");
+  });
+
+  it("falls back to email local-part when both profile and auth names are missing", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: {},
+      userDisplayName: "",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("coffiemoreen");
+  });
+
+  it("uses legacy fullName when name is not present on student profile", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: { fullName: "Ada Lovelace" },
+      userDisplayName: "",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("Ada Lovelace");
+  });
+});

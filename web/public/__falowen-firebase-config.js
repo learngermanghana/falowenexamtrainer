@@ -1,0 +1,1 @@
+self.__FALOWEN_FIREBASE_CONFIG__ = self.__FALOWEN_FIREBASE_CONFIG__ || {};

@@ -1,0 +1,208 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const repoRoot = path.resolve(__dirname, "../..");
+
+const allowedLevels = new Set(["A1", "A2", "B1", "B2", "C1"]);
+const requestedLevel = String(process.argv[2] || "").trim().toUpperCase();
+
+if (!allowedLevels.has(requestedLevel)) {
+  throw new Error(`Choose one level: ${[...allowedLevels].join(", ")}`);
+}
+
+const curriculumPath = path.join(repoRoot, "shared", "curriculumCanonical.json");
+const outputDir = path.join(repoRoot, "artifacts", "course-material-bundles", requestedLevel);
+const outputPath = path.join(outputDir, `Falowen-${requestedLevel}-Course-Materials-manifest.json`);
+
+const curriculum = JSON.parse(fs.readFileSync(curriculumPath, "utf8"));
+
+const normalizeLevel = (value) => String(value || "").trim().toUpperCase();
+const normalizeDay = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? number : null;
+};
+
+const classifyPrintableLesson = (level, day, title = "") => {
+  if (level === "A1") {
+    if (day === 0) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Orientation and platform tutorial",
+      };
+    }
+
+    // The final mock belongs in Exams Room, not in the teaching Course Book PDF.
+    if (/final mock exam/i.test(title)) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Final mock examination belongs to Exams Room",
+      };
+    }
+
+    return {
+      printKind: "combined",
+      status: "ready-for-render-audit",
+    };
+  }
+
+  if (["A2", "B1"].includes(level)) {
+    if (day === 0) {
+      return {
+        printKind: "excluded",
+        status: "excluded-from-course-book",
+        exclusionReason: "Orientation and platform tutorial",
+      };
+    }
+
+    return {
+      printKind: "workbook",
+      status: "ready-for-render-audit",
+    };
+  }
+
+  if (["B2", "C1"].includes(level)) {
+    return {
+      printKind: "combined",
+      status: "ready-for-render-audit",
+    };
+  }
+
+  return {
+    printKind: "review-required",
+    status: "needs-route-classification",
+  };
+};
+
+const lessonCandidates = [];
+const seenObjects = new WeakSet();
+
+const visit = (value, inheritedLevel = "") => {
+  if (!value || typeof value !== "object") return;
+  if (seenObjects.has(value)) return;
+  seenObjects.add(value);
+
+  if (Array.isArray(value)) {
+    value.forEach((item) => visit(item, inheritedLevel));
+    return;
+  }
+
+  const objectLevel = normalizeLevel(
+    value.level || value.courseLevel || value.languageLevel || inheritedLevel,
+  );
+  const day = normalizeDay(value.day ?? value.dayNumber ?? value.lessonDay);
+  const title = String(
+    value.title || value.topic || value.lessonTitle || value.name || "",
+  ).trim();
+
+  if (objectLevel === requestedLevel && day !== null && title) {
+    lessonCandidates.push({
+      day,
+      chapter: String(value.chapter || value.chapterNumber || "").trim(),
+      title,
+      sourceUrl: String(
+        value.workbook_link
+          || value.workbookLink
+          || value.workbookRoute
+          || value.workbookUrl
+          || value.url
+          || value.route
+          || value.path
+          || value.lessonUrl
+          || "",
+      ).trim(),
+    });
+  }
+
+  Object.values(value).forEach((child) => visit(child, objectLevel || inheritedLevel));
+};
+
+visit(curriculum);
+
+const byDay = new Map();
+for (const lesson of lessonCandidates) {
+  const existing = byDay.get(lesson.day);
+  if (!existing || (!existing.sourceUrl && lesson.sourceUrl)) {
+    byDay.set(lesson.day, lesson);
+  }
+}
+
+const lessons = [...byDay.values()]
+  .sort((a, b) => a.day - b.day)
+  .map((lesson) => {
+    const route = requestedLevel === "B1" && lesson.day > 0
+      ? `/campus/course/lesson/B1/${lesson.day}?view=workbook`
+      : lesson.sourceUrl.startsWith("/")
+        ? lesson.sourceUrl
+        : `/campus/course/lesson/${requestedLevel}/${lesson.day}`;
+    const classification = classifyPrintableLesson(requestedLevel, lesson.day, lesson.title);
+
+    return {
+      ...lesson,
+      route,
+      ...classification,
+    };
+  });
+
+if (!lessons.length) {
+  throw new Error(`No ${requestedLevel} lessons were found in shared/curriculumCanonical.json`);
+}
+
+const expectedDays = lessons.map((lesson) => lesson.day);
+const firstDay = Math.min(...expectedDays);
+const lastDay = Math.max(...expectedDays);
+const missingDays = [];
+for (let day = firstDay; day <= lastDay; day += 1) {
+  if (!byDay.has(day)) missingDays.push(day);
+}
+
+const unresolvedLessons = lessons
+  .filter((lesson) => lesson.printKind === "review-required")
+  .map(({ day, chapter, title, route }) => ({ day, chapter, title, route }));
+const excludedLessons = lessons
+  .filter((lesson) => lesson.printKind === "excluded")
+  .map(({ day, chapter, title, route, exclusionReason }) => ({
+    day,
+    chapter,
+    title,
+    route,
+    exclusionReason,
+  }));
+const printableLessons = lessons.filter((lesson) => lesson.printKind !== "excluded");
+const curriculumComplete = missingDays.length === 0;
+const routesClassified = unresolvedLessons.length === 0;
+
+const manifest = {
+  schemaVersion: 3,
+  level: requestedLevel,
+  curriculumSource: "shared/curriculumCanonical.json",
+  generatedAt: new Date().toISOString(),
+  generator: "scripts/course-material-bundles/buildLevelManifest.mjs",
+  lessonCount: lessons.length,
+  printableLessonCount: printableLessons.length,
+  excludedLessonCount: excludedLessons.length,
+  excludedLessons,
+  firstDay,
+  lastDay,
+  missingDays,
+  unresolvedLessonCount: unresolvedLessons.length,
+  unresolvedLessons,
+  curriculumComplete,
+  routesClassified,
+  readyForPdfGeneration: curriculumComplete && routesClassified && printableLessons.length > 0,
+  lessons,
+};
+
+fs.mkdirSync(outputDir, { recursive: true });
+fs.writeFileSync(outputPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+
+console.log(`Created ${outputPath}`);
+console.log(`${requestedLevel}: ${lessons.length} lessons, ${missingDays.length} missing day(s)`);
+console.log(`Printable lessons: ${printableLessons.length}`);
+console.log(`Excluded lessons: ${excludedLessons.length}`);
+console.log(`Unresolved printable routes: ${unresolvedLessons.length}`);
+console.log(`Ready for PDF generation: ${manifest.readyForPdfGeneration}`);

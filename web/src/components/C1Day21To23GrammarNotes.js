@@ -1,0 +1,126 @@
+import React, { useMemo, useState } from "react";
+import { styles } from "../styles";
+
+const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e2e8f0", borderRadius: 18, boxShadow: "0 10px 26px rgba(15,23,42,.06)" };
+const listStyle = { margin: 0, paddingLeft: 22, lineHeight: 1.75 };
+const tableStyle = { width: "100%", borderCollapse: "collapse", fontSize: ".95rem" };
+const cellStyle = { border: "1px solid #e5e7eb", padding: "10px 12px", textAlign: "left", verticalAlign: "top", lineHeight: 1.6 };
+const NoteBox = ({ children, tone = "blue" }) => {
+  const tones = { blue: ["#bfdbfe", "#eff6ff", "#1e3a8a"], green: ["#bbf7d0", "#f0fdf4", "#14532d"], amber: ["#fde68a", "#fffbeb", "#92400e"] };
+  const [border, background, color] = tones[tone] || tones.blue;
+  return <div style={{ border: `1px solid ${border}`, borderRadius: 14, padding: 14, background, color, lineHeight: 1.7 }}>{children}</div>;
+};
+const Table = ({ rows }) => <div style={{ overflowX: "auto" }}><table style={tableStyle}><thead><tr><th style={cellStyle}>Struktur</th><th style={cellStyle}>C1-Beispiel</th></tr></thead><tbody>{rows.map(([a, b]) => <tr key={a + b}><td style={cellStyle}><strong>{a}</strong></td><td style={cellStyle}>{b}</td></tr>)}</tbody></table></div>;
+
+const lessons = {
+  21: {
+    title: "Temporale und kausale Strukturen bei Migration und Teilhabe",
+    subtitle: "Migrationserfahrungen, Sprache und Chancen als Prozess beschreiben",
+    why: "Bei Migration und Teilhabe geht es fast immer um Entwicklungen: zuerst ankommen, dann Sprache lernen, Qualifikationen anerkennen lassen, Arbeit finden und soziale Kontakte aufbauen. Auf C1 solltest du diese Schritte nicht einfach aufzählen, sondern zeitlich und logisch miteinander verbinden.",
+    goals: ["zeitliche Abläufe mit nachdem, sobald und während strukturieren", "Gründe mit da, zumal und aufgrund ausdrücken", "zwischen Ursache, Folge und Zeitpunkt unterscheiden", "Teilhabe als mehrstufigen Prozess erklären"],
+    explanation: [
+      ["1. Zeitpunkt und Reihenfolge", "Mit nachdem beschreibst du, was zuerst passiert ist. Im Nebensatz steht das frühere Ereignis: Nachdem die Anerkennung abgeschlossen wurde, konnte sie eine qualifizierte Stelle antreten."],
+      ["2. Sobald = ab dem Moment, in dem", "Sobald betont einen klaren Startpunkt: Sobald Sprachkurse zugänglich sind, verbessern sich die Chancen auf gesellschaftliche Teilhabe."],
+      ["3. Ursache sachlich ausdrücken", "Da und zumal leiten Nebensätze ein. Aufgrund steht mit einem Nomen: aufgrund fehlender Sprachkenntnisse / aufgrund der langen Wartezeit."],
+      ["4. C1-Tipp", "Verbinde Zeit und Ursache: Nachdem ein Abschluss anerkannt wurde, steigen die Berufschancen deutlich, zumal Arbeitgeber die Qualifikation nun besser einordnen können."],
+    ],
+    rows: [["nachdem", "Nachdem Zugewanderte Sprachkenntnisse aufgebaut haben, verbessern sich ihre Chancen auf dem Arbeitsmarkt."], ["sobald", "Sobald Beratung zugänglich ist, können bürokratische Hürden schneller überwunden werden."], ["aufgrund + Genitiv", "Aufgrund fehlender Anerkennung bleiben manche Qualifikationen ungenutzt."], ["zumal", "Sprachförderung ist zentral, zumal sie soziale Kontakte und berufliche Teilhabe erleichtert."]],
+    model: "Migration ist nicht nur ein Ortswechsel, sondern ein längerer Prozess gesellschaftlicher Teilhabe. Nachdem Menschen angekommen sind, benötigen sie Sprache, Beratung und Zugang zu Bildung oder Arbeit. Aufgrund bürokratischer Hürden bleiben vorhandene Qualifikationen jedoch häufig ungenutzt. Sprachförderung ist daher besonders wichtig, zumal sie nicht nur berufliche Chancen verbessert, sondern auch soziale Kontakte ermöglicht.",
+    quiz: [
+      { q: "Welche Form zeigt, dass ein Ereignis vor einem anderen abgeschlossen ist?", options: ["obwohl", "nachdem", "damit", "währenddessen"], answer: 1, why: "Nach nachdem wird ein früheres Ereignis beschrieben." },
+      { q: "Welche Formulierung ist korrekt?", options: ["Aufgrund die Wartezeit", "Aufgrund der Wartezeit", "Aufgrund von der Wartezeit", "Aufgrund dass die Wartezeit"], answer: 1, why: "Aufgrund wird in formeller Standardsprache typischerweise mit Genitiv verwendet." },
+      { q: "Welche Konjunktion bedeutet ungefähr 'besonders weil'?", options: ["zumal", "sobald", "während", "obgleich"], answer: 0, why: "Zumal nennt einen zusätzlichen, besonders wichtigen Grund." },
+      { q: "Sobald die Beratung beginnt, ...", options: ["wird der Zugang leichter.", "würde der Zugang leichter gewesen.", "der Zugang leichter wird.", "ist leichter der Zugang."], answer: 0, why: "Der sobald-Nebensatz steht zuerst; im Hauptsatz folgt Verbposition 2." },
+      { q: "Welche Aussage beschreibt Teilhabe am differenziertesten?", options: ["Migration endet mit der Ankunft.", "Teilhabe hängt nur von der Person ab.", "Teilhabe entwickelt sich durch Sprache, Anerkennung, Arbeit und soziale Kontakte.", "Teilhabe bedeutet nur einen Arbeitsplatz zu haben."], answer: 2, why: "C1 verlangt eine mehrdimensionale Beschreibung des Prozesses." },
+    ],
+  },
+  22: {
+    title: "Indirekte Rede und argumentative Distanz bei Politik und Mitbestimmung",
+    subtitle: "Quellen nennen, Schlussfolgerungen markieren und fremde Aussagen klar von der eigenen Bewertung trennen",
+    why: "In politischen Texten musst du deutlich machen, woher eine Aussage kommt und ob du sie nur wiedergibst oder selbst bewertest. Besonders wichtig ist der Unterschied zwischen laut und demnach: laut nennt eine Quelle; demnach bezieht sich auf eine vorherige Aussage und zeigt, was daraus folgt oder was dieser Aussage zufolge gilt.",
+    goals: ["Konjunktiv I für indirekte Rede erkennen und korrekt bilden", "Quellen mit laut + Dativ, zufolge und nach Angaben von nennen", "demnach als Satzadverb mit Verb auf Position 2 verwenden", "fremde Position, Schlussfolgerung und eigene Bewertung klar trennen"],
+    explanation: [
+      ["1. Warum Konjunktiv I?", "Der Konjunktiv I signalisiert: Das ist eine fremde Aussage, nicht automatisch meine eigene Position. Direkt: Der Bericht sagt: 'Politische Bildung ist wichtig.' Indirekt: Der Bericht erklärt, politische Bildung sei wichtig."],
+      ["2. Typische Formen richtig bilden", "sein: er/sie sei, sie seien. haben: er/sie habe; im Plural verwendet man häufig hätten als Ersatzform, weil Konjunktiv I haben mit dem Indikativ identisch ist. können: er/sie könne; im Plural steht häufig könnten als Ersatzform. Wenn Konjunktiv I und Indikativ gleich aussehen und dadurch unklar wären, wird häufig Konjunktiv II verwendet."],
+      ["3. laut + Dativ = Wer sagt das?", "Laut ist eine Präposition und nennt die Quelle einer Aussage. In dieser Lektion verwenden wir laut + Dativ: die Studie → laut der Studie; der Bericht → laut dem Bericht; eine Untersuchung → laut einer Untersuchung; die Angaben → laut den Angaben. Steht die laut-Gruppe am Satzanfang, besetzt sie Position 1 und das finite Verb folgt auf Position 2: Laut der Studie fühlen sich viele Jugendliche nicht ausreichend vertreten. Auch im Mittelfeld ist laut möglich: Viele Jugendliche fühlen sich laut der Studie nicht ausreichend vertreten. Laut verlangt nicht automatisch Konjunktiv I: Laut der Studie fühlen sich ... ist möglich; mit stärkerer Distanzierung auch: Laut der Studie seien viele Jugendliche ..."],
+      ["4. demnach = Was folgt daraus?", "Demnach ist keine Präposition, sondern ein Satzadverb. Es nennt nicht selbst die Quelle, sondern verweist auf etwas, das vorher gesagt oder festgestellt wurde. Am Satzanfang steht danach sofort das finite Verb: Viele junge Menschen fühlen sich nicht vertreten. Demnach sollten Beteiligungsangebote leichter zugänglich sein. Bei berichteter Information ist auch Konjunktiv I möglich: Die Initiative veröffentlichte einen Bericht. Demnach seien Bürgerräte besonders wirksam. Falsch wäre: 'Demnach der Studie ...' — dafür sagt man 'Laut der Studie ...' oder 'Der Studie zufolge ...'."],
+      ["5. zufolge und nach Angaben", "Zufolge steht typischerweise nach einer Dativgruppe: dem Bericht zufolge, der Studie zufolge. Nach Angaben nennt ebenfalls eine Quelle: Nach Angaben der Initiative ... / Nach Angaben von Expertinnen und Experten ... Steht eine solche Quellenangabe auf Position 1, folgt im Hauptsatz das finite Verb auf Position 2."],
+      ["6. C1-Tipp: Quelle → Folge → Bewertung", "Baue politische Argumente in drei Schritten auf: Laut einer aktuellen Studie seien Bürgerräte geeignet, politische Beteiligung zu stärken. Demnach könnten Kommunen solche Formate häufiger einsetzen. Diese Schlussfolgerung ist jedoch nur dann überzeugend, wenn die Teilnehmenden gesellschaftlich breit ausgewählt werden. Merksatz: laut = Wer sagt das? demnach = Was folgt aus dem Gesagten?"],
+      ["7. Häufige Fehler", "Nicht: 'Laut die Studie ...', sondern: 'Laut der Studie ...'. Nicht: 'Laut der Studie viele Jugendliche fühlen ...', sondern: 'Laut der Studie fühlen viele Jugendliche ...'. Nicht: 'Demnach die Angebote müssen ...', sondern: 'Demnach müssen die Angebote ...'. Nicht: 'Demnach der Studie ...', sondern: 'Laut der Studie ...' oder 'Der Studie zufolge ...'."],
+    ],
+    rows: [
+      ["laut + Dativ", "Laut der Studie fühlen sich viele junge Menschen politisch nicht ausreichend vertreten."],
+      ["laut + Konjunktiv I", "Laut der Initiative seien Bürgerräte besonders wirksam."],
+      ["demnach", "Viele junge Menschen fühlen sich nicht vertreten. Demnach sollten Beteiligungsangebote leichter zugänglich sein."],
+      ["dem Bericht zufolge", "Dem Bericht zufolge ist politische Bildung eine wichtige Voraussetzung für Mitbestimmung."],
+      ["nach Angaben", "Nach Angaben der Initiative nehmen immer mehr Kommunen an dem Projekt teil."],
+      ["eigene Bewertung", "Diese Schlussfolgerung erscheint sinnvoll, setzt jedoch ausreichende Information voraus."],
+    ],
+    model: "Laut einer aktuellen Studie seien Bürgerräte besonders geeignet, politische Beteiligung zu stärken. Die Befragten hätten dadurch mehr Möglichkeiten, ihre Perspektiven in politische Prozesse einzubringen. Demnach könnten Kommunen solche Beteiligungsformate häufiger einsetzen. Diese Schlussfolgerung erscheint grundsätzlich sinnvoll, überzeugt jedoch nur dann vollständig, wenn die Teilnehmenden gesellschaftlich breit ausgewählt werden und Zugang zu ausreichenden Informationen erhalten.",
+    quiz: [
+      { q: "Welche Formulierung ist korrekt?", options: ["Laut die Studie fühlen sich viele Menschen nicht vertreten.", "Laut der Studie fühlen sich viele Menschen nicht vertreten.", "Laut der Studie viele Menschen fühlen sich nicht vertreten.", "Demnach der Studie fühlen sich viele Menschen nicht vertreten."], answer: 1, why: "In dieser Lektion steht laut mit Dativ: die Studie → laut der Studie. Steht die Quellenangabe zuerst, folgt das finite Verb auf Position 2." },
+      { q: "Was ist der wichtigste Unterschied zwischen laut und demnach?", options: ["Beide nennen immer eine Quelle.", "Laut nennt eine Quelle; demnach verweist auf Vorheriges und markiert eine Folgerung oder wiedergegebene Aussage.", "Demnach steht mit Dativ; laut ist ein Adverb.", "Es gibt keinen Unterschied."], answer: 1, why: "Laut beantwortet vor allem 'Wer sagt das?'; demnach beantwortet im Kontext eher 'Was folgt daraus bzw. was gilt nach dem zuvor Gesagten?'" },
+      { q: "Welche Satzstellung ist korrekt?", options: ["Demnach die Angebote müssen leichter zugänglich sein.", "Demnach müssen die Angebote leichter zugänglich sein.", "Demnach der Bericht müssen die Angebote leichter zugänglich sein.", "Demnach leichter zugänglich die Angebote müssen sein."], answer: 1, why: "Demnach steht auf Position 1; das finite Verb steht deshalb direkt danach auf Position 2." },
+      { q: "Welche Form nennt ausdrücklich eine Quelle?", options: ["demnach", "laut der Studie", "infolgedessen", "deshalb"], answer: 1, why: "Laut der Studie nennt die Quelle direkt. Demnach verweist dagegen auf bereits genannten Inhalt." },
+      { q: "Welche C1-Abfolge trennt fremde Aussage und eigene Bewertung am klarsten?", options: ["Eigene Meinung → erfundene Quelle", "Quelle/Position → Schlussfolgerung → eigene Bewertung", "Nur Konjunktiv I ohne Quelle", "Nur eigene Meinung"], answer: 1, why: "So bleibt nachvollziehbar, was die Quelle sagt, was daraus folgt und was du selbst davon hältst." },
+    ],
+  },
+  23: {
+    title: "Konzessive und finale Strukturen bei Freizeit und Work-Life-Balance",
+    subtitle: "Einwände und Ziele präzise miteinander verbinden",
+    why: "Work-Life-Balance enthält typische Gegensätze: Flexibilität kann hilfreich sein, aber auch Grenzen verwischen. C1-Sprache zeigt diese Spannung und erklärt zugleich, wozu Maßnahmen dienen.",
+    goals: ["Einwände mit obgleich, wenngleich und selbst wenn formulieren", "Ziele mit damit und um ... zu ausdrücken", "damit und um ... zu korrekt unterscheiden", "Chancen und Risiken flexibler Arbeit abwägen"],
+    explanation: [
+      ["1. Konzession = trotz eines Gegenarguments", "Obgleich flexible Arbeit mehr Freiheit bietet, kann ständige Erreichbarkeit belastend sein. Der Nebensatz nennt einen Punkt, der die Hauptaussage eigentlich infrage stellen könnte."],
+      ["2. Selbst wenn", "Selbst wenn verstärkt die Konzession: Selbst wenn jemand gern arbeitet, braucht er Erholung."],
+      ["3. damit oder um ... zu?", "Um ... zu verwendest du meist bei gleichem Subjekt: Beschäftigte machen Pausen, um sich zu erholen. Damit ist nötig, wenn die Subjekte verschieden sind: Unternehmen schaffen Regeln, damit Beschäftigte abschalten können."],
+      ["4. C1-Tipp", "Verbinde Einwand und Lösung: Obgleich Homeoffice mehr Flexibilität schafft, sollten klare Erreichbarkeitsregeln gelten, damit Freizeit tatsächlich geschützt bleibt."],
+    ],
+    rows: [["obgleich", "Obgleich viele Menschen flexible Arbeit schätzen, verschwimmen dadurch oft Grenzen."], ["selbst wenn", "Selbst wenn jemand gern arbeitet, braucht er regelmäßige Erholung."], ["damit", "Unternehmen sollten klare Erreichbarkeitsregeln schaffen, damit Freizeit geschützt bleibt."], ["um ... zu", "Viele Beschäftigte planen bewusste Pausen, um langfristig leistungsfähig zu bleiben."]],
+    model: "Work-Life-Balance ist mehr als ein persönliches Zeitmanagementproblem. Obgleich flexible Arbeitsmodelle mehr Freiheit ermöglichen, können sie auch dazu führen, dass berufliche Aufgaben ständig präsent bleiben. Unternehmen sollten klare Regeln zur Erreichbarkeit schaffen, damit Erholung wirklich geschützt wird. Gleichzeitig müssen Beschäftigte lernen, Grenzen zu setzen, um langfristig gesund und leistungsfähig zu bleiben.",
+    quiz: [
+      { q: "Welches Wort ist ein gehobenes Synonym für obwohl?", options: ["damit", "obgleich", "sobald", "zumal"], answer: 1, why: "Obgleich ist eine formellere konzessive Konjunktion." },
+      { q: "Unternehmen schaffen Regeln, ___ Beschäftigte abschalten können.", options: ["um", "damit", "obgleich", "nachdem"], answer: 1, why: "Die Subjekte sind verschieden: Unternehmen / Beschäftigte. Deshalb passt damit." },
+      { q: "Beschäftigte machen Pausen, ___ sich zu erholen.", options: ["damit", "um", "obwohl", "sobald"], answer: 1, why: "Das Subjekt bleibt gleich, daher passt um ... zu." },
+      { q: "Welche Aussage enthält eine Konzession?", options: ["Weil Homeoffice flexibel ist, ist es beliebt.", "Obgleich Homeoffice flexibel ist, kann es belastend sein.", "Damit Homeoffice flexibel ist, arbeitet man.", "Nachdem Homeoffice flexibel ist, arbeitet man."], answer: 1, why: "Obgleich stellt zwei gegensätzliche Aspekte gegenüber." },
+      { q: "Welche C1-Aussage ist am ausgewogensten?", options: ["Homeoffice ist immer gut.", "Homeoffice ist immer schlecht.", "Flexible Arbeit bietet Chancen, erfordert jedoch klare Grenzen zum Schutz der Erholung.", "Arbeit und Freizeit sind dasselbe."], answer: 2, why: "Die Aussage wägt Vorteil und notwendige Bedingung gegeneinander ab." },
+    ],
+  },
+};
+
+function KnowledgeTest({ questions = [] }) {
+  const [answers, setAnswers] = useState({});
+  const score = useMemo(() => questions.reduce((sum, item, index) => sum + (answers[index] === item.answer ? 1 : 0), 0), [answers, questions]);
+  return <section style={card}>
+    <div><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Knowledge Test</h2><p style={{ margin: "6px 0 0", lineHeight: 1.7, color: "#475569" }}>Klicke auf eine Antwort. Du siehst sofort, ob sie richtig ist.</p></div>
+    {questions.map((item, index) => {
+      const selected = answers[index];
+      return <div key={item.q} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 9 }}>
+        <strong>{index + 1}. {item.q}</strong>
+        <div style={{ display: "grid", gap: 7 }}>{item.options.map((option, optionIndex) => {
+          const chosen = selected === optionIndex;
+          const isCorrect = optionIndex === item.answer;
+          const background = chosen ? (isCorrect ? "#f0fdf4" : "#fef2f2") : "#fff";
+          const borderColor = chosen ? (isCorrect ? "#22c55e" : "#ef4444") : "#cbd5e1";
+          return <button key={option} type="button" onClick={() => setAnswers((old) => ({ ...old, [index]: optionIndex }))} style={{ ...styles.secondaryButton, justifyContent: "flex-start", textAlign: "left", background, borderColor }}>{String.fromCharCode(65 + optionIndex)}) {option}</button>;
+        })}</div>
+        {selected !== undefined ? <NoteBox tone={selected === item.answer ? "green" : "amber"}><strong>{selected === item.answer ? "Richtig." : "Noch nicht."}</strong> {item.why}</NoteBox> : null}
+      </div>;
+    })}
+    <strong>Score: {score}/{questions.length}</strong>
+  </section>;
+}
+
+export default function C1Day21To23GrammarNotes({ day, checked = false, onCheckedChange }) {
+  const lesson = lessons[Number(day)];
+  if (!lesson) return null;
+  return <div style={{ display: "grid", gap: 16 }}>
+    <section style={card}><span style={{ ...styles.badge, width: "fit-content" }}>C1 · Day {day} · Grammar Notes</span><h2 style={{ ...styles.title, margin: 0, fontSize: "clamp(1.7rem,4vw,2.5rem)" }}>{lesson.title}</h2><p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>{lesson.subtitle}</p></section>
+    <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Was lernst du hier?</h2><p style={{ margin: 0, lineHeight: 1.75 }}>{lesson.why}</p><NoteBox><strong>Nach dieser Lektion kannst du:</strong><ul style={{ ...listStyle, marginTop: 8 }}>{lesson.goals.map((goal) => <li key={goal}>{goal}</li>)}</ul></NoteBox></section>
+    <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Grammatik Schritt für Schritt</h2>{lesson.explanation.map(([title, text]) => <div key={title} style={{ display: "grid", gap: 5 }}><strong>{title}</strong><p style={{ margin: 0, lineHeight: 1.75 }}>{text}</p></div>)}</section>
+    <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>Kernstrukturen auf einen Blick</h2><Table rows={lesson.rows} /></section>
+    <KnowledgeTest questions={lesson.quiz} />
+    <section style={card}><h2 style={{ margin: 0, fontSize: "1.2rem" }}>C1-Modellabsatz</h2><NoteBox tone="green">{lesson.model}</NoteBox></section>
+    <section style={card}><label style={{ display: "flex", alignItems: "flex-start", gap: 10, fontWeight: 800, lineHeight: 1.6 }}><input type="checkbox" checked={Boolean(checked)} onChange={(event) => onCheckedChange?.(event.target.checked)} style={{ marginTop: 4 }} /><span>Ich habe die Grammatik gelesen und den Knowledge Test bearbeitet.</span></label></section>
+  </div>;
+}

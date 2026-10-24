@@ -1,0 +1,224 @@
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+import FalowenRadioTabContent from "./FalowenRadioTabContent";
+import { getLessonRadioResource } from "../data/lessonRadioDictionary";
+import { getB1Day5RadioResource } from "../data/b1Day5Media";
+import { getB2C1RadioResource } from "../data/b2C1LessonMediaOverrides";
+import { courseDebug } from "../lib/courseDebug";
+import { styles } from "../styles";
+import { getConfiguredInAppWorkbookResourceRoute } from "../data/inAppWorkbookRoutes";
+import { addDay20WorkbookView } from "../utils/a1ChapterResourceHubState";
+import { buildA1TutorMarkedWorkbookHref, getA1AssignmentByDayAndChapter } from "../data/a1AssignmentRegistry";
+import { getA1GrammarRoute } from "../data/a1GrammarRoutes";
+
+const RADIO_COMPLETE_PARAM = "radio";
+const RADIO_COMPLETE_VALUE = "done";
+const completedRadioSteps = new Set();
+
+const radioStepKey = (level, day) => `${String(level || "").trim().toUpperCase()}:${Number(day)}`;
+
+export const hasPlayableRadioResource = (resource) =>
+  Boolean(
+    String(resource?.youtubeId || "").trim() ||
+      String(resource?.url || "").trim(),
+  );
+
+export const isFalowenRadioResource = (resource) => {
+  if (!hasPlayableRadioResource(resource)) return false;
+  const key = String(resource?.key || "").trim().toLowerCase();
+  const role = String(resource?.resourceRole || resource?.role || "").trim().toLowerCase();
+  const title = String(resource?.title || "").trim().toLowerCase();
+  return key.includes("radio") || role === "falowenradio" || title.includes("falowen radio");
+};
+
+export const resolveRadioFirstWorkbookResource = (level, day) => {
+  const resource =
+    getB2C1RadioResource(level, day) ||
+    getLessonRadioResource(level, day) ||
+    getB1Day5RadioResource(level, day);
+  return hasPlayableRadioResource(resource) ? resource : null;
+};
+
+const hasCompletedRadioStep = (search = "", level = "", day = "") => {
+  try {
+    return new URLSearchParams(search).get(RADIO_COMPLETE_PARAM) === RADIO_COMPLETE_VALUE
+      || completedRadioSteps.has(radioStepKey(level, day));
+  } catch (_error) {
+    return completedRadioSteps.has(radioStepKey(level, day));
+  }
+};
+
+export const buildCompletedRadioSearch = (search = "") => {
+  const params = new URLSearchParams(search);
+  params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+  if (String(params.get("view") || "").toLowerCase() === "radio") params.delete("view");
+  const query = params.toString();
+  return query ? `?${query}` : "";
+};
+
+export const buildCompletedRadioHref = ({ pathname = "", search = "", hash = "" } = {}) => {
+  const match = pathname.match(/^\/campus\/course\/lesson\/A1\/(\d+)\/?$/i);
+  if (match) {
+    const params = new URLSearchParams(search);
+    const day = Number(match[1]);
+    const chapter = params.get("chapter") || "";
+    const requestedView = String(params.get("view") || "").toLowerCase();
+
+    if (requestedView === "grammar") {
+      const grammarRoute = getA1GrammarRoute({ day, chapter });
+      if (grammarRoute) {
+        const destination = new URL(grammarRoute, "https://www.falowen.app");
+        params.delete("hub");
+        params.delete("chapter");
+        params.delete("view");
+        destination.searchParams.forEach((value, key) => params.set(key, value));
+        return `${destination.pathname}${buildCompletedRadioSearch(params.toString())}${destination.hash || hash || ""}`;
+      }
+    }
+
+    const tutorAssignment = getA1AssignmentByDayAndChapter(day, chapter);
+    if (tutorAssignment) {
+      params.set(RADIO_COMPLETE_PARAM, RADIO_COMPLETE_VALUE);
+      const assignmentWithDirectRoute = {
+        ...tutorAssignment,
+        workbookRoute: addDay20WorkbookView(
+          { level: "A1", day, chapter },
+          tutorAssignment.workbookRoute,
+        ),
+      };
+      const canonicalHref = buildA1TutorMarkedWorkbookHref(
+        assignmentWithDirectRoute,
+        params.toString(),
+      );
+      return canonicalHref || `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+    }
+
+    const configuredWorkbook = getConfiguredInAppWorkbookResourceRoute({
+      level: "A1", day, chapter,
+    });
+    const workbook = addDay20WorkbookView({ level: "A1", day, chapter }, configuredWorkbook);
+    if (workbook) {
+      const destination = new URL(workbook, "https://www.falowen.app");
+      params.delete("hub");
+      params.delete("chapter");
+      destination.searchParams.forEach((value, key) => params.set(key, value));
+      return `${destination.pathname}${buildCompletedRadioSearch(params.toString())}${destination.hash || hash || ""}`;
+    }
+  }
+  return `${pathname}${buildCompletedRadioSearch(search)}${hash || ""}`;
+};
+
+export const openCompletedWorkbook = (locationLike, windowRef) => {
+  const href = buildCompletedRadioHref(locationLike);
+  const browserWindow = windowRef || (typeof window !== "undefined" ? window : null);
+  if (!browserWindow || typeof browserWindow.location?.assign !== "function") return false;
+  browserWindow.location.assign(href);
+  return true;
+};
+
+export const shouldShowRadioFirst = (level, day) =>
+  Boolean(resolveRadioFirstWorkbookResource(level, day));
+
+const RadioFirstWorkbookGate = ({ level, day, children, resource = null }) => {
+  const explicitRadio = isFalowenRadioResource(resource) ? resource : null;
+  const radio = explicitRadio || resolveRadioFirstWorkbookResource(level, day);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const requestedView = String(new URLSearchParams(location.search || "").get("view") || "").toLowerCase();
+  const forceRadio = Boolean(radio && requestedView === "radio");
+  const completedAtMount = !radio || (!forceRadio && hasCompletedRadioStep(location.search, level, day));
+  const [hasEnteredWorkbook, setHasEnteredWorkbook] = useState(() => completedAtMount);
+  const [isContinuing, setIsContinuing] = useState(false);
+  const continueHref = buildCompletedRadioHref(location);
+
+  useEffect(() => {
+    if (!forceRadio && !hasEnteredWorkbook && hasCompletedRadioStep(location.search, level, day)) {
+      setHasEnteredWorkbook(true);
+      setIsContinuing(false);
+    }
+  }, [day, forceRadio, hasEnteredWorkbook, level, location.search]);
+
+  useEffect(() => {
+    courseDebug("radioGate:state", {
+      level: String(level || "").toUpperCase(),
+      day: Number(day),
+      hasRadio: Boolean(radio),
+      radioKey: radio?.key || "",
+      youtubeId: radio?.youtubeId || "",
+      search: location.search,
+      completedInUrl: new URLSearchParams(location.search || "").get(RADIO_COMPLETE_PARAM),
+      completedInMemory: completedRadioSteps.has(radioStepKey(level, day)),
+      hasEnteredWorkbook,
+      isContinuing,
+      continueHref,
+    });
+  }, [continueHref, day, hasEnteredWorkbook, isContinuing, level, location.search, radio]);
+
+  if (hasEnteredWorkbook) return children;
+
+  const handleContinue = () => {
+    courseDebug("radioGate:continueClick", {
+      level: String(level || "").toUpperCase(),
+      day: Number(day),
+      searchBefore: location.search,
+      isContinuing,
+      continueHref,
+    });
+
+    if (isContinuing) return;
+
+    setIsContinuing(true);
+    completedRadioSteps.add(radioStepKey(level, day));
+
+    if (openCompletedWorkbook(location)) return;
+    setHasEnteredWorkbook(true);
+  };
+
+  const handleBackToCourseBook = () => {
+    navigate("/campus/course", { replace: true });
+  };
+
+  return (
+    <div
+      data-radio-first-workbook-gate="true"
+      style={{ ...styles.container, display: "grid", gap: 18 }}
+    >
+      <style>{`.book-pdf-download-action { display: none !important; }`}</style>
+      <AppBackButton
+        label="Back to Course Book"
+        fallbackPath="/campus/course"
+        onBack={handleBackToCourseBook}
+      />
+      <header
+        style={{
+          ...styles.card,
+          display: "grid",
+          gap: 10,
+          border: "1px solid #bfdbfe",
+          borderRadius: 20,
+          background: "linear-gradient(135deg, #eff6ff, #f8fafc)",
+        }}
+      >
+        <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e3a8a" }}>
+          Start here
+        </span>
+        <h1 style={{ margin: 0 }}>{String(level).toUpperCase()} · Day {day} · Falowen Radio</h1>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
+          Listen to Falowen Radio first. Continue opens the student workbook.
+        </p>
+      </header>
+      <FalowenRadioTabContent
+        level={level}
+        day={day}
+        resource={radio}
+        actionLabel={isContinuing ? "Opening workbook…" : "Continue to workbook →"}
+        actionDisabled={isContinuing}
+        persistCompletionInUrl={false}
+        onContinue={handleContinue}
+      />
+    </div>
+  );
+};
+
+export default RadioFirstWorkbookGate;

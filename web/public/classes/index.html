@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Falowen Classes | Upcoming Class Brochure</title>
+    <meta
+      name="description"
+      content="Choose a Falowen German class, save your details and view the class brochure."
+    />
+    <link rel="canonical" href="https://www.falowen.app/classes/" />
+    <meta property="og:title" content="Falowen Classes | Upcoming German Classes" />
+    <meta
+      property="og:description"
+      content="Choose your preferred German level and class, then view the full Falowen class brochure."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://www.falowen.app/falo.png" />
+    <link rel="stylesheet" href="/classes/brochure.css?v=20260929-brochure-1" />
+  </head>
+  <body>
+    <main class="page">
+      <section class="intro-video hide-print" aria-label="Falowen classes introduction video">
+        <iframe
+          src="https://www.youtube-nocookie.com/embed/CFkrrVxhdL4?playsinline=1&controls=1&rel=0"
+          title="Falowen classes introduction video"
+          allow="encrypted-media; picture-in-picture; fullscreen"
+          loading="eager"
+          allowfullscreen
+        ></iframe>
+      </section>
+
+      <section class="hero">
+        <div class="eyebrow">FALOWEN GERMAN CLASSES</div>
+        <h1>Choose your German class</h1>
+        <p>Check the fee, start date, meeting times and learning mode first. Register when the class fits your schedule.</p>
+        <div class="hero-actions hide-print">
+          <a id="payHero" class="button primary" href="/signup/">Register for a class</a>
+          <a id="heroScheduleCta" class="button" href="#class-schedule-section">View class schedule</a>
+          <a class="hero-placement-action" href="/placement-test">Not sure of your level? Take the free placement test.</a>
+        </div>
+      </section>
+
+      <section class="card" style="margin-top:16px">
+        <div class="class-tabs" id="classTabs"></div>
+        <div class="notice" id="selectionNotice"></div>
+      </section>
+
+      <section class="grid two" style="margin-top:16px">
+        <div class="card stack">
+          <div class="pill-row" id="classPills"></div>
+          <h2 id="classTitle">Loading class…</h2>
+          <p class="muted" id="classFormat"></p>
+          <div class="grid three" id="stats"></div>
+          <div class="stack">
+            <h3>What students get</h3>
+            <ul id="highlights"></ul>
+          </div>
+        </div>
+
+        <aside class="card stack" id="payment">
+          <h2>Sign up and pay</h2>
+          <p class="muted" id="paymentSummary"></p>
+          <a id="payLink" class="button primary" href="#" target="_blank" rel="noreferrer">Sign up and pay</a>
+          <a id="scheduleLink" class="button" href="#" target="_blank" rel="noreferrer">Open full generated schedule</a>
+          <a id="whatsappLink" class="button amber" href="#" target="_blank" rel="noreferrer">Send WhatsApp enquiry</a>
+        </aside>
+      </section>
+
+      <section class="grid two" style="margin-top:16px">
+        <div class="card stack">
+          <h2>Meeting times</h2>
+          <div style="overflow-x:auto">
+            <table>
+              <thead><tr><th>Day</th><th>Time</th><th>Mode</th></tr></thead>
+              <tbody id="meetingRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card stack">
+          <h2>Class information</h2>
+          <div class="copy-box" id="copyText"></div>
+          <button class="button hide-print" type="button" onclick="copyBrochureText()">Copy enquiry reply</button>
+        </div>
+      </section>
+
+      <section class="card stack" style="margin-top:16px">
+        <h2>Generated class schedule</h2>
+        <p class="muted" id="scheduleHint"></p>
+        <div class="schedule-list" id="scheduleList"></div>
+      </section>
+
+      <p class="footer">
+        Falowen Classes · Live class dates and teaching times are managed in Falowen Admin. Static catalogue data is retained only for always-open self-learning programmes.
+      </p>
+    </main>
+
+    <script src="/classes/class-template-loader.js?v=20260625-2"></script>
+    <script src="/classes/brochure.js?v=20260929-brochure-3"></script>
+    <script src="/classes/class-hero-banner.js?v=20261001-order-1"></script>
+    <script src="/classes/brochure-enhancements.js?v=20261001-order-1"></script>
+    <script src="/classes/class-location-details.js?v=20261001-order-1"></script>
+    <script src="/classes/brochure-faq.js?v=20261001-order-1"></script>
+    <script src="/classes/brochure-footer-reviews.js?v=20261001-order-1"></script>
+    <script src="/classes/class-leads.js?v=20260929-brochure-3"></script>
+    <script src="/classes/class-lead-share-format.js?v=20260717-1"></script>
+    <script src="/classes/class-simple-flow.js?v=20260929-brochure-3"></script>
+    <script src="/classes/active-class-filter.js?v=20260929-brochure-3"></script>
+    <script src="/classes/funnel-journey.js?v=20260616-1"></script>
+    <script src="/classes/post-lead-focus.js?v=20260627-2"></script>
+    <script src="/classes/brochure-download.js?v=20261001-lean-1"></script>
+    <script src="/classes/brochure-download-visible.js?v=20261001-order-1"></script>
+    <script src="/classes/admissions-engagement.js?v=20260930-1"></script>
+  </body>
+</html>

@@ -1,0 +1,150 @@
+import { getLessonRadioResource, resolveLessonRoute } from "./lessonRadioDictionary";
+
+test.each([
+  [5, "NWRCe0wCSb4"],
+  [6, "ql8aR2F6tfU"],
+  [8, "dC8nKSyCE8g"],
+  [9, "BD663tMiWpg"],
+  [10, "yOfTCQDn_JM"],
+  [11, "hsR31V7Fb4U"],
+  [14, "HJ60GX0pbiI"],
+  [15, "WbsTFqIT058"],
+  [16, "6lq6uWK1wAs"],
+  [17, "kp7KvFmaRuo"],
+  [21, "LlXsNA1a8lc"],
+  [22, "KR2oT-mujmI"],
+  [26, "9OVfA1B-nuU"],
+  [27, "XLyXDfsM-HY"],
+])("A2 Day %i radio remains available", (day, id) =>
+  expect(getLessonRadioResource("A2", day).youtubeId).toBe(id),
+);
+
+test("B1 Day 1 Traumwelten radio remains available", () =>
+  expect(getLessonRadioResource("B1", 1)).toEqual(
+    expect.objectContaining({
+      title: "Traumwelten (Übung) 1.1",
+      youtubeId: "PxJzLtdfJzA",
+    }),
+  ),
+);
+
+test("B1 Day 6 Stadt oder Land radio uses the requested course video", () =>
+  expect(getLessonRadioResource("B1", 6)).toEqual(
+    expect.objectContaining({
+      title: "Leben in der Stadt oder auf dem Land? 2.6",
+      youtubeId: "houqw5Dg3eY",
+    }),
+  ),
+);
+
+test("B1 Day 7 Fast Food vs. Hausmannskost radio uses the requested course video", () =>
+  expect(getLessonRadioResource("B1", 7)).toEqual(
+    expect.objectContaining({
+      title: "Fast Food vs. Hausmannskost 3.7",
+      youtubeId: "ugKmSqTMiQc",
+    }),
+  ),
+);
+
+test.each([
+  [8, "Alles für die Gesundheit 3.8", "CXwkby4OHjM"],
+  [9, "Work-Life-Balance im modernen Arbeitsumfeld 3.9", "dpo7_xwUeWU"],
+  [10, "Digitale Auszeit 4.10", "N9fTrnsUfJs"],
+  [11, "Teamspiele 4.11", "lPpQtsfyBI0"],
+  [12, "Abenteuer in der Natur 4.12", "8oISDL8kGqQ"],
+  [13, "Eigene Filmkritik schreiben 4.13", "WpxdZG953Xo"],
+  [14, "Traditionelles vs. digitales Lernen 5.14", "NS58BIySjx8"],
+  [15, "Medien und Arbeiten im Homeoffice 5.15", "VhS1sIckFpU"],
+  [16, "Prüfungsangst und Stressbewältigung 5.16", "dQMaaYXqMWI"],
+  [17, "Wie lernt man am besten? 5.17", "7jbMA-e-jeE"],
+  [18, "Wege zum Wunschberuf 6.18", "uNabTZwqrB0"],
+  [26, "Reiseprobleme und Lösungen 9.26", "8HdiyR5I96I"],
+])("B1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
+  expect(getLessonRadioResource("B1", day)).toEqual(
+    expect.objectContaining({ title, youtubeId }),
+  ),
+);
+
+test("B1 Day 28 Klimafreundlich leben radio uses the requested course video", () =>
+  expect(getLessonRadioResource("B1", 28)).toEqual(
+    expect.objectContaining({
+      title: "Klimafreundlich leben 10.28",
+      youtubeId: ["6ksGuFsv", "_H4"].join(""),
+    }),
+  ),
+);
+
+test.each([1, 2, 3, 4, 27])(
+  "B2 Day %i no longer exposes a retired Falowen Radio slot",
+  (day) => expect(getLessonRadioResource("B2", day)).toBeNull(),
+);
+
+test("C1 Day 2 Kultur und Identität radio remains available", () =>
+  expect(getLessonRadioResource("C1", 2)).toEqual(
+    expect.objectContaining({
+      title: "Kultur und Identität",
+      youtubeId: "rmaxh302FEY",
+    }),
+  ),
+);
+
+test("C1 Day 1 Ziele und Lernweg radio remains available", () =>
+  expect(getLessonRadioResource("C1", 1)).toEqual(
+    expect.objectContaining({
+      title: "Ziele und Lernweg",
+      youtubeId: "McNk1VTFvMk",
+    }),
+  ),
+);
+
+test("C1 Day 3 uses the requested Medien und Informationskompetenz radio", () =>
+  expect(getLessonRadioResource("C1", 3)).toEqual(
+    expect.objectContaining({
+      title: "Medien und Informationskompetenz",
+      youtubeId: "6IvVh9RPJ5s",
+    }),
+  ),
+);
+
+test.each([
+  ["/campus/course/lesson/C1/4", { level: "C1", day: 4 }],
+  ["/campus/course/lesson/C1/5", { level: "C1", day: 5 }],
+  ["/campus/course/lesson/C1/6", { level: "C1", day: 6 }],
+  ["/campus/course/lesson/A2/8", { level: "A2", day: 8 }],
+  ["/campus/course/a2-day-8-rezepte-und-essen-workbook", { level: "A2", day: 8 }],
+  ["/campus/course/lesson/A2/15", { level: "A2", day: 15 }],
+  ["/campus/course/a2-day-15-mein-lieblingssport-workbook", { level: "A2", day: 15 }],
+  ["/campus/course/lesson/A2/16", { level: "A2", day: 16 }],
+  ["/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook", { level: "A2", day: 16 }],
+  ["/campus/course/lesson/A2/26", { level: "A2", day: 26 }],
+  ["/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook", { level: "A2", day: 26 }],
+  ["/campus/course/lesson/A2/27", { level: "A2", day: 27 }],
+  ["/campus/course/a2-day-27-digitale-kommunikation-workbook", { level: "A2", day: 27 }],
+  ["/campus/course/lesson/B1/1", { level: "B1", day: 1 }],
+  ["/campus/course/b1-day-1-traumwelten-workbook", { level: "B1", day: 1 }],
+  ["/campus/course/lesson/B2/1", { level: "B2", day: 1 }],
+  ["/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook", { level: "B2", day: 1 }],
+  ["/campus/course/lesson/B2/3", { level: "B2", day: 3 }],
+  ["/campus/course/lesson/C1/2", { level: "C1", day: 2 }],
+  ["/campus/course/c1-day-2-kultur-und-identitaet-workbook", { level: "C1", day: 2 }],
+])("detects radio route %s", (path, expected) =>
+  expect(resolveLessonRoute(path)).toEqual(expected),
+);
+
+test("A2 Day 10 uses the Tourismus und Traditionelle Feste Falowen Radio link", () =>
+  expect(getLessonRadioResource("A2", 10)).toEqual(expect.objectContaining({
+    title: "Tourismus und Traditionelle Feste 4.10",
+    youtubeId: "yOfTCQDn_JM",
+  })),
+);
+
+test.each([
+  [4, "Beziehungen und Teamarbeit", "Vl3mmytfrRk"],
+  [5, "Berufliche Entwicklung", "69FO0zn9ZvA"],
+  [6, "Gesundheit und Lebensstil", "Yp1usG7StS8"],
+  [8, "Wohnen und Stadtentwicklung", "z61nrz6yFgs"],
+])("C1 Day %i uses the requested Falowen Radio link", (day, title, youtubeId) =>
+  expect(getLessonRadioResource("C1", day)).toEqual(
+    expect.objectContaining({ title, youtubeId }),
+  ),
+);

@@ -1,0 +1,653 @@
+export const A2_READING_TASKS = {
+  1: {
+    chapter: "1.1",
+    format: "Kurze Nachricht",
+    title: "Neu im Büro",
+    strategy: "Lies zuerst die Fragen. Suche dann im Text nach Namen, Uhrzeiten, Orten und Gründen.",
+    text: `Hallo Ben,
+
+ich bin seit Montag neu bei der Firma Keller. Meine Kollegin Jana sitzt neben mir und hilft mir oft. In der Mittagspause essen wir meistens in der Kantine. Am Mittwoch habe ich nach der Arbeit einen Deutschkurs. Am Freitag trinken einige Kollegen nach Feierabend noch einen Kaffee zusammen. Jana hat mich eingeladen. Ich freue mich, weil ich die anderen Kollegen besser kennenlernen möchte.
+
+Viele Grüße
+Mira`,
+    questions: [
+      { stem: "Seit wann arbeitet Mira bei der Firma Keller?", options: ["A) Seit Montag", "B) Seit Mittwoch", "C) Seit Freitag", "D) Seit einem Monat"] },
+      { stem: "Wer hilft Mira oft?", options: ["A) Ben", "B) Jana", "C) Der Chef", "D) Der Deutschlehrer"] },
+      { stem: "Wo isst Mira meistens in der Mittagspause?", options: ["A) Zu Hause", "B) Im Café", "C) In der Kantine", "D) Im Park"] },
+      { stem: "Was macht Mira am Mittwoch nach der Arbeit?", options: ["A) Sie trifft Kollegen.", "B) Sie besucht einen Deutschkurs.", "C) Sie arbeitet länger.", "D) Sie geht einkaufen."] },
+      { stem: "Warum freut sich Mira auf Freitag?", options: ["A) Sie hat frei.", "B) Sie bekommt Besuch.", "C) Sie möchte die Kollegen besser kennenlernen.", "D) Sie fährt nach Hause."] },
+    ],
+  },
+  2: {
+    chapter: "1.2",
+    format: "Personenprofile",
+    title: "Lara und David",
+    strategy: "Achte auf Aussehen, Charakter, Beruf und Interessen. Nicht jedes Detail steht im gleichen Satz.",
+    text: `Lara ist 29 Jahre alt und arbeitet in einem Hotel. Sie ist mittelgroß und hat kurze dunkle Haare. Ihre Freunde sagen, dass sie ruhig und sehr zuverlässig ist. In ihrer Freizeit liest sie gern und geht am Wochenende wandern.
+
+David ist 31 und arbeitet als Krankenpfleger. Er ist groß, trägt eine Brille und hat lockige Haare. Er spricht gern mit Menschen und ist sehr offen. Nach der Arbeit spielt er oft Basketball. Am Sonntag kocht er gern für seine Familie.`,
+    questions: [
+      { stem: "Wo arbeitet Lara?", options: ["A) In einem Hotel", "B) In einem Krankenhaus", "C) In einer Schule", "D) In einem Restaurant"] },
+      { stem: "Wie ist Lara laut ihren Freunden?", options: ["A) Laut und unpünktlich", "B) Ruhig und zuverlässig", "C) Schüchtern und unfreundlich", "D) Lustig und chaotisch"] },
+      { stem: "Was trägt David?", options: ["A) Einen Hut", "B) Eine Brille", "C) Einen Bart", "D) Eine Uniform in der Freizeit"] },
+      { stem: "Welche Freizeitaktivität macht David oft?", options: ["A) Wandern", "B) Lesen", "C) Basketball spielen", "D) Schwimmen"] },
+      { stem: "Was haben Lara und David gemeinsam?", options: ["A) Beide arbeiten im Hotel.", "B) Beide kochen jeden Sonntag.", "C) Beide haben kurze dunkle Haare.", "D) Beide haben Freizeitaktivitäten nach oder neben der Arbeit."] },
+    ],
+  },
+  3: {
+    chapter: "1.3",
+    format: "Vergleich",
+    title: "Zwei Sprachkurse",
+    strategy: "Vergleiche Preis, Zeit, Gruppengröße und Weg. Wörter wie billiger, länger, näher und kleiner sind wichtig.",
+    text: `Nina möchte einen Deutschkurs besuchen. Sprachschule A kostet 95 Euro im Monat. Der Unterricht ist dienstags und donnerstags von 18:00 bis 19:30 Uhr. In einer Gruppe sind höchstens 12 Personen. Von Ninas Wohnung braucht sie 20 Minuten mit dem Bus.
+
+Sprachschule B kostet 120 Euro im Monat. Der Unterricht ist montags und mittwochs von 18:00 bis 20:00 Uhr. In einer Gruppe sind höchstens 8 Personen. Die Schule ist nur zehn Minuten zu Fuß von Ninas Wohnung entfernt.`,
+    questions: [
+      { stem: "Welche Sprachschule ist billiger?", options: ["A) Sprachschule A", "B) Sprachschule B", "C) Beide kosten gleich viel.", "D) Das steht nicht im Text."] },
+      { stem: "Wo dauert eine Unterrichtsstunde länger?", options: ["A) In Sprachschule A", "B) In Sprachschule B", "C) In beiden gleich lang", "D) Nur am Donnerstag"] },
+      { stem: "Welche Schule hat kleinere Gruppen?", options: ["A) Sprachschule A", "B) Sprachschule B", "C) Beide haben 12 Personen.", "D) Keine der Schulen"] },
+      { stem: "Welche Schule liegt näher an Ninas Wohnung?", options: ["A) Sprachschule A", "B) Sprachschule B", "C) Beide sind gleich weit.", "D) Das kann man nicht wissen."] },
+      { stem: "Wann hat Sprachschule A Unterricht?", options: ["A) Montag und Mittwoch", "B) Dienstag und Donnerstag", "C) Freitag und Samstag", "D) Nur am Dienstag"] },
+    ],
+  },
+  4: {
+    chapter: "2.4",
+    format: "Chat",
+    title: "Treffen am Samstag",
+    strategy: "Bei Chats stehen Planänderungen oft in späteren Nachrichten. Lies deshalb bis zum Ende.",
+    text: `Lea: Treffen wir uns am Samstag um 15 Uhr im Stadtpark?
+Omar: Gerne, aber es soll am Nachmittag regnen.
+Lea: Dann vielleicht im Café Central?
+Omar: Gute Idee. Das Café ist direkt neben der U-Bahn-Station Rathaus.
+Lea: Super. Ich komme mit der U-Bahn. Können wir uns um 15:30 Uhr treffen? Ich arbeite bis 14:45 Uhr.
+Omar: Ja. Ich reserviere einen Tisch für uns. Bis Samstag!`,
+    questions: [
+      { stem: "Wo wollten Lea und Omar sich zuerst treffen?", options: ["A) Im Stadtpark", "B) Im Café Central", "C) Am Rathaus", "D) Bei Omar"] },
+      { stem: "Warum ändern sie den Treffpunkt?", options: ["A) Das Café ist geschlossen.", "B) Omar muss arbeiten.", "C) Es soll regnen.", "D) Lea hat kein Geld."] },
+      { stem: "Wo liegt das Café Central?", options: ["A) Im Stadtpark", "B) Neben der U-Bahn-Station Rathaus", "C) Am Bahnhof", "D) Neben Leas Arbeit"] },
+      { stem: "Wann treffen sie sich am Ende?", options: ["A) Um 14:45 Uhr", "B) Um 15:00 Uhr", "C) Um 15:30 Uhr", "D) Um 16:00 Uhr"] },
+      { stem: "Was macht Omar noch?", options: ["A) Er kauft Fahrkarten.", "B) Er reserviert einen Tisch.", "C) Er holt Lea ab.", "D) Er bringt Essen mit."] },
+    ],
+  },
+  5: {
+    chapter: "2.5",
+    format: "Anzeigen zuordnen",
+    title: "Was passt am Samstag?",
+    strategy: "Lies zuerst die Situation der Person. Vergleiche dann Zeit, Preis, Anmeldung und besondere Bedingungen. Nicht jedes passende Stichwort bedeutet automatisch die richtige Antwort.",
+    text: `A – Yoga am Morgen
+09:00–10:00 Uhr, Raum 2. Teilnahme: 6 Euro. Keine Anmeldung nötig. Bitte bequeme Kleidung mitbringen. Der Kurs ist auch für Anfänger geeignet.
+
+B – Fotowalk in der Altstadt
+10:30–12:00 Uhr. Treffpunkt: Raum 5, danach gehen wir gemeinsam nach draußen. Teilnahme: 12 Euro. Eine eigene Kamera oder ein Handy mit guter Kamera ist nötig. Bei starkem Regen bleiben wir im Gebäude und üben Porträts.
+
+C – Fahrradtour am Fluss
+13:00–15:00 Uhr. Treffpunkt vor dem Eingang. Teilnahme kostenlos. Anmeldung bis Freitagabend. Fahrräder können ohne Aufpreis ausgeliehen werden. Bei starkem Regen fällt die Tour aus.
+
+D – Kochkurs „Schnelle Gerichte“
+15:30–17:00 Uhr, Küche. Teilnahme: 15 Euro. Anmeldung erforderlich. Es gibt auch vegetarische Gerichte. Bitte kommen Sie zehn Minuten früher.
+
+E – Filmabend
+18:00–20:00 Uhr, Saal. Eintritt: 5 Euro. Keine Anmeldung. Getränke kann man vor Ort kaufen.`,
+    questions: [
+      { stem: "Mariam möchte am Nachmittag etwas Aktives machen. Sie hat kein eigenes Fahrrad und möchte möglichst nichts bezahlen. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Jonas fotografiert gern. Er hat eine gute Handykamera und möchte vormittags teilnehmen, auch wenn das Wetter schlecht wird. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Selina möchte Sport machen, aber höchstens 5 Euro ausgeben. Sie kann nur nach 12 Uhr. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot D", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Kwame möchte am Samstag zwischen 13 und 16 Uhr etwas machen. Er kann sich noch am Freitag anmelden und möchte keine zusätzliche Ausrüstung mitbringen. Welches Angebot passt?", options: ["A) Angebot B", "B) Angebot D", "C) Angebot C", "D) Angebot A"] },
+      { stem: "Anna ist Anfängerin, hat nur am frühen Morgen Zeit und möchte spontan ohne Anmeldung kommen. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+    ],
+  },
+  6: {
+    chapter: "3.6",
+    format: "Wohnungsbeschreibung",
+    title: "Mein neues Zimmer",
+    strategy: "Achte bei Ortsangaben auf Präpositionen wie neben, vor, an und zwischen.",
+    text: `Seit zwei Wochen wohne ich in einer WG. Mein Zimmer ist klein, aber hell. Das Bett steht an der Wand neben dem Fenster. Vor dem Bett liegt ein Teppich. Zwischen dem Schreibtisch und dem Schrank steht eine kleine Pflanze. Meine Bücher liegen im Regal über dem Schreibtisch. In der Küche gibt es einen großen Tisch. Dort essen wir abends oft zusammen. Fahrräder dürfen nicht im Flur stehen; sie müssen im Keller bleiben.`,
+    questions: [
+      { stem: "Wo steht das Bett?", options: ["A) Neben dem Fenster", "B) Vor dem Schrank", "C) Zwischen Tisch und Tür", "D) Im Flur"] },
+      { stem: "Was liegt vor dem Bett?", options: ["A) Eine Pflanze", "B) Ein Teppich", "C) Ein Regal", "D) Ein Fahrrad"] },
+      { stem: "Wo stehen die Bücher?", options: ["A) Im Keller", "B) Auf dem Bett", "C) Im Regal über dem Schreibtisch", "D) In der Küche"] },
+      { stem: "Was machen die Bewohner oft am Abend?", options: ["A) Sie lernen im Flur.", "B) Sie essen zusammen in der Küche.", "C) Sie fahren Fahrrad.", "D) Sie stellen Möbel um."] },
+      { stem: "Wo müssen Fahrräder stehen?", options: ["A) Im Flur", "B) Im Zimmer", "C) Im Keller", "D) Vor dem Haus"] },
+    ],
+  },
+  7: {
+    chapter: "3.7",
+    format: "Anzeigen zuordnen",
+    title: "Drei Wohnungen",
+    strategy: "Lies zuerst, was die Person braucht. Vergleiche dann Lage, Preis, Zimmer und Ausstattung.",
+    text: `Wohnung A: 1 Zimmer, 32 m², 520 Euro warm. Nähe Universität, möbliert, kein Balkon.
+
+Wohnung B: 2 Zimmer, 55 m², 760 Euro warm. Balkon, ruhige Lage, 15 Minuten mit dem Bus ins Zentrum.
+
+Wohnung C: WG-Zimmer, 20 m², 430 Euro warm. Küche und Bad gemeinsam. Direkt an der U-Bahn. Haustiere erlaubt.`,
+    questions: [
+      { stem: "Mila studiert und möchte allein wohnen. Die Wohnung soll möglichst nah an der Universität sein.", options: ["A) Wohnung A", "B) Wohnung B", "C) Wohnung C", "D) Keine Wohnung passt."] },
+      { stem: "Jonas möchte unbedingt einen Balkon und zwei Zimmer.", options: ["A) Wohnung A", "B) Wohnung B", "C) Wohnung C", "D) Keine Wohnung passt."] },
+      { stem: "Sara hat einen kleinen Hund und möchte direkt an einer U-Bahn wohnen.", options: ["A) Wohnung A", "B) Wohnung B", "C) Wohnung C", "D) Keine Wohnung passt."] },
+      { stem: "Tim möchte höchstens 450 Euro warm bezahlen und allein wohnen.", options: ["A) Wohnung A", "B) Wohnung B", "C) Wohnung C", "D) Keine Wohnung passt."] },
+      { stem: "Welche Wohnung ist möbliert?", options: ["A) Wohnung A", "B) Wohnung B", "C) Wohnung C", "D) Keine Wohnung"] },
+    ],
+  },
+  8: {
+    chapter: "3.8",
+    format: "Goethe A2 · Lesen",
+    title: "Im Restaurant Seeblick am Hafen",
+    strategy: "Lies den Dialog und achte besonders auf Reservierung, Empfehlung, Getränk, Reaktion auf das Essen und Trinkgeld.",
+    text: `Kellner: Guten Abend! Herzlich willkommen im Restaurant Seeblick. Haben Sie reserviert?
+Gast: Guten Abend! Nein, ich habe nicht reserviert. Ich bin alleine. Ist noch ein Platz frei?
+Kellner: Ja, natürlich! Hier am Fenster ist noch ein schöner Tisch frei. Hier ist die Speisekarte.
+Gast: Vielen Dank! Was können Sie mir empfehlen? Ich möchte gerne frischen Fisch essen.
+Kellner: Unser Fischgericht des Tages ist gebratenes Fischfilet mit Kartoffeln und Salat für 18.50 €. Das schmeckt hervorragend.
+Gast: Das klingt lecker! Das nehme ich. Und bringen Sie mir bitte ein Mineralwasser ohne Kohlensäure.
+Kellner: Sehr gerne! Kommt sofort.
+
+Nach dem Essen
+
+Kellner: Hat es Ihnen geschmeckt? War alles in Ordnung?
+Gast: Ja, wunderbar! Das Essen war ausgezeichnet. Ich möchte bitte bezahlen.
+Kellner: Zahlen Sie bar oder mit Karte?
+Gast: Ich bezahle mit Karte.
+Kellner: Das macht zusammen 21.00 € mit dem Getränk.
+Gast: Hier bitte. Machen Sie 23.00 €. Der Rest ist für Sie!
+Kellner: Vielen Dank! Ich wünsche Ihnen noch einen schönen Abend.`,
+    questions: [
+      { stem: "Hat der Gast vorher einen Tisch im Restaurant reserviert?", options: ["A) Ja, er hat vor zwei Tagen reserviert.", "B) Nein, er kommt ohne Reservierung ins Restaurant.", "C) Er hat für eine Gruppe reserviert."] },
+      { stem: "Welche Empfehlung gibt der Kellner dem Gast?", options: ["A) Eine Gemüsesuppe", "B) Gebratenes Fischfilet mit Kartoffeln und Salat", "C) Einen Teller Pasta"] },
+      { stem: "Was bestellt der Gast zum Trinken?", options: ["A) Einen Apfelsaft", "B) Ein Glas Rotwein", "C) Ein Mineralwasser ohne Kohlensäure"] },
+      { stem: "Wie reagiert der Gast auf die Frage, ob das Essen geschmeckt hat?", options: ["A) Er findet das Essen ausgezeichnet und lobt es.", "B) Er beschwert sich, weil das Essen kalt war.", "C) Er antwortet gar nicht."] },
+      { stem: "Wie viel Trinkgeld gibt der Gast beim Bezahlen?", options: ["A) Er gibt kein Trinkgeld.", "B) Er gibt 2.00 € Trinkgeld (er rundet von 21.00 € auf 23.00 € auf).", "C) Er gibt 10.00 € Trinkgeld."] },
+    ],
+  },
+  9: {
+    chapter: "4.9",
+    format: "Hotel-E-Mail",
+    title: "Ihre Buchung in Salzburg",
+    strategy: "Bei Buchungs-E-Mails sind Datum, Preis, Leistungen und Check-in-Zeit die wichtigsten Informationen.",
+    text: `Sehr geehrte Frau Mensah,
+
+vielen Dank für Ihre Buchung. Wir haben für Sie vom 14. bis 17. Oktober ein Einzelzimmer reserviert. Das Zimmer kostet 82 Euro pro Nacht. Frühstück ist im Preis enthalten. WLAN ist kostenlos. Der Check-in ist ab 14 Uhr möglich. Wenn Sie später als 20 Uhr anreisen, informieren Sie bitte die Rezeption. Vom Hauptbahnhof erreichen Sie unser Hotel mit Bus 3 in etwa zehn Minuten.
+
+Freundliche Grüße
+Hotel Stadtblick`,
+    questions: [
+      { stem: "Wie lange bleibt Frau Mensah im Hotel?", options: ["A) Zwei Nächte", "B) Drei Nächte", "C) Vier Nächte", "D) Eine Woche"] },
+      { stem: "Was kostet eine Nacht?", options: ["A) 14 Euro", "B) 17 Euro", "C) 82 Euro", "D) 20 Euro"] },
+      { stem: "Was ist im Zimmerpreis enthalten?", options: ["A) Abendessen", "B) Frühstück", "C) Eine Busfahrkarte", "D) Ein Taxi"] },
+      { stem: "Wann kann Frau Mensah einchecken?", options: ["A) Ab 10 Uhr", "B) Ab 12 Uhr", "C) Ab 14 Uhr", "D) Erst ab 20 Uhr"] },
+      { stem: "Was soll sie tun, wenn sie nach 20 Uhr ankommt?", options: ["A) Ein anderes Hotel suchen.", "B) Die Rezeption informieren.", "C) Den Busfahrer anrufen.", "D) Bis morgens warten."] },
+    ],
+  },
+  10: {
+    chapter: "4.10",
+    format: "Goethe A2 · Lesen",
+    title: "Eine Stadt entdecken und etwas erleben (Hamburg)",
+    strategy: "Lies zuerst die fünf Fragen. Suche dann gezielt nach Orten, Uhrzeiten und der Reihenfolge der Aktivitäten.",
+    text: `Eine Stadt entdecken und etwas erleben (Hamburg)
+
+Wer eine neue Stadt entdeckt, kann an zwei Tagen sehr viel erleben. In der Touristeninformation bekommt man viele Tipps und einen Stadtplan, auf dem die wichtigsten Orte markiert sind. Mit einer Gästekarte für 12 € kann man zwei Tage lang bequem mit Bus und Bahn fahren und erhält Rabatte.
+
+An den Landungsbrücken startet jede Stunde eine einstündige Hafenrundfahrt mit dem Schiff. Wer am Abend Kultur erleben möchte, kann um 20:00 Uhr ein Orchesterkonzert in der Elbphilharmonie besuchen. Für ein gutes Abendessen wird das Restaurant Seeblick im Hafen empfohlen, wo man frischen Fisch essen kann.
+
+Am zweiten Tag lohnt sich ein Besuch im Hafenmuseum. Es ist klein, aber sehr interessant – zwei Stunden reichen dafür völlig aus. Danach kann man bei einem Spaziergang im Stadtpark entspannen.`,
+    questions: [
+      { stem: "Wo bekommt man Tipps und einen markierten Stadtplan für die Stadtbesichtigung?", options: ["A) In der Touristeninformation", "B) Im Hafenmuseum", "C) Im Stadtpark"] },
+      { stem: "Wo startet die Hafenrundfahrt mit dem Schiff?", options: ["A) Im Stadtpark", "B) An den Landungsbrücken", "C) In der Elbphilharmonie"] },
+      { stem: "Welches Erlebnis wird für den Abend um 20:00 Uhr empfohlen?", options: ["A) Ein Spaziergang im Stadtpark", "B) Ein Besuch im Hafenmuseum", "C) Ein Orchesterkonzert in der Elbphilharmonie"] },
+      { stem: "Wo kann man im Hafen gut frischen Fisch essen?", options: ["A) Im Restaurant Seeblick", "B) In der Touristeninformation", "C) Auf dem Schiff"] },
+      { stem: "Was kann man am zweiten Tag nach dem Museumsbesuch erleben?", options: ["A) Im Stadtpark spazieren gehen", "B) Eine zwei Tage lange Zugfahrt machen", "C) Eine neue Gästekarte kaufen"] },
+    ],
+  },
+  11: {
+    chapter: "4.11",
+    format: "Zeitungsartikel",
+    title: "Verkehrsmittel vergleichen",
+    strategy: "Lesen Sie den Zeitungsartikel und beantworten Sie die Fragen 1–7. Wählen Sie die richtige Lösung (a, b oder c).",
+    text: `Zeitung: Berliner Tagesblatt
+Thema: Unterwegs in Deutschland – Auto, Bahn, Bus oder Fahrrad?
+
+Wie reist man am besten in Deutschland? Jeden Tag fahren Millionen Menschen zur Arbeit, zur Universität oder in den Urlaub. Dabei nutzen sie ganz unterschiedliche Verkehrsmittel.
+
+Das Auto ist besonders bei Familien sehr beliebt. Es ist bequem, wenn man viel Gepäck hat und direkt von Tür zu Tür fahren möchte. Aber in großen Städten gibt es oft Probleme: Das Benzin wird immer teurer und man findet nur schwer einen Parkplatz.
+
+Für lange Strecken wählen viele Personen lieber die Bahn. Der Schnellzug (ICE) ist meistens viel schneller als das Auto und man steht am Freitag nicht im Stau. Im Zug kann man entspannen, lesen oder am Laptop arbeiten. Allerdings sind Zugtickets oft teuer, wenn man sie nicht früh bucht.
+
+Wer wenig Geld hat – wie viele Studentinnen und Studenten –, fährt oft mit dem Fernbus. Die Fahrt mit dem Bus dauert zwar am längsten, aber die Tickets sind viel günstiger als Bahnfahrkarten oder Flugtickets.
+
+In der Innenstadt liegt das Fahrrad im Trend. Immer mehr Menschen nutzen für kurze Wege ein Fahrrad oder E-Bike, weil es umweltfreundlicher und gesünder ist als das Auto. Außerdem spart man Geld für Benzin und Parkplätze.`,
+    questions: [
+      { stem: "Warum fahren viele Familien gerne mit dem Auto?", options: ["A) Weil Autotickets günstiger als Bustickets sind.", "B) Weil man viel Gepäck bequem von Tür zu Tür transportieren kann.", "C) Weil man in der Innenstadt immer schnell einen Parkplatz findet."] },
+      { stem: "Welchen Vorteil hat die Bahn auf langen Strecken?", options: ["A) Sie ist schneller als das Auto und steht nicht im Stau.", "B) Die Tickets sind am Freitag immer kostenlos.", "C) Die Fahrt dauert länger als mit dem Bus, ist aber billiger."] },
+      { stem: "Was kann man im Zug machen, während man reist?", options: ["A) Selbst ein Parkhaus suchen.", "B) Entspannen, lesen oder am Laptop arbeiten.", "C) Billigeres Benzin kaufen."] },
+      { stem: "Warum wählen viele Studierende den Fernbus?", options: ["A) Weil der Fernbus das schnellste Verkehrsmittel ist.", "B) Weil sie im Bus keinen Sitzplatz buchen müssen.", "C) Weil die Tickets viel günstiger sind als bei der Bahn."] },
+      { stem: "Was ist ein Nachteil vom Auto in der Stadt?", options: ["A) Man darf mit dem Auto nicht in der Innenstadt fahren.", "B) Benzin ist teuer und Parkplätze sind schwer zu finden.", "C) Es gibt im Auto keinen Platz für Gepäck."] },
+      { stem: "Warum fahren immer mehr Menschen in der Stadt mit dem Fahrrad?", options: ["A) Weil Fahrradfahren gesünder und umweltfreundlicher ist.", "B) Weil Fahrräder auf der Autobahn schneller als Autos sind.", "C) Weil man für Fahrräder teure Parktickets kaufen muss."] },
+      { stem: "Welche Aussage über die Verkehrsmittel ist RICHTIG?", options: ["A) Die Bahn ist das langsamste Verkehrsmittel.", "B) Das Auto ist für Studenten am günstigsten.", "C) Der Fernbus braucht am meisten Zeit, ist aber besonders preiswert."] },
+    ],
+  },
+  12: {
+    chapter: "5.12",
+    format: "Stellenanzeigen zuordnen",
+    title: "Welcher Job passt?",
+    strategy: "Markiere in jeder Anzeige Arbeitszeit, Erfahrung und besondere Voraussetzungen. Vergleiche danach mit der Person.",
+    text: `Anzeige A – Café Morgenrot
+Servicekraft gesucht. Teilzeit, Montag bis Freitag 7–12 Uhr. Erfahrung ist nicht nötig. Gute Deutschkenntnisse sind wichtig.
+
+Anzeige B – Tierpraxis Klein
+Hilfe an der Rezeption gesucht. Vollzeit. Sie telefonieren viel und organisieren Termine. Computerkenntnisse und Erfahrung im Büro sind erforderlich.
+
+Anzeige C – Sportzentrum Aktiv
+Trainerin oder Trainer für Kindergruppen gesucht. Arbeit am Nachmittag und am Samstag. Sporterfahrung ist wichtig.
+
+Anzeige D – Buchhandlung Lesewelt
+Aushilfe am Samstag, 10–18 Uhr. Sie verkaufen Bücher und helfen Kunden. Erfahrung im Verkauf ist hilfreich, aber nicht notwendig.`,
+    questions: [
+      { stem: "Ama kann nur vormittags arbeiten und hat noch keine Berufserfahrung.", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D"] },
+      { stem: "Paul hat im Büro gearbeitet und kennt sich gut mit Computern aus.", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D"] },
+      { stem: "Lena arbeitet gern mit Kindern und hat viele Jahre Volleyball gespielt.", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D"] },
+      { stem: "Timo sucht nur samstags einen Nebenjob und mag Bücher.", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D"] },
+      { stem: "Bei welcher Stelle ist Büroerfahrung ausdrücklich erforderlich?", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D"] },
+    ],
+  },
+  13: {
+    chapter: "5.13",
+    format: "Einladung zum Vorstellungsgespräch",
+    title: "Termin bei der Firma Novak",
+    strategy: "Achte auf Termin, Adresse, Ansprechpartner und was du mitbringen sollst.",
+    text: `Sehr geehrte Frau Owusu,
+
+vielen Dank für Ihre Bewerbung als Büroassistentin. Wir möchten Sie gern zu einem Vorstellungsgespräch einladen.
+
+Termin: Dienstag, 6. Mai, 10:30 Uhr
+Ort: Firma Novak, Lindenstraße 18, 2. Stock
+Ansprechpartner: Herr Berger
+
+Bitte bringen Sie Ihren Lebenslauf und Ihre Zeugnisse mit. Das Gespräch dauert ungefähr 45 Minuten. Wenn Sie den Termin nicht wahrnehmen können, melden Sie sich bitte spätestens am Freitag bei uns.
+
+Mit freundlichen Grüßen
+Personalabteilung Novak`,
+    questions: [
+      { stem: "Für welche Stelle hat sich Frau Owusu beworben?", options: ["A) Büroassistentin", "B) Verkäuferin", "C) Krankenpflegerin", "D) Lehrerin"] },
+      { stem: "Wann ist das Vorstellungsgespräch?", options: ["A) Montag um 10:30 Uhr", "B) Dienstag um 10:30 Uhr", "C) Dienstag um 18:00 Uhr", "D) Freitag um 10:30 Uhr"] },
+      { stem: "Wen trifft Frau Owusu bei der Firma?", options: ["A) Frau Novak", "B) Herrn Berger", "C) Herrn Owusu", "D) Die Buchhaltung"] },
+      { stem: "Was soll sie mitbringen?", options: ["A) Pass und Fahrkarte", "B) Lebenslauf und Zeugnisse", "C) Laptop und Foto", "D) Arbeitskleidung"] },
+      { stem: "Was soll sie tun, wenn sie nicht kommen kann?", options: ["A) Gar nichts.", "B) Erst am Dienstag anrufen.", "C) Sich spätestens am Freitag melden.", "D) Eine neue Bewerbung schreiben."] },
+    ],
+  },
+  14: {
+    chapter: "5.14",
+    format: "Information am Arbeitsplatz",
+    title: "Willkommen bei TechPlus",
+    strategy: "Lies nach Regeln, Zeiten und Ansprechpartnern. Solche Informationen stehen oft in kurzen Absätzen.",
+    text: `Willkommen bei TechPlus!
+
+Die Arbeitszeit beginnt zwischen 8:00 und 9:00 Uhr. Wer später kommt, informiert bitte das Team. Die Mittagspause dauert mindestens 30 Minuten. Urlaub muss vorher im Online-System beantragt werden. Bei Krankheit informieren Sie Ihre Teamleitung am ersten Tag vor 9:00 Uhr. Ab dem dritten Krankheitstag brauchen Sie eine ärztliche Bescheinigung.
+
+Für Fragen zu Weiterbildung sprechen Sie mit Frau König aus der Personalabteilung. Jeden ersten Mittwoch im Monat gibt es außerdem eine kurze Informationsveranstaltung für neue Mitarbeitende.`,
+    questions: [
+      { stem: "Wann kann die Arbeit beginnen?", options: ["A) Zwischen 8:00 und 9:00 Uhr", "B) Nur um 7:00 Uhr", "C) Nach 10:00 Uhr", "D) Immer um 12:00 Uhr"] },
+      { stem: "Wie lange dauert die Mittagspause mindestens?", options: ["A) 15 Minuten", "B) 20 Minuten", "C) 30 Minuten", "D) 60 Minuten"] },
+      { stem: "Wie beantragt man Urlaub?", options: ["A) Per Telefon", "B) Im Online-System", "C) Beim Kollegen", "D) Gar nicht"] },
+      { stem: "Wann muss man bei Krankheit die Teamleitung informieren?", options: ["A) Am ersten Tag vor 9:00 Uhr", "B) Erst nach drei Tagen", "C) Am Wochenende", "D) Nur nach dem Arztbesuch"] },
+      { stem: "Wer hilft bei Fragen zur Weiterbildung?", options: ["A) Herr Berger", "B) Frau König", "C) Die Kantine", "D) Die Teamleitung immer"] },
+    ],
+  },
+  15: {
+    chapter: "6.15",
+    format: "Sportangebote zuordnen",
+    title: "Welcher Sportkurs passt?",
+    strategy: "Vergleiche mehrere Bedingungen gleichzeitig: Trainingszeit, Preis, Erfahrung, Anmeldung und besondere Hinweise. Ein einzelnes passendes Wort reicht nicht.",
+    text: `SPORTVEREIN NORD – KURSE IM FRÜHLING
+
+A – Laufgruppe
+Dienstag und Donnerstag, 18:00–19:00 Uhr. Treffpunkt am Stadion. Teilnahme kostenlos. Geeignet für Anfänger und Fortgeschrittene. Keine Anmeldung nötig.
+
+B – Schwimmen
+Mittwoch, 19:00–20:00 Uhr, Hallenbad. 25 Euro pro Monat. Sicheres Schwimmen ist Voraussetzung. Anmeldung bis zum Monatsende.
+
+C – Badminton
+Freitag, 17:30–19:00 Uhr, Sporthalle 2. 20 Euro pro Monat. Schläger können kostenlos ausgeliehen werden. Anfänger sind willkommen. Anmeldung erforderlich.
+
+D – Familienfitness
+Samstag, 10:00–11:00 Uhr. Für Erwachsene mit Kindern ab 6 Jahren. 8 Euro pro Termin. Anmeldung nicht nötig.
+
+E – Fitnesskurs „Rücken & Bewegung“
+Montag, 18:30–19:30 Uhr. 30 Euro pro Monat. Besonders geeignet für Personen, die nach einer längeren Pause wieder mit Sport beginnen möchten. Anmeldung erforderlich.`,
+    questions: [
+      { stem: "Nora arbeitet bis 17 Uhr und möchte nach der Arbeit Sport machen. Sie hat lange keinen Sport gemacht und möchte langsam wieder anfangen. Welcher Kurs passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Sam möchte am Freitag trainieren. Er hat keinen eigenen Schläger und hat noch nie Badminton gespielt. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Mina möchte mit ihrer achtjährigen Tochter am Wochenende gemeinsam Sport machen und spontan kommen. Welches Angebot passt?", options: ["A) Angebot B", "B) Angebot C", "C) Angebot D", "D) Angebot E"] },
+      { stem: "David kann nur mittwochs abends. Er kann gut schwimmen und möchte einen regelmäßigen Monatskurs. Welches Angebot passt?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot E"] },
+      { stem: "Leonie möchte möglichst nichts bezahlen, zweimal pro Woche trainieren und sich nicht vorher anmelden. Welches Angebot passt am besten?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot D", "D) Angebot E"] },
+    ],
+  },
+  16: {
+    chapter: "6.16",
+    format: "Anzeigen zuordnen",
+    title: "Etwas für das Wohlbefinden",
+    strategy: "Vergleiche Problem und Angebot. Achte auf Wörter wie Rücken, Stress, Ernährung und Entspannung.",
+    text: `Angebot A – Yoga am Abend
+Montag und Donnerstag, 18:30 Uhr. Ruhige Übungen für Anfänger.
+
+Angebot B – Rückenkurs
+Mittwoch, 17:00 Uhr. Übungen für Menschen mit Rückenproblemen.
+
+Angebot C – Ernährungsberatung
+Individuelle Termine. Tipps für gesundes Essen im Alltag.
+
+Angebot D – Entspannung nach der Arbeit
+Freitag, 19:00 Uhr. Atemübungen und einfache Techniken gegen Stress.`,
+    questions: [
+      { stem: "Marta sitzt viel im Büro und hat oft Rückenschmerzen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Kwame möchte lernen, im Alltag gesünder zu essen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Nora ist nach der Arbeit oft gestresst und sucht etwas am Freitagabend.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Jonas möchte als Anfänger zweimal pro Woche ruhige Übungen machen.", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+      { stem: "Welches Angebot hat individuelle Termine?", options: ["A) Angebot A", "B) Angebot B", "C) Angebot C", "D) Angebot D"] },
+    ],
+  },
+  17: {
+    chapter: "6.17",
+    format: "Goethe A2 · Lesen · Teil 1 und Teil 2",
+    title: "Hamburg erleben",
+    strategy: "Teil 1: Wähle a, b oder c. Teil 2: Entscheide bei jeder Aussage zwischen Richtig und Falsch.",
+    text: `Teil 1 · Multiple Choice
+
+Text 1
+
+Ein Mann ist in Hamburg. Er macht eine Fahrt mit dem Schiff. Die Fahrt dauert eine Stunde. Das Ticket kostet 25 Euro. Mit der Gästekarte kostet das Ticket nur 20 Euro.
+
+Text 2
+
+Heute Abend gibt es Musik. Ein Orchester spielt in der Elbphilharmonie. Das Konzert beginnt um 20 Uhr. Der Mann kauft ein Ticket. Er geht vorher Fisch essen. Das Restaurant ist im Hafen und nicht teuer.
+
+Teil 2 · Richtig oder Falsch?
+
+Der Mann bleibt zwei Tage in Hamburg. Er kauft eine Gästekarte für 12 Euro. Er fährt damit zwei Tage mit Bus und Bahn. Heute isst er Fisch im Restaurant Seeblick. Das Essen ist gut. Morgen besucht er ein kleines Museum. Der Besuch dauert zwei Stunden. Danach geht er im Stadtpark spazieren. Die Frau gibt ihm einen Stadtplan.`,
+    questions: [
+      { stem: "Teil 1 · Wie lange dauert die Fahrt mit dem Schiff?", options: ["A) 10 Minuten", "B) Eine Stunde", "C) Zwei Tage"] },
+      { stem: "Teil 1 · Wie viel kostet das Ticket mit der Gästekarte?", options: ["A) 12 Euro", "B) 20 Euro", "C) 25 Euro"] },
+      { stem: "Teil 1 · Wann beginnt das Konzert?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Teil 2 · Der Mann bleibt zwei Tage in Hamburg.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Die Gästekarte kostet 50 Euro.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Der Mann isst im Restaurant Fisch.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Das Museum ist sehr groß.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Teil 2 · Der Mann bekommt einen Stadtplan.", options: ["A) Richtig", "B) Falsch"] },
+    ],
+  },
+  18: {
+    chapter: "7.18",
+    format: "Bank-E-Mail",
+    title: "Ihr Termin zur Kontoeröffnung",
+    strategy: "Achte auf Dokumente, Termin, Ort und Vorbereitung. Diese Details werden in Service-E-Mails oft direkt genannt.",
+    text: `Sehr geehrter Herr Mensah,
+
+Ihr Termin zur Kontoeröffnung ist am Donnerstag um 14:00 Uhr in unserer Filiale am Marktplatz 8. Bitte bringen Sie Ihren Reisepass, Ihre Meldebescheinigung und einen Einkommensnachweis mit. Der Termin dauert ungefähr 45 Minuten.
+
+Wenn Sie Zeit sparen möchten, können Sie die Formulare vorher online ausfüllen. Bitte kommen Sie zehn Minuten vor dem Termin. Falls Sie verhindert sind, ändern Sie den Termin über unsere App oder rufen Sie uns an.
+
+Freundliche Grüße
+Stadtbank`,
+    questions: [
+      { stem: "Wann ist der Termin?", options: ["A) Donnerstag um 14:00 Uhr", "B) Freitag um 14:00 Uhr", "C) Donnerstag um 10:00 Uhr", "D) Montag um 8:00 Uhr"] },
+      { stem: "Wo findet der Termin statt?", options: ["A) Am Bahnhof", "B) Am Marktplatz 8", "C) Im Rathaus", "D) Online"] },
+      { stem: "Welches Dokument soll Herr Mensah mitbringen?", options: ["A) Eine Fahrkarte", "B) Einen Reisepass", "C) Ein Schulbuch", "D) Eine Hotelbuchung"] },
+      { stem: "Wie lange dauert der Termin ungefähr?", options: ["A) 15 Minuten", "B) 30 Minuten", "C) 45 Minuten", "D) Zwei Stunden"] },
+      { stem: "Wie kann er Zeit sparen?", options: ["A) Später kommen", "B) Die Formulare vorher online ausfüllen", "C) Keine Dokumente mitbringen", "D) Den Termin absagen"] },
+    ],
+  },
+  19: {
+    chapter: "7.19",
+    format: "Einkaufsinformationen",
+    title: "Wo kaufe ich was?",
+    strategy: "Lies Preise, Öffnungszeiten und besondere Hinweise. Das ist typisches Informations-Scanning.",
+    text: `Wochenmarkt: Dienstag und Samstag, 7–13 Uhr. Obst, Gemüse, Brot und Käse. Viele Produkte kommen aus der Region. Kartenzahlung ist nicht an allen Ständen möglich.
+
+Supermarkt City: Montag bis Samstag, 8–21 Uhr. Große Auswahl. Ab 19 Uhr sind einige Backwaren günstiger.
+
+Secondhand-Laden: Mittwoch bis Freitag, 11–18 Uhr. Kleidung und kleine Haushaltsartikel. Man kann gut erhaltene Kleidung auch dort abgeben.`,
+    questions: [
+      { stem: "Wann ist der Wochenmarkt geöffnet?", options: ["A) Dienstag und Samstag", "B) Nur Sonntag", "C) Jeden Abend", "D) Montag bis Freitag"] },
+      { stem: "Was ist auf dem Wochenmarkt nicht überall möglich?", options: ["A) Brot kaufen", "B) Kartenzahlung", "C) Gemüse kaufen", "D) Käse kaufen"] },
+      { stem: "Wann sind im Supermarkt einige Backwaren günstiger?", options: ["A) Vor 8 Uhr", "B) Ab 19 Uhr", "C) Nur am Sonntag", "D) Mittags"] },
+      { stem: "Was verkauft der Secondhand-Laden?", options: ["A) Nur Lebensmittel", "B) Kleidung und kleine Haushaltsartikel", "C) Fahrräder", "D) Medikamente"] },
+      { stem: "Was kann man im Secondhand-Laden zusätzlich tun?", options: ["A) Kleidung abgeben", "B) Geld wechseln", "C) Einen Sprachkurs besuchen", "D) Lebensmittel bestellen"] },
+    ],
+  },
+  20: {
+    chapter: "7.20",
+    format: "Reklamations-E-Mail",
+    title: "Der neue Wasserkocher funktioniert nicht",
+    strategy: "Suche zuerst: Was wurde gekauft? Was ist das Problem? Was möchte die Person jetzt?",
+    text: `Sehr geehrte Damen und Herren,
+
+am Montag habe ich in Ihrer Filiale einen Wasserkocher für 39 Euro gekauft. Zu Hause habe ich das Gerät einmal benutzt. Seit Dienstag schaltet es sich nicht mehr ein. Ich habe die Steckdose geprüft; andere Geräte funktionieren dort normal.
+
+Leider finde ich den Kassenbon nicht mehr, aber ich habe die Kartenzahlung in meiner Banking-App. Kann ich den Wasserkocher am Samstag in die Filiale bringen? Ich möchte gern ein neues Gerät oder mein Geld zurück.
+
+Mit freundlichen Grüßen
+Daniel Koch`,
+    questions: [
+      { stem: "Was hat Daniel gekauft?", options: ["A) Eine Kaffeemaschine", "B) Einen Wasserkocher", "C) Einen Toaster", "D) Einen Fernseher"] },
+      { stem: "Wie viel hat das Gerät gekostet?", options: ["A) 19 Euro", "B) 29 Euro", "C) 39 Euro", "D) 49 Euro"] },
+      { stem: "Was ist das Problem?", options: ["A) Das Gerät ist zu laut.", "B) Es schaltet sich nicht mehr ein.", "C) Es fehlt ein Kabel.", "D) Die Farbe ist falsch."] },
+      { stem: "Was fehlt Daniel?", options: ["A) Der Kassenbon", "B) Die Verpackung", "C) Die Bankkarte", "D) Die Adresse der Filiale"] },
+      { stem: "Was möchte Daniel?", options: ["A) Eine Beratung über Kaffee", "B) Ein neues Gerät oder sein Geld zurück", "C) Einen Rabatt auf Kleidung", "D) Einen Termin beim Techniker zu Hause"] },
+    ],
+  },
+  21: {
+    chapter: "8.21",
+    format: "Wochenendplan",
+    title: "Unser Wochenende in Köln",
+    strategy: "Bei Plänen können Bedingungen etwas verändern. Achte besonders auf wenn und falls.",
+    text: `Mara und Daniel fahren am Samstagmorgen mit dem Zug nach Köln. Ihr Zug kommt um 10:15 Uhr an. Zuerst bringen sie ihre Taschen ins Hotel. Danach möchten sie am Rhein spazieren und den Dom besuchen. Falls es stark regnet, gehen sie stattdessen in ein Museum.
+
+Am Abend haben sie um 19 Uhr einen Tisch in einem Restaurant reserviert. Danach gehen sie zu einem Konzert. Am Sonntag frühstücken sie lange und kaufen noch kleine Geschenke. Ihr Zug nach Hause fährt um 17 Uhr.`,
+    questions: [
+      { stem: "Wie reisen Mara und Daniel nach Köln?", options: ["A) Mit dem Zug", "B) Mit dem Auto", "C) Mit dem Bus", "D) Mit dem Flugzeug"] },
+      { stem: "Was möchten sie nach dem Hotel zuerst machen?", options: ["A) Einkaufen", "B) Am Rhein spazieren", "C) Zum Konzert gehen", "D) Nach Hause fahren"] },
+      { stem: "Was machen sie am Samstagabend?", options: ["A) Museum und Hotel", "B) Restaurant und Konzert", "C) Shopping und Kino", "D) Nur einen Spaziergang"] },
+      { stem: "Was machen sie bei starkem Regen?", options: ["A) Sie gehen in ein Museum.", "B) Sie fahren sofort nach Hause.", "C) Sie bleiben am Bahnhof.", "D) Sie machen eine Fahrradtour."] },
+      { stem: "Wann fährt ihr Zug am Sonntag nach Hause?", options: ["A) Um 10:15 Uhr", "B) Um 14:00 Uhr", "C) Um 17:00 Uhr", "D) Um 19:00 Uhr"] },
+    ],
+  },
+  22: {
+    chapter: "8.22",
+    format: "Touristeninformation",
+    title: "In der Touristeninformation Hamburg",
+    strategy: "Lies zuerst die Frage und suche dann gezielt nach Zeit, Preis, Ort oder Vorteil im Gespräch.",
+    text: `Tourist: Guten Tag! Ich bin zum ersten Mal in Hamburg und bleibe nur zwei Tage. Was kann ich hier sehen und erleben?
+
+Mitarbeiterin: Am besten machen Sie eine Hafenrundfahrt. Das Schiff fährt jede Stunde, und die Fahrt dauert eine Stunde. Ein Ticket kostet 25 €, mit der Gästekarte bezahlen Sie nur 20 €. Das Schiff fährt an den Landungsbrücken ab.
+
+Tourist: Was ist eine Gästekarte?
+
+Mitarbeiterin: Mit der Gästekarte fahren Sie zwei Tage lang mit Bus und Bahn und bekommen Rabatt im Museum. Sie kostet 12 €.
+
+Tourist: Dann nehme ich eine Gästekarte, bitte. Gibt es heute Abend ein Konzert?
+
+Mitarbeiterin: Ja, in der Elbphilharmonie spielt heute Abend um 20 Uhr ein Orchester. Karten gibt es leider nur noch auf den hinteren Plätzen.
+
+Tourist: Wo kann ich vorher noch gut Fisch essen?
+
+Mitarbeiterin: Im Hafen gibt es viele Restaurants. Das Restaurant Seeblick ist besonders gut und nicht teuer.
+
+Tourist: Und für morgen? Ich möchte gern ein Museum besuchen.
+
+Mitarbeiterin: Besuchen Sie das Hafenmuseum. Es ist klein und sehr interessant, zwei Stunden reichen dort. Danach können Sie im Stadtpark spazieren gehen.
+
+Mitarbeiterin: Hier ist auch ein Stadtplan, auf dem ich das Schiff, das Restaurant und das Museum markiert habe.`,
+    questions: [
+      { stem: "Wie lange bleibt der Tourist in Hamburg?", options: ["A) Nur einen Tag", "B) Zwei Tage", "C) Eine ganze Woche"] },
+      { stem: "Wie viel kostet die Hafenrundfahrt mit der Gästekarte?", options: ["A) 12 €", "B) 20 €", "C) 25 €"] },
+      { stem: "Wo startet das Schiff für die Hafenrundfahrt?", options: ["A) Am Stadtpark", "B) An der Elbphilharmonie", "C) An den Landungsbrücken"] },
+      { stem: "Welchen Vorteil bietet die Gästekarte?", options: ["A) Freie Fahrt mit Bus und Bahn für zwei Tage", "B) Kostenloses Abendessen im Restaurant", "C) Freie Wahl der besten Plätze in der Elbphilharmonie"] },
+      { stem: "Wann beginnt das Konzert in der Elbphilharmonie?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Welches Restaurant wird für frischen Fisch empfohlen?", options: ["A) Hafenmuseum", "B) Seeblick", "C) Landungsbrücken"] },
+      { stem: "Wie viel Zeit sollte man für das Hafenmuseum einplanen?", options: ["A) Ungefähr zwei Stunden", "B) Den ganzen Tag", "C) Nur 10 Minuten"] },
+    ],
+  },
+  23: {
+    chapter: "9.23",
+    format: "Blogbeitrag",
+    title: "Mein Weg zur Arbeit",
+    strategy: "Lies zuerst die Aufgaben und suche dann gezielt nach Verkehrsmittel, Dauer, Grund, Problem und Preis.",
+    text: `Hallo zusammen!
+
+Ich heiße Markus und wohne in Bremen. Jeden Morgen muss ich zur Arbeit in die Innenstadt fahren. Mein Weg ist ziemlich lang: Zuerst gehe ich zehn Minuten zu Fuß zum Bahnhof. Dann nehme ich um 7:15 Uhr die S-Bahn. Die Fahrt dauert etwa 25 Minuten. Wenn die S-Bahn pünktlich ist, komme ich um 7:50 Uhr im Büro an.
+
+Im Sommer fahre ich manchmal mit dem Fahrrad, aber das dauert fast eine Stunde. Das ist mir im Winter zu kalt. Mein Kollege Jan fährt immer mit dem Auto, aber er steht oft im Stau und findet schwer einen Parkplatz. Deshalb finde ich die S-Bahn am besten, auch wenn ein Monatsticket 65 Euro kostet.
+
+Wie fahrt ihr zur Arbeit oder zur Schule? Schreibt mir einen Kommentar!`,
+    questions: [
+      { stem: "Wie kommt Markus morgens zum Bahnhof?", options: ["A) Mit dem Fahrrad", "B) Zu Fuß", "C) Mit dem Auto"] },
+      { stem: "Wie lange dauert die Fahrt mit der S-Bahn?", options: ["A) 10 Minuten", "B) 25 Minuten", "C) 50 Minuten"] },
+      { stem: "Warum fährt Markus im Winter nicht mit dem Fahrrad?", options: ["A) Weil es ihm zu kalt ist.", "B) Weil sein Fahrrad kaputt ist.", "C) Weil die Fahrkarte teuer ist."] },
+      { stem: "Welches Problem hat sein Kollege Jan?", options: ["A) Die S-Bahn ist oft zu spät.", "B) Er findet schwer einen Parkplatz.", "C) Er darf nicht mit dem Auto fahren."] },
+      { stem: "Was kostet Markus' Monatsticket?", options: ["A) 25 Euro", "B) 50 Euro", "C) 65 Euro"] },
+    ],
+  },
+  24: {
+    chapter: "9.24",
+    format: "Situationen und Anzeigen zuordnen",
+    title: "Welche Anzeige passt?",
+    strategy: "Lies zuerst die fünf Situationen. Markiere Schlüsselwörter wie Sport, Kinder, Kultur, Berge oder günstig und vergleiche sie dann mit den Anzeigen A–F.",
+    text: `Situationen / Personen
+
+1. Herr Becker möchte im Urlaub viel Sport machen, am liebsten im Meer schwimmen und tauchen lernen.
+2. Familie Meier reist mit zwei kleinen Kindern. Sie suchen ein Hotel direkt am Strand mit Betreuung für die Kinder.
+3. Frau Klum möchte eine Städtereise machen. Sie interessiert sich für Kunst, Museen und ein Konzert oder Musical.
+4. Markus und Lisa möchten in den Sommerferien in den Bergen wandern und die Natur genießen.
+5. Sarah ist Studentin, hat wenig Geld und sucht eine sehr günstige Unterkunft im Stadtzentrum.
+
+Anzeigen A–F
+
+Anzeige A – Hotel Alpin in Tirol
+Genießen Sie frische Bergluft! Ideal für Wanderer und Naturfreunde. Geführte Bergtouren jeden Tag. Rezeption rund um die Uhr besetzt.
+
+Anzeige B – City-Hostel Zentrum
+Günstig übernachten mitten in der Stadt! Mehrbettzimmer ab 18 € pro Nacht. Perfekt für Studenten und junge Leute.
+
+Anzeige C – Familien-Resort Ostsee
+Urlaub direkt am Sandstrand! Großer Spielplatz, Kinderbetreuung und Animation von 3 bis 10 Jahren. Die Eltern entspannen am Strand.
+
+Anzeige D – Wassersport-Camp Mittelmeer
+Aktivurlaub für Sportfans! Tauchkurse für Anfänger, Windsurfen und Segeln im Meer. Moderne Ausrüstung inklusive.
+
+Anzeige E – Hamburg Kultur-Spezial
+3 Tage Städtereise inklusive Hotel, Stadtplan, Eintritt ins Museum und Konzertkarte für die Elbphilharmonie!
+
+Anzeige F – Wellness-Hotel Waldruh
+Ruhe und Erholung pur im Schwarzwald. Große Saunalandschaft, Massagen und gutes Essen. Nur für Erwachsene.`,
+    questions: [
+      { stem: "Herr Becker", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Familie Meier", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Frau Klum", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Markus und Lisa", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+      { stem: "Sarah", options: ["A) Anzeige A", "B) Anzeige B", "C) Anzeige C", "D) Anzeige D", "E) Anzeige E", "F) Anzeige F"] },
+    ],
+  },
+  25: {
+    chapter: "9.25",
+    format: "Goethe A2 · Lesen Teil 1",
+    title: "Mein Tagesablauf in Hamburg",
+    strategy: "Lies zuerst die fünf Fragen. Achte dann besonders auf Reihenfolge, Preise, Orte und Uhrzeiten im Tagesablauf.",
+    text: `Ich bin für zwei Tage in Hamburg. Mein erster Tag beginnt in der Touristeninformation. Dort kaufe ich für 12 € eine Gästekarte, mit der ich zwei Tage lang Bus und Bahn nutzen kann.
+
+Danach gehe ich zehn Minuten zu Fuß zu den Landungsbrücken. Dort startet mein Schiff für eine einstündige Hafenrundfahrt. Am späten Nachmittag esse ich im Hafen im Restaurant Seeblick frischen Fisch. Um 20:00 Uhr besuche ich ein Orchesterkonzert in der Elbphilharmonie.
+
+Für den zweiten Tag merke ich mir einen zweistündigen Besuch im Hafenmuseum vor. Anschließend möchte ich im Stadtpark spazieren gehen und einen Kaffee trinken.`,
+    questions: [
+      { stem: "Was macht der Tourist am ersten Tag nach dem Besuch der Touristeninformation?", options: ["A) Er geht direkt ins Hafenmuseum.", "B) Er macht eine Hafenrundfahrt an den Landungsbrücken.", "C) Er fährt in den Stadtpark."] },
+      { stem: "Wie viel kostet die Hafenrundfahrt mit der Gästekarte?", options: ["A) 12 €", "B) 20 € (statt 25 €)", "C) 25 €"] },
+      { stem: "Wo möchte der Tourist am späten Nachmittag essen?", options: ["A) Auf dem Fischmarkt", "B) Im Restaurant Seeblick", "C) Im Stadtpark"] },
+      { stem: "Um wie viel Uhr beginnt das Konzert in der Elbphilharmonie?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
+      { stem: "Was ist für den zweiten Tag geplant?", options: ["A) Eine zweite Schiffsfahrt", "B) Ein Besuch im Hafenmuseum und ein Spaziergang im Stadtpark", "C) Ein ganzer Tag im Konzertsaal"] },
+    ],
+  },
+  26: {
+    chapter: "10.26",
+    format: "Gefühle und Reaktionen im Gespräch",
+    title: "Gefühle und Reaktionen im Gespräch",
+    strategy: "Lies die fünf Situationen und achte auf die Reaktion des Touristen. Entscheide, welches Gefühl oder welche Haltung seine Worte ausdrücken.",
+    text: `Situation 1: Die Mitarbeiterin schlägt eine einstündige Hafenrundfahrt vor. Der Tourist ist begeistert und sagt: „Das klingt toll.“
+
+Situation 2: Der Tourist möchte am Abend etwas Kulturelles unternehmen. Er zeigt sein Interesse mit den Worten: „Ich interessiere mich auch für Musik.“
+
+Situation 3: Die Mitarbeiterin erklärt, dass es für das Orchesterkonzert nur noch Karten auf den hinteren Plätzen gibt. Der Tourist bleibt gelassen und antwortet: „Das ist nicht schlimm.“
+
+Situation 4: Für das Abendessen empfiehlt die Mitarbeiterin das Restaurant Seeblick im Hafen. Der Tourist freut sich über die Empfehlung: „Super Tipp. Danke.“
+
+Situation 5: Für den zweiten Tag wird ein kurzer Besuch im Hafenmuseum und ein Spaziergang im Stadtpark empfohlen. Der Tourist ist zufrieden: „Das gefällt mir.“`,
+    questions: [
+      { stem: "Wie reagiert der Tourist auf den Vorschlag für die Hafenrundfahrt?", options: ["A) Er ist unsicher und möchte lieber warten.", "B) Er findet die Idee sehr gut („Das klingt toll“).", "C) Er reagiert verärgert über den Preis."] },
+      { stem: "Wie drückt der Tourist sein Interesse an einem Konzert aus?", options: ["A) „Ich interessiere mich auch für Musik.“", "B) „Ich habe keine Lust auf Musik.“", "C) „Musik ist mir zu teuer.“"] },
+      { stem: "Welches Gefühl zeigt der Tourist, als es nur noch hintere Plätze im Konzert gibt?", options: ["A) Er ist enttäuscht und geht nicht hin.", "B) Er ist gelassen und nimmt die Karten trotzdem („Das ist nicht schlimm“).", "C) Er ist wütend auf die Mitarbeiterin."] },
+      { stem: "Wie fühlt sich der Tourist nach dem Restauranttipp der Mitarbeiterin?", options: ["A) Er freut sich über den guten Rat („Super Tipp. Danke“).", "B) Er ist traurig, weil es keinen Fisch gibt.", "C) Er möchte lieber im Hotel essen."] },
+      { stem: "Was bedeutet die Reaktion „Das gefällt mir“ beim Tagesprogramm für Tag 2?", options: ["A) Der Tourist ist mit dem Plan für Museum und Stadtpark zufrieden.", "B) Der Tourist möchte den Plan komplett ändern.", "C) Der Tourist versteht den Stadtplan nicht."] },
+    ],
+  },
+  27: {
+    chapter: "10.27",
+    format: "Digitale Mitteilungen & Online-Anzeigen",
+    title: "Digitale Mitteilungen & Online-Anzeigen",
+    strategy: "Lies zuerst die fünf Fragen. Ordne dann die Informationen aus App, E-Mail, Website und Digital-Info gezielt nach Vorteil, Sitzplatz, Reservierung, Dauer und Download.",
+    text: `Anzeige A: Hamburg-App Notification
+
+Gästekarte Hamburg Digital
+Fahren Sie zwei Tage lang unbegrenzt mit Bus und Bahn! Nutzen Sie 20 % Rabatt bei der Hafenrundfahrt an den Landungsbrücken (20 € statt 25 €) sowie Rabatte in vielen Museen. Kaufen und aktivieren Sie die Karte direkt in der App.
+
+Anzeige B: E-Mail-Bestätigung — Kultur-Ticket
+
+Elbphilharmonie Hamburg — Ihre Buchung
+Vielen Dank für Ihre Bestellung! Ihr Ticket für das Orchesterkonzert heute Abend um 20:00 Uhr ist bestätigt. Hinweis: Sie buchten Plätze in der letzten Reihe (hintere Plätze). Bitte zeigen Sie den QR-Code auf Ihrem Smartphone am Eingang vor.
+
+Anzeige C: Website-Anzeige — Gastronomie
+
+Restaurant Seeblick am Hafen
+Lust auf frischen Fisch am Hafen? Besuchen Sie uns! Hervorragende Küche zu günstigen Preisen. Öffnungszeiten & Tischreservierung online unter www.seeblick-hamburg.de.
+
+Anzeige D: Digitaler Stadtplan & Museumsinfos
+
+Hafenmuseum & Stadtpark Info
+Das Hafenmuseum ist klein und sehr interessant. Planen Sie etwa 2 Stunden für Ihren Besuch ein. Lade dir jetzt den digitalen Stadtplan mit allen Markierungen auf dein Handy herunter!`,
+    questions: [
+      { stem: "Was bietet die digitale Gästekarte in der App?", options: ["A) Kostenlosen Eintritt in alle Fischrestaurants", "B) Freie Fahrt mit Bus und Bahn für zwei Tage sowie Rabatte", "C) Ein Gratis-Ticket für das Orchesterkonzert"] },
+      { stem: "Welche Information steht in der E-Mail der Elbphilharmonie?", options: ["A) Das Konzert ist abgesagt.", "B) Die Vorstellung beginnt bereits um 12:00 Uhr.", "C) Die gebuchten Plätze befinden sich auf den hinteren Rängen."] },
+      { stem: "Wo kann man online einen Tisch für frischen Fisch buchen?", options: ["A) Auf der Website des Restaurants Seeblick", "B) In der App des Hafenmuseums", "C) Per SMS bei der Touristeninformation"] },
+      { stem: "Wie lange dauert ein Besuch im Hafenmuseum laut Digital-Info?", options: ["A) Den ganzen Tag", "B) Ungefähr zwei Stunden", "C) Genau zehn Minuten"] },
+      { stem: "Was kann man auf das Smartphone herunterladen?", options: ["A) Eine kostenlose Fahrkarte für die Elbphilharmonie", "B) Einen digitalen Stadtplan mit Markierungen für Sehenswürdigkeiten", "C) Ein Kochbuch für Fischgerichte"] },
+    ],
+  },
+  28: {
+    chapter: "10.28",
+    format: "E-Mail über Zukunftspläne",
+    title: "Reisepläne für Hamburg",
+    strategy: "Lies zuerst die fünf Fragen. Achte dann auf Reihenfolge und Zeitangaben wie heute Abend, morgen, nachmittags und zwei Tage lang.",
+    text: `Hallo Jan,
+
+ich bin gut in Hamburg angekommen! Ich bleibe zwei Tage hier und habe schon viele Pläne.
+
+Heute Abend werde ich im Restaurant Seeblick im Hafen frischen Fisch essen. Danach gehe ich um 20:00 Uhr in die Elbphilharmonie. Dort spielt ein Orchester.
+
+Morgen möchte ich zuerst das Hafenmuseum besuchen. Die Mitarbeiterin in der Touristeninformation hat gesagt, dass zwei Stunden dort reichen. Nachmittags werde ich im Stadtpark spazieren gehen und einen Kaffee trinken.
+
+Für die zwei Tage kaufe ich mir eine Gästekarte. Damit kann ich zwei Tage lang mit Bus und Bahn fahren und bekomme Rabatt im Museum und auf dem Schiff.
+
+Bis bald und liebe Grüße
+Markus`,
+    questions: [
+      { stem: "Was wird Markus heute Abend als Erstes machen?", options: ["A) Er wird im Stadtpark spazieren gehen.", "B) Er wird im Restaurant Seeblick Fisch essen.", "C) Er wird das Hafenmuseum besuchen."] },
+      { stem: "Wann geht Markus in die Elbphilharmonie?", options: ["A) Heute Abend um 20:00 Uhr", "B) Morgen Nachmittag", "C) In zwei Wochen"] },
+      { stem: "Was hat Markus für morgen Vormittag geplant?", options: ["A) Er möchte eine Hafenrundfahrt buchen.", "B) Er möchte das Hafenmuseum besuchen.", "C) Er möchte den ganzen Tag im Hotel bleiben."] },
+      { stem: "Was wird Markus nach dem Museumsbesuch machen?", options: ["A) Er wird direkt nach Hause fahren.", "B) Er wird im Stadtpark spazieren gehen.", "C) Er wird ein neues Ticket für die Bahn kaufen."] },
+      { stem: "Wie lange möchte Markus die Gästekarte nutzen?", options: ["A) Nur für eine Stunde", "B) Einen ganzen Monat", "C) Zwei Tage lang für Bus und Bahn"] },
+    ],
+  },
+};
+
+export const getA2ReadingTask = (day) => A2_READING_TASKS[Number(day)] || null;
+
+export const A2_READING_DAYS = Object.freeze(
+  Object.keys(A2_READING_TASKS).map(Number).sort((a, b) => a - b),
+);
+
+export default A2_READING_TASKS;

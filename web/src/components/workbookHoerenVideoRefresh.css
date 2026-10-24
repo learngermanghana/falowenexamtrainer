@@ -1,0 +1,19 @@
+.workbook-hoeren-refresh.show-hoeren .legacy-workbook a[href*="drive.google.com"],
+.workbook-hoeren-refresh.show-hoeren .legacy-workbook p:has(a[href*="drive.google.com"]),
+.workbook-hoeren-refresh.show-hoeren .legacy-workbook p:has(a[href*="youtu"]),
+.workbook-hoeren-refresh.show-hoeren .legacy-workbook iframe {
+  display: none !important;
+}
+
+.workbook-hoeren-replacement {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.workbook-hoeren-replacement iframe {
+  width: 100%;
+  min-height: 315px;
+  border: 0;
+  border-radius: 10px;
+}

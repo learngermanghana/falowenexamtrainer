@@ -1,0 +1,214 @@
+.a1-goethe-mock-website-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 54px;
+  margin: 26px 8px 22px;
+  align-items: start;
+}
+
+.a1-goethe-mock-browser-panel {
+  min-width: 0;
+  border: 2px solid #525252;
+  background: #efefef;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.a1-goethe-mock-browser-greenbar {
+  min-height: 28px;
+  padding: 3px 8px;
+  background: #4c8d2f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font: 700 17px/1.2 Arial, Helvetica, sans-serif;
+}
+
+.a1-goethe-mock-browser-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 27px;
+  padding: 2px 5px;
+  border-bottom: 1px solid #7a7a7a;
+  background: #ededed;
+}
+
+.a1-goethe-mock-browser-icon {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 21px;
+  border: 1px solid #9b9b9b;
+  background: #fff;
+  font-size: 13px;
+}
+
+.a1-goethe-mock-browser-url {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 5px;
+  border: 1px solid #9c9c9c;
+  background: #fff;
+  color: #111;
+  font: 13px/1.2 Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.a1-goethe-mock-browser-page {
+  min-height: 190px;
+  padding: 9px 12px 13px;
+  display: grid;
+  grid-template-columns: 42% 1fr;
+  gap: 15px;
+  background: #fff;
+}
+
+.a1-goethe-mock-browser-visual {
+  min-height: 150px;
+  border: 1px solid #b7b7b7;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,0)),
+    repeating-linear-gradient(45deg, #c5d1b9 0 12px, #aebc9f 12px 24px);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.a1-goethe-mock-browser-visual span {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.88);
+  border: 2px solid #416326;
+  color: #416326;
+  font: 700 36px/1 Georgia, "Times New Roman", serif;
+}
+
+.a1-goethe-mock-browser-copy {
+  padding-top: 2px;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #191919;
+}
+
+.a1-goethe-mock-browser-copy h3 {
+  margin: 0 0 7px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.a1-goethe-mock-browser-copy strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.a1-goethe-mock-browser-copy p {
+  margin: 5px 0;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.a1-goethe-mock-teil2-answer-row {
+  display: grid;
+  gap: 16px;
+  width: fit-content;
+  margin: 28px 0 0 0;
+}
+
+.a1-goethe-mock-letter-choice {
+  min-width: 72px;
+}
+
+.a1-goethe-mock-letter-choice span {
+  font-weight: 700;
+  text-transform: lowercase;
+}
+
+.a1-goethe-mock-timetable-stack {
+  display: grid;
+  gap: 42px;
+  margin: 30px 0 18px;
+}
+
+.a1-goethe-mock-timetable-card {
+  min-width: 0;
+}
+
+.a1-goethe-mock-timetable-heading {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.a1-goethe-mock-table-scroll {
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.a1-goethe-mock-timetable {
+  width: 100%;
+  min-width: 780px;
+  border-collapse: collapse;
+  font: 16px/1.2 Arial, Helvetica, sans-serif;
+  background: transparent;
+}
+
+.a1-goethe-mock-timetable th,
+.a1-goethe-mock-timetable td {
+  padding: 9px 11px;
+  border-right: 1px solid #444;
+  border-bottom: 1px solid #444;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.a1-goethe-mock-timetable th {
+  font-weight: 700;
+}
+
+.a1-goethe-mock-timetable th:first-child,
+.a1-goethe-mock-timetable td:first-child {
+  width: 75px;
+  font-weight: 700;
+}
+
+.a1-goethe-mock-timetable th:last-child,
+.a1-goethe-mock-timetable td:last-child {
+  border-right: 1px solid #444;
+}
+
+@media (max-width: 820px) {
+  .a1-goethe-mock-website-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .a1-goethe-mock-browser-page {
+    min-height: 170px;
+  }
+}
+
+@media (max-width: 520px) {
+  .a1-goethe-mock-browser-page {
+    grid-template-columns: 1fr;
+  }
+
+  .a1-goethe-mock-browser-visual {
+    min-height: 120px;
+  }
+
+  .a1-goethe-mock-timetable-heading {
+    justify-content: flex-start;
+  }
+}

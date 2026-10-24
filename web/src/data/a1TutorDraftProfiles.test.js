@@ -1,0 +1,109 @@
+import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "./a1AssignmentRegistry";
+import {
+  A1_TUTOR_DRAFT_PROFILES,
+  getA1TutorDraftProgress,
+  getA1TutorDraftProfile,
+  validateA1TutorDraftSubmissionSections,
+} from "./a1TutorDraftProfiles";
+
+const makeSerializedSections = (definition = {}) => new Map(
+  Object.entries(definition).map(([key, lines]) => [key, lines]),
+);
+
+test("defines shared draft capture for every tutor-marked A1 assignment except page-owned A1-3", () => {
+  const expected = A1_ASSIGNMENT_ORDER.filter((key) => !["A1-3", "A1-5.9"].includes(key));
+  expect(Object.keys(A1_TUTOR_DRAFT_PROFILES)).toEqual(expected);
+  expected.forEach((key) => expect(getA1TutorDraftProfile(key)).toBeTruthy());
+  expect(getA1TutorDraftProfile("A1-3")).toBeNull();
+});
+
+test("models A1-14.1 Health as two five-question reading parts + six listening choices", () => {
+  const health = getA1TutorDraftProfile("A1-14.1");
+  expect(health.sections["teil-1"].items).toHaveLength(5);
+  expect(health.sections["teil-1"].items[0]).toEqual(expect.objectContaining({
+    type: "choice",
+    choices: ["A", "B"],
+  }));
+  expect(health.sections["teil-2"].items).toHaveLength(5);
+  expect(health.sections["teil-2"].items[0].choices).toEqual(["Richtig", "Falsch"]);
+  expect(health.sections["teil-2"].embeddedWriting).toBe(false);
+  expect(health.sections["teil-3"].items).toHaveLength(6);
+  expect(health.sections["teil-3"].items.every(({ type }) => type === "choice")).toBe(true);
+  expect(health.sections["teil-3"].items[0].choices).toEqual(["A", "B", "C"]);
+});
+
+test("supports mixed question types in one Teil", () => {
+  const countries = getA1TutorDraftProfile("A1-4");
+  expect(countries.sections["teil-3"].items.slice(0, 4).every(({ type }) => type === "choice")).toBe(true);
+  expect(countries.sections["teil-3"].items[4]).toEqual(expect.objectContaining({ number: 5, type: "choice", choices: ["A", "B", "C"] }));
+  expect(countries.sections["teil-3"].inlineAnswers).toBe(true);
+
+  expect(getA1TutorDraftProfile("A1-12.2")).toBeNull();
+  expect(getA1TutorDraftProfile("A1-5.9")).toBeNull();
+});
+
+test("treats the Day 1 reading text as study material and requires the ten questions only", () => {
+  const profile = getA1TutorDraftProfile("A1-0.1");
+  expect(profile.sections["teil-1"]).toEqual(expect.objectContaining({ readOnly: true, required: false }));
+  expect(profile.sections["teil-2"].items).toHaveLength(10);
+});
+
+test("aligns A1-9 Negation to the three rendered assessed Teile", () => {
+  expect(getA1Assignment("A1-9").sections.map(({ key }) => key)).toEqual(["teil-1", "teil-2", "teil-3"]);
+  expect(Object.keys(getA1TutorDraftProfile("A1-9").sections)).toEqual(["teil-1", "teil-2", "teil-3"]);
+});
+
+test("reports incomplete Health workbook until both reading parts and listening are complete", () => {
+  const partial = {
+    sections: {
+      "teil-1": { answers: { 1: "Anzeige A", 2: "Anzeige B" } },
+      "teil-2": { answers: { 1: "Richtig" } },
+      "teil-3": { answers: { 1: "A" } },
+    },
+  };
+  expect(getA1TutorDraftProgress({ assignmentKey: "A1-14.1", draft: partial })).toEqual(
+    expect.objectContaining({ complete: false, completed: 4, total: 16 }),
+  );
+
+  const complete = {
+    sections: {
+      "teil-1": { answers: Object.fromEntries(Array.from({ length: 5 }, (_, i) => [i + 1, "Anzeige A"])) },
+      "teil-2": { answers: Object.fromEntries(Array.from({ length: 5 }, (_, i) => [i + 1, "Richtig"])) },
+      "teil-3": { answers: Object.fromEntries(Array.from({ length: 6 }, (_, i) => [i + 1, "A"])) },
+    },
+  };
+  expect(getA1TutorDraftProgress({ assignmentKey: "A1-14.1", draft: complete })).toEqual(
+    expect.objectContaining({ complete: true, completed: 16, total: 16 }),
+  );
+});
+
+test("replaces only the agreed A1 assignment sections with Goethe speaking", () => {
+  for (const [key, part, exam] of [
+    ["A1-4", "teil-2", "Sich vorstellen"],
+    ["A1-11", "teil-1", "Bitten und Reagieren"],
+  ]) {
+    const assignment = getA1Assignment(key);
+    const profile = getA1TutorDraftProfile(key);
+    expect(assignment.sections.map(({ key: sectionKey }) => sectionKey)).toEqual(Object.keys(profile.sections));
+    expect(profile.sections[part]).toEqual(expect.objectContaining({ speaking: true, label: expect.stringContaining(exam) }));
+    expect(profile.sections[part].items).toHaveLength(0);
+  }
+  expect(getA1Assignment("A1-8").sections).toHaveLength(2);
+});
+
+test("A1-8 requires five true/false and three a/b/c Lesen responses", () => {
+  const incomplete = makeSerializedSections({
+    "teil-1": ["1. Richtig", "2. Richtig", "3. Falsch", "4. Richtig", "5. Richtig"],
+    "teil-2": ["6. B", "7. C"],
+  });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: incomplete }).ok).toBe(false);
+  const complete = makeSerializedSections({
+    "teil-1": ["1. Richtig", "2. Richtig", "3. Falsch", "4. Richtig", "5. Richtig"],
+    "teil-2": ["6. B", "7. C", "8. B"],
+  });
+  expect(validateA1TutorDraftSubmissionSections({ assignmentKey: "A1-8", sections: complete })).toEqual({ ok: true, message: "" });
+  expect(getA1TutorDraftProgress({ assignmentKey: "A1-8", draft: { sections: {
+    "teil-1": { answers: { 1: "Richtig", 2: "Richtig", 3: "Falsch", 4: "Richtig", 5: "Richtig" } },
+    "teil-2": { answers: { 6: "B", 7: "C", 8: "B" } },
+  } } })).toEqual(expect.objectContaining({ complete: true, total: 8, completed: 8 }));
+});

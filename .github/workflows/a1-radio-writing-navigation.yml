@@ -1,0 +1,79 @@
+name: A1 Radio, writing media and navigation safety
+
+on:
+  pull_request:
+    paths:
+      - "vercel.json"
+      - "web/public/course-speaking-chat-cleanup.js"
+      - "web/src/__tests__/CourseSpeakingChatCleanupSafety.test.js"
+      - "web/src/components/A1ChapterResourceHubRoute.level.test.jsx"
+      - "web/src/components/A1Day15RadioRegression.test.js"
+      - "web/src/components/A1RadioCompletionWorkbookLink.test.js"
+      - "web/src/components/A1RadioFirstWorkbookRoutes.jsx"
+      - "web/src/components/B1Day20WritingVideoRegression.test.js"
+      - "web/src/components/B1Day21LebensformenHeuteWorkbookPage.js"
+      - "web/src/components/B1Day21NoListening.test.js"
+      - "web/src/components/WritingCheatSheetTabs.writingVideo.test.js"
+      - "web/src/data/a1RadioResources.js"
+      - "web/src/data/strictInAppWorkbookRoutes.js"
+      - "web/src/data/writingVideoResources.js"
+      - "web/src/data/writingVideoResources.test.js"
+      - "web/src/utils/a1ChapterResourceHubState.js"
+      - "web/src/utils/lessonRouteEntry.js"
+      - ".github/workflows/a1-radio-writing-navigation.yml"
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web dependencies
+        working-directory: web
+        run: npm install --legacy-peer-deps --no-audit --no-fund
+      - name: Test A1 hub route mock
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1ChapterResourceHubRoute.level.test.jsx
+      - name: Test A1 Radio completion on workbook links
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1RadioCompletionWorkbookLink.test.js
+      - name: Test A1 Day 15 Radio
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1Day15RadioRegression.test.js
+      - name: Test A1 speaking resource entry
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/A1SpeakingExamIntroEntryRoute.test.jsx
+      - name: Test requested Schreiben videos
+        working-directory: web
+        env:
+          CI: true
+        run: >-
+          npm run test:ci -- --runTestsByPath
+          src/components/B1Day20WritingVideoRegression.test.js
+          src/components/WritingCheatSheetTabs.writingVideo.test.js
+          src/data/writingVideoResources.test.js
+      - name: Test B1 Day 21 parts
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/components/B1Day21NoListening.test.js
+      - name: Test History API cleanup safety
+        working-directory: web
+        env:
+          CI: true
+        run: npm run test:ci -- --runTestsByPath src/__tests__/CourseSpeakingChatCleanupSafety.test.js
+      - name: Build web app
+        working-directory: web
+        run: npm run build

@@ -1,0 +1,84 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+
+const root = new URL("../", import.meta.url);
+const source = (path) => readFile(new URL(path, root), "utf8");
+
+test("Falowen keeps exact later Goethe registration campaigns as fallback", async () => {
+  const schedule = await source("src/data/goetheExamSchedule.js");
+  assert.match(schedule, /A1[\s\S]*2026-08-03/);
+  assert.match(schedule, /A2[\s\S]*2026-08-04/);
+  assert.match(schedule, /A2[\s\S]*2026-10-27/);
+  assert.match(schedule, /B1[\s\S]*2026-08-05/);
+  assert.match(schedule, /B1[\s\S]*2026-10-28/);
+  assert.match(schedule, /reminderDays: \[14, 3, 2, 1\]/);
+});
+
+test("shared loader uses the Admin endpoint and a last-known-good cache", async () => {
+  const service = await source("src/services/goetheExamConfigService.js");
+  assert.match(service, /cloudfunctions\.net\/api\/exam-file\/config/);
+  assert.match(service, /falowen_goethe_exam_config_v1/);
+  assert.match(service, /7 \* 24 \* 60 \* 60 \* 1000/);
+  assert.match(service, /defaultGoetheExamConfig/);
+});
+
+test("Exam File and Study Calendar react when the shared Admin config arrives", async () => {
+  const [patch, hook] = await Promise.all([
+    source("scripts/patch-goethe-exam-config-ui.mjs"),
+    source("src/hooks/useGoetheExamConfig.js"),
+  ]);
+  assert.match(patch, /MyExamFilePage\.js/);
+  assert.match(patch, /StudyCalendarPage\.js/);
+  assert.match(patch, /Checking the latest exam dates/);
+  assert.match(patch, /const goetheExamLevels = goetheExamConfig\.levels/);
+  assert.match(patch, /\[detectedLevel, goetheExamLevels, showAllLevels\]/);
+  assert.match(patch, /\[goetheExamLevels, selectedLevel\]/);
+  assert.match(hook, /loadGoetheExamConfig/);
+  assert.match(hook, /fallbackGoetheExamConfig/);
+});
+
+test("Exam File gives students registration, sample and structure guidance without clutter", async () => {
+  const examFile = await source("src/components/MyExamFilePage.js");
+
+  assert.match(examFile, /Registration and exam structure/);
+  assert.match(examFile, /Create or open your Goethe account/);
+  assert.match(examFile, /Open the official registration page/);
+  assert.match(examFile, /EXAM SAMPLE/);
+  assert.match(examFile, /Open exam sample/);
+  assert.match(examFile, /How to register/);
+  assert.match(examFile, /How the \{examGuide\.level\} exam is structured/);
+  assert.match(examFile, /The registration link is the same for every date/);
+  assert.match(examFile, /Registration: \{formatDate\(exam\.registrationStart\)\}/);
+  assert.match(examFile, /setHours\(23, 59, 59, 999\)/);
+  assert.match(examFile, /Checking the latest exam dates/);
+  assert.doesNotMatch(examFile, /Schedule synced from Falowen Admin|last saved schedule|built-in schedule/);
+
+  assert.doesNotMatch(examFile, /downloadExamReminder/);
+  assert.doesNotMatch(examFile, /Add exam reminder/);
+  assert.doesNotMatch(examFile, /getCountdownLabel/);
+  assert.doesNotMatch(examFile, /Official registration link:/);
+  assert.doesNotMatch(examFile, /Account link:/);
+  assert.doesNotMatch(examFile, /Submitted assignments \(locked\)/);
+  assert.doesNotMatch(examFile, /Level leaderboard/);
+  assert.doesNotMatch(examFile, /Teacher feedback history/);
+  assert.doesNotMatch(examFile, /title="Downloadables"/);
+});
+
+test("pending registration entries expire after their exam day", async () => {
+  const examFile = await source("src/components/MyExamFilePage.js");
+
+  assert.match(examFile, /const isScheduleEntryCurrent = \(exam, now\) =>/);
+  assert.match(examFile, /if \(registrationEnd\) return now <= registrationEnd/);
+  assert.match(examFile, /const examEnd = endOfScheduleDay\(exam\?\.date\)/);
+  assert.match(examFile, /return Boolean\(examEnd && now <= examEnd\)/);
+  assert.equal((examFile.match(/isScheduleEntryCurrent\(exam, now\)/g) || []).length, 2);
+  assert.doesNotMatch(examFile, /!registrationEnd \|\| now <= registrationEnd/);
+});
+
+test("build lifecycle always applies the idempotent shared-config patch", async () => {
+  const packageJson = JSON.parse(await source("package.json"));
+  assert.match(packageJson.scripts.prebuild, /sync:goethe-config-ui/);
+  assert.match(packageJson.scripts.prestart, /sync:goethe-config-ui/);
+  assert.equal(packageJson.scripts["sync:goethe-config-ui"], "node scripts/patch-goethe-exam-config-ui.mjs");
+});

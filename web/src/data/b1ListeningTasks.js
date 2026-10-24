@@ -1,0 +1,474 @@
+// Canonical B1 Hören source of truth.
+// The shared B1 workbook shell resolves listening media, questions and submission semantics from here.
+
+import { B1_DAY6_LISTENING_QUESTIONS } from "./b1Day6WorkbookData";
+import { B1_DAY7_LISTENING_QUESTIONS } from "./b1Day7WorkbookData";
+import { B1_DAY8_LISTENING_QUESTIONS } from "./b1Day8WorkbookData";
+
+const q = (stem, options) => Object.freeze({ stem, options: Object.freeze(options) });
+const task = (value) => Object.freeze({ ...value, questions: value.questions ? Object.freeze(value.questions) : value.questions });
+
+export const B1_LISTENING_TASKS = Object.freeze({
+  1: task({
+    title: "Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen.",
+    instructions: "Read the questions first. Listen for discoveries, famous people, nightmares, lucid dreams and sleep phases.",
+    image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones and laptop for listening comprehension",
+    embedUrl: "https://www.youtube.com/embed/dZDgNxPWox8?rel=0",
+    externalUrl: "https://youtu.be/dZDgNxPWox8",
+    videoTitle: "B1 Day 1 Traumwelt listening exercise",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3C ...",
+    questions: [
+      q("Was hat Friedrich August Kekulé in einem Traum erkannt?", ["a) Die Struktur des Benzolmoleküls", "b) Die Lösung für ein mathematisches Problem", "c) Eine neue Art von Medikament", "d) Die Idee für einen Roman"]),
+      q("Was soll Mary Shelley in einem Traum gehabt haben?", ["a) Die Idee für \"Frankenstein\"", "b) Die Lösung für ein chemisches Problem", "c) Eine neue Erfindung", "d) Die Idee für ein Gemälde"]),
+      q("Was können Albträume verursachen?", ["a) Angst und Unwohlsein", "b) Freude und Motivation", "c) Kreative Ideen", "d) Neue Erfindungen"]),
+      q("Was ist luzides Träumen?", ["a) Wenn man im Traum bewusst ist, dass man träumt", "b) Wenn man nie träumt", "c) Wenn man in Träumen nur Schwarz-Weiß sieht", "d) Wenn man sich an keinen Traum erinnern kann"]),
+      q("In welcher Schlafphase sind die Träume am intensivsten?", ["a) In der REM-Phase", "b) In der Tiefschlafphase", "c) In der Leichtschlafphase", "d) In der Einschlafphase"]),
+    ],
+  }),
+  2: task({
+    title: "Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen.",
+    instructions: "Read the questions before listening. Pay attention to support, shared experiences, honesty, success and forgiveness.",
+    image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Listening exercise about friendship",
+    embedUrl: "https://www.youtube.com/embed/t0lMjkXSQdA",
+    externalUrl: "https://youtu.be/t0lMjkXSQdA",
+    videoTitle: "B1 Day 2 Freunde fürs Leben listening exercise",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3C ...",
+    questions: [
+      q("Was tut ein guter Freund, wenn man Probleme hat?", ["a) Hört zu und gibt Ratschläge", "b) Ignoriert die Probleme", "c) Verurteilt den Freund"]),
+      q("Welche Aktivitäten stärken die Bindung zwischen Freunden?", ["a) Gemeinsame Erlebnisse und Erinnerungen", "b) Individuelle Interessen", "c) Keine gemeinsamen Aktivitäten"]),
+      q("Warum ist Ehrlichkeit wichtig in einer Freundschaft?", ["a) Sie vermeidet Missverständnisse", "b) Sie schafft Konflikte", "c) Sie ist unwichtig"]),
+      q("Wie sollte ein Freund auf die Erfolge des anderen reagieren?", ["a) Mit Eifersucht", "b) Mit Freude", "c) Mit Gleichgültigkeit"]),
+      q("Was ist entscheidend bei Konflikten oder Missverständnissen?", ["a) Fehler zu ignorieren", "b) Fehler zu vergeben", "c) Freundschaft zu beenden"]),
+    ],
+  }),
+  3: task({
+    title: "Sehen und hören Sie das Video zweimal. Beantworten Sie danach alle fünf Fragen.",
+    instructions: "Read the questions first. Listen for Herr Müller's routine, the heating problem, his reaction and how he feels at the end.",
+    embedUrl: "https://www.youtube.com/embed/h6-k4YGP3OU?rel=0",
+    externalUrl: "https://youtu.be/h6-k4YGP3OU",
+    videoTitle: "B1 Day 3 Erfolgsgeschichten Teil 4 Hören video",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1B, 2A, 3C ...",
+    questions: [
+      q("Was macht Herr Müller jeden Morgen um fünf Uhr?", ["a) Er geht zur Schule", "b) Er beginnt seine Arbeit als Hausmeister", "c) Er bringt die Schüler zur Schule", "d) Er repariert die Heizung"]),
+      q("Warum ist Herr Müllers Arbeit wichtig?", ["a) Weil sie im Vordergrund steht", "b) Weil sie den Schultag reibungslos macht", "c) Weil er dafür viel Lob bekommt", "d) Weil er berühmt ist"]),
+      q("Was passiert an einem kalten Wintermorgen?", ["a) Die Schule ist geschlossen", "b) Herr Müller bleibt zu Hause", "c) Die Heizung fällt aus", "d) Die Schüler kommen zu spät"]),
+      q("Wie reagiert Herr Müller, als er die defekte Heizung entdeckt?", ["a) Er geht nach Hause", "b) Er ignoriert das Problem", "c) Er behebt das Problem sofort", "d) Er ruft die Polizei"]),
+      q("Wie fühlt sich Herr Müller am Ende des Tages?", ["a) Erschöpft aber zufrieden", "b) Frustriert und müde", "c) Glücklich und ausgeruht", "d) Ärgerlich und enttäuscht"]),
+    ],
+  }),
+  4: task({
+    title: "Hören Sie das Gespräch zweimal und beantworten Sie alle fünf Fragen.",
+    instructions: "Read the questions first. Listen for rent, additional costs, furniture, pets and public transport.",
+    embedUrl: "https://www.youtube.com/embed/Gijr5NHNJ_o?rel=0",
+    videoTitle: "B1 Wohnung suchen – Teil 4 Hören",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3C ...",
+    questions: [
+      q("1. Wie hoch ist die Miete?", ["A) 850 Euro", "B) 950 Euro", "C) 1050 Euro"]),
+      q("2. Was kosten die Nebenkosten?", ["A) 100 Euro", "B) 150 Euro", "C) 200 Euro"]),
+      q("3. Ist die Wohnung möbliert?", ["A) Ja", "B) Nein", "C) Teilweise"]),
+      q("4. Welche Haustiere sind erlaubt?", ["A) Hunde", "B) Kleine Haustiere", "C) Keine Haustiere"]),
+      q("5. Was sagt der Vermieter über die Verkehrsanbindung?", ["A) Keine öffentlichen Verkehrsmittel", "B) U-Bahn und mehrere Bushaltestellen", "C) Nur eine Bushaltestelle"]),
+    ],
+  }),
+  5: task({
+    title: "Sehen und hören Sie das Video zweimal. Beantworten Sie danach alle fünf Fragen.",
+    instructions: "Read the questions first. Listen for time, group viewings, neighbourhood, quick decisions and required documents.",
+    embedUrl: "https://www.youtube-nocookie.com/embed/x7tUQjxt5uI?rel=0&playsinline=1",
+    videoTitle: "B1 Day 5 Besichtigungstermin Hören",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1C, 2B, 3A ...",
+    questions: [
+      q("1. Wann beginnen die Besichtigungstermine oft?", ["a) Am frühen Morgen", "b) Am späten Abend", "c) Am Nachmittag", "d) Mittags"]),
+      q("2. Was ist ein Vorteil von Gruppenbesichtigungen?", ["a) Man kann die Wohnung in Ruhe besichtigen.", "b) Der Vermieter spart Zeit.", "c) Man hat weniger Konkurrenz.", "d) Man sieht weniger von der Wohnung."]),
+      q("3. Worauf achten viele Interessenten während der Besichtigung?", ["a) Nur auf die Inneneinrichtung", "b) Auf das Umfeld und die Nachbarschaft", "c) Nur auf den Preis", "d) Auf die Farbe der Wände"]),
+      q("4. Warum sollten Interessenten schnell entscheiden, ob sie die Wohnung nehmen wollen?", ["a) Weil die Besichtigung anstrengend ist.", "b) Weil sie sonst die nächste Besichtigung verpassen.", "c) Weil die Wohnung schnell vergeben sein könnte.", "d) Weil der Vermieter keine Zeit hat."]),
+      q("5. Welche Unterlagen sollten Interessenten zur Besichtigung mitbringen?", ["a) Mietvertrag", "b) Gehaltsnachweise und Mieterselbstauskunft", "c) Ausweis und Passfoto", "d) Möbelkatalog"]),
+    ],
+  }),
+  6: task({
+    title: "Leben in der Stadt oder auf dem Land? · Hören",
+    instructions: "Lesen Sie zuerst die fünf Fragen. Hören Sie dann das Gespräch zwischen Lisa und Jonas zweimal. Achten Sie auf Kulturangebote, Nachbarschaft, Natur, Arbeitsweg und Mieten.",
+    audioKey: "b1/day-06/day-06.mp3",
+    videoTitle: "B1 Tag 6 · Stadt oder Land? · Gespräch",
+    submitRequired: true,
+    submissionNote: "Reichen Sie nur die fünf Antwortbuchstaben im Submit-Tab ein, zum Beispiel: 1A, 2C, 3B, 4C, 5A.",
+    questions: B1_DAY6_LISTENING_QUESTIONS,
+  }),
+  7: task({
+    title: "Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen.",
+    instructions: "Listen for hidden sugar, short-term effects of sugar, long-term health risks and expert recommendations.",
+    embedUrl: "https://drive.google.com/file/d/1wBI2f7L7guBKTtb0LqdAYhbukEd6BS2a/preview",
+    externalUrl: "https://drive.google.com/file/d/1wBI2f7L7guBKTtb0LqdAYhbukEd6BS2a/view?usp=sharing",
+    videoTitle: "B1 Day 7 Hören",
+    submitRequired: true,
+    submissionNote: "Submit only answer letters, for example: 1B, 2A, 3C.",
+    questions: B1_DAY7_LISTENING_QUESTIONS,
+  }),
+  8: task({
+    title: "Hören Sie den Beitrag zweimal und beantworten Sie 5 Fragen.",
+    instructions: "Listen for Herr Webers daily work, attitude, calm problem-solving, emotional support and how patients and colleagues see him.",
+    embedUrl: "https://drive.google.com/file/d/1Ob1312L9Cp2z5-sHGVfAKhoCWc-oFI6-/preview",
+    externalUrl: "https://drive.google.com/file/d/1Ob1312L9Cp2z5-sHGVfAKhoCWc-oFI6-/view?usp=sharing",
+    videoTitle: "B1 Day 8 Hören",
+    submitRequired: true,
+    submissionNote: "Submit only answer letters, for example: 1B, 2A, 3C.",
+    questions: B1_DAY8_LISTENING_QUESTIONS,
+  }),
+  9: task({
+    title: "Hören Sie den Beitrag über Stressbewältigung und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Read the questions first. Listen carefully, answer all five questions and check your own work afterwards.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for a listening exercise about stress management",
+    embedUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/preview",
+    externalUrl: "https://drive.google.com/file/d/13XH2YBmaUZYBzu8bu-pACmzuDIsRvIR5/view?usp=sharing",
+    videoTitle: "B1 Day 9 Hören · Stress reduzieren",
+    submitRequired: false,
+    selfCheckText: "Complete the listening task independently and mark your own answers. Only Teil 2 Schreiben and Teil 3 Lesen are submitted for tutor evaluation.",
+    questions: [
+      q("Was ist ein wichtiger Tipp, um Stress zu reduzieren?", ["A) Ungeplante Aufgaben erledigen", "B) Realistische Ziele setzen", "C) Mehr Verpflichtungen übernehmen", "D) Aufgaben ignorieren"]),
+      q("Wie kann Bewegung bei Stress helfen?", ["A) Sie macht immer müde.", "B) Sie erhöht den Stress.", "C) Sie verbessert die Stimmung.", "D) Sie verringert die Immunabwehr."]),
+      q("Wie können Entspannungstechniken wie Yoga helfen?", ["A) Sie beruhigen Körper und Geist.", "B) Sie machen nervös.", "C) Sie verstärken den Druck.", "D) Sie verringern die Schlafqualität."]),
+      q("Warum ist Schlaf wichtig für den Stressabbau?", ["A) Weil er den Körper überfordert.", "B) Weil er den Körper regeneriert.", "C) Weil er Stress verursacht.", "D) Weil er ungesund ist."]),
+      q("Warum sind soziale Kontakte wichtig?", ["A) Sie sorgen für zusätzliche Aufgaben.", "B) Sie helfen, das Wohlbefinden zu steigern.", "C) Sie erhöhen den Stress.", "D) Sie verursachen mehr Arbeit."]),
+    ],
+  }),
+  10: task({
+    title: "Hören Sie den Beitrag über Zeit für sich und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Read the questions first. Listen carefully, answer all five questions and check your own work afterwards.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for a listening exercise about self-care",
+    embedUrl: "https://drive.google.com/file/d/1oU9BMq28aRoX5LKk7huwo5lP9z6lwhB0/preview",
+    externalUrl: "https://drive.google.com/file/d/1oU9BMq28aRoX5LKk7huwo5lP9z6lwhB0/view?usp=sharing",
+    videoTitle: "B1 Day 10 Hören · Zeit für sich und Selbstfürsorge",
+    submitRequired: false,
+    selfCheckText: "Complete the listening exercise independently and mark your own answers. Teil 4 is self-check; only Teil 2 Schreiben and Teil 3 Lesen are submitted for tutor evaluation.",
+    questions: [
+      q("Was ist laut dem Hörtext ein häufiges Problem in unserer Gesellschaft?", ["A) Zu wenig Arbeit", "B) Zu viel Freizeit", "C) Stress und Überarbeitung", "D) Zu viel Schlaf"]),
+      q("Wie fühlen sich 70 Prozent der Befragten nach einer Pause?", ["A) Müder", "B) Produktiver", "C) Gestresster", "D) Unmotiviert"]),
+      q("Wie wirkt sich Zeit für sich auf zwischenmenschliche Beziehungen aus?", ["A) Sie verbessert die Kommunikation und Geduld.", "B) Sie führt zu mehr Konflikten.", "C) Sie verschlechtert die Beziehungen.", "D) Sie hat keinen Einfluss."]),
+      q("Was berichten Menschen mit einem gesunden Verhältnis zwischen Arbeit und Freizeit?", ["A) Sie haben häufiger Kopfschmerzen.", "B) Sie haben weniger Schlafprobleme und Rückenschmerzen.", "C) Sie sind weniger produktiv.", "D) Sie sind öfter krank."]),
+      q("Was kann eine negative Folge von zu viel Zeit allein sein?", ["A) Verbesserte Gesundheit", "B) Mehr Kreativität", "C) Gefühle der Einsamkeit und Isolation", "D) Bessere Beziehungen zu Freunden und Familie"]),
+    ],
+  }),
+  11: task({
+    title: "Hören Sie den Beitrag zweimal und beantworten Sie alle fünf Fragen.",
+    instructions: "Read the questions first. Listen for reasons people play, adult preferences, traditional games and the growth of digital games.",
+    image: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80",
+    embedUrl: "https://drive.google.com/file/d/17MdMUvq-Sigu9o92asIctEUWH0iGzAoR/preview",
+    externalUrl: "https://drive.google.com/file/d/17MdMUvq-Sigu9o92asIctEUWH0iGzAoR/view?usp=sharing",
+    videoTitle: "B1 Day 11 Teamspiele listening exercise",
+    submitRequired: true,
+    submissionNote: "Submit only the answer letters in this format: 1A, 2B, 3B …",
+    questions: [
+      q("Warum spielen viele Menschen?", ["A) Um Stress abzubauen", "B) Um Probleme zu vergrößern", "C) Um Geld zu verdienen", "D) Um sich zu isolieren"]),
+      q("Welche Art von Spielen spielen Erwachsene laut dem Hörtext gern?", ["A) Computerspiele", "B) Brettspiele", "C) Nur Videospiele", "D) Nur Bewegungsspiele"]),
+      q("Was ist ein Vorteil traditioneller Spiele?", ["A) Sie bieten keine Lernmöglichkeiten.", "B) Sie fördern soziale und körperliche Fähigkeiten.", "C) Sie sind immer aufregender als digitale Spiele.", "D) Sie brauchen keine anderen Menschen."]),
+      q("Welche Art von Spielen hat in den letzten Jahren an Bedeutung gewonnen?", ["A) Brettspiele", "B) Digitale Spiele", "C) Bewegungsspiele", "D) Kartenspiele"]),
+      q("Was sollte man laut dem Hörtext nicht vergessen?", ["A) Traditionelle Spiele haben soziale und körperliche Vorteile.", "B) Digitale Spiele sind immer besser.", "C) Man sollte nur Computerspiele spielen.", "D) Traditionelle Spiele sind völlig veraltet."]),
+    ],
+  }),
+  12: task({
+    title: "Hören Sie den Bericht über ein Abenteuer in den Bergen und beantworten Sie die fünf Fragen.",
+    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Bergwanderung als Hörthema",
+    embedUrl: "https://www.youtube.com/embed/NSSr1__ngyU",
+    externalUrl: "https://youtu.be/NSSr1__ngyU",
+    videoTitle: "B1 Day 12 Abenteuer in der Natur Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    questions: [
+      q("Warum entschied sich der Sprecher, allein in die Berge zu gehen?", ["a) Er wollte sich einer körperlichen Herausforderung stellen.", "b) Er wollte Zeit mit seinen Freunden verbringen.", "c) Er wollte neue Städte entdecken.", "d) Er musste aus beruflichen Gründen reisen."]),
+      q("Was war das Ziel am ersten Tag?", ["a) Ein abgelegener Bergsee.", "b) Der höchste Gipfel der Region.", "c) Ein kleines Dorf in den Bergen.", "d) Ein Campingplatz mit vielen Touristen."]),
+      q("Welche Tiere sah der Sprecher während seiner Wanderung?", ["a) Adler und ein Reh.", "b) Bären und Wölfe.", "c) Eichhörnchen und Hasen.", "d) Kühe und Schafe."]),
+      q("Welche Schwierigkeit trat während der Reise auf?", ["a) Der Sprecher wurde von einem Tier angegriffen.", "b) Das Wetter änderte sich plötzlich.", "c) Das Essen ging aus.", "d) Der Sprecher verlor seine Ausrüstung."]),
+      q("Wie fühlte sich der Sprecher, nachdem er in die Zivilisation zurückkehrte?", ["a) Erschöpft und enttäuscht.", "b) Erschöpft und stolz.", "c) Erleichtert und gelangweilt.", "d) Motiviert, sofort eine neue Reise zu beginnen."]),
+    ],
+  }),
+  13: task({
+    title: "Hören Sie den Vortrag über Spannung im Film und beantworten Sie die fünf Fragen.",
+    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Filmproduktion und Hören",
+    embedUrl: "https://www.youtube.com/embed/gFDy1atY9K4",
+    externalUrl: "https://youtu.be/gFDy1atY9K4",
+    videoTitle: "B1 Day 13 Eigene Filmkritik Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    questions: [
+      q("Was ist laut dem Sprecher ein wichtiges Element vieler erfolgreicher Filme?", ["a) Humor", "b) Spannung", "c) Liebesgeschichten", "d) Spezialeffekte"]),
+      q("Was kann laut dem Sprecher Spannung in einem Thriller erzeugen?", ["a) Laute Musik", "b) Ein leises, schleichendes Geräusch", "c) Helle Farben", "d) Romantische Dialoge"]),
+      q("Wie trägt die Kameraarbeit zur Spannung bei?", ["a) Durch ruhige, lange Szenen", "b) Durch schnelle Schnitte und Nahaufnahmen", "c) Durch weite Landschaftsaufnahmen", "d) Durch die Verwendung von Schwarz-Weiß-Filtern"]),
+      q("Was hält die Zuschauer laut dem Sprecher in Atem?", ["a) Das Vorhersehbare", "b) Die schauspielerische Leistung", "c) Die Ungewissheit über den Verlauf der Handlung", "d) Die Länge des Films"]),
+      q("Warum schätzen viele Menschen Filme mit Spannung?", ["a) Weil sie romantische Geschichten lieben", "b) Weil sie gerne Spezialeffekte sehen", "c) Weil sie Abenteuer ohne echte Gefahr erleben wollen", "d) Weil sie Humor bevorzugen"]),
+    ],
+  }),
+  14: task({
+    title: "Hören Sie den Dialog über lebenslanges Lernen und beantworten Sie die fünf Fragen.",
+    instructions: "Hören Sie aufmerksam zu. Notieren Sie die richtigen Antwortbuchstaben und reichen Sie sie im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Online-Kurs und lebenslanges Lernen",
+    embedUrl: "https://www.youtube.com/embed/PwA3HJ_V1HA",
+    externalUrl: "https://youtu.be/PwA3HJ_V1HA",
+    videoTitle: "B1 Day 14 Traditionelles vs digitales Lernen Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    questions: [
+      q("Warum hat Anna einen Online-Kurs gemacht?", ["a) Sie möchte in ihrem Beruf vorankommen.", "b) Sie hatte zu viel Freizeit.", "c) Sie musste es für ihre Arbeit machen.", "d) Sie wollte einen neuen Job finden."]),
+      q("Was lernt Lukas gerade?", ["a) Programmierung.", "b) Digitale Fotografie.", "c) Marketing.", "d) Fremdsprachen."]),
+      q("Welche Herausforderung haben beide beim lebenslangen Lernen?", ["a) Die Kursinhalte sind langweilig.", "b) Sie haben wenig Zeit.", "c) Sie können sich keine Kurse leisten.", "d) Die Kurse sind zu einfach."]),
+      q("Wie schafft Lukas es, Zeit zum Lernen zu finden?", ["a) Er nimmt sich jeden Tag eine Stunde Zeit.", "b) Er lernt nur am Wochenende.", "c) Er nimmt sich Urlaub für seine Kurse.", "d) Er lernt nur, wenn er motiviert ist."]),
+      q("Was raten Anna und Lukas am Ende?", ["a) Große Lernziele setzen.", "b) Nur dann lernen, wenn man Zeit hat.", "c) Regelmäßig und in kleinen Schritten lernen.", "d) So viel wie möglich auf einmal lernen."]),
+    ],
+  }),
+  15: task({
+    title: "Hören Sie das Interview über Homeoffice und digitale Medien und beantworten Sie die fünf Fragen.",
+    instructions: "Lesen Sie zuerst die Fragen. Hören Sie dann aufmerksam auf Ellens Erfahrungen, die verwendeten Medien und ihre praktischen Tipps.",
+    image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Hörübung über Homeoffice und digitale Medien",
+    audioKey: "audio/day_15.mp3",
+    videoTitle: "B1 Day 15 Medien und Arbeiten im Homeoffice Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Aufgabe. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    questions: [
+      q("Welchen Vorteil des Homeoffice nennt Ellen?", ["a) Sie verdient im Homeoffice mehr Geld.", "b) Sie spart Zeit und kann ihren Tag flexibler planen.", "c) Sie hat dort mehr Besprechungen.", "d) Sie muss keine Pausen machen."]),
+      q("Welche Nachteile des Homeoffice beschreibt Ellen?", ["a) Sie muss häufiger pendeln und länger arbeiten.", "b) Sie hat zu viele persönliche Treffen.", "c) Sie hat weniger Kontakt zu den Kollegen und kann nach der Arbeit schwer abschalten.", "d) Sie kann digitale Medien nicht benutzen."]),
+      q("Welche Medien nutzt Ellens Team für die Zusammenarbeit?", ["a) Videokonferenzen für große Besprechungen und einen Chat für kurze Fragen.", "b) Nur E-Mails für alle Gespräche.", "c) Ausschließlich Telefonate.", "d) Soziale Medien für Besprechungen."]),
+      q("Wie prüft Ellen Informationen aus dem Internet?", ["a) Sie vertraut immer der ersten Webseite.", "b) Sie fragt nur Kolleginnen und Kollegen.", "c) Sie vergleicht mehrere Quellen.", "d) Sie liest keine Online-Nachrichten."]),
+      q("Welchen praktischen Rat gibt Ellen für gutes Arbeiten im Homeoffice?", ["a) Den ganzen Tag am Küchentisch arbeiten und Pausen vermeiden.", "b) Einen festen Arbeitsplatz haben, feste Pausen machen und Kollegen auch persönlich treffen.", "c) Nach Feierabend weiter erreichbar bleiben.", "d) Möglichst alle Aufgaben allein erledigen."]),
+    ],
+  }),
+  16: task({
+    title: "Hören Sie das Interview über Prüfungsangst und beantworten Sie die fünf Fragen.",
+    instructions: "Lesen Sie zuerst die Fragen. Hören Sie dann aufmerksam auf Ellens Strategien vor und während einer Prüfung.",
+    image: "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Stressbewältigung vor einer Prüfung",
+    audioKey: "audio/day_16.mp3",
+    videoTitle: "B1 Day 16 Prüfungsangst und Stressbewältigung Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    questions: [
+      q("Was hilft Ellen heute vor einer Prüfung?", ["a) Sie lernt die ganze Nacht.", "b) Sie lernt jeden Tag ein bisschen und macht eine Atemübung.", "c) Sie vermeidet den Prüfungsstoff.", "d) Sie trinkt viel Kaffee."]),
+      q("Was empfiehlt Ellen für die mündliche Prüfung?", ["a) Nur leise im Kopf üben.", "b) Schwierige Wörter auswendig lernen und sonst nicht sprechen.", "c) Mit einer anderen Person üben, laut sprechen und die Prüfungssituation trainieren.", "d) Erst am Prüfungstag mit dem Sprechen beginnen."]),
+      q("Warum ist Schlaf vor der Prüfung wichtig?", ["a) Das Gehirn braucht Schlaf, damit man das Gelernte behalten kann.", "b) Man hat dann weniger Zeit zum Nachdenken.", "c) Schlaf ersetzt die Prüfungsvorbereitung.", "d) Man kann dadurch jede Aufgabe sofort lösen."]),
+      q("Was soll man tun, wenn eine Aufgabe in der Prüfung zu schwer ist?", ["a) Sofort die Prüfung beenden.", "b) Die gleiche Aufgabe immer wieder schnell lesen.", "c) Den Prüfer nach der richtigen Lösung fragen.", "d) Ruhig bleiben, langsam noch einmal lesen und gegebenenfalls später zurückkommen."]),
+      q("Was sagt Ellen über Fehler in der Prüfung?", ["a) Jeder Fehler führt automatisch zum Nichtbestehen.", "b) Wichtig ist, dass man sich verständigen kann; ein fehlendes Wort kann man umschreiben.", "c) Nur Muttersprachler dürfen Fehler machen.", "d) Man sollte lieber schweigen, wenn ein Wort fehlt."]),
+    ],
+  }),
+  17: task({
+    title: "Podcast · Wie lernt man am besten?",
+    instructions: "Hören Sie den Podcast aufmerksam. Lesen Sie die fünf Fragen und wählen Sie jeweils A, B, C oder D. Reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Podcast über effektives Deutschlernen",
+    audioKey: "b1/day-17/day-17.mp3",
+    videoTitle: "B1 Day 17 Podcast Wie lernt man am besten",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    transcript: `Anna: Hallo und willkommen zu "Deutsch einfach"! Ich bin Anna.
+
+Ben: Hallo Anna, und hallo an alle Deutschlernenden! Heute sprechen wir über eine wichtige Frage: Wie lernt man am besten?
+
+Anna: Genau, Ben. Ich lerne seit zwei Jahren Deutsch, aber manchmal weiß ich nicht: Mache ich es richtig?
+
+Ben: Das ist ganz normal. Mein erster Tipp: Lerne jeden Tag, auch wenn es nur zwanzig Minuten sind. Das ist besser als einmal pro Woche drei Stunden.
+
+Anna: Wirklich? Ich dachte, lange Lernzeiten sind besser.
+
+Ben: Nein. Das Gehirn braucht Wiederholung. Wenn du jeden Tag etwas wiederholst, bleiben die Wörter länger im Kopf.
+
+Anna: Und was ist mit Vokabeln? Ich schreibe sie immer auf Karten, aber ich vergesse sie schnell.
+
+Ben: Lerne Wörter nie allein, sondern in ganzen Sätzen. Zum Beispiel nicht nur "der Termin", sondern: "Ich habe morgen einen Termin beim Arzt."
+
+Anna: Das ist eine tolle Idee! Und wie kann ich besser sprechen?
+
+Ben: Sprich so viel wie möglich! Such dir einen Lernpartner oder sprich laut mit dir selbst. Fehler sind kein Problem, denn aus Fehlern lernt man.
+
+Anna: Hören ist auch wichtig, oder? Ich höre gern Podcasts, so wie diesen hier.
+
+Ben: Genau! Höre jeden Tag etwas auf Deutsch: Musik, Podcasts oder Filme. Und lies auch kurze Texte.
+
+Anna: Okay, also zusammengefasst: jeden Tag lernen, Wörter in Sätzen lernen, viel sprechen und viel hören.
+
+Ben: Perfekt! Und das Wichtigste: Hab Geduld und Spaß dabei.
+
+Anna: Vielen Dank fürs Zuhören! Bis zur nächsten Folge. Tschüss!
+
+Ben: Tschüss!`,
+    questions: [
+      q("Wie sollte man laut Ben lernen?", ["a) Einmal pro Woche drei Stunden", "b) Jeden Tag, auch nur zwanzig Minuten", "c) Nur vor der Prüfung", "d) Nur am Wochenende"]),
+      q("Warum ist tägliches Lernen besser?", ["a) Weil man dann weniger Zeit braucht", "b) Weil das Gehirn Wiederholung braucht", "c) Weil Anna das sagt", "d) Weil Lernen am Abend leichter ist"]),
+      q("Wie soll man Vokabeln lernen?", ["a) Nur einzelne Wörter auf Karten", "b) Nur mit dem Wörterbuch", "c) In ganzen Sätzen", "d) Gar nicht, man lernt sie automatisch"]),
+      q("Was empfiehlt Ben, um besser zu sprechen?", ["a) Nur leise lesen", "b) Fehler immer vermeiden", "c) Nur Grammatik üben", "d) Viel sprechen, auch laut mit sich selbst"]),
+      q("Was ist laut Ben das Wichtigste beim Lernen?", ["a) Ein teures Buch", "b) Geduld und Spaß", "c) Perfekte Aussprache", "d) Jeden Tag drei Stunden Zeit"]),
+    ],
+  }),
+  18: task({
+    title: "Hören · Wege zum Wunschberuf",
+    instructions: "Lies zuerst die fünf Fragen. Höre das Gespräch zweimal. Achte auf Kindheitsträume, Ausbildung, Praktika und Veränderungen im Berufsleben. Wähle bei jeder Frage A, B, C oder D und reiche die fünf Antwortbuchstaben im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Beratung zur Berufswahl",
+    audioKey: "b1/day-18/day-18.mp3",
+    videoTitle: "B1 Day 18 Wege zum Wunschberuf Hören",
+    submitRequired: true,
+    selfCheckText: "Teil 4 · Hören wird eingereicht. Schreibe im Submit-Tab nur die fünf Buchstaben, z. B. 1B, 2C, 3A, 4D, 5B.",
+    questions: [
+      q("Was wollte der erste Sprecher als Kind werden?", ["A) Zoologe","B) Astronaut","C) Maler","D) Lehrer"]),
+      q("Welche Berufe schlägt der erste Sprecher für jemanden vor, der Kunst liebt?", ["A) Biologe oder Chemiker","B) Grafikdesigner, Innenarchitekt oder Kunsttherapeut","C) Ingenieur oder Architekt","D) Koch oder Bäcker"]),
+      q("Welches Beispiel für ein Praktikum erwähnt der zweite Sprecher?", ["A) Ein Praktikum in einer Arztpraxis","B) Ein Praktikum im Kinderheim","C) Ein Praktikum in einer Grafikagentur","D) Ein Praktikum im Zoo"]),
+      q("Welchen ungewöhnlichen Berufsweg erwähnt einer der Sprecher?", ["A) Ein Lehrer wollte Astronaut werden","B) Ein Zoologe wurde Künstler","C) Ein Mann wollte Ingenieur werden, arbeitet aber heute als Koch","D) Ein Maler wurde Biologe"]),
+      q("Womit wird Neugier bei der Berufswahl im Gespräch verglichen?", ["A) Mit einem Kompass für die Karriere","B) Mit einem Puzzle","C) Mit einem Abenteuer","D) Mit einem Märchenprinzen"]),
+    ],
+  }),
+  19: task({
+    title: "Hören · Das Vorstellungsgespräch",
+    instructions: "Hören Sie den Dialog zwischen Herrn Weber und Frau Keller aufmerksam. Wählen Sie bei jeder Frage A, B, C oder D und reichen Sie danach nur die fünf Antwortbuchstaben im Submit-Tab ein.",
+    image: "https://images.unsplash.com/photo-1521791055366-0d553872125f?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Vorstellungsgespräch in einer Klinik",
+    audioKey: "b1/day-19/day-19.mp3",
+    videoTitle: "B1 Day 19 Das Vorstellungsgespräch Hören",
+    submitRequired: true,
+    selfCheckText: "Hören ist Teil dieser Übung. Reichen Sie Ihre fünf Antwortbuchstaben im Submit-Tab ein.",
+    transcript: `Herr Weber: Guten Tag, Frau Keller! Schön, dass Sie da sind. Bitte nehmen Sie Platz.
+Frau Keller: Guten Tag, Herr Weber. Vielen Dank für die Einladung.
+Herr Weber: Möchten Sie etwas trinken? Wasser oder Kaffee?
+Frau Keller: Ein Glas Wasser, bitte. Danke.
+Herr Weber: Gut. Erzählen Sie mir zuerst etwas über sich. Wer sind Sie, und was haben Sie bisher gemacht?
+Frau Keller: Ich bin achtundzwanzig Jahre alt und komme aus Spanien. Seit drei Jahren lebe ich in Deutschland. Ich habe eine Ausbildung als Krankenschwester gemacht und danach zwei Jahre in einem Krankenhaus gearbeitet.
+Herr Weber: Sehr interessant. Warum möchten Sie bei uns arbeiten?
+Frau Keller: Ihre Klinik hat einen sehr guten Ruf. Außerdem arbeite ich gern im Team, und ich möchte neue Dinge lernen.
+Herr Weber: Was sind Ihre Stärken?
+Frau Keller: Ich bin zuverlässig und geduldig. Mit Patienten spreche ich ruhig und freundlich. Und ich lerne schnell.
+Herr Weber: Und gibt es etwas, das Sie noch verbessern möchten?
+Frau Keller: Ja. Manchmal bin ich zu perfektionistisch. Ich arbeite daran und frage öfter meine Kollegen um Hilfe.
+Herr Weber: Das ist ehrlich. Wie gut ist Ihr Deutsch?
+Frau Keller: Ich spreche Deutsch auf B1-Niveau, und ich besuche noch einen Kurs. Im Alltag verstehe ich fast alles.
+Herr Weber: Sehr gut. Sie müssten auch im Schichtdienst arbeiten, am Wochenende und nachts. Ist das ein Problem?
+Frau Keller: Nein, das ist kein Problem. Ich habe schon im Schichtdienst gearbeitet.
+Herr Weber: Haben Sie noch Fragen an uns?
+Frau Keller: Ja, gern. Wie sieht die Einarbeitung aus? Und gibt es Weiterbildungen?
+Herr Weber: Die ersten vier Wochen arbeiten Sie mit einer erfahrenen Kollegin zusammen. Weiterbildungen bieten wir regelmäßig an.
+Frau Keller: Das klingt sehr gut.
+Herr Weber: Wir melden uns bis Ende der Woche bei Ihnen. Vielen Dank für das Gespräch, Frau Keller.
+Frau Keller: Ich danke Ihnen auch, Herr Weber. Auf Wiedersehen!
+Herr Weber: Auf Wiedersehen!`,
+    questions: [
+      q("Welchen Beruf hat Frau Keller gelernt?", ["a) Ärztin", "b) Krankenschwester", "c) Lehrerin", "d) Verkäuferin"]),
+      q("Seit wann lebt Frau Keller in Deutschland?", ["a) Seit einem Jahr", "b) Seit zwei Jahren", "c) Seit drei Jahren", "d) Seit fünf Jahren"]),
+      q("Warum möchte Frau Keller in der Klinik arbeiten?", ["a) Die Klinik hat einen guten Ruf, und sie arbeitet gern im Team", "b) Die Klinik ist nah bei ihrer Wohnung", "c) Die Klinik zahlt am meisten", "d) Ihre Freundin arbeitet dort"]),
+      q("Was sagt Frau Keller über ihre Schwäche?", ["a) Sie kommt oft zu spät", "b) Sie spricht kein Deutsch", "c) Sie ist manchmal zu perfektionistisch", "d) Sie möchte nicht im Team arbeiten"]),
+      q("Wie lange arbeitet Frau Keller am Anfang mit einer erfahrenen Kollegin zusammen?", ["a) Eine Woche", "b) Zwei Wochen", "c) Vier Wochen", "d) Sechs Monate"]),
+    ],
+  }),
+  20: task({
+    title: "Hören · Ausbildung und Beruf",
+    instructions: "Hören Sie aufmerksam zu. Wählen Sie bei jeder Frage die richtige Lösung und reichen Sie danach nur die fünf Antwortbuchstaben ein.",
+    audioKey: "b1/day-20/day-20.mp3",
+    submitRequired: true,
+    selfCheckText: "Teil 4 ist eine benotete Hörübung.",
+    questions: [
+      q("Welchen Schulabschluss braucht man mindestens?", ["a) Hauptschulabschluss", "b) Mittleren Abschluss", "c) Abitur"]),
+      q("Wie lange dauert die Ausbildung meistens?", ["a) Ein bis zwei Jahre", "b) Drei bis vier Jahre", "c) Sechs Jahre"]),
+      q("Richtig oder falsch: In allen Bundesländern bekommt man Geld in der Ausbildung.", ["a) Richtig", "b) Falsch"]),
+      q("Was macht man im Beruf?", ["a) Man bastelt und singt mit den Kindern", "b) Man arbeitet nur im Büro", "c) Man repariert Spielzeug"]),
+      q("Welche Eigenschaft ist laut Ben wichtig?", ["a) Schnell laufen", "b) Geduld", "c) Gut kochen"]),
+    ],
+  }),
+  21: task({
+    status: "unavailable",
+    title: "Für diese Lektion gibt es kein Teil 4 · Hören.",
+    instructions: "This workbook intentionally contains Teil 1 Sprechen, Teil 2 Schreiben and Teil 3 Lesen only.",
+    submitRequired: false,
+  }),
+  22: task({
+    mode: "reading-fallback",
+    submitRequired: true,
+    title: "Teil 4 uses the preserved second reading assignment for this lesson.",
+    instructions: "This lesson intentionally preserves the existing reading-style Teil 4 instead of inventing a listening resource.",
+  }),
+  23: task({
+    status: "unavailable",
+    title: "Für diese Lektion gibt es kein Teil 4 · Hören.",
+    instructions: "Day 23 intentionally contains Sprechen, Schreiben and Lesen only. The official B1-7.23 answer key has no Teil 4 answers.",
+    submitRequired: false,
+  }),
+  24: task({
+    title: "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Bearbeiten Sie den vollständigen Hörtest zuerst ohne die Lösungen anzusehen. Kontrollieren und markieren Sie Ihre Antworten anschließend selbst.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for listening comprehension",
+    videoId: "zzPpGxzvJCY",
+    externalUrl: "https://youtu.be/zzPpGxzvJCY",
+    submitRequired: false,
+    selfCheckText: "This is Goethe-standard self-check listening practice. The school officially evaluates Lesen and Schreiben.",
+  }),
+  25: task({
+    title: "Nachhaltig einkaufen · Plastiktüten vermeiden (7 Aufgaben)",
+    instructions: "Lesen Sie zuerst die sieben Aufgaben. Hören Sie das Gespräch über Stoffbeutel, Wochenmarkt und Unverpacktladen. Wählen Sie jeweils a, b oder c.",
+    imageAlt: "Zwei Freunde sprechen über umweltfreundliches Einkaufen",
+    transcript: "A: Hallo, schön dich zu sehen. Aber sag mal, was hast du denn da alles in deinen Händen? Das sind ja extrem viele Plastiktüten.\nB: Ach, hallo. Ja, leider. Ich war gerade spontan im Supermarkt, um für das Abendessen einzukaufen. Mein alter Rucksack ist gestern kaputt gegangen und da musste ich an der Kasse diese Einwegtüten kaufen.\nA: Verstehe. Aber auf Dauer ist das für die Umwelt wirklich nicht optimal. Die Tüten landen danach meistens direkt im Müll. Warum kaufst du dir nicht einfach zwei oder drei stabile Jutebeutel? Die kosten fast nichts, halten jahrelang und sind viel reißfester.\nB: Da hast du völlig recht. Ich nehme mir das ehrlich gesagt schon seit Wochen vor. Ich habe sogar zwei Stoffbeutel zu Hause in der Küche liegen. Aber wenn ich spontan nach der Arbeit einkaufen gehe, vergesse ich sie jedes Mal.\nA: Das kenne ich. Am Anfang ging mir das genauso. Mein Tipp: Leg dir am besten direkt einen zusammengefalteten Beutel in deine Jackentasche oder in deine Arbeitstasche. So hast du immer einen dabei und musst nicht extra daran denken.\nB: Das ist echt ein super Tipp. Das werde ich ab morgen sofort ausprobieren. Sag mal, wie machst du das eigentlich beim Obst und Gemüse? Nimmst du da auch diese kleinen Plastiktüten aus dem Supermarkt?\nA: Nein, überhaupt nicht mehr. Ich nutze kleine Wiederverwendungsnetze aus Stoff, die man waschen kann. Oder ich lege Obst wie Äpfel und Bananen einfach direkt lose in den Einkaufswagen. Das spart enorm viel Plastikmüll.\nB: Stimmt, das habe ich neulich auch bei einigen Kunden gesehen. Manchmal ist das Gemüse im Supermarkt aber schon komplett in Plastik eingepackt, zum Beispiel die Gurken oder Paprika. Das stört mich ehrlich gesagt total.\nA: Mich auch. Deshalb gehe ich samstags am liebsten auf den Wochenmarkt in der Innenstadt. Dort ist fast alles unverpackt. Die Produkte kommen aus der Region und schmecken meistens auch viel besser. Außerdem gibt es dort seit kurzem sogar einen Unverpacktladen.\nB: Einen Unverpacktladen? Davon habe ich schon gehört, war aber noch nie dort. Wie funktioniert das genau? Bringt man da eigene Vorratsgläser von zu Hause mit?\nA: Genau. Du wiegst deine leeren Gläser oder Dosen vorher ab, füllst dann zum Beispiel Reis, Nudeln oder Müsli ein und bezahlst am Ende nur das reine Gewicht der Lebensmittel.\nB: Das klingt wirklich praktisch und umweltfreundlich. Weißt du was? Ich muss am Samstag sowieso noch einkaufen. Hast du Lust, dass wir zusammen zum Wochenmarkt gehen?\nA: Sehr gerne. Lass uns am Samstag um zehn Uhr vor dem Rathaus treffen und vergiss deine Beutel nicht.\nB: Keine Sorge, diesmal bin ich vorbereitet. Bis Samstag.",
+    audioKey: "b1/day-25/day-25.mp3",
+    videoTitle: "B1 Day 25 · Nachhaltig einkaufen",
+    submitRequired: true,
+    submissionNote: "Wählen Sie für jede der sieben Aufgaben einen Buchstaben (A, B oder C) und reichen Sie Ihre Antworten über Submit ein.",
+    questions: [
+      q("Warum musste eine Person im Supermarkt Einwegtüten kaufen?", ["a) Sie wollte eine große Party organisieren.","b) Ihr Rucksack war kaputt und sie hatte keine Tasche dabei.","c) Die Stoffbeutel waren im Supermarkt verboten."]),
+      q("Welche Alternative zu Plastiktüten wird zuerst empfohlen?", ["a) Ein Korb aus Kunststoff.","b) Große Papiertüten, die man nur einmal benutzt.","c) Zwei oder drei stabile Jutebeutel."]),
+      q("Warum benutzt die Person ihre Stoffbeutel bisher nicht regelmäßig?", ["a) Sie vergisst sie beim spontanen Einkauf nach der Arbeit.","b) Sie findet Stoffbeutel zu teuer.","c) Sie darf sie nicht in den Supermarkt mitnehmen."]),
+      q("Wie soll die Person laut dem Tipp dafür sorgen, immer einen Beutel dabeizuhaben?", ["a) Jeden Tag einen neuen Beutel kaufen.","b) Einen zusammengefalteten Beutel in der Jacken- oder Arbeitstasche aufbewahren.","c) Den Beutel am Wochenende im Supermarkt abgeben."]),
+      q("Was macht eine Person beim Einkauf von Obst und Gemüse, um Plastik zu vermeiden?", ["a) Sie verwendet waschbare Stoffnetze oder kauft unverpacktes Obst.","b) Sie nimmt immer die kleinen Plastiktüten im Supermarkt.","c) Sie kauft ausschließlich tiefgekühltes Obst."]),
+      q("Warum geht eine Person besonders gern auf den Wochenmarkt?", ["a) Dort sind nur importierte Waren erhältlich.","b) Der Markt ist an jedem Abend geöffnet.","c) Dort gibt es viele unverpackte Produkte aus der Region."]),
+      q("Wann und wo wollen sich die beiden zum gemeinsamen Einkauf treffen?", ["a) Am Freitag um zehn Uhr vor dem Bahnhof.","b) Am Samstag um zehn Uhr vor dem Rathaus.","c) Am Samstag um zwölf Uhr vor dem Supermarkt."])
+    ],
+  }),
+  26: task({
+    title: "Reiseprobleme und Lösungen · Hören · Richtig oder Falsch (5 Aufgaben)",
+    instructions: "Hören Sie das Gespräch zweimal. Entscheiden Sie bei jeder der fünf Aussagen: A) Richtig oder B) Falsch.",
+    audioKey: "b1/day-26/day-26.mp3",
+    videoTitle: "B1 Day 26 · Reiseprobleme und Lösungen",
+    imageAlt: "Reiseprobleme bei Bahn und Gepäck",
+    submitRequired: true,
+    submissionNote: "Markieren Sie für jede der fünf Aussagen A (Richtig) oder B (Falsch) und reichen Sie Ihre Antworten über Submit ein.",
+    questions: [
+      q("Der Sprecher hat seinen Anschlusszug wegen einer großen Verspätung verpasst.", ["A) Richtig", "B) Falsch"]),
+      q("Das Gepäckstück des Reisenden befindet sich bereits in Berlin.", ["A) Richtig", "B) Falsch"]),
+      q("Der Kunde hat den Verlust seines Koffers noch nicht gemeldet.", ["A) Richtig", "B) Falsch"]),
+      q("Der Reisende muss wegen des Problems ein komplett neues Ticket kaufen.", ["A) Richtig", "B) Falsch"]),
+      q("Der gefundene Koffer wird direkt an die Adresse des Kunden in Berlin geschickt.", ["A) Richtig", "B) Falsch"])
+    ]
+  }),
+  27: task({
+    title: "Bearbeiten Sie den Hörtest und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Hören Sie zuerst aufmerksam zu. Kontrollieren Sie Ihre Antworten danach mit dem Video.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for listening practice",
+    videoId: "jzm-MnWC7I0",
+    externalUrl: "https://youtu.be/jzm-MnWC7I0",
+    submitRequired: false,
+    selfCheckText: "This Hören part is self-check practice. The school officially evaluates Lesen and Schreiben. Mark your own listening result after watching the video.",
+  }),
+  28: task({
+    title: "Bearbeiten Sie den Hörtest und kontrollieren Sie Ihre Antworten selbst.",
+    instructions: "Hören Sie zuerst aufmerksam zu. Kontrollieren Sie Ihre Antworten danach mit dem Video.",
+    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Headphones for climate listening comprehension",
+    videoId: "IGIxBJA222o",
+    externalUrl: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
+    submitRequired: false,
+    selfCheckText: "This Hören part is self-check practice. The school officially evaluates Lesen and Schreiben. Mark your own listening result after watching the video.",
+  }),
+});
+
+export function getB1ListeningTask(day) {
+  return B1_LISTENING_TASKS[Number(day)] || null;
+}
+
+export function getB1ListeningTasks() {
+  return Object.values(B1_LISTENING_TASKS);
+}

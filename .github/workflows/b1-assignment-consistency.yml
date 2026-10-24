@@ -1,0 +1,49 @@
+name: B1 assignment consistency
+
+on:
+  pull_request:
+    paths:
+      - "functions/data/answerKeyManifest.json"
+      - "tests/b1-day25-day26-marking-parity.test.mjs"
+      - "web/src/data/b1ReadingTasks.js"
+      - "web/src/data/b1ListeningTasks.js"
+      - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
+      - "scripts/auditB1AssignmentConsistency.mjs"
+      - "web/src/components/B1*Workbook*.js"
+      - "web/src/components/B1*GrammarNotesPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/CourseLessonPage.js"
+      - ".github/workflows/b1-assignment-consistency.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "functions/data/answerKeyManifest.json"
+      - "tests/b1-day25-day26-marking-parity.test.mjs"
+      - "web/src/data/b1ReadingTasks.js"
+      - "web/src/data/b1ListeningTasks.js"
+      - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
+      - "scripts/auditB1AssignmentConsistency.mjs"
+      - "web/src/components/B1*Workbook*.js"
+      - "web/src/components/B1*GrammarNotesPage.js"
+      - "web/src/components/B1StandardWorkbookPage.js"
+      - "web/src/components/A2B1WorkbookGrammarNotesContent.js"
+      - "web/src/components/CourseLessonPage.js"
+      - ".github/workflows/b1-assignment-consistency.yml"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Audit B1 Days 1-28
+        run: node scripts/auditB1AssignmentConsistency.mjs
+      - name: Prevent Day 25/26 learner answer leaks and stale Firebase marking keys
+        run: node --test tests/b1-day25-day26-marking-parity.test.mjs
+      - name: Check B1 Day 6 R2 audio and questions
+        run: node --test tests/b1-day6-stadt-land-r2-listening.test.mjs

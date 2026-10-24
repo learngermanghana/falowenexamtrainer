@@ -1,0 +1,128 @@
+[
+  {
+    "id": "stift",
+    "label": "der Stift",
+    "pictogram": "✏️",
+    "context": "Sie brauchen einen Stift.",
+    "modelAnswer": "Können Sie mir bitte einen Stift geben?"
+  },
+  {
+    "id": "fenster",
+    "label": "das Fenster",
+    "pictogram": "🪟",
+    "context": "Es ist warm im Zimmer.",
+    "modelAnswer": "Können Sie bitte das Fenster öffnen?"
+  },
+  {
+    "id": "stadtplan",
+    "label": "der Stadtplan",
+    "pictogram": "🗺️",
+    "context": "Sie sind neu in der Stadt.",
+    "modelAnswer": "Können Sie mir bitte den Stadtplan geben?"
+  },
+  {
+    "id": "wasser",
+    "label": "das Wasser",
+    "pictogram": "💧",
+    "context": "Sie haben Durst.",
+    "modelAnswer": "Können Sie mir bitte ein Glas Wasser geben?"
+  },
+  {
+    "id": "buch",
+    "label": "das Buch",
+    "pictogram": "📖",
+    "context": "Sie möchten etwas lesen.",
+    "modelAnswer": "Können Sie mir bitte das Buch geben?"
+  },
+  {
+    "id": "schluessel",
+    "label": "der Schlüssel",
+    "pictogram": "🔑",
+    "context": "Sie möchten die Tür öffnen.",
+    "modelAnswer": "Können Sie mir bitte den Schlüssel geben?"
+  },
+  {
+    "id": "tuer",
+    "label": "die Tür",
+    "pictogram": "🚪",
+    "context": "Sie möchten nach draußen gehen.",
+    "modelAnswer": "Können Sie bitte die Tür öffnen?"
+  },
+  {
+    "id": "tasche",
+    "label": "die Tasche",
+    "pictogram": "👜",
+    "context": "Sie möchten die Tasche nehmen.",
+    "modelAnswer": "Können Sie mir bitte die Tasche geben?"
+  },
+  {
+    "id": "handy",
+    "label": "das Handy",
+    "pictogram": "📱",
+    "context": "Sie müssen telefonieren.",
+    "modelAnswer": "Können Sie mir bitte das Handy geben?"
+  },
+  {
+    "id": "uhr",
+    "label": "die Uhr",
+    "pictogram": "⌚",
+    "context": "Sie möchten die Uhrzeit wissen.",
+    "modelAnswer": "Können Sie mir bitte sagen, wie spät es ist?"
+  },
+  {
+    "id": "papier",
+    "label": "das Papier",
+    "pictogram": "📄",
+    "context": "Sie möchten etwas aufschreiben.",
+    "modelAnswer": "Können Sie mir bitte ein Blatt Papier geben?"
+  },
+  {
+    "id": "telefon",
+    "label": "das Telefon",
+    "pictogram": "☎️",
+    "context": "Sie möchten jemanden anrufen.",
+    "modelAnswer": "Können Sie mir bitte das Telefon geben?"
+  },
+  {
+    "id": "tasse",
+    "label": "die Tasse",
+    "pictogram": "☕",
+    "context": "Sie möchten Kaffee trinken.",
+    "modelAnswer": "Können Sie mir bitte eine Tasse geben?"
+  },
+  {
+    "id": "glas",
+    "label": "das Glas",
+    "pictogram": "🥛",
+    "context": "Sie brauchen ein Glas.",
+    "modelAnswer": "Können Sie mir bitte ein Glas geben?"
+  },
+  {
+    "id": "apfel",
+    "label": "der Apfel",
+    "pictogram": "🍎",
+    "context": "Sie möchten einen Apfel essen.",
+    "modelAnswer": "Können Sie mir bitte einen Apfel geben?"
+  },
+  {
+    "id": "brot",
+    "label": "das Brot",
+    "pictogram": "🍞",
+    "context": "Sie haben Hunger.",
+    "modelAnswer": "Können Sie mir bitte etwas Brot geben?"
+  },
+  {
+    "id": "schirm",
+    "label": "der Regenschirm",
+    "pictogram": "☂️",
+    "context": "Es regnet draußen.",
+    "modelAnswer": "Können Sie mir bitte den Regenschirm geben?"
+  },
+  {
+    "id": "fahrrad",
+    "label": "das Fahrrad",
+    "pictogram": "🚲",
+    "context": "Sie möchten mit dem Fahrrad fahren.",
+    "modelAnswer": "Können Sie mir bitte das Fahrrad leihen?"
+  }
+]
