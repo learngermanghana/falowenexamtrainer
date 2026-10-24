@@ -1246,6 +1246,7 @@ const AppShell = ({
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section/:practiceLevel/:sampleId" element={<ExamArea onBack={goHome} />} />
+          <Route path="/exams/:section/:practiceLevel" element={<ExamArea onBack={goHome} />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
