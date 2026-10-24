@@ -1,3 +1,4 @@
+import uploadedB1Tests from "./b1ReadingPdfTests1to8.json";
 // Three original B1 Goethe-style Lesen practice sets inspired by the five-part
 // format of the B1 mock. The final mock question bank is never mutated.
 const trueFalse = (start, rows) => rows.map(([question, answer], index) => ({
@@ -46,6 +47,31 @@ const readingSet = ({ id, label, blog, press, courses, debate, rules }) => ({
     heading: rules.heading, sections: rules.sections,
     questions: multipleChoice(27, rules.questions),
   },
+});
+
+// Uploaded PDFs are source material only: present them using the existing B1 Lesen
+// player, section navigation, timer, scoring, and result persistence.
+const uploadedB1Samples = uploadedB1Tests.map((source, index) => {
+  const group = (start, end) => Array.from({ length: end - start + 1 }, (_, offset) => {
+    const number = start + offset;
+    const answer = source.answerKey[number - 1];
+    return {
+      number,
+      question: number <= 6 ? "Richtig oder Falsch?" : number <= 19 ? "Welche Antwort passt zu Aufgabe " + number + "?" : number <= 26 ? "Ist die Person dafür oder dagegen?" : "Welche Antwort ist richtig?",
+      answer,
+      options: (number <= 6 ? [] : number <= 12 || number >= 27 ? "abc".split("") : number <= 19 ? [..."abcdefghij", "X"] : []).map(id => ({id, label: id === "X" ? "Keine passende Anzeige" : "Antwort " + id.toUpperCase()})),
+    };
+  });
+  return {
+    id: source.id,
+    label: "Lesen Sample " + (index + 4),
+    pdfText: source.sections.slice(1),
+    teil1: {title:"Teil 1",questions:group(1,6)},
+    teil2: {title:"Teil 2",questions:group(7,9),text2:{questions:group(10,12)}},
+    teil3: {title:"Teil 3",situations:group(13,19)},
+    teil4: {title:"Teil 4",comments:group(20,26)},
+    teil5: {title:"Teil 5",questions:group(27,30)},
+  };
 });
 
 export const B1_READING_PRACTICE_SAMPLES = Object.freeze([
@@ -349,6 +375,7 @@ export const B1_READING_PRACTICE_SAMPLES = Object.freeze([
       ],
     },
   }),
+  ...uploadedB1Samples,
 ]);
 
 export const B1_READING_PART_KEYS = Object.freeze(["teil1", "teil2", "teil3", "teil4", "teil5"]);
