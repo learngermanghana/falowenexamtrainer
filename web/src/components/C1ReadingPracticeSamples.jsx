@@ -20,7 +20,7 @@ const cleanSourceText = text => String(text || "")
  .replace(/\n{4,}/g, "\n\n").trim();
 const splitSection = (source, from, to, part) => {
  const cleaned=cleanSourceText(source);
- const normalized=cleaned.replace(/<\\/?b>/gi,"");
+ const normalized=cleaned; // cleanSourceText already strips markup
  const startPattern=new RegExp("(?:^|\\n)\\s*"+from+"(?:\\.|\\s{2,})\\s+","i");
  const found=startPattern.exec(normalized);
  if(!found)return {passage:cleaned,questions:[]};

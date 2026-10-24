@@ -13,12 +13,12 @@ describe("B1 native Exams Room navigation and result sync", () => {
   const listening = source("ListeningPracticeSamplePage.jsx");
   const reading = source("B1ReadingPracticeSamples.jsx");
 
-  it("lists three B1 Lesen samples and routes to a separate interactive page", () => {
+  it("lists the original three plus eight uploaded B1 Lesen samples and routes to a separate interactive page", () => {
     expect(lesen).toContain("B1_READING_PRACTICE_SAMPLES");
     expect(lesen).toContain("<B1ReadingPracticeSamples initialSampleId={selected.id} standalone />");
     expect(lesen).toContain('/exams/lesen/${normalizedLevel.toLowerCase()}/${sample.slug}');
     expect(lesen).not.toContain("Lesen sample PDF.");
-    expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(3);
+    expect(B1_READING_PRACTICE_SAMPLES).toHaveLength(11);
     expect(B1_READING_PRACTICE_SAMPLES.every((sample) =>
       Object.values(getB1ReadingQuestions(sample)).flat().length === 30)).toBe(true);
   });

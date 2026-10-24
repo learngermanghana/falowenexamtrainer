@@ -40,5 +40,10 @@ jobs:
       - name: Verify independent Node audio test suites
         run: node --test functions/functionz/tests/b1Day25ClassAudio.test.js functions/functionz/tests/a2Day18BankAudio.test.js functions/functionz/tests/a2Day20ReklamationAudio.test.js
 
+      - name: Validate A1 book payment order reconciliation
+        run: |
+          node --check functions/functionz/bookCommerce.js
+          node --test functions/__tests__/bookCommerce.test.js
+
       - name: Run Firebase emulator integration tests
         run: npm run test:integration
