@@ -113,3 +113,45 @@
 [data-reading-standard="C1"] .c1-mock-article,
 [data-reading-standard="C1"] .c1-mock-tasks {background:#fff!important;color:#1c2b3d;border:1px solid #e0e7ef;border-radius:14px;margin-top:6px}
 [data-reading-standard="C1"] .c1-mock-instruction {border-color:#e4e9ef}
+
+/* Shared answer-review styling without changing the level-specific scoring engines. */
+[data-reading-standard] .a1-reading-practice-footer,
+[data-reading-standard] .a2-reading-practice-footer,
+[data-reading-standard] footer.b1-final-paper {
+  border:1px solid #e0e7ef!important;
+  border-radius:14px!important;
+  background:#fff!important;
+  padding:clamp(16px,2vw,23px)!important;
+  margin-top:16px!important;
+}
+[data-reading-standard] .a1-reading-practice-result,
+[data-reading-standard] .a2-reading-practice-result,
+[data-reading-standard] footer.b1-final-paper [role="status"] {
+  display:grid!important;
+  gap:12px!important;
+  color:#22364d!important;
+}
+[data-reading-standard] .a1-reading-practice-result>strong,
+[data-reading-standard] .a2-reading-practice-result>strong,
+[data-reading-standard] footer.b1-final-paper [role="status"]>h2 {
+  font-size:clamp(19px,2.4vw,24px)!important;
+  color:#203b57!important;
+}
+[data-reading-standard] .a1-reading-practice-result>div,
+[data-reading-standard] .a2-reading-practice-result>div,
+[data-reading-standard] footer.b1-final-paper [role="status"]>div {
+  display:flex;flex-wrap:wrap;gap:8px;
+}
+[data-reading-standard] .a1-reading-practice-result>div>span,
+[data-reading-standard] .a2-reading-practice-result>div>span,
+[data-reading-standard] footer.b1-final-paper [role="status"]>div>span {
+  padding:8px 10px;border:1px solid #e1e8f1;border-radius:9px;background:#f8fafc;
+  font-size:12px;font-weight:700;color:#36506d;
+}
+[data-reading-standard] .a1-reading-practice-result button,
+[data-reading-standard] .a2-reading-practice-result button,
+[data-reading-standard] footer.b1-final-paper [role="status"] button {
+  background:#254971!important;border:0!important;color:#fff!important;
+  border-radius:9px!important;padding:11px 14px!important;
+  width:fit-content;font-weight:800;cursor:pointer;
+}
