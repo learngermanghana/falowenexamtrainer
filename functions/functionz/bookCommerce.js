@@ -1,6 +1,5 @@
 "use strict";
 const crypto = require("crypto");
-const { calculateSharedPaystackFee } = require("./paystackFeePolicy");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
@@ -19,7 +18,7 @@ function registerBookCommerceRoutes(app, { admin }) {
     return res.json({
       books: Object.values(BOOKS).map(({ id, title, format, priceGhs }) => ({
         id, title, format, priceGhs, deliveryIncluded: false,
-        checkoutTotalGhs: calculateSharedPaystackFee(priceGhs).checkoutAmount,
+        checkoutTotalGhs: priceGhs,
       })),
       paymentsEnabled: paymentsEnabled(),
     });
@@ -44,8 +43,8 @@ function registerBookCommerceRoutes(app, { admin }) {
 
       const orderId = crypto.randomUUID();
       const lookupKey = crypto.randomBytes(24).toString("hex");
-      const quote = calculateSharedPaystackFee(book.priceGhs);
-      const checkoutPesewas = moneyToPesewas(quote.checkoutAmount);
+      // Books use an all-in sticker price; Falowen absorbs the gateway fee.
+      const checkoutPesewas = moneyToPesewas(book.priceGhs);
       const callback = new URL("/books/complete", CALLBACK_ORIGIN);
       callback.searchParams.set("order", orderId);
       callback.searchParams.set("key", lookupKey);
