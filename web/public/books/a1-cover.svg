@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1273" viewBox="0 0 900 1273" role="img" aria-labelledby="title desc">
+<title id="title">Falowen Deutsch A1 – Course and Workbook cover</title>
+<desc id="desc">Navy-and-blue Falowen A1 German coursebook cover featuring clean typography, geometric learning motifs and a subtle black red gold German ribbon.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="0.92" y2="1">
+    <stop offset="0" stop-color="#071a37"/><stop offset="0.58" stop-color="#123d71"/><stop offset="1" stop-color="#0b2348"/>
+  </linearGradient>
+  <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#9ed7ff"/><stop offset="1" stop-color="#4da4ff"/>
+  </linearGradient>
+  <pattern id="dots" width="36" height="36" patternUnits="userSpaceOnUse">
+    <circle cx="4" cy="4" r="1.6" fill="#b9e3ff" opacity=".24"/>
+  </pattern>
+  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+    <feDropShadow dx="1" dy="12" stdDeviation="20" flood-color="#020b1b" flood-opacity=".32"/>
+  </filter>
+</defs>
+<rect width="900" height="1273" fill="url(#bg)"/>
+<circle cx="795" cy="170" r="320" fill="#3b82f6" opacity=".10"/>
+<circle cx="865" cy="205" r="220" fill="none" stroke="#a3d5ff" stroke-width="1.8" opacity=".29"/>
+<circle cx="865" cy="205" r="170" fill="none" stroke="#a3d5ff" stroke-width="1.8" opacity=".19"/>
+<circle cx="865" cy="205" r="120" fill="none" stroke="#a3d5ff" stroke-width="1.8" opacity=".17"/>
+<path d="M 120 500 C 410 300 600 670 1000 350" fill="none" stroke="#75baff" stroke-width="4" opacity=".19"/>
+<path d="M 90 532 C 390 332 580 708 1000 390" fill="none" stroke="#75baff" stroke-width="2" opacity=".15"/>
+<rect x="0" y="0" width="900" height="1273" fill="url(#dots)" opacity=".35"/>
+<path d="M 0 0 H 20 V 1273 H 0 Z" fill="#58b3f4" opacity=".72"/>
+<path d="M 64 85 L 96 68 L 128 85 L 128 121 L 96 139 L 64 121 Z" fill="none" stroke="#9ed7ff" stroke-width="4" opacity=".84"/>
+<path d="M 72 92 L 96 106 L 120 92" fill="none" stroke="#9ed7ff" stroke-width="4" stroke-linecap="round"/>
+<text x="149" y="118" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-weight="800" letter-spacing="2.2" font-size="40">FALOWEN</text>
+<text x="68" y="226" fill="#a9d8fb" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="24" letter-spacing="5.5">GERMAN LANGUAGE LEARNING</text>
+<path d="M 68 268 H 832" stroke="#b8dfff" stroke-width="2" opacity=".31"/>
+<text x="65" y="460" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="124" letter-spacing="-5">DEUTSCH</text>
+<text x="62" y="686" fill="url(#blue)" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="242" letter-spacing="-18">A1</text>
+<g transform="translate(615 515) rotate(10)">
+  <rect x="0" y="0" width="184" height="184" rx="92" fill="#123d71" stroke="#a9d8fb" stroke-width="5"/>
+  <text x="92" y="85" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="46" text-anchor="middle" fill="#fff">CEFR</text>
+  <text x="92" y="127" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="31" text-anchor="middle" fill="#a9d8fb">LEVEL</text>
+</g>
+<text x="67" y="767" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="50" font-weight="750" letter-spacing="-.7">Course &amp; Workbook</text>
+<text x="69" y="827" fill="#c8e5fc" font-family="Arial, Helvetica, sans-serif" font-size="27">Clear explanations. Real practice.</text>
+<text x="69" y="870" fill="#c8e5fc" font-family="Arial, Helvetica, sans-serif" font-size="27">Your first steps in German.</text>
+<g transform="translate(68 966)">
+<rect width="764" height="132" rx="20" fill="#ffffff" opacity=".12" stroke="#c5e8ff" stroke-opacity=".3"/>
+<g fill="none" stroke="#cce9ff" stroke-width="3" stroke-linejoin="round">
+<path d="M 32 41 Q 67 29 98 41 V 94 Q 68 80 32 94 Z"/><path d="M 98 41 Q 129 29 164 41 V 94 Q 127 80 98 94 Z"/>
+</g>
+<text x="202" y="54" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="26">Grammar • Vocabulary • Exercises</text>
+<text x="202" y="94" fill="#cce9ff" font-family="Arial, Helvetica, sans-serif" font-size="24">Learn • Practise • Build confidence</text>
+</g>
+<path d="M 0 1160 Q 240 1117 430 1152 Q 650 1200 900 1154 V 1273 H 0 Z" fill="#ffffff"/>
+<path d="M 0 1160 Q 240 1117 430 1152 Q 650 1200 900 1154" stroke="#b8dfff" stroke-width="3" fill="none"/>
+<rect x="69" y="1201" width="192" height="14" rx="3" fill="#111827"/>
+<rect x="69" y="1218" width="192" height="14" rx="3" fill="#db2e3a"/>
+<rect x="69" y="1235" width="192" height="14" rx="3" fill="#f7c844"/>
+<text x="829" y="1234" text-anchor="end" fill="#173a60" font-family="Arial, Helvetica, sans-serif" font-size="23" font-weight="700" letter-spacing=".4">FALOWEN EDITION</text>
+</svg>
