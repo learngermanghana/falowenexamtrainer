@@ -1122,11 +1122,13 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                     await recoverSavedSpeakingStep();
                     // The course assessment owns cross-Teil recovery. Both checks read
                     // saved results only; neither transcribes or grades again.
-                    await onRecoverCompletedParts?.();
+                    if (gradedCourseMock && safeLevel === "B1") await onRecoverCompletedParts?.();
                   }} disabled={busy || feedbackBusy || recording}>
-                    Check saved speaking progress
+                    {gradedCourseMock && safeLevel === "B1" ? "Check saved speaking progress" : "Check saved answer / speaking progress"}
                   </button>
-                  <small>Restore saved answers or completed Teile without recording or paying for AI again.</small>
+                  <small>{gradedCourseMock && safeLevel === "B1"
+                    ? "Restore saved answers or completed Teile without recording or paying for AI again."
+                    : "Recovers answers and completed Teils already saved to Falowen. No new recording or AI marking is charged."}</small>
                 </div>
               ) : null}
               {audioRetry ? <div role="group" aria-label="Recover unsent speaking audio" className="speaking-exam-recovery">
