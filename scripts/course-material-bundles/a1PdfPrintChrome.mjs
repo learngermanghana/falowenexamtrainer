@@ -14,24 +14,26 @@ export const cleanA1PrintChrome = () => {
   const marked = document.querySelectorAll?.(markedSelector) ?? root.querySelectorAll(markedSelector);
   for (const element of [...marked]) remove(element);
 
-  // The compact website masthead can be a set of nested divs rather than
-  // .app-header. Remove the smallest strip that contains the exact "Falowen"
-  // brand and the FA avatar, without touching workbook or lesson headings.
-  const mastheadNodes = document.querySelectorAll?.("a,span,strong,b,div")
-    ?? root.querySelectorAll("a,span,strong,b,div");
-  for (const brand of [...mastheadNodes]) {
-    if (normalize(brand.textContent) !== "Falowen") continue;
-    let candidate = brand.parentElement;
-    for (let depth = 0; depth < 7 && candidate && candidate !== document.body
-      && candidate !== root; depth += 1, candidate = candidate.parentElement) {
-      const words = normalize(candidate.textContent);
-      if (words.length > 180) break;
-      if (/^Falowen\b/i.test(words) && /\bFA$/i.test(words)
-          && !/Grammar Notes|Workbook|Day\s*\d/i.test(words)) {
-        remove(candidate);
-        break;
-      }
-    }
+  // On deployed course pages the website strip is often an anonymous header
+  // or div. Its "Falowen / bell / FA" content is at the very top of the
+  // document, not inside an educational header. Look for a small, visible
+  // top-of-page container, not an exact descendant whose text may contain a
+  // logo initial or be rendered as several nested spans.
+  const topBarSelector = "header,nav,aside,section,div";
+  const topBarCandidates = document.querySelectorAll?.(topBarSelector)
+    ?? root.querySelectorAll(topBarSelector);
+  for (const candidate of [...topBarCandidates]) {
+    if (candidate === root || candidate === document.body) continue;
+    const rect = candidate.getBoundingClientRect?.();
+    if (!rect || rect.height < 15 || rect.height > 115
+      || rect.top > 155 || rect.bottom < 0) continue;
+    const label = normalize(candidate.innerText || candidate.textContent);
+    if (label.length > 115 || !/\bFalowen\b/i.test(label) || !/\bFA\b/.test(label)) continue;
+    if (/\b(?:Workbook|Grammar Notes|Kapitel|Assignment|Knowledge test|Day\s*\d+)\b/i.test(label)) continue;
+    if (candidate.querySelector?.("h1,h2,h3,input,textarea,fieldset")) continue;
+    // Preserve UI elsewhere in the app; this hides only the exported document.
+    candidate.setAttribute?.("data-a1-pdf-hide-ui", "website-masthead");
+    candidate.style?.setProperty("display", "none", "important");
   }
 
   // Old lesson implementations do not all expose a stable hook yet.
@@ -122,4 +124,30 @@ export const findA1PrintChromeLeaks = (text = "") => {
     ["live recording controls", /^\s*(?:Record family answer|Save recording|Stop recording)\s*$/mi],
   ];
   return issues.filter(([, rx]) => rx.test(t)).map(([label]) => label);
+};
+
+
+// Full PDF text check: inspect what Chromium actually printed, not just the
+// stylesheet or DOM mocks. Fail rather than publish an A1 PDF with a leftover
+// authenticated masthead or the Day 22 QR stranded on another sheet.
+export const findA1PdfLayoutFaults = (pdfText = "") => {
+  const pages = String(pdfText).split("\f").filter((page) => page.trim());
+  const faults = [];
+  for (const [index, page] of pages.entries()) {
+    if (/^\s*(?:F\s+)?Falowen\s+(?:🔔\s*)?FA\s*$/mi.test(page)) {
+      faults.push("Page " + (index + 1) + " still contains the website masthead");
+    }
+  }
+  const stem = "Welche Beschwerden hat Herr Braun?";
+  const hearingPage = pages.findIndex((page) => page.includes(stem));
+  if (hearingPage >= 0) {
+    const hearing = pages[hearingPage];
+    if (!hearing.includes("Hören: Audio im Falowen Course Book")) {
+      faults.push("Day 22 Hören QR instructions are separated from its question sheet");
+    }
+    if (!hearing.includes("Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?")) {
+      faults.push("Day 22 Hören questions 1–6 do not fit on one sheet");
+    }
+  }
+  return faults;
 };

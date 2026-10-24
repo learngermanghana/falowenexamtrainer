@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { cleanA1PrintChrome, findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
+import { cleanA1PrintChrome, findA1PrintChromeLeaks, findA1PdfLayoutFaults } from "./a1PdfPrintChrome.mjs";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 
 class Node {
@@ -156,15 +156,17 @@ test("A1 PDF removes branded bell/avatar strip even when .app-header is absent",
   const lesson = new Node("SECTION", "A1 Day 1 Grammar Notes");
   brand.parentElement = masthead;
   masthead.parentElement = root;
+  masthead.getBoundingClientRect = () => ({ top: 24, bottom: 72, height: 48 });
+  masthead.setAttribute = (name, value) => { masthead[name] = value; };
   const original = globalThis.document;
   globalThis.document = {
     body: root,
     querySelector: selector => selector === "main" ? root : null,
-    querySelectorAll: selector => selector === "a,span,strong,b,div" ? [brand] : [],
+    querySelectorAll: selector => selector === "header,nav,aside,section,div" ? [masthead] : [],
   };
   try {
     cleanA1PrintChrome();
-    assert.equal(masthead.removed, true);
+    assert.equal(masthead["data-a1-pdf-hide-ui"], "website-masthead");
     assert.equal(lesson.removed, false);
   } finally {
     if (original === undefined) delete globalThis.document;
@@ -194,4 +196,55 @@ test("A1 PDF removes only completed section controls and arrow back navigation",
   assert.equal(done.removed, true);
   assert.equal(back.removed, true);
   assert.equal(answer.removed, false);
+});
+
+
+test("A1 PDF hides anonymous top-of-page brand strip without relying on exact text nodes", () => {
+  const root = new Node("MAIN");
+  const brand = new Node("SPAN", "F Falowen");
+  const bar = new Node("DIV", "F Falowen 🔔 FA");
+  bar.parentElement = root;
+  bar.innerText = "F Falowen 🔔 FA";
+  bar.getBoundingClientRect = () => ({ top: 24, bottom: 72, height: 48 });
+  bar.setAttribute = (name, value) => { bar[name] = value; };
+  root.mapping.set("header,nav,aside,section,div", [bar]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(bar["data-a1-pdf-hide-ui"], "website-masthead");
+  assert.equal(bar.display, "none");
+});
+
+test("A1 PDF retains lesson headings, answer choices and brand mentions below masthead", () => {
+  const root = new Node("MAIN");
+  const teaching = new Node("SECTION", "Falowen Day 2 Grammar Notes FA");
+  teaching.innerText = teaching.textContent;
+  teaching.getBoundingClientRect = () => ({ top: 22, bottom: 75, height: 53 });
+  const footer = new Node("DIV", "Falowen FA");
+  footer.getBoundingClientRect = () => ({ top: 400, bottom: 440, height: 40 });
+  const answer = new Node("BUTTON", "A. Ich komme aus Ghana");
+  root.mapping.set("header,nav,aside,section,div", [teaching, footer]);
+  root.mapping.set("button,a", [answer]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(teaching["data-a1-pdf-hide-ui"], undefined);
+  assert.equal(footer["data-a1-pdf-hide-ui"], undefined);
+  assert.equal(answer.removed, false);
+});
+
+
+test("final PDF audit catches the remaining v7 masthead and Day 22 QR-page split", () => {
+  const pdf = [
+    "Falowen                  🔔  FA\nA1 Basic Greetings\nFalowen Learning Hub 5 / 255",
+    "Teil 3 · Hören\nHören: Audio im Falowen Course Book\nFalowen Learning Hub 254 / 255",
+    "1. Welche Beschwerden hat Herr Braun?\n6. Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?\nFalowen Learning Hub 255 / 255",
+  ].join("\f") + "\f";
+  const faults = findA1PdfLayoutFaults(pdf);
+  assert.match(faults.join("; "), /website masthead/);
+  assert.match(faults.join("; "), /QR instructions are separated/);
+});
+
+test("final PDF audit accepts masthead-free Day 22 Hören with QR and all six choices", () => {
+  const content = "Teil 3 · Hören\nHören: Audio im Falowen Course Book\n" +
+    "1. Welche Beschwerden hat Herr Braun?\n" +
+    "6. Was soll Herr Braun tun, wenn er am Freitag nicht kommen kann?\n" +
+    "Falowen Learning Hub 255 / 255";
+  assert.deepEqual(findA1PdfLayoutFaults(content + "\f"), []);
 });

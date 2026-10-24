@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import QRCode from "qrcode";
@@ -11,7 +12,7 @@ import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHel
 import { inspectA1PrintDocument, isA1PrintContentReady } from "./a1PdfContentReadiness.mjs";
 import { prepareA1PrintDocument } from "./a1PdfPrintExtras.mjs";
 import { sanitizeA1PrintDocument, findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
-import { cleanA1PrintChrome, findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
+import { cleanA1PrintChrome, findA1PrintChromeLeaks, findA1PdfLayoutFaults } from "./a1PdfPrintChrome.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -529,6 +530,14 @@ pages.forEach((page, index) => {
 });
 
 fs.writeFileSync(finalPdfPath, await output.save());
+const extractedPdfText = execFileSync("pdftotext", ["-layout", finalPdfPath, "-"], {
+  encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: 30000,
+});
+const layoutFaults = findA1PdfLayoutFaults(extractedPdfText);
+if (layoutFaults.length) {
+  fs.rmSync(finalPdfPath, { force: true });
+  throw new Error("A1 PDF printable layout audit failed: " + layoutFaults.join("; "));
+}
 diagnostics.completedAt = new Date().toISOString();
 diagnostics.pdfPath = finalPdfPath;
 writeDiagnostics();
