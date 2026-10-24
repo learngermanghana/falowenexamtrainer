@@ -33,6 +33,12 @@ Before printing each A1 target, the exporter now waits for visible lazy-loaded l
 
 Printed audio widgets are replaced by a **QR code to the authenticated Falowen course lesson** (a sign-in is required). The generated link strips the print-only `radio=done` query parameter and never exposes expiring Cloudflare R2 URLs. This is a **student workbook companion link**, not a public audio product for Amazon. The PDF rendering pass also suppresses web-only video panels and draft-save UI, while preserving actual answer options and writing inputs.
 
+### 2026-10-24 expanded privacy exclusions
+
+The A1 export now identifies Firestore-backed biographies, classmate introduction lists, shared scrambled-sentence answers, family discussion paragraphs, and live class-response widgets using explicit `data-a1-print-private` markers in the interactive components. The PDF-only sanitizer removes or replaces them with anonymous ruled writing space; normal student workflows remain unchanged. Persistent print CSS also hides any React re-rendered private widgets.
+
+The output validator rejects known class biography/discussion headings, saved sharing status and live-response labels from the final extracted PDF. This addresses leakage observed on printed pages 46–47, 74–75, 78 and 84–85 of the 273-page export. A human privacy review remains required before distribution. Sparse pages near chapter boundaries still require editorial review rather than deleting potentially meaningful question options automatically.
+
 ### Privacy-safe print preparation (A1)
 
 The GitHub renderer must never distribute live classroom discussion posts, student names, submissions, saved draft letters, marking feedback, speaking transcripts, grades, or voice sessions. The **export-only sanitizer** removes live Day 13 contribution blocks and their class controls, replaces letter-marking widgets with blank ruled writing space, strips draft-capture panels, and replaces speaking-recording widgets with neutral partner-practice lines. The original live Course Book remains interactive for signed-in students.
