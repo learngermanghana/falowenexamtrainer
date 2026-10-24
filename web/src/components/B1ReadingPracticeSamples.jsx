@@ -14,7 +14,7 @@ import {
   getB1ReadingQuestions,
 } from "../data/b1ReadingPracticeSamples";
 import "./B1FinalMockExamPage.css";
-import { ReadingPracticeHeader, ReadingPracticeParts } from "./ReadingPracticeShell";
+import { ReadingPracticeHeader, ReadingPracticeParts, ReadingPracticeSampleList } from "./ReadingPracticeShell";
 
 const DURATION_SECONDS = 65 * 60;
 const timeLabel = (seconds) => {
@@ -101,7 +101,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       if (!initialSampleId && B1_READING_PRACTICE_SAMPLES.some(item => item.id === saved.selectedId)) {
         setSelectedId(saved.selectedId);
       }
-      if (B1_READING_PART_KEYS.includes(saved.partKey)) setPartKey(saved.partKey);
+      if (B1_READING_PART_KEYS.includes(saved.partKey) && (!initialSampleId || saved.selectedId === initialSampleId)) setPartKey(saved.partKey);
     } catch (_error) {
       // A damaged local cache cannot prevent reading practice.
     } finally {
@@ -227,15 +227,11 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         onToggleTimer={() => setTimerRunning(value => !value)}
         onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}
       />
-      {!standalone ? (
-        <nav aria-label="B1 reading sample selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {B1_READING_PRACTICE_SAMPLES.map((item, index) => (
-            <button type="button" key={item.id} disabled={item.id === sample.id} onClick={() => selectSample(item.id)}>
-              Lesen Sample {index + 1}
-            </button>
-          ))}
-        </nav>
-      ) : null}
+      {!standalone ? <ReadingPracticeSampleList level="B1"
+        samples={B1_READING_PRACTICE_SAMPLES.map((item,index)=>({
+          id:item.id,label:item.label,detail:"30 questions · 5 Teile · 65 minutes",
+          status:submittedBySample[item.id]?"Completed":Object.keys(answersBySample[item.id]||{}).length?"In progress":"Not started"
+        }))} onOpen={item=>selectSample(item.id)}/> : null}
       <ReadingPracticeParts level="B1" activePart={partKey} onSelect={setPartKey}
         parts={B1_READING_PART_KEYS.map((key, index) => ({
           id:key,label:`Teil ${index+1}`,total:PART_COUNT[key],
