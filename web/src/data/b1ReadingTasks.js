@@ -399,7 +399,7 @@ export const B1_READING_TASKS = Object.freeze({
   25: Object.freeze({ assignmentKey: "B1-8.25", ...{
     title: "Modul Lesen · Teil 2 (7 Aufgaben · 20 Minuten)",
     instructions: "Lesen Sie den Presseartikel und die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
-    submissionNote: "Reichen Sie die sieben Antworten in der Form 1B, 2B, 3B, 4A, 5A, 6A, 7C ein.",
+    submissionNote: "Reichen Sie sieben Antworten in dieser Form ein: 1A, 2B, 3C …",
     imageAlt: "Presseartikel über Verbraucherrechte und Sicherheit beim Online-Shopping",
     text: {
       title: "Online-Shopping – Welche Rechte und Risiken Verbraucher kennen sollten",
