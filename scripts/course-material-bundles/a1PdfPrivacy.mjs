@@ -29,6 +29,18 @@ export const sanitizeA1PrintDocument = () => {
     return block;
   };
 
+  // A1 Day 6 mounts its Firestore-backed GroupDiscussionWritingBox through a
+  // portal. Older deployed builds have this stable mount attribute but NOT the
+  // newer data-a1-print-private attribute. Replace the entire portal target
+  // with a neutral writing task before inspecting other private subtrees.
+  // This preserves the surrounding family vocabulary, templates and quizzes.
+  const day6MountSelector = '[data-a1-day6-family-writing-box="true"]';
+  const day6Mounts = document.querySelectorAll?.(day6MountSelector)
+    ?? root.querySelectorAll(day6MountSelector);
+  for (const mount of [...day6Mounts]) {
+    mount.replaceWith(makeWritingSpace("Meine Familie · Schreiben Sie 6–8 Sätze.", 9));
+  }
+
   // Real Firestore biographies and class answers occur in multiple A1 days,
   // not only Day 13. Redact whole marked subtrees before resetting form fields:
   // otherwise author names / posted sentences can survive DOM text extraction.
