@@ -156,15 +156,17 @@ test("A1 PDF removes branded bell/avatar strip even when .app-header is absent",
   const lesson = new Node("SECTION", "A1 Day 1 Grammar Notes");
   brand.parentElement = masthead;
   masthead.parentElement = root;
+  masthead.getBoundingClientRect = () => ({ top: 24, bottom: 72, height: 48 });
+  masthead.setAttribute = (name, value) => { masthead[name] = value; };
   const original = globalThis.document;
   globalThis.document = {
     body: root,
     querySelector: selector => selector === "main" ? root : null,
-    querySelectorAll: selector => selector === "a,span,strong,b,div" ? [brand] : [],
+    querySelectorAll: selector => selector === "header,nav,aside,section,div" ? [masthead] : [],
   };
   try {
     cleanA1PrintChrome();
-    assert.equal(masthead.removed, true);
+    assert.equal(masthead["data-a1-pdf-hide-ui"], "website-masthead");
     assert.equal(lesson.removed, false);
   } finally {
     if (original === undefined) delete globalThis.document;
@@ -208,7 +210,7 @@ test("A1 PDF hides anonymous top-of-page brand strip without relying on exact te
   root.mapping.set("header,nav,aside,section,div", [bar]);
   runWithDoc(root, cleanA1PrintChrome);
   assert.equal(bar["data-a1-pdf-hide-ui"], "website-masthead");
-  assert.equal(bar.style.display, "none");
+  assert.equal(bar.display, "none");
 });
 
 test("A1 PDF retains lesson headings, answer choices and brand mentions below masthead", () => {
