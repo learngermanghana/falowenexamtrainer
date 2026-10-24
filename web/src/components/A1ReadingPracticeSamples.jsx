@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { ReadingPracticeHeader, ReadingPartNavigation, ReadingPartFooter } from "./ReadingPracticeShell";
 import { useNavigate } from "react-router-dom";
 import {
   getReadingPracticeStudentKey,
@@ -616,6 +617,12 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
 
   return (
     <main className="a1-goethe-mock-shell a1-reading-practice-shell" data-a1-reading-practice-samples>
+      <ReadingPracticeHeader level="A1" sampleLabel={sample.label} part={Number(partKey.slice(-1))} partCount={3}
+   answered={answeredCount} total={15} secondsLeft={remainingSeconds}
+   onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
+   <button type="button" className="reading-unified-back" disabled={submitted}
+    onClick={() => setTimerRunning(v => !v)}>{timerRunning ? "Pause" : "Start / resume"}</button>
+  </ReadingPracticeHeader>
       <div className="a1-goethe-mock-topbar a1-reading-practice-topbar">
         <div>
           <strong>A1 Lesen · Exams Room</strong>
@@ -657,18 +664,10 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
           </div>
         </header>
 
-        <nav className="a1-reading-part-selector" aria-label="A1 Lesen part selector">
-          {["teil1", "teil2", "teil3"].map((key, index) => {
-            const questions = sample.parts[key].questions;
-            const answered = questions.filter((question) => answers[question.number]).length;
-            return (
-              <button key={key} type="button" className={partKey === key ? "is-active" : ""} onClick={() => setPartKey(key)}>
-                Teil {index + 1}
-                <small>{answered}/5 answered</small>
-              </button>
-            );
-          })}
-        </nav>
+        <ReadingPartNavigation
+   parts={["teil1", "teil2", "teil3"].map(key => ({id:key,answered:sample.parts[key].questions.filter(q=>answers[q.number]).length,total:sample.parts[key].questions.length}))}
+   active={Number(partKey.slice(-1))-1}
+   onSelect={index => setPartKey("teil"+(index+1))}/>
 
         {partKey === "teil1" ? (
           <div>
@@ -737,7 +736,12 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
           </div>
         ) : null}
 
-        <footer className="a1-reading-practice-footer">
+        <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={3}
+   onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
+   onNext={() => setPartKey("teil"+Math.min(3,Number(partKey.slice(-1))+1))}>
+   answeredCount/15 answered
+  </ReadingPartFooter>
+  <footer className="a1-reading-practice-footer">
           <div>
             <strong>{answeredCount}/15 answered</strong>
             <span>Complete all three Teile before checking your answers.</span>
