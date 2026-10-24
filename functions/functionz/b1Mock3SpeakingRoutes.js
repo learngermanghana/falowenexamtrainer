@@ -86,7 +86,7 @@ module.exports=function registerB1Mock3SpeakingRoutes(app,{admin,requireAccess})
         if(previous?.sessionId&&previous.sessionId!==sessionId)
           throw Object.assign(new Error("Another saved examiner session already belongs to this Teil."),{status:409});
         const verified=verifyReceipt(receiptSnap.data(),{
-          uid,attemptId,teil,choice:attempt.topicChoice,sessionId});
+          uid,attemptId,teil,choice:attempt.topicChoice,sessionId,deadlineMs:attempt.deadlineMs});
         // Nested Firestore merge keeps completed Teils 1 and 2 intact.
         tx.set(ref,{parts:{[teil]:{...verified,teil:"Teil "+teil,level:"B1",
           taskId:"b1-mock-03-speaking-teil-"+teil,
@@ -124,7 +124,7 @@ module.exports=function registerB1Mock3SpeakingRoutes(app,{admin,requireAccess})
         const snaps=await Promise.all(ids.map(id=>id
           ?tx.get(access.db.collection("liveSpeakExamResults").doc(id)):Promise.resolve(null)));
         const verified=ids.map((id,i)=>id?verifyReceipt(snaps[i]?.data(),{
-          uid,attemptId,teil:String(i+1),choice:attempt.topicChoice,sessionId:id}):null);
+          uid,attemptId,teil:String(i+1),choice:attempt.topicChoice,sessionId:id,deadlineMs:attempt.deadlineMs}):null);
         result=gradeParts(verified,{expired:Date.now()>=Number(attempt.deadlineMs)});
         tx.set(ref,{status:"completed",result,sessionIds:ids,
           updatedAt:admin.firestore.FieldValue.serverTimestamp()},{merge:true});
