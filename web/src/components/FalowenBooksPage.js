@@ -194,7 +194,7 @@ export default function FalowenBooksPage({ mode = "catalog" }) {
       const token = await user.getIdToken();
       const data = await publicApi("/books/download", { token, method: "POST" });
       const url = new URL(data.downloadUrl);
-      if (url.protocol !== "https:" || !url.hostname.endsWith(".googleapis.com")) {
+      if (url.protocol !== "https:" || !url.hostname.endsWith(".r2.cloudflarestorage.com") || !url.searchParams.has("X-Amz-Signature")) {
         throw new Error("Unexpected secure download address.");
       }
       window.location.assign(url.toString());
