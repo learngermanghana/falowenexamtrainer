@@ -79,6 +79,20 @@ jobs:
         run: node --test scripts/deployFirestoreIndexes.test.cjs
       - name: Reconcile indexes through Firestore API without Firestore Rules validation
         run: node scripts/deployFirestoreIndexes.cjs
+      - name: Explain one-time index deployment IAM permission if blocked
+        if: failure()
+        shell: bash
+        run: |
+          account="$(node -e 'const fs=require("fs");const path=process.env.GOOGLE_APPLICATION_CREDENTIALS;try{console.log(JSON.parse(fs.readFileSync(path,"utf8")).client_email||"unknown")}catch{console.log("unknown")}' )"
+          {
+            echo '### Index deployment needs one-time Firestore IAM permission'
+            echo ''
+            echo "Deployment service account: \`$account\`"
+            echo 'Grant **Cloud Datastore Index Admin** (`roles/datastore.indexAdmin`) for project `falowen-examiner-trainer`, then rerun this workflow.'
+            echo 'Google Cloud IAM: https://console.cloud.google.com/iam-admin/iam?project=falowen-examiner-trainer'
+            echo 'The account does **not** need Owner/Editor and no learner recordings need to be stored.'
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "::error::Grant roles/datastore.indexAdmin to $account; then rerun the index workflow."
       - name: Deployment note
         run: |
           echo '### Firestore indexes submitted' >> "$GITHUB_STEP_SUMMARY"
