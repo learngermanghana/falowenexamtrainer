@@ -89,8 +89,7 @@ export default function B1Mock3Hoeren(){
         <span>{answered}/30 beantwortet</span></div>
       <strong>Teil {part?.part||1}</strong>
     </header>
-    <p role="note">Vier Hörteile, 30 Aufgaben. Dies ist zunächst die Hören-Übung, nicht die komplette B1-Mockprüfung.
-      Die Wiederholungen sind bereits in den MP3-Dateien enthalten.</p>
+    <p role="note">Hören-Übung mit vier Teilen. Die Auswertung wird nach der Abgabe serverseitig gespeichert. Das Ergebnis ist noch kein vollständiges B1-Mock-Ergebnis für Lesen, Hören, Schreiben und Sprechen. Die Wiederholungen sind in den Aufnahmen enthalten.</p>
     {error?<p role="alert">{error}</p>:null}
     {!exam&&!error?<p role="status">Aufgaben werden geladen …</p>:null}
     {exam&&part?<><nav className="a2-mock2-nav" aria-label="Hörteile wählen">
@@ -101,11 +100,11 @@ export default function B1Mock3Hoeren(){
     </nav>
     <section className="a2-mock2-paper">
       <h1>Hören Teil {part.part} · {part.label}</h1>
-      {part.part===1?<p>Lesen Sie beide Aufgaben pro Kurztext (Richtig/Falsch und a, b oder c).</p>:
-        <p>Hören Sie die Aufnahme und wählen Sie zu jeder Frage die passende Antwort.</p>}
+      {part.part===1?<p role="note"><strong>Bitte beachten:</strong> Zu jedem Kurztext gibt es zwei Aufgaben: Richtig/Falsch und a, b oder c. Die Aufnahme enthält bereits die vorgesehenen Durchgänge.</p>:
+        <p>Hören Sie die Aufnahme und wählen Sie zu jeder Aufgabe die richtige Antwort.</p>}
       <div className="a2-mock2-audio">
         <strong>Aufnahme Teil {part.part}</strong>
-        <p>Einmal abspielen. Nicht erneut starten; das Audio enthält schon {part.repeats} {part.repeats===1?"Durchgang":"Durchgänge"}.</p>
+        <p>Die MP3 wird einmal gestartet. Keine zusätzliche automatische Wiederholung.</p>
         {audioUrl?<><audio ref={audio} src={audioUrl} preload="metadata" controls={false}
           onError={()=>setAudioError("Die Audiodatei konnte nicht abgespielt werden.")}
           onEnded={()=>{setPlaying(false);setPlayed(old=>({...old,[part.part]:"ended"}))}}/>
