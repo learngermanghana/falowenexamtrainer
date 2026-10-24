@@ -82,3 +82,20 @@ test("B1 Day 21 Lebensformen heute uses the requested teacher lecture video", ()
   expect(teacherVideos[0].url).toBe("https://youtu.be/SFLT4cun5Fg");
   expect(JSON.stringify(lessonVideos)).not.toContain("j-BLeB5eEKw");
 });
+
+test("A1 Day 11 Chapter 7 and Day 12 Chapter 8 use their requested lectures without old teacher duplicates", () => {
+  const updates = [
+    { day: 11, chapter: "7", url: "https://youtu.be/I_bDa_Vz4JE", old: "https://youtu.be/8FnvD8LQEu0" },
+    { day: 12, chapter: "8", url: "https://youtu.be/O10ziTyE3Ww", old: "https://youtu.be/ckuH1McZqJk" },
+  ];
+  for (const { day, chapter, url, old } of updates) {
+    const teacher = getA1TeacherVideoResources(day, chapter);
+    expect(teacher).toHaveLength(1);
+    expect(teacher[0].url).toBe(url);
+    const visible = getLessonVideoResources("A1", day, {day, chapter});
+    const lectures = visible.filter(resource =>
+      resource.chapter === chapter && /teacher|tutor lecture/i.test([resource.key, resource.title].join(" ")));
+    expect(lectures.map(resource => resource.url)).toEqual([url]);
+    expect(JSON.stringify(visible)).not.toContain(old);
+  }
+});
