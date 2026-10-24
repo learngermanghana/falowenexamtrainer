@@ -132,7 +132,7 @@ const cleanExamTask = (task) => ({
   courseAssignmentKey: assignmentConfig(task?.courseAssignmentKey)
     ? String(task.courseAssignmentKey).trim().toUpperCase() : "",
   mockAttemptId: assignmentConfig(task?.courseAssignmentKey) ||
-    (/^a2-mock-01-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
+    (/^(?:a2-mock-01|b1-mock-0[12])-speaking-teil-[123]$/.test(String(task?.id || "")) && !task?.courseAssignmentKey)
     ? String(task?.mockAttemptId || "").trim().slice(0,120) : "",
 });
 const examOpening = (level, task) => {
@@ -345,6 +345,19 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
       const source = cleanPracticeSource(req.body?.source);
       const examTask = source === "exam-speaking-practice" ? cleanExamTask(req.body?.examTask) : null;
       if (examTask && !examTask.id) return error(res, 400, "exam_task_required", "Select a Goethe speaking task before starting the examiner.");
+      if (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "")) {
+        // A full B1 mock cannot start an unbound or cross-mock speaking
+        // session. The immutable examiner receipt must carry its server ID.
+        const requestedMock=examTask.id.slice(0,10);
+        if (!examTask.mockAttemptId) return error(res,400,"mock_attempt_required","Start or resume your B1 mock before opening speaking.");
+        const attemptSnap=await db().collection("b1MockExamUsers").doc(student.auth.uid)
+          .collection("attempts").doc(examTask.mockAttemptId).get();
+        const attempt=attemptSnap.data() || {};
+        if (!attemptSnap.exists || attempt.uid!==student.auth.uid ||
+            attempt.mockId!==requestedMock || attempt.status!=="in_progress") {
+          return error(res,403,"mock_attempt_mismatch","This speaking part is not linked to your active B1 mock attempt.");
+        }
+      }
       if (examTask?.courseAssignmentKey) {
         // Course exam parts must reference an attempt created and owned by the
         // signed-in student on the server before any new voice session begins.
@@ -374,9 +387,11 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
         const existing = sessionSnap.data() || {};
         if (existing.sessionId && !existing.endedAt &&
           (Date.parse(existing.expiresAt || "") > Date.now() || feedbackOpen(existing))) {
-          if (examTask?.courseAssignmentKey &&
+          if ((examTask?.courseAssignmentKey &&
             (existing.examTask?.courseAssignmentKey !== examTask.courseAssignmentKey ||
-              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) {
+              existing.examTask?.mockAttemptId !== examTask.mockAttemptId)) ||
+            (/^b1-mock-0[12]-speaking-teil-[123]$/.test(examTask?.id || "") &&
+              (existing.examTask?.id !== examTask.id || existing.examTask?.mockAttemptId !== examTask.mockAttemptId))) {
             throw Object.assign(new Error(
               "An earlier speaking session is still open. Reset or finish that session before opening this graded attempt."
             ), {status:409,code:"different_mock_attempt_active"});
@@ -406,7 +421,9 @@ function registerLiveSpeakRoutes(app, { admin, getAuthedUser, findStudentByCodeO
           throw Object.assign(new Error("No speaking sessions remain. The pilot does not charge students."),{status:402,code:"no_sessions"});
         }
         const preparedFlow = examFlow ? {...examFlow} : null;
-        if (preparedFlow?.key === "B1-3" && !preparedFlow.discussion && existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0]) {
+        if (preparedFlow?.key === "B1-3" && !preparedFlow.discussion &&
+            existing.examFlow?.key === "B1-2" && existing.confirmedAnswers?.[0] &&
+            existing.examTask?.mockAttemptId === examTask?.mockAttemptId) {
           preparedFlow.contextTopic=existing.examTask.prompt;
           preparedFlow.ownPresentation=String(existing.confirmedAnswers[0]).slice(0,2400);
         }
