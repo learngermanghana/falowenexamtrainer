@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
+import newA2Samples4to7 from "../data/a2ReadingPdfSamples4to7.json";
+import newA2Sample8 from "../data/a2ReadingPdfSample8.json";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -257,6 +259,8 @@ export const A2_READING_PRACTICE_SAMPLES = Object.freeze([
   { id: "a2-reading-practice-01", label: "Lesen Sample 1", ...A2_READING_PRACTICE_SET_01 },
   { id: "a2-reading-practice-02", label: "Lesen Sample 2", ...A2_READING_PRACTICE_SET_02 },
   { id: "a2-reading-practice-03", label: "Lesen Sample 3", ...A2_READING_PRACTICE_SET_03 },
+  ...newA2Samples4to7,
+  newA2Sample8,
 ]);
 
 const ChoiceList = ({ name, options, value, onChange, reveal = false, answer = "" }) => (
@@ -355,7 +359,7 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
     total: 5,
   }));
   const weakestSection = getWeakestReadingSection(sectionScores);
-  const storageKey = `falowen:exams:lesen:a2:three-samples:${studentKey || "guest"}`;
+  const storageKey = `falowen:exams:lesen:a2:three-samples:${studentKey || "guest"}`; // Keep legacy key to preserve existing results.
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -555,11 +559,13 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
                 <h4>{sample.teil1.article.subtitle}</h4>
                 {sample.teil1.article.paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </article>
+              {sample.teil1.example ? (
               <section className="a2-mock-question a2-mock-example">
                 <h3>Beispiel 0</h3>
                 <p>{sample.teil1.example.question}</p>
                 <ChoiceList name={`${sample.id}-example-1`} options={sample.teil1.example.options} value={sample.teil1.example.answer} onChange={() => {}} reveal answer={sample.teil1.example.answer} />
               </section>
+              ) : null}
               {renderQuestions(sample.teil1.questions, "t1")}
             </>
           ) : null}
@@ -575,11 +581,13 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
                   </div>
                 ))}
               </article>
+              {sample.teil2.example ? (
               <section className="a2-mock-question a2-mock-example">
                 <h3>Beispiel 0</h3>
                 <p>{sample.teil2.example.question}</p>
                 <ChoiceList name={`${sample.id}-example-2`} options={sample.teil2.example.options} value={sample.teil2.example.answer} onChange={() => {}} reveal answer={sample.teil2.example.answer} />
               </section>
+              ) : null}
               {renderQuestions(sample.teil2.questions, "t2")}
             </>
           ) : null}
@@ -606,10 +614,11 @@ export default function A2ReadingPracticeSamples({ initialSampleId = "", standal
           {partKey === "teil4" ? (
             <>
               <div className="a2-mock-people-sheet">
-                <div className="a2-mock-person-row a2-mock-example">
+                {sample.teil4.example ? (<div className="a2-mock-person-row a2-mock-example">
                   <div><strong>Beispiel 0</strong><p>{sample.teil4.example.person}</p></div>
                   <label>Anzeige:<select value={sample.teil4.example.answer} disabled><option>{sample.teil4.example.answer}</option></select></label>
-                </div>
+                </div>) : null}
+                
                 {sample.teil4.people.map((item) => (
                   <div className="a2-mock-person-row" key={item.number}>
                     <div>
