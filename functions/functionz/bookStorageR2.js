@@ -5,10 +5,9 @@ const crypto = require("node:crypto");
 // All book requests use this fixed object key. Clients never choose bucket/key.
 const BOOK_OBJECT_KEY = "books/private/falowen-a1-grammar-workbook-v1.pdf";
 const BOOK_DOWNLOAD_SECONDS = 300;
-const REQUIRED_R2_VARS = [
-  "R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BOOKS_BUCKET",
-];
-const simpleBucketName = /^[a-z0-9][a-z0-9.-]*[a-z0-9]$|^[a-z0-9]$/i;
+const simpleBucketName = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/i;
+const bookAccessId = env => String(env.R2_BOOKS_ACCESS_KEY_ID || env.R2_ACCESS_KEY_ID || "").trim();
+const bookSecret = env => String(env.R2_BOOKS_SECRET_ACCESS_KEY || env.R2_SECRET_ACCESS_KEY || "").trim();
 const awsEncode = value => encodeURIComponent(String(value)).replace(/[!'()*]/g, chr =>
   "%" + chr.charCodeAt(0).toString(16).toUpperCase());
 const encodeKey = key => String(key).split("/").map(awsEncode).join("/");
@@ -17,7 +16,7 @@ const hmac = (key, value, encoding) => crypto.createHmac("sha256", key).update(v
 const amzTimestamp = date => date.toISOString().replace(/[:-]|\.\d{3}/g, "");
 
 function isBooksR2Configured(env = process.env) {
-  return REQUIRED_R2_VARS.every(name => Boolean(String(env[name] || "").trim())) &&
+  return Boolean(env.R2_ACCOUNT_ID && bookAccessId(env) && bookSecret(env) && env.R2_BOOKS_BUCKET) &&
     simpleBucketName.test(String(env.R2_BOOKS_BUCKET || "").trim());
 }
 
@@ -36,8 +35,8 @@ function getR2BooksConfig(env = process.env) {
   return {
     bucket: String(env.R2_BOOKS_BUCKET).trim(),
     accountId,
-    accessKeyId: String(env.R2_ACCESS_KEY_ID).trim(),
-    secretAccessKey: String(env.R2_SECRET_ACCESS_KEY).trim(),
+    accessKeyId: bookAccessId(env),
+    secretAccessKey: bookSecret(env),
   };
 }
 
