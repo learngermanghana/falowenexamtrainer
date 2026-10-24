@@ -15,9 +15,9 @@ test("all eight B2 Lesen sets contain five readable parts and thirty graded answ
  });
 });
 
-test("Only genuinely distinct B2 source sets may be scored",()=>{
- expect(tests.filter(x=>x.availability==="needs_revision").map(x=>x.id)).toEqual([
-  "b2-reading-sample-02","b2-reading-sample-03","b2-reading-sample-04"
- ]);
- expect(tests.filter(x=>x.availability==="ready")).toHaveLength(5);
+test("Eight distinct B2 sets are available; revised originals are identified",()=>{
+ expect(tests.filter(x=>x.availability==="ready")).toHaveLength(8);
+ expect(tests.slice(1,4).map(x=>x.sourceType)).toEqual(Array(3).fill("falowen-revised-original"));
+ const textSignatures=tests.map(x=>x.sectionTexts.join("\\n").replace(/\\s+/g," ").trim());
+ expect(new Set(textSignatures).size).toBe(8);
 });
