@@ -15,25 +15,6 @@
           "Die IT-Firma TechSüd in Stuttgart hat seit sechs Monaten ein neues Arbeitszeitmodell eingeführt. Alle 40 Mitarbeiter dürfen ihre Arbeitszeit völlig flexibel gestalten. Es gibt keine Pflicht mehr, jeden Tag von 8 bis 17 Uhr im Büro zu sein. Wer möchte, kann von zu Hause arbeiten oder die Wochenarbeitszeit an vier Tagen erledigen. Geschäftsführer Markus Weber erklärt: 'Wir vertrauen unseren Mitarbeitern. Hauptsache, die Projekte werden pünktlich fertig.' Bisher sind die Erfahrungen sehr positiv: Die Mitarbeiter sind zufriedener und seltener krank. Allerdings betonen viele, dass gute Absprachen im Team nötig sind, damit immer jemand für Kunden erreichbar ist."
         ]
       },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "Im Text genannte Information"
-          },
-          {
-            "id": "b",
-            "label": "Eine andere Aussage"
-          },
-          {
-            "id": "c",
-            "label": "Eine dritte Aussage"
-          }
-        ],
-        "answer": "a"
-      },
       "questions": [
         {
           "number": 1,
@@ -162,25 +143,6 @@
             "Geschäftsführung, Buchhaltung & Rechnungsstelle"
           ]
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "EG"
-          },
-          {
-            "id": "b",
-            "label": "1. Stock"
-          },
-          {
-            "id": "c",
-            "label": "2. Stock"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -399,11 +361,6 @@
         "Fünf Personen suchen passende Angebote.",
         "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
       ],
-      "example": {
-        "number": 0,
-        "person": "Beispiel: Finden Sie die passende Anzeige.",
-        "answer": "a"
-      },
       "people": [
         {
           "number": 16,
@@ -498,25 +455,6 @@
         "paragraphs": [
           "An der Goethe-Schule in Frankfurt gibt es seit Beginn des Schuljahres ein neues Verpflegungskonzept. Statt Fast-Food und zuckerhaltigen Snacks bietet die Schulkantine nun jeden Tag frisch gekochte Bio-Gerichte an. Das Projekt wird von der Stadt Frankfurt gefördert, sodass die Mahlzeiten für Schüler nur 3,50 Euro kosten. Ein regionales Küchenteam bereitet täglich zwei verschiedene Menüs zu, darunter immer eine vegetarische Option. Auch die Schüler wirken mit: In einer Arbeitsgruppe wählen sie monatlich Lieblingsgerichte aus. Die Schulleiterin Fr. Dr. Neumann berichtet: 'Die Schüler sind im Nachmittagsunterricht viel konzentrierter.'"
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "Im Text genannte Information"
-          },
-          {
-            "id": "b",
-            "label": "Eine andere Aussage"
-          },
-          {
-            "id": "c",
-            "label": "Eine dritte Aussage"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -646,25 +584,6 @@
             "Augenheilkunde, Hautarzt & Allergie-Labor"
           ]
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "EG"
-          },
-          {
-            "id": "b",
-            "label": "1. Stock"
-          },
-          {
-            "id": "c",
-            "label": "2. Stock"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -883,11 +802,6 @@
         "Fünf Personen suchen passende Angebote.",
         "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
       ],
-      "example": {
-        "number": 0,
-        "person": "Beispiel: Finden Sie die passende Anzeige.",
-        "answer": "a"
-      },
       "people": [
         {
           "number": 16,
@@ -982,25 +896,6 @@
         "paragraphs": [
           "Immer mehr Familien mit Kindern entscheiden sich für Urlaub auf einem Bauernhof in Deutschland statt für Flugreisen ins Ausland. Familie Krüger aus Berlin hat eine Woche auf einem Bio-Bauernhof im Allgäu verbracht. Vater Thomas erzählt: 'Für die Kinder war es ein fantastisches Erlebnis. Sie durften morgens im Stall mithelfen, Kühe füttern und frische Eier sammeln.' Der Hof bietet moderne Ferienwohnungen mit eigener Küche, sodass sich Gäste selbst verpflegen können. Neben den Tieren gibt es Spielplätze und Fahrräder zum Ausleihen. Die Besitzer stellen fest, dass viele Familien jedes Jahr wiederkommen."
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "Im Text genannte Information"
-          },
-          {
-            "id": "b",
-            "label": "Eine andere Aussage"
-          },
-          {
-            "id": "c",
-            "label": "Eine dritte Aussage"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -1130,25 +1025,6 @@
             "Multiplex-Kino, Fitnessstudio & Bowling-Arena"
           ]
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "EG"
-          },
-          {
-            "id": "b",
-            "label": "1. Stock"
-          },
-          {
-            "id": "c",
-            "label": "2. Stock"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -1367,11 +1243,6 @@
         "Fünf Personen suchen passende Angebote.",
         "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
       ],
-      "example": {
-        "number": 0,
-        "person": "Beispiel: Finden Sie die passende Anzeige.",
-        "answer": "a"
-      },
       "people": [
         {
           "number": 16,
@@ -1466,25 +1337,6 @@
         "paragraphs": [
           "Sprachreisen liegen bei jungen Erwachsenen im Trend. Die Münchner Sprachschule 'Globus' organisiert seit zehn Jahren Intensivsprachkurse in Spanien, Frankreich und Italien. Neben täglichem Unterricht bei Muttersprachlern wohnen die Teilnehmer in Gastfamilien. Dadurch wenden sie die Sprache sofort im Alltag an. Die Kursleiterin Carmen Gomez berichtet: 'Nach zwei Wochen sprechen die Teilnehmer viel flüssiger und haben keine Angst mehr vor Fehlern.' Am Nachmittag stehen Kulturreisen, Kochkurse und Sportausflüge auf dem Programm. Ein besonderes Plus: Das Zertifikat wird europäisch anerkannt."
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "Im Text genannte Information"
-          },
-          {
-            "id": "b",
-            "label": "Eine andere Aussage"
-          },
-          {
-            "id": "c",
-            "label": "Eine dritte Aussage"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -1614,25 +1466,6 @@
             "Gesundheitskurse, Yoga-Studio & Entspannungsräume"
           ]
         ]
-      },
-      "example": {
-        "number": 0,
-        "question": "Beispiel",
-        "options": [
-          {
-            "id": "a",
-            "label": "EG"
-          },
-          {
-            "id": "b",
-            "label": "1. Stock"
-          },
-          {
-            "id": "c",
-            "label": "2. Stock"
-          }
-        ],
-        "answer": "a"
       },
       "questions": [
         {
@@ -1851,11 +1684,6 @@
         "Fünf Personen suchen passende Angebote.",
         "Welche Anzeige a–f passt? Für eine Person gibt es keine passende Anzeige. Wählen Sie X."
       ],
-      "example": {
-        "number": 0,
-        "person": "Beispiel: Finden Sie die passende Anzeige.",
-        "answer": "a"
-      },
       "people": [
         {
           "number": 16,
