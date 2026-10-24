@@ -29,7 +29,9 @@ function registerBookCommerceRoutes(app, { admin }) {
   app.post("/books/checkout", async (req, res) => {
     if (!paymentsEnabled()) return res.status(503).json({ error: "Book payments are not open yet." });
     try {
-      const book = BOOKS[String(req.body?.bookId || "")];
+      const requestedBookId = String(req.body?.bookId || "");
+      const book = Object.prototype.hasOwnProperty.call(BOOKS, requestedBookId)
+        ? BOOKS[requestedBookId] : null;
       const name = String(req.body?.name || "").trim().replace(/\s+/g, " ");
       const email = String(req.body?.email || "").trim().toLowerCase();
       const phone = String(req.body?.phone || "").trim();
