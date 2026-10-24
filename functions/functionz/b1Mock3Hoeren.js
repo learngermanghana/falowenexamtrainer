@@ -55,6 +55,7 @@ const QUESTIONS=Object.freeze(ITEMS.map(([kind,question,choices],index)=>{
     answer:ANSWER_KEY[index]});
 }));
 const QA_WARNINGS=Object.freeze([
+  "Teil 1 audio introduction says there is one statement per short text, but the supplied test contains two questions per short text (Richtig/Falsch plus multiple choice). Teacher should verify this mismatch.",
   "Teil 3 question 16 tests the recorded Beispiel Nummer 0, and the recorded Nummer 5 (Pizzeria) is not separately tested. Confirm with the teacher before release.",
   "Teil 4 roles C and D change implied speaker identity in the middle of the discussion. Regenerate/re-record the affected dialogue before release.",
 ]);
