@@ -195,3 +195,34 @@ test("A1 PDF removes only completed section controls and arrow back navigation",
   assert.equal(back.removed, true);
   assert.equal(answer.removed, false);
 });
+
+
+test("A1 PDF hides anonymous top-of-page brand strip without relying on exact text nodes", () => {
+  const root = new Node("MAIN");
+  const brand = new Node("SPAN", "F Falowen");
+  const bar = new Node("DIV", "F Falowen 🔔 FA");
+  bar.parentElement = root;
+  bar.innerText = "F Falowen 🔔 FA";
+  bar.getBoundingClientRect = () => ({ top: 24, bottom: 72, height: 48 });
+  bar.setAttribute = (name, value) => { bar[name] = value; };
+  root.mapping.set("header,nav,aside,section,div", [bar]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(bar["data-a1-pdf-hide-ui"], "website-masthead");
+  assert.equal(bar.style.display, "none");
+});
+
+test("A1 PDF retains lesson headings, answer choices and brand mentions below masthead", () => {
+  const root = new Node("MAIN");
+  const teaching = new Node("SECTION", "Falowen Day 2 Grammar Notes FA");
+  teaching.innerText = teaching.textContent;
+  teaching.getBoundingClientRect = () => ({ top: 22, bottom: 75, height: 53 });
+  const footer = new Node("DIV", "Falowen FA");
+  footer.getBoundingClientRect = () => ({ top: 400, bottom: 440, height: 40 });
+  const answer = new Node("BUTTON", "A. Ich komme aus Ghana");
+  root.mapping.set("header,nav,aside,section,div", [teaching, footer]);
+  root.mapping.set("button,a", [answer]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(teaching["data-a1-pdf-hide-ui"], undefined);
+  assert.equal(footer["data-a1-pdf-hide-ui"], undefined);
+  assert.equal(answer.removed, false);
+});
