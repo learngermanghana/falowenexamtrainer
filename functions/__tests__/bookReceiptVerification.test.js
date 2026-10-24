@@ -9,7 +9,7 @@ const orderId = "91869b22-88b0-46f4-b0ac-f224e8275604";
 const key = "a".repeat(48);
 const reference = "paystack_receipt_A1";
 const paid = {
-  reference, amount: 80000, currency: "GHS", status: "success",
+  domain: "live", reference, amount: 80000, currency: "GHS", status: "success",
   customer: { email: "reader@example.com" },
   metadata: { productType: "falowen_book", orderId, bookId: "a1-printed", format: "printed", priceGhs: 800 },
 };
@@ -84,9 +84,8 @@ function fixture() {
   };
 }
 
-const before = test.before;
 test.beforeEach(() => { process.env.PAYSTACK_SECRET = "test-only-secret"; });
-test.afterEach(() => { delete process.env.PAYSTACK_SECRET; delete global.fetch; });
+test.afterEach(() => { delete process.env.PAYSTACK_SECRET; delete process.env.FALOWEN_BOOK_PAYMENTS_ENABLED; delete global.fetch; });
 
 test("receipt confirmation rejects invalid or missing private order keys without asking Paystack", async () => {
   const x = fixture();
@@ -140,4 +139,23 @@ test("buyer can check status but cannot verify repeatedly inside cooldown", asyn
   assert.equal(second.body.status, "pending");
   assert.equal(second.body.retryAfterSeconds, 30);
   assert.equal(x.fetched, 1);
+});
+
+test("live checkout refuses test-mode Paystack receipts", async () => {
+  process.env.FALOWEN_BOOK_PAYMENTS_ENABLED = "true";
+  const x = fixture();
+  x.setFetchData({ ...paid, domain: "test" });
+  const result = await x.run("POST /books/verify", { order: orderId, key });
+  assert.equal(result.statusCode, 409);
+  assert.equal(x.order.status, "pending");
+  assert.equal(x.receipt, null);
+});
+
+test("Paystack serialized metadata can verify a live receipt", async () => {
+  process.env.FALOWEN_BOOK_PAYMENTS_ENABLED = "true";
+  const x = fixture();
+  x.setFetchData({ ...paid, metadata: JSON.stringify(paid.metadata) });
+  const result = await x.run("POST /books/verify", { order: orderId, key });
+  assert.equal(result.body.status, "paid");
+  assert.equal(x.receipt.status, "paid");
 });
