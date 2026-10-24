@@ -6,17 +6,28 @@ export const cleanA1PrintChrome = () => {
   const normalize = (value) => String(value || "").replace(/\s+/g, " ").trim();
   const remove = (node) => node?.remove();
 
-  // Explicit markers identify non-educational controls without guessing from
-  // their style, position, or nearby real exercise content.
-  for (const element of [...root.querySelectorAll(
-    '[data-a1-pdf-hide-ui], [data-a1-chapter3-draft-guidance]'
-  )]) remove(element);
+  // Root selection can differ between embedded components and the Course Book
+  // shell. Remove explicit export-excluded UI everywhere in the document,
+  // including status notices outside the first <main>. Persistent CSS in
+  // a1PrintHelpers.mjs covers components React re-renders after this pass.
+  const markedSelector = '[data-a1-pdf-hide-ui], [data-a1-chapter3-draft-guidance]';
+  const marked = document.querySelectorAll?.(markedSelector) ?? root.querySelectorAll(markedSelector);
+  for (const element of [...marked]) remove(element);
 
   // Old lesson implementations do not all expose a stable hook yet.
   // Use exact control labels, never hide buttons wholesale (some are MCQs).
   const actionText = /^(?:Show model|Hide model|Check knowledge test|Reset test|Check my sentences|Try again|Record family answer|Stop recording|Save recording|Review & Submit Assignment|Open Review & Submit|Check completed speaking Teils)$/i;
   for (const element of [...root.querySelectorAll("button,a")]) {
     if (actionText.test(normalize(element.textContent))) remove(element);
+  }
+
+  // Older variants of Day 7 render the notice as a paragraph containing a
+  // nested <strong>Not submitted</strong>. The previous leaf-only cleanup
+  // ignored those paragraphs, so their timestamps leaked into the PDF.
+  for (const notice of [...root.querySelectorAll("p[role='status'],p[aria-live]")]) {
+    const copy = normalize(notice.textContent);
+    if (/^Saved to your assignment draft(?:\\s*[·•-]\\s*\\d{1,2}:\\d{2}\\s*[AP]M)?\\.\\s*Not submitted for marking yet\\.?$/i.test(copy)
+      && !notice.querySelector("input,textarea,fieldset,select")) remove(notice);
   }
 
   // Live progress badges and save messages are not exercises. Keep their
