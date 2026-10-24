@@ -166,7 +166,7 @@ export default function PersonalInformationContributionBox({
   };
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
+    <div data-a1-personal-information-contribution="true" style={{ display: "grid", gap: 16 }}>
       {showReference ? (
         <div
           style={{
@@ -196,7 +196,7 @@ export default function PersonalInformationContributionBox({
         </div>
       ) : null}
 
-      <form onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
+      <form data-a1-print-private="biography-editor" onSubmit={handleSave} style={{ display: "grid", gap: 12 }}>
         <textarea
           className="day5-mobile-writing-box"
           aria-label="Meine Vorstellung"
@@ -232,7 +232,7 @@ export default function PersonalInformationContributionBox({
         {error ? <p role="alert" style={{ margin: 0, color: "#b91c1c", fontWeight: 700 }}>{error}</p> : null}
       </form>
 
-      <section style={{ display: "grid", gap: 10 }}>
+      <section data-a1-print-private="class-introductions" style={{ display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
           <strong>{className ? `${className} introductions` : "Class introductions"}</strong>
           <span style={styles.badge}>{members.length}</span>
