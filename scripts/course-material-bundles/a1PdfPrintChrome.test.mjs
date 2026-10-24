@@ -147,3 +147,51 @@ test("paper PDF removes answer action controls, never answer choices", () => {
     assert.ok(findA1PrintChromeLeaks(action).includes("knowledge-test action buttons"), action);
   }
 });
+
+
+test("A1 PDF removes branded bell/avatar strip even when .app-header is absent", () => {
+  const root = new Node("MAIN");
+  const brand = new Node("SPAN", "Falowen");
+  const masthead = new Node("DIV", "Falowen 🔔 FA");
+  const lesson = new Node("SECTION", "A1 Day 1 Grammar Notes");
+  brand.parentElement = masthead;
+  masthead.parentElement = root;
+  const original = globalThis.document;
+  globalThis.document = {
+    body: root,
+    querySelector: selector => selector === "main" ? root : null,
+    querySelectorAll: selector => selector === "a,span,strong,b,div" ? [brand] : [],
+  };
+  try {
+    cleanA1PrintChrome();
+    assert.equal(masthead.removed, true);
+    assert.equal(lesson.removed, false);
+  } finally {
+    if (original === undefined) delete globalThis.document;
+    else globalThis.document = original;
+  }
+});
+
+test("A1 PDF does not delete a genuine Falowen lesson title", () => {
+  const root = new Node("MAIN");
+  const brand = new Node("SPAN", "Falowen");
+  const lesson = new Node("SECTION", "Falowen A1 Day 6 Workbook · family practice FA");
+  brand.parentElement = lesson;
+  lesson.parentElement = root;
+  root.mapping.set("a,span,strong,b,div", [brand]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(lesson.removed, false);
+});
+
+test("A1 PDF removes only completed section controls and arrow back navigation", () => {
+  const root = new Node("MAIN");
+  const done = new Node("LABEL", "I practised this section.");
+  const back = new Node("BUTTON", "←Back");
+  const answer = new Node("BUTTON", "B. die Mutter");
+  root.mapping.set("label,button", [done]);
+  root.mapping.set("button,a", [back, answer]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(done.removed, true);
+  assert.equal(back.removed, true);
+  assert.equal(answer.removed, false);
+});
