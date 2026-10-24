@@ -365,7 +365,7 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
       <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={5}
    onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
    onNext={() => setPartKey("teil"+Math.min(5,Number(partKey.slice(-1))+1))}>
-   answeredCount/30 answered
+   {answeredCount}/30 answered
   </ReadingPartFooter>
   <footer className="b1-final-paper">
         {!submitted ? (
