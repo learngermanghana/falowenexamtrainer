@@ -248,3 +248,31 @@ test("final PDF audit accepts masthead-free Day 22 Hören with QR and all six ch
     "Falowen Learning Hub 255 / 255";
   assert.deepEqual(findA1PdfLayoutFaults(content + "\f"), []);
 });
+
+
+test("A1 Day 5 print hides website strip shifted beyond viewport top by route scroll", () => {
+  const root = new Node("MAIN");
+  const masthead = new Node("DIV", "F Falowen 🔔 FA");
+  // Day 5's print viewport can retain a scroll offset from the previous route.
+  masthead.getBoundingClientRect = () => ({ top: 420, bottom: 475, height: 55 });
+  masthead.setAttribute = (name, value) => { masthead[name] = value; };
+  root.mapping.set("header,nav,aside,section,div", [masthead]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(masthead["data-a1-pdf-hide-ui"], "website-masthead");
+  assert.equal(masthead.display, "none");
+});
+
+test("A1 print does not hide long instructional panels or short exercise headers", () => {
+  const root = new Node("MAIN");
+  const lesson = new Node("SECTION", "Falowen A1 Day 5 Workbook FA");
+  lesson.getBoundingClientRect = () => ({ top: 430, bottom: 475, height: 45 });
+  const long = new Node("DIV", "Falowen FA " + "Learn German nouns and sentence patterns. ".repeat(8));
+  long.getBoundingClientRect = () => ({ top: 430, bottom: 550, height: 120 });
+  const answer = new Node("BUTTON", "C. das Buch");
+  root.mapping.set("header,nav,aside,section,div", [lesson, long]);
+  root.mapping.set("button,a", [answer]);
+  runWithDoc(root, cleanA1PrintChrome);
+  assert.equal(lesson.display, undefined);
+  assert.equal(long.display, undefined);
+  assert.equal(answer.removed, false);
+});
