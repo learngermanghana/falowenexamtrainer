@@ -314,3 +314,34 @@ test("legacy selectors do not remove ordinary static writing instructions", () =
   assert.equal(lesson.removed, false);
   assert.deepEqual(findA1PrintPrivacyLeaks("Write your own sentences. Correct the questions."), []);
 });
+
+
+test("Day 6 legacy Firestore writing portal is redacted without new privacy attributes", () => {
+  const root = new Element("MAIN");
+  const lessonPrompt = new Element("SECTION", "Family vocabulary · Example: Das ist meine Mutter.");
+  const mount = new Element("DIV", "Write your paragraph here. This saves to Group Discussion only. Saved private family writing. Update in Group Discussion");
+  mount.setAttribute("data-a1-day6-family-writing-box", "true");
+  const privateInput = new Element("TEXTAREA", "My saved name and family details");
+  mount.mapping["textarea"] = [privateInput];
+  root.mapping['[data-a1-day6-family-writing-box="true"]'] = [mount];
+  root.mapping["section"] = [lessonPrompt];
+
+  withDocument(root, () => sanitizeA1PrintDocument());
+
+  assert.equal(mount.removed, true);
+  assert.equal(mount.replacement.getAttribute("data-a1-pdf-writing-space"), "true");
+  assert.equal(mount.replacement.children.filter(node =>
+    node.getAttribute("data-a1-pdf-answer-rule") === "").length, 9);
+  assert.equal(lessonPrompt.removed, false);
+  assert.doesNotMatch(mount.replacement.children.map(node => node.textContent).join(" "),
+    /saved private family|Group Discussion|Update in Group/);
+});
+
+test("Day 6 print privacy leaves other lesson writing tasks and family examples alone", () => {
+  const root = new Element("MAIN");
+  const unrelated = new Element("SECTION", "Das ist mein Vater. Das ist meine Mutter. Schreiben Sie 8 Sätze.");
+  root.mapping["section"] = [unrelated];
+  withDocument(root, () => sanitizeA1PrintDocument());
+  assert.equal(unrelated.removed, false);
+  assert.equal(unrelated.replacement, null);
+});
