@@ -9,7 +9,7 @@ function fixture({mockId="b1-mock-02",uid="learner-1",attemptId="att-1"}={}) {
   const receipts=Object.fromEntries([1,2,3].map((teil,index)=>{
     const id=`session-${teil}`;
     return [id,{uid,sessionId:id,mockAttemptId:attemptId,level:"B1",
-      teil:`Teil ${teil}`,source:"exam-speaking-practice",completed:true,
+      teil:`Teil ${teil}`,source:"exam-speaking-practice",examFlowKey:`B1-${teil}`,completed:true,
       task:{id:`${mockId}-speaking-teil-${teil}`,prompt:prompts[index]},
       assessment:{score:6,maxScore:8,summary:"Task completed"}}];
   }));
