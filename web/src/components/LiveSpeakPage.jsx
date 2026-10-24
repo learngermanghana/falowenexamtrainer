@@ -1124,7 +1124,7 @@ export default function LiveSpeakPage({ embedded = false, initialLevel = "", pra
                     // saved results only; neither transcribes or grades again.
                     if (gradedCourseMock && safeLevel === "B1") await onRecoverCompletedParts?.();
                   }} disabled={busy || feedbackBusy || recording}>
-                    {gradedCourseMock && safeLevel === "B1" ? "Check saved speaking progress" : "Check saved answer / speaking progress"}
+                    Check saved answer / speaking progress
                   </button>
                   <small>{gradedCourseMock && safeLevel === "B1"
                     ? "Restore saved answers or completed Teile without recording or paying for AI again."
