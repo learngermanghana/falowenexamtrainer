@@ -1,0 +1,34 @@
+[
+  {
+    "id": "teil1",
+    "title": "Teil 1 · Persönliche E-Mail",
+    "points": 9,
+    "instruction": "Sie haben vor einer Woche Ihren Geburtstag gefeiert. Ein Freund / Eine Freundin von Ihnen konnte nicht zu Ihrer Feier kommen, weil er/sie krank war.",
+    "bullets": [
+      "Beschreiben Sie: Wie war die Feier?",
+      "Begründen Sie: Welches Geschenk finden Sie besonders toll und warum?",
+      "Machen Sie einen Vorschlag für ein Treffen."
+    ],
+    "note": "Achten Sie auf den Textaufbau (Anrede, Einleitung, Reihenfolge der Inhaltspunkte, Schluss)."
+  },
+  {
+    "id": "teil2",
+    "title": "Teil 2 · Meinung äußern",
+    "points": 10,
+    "instruction": "Sie haben im Fernsehen eine Diskussionssendung zum Thema „Persönliche Kontakte und Internet“ gesehen. Im Online-Gästebuch der Sendung finden Sie folgende Meinung:",
+    "quote": "Ich finde es schlimm, dass persönliche Treffen immer seltener werden. Freunde wohnen oft sehr weit auseinander. Und da ist man dann schon froh über das Internet. Aber Kontakte im Internet können doch persönliche Treffen nicht ersetzen!",
+    "bullets": [
+      "Schreiben Sie nun Ihre Meinung zum Thema."
+    ]
+  },
+  {
+    "id": "teil3",
+    "title": "Teil 3 · Formelle Nachricht",
+    "points": 6,
+    "instruction": "Ihre Kursleiterin, Frau Müller, hat Sie zu einem Gespräch über Ihre persönlichen Lernziele eingeladen. Zu dem Termin können Sie aber nicht kommen.",
+    "bullets": [
+      "Entschuldigen Sie sich höflich und berichten Sie, warum Sie nicht kommen können."
+    ],
+    "note": "Vergessen Sie nicht die Anrede und den Gruß am Schluss."
+  }
+]
