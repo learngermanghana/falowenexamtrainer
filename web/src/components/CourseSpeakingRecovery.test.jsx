@@ -7,7 +7,11 @@ jest.mock('../services/interactionFeedback', () => ({ announceExamSuccess: jest.
 
 jest.mock('../context/AuthContext', () => ({ useAuth: () => ({ idToken: 'token', user: { uid: 'learner' } }) }));
 jest.mock('react-router-dom', () => ({ Link: ({ children }) => <span>{children}</span> }));
-jest.mock('./LiveSpeakPage', () => () => <div>Exam</div>);
+jest.mock('./LiveSpeakPage', () => ({onRecoverCompletedParts}) => (
+  <div>Exam
+    <button type="button" onClick={onRecoverCompletedParts}>Check saved answer / speaking progress</button>
+  </div>
+));
 jest.mock('./SpeakingPracticeHome', () => ({ SpeakingFeedback: () => <div>Feedback</div> }));
 jest.mock('../data/speakingDictionary', () => ({ speakingQuestionDictionary: [] }));
 jest.mock('../services/courseSpeakingMockService', () => ({ fetchCourseSpeakingMockStatus: jest.fn(), startCourseSpeakingMock: jest.fn(), submitCourseSpeakingMock: jest.fn() }));
@@ -99,4 +103,29 @@ test('checking A1 Day 19 verified progress never fabricates a missing first Teil
   await screen.findByText(/No graded Teil was found yet/);
   expect(screen.getByText(/Teil 1 of 3/)).toBeInTheDocument();
   expect(submitCourseSpeakingMock).not.toHaveBeenCalled();
+});
+
+
+test('B1 uses a single in-exam recovery control to advance to the next saved Teil', async () => {
+  const attemptId = '11111111-1111-4111-8111-111111111111';
+  const tasks = [
+    { id:'b1-1', teilLabel:'Teil 1' },
+    { id:'b1-2', teilLabel:'Teil 2' },
+    { id:'b1-3', teilLabel:'Teil 3' },
+  ];
+  const saved = [1,2].map(i=>({ sessionId:`b1-saved-${i}`, teil:`Teil ${i}`,
+    taskId:tasks[i-1].id, assessment:{maxScore:10,score:7,practiceOnly:true} }));
+  const storageKey = 'falowen:graded-speaking:learner:B1-7.23';
+  localStorage.setItem(storageKey, JSON.stringify({tasks,results:[saved[0]],attemptId}));
+  fetchCourseSpeakingMockStatus
+    .mockResolvedValueOnce({completed:false,attemptId,recovery:{parts:[saved[0]]}})
+    .mockResolvedValueOnce({completed:false,attemptId,recovery:{parts:saved}});
+  render(<CourseSpeakingMockAssignment assignmentKey="B1-7.23" />);
+  await screen.findByText(/Teil 2 of 3/);
+  expect(screen.queryByRole('button',{name:'Check completed speaking Teils'})).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button',{name:'Check saved answer / speaking progress'}));
+  await screen.findByText(/Teil 3 of 3/);
+  expect(fetchCourseSpeakingMockStatus).toHaveBeenCalledTimes(2);
+  expect(submitCourseSpeakingMock).not.toHaveBeenCalled();
+  expect(JSON.parse(localStorage.getItem(storageKey)).results).toHaveLength(2);
 });
