@@ -68,7 +68,7 @@
 .fb-edition-price{font-weight:850;font-size:17px;color:#102b4c;white-space:nowrap;margin-left:auto}
 .fb-shipping-note{margin:10px 0 0;background:#fff8e9;padding:9px 10px;color:#836020;font-size:12px;border-radius:8px}
 .fb-form{margin:20px 0 0;display:grid;gap:10px}
-.fb-form-title{font-weight:740;color:#243e5b;font-size:13px;margin:0 0:0}
+.fb-form-title{font-weight:740;color:#243e5b;font-size:13px;margin:0 0 0}
 .fb-form label{display:grid;gap:5px;font-weight:650;color:#445b72;font-size:12px}
 .fb-form input{display:block;width:100%;min-height:43px;border:1px solid #c9d7e5;border-radius:8px;padding:10px 12px;background:#fff;color:#172e49;font-size:13px;outline-color:#368ae4}
 .fb-form input::placeholder{color:#a0adbb}
