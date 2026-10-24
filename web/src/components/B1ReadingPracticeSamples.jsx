@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { ReadingPracticeHeader, ReadingPartNavigation, ReadingPartFooter } from "./ReadingPracticeShell";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { saveExamRoomResult } from "../services/examRoomResultService";
@@ -176,6 +177,12 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
 
   return (
     <main className="b1-final-shell" data-b1-reading-practice-samples>
+      <ReadingPracticeHeader level="B1" sampleLabel={sample.label} part={Number(partKey.slice(-1))} partCount={5}
+   answered={answeredCount} total={30} secondsLeft={secondsLeft}
+   onBack={() => navigate(standalone ? "/exams/lesen" : "/exams/overview")}>
+   <button type="button" className="reading-unified-back" disabled={submitted}
+    onClick={() => setTimerRunning(v => !v)}>{timerRunning ? "Pause" : "Start / resume"}</button>
+  </ReadingPracticeHeader>
       <header className="b1-final-module-header">
         <p>B1 · Lesen · Exams Room</p>
         <h1>{sample.label}</h1>
@@ -203,18 +210,10 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
           </button>
           <span>{answeredCount}/30 answered</span>
         </div>
-        <nav aria-label="B1 reading Teil selector" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {B1_READING_PART_KEYS.map((key, index) => (
-            <button
-              key={key}
-              type="button"
-              disabled={partKey === key}
-              onClick={() => setPartKey(key)}
-            >
-              Teil {index + 1} · {partQuestions[key].filter((q) => answers[q.number]).length}/{PART_COUNT[key]}
-            </button>
-          ))}
-        </nav>
+        <ReadingPartNavigation
+   parts={B1_READING_PART_KEYS.map(key => ({id:key,answered:partQuestions[key].filter(q=>answers[q.number]).length,total:partQuestions[key].length}))}
+   active={Number(partKey.slice(-1))-1}
+   onSelect={index => setPartKey("teil"+(index+1))}/>
       </section>
 
       <section className="b1-final-paper">
@@ -314,7 +313,12 @@ export default function B1ReadingPracticeSamples({ initialSampleId = "", standal
         ) : null}
       </section>
 
-      <footer className="b1-final-paper">
+      <ReadingPartFooter partIndex={Number(partKey.slice(-1))-1} partCount={5}
+   onPrevious={() => setPartKey("teil"+Math.max(1,Number(partKey.slice(-1))-1))}
+   onNext={() => setPartKey("teil"+Math.min(5,Number(partKey.slice(-1))+1))}>
+   answeredCount/30 answered
+  </ReadingPartFooter>
+  <footer className="b1-final-paper">
         {!submitted ? (
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
             <span>Complete every Teil before checking your answers ({answeredCount}/30).</span>
