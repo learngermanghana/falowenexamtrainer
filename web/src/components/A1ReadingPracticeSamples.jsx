@@ -642,6 +642,11 @@ export default function A1ReadingPracticeSamples({ initialSampleId = "", standal
           id:key,total:5,answered:sample.parts[key].questions.filter(q=>answers[q.number]).length
         }))}/>
       <article className="a1-goethe-mock-exam">
+        <header className="reading-standard-part-instructions">
+          <h2>{selectedPart.title}</h2>
+          <p>{selectedPart.instruction}</p>
+          {selectedPart.strong ? <strong>{selectedPart.strong}</strong> : null}
+        </header>
         {partKey === "teil1" ? (
           <div>
             {selectedPart.texts.map((textItem) => {
