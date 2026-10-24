@@ -21,7 +21,7 @@ const normalize = snap => {
   const r=snap.data() || {};
   if (!LEVELS.has(r.level) || r.source !== "exam-speaking-practice") return null;
   return {
-    id:snap.id, level:r.level,
+    id:snap.id, sessionId:r.sessionId || snap.id, level:r.level,
     teil:text(r.teil || r.task?.teil,80),
     assignmentKey:text(r.task?.courseAssignmentKey,45),
     mockAttemptId:text(r.mockAttemptId,90),
