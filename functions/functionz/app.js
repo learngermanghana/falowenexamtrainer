@@ -30,6 +30,7 @@ const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = 
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
+const { publicB1Mock3Hoeren, markB1Mock3Hoeren } = require("./b1Mock3Hoeren");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
 const { getPublishableLessons, isPublisherOwner, validatePublication, publishHoerenLesson, signedStudioUrl, toStudentLesson, scoreHoerenLesson, normaliseAssignmentId } = require("./courseHoerenPublishing");
@@ -1434,6 +1435,49 @@ app.post("/b1-mock-02/hoeren/score", async (req, res) => {
   } catch (error) {
     console.error("B1 Mock 2 Hören score error", error);
     return res.status(503).json({ error: "Could not save the score. Your answers remain on this device; please retry." });
+  }
+});
+
+// Draft B1 Mock 3: do not expose the teacher's question set or accept grades
+// before final question/audio QA, R2 upload, and explicit deployment approval.
+const b1Mock3Released=()=>process.env.B1_MOCK3_HOEREN_RELEASED==="true";
+
+app.get("/b1-mock-03/hoeren/questions", async (req,res)=>{
+  try{
+    if(!b1Mock3Released())return res.status(404).json({error:"B1 Mock 3 Hören is not published yet."});
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    res.set("Cache-Control","private, no-store");
+    return res.json(publicB1Mock3Hoeren());
+  }catch(err){
+    console.error("B1 Mock 3 Hören questions error",err);
+    return res.status(503).json({error:"Could not load B1 Mock 3 listening questions."});
+  }
+});
+
+app.post("/b1-mock-03/hoeren/score",async(req,res)=>{
+  try{
+    if(!b1Mock3Released())return res.status(404).json({error:"B1 Mock 3 Hören is not published yet."});
+    const access=await requireB1Mock2PracticeAccess(req,res);
+    if(!access)return;
+    let result;
+    try{result=markB1Mock3Hoeren(req.body?.answers)}
+    catch{return res.status(400).json({error:"Submit a valid answer to all 30 Hören questions."})}
+    const answers=Object.fromEntries(Object.entries(req.body.answers).sort(([a],[b])=>Number(a)-Number(b)));
+    const attemptId=crypto.createHash("sha256").update(access.authedUser.uid+":b1-mock-03:"+JSON.stringify(answers)).digest("hex").slice(0,40);
+    await access.db.collection("b1Mock3HoerenResults").doc(access.authedUser.uid)
+      .collection("attempts").doc(attemptId).set({
+        uid:access.authedUser.uid,
+        level:"B1",mockId:"b1-mock-03",section:"hoeren",practiceOnly:true,
+        answers,correct:result.correct,total:30,percentage:result.percentage,
+        perPart:result.perPart,status:"completed",verifiedBy:"server-answer-key",
+        submittedAt:admin.firestore.FieldValue.serverTimestamp(),
+      },{merge:true});
+    res.set("Cache-Control","private, no-store");
+    return res.json({...result,attemptId,practiceOnly:true,saved:true});
+  }catch(err){
+    console.error("B1 Mock 3 Hören score error",err);
+    return res.status(503).json({error:"Could not save the score. Your answers remain on this device."});
   }
 });
 
