@@ -47,19 +47,29 @@ describe("Falowen A1 book product", () => {
     expect(publicBook(true)).not.toHaveProperty("storageKey");
   });
 
-  test("sales are disabled without explicit flag, private bucket and Paystack secret", () => {
-    expect(salesConfigured({ PAYSTACK_SECRET: "secret", FALOWEN_BOOKS_PRIVATE_BUCKET: "bucket" })).toBe(false);
+  test("sales are disabled without explicit flag, private R2 bucket and Paystack secret", () => {
+    const r2 = {
+      R2_ACCOUNT_ID: "a".repeat(32), R2_ACCESS_KEY_ID: "key",
+      R2_SECRET_ACCESS_KEY: "secret", R2_BOOKS_BUCKET: "falowen-books-private",
+    };
+    expect(salesConfigured({ PAYSTACK_SECRET: "secret", ...r2 })).toBe(false);
     expect(salesConfigured({ FALOWEN_BOOKS_SALES_ENABLED: "true", PAYSTACK_SECRET: "secret" })).toBe(false);
-    expect(salesConfigured({ FALOWEN_BOOKS_SALES_ENABLED: "true", FALOWEN_BOOKS_PRIVATE_BUCKET: "bucket", PAYSTACK_SECRET: "secret" })).toBe(true);
+    expect(salesConfigured({ FALOWEN_BOOKS_SALES_ENABLED: "true", PAYSTACK_SECRET: "secret", ...r2 })).toBe(true);
   });
 
-  test("even a configured product stays unavailable until its private PDF exists", async () => {
-    const env = { FALOWEN_BOOKS_SALES_ENABLED: "true", FALOWEN_BOOKS_PRIVATE_BUCKET: "private-bucket", PAYSTACK_SECRET: "secret" };
-    const admin = { storage: () => ({ bucket: name => {
-      expect(name).toBe("private-bucket");
-      return { file: key => { expect(key).toBe(STORAGE_KEY); return { exists: async () => [false] }; } };
-    } }) };
-    expect(await isBookReady(admin, env)).toBe(false);
+  test("even a configured product stays unavailable until HEAD confirms its private PDF exists", async () => {
+    const env = {
+      FALOWEN_BOOKS_SALES_ENABLED: "true", PAYSTACK_SECRET: "secret",
+      R2_ACCOUNT_ID: "a".repeat(32), R2_ACCESS_KEY_ID: "key",
+      R2_SECRET_ACCESS_KEY: "secret", R2_BOOKS_BUCKET: "falowen-books-private",
+    };
+    const oldFetch = global.fetch;
+    global.fetch = jest.fn(async () => ({ ok: false, status: 404 }));
+    try {
+      expect(await isBookReady(null, env)).toBe(false);
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(global.fetch.mock.calls[0][1].method).toBe("HEAD");
+    } finally { global.fetch = oldFetch; }
   });
 });
 
