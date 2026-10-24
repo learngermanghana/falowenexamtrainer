@@ -25,8 +25,11 @@ export const cleanA1PrintChrome = () => {
   for (const candidate of [...topBarCandidates]) {
     if (candidate === root || candidate === document.body) continue;
     const rect = candidate.getBoundingClientRect?.();
-    if (!rect || rect.height < 15 || rect.height > 115
-      || rect.top > 155 || rect.bottom < 0) continue;
+    // Day 5's small website masthead can be displaced outside the initial
+    // viewport by persistent route scroll or a print-only layout shift.
+    // Vertical viewport coordinates are therefore NOT proof it is a lesson.
+    // Require instead a small, brand-only card with no exercise content.
+    if (rect && (rect.height < 15 || rect.height > 170)) continue;
     const label = normalize(candidate.innerText || candidate.textContent);
     if (label.length > 115 || !/\bFalowen\b/i.test(label) || !/\bFA\b/.test(label)) continue;
     if (/\b(?:Workbook|Grammar Notes|Kapitel|Assignment|Knowledge test|Day\s*\d+)\b/i.test(label)) continue;
