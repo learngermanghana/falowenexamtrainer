@@ -201,7 +201,16 @@ function registerBookCommerceRoutes(app, { admin }) {
 
 // This is called only from the existing SHA-512 signed Paystack webhook route.
 async function processBookWebhook({ admin, data }) {
-  const metadata = data?.metadata || {};
+  // Paystack normally returns metadata as an object, but integrations may
+  // serialize it as JSON. Never accept an unparseable string as order evidence.
+  let metadata = data?.metadata || {};
+  if (typeof metadata === "string") {
+    try { metadata = JSON.parse(metadata); } catch (_) { metadata = {}; }
+  }
+  if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) metadata = {};
+  if (paymentsEnabled() && String(data?.domain || "").toLowerCase() !== "live") {
+    return { status: 202, body: { status: "rejected", reason: "non_live_transaction" } };
+  }
   const orderId = String(metadata.orderId || "");
   if (!/^[0-9a-f-]{36}$/i.test(orderId)) {
     return { status: 202, body: { status: "rejected", reason: "bad_order_id" } };
