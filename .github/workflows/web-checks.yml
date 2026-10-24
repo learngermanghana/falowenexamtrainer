@@ -149,6 +149,12 @@ jobs:
           CI: true
         run: npx jest --runInBand --runTestsByPath src/components/A2Day4SimpleGrammar.test.js
 
+      - name: Test public A1 bookstore, preview and Paystack receipt checkout
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/components/BookStoreCheckout.test.js
+
       - name: Test A1 workbook visibility, submit mounting, exam cards and mobile layout
         working-directory: web
         env:

@@ -6,6 +6,7 @@ import { chromium } from "playwright";
 import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { addA1RetailCover } from "./a1RetailCover.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 import { classifyA1PdfCoursePage, isRetryableA1PdfCoursePage, matchesA1PdfCourseRoute } from "./a1PdfAuthState.mjs";
 import { a1PrintCss, isA1PdfReadyText, printableA1TabLabels } from "./a1PrintHelpers.mjs";
@@ -435,16 +436,6 @@ const downloadExternalPdf = async (lesson, target, index) => {
   return { kind: target.kind, source: target.url, file };
 };
 
-const addCover = async (output) => {
-  const font = await output.embedFont(StandardFonts.Helvetica);
-  const bold = await output.embedFont(StandardFonts.HelveticaBold);
-  const cover = output.addPage([595.28, 841.89]);
-  cover.drawText("FALOWEN", { x: 54, y: 755, size: 28, font: bold, color: rgb(0.08, 0.25, 0.65) });
-  cover.drawText("A1 Grammar Notes & Workbook", { x: 54, y: 670, size: 28, font: bold });
-  cover.drawText("Grammar notes and workbook practice", { x: 54, y: 625, size: 15, font });
-  cover.drawText("Editorial review copy - not for sale", { x: 54, y: 110, size: 11, font });
-};
-
 const appendPdfFile = async (output, file) => {
   const source = await PDFDocument.load(fs.readFileSync(file));
   const pages = await output.copyPages(source, source.getPageIndices());
@@ -494,7 +485,7 @@ try {
 }
 
 const output = await PDFDocument.create();
-await addCover(output);
+await addA1RetailCover(output);
 const pdfNavigation = await createPdfNavigation(output, { level: "A1" });
 const navigation = [];
 

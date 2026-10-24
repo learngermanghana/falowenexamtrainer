@@ -1,165 +1,327 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { getBackendUrl } from "../services/backendUrl";
+import { A1_SAMPLE_SECTIONS, A1_SAMPLE_DISCLOSURE } from "../data/a1BookSample";
+import "./BookStoreCheckout.css";
 
 const API = getBackendUrl();
 const money = value => `GH₵${Number(value || 0).toFixed(2)}`;
-const styles = {
-  page: { minHeight: "100vh", background: "#f5f7fa", padding: "30px 16px", color: "#14243a", fontFamily: "inherit" },
-  wrap: { maxWidth: 820, margin: "0 auto" },
-  card: { padding: 24, borderRadius: 16, border: "1px solid #dfe7ef", background: "#fff", marginBottom: 16, boxShadow: "0 8px 25px rgba(15,23,42,.04)" },
-  input: { display: "block", width: "100%", padding: "12px", border: "1px solid #a9b9c9", borderRadius: 8, marginTop: 6, boxSizing: "border-box", font: "inherit" },
-  button: { background: "#146c65", color: "#fff", border: 0, padding: "14px 22px", borderRadius: 10, fontWeight: 750, font: "inherit", cursor: "pointer" },
-};
+const SAMPLE_LABELS = { grammar: "Grammar", knowledge: "Knowledge check", workbook: "Workbook" };
+const BOOK_DETAILS = [
+  { icon: "01", title: "Foundations", text: "Greetings, pronunciation, introductions and everyday vocabulary." },
+  { icon: "02", title: "Grammar that clicks", text: "Articles, German cases, modal verbs, negation and prepositions." },
+  { icon: "03", title: "Apply the language", text: "Work through reading, writing, listening-related tasks and speaking activities." },
+  { icon: "04", title: "Build confidence", text: "Practise conversations, directions, letters, the weather and health." },
+];
+const FAQ = [
+  { question: "Is this a Goethe examination book?", answer: "No. This is a Falowen A1 course and practice workbook. The final mock examination is offered separately in Falowen’s Exams Room." },
+  { question: "What is included in the digital edition?", answer: "The complete 250-page A1 Grammar Notes & Workbook PDF is arranged manually after Paystack payment verification. The free sample is only a short excerpt." },
+  { question: "When will I receive the printed book?", answer: "The printed edition is produced on demand, only after successful payment. Falowen will contact you to coordinate printing, collection or delivery. No fixed delivery date is promised at checkout." },
+  { question: "Is delivery included in GH₵800?", answer: "No. The GH₵800 price covers the printed book. Delivery is charged separately and arranged with Falowen." },
+  { question: "How is payment confirmed?", answer: "Pay with Paystack, retain the transaction receipt and reference, and use the secure order-confirmation page. Falowen verifies your payment with Paystack before arranging your book." },
+];
+const sections = ["overview", "contents", "sample", "faq"];
 async function request(path, options = {}) {
   const response = await fetch(`${API}${path}`, {
     ...options, headers: { ...(options.body ? { "Content-Type": "application/json" } : {}) },
   });
-  const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || "Could not load book payments.");
-  return result;
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(payload.error || "Book payments are temporarily unavailable.");
+  return payload;
 }
 
-export default function BookStoreCheckout({ completed = false }) {
-  const [books, setBooks] = useState([]);
-  const [enabled, setEnabled] = useState(false);
-  const [bookId, setBookId] = useState("a1-printed");
-  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [order, setOrder] = useState(null);
-  const params = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
-  const orderId = params.get("order");
-  const key = params.get("key");
-  useEffect(() => {
-    if (completed) return;
-    let active = true;
-    request("/books/catalog").then(data => {
-      if (!active) return;
-      setBooks(data.books || []);
-      setEnabled(Boolean(data.paymentsEnabled));
-    }).catch(e => { if (active) setError(e.message); });
-    return () => { active = false; };
-  }, [completed]);
-  const orderLookup = `/books/order?order=${encodeURIComponent(orderId || "")}&key=${encodeURIComponent(key || "")}`;
-  async function refreshOrder() {
-    if (!orderId || !key) return setError("This payment return link is incomplete. Keep your Paystack receipt and contact Falowen.");
+function SampleContent({ section }) {
+  if (!section) return null;
+  return <div className="fb-sample-paper">
+    <p className="fb-sample-kicker">{section.kicker}</p>
+    <h3>{section.title}</h3>
+    <p>{section.intro}</p>
+    {section.blocks?.map(block => <div className="fb-sample-block" key={block.heading}>
+      <h4>{block.heading}</h4>
+      {block.lines.map(([de, en]) => <div className="fb-word-row" key={de}><strong>{de}</strong><span>{en}</span></div>)}
+    </div>)}
+    {section.questions?.map(question => <div key={question.prompt} className="fb-sample-block">
+      <h4>{question.prompt}</h4>
+      {question.choices.map((choice, index) => <div className="fb-answer" key={choice}>
+        <span aria-hidden="true" className="fb-answer-ring" /> {String.fromCharCode(97 + index)}. {choice}
+      </div>)}
+    </div>)}
+    {section.passage && <div className="fb-sample-block"><h4>Teil 1 · Reading text</h4>
+      <p lang="de">{section.passage}</p><h4>Translation</h4><p>{section.translation}</p>
+      <div className="fb-answer"><strong>Sample question:</strong> {section.question}</div>
+    </div>}
+    <span className="fb-sample-mark">FREE SAMPLE · FALOWEN A1</span>
+  </div>;
+}
+
+async function exportFreeSample() {
+  const { jsPDF } = await import("jspdf");
+  const pdf = new jsPDF({ unit: "mm", format: "a4" });
+  const W = 210, margin = 20;
+  let y = 20;
+  const wrap = (txt, size = 11, lineHeight = 6) => {
+    pdf.setFontSize(size);
+    pdf.setFont("helvetica", "normal");
+    for (const line of pdf.splitTextToSize(String(txt), W - margin * 2)) {
+      if (y + lineHeight > 280) { pdf.addPage(); y = 20; }
+      pdf.text(line, margin, y);
+      y += lineHeight;
+    }
+  };
+  const heading = (txt, size = 15) => {
+    if (y > 260) { pdf.addPage(); y = 20; }
+    pdf.setTextColor(24, 66, 117);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(size);
+    pdf.text(String(txt), margin, y);
+    y += size / 2 + 5;
+    pdf.setTextColor(33, 46, 67);
+  };
+  pdf.setProperties({ title: "Falowen Deutsch A1 – Free Sample", author: "Falowen", subject: "Selected A1 Day 1 workbook excerpts" });
+  pdf.setFillColor(13, 37, 76); pdf.rect(0, 0, 210, 70, "F");
+  pdf.setTextColor(255, 255, 255); pdf.setFont("helvetica", "bold"); pdf.setFontSize(17);
+  pdf.text("FALOWEN", margin, 24);
+  pdf.setFontSize(29); pdf.text("Deutsch A1", margin, 43);
+  pdf.setFontSize(13); pdf.text("Course & Workbook | FREE SAMPLE", margin, 57);
+  pdf.setTextColor(33, 46, 67); y = 89;
+  wrap("Selected excerpts from Day 1 of the Falowen A1 course materials. This is a reformatted preview; exact printed page design may differ.", 11, 7);
+  y += 6; heading("What you can explore", 16);
+  wrap("Formal greetings, real practice questions, and a short workbook reading task.", 12, 7);
+  wrap("Original book: 250 pages across 22 printable lesson days. Digital edition GH₵99; printed edition GH₵800 (delivery extra).", 10, 7);
+  for (const s of A1_SAMPLE_SECTIONS) {
+    pdf.addPage(); y = 22; heading(s.kicker, 11); heading(s.title, 18);
+    wrap(s.intro, 11, 7); y += 6;
+    for (const block of s.blocks || []) {
+      heading(block.heading, 13);
+      for (const [a,b] of block.lines) { wrap(a + " — " + b, 11, 7); }
+      y += 5;
+    }
+    for (const q of s.questions || []) {
+      heading(q.prompt, 12); q.choices.forEach((choice,i) => wrap("    " + String.fromCharCode(97+i) + ". " + choice, 11, 7)); y += 6;
+    }
+    if (s.passage) { heading("Reading text", 13); wrap(s.passage, 11, 7); y += 8; heading("Translation", 13); wrap(s.translation, 11, 7); y += 7; heading("Sample question", 13); wrap(s.question, 11, 7); }
+  }
+  const count = pdf.getNumberOfPages();
+  for (let i=1;i<=count;i++) {
+    pdf.setPage(i); pdf.setDrawColor(210, 223, 235); pdf.line(20, 286, 190, 286);
+    pdf.setFont("helvetica", "normal"); pdf.setFontSize(8); pdf.setTextColor(105, 117, 134);
+    pdf.text("Falowen A1 - free educational sample | www.falowen.app/books", 20, 291);
+    pdf.text(String(i) + " / " + count, 190, 291, { align: "right" });
+  }
+  pdf.save("Falowen-Deutsch-A1-Free-Sample.pdf");
+}
+
+function ReceiptConfirmation() {
+  const query = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
+  const orderId = query.get("order"), key = query.get("key");
+  const [order, setOrder] = useState(null), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const lookup = `/books/order?order=${encodeURIComponent(orderId || "")}&key=${encodeURIComponent(key || "")}`;
+  async function refresh() {
+    if (!orderId || !key) { setError("The order link is incomplete. Keep your Paystack receipt for assistance."); return; }
     setBusy(true); setError("");
     try {
       await request("/books/verify", { method: "POST", body: JSON.stringify({ order: orderId, key }) });
-      setOrder(await request(orderLookup));
-    } catch (e) {
-      // The saved order may still have been paid by the signed webhook.
-      try { setOrder(await request(orderLookup)); } catch (_) { /* keep the first error */ }
-      setError(e.message);
-    } finally { setBusy(false); }
+    } catch (e) { setError(e.message); }
+    try { setOrder(await request(lookup)); } catch (e) { setError(e.message); } finally { setBusy(false); }
   }
-  useEffect(() => {
-    if (!completed || !orderId || !key) return;
-    let active = true;
-    // Paystack recommends server-side transaction verification on return.
-    request("/books/verify", { method: "POST", body: JSON.stringify({ order: orderId, key }) })
-      .catch(() => null)
-      .then(() => request(orderLookup))
-      .then(data => { if (active) setOrder(data); })
-      .catch(e => { if (active) setError(e.message); });
-    return () => { active = false; };
-  }, [completed, orderId, key]);
+  useEffect(() => { void refresh(); /* one verification on return */ }, [orderId, key]);
   const copyReceipt = async () => {
-    if (!order || !navigator.clipboard?.writeText) {
-      setError("Copy is unavailable on this device. You can select the order and Paystack reference displayed above.");
-      return;
-    }
+    if (!order || !navigator.clipboard?.writeText) return setError("Please select the receipt reference displayed below.");
     try {
       await navigator.clipboard.writeText([
-        "Falowen A1 book payment details",
-        `Book: ${order.title}`,
-        `Edition: ${order.format}`,
-        `Order: ${order.orderId}`,
+        "Falowen A1 book payment details", `Book: ${order.title}`,
+        `Edition: ${order.format}`, `Order: ${order.orderId}`,
         `Paystack reference: ${order.reference}`,
         `Amount: ${money(order.priceGhs)}`,
-        `Status: ${order.status === "paid" ? "Verified by Falowen" : "Not yet verified"}`,
+        `Status: ${order.status === "paid" ? "Verified by Falowen" : "Not yet verified"}`
       ].join("\n"));
-    } catch (_) { setError("Could not copy the details. You can select the Paystack reference displayed above."); }
+    } catch (_) { setError("Copy failed. You can select the reference displayed below."); }
   };
-  const selected = books.find(b => b.id === bookId);
-  const buy = async e => {
-    e.preventDefault();
-    setError(""); setBusy(true);
+  return <main className="fb-page fb-receipt-page"><div className="fb-receipt-wrap">
+    <a className="fb-top-back" href="/books">← Back to Books</a>
+    <div className="fb-receipt-card">
+      <span className="fb-eyebrow">FALOWEN · SECURE ORDER</span>
+      <h1>Book payment confirmation</h1>
+      <p>A return from Paystack is not proof of payment. Only verified transactions are marked paid.</p>
+      {order ? <div className="fb-receipt-detail" aria-live="polite">
+        <div className={"fb-payment-state " + (order.status === "paid" ? "is-paid" : "")}>
+          {order.status === "paid" ? "✓ Payment verified with Paystack" : order.status === "rejected" ? "Payment needs review" : "Awaiting secure confirmation"}
+        </div>
+        <dl>
+          <dt>Book</dt><dd>{order.title}</dd>
+          <dt>Order ID</dt><dd><code>{order.orderId}</code></dd>
+          <dt>Paystack reference</dt><dd><code>{order.reference}</code></dd>
+          <dt>Amount</dt><dd><strong>{money(order.priceGhs)}</strong></dd>
+        </dl>
+        <p>{order.status === "paid"
+          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : "Falowen will arrange the PDF manually. No automatic download is issued."
+          : "If you have been charged, do not pay a second time. Retain your Paystack receipt and check again."}</p>
+        <button type="button" className="fb-btn fb-btn-ghost" onClick={copyReceipt}>Copy receipt details</button>
+      </div> : null}
+      {error ? <p className="fb-error" role="alert">{error}</p> : null}
+      <button type="button" className="fb-btn fb-btn-primary" disabled={busy} onClick={refresh}>
+        {busy ? "Checking with Paystack…" : "Check payment status"}
+      </button>
+    </div>
+  </div></main>;
+}
+
+export default function BookStoreCheckout({ completed = false }) {
+  const [books, setBooks] = useState([]), [enabled, setEnabled] = useState(false);
+  const [bookId, setBookId] = useState("a1-digital");
+  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
+  const [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview"), [sampleId, setSampleId] = useState("grammar");
+  const [openFaq, setOpenFaq] = useState(0), [downloadBusy, setDownloadBusy] = useState(false);
+
+  useEffect(() => {
+    const previous = document.title;
+    document.title = completed ? "Book payment confirmation | Falowen" : "Falowen Deutsch A1 Course & Workbook | Digital & Print";
+    return () => { document.title = previous; };
+  }, [completed]);
+  useEffect(() => {
+    if (completed) return;
+    let active = true;
+    request("/books/catalog").then(payload => {
+      if (!active) return;
+      setBooks(payload.books || []);
+      setEnabled(Boolean(payload.paymentsEnabled));
+    }).catch(e => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [completed]);
+
+  const selected = useMemo(() => books.find(b => b.id === bookId), [books,bookId]);
+  const sample = A1_SAMPLE_SECTIONS.find(s => s.id === sampleId);
+  const buy = async event => {
+    event.preventDefault(); setBusy(true); setError("");
     try {
-      const data = await request("/books/checkout", { method: "POST", body: JSON.stringify({ bookId, ...customer }) });
-      const url = new URL(data.authorization_url);
-      if (url.protocol !== "https:" || !["checkout.paystack.com", "paystack.com"].includes(url.hostname)) {
-        throw new Error("Unexpected payment page. Please contact Falowen.");
-      }
+      const result = await request("/books/checkout", { method: "POST", body: JSON.stringify({ bookId, ...customer }) });
+      const url = new URL(result.authorization_url);
+      if (url.protocol !== "https:" || !["checkout.paystack.com", "paystack.com"].includes(url.hostname)) throw Error("Unexpected payment page.");
       window.location.assign(url.toString());
     } catch (e) { setError(e.message); setBusy(false); }
   };
-  return <main style={styles.page}>
-    <div style={styles.wrap}>
-      <a href="/" style={{ color: "#146c65", textDecoration: "none", fontWeight: 650 }}>← Falowen</a>
-      <div style={{ padding: "20px 0 16px" }}>
-        <span style={{ fontSize: 12, letterSpacing: 1.5, color: "#146c65", fontWeight: 800 }}>FALOWEN BOOKS</span>
-        <h1 style={{ fontSize: "clamp(26px, 5vw, 38px)", margin: "8px 0" }}>
-          {completed ? "A1 book payment confirmation" : "Deutsch A1 – Course & Workbook"}
-        </h1>
-        <p style={{ color: "#526378", margin: 0 }}>
-          {completed ? "Payment is confirmed only after Paystack notifies Falowen." : "Choose the digital edition or a printed copy. Printed books are made to order."}
-        </p>
-      </div>
-      {completed ? <section style={styles.card} aria-live="polite">
-        {!order && !error ? <p>Checking your order…</p> : null}
-        {order && <><h2 style={{ marginTop: 0 }}>{order.title}</h2>
-          <p><strong>Order:</strong> {order.orderId}</p>
-          <p><strong>Price:</strong> {money(order.priceGhs)}</p>
-          <p><strong>Paystack transaction reference:</strong> <code style={{ overflowWrap: "anywhere" }}>{order.reference}</code></p>
-          <p><strong>Payment:</strong> {order.status === "paid" ? "Verified with Paystack" : order.status === "rejected" ? "Needs manual review" : "Awaiting Paystack confirmation"}</p>
-          {order.status === "paid" ? <div>
-            <p>Payment verified. Save your Paystack email receipt and this reference for your records.</p>
-            <p>{order.format === "printed"
-              ? "Your printed copy will be arranged manually; delivery is charged separately."
-              : "Falowen will arrange your digital PDF manually. There is no automatic download yet."}</p>
-            <p>For delivery or access enquiries, provide the Paystack reference shown above so the payment can be matched in the Paystack Dashboard.</p>
-          </div> :
-            <p>Returning from Paystack does not mean payment succeeded. If money has been deducted, do not pay a second time. Keep your Paystack receipt and check again shortly.</p>}
-          <button type="button" style={{ ...styles.button, marginRight: 10, marginBottom: 10, background: "#334155" }} onClick={copyReceipt}>Copy order and receipt details</button>
-        </>}
-        {error ? <p role="alert" style={{ color: "#ae2525" }}>{error}</p> : null}
-        <button type="button" style={styles.button} disabled={busy} onClick={refreshOrder}>{busy ? "Checking…" : "Check payment status"}</button>
-      </section> : <>
-        <section style={styles.card}>
-          <h2 style={{ marginTop: 0 }}>Choose your edition</h2>
-          {books.length ? books.map(book => <label key={book.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: 15, marginTop: 10, borderRadius: 10, cursor: "pointer", border: bookId === book.id ? "2px solid #146c65" : "1px solid #cbd7df" }}>
-            <input type="radio" name="edition" checked={bookId === book.id} onChange={() => setBookId(book.id)} />
-            <span style={{ flex: 1 }}><strong>{book.format === "printed" ? "Printed book" : "Digital PDF"}</strong>
-              <small style={{ display: "block", color: "#66788a", marginTop: 4 }}>{book.format === "printed" ? "Printed on demand; delivery charged separately" : "Digital access arranged after payment confirmation"}</small>
-            </span>
-            <strong>{money(book.priceGhs)}</strong>
-          </label>) : <p>Loading available editions…</p>}
-        </section>
-        <section style={styles.card}>
-          <h2 style={{ marginTop: 0 }}>Payment details</h2>
-          <p style={{ color: "#526378" }}>Your contact details are used to confirm your purchase and arrange delivery or digital access.</p>
-          <form onSubmit={buy}>
+  const download = async () => {
+    setDownloadBusy(true); setError("");
+    try { await exportFreeSample(); } catch (e) { setError("The sample could not be created on this device. You can still read the preview below."); }
+    finally { setDownloadBusy(false); }
+  };
+  if (completed) return <ReceiptConfirmation />;
+  return <main className="fb-page">
+    <div className="fb-topbar"><div className="fb-shell fb-topbar-inner">
+      <a href="/" className="fb-brand" aria-label="Falowen homepage">
+        <span className="fb-brand-symbol">F</span><strong>FALOWEN</strong><span className="fb-brand-divider" /><span>BOOKS</span>
+      </a>
+      <a className="fb-top-back" href="/">← Back to Falowen</a>
+    </div></div>
+    <div className="fb-shell">
+      <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>German A1 Book</strong></nav>
+      <section className="fb-hero" aria-label="Falowen Deutsch A1 book">
+        <div className="fb-visual-col">
+          <div className="fb-cover-stage">
+            <div className="fb-cover-perspective"><img src="/books/a1-cover.svg" alt="Falowen Deutsch A1 Course and Workbook front cover" className="fb-main-cover" /></div>
+            <div className="fb-cover-shine" aria-hidden="true" />
+          </div>
+          <div className="fb-cover-caption"><span className="fb-caption-dot" /> Original Falowen learning materials · CEFR A1</div>
+          <button type="button" className="fb-preview-link" onClick={() => {setActiveTab("sample");document.getElementById("fb-book-details")?.scrollIntoView({behavior:"smooth",block:"start"});}}>
+            <span aria-hidden="true">▤</span> Read a free sample <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+        <div className="fb-book-intro">
+          <div className="fb-pills"><span>A1 · BEGINNER</span><span>GRAMMAR + WORKBOOK</span></div>
+          <p className="fb-eyebrow">FALOWEN LANGUAGE LIBRARY</p>
+          <h1>Deutsch <em>A1</em><span>Course &amp; Workbook</span></h1>
+          <p className="fb-lede">A clear, practical introduction to German—from your first greeting to confident everyday conversations.</p>
+          <p className="fb-description">Structured grammar explanations, vocabulary in context, short knowledge checks and guided workbook activities in one beginner-friendly resource.</p>
+          <div className="fb-book-stats">
+            <div><strong>250</strong><small>pages</small></div>
+            <div><strong>22</strong><small>lesson days</small></div>
+            <div><strong>A1</strong><small>CEFR level</small></div>
+          </div>
+          <ul className="fb-feature-list">
+            <li>Step-by-step grammar, with practical German examples</li>
+            <li>Everyday speaking, reading and writing practice</li>
+            <li>Useful for classroom learning and independent revision</li>
+            <li>Free sample available before purchase</li>
+          </ul>
+          <div className="fb-intro-actions">
+            <a className="fb-btn fb-btn-primary" href="#fb-purchase">Choose your edition <span aria-hidden="true">→</span></a>
+            <button type="button" className="fb-btn fb-btn-soft" onClick={() => {setActiveTab("sample");document.getElementById("fb-book-details")?.scrollIntoView({behavior:"smooth"});}}>Explore the book</button>
+          </div>
+        </div>
+        <aside className="fb-purchase-card" id="fb-purchase">
+          <div className="fb-purchase-header"><span className="fb-eyebrow">CHOOSE YOUR EDITION</span><h2>Start with A1</h2><p>One book. Two ways to learn.</p></div>
+          <div className="fb-editions" role="radiogroup" aria-label="Choose book edition">
+            {books.length ? books.map(book => <label key={book.id} className={"fb-edition" + (bookId === book.id ? " selected" : "")}>
+              <input type="radio" name="edition" checked={bookId === book.id} onChange={() => setBookId(book.id)} />
+              <span className="fb-edition-icon" aria-hidden="true">{book.format === "digital" ? "▧" : "▤"}</span>
+              <span className="fb-edition-label"><strong>{book.format === "digital" ? "Digital PDF" : "Printed book"}</strong>
+                <small>{book.format === "digital" ? "Manual PDF delivery" : "Printed on demand"}</small>
+              </span>
+              <span className="fb-edition-price">{money(book.priceGhs).replace(".00","")}</span>
+            </label>) : <p className="fb-muted">Loading editions…</p>}
+          </div>
+          {selected?.format === "printed" && <p className="fb-shipping-note">Print orders are produced after payment. Delivery is arranged and charged separately.</p>}
+          <form onSubmit={buy} className="fb-form">
+            <p className="fb-form-title">Your contact details</p>
             {[
-              ["name", "Full name", "text"],
-              ["email", "Email address", "email"],
-              ["phone", "Phone / WhatsApp number", "tel"],
-            ].map(([id, label, type]) => <label key={id} style={{ display: "block", margin: "12px 0", fontWeight: 650 }}>
-              {label}<input style={styles.input} type={type} required value={customer[id]}
-                onChange={e => setCustomer(prev => ({ ...prev, [id]: e.target.value }))} />
+              ["name","Full name","text","Your full name"],
+              ["email","Email address","email","you@example.com"],
+              ["phone","Phone / WhatsApp","tel","e.g. +233 ..."],
+            ].map(([id,label,type,placeholder]) => <label key={id}>{label}
+              <input required type={type} placeholder={placeholder} autoComplete={id === "name" ? "name" : id === "email" ? "email" : "tel"} value={customer[id]}
+                onChange={e => setCustomer(prev=>({...prev,[id]:e.target.value}))} />
             </label>)}
-            {selected && <p style={{ padding: "12px 0", fontWeight: 750 }}>Book price: {money(selected.priceGhs)} {selected.format === "printed" ? "· Delivery not included" : ""}</p>}
-            <p style={{ color: "#637486", fontSize: 13 }}>
-              Paystack will process your payment securely. Keep the Paystack receipt and transaction reference; Falowen will arrange the book manually after verification. Delivery for printed orders is charged separately.
-            </p>
-            {error ? <p role="alert" style={{ color: "#ae2525" }}>{error}</p> : null}
-            <button type="submit" style={{ ...styles.button, opacity: !enabled || !selected || busy ? .55 : 1, cursor: !enabled ? "not-allowed" : "pointer" }}
-              disabled={!enabled || !selected || busy}>
-              {!enabled ? "Book payments opening soon" : busy ? "Opening Paystack…" : `Pay securely · ${money(selected.priceGhs)}`}
+            <div className="fb-total"><span>Book price</span><strong>{selected ? money(selected.priceGhs) : "—"}</strong></div>
+            {error && <p className="fb-error" role="alert">{error}</p>}
+            <button type="submit" className="fb-btn fb-btn-primary fb-pay" disabled={!enabled || !selected || busy}>
+              {busy ? "Opening secure checkout…" : !enabled ? "Checkout temporarily unavailable" : `Continue to Paystack · ${money(selected.priceGhs)}`}
             </button>
           </form>
-        </section>
-      </>}
+          <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack. Keep your transaction receipt.</p>
+          <p className="fb-manual-note">Falowen arranges your book after payment verification. No automatic PDF download or delivery tracking.</p>
+        </aside>
+      </section>
+      <section id="fb-book-details" className="fb-details">
+        <div className="fb-tabbar" role="tablist" aria-label="Book information">
+          {sections.map(id => <button key={id} type="button" role="tab" aria-selected={activeTab === id} className={activeTab===id?"active":""} onClick={()=>setActiveTab(id)}>
+            {({overview:"Overview",contents:"What's inside",sample:"Free sample",faq:"Questions"})[id]}
+          </button>)}
+        </div>
+        {activeTab === "overview" && <div className="fb-tab-content fb-overview">
+          <div><span className="fb-eyebrow">ABOUT THE BOOK</span><h2>Learn German one practical step at a time.</h2>
+            <p>The Falowen A1 Course &amp; Workbook brings classroom grammar notes and exercises into a single structured resource. It is designed to help early-stage learners practise and revisit the basics at their own pace.</p>
+            <p>Includes grammar sections, learner exercises and activities for all 22 printable A1 lesson days. The separate final mock examination is not included in this book.</p>
+          </div>
+          <div className="fb-outcomes"><h3>By the end of your A1 foundation</h3>
+            <ul><li>Greet and introduce yourself</li><li>Talk about family, prices, time and daily activities</li><li>Understand articles, basic cases and modal verbs</li><li>Write short messages and practise everyday exchanges</li></ul>
+          </div>
+        </div>}
+        {activeTab === "contents" && <div className="fb-tab-content"><span className="fb-eyebrow">LEARNING JOURNEY</span><h2>From day one to confident basics</h2>
+          <div className="fb-topic-grid">{BOOK_DETAILS.map(x => <div className="fb-topic" key={x.icon}>
+            <span>{x.icon}</span><h3>{x.title}</h3><p>{x.text}</p>
+          </div>)}</div>
+          <p className="fb-muted">The PDF covers 22 printed lesson days. Day 0 (platform orientation) and the final A1 mock exam (Day 23) remain online rather than in the book.</p>
+        </div>}
+        {activeTab === "sample" && <div className="fb-tab-content">
+          <div className="fb-sample-heading"><div><span className="fb-eyebrow">SEE BEFORE YOU BUY</span><h2>A real look inside Day 1</h2><p>{A1_SAMPLE_DISCLOSURE}</p></div>
+            <button type="button" className="fb-btn fb-btn-primary" onClick={download} disabled={downloadBusy}>{downloadBusy ? "Preparing PDF…" : "↓ Download free sample PDF"}</button>
+          </div>
+          <div className="fb-sample-layout"><div className="fb-sample-menu" aria-label="Sample section selector">
+            {A1_SAMPLE_SECTIONS.map(s => <button type="button" key={s.id} className={sampleId===s.id?"active":""} onClick={()=>setSampleId(s.id)}>
+              <span>{SAMPLE_LABELS[s.id]}</span><small>{s.kicker}</small>
+            </button>)}
+          </div><SampleContent section={sample} /></div>
+        </div>}
+        {activeTab === "faq" && <div className="fb-tab-content fb-faq"><span className="fb-eyebrow">GOOD TO KNOW</span><h2>Frequently asked questions</h2>
+          {FAQ.map((item,i)=><div className="fb-faq-item" key={item.question}>
+            <button type="button" aria-expanded={openFaq===i} onClick={()=>setOpenFaq(openFaq===i?-1:i)}>
+              <strong>{item.question}</strong><span aria-hidden="true">{openFaq===i?"−":"+"}</span>
+            </button>
+            {openFaq===i && <p>{item.answer}</p>}
+          </div>)}
+        </div>}
+      </section>
+      <footer className="fb-footer"><span>© {new Date().getFullYear()} Falowen · German learning made practical</span><a href="/">Return to Falowen</a></footer>
     </div>
   </main>;
 }

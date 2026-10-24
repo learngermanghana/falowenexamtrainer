@@ -45,6 +45,9 @@ try {
 }
 
 if (level === "A1") {
+  if (/Editorial review copy\s*[-–—]\s*not for sale/i.test(text) || /EDITORIAL PROOF\s*[-–—]\s*NOT FOR SALE/i.test(text)) {
+    throw new Error("Retail A1 PDF still contains the editorial not-for-sale cover.");
+  }
   const chromeLeaks = findA1PrintChromeLeaks(text);
   if (chromeLeaks.length) throw new Error("A1 PDF web-only UI preflight failed: " + chromeLeaks.join(", "));
   const privacyLeaks = findA1PrintPrivacyLeaks(text);
