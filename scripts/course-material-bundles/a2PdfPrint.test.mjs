@@ -18,6 +18,9 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
  assert.match(a2PrintCss,/break-inside: auto/);
  assert.match(a2PrintCss,/data-course-inline-practice/);
  assert.match(a2PrintCss,/data-workbook-tab-navigation/);
+ const sanitizer=fs.readFileSync(path.join(dir,"a2PdfPrint.mjs"),"utf8");
+ assert.match(sanitizer,/section === "workbook-teil-2"/);
+ assert.match(sanitizer,/Schreiben · Your answer/);
 });
 
 test("A2 print is triggered from Playwright only, other levels keep prior CSS",()=>{
