@@ -58,7 +58,11 @@ const hasLessonContent = async (page, lesson) => {
   if (level === "A2") {
     const nav = page.locator("[data-workbook-tab-navigation]").first();
     if (!(await nav.isVisible().catch(() => false))) return false;
-    return (await nav.getByRole("tab", { name: /Grammar|Grammatik|Teil\\s*[1-4]/i }).count()) >= 2;
+    // Count real accessible workbook controls; do not parse translated Teil labels.
+    // The old escaped-whitespace regex rejected genuine A2 navigation.
+    const tabs = nav.getByRole("tab");
+    return (await tabs.count()) >= 2 &&
+      (await nav.getByRole("tab", { name: /^Grammar/i }).count()) === 1;
   }
   const title = String(lesson?.title || "").trim();
   if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
