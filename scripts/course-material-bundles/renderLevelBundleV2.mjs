@@ -11,6 +11,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const level = String(process.argv[2] || "").trim().toUpperCase();
 const baseUrl = String(process.env.FALOWEN_PDF_BASE_URL || "https://www.falowen.app").replace(/\/$/, "");
+const a2EditorialLocal = level === "A2" && process.env.FALOWEN_A2_EDITORIAL_PRINT === "true";
+// Never permit an editorial preview against Falowen production, a public
+// preview, or a non-loopback host. Print-only access is not a student role.
+if (a2EditorialLocal) {
+  const target = new URL(baseUrl);
+  if (target.protocol !== "http:" ||
+    !["127.0.0.1", "localhost"].includes(target.hostname) ||
+    target.port !== "4173" || target.username || target.password) {
+    throw new Error("A2 editorial print requires a local-only Vite server on http://127.0.0.1:4173.");
+  }
+}
 const outputDir = path.join(repoRoot, "artifacts", "course-material-bundles", level);
 const manifestPath = path.join(outputDir, `Falowen-${level}-Course-Materials-manifest.json`);
 const finalPdfPath = path.join(outputDir, `Falowen-${level}-Course-Materials.pdf`);
@@ -561,6 +572,15 @@ const mergeBundle = async (renderedLessons) => {
 const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, storageState: storageStateFromEnv() });
 const page = await context.newPage();
+if (a2EditorialLocal) {
+  // This flag exists only inside this private local browser context.
+  // The A2 React component also requires Vite DEV and loopback hostname.
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__FALOWEN_A2_PDF_EDITORIAL__", {
+      value: true, writable: false, configurable: false,
+    });
+  });
+}
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
 const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
