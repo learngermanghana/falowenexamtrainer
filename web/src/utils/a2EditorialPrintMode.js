@@ -9,5 +9,6 @@ export const isLocalA2EditorialPrintMode = ({
   envDev === true &&
   marker === true &&
   location?.protocol === "http:" &&
+  location?.port === "4173" &&
   (location?.hostname === "127.0.0.1" || location?.hostname === "localhost")
 );
