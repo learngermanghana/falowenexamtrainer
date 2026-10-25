@@ -114,6 +114,8 @@ jobs:
           exit "$status"
 
       - name: Activate verified A1 book checkout after API deployment
+        # Book commerce is a separate release. Deploying unrelated exam mocks must not activate sales.
+        if: ${{ vars.FALOWEN_BOOK_PAYMENTS_RELEASE_APPROVED == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
