@@ -4511,7 +4511,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     const email = String(req.body?.email || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId = String(req.body?.mockId || "a2-mock-01");
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId) && !isA2KombiMock(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
     if (attemptId) {
       const db = getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
@@ -5592,6 +5592,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
     return res.status(500).json({ error: err.message || "Could not save the A1 mock attempt." });
   }
 });
+const { isA2KombiMock, VERSION: A2_KOMBI_VERSION } = require("./a2KombiMockContract");
 app.post("/a2-mock/attempt/start", async (req, res) => {
   let authedUser;
   try {
@@ -5599,7 +5600,8 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId) && !isA2KombiMock(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
+    const assessmentVersion = isA2KombiMock(mockId) ? A2_KOMBI_VERSION : "four-module-v1";
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5625,13 +5627,14 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
               firstAttempt: Boolean(activeData.firstAttempt),
               state: activeData.state || null,
               resumed: true,
+              assessmentVersion:activeData.assessmentVersion || assessmentVersion,
             };
             return;
           }
         }
       }
 
-      const isSecondMock = mockId === "a2-mock-02";
+      const isSecondMock = mockId === "a2-mock-02" || isA2KombiMock(mockId);
       const attemptCount = Math.max(0, Number(isSecondMock
         ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));
       const attemptNumber = attemptCount + 1;
@@ -5653,6 +5656,8 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         uid: authedUser.uid,
         email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
         mockId,
+        assessmentVersion,
+        scoredSections:isA2KombiMock(mockId)?["lesen","schreiben","sprechen"]:["lesen","hoeren","schreiben","sprechen"],
         attemptNumber,
         firstAttempt: attemptNumber === 1,
         status: "in_progress",
@@ -5669,6 +5674,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         firstAttempt: attemptNumber === 1,
         state: null,
         resumed: false,
+        assessmentVersion,
       };
     });
 
@@ -5726,6 +5732,12 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
       }
 
       const existing = attemptSnap.data() || {};
+      if (isA2KombiMock(existing.mockId) &&
+          (state?.mockId !== existing.mockId || state.assessmentVersion !== A2_KOMBI_VERSION ||
+           existing.assessmentVersion !== A2_KOMBI_VERSION)) {
+        saveOutcome = {invalidCompletion:true,code:"ASSESSMENT_TASK_CHANGED",error:"This A2 attempt belongs to another mock or scoring version."};
+        return;
+      }
       if (existing.uid && existing.uid !== authedUser.uid) {
         saveOutcome = { forbidden: true };
         return;
@@ -6768,7 +6780,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     }));
 
     const mockId = String(req.body?.mockId || "a2-mock-01");
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
+    if (!["a2-mock-01", "a2-mock-02"].includes(mockId) && !isA2KombiMock(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
     // Mock 2 is a browser-local practice flow. Never persist its scores into a
     // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
     if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
