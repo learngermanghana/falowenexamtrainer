@@ -34,6 +34,8 @@ test("A2 section readiness rejects loading shell and wrong panel",()=>{
  assert.equal(a2SectionReady("teil-1",{headings:["Teil 1 · Sprechen"],text:words}),true);
  assert.equal(a2SectionReady("teil-3",{headings:["Teil 2 · Schreiben"],text:words}),false);
  assert.equal(a2SectionReady("grammar",{headings:["Grammar"],text:"Loading the app "+words}),false);
+ assert.equal(a2SectionReady("grammar",{headings:["Adjective Declension"],text:words,grammarVisible:true}),true);
+ assert.equal(a2SectionReady("grammar",{headings:["A2 workbook"],text:words,grammarVisible:false}),false);
  assert.equal(a2SectionReady("teil-4",{headings:["Hören · Aufgabe"],text:words}),true);
  assert.equal(a2SectionReady("teil-3",{headings:["Lesen"],text:"A2"}),false);
 });
