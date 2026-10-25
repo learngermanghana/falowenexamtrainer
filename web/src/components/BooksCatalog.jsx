@@ -24,10 +24,12 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
   });
 };
 
-const GUIDE_URLS = Object.freeze({
-  "a1-writing-model-exams": "/books/goethe-a1-writing-model-exams",
-  "a2-four-skills-exam-guide": "/books/goethe-a2-four-skills-exam-guide",
-  "b1-four-skills-exam-guide": "/books/goethe-b1-four-skills-exam-guide",
+const BOOK_PAGES = Object.freeze({
+  "a1-course-workbook": {href:"/books/deutsch-a1-course-workbook",cover:"/books/a1-cover.svg"},
+  "writing-skills-a1-c2": {href:"/books/how-to-unlock-your-german-writing-skills-a1-c2",cover:"/books/writing-skills-a1-c2-cover.svg"},
+  "a1-writing-model-exams": {href:"/books/goethe-a1-writing-model-exams",cover:"/books/a1-writing-exams-cover.svg"},
+  "a2-four-skills-exam-guide": {href:"/books/goethe-a2-four-skills-exam-guide",cover:"/books/a2-exam-guide-cover.svg"},
+  "b1-four-skills-exam-guide": {href:"/books/goethe-b1-four-skills-exam-guide",cover:"/books/b1-exam-guide-cover.svg"},
 });
 
 export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook }) {
@@ -43,7 +45,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
       <div>
         <p className="fb-eyebrow">FALOWEN BOOK LIBRARY</p>
         <h1>Find your next German learning book</h1>
-        <p>Search by title, level, grammar topic, writing skill or book format.</p>
+        <p>Browse book covers, prices and formats. Select View Book for previews and checkout.</p>
       </div>
       <div className="fb-library-fx">
         <strong>GHS is the checkout currency.</strong>
@@ -78,6 +80,10 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
         const available = title.status === "available";
         const offers = books.filter(book => (title.bookIds || []).includes(book.id));
         return <article key={title.id} className="fb-library-card">
+          {BOOK_PAGES[title.id] && <a className="fb-library-cover-link" href={BOOK_PAGES[title.id].href}
+              aria-label={"View " + title.title}>
+            <img src={BOOK_PAGES[title.id].cover} alt={title.title + " cover"} loading="lazy" width="190" height="269" />
+          </a>}
           <div className="fb-library-cardmeta">
             <span>{(title.levelTags || []).join(" · ")}</span><span>{title.pages} pages</span>
           </div>
@@ -90,18 +96,12 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
               </strong>
             </div>) : <p className="fb-library-coming">Coming soon · Price to be announced</p>}
           </div>
-          {available && offers.length
-            ? GUIDE_URLS[title.id]
-              ? <a className="fb-btn fb-btn-soft fb-library-action" href={GUIDE_URLS[title.id]}>
-                  View editions and buy</a>
-              : <button className="fb-btn fb-btn-soft fb-library-action" type="button"
-                  onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
-            : <div>
-                {GUIDE_URLS[title.id]
-                  ? <a className="fb-btn fb-btn-soft fb-library-action" href={GUIDE_URLS[title.id]}>
-                      View book details</a> : null}
-                <p className="fb-library-pending">Please check availability before ordering.</p>
-              </div>}
+          {BOOK_PAGES[title.id]
+            ? <a className="fb-btn fb-btn-soft fb-library-action" href={BOOK_PAGES[title.id].href}>View Book</a>
+            : available && offers.length && onSelectBook
+              ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
+                  onClick={() => onSelectBook(offers[0].id)}>View Book</button>
+              : <p className="fb-library-pending">Ask Falowen about availability.</p>}
         </article>;
       })}
       {!results.length && <div className="fb-library-empty">

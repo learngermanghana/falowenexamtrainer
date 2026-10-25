@@ -27,3 +27,20 @@
 .fb-total-prices small{font-size:11px;color:#527b9f}
 @media (max-width:880px){.fb-library-heading{align-items:start;flex-direction:column}.fb-library-fx{max-width:none;width:100%}.fb-library-tools{grid-template-columns:minmax(0,1fr) 1fr}.fb-library-tools label:first-child{grid-column:1/-1}}
 @media (max-width:640px){.fb-library-grid{grid-template-columns:1fr}.fb-library-card{padding:19px}.fb-library-heading{gap:18px}.fb-library-tools{gap:9px}.fb-library-tools input,.fb-library-tools select{font-size:13px;padding:10px 8px}.fb-library-offer strong{font-size:15px}}
+
+/* Calm, cover-first bookstore: no checkout forms on the catalogue page. */
+.fb-library{padding-top:0;border:0;margin-bottom:0}
+.fb-library-heading h1{font-size:clamp(27px,3.2vw,40px)}
+.fb-library-grid{grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;align-items:stretch}
+.fb-library-card{padding:18px;gap:9px}
+.fb-library-cover-link{display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#ebf4fe,#f5f9ff);padding:22px 20px;text-decoration:none;min-height:275px}
+.fb-library-cover-link img{width:auto;height:245px;max-width:100%;border-radius:3px;filter:drop-shadow(5px 11px 10px rgba(16,49,79,.18));object-fit:contain;transition:transform .2s ease}
+.fb-library-cover-link:hover img,.fb-library-cover-link:focus-visible img{transform:translateY(-5px)}
+.fb-library-card h2{font-size:18px}
+.fb-library-card>p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fb-library-offers{margin-top:auto}
+.fb-library-offer{align-items:center}
+.fb-library-action{display:inline-flex;align-items:center;justify-content:center;width:100%;margin-top:10px;min-height:43px}
+@media(max-width:720px){.fb-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fb-library-card{padding:10px}.fb-library-cover-link{min-height:185px;padding:10px}.fb-library-cover-link img{height:170px}.fb-library-card h2{font-size:15px}.fb-library-offer{align-items:flex-start;flex-direction:column;gap:1px}.fb-library-offer strong{text-align:left;font-size:15px}.fb-library-offer small{white-space:normal}.fb-library-cardmeta{font-size:10px}}
+@media(max-width:350px){.fb-library-grid{grid-template-columns:1fr}.fb-library-cover-link img{height:220px}}
+@media(prefers-reduced-motion:reduce){.fb-library-cover-link img{transition:none}}

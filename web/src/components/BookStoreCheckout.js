@@ -190,11 +190,11 @@ function ReceiptConfirmation() {
   </div></main>;
 }
 
-export default function BookStoreCheckout({ completed = false }) {
+export default function BookStoreCheckout({ completed = false, catalogOnly = false, detailBook = "a1" }) {
   const [books, setBooks] = useState([]), [enabled, setEnabled] = useState(false);
   const [catalogTitles, setCatalogTitles] = useState([]);
   const [fxQuote, setFxQuote] = useState(null);
-  const [bookId, setBookId] = useState("a1-digital");
+  const [bookId, setBookId] = useState(detailBook === "writing" ? "writing-skills-a1-c2-digital" : "a1-digital");
   const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
   const [activeTab, setActiveTab] = useState("overview"), [sampleId, setSampleId] = useState("grammar");
@@ -202,9 +202,31 @@ export default function BookStoreCheckout({ completed = false }) {
 
   useEffect(() => {
     const previous = document.title;
-    document.title = completed ? "Book payment confirmation | Falowen" : "Falowen Deutsch A1 Course & Workbook | Digital & Print";
+    document.title = completed ? "Book payment confirmation | Falowen" : catalogOnly
+      ? "German Books — Workbooks and Exam Guides | Falowen"
+      : detailBook === "writing" ? "German Writing Skills A1–C2 | Falowen Books"
+      : "Falowen Deutsch A1 Course & Workbook | Digital & Print";
     return () => { document.title = previous; };
-  }, [completed]);
+  }, [completed, catalogOnly, detailBook]);
+  useEffect(() => {
+    if (completed) return undefined;
+    // Reuse the canonical that is already present in web/index.html.
+    // Two competing canonicals harm discoverability of individual book pages.
+    const existing = document.head.querySelector('link[rel="canonical"]');
+    const canonical = existing || document.createElement("link");
+    const previousHref = existing?.getAttribute("href");
+    if (!existing) { canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    const suffix = catalogOnly ? "" : detailBook === "writing"
+      ? "/how-to-unlock-your-german-writing-skills-a1-c2"
+      : "/deutsch-a1-course-workbook";
+    canonical.setAttribute("href", "https://www.falowen.app/books" + suffix);
+    return () => {
+      if (existing) {
+        if (previousHref === null) canonical.removeAttribute("href");
+        else canonical.setAttribute("href", previousHref);
+      } else canonical.remove();
+    };
+  }, [completed, catalogOnly, detailBook]);
   useEffect(() => {
     if (completed) return;
     let active = true;
@@ -230,7 +252,10 @@ export default function BookStoreCheckout({ completed = false }) {
   }, [completed]);
 
   const selected = useMemo(() => books.find(b => b.id === bookId), [books,bookId]);
-  const isWritingGuide = selected?.id === "writing-skills-a1-c2-digital";
+  const isWritingGuide = detailBook === "writing";
+  const visibleEditions = books.filter(b => isWritingGuide
+    ? b.id === "writing-skills-a1-c2-digital"
+    : b.id === "a1-digital" || b.id === "a1-printed");
   const sample = A1_SAMPLE_SECTIONS.find(s => s.id === sampleId);
   const buy = async event => {
     event.preventDefault(); setBusy(true); setError("");
@@ -247,6 +272,26 @@ export default function BookStoreCheckout({ completed = false }) {
     finally { setDownloadBusy(false); }
   };
   if (completed) return <ReceiptConfirmation />;
+  if (catalogOnly) return <main className="fb-page fb-catalog-only">
+    <div className="fb-topbar"><div className="fb-shell fb-topbar-inner">
+      <a href="/" className="fb-brand" aria-label="Falowen homepage">
+        <span className="fb-brand-symbol">F</span><strong>FALOWEN</strong>
+        <span className="fb-brand-divider" /><span>BOOKS</span>
+      </a>
+      <a className="fb-top-back" href="/">← Back to Falowen</a>
+    </div></div>
+    <div className="fb-shell">
+      <nav className="fb-breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Falowen</a><span>/</span><strong>Books</strong>
+      </nav>
+      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} />
+      {error && <p role="status" className="fb-error">Unable to load books: {error}</p>}
+      <footer className="fb-footer">
+        <span>© {new Date().getFullYear()} Falowen · German learning made practical</span>
+        <a href="/">Return to Falowen</a>
+      </footer>
+    </div>
+  </main>;
   return <main className="fb-page">
     <div className="fb-topbar"><div className="fb-shell fb-topbar-inner">
       <a href="/" className="fb-brand" aria-label="Falowen homepage">
@@ -255,11 +300,10 @@ export default function BookStoreCheckout({ completed = false }) {
       <a className="fb-top-back" href="/">← Back to Falowen</a>
     </div></div>
     <div className="fb-shell">
-      <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>Books</strong></nav>
-      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} onSelectBook={id => {
-        setBookId(id);
-        document.getElementById("fb-book-featured")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }} />
+      <nav className="fb-breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Falowen</a><span>/</span><a href="/books">Books</a><span>/</span>
+        <strong>{isWritingGuide ? "German Writing Skills" : "Deutsch A1 Course & Workbook"}</strong>
+      </nav>
       <div id="fb-book-featured" style={{scrollMarginTop:24}}>
         {isWritingGuide ? <WritingGuideDetail book={selected} fxQuote={fxQuote}
           customer={customer} onCustomerChange={(field,value) => setCustomer(prev => ({...prev,[field]:value}))}
@@ -298,9 +342,9 @@ export default function BookStoreCheckout({ completed = false }) {
           </div>
         </div>
         <aside className="fb-purchase-card" id="fb-purchase">
-          <div className="fb-purchase-header"><span className="fb-eyebrow">CHOOSE YOUR EDITION</span><h2>Start with A1</h2><p>One book. Two ways to learn.</p></div>
+          <div className="fb-purchase-header"><span className="fb-eyebrow">CHOOSE YOUR EDITION</span><h2>Choose your A1 edition</h2><p>Digital PDF or printed book, after verified payment.</p></div>
           <div className="fb-editions" role="radiogroup" aria-label="Choose book edition">
-            {books.length ? books.map(book => <label key={book.id} className={"fb-edition" + (bookId === book.id ? " selected" : "")}>
+            {visibleEditions.length ? visibleEditions.map(book => <label key={book.id} className={"fb-edition" + (bookId === book.id ? " selected" : "")}>
               <input type="radio" name="edition" checked={bookId === book.id} onChange={() => setBookId(book.id)} />
               <span className="fb-edition-icon" aria-hidden="true">{book.format === "digital" ? "▧" : "▤"}</span>
               <span className="fb-edition-label"><strong>{book.format === "digital" ? "Digital PDF" : "Printed book"}</strong>
@@ -330,7 +374,7 @@ export default function BookStoreCheckout({ completed = false }) {
             </button>
           </form>
           <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack in GHS. Keep your transaction receipt.</p>
-          <p className="fb-manual-note">Falowen arranges your book after payment verification. No automatic PDF download or delivery tracking.</p>
+          <p className="fb-manual-note">Falowen arranges your book after payment verification. Digital orders are fulfilled through Falowen after verified payment; secure downloads are provided when available.</p>
         </aside>
       </section>}
       </div>

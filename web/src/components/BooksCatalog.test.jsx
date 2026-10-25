@@ -38,17 +38,18 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     render(<BooksCatalog catalogTitles={titles} books={offers} fxQuote={{ usdToGhs: 11 }} onSelectBook={choose} />);
     expect(screen.getByText("GH₵39.00")).toBeInTheDocument();
     expect(screen.getAllByText(/Paystack charges in Ghana cedis/i)).toHaveLength(1);
-    const buttons = screen.getAllByRole("button", { name: "View book and editions" });
-    expect(buttons).toHaveLength(1);
-    const guide = screen.getByRole("button", { name: "View writing guide and buy" });
-    fireEvent.click(guide);
-    expect(choose).toHaveBeenCalledWith("writing-skills-a1-c2-digital");
-    fireEvent.click(buttons[0]);
-    expect(choose).toHaveBeenCalledWith("a1-digital");
+    const productLinks = screen.getAllByRole("link",{name:"View Book"});
+    expect(productLinks).toHaveLength(2);
+    expect(productLinks.find(el=>el.getAttribute("href")==="/books/deutsch-a1-course-workbook")).toBeTruthy();
+    expect(productLinks.find(el=>el.getAttribute("href")==="/books/how-to-unlock-your-german-writing-skills-a1-c2")).toBeTruthy();
+    expect(screen.getByRole("img",{name:/Deutsch A1.*cover/i})).toHaveAttribute("src","/books/a1-cover.svg");
+    expect(screen.getByRole("img",{name:/How to Unlock Your German Writing Skills.*cover/i}))
+      .toHaveAttribute("src","/books/writing-skills-a1-c2-cover.svg");
+    expect(screen.queryByText("Your contact details")).not.toBeInTheDocument();
+    expect(choose).not.toHaveBeenCalled();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "writing" } });
     expect(screen.getByRole("status")).toHaveTextContent("1 book found");
-    expect(screen.queryByRole("button", { name: "View book and editions" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "View writing guide and buy" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link",{name:"View Book"})).toHaveLength(1);
   });
 });
 
@@ -69,11 +70,29 @@ test("priced A1 A2 B1 guide catalog cards show editions and direct buyers to eac
   ]);
   render(<BooksCatalog catalogTitles={items} books={offers} onSelectBook={jest.fn()} />);
   for(const [id,slug] of titles) {
-    const link=screen.getAllByRole("link",{name:"View editions and buy"})
+    const link=screen.getAllByRole("link",{name:"View Book"})
       .find(a=>a.getAttribute("href")==="/books/"+slug);
     expect(link).toBeTruthy();
   }
   expect(screen.getAllByText("GH₵200.00")).toHaveLength(2);
   expect(screen.queryByText(/Coming soon/)).not.toBeInTheDocument();
   expect(screen.getAllByText("Printed on demand")).toHaveLength(3);
+});
+
+test("book landing cards link all three exam guides with the same covers and without checkout controls",()=>{
+ const titles=["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"]
+   .map((id,i)=>({id,title:["A1 Writing","A2 Four Skills","B1 Four Skills"][i],
+     description:"Independent exam preparation",levelTags:[["A1","A2","B1"][i]],
+     formats:["digital","printed"],pages:i?50:30,status:"available",
+     bookIds:[id+"-digital",id+"-printed"]}));
+ const books=titles.flatMap((title,i)=>[
+  {id:title.id+"-digital",format:"digital",priceGhs:i?39:29},
+  {id:title.id+"-printed",format:"printed",priceGhs:i?200:100},
+ ]);
+ render(<BooksCatalog catalogTitles={titles} books={books}/>);
+ for(const slug of ["goethe-a1-writing-model-exams","goethe-a2-four-skills-exam-guide","goethe-b1-four-skills-exam-guide"]){
+  expect(screen.getAllByRole("link",{name:"View Book"}).some(a=>a.getAttribute("href")==="/books/"+slug)).toBe(true);
+ }
+ expect(screen.getAllByRole("img",{name:/cover/i})).toHaveLength(3);
+ expect(screen.queryByRole("button",{name:/Continue to Paystack/})).not.toBeInTheDocument();
 });

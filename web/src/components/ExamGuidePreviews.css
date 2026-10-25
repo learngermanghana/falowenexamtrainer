@@ -1,0 +1,19 @@
+.fb-guide-preview{margin:24px 0 55px;padding:clamp(16px,3vw,32px);border:1px solid #d7e5f3;border-radius:18px;background:linear-gradient(145deg,#f3f8ff,#fff)}
+.fb-guide-preview-head{display:flex;justify-content:space-between;gap:18px;align-items:start}
+.fb-guide-preview-head h2{font-size:clamp(23px,3vw,32px);color:#173b5e;margin:7px 0}
+.fb-guide-preview-head p{font-size:13px;color:#607892;max-width:620px;line-height:1.55}
+.fb-guide-preview-head>span{font-size:12px;color:#607892;white-space:nowrap}
+.fb-guide-preview-layout{display:grid;grid-template-columns:minmax(150px,.55fr) minmax(0,1.5fr);gap:20px;margin-top:16px;align-items:start}
+.fb-guide-preview-pages{display:grid;gap:9px}
+.fb-guide-preview-pages button{text-align:left;padding:14px;border:1px solid #cbdeed;background:#fff;color:#1d446c;border-radius:11px;cursor:pointer;display:grid;gap:5px}
+.fb-guide-preview-pages button.is-selected{border-color:#2d6cb3;background:#e4f1ff;box-shadow:inset 4px 0 #2867a9}
+.fb-guide-preview-pages button span{font-size:12px;color:#637b94}
+.fb-guide-preview-paper{min-height:330px;padding:clamp(20px,4vw,36px);background:#fff;box-shadow:0 14px 32px #0f38551a;border:1px solid #e0e5ec;display:flex;flex-direction:column;color:#1b334c}
+.fb-guide-preview-paper-brand{font-weight:800;font-size:10px;letter-spacing:.07em;color:#3a6c99;border-bottom:1px solid #c8d8e7;padding-bottom:12px}
+.fb-guide-preview-paper-kicker{font-weight:700;color:#235f9a;font-size:11px;margin-top:24px}
+.fb-guide-preview-paper h3{font-size:clamp(19px,2.4vw,26px);margin:8px 0 16px}
+.fb-guide-preview-paper-lines{display:grid;gap:6px}
+.fb-guide-preview-paper-lines p{border-left:3px solid #d6e5f5;padding:8px 12px;background:#f7fafc;font-size:14px;margin:0}
+.fb-guide-preview-paper-footer{margin-top:auto;padding-top:20px;font-size:11px;color:#78889a;border-top:1px solid #e2e9f0}
+.fb-guide-preview button:focus-visible{outline:3px solid #2b75ca;outline-offset:2px}
+@media(max-width:650px){.fb-guide-preview-layout{grid-template-columns:1fr}.fb-guide-preview-pages{display:flex;overflow-x:auto;gap:7px}.fb-guide-preview-pages button{min-width:125px}.fb-guide-preview-head{flex-direction:column;gap:0}.fb-guide-preview-paper{min-height:295px}}
