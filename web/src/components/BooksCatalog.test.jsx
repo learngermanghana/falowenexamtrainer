@@ -70,7 +70,7 @@ test("priced A1 A2 B1 guide catalog cards show editions and direct buyers to eac
   ]);
   render(<BooksCatalog catalogTitles={items} books={offers} onSelectBook={jest.fn()} />);
   for(const [id,slug] of titles) {
-    const link=screen.getAllByRole("link",{name:"View editions and buy"})
+    const link=screen.getAllByRole("link",{name:"View Book"})
       .find(a=>a.getAttribute("href")==="/books/"+slug);
     expect(link).toBeTruthy();
   }
