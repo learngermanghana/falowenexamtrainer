@@ -1,6 +1,6 @@
 "use strict";
 const crypto = require("crypto");
-const { registerPrivateBookDeliveryRoute } = require("./privateBookDelivery");
+const { registerPrivateBookDeliveryRoute, DIGITAL_BOOK_OBJECTS } = require("./privateBookDelivery");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
@@ -160,6 +160,16 @@ function registerBookCommerceRoutes(app, { admin }) {
         status: order.status === "paid" ? "paid" : order.status === "rejected" ? "rejected" : "pending",
         reference: order.reference, // private lookup key required before exposing receipt reference
         deliveryIncluded: false,
+        // The buyer still must present the order lookup key again to obtain
+        // a signed URL, and the download endpoint verifies the paid receipt.
+        downloadableBookIds: order.status === "paid" &&
+          process.env.FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED === "true"
+          ? (Array.isArray(order.items) ? order.items : [{
+              bookId: order.bookId, format: order.format, quantity: 1,
+            }]).filter(item => item.format === "digital" &&
+              Object.prototype.hasOwnProperty.call(DIGITAL_BOOK_OBJECTS, item.bookId))
+            .map(item => item.bookId)
+          : [],
       });
     } catch (error) {
       console.error("Book order status error", error);
