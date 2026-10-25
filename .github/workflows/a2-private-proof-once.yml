@@ -1,5 +1,5 @@
 name: A2 private one-time PDF proof
-# Verified attempt after fixing malformed A2 workbook tab label regex; private output only.
+# Private validation after preserving React-owned tabs between Grammar and Teil pages.
 
 on:
   push:
