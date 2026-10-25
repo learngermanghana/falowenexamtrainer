@@ -982,6 +982,12 @@ exports.api = onRequest(
       "OPENAI_API_KEY",
       GOOGLE_SERVICE_ACCOUNT_JSON_B64,
       "PAYSTACK_SECRET",
+      // Dedicated bucket-scoped Object Read R2 credentials. Never expose these
+      // to the browser or bind them to unrelated course-audio functions.
+      "R2_BOOKS_ACCOUNT_ID",
+      "R2_BOOKS_BUCKET",
+      "R2_BOOKS_ACCESS_KEY_ID",
+      "R2_BOOKS_SECRET_ACCESS_KEY",
       STUDENTS_SHEET_ID,
       STUDENTS_SHEET_TAB,
       RESULTS_SHEET_PUBLISHED_CSV_URL,

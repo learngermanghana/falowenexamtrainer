@@ -73,7 +73,8 @@ jobs:
           node --check functionz/app.js
           node --check functionz/paymentAwareApp.js
           node --check functionz/bookCommerce.js
-          node --test __tests__/bookCommerce.test.js __tests__/bookReceiptVerification.test.js
+          node --test __tests__/bookCommerce.test.js __tests__/bookReceiptVerification.test.js functionz/privateBookDelivery.test.js
+          node --check functionz/privateBookDelivery.js
           node --check functionz/paystackFeePolicy.js
           node -e 'const exported = require("./index.entry.js"); if (!exported.api) throw new Error("Firebase api export was not discovered"); if (!exported.submitAssignmentResubmission) throw new Error("Resubmission callable export was not discovered"); if (!exported.sendPushTestNotification) throw new Error("Push test callable export was not discovered"); if (!exported.sendClassPushLifecycleReminders) throw new Error("Class push reminder scheduler export was not discovered"); if (!exported.onClassSessionPushLifecycleUpdated) throw new Error("Class push lifecycle Firestore trigger export was not discovered"); console.log("Firebase API, resubmission, push test and class push lifecycle exports discovered");'
 

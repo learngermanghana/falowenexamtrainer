@@ -71,3 +71,55 @@ test("delivery endpoint is disabled by default with no Firebase or R2 requests",
   else process.env.FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED=original;
  }
 });
+
+test("route grants only a matching paid PDF with a valid secret lookup and private R2 credentials", async () => {
+  const original = Object.fromEntries([
+    "FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED",
+    "R2_BOOKS_ACCOUNT_ID","R2_BOOKS_BUCKET","R2_BOOKS_ACCESS_KEY_ID",
+    "R2_BOOKS_SECRET_ACCESS_KEY",
+  ].map(key=>[key,process.env[key]]));
+  const key = "a".repeat(48);
+  const paid = { ...paidOrder, lookupKeyHash:crypto.createHash("sha256").update(key).digest("hex") };
+  try {
+    Object.assign(process.env,{...env,FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED:"true"});
+    let handler;
+    registerPrivateBookDeliveryRoute({
+      post:(path,fn)=>{assert.equal(path,"/books/download");handler=fn;},
+    },{admin:{firestore:()=>({collection:name=>({doc:()=>({get:async()=>({
+      exists:true,data:()=>name==="bookOrders"?paid:receipt,
+    })})})})}});
+    async function request(bookId, secret) {
+      let status=200,body;
+      const res={set:()=>res,status:value=>{status=value;return res},json:value=>{body=value;return res}};
+      await handler({body:{order:paidOrder.id,key:secret,bookId}},res);
+      return {status,body};
+    }
+    const ok=await request(paid.bookId,key);
+    assert.equal(ok.status,200);
+    assert.equal(new URL(ok.body.url).pathname,"/book/Falowen_A1_Writing_Exam_Guide_Fresh.pdf");
+    assert.equal(ok.body.expiresIn,90);
+    assert.equal(ok.body.url.includes(env.R2_BOOKS_SECRET_ACCESS_KEY),false);
+    const badKey=await request(paid.bookId,"b".repeat(48));
+    assert.equal(badKey.status,403);
+    assert.equal(badKey.body.url,undefined);
+    const wrongBook=await request("a2-four-skills-exam-guide-digital",key);
+    assert.equal(wrongBook.status,403);
+    assert.equal(wrongBook.body.url,undefined);
+  } finally {
+    for(const [name,value] of Object.entries(original)){
+      if(value===undefined) delete process.env[name];
+      else process.env[name]=value;
+    }
+  }
+});
+
+test("the production Firebase API binds books secrets without exposing them to unrelated functions",()=>{
+ const fs=require("fs"),path=require("path");
+ const index=fs.readFileSync(path.resolve(__dirname,"../index.js"),"utf8");
+ const head=index.slice(index.indexOf("exports.api = onRequest("),
+   index.indexOf("// When a student doc is created in Firestore"));
+ for (const name of ["R2_BOOKS_ACCOUNT_ID","R2_BOOKS_BUCKET","R2_BOOKS_ACCESS_KEY_ID","R2_BOOKS_SECRET_ACCESS_KEY"]){
+   assert.ok(head.includes('"'+name+'"'),"Missing books secret binding: "+name);
+   assert.equal(index.split('"'+name+'"').length-1,1,"Book secret is also bound to unrelated service");
+ }
+});
