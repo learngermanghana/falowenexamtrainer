@@ -464,11 +464,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           throw syncError;
         }
         if (isKombi) {
-          if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey) {
+          if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey ||
+            (mockId==="a1-mock-04" && exam.assessmentVersion==="four-module-v2" && !response?.listeningAnswerKey)) {
             throw new Error("Falowen has not returned the verified Kombiprüfung result.");
           }
           completionSaveRef.current = `${attemptId}:${Number(response.verifiedOverall.score)}:${completionRetryNonce}`;
-          setExam(current => ({...current,overall:response.verifiedOverall,sectionScores:response.verifiedSectionScores,readingAnswerKey:response.readingAnswerKey,verificationPending:false}));
+          setExam(current => ({...current,overall:response.verifiedOverall,sectionScores:response.verifiedSectionScores,readingAnswerKey:response.readingAnswerKey,...(response.listeningAnswerKey ? {listeningAnswerKey:response.listeningAnswerKey} : {}),verificationPending:false}));
         }
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
