@@ -3,6 +3,11 @@ name: A2 editorial read-only PDF proof
 # Deliberately manual: do not rerun expensive PDF rendering on every push.
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - fix/a2-pdf-retail-preflight-20261025
+    paths:
+      - .github/workflows/a2-editorial-readonly-proof.yml
 
 permissions:
   contents: read
