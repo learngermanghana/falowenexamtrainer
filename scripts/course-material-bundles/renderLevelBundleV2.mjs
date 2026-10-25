@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { a2PrintCss, sanitizeA2PrintDocument, extractA2PrintSnapshot, a2SectionReady, findA2PdfLeaks } from "./a2PdfPrint.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -218,6 +219,7 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
 const injectPrintMode = async (page) => {
   await page.emulateMedia({ media: "print" });
+  if (level === "A2") return page.addStyleTag({ content: a2PrintCss });
   return page.addStyleTag({ content: `
     @page { size: A4; margin: 12mm 10mm 15mm; }
     html, body { background: #fff !important; }
@@ -236,10 +238,32 @@ const injectPrintMode = async (page) => {
   ` });
 };
 
+const waitForA2PrintableSection = async (page, lesson, suffix) => {
+  if (level !== "A2") return;
+  const section = suffix === "grammar" ? "grammar" : suffix.replace(/^workbook-/, "");
+  // React section tabs may finish rehydrating AFTER the navigation click.
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const snapshot = await page.evaluate(extractA2PrintSnapshot);
+    if (a2SectionReady(section, snapshot)) return;
+    await page.waitForTimeout(500);
+  }
+  // Never include private learner text in Actions logs.
+  throw new Error("A2 Day " + lesson.day + " " + section +
+    ": printable content did not hydrate after 4 seconds; route " + lesson.route);
+};
+
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
+  await waitForA2PrintableSection(page, lesson, suffix);
   const printStyle = await injectPrintMode(page);
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
+    if (level === "A2") {
+      await page.evaluate(sanitizeA2PrintDocument);
+      const printed = await page.evaluate(extractA2PrintSnapshot);
+      const leaks = findA2PdfLeaks(printed.text);
+      if (leaks.length) throw new Error(
+        "A2 Day " + lesson.day + " " + suffix + ": private or web-only content remains: " + leaks.join(", "));
+    }
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
@@ -334,7 +358,11 @@ const renderA2B1Lesson = async (page, lesson) => {
   for (const tabSpec of workbookTabSpecs) {
     const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
-      console.warn(`${level} Day ${lesson.day}: skipping unavailable workbook section ${tabSpec.names[0]}.`);
+      if (level === "A2" && await page.getByRole("tab", { name: new RegExp(tabSpec.names[0], "i") }).count()) {
+        throw new Error("A2 Day " + lesson.day + ": required visible workbook tab " +
+          tabSpec.names[0] + " could not be opened (possibly locked or still loading).");
+      }
+      console.warn(`${level} Day ${lesson.day}: optional workbook tab ${tabSpec.names[0]} not present.`);
       continue;
     }
     workbookParts.push(await saveCurrentPagePdf(page, lesson, `workbook-${tabSpec.key}`));
