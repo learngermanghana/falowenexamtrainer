@@ -145,6 +145,8 @@ jobs:
           node --test scripts/course-material-bundles/a2PdfPrint.test.mjs
           node --check scripts/course-material-bundles/renderA2PrintableListeningQuestions.mjs
           node --test scripts/course-material-bundles/renderA2PrintableListeningQuestions.test.mjs
+          node --test scripts/course-material-bundles/pruneA2BlankSectionPages.test.mjs
+          node --test scripts/course-material-bundles/auditA2PdfPages.test.mjs
       - name: Start local Vite editorial preview bound to loopback
         run: |
           set -euo pipefail
