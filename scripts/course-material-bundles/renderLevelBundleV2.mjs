@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { addA2RetailCover } from "./a2RetailCover.mjs";
 import { a2PrintCss, sanitizeA2PrintDocument, extractA2PrintSnapshot, a2SectionReady, findA2PdfLeaks } from "./a2PdfPrint.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -391,6 +392,7 @@ const renderLesson = async (page, lesson) => {
 };
 
 const addCover = async (output) => {
+  if (level === "A2") return addA2RetailCover(output);
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
