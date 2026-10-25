@@ -29,3 +29,6 @@ jobs:
 
       - name: Verify Falowen ↔ GitHub answer manifest
         run: node scripts/auditA2ReadingAnswerSync.mjs
+
+      - name: Guard Day 17 pharmacy questions, keys and objective-only contract
+        run: node --test tests/a2-day17-pharmacy-alignment.test.mjs

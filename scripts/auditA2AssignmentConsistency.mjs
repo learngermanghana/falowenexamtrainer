@@ -205,7 +205,7 @@ for (const day of expectedDays) {
     fail(label, `workbook chapter ${wrapper.chapter} does not match canonical chapter ${reading.chapter}`);
   }
 
-  const expectedReadingCount = day === 11 || day === 22 ? 7 : day === 17 ? 8 : 5;
+  const expectedReadingCount = day === 11 || day === 22 ? 7 : 5;
   if (!Array.isArray(reading.questions) || reading.questions.length !== expectedReadingCount) {
     fail(label, `Lesen must have exactly ${expectedReadingCount} questions; found ${reading.questions?.length ?? 0}`);
   }
