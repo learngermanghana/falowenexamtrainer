@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { getBackendUrl } from "../services/backendUrl";
 import { indicativeUsd } from "./BooksCatalog";
+import ExamGuidePreviews from "./ExamGuidePreviews";
 import "./BookStoreCheckout.css";
 
 const EXAM_GUIDES = Object.freeze({
@@ -146,16 +147,17 @@ export default function ExamGuideComingSoon({ slug }) {
       </nav>
       <section className="fb-hero" style={{marginTop:25}}>
         <div className="fb-visual-col">
-          <div style={{background:"linear-gradient(155deg,#162b52,#2367a4)",color:"white",borderRadius:18,
-            padding:"44px 25px",minHeight:410,display:"flex",flexDirection:"column",justifyContent:"space-between",
-            boxShadow:"0 15px 44px #142e4c2b"}}>
-            <div style={{fontSize:14,letterSpacing:2,fontWeight:700}}>FALOWEN · EXAM PREPARATION</div>
-            <div><div style={{fontSize:35,fontWeight:750}}>Deutsch {guide.level}</div>
-              <div style={{fontSize:19,lineHeight:1.35,marginTop:12}}>{guide.subtitle}</div>
+          <div className="fb-cover-stage">
+            <div className="fb-cover-perspective">
+              <img className="fb-main-cover"
+                src={guide.level==="A1" ? "/books/a1-writing-exams-cover.svg"
+                  : guide.level==="A2" ? "/books/a2-exam-guide-cover.svg"
+                  : "/books/b1-exam-guide-cover.svg"}
+                alt={"Falowen "+guide.level+" exam guide book cover"} />
             </div>
-            <div style={{borderTop:"1px solid #ffffff55",paddingTop:14,fontSize:14}}>
-              {guide.pages} pages · Independent academy publication</div>
           </div>
+          <div className="fb-cover-caption">Independent Academy guide · {guide.pages} pages</div>
+          <a className="fb-preview-link" href="#fb-guide-preview">View preview pages <span aria-hidden="true">↓</span></a>
         </div>
         <div className="fb-book-intro">
           <p className="fb-eyebrow">FALOWEN EXAM PREPARATION SERIES</p>
@@ -209,6 +211,7 @@ export default function ExamGuideComingSoon({ slug }) {
           <a className="fb-btn fb-btn-soft" href="/books">Browse all books</a>
         </aside>
       </section>
+      <ExamGuidePreviews level={guide.level} />
     </div>
   </main>;
 }
