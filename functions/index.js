@@ -982,6 +982,13 @@ exports.api = onRequest(
       "OPENAI_API_KEY",
       GOOGLE_SERVICE_ACCOUNT_JSON_B64,
       "PAYSTACK_SECRET",
+      // These are dedicated READ-ONLY R2 credentials for the private books
+      // bucket. Provision the Firebase secrets BEFORE deploying this API
+      // revision; do not reuse broader course-audio credentials.
+      "R2_BOOKS_ACCOUNT_ID",
+      "R2_BOOKS_BUCKET",
+      "R2_BOOKS_ACCESS_KEY_ID",
+      "R2_BOOKS_SECRET_ACCESS_KEY",
       STUDENTS_SHEET_ID,
       STUDENTS_SHEET_TAB,
       RESULTS_SHEET_PUBLISHED_CSV_URL,
