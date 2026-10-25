@@ -312,7 +312,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     // page.emulateMedia(print) persists after page.pdf(). Without resetting it,
     // @media print keeps WorkbookTabNav hidden and the following Teil tabs
     // appear "unavailable" even though they were rendered correctly.
-    await page.emulateMedia({ media: "screen" });
+    if (level === "A2") await page.emulateMedia({ media: "screen" });
   }
   return { tab: suffix, file };
 };
