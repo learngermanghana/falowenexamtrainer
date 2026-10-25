@@ -71,10 +71,10 @@ function scoreA1Mock3Form(formValues = {}) {
 function scoreA1KombiForm(mockId, formValues = {}) {
   const set = kombiTasks[mockId];
   if (!set) throw new Error('Unknown A1 Kombipruefung form.');
-  const normalize = value => String(value ?? '').normalize('NFKC').toLowerCase().replace(/ß/g,'ss').replace(/[.,]/g,' ').replace(/\\s+/g,' ').trim();
+  const normalize = value => String(value ?? '').normalize('NFKC').toLowerCase().replace(/ß/g,'ss').replace(/[.,]/g,' ').replace(/\s+/g,' ').trim();
   const fields = set.form.map(field => {
     const submitted = String(formValues[field.number] ?? '').trim();
-    const variants = field.answer.split(/\\s+\\/\\s+/);
+    const variants = field.answer.split(/\s+\/\s+/);
     const correct = variants.some(candidate => normalize(candidate) === normalize(submitted));
     return { number:field.number, submitted, correct, expected:field.answer };
   });
