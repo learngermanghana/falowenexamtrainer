@@ -161,7 +161,9 @@ function ReceiptConfirmation() {
           <dt>Amount</dt><dd><strong>{money(order.priceGhs)}</strong></dd>
         </dl>
         <p>{order.status === "paid"
-          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : "Falowen will arrange the PDF manually. No automatic download is issued."
+          ? order.format === "printed" || (order.items || []).some(item => item.format === "printed")
+            ? "Falowen will arrange any printed copies after payment verification. Delivery costs are separate. Digital PDFs are supplied manually."
+            : "Falowen will arrange the PDF manually. No automatic download is issued."
           : "If you have been charged, do not pay a second time. Retain your Paystack receipt and check again."}</p>
         <button type="button" className="fb-btn fb-btn-ghost" onClick={copyReceipt}>Copy receipt details</button>
       </div> : null}
