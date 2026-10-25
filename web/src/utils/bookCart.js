@@ -5,6 +5,8 @@ export const BOOK_URLS = Object.freeze({
   "a1-course-workbook": "/books/deutsch-a1-course-workbook",
   "a2-course-workbook": "/books/deutsch-a2-course-workbook",
   "writing-skills-a1-c2": "/books/how-to-unlock-your-german-writing-skills-a1-c2",
+  "a1-writing-model-exams": "/books/goethe-a1-writing-model-exams",
+  "a2-four-skills-exam-guide": "/books/goethe-a2-four-skills-exam-guide",
 });
 export const productHref = titleId => BOOK_URLS[titleId] || "/books";
 export const clampBookQuantity = (value, format) => {
