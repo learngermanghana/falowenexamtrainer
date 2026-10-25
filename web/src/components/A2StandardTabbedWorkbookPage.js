@@ -213,7 +213,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     return <div style={{ ...styles.container, display: "grid", gap: 16 }}
       data-a2-editorial-print={editorialPdfMode ? "read-only" : undefined}>
           <div style={card}>
-            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
+            {!editorialPdfMode ? <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" /> : null}
             <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
             <p style={{ ...styles.subtitle, margin: 0 }}>{writingRequired
               ? (showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below.")
