@@ -43,6 +43,11 @@ test("A2 print is triggered from Playwright only, other levels keep prior CSS",(
  assert.match(renderer,/if \(level === "A2"\) await page\.emulateMedia\(\{ media: "screen" \}\)/);
  assert.match(renderer,/addA2RetailCover\(output\)/);
  assert.match(renderer,/level === "A2" && await page\.getByRole\("tab"/);
+ // PDF export must never unlock timed work or silently omit a visible locked Teil.
+ assert.match(renderer,/level === "A2" && await tab\.isDisabled\(\)/);
+ assert.match(renderer,/Use a dedicated PDF test account with legitimately completed\/reviewed/);
+ assert.match(renderer,/No learner timer or submission was changed/);
+ assert.doesNotMatch(renderer,/\.click\(.*start.*timed/i);
  assert.match(renderer,/return \[grammar, \{ tab: "workbook", file: workbookFile \}\]/);
 });
 
