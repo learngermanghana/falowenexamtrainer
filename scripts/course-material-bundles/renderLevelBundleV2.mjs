@@ -295,15 +295,36 @@ const injectPrintMode = async (page) => {
 const waitForA2PrintableSection = async (page, lesson, suffix) => {
   if (level !== "A2") return;
   const section = suffix === "grammar" ? "grammar" : suffix.replace(/^workbook-/, "");
-  // React section tabs may finish rehydrating AFTER the navigation click.
-  for (let attempt = 0; attempt < 8; attempt += 1) {
-    const snapshot = await page.evaluate(extractA2PrintSnapshot);
-    if (a2SectionReady(section, snapshot)) return;
+  // Genuine React workbook content may hydrate after tab navigation. Wait
+  // for actual section text; a visible tab or lesson heading alone is not proof.
+  let lastSnapshot = null;
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    lastSnapshot = await page.evaluate(extractA2PrintSnapshot);
+    if (a2SectionReady(section, lastSnapshot)) return;
     await page.waitForTimeout(500);
   }
-  // Never include private learner text in Actions logs.
+  // Diagnostics report only structure and booleans, never learner content,
+  // tokens, question text, existing answers or personal Firestore records.
+  const s = lastSnapshot || {};
+  const expectedHeading = {
+    grammar: /grammar|grammatik|sprachbausteine/i,
+    "teil-1": /teil\\s*1|sprechen/i,
+    "teil-2": /teil\\s*2|schreiben/i,
+    "teil-3": /teil\\s*3|lesen/i,
+    "teil-4": /teil\\s*4|hören|hoeren/i,
+  }[section];
+  const state = {
+    visibleHeadingCount: s.headings?.length || 0,
+    textCharacters: s.text?.length || 0,
+    expectedHeadingVisible: Boolean(expectedHeading?.test((s.headings || []).join(" "))),
+    grammarPanel: Boolean(s.grammarVisible),
+    listeningPanel: Boolean(s.listeningVisible),
+    listeningQuestionElements: Number(s.listeningQuestionCount || 0),
+    hasAppLoadingText: /Loading the app|Connecting to Falowen|Please wait|Unexpected Application Error|Page not found|Loading failed|Cannot log in right now/i.test(s.text || ""),
+  };
   throw new Error("A2 Day " + lesson.day + " " + section +
-    ": printable content did not hydrate after 4 seconds; route " + lesson.route);
+    ": printable content did not hydrate after 12 seconds; route " + lesson.route +
+    "; safe section diagnostics " + JSON.stringify(state));
 };
 
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
