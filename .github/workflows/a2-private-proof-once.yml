@@ -1,5 +1,5 @@
 name: A2 private one-time PDF proof
-# Private validation after preserving React-owned tabs between Grammar and Teil pages.
+# Verify print-to-screen media restoration between A2 Grammar and Teil sections.
 
 on:
   push:
