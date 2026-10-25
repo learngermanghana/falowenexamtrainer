@@ -12,6 +12,7 @@ import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import BookStoreCheckout from "./components/BookStoreCheckout";
+import ExamGuideComingSoon from "./components/ExamGuideComingSoon";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import { MockExamSignupPage, MockExamCheckoutPage, MockExamOnlyGate, isMockPortal } from "./components/MockExamCommerce";
@@ -453,6 +454,8 @@ function App() {
 
   if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout />;
   if (location.pathname === "/books/complete") return <BookStoreCheckout completed />;
+  const examGuide = location.pathname.match(/^\/books\/(goethe-a1-writing-model-exams|goethe-a2-four-skills-exam-guide)\/?$/);
+  if (examGuide) return <ExamGuideComingSoon slug={examGuide[1]} />;
 
   if (location.pathname === "/payment-complete") {
     return <PaymentComplete />;

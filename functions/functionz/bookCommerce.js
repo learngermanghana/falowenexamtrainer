@@ -31,6 +31,20 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     status: "available",
     bookIds: ["writing-skills-a1-c2-digital"],
   }),
+  Object.freeze({
+    id: "a1-writing-model-exams",
+    title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
+    description: "30-page independent Falowen A1 Schreiben practice guide, with six model form-and-message tasks, grammar support, writing space and annotated solutions. Not an official Goethe-Institut publication.",
+    levelTags: ["A1"], topics: ["goethe", "schreiben", "writing", "formulare", "model exams", "start deutsch 1"],
+    formats: ["digital", "printed"], pages: 30, status: "coming_soon", bookIds: [],
+  }),
+  Object.freeze({
+    id: "a2-four-skills-exam-guide",
+    title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
+    description: "50-page independent Falowen guide to Lesen, Hören listening-script tasks, Schreiben and Sprechen, with model answers and exam strategies. Not an official Goethe-Institut publication; audio is not included.",
+    levelTags: ["A2"], topics: ["goethe", "lesen", "hoeren", "hören", "schreiben", "sprechen", "exam guide"],
+    formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
+  }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
 const allowedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -275,4 +289,4 @@ async function processBookWebhook({ admin, data }) {
   });
 }
 
-module.exports = { BOOKS, registerBookCommerceRoutes, processBookWebhook };
+module.exports = { BOOKS, BOOK_CATALOG_TITLES, registerBookCommerceRoutes, processBookWebhook };

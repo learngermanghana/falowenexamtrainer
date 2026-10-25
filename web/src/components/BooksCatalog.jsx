@@ -87,7 +87,15 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
           {available && offers.length
             ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
                 onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
-            : <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>}
+            : <div>
+                {["a1-writing-model-exams", "a2-four-skills-exam-guide"].includes(title.id)
+                  ? <a className="fb-btn fb-btn-soft fb-library-action" href={
+                      title.id === "a1-writing-model-exams"
+                        ? "/books/goethe-a1-writing-model-exams"
+                        : "/books/goethe-a2-four-skills-exam-guide"
+                    }>View upcoming book</a> : null}
+                <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>
+              </div>}
         </article>;
       })}
       {!results.length && <div className="fb-library-empty">
