@@ -2,6 +2,7 @@
 const {validateA1MockId,getA1MockSet,scoreA1KombiForm}=require("../a1MockSets");
 const {buildVerifiedA1MockScore,buildA1MockCompletionArtifacts}=require("../a1MockCompletionSync");
 const tasks=require("../a1KombiMarkingSets");
+const {mockTaskPrompt,mockTaskVersion}=require("../assessmentTaskContext");
 describe("A1 Kombiprüfung Mocks 4–8 server contracts",()=>{
   test.each([4,5,6,7,8])("Mock %s protects answers and produces /75 verified results",n=>{
     const mockId=`a1-mock-0${n}`;
@@ -27,6 +28,14 @@ describe("A1 Kombiprüfung Mocks 4–8 server contracts",()=>{
     expect(saved.scoreDocument.maxPoints).toBe(75);
     expect(saved.scoreDocument.assignmentId).toBe(`A1-MOCK-0${n}`);
     expect(saved.scoreDocument.link).toBe(`/campus/course/a1-final-mock-${n}`);
+  });
+  test.each([4,5,6,7,8])("Mock %s uses the correct AI task and stable assessment version",n=>{
+    const id=`a1-mock-0${n}`;
+    expect(mockTaskVersion("A1","writing",id)).toBe(`${id}-writing-v1`);
+    expect(mockTaskVersion("A1","speaking",id)).toBe(`${id}-speaking-v1`);
+    const prompt=mockTaskPrompt("A1","writing",undefined,id);
+    expect(prompt).toContain(tasks[id].writing.situation);
+    expect(mockTaskPrompt("A1","speaking",undefined,id)).toContain(tasks[id].speaking.tasks[1].keyword);
   });
   test("cannot manufacture completion from browser-supplied scores",()=>{
     const mockId="a1-mock-04",key=getA1MockSet(mockId).readingAnswerKey;
