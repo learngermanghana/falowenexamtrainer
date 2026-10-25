@@ -72,6 +72,7 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(compactBranch).not.toContain("Download class calendar");
     expect(compactBranch).not.toContain("Course progress");
     expect(homeSource).toContain("onJoinZoom={joinZoom}"); // Existing student Zoom action preserved.
+    expect(classCardSource).toContain('aria-label="Open your live class Zoom room"');
     expect(classCardSource).toContain("fullCalendarLink={fullCalendarLink}");
   });
 
