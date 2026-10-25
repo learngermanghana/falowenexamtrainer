@@ -145,3 +145,16 @@
 @media (max-width:1170px){.fb-hero{grid-template-columns:minmax(230px,.8fr) minmax(300px,1fr);gap:22px}.fb-purchase-card{grid-column:1/-1;position:relative;top:auto}.fb-purchase-card{display:grid;grid-template-columns:.9fr 1.1fr;gap:0 26px}.fb-editions{grid-column:1}.fb-form{grid-column:2;grid-row:1 / span 3;margin:0}.fb-purchase-header{grid-column:1}.fb-shipping-note{grid-column:1}.fb-secure-note,.fb-manual-note{grid-column:1/-1}.fb-cover-stage{min-height:460px}.fb-topic-grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:720px){.fb-topbar-inner{min-height:64px}.fb-brand strong{font-size:17px}.fb-brand>span:last-child{font-size:10px}.fb-hero{grid-template-columns:1fr;gap:23px;padding-bottom:35px}.fb-cover-stage{min-height:auto;max-height:430px;padding:24px}.fb-cover-perspective{width:min(100%,215px)}.fb-visual-col{max-width:100%}.fb-cover-caption{font-size:10px}.fb-pills{margin-bottom:20px}.fb-book-intro h1{margin:9px 0 16px}.fb-purchase-card{display:block;position:relative;padding:20px}.fb-form{margin:18px 0 0}.fb-editions{grid-column:auto}.fb-overview{grid-template-columns:1fr;gap:20px}.fb-topic-grid{grid-template-columns:1fr}.fb-sample-heading{align-items:start;flex-direction:column}.fb-sample-layout{grid-template-columns:1fr}.fb-sample-menu{grid-template-columns:repeat(3,minmax(0,1fr))}.fb-sample-menu button{padding:10px}.fb-sample-menu button span{font-size:12px}.fb-sample-menu button small{display:none}.fb-tabbar{padding-left:10px;gap:0}.fb-tabbar button{font-size:12px;padding:13px 12px}.fb-footer{flex-direction:column}.fb-receipt-detail dl{grid-template-columns:1fr;gap:2px}.fb-receipt-detail dd{margin-bottom:10px}}
 @media (prefers-reduced-motion:reduce){.fb-page *{scroll-behavior:auto!important;transition:none!important}}
+
+/* Independent exam guide product pages: responsive server-priced editions */
+.fb-guide-editions{display:grid;gap:9px;margin:15px 0}
+.fb-guide-option{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:9px;border:1px solid #c8daeb;border-radius:12px;background:#fff;padding:12px;color:#1e3d5c;font-size:13px;cursor:pointer}
+.fb-guide-option:has(input:checked){border-color:#2465ad;background:#f0f7ff;box-shadow:0 0 0 2px #c5e0fa}
+.fb-guide-option input{accent-color:#245ea7}
+.fb-guide-option strong{white-space:nowrap;font-size:15px}
+.fb-guide-option small{grid-column:2 / -1;color:#56718c;font-size:11px}
+.fb-guide-checkout-form{display:grid;gap:12px;margin-top:16px}
+.fb-guide-checkout-form label{font-size:12px;font-weight:700;color:#2c4e70;display:grid;gap:5px}
+.fb-guide-checkout-form input{display:block;width:100%;min-height:44px;border:1px solid #b7cfe4;border-radius:9px;background:#fff;padding:10px 12px;color:#152d47;font:inherit}
+.fb-guide-checkout-form .fb-btn{width:100%;min-height:45px}
+@media(max-width:600px){.fb-guide-editions{gap:8px}.fb-guide-option{grid-template-columns:18px minmax(0,1fr);padding:12px}.fb-guide-option strong{grid-column:2}.fb-guide-option small{grid-column:2}}
