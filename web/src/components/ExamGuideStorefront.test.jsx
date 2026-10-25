@@ -49,3 +49,49 @@ test("failed catalogue does not create misleading checkout or client-side prices
   await waitFor(()=>expect(screen.getByText(/Secure checkout is currently unavailable/)).toBeInTheDocument());
   expect(screen.queryByRole("button",{name:/Continue to Paystack/})).not.toBeInTheDocument();
 });
+
+test.each([
+  "goethe-a1-writing-model-exams",
+  "goethe-a2-four-skills-exam-guide",
+  "goethe-b1-four-skills-exam-guide",
+])("%s uses exactly one correct canonical and restores the homepage canonical after navigation", slug => {
+  const current = [...document.head.querySelectorAll('link[rel="canonical"]')];
+  const homeCanonical = current[0] || document.createElement("link");
+  const hadExisting = current.length > 0;
+  const originalHref = hadExisting ? homeCanonical.getAttribute("href") : null;
+  if (!hadExisting) {
+    homeCanonical.rel = "canonical";
+    document.head.appendChild(homeCanonical);
+  }
+  homeCanonical.href = "https://www.falowen.app/";
+  try {
+    const originalCount = document.head.querySelectorAll('link[rel="canonical"]').length;
+    const view = render(<ExamGuideComingSoon slug={slug} />);
+    const links = document.head.querySelectorAll('link[rel="canonical"]');
+    expect(links).toHaveLength(originalCount);
+    expect(links[0]).toBe(homeCanonical);
+    expect(homeCanonical.getAttribute("href")).toBe("https://www.falowen.app/books/" + slug);
+    view.unmount();
+    expect(document.head.querySelectorAll('link[rel="canonical"]')).toHaveLength(originalCount);
+    expect(homeCanonical.getAttribute("href")).toBe("https://www.falowen.app/");
+  } finally {
+    if (!hadExisting) homeCanonical.remove();
+    else if (originalHref === null) homeCanonical.removeAttribute("href");
+    else homeCanonical.setAttribute("href", originalHref);
+  }
+});
+
+test("a missing HTML canonical is created for an exam guide and removed on unmount", () => {
+  const previous = [...document.head.querySelectorAll('link[rel="canonical"]')];
+  previous.forEach(link=>link.remove());
+  try {
+    const view = render(<ExamGuideComingSoon slug="goethe-b1-four-skills-exam-guide" />);
+    const links = [...document.head.querySelectorAll('link[rel="canonical"]')];
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAttribute("href","https://www.falowen.app/books/goethe-b1-four-skills-exam-guide");
+    view.unmount();
+    expect(document.head.querySelectorAll('link[rel="canonical"]')).toHaveLength(0);
+  } finally {
+    previous.forEach(link=>document.head.appendChild(link));
+  }
+});
