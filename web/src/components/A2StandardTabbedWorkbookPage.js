@@ -30,6 +30,7 @@ import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 import { useAuth } from "../context/AuthContext";
 import fetchA2AudioPlaybackUrl from "../services/a2AudioService";
 import PublishedHoerenPractice from "./PublishedHoerenPractice";
+import { isLocalA2EditorialPrintMode } from "../utils/a2EditorialPrintMode";
 
 const tabs = A2_B1_WORKBOOK_TABS_WITH_GRAMMAR;
 
@@ -147,6 +148,7 @@ const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap:
 const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbookId, sprechenContent, showSpeakingTaskCard = true, mindMapOnlySpeaking = false, schreibenTask, schreibenContent, schreibenPlaceholder = "Liebe/r ...\n\nich schreibe, weil ...", showWorkbookGuidance = true }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const editorialPdfMode = isLocalA2EditorialPrintMode();
   const listeningConfig = getA2ListeningTask(day);
   const lessonProfile = getA2B1LessonProfile("A2", day);
   const part4Profile = lessonProfile?.sections?.part4;
@@ -204,16 +206,10 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     listeningConfig?.task || "Listen to the lesson audio or video from the Course Book, then submit your final answer letters through the Submit tab if required by your tutor.",
   );
 
-  return (
-    <SharedTimedAssignment
-      assignmentKey={assignmentKey}
-      level="A2"
-      configOverride={lessonProfile?.timer || null}
-      onTimeExpired={handleTimedExpiry}
-    >
-      {({ isTabLocked }) => {
-        const displayedActiveTab = isTabLocked(visibleActiveTab) ? "grammar" : visibleActiveTab;
-        return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+  const renderWorkbookContent = ({ isTabLocked }) => {
+    const displayedActiveTab = isTabLocked(visibleActiveTab) ? "grammar" : visibleActiveTab;
+    return <div style={{ ...styles.container, display: "grid", gap: 16 }}
+      data-a2-editorial-print={editorialPdfMode ? "read-only" : undefined}>
           <div style={card}>
             <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
             <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
@@ -266,7 +262,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
               </details>
             ) : null}
           </div>
-          {showWorkbookGuidance && displayedActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
+          {!editorialPdfMode && showWorkbookGuidance && displayedActiveTab === "sprechen" ? <A2B1WorkbookGuidance /> : null}
 
           {displayedActiveTab === "grammar" && <div style={card}><A2B1GrammarNotesTab level="A2" day={day} /></div>}
 
@@ -275,9 +271,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
             {mindMapOnlySpeaking ? null : <A2SecondStageSpeakingUpgrade day={day} />}
             {sprechenContent ? sprechenContent : <><SpeakingMindMap config={getA2SpeakingMindMap(day)} />{!mindMapOnlySpeaking && showSpeakingTaskCard ? <WorkbookTaskCard eyebrow="Speaking practice" title={topicPrompt || title} practiceOnly><p style={{ margin: 0 }}>Prepare a short A2 answer. Use a simple structure: Einleitung → 2–3 details → example → short ending.</p><ul style={listSpacing}><li>Use connectors like <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.</li><li>Speak clearly for 30–60 seconds.</li><li>This part is practice only; submit required final answers in the Submit tab.</li></ul></WorkbookTaskCard> : null}</>}
-            <SpeakingPracticeTimerCard />
-            <CourseInlinePracticePanel type="speaking" />
-            <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
+{!editorialPdfMode ? <><SpeakingPracticeTimerCard /><CourseInlinePracticePanel type="speaking" /><PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} /></> : null}
           </div>}
 
           {writingRequired && displayedActiveTab === "schreiben" && <div style={card}>
@@ -285,9 +279,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <h2 style={sectionTitle}>Teil 2 · Schreiben (Assignment)</h2>
             <A2SecondStageWritingUpgrade day={day} />
             {canonicalWritingTask ? <A2GoetheWritingTaskCard day={day} /> : (schreibenContent ? schreibenContent : <WorkbookTaskCard eyebrow="Writing task" title="Write your final text"><p style={{ margin: 0, lineHeight: 1.7 }}>{schreibenTask || "Write a short A2 email or message about the lesson topic. Include greeting, reason, two clear details and a closing."}</p></WorkbookTaskCard>)}
-            <CourseInlinePracticePanel type="writing" title="A2 writing workspace" description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting." writingContext={{ level: "A2", courseLevel: "A2", day, lessonId: `A2-day-${day}`, workbookId: resolvedWorkbookId, writingTaskId: `${resolvedWorkbookId}-teil-2-writing`, taskTitle: writingTaskTitle, draftPlaceholder: schreibenPlaceholder }} />
-            <WorkbookSubmissionReminder />
-            <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
+{!editorialPdfMode ? <CourseInlinePracticePanel type="writing" title="A2 writing workspace" description="Plan your points in English, write your German text, then use Analyse my text to check your work before submitting." writingContext={{ level: "A2", courseLevel: "A2", day, lessonId: `A2-day-${day}`, workbookId: resolvedWorkbookId, writingTaskId: `${resolvedWorkbookId}-teil-2-writing`, taskTitle: writingTaskTitle, draftPlaceholder: schreibenPlaceholder }} /> : null}
+{!editorialPdfMode ? <><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} /></> : null}
           </div>}
 
           {displayedActiveTab === "lesen" && <div style={card}><HeroImage type="lesen" alt="German reading practice text on a desk" /><h2 style={sectionTitle}>Teil 3 · Lesen (Exercise)</h2><A2ReadingTaskPanel day={day} /><WorkbookSubmissionReminder /><PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} /></div>}
@@ -296,8 +289,23 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
           {displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
           {displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
-        </div>;
-      }}
+    </div>;
+  };
+
+  // Only the local Vite DEV app on loopback can render a read-only editorial
+  // view. Normal public/production workbooks ALWAYS use SharedTimedAssignment.
+  // This never starts, completes, bypasses, or writes a real timed attempt.
+  if (editorialPdfMode) {
+    return renderWorkbookContent({ isTabLocked: () => false });
+  }
+  return (
+    <SharedTimedAssignment
+      assignmentKey={assignmentKey}
+      level="A2"
+      configOverride={lessonProfile?.timer || null}
+      onTimeExpired={handleTimedExpiry}
+    >
+      {renderWorkbookContent}
     </SharedTimedAssignment>
   );
 };
