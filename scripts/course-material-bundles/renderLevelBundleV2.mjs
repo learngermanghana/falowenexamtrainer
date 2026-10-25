@@ -308,10 +308,10 @@ const waitForA2PrintableSection = async (page, lesson, suffix) => {
   const s = lastSnapshot || {};
   const expectedHeading = {
     grammar: /grammar|grammatik|sprachbausteine/i,
-    "teil-1": /teil\\s*1|sprechen/i,
-    "teil-2": /teil\\s*2|schreiben/i,
-    "teil-3": /teil\\s*3|lesen/i,
-    "teil-4": /teil\\s*4|hören|hoeren/i,
+    "teil-1": /teil\s*1|sprechen/i,
+    "teil-2": /teil\s*2|schreiben/i,
+    "teil-3": /teil\s*3|lesen/i,
+    "teil-4": /teil\s*4|hören|hoeren/i,
   }[section];
   const state = {
     visibleHeadingCount: s.headings?.length || 0,
