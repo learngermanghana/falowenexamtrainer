@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./BooksCatalog.css";
+import { productHref } from "../utils/bookCart";
 
 const ghs = amount => "GH₵" + Number(amount || 0).toFixed(2);
 export const indicativeUsd = (ghsAmount, fxQuote) => {
@@ -24,7 +25,7 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
   });
 };
 
-export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook }) {
+export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote }) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
   const [format, setFormat] = useState("all");
@@ -84,10 +85,10 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
               </strong>
             </div>) : <p className="fb-library-coming">Coming soon · Price to be announced</p>}
           </div>
-          {available && offers.length
-            ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
-                onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
-            : <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>}
+          <a className="fb-btn fb-btn-soft fb-library-action" href={productHref(title.id)}>
+            {available && offers.length ? "View book and editions" : "Explore upcoming book"}
+          </a>
+          {!available && <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>}
         </article>;
       })}
       {!results.length && <div className="fb-library-empty">
