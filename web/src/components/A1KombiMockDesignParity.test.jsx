@@ -54,7 +54,7 @@ describe("A1 Mocks 4–8 match the existing Mock 3 visual system", () => {
     expect(mockPageSource).toContain("config={isKombi ? kombiSet.speaking : isMock3");
     expect(mockPageSource).toContain('isKombi ? "ANMELDEFORMULAR"');
     expect(mockPageSource).toContain('isKombi ? "Schreiben · 15 min"');
-    expect(mockPageSource).toContain('isKombi ? "schreiben" : "hoeren"');
+    expect(mockPageSource).toContain('hasHoren ? "hoeren" : "schreiben"');
     for (const mockNumber of [4,5,6,7,8]) {
       const mock = A1_KOMBI_TASK_SETS[mockNumber];
       expect(mock.writing.teil1.formRows).toHaveLength(5);
