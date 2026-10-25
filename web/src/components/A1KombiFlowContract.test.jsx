@@ -29,8 +29,8 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
 
   test("new exams contain different texts and tasks, and do not ship marking keys", () => {
     const numbers = [4,5,6,7,8];
-    expect(new Set(numbers.map(n => A1_KOMBI_READING_PAPERS[n].paperText))).toHaveSize(5);
-    expect(new Set(numbers.map(n => A1_KOMBI_TASK_SETS[n].writing.teil2.situation))).toHaveSize(5);
+    expect(new Set(numbers.map(n => A1_KOMBI_READING_PAPERS[n].paperText)).size).toBe(5);
+    expect(new Set(numbers.map(n => A1_KOMBI_TASK_SETS[n].writing.teil2.situation)).size).toBe(5);
     for (const n of numbers) {
       const { paperText } = A1_KOMBI_READING_PAPERS[n];
       expect(paperText).not.toMatch(/LÖSUNGSSCHLÜSSEL|Musterlösungen|Lösungen: Modul Lesen/i);
