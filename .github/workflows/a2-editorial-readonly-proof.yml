@@ -49,6 +49,40 @@ jobs:
             console.log("Firebase client settings are already configured in Actions.");
             process.exit(0);
           }
+          // Firebase Hosting publishes the project's PUBLIC browser settings
+          // at this reserved endpoint. It avoids duplicating credentials or
+          // copying Vercel server secrets into a GitHub workflow.
+          const firebaseFields = {
+            REACT_APP_FIREBASE_API_KEY: "apiKey",
+            REACT_APP_FIREBASE_AUTH_DOMAIN: "authDomain",
+            REACT_APP_FIREBASE_PROJECT_ID: "projectId",
+            REACT_APP_FIREBASE_STORAGE_BUCKET: "storageBucket",
+            REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "messagingSenderId",
+            REACT_APP_FIREBASE_APP_ID: "appId",
+          };
+          try {
+            const hosted = await fetch(
+              "https://falowen-examiner-trainer.firebaseapp.com/__/firebase/init.json",
+              { signal: AbortSignal.timeout(10000) },
+            );
+            if (hosted.ok) {
+              const config = await hosted.json();
+              if (config?.projectId === "falowen-examiner-trainer" &&
+                  missing.every(key => typeof config[firebaseFields[key]] === "string" &&
+                    config[firebaseFields[key]].trim())) {
+                for (const key of missing) {
+                  const value = config[firebaseFields[key]];
+                  if (/\r|\n/.test(value)) throw new Error("Invalid multiline Firebase public client setting.");
+                  fs.appendFileSync(process.env.GITHUB_ENV, key + "=" + value + "\n", { mode: 0o600 });
+                }
+                console.log("Loaded " + missing.length + " public Firebase browser settings from the official Hosting config.");
+                process.exit(0);
+              }
+            }
+            console.log("Firebase Hosting did not expose a complete matching client config; checking approved Vercel token fallback.");
+          } catch (error) {
+            console.log("Firebase Hosting public config unavailable; checking approved Vercel token fallback.");
+          }
           const token = String(process.env.VERCEL_TOKEN || "").trim();
           if (!token) {
             console.log("VERCEL_TOKEN is unavailable; existing Actions variable preflight will explain what to configure.");
