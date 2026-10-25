@@ -349,7 +349,27 @@ const renderA2B1Lesson = async (page, lesson) => {
 
   const grammarClicked = await clickWorkbookTab(page, ["Grammar"]);
   if (!grammarClicked) {
-    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available.`);
+    // Log only structural boolean flags and known section labels, never
+    // potentially private body text, learner names or form contents.
+    const structure = await page.evaluate(() => {
+      const visible = el => Boolean(el.getClientRects().length) &&
+        getComputedStyle(el).display !== "none";
+      const labels = [...document.querySelectorAll('[role="tab"],button')]
+        .filter(visible)
+        .map(el => (el.getAttribute("aria-label") || el.textContent || "").trim())
+        .filter(label => /^(Grammar|Grammatik|Teil\\s*[1-4]|Continue|Weiter|Enter workbook|Open workbook)/i.test(label))
+        .slice(0, 12).map(label => label.slice(0, 32));
+      return {
+        radioGate: Boolean(document.querySelector("[data-radio-first-workbook-gate]")),
+        workbookNav: Boolean(document.querySelector("[data-workbook-tab-navigation]")),
+        grammarPanel: Boolean(document.querySelector("[data-a2-focused-grammar]")),
+        nativeTabCount: document.querySelectorAll('[role="tab"]').length,
+        recognizedActions: labels,
+      };
+    });
+    const routePath = new URL(page.url()).pathname;
+    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available. ` +
+      `Route: ${routePath}; structure: ${JSON.stringify(structure)}.`);
   }
   const grammar = await saveCurrentPagePdf(page, lesson, "grammar");
 
