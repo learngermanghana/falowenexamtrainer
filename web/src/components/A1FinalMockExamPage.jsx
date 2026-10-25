@@ -460,6 +460,13 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           syncError.retryable = true;
           throw syncError;
         }
+        if (isKombi) {
+          if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey) {
+            throw new Error("Falowen has not returned the verified Kombiprüfung result.");
+          }
+          completionSaveRef.current = `${attemptId}:${Number(response.verifiedOverall.score)}:${completionRetryNonce}`;
+          setExam(current => ({...current,overall:response.verifiedOverall,sectionScores:response.verifiedSectionScores,readingAnswerKey:response.readingAnswerKey,verificationPending:false}));
+        }
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
           announceExamSuccess("A1 mock result saved successfully.");
@@ -499,6 +506,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     exam.sectionScores,
     exam,
     idToken,
+    isKombi,
   ]);
 
   useEffect(
@@ -520,7 +528,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       ...current,
       ...patch,
       stage,
-      sectionDeadlineMs: Date.now() + SECTION_DURATIONS[stage] * 1000,
+      sectionDeadlineMs: Date.now() + (isKombi && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]) * 1000,
     }));
     timeoutHandledRef.current = "";
     const previousSection = { hoeren: "Lesen", schreiben: isKombi ? "Lesen" : "Hören", sprechen: "Schreiben" }[stage];
@@ -894,7 +902,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     const wordCount = exam.schreibenText.trim() ? exam.schreibenText.trim().split(/\s+/).length : 0;
     return (
       <>
-        <SectionHeader label="Schreiben · 20 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+        <SectionHeader label={isKombi ? "Schreiben · 15 min" : "Schreiben · 20 min"} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
         <article className={`a1-goethe-mock-exam a1-schreiben-mock-exam${isAdditionalMock ? " a1-mock2-writing" : ""}`}>
           <header className="a1-goethe-mock-header">
             <p className="a1-goethe-mock-kicker">A1 · Schreiben</p>
@@ -1035,11 +1043,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           <p className="a1-goethe-mock-kicker">{title}</p>
           <h1>{overall.score}% — {overall.passed ? "PASSED" : "NEEDS MORE PRACTICE"}</h1>
           <p>{attemptLabel}</p>
+          {isKombi ? <p>Verified points: {overall.points}/75 · Assessment version: {overall.assessmentVersion}</p> : null}
         </header>
 
-        <FullMockGuide level="A1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
+        {!isKombi ? <FullMockGuide level="A1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} /> : <p>Verified three-module Kombiprüfung · Hören not assessed</p>}
         <div className="a1-final-mock-scoregrid">
-          {["lesen", "hoeren", "schreiben", "sprechen"].map((key) => (
+          {(isKombi ? ["lesen","schreiben","sprechen"] : ["lesen", "hoeren", "schreiben", "sprechen"]).map((key) => (
             <div key={key}>
               <span>{SECTION_LABELS[key]}</span>
               <strong>{Number(exam.sectionScores?.[key] || 0).toFixed(1)}/25</strong>
@@ -1057,19 +1066,19 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           {lesenScoredQuestions.map((question) => {
             const key = readingKey(question);
             const submitted = exam.lesenAnswers?.[key] || "—";
-            const correct = String(submitted).toLowerCase() === String(question.answer).toLowerCase();
+            const correct = String(submitted).toLowerCase() === String(isKombi ? exam.readingAnswerKey?.[key] : question.answer).toLowerCase();
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : submitted}</span>
-                <span>Correct answer: {question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {isKombi ? exam.readingAnswerKey?.[key] : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
           })}
         </section>
 
-        <section className="a1-final-mock-review">
+        {!isKombi ? <section className="a1-final-mock-review">
           <h2>Hören review</h2>
           {hoerenScoredQuestions.map((question) => {
             const key = listeningKey(question);
@@ -1084,11 +1093,11 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
               </div>
             );
           })}
-        </section>
+        </section> : null}
 
         <section className="a1-final-mock-feedback">
           <h2>Schreiben feedback</h2>
-          {isAdditionalMock ? <details><summary>Musterlösung · {isMock3 ? "E-Mail an Anna" : "E-Mail an Markus"}</summary><p className="a1-mock2-model-answer">{writingTask.modelAnswer}</p><p>Ein mögliches Beispiel. Andere passende Antworten sind möglich.</p></details> : null}
+          {isAdditionalMock && !isKombi ? <details><summary>Musterlösung · {isMock3 ? "E-Mail an Anna" : "E-Mail an Markus"}</summary><p className="a1-mock2-model-answer">{writingTask.modelAnswer}</p><p>Ein mögliches Beispiel. Andere passende Antworten sind möglich.</p></details> : null}
           <p><strong>Form:</strong> {exam.writingResult?.form?.score || 0}/10</p>
           <div className="a1-final-mock-review">
             {(exam.writingResult?.form?.fields || []).map((field) => (
