@@ -29,3 +29,4 @@ Disallow: /server-status
 
 Sitemap: https://www.falowen.app/sitemap.xml
 Sitemap: https://www.falowen.app/sitemap-courses.xml
+Sitemap: https://www.falowen.app/sitemap-videos.xml

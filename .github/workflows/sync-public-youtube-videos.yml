@@ -1,0 +1,56 @@
+name: Sync public LLEA YouTube videos
+
+on:
+  schedule:
+    # Once daily at 05:17 UTC (Ghana time), not a running server.
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/syncPublicYouTubeVideos.mjs'
+      - 'scripts/syncPublicYouTubeVideos.test.mjs'
+      - 'web/video-library-exclusions.json'
+      - '.github/workflows/sync-public-youtube-videos.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: falowen-youtube-library
+  cancel-in-progress: false
+
+jobs:
+  sync-videos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify static video generation
+        run: node --test scripts/syncPublicYouTubeVideos.test.mjs
+
+      - name: Sync public videos (no YouTube API key or serverless calls)
+        if: github.event_name != 'pull_request'
+        env:
+          YOUTUBE_CHANNEL_ID: ${{ vars.YOUTUBE_CHANNEL_ID }}
+        run: node scripts/syncPublicYouTubeVideos.mjs
+
+      - name: Commit only if public video content changed
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          git add web/public/videos web/public/sitemap-videos.xml
+          if git diff --cached --quiet; then
+            echo "No video changes. No commit or Vercel deployment needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "content(video): sync public LLEA YouTube lessons"
+          git push origin HEAD:main
