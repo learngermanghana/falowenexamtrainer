@@ -164,6 +164,15 @@ jobs:
           tail -40 /tmp/falowen-a2-editorial-vite.log || true
           exit 1
       # Re-open late A2 Hören tabs with a fresh read-only deep link. Never start student attempts.
+      - name: Verify Day 24 listening with a small private print smoke test
+        env:
+          FALOWEN_A2_EDITORIAL_PRINT: 'true'
+          FALOWEN_A2_PDF_SMOKE_DAY: '24'
+          FALOWEN_PDF_BASE_URL: http://127.0.0.1:4173
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
       - name: Render complete A2 read-only proof
         env:
           FALOWEN_A2_EDITORIAL_PRINT: 'true'
