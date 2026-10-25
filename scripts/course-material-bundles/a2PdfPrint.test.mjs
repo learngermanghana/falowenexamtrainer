@@ -40,6 +40,7 @@ test("A2 print is triggered from Playwright only, other levels keep prior CSS",(
  assert.doesNotMatch(renderer,/getByRole\("tab", \{ name: \/Grammar\|Grammatik\|Teil\\\\s\*/);
  assert.match(renderer,/if \(!\(await isPublicLanding\(page\)\) && level !== "A2"\) break/);
  assert.match(renderer,/waitForA2PrintableSection\(page, lesson, suffix\)/);
+ assert.match(renderer,/if \(level === "A2"\) await page\.emulateMedia\(\{ media: "screen" \}\)/);
  assert.match(renderer,/addA2RetailCover\(output\)/);
  assert.match(renderer,/level === "A2" && await page\.getByRole\("tab"/);
  assert.match(renderer,/return \[grammar, \{ tab: "workbook", file: workbookFile \}\]/);
