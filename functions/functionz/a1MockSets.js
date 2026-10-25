@@ -1,16 +1,20 @@
 "use strict";
 const registry = require('../data/assessmentTasks.json');
+const kombiKeys = require('./a1KombiReadingKeys');
+const kombiTasks = require('./a1KombiMarkingSets');
+const EXTRA_A1_MOCK_IDS = Object.freeze(Object.keys(kombiKeys));
 const DEFAULT_A1_MOCK_ID = 'a1-mock-01';
 const SECOND_A1_MOCK_ID = 'a1-mock-02';
 const THIRD_A1_MOCK_ID = 'a1-mock-03';
 const validateA1MockId = (mockId = DEFAULT_A1_MOCK_ID) => {
-  if (![DEFAULT_A1_MOCK_ID, SECOND_A1_MOCK_ID, THIRD_A1_MOCK_ID].includes(mockId)) {
+  if (![DEFAULT_A1_MOCK_ID, SECOND_A1_MOCK_ID, THIRD_A1_MOCK_ID, ...EXTRA_A1_MOCK_IDS].includes(mockId)) {
     throw Object.assign(new Error('Unknown A1 mock. Reload the mock library.'), { status: 400, code: 'A1_MOCK_NOT_FOUND' });
   }
   return mockId;
 };
 const getA1MockSet = (mockId = DEFAULT_A1_MOCK_ID) => {
   validateA1MockId(mockId);
+  if (EXTRA_A1_MOCK_IDS.includes(mockId)) return { readingAnswerKey: kombiKeys[mockId], writing: { form: { formRows: kombiTasks[mockId].form } }, speaking: kombiTasks[mockId].speaking };
   return mockId === DEFAULT_A1_MOCK_ID ? null : registry.mockSets[mockId];
 };
 // The stored attempt, never a client-supplied task description, owns its marking set.
@@ -64,4 +68,16 @@ function scoreA1Mock3Form(formValues = {}) {
     }));
   return { score: fields.filter((field) => field.correct).length * 2, maxScore: 10, fields };
 }
-module.exports = { DEFAULT_A1_MOCK_ID, SECOND_A1_MOCK_ID, THIRD_A1_MOCK_ID, validateA1MockId, getA1MockSet, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form };
+function scoreA1KombiForm(mockId, formValues = {}) {
+  const set = kombiTasks[mockId];
+  if (!set) throw new Error('Unknown A1 Kombipruefung form.');
+  const normalize = value => String(value ?? '').normalize('NFKC').toLowerCase().replace(/ß/g,'ss').replace(/[.,]/g,' ').replace(/\s+/g,' ').trim();
+  const fields = set.form.map(field => {
+    const submitted = String(formValues[field.number] ?? '').trim();
+    const variants = field.answer.split(/\s+\/\s+/);
+    const correct = variants.some(candidate => normalize(candidate) === normalize(submitted));
+    return { number:field.number, submitted, correct, expected:field.answer };
+  });
+  return { score: fields.filter(x=>x.correct).length*2, maxScore:10, fields };
+}
+module.exports = { EXTRA_A1_MOCK_IDS, scoreA1KombiForm, DEFAULT_A1_MOCK_ID, SECOND_A1_MOCK_ID, THIRD_A1_MOCK_ID, validateA1MockId, getA1MockSet, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form };

@@ -5,7 +5,8 @@ import taskVersions from "../data/assessmentTaskVersions.json";
 // Application failures already retried by the backend are left for the learner.
 export async function postMockAssessment(url, payload, config = {}) {
   const task = url.match(/\/(writing|speaking)\/(a1|a2|b1|b2)-mock-score$/);
-  const requestPayload = task ? { ...payload, taskVersion: taskVersions[task[2] === "a1" && ["a1-mock-02", "a1-mock-03"].includes(payload.mockId) ? `A1_MOCK_${payload.mockId.slice(-1)}` : task[2] === "a2" && payload.mockId === "a2-mock-02" ? "A2_MOCK_2" : task[2].toUpperCase()][task[1]] } : payload;
+  const isKombiA1 = task?.[2] === 'a1' && /^a1-mock-0[4-8]$/.test(String(payload?.mockId || ''));
+  const requestPayload = task ? { ...payload, taskVersion: isKombiA1 ? `${payload.mockId}-${task[1]}-v1` : taskVersions[task[2] === "a1" && ["a1-mock-02", "a1-mock-03"].includes(payload.mockId) ? `A1_MOCK_${payload.mockId.slice(-1)}` : task[2] === "a2" && payload.mockId === "a2-mock-02" ? "A2_MOCK_2" : task[2].toUpperCase()][task[1]] } : payload;
   for (let attempt = 0; attempt < 2; attempt += 1) {
     try {
       return await axios.post(url, requestPayload, { ...config, timeout: 55000 });

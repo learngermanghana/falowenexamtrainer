@@ -22,7 +22,7 @@ const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts"
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
 const { isA2SpeakingAttemptBindingSafe } = require("./a2MockSpeakingAttemptIdentity");
-const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form } = require("./a1MockSets");
+const { validateA1MockId, resolveA1MarkingSet, getA1MockSet, scoreA1Mock2Form, scoreA1Mock3Form, scoreA1KombiForm } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
@@ -2902,6 +2902,8 @@ const scoreA1MockWritingForm = (formValues = {}) => {
   };
 };
 
+const a1KombiMarkingSets = require("./a1KombiMarkingSets");
+const a1KombiWritingPoints = mockId => a1KombiMarkingSets[mockId]?.writing?.points || null;
 const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
   "You are a strict Goethe-style A1 writing examiner for a Falowen mock exam.",
   "Assess the learner's German email exactly as submitted. Do not rewrite it before scoring and do not invent missing information.",
@@ -2912,7 +2914,9 @@ const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
   "Do not fail a response solely because it is above A1. Score the task actually completed, then flag the level mismatch.",
   "",
   "SCORING — 15 points total:",
-  mockId === "a1-mock-03"
+  a1KombiWritingPoints(mockId)
+    ? `Content points: 6 points — 2 for each of these exact points: ${a1KombiWritingPoints(mockId).join(" | ")}. Output keys point1, point2, point3. Judge against this specific scenario and recipient; do not score a different exam task.`
+    : mockId === "a1-mock-03"
     ? "Content points: 6 points — 2 for inviting Anna to eat at the learner's home (invitation), 2 for specifying a Saturday or Sunday and a time (when), 2 for asking Anna to bring a dessert or drinks (bring). An informal German greeting and closing are required. Accept any sensible weekend day and clock time."
     : mockId === "a1-mock-02"
       ? "Content points: 6 points — 2 each for inviting Markus (invitation), specifying a day/time/address (when_where), and asking him to bring something (bring). Accept any sensible chosen day, time, address and item. Use informal register with Markus."
@@ -2927,7 +2931,7 @@ const a1MockWritingScorePrompt = ({ text = "", mockId = "a1-mock-01" }) => [
     score: 0,
     maxScore: 15,
     level_mismatch: false,
-    content: mockId === "a1-mock-03" ? { invitation: 0, when: 0, bring: 0 } : mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
+    content: a1KombiWritingPoints(mockId) ? {point1:0,point2:0,point3:0} : mockId === "a1-mock-03" ? { invitation: 0, when: 0, bring: 0 } : mockId === "a1-mock-02" ? { invitation: 0, when_where: 0, bring: 0 } : { registration: 0, next_course_start: 0, price: 0 },
     structure: {
       greeting: 0,
       closing: 0,
@@ -4302,7 +4306,7 @@ app.post("/writing/a1-mock-score", async (req, res) => {
 
     if (!ensureOpenAIConfigured(res)) return;
 
-    const form = mockId === "a1-mock-03" ? scoreA1Mock3Form(formValues) : mockId === "a1-mock-02" ? scoreA1Mock2Form(formValues) : scoreA1MockWritingForm(formValues);
+    const form = a1KombiMarkingSets[mockId] ? scoreA1KombiForm(mockId, formValues) : mockId === "a1-mock-03" ? scoreA1Mock3Form(formValues) : mockId === "a1-mock-02" ? scoreA1Mock2Form(formValues) : scoreA1MockWritingForm(formValues);
     let letter;
 
     if (!text) {
@@ -5178,6 +5182,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
     validateA1MockId(mockId);
+    const assessmentVersion = /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5203,6 +5208,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
               firstAttempt: Boolean(activeData.firstAttempt),
               state: activeData.state || null,
               resumed: true,
+              assessmentVersion: activeData.assessmentVersion || assessmentVersion,
             };
             return;
           }
@@ -5230,6 +5236,8 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         uid: authedUser.uid,
         email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
         mockId,
+        assessmentVersion,
+        scoredSections: assessmentVersion === "three-module-v1" ? ["lesen","schreiben","sprechen"] : ["lesen","hoeren","schreiben","sprechen"],
         attemptNumber,
         firstAttempt: attemptNumber === 1,
         status: "in_progress",
@@ -5246,6 +5254,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         firstAttempt: attemptNumber === 1,
         state: null,
         resumed: false,
+        assessmentVersion,
       };
     });
 
@@ -5311,6 +5320,10 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       const userData = userSnap.exists ? userSnap.data() || {} : {};
       const mockId = existing.mockId || "a1-mock-01";
       validateA1MockId(mockId);
+      if (existing.assessmentVersion === "three-module-v1" && state.assessmentVersion !== existing.assessmentVersion) {
+        saveOutcome = {invalidCompletion:true,code:"ASSESSMENT_TASK_CHANGED",error:"This attempt must retain its original three-module version."};
+        return;
+      }
       if (state.mockId && state.mockId !== mockId) {
         saveOutcome = { invalidCompletion: true, code: "ASSESSMENT_TASK_CHANGED", error: "This progress belongs to a different mock." };
         return;
@@ -5556,9 +5569,23 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       }
     }
 
+    let verifiedResultPayload = {};
+    if (status === "completed" && saveOutcome?.ok) {
+      const verifiedSnap = await attemptRef.get();
+      const verifiedAttempt = verifiedSnap.exists ? verifiedSnap.data() || {} : {};
+      if (/^a1-mock-0[4-8]$/.test(String(verifiedAttempt.mockId || ""))) {
+        verifiedResultPayload = {
+          verifiedOverall: verifiedAttempt.verifiedOverall || null,
+          verifiedSectionScores: verifiedAttempt.verifiedSectionScores || null,
+          // Release review keys only after the attempt is completed and server-verified.
+          readingAnswerKey: getA1MockSet(verifiedAttempt.mockId)?.readingAnswerKey || null,
+        };
+      }
+    }
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...verifiedResultPayload,
     });
   } catch (err) {
     console.error("/a1-mock/attempt/save error", err);

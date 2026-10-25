@@ -1,0 +1,80 @@
+name: A1 Kombipruefung Mocks 4-8 tests
+
+on:
+  pull_request:
+    paths:
+      - "functions/functionz/a1Kombi*"
+      - "functions/functionz/a1MockSets.js"
+      - "functions/functionz/a1MockCompletionSync.js"
+      - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/verifiedFourSkillMockScore.js"
+      - "functions/functionz/tests/a1KombiMocks04to08.test.cjs"
+      - "functions/functionz/__tests__/a1KombiMocks04to08.test.js"
+      - "web/src/data/a1Kombi*"
+      - "web/src/data/mockExamCatalog.js"
+      - "web/src/data/mockFactoryContract.js"
+      - "web/src/components/A1Kombi*"
+      - "web/src/components/A1FinalMockExamPage.jsx"
+      - "web/src/components/MockExamLibraryPage.js"
+      - "web/src/utils/mockReviewAccess.js"
+      - "web/src/services/mockAssessmentRequest.js"
+      - "web/src/App.js"
+      - ".github/workflows/a1-kombi-mocks-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "functions/functionz/a1Kombi*"
+      - "functions/functionz/a1MockSets.js"
+      - "functions/functionz/a1MockCompletionSync.js"
+      - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/tests/a1KombiMocks04to08.test.cjs"
+      - "web/src/data/a1Kombi*"
+      - "web/src/components/A1Kombi*"
+      - "web/src/components/A1FinalMockExamPage.jsx"
+      - ".github/workflows/a1-kombi-mocks-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  server-verified-a1-kombi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check syntax of server-only A1 mock modules
+        run: |
+          node --check functions/functionz/a1MockSets.js
+          node --check functions/functionz/a1KombiMarkingSets.js
+          node --check functions/functionz/a1KombiReadingKeys.js
+          node --check functions/functionz/a1MockCompletionSync.js
+          node --check functions/functionz/assessmentTaskContext.js
+      - name: Test all five A1 mock answer keys, verified receipts and Firestore result writes
+        run: node --test functions/functionz/tests/a1KombiMocks04to08.test.cjs
+
+  learner-a1-kombi-flow:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install web test dependencies (no deployment)
+        working-directory: web
+        run: npm ci --legacy-peer-deps --no-audit --no-fund
+      - name: Test five exam cards, interactive Lesen, Hören-free progression and result-gating
+        working-directory: web
+        env:
+          CI: true
+        run: |
+          npx jest --runInBand --runTestsByPath \
+            src/data/a1KombiMocks04to08.test.js \
+            src/data/a1KombiMockCatalog.test.js \
+            src/components/A1KombiMockIntegration.test.jsx \
+            src/components/A1KombiFlowContract.test.jsx
