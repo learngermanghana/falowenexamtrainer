@@ -571,6 +571,12 @@ const mergeBundle = async (renderedLessons) => {
 
 const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, storageState: storageStateFromEnv() });
+if (a2EditorialLocal) {
+  // Enforce read-only access at the browser network layer too: do not let
+  // incidental React effects write assessment records to Firestore.
+  await context.route(/https:\/\/firestore\.googleapis\.com\/.*(?:Firestore\/Write\/channel|documents:commit|documents:batchWrite)/i,
+    async route => route.abort("blockedbyclient"));
+}
 const page = await context.newPage();
 if (a2EditorialLocal) {
   // This flag exists only inside this private local browser context.
