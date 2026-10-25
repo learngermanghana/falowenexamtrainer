@@ -1,58 +1,43 @@
 import "@testing-library/jest-dom";
 import React from "react";
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import HomepageBooksCarousel from "./HomepageBooksCarousel";
 
-const originalFetch = global.fetch;
-beforeEach(() => {
-  global.fetch = jest.fn().mockResolvedValue({
-    ok: true,
-    json: async () => ({
-      catalogTitles: [
-        {id:"a1-course-workbook",status:"available",bookIds:["a1-digital"]},
-        {id:"writing-skills-a1-c2",status:"available",bookIds:["writing-skills-a1-c2-digital"]},
-        {id:"a1-writing-model-exams",status:"coming_soon",bookIds:[]},
-        {id:"a2-four-skills-exam-guide",status:"coming_soon",bookIds:[]},
-        {id:"b1-four-skills-exam-guide",status:"coming_soon",bookIds:[]},
-      ],
-      books: [
-        {id:"a1-digital",format:"digital",priceGhs:99},
-        {id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39},
-      ],
-    }),
-  });
-});
-afterEach(() => { global.fetch = originalFetch; jest.useRealTimers(); });
+afterEach(() => jest.useRealTimers());
 
-test("signed-in books carousel shows a real A1 cover and lets students browse five titles", async () => {
+test("signed-in homepage rotates five actual retail book covers and links to each detail page", () => {
   render(<HomepageBooksCarousel />);
   expect(screen.getByRole("region",{name:"Explore Falowen German books"})).toBeInTheDocument();
-  expect(screen.getByRole("img",{name:"Deutsch A1 book cover"})).toHaveAttribute("src","/books/a1-cover.svg");
-  expect(screen.getByRole("link",{name:/Browse all books/})).toHaveAttribute("href","/books");
-  await screen.findByRole("link",{name:/View book editions/});
+  expect(screen.getByRole("img",{name:"Deutsch A1 book cover"}))
+    .toHaveAttribute("src","/books/a1-cover.svg");
+  expect(screen.getByRole("link",{name:/View Book/}))
+    .toHaveAttribute("href","/books/deutsch-a1-course-workbook");
   fireEvent.click(screen.getByRole("button",{name:"Next book"}));
   expect(screen.getByRole("img",{name:"German Writing Skills book cover"}))
     .toHaveAttribute("src","/books/writing-skills-a1-c2-cover.svg");
-  fireEvent.click(screen.getByRole("button",{name:"Show A1 Writing Model Exams"}));
-  expect(screen.getByRole("link",{name:/View book details/}))
-    .toHaveAttribute("href","/books/goethe-a1-writing-model-exams");
-  expect(screen.queryByRole("link",{name:/Buy now/i})).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole("button",{name:"Show A2 Exam Preparation"}));
-  expect(screen.getByRole("link",{name:/View book details/}))
-    .toHaveAttribute("href","/books/goethe-a2-four-skills-exam-guide");
-  fireEvent.click(screen.getByRole("button",{name:"Show B1 Exam Preparation"}));
-  expect(screen.getByRole("link",{name:/View book details/}))
-    .toHaveAttribute("href","/books/goethe-b1-four-skills-exam-guide");
+  expect(screen.getByRole("link",{name:/View Book/}))
+    .toHaveAttribute("href","/books/how-to-unlock-your-german-writing-skills-a1-c2");
+  for (const [name,cover,href] of [
+    ["A1 Writing Model Exams","a1-writing-exams-cover.svg","goethe-a1-writing-model-exams"],
+    ["A2 Exam Preparation","a2-exam-guide-cover.svg","goethe-a2-four-skills-exam-guide"],
+    ["B1 Exam Preparation","b1-exam-guide-cover.svg","goethe-b1-four-skills-exam-guide"],
+  ]) {
+    fireEvent.click(screen.getByRole("button",{name:"Show "+name}));
+    expect(screen.getByRole("img",{name:name+" book cover"}))
+      .toHaveAttribute("src","/books/"+cover);
+    expect(screen.getByRole("link",{name:/View Book/}))
+      .toHaveAttribute("href","/books/"+href);
+  }
+  expect(screen.queryByRole("link",{name:/Buy now|Paystack|Coming soon/i})).not.toBeInTheDocument();
 });
-
-test("carousel can browse manually when the catalogue fails, without inventing purchase availability", async () => {
-  global.fetch = jest.fn().mockRejectedValue(new Error("offline"));
-  render(<HomepageBooksCarousel />);
-  await act(async () => { await Promise.resolve(); });
-  expect(screen.getByRole("link",{name:/View book details/})).toHaveAttribute("href","/books");
-  fireEvent.click(screen.getByRole("button",{name:"Previous book"}));
-  expect(screen.getByRole("img",{name:/B1 Exam Preparation illustrated book cover/})).toBeInTheDocument();
-  expect(screen.getByRole("link",{name:/View book details/}))
-    .toHaveAttribute("href","/books/goethe-b1-four-skills-exam-guide");
-  expect(screen.queryByRole("link",{name:/View book editions/})).not.toBeInTheDocument();
+test("manual navigation and covers work without any backend fetch or pricing in the homepage", () => {
+  const previous=global.fetch;global.fetch=jest.fn(()=>{throw Error("No homepage book API calls");});
+  try {
+    render(<HomepageBooksCarousel />);
+    fireEvent.click(screen.getByRole("button",{name:"Previous book"}));
+    expect(screen.getByRole("img",{name:"B1 Exam Preparation book cover"})).toBeInTheDocument();
+    expect(screen.getByRole("link",{name:/View Book/}))
+      .toHaveAttribute("href","/books/goethe-b1-four-skills-exam-guide");
+    expect(global.fetch).not.toHaveBeenCalled();
+  } finally {global.fetch=previous;}
 });
