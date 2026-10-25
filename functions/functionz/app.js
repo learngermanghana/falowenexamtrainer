@@ -5182,6 +5182,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
     validateA1MockId(mockId);
+    const assessmentVersion = /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5207,6 +5208,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
               firstAttempt: Boolean(activeData.firstAttempt),
               state: activeData.state || null,
               resumed: true,
+              assessmentVersion: activeData.assessmentVersion || assessmentVersion,
             };
             return;
           }
@@ -5234,6 +5236,8 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         uid: authedUser.uid,
         email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
         mockId,
+        assessmentVersion,
+        scoredSections: assessmentVersion === "three-module-v1" ? ["lesen","schreiben","sprechen"] : ["lesen","hoeren","schreiben","sprechen"],
         attemptNumber,
         firstAttempt: attemptNumber === 1,
         status: "in_progress",
@@ -5250,6 +5254,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
         firstAttempt: attemptNumber === 1,
         state: null,
         resumed: false,
+        assessmentVersion,
       };
     });
 
@@ -5315,6 +5320,10 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       const userData = userSnap.exists ? userSnap.data() || {} : {};
       const mockId = existing.mockId || "a1-mock-01";
       validateA1MockId(mockId);
+      if (existing.assessmentVersion === "three-module-v1" && state.assessmentVersion !== existing.assessmentVersion) {
+        saveOutcome = {invalidCompletion:true,code:"ASSESSMENT_TASK_CHANGED",error:"This attempt must retain its original three-module version."};
+        return;
+      }
       if (state.mockId && state.mockId !== mockId) {
         saveOutcome = { invalidCompletion: true, code: "ASSESSMENT_TASK_CHANGED", error: "This progress belongs to a different mock." };
         return;
