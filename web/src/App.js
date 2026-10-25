@@ -453,6 +453,11 @@ function App() {
 
   if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout />;
   if (location.pathname === "/books/complete") return <BookStoreCheckout completed />;
+  // Each public book has a stable, indexable product URL; the cart is also
+  // public so buyers do not need a Falowen student account.
+  const bookProductSlug = location.pathname.match(/^\/books\/(deutsch-a1-course-workbook|deutsch-a2-course-workbook|how-to-unlock-your-german-writing-skills-a1-c2|cart)\/?$/);
+  if (bookProductSlug) return <BookStoreCheckout productSlug={bookProductSlug[1]} />;
+  if (/^\/books\/a1\/?$/.test(location.pathname)) return <Navigate to="/books/deutsch-a1-course-workbook" replace />;
 
   if (location.pathname === "/payment-complete") {
     return <PaymentComplete />;
