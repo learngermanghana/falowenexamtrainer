@@ -199,7 +199,7 @@ module.exports=Object.freeze({
       },
       "teil3": {
         "title": "Gemeinsam planen",
-        "plan": "Einen Wochenendausflug in eine andere Stadt mit einem Freund",
+        "plan": "Einen Wochenendausflug in eine andere Stadt mit einem Freund planen.",
         "points": [
           "Welches Ziel? (z.B. Berlin oder Hamburg)",
           "Wie anreisen? (Zug oder Auto)",
