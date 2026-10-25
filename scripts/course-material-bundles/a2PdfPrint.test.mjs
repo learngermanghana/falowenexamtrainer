@@ -21,6 +21,10 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
  const sanitizer=fs.readFileSync(path.join(dir,"a2PdfPrint.mjs"),"utf8");
  assert.match(sanitizer,/section === "workbook-teil-2"/);
  assert.match(sanitizer,/Schreiben · Your answer/);
+ assert.match(sanitizer,/const webOnlyAction =/);
+ assert.match(sanitizer,/Back to Course Book|back\\|return/);
+ assert.match(a2PrintCss,/data-radio-first-workbook-gate/);
+ assert.match(a2PrintCss,/data-teacher-video/);
  // Removing React-owned navigation from the DOM after the Grammar print
  // used to make every subsequent Teil tab inaccessible.
  assert.doesNotMatch(sanitizer, /const nodes =[\s\S]*?querySelectorAll\([\s\S]*?'\[data-universal-a2-workbook-tabs\]'/);
