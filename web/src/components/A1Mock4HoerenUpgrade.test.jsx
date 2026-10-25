@@ -4,7 +4,7 @@ import {A1_MOCK_4_LISTENING} from "../data/a1Mock4Listening";
 import {getMockExam} from "../data/mockExamCatalog";
 import {canReviewFullMock,getScoredMockSections} from "../utils/mockReviewAccess";
 const page=fs.readFileSync(path.join(__dirname,"A1FinalMockExamPage.jsx"),"utf8");
-const server=fs.readFileSync(path.join(__dirname,"../../functions/functionz/app.js"),"utf8");
+const server=fs.readFileSync(path.join(__dirname,"../../../functions/functionz/app.js"),"utf8");
 test("Mock 4 has the exact three protected R2 part names and 15 interactive questions",()=>{
  const sections=["teil1","teil2","teil3"];
  expect(sections.map((k)=>A1_MOCK_4_LISTENING[k].questions.length)).toEqual([6,4,5]);
