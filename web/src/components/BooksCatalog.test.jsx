@@ -51,4 +51,22 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     expect(screen.getByRole("status")).toHaveTextContent("1 book found");
     expect(screen.getAllByRole("link", { name: "View book and editions" })).toHaveLength(1);
   });
+  test("search and show distinct A1 writing / A2 four-skills exam guides without a purchase button", () => {
+    const newTitles = [
+      { id: "a1-writing-model-exams", title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
+        description: "Independent A1 writing practice", levelTags: ["A1"], formats: ["digital", "printed"],
+        pages: 30, topics: ["schreiben", "formulare"], status: "coming_soon", bookIds: [] },
+      { id: "a2-four-skills-exam-guide", title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
+        description: "Independent A2 four-skills preparation", levelTags: ["A2"], formats: ["digital", "printed"],
+        pages: 50, topics: ["lesen", "hören", "schreiben", "sprechen"], status: "coming_soon", bookIds: [] },
+    ];
+    render(<BooksCatalog catalogTitles={newTitles} books={offers} fxQuote={null} />);
+    const upcomingLinks = screen.getAllByRole("link", { name: "Explore upcoming book" });
+    expect(upcomingLinks).toHaveLength(2);
+    expect(upcomingLinks[1]).toHaveAttribute("href", "/books/goethe-a2-four-skills-exam-guide");
+    expect(screen.getAllByText(/Checkout is not available yet/)).toHaveLength(2);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "sprechen" } });
+    expect(screen.getByRole("status")).toHaveTextContent("1 book found");
+  });
+
 });
