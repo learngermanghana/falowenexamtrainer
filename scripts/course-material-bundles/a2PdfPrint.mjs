@@ -69,6 +69,24 @@ export const sanitizeA2PrintDocument = (section = "") => {
   if (webOnlyAction.test(label)) node.remove();
  }
 
+ // Last-resort printable-copy cleanup for chrome labels that are rendered
+ // as ordinary React text rather than a link or a marked widget. This operates
+ // only in the private Playwright page, never in the student app or curriculum.
+ // Keep the audio instruction readable instead of leaving a broken sentence.
+ const textWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+ const printTextNodes = [];
+ while (textWalker.nextNode()) printTextNodes.push(textWalker.currentNode);
+ for (const node of printTextNodes) {
+  if (node.parentElement?.closest('script,style,noscript')) continue;
+  const original = String(node.nodeValue || "");
+  if (!/(?:back\\s+to\\s+course\\s+book|falowen\\s+radio|teacher\\s+video)/i.test(original)) continue;
+  const cleaned = original
+   .replace(/[←‹«]?[ \\t]*back\\s+to\\s+course\\s+book/gi, "")
+   .replace(/falowen\\s+radio/gi, "Falowen audio lesson")
+   .replace(/teacher\\s+video/gi, "teacher lecture");
+  node.nodeValue = cleaned;
+ }
+
  // Legacy class-sharing widgets include classmates' names, dates and prose.
  for (const field of [...root.querySelectorAll('textarea[id^="workbook-share-"]')]) {
   let wrapper = field.parentElement;
