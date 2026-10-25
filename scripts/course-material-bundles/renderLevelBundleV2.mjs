@@ -5,6 +5,7 @@ import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { addA2RetailCover } from "./a2RetailCover.mjs";
+import { renderA2Day22SpeakingMockPrint } from "./renderA2Day22SpeakingMockPrint.mjs";
 import { a2PrintCss, sanitizeA2PrintDocument, extractA2PrintSnapshot, a2SectionReady, findA2PdfLeaks } from "./a2PdfPrint.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -473,6 +474,13 @@ const renderA2B1Lesson = async (page, lesson) => {
 };
 
 const renderLesson = async (page, lesson) => {
+  // Day 22 is the live Goethe A2 Speaking Mock (not a normal tabbed
+  // workbook). In the private read-only print proof only, build its
+  // deterministic paper practice sheets from the existing speaking
+  // dictionary. Never start a graded assessment or read a student's work.
+  if (a2EditorialLocal && level === "A2" && Number(lesson.day) === 22) {
+    return renderA2Day22SpeakingMockPrint({ lesson, renderDir });
+  }
   if (level === "A1") return renderA1Lesson(page, lesson);
   if (level === "A2" || level === "B1") return renderA2B1Lesson(page, lesson);
   if (level === "B2" || level === "C1" || level === "C2") return renderGuidedLesson(page, lesson);
