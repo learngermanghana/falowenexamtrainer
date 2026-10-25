@@ -5989,6 +5989,7 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
       ...(verifiedResult && completionSync?.ok ? { verifiedResult } : {}),
+      ...(verifiedResult && completionSync?.ok && isA2KombiMock(state.mockId) ? {readingAnswerKey:require("./a2KombiReadingKeys")[state.mockId]} : {}),
     });
   } catch (err) {
     console.error("/a2-mock/attempt/save error", err);
