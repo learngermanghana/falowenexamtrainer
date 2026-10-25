@@ -51,3 +51,28 @@ A2 is **not a live Falowen Books product** yet. The PDF and sample are editorial
 - Decide final page count and pricing after visual review; never assume A2 must have A1's 250 pages.
 
 A1 Books PR #3161 is open separately and touches the same course-material workflow. Merge carefully to preserve the sample-only privacy gates for both A1 and A2. The Vercel preview deployments for Falowen remain disabled. Do not merge this A2 change until all CI and a full content proof are reviewed.
+
+
+## Private localhost A2 editorial export (implemented October 25)
+
+Use the branch-only manual GitHub workflow:
+`.github/workflows/a2-editorial-readonly-proof.yml`
+
+It starts the **current repository source** using a local Vite development server on `http://127.0.0.1:4173`. The PDF renderer activates `FALOWEN_A2_EDITORIAL_PRINT=true` only with that loopback URL and a private browser init-script flag. The A2 workbook accepts that flag only in Vite development mode on port 4173, so it cannot be activated by query strings, production builds, student accounts, public preview domains or normal browser navigation.
+
+The workbook uses a presentational, read-only wrapper rather than `SharedTimedAssignment` in this isolated editor session. It preserves the original lesson's Grammar, Sprechen, Schreiben, Lesen and Hören sections, without starting a timer or unlocking a student's actual assignment. Submit/Ref navigation, live AI practice fields, and grading buttons cannot appear in the editorial view. The browser also blocks Firestore write/commit traffic while the PDF is produced. Normal Falowen pages still mount the original `SharedTimedAssignment`, use its locking rules, and maintain normal student status and scores.
+
+**GitHub Actions prerequisites:** The PDF editorial test account already uses `FALOWEN_PDF_EMAIL` and `FALOWEN_PDF_PASSWORD` secrets. The local Vite app additionally requires these six **Firebase public client configuration values** to be saved under GitHub repository Settings → Secrets and variables → Actions, preferably in *Variables* (the workflow also accepts secrets with these names):
+
+- `REACT_APP_FIREBASE_API_KEY`
+- `REACT_APP_FIREBASE_AUTH_DOMAIN`
+- `REACT_APP_FIREBASE_PROJECT_ID`
+- `REACT_APP_FIREBASE_STORAGE_BUCKET`
+- `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`
+- `REACT_APP_FIREBASE_APP_ID`
+
+Copy the existing **client** settings from Falowen's approved Firebase/Vercel environment. **Never copy Firebase Admin service-account credentials, a Vercel API token, database admin keys, or Paystack secrets into the client variables.** The values above are client identifiers/configuration, not server secrets. When missing, the workflow fails before installing browser/runtime dependencies; see the initial preflight attempt: https://github.com/learngermanghana/falowenexamtrainer/actions/runs/40175342936.
+
+After the six public client settings are available, rerun the private proof from the A2 branch (workflow can be retriggered by a change to its YAML file). Only the free Day 1 sample may be uploaded as an Actions artifact. No full book, personal saved work, Firestore data, authentication tokens, or private PDF must be published publicly. Review the complete page count, layout and navigation *within the trusted runner* before sale. The source content still needs a commercial rights review and book-only audio-access disclosure.
+
+**No production merges/deployments were made as part of implementing this mode.**
