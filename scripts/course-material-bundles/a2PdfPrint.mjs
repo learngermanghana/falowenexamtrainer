@@ -34,10 +34,11 @@ export const findA2PdfLeaks = value => {
 // without editing a student React component or exposing a saved Firestore draft.
 export const sanitizeA2PrintDocument = (section = "") => {
  const root = document.querySelector("main") || document.body;
+ // Hide workbook tabs from the PDF with print CSS only. Never delete
+ // React-owned tab controls during a multi-section render.
  const nodes = [...root.querySelectorAll(
   '[data-course-inline-practice], [data-a2-print-private], [data-a1-print-private], ' +
-  '[data-live-class-response], [data-live-class-response-mount], ' +
-  '[data-universal-a2-workbook-tabs]'
+  '[data-live-class-response], [data-live-class-response-mount]'
  )];
  for (const node of nodes) node.remove();
 
