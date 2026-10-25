@@ -49,10 +49,31 @@ const LISTENING_ANSWER_KEY = Object.freeze({
   "t3-15": "a",
 });
 
-const {scoreObjectiveAnswers,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
+const {scoreObjectiveAnswers,verifiedSectionScore,buildVerifiedFourSkillScore}=require("./verifiedFourSkillMockScore");
+const isKombiMock = (mockId) => /^a1-mock-0[4-8]$/.test(String(mockId || ""));
 
 const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {}, mockId = "a1-mock-01" } = {}) => {
   const mockSet = getA1MockSet(mockId);
+  if (isKombiMock(mockId)) {
+    if (state?.mockId && state.mockId !== mockId) {
+      const error = new Error("Saved A1 Kombipruefung attempt belongs to a different paper.");
+      error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
+    }
+    if (state?.assessmentVersion && state.assessmentVersion !== "three-module-v1") {
+      const error = new Error("Unsupported A1 Kombipruefung assessment version.");
+      error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
+    }
+    const lesen = scoreObjectiveAnswers(state.lesenAnswers || {}, mockSet.readingAnswerKey, 25);
+    const schreiben = verifiedSectionScore(verifiedSections,"schreiben",{errorCode:"A1_MOCK_SECTION_NOT_VERIFIED"});
+    const sprechen = verifiedSectionScore(verifiedSections,"sprechen",{errorCode:"A1_MOCK_SECTION_NOT_VERIFIED"});
+    const points = Number((lesen.score + schreiben + sprechen).toFixed(1));
+    const percentage = Number((points * 100 / 75).toFixed(1));
+    return {
+      sectionScores: {lesen:lesen.score, schreiben, sprechen},
+      overall: {score:percentage,maxScore:100,points,maxPoints:75,assessmentVersion:"three-module-v1",sections:["lesen","schreiben","sprechen"],passed:percentage>=60},
+      objective: {lesen}
+    };
+  }
   return buildVerifiedFourSkillScore({
     level:"A1",state,verifiedSections,
     answerKeys:{
@@ -146,16 +167,16 @@ const formatScore = (value) => {
   return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
 };
 
-const buildSectionBreakdown = (sectionScores = {}) =>
-  SECTION_ORDER.map((key) => ({
+const buildSectionBreakdown = (sectionScores = {}, mockId = "") =>
+  (isKombiMock(mockId) ? ["lesen","schreiben","sprechen"] : SECTION_ORDER).map((key) => ({
     key,
     label: SECTION_LABELS[key],
     score: Math.max(0, Math.min(25, Number(sectionScores?.[key]) || 0)),
     maxScore: 25,
   }));
 
-const deriveMockInsights = (sectionScores = {}) => {
-  const breakdown = buildSectionBreakdown(sectionScores);
+const deriveMockInsights = (sectionScores = {}, mockId = "") => {
+  const breakdown = buildSectionBreakdown(sectionScores, mockId);
   const sorted = [...breakdown].sort((left, right) => right.score - left.score);
   return {
     breakdown,
@@ -187,8 +208,8 @@ const resolveStudentIdentity = ({ authedUser = {}, studentProfile = null } = {})
 };
 
 const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockId = "a1-mock-01" } = {}) => {
-  if (["a1-mock-02", "a1-mock-03"].includes(mockId)) {
-    const id = mockId === "a1-mock-03" ? "A1-MOCK-03" : "A1-MOCK-02";
+  if (["a1-mock-02", "a1-mock-03"].includes(mockId) || isKombiMock(mockId)) {
+    const id = `A1-MOCK-${String(mockId).slice(-2)}`;
     return firstAttempt || Number(attemptNumber) === 1 ? id : `${id}-PRACTICE-${Math.max(1, Number(attemptNumber) || 1)}`;
   }
   const number = Math.max(1, Number(attemptNumber) || 1);
@@ -209,10 +230,10 @@ const buildA1MockCompletionArtifacts = ({
   now = new Date(),
 } = {}) => {
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
-  const mockTitle = mockId === "a1-mock-03" ? "A1 Mock 3" : mockId === "a1-mock-02" ? "A1 Mock 2" : MOCK_TITLE;
+  const mockTitle = isKombiMock(mockId) ? `A1 Mock ${Number(mockId.slice(-2))} · Kombiprüfung` : mockId === "a1-mock-03" ? "A1 Mock 3" : mockId === "a1-mock-02" ? "A1 Mock 2" : MOCK_TITLE;
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
-  const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores);
+  const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores, mockId);
   const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1
     ? "First readiness attempt"
@@ -252,12 +273,16 @@ const buildA1MockCompletionArtifacts = ({
     comments,
     feedback: comments,
     date: iso,
-    link: mockId === "a1-mock-03" ? "/campus/course/a1-final-mock-3" : mockId === "a1-mock-02" ? "/campus/course/a1-final-mock-2" : "/campus/course/a1-final-mock-exam",
+    link: isKombiMock(mockId) ? `/campus/course/a1-final-mock-${Number(mockId.slice(-2))}` : mockId === "a1-mock-03" ? "/campus/course/a1-final-mock-3" : mockId === "a1-mock-02" ? "/campus/course/a1-final-mock-2" : "/campus/course/a1-final-mock-exam",
     attempt: Math.max(1, Number(attemptNumber) || 1),
     firstAttempt: Boolean(firstAttempt),
     attemptLabel,
     attemptType: firstAttempt || Number(attemptNumber) === 1 ? "readiness" : "practice",
     mockAttemptId: clean(attemptId),
+    assessmentVersion: isKombiMock(mockId) ? "three-module-v1" : "four-module-v1",
+    scoredModules: breakdown.map(item => item.key),
+    points: isKombiMock(mockId) ? Number(overall?.points || 0) : score,
+    maxPoints: isKombiMock(mockId) ? 75 : 100,
     sectionScores: Object.fromEntries(breakdown.map((item) => [item.key, item.score])),
     scoreBreakdown: breakdown,
     strongestArea: strongest,
@@ -267,7 +292,7 @@ const buildA1MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = mockId === "a1-mock-03" ? "Your A1 Mock 3 result is ready" : mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
+  const notificationTitle = isKombiMock(mockId) ? `Your A1 Mock ${Number(mockId.slice(-2))} result is ready` : mockId === "a1-mock-03" ? "Your A1 Mock 3 result is ready" : mockId === "a1-mock-02" ? "Your A1 Mock 2 result is ready" : firstAttempt
     ? "Your A1 Final Mock result is ready"
     : "Your A1 Final Mock practice result is ready";
 
@@ -307,7 +332,7 @@ const buildA1MockCompletionArtifacts = ({
       strongestArea: strongest,
       practiseNext: weakest,
       lesen: formatScore(sectionScores?.lesen),
-      hoeren: formatScore(sectionScores?.hoeren),
+      ...(isKombiMock(mockId) ? {} : {hoeren: formatScore(sectionScores?.hoeren)}),
       schreiben: formatScore(sectionScores?.schreiben),
       sprechen: formatScore(sectionScores?.sprechen),
       notificationId,
