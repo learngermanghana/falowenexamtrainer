@@ -1,26 +1,98 @@
 import React from "react";
-import { A1_KOMBI_READING_PAPERS } from "../data/a1KombiReadingPapers";
+import { A1_KOMBI_STRUCTURED_READING } from "../data/a1KombiStructuredReading";
+import "./A1GoetheReadingMockTeil1Preview.css";
+import "./A1GoetheReadingMockTeil3Preview.css";
+import "./A1Mock2.css";
+import "./A1Mock3Reading.css";
 
-// Source text retains the original contexts and statements; no answers are shipped.
-export default function A1KombiReadingSection({mockNumber,answers={},onChange}){
- const paper=A1_KOMBI_READING_PAPERS[mockNumber];
- if(!paper) return <p role="alert">Reading paper not available.</p>;
- return <div className="a1-kombi-reading">
-  <p>Lesen Sie alle Texte und Aufgaben auf dem Prüfungsblatt. Wählen Sie danach Ihre Antworten. Teil 1 und Teil 3: Richtig/Falsch. Teil 2: Anzeige a/b.</p>
-  <div style={{whiteSpace:"pre-wrap",fontFamily:"inherit",lineHeight:1.65,padding:"1rem",background:"#fff",border:"1px solid #e2e8f0",borderRadius:12}}>{paper.paperText}</div>
-  {["Teil 1 · Aufgaben 1–5","Teil 2 · Aufgaben 6–10","Teil 3 · Aufgaben 11–15"].map((label,i)=>
-  <fieldset key={label} style={{marginTop:20,padding:16,border:"1px solid #dbe2ea",borderRadius:10}}>
-   <legend style={{fontWeight:700}}>{label}</legend>
-   {Array.from({length:5},(_,j)=>i*5+j+1).map(n=>{
-    const id=`t${i+1}-${n}`,choices=i===1?["a","b"]:["richtig","falsch"];
-    return <fieldset key={id} style={{margin:"12px 0",padding:10,border:"1px solid #edf2f7",borderRadius:8}}>
-      <legend>Aufgabe {n}</legend>
-      {choices.map(choice=><label key={choice} style={{display:"inline-flex",alignItems:"center",gap:7,marginRight:20}}>
-        <input type="radio" name={`lesen-${id}`} value={choice} checked={answers[id]===choice} onChange={()=>onChange(id,choice)} />
-        {choice==="richtig"?"Richtig":choice==="falsch"?"Falsch":choice}
-      </label>)}
-    </fieldset>;
-   })}
-  </fieldset>)}
- </div>;
+// Reuse the same cards, radio controls, source panels and responsive styles as A1 Mock 3.
+// Answer keys remain on the backend; these components receive learner answers only.
+const Choices = ({ number, part, answers, onChange, mockNumber }) => {
+  const key = `t${part}-${number}`;
+  const choices = part === 2 ? [["a", "Text A"], ["b", "Text B"]] :
+    [["richtig", "Richtig"], ["falsch", "Falsch"]];
+  return (
+    <div className="a1-goethe-mock-choices" role="radiogroup" aria-label={`Aufgabe ${number}`}>
+      {choices.map(([value,label]) => (
+        <label className="a1-goethe-mock-choice" key={value}>
+          <input
+            type="radio"
+            name={`a1-mock-${mockNumber}-lesen-${key}`}
+            value={value}
+            checked={answers[key] === value}
+            onChange={() => onChange(key,value)}
+          />
+          <span>{label}</span>
+        </label>
+      ))}
+    </div>
+  );
+};
+
+export default function A1KombiReadingSection({ mockNumber, answers = {}, onChange }) {
+  const paper = A1_KOMBI_STRUCTURED_READING[mockNumber];
+  if (!paper) return <p role="alert">Reading paper not available.</p>;
+
+  return (
+    <div className="a1-mock2-reading a1-mock3-reading a1-kombi-reading" lang="de" data-a1-kombi-reading-section>
+      <section className="a1-final-mock-part" aria-labelledby={`kombi-${mockNumber}-part-1`}>
+        <h2 id={`kombi-${mockNumber}-part-1`}>Teil 1</h2>
+        <p>Lesen Sie die beiden Texte und die Aufgaben 1 bis 5. <strong>Kreuzen Sie an: Richtig oder Falsch.</strong></p>
+        {paper.texts.map(text => (
+          <React.Fragment key={text.id}>
+            <h3>Text {text.id}</h3>
+            <article className="a1-goethe-mock-paper">
+              <div className="a1-mock2-email-meta"><strong>{text.title}</strong></div>
+              <div className="a1-goethe-mock-paper-copy"><p>{text.body.replace(text.title, "").trim()}</p></div>
+            </article>
+            {paper.teil1.filter(question => question.text === text.id).map(question => (
+              <section className="a1-goethe-mock-question" key={question.number}>
+                <h3>Aufgabe {question.number}</h3>
+                <p className="a1-goethe-mock-statement">{question.statement}</p>
+                <Choices number={question.number} part={1} mockNumber={mockNumber} answers={answers} onChange={onChange} />
+              </section>
+            ))}
+          </React.Fragment>
+        ))}
+      </section>
+
+      <section className="a1-final-mock-part" aria-labelledby={`kombi-${mockNumber}-part-2`}>
+        <h2 id={`kombi-${mockNumber}-part-2`}>Teil 2</h2>
+        <p>Lesen Sie die Situation und beide Websites. <strong>Wählen Sie Text A oder Text B.</strong></p>
+        {paper.teil2.map(question => (
+          <section className="a1-goethe-mock-question" key={question.number}>
+            <h3>Aufgabe {question.number}</h3>
+            <p className="a1-goethe-mock-statement">{question.statement}</p>
+            <div className="a1-mock2-sources">
+              {question.options.map(option => (
+                <article key={option.id} className="a1-goethe-mock-browser-panel">
+                  <div className="a1-goethe-mock-browser-greenbar">Website {option.id.toUpperCase()}</div>
+                  <div className="a1-mock2-source-copy"><p>{option.body}</p></div>
+                </article>
+              ))}
+            </div>
+            <Choices number={question.number} part={2} mockNumber={mockNumber} answers={answers} onChange={onChange} />
+          </section>
+        ))}
+      </section>
+
+      <section className="a1-final-mock-part" aria-labelledby={`kombi-${mockNumber}-part-3`}>
+        <h2 id={`kombi-${mockNumber}-part-3`}>Teil 3</h2>
+        <p>Lesen Sie die Schilder und Aushänge. <strong>Kreuzen Sie an: Richtig oder Falsch.</strong></p>
+        {paper.teil3.map(question => (
+          <section className="a1-goethe-mock-question a1-goethe-mock-teil3-question" key={question.number}>
+            <h3>Aufgabe {question.number}</h3>
+            <div className="a1-goethe-mock-notice-card">
+              <div className="a1-goethe-mock-notice-inner">
+                <h3>{question.heading}</h3>
+                <p>{question.notice}</p>
+              </div>
+            </div>
+            <p className="a1-goethe-mock-statement">{question.statement}</p>
+            <Choices number={question.number} part={3} mockNumber={mockNumber} answers={answers} onChange={onChange} />
+          </section>
+        ))}
+      </section>
+    </div>
+  );
 }
