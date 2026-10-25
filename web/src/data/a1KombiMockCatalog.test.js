@@ -5,7 +5,7 @@ test.each([4,5,6,7,8])("A1 Mock %s is registered as a separately labelled three-
  const id = `a1-final-${String(number).padStart(2,"0")}`;
  const exam = getMockExam(id);
  expect(exam).toMatchObject({id,level:"A1",status:"preview",mode:"kombi",
-    sections:["Lesen","Schreiben","Sprechen"],showInMockLibrary:true});
+    sections:number===4?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"],showInMockLibrary:true});
  expect(buildA1KombiAttemptContract(number).mockId).toBe(id);
  expect(getMockExamsForLevel("A1").some(item=>item.id===id)).toBe(true);
 });

@@ -5,6 +5,10 @@ on:
     paths:
       - "functions/functionz/a1Kombi*"
       - "functions/functionz/a1MockSets.js"
+      - "functions/functionz/a1Mock4ListeningKeys.js"
+      - "functions/functionz/tests/a1Mock4HoerenUpgrade.test.cjs"
+      - "web/src/data/a1Mock4Listening.js"
+      - "web/src/components/A1Mock4HoerenUpgrade.test.jsx"
       - "functions/functionz/a1MockCompletionSync.js"
       - "functions/functionz/assessmentTaskContext.js"
       - "functions/functionz/verifiedFourSkillMockScore.js"
@@ -51,9 +55,10 @@ jobs:
           node --check functions/functionz/a1KombiMarkingSets.js
           node --check functions/functionz/a1KombiReadingKeys.js
           node --check functions/functionz/a1MockCompletionSync.js
+          node --check functions/functionz/a1Mock4ListeningKeys.js
           node --check functions/functionz/assessmentTaskContext.js
       - name: Test all five A1 mock answer keys, verified receipts and Firestore result writes
-        run: node --test functions/functionz/tests/a1KombiMocks04to08.test.cjs
+        run: node --test functions/functionz/tests/a1KombiMocks04to08.test.cjs functions/functionz/tests/a1Mock4HoerenUpgrade.test.cjs
 
   learner-a1-kombi-flow:
     runs-on: ubuntu-latest
@@ -78,4 +83,5 @@ jobs:
             src/data/a1KombiMockCatalog.test.js \
             src/components/A1KombiMockIntegration.test.jsx \
             src/components/A1KombiFlowContract.test.jsx \
-            src/components/A1KombiMockDesignParity.test.jsx
+            src/components/A1KombiMockDesignParity.test.jsx \
+            src/components/A1Mock4HoerenUpgrade.test.jsx

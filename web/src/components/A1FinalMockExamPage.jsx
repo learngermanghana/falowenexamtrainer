@@ -14,6 +14,7 @@ import A1Mock2Reading from "./A1Mock2Reading";
 import A1Mock3ReadingSection from "./A1Mock3ReadingSection";
 import A1KombiReadingSection from "./A1KombiReadingSection";
 import { A1_KOMBI_TASK_SETS } from "../data/a1KombiTaskSets";
+import { A1_MOCK_4_LISTENING } from "../data/a1Mock4Listening";
 import { A1_MOCK_3_ID, A1_MOCK_3_READING, A1_MOCK_3_LISTENING, A1_MOCK_3_WRITING, A1_MOCK_3_WRITING_TASK, A1_MOCK_3_SPEAKING } from "../data/a1FinalMock3Data";
 import { A1_MOCK_2_ID, A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from "../data/a1FinalMock2Data";
 import { A1PictureOptions } from "./ListeningPracticeSamplePage";
@@ -238,7 +239,7 @@ const NoticeCard = ({ notice }) => (
   </div>
 );
 
-const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange, sampleId }) => {
+const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange, sampleId, mockAudioId="mock-01" }) => {
   const audioRef = useRef(null);
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -253,7 +254,7 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange, sam
 
     (sampleId ? fetchA1ExamHorenAudioPlaybackUrl : fetchA1MockAudioPlaybackUrl)({
       sampleId,
-      mockId: "mock-01",
+      mockId: mockAudioId,
       part,
       key: objectKey,
       idToken,
@@ -273,7 +274,7 @@ const LockedExamAudio = ({ part, objectKey, idToken, status, onStatusChange, sam
     return () => {
       active = false;
     };
-  }, [idToken, objectKey, part, sampleId]);
+  }, [idToken, objectKey, part, sampleId, mockAudioId]);
 
   const startAudio = () => {
     if (loading || status === "ended" || !audioRef.current || !audioUrl) return;
@@ -362,7 +363,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const kombiSet = isKombi ? A1_KOMBI_TASK_SETS[kombiNumber] : null;
   const isAdditionalMock = isMock2 || isMock3 || isKombi;
   const title = isKombi ? `A1 Mock ${kombiNumber} · Kombiprüfung` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
-  const listening = isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
+  const listening = mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
   const writing = isKombi ? kombiSet.writing : isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
   const writingTask = isKombi ? {situation:writing.teil2.situation,points:writing.teil2.points} : isMock3 ? A1_MOCK_3_WRITING_TASK : isMock2 ? A1_MOCK_2_WRITING_TASK : A1_FINAL_MOCK_WRITING_TASK;
   const lesenScoredQuestions = useMemo(() => isKombi
@@ -370,11 +371,13 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     : isAdditionalMock
       ? Object.values(isMock3 ? A1_MOCK_3_READING : A1_MOCK_2_READING).flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
       : defaultLesenQuestions, [isAdditionalMock, isMock3, isKombi]);
-  const hoerenScoredQuestions = useMemo(() => isKombi ? [] : isAdditionalMock
+  const hoerenScoredQuestions = useMemo(() => isKombi && mockId!=="a1-mock-04" ? [] : isAdditionalMock
     ? [listening.teil1, listening.teil2, listening.teil3].flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
-    : defaultHoerenQuestions, [isAdditionalMock, listening, isKombi]);
+    : defaultHoerenQuestions, [isAdditionalMock, listening, isKombi, mockId]);
   const storageKey = `${isAdditionalMock ? `falowen:a1-final-mock:${mockId}` : A1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey, mockId));
+  const hasHoren = !isKombi || (mockId==="a1-mock-04" && (exam.assessmentVersion==="four-module-v2" || (!exam.attemptInfo && exam.stage==="intro")));
+  const isKombiThree = isKombi && !hasHoren;
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -461,11 +464,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           throw syncError;
         }
         if (isKombi) {
-          if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey) {
+          if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey ||
+            (mockId==="a1-mock-04" && exam.assessmentVersion==="four-module-v2" && !response?.listeningAnswerKey)) {
             throw new Error("Falowen has not returned the verified Kombiprüfung result.");
           }
           completionSaveRef.current = `${attemptId}:${Number(response.verifiedOverall.score)}:${completionRetryNonce}`;
-          setExam(current => ({...current,overall:response.verifiedOverall,sectionScores:response.verifiedSectionScores,readingAnswerKey:response.readingAnswerKey,verificationPending:false}));
+          setExam(current => ({...current,overall:response.verifiedOverall,sectionScores:response.verifiedSectionScores,readingAnswerKey:response.readingAnswerKey,...(response.listeningAnswerKey ? {listeningAnswerKey:response.listeningAnswerKey} : {}),verificationPending:false}));
         }
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
@@ -531,10 +535,10 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       sectionDeadlineMs: Date.now() + (isKombi && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]) * 1000,
     }));
     timeoutHandledRef.current = "";
-    const previousSection = { hoeren: "Lesen", schreiben: isKombi ? "Lesen" : "Hören", sprechen: "Schreiben" }[stage];
+    const previousSection = { hoeren: "Lesen", schreiben: hasHoren ? "Hören" : "Lesen", sprechen: "Schreiben" }[stage];
     if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [isKombi]);
+  }, [isKombi,hasHoren]);
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
@@ -567,7 +571,9 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
             ? exam
             : response.state;
 
-        setExam({ ...emptyState(mockId), ...newestState, attemptInfo: {
+        setExam({ ...emptyState(mockId), ...newestState,
+          assessmentVersion:response.assessmentVersion || newestState.assessmentVersion,
+          attemptInfo: {
           attemptId: response.attemptId,
           attemptNumber: response.attemptNumber,
           firstAttempt: response.firstAttempt,
@@ -578,7 +584,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
       const next = {
         ...emptyState(mockId),
-        ...(isKombi ? {assessmentVersion:"three-module-v1", verificationPending:false} : {}),
+        ...(isKombi ? {assessmentVersion:response.assessmentVersion || "three-module-v1", verificationPending:false} : {}),
         stage: "lesen",
         sectionDeadlineMs: Date.now() + SECTION_DURATIONS.lesen * 1000,
         attemptInfo: {
@@ -598,19 +604,19 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
   const submitLesen = useCallback(() => {
     const result = isKombi ? null : scoreObjective(exam.lesenAnswers, lesenScoredQuestions, readingKey);
-    moveToSection(isKombi ? "schreiben" : "hoeren", {
+    moveToSection(hasHoren ? "hoeren" : "schreiben", {
       sectionScores: isKombi ? exam.sectionScores : { ...exam.sectionScores, lesen: result.score },
       lesenResult: result,
     });
-  }, [exam.lesenAnswers, exam.sectionScores, moveToSection, lesenScoredQuestions, isKombi]);
+  }, [exam.lesenAnswers, exam.sectionScores, moveToSection, lesenScoredQuestions, isKombi,hasHoren]);
 
   const submitHoeren = useCallback(() => {
-    const result = scoreObjective(exam.hoerenAnswers, hoerenScoredQuestions, listeningKey);
+    const result = isKombi ? null : scoreObjective(exam.hoerenAnswers, hoerenScoredQuestions, listeningKey);
     moveToSection("schreiben", {
-      sectionScores: { ...exam.sectionScores, hoeren: result.score },
+      sectionScores: isKombi ? exam.sectionScores : { ...exam.sectionScores, hoeren: result.score },
       hoerenResult: result,
     });
-  }, [exam.hoerenAnswers, exam.sectionScores, moveToSection, hoerenScoredQuestions]);
+  }, [exam.hoerenAnswers, exam.sectionScores, moveToSection, hoerenScoredQuestions,isKombi]);
 
   const submitSchreiben = useCallback(async () => {
     if (busy) return;
@@ -678,7 +684,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           maxScore: 100,
           passed: overallScore >= 60,
         },
-        ...(isKombi ? {verificationPending:true,assessmentVersion:"three-module-v1"} : {}),
+        ...(isKombi ? {verificationPending:true} : {}),
         completed: true,
       };
     });
@@ -808,7 +814,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
         </>}
         <div className="a1-final-mock-submitbar">
           <span>{Object.keys(exam.lesenAnswers).length}/15 answered</span>
-          <button type="button" onClick={submitLesen}>Submit Lesen → {isKombi ? "Schreiben" : "Hören"}</button>
+          <button type="button" onClick={submitLesen}>Submit Lesen → {hasHoren ? "Hören" : "Schreiben"}</button>
         </div>
       </article>
     </>
@@ -824,6 +830,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
       <LockedExamAudio
         sampleId={listening.sampleId}
+        mockAudioId={mockId==="a1-mock-04"?"mock-04":"mock-01"}
         part={partName}
         objectKey={config.audioObjectKey}
         idToken={idToken}
@@ -1043,12 +1050,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           <p className="a1-goethe-mock-kicker">{title}</p>
           <h1>{overall.score}% — {overall.passed ? "PASSED" : "NEEDS MORE PRACTICE"}</h1>
           <p>{attemptLabel}</p>
-          {isKombi ? <p>Verified points: {overall.points}/75 · Assessment version: {overall.assessmentVersion}</p> : null}
+          {isKombi ? <p>Verified points: {overall.points}/{overall.maxPoints || 75} · Assessment version: {overall.assessmentVersion}</p> : null}
         </header>
 
-        {!isKombi ? <FullMockGuide level="A1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} /> : <p>Verified three-module Kombiprüfung · Hören not assessed</p>}
+        {!isKombi ? <FullMockGuide level="A1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} /> : <p>{hasHoren?"Verified four-module exam · Hören included":"Verified three-module Kombiprüfung · Hören not assessed"}</p>}
         <div className="a1-final-mock-scoregrid">
-          {(isKombi ? ["lesen","schreiben","sprechen"] : ["lesen", "hoeren", "schreiben", "sprechen"]).map((key) => (
+          {(isKombiThree ? ["lesen","schreiben","sprechen"] : ["lesen", "hoeren", "schreiben", "sprechen"]).map((key) => (
             <div key={key}>
               <span>{SECTION_LABELS[key]}</span>
               <strong>{Number(exam.sectionScores?.[key] || 0).toFixed(1)}/25</strong>
@@ -1078,17 +1085,17 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           })}
         </section>
 
-        {!isKombi ? <section className="a1-final-mock-review">
+        {hasHoren ? <section className="a1-final-mock-review">
           <h2>Hören review</h2>
           {hoerenScoredQuestions.map((question) => {
             const key = listeningKey(question);
             const submitted = exam.hoerenAnswers?.[key] || "—";
-            const correct = String(submitted).toLowerCase() === String(question.answer).toLowerCase();
+            const correct = String(submitted).toLowerCase() === String(isKombi ? exam.listeningAnswerKey?.[key] : question.answer).toLowerCase();
             return (
               <div className={correct ? "correct" : "incorrect"} key={key}>
                 <strong>Aufgabe {question.number}</strong>
                 <span>Your answer: {submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, isKombi ? exam.listeningAnswerKey?.[key] : question.answer, `${question.options.some(option => option.picture) ? "a1-picture-" : ""}hoeren-${key}`) : (isKombi ? exam.listeningAnswerKey?.[key] : question.part === "t2" && isAdditionalMock && question.explanation ? `Text ${question.answer.toUpperCase()}` : question.answer)}</span>
                 {question.explanation ? <p className="a1-mock2-explanation">{question.explanation}</p> : null}
               </div>
             );
@@ -1160,25 +1167,25 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
         <article className="a1-final-mock-intro">
           <p className="a1-goethe-mock-kicker">{isAdditionalMock ? "Exams Room · A1" : "Day 23 · A1"}</p>
           <h1>{title}</h1>
-          <p>{isKombi ? "Complete Lesen, Schreiben and Sprechen. Hören will be added later; it is not included in this result." : "Complete all four sections in order. Answers and AI feedback are revealed only after the full mock is finished."}</p>
+          <p>{isKombiThree ? "Complete Lesen, Schreiben and Sprechen. Hören is not included in this historic attempt." : "Complete all four sections in order. Answers and AI feedback are revealed only after the full mock is finished."}</p>
 
           {!isKombi ? <FullMockGuide level="A1" stage="intro" /> : null}
           <div className="a1-final-mock-overview">
             <div><strong>Lesen</strong><span>25 min · 25 points</span></div>
-            {!isKombi ? <div><strong>Hören</strong><span>max. 20 min · 25 points</span></div> : null}
+            {hasHoren ? <div><strong>Hören</strong><span>max. 20 min · 25 points</span></div> : null}
             <div><strong>Schreiben</strong><span>{isKombi ? 15 : 20} min · 25 points</span></div>
             <div><strong>Sprechen</strong><span>15 min · 25 points</span></div>
           </div>
 
           <div className="a1-final-mock-rules">
-            <strong>{isKombi ? "Pass mark: 60% · three modules /75" : "Pass mark: 60/100"}</strong>
+            <strong>{isKombiThree ? "Pass mark: 60% · three modules /75" : "Pass mark: 60/100"}</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
             <p>Your progress is saved automatically. Completed sections are locked. <strong>Leaving does not pause the section timer.</strong> Return to this page to resume the unfinished attempt; it is not a failed mock.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
           <button type="button" className="a1-final-mock-start" onClick={() => startExam()} disabled={busy === "start"}>
-            {busy === "start" ? "Preparing mock …" : isKombi ? "Start or resume 3 modules" : "Start or resume all 4 modules"}
+            {busy === "start" ? "Preparing mock …" : isKombiThree ? "Start or resume 3 modules" : "Start or resume all 4 modules"}
           </button>
         </article>
       </main>
@@ -1216,10 +1223,10 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           />
         </>
       ) : null}
-      {exam.stage === "result" && exam.verificationPending && !exam.writingPending ? <article className="a1-final-mock-intro" role="status"><h2>Verifying your final result</h2><p>Falowen is checking Lesen, verified Schreiben and verified Sprechen on the server. Your three-module score will appear after confirmation.</p>{error ? <p role="alert">{error}</p> : null}</article> : null}
+      {exam.stage === "result" && exam.verificationPending && !exam.writingPending ? <article className="a1-final-mock-intro" role="status"><h2>Verifying your final result</h2><p>Falowen is checking all required modules on the server. Your verified score will appear after confirmation.</p>{error ? <p role="alert">{error}</p> : null}</article> : null}
       {exam.stage === "result" && exam.writingPending ? (
         <article className="a1-final-mock-intro">
-          <h2>{isKombi ? "Three modules submitted" : "All four modules submitted"} · Schreiben feedback pending</h2>
+          <h2>{isKombiThree ? "Three modules submitted" : "All four modules submitted"} · Schreiben feedback pending</h2>
           <p>Your writing has been submitted, but AI marking is unavailable. You do not need to repeat the exam. The overall score will be shown only after grading succeeds.</p>
           {error ? <p role="alert">{error}</p> : null}
           <button type="button" disabled={busy==="schreiben"} onClick={retryPendingWriting}>

@@ -5182,7 +5182,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
     validateA1MockId(mockId);
-    const assessmentVersion = /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
+    const assessmentVersion = mockId==="a1-mock-04" ? "four-module-v2" : /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5320,7 +5320,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       const userData = userSnap.exists ? userSnap.data() || {} : {};
       const mockId = existing.mockId || "a1-mock-01";
       validateA1MockId(mockId);
-      if (existing.assessmentVersion === "three-module-v1" && state.assessmentVersion !== existing.assessmentVersion) {
+      if (["three-module-v1","four-module-v2"].includes(existing.assessmentVersion) && state.assessmentVersion !== existing.assessmentVersion) {
         saveOutcome = {invalidCompletion:true,code:"ASSESSMENT_TASK_CHANGED",error:"This attempt must retain its original three-module version."};
         return;
       }
@@ -5579,6 +5579,8 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           verifiedSectionScores: verifiedAttempt.verifiedSectionScores || null,
           // Release review keys only after the attempt is completed and server-verified.
           readingAnswerKey: getA1MockSet(verifiedAttempt.mockId)?.readingAnswerKey || null,
+          ...(verifiedAttempt.mockId==="a1-mock-04" && verifiedAttempt.assessmentVersion==="four-module-v2"
+            ? {listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey || null} : {}),
         };
       }
     }
