@@ -16,6 +16,13 @@ describe("Falowen A1 public bookstore launch", () => {
   test("keeps public storefront routing and secure Paystack receipt verification", () => {
     expect(app).toContain('location.pathname === "/books"');
     expect(app).toContain('location.pathname === "/books/complete"');
+    expect(app).toContain('<BookStoreCheckout catalogOnly />');
+    expect(app).toContain('<BookStoreCheckout detailBook="a1" />');
+    expect(app).toContain('<BookStoreCheckout detailBook="writing" />');
+    expect(bookstore).toContain('if (catalogOnly) return <main');
+    expect(bookstore).toContain('const visibleEditions = books.filter');
+    expect(bookstore).toContain('{visibleEditions.length ? visibleEditions.map');
+    expect(bookstore).toContain('document.head.querySelector(\'link[rel="canonical"]\')');
     expect(bookstore).toContain('request("/books/checkout"');
     expect(bookstore).toContain('request("/books/verify"');
     expect(bookstore).toContain("checkout.paystack.com");
@@ -41,7 +48,7 @@ describe("Falowen A1 public bookstore launch", () => {
   test("does not falsely promise the final mock, shipping, or immediate delivery", () => {
     expect(bookstore).toMatch(/final mock examination is not included/i);
     expect(bookstore).toMatch(/Delivery is charged separately/i);
-    expect(bookstore).toMatch(/No automatic PDF download/i);
+    expect(bookstore).toContain("secure downloads are provided when available");
     expect(bookstore).not.toContain("guaranteed same-day delivery");
   });
 });
