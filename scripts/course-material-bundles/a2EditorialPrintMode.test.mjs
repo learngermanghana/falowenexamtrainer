@@ -30,6 +30,12 @@ test("A2 editorial render skips the timed provider but normal students always us
   assert.match(workbook, /\{renderWorkbookContent\}[\s\S]*?<\/SharedTimedAssignment>/);
   assert.match(workbook, /!editorialPdfMode \? <CourseInlinePracticePanel type="writing"/);
   assert.match(workbook, /!editorialPdfMode \? <><SpeakingPracticeTimerCard \/>/);
+  assert.match(workbook, /!editorialPdfMode \|\| !\["references", "submit"\]\.includes\(requestedView\)/);
+  assert.match(workbook, /!editorialPdfMode && displayedActiveTab === "submit"/);
+  assert.match(workbook, /readOnly=\{editorialPdfMode\}/);
+  const published = get("web/src/components/PublishedHoerenPractice.jsx");
+  assert.match(published, /if \(readOnly \|\| !complete \|\| busy \|\| !lesson\) return/);
+  assert.match(published, /readOnly \? null : <button/);
   assert.match(workbook, /data-a2-editorial-print=\{editorialPdfMode \? "read-only"/);
 });
 
