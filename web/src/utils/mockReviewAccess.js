@@ -23,15 +23,23 @@ export const isA2Mock2ReviewReady = (keys) => {
     .every(k => Boolean(s[k]?.transcript));
   return Boolean(l.completedAt && h.completedAt && w.submittedAt && (conversationalComplete || originalComplete));
 };
-export const canReviewFullMock = (exam) => Boolean(exam?.completed &&
-  ["lesen", "hoeren", "schreiben", "sprechen"].every(key => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key)));
+export const getScoredMockSections = (exam) =>
+  exam?.assessmentVersion === "three-module-v1"
+    ? ["lesen", "schreiben", "sprechen"]
+    : ["lesen", "hoeren", "schreiben", "sprechen"];
+
+export const canReviewFullMock = (exam) => Boolean(
+  exam?.completed && !exam.writingPending && !exam.verificationPending &&
+  (exam.assessmentVersion !== "three-module-v1" ||
+    (exam.overall?.assessmentVersion === "three-module-v1" && exam.overall?.maxPoints === 75)) &&
+  getScoredMockSections(exam).every(key => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key)),
+);
 
 export const restoreFullMockReviewState = (exam) => {
-  // A submitted writing response may still await AI grading after Sprechen.
-  // Preserve the final pending-review screen instead of rolling a learner back
-  // into Schreiben and making them repeat work.
-  if (exam.stage !== "result" || exam.writingPending === true || canReviewFullMock(exam)) return exam;
-  const stage = ["lesen", "hoeren", "schreiben", "sprechen"].find(
+  // An exam with an AI or server verification still pending must remain on
+  // the review screen. Do not send learners back to already-submitted modules.
+  if (exam.stage !== "result" || exam.writingPending === true || exam.verificationPending === true || canReviewFullMock(exam)) return exam;
+  const stage = getScoredMockSections(exam).find(
     key => !Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, key),
   ) || "sprechen";
   return { ...exam, stage, completed: false };
