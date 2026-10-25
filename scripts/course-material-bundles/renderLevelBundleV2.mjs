@@ -362,6 +362,19 @@ const clickWorkbookTab = async (page, names) => {
     ];
     for (const tab of candidates) {
       if (!(await tab.count()) || !(await tab.isVisible().catch(() => false))) continue;
+      if (level === "A2" && await tab.isDisabled().catch(() => false)) {
+        const aria = String(await tab.getAttribute("aria-label") || "");
+        const lockedByTimer = /locked until timed work starts/i.test(aria);
+        // This is a real learner assessment gate. Never start/submit an
+        // attempt or forge Firestore progress merely to create a retail PDF.
+        throw new Error(
+          "A2 PDF export blocked: " + name +
+          (lockedByTimer ? " requires a timed assignment to start." : " is disabled.") +
+          " Use a dedicated PDF test account with legitimately completed/reviewed " +
+          "lesson access, or implement an authorized read-only print data path. " +
+          "No learner timer or submission was changed."
+        );
+      }
       await tab.click({ timeout: 10000 });
       await page.waitForTimeout(350);
       return true;
