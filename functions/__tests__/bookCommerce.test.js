@@ -145,3 +145,36 @@ test("a combined book order reconciles only the exact signed cart digest, total 
     assert.equal(rejected.body.status, "rejected");
   }
 });
+
+test("A1 and A2 exam guides remain distinct upcoming books with no purchasable SKU", () => {
+  const a1Guide = BOOK_CATALOG_TITLES.find(x => x.id === "a1-writing-model-exams");
+  const a2Guide = BOOK_CATALOG_TITLES.find(x => x.id === "a2-four-skills-exam-guide");
+  assert.ok(a1Guide);
+  assert.ok(a2Guide);
+  assert.equal(a1Guide.pages, 30);
+  assert.equal(a2Guide.pages, 50);
+  assert.deepEqual(a1Guide.levelTags, ["A1"]);
+  assert.deepEqual(a2Guide.levelTags, ["A2"]);
+  for (const guide of [a1Guide, a2Guide]) {
+    assert.equal(guide.status, "coming_soon");
+    assert.deepEqual(guide.bookIds, []);
+    assert.match(guide.description, /independent/i);
+    assert.match(guide.description, /not an official Goethe-Institut publication/i);
+  }
+  assert.equal(Object.keys(BOOKS).some(id => id.includes("exam-guide") || id.includes("writing-model-exams")), false);
+  assert.throws(() => priceBookCart([{ bookId: "a1-writing-model-exams-digital", quantity: 1 }]), /Choose a valid book/);
+  assert.throws(() => priceBookCart([{ bookId: "a2-four-skills-exam-guide-printed", quantity: 1 }]), /Choose a valid book/);
+});
+
+test("A1 printing rate produces provisional but not approved prices for the upcoming 30- and 50-page guides", () => {
+  const a1 = estimatePrintedBookPrice(30);
+  const a2 = estimatePrintedBookPrice(50);
+  assert.equal(a1.estimatedCostGhs, 79.2);
+  assert.equal(a1.rawRetailGhs, 96);
+  assert.equal(a1.suggestedRetailGhs, 100);
+  assert.equal(a2.estimatedCostGhs, 132);
+  assert.equal(a2.rawRetailGhs, 160);
+  assert.equal(a2.suggestedRetailGhs, 200);
+  assert.equal(a1.requiresPrinterQuote, true);
+  assert.equal(a2.requiresPrinterQuote, true);
+});
