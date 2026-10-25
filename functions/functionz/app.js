@@ -5579,6 +5579,8 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           verifiedSectionScores: verifiedAttempt.verifiedSectionScores || null,
           // Release review keys only after the attempt is completed and server-verified.
           readingAnswerKey: getA1MockSet(verifiedAttempt.mockId)?.readingAnswerKey || null,
+          ...(verifiedAttempt.mockId==="a1-mock-04" && verifiedAttempt.assessmentVersion==="four-module-v2"
+            ? {listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey || null} : {}),
         };
       }
     }
