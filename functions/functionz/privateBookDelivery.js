@@ -69,7 +69,6 @@ function signPrivateBookDownload({ bookId, env = process.env, now = new Date() }
     ["X-Amz-Date",amzDate],
     ["X-Amz-Expires",String(URL_EXPIRES_SECONDS)],
     ["X-Amz-SignedHeaders","host"],
-    ["response-content-disposition",'attachment; filename="' + object.filename + '"'],
   ].map(([k,v])=>[encode(k),encode(v)]).sort(([a],[b])=>a.localeCompare(b))
     .map(([k,v])=>k+"="+v).join("&");
   const canonical = ["GET",uri,query,"host:"+host+"\n","host","UNSIGNED-PAYLOAD"].join("\n");
