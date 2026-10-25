@@ -228,6 +228,27 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
   if (await openLessonWithAuthHydration(page, lesson, targetUrl)) return;
 
+  if (level === "A2") {
+    // Never write student names, course submissions or personalized HTML
+    // into a public GitHub Actions log (even on a failed proof).
+    const safeState = await page.evaluate(() => {
+      const body = document.body?.innerText || "";
+      return {
+        workbookHeadingPresent: /A2\\s*[·:]?\\s*Day\\s*\\d+\\s*Workbook/i.test(body),
+        loginFormPresent: Boolean(document.querySelector('input[type="password"]')),
+        radioGatePresent: Boolean(document.querySelector("[data-radio-first-workbook-gate]")),
+        workbookNavPresent: Boolean(document.querySelector("[data-workbook-tab-navigation]")),
+        nativeTabCount: document.querySelectorAll('[role="tab"]').length,
+        knownAppError: /Unexpected Application Error|permission denied|Missing or insufficient permissions/i.test(body),
+      };
+    });
+    const safePath = new URL(page.url()).pathname;
+    throw new Error(
+      `A2 Day ${lesson.day}: workbook tabs did not mount after authenticated navigation. ` +
+      `Path: ${safePath}; safe UI state: ${JSON.stringify(safeState)}. ` +
+      "Check deployed A2 tab rendering and PDF test-account course access before another full build.",
+    );
+  }
   const preview = (await getBodyText(page)).slice(0, 700);
   throw new Error(
     `Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Current URL: ${page.url()}. Preview: ${preview}`,
