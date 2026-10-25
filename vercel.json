@@ -171,6 +171,13 @@
   ],
   "routes": [
     {
+      "src": "/book/?",
+      "status": 308,
+      "headers": {
+        "Location": "/books"
+      }
+    },
+    {
       "src": "/robots\\.txt",
       "has": [
         {
