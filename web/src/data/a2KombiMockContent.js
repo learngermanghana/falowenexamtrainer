@@ -1,4 +1,4 @@
-// Falowen A2 three-module Kombiprüfung Mocks 4–8. Answer keys and example solutions are not bundled for students.
+// Falowen A2 three-module Kombiprüfung Mocks 4–8. Student source only; answer keys stay private.
 export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
   "4": {
     "id": "a2-mock-04",
@@ -115,7 +115,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Information, Fundbüro, Gastronomie & Bistro\n        (EG)",
+        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Information, Fundbüro, Gastronomie & Bistro\n        (EG)\n\n 1. Obergeschoss      Damen- & Herrenmode, Schuhe, Accessoires\n\n 2. Obergeschoss      Elektronik, Laptops, Smartphones, Reparaturservice\n\n 3. Obergeschoss      Bücher, Schreibwaren, Café, Kundenservice",
         "questions": [
           {
             "number": 6,
@@ -211,7 +211,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil3": {
         "title": "Teil 3 · E-Mail / Mitteilung",
-        "source": "E-Mail von Laura: Einladung zum gemeinsamen Kochabend Liebe Grüße aus Berlin! Ich habe letzten Samstag meine neue Küche fertig eingerichtet und möchte das feiern. Hast du Lust, am Freitagabend ab 18:30 Uhr zu mir zu kommen? Wir können zusammen italienisch kochen. Ich kaufe die Zutaten ein. Bring bitte nur ein paar Getränke und gute Laune mit! Sag mir bitte bis Mittwoch Bescheid, ob du kommen kannst. 11. Warum lädt Laura ein? a) Sie feiert ihre neue Küche. b) Sie hat Geburtstag. c) Sie zieht nach München. 12. Wann soll das Treffen stattfinden? a) Am Samstagmittag. b) Am Freitagabend. c) Am Mittwochmorgen. 13. Was soll der Gast mitbringen? a) Zutaten zum Kochen. b) Getränke. c) Ein Geschenk für die Küche. 14. Wer kaufe die Lebensmittel ein? a) Der Gast. b) Laura. c) Niemand, sie bestellen Pizza. 15. Bis wann möchte Laura eine Rückmeldung? a) Bis Freitag. b) Bis Mittwoch. c) Sofort am Donnerstag.",
+        "source": "E-Mail von Laura: Einladung zum gemeinsamen Kochabend Liebe Grüße aus Berlin! Ich habe letzten Samstag meine neue Küche fertig eingerichtet und möchte das feiern. Hast du Lust, am Freitagabend ab 18:30 Uhr zu mir zu kommen? Wir können zusammen italienisch kochen. Ich kaufe die Zutaten ein. Bring bitte nur ein paar Getränke und gute Laune mit! Sag mir bitte bis Mittwoch Bescheid, ob du kommen kannst.",
         "questions": [
           {
             "number": 11,
@@ -307,7 +307,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil4": {
         "title": "Teil 4 · Kleinanzeigen",
-        "source": "Anzeige A                                                   Anzeige B\n  Gebrauchter Schreibtisch aus Holz, top Zustand, günstig     Suchen Nachhilfe in Mathematik für Schüler der 8.\n  abzugeben. Nur Selbstabholung in Hamburg-Mitte.             Klasse. 2 Stunden pro Woche.\n\n  Anzeige C                                                   Anzeige D\n  Biete Yoga-Kurs für Anfänger jeden Dienstagabend.           Repariere Fahrräder schnell und preiswert. Werkstatt\n  Kleine Gruppe, entspannte Atmosphäre.                       direkt am Hauptbahnhof.\n\n  Anzeige E                                                   Anzeige F\n  Vermiete helle 2-Zimmer-Wohnung mit Balkon nahe der         Verkaufe gut erhaltenes Damenrad (28 Zoll), mit Licht\n  Universität ab nächstem Monat.                              und Gangschaltung.",
         "questions": [
           {
             "number": 16,
@@ -328,6 +327,32 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           {
             "number": 20,
             "question": "Tobias: Sucht eine neue Mietwohnung in Uninähe."
+          }
+        ],
+        "ads": [
+          {
+            "id": "a",
+            "text": "Gebrauchter Schreibtisch aus Holz, top Zustand, günstig abzugeben. Nur Selbstabholung in Hamburg-Mitte."
+          },
+          {
+            "id": "b",
+            "text": "Suchen Nachhilfe in Mathematik für Schüler der 8. Klasse. 2 Stunden pro Woche."
+          },
+          {
+            "id": "c",
+            "text": "Biete Yoga-Kurs für Anfänger jeden Dienstagabend. R Kleine Gruppe, entspannte Atmosphäre. d"
+          },
+          {
+            "id": "d",
+            "text": "epariere Fahrräder schnell und preiswert. Werkstatt irekt am Hauptbahnhof."
+          },
+          {
+            "id": "e",
+            "text": "Vermiete helle 2-Zimmer-Wohnung mit Balkon nahe der V Universität ab nächstem Monat. u"
+          },
+          {
+            "id": "f",
+            "text": "erkaufe gut erhaltenes Damenrad (28 Zoll), mit Licht nd Gangschaltung."
           }
         ]
       }
@@ -497,7 +522,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Apotheke, Sanitätshaus, Empfang & Anmeldung\n        (EG)",
+        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Apotheke, Sanitätshaus, Empfang & Anmeldung\n        (EG)\n\n 1. Obergeschoss      Allgemeinmedizin, Kinderheilkunde, Labor\n\n 2. Obergeschoss      Zahnmedizin, Kieferorthopädie, Prophylaxe\n\n 3. Obergeschoss      Physiotherapie, Krankengymnastik, Reha-Zentrum",
         "questions": [
           {
             "number": 6,
@@ -593,7 +618,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil3": {
         "title": "Teil 3 · E-Mail / Mitteilung",
-        "source": "E-Mail von der Fitness-Studio Leitung: Neue Kurszeiten Sehr geehrte Mitglieder, ab kommenden Monat ändern sich unsere Kurszeiten am Abend. Der beliebte Rücken-Fit-Kurs findet nun montags um 19:00 Uhr statt, direkt gefolgt von Pilates um 20:00 Uhr. Aufgrund der hohen Nachfrage bitten wir Sie, sich vorab über unsere Smartphone-App anzumelden. Sollten Sie verhindert sein, stornieren Sie Ihre Teilnahme bitte mindestens zwei Stunden vorher. 11. Wann ändern sich die Kurszeiten? a) Ab sofort. b) Ab kommenden Monat. c) Erst im nächsten Jahr. 12. Wann beginnt der Rücken-Fit-Kurs? a) Montags um 19:00 Uhr. b) Dienstags um 20:00 Uhr. c) Samstags um 10:00 Uhr. 13. Wie soll man sich für Kurse anmelden? a) Telefonisch. b) Über die Smartphone-App. c) Persönlich am Empfang. 14. Was passiert direkt nach dem Rücken-Fit-Kurs? a) Yoga. b) Pilates um 20:00 Uhr. c) Das Studio schließt. 15. Bis wann muss man eine Anmeldung stornieren? a) Mindestens 2 Stunden vorher. b) Einen Tag vorher. c) Gar nicht.",
+        "source": "E-Mail von der Fitness-Studio Leitung: Neue Kurszeiten Sehr geehrte Mitglieder, ab kommenden Monat ändern sich unsere Kurszeiten am Abend. Der beliebte Rücken-Fit-Kurs findet nun montags um 19:00 Uhr statt, direkt gefolgt von Pilates um 20:00 Uhr. Aufgrund der hohen Nachfrage bitten wir Sie, sich vorab über unsere Smartphone-App anzumelden. Sollten Sie verhindert sein, stornieren Sie Ihre Teilnahme bitte mindestens zwei Stunden vorher.",
         "questions": [
           {
             "number": 11,
@@ -689,7 +714,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil4": {
         "title": "Teil 4 · Kleinanzeigen",
-        "source": "Anzeige A                                                   Anzeige B\n  Biete Bio-Gemüsekiste im Abo, wöchentlich frisch vom        Personal Trainer bietet individuelles Lauftraining im\n  Bauernhof geliefert.                                        Stadtpark an. Erste Stunde kostenlos!\n\n  Anzeige C                                                   Anzeige D\n  Verkaufe gut erhaltenen Heimtrainer (Ergometer) für         Suche Mitbewohner für Koch-AG: Wir kochen einmal pro\n  Wohnungstraining.                                           Woche vegetarisch.\n\n  Anzeige E                                                   Anzeige F\n  Tanzschule sucht Assistenten für Anfängerkurse am           Praxis für medizinische Fußpflege hat noch freie\n  Wochenende.                                                 Termine am Nachmittag.",
         "questions": [
           {
             "number": 16,
@@ -710,6 +734,32 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           {
             "number": 20,
             "question": "Katrin: Möchte regelmäßig mit anderen vegetarisch kochen."
+          }
+        ],
+        "ads": [
+          {
+            "id": "a",
+            "text": "Biete Bio-Gemüsekiste im Abo, wöchentlich frisch vom Bauernhof geliefert."
+          },
+          {
+            "id": "b",
+            "text": "Personal Trainer bietet individuelles Lauftraining im Stadtpark an. Erste Stunde kostenlos!"
+          },
+          {
+            "id": "c",
+            "text": "Verkaufe gut erhaltenen Heimtrainer (Ergometer) für S Wohnungstraining. W"
+          },
+          {
+            "id": "d",
+            "text": "uche Mitbewohner für Koch-AG: Wir kochen einmal pro oche vegetarisch."
+          },
+          {
+            "id": "e",
+            "text": "Tanzschule sucht Assistenten für Anfängerkurse am P Wochenende. T"
+          },
+          {
+            "id": "f",
+            "text": "raxis für medizinische Fußpflege hat noch freie ermine am Nachmittag."
           }
         ]
       }
@@ -879,7 +929,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                           Abteilungen / Angebote\n    Erdgeschoss\n                      Bürgerbüro, Passstelle, Fundbüro & Information\n        (EG)",
+        "source": "Etage / Ebene                                           Abteilungen / Angebote\n    Erdgeschoss\n                      Bürgerbüro, Passstelle, Fundbüro & Information\n        (EG)\n\n 1. Obergeschoss      Wohngeldbehörde, Mietberatung, Wohnungsvermittlung\n\n 2. Obergeschoss      Umweltamt, Abfallberatung, Stadtplanung\n\n 3. Obergeschoss      Kulturamt, Volkshochschule, Veranstaltungssaal",
         "questions": [
           {
             "number": 6,
@@ -975,7 +1025,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil3": {
         "title": "Teil 3 · E-Mail / Mitteilung",
-        "source": "E-Mail vom Vermieter: Wartungsarbeiten im Treppenhaus Sehr geehrte Mieterinnen und Mieter, am kommenden Donnerstag finden zwischen 08:00 Uhr und 16:00 Uhr Malerarbeiten im Treppenhaus statt. Wir bitten Sie, Schuhe und Fahrräder aus dem Flur zu entfernen, damit die Handwerker ungehindert arbeiten können. Zudem wird der Aufzug zwischen 10:00 Uhr und 12:00 Uhr vorübergehend abgeschaltet. Wir danken für Ihr Verständnis. 11. Welche Arbeiten finden im Haus statt? a) Malerarbeiten im Treppenhaus. b) Dachreparaturen. c) Heizungswartung in der Wohnung. 12. Wann beginnen die Handwerker am Donnerstag? a) Um 08:00 Uhr. b) Um 10:00 Uhr. c) Um 16:00 Uhr. 13. Was sollen die Mieter aus dem Treppenhaus entfernen? a) Mülltonnen. b) Schuhe und Fahrräder. c) Blumentöpfe im Balkon. 14. Wann ist der Aufzug nicht benutzbar? a) Den ganzen Tag. b) Zwischen 10:00 und 12:00 Uhr. c) Gar nicht. 15. Wer schreibt diese Mitteilung? a) Ein Handwerker. b) Die Hausverwaltung / Vermieter. c) Ein Nachbar.",
+        "source": "E-Mail vom Vermieter: Wartungsarbeiten im Treppenhaus Sehr geehrte Mieterinnen und Mieter, am kommenden Donnerstag finden zwischen 08:00 Uhr und 16:00 Uhr Malerarbeiten im Treppenhaus statt. Wir bitten Sie, Schuhe und Fahrräder aus dem Flur zu entfernen, damit die Handwerker ungehindert arbeiten können. Zudem wird der Aufzug zwischen 10:00 Uhr und 12:00 Uhr vorübergehend abgeschaltet. Wir danken für Ihr Verständnis.",
         "questions": [
           {
             "number": 11,
@@ -1071,7 +1121,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil4": {
         "title": "Teil 4 · Kleinanzeigen",
-        "source": "Anzeige A                                                   Anzeige B\n  Verkaufe gebrauchtes Schlafsofa (grau, klappbar) für        Gärtner sucht Arbeit im Bereich Rasenmähen und\n  Selbstabholer.                                              Heckenschnitt in der Region.\n\n  Anzeige C                                                   Anzeige D\n  Suche Garage oder Stellplatz zur Miete nahe Bahnhof.        Biete Nachhilfe in Deutsch und Englisch für\n                                                              Grundschüler.\n\n  Anzeige E                                                   Anzeige F\n  Suche gebrauchte Waschmaschine (A+++, voll                  Biete Baby-Sitter-Service an Wochenenden am Abend.\n  funktionsfähig).",
         "questions": [
           {
             "number": 16,
@@ -1092,6 +1141,32 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           {
             "number": 20,
             "question": "Martina: Sucht einen Klavierlehrer für ihre Tochter."
+          }
+        ],
+        "ads": [
+          {
+            "id": "a",
+            "text": "Verkaufe gebrauchtes Schlafsofa (grau, klappbar) für Selbstabholer."
+          },
+          {
+            "id": "b",
+            "text": "Gärtner sucht Arbeit im Bereich Rasenmähen und Heckenschnitt in der Region."
+          },
+          {
+            "id": "c",
+            "text": "Suche Garage oder Stellplatz zur Miete nahe Bahnhof. B G"
+          },
+          {
+            "id": "d",
+            "text": "iete Nachhilfe in Deutsch und Englisch für rundschüler."
+          },
+          {
+            "id": "e",
+            "text": "Suche gebrauchte Waschmaschine (A+++, voll B funktionsfähig)."
+          },
+          {
+            "id": "f",
+            "text": "iete Baby-Sitter-Service an Wochenenden am Abend."
           }
         ]
       }
@@ -1357,7 +1432,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil3": {
         "title": "Teil 3 · E-Mail / Mitteilung",
-        "source": "E-Mail vom Sprachinstitut: Bestätigung für Ihren Deutschkurs Liebe Kursteilnehmerin, lieber Kursteilnehmer, wir bestätigen Ihre Anmeldung für den Intensivkurs Deutsch A2.2 ab dem 5. November. Der Unterricht findet montags bis donnerstags jeweils von 09:00 bis 12:15 Uhr im Raum 204 statt. Bitte bringen Sie am ersten Tag das Lehrbuch \"Schritte International A2\" mit. Am Ende des Kurses legen Sie eine Abschlussprüfung ab. 11. Welchen Kurs hat die Person gebucht? a) A1.1 Anfängerkurs. b) Intensivkurs Deutsch A2.2. c) C1 Vorbereitungskurs. 12. An welchen Tagen findet der Kurs statt? a) Montags bis donnerstags. b) Nur am Samstag. c) Jeden Tag auch am Wochenende. 13. Wann beginnt der Unterricht morgens? a) Um 08:00 Uhr. b) Um 09:00 Uhr. c) Um 10:00 Uhr. 14. Wo findet der Unterricht statt? a) Im Raum 204. b) Im Raum 101. c) Online per Videocall. 15. Was soll man am ersten Kurstag mitbringen? a) Ein Wörterbuch. b) Das Lehrbuch. c) Einen Laptop.",
+        "source": "E-Mail vom Sprachinstitut: Bestätigung für Ihren Deutschkurs Liebe Kursteilnehmerin, lieber Kursteilnehmer, wir bestätigen Ihre Anmeldung für den Intensivkurs Deutsch A2.2 ab dem 5. November. Der Unterricht findet montags bis donnerstags jeweils von 09:00 bis 12:15 Uhr im Raum 204 statt. Bitte bringen Sie am ersten Tag das Lehrbuch \"Schritte International A2\" mit. Am Ende des Kurses legen Sie eine Abschlussprüfung ab.",
         "questions": [
           {
             "number": 11,
@@ -1453,7 +1528,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil4": {
         "title": "Teil 4 · Kleinanzeigen",
-        "source": "Anzeige A                                                   Anzeige B\n  Wochenendausflug nach Prag mit dem Bus: Hotel inkl.         Sprachtandem gesucht: Biete Spanisch, suche Deutsch\n  Frühstück, Stadtführung inklusive.                          für gemeinsame Treffen im Café.\n\n  Anzeige C                                                   Anzeige D\n  Verkaufe 2 Theaterkarten für die Oper am                    Biete Koffer-Set (3 Teile, Hartschale, rot) günstig zum\n  Samstagabend wegen Krankheit.                               Verkauf.\n\n  Anzeige E                                                   Anzeige F\n  Geführte Fahrradtour entlang der Elbe, jeden Sonntag        Verkaufe Reiseführer Italien & Wörterbuch Italienisch.\n  ab 10 Uhr.",
         "questions": [
           {
             "number": 16,
@@ -1474,6 +1548,32 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           {
             "number": 20,
             "question": "Mone: Sucht einen gebrauchten Wohnwagen für Urlaubsreisen."
+          }
+        ],
+        "ads": [
+          {
+            "id": "a",
+            "text": "Wochenendausflug nach Prag mit dem Bus: Hotel inkl. Frühstück, Stadtführung inklusive."
+          },
+          {
+            "id": "b",
+            "text": "Sprachtandem gesucht: Biete Spanisch, suche Deutsch für gemeinsame Treffen im Café."
+          },
+          {
+            "id": "c",
+            "text": "Verkaufe 2 Theaterkarten für die Oper am B Samstagabend wegen Krankheit. V"
+          },
+          {
+            "id": "d",
+            "text": "iete Koffer-Set (3 Teile, Hartschale, rot) günstig zum erkauf."
+          },
+          {
+            "id": "e",
+            "text": "Geführte Fahrradtour entlang der Elbe, jeden Sonntag V ab 10 Uhr."
+          },
+          {
+            "id": "f",
+            "text": "erkaufe Reiseführer Italien & Wörterbuch Italienisch."
           }
         ]
       }
@@ -1739,7 +1839,7 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil3": {
         "title": "Teil 3 · E-Mail / Mitteilung",
-        "source": "E-Mail vom Kulturamt: Stadtfest am Wochenende Liebe Bürgerinnen und Bürger, dieses Wochenende feiert unsere Stadt das jährliche Sommerfest im Stadtpark! Am Samstag und Sonntag erwarten Sie ab 11:00 Uhr Live-Musik, Marktstände mit regionalen Spezialitäten und ein buntes Kinderprogramm mit Hüpfburg. Der Eintritt ist an beiden Tagen kostenfrei. Wegen der eingeschränkten Parkmöglichkeiten empfehlen wir die Anreise mit öffentlichen Verkehrsmitteln. 11. Wo findet das Sommerfest statt? a) Im Stadtpark. b) Auf dem Marktplatz. c) Im Stadion. 12. Um wie viel Uhr beginnt das Programm an den Tagen? a) Um 09:00 Uhr. b) Um 11:00 Uhr. c) Um 14:00 Uhr. 13. Wie viel kostet der Eintritt zum Sommerfest? a) 5 Euro pro Person. b) Der Eintritt ist kostenfrei. c) 10 Euro für Familien. 14. Was gibt es für Kinder? a) Einen Malwettbewerb. b) Ein buntes Programm mit Hüpfburg. c) Einen Schwimmkurs. 15. Was wird für die Anreise empfohlen? a) Mit dem Auto zu kommen. b) Öffentliche Verkehrsmittel zu nutzen. c) Das Taxi zu nehmen.",
+        "source": "E-Mail vom Kulturamt: Stadtfest am Wochenende Liebe Bürgerinnen und Bürger, dieses Wochenende feiert unsere Stadt das jährliche Sommerfest im Stadtpark! Am Samstag und Sonntag erwarten Sie ab 11:00 Uhr Live-Musik, Marktstände mit regionalen Spezialitäten und ein buntes Kinderprogramm mit Hüpfburg. Der Eintritt ist an beiden Tagen kostenfrei. Wegen der eingeschränkten Parkmöglichkeiten empfehlen wir die Anreise mit öffentlichen Verkehrsmitteln.",
         "questions": [
           {
             "number": 11,
@@ -1835,7 +1935,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil4": {
         "title": "Teil 4 · Kleinanzeigen",
-        "source": "Anzeige A                                                   Anzeige B\n  Verkaufe 2 Eintrittskarten für das Rockkonzert am           Laufgruppe sucht Mitläufer für wöchentliches\n  Freitag zum Halben Preis.                                   Lauftraining im Park (dienstags 18 Uhr).\n\n  Anzeige C                                                   Anzeige D\n  Gebrauchtes Mountainbike (26 Zoll,                          Schachklub bietet kostenlosen Schnupperkurs für\n  Shimano-Schaltung) günstig zu verkaufen.                    Jugendliche an.\n\n  Anzeige E                                                   Anzeige F\n  Suche gebrauchten Tennis-Schläger für Anfänger.             Verkaufe Stand-Up-Paddle Board (SUP) inkl. Paddel und\n                                                              Pumpe.",
         "questions": [
           {
             "number": 16,
@@ -1856,6 +1955,32 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           {
             "number": 20,
             "question": "Nadine: Sucht Reitausrüstung für Anfänger."
+          }
+        ],
+        "ads": [
+          {
+            "id": "a",
+            "text": "Verkaufe 2 Eintrittskarten für das Rockkonzert am Freitag zum Halben Preis."
+          },
+          {
+            "id": "b",
+            "text": "Laufgruppe sucht Mitläufer für wöchentliches Lauftraining im Park (dienstags 18 Uhr)."
+          },
+          {
+            "id": "c",
+            "text": "Gebrauchtes Mountainbike (26 Zoll, S Shimano-Schaltung) günstig zu verkaufen. J"
+          },
+          {
+            "id": "d",
+            "text": "chachklub bietet kostenlosen Schnupperkurs für ugendliche an."
+          },
+          {
+            "id": "e",
+            "text": "Suche gebrauchten Tennis-Schläger für Anfänger. V P"
+          },
+          {
+            "id": "f",
+            "text": "erkaufe Stand-Up-Paddle Board (SUP) inkl. Paddel und umpe."
           }
         ]
       }
