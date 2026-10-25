@@ -7,6 +7,8 @@ test("each book has a shareable product URL", () => {
   expect(productHref("a1-course-workbook")).toBe("/books/deutsch-a1-course-workbook");
   expect(productHref("a2-course-workbook")).toBe("/books/deutsch-a2-course-workbook");
   expect(productHref("writing-skills-a1-c2")).toBe("/books/how-to-unlock-your-german-writing-skills-a1-c2");
+  expect(productHref("a1-writing-model-exams")).toBe("/books/goethe-a1-writing-model-exams");
+  expect(productHref("a2-four-skills-exam-guide")).toBe("/books/goethe-a2-four-skills-exam-guide");
 });
 
 test("cart totals use catalog prices, not a client-submitted override", () => {
