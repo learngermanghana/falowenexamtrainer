@@ -28,6 +28,9 @@ test("A2 print is triggered from Playwright only, other levels keep prior CSS",(
  assert.match(renderer,/await page\.evaluate\(sanitizeA2PrintDocument, suffix\)/);
  assert.match(renderer,/if \(level === "A2" && target\.searchParams\.get\("radio"\) !== "done"\)/);
  assert.match(renderer,/target\.searchParams\.set\("radio", "done"\)/);
+ assert.match(renderer,/if \(level === "A2"\) \{\s*const nav = page\.locator\("\[data-workbook-tab-navigation\]"\)/);
+ assert.match(renderer,/if \(!\(await nav\.isVisible\(\)\.catch\(\(\) => false\)\)\) return false/);
+ assert.match(renderer,/if \(!\(await isPublicLanding\(page\)\) && level !== "A2"\) break/);
  assert.match(renderer,/waitForA2PrintableSection\(page, lesson, suffix\)/);
  assert.match(renderer,/addA2RetailCover\(output\)/);
  assert.match(renderer,/level === "A2" && await page\.getByRole\("tab"/);
