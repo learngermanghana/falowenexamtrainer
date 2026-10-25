@@ -334,6 +334,14 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, ho
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{homepageCompact ? "Your next class" : "Live class access & calendar"}</h2>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{homepageCompact ? "Your next lesson and Zoom access." : "Your next lesson, timetable, Zoom access and course progress."}</p>
         </div>
+        {homepageCompact && zoom?.url ? (
+          <a href={zoom.url} target="_blank" rel="noopener noreferrer"
+            aria-label="Open your live class Zoom room"
+            style={{ ...styles.primaryButton, minHeight: 42, padding: "10px 14px",
+              width: "fit-content", textDecoration: "none", whiteSpace: "nowrap" }}>
+            Open Zoom
+          </a>
+        ) : null}
         {!homepageCompact ? (
           <span style={{ ...styles.badge, background: canonicalStatus === "ready" ? "#dcfce7" : "#fef3c7", color: canonicalStatus === "ready" ? "#166534" : "#92400e" }}>
             {canonicalStatus === "ready" ? "Live from Admin" : canonicalStatus === "loading" ? "Updating schedule…" : canonicalStatus === "cached" ? "Last known schedule" : "Legacy schedule"}
