@@ -115,7 +115,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Information, Fundbüro, Gastronomie & Bistro\n        (EG)\n\n 1. Obergeschoss      Damen- & Herrenmode, Schuhe, Accessoires\n\n 2. Obergeschoss      Elektronik, Laptops, Smartphones, Reparaturservice\n\n 3. Obergeschoss      Bücher, Schreibwaren, Café, Kundenservice",
         "questions": [
           {
             "number": 6,
@@ -207,6 +206,24 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
               }
             ]
           }
+        ],
+        "floors": [
+          [
+            "Erdgeschoss (EG)",
+            "Information, Fundbüro, Gastronomie & Bistro"
+          ],
+          [
+            "1. Obergeschoss",
+            "Damen- & Herrenmode, Schuhe, Accessoires"
+          ],
+          [
+            "2. Obergeschoss",
+            "Elektronik, Laptops, Smartphones, Reparaturservice"
+          ],
+          [
+            "3. Obergeschoss",
+            "Bücher, Schreibwaren, Café, Kundenservice"
+          ]
         ]
       },
       "teil3": {
@@ -524,7 +541,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                          Abteilungen / Angebote\n    Erdgeschoss\n                      Apotheke, Sanitätshaus, Empfang & Anmeldung\n        (EG)\n\n 1. Obergeschoss      Allgemeinmedizin, Kinderheilkunde, Labor\n\n 2. Obergeschoss      Zahnmedizin, Kieferorthopädie, Prophylaxe\n\n 3. Obergeschoss      Physiotherapie, Krankengymnastik, Reha-Zentrum",
         "questions": [
           {
             "number": 6,
@@ -616,6 +632,24 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
               }
             ]
           }
+        ],
+        "floors": [
+          [
+            "Erdgeschoss (EG)",
+            "Apotheke, Sanitätshaus, Empfang & Anmeldung"
+          ],
+          [
+            "1. Obergeschoss",
+            "Allgemeinmedizin, Kinderheilkunde, Labor"
+          ],
+          [
+            "2. Obergeschoss",
+            "Zahnmedizin, Kieferorthopädie, Prophylaxe"
+          ],
+          [
+            "3. Obergeschoss",
+            "Physiotherapie, Krankengymnastik, Reha-Zentrum"
+          ]
         ]
       },
       "teil3": {
@@ -933,7 +967,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                           Abteilungen / Angebote\n    Erdgeschoss\n                      Bürgerbüro, Passstelle, Fundbüro & Information\n        (EG)\n\n 1. Obergeschoss      Wohngeldbehörde, Mietberatung, Wohnungsvermittlung\n\n 2. Obergeschoss      Umweltamt, Abfallberatung, Stadtplanung\n\n 3. Obergeschoss      Kulturamt, Volkshochschule, Veranstaltungssaal",
         "questions": [
           {
             "number": 6,
@@ -1025,6 +1058,24 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
               }
             ]
           }
+        ],
+        "floors": [
+          [
+            "Erdgeschoss (EG)",
+            "Bürgerbüro, Passstelle, Fundbüro & Information"
+          ],
+          [
+            "1. Obergeschoss",
+            "Wohngeldbehörde, Mietberatung, Wohnungsvermittlung"
+          ],
+          [
+            "2. Obergeschoss",
+            "Umweltamt, Abfallberatung, Stadtplanung"
+          ],
+          [
+            "3. Obergeschoss",
+            "Kulturamt, Volkshochschule, Veranstaltungssaal"
+          ]
         ]
       },
       "teil3": {
@@ -1342,7 +1393,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                            Abteilungen / Angebote\n   Garde / Foyer        Garderobe, Ticketkasse, Museumsshop, Audio-Guides\n\n       Saal 1\n                        Sonderausstellung: Malerei & Skulpturen des 20. Jahrhunderts\n   (Erdgeschoss)\n\n   Saal 2 (1. OG)       Dauerausstellung: Geschichte & Stadtentwicklung\n\n Dachterrasse (2.\n                        Museumscafé, Aussichtsplattform, Toiletten\n      OG)",
         "questions": [
           {
             "number": 6,
@@ -1434,6 +1484,24 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
               }
             ]
           }
+        ],
+        "floors": [
+          [
+            "Garde / Foyer",
+            "Garderobe, Ticketkasse, Museumsshop, Audio-Guides"
+          ],
+          [
+            "Saal 1 (Erdgeschoss)",
+            "Sonderausstellung: Malerei & Skulpturen des 20. Jahrhunderts"
+          ],
+          [
+            "Saal 2 (1. OG)",
+            "Dauerausstellung: Geschichte & Stadtentwicklung"
+          ],
+          [
+            "Dachterrasse (2. OG)",
+            "Museumscafé, Aussichtsplattform, Toiletten"
+          ]
         ]
       },
       "teil3": {
@@ -1751,7 +1819,6 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
       },
       "teil2": {
         "title": "Teil 2 · Etagenverzeichnis",
-        "source": "Etage / Ebene                                            Abteilungen / Angebote\n    Erdgeschoss\n                      Information, Kasse, Garderobe, Restaurant & Sportsbar\n        (EG)\n\n      Ebene 1         Schwimmhalle, Kinderbecken, Whirlpool, Schwimmschule\n\n      Ebene 2         Saunalandschaft, Massage-Bereich, Ruhezonen\n\n      Ebene 3         Fitnessbereich, Gerätetraining, Kurssaal für Indoor-Cycling",
         "questions": [
           {
             "number": 6,
@@ -1843,6 +1910,24 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
               }
             ]
           }
+        ],
+        "floors": [
+          [
+            "Erdgeschoss (EG)",
+            "Information, Kasse, Garderobe, Restaurant & Sportsbar"
+          ],
+          [
+            "Ebene 1",
+            "Schwimmhalle, Kinderbecken, Whirlpool, Schwimmschule"
+          ],
+          [
+            "Ebene 2",
+            "Saunalandschaft, Massage-Bereich, Ruhezonen"
+          ],
+          [
+            "Ebene 3",
+            "Fitnessbereich, Gerätetraining, Kurssaal für Indoor-Cycling"
+          ]
         ]
       },
       "teil3": {
