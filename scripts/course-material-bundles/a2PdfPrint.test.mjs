@@ -26,6 +26,8 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
 test("A2 print is triggered from Playwright only, other levels keep prior CSS",()=>{
  assert.match(renderer,/if \(level === "A2"\) return page\.addStyleTag\(\{ content: a2PrintCss \}\)/);
  assert.match(renderer,/await page\.evaluate\(sanitizeA2PrintDocument, suffix\)/);
+ assert.match(renderer,/if \(level === "A2" && target\.searchParams\.get\("radio"\) !== "done"\)/);
+ assert.match(renderer,/target\.searchParams\.set\("radio", "done"\)/);
  assert.match(renderer,/waitForA2PrintableSection\(page, lesson, suffix\)/);
  assert.match(renderer,/addA2RetailCover\(output\)/);
  assert.match(renderer,/level === "A2" && await page\.getByRole\("tab"/);
