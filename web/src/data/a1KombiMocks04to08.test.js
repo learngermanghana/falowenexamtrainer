@@ -2,7 +2,7 @@ import { A1_KOMBI_MOCKS,buildA1KombiAttemptContract,calculateA1KombiResult } fro
 test("five additional mocks map to uploaded source tests",()=>{
  expect(A1_KOMBI_MOCKS.map(x=>x.mockNumber)).toEqual([4,5,6,7,8]);
  expect(A1_KOMBI_MOCKS.map(x=>x.sourceTestNumber)).toEqual([1,2,3,4,5]);
- expect(A1_KOMBI_MOCKS.every(x=>x.status==="staged")).toBe(true);
+ expect(A1_KOMBI_MOCKS.every(x=>x.status==="preview")).toBe(true);
 });
 test("3 module scoring excludes Hören",()=>{
  const a=buildA1KombiAttemptContract(4);
