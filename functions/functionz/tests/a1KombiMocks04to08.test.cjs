@@ -76,7 +76,7 @@ for (const mockId of mockIds) {
       /Server-verified sprechen/);
     assert.throws(() => buildVerifiedA1MockScore({ mockId, state: { ...attempt(mockId), mockId: "a1-mock-01" }, verifiedSections: receipts() }),
       /different paper/);
-    assert.throws(() => buildVerifiedA1MockScore({ mockId, state: { ...attempt(mockId), assessmentVersion: "four-module-v2" }, verifiedSections: receipts() }),
+    assert.throws(() => buildVerifiedA1MockScore({ mockId, state: { ...attempt(mockId), assessmentVersion: "four-module-v3" }, verifiedSections: receipts() }),
       /Unsupported.*version/);
   });
 
