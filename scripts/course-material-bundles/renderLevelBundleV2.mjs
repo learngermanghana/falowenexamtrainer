@@ -53,6 +53,13 @@ const isPublicLanding = async (page) => {
 const hasLessonContent = async (page, lesson) => {
   if (await isPublicLanding(page)) return false;
   const text = await getBodyText(page);
+  // The A2 lesson title also appears on intermediate shells and course hubs.
+  // Only the actual, visible authenticated workbook tabs establish readiness.
+  if (level === "A2") {
+    const nav = page.locator("[data-workbook-tab-navigation]").first();
+    if (!(await nav.isVisible().catch(() => false))) return false;
+    return (await nav.getByRole("tab", { name: /Grammar|Grammatik|Teil\\s*[1-4]/i }).count()) >= 2;
+  }
   const title = String(lesson?.title || "").trim();
   if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
 
@@ -153,7 +160,8 @@ const openLessonWithAuthHydration = async (page, lesson, targetUrl) => {
     // short window to replace that transient screen before deciding it failed.
     for (let check = 0; check < 8; check += 1) {
       if (await hasLessonContent(page, lesson)) return true;
-      if (!(await isPublicLanding(page))) break;
+      if (!(await isPublicLanding(page)) && level !== "A2") break;
+      // A2 can show the lesson title before React mounts its real workbook nav.
       await page.waitForTimeout(500);
     }
 
