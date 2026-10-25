@@ -309,6 +309,10 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
+    // page.emulateMedia(print) persists after page.pdf(). Without resetting it,
+    // @media print keeps WorkbookTabNav hidden and the following Teil tabs
+    // appear "unavailable" even though they were rendered correctly.
+    await page.emulateMedia({ media: "screen" });
   }
   return { tab: suffix, file };
 };
