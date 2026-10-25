@@ -1,0 +1,29 @@
+.fb-library{padding:8px 0 42px;border-bottom:1px solid #dde6f0;margin-bottom:37px}
+.fb-library-heading{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:22px}
+.fb-library-heading h1{margin:9px 0 8px;color:#122d4a;font-size:clamp(25px,3vw,39px);line-height:1.16;letter-spacing:-.035em}
+.fb-library-heading p{margin:0;color:#617891;font-size:13px}
+.fb-library-fx{max-width:330px;min-width:230px;display:grid;gap:5px;background:#edf5ff;border:1px solid #d2e4f8;border-radius:13px;padding:13px 16px;color:#355979;font-size:11px;line-height:1.45}
+.fb-library-fx strong{color:#174471;font-size:12px}
+.fb-library-tools{display:grid;grid-template-columns:minmax(240px,1fr) minmax(135px,190px) minmax(135px,190px);gap:12px}
+.fb-library-tools label{display:grid;gap:6px;font-size:12px;font-weight:750;color:#415a75}
+.fb-library-tools input,.fb-library-tools select{min-height:46px;border:1px solid #c9d9ea;border-radius:10px;color:#173b61;background:#fff;padding:10px 13px;width:100%;font-size:13px;outline-color:#2b7cd6}
+.fb-library-resultcount{font-size:12px;color:#657c91;margin:13px 0}
+.fb-library-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.fb-library-card{padding:23px;border-radius:16px;border:1px solid #dce7f3;box-shadow:0 8px 23px #2c4a6c09;background:#fff;display:flex;flex-direction:column;min-width:0;gap:10px}
+.fb-library-cardmeta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;color:#2666a7;font-size:11px;font-weight:800;letter-spacing:.035em}
+.fb-library-card h2{font-size:clamp(17px,1.75vw,22px);line-height:1.27;letter-spacing:-.02em;margin:0;color:#193350}
+.fb-library-card>p{font-size:13px;color:#526b83;line-height:1.55;margin:0}
+.fb-library-offers{display:grid;gap:10px;margin-top:auto;padding-top:15px}
+.fb-library-offer{display:flex;align-items:center;justify-content:space-between;gap:14px;border-top:1px solid #e8eef5;padding-top:8px;font-size:12px;color:#65788a}
+.fb-library-offer strong{display:grid;text-align:right;gap:2px;color:#163858;font-size:17px}
+.fb-library-offer small{font-size:11px;font-weight:500;color:#527b9f;white-space:nowrap}
+.fb-library-coming{font-size:13px;font-weight:700;color:#795924;background:#fff7e6;border-radius:10px;padding:11px 14px;margin:0}
+.fb-library-card .fb-library-pending{margin-top:1px;color:#687b8e;font-size:12px}
+.fb-library-action{margin-top:4px;align-self:flex-start}
+.fb-library-empty{grid-column:1/-1;border:1px dashed #bdd1e5;border-radius:13px;padding:28px;color:#365573;background:#f9fcff}
+.fb-library-empty p{font-size:13px;color:#667c91}
+.fb-edition-price small{display:block;font-size:10px;font-weight:600;color:#527b9f;text-align:right;white-space:nowrap}
+.fb-total-prices{display:grid;text-align:right;gap:2px}
+.fb-total-prices small{font-size:11px;color:#527b9f}
+@media (max-width:880px){.fb-library-heading{align-items:start;flex-direction:column}.fb-library-fx{max-width:none;width:100%}.fb-library-tools{grid-template-columns:minmax(0,1fr) 1fr}.fb-library-tools label:first-child{grid-column:1/-1}}
+@media (max-width:640px){.fb-library-grid{grid-template-columns:1fr}.fb-library-card{padding:19px}.fb-library-heading{gap:18px}.fb-library-tools{gap:9px}.fb-library-tools input,.fb-library-tools select{font-size:13px;padding:10px 8px}.fb-library-offer strong{font-size:15px}}

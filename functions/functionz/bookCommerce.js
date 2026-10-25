@@ -5,6 +5,32 @@ const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
 });
+// Public discovery metadata, separate from the server-authoritative purchasable SKU list.
+ // "coming_soon" titles are NEVER accepted by /books/checkout.
+const BOOK_CATALOG_TITLES = Object.freeze([
+  Object.freeze({
+    id: "a1-course-workbook",
+    title: "Deutsch A1 — Course & Workbook",
+    description: "A complete beginner course with grammar explanations, vocabulary and guided workbook practice.",
+    levelTags: ["A1"],
+    topics: ["grammar", "vocabulary", "beginner", "reading", "speaking", "writing", "course workbook"],
+    formats: ["digital", "printed"],
+    pages: 250,
+    status: "available",
+    bookIds: ["a1-digital", "a1-printed"],
+  }),
+  Object.freeze({
+    id: "writing-skills-a1-c2",
+    title: "How to Unlock Your German Writing Skills (A1–C2)",
+    description: "A standalone writing guide with sentence structure, connectors, model texts, exercises and self-correction across all six CEFR levels.",
+    levelTags: ["A1", "A2", "B1", "B2", "C1", "C2"],
+    topics: ["writing", "schreiben", "letters", "emails", "grammar", "connectors", "essays", "cefr", "exam preparation", "practice"],
+    formats: ["digital"],
+    pages: 32,
+    status: "coming_soon",
+    bookIds: [],
+  }),
+]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
 const allowedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const moneyToPesewas = amount => Math.round(Number(amount) * 100);
@@ -20,6 +46,7 @@ function registerBookCommerceRoutes(app, { admin }) {
         id, title, format, priceGhs, deliveryIncluded: false,
         checkoutTotalGhs: priceGhs,
       })),
+      catalogTitles: BOOK_CATALOG_TITLES,
       paymentsEnabled: paymentsEnabled(),
       receiptConfirmationAvailable: true,
     });

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getBackendUrl } from "../services/backendUrl";
 import { A1_SAMPLE_SECTIONS, A1_SAMPLE_DISCLOSURE } from "../data/a1BookSample";
 import "./BookStoreCheckout.css";
+import BooksCatalog, { indicativeUsd } from "./BooksCatalog";
 
 const API = getBackendUrl();
 const money = value => `GH₵${Number(value || 0).toFixed(2)}`;
@@ -167,6 +168,8 @@ function ReceiptConfirmation() {
 
 export default function BookStoreCheckout({ completed = false }) {
   const [books, setBooks] = useState([]), [enabled, setEnabled] = useState(false);
+  const [catalogTitles, setCatalogTitles] = useState([]);
+  const [fxQuote, setFxQuote] = useState(null);
   const [bookId, setBookId] = useState("a1-digital");
   const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
   const [error, setError] = useState(""), [busy, setBusy] = useState(false);
@@ -184,8 +187,21 @@ export default function BookStoreCheckout({ completed = false }) {
     request("/books/catalog").then(payload => {
       if (!active) return;
       setBooks(payload.books || []);
+      setCatalogTitles(Array.isArray(payload.catalogTitles) ? payload.catalogTitles : []);
       setEnabled(Boolean(payload.paymentsEnabled));
     }).catch(e => { if (active) setError(e.message); });
+    return () => { active = false; };
+  }, [completed]);
+
+  useEffect(() => {
+    if (completed) return undefined;
+    let active = true;
+    // Use the same cached daily quote as Falowen sign-up; GHS remains the Paystack charge currency.
+    request("/fx/usd-ghs").then(quote => {
+      if (active && Number.isFinite(Number(quote.usdToGhs)) && Number(quote.usdToGhs) > 0) {
+        setFxQuote({ usdToGhs: Number(quote.usdToGhs), stale: Boolean(quote.stale) });
+      }
+    }).catch(() => { /* No guessed or stale hardcoded rates. */ });
     return () => { active = false; };
   }, [completed]);
 
@@ -214,7 +230,11 @@ export default function BookStoreCheckout({ completed = false }) {
       <a className="fb-top-back" href="/">← Back to Falowen</a>
     </div></div>
     <div className="fb-shell">
-      <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>German A1 Book</strong></nav>
+      <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>Books</strong></nav>
+      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} onSelectA1={id => {
+        setBookId(id);
+        document.getElementById("fb-purchase")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }} />
       <section className="fb-hero" aria-label="Falowen Deutsch A1 book">
         <div className="fb-visual-col">
           <div className="fb-cover-stage">
@@ -257,7 +277,9 @@ export default function BookStoreCheckout({ completed = false }) {
               <span className="fb-edition-label"><strong>{book.format === "digital" ? "Digital PDF" : "Printed book"}</strong>
                 <small>{book.format === "digital" ? "Manual PDF delivery" : "Printed on demand"}</small>
               </span>
-              <span className="fb-edition-price">{money(book.priceGhs).replace(".00","")}</span>
+              <span className="fb-edition-price">{money(book.priceGhs).replace(".00","")}
+                {indicativeUsd(book.priceGhs, fxQuote) && <small>{indicativeUsd(book.priceGhs, fxQuote)}</small>}
+              </span>
             </label>) : <p className="fb-muted">Loading editions…</p>}
           </div>
           {selected?.format === "printed" && <p className="fb-shipping-note">Print orders are produced after payment. Delivery is arranged and charged separately.</p>}
@@ -271,13 +293,14 @@ export default function BookStoreCheckout({ completed = false }) {
               <input required type={type} placeholder={placeholder} autoComplete={id === "name" ? "name" : id === "email" ? "email" : "tel"} value={customer[id]}
                 onChange={e => setCustomer(prev=>({...prev,[id]:e.target.value}))} />
             </label>)}
-            <div className="fb-total"><span>Book price</span><strong>{selected ? money(selected.priceGhs) : "—"}</strong></div>
+            <div className="fb-total"><span>Book price</span><span className="fb-total-prices"><strong>{selected ? money(selected.priceGhs) : "—"}</strong>
+              {selected && indicativeUsd(selected.priceGhs, fxQuote) && <small>{indicativeUsd(selected.priceGhs, fxQuote)} · display only</small>}</span></div>
             {error && <p className="fb-error" role="alert">{error}</p>}
             <button type="submit" className="fb-btn fb-btn-primary fb-pay" disabled={!enabled || !selected || busy}>
               {busy ? "Opening secure checkout…" : !enabled ? "Checkout temporarily unavailable" : `Continue to Paystack · ${money(selected.priceGhs)}`}
             </button>
           </form>
-          <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack. Keep your transaction receipt.</p>
+          <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack in GHS. Keep your transaction receipt.</p>
           <p className="fb-manual-note">Falowen arranges your book after payment verification. No automatic PDF download or delivery tracking.</p>
         </aside>
       </section>
