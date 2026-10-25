@@ -28,6 +28,17 @@ export function missingMockRuntimeCapabilities(mockId, registry = MOCK_RUNTIME_R
 
 export function assertFullMockReady(exam, registry = MOCK_RUNTIME_REGISTRY) {
   if (!exam || !MOCK_FACTORY_LEVELS.includes(exam.level)) return exam;
+  if (exam.mode === "kombi" && exam.status === "ready") {
+    const required = ["lesen","schreiben","sprechen"];
+    if (!required.every(section=>exam.sections?.some(name=>String(name).toLowerCase()===section))) {
+      throw new Error(`Kombiprüfung ${exam.id} is missing a required scored section.`);
+    }
+    const missing = missingMockRuntimeCapabilities(exam.questionSetId || exam.id, registry);
+    if (missing.length) {
+      throw new Error(`Kombiprüfung ${exam.id} cannot be published: ${missing.join(", ")}.`);
+    }
+    return exam;
+  }
   if (exam.mode !== "full" || exam.status !== "ready") return exam;
   if (!MOCK_FACTORY_SECTIONS.every(section => exam.sections?.some(
     name => String(name).toLowerCase().replace(/ö/g, "oe") === section,
