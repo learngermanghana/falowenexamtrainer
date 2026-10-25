@@ -75,12 +75,12 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
   "a1-final-04": {
     id: "a1-final-04", level: "A1", title: "A1 Mock 4 · Kombiprüfung",
     shortTitle: "A1 Mock 4",
-    description: "Three-module A1 Kombiprüfung: 15 Lesen questions, an AI-marked email and form, and three AI speaking parts. Hören is not assessed.",
-    durationLabel: "55 min · 3 modules", status: "preview",
+    description: "A1 Mock 4 with 15 Lesen and 15 Hören questions, an AI-marked form and email, and three speaking parts. Older three-module results remain unchanged.",
+    durationLabel: "75 min · 4 modules", status: "preview",
     route: "/campus/course/a1-final-mock-4", mode: "kombi",
     showInMockLibrary: true,
     questionSetId: "a1-mock-04",
-    sections: ["Lesen", "Schreiben", "Sprechen"],
+    sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
   "a1-final-05": {
     id: "a1-final-05", level: "A1", title: "A1 Mock 5 · Kombiprüfung",
