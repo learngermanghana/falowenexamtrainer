@@ -74,7 +74,7 @@ export default function FalowenHomepageCarousel({ language="en", classroomImage,
   const [restart,setRestart]=useState(0);
   const touchX=useRef(null);
   useEffect(()=>{
-    if(paused || (typeof window!=="undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return undefined;
+    if(paused || (typeof window!=="undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches)) return undefined;
     const handle=window.setInterval(()=>{if(!document.hidden)setActive(value=>(value+1)%slides.length);},6000);
     return ()=>window.clearInterval(handle);
   },[paused,restart,slides.length]);
