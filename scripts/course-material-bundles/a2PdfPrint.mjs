@@ -14,7 +14,8 @@ export const a2SectionReady = (section, snapshot) => {
    "teil-4": /(?:teil\s*4|hören|hoeren)/i,
  }[section];
  return !!marker && text.length >= 160 && !LOADING.test(text)
-  && marker.test(headings) && text.length > headings.length + 90;
+  && (section === "grammar" ? snapshot?.grammarVisible === true : marker.test(headings))
+  && text.length > headings.length + 90;
 };
 
 export const findA2PdfLeaks = value => {
@@ -102,5 +103,5 @@ export const extractA2PrintSnapshot = () => {
  const text = [...root.querySelectorAll("h1,h2,h3,h4,p,li,legend,label,strong,blockquote")]
   .filter(visible).map(element => element.innerText || element.textContent || "")
   .join(" ").replace(/\s+/g, " ").trim();
- return { headings, text };
+ return { headings, text, grammarVisible: Boolean(root.querySelector("[data-a2-focused-grammar]")) };
 };
