@@ -22,7 +22,7 @@ const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts"
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt, requireMockTaskVersion } = require("./assessmentTaskContext");
 const { isA2SpeakingAttemptBindingSafe } = require("./a2MockSpeakingAttemptIdentity");
-const { validateA1MockId, resolveA1MarkingSet, scoreA1Mock2Form, scoreA1Mock3Form, scoreA1KombiForm } = require("./a1MockSets");
+const { validateA1MockId, resolveA1MarkingSet, getA1MockSet, scoreA1Mock2Form, scoreA1Mock3Form, scoreA1KombiForm } = require("./a1MockSets");
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
@@ -5560,9 +5560,23 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
       }
     }
 
+    let verifiedResultPayload = {};
+    if (status === "completed" && saveOutcome?.ok) {
+      const verifiedSnap = await attemptRef.get();
+      const verifiedAttempt = verifiedSnap.exists ? verifiedSnap.data() || {} : {};
+      if (/^a1-mock-0[4-8]$/.test(String(verifiedAttempt.mockId || ""))) {
+        verifiedResultPayload = {
+          verifiedOverall: verifiedAttempt.verifiedOverall || null,
+          verifiedSectionScores: verifiedAttempt.verifiedSectionScores || null,
+          // Release review keys only after the attempt is completed and server-verified.
+          readingAnswerKey: getA1MockSet(verifiedAttempt.mockId)?.readingAnswerKey || null,
+        };
+      }
+    }
     return res.json({
       ...(saveOutcome || { ok: true, attemptId, status }),
       ...(completionSync ? { completionSync } : {}),
+      ...verifiedResultPayload,
     });
   } catch (err) {
     console.error("/a1-mock/attempt/save error", err);
