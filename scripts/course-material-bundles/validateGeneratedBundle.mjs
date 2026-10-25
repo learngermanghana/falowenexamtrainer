@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
+import { auditA2PdfPages } from "./auditA2PdfPages.mjs";
 import { findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
 import { findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
 import { findA2PdfLeaks } from "./a2PdfPrint.mjs";
@@ -64,9 +65,13 @@ if (level === "A2") {
   if (privacyLeaks.length) {
     throw new Error("A2 PDF privacy/online UI preflight failed: " + privacyLeaks.join(", "));
   }
-  const audit = scanPdfPageContent(text, pdf.getPageCount());
+  const audit = auditA2PdfPages(text, pdf.getPageCount(), pdfPath);
   if (audit.faults.length) {
     throw new Error("A2 PDF blank/loading page preflight failed:\n" + audit.faults.join("\n"));
+  }
+  if (audit.retainedGraphics.length) {
+    console.log("A2 printable graphics/answer-line pages validated: " +
+      audit.retainedGraphics.join(", "));
   }
 }
 
