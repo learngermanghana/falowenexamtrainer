@@ -1,4 +1,5 @@
 name: A2 private one-time PDF proof
+# Run 2: bypass A2 radio introduction in print-only export.
 
 on:
   push:
