@@ -77,4 +77,5 @@ jobs:
             src/data/a1KombiMocks04to08.test.js \
             src/data/a1KombiMockCatalog.test.js \
             src/components/A1KombiMockIntegration.test.jsx \
-            src/components/A1KombiFlowContract.test.jsx
+            src/components/A1KombiFlowContract.test.jsx \
+            src/components/A1KombiMockDesignParity.test.jsx
