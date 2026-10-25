@@ -8,7 +8,7 @@ export const A1_KOMBI_MOCKS = Object.freeze(A1_KOMBI_MOCK_IDS.map(number => Obje
   questionSetId: `a1-mock-${String(number).padStart(2,"0")}`,
   level:"A1",mockNumber:number,sourceTestNumber:A1_KOMBI_SOURCE_MAPPING[number],
   title:`A1 Mock ${number} · Kombiprüfung`,version:"three-module-v1",
-  status:"staged",requiredSections:A1_KOMBI_SECTIONS,futureOptionalSection:"hoeren",
+  status:"preview",requiredSections:A1_KOMBI_SECTIONS,futureOptionalSection:"hoeren",
   sourceHasHoeren:false,minutes:A1_KOMBI_DURATIONS,scoreMax:75
 })));
 export function getA1KombiMock(number){
