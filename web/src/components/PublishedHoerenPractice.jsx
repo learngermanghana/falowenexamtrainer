@@ -6,7 +6,7 @@ import { needsFreshSignedAudio } from "../utils/hoerenSignedAudio";
 const wrap = { border: "1px solid #bfdbfe", borderRadius: 14, padding: 16, background: "#f8fbff", display: "grid", gap: 12 };
 const questionStyle = { display: "grid", gap: 8, background: "#fff", padding: 12, border: "1px solid #dce7f5", borderRadius: 10 };
 
-export default function PublishedHoerenPractice({ assignmentKey }) {
+export default function PublishedHoerenPractice({ assignmentKey, readOnly = false }) {
   const { idToken } = useAuth();
   const [lesson, setLesson] = useState(null);
   const [answers, setAnswers] = useState({});
@@ -105,7 +105,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
   if (!lesson && !error) return null;
   const complete = lesson?.questions.every((_, index) => Object.hasOwn(answers, index));
   const submit = async () => {
-    if (!complete || busy || !lesson) return;
+    if (readOnly || !complete || busy || !lesson) return;
     setBusy(true); setError("");
     try {
       const ordered = lesson.questions.map((_, index) => answers[index]);
@@ -144,7 +144,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
             const value = lesson.kind === "richtig-falsch" ? option : choice;
             return <label key={choice} style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input type="radio" name={`studio-${assignmentKey}-${index}`} value={String(value)}
-                checked={answers[index] === value} disabled={!!result || busy}
+                checked={answers[index] === value} disabled={readOnly || !!result || busy}
                 onChange={() => setAnswers(previous => ({ ...previous, [index]: value }))} />
               {option}
             </label>;
@@ -155,7 +155,7 @@ export default function PublishedHoerenPractice({ assignmentKey }) {
         </small> : null}
       </fieldset>)}
       {result ? <div role="status" style={{ fontWeight: 700 }}>Ergebnis: {result.correct}/5 · {result.score}%</div>
-        : <button type="button" onClick={submit} disabled={!complete || busy}
+        : readOnly ? null : <button type="button" onClick={submit} disabled={!complete || busy}
             style={{ padding: 12, color: "#fff", border: 0, background: "#1d4ed8", borderRadius: 9, fontWeight: 700 }}>
             {busy ? "Antworten werden bewertet…" : "5 Antworten kontrollieren"}
           </button>}
