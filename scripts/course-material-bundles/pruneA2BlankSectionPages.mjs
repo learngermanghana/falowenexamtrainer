@@ -70,11 +70,13 @@ export const pruneA2TrulyBlankSectionPages = async (pdfPath, { log = console.log
     throw new Error("A2 print-page audit count mismatch; refusing to remove any pages.");
   }
   const remove = [], graphicsOnly = [];
+  // A few stray border pixels are not meaningful body artwork or writing space.
+  const significantBodyInk = 150;
   for (let i = 0; i < pages.length; i++) {
     const normalized = pages[i].replace(/\s+/g, " ").trim();
     if (normalized.length >= 12) continue;
     const ink = measureA2PdfPageInk(pdfPath, i + 1);
-    if (ink < 20) remove.push(i);
+    if (ink < significantBodyInk) remove.push(i);
     else graphicsOnly.push({ page: i + 1, ink });
   }
   if (remove.length >= pdf.getPageCount()) {
