@@ -1,0 +1,95 @@
+name: A2 editorial read-only PDF proof
+
+# Deliberately manual: do not rerun expensive PDF rendering on every push.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  a2-editorial-proof:
+    name: Local-only A2 editorial PDF proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REACT_APP_FIREBASE_API_KEY: ${{ vars.REACT_APP_FIREBASE_API_KEY || secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ vars.REACT_APP_FIREBASE_AUTH_DOMAIN || secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
+      REACT_APP_FIREBASE_PROJECT_ID: ${{ vars.REACT_APP_FIREBASE_PROJECT_ID || secrets.REACT_APP_FIREBASE_PROJECT_ID }}
+      REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ vars.REACT_APP_FIREBASE_STORAGE_BUCKET || secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
+      REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
+      REACT_APP_FIREBASE_APP_ID: ${{ vars.REACT_APP_FIREBASE_APP_ID || secrets.REACT_APP_FIREBASE_APP_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Assert Firebase public client settings and PDF login secrets exist
+        env:
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for key in REACT_APP_FIREBASE_API_KEY REACT_APP_FIREBASE_AUTH_DOMAIN REACT_APP_FIREBASE_PROJECT_ID REACT_APP_FIREBASE_STORAGE_BUCKET REACT_APP_FIREBASE_MESSAGING_SENDER_ID REACT_APP_FIREBASE_APP_ID FALOWEN_PDF_EMAIL FALOWEN_PDF_PASSWORD; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing GitHub repository Actions secret/variable $key. Populate the existing public Firebase client config and the private PDF test-account login before rendering."
+              exit 1
+            fi
+          done
+      - name: Build and check A2 manifest without public PDF upload
+        run: |
+          node scripts/course-material-bundles/buildLevelManifest.mjs A2
+          node --test scripts/course-material-bundles/a2EditorialPrintMode.test.mjs
+      - name: Install local-only frontend and PDF runner dependencies
+        run: |
+          npm install --prefix web --no-package-lock --no-audit --no-fund
+          npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
+      - name: Start local Vite editorial preview bound to loopback
+        run: |
+          set -euo pipefail
+          (
+            cd web
+            ./node_modules/.bin/vite --host 127.0.0.1 --port 4173 --strictPort > /tmp/falowen-a2-editorial-vite.log 2>&1 &
+            echo $! > /tmp/falowen-a2-editorial-vite.pid
+          )
+          for i in $(seq 1 50); do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then
+              echo "Vite editorial server ready on loopback."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Local A2 editorial Vite server did not start."
+          tail -40 /tmp/falowen-a2-editorial-vite.log || true
+          exit 1
+      - name: Render complete A2 read-only proof
+        env:
+          FALOWEN_A2_EDITORIAL_PRINT: 'true'
+          FALOWEN_PDF_BASE_URL: http://127.0.0.1:4173
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
+      - name: Validate complete PDF before publishing sample
+        run: |
+          node scripts/course-material-bundles/validateGeneratedBundle.mjs A2
+          pdfinfo artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials.pdf | grep -E '^(Pages|Page size|File size):'
+          node scripts/course-material-bundles/prepareA2Sample.mjs
+      - name: Upload free Day 1 sample only
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-Free-Day1-Sample-editorial
+          path: artifacts/course-material-bundles/A2/Falowen-A2-Free-Day1-Sample.pdf
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload non-sensitive render diagnostics only on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: A2-editorial-render-diagnostics
+          path: artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: ignore
+          retention-days: 7
