@@ -289,4 +289,4 @@ async function processBookWebhook({ admin, data }) {
   });
 }
 
-module.exports = { BOOKS, registerBookCommerceRoutes, processBookWebhook };
+module.exports = { BOOKS, BOOK_CATALOG_TITLES, registerBookCommerceRoutes, processBookWebhook };
