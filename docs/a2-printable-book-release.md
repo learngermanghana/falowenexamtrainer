@@ -75,4 +75,11 @@ Copy the existing **client** settings from Falowen's approved Firebase/Vercel en
 
 After the six public client settings are available, rerun the private proof from the A2 branch (workflow can be retriggered by a change to its YAML file). Only the free Day 1 sample may be uploaded as an Actions artifact. No full book, personal saved work, Firestore data, authentication tokens, or private PDF must be published publicly. Review the complete page count, layout and navigation *within the trusted runner* before sale. The source content still needs a commercial rights review and book-only audio-access disclosure.
 
+
+### Automatic reuse of existing Vercel client settings
+
+The private A2 proof workflow first accepts the six `REACT_APP_FIREBASE_*` Actions variables or secrets. If any are missing, it can instead read **only those six browser-client values** from the existing Falowen Vercel production project through the repository's existing `VERCEL_TOKEN` secret (when that token has environment-read permission). The lookup runs in memory, never writes the full Vercel environment to disk and never prints decrypted values. It does not create Vercel deployments, change production settings, or require previews.
+
+If `VERCEL_TOKEN` is unavailable or lacks permission, set the six public Firebase client values in GitHub Actions Variables as documented above. The PDF test-account credentials still remain separate private GitHub secrets. Do not embed Firebase config, API keys or bearer tokens directly in the workflow source.
+
 **No production merges/deployments were made as part of implementing this mode.**
