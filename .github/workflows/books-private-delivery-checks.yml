@@ -1,0 +1,35 @@
+name: Private Falowen books delivery checks
+
+on:
+  push:
+    branches:
+      - feature/b1-books-private-delivery-20261025
+    paths:
+      - functions/functionz/bookCommerce.js
+      - functions/functionz/privateBookDelivery.js
+      - functions/functionz/privateBookDelivery.test.js
+      - functions/__tests__/bookCommerce.test.js
+      - .github/workflows/books-private-delivery-checks.yml
+  pull_request:
+    paths:
+      - functions/functionz/bookCommerce.js
+      - functions/functionz/privateBookDelivery.js
+      - functions/functionz/privateBookDelivery.test.js
+      - functions/__tests__/bookCommerce.test.js
+      - .github/workflows/books-private-delivery-checks.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify-private-books:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check functions/functionz/privateBookDelivery.js
+      - run: node --check functions/functionz/bookCommerce.js
+      - run: node --test functions/functionz/privateBookDelivery.test.js functions/__tests__/bookCommerce.test.js

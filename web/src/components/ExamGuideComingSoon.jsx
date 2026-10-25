@@ -13,6 +13,17 @@ const EXAM_GUIDES = Object.freeze({
       "Writing spaces, sample answers and self-correction tips",
     ],
   },
+  "goethe-b1-four-skills-exam-guide": {
+    level: "B1", pages: 50,
+    title: "Goethe-Zertifikat B1: Four-Skills Exam Preparation Guide",
+    subtitle: "Lesen · Hören · Schreiben · Sprechen",
+    description: "Independent 50-page B1 exam preparation with reading strategies, listening scripts, writing models, joint-planning speaking practice and worked examples.",
+    highlights: [
+      "Five-part Lesen strategy and sample task analysis",
+      "Listening-script drills and signal-word guidance (audio not included)",
+      "Three writing tasks, presentation planning and speaking expressions",
+    ],
+  },
   "goethe-a2-four-skills-exam-guide": {
     level: "A2", pages: 50,
     title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",

@@ -1,5 +1,6 @@
 "use strict";
 const crypto = require("crypto");
+const { registerPrivateBookDeliveryRoute, DIGITAL_BOOK_OBJECTS } = require("./privateBookDelivery");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
@@ -45,6 +46,13 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     levelTags: ["A2"], topics: ["goethe", "lesen", "hoeren", "hören", "schreiben", "sprechen", "exam guide"],
     formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
   }),
+  Object.freeze({
+    id: "b1-four-skills-exam-guide",
+    title: "Goethe-Zertifikat B1: Four-Skills Exam Preparation Guide",
+    description: "50-page independent Falowen B1 exam preparation guide for Lesen, Hören script-based practice, Schreiben and Sprechen with strategies, explanations and worked examples. Not an official Goethe-Institut publication; audio is not included.",
+    levelTags: ["B1"], topics: ["goethe", "lesen", "hören", "hoeren", "schreiben", "sprechen", "exam guide", "b1"],
+    formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
+  }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
 const allowedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,6 +61,7 @@ const paymentsEnabled = () => process.env.FALOWEN_BOOK_PAYMENTS_ENABLED === "tru
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 
 function registerBookCommerceRoutes(app, { admin }) {
+  registerPrivateBookDeliveryRoute(app, {admin});
   const db = () => admin.firestore();
   app.get("/books/catalog", (_req, res) => {
     res.set("Cache-Control", "no-store");
@@ -151,6 +160,16 @@ function registerBookCommerceRoutes(app, { admin }) {
         status: order.status === "paid" ? "paid" : order.status === "rejected" ? "rejected" : "pending",
         reference: order.reference, // private lookup key required before exposing receipt reference
         deliveryIncluded: false,
+        // The buyer still must present the order lookup key again to obtain
+        // a signed URL, and the download endpoint verifies the paid receipt.
+        downloadableBookIds: order.status === "paid" &&
+          process.env.FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED === "true"
+          ? (Array.isArray(order.items) ? order.items : [{
+              bookId: order.bookId, format: order.format, quantity: 1,
+            }]).filter(item => item.format === "digital" &&
+              Object.prototype.hasOwnProperty.call(DIGITAL_BOOK_OBJECTS, item.bookId))
+            .map(item => item.bookId)
+          : [],
       });
     } catch (error) {
       console.error("Book order status error", error);

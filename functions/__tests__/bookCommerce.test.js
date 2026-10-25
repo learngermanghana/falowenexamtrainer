@@ -96,3 +96,15 @@ test("new independent exam guides are catalogue-only until private fulfilment is
   assert.ok(!BOOKS["a1-writing-model-exams"]);
   assert.ok(!BOOKS["a2-four-skills-exam-guide"]);
 });
+
+
+test("B1 50-page independent exam guide is visible but never purchasable by accident",()=>{
+ const book=BOOK_CATALOG_TITLES.find(item=>item.id==="b1-four-skills-exam-guide");
+ assert.ok(book);
+ assert.equal(book.pages,50);
+ assert.deepEqual(book.levelTags,["B1"]);
+ assert.equal(book.status,"coming_soon");
+ assert.deepEqual(book.bookIds,[]);
+ assert.match(book.description,/Not an official Goethe-Institut publication/);
+ assert.equal(BOOKS["b1-four-skills-exam-guide-digital"],undefined);
+});

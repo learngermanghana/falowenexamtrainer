@@ -454,7 +454,7 @@ function App() {
 
   if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout />;
   if (location.pathname === "/books/complete") return <BookStoreCheckout completed />;
-  const examGuide = location.pathname.match(/^\/books\/(goethe-a1-writing-model-exams|goethe-a2-four-skills-exam-guide)\/?$/);
+  const examGuide = location.pathname.match(/^\/books\/(goethe-a1-writing-model-exams|goethe-a2-four-skills-exam-guide|goethe-b1-four-skills-exam-guide)\/?$/);
   if (examGuide) return <ExamGuideComingSoon slug={examGuide[1]} />;
 
   if (location.pathname === "/payment-complete") {
