@@ -319,7 +319,7 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
           <p><strong>Coming soon:</strong> Digital and printed editions are being reviewed. Final pricing, printing options and fulfilment must be approved before checkout can open.</p>
           <a href="/books" className="fb-btn fb-btn-soft">Back to all Falowen books</a>
         </section>
-        : {isA2 ? <section className="fb-book-coming" aria-label="Upcoming Deutsch A2 course book">
+        : isA2 ? <section className="fb-book-coming" aria-label="Upcoming Deutsch A2 course book">
           <p className="fb-eyebrow">FALOWEN BOOK LIBRARY · COMING SOON</p>
           <h1>Deutsch A2 · Course &amp; Workbook</h1>
           <p>441 pages of German grammar, writing, reading, listening questions and speaking practice. The book is being prepared for publication.</p>
@@ -407,7 +407,7 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
         </aside>
       </section>}
       </div>}
-      {productSlug && !isWritingGuide && !isA2 && <section id="fb-book-details" className="fb-details">
+      {productSlug && !upcomingGuide && !isWritingGuide && !isA2 && <section id="fb-book-details" className="fb-details">
         <div className="fb-tabbar" role="tablist" aria-label="Book information">
           {sections.map(id => <button key={id} type="button" role="tab" aria-selected={activeTab === id} className={activeTab===id?"active":""} onClick={()=>setActiveTab(id)}>
             {({overview:"Overview",contents:"What's inside",sample:"Free sample",faq:"Questions"})[id]}
