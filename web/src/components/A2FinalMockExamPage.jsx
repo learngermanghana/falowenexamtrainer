@@ -324,7 +324,9 @@ export default function A2FinalMockExamPage({mockId=A2_FINAL_MOCK_ID}) {
   const kombiSet=isKombi?A2_KOMBI_MOCK_CONTENT[kombiNumber]:null;
   const title=isKombi?`A2 Mock ${kombiNumber} · Kombiprüfung`:"A2 Final Mock Exam";
   const writing=isKombi?kombiSet.writing:A2_GOETHE_WRITING_MOCK;
-  const storageKey = `${A2_FINAL_MOCK_STORAGE_KEY}:${mockId}:${user?.uid || "guest"}`;
+  const storageKey = isKombi
+    ? `${A2_FINAL_MOCK_STORAGE_KEY}:${mockId}:${user?.uid || "guest"}`
+    : `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey,mockId));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
@@ -1149,7 +1151,7 @@ export default function A2FinalMockExamPage({mockId=A2_FINAL_MOCK_ID}) {
           })}
         </section>
 
-        <FullMockRecovery level="A2" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="Completed attempts stay recorded; a retake starts again from Lesen." />
+        {!isKombi?<FullMockRecovery level="A2" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="Completed attempts stay recorded; a retake starts again from Lesen." />:<p>To repeat this Kombiprüfung, select another practice attempt. Earlier results remain unchanged.</p>}
         <div className="a1-final-mock-result-actions">
           <a href="/exams/overview">Continue in Exams Room</a>
           <a href="/exams/speaking">More Sprechen practice</a>
@@ -1168,10 +1170,10 @@ export default function A2FinalMockExamPage({mockId=A2_FINAL_MOCK_ID}) {
       <main className="a1-goethe-mock-shell a1-final-mock-shell">
         <div className="a1-goethe-mock-topbar">
           <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-          <span className="a1-goethe-mock-preview-badge">A2 Final Mock · repeatable practice</span>
+          <span className="a1-goethe-mock-preview-badge">{isKombi?title:"A2 Final Mock · repeatable practice"}</span>
         </div>
         <article className="a1-final-mock-intro">
-          <p className="a1-goethe-mock-kicker">Day 29 · A2</p>
+          <p className="a1-goethe-mock-kicker">{isKombi?"A2 · Kombiprüfung":"Day 29 · A2"}</p>
           <h1>{title}</h1>
           <p>{isKombi?"Complete Lesen, Schreiben and Sprechen. Hören is not part of this Kombiprüfung. Your scores will be verified on the server.":"Complete all four sections in order. Your answers are saved automatically. Feedback appears after the full mock is finished."}</p>
 
@@ -1203,7 +1205,7 @@ export default function A2FinalMockExamPage({mockId=A2_FINAL_MOCK_ID}) {
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">
-          {exam.completed ? "Mock complete" : "A2 Final Mock"}
+          {exam.completed ? "Mock complete" : title}
         </span>
       </div>
 
