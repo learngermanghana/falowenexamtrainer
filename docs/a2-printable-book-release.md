@@ -83,3 +83,13 @@ The private A2 proof workflow first accepts the six `REACT_APP_FIREBASE_*` Actio
 If `VERCEL_TOKEN` is unavailable or lacks permission, set the six public Firebase client values in GitHub Actions Variables as documented above. The PDF test-account credentials still remain separate private GitHub secrets. Do not embed Firebase config, API keys or bearer tokens directly in the workflow source.
 
 **No production merges/deployments were made as part of implementing this mode.**
+
+
+## A2 Day 22: speaking-only lesson in the printed book
+
+The live A2 Day 22 course route mounts `CourseSpeakingMockAssignment`: it has no standard Grammar/Teil workbook tabs. On the first complete authenticated **read-only** print run, Days 1–21 succeeded but Day 22 could not satisfy the tab-based renderer and fell into a /login retry while an authenticated account was already present.
+
+For A2 editorial exports **only**, Day 22 now uses an offline paper companion: one clearly labeled speaking-support page (rather than falsely claiming an online grammar lesson), followed by three printable sections with representative Teil 1–3 task cards drawn deterministically from `web/src/data/speakingDictionary.js`. The live AI speaking assessment selects its own prompts, requires online access, and is **not** bundled, recorded, started or marked by a PDF export. The branch-specific print module rejects a changed/unrecognized source route rather than silently substituting teaching content.
+
+This removes Day 22's non-tabbed-lesson blocker without altering the live Day 22 student page, grading, subscriptions, timers or user work. The complete PDF still requires a successful Day 1–28 render, visual proof, rights review, and private storage before sale.
+
