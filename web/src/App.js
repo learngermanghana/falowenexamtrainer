@@ -1071,6 +1071,11 @@ const AppShell = ({
           <Route path="/campus/course/a2-mock-3-hoeren" element={<A2Mock3Hoeren />} />
           <Route path="/campus/course/a2-mock-2-sprechen" element={<A2Mock2Sprechen />} />
           <Route path="/campus/course/a2-mock-2" element={<A2Mock2ExamHub />} />
+          <Route path="/campus/course/a2-mock-4" element={<A2FinalMockExamPage key="a2-mock-04" mockId="a2-mock-04"/>} />
+          <Route path="/campus/course/a2-mock-5" element={<A2FinalMockExamPage key="a2-mock-05" mockId="a2-mock-05"/>} />
+          <Route path="/campus/course/a2-mock-6" element={<A2FinalMockExamPage key="a2-mock-06" mockId="a2-mock-06"/>} />
+          <Route path="/campus/course/a2-mock-7" element={<A2FinalMockExamPage key="a2-mock-07" mockId="a2-mock-07"/>} />
+          <Route path="/campus/course/a2-mock-8" element={<A2FinalMockExamPage key="a2-mock-08" mockId="a2-mock-08"/>} />
           <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
           <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/campus/course/b1-mock-practice-preview" element={<B1FinalMockExamPage />} />
