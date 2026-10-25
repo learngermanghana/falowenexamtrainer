@@ -42,6 +42,11 @@ function harness({identity={role:"tutor"},results=[frozen]}={}){
               examTask:{courseAssignmentKey:"B1-7.23"},inFlight:true})}],size:1};}};}
         };},
       };
+      if(name==="students")return {where(field,op,ids){
+        expect([field,op]).toEqual(["uid","in"]);
+        expect(ids).toEqual([UID]);
+        return {limit(n){expect(n).toBe(60);return {get:async()=>{dbReads++;return {docs:[{data:()=>({uid:UID,name:"Akua Anaaku"})}]}}}}};
+      }};
       if(name==="liveSpeakUsage")return {doc(){return {get:async()=>{dbReads++;return {data:()=>({turns:12})}}}}};
       if(name==="courseSpeakingMockAttempts"||name==="scores")return{
         doc(){return {get:async()=>{dbReads+=1;return {exists:false,data:()=>undefined}}};},
@@ -129,11 +134,41 @@ test("Activity overview loads only on a staff request and shows usage without US
   expect(r.body.view).toBe("activity");
   expect(r.body.activity).toHaveLength(1);
   expect(r.body.activity[0]).toMatchObject({
-    level:"B1",source:"course_book",state:"processing",practiceTurns:4,
+    studentName:"Akua Anaaku",score:null,level:"B1",source:"course_book",state:"processing",practiceTurns:4,
     answeredQuestions:3,costUsd:null
   });
   expect(r.body.usage.reservedAiCallUnits).toBe(12);
   expect(r.body.usage.costUsd).toBeNull();
-  expect(h.dbReads).toBe(2);
+  expect(h.dbReads).toBe(3);
   expect(JSON.stringify(r.body)).not.toContain("Ich schlage");
+});
+
+
+test("missing marks remain unscored while an actual zero remains a score",()=>{
+  const {normalizeActivity,normalize}=require("../staffSpeakingReview");
+  const snap=percent=>({id:"session",data:()=>({...frozen,assessment:{percent}})});
+  for(const missing of [undefined,null,""," ",false,[]]){
+    expect(normalizeActivity(snap(missing)).score).toBeNull();
+    expect(normalize(snap(missing)).score).toBeNull();
+  }
+  expect(normalizeActivity(snap(0)).score).toBe(0);
+  expect(normalizeActivity(snap(85.5)).score).toBe(85.5);
+});
+
+test("activity name lookup deduplicates repeated UIDs and uses matching profiles",async()=>{
+  const {nameSpeakingActivity}=require("../staffSpeakingReview");
+  let reads=0;
+  const db={collection:()=>({where(field,op,ids){expect(ids).toEqual([UID]);return {limit:()=>({get:async()=>{reads++;return {docs:[{data:()=>({uid:UID,fullName:"Akua Anaaku"})}]}}})}}})};
+  const rows=await nameSpeakingActivity([{uid:UID,score:80},{uid:UID,score:90}],{db,admin:{}});
+  expect(reads).toBe(1);expect(rows.map(r=>r.studentName)).toEqual(["Akua Anaaku","Akua Anaaku"]);
+  expect(rows.map(r=>r.score)).toEqual([80,90]);
+});
+
+
+test("unlinked UIDs resolve names through Auth email without using another learner's profile",async()=>{
+  const {nameSpeakingActivity}=require("../staffSpeakingReview");
+  const db={collection:()=>({where(field,op,ids){return {limit:()=>({get:async()=>({docs:field==="email"?[{data:()=>({email:"learner@example.com",name:"Akua Anaaku"})}]:[]})})}}})};
+  const admin={auth:()=>({getUsers:async ids=>{expect(ids).toEqual([{uid:UID}]);return {users:[{uid:UID,email:"learner@example.com",displayName:"Fallback name"}]}}})};
+  const rows=await nameSpeakingActivity([{uid:UID,score:0}],{db,admin});
+  expect(rows[0]).toMatchObject({studentName:"Akua Anaaku",score:0});
 });

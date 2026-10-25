@@ -17,6 +17,11 @@ const isStaff = identity => Boolean(identity && (
 ));
 const text = (value, size=4000) => clean(value).slice(0,size);
 const safeCount=value=>Math.max(0,Math.min(100000,Number(value)||0));
+const savedPercent = value => {
+  if (!["number","string"].includes(typeof value) || (typeof value === "string" && !value.trim())) return null;
+  const score=Number(value);
+  return Number.isFinite(score)&&score>=0&&score<=100?score:null;
+};
 const normalize = snap => {
   const r=snap.data() || {};
   if (!LEVELS.has(r.level) || r.source !== "exam-speaking-practice") return null;
@@ -27,7 +32,7 @@ const normalize = snap => {
     mockAttemptId:text(r.mockAttemptId,90),
     source:r.task?.courseAssignmentKey ? "course_book" : "exams_room",
     completed:r.completed === true, createdAt:timestamp(r.createdAt),
-    score:Number.isFinite(Number(r.assessment?.percent)) ? Number(r.assessment.percent) : null,
+    score:savedPercent(r.assessment?.percent),
     answeredQuestions:Array.isArray(r.answers) ? r.answers.length : 0,
     // Current provider cost is not recorded per student. Never infer USD from
     // a transcript, unpriced audio size or number of practice sessions.
@@ -41,6 +46,7 @@ const normalizeActivity = (snap, now=Date.now()) => {
   const open=!r.endedAt && Number.isFinite(expires) && expires>now;
   return {
     uid:text(r.uid,130),level:r.level,
+    score:savedPercent(r.assessment?.percent),
     source:r.examTask?.courseAssignmentKey?"course_book":"exams_room",
     assignmentKey:text(r.examTask?.courseAssignmentKey,45),
     startedAt:timestamp(r.startedAt),
@@ -51,6 +57,43 @@ const normalizeActivity = (snap, now=Date.now()) => {
     costUsd:null,
   };
 };
+// Resolve only the bounded activity snapshot, without scanning the student roster.
+// Repeated sessions share a lookup; names come from profiles, then Auth as fallback.
+async function nameSpeakingActivity(activity,{admin,db}) {
+  const names=new Map();
+  const uids=[...new Set(activity.map(row=>row.uid).filter(Boolean))];
+  for(const field of ["uid","authUid","firebaseUid","firebaseAuthUid","studentUID"]) {
+    const missing=uids.filter(uid=>!names.has(uid));
+    if(!missing.length)break;
+    for(let offset=0;offset<missing.length;offset+=30) {
+      const ids=missing.slice(offset,offset+30);
+      const snapshot=await db.collection("students").where(field,"in",ids).limit(60).get();
+      for(const doc of snapshot.docs||[]) {
+        const row=doc.data()||{};
+        const name=text(row.name||row.fullName||row.studentName,120);
+        if(name&&ids.includes(row[field]))names.set(row[field],name);
+      }
+    }
+  }
+  const remaining=uids.filter(uid=>!names.has(uid));
+  const fallback=new Map();
+  if(remaining.length&&typeof admin.auth==="function") {
+    try {
+      const result=await admin.auth().getUsers(remaining.map(uid=>({uid})));
+      for(const user of result.users||[])fallback.set(user.uid,{name:text(user.displayName,120),email:text(user.email,150)});
+      const emails=[...new Set([...fallback.values()].map(user=>user.email).filter(Boolean))];
+      for(let offset=0;offset<emails.length;offset+=30) {
+        const snapshot=await db.collection("students").where("email","in",emails.slice(offset,offset+30)).limit(60).get();
+        for(const doc of snapshot.docs||[]) {
+          const row=doc.data()||{};const name=text(row.name||row.fullName||row.studentName,120);
+          if(name)for(const [uid,user] of fallback)if(user.email.toLowerCase()===clean(row.email).toLowerCase())names.set(uid,name);
+        }
+      }
+    }catch(error){console.warn("Speaking activity name fallback unavailable",error?.code||"lookup_failed");}
+  }
+  return activity.map(row=>({...row,studentName:names.get(row.uid)||fallback.get(row.uid)?.name||"",studentEmail:fallback.get(row.uid)?.email||""}));
+}
+
 async function resolveStudent({ admin, findStudentByCodeOrEmail, input }) {
   const value=clean(input);
   let record=await findStudentByCodeOrEmail({
@@ -114,9 +157,10 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
         // background polling, microphone recordings, or model/API calls.
         const db=admin.firestore();
         const snaps=await db.collection("liveSpeakSessions").orderBy("startedAt","desc").limit(80).get();
-        const activity=(snaps.docs||[]).map(snap=>normalizeActivity(snap))
+        const sessionActivity=(snaps.docs||[]).map(snap=>normalizeActivity(snap))
           .filter(Boolean).filter(row=>!level||level==="ALL"||row.level===level)
           .slice(0,60);
+        const activity=await nameSpeakingActivity(sessionActivity,{admin,db});
         const ym=new Date().toISOString().slice(0,7);
         const usage=await db.collection("liveSpeakUsage").doc(ym).get();
         return res.json({ok:true,view:"activity",checkedAt:new Date().toISOString(),
@@ -165,4 +209,4 @@ function registerStaffSpeakingReviewRoutes(app,{admin,getAuthedUser,findStudentB
     }
   });
 }
-module.exports={registerStaffSpeakingReviewRoutes,normalize,normalizeActivity,resolveStudent,isStaff};
+module.exports={registerStaffSpeakingReviewRoutes,normalize,normalizeActivity,resolveStudent,isStaff,nameSpeakingActivity,savedPercent};
