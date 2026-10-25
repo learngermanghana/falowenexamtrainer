@@ -2,10 +2,11 @@
 
 // Immutable examiner results are evidence for either A2 mock.
 // Reject scores that do not belong to this student, mock and attempt.
+const { isA2KombiMock } = require("./a2KombiMockContract");
 const expectedTaskId = (part, mockId) => `${mockId}-speaking-teil-${part}`;
 
 const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds, mockId = "a2-mock-01"}) => {
-  if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unsupported A2 mock.");
+  if (!["a2-mock-01", "a2-mock-02"].includes(mockId) && !isA2KombiMock(mockId)) throw new Error("Unsupported A2 mock.");
   if (!String(attemptId || "").trim()) {
     throw Object.assign(new Error("The A2 mock attempt ID is required."), {status:400,code:"A2_MOCK_ATTEMPT_ID_REQUIRED"});
   }
