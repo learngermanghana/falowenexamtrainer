@@ -32,7 +32,7 @@ export const findA2PdfLeaks = value => {
 
 // Run via page.evaluate only for PDF. Reset answers and redact personal widgets
 // without editing a student React component or exposing a saved Firestore draft.
-export const sanitizeA2PrintDocument = () => {
+export const sanitizeA2PrintDocument = (section = "") => {
  const root = document.querySelector("main") || document.body;
  const nodes = [...root.querySelectorAll(
   '[data-course-inline-practice], [data-a2-print-private], [data-a1-print-private], ' +
@@ -67,6 +67,17 @@ export const sanitizeA2PrintDocument = () => {
  }
  for (const field of [...root.querySelectorAll("textarea")]) {
   field.replaceWith(makeLines(7));
+ }
+ // Live A2 writing pages normally have only an AI writing workspace, which we
+ // redact. Add paper answer lines after the actual printed writing task.
+ if (section === "workbook-teil-2" && !root.querySelector("[data-a2-pdf-answer-space]")) {
+  const heading = [...root.querySelectorAll("h2,h3")]
+   .find(node => /Teil\\s*2.*Schreiben/i.test(node.textContent || ""));
+  if (heading?.parentElement) {
+   const label = document.createElement("h3");
+   label.textContent = "Schreiben · Your answer";
+   heading.parentElement.append(label, makeLines(8));
+  }
  }
  for (const input of [...root.querySelectorAll("input")]) {
   const type = String(input.type || "text").toLowerCase();
