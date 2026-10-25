@@ -234,7 +234,7 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
     const safeState = await page.evaluate(() => {
       const body = document.body?.innerText || "";
       return {
-        workbookHeadingPresent: /A2\\s*[·:]?\\s*Day\\s*\\d+\\s*Workbook/i.test(body),
+        workbookHeadingPresent: /A2\s*[·:]?\s*Day\s*\d+\s*Workbook/i.test(body),
         loginFormPresent: Boolean(document.querySelector('input[type="password"]')),
         radioGatePresent: Boolean(document.querySelector("[data-radio-first-workbook-gate]")),
         workbookNavPresent: Boolean(document.querySelector("[data-workbook-tab-navigation]")),
