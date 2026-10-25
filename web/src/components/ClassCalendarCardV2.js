@@ -11,6 +11,7 @@ import {
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import { subscribeCanonicalLiveClass } from "../services/canonicalLiveClassService";
 import NextLiveClassCard from "./NextLiveClassCard";
+import HomepageBooksCarousel from "./HomepageBooksCarousel";
 import {
   GHANA_TIMEZONE,
   asLiveClassDate,
@@ -210,71 +211,6 @@ function LegacyClassCard({ selectedClass, classDetails, now }) {
   );
 }
 
-function HomeZoomAccessCard({ zoom = {}, className = "" }) {
-  if (!zoom.url) return null;
-
-  return (
-    <section
-      data-home-zoom-access
-      style={{
-        ...infoCardStyle,
-        borderColor: "#c7d2fe",
-        background: "linear-gradient(135deg, #eef2ff 0%, #ffffff 62%, #eff6ff 100%)",
-        boxShadow: "0 14px 30px rgba(37, 99, 235, 0.08)",
-        padding: 18,
-        gap: 12,
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: 4 }}>
-          <span style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af" }}>Live class</span>
-          <h3 style={{ margin: 0, fontSize: 19 }}>Join your class on Zoom</h3>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {className ? `${className} · ` : ""}Use this link when it is time for your live lesson.
-          </p>
-        </div>
-        <a
-          href={zoom.url}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            ...styles.primaryButton,
-            textDecoration: "none",
-            minWidth: 150,
-            textAlign: "center",
-            boxShadow: "0 8px 18px rgba(37, 99, 235, 0.18)",
-          }}
-        >
-          Open Zoom
-        </a>
-      </div>
-
-      {zoom.meetingId || zoom.passcode ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-            gap: 8,
-          }}
-        >
-          {zoom.meetingId ? (
-            <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: "10px 12px", background: "#ffffff" }}>
-              <span style={{ ...styles.helperText, display: "block", marginBottom: 2 }}>Meeting ID</span>
-              <strong>{zoom.meetingId}</strong>
-            </div>
-          ) : null}
-          {zoom.passcode ? (
-            <div style={{ border: "1px solid #dbeafe", borderRadius: 12, padding: "10px 12px", background: "#ffffff" }}>
-              <span style={{ ...styles.helperText, display: "block", marginBottom: 2 }}>Passcode</span>
-              <strong>{zoom.passcode}</strong>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
 function LegacyHomeClassCard({ selectedClass, classDetails, now }) {
   const nextClass = findNextClassSession(selectedClass, now);
   return (
@@ -291,7 +227,7 @@ function LegacyHomeClassCard({ selectedClass, classDetails, now }) {
         )}
         <p style={{ ...styles.helperText, margin: 0 }}>{formatScheduleSummary(classDetails?.schedule)}</p>
       </section>
-      <HomeZoomAccessCard zoom={ZOOM_DETAILS} className={selectedClass} />
+      <HomepageBooksCarousel />
     </>
   );
 }
@@ -435,7 +371,7 @@ const ClassCalendarCardV2 = ({ id, initialClassName, initialClassId, program, ho
                 <span style={styles.helperText}>There is no upcoming live lesson scheduled right now.</span>
               </section>
             )}
-            <HomeZoomAccessCard zoom={zoom} className={canonicalSummary.klass?.name || selectedClass} />
+            <HomepageBooksCarousel />
           </>
         ) : (
         <>
