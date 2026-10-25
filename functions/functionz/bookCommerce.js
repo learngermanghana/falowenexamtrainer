@@ -1,5 +1,6 @@
 "use strict";
 const crypto = require("crypto");
+const { registerPrivateBookDeliveryRoute } = require("./privateBookDelivery");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
@@ -45,6 +46,13 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     levelTags: ["A2"], topics: ["goethe", "lesen", "hoeren", "hören", "schreiben", "sprechen", "exam guide"],
     formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
   }),
+  Object.freeze({
+    id: "b1-four-skills-exam-guide",
+    title: "Goethe-Zertifikat B1: Four-Skills Exam Preparation Guide",
+    description: "50-page independent Falowen B1 exam preparation guide for Lesen, Hören script-based practice, Schreiben and Sprechen with strategies, explanations and worked examples. Not an official Goethe-Institut publication; audio is not included.",
+    levelTags: ["B1"], topics: ["goethe", "lesen", "hören", "hoeren", "schreiben", "sprechen", "exam guide", "b1"],
+    formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
+  }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
 const allowedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -53,6 +61,7 @@ const paymentsEnabled = () => process.env.FALOWEN_BOOK_PAYMENTS_ENABLED === "tru
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 
 function registerBookCommerceRoutes(app, { admin }) {
+  registerPrivateBookDeliveryRoute(app, {admin});
   const db = () => admin.firestore();
   app.get("/books/catalog", (_req, res) => {
     res.set("Cache-Control", "no-store");
