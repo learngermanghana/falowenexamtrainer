@@ -79,11 +79,11 @@ export const sanitizeA2PrintDocument = (section = "") => {
  for (const node of printTextNodes) {
   if (node.parentElement?.closest('script,style,noscript')) continue;
   const original = String(node.nodeValue || "");
-  if (!/(?:back\\s+to\\s+course\\s+book|falowen\\s+radio|teacher\\s+video)/i.test(original)) continue;
+  if (!/(?:back\s+to\s+course\s+book|falowen\s+radio|teacher\s+video)/i.test(original)) continue;
   const cleaned = original
-   .replace(/[←‹«]?[ \\t]*back\\s+to\\s+course\\s+book/gi, "")
-   .replace(/falowen\\s+radio/gi, "Falowen audio lesson")
-   .replace(/teacher\\s+video/gi, "teacher lecture");
+   .replace(/[←‹«]?[ \t]*back\s+to\s+course\s+book/gi, "")
+   .replace(/falowen\s+radio/gi, "Falowen audio lesson")
+   .replace(/teacher\s+video/gi, "teacher lecture");
   node.nodeValue = cleaned;
  }
 
