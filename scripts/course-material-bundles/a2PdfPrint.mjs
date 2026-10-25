@@ -72,7 +72,7 @@ export const sanitizeA2PrintDocument = (section = "") => {
  // redact. Add paper answer lines after the actual printed writing task.
  if (section === "workbook-teil-2" && !root.querySelector("[data-a2-pdf-answer-space]")) {
   const heading = [...root.querySelectorAll("h2,h3")]
-   .find(node => /Teil\\s*2.*Schreiben/i.test(node.textContent || ""));
+   .find(node => /Teil\s*2.*Schreiben/i.test(node.textContent || ""));
   if (heading?.parentElement) {
    const label = document.createElement("h3");
    label.textContent = "Schreiben · Your answer";
