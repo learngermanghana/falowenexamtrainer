@@ -64,14 +64,25 @@ export default function ExamGuideComingSoon({ slug }) {
     const meta = document.querySelector('meta[name="description"]');
     const oldDescription = meta?.getAttribute("content");
     if (meta) meta.setAttribute("content", guide.description + " Digital and printed editions at Falowen.");
-    const canonical = document.createElement("link");
-    canonical.rel = "canonical";
+    // The SPA HTML already contains a homepage canonical. Reuse it rather
+    // than appending a conflicting second canonical for the book detail route.
+    const existingCanonical = document.head.querySelector('link[rel="canonical"]');
+    const canonical = existingCanonical || document.createElement("link");
+    const previousCanonicalHref = existingCanonical?.getAttribute("href");
+    if (!existingCanonical) {
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
     canonical.href = "https://www.falowen.app/books/" + slug;
-    document.head.appendChild(canonical);
     return () => {
       document.title = previous;
       if (meta && oldDescription !== null) meta.setAttribute("content", oldDescription);
-      canonical.remove();
+      if (existingCanonical) {
+        if (previousCanonicalHref === null) canonical.removeAttribute("href");
+        else canonical.setAttribute("href", previousCanonicalHref);
+      } else {
+        canonical.remove();
+      }
     };
   }, [slug, guide]);
 
