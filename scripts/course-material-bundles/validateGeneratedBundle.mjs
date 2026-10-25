@@ -86,7 +86,17 @@ const forbidden = [
 
 const leaked = forbidden.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
 if (leaked.length) {
-  throw new Error(`${level} PDF contains excluded UI/content: ${leaked.join(", ")}.`);
+  // Page numbers and public UI category only; never print extracted lesson
+  // paragraphs, learner names, draft contents or PDF snippets in Actions.
+  const locations = level === "A2"
+    ? forbidden.filter(([, expression]) => expression.test(text)).map(([name, expression]) => {
+      const pages = text.split("\\f").flatMap((content, index) =>
+        expression.test(content) ? [index + 1] : []);
+      return name + " (pages " + pages.slice(0, 25).join(", ") + ")";
+    }).join("; ")
+    : "";
+  throw new Error(`${level} PDF contains excluded UI/content: ${leaked.join(", ")}.` +
+    (locations ? " Safe page locations: " + locations : ""));
 }
 
 if (!/Contents/i.test(text)) throw new Error(`${level} PDF is missing its contents page.`);
