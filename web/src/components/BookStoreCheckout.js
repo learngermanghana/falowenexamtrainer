@@ -116,6 +116,7 @@ function ReceiptConfirmation() {
   const query = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
   const orderId = query.get("order"), key = query.get("key");
   const [order, setOrder] = useState(null), [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const [downloadBusy, setDownloadBusy] = useState(false);
   const lookup = `/books/order?order=${encodeURIComponent(orderId || "")}&key=${encodeURIComponent(key || "")}`;
   async function refresh() {
     if (!orderId || !key) { setError("The order link is incomplete. Keep your Paystack receipt for assistance."); return; }
@@ -126,6 +127,21 @@ function ReceiptConfirmation() {
     try { setOrder(await request(lookup)); } catch (e) { setError(e.message); } finally { setBusy(false); }
   }
   useEffect(() => { void refresh(); /* one verification on return */ }, [orderId, key]);
+  const openPaidPdf = async bookId => {
+    if (!orderId || !key || !bookId) return;
+    setDownloadBusy(true); setError("");
+    try {
+      const result = await request("/books/download",{
+        method:"POST",
+        body:JSON.stringify({order:orderId,key,bookId}),
+      });
+      const url = new URL(result.url);
+      if (url.protocol !== "https:" || !url.hostname.endsWith(".r2.cloudflarestorage.com") ||
+          !url.hostname.startsWith("falowen-books-private.")) throw Error("Unexpected download destination.");
+      window.location.assign(url.toString());
+    } catch (e) { setError(e.message); }
+    finally { setDownloadBusy(false); }
+  };
   const copyReceipt = async () => {
     if (!order || !navigator.clipboard?.writeText) return setError("Please select the receipt reference displayed below.");
     try {
@@ -155,8 +171,15 @@ function ReceiptConfirmation() {
           <dt>Amount</dt><dd><strong>{money(order.priceGhs)}</strong></dd>
         </dl>
         <p>{order.status === "paid"
-          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : "Falowen will arrange the PDF manually. No automatic download is issued."
+          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : order.downloadableBookIds?.length ? "Your private PDF download is available below for this verified purchase." : "Falowen will arrange the PDF manually. No automatic download is issued."
           : "If you have been charged, do not pay a second time. Retain your Paystack receipt and check again."}</p>
+        {order.status === "paid" && Array.isArray(order.downloadableBookIds)
+          ? order.downloadableBookIds.map(id =>
+            <button key={id} type="button" className="fb-btn fb-btn-primary" disabled={downloadBusy}
+              onClick={() => openPaidPdf(id)}>
+              {downloadBusy ? "Preparing your private PDF…" : "Download purchased PDF"}
+            </button>)
+          : null}
         <button type="button" className="fb-btn fb-btn-ghost" onClick={copyReceipt}>Copy receipt details</button>
       </div> : null}
       {error ? <p className="fb-error" role="alert">{error}</p> : null}
