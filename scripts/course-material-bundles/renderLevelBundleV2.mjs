@@ -6,6 +6,8 @@ import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { addA2RetailCover } from "./a2RetailCover.mjs";
 import { renderA2Day22SpeakingMockPrint } from "./renderA2Day22SpeakingMockPrint.mjs";
+import { renderA2PrintableListeningQuestions } from "./renderA2PrintableListeningQuestions.mjs";
+import { getA2ListeningTask, A2_LISTENING_MODES } from "../../web/src/data/a2ListeningTasks.js";
 import { a2PrintCss, sanitizeA2PrintDocument, extractA2PrintSnapshot, a2SectionReady, findA2PdfLeaks } from "./a2PdfPrint.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -468,27 +470,19 @@ const renderA2B1Lesson = async (page, lesson) => {
   ];
   const workbookParts = [];
   for (const tabSpec of workbookTabSpecs) {
-    let clicked = false;
     if (a2EditorialLocal && Number(lesson.day) >= 24 && tabSpec.key === "teil-4") {
-      // Late A2 Hören panels may re-mount after a previous print DOM cleanup.
-      // Load the actual, read-only listening tab on a fresh local page, rather
-      // than treating a stale navigation click as proof that its questions loaded.
-      const offered = page.getByRole("tab", { name: /^Teil 4/i }).first();
-      if (await offered.isVisible().catch(() => false)) {
-        const deepLink = new URL(lesson.route, baseUrl);
-        deepLink.searchParams.set("radio", "done");
-        deepLink.searchParams.set("view", "hoeren");
-        if (!(await openLessonWithAuthHydration(page, lesson, deepLink.toString()))) {
-          throw new Error("A2 Day " + lesson.day +
-            ": Hören editorial deep link could not open the authenticated workbook.");
-        }
-        clicked = await page.locator('[data-a2-pdf-listening-task="true"]').isVisible().catch(() => false);
-        if (!clicked) throw new Error("A2 Day " + lesson.day +
-          ": Hören editorial deep link loaded workbook navigation but not listening questions.");
+      // Late A2 live audio widgets are not stable in an unattended print
+      // browser. Use the exact published question/choice dictionary instead.
+      // This prints no audio, student data, attempt or grading results.
+      const listen = getA2ListeningTask(lesson.day);
+      if (listen?.mode && listen.mode !== A2_LISTENING_MODES.NONE) {
+        workbookParts.push(await renderA2PrintableListeningQuestions({ lesson, renderDir }));
+      } else {
+        console.warn(`A2 Day ${lesson.day}: no canonical listening task, optional Teil 4 omitted.`);
       }
-    } else {
-      clicked = await clickWorkbookTab(page, tabSpec.names);
+      continue;
     }
+    const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
       if (level === "A2" && await page.getByRole("tab", { name: new RegExp(tabSpec.names[0], "i") }).count()) {
         throw new Error("A2 Day " + lesson.day + ": required visible workbook tab " +
