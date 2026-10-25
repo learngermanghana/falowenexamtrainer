@@ -9,11 +9,12 @@ const titles = [
   { id: "writing-skills-a1-c2", title: "How to Unlock Your German Writing Skills (A1–C2)",
     description: "Model emails and essays", levelTags: ["A1", "A2", "B1", "B2", "C1", "C2"],
     formats: ["digital"], topics: ["writing", "connectors", "email"], pages: 32,
-    status: "coming_soon", bookIds: [] },
+    status: "available", bookIds: ["writing-skills-a1-c2-digital"] },
 ];
 const offers = [
   { id: "a1-digital", format: "digital", priceGhs: 99 },
   { id: "a1-printed", format: "printed", priceGhs: 800 },
+  { id: "writing-skills-a1-c2-digital", format: "digital", priceGhs: 39 },
 ];
 
 describe("Falowen Books discovery, currency and checkout safety", () => {
@@ -32,17 +33,21 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     expect(indicativeUsd(99, { usdToGhs: 0 })).toBe("");
   });
 
-  test("keeps the new guide not purchasable and offers existing A1 checkout selection", () => {
+  test("offers an independently purchasable GH₵39 writing guide and preserves A1 selection", () => {
     const choose = jest.fn();
-    render(<BooksCatalog catalogTitles={titles} books={offers} fxQuote={{ usdToGhs: 11 }} onSelectA1={choose} />);
-    expect(screen.getByText(/Coming soon · Price to be announced/i)).toBeInTheDocument();
+    render(<BooksCatalog catalogTitles={titles} books={offers} fxQuote={{ usdToGhs: 11 }} onSelectBook={choose} />);
+    expect(screen.getByText("GH₵39.00")).toBeInTheDocument();
     expect(screen.getAllByText(/Paystack charges in Ghana cedis/i)).toHaveLength(1);
     const buttons = screen.getAllByRole("button", { name: "View book and editions" });
     expect(buttons).toHaveLength(1);
+    const guide = screen.getByRole("button", { name: "View writing guide and buy" });
+    fireEvent.click(guide);
+    expect(choose).toHaveBeenCalledWith("writing-skills-a1-c2-digital");
     fireEvent.click(buttons[0]);
     expect(choose).toHaveBeenCalledWith("a1-digital");
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "writing" } });
     expect(screen.getByRole("status")).toHaveTextContent("1 book found");
     expect(screen.queryByRole("button", { name: "View book and editions" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "View writing guide and buy" })).toBeInTheDocument();
   });
 });
