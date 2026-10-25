@@ -27,8 +27,11 @@ upload. All three titles remain **coming_soon** and cannot be purchased yet.
    chat, GitHub commit or Actions logs):
    `R2_BOOKS_ACCOUNT_ID`, `R2_BOOKS_BUCKET`,
    `R2_BOOKS_ACCESS_KEY_ID`, `R2_BOOKS_SECRET_ACCESS_KEY`.
-   Set bucket value to `falowen-books-private`. All four are bound to
-   `exports.api` in `functions/index.js` and must exist before deployment.
+   Set bucket value to `falowen-books-private`. **These values are not yet bound**
+   to `exports.api`: the safe first phase deploys only the disabled endpoint
+   and B1 coming-soon catalogue. Once provisioned, add these four bindings to
+   the `secrets` array of the `exports.api = onRequest(...)` function in
+   `functions/index.js`, then deploy and verify before enabling delivery.
 3. The kill switch `FALOWEN_BOOK_DIGITAL_DELIVERY_ENABLED` defaults off
    (anything except exact `true` returns HTTP 503).
    Do not set to `true` until verified payment, delivery, and cross-book
@@ -51,7 +54,10 @@ upload. All three titles remain **coming_soon** and cannot be purchased yet.
    `node --test functions/functionz/privateBookDelivery.test.js
    functions/__tests__/bookCommerce.test.js`.
 
-**Deployment warning:** The function secret bindings require prior
-configuration. Do not deploy this branch to production, merge it, or activate
-paid book SKUs before that configuration and paid end-to-end validation.
+**Safe staged deployment:** This branch contains **no new Firebase secret bindings**
+so it can publish the B1 coming-soon page and a disabled download endpoint
+without requiring credentials first. Production delivery remains OFF. A
+**separate gated release** must attach the secrets, verify the R2 signature
+against a real purchased PDF, perform a paid Paystack receipt/download test,
+and approve prices and publication rights before activating any new guide SKU.
 There is no new Vercel blob store or public file hosting cost.
