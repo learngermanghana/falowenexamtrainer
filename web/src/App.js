@@ -875,6 +875,26 @@ const AppShell = ({
             element={<A1FinalMockExamPage key="a1-mock-03" mockId="a1-mock-03" />}
           />
           <Route
+            path="/campus/course/a1-final-mock-4"
+            element={<A1FinalMockExamPage key="a1-mock-04" mockId="a1-mock-04" />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-5"
+            element={<A1FinalMockExamPage key="a1-mock-05" mockId="a1-mock-05" />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-6"
+            element={<A1FinalMockExamPage key="a1-mock-06" mockId="a1-mock-06" />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-7"
+            element={<A1FinalMockExamPage key="a1-mock-07" mockId="a1-mock-07" />}
+          />
+          <Route
+            path="/campus/course/a1-final-mock-8"
+            element={<A1FinalMockExamPage key="a1-mock-08" mockId="a1-mock-08" />}
+          />
+          <Route
             path="/campus/course/a1-final-mock-3-hoeren"
             element={<A1FinalMockExamPage key="a1-mock-03" mockId="a1-mock-03" />}
           />
