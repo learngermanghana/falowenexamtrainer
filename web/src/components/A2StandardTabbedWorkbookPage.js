@@ -162,6 +162,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     requestedView &&
     requestedView !== "radio" &&
     requestedView !== "workbook" &&
+    (!editorialPdfMode || !["references", "submit"].includes(requestedView)) &&
     (requestedView !== "hoeren" || showHoeren) &&
     (requestedView !== "schreiben" || writingRequired)
       ? requestedView
@@ -178,7 +179,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
     ? getTeacherLectureVideoResources("A2", day)[0] || null
     : null;
   const inlineTeacherVideoId = extractYouTubeId(inlineTeacherLecture?.url);
-  const visibleTabs = tabs.filter((tab) => lessonProfile?.tabs?.[tab.key] !== false);
+  const visibleTabs = tabs.filter((tab) => lessonProfile?.tabs?.[tab.key] !== false &&
+    (!editorialPdfMode || !["references", "submit"].includes(tab.key)));
   const assignmentKey = lessonProfile?.assignmentKey || `A2-${chapter}`;
   const handleTimedExpiry = useCallback(() => {
     setActiveTab("submit");
@@ -287,8 +289,8 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
           {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioKey ? <ProtectedA2ListeningAudio day={day} audioKey={hoerenAudioKey} /> : hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><PublishedHoerenPractice assignmentKey={assignmentKey} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
-          {displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
-          {displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
+          {!editorialPdfMode && displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
+          {!editorialPdfMode && displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
     </div>;
   };
 
