@@ -632,7 +632,19 @@ if (a2EditorialLocal) {
 }
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
-const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+// A quick, private one-day smoke check catches late A2 tab failures before
+// launching the expensive entire-course render. It never merges or uploads
+// even a partial manuscript and is disabled for every other render mode.
+const smokeDayRaw = String(process.env.FALOWEN_A2_PDF_SMOKE_DAY || "").trim();
+const smokeDay = smokeDayRaw ? Number(smokeDayRaw) : 0;
+if (smokeDayRaw && (!a2EditorialLocal || !Number.isInteger(smokeDay) || smokeDay < 1 || smokeDay > 28)) {
+  throw new Error("A2 PDF smoke day requires loopback editorial mode and a valid teaching day.");
+}
+const allPrintableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+const printableLessons = smokeDay
+  ? allPrintableLessons.filter((lesson) => Number(lesson.day) === smokeDay)
+  : allPrintableLessons;
+if (!printableLessons.length) throw new Error("No matching printable lesson for A2 PDF smoke test.");
 const renderedLessons = new Map();
 
 try {
@@ -666,6 +678,15 @@ try {
   }
 } finally {
   await browser.close();
+}
+
+if (smokeDay) {
+  const files = renderedLessons.get(smokeDay) || [];
+  if (files.length !== 2 || files[0]?.tab !== "grammar" || files[1]?.tab !== "workbook") {
+    throw new Error("A2 PDF Day " + smokeDay + " smoke failed: expected Grammar and Workbook sections.");
+  }
+  console.log("A2 PDF Day " + smokeDay + " smoke passed: Grammar and Workbook sections generated without affecting learners.");
+  process.exit(0);
 }
 
 await mergeBundle(renderedLessons);
