@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { BOOKS, processBookWebhook } = require("../functionz/bookCommerce");
+const { BOOKS, BOOK_CATALOG_TITLES, processBookWebhook } = require("../functionz/bookCommerce");
 
 const orderId = "91869b22-88b0-46f4-b0ac-f224e8275604";
 const order = {
@@ -77,4 +77,22 @@ test("wrong reference or customer cannot complete an order", async () => {
     assert.equal(result.body.status, "rejected");
     assert.equal(admin.calls.some(x => x.type === "create"), false);
   }
+});
+
+test("new independent exam guides are catalogue-only until private fulfilment is available", () => {
+  for (const [id,pages,level] of [
+    ["a1-writing-model-exams",30,"A1"],
+    ["a2-four-skills-exam-guide",50,"A2"],
+  ]) {
+    const item = BOOK_CATALOG_TITLES.find(book => book.id === id);
+    assert.ok(item);
+    assert.equal(item.status, "coming_soon");
+    assert.equal(item.pages, pages);
+    assert.deepEqual(item.levelTags, [level]);
+    assert.deepEqual(item.bookIds, []);
+    assert.match(item.description, /not an official Goethe-Institut publication/i);
+  }
+  assert.equal(Object.keys(BOOKS).length, 3);
+  assert.ok(!BOOKS["a1-writing-model-exams"]);
+  assert.ok(!BOOKS["a2-four-skills-exam-guide"]);
 });
