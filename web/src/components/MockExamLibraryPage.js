@@ -8,6 +8,7 @@ import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
+  if (mock?.mode === "kombi") return status === "ready" ? "3-module Kombiprüfung" : "3-module Kombiprüfung · preview";
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
@@ -86,6 +87,10 @@ export default function MockExamLibraryPage() {
                     <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#7f1d1d", fontWeight: 700 }}>
                       Finish all four modules for your final result. You can resume an unfinished attempt; running timers do not pause.
                     </p>
+                  ) : mock.mode === "kombi" ? (
+                    <p style={{ ...styles.helperText, margin: "8px 0 0", fontWeight: 700 }}>
+                      Complete Lesen, Schreiben and Sprechen for a combined verified score out of 75 points. Hören is not included and will be added later. Your old result stays unchanged.
+                    </p>
                   ) : mock.id === "a2-mock-02" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                       All four modules are inside this mock. Your progress is saved on this device; verified final scores are not available yet.
@@ -97,7 +102,7 @@ export default function MockExamLibraryPage() {
                   )}
                 </div>
                 <button type="button" style={styles.primaryButton} onClick={() => { announceExamSuccess(`${mock.shortTitle || mock.title} opened successfully.`); navigate(mock.route); }}>
-                  {mock.mode === "full" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
+                  {mock.mode === "full" || mock.mode === "kombi" ? "Start or resume mock" : mock.id === "a2-mock-02" ? "Open A2 Mock 2" : mock.status === "planned" ? "Browse exam skills" : "Open practice section"}
                 </button>
               </div>
             </article>
