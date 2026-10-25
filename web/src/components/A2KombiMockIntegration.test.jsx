@@ -36,7 +36,7 @@ describe("A2 Kombiprüfung Mocks 4–8 production-preview contract",()=>{
   expect(exam).toContain('moveToSection(isKombi?"schreiben":"hoeren"');
   expect(exam).toContain('isKombi?<A2KombiMockSpeaking');
   expect(exam).toContain('isKombi ? "Start or resume 3 modules"');
-  expect(exam).toContain('isKombi?<A2KombiReadingSection');
+  expect(exam).toContain('isKombi ? <A2KombiReadingSection');
   expect(exam).toContain("verificationPending:false");
   for(const i of [1,2])expect(getMockExamsForLevel("A2").some(e=>e.status==="ready")).toBe(true);
  });
