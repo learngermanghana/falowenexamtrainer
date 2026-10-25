@@ -3,6 +3,7 @@ import { getBackendUrl } from "../services/backendUrl";
 import { A1_SAMPLE_SECTIONS, A1_SAMPLE_DISCLOSURE } from "../data/a1BookSample";
 import "./BookStoreCheckout.css";
 import BooksCatalog, { indicativeUsd } from "./BooksCatalog";
+import WritingGuideDetail from "./WritingGuideDetail";
 
 const API = getBackendUrl();
 const money = value => `GH₵${Number(value || 0).toFixed(2)}`;
@@ -129,7 +130,7 @@ function ReceiptConfirmation() {
     if (!order || !navigator.clipboard?.writeText) return setError("Please select the receipt reference displayed below.");
     try {
       await navigator.clipboard.writeText([
-        "Falowen A1 book payment details", `Book: ${order.title}`,
+        "Falowen Books payment details", `Book: ${order.title}`,
         `Edition: ${order.format}`, `Order: ${order.orderId}`,
         `Paystack reference: ${order.reference}`,
         `Amount: ${money(order.priceGhs)}`,
@@ -206,6 +207,7 @@ export default function BookStoreCheckout({ completed = false }) {
   }, [completed]);
 
   const selected = useMemo(() => books.find(b => b.id === bookId), [books,bookId]);
+  const isWritingGuide = selected?.id === "writing-skills-a1-c2-digital";
   const sample = A1_SAMPLE_SECTIONS.find(s => s.id === sampleId);
   const buy = async event => {
     event.preventDefault(); setBusy(true); setError("");
@@ -231,10 +233,14 @@ export default function BookStoreCheckout({ completed = false }) {
     </div></div>
     <div className="fb-shell">
       <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>Books</strong></nav>
-      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} onSelectA1={id => {
+      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} onSelectBook={id => {
         setBookId(id);
-        document.getElementById("fb-purchase")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document.getElementById("fb-book-featured")?.scrollIntoView({ behavior: "smooth", block: "start" });
       }} />
+      <div id="fb-book-featured" style={{scrollMarginTop:24}}>
+        {isWritingGuide ? <WritingGuideDetail book={selected} fxQuote={fxQuote}
+          customer={customer} onCustomerChange={(field,value) => setCustomer(prev => ({...prev,[field]:value}))}
+          onCheckout={buy} busy={busy} enabled={enabled} error={error} /> :
       <section className="fb-hero" aria-label="Falowen Deutsch A1 book">
         <div className="fb-visual-col">
           <div className="fb-cover-stage">
@@ -303,8 +309,9 @@ export default function BookStoreCheckout({ completed = false }) {
           <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack in GHS. Keep your transaction receipt.</p>
           <p className="fb-manual-note">Falowen arranges your book after payment verification. No automatic PDF download or delivery tracking.</p>
         </aside>
-      </section>
-      <section id="fb-book-details" className="fb-details">
+      </section>}
+      </div>
+      {!isWritingGuide && <section id="fb-book-details" className="fb-details">
         <div className="fb-tabbar" role="tablist" aria-label="Book information">
           {sections.map(id => <button key={id} type="button" role="tab" aria-selected={activeTab === id} className={activeTab===id?"active":""} onClick={()=>setActiveTab(id)}>
             {({overview:"Overview",contents:"What's inside",sample:"Free sample",faq:"Questions"})[id]}
@@ -343,7 +350,7 @@ export default function BookStoreCheckout({ completed = false }) {
             {openFaq===i && <p>{item.answer}</p>}
           </div>)}
         </div>}
-      </section>
+      </section>}
       <footer className="fb-footer"><span>© {new Date().getFullYear()} Falowen · German learning made practical</span><a href="/">Return to Falowen</a></footer>
     </div>
   </main>;
