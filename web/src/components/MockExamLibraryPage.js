@@ -8,7 +8,10 @@ import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
-  if (mock?.mode === "kombi") return status === "ready" ? "3-module Kombiprüfung" : "3-module Kombiprüfung · preview";
+  if (mock?.mode === "kombi") {
+    const count=mock.sections?.length||3;
+    return status === "ready" ? `${count}-module Kombiprüfung` : `${count}-module Kombiprüfung · preview`;
+  }
   if (mock?.id === "a2-mock-02") return "4-module mock · grading verification pending";
   if (status === "preview") return "Section practice only";
   if (status === "ready") return "Complete 4-module mock";
@@ -89,7 +92,7 @@ export default function MockExamLibraryPage() {
                     </p>
                   ) : mock.mode === "kombi" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0", fontWeight: 700 }}>
-                      Complete Lesen, Schreiben and Sprechen for a combined verified score out of 75 points. Hören is not included and will be added later. Your old result stays unchanged.
+                      {mock.sections?.some(section=>section==="Hören") ? "Complete Lesen, Hören, Schreiben and Sprechen for a verified score out of 100 points. Your earlier three-module results remain unchanged." : "Complete Lesen, Schreiben and Sprechen for a combined verified score out of 75 points. Hören is not included and will be added later. Your old result stays unchanged."}
                     </p>
                   ) : mock.id === "a2-mock-02" ? (
                     <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
