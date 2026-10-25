@@ -142,6 +142,55 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     route: "/campus/course/a2-mock-2", mode: "full",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a2-mock-04": {
+    id:"a2-mock-04",level:"A2",title:"A2 Mock 4 · Kombiprüfung",
+    shortTitle:"A2 Mock 4",
+    description:"Three-module Goethe-style A2 practice. Lesen (20 questions), Schreiben (two texts), Sprechen (three parts). No Hören.",
+    durationLabel:"75 min · 3 modules",
+    status:"preview",route:"/campus/course/a2-mock-4",
+    mode:"kombi",questionSetId:"a2-mock-04",showInMockLibrary:true,
+    sections:["Lesen","Schreiben","Sprechen"],
+  },
+
+  "a2-mock-05": {
+    id:"a2-mock-05",level:"A2",title:"A2 Mock 5 · Kombiprüfung",
+    shortTitle:"A2 Mock 5",
+    description:"Three-module Goethe-style A2 practice. Lesen (20 questions), Schreiben (two texts), Sprechen (three parts). No Hören.",
+    durationLabel:"75 min · 3 modules",
+    status:"preview",route:"/campus/course/a2-mock-5",
+    mode:"kombi",questionSetId:"a2-mock-05",showInMockLibrary:true,
+    sections:["Lesen","Schreiben","Sprechen"],
+  },
+
+  "a2-mock-06": {
+    id:"a2-mock-06",level:"A2",title:"A2 Mock 6 · Kombiprüfung",
+    shortTitle:"A2 Mock 6",
+    description:"Three-module Goethe-style A2 practice. Lesen (20 questions), Schreiben (two texts), Sprechen (three parts). No Hören.",
+    durationLabel:"75 min · 3 modules",
+    status:"preview",route:"/campus/course/a2-mock-6",
+    mode:"kombi",questionSetId:"a2-mock-06",showInMockLibrary:true,
+    sections:["Lesen","Schreiben","Sprechen"],
+  },
+
+  "a2-mock-07": {
+    id:"a2-mock-07",level:"A2",title:"A2 Mock 7 · Kombiprüfung",
+    shortTitle:"A2 Mock 7",
+    description:"Three-module Goethe-style A2 practice. Lesen (20 questions), Schreiben (two texts), Sprechen (three parts). No Hören.",
+    durationLabel:"75 min · 3 modules",
+    status:"preview",route:"/campus/course/a2-mock-7",
+    mode:"kombi",questionSetId:"a2-mock-07",showInMockLibrary:true,
+    sections:["Lesen","Schreiben","Sprechen"],
+  },
+
+  "a2-mock-08": {
+    id:"a2-mock-08",level:"A2",title:"A2 Mock 8 · Kombiprüfung",
+    shortTitle:"A2 Mock 8",
+    description:"Three-module Goethe-style A2 practice. Lesen (20 questions), Schreiben (two texts), Sprechen (three parts). No Hören.",
+    durationLabel:"75 min · 3 modules",
+    status:"preview",route:"/campus/course/a2-mock-8",
+    mode:"kombi",questionSetId:"a2-mock-08",showInMockLibrary:true,
+    sections:["Lesen","Schreiben","Sprechen"],
+  },
   "a2-mock-03-hoeren": {
     id: "a2-mock-03-hoeren",
     level: "A2",
