@@ -10,6 +10,28 @@ import { addBookCartItem, readBookCart, saveBookCart } from "../utils/bookCart";
 const API = getBackendUrl();
 const money = value => `GH₵${Number(value || 0).toFixed(2)}`;
 const SAMPLE_LABELS = { grammar: "Grammar", knowledge: "Knowledge check", workbook: "Workbook" };
+
+const UPCOMING_EXAM_GUIDES = Object.freeze({
+  "goethe-a1-writing-model-exams": {
+    title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
+    level: "A1",
+    pages: 30,
+    module: "Schreiben · Writing practice",
+    description: "Six independent A1 writing model exams with personal-detail forms, short informal and formal messages, guided writing spaces and annotated model answers.",
+    highlights: ["Six A1 Schreiben model exams", "Forms and short letter-writing practice", "Grammar, connectors and self-checking tips"],
+    disclaimer: "An independent Falowen writing practice workbook, not an official Goethe-Institut exam paper or a full four-skills mock test.",
+  },
+  "goethe-a2-four-skills-exam-guide": {
+    title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
+    level: "A2",
+    pages: 50,
+    module: "Lesen · Hören · Schreiben · Sprechen",
+    description: "A 50-page exam preparation handbook with reading tasks, listening scripts, guided writing practice, speaking cue cards, strategies, and model solutions.",
+    highlights: ["Reading and listening question strategies", "A2 message and email-writing examples", "Speaking cue cards and planning dialogues"],
+    disclaimer: "Independent Falowen preparation material, not an official Goethe-Institut publication. The Hören section includes scripts; playable audio is not supplied in this PDF.",
+  },
+});
+
 const BOOK_DETAILS = [
   { icon: "01", title: "Foundations", text: "Greetings, pronunciation, introductions and everyday vocabulary." },
   { icon: "02", title: "Grammar that clicks", text: "Articles, German cases, modal verbs, negation and prepositions." },
@@ -183,6 +205,7 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
   const isCart = productSlug === "cart";
   const isWritingGuide = productSlug === "how-to-unlock-your-german-writing-skills-a1-c2";
   const isA2 = productSlug === "deutsch-a2-course-workbook";
+  const upcomingGuide = UPCOMING_EXAM_GUIDES[productSlug];
   const [bookId, setBookId] = useState(isWritingGuide ? "writing-skills-a1-c2-digital" : "a1-digital");
   const [copyQuantity, setCopyQuantity] = useState(1);
   const [cart, setCart] = useState(readBookCart);
@@ -196,12 +219,13 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
     document.title = completed ? "Book payment confirmation | Falowen"
       : isCart ? "Shopping Cart | Falowen Books"
       : isWritingGuide ? "German Writing Skills Guide A1–C2 | Falowen Books"
+      : upcomingGuide ? upcomingGuide.title + " | Falowen Books"
       : isA2 ? "Deutsch A2 Grammar and Workbook | Falowen Books"
       : isCatalogue ? "Falowen Books | German Workbooks and Writing Guides"
       : "Deutsch A1 Course & Workbook | Falowen Books";
     const canonical = completed || isCart ? "" : "https://www.falowen.app/books" +
       (productSlug ? "/" + productSlug : "");
-    const description = isA2
+    const description = upcomingGuide ? upcomingGuide.description : isA2
       ? "Explore Falowen's upcoming Deutsch A2 grammar, reading, writing and speaking workbook."
       : isWritingGuide ? "Practical German writing guide for A1 to C2 with connectors, emails and exercises."
       : isCatalogue ? "Shop Falowen German workbooks, digital learning books and writing guides."
@@ -219,7 +243,7 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
       if (link && previousCanonical != null) link.setAttribute("href", previousCanonical);
       else if (link && canonical && previousCanonical == null) link.remove();
     };
-  }, [completed, isCart, isWritingGuide, isA2, isCatalogue, productSlug]);
+  }, [completed, isCart, isWritingGuide, isA2, isCatalogue, productSlug, upcomingGuide]);
   useEffect(() => {
     if (completed) return;
     let active = true;
@@ -280,7 +304,22 @@ export default function BookStoreCheckout({ completed = false, productSlug = "" 
       </div>
       {isCatalogue && <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} />}
       {productSlug && <div id="fb-book-featured" style={{scrollMarginTop:24}}>
-        {isA2 ? <section className="fb-book-coming" aria-label="Upcoming Deutsch A2 course book">
+        {upcomingGuide ? <section className="fb-book-coming" aria-label={upcomingGuide.title}>
+          <p className="fb-eyebrow">FALOWEN EXAM PREPARATION SERIES · COMING SOON</p>
+          <h1>{upcomingGuide.title}</h1>
+          <div className="fb-book-stats">
+            <div><strong>{upcomingGuide.pages}</strong><small>pages</small></div>
+            <div><strong>{upcomingGuide.level}</strong><small>CEFR level</small></div>
+            <div><strong>2</strong><small>planned formats</small></div>
+          </div>
+          <p><strong>{upcomingGuide.module}</strong></p>
+          <p>{upcomingGuide.description}</p>
+          <ul className="fb-feature-list">{upcomingGuide.highlights.map(item => <li key={item}>{item}</li>)}</ul>
+          <p>{upcomingGuide.disclaimer}</p>
+          <p><strong>Coming soon:</strong> Digital and printed editions are being reviewed. Final pricing, printing options and fulfilment must be approved before checkout can open.</p>
+          <a href="/books" className="fb-btn fb-btn-soft">Back to all Falowen books</a>
+        </section>
+        : {isA2 ? <section className="fb-book-coming" aria-label="Upcoming Deutsch A2 course book">
           <p className="fb-eyebrow">FALOWEN BOOK LIBRARY · COMING SOON</p>
           <h1>Deutsch A2 · Course &amp; Workbook</h1>
           <p>441 pages of German grammar, writing, reading, listening questions and speaking practice. The book is being prepared for publication.</p>
