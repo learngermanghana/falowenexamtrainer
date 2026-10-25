@@ -163,7 +163,8 @@ jobs:
           echo "::error::Local A2 editorial Vite server did not start."
           tail -40 /tmp/falowen-a2-editorial-vite.log || true
           exit 1
-      # Re-open late A2 Hören tabs with a fresh read-only deep link. Never start student attempts.
+      # For late A2 Hören, print original published question/choice data only.
+      # Browser audio, scores and student assessments are never included.
       - name: Verify Day 24 listening with a small private print smoke test
         env:
           FALOWEN_A2_EDITORIAL_PRINT: 'true'
