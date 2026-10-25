@@ -65,7 +65,7 @@ export const sanitizeA2PrintDocument = (section = "") => {
  const webOnlyAction = /^(?:(?:back|return) to course book|(?:open|watch|view) teacher video(?: on youtube)?|teacher video|(?:open|listen to|play) falowen radio|falowen radio)$/i;
  for (const node of [...document.body.querySelectorAll('a,button,[role="link"],[role="button"]')]) {
   const label = String(node.textContent || node.getAttribute("aria-label") || "")
-   .replace(/\\s+/g, " ").trim();
+   .replace(/\s+/g, " ").trim();
   if (webOnlyAction.test(label)) node.remove();
  }
 
