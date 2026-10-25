@@ -138,6 +138,10 @@ jobs:
           npx playwright install --with-deps chromium
           sudo apt-get update -qq
           sudo apt-get install -y poppler-utils
+      - name: Test A2 Day 22 offline speaking mock paper companion
+        run: |
+          node --check scripts/course-material-bundles/renderA2Day22SpeakingMockPrint.mjs
+          node --test scripts/course-material-bundles/renderA2Day22SpeakingMockPrint.test.mjs
       - name: Start local Vite editorial preview bound to loopback
         run: |
           set -euo pipefail
