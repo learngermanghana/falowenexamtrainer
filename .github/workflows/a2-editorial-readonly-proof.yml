@@ -29,6 +29,58 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Reuse only existing Vercel Firebase browser settings when Actions variables are missing
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const required = [
+            "REACT_APP_FIREBASE_API_KEY",
+            "REACT_APP_FIREBASE_AUTH_DOMAIN",
+            "REACT_APP_FIREBASE_PROJECT_ID",
+            "REACT_APP_FIREBASE_STORAGE_BUCKET",
+            "REACT_APP_FIREBASE_MESSAGING_SENDER_ID",
+            "REACT_APP_FIREBASE_APP_ID",
+          ];
+          const missing = required.filter(key => !String(process.env[key] || "").trim());
+          if (!missing.length) {
+            console.log("Firebase client settings are already configured in Actions.");
+            process.exit(0);
+          }
+          const token = String(process.env.VERCEL_TOKEN || "").trim();
+          if (!token) {
+            console.log("VERCEL_TOKEN is unavailable; existing Actions variable preflight will explain what to configure.");
+            process.exit(0);
+          }
+          // Retrieve Vercel settings only in runner memory. Never copy other
+          // production env values, log decrypted JSON or create .env files.
+          const url = new URL("https://api.vercel.com/v9/projects/prj_6Hx7qU9tTDyerFk9C5c1IzC2K9wt/env");
+          url.searchParams.set("teamId", "team_vYAAqPf7zycxvsCSqqPFo5qc");
+          url.searchParams.set("decrypt", "true");
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+          if (!res.ok) {
+            throw new Error("Falowen Vercel client-config lookup failed (HTTP " + res.status +
+              "). Set only the six Firebase client values in GitHub Actions Variables.");
+          }
+          const json = await res.json();
+          const envs = Array.isArray(json.envs) ? json.envs : [];
+          const missingFromVercel = [];
+          for (const key of missing) {
+            const match = envs.find(row => row.key === key &&
+              (Array.isArray(row.target) ? row.target.includes("production") : row.target === "production") &&
+              typeof row.value === "string" && row.value.trim().length);
+            if (!match) { missingFromVercel.push(key); continue; }
+            if (/\r|\n/.test(match.value)) throw new Error("Unexpected multiline Firebase client config: " + key);
+            fs.appendFileSync(process.env.GITHUB_ENV, key + "=" + match.value + "\n", { mode: 0o600 });
+          }
+          if (missingFromVercel.length) {
+            throw new Error("Firebase browser settings unavailable in Vercel: " +
+              missingFromVercel.join(", ") + ". Configure GitHub Actions Variables.");
+          }
+          console.log("Reused " + missing.length + " Vercel Firebase browser-client settings without exporting unrelated credentials.");
+          NODE
       - name: Assert Firebase public client settings and PDF login secrets exist
         env:
           FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
