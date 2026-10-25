@@ -5,7 +5,7 @@ import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
 const read = (relative) => fs.readFileSync(path.resolve(__dirname, relative), "utf8");
 
 describe("Falowen public marketing redesign", () => {
-  test("both homepage and visitor guide display the same four marketing promises", () => {
+  test("four public marketing promises remain in visitor guide and rotating landing slides", () => {
     expect(PUBLIC_MARKETING_FEATURES.map((feature) => feature.key)).toEqual([
       "placement", "exams", "class", "self",
     ]);
@@ -25,7 +25,9 @@ describe("Falowen public marketing redesign", () => {
 
     const landing = read("./LandingPageSimple.js");
     const visitor = read("./PublicAdmissionsVisitorGuidePage.js");
-    expect(landing).toContain("PUBLIC_MARKETING_FEATURES.map");
+    expect(landing).toContain("<FalowenHomepageCarousel");
+    const carousel = read("./FalowenHomepageCarousel.js");
+    for (const href of ["/classes", "/placement-test", "/exam-practice", "/books"]) expect(carousel).toContain(`href:"${href}"`);
     expect(visitor).toContain("PUBLIC_MARKETING_FEATURES.map");
     expect(visitor).not.toContain("How your course works");
     expect(visitor).not.toContain("Why students study with us");
@@ -50,10 +52,12 @@ describe("Falowen public marketing redesign", () => {
     const styles = read("./LandingPageMarketing.css");
     const guideStyles = read("./PublicAdmissionsVisitorGuidePage.css");
     expect(wrapper).toContain("/homepage-reviews.js");
-    expect(landing).toContain("falowen-final-cta");
+    expect(landing).toContain("falowen-home-support");
+    expect(landing).toContain("falowen-home-reviews-intro");
     expect(landing).toContain("academyProfile.classroomImage");
     expect(landing).toContain("FOOTER_LINKS");
-    expect(landing).toContain("falowen-home-feature-schedule");
+    expect(landing).toContain("falowen-home-nav-links");
+    expect(read("./FalowenHomepageCarousel.js")).toContain("View upcoming classes");
     expect(visitor).toContain("visitor-guide-marketing-schedule");
     expect(styles).toContain("@media (max-width: 600px)");
     expect(styles).toContain(".falowen-home-feature-actions");
