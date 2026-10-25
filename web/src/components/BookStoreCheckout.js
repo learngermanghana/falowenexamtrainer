@@ -209,6 +209,25 @@ export default function BookStoreCheckout({ completed = false, catalogOnly = fal
     return () => { document.title = previous; };
   }, [completed, catalogOnly, detailBook]);
   useEffect(() => {
+    if (completed) return undefined;
+    // Reuse the canonical that is already present in web/index.html.
+    // Two competing canonicals harm discoverability of individual book pages.
+    const existing = document.head.querySelector('link[rel="canonical"]');
+    const canonical = existing || document.createElement("link");
+    const previousHref = existing?.getAttribute("href");
+    if (!existing) { canonical.rel = "canonical"; document.head.appendChild(canonical); }
+    const suffix = catalogOnly ? "" : detailBook === "writing"
+      ? "/how-to-unlock-your-german-writing-skills-a1-c2"
+      : "/deutsch-a1-course-workbook";
+    canonical.setAttribute("href", "https://www.falowen.app/books" + suffix);
+    return () => {
+      if (existing) {
+        if (previousHref === null) canonical.removeAttribute("href");
+        else canonical.setAttribute("href", previousHref);
+      } else canonical.remove();
+    };
+  }, [completed, catalogOnly, detailBook]);
+  useEffect(() => {
     if (completed) return;
     let active = true;
     request("/books/catalog").then(payload => {
