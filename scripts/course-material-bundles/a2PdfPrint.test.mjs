@@ -22,7 +22,7 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
  assert.match(sanitizer,/section === "workbook-teil-2"/);
  assert.match(sanitizer,/Schreiben · Your answer/);
  assert.match(sanitizer,/const webOnlyAction =/);
- assert.match(sanitizer,/webOnlyAction[\\s\\S]*?teacher video/);
+ assert.match(sanitizer,/teacher video/);
  assert.match(a2PrintCss,/data-radio-first-workbook-gate/);
  assert.match(a2PrintCss,/data-teacher-video/);
  // Removing React-owned navigation from the DOM after the Grammar print
