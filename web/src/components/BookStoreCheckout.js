@@ -4,10 +4,34 @@ import { A1_SAMPLE_SECTIONS, A1_SAMPLE_DISCLOSURE } from "../data/a1BookSample";
 import "./BookStoreCheckout.css";
 import BooksCatalog, { indicativeUsd } from "./BooksCatalog";
 import WritingGuideDetail from "./WritingGuideDetail";
+import BookShoppingCart from "./BookShoppingCart";
+import { addBookCartItem, readBookCart, saveBookCart } from "../utils/bookCart";
 
 const API = getBackendUrl();
 const money = value => `GH₵${Number(value || 0).toFixed(2)}`;
 const SAMPLE_LABELS = { grammar: "Grammar", knowledge: "Knowledge check", workbook: "Workbook" };
+
+const UPCOMING_EXAM_GUIDES = Object.freeze({
+  "goethe-a1-writing-model-exams": {
+    title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
+    level: "A1",
+    pages: 30,
+    module: "Schreiben · Writing practice",
+    description: "Six independent A1 writing model exams with personal-detail forms, short informal and formal messages, guided writing spaces and annotated model answers.",
+    highlights: ["Six A1 Schreiben model exams", "Forms and short letter-writing practice", "Grammar, connectors and self-checking tips"],
+    disclaimer: "An independent Falowen writing practice workbook, not an official Goethe-Institut exam paper or a full four-skills mock test.",
+  },
+  "goethe-a2-four-skills-exam-guide": {
+    title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
+    level: "A2",
+    pages: 50,
+    module: "Lesen · Hören · Schreiben · Sprechen",
+    description: "A 50-page exam preparation handbook with reading tasks, listening scripts, guided writing practice, speaking cue cards, strategies, and model solutions.",
+    highlights: ["Reading and listening question strategies", "A2 message and email-writing examples", "Speaking cue cards and planning dialogues"],
+    disclaimer: "Independent Falowen preparation material, not an official Goethe-Institut publication. The Hören section includes scripts; playable audio is not supplied in this PDF.",
+  },
+});
+
 const BOOK_DETAILS = [
   { icon: "01", title: "Foundations", text: "Greetings, pronunciation, introductions and everyday vocabulary." },
   { icon: "02", title: "Grammar that clicks", text: "Articles, German cases, modal verbs, negation and prepositions." },
@@ -130,7 +154,8 @@ function ReceiptConfirmation() {
     if (!order || !navigator.clipboard?.writeText) return setError("Please select the receipt reference displayed below.");
     try {
       await navigator.clipboard.writeText([
-        "Falowen Books payment details", `Book: ${order.title}`,
+        "Falowen Books payment details", `Books: ${order.title}`,
+        ...(order.items || []).map(item => `${item.quantity} × ${item.title} — ${money(item.lineTotalGhs)}`),
         `Edition: ${order.format}`, `Order: ${order.orderId}`,
         `Paystack reference: ${order.reference}`,
         `Amount: ${money(order.priceGhs)}`,
@@ -149,13 +174,18 @@ function ReceiptConfirmation() {
           {order.status === "paid" ? "✓ Payment verified with Paystack" : order.status === "rejected" ? "Payment needs review" : "Awaiting secure confirmation"}
         </div>
         <dl>
-          <dt>Book</dt><dd>{order.title}</dd>
+          <dt>Books</dt><dd>{order.title}</dd>
+          {Array.isArray(order.items) && order.items.map(item => <React.Fragment key={item.bookId}>
+            <dt>Edition</dt><dd>{item.title} · {item.quantity} {item.quantity === 1 ? "copy" : "copies"} · {money(item.lineTotalGhs)}</dd>
+          </React.Fragment>)}
           <dt>Order ID</dt><dd><code>{order.orderId}</code></dd>
           <dt>Paystack reference</dt><dd><code>{order.reference}</code></dd>
           <dt>Amount</dt><dd><strong>{money(order.priceGhs)}</strong></dd>
         </dl>
         <p>{order.status === "paid"
-          ? order.format === "printed" ? "Falowen will arrange printing manually. Delivery costs are separate." : "Falowen will arrange the PDF manually. No automatic download is issued."
+          ? order.format === "printed" || (order.items || []).some(item => item.format === "printed")
+            ? "Falowen will arrange any printed copies after payment verification. Delivery costs are separate. Digital PDFs are supplied manually."
+            : "Falowen will arrange the PDF manually. No automatic download is issued."
           : "If you have been charged, do not pay a second time. Retain your Paystack receipt and check again."}</p>
         <button type="button" className="fb-btn fb-btn-ghost" onClick={copyReceipt}>Copy receipt details</button>
       </div> : null}
@@ -167,21 +197,53 @@ function ReceiptConfirmation() {
   </div></main>;
 }
 
-export default function BookStoreCheckout({ completed = false }) {
+export default function BookStoreCheckout({ completed = false, productSlug = "" }) {
   const [books, setBooks] = useState([]), [enabled, setEnabled] = useState(false);
   const [catalogTitles, setCatalogTitles] = useState([]);
   const [fxQuote, setFxQuote] = useState(null);
-  const [bookId, setBookId] = useState("a1-digital");
-  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
-  const [error, setError] = useState(""), [busy, setBusy] = useState(false);
+  const isCatalogue = !productSlug;
+  const isCart = productSlug === "cart";
+  const isWritingGuide = productSlug === "how-to-unlock-your-german-writing-skills-a1-c2";
+  const isA2 = productSlug === "deutsch-a2-course-workbook";
+  const upcomingGuide = UPCOMING_EXAM_GUIDES[productSlug];
+  const [bookId, setBookId] = useState(isWritingGuide ? "writing-skills-a1-c2-digital" : "a1-digital");
+  const [copyQuantity, setCopyQuantity] = useState(1);
+  const [cart, setCart] = useState(readBookCart);
+  const [added, setAdded] = useState("");
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("overview"), [sampleId, setSampleId] = useState("grammar");
   const [openFaq, setOpenFaq] = useState(0), [downloadBusy, setDownloadBusy] = useState(false);
 
   useEffect(() => {
     const previous = document.title;
-    document.title = completed ? "Book payment confirmation | Falowen" : "Falowen Deutsch A1 Course & Workbook | Digital & Print";
-    return () => { document.title = previous; };
-  }, [completed]);
+    document.title = completed ? "Book payment confirmation | Falowen"
+      : isCart ? "Shopping Cart | Falowen Books"
+      : isWritingGuide ? "German Writing Skills Guide A1–C2 | Falowen Books"
+      : upcomingGuide ? upcomingGuide.title + " | Falowen Books"
+      : isA2 ? "Deutsch A2 Grammar and Workbook | Falowen Books"
+      : isCatalogue ? "Falowen Books | German Workbooks and Writing Guides"
+      : "Deutsch A1 Course & Workbook | Falowen Books";
+    const canonical = completed || isCart ? "" : "https://www.falowen.app/books" +
+      (productSlug ? "/" + productSlug : "");
+    const description = upcomingGuide ? upcomingGuide.description : isA2
+      ? "Explore Falowen's upcoming Deutsch A2 grammar, reading, writing and speaking workbook."
+      : isWritingGuide ? "Practical German writing guide for A1 to C2 with connectors, emails and exercises."
+      : isCatalogue ? "Shop Falowen German workbooks, digital learning books and writing guides."
+      : "Deutsch A1 course and workbook, 250-page digital or print-on-demand editions.";
+    const meta = document.querySelector('meta[name="description"]');
+    const previousDescription = meta?.getAttribute("content");
+    if (meta) meta.setAttribute("content", description);
+    let link = document.querySelector('link[rel="canonical"]');
+    const previousCanonical = link?.getAttribute("href");
+    if (!link && canonical) { link = document.createElement("link"); link.rel = "canonical"; document.head.appendChild(link); }
+    if (link && canonical) link.setAttribute("href", canonical);
+    return () => {
+      document.title = previous;
+      if (meta && previousDescription !== null) meta.setAttribute("content", previousDescription);
+      if (link && previousCanonical != null) link.setAttribute("href", previousCanonical);
+      else if (link && canonical && previousCanonical == null) link.remove();
+    };
+  }, [completed, isCart, isWritingGuide, isA2, isCatalogue, productSlug, upcomingGuide]);
   useEffect(() => {
     if (completed) return;
     let active = true;
@@ -207,16 +269,18 @@ export default function BookStoreCheckout({ completed = false }) {
   }, [completed]);
 
   const selected = useMemo(() => books.find(b => b.id === bookId), [books,bookId]);
-  const isWritingGuide = selected?.id === "writing-skills-a1-c2-digital";
   const sample = A1_SAMPLE_SECTIONS.find(s => s.id === sampleId);
-  const buy = async event => {
-    event.preventDefault(); setBusy(true); setError("");
-    try {
-      const result = await request("/books/checkout", { method: "POST", body: JSON.stringify({ bookId, ...customer }) });
-      const url = new URL(result.authorization_url);
-      if (url.protocol !== "https:" || !["checkout.paystack.com", "paystack.com"].includes(url.hostname)) throw Error("Unexpected payment page.");
-      window.location.assign(url.toString());
-    } catch (e) { setError(e.message); setBusy(false); }
+  const addToCart = (book, quantity = 1) => {
+    if (!book) return;
+    const next = saveBookCart(addBookCartItem(cart, book, quantity));
+    setCart(next);
+    setAdded((book.format === "printed" ? "Printed copies" : "Digital edition") +
+      " added to your cart.");
+  };
+  const buyNow = (book, quantity = 1) => {
+    if (!book) return;
+    saveBookCart(addBookCartItem(cart, book, quantity));
+    window.location.assign("/books/cart");
   };
   const download = async () => {
     setDownloadBusy(true); setError("");
@@ -224,6 +288,7 @@ export default function BookStoreCheckout({ completed = false }) {
     finally { setDownloadBusy(false); }
   };
   if (completed) return <ReceiptConfirmation />;
+  if (isCart) return <main className="fb-page"><BookShoppingCart books={books} paymentsEnabled={enabled} fxQuote={fxQuote}/></main>;
   return <main className="fb-page">
     <div className="fb-topbar"><div className="fb-shell fb-topbar-inner">
       <a href="/" className="fb-brand" aria-label="Falowen homepage">
@@ -233,14 +298,37 @@ export default function BookStoreCheckout({ completed = false }) {
     </div></div>
     <div className="fb-shell">
       <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href="/">Falowen</a><span>/</span><strong>Books</strong></nav>
-      <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} onSelectBook={id => {
-        setBookId(id);
-        document.getElementById("fb-book-featured")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }} />
-      <div id="fb-book-featured" style={{scrollMarginTop:24}}>
-        {isWritingGuide ? <WritingGuideDetail book={selected} fxQuote={fxQuote}
-          customer={customer} onCustomerChange={(field,value) => setCustomer(prev => ({...prev,[field]:value}))}
-          onCheckout={buy} busy={busy} enabled={enabled} error={error} /> :
+      <div className="fb-book-product-nav">
+        <a className="fb-cart-link" href="/books">{isCatalogue ? "Browse all titles" : "← All books"}</a>
+        <a className="fb-cart-link" href="/books/cart">Shopping cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</a>
+      </div>
+      {isCatalogue && <BooksCatalog books={books} catalogTitles={catalogTitles} fxQuote={fxQuote} />}
+      {productSlug && <div id="fb-book-featured" style={{scrollMarginTop:24}}>
+        {upcomingGuide ? <section className="fb-book-coming" aria-label={upcomingGuide.title}>
+          <p className="fb-eyebrow">FALOWEN EXAM PREPARATION SERIES · COMING SOON</p>
+          <h1>{upcomingGuide.title}</h1>
+          <div className="fb-book-stats">
+            <div><strong>{upcomingGuide.pages}</strong><small>pages</small></div>
+            <div><strong>{upcomingGuide.level}</strong><small>CEFR level</small></div>
+            <div><strong>2</strong><small>planned formats</small></div>
+          </div>
+          <p><strong>{upcomingGuide.module}</strong></p>
+          <p>{upcomingGuide.description}</p>
+          <ul className="fb-feature-list">{upcomingGuide.highlights.map(item => <li key={item}>{item}</li>)}</ul>
+          <p>{upcomingGuide.disclaimer}</p>
+          <p><strong>Coming soon:</strong> Digital and printed editions are being reviewed. Final pricing, printing options and fulfilment must be approved before checkout can open.</p>
+          <a href="/books" className="fb-btn fb-btn-soft">Back to all Falowen books</a>
+        </section>
+        : isA2 ? <section className="fb-book-coming" aria-label="Upcoming Deutsch A2 course book">
+          <p className="fb-eyebrow">FALOWEN BOOK LIBRARY · COMING SOON</p>
+          <h1>Deutsch A2 · Course &amp; Workbook</h1>
+          <p>441 pages of German grammar, writing, reading, listening questions and speaking practice. The book is being prepared for publication.</p>
+          <p>Digital and printed editions are planned. Printing and delivery prices will be confirmed after the printer's quotation. No A2 checkout is available yet.</p>
+          <a href="/books" className="fb-btn fb-btn-soft">Browse available books</a>
+        </section>
+        : isWritingGuide ? <WritingGuideDetail book={books.find(b => b.id === "writing-skills-a1-c2-digital")}
+          fxQuote={fxQuote} onAddToCart={addToCart} onBuyNow={buyNow}
+          enabled={enabled} added={added} /> :
       <section className="fb-hero" aria-label="Falowen Deutsch A1 book">
         <div className="fb-visual-col">
           <div className="fb-cover-stage">
@@ -277,7 +365,8 @@ export default function BookStoreCheckout({ completed = false }) {
         <aside className="fb-purchase-card" id="fb-purchase">
           <div className="fb-purchase-header"><span className="fb-eyebrow">CHOOSE YOUR EDITION</span><h2>Start with A1</h2><p>One book. Two ways to learn.</p></div>
           <div className="fb-editions" role="radiogroup" aria-label="Choose book edition">
-            {books.length ? books.map(book => <label key={book.id} className={"fb-edition" + (bookId === book.id ? " selected" : "")}>
+            {books.filter(book => book.id === "a1-digital" || book.id === "a1-printed").length ?
+              books.filter(book => book.id === "a1-digital" || book.id === "a1-printed").map(book => <label key={book.id} className={"fb-edition" + (bookId === book.id ? " selected" : "")}>
               <input type="radio" name="edition" checked={bookId === book.id} onChange={() => setBookId(book.id)} />
               <span className="fb-edition-icon" aria-hidden="true">{book.format === "digital" ? "▧" : "▤"}</span>
               <span className="fb-edition-label"><strong>{book.format === "digital" ? "Digital PDF" : "Printed book"}</strong>
@@ -289,29 +378,36 @@ export default function BookStoreCheckout({ completed = false }) {
             </label>) : <p className="fb-muted">Loading editions…</p>}
           </div>
           {selected?.format === "printed" && <p className="fb-shipping-note">Print orders are produced after payment. Delivery is arranged and charged separately.</p>}
-          <form onSubmit={buy} className="fb-form">
-            <p className="fb-form-title">Your contact details</p>
-            {[
-              ["name","Full name","text","Your full name"],
-              ["email","Email address","email","you@example.com"],
-              ["phone","Phone / WhatsApp","tel","e.g. +233 ..."],
-            ].map(([id,label,type,placeholder]) => <label key={id}>{label}
-              <input required type={type} placeholder={placeholder} autoComplete={id === "name" ? "name" : id === "email" ? "email" : "tel"} value={customer[id]}
-                onChange={e => setCustomer(prev=>({...prev,[id]:e.target.value}))} />
-            </label>)}
-            <div className="fb-total"><span>Book price</span><span className="fb-total-prices"><strong>{selected ? money(selected.priceGhs) : "—"}</strong>
-              {selected && indicativeUsd(selected.priceGhs, fxQuote) && <small>{indicativeUsd(selected.priceGhs, fxQuote)} · display only</small>}</span></div>
-            {error && <p className="fb-error" role="alert">{error}</p>}
-            <button type="submit" className="fb-btn fb-btn-primary fb-pay" disabled={!enabled || !selected || busy}>
-              {busy ? "Opening secure checkout…" : !enabled ? "Checkout temporarily unavailable" : `Continue to Paystack · ${money(selected.priceGhs)}`}
+          <div className="fb-form">
+            <label className="fb-copy-picker">Number of {selected?.format === "printed" ? "printed copies" : "digital copies"}
+              <input type="number" min="1" max={selected?.format === "printed" ? "10" : "1"}
+                value={selected?.format === "digital" ? 1 : copyQuantity}
+                disabled={selected?.format !== "printed"}
+                onChange={event => setCopyQuantity(Math.max(1, Math.min(10, Number(event.target.value) || 1)))}/>
+            </label>
+            <div className="fb-total"><span>{selected?.format === "printed" ? "Books subtotal" : "Book price"}</span>
+              <span className="fb-total-prices"><strong>{selected ? money(selected.priceGhs * (selected.format === "printed" ? copyQuantity : 1)) : "—"}</strong>
+                {selected && indicativeUsd(selected.priceGhs * (selected.format === "printed" ? copyQuantity : 1), fxQuote) &&
+                  <small>{indicativeUsd(selected.priceGhs * (selected.format === "printed" ? copyQuantity : 1), fxQuote)} · display only</small>}
+              </span>
+            </div>
+            <button type="button" className="fb-btn fb-btn-primary fb-pay" disabled={!selected}
+              onClick={() => addToCart(selected, selected.format === "printed" ? copyQuantity : 1)}>
+              Add to cart
             </button>
-          </form>
+            <button type="button" className="fb-btn fb-btn-soft fb-pay" disabled={!selected || !enabled}
+              onClick={() => buyNow(selected, selected.format === "printed" ? copyQuantity : 1)}>
+              {enabled ? "Buy now · Review cart" : "Checkout temporarily unavailable"}
+            </button>
+            {added && <p className="fb-add-feedback" role="status">{added} <a href="/books/cart">View cart</a></p>}
+            {error && <p className="fb-error" role="alert">{error}</p>}
+          </div>
           <p className="fb-secure-note"><span aria-hidden="true">◈</span> Verified payment through Paystack in GHS. Keep your transaction receipt.</p>
           <p className="fb-manual-note">Falowen arranges your book after payment verification. No automatic PDF download or delivery tracking.</p>
         </aside>
       </section>}
-      </div>
-      {!isWritingGuide && <section id="fb-book-details" className="fb-details">
+      </div>}
+      {productSlug && !upcomingGuide && !isWritingGuide && !isA2 && <section id="fb-book-details" className="fb-details">
         <div className="fb-tabbar" role="tablist" aria-label="Book information">
           {sections.map(id => <button key={id} type="button" role="tab" aria-selected={activeTab === id} className={activeTab===id?"active":""} onClick={()=>setActiveTab(id)}>
             {({overview:"Overview",contents:"What's inside",sample:"Free sample",faq:"Questions"})[id]}

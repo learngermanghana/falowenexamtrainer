@@ -1,0 +1,33 @@
+name: Falowen Books cart security checks
+
+on:
+  push:
+    branches:
+      - feature/falowen-books-product-pages-cart-20261025
+    paths:
+      - functions/functionz/bookCommerce.js
+      - functions/functionz/bookPrintPricing.js
+      - functions/__tests__/bookCommerce.test.js
+      - .github/workflows/book-commerce-cart-checks.yml
+  pull_request:
+    paths:
+      - functions/functionz/bookCommerce.js
+      - functions/functionz/bookPrintPricing.js
+      - functions/__tests__/bookCommerce.test.js
+      - .github/workflows/book-commerce-cart-checks.yml
+
+permissions:
+  contents: read
+
+jobs:
+  book-cart-contract:
+    name: Validate server-authoritative book pricing and Paystack receipts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check functions/functionz/bookCommerce.js
+      - run: node --test functions/__tests__/bookCommerce.test.js

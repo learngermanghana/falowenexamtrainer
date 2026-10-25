@@ -33,21 +33,40 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     expect(indicativeUsd(99, { usdToGhs: 0 })).toBe("");
   });
 
-  test("offers an independently purchasable GH₵39 writing guide and preserves A1 selection", () => {
-    const choose = jest.fn();
-    render(<BooksCatalog catalogTitles={titles} books={offers} fxQuote={{ usdToGhs: 11 }} onSelectBook={choose} />);
+  test("every book opens its own canonical product URL, including coming-soon titles", () => {
+    const all = [...titles, { id: "a2-course-workbook", title: "Deutsch A2 — Course & Workbook",
+      description: "A2 German course", levelTags: ["A2"], formats: ["digital", "printed"],
+      pages: 441, status: "coming_soon", bookIds: [] }];
+    render(<BooksCatalog catalogTitles={all} books={offers} fxQuote={{ usdToGhs: 11 }} />);
     expect(screen.getByText("GH₵39.00")).toBeInTheDocument();
     expect(screen.getAllByText(/Paystack charges in Ghana cedis/i)).toHaveLength(1);
-    const buttons = screen.getAllByRole("button", { name: "View book and editions" });
-    expect(buttons).toHaveLength(1);
-    const guide = screen.getByRole("button", { name: "View writing guide and buy" });
-    fireEvent.click(guide);
-    expect(choose).toHaveBeenCalledWith("writing-skills-a1-c2-digital");
-    fireEvent.click(buttons[0]);
-    expect(choose).toHaveBeenCalledWith("a1-digital");
+    const detailLinks = screen.getAllByRole("link", { name: "View book and editions" });
+    expect(detailLinks).toHaveLength(2);
+    expect(detailLinks[0]).toHaveAttribute("href", "/books/deutsch-a1-course-workbook");
+    expect(detailLinks[1]).toHaveAttribute("href", "/books/how-to-unlock-your-german-writing-skills-a1-c2");
+    expect(screen.getByRole("link", { name: "Explore upcoming book" }))
+      .toHaveAttribute("href", "/books/deutsch-a2-course-workbook");
+    expect(screen.getByText(/Checkout is not available yet/)).toBeInTheDocument();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "writing" } });
     expect(screen.getByRole("status")).toHaveTextContent("1 book found");
-    expect(screen.queryByRole("button", { name: "View book and editions" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "View writing guide and buy" })).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "View book and editions" })).toHaveLength(1);
   });
+  test("search and show distinct A1 writing / A2 four-skills exam guides without a purchase button", () => {
+    const newTitles = [
+      { id: "a1-writing-model-exams", title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
+        description: "Independent A1 writing practice", levelTags: ["A1"], formats: ["digital", "printed"],
+        pages: 30, topics: ["schreiben", "formulare"], status: "coming_soon", bookIds: [] },
+      { id: "a2-four-skills-exam-guide", title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
+        description: "Independent A2 four-skills preparation", levelTags: ["A2"], formats: ["digital", "printed"],
+        pages: 50, topics: ["lesen", "hören", "schreiben", "sprechen"], status: "coming_soon", bookIds: [] },
+    ];
+    render(<BooksCatalog catalogTitles={newTitles} books={offers} fxQuote={null} />);
+    const upcomingLinks = screen.getAllByRole("link", { name: "Explore upcoming book" });
+    expect(upcomingLinks).toHaveLength(2);
+    expect(upcomingLinks[1]).toHaveAttribute("href", "/books/goethe-a2-four-skills-exam-guide");
+    expect(screen.getAllByText(/Checkout is not available yet/)).toHaveLength(2);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "sprechen" } });
+    expect(screen.getByRole("status")).toHaveTextContent("1 book found");
+  });
+
 });

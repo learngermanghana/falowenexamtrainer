@@ -31,7 +31,7 @@ const CHAPTERS = [
   "Editing checklist, practice solutions and answer key",
 ];
 
-export default function WritingGuideDetail({ book, fxQuote, customer, onCustomerChange, onCheckout, busy, enabled, error }) {
+export default function WritingGuideDetail({ book, fxQuote, onAddToCart, onBuyNow, enabled, added }) {
   const [tab, setTab] = useState("sample");
   const usd = indicativeUsd(book?.priceGhs, fxQuote);
   return <section className="fb-wg" aria-label="How to Unlock Your German Writing Skills">
@@ -68,23 +68,15 @@ export default function WritingGuideDetail({ book, fxQuote, customer, onCustomer
         <div className="fb-wg-price"><strong>{ghs(book?.priceGhs)}</strong>
           {usd && <small>{usd} · indicative only</small>}</div>
         <p className="fb-wg-fxnote">Checkout is in Ghana cedis. USD is only for international price comparison.</p>
-        <form onSubmit={onCheckout} className="fb-form">
-          <p className="fb-form-title">Your contact details</p>
-          {[
-            ["name", "Full name", "text", "Your full name"],
-            ["email", "Email address", "email", "you@example.com"],
-            ["phone", "Phone / WhatsApp", "tel", "e.g. +233 ..."],
-          ].map(([id, label, type, placeholder]) => <label key={id}>{label}
-            <input required type={type} placeholder={placeholder}
-              autoComplete={id === "name" ? "name" : id === "email" ? "email" : "tel"}
-              value={customer[id]} onChange={event => onCustomerChange(id, event.target.value)} />
-          </label>)}
-          {error && <p className="fb-error" role="alert">{error}</p>}
-          <button type="submit" className="fb-btn fb-btn-primary fb-pay"
-            disabled={!enabled || !book || busy}>
-            {busy ? "Opening secure checkout…" : !enabled ? "Checkout temporarily unavailable" : "Continue to Paystack · " + ghs(book?.priceGhs)}
+        <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+          <button type="button" className="fb-btn fb-btn-primary fb-pay"
+            onClick={() => onAddToCart(book, 1)} disabled={!book || !enabled}>
+            {!enabled ? "Checkout temporarily unavailable" : "Add digital guide to cart"}
           </button>
-        </form>
+          <button type="button" className="fb-btn fb-btn-soft" onClick={() => onBuyNow(book, 1)}
+            disabled={!book || !enabled}>Buy now · {ghs(book?.priceGhs)}</button>
+          {added && <p className="fb-add-feedback" role="status">{added}</p>}
+        </div>
         <p className="fb-wg-delivery">Payment is verified through Paystack. Your PDF is arranged manually after confirmation; there is no immediate automatic download. Keep your receipt.</p>
       </aside>
     </div>
