@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { pruneA2TrulyBlankSectionPages } from "./pruneA2BlankSectionPages.mjs";
 import { addA2RetailCover } from "./a2RetailCover.mjs";
 import { renderA2Day22SpeakingMockPrint } from "./renderA2Day22SpeakingMockPrint.mjs";
 import { renderA2PrintableListeningQuestions } from "./renderA2PrintableListeningQuestions.mjs";
@@ -348,6 +349,11 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     // @media print keeps WorkbookTabNav hidden and the following Teil tabs
     // appear "unavailable" even though they were rendered correctly.
     if (level === "A2") await page.emulateMedia({ media: "screen" });
+  }
+  if (a2EditorialLocal) {
+    await pruneA2TrulyBlankSectionPages(file, {
+      log: message => console.log(`A2 Day ${lesson.day} ${suffix}: ${message}`),
+    });
   }
   return { tab: suffix, file };
 };
