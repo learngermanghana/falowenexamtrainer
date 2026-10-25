@@ -21,6 +21,9 @@ const DIGITAL_BOOK_OBJECTS = Object.freeze({
   }),
 });
 const FALOWEN_BOOKS_BUCKET = "falowen-books-private";
+// Public Cloudflare account identifier (not an access credential).
+// Avoid forcing a Secret Manager binding for an identifier already shown in R2 dashboard URLs.
+const FALOWEN_R2_ACCOUNT_ID = "886b2264d12c796d29879a8e919a2f46";
 const URL_EXPIRES_SECONDS = 90; // a signed GET is bearer access until expiration
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
 const hmac = (key, value, encoding) => crypto.createHmac("sha256", key).update(value).digest(encoding);
@@ -28,7 +31,7 @@ const encode = v => encodeURIComponent(v).replace(/[!'()*]/g, c=>"%"+c.charCodeA
 const encodeKey = key => key.split("/").map(encode).join("/");
 
 function getBookR2Config(env = process.env) {
-  const accountId = String(env.R2_BOOKS_ACCOUNT_ID || "").trim();
+  const accountId = String(env.R2_BOOKS_ACCOUNT_ID || FALOWEN_R2_ACCOUNT_ID).trim();
   const accessKeyId = String(env.R2_BOOKS_ACCESS_KEY_ID || "").trim();
   const secretAccessKey = String(env.R2_BOOKS_SECRET_ACCESS_KEY || "").trim();
   const bucket = String(env.R2_BOOKS_BUCKET || "").trim();

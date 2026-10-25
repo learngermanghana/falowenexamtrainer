@@ -118,8 +118,20 @@ test("the production Firebase API binds books secrets without exposing them to u
  const index=fs.readFileSync(path.resolve(__dirname,"../index.js"),"utf8");
  const head=index.slice(index.indexOf("exports.api = onRequest("),
    index.indexOf("// When a student doc is created in Firestore"));
- for (const name of ["R2_BOOKS_ACCOUNT_ID","R2_BOOKS_BUCKET","R2_BOOKS_ACCESS_KEY_ID","R2_BOOKS_SECRET_ACCESS_KEY"]){
+ for (const name of ["R2_BOOKS_BUCKET","R2_BOOKS_ACCESS_KEY_ID","R2_BOOKS_SECRET_ACCESS_KEY"]){
    assert.ok(head.includes('"'+name+'"'),"Missing books secret binding: "+name);
    assert.equal(index.split('"'+name+'"').length-1,1,"Book secret is also bound to unrelated service");
  }
+});
+
+test("public R2 account ID needs no Secret Manager binding and can sign with just the three private bucket secrets",()=> {
+ const {signPrivateBookDownload}=require("./privateBookDelivery");
+ const env={
+  R2_BOOKS_BUCKET:"falowen-books-private",
+  R2_BOOKS_ACCESS_KEY_ID:"read_only_test_key",
+  R2_BOOKS_SECRET_ACCESS_KEY:"dummy-test-secret",
+ };
+ const result=signPrivateBookDownload({bookId:"b1-four-skills-exam-guide-digital",env});
+ assert.equal(new URL(result.url).host,
+   "falowen-books-private.886b2264d12c796d29879a8e919a2f46.r2.cloudflarestorage.com");
 });
