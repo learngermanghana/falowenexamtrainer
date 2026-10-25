@@ -13,6 +13,7 @@ describe("A2 Kombiprüfung Mocks 4–8 production-preview contract",()=>{
   const mock=A2_KOMBI_MOCK_CONTENT[n];
   expect(mock.modules).toEqual(["lesen","schreiben","sprechen"]);
   expect(Object.values(mock.reading).flatMap(p=>p.questions)).toHaveLength(20);
+  expect(mock.reading.teil2.floors).toHaveLength(4);
   expect(mock.reading.teil4.ads).toHaveLength(6);
   expect(mock.writing.teil1.points).toHaveLength(3);
   expect(mock.writing.teil2.points).toHaveLength(3);
