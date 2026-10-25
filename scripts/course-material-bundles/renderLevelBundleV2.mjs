@@ -199,7 +199,15 @@ const submitLogin = async (page) => {
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
-  const targetUrl = new URL(lesson.route, baseUrl).toString();
+  const target = new URL(lesson.route, baseUrl);
+  // A2 workbooks are radio-first in the student app. The PDF needs the
+  // complete educational workbook, not the Falowen Radio introduction gate.
+  // This query param only applies to the private Playwright export session;
+  // no student navigation, completion or recorded progress is changed.
+  if (level === "A2" && target.searchParams.get("radio") !== "done") {
+    target.searchParams.set("radio", "done");
+  }
+  const targetUrl = target.toString();
   const initiallyLoaded = await openLessonWithAuthHydration(page, lesson, targetUrl);
   if (initiallyLoaded) return;
 
