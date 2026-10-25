@@ -1,0 +1,79 @@
+
+/* Falowen marketing carousel; all four paths share one viewport-sized slide. */
+.falowen-carousel { --tone:#0861e9;--soft:#ecf5ff; --deep:#10244a; }
+.falowen-carousel-placement { --tone:#9b622c;--soft:#fff6e7; }
+.falowen-carousel-exams { --tone:#087558;--soft:#e8f8f2; }
+.falowen-carousel-books { --tone:#6951b6;--soft:#f4efff; }
+.falowen-carousel-stage { position:relative; overflow:hidden; border-radius:24px; border:1px solid #dce5f1; background:var(--soft); box-shadow:0 15px 42px rgba(23,44,83,.07); }
+.falowen-carousel-content { min-height:430px; display:grid; grid-template-columns:minmax(0, 1.12fr) minmax(0,.88fr); overflow:hidden; }
+.falowen-carousel-copy { padding:clamp(32px,5vw,66px) clamp(28px,5vw,62px) 65px; display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:16px;min-width:0; }
+.falowen-carousel-kicker {font-size:11px;font-weight:900;letter-spacing:.16em;color:var(--tone);}
+.falowen-carousel-copy h1,.falowen-carousel-copy h2 {margin:0;max-width:550px;font-size:clamp(33px,4.6vw,56px);line-height:1.09;font-weight:900;letter-spacing:-.046em;color:var(--deep);}
+.falowen-carousel-copy h1 span,.falowen-carousel-copy h2 span {color:var(--tone);}
+.falowen-carousel-copy p {margin:0;max-width:465px;font-size:clamp(14px,1.4vw,16px);line-height:1.65;color:#485c76;}
+.falowen-carousel-cta {display:flex;flex-wrap:wrap;align-items:center;gap:12px;}
+.falowen-carousel-button {display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:46px;padding:12px 19px;background:var(--tone);border:0;border-radius:12px;font-family:inherit;font-size:14px;font-weight:800;color:white;text-decoration:none;cursor:pointer;}
+.falowen-carousel-button:hover {filter:brightness(.89);}
+.falowen-carousel-secondary {font-size:12px;font-weight:800;color:#1a559e;}
+.falowen-slide-photo {position:relative;min-height:285px;height:100%;background:#d1dfe9;overflow:hidden;}
+.falowen-slide-photo img {display:block;width:100%;height:100%;object-fit:cover;}
+.falowen-slide-photo span {position:absolute;bottom:18px;left:16px;right:16px;padding:11px 14px;color:#fff;font-size:12px;line-height:1.4;font-weight:800;border-radius:11px;background:rgba(16,36,74,.77);backdrop-filter:blur(5px);}
+.falowen-slide-illustration {position:relative;display:grid;place-items:center;min-height:285px;padding:35px 26px;background:linear-gradient(142deg,rgba(255,255,255,.35),rgba(167,195,228,.2));}
+.falowen-slide-paper {width:min(100%,306px);padding:24px 22px;border-radius:20px;background:white;box-shadow:0 22px 43px rgba(28,55,96,.17);transform:rotate(-3deg);display:grid;gap:10px;}
+.falowen-slide-paper-label {font-size:10px;font-weight:900;color:var(--tone);letter-spacing:.1em;}
+.falowen-slide-paper strong {font-size:20px;line-height:1.2;color:#142a49;}
+.falowen-slide-paper small {font-size:12px;color:#63738b;}
+.falowen-slide-answer {padding:11px 12px;border:1px solid #dee7f0;border-radius:9px;font-size:12px;color:#596b7f;}
+.falowen-slide-answer.selected {border-color:#ddb97b;background:#fff5e1;color:#865921;font-weight:800;}
+.falowen-slide-progress {height:6px;background:#e5eef8;border-radius:9px;overflow:hidden;}
+.falowen-slide-progress span {display:block;width:43%;height:100%;background:var(--tone);border-radius:9px;}
+.falowen-slide-skills {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;}
+.falowen-slide-skills span {border:1px solid #dceee7;background:#f1faf6;border-radius:9px;padding:11px 9px;color:#185b48;font-size:12px;font-weight:800;}
+.falowen-slide-ready {padding:10px 12px;border-radius:8px;background:#e4f7ed;color:#087558;font-size:12px;font-weight:800;}
+.falowen-slide-book {z-index:2;transform:rotate(-8deg);width:197px;min-height:255px;background:linear-gradient(140deg,#154c9a,#1267bd);border-left:12px solid #0b2f6b;border-radius:5px 14px 14px 4px;padding:24px 17px;color:#fff;box-shadow:10px 14px 0 #183d73,20px 24px 36px rgba(27,29,79,.29);display:flex;flex-direction:column;justify-content:space-between;}
+.falowen-slide-book span {font-size:18px;font-weight:900;}
+.falowen-slide-book strong {font-size:70px;line-height:.98;letter-spacing:-.05em;color:#ffd28a;}
+.falowen-slide-book small {font-size:10px;font-weight:800;letter-spacing:.08em;}
+.falowen-carousel-controls {position:absolute;bottom:14px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;z-index:4;}
+.falowen-carousel-controls>button {pointer-events:auto;border:1px solid #d4e1f1;color:#234266;background:rgba(255,255,255,.95);border-radius:50%;font-size:23px;font-weight:600;width:37px;height:37px;cursor:pointer;box-shadow:0 2px 10px rgba(28,55,96,.1);}
+.falowen-carousel-dots {display:flex;align-items:center;gap:7px;}
+.falowen-carousel-dots button {pointer-events:auto;width:10px;height:10px;cursor:pointer;border:0;border-radius:50%;background:#9ab0c9;padding:0;}
+.falowen-carousel-dots button.is-active {width:27px;border-radius:9px;background:var(--tone);}
+@media(max-width:700px){
+ .falowen-carousel-content {grid-template-columns:1fr;grid-template-rows:auto minmax(150px,195px);min-height:490px;}
+ .falowen-carousel-copy {padding:29px 24px 16px;gap:12px;}
+ .falowen-carousel-copy h1,.falowen-carousel-copy h2 {font-size:clamp(30px,8vw,40px);}
+ .falowen-carousel-copy p {font-size:13px;line-height:1.55;}
+ .falowen-carousel-button {min-height:43px;font-size:13px;padding:10px 15px;}
+ .falowen-carousel-secondary {font-size:11px;}
+ .falowen-slide-photo,.falowen-slide-illustration {min-height:165px;height:195px;}
+ .falowen-slide-illustration {padding:8px 20px;}
+ .falowen-slide-paper {width:min(100%,225px);padding:12px 14px;gap:5px;transform:rotate(-2deg);}
+ .falowen-slide-paper strong {font-size:14px;}
+ .falowen-slide-paper small {font-size:10px;}
+ .falowen-slide-answer {padding:5px 8px;font-size:10px;}
+ .falowen-slide-skills {gap:5px;}
+ .falowen-slide-skills span {font-size:10px;padding:6px;}
+ .falowen-slide-book {min-height:145px;width:140px;padding:12px;transform:rotate(-6deg);border-left-width:7px;}
+ .falowen-slide-book strong {font-size:35px;}
+ .falowen-slide-book span {font-size:13px;}
+ .falowen-slide-book small {font-size:8px;}
+ .falowen-carousel-controls {bottom:10px;left:12px;right:12px;}
+ .falowen-public-home {padding-bottom:30px;}
+ .falowen-home-nav-signup {display:inline-flex;padding:7px 10px;min-height:39px;font-size:12px;}
+ .falowen-home-login {min-height:39px;padding:7px 10px;font-size:12px;}
+ .falowen-home-nav-actions {gap:5px;}
+ .falowen-home-nav {gap:6px;}
+ .falowen-home-language {max-width:78px;padding:5px 3px;font-size:11px;}
+}
+@media(max-width:400px){
+ .falowen-home-brand {font-size:16px;gap:4px;}
+ .falowen-home-brand img {width:31px;height:31px;}
+ .falowen-home-login {padding:7px;}
+ .falowen-home-nav-signup {padding:7px;}
+ .falowen-home-language {max-width:58px;font-size:10px;}
+ .falowen-carousel-copy {padding:26px 19px 12px;}
+ .falowen-carousel-content {min-height:485px;}
+}
+@media(max-width:340px){.falowen-home-brand span {display:none;}}
+@media(prefers-reduced-motion:reduce){.falowen-carousel-button {transition:none;}}

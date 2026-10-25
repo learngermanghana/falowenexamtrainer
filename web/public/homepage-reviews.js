@@ -95,7 +95,7 @@
       '@media(max-width:760px){.falowen-google-reviews{padding:18px}.falowen-google-reviews__grid{grid-template-columns:1fr}.falowen-google-reviews__score{width:100%}}';
     document.head.appendChild(style);
 
-    var finalCta = shell.querySelector(".falowen-final-cta");
+    var finalCta = shell.querySelector(".falowen-home-footer");
     if (finalCta) shell.insertBefore(section, finalCta);
     else shell.appendChild(section);
     return true;

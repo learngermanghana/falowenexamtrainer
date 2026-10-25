@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import academyProfile from "../data/publicAcademyProfile.json";
-import { PUBLIC_MARKETING_FEATURES } from "../data/publicMarketingFeatures";
+import FalowenHomepageCarousel from "./FalowenHomepageCarousel";
 import "./LandingPageMarketing.css";
 
 const COPY = {
@@ -187,64 +187,7 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           </div>
         </nav>
 
-        <section className="falowen-home-hero" aria-labelledby="falowen-home-title">
-          <div className="falowen-home-copy">
-            <span className="falowen-home-eyebrow">{copy.eyebrow}</span>
-            <h1 id="falowen-home-title">{copy.title} <span>{copy.titleAccent}</span></h1>
-            <p className="falowen-home-intro">{copy.subtitle}</p>
-            <div className="falowen-home-cta-row">
-              <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start} <span aria-hidden="true">↗</span></button>
-              <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.returning} {copy.login}</button>
-              <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement} <span aria-hidden="true">→</span></a>
-            </div>
-            <p className="falowen-home-helper">{copy.smallNote}</p>
-            <div className="falowen-home-proof" aria-label="Falowen A1 to C2 learning options">
-              {[copy.levels, copy.flexible, copy.supported].map((label) => <span key={label}>✓ {label}</span>)}
-            </div>
-          </div>
-          <div className="falowen-home-hero-art">
-            <img src={academyProfile.classroomImage} alt="German classroom at Learn Language Education Academy" className="falowen-home-classroom" width="560" height="520" />
-            <div className="falowen-home-image-overlay"><span>{copy.heroPhoto}</span><strong>Learn Language Education Academy · Accra & online</strong></div>
-            <div className="falowen-home-image-sticker" aria-hidden="true">A1 → C2</div>
-          </div>
-        </section>
-
-        <section className="falowen-home-features" aria-labelledby="falowen-features-title">
-          <div className="falowen-home-section-heading">
-            <span className="falowen-home-section-kicker">{copy.featuresEyebrow}</span>
-            <h2 id="falowen-features-title">{copy.featuresTitle}</h2>
-            <p>{copy.featuresIntro}</p>
-          </div>
-          <div className="falowen-home-feature-grid">
-            {PUBLIC_MARKETING_FEATURES.map((feature, index) => {
-              const localized = copy.featureCopy[feature.key];
-              return (
-                <article className="falowen-home-feature" key={feature.key}>
-                  <div className="falowen-home-feature-top">
-                    <span className="falowen-home-feature-icon" aria-hidden="true">{feature.icon}</span>
-                    <span className="falowen-home-feature-index" aria-hidden="true">0{index + 1}</span>
-                  </div>
-                  <h3>{localized?.[0] || feature.title}</h3>
-                  <p>{localized?.[1] || feature.description}</p>
-                  <div className="falowen-home-feature-actions">
-                    {feature.key === "self" ? (
-                      <button type="button" className="falowen-home-feature-link" onClick={signup}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></button>
-                    ) : (
-                      <a className="falowen-home-feature-link" href={feature.href}>{localized?.[2] || feature.action} <span aria-hidden="true">↗</span></a>
-                    )}
-                    {feature.scheduleHref ? (
-                      <a className="falowen-home-feature-schedule" href={feature.scheduleHref}>
-                        <span aria-hidden="true">🗓</span>
-                        <span>{copy.classScheduleAction || feature.scheduleAction}</span>
-                        <span aria-hidden="true">→</span>
-                      </a>
-                    ) : null}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+        <FalowenHomepageCarousel language={language} classroomImage={academyProfile.classroomImage} onSignUp={signup} />
 
         <section className="falowen-home-support" aria-labelledby="falowen-support-heading">
           <div className="falowen-home-support-copy">
@@ -257,18 +200,6 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
 
         <div className="falowen-home-reviews-intro"><p>{copy.reviewsIntro}</p></div>
         {/* /homepage-reviews.js injects genuine Google reviews before the final CTA. */}
-
-        <section className="falowen-final-cta">
-          <div>
-            <span className="falowen-home-section-kicker">{copy.finalEyebrow}</span>
-            <h2>{copy.finalTitle}</h2>
-            <p>{copy.finalText}</p>
-          </div>
-          <div className="falowen-home-final-actions">
-            <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.signup} ↗</button>
-            <a href="/classes" className="falowen-home-button falowen-home-button-light">{copy.navClasses} →</a>
-          </div>
-        </section>
 
         <footer className="falowen-home-footer">
           <div className="falowen-home-footer-links">
@@ -294,11 +225,6 @@ export default function LandingPageSimple({ onSignUp, onLogin }) {
           </div>
           <a className="falowen-home-contact-link" href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">{copy.contact} ↗</a>
         </footer>
-      </div>
-      <div className="falowen-mobile-actions">
-        <button type="button" className="falowen-home-button falowen-home-button-primary" onClick={signup}>{copy.start}</button>
-        <button type="button" className="falowen-home-button falowen-home-button-outline" onClick={login}>{copy.login}</button>
-        <a className="falowen-home-button falowen-home-button-outline" href="/placement-test">{copy.placement}</a>
       </div>
     </main>
   );
