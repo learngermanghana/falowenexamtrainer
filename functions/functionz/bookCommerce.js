@@ -1,5 +1,6 @@
 "use strict";
 const crypto = require("crypto");
+const { estimatePrintedBookPrice } = require("./bookPrintPricing");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
@@ -21,6 +22,13 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     bookIds: ["a1-digital", "a1-printed"],
   }),
   Object.freeze({
+    id: "a2-course-workbook",
+    title: "Deutsch A2 — Course & Workbook",
+    description: "A2 grammar, writing, reading, listening and paper speaking practice. Editorial PDF complete; print quote and commercial release pending.",
+    levelTags: ["A2"], topics: ["grammar", "writing", "reading", "listening", "course workbook"],
+    formats: ["digital", "printed"], pages: 441, status: "coming_soon", bookIds: [],
+  }),
+  Object.freeze({
     id: "writing-skills-a1-c2",
     title: "How to Unlock Your German Writing Skills (A1–C2)",
     description: "A standalone writing guide with sentence structure, connectors, model texts, exercises and self-correction across all six CEFR levels.",
@@ -37,6 +45,35 @@ const allowedEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const moneyToPesewas = amount => Math.round(Number(amount) * 100);
 const paymentsEnabled = () => process.env.FALOWEN_BOOK_PAYMENTS_ENABLED === "true";
 const sha256 = value => crypto.createHash("sha256").update(value).digest("hex");
+const cartDigest = items => sha256(JSON.stringify(items.map(({ bookId, quantity, unitPriceGhs }) =>
+  [bookId, quantity, unitPriceGhs])));
+const MAX_CART_LINES = 6;
+const MAX_TOTAL_COPIES = 15;
+function priceBookCart(input) {
+  if (!Array.isArray(input) || !input.length || input.length > MAX_CART_LINES)
+    throw new Error("Choose between 1 and 6 available book editions.");
+  const seen = new Set();
+  let copies = 0;
+  const items = input.map(raw => {
+    const id = String(raw?.bookId || "");
+    const book = Object.prototype.hasOwnProperty.call(BOOKS, id) ? BOOKS[id] : null;
+    const quantity = raw?.quantity === undefined ? 1 : raw.quantity;
+    if (!book || seen.has(id) || !Number.isInteger(quantity) || quantity < 1 || quantity > 10)
+      throw new Error("Choose a valid book and quantity (1–10).");
+    // Digital PDFs are supplied per buyer; purchasing duplicate licences through
+    // one email is not supported until a specific multi-user licence exists.
+    if (book.format === "digital" && quantity !== 1)
+      throw new Error("Digital books are limited to one per order.");
+    seen.add(id);
+    copies += quantity;
+    return Object.freeze({ bookId: id, title: book.title, format: book.format,
+      quantity, unitPriceGhs: book.priceGhs, lineTotalGhs: book.priceGhs * quantity });
+  });
+  if (copies > MAX_TOTAL_COPIES) throw new Error("Limit one order to 15 total copies.");
+  const totalGhs = items.reduce((sum, item) => sum + item.lineTotalGhs, 0);
+  return Object.freeze({ items, copies, totalGhs, checkoutPesewas: moneyToPesewas(totalGhs),
+    digest: cartDigest(items) });
+}
 
 function registerBookCommerceRoutes(app, { admin }) {
   const db = () => admin.firestore();
@@ -58,13 +95,19 @@ function registerBookCommerceRoutes(app, { admin }) {
   app.post("/books/checkout", async (req, res) => {
     if (!paymentsEnabled()) return res.status(503).json({ error: "Book payments are not open yet." });
     try {
-      const requestedBookId = String(req.body?.bookId || "");
-      const book = Object.prototype.hasOwnProperty.call(BOOKS, requestedBookId)
-        ? BOOKS[requestedBookId] : null;
+      const inputItems = Array.isArray(req.body?.items)
+        ? req.body.items : [{ bookId: req.body?.bookId, quantity: 1 }];
+      let cart;
+      try { cart = priceBookCart(inputItems); }
+      catch (e) { return res.status(400).json({ error: e.message }); }
+      const { items, totalGhs, checkoutPesewas } = cart;
+      const single = items.length === 1 && items[0].quantity === 1 ? items[0] : null;
+      const orderBookId = single?.bookId || "cart";
+      const orderTitle = single?.title || `Falowen Books order (${cart.copies} copies)`;
+      const orderFormat = single?.format || (items.every(item => item.format === "printed") ? "printed" : "mixed");
       const name = String(req.body?.name || "").trim().replace(/\s+/g, " ");
       const email = String(req.body?.email || "").trim().toLowerCase();
       const phone = String(req.body?.phone || "").trim();
-      if (!book) return res.status(400).json({ error: "Choose a valid book." });
       if (name.length < 3 || name.length > 120 || email.length > 254 || !allowedEmail.test(email)
         || !/^\+?[0-9\s()-]{8,25}$/.test(phone)) {
         return res.status(400).json({ error: "Enter a valid name, email, and contact number." });
@@ -75,7 +118,6 @@ function registerBookCommerceRoutes(app, { admin }) {
       const orderId = crypto.randomUUID();
       const lookupKey = crypto.randomBytes(24).toString("hex");
       // Books use an all-in sticker price; Falowen absorbs the gateway fee.
-      const checkoutPesewas = moneyToPesewas(book.priceGhs);
       const callback = new URL("/books/complete", CALLBACK_ORIGIN);
       callback.searchParams.set("order", orderId);
       callback.searchParams.set("key", lookupKey);
@@ -85,11 +127,11 @@ function registerBookCommerceRoutes(app, { admin }) {
         body: JSON.stringify({
           email, currency: "GHS", amount: checkoutPesewas, callback_url: callback.toString(),
           metadata: {
-            productType: "falowen_book", orderId, bookId: book.id, priceGhs: book.priceGhs,
-            format: book.format,
+            productType: "falowen_book", orderId, bookId: orderBookId, priceGhs: totalGhs,
+            format: orderFormat, cartDigest: cart.digest,
             custom_fields: [
-              { display_name: "Product", variable_name: "product", value: book.title },
-              { display_name: "Edition", variable_name: "edition", value: book.format },
+              { display_name: "Books", variable_name: "books", value: orderTitle },
+              { display_name: "Copies", variable_name: "copies", value: String(cart.copies) },
               { display_name: "Falowen order ID", variable_name: "order_id", value: orderId },
             ],
           }
@@ -104,9 +146,9 @@ function registerBookCommerceRoutes(app, { admin }) {
         return res.status(502).json({ error: "Unexpected payment gateway." });
       }
       await db().collection("bookOrders").doc(orderId).create({
-        id: orderId, reference: String(payload.data.reference), bookId: book.id, title: book.title,
-        format: book.format, email, name, phone,
-        priceGhs: book.priceGhs, checkoutPesewas, lookupKeyHash: sha256(lookupKey),
+        id: orderId, reference: String(payload.data.reference), bookId: orderBookId, title: orderTitle,
+        format: orderFormat, items, copies: cart.copies, cartDigest: cart.digest, email, name, phone,
+        priceGhs: totalGhs, checkoutPesewas, lookupKeyHash: sha256(lookupKey),
         status: "pending", fulfilmentStatus: "not_started",
         deliveryIncluded: false, createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
@@ -134,6 +176,8 @@ function registerBookCommerceRoutes(app, { admin }) {
       )) return res.status(403).json({ error: "Invalid order link." });
       return res.json({
         orderId: id, title: order.title, format: order.format, priceGhs: order.priceGhs,
+        items: Array.isArray(order.items) ? order.items : [{ bookId: order.bookId, title: order.title,
+          format: order.format, quantity: 1, unitPriceGhs: order.priceGhs, lineTotalGhs: order.priceGhs }],
         status: order.status === "paid" ? "paid" : order.status === "rejected" ? "rejected" : "pending",
         reference: order.reference, // private lookup key required before exposing receipt reference
         deliveryIncluded: false,
@@ -256,6 +300,8 @@ async function processBookWebhook({ admin, data }) {
       && metadata.orderId === order.id && metadata.bookId === order.bookId
       && Number(metadata.priceGhs) === order.priceGhs
       && String(metadata.format) === order.format
+      && (!Array.isArray(order.items) || (String(metadata.cartDigest || "") === order.cartDigest
+        && order.cartDigest === cartDigest(order.items)))
       && String(data.reference || "") === order.reference
       && Number(data.amount) === order.checkoutPesewas
       && String(data.currency || "").toUpperCase() === "GHS"
@@ -267,7 +313,8 @@ async function processBookWebhook({ admin, data }) {
     }
     const paidAt = admin.firestore.FieldValue.serverTimestamp();
     tx.create(receiptRef, {
-      orderId, bookId: order.bookId, reference: order.reference, amountGhs: order.priceGhs,
+      orderId, bookId: order.bookId, items: order.items || null,
+      reference: order.reference, amountGhs: order.priceGhs,
       checkoutPesewas: order.checkoutPesewas, status: "paid", paidAt,
     });
     tx.update(ref, { status: "paid", paidAt, fulfilmentStatus: "not_started" });
@@ -275,4 +322,4 @@ async function processBookWebhook({ admin, data }) {
   });
 }
 
-module.exports = { BOOKS, registerBookCommerceRoutes, processBookWebhook };
+module.exports = { BOOKS, BOOK_CATALOG_TITLES, priceBookCart, registerBookCommerceRoutes, processBookWebhook, estimatePrintedBookPrice };
