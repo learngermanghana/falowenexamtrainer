@@ -24,4 +24,4 @@ jobs:
         with:
           node-version: '22'
       - run: node --check functions/functionz/bookCommerce.js
-      - run: node --test functions/__tests__/bookCommerce.test.js
+      - run: node --test functions/__tests__/bookCommerce.test.js functions/functionz/bookPricing.test.js
