@@ -103,11 +103,18 @@ test("Hören upgrade is not silently applied to completed three-module results",
   const mockId = "a1-mock-04";
   const original = buildVerifiedA1MockScore({ mockId, state: attempt(mockId), verifiedSections: receipts() });
   assert.equal(original.overall.maxPoints, 75);
-  assert.throws(() => buildVerifiedA1MockScore({
+  const newListening = getA1MockSet(mockId).listeningAnswerKey;
+  assert.equal(Object.keys(newListening).length, 15);
+  const upgraded = buildVerifiedA1MockScore({
     mockId,
-    state: { ...attempt(mockId), assessmentVersion: "four-module-v2", hoerenAnswers: LISTENING_ANSWER_KEY },
+    state: { ...attempt(mockId), assessmentVersion: "four-module-v2", hoerenAnswers: newListening },
     verifiedSections: receipts(),
-  }), /Unsupported/);
+  });
+  assert.equal(upgraded.overall.maxPoints, 100);
+  assert.equal(upgraded.overall.assessmentVersion, "four-module-v2");
+  assert.equal(upgraded.sectionScores.hoeren, 25);
+  assert.equal(upgraded.objective.hoeren.correct, 15);
+  assert.equal(original.overall.maxPoints, 75);
   const oldFull = buildVerifiedA1MockScore({
     mockId: "a1-mock-01",
     state: { lesenAnswers: READING_ANSWER_KEY, hoerenAnswers: LISTENING_ANSWER_KEY },
