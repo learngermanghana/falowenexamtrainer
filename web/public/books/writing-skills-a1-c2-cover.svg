@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 595 842" role="img" aria-label="Falowen German Writing Skills A1 to C2 book cover">
+ <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102342"/><stop offset="1" stop-color="#153e65"/></linearGradient><linearGradient id="line" x1="0" x2="1"><stop stop-color="#2fd4d5"/><stop offset="1" stop-color="#6bc8fb"/></linearGradient></defs>
+ <rect width="595" height="842" rx="8" fill="url(#bg)"/>
+ <path d="M0 172 H595" stroke="url(#line)" stroke-width="5"/>
+ <text x="55" y="72" fill="#f2fcff" font-size="19" font-family="Arial,Helvetica,sans-serif" letter-spacing="4" font-weight="bold">LEARN LANGUAGE</text>
+ <text x="55" y="99" fill="#bdcfe6" font-size="16" font-family="Arial,Helvetica,sans-serif" letter-spacing="3">EDUCATION ACADEMY</text>
+ <text x="55" y="222" fill="#4de0de" font-size="19" font-family="Arial,Helvetica,sans-serif" letter-spacing="3">WRITING WORKBOOK · A1–C2</text>
+ <text x="55" y="296" fill="#fff" font-size="46" font-family="Arial,Helvetica,sans-serif" font-weight="bold">HOW TO UNLOCK</text>
+ <text x="55" y="354" fill="#fff" font-size="46" font-family="Arial,Helvetica,sans-serif" font-weight="bold">YOUR GERMAN</text>
+ <text x="55" y="412" fill="#fff" font-size="46" font-family="Arial,Helvetica,sans-serif" font-weight="bold">WRITING SKILLS</text>
+ <rect x="55" y="450" width="141" height="6" fill="url(#line)"/>
+ <text x="55" y="505" fill="#d6e5fa" font-size="21" font-family="Arial,Helvetica,sans-serif">From your first message to precise</text>
+ <text x="55" y="536" fill="#d6e5fa" font-size="21" font-family="Arial,Helvetica,sans-serif">academic and professional German</text>
+ <rect x="55" y="605" width="483" height="84" rx="10" fill="#1c4b70"/>
+ <text x="74" y="636" fill="#e9f9ff" font-size="18" font-family="Arial,Helvetica,sans-serif">Grammar explained in English</text>
+ <text x="74" y="669" fill="#e9f9ff" font-size="18" font-family="Arial,Helvetica,sans-serif">Model texts · Guided practice · Answer key</text>
+ <path d="M55 756 H540" stroke="#5d93b8" stroke-width="1"/>
+ <text x="55" y="792" fill="#b9dcff" font-size="16" font-family="Arial,Helvetica,sans-serif" letter-spacing="1">FALOWEN BOOKS · INDEPENDENT STUDY EDITION</text>
+</svg>

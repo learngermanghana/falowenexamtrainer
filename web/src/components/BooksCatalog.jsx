@@ -24,7 +24,7 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
   });
 };
 
-export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectA1 }) {
+export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook }) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
   const [format, setFormat] = useState("all");
@@ -86,7 +86,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
           </div>
           {available && offers.length
             ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
-                onClick={() => onSelectA1(offers[0].id)}>View book and editions</button>
+                onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
             : <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>}
         </article>;
       })}

@@ -4,9 +4,10 @@ const crypto = require("crypto");
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
+  "writing-skills-a1-c2-digital": Object.freeze({ id: "writing-skills-a1-c2-digital", title: "How to Unlock Your German Writing Skills (A1–C2)", format: "digital", priceGhs: 39 }),
 });
 // Public discovery metadata, separate from the server-authoritative purchasable SKU list.
- // "coming_soon" titles are NEVER accepted by /books/checkout.
+// Only vetted SKUs listed in BOOKS are accepted by /books/checkout.
 const BOOK_CATALOG_TITLES = Object.freeze([
   Object.freeze({
     id: "a1-course-workbook",
@@ -27,8 +28,8 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     topics: ["writing", "schreiben", "letters", "emails", "grammar", "connectors", "essays", "cefr", "exam preparation", "practice"],
     formats: ["digital"],
     pages: 32,
-    status: "coming_soon",
-    bookIds: [],
+    status: "available",
+    bookIds: ["writing-skills-a1-c2-digital"],
   }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
