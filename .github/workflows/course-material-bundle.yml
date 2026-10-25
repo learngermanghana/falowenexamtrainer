@@ -122,6 +122,7 @@ jobs:
           fi
           if [ "${{ matrix.level }}" = "A2" ]; then
             node --test scripts/course-material-bundles/a2PdfPrint.test.mjs
+            node --test scripts/course-material-bundles/a2EditorialPrintMode.test.mjs
           fi
 
       - name: Build and validate manifest
