@@ -9,6 +9,9 @@ describe("Falowen A1 public bookstore launch", () => {
   const css = source("./BookStoreCheckout.css");
   const app = source("../App.js");
   const backend = source("../../../functions/functionz/bookCommerce.js");
+  const storebookSafety = () => !backend.includes('"writing-skills-a1-c2-digital": "https://"')
+    && bookstore.includes('isWritingGuide ? <WritingGuideDetail')
+    && bookstore.includes("Continue to Paystack");
 
   test("keeps public storefront routing and secure Paystack receipt verification", () => {
     expect(app).toContain('location.pathname === "/books"');
@@ -19,6 +22,9 @@ describe("Falowen A1 public bookstore launch", () => {
     expect(bookstore).not.toContain("PAYSTACK_SECRET");
     expect(backend).toContain('priceGhs: 99');
     expect(backend).toContain('priceGhs: 800');
+    expect(backend).toContain('"writing-skills-a1-c2-digital"');
+    expect(backend).toContain("priceGhs: 39");
+    expect(storebookSafety()).toBe(true);
   });
 
   test("shows the book cover and genuinely labelled free sample", () => {
