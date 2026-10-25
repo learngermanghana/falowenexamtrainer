@@ -259,7 +259,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     if (level === "A2") {
-      await page.evaluate(sanitizeA2PrintDocument);
+      await page.evaluate(sanitizeA2PrintDocument, suffix);
       const printed = await page.evaluate(extractA2PrintSnapshot);
       const leaks = findA2PdfLeaks(printed.text);
       if (leaks.length) throw new Error(
