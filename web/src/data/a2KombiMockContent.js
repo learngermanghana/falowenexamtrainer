@@ -367,7 +367,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Fragen, was Sie mitbringen sollen"
         ],
         "wordMin": 20,
-        "wordMax": 30
+        "wordMax": 30,
+        "instruction": "Schreiben Sie 20–30 Wörter und beantworten Sie alle drei Leitpunkte."
       },
       "teil2": {
         "title": "Teil 2 · Formelle E-Mail",
@@ -378,7 +379,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Bitte um einen neuen Termin"
         ],
         "wordMin": 30,
-        "wordMax": 40
+        "wordMax": 40,
+        "instruction": "Schreiben Sie 30–40 Wörter in einer höflichen formellen E-Mail. Beantworten Sie alle drei Leitpunkte."
       }
     },
     "speaking": {
@@ -774,7 +776,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Hilfe beim Einkaufen oder bei der Arbeit anbieten"
         ],
         "wordMin": 20,
-        "wordMax": 30
+        "wordMax": 30,
+        "instruction": "Schreiben Sie 20–30 Wörter und beantworten Sie alle drei Leitpunkte."
       },
       "teil2": {
         "title": "Teil 2 · Formelle E-Mail",
@@ -785,7 +788,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Bitte um Anmeldebestätigung"
         ],
         "wordMin": 30,
-        "wordMax": 40
+        "wordMax": 40,
+        "instruction": "Schreiben Sie 30–40 Wörter in einer höflichen formellen E-Mail. Beantworten Sie alle drei Leitpunkte."
       }
     },
     "speaking": {
@@ -1181,7 +1185,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Kurze Information zur neuen Wohnung"
         ],
         "wordMin": 20,
-        "wordMax": 30
+        "wordMax": 30,
+        "instruction": "Schreiben Sie 20–30 Wörter und beantworten Sie alle drei Leitpunkte."
       },
       "teil2": {
         "title": "Teil 2 · Formelle E-Mail",
@@ -1192,7 +1197,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Um schnellen Handwerkertermin bitten"
         ],
         "wordMin": 30,
-        "wordMax": 40
+        "wordMax": 40,
+        "instruction": "Schreiben Sie 30–40 Wörter in einer höflichen formellen E-Mail. Beantworten Sie alle drei Leitpunkte."
       }
     },
     "speaking": {
@@ -1588,7 +1594,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Berichten, was Sie besichtigst haben"
         ],
         "wordMin": 20,
-        "wordMax": 30
+        "wordMax": 30,
+        "instruction": "Schreiben Sie 20–30 Wörter und beantworten Sie alle drei Leitpunkte."
       },
       "teil2": {
         "title": "Teil 2 · Formelle E-Mail",
@@ -1599,7 +1606,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Fragen, ob der Schlüssel hinterlegt werden kann"
         ],
         "wordMin": 30,
-        "wordMax": 40
+        "wordMax": 40,
+        "instruction": "Schreiben Sie 30–40 Wörter in einer höflichen formellen E-Mail. Beantworten Sie alle drei Leitpunkte."
       }
     },
     "speaking": {
@@ -1995,7 +2003,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Aufregung auf das Spiel ausdrücken"
         ],
         "wordMin": 20,
-        "wordMax": 30
+        "wordMax": 30,
+        "instruction": "Schreiben Sie 20–30 Wörter und beantworten Sie alle drei Leitpunkte."
       },
       "teil2": {
         "title": "Teil 2 · Formelle E-Mail",
@@ -2006,7 +2015,8 @@ export const A2_KOMBI_MOCK_CONTENT = Object.freeze({
           "Bitte um kurze Antwort"
         ],
         "wordMin": 30,
-        "wordMax": 40
+        "wordMax": 40,
+        "instruction": "Schreiben Sie 30–40 Wörter in einer höflichen formellen E-Mail. Beantworten Sie alle drei Leitpunkte."
       }
     },
     "speaking": {
