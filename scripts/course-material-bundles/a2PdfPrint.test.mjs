@@ -22,6 +22,8 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
  assert.match(sanitizer,/section === "workbook-teil-2"/);
  assert.match(sanitizer,/Schreiben · Your answer/);
  assert.match(sanitizer,/const webOnlyAction =/);
+ assert.ok(sanitizer.includes('replace(/falowen\\s+radio/gi, "Falowen audio lesson")'));
+ assert.ok(sanitizer.includes('back\\s+to\\s+course\\s+book/gi, "")'));
  assert.match(sanitizer,/teacher video/);
  assert.match(a2PrintCss,/data-radio-first-workbook-gate/);
  assert.match(a2PrintCss,/data-teacher-video/);
