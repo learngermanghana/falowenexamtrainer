@@ -1,5 +1,5 @@
 name: A2 private one-time PDF proof
-# Run 3: diagnose A2 Day 1 navigation using safe structural metadata.
+# Run 4: require real authenticated A2 workbook nav before accepting lesson hydration.
 
 on:
   push:
