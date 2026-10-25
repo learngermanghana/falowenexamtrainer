@@ -43,6 +43,10 @@ export const renderA2PrintableListeningQuestions = async ({ lesson, renderDir })
   if (!Number.isInteger(day) || day < 24 || day > 28) {
     throw new Error("Late-course A2 print-only Hören supports Days 24–28 only.");
   }
+  const route = String(lesson?.route || "").split("?")[0];
+  if (!new RegExp("^/campus/course/a2-day-" + day + "-.+-workbook$").test(route)) {
+    throw new Error("Unexpected A2 Day " + day + " source route: do not substitute a listening lesson.");
+  }
   const task = a2PrintableListeningQuestions(day);
   const pdf = await PDFDocument.create();
   const font = await pdf.embedFont(StandardFonts.Helvetica);
