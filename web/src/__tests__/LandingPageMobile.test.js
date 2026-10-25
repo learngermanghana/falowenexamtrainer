@@ -72,7 +72,7 @@ describe("Falowen current four-slide public homepage and iPhone navigation", () 
     expect(css).toContain("@media (max-width: 600px)");
     expect(container.querySelector(".falowen-home-reviews-intro")).toBeInTheDocument();
     expect(container.querySelector(".falowen-home-support")).toBeInTheDocument();
-    expect(screen.getByRole("img",{name:"German classroom at Learn Language Education Academy"}))
+    expect(screen.getByRole("img",{name:"A real German class at Learn Language Education Academy"}))
       .toHaveAttribute("src","/classes/llea-classroom.jpg");
   });
 });
