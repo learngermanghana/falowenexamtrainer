@@ -21,6 +21,10 @@ test("A2 multiple-choice answer buttons and checkbox labels survive print CSS",(
  const sanitizer=fs.readFileSync(path.join(dir,"a2PdfPrint.mjs"),"utf8");
  assert.match(sanitizer,/section === "workbook-teil-2"/);
  assert.match(sanitizer,/Schreiben · Your answer/);
+ // Removing React-owned navigation from the DOM after the Grammar print
+ // used to make every subsequent Teil tab inaccessible.
+ assert.doesNotMatch(sanitizer, /const nodes =[\s\S]*?querySelectorAll\([\s\S]*?'\[data-universal-a2-workbook-tabs\]'/);
+ assert.match(a2PrintCss,/\[data-universal-a2-workbook-tabs\]/);
 });
 
 test("A2 print is triggered from Playwright only, other levels keep prior CSS",()=>{
