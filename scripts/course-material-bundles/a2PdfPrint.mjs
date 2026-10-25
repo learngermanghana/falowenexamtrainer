@@ -115,5 +115,15 @@ export const extractA2PrintSnapshot = () => {
  const text = [...root.querySelectorAll("h1,h2,h3,h4,p,li,legend,label,strong,blockquote")]
   .filter(visible).map(element => element.innerText || element.textContent || "")
   .join(" ").replace(/\s+/g, " ").trim();
- return { headings, text, grammarVisible: Boolean(root.querySelector("[data-a2-focused-grammar]")) };
+ const listeningPanel = root.querySelector('[data-a2-pdf-listening-task="true"]');
+ const listeningVisible = Boolean(listeningPanel && visible(listeningPanel));
+ const listeningQuestionCount = listeningVisible
+  ? [...listeningPanel.querySelectorAll("strong")].filter(visible).length
+  : 0;
+ return {
+  headings, text,
+  grammarVisible: Boolean(root.querySelector("[data-a2-focused-grammar]")),
+  listeningVisible,
+  listeningQuestionCount,
+ };
 };
