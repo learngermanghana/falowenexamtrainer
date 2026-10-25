@@ -196,7 +196,14 @@ export async function sync({ feedXml, channelHtml, channelId, fetchImpl = fetch,
   const excluded = new Set(fs.existsSync(excludedFile) ? JSON.parse(fs.readFileSync(excludedFile, 'utf8')) : []);
   const merged = new Map((old.videos || []).filter(v => validId.test(v.id) && !excluded.has(v.id)).map(v => [v.id, v]));
   for (const video of entries) {
-    if (isEducational(video) && !excluded.has(video.id)) merged.set(video.id, video);
+    // The current feed is authoritative for IDs it includes. A renamed video
+    // that no longer qualifies must also disappear from the cached catalogue.
+    // Keep previously published videos absent from this limited RSS window.
+    if (isEducational(video) && !excluded.has(video.id)) {
+      merged.set(video.id, video);
+    } else {
+      merged.delete(video.id);
+    }
   }
   const videos = [...merged.values()].sort((a, b) => b.published.localeCompare(a.published) || a.id.localeCompare(b.id));
   const data = { channelId: id, channelUrl, videos };
