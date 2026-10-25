@@ -919,7 +919,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
             <div className="a1-schreiben-form-paper">
               <div className="a1-schreiben-form-header">
-                <div><strong>{isAdditionalMock ? "SPRACHSCHULE" : "REISEBÜRO"}</strong><span>{isAdditionalMock ? "Berlin" : "Stadttour & Ausflug"}</span></div>
+                <div><strong>{isKombi ? "ANMELDEFORMULAR" : isAdditionalMock ? "SPRACHSCHULE" : "REISEBÜRO"}</strong><span>{isKombi ? `A1 Mock ${kombiNumber} · Teil 1` : isAdditionalMock ? "Berlin" : "Stadttour & Ausflug"}</span></div>
                 <div className="a1-schreiben-form-title">ANMELDUNG</div>
               </div>
               <div className="a1-schreiben-form-body">
