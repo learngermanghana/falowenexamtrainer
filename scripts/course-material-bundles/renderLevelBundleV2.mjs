@@ -468,7 +468,27 @@ const renderA2B1Lesson = async (page, lesson) => {
   ];
   const workbookParts = [];
   for (const tabSpec of workbookTabSpecs) {
-    const clicked = await clickWorkbookTab(page, tabSpec.names);
+    let clicked = false;
+    if (a2EditorialLocal && Number(lesson.day) >= 24 && tabSpec.key === "teil-4") {
+      // Late A2 Hören panels may re-mount after a previous print DOM cleanup.
+      // Load the actual, read-only listening tab on a fresh local page, rather
+      // than treating a stale navigation click as proof that its questions loaded.
+      const offered = page.getByRole("tab", { name: /^Teil 4/i }).first();
+      if (await offered.isVisible().catch(() => false)) {
+        const deepLink = new URL(lesson.route, baseUrl);
+        deepLink.searchParams.set("radio", "done");
+        deepLink.searchParams.set("view", "hoeren");
+        if (!(await openLessonWithAuthHydration(page, lesson, deepLink.toString()))) {
+          throw new Error("A2 Day " + lesson.day +
+            ": Hören editorial deep link could not open the authenticated workbook.");
+        }
+        clicked = await page.locator('[data-a2-pdf-listening-task="true"]').isVisible().catch(() => false);
+        if (!clicked) throw new Error("A2 Day " + lesson.day +
+          ": Hören editorial deep link loaded workbook navigation but not listening questions.");
+      }
+    } else {
+      clicked = await clickWorkbookTab(page, tabSpec.names);
+    }
     if (!clicked) {
       if (level === "A2" && await page.getByRole("tab", { name: new RegExp(tabSpec.names[0], "i") }).count()) {
         throw new Error("A2 Day " + lesson.day + ": required visible workbook tab " +
