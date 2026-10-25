@@ -56,7 +56,7 @@ export default function ExamGuidePreviews({level}) {
             <strong>{item.module}</strong><span>Book page {item.page}</span>
           </button>)}
       </div>
-      <div className="fb-guide-preview-paper" role="img"
+      <article className="fb-guide-preview-paper"
         aria-label={"Reformatted excerpt from page "+page.page+": "+page.heading}>
         <div className="fb-guide-preview-paper-brand">LEARN LANGUAGE EDUCATION ACADEMY · FALOWEN</div>
         <span className="fb-guide-preview-paper-kicker">{page.lead}</span>
@@ -65,7 +65,7 @@ export default function ExamGuidePreviews({level}) {
           {page.lines.map((line,i)=><p key={i}>{line}</p>)}
         </div>
         <div className="fb-guide-preview-paper-footer">Preview only · Source page {page.page} of the {level} guide</div>
-      </div>
+      </article>
     </div>
   </section>;
 }
