@@ -28,7 +28,7 @@ export default function A2KombiReadingSection({mockNumber,answers={},onChange}){
   <section className="a2-mock-part">
    <header className="a2-mock-part-heading"><h2>Teil 2 · Etagenverzeichnis</h2><p>In welcher Etage finden Sie die gesuchte Information?</p></header>
    <article className="a2-mock-directory"><h3>Etagen / Abteilungen</h3>
-    {p.teil2.source.split(/\n+/).filter(Boolean).map((line,i)=><div className="a2-mock-floor" key={i}><p>{line.trim()}</p></div>)}
+    {p.teil2.floors.map(([floor,items])=><div className="a2-mock-floor" key={floor}><strong>{floor}</strong><p>{items}</p></div>)}
    </article>{questions(p.teil2,2)}
   </section>
   <section className="a2-mock-part">
