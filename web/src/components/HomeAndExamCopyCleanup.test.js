@@ -53,23 +53,27 @@ describe("homepage and Exams Room student-facing cleanup", () => {
     expect(homeSource).toContain("homepageCompact");
   });
 
-  test("compact homepage class area contains only next class and Zoom, not the long class feed", () => {
+  test("signed-in Home keeps next class access while replacing bulky Zoom panel with book covers", () => {
     const canonicalStart = classCardSource.indexOf("{canonicalSummary ? (");
     const compactStart = classCardSource.indexOf("homepageCompact ? (", canonicalStart);
-    const zoomIndex = classCardSource.indexOf("<HomeZoomAccessCard", compactStart);
-    const fullStart = classCardSource.indexOf("        ) : (\n        <>", zoomIndex);
+    const bookIndex = classCardSource.indexOf("<HomepageBooksCarousel", compactStart);
+    const fullStart = classCardSource.indexOf("        ) : (\n        <>", bookIndex);
     const compactBranch = classCardSource.slice(compactStart, fullStart);
 
     expect(compactStart).toBeGreaterThan(canonicalStart);
-    expect(zoomIndex).toBeGreaterThan(compactStart);
-    expect(fullStart).toBeGreaterThan(zoomIndex);
+    expect(bookIndex).toBeGreaterThan(compactStart);
+    expect(fullStart).toBeGreaterThan(bookIndex);
     expect(compactBranch).toContain("<NextLiveClassCard");
     expect(compactBranch).toContain("simple");
-    expect(compactBranch).toContain("<HomeZoomAccessCard");
+    expect(compactBranch).toContain("<HomepageBooksCarousel");
+    expect(compactBranch).not.toContain("<HomeZoomAccessCard");
     expect(compactBranch).not.toContain("Latest completed class");
     expect(compactBranch).not.toContain("<SessionsPreview");
     expect(compactBranch).not.toContain("Download class calendar");
     expect(compactBranch).not.toContain("Course progress");
+    expect(homeSource).toContain("onJoinZoom={joinZoom}"); // Existing student Zoom action preserved.
+    expect(classCardSource).toContain('aria-label="Open your live class Zoom room"');
+    expect(classCardSource).toContain("fullCalendarLink={fullCalendarLink}");
   });
 
   test("simple next-class card hides timetable, duplicate Zoom action and after-this list", () => {
