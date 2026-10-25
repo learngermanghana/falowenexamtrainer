@@ -22,13 +22,13 @@ describe("A2 canonical Lesen tasks", () => {
       expect(task.title).toBeTruthy();
       expect(task.strategy).toBeTruthy();
       expect(task.text.length).toBeGreaterThan(100);
-      expect(task.questions).toHaveLength(day === 11 ? 7 : day === 17 ? 8 : 5);
+      expect(task.questions).toHaveLength(day === 11 || day === 22 ? 7 : 5);
 
       task.questions.forEach((question) => {
         expect(question.stem).toBeTruthy();
-        expect(question.options.length).toBeGreaterThanOrEqual(day === 17 ? 2 : 3);
+        expect(question.options.length).toBeGreaterThanOrEqual(3);
         expect(new Set(question.options).size).toBe(question.options.length);
-        question.options.forEach((option) => expect(option).toMatch(/^[A-D]\)/));
+        question.options.forEach((option, index) => expect(option.startsWith(`${String.fromCharCode(65 + index)})`)).toBe(true));
       });
     });
 
@@ -45,16 +45,16 @@ describe("A2 canonical Lesen tasks", () => {
     expect(A2_READING_TASKS[11].questions).toHaveLength(7);
     expect(A2_READING_TASKS[11].text).toMatch(/Berliner Tagesblatt/);
     expect(A2_READING_TASKS[12].text).not.toMatch(/beglaubigen|Anerkennung ausländischer Abschlüsse/i);
-    expect(A2_READING_TASKS[13].title).toMatch(/Vorstellungsgespräch/i);
+    expect(A2_READING_TASKS[13].title).toBe("Termin bei der Firma Novak");
     expect(A2_READING_TASKS[13].text).not.toMatch(/Kinderbetreuung|Kinderkrippe/i);
-    expect(A2_READING_TASKS[17].title).toBe("Hamburg erleben");
-    expect(A2_READING_TASKS[17].questions).toHaveLength(8);
-    expect(A2_READING_TASKS[17].text).toMatch(/Elbphilharmonie/);
-    expect(A2_READING_TASKS[17].questions.slice(3).every((question) => question.options.length === 2)).toBe(true);
+    expect(A2_READING_TASKS[17].title).toBe("Die Sonnen-Apotheke informiert");
+    expect(A2_READING_TASKS[17].questions).toHaveLength(5);
+    expect(A2_READING_TASKS[17].text).toMatch(/Sonnenschutzmittel|Lieferservice/);
+    expect(A2_READING_TASKS[17].questions.every((question) => question.options.length === 3)).toBe(true);
     expect(A2_READING_TASKS[19].text).not.toMatch(/soziale Gerechtigkeit|Umweltverschmutzung/i);
-    expect(A2_READING_TASKS[23].text).toMatch(/Regionalzug/);
-    expect(A2_READING_TASKS[23].text).toMatch(/Bus 16/);
-    expect(A2_READING_TASKS[23].text).toMatch(/U-Bahn/);
+    expect(A2_READING_TASKS[23].text).toMatch(/S-Bahn/);
+    expect(A2_READING_TASKS[23].text).toMatch(/7:15 Uhr/);
+    expect(A2_READING_TASKS[23].text).toMatch(/Monatsticket 65 Euro/);
   });
 
   test("routes Days 12, 13, 14 and 17 through the shared canonical workbook shell", () => {

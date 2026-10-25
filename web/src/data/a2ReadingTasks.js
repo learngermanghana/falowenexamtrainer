@@ -346,31 +346,24 @@ Freitag, 19:00 Uhr. Atemübungen und einfache Techniken gegen Stress.`,
   },
   17: {
     chapter: "6.17",
-    format: "Goethe A2 · Lesen · Teil 1 und Teil 2",
-    title: "Hamburg erleben",
-    strategy: "Teil 1: Wähle a, b oder c. Teil 2: Entscheide bei jeder Aussage zwischen Richtig und Falsch.",
-    text: `Teil 1 · Multiple Choice
+    format: "Informationen aus der Apotheke",
+    title: "Die Sonnen-Apotheke informiert",
+    strategy: "Lies die Hinweise und vergleiche Angebot, Servicezeiten, Lieferbedingungen und Notdienst. Wähle bei jeder Frage A, B oder C.",
+    text: `Willkommen in der Sonnen-Apotheke!
 
-Text 1
+Im Juni erhalten Sie 15 Prozent Rabatt auf Sonnenschutzmittel und Hautcremes. Medikamente gegen Erkältungen sind von diesem Angebot ausgeschlossen.
 
-Ein Mann ist in Hamburg. Er macht eine Fahrt mit dem Schiff. Die Fahrt dauert eine Stunde. Das Ticket kostet 25 Euro. Mit der Gästekarte kostet das Ticket nur 20 Euro.
+Sie möchten Ihren Blutdruck messen lassen? Dafür können Sie von Montag bis Freitag zwischen 8:30 und 12:00 Uhr ohne Termin zu uns kommen. Am Nachmittag ist eine vorherige Anmeldung nötig.
 
-Text 2
+Unser kostenloser Lieferservice ist für Kunden gedacht, die wegen einer Krankheit nicht persönlich vorbeikommen können. Wenn Sie vor 14:00 Uhr bestellen, liefern wir die Produkte noch am selben Tag. Spätere Bestellungen kommen am nächsten Werktag.
 
-Heute Abend gibt es Musik. Ein Orchester spielt in der Elbphilharmonie. Das Konzert beginnt um 20 Uhr. Der Mann kauft ein Ticket. Er geht vorher Fisch essen. Das Restaurant ist im Hafen und nicht teuer.
-
-Teil 2 · Richtig oder Falsch?
-
-Der Mann bleibt zwei Tage in Hamburg. Er kauft eine Gästekarte für 12 Euro. Er fährt damit zwei Tage mit Bus und Bahn. Heute isst er Fisch im Restaurant Seeblick. Das Essen ist gut. Morgen besucht er ein kleines Museum. Der Besuch dauert zwei Stunden. Danach geht er im Stadtpark spazieren. Die Frau gibt ihm einen Stadtplan.`,
+Wenn unsere Apotheke geschlossen ist, hilft Ihnen der Apotheken-Notdienst. Die Adresse der nächsten dienstbereiten Apotheke finden Sie auf einem Aushang neben unserer Tür.`,
     questions: [
-      { stem: "Teil 1 · Wie lange dauert die Fahrt mit dem Schiff?", options: ["A) 10 Minuten", "B) Eine Stunde", "C) Zwei Tage"] },
-      { stem: "Teil 1 · Wie viel kostet das Ticket mit der Gästekarte?", options: ["A) 12 Euro", "B) 20 Euro", "C) 25 Euro"] },
-      { stem: "Teil 1 · Wann beginnt das Konzert?", options: ["A) Um 10 Uhr", "B) Um 12 Uhr", "C) Um 20 Uhr"] },
-      { stem: "Teil 2 · Der Mann bleibt zwei Tage in Hamburg.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Die Gästekarte kostet 50 Euro.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Der Mann isst im Restaurant Fisch.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Das Museum ist sehr groß.", options: ["A) Richtig", "B) Falsch"] },
-      { stem: "Teil 2 · Der Mann bekommt einen Stadtplan.", options: ["A) Richtig", "B) Falsch"] },
+      { stem: "Worauf gibt es im Juni einen Rabatt?", options: ["A) Auf alle Erkältungsmedikamente.", "B) Auf Sonnenschutzmittel und Hautcremes.", "C) Auf Blutdruckmessgeräte."] },
+      { stem: "Für eine Blutdruckmessung ohne Termin …", options: ["A) Nur am Samstagnachmittag.", "B) können Sie von Montag bis Freitag am Vormittag kommen.", "C) Jeden Abend nach 18:00 Uhr."] },
+      { stem: "Für wen ist der kostenlose Lieferservice gedacht?", options: ["A) Für alle Touristen in der Stadt.", "B) Kunden, die wegen Krankheit nicht vorbeikommen können.", "C) Nur für Kunden mit einem Auto."] },
+      { stem: "Wann werden bestellte Produkte noch am selben Tag geliefert?", options: ["A) Wenn man vor 14:00 Uhr bestellt.", "B) Wenn man nach 18:00 Uhr bestellt.", "C) Nur bei einer Bestellung am Sonntag."] },
+      { stem: "Wo findet man die Adresse der dienstbereiten Apotheke?", options: ["A) Auf einem Aushang neben der Tür.", "B) Auf jedem Kassenbon.", "C) Nur im Schaufenster des Supermarkts."] },
     ],
   },
   18: {

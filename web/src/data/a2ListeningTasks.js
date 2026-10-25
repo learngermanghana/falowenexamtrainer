@@ -218,14 +218,15 @@ export const A2_LISTENING_TASKS = {
   17: {
     chapter: "6.17",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Höre das Gespräch in der Apotheke. Trage danach deine endgültigen Antwortbuchstaben im Submit-Bereich ein.",
-    audioUrl: "https://youtu.be/jgl__L4L9kE",
+    task: "Höre das Gespräch in der Apotheke zweimal. Achte auf Beschwerden, Einnahme, Rezept, das Pflaster für das Kind und die Bezahlung. Wähle bei jeder Frage A, B oder C.",
+    audioKey: "a2/day-17/day-17.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Warum ging Anna in die Apotheke?", options: ["A) Um Medikamente gegen Husten zu kaufen", "B) Wegen Kopfschmerzen", "C) Um eine Creme zu kaufen", "D) Um Proben zu holen"] },
-      { stem: "Was empfahl die Apothekerin gegen Kopfschmerzen?", options: ["A) Aspirin", "B) Paracetamol", "C) Ibuprofen", "D) Nasenspray"] },
-      { stem: "Welches Problem hatte Anna noch?", options: ["A) Halsschmerzen", "B) Trockene Haut", "C) Schnupfen", "D) Fieber"] },
-      { stem: "Wie reagierte Anna auf die Empfehlungen der Apothekerin?", options: ["A) Sie war skeptisch", "B) Sie war erleichtert", "C) Sie war verwirrt", "D) Sie war unzufrieden"] },
-      { stem: "Was bekam Anna zusätzlich zu den Medikamenten?", options: ["A) Ein Rezept", "B) Proben von Produkten", "C) Eine Broschüre", "D) Ein neues Medikament"] },
+      { stem: "Welche Beschwerden hat der Kunde?", options: ["A) Kopfschmerzen und Fieber.", "B) Halsschmerzen und eine laufende Nase.", "C) Bauchschmerzen und Übelkeit."] },
+      { stem: "Wie oft soll der Kunde das Mittel nehmen?", options: ["A) Alle drei Stunden.", "B) Einmal pro Woche.", "C) Nur am Abend."] },
+      { stem: "Braucht der Kunde für das Mittel ein Rezept?", options: ["A) Ja, er muss zuerst zum Arzt.", "B) Ja, aber er kann es später bringen.", "C) Nein, er braucht kein Rezept."] },
+      { stem: "Was bekommt das Kind?", options: ["A) Ein Pflaster mit bunten Tieren.", "B) Eine Packung Hustensaft.", "C) Einen neuen Rucksack."] },
+      { stem: "Wie bezahlt der Kunde?", options: ["A) Bar.", "B) Mit Karte.", "C) Per Überweisung."] },
     ],
   },
   18: {
