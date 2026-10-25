@@ -1,5 +1,6 @@
 const registry = require('../data/assessmentTasks.json');
 const kombiTasks = require('./a1KombiMarkingSets');
+const a2KombiTasks = require('./a2KombiTaskSets');
 
 function taskError(message) {
   return Object.assign(new Error(message), { status: 409, code: 'ASSESSMENT_TASK_CHANGED' });
@@ -28,8 +29,8 @@ function assessmentTaskPrompt(task) {
   ].join('\n');
 }
 function mockTaskPrompt(level, kind, selectedTopicId, mockId) {
-  const task = (level === 'A1' && kombiTasks[mockId] ? (kind === 'writing' ? { ...kombiTasks[mockId].writing, form: kombiTasks[mockId].form } : kombiTasks[mockId].speaking) : ((level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)) || (level === 'A2' && mockId === 'a2-mock-02'))
-    ? registry.mockSets[mockId]?.[kind] : registry.mocks[level]?.[kind]);
+  const task = (level === 'A2' && a2KombiTasks[mockId] ? a2KombiTasks[mockId][kind] : (level === 'A1' && kombiTasks[mockId] ? (kind === 'writing' ? { ...kombiTasks[mockId].writing, form: kombiTasks[mockId].form } : kombiTasks[mockId].speaking) : ((level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)) || (level === 'A2' && mockId === 'a2-mock-02'))
+    ? registry.mockSets[mockId]?.[kind] : registry.mocks[level]?.[kind]));
   if (!task) throw new Error('Missing canonical mock task');
   if (level === 'B2' && kind === 'speaking' && selectedTopicId) {
     const theme = task.teil1.themes.find(item => item.id === selectedTopicId);
@@ -41,6 +42,7 @@ function mockTaskPrompt(level, kind, selectedTopicId, mockId) {
 module.exports = { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt };
 
 function mockTaskVersion(level, kind, mockId) {
+  if (level === 'A2' && a2KombiTasks[mockId]) return `${mockId}-${kind}-v1`;
   if (level === 'A1' && kombiTasks[mockId]) return `${mockId}-${kind}-v1`;
   const task = ((level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)) || (level === 'A2' && mockId === 'a2-mock-02'))
     ? registry.mockSets[mockId]?.[kind] : registry.mocks[level][kind];
