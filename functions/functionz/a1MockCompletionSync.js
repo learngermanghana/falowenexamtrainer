@@ -336,7 +336,7 @@ const buildA1MockCompletionArtifacts = ({
       strongestArea: strongest,
       practiseNext: weakest,
       lesen: formatScore(sectionScores?.lesen),
-      ...(isKombiMock(mockId) ? {} : {hoeren: formatScore(sectionScores?.hoeren)}),
+      ...(isKombiMock(mockId) && overall?.assessmentVersion !== "four-module-v2" ? {} : {hoeren: formatScore(sectionScores?.hoeren)}),
       schreiben: formatScore(sectionScores?.schreiben),
       sprechen: formatScore(sectionScores?.sprechen),
       notificationId,
