@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getBackendUrl } from "../services/backendUrl";
 import "./HomepageBooksCarousel.css";
 
 const SLIDES = Object.freeze([
@@ -10,7 +9,7 @@ const SLIDES = Object.freeze([
     summary: "Learn step by step with beginner grammar, vocabulary and guided workbook practice.",
     cover: "/books/a1-cover.svg",
     label: "A1 coursebook",
-    href: "/books",
+    href: "/books/deutsch-a1-course-workbook",
   }),
   Object.freeze({
     id: "writing-skills-a1-c2",
@@ -19,14 +18,14 @@ const SLIDES = Object.freeze([
     summary: "Build better sentences, letters and essays with practical examples and exercises.",
     cover: "/books/writing-skills-a1-c2-cover.svg",
     label: "German writing handbook",
-    href: "/books",
+    href: "/books/how-to-unlock-your-german-writing-skills-a1-c2",
   }),
   Object.freeze({
     id: "a1-writing-model-exams",
     title: "A1 Writing Model Exams",
     subtitle: "Forms, emails & model answers",
     summary: "Six writing practice exams with guided tasks and annotated answers.",
-    level: "A1", kind: "writing", label: "A1 exam guide",
+    cover: "/books/a1-writing-exams-cover.svg", label: "A1 exam guide",
     href: "/books/goethe-a1-writing-model-exams",
   }),
   Object.freeze({
@@ -34,7 +33,7 @@ const SLIDES = Object.freeze([
     title: "A2 Exam Preparation",
     subtitle: "Lesen · Hören · Schreiben · Sprechen",
     summary: "Four-skills practice with listening scripts, writing guidance and speaking tasks.",
-    level: "A2", kind: "four-skills", label: "A2 exam guide",
+    cover: "/books/a2-exam-guide-cover.svg", label: "A2 exam guide",
     href: "/books/goethe-a2-four-skills-exam-guide",
   }),
   Object.freeze({
@@ -42,50 +41,21 @@ const SLIDES = Object.freeze([
     title: "B1 Exam Preparation",
     subtitle: "Four-Skills Preparation Guide",
     summary: "Reading strategies, listening scripts, writing models and speaking practice.",
-    level: "B1", kind: "four-skills", label: "B1 exam guide",
+    cover: "/books/b1-exam-guide-cover.svg", label: "B1 exam guide",
     href: "/books/goethe-b1-four-skills-exam-guide",
   }),
 ]);
 
 function Cover({ slide }) {
-  if (slide.cover) {
-    return <img className="home-books-cover-image" src={slide.cover}
-      alt={slide.title + " book cover"} loading="lazy" />;
-  }
-  return (
-    <div className={"home-books-illustrated-cover home-books-cover-" + slide.level.toLowerCase()}
-      aria-label={slide.title + " illustrated book cover"} role="img">
-      <div className="home-books-cover-brand">FALOWEN · BOOKS</div>
-      <div className="home-books-cover-rule" />
-      <div className="home-books-cover-level">{slide.level}</div>
-      <div className="home-books-cover-title">Goethe-style<br />exam preparation</div>
-      <div className="home-books-cover-tag">{slide.kind === "writing" ? "WRITING MODEL EXAMS" : "FOUR-SKILLS GUIDE"}</div>
-      <div className="home-books-cover-footer">Learn Language Education Academy</div>
-    </div>
-  );
+  return <img className="home-books-cover-image" src={slide.cover}
+    alt={slide.title + " book cover"} loading="lazy" />;
 }
 
 export default function HomepageBooksCarousel() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [offers, setOffers] = useState([]);
-  const [titles, setTitles] = useState([]);
   const touchStart = useRef(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    const abort = new AbortController();
-    fetch(getBackendUrl() + "/books/catalog", { signal: abort.signal })
-      .then(response => response.ok ? response.json() : Promise.reject(new Error("catalog unavailable")))
-      .then(data => {
-        if (!cancelled) {
-          setOffers(Array.isArray(data.books) ? data.books : []);
-          setTitles(Array.isArray(data.catalogTitles) ? data.catalogTitles : []);
-        }
-      })
-      .catch(() => {}); // All book details still have working links if the catalogue is offline.
-    return () => { cancelled = true; abort.abort(); };
-  }, []);
 
   useEffect(() => {
     if (paused || (typeof window !== "undefined" &&
@@ -98,10 +68,6 @@ export default function HomepageBooksCarousel() {
 
   const change = next => setActive((next + SLIDES.length) % SLIDES.length);
   const slide = SLIDES[active];
-  const liveTitle = titles.find(book => book.id === slide.id);
-  const purchasable = liveTitle?.status === "available" &&
-    liveTitle.bookIds?.some(id => offers.some(offer => offer.id === id));
-  const primaryLabel = purchasable ? "View book editions" : "View book details";
 
   return (
     <section className="home-books-carousel" aria-label="Explore Falowen German books">
@@ -129,7 +95,7 @@ export default function HomepageBooksCarousel() {
           <h4>{slide.title}</h4>
           <p className="home-books-subtitle">{slide.subtitle}</p>
           <p className="home-books-summary">{slide.summary}</p>
-          <a className="home-books-primary" href={slide.href}>{primaryLabel} <span aria-hidden="true">→</span></a>
+          <a className="home-books-primary" href={slide.href}>View Book <span aria-hidden="true">→</span></a>
           <span className="home-books-counter">{active + 1} / {SLIDES.length} books</span>
         </div>
       </div>
