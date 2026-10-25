@@ -1,0 +1,58 @@
+name: A2 Kombipruefung Mocks 4-8 tests
+on:
+  pull_request:
+    paths:
+      - "web/src/data/a2Kombi*"
+      - "web/src/components/A2Kombi*"
+      - "web/src/components/A2FinalMockExamPage.jsx"
+      - "web/src/data/mockExamCatalog.js"
+      - "web/src/App.js"
+      - "functions/functionz/a2Kombi*"
+      - "functions/functionz/a2MockCompletionSync.js"
+      - "functions/functionz/a2MockExaminerScore.js"
+      - "functions/functionz/assessmentTaskContext.js"
+      - "functions/functionz/tests/a2KombiMocks04to08.test.cjs"
+      - ".github/workflows/a2-kombi-mocks-tests.yml"
+  push:
+    branches: [main]
+    paths:
+      - "web/src/data/a2Kombi*"
+      - "web/src/components/A2Kombi*"
+      - "functions/functionz/a2Kombi*"
+      - ".github/workflows/a2-kombi-mocks-tests.yml"
+permissions:
+  contents: read
+jobs:
+  a2-server-grading:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check syntax and reject incomplete mock score contract
+        run: |
+          node --check functions/functionz/a2MockCompletionSync.js
+          node --check functions/functionz/a2KombiMockContract.js
+          node --check functions/functionz/a2KombiReadingKeys.js
+          node --check functions/functionz/a2KombiTaskSets.js
+          node --check functions/functionz/a2MockExaminerScore.js
+          node --check functions/functionz/app.js
+          node --test functions/functionz/tests/a2KombiMocks04to08.test.cjs
+  a2-student-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --legacy-peer-deps --no-audit --no-fund
+        working-directory: web
+      - run: npx jest --runInBand --runTestsByPath src/components/A2KombiMockIntegration.test.jsx
+        working-directory: web
+        env:
+          CI: true
