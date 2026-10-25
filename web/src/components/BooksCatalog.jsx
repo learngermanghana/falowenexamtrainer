@@ -24,6 +24,12 @@ export const matchCatalogTitles = (titles = [], search = "", level = "all", form
   });
 };
 
+const GUIDE_URLS = Object.freeze({
+  "a1-writing-model-exams": "/books/goethe-a1-writing-model-exams",
+  "a2-four-skills-exam-guide": "/books/goethe-a2-four-skills-exam-guide",
+  "b1-four-skills-exam-guide": "/books/goethe-b1-four-skills-exam-guide",
+});
+
 export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook }) {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
@@ -85,16 +91,16 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
             </div>) : <p className="fb-library-coming">Coming soon · Price to be announced</p>}
           </div>
           {available && offers.length
-            ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
-                onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
+            ? GUIDE_URLS[title.id]
+              ? <a className="fb-btn fb-btn-soft fb-library-action" href={GUIDE_URLS[title.id]}>
+                  View editions and buy</a>
+              : <button className="fb-btn fb-btn-soft fb-library-action" type="button"
+                  onClick={() => onSelectBook(offers[0].id)}>{title.id === "writing-skills-a1-c2" ? "View writing guide and buy" : "View book and editions"}</button>
             : <div>
-                {["a1-writing-model-exams", "a2-four-skills-exam-guide"].includes(title.id)
-                  ? <a className="fb-btn fb-btn-soft fb-library-action" href={
-                      title.id === "a1-writing-model-exams"
-                        ? "/books/goethe-a1-writing-model-exams"
-                        : "/books/goethe-a2-four-skills-exam-guide"
-                    }>View upcoming book</a> : null}
-                <p className="fb-library-pending">This book is being prepared. Checkout is not available yet.</p>
+                {GUIDE_URLS[title.id]
+                  ? <a className="fb-btn fb-btn-soft fb-library-action" href={GUIDE_URLS[title.id]}>
+                      View book details</a> : null}
+                <p className="fb-library-pending">Please check availability before ordering.</p>
               </div>}
         </article>;
       })}

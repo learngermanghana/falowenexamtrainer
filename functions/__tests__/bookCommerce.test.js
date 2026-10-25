@@ -79,32 +79,28 @@ test("wrong reference or customer cannot complete an order", async () => {
   }
 });
 
-test("new independent exam guides are catalogue-only until private fulfilment is available", () => {
-  for (const [id,pages,level] of [
-    ["a1-writing-model-exams",30,"A1"],
-    ["a2-four-skills-exam-guide",50,"A2"],
-  ]) {
+test("independent A1 A2 B1 exam guides use approved benchmark-derived prices and catalogues", () => {
+  const expectations = [
+    ["a1-writing-model-exams",30,"A1",29,100],
+    ["a2-four-skills-exam-guide",50,"A2",39,200],
+    ["b1-four-skills-exam-guide",50,"B1",39,200],
+  ];
+  for (const [id,pages,level,digital,printed] of expectations) {
     const item = BOOK_CATALOG_TITLES.find(book => book.id === id);
-    assert.ok(item);
-    assert.equal(item.status, "coming_soon");
+    assert.ok(item, id);
+    assert.equal(item.status, "available");
     assert.equal(item.pages, pages);
     assert.deepEqual(item.levelTags, [level]);
-    assert.deepEqual(item.bookIds, []);
-    assert.match(item.description, /not an official Goethe-Institut publication/i);
+    assert.deepEqual(item.bookIds,[id+"-digital",id+"-printed"]);
+    assert.equal(BOOKS[id+"-digital"].priceGhs,digital);
+    assert.equal(BOOKS[id+"-printed"].priceGhs,printed);
+    assert.equal(BOOKS[id+"-digital"].format,"digital");
+    assert.equal(BOOKS[id+"-printed"].format,"printed");
+    assert.match(item.description, /Not an official Goethe-Institut publication/i);
   }
-  assert.equal(Object.keys(BOOKS).length, 3);
-  assert.ok(!BOOKS["a1-writing-model-exams"]);
-  assert.ok(!BOOKS["a2-four-skills-exam-guide"]);
-});
-
-
-test("B1 50-page independent exam guide is visible but never purchasable by accident",()=>{
- const book=BOOK_CATALOG_TITLES.find(item=>item.id==="b1-four-skills-exam-guide");
- assert.ok(book);
- assert.equal(book.pages,50);
- assert.deepEqual(book.levelTags,["B1"]);
- assert.equal(book.status,"coming_soon");
- assert.deepEqual(book.bookIds,[]);
- assert.match(book.description,/Not an official Goethe-Institut publication/);
- assert.equal(BOOKS["b1-four-skills-exam-guide-digital"],undefined);
+  // Existing retail prices and their checkout IDs must remain unchanged.
+  assert.equal(BOOKS["a1-digital"].priceGhs, 99);
+  assert.equal(BOOKS["a1-printed"].priceGhs, 800);
+  assert.equal(BOOKS["writing-skills-a1-c2-digital"].priceGhs, 39);
+  assert.equal(Object.keys(BOOKS).length,9);
 });

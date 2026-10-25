@@ -1,14 +1,21 @@
 "use strict";
 const crypto = require("crypto");
 const { registerPrivateBookDeliveryRoute, DIGITAL_BOOK_OBJECTS } = require("./privateBookDelivery");
+const { pricePrintedGuide, priceDigitalExamGuide } = require("./bookPricing");
 
 const BOOKS = Object.freeze({
   "a1-digital": Object.freeze({ id: "a1-digital", title: "Falowen Deutsch A1 – Digital Course & Workbook", format: "digital", priceGhs: 99 }),
   "a1-printed": Object.freeze({ id: "a1-printed", title: "Falowen Deutsch A1 – Printed Course & Workbook", format: "printed", priceGhs: 800 }),
   "writing-skills-a1-c2-digital": Object.freeze({ id: "writing-skills-a1-c2-digital", title: "How to Unlock Your German Writing Skills (A1–C2)", format: "digital", priceGhs: 39 }),
+  "a1-writing-model-exams-digital": Object.freeze({ id: "a1-writing-model-exams-digital", title: "Falowen A1 Writing Model Exams & Practice Workbook — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:1}) }),
+  "a1-writing-model-exams-printed": Object.freeze({ id: "a1-writing-model-exams-printed", title: "Falowen A1 Writing Model Exams & Practice Workbook — Printed", format: "printed", priceGhs: pricePrintedGuide(30) }),
+  "a2-four-skills-exam-guide-digital": Object.freeze({ id: "a2-four-skills-exam-guide-digital", title: "Falowen A2 Four-Skills Exam Preparation Guide — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:4}) }),
+  "a2-four-skills-exam-guide-printed": Object.freeze({ id: "a2-four-skills-exam-guide-printed", title: "Falowen A2 Four-Skills Exam Preparation Guide — Printed", format: "printed", priceGhs: pricePrintedGuide(50) }),
+  "b1-four-skills-exam-guide-digital": Object.freeze({ id: "b1-four-skills-exam-guide-digital", title: "Falowen B1 Four-Skills Exam Preparation Guide — PDF", format: "digital", priceGhs: priceDigitalExamGuide({skills:4}) }),
+  "b1-four-skills-exam-guide-printed": Object.freeze({ id: "b1-four-skills-exam-guide-printed", title: "Falowen B1 Four-Skills Exam Preparation Guide — Printed", format: "printed", priceGhs: pricePrintedGuide(50) }),
 });
 // Public discovery metadata, separate from the server-authoritative purchasable SKU list.
-// Only vetted SKUs listed in BOOKS are accepted by /books/checkout.
+// Prices for the three independent guides come from the Academy A1 benchmark.
 const BOOK_CATALOG_TITLES = Object.freeze([
   Object.freeze({
     id: "a1-course-workbook",
@@ -37,21 +44,21 @@ const BOOK_CATALOG_TITLES = Object.freeze([
     title: "Goethe-Zertifikat A1: Writing Model Exams & Practice Workbook",
     description: "30-page independent Falowen A1 Schreiben practice guide, with six model form-and-message tasks, grammar support, writing space and annotated solutions. Not an official Goethe-Institut publication.",
     levelTags: ["A1"], topics: ["goethe", "schreiben", "writing", "formulare", "model exams", "start deutsch 1"],
-    formats: ["digital", "printed"], pages: 30, status: "coming_soon", bookIds: [],
+    formats: ["digital", "printed"], pages: 30, status: "available", bookIds: ["a1-writing-model-exams-digital", "a1-writing-model-exams-printed"],
   }),
   Object.freeze({
     id: "a2-four-skills-exam-guide",
     title: "Goethe-Zertifikat A2: Four-Skills Exam Preparation Guide",
     description: "50-page independent Falowen guide to Lesen, Hören listening-script tasks, Schreiben and Sprechen, with model answers and exam strategies. Not an official Goethe-Institut publication; audio is not included.",
     levelTags: ["A2"], topics: ["goethe", "lesen", "hoeren", "hören", "schreiben", "sprechen", "exam guide"],
-    formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
+    formats: ["digital", "printed"], pages: 50, status: "available", bookIds: ["a2-four-skills-exam-guide-digital", "a2-four-skills-exam-guide-printed"],
   }),
   Object.freeze({
     id: "b1-four-skills-exam-guide",
     title: "Goethe-Zertifikat B1: Four-Skills Exam Preparation Guide",
     description: "50-page independent Falowen B1 exam preparation guide for Lesen, Hören script-based practice, Schreiben and Sprechen with strategies, explanations and worked examples. Not an official Goethe-Institut publication; audio is not included.",
     levelTags: ["B1"], topics: ["goethe", "lesen", "hören", "hoeren", "schreiben", "sprechen", "exam guide", "b1"],
-    formats: ["digital", "printed"], pages: 50, status: "coming_soon", bookIds: [],
+    formats: ["digital", "printed"], pages: 50, status: "available", bookIds: ["b1-four-skills-exam-guide-digital", "b1-four-skills-exam-guide-printed"],
   }),
 ]);
 const CALLBACK_ORIGIN = "https://www.falowen.app";
@@ -77,7 +84,8 @@ function registerBookCommerceRoutes(app, { admin }) {
   });
 
   // Public checkout: customers do not need to be Falowen students.
-  // Fulfilment and automatic PDF access will be introduced in a later phase.
+  // Digital delivery is automatic for paid guide receipts when the private R2
+  // signing feature is active; otherwise Falowen arranges fulfilment manually.
   app.post("/books/checkout", async (req, res) => {
     if (!paymentsEnabled()) return res.status(503).json({ error: "Book payments are not open yet." });
     try {

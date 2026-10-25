@@ -51,3 +51,29 @@ describe("Falowen Books discovery, currency and checkout safety", () => {
     expect(screen.getByRole("button", { name: "View writing guide and buy" })).toBeInTheDocument();
   });
 });
+
+test("priced A1 A2 B1 guide catalog cards show editions and direct buyers to each own page", () => {
+  const titles = [
+    ["a1-writing-model-exams","goethe-a1-writing-model-exams","A1",30,29,100],
+    ["a2-four-skills-exam-guide","goethe-a2-four-skills-exam-guide","A2",50,39,200],
+    ["b1-four-skills-exam-guide","goethe-b1-four-skills-exam-guide","B1",50,39,200],
+  ];
+  const items = titles.map(([id,,level,pages])=>({
+    id,title:"Falowen "+level+" Exam Guide",description:"Independent exam guide",
+    levelTags:[level],topics:["exam"],formats:["digital","printed"],pages,
+    status:"available",bookIds:[id+"-digital",id+"-printed"],
+  }));
+  const offers = titles.flatMap(([id,,,,pdf,print])=>[
+    {id:id+"-digital",format:"digital",priceGhs:pdf},
+    {id:id+"-printed",format:"printed",priceGhs:print},
+  ]);
+  render(<BooksCatalog catalogTitles={items} books={offers} onSelectBook={jest.fn()} />);
+  for(const [id,slug] of titles) {
+    const link=screen.getAllByRole("link",{name:"View editions and buy"})
+      .find(a=>a.getAttribute("href")==="/books/"+slug);
+    expect(link).toBeTruthy();
+  }
+  expect(screen.getAllByText("GH₵200.00")).toHaveLength(2);
+  expect(screen.queryByText(/Coming soon/)).not.toBeInTheDocument();
+  expect(screen.getAllByText("Printed on demand")).toHaveLength(3);
+});
