@@ -90,7 +90,7 @@ if (leaked.length) {
   // paragraphs, learner names, draft contents or PDF snippets in Actions.
   const locations = level === "A2"
     ? forbidden.filter(([, expression]) => expression.test(text)).map(([name, expression]) => {
-      const pages = text.split("\\f").flatMap((content, index) =>
+      const pages = text.split("\f").flatMap((content, index) =>
         expression.test(content) ? [index + 1] : []);
       return name + " (pages " + pages.slice(0, 25).join(", ") + ")";
     }).join("; ")
