@@ -17,7 +17,7 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
     const route = `/campus/course/a1-final-mock-${n}`;
     expect(getMockExam(id)).toMatchObject({
       id, questionSetId: mockId, status: "preview",
-      mode: "kombi", route, sections: n<=5 ? ["Lesen","Hören","Schreiben","Sprechen"] : ["Lesen", "Schreiben", "Sprechen"],
+      mode: n<=5 ? "full" : "kombi", route, sections: n<=5 ? ["Lesen","Hören","Schreiben","Sprechen"] : ["Lesen", "Schreiben", "Sprechen"],
     });
     expect(getMockExamsForLevel("A1").find(x => x.id === id)).toBeDefined();
     expect(app).toContain(`path="${route}"`);
@@ -45,7 +45,7 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
     expect(engine).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId)');
     expect(engine).toContain('const hasHoren = !isKombi || (hasPublishedListening');
     expect(engine).toContain('moveToSection(hasHoren ? "hoeren" : "schreiben"');
-    expect(engine).toContain('isKombi && stage === "schreiben" ? 15 * 60');
+    expect(engine).toContain('isKombiThree && stage === "schreiben" ? 15 * 60');
     expect(engine).toContain('isKombiThree ? "Start or resume 3 modules"');
     expect(engine).toContain('isKombi ? kombiSet.speaking');
     expect(engine).toContain('isKombi ? <A1KombiReadingSection');
