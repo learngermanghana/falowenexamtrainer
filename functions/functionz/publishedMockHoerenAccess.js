@@ -2,13 +2,19 @@
 
 const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 
-// These are the *exact* MP3 keys referenced by the existing, already
-// accessible A1/A2 Mock 1 lesson manifests. Never wildcard their directories.
-// All other canonical mock keys must be explicitly released server-side.
+// Exact, teacher-supplied A1 Mock 04/05 recordings share the same code-owned
+// protected-audio release path as the existing Mock 01 keys. No directory
+// wildcard is allowed. Other mocks still require an approved server manifest.
 const EXISTING_RELEASED_CANONICAL_KEYS = new Set([
   "a1/mock-hoeren/mock-01/teil-1.mp3",
   "a1/mock-hoeren/mock-01/teil-2.mp3",
   "a1/mock-hoeren/mock-01/teil-3.mp3",
+  "a1/mock-hoeren/mock-04/teil-1.mp3",
+  "a1/mock-hoeren/mock-04/teil-2.mp3",
+  "a1/mock-hoeren/mock-04/teil-3.mp3",
+  "a1/mock-hoeren/mock-05/teil-1.mp3",
+  "a1/mock-hoeren/mock-05/teil-2.mp3",
+  "a1/mock-hoeren/mock-05/teil-3.mp3",
   "a2/mock-hoeren/mock-01/teil-1.mp3",
   "a2/mock-hoeren/mock-01/teil-2.mp3",
   "a2/mock-hoeren/mock-01/teil-3.mp3",
@@ -40,8 +46,8 @@ async function isReleasedMockHoerenAudio({ db, level, mockId, part, key } = {}) 
   if (!isCanonicalMockHoerenObjectKey(normalized)) return true;
 
   if (EXISTING_RELEASED_CANONICAL_KEYS.has(normalized.key) &&
-      normalized.mockId === "mock-01" &&
-      (normalized.level === "A1" || normalized.level === "A2")) return true;
+      ((normalized.level === "A1" && ["mock-01", "mock-04", "mock-05"].includes(normalized.mockId)) ||
+       (normalized.level === "A2" && normalized.mockId === "mock-01"))) return true;
 
   if (!db || typeof db.collection !== "function") return false;
   const documentId = `${normalized.level.toLowerCase()}-${normalized.mockId}`;
