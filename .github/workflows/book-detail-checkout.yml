@@ -1,0 +1,28 @@
+name: Book detail and checkout regression
+on:
+  pull_request:
+    paths:
+      - 'web/src/components/Book*'
+      - 'web/src/components/ExamGuide*'
+      - 'web/src/App.js'
+      - 'web/public/books/**'
+      - 'functions/functionz/bookCommerce.js'
+      - 'functions/__tests__/bookCheckoutFlow.test.js'
+      - '.github/workflows/book-detail-checkout.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --prefix web --ignore-scripts
+      - run: node --test functions/__tests__/bookCheckoutFlow.test.js functions/__tests__/bookCommerce.test.js functions/__tests__/bookReceiptVerification.test.js functions/functionz/bookPricing.test.js functions/functionz/privateBookDelivery.test.js
+      - working-directory: web
+        run: npx jest --runInBand --runTestsByPath src/components/BookStoreCheckout.test.js src/components/ExamGuideStorefront.test.jsx src/components/BooksCatalog.test.jsx

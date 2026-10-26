@@ -9,7 +9,7 @@ beforeEach(()=>{
     if (String(url).includes("/books/catalog")) return {ok:true,json:async()=>({
       paymentsEnabled:true,
       catalogTitles:["a1-writing-model-exams","a2-four-skills-exam-guide","b1-four-skills-exam-guide"].map(id=>({
-        id,status:"available",bookIds:[id+"-digital",id+"-printed"],
+        id,title:id,description:"Independent guide",levelTags:["A1"],pages:50,status:"available",bookIds:[id+"-digital",id+"-printed"],
       })),
       books:[
         {id:"a1-writing-model-exams-digital",priceGhs:29,format:"digital"},
@@ -34,11 +34,11 @@ test.each([
   const {unmount}=render(<ExamGuideComingSoon slug={slug}/>);
   await screen.findByText(digital);
   expect(screen.getByText(printed)).toBeInTheDocument();
-  expect(screen.getByRole("button",{name:new RegExp("Continue to Paystack")})).toBeEnabled();
-  expect(screen.getByText(/Paystack charges in Ghana cedis/)).toBeInTheDocument();
-  const printedOption=screen.getByRole("radio",{name:/Printed on demand/});
+  expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute("href",`/books/${slug}/checkout?edition=${slug.replace(/^goethe-/, "")}-digital`);
+  expect(screen.queryByLabelText("Full name")).not.toBeInTheDocument();
+  const printedOption=screen.getByRole("radio",{name:/Printed book/});
   fireEvent.click(printedOption);
-  expect(screen.getByRole("button",{name:new RegExp(printed.replace("₵","."))})).toBeInTheDocument();
+  expect(screen.getByRole("link",{name:"Buy Now"})).toHaveAttribute("href",`/books/${slug}/checkout?edition=${slug.replace(/^goethe-/, "")}-printed`);
   expect(screen.queryByText(/Coming soon/)).not.toBeInTheDocument();
   unmount();
 });
@@ -46,7 +46,7 @@ test.each([
 test("failed catalogue does not create misleading checkout or client-side prices",async()=>{
   global.fetch=jest.fn().mockRejectedValue(new Error("offline"));
   render(<ExamGuideComingSoon slug="goethe-b1-four-skills-exam-guide"/>);
-  await waitFor(()=>expect(screen.getByText(/Secure checkout is currently unavailable/)).toBeInTheDocument());
+  await waitFor(()=>expect(screen.getByText(/Book information is unavailable/)).toBeInTheDocument());
   expect(screen.queryByRole("button",{name:/Continue to Paystack/})).not.toBeInTheDocument();
 });
 

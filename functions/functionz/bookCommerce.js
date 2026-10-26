@@ -95,7 +95,20 @@ function registerBookCommerceRoutes(app, { admin }) {
       const name = String(req.body?.name || "").trim().replace(/\s+/g, " ");
       const email = String(req.body?.email || "").trim().toLowerCase();
       const phone = String(req.body?.phone || "").trim();
-      if (!book) return res.status(400).json({ error: "Choose a valid book." });
+      if (!book || !BOOK_CATALOG_TITLES.some(title => title.status === "available" && title.bookIds.includes(requestedBookId))) {
+        return res.status(400).json({ error: "Choose an available book." });
+      }
+      const quantity = req.body?.quantity === undefined ? 1 : req.body.quantity;
+      if (!Number.isInteger(quantity) || quantity < 1 || quantity > 20 || (book.format === "digital" && quantity !== 1)) {
+        return res.status(400).json({ error: "Choose 1–20 printed copies or one digital copy." });
+      }
+      const deliveryMethod = book.format === "printed" ? String(req.body?.deliveryMethod || "collection") : "digital";
+      const deliveryAddress = book.format === "printed" && deliveryMethod === "delivery" ? String(req.body?.deliveryAddress || "").trim() : "";
+      if (book.format === "printed" && (!["collection", "delivery"].includes(deliveryMethod) ||
+          (deliveryMethod === "delivery" && (deliveryAddress.length < 5 || deliveryAddress.length > 500)))) {
+        return res.status(400).json({ error: "Choose collection or enter a valid delivery address." });
+      }
+      const totalGhs = book.priceGhs * quantity;
       if (name.length < 3 || name.length > 120 || email.length > 254 || !allowedEmail.test(email)
         || !/^\+?[0-9\s()-]{8,25}$/.test(phone)) {
         return res.status(400).json({ error: "Enter a valid name, email, and contact number." });
@@ -106,7 +119,7 @@ function registerBookCommerceRoutes(app, { admin }) {
       const orderId = crypto.randomUUID();
       const lookupKey = crypto.randomBytes(24).toString("hex");
       // Books use an all-in sticker price; Falowen absorbs the gateway fee.
-      const checkoutPesewas = moneyToPesewas(book.priceGhs);
+      const checkoutPesewas = moneyToPesewas(totalGhs);
       const callback = new URL("/books/complete", CALLBACK_ORIGIN);
       callback.searchParams.set("order", orderId);
       callback.searchParams.set("key", lookupKey);
@@ -116,7 +129,7 @@ function registerBookCommerceRoutes(app, { admin }) {
         body: JSON.stringify({
           email, currency: "GHS", amount: checkoutPesewas, callback_url: callback.toString(),
           metadata: {
-            productType: "falowen_book", orderId, bookId: book.id, priceGhs: book.priceGhs,
+            productType: "falowen_book", orderId, bookId: book.id, priceGhs: totalGhs, quantity, unitPriceGhs: book.priceGhs,
             format: book.format,
             custom_fields: [
               { display_name: "Product", variable_name: "product", value: book.title },
@@ -136,8 +149,9 @@ function registerBookCommerceRoutes(app, { admin }) {
       }
       await db().collection("bookOrders").doc(orderId).create({
         id: orderId, reference: String(payload.data.reference), bookId: book.id, title: book.title,
-        format: book.format, email, name, phone,
-        priceGhs: book.priceGhs, checkoutPesewas, lookupKeyHash: sha256(lookupKey),
+        format: book.format, email, name, phone, quantity, deliveryMethod, deliveryAddress,
+        unitPriceGhs: book.priceGhs,
+        priceGhs: totalGhs, checkoutPesewas, lookupKeyHash: sha256(lookupKey),
         status: "pending", fulfilmentStatus: "not_started",
         deliveryIncluded: false, createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
@@ -165,6 +179,7 @@ function registerBookCommerceRoutes(app, { admin }) {
       )) return res.status(403).json({ error: "Invalid order link." });
       return res.json({
         orderId: id, title: order.title, format: order.format, priceGhs: order.priceGhs,
+        quantity: order.quantity || 1, deliveryMethod: order.deliveryMethod || null,
         status: order.status === "paid" ? "paid" : order.status === "rejected" ? "rejected" : "pending",
         reference: order.reference, // private lookup key required before exposing receipt reference
         deliveryIncluded: false,
