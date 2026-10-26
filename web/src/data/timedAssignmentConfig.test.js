@@ -15,7 +15,7 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("A1-11")).toBe(25 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-12.1")).toBe(25 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-12.2")).toBe(25 * 60);
-    expect(getTimedAssignmentDurationSeconds("A1-12.3")).toBe(30 * 60);
+    expect(getTimedAssignmentDurationSeconds("A1-12.3")).toBe(20 * 60);
     expect(getTimedAssignmentConfig("A1-12.3")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("A1-13")).toBe(35 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-14.1")).toBe(30 * 60);

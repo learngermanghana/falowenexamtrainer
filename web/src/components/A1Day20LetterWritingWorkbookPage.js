@@ -5,230 +5,50 @@ import A1TutorMarkedWorkbookShell, { WorkbookSection } from "./A1TutorMarkedWork
 import A1CourseBookLetterPracticePanel from "./A1CourseBookLetterPracticePanel";
 import "./A1Day20LetterWritingWorkbookPage.css";
 
-const sectionStyle = {
-  ...styles.card,
-  display: "grid",
-  gap: 14,
-  marginBottom: 0,
-};
-
-const infoBoxStyle = {
-  border: "1px solid #e2e8f0",
-  borderRadius: 14,
-  padding: 14,
-  display: "grid",
-  gap: 10,
-  background: "#ffffff",
-};
-
-const eyebrowStyle = {
-  display: "inline-flex",
-  width: "fit-content",
-  padding: "6px 12px",
-  borderRadius: 999,
-  background: "#dbeafe",
-  color: "#1d4ed8",
-  fontSize: 13,
-  fontWeight: 800,
-};
-
-const questionCardStyle = {
-  border: "1px solid #bfdbfe",
-  borderRadius: 18,
-  padding: 18,
-  display: "grid",
-  gap: 12,
-  background: "linear-gradient(135deg, #eff6ff, #ffffff 70%)",
-};
-
-const InfoBox = ({ title, children }) => (
-  <div style={infoBoxStyle}>
-    {title ? <strong>{title}</strong> : null}
-    {children}
-  </div>
-);
-
-const BulletList = ({ items, ordered = false }) => {
-  const Tag = ordered ? "ol" : "ul";
-  return (
-    <Tag style={{ margin: 0, paddingLeft: 24, display: "grid", gap: 8, lineHeight: 1.7 }}>
-      {items.map((item) => <li key={item}>{item}</li>)}
-    </Tag>
-  );
-};
-
-const InformalLetterPractice = () => (
-  <A1CourseBookLetterPracticePanel
-    title="Mark My Informal Letter"
-    description="Write or paste your birthday letter here. Falowen will mark it and explain the corrections before you copy the improved version to Submit Assignment."
-    taskId="A1-12.3-teil-1-informal-letter"
-    taskTitle="Informal birthday letter to a friend"
-    taskContext="informal birthday note to a friend using du, dir and an informal closing"
-    letterType="informal"
-    promptType="note"
-    placeholder={"Hallo Anna,\n\nwie geht es dir? Ich schreibe dir, weil ...\n\nLiebe Grüße\nMia"}
-    minimumWords={35}
-    maximumWords={50}
-  />
-);
-
-const FormalLetterPractice = () => (
-  <A1CourseBookLetterPracticePanel
-    title="Mark My Formal Letter"
-    description="Write or paste your enquiry to the language school here. Improve it with the feedback before copying the final version to Submit Assignment."
-    taskId="A1-12.3-teil-2-formal-letter"
-    taskTitle="Formal enquiry to a language school"
-    taskContext="formal email to a language school using Sie, Ihnen, a formal greeting and a formal closing"
-    letterType="formal"
-    promptType="email"
-    placeholder={"Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ...\n\nMit freundlichen Grüßen\nMax Mustermann"}
-    minimumWords={35}
-    maximumWords={50}
-  />
-);
-
-const WorkbookOverview = () => (
-  <section
-    style={{ ...sectionStyle, border: "1px solid #93c5fd", background: "#eff6ff" }}
-    data-a1-day20-chapter123-workbook-overview="true"
-  >
-    <span style={eyebrowStyle}>Tutor-marked assignment · Kapitel 12.3</span>
-    <h2 style={{ margin: 0 }}>How this workbook is organised</h2>
-    <p style={{ margin: 0, lineHeight: 1.7 }}>
-      Use the shared navigation: <strong>Overview</strong>, <strong>Teil 1</strong>,{" "}
-      <strong>Teil 2</strong>, and <strong>Submit Assignment</strong>. Open each Teil, write the letter,
-      use <strong>Mark My Letter</strong> below the task, and improve it before final submission.
-    </p>
-  </section>
-);
-
-const InformalLetterSection = () => (
-  <section className="a1-day20-letter-task" style={questionCardStyle} data-a1-letter-task="informal">
-    <span style={{ ...eyebrowStyle, background: "#dcfce7", color: "#166534" }}>
-      Letter 1 · Informal
-    </span>
-    <h2 style={{ margin: 0 }}>Teil 1 · Informal letter: Birthday message</h2>
-    <InfoBox title="Situation">
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Ihr Freund / Ihre Freundin hat Geburtstag. Sie möchten gratulieren und mehr über die
-        Geburtstagsfeier wissen.
-      </p>
-    </InfoBox>
-    <InfoBox title="Aufgabe">
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie eine kurze Nachricht. Schreiben Sie etwas zu allen Punkten:
-      </p>
-      <BulletList
-        ordered
-        items={[
-          "Sagen Sie, warum Sie schreiben.",
-          "Gratulieren Sie zum Geburtstag.",
-          "Fragen Sie: Gibt es eine Feier?",
-          "Fragen Sie: Kann Ihre Familie mitkommen?",
-        ]}
-      />
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie höchstens fünf kurze Sätze im Hauptteil. Schreiben Sie außerdem eine passende
-        Anrede, einen Gruß und Ihren Namen.
-      </p>
-    </InfoBox>
-    <div className="a1-day20-write-here" data-a1-day20-write-here="teil-1">
-      <div className="a1-day20-write-here__prompt">
-        <strong>Write Teil 1 here</strong>
-        <span>Answer the four points above, then ask Falowen to mark your draft.</span>
-      </div>
-      <InformalLetterPractice />
-    </div>
-    <InfoBox title="Use">
-      <BulletList
-        items={[
-          "du, dir, dich, dein/deine",
-          "Hallo, Liebe, or Lieber",
-          "Liebe Grüße or Viele Grüße",
-          "Geburtstag = birthday; gratulieren = to congratulate.",
-          "Use möchte for the reason: Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.",
-          "Feier = party / celebration. Ask: Gibt es eine Feier?",
-          "Use Kann ...? for a yes/no question: Kann meine Familie mitkommen?",
-        ]}
-      />
-    </InfoBox>
-  </section>
-);
-
-const FormalLetterSection = () => (
-  <section className="a1-day20-letter-task" style={questionCardStyle} data-a1-letter-task="formal">
-    <span style={{ ...eyebrowStyle, background: "#ffedd5", color: "#9a3412" }}>
-      Letter 2 · Formal
-    </span>
-    <h2 style={{ margin: 0 }}>Teil 2 · Formal letter: Enquiry to a language school</h2>
-    <InfoBox title="Situation">
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Sie möchten einen Deutschkurs besuchen. Auf der Website einer Sprachschule fehlen
-        wichtige Informationen.
-      </p>
-    </InfoBox>
-    <InfoBox title="Aufgabe">
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie eine kurze E-Mail an die Sprachschule. Schreiben Sie etwas zu allen Punkten:
-      </p>
-      <BulletList
-        ordered
-        items={[
-          "Sagen Sie, warum Sie schreiben.",
-          "Fragen Sie: Wann beginnt der Kurs?",
-          "Fragen Sie: Wie viel kostet der Kurs?",
-          "Fragen Sie: Kann ich online bezahlen?",
-        ]}
-      />
-      <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Schreiben Sie höchstens fünf kurze Sätze im Hauptteil. Schreiben Sie außerdem eine passende
-        Anrede, einen formellen Gruß und Ihren vollständigen Namen.
-      </p>
-    </InfoBox>
-    <div className="a1-day20-write-here" data-a1-day20-write-here="teil-2">
-      <div className="a1-day20-write-here__prompt">
-        <strong>Write Teil 2 here</strong>
-        <span>Answer the four points above, then ask Falowen to mark your draft.</span>
-      </div>
-      <FormalLetterPractice />
-    </div>
-    <InfoBox title="Use">
-      <BulletList
-        items={[
-          "Sie, Ihnen, Ihr/Ihre",
-          "Sehr geehrte Damen und Herren,",
-          "Mit freundlichen Grüßen + full name",
-          "sich für einen Deutschkurs anmelden = to register for a German course.",
-          "Use möchte: Ich möchte mich für einen Deutschkurs anmelden.",
-          "For your introduction: Ich schreibe Ihnen, weil ich Deutsch lernen möchte.",
-          "Ask about dates: Wann beginnt der Kurs?",
-          "Ask the price: Wie viel kostet der Kurs?",
-          "Ask about payment: Kann ich online bezahlen?",
-        ]}
-      />
-    </InfoBox>
-  </section>
-);
-
+const card = { ...styles.card, display:"grid", gap:16, minWidth:0 };
+const fields = ["Kursart", "Kursbeginn — Monat", "Kursdauer — wie viele Wochen?", "Zimmerart im Wohnheim", "Zahlungsweise"];
 export default function A1Day20LetterWritingWorkbookPage() {
-  return (
-    <A1TutorMarkedWorkbookShell
-      fallbackAssignmentKey="A1-12.3"
-      title="A1 · Day 20 Workbook · Letter Writing"
-      subtitle="Kapitel 12.3 · Tutor-marked Schreiben assignment"
-      assignmentIntro="Use Overview, complete Teil 1 and Teil 2, check both drafts with Mark My Letter, then open Submit Assignment and send both final letters to your tutor."
-      submitTitle="Submit A1 · Day 20 · Kapitel 12.3"
-      submitDescription="Submit both the informal and formal letter together for tutor marking."
-      backLabel="Back to lesson"
-      backTo={A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE}
-    >
-      <WorkbookOverview />
-      <WorkbookSection sectionKey="teil-1">
-        <InformalLetterSection />
-      </WorkbookSection>
-      <WorkbookSection sectionKey="teil-2">
-        <FormalLetterSection />
-      </WorkbookSection>
-    </A1TutorMarkedWorkbookShell>
-  );
+  return <A1TutorMarkedWorkbookShell
+    fallbackAssignmentKey="A1-12.3"
+    title="A1 · Day 20 Workbook · Form Filling & Email Writing"
+    subtitle="Kapitel 12.3 · Tutor-marked Schreiben assignment"
+    assignmentIntro="Study Grammar first. Complete five form answers in Teil 1 and one email to Julia in Teil 2. Review both parts, then submit them together."
+    submitTitle="Submit A1 · Day 20 · Kapitel 12.3"
+    submitDescription="Submit all five form answers and your email to Julia together for tutor marking."
+    backLabel="Back to lesson" backTo={A1_DAY20_CHAPTER123_RESOURCE_HUB_ROUTE}>
+    <section style={card} data-a1-day20-chapter123-workbook-overview="true">
+      <h2>How this workbook is organised</h2>
+      <p>Teil 1: five short form answers (5 raw points). Teil 2: one informal email of approximately 30 words (10 raw points). The timed assignment lasts 20 minutes. Suggested pacing: 5 minutes for the form and 15 minutes for the email.</p>
+      <p>Use Grammar, Overview, Teil 1, Teil 2 and Review &amp; Submit. Your answers save into the assignment draft. Write independently during the timed attempt.</p>
+    </section>
+    <WorkbookSection sectionKey="teil-1">
+      <section style={card} data-a1-form-task="maria">
+        <h2>Teil 1 · Formular ausfüllen · 5 Punkte</h2>
+        <p>Ihre Freundin Maria Rossi kommt aus Rom und möchte in München Deutsch lernen. Sie besucht einen Intensivkurs an der Sprachschule Aktiv. Der Kurs beginnt im August und dauert vier Wochen. Maria möchte ein Einzelzimmer im Wohnheim. Sie bezahlt mit Kreditkarte.</p>
+        <p>Helfen Sie Maria. Schreiben Sie die fünf fehlenden Informationen in das Formular. Schreiben Sie keine ganzen Sätze.</p>
+        <h3>Anmeldung — Sprachschule Aktiv München</h3>
+        <p>Familienname: Rossi · Vorname: Maria · Wohnort: Rom</p>
+        <ol>{fields.map(field => <li key={field} style={{padding:"9px 0"}}><strong>{field}</strong>: ____________________</li>)}</ol>
+        <p>Enter answers 1–5 in the saved answer fields below. Match each answer to its numbered field.</p>
+      </section>
+    </WorkbookSection>
+    <WorkbookSection sectionKey="teil-2">
+      <section style={card} data-a1-letter-task="informal">
+        <h2>Teil 2 · E-Mail an Julia · 10 Punkte</h2>
+        <p>Sie feiern am Wochenende eine Party bei Ihnen zu Hause. Sie möchten Ihre Freundin Julia einladen. Schreiben Sie Julia eine E-Mail.</p>
+        <p>Schreiben Sie etwas zu allen drei Punkten:</p>
+        <ul><li><strong>Einladung:</strong> Laden Sie Julia zu Ihrer Party ein.</li><li><strong>Termin und Ort:</strong> An welchem Tag, um wie viel Uhr und an welcher Adresse findet die Party statt?</li><li><strong>Mitbringen:</strong> Bitten Sie Julia, etwas zu essen oder zu trinken mitzubringen.</li></ul>
+        <p>Schreiben Sie circa 30 Wörter. Schreiben Sie auch eine passende Anrede und einen Gruß. Benutzen Sie die du-Form.</p>
+        <div className="a1-day20-write-here" data-a1-day20-write-here="teil-2">
+          <strong>Write Teil 2 here</strong>
+          <A1CourseBookLetterPracticePanel title="Mark My Email to Julia"
+            description="Write your invitation here. Draft feedback is available outside the timed attempt. Your latest email is saved with this assignment."
+            taskId="A1-12.3-teil-2-julia-invitation" taskTitle="Invite Julia to a weekend party"
+            taskContext="Write an informal email of approximately 30 words to Julia. Cover exactly three content points: invite her to your party; give the day, time and home address; ask her to bring food or drinks. Use du, a suitable greeting, closing and your name. Assess each content point for understandable completion; do not treat greeting and closing as extra content points."
+            letterType="informal" promptType="email" placeholder="Write your own email to Julia…" minimumWords={25} maximumWords={40} />
+        </div>
+        <p>Before submitting: check all three points, your greeting, closing and name. Approximately 30 words is a target, not an exact word limit.</p>
+      </section>
+    </WorkbookSection>
+  </A1TutorMarkedWorkbookShell>;
 }

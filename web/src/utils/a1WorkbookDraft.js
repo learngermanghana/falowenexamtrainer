@@ -7,6 +7,7 @@ const normalizeAssignmentKey = (value = "") =>
 // Changed reading exercises must not reuse answers to the former questions.
 // Retain sections whose questions have not changed.
 const READING_REVISIONS = {
+  "A1-12.3": { revision: "form-and-julia-email-v1", sections: { "teil-1": 5, "teil-2": 0 } },
   "A1-2": { revision: "a1-day4-number-form-words-speaking-v2", sections: { "teil-1": 5, "teil-2": 5, "teil-3": 0 } },
   "A1-12.1": { revision: "a1-12.1-bahnhof-hoeren-v3", sections: { "teil-1": 5, "teil-2": 0, "teil-3": 5 } },
   "A1-4": { revision: "a1-4-goethe-speaking-v3", sections: { "teil-2": 0, "teil-3": 5 } },

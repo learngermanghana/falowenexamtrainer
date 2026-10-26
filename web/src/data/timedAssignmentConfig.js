@@ -83,8 +83,8 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   }),
   "A1-12.3": timed({
     level: "A1",
-    durationMinutes: 30,
-    scope: "Two complete letters",
+    durationMinutes: 20,
+    scope: "Five form answers and one approximately 30-word email",
     timedTabs: ["teil-1", "teil-2"],
     preparationLabel: A1_PREP,
     mode: "mock",

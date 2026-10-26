@@ -20,18 +20,9 @@ describe("LetterWritingIntroPage routing", () => {
     expect(resolveLetterWritingPageMode(A1_DAY20_CHAPTER123_WORKBOOK_ROUTE)).toBe("workbook");
   });
 
-  it("uses the standard A1 tutor-marked Assignment and Submit shell", () => {
-    expect(pageSource).toContain('import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell"');
-    expect(pageSource).toContain("<A1TutorMarkedWorkbookShell");
-    expect(pageSource).toContain('day={20}');
-    expect(pageSource).toContain('chapter="12.3"');
-    expect(pageSource).toContain('fallbackAssignmentKey="A1-12.3"');
-    expect(pageSource).toContain("Tutor-marked Schreiben assignment");
-  });
-
-  it("keeps only the two required writing questions inside the workbook", () => {
-    expect(pageSource).toContain("Question 1 · Informal letter");
-    expect(pageSource).toContain("Question 2 · Formal letter");
-    expect(pageSource).toContain('data-a1-day20-chapter123-workbook-content="true"');
+  it("routes legacy URLs to the canonical revised lesson and workbook", () => {
+    expect(pageSource).toContain('<A1Day20GoetheWritingGrammarPage />');
+    expect(pageSource).toContain('<A1Day20LetterWritingWorkbookPage />');
+    expect(pageSource).not.toContain('Question 1 · Informal letter');
   });
 });

@@ -8,6 +8,11 @@ const pagePath = path.join(root, "web/src/components/LetterWritingIntroPage.js")
 
 let source = fs.readFileSync(pagePath, "utf8");
 
+if (source.includes("A1-12.3-FORM-EMAIL-V1")) {
+  console.log("A1 Day 20 uses the canonical form-and-email lesson; no legacy patch needed.");
+  process.exit(0);
+}
+
 const directWorkbookImport = 'import A1Day20LetterWritingWorkbookPage from "./A1Day20LetterWritingWorkbookPage";';
 if (!source.includes(directWorkbookImport)) {
   const importAnchor = 'import A1TutorMarkedWorkbookShell from "./A1TutorMarkedWorkbookShell";';
