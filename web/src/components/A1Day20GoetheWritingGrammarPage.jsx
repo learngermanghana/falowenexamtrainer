@@ -13,6 +13,71 @@ export default function A1Day20GoetheWritingGrammarPage() {
    <article><h3>Formal: schools, hotels and offices</h3><p>Use Sie, Ihnen, Ihr/Ihre.</p><p>Sehr geehrte Damen und Herren, · Sehr geehrter Herr Weber, · Sehr geehrte Frau Müller,</p><p>Useful openings: Ich möchte einen Deutschkurs machen. · Ich habe eine Frage. · Können Sie mir bitte Informationen schicken?</p><p>Close with Mit freundlichen Grüßen, then your full name. Do not add a comma after the closing.</p></article></div>
    <p>After a greeting ending in a comma, continue with a lowercase word unless it requires a capital letter, such as a noun or formal Sie/Ihnen. Write clear, simple sentences. A weil clause is optional; its verb goes at the end.</p>
    <h3>Simple A1 sentence patterns</h3><ul><li>Statement: Subject + verb + rest. Ich feiere am Samstag.</li><li>Modal verb: Subject + modal verb + rest + infinitive. Ich möchte dich einladen.</li><li>Yes/no question: Verb + subject + rest? Kannst du Getränke mitbringen?</li><li>W-question: W-word + verb + subject/rest? Wann beginnt der Kurs?</li><li>Separable verb: Subject + verb + rest + prefix. Ich lade dich ein.</li></ul>
+   <div data-a1-day20-letter-structure="true" style={{display:"grid",gap:16}}>
+    <section style={{border:"1px solid #bfdbfe",borderRadius:14,padding:16,background:"#eff6ff",display:"grid",gap:10,minWidth:0}}>
+     <h3>Informal Letter Structure</h3>
+     <p><strong>When?</strong> Write informally to a friend or family member. Use <strong>du, dich, dir, dein/deine</strong>, not formal Sie. The same structure works for a short letter, email or message.</p>
+     <ol>
+      <li><strong>Greeting (Anrede):</strong> Liebe Sara, / Lieber Ben, / Hallo Tom,</li>
+      <li><strong>Opening (Einleitung):</strong> Danke für deine Nachricht. / Wie geht es dir? / Ich schreibe dir, weil …</li>
+      <li><strong>Body (Hauptteil):</strong> Answer every requested point with a short, clear sentence. Include the requested day, time, place, question or reason.</li>
+      <li><strong>Closing sentence (Schlusssatz):</strong> Schreib mir bitte bald. / Ich freue mich auf deine Antwort.</li>
+      <li><strong>Sign-off (Gruß) and name:</strong> Liebe Grüße / Viele Grüße, followed by your first name. Do not add a comma after the sign-off.</li>
+     </ol>
+     <h4>Complete informal email example (different from your assignment)</h4>
+     <div style={{border:"1px solid #93c5fd",borderRadius:12,padding:14,background:"#ffffff",lineHeight:1.8,overflowWrap:"anywhere"}}>
+      <p><strong>Liebe Sara,</strong></p>
+      <p>danke für deine Nachricht. Ich kann am Freitag nicht kommen, weil ich arbeiten muss. Hast du am Samstag Zeit? Wir können uns im Park treffen.</p>
+      <p><strong>Liebe Grüße</strong></p>
+      <p><strong>Kojo</strong></p>
+     </div>
+     <p><strong>Why it works:</strong> Sara is a friend, so the writer uses <em>deine/du</em> forms. The message explains the reason, suggests another day, asks a question and closes appropriately. It is a study example, not a model answer to the Julia assignment.</p>
+    </section>
+    <section style={{border:"1px solid #e2e8f0",borderRadius:14,padding:16,background:"#f8fafc",display:"grid",gap:10,minWidth:0}}>
+     <h3>How to use weil (because)</h3>
+     <p><strong>Weil</strong> introduces the reason for something. Put a comma before the <em>weil</em> clause and move its conjugated verb to the <strong>end</strong> of that clause.</p>
+     <p><strong>Pattern:</strong> Main clause + , weil + subject + other words + conjugated verb.</p>
+     <ul>
+      <li><strong>Ich bleibe zu Hause, weil ich krank bin.</strong> — I stay at home because I am ill. The verb <em>bin</em> is last.</li>
+      <li><strong>Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.</strong> — I am learning German because I want to work in Germany. The conjugated modal <em>möchte</em> is last.</li>
+      <li><strong>Ich kann nicht kommen, weil ich arbeiten muss.</strong> — I cannot come because I have to work. The conjugated modal <em>muss</em> is last.</li>
+     </ul>
+     <p><strong>Common mistake:</strong> ✗ Ich komme nicht, weil ich bin krank. <strong>Correct:</strong> ✓ Ich komme nicht, weil ich krank bin.</p>
+     <p><strong>Remember:</strong> You do not need <em>weil</em> in every A1 email. A correct short sentence can be better than an incorrect long one.</p>
+     <h4>Other useful connecting words</h4>
+     <ul>
+      <li><strong>und (and):</strong> Ich habe Zeit und ich komme gern. — joins ideas; normal statement word order.</li>
+      <li><strong>aber (but):</strong> Ich möchte kommen, aber ich habe keine Zeit. — contrasts ideas; normal statement word order.</li>
+      <li><strong>oder (or):</strong> Wir treffen uns am Freitag oder wir telefonieren am Samstag. — gives alternatives.</li>
+      <li><strong>denn (because):</strong> Ich bleibe zu Hause, denn ich bin krank. — gives a reason, but unlike <em>weil</em>, the verb stays in its normal position.</li>
+      <li><strong>deshalb (therefore):</strong> Ich bin krank. Deshalb bleibe ich zu Hause. — <em>bleibe</em> comes directly after <em>deshalb</em> in the second sentence (optional extra pattern).</li>
+     </ul>
+     <details>
+      <summary><strong>Try it yourself — then reveal the answers</strong></summary>
+      <p>Join the sentences with <em>weil</em>: (1) Ich bin müde. Ich gehe nach Hause. (2) Ich lerne Deutsch. Ich möchte in Berlin arbeiten.</p>
+      <p><strong>Possible answers:</strong> (1) Ich gehe nach Hause, weil ich müde bin. (2) Ich lerne Deutsch, weil ich in Berlin arbeiten möchte.</p>
+     </details>
+    </section>
+    <section style={{border:"1px solid #e2e8f0",borderRadius:14,padding:16,background:"#ffffff",display:"grid",gap:10,minWidth:0}}>
+     <h3>Formal Letter Structure</h3>
+     <p>For a school, hotel or office, use <strong>Sie, Ihnen, Ihr/Ihre</strong>. The five steps stay the same, but greetings and requests are polite.</p>
+     <ol>
+      <li><strong>Greeting:</strong> Sehr geehrte Frau Keller, / Sehr geehrte Damen und Herren,</li>
+      <li><strong>Opening:</strong> Ich habe eine Frage. / Ich schreibe Ihnen, weil …</li>
+      <li><strong>Body:</strong> Cover every requested point using short formal sentences and polite questions: Können Sie mir bitte helfen?</li>
+      <li><strong>Closing sentence:</strong> Vielen Dank für Ihre Hilfe. / Ich freue mich auf Ihre Antwort.</li>
+      <li><strong>Sign-off and name:</strong> Mit freundlichen Grüßen, followed by your full name (no comma after the sign-off).</li>
+     </ol>
+     <h4>Complete formal email example</h4>
+     <div style={{border:"1px solid #e2e8f0",borderRadius:12,padding:14,background:"#f8fafc",lineHeight:1.8,overflowWrap:"anywhere"}}>
+      <p><strong>Sehr geehrte Frau Keller,</strong></p>
+      <p>ich habe eine Frage zu meinem Hotelzimmer. Ich komme am Freitag. Kann ich schon um elf Uhr einchecken? Vielen Dank für Ihre Hilfe.</p>
+      <p><strong>Mit freundlichen Grüßen</strong></p>
+      <p><strong>Ama Mensah</strong></p>
+     </div>
+     <p><strong>Tip:</strong> After a greeting with a comma, start the next line with lowercase unless the first word is a noun or formal <em>Sie/Ihnen/Ihr</em>. Never mix <em>du</em> with <em>Sehr geehrte …</em>.</p>
+    </section>
+   </div>
    <h3>Three-point strategy</h3><ol><li>Identify the recipient and choose du or Sie.</li><li>Underline the three task points. Write one clear sentence for each; use another sentence if needed for all details.</li><li>Check the greeting, all requested details, closing and your name. Remove unnecessary introductory sentences.</li></ol>
    <h3>How Teil 2 is assessed</h3><p>Each of the three content points receives 0, 1.5 or 3 raw points according to understandable completion. Appropriate text format receives 0, 0.5 or 1 point. Mentioning all three points does not automatically earn full marks: the message must be understandable.</p>
   </section>
