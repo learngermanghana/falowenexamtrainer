@@ -1,34 +1,63 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./FalowenHomepageCarousel.css";
+import { loadPublicClasses } from "../services/publicClassCatalogService";
 
 const WORDING = {
   en: [
-    { kicker:"GERMAN LANGUAGE COURSES",title:"Learn German.",accent:"Build your future.",desc:"Join live German classes online from anywhere. Learn with tutors, recorded lessons, structured workbooks and AI practice.",action:"Register for German",support:"View upcoming classes",href:"/classes",kind:"courses" },
+    { kicker:"UPCOMING GERMAN CLASSES",title:"Your next chapter",accent:"starts with German.",desc:"Find your next class and take the first step. Learn live with a tutor, practise with AI, and keep building your confidence between lessons.",action:"View upcoming classes",support:"Find my level",href:"/classes",kind:"courses" },
     { kicker:"FREE PLACEMENT TEST",title:"Find your",accent:"German level.",desc:"New to German, or unsure where to begin? Take a free A1–B1 placement test to discover your starting point.",action:"Take free placement test",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-STYLE EXAM PRACTICE",title:"Prepare for",accent:"your German exam.",desc:"Practise sample tests and full mocks in Lesen, Hören, Schreiben and Sprechen, with AI-supported feedback.",action:"Explore exam practice",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BOOKSTORE",title:"Learn more with",accent:"German books.",desc:"Explore Falowen German workbooks. Choose an available digital edition or order a printed book.",action:"Browse German books",href:"/books",kind:"books" },
   ],
   de: [
-    { kicker:"DEUTSCHKURSE",title:"Deutsch lernen.",accent:"Zukunft gestalten.",desc:"Lerne online von überall mit Live-Unterricht, Lehrkräften, Aufzeichnungen, Arbeitsbüchern und KI-Übungen.",action:"Für Deutsch registrieren",support:"Kurse ansehen",href:"/classes",kind:"courses" },
+    { kicker:"KOMMENDE DEUTSCHKURSE",title:"Dein nächstes Kapitel",accent:"beginnt mit Deutsch.",desc:"Lerne online von überall mit Live-Unterricht, Lehrkräften, Aufzeichnungen, Arbeitsbüchern und KI-Übungen.",action:"Kommende Kurse ansehen",support:"Mein Niveau finden",href:"/classes",kind:"courses" },
     { kicker:"KOSTENLOSER EINSTUFUNGSTEST",title:"Finde dein",accent:"Deutschniveau.",desc:"Du weißt nicht, wo du anfangen sollst? Mit dem kostenlosen A1–B1-Test findest du deinen Einstieg.",action:"Einstufungstest starten",href:"/placement-test",kind:"placement" },
     { kicker:"GOETHE-ORIENTIERTE PRÜFUNGSÜBUNGEN",title:"Bereite dich auf",accent:"deine Prüfung vor.",desc:"Übe Lesen, Hören, Schreiben und Sprechen mit Beispieltests, Probeprüfungen und KI-Feedback.",action:"Prüfungsübungen ansehen",href:"/exam-practice",kind:"exams" },
     { kicker:"FALOWEN BÜCHER",title:"Deutsch lernen",accent:"mit Arbeitsbüchern.",desc:"Entdecke Falowen Arbeitsbücher als verfügbare digitale oder gedruckte Ausgabe.",action:"Bücher ansehen",href:"/books",kind:"books" },
   ],
   fr: [
-    { kicker:"COURS D'ALLEMAND",title:"Apprenez l'allemand.",accent:"Préparez votre avenir.",desc:"Suivez des cours en ligne depuis n'importe où, avec enseignants, vidéos, cahiers et exercices IA.",action:"S'inscrire au cours",support:"Voir les cours",href:"/classes",kind:"courses" },
+    { kicker:"PROCHAINS COURS D'ALLEMAND",title:"Votre prochain chapitre",accent:"commence en allemand.",desc:"Suivez des cours en ligne depuis n'importe où, avec enseignants, vidéos, cahiers et exercices IA.",action:"Voir les prochains cours",support:"Trouver mon niveau",href:"/classes",kind:"courses" },
     { kicker:"TEST DE NIVEAU GRATUIT",title:"Découvrez votre",accent:"niveau d'allemand.",desc:"Vous hésitez sur votre niveau? Faites notre test gratuit A1–B1 et trouvez où commencer.",action:"Faire le test gratuit",href:"/placement-test",kind:"placement" },
     { kicker:"PRÉPARATION AUX EXAMENS TYPE GOETHE",title:"Préparez votre",accent:"examen d'allemand.",desc:"Entraînez-vous en lecture, écoute, expression écrite et orale avec des examens blancs et des retours IA.",action:"Explorer les examens",href:"/exam-practice",kind:"exams" },
     { kicker:"LIVRES FALOWEN",title:"Progressez avec",accent:"nos livres d'allemand.",desc:"Découvrez les cahiers Falowen disponibles en version numérique ou imprimée.",action:"Voir les livres",href:"/books",kind:"books" },
   ],
 };
 
-function SlideIllustration({kind,classroomImage}) {
-  if (kind==="courses") return (
-    <div className="falowen-slide-photo">
-      <img src={classroomImage} alt="A real German class at Learn Language Education Academy" width="600" height="480" loading="eager" />
-      <span>Based in Ghana · Online classes open worldwide</span>
+const CLASS_COPY = {
+  en: { title:"Find your next class", label:"NEXT INTAKE", generic:"Start your German journey", desc:"A clear foundation. A tutor to guide you.", date:"Next intake", schedule:"Class schedule", format:"Learning format", online:"Live online classes", zone:"Time zone", pending:"See available classes", times:"View meeting times", cta:"View class details & register", other:"Already learning German?", explore:"Explore classes", loading:"Loading upcoming classes…", benefits:["Live online lessons","Lesson recordings","Structured workbooks"] },
+  de: { title:"Finde deinen nächsten Kurs", label:"NÄCHSTER KURSSTART", generic:"Starte deine Deutschreise", desc:"Eine klare Grundlage. Begleitung durch eine Lehrkraft.", date:"Kursstart", schedule:"Unterrichtszeiten", format:"Unterrichtsform", online:"Live-Online-Unterricht", zone:"Zeitzone", pending:"Verfügbare Kurse ansehen", times:"Unterrichtszeiten ansehen", cta:"Kursdetails & Anmeldung", other:"Du lernst bereits Deutsch?", explore:"Kurse entdecken", loading:"Kurse werden geladen…", benefits:["Live-Online-Unterricht","Aufzeichnungen","Arbeitsbücher"] },
+  fr: { title:"Trouvez votre prochain cours", label:"PROCHAINE RENTRÉE", generic:"Commencez votre parcours en allemand", desc:"Des bases solides. Un enseignant pour vous guider.", date:"Début du cours", schedule:"Horaires", format:"Format", online:"Cours en direct en ligne", zone:"Fuseau horaire", pending:"Voir les cours disponibles", times:"Voir les horaires", cta:"Détails du cours et inscription", other:"Vous apprenez déjà l’allemand ?", explore:"Explorer les cours", loading:"Chargement des cours…", benefits:["Cours en direct","Enregistrements","Cahiers structurés"] },
+};
+
+function UpcomingClassCard({ language }) {
+  const [classes, setClasses] = useState(null);
+  const copy = CLASS_COPY[language] || CLASS_COPY.en;
+  useEffect(() => {
+    let cancelled = false;
+    loadPublicClasses().then(items => { if (!cancelled) setClasses(items); })
+      .catch(() => { if (!cancelled) setClasses([]); });
+    return () => { cancelled = true; };
+  }, []);
+  const today = new Date().toLocaleDateString("en-CA", { timeZone:"Africa/Accra", year:"numeric", month:"2-digit", day:"2-digit" });
+  const course = (classes || []).filter(item => item.availability !== "always" && !item.isSelfLearning && item.publicVisible !== false && item.registrationOpen !== false && item.startDate >= today)
+    .sort((a,b) => a.startDate.localeCompare(b.startDate))[0];
+  const href = course?.classUrl || "/classes";
+  const start = course ? new Date(`${course.startDate}T12:00:00Z`).toLocaleDateString(language === "de" ? "de-DE" : language === "fr" ? "fr-FR" : "en-GB", { day:"numeric", month:"short", year:"numeric", timeZone:"Africa/Accra" }) : copy.pending;
+  const times = (course?.meetingDays || []).map(slot => `${slot.day} ${slot.startTime || ""}${slot.endTime ? `–${slot.endTime}` : ""}`).join(" · ");
+  return <div className="falowen-class-board" aria-label={copy.title}>
+    <div className="falowen-class-board-head"><div><small>LEARN LANGUAGE EDUCATION ACADEMY</small><h2>{copy.title}</h2></div><span aria-hidden="true">▦</span></div>
+    <div className="falowen-class-board-body" aria-busy={classes === null}>
+      <div className="falowen-class-board-label"><strong>{course?.level || "DE"}</strong><span>{copy.label}</span></div>
+      <h3>{course?.title || copy.generic}</h3><p>{classes === null ? copy.loading : copy.desc}</p>
+      <dl><div><dt>{copy.date}</dt><dd>{start}</dd></div><div><dt>{copy.schedule}</dt><dd>{times || copy.times}</dd></div><div><dt>{copy.format}</dt><dd>{copy.online}</dd></div><div><dt>{copy.zone}</dt><dd>{course?.timeZone || course?.timezone || "Africa/Accra (GMT)"}</dd></div></dl>
+      <a className="falowen-class-board-cta" href={href}>{copy.cta} <span aria-hidden="true">→</span></a>
+      <div className="falowen-class-board-footer"><span>{copy.other}</span><a href="/classes">{copy.explore} →</a></div>
     </div>
-  );
+  </div>;
+}
+
+function SlideIllustration({kind,language}) {
+  if (kind === "courses") return <UpcomingClassCard language={language} />;
   if(kind==="placement") return (
     <div className="falowen-slide-illustration" aria-hidden="true">
       <div className="falowen-slide-paper">
@@ -103,12 +132,12 @@ export default function FalowenHomepageCarousel({ language="en", classroomImage,
             {active===0 ? <h1>{item.title} <span>{item.accent}</span></h1> : <h2>{item.title} <span>{item.accent}</span></h2>}
             <p>{item.desc}</p>
             <div className="falowen-carousel-cta">
-              {item.kind==="courses" ? <button type="button" className="falowen-carousel-button" onClick={onSignUp}>{item.action} <span aria-hidden="true">→</span></button> :
-                <a className="falowen-carousel-button" href={item.href}>{item.action} <span aria-hidden="true">→</span></a>}
-              {item.support ? <a className="falowen-carousel-secondary" href={item.href}>{item.support} →</a> : null}
+              <a className="falowen-carousel-button" href={item.href}>{item.action} <span aria-hidden="true">→</span></a>
+              {item.support ? <a className="falowen-carousel-secondary" href="/placement-test">{item.support} →</a> : null}
             </div>
+            {item.kind === "courses" && <div className="falowen-class-benefits">{(CLASS_COPY[language] || CLASS_COPY.en).benefits.map(text => <span key={text}>✓ {text}</span>)}</div>}
           </div>
-          <SlideIllustration kind={item.kind} classroomImage={classroomImage} />
+          <SlideIllustration kind={item.kind} language={language} />
         </div>
         <div className="falowen-carousel-controls">
           <button type="button" onClick={()=>go(active-1)} aria-label="Previous slide">‹</button>

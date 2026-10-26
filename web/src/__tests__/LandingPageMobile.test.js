@@ -11,6 +11,7 @@ jest.mock("../lib/publicFunnelTracking", () => ({
   rememberPublicFunnelContext: jest.fn(),
   trackPublicFunnelEvent: jest.fn(),
 }));
+jest.mock("../services/publicClassCatalogService", () => ({ loadPublicClasses: jest.fn(() => new Promise(() => {})) }));
 jest.mock("../lib/pageMeta", () => ({ updatePageMeta: jest.fn() }));
 
 const renderHome = (props={}) => render(<LandingPage program="german" onSignUp={jest.fn()} onLogin={jest.fn()} {...props} />);
@@ -19,13 +20,12 @@ describe("Falowen current four-slide public homepage and iPhone navigation", () 
   beforeEach(async()=>{ await i18n.changeLanguage("en"); });
   afterEach(()=>{ cleanup(); jest.clearAllMocks(); });
 
-  it("shows German course signup first, without a French program or unsupported claims",()=>{
+  it("shows upcoming German classes first, without a French program or unsupported claims",()=>{
     const onSignUp=jest.fn();
     renderHome({program:"french",onSignUp});
     expect(screen.getByRole("navigation",{name:"Falowen"})).toBeInTheDocument();
-    expect(screen.getByRole("heading",{name:/Learn German/i})).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button",{name:/Register for German/i}));
-    expect(onSignUp).toHaveBeenCalledWith("german");
+    expect(screen.getByRole("heading",{name:/Your next chapter/i})).toBeInTheDocument();
+    expect(screen.getByRole("link",{name:/View upcoming classes/i})).toHaveAttribute("href","/classes");
     expect(screen.queryByRole("button",{name:"French"})).not.toBeInTheDocument();
     expect(screen.queryByText(/Goethe pass rate/i)).not.toBeInTheDocument();
   });
@@ -65,14 +65,13 @@ describe("Falowen current four-slide public homepage and iPhone navigation", () 
     expect(screen.getByRole("link",{name:"Livres"})).toHaveAttribute("href","/books");
   });
 
-  it("keeps iPhone-safe CSS, real classroom image, support and review area",()=>{
+  it("keeps iPhone-safe CSS, upcoming class card, support and review area",()=>{
     const {container}=renderHome();
     const css=fs.readFileSync(path.resolve(__dirname,"../components/LandingPageMarketing.css"),"utf8");
     expect(css).toContain("env(safe-area-inset-bottom)");
     expect(css).toContain("@media (max-width: 600px)");
     expect(container.querySelector(".falowen-home-reviews-intro")).toBeInTheDocument();
     expect(container.querySelector(".falowen-home-support")).toBeInTheDocument();
-    expect(screen.getByRole("img",{name:"A real German class at Learn Language Education Academy"}))
-      .toHaveAttribute("src","/classes/llea-classroom.jpg");
+    expect(screen.getByRole("heading",{name:"Find your next class"})).toBeInTheDocument();
   });
 });

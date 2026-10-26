@@ -77,3 +77,26 @@
 }
 @media(max-width:340px){.falowen-home-brand span {display:none;}}
 @media(prefers-reduced-motion:reduce){.falowen-carousel-button {transition:none;}}
+
+/* Upcoming classes replace the first slide's classroom photograph. */
+.falowen-carousel-courses {--tone:#123f92;--soft:#f3f6fc;}
+.falowen-carousel-courses .falowen-carousel-content {grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;padding-right:28px;}
+.falowen-class-benefits {display:flex;flex-wrap:wrap;gap:12px;font-size:11px;color:#51637d;}
+.falowen-class-board {margin:28px 0 60px;background:#fff;border:1px solid #dbe3ef;border-radius:18px;overflow:hidden;min-width:0;box-shadow:0 20px 45px #15366d12;}
+.falowen-class-board-head {display:flex;align-items:center;justify-content:space-between;gap:12px;background:#123f92;color:#fff;padding:23px;}
+.falowen-class-board-head small {font-size:9px;letter-spacing:1.4px;}
+.falowen-class-board-head h2 {font-size:22px;line-height:1.2;margin:8px 0 0;color:#fff;}
+.falowen-class-board-head>span {font-size:30px;}
+.falowen-class-board-body {padding:23px;}
+.falowen-class-board-label {display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.falowen-class-board-label strong {padding:10px;background:#eaf0fc;color:#123f92;border:1px solid #d7e3fb;border-radius:9px;font-size:20px;}
+.falowen-class-board-label>span {font-size:9px;font-weight:800;letter-spacing:.06em;border-radius:20px;background:#fbf4e4;color:#85601d;padding:8px 10px;}
+.falowen-class-board-body h3 {font-size:22px;line-height:1.3;margin:18px 0 6px;overflow-wrap:anywhere;}
+.falowen-class-board-body p {font-size:12px;color:#65748a;margin:0 0 20px;}
+.falowen-class-board-body dl {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px 15px;border-block:1px solid #e2e8f1;padding:18px 0;margin:0;}
+.falowen-class-board-body dt {font-size:10px;color:#65748a;margin-bottom:7px;}
+.falowen-class-board-body dd {font-size:12px;font-weight:700;line-height:1.6;margin:0;overflow-wrap:anywhere;}
+.falowen-class-board-cta {display:flex;justify-content:center;align-items:center;gap:14px;background:#123f92;color:white;border-radius:9px;min-height:46px;padding:13px;margin-top:20px;text-align:center;font-size:12px;font-weight:800;text-decoration:none;}
+.falowen-class-board-footer {display:flex;justify-content:space-between;gap:14px;margin-top:18px;font-size:11px;line-height:1.5;color:#65748a;}
+.falowen-class-board-footer a {color:#123f92;font-weight:700;}
+@media(max-width:760px){.falowen-carousel-courses .falowen-carousel-content{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;padding-right:0;}.falowen-class-board{margin:8px 20px 60px;}.falowen-class-board-head,.falowen-class-board-body{padding:20px;}}
