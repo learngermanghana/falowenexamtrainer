@@ -2,7 +2,7 @@
 const registry = require('../data/assessmentTasks.json');
 const kombiKeys = require('./a1KombiReadingKeys');
 const kombiTasks = require('./a1KombiMarkingSets');
-const publishedListeningKeys = { ...require('./a1Mock4ListeningKeys'), ...require('./a1Mock5ListeningKeys') };
+const publishedListeningKeys = { ...require('./a1Mock4ListeningKeys'), ...require('./a1Mock5ListeningKeys'), ...require('./a1Mock6ListeningKeys') };
 const EXTRA_A1_MOCK_IDS = Object.freeze(Object.keys(kombiKeys));
 const DEFAULT_A1_MOCK_ID = 'a1-mock-01';
 const SECOND_A1_MOCK_ID = 'a1-mock-02';
