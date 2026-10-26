@@ -1,0 +1,208 @@
+name: A2 editorial read-only PDF proof
+
+# Deliberately manual: do not rerun expensive PDF rendering on every push.
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - fix/a2-pdf-retail-preflight-20261025
+    paths:
+      - .github/workflows/a2-editorial-readonly-proof.yml
+
+permissions:
+  contents: read
+
+jobs:
+  a2-editorial-proof:
+    name: Local-only A2 editorial PDF proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      REACT_APP_FIREBASE_API_KEY: ${{ vars.REACT_APP_FIREBASE_API_KEY || secrets.REACT_APP_FIREBASE_API_KEY }}
+      REACT_APP_FIREBASE_AUTH_DOMAIN: ${{ vars.REACT_APP_FIREBASE_AUTH_DOMAIN || secrets.REACT_APP_FIREBASE_AUTH_DOMAIN }}
+      REACT_APP_FIREBASE_PROJECT_ID: ${{ vars.REACT_APP_FIREBASE_PROJECT_ID || secrets.REACT_APP_FIREBASE_PROJECT_ID }}
+      REACT_APP_FIREBASE_STORAGE_BUCKET: ${{ vars.REACT_APP_FIREBASE_STORAGE_BUCKET || secrets.REACT_APP_FIREBASE_STORAGE_BUCKET }}
+      REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || secrets.REACT_APP_FIREBASE_MESSAGING_SENDER_ID }}
+      REACT_APP_FIREBASE_APP_ID: ${{ vars.REACT_APP_FIREBASE_APP_ID || secrets.REACT_APP_FIREBASE_APP_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reuse only existing Vercel Firebase browser settings when Actions variables are missing
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const required = [
+            "REACT_APP_FIREBASE_API_KEY",
+            "REACT_APP_FIREBASE_AUTH_DOMAIN",
+            "REACT_APP_FIREBASE_PROJECT_ID",
+            "REACT_APP_FIREBASE_STORAGE_BUCKET",
+            "REACT_APP_FIREBASE_MESSAGING_SENDER_ID",
+            "REACT_APP_FIREBASE_APP_ID",
+          ];
+          const missing = required.filter(key => !String(process.env[key] || "").trim());
+          if (!missing.length) {
+            console.log("Firebase client settings are already configured in Actions.");
+            process.exit(0);
+          }
+          // Firebase Hosting publishes the project's PUBLIC browser settings
+          // at this reserved endpoint. It avoids duplicating credentials or
+          // copying Vercel server secrets into a GitHub workflow.
+          const firebaseFields = {
+            REACT_APP_FIREBASE_API_KEY: "apiKey",
+            REACT_APP_FIREBASE_AUTH_DOMAIN: "authDomain",
+            REACT_APP_FIREBASE_PROJECT_ID: "projectId",
+            REACT_APP_FIREBASE_STORAGE_BUCKET: "storageBucket",
+            REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "messagingSenderId",
+            REACT_APP_FIREBASE_APP_ID: "appId",
+          };
+          try {
+            const hosted = await fetch(
+              "https://falowen-examiner-trainer.firebaseapp.com/__/firebase/init.json",
+              { signal: AbortSignal.timeout(10000) },
+            );
+            if (hosted.ok) {
+              const config = await hosted.json();
+              if (config?.projectId === "falowen-examiner-trainer" &&
+                  missing.every(key => typeof config[firebaseFields[key]] === "string" &&
+                    config[firebaseFields[key]].trim())) {
+                for (const key of missing) {
+                  const value = config[firebaseFields[key]];
+                  if (/\r|\n/.test(value)) throw new Error("Invalid multiline Firebase public client setting.");
+                  fs.appendFileSync(process.env.GITHUB_ENV, key + "=" + value + "\n", { mode: 0o600 });
+                }
+                console.log("Loaded " + missing.length + " public Firebase browser settings from the official Hosting config.");
+                process.exit(0);
+              }
+            }
+            console.log("Firebase Hosting did not expose a complete matching client config; checking approved Vercel token fallback.");
+          } catch (error) {
+            console.log("Firebase Hosting public config unavailable; checking approved Vercel token fallback.");
+          }
+          const token = String(process.env.VERCEL_TOKEN || "").trim();
+          if (!token) {
+            console.log("VERCEL_TOKEN is unavailable; existing Actions variable preflight will explain what to configure.");
+            process.exit(0);
+          }
+          // Retrieve Vercel settings only in runner memory. Never copy other
+          // production env values, log decrypted JSON or create .env files.
+          const url = new URL("https://api.vercel.com/v9/projects/prj_6Hx7qU9tTDyerFk9C5c1IzC2K9wt/env");
+          url.searchParams.set("teamId", "team_vYAAqPf7zycxvsCSqqPFo5qc");
+          url.searchParams.set("decrypt", "true");
+          const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+          if (!res.ok) {
+            throw new Error("Falowen Vercel client-config lookup failed (HTTP " + res.status +
+              "). Set only the six Firebase client values in GitHub Actions Variables.");
+          }
+          const json = await res.json();
+          const envs = Array.isArray(json.envs) ? json.envs : [];
+          const missingFromVercel = [];
+          for (const key of missing) {
+            const match = envs.find(row => row.key === key &&
+              (Array.isArray(row.target) ? row.target.includes("production") : row.target === "production") &&
+              typeof row.value === "string" && row.value.trim().length);
+            if (!match) { missingFromVercel.push(key); continue; }
+            if (/\r|\n/.test(match.value)) throw new Error("Unexpected multiline Firebase client config: " + key);
+            fs.appendFileSync(process.env.GITHUB_ENV, key + "=" + match.value + "\n", { mode: 0o600 });
+          }
+          if (missingFromVercel.length) {
+            throw new Error("Firebase browser settings unavailable in Vercel: " +
+              missingFromVercel.join(", ") + ". Configure GitHub Actions Variables.");
+          }
+          console.log("Reused " + missing.length + " Vercel Firebase browser-client settings without exporting unrelated credentials.");
+          NODE
+      - name: Assert Firebase public client settings and PDF login secrets exist
+        env:
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+        run: |
+          set -euo pipefail
+          for key in REACT_APP_FIREBASE_API_KEY REACT_APP_FIREBASE_AUTH_DOMAIN REACT_APP_FIREBASE_PROJECT_ID REACT_APP_FIREBASE_STORAGE_BUCKET REACT_APP_FIREBASE_MESSAGING_SENDER_ID REACT_APP_FIREBASE_APP_ID FALOWEN_PDF_EMAIL FALOWEN_PDF_PASSWORD; do
+            if [ -z "${!key:-}" ]; then
+              echo "::error::Missing GitHub repository Actions secret/variable $key. Populate the existing public Firebase client config and the private PDF test-account login before rendering."
+              exit 1
+            fi
+          done
+      - name: Build and check A2 manifest without public PDF upload
+        run: |
+          node scripts/course-material-bundles/buildLevelManifest.mjs A2
+          node --test scripts/course-material-bundles/a2EditorialPrintMode.test.mjs
+      - name: Install local-only frontend and PDF runner dependencies
+        run: |
+          npm install --prefix web --no-package-lock --no-audit --no-fund
+          npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
+      - name: Test A2 Day 22 offline speaking mock paper companion
+        run: |
+          node --check scripts/course-material-bundles/renderA2Day22SpeakingMockPrint.mjs
+          node --test scripts/course-material-bundles/renderA2Day22SpeakingMockPrint.test.mjs
+          node --test scripts/course-material-bundles/a2PdfPrint.test.mjs
+          node --check scripts/course-material-bundles/renderA2PrintableListeningQuestions.mjs
+          node --test scripts/course-material-bundles/renderA2PrintableListeningQuestions.test.mjs
+          node --test scripts/course-material-bundles/pruneA2BlankSectionPages.test.mjs
+          node --test scripts/course-material-bundles/auditA2PdfPages.test.mjs
+          node --check scripts/course-material-bundles/a2PdfPrint.mjs
+          node --check scripts/course-material-bundles/validateGeneratedBundle.mjs
+      - name: Start local Vite editorial preview bound to loopback
+        run: |
+          set -euo pipefail
+          (
+            cd web
+            ./node_modules/.bin/vite --host 127.0.0.1 --port 4173 --strictPort > /tmp/falowen-a2-editorial-vite.log 2>&1 &
+            echo $! > /tmp/falowen-a2-editorial-vite.pid
+          )
+          for i in $(seq 1 50); do
+            if curl --silent --fail http://127.0.0.1:4173/ > /dev/null; then
+              echo "Vite editorial server ready on loopback."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::Local A2 editorial Vite server did not start."
+          tail -40 /tmp/falowen-a2-editorial-vite.log || true
+          exit 1
+      # For late A2 Hören, print original published question/choice data only.
+      # Browser audio, scores and student assessments are never included.
+      - name: Verify Day 24 listening with a small private print smoke test
+        env:
+          FALOWEN_A2_EDITORIAL_PRINT: 'true'
+          FALOWEN_A2_PDF_SMOKE_DAY: '24'
+          FALOWEN_PDF_BASE_URL: http://127.0.0.1:4173
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
+      - name: Render complete A2 read-only proof
+        env:
+          FALOWEN_A2_EDITORIAL_PRINT: 'true'
+          FALOWEN_PDF_BASE_URL: http://127.0.0.1:4173
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
+      - name: Validate complete PDF before publishing sample
+        run: |
+          node scripts/course-material-bundles/validateGeneratedBundle.mjs A2
+          pdfinfo artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials.pdf | grep -E '^(Pages|Page size|File size):'
+          node scripts/course-material-bundles/prepareA2Sample.mjs
+      - name: Upload free Day 1 sample only
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-Free-Day1-Sample-editorial
+          path: artifacts/course-material-bundles/A2/Falowen-A2-Free-Day1-Sample.pdf
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload non-sensitive render diagnostics only on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: A2-editorial-render-diagnostics
+          path: artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: ignore
+          retention-days: 7

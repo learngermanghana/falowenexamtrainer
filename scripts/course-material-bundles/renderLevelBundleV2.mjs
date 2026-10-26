@@ -4,11 +4,28 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { pruneA2TrulyBlankSectionPages } from "./pruneA2BlankSectionPages.mjs";
+import { addA2RetailCover } from "./a2RetailCover.mjs";
+import { renderA2Day22SpeakingMockPrint } from "./renderA2Day22SpeakingMockPrint.mjs";
+import { renderA2PrintableListeningQuestions } from "./renderA2PrintableListeningQuestions.mjs";
+import { getA2ListeningTask, A2_LISTENING_MODES } from "../../web/src/data/a2ListeningTasks.js";
+import { a2PrintCss, sanitizeA2PrintDocument, extractA2PrintSnapshot, a2SectionReady, findA2PdfLeaks } from "./a2PdfPrint.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const level = String(process.argv[2] || "").trim().toUpperCase();
 const baseUrl = String(process.env.FALOWEN_PDF_BASE_URL || "https://www.falowen.app").replace(/\/$/, "");
+const a2EditorialLocal = level === "A2" && process.env.FALOWEN_A2_EDITORIAL_PRINT === "true";
+// Never permit an editorial preview against Falowen production, a public
+// preview, or a non-loopback host. Print-only access is not a student role.
+if (a2EditorialLocal) {
+  const target = new URL(baseUrl);
+  if (target.protocol !== "http:" ||
+    !["127.0.0.1", "localhost"].includes(target.hostname) ||
+    target.port !== "4173" || target.username || target.password) {
+    throw new Error("A2 editorial print requires a local-only Vite server on http://127.0.0.1:4173.");
+  }
+}
 const outputDir = path.join(repoRoot, "artifacts", "course-material-bundles", level);
 const manifestPath = path.join(outputDir, `Falowen-${level}-Course-Materials-manifest.json`);
 const finalPdfPath = path.join(outputDir, `Falowen-${level}-Course-Materials.pdf`);
@@ -51,6 +68,17 @@ const isPublicLanding = async (page) => {
 const hasLessonContent = async (page, lesson) => {
   if (await isPublicLanding(page)) return false;
   const text = await getBodyText(page);
+  // The A2 lesson title also appears on intermediate shells and course hubs.
+  // Only the actual, visible authenticated workbook tabs establish readiness.
+  if (level === "A2") {
+    const nav = page.locator("[data-workbook-tab-navigation]").first();
+    if (!(await nav.isVisible().catch(() => false))) return false;
+    // Count real accessible workbook controls; do not parse translated Teil labels.
+    // The old escaped-whitespace regex rejected genuine A2 navigation.
+    const tabs = nav.getByRole("tab");
+    return (await tabs.count()) >= 2 &&
+      (await nav.getByRole("tab", { name: /^Grammar/i }).count()) === 1;
+  }
   const title = String(lesson?.title || "").trim();
   if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
 
@@ -151,7 +179,8 @@ const openLessonWithAuthHydration = async (page, lesson, targetUrl) => {
     // short window to replace that transient screen before deciding it failed.
     for (let check = 0; check < 8; check += 1) {
       if (await hasLessonContent(page, lesson)) return true;
-      if (!(await isPublicLanding(page))) break;
+      if (!(await isPublicLanding(page)) && level !== "A2") break;
+      // A2 can show the lesson title before React mounts its real workbook nav.
       await page.waitForTimeout(500);
     }
 
@@ -197,7 +226,15 @@ const submitLogin = async (page) => {
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
-  const targetUrl = new URL(lesson.route, baseUrl).toString();
+  const target = new URL(lesson.route, baseUrl);
+  // A2 workbooks are radio-first in the student app. The PDF needs the
+  // complete educational workbook, not the Falowen Radio introduction gate.
+  // This query param only applies to the private Playwright export session;
+  // no student navigation, completion or recorded progress is changed.
+  if (level === "A2" && target.searchParams.get("radio") !== "done") {
+    target.searchParams.set("radio", "done");
+  }
+  const targetUrl = target.toString();
   const initiallyLoaded = await openLessonWithAuthHydration(page, lesson, targetUrl);
   if (initiallyLoaded) return;
 
@@ -210,6 +247,27 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
   if (await openLessonWithAuthHydration(page, lesson, targetUrl)) return;
 
+  if (level === "A2") {
+    // Never write student names, course submissions or personalized HTML
+    // into a public GitHub Actions log (even on a failed proof).
+    const safeState = await page.evaluate(() => {
+      const body = document.body?.innerText || "";
+      return {
+        workbookHeadingPresent: /A2\s*[·:]?\s*Day\s*\d+\s*Workbook/i.test(body),
+        loginFormPresent: Boolean(document.querySelector('input[type="password"]')),
+        radioGatePresent: Boolean(document.querySelector("[data-radio-first-workbook-gate]")),
+        workbookNavPresent: Boolean(document.querySelector("[data-workbook-tab-navigation]")),
+        nativeTabCount: document.querySelectorAll('[role="tab"]').length,
+        knownAppError: /Unexpected Application Error|permission denied|Missing or insufficient permissions/i.test(body),
+      };
+    });
+    const safePath = new URL(page.url()).pathname;
+    throw new Error(
+      `A2 Day ${lesson.day}: workbook tabs did not mount after authenticated navigation. ` +
+      `Path: ${safePath}; safe UI state: ${JSON.stringify(safeState)}. ` +
+      "Check deployed A2 tab rendering and PDF test-account course access before another full build.",
+    );
+  }
   const preview = (await getBodyText(page)).slice(0, 700);
   throw new Error(
     `Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Current URL: ${page.url()}. Preview: ${preview}`,
@@ -218,6 +276,7 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 
 const injectPrintMode = async (page) => {
   await page.emulateMedia({ media: "print" });
+  if (level === "A2") return page.addStyleTag({ content: a2PrintCss });
   return page.addStyleTag({ content: `
     @page { size: A4; margin: 12mm 10mm 15mm; }
     html, body { background: #fff !important; }
@@ -236,13 +295,65 @@ const injectPrintMode = async (page) => {
   ` });
 };
 
+const waitForA2PrintableSection = async (page, lesson, suffix) => {
+  if (level !== "A2") return;
+  const section = suffix === "grammar" ? "grammar" : suffix.replace(/^workbook-/, "");
+  // Genuine React workbook content may hydrate after tab navigation. Wait
+  // for actual section text; a visible tab or lesson heading alone is not proof.
+  let lastSnapshot = null;
+  for (let attempt = 0; attempt < 24; attempt += 1) {
+    lastSnapshot = await page.evaluate(extractA2PrintSnapshot);
+    if (a2SectionReady(section, lastSnapshot)) return;
+    await page.waitForTimeout(500);
+  }
+  // Diagnostics report only structure and booleans, never learner content,
+  // tokens, question text, existing answers or personal Firestore records.
+  const s = lastSnapshot || {};
+  const expectedHeading = {
+    grammar: /grammar|grammatik|sprachbausteine/i,
+    "teil-1": /teil\s*1|sprechen/i,
+    "teil-2": /teil\s*2|schreiben/i,
+    "teil-3": /teil\s*3|lesen/i,
+    "teil-4": /teil\s*4|hören|hoeren/i,
+  }[section];
+  const state = {
+    visibleHeadingCount: s.headings?.length || 0,
+    textCharacters: s.text?.length || 0,
+    expectedHeadingVisible: Boolean(expectedHeading?.test((s.headings || []).join(" "))),
+    grammarPanel: Boolean(s.grammarVisible),
+    listeningPanel: Boolean(s.listeningVisible),
+    listeningQuestionElements: Number(s.listeningQuestionCount || 0),
+    hasAppLoadingText: /Loading the app|Connecting to Falowen|Please wait|Unexpected Application Error|Page not found|Loading failed|Cannot log in right now/i.test(s.text || ""),
+  };
+  throw new Error("A2 Day " + lesson.day + " " + section +
+    ": printable content did not hydrate after 12 seconds; route " + lesson.route +
+    "; safe section diagnostics " + JSON.stringify(state));
+};
+
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
+  await waitForA2PrintableSection(page, lesson, suffix);
   const printStyle = await injectPrintMode(page);
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
+    if (level === "A2") {
+      await page.evaluate(sanitizeA2PrintDocument, suffix);
+      const printed = await page.evaluate(extractA2PrintSnapshot);
+      const leaks = findA2PdfLeaks(printed.text);
+      if (leaks.length) throw new Error(
+        "A2 Day " + lesson.day + " " + suffix + ": private or web-only content remains: " + leaks.join(", "));
+    }
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
+    // page.emulateMedia(print) persists after page.pdf(). Without resetting it,
+    // @media print keeps WorkbookTabNav hidden and the following Teil tabs
+    // appear "unavailable" even though they were rendered correctly.
+    if (level === "A2") await page.emulateMedia({ media: "screen" });
+  }
+  if (a2EditorialLocal) {
+    await pruneA2TrulyBlankSectionPages(file, {
+      log: message => console.log(`A2 Day ${lesson.day} ${suffix}: ${message}`),
+    });
   }
   return { tab: suffix, file };
 };
@@ -292,6 +403,19 @@ const clickWorkbookTab = async (page, names) => {
     ];
     for (const tab of candidates) {
       if (!(await tab.count()) || !(await tab.isVisible().catch(() => false))) continue;
+      if (level === "A2" && await tab.isDisabled().catch(() => false)) {
+        const aria = String(await tab.getAttribute("aria-label") || "");
+        const lockedByTimer = /locked until timed work starts/i.test(aria);
+        // This is a real learner assessment gate. Never start/submit an
+        // attempt or forge Firestore progress merely to create a retail PDF.
+        throw new Error(
+          "A2 PDF export blocked: " + name +
+          (lockedByTimer ? " requires a timed assignment to start." : " is disabled.") +
+          " Use a dedicated PDF test account with legitimately completed/reviewed " +
+          "lesson access, or implement an authorized read-only print data path. " +
+          "No learner timer or submission was changed."
+        );
+      }
       await tab.click({ timeout: 10000 });
       await page.waitForTimeout(350);
       return true;
@@ -316,7 +440,27 @@ const renderA2B1Lesson = async (page, lesson) => {
 
   const grammarClicked = await clickWorkbookTab(page, ["Grammar"]);
   if (!grammarClicked) {
-    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available.`);
+    // Log only structural boolean flags and known section labels, never
+    // potentially private body text, learner names or form contents.
+    const structure = await page.evaluate(() => {
+      const visible = el => Boolean(el.getClientRects().length) &&
+        getComputedStyle(el).display !== "none";
+      const labels = [...document.querySelectorAll('[role="tab"],button')]
+        .filter(visible)
+        .map(el => (el.getAttribute("aria-label") || el.textContent || "").trim())
+        .filter(label => /^(Grammar|Grammatik|Teil\\s*[1-4]|Continue|Weiter|Enter workbook|Open workbook)/i.test(label))
+        .slice(0, 12).map(label => label.slice(0, 32));
+      return {
+        radioGate: Boolean(document.querySelector("[data-radio-first-workbook-gate]")),
+        workbookNav: Boolean(document.querySelector("[data-workbook-tab-navigation]")),
+        grammarPanel: Boolean(document.querySelector("[data-a2-focused-grammar]")),
+        nativeTabCount: document.querySelectorAll('[role="tab"]').length,
+        recognizedActions: labels,
+      };
+    });
+    const routePath = new URL(page.url()).pathname;
+    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available. ` +
+      `Route: ${routePath}; structure: ${JSON.stringify(structure)}.`);
   }
   const grammar = await saveCurrentPagePdf(page, lesson, "grammar");
 
@@ -332,9 +476,25 @@ const renderA2B1Lesson = async (page, lesson) => {
   ];
   const workbookParts = [];
   for (const tabSpec of workbookTabSpecs) {
+    if (a2EditorialLocal && Number(lesson.day) >= 24 && tabSpec.key === "teil-4") {
+      // Late A2 live audio widgets are not stable in an unattended print
+      // browser. Use the exact published question/choice dictionary instead.
+      // This prints no audio, student data, attempt or grading results.
+      const listen = getA2ListeningTask(lesson.day);
+      if (listen?.mode && listen.mode !== A2_LISTENING_MODES.NONE) {
+        workbookParts.push(await renderA2PrintableListeningQuestions({ lesson, renderDir }));
+      } else {
+        console.warn(`A2 Day ${lesson.day}: no canonical listening task, optional Teil 4 omitted.`);
+      }
+      continue;
+    }
     const clicked = await clickWorkbookTab(page, tabSpec.names);
     if (!clicked) {
-      console.warn(`${level} Day ${lesson.day}: skipping unavailable workbook section ${tabSpec.names[0]}.`);
+      if (level === "A2" && await page.getByRole("tab", { name: new RegExp(tabSpec.names[0], "i") }).count()) {
+        throw new Error("A2 Day " + lesson.day + ": required visible workbook tab " +
+          tabSpec.names[0] + " could not be opened (possibly locked or still loading).");
+      }
+      console.warn(`${level} Day ${lesson.day}: optional workbook tab ${tabSpec.names[0]} not present.`);
       continue;
     }
     workbookParts.push(await saveCurrentPagePdf(page, lesson, `workbook-${tabSpec.key}`));
@@ -355,6 +515,13 @@ const renderA2B1Lesson = async (page, lesson) => {
 };
 
 const renderLesson = async (page, lesson) => {
+  // Day 22 is the live Goethe A2 Speaking Mock (not a normal tabbed
+  // workbook). In the private read-only print proof only, build its
+  // deterministic paper practice sheets from the existing speaking
+  // dictionary. Never start a graded assessment or read a student's work.
+  if (a2EditorialLocal && level === "A2" && Number(lesson.day) === 22) {
+    return renderA2Day22SpeakingMockPrint({ lesson, renderDir });
+  }
   if (level === "A1") return renderA1Lesson(page, lesson);
   if (level === "A2" || level === "B1") return renderA2B1Lesson(page, lesson);
   if (level === "B2" || level === "C1" || level === "C2") return renderGuidedLesson(page, lesson);
@@ -363,6 +530,7 @@ const renderLesson = async (page, lesson) => {
 };
 
 const addCover = async (output) => {
+  if (level === "A2") return addA2RetailCover(output);
   const font = await output.embedFont(StandardFonts.Helvetica);
   const bold = await output.embedFont(StandardFonts.HelveticaBold);
   const cover = output.addPage([595.28, 841.89]);
@@ -452,10 +620,37 @@ const mergeBundle = async (renderedLessons) => {
 
 const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, storageState: storageStateFromEnv() });
+if (a2EditorialLocal) {
+  // Enforce read-only access at the browser network layer too: do not let
+  // incidental React effects write assessment records to Firestore.
+  await context.route(/https:\/\/firestore\.googleapis\.com\/.*(?:Firestore\/Write\/channel|documents:commit|documents:batchWrite)/i,
+    async route => route.abort("blockedbyclient"));
+}
 const page = await context.newPage();
+if (a2EditorialLocal) {
+  // This flag exists only inside this private local browser context.
+  // The A2 React component also requires Vite DEV and loopback hostname.
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "__FALOWEN_A2_PDF_EDITORIAL__", {
+      value: true, writable: false, configurable: false,
+    });
+  });
+}
 page.setDefaultTimeout(15000);
 page.setDefaultNavigationTimeout(45000);
-const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+// A quick, private one-day smoke check catches late A2 tab failures before
+// launching the expensive entire-course render. It never merges or uploads
+// even a partial manuscript and is disabled for every other render mode.
+const smokeDayRaw = String(process.env.FALOWEN_A2_PDF_SMOKE_DAY || "").trim();
+const smokeDay = smokeDayRaw ? Number(smokeDayRaw) : 0;
+if (smokeDayRaw && (!a2EditorialLocal || !Number.isInteger(smokeDay) || smokeDay < 1 || smokeDay > 28)) {
+  throw new Error("A2 PDF smoke day requires loopback editorial mode and a valid teaching day.");
+}
+const allPrintableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
+const printableLessons = smokeDay
+  ? allPrintableLessons.filter((lesson) => Number(lesson.day) === smokeDay)
+  : allPrintableLessons;
+if (!printableLessons.length) throw new Error("No matching printable lesson for A2 PDF smoke test.");
 const renderedLessons = new Map();
 
 try {
@@ -489,6 +684,15 @@ try {
   }
 } finally {
   await browser.close();
+}
+
+if (smokeDay) {
+  const files = renderedLessons.get(smokeDay) || [];
+  if (files.length !== 2 || files[0]?.tab !== "grammar" || files[1]?.tab !== "workbook") {
+    throw new Error("A2 PDF Day " + smokeDay + " smoke failed: expected Grammar and Workbook sections.");
+  }
+  console.log("A2 PDF Day " + smokeDay + " smoke passed: Grammar and Workbook sections generated without affecting learners.");
+  process.exit(0);
 }
 
 await mergeBundle(renderedLessons);

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { isLocalA2EditorialPrintMode } from "../utils/a2EditorialPrintMode";
 import A2LegacyStandardWorkbookNavigationImpl, {
   A2_LEGACY_STANDARD_NAV_BY_PATH,
   findA2LegacyWorkbookTabRow,
@@ -150,10 +151,16 @@ export const safelyCleanA2Day22Presentation = (root = document) => {
 export default function A2LegacyStandardWorkbookNavigation() {
   const location = useLocation();
   const normalizedPath = normalizePath(location.pathname);
-  const isSupportedRoute = A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath);
-  const shouldCleanPresentation =
+  // The private loopback-only PDF exporter uses the React-owned workbook
+  // tabs directly. Legacy portal overlays / DOM cleanup can race against
+  // printing successive Teils (especially Day 24 Hören). Keep the entire
+  // student-facing legacy navigation unchanged in production.
+  const printOnly = isLocalA2EditorialPrintMode();
+  const isSupportedRoute = !printOnly && A2_LEGACY_STANDARD_NAV_PATHS.has(normalizedPath);
+  const shouldCleanPresentation = !printOnly && (
     A2_GOETHE_LISTENING_ONLY_PATHS.has(normalizedPath) ||
-    A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath);
+    A2_LEGACY_SUBMISSION_CLEANUP_PATHS.has(normalizedPath)
+  );
 
   useEffect(() => {
     if (!isSupportedRoute) return undefined;

@@ -80,6 +80,9 @@ jobs:
           node --check scripts/course-material-bundles/renderLevelBundleV2.mjs
           node --check scripts/course-material-bundles/renderA1Bundle.mjs
           node --check scripts/course-material-bundles/a1RetailCover.mjs
+          node --check scripts/course-material-bundles/a2RetailCover.mjs
+          node --check scripts/course-material-bundles/a2PdfPrint.mjs
+          node --check scripts/course-material-bundles/prepareA2Sample.mjs
           node --check scripts/course-material-bundles/a1PdfAuthState.mjs
           node --test scripts/course-material-bundles/a1PdfAuthState.test.mjs
           node --check scripts/course-material-bundles/pdfNavigation.mjs
@@ -103,18 +106,24 @@ jobs:
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
 
-      - name: Runtime-test PDF navigation objects
-        if: ${{ matrix.level == 'A1' }}
+      - name: Runtime-test PDF navigation and print safety
+        if: ${{ matrix.level == 'A1' || matrix.level == 'A2' }}
         run: |
           if ! command -v pdftotext >/dev/null || ! command -v pdftoppm >/dev/null; then
             sudo apt-get update -qq
             sudo apt-get install -y poppler-utils
           fi
           npm install --no-save --package-lock=false pdf-lib@1.17.1
-          node --test scripts/course-material-bundles/a1RetailCover.test.mjs
-          node --test scripts/course-material-bundles/pdfNavigation.test.mjs
-          node --test scripts/course-material-bundles/buildPressProof.test.mjs
-          node --test scripts/course-material-bundles/trimPrintedPdfTail.test.mjs
+          if [ "${{ matrix.level }}" = "A1" ]; then
+            node --test scripts/course-material-bundles/a1RetailCover.test.mjs
+            node --test scripts/course-material-bundles/pdfNavigation.test.mjs
+            node --test scripts/course-material-bundles/buildPressProof.test.mjs
+            node --test scripts/course-material-bundles/trimPrintedPdfTail.test.mjs
+          fi
+          if [ "${{ matrix.level }}" = "A2" ]; then
+            node --test scripts/course-material-bundles/a2PdfPrint.test.mjs
+            node --test scripts/course-material-bundles/a2EditorialPrintMode.test.mjs
+          fi
 
       - name: Build and validate manifest
         env:
@@ -242,8 +251,22 @@ jobs:
         if: ${{ inputs.build_pdf && (inputs.level == 'A1' || inputs.level == 'A2' || inputs.level == 'B1') }}
         run: node scripts/course-material-bundles/validateGeneratedBundle.mjs "${{ inputs.level }}"
 
-      - name: Upload consolidated level PDF
-        if: ${{ inputs.build_pdf }}
+      - name: Create free A2 PDF sample from the validated retail candidate
+        if: ${{ inputs.build_pdf && inputs.level == 'A2' }}
+        run: node scripts/course-material-bundles/prepareA2Sample.mjs
+
+      # Public repositories must not distribute the full A2 retail manuscript.
+      - name: Upload A2 sample only
+        if: ${{ inputs.build_pdf && inputs.level == 'A2' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-Free-Day1-Sample
+          path: artifacts/course-material-bundles/A2/Falowen-A2-Free-Day1-Sample.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload consolidated level PDF (excluding paid A2 manuscript)
+        if: ${{ inputs.build_pdf && inputs.level != 'A2' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-course-materials-pdf
@@ -252,11 +275,11 @@ jobs:
           retention-days: 30
 
       - name: Build Falowen Press editorial proof
-        if: ${{ inputs.build_pdf && inputs.press_preview }}
+        if: ${{ inputs.build_pdf && inputs.press_preview && inputs.level != 'A2' }}
         run: node scripts/course-material-bundles/buildPressProof.mjs "${{ inputs.level }}"
 
       - name: Upload Falowen Press editorial proof
-        if: ${{ inputs.build_pdf && inputs.press_preview }}
+        if: ${{ inputs.build_pdf && inputs.press_preview && inputs.level != 'A2' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-press-editorial-proof
@@ -264,8 +287,17 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Upload render diagnostics on failure
-        if: ${{ failure() && inputs.build_pdf }}
+      - name: Upload A2 render diagnostics on failure (metadata JSON only)
+        if: ${{ failure() && inputs.build_pdf && inputs.level == 'A2' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-render-diagnostics
+          path: artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 7
+
+      - name: Upload render diagnostics on failure for other levels
+        if: ${{ failure() && inputs.build_pdf && inputs.level != 'A2' }}
         uses: actions/upload-artifact@v4
         with:
           name: Falowen-${{ inputs.level }}-render-diagnostics

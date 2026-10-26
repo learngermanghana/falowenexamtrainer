@@ -41,11 +41,16 @@ describe("A2/B1 coursebook speaking cleanup", () => {
     document.body.innerHTML = "";
   });
 
-  test("uses only the approved A2 Day 9 Teil 4 Hören video", () => {
-    const source = readWebFile("src/components/A2Day9UrlaubWorkbookPage.js");
+  test("uses the current canonical A2 Day 9 Teil 4 Hören audio instead of an obsolete video", () => {
+    const tasks = readWebFile("src/data/a2ListeningTasks.js");
+    const workbook = readWebFile("src/components/A2StandardTabbedWorkbookPage.js");
+    const day9 = tasks.match(/^\s*9:\s*\{([\s\S]*?)(?=^\s*10:\s*\{)/m)?.[1];
 
-    expect(source).toContain('hoerenAudioUrl="https://youtu.be/Q6PjXP6Ccik"');
-    expect(source).not.toContain("https://youtu.be/bQlIXyfcUFc");
+    expect(day9).toContain('audioKey: "a2/day-09/day-09.mp3"');
+    expect(day9).toContain('audioUrl: ""');
+    expect(workbook).toContain("const listeningConfig = getA2ListeningTask(day)");
+    expect(workbook).toContain("hoerenAudioKey ? <ProtectedA2ListeningAudio");
+    expect(day9).not.toContain("https://youtu.be/bQlIXyfcUFc");
   });
 
   test("loads the course speaking cleanup before the React application", () => {
