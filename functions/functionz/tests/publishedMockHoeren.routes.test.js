@@ -76,7 +76,7 @@ beforeEach(() => {
 });
 
 test.each([
-  ["A1", "mock-04", "teil-1", "a1/mock-hoeren/mock-04/teil-1.mp3"],
+  ["A1", "mock-06", "teil-1", "a1/mock-hoeren/mock-06/teil-1.mp3"],
   ["A2", "mock-02", "teil-1", "a2/mock-hoeren/mock-02/teil-1.mp3"],
   ["B1", "mock-02", "teil-1", "b1/mock-hoeren/mock-02/teil-1.mp3"],
   ["B2", "mock-99", "teil-1", "b2/mock-hoeren/mock-99/teil-1.mp3"],
@@ -105,6 +105,10 @@ test("published B1 manifest permits only the exact approved recording", async ()
 
 test.each([
   ["A1", "mock-01", "teil-1", "a1/mock-hoeren/mock-01/teil-1.mp3"],
+  ["A1", "mock-04", "teil-1", "a1/mock-hoeren/mock-04/teil-1.mp3"],
+  ["A1", "mock-05", "teil-1", "a1/mock-hoeren/mock-05/teil-1.mp3"],
+  ["A1", "mock-05", "teil-2", "a1/mock-hoeren/mock-05/teil-2.mp3"],
+  ["A1", "mock-05", "teil-3", "a1/mock-hoeren/mock-05/teil-3.mp3"],
   ["A2", "mock-01", "teil-4", "a2/mock-hoeren/mock-01/teil-4.mp3"],
   ["A2", "mock-02", "teil-1", "a2/mock-horen-2/teil-1.mp3"],
   ["B1", "mock-01", "teil-1", "b1/mock-hoeren-1/teil-1.mp3"],

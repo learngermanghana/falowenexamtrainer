@@ -93,7 +93,7 @@ describe("A1 Final Mock Exam Day 23", () => {
     expect(componentSource).toContain("Full mock ·");
     expect(componentSource).toContain("Time left");
     expect(componentSource).toContain("Start or resume all 4 modules");
-    expect(componentSource).toContain("Submit Lesen → Hören");
+    expect(componentSource).toContain('Submit Lesen → {hasHoren ? "Hören" : "Schreiben"}');
     expect(componentSource).toContain("Submit Hören → Schreiben");
     expect(componentSource).toContain("Submit Schreiben → Sprechen");
     expect(componentSource).toContain("Start audio");

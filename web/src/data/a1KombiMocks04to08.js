@@ -7,9 +7,12 @@ export const A1_KOMBI_MOCKS = Object.freeze(A1_KOMBI_MOCK_IDS.map(number => Obje
   id: `a1-final-${String(number).padStart(2,"0")}`,
   questionSetId: `a1-mock-${String(number).padStart(2,"0")}`,
   level:"A1",mockNumber:number,sourceTestNumber:A1_KOMBI_SOURCE_MAPPING[number],
-  title:`A1 Mock ${number} · Kombiprüfung`,version:"three-module-v1",
-  status:"preview",requiredSections:A1_KOMBI_SECTIONS,futureOptionalSection:"hoeren",
-  sourceHasHoeren:false,minutes:A1_KOMBI_DURATIONS,scoreMax:75
+  title:number<=5?`A1 Mock ${number}`:`A1 Mock ${number} · Kombiprüfung`,
+  version:number<=5?"four-module-v2":"three-module-v1",
+  status:"preview",requiredSections:number<=5?["lesen","hoeren","schreiben","sprechen"]:A1_KOMBI_SECTIONS,
+  futureOptionalSection:number<=5?null:"hoeren",
+  sourceHasHoeren:number<=5,minutes:number<=5?{...A1_KOMBI_DURATIONS,hoeren:20,schreiben:20}:A1_KOMBI_DURATIONS,
+  scoreMax:number<=5?100:75
 })));
 export function getA1KombiMock(number){
   return A1_KOMBI_MOCKS.find(mock=>mock.mockNumber===Number(number))||null;
@@ -17,10 +20,12 @@ export function getA1KombiMock(number){
 export function buildA1KombiAttemptContract(mockNumber,options={}){
   const mock=getA1KombiMock(mockNumber);
   if(!mock) throw new Error("Unknown A1 Kombipruefung mock");
-  const withHoeren=options.hoerenPublished===true;
+  // Current Mock 04/05 launches include Hören; explicit false continues to
+  // describe immutable historical three-module attempts for review/tests.
+  const withHoeren=options.hoerenPublished===undefined ? Boolean(mock.sourceHasHoeren) : options.hoerenPublished===true;
   const sections=withHoeren?["lesen","hoeren","schreiben","sprechen"]:[...A1_KOMBI_SECTIONS];
   return {mockId:mock.id,questionSetId:mock.questionSetId,
-    assessmentVersion:withHoeren?"four-module-v2":mock.version,sections,
+    assessmentVersion:withHoeren?"four-module-v2":"three-module-v1",sections,
     maxScore:sections.length*25,
     resultsLabel:withHoeren?"Full mock · 4 modules":"Kombiprüfung · 3 modules"};
 }

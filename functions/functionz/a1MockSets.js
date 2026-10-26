@@ -2,7 +2,7 @@
 const registry = require('../data/assessmentTasks.json');
 const kombiKeys = require('./a1KombiReadingKeys');
 const kombiTasks = require('./a1KombiMarkingSets');
-const mock4ListeningKeys = require('./a1Mock4ListeningKeys');
+const publishedListeningKeys = { ...require('./a1Mock4ListeningKeys'), ...require('./a1Mock5ListeningKeys') };
 const EXTRA_A1_MOCK_IDS = Object.freeze(Object.keys(kombiKeys));
 const DEFAULT_A1_MOCK_ID = 'a1-mock-01';
 const SECOND_A1_MOCK_ID = 'a1-mock-02';
@@ -15,7 +15,7 @@ const validateA1MockId = (mockId = DEFAULT_A1_MOCK_ID) => {
 };
 const getA1MockSet = (mockId = DEFAULT_A1_MOCK_ID) => {
   validateA1MockId(mockId);
-  if (EXTRA_A1_MOCK_IDS.includes(mockId)) return { readingAnswerKey: kombiKeys[mockId], ...(mock4ListeningKeys[mockId] ? {listeningAnswerKey:mock4ListeningKeys[mockId]} : {}), writing: { form: { formRows: kombiTasks[mockId].form } }, speaking: kombiTasks[mockId].speaking };
+  if (EXTRA_A1_MOCK_IDS.includes(mockId)) return { readingAnswerKey: kombiKeys[mockId], ...(publishedListeningKeys[mockId] ? {listeningAnswerKey:publishedListeningKeys[mockId]} : {}), writing: { form: { formRows: kombiTasks[mockId].form } }, speaking: kombiTasks[mockId].speaking };
   return mockId === DEFAULT_A1_MOCK_ID ? null : registry.mockSets[mockId];
 };
 // The stored attempt, never a client-supplied task description, owns its marking set.
