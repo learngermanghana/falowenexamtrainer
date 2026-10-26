@@ -39,3 +39,19 @@ const b1Expected = JSON.stringify(b1Snapshot, null, 2) + '\n';
 if (process.argv.includes('--check')) assert.equal(readFileSync(b1Target, 'utf8'), b1Expected, 'B1 writing snapshot is stale');
 else writeFileSync(b1Target, b1Expected);
 console.log('Verified canonical writing contracts for all 28 B1 days');
+
+// Day 20's two teacher-authored task contexts are also used by Mark My Letter.
+const a1Source = readFileSync(new URL('../web/src/components/A1Day20LetterWritingWorkbookPage.js', import.meta.url), 'utf8');
+const contexts = [...a1Source.matchAll(/taskContext="([^"]+)"/g)].map(match => match[1]);
+assert.equal(contexts.length, 2);
+const a1Snapshot = { 'A1-12.3': {
+  assignmentKey: 'A1-12.3', title: 'Einladung an Julia und Anfrage an Sprachakademie München',
+  situation: contexts.map((text, index) => `Teil ${index + 1}: ${text}`).join('\n\n'),
+  points: contexts.flatMap((text, index) => [...text.matchAll(/\(\d\)\s*(.*?)(?=,\s*\(\d\)|\.\s*Check|$)/g)].map(match => `Teil ${index + 1}: ${match[1].trim()}`)),
+  taskVersion: 'A1-12.3-INVITATION-COURSE-V2',
+}};
+assert.equal(a1Snapshot['A1-12.3'].points.length, 6);
+const a1Target = new URL('../functions/data/a1WritingTasks.json', import.meta.url);
+const a1Expected = JSON.stringify(a1Snapshot, null, 2) + '\n';
+if (process.argv.includes('--check')) assert.equal(readFileSync(a1Target, 'utf8'), a1Expected, 'A1 writing snapshot is stale');
+else writeFileSync(a1Target, a1Expected);
