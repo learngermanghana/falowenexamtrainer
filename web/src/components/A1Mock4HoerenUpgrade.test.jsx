@@ -38,3 +38,18 @@ test("the backend returns private listening keys only after verified Mock 04/05 
  expect(server).toContain('["a1-mock-04","a1-mock-05"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
  expect(server).toContain('listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey');
 });
+
+test("Mocks 04/05 reuse the original full-mock guide and equal 20-minute writing timing",()=>{
+ expect(page).toContain('const showFullMockGuide = !isKombiThree');
+ expect(page).toContain('{showFullMockGuide ? <FullMockGuide level="A1" stage="intro" /> : null}');
+ expect(page).toContain('exam.stage !== "result" && showFullMockGuide ? <FullMockGuide');
+ expect(page).toContain('showFullMockGuide ? <FullMockGuide level="A1" stage="result"');
+ expect(page).toContain('isKombiThree && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]');
+ expect(page).toContain('isKombiThree ? "Schreiben · 15 min" : "Schreiben · 20 min"');
+ for(const id of ["a1-final-04","a1-final-05"]){
+   const exam=getMockExam(id);
+   expect(exam.mode).toBe("full");
+   expect(exam.sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
+   expect(exam.durationLabel).toContain("80 min");
+ }
+});
