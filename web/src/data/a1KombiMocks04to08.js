@@ -25,7 +25,7 @@ export function buildA1KombiAttemptContract(mockNumber,options={}){
   const withHoeren=options.hoerenPublished===undefined ? Boolean(mock.sourceHasHoeren) : options.hoerenPublished===true;
   const sections=withHoeren?["lesen","hoeren","schreiben","sprechen"]:[...A1_KOMBI_SECTIONS];
   return {mockId:mock.id,questionSetId:mock.questionSetId,
-    assessmentVersion:withHoeren?"four-module-v2":mock.version,sections,
+    assessmentVersion:withHoeren?"four-module-v2":"three-module-v1",sections,
     maxScore:sections.length*25,
     resultsLabel:withHoeren?"Full mock · 4 modules":"Kombiprüfung · 3 modules"};
 }
