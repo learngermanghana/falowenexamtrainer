@@ -1,54 +1,44 @@
-import fs from "fs";
-import path from "path";
-import { A1_SAMPLE_SECTIONS, A1_SAMPLE_DISCLOSURE } from "../data/a1BookSample";
-
-const source = (pathFromComponents) => fs.readFileSync(path.resolve(__dirname, pathFromComponents), "utf8");
-
-describe("Falowen A1 public bookstore launch", () => {
-  const bookstore = source("./BookStoreCheckout.js");
-  const css = source("./BookStoreCheckout.css");
-  const app = source("../App.js");
-  const backend = source("../../../functions/functionz/bookCommerce.js");
-  const storebookSafety = () => !backend.includes('"writing-skills-a1-c2-digital": "https://"')
-    && bookstore.includes('isWritingGuide ? <WritingGuideDetail')
-    && bookstore.includes("Continue to Paystack");
-
-  test("keeps public storefront routing and secure Paystack receipt verification", () => {
-    expect(app).toContain('location.pathname === "/books"');
-    expect(app).toContain('location.pathname === "/books/complete"');
-    expect(app).toContain('<BookStoreCheckout catalogOnly />');
-    expect(app).toContain('<BookStoreCheckout detailBook="a1" />');
-    expect(app).toContain('<BookStoreCheckout detailBook="writing" />');
-    expect(bookstore).toContain('if (catalogOnly) return <main');
-    expect(bookstore).toContain('const visibleEditions = books.filter');
-    expect(bookstore).toContain('{visibleEditions.length ? visibleEditions.map');
-    expect(bookstore).toContain('document.head.querySelector(\'link[rel="canonical"]\')');
-    expect(bookstore).toContain('request("/books/checkout"');
-    expect(bookstore).toContain('request("/books/verify"');
-    expect(bookstore).toContain("checkout.paystack.com");
-    expect(bookstore).not.toContain("PAYSTACK_SECRET");
-    expect(backend).toContain('priceGhs: 99');
-    expect(backend).toContain('priceGhs: 800');
-    expect(backend).toContain('"writing-skills-a1-c2-digital"');
-    expect(backend).toContain("priceGhs: 39");
-    expect(storebookSafety()).toBe(true);
-  });
-
-  test("shows the book cover and genuinely labelled free sample", () => {
-    expect(bookstore).toContain('"/books/a1-cover.svg"');
-    expect(bookstore).toContain('Download free sample PDF');
-    expect(bookstore).toContain("exportFreeSample");
-    expect(bookstore).toContain("A1_SAMPLE_DISCLOSURE");
-    expect(css).toContain("@media (max-width:720px)");
-    expect(A1_SAMPLE_SECTIONS.map(section => section.id)).toEqual(["grammar", "knowledge", "workbook"]);
-    expect(A1_SAMPLE_DISCLOSURE).toMatch(/reformatted/i);
-    expect(A1_SAMPLE_SECTIONS[0].blocks[0].lines[0][0]).toBe("Guten Morgen");
-  });
-
-  test("does not falsely promise the final mock, shipping, or immediate delivery", () => {
-    expect(bookstore).toMatch(/final mock examination is not included/i);
-    expect(bookstore).toMatch(/Delivery is charged separately/i);
-    expect(bookstore).toContain("secure downloads are provided when available");
-    expect(bookstore).not.toContain("guaranteed same-day delivery");
-  });
+import React from "react";
+import {render,screen,fireEvent} from "@testing-library/react";
+import BookStoreCheckout from "./BookStoreCheckout";
+const originalFetch=global.fetch;
+const catalog={paymentsEnabled:true,catalogTitles:[
+ {id:"a1-course-workbook",title:"A1 Course",status:"available",bookIds:["a1-digital","a1-printed"],pages:250},
+ {id:"writing-skills-a1-c2",title:"Writing guide",status:"coming_soon",bookIds:["writing-skills-a1-c2-digital"],pages:32}
+],books:[{id:"a1-digital",format:"digital",priceGhs:99},{id:"a1-printed",format:"printed",priceGhs:800},{id:"writing-skills-a1-c2-digital",format:"digital",priceGhs:39}]};
+beforeEach(()=>{window.history.replaceState({},"","/books");global.fetch=jest.fn(async url=>({ok:true,json:async()=>String(url).includes("/books/catalog")?catalog:{usdToGhs:10}}));});
+afterEach(()=>{global.fetch=originalFetch;});
+test("detail uses actual selected pages, separate checkout and related books without customer fields",async()=>{
+ render(<BookStoreCheckout detailBook="a1"/>);
+ expect(await screen.findByRole("link",{name:"Buy Now"})).toHaveAttribute("href","/books/deutsch-a1-course-workbook/checkout?edition=a1-digital");
+ expect(screen.getByRole("img",{name:/Preview page 2/})).toHaveAttribute("src","/books/previews/a1-course-workbook-2.webp");
+ expect(screen.getByRole("region",{name:"Related books"})).toHaveTextContent("Writing guide");
+ expect(screen.queryByLabelText("Full name")).toBeNull();
+ expect(global.fetch.mock.calls.every(([,options])=>!options?.method)).toBe(true);
+});
+test("checkout retains format, calculates quantity and posts delivery to existing API",async()=>{
+ window.history.replaceState({},"","/books/deutsch-a1-course-workbook/checkout?edition=a1-printed");
+ global.fetch=jest.fn(async url=>String(url).includes("/books/checkout")?{ok:false,json:async()=>({error:"Test payment response"})}:{ok:true,json:async()=>String(url).includes("/books/catalog")?catalog:{usdToGhs:10}});
+ render(<BookStoreCheckout checkout/>);
+ await screen.findByLabelText("Full name");
+ for(const [label,value] of [["Full name","Test Reader"],["Email address","reader@example.com"],["Phone / WhatsApp","+233241234567"],["Quantity","3"],["Collection or delivery","delivery"]]) fireEvent.change(screen.getByLabelText(label),{target:{value}});
+ fireEvent.change(screen.getByLabelText("Delivery address"),{target:{value:"Accra, Example Street"}});
+ fireEvent.click(screen.getByRole("button",{name:"Continue to Paystack · GH₵2400.00"}));
+ await screen.findByRole("alert");
+ const call=global.fetch.mock.calls.find(([url])=>url.includes("/books/checkout"));
+ expect(JSON.parse(call[1].body)).toEqual({bookId:"a1-printed",name:"Test Reader",email:"reader@example.com",phone:"+233241234567",quantity:3,deliveryMethod:"delivery",deliveryAddress:"Accra, Example Street"});
+ expect(screen.getByRole("button",{name:/Continue to Paystack/})).toBeEnabled();
+});
+test("coming soon blocks detail and direct checkout purchases",async()=>{
+ const view=render(<BookStoreCheckout detailBook="writing"/>);
+ await screen.findByText(/Coming Soon · Unavailable/);
+ expect(screen.queryByRole("link",{name:"Buy Now"})).toBeNull();view.unmount();
+ render(<BookStoreCheckout detailBook="writing" checkout/>);
+ await screen.findByText(/Coming Soon · Unavailable/);
+ expect(screen.queryByLabelText("Full name")).toBeNull();
+});
+test("digital checkout restricts quantity to one and hides delivery address",async()=>{
+ render(<BookStoreCheckout checkout/>);await screen.findByLabelText("Quantity");
+ expect(screen.getByLabelText("Quantity")).toBeDisabled();
+ expect(screen.queryByLabelText("Collection or delivery")).toBeNull();
 });

@@ -455,6 +455,8 @@ function App() {
   if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout catalogOnly />;
   if (location.pathname === "/books/deutsch-a1-course-workbook" || location.pathname === "/books/deutsch-a1-course-workbook/") return <BookStoreCheckout detailBook="a1" />;
   if (location.pathname === "/books/how-to-unlock-your-german-writing-skills-a1-c2" || location.pathname === "/books/how-to-unlock-your-german-writing-skills-a1-c2/") return <BookStoreCheckout detailBook="writing" />;
+  const bookCheckout = location.pathname.match(/^\/books\/([^/]+)\/checkout\/?$/);
+  if (bookCheckout) return <BookStoreCheckout slug={bookCheckout[1]} checkout />;
   if (location.pathname === "/books/complete") return <BookStoreCheckout completed />;
   const examGuide = location.pathname.match(/^\/books\/(goethe-a1-writing-model-exams|goethe-a2-four-skills-exam-guide|goethe-b1-four-skills-exam-guide)\/?$/);
   if (examGuide) return <ExamGuideComingSoon slug={examGuide[1]} />;
