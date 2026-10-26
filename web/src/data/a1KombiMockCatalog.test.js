@@ -6,7 +6,10 @@ test.each([4,5,6,7,8])("A1 Mock %s is registered as a separately labelled three-
  const exam = getMockExam(id);
  expect(exam).toMatchObject({id,level:"A1",status:"preview",mode:number<=5?"full":"kombi",
     sections:number<=5?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"],showInMockLibrary:true});
- expect(buildA1KombiAttemptContract(number).mockId).toBe(id);
+ const contract=buildA1KombiAttemptContract(number);
+ expect(contract.mockId).toBe(id);
+ expect(contract.maxScore).toBe(number<=5?100:75);
+ expect(contract.sections).toEqual(number<=5?["lesen","hoeren","schreiben","sprechen"]:["lesen","schreiben","sprechen"]);
  expect(getMockExamsForLevel("A1").some(item=>item.id===id)).toBe(true);
 });
 test("historical A1 mock 1–3 remain published",()=>{
