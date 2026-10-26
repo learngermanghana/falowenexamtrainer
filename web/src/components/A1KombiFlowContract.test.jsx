@@ -55,8 +55,8 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
   });
 
   test("a completed /75 attempt stays immutable when a later /100 contract exists", () => {
-    const original = buildA1KombiAttemptContract(4);
-    const future = buildA1KombiAttemptContract(4, {hoerenPublished:true});
+    const original = buildA1KombiAttemptContract(4, {hoerenPublished:false});
+    const future = buildA1KombiAttemptContract(4);
     expect(original.maxScore).toBe(75);
     expect(original.sections).toEqual(["lesen","schreiben","sprechen"]);
     expect(future.maxScore).toBe(100);
