@@ -1,0 +1,19 @@
+name: Verified tutor speaking
+on:
+  pull_request:
+    paths:
+      - 'functions/functionz/verifiedTutorSpeaking.js'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/tests/verifiedTutorSpeaking.test.cjs'
+      - 'web/src/components/A1TutorSpeakingCheckpoint*'
+      - 'firestore.rules'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test functions/functionz/tests/verifiedTutorSpeaking.test.cjs
+      - run: node --check functions/functionz/app.js

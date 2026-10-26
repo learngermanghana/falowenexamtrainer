@@ -337,6 +337,11 @@ service cloud.firestore {
     match /answerKeyRegistry/{document=**} { allow read, write: if isStaff(); }
     match /answerKeySyncRuns/{document=**} { allow read, write: if isStaff(); }
 
+    match /verifiedTutorSpeakingAssessments/{assessmentId} {
+      allow read: if isStaff();
+      allow write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
