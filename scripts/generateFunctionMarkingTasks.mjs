@@ -23,3 +23,19 @@ if (process.argv.includes("--check")) {
   if (actual !== expected) writeFileSync(target, expected, "utf8");
   console.log("Generated Firebase writing-task snapshot for " + tasks.length + " A2 lessons");
 }
+
+// Publish the exact B1 situations and source texts used by all 28 workbooks.
+const { getB1WritingTasks } = await import('../web/src/data/b1WritingTasks.js');
+const b1Tasks = getB1WritingTasks();
+assert.equal(b1Tasks.length, 28);
+const b1Snapshot = Object.fromEntries(b1Tasks.map(task => [task.assignmentKey, {
+  assignmentKey: task.assignmentKey, title: task.title,
+  situation: [task.instructions, task.sourceText].filter(Boolean).join('\n\n'),
+  points: [...(task.taskPoints || [])],
+  submissionNote: task.submissionNote || '',
+}]));
+const b1Target = new URL('../functions/data/b1WritingTasks.json', import.meta.url);
+const b1Expected = JSON.stringify(b1Snapshot, null, 2) + '\n';
+if (process.argv.includes('--check')) assert.equal(readFileSync(b1Target, 'utf8'), b1Expected, 'B1 writing snapshot is stale');
+else writeFileSync(b1Target, b1Expected);
+console.log('Verified canonical writing contracts for all 28 B1 days');

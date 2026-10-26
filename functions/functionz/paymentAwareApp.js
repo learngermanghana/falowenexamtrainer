@@ -786,6 +786,15 @@ app.get("/internal/marking-manifest", async (req, res) => {
         };
       }
     }
+    if (assignmentId.startsWith("B1-")) {
+      const item = require("../data/b1WritingTasks.json")[assignmentId];
+      if (item) writingTask = {
+        assignmentKey: assignmentId, title: item.title,
+        taskSituationDe: item.situation, taskPointsDe: item.points,
+        taskText: [item.situation, ...item.points, item.submissionNote].filter(Boolean).join("\n"),
+        source: "learner-coursebook",
+      };
+    }
     if (!key && !writingTask) return res.status(404).json({ error: "Assignment not found" });
     const contract = {
       schemaVersion: 1,
