@@ -420,26 +420,54 @@ export const B1_READING_TASKS = Object.freeze({
         ]
     }
 } }),
-  25: Object.freeze({ assignmentKey: "B1-8.25", ...{
-    title: "Modul Lesen · Teil 2 (7 Aufgaben · 20 Minuten)",
-    instructions: "Lesen Sie den Presseartikel und die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",
-    submissionNote: "Notieren Sie für jede der sieben Aufgaben die Aufgabennummer und Ihren gewählten Buchstaben (A, B oder C).",
-    imageAlt: "Presseartikel über Verbraucherrechte und Sicherheit beim Online-Shopping",
+  25: Object.freeze({ ...{
+    assignmentKey: "B1-8.25",
+    title: "Goethe-Leseverstehen B1: Rechte beim Online-Shopping",
+    instructions: "Lesen Sie den folgenden Text und lösen Sie die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung: a, b oder c.",
+    submissionNote: "Reichen Sie für jede der sieben Aufgaben einen Buchstaben (A, B oder C) ein.",
+    imageAlt: "Verbraucherrechte beim Online-Kauf",
     text: {
-      title: "Online-Shopping – Welche Rechte und Risiken Verbraucher kennen sollten",
-      questionTitle: "Aufgaben 1–7",
-      paragraphs: ["Der Einkauf im Internet gehört für Millionen Menschen mittlerweile zum Alltag. Ob Kleidung, Elektronik oder Lebensmittel – mit wenigen Klicks ist die Bestellung aufgegeben und wird direkt nach Hause geliefert. Doch neben der großen Bequemlichkeit und der riesigen Auswahl gibt es beim Online-Shopping auch Gefahren, vor denen Verbraucherschützer warnen.","Zu den größten Risiken zählen sogenannte Fake-Shops. Das sind gefälschte Internetseiten, die Waren zu extrem günstigen Preisen anbieten. Sie kassieren das Geld meist per Vorkasse, liefern die bestellte Ware jedoch niemals aus. Zudem kommt es im Internet immer wieder zum Missbrauch von persönlichen Daten und Kreditkarteninformationen.","Auf der anderen Seite garantiert das europäische Verbraucherrecht Online-Käufern besondere Schutzrechte. Das wichtigste Recht ist das 14-tägige Widerrufsrecht: Verbraucher können den Vertrag innerhalb von zwei Wochen ohne Angabe von Gründen stornieren und die erhaltene Ware an den Händler zurückschicken.","Um beim Online-Kauf sicher zu sein, raten Experten zu mehr Vorsicht. Vor einer Bestellung sollte man immer das Impressum des Händlers kontrollieren und Bewertungen anderer Kunden lesen. Außerdem empfiehlt es sich, sichere Zahlungsmethoden wie den Kauf auf Rechnung oder etablierte Bezahldienste zu wählen."],
-      questions: [
-        { stem: "Warum ist der Online-Einkauf bei vielen Menschen so beliebt?", options: ["a) Weil die Produkte im Internet immer kostenlos geliefert werden.","b) Weil man bequem von zu Hause aus eine große Auswahl bestellen kann.","c) Weil man im Internet keine persönlichen Daten eingeben muss."] },
-        { stem: "Was kennzeichnet sogenannte Fake-Shops?", options: ["a) Sie bieten Markenware zu sehr hohen Preisen an.","b) Sie verlangen Geld per Vorkasse, schicken die Ware aber nie ab.","c) Sie verkaufen ausschließlich gebrauchte und beschädigte Produkte."] },
-        { stem: "Welche weitere Gefahr beim Online-Einkauf wird im zweiten Abschnitt genannt?", options: ["a) Dass die Produkte beim Transport beschädigt werden.","b) Dass vertrauliche Daten und Kreditkartendaten missbraucht werden.","c) Dass man im Internet nur mit Bargeld bezahlen kann."] },
-        { stem: "Welches Recht gibt das europäische Verbraucherrecht Online-Käufern?", options: ["a) Ein 14-tägiges Widerrufsrecht ohne Angabe von Gründen.","b) Das Recht, beschädigte Ware erst nach einem Jahr zurückzugeben.","c) Eine Garantie, dass alle Lieferungen innerhalb von 24 Stunden ankommen."] },
-        { stem: "Was kann der Käufer innerhalb von zwei Wochen tun, wenn er die Ware doch nicht möchte?", options: ["a) Er kann den Vertrag stornieren und die Ware zurückschicken.","b) Er muss das Produkt behalten, bekommt aber die Hälfte des Geldes zurück.","c) Er muss den Händler persönlich im Geschäft besuchen."] },
-        { stem: "Welchen Rat geben Experten bezüglich der Händler-Website?", options: ["a) Man sollte das Impressum prüfen und Kundenbewertungen lesen.","b) Man sollte nur auf Internetseiten einkaufen, die Werbung anzeigen.","c) Man soll keine Kundenbewertungen lesen, da diese unzuverlässig sind."] },
-        { stem: "Welche Zahlungsmethoden halten Experten für besonders sicher?", options: ["a) Die Barzahlung per Postbrief an den Händler.","b) Die Überweisung per Vorkasse an unbekannte Konten.","c) Den Kauf auf Rechnung sowie etablierte Bezahldienste."] }
-      ],
-    },
-  } }),
+        title: "Verbraucherrechte im Internet: Was Sie beim Online-Kauf wissen müssen",
+        questionTitle: "Aufgaben 1–7",
+        paragraphs: [
+            "Das Einkaufen im Internet ist bequem und schnell, doch immer wieder stellen sich Käufer die Frage: Welche Rechte habe ich eigentlich, wenn die bestellte Ware nicht gefällt oder beschädigt ist? Das europäische Verbraucherrecht schützt Online-Käufer durch klare Regeln.",
+            "Das wichtigste Recht beim Online-Kauf ist das 14-tägige Widerrufsrecht. Im Gegensatz zum Kauf im Geschäft vor Ort können Verbraucher einen Online-Kauf innerhalb von zwei Wochen ohne Angabe von Gründen stornieren. Die Frist beginnt genau an dem Tag, an dem das Paket beim Kunden zu Hause ankommt. Nach dem Widerruf hat der Käufer weitere 14 Tage Zeit, um die Ware an den Händler zurückzusenden.",
+            "Allerdings gibt es Ausnahmen vom Widerrufsrecht. Produkte, die speziell nach Kundenwunsch angefertigt wurden – wie zum Beispiel ein T-Shirt mit einem persönlichen Foto-Aufdruck – können nicht zurückgegeben werden. Auch leicht verderbliche Lebensmittel sowie geöffnete Hygieneartikel oder entsiegelte Software sind vom Umtausch ausgeschlossen.",
+            "Ein häufiger Streitpunkt sind die Rücksendekosten. Gesetzlich gilt: Wenn der Händler den Kunden vor dem Kauf darüber informiert hat, muss der Käufer das Porto für die Rücksendung selbst bezahlen. Viele große Online-Shops übernehmen die Rücksendekosten jedoch weiterhin freiwillig als Service.",
+            "Sollte die gelieferte Ware jedoch beschädigt oder fehlerhaft sein, greift das gesetzliche Gewährleistungsrecht. In diesem Fall gilt eine zweijährige Frist. Der Kunde muss die Rücksendung nicht bezahlen und hat primär das Recht auf Reparatur oder eine neue Ersatzlieferung. Erst wenn eine Reparatur zweimal scheitert, kann der Käufer sein Geld zurückverlangen."
+        ],
+        questions: [
+            {
+                stem: "Was ist die Besonderheit des 14-tägigen Widerrufsrechts im Internet?",
+                options: ["a) Man darf Produkte nur umtauschen, wenn sie kaputt sind.", "b) Man kann den Kauf ohne Nennung von Gründen stornieren.", "c) Es gilt genau wie im Geschäft vor Ort."]
+            },
+            {
+                stem: "Wann beginnt die 14-tägige Widerrufsfrist genau?",
+                options: ["a) Am Tag, an dem man die Bestellung im Internet aufgibt.", "b) An dem Tag, an dem der Händler die Ware verschickt.", "c) Sobald der Kunde das Paket zu Hause empfängt."]
+            },
+            {
+                stem: "Welches Produkt kann man nach dem Kauf NICHT zurückgeben?",
+                options: ["a) Ein Buch aus einem Online-Buchladen.", "b) Ein T-Shirt mit einem persönlichen Foto-Aufdruck.", "c) Eine Jacke in Standardgröße."]
+            },
+            {
+                stem: "Wer muss laut Gesetz die Rücksendekosten tragen, wenn die Ware nicht gefällt?",
+                options: ["a) Immer der Händler.", "b) Der Käufer, wenn der Händler ihn vorab darüber informiert hat.", "c) Die Post bzw. der Paketdienst."]
+            },
+            {
+                stem: "Welches Recht gilt, wenn die gelieferte Ware fehlerhaft oder beschädigt ist?",
+                options: ["a) Das Widerrufsrecht.", "b) Das Gewährleistungsrecht.", "c) Das Rücksenderecht für Kleidung."]
+            },
+            {
+                stem: "Wie lange gilt die gesetzliche Gewährleistung für Waren?",
+                options: ["a) 14 Tage.", "b) 6 Monate.", "c) 2 Jahre."]
+            },
+            {
+                stem: "Wann kann der Käufer bei defekter Ware sein Geld zurückfordern?",
+                options: ["a) Sofort am ersten Tag nach der Lieferung.", "b) Wenn die Reparatur der Ware zweimal nicht geklappt hat.", "c) Gar nicht, man bekommt immer nur eine Gutschrift."]
+            }
+        ]
+    }
+} }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
     title: "Lesen · Situationen und Anzeigen zuordnen (4 Aufgaben)",
     instructions: "Lesen Sie die Situationen 1–4 und die Anzeigen A–E. Welche Anzeige passt zu welcher Person? Wählen Sie pro Aufgabe A, B, C, D, E oder 0, falls keine Anzeige passt.",

@@ -45,7 +45,7 @@ const config = {
   },
   writing: getB1WritingTask(25),
   reading: getB1ReadingTask(25),
-  submitWritingDescription: "Write your approx. 80-word opinion for the online-shopping discussion.",
+  submitWritingDescription: "Write your formal complaint email to ElectroWorld in approximately 40–50 words.",
   submitReadingDescription: "Submit one selected letter (A, B or C) for each of the seven reading questions.",
 };
 

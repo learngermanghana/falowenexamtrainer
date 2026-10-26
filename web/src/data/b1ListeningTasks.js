@@ -445,24 +445,20 @@ Herr Weber: Auf Wiedersehen!`,
     ]
 }),
   25: task({
-    title: "Nachhaltig einkaufen · Plastiktüten vermeiden (7 Aufgaben)",
-    instructions: "Lesen Sie zuerst die sieben Aufgaben. Hören Sie das Gespräch über Stoffbeutel, Wochenmarkt und Unverpacktladen. Wählen Sie jeweils a, b oder c.",
-    imageAlt: "Zwei Freunde sprechen über umweltfreundliches Einkaufen",
-    transcript: "A: Hallo, schön dich zu sehen. Aber sag mal, was hast du denn da alles in deinen Händen? Das sind ja extrem viele Plastiktüten.\nB: Ach, hallo. Ja, leider. Ich war gerade spontan im Supermarkt, um für das Abendessen einzukaufen. Mein alter Rucksack ist gestern kaputt gegangen und da musste ich an der Kasse diese Einwegtüten kaufen.\nA: Verstehe. Aber auf Dauer ist das für die Umwelt wirklich nicht optimal. Die Tüten landen danach meistens direkt im Müll. Warum kaufst du dir nicht einfach zwei oder drei stabile Jutebeutel? Die kosten fast nichts, halten jahrelang und sind viel reißfester.\nB: Da hast du völlig recht. Ich nehme mir das ehrlich gesagt schon seit Wochen vor. Ich habe sogar zwei Stoffbeutel zu Hause in der Küche liegen. Aber wenn ich spontan nach der Arbeit einkaufen gehe, vergesse ich sie jedes Mal.\nA: Das kenne ich. Am Anfang ging mir das genauso. Mein Tipp: Leg dir am besten direkt einen zusammengefalteten Beutel in deine Jackentasche oder in deine Arbeitstasche. So hast du immer einen dabei und musst nicht extra daran denken.\nB: Das ist echt ein super Tipp. Das werde ich ab morgen sofort ausprobieren. Sag mal, wie machst du das eigentlich beim Obst und Gemüse? Nimmst du da auch diese kleinen Plastiktüten aus dem Supermarkt?\nA: Nein, überhaupt nicht mehr. Ich nutze kleine Wiederverwendungsnetze aus Stoff, die man waschen kann. Oder ich lege Obst wie Äpfel und Bananen einfach direkt lose in den Einkaufswagen. Das spart enorm viel Plastikmüll.\nB: Stimmt, das habe ich neulich auch bei einigen Kunden gesehen. Manchmal ist das Gemüse im Supermarkt aber schon komplett in Plastik eingepackt, zum Beispiel die Gurken oder Paprika. Das stört mich ehrlich gesagt total.\nA: Mich auch. Deshalb gehe ich samstags am liebsten auf den Wochenmarkt in der Innenstadt. Dort ist fast alles unverpackt. Die Produkte kommen aus der Region und schmecken meistens auch viel besser. Außerdem gibt es dort seit kurzem sogar einen Unverpacktladen.\nB: Einen Unverpacktladen? Davon habe ich schon gehört, war aber noch nie dort. Wie funktioniert das genau? Bringt man da eigene Vorratsgläser von zu Hause mit?\nA: Genau. Du wiegst deine leeren Gläser oder Dosen vorher ab, füllst dann zum Beispiel Reis, Nudeln oder Müsli ein und bezahlst am Ende nur das reine Gewicht der Lebensmittel.\nB: Das klingt wirklich praktisch und umweltfreundlich. Weißt du was? Ich muss am Samstag sowieso noch einkaufen. Hast du Lust, dass wir zusammen zum Wochenmarkt gehen?\nA: Sehr gerne. Lass uns am Samstag um zehn Uhr vor dem Rathaus treffen und vergiss deine Beutel nicht.\nB: Keine Sorge, diesmal bin ich vorbereitet. Bis Samstag.",
+    title: "Online einkaufen – Rechte und Risiken · Hören · Richtig oder Falsch (5 Aufgaben)",
+    instructions: "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
     audioKey: "b1/day-25/day-25.mp3",
-    videoTitle: "B1 Day 25 · Nachhaltig einkaufen",
+    videoTitle: "B1 Day 25 · Online einkaufen – Rechte und Risiken",
     submitRequired: true,
-    submissionNote: "Wählen Sie für jede der sieben Aufgaben einen Buchstaben (A, B oder C) und reichen Sie Ihre Antworten über Submit ein.",
+    submissionNote: "Reichen Sie alle fünf Antworten über Submit als TEIL 4 ein: A = Richtig, B = Falsch.",
     questions: [
-      q("Warum musste eine Person im Supermarkt Einwegtüten kaufen?", ["a) Sie wollte eine große Party organisieren.","b) Ihr Rucksack war kaputt und sie hatte keine Tasche dabei.","c) Die Stoffbeutel waren im Supermarkt verboten."]),
-      q("Welche Alternative zu Plastiktüten wird zuerst empfohlen?", ["a) Ein Korb aus Kunststoff.","b) Große Papiertüten, die man nur einmal benutzt.","c) Zwei oder drei stabile Jutebeutel."]),
-      q("Warum benutzt die Person ihre Stoffbeutel bisher nicht regelmäßig?", ["a) Sie vergisst sie beim spontanen Einkauf nach der Arbeit.","b) Sie findet Stoffbeutel zu teuer.","c) Sie darf sie nicht in den Supermarkt mitnehmen."]),
-      q("Wie soll die Person laut dem Tipp dafür sorgen, immer einen Beutel dabeizuhaben?", ["a) Jeden Tag einen neuen Beutel kaufen.","b) Einen zusammengefalteten Beutel in der Jacken- oder Arbeitstasche aufbewahren.","c) Den Beutel am Wochenende im Supermarkt abgeben."]),
-      q("Was macht eine Person beim Einkauf von Obst und Gemüse, um Plastik zu vermeiden?", ["a) Sie verwendet waschbare Stoffnetze oder kauft unverpacktes Obst.","b) Sie nimmt immer die kleinen Plastiktüten im Supermarkt.","c) Sie kauft ausschließlich tiefgekühltes Obst."]),
-      q("Warum geht eine Person besonders gern auf den Wochenmarkt?", ["a) Dort sind nur importierte Waren erhältlich.","b) Der Markt ist an jedem Abend geöffnet.","c) Dort gibt es viele unverpackte Produkte aus der Region."]),
-      q("Wann und wo wollen sich die beiden zum gemeinsamen Einkauf treffen?", ["a) Am Freitag um zehn Uhr vor dem Bahnhof.","b) Am Samstag um zehn Uhr vor dem Rathaus.","c) Am Samstag um zwölf Uhr vor dem Supermarkt."])
-    ],
-  }),
+        q("Der Kunde hat online ein neues Smartphone bestellt.", ["A) Richtig", "B) Falsch"]),
+        q("Das Paket wurde dem Kunden persönlich übergeben.", ["A) Richtig", "B) Falsch"]),
+        q("Bei Online-Käufen in der EU gibt es laut dem Gespräch ein gesetzliches Widerrufsrecht von vierzehn Tagen.", ["A) Richtig", "B) Falsch"]),
+        q("Die Nachforschung der Post dauert laut dem Mitarbeiter genau einen Monat.", ["A) Richtig", "B) Falsch"]),
+        q("Wenn das Paket nicht auftaucht, erhält der Kunde sein Geld zurück.", ["A) Richtig", "B) Falsch"])
+    ]
+}),
   26: task({
     title: "Reiseprobleme und Lösungen · Hören · Richtig oder Falsch (5 Aufgaben)",
     instructions: "Hören Sie das Gespräch zweimal. Entscheiden Sie bei jeder der fünf Aussagen: A) Richtig oder B) Falsch.",

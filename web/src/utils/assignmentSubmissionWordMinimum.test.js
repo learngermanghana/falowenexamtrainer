@@ -72,3 +72,8 @@ describe("assignment submission word minimum", () => {
     })).toBe(`Your answer has 35 words. You need at least 50 words for the letter-writing task and answers. Add 15 more words before submitting.`);
   });
 });
+
+ test("B1 Day 25 accepts the 40-word formal complaint while other assignments keep their minimum", () => {
+ expect(getAssignmentSubmissionWordMinimum({ level: "B1", chapter: "8.25" })).toBe(40);
+ expect(getAssignmentSubmissionWordMinimum({ level: "B1", chapter: "8.24" })).toBe(20);
+});

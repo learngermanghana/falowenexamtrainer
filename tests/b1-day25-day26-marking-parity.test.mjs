@@ -57,9 +57,9 @@ function matchOptions(id,day,part,kind,source,expectedLetters) {
     assert.ok(exactOrTitle,`${id}/${part} item ${i+1}: old answer text or changed learner option`);
   }
 }
-test("Day 25 bundled Lesen/Hören keys match 7+7 actual learner options",()=>{
-  matchOptions("B1-8.25",25,"teil3","reading",reading,["B","B","B","A","A","A","C"]);
-  matchOptions("B1-8.25",25,"teil4","listening",listening,["B","C","A","B","A","C","B"]);
+test("Day 25 bundled Lesen/Hören keys match 7+5 actual learner options",()=>{
+  matchOptions("B1-8.25",25,"teil3","reading",reading,["B","C","B","B","B","C","B"]);
+  matchOptions("B1-8.25",25,"teil4","listening",listening,["A","B","A","B","A"]);
   const section=block(listening,25,"listening");
   assert.match(section,/audioKey: "b1\/day-25\/day-25\.mp3"/);
   assert.match(section,/submitRequired: true/);

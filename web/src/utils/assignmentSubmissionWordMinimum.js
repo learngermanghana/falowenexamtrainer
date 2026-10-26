@@ -37,6 +37,7 @@ const isA1ObjectiveAssignment = ({ level = "", chapter = "" } = {}) =>
   normalizeLevel(level) === "A1" && A1_OBJECTIVE_ASSIGNMENT_CHAPTERS.includes(normalizeChapter(chapter));
 
 export const getAssignmentSubmissionWordMinimum = ({ level = "", chapter = "" } = {}) => {
+  if (normalizeLevel(level) === "B1" && normalizeChapter(chapter) === "8.25") return 40;
   if (isA1FiftyWordAssignment({ level, chapter })) return A1_LETTER_ASSIGNMENT_MINIMUM_WORDS;
   if (isA1ObjectiveAssignment({ level, chapter })) return NO_ASSIGNMENT_SUBMISSION_WORD_MINIMUM;
   if (isA1StandardWritingAssignment({ level, chapter })) return A1_STANDARD_ASSIGNMENT_MINIMUM_WORDS;

@@ -396,27 +396,34 @@ export const B1_WRITING_TASKS = Object.freeze({
     ],
     "submissionNote": "Schreiben Sie ca. 80 Wörter und bearbeiten Sie alle vier Punkte."
 } }),
-  25: Object.freeze({ assignmentKey: "B1-8.25", ...{
-    title: "Diskussionsbeitrag · Online einkaufen – Rechte und Risiken (ca. 80 Wörter)",
-    instructions: "Sie haben im Fernsehen eine Diskussionssendung zum Thema „Online einkaufen – Rechte und Risiken“ gesehen. Im Online-Gästebuch der Sendung lesen Sie Tims Meinung. Schreiben Sie Ihren Diskussionsbeitrag in etwa 25 Minuten (ca. 80 Wörter).",
-    imageAlt: "Diskussionsbeitrag über Online-Shopping",
-    sourceTitle: "Tim, 28 Jahre",
-    sourceText: "„Ich kaufe fast alles im Internet, weil es schnell und bequem ist. Bisher hatte ich noch nie Probleme. Wer vorsichtig ist und bei bekannten Händlern bestellt, geht kaum ein Risiko ein. Außerdem hat man ja das Recht, Waren innerhalb von 14 Tagen zurückzusenden.“",
+  25: Object.freeze({ ...{
+    assignmentKey: "B1-8.25",
+    title: "B1 Schreiben: Prüfungsaufgabe · Formelle E-Mail / Reklamation (ca. 40–50 Wörter)",
+    instructions: "Sie haben vor wenigen Tagen im Online-Shop „ElectroWorld“ ein elektronisches Gerät (z. B. ein Tablet oder eine Kaffeemaschine) bestellt. Heute ist das Paket angekommen, aber die Ware ist beschädigt / kaputt. Schreiben Sie eine formelle E-Mail an den Kundenservice von „ElectroWorld“ (ca. 40–50 Wörter). Bearbeiten Sie alle drei Punkte.",
+    imageAlt: "Formelle Reklamation an den Kundenservice",
+    sourceTitle: "Situation: Beschädigte Ware von ElectroWorld",
     taskPoints: [
-      "Äußern Sie Ihre Meinung zum Thema Online-Shopping sowie zu Risiken und Verbraucherrechten.",
-      "Begründen Sie Ihre Haltung.",
-      "Nennen Sie persönliche Erfahrungen oder ein Beispiel aus Ihrem Alltag bzw. Ihrem Heimatland."
+        "Grund des Schreibens: Geben Sie Ihren Kauf an (Datum, Produkt und Bestellnummer).",
+        "Problem beschreiben: Was ist beschädigt oder funktioniert nicht?",
+        "Lösung / Forderung: Bitten Sie um Umtausch, Reparatur oder Rückerstattung des Geldes."
     ],
     supportStructure: [
-      "Kurze Einleitung: Beziehen Sie sich auf Tims Aussage.",
-      "Eigene Meinung mit einem Grund (weil, denn, deshalb).",
-      "Vorteil und Risiko des Online-Shoppings abwägen (einerseits … andererseits).",
-      "Verbraucherrecht oder sicheren Einkauf erwähnen.",
-      "Eigene Erfahrung / Beispiel und kurzer Schluss."
+        "Formelle Anrede: Sehr geehrte Damen und Herren,",
+        "Kaufdatum, Produkt und Bestellnummer nennen.",
+        "Den Defekt kurz beschreiben.",
+        "Eine konkrete Lösung erbitten.",
+        "Formeller Gruß: Mit freundlichen Grüßen"
     ],
-    template: "Ich habe Tims Meinung gelesen und stimme ihm nur teilweise zu. Einerseits … Andererseits … Meiner Meinung nach … Ein Beispiel aus meinem Alltag / Heimatland ist … Deshalb finde ich, dass …",
-    vocabulary: ["der Fake-Shop", "das Widerrufsrecht", "das Risiko", "die Verbraucherrechte", "der Kundenservice", "die Bewertung", "auf Rechnung bezahlen"],
-  } }),
+    vocabulary: [
+        "die Bestellnummer",
+        "beschädigt ankommen",
+        "nicht funktionieren",
+        "die Ersatzlieferung",
+        "die Rückerstattung",
+        "umtauschen"
+    ],
+    submissionNote: "Schreiben Sie ca. 40–50 Wörter. Vergessen Sie nicht die formelle Anrede und den Gruß."
+} }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
     title: "Goethe-Zertifikat B1 · Schreiben Teil 2 · Reiseprobleme und Lösungen",
     instructions: "Arbeitszeit: ca. 25 Minuten. Schreiben Sie einen Forumsbeitrag von ca. 80 Wörtern. Sie haben im Internet einen Beitrag von Markus zum Thema „Reiseprobleme und Lösungen“ gelesen. Reagieren Sie darauf.",
