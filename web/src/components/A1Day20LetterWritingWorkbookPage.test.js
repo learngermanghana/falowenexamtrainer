@@ -107,24 +107,38 @@ describe("A1 Day 20 letter-writing workbook", () => {
     );
     expect(informal).toHaveAttribute("data-letter-type", "informal");
     expect(formal).toHaveAttribute("data-letter-type", "formal");
-    expect(informal).toHaveAttribute("data-prompt-type", "note");
+    expect(informal).toHaveAttribute("data-prompt-type", "email");
     expect(formal).toHaveAttribute("data-prompt-type", "email");
-    expect(informal.getAttribute("data-placeholder")).toContain("Hallo Anna");
+    expect(informal.getAttribute("data-placeholder")).toContain("Liebe Julia");
     expect(formal.getAttribute("data-placeholder")).toContain(
       "Sehr geehrte Damen und Herren",
     );
-    expect(informal.getAttribute("data-task-context")).toContain("informal");
+    expect(informal.getAttribute("data-task-context")).toContain("Julia");
+    expect(informal.getAttribute("data-task-context")).toContain("day, clock time and location");
+    expect(formal.getAttribute("data-task-context")).toContain("course times and costs");
+    expect(formal.getAttribute("data-task-context")).toContain("when the learner would like to begin");
     expect(formal.getAttribute("data-task-context")).toContain("formal email");
 
     const teilOne = document.querySelector('[data-a1-letter-task="informal"]');
     const teilTwo = document.querySelector('[data-a1-letter-task="formal"]');
     expect(teilOne.querySelector('[data-a1-day20-write-here="teil-1"]')).toContainElement(informal);
     expect(teilTwo.querySelector('[data-a1-day20-write-here="teil-2"]')).toContainElement(formal);
-    expect(screen.getByText("Write Teil 1 here")).toBeInTheDocument();
-    expect(screen.getByText("Write Teil 2 here")).toBeInTheDocument();
+    expect(screen.getByText("Write your informal email here")).toBeInTheDocument();
+    expect(screen.getByText("Write your formal email here")).toBeInTheDocument();
 
     const teilOneTask = Array.from(teilOne.children).find((child) => child.textContent.includes("Aufgabe"));
     const teilOneWriter = teilOne.querySelector('[data-a1-day20-write-here="teil-1"]');
     expect(teilOneTask.compareDocumentPosition(teilOneWriter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(teilOne).toHaveTextContent("Ihre Freundin Julia");
+    expect(teilOne).toHaveTextContent("Tag, Uhrzeit und Ort");
+    expect(teilOne).toHaveTextContent("Essen/Getränke");
+    expect(teilTwo).toHaveTextContent("Sprachakademie München");
+    expect(teilTwo).toHaveTextContent("Kurszeiten und Kosten");
+    expect(teilTwo).toHaveTextContent("Wann möchten Sie anfangen?");
+    expect(teilOne).toHaveTextContent("ca. 30 Wörter");
+    expect(teilTwo).toHaveTextContent("ca. 30 Wörter");
+    expect(teilOne).not.toHaveTextContent("Geburtstag");
+    expect(teilTwo).not.toHaveTextContent("Kann ich online bezahlen?");
+
   });
 });
