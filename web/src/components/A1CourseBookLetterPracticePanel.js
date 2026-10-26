@@ -53,7 +53,7 @@ export default function A1CourseBookLetterPracticePanel({
   const { user, idToken, studentProfile } = useAuth();
   const timed = useTimedAssignment();
   const normalizedAssignmentKey = String(assignmentKey || "").trim().toUpperCase();
-  const independentFinalMock = ["A1-13", "A1-14.1"].includes(normalizedAssignmentKey);
+  const independentFinalMock = ["A1-12.3", "A1-13", "A1-14.1"].includes(normalizedAssignmentKey);
   const feedbackLockedDuringAttempt = Boolean(
     independentFinalMock && timed?.enabled && timed?.attemptState === "active" && !timed?.reviewUnlocked,
   );

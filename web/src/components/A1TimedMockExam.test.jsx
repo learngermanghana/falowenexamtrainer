@@ -31,25 +31,25 @@ describe("A1 timed mock exam", () => {
   });
 
   test("allocates time according to the amount of work in each remaining assignment", () => {
-    expect(getA1MockExamDurationSeconds("A1-12.3")).toBe(30 * 60);
+    expect(getA1MockExamDurationSeconds("A1-12.3")).toBe(20 * 60);
     expect(getA1MockExamDurationSeconds("A1-13")).toBe(35 * 60);
     expect(getA1MockExamDurationSeconds("A1-14.1")).toBe(30 * 60);
   });
 
-  test("starts a persistent 30-minute mock for Day 20", () => {
+  test("starts a persistent 20-minute mock for Day 20", () => {
     render(
       <MemoryRouter initialEntries={["/workbook"]}>
         <Routes><Route path="/workbook" element={<A1TimedMockExam assignment={{ assignmentKey: "A1-12.3" }}><TimedAssignmentPanel /></A1TimedMockExam>} /></Routes>
       </MemoryRouter>,
     );
 
-    const unlockButton = screen.getByRole("button", { name: "Start 30-minute mock" });
+    const unlockButton = screen.getByRole("button", { name: "Start 20-minute mock" });
     expect(unlockButton).toBeDisabled();
     expect(document.querySelector("[data-a1-timed-mock-exam]")).toHaveAttribute("data-assignment-locked", "true");
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(unlockButton);
 
-    expect(screen.getByText("30:00")).toBeInTheDocument();
+    expect(screen.getByText("20:00")).toBeInTheDocument();
     expect(document.querySelector("[data-a1-timed-mock-exam]")).toHaveAttribute("data-assignment-locked", "false");
     const saved = JSON.parse(window.localStorage.getItem(buildA1MockExamStorageKey("A1-12.3")));
     expect(saved.endsAt - Date.now()).toBe(getA1MockExamDurationSeconds("A1-12.3") * 1000);

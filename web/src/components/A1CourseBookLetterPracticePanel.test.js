@@ -193,7 +193,7 @@ test("locks Mark My Letter during A1-13 and A1-14.1 timed attempts", async () =>
   expect(markLetterWithAI).not.toHaveBeenCalled();
 });
 
-test("keeps ordinary A1 letter practice marking available outside the final timed mocks", async () => {
+test("locks Kapitel 12.3 practice marking during its independent timed attempt", async () => {
   useTimedAssignment.mockReturnValue({
     enabled: true,
     attemptState: "active",
@@ -203,5 +203,5 @@ test("keeps ordinary A1 letter practice marking available outside the final time
   render(<A1CourseBookLetterPracticePanel {...formalProps} assignmentKey="A1-12.3" />);
 
   await screen.findByLabelText("Your letter");
-  expect(screen.getByRole("button", { name: "Mark My Formal Letter" })).not.toBeDisabled();
+  expect(screen.getByRole("button", { name: "Mark My Letter locked during timed attempt" })).toBeDisabled();
 });
