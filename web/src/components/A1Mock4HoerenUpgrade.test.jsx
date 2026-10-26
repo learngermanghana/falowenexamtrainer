@@ -35,7 +35,7 @@ test("library and UI include Hören for new Mocks 04/05/06 but preserve historic
  expect(canReviewFullMock({...current,sectionScores:{lesen:25,schreiben:25,sprechen:25}})).toBe(false);
 });
 test("the backend returns private listening keys only after verified Mock 04/05/06 completion",()=>{
- expect(server).toContain('["a1-mock-04","a1-mock-05"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
+ expect(server).toContain('["a1-mock-04","a1-mock-05","a1-mock-06"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
  expect(server).toContain('listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey');
 });
 
