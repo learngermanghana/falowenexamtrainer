@@ -101,4 +101,29 @@ describe("A1 Day 20 letter-writing workbook", () => {
     expect(email).toHaveTextContent("circa 30 Wörter");
     expect(email).not.toHaveTextContent("Liebe Julia,");
   });
+  test("restores informal letter steps and weil explanations on the Day 12.3 Grammar tab", async () => {
+    const { container } = render(
+      <MemoryRouter
+        initialEntries={[
+          "/campus/course/letter-writing-intro-german-a1-day-12-3?radio=done&assignmentKey=A1-12.3&assignmentId=A1-12.3&level=A1&workbookTab=grammar&view=grammar",
+        ]}
+      >
+        <A1Day20LetterWritingWorkbookPage />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("tab", { name: "Grammar" })).toHaveAttribute("aria-selected", "true");
+    expect(await screen.findByRole("heading", { name: "Informal Letter Structure" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "How to use weil (because)" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Formal Letter Structure" })).toBeInTheDocument();
+
+    const notes = container.querySelector('[data-a1-day20-letter-structure="true"]');
+    expect(notes).not.toBeNull();
+    expect(notes).toHaveTextContent("Liebe Sara,");
+    expect(notes).toHaveTextContent("Ich bleibe zu Hause, weil ich krank bin.");
+    expect(notes).toHaveTextContent("denn (because)");
+    expect(notes).toHaveTextContent("Mit freundlichen Grüßen");
+    expect(screen.getByRole("tab", { name: /Teil 2 · E-Mail an Julia/ })).toBeInTheDocument();
+  });
+
 });
