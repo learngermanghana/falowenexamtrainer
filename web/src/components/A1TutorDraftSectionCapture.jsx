@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styles } from "../styles";
 import {
   getA1TutorDraftProfile,
@@ -157,8 +157,8 @@ export default function A1TutorDraftSectionCapture({ sectionKey }) {
   const savedSection = draft?.sections?.[sectionKey] || {};
   const progress = getA1TutorDraftSectionProgress({ assignmentKey, sectionKey, draft });
   const label = sectionProfile?.label || sectionKey.replace("teil-", "Teil ");
-  const choiceItems = useMemo(() => sectionProfile?.items?.filter((item) => item.type === "choice") || [], [sectionProfile]);
-  const shortItems = useMemo(() => sectionProfile?.items?.filter((item) => item.type === "short") || [], [sectionProfile]);
+  const choiceItems = sectionProfile?.items?.filter((item) => item.type === "choice") || [];
+  const shortItems = sectionProfile?.items?.filter((item) => item.type === "short") || [];
   const [boundChoiceNumbers, setBoundChoiceNumbers] = useState([]);
   const [choiceBindingChecked, setChoiceBindingChecked] = useState(false);
 

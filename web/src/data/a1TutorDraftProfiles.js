@@ -135,8 +135,8 @@ const profiles = {
   },
   "A1-12.3": {
     sections: {
-      "teil-1": section(shortItems(5, "Write the requested word or number"), { label: "Formular ausfüllen" }),
-      "teil-2": section([], { label: "E-Mail an Julia", embeddedWriting: true }),
+      "teil-1": section([], { label: "Informal letter", embeddedWriting: true }),
+      "teil-2": section([], { label: "Formal letter", embeddedWriting: true }),
     },
   },
   "A1-13": {
