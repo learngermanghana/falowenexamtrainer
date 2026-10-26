@@ -52,8 +52,15 @@ async function run(){
 }
 if(require.main===module){
   run().catch(err=>{
-    console.error("Firestore index reconciliation failed:",err.response?.status||err.code||"unknown",
-      String(err.response?.data?.error?.message||err.message||"").slice(0,300));
+    const status=err.response?.status;
+    const providerStatus=err.response?.data?.error?.status;
+    const message=String(err.response?.data?.error?.message||err.message||"");
+    const isPermissionDenied=status===403 && providerStatus==="PERMISSION_DENIED";
+    if(isPermissionDenied && process.env.GITHUB_OUTPUT){
+      fs.appendFileSync(process.env.GITHUB_OUTPUT,"permission_denied=true\n");
+    }
+    console.error("Firestore index reconciliation failed:",status||err.code||"unknown",
+      message.slice(0,300));
     process.exitCode=1;
   });
 }
