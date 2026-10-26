@@ -41,7 +41,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
   const { draft, updateSectionText } = useA1TutorWorkbookDraft() || {};
   const saved = draft?.sections?.[sectionKey]?.text || "";
   const marker = task?.assessmentMarker || "GOETHE_A1_TUTOR_SPEAKING_V1";
-  const alreadyAssessed = saved.startsWith(marker);
+  const alreadyAssessed = saved.startsWith(marker) && /^Verified speaking assessment: [A-Za-z0-9_-]{1,128}\s*$/m.test(saved);
   const recorder = useRef(null);
   const stream = useRef(null);
   const mountedRef = useRef(false);
@@ -141,6 +141,9 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         cardId: isPictureCardTask ? drawnCard?.id : undefined,
         idToken: await user.getIdToken(),
       });
+      if (!result.verified || !/^[A-Za-z0-9_-]{1,128}$/.test(result.assessmentId || "")) {
+        throw new Error("The server could not save your speaking assessment. Please retry before submitting.");
+      }
       const rawScore = result.score ?? result.assessment?.score ?? result.result?.score ?? result.scores?.overall ?? result.rubric?.overall;
       const numeric = Number(rawScore);
       if (!Number.isFinite(numeric) || numeric < 0) {
@@ -160,6 +163,7 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         task.taskLine || ("Speaking exam part: " + task.examPart),
         ...(isPictureCardTask && drawnCard ? ["Drawn picture card: " + drawnCard.label] : []),
         "Score: " + score + "/10",
+        "Verified speaking assessment: " + result.assessmentId,
         ...(isPictureCardTask ? ["Scoring criteria: Request 4, Politeness 2, Transcript intelligibility 2, Complete expression 2"] : []),
         ...(isPictureCardTask && result.rubric ? [
           "Rubric: " + Object.entries(result.rubric).map(([key, points]) => {
@@ -287,7 +291,8 @@ export default function A1TutorSpeakingCheckpoint({ assignmentKey, sectionKey })
         {practiceMode && practiceBlob && !recording && <span style={{color:"#166534",fontSize:13}}>Practice saved only on this device while you stay on this page. It is not submitted or AI-assessed.</span>}
       </div>
       {error ? <p role="alert" style={{ color: "#b91c1c" }}>{error}</p> : null}
-      {saved.startsWith(marker) ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace(marker, "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
+      {saved.startsWith(marker) && !alreadyAssessed ? <p role="status">This older assessment needs verification. Record and assess again to enable automatic marking.</p> : null}
+      {alreadyAssessed ? <div style={{ background: "#f0fdf4", borderRadius: 10, padding: 12, whiteSpace: "pre-wrap" }}><strong>Assessment saved in your assignment draft</strong><p>{saved.replace(marker, "").trim()}</p><small>Only score and feedback are stored; the audio is not permanently uploaded. Open Review & Submit to send this assignment.</small></div> : null}
     </div>
   );
 }

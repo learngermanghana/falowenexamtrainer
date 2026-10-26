@@ -26,6 +26,7 @@ const { validateA1MockId, resolveA1MarkingSet, getA1MockSet, scoreA1Mock2Form, s
 const { createMockAssessment } = require("./mockAssessment");
 const { A2_WRITING_GUIDANCE, pointAssessmentShape, validateA2WritingEvidence } = require("./a2WritingAssessment");
 const { audioHttpError, extensionForRemoteAudio, transcribeAudioFile } = require("./speakingAudioReliability");
+const { saveTutorSpeakingAssessment, genericTutorTask, genericTutorPrompt, parseGenericTutorScore } = require("./verifiedTutorSpeaking");
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
@@ -6428,7 +6429,20 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
         route: "/speaking/analyze", uid: authedUser.uid, email: authedUser.email,
         metadata: { teil: "3", level: "A1", task: "A1-11", cardId: card.id, quotaRemaining: quota.remaining },
       });
-      return res.json({ ...scored, transcript, quotaRemaining: quota.remaining });
+      const assessment = await saveTutorSpeakingAssessment({ db: getFirestoreSafe(), uid: authedUser.uid, assignmentKey: "A1-11", scored });
+      return res.json({ ...scored, ...assessment, transcript, quotaRemaining: quota.remaining });
+    }
+
+    const tutorTask = level === "A1" ? genericTutorTask(contextType, teil) : null;
+    if (tutorTask) {
+      if (!transcript.trim()) return res.status(422).json({ error: "No speech was recognized. Please record again." });
+      const evaluation = await createChatCompletion([
+        { role: "system", content: genericTutorPrompt(tutorTask) },
+        { role: "user", content: "Learner's German speech transcript: " + transcript },
+      ], { temperature: 0.2, max_tokens: 380 });
+      const scored = parseGenericTutorScore(evaluation);
+      const assessment = await saveTutorSpeakingAssessment({ db: getFirestoreSafe(), uid: authedUser.uid, assignmentKey: tutorTask.assignmentKey, scored });
+      return res.json({ ...scored, ...assessment, transcript, quotaRemaining: quota.remaining });
     }
 
     const messages = [

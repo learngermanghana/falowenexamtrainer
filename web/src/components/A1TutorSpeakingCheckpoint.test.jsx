@@ -1,5 +1,5 @@
 import React from "react";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import A1TutorSpeakingCheckpoint from "./A1TutorSpeakingCheckpoint";
 import { createSpeakingMediaRecorder } from "../lib/speakingAudio";
 import { assessA1TutorSpeaking } from "../services/coachService";
@@ -137,7 +137,7 @@ test.each([
   }
 });
 
-test("A1-11 assesses only the drawn card and saves the card name with the score", async () => {
+test.each([true, false])("A1-11 saves only server-verified assessments (verified=%s)", async (verified) => {
   const random = jest.spyOn(Math, "random").mockReturnValue(0.06);
   const originalCreateObjectURL = URL.createObjectURL;
   const originalRevokeObjectURL = URL.revokeObjectURL;
@@ -147,7 +147,7 @@ test("A1-11 assesses only the drawn card and saves the card name with the score"
     const { media } = makeStream();
     navigator.mediaDevices.getUserMedia.mockResolvedValueOnce(media);
     assessA1TutorSpeaking.mockResolvedValueOnce({
-      score: 8.5, maxScore: 10, feedback: "Höfliche Bitte mit Sie und bitte.",
+      verified, assessmentId: verified ? "receipt123" : undefined, score: 8.5, maxScore: 10, feedback: "Höfliche Bitte mit Sie und bitte.",
     });
     render(<A1TutorSpeakingCheckpoint assignmentKey="A1-11" sectionKey="teil-1" />);
     fireEvent.click(screen.getByRole("button", { name: "Karte ziehen" }));
@@ -170,11 +170,19 @@ test("A1-11 assesses only the drawn card and saves the card name with the score"
       assignmentKey: "A1-11", examPart: 3, cardId:"fenster",
       question: expect.stringContaining("das Fenster"),
     }));
+    if (!verified) {
+      expect(mockUpdateSectionText).not.toHaveBeenCalled();
+      expect(screen.getByText(/server could not save your speaking assessment/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "Assess final recording" })).toBeEnabled();
+      return;
+    }
+    expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Verified speaking assessment: receipt123");
     expect(mockUpdateSectionText).toHaveBeenCalledWith("teil-1",
       expect.stringContaining("Drawn picture card: das Fenster"));
     expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Score: 8.5/10");
     expect(mockUpdateSectionText.mock.calls[0][1]).toContain("Corrected example: Können Sie bitte das Fenster öffnen?");
   } finally {
+    cleanup();
     random.mockRestore();
     URL.createObjectURL = originalCreateObjectURL;
     URL.revokeObjectURL = originalRevokeObjectURL;
