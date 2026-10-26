@@ -7,6 +7,7 @@ const mockSetLevel = jest.fn((value) => { mockSelectedLevel = value; });
 const mockShowToast = jest.fn();
 const mockMark = jest.fn();
 const mockSaveAttempt = jest.fn();
+const mockSaveExamResult = jest.fn();
 const mockSaveForTutor = jest.fn();
 
 jest.mock("../context/ExamContext", () => ({
@@ -28,6 +29,9 @@ jest.mock("../context/ToastContext", () => ({
 }));
 jest.mock("../services/coachService", () => ({
   markLetterWithAI: (...args) => mockMark(...args),
+}));
+jest.mock("../services/examRoomResultService", () => ({
+  saveExamRoomResult: (...args) => mockSaveExamResult(...args),
 }));
 jest.mock("../services/writingProgressService", () => ({
   saveWritingAttempt: (...args) => mockSaveAttempt(...args),
@@ -75,6 +79,11 @@ describe("Exams Room writing tasks", () => {
     expect(screen.getByText("5/5")).toBeInTheDocument();
     expect(screen.getByText("1/5 completed")).toBeInTheDocument();
     expect(mockSaveAttempt).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(mockSaveExamResult).toHaveBeenCalledTimes(1));
+    expect(mockSaveExamResult.mock.calls[0][0]).toMatchObject({
+      level: "A1", section: "schreiben", score: 5, total: 5, resultType: "practice",
+    });
+    expect(mockSaveExamResult.mock.calls[0][0]).not.toHaveProperty("text");
   });
 
   test("requires all numbered A1 fields before checking or saving", () => {

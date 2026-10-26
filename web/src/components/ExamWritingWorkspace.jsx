@@ -3,6 +3,7 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { markLetterWithAI } from "../services/coachService";
+import { saveExamRoomResult } from "../services/examRoomResultService";
 import { saveWritingAttempt } from "../services/writingProgressService";
 import { saveExamLetterForTutorReview, isTutorReviewCloudEnabled } from "../services/tutorReviewService";
 import { buildWritingHistoryRecord } from "./WritingHistorySection";
@@ -138,6 +139,19 @@ export default function ExamWritingWorkspace() {
     });
     await saveWritingAttempt({ userId: user.uid, studentCode, mode: "exam",
       workspaceKey: "exam-room", attempt: { ...attempt, teil: teil.id, format } });
+    // Share score metadata with staff monitoring; keep the student's text in writing history.
+    if (result.score != null && result.maxScore != null && Number(result.maxScore) > 0) {
+      try {
+        await saveExamRoomResult({
+          idToken: idToken || await user.getIdToken(), level, section: "schreiben",
+          setId: checkedTask.id, title: attempt.taskTitle,
+          score: Number(result.score), total: Number(result.maxScore),
+          attemptId: attempt.id, resultType: "practice", route: "/exams/schreiben",
+        });
+      } catch {
+        showToast("Feedback is ready, but the exam tracking score could not be saved. Please check this task again to retry.", "info");
+      }
+    }
   };
   const evaluate = async () => {
     if (!task || busy || requestInFlight.current) return;
