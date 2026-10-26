@@ -12,12 +12,12 @@ const engine = read("./A1FinalMockExamPage.jsx");
 const library = read("./MockExamLibraryPage.js");
 
 describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
-  test.each([4,5,6,7,8])("A1 Mock %s has an independent route, paper and 3-module catalog card", n => {
+  test.each([4,5,6,7,8])("A1 Mock %s has an independent route, paper and correct module catalog card", n => {
     const id = `a1-final-0${n}`, mockId = `a1-mock-0${n}`;
     const route = `/campus/course/a1-final-mock-${n}`;
     expect(getMockExam(id)).toMatchObject({
       id, questionSetId: mockId, status: "preview",
-      mode: "kombi", route, sections: n===4 ? ["Lesen","Hören","Schreiben","Sprechen"] : ["Lesen", "Schreiben", "Sprechen"],
+      mode: "kombi", route, sections: n<=5 ? ["Lesen","Hören","Schreiben","Sprechen"] : ["Lesen", "Schreiben", "Sprechen"],
     });
     expect(getMockExamsForLevel("A1").find(x => x.id === id)).toBeDefined();
     expect(app).toContain(`path="${route}"`);
@@ -41,7 +41,9 @@ describe("A1 Kombiprüfung Mocks 4–8 release flow", () => {
     }
   });
 
-  test("all three exam steps are reachable without Hören or four-module copy", () => {
+  test("legacy three-module exams remain reachable, while new Mocks 04/05 include Hören", () => {
+    expect(engine).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId)');
+    expect(engine).toContain('const hasHoren = !isKombi || (hasPublishedListening');
     expect(engine).toContain('moveToSection(hasHoren ? "hoeren" : "schreiben"');
     expect(engine).toContain('isKombi && stage === "schreiben" ? 15 * 60');
     expect(engine).toContain('isKombiThree ? "Start or resume 3 modules"');
