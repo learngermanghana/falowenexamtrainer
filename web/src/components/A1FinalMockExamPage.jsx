@@ -363,7 +363,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const kombiNumber = isKombi ? Number(mockId.slice(-2)) : 0;
   const kombiSet = isKombi ? A1_KOMBI_TASK_SETS[kombiNumber] : null;
   const isAdditionalMock = isMock2 || isMock3 || isKombi;
-  const title = isKombi ? `A1 Mock ${kombiNumber} · Kombiprüfung` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
+  const title = isKombi ? `A1 Mock ${kombiNumber}` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
   const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId);
   const listening = mockId==="a1-mock-05" ? A1_MOCK_5_LISTENING : mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
   const writing = isKombi ? kombiSet.writing : isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
@@ -380,6 +380,13 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const [exam, setExam] = useState(() => readStoredState(storageKey, mockId));
   const hasHoren = !isKombi || (hasPublishedListening && (exam.assessmentVersion==="four-module-v2" || (!exam.attemptInfo && exam.stage==="intro")));
   const isKombiThree = isKombi && !hasHoren;
+  const showFullMockGuide = !isKombiThree;
+  // The original Mocks 01–03 already use this shared four-step guide.
+  // For 04/05 derive completed steps from navigation until the server releases
+  // objective scores at the end; never fabricate intermediate grades.
+  const completedSkillKeys = isKombi && hasHoren
+    ? ["lesen","hoeren","schreiben","sprechen"].slice(0, Math.max(0, ["lesen","hoeren","schreiben","sprechen","result"].indexOf(exam.stage)))
+    : FULL_MOCK_SKILLS.filter(skill => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map(skill => skill.key);
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -534,13 +541,13 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
       ...current,
       ...patch,
       stage,
-      sectionDeadlineMs: Date.now() + (isKombi && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]) * 1000,
+      sectionDeadlineMs: Date.now() + (isKombiThree && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]) * 1000,
     }));
     timeoutHandledRef.current = "";
     const previousSection = { hoeren: "Lesen", schreiben: hasHoren ? "Hören" : "Lesen", sprechen: "Schreiben" }[stage];
     if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [isKombi,hasHoren]);
+  }, [isKombiThree,hasHoren]);
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
@@ -911,7 +918,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     const wordCount = exam.schreibenText.trim() ? exam.schreibenText.trim().split(/\s+/).length : 0;
     return (
       <>
-        <SectionHeader label={isKombi ? "Schreiben · 15 min" : "Schreiben · 20 min"} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+        <SectionHeader label={isKombiThree ? "Schreiben · 15 min" : "Schreiben · 20 min"} secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
         <article className={`a1-goethe-mock-exam a1-schreiben-mock-exam${isAdditionalMock ? " a1-mock2-writing" : ""}`}>
           <header className="a1-goethe-mock-header">
             <p className="a1-goethe-mock-kicker">A1 · Schreiben</p>
@@ -1052,10 +1059,10 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           <p className="a1-goethe-mock-kicker">{title}</p>
           <h1>{overall.score}% — {overall.passed ? "PASSED" : "NEEDS MORE PRACTICE"}</h1>
           <p>{attemptLabel}</p>
-          {isKombi ? <p>Verified points: {overall.points}/{overall.maxPoints || 75} · Assessment version: {overall.assessmentVersion}</p> : null}
+          {isKombiThree ? <p>Verified points: {overall.points}/{overall.maxPoints || 75}</p> : null}
         </header>
 
-        {!isKombi ? <FullMockGuide level="A1" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} /> : <p>{hasHoren?"Verified four-module exam · Hören included":"Verified three-module Kombiprüfung · Hören not assessed"}</p>}
+        {showFullMockGuide ? <FullMockGuide level="A1" stage="result" completedSkills={completedSkillKeys} complete={exam.completed} /> : <p>Verified three-module attempt · Hören not assessed</p>}
         <div className="a1-final-mock-scoregrid">
           {(isKombiThree ? ["lesen","schreiben","sprechen"] : ["lesen", "hoeren", "schreiben", "sprechen"]).map((key) => (
             <div key={key}>
@@ -1171,11 +1178,11 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
           <h1>{title}</h1>
           <p>{isKombiThree ? "Complete Lesen, Schreiben and Sprechen. Hören is not included in this historic attempt." : "Complete all four sections in order. Answers and AI feedback are revealed only after the full mock is finished."}</p>
 
-          {!isKombi ? <FullMockGuide level="A1" stage="intro" /> : null}
+          {showFullMockGuide ? <FullMockGuide level="A1" stage="intro" /> : null}
           <div className="a1-final-mock-overview">
             <div><strong>Lesen</strong><span>25 min · 25 points</span></div>
             {hasHoren ? <div><strong>Hören</strong><span>max. 20 min · 25 points</span></div> : null}
-            <div><strong>Schreiben</strong><span>{isKombi ? 15 : 20} min · 25 points</span></div>
+            <div><strong>Schreiben</strong><span>{isKombiThree ? 15 : 20} min · 25 points</span></div>
             <div><strong>Sprechen</strong><span>15 min · 25 points</span></div>
           </div>
 
@@ -1203,7 +1210,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
         </span>
       </div>
 
-      {exam.stage !== "result" && !isKombi ? <FullMockGuide level="A1" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
+      {exam.stage !== "result" && showFullMockGuide ? <FullMockGuide level="A1" stage={exam.stage} completedSkills={completedSkillKeys} /> : null}
 
       {exam.stage === "lesen" ? renderLesen() : null}
       {exam.stage === "hoeren" ? renderHoeren() : null}
