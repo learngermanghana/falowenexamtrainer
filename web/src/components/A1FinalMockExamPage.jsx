@@ -363,7 +363,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const kombiNumber = isKombi ? Number(mockId.slice(-2)) : 0;
   const kombiSet = isKombi ? A1_KOMBI_TASK_SETS[kombiNumber] : null;
   const isAdditionalMock = isMock2 || isMock3 || isKombi;
-  const title = isKombi ? `A1 Mock ${kombiNumber}` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
+  const title = isKombi ? `A1 Mock ${kombiNumber}${kombiNumber > 5 ? " · Kombiprüfung" : ""}` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
   const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId);
   const listening = mockId==="a1-mock-05" ? A1_MOCK_5_LISTENING : mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
   const writing = isKombi ? kombiSet.writing : isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
