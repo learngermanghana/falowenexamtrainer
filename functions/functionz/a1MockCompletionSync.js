@@ -59,23 +59,23 @@ const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {}, mockId = 
       const error = new Error("Saved A1 Kombipruefung attempt belongs to a different paper.");
       error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
     }
-    const isFourPartMock4 = mockId==="a1-mock-04" && state?.assessmentVersion==="four-module-v2";
-    if (state?.assessmentVersion && !["three-module-v1", ...(mockId==="a1-mock-04"?["four-module-v2"]:[])].includes(state.assessmentVersion)) {
+    const isFourPartKombi = ["a1-mock-04","a1-mock-05"].includes(mockId) && state?.assessmentVersion==="four-module-v2";
+    if (state?.assessmentVersion && !["three-module-v1", ...(["a1-mock-04","a1-mock-05"].includes(mockId)?["four-module-v2"]:[])].includes(state.assessmentVersion)) {
       const error = new Error("Unsupported A1 Kombipruefung assessment version.");
       error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
     }
     const lesen = scoreObjectiveAnswers(state.lesenAnswers || {}, mockSet.readingAnswerKey, 25);
-    const hoeren = isFourPartMock4 ? scoreObjectiveAnswers(state.hoerenAnswers || {}, mockSet.listeningAnswerKey, 25) : null;
+    const hoeren = isFourPartKombi ? scoreObjectiveAnswers(state.hoerenAnswers || {}, mockSet.listeningAnswerKey, 25) : null;
     const schreiben = verifiedSectionScore(verifiedSections,"schreiben",{errorCode:"A1_MOCK_SECTION_NOT_VERIFIED"});
     const sprechen = verifiedSectionScore(verifiedSections,"sprechen",{errorCode:"A1_MOCK_SECTION_NOT_VERIFIED"});
-    const maxPoints = isFourPartMock4 ? 100 : 75;
+    const maxPoints = isFourPartKombi ? 100 : 75;
     const points = Number((lesen.score + Number(hoeren?.score || 0) + schreiben + sprechen).toFixed(1));
     const percentage = Number((points * 100 / maxPoints).toFixed(1));
-    const sections = isFourPartMock4 ? ["lesen","hoeren","schreiben","sprechen"] : ["lesen","schreiben","sprechen"];
+    const sections = isFourPartKombi ? ["lesen","hoeren","schreiben","sprechen"] : ["lesen","schreiben","sprechen"];
     return {
-      sectionScores: isFourPartMock4 ? {lesen:lesen.score,hoeren:hoeren.score,schreiben,sprechen} : {lesen:lesen.score,schreiben,sprechen},
-      overall: {score:percentage,maxScore:100,points,maxPoints,assessmentVersion:isFourPartMock4?"four-module-v2":"three-module-v1",sections,passed:percentage>=60},
-      objective: isFourPartMock4 ? {lesen,hoeren} : {lesen}
+      sectionScores: isFourPartKombi ? {lesen:lesen.score,hoeren:hoeren.score,schreiben,sprechen} : {lesen:lesen.score,schreiben,sprechen},
+      overall: {score:percentage,maxScore:100,points,maxPoints,assessmentVersion:isFourPartKombi?"four-module-v2":"three-module-v1",sections,passed:percentage>=60},
+      objective: isFourPartKombi ? {lesen,hoeren} : {lesen}
     };
   }
   return buildVerifiedFourSkillScore({

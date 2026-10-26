@@ -15,6 +15,7 @@ import A1Mock3ReadingSection from "./A1Mock3ReadingSection";
 import A1KombiReadingSection from "./A1KombiReadingSection";
 import { A1_KOMBI_TASK_SETS } from "../data/a1KombiTaskSets";
 import { A1_MOCK_4_LISTENING } from "../data/a1Mock4Listening";
+import { A1_MOCK_5_LISTENING } from "../data/a1Mock5Listening";
 import { A1_MOCK_3_ID, A1_MOCK_3_READING, A1_MOCK_3_LISTENING, A1_MOCK_3_WRITING, A1_MOCK_3_WRITING_TASK, A1_MOCK_3_SPEAKING } from "../data/a1FinalMock3Data";
 import { A1_MOCK_2_ID, A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from "../data/a1FinalMock2Data";
 import { A1PictureOptions } from "./ListeningPracticeSamplePage";
@@ -363,7 +364,8 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const kombiSet = isKombi ? A1_KOMBI_TASK_SETS[kombiNumber] : null;
   const isAdditionalMock = isMock2 || isMock3 || isKombi;
   const title = isKombi ? `A1 Mock ${kombiNumber} · Kombiprüfung` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
-  const listening = mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
+  const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId);
+  const listening = mockId==="a1-mock-05" ? A1_MOCK_5_LISTENING : mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
   const writing = isKombi ? kombiSet.writing : isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
   const writingTask = isKombi ? {situation:writing.teil2.situation,points:writing.teil2.points} : isMock3 ? A1_MOCK_3_WRITING_TASK : isMock2 ? A1_MOCK_2_WRITING_TASK : A1_FINAL_MOCK_WRITING_TASK;
   const lesenScoredQuestions = useMemo(() => isKombi
@@ -371,12 +373,12 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
     : isAdditionalMock
       ? Object.values(isMock3 ? A1_MOCK_3_READING : A1_MOCK_2_READING).flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
       : defaultLesenQuestions, [isAdditionalMock, isMock3, isKombi]);
-  const hoerenScoredQuestions = useMemo(() => isKombi && mockId!=="a1-mock-04" ? [] : isAdditionalMock
+  const hoerenScoredQuestions = useMemo(() => isKombi && !hasPublishedListening ? [] : isAdditionalMock
     ? [listening.teil1, listening.teil2, listening.teil3].flatMap((part, i) => part.questions.map(question => ({ ...question, part: `t${i + 1}` })))
-    : defaultHoerenQuestions, [isAdditionalMock, listening, isKombi, mockId]);
+    : defaultHoerenQuestions, [isAdditionalMock, listening, isKombi, mockId, hasPublishedListening]);
   const storageKey = `${isAdditionalMock ? `falowen:a1-final-mock:${mockId}` : A1_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
   const [exam, setExam] = useState(() => readStoredState(storageKey, mockId));
-  const hasHoren = !isKombi || (mockId==="a1-mock-04" && (exam.assessmentVersion==="four-module-v2" || (!exam.attemptInfo && exam.stage==="intro")));
+  const hasHoren = !isKombi || (hasPublishedListening && (exam.assessmentVersion==="four-module-v2" || (!exam.attemptInfo && exam.stage==="intro")));
   const isKombiThree = isKombi && !hasHoren;
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
@@ -465,7 +467,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
         }
         if (isKombi) {
           if (!response?.verifiedOverall || !response?.verifiedSectionScores || !response?.readingAnswerKey ||
-            (mockId==="a1-mock-04" && exam.assessmentVersion==="four-module-v2" && !response?.listeningAnswerKey)) {
+            (hasPublishedListening && exam.assessmentVersion==="four-module-v2" && !response?.listeningAnswerKey)) {
             throw new Error("Falowen has not returned the verified Kombiprüfung result.");
           }
           completionSaveRef.current = `${attemptId}:${Number(response.verifiedOverall.score)}:${completionRetryNonce}`;
@@ -830,7 +832,7 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
 
       <LockedExamAudio
         sampleId={listening.sampleId}
-        mockAudioId={mockId==="a1-mock-04"?"mock-04":"mock-01"}
+        mockAudioId={hasPublishedListening ? mockId.replace("a1-", "") : "mock-01"}
         part={partName}
         objectKey={config.audioObjectKey}
         idToken={idToken}

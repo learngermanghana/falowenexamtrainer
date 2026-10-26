@@ -52,5 +52,5 @@ test("new version rejects browser totals, missing receipt, and mismatched answer
  const empty=buildVerifiedA1MockScore({mockId:id,state:{...basic,assessmentVersion:"four-module-v2",hoerenAnswers:{}},verifiedSections:receipts});
  assert.equal(empty.objective.hoeren.score,0);
  assert.equal(empty.overall.maxPoints,100);
- assert.throws(()=>buildVerifiedA1MockScore({mockId:"a1-mock-05",state:{...basic,mockId:"a1-mock-05",assessmentVersion:"four-module-v2"},verifiedSections:receipts}),/Unsupported/);
+ assert.throws(()=>buildVerifiedA1MockScore({mockId:"a1-mock-06",state:{...basic,mockId:"a1-mock-06",assessmentVersion:"four-module-v2"},verifiedSections:receipts}),/Unsupported/);
 });
