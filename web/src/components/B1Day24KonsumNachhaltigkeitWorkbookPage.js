@@ -1,6 +1,7 @@
 import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
+import { getB1ListeningTask } from "../data/b1ListeningTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
 
 export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
@@ -124,28 +125,9 @@ export const B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(24),
   reading: getB1ReadingTask(24),
-  listening: {
-    title:
-      "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",
-    instructions:
-      "Bearbeiten Sie den vollständigen Hörtest zuerst ohne die Lösungen anzusehen. Kontrollieren und markieren Sie Ihre Antworten anschließend selbst.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for listening comprehension",
-    videoId: "zzPpGxzvJCY",
-    videoTitle: "B1 Konsum und Nachhaltigkeit 8.24 Hörverstehen",
-    externalUrl: "https://youtu.be/zzPpGxzvJCY",
-    selfCheckText:
-      "Please note that this is a Goethe-standard Hörverstehen (listening comprehension) test, and the answers are provided in the YouTube video. You are responsible for checking your own answers. The only parts that will be officially evaluated by the school are Lesen (reading) and Schreiben (writing). You must mark your own Hörverstehen results. This process will require a lot of motivation and self-discipline on your part to be effective. Thank you, and good luck!",
-    steps: [
-      "Bearbeiten Sie den Hörtest, ohne zuerst die Lösungen anzusehen.",
-      "Hören Sie schwierige Teile bei Bedarf ein zweites Mal.",
-      "Vergleichen Sie danach Ihre Antworten mit den Lösungen im Video.",
-      "Markieren und notieren Sie Ihr eigenes Hörverstehensergebnis.",
-      "Reichen Sie nur Lesen und Schreiben zur offiziellen Bewertung ein.",
-    ],
-  },
-  submitWritingDescription: "Paste your final 80–100 word opinion text.",
-  submitReadingDescription: "Paste your seven Richtig/Falsch answer letters.",
+  listening: getB1ListeningTask(24),
+  submitWritingDescription: "Paste your final blog/forum post of about 80 words covering all four points.",
+  submitReadingDescription: "Paste your seven answer letters (A, B or C).",
 };
 
 export default function B1Day24KonsumNachhaltigkeitWorkbookPage() {

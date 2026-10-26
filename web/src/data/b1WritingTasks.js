@@ -368,41 +368,34 @@ export const B1_WRITING_TASKS = Object.freeze({
       "eine Beziehung entwickeln",
     ],
   } }),
-  24: Object.freeze({ assignmentKey: "B1-8.24", ...{
-    title:
-      "Ist es wichtig, beim Konsum auf Nachhaltigkeit zu achten? Schreiben Sie Ihre Meinung.",
-    instructions:
-      "Lesen Sie Pauls Meinung. Schreiben Sie danach Ihre eigene Meinung, begründen Sie Ihren Standpunkt und nennen Sie konkrete Beispiele.",
-    image: "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Writing an opinion about sustainable consumption",
-    sourceTitle: "Paul",
-    sourceText:
-      "In der heutigen Zeit ist es immer wichtiger, nachhaltig zu konsumieren. Ich stimme dem zu, denn durch bewusstes Einkaufen können wir die Umwelt schützen und Ressourcen sparen. Viele Produkte, die wir kaufen, haben einen großen Einfluss auf die Natur, zum Beispiel durch Verpackungen oder den CO₂-Ausstoß bei der Herstellung. Dennoch ist es manchmal schwierig, nachhaltige Alternativen zu finden, vor allem bei den Preisen. Ich finde, dass jeder von uns kleine Schritte machen kann, wie weniger Plastik zu verwenden oder Secondhand zu kaufen. Was denken Sie darüber?",
-    taskPoints: [
-      "Sagen Sie, ob Sie Paul zustimmen oder nicht.",
-      "Erklären Sie, warum nachhaltiger Konsum wichtig sein kann.",
-      "Nennen Sie Schwierigkeiten oder Nachteile nachhaltiger Alternativen.",
-      "Geben Sie konkrete Beispiele für nachhaltigen Konsum.",
-      "Formulieren Sie einen klaren Schluss.",
+  24: Object.freeze({ ...{
+    "assignmentKey": "B1-8.24",
+    "title": "B1 Schreiben Teil 1: Prüfungsaufgabe · Konsum und Nachhaltigkeit",
+    "instructions": "Sie haben im Fernsehen eine Diskussion zum Thema „Konsum und Nachhaltigkeit – Brauchen wir wirklich so viel?“ gesehen. Im Online-Gästebuch der Sendung finden Sie Lauras Meinung. Schreiben Sie nun einen Blogbeitrag / Forenbeitrag zum Thema (ca. 80 Wörter). Schreiben Sie zu allen vier Punkten.",
+    "imageAlt": "Blogbeitrag über nachhaltigen Konsum",
+    "sourceTitle": "Laura (24 Jahre)",
+    "sourceText": "„Ich versuche seit einigen Monaten, weniger neue Kleidung und Plastikprodukte zu kaufen. Viele Dinge kann man gebraucht kaufen oder reparieren. Das spart Geld und schont die Umwelt!“",
+    "taskPoints": [
+        "Meinung: Äußern Sie Ihre Meinung zum Thema nachhaltiger Konsum.",
+        "Gründe: Nennen Sie Gründe, warum dieses Thema heutzutage wichtig ist.",
+        "Alternativen: Nennen Sie andere Möglichkeiten, wie man im Alltag nachhaltiger leben kann.",
+        "Vor- und Nachteile: Nennen Sie Vor- oder Nachteile von nachhaltigem Konsum."
     ],
-    supportStructure: [
-      "Einleitung",
-      "Reaktion auf Pauls Meinung",
-      "Argumente für nachhaltigen Konsum",
-      "Schwierigkeiten oder Gegenargumente",
-      "Persönliches Beispiel und eigene Meinung",
-      "Schluss",
+    "supportStructure": [
+        "Einleitung: Reagieren Sie kurz auf Lauras Meinung.",
+        "Eigene Meinung und Gründe nennen.",
+        "Nachhaltige Alternativen im Alltag beschreiben.",
+        "Vor- oder Nachteile abwägen und einen kurzen Schluss schreiben."
     ],
-    vocabulary: [
-      "Ressourcen sparen",
-      "Verpackungen vermeiden",
-      "Secondhand kaufen",
-      "regionale Produkte",
-      "nachhaltige Alternative",
-      "bewusst konsumieren",
-      "CO₂-Ausstoß reduzieren",
+    "vocabulary": [
+        "Ressourcen schonen",
+        "Secondhand kaufen",
+        "reparieren lassen",
+        "Plastik vermeiden",
+        "bewusst konsumieren"
     ],
-  } }),
+    "submissionNote": "Schreiben Sie ca. 80 Wörter und bearbeiten Sie alle vier Punkte."
+} }),
   25: Object.freeze({ assignmentKey: "B1-8.25", ...{
     title: "Diskussionsbeitrag · Online einkaufen – Rechte und Risiken (ca. 80 Wörter)",
     instructions: "Sie haben im Fernsehen eine Diskussionssendung zum Thema „Online einkaufen – Rechte und Risiken“ gesehen. Im Online-Gästebuch der Sendung lesen Sie Tims Meinung. Schreiben Sie Ihren Diskussionsbeitrag in etwa 25 Minuten (ca. 80 Wörter).",

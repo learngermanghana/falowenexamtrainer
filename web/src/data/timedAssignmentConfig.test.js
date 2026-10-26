@@ -55,7 +55,7 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(15 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.23")).toBe(20 * 60);
     expect(getTimedAssignmentConfig("B1-7.22")?.timedTabs).toEqual(["lesen", "hoeren"]);
-    expect(getTimedAssignmentConfig("B1-8.24")?.timedTabs).toEqual(["schreiben", "lesen"]);
+    expect(getTimedAssignmentConfig("B1-8.24")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-8.25")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-9.26")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-10.27")?.mode).toBe("mock");

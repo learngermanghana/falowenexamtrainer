@@ -345,57 +345,81 @@ export const B1_READING_TASKS = Object.freeze({
       ],
     },
   } }),
-  24: Object.freeze({ assignmentKey: "B1-8.24", ...{
-    title:
-      "Lesen Sie den Text und entscheiden Sie bei allen sieben Aussagen: richtig oder falsch.",
-    instructions:
-      "Lesen Sie zuerst Elenis vollständigen Text. Wählen Sie danach bei jeder Aussage genau eine Antwort: Richtig oder Falsch.",
-    image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Reading about environmental awareness and recycling",
-    text: {
-      title: "Hallo liebe Umweltfreunde!",
-      questionTitle: "Aussagen: Richtig oder Falsch",
-      paragraphs: [
-        "Durch meine Nachbarin Heike habe ich über eine Bürgerinitiative in unserem Viertel erfahren, die sich für den Umweltschutz und für die Umwelterziehung einsetzt. Ich finde es wichtig, dass man sich in der eigenen Stadt für die Umwelt einsetzt und den Kindern beibringt, wie wir umweltbewusst leben können. Meine Tochter ist zwar erst vier Jahre alt, aber ich denke, sie sollte schon früh mitbekommen, dass wir nicht so weitermachen können wie bisher.",
-        "In Griechenland ist das Umweltbewusstsein leider nicht so hoch. Das finde ich an Deutschland viel besser! In Griechenland ist auch die Sperrmüllabholung nicht so gut organisiert wie hier. Wir schmeißen einfach alles auf die Straße, aber es wird nicht wirklich abgeholt, zumindest nicht regelmäßig. Manchmal liegen bei uns wirklich alte Möbel monatelang am Straßenrand herum.",
-        "In Deutschland stellen die Leute ihre alten Möbel gut geordnet am Abend vor der Abholung vor die Tür. Manche Sachen sind auch noch brauchbar. Ich habe auch schon Stühle und einen Tisch aus dem Sperrmüll geholt und benutze sie jetzt bei mir zu Hause. Man gibt Sachen eine zweite Chance! Hier wird man nicht blöd angeschaut, wenn man das macht.",
-        "Ich finde es super, dass man auch Kleidung, die man vielleicht nicht mehr mag, die aber noch tragbar ist, in Altkleidercontainern sammelt und bedürftigen Menschen zukommen lässt. Die Container stehen überall in der Stadt und man kann die Sachen da reingeben. Auch dass es die Möglichkeit gibt, Einwegglas zu sammeln, und dass man daraus wieder neues Glas herstellt, ist genial.",
-        "In Deutschland habe ich zum ersten Mal einen Wertstoffhof und ein Schadstoffmobil kennengelernt. Es ist richtig, dass giftige und umweltschädliche Sachen nicht einfach in den Müll geworfen werden und dass man Teile von alten Elektrogeräten wiederverwendet. Das sind wir unseren Kindern schuldig!",
-        "Eure Eleni",
-      ],
-      questions: [
-        {
-          stem: "Eleni hat mit ihrer Nachbarin eine Bürgerinitiative gegründet.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Sie findet, dass Kinder früh etwas über Umweltschutz lernen sollten.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "In Griechenland sind alle Menschen sehr umweltbewusst.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem:
-            "Eleni meint, dass es in Deutschland zu viele unnötige Sammelstellen für Müll gibt.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Altkleidersammlungen findet sie sinnvoll.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Das Recyceln von Wertstoffen ist ihrer Meinung nach nutzlos.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-        {
-          stem: "Sie mag es, wenn Sachen eine zweite Chance bekommen.",
-          options: ["A) Richtig", "B) Falsch"],
-        },
-      ],
-    },
-  } }),
+  24: Object.freeze({ ...{
+    "assignmentKey": "B1-8.24",
+    "title": "Goethe-Leseverstehen: Konsum und Nachhaltigkeit",
+    "instructions": "Lesen Sie den folgenden Text und lösen Sie die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung: a, b oder c.",
+    "submissionNote": "Reichen Sie für jede der sieben Aufgaben einen Buchstaben (A, B oder C) ein.",
+    "imageAlt": "Nachhaltiger Konsum, Secondhand und Reparaturen",
+    "text": {
+        "title": "Weniger ist mehr: Der Wandel im Konsumverhalten",
+        "questionTitle": "Aufgaben 1–7",
+        "paragraphs": [
+            "Immer mehr Menschen hinterfragen heutzutage ihren täglichen Konsum. Während früher das Kaufen neuer Produkte als Symbol für Wohlstand galt, rückt heute der Gedanke der Nachhaltigkeit in den Vordergrund. Viele Verbraucher achten bewusst darauf, Ressourcen zu schonen und Umweltbelastungen zu reduzieren.",
+            "Ein zentraler Trend ist der Kauf von Secondhand-Ware. Ob Kleidung, Möbel oder elektronische Geräte: Gebrauchte Gegenstände sind längst nicht mehr nur eine Notlösung für Menschen mit geringem Einkommen. Im Gegenteil, Secondhand-Shopping gilt in vielen Städten als modern und umweltbewusst. Durch die Weiterverwendung von Produkten werden nicht nur wertvolle Rohstoffe gespart, sondern auch Müllberge und CO₂-Emissionen nachhaltig verringert.",
+            "Neben dem Kauf von Gebrauchtem gewinnt auch das Reparieren an Bedeutung. In sogenannten „Repair-Cafés“ helfen ehrenamtliche Fachleute Bürgern dabei, defekte Haushaltsgeräte, Möbel oder Fahrräder wieder instand zu setzen. Dadurch wird verhindert, dass noch nutzbare Gegenstände zu früh im Müll landen.",
+            "Dennoch gibt es Herausforderungen. Nachhaltige Produkte, wie biologisch angebaute Lebensmittel oder fair produzierte Kleidung, sind im Handel oft teurer als herkömmliche Alternativen. Zudem werben manche Firmen mit Begriffen wie „grün“ oder „ökologisch“, obwohl ihre Herstellungsverfahren kaum umweltfreundlich sind – ein Phänomen, das als „Greenwashing“ bezeichnet wird. Um echten nachhaltigen Konsum zu fördern, bedarf es daher sowohl kritischer Verbraucher als auch klarer gesetzlicher Regelungen."
+        ],
+        "questions": [
+            {
+                "stem": "Was galt früher als Zeichen für Wohlstand?",
+                "options": [
+                    "a) Der Kauf neuer Produkte.",
+                    "b) Das Reparieren defekter Gegenstände.",
+                    "c) Der bewusste Verzicht auf Konsum."
+                ]
+            },
+            {
+                "stem": "Wie werden Secondhand-Waren heute wahrgenommen?",
+                "options": [
+                    "a) Sie sind ausschließlich für Menschen mit wenig Geld gedacht.",
+                    "b) Sie gelten als modern und umweltfreundlich.",
+                    "c) Sie werden seltener gekauft als in der Vergangenheit."
+                ]
+            },
+            {
+                "stem": "Welchen Vorteil hat die Wiederverwendung gebrauchter Gegenstände?",
+                "options": [
+                    "a) Sie steigert den Gewinn großer Konzerne.",
+                    "b) Sie reduziert Müll und Emissionen.",
+                    "c) Sie beschleunigt die Produktion neuer Waren."
+                ]
+            },
+            {
+                "stem": "Was geschieht in einem „Repair-Café“?",
+                "options": [
+                    "a) Ehrenamtliche Experten reparieren gemeinsam mit Besuchern defekte Sachen.",
+                    "b) Man kann neue Haushaltsgeräte kostenlos ausleihen.",
+                    "c) Es werden Ingenieure für Unternehmen ausgebildet."
+                ]
+            },
+            {
+                "stem": "Warum kaufen viele Menschen keine nachhaltigen Produkte?",
+                "options": [
+                    "a) Weil die Qualität meist schlecht ist.",
+                    "b) Weil sie oft teurer sind als herkömmliche Waren.",
+                    "c) Weil es kaum Auswahl im Handel gibt."
+                ]
+            },
+            {
+                "stem": "Was bedeutet der Begriff „Greenwashing“?",
+                "options": [
+                    "a) Das Recycling von Plastikverpackungen.",
+                    "b) Das Waschen von Kleidung mit Öko-Waschmitteln.",
+                    "c) Irreführende Werbung mit angeblicher Umweltfreundlichkeit."
+                ]
+            },
+            {
+                "stem": "Was ist laut Text nötig, um nachhaltigen Konsum zu stärken?",
+                "options": [
+                    "a) Höhere Steuern auf Secondhand-Ware.",
+                    "b) Kritische Konsumenten und gesetzliche Vorschriften.",
+                    "c) Das Verbot von Online-Geschäften."
+                ]
+            }
+        ]
+    }
+} }),
   25: Object.freeze({ assignmentKey: "B1-8.25", ...{
     title: "Modul Lesen · Teil 2 (7 Aufgaben · 20 Minuten)",
     instructions: "Lesen Sie den Presseartikel und die Aufgaben 1 bis 7. Wählen Sie bei jeder Aufgabe die richtige Lösung a, b oder c.",

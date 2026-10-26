@@ -4,7 +4,7 @@ const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([8, 10, 11, 12, 17, 18, 21, 22]),
   A2: new Set([6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 20, 24, 26, 27, 28]),
-  B1: new Set([6, 15, 16, 17, 18, 19, 20, 25]),
+  B1: new Set([6, 15, 16, 17, 18, 19, 20, 24, 25]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
@@ -103,9 +103,11 @@ const validateCourseAudioKey = ({ level, day, key }) => {
     // general B1 signing policy or expose arbitrary R2 objects.
     const curatedDay25 = normalizedDay === 25
       && normalizedKey === "b1/day-25/online-shopping-verbraucherservice.mp3";
+    const curatedDay24 = normalizedDay === 24
+      && normalizedKey === "b1/day_24/day-24.mp3";
     if (!normalizedKey.startsWith(legacyFlatStem)
       && !normalizedKey.startsWith(folderPrefix)
-      && !curatedDay25) return null;
+      && !curatedDay25 && !curatedDay24) return null;
   } else if (!normalizedKey.startsWith(expectedPrefixForDay(normalizedLevel, normalizedDay))) {
     return null;
   }

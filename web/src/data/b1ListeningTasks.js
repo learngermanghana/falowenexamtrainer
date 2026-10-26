@@ -399,15 +399,51 @@ Herr Weber: Auf Wiedersehen!`,
     submitRequired: false,
   }),
   24: task({
-    title: "Bearbeiten Sie den Goethe-Standard-Hörverstehenstest und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Bearbeiten Sie den vollständigen Hörtest zuerst ohne die Lösungen anzusehen. Kontrollieren und markieren Sie Ihre Antworten anschließend selbst.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for listening comprehension",
-    videoId: "zzPpGxzvJCY",
-    externalUrl: "https://youtu.be/zzPpGxzvJCY",
-    submitRequired: false,
-    selfCheckText: "This is Goethe-standard self-check listening practice. The school officially evaluates Lesen and Schreiben.",
-  }),
+    "title": "Konsum und Nachhaltigkeit · Hören · Richtig oder Falsch (5 Aufgaben)",
+    "instructions": "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
+    "audioKey": "b1/day_24/day-24.mp3",
+    "videoTitle": "B1 Day 24 · Konsum und Nachhaltigkeit",
+    "submitRequired": true,
+    "selfCheckText": "",
+    "submissionNote": "Reichen Sie alle fünf Antworten über Submit als TEIL 4 ein: A = Richtig, B = Falsch.",
+    "questions": [
+        {
+            "stem": "Jonas möchte sich sofort ein neues Smartphone kaufen, weil sein altes komplett kaputt ist.",
+            "options": [
+                "A) Richtig",
+                "B) Falsch"
+            ]
+        },
+        {
+            "stem": "Lisa weist darauf hin, dass man auf den Konsum achten und Elektroschrott vermeiden sollte.",
+            "options": [
+                "A) Richtig",
+                "B) Falsch"
+            ]
+        },
+        {
+            "stem": "Jonas plant nun, den Akku seines Smartphones reparieren zu lassen.",
+            "options": [
+                "A) Richtig",
+                "B) Falsch"
+            ]
+        },
+        {
+            "stem": "Laut Lisa ist eine Reparatur teurer als ein komplett neues Smartphone.",
+            "options": [
+                "A) Richtig",
+                "B) Falsch"
+            ]
+        },
+        {
+            "stem": "Jonas möchte das Gerät nach der Reparatur noch mindestens zwei Jahre lang nutzen.",
+            "options": [
+                "A) Richtig",
+                "B) Falsch"
+            ]
+        }
+    ]
+}),
   25: task({
     title: "Nachhaltig einkaufen · Plastiktüten vermeiden (7 Aufgaben)",
     instructions: "Lesen Sie zuerst die sieben Aufgaben. Hören Sie das Gespräch über Stoffbeutel, Wochenmarkt und Unverpacktladen. Wählen Sie jeweils a, b oder c.",
