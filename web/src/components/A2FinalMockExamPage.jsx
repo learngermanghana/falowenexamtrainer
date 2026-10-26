@@ -24,6 +24,9 @@ import { A2_GOETHE_LISTENING_TEIL3 } from "./A2GoetheListeningMockTeil3Preview";
 import { A2_GOETHE_LISTENING_TEIL4 } from "./A2GoetheListeningMockTeil4Preview";
 import { A2_GOETHE_WRITING_MOCK } from "./A2GoetheWritingMockPreview";
 import A2FinalMockSpeaking from "./A2Mock1ConversationalSpeaking";
+import A2KombiMockSpeaking from "./A2KombiMockSpeaking";
+import A2KombiReadingSection from "./A2KombiReadingSection";
+import { A2_KOMBI_MOCK_CONTENT } from "../data/a2KombiMockContent";
 import "./A1GoetheReadingMockTeil1Preview.css";
 import "./A1GoetheListeningMockPreview.css";
 import "./A1FinalMockExamPage.css";
@@ -47,9 +50,11 @@ const SECTION_LABELS = Object.freeze({
   sprechen: "Sprechen",
 });
 
-const emptyState = () => ({
+const emptyState = (mockId=A2_FINAL_MOCK_ID) => ({
   version: 1,
-  mockId: A2_FINAL_MOCK_ID,
+  mockId,
+  assessmentVersion: /^a2-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1",
+  verificationPending:false,
   stage: "intro",
   sectionDeadlineMs: null,
   attemptInfo: null,
@@ -127,14 +132,14 @@ const hoerenScoredQuestions = [
   })),
 ];
 
-const readStoredState = (storageKey) => {
-  if (typeof window === "undefined") return emptyState();
+const readStoredState = (storageKey,mockId=A2_FINAL_MOCK_ID) => {
+  if (typeof window === "undefined") return emptyState(mockId);
   try {
     const parsed = JSON.parse(window.localStorage.getItem(storageKey) || "null");
-    if (!parsed || parsed.mockId !== A2_FINAL_MOCK_ID) return emptyState();
-    return restoreFullMockReviewState({ ...emptyState(), ...parsed });
+    if (!parsed || parsed.mockId !== mockId) return emptyState(mockId);
+    return restoreFullMockReviewState({ ...emptyState(mockId), ...parsed });
   } catch (_error) {
-    return emptyState();
+    return emptyState(mockId);
   }
 };
 
@@ -195,10 +200,10 @@ const BinaryChoice = ({ name, value, onChange }) => (
   </div>
 );
 
-const SectionHeader = ({ label, secondsLeft, attemptInfo }) => (
+const SectionHeader = ({ label, secondsLeft, attemptInfo, isKombi=false }) => (
   <div className="a1-final-mock-sectionbar">
     <div>
-      <span>Full mock · {FULL_MOCK_SKILLS.findIndex((step) => label.startsWith(step.label)) + 1}/4</span>
+      <span>{isKombi ? "Kombiprüfung" : "Full mock"} · {isKombi ? (label.startsWith("Lesen") ? 1 : label.startsWith("Schreiben") ? 2 : 3) : FULL_MOCK_SKILLS.findIndex((step) => label.startsWith(step.label)) + 1}/{isKombi ? 3 : 4}</span>
       <strong>{label}</strong>
     </div>
     <div>
@@ -311,11 +316,18 @@ const WordCount = ({ text, min, max }) => {
   );
 };
 
-export default function A2FinalMockExamPage() {
+export default function A2FinalMockExamPage({mockId=A2_FINAL_MOCK_ID}) {
   useAssessmentRestriction();
   const { idToken, user } = useAuth();
-  const storageKey = `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
-  const [exam, setExam] = useState(() => readStoredState(storageKey));
+  const isKombi=/^a2-mock-0[4-8]$/.test(mockId);
+  const kombiNumber=isKombi?Number(mockId.slice(-2)):null;
+  const kombiSet=isKombi?A2_KOMBI_MOCK_CONTENT[kombiNumber]:null;
+  const title=isKombi?`A2 Mock ${kombiNumber} · Kombiprüfung`:"A2 Final Mock Exam";
+  const writing=isKombi?kombiSet.writing:A2_GOETHE_WRITING_MOCK;
+  const storageKey = isKombi
+    ? `${A2_FINAL_MOCK_STORAGE_KEY}:${mockId}:${user?.uid || "guest"}`
+    : `${A2_FINAL_MOCK_STORAGE_KEY}:${user?.uid || "guest"}`;
+  const [exam, setExam] = useState(() => readStoredState(storageKey,mockId));
   const [now, setNow] = useState(Date.now());
   const [busy, setBusy] = useState("");
   const [error, setError] = useState("");
@@ -398,6 +410,14 @@ export default function A2FinalMockExamPage() {
         if (response?.completionSync && response.completionSync.ok === false) {
           throw new Error(response.completionSync.error || "Could not sync final A2 mock result.");
         }
+        if(isKombi){
+          if(!response?.verifiedResult?.overall || !response?.verifiedResult?.sectionScores || !response?.readingAnswerKey)
+            throw new Error("The A2 three-module result is not yet server-verified.");
+          completionSaveRef.current=`${attemptId}:${Number(response.verifiedResult.overall.score)}:${completionRetryNonce}`;
+          setExam(current=>({...current,overall:response.verifiedResult.overall,
+            sectionScores:response.verifiedResult.sectionScores,readingAnswerKey:response.readingAnswerKey,
+            verificationPending:false}));
+        }
         if (savedCompletionToastRef.current !== attemptId) {
           savedCompletionToastRef.current = attemptId;
           announceExamSuccess("A2 mock result saved successfully.");
@@ -433,6 +453,7 @@ export default function A2FinalMockExamPage() {
     exam.overall,
     exam.sectionScores,
     idToken,
+    isKombi,
   ]);
 
   useEffect(
@@ -455,10 +476,10 @@ export default function A2FinalMockExamPage() {
       sectionDeadlineMs: Date.now() + SECTION_DURATIONS[stage] * 1000,
     }));
     timeoutHandledRef.current = "";
-    const previousSection = { hoeren: "Lesen", schreiben: "Hören", sprechen: "Schreiben" }[stage];
+    const previousSection = { hoeren: "Lesen", schreiben: isKombi ? "Lesen" : "Hören", sprechen: "Schreiben" }[stage];
     if (previousSection) announceExamSuccess(`${previousSection} completed successfully. Continue to ${{ hoeren: "Hören", schreiben: "Schreiben", sprechen: "Sprechen" }[stage]}.`);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [isKombi]);
 
   const startExam = async ({ forceNew = false } = {}) => {
     if (busy) return;
@@ -481,7 +502,7 @@ export default function A2FinalMockExamPage() {
         window.localStorage.removeItem(storageKey);
       }
 
-      const response = await startA2MockAttempt({ idToken, mockId: A2_FINAL_MOCK_ID });
+      const response = await startA2MockAttempt({ idToken, mockId });
       if (response?.resumed && response?.state && !forceNew) {
         const sameLocalAttempt = exam.attemptInfo?.attemptId === response.attemptId;
         const localSavedAt = Number(exam.clientSavedAtMs || 0);
@@ -492,7 +513,7 @@ export default function A2FinalMockExamPage() {
             : response.state;
 
         setExam({
-          ...emptyState(),
+          ...emptyState(mockId),
           ...newestState,
           attemptInfo: {
             attemptId: response.attemptId,
@@ -505,7 +526,7 @@ export default function A2FinalMockExamPage() {
       }
 
       setExam({
-        ...emptyState(),
+        ...emptyState(mockId),
         stage: "lesen",
         sectionDeadlineMs: Date.now() + SECTION_DURATIONS.lesen * 1000,
         attemptInfo: {
@@ -523,12 +544,12 @@ export default function A2FinalMockExamPage() {
   };
 
   const submitLesen = useCallback(() => {
-    const result = scoreObjective(exam.lesenAnswers, lesenScoredQuestions);
-    moveToSection("hoeren", {
-      sectionScores: { ...exam.sectionScores, lesen: result.score },
+    const result = isKombi ? null : scoreObjective(exam.lesenAnswers, lesenScoredQuestions);
+    moveToSection(isKombi?"schreiben":"hoeren", {
+      sectionScores: isKombi ? exam.sectionScores : { ...exam.sectionScores, lesen: result.score },
       lesenResult: result,
     });
-  }, [exam.lesenAnswers, exam.sectionScores, moveToSection]);
+  }, [exam.lesenAnswers, exam.sectionScores, moveToSection,isKombi]);
 
   const submitHoeren = useCallback(() => {
     const result = scoreObjective(exam.hoerenAnswers, hoerenScoredQuestions);
@@ -548,6 +569,7 @@ export default function A2FinalMockExamPage() {
         email: exam.schreibenEmail,
         attemptId: exam.attemptInfo?.attemptId || "",
         idToken,
+        mockId,
       });
       moveToSection("sprechen", {
         schreibenResult: result,
@@ -571,6 +593,7 @@ export default function A2FinalMockExamPage() {
     exam.sectionScores,
     exam.speakingProgress,
     idToken,
+    mockId,
     moveToSection,
   ]);
 
@@ -578,13 +601,14 @@ export default function A2FinalMockExamPage() {
     if (busy || !exam.writingPending) return;
     setBusy("schreiben"); setError("");
     try {
-      const result = await scoreA2MockWriting({ sms: exam.schreibenSms, email: exam.schreibenEmail, attemptId: exam.attemptInfo?.attemptId || "", idToken });
+      const result = await scoreA2MockWriting({ sms: exam.schreibenSms, email: exam.schreibenEmail, attemptId: exam.attemptInfo?.attemptId || "", idToken,mockId });
       setExam(current => {
         const sectionScores = {...current.sectionScores, schreiben:Number(result?.score || 0)};
         const total = Number(Object.values(sectionScores)
           .reduce((sum, n) => sum + Number(n || 0), 0).toFixed(1));
         return {...current, schreibenResult:result, writingPending:false, sectionScores,
-          overall:current.completed ? {score:total, maxScore:100, passed:total >= 60} : current.overall};
+          overall:current.completed ? (isKombi?null:{score:total, maxScore:100, passed:total >= 60}) : current.overall,
+          ...(isKombi?{verificationPending:true}: {})};
       });
     } catch (markError) {
       setError(getMockWritingSubmissionError(markError));
@@ -606,17 +630,18 @@ export default function A2FinalMockExamPage() {
         sectionDeadlineMs: null,
         speakingResult,
         sectionScores: scores,
-        overall: {
+        overall: isKombi ? null : {
           score: overallScore,
           maxScore: 100,
           passed: overallScore >= 60,
         },
+        ...(isKombi?{verificationPending:true}:{}),
         completed: true,
       };
     });
     announceExamSuccess("A2 mock completed! Saving your final result.");
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  }, [isKombi]);
 
   useEffect(() => {
     if (!SECTION_DURATIONS[exam.stage] || exam.stage === "sprechen" || secondsLeft > 0) return;
@@ -663,7 +688,7 @@ export default function A2FinalMockExamPage() {
 
   const renderLesen = () => (
     <>
-      <SectionHeader label="Lesen · 30 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+      <SectionHeader label="Lesen · 30 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} isKombi={isKombi} />
       <article className="a2-mock-exam">
         <header className="a2-mock-title">
           <p>A2 · Lesen</p>
@@ -671,6 +696,7 @@ export default function A2FinalMockExamPage() {
           <span>{Object.keys(exam.lesenAnswers).length}/20 answered</span>
         </header>
 
+        {isKombi ? <A2KombiReadingSection mockNumber={kombiNumber} answers={exam.lesenAnswers} onChange={setLesenAnswer}/> : <>
         <section className="a2-mock-part">
           <header className="a2-mock-part-heading">
             <h2>{A2_GOETHE_READING_MOCK.teil1.title}</h2>
@@ -793,9 +819,10 @@ export default function A2FinalMockExamPage() {
           </div>
         </section>
 
+        </>}
         <div className="a1-final-mock-submitbar">
           <span>{Object.keys(exam.lesenAnswers).length}/20 answered</span>
-          <button type="button" onClick={submitLesen}>Submit Lesen → Hören</button>
+          <button type="button" onClick={submitLesen}>Submit Lesen → {isKombi?"Schreiben":"Hören"}</button>
         </div>
       </article>
     </>
@@ -961,7 +988,7 @@ export default function A2FinalMockExamPage() {
 
   const renderSchreiben = () => (
     <>
-      <SectionHeader label="Schreiben · 30 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
+      <SectionHeader label="Schreiben · 30 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} isKombi={isKombi} />
       <article className="a1-goethe-mock-exam a2-schreiben-exam">
         <header className="a1-goethe-mock-header">
           <p className="a1-goethe-mock-kicker">A2 · Schreiben</p>
@@ -971,7 +998,7 @@ export default function A2FinalMockExamPage() {
 
         <section className="a2-schreiben-part">
           <header className="a2-schreiben-part-header">
-            <h2>{A2_GOETHE_WRITING_MOCK.teil1.title}</h2>
+            <h2>{writing.teil1.title}</h2>
             <p>{A2_GOETHE_WRITING_MOCK.teil1.situation}</p>
           </header>
           <div className="a2-schreiben-task-paper sms">
@@ -980,7 +1007,7 @@ export default function A2FinalMockExamPage() {
             </ul>
             <p><strong>{A2_GOETHE_WRITING_MOCK.teil1.instruction}</strong></p>
             <div className="a2-schreiben-sms-frame">
-              <div className="a2-schreiben-sms-header"><span>SMS</span><strong>Mila</strong></div>
+              <div className="a2-schreiben-sms-header"><span>SMS</span><strong>{isKombi?"Teil 1": "Mila"}</strong></div>
               <textarea
                 value={exam.schreibenSms}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenSms: event.target.value }))}
@@ -995,17 +1022,17 @@ export default function A2FinalMockExamPage() {
 
         <section className="a2-schreiben-part">
           <header className="a2-schreiben-part-header">
-            <h2>{A2_GOETHE_WRITING_MOCK.teil2.title}</h2>
-            <p>{A2_GOETHE_WRITING_MOCK.teil2.situation}</p>
+            <h2>{writing.teil2.title}</h2>
+            <p>{writing.teil2.situation}</p>
           </header>
           <div className="a2-schreiben-task-paper email">
             <ul className="a2-schreiben-points">
-              {A2_GOETHE_WRITING_MOCK.teil2.points.map((point) => <li key={point}>{point}</li>)}
+              {writing.teil2.points.map((point) => <li key={point}>{point}</li>)}
             </ul>
-            <p><strong>{A2_GOETHE_WRITING_MOCK.teil2.instruction}</strong></p>
+            <p><strong>{writing.teil2.instruction}</strong></p>
             <div className="a2-schreiben-email-frame">
-              <div className="a2-schreiben-email-field"><strong>An:</strong><span>Frau Becker</span></div>
-              <div className="a2-schreiben-email-field"><strong>Betreff:</strong><span>Sommerfest</span></div>
+              <div className="a2-schreiben-email-field"><strong>An:</strong><span>{isKombi?"Empfänger aus der Aufgabe":"Frau Becker"}</span></div>
+              <div className="a2-schreiben-email-field"><strong>Betreff:</strong><span>{isKombi?"Ihre Anfrage":"Sommerfest"}</span></div>
               <textarea
                 value={exam.schreibenEmail}
                 onChange={(event) => setExam((current) => ({ ...current, schreibenEmail: event.target.value }))}
@@ -1038,14 +1065,15 @@ export default function A2FinalMockExamPage() {
     return (
       <article className="a1-final-mock-result">
         <header>
-          <p className="a1-goethe-mock-kicker">A2 Final Mock Exam</p>
+          <p className="a1-goethe-mock-kicker">{title}</p>
           <h1>{overall.score}% — {overall.passed ? "PASSED" : "NEEDS MORE PRACTICE"}</h1>
           <p>{attemptLabel}</p>
+          {isKombi?<p>Verified points: {overall.points}/75 · Hören not assessed</p>:null}
         </header>
 
-        <FullMockGuide level="A2" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />
+        {!isKombi?<FullMockGuide level="A2" stage="result" completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} complete={exam.completed} />:<p>Three-module Kombiprüfung · Lesen, Schreiben, Sprechen</p>}
         <div className="a1-final-mock-scoregrid">
-          {["lesen", "hoeren", "schreiben", "sprechen"].map((key) => (
+          {(isKombi?["lesen","schreiben","sprechen"]:["lesen", "hoeren", "schreiben", "sprechen"]).map((key) => (
             <div key={key}>
               <span>{SECTION_LABELS[key]}</span>
               <strong>{Number(exam.sectionScores?.[key] || 0).toFixed(1)}/25</strong>
@@ -1060,20 +1088,22 @@ export default function A2FinalMockExamPage() {
 
         <section className="a1-final-mock-review">
           <h2>Lesen review</h2>
-          {lesenScoredQuestions.map((question) => {
-            const submitted = exam.lesenAnswers?.[question.key] || "—";
-            const correct = String(submitted).toLowerCase() === String(question.answer).toLowerCase();
+          {(isKombi?Object.values(kombiSet.reading).flatMap(part=>part.questions):lesenScoredQuestions).map((question) => {
+            const questionKey=isKombi?`t${question.number<=5?1:question.number<=10?2:question.number<=15?3:4}-${question.number}`:question.key;
+            const serverAnswer=isKombi?exam.readingAnswerKey?.[questionKey]:question.answer;
+            const submitted = exam.lesenAnswers?.[questionKey] || "—";
+            const correct = String(submitted).toLowerCase() === String(serverAnswer).toLowerCase();
             return (
-              <div className={correct ? "correct" : "incorrect"} key={question.key}>
+              <div className={correct ? "correct" : "incorrect"} key={questionKey}>
                 <strong>Aufgabe {question.number}</strong>
-                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `a2-final-${question.key}`) : submitted}</span>
-                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, question.answer, `a2-final-${question.key}`) : question.answer}</span>
+                <span>Your answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, submitted, `a2-final-${questionKey}`) : submitted}</span>
+                <span>Correct answer: {question.options?.length >= 3 ? mockDisplayAnswer(question.options, serverAnswer, `a2-final-${questionKey}`) : serverAnswer}</span>
               </div>
             );
           })}
         </section>
 
-        <section className="a1-final-mock-review">
+        {!isKombi?<section className="a1-final-mock-review">
           <h2>Hören review</h2>
           {hoerenScoredQuestions.map((question) => {
             const submitted = exam.hoerenAnswers?.[question.key] || "—";
@@ -1086,7 +1116,7 @@ export default function A2FinalMockExamPage() {
               </div>
             );
           })}
-        </section>
+        </section>:null}
 
         <section className="a1-final-mock-feedback">
           <h2>Schreiben feedback</h2>
@@ -1121,7 +1151,7 @@ export default function A2FinalMockExamPage() {
           })}
         </section>
 
-        <FullMockRecovery level="A2" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="Completed attempts stay recorded; a retake starts again from Lesen." />
+        {!isKombi?<FullMockRecovery level="A2" sectionScores={exam.sectionScores} onRetake={() => startExam({ forceNew: true })} retakeDisabled={busy === "start"} retakeNote="Completed attempts stay recorded; a retake starts again from Lesen." />:<p>To repeat this Kombiprüfung, select another practice attempt. Earlier results remain unchanged.</p>}
         <div className="a1-final-mock-result-actions">
           <a href="/exams/overview">Continue in Exams Room</a>
           <a href="/exams/speaking">More Sprechen practice</a>
@@ -1140,30 +1170,30 @@ export default function A2FinalMockExamPage() {
       <main className="a1-goethe-mock-shell a1-final-mock-shell">
         <div className="a1-goethe-mock-topbar">
           <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
-          <span className="a1-goethe-mock-preview-badge">A2 Final Mock · repeatable practice</span>
+          <span className="a1-goethe-mock-preview-badge">{isKombi?title:"A2 Final Mock · repeatable practice"}</span>
         </div>
         <article className="a1-final-mock-intro">
-          <p className="a1-goethe-mock-kicker">Day 29 · A2</p>
-          <h1>A2 Final Mock Exam</h1>
-          <p>Complete all four sections in order. Your answers are saved automatically. Feedback appears after the full mock is finished.</p>
+          <p className="a1-goethe-mock-kicker">{isKombi?"A2 · Kombiprüfung":"Day 29 · A2"}</p>
+          <h1>{title}</h1>
+          <p>{isKombi?"Complete Lesen, Schreiben and Sprechen. Hören is not part of this Kombiprüfung. Your scores will be verified on the server.":"Complete all four sections in order. Your answers are saved automatically. Feedback appears after the full mock is finished."}</p>
 
-          <FullMockGuide level="A2" stage="intro" />
+          {!isKombi?<FullMockGuide level="A2" stage="intro" />:null}
           <div className="a1-final-mock-overview">
             <div><strong>Lesen</strong><span>30 min · 25 points</span></div>
-            <div><strong>Hören</strong><span>30 min · 25 points</span></div>
+            {!isKombi?<div><strong>Hören</strong><span>30 min · 25 points</span></div>:null}
             <div><strong>Schreiben</strong><span>30 min · 25 points</span></div>
             <div><strong>Sprechen</strong><span>15 min · 25 points</span></div>
           </div>
 
           <div className="a1-final-mock-rules">
-            <strong>Pass mark: 60/100</strong>
+            <strong>{isKombi?"Pass mark: 60% · three modules /75":"Pass mark: 60/100"}</strong>
             <p>Your first completed attempt is kept as your readiness score. Later attempts are saved as practice attempts.</p>
             <p>Your progress is saved automatically. Completed sections are locked. <strong>Leaving does not pause the section timer.</strong> Return to this page to resume the unfinished attempt; it is not a failed mock.</p>
           </div>
 
           {error ? <p className="a1-final-mock-error">{error}</p> : null}
           <button type="button" className="a1-final-mock-start" onClick={() => startExam()} disabled={busy === "start"}>
-            {busy === "start" ? "Preparing mock …" : "Start or resume all 4 modules"}
+            {busy === "start" ? "Preparing mock …" : isKombi ? "Start or resume 3 modules" : "Start or resume all 4 modules"}
           </button>
         </article>
       </main>
@@ -1175,31 +1205,34 @@ export default function A2FinalMockExamPage() {
       <div className="a1-goethe-mock-topbar">
         <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span className="a1-goethe-mock-preview-badge">
-          {exam.completed ? "Mock complete" : "A2 Final Mock"}
+          {exam.completed ? "Mock complete" : title}
         </span>
       </div>
 
-      {exam.stage !== "result" ? <FullMockGuide level="A2" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
+      {exam.stage !== "result" && !isKombi ? <FullMockGuide level="A2" stage={exam.stage} completedSkills={FULL_MOCK_SKILLS.filter((skill) => Object.prototype.hasOwnProperty.call(exam.sectionScores || {}, skill.key)).map((skill) => skill.key)} /> : null}
 
       {exam.stage === "lesen" ? renderLesen() : null}
       {exam.stage === "hoeren" ? renderHoeren() : null}
       {exam.stage === "schreiben" ? renderSchreiben() : null}
       {exam.stage === "sprechen" ? (
         <>
-          <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} />
-          <A2FinalMockSpeaking
+          <SectionHeader label="Sprechen · 15 min" secondsLeft={secondsLeft} attemptInfo={exam.attemptInfo} isKombi={isKombi} />
+          {isKombi?<A2KombiMockSpeaking mockNumber={kombiNumber}
             externalSecondsLeft={secondsLeft}
             initialAttempts={exam.speakingProgress?.attempts || {}}
             initialResult={exam.speakingResult}
             attemptId={exam.attemptInfo?.attemptId || ""}
             onProgress={speakingProgressHandler}
             onComplete={finishExamWithSpeaking}
-          />
+          />:<A2FinalMockSpeaking
+            externalSecondsLeft={secondsLeft} initialAttempts={exam.speakingProgress?.attempts||{}}
+            initialResult={exam.speakingResult} attemptId={exam.attemptInfo?.attemptId||""}
+            onProgress={speakingProgressHandler} onComplete={finishExamWithSpeaking}/>}
         </>
       ) : null}
       {exam.stage === "result" && exam.writingPending ? (
         <article className="a1-final-mock-intro">
-          <h2>All four modules submitted · Schreiben feedback pending</h2>
+          <h2>{isKombi?"Three modules submitted":"All four modules submitted"} · Schreiben feedback pending</h2>
           <p>Your writing has been submitted, but AI marking is unavailable. You do not need to repeat the exam. The overall score will be shown only after grading succeeds.</p>
           {error ? <p role="alert">{error}</p> : null}
           <button type="button" disabled={busy==="schreiben"} onClick={retryPendingWriting}>
@@ -1207,7 +1240,8 @@ export default function A2FinalMockExamPage() {
           </button>
         </article>
       ) : null}
-      {exam.stage === "result" && !exam.writingPending && canReviewFullMock(exam) ? renderResult() : null}
+      {exam.stage === "result" && isKombi && exam.verificationPending && !exam.writingPending ? <article className="a1-final-mock-intro" role="status"><h2>Verifying your three-module result</h2><p>Falowen is verifying Lesen, Schreiben and Sprechen before showing your grade.</p>{error?<p role="alert">{error}</p>:null}</article> : null}
+      {exam.stage === "result" && !exam.writingPending && !exam.verificationPending && canReviewFullMock(exam) ? renderResult() : null}
     </main>
   );
 }

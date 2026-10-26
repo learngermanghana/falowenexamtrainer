@@ -1,7 +1,7 @@
 import { getMockExam, getMockExamsForLevel } from "./mockExamCatalog";
 test("the A2 library shows full mocks and separately labelled Mock 3 listening practice", () => {
  const items=getMockExamsForLevel("A2",{includeCourse:true});
- expect(items.map(x=>x.id)).toEqual(["a2-final-01","a2-mock-02","a2-mock-03-hoeren"]);
+ expect(items.map(x=>x.id)).toEqual(["a2-final-01","a2-mock-02","a2-mock-04","a2-mock-05","a2-mock-06","a2-mock-07","a2-mock-08","a2-mock-03-hoeren"]);
  expect(getMockExam("a2-mock-02").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
 });
 test("each A2 Mock 2 section remains accessible within its exam", () => {
