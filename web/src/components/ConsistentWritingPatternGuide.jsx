@@ -40,6 +40,7 @@ export default function ConsistentWritingPatternGuide({
   taskTitle = "",
   text = "",
   defaultOpen = false,
+  compactA1 = false,
 }) {
   const normalizedLevel = String(level || "").toUpperCase();
   const [style, setStyle] = useState(() => suggestWritingStyle(taskTitle, normalizedLevel));
@@ -56,6 +57,14 @@ export default function ConsistentWritingPatternGuide({
     label: phrase || label,
     text: meaning,
   })) || [];
+  const displayedSteps = compactA1 && normalizedLevel === "A1"
+    ? steps.map(({label, text: value}) => ({
+        label,
+        text: label === "Einleitung"
+          ? (selected === "formal" ? "Ich schreibe Ihnen, weil [Grund + Verb am Ende]." : "Ich schreibe dir, weil [Grund + Verb am Ende].")
+          : /^Punkt [123]$/.test(label) ? `[${label}]` : value,
+      }))
+    : steps;
   const checks = selected === "opinion" && String(text).trim()
     ? getOpinionStructureChecks(text)
     : [];
@@ -78,19 +87,28 @@ export default function ConsistentWritingPatternGuide({
         ))}
       </div>
       <ol style={{ margin: 0, paddingLeft: 24, display: "grid", gap: 9 }}>
-        {steps.map(({label, text: example}) => (
+        {displayedSteps.map(({label, text: example}) => (
           <li key={label} style={{ lineHeight: 1.6 }}>
             <strong>{label}: </strong>
             <span style={{ whiteSpace: "pre-line" }}>{example}</span>
           </li>
         ))}
       </ol>
-      <p style={{ margin: 0, fontSize: ".85rem", color: "#334155", lineHeight: 1.55 }}>
-        After weil, place the conjugated verb at the end (weil ich krank bin / weil ich nicht kommen kann).
-        For a short A1 task, shorten the introduction and prioritize all required points and the word limit.
-        Use connectors naturally rather than adding extra words only to fit the template.
-        An opinion essay needs no letter greeting or signature.
-      </p>
+      {compactA1 && normalizedLevel === "A1" ? (
+        <p style={{ margin: 0, lineHeight: 1.6 }}>
+          <strong>weil = because.</strong> The conjugated verb goes <strong>at the end</strong>:
+          Ich bleibe zu Hause, weil ich krank <strong>bin</strong>.
+          With a modal verb: Ich kann nicht kommen, weil ich arbeiten <strong>muss</strong>.
+          Use weil only when giving a reason.
+        </p>
+      ) : (
+        <p style={{ margin: 0, fontSize: ".85rem", color: "#334155", lineHeight: 1.55 }}>
+          After weil, place the conjugated verb at the end (weil ich krank bin / weil ich nicht kommen kann).
+          For a short A1 task, shorten the introduction and prioritize all required points and the word limit.
+          Use connectors naturally rather than adding extra words only to fit the template.
+          An opinion essay needs no letter greeting or signature.
+        </p>
+      )}
       {checks.length > 0 && (
         <section aria-label="B1 opinion essay structure check" style={{ background: "#fff", borderRadius: 10, padding: 12, border: "1px solid #bfdbfe" }}>
           <strong>B1 opinion essay structure check · {checks.filter(item => item.found).length}/{checks.length} cues found</strong>
