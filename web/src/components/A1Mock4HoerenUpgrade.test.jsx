@@ -17,11 +17,11 @@ test("Mock 4 has the exact three protected R2 part names and 15 interactive ques
  expect(A1_MOCK_4_LISTENING.teil2.questions.every(q=>typeof q.statement==="string"&&!q.options)).toBe(true);
  expect(Object.keys(A1_MOCK_4_LISTENING)).toEqual(sections);
 });
-test("library and UI include Hören for new Mocks 04/05 but preserve historic three-module results",()=>{
+test("library and UI include Hören for new Mocks 04/05/06 but preserve historic three-module results",()=>{
  expect(getMockExam("a1-final-04").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
  expect(getMockExam("a1-final-05").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
- expect(getMockExam("a1-final-06").sections).toEqual(["Lesen","Schreiben","Sprechen"]);
- expect(page).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId)');
+ expect(getMockExam("a1-final-06").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
+ expect(page).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05", "a1-mock-06"].includes(mockId)');
  expect(page).toContain('mockAudioId={hasPublishedListening ? mockId.replace("a1-", "") : "mock-01"}');
  expect(page).toContain('assessmentVersion:response.assessmentVersion || "three-module-v1"');
  expect(page).toContain('moveToSection(hasHoren ? "hoeren" : "schreiben"');
@@ -34,19 +34,19 @@ test("library and UI include Hören for new Mocks 04/05 but preserve historic th
  expect(canReviewFullMock(current)).toBe(true);
  expect(canReviewFullMock({...current,sectionScores:{lesen:25,schreiben:25,sprechen:25}})).toBe(false);
 });
-test("the backend returns private listening keys only after verified Mock 04/05 completion",()=>{
+test("the backend returns private listening keys only after verified Mock 04/05/06 completion",()=>{
  expect(server).toContain('["a1-mock-04","a1-mock-05"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
  expect(server).toContain('listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey');
 });
 
-test("Mocks 04/05 reuse the original full-mock guide and equal 20-minute writing timing",()=>{
+test("Mocks 04/05/06 reuse the original full-mock guide and equal 20-minute writing timing",()=>{
  expect(page).toContain('const showFullMockGuide = !isKombiThree');
  expect(page).toContain('{showFullMockGuide ? <FullMockGuide level="A1" stage="intro" /> : null}');
  expect(page).toContain('exam.stage !== "result" && showFullMockGuide ? <FullMockGuide');
  expect(page).toContain('showFullMockGuide ? <FullMockGuide level="A1" stage="result"');
  expect(page).toContain('isKombiThree && stage === "schreiben" ? 15 * 60 : SECTION_DURATIONS[stage]');
  expect(page).toContain('isKombiThree ? "Schreiben · 15 min" : "Schreiben · 20 min"');
- for(const id of ["a1-final-04","a1-final-05"]){
+ for(const id of ["a1-final-04","a1-final-05","a1-final-06"]){
    const exam=getMockExam(id);
    expect(exam.mode).toBe("full");
    expect(exam.sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);

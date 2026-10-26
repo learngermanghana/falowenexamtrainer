@@ -15,8 +15,8 @@ const mockDb = {
   }) })),
 };
 
-test("existing Mock 01 and exact A1 Mock 04/05 MP3 files stay accessible", async () => {
-  expect(EXISTING_RELEASED_CANONICAL_KEYS).toHaveProperty("size", 13);
+test("existing Mock 01 and exact A1 Mock 04/05/06 MP3 files stay accessible", async () => {
+  expect(EXISTING_RELEASED_CANONICAL_KEYS).toHaveProperty("size", 16);
   for (const level of ["A1", "A2"]) {
     const maxPart = level === "A1" ? 3 : 4;
     for (let number = 1; number <= maxPart; number++) {
@@ -25,7 +25,7 @@ test("existing Mock 01 and exact A1 Mock 04/05 MP3 files stay accessible", async
       expect(await isReleasedMockHoerenAudio({ db: mockDb, level, mockId: "mock-01", part, key })).toBe(true);
     }
   }
-  for (const mockId of ["mock-04","mock-05"]) {
+  for (const mockId of ["mock-04","mock-05","mock-06"]) {
     for (const part of ["teil-1","teil-2","teil-3"]) {
       const key = `a1/mock-hoeren/${mockId}/${part}.mp3`;
       expect(await isReleasedMockHoerenAudio({ db:null, level:"A1", mockId, part, key })).toBe(true);
