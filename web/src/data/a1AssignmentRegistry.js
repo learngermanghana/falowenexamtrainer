@@ -59,7 +59,7 @@ const records = [
   ["A1-11", 17, "11", "Instructions", "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook", "A1Day17InstructionsDirectionsKapitel11WorkbookPage", ["Teil 1 · Sprechen: Bitten und Reagieren", "Teil 2 · Hören: Wegbeschreibung zum Bahnhof", "Teil 3 · Lesen: Wegbeschreibung"]],
   ["A1-12.1", 18, "12.1", "Two-Way and Dative Prepositions", "/campus/course/two-case-prepositions-wechselpraepositionen-day-18?view=workbook", "A1Day18Kapitel121WorkbookPage", [[1, "Teil 1 · Lesen: Bahn, Auto & Beruf"], [3, "Teil 3 · Hören"]]],
   ["A1-5.9", 19, "5.9", "Goethe A1 Speaking Confidence Lab", "/campus/course/verboten-erlaubt-5-9", "VerbotenErlaubtPage", ["Teil 1 · Sich vorstellen", "Teil 2 · Fragen und Antworten", "Teil 3 · Bitten und Reagieren"]],
-  ["A1-12.3", 20, "12.3", "Introduction to Letter Writing", "/campus/course/letter-writing-intro-german-a1-day-12-3", "A1Day20LetterWritingWorkbookPage", ["Teil 1 · Formular ausfüllen", "Teil 2 · E-Mail an Julia"]],
+  ["A1-12.3", 20, "12.3", "Introduction to Letter Writing", "/campus/course/letter-writing-intro-german-a1-day-12-3", "A1Day20LetterWritingWorkbookPage", ["Teil 1 · Informal letter: Birthday message", "Teil 2 · Formal letter: Enquiry to a language school"]],
   ["A1-13", 21, "13", "Weather", "/campus/course/a1-day-21-weather-workbook", "A1Day21WeatherWorkbookPage", ["Teil 1 · Anzeigen", "Teil 2 · Nachricht", "Teil 3 · Schreiben", "Teil 4 · Hören"]],
   ["A1-14.1", 22, "14.1", "Health", "/campus/course/a1-day-22-health-and-body-parts-workbook", "A1Day22HealthBodyPartsWorkbookPage", ["Teil 1 · Lesen: Anzeigen und Termine", "Teil 2 · Lesen: Ihr Termin", "Teil 3 · Hören"]],
 ];

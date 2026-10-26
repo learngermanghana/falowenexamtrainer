@@ -56,8 +56,8 @@ describe("A1 Day 20 letter-writing workbook", () => {
 
     const grammarTab = screen.getByRole("tab", { name: "Grammar" });
     const overviewTab = screen.getByRole("tab", { name: "Overview" });
-    const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Formular ausfüllen/i });
-    const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · E-Mail an Julia/i });
+    const teilOneTab = screen.getByRole("tab", { name: /Teil 1 · Informal letter/i });
+    const teilTwoTab = screen.getByRole("tab", { name: /Teil 2 · Formal letter/i });
     const submitTab = screen.getByRole("tab", { name: "Review & Submit" });
 
     expect(grammarTab).toHaveAttribute("aria-selected", "true");
@@ -84,46 +84,47 @@ describe("A1 Day 20 letter-writing workbook", () => {
     expect(screen.getByTestId("canonical-submit")).toHaveTextContent("A1-12.3");
   });
 
-  test("shows five form fields and one invitation writing tool", () => {
-    render(<MemoryRouter><A1Day20LetterWritingWorkbookPage /></MemoryRouter>);
-    const panels = screen.getAllByTestId("letter-practice");
-    expect(panels).toHaveLength(1);
-    expect(panels[0]).toHaveAttribute("data-task-id", "A1-12.3-teil-2-julia-invitation");
-    expect(panels[0]).toHaveAttribute("data-letter-type", "informal");
-    fireEvent.click(screen.getByRole("tab", {name:/Teil 1 · Formular/}));
-    const form = document.querySelector('[data-a1-form-task="maria"]');
-    expect(form.querySelectorAll("li")).toHaveLength(5);
-    expect(form).toHaveTextContent("Der Kurs beginnt im August");
-    expect(form).not.toHaveTextContent("Geburtsort");
-    fireEvent.click(screen.getByRole("tab", {name:/Teil 2 · E-Mail/}));
-    const email = document.querySelector('[data-a1-letter-task="informal"]');
-    expect(email.querySelectorAll("li")).toHaveLength(3);
-    expect(email).toHaveTextContent("circa 30 Wörter");
-    expect(email).not.toHaveTextContent("Liebe Julia,");
-  });
-  test("restores informal letter steps and weil explanations on the Day 12.3 Grammar tab", async () => {
-    const { container } = render(
-      <MemoryRouter
-        initialEntries={[
-          "/campus/course/letter-writing-intro-german-a1-day-12-3?radio=done&assignmentKey=A1-12.3&assignmentId=A1-12.3&level=A1&workbookTab=grammar&view=grammar",
-        ]}
-      >
+  test("places two independently configured Mark My Letter tools below the tasks", () => {
+    render(
+      <MemoryRouter>
         <A1Day20LetterWritingWorkbookPage />
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("tab", { name: "Grammar" })).toHaveAttribute("aria-selected", "true");
-    expect(await screen.findByRole("heading", { name: "Informal Letter Structure" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "How to use weil (because)" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Formal Letter Structure" })).toBeInTheDocument();
+    const practicePanels = screen.getAllByTestId("letter-practice");
+    expect(practicePanels).toHaveLength(2);
 
-    const notes = container.querySelector('[data-a1-day20-letter-structure="true"]');
-    expect(notes).not.toBeNull();
-    expect(notes).toHaveTextContent("Liebe Sara,");
-    expect(notes).toHaveTextContent("Ich bleibe zu Hause, weil ich krank bin.");
-    expect(notes).toHaveTextContent("denn (because)");
-    expect(notes).toHaveTextContent("Mit freundlichen Grüßen");
-    expect(screen.getByRole("tab", { name: /Teil 2 · E-Mail an Julia/ })).toBeInTheDocument();
+    const informal = screen.getByText("Mark My Informal Letter");
+    const formal = screen.getByText("Mark My Formal Letter");
+
+    expect(informal).toHaveAttribute(
+      "data-task-id",
+      "A1-12.3-teil-1-informal-letter",
+    );
+    expect(formal).toHaveAttribute(
+      "data-task-id",
+      "A1-12.3-teil-2-formal-letter",
+    );
+    expect(informal).toHaveAttribute("data-letter-type", "informal");
+    expect(formal).toHaveAttribute("data-letter-type", "formal");
+    expect(informal).toHaveAttribute("data-prompt-type", "note");
+    expect(formal).toHaveAttribute("data-prompt-type", "email");
+    expect(informal.getAttribute("data-placeholder")).toContain("Hallo Anna");
+    expect(formal.getAttribute("data-placeholder")).toContain(
+      "Sehr geehrte Damen und Herren",
+    );
+    expect(informal.getAttribute("data-task-context")).toContain("informal");
+    expect(formal.getAttribute("data-task-context")).toContain("formal email");
+
+    const teilOne = document.querySelector('[data-a1-letter-task="informal"]');
+    const teilTwo = document.querySelector('[data-a1-letter-task="formal"]');
+    expect(teilOne.querySelector('[data-a1-day20-write-here="teil-1"]')).toContainElement(informal);
+    expect(teilTwo.querySelector('[data-a1-day20-write-here="teil-2"]')).toContainElement(formal);
+    expect(screen.getByText("Write Teil 1 here")).toBeInTheDocument();
+    expect(screen.getByText("Write Teil 2 here")).toBeInTheDocument();
+
+    const teilOneTask = Array.from(teilOne.children).find((child) => child.textContent.includes("Aufgabe"));
+    const teilOneWriter = teilOne.querySelector('[data-a1-day20-write-here="teil-1"]');
+    expect(teilOneTask.compareDocumentPosition(teilOneWriter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
-
 });

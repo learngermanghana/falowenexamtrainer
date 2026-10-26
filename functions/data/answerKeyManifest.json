@@ -542,44 +542,9 @@
   },
   "Introduction to Letter Writing  12.3": {
     "answers": {
-      "teil1": {
-        "Answer1": "Intensivkurs / Intensiv-Deutschkurs",
-        "Answer2": "August",
-        "Answer3": "4 / vier / 4 Wochen / vier Wochen",
-        "Answer4": "Einzelzimmer / Einzelzimmer im Wohnheim",
-        "Answer5": "Kreditkarte"
-      }
+      "Answer1": "Read comment for answers"
     },
-    "assignment_id": "A1-12.3",
-    "format": "objective",
-    "expectedParts": [
-      "teil1",
-      "teil2"
-    ],
-    "writingParts": [
-      "teil2"
-    ],
-    "aiGradedParts": [
-      "teil2"
-    ],
-    "referenceAnswerParts": [
-      "teil1"
-    ],
-    "answerLayout": "multipart",
-    "partGrading": {
-      "teil1": {
-        "label": "Teil 1 Formular ausfüllen",
-        "hasReferenceAnswers": true,
-        "gradingMode": "answer_key",
-        "instruction": "Five form fields, 1 raw point each. Accept equivalent wording and numbers. Match the requested field: August is the course start month; Einzelzimmer is the room type."
-      },
-      "teil2": {
-        "label": "Teil 2 E-Mail an Julia",
-        "hasReferenceAnswers": false,
-        "gradingMode": "ai_written_response",
-        "instruction": "Informal email to Julia, approximately 30 words. Three content points: invite Julia to a weekend party at home; give day, time and home address; request food or drinks. Each point 0, 1.5 or 3 raw points for understandable completion; text format 0, 0.5 or 1. Greeting, informal du and suitable closing/name belong to format, not extra content points. Do not require a specific model or penalize harmless length variation automatically. Teil 1: 1 raw point per correct field, total 5; Teil 2 total 10; combined raw total 15. Distinguish this raw score from any application percentage."
-      }
-    }
+    "assignment_id": "A1-12.3"
   },
   "A1 Weather 13": {
     "answers": {
