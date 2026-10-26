@@ -17,10 +17,12 @@ test("Mock 4 has the exact three protected R2 part names and 15 interactive ques
  expect(A1_MOCK_4_LISTENING.teil2.questions.every(q=>typeof q.statement==="string"&&!q.options)).toBe(true);
  expect(Object.keys(A1_MOCK_4_LISTENING)).toEqual(sections);
 });
-test("library and UI include Hören for new Mock 4 but preserve historic three-module result",()=>{
+test("library and UI include Hören for new Mocks 04/05 but preserve historic three-module results",()=>{
  expect(getMockExam("a1-final-04").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
- expect(getMockExam("a1-final-05").sections).toEqual(["Lesen","Schreiben","Sprechen"]);
- expect(page).toContain('mockAudioId={mockId==="a1-mock-04"?"mock-04":"mock-01"}');
+ expect(getMockExam("a1-final-05").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
+ expect(getMockExam("a1-final-06").sections).toEqual(["Lesen","Schreiben","Sprechen"]);
+ expect(page).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05"].includes(mockId)');
+ expect(page).toContain('mockAudioId={hasPublishedListening ? mockId.replace("a1-", "") : "mock-01"}');
  expect(page).toContain('assessmentVersion:response.assessmentVersion || "three-module-v1"');
  expect(page).toContain('moveToSection(hasHoren ? "hoeren" : "schreiben"');
  expect(page).toContain('isKombi ? exam.listeningAnswerKey?.[key] : question.answer');
@@ -32,7 +34,7 @@ test("library and UI include Hören for new Mock 4 but preserve historic three-m
  expect(canReviewFullMock(current)).toBe(true);
  expect(canReviewFullMock({...current,sectionScores:{lesen:25,schreiben:25,sprechen:25}})).toBe(false);
 });
-test("the backend returns listening keys only after verified Mock 4 completion",()=>{
- expect(server).toContain('verifiedAttempt.mockId==="a1-mock-04" && verifiedAttempt.assessmentVersion==="four-module-v2"');
+test("the backend returns private listening keys only after verified Mock 04/05 completion",()=>{
+ expect(server).toContain('["a1-mock-04","a1-mock-05"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
  expect(server).toContain('listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey');
 });
