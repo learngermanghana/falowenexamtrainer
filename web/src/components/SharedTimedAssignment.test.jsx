@@ -59,6 +59,28 @@ test.each([["B1", "B1-6.18", 18], ["B1", "B1-10.27", 27], ["A2", "A2-10.27", 27]
     expect(onTimeExpired).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("button", { name: /^Start/ })).not.toBeInTheDocument();
   });
+test.each([
+  ["B1-10.27", 27],
+  ["B1-10.28", 28],
+])("%s shows and saves a new 30-minute assessed workbook attempt", async (assignmentKey, day) => {
+  const config = getA2B1LessonProfile("B1", day).timer;
+  expect(config.mode).toBe("practice");
+  expect(config.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
+  expect(config.durationMinutes).toBe(30);
+
+  render(<Harness level="B1" assignmentKey={assignmentKey} day={day} />);
+  expect(screen.getByText("Timed practice · 30 minutes")).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Start 30-minute practice/ })).toBeDisabled();
+  fireEvent.click(screen.getByRole("checkbox"));
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: /Start 30-minute practice/ })));
+  expect(screen.getByLabelText("1800 seconds remaining")).toBeInTheDocument();
+  expect(setDoc).toHaveBeenCalledWith("ref", expect.objectContaining({
+    assignmentKey,
+    durationSeconds: 30 * 60,
+    status: "active",
+  }));
+});
+
 test("a rejected start stays locked and explains the failure", async () => {
   setDoc.mockRejectedValueOnce(new Error("permission-denied"));
   const log = jest.spyOn(console, "error").mockImplementation(() => {});
