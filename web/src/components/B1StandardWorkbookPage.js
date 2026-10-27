@@ -19,6 +19,7 @@ import { getB1ListeningTask } from "../data/b1ListeningTasks";
 import { getA2B1LessonProfile } from "../data/a2B1LessonProfile";
 import A2B1ReadingQualityChallenge from "./A2B1ReadingQualityChallenge";
 import B1ProtectedAudioPlayer from "./B1ProtectedAudioPlayer";
+import B1Day26MatchingReading from "./B1Day26MatchingReading";
 import PublishedHoerenPractice from "./PublishedHoerenPractice";
 
 const card = {
@@ -489,10 +490,12 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                       <ReadingExamFrame
                         level="B1"
                         title={reading.text?.title || reading.title || "Lesen"}
-                        format={reading.additionalTexts?.length ? "Mehrere Texte" : "Lesetext"}
-                        variant={reading.additionalTexts?.length ? "sources" : "document"}
+                        format={reading.layout === "matching-ads" ? "Anzeigen zuordnen" : reading.additionalTexts?.length ? "Mehrere Texte" : "Lesetext"}
+                        variant={reading.layout === "matching-ads" || reading.additionalTexts?.length ? "sources" : "document"}
                       >
-                        {reading.additionalTexts?.length ? (
+                        {reading.layout === "matching-ads" ? (
+                          <B1Day26MatchingReading task={reading} />
+                        ) : {reading.additionalTexts?.length ? (
                           <ReadingSourceGrid>
                             <TextBlock block={reading.text} examReading sourceLabel={readingSourceLabel(0)} />
                             {reading.additionalTexts.map((block, index) => (
