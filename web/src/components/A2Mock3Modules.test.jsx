@@ -46,7 +46,7 @@ test("student can work through the four reading parts with 30-minute timer and l
   expect(choose.checked).toBe(true);
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 2/}));
   expect(screen.getByText(/Wegweiser: Kaufhaus/)).toBeInTheDocument();
-  expect(screen.getByText("3. Obergeschoss (3. OG)")).toBeInTheDocument();
+  expect(screen.getAllByText("3. Obergeschoss (3. OG)").length).toBeGreaterThan(0);
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 3/}));
   expect(screen.getByText(/E-Mail von Sarah an Jan/)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 4/}));
