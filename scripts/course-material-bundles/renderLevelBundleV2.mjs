@@ -53,22 +53,17 @@ const hasLessonContent = async (page, lesson) => {
   // A Radio introduction is not the printable workbook, even when its copy mentions exercises.
   if (await page.locator('[data-radio-first-workbook-gate="true"]').count()) return false;
   if (await isPublicLanding(page)) return false;
+  // A lesson overview, redirect shell, or Radio preview may mention Grammar
+  // without rendering its actual tab navigation. Only the *real* tabbed workbook
+  // is acceptable for A2/B1 PDF generation.
+  if (level === "A2" || level === "B1") {
+    const grammarTab = page.locator('[data-workbook-tab-navigation] [role="tab"][aria-label^="Grammar"]');
+    return (await grammarTab.count()) > 0 && await grammarTab.first().isVisible().catch(() => false);
+  }
+
   const text = await getBodyText(page);
   const title = String(lesson?.title || "").trim();
   if (title && text.toLowerCase().includes(title.toLowerCase())) return true;
-
-  // A2/B1 workbook routes do not all repeat the manifest title in the page
-  // heading. Their section tabs are a more stable indication that the
-  // authenticated lesson has loaded. Without this check, a valid workbook can
-  // be mistaken for a logged-out page and the renderer navigates an already
-  // authenticated user to /login, where no login form is rendered.
-  if (level === "A2" || level === "B1") {
-    const workbookTabs = page.locator('[role="tab"], button').filter({
-      hasText: /^\s*(?:Grammar|Teil\s+[1-4])(?:\s*[·:–—-].*)?\s*$/i,
-    });
-    if (await workbookTabs.count()) return true;
-    return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
-  }
 
   if (level === "A1") {
     return /Workbook|Arbeitsbuch|Grammar|Grammatik|Kapitel|Course Book|Übung|Ubung|Aufgabe/i.test(text) && text.length > 500;
@@ -154,7 +149,9 @@ const openLessonWithAuthHydration = async (page, lesson, targetUrl) => {
     // short window to replace that transient screen before deciding it failed.
     for (let check = 0; check < 8; check += 1) {
       if (await hasLessonContent(page, lesson)) return true;
-      if (!(await isPublicLanding(page))) break;
+      // A2/B1 workbooks may render their React tabs a little after the shell.
+      // Do not treat a generic course overview as the final destination.
+      if (level !== "A2" && level !== "B1" && !(await isPublicLanding(page))) break;
       await page.waitForTimeout(500);
     }
 
@@ -284,6 +281,20 @@ const renderGuidedLesson = async (page, lesson) => {
   return rendered;
 };
 
+// Navigation-only diagnostics. Never persist body text, credentials or student data.
+const workbookPageSnapshot = async (page) => page.evaluate(() => ({
+  path: window.location.pathname,
+  view: new URLSearchParams(window.location.search).get("view") || "",
+  radioComplete: new URLSearchParams(window.location.search).get("radio") === "done",
+  hasRadioGate: Boolean(document.querySelector('[data-radio-first-workbook-gate="true"]')),
+  hasWorkbookNav: Boolean(document.querySelector('[data-workbook-tab-navigation]')),
+  tabNames: [...document.querySelectorAll('[role="tab"]')].slice(0, 12)
+    .map((tab) => (tab.getAttribute("aria-label") || tab.textContent || "").trim().slice(0, 75)),
+  hasLoginForm: [...document.querySelectorAll("form")].some((form) =>
+    /Email or student code/i.test(form.innerText || "")),
+  hasPublicLanding: Boolean(document.querySelector(".falowen-public-home")),
+}));
+
 const clickWorkbookTab = async (page, names) => {
   for (const name of names) {
     const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -319,7 +330,9 @@ const renderA2B1Lesson = async (page, lesson) => {
 
   const grammarClicked = await clickWorkbookTab(page, ["Grammar"]);
   if (!grammarClicked) {
-    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available.`);
+    const snapshot = await workbookPageSnapshot(page);
+    console.error("PDF workbook navigation diagnostic:", JSON.stringify(snapshot));
+    throw new Error(`${level} Day ${lesson.day}: Grammar section was not available. Navigation: ${JSON.stringify(snapshot)}`);
   }
   const grammar = await saveCurrentPagePdf(page, lesson, "grammar");
 
@@ -482,6 +495,7 @@ try {
         status: "failed",
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
         error: error instanceof Error ? error.message : String(error),
+        ...(level === "A2" || level === "B1" ? { navigation: await workbookPageSnapshot(page).catch(() => null) } : {}),
       });
       writeDiagnostics();
       throw error;
