@@ -59,8 +59,8 @@ const buildVerifiedA1MockScore = ({ state = {}, verifiedSections = {}, mockId = 
       const error = new Error("Saved A1 Kombipruefung attempt belongs to a different paper.");
       error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
     }
-    const isFourPartKombi = ["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07"].includes(mockId) && state?.assessmentVersion==="four-module-v2";
-    if (state?.assessmentVersion && !["three-module-v1", ...(["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07"].includes(mockId)?["four-module-v2"]:[])].includes(state.assessmentVersion)) {
+    const isFourPartKombi = ["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07","a1-mock-08"].includes(mockId) && state?.assessmentVersion==="four-module-v2";
+    if (state?.assessmentVersion && !["three-module-v1", ...(["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07","a1-mock-08"].includes(mockId)?["four-module-v2"]:[])].includes(state.assessmentVersion)) {
       const error = new Error("Unsupported A1 Kombipruefung assessment version.");
       error.code = "ASSESSMENT_TASK_CHANGED"; throw error;
     }
