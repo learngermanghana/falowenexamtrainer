@@ -123,3 +123,13 @@ test("A2 PDF builder retries navigation timeouts only and fails closed for conte
   assert.match(source, /page\.goto\("about:blank"/);
   assert.match(source, /await renderWithTransientNavigationRetry\(page, lesson\)/);
 });
+
+test("A2 printing strips web chrome temporarily, not student content", () => {
+  assert.match(source, /const suppressPdfChromeText = async/);
+  assert.match(source, /const restorePdfChromeText = async/);
+  assert.match(source, /Falowen\\s/);
+  assert.match(source, /Back\\s/);
+  assert.match(source, /Teacher\\s/);
+  assert.match(source, /node\.textContent = original/);
+  assert.match(source, /img\[src\*="images\.unsplash\.com"\]/);
+});
