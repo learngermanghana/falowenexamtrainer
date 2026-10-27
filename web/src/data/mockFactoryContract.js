@@ -11,7 +11,11 @@ export const REQUIRED_RUNTIME_CAPABILITIES = Object.freeze([
 // behavior is retained; this allowlist does NOT automatically promote new IDs.
 const HISTORICAL_PUBLISHED_MOCKS = Object.freeze([
   "a1-final-01", "a1-final-02", "a1-final-03",
-  "a2-final-01", "a2-mock-02", "b1-final-01", "b2-final-01",
+  "a2-final-01", "a2-mock-02",
+  // Publicly released three-skill A2 variants use the same authenticated
+  // scoring/Results lifecycle, with Hören omitted from their immutable /75 contract.
+  "a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07", "a2-mock-08",
+  "b1-final-01", "b2-final-01",
 ]);
 
 export const MOCK_RUNTIME_REGISTRY = Object.freeze(Object.fromEntries(
