@@ -79,3 +79,29 @@ test("generated A1-A2-B1 PDFs are scanned for excluded interface content", () =>
   assert.match(validatorSource, /Back\\s\+to\\s\+Course\\s\+Book/);
   assert.match(validatorSource, /missing expected section divider/);
 });
+
+
+test("A2 and B1 PDF navigation skips Radio while preserving lesson routes and workbook views", async () => {
+  const { buildPdfLessonTargetUrl } = await import("./pdfLessonRoute.mjs");
+  assert.match(source, /buildPdfLessonTargetUrl\(lesson\.route, baseUrl, level\)/);
+  assert.match(source, /data-radio-first-workbook-gate/);
+
+  const base = "https://www.falowen.app";
+  const a2 = new URL(buildPdfLessonTargetUrl("/campus/course/lesson/A2/1?view=workbook", base, "A2"));
+  assert.equal(a2.pathname, "/campus/course/lesson/A2/1");
+  assert.equal(a2.searchParams.get("view"), "workbook");
+  assert.equal(a2.searchParams.get("radio"), "done");
+
+  const b1 = new URL(buildPdfLessonTargetUrl("/campus/course/lesson/B1/23?view=workbook&chapter=9.23", base, "B1"));
+  assert.equal(b1.searchParams.get("chapter"), "9.23");
+  assert.equal(b1.searchParams.get("view"), "workbook");
+  assert.equal(b1.searchParams.get("radio"), "done");
+
+  const a1 = new URL(buildPdfLessonTargetUrl("/campus/course/lesson/A1/1?view=grammar", base, "A1"));
+  assert.equal(a1.searchParams.get("radio"), null);
+  assert.equal(a1.searchParams.get("view"), "grammar");
+
+  const existing = new URL(buildPdfLessonTargetUrl("/campus/course/a2-day-2?radio=done&view=lesen", base, "A2"));
+  assert.equal(existing.searchParams.getAll("radio").length, 1);
+  assert.equal(existing.searchParams.get("view"), "lesen");
+});
