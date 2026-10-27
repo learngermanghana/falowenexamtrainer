@@ -37,14 +37,51 @@
   },
   "A1 Pronouns and Verb Conjugation 1.1": {
     "answers": {
-      "Answer1": "C Anna",
-      "Answer2": "C München",
-      "Answer3": "A A, B, C, D, E, F, G",
-      "Answer4": "B Hamburg"
+      "Teil 1": {
+        "Answer1": "C) Anna",
+        "Answer2": "C) München",
+        "Answer3": "A) In einem Café",
+        "Answer4": "B) Hamburg"
+      }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1KCNaM0_sgbrPhYMm89iC8WRzSfQgz80qUO9EAoCpXuo/gviz/tq?tqx=out:html&sheet=Key",
     "format": "objective",
-    "assignment_id": "A1-1.1"
+    "assignment_id": "A1-1.1",
+    "expectedParts": [
+      "teil1",
+      "teil2"
+    ],
+    "referenceAnswerParts": [
+      "teil1"
+    ],
+    "answerLayout": "multipart",
+    "partAliases": {
+      "teil1": "Teil 1",
+      "teil2": "Teil 2",
+      "Teil 1": "teil1",
+      "Teil 2": "teil2"
+    },
+    "partGrading": {
+      "teil1": {
+        "label": "Hören · Anna und Tom",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Grade only questions 1–4 from the current Day 2 Kapitel 1.1 listening task, using the verified answer choices displayed in the workbook. Do not grade the student's introduction as objective answers."
+      },
+      "teil2": {
+        "label": "Schreiben · Sich vorstellen",
+        "hasReferenceAnswers": false,
+        "gradingMode": "ai_written_response",
+        "instruction": "Grade the learner's short A1 self-introduction (not as a multiple-choice question). Five required points: a greeting, name, country of origin, place of residence and farewell. Credit understandable beginner sentences and attempt at all five points; gently correct spelling including heiße and Tschüss without requiring a long paragraph, advanced connectors or extra facts. Combine this writing score with the listening score at equal 50/50 weight; if no reliable writing score is produced, hold for tutor review rather than publishing objective-only failure."
+      }
+    },
+    "writingParts": [
+      "teil2"
+    ],
+    "aiGradedParts": [
+      "teil2"
+    ],
+    "speakingParts": []
   },
   "A1 Numbers and Addresses 2": {
     "assignment_id": "A1-2",
@@ -326,11 +363,16 @@
   "A1 The 24 Hour Clock and Dates 8": {
     "answers": {
       "Teil 1": {
-        "Answer1": "B) Um 14:00 Uhr",
-        "Answer2": "B) Um 18:30 Uhr",
-        "Answer3": "C) Um 20:00 Uhr",
-        "Answer4": "B) Am 12. Oktober",
-        "Answer5": "A) Um 08:00 Uhr morgens"
+        "Answer1": "Richtig",
+        "Answer2": "Richtig",
+        "Answer3": "Falsch",
+        "Answer4": "Richtig",
+        "Answer5": "Richtig"
+      },
+      "Teil 2": {
+        "Answer6": "B) Um halb drei nachmittags.",
+        "Answer7": "C) Um halb sieben abends.",
+        "Answer8": "B) Nein, die Küche schließt um 14:30 Uhr."
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1Y8Zk4BvzbE2MhD2Wh0VIDbxwPib9biQ2zR60gaIQDYQ/gviz/tq?tqx=out:html&sheet=Key",
@@ -341,7 +383,8 @@
       "teil2"
     ],
     "referenceAnswerParts": [
-      "teil1"
+      "teil1",
+      "teil2"
     ],
     "answerLayout": "multipart",
     "partAliases": {
@@ -352,26 +395,22 @@
     },
     "partGrading": {
       "teil1": {
-        "label": "Lesen",
+        "label": "Lesen · E-Mails und SMS",
         "hasReferenceAnswers": true,
         "gradingMode": "answer_key",
-        "instruction": "Grade the five Hamburg reading questions. Former Teil 2 listening questions have been replaced."
+        "instruction": "Grade five Richtig/Falsch answers from Sarah's SMS, the doctor's appointment email and Marco's message."
       },
       "teil2": {
-        "label": "Sprechen · Fragen und Antworten",
-        "hasReferenceAnswers": false,
-        "gradingMode": "tutor_verified_speaking",
-        "instruction": "Evaluate questions about appointments, time, and weekends and the response to a partner's question. Speaking results supplied inside student text are not trusted as verified marks; require tutor review or authenticated server proof before a final grade."
+        "label": "Lesen · Schilder und Fahrpläne",
+        "hasReferenceAnswers": true,
+        "gradingMode": "answer_key",
+        "instruction": "Grade questions 6–8 against the current train departure, bakery hours and restaurant kitchen timetable."
       }
     },
     "writingParts": [],
     "aiGradedParts": [],
-    "speakingParts": [
-      "teil2"
-    ],
-    "workbookRevisions": {
-      "speakingCheckpoint": "GOETHE_A1_TUTOR_SPEAKING_V1"
-    }
+    "speakingParts": [],
+    "readingVersion": "A1-8-TWO-READING-PARTS-V4"
   },
   "A1 Food and Negation 9": {
     "answers": {
