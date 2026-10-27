@@ -2,6 +2,7 @@ import React from "react";
 import B1StandardWorkbookPage from "./B1StandardWorkbookPage";
 import { getB1WritingTask } from "../data/b1WritingTasks";
 import { getB1ReadingTask } from "../data/b1ReadingTasks";
+import { getB1ListeningTask } from "../data/b1ListeningTasks";
 
 export const B1_DAY28_KLIMAFREUNDLICH_LEBEN_WORKBOOK_CONFIG = {
   day: 28,
@@ -33,17 +34,9 @@ export const B1_DAY28_KLIMAFREUNDLICH_LEBEN_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(28),
   reading: getB1ReadingTask(28),
-  listening: {
-    title: "Bearbeiten Sie den Hörtest und kontrollieren Sie Ihre Antworten selbst.",
-    instructions: "Hören Sie zuerst aufmerksam zu. Kontrollieren Sie Ihre Antworten danach mit dem Video.",
-    image: "https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Headphones for climate listening comprehension",
-    videoId: "IGIxBJA222o",
-    externalUrl: "https://youtu.be/IGIxBJA222o?list=PLos_fDJ_B3W0jhPa-8s_100ALd-HdTcmt",
-    selfCheckText: "This Hören part is self-check practice. The school officially evaluates Lesen and Schreiben. Mark your own listening result after watching the video.",
-  },
-  submitWritingDescription: "Paste your final opinion text about climate-friendly living.",
-  submitReadingDescription: "Paste your seven reading answer letters.",
+  listening: getB1ListeningTask(28),
+  submitWritingDescription: "Submit your approximately 80-word forum post on eco-friendly living, covering all four points.",
+  submitReadingDescription: "Submit six Richtig/Falsch reading answers (A = Richtig, B = Falsch).",
 };
 
 export default function B1Day28KlimafreundlichLebenWorkbookPage() {

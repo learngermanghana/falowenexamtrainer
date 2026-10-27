@@ -215,9 +215,10 @@ const B1_CLEANED_TASK_POINTS = {
     "Nennen Sie Vor- oder Nachteile von umweltfreundlichem Verhalten.",
   ],
   28: [
-    "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
-    "Beschreiben Sie eine Schwierigkeit, zum Beispiel Geld, Wohnort oder Gewohnheiten.",
-    "Sagen Sie, ob jeder Mensch klimafreundlich leben kann, und begründen Sie Ihre Meinung.",
+    "Meinung: Äußern Sie Ihre Meinung zum umweltfreundlichen Leben im Alltag.",
+    "Gründe: Nennen Sie Gründe, warum Umweltschutz im Alltag wichtig ist.",
+    "Möglichkeiten: Nennen Sie weitere Möglichkeiten, wie man im Alltag umweltbewusst handeln kann.",
+    "Vor- und Nachteile: Nennen Sie Vor- oder Nachteile einer nachhaltigen Lebensweise.",
   ],
 };
 

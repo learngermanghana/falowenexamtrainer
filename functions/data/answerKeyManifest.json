@@ -1930,20 +1930,19 @@
   "B1 10.28 Klimafreundlich leben": {
     "answers": {
       "teil3": {
-        "Answer1": "B) Weil es in vielen Teilen der Welt knapp ist.",
-        "Answer2": "B) Für die Landwirtschaft und die Industrie.",
-        "Answer3": "B) Wassersparende Geräte benutzen.",
-        "Answer4": "B) Weil es das Trinkwasser verschmutzt.",
-        "Answer5": "A) Gesetze und Verordnungen erlassen.",
-        "Answer6": "B) Um die Bedeutung des Wassersparens zu verstehen.",
-        "Answer7": "B) Wasser ist eine kostbare Ressource, die geschützt werden muss."
+        "Answer1": "A) Richtig",
+        "Answer2": "B) Falsch",
+        "Answer3": "B) Falsch",
+        "Answer4": "A) Richtig",
+        "Answer5": "B) Falsch",
+        "Answer6": "A) Richtig"
       },
       "teil4": {
-        "Answer1": "B",
-        "Answer2": "B",
-        "Answer3": "B",
-        "Answer4": "B",
-        "Answer5": "B"
+        "Answer1": "A) Richtig",
+        "Answer2": "B) Falsch",
+        "Answer3": "A) Richtig",
+        "Answer4": "B) Falsch",
+        "Answer5": "A) Richtig"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/1ZmpTcbi4zR5gxGt80Khu3E2M-1sneiJM0qCOCwa8UKo/gviz/tq?tqx=out:html&sheet=Key",
