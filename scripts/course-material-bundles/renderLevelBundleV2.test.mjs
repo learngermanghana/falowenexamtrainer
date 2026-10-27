@@ -32,7 +32,7 @@ test("renderer version identifies the grammar-workbook bundle contract", () => {
 test("A2 and B1 bundle renderer exposes only Grammar and one merged Workbook resource", () => {
   assert.match(source, /const renderA2B1Lesson = async/);
   assert.match(source, /const workbookTabSpecs = \[/);
-  assert.match(source, /return \[grammar, \{ tab: "workbook", file: workbookFile \}\];/);
+  assert.match(source, /return \\[grammar, \\{ tab: "workbook", file: workbookFile,/);
   assert.doesNotMatch(source, /\{ key: "ref", names: \["Ref"\] \}/);
 });
 
