@@ -202,6 +202,10 @@ describe("A1/A2/B1/B2/C2 R2 course audio", () => {
       .toEqual({ day: 27, key: "b1/day-27/day-27.mp3" });
     expect(validateB1AudioKey({ day: 27, key: "b1/day-26/day-26.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 27, key: "../day-27.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 28, key: "b1/day-28/day-28.mp3" }))
+      .toEqual({ day: 28, key: "b1/day-28/day-28.mp3" });
+    expect(validateB1AudioKey({ day: 28, key: "b1/day-27/day-27.mp3" })).toBeNull();
+    expect(validateB1AudioKey({ day: 28, key: "../day-28.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 29, key: "b1/day-29/day-29.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 15, key: "audio/day_16.mp3" })).toBeNull();
     expect(validateB1AudioKey({ day: 14, key: "audio/day_14.mp3" })).toBeNull();
