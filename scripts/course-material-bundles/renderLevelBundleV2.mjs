@@ -254,6 +254,8 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/Submit\s+workbook\s+answers/gi, ""],
     [/Reference\s+Answers/gi, ""],
     [/The tabs stay visible at the top of the workbook\.?/gi, ""],
+    [/Supporting\s+materials/gi, ""],
+    [/Download\s+this\s+workbook\s+as\s+PDF/gi, ""],
   ];
   const changes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
