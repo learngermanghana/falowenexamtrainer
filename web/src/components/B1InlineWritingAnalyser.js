@@ -75,6 +75,7 @@ export default function B1InlineWritingAnalyser({
     <div style={{ display: "grid", gap: 12 }}>
       <button
         type="button"
+        data-course-writing-analysis-action="true"
         style={{ ...styles.primaryButton, width: "fit-content" }}
         onClick={analyseText}
         disabled={loading}

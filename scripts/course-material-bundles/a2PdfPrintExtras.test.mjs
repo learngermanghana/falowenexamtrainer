@@ -75,3 +75,30 @@ test("print-only online answer counts are scrubbed even with nested badges or ex
   assert.match(helpers, /querySelector\("input\[type=radio\],textarea,fieldset,select,h1,h2,h3"\)/);
   assert.ok(renderer.includes(String.raw`/\b\d+\s+of\s+\d+\s+answered\b/gi`));
 });
+
+test("A2 print cleanup removes browser chrome, speaking timer and writing actions without touching mind-map choices", () => {
+  const check = fs.readFileSync(path.join(dir, "validateGeneratedBundle.mjs"), "utf8");
+  const analyse = fs.readFileSync(path.join(dir, "../../web/src/components/B1InlineWritingAnalyser.js"), "utf8");
+  assert.match(helpers, /site-masthead/);
+  assert.match(helpers, /redundant-workbook-header/);
+  assert.match(helpers, /data-compact-speaking-timer/);
+  assert.match(helpers, /online-speaking-help-notice/);
+  assert.match(helpers, /interactive-writing-or-timer-control/);
+  assert.match(helpers, /online-workbook-instructions/);
+  assert.match(helpers, /input\[type=radio\],textarea,fieldset/);
+  assert.match(renderer, /scale: level === "A2" \? 0\.95 : 1/);
+  assert.match(renderer, /data-course-writing-analysis-action/);
+  assert.match(analyse, /data-course-writing-analysis-action="true"/);
+  for (const item of [
+    "Website masthead", "Speaking timer controls", "Speaking help notice",
+    "Writing analysis button", "Workbook navigation panel",
+  ]) assert.ok(check.includes(item), "Missing PDF release validator gate: " + item);
+});
+
+test("A2 page compacting preserves QR callouts and limits itself to print output", () => {
+  assert.match(renderer, /getA2PdfLessonCompanionUrl\(lesson\.route, baseUrl\)/);
+  assert.match(renderer, /data-a2-pdf-audio-companion/);
+  assert.match(renderer, /await page\.evaluate\(restoreA2PrintDocument\)/);
+  assert.match(helpers, /removeAttribute\("data-a2-pdf-hide"\)/);
+  assert.doesNotMatch(helpers, /localStorage\.setItem|setDoc\(/);
+});
