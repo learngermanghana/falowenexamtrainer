@@ -4,7 +4,7 @@ const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 const COURSE_LISTENING_DAYS = Object.freeze({
   A1: new Set([8, 10, 11, 12, 17, 18, 21, 22]),
   A2: new Set([6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 20, 24, 26, 27, 28]),
-  B1: new Set([6, 15, 16, 17, 18, 19, 20, 24, 25]),
+  B1: new Set([6, 15, 16, 17, 18, 19, 20, 24, 25, 26]),
   B2: new Set([2, 6, 10, 14, 18, 22, 26]),
   C2: new Set([2, 6, 10, 14, 18, 22, 26]),
 });
