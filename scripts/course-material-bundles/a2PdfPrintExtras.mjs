@@ -33,6 +33,51 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
     '[data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture]'
   ).forEach(node => hide(node, "resource-or-assessment-ui"));
 
+  // Deployed web builds may not yet carry data-pdf-exclude attributes.
+  // Find only the stand-alone WorkbookStartGuide resource section. Its heading
+  // and navigation links distinguish it from any academic lesson section.
+  for (const title of document.querySelectorAll("h2,h3")) {
+    if (normalize(title.textContent) !== "Supporting materials") continue;
+    const section = title.closest("section");
+    if (!section || section === root || section === document.body) continue;
+    const body = normalize(section.textContent);
+    if (body.length > 2100 || !/You are already in the/i.test(body) ||
+        !/(?:Open grammar book|Open workbook|Watch teacher video|Watch AI video)/i.test(body)) continue;
+    hide(section, "workbook-start-guide-resources");
+  }
+
+  // The older workbook theme sometimes wraps the title inside an anonymous
+  // div. Anchor by the *specific* resource link, never a lesson heading.
+  for (const link of document.querySelectorAll("a,button")) {
+    if (!/^(?:Open grammar book|Open workbook)$/.test(normalize(link.textContent))) continue;
+    const section = link.closest("section");
+    if (!section || section === root || section === document.body) continue;
+    const body = normalize(section.textContent);
+    if (body.length < 2100 && /You are already in the/i.test(body) &&
+        /(Teacher lecture video|AI lecture|Supporting materials)/i.test(body)) {
+      hide(section, "workbook-resource-links");
+    }
+  }
+
+  // A completion checkbox is not a choice in a reading or listening question.
+  // Exclude its entire label rather than only its text; do not hide radios.
+  for (const label of document.querySelectorAll("label")) {
+    if (/^I prepared this part\.?$/i.test(normalize(label.textContent)) &&
+        label.querySelector('input[type="checkbox"]') &&
+        !label.querySelector('input[type="radio"]')) {
+      hide(label, "online-completion-checkbox");
+    }
+  }
+
+  // Small answer-count badges can contain multiple nested spans. Match their
+  // *whole* text and require a small, input-free node, preserving all MCQs.
+  for (const el of document.querySelectorAll("small,span,p,div")) {
+    const text = normalize(el.textContent);
+    if (text.length > 75 || !/^\d+\s+of\s+\d+\s+answered$/i.test(text)) continue;
+    if (el.querySelector("input,textarea,fieldset,select,h1,h2,h3")) continue;
+    hide(el, "online-answer-progress");
+  }
+
   for (const leaf of root.querySelectorAll("p,span,small,strong")) {
     if (leaf.children.length) continue;
     const txt = normalize(leaf.textContent);
