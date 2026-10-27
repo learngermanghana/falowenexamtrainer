@@ -22,19 +22,6 @@ const SPEAKING_EXAMPLES = {
   },
 };
 
-const DAY26_WRITING_SUPPORT = {
-  title: "Schreibplan für Ihren informellen Brief",
-  steps: [
-    "Anrede: Beginnen Sie mit „Lieber Max,“ oder „Liebe Lisa,“.",
-    "Einleitung: Schreiben Sie kurz, wohin Sie gereist sind und wie Sie gereist sind.",
-    "Problem: Beschreiben Sie genau, was passiert ist, zum Beispiel eine Verspätung oder verlorenes Gepäck.",
-    "Reaktion: Erklären Sie, was Sie getan haben, um das Problem zu lösen.",
-    "Ergebnis: Sagen Sie, wie die Situation ausgegangen ist und wie Sie sich gefühlt haben.",
-    "Schluss: Beenden Sie den Brief freundlich und bitten Sie um eine Antwort.",
-  ],
-  phrases: "Nützliche Sätze: „Auf meiner Reise ist leider etwas passiert.“ · „Das Problem war, dass ...“ · „Deshalb habe ich ...“ · „Zum Glück konnte ich ...“ · „Am Ende war ich erleichtert, weil ...“ · „Schreib mir bald!“",
-};
-
 const getDay = () => {
   const pathname = String(window.location?.pathname || "");
   const slugMatch = pathname.match(/b1-day-(\d+)/i);
@@ -78,44 +65,11 @@ const addSpeakingExamples = (root, day) => {
   return changed;
 };
 
-const addDay26WritingSupport = (root, day) => {
-  if (day !== 26) return 0;
-  const section = findSection(root, /Teil 2[\s\S]{0,80}Schreiben/i);
-  if (!section || section.querySelector('[data-b1-day26-writing-support="true"]')) return 0;
-
-  const box = document.createElement("div");
-  box.setAttribute("data-b1-day26-writing-support", "true");
-  box.style.cssText = "border:1px solid #bfdbfe;border-radius:12px;padding:14px;background:#f8fbff;display:grid;gap:10px;line-height:1.7;";
-
-  const title = document.createElement("strong");
-  title.textContent = DAY26_WRITING_SUPPORT.title;
-  box.appendChild(title);
-
-  const list = document.createElement("ol");
-  list.style.cssText = "margin:0;padding-left:22px;line-height:1.7;";
-  DAY26_WRITING_SUPPORT.steps.forEach((step) => {
-    const item = document.createElement("li");
-    item.textContent = step;
-    list.appendChild(item);
-  });
-  box.appendChild(list);
-
-  const phrases = document.createElement("p");
-  phrases.style.cssText = "margin:0;color:#1e3a8a;font-weight:700;";
-  phrases.textContent = DAY26_WRITING_SUPPORT.phrases;
-  box.appendChild(phrases);
-
-  const practice = section.querySelector('[data-course-inline-practice="writing"]');
-  if (practice) section.insertBefore(box, practice);
-  else section.appendChild(box);
-  return 1;
-};
-
 export const enhanceB1Days26To28 = (root = document) => {
   if (typeof window === "undefined" || !isB1Workbook()) return 0;
   const day = getDay();
   if (day < 26 || day > 28) return 0;
-  return addSpeakingExamples(root, day) + addDay26WritingSupport(root, day);
+  return addSpeakingExamples(root, day);
 };
 
 let scheduled = false;
