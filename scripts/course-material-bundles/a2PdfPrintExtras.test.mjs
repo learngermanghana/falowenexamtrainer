@@ -43,3 +43,12 @@ test("Every A2 Teil 4 page generates an embedded authenticated Hören QR, not a 
   assert.match(renderer, /page\.evaluate\(restoreA2PrintDocument/);
   assert.match(renderer, /await trimPrintedPdfTail/);
 });
+
+test("A2 website-only controls have durable print-only markers that do not change student UI", () => {
+  const startGuide = fs.readFileSync(path.join(dir, "../../web/src/components/WorkbookStartGuide.js"), "utf8");
+  const workbook = fs.readFileSync(path.join(dir, "../../web/src/components/A2StandardTabbedWorkbookPage.js"), "utf8");
+  assert.match(startGuide, /data-pdf-exclude="workbook-start-resources"/);
+  assert.match(workbook, /data-pdf-exclude="a2-prepared-checkbox"/);
+  assert.ok(helpers.includes(String.raw`/^\d+\s+of\s+\d+\s+answered$/i`));
+  assert.match(renderer, /\[data-pdf-exclude\]/);
+});
