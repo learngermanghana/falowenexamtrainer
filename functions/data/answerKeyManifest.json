@@ -1883,10 +1883,13 @@
   "B1 9.26 Reiseprobleme und Lösungen": {
     "answers": {
       "teil3": {
-        "Answer1": "A) Flug-Recht24 – Kofferverlust und Entschädigung",
-        "Answer2": "C) EuroPannenschutz – Autopanne in Europa",
-        "Answer3": "B) ZugPlus App – Entschädigung bei Zugverspätung",
-        "Answer4": "E) SicherReisen – Reiserücktritt wegen Krankheit"
+        "Answer1": "A) Alpen-Trekking pur!",
+        "Answer2": "B) Schwimmschule Delphin",
+        "Answer3": "X) Keine passende Anzeige",
+        "Answer4": "D) Gratis-Kleinanzeigen-Portal",
+        "Answer5": "E) Hausgeräte-Notdienst 24/7",
+        "Answer6": "F) Spanisch am Abend",
+        "Answer7": "H) Hunde-Tagesbetreuung „Bello & Co.“"
       },
       "teil4": {
         "Answer1": "A) Richtig",
