@@ -127,16 +127,17 @@ describe("resolveWritingSupportItems", () => {
     expect(items.join(" ")).not.toMatch(/Ahmed/i);
   });
 
-  test("Day 28 replaces the old model structure with the concise climate task", () => {
+  test("Day 28 writing support matches all four Laura forum prompts", () => {
     const items = resolveWritingSupportItems({
       day: 28,
-      supportStructure: ["Einleitung", "Eigene Meinung", "Beispiele", "Schwierigkeiten", "Begründung", "Schluss"],
+      supportStructure: ["Former opinion essay structure"],
     }, "B1");
 
     expect(items).toEqual([
-      "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
-      "Beschreiben Sie eine Schwierigkeit, zum Beispiel Geld, Wohnort oder Gewohnheiten.",
-      "Sagen Sie, ob jeder Mensch klimafreundlich leben kann, und begründen Sie Ihre Meinung.",
+      "Meinung: Äußern Sie Ihre Meinung zum umweltfreundlichen Leben im Alltag.",
+      "Gründe: Nennen Sie Gründe, warum Umweltschutz im Alltag wichtig ist.",
+      "Möglichkeiten: Nennen Sie weitere Möglichkeiten, wie man im Alltag umweltbewusst handeln kann.",
+      "Vor- und Nachteile: Nennen Sie Vor- oder Nachteile einer nachhaltigen Lebensweise.",
     ]);
   });
 
