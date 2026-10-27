@@ -243,6 +243,10 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
+    // page.pdf() prints the current section in print media. Restore the
+    // interactive workbook before looking for the next Grammar/Teil tab;
+    // otherwise the app's @media print CSS hides the tab navigation.
+    await page.emulateMedia({ media: "screen" });
   }
   return { tab: suffix, file };
 };
