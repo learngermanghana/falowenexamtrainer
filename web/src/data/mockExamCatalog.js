@@ -142,6 +142,13 @@ export const MOCK_EXAM_CATALOG = Object.freeze({
     route: "/campus/course/a2-mock-2", mode: "full",
     questionSetId: "a2-mock-02", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   },
+  "a2-mock-03": {
+    id: "a2-mock-03", level: "A2", title: "A2 Mock 3", shortTitle: "A2 Mock 3",
+    description: "Full A2 mock with teacher-provided Lesen (20 items), existing four-part protected Hören (20 items), two Schreiben tasks and interactive Sprechen. Dedicated server-verified result out of 100.",
+    durationLabel: "about 1 hr 45 min · 4 modules", status: "preview",
+    route: "/campus/course/a2-mock-3", mode: "full",
+    questionSetId: "a2-mock-03", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
+  },
   "a2-mock-03-hoeren": {
     id: "a2-mock-03-hoeren",
     level: "A2",
