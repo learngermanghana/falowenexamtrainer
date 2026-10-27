@@ -105,3 +105,13 @@ test("A2 and B1 PDF navigation skips Radio while preserving lesson routes and wo
   assert.equal(existing.searchParams.getAll("radio").length, 1);
   assert.equal(existing.searchParams.get("view"), "lesen");
 });
+
+test("printing a workbook section restores screen media before the next tab click", () => {
+  const saveStart = source.indexOf("const saveCurrentPagePdf = async");
+  const saveEnd = source.indexOf("const renderA1Lesson =", saveStart);
+  assert.ok(saveStart >= 0 && saveEnd > saveStart);
+  const saveMethod = source.slice(saveStart, saveEnd);
+  assert.match(saveMethod, /await injectPrintMode\(page\)/);
+  assert.match(saveMethod, /await page\.pdf\(/);
+  assert.match(saveMethod, /finally\s*\{[\s\S]*?await page\.emulateMedia\(\{ media: "screen" \}\)/);
+});
