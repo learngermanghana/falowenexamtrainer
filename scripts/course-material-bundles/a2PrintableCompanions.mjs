@@ -9,7 +9,8 @@ const canonical = async (filename) => {
   if (/^\s*import\s/m.test(source)) throw new Error("Print source is not standalone: " + filename);
   return import("data:text/javascript;base64," + Buffer.from(source).toString("base64"));
 };
-const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;")
+const esc = (s) => String(s ?? "").replace(/Falowen\s+Radio/gi, "pre-lesson audio")
+  .replace(/&/g, "&amp;").replace(/</g, "&lt;")
   .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 const paragraph = (s) => "<p>" + esc(s) + "</p>";
 const list = (xs) => "<ol>" + xs.map(s => "<li>" + esc(s) + "</li>").join("") + "</ol>";
