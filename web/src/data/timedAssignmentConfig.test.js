@@ -89,15 +89,14 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentDurationSeconds("B1-6.18")).toBe(30 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-6.19")).toBe(20 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.21")).toBe(20 * 60);
-    // Day 22 is an intentionally shorter two-part lesson, not the standard B1 timer.
-    expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(15 * 60);
+    expect(getTimedAssignmentDurationSeconds("B1-7.22")).toBe(20 * 60);
     expect(getTimedAssignmentDurationSeconds("B1-7.23")).toBe(20 * 60);
     expect(getTimedAssignmentConfig("B1-7.22")?.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-8.24")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-8.25")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
     expect(getTimedAssignmentConfig("B1-9.26")?.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
-    expect(getTimedAssignmentConfig("B1-10.27")?.mode).toBe("mock");
-    expect(getTimedAssignmentDurationSeconds("B1-10.28")).toBe(60 * 60);
+    expect(getTimedAssignmentConfig("B1-10.27")?.mode).toBe("practice");
+    expect(getTimedAssignmentDurationSeconds("B1-10.28")).toBe(30 * 60);
   });
 
   test("A2 and B1 regular workbooks allow ten minutes per graded tab", () => {
@@ -105,9 +104,7 @@ describe("shared timed assignment configuration", () => {
       for (const key of getTimedAssignmentKeysForLevel(level)) {
         const config = getTimedAssignmentConfig(key);
         if (config.mode === "mock") continue;
-        const expectedMinutes = key === "B1-7.22"
-          ? 15
-          : new Set(config.timedTabs).size * 10;
+        const expectedMinutes = new Set(config.timedTabs).size * 10;
         expect(config.durationMinutes).toBe(expectedMinutes);
       }
     }
@@ -116,9 +113,16 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentConfig("A2-10.26")?.durationMinutes).toBe(30);
     expect(getTimedAssignmentConfig("B1-8.25")?.durationMinutes).toBe(30);
     expect(getTimedAssignmentConfig("B1-9.26")?.durationMinutes).toBe(30);
-    expect(getTimedAssignmentConfig("B1-7.22")?.durationMinutes).toBe(15);
+    expect(getTimedAssignmentConfig("B1-7.22")?.durationMinutes).toBe(20);
     expect(getTimedAssignmentConfig("A2-10.27")?.durationMinutes).toBe(45);
-    expect(getTimedAssignmentConfig("B1-10.27")?.durationMinutes).toBe(55);
+    expect(getTimedAssignmentConfig("B1-10.27")?.durationMinutes).toBe(30);
+    expect(getTimedAssignmentConfig("B1-10.28")?.durationMinutes).toBe(30);
+    for (const key of getTimedAssignmentKeysForLevel("B1")) {
+      const config = getTimedAssignmentConfig(key);
+      expect(config.mode).toBe("practice");
+      expect(config.durationMinutes).toBe(config.timedTabs.length * 10);
+      expect(config.timedTabs).toEqual(expect.arrayContaining(["lesen"]));
+    }
   });
 
   test("A2/B1 timer scope is generated from the same required submission parts", () => {
