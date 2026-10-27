@@ -223,8 +223,8 @@ const injectPrintMode = async (page) => {
     @page { size: A4; margin: 12mm 10mm 15mm; }
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    nav, [role="navigation"], [role="tablist"], .book-print-stamp,
-    .book-pdf-download-action, iframe, video, button, input[type="checkbox"],
+    nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
+    .book-pdf-download-action, iframe, video, audio, button, input[type="checkbox"],
     [class*="study-buddy" i], [class*="floating" i], [class*="chat" i],
     [class*="video-card" i], [class*="videoCard"], [class*="thumbnail" i],
     [data-pdf-exclude], [aria-label*="Study Buddy" i], [aria-label*="download" i],
@@ -233,16 +233,49 @@ const injectPrintMode = async (page) => {
     [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
     section, article, table, pre, blockquote { break-inside: avoid; }
     img { max-width: 100% !important; }
+    img[src*="images.unsplash.com"] { display: none !important; }
+    a[href="/campus/course"], a[href="/campus/course/"] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
   ` });
 };
 
+// Remove web-only navigation copy before printing and restore every original
+// text node immediately afterwards so the live student page is unchanged.
+const suppressPdfChromeText = async (page) => page.evaluate(() => {
+  const replacements = [
+    [/Falowen\\s+Radio/gi, "pre-lesson audio"],
+    [/Back\\s+to\\s+Course\\s+Book/gi, ""],
+    [/Teacher\\s+Video/gi, ""],
+    [/Study\\s+Buddy/gi, ""],
+    [/Submit\\s+workbook\\s+answers/gi, ""],
+    [/Reference\\s+Answers/gi, ""],
+  ];
+  const changes = [];
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walker.nextNode())) {
+    const previous = node.textContent || "";
+    let clean = previous;
+    for (const [pattern, replacement] of replacements) clean = clean.replace(pattern, replacement);
+    if (clean !== previous) { changes.push([node, previous]); node.textContent = clean; }
+  }
+  window.__falowenPdfChromeChanges = changes;
+});
+
+const restorePdfChromeText = async (page) => page.evaluate(() => {
+  for (const [node, original] of window.__falowenPdfChromeChanges || []) {
+    if (node.isConnected) node.textContent = original;
+  }
+  delete window.__falowenPdfChromeChanges;
+});
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const printStyle = await injectPrintMode(page);
+  if (level === "A2" || level === "B1") await suppressPdfChromeText(page);
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
   } finally {
+    if (level === "A2" || level === "B1") await restorePdfChromeText(page).catch(() => {});
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
     // page.pdf() prints the current section in print media. Restore the
     // interactive workbook before looking for the next Grammar/Teil tab;
