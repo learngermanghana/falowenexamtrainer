@@ -334,7 +334,7 @@ const buildA2MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = isSecond ? "Your A2 Mock 2 result is ready" : firstAttempt
+  const notificationTitle = isThird ? "Your A2 Mock 3 result is ready" : isSecond ? "Your A2 Mock 2 result is ready" : firstAttempt
     ? "Your A2 Final Mock result is ready"
     : "Your A2 Final Mock practice result is ready";
 
