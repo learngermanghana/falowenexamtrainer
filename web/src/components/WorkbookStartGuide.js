@@ -151,7 +151,7 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, workbookUrl, mode = "workb
   if (isDuplicateA1WorkbookGuide || isSpeakingMock) return null;
 
   return (
-    <section style={guideStyle}>
+    <section data-pdf-exclude="workbook-start-resources" style={guideStyle}>
       <div style={{ display: "grid", gap: 3 }}>
         <h2 style={{ margin: 0, fontSize: 18 }}>Supporting materials</h2>
         <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
