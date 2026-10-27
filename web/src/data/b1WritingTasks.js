@@ -425,24 +425,27 @@ export const B1_WRITING_TASKS = Object.freeze({
     submissionNote: "Schreiben Sie ca. 40–50 Wörter. Vergessen Sie nicht die formelle Anrede und den Gruß."
 } }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
-    title: "Goethe-Zertifikat B1 · Schreiben Teil 2 · Reiseprobleme und Lösungen",
-    instructions: "Arbeitszeit: ca. 25 Minuten. Schreiben Sie einen Forumsbeitrag von ca. 80 Wörtern. Sie haben im Internet einen Beitrag von Markus zum Thema „Reiseprobleme und Lösungen“ gelesen. Reagieren Sie darauf.",
-    imageAlt: "Forumsbeitrag zu Reiseproblemen und Lösungen",
-    sourceTitle: "Markus schreibt",
-    sourceText: "„Letzten Sommer hatte mein Zug drei Stunden Verspätung und mein Koffer ist am Flughafen verloren gegangen. Reisen kann heutzutage wirklich stressig sein! Ich finde, man sollte lieber öfter zu Hause bleiben oder nur kurze Ausflüge in der Region machen, anstatt weit weg zu fahren.“",
+    title: "Goethe B1 Schreiben Teil 2 · Formelle E-Mail – Städtereise nach Wien",
+    instructions: "Sie haben im Internet ein attraktives Angebot für eine 5-tägige Städtereise nach Wien bei „TraumReisen GmbH“ gesehen. Schreiben Sie eine formelle E-Mail an den Kundenservice des Reiseveranstalters (ca. 40–50 Wörter). Bearbeiten Sie alle drei Punkte.",
+    imageAlt: "Formelle Anfrage an einen Reiseveranstalter",
+    sourceTitle: "Situation: 5-tägige Städtereise nach Wien",
     taskPoints: [
-      "Meinung: Äußern Sie Ihre Meinung zu Markus' Aussage.",
-      "Erfahrung/Gründe: Berichten Sie von eigenen Erfahrungen mit Reiseproblemen oder nennen Sie Gründe dafür.",
-      "Lösungen: Machen Sie Vorschläge, wie man Stress oder Probleme beim Reisen vermeiden oder lösen kann."
+      "Grund des Schreibens: Interesse an der Städtereise nach Wien angeben.",
+      "Informationen erfragen: Nach genauen Reisedaten, Hotelkategorie und Ausflügen fragen.",
+      "Angebot / Buchungsunterlagen: Um Zusendung eines verbindlichen Angebots bitten."
     ],
     supportStructure: [
-      "Reagieren Sie kurz auf Markus' Beitrag (zustimmen / widersprechen).",
-      "Begründen Sie Ihre Meinung und erzählen Sie von einer Erfahrung oder nennen Sie Gründe.",
-      "Nennen Sie ein oder zwei konkrete Lösungen oder Vorbereitungstipps.",
-      "Schließen Sie mit Ihrer eigenen Einschätzung."
+      "Formelle Anrede: Sehr geehrte Damen und Herren,",
+      "Nennen Sie das 5-tägige Wien-Angebot und Ihr Interesse.",
+      "Fragen Sie nach Reisedaten, Hotelkategorie und Ausflügen.",
+      "Bitten Sie um ein verbindliches Angebot.",
+      "Formeller Schluss: Mit freundlichen Grüßen"
     ],
-    template: "Ich habe Markus' Beitrag gelesen. Ich kann ihn gut verstehen, aber ... Meiner Meinung nach ... Ich habe einmal erlebt, dass ... Deshalb sollte man ... Außerdem könnte man ...",
-    vocabulary: ["die Verspätung", "das Gepäck", "ein Anschlusszug", "die Entschädigung", "umbuchen", "eine Alternative suchen", "Pufferzeit einplanen", "sich an den Kundenservice wenden"]
+    vocabulary: [
+      "die Städtereise", "der Reiseveranstalter", "die Reisedaten",
+      "die Hotelkategorie", "der Ausflug", "das verbindliche Angebot", "zusenden"
+    ],
+    submissionNote: "Schreiben Sie ca. 40–50 Wörter. Verwenden Sie eine formelle Anrede und einen passenden Gruß."
   } }),
   27: Object.freeze({ assignmentKey: "B1-10.27", ...{
     title: "Kann jeder Mensch umweltfreundlich leben? Schreiben Sie Ihre Meinung.",
