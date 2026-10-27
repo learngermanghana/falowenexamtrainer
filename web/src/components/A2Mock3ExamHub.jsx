@@ -67,17 +67,14 @@ function A2Mock3ExamHubAttempt() {
     if (!idToken || !user?.uid || stage==="intro" || flow.attemptInfo?.attemptId || connecting.current) return;
     connecting.current=true;
     setConnectionError("");
-    let alive=true;
     startA2MockAttempt({idToken,mockId:"a2-mock-03"}).then(reply=>{
-      if(!alive)return;
       if(!reply?.attemptId)throw new Error("Exam server did not provide a Mock 03 attempt.");
       setFlow(old=>({...old,attemptInfo:{
         attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,
       }}));
     }).catch(err=>{
-      if(alive)setConnectionError(err?.response?.data?.error || err.message || "Could not register Mock 03.");
+      setConnectionError(err?.response?.data?.error || err.message || "Could not register Mock 03.");
     }).finally(()=>{connecting.current=false;});
-    return ()=>{alive=false;};
   },[idToken,user?.uid,stage,flow.attemptInfo?.attemptId,retryConnect]);
 
   useEffect(()=>{
