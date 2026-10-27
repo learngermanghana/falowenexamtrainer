@@ -31,7 +31,7 @@ function answerList(keyPart) {
   const n=Object.keys(keyPart||{}).length;
   return Array.from({length:n},(_,i)=>{
     const answer=keyPart[`Answer${i+1}`];
-    assert.match(answer,/^[A-F0]\) /i,`Answer${i+1} needs a marked option`);
+    assert.match(answer,/^[A-HX0]\) /i,`Answer${i+1} needs a marked option`);
     return answer;
   });
 }
@@ -64,8 +64,8 @@ test("Day 25 bundled Lesen/Hören keys match 7+5 actual learner options",()=>{
   assert.match(section,/audioKey: "b1\/day-25\/day-25\.mp3"/);
   assert.match(section,/submitRequired: true/);
 });
-test("Day 26 bundled Lesen/Hören keys match 4+5 actual learner options",()=>{
-  matchOptions("B1-9.26",26,"teil3","reading",reading,["A","C","B","E"]);
+test("Day 26 bundled Lesen/Hören keys match 7+5 actual learner options",()=>{
+  matchOptions("B1-9.26",26,"teil3","reading",reading,["A","B","X","D","E","F","H"]);
   matchOptions("B1-9.26",26,"teil4","listening",listening,["A","B","B","B","A"]);
   const section=block(listening,26,"listening");
   assert.match(section,/audioKey: "b1\/day-26\/day-26\.mp3"/);
