@@ -97,8 +97,8 @@ export const B1_DAY26_REISEPROBLEME_LOESUNGEN_WORKBOOK_CONFIG = {
   },
   writing: getB1WritingTask(26),
   reading: getB1ReadingTask(26),
-  submitWritingDescription: "Write your approx. 80-word reply to Markus in the travel-problems forum.",
-  submitReadingDescription: "Submit your chosen matching letter (A–E) or 0 for each of the four reading situations.",
+  submitWritingDescription: "Submit your formal 40–50-word email to TraumReisen GmbH requesting information and a binding Vienna travel offer.",
+  submitReadingDescription: "Submit seven matching answers A–H or X for the Personen-und-Anzeigen exercise.",
 };
 
 export default function B1Day26ReiseproblemeLoesungenWorkbookPage() {
