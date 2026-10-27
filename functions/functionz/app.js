@@ -4512,7 +4512,7 @@ app.post("/writing/a2-mock-score", async (req, res) => {
     const email = String(req.body?.email || "").trim().slice(0, 6000);
     const attemptId = String(req.body?.attemptId || "").trim().slice(0, 120);
     const mockId = String(req.body?.mockId || "a2-mock-01");
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
+    if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId)) return res.status(400).json({error: "Unknown A2 mock."});
     if (attemptId) {
       const db = getFirestoreSafe();
       if (!db) return res.status(503).json({error:"Mock exam storage is unavailable."});
@@ -5602,7 +5602,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
     if (!authedUser) return;
 
     const mockId = String(req.body?.mockId || "a2-mock-01").trim().slice(0, 80);
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
+    if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId)) return res.status(400).json({ error: "Unsupported A2 mock." });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5634,7 +5634,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const isSecondMock = mockId === "a2-mock-02";
+      const isSecondMock = mockId !== "a2-mock-01";
       const attemptCount = Math.max(0, Number(isSecondMock
         ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));
       const attemptNumber = attemptCount + 1;
@@ -6715,7 +6715,7 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    // Enforce Mock 1 / Mock 2 identity BEFORE any verified score write.
+    // Enforce A2 Mock 1, 2 and 3 identity BEFORE any verified score write.
     // Reapply this guard below for the original five-answer grading route.
     {
       const mockId = String(req.body?.mockId || "a2-mock-01");
@@ -6784,13 +6784,13 @@ app.post("/speaking/a2-mock-score", async (req, res) => {
     }));
 
     const mockId = String(req.body?.mockId || "a2-mock-01");
-    if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
+    if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId)) return res.status(400).json({ error: "Invalid A2 mock identity." });
     // Mock 2 is a browser-local practice flow. Never persist its scores into a
     // server-side Mock 1 attempt, even when the caller knows a valid attemptId.
     if (!isA2SpeakingAttemptBindingSafe({ mockId, attemptId, verifiedMockId })) {
       return res.status(400).json({ code: "A2_MOCK_ATTEMPT_MISMATCH", error: "A2 Mock 2 scores cannot be saved to a Mock 1 attempt." });
     }
-    const expectedIds = mockId === "a2-mock-02"
+    const expectedIds = ["a2-mock-02", "a2-mock-03"].includes(mockId)
       ? ["t1_questions", "t1_answers", "t2_main", "t2_followups", "t3_plan"]
       : ["teil1_questions", "teil1_answers", "teil2_main", "teil2_followup", "teil3"];
     const suppliedIds = normalizedAttempts.map((attempt) => attempt.id).sort();

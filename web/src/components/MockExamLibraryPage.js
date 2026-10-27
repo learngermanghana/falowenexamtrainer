@@ -8,7 +8,7 @@ import { styles } from "../styles";
 import { announceExamSuccess } from "../services/interactionFeedback";
 
 const statusLabel = (status, mock) => {
-  if (mock?.mode === "full" && status === "preview" && ["a1-final-04", "a1-final-05", "a1-final-06", "a1-final-07", "a1-final-08"].includes(mock.id)) return "4-module mock";
+  if (mock?.mode === "full" && status === "preview" && ["a1-final-04", "a1-final-05", "a1-final-06", "a1-final-07", "a1-final-08", "a2-mock-03"].includes(mock.id)) return "4-module mock · preview";
   if (mock?.mode === "kombi") {
     const count=mock.sections?.length||3;
     return status === "ready" ? `${count}-module Kombiprüfung` : `${count}-module Kombiprüfung · preview`;
