@@ -74,9 +74,22 @@ if (level === "A2") {
     ["Supporting materials navigation", /Supporting\s+materials/i],
     ["Workbook download controls", /Download\s+this\s+workbook\s+as\s+PDF/i],
     ["Workbook tab-navigation hint", /The\s+tabs\s+stay\s+visible\s+at\s+the\s+top\s+of\s+the\s+workbook/i],
+    ["Workbook teacher-resource strip", /You\s+are\s+already\s+in\s+the\s+workbook\s+Kapitel/i],
+    ["Teacher lecture links", /Teacher\s+lecture\s+video/i],
+    ["Grammar book resource links", /Open\s+grammar\s+book/i],
+    ["Live speaking chat", /Goethe\s+Free\s+Sprechen\s+Chat/i],
+    ["Live speaking toggle", /Collapse\s+speaking\s+help/i],
+    ["Student completion checkboxes", /I\s+prepared\s+this\s+part/i],
+    ["Online tab controls", /Select\s+Grammar,\s+Teil\s*1/i],
+    ["Online answer state", /\b0\s+of\s+\d+\s+answered\b/i],
+    ["Unhydrated grammar content", /Loading\s+grammar\s+notes(?:\u2026|\.{2,3})?|^\s*Loading(?:\u2026|\.{2,3})?\s*$/mi],
+
   );
 }
 const leaked = forbidden.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
+if (level === "A2" && !/Hören\s*[·:]\s*Audio im Falowen Course Book/i.test(text)) {
+  throw new Error("A2 PDF is missing the A1-style authenticated Hören audio companion QR section.");
+}
 if (leaked.length) {
   throw new Error(`${level} PDF contains excluded UI/content: ${leaked.join(", ")}.`);
 }

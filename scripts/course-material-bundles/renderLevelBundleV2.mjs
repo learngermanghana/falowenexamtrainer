@@ -2,10 +2,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
+import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { buildPdfLessonTargetUrl } from "./pdfLessonRoute.mjs";
 import { buildA2ReadOnlyPrintHtml } from "./a2PrintableCompanions.mjs";
+import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
+import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -223,10 +226,10 @@ const injectPrintMode = async (page) => {
     @page { size: A4; margin: 12mm 10mm 15mm; }
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
+    [data-a2-pdf-hide], nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
     [data-self-learning-supporting-materials], [data-teacher-lecture-support],
     [data-timed-assignment], section[aria-label="Assessment rules"],
-    .book-pdf-download-action, iframe, video, audio, button, input[type="checkbox"],
+    .book-pdf-download-action, iframe, video, audio, button[type="submit"], button[role="tab"],
     [class*="study-buddy" i], [class*="floating" i], [class*="chat" i],
     [class*="video-card" i], [class*="videoCard"], [class*="thumbnail" i],
     [data-pdf-exclude], [aria-label*="Study Buddy" i], [aria-label*="download" i],
@@ -239,6 +242,10 @@ const injectPrintMode = async (page) => {
     img[src*="images.unsplash.com"] { display: none !important; }
     div:has(> iframe), div:has(> video) { display: none !important; }
     a[href="/campus/course"], a[href="/campus/course/"] { display: none !important; }
+    [data-a2-pdf-audio-companion] { display: flex !important; }
+    [data-a2-pdf-audio-companion] img { width: 86px !important; height: 86px !important; }
+    [data-a2-pdf-hide] { display: none !important; }
+    [data-course-inline-practice="speaking"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
   ` });
 };
@@ -278,10 +285,18 @@ const restorePdfChromeText = async (page) => page.evaluate(() => {
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const printStyle = await injectPrintMode(page);
   if (level === "A2" || level === "B1") await suppressPdfChromeText(page);
+  if (level === "A2") {
+    const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
+    const qrDataUrl = suffix === "workbook-teil-4"
+      ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
+    await page.evaluate(prepareA2PrintDocument, { section: suffix, lessonUrl, qrDataUrl });
+  }
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    if (level === "A2") await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
   } finally {
+    if (level === "A2") await page.evaluate(restoreA2PrintDocument).catch(() => {});
     if (level === "A2" || level === "B1") await restorePdfChromeText(page).catch(() => {});
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
     // page.pdf() prints the current section in print media. Restore the
@@ -374,12 +389,16 @@ const mergeRenderedSections = async (items, outputFile) => {
 // Render source-controlled practice in an inert page, without using the student
 // application, unlocking timed attempts, or persisting student information.
 const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
-  const content = await buildA2ReadOnlyPrintHtml({ day: lesson.day, part, lesson });
+  const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
+  const audioQrDataUrl = part === "teil-4"
+    ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
+  const content = await buildA2ReadOnlyPrintHtml({ day: lesson.day, part, lesson, lessonUrl, audioQrDataUrl });
   const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
   const printPage = await page.context().newPage();
   try {
     await printPage.setContent(content, { waitUntil: "load" });
     await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${part} companion` });
   } finally {
     await printPage.close();
   }

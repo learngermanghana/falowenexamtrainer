@@ -51,18 +51,26 @@ const reading = async (day) => {
     intro:t.strategy,
     body:"<h2>Lesetext</h2><div class=\"reading\">" + esc(t.text) + "</div><h2>Fragen</h2>" + questions(t.questions)});
 };
-const listening = async (day) => {
+const listening = async (day, lessonUrl, audioQrDataUrl) => {
   const { getA2ListeningTask } = await canonical("a2ListeningTasks.js");
   const t = getA2ListeningTask(day);
   if (!t || t.mode === "none" || (!t.audioUrl && !t.audioKey) ||
     (!t.task && !t.questions?.length))
     throw new Error("A2 Day " + day + ": canonical Hören material missing");
+  // Reuse the A1 retail-book convention. The QR opens a stable authenticated
+  // lesson; never print signed R2 URLs, storage keys or tokenized media links.
+  const audioCallout = lessonUrl && audioQrDataUrl
+    ? '<aside data-a2-pdf-audio-companion="true" style="display:flex;align-items:center;gap:12px;padding:12px;background:#eff6ff;border:1px solid #bfd3eb;border-radius:8px;break-inside:avoid">' +
+      '<img src="' + esc(audioQrDataUrl) + '" width="90" height="90" alt="A2 Hören audio QR">' +
+      '<div><strong>Hören · Audio im Falowen Course Book</strong>' +
+      '<p>Scan the QR code, log in and open Teil 4 · Hören.</p>' +
+      '<a href="' + esc(lessonUrl) + '">' + esc(lessonUrl) + '</a></div></aside>'
+    : '<p>Hören-Audio: Im Falowen Course Book anmelden und Teil 4 öffnen.</p>';
   return html({day,chapter:t.chapter,section:"Teil 4 · Hören",title:"Hörverstehen",
-    intro:"Die Audiodatei ist nicht im PDF. Öffnen Sie die Aufnahme im Falowen Course Book.",
-    body:paragraph(t.task) + "<h2>Audio</h2>" +
-      paragraph(t.audioUrl || "In der Falowen App: " + t.audioKey) +
+    intro:"Die Audiodatei ist nicht im PDF. Verwenden Sie die Falowen-Lektion zum Anhören.",
+    body:paragraph(t.task) + "<h2>Audio</h2>" + audioCallout +
       (t.questions?.length ? "<h2>Fragen</h2>" + questions(t.questions) :
-        paragraph("Selbstkontrolle: Bearbeiten Sie die Hörübung und vergleichen Sie die Lösungen im angegebenen Video.")) });
+        paragraph("Selbstkontrolle: Hören Sie die Übung in Falowen und kontrollieren Sie dort die Antworten.")) });
 };
 const speaking = async (day, lesson) => html({
   day,chapter:"",section:"Teil 1 · Sprechen",title:lesson.title,
@@ -107,7 +115,7 @@ const speakingMock = async (part) => {
     footer:"Selected static practice questions, no recording or student data."});
   throw new Error("A2 Day 22 only supports grammar/workbook static sections");
 };
-export async function buildA2ReadOnlyPrintHtml({day, part, lesson = {}}) {
+export async function buildA2ReadOnlyPrintHtml({day, part, lesson = {}, lessonUrl = "", audioQrDataUrl = ""}) {
   day = Number(day);
   if (!Number.isInteger(day) || day < 1 || day > 28)
     throw new Error("Invalid A2 print day: " + day);
@@ -116,7 +124,7 @@ export async function buildA2ReadOnlyPrintHtml({day, part, lesson = {}}) {
     case "teil-1": return speaking(day, lesson);
     case "teil-2": return writing(day);
     case "teil-3": return reading(day);
-    case "teil-4": return listening(day);
+    case "teil-4": return listening(day, lessonUrl, audioQrDataUrl);
     default: throw new Error("Missing A2 print companion: " + part);
   }
 }

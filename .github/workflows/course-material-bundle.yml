@@ -103,6 +103,7 @@ jobs:
           node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
           node --check scripts/course-material-bundles/a2PrintableCompanions.mjs
           node --test scripts/course-material-bundles/a2PrintableCompanions.test.mjs
+          node --test scripts/course-material-bundles/a2PdfPrintExtras.test.mjs
           if [ "${{ matrix.level }}" = "A1" ]; then node --test scripts/course-material-bundles/validateA1RenderPlan.test.mjs; fi
 
       - name: Runtime-test PDF navigation objects

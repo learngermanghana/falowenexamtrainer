@@ -16,7 +16,8 @@ test("A2 reading and listening printouts use source-controlled questions, not an
   assert.match(reading, /Fragen/);
   const listening = await buildA2ReadOnlyPrintHtml({ day: 26, part: "teil-4" });
   assert.match(listening, /Hörverstehen/);
-  assert.match(listening, /a2\/day-26\/day-26.mp3/);
+  assert.doesNotMatch(listening, /a2\/day-26\/day-26.mp3/);
+  assert.match(listening, /Falowen Course Book/);
   assert.doesNotMatch(listening, /<audio/);
 });
 
@@ -36,4 +37,16 @@ test("Missing canonical sections or unsupported days fail closed", async () => {
   await assert.rejects(() => buildA2ReadOnlyPrintHtml({ day: 22, part: "teil-2" }));
   await assert.rejects(() => buildA2ReadOnlyPrintHtml({ day: 24, part: "submit" }));
   await assert.rejects(() => buildA2ReadOnlyPrintHtml({ day: 23, part: "teil-4" }));
+});
+
+test("source-only A2 Hören prints A1-style QR for a stable authenticated lesson, not R2 keys", async () => {
+  const lessonUrl = "https://www.falowen.app/campus/course/lesson/A2/26";
+  const html = await buildA2ReadOnlyPrintHtml({
+    day: 26, part: "teil-4", lessonUrl, audioQrDataUrl: "data:image/png;base64,ZG9udC1sZWFr",
+  });
+  assert.match(html, /data-a2-pdf-audio-companion/);
+  assert.match(html, /<img src="data:image\/png;base64,/);
+  assert.match(html, /Scan the QR code/);
+  assert.match(html, /campus\/course\/lesson\/A2\/26/);
+  assert.doesNotMatch(html, /a2\/day-26\/day-26\.mp3|r2\.cloudflare|token=|signature=/i);
 });
