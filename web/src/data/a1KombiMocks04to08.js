@@ -7,12 +7,12 @@ export const A1_KOMBI_MOCKS = Object.freeze(A1_KOMBI_MOCK_IDS.map(number => Obje
   id: `a1-final-${String(number).padStart(2,"0")}`,
   questionSetId: `a1-mock-${String(number).padStart(2,"0")}`,
   level:"A1",mockNumber:number,sourceTestNumber:A1_KOMBI_SOURCE_MAPPING[number],
-  title:number<=7?`A1 Mock ${number}`:`A1 Mock ${number} · Kombiprüfung`,
-  version:number<=7?"four-module-v2":"three-module-v1",
-  status:"preview",requiredSections:number<=7?["lesen","hoeren","schreiben","sprechen"]:A1_KOMBI_SECTIONS,
-  futureOptionalSection:number<=7?null:"hoeren",
-  sourceHasHoeren:number<=7,minutes:number<=7?{...A1_KOMBI_DURATIONS,hoeren:20,schreiben:20}:A1_KOMBI_DURATIONS,
-  scoreMax:number<=7?100:75
+  title:number<=8?`A1 Mock ${number}`:`A1 Mock ${number} · Kombiprüfung`,
+  version:number<=8?"four-module-v2":"three-module-v1",
+  status:"preview",requiredSections:number<=8?["lesen","hoeren","schreiben","sprechen"]:A1_KOMBI_SECTIONS,
+  futureOptionalSection:number<=8?null:"hoeren",
+  sourceHasHoeren:number<=8,minutes:number<=8?{...A1_KOMBI_DURATIONS,hoeren:20,schreiben:20}:A1_KOMBI_DURATIONS,
+  scoreMax:number<=8?100:75
 })));
 export function getA1KombiMock(number){
   return A1_KOMBI_MOCKS.find(mock=>mock.mockNumber===Number(number))||null;
@@ -20,7 +20,7 @@ export function getA1KombiMock(number){
 export function buildA1KombiAttemptContract(mockNumber,options={}){
   const mock=getA1KombiMock(mockNumber);
   if(!mock) throw new Error("Unknown A1 Kombipruefung mock");
-  // Current Mock 04/05/06/07 launches include Hören; explicit false continues to
+  // Current Mock 04/05/06/07/08 launches include Hören; explicit false continues to
   // describe immutable historical three-module attempts for review/tests.
   const withHoeren=options.hoerenPublished===undefined ? Boolean(mock.sourceHasHoeren) : options.hoerenPublished===true;
   const sections=withHoeren?["lesen","hoeren","schreiben","sprechen"]:[...A1_KOMBI_SECTIONS];
