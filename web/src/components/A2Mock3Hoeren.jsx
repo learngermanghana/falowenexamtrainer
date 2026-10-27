@@ -88,6 +88,11 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
         <AppBackButton label="Zurück zum Prüfungsraum" fallbackPath="/exams/mocks" />
         <span>A2 · Mock 3 · Hören</span>
       </div> : null}
+      {!embedded ? <aside style={{padding:"12px 14px",border:"1px solid #bfdbfe",borderRadius:10,marginBottom:12}}>
+        <strong>Neu: A2 Mock 3 mit allen vier Modulen</strong>
+        <p>Lesen, Hören, Schreiben und Sprechen zusammen üben.</p>
+        <a href="/campus/course/a2-mock-3">Vollständige A2 Mock 3 öffnen</a>
+      </aside> : null}
       <header className="a2-mock2-progress">
         <div>
           <strong>Hören Mock 3 — Teile 1 bis 4</strong>
