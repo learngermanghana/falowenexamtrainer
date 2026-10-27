@@ -22,11 +22,16 @@ const restore = uid => {
   catch { return {}; }
 };
 
+const readFullHoerenCompletion = uid => {
+  try { return Boolean(JSON.parse(localStorage.getItem(getA2Mock3StorageKeys(uid).hoeren) || "null")?.completedAt); }
+  catch { return false; }
+};
+
 export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewReleased = false }) {
   const { idToken, user } = useAuth();
   const [active, setActive] = useState(0);
   const [answers, setAnswers] = useState(() => restore(user?.uid));
-  const [submitted, setSubmitted] = useState(() => Boolean(embedded && JSON.parse(localStorage.getItem(getA2Mock3StorageKeys(user?.uid).hoeren) || "null")?.completedAt));
+  const [submitted, setSubmitted] = useState(() => Boolean(embedded && readFullHoerenCompletion(user?.uid)));
   const [audioUrl, setAudioUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [audioError, setAudioError] = useState("");
@@ -42,7 +47,7 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
 
   useEffect(() => {
     setAnswers(restore(user?.uid));
-    setSubmitted(Boolean(embedded && JSON.parse(localStorage.getItem(getA2Mock3StorageKeys(user?.uid).hoeren) || "null")?.completedAt));
+    setSubmitted(Boolean(embedded && readFullHoerenCompletion(user?.uid)));
   }, [user?.uid, embedded]);
   useEffect(() => {
     if (!user?.uid) return;
@@ -102,9 +107,9 @@ export default function A2Mock3Hoeren({ embedded = false, onComplete, reviewRele
       </header>
       <p role="note">
         Dies ist die vollständige Hören-Übung zu Mock 3 (Teile 1 bis 4, 20 Aufgaben).
-        {embedded ? "Nach Hören folgen Schreiben und Sprechen in dieser Mock-Prüfung." : "Lesen, Schreiben und Sprechen gehören zur separaten vollständigen A2-Prüfung."}
-        Ihre Antworten bleiben auf diesem Gerät; hier wird kein offizielles
-        vierteiliges Prüfungsergebnis gespeichert.
+        {embedded
+          ? " Nach Hören folgen Schreiben und Sprechen in dieser Mock-Prüfung. Das Gesamtergebnis wird nach serverseitiger Prüfung aller vier Module gespeichert."
+          : " Lesen, Schreiben und Sprechen gehören zur separaten vollständigen A2-Prüfung. Ihre Antworten bleiben auf diesem Gerät; hier wird kein offizielles vierteiliges Prüfungsergebnis gespeichert."}
       </p>
       <nav className="a2-mock2-nav" aria-label="Hören Teile">
         {PARTS.map((item, index) => (
