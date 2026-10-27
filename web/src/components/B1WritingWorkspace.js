@@ -204,9 +204,9 @@ const B1_CLEANED_TASK_POINTS = {
     "Sagen Sie, welche Lösung Sie erwarten, und bitten Sie höflich um eine schnelle Antwort.",
   ],
   26: [
-    "Erzählen Sie, wohin Sie gereist sind und wie Sie gereist sind.",
-    "Beschreiben Sie ein Reiseproblem, zum Beispiel eine Verspätung, ein geschlossenes Hotel oder verlorenes Gepäck.",
-    "Erklären Sie, wie Sie das Problem gelöst haben, und beenden Sie den Brief freundlich.",
+    "Geben Sie Ihr Interesse an der 5-tägigen Städtereise nach Wien an.",
+    "Fragen Sie nach den Reisedaten, der Hotelkategorie und den Ausflügen.",
+    "Bitten Sie um ein verbindliches Angebot.",
   ],
   27: [
     "Erklären Sie, warum umweltfreundliches Leben wichtig ist, und nennen Sie Beispiele aus dem Alltag.",
