@@ -13,7 +13,9 @@ describe("B1 Day 26 to 28 workbooks", () => {
       "Gepäck verloren: Der Koffer kommt nicht an",
     );
     expect(config.reading.text.questions).toHaveLength(7);
-    expect(config.listening.videoId).toBe("0sZVT9XAEBc");
+    expect(config.writing.title).toMatch(/Formelle E-Mail/);
+    expect(config.reading.text.advertisements).toHaveLength(8);
+    expect(config.submitReadingDescription).toMatch(/A–H or X/);
   });
 
   test("Day 27 keeps Umweltfreundlich im Alltag content and listening video", () => {
