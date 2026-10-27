@@ -1973,6 +1973,56 @@ app.post("/admin/purge-expired-students", async (req, res) => {
 });
 
 
+// Standalone A1 Hören Samples 04–08 reuse full-mock recordings, but never
+// mutate full-mock attempts. Grade private answer keys on the server and store
+// an Exams Room practice result in the existing scores collection.
+app.post("/a1-mock/hoeren/practice/score", async (req, res) => {
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const { scoreA1HoerenPractice } = require("./a1HoerenPracticeScore");
+    const result = scoreA1HoerenPractice({
+      mockId: req.body?.mockId,
+      answers: req.body?.answers,
+    });
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Practice result storage is unavailable." });
+    const studentProfile = await findAuthedStudentProfile(db, authedUser);
+    const mockNumber = result.mockId.slice(-2);
+    const saved = await syncExamRoomResult({
+      db,
+      admin,
+      authedUser,
+      studentProfile,
+      input: {
+        level: "A1", section: "hoeren",
+        setId: `${result.mockId}-hoeren`,
+        title: `A1 Mock ${Number(mockNumber)} · Hören`,
+        score: result.correct,
+        total: result.total,
+        percent: result.percent,
+        passed: result.passed,
+        attemptId: `hoeren-${result.mockId}-${crypto.randomUUID()}`,
+        resultType: "practice",
+        route: `/exams/horen/a1/sample-${Number(mockNumber)}`,
+        sectionScores: result.sectionScores,
+      },
+      now: new Date(),
+    });
+    res.set("Cache-Control", "no-store");
+    return res.json({ ...result, saved: saved.ok });
+  } catch (error) {
+    console.error("a1_hoeren_practice_score_failed", {
+      code: error?.code || "",
+      message: error?.message || String(error),
+    });
+    return res.status(error?.status || 500).json({
+      error: error?.status ? error.message : "Could not mark this Hören practice.",
+    });
+  }
+});
+
 app.post("/exam-room/results", async (req, res) => {
   try {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
