@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
+import { getA2PdfLessonCompanionUrl, prepareA2PrintDocument, restoreA2PrintDocument } from "./a2PdfPrintExtras.mjs";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const helpers = fs.readFileSync(path.join(dir, "a2PdfPrintExtras.mjs"), "utf8");
@@ -111,4 +111,56 @@ test("A2 print hides the real App.js authenticated masthead, including h1 and ac
   assert.match(renderer, /app-shell > header\.app-header/);
   assert.match(renderer, /level === "A2"/);
   assert.match(helpers, /removeAttribute\("data-a2-pdf-hide"\)/);
+});
+
+
+test("compact site header is excluded even with long hidden profile-menu text and joined initials", () => {
+  const patcher = fs.readFileSync(path.join(dir, "../patchCompactStudentNavigation.mjs"), "utf8");
+  assert.match(patcher, /app-header app-header--compact/);
+  assert.match(patcher, /profile-menu__panel/);
+  assert.match(helpers, /header\.app-header--compact/);
+  assert.match(renderer, /header\.app-header--compact/);
+  assert.doesNotMatch(helpers, /text\.length > 115|\bFA\\b/);
+
+  // Simulate the compact header from the patcher. Even though the profile
+  // menu is closed, its identity, locale options and actions count as
+  // textContent and the "FA" initials join adjacent inline text.
+  const fullHeaderText =
+    "FalowenFAFelix Asadu student@example.test Language English Deutsch Français " +
+    "Profile Account Accessibility Learning Preferences Notifications Sign out";
+  assert.ok(fullHeaderText.length > 115);
+  assert.doesNotMatch(fullHeaderText, /\bFA\b/);
+
+  const attrs = new Map();
+  const header = {
+    textContent: fullHeaderText,
+    hasAttribute: (name) => attrs.has(name),
+    setAttribute: (name, value) => attrs.set(name, value),
+    removeAttribute: (name) => attrs.delete(name),
+    querySelector: () => {
+      throw new Error("Known site header must not be inspected for exercise controls");
+    },
+  };
+  const root = { querySelectorAll: () => [] };
+  const body = { querySelectorAll: () => [] };
+  const priorDoc = globalThis.document;
+  const priorWin = globalThis.window;
+  try {
+    globalThis.document = {
+      body,
+      querySelector: (sel) => sel === "main" ? root : null,
+      querySelectorAll: (sel) => sel.includes("header.app-header--compact") ? [header] : [],
+    };
+    globalThis.window = {};
+    const result = prepareA2PrintDocument({ section: "grammar", lessonUrl: "", qrDataUrl: "" });
+    assert.equal(result.hidden, 1);
+    assert.equal(attrs.get("data-a2-pdf-hide"), "authenticated-site-masthead");
+    restoreA2PrintDocument();
+    assert.equal(attrs.has("data-a2-pdf-hide"), false, "Print cleanup must restore DOM");
+  } finally {
+    if (priorDoc === undefined) delete globalThis.document;
+    else globalThis.document = priorDoc;
+    if (priorWin === undefined) delete globalThis.window;
+    else globalThis.window = priorWin;
+  }
 });

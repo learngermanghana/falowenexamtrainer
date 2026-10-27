@@ -24,26 +24,21 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
     marked.push(node);
   };
 
-  // The authenticated site's real masthead is `header.app-header` in
-  // web/src/App.js. It contains an h1, notification button and account controls,
-  // so the text-only heuristic below deliberately misses it. Exclude it by its
-  // stable application-shell component class before printing (never in the app).
-  for (const header of document.querySelectorAll("header.app-header, .app-shell > .app-header")) {
-    hide(header, "authenticated-site-masthead");
-  }
-
-  // A1-style masthead cleanup: website logo, notification count and account
-  // badge are never lesson content. Search the entire document because the
-  // global site header normally lives OUTSIDE the workbook's <main>.
-  for (const candidate of document.querySelectorAll("header,nav,aside,section,div")) {
-    if (candidate === root || candidate === document.body) continue;
-    const text = normalize(candidate.textContent);
-    if (text.length > 115 || !/\bFalowen\b/i.test(text) || !/\bFA\b/.test(text)) continue;
-    if (/\b(?:Workbook|Grammar Notes|Kapitel|Assignment|Day\s*\d+)\b/i.test(text)) continue;
-    if (candidate.querySelector("h1,h2,h3,input,textarea,fieldset,[role=tablist]")) continue;
-    const box = candidate.getBoundingClientRect?.();
-    if (box && (box.height < 10 || box.height > 170)) continue;
-    hide(candidate, "site-masthead");
+  // Both site-header variants are app chrome, not lesson content.
+  // scripts/patchCompactStudentNavigation.mjs adds the --compact class and a
+  // closed <details> profile menu. Its hidden identity, language options and
+  // actions are part of textContent, so never use descendant-text length,
+  // badge initials or visibility to identify the compact header.
+  // This runs only in the temporary Playwright PDF print view.
+  const appHeaderSelector =
+    "header.app-header--compact, header.app-header, .app-shell > header.app-header";
+  for (const header of document.querySelectorAll(appHeaderSelector)) {
+    if (header === root || header === document.body ||
+        header.hasAttribute("data-a2-pdf-hide")) continue;
+    // The known application header may contain controls. It cannot contain
+    // the academic exercise cards found under <main>; mark it as one unit.
+    header.setAttribute("data-a2-pdf-hide", "authenticated-site-masthead");
+    marked.push(header);
   }
 
   // The chapter divider already provides the printed lesson title. The
