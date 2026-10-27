@@ -20,15 +20,18 @@ describe("CEFR graded-tab timer policy", () => {
     })).toBeNull();
   });
 
-  test("keeps a deliberately short B1 lesson and existing full mock timing", () => {
+  test("removes B1 workbook exceptions but preserves actual full mock exam timing", () => {
     expect(getGradedTabDurationMinutes({
       level: "B1", assignmentKey: "B1-7.22",
       timedTabs: ["lesen", "hoeren"], configuredDurationMinutes: 55,
-    })).toBe(15);
-    expect(getGradedTabDurationMinutes({
-      level: "B1", assignmentKey: "B1-10.28",
-      timedTabs: ["schreiben", "lesen"], mode: "mock", configuredDurationMinutes: 60,
-    })).toBe(60);
+    })).toBe(20);
+    for (const key of ["B1-10.27", "B1-10.28"]) {
+      expect(getGradedTabDurationMinutes({
+        level: "B1", assignmentKey: key,
+        timedTabs: ["schreiben", "lesen", "hoeren"], mode: "practice",
+        configuredDurationMinutes: 60,
+      })).toBe(30);
+    }
     expect(getGradedTabDurationMinutes({
       level: "A2", assignmentKey: "A2-10.27",
       timedTabs: ["lesen", "hoeren"], mode: "mock", configuredDurationMinutes: 45,
