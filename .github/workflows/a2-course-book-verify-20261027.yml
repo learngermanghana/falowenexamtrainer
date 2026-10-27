@@ -1,0 +1,100 @@
+name: A2 complete course-book PDF production proof
+
+# Validated renderer including canonical read-only sections and speaking companion.
+# This workflow is scoped to this one operational branch only.
+# It does not change production, schedule jobs, or publish book sales.
+on:
+  push:
+    branches:
+      - ops/a2-pdf-complete-20261027
+    paths:
+      - .github/workflows/a2-course-book-verify-20261027.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-a2-course-book:
+    name: Render, validate, and upload A2 PDF
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Check out merged Falowen snapshot
+        uses: actions/checkout@v4
+
+      - name: Confirm merged PDF renderer fix
+        run: |
+          git log -1 --oneline
+          node --test scripts/course-material-bundles/renderLevelBundleV2.test.mjs
+          node --test scripts/course-material-bundles/a2PrintableCompanions.test.mjs
+          test -f scripts/course-material-bundles/pdfLessonRoute.mjs
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build A2 lesson manifest
+        run: |
+          node scripts/course-material-bundles/buildLevelManifest.mjs A2
+          node --input-type=module <<'NODE'
+          import fs from "node:fs";
+          const file = "artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials-manifest.json";
+          const manifest = JSON.parse(fs.readFileSync(file, "utf8"));
+          if (manifest.schemaVersion !== 3 || manifest.lessonCount !== 29 ||
+              !manifest.curriculumComplete || !manifest.routesClassified ||
+              !manifest.readyForPdfGeneration) {
+            throw new Error("A2 manifest not ready for 28-day book generation.");
+          }
+          console.log("A2 manifest ready:", manifest.printableLessonCount, "printable lessons");
+          NODE
+
+      - name: Install PDF rendering dependencies
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Install PDF text validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+
+      - name: Render and merge A2 course book
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
+        env:
+          FALOWEN_PDF_BASE_URL: https://www.falowen.app
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+
+      - name: Validate generated A2 PDF
+        run: node scripts/course-material-bundles/validateGeneratedBundle.mjs A2
+
+      - name: Upload complete validated A2 PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-course-materials-pdf
+          path: artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials.pdf
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload A2 manifest
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-course-manifest
+          path: artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials-manifest.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload A2 diagnostic files if build fails
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-render-diagnostics
+          path: |
+            artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials-manifest.json
+            artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: warn
+          retention-days: 7
