@@ -1,4 +1,5 @@
 import { getA1Assignment } from "./a1AssignmentRegistry";
+import { isTimedAssignmentTabLocked } from "../utils/timedAssignmentAccess";
 import { getCurriculumEntriesForLevel } from "./curriculumManifest";
 import {
   getTimedAssignmentConfig,
@@ -19,10 +20,47 @@ describe("shared timed assignment configuration", () => {
     expect(getTimedAssignmentConfig("A1-12.3")?.mode).toBe("mock");
     expect(getTimedAssignmentDurationSeconds("A1-13")).toBe(35 * 60);
     expect(getTimedAssignmentDurationSeconds("A1-14.1")).toBe(30 * 60);
-    expect(getTimedAssignmentConfig("A1-13")?.timedTabs).toEqual(["teil-1", "teil-2", "teil-3"]);
+    expect(getTimedAssignmentConfig("A1-13")?.timedTabs).toEqual(["teil-1", "teil-2", "teil-3", "teil-4"]);
     expect(getTimedAssignmentConfig("A1-14.1")?.timedTabs).toEqual(["teil-1", "teil-2", "teil-3"]);
     expect(getTimedAssignmentConfig("A1-14.1")?.scope).toMatch(/10 reading answers and 6 listening answers/);
     expect(getTimedAssignmentConfig("A1-8")).toBeNull();
+  });
+
+  test("A1 Day 21 assessed listening is locked with the three other parts, while Overview self-check is open", () => {
+    const config = getTimedAssignmentConfig("A1-13");
+    expect(config).toMatchObject({
+      level: "A1",
+      durationMinutes: 35,
+      mode: "mock",
+      autoSubmit: true,
+      timedTabs: ["teil-1", "teil-2", "teil-3", "teil-4"],
+    });
+    expect(config.scope).toMatch(/6 listening answers/);
+    for (const tabKey of config.timedTabs) {
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "none", tabKey,
+      })).toBe(true);
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "active", secondsLeft: 300, tabKey,
+      })).toBe(false);
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "expired", secondsLeft: 0, tabKey,
+      })).toBe(true);
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "submitted", tabKey,
+      })).toBe(true);
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "submitted", tabKey, reviewUnlocked: true,
+      })).toBe(false);
+    }
+    for (const tabKey of ["overview", "grammar"]) {
+      expect(isTimedAssignmentTabLocked({
+        enabled: true, timedTabs: config.timedTabs, attemptState: "none", tabKey,
+      })).toBe(false);
+    }
+    expect(isTimedAssignmentTabLocked({
+      enabled: true, timedTabs: config.timedTabs, attemptState: "none", tabKey: "submit",
+    })).toBe(true);
   });
 
   test("times every A2 tutor-marked workbook from Week 5 while excluding self-check Hören", () => {
