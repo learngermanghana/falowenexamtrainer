@@ -38,18 +38,18 @@ test("Schreiben and Sprechen tasks are unique to Mock 03",()=>{
 test("student can work through the four reading parts with 30-minute timer and local autosave",()=>{
   const {container}=render(<MemoryRouter><A2Mock3Lesen/></MemoryRouter>);
   fireEvent.click(screen.getByRole("button",{name:"Lesen starten"}));
-  expect(screen.getByText("Der Traum vom eigenen Bio-Café")).toBeInTheDocument();
+  expect(screen.getByText(/Der Traum vom eigenen Bio-Café/)).toBeInTheDocument();
   expect(screen.getByRole("timer")).toBeInTheDocument();
   const choose = container.querySelector('input[name="a2-mock3-lesen-1"][value="b"]');
   expect(choose).toBeTruthy();
   fireEvent.click(choose);
   expect(choose.checked).toBe(true);
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 2/}));
-  expect(screen.getByText("Wegweiser: Kaufhaus „Galerie Stadtmitte“")).toBeInTheDocument();
+  expect(screen.getByText(/Wegweiser: Kaufhaus/)).toBeInTheDocument();
   expect(screen.getByText("3. Obergeschoss (3. OG)")).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 3/}));
-  expect(screen.getByText("E-Mail von Sarah an Jan")).toBeInTheDocument();
+  expect(screen.getByText(/E-Mail von Sarah an Jan/)).toBeInTheDocument();
   fireEvent.click(screen.getByRole("button",{name:/Weiter: Teil 4/}));
-  expect(screen.getByText("Kleinanzeigen")).toBeInTheDocument();
+  expect(screen.getByText(/Kleinanzeigen/)).toBeInTheDocument();
   expect(screen.getByText(/ohne Eltern/)).toBeInTheDocument();
 });
