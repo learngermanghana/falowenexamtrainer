@@ -519,12 +519,29 @@ page.setDefaultNavigationTimeout(45000);
 const printableLessons = manifest.lessons.filter((lesson) => lesson.printKind !== "excluded");
 const renderedLessons = new Map();
 
+// Only navigation timeouts are retried. Incorrect or incomplete lesson content
+// must fail immediately; this job never starts assessment attempts or writes to Firestore.
+const renderWithTransientNavigationRetry = async (page, lesson) => {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      return await renderLesson(page, lesson);
+    } catch (error) {
+      const transient = error?.name === "TimeoutError" ||
+        /net::ERR_|Navigation timeout|Timeout \d+ms exceeded/i.test(String(error?.message || ""));
+      if (!transient || attempt === 3) throw error;
+      console.warn(`${level} Day ${lesson.day}: transient navigation timeout (attempt ${attempt}/3); reopening lesson.`);
+      await page.goto("about:blank", { waitUntil: "domcontentloaded" }).catch(() => {});
+      await page.waitForTimeout(1000 * attempt);
+    }
+  }
+};
+
 try {
   for (const lesson of printableLessons) {
     const startedAt = Date.now();
     console.log(`::group::Rendering ${level} Day ${lesson.day}: ${lesson.title}`);
     try {
-      const rendered = await renderLesson(page, lesson);
+      const rendered = await renderWithTransientNavigationRetry(page, lesson);
       renderedLessons.set(lesson.day, rendered);
       diagnostics.lessons.push({
         day: lesson.day,
