@@ -18,15 +18,18 @@ describe("B1 Day 26 to 28 workbooks", () => {
     expect(config.submitReadingDescription).toMatch(/A–H or X/);
   });
 
-  test("Day 27 keeps Umweltfreundlich im Alltag content and listening video", () => {
+  test("Day 27 uses the requested Goethe forum, reading and R2 Hören", () => {
     const config = B1_DAY27_UMWELTFREUNDLICH_ALLTAG_WORKBOOK_CONFIG;
-
     expect(config.day).toBe(27);
     expect(config.chapter).toBe("10.27");
     expect(config.speaking.ideaGroups).toHaveLength(5);
-    expect(config.writing.sourceTitle).toBe("Ahmed");
-    expect(config.reading.text.questions).toHaveLength(7);
-    expect(config.listening.videoId).toBe("jzm-MnWC7I0");
+    expect(config.writing.sourceTitle).toMatch(/Felix \(26 Jahre\)/);
+    expect(config.writing.taskPoints).toHaveLength(4);
+    expect(config.reading.text.questions).toHaveLength(6);
+    expect(config.reading.text.questions[0].options).toEqual(["A) Richtig", "B) Falsch"]);
+    expect(config.listening.audioKey).toBe("b1/day-27/day-27.mp3");
+    expect(config.listening.questions).toHaveLength(5);
+    expect(config.listening.submitRequired).toBe(true);
   });
 
   test("Day 28 keeps Klimafreundlich leben content and listening video", () => {
