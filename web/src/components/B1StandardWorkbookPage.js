@@ -495,7 +495,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                       >
                         {reading.layout === "matching-ads" ? (
                           <B1Day26MatchingReading task={reading} />
-                        ) : {reading.additionalTexts?.length ? (
+                        ) : reading.additionalTexts?.length ? (
                           <ReadingSourceGrid>
                             <TextBlock block={reading.text} examReading sourceLabel={readingSourceLabel(0)} />
                             {reading.additionalTexts.map((block, index) => (
