@@ -146,3 +146,15 @@ test("A2 retail print hides timed assessment banners and web-only learning-resou
     /Download\\s\+this\\s\+workbook/, /The\\s\+tabs\\s\+stay\\s\+visible/,
   ]) assert.match(validatorSource, pattern);
 });
+
+test("A2 retail PDF suppresses the two labels caught in build 40490474437", () => {
+  const start = source.indexOf("const suppressPdfChromeText = async");
+  const end = source.indexOf("const restorePdfChromeText = async", start);
+  assert.ok(start >= 0 && end > start);
+  const scrub = source.slice(start, end);
+  assert.ok(scrub.includes("Supporting\\s+materials"));
+  assert.ok(scrub.includes("Download\\s+this\\s+workbook\\s+as\\s+PDF"));
+  assert.match(source, /restorePdfChromeText\(page\)/);
+  assert.match(validatorSource, /Supporting\\s\+materials/);
+  assert.match(validatorSource, /Download\\s\+this\\s\+workbook/);
+});
