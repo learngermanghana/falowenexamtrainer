@@ -350,7 +350,7 @@ const B1WritingSupport = ({ onInsertTemplate, day }) => {
       <div style={{ display: "grid", gap: 12, marginTop: 10 }}>
       <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 12, background: "#eff6ff", display: "grid", gap: 10 }}>
         <div>
-          <strong style={{ color: "#1e3a8a" }}>B1 Writing Cheat Sheet</strong>
+          <strong style={{ color: "#1e3a8a" }}>Connectors and templates</strong>
           <p style={{ margin: "4px 0 0", color: "#475569", lineHeight: 1.6 }}>
             Use the phrases below while writing. The template buttons insert a complete structure directly into the German text box.
           </p>
