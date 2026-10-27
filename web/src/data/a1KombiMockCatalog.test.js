@@ -4,12 +4,12 @@ import { buildA1KombiAttemptContract, A1_KOMBI_MOCKS } from "./a1KombiMocks04to0
 test.each([4,5,6,7,8])("A1 Mock %s is registered with the matching full or three-module preview", number => {
  const id = `a1-final-${String(number).padStart(2,"0")}`;
  const exam = getMockExam(id);
- expect(exam).toMatchObject({id,level:"A1",status:"preview",mode:number<=6?"full":"kombi",
-    sections:number<=6?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"],showInMockLibrary:true});
+ expect(exam).toMatchObject({id,level:"A1",status:"preview",mode:number<=7?"full":"kombi",
+    sections:number<=7?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"],showInMockLibrary:true});
  const contract=buildA1KombiAttemptContract(number);
  expect(contract.mockId).toBe(id);
- expect(contract.maxScore).toBe(number<=6?100:75);
- expect(contract.sections).toEqual(number<=6?["lesen","hoeren","schreiben","sprechen"]:["lesen","schreiben","sprechen"]);
+ expect(contract.maxScore).toBe(number<=7?100:75);
+ expect(contract.sections).toEqual(number<=7?["lesen","hoeren","schreiben","sprechen"]:["lesen","schreiben","sprechen"]);
  expect(getMockExamsForLevel("A1").some(item=>item.id===id)).toBe(true);
 });
 test("historical A1 mock 1–3 remain published",()=>{

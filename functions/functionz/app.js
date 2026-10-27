@@ -5183,7 +5183,7 @@ app.post("/a1-mock/attempt/start", async (req, res) => {
 
     const mockId = String(req.body?.mockId || "a1-mock-01").trim().slice(0, 80);
     validateA1MockId(mockId);
-    const assessmentVersion = ["a1-mock-04","a1-mock-05","a1-mock-06"].includes(mockId) ? "four-module-v2" : /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
+    const assessmentVersion = ["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07"].includes(mockId) ? "four-module-v2" : /^a1-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
 
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Mock exam storage is unavailable." });
@@ -5580,7 +5580,7 @@ app.post("/a1-mock/attempt/save", async (req, res) => {
           verifiedSectionScores: verifiedAttempt.verifiedSectionScores || null,
           // Release review keys only after the attempt is completed and server-verified.
           readingAnswerKey: getA1MockSet(verifiedAttempt.mockId)?.readingAnswerKey || null,
-          ...(["a1-mock-04","a1-mock-05","a1-mock-06"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"
+          ...(["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"
             ? {listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey || null} : {}),
         };
       }
