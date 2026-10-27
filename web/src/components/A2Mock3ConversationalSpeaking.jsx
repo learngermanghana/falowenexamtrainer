@@ -20,7 +20,7 @@ const TASKS = [
     keywords:MOCK_3_CARDS.map(c=>c.keyword).join(", "),
     hint:"Use all four topic cards; take turns asking and answering in German." },
   { teil:"2",title:"Von sich erzählen", english:"Talk about your free afternoon, then answer the examiner's follow-up questions.",
-    prompt:`${CONTENT.teil2.topic} ${CONTENT.teil2.instruction} Stichwörter: ${CONTENT.teil2.points.join(" / ")}. Danach beantworten Sie: ${CONTENT.teil2.followups.join(" / ")}`,
+    prompt:`${CONTENT.teil2.topic} ${CONTENT.teil2.instruction} Stichwörter: ${CONTENT.teil2.points.join(" / ")}. Alternativ: ${CONTENT.teil2.alternate.topic} – ${CONTENT.teil2.alternate.points.join(" / ")}. Danach beantworten Sie: ${CONTENT.teil2.followups.join(" / ")}`,
     keywords:CONTENT.teil2.points.join(" / "),
     hint:"Speak for one to two minutes, then answer the examiner's follow-ups in German." },
   { teil:"3",title:"Gemeinsam planen", english:"Plan a friend's surprise birthday party together with your AI partner.",
