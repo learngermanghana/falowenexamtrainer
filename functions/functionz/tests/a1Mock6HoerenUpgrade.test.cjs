@@ -45,5 +45,5 @@ test("browser grades and unverified writing are never trusted",()=>{
  assert.throws(()=>buildVerifiedA1MockScore({mockId:id,state:{...basic,assessmentVersion:"four-module-v2",hoerenAnswers:keys,overall:{score:100}},verifiedSections:{}}),/Server-verified schreiben/);
  const blank=buildVerifiedA1MockScore({mockId:id,state:{...basic,assessmentVersion:"four-module-v2",hoerenAnswers:{}},verifiedSections:verified});
  assert.equal(blank.objective.hoeren.score,0);
- assert.throws(()=>buildVerifiedA1MockScore({mockId:"a1-mock-07",state:{mockId:"a1-mock-07",assessmentVersion:"four-module-v2"},verifiedSections:verified}),/Unsupported/);
+ assert.throws(()=>buildVerifiedA1MockScore({mockId:"a1-mock-08",state:{mockId:"a1-mock-08",assessmentVersion:"four-module-v2"},verifiedSections:verified}),/Unsupported/);
 });
