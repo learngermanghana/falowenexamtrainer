@@ -471,7 +471,7 @@ export const B1_READING_TASKS = Object.freeze({
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
       "title": "Modul Lesen · Teil 3 · Anzeigen zuordnen (7 Aufgaben)",
       "instructions": "Arbeitszeit: ca. 10 Minuten. Lesen Sie die Situationen 1–7 und die Anzeigen a–h. Welche Anzeige passt zu welcher Person? Für eine Person gibt es keine passende Anzeige: Wählen Sie X. Jede Anzeige darf nur einmal verwendet werden.",
-      "submissionNote": "Reichen Sie sieben Antworten ein: jeweils A–H oder X für „keine passende Anzeige“.",
+      submissionNote: "Reichen Sie sieben Antworten ein: jeweils A–H oder X für „keine passende Anzeige“.",
       "layout": "matching-ads",
       "imageAlt": "Anzeigen und Situationen zuordnen",
       "text": {
