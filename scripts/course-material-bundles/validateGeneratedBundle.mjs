@@ -83,6 +83,13 @@ if (level === "A2") {
     ["Online tab controls", /Select\s+Grammar,\s+Teil\s*1/i],
     ["Online answer state", /\b0\s+of\s+\d+\s+answered\b/i],
     ["Unhydrated grammar content", /Loading\s+grammar\s+notes(?:\u2026|\.{2,3})?|^\s*Loading(?:\u2026|\.{2,3})?\s*$/mi],
+    ["Website masthead", /^\s*Falowen\s*(?:🔔\s*)?(?:\d+\s*)?FA\s*$/mi],
+    ["Speaking timer controls", /⏱\s*\d{2}:\d{2}\s+\d+\s*min\s+Start\s+Reset/i],
+    ["Speaking help notice", /Speaking help is open by default/i],
+    ["Writing analysis button", /^\s*Analyse my text\s*$/mi],
+    ["Workbook navigation panel", /^\s*A2 workbook navigation\s*$/mi],
+    ["Online workbook instructions", /^\s*Day\s+\d+\s*[·•-]\s*A2 workbook\s*[·•-]\s*how to complete this workbook\s*$/mi],
+
 
   );
 }
@@ -94,6 +101,16 @@ if (leaked.length) {
   throw new Error(`${level} PDF contains excluded UI/content: ${leaked.join(", ")}.`);
 }
 
+if (level === "A2") {
+  // Sparse-page figures are diagnostics, not deletion rules: never silently
+  // discard a printed question, diagram or chapter-divider page.
+  const pdfPages = text.split("\\f").filter(page => page.trim());
+  const shortPages = pdfPages
+    .map((page, index) => ({ index: index + 1, words: page.replace(/Falowen Learning Hub\\s+\\d+\\s*\\/\\s*\\d+/gi, "").trim().split(/\\s+/).filter(Boolean).length }))
+    .filter(item => item.words > 0 && item.words <= 20);
+  console.log("A2 print page density: " + shortPages.length + " low-text pages (manual review): " +
+    shortPages.slice(0, 35).map(page => page.index).join(", "));
+}
 if (!/Contents/i.test(text)) throw new Error(`${level} PDF is missing its contents page.`);
 
 const expectedByDay = new Map();
