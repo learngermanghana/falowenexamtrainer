@@ -1,0 +1,64 @@
+name: A2 Kombipruefung Mocks 04-08 verified publish
+on:
+  pull_request:
+    paths:
+      - 'web/src/data/a2KombiMockSets*'
+      - 'web/src/services/a2KombiMockFinalization.js'
+      - 'web/src/components/A2KombiMockExamPage.jsx'
+      - 'web/src/App.js'
+      - 'web/src/data/mockExamCatalog.js'
+      - 'web/src/services/mockAssessmentRequest.js'
+      - 'functions/functionz/a2KombiMarkingSets.js'
+      - 'functions/functionz/a2MockCompletionSync.js'
+      - 'functions/functionz/assessmentTaskContext.js'
+      - 'functions/functionz/a2MockExaminerScore.js'
+      - 'functions/functionz/a2MockSpeakingAttemptIdentity.js'
+      - 'functions/functionz/app.js'
+      - 'functions/functionz/tests/a2Kombi04to08.test.cjs'
+      - '.github/workflows/a2-kombi-mocks-04-08.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/src/data/a2KombiMockSets*'
+      - 'web/src/components/A2KombiMockExamPage.jsx'
+      - 'functions/functionz/a2KombiMarkingSets.js'
+      - 'functions/functionz/tests/a2Kombi04to08.test.cjs'
+      - '.github/workflows/a2-kombi-mocks-04-08.yml'
+permissions:
+  contents: read
+jobs:
+  grading-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify private rubric, scoring, and backend syntax
+        run: |
+          node --check functions/functionz/app.js
+          node --check functions/functionz/a2KombiMarkingSets.js
+          node --check functions/functionz/a2MockCompletionSync.js
+          node --check functions/functionz/assessmentTaskContext.js
+          node --test functions/functionz/tests/a2Kombi04to08.test.cjs
+  web-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci --no-audit --no-fund
+        working-directory: web
+      - name: Verify mock catalogue, extracted content and storage identity
+        working-directory: web
+        env:
+          CI: true
+        run: npx jest --runInBand --runTestsByPath src/data/a2KombiMockSets.test.js src/data/a2FullMockContract.test.js src/data/mockExamCatalog.a2Library.test.js
+      - name: Verify production web bundle (no preview deployment)
+        working-directory: web
+        run: npx vite build

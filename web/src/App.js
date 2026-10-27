@@ -49,6 +49,7 @@ import A2Mock2Hoeren from "./components/A2Mock2Hoeren";
 import A2Mock3Hoeren from "./components/A2Mock3Hoeren";
 import A2Mock2Sprechen from "./components/A2Mock2Sprechen";
 import A2Mock2ExamHub from "./components/A2Mock2ExamHub";
+import A2KombiMockExamPage from "./components/A2KombiMockExamPage";
 import B1FinalMockExamPage from "./components/B1FinalMockExamPage";
 import B1Mock2Hoeren from "./components/B1Mock2Hoeren";
 import B2FinalMockExamPage from "./components/B2FinalMockExamPage";
@@ -1078,6 +1079,9 @@ const AppShell = ({
           <Route path="/campus/course/a2-mock-3-hoeren" element={<A2Mock3Hoeren />} />
           <Route path="/campus/course/a2-mock-2-sprechen" element={<A2Mock2Sprechen />} />
           <Route path="/campus/course/a2-mock-2" element={<A2Mock2ExamHub />} />
+          {[4,5,6,7,8].map(number=><Route key={number}
+            path={`/campus/course/a2-kombi-mock-${number}`}
+            element={<A2KombiMockExamPage key={number} mockNumber={number}/>}/>)}
           <Route path="/campus/course/a2-day-29-goethe-exam-orientation" element={<A2FinalMockExamPage />} />
           <Route path="/campus/course/a1-day-25-goethe-exam-orientation" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/campus/course/b1-mock-practice-preview" element={<B1FinalMockExamPage />} />
