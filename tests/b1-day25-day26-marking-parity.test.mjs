@@ -43,7 +43,7 @@ function matchOptions(id,day,part,kind,source,expectedLetters) {
   assert.equal(answers.length,options.length,`${id}/${part}: Firebase bundled task count`);
   assert.deepEqual(answers.map(x=>x[0].toUpperCase()),expectedLetters);
   for(let i=0;i<answers.length;i++){
-    const letters=options[i].map(x=>x.match(/^[A-F0]\)/i)?.[0]?.[0].toUpperCase());
+    const letters=options[i].map(x=>x.match(/^[A-HX0]\)/i)?.[0]?.[0].toUpperCase());
     const letter=answers[i][0].toUpperCase();
     const idx=letters.indexOf(letter);
     assert.ok(idx>=0,`${id}/${part} item ${i+1} has no option ${letter}`);
