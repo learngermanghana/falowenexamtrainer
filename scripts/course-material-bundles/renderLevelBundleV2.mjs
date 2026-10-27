@@ -223,10 +223,10 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
 const injectPrintMode = async (page) => {
   await page.emulateMedia({ media: "print" });
   return page.addStyleTag({ content: `
-    @page { size: A4; margin: 12mm 10mm 15mm; }
+    @page { size: A4; margin: ${level === "A2" ? "10mm 9mm 12mm" : "12mm 10mm 15mm"}; }
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    [data-a2-pdf-hide], nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
+    [data-a2-pdf-hide], [data-compact-speaking-timer], [data-course-writing-analysis-action], nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
     [data-self-learning-supporting-materials], [data-teacher-lecture-support],
     [data-timed-assignment], section[aria-label="Assessment rules"],
     .book-pdf-download-action, iframe, video, audio, button[type="submit"], button[role="tab"],
@@ -245,7 +245,7 @@ const injectPrintMode = async (page) => {
     [data-a2-pdf-audio-companion] { display: flex !important; }
     [data-a2-pdf-audio-companion] img { width: 86px !important; height: 86px !important; }
     [data-a2-pdf-hide] { display: none !important; }
-    [data-course-inline-practice="speaking"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture] { display: none !important; }
+    [data-course-inline-practice="speaking"], .speaking-compact-timer, [aria-label="Teil 1 speaking timer"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
   ` });
 };
@@ -298,7 +298,7 @@ const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   }
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
-    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, scale: level === "A2" ? 0.95 : 1, timeout: 30000 });
     if (level === "A2") await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
   } finally {
     if (level === "A2") await page.evaluate(restoreA2PrintDocument).catch(() => {});
