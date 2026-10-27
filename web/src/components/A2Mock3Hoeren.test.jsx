@@ -71,7 +71,7 @@ test("four-part answers are isolated between students and remain a practice resu
   mockUid = "a2-mock3-second";
   rerender(<MemoryRouter><A2Mock3Hoeren /></MemoryRouter>);
   await waitFor(() => expect(container.querySelectorAll("input:checked")).toHaveLength(0));
-  expect(screen.getByText(/noch kein offizielles/i)).not.toBeInTheDocument();
-  expect(screen.getByText(/keine vollständige A2-Prüfung/i)).not.toBeInTheDocument();
-  expect(screen.getByText(/kein offizielles/i)).toBeInTheDocument();
+  expect(screen.queryByText(/noch kein offizielles/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/keine vollständige A2-Prüfung/i)).not.toBeInTheDocument();
+  expect(screen.getByRole("note").textContent).toMatch(/kein offizielles/i);
 });
