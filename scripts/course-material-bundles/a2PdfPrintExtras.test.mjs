@@ -49,7 +49,7 @@ test("A2 website-only controls have durable print-only markers that do not chang
   const workbook = fs.readFileSync(path.join(dir, "../../web/src/components/A2StandardTabbedWorkbookPage.js"), "utf8");
   assert.match(startGuide, /data-pdf-exclude="workbook-start-resources"/);
   assert.match(workbook, /data-pdf-exclude="a2-prepared-checkbox"/);
-  assert.ok(helpers.includes(String.raw`/^\d+\s+of\s+\d+\s+answered$/i`));
+  assert.ok(helpers.includes(String.raw`/\b\d+\s+of\s+\d+\s+answered\b/i`));
   assert.match(renderer, /\[data-pdf-exclude\]/);
 });
 
@@ -60,7 +60,7 @@ test("print audit removes complete resource cards even before their new markers 
   assert.match(helpers, /workbook-resource-links/);
   assert.match(helpers, /online-completion-checkbox/);
   assert.match(helpers, /online-answer-progress/);
-  assert.match(helpers, /querySelector\("input,textarea,fieldset,select,h1,h2,h3"\)/);
+  assert.match(helpers, /querySelector\("input\[type=radio\],textarea,fieldset,select,h1,h2,h3"\)/);
   const marker = renderer.indexOf("page.evaluate(prepareA2PrintDocument");
   const scrub = renderer.indexOf("await suppressPdfChromeText(page);", marker);
   assert.ok(marker > 0 && scrub > marker,
