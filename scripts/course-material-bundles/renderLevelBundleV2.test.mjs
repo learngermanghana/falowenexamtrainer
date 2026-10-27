@@ -133,3 +133,16 @@ test("A2 printing strips web chrome temporarily, not student content", () => {
   assert.match(source, /node\.textContent = original/);
   assert.match(source, /img\[src\*="images\.unsplash\.com"\]/);
 });
+
+test("A2 retail print hides timed assessment banners and web-only learning-resource panels", () => {
+  assert.match(source, /data-timed-assignment/);
+  assert.match(source, /Assessment rules/);
+  assert.match(source, /data-self-learning-supporting-materials/);
+  assert.match(source, /data-teacher-lecture-support/);
+  assert.match(source, /section, article \{ break-inside: auto/);
+  assert.match(source, /div:has\(> iframe\)/);
+  for (const pattern of [
+    /Independent\\s\+assessment/, /StudyBuddy/, /Supporting\\s\+materials/,
+    /Download\\s\+this\\s\+workbook/, /The\\s\+tabs\\s\+stay\\s\+visible/,
+  ]) assert.match(validatorSource, pattern);
+});
