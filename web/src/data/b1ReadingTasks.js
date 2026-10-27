@@ -469,22 +469,150 @@ export const B1_READING_TASKS = Object.freeze({
     }
 } }),
   26: Object.freeze({ assignmentKey: "B1-9.26", ...{
-    title: "Lesen · Situationen und Anzeigen zuordnen (4 Aufgaben)",
-    instructions: "Lesen Sie die Situationen 1–4 und die Anzeigen A–E. Welche Anzeige passt zu welcher Person? Wählen Sie pro Aufgabe A, B, C, D, E oder 0, falls keine Anzeige passt.",
-    submissionNote: "Geben Sie zu jeder der vier Situationen Ihre gewählte Anzeige (A–E) oder 0 ein. Eine Lösung ist pro Situation erlaubt.",
-    imageAlt: "Passende Reisehilfe-Anzeigen finden",
-    text: {
-      title: "Reiseprobleme und Lösungen · Situationen und Anzeigen",
-      questionTitle: "Aufgaben 1–4 · Welche Anzeige passt?",
-      paragraphs: ["Situation 1 · Katrin ist aus dem Urlaub zurückgekehrt, aber ihr Koffer ist am Flughafen verschwunden. Sie sucht professionelle Hilfe, um Entschädigung von der Fluggesellschaft zu bekommen.","Situation 2 · Markus plant eine Autoreise durch Europa und möchte für den Fall einer Autopanne im Ausland abgesichert sein.","Situation 3 · Elena fährt oft mit dem Zug zur Arbeit und in den Urlaub. Bei Verspätungen möchte sie ohne viel Papierkram ihr Geld zurückerhalten.","Situation 4 · Familie Becker sucht eine Versicherung, die die Kosten übernimmt, falls jemand vor der Reise krank wird und nicht mitfahren kann.","Anzeigen A–E","Anzeige A · Flug-Recht24 – Ihr Partner bei Flugproblemen! — Flug gecancelt? Koffer verloren oder beschädigt? Wir setzen Ihre Ansprüche gegenüber der Airline durch – schnell, unkompliziert und ohne finanzielles Risiko. Sie zahlen nur im Erfolgsfall!","Anzeige B · ZugPlus App – Entschädigung per Klick — Zugverspätung gehabt? Mit unserer App reichen Sie Ihren Entschädigungsantrag bei der Bahn in unter 2 Minuten ein. Automatische Auszahlung direkt auf Ihr Konto.","Anzeige C · EuroPannenschutz – Rund um die Uhr sicher unterwegs — Egal ob Motorschaden, Reifenschaden oder Unfall: Unser 24-Stunden-Pannendienst hilft Ihnen in über 30 europäischen Ländern schnell vor Ort oder organisiert einen Ersatzwagen.","Anzeige D · City-Hotel Terminal – Direkt am Flughafen — Flug verpasst oder Ausfall wegen Streik? Übernachten Sie komfortabel und günstig direkt am Flughafen. Kostenloser Shuttle-Service rund um die Uhr.","Anzeige E · SicherReisen Reiserücktrittsversicherung — Plötzlich krank vor dem Urlaub? Schützen Sie sich vor hohen Stornogebühren. Unsere Tarife passen sich flexibel an Einzelpersonen und Familien an."],
-      questions: [
-        { stem: "Welche Anzeige passt zu Katrin?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
-        { stem: "Welche Anzeige passt zu Markus?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
-        { stem: "Welche Anzeige passt zu Elena?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] },
-        { stem: "Welche Anzeige passt zu Familie Becker?", options: ["A) Flug-Recht24","B) ZugPlus App","C) EuroPannenschutz","D) City-Hotel Terminal","E) SicherReisen","0) Keine passende Anzeige"] }
-      ]
-    }
-  } }),
+      "title": "Modul Lesen · Teil 3 · Anzeigen zuordnen (7 Aufgaben)",
+      "instructions": "Arbeitszeit: ca. 10 Minuten. Lesen Sie die Situationen 1–7 und die Anzeigen a–h. Welche Anzeige passt zu welcher Person? Für eine Person gibt es keine passende Anzeige: Wählen Sie X. Jede Anzeige darf nur einmal verwendet werden.",
+      submissionNote: "Reichen Sie sieben Antworten ein: jeweils A–H oder X für „keine passende Anzeige“.",
+      "layout": "matching-ads",
+      "imageAlt": "Anzeigen und Situationen zuordnen",
+      "text": {
+        "title": "Lesen Teil 3 · Situationen und Anzeigen",
+        "questionTitle": "Aufgaben 1–7 · Welche Anzeige passt?",
+        "situations": [
+          {
+            "number": 1,
+            "person": "Lukas",
+            "description": "Lukas möchte im Sommer eine geführte, mehrtägige Wandertour in den Alpen machen, bei der das schwere Gepäck von Unterkunft zu Unterkunft transportiert wird."
+          },
+          {
+            "number": 2,
+            "person": "Hannah",
+            "description": "Hannah sucht für ihre 12-jährige Tochter einen intensiven Schwimmkurs während der Sommerferien."
+          },
+          {
+            "number": 3,
+            "person": "Herr und Frau Berger",
+            "description": "Herr und Frau Berger suchen für einen dreimonatigen Arbeitsaufenthalt in Frankfurt eine möblierte 3-Zimmer-Wohnung zur Zwischenmiete."
+          },
+          {
+            "number": 4,
+            "person": "Elena",
+            "description": "Elena möchte ihr gebrauchtes Rennrad verkaufen und sucht dafür ein kostenloses regionales Kleinanzeigen-Portal."
+          },
+          {
+            "number": 5,
+            "person": "Klaus",
+            "description": "Klaus braucht einen Handwerker für seine defekte Waschmaschine, der auch am Samstag oder Sonntag vorbeikommen kann."
+          },
+          {
+            "number": 6,
+            "person": "Katrin",
+            "description": "Katrin möchte nach der Arbeit Spanisch lernen, hat aber unter der Woche erst ab 20:00 Uhr Zeit."
+          },
+          {
+            "number": 7,
+            "person": "Martin",
+            "description": "Martin arbeitet tagsüber Vollzeit und sucht jemanden, der seinen Hund während der Arbeitszeiten stundenweise betreut."
+          }
+        ],
+        "advertisements": [
+          {
+            "letter": "a",
+            "title": "Alpen-Trekking pur!",
+            "description": "5-tägige geführte Hüttenwanderung von Oberstdorf nach Meran. Inklusive Übernachtung, Halbpension und täglichem Gepäcktransfer zur nächsten Hütte!",
+            "contact": "www.alpin-tours.de"
+          },
+          {
+            "letter": "b",
+            "title": "Schwimmschule Delphin",
+            "description": "Sommerferien-Intensivkurse für Kinder und Jugendliche (8–14 Jahre). Sicheres Schwimmen und Tauchen in kleinen Gruppen.",
+            "contact": "Hallenbad West · Tel.: 089-44321"
+          },
+          {
+            "letter": "c",
+            "title": "Wohnen auf Zeit in Frankfurt",
+            "description": "Exklusive 3-Zimmer-Wohnungen, voll möbliert im Zentrum. Mindestmietdauer: 6 Monate. Nichtraucher, keine Haustiere.",
+            "contact": "Immo-Frankfurt GmbH"
+          },
+          {
+            "letter": "d",
+            "title": "Gratis-Kleinanzeigen-Portal",
+            "description": "Verkaufen Sie alte Möbel, Fahrräder und Elektronik schnell und ohne Gebühren in Ihrer Region! Jetzt kostenlos inserieren.",
+            "contact": "www.deine-anzeige-direkt.de"
+          },
+          {
+            "letter": "e",
+            "title": "Hausgeräte-Notdienst 24/7",
+            "description": "Schnelle Reparatur von Waschmaschinen, Trocknern und Herdgeräten. Wir sind 7 Tage die Woche für Sie im Einsatz – auch an Wochenenden und Feiertagen!",
+            "contact": ""
+          },
+          {
+            "letter": "f",
+            "title": "Spanisch am Abend",
+            "description": "Kompaktkurse für Anfänger und Fortgeschrittene. Jeden Dienstag und Donnerstag von 20:15 bis 21:45 Uhr.",
+            "contact": "Sprachschule Lingua, Neustadt"
+          },
+          {
+            "letter": "g",
+            "title": "Hundepension Waldfrieden",
+            "description": "Liebevolle Urlaubsbetreuung für Ihren Hund! Große Ausläufe, professionelle Pflege und Übernachtung ab 3 Tagen Dauer.",
+            "contact": ""
+          },
+          {
+            "letter": "h",
+            "title": "Hunde-Tagesbetreuung „Bello & Co.“",
+            "description": "Sie arbeiten viel? Wir holen Ihren Hund morgens ab, betreuen ihn tagsüber und bringen ihn nachmittags wieder nach Hause!",
+            "contact": ""
+          }
+        ],
+        "paragraphs": [
+          "Situation 1 · Lukas: Lukas möchte im Sommer eine geführte, mehrtägige Wandertour in den Alpen machen, bei der das schwere Gepäck von Unterkunft zu Unterkunft transportiert wird.",
+          "Situation 2 · Hannah: Hannah sucht für ihre 12-jährige Tochter einen intensiven Schwimmkurs während der Sommerferien.",
+          "Situation 3 · Herr und Frau Berger: Herr und Frau Berger suchen für einen dreimonatigen Arbeitsaufenthalt in Frankfurt eine möblierte 3-Zimmer-Wohnung zur Zwischenmiete.",
+          "Situation 4 · Elena: Elena möchte ihr gebrauchtes Rennrad verkaufen und sucht dafür ein kostenloses regionales Kleinanzeigen-Portal.",
+          "Situation 5 · Klaus: Klaus braucht einen Handwerker für seine defekte Waschmaschine, der auch am Samstag oder Sonntag vorbeikommen kann.",
+          "Situation 6 · Katrin: Katrin möchte nach der Arbeit Spanisch lernen, hat aber unter der Woche erst ab 20:00 Uhr Zeit.",
+          "Situation 7 · Martin: Martin arbeitet tagsüber Vollzeit und sucht jemanden, der seinen Hund während der Arbeitszeiten stundenweise betreut.",
+          "Anzeige a · Alpen-Trekking pur! — 5-tägige geführte Hüttenwanderung von Oberstdorf nach Meran. Inklusive Übernachtung, Halbpension und täglichem Gepäcktransfer zur nächsten Hütte! www.alpin-tours.de",
+          "Anzeige b · Schwimmschule Delphin — Sommerferien-Intensivkurse für Kinder und Jugendliche (8–14 Jahre). Sicheres Schwimmen und Tauchen in kleinen Gruppen. Hallenbad West · Tel.: 089-44321",
+          "Anzeige c · Wohnen auf Zeit in Frankfurt — Exklusive 3-Zimmer-Wohnungen, voll möbliert im Zentrum. Mindestmietdauer: 6 Monate. Nichtraucher, keine Haustiere. Immo-Frankfurt GmbH",
+          "Anzeige d · Gratis-Kleinanzeigen-Portal — Verkaufen Sie alte Möbel, Fahrräder und Elektronik schnell und ohne Gebühren in Ihrer Region! Jetzt kostenlos inserieren. www.deine-anzeige-direkt.de",
+          "Anzeige e · Hausgeräte-Notdienst 24/7 — Schnelle Reparatur von Waschmaschinen, Trocknern und Herdgeräten. Wir sind 7 Tage die Woche für Sie im Einsatz – auch an Wochenenden und Feiertagen!",
+          "Anzeige f · Spanisch am Abend — Kompaktkurse für Anfänger und Fortgeschrittene. Jeden Dienstag und Donnerstag von 20:15 bis 21:45 Uhr. Sprachschule Lingua, Neustadt",
+          "Anzeige g · Hundepension Waldfrieden — Liebevolle Urlaubsbetreuung für Ihren Hund! Große Ausläufe, professionelle Pflege und Übernachtung ab 3 Tagen Dauer.",
+          "Anzeige h · Hunde-Tagesbetreuung „Bello & Co.“ — Sie arbeiten viel? Wir holen Ihren Hund morgens ab, betreuen ihn tagsüber und bringen ihn nachmittags wieder nach Hause!"
+        ],
+        "questions": [
+          {
+            "stem": "Welche Anzeige passt zu Lukas?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Hannah?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Herr und Frau Berger?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Elena?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Klaus?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Katrin?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          },
+          {
+            "stem": "Welche Anzeige passt zu Martin?",
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
+          }
+        ]
+      }
+    } }),
   27: Object.freeze({ assignmentKey: "B1-10.27", ...{
     title: "Lesen Sie den Text und beantworten Sie alle sieben Fragen.",
     instructions: "Lesen Sie zuerst den vollständigen Essay. Wählen Sie danach bei jeder Frage genau eine Antwort.",

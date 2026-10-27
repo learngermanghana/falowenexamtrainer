@@ -5,22 +5,26 @@ import { getA2B1LessonProfile } from "./a2B1LessonProfile";
 import { getTimedAssignmentConfig } from "./timedAssignmentConfig";
 
 describe("B1 Day 26 · Reiseprobleme und Lösungen official workbook alignment", () => {
-  test("Schreiben asks for 80-word Markus forum opinion, not a Max/Lisa letter", () => {
+  test("Schreiben requests a 40–50-word formal Vienna tour email", () => {
     const writing=getB1WritingTask(26);
-    expect(writing.sourceTitle).toContain("Markus");
-    expect(writing.sourceText).toContain("drei Stunden Verspätung");
-    expect(writing.instructions).toContain("80");
+    expect(writing.title).toMatch(/Formelle E-Mail/);
+    expect(writing.instructions).toContain("TraumReisen GmbH");
+    expect(writing.instructions).toContain("40–50");
     expect(writing.taskPoints).toHaveLength(3);
-    expect(JSON.stringify(writing)).not.toMatch(/Lieber Max|Liebe Lisa/i);
+    expect(writing.taskPoints[1]).toMatch(/Reisedaten.*Hotelkategorie.*Ausflügen/);
+    expect(writing.taskPoints[2]).toMatch(/verbindlichen Angebots/);
+    expect(JSON.stringify(writing)).not.toMatch(/Markus|Lieber Max|Liebe Lisa/i);
   });
-  test("Lesen presents all five ads and four matching scenarios with an unused 0 option", () => {
+  test("Lesen matches seven people and eight Anzeigen using A–H or X", () => {
     const reading=getB1ReadingTask(26);
-    expect(reading.text.paragraphs.filter(x=>x.startsWith("Situation "))).toHaveLength(4);
-    expect(reading.text.paragraphs.filter(x=>x.startsWith("Anzeige "))).toHaveLength(5);
-    expect(reading.text.questions).toHaveLength(4);
-    expect(reading.text.questions.every(q=>q.options.length===6)).toBe(true);
-    expect(reading.text.questions[0].options[5]).toMatch(/^0\)/);
-    expect(reading.text.paragraphs.join(" ")).toContain("EuroPannenschutz");
+    expect(reading.layout).toBe("matching-ads");
+    expect(reading.text.situations).toHaveLength(7);
+    expect(reading.text.advertisements).toHaveLength(8);
+    expect(reading.text.questions).toHaveLength(7);
+    expect(reading.text.questions.every(q=>q.options.length===9)).toBe(true);
+    expect(reading.text.questions[0].options[8]).toMatch(/^X\)/);
+    expect(reading.text.advertisements[2].description).toMatch(/Mindestmietdauer: 6 Monate/);
+    expect(reading.text.situations[2].description).toMatch(/dreimonatigen/);
   });
   test("Hören uses uploaded Day 26 R2 recording and five Richtig/Falsch statements", () => {
     const listening=getB1ListeningTask(26);
