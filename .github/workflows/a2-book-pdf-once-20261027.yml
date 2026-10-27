@@ -1,6 +1,6 @@
 name: One-time A2 course-book PDF build (merged fix)
 
-# Retry 2: verify exact workbook tabs before merging the A2 PDF.
+# Retry 3: restore screen media between all Grammar and Workbook sections.
 # This workflow is scoped to this one operational branch only.
 # It does not change production, schedule jobs, or publish book sales.
 on:
