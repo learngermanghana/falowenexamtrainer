@@ -422,6 +422,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                       <p style={{ margin: 0 }}>
                         {writing.instructions || "State your opinion clearly, give reasons and include a relevant example."}
                       </p>
+                      <BulletList items={writing.taskPoints} ordered />
                     </WorkbookTaskCard>
           
                     <SectionImage image={writing.image} alt={writing.imageAlt} />
