@@ -224,6 +224,8 @@ const injectPrintMode = async (page) => {
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
+    [data-self-learning-supporting-materials], [data-teacher-lecture-support],
+    [data-timed-assignment], section[aria-label="Assessment rules"],
     .book-pdf-download-action, iframe, video, audio, button, input[type="checkbox"],
     [class*="study-buddy" i], [class*="floating" i], [class*="chat" i],
     [class*="video-card" i], [class*="videoCard"], [class*="thumbnail" i],
@@ -231,9 +233,11 @@ const injectPrintMode = async (page) => {
     [aria-label*="video" i] { display: none !important; }
     section:has(> iframe), section:has(> video), article:has(> iframe), article:has(> video) { display: none !important; }
     [style*="position: sticky"], [style*="position: fixed"] { position: static !important; }
-    section, article, table, pre, blockquote { break-inside: avoid; }
+    section, article { break-inside: auto; }
+    table, pre, blockquote { break-inside: avoid; }
     img { max-width: 100% !important; }
     img[src*="images.unsplash.com"] { display: none !important; }
+    div:has(> iframe), div:has(> video) { display: none !important; }
     a[href="/campus/course"], a[href="/campus/course/"] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
   ` });
@@ -249,6 +253,7 @@ const suppressPdfChromeText = async (page) => page.evaluate(() => {
     [/Study\s+Buddy/gi, ""],
     [/Submit\s+workbook\s+answers/gi, ""],
     [/Reference\s+Answers/gi, ""],
+    [/The tabs stay visible at the top of the workbook\.?/gi, ""],
   ];
   const changes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);

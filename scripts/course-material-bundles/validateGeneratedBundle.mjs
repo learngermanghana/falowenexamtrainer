@@ -67,6 +67,15 @@ const forbidden = [
   ["Teacher Video", /Teacher\s+Video/i],
 ];
 
+if (level === "A2") {
+  forbidden.push(
+    ["Independent assessment notices", /Independent\s+assessment/i],
+    ["StudyBuddy assessment UI", /StudyBuddy/i],
+    ["Supporting materials navigation", /Supporting\s+materials/i],
+    ["Workbook download controls", /Download\s+this\s+workbook\s+as\s+PDF/i],
+    ["Workbook tab-navigation hint", /The\s+tabs\s+stay\s+visible\s+at\s+the\s+top\s+of\s+the\s+workbook/i],
+  );
+}
 const leaked = forbidden.filter(([, pattern]) => pattern.test(text)).map(([label]) => label);
 if (leaked.length) {
   throw new Error(`${level} PDF contains excluded UI/content: ${leaked.join(", ")}.`);
