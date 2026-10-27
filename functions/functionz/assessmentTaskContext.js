@@ -43,7 +43,7 @@ module.exports = { resolvePracticeTask, assessmentTaskPrompt, mockTaskPrompt };
 
 function mockTaskVersion(level, kind, mockId) {
   if (level === 'A1' && kombiTasks[mockId]) return `${mockId}-${kind}-v1`;
-  if (level === 'A2' && mockId === 'a2-mock-03') return require('crypto').createHash('sha256').update(JSON.stringify(a2Mock3[kind])).digest('hex');
+  if (level === 'A2' && mockId === 'a2-mock-03') return `${mockId}-${kind}-v1`;
   const task = ((level === 'A1' && ['a1-mock-02', 'a1-mock-03'].includes(mockId)) || (level === 'A2' && mockId === 'a2-mock-02'))
     ? registry.mockSets[mockId]?.[kind] : registry.mocks[level][kind];
   return require('crypto').createHash('sha256').update(JSON.stringify(task)).digest('hex');
