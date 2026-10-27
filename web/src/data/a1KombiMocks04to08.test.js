@@ -10,7 +10,7 @@ test("historical 3-module scoring excludes Hören",()=>{
  expect(calculateA1KombiResult(a,{lesen:20,schreiben:15,sprechen:25})).toMatchObject({earned:60,maximum:75,percentage:80});
 });
 test("4 module upgrade preserves historical contract",()=>{
- const old=buildA1KombiAttemptContract(8),next=buildA1KombiAttemptContract(8,{hoerenPublished:true});
+ const old=buildA1KombiAttemptContract(8,{hoerenPublished:false}),next=buildA1KombiAttemptContract(8,{hoerenPublished:true});
  expect(old.maxScore).toBe(75);expect(next.maxScore).toBe(100);
  expect(old.sections).not.toContain("hoeren");expect(next.sections).toContain("hoeren");
 });
