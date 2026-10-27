@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import ListeningPracticeSamplePage from "./ListeningPracticeSamplePage";
+import A1MockHoerenPractice from "./A1MockHoerenPractice";
 
 const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
   const { t } = useTranslation();
@@ -22,7 +23,7 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
     if (sampleId) {
       const sampleExists =
         sampleId === "sample-1" ||
-        (normalizedLevel === "A1" && ["sample-2", "sample-3"].includes(sampleId)) ||
+        (normalizedLevel === "A1" && ["sample-2", "sample-3", "sample-4", "sample-5", "sample-6", "sample-7", "sample-8"].includes(sampleId)) ||
         (normalizedLevel === "A2" && sampleId === "sample-2");
 
       if (!sampleExists) {
@@ -34,6 +35,10 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
             </button>
           </section>
         );
+      }
+
+      if (normalizedLevel === "A1" && /^sample-[4-8]$/.test(sampleId)) {
+        return <A1MockHoerenPractice sampleId={sampleId} />;
       }
 
       return <ListeningPracticeSamplePage level={normalizedLevel} sampleId={sampleId} />;
@@ -148,6 +153,26 @@ const HorenPage = ({ practiceLevel = "", sampleId = "" }) => {
                   15 questions · Teil 1–3
                 </span>
               </button>
+              {[4, 5, 6, 7, 8].map(number => (
+                <button
+                  key={number}
+                  type="button"
+                  onClick={() => openListeningSample(`/exams/horen/a1/sample-${number}`, `Hören Sample ${number} opened successfully.`)}
+                  style={{
+                    ...styles.secondaryButton,
+                    width: "100%",
+                    textAlign: "left",
+                    display: "grid",
+                    gap: 4,
+                    padding: "14px 16px",
+                  }}
+                >
+                  <strong>Hören Sample {number}</strong>
+                  <span style={{ fontSize: 13, fontWeight: 500, opacity: 0.8 }}>
+                    15 questions · Teil 1–3 · From A1 Mock {number} · server-graded
+                  </span>
+                </button>
+              ))}
             </>
           ) : null}
         </div>
