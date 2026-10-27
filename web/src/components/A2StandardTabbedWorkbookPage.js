@@ -140,7 +140,7 @@ const ProtectedA2ListeningAudio = ({ day, audioKey }) => {
   return <div style={{ display: "grid", gap: 8 }}><audio data-a2-r2-audio="true" controls preload="metadata" src={signedUrl} style={{ width: "100%" }}>Ihr Browser unterstützt die Audiowiedergabe nicht.</audio><span style={{ color: "#64748b", fontSize: 13 }}>Die Aufnahme wird direkt hier in Falowen abgespielt.</span></div>;
 };
 
-const PreparedCheckbox = ({ checked, onChange, label = "I prepared this part." }) => <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={checked} onChange={onChange} />{label}</label>;
+const PreparedCheckbox = ({ checked, onChange, label = "I prepared this part." }) => <label data-pdf-exclude="a2-prepared-checkbox" style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={checked} onChange={onChange} />{label}</label>;
 const HeroImage = ({ type, alt }) => <img src={defaultImages[type] || defaultImages.sprechen} alt={alt} loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />;
 const QuestionList = ({ questions = [] }) => <div style={{ display: "grid", gap: 10 }}>{questions.map((question, index) => <div key={`${question.stem}-${index}`} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{(question.options || []).map((option) => <span key={option}>{option}</span>)}</div>)}</div>;
 
