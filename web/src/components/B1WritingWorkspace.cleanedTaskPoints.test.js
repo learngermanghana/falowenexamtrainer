@@ -116,19 +116,13 @@ describe("resolveWritingSupportItems", () => {
     ]);
   });
 
-  test("Day 27 ignores stale Ahmed/source structure", () => {
-    const items = resolveWritingSupportItems({
-      day: 27,
-      supportStructure: [
-        "Reaktion auf Ahmeds Meinung",
-        "Argumente und Beispiele",
-      ],
-    }, "B1");
-
+  test("Day 27 preserves all four requested Goethe B1 forum prompts", () => {
+    const items = resolveWritingSupportItems({ day: 27, supportStructure: ["Old Ahmed prompt"] }, "B1");
     expect(items).toEqual([
-      "Erklären Sie, warum umweltfreundliches Leben wichtig ist, und nennen Sie Beispiele aus dem Alltag.",
-      "Beschreiben Sie eine Schwierigkeit, die umweltfreundliches Verhalten erschweren kann.",
-      "Begründen Sie Ihre eigene Meinung und formulieren Sie einen klaren Schluss.",
+      "Äußern Sie Ihre Meinung zum umweltfreundlichen Leben im Alltag.",
+      "Nennen Sie Gründe, warum Umweltschutz im Alltag wichtig ist.",
+      "Nennen Sie weitere Möglichkeiten, wie man im Alltag die Umwelt schonen kann.",
+      "Nennen Sie Vor- oder Nachteile von umweltfreundlichem Verhalten.",
     ]);
     expect(items.join(" ")).not.toMatch(/Ahmed/i);
   });
