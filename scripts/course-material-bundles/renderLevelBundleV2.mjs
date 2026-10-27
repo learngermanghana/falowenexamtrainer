@@ -226,7 +226,7 @@ const injectPrintMode = async (page) => {
     @page { size: A4; margin: ${level === "A2" ? "10mm 9mm 12mm" : "12mm 10mm 15mm"}; }
     html, body { background: #fff !important; }
     body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    ${level === "A2" ? ".app-header, .app-shell > header.app-header { display: none !important; }" : ""}
+    ${level === "A2" ? ".app-header, header.app-header--compact, .app-shell > header.app-header { display: none !important; }" : ""}
     [data-a2-pdf-hide], [data-compact-speaking-timer], [data-course-writing-analysis-action], nav, [role="navigation"], [role="tablist"], [data-workbook-tab-navigation], .book-print-stamp,
     [data-self-learning-supporting-materials], [data-teacher-lecture-support],
     [data-timed-assignment], section[aria-label="Assessment rules"],
