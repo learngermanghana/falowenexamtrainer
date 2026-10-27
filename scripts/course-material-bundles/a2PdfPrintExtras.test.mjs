@@ -67,3 +67,11 @@ test("print audit removes complete resource cards even before their new markers 
     "detect resource cards before the heading-text scrub runs");
   assert.match(renderer, /page\.evaluate\(restoreA2PrintDocument\)/);
 });
+
+test("print-only online answer counts are scrubbed even with nested badges or extra text", () => {
+  assert.match(helpers, /const answerCounter =/);
+  assert.match(helpers, /online-answer-progress/);
+  assert.match(helpers, /const smallerMatch/);
+  assert.match(helpers, /querySelector\("input\[type=radio\],textarea,fieldset,select,h1,h2,h3"\)/);
+  assert.ok(renderer.includes(String.raw`/\b\d+\s+of\s+\d+\s+answered\b/gi`));
+});
