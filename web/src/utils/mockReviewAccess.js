@@ -23,6 +23,25 @@ export const isA2Mock2ReviewReady = (keys) => {
     .every(k => Boolean(s[k]?.transcript));
   return Boolean(l.completedAt && h.completedAt && w.submittedAt && (conversationalComplete || originalComplete));
 };
+
+// Mock 03 has its own student-scoped drafts, never shared with Mock 02.
+export const A2_MOCK_3_STORAGE = Object.freeze({
+  flow: "falowen:a2:mock-03:full-flow:v1",
+  lesen: "falowen:a2:mock-03:lesen:v1",
+  hoeren: "falowen:a2:mock-03:full-hoeren:v1",
+  schreiben: "falowen:a2:mock-03:schreiben:v1",
+  sprechen: "falowen:a2:mock-03:sprechen:v1",
+});
+export const getA2Mock3StorageKeys = (userId) => Object.fromEntries(
+  Object.entries(A2_MOCK_3_STORAGE).map(([name, key]) => [name, getStudentMockStorageKey(key, userId)]),
+);
+export const isA2Mock3ReviewReady = (keys) => {
+  const l = readMockState(keys.lesen), h = readMockState(keys.hoeren);
+  const w = readMockState(keys.schreiben), s = readMockState(keys.sprechen);
+  return Boolean(l.completedAt && h.completedAt && w.submittedAt
+    && ["1","2","3"].every(part => s._examinerParts?.[part]?.sessionId && s._examinerParts?.[part]?.assessment));
+};
+
 export const getScoredMockSections = (exam) =>
   exam?.assessmentVersion === "three-module-v1"
     ? ["lesen", "schreiben", "sprechen"]
