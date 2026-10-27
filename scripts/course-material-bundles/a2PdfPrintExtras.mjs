@@ -62,7 +62,7 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
   // A completion checkbox is not a choice in a reading or listening question.
   // Exclude its entire label rather than only its text; do not hide radios.
   for (const label of document.querySelectorAll("label")) {
-    if (/^I prepared this part\\.?$/i.test(normalize(label.textContent)) &&
+    if (/^I prepared this part\.?$/i.test(normalize(label.textContent)) &&
         label.querySelector('input[type="checkbox"]') &&
         !label.querySelector('input[type="radio"]')) {
       hide(label, "online-completion-checkbox");
@@ -73,7 +73,7 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
   // *whole* text and require a small, input-free node, preserving all MCQs.
   for (const el of document.querySelectorAll("small,span,p,div")) {
     const text = normalize(el.textContent);
-    if (text.length > 75 || !/^\\d+\\s+of\\s+\\d+\\s+answered$/i.test(text)) continue;
+    if (text.length > 75 || !/^\d+\s+of\s+\d+\s+answered$/i.test(text)) continue;
     if (el.querySelector("input,textarea,fieldset,select,h1,h2,h3")) continue;
     hide(el, "online-answer-progress");
   }
