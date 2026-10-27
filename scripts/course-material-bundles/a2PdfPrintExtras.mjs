@@ -24,6 +24,14 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
     marked.push(node);
   };
 
+  // The authenticated site's real masthead is `header.app-header` in
+  // web/src/App.js. It contains an h1, notification button and account controls,
+  // so the text-only heuristic below deliberately misses it. Exclude it by its
+  // stable application-shell component class before printing (never in the app).
+  for (const header of document.querySelectorAll("header.app-header, .app-shell > .app-header")) {
+    hide(header, "authenticated-site-masthead");
+  }
+
   // A1-style masthead cleanup: website logo, notification count and account
   // badge are never lesson content. Search the entire document because the
   // global site header normally lives OUTSIDE the workbook's <main>.
