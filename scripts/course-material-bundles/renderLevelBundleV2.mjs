@@ -284,12 +284,16 @@ const restorePdfChromeText = async (page) => page.evaluate(() => {
 });
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
   const printStyle = await injectPrintMode(page);
-  if (level === "A2" || level === "B1") await suppressPdfChromeText(page);
+  // Identify whole resource cards before the generic text scrub removes
+  // their "Supporting materials" heading. Live production may not yet have
+  // the newer data-pdf-exclude React markers.
+  if (level === "B1") await suppressPdfChromeText(page);
   if (level === "A2") {
     const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
     const qrDataUrl = suffix === "workbook-teil-4"
       ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
     await page.evaluate(prepareA2PrintDocument, { section: suffix, lessonUrl, qrDataUrl });
+    await suppressPdfChromeText(page);
   }
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
