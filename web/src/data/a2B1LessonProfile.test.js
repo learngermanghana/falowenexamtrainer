@@ -106,7 +106,7 @@ describe("canonical A2/B1 lesson profiles", () => {
     expect(getA2B1LessonProfile("B1", 22)).toMatchObject({
       assignmentKey: "B1-7.22",
       timer: {
-        durationMinutes: 15,
+        durationMinutes: 20,
         timedTabs: ["lesen", "hoeren"],
         source: "lesson-profile",
       },
@@ -117,14 +117,30 @@ describe("canonical A2/B1 lesson profiles", () => {
     expect(getA2B1LessonProfile("A2", 27).timer.timedTabs).toEqual(["lesen", "hoeren"]);
     expect(getA2B1LessonProfile("B1", 25).timer.timedTabs).toEqual(["schreiben", "lesen", "hoeren"]);
 
-    expect(getA2B1LessonProfile("B1", 28)).toMatchObject({
-      assignmentKey: "B1-10.28",
-      timer: {
-        durationMinutes: 60,
-        mode: "mock",
-      },
-    });
+    for (const day of [27, 28]) {
+      expect(getA2B1LessonProfile("B1", day)).toMatchObject({
+        assignmentKey: `B1-10.${day}`,
+        timer: {
+          durationMinutes: 30,
+          mode: "practice",
+          timedTabs: ["schreiben", "lesen", "hoeren"],
+        },
+      });
+    }
     expect(getA2B1LessonProfile("A2", 15).timer).toBeNull();
+  });
+
+  test("all timed B1 workbook profiles use 10 minutes per required assessed tab", () => {
+    const profiles = getA2B1LessonProfiles("B1");
+    const timed = profiles.filter((profile) => profile.timer);
+    expect(timed.map((profile) => profile.day)).toEqual([18, 19, 21, 22, 23, 24, 25, 26, 27, 28]);
+    for (const profile of timed) {
+      const tabs = profile.requiredSubmissionParts.map((part) => part.sectionKey);
+      expect(profile.timer.mode).toBe("practice");
+      expect(profile.timer.timedTabs).toHaveLength(tabs.length);
+      expect(profile.timer.durationMinutes).toBe(tabs.length * 10);
+      expect(profile.timer.durationMinutes).toBeGreaterThanOrEqual(10);
+    }
   });
 
   test("critical late-course profiles no longer drift from lesson data", () => {
