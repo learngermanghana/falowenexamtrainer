@@ -17,7 +17,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import B1WritingWorkspace from "./B1WritingWorkspace";
 
 describe("B1WritingWorkspace", () => {
-  test("shows the B1 cheat sheet on every B1 writing workspace", () => {
+  test("keeps optional B1 writing support available on demand", () => {
     render(
       <B1WritingWorkspace
         writingContext={{
@@ -29,6 +29,7 @@ describe("B1WritingWorkspace", () => {
     );
 
     expect(screen.getByText("B1 Writing Cheat Sheet")).toBeVisible();
+    fireEvent.click(screen.getByText("B1 Writing Cheat Sheet"));
     expect(screen.getByRole("button", { name: "Insert Opinion Essay Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Formal Letter Template" })).toBeVisible();
     expect(screen.getByRole("button", { name: "Insert Informal Letter Template" })).toBeVisible();
@@ -45,6 +46,7 @@ describe("B1WritingWorkspace", () => {
       />,
     );
 
+    fireEvent.click(screen.getByText("B1 Writing Cheat Sheet"));
     const day4CheatSheet = screen.getByTestId("b1-day4-writing-cheat-sheet");
     expect(day4CheatSheet).toBeVisible();
     expect(within(day4CheatSheet).getByText("Day 4 · Wohnung suchen")).toBeVisible();
@@ -65,6 +67,7 @@ describe("B1WritingWorkspace", () => {
       />,
     );
 
+    fireEvent.click(screen.getByText("B1 Writing Cheat Sheet"));
     const day5CheatSheet = screen.getByTestId("b1-day5-writing-cheat-sheet");
     expect(day5CheatSheet).toBeVisible();
     expect(within(day5CheatSheet).getByText("Day 5 · Der Besichtigungstermin")).toBeVisible();
@@ -85,6 +88,7 @@ describe("B1WritingWorkspace", () => {
     render(<B1WritingWorkspace writingContext={{ level: "B1", day: 3 }} />);
 
     const germanDraft = screen.getByLabelText("B1 German writing draft");
+    fireEvent.click(screen.getByText("B1 Writing Cheat Sheet"));
     fireEvent.click(screen.getByRole("button", { name: "Insert Formal Letter Template" }));
 
     expect(germanDraft.value).toContain("Anrede:");
@@ -98,6 +102,7 @@ describe("B1WritingWorkspace", () => {
 
     const germanDraft = screen.getByLabelText("B1 German writing draft");
     fireEvent.change(germanDraft, { target: { value: "Mein eigener Anfang." } });
+    fireEvent.click(screen.getByText("B1 Writing Cheat Sheet"));
     fireEvent.click(screen.getByRole("button", { name: "Insert Informal Letter Template" }));
 
     expect(germanDraft.value).toMatch(/^Mein eigener Anfang\.\n\nAnrede:/);
@@ -127,6 +132,7 @@ describe("B1WritingWorkspace", () => {
       />,
     );
 
+    fireEvent.click(screen.getByText("Planning notes (optional)"));
     const planning = screen.getByLabelText("B1 planning points");
     const germanDraft = screen.getByLabelText("B1 German writing draft");
     const analyser = screen.getByTestId("analyse-text");

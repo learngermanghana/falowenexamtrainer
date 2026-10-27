@@ -1907,20 +1907,19 @@
   "B1 10.27 Umweltfreundlich im Alltag": {
     "answers": {
       "teil3": {
-        "Answer1": "C) Papier, Glas und Plastik",
-        "Answer2": "A) Durch den Einsatz energieeffizienter Geräte",
-        "Answer3": "B) Solar- und Windkraft",
-        "Answer4": "A) Fahrräder und öffentliche Verkehrsmittel",
-        "Answer5": "B) Weil die Fleischproduktion ressourcenintensiv ist",
-        "Answer6": "C) Umweltfreundlich einkaufen",
-        "Answer7": "B) Bei jedem Einzelnen"
+        "Answer1": "A) Richtig",
+        "Answer2": "B) Falsch",
+        "Answer3": "B) Falsch",
+        "Answer4": "A) Richtig",
+        "Answer5": "B) Falsch",
+        "Answer6": "A) Richtig"
       },
       "teil4": {
-        "Answer1": "B) Stoffbeutel",
-        "Answer2": "B) Indem man Produkte ohne Plastikverpackung kauft",
-        "Answer3": "C) Indem man das Licht ausschaltet, wenn man einen Raum verlasst",
-        "Answer4": "B) Die Heizung niedriger stellen und warme Kleidung tragen",
-        "Answer5": "B) Bei jedem Einzelnen"
+        "Answer1": "A) Plastik",
+        "Answer2": "B) Im Bioladen",
+        "Answer3": "C) Stofftaschen",
+        "Answer4": "A) Für Brötchen",
+        "Answer5": "B) Essig und Natron"
       }
     },
     "answer_url": "https://docs.google.com/spreadsheets/d/14lfVVKeZkgYlfg3QOArxlRoNddpAFM0SfKwzfit9ZNU/gviz/tq?tqx=out:html&sheet=Key",

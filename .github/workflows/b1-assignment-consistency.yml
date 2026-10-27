@@ -5,6 +5,7 @@ on:
     paths:
       - "functions/data/answerKeyManifest.json"
       - "tests/b1-day25-day26-marking-parity.test.mjs"
+      - "tests/b1-day27-content-parity.test.mjs"
       - "web/src/data/b1ReadingTasks.js"
       - "web/src/data/b1ListeningTasks.js"
       - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
@@ -21,6 +22,7 @@ on:
     paths:
       - "functions/data/answerKeyManifest.json"
       - "tests/b1-day25-day26-marking-parity.test.mjs"
+      - "tests/b1-day27-content-parity.test.mjs"
       - "web/src/data/b1ReadingTasks.js"
       - "web/src/data/b1ListeningTasks.js"
       - "tests/b1-day6-stadt-land-r2-listening.test.mjs"
@@ -45,5 +47,7 @@ jobs:
         run: node scripts/auditB1AssignmentConsistency.mjs
       - name: Prevent Day 25/26 learner answer leaks and stale Firebase marking keys
         run: node --test tests/b1-day25-day26-marking-parity.test.mjs
+      - name: Verify Day 27 Lesen, Schreiben and R2 Hören match grading keys
+        run: node --test tests/b1-day27-content-parity.test.mjs
       - name: Check B1 Day 6 R2 audio and questions
         run: node --test tests/b1-day6-stadt-land-r2-listening.test.mjs

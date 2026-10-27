@@ -209,9 +209,10 @@ const B1_CLEANED_TASK_POINTS = {
     "Bitten Sie um ein verbindliches Angebot.",
   ],
   27: [
-    "Erklären Sie, warum umweltfreundliches Leben wichtig ist, und nennen Sie Beispiele aus dem Alltag.",
-    "Beschreiben Sie eine Schwierigkeit, die umweltfreundliches Verhalten erschweren kann.",
-    "Begründen Sie Ihre eigene Meinung und formulieren Sie einen klaren Schluss.",
+    "Äußern Sie Ihre Meinung zum umweltfreundlichen Leben im Alltag.",
+    "Nennen Sie Gründe, warum Umweltschutz im Alltag wichtig ist.",
+    "Nennen Sie weitere Möglichkeiten, wie man im Alltag die Umwelt schonen kann.",
+    "Nennen Sie Vor- oder Nachteile von umweltfreundlichem Verhalten.",
   ],
   28: [
     "Nennen Sie konkrete Möglichkeiten, im Verkehr, beim Einkaufen oder zu Hause klimafreundlicher zu leben.",
@@ -342,10 +343,14 @@ const B1WritingSupport = ({ onInsertTemplate, day }) => {
   );
 
   return (
-    <div data-b1-writing-cheat-sheet="always-visible" style={{ display: "grid", gap: 12 }}>
+    <details data-b1-writing-cheat-sheet="always-visible" style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#f8fafc", padding: 10 }}>
+      <summary style={{ cursor: "pointer", color: "#1e3a8a", fontWeight: 700 }}>
+        <strong>B1 Writing Cheat Sheet</strong> · phrases and templates (optional)
+      </summary>
+      <div style={{ display: "grid", gap: 12, marginTop: 10 }}>
       <div style={{ border: "1px solid #bfdbfe", borderRadius: 14, padding: 12, background: "#eff6ff", display: "grid", gap: 10 }}>
         <div>
-          <strong style={{ color: "#1e3a8a" }}>B1 Writing Cheat Sheet</strong>
+          <strong style={{ color: "#1e3a8a" }}>Connectors and templates</strong>
           <p style={{ margin: "4px 0 0", color: "#475569", lineHeight: 1.6 }}>
             Use the phrases below while writing. The template buttons insert a complete structure directly into the German text box.
           </p>
@@ -381,7 +386,8 @@ const B1WritingSupport = ({ onInsertTemplate, day }) => {
           </button>
         ))}
       </div>
-    </div>
+      </div>
+    </details>
   );
 };
 
@@ -416,7 +422,9 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
 
   return (
     <div data-a2-b1-writing-workspace="standard" style={{ display: "grid", gap: 14 }}>
-      <section style={cardStyle} aria-label={`${level} writing planning points`}>
+      <details aria-label={`${level} writing planning points`} style={{ ...cardStyle, padding: 10, background: "#f8fafc" }}>
+        <summary style={{ fontWeight: 700, cursor: "pointer", color: "#1e3a8a" }}>Planning notes (optional)</summary>
+        <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
         <div>
           <h3 style={{ margin: 0 }}>Stichpunkte / ideas</h3>
           <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
@@ -442,7 +450,8 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           placeholder={planningPlaceholder}
           style={{ ...textareaStyle, minHeight: 140 }}
         />
-      </section>
+      </div>
+      </details>
 
       <section style={cardStyle} aria-label={`${level} German writing`}>
         <div>
@@ -456,7 +465,6 @@ export default function B1WritingWorkspace({ writingContext = {} }) {
           level={level}
           taskTitle={[writingContext.taskTitle, writingContext.instructions, writingContext.question].filter(Boolean).join(" ")}
           text={germanDraft}
-          defaultOpen
         />
 
         {level === "B1" ? (
