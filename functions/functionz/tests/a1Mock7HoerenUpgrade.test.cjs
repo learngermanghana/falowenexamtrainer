@@ -18,7 +18,7 @@ test("Mock 07 refers to the exact three approved Cloudflare R2 MP3 object keys",
     assert.equal(await isReleasedMockHoerenAudio({ db: null, level: "A1", mockId: "mock-07", part: `teil-${i}`, key }), true);
     assert.equal(validateA1MockAudioKey({ mockId: "mock-08", part: `teil-${i}`, key }), null);
   }
-  assert.equal(await isReleasedMockHoerenAudio({ db: null, level: "A1", mockId: "mock-08", part: "teil-1", key: "a1/mock-hoeren/mock-08/teil-1.mp3" }), false);
+  assert.equal(await isReleasedMockHoerenAudio({ db: null, level: "A1", mockId: "mock-09", part: "teil-1", key: "a1/mock-hoeren/mock-09/teil-1.mp3" }), false);
 });
 
 test("Mock 07 has precisely 6/4/5 answers, server-only", () => {
