@@ -92,9 +92,9 @@ const BASE_TIMED_ASSIGNMENT_CONFIG = Object.freeze({
   "A1-13": timed({
     level: "A1",
     durationMinutes: 35,
-    scope: "10 reading answers and one independent 35–50 word letter",
-    timedTabs: ["teil-1", "teil-2", "teil-3"],
-    preparationLabel: "Controlled mock: prepare first. Start the timer only when you have enough uninterrupted time, then complete the reading and letter independently. Mark My Letter is unavailable while the timer is running.",
+    scope: "10 reading answers, one independent 35–50 word letter, and 6 listening answers",
+    timedTabs: ["teil-1", "teil-2", "teil-3", "teil-4"],
+    preparationLabel: "Controlled mock: prepare first. Start the timer only when you have enough uninterrupted time, then complete the reading, letter and listening independently. Mark My Letter is unavailable while the timer is running.",
     mode: "mock",
   }),
   "A1-14.1": timed({
