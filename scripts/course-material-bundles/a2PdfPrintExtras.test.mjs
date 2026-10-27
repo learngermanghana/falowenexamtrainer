@@ -102,3 +102,13 @@ test("A2 page compacting preserves QR callouts and limits itself to print output
   assert.match(helpers, /removeAttribute\("data-a2-pdf-hide"\)/);
   assert.doesNotMatch(helpers, /localStorage\.setItem|setDoc\(/);
 });
+
+test("A2 print hides the real App.js authenticated masthead, including h1 and account tools", () => {
+  const app = fs.readFileSync(path.join(dir, "../../web/src/App.js"), "utf8");
+  assert.match(app, /className="app-header"/);
+  assert.match(helpers, /header\.app-header/);
+  assert.match(helpers, /authenticated-site-masthead/);
+  assert.match(renderer, /app-shell > header\.app-header/);
+  assert.match(renderer, /level === "A2"/);
+  assert.match(helpers, /removeAttribute\("data-a2-pdf-hide"\)/);
+});
