@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
+import { buildPdfLessonTargetUrl } from "./pdfLessonRoute.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -49,6 +50,8 @@ const isPublicLanding = async (page) => {
 };
 
 const hasLessonContent = async (page, lesson) => {
+  // A Radio introduction is not the printable workbook, even when its copy mentions exercises.
+  if (await page.locator('[data-radio-first-workbook-gate="true"]').count()) return false;
   if (await isPublicLanding(page)) return false;
   const text = await getBodyText(page);
   const title = String(lesson?.title || "").trim();
@@ -197,7 +200,7 @@ const submitLogin = async (page) => {
 };
 
 const ensureAuthenticatedLesson = async (page, lesson) => {
-  const targetUrl = new URL(lesson.route, baseUrl).toString();
+  const targetUrl = buildPdfLessonTargetUrl(lesson.route, baseUrl, level);
   const initiallyLoaded = await openLessonWithAuthHydration(page, lesson, targetUrl);
   if (initiallyLoaded) return;
 
