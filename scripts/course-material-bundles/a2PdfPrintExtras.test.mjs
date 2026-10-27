@@ -52,3 +52,18 @@ test("A2 website-only controls have durable print-only markers that do not chang
   assert.ok(helpers.includes(String.raw`/^\d+\s+of\s+\d+\s+answered$/i`));
   assert.match(renderer, /\[data-pdf-exclude\]/);
 });
+
+test("print audit removes complete resource cards even before their new markers deploy", () => {
+  assert.match(helpers, /title\.closest\("section"\)/);
+  assert.match(helpers, /Supporting materials/);
+  assert.match(helpers, /workbook-start-guide-resources/);
+  assert.match(helpers, /workbook-resource-links/);
+  assert.match(helpers, /online-completion-checkbox/);
+  assert.match(helpers, /online-answer-progress/);
+  assert.match(helpers, /querySelector\("input,textarea,fieldset,select,h1,h2,h3"\)/);
+  const marker = renderer.indexOf("page.evaluate(prepareA2PrintDocument");
+  const scrub = renderer.indexOf("await suppressPdfChromeText(page);", marker);
+  assert.ok(marker > 0 && scrub > marker,
+    "detect resource cards before the heading-text scrub runs");
+  assert.match(renderer, /page\.evaluate\(restoreA2PrintDocument\)/);
+});
