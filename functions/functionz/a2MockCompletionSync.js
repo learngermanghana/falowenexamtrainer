@@ -363,7 +363,7 @@ const buildA2MockCompletionArtifacts = ({
     message: notificationBody,
     timestamp: timestamp.getTime(),
     sentAt: iso,
-    route: MOCK_ROUTE,
+    route: mockLink,
     source: mockSource,
     studentCode: identity.studentCode,
     studentCodeOriginal: identity.studentCode,
