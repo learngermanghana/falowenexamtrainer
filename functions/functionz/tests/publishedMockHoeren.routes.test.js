@@ -76,7 +76,7 @@ beforeEach(() => {
 });
 
 test.each([
-  ["A1", "mock-08", "teil-1", "a1/mock-hoeren/mock-08/teil-1.mp3"],
+  ["A1", "mock-09", "teil-1", "a1/mock-hoeren/mock-09/teil-1.mp3"],
   ["A2", "mock-02", "teil-1", "a2/mock-hoeren/mock-02/teil-1.mp3"],
   ["B1", "mock-02", "teil-1", "b1/mock-hoeren/mock-02/teil-1.mp3"],
   ["B2", "mock-99", "teil-1", "b2/mock-hoeren/mock-99/teil-1.mp3"],
@@ -115,6 +115,9 @@ test.each([
   ["A1", "mock-07", "teil-1", "a1/mock-hoeren/mock-07/teil-1.mp3"],
   ["A1", "mock-07", "teil-2", "a1/mock-hoeren/mock-07/teil-2.mp3"],
   ["A1", "mock-07", "teil-3", "a1/mock-hoeren/mock-07/teil-3.mp3"],
+  ["A1", "mock-08", "teil-1", "a1/mock-hoeren/mock-08/teil-1.mp3"],
+  ["A1", "mock-08", "teil-2", "a1/mock-hoeren/mock-08/teil-2.mp3"],
+  ["A1", "mock-08", "teil-3", "a1/mock-hoeren/mock-08/teil-3.mp3"],
   ["A2", "mock-01", "teil-4", "a2/mock-hoeren/mock-01/teil-4.mp3"],
   ["A2", "mock-02", "teil-1", "a2/mock-horen-2/teil-1.mp3"],
   ["B1", "mock-01", "teil-1", "b1/mock-hoeren-1/teil-1.mp3"],
