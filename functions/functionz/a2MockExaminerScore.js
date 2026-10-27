@@ -5,7 +5,7 @@
 const expectedTaskId = (part, mockId) => `${mockId}-speaking-teil-${part}`;
 
 const scoreA2ExaminerSnapshots = async ({db, uid, attemptId, sessionIds, mockId = "a2-mock-01"}) => {
-  if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unsupported A2 mock.");
+  if (!["a2-mock-01", "a2-mock-02", "a2-mock-04", "a2-mock-05", "a2-mock-06", "a2-mock-07", "a2-mock-08"].includes(mockId)) throw new Error("Unsupported A2 mock.");
   if (!String(attemptId || "").trim()) {
     throw Object.assign(new Error("The A2 mock attempt ID is required."), {status:400,code:"A2_MOCK_ATTEMPT_ID_REQUIRED"});
   }
