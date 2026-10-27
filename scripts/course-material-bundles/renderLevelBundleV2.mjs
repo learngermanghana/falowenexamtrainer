@@ -5,6 +5,7 @@ import { chromium } from "playwright";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { buildPdfLessonTargetUrl } from "./pdfLessonRoute.mjs";
+import { buildA2ReadOnlyPrintHtml } from "./a2PrintableCompanions.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
@@ -310,6 +311,7 @@ const clickWorkbookTab = async (page, names) => {
     ];
     for (const tab of candidates) {
       if (!(await tab.count()) || !(await tab.isVisible().catch(() => false))) continue;
+      if (!(await tab.isEnabled().catch(() => false))) return false;
       await tab.click({ timeout: 10000 });
       await page.waitForTimeout(350);
       return true;
@@ -329,7 +331,35 @@ const mergeRenderedSections = async (items, outputFile) => {
   return outputFile;
 };
 
+// Render source-controlled practice in an inert page, without using the student
+// application, unlocking timed attempts, or persisting student information.
+const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
+  const content = await buildA2ReadOnlyPrintHtml({ day: lesson.day, part, lesson });
+  const file = path.join(renderDir, String(lesson.day).padStart(2, "0") + "-" + filename + ".pdf");
+  const printPage = await page.context().newPage();
+  try {
+    await printPage.setContent(content, { waitUntil: "load" });
+    await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+  } finally {
+    await printPage.close();
+  }
+  return { tab: filename, file, origin: "canonical-read-only" };
+};
+
+const getWorkbookTabAvailability = async (page, name) => {
+  const tab = page.getByRole("tab", { name: new RegExp("^\\s*" + name + "(?:\\s*[·:–—-].*)?\\s*$", "i") }).first();
+  if (!(await tab.count())) return "absent";
+  if (!(await tab.isVisible().catch(() => false))) return "hidden";
+  return (await tab.isEnabled().catch(() => false)) ? "available" : "locked";
+};
 const renderA2B1Lesson = async (page, lesson) => {
+  // A2 Day 22 is a graded interactive speaking mock, not a tabbed lesson.
+  // Print only offline preparation from canonical speaking prompts.
+  if (level === "A2" && Number(lesson.day) === 22) {
+    const grammar = await renderReadOnlyA2Section(page, lesson, "grammar", "grammar");
+    const workbook = await renderReadOnlyA2Section(page, lesson, "workbook", "workbook");
+    return [grammar, workbook];
+  }
   await ensureAuthenticatedLesson(page, lesson);
 
   const grammarClicked = await clickWorkbookTab(page, ["Grammar"]);
@@ -352,11 +382,22 @@ const renderA2B1Lesson = async (page, lesson) => {
   ];
   const workbookParts = [];
   for (const tabSpec of workbookTabSpecs) {
-    const clicked = await clickWorkbookTab(page, tabSpec.names);
-    if (!clicked) {
-      console.warn(`${level} Day ${lesson.day}: skipping unavailable workbook section ${tabSpec.names[0]}.`);
+    const availability = await getWorkbookTabAvailability(page, tabSpec.names[0]);
+    if (availability === "absent") {
+      console.log(`${level} Day ${lesson.day}: ${tabSpec.names[0]} not present in lesson tab profile.`);
       continue;
     }
+    if (availability === "hidden")
+      throw new Error(`${level} Day ${lesson.day}: ${tabSpec.names[0]} unexpectedly hidden.`);
+    if (availability === "locked") {
+      if (level !== "A2") throw new Error(`${level} Day ${lesson.day}: locked ${tabSpec.names[0]} has no print companion.`);
+      const printable = await renderReadOnlyA2Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`);
+      workbookParts.push(printable);
+      console.log(`A2 Day ${lesson.day}: printed locked ${tabSpec.names[0]} read-only from canonical data.`);
+      continue;
+    }
+    const clicked = await clickWorkbookTab(page, tabSpec.names);
+    if (!clicked) throw new Error(`${level} Day ${lesson.day}: ${tabSpec.names[0]} became unclickable.`);
     workbookParts.push(await saveCurrentPagePdf(page, lesson, `workbook-${tabSpec.key}`));
   }
 
@@ -371,7 +412,7 @@ const renderA2B1Lesson = async (page, lesson) => {
   await mergeRenderedSections(workbookParts, workbookFile);
   workbookParts.forEach(({ file }) => fs.rmSync(file, { force: true }));
 
-  return [grammar, { tab: "workbook", file: workbookFile }];
+  return [grammar, { tab: "workbook", file: workbookFile, origin: workbookParts.some(item => item.origin === "canonical-read-only") ? "mixed-live-and-read-only" : "live-workbook" }];
 };
 
 const renderLesson = async (page, lesson) => {
@@ -490,6 +531,7 @@ try {
         title: lesson.title,
         status: "rendered",
         sections: rendered.map((item) => item.tab),
+        origins: rendered.map((item) => item.origin || "live-workbook"),
         durationSeconds: Math.round((Date.now() - startedAt) / 1000),
       });
     } catch (error) {

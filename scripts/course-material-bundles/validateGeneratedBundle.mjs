@@ -93,6 +93,23 @@ if (level === "A1") {
   }
 }
 
+if (level === "A2") {
+  const diagPath = path.join(outputDir, "render-diagnostics.json");
+  if (!fs.existsSync(diagPath)) throw new Error("A2 PDF: lesson render diagnostics missing.");
+  const diag = JSON.parse(fs.readFileSync(diagPath, "utf8"));
+  if (!diag.completedAt) throw new Error("A2 PDF: render did not complete all lessons.");
+  const completedLessons = diag.lessons.filter((entry) => entry.status === "rendered");
+  if (completedLessons.length !== expectedByDay.size)
+    throw new Error(`A2 PDF: expected ${expectedByDay.size} rendered lessons, received ${completedLessons.length}.`);
+  for (const day of expectedByDay.keys()) {
+    const entries = completedLessons.filter((entry) => Number(entry.day) === day);
+    if (entries.length !== 1 || entries[0].sections?.join(",") !== "grammar,workbook")
+      throw new Error(`A2 PDF: Day ${day} missing complete Grammar/Workbook bundle.`);
+  }
+  const mockDay = completedLessons.find((entry) => Number(entry.day) === 22);
+  if (mockDay && !mockDay.origins?.every((source) => source === "canonical-read-only"))
+    throw new Error("A2 PDF: Day 22 must be a noninteractive source-only print companion.");
+}
 const missing = [];
 for (const [day, sections] of expectedByDay) {
   for (const section of sections) {
