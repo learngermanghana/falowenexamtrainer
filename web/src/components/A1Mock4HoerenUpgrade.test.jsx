@@ -21,7 +21,7 @@ test("library and UI include Hören for new Mocks 04/05/06 but preserve historic
  expect(getMockExam("a1-final-04").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
  expect(getMockExam("a1-final-05").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
  expect(getMockExam("a1-final-06").sections).toEqual(["Lesen","Hören","Schreiben","Sprechen"]);
- expect(page).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05", "a1-mock-06", "a1-mock-07"].includes(mockId)');
+ expect(page).toContain('const hasPublishedListening = ["a1-mock-04", "a1-mock-05", "a1-mock-06", "a1-mock-07", "a1-mock-08"].includes(mockId)');
  expect(page).toContain('mockAudioId={hasPublishedListening ? mockId.replace("a1-", "") : "mock-01"}');
  expect(page).toContain('assessmentVersion:response.assessmentVersion || "three-module-v1"');
  expect(page).toContain('moveToSection(hasHoren ? "hoeren" : "schreiben"');
@@ -35,7 +35,7 @@ test("library and UI include Hören for new Mocks 04/05/06 but preserve historic
  expect(canReviewFullMock({...current,sectionScores:{lesen:25,schreiben:25,sprechen:25}})).toBe(false);
 });
 test("the backend returns private listening keys only after verified Mock 04/05/06 completion",()=>{
- expect(server).toContain('["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
+ expect(server).toContain('["a1-mock-04","a1-mock-05","a1-mock-06","a1-mock-07","a1-mock-08"].includes(verifiedAttempt.mockId) && verifiedAttempt.assessmentVersion==="four-module-v2"');
  expect(server).toContain('listeningAnswerKey:getA1MockSet(verifiedAttempt.mockId)?.listeningAnswerKey');
 });
 

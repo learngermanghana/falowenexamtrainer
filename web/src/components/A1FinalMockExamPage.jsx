@@ -18,6 +18,7 @@ import { A1_MOCK_4_LISTENING } from "../data/a1Mock4Listening";
 import { A1_MOCK_5_LISTENING } from "../data/a1Mock5Listening";
 import { A1_MOCK_6_LISTENING } from "../data/a1Mock6Listening";
 import { A1_MOCK_7_LISTENING } from "../data/a1Mock7Listening";
+import { A1_MOCK_8_LISTENING } from "../data/a1Mock8Listening";
 import { A1_MOCK_3_ID, A1_MOCK_3_READING, A1_MOCK_3_LISTENING, A1_MOCK_3_WRITING, A1_MOCK_3_WRITING_TASK, A1_MOCK_3_SPEAKING } from "../data/a1FinalMock3Data";
 import { A1_MOCK_2_ID, A1_MOCK_2_READING, A1_MOCK_2_LISTENING, A1_MOCK_2_WRITING, A1_MOCK_2_WRITING_TASK, A1_MOCK_2_SPEAKING } from "../data/a1FinalMock2Data";
 import { A1PictureOptions } from "./ListeningPracticeSamplePage";
@@ -365,9 +366,9 @@ export default function A1FinalMockExamPage({ mockId = A1_FINAL_MOCK_ID }) {
   const kombiNumber = isKombi ? Number(mockId.slice(-2)) : 0;
   const kombiSet = isKombi ? A1_KOMBI_TASK_SETS[kombiNumber] : null;
   const isAdditionalMock = isMock2 || isMock3 || isKombi;
-  const title = isKombi ? `A1 Mock ${kombiNumber}${kombiNumber > 7 ? " · Kombiprüfung" : ""}` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
-  const hasPublishedListening = ["a1-mock-04", "a1-mock-05", "a1-mock-06", "a1-mock-07"].includes(mockId);
-  const listening = mockId==="a1-mock-07" ? A1_MOCK_7_LISTENING : mockId==="a1-mock-06" ? A1_MOCK_6_LISTENING : mockId==="a1-mock-05" ? A1_MOCK_5_LISTENING : mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
+  const title = isKombi ? `A1 Mock ${kombiNumber}${kombiNumber > 8 ? " · Kombiprüfung" : ""}` : isMock3 ? "A1 Mock 3" : isMock2 ? "A1 Mock 2" : "A1 Final Mock Exam";
+  const hasPublishedListening = ["a1-mock-04", "a1-mock-05", "a1-mock-06", "a1-mock-07", "a1-mock-08"].includes(mockId);
+  const listening = mockId==="a1-mock-08" ? A1_MOCK_8_LISTENING : mockId==="a1-mock-07" ? A1_MOCK_7_LISTENING : mockId==="a1-mock-06" ? A1_MOCK_6_LISTENING : mockId==="a1-mock-05" ? A1_MOCK_5_LISTENING : mockId==="a1-mock-04" ? A1_MOCK_4_LISTENING : isMock3 ? A1_MOCK_3_LISTENING : isMock2 ? A1_MOCK_2_LISTENING : A1_GOETHE_LISTENING_MOCK;
   const writing = isKombi ? kombiSet.writing : isMock3 ? A1_MOCK_3_WRITING : isMock2 ? A1_MOCK_2_WRITING : A1_GOETHE_WRITING_MOCK;
   const writingTask = isKombi ? {situation:writing.teil2.situation,points:writing.teil2.points} : isMock3 ? A1_MOCK_3_WRITING_TASK : isMock2 ? A1_MOCK_2_WRITING_TASK : A1_FINAL_MOCK_WRITING_TASK;
   const lesenScoredQuestions = useMemo(() => isKombi

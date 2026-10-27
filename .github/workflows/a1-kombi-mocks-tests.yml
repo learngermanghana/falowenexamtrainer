@@ -7,6 +7,10 @@ on:
       - "functions/functionz/a1MockSets.js"
       - "functions/functionz/a1Mock4ListeningKeys.js"
       - "functions/functionz/a1Mock7ListeningKeys.js"
+      - "functions/functionz/a1Mock8ListeningKeys.js"
+      - "functions/functionz/tests/a1Mock8HoerenUpgrade.test.cjs"
+      - "web/src/data/a1Mock8Listening.js"
+      - "web/src/data/a1Mock8Listening.test.js"
       - "functions/functionz/tests/a1Mock7HoerenUpgrade.test.cjs"
       - "web/src/data/a1Mock7Listening.js"
       - "web/src/data/a1Mock7Listening.test.js"
@@ -61,9 +65,10 @@ jobs:
           node --check functions/functionz/a1MockCompletionSync.js
           node --check functions/functionz/a1Mock4ListeningKeys.js
           node --check functions/functionz/a1Mock7ListeningKeys.js
+          node --check functions/functionz/a1Mock8ListeningKeys.js
           node --check functions/functionz/assessmentTaskContext.js
       - name: Test all five A1 mock answer keys, verified receipts and Firestore result writes
-        run: node --test functions/functionz/tests/a1KombiMocks04to08.test.cjs functions/functionz/tests/a1Mock4HoerenUpgrade.test.cjs functions/functionz/tests/a1Mock7HoerenUpgrade.test.cjs
+        run: node --test functions/functionz/tests/a1KombiMocks04to08.test.cjs functions/functionz/tests/a1Mock4HoerenUpgrade.test.cjs functions/functionz/tests/a1Mock7HoerenUpgrade.test.cjs functions/functionz/tests/a1Mock8HoerenUpgrade.test.cjs
 
   learner-a1-kombi-flow:
     runs-on: ubuntu-latest
@@ -87,6 +92,7 @@ jobs:
             src/data/a1KombiMocks04to08.test.js \
             src/data/a1KombiMockCatalog.test.js \
             src/data/a1Mock7Listening.test.js \
+            src/data/a1Mock8Listening.test.js \
             src/components/A1KombiMockIntegration.test.jsx \
             src/components/A1KombiFlowContract.test.jsx \
             src/components/A1KombiMockDesignParity.test.jsx \

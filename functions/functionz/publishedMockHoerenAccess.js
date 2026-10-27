@@ -2,7 +2,7 @@
 
 const { isCanonicalMockHoerenObjectKey } = require("./mockHoerenObjectKeys");
 
-// Exact, teacher-supplied A1 Mock 04/05/06/07 recordings share the same code-owned
+// Exact, teacher-supplied A1 Mock 04/05/06/07/08 recordings share the same code-owned
 // protected-audio release path as the existing Mock 01 keys. No directory
 // wildcard is allowed. Other mocks still require an approved server manifest.
 const EXISTING_RELEASED_CANONICAL_KEYS = new Set([
@@ -21,6 +21,9 @@ const EXISTING_RELEASED_CANONICAL_KEYS = new Set([
   "a1/mock-hoeren/mock-07/teil-1.mp3",
   "a1/mock-hoeren/mock-07/teil-2.mp3",
   "a1/mock-hoeren/mock-07/teil-3.mp3",
+  "a1/mock-hoeren/mock-08/teil-1.mp3",
+  "a1/mock-hoeren/mock-08/teil-2.mp3",
+  "a1/mock-hoeren/mock-08/teil-3.mp3",
   "a2/mock-hoeren/mock-01/teil-1.mp3",
   "a2/mock-hoeren/mock-01/teil-2.mp3",
   "a2/mock-hoeren/mock-01/teil-3.mp3",
@@ -52,7 +55,7 @@ async function isReleasedMockHoerenAudio({ db, level, mockId, part, key } = {}) 
   if (!isCanonicalMockHoerenObjectKey(normalized)) return true;
 
   if (EXISTING_RELEASED_CANONICAL_KEYS.has(normalized.key) &&
-      ((normalized.level === "A1" && ["mock-01", "mock-04", "mock-05", "mock-06", "mock-07"].includes(normalized.mockId)) ||
+      ((normalized.level === "A1" && ["mock-01", "mock-04", "mock-05", "mock-06", "mock-07", "mock-08"].includes(normalized.mockId)) ||
        (normalized.level === "A2" && normalized.mockId === "mock-01"))) return true;
 
   if (!db || typeof db.collection !== "function") return false;

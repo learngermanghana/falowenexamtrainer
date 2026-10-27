@@ -45,7 +45,7 @@ describe("A1 Kombiprüfung Mocks 4–8 server contracts",()=>{
   });
   test("three-module completion rejects changed assessment version",()=>{
     const mockId="a1-mock-08";
-    expect(()=>buildVerifiedA1MockScore({mockId,state:{mockId,assessmentVersion:"four-module-v2"},
+    expect(()=>buildVerifiedA1MockScore({mockId,state:{mockId,assessmentVersion:"four-module-v3"},
       verifiedSections:{}})).toThrow(/Unsupported/);
   });
 });
