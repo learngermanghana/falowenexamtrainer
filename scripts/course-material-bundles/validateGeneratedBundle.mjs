@@ -104,9 +104,13 @@ if (leaked.length) {
 if (level === "A2") {
   // Sparse-page figures are diagnostics, not deletion rules: never silently
   // discard a printed question, diagram or chapter-divider page.
-  const pdfPages = text.split("\\f").filter(page => page.trim());
+  const pdfPages = text.split("\f").filter(page => page.trim());
   const shortPages = pdfPages
-    .map((page, index) => ({ index: index + 1, words: page.replace(/Falowen Learning Hub\\s+\\d+\\s*\\/\\s*\\d+/gi, "").trim().split(/\\s+/).filter(Boolean).length }))
+    .map((page, index) => ({
+      index: index + 1,
+      words: page.replace(/Falowen Learning Hub\s+\d+\s*\/\s*\d+/gi, "")
+        .trim().split(/\s+/).filter(Boolean).length,
+    }))
     .filter(item => item.words > 0 && item.words <= 20);
   console.log("A2 print page density: " + shortPages.length + " low-text pages (manual review): " +
     shortPages.slice(0, 35).map(page => page.index).join(", "));
