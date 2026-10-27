@@ -28,7 +28,7 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
   // legacy A2 lesson-resource cards lack markers, so identify their *small*
   // self-contained card using two resource labels without touching exercises.
   root.querySelectorAll(
-    '[data-self-learning-supporting-materials], [data-teacher-lecture-support],' +
+    '[data-pdf-exclude], [data-self-learning-supporting-materials], [data-teacher-lecture-support],' +
     '[data-timed-assignment], section[aria-label="Assessment rules"],' +
     '[data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture]'
   ).forEach(node => hide(node, "resource-or-assessment-ui"));
@@ -72,6 +72,8 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
     /^Select Grammar, Teil 1/i,
     /^Click an answer option/i,
     /^Choose one answer for each question/i,
+    /^\d+\s+of\s+\d+\s+answered$/i,
+    /^Click an answer option\.?/i,
     /^Loading(?:…|\.{3})?$/i,
   ];
   for (const el of root.querySelectorAll("button,small,span,p,strong,div,label")) {
