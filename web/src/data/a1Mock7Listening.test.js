@@ -23,16 +23,16 @@ test("A1 Mock 07 Hören has the uploaded 6/4/5 questions without solutions", () 
   expect(A1_MOCK_7_LISTENING.teil3.questions[4].question).toBe("Warum ruft Anna von der Personalabteilung an?");
 });
 
-test("A1 Mock 07 is a four-module /100 exam, with no change to Mock 08", () => {
+test("A1 Mock 07 remains a four-module /100 exam alongside upgraded Mock 08", () => {
   expect(getMockExam("a1-final-07")).toMatchObject({
     level: "A1", mode: "full", status: "preview",
     questionSetId: "a1-mock-07",
     sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   });
   expect(getMockExam("a1-final-08")).toMatchObject({
-    mode: "kombi", sections: ["Lesen", "Schreiben", "Sprechen"],
+    mode: "full", sections: ["Lesen", "Hören", "Schreiben", "Sprechen"],
   });
   const page = fs.readFileSync(path.resolve(__dirname, "../components/A1FinalMockExamPage.jsx"), "utf8");
   expect(page).toContain("A1_MOCK_7_LISTENING");
-  expect(page).toContain('"a1-mock-07"].includes(mockId)');
+  expect(page).toContain('"a1-mock-07", "a1-mock-08"].includes(mockId)');
 });
