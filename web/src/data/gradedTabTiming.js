@@ -4,10 +4,10 @@
 export const MINUTES_PER_GRADED_TAB = 10;
 const SUPPORTED_LEVELS = new Set(["A2", "B1", "B2"]);
 const GRADED_TABS = new Set(["schreiben", "lesen", "hoeren"]);
-export const TIMED_LESSON_EXCEPTIONS = Object.freeze({
-  // Deliberately short Day 22 lesson (two compact reading exercises).
-  "B1-7.22": 15,
-});
+// Reserve this registry for genuine approved exceptions. All regular B1
+// tutor-marked workbooks—including Days 22, 27 and 28—use 10 minutes per
+// submitted tab; only a separate full mock may use an examination limit.
+export const TIMED_LESSON_EXCEPTIONS = Object.freeze({});
 
 export const getGradedTabDurationMinutes = ({
   level = "",
