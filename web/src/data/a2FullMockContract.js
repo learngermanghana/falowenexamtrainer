@@ -9,6 +9,8 @@ export const A2_FULL_MOCK_REQUIREMENTS = Object.freeze([
 ]);
 
 export const A2_MOCK_CAPABILITIES = Object.freeze({
+  // Three-module Kombiprüfung entries have their own /75 contract; they are not
+  // misrepresented as full four-module /100 A2 exams.
   "a2-final-01": Object.freeze({
     serverAttempt: true,
     serverObjectiveScoring: true,
