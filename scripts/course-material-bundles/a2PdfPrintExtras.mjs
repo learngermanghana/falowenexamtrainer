@@ -69,12 +69,18 @@ export const prepareA2PrintDocument = ({ section, lessonUrl, qrDataUrl }) => {
     }
   }
 
-  // Small answer-count badges can contain multiple nested spans. Match their
-  // *whole* text and require a small, input-free node, preserving all MCQs.
-  for (const el of document.querySelectorAll("small,span,p,div")) {
+  // Answer-count status may have sibling spans ("0" + "of 5" +
+  // "answered"), appear inside a button, or include other status copy.
+  // Find the smallest input-free container, never a question / choice.
+  const answerCounter = /\b\d+\s+of\s+\d+\s+answered\b/i;
+  for (const el of document.querySelectorAll("small,span,p,strong,label,button,aside,div")) {
     const text = normalize(el.textContent);
-    if (text.length > 75 || !/^\d+\s+of\s+\d+\s+answered$/i.test(text)) continue;
-    if (el.querySelector("input,textarea,fieldset,select,h1,h2,h3")) continue;
+    if (text.length > 180 || !answerCounter.test(text)) continue;
+    if (el.querySelector("input[type=radio],textarea,fieldset,select,h1,h2,h3")) continue;
+    const smallerMatch = [...el.children].some(child =>
+      answerCounter.test(normalize(child.textContent)) &&
+      !child.querySelector("input[type=radio],textarea,fieldset,select,h1,h2,h3"));
+    if (smallerMatch) continue;
     hide(el, "online-answer-progress");
   }
 
