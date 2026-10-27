@@ -243,12 +243,12 @@ const injectPrintMode = async (page) => {
 // text node immediately afterwards so the live student page is unchanged.
 const suppressPdfChromeText = async (page) => page.evaluate(() => {
   const replacements = [
-    [/Falowen\\s+Radio/gi, "pre-lesson audio"],
-    [/Back\\s+to\\s+Course\\s+Book/gi, ""],
-    [/Teacher\\s+Video/gi, ""],
-    [/Study\\s+Buddy/gi, ""],
-    [/Submit\\s+workbook\\s+answers/gi, ""],
-    [/Reference\\s+Answers/gi, ""],
+    [/Falowen\s+Radio/gi, "pre-lesson audio"],
+    [/Back\s+to\s+Course\s+Book/gi, ""],
+    [/Teacher\s+Video/gi, ""],
+    [/Study\s+Buddy/gi, ""],
+    [/Submit\s+workbook\s+answers/gi, ""],
+    [/Reference\s+Answers/gi, ""],
   ];
   const changes = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
