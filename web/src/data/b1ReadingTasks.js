@@ -584,101 +584,31 @@ export const B1_READING_TASKS = Object.freeze({
         "questions": [
           {
             "stem": "Welche Anzeige passt zu Lukas?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Hannah?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Herr und Frau Berger?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Elena?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Klaus?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Katrin?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           },
           {
             "stem": "Welche Anzeige passt zu Martin?",
-            "options": [
-              "A) Alpen-Trekking pur!",
-              "B) Schwimmschule Delphin",
-              "C) Wohnen auf Zeit in Frankfurt",
-              "D) Gratis-Kleinanzeigen-Portal",
-              "E) Hausgeräte-Notdienst 24/7",
-              "F) Spanisch am Abend",
-              "G) Hundepension Waldfrieden",
-              "H) Hunde-Tagesbetreuung „Bello & Co.“",
-              "X) Keine passende Anzeige"
-            ]
+            options: ["A) Alpen-Trekking pur!","B) Schwimmschule Delphin","C) Wohnen auf Zeit in Frankfurt","D) Gratis-Kleinanzeigen-Portal","E) Hausgeräte-Notdienst 24/7","F) Spanisch am Abend","G) Hundepension Waldfrieden","H) Hunde-Tagesbetreuung „Bello & Co.“","X) Keine passende Anzeige"]
           }
         ]
       }
