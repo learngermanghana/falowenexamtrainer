@@ -76,4 +76,8 @@ Timings use the actual MP3 playback clock; pause, seek, repeat and speed changes
 
 The read-only `/api/music-lyrics` endpoint is confined to music MP3 sibling files. It rejects private course audio paths, mismatched recordings, incomplete/unordered line timings, and oversized files. A missing timing file leaves existing plain lyrics/audio available. No new Firestore storage, background jobs or bucket permission changes are required. Admin's complete local timing edits take priority until removed/updated on that device.
 
-The five recordings listed in `docs/music-recording-timings.md` already have built-in recording-specific timings. They need no manual marking or R2 timing-file upload. Built-in timings take precedence for those exact MP3 keys. New recordings can still use the manual sidecar workflow.
+The seven recordings listed in `docs/music-recording-timings.md` already have built-in recording-specific timings. They need no manual marking or R2 timing-file upload. Built-in timings take precedence for those exact MP3 keys. New recordings can still use the manual sidecar workflow.
+
+## Shuffle playback
+
+The player offers a saved **Shuffle** setting. It shuffles the selected song list without duplicates, keeps the current song playing, and reshuffles when that list is exhausted. Enabling Shuffle clears Repeat song so the player can advance; previous/next controls remain available. Turning Shuffle off restores the selected list’s normal order.
