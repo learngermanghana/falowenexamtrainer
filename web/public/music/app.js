@@ -143,6 +143,7 @@ function card(track) {
   listen.addEventListener("click", () => showSong(track, true, true));
   const explore = el("a", "track-link", track.category === "lesson" ? "Lyrics & questions ↗" : "Open song ↗");
   explore.href = songUrl(track).pathname;
+  if (!learning[track.id] || learning[track.id].assignmentKey !== track.assignmentKey) explore.textContent = "Open song ↗";
   explore.addEventListener("click", event => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
