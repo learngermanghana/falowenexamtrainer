@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
 import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
+import A2Mock04Hoeren from "./A2Mock04Hoeren";
 import { getA2KombiSet } from "../data/a2KombiMockSets";
 import { startA2MockAttempt, saveA2MockAttempt } from "../services/a2FinalMockService";
 import { a2KombiKeys, a2KombiProgress, getA2KombiState, finalizeA2Kombi } from "../services/a2KombiMockFinalization";
@@ -9,10 +10,12 @@ import "./A2Mock2Lesen.css";
 import "./A2Mock2ExamHub.css";
 import "./A2GoetheWritingMockPreview.css";
 
-const ORDER=["lesen","schreiben","sprechen"];
-const LABELS={lesen:"Lesen",schreiben:"Schreiben",sprechen:"Sprechen"};
+const LEGACY_ORDER=["lesen","schreiben","sprechen"];
+const FULL_ORDER=["lesen","hoeren","schreiben","sprechen"];
+const orderFor=flow=>flow?.attemptInfo?.assessmentVersion==="four-module-v2"?FULL_ORDER:LEGACY_ORDER;
+const LABELS={lesen:"Lesen",hoeren:"Hören",schreiben:"Schreiben",sprechen:"Sprechen"};
 const read=key=>{try{return JSON.parse(localStorage.getItem(key)||"{}")||{};}catch{return {};}};
-const duration={lesen:30*60000,schreiben:30*60000};
+const duration={lesen:30*60000,hoeren:30*60000,schreiben:30*60000};
 const asTime=ms=>{const sec=Math.ceil(Math.max(0,ms)/1000);return `${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;};
 const wordCount=value=>String(value||"").trim().split(/\s+/).filter(Boolean).length;
 
@@ -58,11 +61,12 @@ function A2KombiAttempt({mockNumber,paper}) {
   const {idToken,user}=useAuth();
   const keys=useMemo(()=>a2KombiKeys(paper.id,user?.uid),[paper.id,user?.uid]);
   const initial=()=>{const flow=read(keys.flow);if(flow.stage)return flow;
-    const progress=a2KombiProgress(keys);const stage=ORDER.find(k=>!progress[k].done);
-    return {stage:ORDER.some(k=>progress[k].done||progress[k].count) ? (stage||"result") : "intro"};};
+    const progress=a2KombiProgress(keys);const order=orderFor(flow);const stage=order.find(k=>!progress[k].done);
+    return {stage:order.some(k=>progress[k].done||progress[k].count) ? (stage||"result") : "intro"};};
   const [flow,setFlow]=useState(initial);
   const [progress,setProgress]=useState(()=>a2KombiProgress(keys));
   const [lesen,setLesen]=useState(()=>read(keys.lesen));
+  const [hoeren,setHoeren]=useState(()=>keys.hoeren?read(keys.hoeren):{});
   const [writing,setWriting]=useState(()=>read(keys.schreiben));
   const [part,setPart]=useState(0);
   const [now,setNow]=useState(Date.now());
@@ -75,22 +79,25 @@ function A2KombiAttempt({mockNumber,paper}) {
   const started=Boolean(flow.stage&&flow.stage!=="intro");
   const attemptId=flow.attemptInfo?.attemptId;
   const stage=flow.stage||"intro";
-  const currentTimeState=stage==="lesen"?lesen:stage==="schreiben"?writing:null;
+  const order=orderFor(flow);
+  const currentTimeState=stage==="lesen"?lesen:stage==="hoeren"?hoeren:stage==="schreiben"?writing:null;
   const msRemaining=currentTimeState?.startedAt?currentTimeState.startedAt+duration[stage]-now:duration[stage]||0;
 
   useEffect(()=>{localStorage.setItem(keys.flow,JSON.stringify(flow));},[keys.flow,flow]);
   useEffect(()=>{localStorage.setItem(keys.lesen,JSON.stringify(lesen));},[keys.lesen,lesen]);
+  useEffect(()=>{if(keys.hoeren)localStorage.setItem(keys.hoeren,JSON.stringify(hoeren));},[keys.hoeren,hoeren]);
   useEffect(()=>{localStorage.setItem(keys.schreiben,JSON.stringify(writing));},[keys.schreiben,writing]);
-  useEffect(()=>{if(!["lesen","schreiben"].includes(stage))return undefined;
+  useEffect(()=>{if(!["lesen","hoeren","schreiben"].includes(stage))return undefined;
     const interval=window.setInterval(()=>setNow(Date.now()),1000);
     return ()=>window.clearInterval(interval);
   },[stage]);
   const advance=useCallback((section)=>{
     setProgress(a2KombiProgress(keys));
     setFlow(current=>{
-      const currentIndex=ORDER.indexOf(current.stage);
+      const activeOrder=orderFor(current);
+      const currentIndex=activeOrder.indexOf(current.stage);
       if(current.stage!==section||currentIndex<0)return current;
-      return {...current,stage:currentIndex===ORDER.length-1?"result":ORDER[currentIndex+1]};
+      return {...current,stage:currentIndex===activeOrder.length-1?"result":activeOrder[currentIndex+1]};
     });
     window.scrollTo?.({top:0,behavior:"smooth"});
   },[keys]);
@@ -100,11 +107,16 @@ function A2KombiAttempt({mockNumber,paper}) {
       const submitted={...lesen,completedAt:Date.now()};
       localStorage.setItem(keys.lesen,JSON.stringify(submitted));setLesen(submitted);advance("lesen");
     }
+    if(stage==="hoeren"&&hoeren.startedAt&&!hoeren.completedAt&&msRemaining<=0){
+      const submitted={...hoeren,completedAt:Date.now()};
+      if(keys.hoeren)localStorage.setItem(keys.hoeren,JSON.stringify(submitted));
+      setHoeren(submitted);advance("hoeren");
+    }
     if(stage==="schreiben"&&writing.startedAt&& !writing.submittedAt&&msRemaining<=0){
       const submitted={...writing,submittedAt:Date.now()};
       localStorage.setItem(keys.schreiben,JSON.stringify(submitted));setWriting(submitted);advance("schreiben");
     }
-  },[stage,lesen,writing,msRemaining,keys,advance]);
+  },[stage,lesen,hoeren,writing,msRemaining,keys,advance]);
 
   const begin=async()=>{
     if(!idToken||connecting)return;
@@ -112,7 +124,7 @@ function A2KombiAttempt({mockNumber,paper}) {
     try{
       const reply=await startA2MockAttempt({mockId:paper.id,idToken});
       if(!reply?.attemptId)throw new Error("A saved exam attempt was not returned.");
-      const next={stage:"lesen",attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt},startedAt:Date.now()};
+      const next={stage:"lesen",attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,assessmentVersion:reply.assessmentVersion||"three-module-v1"},startedAt:Date.now()};
       setFlow(next);
       setLesen(old=>({...old,startedAt:old.startedAt||Date.now(),answers:old.answers||{}}));
     }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not connect to exam.");}
@@ -125,7 +137,7 @@ function A2KombiAttempt({mockNumber,paper}) {
     try{
       const reply=await startA2MockAttempt({mockId:paper.id,idToken});
       if(!reply?.attemptId)throw new Error("Could not register this attempt.");
-      setFlow(current=>({...current,attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt}}));
+      setFlow(current=>({...current,attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,assessmentVersion:reply.assessmentVersion||"three-module-v1"}}));
     }catch(error){setConnectionError(error?.response?.data?.error||error.message);}
     finally{setConnecting(false);}
   };
@@ -142,24 +154,34 @@ function A2KombiAttempt({mockNumber,paper}) {
   const submitReading=()=>{
     if(!window.confirm("Lesen abgeben? Nicht beantwortete Fragen werden als falsch gewertet."))return;
     const next={...lesen,completedAt:Date.now()};localStorage.setItem(keys.lesen,JSON.stringify(next));setLesen(next);
-    checkpoint("lesen");advance("lesen");setWriting(old=>({...old,startedAt:old.startedAt||Date.now()}));
+    checkpoint("lesen");advance("lesen");
+    if(order===LEGACY_ORDER)setWriting(old=>({...old,startedAt:old.startedAt||Date.now()}));
+    else setHoeren(old=>({...old,startedAt:old.startedAt||Date.now(),answers:old.answers||{}}));
+  };
+  const submitHoeren=()=>{
+    if(!window.confirm("Hören abgeben? Nicht beantwortete Fragen werden als falsch gewertet."))return;
+    const next={...hoeren,completedAt:Date.now()};
+    if(keys.hoeren)localStorage.setItem(keys.hoeren,JSON.stringify(next));
+    setHoeren(next);checkpoint("hoeren");advance("hoeren");
+    setWriting(old=>({...old,startedAt:old.startedAt||Date.now()}));
   };
   const submitWriting=()=>{
     if(!window.confirm("Schreiben abgeben? Die beiden Texte können danach nicht mehr verändert werden."))return;
     const next={...writing,submittedAt:Date.now()};localStorage.setItem(keys.schreiben,JSON.stringify(next));setWriting(next);
     checkpoint("schreiben");advance("schreiben");
   };
+  useEffect(()=>{if(stage==="hoeren"&&!hoeren.startedAt)setHoeren(old=>({...old,startedAt:Date.now()}));},[stage,hoeren.startedAt]);
   useEffect(()=>{if(stage==="schreiben"&&!writing.startedAt)setWriting(old=>({...old,startedAt:Date.now()}));},[stage,writing.startedAt]);
   useEffect(()=>{
     if(stage!=="result"||flow.verifiedResult||!attemptId||!idToken||finalizing.current)return;
     const complete=a2KombiProgress(keys);
-    if(!ORDER.every(name=>complete[name].done))return;
+    if(!order.every(name=>complete[name].done))return;
     finalizing.current=true;setGrading(true);setGradingError("");
     finalizeA2Kombi({keys,mockId:paper.id,attemptId,idToken}).then(result=>{
       setFlow(current=>({...current,verifiedResult:result,stage:"result",verifiedAt:Date.now()}));
     }).catch(error=>{setGradingError(error?.response?.data?.error||error.message||"Could not verify the result.");})
       .finally(()=>{setGrading(false);finalizing.current=false;});
-  },[stage,flow.verifiedResult,attemptId,idToken,keys,paper.id,retry]);
+  },[stage,flow.verifiedResult,attemptId,idToken,keys,paper.id,retry,order]);
 
   const restart=()=>{
     if(!flow.verifiedResult||!window.confirm("Start another attempt? Your previous verified result will remain in Results."))return;
@@ -167,14 +189,14 @@ function A2KombiAttempt({mockNumber,paper}) {
       const historyKey=`${keys.flow}:history`;
       const past=read(historyKey);
       const history=Array.isArray(past)?past:[];
-      localStorage.setItem(historyKey,JSON.stringify([...history,{flow,lesen,writing,speaking:read(keys.sprechen)}]));
+      localStorage.setItem(historyKey,JSON.stringify([...history,{flow,lesen,writing,speaking:read(keys.sprechen),hoeren}]));
       for(const key of Object.values(keys))localStorage.removeItem(key);
       setFlow({stage:"intro"});setProgress(a2KombiProgress(keys));
-      setLesen({});setWriting({});setPart(0);setGradingError("");
+      setLesen({});setHoeren({});setWriting({});setPart(0);setGradingError("");
     }catch{setGradingError("Could not archive the previous attempt; nothing was deleted.");}
   };
   const currentReading=paper.reading[part];
-  const sectionIndex=ORDER.indexOf(stage);
+  const sectionIndex=order.indexOf(stage);
   return <main className="a2-mock2-full" data-a2-kombi-mock={paper.id}>
     <div className="a2-mock2-top"><AppBackButton label="Back to Mock Exams" fallbackPath="/exams/mocks"/><span>A2 · Mock {mockNumber}</span></div>
     <header className="a2-mock2-full-heading">
