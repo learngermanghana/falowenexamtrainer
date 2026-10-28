@@ -94,7 +94,7 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.equal(artifacts.scoreDocument.sectionScores.hoeren,25);
   assert.throws(()=>buildVerifiedA2MockScore({
-    mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
+    mockId:"a2-mock-06",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
     verifiedSections:verification,
   }),/Unsupported/);
 });
