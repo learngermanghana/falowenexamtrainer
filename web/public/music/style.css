@@ -60,3 +60,22 @@
 .track-art.art-motivation{background:#e7dfc5}
 @media(max-width:900px){.learning-columns{grid-template-columns:1fr;gap:16px}.player-inner{flex-wrap:wrap}.player audio{order:5;width:100%;flex:auto;max-width:none}.player-tools{margin-left:auto}}
 @media(max-width:570px){.detail-shell{padding:26px 18px 44px}.detail-panel{padding:21px 17px}.detail-heading h2{font-size:2.35rem}.detail-actions{width:100%}.detail-actions button{flex:1}.lesson-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.lesson-tabs button{padding:11px 5px;font-size:11px;min-width:0}.quiz-question{padding:13px}.hero-actions{gap:12px}.featured-description{font-size:12px}.player-inner{padding:10px 12px}.player-tools{width:100%;justify-content:flex-end}.player-tools label{font-size:11px}.player audio{order:5}.has-player{padding-bottom:0}.share-button{margin:0}.category-controls button{flex:1 1 auto;padding:11px}}
+
+/* Full 28-day music calendar; empty days stay visible until an MP3 is uploaded. */
+.day-group{background:#fff;border:1px solid #dde7db;border-radius:17px;padding:13px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.day-heading{display:flex;justify-content:space-between;align-items:center;gap:7px;padding:4px 2px}
+.day-heading strong{font-size:15px;color:#194034;white-space:nowrap}
+.day-heading small{font-size:11px;color:#6f8375;white-space:nowrap}
+.day-group .track-card{min-height:235px;border-radius:12px;box-shadow:none}
+.day-group .track-art{height:105px}
+.day-group .art-circle{width:90px;height:90px;font-size:30px}
+.day-group .track-body{padding:15px}
+.day-group .track-body h3{font-size:17px}
+.day-group .track-actions{padding-top:15px}
+.empty-day{display:flex;align-items:center;justify-content:center;min-height:110px;padding:16px;text-align:center;border-radius:12px;border:1px dashed #dce5d8;background:#f8faf6;color:#789085;font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.motivation-area{grid-column:1/-1;padding-top:18px}
+.motivation-area h3{font-size:21px;margin:8px 0 18px}
+.motivation-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:19px}
+#discovery-status{min-height:16px;margin:4px 0 14px}
+@media(max-width:860px){.motivation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:570px){.motivation-grid{grid-template-columns:1fr}.day-group{padding:12px}.empty-day{min-height:82px}.day-group .track-card{min-height:220px}}
