@@ -1,3 +1,4 @@
+import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, tracking, AI calls,
@@ -30,6 +31,16 @@ const lyricsRequests = new Set();
 let renderedCues = [];
 let highlightedLine = -1;
 let playbackQueue = [];
+let playbackTracks = [];
+let shuffleEnabled = false;
+try { shuffleEnabled = localStorage.getItem("falowen_music_shuffle") === "1"; } catch {}
+byId("shuffle").checked = shuffleEnabled;
+byId("shuffle").addEventListener("change", () => {
+  shuffleEnabled = byId("shuffle").checked;
+  playbackQueue = buildPlaybackQueue(playbackTracks, current?.id, shuffleEnabled);
+  if (shuffleEnabled) { byId("repeat").checked = false; audio.loop = false; }
+  try { localStorage.setItem("falowen_music_shuffle", shuffleEnabled ? "1" : "0"); } catch {}
+});
 let visibleTracks = [];
 const initialParams = new URLSearchParams(location.search);
 const initialId = (document.body.dataset.track || initialParams.get("track") || "").trim();
@@ -240,7 +251,11 @@ function renderCatalog() {
 }
 function moveTrack(direction = 1) {
   if (!playbackQueue.length) return;
-  const index = playbackQueue.findIndex(track => track.id === current?.id);
+  let index = playbackQueue.findIndex(track => track.id === current?.id);
+  if (shuffleEnabled && direction > 0 && index === playbackQueue.length - 1 && playbackQueue.length > 1) {
+    playbackQueue = buildPlaybackQueue(playbackQueue, current.id, true);
+    index = 0;
+  }
   const track = playbackQueue[(index + direction + playbackQueue.length) % playbackQueue.length];
   selected = track;
   setPlayer(track, true);
@@ -423,7 +438,8 @@ function renderDetail(track) {
 }
 function showSong(track, autoplay = false, navigate = true) {
   selected = track;
-  playbackQueue = visibleTracks.some(song => song.id === track.id) ? [...visibleTracks] : [...catalog];
+  playbackTracks = [...(visibleTracks.some(song => song.id === track.id) ? visibleTracks : catalog)];
+  playbackQueue = buildPlaybackQueue(playbackTracks, track.id, shuffleEnabled);
   setPlayer(track, autoplay);
   renderDetail(track);
   if (navigate && location.pathname + location.search !== songUrl(track).pathname + songUrl(track).search) history.pushState({ trackId: track.id }, "", songUrl(track).pathname + songUrl(track).search);

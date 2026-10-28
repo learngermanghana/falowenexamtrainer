@@ -35,13 +35,14 @@ test('missing, oversized or mismatched timing never breaks audio or exposes raw 
 });
 
 const published=require('../web/public/music/timings.json');
-test('all five real recordings have valid timings and no line remains active in instrumental gaps',async()=>{
- assert.equal(published.recordings.length,5);
+test('all seven real recordings have valid timings and no line remains active in instrumental gaps',async()=>{
+ assert.equal(published.recordings.length,7);
  for(const pack of published.recordings){
   assert.ok(validateLyrics(pack,pack.objectKey),pack.trackId);
   const cues=validateCues(pack.cues,pack.lyrics);
   assert.equal(cues.length,lyricLines(pack.lyrics).length);
-  assert.ok(cues[0].start>5,'do not highlight instrumental intro');
+  assert.ok(cues[0].start>0,'do not highlight before first vocal');
+  assert.equal(activeLyricIndex(cues,cues[0].start/2),-1);
   for(let i=0;i<cues.length;i++){
    const c=cues[i];assert.ok(c.end>c.start);
    assert.equal(activeLyricIndex(cues,(c.start+c.end)/2),i);
