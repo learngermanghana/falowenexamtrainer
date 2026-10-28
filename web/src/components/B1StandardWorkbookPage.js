@@ -602,8 +602,9 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
           
                 {resolvedActiveTab === "references" && (
                   <WorkbookDayMusic
-                    level="B1" day={config.day} title={config.title}
-                    workbookId={config.workbookId || `B1Day${config.day}Workbook`}
+                    level="B1" day={config.day}
+                    title={config.workbookId || `B1Day${config.day}`}
+                    workbookId={config.workbookId}
                   />
                 )}
           
