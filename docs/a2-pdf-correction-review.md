@@ -83,3 +83,22 @@ Outstanding, required before merging:
 
 The new A2-only CI job uploads an explicitly named **offline companion proof**
 for review; it must never be presented as the complete book or a paid product.
+
+## PR #3223 follow-up
+
+The draft PR is https://github.com/learngermanghana/falowenexamtrainer/pull/3223.
+Its initial Course material bundle validation succeeded in run
+https://github.com/learngermanghana/falowenexamtrainer/actions/runs/40713362600.
+That was the PR/offline validation, not an authenticated full-book build.
+
+`A2 PDF PR review (no deployment)` adds a branch-only full-build job. It runs
+only for `fix/a2-pdf-validation` in the owner repository, uses the existing
+PDF login/session secrets, and has only contents/actions read permissions.
+It downloads the reported original artifact where available, renders and
+validates all 28 A2 lessons, then uploads `Falowen-A2-PR3223-review-pdf`.
+The comparison report exposes only page counts, byte sizes and finding labels,
+never original learner text. Original-download failure does not prevent useful
+full-render work, but is reported as a pending edition comparison.
+
+No step merges, deploys, publishes a book, changes payment behavior or updates
+Firestore rules. The complete PDF and live audio still require editorial review.
