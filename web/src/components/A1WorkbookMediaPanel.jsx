@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import A1OptionalWorkbookMusic from "./A1OptionalWorkbookMusic";
 import { A1_ASSIGNMENT_REGISTRY } from "../data/a1AssignmentRegistry";
 import { getA1TeacherVideoResources } from "../data/a1TeacherVideoResources";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
@@ -106,7 +107,7 @@ export const getA1WorkbookMediaResources = ({ day, chapter } = {}) => {
   return dedupeByUrl([...teacherResources, ...aiResources]);
 };
 
-const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = null }) => {
+const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = null, learningMode = "tutor" }) => {
   const resources = useMemo(() => {
     const suppressAiVideo = shouldSuppressA1WorkbookAiVideo(day, chapter);
     const canonicalResources = getA1WorkbookMediaResources({ day, chapter });
@@ -135,9 +136,12 @@ const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = nul
     ].filter(Boolean));
   }, [aiVideo, chapter, day, teacherVideo]);
 
-  if (!resources.length) return null;
+  // Even lessons without recorded video resources can offer optional Music.
+  // A1 self-learning pages mount this panel only after the Radio entry gate.
+  if (!resources.length) return <A1OptionalWorkbookMusic day={day} mode={learningMode} />;
 
   return (
+    <>
     <section
       data-a1-workbook-media="true"
       aria-label="A1 lesson videos"
@@ -208,6 +212,8 @@ const A1WorkbookMediaPanel = ({ day, chapter, teacherVideo = null, aiVideo = nul
         );
       })}
     </section>
+    <A1OptionalWorkbookMusic day={day} mode={learningMode} />
+    </>
   );
 };
 

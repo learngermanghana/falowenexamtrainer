@@ -77,7 +77,7 @@ const resourceMatchesPractice = (resource = {}, practice = {}) => {
 
 const scopeA1PracticeLesson = (practice) => {
   const rawLesson = (courseSchedules.A1 || []).find(
-    (lesson) => Number(lesson?.day || lesson?.assignmentDay) === Number(practice.day),
+    (lesson) => lesson != null && Number(lesson.day || lesson.assignmentDay) === Number(practice.day),
   );
   if (!rawLesson) {
     return {
@@ -322,6 +322,7 @@ const A1CoursePracticeAutoMount = () => {
           chapter={practice.chapter}
           teacherVideo={journeyResources?.teacherVideo}
           aiVideo={journeyResources?.aiVideo}
+          learningMode="self"
         />,
       );
 

@@ -67,7 +67,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --forceExit --runTestsByPath src/components/A1WorkbookMediaPanel.regression.test.jsx
+        run: npx jest --runInBand --forceExit --runTestsByPath src/components/A1WorkbookMediaPanel.regression.test.jsx src/components/A1OptionalWorkbookMusic.test.jsx src/components/A1SelfLearningDestinationMaterials.test.js
 
       - name: Run A1 Day 17 navigation and speaking-card regression in isolation
         working-directory: web
