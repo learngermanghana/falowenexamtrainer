@@ -12,6 +12,7 @@ import CourseLessonPage from "./components/CourseLessonPage";
 import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import BookStoreCheckout from "./components/BookStoreCheckout";
+import CampusMusicPage from "./components/CampusMusicPage";
 import ExamGuideComingSoon from "./components/ExamGuideComingSoon";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
@@ -227,6 +228,8 @@ const getTabStructure = (program, t) => {
 
   return [
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
+    { key: "music", label: "Music", section: "music" },
+    { key: "books", label: "Books", section: "books", route: "/books" },
     { key: "examFile", label: t("appNav.sections.examFile"), section: "examFile" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
     { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
@@ -322,6 +325,8 @@ function App() {
     () => ({
       submit: isStaff,
       course: true,
+      music: true,
+      books: true,
       examFile: isEnrolled || isStaff,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
@@ -828,6 +833,7 @@ const AppShell = ({
           <Route path="/tutor-marking" element={<Navigate to="/campus/tutor-marking" replace />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
+          <Route path="/campus/books" element={<Navigate to="/books" replace />} />
           <Route path="/campus/live-speak" element={<LiveSpeakPage />} />
           <Route
             path="/campus/:section"
@@ -1307,6 +1313,10 @@ const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure })
   );
 
   const handleMainTabClick = (tab) => {
+    if (tab.route) {
+      navigate(tab.route);
+      return;
+    }
     if (tab.section) {
       navigate(`/campus/${tab.section}`);
       return;
@@ -1406,6 +1416,10 @@ const CampusArea = ({
   }, [resolvedSection, tabStorageKey, tabStructure]);
 
   const handleMainTabClick = (tab) => {
+    if (tab.route) {
+      navigate(tab.route);
+      return;
+    }
     if (tab.section) {
       navigate(`/campus/${tab.section}`);
       return;
@@ -1505,6 +1519,7 @@ const CampusArea = ({
         </section>
       ) : null}
 
+      {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
         <CourseTab
           defaultLevel={campusStudentProfile?.level}

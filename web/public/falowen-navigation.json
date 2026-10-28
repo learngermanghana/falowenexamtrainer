@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-10-11",
+  "lastReviewed": "2026-10-28",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -19,7 +19,7 @@
     "For private account state, explain where to check it rather than claiming to know it.",
     "Use the Falowen Course Map for level/day/chapter-specific lesson navigation and section availability.",
     "For a specific lesson section, use the exact sectionRoutes URL from falowen-course-map.json; these links preserve the requested destination through required Falowen Radio.",
-    "Falowen currently offers German A1\u2013C2 only. Recommend German signup and German courses; French enrollment is paused."
+    "Falowen currently offers German A1–C2 only. Recommend German signup and German courses; French enrollment is paused."
   ],
   "navigation": [
     {
@@ -67,6 +67,32 @@
         "course materials",
         "my course",
         "continue learning"
+      ]
+    },
+    {
+      "id": "music",
+      "label": "Music",
+      "route": "/campus/music",
+      "purpose": "Open the existing Falowen Music player inside the signed-in student campus; standalone sharing remains at https://music.falowen.app/",
+      "requiresLogin": true,
+      "aliases": [
+        "music",
+        "songs",
+        "learn German with music",
+        "Falowen Music"
+      ]
+    },
+    {
+      "id": "books",
+      "label": "Books",
+      "route": "/books",
+      "purpose": "Browse the official Falowen German book catalogue and checkout on the same website",
+      "requiresLogin": false,
+      "aliases": [
+        "buy German books",
+        "workbooks",
+        "book catalogue",
+        "German books"
       ]
     },
     {
@@ -144,7 +170,7 @@
     },
     {
       "id": "student-data",
-      "label": "Account \u2192 Student Data",
+      "label": "Account → Student Data",
       "route": "/campus/account?tab=studentData",
       "purpose": "View profile and student information",
       "requiresLogin": true,
@@ -155,7 +181,7 @@
     },
     {
       "id": "notifications",
-      "label": "Account \u2192 Notifications",
+      "label": "Account → Notifications",
       "route": "/campus/account?tab=notifications",
       "purpose": "Manage notification settings",
       "requiresLogin": true,
@@ -166,7 +192,7 @@
     },
     {
       "id": "billing",
-      "label": "Account \u2192 Billing",
+      "label": "Account → Billing",
       "route": "/campus/account?tab=billing",
       "purpose": "View tuition, balance, payment history and available receipts",
       "requiresLogin": true,
@@ -180,7 +206,7 @@
     },
     {
       "id": "upgrade",
-      "label": "Account \u2192 Upgrade",
+      "label": "Account → Upgrade",
       "route": "/campus/account?tab=upgrade",
       "purpose": "Check or start movement to the next level",
       "requiresLogin": true,
@@ -203,7 +229,7 @@
       "meaning": "Teaching material, explanations and guided lesson content"
     },
     {
-      "label": "H\u00f6ren",
+      "label": "Hören",
       "meaning": "Listening practice"
     },
     {
@@ -413,6 +439,15 @@
       ],
       "confirmation": "Provider confirmation is required; returning from checkout is not proof of payment.",
       "pending": "Refresh payment status and inspect transaction history before paying again."
+    },
+    "music": {
+      "campus": "/campus/music",
+      "publicSite": "https://music.falowen.app/",
+      "behavior": "The campus embeds the same-origin existing music app, so enrolled users retain the Falowen navigation; there is no separate login or duplicate audio copy."
+    },
+    "books": {
+      "catalog": "/books",
+      "behavior": "Books opens the existing public bookstore and keeps its payment/digital delivery flow."
     }
   }
 }

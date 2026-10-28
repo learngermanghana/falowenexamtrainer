@@ -323,6 +323,17 @@ const GeneralHome = ({
       ) : null}
 
       <QuickMainAccess t={t} openCampus={openCampus} openExamsRoom={openExamsRoom} />
+      <section aria-label="More learning resources" style={{
+        display: "flex", alignItems: "center", flexWrap: "wrap", gap: 10,
+        padding: "12px 16px", border: "1px solid #dbeafe", borderRadius: 14,
+        background: "#f8fbff",
+      }}>
+        <strong style={{ fontSize: 13, color: "#1e3a8a", marginRight: 6 }}>More to explore</strong>
+        <button type="button" onClick={() => navigate("/campus/music")}
+          style={{ ...styles.secondaryButton, fontSize: 13 }}>♫ Music</button>
+        <button type="button" onClick={() => navigate("/books")}
+          style={{ ...styles.secondaryButton, fontSize: 13 }}>Books</button>
+      </section>
       <FirstLessonGuide />
 
       <HomeMetrics studentProfile={metricsStudentProfile} />
