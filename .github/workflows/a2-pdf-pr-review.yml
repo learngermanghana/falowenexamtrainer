@@ -1,0 +1,87 @@
+name: A2 PDF PR review (no deployment)
+
+on:
+  push:
+    branches: [fix/a2-pdf-validation]
+    paths:
+      - .github/workflows/a2-pdf-pr-review.yml
+      - scripts/course-material-bundles/**
+      - web/src/components/A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage.js
+      - web/src/components/A2Days12To16ThinkingSupport.js
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: a2-pdf-pr-3223-review
+  cancel-in-progress: true
+
+jobs:
+  build-a2-review:
+    # This is the owner's review branch, not a fork or an arbitrary PR.
+    if: github.repository == 'learngermanghana/falowenexamtrainer' && github.ref == 'refs/heads/fix/a2-pdf-validation'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install PDF tools without changing the dependency declarations
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4 jsqr@1.4.0 pngjs@7.0.0
+      - name: Install browser and PDF inspectors
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Validate A2 source, privacy and printed QR recovery
+        run: |
+          node --test scripts/course-material-bundles/a2PdfSafety.test.mjs scripts/course-material-bundles/a2PdfSafety.browser.test.mjs scripts/course-material-bundles/a2PrintableCompanions.test.mjs scripts/course-material-bundles/a2PdfPrintExtras.test.mjs scripts/course-material-bundles/compareA2PdfEditions.test.mjs
+          node scripts/course-material-bundles/buildLevelManifest.mjs A2
+      - name: Download the reported 28 October A2 edition for comparison
+        id: original
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 40704827225 --repo learngermanghana/falowenexamtrainer --name Falowen-A2-course-materials-pdf --dir "$RUNNER_TEMP/a2-original"
+      - name: Render all 28 authenticated A2 lessons (read only)
+        id: render
+        env:
+          FALOWEN_PDF_BASE_URL: https://www.falowen.app
+          FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
+          FALOWEN_PDF_PASSWORD: ${{ secrets.FALOWEN_PDF_PASSWORD }}
+          FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
+        run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
+      - name: Validate the complete A2 book before uploading
+        id: validation
+        run: node scripts/course-material-bundles/validateGeneratedBundle.mjs A2
+      - name: Compare editions without publishing original private content
+        if: always() && steps.render.outcome == 'success'
+        env:
+          ORIGINAL_DOWNLOAD: ${{ steps.original.outcome }}
+          PDF_VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
+        run: |
+          node scripts/course-material-bundles/compareA2PdfEditions.mjs \
+            "$RUNNER_TEMP/a2-original/Falowen-A2-Course-Materials.pdf" \
+            artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials.pdf \
+            artifacts/course-material-bundles/A2/a2-edition-comparison.json
+      - name: Upload validated A2 PDF for PR review only
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-PR3223-review-pdf
+          path: |
+            artifacts/course-material-bundles/A2/Falowen-A2-Course-Materials.pdf
+            artifacts/course-material-bundles/A2/a2-edition-comparison.json
+            artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload safe failure diagnostics only
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-PR3223-review-diagnostics
+          path: artifacts/course-material-bundles/A2/render-diagnostics.json
+          if-no-files-found: ignore
+          retention-days: 7

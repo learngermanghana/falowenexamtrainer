@@ -6,10 +6,23 @@ import { PDFArray, PDFDocument, PDFName } from "pdf-lib";
 import { scanPdfPageContent } from "./pdfPageAudit.mjs";
 import { findA1PrintPrivacyLeaks } from "./a1PdfPrivacy.mjs";
 import { findA1PrintChromeLeaks } from "./a1PdfPrintChrome.mjs";
+import { assertA2PrintSafety } from "./a2PdfSafety.mjs";
+import { getA2ReadOnlyParts } from "./a2PrintableCompanions.mjs";
+import { getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const level = String(process.argv[2] || "").trim().toUpperCase();
+if (level === "A2" && process.env.GITHUB_STEP_SUMMARY) {
+  // Validation errors below contain page numbers and fixed finding labels,
+  // never extracted learner text. Preserve the failing exit status while
+  // making the specific gate visible on the public PR build summary.
+  process.on("uncaughtExceptionMonitor", error => {
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+      "### A2 final PDF validation failed\n\n```text\n" +
+      String(error.message).replace(/`/g, "'") + "\n```\n\nThe book was not approved for upload.\n");
+  });
+}
 
 if (!["A1", "A2", "B1"].includes(level)) {
   throw new Error("Generated bundle validation is currently defined for A1, A2 and B1.");
@@ -68,6 +81,10 @@ const forbidden = [
 ];
 
 if (level === "A2") {
+  assertA2PrintSafety(text);
+  const audit = scanPdfPageContent(text, pdf.getPageCount());
+  if (audit.faults.length) throw new Error("A2 PDF preflight failed:\n" + audit.faults.join("\n"));
+  if (/wanted\s*todo\b/i.test(text)) throw new Error("A2 PDF contains the joined Day 13 explanation: wanted todo");
   forbidden.push(
     ["Independent assessment notices", /Independent\s+assessment/i],
     ["StudyBuddy assessment UI", /StudyBuddy/i],
@@ -148,6 +165,13 @@ if (level === "A2") {
     const entries = completedLessons.filter((entry) => Number(entry.day) === day);
     if (entries.length !== 1 || entries[0].sections?.join(",") !== "grammar,workbook")
       throw new Error(`A2 PDF: Day ${day} missing complete Grammar/Workbook bundle.`);
+  }
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+  for (const lesson of manifest.lessons.filter(entry => expectedByDay.has(Number(entry.day)))) {
+    if (Number(lesson.day) === 22 || !(await getA2ReadOnlyParts(lesson.day)).includes("teil-4")) continue;
+    const expectedLink = getA2PdfLessonCompanionUrl(lesson.route, process.env.FALOWEN_PDF_BASE_URL || "https://www.falowen.app");
+    if (!text.replace(/\s+/g, "").includes(expectedLink))
+      throw new Error(`A2 PDF: Day ${lesson.day} missing its correct authenticated listening companion link.`);
   }
   const mockDay = completedLessons.find((entry) => Number(entry.day) === 22);
   if (mockDay && !mockDay.origins?.every((source) => source === "canonical-read-only"))

@@ -26,7 +26,7 @@ test("course bundle renderer allows Firebase auth hydration after hard lesson na
 });
 
 test("renderer version identifies the grammar-workbook bundle contract", () => {
-  assert.match(source, /rendererVersion: 8/);
+  assert.match(source, /rendererVersion: 9/);
 });
 
 test("A2 and B1 bundle renderer exposes only Grammar and one merged Workbook resource", () => {

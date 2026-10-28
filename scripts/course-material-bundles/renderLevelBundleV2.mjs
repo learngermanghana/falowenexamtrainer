@@ -1,13 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { execFileSync } from "node:child_process";
 import { chromium } from "playwright";
 import QRCode from "qrcode";
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import { createPdfNavigation } from "./pdfNavigation.mjs";
 import { buildPdfLessonTargetUrl } from "./pdfLessonRoute.mjs";
-import { buildA2ReadOnlyPrintHtml } from "./a2PrintableCompanions.mjs";
+import { buildA2ReadOnlyPrintHtml, getA2ReadOnlyParts } from "./a2PrintableCompanions.mjs";
 import { prepareA2PrintDocument, restoreA2PrintDocument, getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
+import { A2_PRINT_CSS, prepareA2SafePrintView, restoreA2SafePrintView, assertA2PrintSafety, assertA2PrintedContent } from "./a2PdfSafety.mjs";
 import { trimPrintedPdfTail } from "./trimPrintedPdfTail.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,12 +29,14 @@ if (!manifest.readyForPdfGeneration) throw new Error(`${level} manifest is not r
 fs.rmSync(renderDir, { recursive: true, force: true });
 fs.mkdirSync(renderDir, { recursive: true });
 
-const diagnostics = { level, rendererVersion: 8, startedAt: new Date().toISOString(), lessons: [] };
+const diagnostics = { level, rendererVersion: 9, startedAt: new Date().toISOString(), lessons: [] };
 const writeDiagnostics = () => fs.writeFileSync(diagnosticsPath, `${JSON.stringify(diagnostics, null, 2)}\n`, "utf8");
 
 const storageStateFromEnv = () => {
   const encoded = String(process.env.FALOWEN_PDF_AUTH_STATE_B64 || "").trim();
   if (!encoded) return undefined;
+  // Never write the A2 export account's session into the artifact tree.
+  if (level === "A2") return JSON.parse(Buffer.from(encoded, "base64").toString("utf8"));
   const file = path.join(outputDir, "playwright-storage-state.json");
   fs.writeFileSync(file, Buffer.from(encoded, "base64").toString("utf8"));
   return file;
@@ -124,6 +128,7 @@ const waitForLoginCompletion = async (page) => {
 
   const authText = await getBodyText(page);
   if (LOGIN_FAILURE_PATTERN.test(authText)) {
+    if (level === "A2") throw new Error("A2 PDF login failed; page text omitted to protect account data.");
     throw new Error(`Falowen PDF login failed: ${authText.slice(0, 500)}`);
   }
 
@@ -215,6 +220,7 @@ const ensureAuthenticatedLesson = async (page, lesson) => {
   if (await openLessonWithAuthHydration(page, lesson, targetUrl)) return;
 
   const preview = (await getBodyText(page)).slice(0, 700);
+  if (level === "A2") throw new Error(`Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Page text omitted to protect account data.`);
   throw new Error(
     `Authentication completed but Day ${lesson.day} still did not show the real lesson after auth hydration retries. Current URL: ${page.url()}. Preview: ${preview}`,
   );
@@ -248,6 +254,7 @@ const injectPrintMode = async (page) => {
     [data-a2-pdf-hide] { display: none !important; }
     [data-course-inline-practice="speaking"], .speaking-compact-timer, [aria-label="Teil 1 speaking timer"], [data-a2-day16-teacher-lecture], [data-a2-day17-teacher-lecture] { display: none !important; }
     a { color: inherit !important; text-decoration: none !important; }
+    ${level === "A2" ? A2_PRINT_CSS : ""}
   ` });
 };
 
@@ -285,23 +292,34 @@ const restorePdfChromeText = async (page) => page.evaluate(() => {
   delete window.__falowenPdfChromeChanges;
 });
 const saveCurrentPagePdf = async (page, lesson, suffix = "lesson") => {
+  if (level === "A2") {
+    // Wait for lazy grammar/Teil panels, not a fixed 350ms snapshot.
+    await page.waitForFunction(() => ![...document.querySelectorAll("main *")].some(node =>
+      node.children.length === 0 && node.getBoundingClientRect().height > 0 &&
+      /^(?:Loading(?: grammar notes)?(?:…|\.{2,3})?|Audio wird geladen\s*(?:…|\.{2,3})?)$/i.test(node.textContent.trim())
+    ), undefined, {timeout:20000});
+  }
   const printStyle = await injectPrintMode(page);
   // Identify whole resource cards before the generic text scrub removes
   // their "Supporting materials" heading. Live production may not yet have
   // the newer data-pdf-exclude React markers.
-  if (level === "B1") await suppressPdfChromeText(page);
-  if (level === "A2") {
-    const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
-    const qrDataUrl = suffix === "workbook-teil-4"
-      ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
-    await page.evaluate(prepareA2PrintDocument, { section: suffix, lessonUrl, qrDataUrl });
-    await suppressPdfChromeText(page);
-  }
   const file = path.join(renderDir, `${String(lesson.day).padStart(2, "0")}-${suffix}.pdf`);
   try {
+    if (level === "B1") await suppressPdfChromeText(page);
+    if (level === "A2") {
+      const lessonUrl = getA2PdfLessonCompanionUrl(lesson.route, baseUrl);
+      const qrDataUrl = suffix === "workbook-teil-4"
+        ? await QRCode.toDataURL(lessonUrl, { width: 160, margin: 1, errorCorrectionLevel: "M" }) : "";
+      await page.evaluate(prepareA2PrintDocument, { section: suffix, lessonUrl, qrDataUrl });
+      await page.evaluate(prepareA2SafePrintView);
+      const printableText = await page.locator("body").innerText();
+      assertA2PrintSafety(printableText);
+      await suppressPdfChromeText(page);
+    }
     await page.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, scale: level === "A2" ? 0.95 : 1, timeout: 30000 });
     if (level === "A2") await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${suffix}` });
   } finally {
+    if (level === "A2") await page.evaluate(restoreA2SafePrintView).catch(() => {});
     if (level === "A2") await page.evaluate(restoreA2PrintDocument).catch(() => {});
     if (level === "A2" || level === "B1") await restorePdfChromeText(page).catch(() => {});
     await printStyle.evaluate((style) => style.remove()).catch(() => {});
@@ -403,7 +421,12 @@ const renderReadOnlyA2Section = async (page, lesson, part, filename = part) => {
   const printPage = await page.context().newPage();
   try {
     await printPage.setContent(content, { waitUntil: "load" });
+    const expectedText = await printPage.locator("body").innerText();
+    assertA2PrintSafety(expectedText);
     await printPage.pdf({ path: file, format: "A4", printBackground: true, preferCSSPageSize: true, timeout: 30000 });
+    const printedText = execFileSync("pdftotext", ["-layout", file, "-"], {encoding:"utf8", maxBuffer:16*1024*1024});
+    assertA2PrintSafety(printedText);
+    assertA2PrintedContent(expectedText, printedText);
     await trimPrintedPdfTail(file, { description: `A2 Day ${lesson.day} ${part} companion` });
   } finally {
     await printPage.close();
@@ -446,8 +469,19 @@ const renderA2B1Lesson = async (page, lesson) => {
     { key: "teil-4", names: ["Teil 4"] },
   ];
   const workbookParts = [];
+  const readOnlyParts = level === "A2" ? await getA2ReadOnlyParts(lesson.day) : [];
   for (const tabSpec of workbookTabSpecs) {
+    // Graded A2 questions always come from the public source fields. Never
+    // click a graded tab or print the account's answer/marking state, even
+    // when its online exercise is unlocked.
+    if (level === "A2" && tabSpec.key !== "teil-1") {
+      if (!readOnlyParts.includes(tabSpec.key)) continue;
+      workbookParts.push(await renderReadOnlyA2Section(page, lesson, tabSpec.key, `workbook-${tabSpec.key}`));
+      continue;
+    }
     const availability = await getWorkbookTabAvailability(page, tabSpec.names[0]);
+    if (level === "A2" && tabSpec.key === "teil-1" && availability !== "available")
+      throw new Error(`A2 Day ${lesson.day}: actual speaking material is ${availability}; refusing generic replacement content.`);
     if (availability === "absent") {
       console.log(`${level} Day ${lesson.day}: ${tabSpec.names[0]} not present in lesson tab profile.`);
       continue;
@@ -576,7 +610,7 @@ const mergeBundle = async (renderedLessons) => {
   fs.writeFileSync(finalPdfPath, await output.save());
 };
 
-const browser = await chromium.launch({ headless: true, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
+const browser = await chromium.launch({ headless: true, executablePath: process.env.FALOWEN_PDF_CHROMIUM || undefined, args: ["--no-sandbox", "--disable-dev-shm-usage"] });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1800 }, storageState: storageStateFromEnv() });
 const page = await context.newPage();
 page.setDefaultTimeout(15000);

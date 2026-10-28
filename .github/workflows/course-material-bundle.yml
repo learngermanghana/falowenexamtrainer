@@ -37,6 +37,35 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  validate-a2-print-safety:
+    name: Validate A2 private-data redaction and printed QR codes
+    if: github.event_name == 'pull_request' || inputs.level == 'A2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install isolated print-test tools
+        run: npm install --no-save --package-lock=false playwright@1.54.2 pdf-lib@1.17.1 qrcode@1.5.4 jsqr@1.4.0 pngjs@7.0.0
+      - name: Install Chromium and PDF inspection tools
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+      - name: Check all 28 days and decode QR codes from printed PDF pages
+        run: node --test scripts/course-material-bundles/a2PdfSafety.test.mjs scripts/course-material-bundles/a2PdfSafety.browser.test.mjs
+        env:
+          FALOWEN_A2_COMPANION_PROOF: ${{ runner.temp }}/Falowen-A2-offline-companion-proof.pdf
+      - name: Upload offline companion proof (not the complete Course Book)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Falowen-A2-offline-companion-proof
+          path: ${{ runner.temp }}/Falowen-A2-offline-companion-proof.pdf
+          if-no-files-found: error
+          retention-days: 14
+
   validate-manifests:
     name: Validate ${{ matrix.level }} manifest
     runs-on: ubuntu-latest

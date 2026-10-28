@@ -14,16 +14,23 @@ const esc = (s) => String(s ?? "").replace(/Falowen\s+Radio/gi, "pre-lesson audi
   .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 const paragraph = (s) => "<p>" + esc(s) + "</p>";
 const list = (xs) => "<ol>" + xs.map(s => "<li>" + esc(s) + "</li>").join("") + "</ol>";
-const questions = (xs) => "<ol class=\"questions\">" + xs.map(q =>
-  "<li><strong>" + esc(q.stem || q.text || "") + "</strong>" +
-  (q.options?.length ? list(q.options) : "") + "</li>").join("") + "</ol>";
+const questions = (xs) => "<ol class=\"questions\">" + xs.map(q => {
+  if (!(q.stem || q.text)?.trim() || !Array.isArray(q.options) || q.options.length < 2 ||
+      q.options.some(option => typeof option !== "string" || !option.trim()))
+    throw new Error("A2 printable question or answer options are incomplete");
+  // Render only public question/option fields, never keys, explanations or
+  // the export account's selected answers. Options already carry A/B labels.
+  return "<li><strong>" + esc(q.stem || q.text) + "</strong><ul class=\"options\">" +
+    q.options.map(option => "<li>" + esc(option) + "</li>").join("") + "</ul></li>";
+}).join("") + "</ol>";
 const html = ({ day, chapter, section, title, intro, body, footer }) => {
   if (!body || body.replace(/<[^>]*>/g, "").trim().length < 90)
     throw new Error("A2 Day " + day + " " + section + ": printable content is incomplete");
   return '<!doctype html><html lang="de"><head><meta charset="utf-8"><style>' +
-    '@page{size:A4;margin:15mm 15mm 17mm}html,body{color:#172033;font:12pt/1.5 Arial,sans-serif}' +
-    'h1{font-size:22pt}h2{font-size:16pt;margin-top:18px}li{margin:7px 0;break-inside:avoid}' +
-    'p{white-space:pre-wrap}.reading{white-space:pre-wrap;line-height:1.6;padding:15px;border:1px solid #cbd5e1}' +
+    '@page{size:A4;margin:12mm 13mm 14mm}html,body{color:#172033;font:11pt/1.4 Arial,sans-serif}' +
+    'h1{font-size:20pt}h2{font-size:14pt;margin-top:14px;break-after:avoid}li{margin:5px 0;break-inside:avoid}' +
+    '.options{list-style:none;padding-left:12px}.options li{margin:2px 0}' +
+    'p{white-space:pre-wrap}.reading{white-space:pre-wrap;line-height:1.5;padding:12px;border:1px solid #cbd5e1}' +
     'header{border-bottom:2px solid #1d4ed8;padding-bottom:10px}.hint{background:#eff6ff;padding:12px}' +
     'footer{border-top:1px solid #ddd;margin-top:22px;padding-top:9px;color:#475569;font-size:9pt}' +
     '</style></head><body><header><strong>FALOWEN · A2 COURSE BOOK · DAY ' + day + '</strong>' +
@@ -68,7 +75,7 @@ const listening = async (day, lessonUrl, audioQrDataUrl) => {
     : '<p>Hören-Audio: Im Falowen Course Book anmelden und Teil 4 öffnen.</p>';
   return html({day,chapter:t.chapter,section:"Teil 4 · Hören",title:"Hörverstehen",
     intro:"Die Audiodatei ist nicht im PDF. Verwenden Sie die Falowen-Lektion zum Anhören.",
-    body:paragraph(t.task) + "<h2>Audio</h2>" + audioCallout +
+    body:paragraph(t.task.replace(/Sieh dir das eingebettete Video an/gi, "Öffne die Falowen-Lektion über den QR-Code und höre die Aufnahme an")) + "<h2>Audio</h2>" + audioCallout +
       (t.questions?.length ? "<h2>Fragen</h2>" + questions(t.questions) :
         paragraph("Selbstkontrolle: Hören Sie die Übung in Falowen und kontrollieren Sie dort die Antworten.")) });
 };
@@ -127,4 +134,11 @@ export async function buildA2ReadOnlyPrintHtml({day, part, lesson = {}, lessonUr
     case "teil-4": return listening(day, lessonUrl, audioQrDataUrl);
     default: throw new Error("Missing A2 print companion: " + part);
   }
+}
+
+export async function getA2ReadOnlyParts(day) {
+  const { getA2ListeningTask } = await canonical("a2ListeningTasks.js");
+  const task = getA2ListeningTask(Number(day));
+  if (!task) throw new Error("A2 listening profile missing for Day " + day);
+  return ["teil-2", "teil-3", ...(task.mode === "none" ? [] : ["teil-4"])];
 }
