@@ -200,3 +200,24 @@ test('bounded R2 LIST only reads music prefix, never Hören or arbitrary keys',a
   assert.equal(tracks[0].day,19);
   assert.equal(tracks[0].level,'A2');
 });
+
+test('embedded campus music accepts its own signed playback API but rejects unrelated paths',()=>{
+  const js=file('web/public/music/app.js');
+  const source=js.match(/function safeAudioUrl\(value\) \{[\s\S]*?\n\}/)?.[0];
+  assert.ok(source,'music URL guard must remain testable');
+  const location={origin:'https://www.falowen.app',protocol:'https:'};
+  const check=runInNewContext(source+'; safeAudioUrl', { URL, location });
+  for(const id of ['a1-day-04-numbers','a2-day-18-bank','r2-a2-day-19-song','r2-a2-day-19-b64_U29uZy5tcDM']) {
+    const url='https://www.falowen.app/api/music?track='+id;
+    assert.equal(check(url),url,'approved or discovered music must be playable inside campus');
+  }
+  for(const url of [
+    'https://www.falowen.app/api/music?track=abc&private=1',
+    'https://www.falowen.app/api/music?track=abc&track=def',
+    'https://www.falowen.app/api/music?track=abc%2Fprivate',
+    'https://www.falowen.app/api/admin',
+    'https://www.falowen.app/a2/day-19/einkaufen-wo-und-wie.mp3',
+    'https://falowen-course-audio.886b2264d12c796d29879a8e919a2f46.r2.cloudflarestorage.com/music/a2/day-19/song.mp3',
+    'http://www.falowen.app/api/music?track=a2-day-18-bank'
+  ]) assert.equal(check(url),'','private or arbitrary URLs must stay blocked');
+});
