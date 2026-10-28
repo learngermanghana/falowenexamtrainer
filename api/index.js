@@ -1,3 +1,4 @@
+const classroomBankAudioHandler = require('../server/courseMusic.cjs').createClassroomBankAudioHandler();
 const app = require("../functions/functionz/paymentAwareApp");
 const { publicClassesHandler } = require("../functions/functionz/routes/publicClasses");
 const { classParticipationMeHandler } = require("../functions/functionz/routes/classParticipation");
@@ -125,6 +126,10 @@ module.exports = (req, res) => {
   if (typeof req.url === "string") {
     if (req.url === "/api") req.url = "/";
     else if (req.url.startsWith("/api/")) req.url = req.url.slice(4);
+  }
+
+  if (req.url === "/course-media/a2/classroom-audio-url" || req.url?.startsWith("/course-media/a2/classroom-audio-url?")) {
+    return classroomBankAudioHandler(req, res);
   }
 
   if (req.url === "/course-media/music/audio-url" || req.url?.startsWith("/course-media/music/audio-url?")) {

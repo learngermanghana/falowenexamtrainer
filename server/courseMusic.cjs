@@ -39,7 +39,11 @@ function isMusicStaff(account, env = process.env) {
   return claims.admin === true || ['admin','teacher','tutor','staff','instructor'].includes(String(claims.role || '').toLowerCase())
     || emails.includes(String(account.email || '').toLowerCase());
 }
-function createMusicHandler({ env = process.env, fetchImpl = fetch } = {}) {
+function prepareMusic(req, env) {
+  const id = new URL(req.url, 'https://www.falowen.app').searchParams.get('track') || '';
+  return signTrack(id, env);
+}
+function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = prepareMusic } = {}) {
   return async (req,res) => {
     const origin = req.headers.origin;
     if (['https://admin.falowen.app','https://www.falowen.app','https://music.falowen.app'].includes(origin)) {
@@ -62,12 +66,25 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch } = {}) {
       const account = data.users?.[0];
       if (!response.ok || !account?.localId || account.disabled) return res.status(401).json({error:'Your Falowen session has expired. Please sign in again.'});
       if (!isMusicStaff(account,env)) return res.status(403).json({error:'Teacher or administrator access is required.'});
-      const id = new URL(req.url,'https://www.falowen.app').searchParams.get('track') || '';
-      const signed = signTrack(id,env);
+      const signed = await prepare(req, env);
       return res.status(200).json({url:signed.url, expiresAt:signed.expiresAt, track:signed.id});
     } catch (error) {
       return res.status(error.status || 502).json({error:error.status ? error.message : 'Could not prepare classroom music. Please retry.'});
     }
   };
 }
-module.exports = { TRACKS, signTrack, isMusicStaff, createMusicHandler };
+// Teacher-only access to one private recording using the existing Vercel R2
+// configuration. Never accepts arbitrary object keys or public playback.
+function createClassroomBankAudioHandler(options = {}) {
+  return createMusicHandler({ ...options, prepare: async (req, env) => {
+    const { validateA2AudioKey, createA2AudioSignedUrl } = require('../functions/functionz/r2CourseAudio.js');
+    const params = new URL(req.url, 'https://www.falowen.app').searchParams;
+    const day = Number(params.get('day'));
+    const key = params.get('key') || '';
+    if (day !== 18 || key !== 'a2/day-18/bank-telefonat.mp3' || !validateA2AudioKey({ day, key })) {
+      throw Object.assign(new Error('Invalid classroom bank audio request.'), { status: 400 });
+    }
+    return { ...await createA2AudioSignedUrl({ day, key, env }), id: 'a2-day18-bank-telephone' };
+  } });
+}
+module.exports = { createClassroomBankAudioHandler, TRACKS, signTrack, isMusicStaff, createMusicHandler };

@@ -37,3 +37,31 @@ test('expired tokens, disabled accounts and untrusted origins do not gain access
   assert.equal(res.code,401);assert.equal(res.headers['Access-Control-Allow-Origin'],undefined);
  }
 });
+
+test('private bank telephone audio requires staff and signs only the uploaded Day 18 object', async () => {
+ const {createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-18/bank-telefonat.mp3';
+ for(const [account,requestKey,day,expected] of [
+  [null,key,18,401],
+  [{localId:'student',email:'student@example.com'},key,18,403],
+  [{localId:'staff',email:'moxflex@gmail.com'},key,18,200],
+  [{localId:'staff',email:'moxflex@gmail.com'},'a2/day-18/other.mp3',18,400],
+  [{localId:'staff',email:'moxflex@gmail.com'},key,17,400],
+  [{localId:'staff',email:'moxflex@gmail.com'},'a2/day-18/../private.mp3',18,400],
+  [{localId:'disabled',email:'moxflex@gmail.com',disabled:true},key,18,401],
+ ]) {
+  const res=response();
+  await createClassroomBankAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({method:'GET',
+   headers:account?{authorization:'Bearer test',origin:'https://admin.falowen.app'}:{},
+   url:`/course-media/a2/classroom-audio-url?${new URLSearchParams({day:String(day),key:requestKey})}`},res);
+  assert.equal(res.code,expected);
+  assert.equal(Boolean(res.body.url),expected===200);
+  if(expected===200) {
+   const url=new URL(res.body.url);
+   assert.match(url.pathname,/^\/a2\/day-18\/bank-telefonat\.mp3$/);
+   assert.equal(url.hostname,`falowen-course-audio.${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`);
+   assert.match(url.searchParams.get('X-Amz-Signature'),/^[a-f0-9]{64}$/);
+   assert.equal(res.headers['Cache-Control'],'private, no-store');
+  }
+ }
+});
