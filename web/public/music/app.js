@@ -155,8 +155,9 @@ function populateFilters() {
   available.forEach(level => levelInput.add(new Option(level, level)));
   const queryLevel=(initialParams.get("level") || "").toUpperCase();
   levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "";
-  dayInput.replaceChildren(new Option("All 28 days", ""));
-  for(let day=1;day<=28;day++) dayInput.add(new Option("Day "+day,String(day)));
+  dayInput.replaceChildren(new Option("Available days", ""));
+  const days = [...new Set(catalog.filter(track => track.category === "lesson" && (!levelInput.value || track.level === levelInput.value)).map(track => track.day).filter(Boolean))].sort((a,b) => a-b);
+  for(const day of days) dayInput.add(new Option("Day "+day,String(day)));
   const queryDay=String(Number(initialParams.get("day")));
   dayInput.value = Number(oldDay)>=1 && Number(oldDay)<=28 ? oldDay
     : Number(queryDay)>=1 && Number(queryDay)<=28 ? queryDay : "";
@@ -194,6 +195,11 @@ function card(track) {
   return article;
 }
 function renderCatalog() {
+  const previousDay = dayInput.value;
+  const days = [...new Set(catalog.filter(track => track.category === "lesson" && (!levelInput.value || track.level === levelInput.value)).map(track => track.day).filter(Boolean))].sort((a,b) => a-b);
+  dayInput.replaceChildren(new Option("Available days", ""));
+  for (const day of days) dayInput.add(new Option("Day " + day, String(day)));
+  dayInput.value = days.includes(Number(previousDay)) ? previousDay : "";
   const q = searchInput.value.trim().toLocaleLowerCase();
   const level = levelInput.value;
   const day = Number(dayInput.value);
