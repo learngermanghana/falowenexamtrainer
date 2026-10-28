@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import AppBackButton from "./navigation/AppBackButton";
 import A2MockSpeakingExaminer from "./A2MockSpeakingExaminer";
 import A2Mock04Hoeren from "./A2Mock04Hoeren";
+import { fetchA2MockAudioPlaybackUrl } from "../services/a2AudioService";
 import { getA2KombiSet } from "../data/a2KombiMockSets";
 import { startA2MockAttempt, saveA2MockAttempt } from "../services/a2FinalMockService";
 import { a2KombiKeys, a2KombiProgress, getA2KombiState, finalizeA2Kombi } from "../services/a2KombiMockFinalization";
@@ -123,12 +124,24 @@ function A2KombiAttempt({mockNumber,paper}) {
     if(!idToken||connecting)return;
     setConnecting(true);setConnectionError("");
     try{
+      // Before opening a new four-module Mock 04 attempt, require all four
+      // teacher-approved R2 recordings to pass server-side SHA-256 verification.
+      // This prevents students from starting an exam with missing Hören audio.
+      // Existing in-progress /75 attempts resume through reconnect(), not begin().
+      if(paper.id==="a2-mock-04"){
+        for(let n=1;n<=4;n++){
+          await fetchA2MockAudioPlaybackUrl({
+            mockId:"mock-04",part:`teil-${n}`,
+            key:`a2/mock-hoeren/mock-04/teil-${n}.mp3`,idToken
+          });
+        }
+      }
       const reply=await startA2MockAttempt({mockId:paper.id,idToken});
       if(!reply?.attemptId)throw new Error("A saved exam attempt was not returned.");
       const next={stage:"lesen",attemptInfo:{attemptId:reply.attemptId,attemptNumber:reply.attemptNumber,firstAttempt:reply.firstAttempt,assessmentVersion:reply.assessmentVersion||"three-module-v1"},startedAt:Date.now()};
       setFlow(next);
       setLesen(old=>({...old,startedAt:old.startedAt||Date.now(),answers:old.answers||{}}));
-    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not connect to exam.");}
+    }catch(error){setConnectionError(error?.response?.data?.error||error.message||"Could not verify all four Hören recordings. Please try again after the MP3s are uploaded.");}
     finally{setConnecting(false);}
   };
 
