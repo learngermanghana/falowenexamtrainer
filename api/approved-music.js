@@ -14,10 +14,10 @@ module.exports = async function approvedMusicHandler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     return res.status(204).end();
   }
-  if (req.method !== 'GET' && req.method !== 'HEAD') {
+  if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET, HEAD, OPTIONS');
     return res.status(405).json({ error: 'Method not allowed' });
   }
