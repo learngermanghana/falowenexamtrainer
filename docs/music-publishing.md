@@ -75,3 +75,5 @@ Timings use the actual MP3 playback clock; pause, seek, repeat and speed changes
 5. Reload the song after the short metadata cache (up to 60 seconds). Both Admin and public Music read the same file. The public Lyrics tab can be available without a quiz; existing quizzes are hidden if the published lyrics differ from their reviewed learning pack.
 
 The read-only `/api/music-lyrics` endpoint is confined to music MP3 sibling files. It rejects private course audio paths, mismatched recordings, incomplete/unordered line timings, and oversized files. A missing timing file leaves existing plain lyrics/audio available. No new Firestore storage, background jobs or bucket permission changes are required. Admin's complete local timing edits take priority until removed/updated on that device.
+
+The five recordings listed in `docs/music-recording-timings.md` already have built-in recording-specific timings. They need no manual marking or R2 timing-file upload. Built-in timings take precedence for those exact MP3 keys. New recordings can still use the manual sidecar workflow.

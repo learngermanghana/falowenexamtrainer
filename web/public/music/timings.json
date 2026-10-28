@@ -1,0 +1,571 @@
+{
+  "version": 1,
+  "description": "Recording-specific line timings aligned locally against the published MP3s. Original songbook drafts remain separate; instrumental gaps have no active line.",
+  "recordings": [
+    {
+      "trackId": "a1-day-04-numbers",
+      "objectKey": "music/a1/day-04/welche-nummer-hast-du.mp3",
+      "lyrics": "Hallo! Guten Tag!\nIch heiße Ben.\nWie heißt du?\nIch heiße Sam.\nWoher kommst du?\nIch komme aus Ghana.\nWo wohnst du?\nIch wohne in Accra.\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\nWie schreibt man Ben?\nB–E–N.\nWie schreibt man Sam?\nS–A–M.\nWie alt bist du?\nIch bin zwanzig Jahre alt.\nWie geht es dir?\nGut, danke! Und dir?\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\nHallo! Ich heiße Ben.\nB–E–N.\nEins, zwei, drei — Falowen!\nAuf Wiedersehen!",
+      "cues": [
+        {
+          "start": 10.5,
+          "end": 13.84,
+          "text": "Hallo! Guten Tag!"
+        },
+        {
+          "start": 14.26,
+          "end": 16.28,
+          "text": "Ich heiße Ben."
+        },
+        {
+          "start": 17.64,
+          "end": 19.02,
+          "text": "Wie heißt du?"
+        },
+        {
+          "start": 21.42,
+          "end": 24.36,
+          "text": "Ich heiße Sam."
+        },
+        {
+          "start": 27.12,
+          "end": 29.62,
+          "text": "Woher kommst du?"
+        },
+        {
+          "start": 30.52,
+          "end": 32.74,
+          "text": "Ich komme aus Ghana."
+        },
+        {
+          "start": 34.24,
+          "end": 36.26,
+          "text": "Wo wohnst du?"
+        },
+        {
+          "start": 37.18,
+          "end": 40.32,
+          "text": "Ich wohne in Accra."
+        },
+        {
+          "start": 42.38,
+          "end": 44.62,
+          "text": "Eins, zwei, drei,"
+        },
+        {
+          "start": 44.62,
+          "end": 47.02,
+          "text": "vier, fünf, sechs."
+        },
+        {
+          "start": 48.3,
+          "end": 50.94,
+          "text": "Sieben, acht, neun, zehn."
+        },
+        {
+          "start": 53.32,
+          "end": 56.34,
+          "text": "Hallo Sam! Hallo Ben!"
+        },
+        {
+          "start": 57.6,
+          "end": 60.5,
+          "text": "Wie ist deine Nummer?"
+        },
+        {
+          "start": 63.52,
+          "end": 65.58,
+          "text": "Vier, fünf, sechs."
+        },
+        {
+          "start": 65.68,
+          "end": 68.1,
+          "text": "Noch einmal, bitte:"
+        },
+        {
+          "start": 68.1,
+          "end": 72.44,
+          "text": "Vier, fünf, sechs."
+        },
+        {
+          "start": 73.12,
+          "end": 75.1,
+          "text": "Wie schreibt man Ben?"
+        },
+        {
+          "start": 76.22,
+          "end": 77.94,
+          "text": "B–E–N."
+        },
+        {
+          "start": 78.82,
+          "end": 80.46,
+          "text": "Wie schreibt man Sam?"
+        },
+        {
+          "start": 80.46,
+          "end": 82.98,
+          "text": "S–A–M."
+        },
+        {
+          "start": 83.34,
+          "end": 88.56,
+          "text": "Wie alt bist du?"
+        },
+        {
+          "start": 89.66,
+          "end": 93.88,
+          "text": "Ich bin zwanzig Jahre alt."
+        },
+        {
+          "start": 96.82,
+          "end": 99.1,
+          "text": "Wie geht es dir?"
+        },
+        {
+          "start": 100.84,
+          "end": 104.44,
+          "text": "Gut, danke! Und dir?"
+        },
+        {
+          "start": 106.26,
+          "end": 108.56,
+          "text": "Eins, zwei, drei,"
+        },
+        {
+          "start": 108.58,
+          "end": 111.0,
+          "text": "vier, fünf, sechs."
+        },
+        {
+          "start": 111.1,
+          "end": 114.94,
+          "text": "Sieben, acht, neun, zehn."
+        },
+        {
+          "start": 114.94,
+          "end": 120.28,
+          "text": "Hallo Sam! Hallo Ben!"
+        },
+        {
+          "start": 120.68,
+          "end": 124.44,
+          "text": "Wie ist deine Nummer?"
+        },
+        {
+          "start": 127.34,
+          "end": 129.5,
+          "text": "Vier, fünf, sechs."
+        },
+        {
+          "start": 129.68,
+          "end": 132.06,
+          "text": "Noch einmal, bitte:"
+        },
+        {
+          "start": 133.02,
+          "end": 136.36,
+          "text": "Vier, fünf, sechs."
+        },
+        {
+          "start": 137.9,
+          "end": 141.64,
+          "text": "Hallo! Ich heiße Ben."
+        },
+        {
+          "start": 142.74,
+          "end": 144.62,
+          "text": "B–E–N."
+        },
+        {
+          "start": 144.62,
+          "end": 147.16,
+          "text": "Eins, zwei, drei — Falowen!"
+        },
+        {
+          "start": 148.76,
+          "end": 150.3,
+          "text": "Auf Wiedersehen!"
+        }
+      ]
+    },
+    {
+      "trackId": "a1-day-22-health",
+      "objectKey": "music/a1/day-22/mein-kopf-tut-weh.mp3",
+      "lyrics": "Am Morgen rufe ich Mia an.\nHallo Mia, bist du da?\nJa, ich bin hier. Wie geht's dir?\nNicht so gut. Mein Kopf tut weh.\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\nMia fragt: Hast du Fieber?\nNein, aber mein Bauch tut weh.\nSie fragt: Brauchst du Hilfe?\nJa, bitte. Komm zu mir.\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\nMia bringt mir Wasser und Tee.\nJetzt geht es mir schon besser.\nDanke, Mia! Gute Nacht.",
+      "cues": [
+        {
+          "start": 10.04,
+          "end": 15.98,
+          "text": "Am Morgen rufe ich Mia an."
+        },
+        {
+          "start": 16.26,
+          "end": 21.44,
+          "text": "Hallo Mia, bist du da?"
+        },
+        {
+          "start": 21.44,
+          "end": 27.96,
+          "text": "Ja, ich bin hier. Wie geht's dir?"
+        },
+        {
+          "start": 28.9,
+          "end": 33.44,
+          "text": "Nicht so gut. Mein Kopf tut weh."
+        },
+        {
+          "start": 34.04,
+          "end": 39.54,
+          "text": "Wie geht's dir? Wie geht's dir?"
+        },
+        {
+          "start": 40.5,
+          "end": 45.54,
+          "text": "Heute geht es mir nicht gut."
+        },
+        {
+          "start": 45.94,
+          "end": 49.96,
+          "text": "Ein Glas Wasser tut mir gut."
+        },
+        {
+          "start": 52.1,
+          "end": 55.9,
+          "text": "Mia fragt: Hast du Fieber?"
+        },
+        {
+          "start": 57.9,
+          "end": 63.96,
+          "text": "Nein, aber mein Bauch tut weh."
+        },
+        {
+          "start": 64.2,
+          "end": 68.66,
+          "text": "Sie fragt: Brauchst du Hilfe?"
+        },
+        {
+          "start": 69.8,
+          "end": 72.86,
+          "text": "Ja, bitte. Komm zu mir."
+        },
+        {
+          "start": 74.48,
+          "end": 80.0,
+          "text": "Wie geht's dir? Wie geht's dir?"
+        },
+        {
+          "start": 80.9,
+          "end": 86.02,
+          "text": "Heute geht es mir nicht gut."
+        },
+        {
+          "start": 86.34,
+          "end": 90.24,
+          "text": "Ein Glas Wasser tut mir gut."
+        },
+        {
+          "start": 114.94,
+          "end": 120.4,
+          "text": "Mia bringt mir Wasser und Tee."
+        },
+        {
+          "start": 121.24,
+          "end": 126.86,
+          "text": "Jetzt geht es mir schon besser."
+        },
+        {
+          "start": 128.58,
+          "end": 133.78,
+          "text": "Danke, Mia! Gute Nacht."
+        }
+      ]
+    },
+    {
+      "trackId": "a2-day-18-bank",
+      "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3",
+      "lyrics": "Heute möchte ich mit meiner Karte bezahlen.\nAber das Gerät zeigt einen Fehler.\nZu Hause rufe ich meine Bank an.\nEine Mitarbeiterin fragt nach dem Problem.\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\nWir finden gemeinsam eine Lösung.\nSie prüft meine Angaben am Telefon.\nDann erklärt sie mir den nächsten Schritt.\nIch soll die Karte noch einmal testen.\nAm Nachmittag klappt die Zahlung wieder.\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\nIch bedanke mich für die Hilfe.\nIch bedanke mich für die Hilfe.\nDas Problem ist endlich gelöst.\nBei Falowen übe ich schwierige Telefonate.",
+      "cues": [
+        {
+          "start": 11.74,
+          "end": 17.42,
+          "text": "Heute möchte ich mit meiner Karte bezahlen."
+        },
+        {
+          "start": 18.0,
+          "end": 21.6,
+          "text": "Aber das Gerät zeigt einen Fehler."
+        },
+        {
+          "start": 23.24,
+          "end": 28.58,
+          "text": "Zu Hause rufe ich meine Bank an."
+        },
+        {
+          "start": 28.58,
+          "end": 33.94,
+          "text": "Eine Mitarbeiterin fragt nach dem Problem."
+        },
+        {
+          "start": 34.58,
+          "end": 39.7,
+          "text": "Guten Tag, ich habe eine Frage."
+        },
+        {
+          "start": 40.58,
+          "end": 44.44,
+          "text": "Können Sie mir bitte helfen?"
+        },
+        {
+          "start": 45.42,
+          "end": 51.12,
+          "text": "Wir finden gemeinsam eine Lösung."
+        },
+        {
+          "start": 51.12,
+          "end": 55.4,
+          "text": "Wir finden gemeinsam eine Lösung."
+        },
+        {
+          "start": 56.74,
+          "end": 61.68,
+          "text": "Sie prüft meine Angaben am Telefon."
+        },
+        {
+          "start": 63.08,
+          "end": 67.12,
+          "text": "Dann erklärt sie mir den nächsten Schritt."
+        },
+        {
+          "start": 68.48,
+          "end": 73.64,
+          "text": "Ich soll die Karte noch einmal testen."
+        },
+        {
+          "start": 74.04,
+          "end": 77.46,
+          "text": "Am Nachmittag klappt die Zahlung wieder."
+        },
+        {
+          "start": 77.46,
+          "end": 84.38,
+          "text": "Guten Tag, ich habe eine Frage."
+        },
+        {
+          "start": 84.98,
+          "end": 88.66,
+          "text": "Können Sie mir bitte helfen?"
+        },
+        {
+          "start": 90.82,
+          "end": 95.7,
+          "text": "Wir finden gemeinsam eine Lösung."
+        },
+        {
+          "start": 112.9,
+          "end": 116.46,
+          "text": "Ich bedanke mich für die Hilfe."
+        },
+        {
+          "start": 117.22,
+          "end": 122.14,
+          "text": "Ich bedanke mich für die Hilfe."
+        },
+        {
+          "start": 124.44,
+          "end": 129.4,
+          "text": "Das Problem ist endlich gelöst."
+        },
+        {
+          "start": 130.02,
+          "end": 136.08,
+          "text": "Bei Falowen übe ich schwierige Telefonate."
+        }
+      ]
+    },
+    {
+      "trackId": "r2-a2-day-19-lieber-online-oder-im-laden",
+      "objectKey": "music/a2/day-19/lieber-online-oder-im-laden.mp3",
+      "lyrics": "Mia braucht neue Schuhe für den Winter.\nOnline findet sie ein günstiges Paar.\nDoch sie kennt ihre Größe nicht genau.\nDarum gehen wir zuerst in ein Geschäft.\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl, die richtige Wahl.\nIm Geschäft probiert Mia zwei Paare.\nDas zweite sitzt viel bequemer.\nDer Preis ist auch in Ordnung.\nMia kauft es gleich und ist zufrieden.\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl, die richtige Wahl.\nZu Hause stellt sie die Schuhe ins Regal.\nJetzt kann der Winter kommen.\nMit Falowen kann ich Preise vergleichen.",
+      "cues": [
+        {
+          "start": 10.02,
+          "end": 14.78,
+          "text": "Mia braucht neue Schuhe für den Winter."
+        },
+        {
+          "start": 15.72,
+          "end": 20.2,
+          "text": "Online findet sie ein günstiges Paar."
+        },
+        {
+          "start": 20.2,
+          "end": 25.04,
+          "text": "Doch sie kennt ihre Größe nicht genau."
+        },
+        {
+          "start": 25.62,
+          "end": 30.18,
+          "text": "Darum gehen wir zuerst in ein Geschäft."
+        },
+        {
+          "start": 30.96,
+          "end": 36.28,
+          "text": "Wo kaufen wir am besten ein?"
+        },
+        {
+          "start": 36.72,
+          "end": 40.92,
+          "text": "Wir schauen, fragen, vergleichen."
+        },
+        {
+          "start": 40.92,
+          "end": 50.18,
+          "text": "Dann treffen wir die richtige Wahl, die richtige Wahl."
+        },
+        {
+          "start": 61.54,
+          "end": 65.84,
+          "text": "Im Geschäft probiert Mia zwei Paare."
+        },
+        {
+          "start": 65.84,
+          "end": 71.0,
+          "text": "Das zweite sitzt viel bequemer."
+        },
+        {
+          "start": 71.52,
+          "end": 76.2,
+          "text": "Der Preis ist auch in Ordnung."
+        },
+        {
+          "start": 76.9,
+          "end": 81.46,
+          "text": "Mia kauft es gleich und ist zufrieden."
+        },
+        {
+          "start": 82.44,
+          "end": 87.32,
+          "text": "Wo kaufen wir am besten ein?"
+        },
+        {
+          "start": 87.84,
+          "end": 91.88,
+          "text": "Wir schauen, fragen, vergleichen."
+        },
+        {
+          "start": 91.88,
+          "end": 101.08,
+          "text": "Dann treffen wir die richtige Wahl, die richtige Wahl."
+        },
+        {
+          "start": 112.14,
+          "end": 116.84,
+          "text": "Zu Hause stellt sie die Schuhe ins Regal."
+        },
+        {
+          "start": 116.84,
+          "end": 121.96,
+          "text": "Jetzt kann der Winter kommen."
+        },
+        {
+          "start": 123.0,
+          "end": 132.2,
+          "text": "Mit Falowen kann ich Preise vergleichen."
+        }
+      ]
+    },
+    {
+      "trackId": "r2-a2-day-20-b64_SMO2ZmxpY2ggcmVrbGFtaWVyZW4ubXAz",
+      "objectKey": "music/a2/day-20/Höflich reklamieren.mp3",
+      "lyrics": "Vor einer Woche habe ich eine Jacke gekauft.\nHeute merke ich: Sie ist zu klein.\nIch finde noch den Kassenbon.\nDann gehe ich zurück ins Geschäft.\nEntschuldigung, ich habe ein Problem.\nKönnen wir das bitte klären?\nWir sprechen ruhig miteinander.\nDie Verkäuferin fragt nach dem Kaufdatum.\nIch zeige ihr den Kassenbon.\nSie bringt die Jacke eine Nummer größer.\nJetzt passt sie mir sehr gut.\nEntschuldigung, ich habe ein Problem.\nKönnen wir das bitte klären?\nWir sprechen ruhig miteinander.\nIch sage danke für die Hilfe.\nSo endet der Tag doch noch schön.\nBei Falowen lerne ich, höflich zu reklamieren.",
+      "cues": [
+        {
+          "start": 8.98,
+          "end": 15.24,
+          "text": "Vor einer Woche habe ich eine Jacke gekauft."
+        },
+        {
+          "start": 15.5,
+          "end": 19.6,
+          "text": "Heute merke ich: Sie ist zu klein."
+        },
+        {
+          "start": 20.72,
+          "end": 24.04,
+          "text": "Ich finde noch den Kassenbon."
+        },
+        {
+          "start": 24.44,
+          "end": 27.52,
+          "text": "Dann gehe ich zurück ins Geschäft."
+        },
+        {
+          "start": 33.08,
+          "end": 36.82,
+          "text": "Entschuldigung, ich habe ein Problem."
+        },
+        {
+          "start": 37.22,
+          "end": 39.98,
+          "text": "Können wir das bitte klären?"
+        },
+        {
+          "start": 40.46,
+          "end": 43.52,
+          "text": "Wir sprechen ruhig miteinander."
+        },
+        {
+          "start": 47.72,
+          "end": 51.46,
+          "text": "Die Verkäuferin fragt nach dem Kaufdatum."
+        },
+        {
+          "start": 52.5,
+          "end": 57.6,
+          "text": "Ich zeige ihr den Kassenbon."
+        },
+        {
+          "start": 57.6,
+          "end": 63.4,
+          "text": "Sie bringt die Jacke eine Nummer größer."
+        },
+        {
+          "start": 63.4,
+          "end": 68.76,
+          "text": "Jetzt passt sie mir sehr gut."
+        },
+        {
+          "start": 71.1,
+          "end": 74.94,
+          "text": "Entschuldigung, ich habe ein Problem."
+        },
+        {
+          "start": 75.32,
+          "end": 78.14,
+          "text": "Können wir das bitte klären?"
+        },
+        {
+          "start": 78.58,
+          "end": 81.64,
+          "text": "Wir sprechen ruhig miteinander."
+        },
+        {
+          "start": 83.96,
+          "end": 87.62,
+          "text": "Ich sage danke für die Hilfe."
+        },
+        {
+          "start": 88.96,
+          "end": 92.88,
+          "text": "So endet der Tag doch noch schön."
+        },
+        {
+          "start": 94.88,
+          "end": 104.1,
+          "text": "Bei Falowen lerne ich, höflich zu reklamieren."
+        }
+      ]
+    }
+  ]
+}

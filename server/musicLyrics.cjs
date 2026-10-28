@@ -2,6 +2,7 @@
 const { musicTrackFromKey, musicKeyFromAutoId } = require('./musicDiscovery.cjs');
 const { signObject } = require('./courseMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
+const builtInTimings = require('../web/public/music/timings.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey || !Array.isArray(data.cues) || !data.cues.length || data.cues.length > 500) return null;
   const lyrics = typeof data.lyrics === 'string' ? data.lyrics : data.cues.map(c => c?.text || '').join('\n');
@@ -13,7 +14,8 @@ function validateLyrics(data, objectKey) {
   for (let i = 0; i < lines.length; i++) {
     const cue = data.cues[i];
     if (!lines[i] || lines[i].length > 1000 || cue?.text !== lines[i] || !Number.isFinite(cue.start) || cue.start < 0 || cue.start > 7200 || cue.start <= previous) return null;
-    cues.push({start:cue.start,text:cue.text}); previous = cue.start;
+    if (cue.end !== undefined && (!Number.isFinite(cue.end) || cue.end <= cue.start || cue.end > 7200)) return null;
+    cues.push({start:cue.start,text:cue.text,...(cue.end !== undefined ? {end:cue.end} : {})}); previous = cue.start;
   }
   return { objectKey, lyrics, cues };
 }
@@ -24,7 +26,7 @@ async function readBounded(response) {
   finally { await reader.cancel().catch(()=>{}); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
-function createLyricsHandler({env=process.env,fetchImpl=fetch}={}) {
+function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTimings}={}) {
   return async (req,res) => {
     res.setHeader('Access-Control-Allow-Origin','*');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -35,6 +37,9 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch}={}) {
     const pinned=catalog.tracks.find(t=>t.id===id && t.approved===true);
     const objectKey=key || pinned?.objectKey || musicKeyFromAutoId(id);
     if(!musicTrackFromKey(objectKey)) return res.status(404).json({error:'Lyrics not published'});
+    const recorded = timings.recordings?.find(pack => pack.objectKey === objectKey);
+    const checkedRecording = validateLyrics(recorded, objectKey);
+    if (checkedRecording) return res.status(200).json(checkedRecording);
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
