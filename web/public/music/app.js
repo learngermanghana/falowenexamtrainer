@@ -119,20 +119,20 @@ function populateFeatured() {
 }
 function populateFilters() {
   const available = ["A1","A2","B1","B2","C1","C2"];
+  const oldLevel = levelInput.value, oldDay = dayInput.value, oldGenre = genreInput.value;
   levelInput.replaceChildren();
   available.forEach(level => levelInput.add(new Option(level, level)));
+  const queryLevel=(initialParams.get("level") || "").toUpperCase();
+  levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "A1";
   dayInput.replaceChildren(new Option("All 28 days", ""));
   for(let day=1;day<=28;day++) dayInput.add(new Option("Day "+day,String(day)));
+  const queryDay=String(Number(initialParams.get("day")));
+  dayInput.value = Number(oldDay)>=1 && Number(oldDay)<=28 ? oldDay
+    : Number(queryDay)>=1 && Number(queryDay)<=28 ? queryDay : "";
   const genres = [...new Set(catalog.map(track => track.genre).filter(Boolean))].sort();
-  const oldGenre = genreInput.value;
   genreInput.replaceChildren(new Option("All genres", ""));
   genres.forEach(genre => genreInput.add(new Option(genre, genre)));
   if(genres.includes(oldGenre)) genreInput.value=oldGenre;
-  const queryLevel=(initialParams.get("level") || "").toUpperCase();
-  if(available.includes(queryLevel)) levelInput.value=queryLevel;
-  else if(!levelInput.value) levelInput.value="A1";
-  const queryDay=String(Number(initialParams.get("day")));
-  if(Number(queryDay)>=1 && Number(queryDay)<=28) dayInput.value=queryDay;
 }
 function card(track) {
   const article = el("article", "track-card");
