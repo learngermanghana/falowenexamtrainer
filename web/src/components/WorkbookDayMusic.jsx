@@ -6,7 +6,7 @@ import { styles } from "../styles";
 // Uploads to music/<level>/day-XX/ are discovered through the existing
 // bounded server-side R2 music-list endpoint, not direct browser R2 access.
 const SONG_ID = /^[a-zA-Z0-9_-]{1,245}$/;
-const LEVELS = new Set(["A2", "B1"]);
+const LEVELS = new Set(["A1", "A2", "B1"]);
 
 export const normalizeWorkbookSong = (track, level, day) => {
   if (!track || !SONG_ID.test(String(track.id || ""))) return null;
@@ -33,7 +33,7 @@ const listenLinkFor = (song) => song.autoDiscovered
   ? `https://music.falowen.app/?track=${encodeURIComponent(song.id)}`
   : `https://music.falowen.app/music/songs/${song.id}.html`;
 
-export default function WorkbookDayMusic({ level, day, title = "", workbookId = "" }) {
+export default function WorkbookDayMusic({ level, day, title = "", workbookId = "", learningMode = "tutor", hideLegacyNotes = false, compact = false }) {
   const courseLevel = String(level || "").trim().toUpperCase();
   const lessonDay = Number(day);
   const valid = LEVELS.has(courseLevel) && Number.isInteger(lessonDay) && lessonDay >= 1 && lessonDay <= 28;
@@ -90,19 +90,23 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
 
   return (
     <section data-workbook-music="true" data-music-level={courseLevel} data-music-day={lessonDay}
-      style={{ ...styles.card, display: "grid", gap: 14 }}>
+      style={{ ...(compact ? {} : styles.card), display: "grid", gap: 14, padding: compact ? "10px 0 4px" : undefined }}>
       <div style={{ display: "grid", gap: 5 }}>
         <span style={{ width: "fit-content", borderRadius: 999, background: "#e3f5e7",
           color: "#1c6641", padding: "5px 11px", fontWeight: 800, fontSize: 12 }}>
           OPTIONAL LISTENING · NOT AN ASSIGNMENT
         </span>
-        <h2 style={{ margin: 0, fontSize: "1.45rem", color: "#164e36" }}>
+        <h2 style={{ margin: 0, fontSize: compact ? "1.12rem" : "1.45rem", color: "#164e36" }}>
           Music · {courseLevel} Day {lessonDay}
         </h2>
         <p style={{ color: "#475569", lineHeight: 1.7, margin: 0 }}>
           Enjoy the song for this lesson and follow the German lyrics when available.
           No answers, submission, AI marking, score or music-specific deadline are required.
-          Assessed Teil 4 · Hören remains separate.
+          {courseLevel === "A1"
+            ? (learningMode === "self"
+              ? " Self-learning exercises and Radio are separate from Music."
+              : " Tutor-marked assignments and their submission remain separate from Music.")
+            : " Assessed Teil 4 · Hören remains separate."}
         </p>
       </div>
 
@@ -154,7 +158,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           )}
         </div>
       ) : null}
-      <details data-preserved-workbook-notes="true">
+      {!hideLegacyNotes ? <details data-preserved-workbook-notes="true">
         <summary style={{ cursor: "pointer", color: "#475569", fontWeight: 700, fontSize: 13 }}>
           My saved notes (from the previous Ref tab)
         </summary>
@@ -163,7 +167,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
             lesson={{ level: courseLevel, day: lessonDay, title, workbookId }}
             workbookId={workbookId} />
         </div>
-      </details>
+      </details> : null}
     </section>
   );
 }
