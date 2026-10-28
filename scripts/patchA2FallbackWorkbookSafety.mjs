@@ -38,7 +38,7 @@ if (!guidanceSource.includes(fallbackSubmissionMarker)) {
   { key: "schreiben", legacyKey: "teil2", match: /\\bteil\\s*2\\b|schreiben|write/i },
   { key: "lesen", legacyKey: "teil3", match: /\\bteil\\s*3\\b|lesen|read/i },
   { key: "hoeren", legacyKey: "teil4", match: /\\bteil\\s*4\\b|h[oö]ren|hoeren|listen/i },
-  { key: "references", legacyKey: "ref", match: /\\bref\\b|reference|answers|antwort/i },
+  { key: "references", legacyKey: "ref", match: /\\bmusic\\b|\\bref\\b|reference|answers|antwort/i },
   { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
 ];`;
   // The A2/B1 workbook may rename its non-assessed Ref tab to Music.
@@ -99,7 +99,7 @@ if (!guidanceSource.includes(day25TabsMarker)) {
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "lesen2", label: "Teil 4", description: "Lesen" },
-  { key: "references", label: "Ref", description: "Notes" },
+  { key: "references", label: "Music", description: "Optional" },
   { key: "submit", label: "Submit", description: "Send work" },
 ];
 
