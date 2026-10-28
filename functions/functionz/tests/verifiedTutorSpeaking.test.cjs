@@ -1,6 +1,6 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
-const {genericTutorTask,parseGenericTutorScore,saveTutorSpeakingAssessment}=require('../verifiedTutorSpeaking');
+const {genericTutorTask,genericTutorPrompt,parseGenericTutorScore,saveTutorSpeakingAssessment}=require('../verifiedTutorSpeaking');
 test('only registered checkpoint tasks are accepted and score validation fails closed',()=>{
  assert.equal(genericTutorTask('A1 tutor checkpoint A1-4','1').assignmentKey,'A1-4');
  assert.equal(genericTutorTask('A1 tutor checkpoint A1-4','3'),null);
@@ -14,4 +14,14 @@ test('receipt is server-owned and stores marks without audio or transcript',asyn
  const result=await saveTutorSpeakingAssessment({db,uid:'u1',assignmentKey:'A1-11',scored:{score:8,maxScore:10,feedback:'Good',cardId:'stift',cardLabel:'Stift',transcript:'not persisted',audio:'not persisted'}});
  assert.deepEqual(result,{assessmentId:'receipt123',verified:true});
  assert.equal(saved.uid,'u1');assert.equal(saved.score,8);assert.equal(saved.transcript,undefined);assert.equal(saved.audio,undefined);
+});
+
+test('Day 4 number-speaking feedback does not treat ASR numerals as typed answers',()=>{
+ const phone=genericTutorTask('A1 tutor checkpoint A1-2','1');
+ const prompt=genericTutorPrompt(phone);
+ assert.match(prompt,/Speech recognition commonly converts SPOKEN German digits into numeric symbols/);
+ assert.match(prompt,/Credit an intelligible phone-number sequence/);
+ assert.match(prompt,/Never ask a speaking learner to write out digits/);
+ const introduction=genericTutorPrompt(genericTutorTask('A1 tutor checkpoint A1-4','1'));
+ assert.doesNotMatch(introduction,/phone-number sequence/);
 });
