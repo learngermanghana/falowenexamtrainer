@@ -274,6 +274,9 @@ function renderDetail(track) {
     ? "First listen without reading. " + lesson.summary + ". Which key words can you hear?"
     : "Listen, relax and enjoy this Falowen classroom song. You can play it again with the repeat control.";
   byId("course-link").hidden = !hasLesson;
+  if (hasLesson) byId("course-link").href = /^https:\/\/www\.falowen\.app\/campus\/course\/[a-z0-9-]+$/.test(lesson.courseUrl || "")
+    ? lesson.courseUrl : "https://www.falowen.app/campus"; 
+  byId("listen-next").hidden = !hasLesson;
   for (const tab of ["lyrics","practice"]) {
     document.querySelector('[data-tab="' + tab + '"]').hidden = !hasLesson;
   }
