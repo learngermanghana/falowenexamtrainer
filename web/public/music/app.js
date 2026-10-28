@@ -29,7 +29,7 @@ function safeAudioUrl(value) {
   } catch { return ""; }
 }
 function safeTrack(row) {
-  if (!row || typeof row !== "object" || !/^[a-z0-9-]{1,90}$/.test(String(row.id || ""))) return null;
+  if (!row || typeof row !== "object" || !/^[a-zA-Z0-9_-]{1,245}$/.test(String(row.id || ""))) return null;
   const audioUrl = safeAudioUrl(row.audioUrl);
   if (!audioUrl || !row.title) return null;
   const level = String(row.level || "ALL").toUpperCase();
