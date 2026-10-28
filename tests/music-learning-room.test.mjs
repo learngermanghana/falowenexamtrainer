@@ -146,6 +146,12 @@ test('only music/<level>/day-XX/ lowercase named MP3 files can auto-publish', as
   assert.equal(track.day,19);
   assert.equal(track.level,'A2');
   assert.equal(musicKeyFromAutoId(track.id),good);
+  for (const filename of ['Shopping Song (Final).mp3','A2_day_19_music.mp3','NewSong2026.mp3']) {
+    const key='music/a2/day-19/'+filename;
+    const detected=musicTrackFromKey(key);
+    assert.ok(detected,'ordinary MP3 filenames must auto-appear');
+    assert.equal(musicKeyFromAutoId(detected.id),key);
+  }
   for (const key of [
     'a2/day-19/einkaufen-wo-und-wie.mp3',
     'music/a2/day-19/../../a2/private.mp3',
