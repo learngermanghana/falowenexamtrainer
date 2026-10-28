@@ -6,7 +6,7 @@
 
 ## Automatic upload-to-website flow
 
-1. In the private Cloudflare R2 bucket **falowen-course-audio**, upload a reviewed MP3 to a music-only folder with this exact convention: `music/a2/day-19/lieber-online-oder-im-laden.mp3` (replace level/day and filename appropriately). Use lowercase ASCII letters, digits, hyphens and `.mp3`.
+1. In the private Cloudflare R2 bucket **falowen-course-audio**, upload a reviewed MP3 to a music-only folder with this exact convention: `music/a2/day-19/lieber-online-oder-im-laden.mp3` (replace level/day and filename appropriately). Use the exact lowercase level/day folders and an `.mp3` file. Song filenames may contain letters, digits, spaces, underscores, hyphens or parentheses; the server handles these safely.
 2. Open **https://music.falowen.app/**, select the A2 level, and find **Day 19**. The website performs a **single on-demand `ListObjectsV2` request** scoped to the `music/` prefix. The server returns only files matching strict `music/(a1|a2|b1|b2|c1|c2)/day-01..28/*.mp3` patterns.
 3. The day changes from **"No song yet"** to the new track, using the filename as its initial title. Its Play button uses a short-lived R2 signed GET URL created server-side; the private R2 credentials never reach the browser.
 4. If it is not visible immediately, press **Refresh songs**. The listing is cached around 45 seconds to limit R2 requests. No cron job, Firestore database, or scheduled scanner is needed.
