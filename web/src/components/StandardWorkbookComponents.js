@@ -17,7 +17,7 @@ export const A2_B1_WORKBOOK_TABS = [
   { key: "schreiben", label: "Teil 2", description: "Schreiben" },
   { key: "lesen", label: "Teil 3", description: "Lesen" },
   { key: "hoeren", label: "Teil 4", description: "Hören" },
-  { key: "references", label: "Ref", description: "Notes" },
+  { key: "references", label: "Music", description: "Optional" },
   { key: "submit", label: "Submit", description: "Send work" },
 ];
 
