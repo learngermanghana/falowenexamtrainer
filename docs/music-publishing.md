@@ -1,14 +1,25 @@
 # Publishing approved music to music.falowen.app
 
-**An MP3 uploaded to Cloudflare R2 is not automatically published.** This is intentional: `falowen-course-audio` also contains private course Hören recordings. The public library must never list arbitrary objects from the bucket.
+**NEW: Approved songs uploaded to the dedicated `music/` folder automatically appear on the website after a refresh.** The public site shows all 28 days for each A1–C2 level. An empty day says "No song yet" until it has a recording.
 
-## Current architecture
+**Important privacy rule:** Uploading a file under `music/<level>/day-XX/` now counts as **approving it for public listening**. Never upload private Hören conversations, unreviewed audio, copyrighted content without rights, or student recordings into `music/`. The separate private course audio areas (`a1/`, `a2/`, `b1/`, etc.) remain inaccessible to public music discovery.
 
-1. A teacher uploads and listens to a final, approved MP3 under `falowen-course-audio/music/<level>/day-XX/<filename>.mp3`. The **exact key including the filename** is required.
-2. The approved song is registered in `web/public/music/catalog.json` with `approved: true` and `audioUrl: https://www.falowen.app/api/music?track=<id>`. The catalogue is the **single publication allowlist**. Only keys under `music/<level>/day-XX/` are accepted by the API. The private R2 bucket remains private.
-3. The learner site is built and deployed to `www.falowen.app` / `music.falowen.app`. The public `/api/music?track=<id>` API signs a short-lived (15-minute) R2 GET URL for each approved track, with no public object listing or user-supplied R2 keys.
-4. If matching final-audio-approved learning assets are available in `web/public/music/learning.json`, the song detail page also shows complete lyrics, vocabulary, listening questions and speaking practice. Otherwise, **the song is listen-only**, with no invented learning content.
-5. The song's shareable static page is `web/public/music/songs/<id>.html`, with its own title and social previews. The library fetches the catalogue once per page visit. It does not scan R2, run a background job, or call AI.
+## Automatic upload-to-website flow
+
+1. In the private Cloudflare R2 bucket **falowen-course-audio**, upload a reviewed MP3 to a music-only folder with this exact convention: `music/a2/day-19/lieber-online-oder-im-laden.mp3` (replace level/day and filename appropriately). Use lowercase ASCII letters, digits, hyphens and `.mp3`.
+2. Open **https://music.falowen.app/**, select the A2 level, and find **Day 19**. The website performs a **single on-demand `ListObjectsV2` request** scoped to the `music/` prefix. The server returns only files matching strict `music/(a1|a2|b1|b2|c1|c2)/day-01..28/*.mp3` patterns.
+3. The day changes from **"No song yet"** to the new track, using the filename as its initial title. Its Play button uses a short-lived R2 signed GET URL created server-side; the private R2 credentials never reach the browser.
+4. If it is not visible immediately, press **Refresh songs**. The listing is cached around 45 seconds to limit R2 requests. No cron job, Firestore database, or scheduled scanner is needed.
+5. Existing manually approved catalog songs still appear with their curated titles, genres and linked lyrics/questions. An automatic discovery of the same R2 object is deduplicated. **New files remain listen-only until their lyrics/quiz are reviewed and added separately.**
+6. The R2 API token configured on the learner Vercel project must permit **listing objects** under `music/`. If it does not, the page displays a discovery warning and preserves existing approved songs. Do not loosen public bucket permissions.
+
+### A2 Day 19
+
+Your Cloudflare dashboard link `?prefix=music%2Fa2%2Fday-19%2F` shows the directory only. A file like `music/a2/day-19/lieber-online-oder-im-laden.mp3` (illustrative filename) will be picked up automatically; the actual file name was not visible from the shared link. **The Hören conversation** `a2/day-19/einkaufen-wo-und-wie.mp3` **must remain private** and is never listed as music.
+
+## Manual curation is now optional
+
+For better display titles, search metadata, curated audio/lyrics alignment, and permanent per-song SEO pages, you may still register a reviewed MP3 in `web/public/music/catalog.json` using the helper below. This is **not required to make a newly uploaded song playable**.
 
 ## Single-command manual registration
 
@@ -29,7 +40,7 @@ Prepare a temporary JSON input outside the repository (sample below). **Never en
 }
 ```
 
-**This is a template, not a published entry.** Replace the placeholder title and `EXACT-APPROVED-FILENAME.mp3` with the verified final MP3 data before publishing. Filenames must use lowercase letters, digits and hyphens.
+**This optional metadata template is not a published entry.** Replace the placeholder title and `EXACT-APPROVED-FILENAME.mp3` with the verified final MP3 data before publishing. Filenames must use lowercase letters, digits and hyphens.
 
 After confirming the object exists in Cloudflare R2, listening through the complete audio, checking the commercial rights, and approving the final lyrics:
 
@@ -39,7 +50,7 @@ node scripts/publishApprovedMusic.mjs --file /path/to/approved-track.json --appl
 node --test tests/music-learning-room.test.mjs
 ```
 
-The first command is a dry run. The second makes the catalog entry and creates the shareable song-detail HTML file; review both changes in a PR. It does **not** generate, download or upload any MP3s; it also does not deploy or change bucket permissions. Only merge and release after review. Existing songs are rejected on duplicate IDs/keys.
+The first command is a dry run. The second adds optional curated metadata and a dedicated SEO share page; review both changes in a PR. It does **not** generate, download or upload any MP3s; it also does not deploy or change bucket permissions. Only merge and release after review. Existing songs are rejected on duplicate IDs/keys.
 
 ## Why A2 Day 19 is currently missing
 
@@ -51,4 +62,4 @@ The separate A2 Day 19 classroom Hören recording `a2/day-19/einkaufen-wo-und-wi
 
 The three initial learning packs are copies of teacher-approved original Falowen song lyrics and reviewed questions from the Admin songbook. All questions are ungraded practice. If an uploaded MP3 has different lyrics, **listen and update the learning pack before enabling questions**. A newly registered song without a matching reviewed pack is playable, but has no quiz or lyrics until explicitly reviewed.
 
-The platform remains on the existing learner Vercel deployment with the original signed R2 flow. Do not enable the bucket's public access, create another music-generation call, or introduce Firestore reads, background scans or scheduled publishing.
+The platform remains on the existing learner Vercel deployment with the original signed R2 flow plus on-demand music-only discovery. Do not enable the bucket's public access, create another music-generation call, or introduce Firestore reads, background scans or scheduled publishing.
