@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+const { musicKeyFromAutoId, musicTrackFromKey, listMusicTracks, parseMusicList, signatureForList } = require('../server/musicDiscovery.cjs');
 import { validateApprovedTrack, generateSongPage, publishApprovedTrack } from '../scripts/publishApprovedMusic.mjs';
 
 const file = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
@@ -17,7 +20,8 @@ function api() {
       signedCalls.push(options);
       return 'https://signed.invalid/music.mp3';
     } };
-    if (id.includes('courseMusic.cjs')) return { signTrack: id => ({ url: 'https://signed.invalid/' + id }) };
+    if (id.includes('courseMusic.cjs')) return { signTrack: id => ({ url: 'https://signed.invalid/' + id }), signObject: ({key}) => {signedCalls.push({key});return {url:'https://signed.invalid/'+key};} };
+    if (id.includes('musicDiscovery.cjs')) return { musicKeyFromAutoId };
     throw new Error('Unexpected import ' + id);
   };
   const module = { exports: {} };
@@ -119,4 +123,74 @@ test('all five static share pages have grounded metadata and the common learning
   assert.match(js,/setPlayer\(track/);
   assert.match(js,/audio.loop/);
   assert.match(js,/hasLesson/);
+});
+
+test('all 28 days are visible in each level and new music uploads require no site build', () => {
+  const js=file('web/public/music/app.js');
+  assert.match(js,/Array\.from\(\{length:28\}/);
+  assert.match(js,/const available = \["A1","A2","B1","B2","C1","C2"\]/);
+  assert.match(js,/No song yet/);
+  assert.match(js,/\/api\/music-library/);
+  assert.match(js,/byId\("refresh-music"\)/);
+  assert.match(js,/pinnedKeys/);
+  assert.match(js,/dynamic\.filter/);
+  assert.match(file('web/public/music/index.html'),/Refresh songs/);
+  const vercel=JSON.parse(file('vercel.json'));
+  assert.ok(vercel.routes.find(r=>r.src==='/api/music-library' && r.dest==='/api/music-library.js'));
+});
+test('only music/<level>/day-XX/ lowercase named MP3 files can auto-publish', async () => {
+  const good='music/a2/day-19/lieber-online-oder-im-laden.mp3';
+  const track=musicTrackFromKey(good);
+  assert.ok(track);
+  assert.equal(track.id,'r2-a2-day-19-lieber-online-oder-im-laden');
+  assert.equal(track.day,19);
+  assert.equal(track.level,'A2');
+  assert.equal(musicKeyFromAutoId(track.id),good);
+  for (const key of [
+    'a2/day-19/einkaufen-wo-und-wie.mp3',
+    'music/a2/day-19/../../a2/private.mp3',
+    'music/a2/day-00/invalid.mp3',
+    'music/a2/day-29/invalid.mp3',
+    'music/a2/day-19/private.wav',
+    'music/a2/day-19/Secret.MP3',
+    'music/a2/day-19/x.mp3?private=true',
+    'music/a2/day-19/folder/file.mp3'
+  ]) assert.equal(musicTrackFromKey(key),null);
+  for(const key of ['a2/day-19/hoeren.mp3','music/a2/day-19/../private','r2-a2-day-19-../hidden'])
+    assert.equal(musicKeyFromAutoId(key),'');
+  const {handler, signedCalls}=api();
+  const res=response();
+  await handler({method:'GET',query:{track:track.id}},res);
+  assert.equal(res.statusCode,302);
+  assert.equal(signedCalls.at(-1).key,good);
+});
+test('bounded R2 LIST only reads music prefix, never Hören or arbitrary keys',async()=>{
+  const xml=[
+    '<?xml version="1.0"?>',
+    '<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">',
+    '<IsTruncated>false</IsTruncated>',
+    '<Contents><Key>music/a2/day-19/lieber-online-oder-im-laden.mp3</Key></Contents>',
+    '<Contents><Key>a2/day-19/einkaufen-wo-und-wie.mp3</Key></Contents>',
+    '<Contents><Key>music/a2/day-19/secret.wav</Key></Contents>',
+    '</ListBucketResult>'
+  ].join('');
+  const parsed=parseMusicList(xml);
+  assert.deepEqual(parsed.keys,['music/a2/day-19/lieber-online-oder-im-laden.mp3']);
+  const env={R2_ACCOUNT_ID:'886b2264d12c796d29879a8e919a2f46',
+    R2_ACCESS_KEY_ID:'testAccess',R2_SECRET_ACCESS_KEY:'testSecret',
+    R2_AUDIO_BUCKET:'falowen-course-audio'};
+  let requests=0;
+  const now=()=>new Date('2026-10-28T12:00:00Z');
+  const signed=signatureForList(env,'',now());
+  assert.match(signed,/prefix=music%2F/);
+  assert.doesNotMatch(signed,/prefix=a2%2F/);
+  const tracks=await listMusicTracks({env,now,fetchImpl:async url=>{
+    requests++;
+    assert.match(url,/prefix=music%2F/);
+    return {ok:true,text:async()=>xml};
+  }});
+  assert.equal(requests,1);
+  assert.equal(tracks.length,1);
+  assert.equal(tracks[0].day,19);
+  assert.equal(tracks[0].level,'A2');
 });
