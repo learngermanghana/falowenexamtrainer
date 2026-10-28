@@ -423,6 +423,10 @@
       "dest": "/api/placement-attempts.js"
     },
     {
+      "src": "/api/music",
+      "dest": "/api/approved-music.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
