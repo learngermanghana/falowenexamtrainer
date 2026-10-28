@@ -1,0 +1,35 @@
+name: Falowen Music learning room
+
+on:
+  pull_request:
+    paths:
+      - 'web/public/music/**'
+      - 'api/approved-music.js'
+      - 'scripts/publishApprovedMusic.mjs'
+      - 'tests/music-learning-room.test.mjs'
+      - '.github/workflows/music-learning-room.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'web/public/music/**'
+      - 'api/approved-music.js'
+      - 'scripts/publishApprovedMusic.mjs'
+      - 'tests/music-learning-room.test.mjs'
+
+jobs:
+  validate-music:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Parse music JS and publishing script
+        run: |
+          node --check web/public/music/app.js
+          node --check api/approved-music.js
+          node --check scripts/publishApprovedMusic.mjs
+      - name: Verify published songs, quiz evidence and R2 privacy
+        run: node --test tests/music-learning-room.test.mjs
