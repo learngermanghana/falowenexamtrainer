@@ -1,7 +1,7 @@
 {
-  "version": 3,
+  "version": 4,
   "updated": "2026-10-28",
-  "description": "Public Falowen Music catalog. Only add tracks that have been approved and whose public MP3 URLs exist. No private Hören audio.",
+  "description": "Only teacher-approved songs with verified R2 MP3 keys appear here; lesson tracks require approved:true, the safe music/ prefix, and the Falowen playback API. Private Hören audio and unverified uploads must never be published.",
   "tracks": [
     {
       "id": "a1-day-04-numbers",
@@ -18,7 +18,8 @@
       "attendance": true,
       "coursebook": true,
       "slides": true,
-      "objectKey": "music/a1/day-04/welche-nummer-hast-du.mp3"
+      "objectKey": "music/a1/day-04/welche-nummer-hast-du.mp3",
+      "approved": true
     },
     {
       "id": "a1-day-22-health",
@@ -35,7 +36,8 @@
       "attendance": true,
       "coursebook": true,
       "slides": true,
-      "objectKey": "music/a1/day-22/mein-kopf-tut-weh.mp3"
+      "objectKey": "music/a1/day-22/mein-kopf-tut-weh.mp3",
+      "approved": true
     },
     {
       "id": "a2-day-18-bank",
@@ -52,7 +54,8 @@
       "attendance": true,
       "coursebook": true,
       "slides": true,
-      "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3"
+      "objectKey": "music/a2/day-18/die-karte-funktioniert-nicht.mp3",
+      "approved": true
     },
     {
       "id": "gemeinsam-schaffen-wir-das",
