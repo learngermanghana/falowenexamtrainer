@@ -1,0 +1,197 @@
+{
+  "version": 1,
+  "description": "Public lesson content for already approved song recordings. Draft lyrics and exercises are sourced from the Falowen Admin original songbook; review against final audio before release of any revised MP3.",
+  "lessons": {
+    "a1-day-04-numbers": {
+      "assignmentKey": "A1-2",
+      "title": "Welche Nummer hast du?",
+      "summary": "Numbers and introductions",
+      "lyrics": "[Verse 1]\nHallo! Guten Tag!\nIch heiße Ben.\nWie heißt du?\nIch heiße Sam.\n\nWoher kommst du?\nIch komme aus Ghana.\nWo wohnst du?\nIch wohne in Accra.\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Verse 2]\nWie schreibt man Ben?\nB–E–N.\nWie schreibt man Sam?\nS–A–M.\n\nWie alt bist du?\nIch bin zwanzig Jahre alt.\nWie geht es dir?\nGut, danke! Und dir?\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Outro]\nHallo! Ich heiße Ben.\nB–E–N.\nEins, zwei, drei — Falowen!\nAuf Wiedersehen!",
+      "vocabulary": [
+        {
+          "de": "Wie heißt du?",
+          "en": "What is your name?"
+        },
+        {
+          "de": "Woher kommst du?",
+          "en": "Where are you from?"
+        },
+        {
+          "de": "Ich wohne in Accra.",
+          "en": "I live in Accra."
+        },
+        {
+          "de": "die Nummer",
+          "en": "number"
+        },
+        {
+          "de": "Noch einmal, bitte.",
+          "en": "One more time, please."
+        },
+        {
+          "de": "Wie alt bist du?",
+          "en": "How old are you?"
+        },
+        {
+          "de": "zwanzig",
+          "en": "twenty"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Welche drei Zahlen werden als Nummer wiederholt?",
+          "answer": "Vier, fünf, sechs.",
+          "options": [
+            "Eins, zwei, drei.",
+            "Vier, fünf, sechs.",
+            "Sieben, acht, neun."
+          ],
+          "correctIndex": 1
+        },
+        {
+          "type": "listening",
+          "prompt": "Wie alt ist die Person im Lied?",
+          "answer": "Zwanzig Jahre alt.",
+          "options": [
+            "Zehn Jahre alt.",
+            "Zwanzig Jahre alt.",
+            "Dreißig Jahre alt."
+          ],
+          "correctIndex": 1
+        },
+        {
+          "type": "speaking",
+          "prompt": "Wie heißt du? Sag eine erfundene Nummer mit drei Ziffern.",
+          "hint": "Say an invented three-digit practice number, never your personal phone number."
+        }
+      ]
+    },
+    "a1-day-22-health": {
+      "assignmentKey": "A1-14.1",
+      "title": "Mein Kopf tut weh",
+      "summary": "Health and feeling unwell",
+      "lyrics": "[Verse 1]\nAm Morgen rufe ich Mia an.\nHallo Mia, bist du da?\nJa, ich bin hier. Wie geht's dir?\nNicht so gut. Mein Kopf tut weh.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Verse 2]\nMia fragt: Hast du Fieber?\nNein, aber mein Bauch tut weh.\nSie fragt: Brauchst du Hilfe?\nJa, bitte. Komm zu mir.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Outro]\nMia bringt mir Wasser und Tee.\nJetzt geht es mir schon besser.\nDanke, Mia! Gute Nacht.\nBei Falowen lerne ich: Gute Besserung!",
+      "vocabulary": [
+        {
+          "de": "Mein Kopf tut weh.",
+          "en": "My head hurts."
+        },
+        {
+          "de": "Wie geht es dir?",
+          "en": "How are you?"
+        },
+        {
+          "de": "das Fieber",
+          "en": "fever"
+        },
+        {
+          "de": "der Bauch",
+          "en": "stomach / belly"
+        },
+        {
+          "de": "Brauchst du Hilfe?",
+          "en": "Do you need help?"
+        },
+        {
+          "de": "Gute Besserung!",
+          "en": "Get well soon!"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Was tut der Person am Morgen weh?",
+          "answer": "Der Kopf.",
+          "options": [
+            "Der Kopf.",
+            "Der Bauch.",
+            "Das Bein."
+          ],
+          "correctIndex": 0
+        },
+        {
+          "type": "listening",
+          "prompt": "Was bringt Mia mit?",
+          "answer": "Wasser und Tee.",
+          "options": [
+            "Brot und Milch.",
+            "Wasser und Tee.",
+            "Saft und Obst."
+          ],
+          "correctIndex": 1
+        },
+        {
+          "type": "speaking",
+          "prompt": "Was sagst du, wenn du krank bist?",
+          "hint": "Answer in one or two simple German sentences."
+        }
+      ]
+    },
+    "a2-day-18-bank": {
+      "assignmentKey": "A2-7.18",
+      "title": "Die Karte funktioniert nicht",
+      "summary": "A problem paying by card",
+      "lyrics": "[Verse 1]\nHeute möchte ich mit meiner Karte bezahlen.\nAber das Gerät zeigt einen Fehler.\nZu Hause rufe ich meine Bank an.\nEine Mitarbeiterin fragt nach dem Problem.\n\n[Chorus]\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\n\n[Verse 2]\nSie prüft meine Angaben am Telefon.\nDann erklärt sie mir den nächsten Schritt.\nIch soll die Karte noch einmal testen.\nAm Nachmittag klappt die Zahlung wieder.\n\n[Chorus]\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\n\n[Outro]\nIch bedanke mich für die Hilfe.\nDas Problem ist endlich gelöst.\nBei Falowen übe ich schwierige Telefonate.",
+      "vocabulary": [
+        {
+          "de": "mit Karte bezahlen",
+          "en": "to pay by card"
+        },
+        {
+          "de": "das Gerät",
+          "en": "device / terminal"
+        },
+        {
+          "de": "einen Fehler anzeigen",
+          "en": "to display an error"
+        },
+        {
+          "de": "die Mitarbeiterin",
+          "en": "female employee"
+        },
+        {
+          "de": "meine Angaben prüfen",
+          "en": "to check my details"
+        },
+        {
+          "de": "der nächste Schritt",
+          "en": "the next step"
+        },
+        {
+          "de": "die Zahlung",
+          "en": "payment"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Was funktioniert beim Bezahlen nicht?",
+          "answer": "Die Bankkarte oder das Zahlungsgerät.",
+          "options": [
+            "Die Bankkarte oder das Zahlungsgerät.",
+            "Das Handy der Mitarbeiterin.",
+            "Der Geldautomat in der Bank."
+          ],
+          "correctIndex": 0
+        },
+        {
+          "type": "listening",
+          "prompt": "Wie wird das Problem gelöst?",
+          "answer": "Nach der Erklärung der Bank funktioniert die Zahlung wieder.",
+          "options": [
+            "Die Person bezahlt nur noch bar.",
+            "Nach der Erklärung der Bank funktioniert die Zahlung wieder.",
+            "Die Bank schickt sofort eine neue Karte."
+          ],
+          "correctIndex": 1
+        },
+        {
+          "type": "speaking",
+          "prompt": "Wie würdest du ein Zahlungsproblem am Telefon erklären?",
+          "hint": "Try explaining a payment problem politely using 'Können Sie mir bitte helfen?'"
+        }
+      ]
+    }
+  }
+}
