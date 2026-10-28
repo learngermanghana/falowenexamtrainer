@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { getLessonsByLevel } from "../data/lessonCatalog";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import A2MiniLearningBlock from "./A2MiniLearningBlock";
 import {
   STANDARD_WORKBOOK_TABS,
@@ -56,7 +57,7 @@ const UNIVERSAL_A2_WORKBOOK_TABS = [
   { key: "schreiben", legacyKey: "teil2", match: /\bteil\s*2\b|schreiben|write/i },
   { key: "lesen", legacyKey: "teil3", match: /\bteil\s*3\b|lesen|read/i },
   { key: "hoeren", legacyKey: "teil4", match: /\bteil\s*4\b|h[oö]ren|hoeren|listen/i },
-  { key: "references", legacyKey: "ref", match: /\bref\b|reference|answers|antwort/i },
+  { key: "references", legacyKey: "ref", match: /\bmusic\b|\bref\b|reference|answers|antwort/i },
   { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
 ];
 
@@ -181,7 +182,7 @@ const detectTabKey = (text = "") => {
   if (/teil\s*2\b|schreiben|write/.test(normalized)) return "teil2";
   if (/teil\s*3\b|lesen|read/.test(normalized)) return "teil3";
   if (/teil\s*4\b|horen|hoeren|listen/.test(normalized)) return "teil4";
-  if (/\bref\b|reference|answers|antwort/.test(normalized)) return "ref";
+  if (/\bmusic\b|\bref\b|reference|answers|antwort/.test(normalized)) return "ref";
   if (/submit|abgeben|send/.test(normalized)) return "submit";
   return "";
 };
@@ -331,7 +332,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
     }
 
     setShowSubmit(false);
-    clickExistingWorkbookTab(tab);
+    if (tab.key !== "references") clickExistingWorkbookTab(tab);
   };
 
   return (
@@ -349,7 +350,7 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
       <div style={{ display: "grid", gap: 4 }}>
         <strong>A2 workbook navigation</strong>
         <span style={{ color: "#475569", fontSize: 13 }}>
-          Use the shared workbook tabs below: Grammar, Teil 1, Teil 2, Teil 3, Teil 4, Ref and Submit.
+          Use the workbook tabs: Grammar, Teil 1–4, optional Music and Submit. Music is not an assignment.
         </span>
       </div>
 
@@ -359,6 +360,8 @@ const UniversalA2WorkbookTabs = ({ level = "" }) => {
         tabs={STANDARD_WORKBOOK_TABS}
         ariaLabel={workbookDay ? `A2 Day ${workbookDay} workbook sections` : "A2 workbook sections"}
       />
+
+      {activeTab === "references" && workbookDay ? <WorkbookDayMusic level="A2" day={workbookDay} /> : null}
 
       {showSubmit ? (
         <div ref={submitRef} style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 10, background: "#fff" }}>
@@ -422,7 +425,7 @@ export const A2B1WorkbookGuidance = ({ level = "" }) => {
 
         <div style={{ display: "grid", gap: 10, padding: "0 14px 14px", lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Review the <strong>Grammar</strong> notes for {lessonContext} when needed. Complete the lesson’s speaking, writing, reading and listening tasks, then use <strong>Ref</strong> to reflect on your answers. The <strong>Submit</strong> tab is for final work only.
+            Review the <strong>Grammar</strong> notes for {lessonContext} when needed. Complete the lesson’s speaking, writing, reading and listening tasks, use <strong>Music</strong> for optional day-specific listening with lyrics. Music is not an assignment. The <strong>Submit</strong> tab is for final work only.
           </p>
           {specificLessonTitle ? (
             <p style={{ margin: 0 }}>
