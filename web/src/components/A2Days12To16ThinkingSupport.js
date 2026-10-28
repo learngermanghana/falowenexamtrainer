@@ -16,7 +16,7 @@ const grammarThinking = {
   },
   13: {
     title: "Modal verbs in the past: separate ability, duty and intention",
-    question: "What could, had to, or wanted to happen in the past?",
+    question: "What were you able to do, what did you have to do, and what did you want to do in the past?",
     steps: [
       "können → konnte: past ability.",
       "müssen → musste: past necessity.",

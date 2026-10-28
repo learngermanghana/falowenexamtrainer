@@ -4,8 +4,9 @@ export const getA2PdfLessonCompanionUrl = (route, baseUrl = "https://www.falowen
   const url = new URL(route, baseUrl);
   // Same policy as A1: an authenticated lesson URL, never a short-lived
   // signed R2 URL, R2 object path, token, or an assessment bypass.
-  if (url.protocol !== "https:" || url.hostname !== new URL(baseUrl).hostname
-      || !url.pathname.startsWith("/campus/course/")) {
+  if (url.protocol !== "https:" || url.origin !== new URL(baseUrl).origin
+      || url.username || url.password
+      || !/^\/campus\/course\/(?:lesson\/A2\/(?:[1-9]|1\d|2[0-8])\/?$|a2-day-(?:[1-9]|1\d|2[0-8])(?:-|\/|$))/i.test(url.pathname)) {
     throw new Error("A2 PDF audio QR must point to an authenticated Falowen course lesson");
   }
   url.search = "";

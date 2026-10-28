@@ -74,8 +74,8 @@ const A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage = () => {
             Grammar focus: <strong>Modalverben im Präteritum</strong> for interview stories and past experience.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In job interviews, you often describe what you <em>could</em>, <em>had to</em>, and <em>wanted to</em>
-            do in the past. Use these key forms confidently: <strong>konnte</strong>, <strong>musste</strong>,
+            In job interviews, you often describe what you <em>could</em>, <em>had to</em>, and <em>wanted to</em>{" "}
+            do in the past. Use these key forms confidently: <strong>konnte</strong>, <strong>musste</strong>,{" "}
             and <strong>wollte</strong>.
           </p>
         </header>
