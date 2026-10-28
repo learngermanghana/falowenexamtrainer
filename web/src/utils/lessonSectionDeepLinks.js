@@ -28,6 +28,7 @@ const A2_B1_ALIASES = Object.freeze({
   "hören": "hoeren",
   hoeren: "hoeren",
   references: "references",
+  music: "references", // Preserve old ?view=ref links while showing Music in A2/B1.
 });
 
 const ADVANCED_ALIASES = Object.freeze({
