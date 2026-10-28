@@ -88,11 +88,15 @@ describe("A1 self-learning journey standardization", () => {
     expect(href).not.toContain("materials=");
   });
 
-  test("Day 19 stays self-learning and keeps both configured lesson videos", () => {
+  test("does not fabricate a self-learning entry for Day 19 outside the current canonical catalogue", () => {
+    // The former Day 19 self-practice route is not in the present A1
+    // canonical registry. Optional Music must not reinstate a withdrawn
+    // lesson or manufacture a new submission/progression requirement.
     const day19 = practices.find((practice) => Number(practice.day) === 19);
-    const resources = getA1SelfLearningJourneyResources(day19);
-
-    expect(resources.teacherVideo?.url).toBe("https://youtu.be/ZfXw4fRQ0Tg");
-    expect(resources.aiVideo?.url).toBe("https://youtu.be/gprnEZtMUPM");
+    expect(day19).toBeUndefined();
+    expect(getA1SelfLearningPracticeForLocation({
+      pathname: "/campus/course/lesson/A1/19",
+      search: "?chapter=5.10",
+    })).toBeNull();
   });
 });
