@@ -202,20 +202,20 @@ function A2KombiAttempt({mockNumber,paper}) {
     <header className="a2-mock2-full-heading">
       <p className="a2-mock2-kicker">A2 Kombiprüfung · Mock {mockNumber}</p>
       <h1>A2 Mock {mockNumber}</h1>
-      <p>{paper.theme}</p><p><strong>Lesen · Schreiben · Sprechen</strong> · Hören will be added later.</p>
+      <p>{paper.theme}</p><p><strong>{(stage==="intro"&&paper.id==="a2-mock-04"?FULL_ORDER:order).map(name=>LABELS[name]).join(" · ")}</strong></p>
     </header>
-    <section className="a2-mock2-full-progress" aria-label="Progress across three exam modules">
-      <div className="a2-mock2-full-progress-head"><strong>Exam progress</strong><span>{ORDER.filter(k=>progress[k].done).length} of 3 completed</span></div>
-      <div className="a2-mock2-full-track"><div style={{width:`${ORDER.filter(k=>progress[k].done).length/3*100}%`}}/></div>
-      <div className="a2-mock2-full-stages">{ORDER.map((name,index)=><div key={name} className={progress[name].done?"complete":stage===name?"current":""}>
+    <section className="a2-mock2-full-progress" aria-label="Exam module progress">
+      <div className="a2-mock2-full-progress-head"><strong>Exam progress</strong><span>{order.filter(k=>progress[k].done).length} of {order.length} completed</span></div>
+      <div className="a2-mock2-full-track"><div style={{width:`${order.filter(k=>progress[k].done).length/order.length*100}%`}}/></div>
+      <div className="a2-mock2-full-stages">{order.map((name,index)=><div key={name} className={progress[name].done?"complete":stage===name?"current":""}>
         <span>{progress[name].done?"✓":index+1}</span><strong>{LABELS[name]}</strong>
         <small>{progress[name].done?"Completed":stage===name?"Current":"Not started"}</small>
       </div>)}</div>
     </section>
     {stage==="intro"?<section className="a2-mock2-full-intro">
       <h2>Start A2 Mock {mockNumber}</h2>
-      <p>Complete the 30-minute reading module, two writing tasks in 30 minutes, and three speaking parts with the German-speaking AI examiner. Your work is saved as you go.</p>
-      <p>The verified score is out of <strong>75 points</strong> for the three available modules. Hören is not included and will be added later.</p>
+      <p>Complete Lesen, {paper.id==="a2-mock-04"?"Hören, ":""}Schreiben and Sprechen. Your work is saved as you go.</p>
+      <p>The verified score is out of <strong>{paper.id==="a2-mock-04"?100:75} points</strong>.</p>
       <button type="button" className="a2-mock2-primary" onClick={begin} disabled={connecting||!idToken}>
         {connecting?"Connecting…":"Start mock exam"}
       </button>
@@ -251,6 +251,9 @@ function A2KombiAttempt({mockNumber,paper}) {
         </footer>
       </article>
     </section>:null}
+    {stage==="hoeren"&&paper.id==="a2-mock-04"?<A2Mock04Hoeren idToken={idToken}
+      value={hoeren.answers||{}} timeRemaining={asTime(msRemaining)}
+      onChange={answers=>setHoeren(old=>({...old,answers}))} onSubmit={submitHoeren}/>:null}
     {stage==="schreiben"?<section className="a2-mock2-shell" lang="de">
       <header className="a2-mock2-progress"><strong>Schreiben · Teil 1 und 2</strong><strong aria-label="Time remaining">{asTime(msRemaining)}</strong></header>
       <article className="a2-mock2-paper a2-schreiben-exam">
@@ -275,9 +278,9 @@ function A2KombiAttempt({mockNumber,paper}) {
       <h2>A2 Mock {mockNumber} · Ergebnis</h2>
       {flow.verifiedResult?<div className="a2-mock2-results" role="status">
         <h3>Verified Kombiprüfung result</h3>
-        <p><strong>{flow.verifiedResult.overall.points}/75 points</strong> · {flow.verifiedResult.overall.score}% · {flow.verifiedResult.overall.passed?"Passed":"More practice recommended"}</p>
-        {ORDER.map(k=><p key={k}>{LABELS[k]}: <strong>{flow.verifiedResult.sectionScores[k]}/25</strong></p>)}
-        <p>Hören pending · No Hören points have been added. Your existing result remains unchanged when the Hören module is later published.</p>
+        <p><strong>{flow.verifiedResult.overall.points}/{flow.verifiedResult.overall.maxPoints} points</strong> · {flow.verifiedResult.overall.score}% · {flow.verifiedResult.overall.passed?"Passed":"More practice recommended"}</p>
+        {(flow.verifiedResult.overall.sections||order).map(k=><p key={k}>{LABELS[k]}: <strong>{flow.verifiedResult.sectionScores[k]}/25</strong></p>)}
+        {flow.verifiedResult.overall.assessmentVersion==="three-module-v1"?<p>This earlier /75 result remains unchanged; Hören was not part of this attempt.</p>:null}
         <p>The verified result is saved in Falowen Results.</p>
         <button type="button" className="a2-mock2-primary" onClick={restart}>Start another attempt</button>
       </div>:<>
