@@ -1,6 +1,14 @@
 // Falowen Music's static listening room. No authentication, tracking, AI calls,
 // Firestore writes or generated media. Only catalog-approved recordings play.
 const byId = id => document.getElementById(id);
+const embedded = new URLSearchParams(location.search).get("embedded") === "1";
+// Embedded pages run on www.falowen.app, same-origin with the student's session.
+if (embedded) {
+  document.body.classList.add("music-embedded");
+  document.querySelectorAll('a[href^="https://www.falowen.app/"]').forEach(link => {
+    link.target = "_top";
+  });
+}
 const audio = byId("audio");
 const player = byId("player");
 const tracksRoot = byId("tracks");
@@ -55,11 +63,23 @@ function el(tag, className, content) {
   if (content !== undefined) node.textContent = content;
   return node;
 }
+function publicSongUrl(track) {
+  // Share the public music website even when the player is inside the campus.
+  const path = track.autoDiscovered
+    ? "/?track=" + encodeURIComponent(track.id)
+    : "/music/songs/" + encodeURIComponent(track.id) + ".html";
+  return new URL(path, "https://music.falowen.app");
+}
 function songUrl(track) {
-  // New R2 uploads have a live dynamic page even before publishing a
-  // separate static SEO/share document in GitHub.
-  if (track.autoDiscovered) return new URL("/?track=" + encodeURIComponent(track.id), location.origin);
-  return new URL("/music/songs/" + encodeURIComponent(track.id) + ".html", location.origin);
+  const publicPath = publicSongUrl(track);
+  if (!embedded) return new URL(publicPath.pathname + publicPath.search, location.origin);
+  // Never send the embedded player to '/' on www.falowen.app:
+  // '/' is the learner homepage, not the music app.
+  const url = track.autoDiscovered
+    ? new URL("/music/index.html?track=" + encodeURIComponent(track.id), location.origin)
+    : new URL("/music/songs/" + encodeURIComponent(track.id) + ".html", location.origin);
+  url.searchParams.set("embedded", "1");
+  return url;
 }
 function setShareText(label) {
   byId("share").textContent = label;
@@ -67,7 +87,7 @@ function setShareText(label) {
 }
 async function shareCurrent() {
   if (!current && !selected) return;
-  const url = songUrl(selected || current).href;
+  const url = publicSongUrl(selected || current).href;
   try {
     await navigator.clipboard.writeText(url);
     setShareText("Link copied!");
@@ -333,7 +353,7 @@ function closeDetail(navigate = true) {
   selected = null;
   byId("song-detail").hidden = true;
   document.title = "Falowen Music · Learn German through songs";
-  if (navigate && (location.pathname !== "/" || location.search)) history.pushState(null, "", "/");
+  if (navigate) history.pushState(null, "", embedded ? "/music/index.html?embedded=1" : "/");
   byId("library").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 for (const control of [searchInput, levelInput, dayInput, genreInput])
