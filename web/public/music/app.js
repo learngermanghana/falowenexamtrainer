@@ -1,3 +1,4 @@
+// Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, tracking, AI calls,
 // Firestore writes or generated media. Only catalog-approved recordings play.
 const byId = id => document.getElementById(id);
@@ -23,6 +24,8 @@ let current = null;
 let selected = null;
 let category = "all";
 let featured = null;
+let playbackQueue = [];
+let visibleTracks = [];
 const initialParams = new URLSearchParams(location.search);
 const initialId = (document.body.dataset.track || initialParams.get("track") || "").trim();
 
@@ -148,10 +151,10 @@ function populateFeatured() {
 function populateFilters() {
   const available = ["A1","A2","B1","B2","C1","C2"];
   const oldLevel = levelInput.value, oldDay = dayInput.value, oldGenre = genreInput.value;
-  levelInput.replaceChildren();
+  levelInput.replaceChildren(new Option("All levels", ""));
   available.forEach(level => levelInput.add(new Option(level, level)));
   const queryLevel=(initialParams.get("level") || "").toUpperCase();
-  levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "A1";
+  levelInput.value = available.includes(oldLevel) ? oldLevel : available.includes(queryLevel) ? queryLevel : "";
   dayInput.replaceChildren(new Option("All 28 days", ""));
   for(let day=1;day<=28;day++) dayInput.add(new Option("Day "+day,String(day)));
   const queryDay=String(Number(initialParams.get("day")));
@@ -192,45 +195,50 @@ function card(track) {
 }
 function renderCatalog() {
   const q = searchInput.value.trim().toLocaleLowerCase();
-  const level = levelInput.value || "A1";
-  const day = dayInput.value ? Number(dayInput.value) : null;
+  const level = levelInput.value;
+  const day = Number(dayInput.value);
   const genre = genreInput.value;
-  const matches = track => (!genre || track.genre === genre)
-    && (!q || [track.title,track.topic,track.type,track.level,track.assignmentKey,track.genre]
-      .join(" ").toLocaleLowerCase().includes(q));
-  const lessonTracks = catalog.filter(track => track.category === "lesson"
-    && track.level === level && matches(track) && (!day || track.day === day));
-  const motivationTracks = catalog.filter(track => track.category === "motivation"
-    && matches(track) && !day);
+  visibleTracks = catalog.filter(track => (!level || track.level === level)
+    && (!day || track.day === day) && (!genre || track.genre === genre)
+    && (category === "all" || track.category === category)
+    && (!q || [track.title, track.topic, track.level, track.genre, track.assignmentKey].join(" ").toLocaleLowerCase().includes(q)));
   tracksRoot.replaceChildren();
-  const days = day ? [day] : Array.from({length:28},(_,index)=>index+1);
-  if(category !== "motivation") {
-    for (const dayNumber of days) {
-      const group = el("section","day-group");
-      group.setAttribute("aria-label",level + " Day " + dayNumber);
-      const header = el("div","day-heading");
-      header.append(el("strong","",level+" · Day "+dayNumber));
-      const dayTracks = lessonTracks.filter(track => track.day === dayNumber);
-      header.append(el("small","",dayTracks.length ? dayTracks.length + (dayTracks.length===1?" song":" songs") : "No song yet"));
-      group.append(header);
-      if(dayTracks.length) dayTracks.forEach(track=>group.append(card(track)));
-      else group.append(el("div","empty-day","No song yet · Upload to music/"+level.toLowerCase()+"/day-"+String(dayNumber).padStart(2,"0")+"/"));
-      tracksRoot.append(group);
-    }
+  for (const groupLevel of ["A1", "A2", "B1", "B2", "C1", "C2", "ALL"]) {
+    const songs = visibleTracks.filter(track => track.level === groupLevel);
+    if (!songs.length) continue;
+    const section = el("section", "level-section");
+    const heading = el("div", "level-heading");
+    const title = groupLevel === "ALL" ? "Classroom motivation" : groupLevel + " · German songs";
+    heading.append(el("h3", "", title));
+    const view = el("button", "clear-button", level ? "All levels ←" : "View all " + songs.length + " →");
+    view.type = "button";
+    view.addEventListener("click", () => {
+      levelInput.value = level ? "" : groupLevel === "ALL" ? "" : groupLevel;
+      category = !level && groupLevel === "ALL" ? "motivation" : "all";
+      document.querySelectorAll("[data-category]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.category === category)));
+      renderCatalog();
+    });
+    heading.append(view);
+    const grid = el("div", "level-grid");
+    (level || q || day || genre || category === "motivation" ? songs : songs.slice(0, 4)).forEach(track => grid.append(card(track)));
+    section.append(heading, grid);
+    tracksRoot.append(section);
   }
-  if((category === "all" || category === "motivation") && motivationTracks.length) {
-    const group=el("section","motivation-area");
-    group.append(el("h3","","Classroom motivation"));
-    const grid=el("div","motivation-grid");
-    motivationTracks.forEach(track=>grid.append(card(track)));
-    group.append(grid);
-    tracksRoot.append(group);
-  }
-  const count=category==="motivation" ? motivationTracks.length : lessonTracks.length+(category==="all" ? motivationTracks.length : 0);
-  byId("song-count").textContent = count + (count===1?" song":" songs") + (category==="motivation"?"":" · 28 days / "+level);
-  if(category==="motivation" && !motivationTracks.length)
-    tracksRoot.append(el("div","empty","No matching classroom motivation tracks."));
+  if (!visibleTracks.length) tracksRoot.append(el("p", "empty", "No songs here yet. Try another level or clear your filters."));
+  byId("song-count").textContent = visibleTracks.length + (visibleTracks.length === 1 ? " song" : " songs");
 }
+function moveTrack(direction = 1) {
+  if (!playbackQueue.length) return;
+  const index = playbackQueue.findIndex(track => track.id === current?.id);
+  const track = playbackQueue[(index + direction + playbackQueue.length) % playbackQueue.length];
+  selected = track;
+  setPlayer(track, true);
+  if (!byId("song-detail").hidden) renderDetail(track);
+  history.replaceState({trackId: track.id}, "", songUrl(track).pathname + songUrl(track).search);
+}
+audio.addEventListener("ended", () => { if (!audio.loop) moveTrack(1); });
+byId("next-track")?.addEventListener("click", () => moveTrack(1));
+byId("previous-track")?.addEventListener("click", () => moveTrack(-1));
 function setTab(name) {
   if (!["listen", "lyrics", "practice"].includes(name)) return;
   const lesson = selected && learning[selected.id];
@@ -352,6 +360,7 @@ function renderDetail(track) {
 }
 function showSong(track, autoplay = false, navigate = true) {
   selected = track;
+  playbackQueue = visibleTracks.some(song => song.id === track.id) ? [...visibleTracks] : [...catalog];
   setPlayer(track, autoplay);
   renderDetail(track);
   if (navigate && location.pathname + location.search !== songUrl(track).pathname + songUrl(track).search) history.pushState({ trackId: track.id }, "", songUrl(track).pathname + songUrl(track).search);
@@ -375,7 +384,7 @@ byId("clear").addEventListener("click", () => {
   category = "all";
   document.querySelectorAll("[data-category]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.category === "all")));
   searchInput.value = "";
-  levelInput.value = "A1";
+  levelInput.value = "";
   dayInput.value = "";
   genreInput.value = "";
   renderCatalog();
@@ -401,7 +410,7 @@ window.addEventListener("popstate", () => {
 async function refreshMusic() {
   const button=byId("refresh-music");
   button.disabled=true;
-  byId("discovery-status").textContent="Checking new music uploads…";
+  byId("discovery-status").textContent="Updating songs…";
   try {
     const response=await fetch("/api/music-library",{cache:"no-cache"});
     if(!response.ok) throw Error("R2 music discovery is unavailable.");
@@ -413,7 +422,7 @@ async function refreshMusic() {
     catalog=[...pinnedTracks,...dynamic.filter(track=>!pinnedIds.has(track.id)&&!pinnedKeys.has(track.objectKey))];
     populateFilters();
     renderCatalog();
-    byId("discovery-status").textContent="Music folders checked · "+dynamic.length+" R2 song file(s) found. Refresh again after uploading.";
+    byId("discovery-status").textContent="";
     const selectedId=initialId || new URLSearchParams(location.search).get("track");
     if(selectedId && !selected) {
       const track=catalog.find(song=>song.id===selectedId);

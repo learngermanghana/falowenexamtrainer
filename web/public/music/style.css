@@ -99,3 +99,25 @@
   .music-embedded .library-section { padding-top: 12px; padding-bottom: 96px; }
   .music-embedded .detail-shell { padding: 15px 12px 96px; }
 }
+
+/* Compact listening shelves: music appears immediately, with full-level browsing. */
+:root{color:#f1f5f3;background:#101a20}
+.site-header{background:#101a20;border-color:#ffffff12}
+.hero{background:linear-gradient(110deg,#203f39,#14222b)}
+.hero-inner{min-height:0;padding:28px;display:flex;justify-content:space-between;gap:28px}
+.hero h1{font-size:clamp(1.9rem,4vw,3rem);letter-spacing:-.045em;margin:10px 0}
+.hero-description{font-size:14px;margin:0;line-height:1.5}
+.hero-actions{margin:0;max-width:310px;gap:8px}.featured-description{margin:0;font-size:12px}
+.library-section{padding:28px 28px 50px}.section-heading{align-items:center}.section-heading h2{font-size:25px;margin:4px 0}.section-heading .eyebrow{display:none}.section-heading p:not(.eyebrow){font-size:13px;color:#a5b7b1;margin:7px 0}
+.song-count{background:#ffffff0d;color:#b9ccc4}.category-controls{margin-top:20px}
+.category-controls button{background:#ffffff0c;border-color:#ffffff14;color:#d1dfd8}.category-controls button[aria-pressed=true]{background:#d5f17d;border-color:#d5f17d;color:#172e26}
+.filters{margin:18px 0;gap:10px}.search-wrap input,.select-wrap select{background:#1c2a30;border-color:#34433f;color:#f0f5f2;min-height:44px}.select-wrap{color:#b2c3ba}.clear-button{color:#d5f17d;padding:12px 6px;font-size:12px}
+.track-grid{display:block}.level-section{margin-bottom:32px}.level-heading{display:flex;align-items:center;justify-content:space-between;gap:14px}.level-heading h3{font-size:21px;margin:10px 0 16px;letter-spacing:-.025em}.level-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.track-card{min-height:0;background:#1a272c;border:1px solid #ffffff09;border-radius:12px;padding:10px;box-shadow:none;transition:background .15s,transform .15s}.track-card:hover{background:#253630;transform:translateY(-2px)}
+.track-art{height:auto;aspect-ratio:1.5;border-radius:8px;background:linear-gradient(135deg,#597e68,#233d39)}.track-card:nth-child(3n+2) .track-art{background:linear-gradient(135deg,#b68e61,#584330)}.track-card:nth-child(3n+3) .track-art{background:linear-gradient(135deg,#6d91a0,#29414c)}
+.art-circle{width:98px;height:98px;border:12px solid #0e232944;color:#eef6cf;font-size:38px}.track-badge{background:#102520ce;color:#f1f6dd;font-size:10px;padding:6px 9px;top:9px;left:9px}.track-body{padding:14px 3px 4px}.track-body h3{font-size:16px;line-height:1.35;margin:7px 0}.track-topic{color:#a9c3b3;font-size:10px;letter-spacing:.7px}.track-meta{color:#9dafaa;font-size:11px}.track-actions{gap:8px;padding-top:16px}.play-button{background:#d5f17d;color:#183027;padding:10px 15px}.play-button:hover,.play-button:focus-visible{background:#e1ffa0}.track-link{color:#becfc7;font-size:11px}
+.library-footer{border-color:#ffffff13;color:#9eb3a7;margin-top:12px}.library-footer a{color:#d5f17d}.footer{border-top:1px solid #ffffff10}.empty{color:#b7cac1;border-color:#4b6256}.song-detail{color:#142a36}.song-detail .play-button{background:#183e36;color:white}.player{position:fixed;left:0;right:0;bottom:0;background:#111e25;border-top:1px solid #ffffff22}.has-player{padding-bottom:155px}#player-error{font-size:12px;color:#ffd3c3;text-align:center;margin:0;padding:0 15px 8px}#player-error:empty{display:none}.player-inner{gap:12px}.player-details{min-width:120px}.player-tools{gap:8px}
+.music-embedded{background:#101a20}.music-embedded .library-section{padding-bottom:40px}
+@media(max-width:1000px){.level-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){.hero-inner{padding:22px 18px;display:block}.hero-actions{margin-top:16px;max-width:none}.hero-actions .featured-description{flex-basis:100%}.library-section{padding:22px 16px 40px}.level-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.section-heading{display:flex}.section-heading>div>p:not(.eyebrow){display:none}.song-count{margin:0;font-size:11px}.filters{gap:8px}.search-wrap{flex-basis:100%}.select-wrap{min-width:80px;flex:1}.track-body h3{font-size:15px}.track-actions{flex-wrap:wrap;gap:12px}.level-heading h3{font-size:19px}.site-header nav>a[href$="/books"]{display:none}.has-player{padding-bottom:235px}.player-cover{display:none}.player-details{flex-basis:50%}.player-tools{justify-content:flex-start;width:100%;margin:0}.hero-art,.hero-stats{display:none}}
+@media(prefers-reduced-motion:reduce){.track-card{transition:none}.track-card:hover{transform:none}}

@@ -21,7 +21,7 @@ function signTrack(id, env = process.env, now = new Date()) {
   if (!track) throw Object.assign(new Error('Unknown classroom song.'), { status: 404 });
   return signObject(track, env, now);
 }
-function signObject(track, env, now = new Date()) {
+function signObject(track, env = process.env, now = new Date()) {
   for (const key of ['R2_ACCOUNT_ID','R2_ACCESS_KEY_ID','R2_SECRET_ACCESS_KEY','R2_AUDIO_BUCKET']) {
     if (!String(env[key] || '').trim()) throw Object.assign(new Error('Classroom music storage is not configured.'), { status: 503 });
   }
