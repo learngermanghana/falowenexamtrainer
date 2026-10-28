@@ -21,7 +21,7 @@ describe("A2 Day 14 Beruf und Karriere workbook", () => {
     expect(screen.queryByRole("tab", { name: /^Teil 2/ })).not.toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /^Teil 3/ })).toBeInTheDocument();
     expect(screen.queryByRole("tab", { name: /^Teil 4/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /^Ref/ })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /^Music/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /^Submit/ })).toBeInTheDocument();
   });
 
