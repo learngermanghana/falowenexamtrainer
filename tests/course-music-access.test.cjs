@@ -65,3 +65,25 @@ test('private bank telephone audio requires staff and signs only the uploaded Da
   }
  }
 });
+
+test('Day 19 is a staff-only exact-key conversation; private keys cannot use public music playback', async () => {
+ const {createClassroomBankAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-19/einkaufen-wo-und-wie.mp3';
+ for(const [account,requested,day,expected] of [
+  [null,key,19,401],
+  [{localId:'student',email:'student@example.com'},key,19,403],
+  [{localId:'staff',email:'moxflex@gmail.com'},key,19,200],
+  [{localId:'staff',email:'moxflex@gmail.com'},key,18,400],
+  [{localId:'staff',email:'moxflex@gmail.com'},'a2/day-19/another.mp3',19,400],
+ ]) {
+  const res=response();
+  await createClassroomBankAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({method:'GET',
+   headers:account?{authorization:'Bearer test',origin:'https://admin.falowen.app'}:{},
+   url:`/course-media/a2/classroom-audio-url?${new URLSearchParams({day:String(day),key:requested})}`},res);
+  assert.equal(res.code,expected);
+  if(expected===200) assert.equal(new URL(res.body.url).pathname,'/'+key);
+ }
+ assert.throws(()=>signTrack('a2-day19-shopping',env),/Unknown/);
+ const song=signTrack('a2-day-18-bank',env);
+ assert.equal(new URL(song.url).pathname,'/music/a2/day-18/die-karte-funktioniert-nicht.mp3');
+});

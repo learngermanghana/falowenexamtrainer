@@ -40,7 +40,7 @@ test('public approved music route has static track allowlist and no credentials 
   assert.doesNotMatch(route,/R2_SECRET_ACCESS_KEY\s*:/);
 });
 
-test('Day 4 music signs exactly the approved numbers recording and route redirects to it', async () => {
+test('approved music redirects to the exact Day 4 and corrected Day 18 recordings', async () => {
   const { signTrack } = require('../server/courseMusic.cjs');
   const trackEnv = { ...env, R2_ACCOUNT_ID: 'a'.repeat(32) };
   const signed = signTrack('a1-day-04-numbers', trackEnv, now);
@@ -50,13 +50,15 @@ test('Day 4 music signs exactly the approved numbers recording and route redirec
   Object.assign(process.env, trackEnv);
   try {
     const handler = require('../api/approved-music.js');
+    for (const [track, path] of [['a1-day-04-numbers','/music/a1/day-04/welche-nummer-hast-du.mp3'], ['a2-day-18-bank','/music/a2/day-18/die-karte-funktioniert-nicht.mp3']]) {
     const res = { headers: {}, setHeader(k,v) { this.headers[k]=v; }, status(code) { this.code=code; return this; }, end() {}, json(body) { this.body=body; return this; } };
-    await handler({ method: 'GET', query: { track: 'a1-day-04-numbers' } }, res);
+    await handler({ method: 'GET', query: { track } }, res);
     assert.equal(res.code, 302);
     assert.equal(res.headers['Cache-Control'], 'no-store');
     const url = new URL(res.headers.Location);
-    assert.equal(url.pathname, '/music/a1/day-04/welche-nummer-hast-du.mp3');
+    assert.equal(url.pathname, path);
     assert.ok(url.searchParams.get('X-Amz-Signature'));
+    }
   } finally {
     for (const [key,value] of Object.entries(previous)) {
       if (value === undefined) delete process.env[key]; else process.env[key]=value;

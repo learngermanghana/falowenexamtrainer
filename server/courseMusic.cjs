@@ -9,12 +9,19 @@ const TRACKS = Object.freeze({
     id: 'a1-day-04-numbers', level: 'A1', day: 4, assignmentId: 'A1-2',
     title: 'Welche Nummer hast du?', key: 'music/a1/day-04/welche-nummer-hast-du.mp3',
   }),
+  'a2-day-18-bank': Object.freeze({
+    id: 'a2-day-18-bank', level: 'A2', day: 18, assignmentId: 'A2-7.18',
+    title: 'Die Karte funktioniert nicht', key: 'music/a2/day-18/die-karte-funktioniert-nicht.mp3',
+  }),
 });
 const encode = s => encodeURIComponent(String(s)).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
 const hmac = (key, value) => crypto.createHmac('sha256', key).update(value).digest();
 function signTrack(id, env = process.env, now = new Date()) {
   const track = Object.hasOwn(TRACKS, id) ? TRACKS[id] : null;
   if (!track) throw Object.assign(new Error('Unknown classroom song.'), { status: 404 });
+  return signObject(track, env, now);
+}
+function signObject(track, env, now = new Date()) {
   for (const key of ['R2_ACCOUNT_ID','R2_ACCESS_KEY_ID','R2_SECRET_ACCESS_KEY','R2_AUDIO_BUCKET']) {
     if (!String(env[key] || '').trim()) throw Object.assign(new Error('Classroom music storage is not configured.'), { status: 503 });
   }
@@ -77,18 +84,21 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = pr
     }
   };
 }
-// Teacher-only access to one private recording using the existing Vercel R2
-// configuration. Never accepts arbitrary object keys or public playback.
+// These private classroom conversations are never added to the public music map.
+const CLASSROOM_RECORDINGS = Object.freeze({
+  18: { id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' },
+  19: { id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' },
+});
 function createClassroomBankAudioHandler(options = {}) {
   return createMusicHandler({ ...options, prepare: async (req, env) => {
-    const { validateA2AudioKey, createA2AudioSignedUrl } = require('../functions/functionz/r2CourseAudio.js');
     const params = new URL(req.url, 'https://www.falowen.app').searchParams;
     const day = Number(params.get('day'));
     const key = params.get('key') || '';
-    if (day !== 18 || key !== 'a2/day-18/bank-telefonat.mp3' || !validateA2AudioKey({ day, key })) {
-      throw Object.assign(new Error('Invalid classroom bank audio request.'), { status: 400 });
+    const recording = Object.hasOwn(CLASSROOM_RECORDINGS, day) ? CLASSROOM_RECORDINGS[day] : null;
+    if (!recording || key !== recording.key) {
+      throw Object.assign(new Error('Invalid classroom audio request.'), { status: 400 });
     }
-    return { ...await createA2AudioSignedUrl({ day, key, env }), id: 'a2-day18-bank-telephone' };
+    return signObject(recording, env);
   } });
 }
 module.exports = { createClassroomBankAudioHandler, TRACKS, signTrack, isMusicStaff, createMusicHandler };

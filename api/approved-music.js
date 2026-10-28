@@ -7,7 +7,7 @@ const { signTrack } = require('../server/courseMusic.cjs');
 const APPROVED_MUSIC_KEYS = Object.freeze({
   'a1-day-04-numbers': 'music/a1/day-04/welche-nummer-hast-du.mp3',
   'a1-day-22-health': 'music/a1/day-22/mein-kopf-tut-weh.mp3',
-  'a2-day-18-bank': 'music/a2/die-karte-funktioniert-nicht.mp3',
+  'a2-day-18-bank': 'music/a2/day-18/die-karte-funktioniert-nicht.mp3',
 });
 
 module.exports = async function approvedMusicHandler(req, res) {
@@ -31,7 +31,7 @@ module.exports = async function approvedMusicHandler(req, res) {
   try {
     // Fresh short-lived URL on each press of Play. R2 music stays in the
     // existing bucket without enabling public access to private Hören assets.
-    const location = trackId === 'a1-day-04-numbers'
+    const location = ['a1-day-04-numbers', 'a2-day-18-bank'].includes(trackId)
       ? signTrack(trackId).url
       : signedStudioUrl({ method: 'GET', key: objectKey, expires: 900 });
     res.setHeader('Location', location);
