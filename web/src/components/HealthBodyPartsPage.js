@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import FalowenLessonMusic from "./FalowenLessonMusic";
 
 import { styles } from "../styles";
 
@@ -363,6 +364,7 @@ const HealthBodyPartsPage = () => {
         </div>
 
         <HeroImage src={heroSrc} alt="Doctor consultation in clinic" />
+        <FalowenLessonMusic level="A1" day={22} assignmentKey="A1-14.1" />
       </header>
 
       <Section title="Part 1: Two Ways to Say You Are Not Feeling Well">
