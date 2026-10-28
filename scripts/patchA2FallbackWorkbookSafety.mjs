@@ -41,11 +41,20 @@ if (!guidanceSource.includes(fallbackSubmissionMarker)) {
   { key: "references", legacyKey: "ref", match: /\\bref\\b|reference|answers|antwort/i },
   { key: "submit", legacyKey: "submit", match: /submit|abgeben|send/i },
 ];`;
-  if (!guidanceSource.includes(universalTabsBlock)) {
+  // The A2/B1 workbook may rename its non-assessed Ref tab to Music.
+  // Identify the shared block structurally instead of hard-coding its label.
+  const universalStart = guidanceSource.indexOf("const UNIVERSAL_A2_WORKBOOK_TABS = [");
+  const universalEnd = universalStart < 0 ? -1 : guidanceSource.indexOf("\\n];", universalStart);
+  if (universalStart < 0 || universalEnd < 0) {
     throw new Error("Could not find universal A2 fallback tabs block.");
   }
+  const actualUniversalTabsBlock = guidanceSource.slice(universalStart, universalEnd + 3);
+  if (!actualUniversalTabsBlock.includes('key: "references"') ||
+      !actualUniversalTabsBlock.includes('key: "submit"')) {
+    throw new Error("A2 workbook fallback tab structure is incomplete.");
+  }
 
-  const fallbackSubmissionBlock = `${universalTabsBlock}
+  const fallbackSubmissionBlock = `${actualUniversalTabsBlock}
 
 const A2_FALLBACK_SUBMISSION_CONFIG_BY_DAY = {
   24: { fallbackChapter: "9.24", workbookId: "A2Day24EinenUrlaubPlanen" },
@@ -72,7 +81,7 @@ export const resolveA2FallbackSubmissionContext = (day) => {
   };
 };`;
 
-  guidanceSource = guidanceSource.replace(universalTabsBlock, fallbackSubmissionBlock);
+  guidanceSource = guidanceSource.replace(actualUniversalTabsBlock, fallbackSubmissionBlock);
 }
 
 // Day 25 is the one forced shared-fallback lesson whose Part 4 is Lesen rather
