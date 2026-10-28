@@ -44,7 +44,7 @@ if (!guidanceSource.includes(fallbackSubmissionMarker)) {
   // The A2/B1 workbook may rename its non-assessed Ref tab to Music.
   // Identify the shared block structurally instead of hard-coding its label.
   const universalStart = guidanceSource.indexOf("const UNIVERSAL_A2_WORKBOOK_TABS = [");
-  const universalEnd = universalStart < 0 ? -1 : guidanceSource.indexOf("\\n];", universalStart);
+  const universalEnd = universalStart < 0 ? -1 : guidanceSource.indexOf(String.fromCharCode(10) + "];", universalStart);
   if (universalStart < 0 || universalEnd < 0) {
     throw new Error("Could not find universal A2 fallback tabs block.");
   }
