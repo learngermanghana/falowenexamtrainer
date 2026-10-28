@@ -11,6 +11,11 @@ const LEVELS = new Set(["A2", "B1"]);
 export const normalizeWorkbookSong = (track, level, day) => {
   if (!track || !SONG_ID.test(String(track.id || ""))) return null;
   if (track.level !== level || Number(track.day) !== day || track.coursebook !== true) return null;
+  if (!track.autoDiscovered && track.approved !== true) return null;
+  const objectKey = String(track.objectKey || "");
+  // A course Hören recording must never be mistaken for optional public music.
+  const prefix = `music/${level.toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
+  if (!objectKey.startsWith(prefix) || !/^[^/]+\\.mp3$/.test(objectKey.slice(prefix.length))) return null;
   const url = new URL("https://www.falowen.app/api/music?track=" + encodeURIComponent(track.id));
   if (track.audioUrl !== url.href) return null;
   return {
