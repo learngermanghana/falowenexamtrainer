@@ -79,3 +79,23 @@
 #discovery-status{min-height:16px;margin:4px 0 14px}
 @media(max-width:860px){.motivation-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:570px){.motivation-grid{grid-template-columns:1fr}.day-group{padding:12px}.empty-day{min-height:82px}.day-group .track-card{min-height:220px}}
+
+
+/* The student campus embeds this SAME-ORIGIN player, not a second music app.
+   Keep the song library/learning flow and audio, but avoid nested site nav. */
+.music-embedded .site-header,
+.music-embedded .hero,
+.music-embedded .bottom-band,
+.music-embedded .footer,
+.music-embedded .library-footer,
+.music-embedded .catalog-hint { display: none !important; }
+.music-embedded { background: #f6f9f4; }
+.music-embedded .library-section { padding-top: 20px; padding-bottom: 80px; }
+.music-embedded .library-section .section-heading { margin-top: 0; }
+.music-embedded .song-detail { border-top: 0; }
+.music-embedded .detail-shell { padding-top: 22px; }
+.music-embedded .player { z-index: 50; }
+@media(max-width:570px) {
+  .music-embedded .library-section { padding-top: 12px; padding-bottom: 96px; }
+  .music-embedded .detail-shell { padding: 15px 12px 96px; }
+}
