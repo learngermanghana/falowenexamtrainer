@@ -20,7 +20,7 @@ const APPROVED_A2_MOCK_05_AUDIO = Object.freeze({
   },
   "teil-4": {
     "key": "a2/mock-hoeren/mock-05/teil-4.mp3",
-    "sha256": "4c5de14e47b6fbff63bac9e0dda65ae26e6ae09378f05e6ddea2fdd4d53ab8e7",
+    "sha256": "fd95d07cc74b0a930c71ffee9fb66727516ebc9a19ceb43c0f1c8736a8446033",
     "bytes": 2721312
   }
 });
