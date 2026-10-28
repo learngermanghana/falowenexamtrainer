@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
-const { musicKeyFromAutoId, musicTrackFromKey, listMusicTracks, parseMusicList, signatureForList } = require('../server/musicDiscovery.cjs');
+const { musicKeyFromAutoId, musicTrackFromKey, listMusicTracks, parseMusicList, authorizedMusicListRequest } = require('../server/musicDiscovery.cjs');
 import { validateApprovedTrack, generateSongPage, publishApprovedTrack } from '../scripts/publishApprovedMusic.mjs';
 
 const file = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
@@ -138,7 +138,7 @@ test('all 28 days are visible in each level and new music uploads require no sit
   const vercel=JSON.parse(file('vercel.json'));
   assert.ok(vercel.routes.find(r=>r.src==='/api/music-library' && r.dest==='/api/music-library.js'));
 });
-test('only music/<level>/day-XX/ lowercase named MP3 files can auto-publish', async () => {
+test('only music/<level>/day-XX/ MP3 files can auto-publish', async () => {
   const good='music/a2/day-19/lieber-online-oder-im-laden.mp3';
   const track=musicTrackFromKey(good);
   assert.ok(track);
@@ -146,7 +146,7 @@ test('only music/<level>/day-XX/ lowercase named MP3 files can auto-publish', as
   assert.equal(track.day,19);
   assert.equal(track.level,'A2');
   assert.equal(musicKeyFromAutoId(track.id),good);
-  for (const filename of ['Shopping Song (Final).mp3','A2_day_19_music.mp3','NewSong2026.mp3']) {
+  for (const filename of ['Shopping Song (Final).mp3','A2_day_19_music.mp3','NewSong2026.mp3','Einkaufen – wo und wie?.MP3','Lieber online oder im Laden!.mp3','Gefühle und Wünsche.mp3']) {
     const key='music/a2/day-19/'+filename;
     const detected=musicTrackFromKey(key);
     assert.ok(detected,'ordinary MP3 filenames must auto-appear');
@@ -158,7 +158,6 @@ test('only music/<level>/day-XX/ lowercase named MP3 files can auto-publish', as
     'music/a2/day-00/invalid.mp3',
     'music/a2/day-29/invalid.mp3',
     'music/a2/day-19/private.wav',
-    'music/a2/day-19/Secret.MP3',
     'music/a2/day-19/x.mp3?private=true',
     'music/a2/day-19/folder/file.mp3'
   ]) assert.equal(musicTrackFromKey(key),null);
@@ -187,18 +186,27 @@ test('bounded R2 LIST only reads music prefix, never Hören or arbitrary keys',a
     R2_AUDIO_BUCKET:'falowen-course-audio'};
   let requests=0;
   const now=()=>new Date('2026-10-28T12:00:00Z');
-  const signed=signatureForList(env,'',now());
-  assert.match(signed,/prefix=music%2F/);
-  assert.doesNotMatch(signed,/prefix=a2%2F/);
-  const tracks=await listMusicTracks({env,now,fetchImpl:async url=>{
+  const signed=authorizedMusicListRequest(env,'',now());
+  assert.match(signed.url,/^https:\/\/886b2264d12c796d29879a8e919a2f46\.r2\.cloudflarestorage\.com\/falowen-course-audio\?/);
+  assert.match(signed.url,/prefix=music%2F/);
+  assert.doesNotMatch(signed.url,/prefix=a2%2F/);
+  assert.match(signed.headers.Authorization,/^AWS4-HMAC-SHA256 Credential=testAccess\//);
+  assert.ok(signed.headers['x-amz-content-sha256']);
+  assert.equal(signed.url.includes('testSecret'),false);
+  const tracks=await listMusicTracks({env,now,fetchImpl:async (url,options)=>{
     requests++;
     assert.match(url,/prefix=music%2F/);
+    assert.equal(options.method,'GET');
+    assert.match(options.headers.Authorization,/^AWS4-HMAC-SHA256 Credential=/);
     return {ok:true,text:async()=>xml};
   }});
   assert.equal(requests,1);
   assert.equal(tracks.length,1);
   assert.equal(tracks[0].day,19);
   assert.equal(tracks[0].level,'A2');
+  const x=musicTrackFromKey('music/a2/day-19/Einkaufen – wo und wie?.MP3');
+  assert.equal(musicKeyFromAutoId(x.id),x.objectKey);
+  assert.ok(x.id.startsWith('r2-a2-day-19-b64_'));
 });
 
 test('embedded campus music accepts its own signed playback API but rejects unrelated paths',()=>{
