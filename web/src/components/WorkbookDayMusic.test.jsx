@@ -7,7 +7,7 @@ import { normalizeA2B1SectionView } from "../utils/lessonSectionDeepLinks";
 
 const day18 = {
   id: "a2-day-18-bank", title: "Die Bank anrufen", level: "A2", day: 18,
-  assignmentKey: "A2-7.18", coursebook: true,
+  assignmentKey: "A2-7.18", coursebook: true, approved: true,
   objectKey: "music/a2/day-18/bank.mp3",
   audioUrl: "https://www.falowen.app/api/music?track=a2-day-18-bank",
 };
