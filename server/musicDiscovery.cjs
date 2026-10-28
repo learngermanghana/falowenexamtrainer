@@ -5,7 +5,7 @@
 const crypto = require('node:crypto');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
-const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([A-Za-z0-9 _()\-]{1,150})\.mp3$/i;
+const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([A-Za-z0-9 _()\-]{1,150})\.mp3$/;
 const AUTO_ID = /^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const enc = value => encodeURIComponent(String(value)).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
 const hmac = (key,msg) => crypto.createHmac('sha256',key).update(msg).digest();
