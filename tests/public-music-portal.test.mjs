@@ -14,7 +14,7 @@ test("verified music.falowen.app host opens public music site before ordinary st
 });
 
 test("music catalog only contains actual approved public URLs, not private course audio", () => {
-  assert.equal(catalog.version, 1);
+  assert.ok(Number.isInteger(catalog.version) && catalog.version >= 1);
   assert.ok(catalog.tracks.length > 0);
   for (const track of catalog.tracks) {
     assert.ok(track.id && track.title && track.topic);

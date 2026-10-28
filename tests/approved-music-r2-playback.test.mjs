@@ -50,7 +50,7 @@ test('approved music redirects to the exact Day 4 and corrected Day 18 recording
   Object.assign(process.env, trackEnv);
   try {
     const handler = require('../api/approved-music.js');
-    for (const [track, path] of [['a1-day-04-numbers','/music/a1/day-04/welche-nummer-hast-du.mp3'], ['a2-day-18-bank','/music/a2/day-18/die-karte-funktioniert-nicht.mp3']]) {
+    for (const [track, path] of [['a1-day-04-numbers','/music/a1/day-04/welche-nummer-hast-du.mp3'], ['a2-day-18-bank','/music/a2/day-18/die-karte-funktioniert-nicht.mp3'], ['r2-a2-day-19-lieber-online-oder-im-laden','/music/a2/day-19/lieber-online-oder-im-laden.mp3'], ['r2-a2-day-20-b64_SMO2ZmxpY2ggcmVrbGFtaWVyZW4ubXAz', '/music/a2/day-20/H%C3%B6flich%20reklamieren.mp3']]) {
     const res = { headers: {}, setHeader(k,v) { this.headers[k]=v; }, status(code) { this.code=code; return this; }, end() {}, json(body) { this.body=body; return this; } };
     await handler({ method: 'GET', query: { track } }, res);
     assert.equal(res.code, 302);

@@ -125,11 +125,11 @@ test('all five static share pages have grounded metadata and the common learning
   assert.match(js,/hasLesson/);
 });
 
-test('all 28 days are visible in each level and new music uploads require no site build', () => {
+test('level shelves show available songs and new uploads require no site build', () => {
   const js=file('web/public/music/app.js');
-  assert.match(js,/Array\.from\(\{length:28\}/);
+  assert.match(js,/songs.slice\(0, 4\)/);
   assert.match(js,/const available = \["A1","A2","B1","B2","C1","C2"\]/);
-  assert.match(js,/No song yet/);
+  assert.doesNotMatch(js,/No song yet/);
   assert.match(js,/\/api\/music-library/);
   assert.match(js,/byId\("refresh-music"\)/);
   assert.match(js,/pinnedKeys/);
