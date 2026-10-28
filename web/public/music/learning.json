@@ -65,7 +65,8 @@
           "prompt": "Wie heißt du? Sag eine erfundene Nummer mit drei Ziffern.",
           "hint": "Say an invented three-digit practice number, never your personal phone number."
         }
-      ]
+      ],
+      "courseUrl": "https://www.falowen.app/campus/course/a1-day-4-numbers-for-beginners-workbook"
     },
     "a1-day-22-health": {
       "assignmentKey": "A1-14.1",
@@ -126,7 +127,8 @@
           "prompt": "Was sagst du, wenn du krank bist?",
           "hint": "Answer in one or two simple German sentences."
         }
-      ]
+      ],
+      "courseUrl": "https://www.falowen.app/campus/course/a1-day-22-health-and-body-parts-workbook"
     },
     "a2-day-18-bank": {
       "assignmentKey": "A2-7.18",
@@ -191,7 +193,8 @@
           "prompt": "Wie würdest du ein Zahlungsproblem am Telefon erklären?",
           "hint": "Try explaining a payment problem politely using 'Können Sie mir bitte helfen?'"
         }
-      ]
+      ],
+      "courseUrl": "https://www.falowen.app/campus/course/a2-day-18-die-bank-anrufen-workbook"
     }
   }
 }
