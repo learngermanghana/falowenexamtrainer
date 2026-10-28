@@ -2,6 +2,7 @@
 
 const MOCK_TITLE = "A2 Final Mock Exam";
 const KOMBI_SETS = require("./a2KombiMarkingSets");
+const MOCK_04_LISTENING_KEY = require("./a2Mock04HoerenKeys");
 const isA2Kombi = id => /^a2-mock-0[4-8]$/.test(String(id || ""));
 const MOCK_ROUTE = "/campus/results";
 
@@ -117,17 +118,21 @@ const {scoreObjectiveAnswers,verifiedSectionScore,buildVerifiedFourSkillScore}=r
 const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
   if (isA2Kombi(mockId)) {
     if (state?.mockId && state.mockId !== mockId) throw new Error("Saved A2 Kombiprüfung belongs to another paper.");
-    if (state?.assessmentVersion && state.assessmentVersion !== "three-module-v1") throw new Error("Unsupported A2 Kombiprüfung version.");
+    const isFour = mockId === "a2-mock-04" && state?.assessmentVersion === "four-module-v2";
+    if (state?.assessmentVersion && state.assessmentVersion !== "three-module-v1" && !isFour)
+      throw new Error("Unsupported A2 Kombiprüfung version.");
     const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {},KOMBI_SETS[mockId].reading,25);
+    const hoeren = isFour ? scoreObjectiveAnswers(state?.hoerenAnswers || {},MOCK_04_LISTENING_KEY,25) : null;
     const schreiben = verifiedSectionScore(verifiedSections,"schreiben",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
     const sprechen = verifiedSectionScore(verifiedSections,"sprechen",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
-    const points = Number((lesen.score + schreiben + sprechen).toFixed(1));
-    const score = Number((points / 75 * 100).toFixed(1));
+    const points = Number((lesen.score + (hoeren?.score || 0) + schreiben + sprechen).toFixed(1));
+    const maxPoints = isFour ? 100 : 75;
+    const score = Number((points / maxPoints * 100).toFixed(1));
     return {
-      sectionScores:{lesen:lesen.score,schreiben,sprechen},
-      overall:{score,maxScore:100,points,maxPoints:75,assessmentVersion:"three-module-v1",
-        sections:["lesen","schreiben","sprechen"],passed:score>=60},
-      objective:{lesen},
+      sectionScores:isFour?{lesen:lesen.score,hoeren:hoeren.score,schreiben,sprechen}:{lesen:lesen.score,schreiben,sprechen},
+      overall:{score,maxScore:100,points,maxPoints,assessmentVersion:isFour?"four-module-v2":"three-module-v1",
+        sections:isFour?["lesen","hoeren","schreiben","sprechen"]:["lesen","schreiben","sprechen"],passed:score>=60},
+      objective:isFour?{lesen,hoeren}:{lesen},
     };
   }
   if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unknown A2 mock answer set.");
@@ -226,16 +231,16 @@ const formatScore = (value) => {
   return Number.isInteger(numeric) ? String(numeric) : numeric.toFixed(1);
 };
 
-const buildSectionBreakdown = (sectionScores = {}, mockId = "") =>
-  (isA2Kombi(mockId) ? ["lesen","schreiben","sprechen"] : SECTION_ORDER).map((key) => ({
+const buildSectionBreakdown = (sectionScores = {}, mockId = "", version = "") =>
+  (isA2Kombi(mockId) && version !== "four-module-v2" ? ["lesen","schreiben","sprechen"] : SECTION_ORDER).map((key) => ({
     key,
     label: SECTION_LABELS[key],
     score: Math.max(0, Math.min(25, Number(sectionScores?.[key]) || 0)),
     maxScore: 25,
   }));
 
-const deriveMockInsights = (sectionScores = {}, mockId = "") => {
-  const breakdown = buildSectionBreakdown(sectionScores,mockId);
+const deriveMockInsights = (sectionScores = {}, mockId = "", version = "") => {
+  const breakdown = buildSectionBreakdown(sectionScores,mockId,version);
   const sorted = [...breakdown].sort((left, right) => right.score - left.score);
   return {
     breakdown,
@@ -289,10 +294,11 @@ const buildA2MockCompletionArtifacts = ({
   const identity = resolveStudentIdentity({ authedUser, studentProfile });
   const score = scoreNumber(overall?.score);
   const passed = Boolean(overall?.passed ?? score >= 60);
-  const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores,mockId);
+  const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores,mockId,overall?.assessmentVersion);
   const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const isSecond = mockId === "a2-mock-02";
   const isKombi = isA2Kombi(mockId);
+  const isFourKombi = mockId === "a2-mock-04" && overall?.assessmentVersion === "four-module-v2";
   const mockTitle = isKombi ? `A2 Mock ${Number(mockId.slice(-2))} · Kombiprüfung` : isSecond ? "A2 Mock 2" : MOCK_TITLE;
   const mockSource = isKombi ? mockId.replace(/-/g,"_") : isSecond ? "a2_mock_02" : "a2_final_mock";
   const mockLink = isKombi ? `/campus/course/a2-kombi-mock-${Number(mockId.slice(-2))}` : isSecond ? "/campus/course/a2-mock-2" : "/campus/course/a2-final-mock-exam";
@@ -327,8 +333,8 @@ const buildA2MockCompletionArtifacts = ({
     canonicalAssignmentKey: assignmentId,
     score,
     finalScore: score,
-    ...(isKombi ? {assessmentVersion:"three-module-v1",earnedPoints:Number(overall?.points)||0,
-      maxPoints:75,completedSections:["lesen","schreiben","sprechen"],hoerenPending:true} : {}),
+    ...(isKombi ? {assessmentVersion:isFourKombi?"four-module-v2":"three-module-v1",earnedPoints:Number(overall?.points)||0,
+      maxPoints:isFourKombi?100:75,completedSections:isFourKombi?SECTION_ORDER:["lesen","schreiben","sprechen"],hoerenPending:!isFourKombi} : {}),
     status: passed ? "passed" : "needs_more_practice",
     result: passed ? "passed" : "needs_more_practice",
     passed,
