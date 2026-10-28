@@ -80,6 +80,7 @@ function A2KombiAttempt({mockNumber,paper}) {
   const attemptId=flow.attemptInfo?.attemptId;
   const stage=flow.stage||"intro";
   const order=orderFor(flow);
+  const displayOrder=stage==="intro"&&paper.id==="a2-mock-04"?FULL_ORDER:order;
   const currentTimeState=stage==="lesen"?lesen:stage==="hoeren"?hoeren:stage==="schreiben"?writing:null;
   const msRemaining=currentTimeState?.startedAt?currentTimeState.startedAt+duration[stage]-now:duration[stage]||0;
 
@@ -202,12 +203,12 @@ function A2KombiAttempt({mockNumber,paper}) {
     <header className="a2-mock2-full-heading">
       <p className="a2-mock2-kicker">A2 Kombiprüfung · Mock {mockNumber}</p>
       <h1>A2 Mock {mockNumber}</h1>
-      <p>{paper.theme}</p><p><strong>{(stage==="intro"&&paper.id==="a2-mock-04"?FULL_ORDER:order).map(name=>LABELS[name]).join(" · ")}</strong></p>
+      <p>{paper.theme}</p><p><strong>{displayOrder.map(name=>LABELS[name]).join(" · ")}</strong></p>
     </header>
     <section className="a2-mock2-full-progress" aria-label="Exam module progress">
-      <div className="a2-mock2-full-progress-head"><strong>Exam progress</strong><span>{order.filter(k=>progress[k].done).length} of {order.length} completed</span></div>
-      <div className="a2-mock2-full-track"><div style={{width:`${order.filter(k=>progress[k].done).length/order.length*100}%`}}/></div>
-      <div className="a2-mock2-full-stages">{order.map((name,index)=><div key={name} className={progress[name].done?"complete":stage===name?"current":""}>
+      <div className="a2-mock2-full-progress-head"><strong>Exam progress</strong><span>{displayOrder.filter(k=>progress[k].done).length} of {displayOrder.length} completed</span></div>
+      <div className="a2-mock2-full-track"><div style={{width:`${displayOrder.filter(k=>progress[k].done).length/displayOrder.length*100}%`}}/></div>
+      <div className="a2-mock2-full-stages">{displayOrder.map((name,index)=><div key={name} className={progress[name].done?"complete":stage===name?"current":""}>
         <span>{progress[name].done?"✓":index+1}</span><strong>{LABELS[name]}</strong>
         <small>{progress[name].done?"Completed":stage===name?"Current":"Not started"}</small>
       </div>)}</div>
@@ -247,7 +248,7 @@ function A2KombiAttempt({mockNumber,paper}) {
         <footer className="a2-mock2-actions">
           <button type="button" disabled={part===0} onClick={()=>setPart(i=>i-1)}>Zurück</button>
           {part<3?<button type="button" className="a2-mock2-primary" onClick={()=>setPart(i=>i+1)}>Weiter: Teil {part+2}</button>:
-            <button type="button" className="a2-mock2-primary" onClick={submitReading}>Lesen abgeben → Schreiben</button>}
+            <button type="button" className="a2-mock2-primary" onClick={submitReading}>Lesen abgeben → {order===FULL_ORDER?"Hören":"Schreiben"}</button>}
         </footer>
       </article>
     </section>:null}
