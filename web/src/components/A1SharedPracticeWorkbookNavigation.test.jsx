@@ -14,7 +14,6 @@ const expectedPractices = [
   [13, "3.5", "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook"],
   [14, "3.6", "/campus/course/modal-verbs-day-14-3-6"],
   [15, "4.7", "/campus/course/speaking-exams-intro-4-7"],
-  [19, "5.9", "/campus/course/verboten-erlaubt-5-9"],
 ];
 
 const FakePracticeWorkbook = ({ remountOnSearch = false }) => {
@@ -55,8 +54,8 @@ describe("A1 shared self-practice navigation", () => {
     window.cancelAnimationFrame = (id) => window.clearTimeout(id);
   });
 
-  test("keeps only the eight workbook self-practice identities separate from tutor assignments", () => {
-    expect(A1_SHARED_PRACTICE_LESSONS).toHaveLength(8);
+  test("keeps only the seven current shared workbook self-practice identities separate from tutor assignments", () => {
+    expect(A1_SHARED_PRACTICE_LESSONS).toHaveLength(7);
     expectedPractices.forEach(([day, chapter, pathname]) => {
       const practice = resolveA1SharedPracticeLesson({ pathname });
       expect(practice).toEqual(expect.objectContaining({ day, chapter, kind: "practice", assignmentKey: null }));
