@@ -2,7 +2,8 @@
 // private course-audio R2 bucket. The published catalog is the single source
 // for approved IDs; uploading an object alone never exposes it to listeners.
 const { signedStudioUrl } = require('../functions/functionz/courseHoerenPublishing');
-const { signTrack } = require('../server/courseMusic.cjs');
+const { signTrack, signObject } = require('../server/courseMusic.cjs');
+const { musicKeyFromAutoId } = require('../server/musicDiscovery.cjs');
 const catalog = require('../web/public/music/catalog.json');
 
 // Deliberately restrict keys to the music/ namespace, not Hören resources.
@@ -39,14 +40,19 @@ async function approvedMusicHandler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
   const trackId = typeof req.query?.track === 'string' ? req.query.track : '';
-  const objectKey = Object.prototype.hasOwnProperty.call(APPROVED_MUSIC_KEYS, trackId)
+  const catalogKey = Object.prototype.hasOwnProperty.call(APPROVED_MUSIC_KEYS, trackId)
     ? APPROVED_MUSIC_KEYS[trackId] : '';
+  // The dedicated music/ folder is a public-release namespace. IDs map
+  // deterministically to a strictly validated music-only R2 path.
+  const autoKey = musicKeyFromAutoId(trackId);
+  const objectKey = catalogKey || autoKey;
   if (!objectKey) return res.status(404).json({ error: 'Music track not published' });
   try {
     // Special legacy signers continue to work; new approved lesson tracks
     // use the same bounded 15-minute signed R2 URL as the other songs.
     const location = ['a1-day-04-numbers', 'a2-day-18-bank'].includes(trackId)
       ? signTrack(trackId).url
+      : autoKey ? signObject({ id: trackId, key: autoKey }).url
       : signedStudioUrl({ method: 'GET', key: objectKey, expires: 900 });
     res.setHeader('Location', location);
     return res.status(302).end();
