@@ -274,7 +274,7 @@ export const getA2B1LessonProfile = (level, day) => {
       mode: "reference",
       submitRequired: false,
       partNumber: null,
-      label: "References",
+      label: "Music",
     }),
     submit: freezeSection({
       key: "submit",
