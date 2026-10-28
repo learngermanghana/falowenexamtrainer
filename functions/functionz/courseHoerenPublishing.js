@@ -93,8 +93,15 @@ const awsEncode = v => encodeURIComponent(String(v)).replace(/[!'()*]/g, c => `%
 const encodePath = value => value.split("/").map(awsEncode).join("/");
 const hmac = (key, value) => crypto.createHmac("sha256", key).update(value).digest();
 function signedStudioUrl({ method = "GET", key, env = process.env, now = new Date(), expires = 900 }) {
-  if (!/^(a1|a2|b1)\/studio\/[a-z0-9.-]+\/[a-f0-9-]{36}\.mp3$/.test(key) || !["GET", "PUT"].includes(method)) {
-    throw new Error("Invalid private studio object path.");
+  // Only two approved music files can be signed for public GET playback.
+  // Keep studio uploads and all private Hören key patterns restricted.
+  const approvedMusic = method === "GET" && (
+    key === "music/a1/day-22/mein-kopf-tut-weh.mp3"
+    || key === "music/a2/die-karte-funktioniert-nicht.mp3"
+  );
+  if ((!/^(a1|a2|b1)\\/studio\\/[a-z0-9.-]+\\/[a-f0-9-]{36}\\.mp3$/.test(key) && !approvedMusic)
+    || !["GET", "PUT"].includes(method)) {
+    throw new Error("Invalid private studio or approved music object path.");
   }
   const { accountId, accessKeyId, secretAccessKey, bucket } = getR2AudioConfig(env);
   const stamp = now.toISOString().replace(/[:-]|\.\d{3}/g, "");
