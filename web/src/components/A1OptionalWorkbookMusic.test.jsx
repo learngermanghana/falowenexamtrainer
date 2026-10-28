@@ -41,7 +41,7 @@ const stubFetch = ({ pinned = [day4, day22, day18], automatic = [discovered], ly
 const openMusic = container => {
   const details = container.querySelector('[data-a1-optional-music="true"]');
   details.open = true;
-  fireEvent.toggle(details);
+  fireEvent(details, new Event("toggle", { bubbles: false }));
 };
 
 describe("A1 optional Music within tutor and self-learning materials", () => {
