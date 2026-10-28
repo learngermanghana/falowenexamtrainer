@@ -24,7 +24,7 @@
         <h1 id="hero-title">German that <em>stays</em> with you.</h1>
         <p class="hero-description">Every phrase has a rhythm. Listen to warm German learning songs, follow everyday stories and make new words your own.</p>
         <div class="hero-actions"><button id="featured-play" class="hero-link" type="button">▶ Listen to a song</button><a class="hero-secondary" href="#library">Browse all songs ↓</a></div><p id="featured-description" class="featured-description" aria-live="polite">Listen to an original Falowen learning song.</p>
-        <div class="hero-stats"><span><strong>A1 + A2</strong><small>Lesson music available now</small></span><span class="stat-divider"></span><span><strong>Free</strong><small>Listen & practise</small></span></div>
+        <div class="hero-stats"><span><strong>A1–C2</strong><small>All lesson days · songs added as uploaded</small></span><span class="stat-divider"></span><span><strong>Free</strong><small>Listen & practise</small></span></div>
       </div>
       <div class="hero-art" aria-hidden="true"><div class="record-glow"></div><div class="record"><div class="record-ring ring-a"></div><div class="record-ring ring-b"></div><div class="record-ring ring-c"></div><div class="record-label"><span>FALOWEN</span><strong>Deutsch<br>im Takt</strong><small>33⅓ RPM</small></div></div><div class="floating-note note-a">♪</div><div class="floating-note note-b">♫</div></div>
     </div></section>
@@ -58,19 +58,19 @@
           <div><a id="course-link" href="https://www.falowen.app/campus">Open Course Book ↗</a><a href="https://www.falowen.app/classes">View live classes ↗</a></div></div>
       </div>
     </section>
-    <section class="library-section" id="library" aria-labelledby="library-title"><div class="section-heading"><div><p class="eyebrow dark">THE LISTENING ROOM</p><h2 id="library-title">Find your next favourite song.</h2><p>Choose your level, find a lesson or simply press play.</p></div><span id="song-count" class="song-count" aria-live="polite">Loading songs…</span></div>
+    <section class="library-section" id="library" aria-labelledby="library-title"><div class="section-heading"><div><p class="eyebrow dark">THE LISTENING ROOM</p><h2 id="library-title">Music for every lesson day.</h2><p>Pick your level and see all 28 days. A new MP3 uploaded to the matching music folder appears after refreshing.</p></div><span id="song-count" class="song-count" aria-live="polite">Loading songs…</span></div>
       <div class="category-controls" role="group" aria-label="Music categories">
         <button type="button" data-category="all" aria-pressed="true">All songs</button>
         <button type="button" data-category="lesson" aria-pressed="false">German learning</button>
         <button type="button" data-category="motivation" aria-pressed="false">Class motivation</button>
       </div>
       <div class="filters"><label class="search-wrap"><span class="visually-hidden">Search songs</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Search a song, topic or lesson…" autocomplete="off"></label>
-        <label class="select-wrap"><span>Level</span><select id="level"><option value="">All levels</option><option>A1</option><option>A2</option></select></label>
+        <label class="select-wrap"><span>Level</span><select id="level"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
         <label class="select-wrap"><span>Day</span><select id="day"><option value="">Any day</option></select></label><label class="select-wrap"><span>Genre</span><select id="genre"><option value="">All genres</option></select></label>
-        <button id="clear" type="button" class="clear-button">Clear filters</button>
+        <button id="clear" type="button" class="clear-button">Clear filters</button><button id="refresh-music" type="button" class="clear-button" title="Check for newly uploaded songs">↻ Refresh songs</button>
       </div>
-      <div id="library-status" role="status" aria-live="polite"></div>
-      <div id="tracks" class="track-grid"></div><p class="catalog-hint">More A1–C2 lesson songs will appear as their recordings are reviewed and published. Unreleased lessons are not shown as playable tracks.</p>
+      <div id="library-status" role="status" aria-live="polite"></div><p id="discovery-status" class="detail-note" role="status" aria-live="polite"></p>
+      <div id="tracks" class="track-grid"></div><p class="catalog-hint">Days without music stay visible. Upload approved MP3s to <code>music/a2/day-19/</code> (or the matching level and day) in Cloudflare R2, then choose Refresh songs. Music folders are public-listening release areas; never place private Hören recordings there.</p>
       <div class="library-footer"><p>Have a class today? Your teacher can choose music for each lesson in Falowen.</p><a href="https://www.falowen.app/books">Explore course books <span aria-hidden="true">↗</span></a></div>
     </section>
     <section class="bottom-band"><div><span class="band-symbol" aria-hidden="true">✳</span><div><p class="eyebrow">A LITTLE EVERY DAY</p><h2>Listen. Repeat. Remember.</h2><p>Good language habits sound better with music.</p></div></div><a href="https://www.falowen.app/">Continue learning <span aria-hidden="true">↗</span></a></section>
