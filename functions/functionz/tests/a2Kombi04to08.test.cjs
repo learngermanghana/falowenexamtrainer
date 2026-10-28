@@ -94,7 +94,27 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.equal(artifacts.scoreDocument.sectionScores.hoeren,25);
   assert.throws(()=>buildVerifiedA2MockScore({
-    mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
+    mockId:"a2-mock-06",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
     verifiedSections:verification,
   }),/Unsupported/);
+});
+
+test("A2 Mock 05 new /100 assessments score all 20 private listening responses; historical /75 results remain",()=>{
+ const key=require("../a2Mock05HoerenKeys");
+ const mockId="a2-mock-05";
+ assert.deepEqual(Object.keys(key),Array.from({length:20},(_,i)=>String(i+1)));
+ const verification={schreiben:{verified:true,score:25},sprechen:{verified:true,score:25}};
+ const state={mockId,assessmentVersion:"four-module-v2",lesenAnswers:sets[mockId].reading,hoerenAnswers:key};
+ const score=buildVerifiedA2MockScore({mockId,state,verifiedSections:verification});
+ assert.equal(score.overall.maxPoints,100);
+ assert.equal(score.overall.points,100);
+ assert.equal(score.sectionScores.hoeren,25);
+ assert.deepEqual(Object.keys(score.sectionScores),["lesen","hoeren","schreiben","sprechen"]);
+ const artifacts=buildA2MockCompletionArtifacts({mockId,authedUser:{uid:"teacher-test",email:"student@example.test"},attemptId:"fresh",overall:score.overall,sectionScores:score.sectionScores});
+ assert.equal(artifacts.scoreDocument.maxPoints,100);
+ assert.equal(artifacts.scoreDocument.hoerenPending,false);
+ const old=buildVerifiedA2MockScore({mockId,state:{mockId,assessmentVersion:"three-module-v1",lesenAnswers:sets[mockId].reading},verifiedSections:verification});
+ assert.equal(old.overall.maxPoints,75);
+ assert.equal(old.sectionScores.hoeren,undefined);
+ assert.throws(()=>buildVerifiedA2MockScore({mockId:"a2-mock-06",state,verifiedSections:verification}),/another paper/);
 });
