@@ -47,6 +47,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 40704827225 --repo learngermanghana/falowenexamtrainer --name Falowen-A2-course-materials-pdf --dir "$RUNNER_TEMP/a2-original"
       - name: Render all 28 authenticated A2 lessons (read only)
+        id: render
         env:
           FALOWEN_PDF_BASE_URL: https://www.falowen.app
           FALOWEN_PDF_EMAIL: ${{ secrets.FALOWEN_PDF_EMAIL }}
@@ -54,10 +55,13 @@ jobs:
           FALOWEN_PDF_AUTH_STATE_B64: ${{ secrets.FALOWEN_PDF_AUTH_STATE_B64 }}
         run: node scripts/course-material-bundles/renderLevelBundleV2.mjs A2
       - name: Validate the complete A2 book before uploading
+        id: validation
         run: node scripts/course-material-bundles/validateGeneratedBundle.mjs A2
       - name: Compare editions without publishing original private content
+        if: always() && steps.render.outcome == 'success'
         env:
           ORIGINAL_DOWNLOAD: ${{ steps.original.outcome }}
+          PDF_VALIDATION_OUTCOME: ${{ steps.validation.outcome }}
         run: |
           node scripts/course-material-bundles/compareA2PdfEditions.mjs \
             "$RUNNER_TEMP/a2-original/Falowen-A2-Course-Materials.pdf" \

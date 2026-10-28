@@ -29,6 +29,7 @@ const report = {
   corrected:{pages:corrected.pages,bytes:corrected.bytes,safetyFindings:[],
     joinedDay13Text:/wanted\s*todo\b/i.test(corrected.text)},
   reviewOnly:true,
+  fullValidationOutcome:process.env.PDF_VALIDATION_OUTCOME || "not-reported",
   remainingReview:["Manual comparison of all 28 lessons", "Live listening/audio semantic verification", "Editorial approval before merge or distribution"],
 };
 fs.writeFileSync(reportPath,JSON.stringify(report,null,2)+"\n");
@@ -37,4 +38,5 @@ if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_S
   `### A2 PR #3223 review PDF\n\nCorrected PDF: **${corrected.pages} pages**. ` +
   (original ? `Original: **${original.pages} pages**; reported-edition match: **${original.pages === 356}**.` :
     "Original PDF download unavailable; edition comparison remains pending.") +
-  "\n\nReview artifact only. No merge, website deployment or payment changes.\n");
+  `\n\nFull validation outcome: **${report.fullValidationOutcome}**. ` +
+  "Review artifact only; a validation failure blocks the book upload. No merge, website deployment or payment changes.\n");

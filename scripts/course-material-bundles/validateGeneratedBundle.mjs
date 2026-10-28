@@ -13,6 +13,16 @@ import { getA2PdfLessonCompanionUrl } from "./a2PdfPrintExtras.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, "../..");
 const level = String(process.argv[2] || "").trim().toUpperCase();
+if (level === "A2" && process.env.GITHUB_STEP_SUMMARY) {
+  // Validation errors below contain page numbers and fixed finding labels,
+  // never extracted learner text. Preserve the failing exit status while
+  // making the specific gate visible on the public PR build summary.
+  process.on("uncaughtExceptionMonitor", error => {
+    fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+      "### A2 final PDF validation failed\n\n```text\n" +
+      String(error.message).replace(/`/g, "'") + "\n```\n\nThe book was not approved for upload.\n");
+  });
+}
 
 if (!["A1", "A2", "B1"].includes(level)) {
   throw new Error("Generated bundle validation is currently defined for A1, A2 and B1.");

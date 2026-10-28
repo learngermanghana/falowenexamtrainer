@@ -63,12 +63,16 @@ test("print redaction removes complete private widgets, preserves examples and r
 test("all 28 days render complete canonical A2 companions and every printed Hören QR decodes to its lesson", async () => {
   const page = await browser.newPage();
   const merged = await PDFDocument.create();
+  const curriculum = JSON.parse(fs.readFileSync(new URL("../../shared/curriculumCanonical.json", import.meta.url), "utf8"));
+  const lessons = new Map(curriculum.filter(lesson => lesson.level === "A2").map(lesson => [Number(lesson.day), lesson]));
   let sections = 0, qrCount = 0;
   try {
     for (let day = 1; day <= 28; day++) {
       const parts = day === 22 ? ["grammar", "workbook"] : await getA2ReadOnlyParts(day);
       for (const part of parts) {
-        const lessonUrl = getA2PdfLessonCompanionUrl(`/campus/course/lesson/A2/${day}`);
+        const lesson = lessons.get(day);
+        assert.ok(lesson, `A2 Day ${day} must exist in the canonical curriculum`);
+        const lessonUrl = getA2PdfLessonCompanionUrl(lesson.workbookRoute || `/campus/course/lesson/A2/${day}`);
         const audioQrDataUrl = part === "teil-4" ? await QRCode.toDataURL(lessonUrl, {width:160, margin:1, errorCorrectionLevel:"M"}) : "";
         await page.setContent(await buildA2ReadOnlyPrintHtml({day,part,lesson:{title:`Tag ${day}`},lessonUrl,audioQrDataUrl}));
         const expected = await page.locator("body").innerText();
