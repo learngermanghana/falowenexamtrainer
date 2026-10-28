@@ -235,7 +235,7 @@ function A2KombiAttempt({mockNumber,paper}) {
         {connecting?"Connecting…":"Start mock exam"}
       </button>
     </section>:null}
-    {connectionError?<p role="alert">{connectionError} <button type="button" onClick={reconnect}>Retry server connection</button></p>:null}
+    {connectionError?<p role="alert">{connectionError} <button type="button" onClick={stage==="intro"?begin:reconnect}>{stage==="intro"?"Retry audio verification":"Retry server connection"}</button></p>:null}
     {started&&!attemptId?<p role="status">Connecting your exam attempt. Your saved work remains available.</p>:null}
     {stage==="lesen"?<section className="a2-mock2-shell" lang="de">
       <header className="a2-mock2-progress">
