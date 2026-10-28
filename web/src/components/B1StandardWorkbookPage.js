@@ -3,7 +3,7 @@ import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
 import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
-import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 import {
   A2_B1_WORKBOOK_TABS_WITH_GRAMMAR,
@@ -316,8 +316,8 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                   <p style={{ ...styles.subtitle, margin: 0 }}>
                     {config.subtitle || (writingRequired
                       ? (hasListeningTab
-                        ? "Select Grammar, Teil 1–4, Ref or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
-                        : "Select Grammar, Teil 1–3, Ref or Submit below. This lesson intentionally has no Teil 4.")
+                        ? "Select Grammar, Teil 1–4, Music or Submit below. The highlighted card at the top of each section tells you exactly what to answer."
+                        : "Select Grammar, Teil 1–3, Music or Submit below. This lesson intentionally has no Teil 4.")
                       : (hasListeningTab
                         ? `Today: Sprechen in class, then Teil 3 · Lesen and Teil 4 · ${part4Profile?.label || "Hören"}. Schreiben is not required for submission.`
                         : "Today: Sprechen in class, then Teil 3 · Lesen. Schreiben is not required for submission."))}
@@ -601,9 +601,9 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                 ) : null}
           
                 {resolvedActiveTab === "references" && (
-                  <WorkbookReferenceAnswers
-                    level="B1"
-                    lesson={{ title: config.workbookId || `B1Day${config.day}`, level: "B1", day: config.day, workbookId: config.workbookId }}
+                  <WorkbookDayMusic
+                    level="B1" day={config.day}
+                    title={config.workbookId || `B1Day${config.day}`}
                     workbookId={config.workbookId}
                   />
                 )}
