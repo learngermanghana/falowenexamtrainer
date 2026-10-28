@@ -3,6 +3,8 @@ const { publicClassesHandler } = require("../functions/functionz/routes/publicCl
 const { classParticipationMeHandler } = require("../functions/functionz/routes/classParticipation");
 const { admissionsEngagementHandler } = require("../functions/functionz/routes/admissionsEngagement");
 
+const courseMusicHandler = require("../server/courseMusic.cjs").createMusicHandler();
+
 let deploymentStatusCache = null;
 let deploymentStatusCacheTime = 0;
 const DEPLOYMENT_STATUS_CACHE_MS = 5 * 60 * 1000;
@@ -123,6 +125,10 @@ module.exports = (req, res) => {
   if (typeof req.url === "string") {
     if (req.url === "/api") req.url = "/";
     else if (req.url.startsWith("/api/")) req.url = req.url.slice(4);
+  }
+
+  if (req.url === "/course-media/music/audio-url" || req.url?.startsWith("/course-media/music/audio-url?")) {
+    return courseMusicHandler(req, res);
   }
 
   if (req.url === "/deployment-status" || req.url?.startsWith("/deployment-status?")) {
