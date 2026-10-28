@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AppBackButton from "./navigation/AppBackButton";
 import SharedTimedAssignment from "./SharedTimedAssignment";
 import ContextualAssignmentSubmissionPage from "./ContextualAssignmentSubmissionPage";
-import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import SpeakingMindMap from "./SpeakingMindMap";
@@ -218,7 +218,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
             <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
             <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day {day} Workbook · {title}</h1>
             <p style={{ ...styles.subtitle, margin: 0 }}>{writingRequired
-              ? (showHoeren ? "Select Grammar, Teil 1–4, Ref or Submit below." : "Select Grammar, Teil 1–3, Ref or Submit below.")
+              ? (showHoeren ? "Select Grammar, Teil 1–4, Music or Submit below." : "Select Grammar, Teil 1–3, Music or Submit below.")
               : (showHoeren ? "Today: Sprechen in class, then Lesen and Hören. Schreiben is not required." : "Today: Sprechen in class, then Lesen. Schreiben is not required.")} The tabs stay visible at the top of the workbook.</p>
             <div style={{ position: "sticky", top: 0, zIndex: 20, padding: 10, margin: "0 -4px", border: "1px solid #bfdbfe", borderRadius: 14, background: "rgba(255,255,255,0.98)", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.08)" }}><WorkbookTabNav
                 activeTab={displayedActiveTab}
@@ -295,7 +295,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
 
           {showHoeren && displayedActiveTab === "hoeren" && <div style={card}><HeroImage type="hoeren" alt="Headphones ready for German listening practice" /><h2 style={sectionTitle}>{hoerenSelfCheck ? "Teil 4 · Hören · Goethe-Praxis (Selbstkontrolle)" : "Teil 4 · Hören (Exercise)"}</h2>{hoerenSelfCheck ? <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e3a8a", lineHeight: 1.65 }}><strong>Selbstkontrolle · keine Abgabe.</strong> Bearbeite diese externe Goethe-Hören-Übung selbstständig und kontrolliere deine Antworten dort. <strong>Du trägst für diese Übung nichts im Falowen Submit-Tab ein.</strong></div> : null}<p style={{ margin: 0, lineHeight: 1.7 }}>{listeningTask}</p>{hoerenAudioKey ? <ProtectedA2ListeningAudio day={day} audioKey={hoerenAudioKey} /> : hoerenAudioUrl ? <ListeningMedia url={hoerenAudioUrl} /> : null}<QuestionList questions={hoerenQuestions} /><PublishedHoerenPractice assignmentKey={assignmentKey} />{hoerenSelfCheck ? null : <WorkbookSubmissionReminder />}<PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} label={hoerenSelfCheck ? "Ich habe die Hören-Selbstkontrolle abgeschlossen." : "I prepared this part."} /></div>}
 
-          {displayedActiveTab === "references" && <WorkbookReferenceAnswers level="A2" lesson={{ title, level: "A2", day, workbookId: resolvedWorkbookId }} workbookId={resolvedWorkbookId} />}
+          {displayedActiveTab === "references" && <WorkbookDayMusic level="A2" day={day} title={title} workbookId={resolvedWorkbookId} />}
           {displayedActiveTab === "submit" && <div style={card}><ContextualAssignmentSubmissionPage submissionContext={submissionContext} /></div>}
         </div>;
       }}
