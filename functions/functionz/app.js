@@ -30,6 +30,7 @@ const { saveTutorSpeakingAssessment, genericTutorTask, genericTutorPrompt, parse
 const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = require("./a1TutorSpeakingScore");
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
+const { verifyA2Mock04Audio } = require("./a2Mock04PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
@@ -1177,8 +1178,10 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
     // path; other future mocks still require a trusted published manifest.
     const isApprovedMock3Part = validated.mockId === "mock-03" &&
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
+    const isApprovedMock4Part = validated.mockId === "mock-04" &&
+      ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock3Part) {
+    if (!released && !isApprovedMock3Part && !isApprovedMock4Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
     const signed = await createA2MockAudioSignedUrl(validated);
@@ -1186,6 +1189,11 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "This Mock Hören recording does not match the approved audio." });
+    }
+    if (isApprovedMock4Part && !(await verifyA2Mock04Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "A2 Mock 04 Hören is unavailable until the approved MP3 is uploaded." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
@@ -5627,6 +5635,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
               attemptNumber: Number(activeData.attemptNumber || 1),
               firstAttempt: Boolean(activeData.firstAttempt),
               state: activeData.state || null,
+              assessmentVersion: activeData.assessmentVersion || (/^a2-mock-0[4-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1"),
               resumed: true,
             };
             return;
@@ -5634,6 +5643,8 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
+      const assessmentVersion = mockId === "a2-mock-04" ? "four-module-v2"
+        : /^a2-mock-0[5-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
       const isSecondMock = mockId !== "a2-mock-01";
       const attemptCount = Math.max(0, Number(isSecondMock
         ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));
@@ -5656,6 +5667,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         uid: authedUser.uid,
         email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
         mockId,
+        assessmentVersion,
         attemptNumber,
         firstAttempt: attemptNumber === 1,
         status: "in_progress",
@@ -5670,6 +5682,7 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         attemptId: newAttemptRef.id,
         attemptNumber,
         firstAttempt: attemptNumber === 1,
+        assessmentVersion,
         state: null,
         resumed: false,
       };
@@ -5735,9 +5748,14 @@ app.post("/a2-mock/attempt/save", async (req, res) => {
       }
 
       const userData = userSnap.exists ? userSnap.data() || {} : {};
+      if (/^a2-mock-0[4-8]$/.test(existing.mockId || "") &&
+          state.assessmentVersion !== (existing.assessmentVersion || "three-module-v1")) {
+        saveOutcome = { invalidCompletion:true,code:"ASSESSMENT_TASK_CHANGED",
+          error:"This exam must retain the module version with which it started." };
+        return;
+      }
 
-      // Completion is monotonic, but a completed record is only publishable when
-      // all four section scores can be reconstructed from server-trusted data.
+      // Completion is monotonic; do not overwrite a completed score.
       if (existing.status === "completed") {
         let verifiedCompletion;
         try {

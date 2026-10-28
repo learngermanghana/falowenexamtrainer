@@ -70,3 +70,31 @@ test("completed Kombi scores preserve mock identity, no Hören and separate /75 
     assert.ok(artifacts.scoreDocId.includes(id));
   }
 });
+
+test("new A2 Mock 04 Hören is verified as the fourth /25 module without altering legacy attempts",()=>{
+  const listening=require("../a2Mock04HoerenKeys");
+  const reading=sets["a2-mock-04"].reading;
+  assert.deepEqual(Object.keys(listening),Array.from({length:20},(_,i)=>String(i+1)));
+  const verification={schreiben:{verified:true,score:25},sprechen:{verified:true,score:25}};
+  const state={mockId:"a2-mock-04",assessmentVersion:"four-module-v2",lesenAnswers:reading,hoerenAnswers:listening};
+  const graded=buildVerifiedA2MockScore({mockId:"a2-mock-04",state,verifiedSections:verification});
+  assert.equal(graded.overall.points,100);
+  assert.equal(graded.overall.maxPoints,100);
+  assert.equal(graded.overall.assessmentVersion,"four-module-v2");
+  assert.deepEqual(graded.overall.sections,["lesen","hoeren","schreiben","sprechen"]);
+  assert.equal(graded.sectionScores.hoeren,25);
+  const artifacts=buildA2MockCompletionArtifacts({
+    authedUser:{uid:"student-77",email:"learner@example.test"},
+    mockId:"a2-mock-04",attemptId:"fresh-four-skill",attemptNumber:2,
+    overall:graded.overall,sectionScores:graded.sectionScores,
+    now:new Date("2026-10-28T10:00:00.000Z"),
+  });
+  assert.equal(artifacts.scoreDocument.maxPoints,100);
+  assert.equal(artifacts.scoreDocument.hoerenPending,false);
+  assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
+  assert.equal(artifacts.scoreDocument.sectionScores.hoeren,25);
+  assert.throws(()=>buildVerifiedA2MockScore({
+    mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
+    verifiedSections:verification,
+  }),/Unsupported/);
+});

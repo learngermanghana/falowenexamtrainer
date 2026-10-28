@@ -24,9 +24,9 @@ test("all five extracted A2 paper versions have 20 questions, no answer leakage 
     expect(paper.speaking.teil3.points).toHaveLength(4);
     expect(library.status).toBe("ready");
     expect(library.mode).toBe("kombi");
-    expect(library.sections).toEqual(["Lesen","Schreiben","Sprechen"]);
+    expect(library.sections).toEqual(index===0?["Lesen","Hören","Schreiben","Sprechen"]:["Lesen","Schreiben","Sprechen"]);
     expect(library.route).toBe(`/campus/course/a2-kombi-mock-${index+4}`);
-    expect(library.sections).not.toContain("Hören");
+    if(index!==0)expect(library.sections).not.toContain("Hören");
   });
 });
 
@@ -43,7 +43,7 @@ test("each mock and student has private local progress; no audio or answer keys 
   const c=a2KombiKeys("a2-mock-05","student-a");
   expect(a.flow).not.toBe(b.flow);
   expect(a.lesen).not.toBe(c.lesen);
-  expect(Object.keys(a)).toEqual(["flow","lesen","schreiben","sprechen"]);
+  expect(Object.keys(a)).toEqual(["flow","lesen","hoeren","schreiben","sprechen"]);
   expect(A2_KOMBI_VERSION).toBe("three-module-v1");
   expect(a2KombiProgress(a).sprechen.done).toBe(false);
 });

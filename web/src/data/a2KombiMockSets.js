@@ -1,5 +1,5 @@
 // A2 Kombiprüfung Mock 04–08, faithfully adapted from the five teacher-provided PDFs.
-// NO answer keys or model solutions in this learner bundle. Hören is not published yet.
+// NO answer keys or model solutions in this learner bundle. Mock 04 Hören is in a separate protected module.
 export const A2_KOMBI_SETS = Object.freeze({
   "a2-mock-04": {
     "id": "a2-mock-04",
