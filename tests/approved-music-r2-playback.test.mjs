@@ -30,7 +30,7 @@ test('public approved music route has static track allowlist and no credentials 
   const route=readFileSync(new URL('../api/approved-music.js',import.meta.url),'utf8');
   const catalog=JSON.parse(readFileSync(new URL('../web/public/music/catalog.json',import.meta.url),'utf8'));
   const vercel=JSON.parse(readFileSync(new URL('../vercel.json',import.meta.url),'utf8'));
-  assert.equal(catalog.tracks.filter(x=>x.slides===true).length,2);
+  assert.equal(catalog.tracks.filter(x=>x.slides===true).length,3);
   assert.ok(catalog.tracks.filter(x=>x.slides===true).every(x=>x.attendance && x.coursebook));
   assert.ok(catalog.tracks.some(x=>x.assignmentKey==='A1-14.1'));
   assert.ok(catalog.tracks.some(x=>x.assignmentKey==='A2-7.18'));
@@ -38,4 +38,28 @@ test('public approved music route has static track allowlist and no credentials 
   assert.match(route,/Object\.prototype\.hasOwnProperty\.call/);
   assert.match(route,/no-store/);
   assert.doesNotMatch(route,/R2_SECRET_ACCESS_KEY\s*:/);
+});
+
+test('Day 4 music signs exactly the approved numbers recording and route redirects to it', async () => {
+  const { signTrack } = require('../server/courseMusic.cjs');
+  const trackEnv = { ...env, R2_ACCOUNT_ID: 'a'.repeat(32) };
+  const signed = signTrack('a1-day-04-numbers', trackEnv, now);
+  assert.equal(new URL(signed.url).pathname, '/music/a1/day-04/welche-nummer-hast-du.mp3');
+  assert.throws(() => signTrack('music/a1/day-04/other.mp3', env), /Unknown/);
+  const previous = Object.fromEntries(Object.keys(env).map(key => [key, process.env[key]]));
+  Object.assign(process.env, trackEnv);
+  try {
+    const handler = require('../api/approved-music.js');
+    const res = { headers: {}, setHeader(k,v) { this.headers[k]=v; }, status(code) { this.code=code; return this; }, end() {}, json(body) { this.body=body; return this; } };
+    await handler({ method: 'GET', query: { track: 'a1-day-04-numbers' } }, res);
+    assert.equal(res.code, 302);
+    assert.equal(res.headers['Cache-Control'], 'no-store');
+    const url = new URL(res.headers.Location);
+    assert.equal(url.pathname, '/music/a1/day-04/welche-nummer-hast-du.mp3');
+    assert.ok(url.searchParams.get('X-Amz-Signature'));
+  } finally {
+    for (const [key,value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key]; else process.env[key]=value;
+    }
+  }
 });

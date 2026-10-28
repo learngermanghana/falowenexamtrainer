@@ -5,6 +5,10 @@ const TRACKS = Object.freeze({
     id: 'a1-day22-mein-kopf-tut-weh', level: 'A1', day: 22, assignmentId: 'A1-14.1',
     title: 'Mein Kopf tut weh', key: 'music/a1/day-22/mein-kopf-tut-weh.mp3',
   }),
+  'a1-day-04-numbers': Object.freeze({
+    id: 'a1-day-04-numbers', level: 'A1', day: 4, assignmentId: 'A1-2',
+    title: 'Welche Nummer hast du?', key: 'music/a1/day-04/welche-nummer-hast-du.mp3',
+  }),
 });
 const encode = s => encodeURIComponent(String(s)).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
 const hmac = (key, value) => crypto.createHmac('sha256', key).update(value).digest();

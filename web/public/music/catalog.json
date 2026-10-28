@@ -1,8 +1,25 @@
 {
-  "version": 2,
+  "version": 3,
   "updated": "2026-10-28",
   "description": "Public Falowen Music catalog. Only add tracks that have been approved and whose public MP3 URLs exist. No private Hören audio.",
   "tracks": [
+    {
+      "id": "a1-day-04-numbers",
+      "title": "Welche Nummer hast du?",
+      "level": "A1",
+      "day": 4,
+      "assignmentKey": "A1-2",
+      "topic": "Zahlen, Begrüßung und Vorstellung",
+      "type": "Learning story",
+      "genre": "Soft Funk",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=a1-day-04-numbers",
+      "featured": true,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a1/day-04/welche-nummer-hast-du.mp3"
+    },
     {
       "id": "a1-day-22-health",
       "title": "Mein Kopf tut weh",
