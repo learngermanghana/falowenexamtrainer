@@ -254,6 +254,7 @@ function setTab(name) {
   if (!["listen", "lyrics", "practice"].includes(name)) return;
   const lesson = selected && (publishedLyrics.get(selected.id) || learning[selected.id]);
   if (!lesson && name !== "listen") return;
+  if (name !== "listen" && document.querySelector('[data-tab="' + name + '"]').hidden) return;
   if (name === "practice" && !learning[selected?.id]?.questions) return;
   document.querySelectorAll(".lesson-tabs button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.tab === name));
@@ -283,7 +284,8 @@ function renderLyrics(lesson) {
     if (cue) line.addEventListener("click", () => {
       if (!selected) return;
       if (current?.id !== selected.id) setPlayer(selected, false);
-      const seek = () => { audio.currentTime = cue.start; updateLyricHighlight(); };
+      const trackId = selected.id;
+      const seek = () => { if (current?.id === trackId) { audio.currentTime = cue.start; updateLyricHighlight(); } };
       if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, {once:true});
       audio.play().catch(() => {});
     });
@@ -311,7 +313,7 @@ function updateLyricHighlight() {
   });
   const line = root.querySelector('[data-line="' + active + '"]');
   if (line && !byId("detail-lyrics").hidden && byId("follow-lyrics").checked) {
-    const top = line.offsetTop - root.offsetTop;
+    const top = line.getBoundingClientRect().top - root.getBoundingClientRect().top + root.scrollTop;
     if (top < root.scrollTop || top + line.offsetHeight > root.scrollTop + root.clientHeight)
       root.scrollTo({top:Math.max(0, top - root.clientHeight / 3), behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
   }
