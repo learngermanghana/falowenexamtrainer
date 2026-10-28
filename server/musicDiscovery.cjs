@@ -5,23 +5,37 @@
 const crypto = require('node:crypto');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
-const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([a-z0-9]+(?:-[a-z0-9]+)*)\.mp3$/;
+const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([A-Za-z0-9 _()\-]{1,150})\.mp3$/i;
 const AUTO_ID = /^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-([a-z0-9]+(?:-[a-z0-9]+)*)$/;
 const enc = value => encodeURIComponent(String(value)).replace(/[!'()*]/g,c=>'%'+c.charCodeAt(0).toString(16).toUpperCase());
 const hmac = (key,msg) => crypto.createHmac('sha256',key).update(msg).digest();
 function musicKeyFromAutoId(id) {
+  const encoded=String(id || '').match(/^r2-(a1|a2|b1|b2|c1|c2)-day-(0[1-9]|1[0-9]|2[0-8])-b64_([a-zA-Z0-9_-]{4,220})$/);
+  if (encoded) {
+    try {
+      const name=Buffer.from(encoded[3],'base64url').toString('utf8');
+      const match=musicTrackFromKey('music/'+encoded[1]+'/day-'+encoded[2]+'/'+name);
+      if(match && match.id === id) return match.objectKey;
+    } catch {}
+    return '';
+  }
   const match = String(id || '').match(AUTO_ID);
   return match ? 'music/' + match[1] + '/day-' + match[2] + '/' + match[3] + '.mp3' : '';
 }
 function musicTrackFromKey(key) {
   const match = String(key || '').match(OBJECT_KEY);
-  if (!match) return null;
+  if (!match || match[3].trim().length < 1) return null;
   const level = match[1].toUpperCase();
   if (!LEVELS.has(level)) return null;
-  const name = match[3].split('-').map(token=>token.charAt(0).toUpperCase()+token.slice(1)).join(' ');
-  const id = 'r2-' + match[1] + '-day-' + match[2] + '-' + match[3];
+  const filename=match[3]+'.mp3';
+  const isSlug=/^[a-z0-9]+(?:-[a-z0-9]+)*\.mp3$/.test(filename);
+  const suffix=isSlug?match[3]:'b64_'+Buffer.from(filename,'utf8').toString('base64url');
+  if(suffix.length>225) return null;
+  const id = 'r2-' + match[1].toLowerCase() + '-day-' + match[2] + '-' + suffix;
+  const name=match[3].replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
   return {
-    id, title:name, level, day:Number(match[2]), topic:'Day '+Number(match[2])+' · German music',
+    id, title:name.charAt(0).toUpperCase()+name.slice(1), level, day:Number(match[2]),
+    topic:'Day '+Number(match[2])+' · German music',
     type:'Learning story', genre:'', language:'German',
     audioUrl:'https://www.falowen.app/api/music?track='+id,
     assignmentKey:'', coursebook:true, autoDiscovered:true,
