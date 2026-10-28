@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "updated": "2026-10-28",
+  "description": "Public Falowen Music catalog. Only add tracks that have been approved and whose public MP3 URLs exist. No private Hören audio.",
+  "tracks": [
+    {
+      "id": "gemeinsam-schaffen-wir-das",
+      "title": "Gemeinsam schaffen wir das",
+      "level": "ALL",
+      "day": null,
+      "assignmentKey": null,
+      "topic": "Motivation",
+      "type": "Class welcome",
+      "language": "German + English",
+      "audioUrl": "https://admin.falowen.app/Gemeinsam%20schaffen%20wir%20das.mp3",
+      "featured": true,
+      "attendance": true
+    },
+    {
+      "id": "schritt-fuer-schritt",
+      "title": "Schritt für Schritt",
+      "level": "ALL",
+      "day": null,
+      "assignmentKey": null,
+      "topic": "Motivation",
+      "type": "Encouragement",
+      "language": "German",
+      "audioUrl": "https://admin.falowen.app/Schritt%20f%C3%BCr%20Schritt.mp3",
+      "featured": false,
+      "attendance": true
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Falowen Lesson Music</title><style>*{box-sizing:border-box}body{margin:0;font:14px system-ui,-apple-system,sans-serif;background:#f1f6e7;color:#173c34}.box{padding:17px;border:1px solid #d4e4cb;border-radius:14px}.tag{font-size:10px;letter-spacing:2px;font-weight:800;color:#60833d}.row{display:flex;align-items:center;justify-content:space-between;gap:12px}h2{font-size:18px;margin:8px 0 5px}p{margin:5px 0 12px;color:#5a7068}audio{width:100%;height:43px;margin:5px 0}a{color:#2c6245;font-weight:700;text-decoration:underline}button{border:0;background:#214b39;color:white;padding:9px 13px;border-radius:10px;font:inherit;cursor:pointer}.small{font-size:12px}</style></head><body><section class="box"><div class="row"><span class="tag">♫ FALOWEN · LESSON MUSIC</span><a href="https://music.falowen.app/" target="_blank" rel="noopener noreferrer">Library ↗</a></div><h2 id="title">Looking for this lesson's song…</h2><p id="description">Songs appear after they are approved and published.</p><audio id="player" controls preload="none" hidden></audio><div class="row"><span class="small" id="status"></span><a id="open" href="https://music.falowen.app/" target="_blank" rel="noopener noreferrer">Open music library ↗</a></div></section><script type="module">
+const params = new URLSearchParams(location.search), level = (params.get("level")||"").toUpperCase(), day = Number(params.get("day")), trackId = params.get("track");
+const title = document.getElementById("title"), description = document.getElementById("description"), player = document.getElementById("player");
+const library = new URL("https://music.falowen.app/");
+if (/^(A1|A2|B1|B2|C1|C2)$/.test(level)) library.searchParams.set("level",level);
+if (Number.isInteger(day) && day>=1 && day<=31) library.searchParams.set("day",String(day));
+document.getElementById("open").href = library.href;
+fetch("/music/catalog.json").then(r=>{if(!r.ok)throw Error("Catalog unavailable");return r.json()}).then(data=>{
+const song = (data.tracks||[]).find(t=>t.id===trackId) || (data.tracks||[]).find(t=>t.level===level && t.day===day && t.coursebook!==false);
+if (!song) {title.textContent="Song coming soon";description.textContent="There is no published song for this lesson yet. Visit the library for other German songs.";return}
+const url=new URL(song.audioUrl,location.origin);
+if(url.protocol!=="https:" || /(^|\.)r2\.cloudflarestorage\.com$/i.test(url.hostname)) throw Error("Invalid public audio URL");
+title.textContent=String(song.title||"Lesson music");description.textContent=[song.level,"Day "+song.day,song.topic].filter(Boolean).join(" · ");
+player.src=url.href;player.hidden=false;
+const open=new URL(library);open.searchParams.set("track",song.id);document.getElementById("open").href=open.href;
+}).catch(()=>{title.textContent="Music temporarily unavailable";description.textContent="Please visit the Falowen Music library."});
+</script></body></html>

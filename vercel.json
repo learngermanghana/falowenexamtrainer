@@ -167,6 +167,36 @@
           "value": "noindex, follow"
         }
       ]
+    },
+    {
+      "source": "/music/catalog.json",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=60, must-revalidate"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/music/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
     }
   ],
   "routes": [
@@ -254,6 +284,29 @@
       "headers": {
         "Cache-Control": "public, max-age=0, must-revalidate"
       }
+    },
+    {
+      "src": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "music.falowen.app"
+        }
+      ],
+      "dest": "/music/index.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate"
+      }
+    },
+    {
+      "src": "/robots\\.txt",
+      "has": [
+        {
+          "type": "host",
+          "value": "music.falowen.app"
+        }
+      ],
+      "dest": "/music/robots.txt"
     },
     {
       "src": "/",
