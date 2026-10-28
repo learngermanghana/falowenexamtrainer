@@ -1,8 +1,42 @@
 {
-  "version": 1,
+  "version": 2,
   "updated": "2026-10-28",
   "description": "Public Falowen Music catalog. Only add tracks that have been approved and whose public MP3 URLs exist. No private Hören audio.",
   "tracks": [
+    {
+      "id": "a1-day-22-health",
+      "title": "Mein Kopf tut weh",
+      "level": "A1",
+      "day": 22,
+      "assignmentKey": "A1-14.1",
+      "topic": "Gesundheit und Körperteile",
+      "type": "Learning story",
+      "genre": "Acoustic Afro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=a1-day-22-health",
+      "featured": true,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a1/day-22/mein-kopf-tut-weh.mp3"
+    },
+    {
+      "id": "a2-day-18-bank",
+      "title": "Die Karte funktioniert nicht",
+      "level": "A2",
+      "day": 18,
+      "assignmentKey": "A2-7.18",
+      "topic": "Bank und Telefonat",
+      "type": "Learning story",
+      "genre": "Downtempo Electronic",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=a2-day-18-bank",
+      "featured": true,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/die-karte-funktioniert-nicht.mp3"
+    },
     {
       "id": "gemeinsam-schaffen-wir-das",
       "title": "Gemeinsam schaffen wir das",
