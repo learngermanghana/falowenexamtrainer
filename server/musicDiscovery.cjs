@@ -52,7 +52,7 @@ function authorizedMusicListRequest(env=process.env, continuationToken='', now=n
   const { accountId, accessKeyId, secretAccessKey, bucket } = getR2AudioConfig(env);
   const host=accountId+'.r2.cloudflarestorage.com';
   const uri='/'+enc(bucket);
-  const stamp=now.toISOString().replace(/[:-]|\\.\\d{3}/g,'');
+  const stamp=now.toISOString().replace(/[:-]|\.\d{3}/g,'');
   const date=stamp.slice(0,8);
   const scope=date+'/auto/s3/aws4_request';
   const values=[
@@ -63,12 +63,12 @@ function authorizedMusicListRequest(env=process.env, continuationToken='', now=n
     .map(([k,v])=>k+'='+v).join('&');
   const contentHash=crypto.createHash('sha256').update('').digest('hex');
   const signedHeaders='host;x-amz-content-sha256;x-amz-date';
-  const canonicalHeaders='host:'+host+'\\n'
-    +'x-amz-content-sha256:'+contentHash+'\\n'
-    +'x-amz-date:'+stamp+'\\n';
-  const canonical=['GET',uri,query,canonicalHeaders,signedHeaders,contentHash].join('\\n');
+  const canonicalHeaders='host:'+host+'\n'
+    +'x-amz-content-sha256:'+contentHash+'\n'
+    +'x-amz-date:'+stamp+'\n';
+  const canonical=['GET',uri,query,canonicalHeaders,signedHeaders,contentHash].join('\n');
   const digest=crypto.createHash('sha256').update(canonical).digest('hex');
-  const toSign=['AWS4-HMAC-SHA256',stamp,scope,digest].join('\\n');
+  const toSign=['AWS4-HMAC-SHA256',stamp,scope,digest].join('\n');
   const secret=hmac(hmac(hmac(hmac('AWS4'+secretAccessKey,date),'auto'),'s3'),'aws4_request');
   const sig=crypto.createHmac('sha256',secret).update(toSign).digest('hex');
   return {
