@@ -21,7 +21,7 @@ test('timings must match every sung line and the exact MP3',()=>{
 });
 test('only a music sidecar is fetched and no signed URL or credentials are returned',async()=>{
  let calls=0;
- const handler=createLyricsHandler({env,fetchImpl:async url=>{calls++;assert.equal(new URL(url).pathname,'/'+key.replace('.mp3','.lyrics.json'));return new Response(JSON.stringify(pack));}});
+ const handler=createLyricsHandler({env,timings:{recordings:[]},fetchImpl:async url=>{calls++;assert.equal(new URL(url).pathname,'/'+key.replace('.mp3','.lyrics.json'));return new Response(JSON.stringify(pack));}});
  const response=res(); await handler({method:'GET',query:{track:'r2-a2-day-19-lieber-online-oder-im-laden'}},response);
  assert.equal(response.code,200);assert.deepEqual(response.body,pack);assert.equal(calls,1);
  assert.doesNotMatch(JSON.stringify(response.body),/X-Amz|test-audio/);
@@ -30,6 +30,30 @@ test('only a music sidecar is fetched and no signed URL or credentials are retur
 });
 test('missing, oversized or mismatched timing never breaks audio or exposes raw errors',async()=>{
  for(const [response,expected] of [[new Response('',{status:404}),404],[new Response('x'.repeat(100001)),503],[new Response(JSON.stringify({...pack,objectKey:'wrong'})),422]]){
- const r=res();await createLyricsHandler({env,fetchImpl:async()=>response})({method:'GET',query:{key}},r);assert.equal(r.code,expected);assert.equal(r.body.cues,undefined);
+ const r=res();await createLyricsHandler({env,timings:{recordings:[]},fetchImpl:async()=>response})({method:'GET',query:{key}},r);assert.equal(r.code,expected);assert.equal(r.body.cues,undefined);
  }
+});
+
+const published=require('../web/public/music/timings.json');
+test('all five real recordings have valid timings and no line remains active in instrumental gaps',async()=>{
+ assert.equal(published.recordings.length,5);
+ for(const pack of published.recordings){
+  assert.ok(validateLyrics(pack,pack.objectKey),pack.trackId);
+  const cues=validateCues(pack.cues,pack.lyrics);
+  assert.equal(cues.length,lyricLines(pack.lyrics).length);
+  assert.ok(cues[0].start>5,'do not highlight instrumental intro');
+  for(let i=0;i<cues.length;i++){
+   const c=cues[i];assert.ok(c.end>c.start);
+   assert.equal(activeLyricIndex(cues,(c.start+c.end)/2),i);
+   if(i+1<cues.length && cues[i+1].start>c.end+.1)assert.equal(activeLyricIndex(cues,c.end+.05),-1);
+  }
+  const r=res();await createLyricsHandler({fetchImpl:()=>{throw Error('built-in timing must not call storage');}})({method:'GET',query:{track:pack.trackId}},r);
+  assert.equal(r.code,200);assert.deepEqual(r.body.cues,pack.cues);
+ }
+});
+test('recorded versions include repeated phrases and omit a closing line absent from the MP3',()=>{
+ const bank=published.recordings.find(p=>p.trackId==='a2-day-18-bank');
+ assert.equal(bank.cues.filter(c=>c.text==='Wir finden gemeinsam eine Lösung.').length,3);
+ const health=published.recordings.find(p=>p.trackId==='a1-day-22-health');
+ assert.equal(health.cues.at(-1).text,'Danke, Mia! Gute Nacht.');
 });

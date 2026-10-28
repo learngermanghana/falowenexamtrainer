@@ -1,4 +1,4 @@
-import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028";
+import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, tracking, AI calls,
 // Firestore writes or generated media. Only catalog-approved recordings play.
