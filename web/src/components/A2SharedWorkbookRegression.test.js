@@ -33,7 +33,7 @@ describe("shared A2 workbook regression", () => {
     expect(standardShell).toContain('displayedActiveTab === "submit"');
     expect(standardShell).toContain("SpeakingMindMap");
     expect(standardShell).toContain("SpeakingPracticeTimerCard");
-    expect(standardShell).toContain("WorkbookReferenceAnswers");
+    expect(standardShell).toContain("WorkbookDayMusic");
     expect(standardShell).toContain("ContextualAssignmentSubmissionPage");
   });
 
