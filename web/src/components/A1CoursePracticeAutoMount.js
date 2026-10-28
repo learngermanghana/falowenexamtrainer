@@ -322,6 +322,7 @@ const A1CoursePracticeAutoMount = () => {
           chapter={practice.chapter}
           teacherVideo={journeyResources?.teacherVideo}
           aiVideo={journeyResources?.aiVideo}
+          learningMode="self"
         />,
       );
 
