@@ -427,6 +427,10 @@
       "dest": "/api/music-library.js"
     },
     {
+      "src": "/api/music-lyrics",
+      "dest": "/api/music-lyrics.js"
+    },
+    {
       "src": "/api/music",
       "dest": "/api/approved-music.js"
     },

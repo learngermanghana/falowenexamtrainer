@@ -63,3 +63,15 @@ The separate A2 Day 19 classroom Hören recording `a2/day-19/einkaufen-wo-und-wi
 The three initial learning packs are copies of teacher-approved original Falowen song lyrics and reviewed questions from the Admin songbook. All questions are ungraded practice. If an uploaded MP3 has different lyrics, **listen and update the learning pack before enabling questions**. A newly registered song without a matching reviewed pack is playable, but has no quiz or lyrics until explicitly reviewed.
 
 The platform remains on the existing learner Vercel deployment with the original signed R2 flow plus on-demand music-only discovery. Do not enable the bucket's public access, create another music-generation call, or introduce Firestore reads, background scans or scheduled publishing.
+
+## Timed lyric highlighting (Admin slides and public Music)
+
+Timings use the actual MP3 playback clock; pause, seek, repeat and speed changes stay aligned. No timing is estimated from song duration and no AI request is made.
+
+1. Open the lesson song in Admin slides, choose **Liedtext**, then expand **Lehrkraft · Zeitmarken für beide Musikplayer**.
+2. Play the final recording. Press **Zeilenanfang markieren** at the beginning of each sung line, including every repeated chorus. Undo the last mark if needed. Local edits are saved on this device.
+3. Once every line is marked, test the highlighting and export **Zeitmarken für Cloudflare**. Keep the generated filename: e.g. `lieber-online-oder-im-laden.lyrics.json`.
+4. Upload that JSON beside its MP3 in the existing public-release folder: `music/a2/day-19/`. This publishes the reviewed lyrics/timings to listeners. Keep the MP3 in place. The JSON contains its exact `objectKey`, the final `lyrics` and ordered `cues: [{start: 4.2, text: "..."}]` in seconds.
+5. Reload the song after the short metadata cache (up to 60 seconds). Both Admin and public Music read the same file. The public Lyrics tab can be available without a quiz; existing quizzes are hidden if the published lyrics differ from their reviewed learning pack.
+
+The read-only `/api/music-lyrics` endpoint is confined to music MP3 sibling files. It rejects private course audio paths, mismatched recordings, incomplete/unordered line timings, and oversized files. A missing timing file leaves existing plain lyrics/audio available. No new Firestore storage, background jobs or bucket permission changes are required. Admin's complete local timing edits take priority until removed/updated on that device.
