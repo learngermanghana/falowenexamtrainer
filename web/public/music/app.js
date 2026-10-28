@@ -31,7 +31,15 @@ function safeAudioUrl(value) {
     const url = new URL(String(value || ""), location.origin);
     if (url.protocol !== "https:" && !(url.origin === location.origin && location.protocol === "http:")) return "";
     if (url.username || url.password) return "";
-    if (url.origin === location.origin && !url.pathname.startsWith("/music/")) return "";
+    // Inside /campus/music, the same public /api/music?track=... playback
+    // URL becomes SAME-ORIGIN. Allow only this exact owned media endpoint.
+    // Keep rejecting arbitrary same-origin paths or private R2 URLs.
+    const trackIds = url.searchParams.getAll("track");
+    const isOwnedPlayback = url.pathname === "/api/music"
+      && trackIds.length === 1
+      && /^[a-zA-Z0-9_-]{1,245}$/.test(trackIds[0])
+      && [...url.searchParams.keys()].every(key => key === "track");
+    if (url.origin === location.origin && !url.pathname.startsWith("/music/") && !isOwnedPlayback) return "";
     if (/(^|\.)r2\.cloudflarestorage\.com$/i.test(url.hostname)) return "";
     return url.href;
   } catch { return ""; }
