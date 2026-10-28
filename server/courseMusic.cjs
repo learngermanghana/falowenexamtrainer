@@ -101,4 +101,4 @@ function createClassroomBankAudioHandler(options = {}) {
     return signObject(recording, env);
   } });
 }
-module.exports = { createClassroomBankAudioHandler, TRACKS, signTrack, isMusicStaff, createMusicHandler };
+module.exports = { createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
