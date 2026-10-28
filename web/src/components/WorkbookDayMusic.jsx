@@ -15,7 +15,7 @@ export const normalizeWorkbookSong = (track, level, day) => {
   const objectKey = String(track.objectKey || "");
   // A course Hören recording must never be mistaken for optional public music.
   const prefix = `music/${level.toLowerCase()}/day-${String(day).padStart(2, "0")}/`;
-  if (!objectKey.startsWith(prefix) || !/^[^/]+\\.mp3$/.test(objectKey.slice(prefix.length))) return null;
+  if (!objectKey.startsWith(prefix) || !/^[^/]+\.mp3$/.test(objectKey.slice(prefix.length))) return null;
   const url = new URL("https://www.falowen.app/api/music?track=" + encodeURIComponent(track.id));
   if (track.audioUrl !== url.href) return null;
   return {
