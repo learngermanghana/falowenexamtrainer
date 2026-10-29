@@ -3,6 +3,11 @@ import { lyricLines } from './lyrics-timing.js';
 // Questions must use the text attached to this exact recording, including repeats.
 export function recordingQuestions(lyrics) {
   const sung=lyricLines(lyrics);
+  if(sung.includes('Wir zahlen sieben Euro.') && sung.includes('Die Uhr zeigt halb drei.'))return [
+    {type:'listening',prompt:'Wie spät ist es im Café?',options:['Halb drei.','Halb vier.','Viertel nach drei.'],correctIndex:0,answer:'Halb drei.',evidence:'Die Uhr zeigt halb drei.'},
+    {type:'listening',prompt:'Wie viel bezahlen sie insgesamt?',options:['Vier Euro.','Sieben Euro.','Drei Euro.'],correctIndex:1,answer:'Sieben Euro.',evidence:'Wir zahlen sieben Euro.'},
+    {type:'speaking',prompt:'Bestelle zwei Getränke und ein Stück Kuchen. Frage nach dem Preis.',hint:'Ich möchte … Wie viel kostet das zusammen?'}
+  ];
   if(sung.includes('Wir müssen in Hannover umsteigen,') && sung.includes('wir möchten in Berlin ankommen.'))return [
     {type:'listening',prompt:'Wo müssen Mia und Ben umsteigen?',options:['In Hannover.','In Berlin.','In Accra.'],correctIndex:0,answer:'In Hannover.',evidence:'Wir müssen in Hannover umsteigen,'},
     {type:'listening',prompt:'Wo möchten sie ankommen?',options:['In Hamburg.','In Berlin.','In München.'],correctIndex:1,answer:'In Berlin.',evidence:'wir möchten in Berlin ankommen.'},
