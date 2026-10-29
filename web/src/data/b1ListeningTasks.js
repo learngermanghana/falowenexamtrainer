@@ -399,51 +399,21 @@ Herr Weber: Auf Wiedersehen!`,
     submitRequired: false,
   }),
   24: task({
-    "title": "Konsum und Nachhaltigkeit · Hören · Richtig oder Falsch (5 Aufgaben)",
-    "instructions": "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
-    "audioKey": "b1/day_24/day-24.mp3",
-    "videoTitle": "B1 Day 24 · Konsum und Nachhaltigkeit",
-    "submitRequired": true,
-    "selfCheckText": "",
-    "submissionNote": "Reichen Sie alle fünf Antworten über Submit als TEIL 4 ein: A = Richtig, B = Falsch.",
-    "questions": [
-        {
-            "stem": "Jonas möchte sich sofort ein neues Smartphone kaufen, weil sein altes komplett kaputt ist.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Lisa weist darauf hin, dass man auf den Konsum achten und Elektroschrott vermeiden sollte.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas plant nun, den Akku seines Smartphones reparieren zu lassen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Laut Lisa ist eine Reparatur teurer als ein komplett neues Smartphone.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas möchte das Gerät nach der Reparatur noch mindestens zwei Jahre lang nutzen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        }
-    ]
-}),
+    title: "Konsum und Nachhaltigkeit · Hören 2 · Gespräch",
+    instructions: "Lies zuerst die fünf offenen Hörfragen. Höre die neue Aufnahme zweimal. Notiere kurze Antworten und belege deine Aussagen mit dem, was du wirklich hörst.",
+    audioKey: "b1/day-24/day-25.mp3",
+    videoTitle: "B1 Day 24 · Hören 2 · Neues Gespräch",
+    submitRequired: false,
+    selfCheckText: "Hören 2 ist eine offene Selbstkontrolle und wird derzeit nicht automatisch bewertet. Die alte Smartphone-Aufgabe ist entfernt. Die Lehrkraft kann deine Antworten anhand der tatsächlichen Aufnahme besprechen.",
+    submissionNote: "Nicht über Submit abgeben. Nur Teil 2 Schreiben und Teil 3 Lesen werden in dieser Lektion bewertet.",
+    questions: [
+      q("Worum geht es in dem Gespräch? Fasse das Hauptthema in einem Satz zusammen.", []),
+      q("Welche unterschiedlichen Meinungen oder Wünsche hörst du?", []),
+      q("Welche konkreten Beispiele oder Handlungen werden genannt?", []),
+      q("Wie begründen die Personen ihre Positionen?", []),
+      q("Welche Entscheidung, Lösung oder offene Frage steht am Ende des Gesprächs?", []),
+    ],
+  }),
   25: task({
     title: "Online einkaufen – Rechte und Risiken · Hören · Richtig oder Falsch (5 Aufgaben)",
     instructions: "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
