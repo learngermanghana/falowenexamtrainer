@@ -85,20 +85,41 @@ function createMusicHandler({ env = process.env, fetchImpl = fetch, prepare = pr
   };
 }
 // These private classroom conversations are never added to the public music map.
+// Private course conversations, never exposed by the public music track map.
+// Fixed (level, day, objectKey) triples prevent arbitrary private R2 access.
 const CLASSROOM_RECORDINGS = Object.freeze({
-  18: { id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' },
-  19: { id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' },
+  'A2-18': Object.freeze({ id: 'a2-day18-bank-telephone', key: 'a2/day-18/bank-telefonat.mp3' }),
+  'A2-19': Object.freeze({ id: 'a2-day19-shopping', key: 'a2/day-19/einkaufen-wo-und-wie.mp3' }),
+  'B1-25': Object.freeze({ id: 'b1-day25-consumer-service', key: 'b1/day-25/online-shopping-verbraucherservice.mp3' }),
 });
-function createClassroomBankAudioHandler(options = {}) {
+function createClassroomAudioHandler(options = {}) {
   return createMusicHandler({ ...options, prepare: async (req, env) => {
     const params = new URL(req.url, 'https://www.falowen.app').searchParams;
-    const day = Number(params.get('day'));
+    const level = params.get('level') || '';
+    const dayText = params.get('day') || '';
     const key = params.get('key') || '';
-    const recording = Object.hasOwn(CLASSROOM_RECORDINGS, day) ? CLASSROOM_RECORDINGS[day] : null;
+    const day = Number(dayText);
+    const lookupKey = /^(A2|B1)$/.test(level) && /^[1-9][0-9]?$/.test(dayText)
+      ? `${level}-${day}` : '';
+    const recording = Object.hasOwn(CLASSROOM_RECORDINGS, lookupKey) ? CLASSROOM_RECORDINGS[lookupKey] : null;
     if (!recording || key !== recording.key) {
       throw Object.assign(new Error('Invalid classroom audio request.'), { status: 400 });
     }
     return signObject(recording, env);
   } });
 }
-module.exports = { createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };
+// Legacy A2 classroom URLs remain unchanged and securely limited to A2.
+function createClassroomBankAudioHandler(options = {}) {
+  return createMusicHandler({ ...options, prepare: async (req, env) => {
+    const params = new URL(req.url, 'https://www.falowen.app').searchParams;
+    const dayText = params.get('day') || '';
+    const key = params.get('key') || '';
+    const lookupKey = /^[1-9][0-9]?$/.test(dayText) ? `A2-${Number(dayText)}` : '';
+    const recording = Object.hasOwn(CLASSROOM_RECORDINGS, lookupKey) ? CLASSROOM_RECORDINGS[lookupKey] : null;
+    if (!recording || key !== recording.key) {
+      throw Object.assign(new Error('Invalid classroom audio request.'), { status: 400 });
+    }
+    return signObject(recording, env);
+  } });
+}
+module.exports = { createClassroomAudioHandler, createClassroomBankAudioHandler, TRACKS, signTrack, signObject, isMusicStaff, createMusicHandler };

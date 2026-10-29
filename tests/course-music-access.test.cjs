@@ -87,3 +87,36 @@ test('Day 19 is a staff-only exact-key conversation; private keys cannot use pub
  const song=signTrack('a2-day-18-bank',env);
  assert.equal(new URL(song.url).pathname,'/music/a2/day-18/die-karte-funktioniert-nicht.mp3');
 });
+
+test('B1 Day 25 private consumer-service recording uses existing staff-only R2 signer, not workbook Hören', async () => {
+ const {createClassroomAudioHandler}=require('../server/courseMusic.cjs');
+ const key='b1/day-25/online-shopping-verbraucherservice.mp3';
+ const cases=[
+   {account:null,level:'B1',day:25,key,expected:401},
+   {account:{localId:'student',email:'student@example.com'},level:'B1',day:25,key,expected:403},
+   {account:{localId:'teacher',email:'moxflex@gmail.com'},level:'B1',day:25,key,expected:200},
+   {account:{localId:'teacher',email:'moxflex@gmail.com'},level:'B1',day:25,key:'b1/day-25/day-25.mp3',expected:400},
+   {account:{localId:'teacher',email:'moxflex@gmail.com'},level:'B1',day:24,key,expected:400},
+   {account:{localId:'teacher',email:'moxflex@gmail.com'},level:'A2',day:25,key,expected:400},
+   {account:{localId:'teacher',email:'moxflex@gmail.com'},level:'B1',day:25,key:'b1/day-25/../secret.mp3',expected:400},
+ ];
+ for(const {account,level,day,key:requestKey,expected} of cases){
+  const res=response();
+  const handler=createClassroomAudioHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})});
+  await handler({method:'GET',headers:account?{authorization:'Bearer teacher-token',origin:'https://admin.falowen.app'}:{},
+    url:`/course-media/classroom/audio-url?${new URLSearchParams({level,day:String(day),key:requestKey})}`},res);
+  assert.equal(res.code,expected,level+' '+day+' '+requestKey);
+  assert.equal(Boolean(res.body.url),expected===200);
+  if(expected===200) {
+    const parsed=new URL(res.body.url);
+    assert.equal(parsed.pathname,'/'+key);
+    assert.equal(parsed.hostname,`falowen-course-audio.${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`);
+    assert.equal(res.headers['Cache-Control'],'private, no-store');
+    assert.ok(parsed.searchParams.get('X-Amz-Signature'));
+  }
+ }
+ assert.throws(()=>signTrack('b1-day25-consumer-service',env),/Unknown/);
+ const index=require('node:fs').readFileSync(require('node:path').join(__dirname,'../api/index.js'),'utf8');
+ assert.match(index,/\/course-media\/classroom\/audio-url/);
+ assert.match(index,/createClassroomAudioHandler/);
+});
