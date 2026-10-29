@@ -84,7 +84,7 @@ import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
 import A1Day1GreetingsWorkbookPage from "./components/A1Day1GreetingsWorkbookPage";
 import A1Day2Kapitel11WorkbookPage from "./components/A1Day2Kapitel11WorkbookPage";
 import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3GermanAlphabetReviewingWorkbookPage";
-import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
+import A1Day3SchreibenSprechenKapitel11WorkbookPage, { A1_DAY3_PRACTICE_VIDEOS } from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
 import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
 import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
@@ -279,8 +279,8 @@ const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHi
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
 
-const withA1PracticeBook = (day, chapter, title, overview, workbookPage) => (
-  <A1PracticeBookLayout day={day} chapter={chapter} title={title} overview={overview}>
+const withA1PracticeBook = (day, chapter, title, overview, workbookPage, aiVideo = null) => (
+  <A1PracticeBookLayout day={day} chapter={chapter} title={title} overview={overview} aiVideo={aiVideo}>
     {workbookPage}
   </A1PracticeBookLayout>
 );
@@ -1004,11 +1004,11 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"
-            element={withA1PracticeBook(3, "1.1", "Personal Information and Questions", "Practise introductions, personal information and basic German questions.", <A1Day3SchreibenSprechenKapitel11WorkbookPage hidePracticeMedia />)}
+            element={withA1PracticeBook(3, "1.1", "Personal Information and Questions", "Practise introductions, personal information and basic German questions.", <A1Day3SchreibenSprechenKapitel11WorkbookPage hidePracticeMedia />, A1_DAY3_PRACTICE_VIDEOS[0])}
           />
           <Route
             path="/campus/course/a1-day-3-kapitel-1-2-workbook"
-            element={withA1PracticeBook(3, "1.2", "Introducing Yourself: Reading, Writing and Listening", "Review the lesson and complete the original Lesen, Schreiben and Hören activities.", <A1Day3Kapitel12WorkbookPage />)}
+            element={<A1Day3Kapitel12WorkbookPage />}
           />
           <Route
             path="/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"
@@ -1016,7 +1016,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"
-            element={withA1PracticeBook(5, "2.2", "Personal Information, Articles and W-Questions", "Practise personal information, German articles, adjectives and W-questions.", <A1Day5IntroducingYourselfArticlesWorkbookPage />)}
+            element={withA1PracticeBook(5, "1.2", "Personal Information, Articles and W-Questions", "Practise personal information, German articles, adjectives and W-questions.", <A1Day5IntroducingYourselfArticlesWorkbookPage />)}
           />
           <Route
             path="/campus/course/a1-day-6-family-and-hobbies-workbook"
