@@ -46,7 +46,17 @@ describe("A1 independent practice book presentation", () => {
       </A1PracticeBookLayout>
     );
 
-    expect(container.querySelectorAll('[data-a1-practice-resources] a')).toHaveLength(2);
+    // The canonical teacher + AI players appear above the practice book;
+    // no duplicate video links or third embed belongs inside this layout.
+    expect(container.querySelectorAll('[data-a1-practice-resources] a')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-a1-practice-book-layout] iframe')).toHaveLength(0);
+    const practiceNavigation = container.querySelector('[data-a1-practice-tabs]');
+    expect(practiceNavigation.style.border).toContain("2px solid");
+    expect(practiceNavigation.style.background).toContain("linear-gradient");
+    expect(screen.getByRole("button", { name: "Overview" })).toHaveStyle({
+      fontWeight: "900",
+      minHeight: "50px",
+    });
     expect(screen.getByText("Review numbers and time.")).toBeTruthy();
     await waitFor(() => expect(screen.getByRole("button", { name: /Music/ })).toBeTruthy());
 
@@ -101,5 +111,12 @@ describe("A1 independent practice book presentation", () => {
     const day3 = fs.readFileSync(path.resolve(process.cwd(), "src/components/A1Day3SchreibenSprechenKapitel11WorkbookPage.js"), "utf8");
     expect(day3).toContain("hidePracticeMedia = false");
     expect(day3).toContain("<A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />");
+    // The formerly page-specific Day 3 AI video is retained in the canonical
+    // top video registry, so removing duplicate inline links does not lose it.
+    const dictionary = fs.readFileSync(path.resolve(process.cwd(), "src/data/lessonVideoDictionary.js"), "utf8");
+    expect(dictionary).toContain('key: "ai-lesson-video-1-1-self-practice"');
+    expect(dictionary).toContain('chapter: "1.1"');
+    expect(dictionary).toContain("https://youtu.be/LdCVsY-SFTg");
+    expect(day3).toContain("https://youtu.be/LdCVsY-SFTg");
   });
 });

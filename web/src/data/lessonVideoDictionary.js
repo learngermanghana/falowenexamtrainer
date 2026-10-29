@@ -64,6 +64,13 @@ export const LESSON_VIDEO_DICTIONARY = {
     3: {
       videoResources: [
         {
+          key: "ai-lesson-video-1-1-self-practice",
+          chapter: "1.1",
+          title: "Kapitel 1.1 · Personal Information and Questions · AI lesson",
+          description: "Self-practice AI explanation for personal information and W-questions.",
+          url: "https://youtu.be/LdCVsY-SFTg",
+        },
+        {
           key: "ai-grammar-video-1-2-assignment-day-3",
           chapter: "1.2",
           title: "Kapitel 1.2 · Assignment for day 3 · AI video",

@@ -341,7 +341,10 @@ export const applyA1WorkbookVideoHeader = ({
 
   const existing = root.querySelector(`[${HEADER_ATTRIBUTE}="true"]`);
   const model = buildA1WorkbookVideoModel({ pathname, search });
-  if (!model?.embedUrl || root.querySelector(RADIO_GATE_SELECTOR) || root.querySelector(`[${A1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)) {
+  // Self-practice lessons already show their canonical teacher and AI videos
+  // above the workbook. Do not inject a second AI player inside the lesson.
+  // Tutor-marked assignments retain their existing video-header behaviour.
+  if (!model?.embedUrl || model.lesson?.submissionRequired === false || root.querySelector(RADIO_GATE_SELECTOR) || root.querySelector(`[${A1_GRAMMAR_VIDEO_ATTRIBUTE}="true"]`)) {
     existing?.remove();
     return 0;
   }
