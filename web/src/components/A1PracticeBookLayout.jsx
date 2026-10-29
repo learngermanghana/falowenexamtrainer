@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import WorkbookDayMusic, { normalizeWorkbookSong } from "./WorkbookDayMusic";
-import { getA1WorkbookMediaResources, getYouTubeVideoId } from "./A1WorkbookMediaPanel";
+import { getYouTubeVideoId } from "./A1WorkbookMediaPanel";
 import { styles } from "../styles";
 
 // This wrapper is for independent A1 practice books only. Do not mount it
@@ -33,8 +33,6 @@ const loadA1PracticeMusicCatalog = () => {
   return musicCatalogPromise;
 };
 
-const mediaLabel = (resource) => resource.kind === "teacher" ? "Teacher lecture" : "AI explanation";
-
 export const selectPracticeBookVideos = (resources = []) => {
   const seenIds = new Set();
   let aiSelected = false;
@@ -53,18 +51,10 @@ export const selectPracticeBookVideos = (resources = []) => {
   });
 };
 
-export default function A1PracticeBookLayout({ day, chapter, title, overview = "", aiVideo = null, children }) {
+export default function A1PracticeBookLayout({ day, chapter, title, overview = "", children }) {
   const [tab, setTab] = useState("overview");
   const [hasMusic, setHasMusic] = useState(false);
   const [musicStatus, setMusicStatus] = useState("loading");
-  const videos = useMemo(() => {
-    const available = getA1WorkbookMediaResources({ day, chapter });
-    const selected = aiVideo
-      ? [...available.filter((resource) => resource.kind !== "ai"), { ...aiVideo, kind: "ai" }]
-      : available;
-    return selectPracticeBookVideos(selected);
-  }, [day, chapter, aiVideo]);
-
   useEffect(() => {
     let cancelled = false;
     setHasMusic(false);
@@ -84,16 +74,21 @@ export default function A1PracticeBookLayout({ day, chapter, title, overview = "
   }, [hasMusic, musicStatus, tab]);
 
   const changeTab = (nextTab) => setTab(nextTab);
+  // Match the bold, high-contrast tutor-marked A1 navigation.
   const tabStyle = (selected) => ({
-    padding: "12px 16px",
-    border: 0,
-    borderBottom: selected ? "3px solid #2563eb" : "3px solid transparent",
-    background: selected ? "#eff6ff" : "transparent",
-    color: selected ? "#1d4ed8" : "#475569",
-    fontWeight: 800,
+    ...styles.secondaryButton,
+    background: selected ? "#2563eb" : "#ffffff",
+    borderColor: selected ? "#2563eb" : "#93c5fd",
+    color: selected ? "#ffffff" : "#1d4ed8",
+    borderRadius: 12,
     cursor: "pointer",
-    flex: "1 1 120px",
-    minHeight: 44,
+    flex: "1 1 112px",
+    fontWeight: 900,
+    lineHeight: 1.2,
+    minHeight: 50,
+    minWidth: 0,
+    padding: "10px 12px",
+    whiteSpace: "normal",
   });
 
   return (
@@ -106,25 +101,23 @@ export default function A1PracticeBookLayout({ day, chapter, title, overview = "
         <h1 style={{ margin: 0, fontSize: "clamp(1.3rem, 2.5vw, 1.9rem)", color: "#0f172a" }}>
           {title}
         </h1>
-        <div aria-label="Lesson video resources" data-a1-practice-resources="true"
-          style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
-          {videos.map((resource) => (
-            <a key={resource.key || resource.url} href={resource.url}
-              target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-flex", gap: 8, alignItems: "center", textDecoration: "none",
-                borderRadius: 11, border: "1px solid #bfdbfe", padding: "10px 13px",
-                fontSize: 13, fontWeight: 800, background: "#f8fafc", color: "#1e40af" }}>
-              <span aria-hidden="true">{resource.kind === "teacher" ? "▶" : "✦"}</span>
-              {mediaLabel(resource)}
-              {resource.videoNumber > 1 ? " " + resource.videoNumber : ""}
-            </a>
-          ))}
-        </div>
+        {/* Canonical teacher and AI players already appear above this practice
+            book. Do not repeat their links or players inside the workbook. */}
       </header>
 
       <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
         <nav aria-label="A1 practice book sections" data-a1-practice-tabs="true"
-          style={{ display: "flex", flexWrap: "wrap", borderBottom: "1px solid #e2e8f0" }}>
+          style={{
+            ...styles.card,
+            border: "2px solid #2563eb",
+            background: "linear-gradient(135deg, #dbeafe 0%, #ffffff 74%)",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 8,
+            padding: 12,
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
+          }}>
           <button type="button" style={tabStyle(tab === "overview")}
             aria-current={tab === "overview" ? "page" : undefined}
             onClick={() => changeTab("overview")}>Overview</button>
