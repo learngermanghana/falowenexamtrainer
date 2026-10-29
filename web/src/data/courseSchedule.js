@@ -1082,8 +1082,8 @@ const RAW_COURSE_SCHEDULES = {
       instruction:
         "Use the statement rule to talk about your weekly routine using the activities listed. Go to the classnotes page, search for the assignment number and add your contribution",
       schreiben_sprechen: {
-        video: "https://youtu.be/eqSc_5p5uyQ",
-        youtube_link: "https://youtu.be/eqSc_5p5uyQ",
+        video: "https://youtu.be/0aprj_rMWw8",
+        youtube_link: "https://youtu.be/0aprj_rMWw8",
         assignment: false,
         workbook_link: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
       },
