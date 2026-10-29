@@ -523,7 +523,7 @@ export default function B1StandardWorkbookPage({ config, renderSections = null }
                 {resolvedActiveTab === "hoeren" && hasListeningTab && (
                   <section style={card}>
                     <h2 style={sectionTitle}>Teil 4 · Hören ({listeningRequiresSubmission ? "Assignment" : "Self-check"})</h2>
-                    <PublishedHoerenPractice assignmentKey={resolvedAssignmentKey} />
+                    {config.day !== 24 ? <PublishedHoerenPractice assignmentKey={resolvedAssignmentKey} /> : null}
                     <WorkbookTaskCard
                       eyebrow={listeningRequiresSubmission ? "Your assignment · Listening" : "Listening · Self-check"}
                       title={listening.title || "Listening task will be added here."}
