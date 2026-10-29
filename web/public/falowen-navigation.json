@@ -96,6 +96,18 @@
       ]
     },
     {
+      "id": "vocabulary",
+      "label": "Vocab",
+      "route": "/exams/vocab",
+      "purpose": "Practice vocabulary inside Exams Room; the former Campus Vocab destination now opens Music",
+      "requiresLogin": true,
+      "aliases": [
+        "vocabulary",
+        "vocab",
+        "practice words"
+      ]
+    },
+    {
       "id": "results",
       "label": "Results",
       "route": "/campus/results",
