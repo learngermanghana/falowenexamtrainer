@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getBackendUrl } from "../services/backendUrl";
 import BooksCatalog from "./BooksCatalog";
 import BookProductPage from "./BookProductPage";
@@ -57,7 +56,7 @@ function ReceiptConfirmation({ basePath = "/books" }) {
     } catch (_) { setError("Copy failed. You can select the reference displayed below."); }
   };
   return <main className="fb-page fb-receipt-page"><div className="fb-receipt-wrap">
-    <Link className="fb-top-back" to={basePath}>← Back to Books</Link>
+    <a className="fb-top-back" href={basePath}>← Back to Books</a>
     <div className="fb-receipt-card">
       <span className="fb-eyebrow">FALOWEN · SECURE ORDER</span>
       <h1>Book payment confirmation</h1>
@@ -121,7 +120,7 @@ function BookCataloguePage({ basePath = "/books" }) {
     return () => {active=false;};
   }, []);
   return <main className="fb-page"><div className="fb-shell">
-    {basePath === "/books" ? <Link className="fb-top-back" to="/">← Back to Falowen</Link> : <Link className="fb-top-back" to="/campus/course">← Back to Campus</Link>}
+    {basePath === "/books" ? <a className="fb-top-back" href="/">← Back to Falowen</a> : <a className="fb-top-back" href="/campus/course">← Back to Campus</a>}
     <BooksCatalog books={catalog.books} catalogTitles={catalog.catalogTitles} fxQuote={fxQuote} basePath={basePath} />
     {error && <p className="fb-error" role="alert">{error}</p>}
   </div></main>;
