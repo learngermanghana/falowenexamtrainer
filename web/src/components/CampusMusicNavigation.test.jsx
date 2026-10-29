@@ -36,6 +36,28 @@ describe("Student Music and Books navigation", () => {
     expect(app).toContain('if (location.pathname === "/books" || location.pathname === "/books/")');
   });
 
+  test("keeps the complete bookstore journey inside Campus while preserving public books", () => {
+    const app = file("src/App.js");
+    const campusBooks = file("src/components/CampusBooksPage.jsx");
+    const checkout = file("src/components/BookStoreCheckout.js");
+    const listing = file("src/components/BooksCatalog.jsx");
+    const product = file("src/components/BookProductPage.jsx");
+    const patch = file("../scripts/patchCompactStudentNavigation.mjs");
+
+    expect(app).toContain('path="/campus/:section/*"');
+    expect(app).toContain('resolvedSection === "books" && allowedSections.books ? <CampusBooksPage />');
+    expect(app).toContain('if (location.pathname === "/books" || location.pathname === "/books/") return <BookStoreCheckout catalogOnly />;');
+    expect(campusBooks).toContain('sectionPath = "/campus/books"');
+    expect(campusBooks).toContain('<BookStoreCheckout catalogOnly campus />');
+    expect(campusBooks).toContain('checkout={Boolean(match[2])} campus');
+    expect(checkout).toContain('campus ? "/campus/books" : "/books"');
+    expect(listing).toContain('basePath + page.href.slice("/books".length)');
+    expect(product).toContain('basePath + href.slice("/books".length)');
+    expect(product).toContain('window.location.assign(url.toString());');
+    expect(patch).toContain('label: "Books", route: "/campus/books"');
+    expect(patch).toContain('["books", "examFile", "classMembers", "home"]');
+  });
+
   test("reuses music backend and keeps sharing and song navigation correct inside iframe", () => {
     const music = file("../web/public/music/app.js");
     const css = file("../web/public/music/style.css");
