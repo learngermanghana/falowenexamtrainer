@@ -984,7 +984,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook"
-            element={withA1PracticeBook(13, "3.5", "Revision: Numbers, Time and Prices", "Revise numbers, time, years, birthdays, prices and sentence building.", <A1Day13RevisionNumbersTimePricesWorkbookPage />)}
+            element={withA1PracticeBook(13, "3.5", "Revision: Numbers, Time and Prices", "Check numbers, days, time and prices, then learn to form German statements.", <A1Day13RevisionNumbersTimePricesWorkbookPage />)}
           />
           <Route
             path="/campus/course/a1-day-2-german-alphabet-reviewing-workbook"
