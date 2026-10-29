@@ -6,7 +6,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pagePath = path.join(root, "web/src/components/A1Day13RevisionNumbersTimePricesWorkbookPage.js");
 let source = fs.readFileSync(pagePath, "utf8");
 
+// The focused Day 13 practice book has its own native answer checks and
+// four-sentence self-practice. Do not reapply old seven-sentence patches.
+const isFocusedWorkbook = source.includes('const numberReviewItems = [');
+
 const replaceRequired = (before, after, label) => {
+  if (isFocusedWorkbook) return;
   if (source.includes(after)) return;
   if (!source.includes(before)) throw new Error(`Could not patch A1 Day 13 ${label}.`);
   source = source.replace(before, after);

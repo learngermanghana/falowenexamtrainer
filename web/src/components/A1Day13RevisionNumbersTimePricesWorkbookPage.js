@@ -100,101 +100,41 @@ const LESSON_LEVEL = "A1";
 const LESSON_ID = "a1-day-13-revision-numbers-time-prices-statements";
 const LESSON_TITLE = "A1 Day 13 — Sentence Building with Days and Activities";
 
-const numbersItems = [
-  ["56", "sechsundfünfzig"],
-  ["248", "zweihundertachtundvierzig"],
-  ["1,234", "eintausendzweihundertvierunddreißig"],
-  ["3,452", "dreitausendvierhundertzweiundfünfzig"],
-  ["4,560", "viertausendfünfhundertsechzig"],
-  ["5,678", "fünftausendsechshundertachtundsiebzig"],
-  ["6,789", "sechstausendsiebenhundertneunundachtzig"],
-  ["7,890", "siebentausendachthundertneunzig"],
-  ["9,999", "neuntausendneunhundertneunundneunzig"],
-];
 
-const timePracticeItems = [
-  ["2:15", "Es ist Viertel nach zwei."],
-  ["5:45", "Es ist Viertel vor sechs."],
-  ["7:30", "Es ist halb acht."],
-  ["10:10", "Es ist zehn nach zehn."],
-  ["8:20", "Es ist zwanzig nach acht."],
+const numberReviewItems = [
+  { id:"n56", prompt:"56", answer:"sechsundfünfzig", compact:true },
+  { id:"n248", prompt:"248", answer:"zweihundertachtundvierzig", compact:true },
+  { id:"n1234", prompt:"1,234", answer:"eintausendzweihundertvierunddreißig", compact:true },
+  { id:"n5678", prompt:"5,678", answer:"fünftausendsechshundertachtundsiebzig", compact:true },
 ];
-
-const yearPracticeItems = [
-  ["1453", "vierzehnhundertdreiundfünfzig"],
-  ["1944", "neunzehnhundertvierundvierzig"],
-  ["1999", "neunzehnhundertneunundneunzig"],
-  ["2000", "zweitausend"],
-  ["2010", "zweitausendzehn"],
-  ["2025", "zweitausendfünfundzwanzig"],
-  ["2030", "zweitausenddreißig"],
+const daysReviewItems = [
+  { prompt:"Heute ist Dienstag. Welcher Tag ist morgen?", answer:1,
+    options:["Montag","Mittwoch","Donnerstag","Freitag"] },
+  { prompt:"How do you say 'on Friday' in German?", answer:2,
+    options:["um Freitag","in Freitag","am Freitag","an Freitag"] },
 ];
-
-const birthdayMcqItems = [
-  {
-    prompt: "12.05.1995",
-    correct: 1,
-    options: [
-      "Ich bin am zwölf Mai neunzehnhundertfünfundneunzig geboren.",
-      "Ich bin am zwölften Mai neunzehnhundertfünfundneunzig geboren.",
-      "Ich bin geboren am zwölften Mai neunzehnhundertfünfundneunzig.",
-    ],
-  },
-  {
-    prompt: "03.07.1980",
-    correct: 0,
-    options: [
-      "Ich bin am dritten Juli neunzehnhundertachtzig geboren.",
-      "Ich bin am drei Juli neunzehnhundertachtzig geboren.",
-      "Ich bin geboren am dritten Juli neunzehnhundertachtzig.",
-    ],
-  },
-  {
-    prompt: "01.01.2001",
-    correct: 1,
-    options: [
-      "Ich bin am ein Januar zweitausendeins geboren.",
-      "Ich bin am ersten Januar zweitausendeins geboren.",
-      "Ich bin geboren am ersten Januar zweitausendeins.",
-    ],
-  },
+const timeReviewItems = [
+  { id:"t730", prompt:"7:30", answer:"Es ist halb acht.", accepted:["halb acht"] },
+  { id:"t545", prompt:"5:45", answer:"Es ist Viertel vor sechs.", accepted:["Viertel vor sechs"] },
 ];
-
-const pricesQaItems = [
-  { question: "Wie viel kostet das Buch?", object: "das Buch", price: "10 Euro" },
-  { question: "Wie viel kostet der Apfel?", object: "der Apfel", price: "2 Euro" },
-  { question: "Wie viel kostet die Banane?", object: "die Banane", price: "1 Euro" },
-  { question: "Wie viel kostet die Zeitung?", object: "die Zeitung", price: "2,50 Euro" },
-  { question: "Wie viel kostet die Tasse?", object: "die Tasse", price: "3 Euro" },
+const priceReviewItems = [
+  { id:"pbook", prompt:"Das Buch kostet 12 Euro. Write the question asking how much the book costs.",
+    answer:"Wie viel kostet das Buch?", accepted:["Was kostet das Buch?"] },
+  { id:"ppaper", prompt:"Wie viel kostet die Zeitung? (2,50 Euro). Write a complete answer.",
+    answer:"Die Zeitung kostet zwei Euro fünfzig.",
+    accepted:["Sie kostet zwei Euro fünfzig.","Die Zeitung kostet 2,50 Euro.","Sie kostet 2,50 Euro.",
+    "Die Zeitung kostet zwei Euro und fünfzig Cent.","Sie kostet zwei Euro und fünfzig Cent."] },
 ];
-
-const kostetKostenMcqItems = [
-  {
-    prompt: "Wie viel kostet die Zeitung?",
-    correct: 0,
-    options: [
-      "Sie kostet zwei Euro fünfzig.",
-      "Sie kosten zwei Euro fünfzig.",
-      "Er kostet zwei Euro fünfzig.",
-    ],
-  },
-  {
-    prompt: "Wie viel kosten die Bücher?",
-    correct: 1,
-    options: [
-      "Sie kostet zwanzig Euro.",
-      "Sie kosten zwanzig Euro.",
-      "Er kostet zwanzig Euro.",
-    ],
-  },
+const priceVerbReviewItems = [
+  { prompt:"Wie viel kosten die Bücher? (20 Euro) Choose the correct reply.", answer:1,
+    options:["Sie kostet zwanzig Euro.","Sie kosten zwanzig Euro.",
+      "Es kostet zwanzig Euro.","Er kosten zwanzig Euro."] },
 ];
-
 const groupTaskChecklist = [
-  "Write five simple sentences about days and activities.",
-  "Use at least two sentences that start with Ich.",
-  "Use at least two sentences that start with a day, for example Am Montag.",
-  "Use the verb in position 2.",
-  "Use different days and different activities where possible.",
+  "Write four original German sentences about your weekly routine.",
+  "Begin two sentences with Ich and two with a time phrase (Am Montag or Um acht Uhr).",
+  "Include at least two different weekdays and one clock time.",
+  "Keep the conjugated verb in position 2 in every statement.",
 ];
 
 const safeDocKey = (value = "") =>
@@ -249,85 +189,76 @@ const getDisplayName = (studentProfile = {}, user = {}) =>
 const contributionsCollectionRef = (classKey) =>
   collection(db, "group_discussion", LESSON_LEVEL, "classes", classKey, "lessons", LESSON_ID, "contributions");
 
-function PracticeInputSection({ title, subtitle, items, placeholder = "Type your answer..." }) {
-  const [inputs, setInputs] = useState({});
 
+const normalizeDay13ReviewAnswer = (value = "", compact = false) => {
+  const normalized = String(value || "").toLocaleLowerCase("de-DE")
+    .replace(/ß/g, "ss").replace(/[.!?;:]/g, "").replace(/[-–]/g, "")
+    .replace(/\s+/g, compact ? "" : " ").trim();
+  return normalized;
+};
+
+function ShortAnswerSection({ title, description, items }) {
+  const [answers, setAnswers] = useState({});
+  const [checks, setChecks] = useState({});
   return (
-    <section style={section}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <h2 style={{ margin: 0 }}>{title}</h2>
-        {subtitle ? <p style={{ margin: 0 }}>{subtitle}</p> : null}
-      </div>
-
-      {items.map((item, i) => {
-        const prompt = Array.isArray(item) ? item[0] : item.question;
-        const helper = Array.isArray(item) ? null : `${item.object} · ${item.price}`;
-
+    <div style={{ display:"grid", gap:12 }} aria-label={title}>
+      <h3 style={{ margin:0, fontSize:18 }}>{title}</h3>
+      {description ? <p style={{ margin:0, color:"#475569" }}>{description}</p> : null}
+      {items.map((item,i) => {
+        const value=answers[item.id] || "";
+        const accepted=[item.answer, ...(item.accepted || [])];
+        const correct=accepted.some(answer => normalizeDay13ReviewAnswer(answer,item.compact) === normalizeDay13ReviewAnswer(value,item.compact));
         return (
-          <div key={`${prompt}-${i}`} style={card}>
-            <strong>{prompt}</strong>
-            {helper ? <span style={{ color: "#6b7280", fontSize: 13 }}>Use: {helper}</span> : null}
-            <input
-              style={inputStyle}
-              placeholder={placeholder}
-              value={inputs[i] || ""}
-              onChange={(e) => setInputs((prev) => ({ ...prev, [i]: e.target.value }))}
-            />
+          <div key={item.id} style={card}>
+            <label htmlFor={"day13-"+item.id} style={{fontWeight:700}}>{i+1}. {item.prompt}</label>
+            <input id={"day13-"+item.id} style={inputStyle} autoComplete="off"
+              value={value} placeholder="Write your answer in German..."
+              onChange={event => {
+                setAnswers(previous => ({...previous, [item.id]:event.target.value}));
+                setChecks(previous => ({...previous, [item.id]:false}));
+              }} />
+            <button type="button" style={{...lightBtn,justifySelf:"start"}}
+              disabled={!value.trim()} onClick={() => setChecks(previous => ({...previous,[item.id]:true}))}>Check answer</button>
+            {checks[item.id] ? <p role="status" style={{margin:0,color:correct?"#166534":"#9a3412"}}>
+              {correct ? "✓ Correct!" : "Not quite. Model answer: "+item.answer}
+            </p> : null}
           </div>
         );
       })}
-    </section>
+    </div>
   );
 }
 
-function McqSection({ title, subtitle, items }) {
-  const [selected, setSelected] = useState({});
-  const [checked, setChecked] = useState({});
-
+function ChoiceReviewSection({ title, items }) {
+  const [selected,setSelected] = useState({});
+  const [checks,setChecks] = useState({});
   return (
-    <section style={section}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <h2 style={{ margin: 0 }}>{title}</h2>
-        {subtitle ? <p style={{ margin: 0 }}>{subtitle}</p> : null}
-      </div>
-
-      {items.map((item, qi) => (
-        <div key={qi} style={card}>
-          <strong>{item.prompt}</strong>
-
-          {item.options.map((opt, oi) => {
-            const isCorrect = checked[qi] && oi === item.correct;
-            const isWrong = checked[qi] && selected[qi] === oi && oi !== item.correct;
-
-            return (
-              <button
-                key={oi}
-                type="button"
-                style={{
-                  ...lightBtn,
-                  textAlign: "left",
-                  background: isCorrect ? "#dcfce7" : isWrong ? "#fee2e2" : "#fff",
-                }}
-                onClick={() => setSelected((prev) => ({ ...prev, [qi]: oi }))}
-              >
-                {String.fromCharCode(65 + oi)}. {opt}
-              </button>
-            );
-          })}
-
-          <button
-            type="button"
-            style={darkBtn}
-            onClick={() => setChecked((prev) => ({ ...prev, [qi]: true }))}
-          >
-            Check answer
-          </button>
-        </div>
+    <div style={{display:"grid",gap:12}} aria-label={title}>
+      <h3 style={{margin:0,fontSize:18}}>{title}</h3>
+      {items.map((item,qi) => (
+        <fieldset key={item.prompt} style={{...card,minWidth:0,borderRadius:12}}>
+          <legend style={{padding:"0 5px",fontWeight:700}}>{qi+1}. {item.prompt}</legend>
+          {item.options.map((option,index) => (
+            <label key={option} style={{display:"flex",gap:9,alignItems:"flex-start",cursor:"pointer"}}>
+              <input type="radio" name={title+"-"+qi} value={index}
+                checked={selected[qi] === index} onChange={()=>{
+                  setSelected(previous=>({...previous,[qi]:index}));
+                  setChecks(previous=>({...previous,[qi]:false}));
+                }} />
+              <span>{String.fromCharCode(65+index)}. {option}</span>
+            </label>
+          ))}
+          <button type="button" style={{...lightBtn,justifySelf:"start"}}
+            disabled={selected[qi] === undefined}
+            onClick={() => setChecks(previous=>({...previous,[qi]:true}))}>Check answer</button>
+          {checks[qi] ? <p role="status" style={{margin:0,color:selected[qi] === item.answer?"#166534":"#9a3412"}}>
+            {selected[qi] === item.answer ? "✓ Correct!" : "Not quite. Correct answer: "+item.options[item.answer]}
+          </p> : null}
+        </fieldset>
       ))}
-    </section>
+    </div>
   );
 }
-
 function StatementContributionSection() {
   const { user, studentProfile } = useAuth();
   const className = getClassName(studentProfile);
@@ -435,60 +366,32 @@ function StatementContributionSection() {
 
   return (
     <section style={{ ...section, borderColor: "#86efac", background: "#f7fee7" }}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <p style={{ margin: 0, color: "#166534", fontWeight: 800 }}>Practical group assignment</p>
-        <h2 style={{ margin: 0 }}>Build your own sentences with days and activities</h2>
-        <p style={{ margin: 0 }}>
-          This is not a tutor assignment. First learn the sentence patterns below. Then write your own sentences and save them for your class discussion.
+      <div style={{display:"grid",gap:6}}>
+        <p style={{margin:0,color:"#166534",fontWeight:800}}>Part 5 · Self-practice · Optional class sharing</p>
+        <h2 style={{margin:0}}>Your Weekly Routine — Four Statements</h2>
+        <p style={{margin:0}}>
+          Write your own sentences using the verb-second rule you have just learned.
+          Optionally save them to the existing class discussion so classmates can read them.
+          This is not a tutor-marked assignment.
         </p>
       </div>
-
-      <div style={infoBox}>
-        <strong>Step 1: Learn the two sentence structures</strong>
-        <div><strong>Structure 1:</strong> Subject + Verb + Time + Activity</div>
-        <div>Ich gehe am Montag zur Schule.</div>
-        <div>Ich lese am Freitag.</div>
-        <div style={{ marginTop: 6 }}><strong>Structure 2:</strong> Time + Verb + Subject + Activity</div>
-        <div>Am Montag gehe ich zur Schule.</div>
-        <div>Am Dienstag treibe ich Sport.</div>
-        <div style={{ color: "#1e40af", marginTop: 6 }}>
-          Important: If the sentence starts with a day, the verb comes directly after the day.
-        </div>
-      </div>
-
       <div style={tipBox}>
-        <strong>Step 2: Choose your day and activity</strong>
+        <strong>Ideas for your own sentences</strong>
         <div><strong>Days:</strong> Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
-        <div><strong>Activities:</strong> kochen · Freunde treffen · Hausaufgaben machen · fernsehen · lesen</div>
-        <div>im Park spazieren gehen · zur Schule gehen · arbeiten · Sport treiben · einkaufen gehen</div>
+        <div><strong>Activities:</strong> Deutsch lernen · zur Schule gehen · arbeiten · Musik hören · Sport treiben · einkaufen gehen</div>
+        <div><strong>Examples:</strong> Ich lerne am Montag Deutsch. · Um acht Uhr gehe ich zur Schule.</div>
       </div>
-
       <div style={infoBox}>
-        <strong>Step 3: Use the correct verb form for ich</strong>
-        <div>gehen → ich gehe</div>
-        <div>machen → ich mache</div>
-        <div>lesen → ich lese</div>
-        <div>treffen → ich treffe</div>
-        <div>arbeiten → ich arbeite</div>
-        <div>fernsehen → ich sehe fern</div>
-        <div>Sport treiben → ich treibe Sport</div>
-        <div>einkaufen gehen → ich gehe einkaufen</div>
-      </div>
-
-      <div style={tipBox}>
-        <strong>Your group assignment:</strong>
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-          {groupTaskChecklist.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
+        <strong>Your self-practice checklist</strong>
+        <ul style={{margin:0,paddingLeft:20,display:"grid",gap:4}}>
+          {groupTaskChecklist.map(item=><li key={item}>{item}</li>)}
         </ul>
       </div>
-
       <label style={{ display: "grid", gap: 6, fontWeight: 700 }}>
         Your answer box
         <textarea
           style={textareaStyle}
-          placeholder="Write your 5 sentences here. Example pattern only: Ich ... am Montag ... / Am Dienstag ... ich ..."
+          placeholder="Write four sentences here. Example: Ich lerne am Montag Deutsch. / Am Dienstag spiele ich Fußball. / Um acht Uhr ..."
           value={draft}
           onChange={(event) => {
             setDraft(event.target.value);
@@ -529,187 +432,62 @@ function StatementContributionSection() {
 }
 
 export default function A1RevisionOriginalContentPage() {
-
   return (
     <div style={styles.pageWrap}>
-      <div style={styles.page}>
-        <section data-a1-day13-revision-hero="true" style={heroCard}>
-          <img
-            src={heroImage}
-            alt="German revision lesson"
-            style={{ width: "100%", height: 240, objectFit: "cover", display: "block" }}
-          />
-          <div style={{ padding: 18, display: "grid", gap: 8 }}>
-            <h1 style={{ margin: 0 }}>A1 Revision — Numbers, Time, Years, Birthdays, Prices, and Word Order</h1>
-            <p style={{ margin: 0 }}>
-              This revision page helps you practise practical German for everyday situations.
-            </p>
-            <AppBackButton label="Back" fallbackPath="/campus/course" />
-          </div>
-        </section>
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Introduction to the Numbers Practice</h2>
-          <p style={{ margin: 0 }}>
-            Today, you will revise numbers, time, years, birthdays, prices, and basic word order.
-            Type your own answers first. The final task at the bottom is where you share your own German sentences with your class.
+      <div style={{ ...styles.page, display:"grid", gap:16 }}>
+        <section style={{ ...section, background:"#f8fafc" }} aria-label="Day 13 revision introduction">
+          <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>A1 Day 13 · Quick revision, then a new skill</div>
+          <h2 style={{margin:0}}>Numbers, Days, Time, Prices and Statement Formation</h2>
+          <p style={{margin:0,color:"#475569",lineHeight:1.7}}>
+            First, answer 11 short questions to check what you already know.
+            Then learn how to build German statements and write four sentences of your own.
           </p>
-        </section>
-
-        <PracticeInputSection
-          title="Practice: Numbers from 1 to 10,000"
-          subtitle="Read the numbers out loud in German and type what you think. The model answer is not shown here, so you practise actively."
-          items={numbersItems}
-          placeholder="Type the number in German..."
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Practice: Asking for the Time in German</h2>
-
-          <div style={infoBox}>
-            <div><strong>🕒 Wie spät ist es?</strong></div>
-            <div><strong>✅ Key Question:</strong> Wie spät ist es? – What time is it?</div>
-            <div><strong>🗣️ Other Way to Ask:</strong> Wie viel Uhr ist es?</div>
-          </div>
-
-          <div style={tipBox}>
-            <div><strong>Useful patterns:</strong></div>
-            <div>Es ist ______ Uhr.</div>
-            <div>Es ist halb ______.</div>
-            <div>Es ist Viertel nach ______.</div>
-            <div>Es ist Viertel vor ______.</div>
+          <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10}}>
+            <span style={{fontSize:13,color:"#475569"}}>11 revision questions · 1 grammar lesson · 1 self-practice task</span>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
           </div>
         </section>
-
-        <PracticeInputSection
-          title="Time Practice"
-          subtitle="Say the time in German. Use the patterns above to help you."
-          items={timePracticeItems}
-          placeholder="Type the full answer..."
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Explanation of Years in German</h2>
-          <p style={{ margin: 0 }}>
-            In German, the years from 1000 to 1999 are often spoken with
-            <strong> hundert</strong>, while years from 2000 onwards are spoken directly.
+        <section style={section} data-a1-day13-section="numbers">
+          <h2 style={{margin:0}}>1. Zahlen · Numbers</h2>
+          <ShortAnswerSection title="Numbers check" description="Write these four numbers in German words. Check each answer." items={numberReviewItems}/>
+        </section>
+        <section style={section} data-a1-day13-section="days-time">
+          <h2 style={{margin:0}}>2. Tage und Uhrzeit · Days and Time</h2>
+          <p style={{margin:0,color:"#475569"}}>Check the day of the week, how to say 'on Friday' and two common clock times.</p>
+          <ChoiceReviewSection title="Days of the week" items={daysReviewItems}/>
+          <ShortAnswerSection title="Tell the time" description="Write the time naturally in German." items={timeReviewItems}/>
+        </section>
+        <section style={section} data-a1-day13-section="prices">
+          <h2 style={{margin:0}}>3. Preise · Asking About Prices</h2>
+          <p style={{margin:0,color:"#475569"}}>Practise asking for a price, giving a full answer and choosing kostet or kosten.</p>
+          <ShortAnswerSection title="Ask and answer" items={priceReviewItems}/>
+          <ChoiceReviewSection title="kostet oder kosten?" items={priceVerbReviewItems}/>
+        </section>
+        <section style={section} data-a1-day13-section="statement-formation">
+          <div style={{color:"#1d4ed8",fontSize:13,fontWeight:800}}>NEW GRAMMAR SKILL</div>
+          <h2 style={{margin:0}}>4. Satzbildung · How to Form a Statement</h2>
+          <p style={{margin:0,lineHeight:1.7}}>
+            In a normal German main-clause statement, the <strong>conjugated verb stays in position 2</strong>.
+            You can begin the sentence with the subject or with a time expression.
           </p>
-
           <div style={infoBox}>
-            <div>1100: <span style={{ color: yearPartColor.thousandPart }}>elf</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span></div>
-            <div>1453: <span style={{ color: yearPartColor.thousandPart }}>vierzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>dreiundfünfzig</span></div>
-            <div>1944: <span style={{ color: yearPartColor.thousandPart }}>neunzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
+            <strong>Pattern A · Subject first</strong>
+            <div>Ich <strong style={{color:"#1d4ed8"}}>lerne</strong> am Montag Deutsch.</div>
+            <div style={{color:"#475569",fontSize:13}}>Subject (Ich) → Verb (lerne) → Time (am Montag) → Other information (Deutsch)</div>
           </div>
-
           <div style={infoBox}>
-            <div><strong>For years beyond 1999, you say the number directly:</strong></div>
-            <div>2000: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span></div>
-            <div>2010: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>zehn</span></div>
-            <div>2025: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>fünfundzwanzig</span></div>
+            <strong>Pattern B · Time first</strong>
+            <div>Am Montag <strong style={{color:"#1d4ed8"}}>lerne</strong> ich Deutsch.</div>
+            <div style={{color:"#475569",fontSize:13}}>Time phrase (Am Montag) → Verb (lerne) → Subject (ich) → Other information (Deutsch)</div>
           </div>
-        </section>
-
-        <PracticeInputSection
-          title="Year Practice"
-          subtitle="Say the year in German."
-          items={yearPracticeItems}
-          placeholder="Type the year in German..."
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Explaining “Ich bin am ... geboren.” in German</h2>
-          <p style={{ margin: 0 }}>
-            In German, when stating your birthdate, you use the structure:
-            <strong> Ich bin am [date] geboren.</strong>
-          </p>
-
-          <div style={infoBox}>
-            <div><strong>1️⃣ Understanding the Grammar</strong></div>
-            <div>"Ich bin" = I am.</div>
-            <div>"am" = on the, and the date takes the ending -ten or -sten.</div>
-            <div>"geboren" = born, usually at the end of the sentence.</div>
-          </div>
-
           <div style={tipBox}>
-            <div><strong>Forming Dates in German</strong></div>
-            <div>1–19 → Add "-te" → after "am" it becomes "-ten".</div>
-            <div>20 and above → Add "-ste" → after "am" it becomes "-sten".</div>
-            <div>Example frame: Ich bin am ______ Mai ______ geboren.</div>
+            <strong>Remember: the verb stays second.</strong>
+            <div>"Am Montag" counts as one time phrase, so the verb follows it immediately.</div>
+            <div><strong>Another example:</strong> Um acht Uhr <strong>gehe</strong> ich zur Schule.</div>
+            <div><strong>Useful verb forms:</strong> ich lerne · ich gehe · ich spiele · ich arbeite</div>
           </div>
         </section>
-
-        <McqSection
-          title="Birthday Practice"
-          subtitle="Choose the correct sentence."
-          items={birthdayMcqItems}
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Practice: Asking and Saying Prices in German</h2>
-
-          <div style={infoBox}>
-            <div><strong>Step 1: Practice with Objects</strong></div>
-            <div>das Buch · der Apfel · der Kaffee · die Banane · die Zeitung · die Tasse</div>
-          </div>
-
-          <div style={tipBox}>
-            <div><strong>Step 2: Ask and Answer</strong></div>
-            <div>A: Wie viel kostet [object]?</div>
-            <div>B: [Pronoun] kostet [price] Euro.</div>
-          </div>
-        </section>
-
-        <PracticeInputSection
-          title="Price Question and Answer Practice"
-          subtitle="Read the question and write your own full answer."
-          items={pricesQaItems}
-          placeholder="Write the full answer..."
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Understanding “kostet” vs. “kosten”</h2>
-
-          <div style={infoBox}>
-            <div><strong>kostet</strong> → Use when talking about one item.</div>
-            <div>Wie viel kostet die Zeitung?</div>
-            <div>Sie kostet zwei Euro fünfzig.</div>
-          </div>
-
-          <div style={tipBox}>
-            <div><strong>kosten</strong> → Use when talking about multiple items.</div>
-            <div>Wie viel kosten die Bücher?</div>
-            <div>Sie kosten zwanzig Euro.</div>
-          </div>
-        </section>
-
-        <McqSection
-          title="kostet vs. kosten Practice"
-          subtitle="Choose the correct answer."
-          items={kostetKostenMcqItems}
-        />
-
-        <section style={section}>
-          <h2 style={{ margin: 0 }}>Sentence Building with Days and Activities</h2>
-
-          <div style={infoBox}>
-            <div><strong>Sentence Structures:</strong></div>
-            <div>1. Subject + Verb + Time + Other Elements</div>
-            <div>2. Time + Verb + Subject + Other Elements</div>
-          </div>
-
-          <div style={tipBox}>
-            <div><strong>Days of the Week in German</strong></div>
-            <div>Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
-          </div>
-
-          <div style={infoBox}>
-            <div><strong>Activities to Use in Sentences</strong></div>
-            <div>kochen · Freunde treffen · Hausaufgaben machen · fernsehen · lesen</div>
-            <div>im Park spazieren gehen · zur Schule gehen · arbeiten · Sport treiben · einkaufen gehen</div>
-          </div>
-        </section>
-
-        <StatementContributionSection />
+        <StatementContributionSection/>
       </div>
     </div>
   );
