@@ -28,7 +28,8 @@ const routeRows = [
   ["Goethe/exam information", "Exam File", "/campus/examFile"],
   ["Exam-style practice", "Exams Room", "/exams/overview"],
   ["Study/exam planning", "Study Calendar", "/exams/study"],
-  ["Vocabulary practice", "Vocab", "/campus/vocab"],
+  ["German learning songs", "Music", "/campus/music"],
+  ["Vocabulary practice", "Exams Room → Vocab", "/exams/vocab"],
   ["Tuition, balance, receipts", "Account → Billing", "/campus/account?tab=billing"],
 ];
 
@@ -132,7 +133,7 @@ const PublicStudentGuidePage = () => {
           To continue lessons, tap or click <strong>Course Book</strong>. On mobile, Course Book is the first item in the bottom navigation. On desktop, Course Book appears in the campus navigation row.
         </p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Course Book</strong> opens <RouteLink href="/campus/course">your lessons</RouteLink>. <strong>Vocab</strong> opens vocabulary practice, while <strong>Results</strong> opens your scores and feedback.
+          <strong>Course Book</strong> opens <RouteLink href="/campus/course">your lessons</RouteLink>. <strong>Music</strong> opens <RouteLink href="/campus/music">German learning songs</RouteLink>. Vocabulary practice remains in Exams Room → Vocab, while <strong>Results</strong> opens your scores and feedback.
         </p>
         <div style={{ margin: 0, padding: 12, borderRadius: 12, border: "1px solid #fed7aa", background: "#fff7ed", color: "#9a3412", lineHeight: 1.6 }}>
           Do not look for <strong>My Library</strong>, <strong>Learning Hub</strong>, or <strong>My Hub</strong>. These are not current Falowen navigation labels.
