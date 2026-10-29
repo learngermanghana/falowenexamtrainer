@@ -22,6 +22,21 @@ const searchInput = byId("search");
 let catalog = [];
 let pinnedTracks = [];
 let learning = {};
+let studioDrafts = [];
+const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
+  .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+function referenceLyricsFor(track) {
+  if (!track || !track.autoDiscovered) return null;
+  const candidates = studioDrafts.filter(item => item.level === track.level && item.day === track.day);
+  const exact = candidates.find(item => normalizedTitle(item.title) === normalizedTitle(track.title));
+  const byKey = track.assignmentKey && candidates.find(item => item.assignmentKey === track.assignmentKey);
+  const draft = exact || byKey || (candidates.length === 1 ? candidates[0] : null);
+  return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
+    ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey} : null;
+}
+function lyricsFor(track) {
+  return publishedLyrics.get(track.id) || learning[track.id] || referenceLyricsFor(track);
+}
 let current = null;
 let selected = null;
 let category = "all";
@@ -267,7 +282,7 @@ byId("next-track")?.addEventListener("click", () => moveTrack(1));
 byId("previous-track")?.addEventListener("click", () => moveTrack(-1));
 function setTab(name) {
   if (!["listen", "lyrics", "practice"].includes(name)) return;
-  const lesson = selected && (publishedLyrics.get(selected.id) || learning[selected.id]);
+  const lesson = selected && lyricsFor(selected);
   if (!lesson && name !== "listen") return;
   if (name !== "listen" && document.querySelector('[data-tab="' + name + '"]').hidden) return;
   if (name === "practice" && !learning[selected?.id]?.questions) return;
@@ -283,7 +298,7 @@ function renderLyrics(lesson) {
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
   highlightedLine = -1;
-  const note = el("p", "detail-note", renderedCues.length ? "Follow the highlighted line, or tap a line to replay it." : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
+  const note = el("p", "detail-note", lesson.referenceOnly ? "COURSE DRAFT — These are the original Music Studio lyrics for this lesson, not verified against this MP3. Words may differ from the recording. Timed highlighting is unavailable until matching lyrics are published." : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it." : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
   root.append(note);
   let index = 0;
   for (const raw of String(lesson.lyrics || "").replace(/\\n/g, "\n").split(/\r?\n/)) {
@@ -341,7 +356,8 @@ async function loadPublishedLyrics(track) {
     const response = await fetch("/api/music-lyrics?track=" + encodeURIComponent(track.id), {cache:"no-cache"});
     if (!response.ok) return;
     const data = await response.json();
-    if (data.objectKey !== track.objectKey || !validateCues(data.cues, data.lyrics).length) return;
+    if (data.objectKey !== track.objectKey || typeof data.lyrics !== "string" || !data.lyrics.trim()) return;
+    if (Array.isArray(data.cues) && data.cues.length && !validateCues(data.cues, data.lyrics).length) return;
     publishedLyrics.set(track.id, data);
     if (selected?.id === track.id) {
       const tab = document.querySelector('.lesson-tabs button[aria-pressed="true"]')?.dataset.tab || "listen";
@@ -404,7 +420,7 @@ function checkAnswers() {
 }
 function renderDetail(track) {
   const lesson = learning[track.id];
-  const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null);
+  const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
   const hasLyrics = Boolean(lyricPack?.lyrics);
   const hasLesson = Boolean(lesson && lesson.assignmentKey === track.assignmentKey && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
@@ -521,10 +537,16 @@ Promise.all([
   }),
   fetch("/music/learning.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : { lessons: {} })
     .catch(() => ({ lessons: {} })),
-]).then(([data, lessons]) => {
+  fetch("/music/studio-drafts.json", { cache: "no-cache" }).then(res => res.ok ? res.json() : { tracks: [] })
+    .catch(() => ({ tracks: [] })),
+]).then(([data, lessons, drafts]) => {
   pinnedTracks = (Array.isArray(data.tracks) ? data.tracks : []).map(safeTrack).filter(Boolean);
   catalog = [...pinnedTracks];
   learning = lessons && typeof lessons.lessons === "object" && lessons.lessons ? lessons.lessons : {};
+  studioDrafts = Array.isArray(drafts?.tracks) ? drafts.tracks.filter(item =>
+    ["A1","A2","B1"].includes(item.level) && Number.isInteger(item.day)
+    && typeof item.lyrics === "string" && item.lyrics.length <= 6000
+  ) : [];
   populateFeatured();
   populateFilters();
   renderCatalog();
