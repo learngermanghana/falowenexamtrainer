@@ -37,13 +37,18 @@ describe("B1 Day 24 sustainability workbook", () => {
     expect(text.questions.every((question) => question.options.length === 2)).toBe(true);
   });
 
-  test("embeds the requested Goethe listening video as self-check practice", () => {
+  test("uses the exact new Conversation 2 recording and five submitted clothing-recycling questions", () => {
     const { listening } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG;
-
-    expect(listening.videoId).toBe("zzPpGxzvJCY");
-    expect(listening.externalUrl).toBe("https://youtu.be/zzPpGxzvJCY");
-    expect(listening.selfCheckText).toContain(
-      "The only parts that will be officially evaluated by the school are Lesen (reading) and Schreiben (writing).",
-    );
+    expect(listening.audioKey).toBe("b1/day-24/day-25.mp3");
+    expect(listening.submitRequired).toBe(true);
+    expect(listening.questions.map(item => item.stem)).toEqual([
+      "Jonas verkauft seine alten Kleider dieses Mal online auf einem Flohmarkt.",
+      "Jonas wirft seine Kleidung in einen Altkontainer.",
+      "Ein großer Teil der Altkleider zerstört laut Lisa lokale Märkte im Globalen Süden.",
+      "Jonas wusste von Anfang an genau, was mit der Altkleidung passiert.",
+      "Lisa empfiehlt, Kleidung länger zu tragen oder Tauschpartys zu besuchen.",
+    ]);
+    expect(listening.questions.every(q => q.options.join(" ") === "A) Richtig B) Falsch")).toBe(true);
+    expect(listening.videoId || listening.embedUrl || listening.externalUrl).toBeFalsy();
   });
 });
