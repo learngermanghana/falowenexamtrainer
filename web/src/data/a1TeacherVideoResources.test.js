@@ -130,10 +130,13 @@ describe("standardized A1 teacher videos", () => {
     expect(configuredVideos[0]).toMatchObject({
       key: "a1-day13-chapter-3-5-teacher-video",
       title: "Revision: Numbers, Time and Prices · Teacher lecture",
-      url: "https://youtu.be/zizS5WdOYs8",
+      url: "https://youtu.be/0aprj_rMWw8",
     });
     expect(configuredVideos.map((video) => video.url)).not.toContain(
       "https://youtu.be/eqSc_5p5uyQ",
+    );
+    expect(configuredVideos.map((video) => video.url)).not.toContain(
+      "https://youtu.be/zizS5WdOYs8",
     );
 
     const lesson = normalizeLesson(
@@ -149,7 +152,7 @@ describe("standardized A1 teacher videos", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/zizS5WdOYs8",
+      "https://youtu.be/0aprj_rMWw8",
     ]);
   });
 
