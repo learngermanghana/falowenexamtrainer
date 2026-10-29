@@ -27,3 +27,9 @@ Automatic alignment can be refined using the existing Admin timing controls. Rep
 The public app resolves recording metadata by exact MP3 key, including discovered IDs. It builds literal-evidence questions when no matching saved lesson exists, and hides the questions continuation when no question set is available. Follow is disabled and unchecked without a complete matching cue set. A manual catalog refresh also refreshes the current song's lyrics.
 
 DOM interaction tests exercise the real app for A1, A2, B1 and Day 14: highlighted line, container scrolling, follow off/on, click-to-seek, repeat to intro, question navigation and correct-answer feedback. They mock only media playback, network and layout. They verify cue-driven UI behavior, not acoustic alignment accuracy. The shared music API remains the timing source for teacher slides and course book.
+
+## A1 Day 13 timestamps — 29 October 2026
+
+The currently published `music/a1/day-13/Zwei Tees, vier Euro.mp3` receives 17 line cues from its own MP3, not the earlier guessed lowercase filename. First vocal: 18.48 s; last line ends 130.74 s. Instrumental gaps remain unhighlighted (including the long break before the outro). The complete original 17-line text matches this recording pack; no songbook rewrite is required. Public questions check half past two and the seven-euro total. The same API pack is loaded by the discovery-based Day 13 presenter.
+
+The DOM test matrix now explicitly includes Day 13. Built-in API tests validate every cue, exact recording identity and instrumental gaps, without an R2 metadata fetch.

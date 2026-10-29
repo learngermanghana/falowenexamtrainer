@@ -977,6 +977,98 @@
         }
       ],
       "trackId": "r2-a1-day-14-b64_RWluc3RlaWdlbiDigJMgV2lyIGZhaHJlbiBsb3MubXAz"
+    },
+    {
+      "objectKey": "music/a1/day-13/Zwei Tees, vier Euro.mp3",
+      "lyrics": "[Verse 1]\nIm Café sind wir zu zweit.\nZwei Tees stehen auf dem Tisch.\nDie Uhr zeigt halb drei.\nDie Rechnung kommt jetzt auch.\n\n[Chorus]\nZwei Tees, vier Euro, danke.\nWie spät ist es? Halb drei.\nWir rechnen und wir lachen.\n\n[Verse 2]\nMia kauft noch ein Stück Kuchen.\nDas kostet drei Euro.\nWir zahlen sieben Euro.\nDann gehen wir nach Hause.\n\n[Chorus]\nZwei Tees, vier Euro, danke.\nWie spät ist es? Halb drei.\nWir rechnen und wir lachen.\n\n[Outro]\nIch kenne Zeit und Preise.\nBis morgen im Café!\nBei Falowen zählen wir zusammen.",
+      "cues": [
+        {
+          "start": 18.48,
+          "end": 21.5,
+          "text": "Im Café sind wir zu zweit."
+        },
+        {
+          "start": 21.5,
+          "end": 26.14,
+          "text": "Zwei Tees stehen auf dem Tisch."
+        },
+        {
+          "start": 28.76,
+          "end": 31.12,
+          "text": "Die Uhr zeigt halb drei."
+        },
+        {
+          "start": 31.12,
+          "end": 36.54,
+          "text": "Die Rechnung kommt jetzt auch."
+        },
+        {
+          "start": 37.54,
+          "end": 41.3,
+          "text": "Zwei Tees, vier Euro, danke."
+        },
+        {
+          "start": 41.3,
+          "end": 46.44,
+          "text": "Wie spät ist es? Halb drei."
+        },
+        {
+          "start": 46.44,
+          "end": 49.62,
+          "text": "Wir rechnen und wir lachen."
+        },
+        {
+          "start": 59.08,
+          "end": 62.0,
+          "text": "Mia kauft noch ein Stück Kuchen."
+        },
+        {
+          "start": 62.0,
+          "end": 67.14,
+          "text": "Das kostet drei Euro."
+        },
+        {
+          "start": 69.26,
+          "end": 72.28,
+          "text": "Wir zahlen sieben Euro."
+        },
+        {
+          "start": 72.28,
+          "end": 77.34,
+          "text": "Dann gehen wir nach Hause."
+        },
+        {
+          "start": 77.34,
+          "end": 82.28,
+          "text": "Zwei Tees, vier Euro, danke."
+        },
+        {
+          "start": 82.28,
+          "end": 87.42,
+          "text": "Wie spät ist es? Halb drei."
+        },
+        {
+          "start": 87.42,
+          "end": 91.42,
+          "text": "Wir rechnen und wir lachen."
+        },
+        {
+          "start": 112.78,
+          "end": 115.78,
+          "text": "Ich kenne Zeit und Preise."
+        },
+        {
+          "start": 115.78,
+          "end": 120.64,
+          "text": "Bis morgen im Café!"
+        },
+        {
+          "start": 122.7,
+          "end": 130.74,
+          "text": "Bei Falowen zählen wir zusammen."
+        }
+      ],
+      "trackId": "r2-a1-day-13-b64_WndlaSBUZWVzLCB2aWVyIEV1cm8ubXAz"
     }
   ]
 }
