@@ -223,10 +223,7 @@ import { getPartialPaymentAccessEndMs, hasClearedBalance, normalizePaymentStatus
 import { persistInterfaceLanguage } from "./i18n";
 import { trackAdmissionsEngagement } from "./services/admissionsEngagementService";
 
-const getTabStructure = (program, t) => {
-  const isFrenchProgram = program === "french";
-  const vocabLabel = isFrenchProgram ? t("appNav.sections.vocabFrench") : t("appNav.sections.vocab");
-
+const getTabStructure = (t) => {
   return [
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
     { key: "music", label: "Music", section: "music" },
@@ -234,11 +231,6 @@ const getTabStructure = (program, t) => {
     { key: "examFile", label: t("appNav.sections.examFile"), section: "examFile" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
     { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
-    {
-      key: "vocab",
-      label: vocabLabel,
-      section: "vocab",
-    },
     { key: "results", label: t("appNav.tabs.results"), section: "results" },
     { key: "account", label: t("appNav.tabs.account"), section: "account" },
   ];
@@ -324,8 +316,8 @@ function App() {
   const levelToken = String(studentProfile?.level || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
   const isSelfLearningTrack = !isStaff && ["B2", "C1"].includes(levelToken);
   const tabStructure = useMemo(
-    () => getTabStructure(studentProfile?.program, t),
-    [studentProfile?.program, t]
+    () => getTabStructure(t),
+    [t]
   );
 
   const allowedSections = useMemo(
@@ -337,7 +329,6 @@ function App() {
       examFile: isEnrolled || isStaff,
       attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
-      vocab: true,
       discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
       classMembers: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
@@ -841,6 +832,7 @@ const AppShell = ({
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route path="/campus/books" element={<Navigate to="/books" replace />} />
+          <Route path="/campus/vocab" element={<Navigate to="/campus/music" replace />} />
           <Route path="/campus/live-speak" element={<LiveSpeakPage />} />
           <Route
             path="/campus/:section"
@@ -1540,7 +1532,6 @@ const CampusArea = ({
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
-      {resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage /> : null}
       {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
