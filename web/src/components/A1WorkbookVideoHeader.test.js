@@ -103,6 +103,32 @@ describe("A1 workbook AI video header", () => {
     );
   });
 
+  test("keeps only the two canonical top videos on every A1 self-practice route", () => {
+    for (const pathname of [
+      "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
+      "/campus/course/modal-verbs-day-14-3-6",
+    ]) {
+      buildWorkbookDom();
+      // Legacy AI video headers must never add a third YouTube iframe
+      // below the teacher and AI resource cards on self-practice days.
+      expect(applyA1WorkbookVideoHeader({ pathname })).toBe(0);
+      expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
+    }
+  });
+
+  test("removes a prior tutor video header when navigating into self-practice", () => {
+    buildWorkbookDom();
+    expect(applyA1WorkbookVideoHeader({
+      pathname: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
+      search: "?assignmentKey=A1-8&level=A1",
+    })).toBe(1);
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeTruthy();
+    expect(applyA1WorkbookVideoHeader({
+      pathname: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
+    })).toBe(0);
+    expect(document.querySelector('[data-a1-workbook-video-header="true"]')).toBeNull();
+  });
+
   test("does not embed on the dynamic A1 lesson hub unless view=workbook is explicit", () => {
     expect(
       resolveA1WorkbookVideoLesson({
