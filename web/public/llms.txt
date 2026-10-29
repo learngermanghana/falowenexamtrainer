@@ -30,7 +30,8 @@ Last reviewed: 11 October 2026. Read the linked official sources for current ins
 - Free Goethe A2 Lesen practice: https://www.falowen.app/exam-practice/a2
 - Student Exams Room: https://www.falowen.app/exams/overview
 - Study Calendar: https://www.falowen.app/exams/study
-- Vocab: https://www.falowen.app/campus/vocab
+- Music: https://www.falowen.app/campus/music
+- Vocabulary practice (Exams Room): https://www.falowen.app/exams/vocab
 - Account: https://www.falowen.app/campus/account
 - Billing: https://www.falowen.app/campus/account?tab=billing
 

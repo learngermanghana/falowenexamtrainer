@@ -137,7 +137,8 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
 
   const navigationHelpers = `const getCampusNavigationItems = (allowedSections = {}) => [
   { key: "learn", label: "Learn", route: "/campus/course", enabled: true },
-  { key: "practice", label: "Vocab", route: "/campus/vocab", enabled: Boolean(allowedSections.vocab) },
+  { key: "music", label: "Music", route: "/campus/music", enabled: Boolean(allowedSections.music) },
+  { key: "books", label: "Books", route: "/books", enabled: Boolean(allowedSections.books) },
   { key: "attendance", label: "Attendance", route: "/campus/attendance", enabled: Boolean(allowedSections.attendance) },
   { key: "results", label: "Results", route: "/campus/results", enabled: Boolean(allowedSections.results) },
   { key: "examFile", label: "Exam File", route: "/campus/examFile", enabled: Boolean(allowedSections.examFile) },
@@ -147,7 +148,8 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
 
 const isCampusNavigationItemActive = (item, location) => {
   if (item.key === "learn") return location.pathname.startsWith("/campus/course");
-  if (item.key === "practice") return location.pathname.startsWith("/campus/vocab");
+  if (item.key === "music") return location.pathname.startsWith("/campus/music");
+  if (item.key === "books") return location.pathname.startsWith("/books");
   if (item.key === "attendance") return location.pathname.startsWith("/campus/attendance");
   if (item.key === "results") return location.pathname.startsWith("/campus/results");
   if (item.key === "examFile") return location.pathname.startsWith("/campus/examFile");
@@ -178,7 +180,7 @@ const CampusPrimaryNavigation = ({ allowedSections }) => {
 
 const MOBILE_NAV_ITEMS = [
   { key: "learn", label: "Learn", icon: "▤", route: "/campus/course", permission: "course" },
-  { key: "practice", label: "Vocab", icon: "✦", route: "/campus/vocab", permission: "vocab" },
+  { key: "music", label: "Music", icon: "✦", route: "/campus/music", permission: "music" },
   { key: "attendance", label: "Attendance", icon: "✓", route: "/campus/attendance", permission: "attendance" },
   { key: "results", label: "Results", icon: "◎", route: "/campus/results", permission: "results" },
 ];
@@ -187,7 +189,7 @@ const CampusMobileBottomNav = ({ allowedSections }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const moreItems = getCampusNavigationItems(allowedSections).filter((item) =>
-    ["examFile", "classMembers", "home"].includes(item.key)
+    ["books", "examFile", "classMembers", "home"].includes(item.key)
   );
   const moreActive = moreItems.some((item) => isCampusNavigationItemActive(item, location));
 
@@ -244,17 +246,17 @@ const CampusQuickNavigation = ({ allowedSections }) => <CampusPrimaryNavigation 
   app = `${app.slice(0, start)}${navigationHelpers}${app.slice(end)}`;
 }
 
-// Keep the generated vocabulary destination correct on already-patched worktrees.
+// Keep the generated Music destination correct on already-patched worktrees.
 // prestart/prebuild rerun this patch after CampusPrimaryNavigation already exists,
 // so this replacement must live outside the initialization-only guard above.
 app = app
   .replaceAll(
-    '{ key: "practice", label: "Practice", route: "/campus/vocab"',
-    '{ key: "practice", label: "Vocab", route: "/campus/vocab"',
+    '{ key: "music", label: "Practice", route: "/campus/music"',
+    '{ key: "music", label: "Music", route: "/campus/music"',
   )
   .replaceAll(
-    '{ key: "practice", label: "Practice", icon: "✦", route: "/campus/vocab"',
-    '{ key: "practice", label: "Vocab", icon: "✦", route: "/campus/vocab"',
+    '{ key: "music", label: "Practice", icon: "✦", route: "/campus/music"',
+    '{ key: "music", label: "Music", icon: "✦", route: "/campus/music"',
   );
 
 if (!app.includes('<CampusPrimaryNavigation allowedSections={allowedSections} />\n\n      {showCampusHero ? (')) {

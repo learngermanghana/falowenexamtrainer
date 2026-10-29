@@ -6,7 +6,8 @@ export const STUDY_BUDDY_DESTINATIONS = Object.freeze({
   examFile: { label: "Exam File", path: "/campus/examFile" },
   courseBook: { label: "Course Book", path: "/campus/course" },
   attendance: { label: "Attendance", path: "/campus/attendance" },
-  vocab: { label: "Vocab", path: "/campus/vocab" },
+  music: { label: "Music", path: "/campus/music" },
+  vocab: { label: "Vocab", path: "/exams/vocab" },
   calendar: { label: "Study Calendar", path: "/exams/study" },
   billing: { label: "Billing", path: "/campus/account?tab=billing" },
   placement: { label: "Placement Test", path: "/placement-test" },
@@ -88,8 +89,11 @@ export const resolveStudyBuddyNavigationReply = (rawMessage, conversationHistory
   if (requiresNavigation(resolvedMessage, /\b(?:attendance|presence|anwesenheit)\b/)) {
     return { destination: "attendance", reply: makeReply("attendance", "Open Attendance in your campus:", "Attendance may not appear for self-learning courses.") };
   }
+  if (requiresNavigation(resolvedMessage, /\b(?:music|songs?|musik|lieder|listening room)\b/)) {
+    return { destination: "music", reply: makeReply("music", "Open Music in your Falowen campus to listen and practise:") };
+  }
   if (requiresNavigation(resolvedMessage, /\b(?:vocab|vocabulary|word practice|wortschatz)\b/)) {
-    return { destination: "vocab", reply: makeReply("vocab", "Open Vocab to practise words:") };
+    return { destination: "vocab", reply: makeReply("vocab", "Open Exams Room → Vocab to practise words:") };
   }
   if (requiresNavigation(resolvedMessage, /\b(?:study calendar|study plan|learning calendar|lernkalender)\b/)) {
     return { destination: "calendar", reply: makeReply("calendar", "Open Study Calendar to plan your preparation:") };

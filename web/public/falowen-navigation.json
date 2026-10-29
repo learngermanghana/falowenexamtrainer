@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-10-28",
+  "lastReviewed": "2026-10-29",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -98,8 +98,8 @@
     {
       "id": "vocabulary",
       "label": "Vocab",
-      "route": "/campus/vocab",
-      "purpose": "Open vocabulary practice",
+      "route": "/exams/vocab",
+      "purpose": "Practice vocabulary inside Exams Room; the former Campus Vocab destination now opens Music",
       "requiresLogin": true,
       "aliases": [
         "vocabulary",
