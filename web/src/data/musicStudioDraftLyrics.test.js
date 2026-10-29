@@ -1,9 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { createRequire } from "module";
-
-const requireNode = createRequire(import.meta.url);
-const { validateLyrics } = requireNode("../../../server/musicLyrics.cjs");
+const { validateLyrics } = require("../../../server/musicLyrics.cjs");
 const read = file => fs.readFileSync(path.resolve(process.cwd(),file),"utf8");
 
 describe("Falowen Music studio lyrics for published R2 tracks", () => {
