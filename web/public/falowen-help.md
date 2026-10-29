@@ -1,7 +1,7 @@
 # Falowen Help & Navigation Knowledge Base
 
 **Official Falowen source for learners, support staff, search engines and AI assistants.**  
-Last reviewed: **11 October 2026**.
+Last reviewed: **29 October 2026**.
 
 Falowen is a language-learning campus that combines structured lessons, Falowen Radio, workbooks, teacher-marked assignments, results, attendance, exam support, vocabulary practice, account management and an in-app Study Buddy.
 
@@ -24,7 +24,8 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 | Goethe/exam information | Exam File | https://www.falowen.app/campus/examFile |
 | Exam-style practice | Exams Room | https://www.falowen.app/exams/overview |
 | Study/exam planning | Study Calendar | https://www.falowen.app/exams/study |
-| Vocabulary practice | Vocab | https://www.falowen.app/campus/vocab |
+| German learning songs | Music | https://www.falowen.app/campus/music |
+| Vocabulary practice | Exams Room → Vocab | https://www.falowen.app/exams/vocab |
 | Profile and student data | Account → Student Data | https://www.falowen.app/campus/account?tab=studentData |
 | Notification settings | Account → Notifications | https://www.falowen.app/campus/account?tab=notifications |
 | Tuition, balance, history, receipts | Account → Billing | https://www.falowen.app/campus/account?tab=billing |
@@ -36,11 +37,11 @@ Campus routes require a Falowen account and may redirect a learner who has not y
 
 For a signed-in learner, use the **current visible navigation labels** when giving directions.
 
-- **Mobile:** the bottom navigation shows **Course Book**, **Vocab**, **Attendance**, **Results**, and **More** (subject to the learner's level/access).
-- **Desktop:** the campus navigation row includes **Course Book**, **Vocab**, **Attendance**, **Results**, and other available destinations.
+- **Mobile:** the campus navigation includes **Course Book**, **Music**, **Books**, **Attendance**, **Results**, and other available destinations.
+- **Desktop:** the campus navigation row includes **Course Book**, **Music**, **Books**, **Attendance**, **Results**, and other available destinations.
 - **Course Book:** tap or click **Course Book** to open https://www.falowen.app/campus/course.
 - Inside the Course Book, the learner sees the **Course Book** heading, progress, next lesson and the **Continue learning** action.
-- **Vocab** opens vocabulary practice at https://www.falowen.app/campus/vocab.
+- **Music** opens the Falowen Music listening room at https://www.falowen.app/campus/music. Existing `/campus/vocab` bookmarks redirect there. Vocabulary practice remains available under Exams Room → Vocab.
 - **Results** opens https://www.falowen.app/campus/results.
 - **Account settings** are opened from the profile menu.
 
@@ -96,7 +97,7 @@ A2 and B1 use a consistent lesson flow with grammar/learning material, workbook 
 
 B2 and C1 are self-learning tracks with AI support. Published teacher-marked lessons can still show a locked teacher-submission panel. Planned assignments should not be presented as available before they are published.
 
-For B2/C1 self-learning students, **Exam File is available**. Standard class **Attendance and Class Members** remain hidden. They should primarily use Course Book, Vocab, Results, Exam File and Account.
+For B2/C1 self-learning students, **Exam File is available**. Standard class **Attendance and Class Members** remain hidden. They should primarily use Course Book, Music, Results, Exam File and Account.
 
 ### C2
 
@@ -165,7 +166,8 @@ Translate informal student wording to the exact current Falowen label:
 | --- | --- |
 | homework, assignment, course material, my lesson | Course Book |
 | marks, grades, correction, feedback | Results |
-| words, vocabulary practice | Vocab |
+| songs, music, listening room | Music |
+| words, vocabulary practice | Exams Room → Vocab |
 | fees, tuition, balance, receipt, payment | Account → Billing |
 | exam practice, mock exam, Goethe practice | Exams Room |
 | study plan, exam plan | Study Calendar |
@@ -297,7 +299,7 @@ Send them to Exams Room: https://www.falowen.app/exams/overview.
 Send them to https://www.falowen.app/exams/study.
 
 ### “Where do I practise vocabulary?”
-Send them to https://www.falowen.app/campus/vocab.
+Send them to https://www.falowen.app/exams/vocab in Exams Room. The former campus Vocab page now opens Music.
 
 ### “Where do I pay or check my balance?”
 Send them to Account → Billing: https://www.falowen.app/campus/account?tab=billing.
