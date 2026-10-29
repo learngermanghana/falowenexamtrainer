@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastReviewed": "2026-10-28",
+  "lastReviewed": "2026-10-29",
   "canonicalBaseUrl": "https://www.falowen.app",
   "sourceOfTruth": {
     "humanHelp": "https://www.falowen.app/help",
@@ -93,18 +93,6 @@
         "workbooks",
         "book catalogue",
         "German books"
-      ]
-    },
-    {
-      "id": "vocabulary",
-      "label": "Vocab",
-      "route": "/campus/vocab",
-      "purpose": "Open vocabulary practice",
-      "requiresLogin": true,
-      "aliases": [
-        "vocabulary",
-        "vocab",
-        "practice words"
       ]
     },
     {
