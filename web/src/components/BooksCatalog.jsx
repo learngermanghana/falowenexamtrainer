@@ -32,7 +32,8 @@ export const BOOK_PAGES = Object.freeze({
   "b1-four-skills-exam-guide": {href:"/books/goethe-b1-four-skills-exam-guide",cover:"/books/b1-exam-guide-cover.svg"},
 });
 
-export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook }) {
+export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, onSelectBook, basePath = "/books" }) {
+  const bookHref = page => basePath + page.href.slice("/books".length);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState("all");
   const [format, setFormat] = useState("all");
@@ -80,7 +81,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
         const available = title.status === "available";
         const offers = books.filter(book => (title.bookIds || []).includes(book.id));
         return <article key={title.id} className="fb-library-card">
-          {BOOK_PAGES[title.id] && <a className="fb-library-cover-link" href={BOOK_PAGES[title.id].href}
+          {BOOK_PAGES[title.id] && <a className="fb-library-cover-link" href={bookHref(BOOK_PAGES[title.id])}
               aria-label={"View " + title.title}>
             <img src={BOOK_PAGES[title.id].cover} alt={title.title + " cover"} loading="lazy" width="190" height="269" />
           </a>}
@@ -97,7 +98,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
             </div>) : <p className="fb-library-coming">Coming soon · Price to be announced</p>}
           </div>
           {BOOK_PAGES[title.id]
-            ? <a className="fb-btn fb-btn-soft fb-library-action" href={BOOK_PAGES[title.id].href}>View Book</a>
+            ? <a className="fb-btn fb-btn-soft fb-library-action" href={bookHref(BOOK_PAGES[title.id])}>View Book</a>
             : available && offers.length && onSelectBook
               ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
                   onClick={() => onSelectBook(offers[0].id)}>View Book</button>

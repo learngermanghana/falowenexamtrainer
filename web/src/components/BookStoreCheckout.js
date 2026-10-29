@@ -13,7 +13,7 @@ async function request(path, options = {}) {
   if (!response.ok) throw new Error(payload.error || "Book payments are temporarily unavailable.");
   return payload;
 }
-function ReceiptConfirmation() {
+function ReceiptConfirmation({ basePath = "/books" }) {
   const query = new URLSearchParams(typeof window === "undefined" ? "" : window.location.search);
   const orderId = query.get("order"), key = query.get("key");
   const [order, setOrder] = useState(null), [error, setError] = useState(""), [busy, setBusy] = useState(false);
@@ -56,7 +56,7 @@ function ReceiptConfirmation() {
     } catch (_) { setError("Copy failed. You can select the reference displayed below."); }
   };
   return <main className="fb-page fb-receipt-page"><div className="fb-receipt-wrap">
-    <a className="fb-top-back" href="/books">← Back to Books</a>
+    <a className="fb-top-back" href={basePath}>← Back to Books</a>
     <div className="fb-receipt-card">
       <span className="fb-eyebrow">FALOWEN · SECURE ORDER</span>
       <h1>Book payment confirmation</h1>
@@ -93,13 +93,14 @@ function ReceiptConfirmation() {
 }
 
 
-export default function BookStoreCheckout({ completed = false, catalogOnly = false, detailBook = "a1", slug, checkout = false }) {
-  if (completed) return <ReceiptConfirmation />;
+export default function BookStoreCheckout({ completed = false, catalogOnly = false, detailBook = "a1", slug, checkout = false, campus = false }) {
+  const basePath = campus ? "/campus/books" : "/books";
+  if (completed) return <ReceiptConfirmation basePath={basePath} />;
   if (!catalogOnly) return <BookProductPage slug={slug || (detailBook === "writing"
-    ? "how-to-unlock-your-german-writing-skills-a1-c2" : "deutsch-a1-course-workbook")} checkout={checkout} />;
-  return <BookCataloguePage />;
+    ? "how-to-unlock-your-german-writing-skills-a1-c2" : "deutsch-a1-course-workbook")} checkout={checkout} basePath={basePath} />;
+  return <BookCataloguePage basePath={basePath} />;
 }
-function BookCataloguePage() {
+function BookCataloguePage({ basePath = "/books" }) {
   const [catalog, setCatalog] = useState({});
   const [fxQuote, setFxQuote] = useState(null);
   const [error, setError] = useState("");
@@ -119,8 +120,8 @@ function BookCataloguePage() {
     return () => {active=false;};
   }, []);
   return <main className="fb-page"><div className="fb-shell">
-    <a className="fb-top-back" href="/">← Back to Falowen</a>
-    <BooksCatalog books={catalog.books} catalogTitles={catalog.catalogTitles} fxQuote={fxQuote} />
+    {basePath === "/books" ? <a className="fb-top-back" href="/">← Back to Falowen</a> : <a className="fb-top-back" href="/campus/course">← Back to Campus</a>}
+    <BooksCatalog books={catalog.books} catalogTitles={catalog.catalogTitles} fxQuote={fxQuote} basePath={basePath} />
     {error && <p className="fb-error" role="alert">{error}</p>}
   </div></main>;
 }

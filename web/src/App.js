@@ -13,6 +13,7 @@ import AutoWorkbookStartGuide from "./components/AutoWorkbookStartGuide";
 import BookPdfDownloadInjector from "./components/BookPdfDownloadInjector";
 import BookStoreCheckout from "./components/BookStoreCheckout";
 import CampusMusicPage from "./components/CampusMusicPage";
+import CampusBooksPage from "./components/CampusBooksPage";
 import ExamGuideComingSoon from "./components/ExamGuideComingSoon";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
@@ -227,7 +228,7 @@ const getTabStructure = (t) => {
   return [
     { key: "course", label: t("appNav.sections.courseBook"), section: "course" },
     { key: "music", label: "Music", section: "music" },
-    { key: "books", label: "Books", section: "books", route: "/books" },
+    { key: "books", label: "Books", section: "books" },
     { key: "examFile", label: t("appNav.sections.examFile"), section: "examFile" },
     { key: "attendance", label: t("appNav.sections.attendance"), section: "attendance" },
     { key: "classMembers", label: t("appNav.sections.classMembers"), section: "classMembers" },
@@ -831,7 +832,20 @@ const AppShell = ({
           <Route path="/tutor-marking" element={<Navigate to="/campus/tutor-marking" replace />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
-          <Route path="/campus/books" element={<Navigate to="/books" replace />} />
+          <Route
+            path="/campus/:section/*"
+            element={
+              <CampusArea
+                allowedSections={allowedSections}
+                availableTabs={availableTabs}
+                defaultSection={defaultCampusSection}
+                onBack={goHome}
+                studentProfile={studentProfile}
+                tabStructure={tabStructure}
+                tabStorageKey={tabStorageKey}
+              />
+            }
+          />
           <Route path="/campus/vocab" element={<Navigate to="/campus/music" replace />} />
           <Route path="/campus/live-speak" element={<LiveSpeakPage />} />
           <Route
@@ -1519,6 +1533,7 @@ const CampusArea = ({
       ) : null}
 
       {resolvedSection === "music" && allowedSections.music ? <CampusMusicPage /> : null}
+      {resolvedSection === "books" && allowedSections.books ? <CampusBooksPage /> : null}
       {resolvedSection === "course" && allowedSections.course ? (
         <CourseTab
           defaultLevel={campusStudentProfile?.level}

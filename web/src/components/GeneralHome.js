@@ -331,7 +331,7 @@ const GeneralHome = ({
         <strong style={{ fontSize: 13, color: "#1e3a8a", marginRight: 6 }}>More to explore</strong>
         <button type="button" onClick={() => navigate("/campus/music")}
           style={{ ...styles.secondaryButton, fontSize: 13 }}>♫ Music</button>
-        <button type="button" onClick={() => navigate("/books")}
+        <button type="button" onClick={() => navigate("/campus/books")}
           style={{ ...styles.secondaryButton, fontSize: 13 }}>Books</button>
       </section>
       <FirstLessonGuide />

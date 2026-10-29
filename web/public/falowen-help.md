@@ -19,6 +19,7 @@ Generated A1–C2 lesson/course map: https://www.falowen.app/falowen-course-map.
 | New German registration | Sign up | https://www.falowen.app/signup?program=german |
 | Existing account | Log in | https://www.falowen.app/login/ |
 | Start or continue lessons | Course Book | https://www.falowen.app/campus/course |
+| Browse books without leaving Campus | Books | https://www.falowen.app/campus/books |
 | Scores and tutor feedback | Results | https://www.falowen.app/campus/results |
 | Class attendance | Attendance | https://www.falowen.app/campus/attendance |
 | Goethe/exam information | Exam File | https://www.falowen.app/campus/examFile |
@@ -42,6 +43,7 @@ For a signed-in learner, use the **current visible navigation labels** when givi
 - **Course Book:** tap or click **Course Book** to open https://www.falowen.app/campus/course.
 - Inside the Course Book, the learner sees the **Course Book** heading, progress, next lesson and the **Continue learning** action.
 - **Music** opens the Falowen Music listening room at https://www.falowen.app/campus/music. Existing `/campus/vocab` bookmarks redirect there. Vocabulary practice remains available under Exams Room → Vocab.
+- **Books** opens the bookstore inside Campus at https://www.falowen.app/campus/books, with book details and checkout under the Campus navigation. The public storefront remains at https://www.falowen.app/books. Secure Paystack payment opens on Paystack.
 - **Results** opens https://www.falowen.app/campus/results.
 - **Account settings** are opened from the profile menu.
 

@@ -1,0 +1,8 @@
+/* Campus-only storefront refinements. Public /books retains its original layout. */
+.campus-books { min-width: 0; }
+.campus-books .fb-page { min-height: 0; background: transparent; }
+.campus-books .fb-shell { max-width: none; padding: clamp(12px, 2vw, 24px); }
+.campus-books .fb-product-shell { padding-top: 0; }
+@media (max-width: 600px) {
+  .campus-books .fb-shell { padding: 10px 4px 24px; }
+}
