@@ -111,5 +111,12 @@ describe("A1 independent practice book presentation", () => {
     const day3 = fs.readFileSync(path.resolve(process.cwd(), "src/components/A1Day3SchreibenSprechenKapitel11WorkbookPage.js"), "utf8");
     expect(day3).toContain("hidePracticeMedia = false");
     expect(day3).toContain("<A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />");
+    // The formerly page-specific Day 3 AI video is retained in the canonical
+    // top video registry, so removing duplicate inline links does not lose it.
+    const dictionary = fs.readFileSync(path.resolve(process.cwd(), "src/data/lessonVideoDictionary.js"), "utf8");
+    expect(dictionary).toContain('key: "ai-lesson-video-1-1-self-practice"');
+    expect(dictionary).toContain('chapter: "1.1"');
+    expect(dictionary).toContain("https://youtu.be/LdCVsY-SFTg");
+    expect(day3).toContain("https://youtu.be/LdCVsY-SFTg");
   });
 });
