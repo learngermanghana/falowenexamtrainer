@@ -19,3 +19,11 @@ The saved dictionary is retained unchanged. Recording-specific lyrics include th
 The music-only metadata endpoint serves a validated built-in pack first, avoiding an extra R2 fetch for these recordings. For other music keys it retains the existing reviewed `.lyrics.json` sidecar flow. Admin renders the published recording lyrics and keeps local edits only if they match that recording text. Public quizzes remain hidden when their saved lyric pack differs from the final recording lyrics.
 
 Automatic alignment can be refined using the existing Admin timing controls. Replacing an MP3 at the same key requires re-aligning its timings; the exact object key identifies a recording, not an immutable content checksum.
+
+## A1 Day 14 follow and questions — 29 October 2026
+
+`music/a1/day-14/Einsteigen – Wir fahren los.mp3` now has 44 recording-specific lyric cues. These were aligned locally against the final public MP3 with Whisper small word timestamps and sequence matching, preserving repeated choruses. The recording pack omits unsung dialogue speaker labels; the original songwriting draft remains unchanged. Two grounded questions ask where they change trains (Hannover) and where they want to arrive (Berlin), with a speaking transfer task.
+
+The public app resolves recording metadata by exact MP3 key, including discovered IDs. It builds literal-evidence questions when no matching saved lesson exists, and hides the questions continuation when no question set is available. Follow is disabled and unchecked without a complete matching cue set. A manual catalog refresh also refreshes the current song's lyrics.
+
+DOM interaction tests exercise the real app for A1, A2, B1 and Day 14: highlighted line, container scrolling, follow off/on, click-to-seek, repeat to intro, question navigation and correct-answer feedback. They mock only media playback, network and layout. They verify cue-driven UI behavior, not acoustic alignment accuracy. The shared music API remains the timing source for teacher slides and course book.

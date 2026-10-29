@@ -1,3 +1,4 @@
+import { resolveRecordingLesson } from "./lesson-content.js?v=20261029-follow";
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 // Never autoplay on initial load; continue only after a listener starts a song.
@@ -34,8 +35,11 @@ function referenceLyricsFor(track) {
   return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
     ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey} : null;
 }
+function lessonFor(track) {
+  return resolveRecordingLesson(track,learning,pinnedTracks,publishedLyrics.get(track.id));
+}
 function lyricsFor(track) {
-  return publishedLyrics.get(track.id) || learning[track.id] || referenceLyricsFor(track);
+  return publishedLyrics.get(track.id) || lessonFor(track) || referenceLyricsFor(track);
 }
 let current = null;
 let selected = null;
@@ -44,6 +48,7 @@ let featured = null;
 const publishedLyrics = new Map();
 const lyricsRequests = new Set();
 let renderedCues = [];
+let followLyrics = true;
 let highlightedLine = -1;
 let playbackQueue = [];
 let playbackTracks = [];
@@ -285,7 +290,7 @@ function setTab(name) {
   const lesson = selected && lyricsFor(selected);
   if (!lesson && name !== "listen") return;
   if (name !== "listen" && document.querySelector('[data-tab="' + name + '"]').hidden) return;
-  if (name === "practice" && !learning[selected?.id]?.questions) return;
+  if (name === "practice" && !lessonFor(selected)?.questions) return;
   document.querySelectorAll(".lesson-tabs button").forEach(button => {
     button.setAttribute("aria-pressed", String(button.dataset.tab === name));
   });
@@ -298,6 +303,8 @@ function renderLyrics(lesson) {
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
   highlightedLine = -1;
+  byId("follow-lyrics").disabled = !renderedCues.length;
+  byId("follow-lyrics").checked = followLyrics && renderedCues.length>0;
   const note = el("p", "detail-note", lesson.referenceOnly ? "COURSE DRAFT — These are the original Music Studio lyrics for this lesson, not verified against this MP3. Words may differ from the recording. Timed highlighting is unavailable until matching lyrics are published." : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it." : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
   root.append(note);
   let index = 0;
@@ -354,7 +361,7 @@ async function loadPublishedLyrics(track) {
   lyricsRequests.add(track.id);
   try {
     const response = await fetch("/api/music-lyrics?track=" + encodeURIComponent(track.id), {cache:"no-cache"});
-    if (!response.ok) return;
+    if (!response.ok) {lyricsRequests.delete(track.id);return;}
     const data = await response.json();
     if (data.objectKey !== track.objectKey || typeof data.lyrics !== "string" || !data.lyrics.trim()) return;
     if (Array.isArray(data.cues) && data.cues.length && !validateCues(data.cues, data.lyrics).length) return;
@@ -363,7 +370,7 @@ async function loadPublishedLyrics(track) {
       const tab = document.querySelector('.lesson-tabs button[aria-pressed="true"]')?.dataset.tab || "listen";
       renderDetail(track); setTab(tab);
     }
-  } catch { /* Untimed reviewed lyrics remain readable when timing is unavailable. */ }
+  } catch { lyricsRequests.delete(track.id); /* A manual refresh may retry. */ }
 }
 function renderQuestions(lesson) {
   const root = byId("listening-questions");
@@ -394,7 +401,7 @@ function renderQuestions(lesson) {
 }
 function checkAnswers() {
   if (!selected) return;
-  const lesson = learning[selected.id];
+  const lesson = lessonFor(selected);
   if (!lesson) return;
   const questions = (lesson.questions || []).filter(q => q.type === "listening");
   const groups = [...byId("listening-questions").querySelectorAll("fieldset")];
@@ -419,10 +426,10 @@ function checkAnswers() {
     : answered + " of " + questions.length + " answered. Finish the remaining question(s).";
 }
 function renderDetail(track) {
-  const lesson = learning[track.id];
+  const lesson = lessonFor(track);
   const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
   const hasLyrics = Boolean(lyricPack?.lyrics);
-  const hasLesson = Boolean(lesson && lesson.assignmentKey === track.assignmentKey && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
+  const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
   byId("detail-title").textContent = track.title;
   byId("detail-meta").textContent = [track.topic, track.genre || track.type, track.language].join(" · ");
@@ -433,6 +440,7 @@ function renderDetail(track) {
   if (hasLesson) byId("course-link").href = /^https:\/\/www\.falowen\.app\/campus\/course\/[a-z0-9-]+$/.test(lesson.courseUrl || "")
     ? lesson.courseUrl : "https://www.falowen.app/campus"; 
   byId("listen-next").hidden = !hasLyrics;
+  byId("lyrics-next").hidden = !hasLesson;
   for (const tab of ["lyrics","practice"]) {
     document.querySelector('[data-tab="' + tab + '"]').hidden = tab === "lyrics" ? !hasLyrics : !hasLesson;
   }
@@ -493,7 +501,7 @@ byId("lyrics-next").addEventListener("click", () => setTab("practice"));
 byId("check-answers").addEventListener("click", checkAnswers);
 byId("share").addEventListener("click", shareCurrent);
 byId("detail-share").addEventListener("click", shareCurrent);
-byId("follow-lyrics").addEventListener("change", () => { highlightedLine = -2; updateLyricHighlight(); });
+byId("follow-lyrics").addEventListener("change", () => { followLyrics=byId("follow-lyrics").checked; highlightedLine = -2; updateLyricHighlight(); });
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
 byId("repeat").addEventListener("change", () => { audio.loop = byId("repeat").checked; });
 audio.addEventListener("error", () => { byId("player-error").textContent = "This song could not be loaded. Please try another track."; });
@@ -519,6 +527,7 @@ async function refreshMusic() {
     populateFilters();
     renderCatalog();
     byId("discovery-status").textContent="";
+    if(selected){lyricsRequests.delete(selected.id);loadPublishedLyrics(selected);}
     const selectedId=initialId || new URLSearchParams(location.search).get("track");
     if(selectedId && !selected) {
       const track=catalog.find(song=>song.id===selectedId);

@@ -7,6 +7,9 @@ on:
       - 'api/approved-music.js'
       - 'scripts/publishApprovedMusic.mjs'
       - 'tests/music-learning-room.test.mjs'
+      - 'tests/music-follow-ui.test.mjs'
+      - 'tests/music-timed-lyrics.test.mjs'
+      - 'tests/music-ui/**'
       - '.github/workflows/music-learning-room.yml'
   push:
     branches: [main]
@@ -15,6 +18,9 @@ on:
       - 'api/approved-music.js'
       - 'scripts/publishApprovedMusic.mjs'
       - 'tests/music-learning-room.test.mjs'
+      - 'tests/music-follow-ui.test.mjs'
+      - 'tests/music-timed-lyrics.test.mjs'
+      - 'tests/music-ui/**'
 
 jobs:
   validate-music:
@@ -31,5 +37,7 @@ jobs:
           node --check web/public/music/app.js
           node --check api/approved-music.js
           node --check scripts/publishApprovedMusic.mjs
+      - name: Install isolated DOM test dependencies
+        run: npm ci --prefix tests/music-ui --ignore-scripts
       - name: Verify published songs, quiz evidence and R2 privacy
-        run: node --test tests/music-learning-room.test.mjs
+        run: node --test tests/music-learning-room.test.mjs tests/music-timed-lyrics.test.mjs tests/music-follow-ui.test.mjs
