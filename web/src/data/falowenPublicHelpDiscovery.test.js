@@ -142,6 +142,14 @@ describe("Falowen public help and AI discovery", () => {
     });
     expect(studyBuddy).toContain("Falowen navigation/support questions are not unrelated");
     expect(backendApp).toContain("Falowen navigation/support questions are NEVER off-topic");
+    // The deterministic Study Buddy answer bypasses the AI prompts. Both prompt
+    // layers must nevertheless agree with its current Exam Room vocabulary route.
+    [studyBuddy, backendApp].forEach((source) => {
+      expect(source).toContain("https://www.falowen.app/exams/vocab");
+      expect(source).toContain("https://www.falowen.app/campus/music");
+      expect(source).not.toContain("https://www.falowen.app/campus/vocab");
+    });
+    expect(guide).toContain('"Vocabulary practice", "Exams Room → Vocab", "/exams/vocab"');
   });
 
   test("does not block OpenAI search or Google Extended from public help", () => {
