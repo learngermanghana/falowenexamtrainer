@@ -46,7 +46,17 @@ describe("A1 independent practice book presentation", () => {
       </A1PracticeBookLayout>
     );
 
-    expect(container.querySelectorAll('[data-a1-practice-resources] a')).toHaveLength(2);
+    // The canonical teacher + AI players appear above the practice book;
+    // no duplicate video links or third embed belongs inside this layout.
+    expect(container.querySelectorAll('[data-a1-practice-resources] a')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-a1-practice-book-layout] iframe')).toHaveLength(0);
+    const practiceNavigation = container.querySelector('[data-a1-practice-tabs]');
+    expect(practiceNavigation.style.border).toContain("2px solid");
+    expect(practiceNavigation.style.background).toContain("linear-gradient");
+    expect(screen.getByRole("button", { name: "Overview" })).toHaveStyle({
+      fontWeight: "900",
+      minHeight: "50px",
+    });
     expect(screen.getByText("Review numbers and time.")).toBeTruthy();
     await waitFor(() => expect(screen.getByRole("button", { name: /Music/ })).toBeTruthy());
 
