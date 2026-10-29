@@ -9,7 +9,7 @@ describe("Study Buddy authoritative navigation routing", () => {
   test("all supported signed-in destinations match the published Falowen navigation catalogue", () => {
     const ids = {
       results: "results", exams: "exams-room", examFile: "exam-file",
-      courseBook: "course-book", attendance: "attendance", vocab: "vocabulary",
+      courseBook: "course-book", attendance: "attendance", music: "music", vocab: "vocabulary",
       calendar: "study-calendar", billing: "billing",
     };
     Object.entries(ids).forEach(([key, id]) => {
@@ -59,7 +59,8 @@ describe("Study Buddy authoritative navigation routing", () => {
     ["Where do I open my course book?", "courseBook", "/campus/course"],
     ["Where can I submit my assignment?", "courseBook", "/campus/course"],
     ["How do I check attendance?", "attendance", "/campus/attendance"],
-    ["Where do I open vocabulary practice?", "vocab", "/campus/vocab"],
+    ["Where do I open vocabulary practice?", "vocab", "/exams/vocab"],
+    ["Where can I listen to Falowen music?", "music", "/campus/music"],
     ["How do I find my study calendar?", "calendar", "/exams/study"],
     ["Where is my payment history?", "billing", "/campus/account?tab=billing"],
     ["How can I take a placement test?", "placement", "/placement-test"],
