@@ -1,0 +1,594 @@
+{
+  "version": 1,
+  "source": "Falowen Admin original course-song drafts; reference text, NOT verified against individual MP3 recordings",
+  "tracks": [
+    {
+      "level": "A1",
+      "day": 0,
+      "assignmentKey": "A1-Tutorial",
+      "title": "Wir lernen zusammen",
+      "lyrics": "[Verse 1]\nHeute bin ich neu hier.\nIch öffne mein Buch.\nEine Stimme sagt: Hallo!\nIch lächle und höre zu.\n\n[Chorus]\nSchritt für Schritt, Tag für Tag,\nich lerne, was ich lernen mag.\nEin Wort, ein Satz, ich bin dabei.\n\n[Verse 2]\nIch frage: Wie heißt du?\nDu sagst: Ich heiße Tom.\nWir lernen heute Deutsch.\nZusammen macht es Spaß.\n\n[Chorus]\nSchritt für Schritt, Tag für Tag,\nich lerne, was ich lernen mag.\nEin Wort, ein Satz, ich bin dabei.\n\n[Outro]\nMorgen komme ich zurück.\nMein neues Buch liegt schon bereit.\nMit Falowen lerne ich jeden Tag."
+    },
+    {
+      "level": "A1",
+      "day": 1,
+      "assignmentKey": "A1-0.1",
+      "title": "Hallo, wie geht's?",
+      "lyrics": "[Verse 1]\nIch sehe Mia vor dem Haus.\nSie winkt und ruft: Hallo!\nIch sage: Guten Morgen, Mia!\nSie fragt mich: Wie geht es dir?\n\n[Chorus]\nHallo, hallo, wie geht es dir?\nMir geht es gut, danke dir!\nUnd wie geht es heute dir?\n\n[Verse 2]\nMein Freund Ben kommt auch dazu.\nEr sagt: Mir geht es nicht gut.\nWir fragen: Brauchst du Hilfe?\nEr sagt: Ein bisschen Ruhe.\n\n[Chorus]\nHallo, hallo, wie geht es dir?\nMir geht es gut, danke dir!\nUnd wie geht es heute dir?\n\n[Outro]\nWir sagen: Gute Besserung!\nBis morgen, macht es gut!\nBei Falowen sage ich freundlich Hallo."
+    },
+    {
+      "level": "A1",
+      "day": 2,
+      "assignmentKey": "A1-0.2",
+      "title": "Ein Name am Telefon",
+      "lyrics": "[Verse 1]\nMein Name ist Lena, hallo!\nIch rufe bei der Schule an.\nDie Frau fragt: Wie heißt du?\nIch sage: L-E-N-A.\n\n[Chorus]\nA, B, C, wir hören zu.\nIch sage meinen Namen, du auch.\nBuchstabe für Buchstabe,\njetzt ist mein Name klar.\n\n[Verse 2]\nDie Frau sagt: Bitte noch mal.\nIch spreche langsam: L-E-N-A.\nSie sagt: Danke, liebe Lena!\nDer Kurs beginnt um zehn.\n\n[Chorus]\nA, B, C, wir hören zu.\nIch sage meinen Namen, du auch.\nBuchstabe für Buchstabe,\njetzt ist mein Name klar.\n\n[Outro]\nIch lege mein Handy weg.\nMein Name steht jetzt auf der Liste.\nMit Falowen kann ich Namen schreiben."
+    },
+    {
+      "level": "A1",
+      "day": 2,
+      "assignmentKey": "A1-1.1",
+      "title": "Ich lerne, du lernst",
+      "lyrics": "[Verse 1]\nIch bin Ali, du bist Mia.\nSie ist hier, er ist da.\nIch lerne Deutsch am Morgen.\nDu lernst Deutsch am Abend.\n\n[Chorus]\nIch lerne, du lernst, wir lernen.\nIch komme, du kommst, wir kommen.\nZusammen sprechen wir Deutsch.\n\n[Verse 2]\nMia fragt: Was machst du?\nIch sage: Ich schreibe jetzt.\nBen fragt: Was macht ihr?\nWir sagen: Wir lesen hier.\n\n[Chorus]\nIch lerne, du lernst, wir lernen.\nIch komme, du kommst, wir kommen.\nZusammen sprechen wir Deutsch.\n\n[Outro]\nJetzt sprechen alle mit.\nUnd morgen lernen wir noch mehr.\nBei Falowen üben wir die Verben."
+    },
+    {
+      "level": "A1",
+      "day": 3,
+      "assignmentKey": "A1-1.1-practice",
+      "title": "Wer ist das?",
+      "lyrics": "[Verse 1]\nIm Kurs sitzt ein neuer Mann.\nEr hat eine blaue Tasche.\nIch frage: Wer ist das?\nMia sagt: Das ist Herr Braun.\n\n[Chorus]\nWer, was, wo und wie?\nIch frage, du antwortest.\nEin Satz, ein Name, ein Lächeln.\n\n[Verse 2]\nIch frage: Woher kommt er?\nEr sagt: Ich komme aus Bonn.\nIst das dein neues Buch?\nJa, das ist mein Buch.\n\n[Chorus]\nWer, was, wo und wie?\nIch frage, du antwortest.\nEin Satz, ein Name, ein Lächeln.\n\n[Outro]\nJetzt kennen wir Herrn Braun.\nUnd unser Kurs beginnt.\nMit Falowen stelle ich gute Fragen."
+    },
+    {
+      "level": "A1",
+      "day": 3,
+      "assignmentKey": "A1-1.2",
+      "title": "Heute üben wir",
+      "lyrics": "[Verse 1]\nIm Kurs fragt Tom: Was machst du?\nIch sage: Ich wohne in Bonn.\nMia sagt: Ich lerne Deutsch.\nWir schreiben es an die Tafel.\n\n[Chorus]\nIch wohne, du wohnst, er wohnt.\nIch spiele, du spielst, sie spielt.\nWir sprechen, und alle machen mit.\n\n[Verse 2]\nTom fragt: Spielst du Fußball?\nIch sage: Ja, am Samstag.\nMia fragt: Lernst du heute?\nIch sage: Ja, mit euch.\n\n[Chorus]\nIch wohne, du wohnst, er wohnt.\nIch spiele, du spielst, sie spielt.\nWir sprechen, und alle machen mit.\n\n[Outro]\nDie Stunde ist jetzt zu Ende.\nWir üben morgen weiter.\nBei Falowen sprechen wir zusammen Deutsch."
+    },
+    {
+      "level": "A1",
+      "day": 4,
+      "assignmentKey": "A1-2",
+      "title": "Welche Nummer hast du?",
+      "lyrics": "[Verse 1]\nHallo! Guten Tag!\nIch heiße Ben.\nWie heißt du?\nIch heiße Sam.\n\nWoher kommst du?\nIch komme aus Ghana.\nWo wohnst du?\nIch wohne in Accra.\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Verse 2]\nWie schreibt man Ben?\nB–E–N.\nWie schreibt man Sam?\nS–A–M.\n\nWie alt bist du?\nIch bin zwanzig Jahre alt.\nWie geht es dir?\nGut, danke! Und dir?\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Outro]\nHallo! Ich heiße Ben.\nB–E–N.\nEins, zwei, drei — Falowen!\nAuf Wiedersehen!"
+    },
+    {
+      "level": "A1",
+      "day": 5,
+      "assignmentKey": "A1-1.3",
+      "title": "Ich heiße Sara",
+      "lyrics": "[Verse 1]\nHallo, ich heiße Sara.\nIch komme aus Accra.\nIch wohne jetzt in Berlin.\nUnd ich lerne gern Deutsch.\n\n[Chorus]\nWie heißt du? Woher kommst du?\nWo wohnst du? Was machst du?\nWir lernen uns heute kennen.\n\n[Verse 2]\nDas ist mein Freund Karim.\nEr hat einen kleinen Hund.\nKarim sagt: Das ist Bello.\nBello spielt vor dem Haus.\n\n[Chorus]\nWie heißt du? Woher kommst du?\nWo wohnst du? Was machst du?\nWir lernen uns heute kennen.\n\n[Outro]\nWir sagen alle: Willkommen!\nUnser Kurs ist wie ein Team.\nBei Falowen stelle ich mich vor."
+    },
+    {
+      "level": "A1",
+      "day": 6,
+      "assignmentKey": "A1-2.3",
+      "title": "Sonntag mit meiner Familie",
+      "lyrics": "[Verse 1]\nAm Sonntag bin ich zu Hause.\nMeine Mutter macht den Tee.\nMein Bruder spielt Gitarre.\nIch singe ein Lied dazu.\n\n[Chorus]\nWas machst du gern? Was machst du gern?\nIch singe gern, du spielst gern.\nZusammen sind wir froh.\n\n[Verse 2]\nMein Vater liest ein Buch.\nMeine Schwester malt ein Bild.\nWir lachen und essen zusammen.\nDann gehen wir in den Park.\n\n[Chorus]\nWas machst du gern? Was machst du gern?\nIch singe gern, du spielst gern.\nZusammen sind wir froh.\n\n[Outro]\nDas ist mein schöner Sonntag.\nIch mag meine Familie sehr.\nMit Falowen erzähle ich von zu Haus."
+    },
+    {
+      "level": "A1",
+      "day": 7,
+      "assignmentKey": "A1-3",
+      "title": "Wie viel kostet das?",
+      "lyrics": "[Verse 1]\nAuf dem Markt sehe ich Äpfel.\nIch frage: Was kostet das?\nDer Mann sagt: Zwei Euro.\nIch sage: Das ist gut.\n\n[Chorus]\nWie viel kostet das?\nIch möchte bitte zwei Stück.\nDanke schön und auf Wiedersehen.\n\n[Verse 2]\nMia möchte rote Blumen.\nSie fragt: Haben Sie Rosen?\nDie Frau sagt: Ja, hier bitte.\nMia sagt: Die mag ich gern.\n\n[Chorus]\nWie viel kostet das?\nIch möchte bitte zwei Stück.\nDanke schön und auf Wiedersehen.\n\n[Outro]\nWir tragen unsere Taschen heim.\nUnd trinken zu Hause Tee.\nBei Falowen frage ich nach Preisen."
+    },
+    {
+      "level": "A1",
+      "day": 8,
+      "assignmentKey": "A1-4",
+      "title": "Woher kommst du?",
+      "lyrics": "[Verse 1]\nIm Kurs sitzt mein Freund Sam.\nEr fragt: Woher kommst du?\nIch sage: Aus Ghana.\nUnd du? Aus Österreich.\n\n[Chorus]\nWoher kommst du? Welche Sprache sprichst du?\nIch spreche Deutsch und Englisch.\nWir verstehen uns jeden Tag.\n\n[Verse 2]\nMia kommt aus Italien.\nSie spricht Italienisch.\nWir sprechen heute Deutsch.\nUnd lernen neue Wörter.\n\n[Chorus]\nWoher kommst du? Welche Sprache sprichst du?\nIch spreche Deutsch und Englisch.\nWir verstehen uns jeden Tag.\n\n[Outro]\nViele Länder, viele Sprachen.\nEin Kurs, ein schönes Hallo.\nMit Falowen spreche ich über Länder."
+    },
+    {
+      "level": "A1",
+      "day": 9,
+      "assignmentKey": "A1-5",
+      "title": "Ich sehe den Hund",
+      "lyrics": "[Verse 1]\nIm Garten steht ein Hund.\nDer Hund ist klein und braun.\nIch sehe den Hund dort.\nEr läuft schnell zu mir.\n\n[Chorus]\nWer ist da? Der Hund ist da.\nWen sehe ich? Den kleinen Hund.\nEr möchte mit mir spielen.\n\n[Verse 2]\nEine Frau kommt aus dem Haus.\nSie hat einen roten Ball.\nIch nehme den Ball in die Hand.\nIch werfe den Ball ins Gras.\n\n[Chorus]\nWer ist da? Der Hund ist da.\nWen sehe ich? Den kleinen Hund.\nEr möchte mit mir spielen.\n\n[Outro]\nDer Hund läuft glücklich nach Hause.\nIch winke ihm noch nach.\nBei Falowen übe ich neue Sätze."
+    },
+    {
+      "level": "A1",
+      "day": 10,
+      "assignmentKey": "A1-6",
+      "title": "Ist das deine blaue Tasche?",
+      "lyrics": "[Verse 1]\nIm Bus liegt eine Tasche.\nSie ist blau und ziemlich klein.\nIch frage: Ist das deine Tasche?\nMia sagt: Nein, meine ist rot.\n\n[Chorus]\nMeine Tasche, deine Tasche.\nMein Buch, dein grüner Stift.\nJeder findet seine Sachen.\n\n[Verse 2]\nBen sucht seinen schwarzen Schal.\nEr liegt auf meinem Stuhl.\nIch sage: Ben, hier ist er!\nBen lacht: Ja, das ist mein Schal.\n\n[Chorus]\nMeine Tasche, deine Tasche.\nMein Buch, dein grüner Stift.\nJeder findet seine Sachen.\n\n[Outro]\nNun hat jeder seine Sachen.\nUnd unser Bus fährt los.\nMit Falowen lerne ich neue Farben."
+    },
+    {
+      "level": "A1",
+      "day": 11,
+      "assignmentKey": "A1-7",
+      "title": "Um sieben stehe ich auf",
+      "lyrics": "[Verse 1]\nUm sieben stehe ich auf.\nUm acht trinke ich Tee.\nUm neun beginnt mein Deutschkurs.\nIch gehe zu Fuß dorthin.\n\n[Chorus]\nWie spät ist es? Wie spät ist es?\nEs ist zehn, wir lernen jetzt.\nAm Abend bin ich wieder da.\n\n[Verse 2]\nUm zwölf esse ich zu Mittag.\nUm vier gehe ich nach Haus.\nUm sechs rufe ich Mama an.\nDann mache ich das Licht aus.\n\n[Chorus]\nWie spät ist es? Wie spät ist es?\nEs ist zehn, wir lernen jetzt.\nAm Abend bin ich wieder da.\n\n[Outro]\nMorgen geht der Tag von vorn los.\nUnd ich bin wieder dabei.\nBei Falowen übe ich die Uhrzeit."
+    },
+    {
+      "level": "A1",
+      "day": 12,
+      "assignmentKey": "A1-8",
+      "title": "Der Termin um achtzehn Uhr",
+      "lyrics": "[Verse 1]\nMein Handy zeigt sechzehn Uhr.\nIch habe heute einen Termin.\nMia fragt: Wann treffen wir uns?\nIch sage: Um achtzehn Uhr.\n\n[Chorus]\nUm achtzehn Uhr, am dritten Mai.\nIch schreibe Zeit und Datum auf.\nDann bin ich pünktlich da.\n\n[Verse 2]\nMia schreibt den Tag ins Handy.\nHeute ist der dritte Mai.\nSie sagt: Bis um achtzehn Uhr!\nIch sage: Ja, bis dann.\n\n[Chorus]\nUm achtzehn Uhr, am dritten Mai.\nIch schreibe Zeit und Datum auf.\nDann bin ich pünktlich da.\n\n[Outro]\nAm Abend treffen wir uns.\nDer Termin klappt genau.\nMit Falowen bin ich pünktlich da."
+    },
+    {
+      "level": "A1",
+      "day": 13,
+      "assignmentKey": "A1-3.5",
+      "title": "Die Rechnung im Café",
+      "lyrics": "[Verse 1]\nIm Café sind wir zu zweit.\nZwei Tees stehen auf dem Tisch.\nDie Uhr zeigt halb drei.\nDie Rechnung kommt jetzt auch.\n\n[Chorus]\nZwei Tees, vier Euro, danke.\nWie spät ist es? Halb drei.\nWir rechnen und wir lachen.\n\n[Verse 2]\nMia kauft noch ein Stück Kuchen.\nDas kostet drei Euro.\nWir zahlen sieben Euro.\nDann gehen wir nach Hause.\n\n[Chorus]\nZwei Tees, vier Euro, danke.\nWie spät ist es? Halb drei.\nWir rechnen und wir lachen.\n\n[Outro]\nIch kenne Zeit und Preise.\nBis morgen im Café!\nBei Falowen zählen wir zusammen."
+    },
+    {
+      "level": "A1",
+      "day": 14,
+      "assignmentKey": "A1-3.6",
+      "title": "Einsteigen – Wir fahren los!",
+      "lyrics": "[Verse 1]\nAm Bahnhof, kurz vor acht,\nMia hat die Fahrkarte mitgebracht.\nSie fragt: „Wo können wir einsteigen?“\nBen sagt: „Am Gleis drei, komm mit!“\n\n[Pre-Chorus]\nDie Uhr zeigt acht, wir sind bereit,\nder Zug fährt ab, jetzt ist es so weit.\nDie Türen sind offen, wir steigen ein,\nheute wollen wir zusammen sein.\n\n[Chorus]\nWir können jetzt einsteigen,\nwir wollen zusammen mitfahren.\nWir müssen in Hannover umsteigen,\nwir möchten in Berlin ankommen.\nEinsteigen, umsteigen, weiterfahren,\nwir können zusammen nach Berlin fahren.\n\n[Verse 2]\nDer Zug fährt los, wir schauen raus,\ndie Stadt sieht jetzt ganz anders aus.\nMia fragt: „Muss ich hier aussteigen?“\nBen sagt: „Nein, wir müssen umsteigen.“\n\n[Pre-Chorus]\nDer nächste Zug kommt gleich an,\nwir schauen, wo er halten kann.\n„Darf ich jetzt schon einsteigen?“\n„Ja, komm mit, wir können weiterfahren.“\n\n[Chorus]\nWir können jetzt einsteigen,\nwir wollen zusammen mitfahren.\nWir müssen in Hannover umsteigen,\nwir möchten in Berlin ankommen.\nEinsteigen, umsteigen, weiterfahren,\nwir können zusammen nach Berlin fahren.\n\n[Bridge – Spoken dialogue with soft music]\nMia: „Wann muss der Zug abfahren?“\nBen: „Um vierzehn Uhr zwanzig.“\nMia: „Wo müssen wir umsteigen?“\nBen: „In Hannover, am Hauptbahnhof.“\nMia: „Und wo können wir aussteigen?“\nBen: „In Berlin! Dann sind wir da.“\n\n[Final Chorus – Stronger melody]\nWir können jetzt einsteigen,\nwir wollen zusammen mitfahren.\nWir müssen in Hannover umsteigen,\nwir möchten in Berlin ankommen.\nEinsteigen, umsteigen, weiterfahren,\nzusammen können wir alles schaffen!\n\n[Outro]\nDer Zug kommt an, wir sind am Ziel,\nwir können jetzt aussteigen.\nMit Falowen lerne ich jeden Tag,\nund morgen kann ich weiterfahren."
+    },
+    {
+      "level": "A1",
+      "day": 15,
+      "assignmentKey": "A1-4.7",
+      "title": "Ich bin bereit zu sprechen",
+      "lyrics": "[Verse 1]\nVor der Prüfung bin ich nervös.\nMia sagt: Du schaffst das.\nIch sage: Ich heiße Ben.\nIch komme aus Berlin.\n\n[Chorus]\nIch höre zu, ich frage nach.\nIch sage: Können Sie das wiederholen?\nGanz ruhig, ich bin bereit.\n\n[Verse 2]\nIch sehe eine Karte: Wasser.\nIch frage: Möchten Sie Wasser?\nMia sagt: Ja, bitte.\nIch antworte: Hier, bitte schön.\n\n[Chorus]\nIch höre zu, ich frage nach.\nIch sage: Können Sie das wiederholen?\nGanz ruhig, ich bin bereit.\n\n[Outro]\nDie Prüfung macht mir weniger Angst.\nDenn ich kann schon viel sagen.\nBei Falowen übe ich das Sprechen."
+    },
+    {
+      "level": "A1",
+      "day": 16,
+      "assignmentKey": "A1-9",
+      "title": "Kein Fleisch, bitte",
+      "lyrics": "[Verse 1]\nIm Restaurant sehe ich die Karte.\nDer Kellner fragt: Was möchten Sie?\nIch sage: Eine Suppe, bitte.\nAber kein Fleisch für mich.\n\n[Chorus]\nIch möchte Suppe, keinen Fisch.\nIch trinke Wasser, keinen Saft.\nSo bestelle ich mein Essen.\n\n[Verse 2]\nMia isst gern Reis und Gemüse.\nSie mag heute keinen Kuchen.\nDer Kellner bringt uns alles.\nWir sagen: Vielen Dank!\n\n[Chorus]\nIch möchte Suppe, keinen Fisch.\nIch trinke Wasser, keinen Saft.\nSo bestelle ich mein Essen.\n\n[Outro]\nDas Essen schmeckt uns sehr.\nWir kommen morgen wieder.\nMit Falowen kann ich Essen bestellen."
+    },
+    {
+      "level": "A1",
+      "day": 16,
+      "assignmentKey": "A1-10",
+      "title": "Was gibt es heute?",
+      "lyrics": "[Verse 1]\nAm Morgen esse ich Brot.\nDazu trinke ich warmen Tee.\nMittags kocht mein Bruder Reis.\nIch helfe ihm in der Küche.\n\n[Chorus]\nWas essen wir? Was trinken wir?\nWir sitzen hier am Tisch.\nZusammen schmeckt das Essen gut.\n\n[Verse 2]\nAm Abend kommt auch Mia.\nSie bringt Tomaten mit.\nWir schneiden sie ganz klein.\nDann essen wir alle zusammen.\n\n[Chorus]\nWas essen wir? Was trinken wir?\nWir sitzen hier am Tisch.\nZusammen schmeckt das Essen gut.\n\n[Outro]\nDie Küche ist jetzt sauber.\nWir sagen: Gute Nacht.\nBei Falowen sprechen wir über Essen."
+    },
+    {
+      "level": "A1",
+      "day": 17,
+      "assignmentKey": "A1-11",
+      "title": "Wie komme ich zum Bahnhof?",
+      "lyrics": "[Verse 1]\nIch stehe vor dem Rathaus.\nIch suche den Bahnhof.\nIch frage eine nette Frau:\nWie komme ich dorthin?\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Verse 2]\nDie Frau sagt: Gehen Sie weiter.\nAn der Ampel nach rechts.\nIch sage: Vielen Dank!\nSie lächelt: Gern geschehen.\n\n[Chorus]\nGehen Sie geradeaus.\nDann gehen Sie nach links.\nDer Bahnhof ist gleich da.\n\n[Outro]\nJetzt sehe ich den Bahnhof.\nMein Zug kommt gerade an.\nMit Falowen finde ich den Weg."
+    },
+    {
+      "level": "A1",
+      "day": 18,
+      "assignmentKey": "A1-12.1",
+      "title": "Wo ist mein Schlüssel?",
+      "lyrics": "[Verse 1]\nIch suche meinen Schlüssel.\nEr liegt nicht auf dem Tisch.\nMia fragt: Ist er in der Tasche?\nIch sehe in die Tasche.\n\n[Chorus]\nAuf dem Tisch, in der Tasche.\nUnter dem Stuhl, neben mir.\nWo ist er? Jetzt sehe ich ihn!\n\n[Verse 2]\nMein Schlüssel liegt unter dem Buch.\nIch nehme ihn in die Hand.\nDann gehe ich mit Mia\nzum Bäcker um die Ecke.\n\n[Chorus]\nAuf dem Tisch, in der Tasche.\nUnter dem Stuhl, neben mir.\nWo ist er? Jetzt sehe ich ihn!\n\n[Outro]\nJetzt habe ich meinen Schlüssel.\nUnd wir sind schon unterwegs.\nBei Falowen weiß ich, wo es liegt."
+    },
+    {
+      "level": "A1",
+      "day": 19,
+      "assignmentKey": "A1-5.9",
+      "title": "Bitte, darf ich fragen?",
+      "lyrics": "[Verse 1]\nIch stehe vor meiner Prüfung.\nAuf dem Tisch liegt eine Karte.\nDas Wort auf der Karte: Brot.\nIch frage: Möchten Sie Brot?\n\n[Chorus]\nIch frage freundlich, du antwortest.\nBitte schön, ja, vielen Dank.\nSo sprechen wir auf Deutsch.\n\n[Verse 2]\nDann sehe ich eine Tasche.\nIch sage: Geben Sie mir die Tasche, bitte.\nMia gibt sie mir und lächelt.\nIch sage: Danke, das ist nett.\n\n[Chorus]\nIch frage freundlich, du antwortest.\nBitte schön, ja, vielen Dank.\nSo sprechen wir auf Deutsch.\n\n[Outro]\nIch kann fragen und antworten.\nJetzt bin ich wirklich bereit.\nMit Falowen frage ich ganz freundlich."
+    },
+    {
+      "level": "A1",
+      "day": 20,
+      "assignmentKey": "A1-12.3",
+      "title": "Eine Nachricht für Mia",
+      "lyrics": "[Verse 1]\nHeute habe ich keine Zeit.\nMia wartet vor dem Café.\nIch schreibe ihr eine Nachricht.\nIch sage: Liebe Mia, hallo!\n\n[Chorus]\nIch schreibe kurz und freundlich.\nWarum, wann und wo?\nAm Ende sage ich: Viele Grüße.\n\n[Verse 2]\nIch bin krank und bleibe zu Haus.\nKönnen wir uns morgen treffen?\nMia schreibt: Ja, um drei!\nIch sage: Danke, bis morgen.\n\n[Chorus]\nIch schreibe kurz und freundlich.\nWarum, wann und wo?\nAm Ende sage ich: Viele Grüße.\n\n[Outro]\nMeine Nachricht ist jetzt fertig.\nMia weiß nun gut Bescheid.\nBei Falowen schreibe ich auf Deutsch."
+    },
+    {
+      "level": "A1",
+      "day": 21,
+      "assignmentKey": "A1-13",
+      "title": "Heute regnet es",
+      "lyrics": "[Verse 1]\nIch schaue aus dem Fenster.\nDer Himmel ist heute grau.\nMia fragt: Wie ist das Wetter?\nIch sage: Heute regnet es.\n\n[Chorus]\nRegen, Sonne, Wind und Schnee.\nWie ist das Wetter heute?\nIch nehme meinen Schirm mit.\n\n[Verse 2]\nAm Mittag kommt die Sonne.\nDer Wind ist nicht mehr kalt.\nWir gehen in den Garten.\nUnd lachen in der Sonne.\n\n[Chorus]\nRegen, Sonne, Wind und Schnee.\nWie ist das Wetter heute?\nIch nehme meinen Schirm mit.\n\n[Outro]\nMorgen scheint vielleicht die Sonne.\nWir sehen morgen nach.\nMit Falowen spreche ich über das Wetter."
+    },
+    {
+      "level": "A1",
+      "day": 22,
+      "assignmentKey": "A1-14.1",
+      "title": "Mein Kopf tut weh",
+      "lyrics": "[Verse 1]\nAm Morgen rufe ich Mia an.\nHallo Mia, bist du da?\nJa, ich bin hier. Wie geht's dir?\nNicht so gut. Mein Kopf tut weh.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Verse 2]\nMia fragt: Hast du Fieber?\nNein, aber mein Bauch tut weh.\nSie fragt: Brauchst du Hilfe?\nJa, bitte. Komm zu mir.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Outro]\nMia bringt mir Wasser und Tee.\nJetzt geht es mir schon besser.\nDanke, Mia! Gute Nacht.\nBei Falowen lerne ich: Gute Besserung!"
+    },
+    {
+      "level": "A1",
+      "day": 23,
+      "assignmentKey": "A1-14.2",
+      "title": "Ich gebe dir das Buch",
+      "lyrics": "[Verse 1]\nMia sucht ihr rotes Buch.\nIch sehe es auf dem Tisch.\nSie fragt: Gibst du es mir?\nIch sage: Ja, hier bitte.\n\n[Chorus]\nIch gebe dir das Buch.\nDu zeigst mir deinen Stift.\nWir helfen uns im Kurs.\n\n[Verse 2]\nBen bringt seiner Mutter Blumen.\nIch sehe den schönen Strauß.\nEr sagt: Ich schenke ihr Blumen.\nSie sagt: Danke, lieber Ben.\n\n[Chorus]\nIch gebe dir das Buch.\nDu zeigst mir deinen Stift.\nWir helfen uns im Kurs.\n\n[Outro]\nAm Abend gehen alle heim.\nUnd alle sind zufrieden.\nMit Falowen übe ich: dir und dich."
+    },
+    {
+      "level": "A1",
+      "day": 24,
+      "assignmentKey": "A1-5.10",
+      "title": "Ich bleibe heute zu Hause",
+      "lyrics": "[Verse 1]\nMia fragt: Kommst du heute mit?\nIch sage: Nein, leider nicht.\nSie fragt mich: Warum denn?\nIch sage: Weil ich krank bin.\n\n[Chorus]\nWarum? Warum? Sag es mir.\nIch bleibe hier, weil ich müde bin.\nMorgen bin ich wieder da.\n\n[Verse 2]\nBen fragt: Kann ich dir helfen?\nIch sage: Ja, das ist sehr nett.\nEr bringt mir ein Glas Wasser.\nIch sage: Danke für die Hilfe.\n\n[Chorus]\nWarum? Warum? Sag es mir.\nIch bleibe hier, weil ich müde bin.\nMorgen bin ich wieder da.\n\n[Outro]\nAm Morgen geht es mir gut.\nDann komme ich wieder mit.\nBei Falowen sage ich auch warum."
+    },
+    {
+      "level": "A2",
+      "day": 1,
+      "assignmentKey": "A2-1.1",
+      "title": "Hallo, das bin ich!",
+      "lyrics": "[Verse 1]\nHallo, ich heiße Daniel. Wie heißt du?\nIch komme aus Ghana. Woher kommst du?\nIch wohne in Accra und lerne Deutsch.\nSeit einem Jahr macht mir das Spaß.\nManchmal ist es schwer, doch ich gebe nicht auf.\n\n[Chorus]\nWie geht es dir? Mir geht es gut.\nWas machst du gern? Ich höre Musik.\nEin kleines Hallo, ein neues Gespräch.\nSo lernen wir uns kennen.\n\n[Verse 2]\nAm Morgen trinke ich Kaffee oder Tee.\nDann gehe ich zur Arbeit in die Stadt.\nAm Abend lerne ich oder sehe fern.\nAm Wochenende treffe ich Freunde gern.\nWie ist das Wetter heute bei dir?\nHier scheint die Sonne. Erzähl doch von dir!\n\n[Chorus]\nWie geht es dir? Mir geht es gut.\nWas machst du gern? Ich höre Musik.\nEin kleines Hallo, ein neues Gespräch.\nSo lernen wir uns kennen.\n\n[Outro]\nIch frage, ich höre zu und erzähle von mir.\nMit jedem Gespräch wird Deutsch leichter.\nMit Falowen lerne ich jeden Tag mehr."
+    },
+    {
+      "level": "A2",
+      "day": 2,
+      "assignmentKey": "A2-1.2",
+      "title": "Die neue Kollegin",
+      "lyrics": "[Verse 1]\nAm Montag beginnt Lea bei uns.\nSie trägt eine Brille und lacht viel.\nSie hat kurze braune Haare.\nIch zeige ihr zuerst unser Büro.\n\n[Chorus]\nSie ist freundlich und sehr geduldig,\nsie hört gut zu und hilft gern.\nSo lernen wir uns langsam kennen.\n\n[Verse 2]\nIn der Pause trinken wir Kaffee.\nLea erzählt von ihrer Familie.\nSie spielt gern Tennis am Wochenende.\nIch sage: Das möchte ich auch probieren.\n\n[Chorus]\nSie ist freundlich und sehr geduldig,\nsie hört gut zu und hilft gern.\nSo lernen wir uns langsam kennen.\n\n[Outro]\nAm Freitag gehen wir zusammen spielen.\nLea gehört jetzt zu unserem Team.\nBei Falowen finde ich Worte für Menschen."
+    },
+    {
+      "level": "A2",
+      "day": 3,
+      "assignmentKey": "A2-1.3",
+      "title": "Welches Fahrrad nehmen wir?",
+      "lyrics": "[Verse 1]\nTom braucht ein Fahrrad für die Stadt.\nIm Laden stehen zwei Modelle.\nDas rote Rad ist leichter.\nDas blaue Rad ist etwas günstiger.\n\n[Chorus]\nWelches passt besser zu dir?\nVergleiche in Ruhe, schau genau.\nDas Beste ist nicht immer das Teuerste.\n\n[Verse 2]\nTom fährt beide Räder zur Probe.\nDas rote fährt schneller bergauf.\nDas blaue ist aber bequemer.\nEr entscheidet sich für das blaue Rad.\n\n[Chorus]\nWelches passt besser zu dir?\nVergleiche in Ruhe, schau genau.\nDas Beste ist nicht immer das Teuerste.\n\n[Outro]\nJetzt fährt Tom jeden Tag zur Arbeit.\nEr ist mit seiner Wahl zufrieden.\nMit Falowen kann ich Dinge besser vergleichen."
+    },
+    {
+      "level": "A2",
+      "day": 4,
+      "assignmentKey": "A2-2.4",
+      "title": "Treffen wir uns um fünf?",
+      "lyrics": "[Verse 1]\nMia und ich wollen uns treffen.\nAm Nachmittag habe ich endlich Zeit.\nIch schlage das Café am Markt vor.\nMia sagt: Dort ist es oft zu laut.\n\n[Chorus]\nWo möchten wir uns treffen?\nVielleicht im Park, vielleicht am See.\nWir finden einen Ort für uns.\n\n[Verse 2]\nSie schlägt die kleine Bibliothek vor.\nDort gibt es einen ruhigen Garten.\nWir treffen uns um fünf am Eingang.\nIch bringe Tee in einer Flasche mit.\n\n[Chorus]\nWo möchten wir uns treffen?\nVielleicht im Park, vielleicht am See.\nWir finden einen Ort für uns.\n\n[Outro]\nWir sitzen draußen und reden lange.\nDer neue Treffpunkt gefällt uns beiden.\nBei Falowen lerne ich, Treffen zu planen."
+    },
+    {
+      "level": "A2",
+      "day": 5,
+      "assignmentKey": "A2-2.5",
+      "title": "Samstag ist mein Tag",
+      "lyrics": "[Verse 1]\nNach einer langen Woche bin ich frei.\nMorgens schlafe ich ein wenig länger.\nDann gehe ich mit Ben schwimmen.\nEr macht lieber Sport als Fernsehen.\n\n[Chorus]\nIn meiner Freizeit finde ich Zeit\nfür Freunde, Sport und neue Ideen.\nSo wird der Samstag wunderbar.\n\n[Verse 2]\nAm Mittag treffen wir noch Sara.\nSie hat gestern einen Kuchen gebacken.\nWir essen draußen in der Sonne.\nAm Abend höre ich Musik zu Hause.\n\n[Chorus]\nIn meiner Freizeit finde ich Zeit\nfür Freunde, Sport und neue Ideen.\nSo wird der Samstag wunderbar.\n\n[Outro]\nAm Sonntag plane ich die neue Woche.\nIch freue mich schon aufs Wochenende.\nMit Falowen erzähle ich gern vom Wochenende."
+    },
+    {
+      "level": "A2",
+      "day": 6,
+      "assignmentKey": "A2-3.6",
+      "title": "Das neue Zimmer",
+      "lyrics": "[Verse 1]\nMeine Schwester bekommt ein neues Zimmer.\nWir tragen den Tisch ins Haus.\nDas Bett steht neben dem Fenster.\nDie Lampe kommt auf den Schreibtisch.\n\n[Chorus]\nEin Platz für dich, ein Platz für mich,\nein helles Zimmer wird gemütlich.\nMit kleinen Dingen fühlt es sich gut an.\n\n[Verse 2]\nDer Schrank passt nicht an die Wand.\nAlso stellen wir ihn neben die Tür.\nDann hängen wir ein Bild auf.\nMeine Schwester sagt: Jetzt ist es schön.\n\n[Chorus]\nEin Platz für dich, ein Platz für mich,\nein helles Zimmer wird gemütlich.\nMit kleinen Dingen fühlt es sich gut an.\n\n[Outro]\nWir sitzen noch eine Weile zusammen.\nDas neue Zimmer ist endlich fertig.\nBei Falowen beschreibe ich mein neues Zimmer."
+    },
+    {
+      "level": "A2",
+      "day": 7,
+      "assignmentKey": "A2-3.7",
+      "title": "Eine Wohnung für uns",
+      "lyrics": "[Verse 1]\nWir suchen seit Wochen eine Wohnung.\nHeute sehen wir uns eine neue an.\nDie Küche ist groß und hell.\nAber die Straße ist ziemlich laut.\n\n[Chorus]\nEine Wohnung soll zu uns passen,\nnicht nur schön auf Fotos sein.\nWir schauen genau und fragen nach.\n\n[Verse 2]\nDie zweite Wohnung liegt am Park.\nSie ist kleiner, aber ruhiger.\nDer Vermieter beantwortet alle Fragen.\nAm Abend schicken wir unsere Bewerbung.\n\n[Chorus]\nEine Wohnung soll zu uns passen,\nnicht nur schön auf Fotos sein.\nWir schauen genau und fragen nach.\n\n[Outro]\nZwei Tage später kommt die Zusage.\nJetzt können wir endlich umziehen.\nMit Falowen kann ich nach Wohnungen fragen."
+    },
+    {
+      "level": "A2",
+      "day": 8,
+      "assignmentKey": "A2-3.8",
+      "title": "Ein Tisch für zwei",
+      "lyrics": "[Verse 1]\nIm Restaurant ist heute viel los.\nWir haben einen Tisch reserviert.\nDer Kellner bringt uns die Speisekarte.\nMia möchte eine Suppe bestellen.\n\n[Chorus]\nFür mich bitte das Gemüse,\nund ein Glas Wasser dazu.\nWir bestellen freundlich und sagen danke.\n\n[Verse 2]\nIch bekomme zuerst das falsche Essen.\nDer Kellner fragt: Ist alles in Ordnung?\nIch erkläre ihm ruhig den Fehler.\nEr bringt mir gleich den richtigen Teller.\n\n[Chorus]\nFür mich bitte das Gemüse,\nund ein Glas Wasser dazu.\nWir bestellen freundlich und sagen danke.\n\n[Outro]\nAm Ende schmeckt uns alles sehr gut.\nWir bezahlen und gehen zufrieden heim.\nBei Falowen übe ich, freundlich zu bestellen."
+    },
+    {
+      "level": "A2",
+      "day": 9,
+      "assignmentKey": "A2-4.9",
+      "title": "Drei Tage am Meer",
+      "lyrics": "[Verse 1]\nLetzten Sommer war ich am Meer.\nMeine Freundin war auch dabei.\nWir sind früh mit dem Zug gefahren.\nAm Abend haben wir den Strand gesehen.\n\n[Chorus]\nEin kleiner Urlaub, weit vom Alltag,\ndie Luft ist warm, das Wasser blau.\nDiese Tage bleiben in Erinnerung.\n\n[Verse 2]\nAm zweiten Tag hat es geregnet.\nWir sind deshalb ins Museum gegangen.\nDort haben wir viel Neues entdeckt.\nAm letzten Tag kam die Sonne zurück.\n\n[Chorus]\nEin kleiner Urlaub, weit vom Alltag,\ndie Luft ist warm, das Wasser blau.\nDiese Tage bleiben in Erinnerung.\n\n[Outro]\nWir haben viele Fotos gemacht.\nNächstes Jahr fahren wir wieder hin.\nMit Falowen kann ich von Reisen erzählen."
+    },
+    {
+      "level": "A2",
+      "day": 10,
+      "assignmentKey": "A2-4.10",
+      "title": "Ein Tag in der fremden Stadt",
+      "lyrics": "[Verse 1]\nWir besuchen heute eine neue Stadt.\nAm Bahnhof holen wir einen Stadtplan.\nZuerst möchten wir den Dom sehen.\nDanach gehen wir über den Markt.\n\n[Chorus]\nLinks ist ein Platz, rechts ein Café,\nhinter der Brücke fließt der Fluss.\nWir entdecken Schritt für Schritt die Stadt.\n\n[Verse 2]\nPlötzlich finden wir die Straße nicht.\nEine Frau zeigt uns den Weg.\nSie empfiehlt uns auch ein kleines Museum.\nDort verbringen wir den Nachmittag.\n\n[Chorus]\nLinks ist ein Platz, rechts ein Café,\nhinter der Brücke fließt der Fluss.\nWir entdecken Schritt für Schritt die Stadt.\n\n[Outro]\nZum Schluss trinken wir Kaffee am Fluss.\nSo ein Tag macht richtig Spaß.\nBei Falowen entdecke ich neue deutsche Wörter."
+    },
+    {
+      "level": "A2",
+      "day": 11,
+      "assignmentKey": "A2-4.11",
+      "title": "Mit Bus oder Fahrrad?",
+      "lyrics": "[Verse 1]\nBen fährt jeden Morgen zur Arbeit.\nSein Bus kommt heute wieder zu spät.\nEr denkt über ein Fahrrad nach.\nDer Weg ist nur vier Kilometer lang.\n\n[Chorus]\nWas ist schneller, was ist besser?\nDer Bus ist bequem, das Rad ist frei.\nWir wählen, was zum Alltag passt.\n\n[Verse 2]\nAm Montag probiert er das Fahrrad.\nEr kommt pünktlich und gut gelaunt an.\nBei Regen nimmt er lieber den Bus.\nSo kann er beide Wege nutzen.\n\n[Chorus]\nWas ist schneller, was ist besser?\nDer Bus ist bequem, das Rad ist frei.\nWir wählen, was zum Alltag passt.\n\n[Outro]\nJetzt ist Ben viel entspannter.\nDer Morgen beginnt ohne Stress.\nMit Falowen vergleiche ich Wege und Zeiten."
+    },
+    {
+      "level": "A2",
+      "day": 12,
+      "assignmentKey": "A2-5.12",
+      "title": "Mein Beruf, mein Traum",
+      "lyrics": "[Verse 1]\nAls Kind wollte ich Pilot werden.\nHeute interessiere ich mich für Medizin.\nIch möchte Menschen helfen können.\nDeshalb lese ich oft über diesen Beruf.\n\n[Chorus]\nWas willst du später machen?\nWas macht dir wirklich Freude?\nDein Weg beginnt mit einem kleinen Schritt.\n\n[Verse 2]\nMeine Freundin will Lehrerin werden.\nSie hat schon ein Praktikum gemacht.\nWir sprechen über unsere Pläne.\nDann suchen wir nach guten Kursen.\n\n[Chorus]\nWas willst du später machen?\nWas macht dir wirklich Freude?\nDein Weg beginnt mit einem kleinen Schritt.\n\n[Outro]\nNoch wissen wir nicht alles.\nAber wir gehen unseren Weg weiter.\nBei Falowen spreche ich über meine Träume."
+    },
+    {
+      "level": "A2",
+      "day": 13,
+      "assignmentKey": "A2-5.13",
+      "title": "Das Gespräch am Montag",
+      "lyrics": "[Verse 1]\nAm Montag habe ich ein Bewerbungsgespräch.\nIch bin nervös und komme früh.\nDie Chefin begrüßt mich freundlich.\nSie fragt nach meiner Erfahrung.\n\n[Chorus]\nGuten Tag, schön, dass Sie hier sind.\nIch höre zu und antworte klar.\nIch zeige, was ich gerne mache.\n\n[Verse 2]\nIch erzähle von meinem letzten Praktikum.\nDort habe ich im Team gearbeitet.\nDann frage ich nach den Arbeitszeiten.\nDie Chefin erklärt mir alles in Ruhe.\n\n[Chorus]\nGuten Tag, schön, dass Sie hier sind.\nIch höre zu und antworte klar.\nIch zeige, was ich gerne mache.\n\n[Outro]\nAm Freitag bekomme ich eine Nachricht.\nIch darf nächste Woche anfangen.\nMit Falowen bereite ich mich gut vor."
+    },
+    {
+      "level": "A2",
+      "day": 14,
+      "assignmentKey": "A2-5.14",
+      "title": "Ein neuer Schritt im Beruf",
+      "lyrics": "[Verse 1]\nNora arbeitet seit zwei Jahren im Büro.\nSie möchte neue Aufgaben übernehmen.\nDeshalb besucht sie einen Abendkurs.\nEs ist manchmal schwer nach der Arbeit.\n\n[Chorus]\nSchritt für Schritt wächst mein Mut,\nich lerne Neues und bleibe dran.\nEin neuer Weg kann heute beginnen.\n\n[Verse 2]\nIhr Chef sieht ihre Fortschritte.\nEr bietet ihr ein kleines Projekt an.\nNora plant die Aufgaben mit dem Team.\nAm Ende gelingt das Projekt gut.\n\n[Chorus]\nSchritt für Schritt wächst mein Mut,\nich lerne Neues und bleibe dran.\nEin neuer Weg kann heute beginnen.\n\n[Outro]\nJetzt hat Nora mehr Verantwortung.\nSie ist stolz auf ihren neuen Weg.\nBei Falowen lerne ich Neues für meinen Beruf."
+    },
+    {
+      "level": "A2",
+      "day": 15,
+      "assignmentKey": "A2-6.15",
+      "title": "Mein Sport am Mittwoch",
+      "lyrics": "[Verse 1]\nJeden Mittwoch treffe ich Fatima.\nWir spielen Basketball im Park.\nHeute habe ich wenig Energie.\nAber sie sagt: Komm, wir fangen langsam an.\n\n[Chorus]\nMein Lieblingssport macht mich froh,\nich bewege mich und bin dabei.\nZusammen geht es leichter.\n\n[Verse 2]\nZuerst laufen wir nur eine Runde.\nDann spielen wir mit anderen Freunden.\nIch habe schon lange nicht so gelacht.\nNach dem Spiel trinken wir Wasser.\n\n[Chorus]\nMein Lieblingssport macht mich froh,\nich bewege mich und bin dabei.\nZusammen geht es leichter.\n\n[Outro]\nJetzt fühle ich mich richtig gut.\nNächste Woche bin ich wieder hier.\nMit Falowen erzähle ich von meinem Sport."
+    },
+    {
+      "level": "A2",
+      "day": 16,
+      "assignmentKey": "A2-6.16",
+      "title": "Eine Pause für mich",
+      "lyrics": "[Verse 1]\nNach der Arbeit bin ich oft müde.\nMein Handy klingelt immer wieder.\nHeute mache ich es einfach aus.\nIch gehe eine Runde durch den Park.\n\n[Chorus]\nTief einatmen, ruhig werden,\nein bisschen Zeit nur für mich.\nDanach geht es mir wieder gut.\n\n[Verse 2]\nUnter einem Baum setze ich mich hin.\nIch höre die Vögel und den Wind.\nSpäter lese ich ein paar Seiten.\nAm Abend schlafe ich viel besser.\n\n[Chorus]\nTief einatmen, ruhig werden,\nein bisschen Zeit nur für mich.\nDanach geht es mir wieder gut.\n\n[Outro]\nMorgen nehme ich wieder eine Pause.\nDenn Erholung ist mir wichtig.\nBei Falowen lerne ich auch, Pausen zu machen."
+    },
+    {
+      "level": "A2",
+      "day": 17,
+      "assignmentKey": "A2-6.17",
+      "title": "Was hilft gegen Husten?",
+      "lyrics": "[Verse 1]\nSeit gestern habe ich starken Husten.\nMeine Nase ist zu und ich bin müde.\nIch gehe zur Apotheke um die Ecke.\nDie Apothekerin fragt nach meinen Beschwerden.\n\n[Chorus]\nGuten Tag, ich brauche etwas Hilfe.\nWas kann ich heute nehmen?\nIch höre zu und frage nach.\n\n[Verse 2]\nSie erklärt mir, wie ich das Mittel nehme.\nSie sagt, ich soll viel Wasser trinken.\nBei hohem Fieber soll ich zum Arzt.\nIch bedanke mich und gehe nach Haus.\n\n[Chorus]\nGuten Tag, ich brauche etwas Hilfe.\nWas kann ich heute nehmen?\nIch höre zu und frage nach.\n\n[Outro]\nIch ruhe mich heute gut aus.\nHoffentlich geht es mir bald besser.\nMit Falowen kann ich Beschwerden besser erklären."
+    },
+    {
+      "level": "A2",
+      "day": 18,
+      "assignmentKey": "A2-7.18",
+      "title": "Die Karte funktioniert nicht",
+      "lyrics": "[Verse 1]\nHeute möchte ich mit meiner Karte bezahlen.\nAber das Gerät zeigt einen Fehler.\nZu Hause rufe ich meine Bank an.\nEine Mitarbeiterin fragt nach dem Problem.\n\n[Chorus]\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\n\n[Verse 2]\nSie prüft meine Angaben am Telefon.\nDann erklärt sie mir den nächsten Schritt.\nIch soll die Karte noch einmal testen.\nAm Nachmittag klappt die Zahlung wieder.\n\n[Chorus]\nGuten Tag, ich habe eine Frage.\nKönnen Sie mir bitte helfen?\nWir finden gemeinsam eine Lösung.\n\n[Outro]\nIch bedanke mich für die Hilfe.\nDas Problem ist endlich gelöst.\nBei Falowen übe ich schwierige Telefonate."
+    },
+    {
+      "level": "A2",
+      "day": 19,
+      "assignmentKey": "A2-7.19",
+      "title": "Lieber online oder im Laden?",
+      "lyrics": "[Verse 1]\nMia braucht neue Schuhe für den Winter.\nOnline findet sie ein günstiges Paar.\nDoch sie kennt ihre Größe nicht genau.\nDarum gehen wir zuerst in ein Geschäft.\n\n[Chorus]\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl.\n\n[Verse 2]\nIm Geschäft probiert Mia zwei Paare.\nDas zweite sitzt viel bequemer.\nDer Preis ist auch in Ordnung.\nMia kauft es gleich und ist zufrieden.\n\n[Chorus]\nWo kaufen wir am besten ein?\nWir schauen, fragen, vergleichen.\nDann treffen wir die richtige Wahl.\n\n[Outro]\nZu Hause stellt sie die Schuhe ins Regal.\nJetzt kann der Winter kommen.\nMit Falowen kann ich Preise vergleichen."
+    },
+    {
+      "level": "A2",
+      "day": 20,
+      "assignmentKey": "A2-7.20",
+      "title": "Die Jacke ist zu klein",
+      "lyrics": "[Verse 1]\nVor einer Woche habe ich eine Jacke gekauft.\nHeute merke ich: Sie ist zu klein.\nIch finde noch den Kassenbon.\nDann gehe ich zurück ins Geschäft.\n\n[Chorus]\nEntschuldigung, ich habe ein Problem.\nKönnen wir das bitte klären?\nWir sprechen ruhig miteinander.\n\n[Verse 2]\nDie Verkäuferin fragt nach dem Kaufdatum.\nIch zeige ihr den Kassenbon.\nSie bringt die Jacke eine Nummer größer.\nJetzt passt sie mir sehr gut.\n\n[Chorus]\nEntschuldigung, ich habe ein Problem.\nKönnen wir das bitte klären?\nWir sprechen ruhig miteinander.\n\n[Outro]\nIch sage danke für die Hilfe.\nSo endet der Tag doch noch schön.\nBei Falowen lerne ich, höflich zu reklamieren."
+    },
+    {
+      "level": "A2",
+      "day": 21,
+      "assignmentKey": "A2-8.21",
+      "title": "Ein Wochenende in den Bergen",
+      "lyrics": "[Verse 1]\nAm Freitag fragen wir unsere Freunde:\nHabt ihr am Wochenende schon etwas vor?\nBen möchte in die Berge fahren.\nMia bleibt lieber in der Nähe.\n\n[Chorus]\nWas machen wir am Wochenende?\nWir hören zu und planen zusammen.\nFür alle soll etwas dabei sein.\n\n[Verse 2]\nAm Ende fahren wir am Samstag zum See.\nDort gibt es einen kurzen Wanderweg.\nAm Sonntag besuchen wir ein kleines Café.\nAlle sind mit dem Plan zufrieden.\n\n[Chorus]\nWas machen wir am Wochenende?\nWir hören zu und planen zusammen.\nFür alle soll etwas dabei sein.\n\n[Outro]\nWir schicken die Zeiten in unsere Gruppe.\nJetzt kann das Wochenende kommen.\nMit Falowen planen wir einen schönen Ausflug."
+    },
+    {
+      "level": "A2",
+      "day": 22,
+      "assignmentKey": "A2-8.22",
+      "title": "Der Plan für unsere Woche",
+      "lyrics": "[Verse 1]\nAm Montag habe ich einen Deutschkurs.\nAm Dienstag muss ich länger arbeiten.\nMia fragt, wann wir uns treffen können.\nIch schaue in meinen Kalender.\n\n[Chorus]\nMontag, Dienstag, Mittwoch und mehr,\nwir planen unsere Tage.\nDann bleibt auch Zeit für Freunde.\n\n[Verse 2]\nAm Donnerstag ist mein Abend noch frei.\nWir wollen zusammen etwas kochen.\nAm Freitag gehe ich zum Sport.\nAm Samstag besuche ich meine Familie.\n\n[Chorus]\nMontag, Dienstag, Mittwoch und mehr,\nwir planen unsere Tage.\nDann bleibt auch Zeit für Freunde.\n\n[Outro]\nJetzt sind alle Termine eingetragen.\nUnd ich habe weniger Stress.\nBei Falowen spreche ich über meine Woche."
+    },
+    {
+      "level": "A2",
+      "day": 23,
+      "assignmentKey": "A2-9.23",
+      "title": "Mein Weg zur Arbeit",
+      "lyrics": "[Verse 1]\nJeden Morgen fahre ich mit dem Bus.\nHeute steht er lange im Verkehr.\nMeine Kollegin wartet schon im Büro.\nIch schicke ihr eine kurze Nachricht.\n\n[Chorus]\nWie kommst du heute zur Arbeit?\nMit dem Bus, zu Fuß, mit dem Rad.\nJeder findet seinen Weg.\n\n[Verse 2]\nMorgen möchte ich früher losfahren.\nVielleicht ist das Fahrrad schneller.\nIch probiere den neuen Weg aus.\nUnd komme schon vor neun Uhr an.\n\n[Chorus]\nWie kommst du heute zur Arbeit?\nMit dem Bus, zu Fuß, mit dem Rad.\nJeder findet seinen Weg.\n\n[Outro]\nMein Weg ist jetzt viel entspannter.\nIch habe sogar Zeit für einen Kaffee.\nMit Falowen finde ich Worte für den Weg."
+    },
+    {
+      "level": "A2",
+      "day": 24,
+      "assignmentKey": "A2-9.24",
+      "title": "Wir fahren nach Hamburg",
+      "lyrics": "[Verse 1]\nIn den Ferien möchten wir verreisen.\nWir sehen uns die Preise für Züge an.\nDas Hotel ist noch nicht gebucht.\nAlso planen wir alles zusammen.\n\n[Chorus]\nWohin fahren wir? Wann geht es los?\nWir buchen, packen und freuen uns.\nDie Reise kann bald beginnen.\n\n[Verse 2]\nMia sucht ein Zimmer in der Altstadt.\nIch buche die Tickets für Samstag.\nBen schreibt eine Liste für die Koffer.\nAm Freitag ist endlich alles fertig.\n\n[Chorus]\nWohin fahren wir? Wann geht es los?\nWir buchen, packen und freuen uns.\nDie Reise kann bald beginnen.\n\n[Outro]\nAm Morgen steigen wir in den Zug.\nHamburg, wir kommen!\nBei Falowen lerne ich, Reisen gut zu planen."
+    },
+    {
+      "level": "A2",
+      "day": 25,
+      "assignmentKey": "A2-9.25",
+      "title": "Ein anderer Tagesablauf",
+      "lyrics": "[Verse 1]\nFrüher bin ich sehr spät aufgestanden.\nDann war ich immer in Eile.\nSeit Montag klingelt mein Wecker früher.\nJetzt frühstücke ich ganz in Ruhe.\n\n[Chorus]\nMorgens Zeit, am Abend Ruhe,\njeder Tag hat seinen Rhythmus.\nIch finde meinen eigenen Weg.\n\n[Verse 2]\nNach der Arbeit gehe ich spazieren.\nDanach koche ich etwas Einfaches.\nBevor ich schlafe, lese ich ein Buch.\nMein Handy liegt nicht neben dem Bett.\n\n[Chorus]\nMorgens Zeit, am Abend Ruhe,\njeder Tag hat seinen Rhythmus.\nIch finde meinen eigenen Weg.\n\n[Outro]\nDer neue Tagesablauf tut mir gut.\nSo möchte ich weitermachen.\nMit Falowen beschreibe ich meinen Tagesablauf."
+    },
+    {
+      "level": "A2",
+      "day": 26,
+      "assignmentKey": "A2-10.26",
+      "title": "Heute bin ich aufgeregt",
+      "lyrics": "[Verse 1]\nMorgen habe ich eine wichtige Prüfung.\nHeute bin ich ziemlich nervös.\nMein Freund merkt das sofort.\nEr fragt: Was macht dir Sorgen?\n\n[Chorus]\nManchmal bin ich froh, manchmal traurig,\nmanchmal habe ich ein bisschen Angst.\nIch darf sagen, wie ich mich fühle.\n\n[Verse 2]\nWir sprechen lange über meine Gedanken.\nEr erzählt von seiner letzten Prüfung.\nDanach fühle ich mich ruhiger.\nIch weiß: Ich habe viel gelernt.\n\n[Chorus]\nManchmal bin ich froh, manchmal traurig,\nmanchmal habe ich ein bisschen Angst.\nIch darf sagen, wie ich mich fühle.\n\n[Outro]\nAm Morgen gehe ich mit neuem Mut los.\nEgal was kommt, ich versuche es.\nBei Falowen kann ich sagen, wie ich mich fühle."
+    },
+    {
+      "level": "A2",
+      "day": 27,
+      "assignmentKey": "A2-10.27",
+      "title": "Eine Nachricht kommt zu spät",
+      "lyrics": "[Verse 1]\nMia schreibt mir eine Nachricht.\nSie fragt, ob ich heute Zeit habe.\nIch bin unterwegs und sehe sie nicht.\nErst am Abend öffne ich mein Handy.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal braucht man auch eine Pause.\n\n[Verse 2]\nIch schreibe: Entschuldige die späte Antwort.\nMia sagt: Kein Problem, ich verstehe.\nWir machen einen Termin für morgen.\nDann legen wir beide das Handy weg.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal braucht man auch eine Pause.\n\n[Outro]\nAm nächsten Tag reden wir persönlich.\nDas ist manchmal einfach schöner.\nMit Falowen schreibe ich klare Nachrichten."
+    },
+    {
+      "level": "A2",
+      "day": 28,
+      "assignmentKey": "A2-10.28",
+      "title": "Nächstes Jahr möchte ich",
+      "lyrics": "[Verse 1]\nAm Ende des Jahres denke ich nach.\nWas habe ich in den letzten Monaten gelernt?\nIch habe viele neue Menschen getroffen.\nMein Deutsch ist schon viel besser geworden.\n\n[Chorus]\nNächstes Jahr möchte ich weiterlernen,\netwas Neues ausprobieren.\nEin kleiner Plan wird ein neuer Weg.\n\n[Verse 2]\nMia möchte einen Deutschkurs besuchen.\nBen will eine neue Arbeit finden.\nWir sprechen über unsere Wünsche.\nDann schreiben wir unsere Ziele auf.\n\n[Chorus]\nNächstes Jahr möchte ich weiterlernen,\netwas Neues ausprobieren.\nEin kleiner Plan wird ein neuer Weg.\n\n[Outro]\nMorgen fangen wir mit dem ersten Schritt an.\nIch freue mich auf die Zukunft.\nBei Falowen spreche ich über meine Zukunft."
+    },
+    {
+      "level": "B1",
+      "day": 1,
+      "assignmentKey": "B1-1.1",
+      "title": "Der Traum im alten Koffer",
+      "lyrics": "[Verse 1]\nIm Keller finde ich einen alten Koffer.\nDarin liegt mein Reisebuch von damals.\nAls Kind wollte ich um die Welt fahren,\ndoch später blieb für Träume kaum Zeit.\n\n[Chorus]\nEin Traum geht nicht einfach verloren,\nauch wenn die Jahre weiterziehen.\nHeute mach ich wieder einen Schritt.\n\n[Verse 2]\nIch erzähle Mia von meinem großen Wunsch.\nSie sagt, dass ich noch immer reisen kann.\nWir suchen gemeinsam nach günstigen Tickets,\nobwohl die Reise noch weit entfernt ist.\n\n[Chorus]\nEin Traum geht nicht einfach verloren,\nauch wenn die Jahre weiterziehen.\nHeute mach ich wieder einen Schritt.\n\n[Outro]\nAm Abend liegt ein kleiner Plan auf dem Tisch.\nDer erste Ort auf meiner Liste heißt Wien.\nMit Falowen finde ich neue Worte für alte Träume."
+    },
+    {
+      "level": "B1",
+      "day": 2,
+      "assignmentKey": "B1-1.2",
+      "title": "Die Bank am Fluss",
+      "lyrics": "[Verse 1]\nFrüher saßen wir oft am Fluss.\nBen und ich erzählten uns alles.\nDann ist er in eine andere Stadt gezogen,\nund unser Kontakt wurde immer seltener.\n\n[Chorus]\nGute Freunde bleiben nicht nur im Bild,\nsie hören zu, wenn das Leben laut wird.\nEin Anruf kann uns wieder näherbringen.\n\n[Verse 2]\nHeute rufe ich ihn nach langer Zeit an.\nEr sagt, dass er oft an mich gedacht hat.\nWir lachen über unsere Schulzeit\nund planen ein Treffen im nächsten Monat.\n\n[Chorus]\nGute Freunde bleiben nicht nur im Bild,\nsie hören zu, wenn das Leben laut wird.\nEin Anruf kann uns wieder näherbringen.\n\n[Outro]\nAn der alten Bank am Fluss warten wir.\nManche Freundschaften finden zurück.\nBei Falowen erzähle ich, was Freundschaft für mich bedeutet."
+    },
+    {
+      "level": "B1",
+      "day": 3,
+      "assignmentKey": "B1-1.3",
+      "title": "Mein erster kleiner Erfolg",
+      "lyrics": "[Verse 1]\nAls Sara ihren ersten Kurs begann,\nkonnte sie kaum einen Satz sagen.\nSie machte Fehler und schämte sich,\nobwohl sie jeden Abend fleißig übte.\n\n[Chorus]\nEin kleiner Erfolg verändert viel,\nauch wenn noch nicht alles gelingt.\nIch bleibe dran und glaube an mich.\n\n[Verse 2]\nEines Tages hielt sie einen kurzen Vortrag.\nSie zitterte, doch sie sprach bis zum Schluss.\nDie Gruppe hörte aufmerksam zu.\nDanach sagte jemand: Das hast du gut gemacht.\n\n[Chorus]\nEin kleiner Erfolg verändert viel,\nauch wenn noch nicht alles gelingt.\nIch bleibe dran und glaube an mich.\n\n[Outro]\nSara ging lächelnd nach Hause.\nSie wusste, dass Übung wirklich hilft.\nMit Falowen wachsen meine Sätze und mein Mut."
+    },
+    {
+      "level": "B1",
+      "day": 4,
+      "assignmentKey": "B1-2.4",
+      "title": "Ein Zimmer mit Licht",
+      "lyrics": "[Verse 1]\nSeit Wochen suche ich eine neue Wohnung.\nIn meinem alten Zimmer ist es zu dunkel.\nDie Angebote im Internet klingen gut,\naber oft sind die Preise viel zu hoch.\n\n[Chorus]\nIch suche nicht nur vier Wände,\nich suche einen Ort zum Leben.\nEin Fenster, Licht und etwas Ruhe.\n\n[Verse 2]\nDann schickt mir Mia eine Anzeige.\nDie Wohnung liegt nicht weit vom Park.\nIch rufe sofort beim Vermieter an,\nweil ich den Besichtigungstermin nicht verpassen möchte.\n\n[Chorus]\nIch suche nicht nur vier Wände,\nich suche einen Ort zum Leben.\nEin Fenster, Licht und etwas Ruhe.\n\n[Outro]\nMorgen sehe ich mir die Wohnung an.\nVielleicht beginnt hier mein neues Kapitel.\nBei Falowen kann ich meine Wünsche genauer erklären."
+    },
+    {
+      "level": "B1",
+      "day": 5,
+      "assignmentKey": "B1-2.5",
+      "title": "Ein Termin mit vielen Fragen",
+      "lyrics": "[Verse 1]\nWir stehen vor der Wohnungstür.\nDer Vermieter begrüßt uns pünktlich.\nDie Küche gefällt uns sofort,\ndoch im Bad entdecken wir einen Schaden.\n\n[Chorus]\nFragen stellen heißt genau hinsehen,\nauch wenn die Wohnung schön aussieht.\nEine gute Entscheidung braucht Zeit.\n\n[Verse 2]\nIch frage, wann die Reparatur geplant ist.\nMia erkundigt sich nach den Nebenkosten.\nDer Vermieter erklärt uns alles ruhig.\nDanach vergleichen wir noch unsere Notizen.\n\n[Chorus]\nFragen stellen heißt genau hinsehen,\nauch wenn die Wohnung schön aussieht.\nEine gute Entscheidung braucht Zeit.\n\n[Outro]\nErst am Abend treffen wir unsere Entscheidung.\nWir möchten die Wohnung gern mieten.\nMit Falowen stelle ich die Fragen, die wirklich zählen."
+    },
+    {
+      "level": "B1",
+      "day": 6,
+      "assignmentKey": "B1-2.6",
+      "title": "Zwischen Stadt und Land",
+      "lyrics": "[Verse 1]\nMeine Schwester liebt das Leben in der Stadt.\nSie mag Cafés, Konzerte und kurze Wege.\nIch wohne lieber auf dem Land,\nweil ich dort abends die Ruhe genieße.\n\n[Chorus]\nWo fühlt sich unser Leben richtig an?\nZwischen Lichtern und grünen Wiesen\nhat jeder Mensch seinen eigenen Platz.\n\n[Verse 2]\nAm Wochenende besucht sie mich zu Hause.\nWir fahren Rad und gehen durch den Wald.\nDanach fahren wir zusammen in die Stadt,\nwo wir einen alten Freund treffen.\n\n[Chorus]\nWo fühlt sich unser Leben richtig an?\nZwischen Lichtern und grünen Wiesen\nhat jeder Mensch seinen eigenen Platz.\n\n[Outro]\nWir müssen uns nicht für dasselbe entscheiden.\nBeide Lebensformen haben ihren Wert.\nBei Falowen lerne ich, verschiedene Lebensweisen zu beschreiben."
+    },
+    {
+      "level": "B1",
+      "day": 7,
+      "assignmentKey": "B1-3.7",
+      "title": "Heute kochen wir selbst",
+      "lyrics": "[Verse 1]\nNach der Arbeit wollen wir etwas essen.\nBen schlägt wieder schnelle Burger vor.\nIch sage, dass wir auch kochen könnten,\ndenn zu Hause steht noch frisches Gemüse.\n\n[Chorus]\nSchnell und einfach ist nicht immer besser,\ndoch gesund muss nicht kompliziert sein.\nWir finden heute unseren Mittelweg.\n\n[Verse 2]\nWir schneiden Tomaten, Zwiebeln und Paprika.\nBen würzt den Reis mit frischen Kräutern.\nEs dauert etwas länger als Bestellen,\naber wir reden und lachen dabei.\n\n[Chorus]\nSchnell und einfach ist nicht immer besser,\ndoch gesund muss nicht kompliziert sein.\nWir finden heute unseren Mittelweg.\n\n[Outro]\nAm Ende schmeckt uns das Essen besonders gut.\nMorgen kochen wir vielleicht wieder gemeinsam.\nMit Falowen begründe ich, was für mich gesund ist."
+    },
+    {
+      "level": "B1",
+      "day": 8,
+      "assignmentKey": "B1-3.8",
+      "title": "Kleine Schritte für die Gesundheit",
+      "lyrics": "[Verse 1]\nSeit einigen Wochen schlafe ich schlecht.\nIch bin oft müde bei der Arbeit.\nBeim Arzt spreche ich über meinen Alltag,\nweil ich etwas verändern möchte.\n\n[Chorus]\nGesund bleiben beginnt im Kleinen,\nmit Ruhe, Bewegung und Zeit.\nIch höre auf, was mein Körper braucht.\n\n[Verse 2]\nDie Ärztin empfiehlt regelmäßige Pausen.\nIch gehe nun jeden Abend spazieren.\nAußerdem lege ich das Handy früher weg,\nobwohl das anfangs nicht leicht war.\n\n[Chorus]\nGesund bleiben beginnt im Kleinen,\nmit Ruhe, Bewegung und Zeit.\nIch höre auf, was mein Körper braucht.\n\n[Outro]\nHeute fühle ich mich schon viel wacher.\nIch möchte auf mich achten.\nBei Falowen finde ich Worte für mein Wohlbefinden."
+    },
+    {
+      "level": "B1",
+      "day": 9,
+      "assignmentKey": "B1-3.9",
+      "title": "Nach Feierabend",
+      "lyrics": "[Verse 1]\nAm Morgen beginnt mein Postfach zu klingeln.\nSchon vor acht kommen neue Aufgaben.\nIch arbeite gern mit meinem Team,\ndoch abends bin ich oft zu erschöpft.\n\n[Chorus]\nEs gibt Zeit für Arbeit und Zeit für mich,\nfür Menschen, die mir wichtig sind.\nIch muss nicht alles heute schaffen.\n\n[Verse 2]\nIch spreche offen mit meiner Chefin.\nWir planen die Aufgaben besser zusammen.\nJetzt schalte ich nach Feierabend ab,\nauch wenn noch Nachrichten auf mich warten.\n\n[Chorus]\nEs gibt Zeit für Arbeit und Zeit für mich,\nfür Menschen, die mir wichtig sind.\nIch muss nicht alles heute schaffen.\n\n[Outro]\nHeute esse ich mit meiner Familie.\nZum ersten Mal seit Tagen bin ich wirklich da.\nMit Falowen sage ich klar, was ich brauche."
+    },
+    {
+      "level": "B1",
+      "day": 10,
+      "assignmentKey": "B1-4.10",
+      "title": "Ein Sonntag ohne Bildschirm",
+      "lyrics": "[Verse 1]\nAm Sonntag greife ich wieder zum Handy.\nIch wollte nur kurz die Nachrichten lesen.\nEine Stunde später merke ich,\ndass der Morgen schon fast vorbei ist.\n\n[Chorus]\nLeg das Handy einen Moment weg,\ndie Welt ist auch vor deinem Fenster.\nEin freier Tag gehört auch dir.\n\n[Verse 2]\nIch gehe hinaus und treffe meine Freundin.\nWir sprechen, ohne ständig aufs Display zu schauen.\nSpäter koche ich etwas und lese ein Buch.\nAm Abend habe ich viele neue Gedanken.\n\n[Chorus]\nLeg das Handy einen Moment weg,\ndie Welt ist auch vor deinem Fenster.\nEin freier Tag gehört auch dir.\n\n[Outro]\nDie Nachrichten sind morgen noch da.\nDiesen Sonntag habe ich wirklich erlebt.\nBei Falowen lerne ich, über Gewohnheiten nachzudenken."
+    },
+    {
+      "level": "B1",
+      "day": 11,
+      "assignmentKey": "B1-4.11",
+      "title": "Wir gewinnen zusammen",
+      "lyrics": "[Verse 1]\nBeim Sportfest werden zwei Teams gebildet.\nEinige kennen die Spiele noch nicht.\nBen möchte alles allein entscheiden,\ndoch dadurch wird unsere Gruppe unsicher.\n\n[Chorus]\nNicht einer allein, wir schaffen es zusammen,\njeder bringt eine Stärke mit.\nWir hören zu und geben nicht auf.\n\n[Verse 2]\nWir verteilen die Aufgaben nach unseren Fähigkeiten.\nSara läuft schnell, Mia behält den Überblick.\nAls jemand einen Fehler macht,\nhelfen wir weiter statt uns zu ärgern.\n\n[Chorus]\nNicht einer allein, wir schaffen es zusammen,\njeder bringt eine Stärke mit.\nWir hören zu und geben nicht auf.\n\n[Outro]\nAm Ende gewinnen wir nicht den ersten Preis.\nDoch unser Team ist richtig zusammengewachsen.\nMit Falowen wird aus Zuhören gutes Zusammenspiel."
+    },
+    {
+      "level": "B1",
+      "day": 12,
+      "assignmentKey": "B1-4.12",
+      "title": "Der falsche Weg im Wald",
+      "lyrics": "[Verse 1]\nWir wandern am Samstag durch den Wald.\nDie Sonne scheint und alles sieht einfach aus.\nNach einer Stunde fehlt die Markierung,\nund plötzlich wissen wir nicht mehr weiter.\n\n[Chorus]\nManchmal führt ein Umweg zum Ziel,\nwenn wir ruhig bleiben und nachdenken.\nZusammen finden wir den richtigen Weg.\n\n[Verse 2]\nWir setzen uns hin und öffnen die Karte.\nBen entdeckt einen Weg entlang des Bachs.\nObwohl wir etwas später ankommen,\nsehen wir unterwegs einen schönen Wasserfall.\n\n[Chorus]\nManchmal führt ein Umweg zum Ziel,\nwenn wir ruhig bleiben und nachdenken.\nZusammen finden wir den richtigen Weg.\n\n[Outro]\nAm Abend erzählen wir lachend davon.\nDas Abenteuer vergessen wir nicht.\nBei Falowen kann ich sogar Abenteuer gut erzählen."
+    },
+    {
+      "level": "B1",
+      "day": 13,
+      "assignmentKey": "B1-4.13",
+      "title": "Der Film nach dem Regen",
+      "lyrics": "[Verse 1]\nGestern haben wir einen Film gesehen.\nDie Geschichte begann in einer kleinen Stadt.\nZwei Geschwister suchten ihren Vater,\nden sie seit Jahren nicht getroffen hatten.\n\n[Chorus]\nEine gute Geschichte bleibt bei mir,\nauch wenn der Abspann längst vorbei ist.\nIch frage mich: Was hätte ich getan?\n\n[Verse 2]\nNach dem Film diskutieren wir im Café.\nMia fand die Bilder besonders schön.\nIch mochte die Figuren und ihre Entwicklung,\nobwohl mir das Ende zu schnell kam.\n\n[Chorus]\nEine gute Geschichte bleibt bei mir,\nauch wenn der Abspann längst vorbei ist.\nIch frage mich: Was hätte ich getan?\n\n[Outro]\nZu Hause schreibe ich meine Filmkritik.\nVielleicht sehen wir nächste Woche einen neuen Film.\nMit Falowen kann ich meine Meinung zum Film begründen."
+    },
+    {
+      "level": "B1",
+      "day": 14,
+      "assignmentKey": "B1-5.14",
+      "title": "Kreide oder Bildschirm?",
+      "lyrics": "[Verse 1]\nIn unserem Kurs gibt es neue Tablets.\nDer Lehrer zeigt uns digitale Übungen.\nBen vermisst die Arbeit am Papier,\nweil er sich damit besser konzentrieren kann.\n\n[Chorus]\nNicht alles Alte muss verschwinden,\nnicht alles Neue ist sofort besser.\nWir lernen, was für uns funktioniert.\n\n[Verse 2]\nWir probieren beide Methoden im Unterricht.\nOnline können wir das Hören oft wiederholen.\nAuf Papier sammeln wir unsere Gedanken.\nAm Ende nutzen wir beides gemeinsam.\n\n[Chorus]\nNicht alles Alte muss verschwinden,\nnicht alles Neue ist sofort besser.\nWir lernen, was für uns funktioniert.\n\n[Outro]\nDer Lehrer lächelt und sagt: Sehr gut.\nDie beste Methode hilft uns beim Lernen.\nBei Falowen probiere ich neue Lernwege aus."
+    },
+    {
+      "level": "B1",
+      "day": 15,
+      "assignmentKey": "B1-5.15",
+      "title": "Das Büro ist heute zu Hause",
+      "lyrics": "[Verse 1]\nHeute arbeite ich wieder von zu Hause.\nDer Computer steht am Küchentisch.\nUm neun beginnt unsere Videokonferenz,\ndoch plötzlich fällt meine Verbindung aus.\n\n[Chorus]\nAuch wenn der Bildschirm uns verbindet,\nbrauchen wir Zeit für echte Gespräche.\nIch finde meinen Rhythmus jeden Tag.\n\n[Verse 2]\nIch rufe meine Kollegin schnell an.\nSie erklärt mir die wichtigsten Aufgaben.\nIn der Pause gehe ich kurz nach draußen,\ndamit ich mich wieder besser konzentrieren kann.\n\n[Chorus]\nAuch wenn der Bildschirm uns verbindet,\nbrauchen wir Zeit für echte Gespräche.\nIch finde meinen Rhythmus jeden Tag.\n\n[Outro]\nAm Abend schließe ich meinen Laptop.\nDie Arbeit bleibt heute wirklich im Büro.\nMit Falowen kann ich auch digitale Probleme erklären."
+    },
+    {
+      "level": "B1",
+      "day": 16,
+      "assignmentKey": "B1-5.16",
+      "title": "Vor der Prüfung",
+      "lyrics": "[Verse 1]\nMorgen schreibe ich meine Deutschprüfung.\nDie Wörter kenne ich eigentlich gut.\nTrotzdem kann ich kaum schlafen,\nweil ich ständig an mögliche Fehler denke.\n\n[Chorus]\nIch atme ein und atme aus,\nein Fehler macht mich nicht klein.\nIch habe gelernt und gebe mein Bestes.\n\n[Verse 2]\nMeine Lehrerin erinnert mich an meine Fortschritte.\nIch mache eine Pause und gehe spazieren.\nDanach wiederhole ich nur die wichtigsten Themen,\nanstatt bis tief in die Nacht zu lernen.\n\n[Chorus]\nIch atme ein und atme aus,\nein Fehler macht mich nicht klein.\nIch habe gelernt und gebe mein Bestes.\n\n[Outro]\nAm Morgen gehe ich ruhig zur Prüfung.\nIch bin bereit für diesen Schritt.\nBei Falowen wächst mein Mut vor jeder Prüfung."
+    },
+    {
+      "level": "B1",
+      "day": 17,
+      "assignmentKey": "B1-5.17",
+      "title": "So lerne ich am besten",
+      "lyrics": "[Verse 1]\nBen lernt Vokabeln mit kleinen Karten.\nMia hört kurze Geschichten auf Deutsch.\nIch muss neue Sätze laut sagen,\ndamit sie in meinem Kopf bleiben.\n\n[Chorus]\nJeder lernt auf seine Weise,\nmit Zeit, Geduld und guten Fragen.\nWir finden, was uns wirklich hilft.\n\n[Verse 2]\nWir treffen uns einmal in der Woche.\nZuerst erklären wir uns die schwierigen Regeln.\nDann spielen wir eine kleine Alltagsszene.\nSo merken wir, was wir schon können.\n\n[Chorus]\nJeder lernt auf seine Weise,\nmit Zeit, Geduld und guten Fragen.\nWir finden, was uns wirklich hilft.\n\n[Outro]\nNiemand kann alles sofort verstehen.\nAber zusammen kommen wir weiter.\nMit Falowen finde ich meine eigene Lernmethode."
+    },
+    {
+      "level": "B1",
+      "day": 18,
+      "assignmentKey": "B1-6.18",
+      "title": "Ein Weg zu meinem Traumberuf",
+      "lyrics": "[Verse 1]\nSeit meiner Schulzeit möchte ich Kindern helfen.\nDoch lange wusste ich nicht,\nwelche Ausbildung zu meinem Wunsch passt,\nund wen ich dazu fragen könnte.\n\n[Chorus]\nNicht jeder Weg beginnt ganz gerade,\nmanchmal braucht ein Traum etwas Zeit.\nIch gehe los und lerne unterwegs.\n\n[Verse 2]\nEine Beraterin erklärt mir die Möglichkeiten.\nDanach besuche ich eine Schule für Erzieher.\nDort spreche ich mit zwei Auszubildenden,\ndie mir ehrlich von ihrem Alltag erzählen.\n\n[Chorus]\nNicht jeder Weg beginnt ganz gerade,\nmanchmal braucht ein Traum etwas Zeit.\nIch gehe los und lerne unterwegs.\n\n[Outro]\nJetzt weiß ich, was ich tun möchte.\nIm Herbst schicke ich meine Bewerbung ab.\nBei Falowen lerne ich, meine beruflichen Ziele zu erklären."
+    },
+    {
+      "level": "B1",
+      "day": 19,
+      "assignmentKey": "B1-6.19",
+      "title": "Die Frage im Bewerbungsgespräch",
+      "lyrics": "[Verse 1]\nVor der Tür atme ich noch einmal tief durch.\nHeute habe ich mein erstes Vorstellungsgespräch.\nDie Chefin fragt nach meinen Stärken,\nund für einen Moment fehlen mir die Worte.\n\n[Chorus]\nIch muss nicht perfekt klingen,\nich darf kurz überlegen und dann antworten.\nEin ehrlicher Satz kann viel sagen.\n\n[Verse 2]\nIch erzähle von einem schwierigen Projekt,\nbei dem wir gemeinsam eine Lösung fanden.\nDanach frage ich selbst nach dem Team,\nweil mir die Zusammenarbeit besonders wichtig ist.\n\n[Chorus]\nIch muss nicht perfekt klingen,\nich darf kurz überlegen und dann antworten.\nEin ehrlicher Satz kann viel sagen.\n\n[Outro]\nBeim Abschied fühle ich mich erleichtert.\nIch habe mich von meiner besten Seite gezeigt.\nMit Falowen kann ich selbstbewusst über meine Stärken sprechen."
+    },
+    {
+      "level": "B1",
+      "day": 20,
+      "assignmentKey": "B1-6.20",
+      "title": "Wie wird man eigentlich…?",
+      "lyrics": "[Verse 1]\nMein Bruder möchte Krankenpfleger werden.\nEr hat im Krankenhaus ein Praktikum gemacht.\nSeitdem interessiert er sich dafür,\nwelche Ausbildung und Prüfungen notwendig sind.\n\n[Chorus]\nEin Beruf beginnt mit einer Frage,\nund aus der Frage wird ein Plan.\nWir lernen jeden Schritt auf diesem Weg.\n\n[Verse 2]\nEr besucht einen Informationstag in der Schule.\nEine Lehrerin erklärt die Aufnahmebedingungen.\nDann spricht er mit einer jungen Pflegerin,\ndie gerade ihre Ausbildung beendet hat.\n\n[Chorus]\nEin Beruf beginnt mit einer Frage,\nund aus der Frage wird ein Plan.\nWir lernen jeden Schritt auf diesem Weg.\n\n[Outro]\nJetzt sammelt mein Bruder seine Unterlagen.\nIm nächsten Monat will er sich bewerben.\nBei Falowen stelle ich Fragen zu Ausbildung und Beruf."
+    },
+    {
+      "level": "B1",
+      "day": 21,
+      "assignmentKey": "B1-7.21",
+      "title": "Unser Leben in der WG",
+      "lyrics": "[Verse 1]\nSeit einem Monat wohne ich in einer WG.\nWir teilen Küche, Bad und viele Geschichten.\nAm Anfang stand das Geschirr oft herum,\nweil niemand sich zuständig fühlte.\n\n[Chorus]\nZusammen wohnen heißt zusammen reden,\nmanchmal geben und manchmal nehmen.\nWir finden Platz für jeden Menschen.\n\n[Verse 2]\nAn einem Sonntag setzen wir uns an den Tisch.\nWir machen einen Plan für die Hausarbeit.\nJetzt kocht jeder einmal in der Woche,\nund wir fragen öfter, wie es den anderen geht.\n\n[Chorus]\nZusammen wohnen heißt zusammen reden,\nmanchmal geben und manchmal nehmen.\nWir finden Platz für jeden Menschen.\n\n[Outro]\nUnser Zuhause ist nicht immer perfekt.\nAber es fühlt sich inzwischen richtig gut an.\nMit Falowen spreche ich offen über das Zusammenleben."
+    },
+    {
+      "level": "B1",
+      "day": 22,
+      "assignmentKey": "B1-7.22",
+      "title": "Was mir wichtig ist",
+      "lyrics": "[Verse 1]\nMia erzählt von ihrer neuen Beziehung.\nSie sagt, dass beide wenig Zeit haben.\nIhr Freund arbeitet oft am Wochenende,\nund manchmal fühlt sie sich nicht gehört.\n\n[Chorus]\nLiebe braucht mehr als schöne Worte,\nsie braucht Vertrauen und offene Ohren.\nWir sagen ehrlich, was uns wichtig ist.\n\n[Verse 2]\nAm Abend spricht Mia ruhig mit ihm.\nSie erklärt, warum gemeinsame Zeit ihr fehlt.\nEr hört zu und schlägt einen festen Abend vor,\nan dem sie ihre Handys weglegen.\n\n[Chorus]\nLiebe braucht mehr als schöne Worte,\nsie braucht Vertrauen und offene Ohren.\nWir sagen ehrlich, was uns wichtig ist.\n\n[Outro]\nNicht jeder Tag wird leicht sein.\nDoch beide wollen einander verstehen.\nBei Falowen finde ich Worte für Vertrauen und Nähe."
+    },
+    {
+      "level": "B1",
+      "day": 23,
+      "assignmentKey": "B1-7.23",
+      "title": "Ein Kaffee, zwei Geschichten",
+      "lyrics": "[Verse 1]\nFür unser erstes Date wählen wir ein Café.\nIch komme zehn Minuten zu früh.\nAls Leon endlich durch die Tür kommt,\nbin ich plötzlich viel nervöser als gedacht.\n\n[Chorus]\nEin ehrliches Lächeln reicht manchmal,\nwenn die richtigen Worte noch fehlen.\nWir lassen uns einfach Zeit.\n\n[Verse 2]\nZuerst sprechen wir nur über das Wetter.\nDann erzählt Leon von seinem Hund.\nIch muss lachen, weil er ein Foto zeigt,\nauf dem der Hund seine Schuhe trägt.\n\n[Chorus]\nEin ehrliches Lächeln reicht manchmal,\nwenn die richtigen Worte noch fehlen.\nWir lassen uns einfach Zeit.\n\n[Outro]\nNach zwei Stunden ist die Nervosität weg.\nWir möchten uns bald wiedersehen.\nMit Falowen wird aus einem Gespräch vielleicht mehr."
+    },
+    {
+      "level": "B1",
+      "day": 24,
+      "assignmentKey": "B1-8.24",
+      "title": "Weniger kaufen, mehr erleben",
+      "lyrics": "[Verse 1]\nIm Schaufenster sehe ich ein neues Handy.\nMeins funktioniert eigentlich noch gut.\nTrotzdem möchte ich es sofort kaufen,\nweil überall Werbung für das Modell läuft.\n\n[Chorus]\nBrauche ich das wirklich heute?\nVielleicht hält das Alte noch lang.\nWeniger kaufen lässt Raum für anderes.\n\n[Verse 2]\nZu Hause spreche ich mit meinem Bruder.\nEr zeigt mir, wie ich den Akku schonen kann.\nWir beschließen, das Geld lieber zu sparen,\num im Sommer gemeinsam zu verreisen.\n\n[Chorus]\nBrauche ich das wirklich heute?\nVielleicht hält das Alte noch lang.\nWeniger kaufen lässt Raum für anderes.\n\n[Outro]\nDas neue Handy bleibt im Geschäft.\nDie Reise ist mir jetzt wichtiger.\nBei Falowen lerne ich, bewusster zu entscheiden."
+    },
+    {
+      "level": "B1",
+      "day": 25,
+      "assignmentKey": "B1-8.25",
+      "title": "Das Paket kam nicht an",
+      "lyrics": "[Verse 1]\nLetzte Woche habe ich Schuhe online bestellt.\nDer Shop versprach eine schnelle Lieferung.\nHeute steht in der Sendungsverfolgung zugestellt,\nobwohl vor meiner Tür kein Paket liegt.\n\n[Chorus]\nIch frage nach, ich bleibe ruhig,\nund halte meine Unterlagen bereit.\nAls Kunde habe ich auch Rechte.\n\n[Verse 2]\nIch schreibe dem Kundenservice eine Nachricht.\nDarin nenne ich die Bestellung und das Datum.\nAm nächsten Tag kommt eine freundliche Antwort:\nDas Paket wurde beim Nachbarn abgegeben.\n\n[Chorus]\nIch frage nach, ich bleibe ruhig,\nund halte meine Unterlagen bereit.\nAls Kunde habe ich auch Rechte.\n\n[Outro]\nIch hole die Schuhe ab und bedanke mich.\nBeim nächsten Mal prüfe ich die Lieferadresse.\nMit Falowen kenne ich die Worte für meine Rechte."
+    },
+    {
+      "level": "B1",
+      "day": 26,
+      "assignmentKey": "B1-9.26",
+      "title": "Der Zug fährt nicht",
+      "lyrics": "[Verse 1]\nWir wollen heute nach Hamburg reisen.\nAm Bahnhof steht plötzlich eine große Anzeige.\nUnser Zug fällt wegen einer Störung aus,\nund Mia wird langsam richtig nervös.\n\n[Chorus]\nEin Plan kann sich ganz schnell ändern,\ndoch eine Lösung gibt es oft.\nWir bleiben ruhig und fragen nach.\n\n[Verse 2]\nEin Mitarbeiter erklärt uns die Alternativen.\nWir nehmen einen anderen Zug über Hannover.\nObwohl wir eine Stunde später ankommen,\nschaffen wir noch den Termin am Abend.\n\n[Chorus]\nEin Plan kann sich ganz schnell ändern,\ndoch eine Lösung gibt es oft.\nWir bleiben ruhig und fragen nach.\n\n[Outro]\nMia lacht, als wir endlich aussteigen.\nAus dem Problem wurde eine kleine Geschichte.\nBei Falowen lerne ich, ruhig nach Lösungen zu fragen."
+    },
+    {
+      "level": "B1",
+      "day": 27,
+      "assignmentKey": "B1-10.27",
+      "title": "Ein guter Schritt für unsere Straße",
+      "lyrics": "[Verse 1]\nVor unserem Haus liegt oft viel Müll.\nManche Nachbarn ärgern sich darüber,\ndoch lange hat niemand etwas gemacht,\nweil alle nur auf andere gewartet haben.\n\n[Chorus]\nDie Umwelt beginnt vor unserer Tür,\nmit kleinen Schritten jeden Tag.\nGemeinsam können wir etwas verändern.\n\n[Verse 2]\nWir laden die Nachbarn zum Aufräumen ein.\nAm Samstag kommen mehr Menschen als erwartet.\nWir trennen den Müll und pflanzen Blumen,\ndamit unsere Straße wieder schöner wird.\n\n[Chorus]\nDie Umwelt beginnt vor unserer Tür,\nmit kleinen Schritten jeden Tag.\nGemeinsam können wir etwas verändern.\n\n[Outro]\nAm Abend sitzen wir zusammen im Hof.\nAus einer Idee ist etwas Gutes geworden.\nMit Falowen kann ich gemeinsam Veränderungen anstoßen."
+    },
+    {
+      "level": "B1",
+      "day": 28,
+      "assignmentKey": "B1-10.28",
+      "title": "Morgen etwas grüner",
+      "lyrics": "[Verse 1]\nMein Vater fährt für jeden Weg mit dem Auto.\nIch habe ihm von meiner Idee erzählt:\nVielleicht können wir öfter den Bus nehmen,\nwenn das Wetter und die Zeit es erlauben.\n\n[Chorus]\nWir müssen nicht alles heute ändern,\ndoch morgen können wir anfangen.\nEin kleiner Weg führt uns weiter.\n\n[Verse 2]\nAm Sonntag fahren wir mit dem Fahrrad zum Markt.\nWir kaufen Gemüse aus der Region.\nSpäter sprechen wir über unseren Stromverbrauch,\nohne dass jemand alles perfekt machen muss.\n\n[Chorus]\nWir müssen nicht alles heute ändern,\ndoch morgen können wir anfangen.\nEin kleiner Weg führt uns weiter.\n\n[Outro]\nUnser Alltag sieht noch fast gleich aus.\nAber wir achten jetzt bewusster auf die Zukunft.\nBei Falowen lerne ich, über unsere Zukunft nachzudenken."
+    }
+  ]
+}

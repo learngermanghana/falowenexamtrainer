@@ -4,15 +4,22 @@ const { signObject } = require('./courseMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
 const builtInTimings = require('../web/public/music/timings.json');
 function validateLyrics(data, objectKey) {
-  if (!data || data.objectKey !== objectKey || !Array.isArray(data.cues) || !data.cues.length || data.cues.length > 500) return null;
-  const lyrics = typeof data.lyrics === 'string' ? data.lyrics : data.cues.map(c => c?.text || '').join('\n');
-  if (lyrics.length > 60000) return null;
+  if (!data || data.objectKey !== objectKey) return null;
+  if (data.cues !== undefined && !Array.isArray(data.cues)) return null;
+  const cuesInput = data.cues || [];
+  if (cuesInput.length > 500) return null;
+  const lyrics = typeof data.lyrics === 'string' ? data.lyrics : cuesInput.map(c => c?.text || '').join('\n');
+  if (!lyrics.trim() || lyrics.length > 60000) return null;
   const lines = lyrics.replace(/\\n/g, '\n').split(/\r?\n/).map(s => s.trim()).filter(s => s && !/^\[.*\]$/.test(s));
-  if (lines.length !== data.cues.length) return null;
+  if (!lines.length || lines.length > 500 || lines.some(line => line.length > 1000)) return null;
+  // Matching .lyrics.json files may be published before manual cue timing.
+  // Display readable lyrics without claiming synchronized highlighting.
+  if (!cuesInput.length) return { objectKey, lyrics, cues: [] };
+  if (lines.length !== cuesInput.length) return null;
   let previous = -1;
   const cues = [];
   for (let i = 0; i < lines.length; i++) {
-    const cue = data.cues[i];
+    const cue = cuesInput[i];
     if (!lines[i] || lines[i].length > 1000 || cue?.text !== lines[i] || !Number.isFinite(cue.start) || cue.start < 0 || cue.start > 7200 || cue.start <= previous) return null;
     if (cue.end !== undefined && (!Number.isFinite(cue.end) || cue.end <= cue.start || cue.end > 7200)) return null;
     cues.push({start:cue.start,text:cue.text,...(cue.end !== undefined ? {end:cue.end} : {})}); previous = cue.start;
