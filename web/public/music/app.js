@@ -25,23 +25,34 @@ let learning = {};
 let studioDrafts = [];
 const normalizedTitle = value => String(value || "").toLocaleLowerCase("de-DE")
   .normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
-function referenceLyricsFor(track) {
+function matchedStudioDraft(track) {
   if (!track || !track.autoDiscovered) return null;
   const candidates = studioDrafts.filter(item => item.level === track.level && item.day === track.day);
   const exact = candidates.find(item => normalizedTitle(item.title) === normalizedTitle(track.title));
   const byKey = track.assignmentKey && candidates.find(item => item.assignmentKey === track.assignmentKey);
   const draft = exact || byKey || (candidates.length === 1 ? candidates[0] : null);
+  return draft || null;
+}
+function referenceLyricsFor(track) {
+  const draft = matchedStudioDraft(track);
   return draft && typeof draft.lyrics === "string" && draft.lyrics.trim()
     ? {lyrics:draft.lyrics, cues:[], referenceOnly:true, assignmentKey:draft.assignmentKey} : null;
 }
+function currentLyricPack(track) {
+  return publishedLyrics.get(track.id)
+    || savedStudioLyrics.get(track.assignmentKey || matchedStudioDraft(track)?.assignmentKey)
+    || learning[track.id] || referenceLyricsFor(track);
+}
 function lyricsFor(track) {
-  return publishedLyrics.get(track.id) || learning[track.id] || referenceLyricsFor(track);
+  return currentLyricPack(track);
 }
 let current = null;
 let selected = null;
 let category = "all";
 let featured = null;
 const publishedLyrics = new Map();
+const savedStudioLyrics = new Map();
+const studioLyricsRequests = new Set();
 const lyricsRequests = new Set();
 let renderedCues = [];
 let highlightedLine = -1;
@@ -349,6 +360,26 @@ function updateLyricHighlight() {
   }
 }
 for (const event of ["timeupdate", "seeked", "loadedmetadata", "ended", "emptied"]) audio.addEventListener(event, updateLyricHighlight);
+async function loadSavedStudioLyrics(track) {
+  const key = track.assignmentKey || matchedStudioDraft(track)?.assignmentKey;
+  // Bounded single-document read only, once per assignment on song selection.
+  if (!key || studioLyricsRequests.has(key)) return;
+  if (!/^(A1|A2|B1|B2|C1|C2)-[A-Za-z0-9.-]{1,60}$/.test(key)) return;
+  studioLyricsRequests.add(key);
+  try {
+    const endpoint="https://us-central1-falowen-examiner-trainer.cloudfunctions.net/api/music-studio/public-lyrics";
+    const response=await fetch(endpoint+"?assignmentKey="+encodeURIComponent(key),{cache:"no-cache"});
+    if (!response.ok) return;
+    const data=await response.json();
+    if (data.ok!==true || data.assignmentKey!==key.toUpperCase() || !data.found
+      || typeof data.lyrics!=="string" || !data.lyrics.trim() || data.lyrics.length>5500) return;
+    savedStudioLyrics.set(key,{lyrics:data.lyrics,cues:[],referenceOnly:true,assignmentKey:key});
+    if (selected?.id===track.id && !publishedLyrics.has(track.id)) {
+      const tab=document.querySelector('.lesson-tabs button[aria-pressed="true"]')?.dataset.tab || "listen";
+      renderDetail(track); setTab(tab);
+    }
+  } catch { /* The bundled songbook remains usable while the owner API is unreachable. */ }
+}
 async function loadPublishedLyrics(track) {
   if (lyricsRequests.has(track.id) || !track.objectKey) return;
   lyricsRequests.add(track.id);
@@ -420,7 +451,7 @@ function checkAnswers() {
 }
 function renderDetail(track) {
   const lesson = learning[track.id];
-  const lyricPack = publishedLyrics.get(track.id) || (lesson?.assignmentKey === track.assignmentKey ? lesson : null) || referenceLyricsFor(track);
+  const lyricPack = currentLyricPack(track);
   const hasLyrics = Boolean(lyricPack?.lyrics);
   const hasLesson = Boolean(lesson && lesson.assignmentKey === track.assignmentKey && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
@@ -446,6 +477,7 @@ function renderDetail(track) {
   renderedCues = []; highlightedLine = -1;
   if (hasLyrics) renderLyrics(hasLesson ? {...lesson, ...lyricPack} : lyricPack);
   loadPublishedLyrics(track);
+  loadSavedStudioLyrics(track);
   byId("song-detail").hidden = false;
   setTab("listen");
   document.title = track.title + " · Falowen Music";
