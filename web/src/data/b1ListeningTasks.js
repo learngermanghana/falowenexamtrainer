@@ -399,51 +399,20 @@ Herr Weber: Auf Wiedersehen!`,
     submitRequired: false,
   }),
   24: task({
-    "title": "Konsum und Nachhaltigkeit · Hören · Richtig oder Falsch (5 Aufgaben)",
-    "instructions": "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
-    "audioKey": "b1/day_24/day-24.mp3",
-    "videoTitle": "B1 Day 24 · Konsum und Nachhaltigkeit",
-    "submitRequired": true,
-    "selfCheckText": "",
-    "submissionNote": "Reichen Sie alle fünf Antworten über Submit als TEIL 4 ein: A = Richtig, B = Falsch.",
-    "questions": [
-        {
-            "stem": "Jonas möchte sich sofort ein neues Smartphone kaufen, weil sein altes komplett kaputt ist.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Lisa weist darauf hin, dass man auf den Konsum achten und Elektroschrott vermeiden sollte.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas plant nun, den Akku seines Smartphones reparieren zu lassen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Laut Lisa ist eine Reparatur teurer als ein komplett neues Smartphone.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        },
-        {
-            "stem": "Jonas möchte das Gerät nach der Reparatur noch mindestens zwei Jahre lang nutzen.",
-            "options": [
-                "A) Richtig",
-                "B) Falsch"
-            ]
-        }
-    ]
-}),
+    title: "Konsum und Nachhaltigkeit · Gespräch 2 · Richtig oder Falsch",
+    instructions: "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zwischen Jonas und Lisa zweimal. Entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
+    audioKey: "b1/day-24/day-25.mp3",
+    videoTitle: "B1 Tag 24 · Kleidung, Altkleider und bewusster Konsum · Gespräch 2",
+    submitRequired: true,
+    submissionNote: "Reichen Sie alle fünf Antworten als TEIL 4 ein: A = Richtig, B = Falsch.",
+    questions: [
+      q("Jonas verkauft seine alten Kleider dieses Mal online auf einem Flohmarkt.", ["A) Richtig", "B) Falsch"]),
+      q("Jonas wirft seine Kleidung in einen Altkontainer.", ["A) Richtig", "B) Falsch"]),
+      q("Ein großer Teil der Altkleider zerstört laut Lisa lokale Märkte im Globalen Süden.", ["A) Richtig", "B) Falsch"]),
+      q("Jonas wusste von Anfang an genau, was mit der Altkleidung passiert.", ["A) Richtig", "B) Falsch"]),
+      q("Lisa empfiehlt, Kleidung länger zu tragen oder Tauschpartys zu besuchen.", ["A) Richtig", "B) Falsch"]),
+    ],
+  }),
   25: task({
     title: "Online einkaufen – Rechte und Risiken · Hören · Richtig oder Falsch (5 Aufgaben)",
     instructions: "Lesen Sie zuerst die fünf Aussagen. Hören Sie das Gespräch zweimal und entscheiden Sie jeweils: A) Richtig oder B) Falsch.",
