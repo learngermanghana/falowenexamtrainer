@@ -198,7 +198,7 @@ describe("A1 lesson links preserve the lesson resource hub", () => {
     );
 
     expect(teacherVideos.map((video) => video.url)).toEqual([
-      "https://youtu.be/zizS5WdOYs8",
+      "https://youtu.be/0aprj_rMWw8",
     ]);
     expect(teacherVideos[0]).toMatchObject({
       videoNumber: 1,
