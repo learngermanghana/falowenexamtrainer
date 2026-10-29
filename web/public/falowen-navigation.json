@@ -85,9 +85,9 @@
     {
       "id": "books",
       "label": "Books",
-      "route": "/books",
-      "purpose": "Browse the official Falowen German book catalogue and checkout on the same website",
-      "requiresLogin": false,
+      "route": "/campus/books",
+      "purpose": "Browse and buy Falowen books without leaving the signed-in Campus; the public bookstore stays at /books",
+      "requiresLogin": true,
       "aliases": [
         "buy German books",
         "workbooks",
