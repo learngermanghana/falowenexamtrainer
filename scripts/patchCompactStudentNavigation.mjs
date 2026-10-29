@@ -138,6 +138,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
   const navigationHelpers = `const getCampusNavigationItems = (allowedSections = {}) => [
   { key: "learn", label: "Learn", route: "/campus/course", enabled: true },
   { key: "music", label: "Music", route: "/campus/music", enabled: Boolean(allowedSections.music) },
+  { key: "books", label: "Books", route: "/books", enabled: Boolean(allowedSections.books) },
   { key: "attendance", label: "Attendance", route: "/campus/attendance", enabled: Boolean(allowedSections.attendance) },
   { key: "results", label: "Results", route: "/campus/results", enabled: Boolean(allowedSections.results) },
   { key: "examFile", label: "Exam File", route: "/campus/examFile", enabled: Boolean(allowedSections.examFile) },
@@ -148,6 +149,7 @@ if (!app.includes("const CampusPrimaryNavigation =")) {
 const isCampusNavigationItemActive = (item, location) => {
   if (item.key === "learn") return location.pathname.startsWith("/campus/course");
   if (item.key === "music") return location.pathname.startsWith("/campus/music");
+  if (item.key === "books") return location.pathname.startsWith("/books");
   if (item.key === "attendance") return location.pathname.startsWith("/campus/attendance");
   if (item.key === "results") return location.pathname.startsWith("/campus/results");
   if (item.key === "examFile") return location.pathname.startsWith("/campus/examFile");
@@ -187,7 +189,7 @@ const CampusMobileBottomNav = ({ allowedSections }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const moreItems = getCampusNavigationItems(allowedSections).filter((item) =>
-    ["examFile", "classMembers", "home"].includes(item.key)
+    ["books", "examFile", "classMembers", "home"].includes(item.key)
   );
   const moreActive = moreItems.some((item) => isCampusNavigationItemActive(item, location));
 
