@@ -1,5 +1,4 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Link} from "react-router-dom";
 import {getBackendUrl} from "../services/backendUrl";
 import {BOOK_PAGES, indicativeUsd} from "./BooksCatalog";
 import "./BookStoreCheckout.css";
@@ -86,10 +85,10 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
       window.location.assign(url.toString());
     } catch(e) {setError(e.message);setBusy(false);}
   }
-  if(!product) return <main className="fb-page"><div className="fb-shell"><h1>Book not found</h1><Link to={basePath}>Browse books</Link></div></main>;
+  if(!product) return <main className="fb-page"><div className="fb-shell"><h1>Book not found</h1><a href={basePath}>Browse books</a></div></main>;
   const total=selected ? selected.priceGhs*(selected.format==="printed"?Number(quantity):1) : 0;
   return <main className="fb-page"><div className="fb-shell fb-product-shell">
-    <nav className="fb-breadcrumb" aria-label="Breadcrumb"><Link to={basePath === "/books" ? "/" : "/campus/course"}>Falowen</Link><span>/</span><Link to={basePath}>Books</Link>{checkout && <><span>/</span><Link to={bookHref(page.href)}>Book details</Link></>}</nav>
+    <nav className="fb-breadcrumb" aria-label="Breadcrumb"><a href={basePath === "/books" ? "/" : "/campus/course"}>Falowen</a><span>/</span><a href={basePath}>Books</a>{checkout && <><span>/</span><a href={bookHref(page.href)}>Book details</a></>}</nav>
     {error && <p className="fb-error" role="alert">{error}</p>}
     {!listing ? <p role="status">{error ? "Book information is unavailable. Please reload to try again." : "Loading book…"}</p> : <>
       <section className="fb-product-layout">
@@ -97,7 +96,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
         <div className="fb-product-info">
           <p className="fb-eyebrow">LEARN LANGUAGE EDUCATION ACADEMY · FALOWEN</p>
           <h1>{checkout ? "Checkout" : listing.title}</h1>
-          {checkout ? <><h2>{listing.title}</h2><Link to={bookHref(page.href)}>← Back to book details</Link></> : <>
+          {checkout ? <><h2>{listing.title}</h2><a href={bookHref(page.href)}>← Back to book details</a></> : <>
             <p className="fb-lede">{listing.description}</p><p>{listing.pages} pages · {listing.levelTags?.join(" / ")}</p>
           </>}
           {available ? <>
@@ -108,7 +107,7 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
                 <strong>{money(book.priceGhs)}<small>{indicativeUsd(book.priceGhs,fx)}</small></strong>
               </label>)}
             </fieldset>
-            {!checkout && (canPay ? <Link className="fb-btn fb-btn-primary fb-pay" to={`${bookHref(page.href)}/checkout?edition=${encodeURIComponent(selected.id)}`}>Buy Now</Link>
+            {!checkout && (canPay ? <a className="fb-btn fb-btn-primary fb-pay" href={`${bookHref(page.href)}/checkout?edition=${encodeURIComponent(selected.id)}`}>Buy Now</a>
               : <button className="fb-btn fb-btn-primary" disabled>Checkout temporarily unavailable</button>)}
           </> : <p role="status">Coming Soon · Unavailable for purchase</p>}
           {checkout && available && <form className="fb-form" onSubmit={pay}>
@@ -129,9 +128,9 @@ export default function BookProductPage({slug, checkout=false, basePath="/books"
             <button type="submit" className="fb-btn fb-btn-primary fb-pay" disabled={!canPay||busy}>{busy?"Opening Paystack…":canPay?`Continue to Paystack · ${money(total)}`:"Checkout temporarily unavailable"}</button>
           </form>}
           {!checkout && <section className="fb-related" aria-label="Related books"><h2>Explore other books</h2>
-            <div>{catalog.catalogTitles.filter(item=>item.id!==productId && BOOK_PAGES[item.id]).map(item=><Link key={item.id} to={bookHref(BOOK_PAGES[item.id].href)}>
+            <div>{catalog.catalogTitles.filter(item=>item.id!==productId && BOOK_PAGES[item.id]).map(item=><a key={item.id} href={bookHref(BOOK_PAGES[item.id].href)}>
               <img src={BOOK_PAGES[item.id].cover} alt="" width="70" height="100" /><span>{item.title}{item.status!=="available" && <small>Coming Soon</small>}</span>
-            </Link>)}</div>
+            </a>)}</div>
           </section>}
         </div>
       </section>
