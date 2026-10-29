@@ -53,13 +53,17 @@ export const selectPracticeBookVideos = (resources = []) => {
   });
 };
 
-export default function A1PracticeBookLayout({ day, chapter, title, overview = "", children }) {
+export default function A1PracticeBookLayout({ day, chapter, title, overview = "", aiVideo = null, children }) {
   const [tab, setTab] = useState("overview");
   const [hasMusic, setHasMusic] = useState(false);
   const [musicStatus, setMusicStatus] = useState("loading");
-  const videos = useMemo(() => selectPracticeBookVideos(
-    getA1WorkbookMediaResources({ day, chapter }),
-  ), [day, chapter]);
+  const videos = useMemo(() => {
+    const available = getA1WorkbookMediaResources({ day, chapter });
+    const selected = aiVideo
+      ? [...available.filter((resource) => resource.kind !== "ai"), { ...aiVideo, kind: "ai" }]
+      : available;
+    return selectPracticeBookVideos(selected);
+  }, [day, chapter, aiVideo]);
 
   useEffect(() => {
     let cancelled = false;
