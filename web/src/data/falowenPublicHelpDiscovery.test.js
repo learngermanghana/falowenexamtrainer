@@ -40,7 +40,8 @@ describe("Falowen public help and AI discovery", () => {
       "/campus/examFile",
       "/exams/overview",
       "/exams/study",
-      "/campus/vocab",
+      "/campus/music",
+      "/exams/vocab",
       "/campus/account?tab=billing",
     ].forEach((route) => expect(help).toContain(route));
   });
@@ -59,9 +60,13 @@ describe("Falowen public help and AI discovery", () => {
       label: "Course Book",
       route: "/campus/course",
     });
+    expect(navigation.navigation.find((item) => item.id === "music")).toMatchObject({
+      label: "Music",
+      route: "/campus/music",
+    });
     expect(navigation.navigation.find((item) => item.id === "vocabulary")).toMatchObject({
       label: "Vocab",
-      route: "/campus/vocab",
+      route: "/exams/vocab",
     });
     expect(navigation.intentRoutes.some((item) => item.intent === "submit teacher-marked work")).toBe(true);
     expect(navigation.accessStates.some((item) => item.state === "radio-gated")).toBe(true);
@@ -108,18 +113,20 @@ describe("Falowen public help and AI discovery", () => {
     expect(courseMap.assistantRules.join(" ")).toContain("A1 through C2");
   });
 
-  test("documents the exact current Course Book and Vocab navigation labels", () => {
+  test("documents the current Course Book, Music and Exams Room Vocab destinations", () => {
     [help, llms, guide].forEach((source) => {
       expect(source).toContain("Course Book");
+      expect(source).toContain("Music");
       expect(source).toContain("Vocab");
       expect(source).toContain("/campus/course");
-      expect(source).toContain("/campus/vocab");
+      expect(source).toContain("/campus/music");
+      expect(source).toContain("/exams/vocab");
       expect(source).toContain("My Library");
       expect(source).toContain("Learning Hub");
       expect(source).toContain("My Hub");
     });
-    expect(compactNavigationPatch).toContain('label: "Vocab"');
-    expect(compactNavigationPatch).toContain('route: "/campus/vocab"');
+    expect(compactNavigationPatch).toContain('label: "Music"');
+    expect(compactNavigationPatch).toContain('route: "/campus/music"');
     expect(compactNavigationRunner).toContain(
       'replaceAll(\'key: "learn", label: "Learn"\', \'key: "learn", label: "Course Book"\')'
     );
