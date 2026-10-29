@@ -39,11 +39,13 @@ for(const [level,day] of [['A1',4],['A2',18],['B1',24],['A1',14]])test(level+' D
  click('follow-lyrics');assert.ok(scrolls>before,'enabling follow scrolls without needing a new cue');
  root.querySelector('[data-line="1"]').click();assert.equal(a.currentTime,pack.cues[1].start);
  a.currentTime=0;a.dispatchEvent(new w.Event('seeked'));assert.equal(root.querySelector('[aria-current="true"]'),null);
- d.querySelector('[data-tab="practice"]').click();assert.equal(d.getElementById('detail-practice').hidden,false);
+ click('lyrics-next');assert.equal(d.getElementById('detail-practice').hidden,false);
  const lesson=resolveRecordingLesson(track,{},[],pack);
  const groups=d.querySelectorAll('#listening-questions fieldset');assert.equal(groups.length,2);
  groups.forEach((g,i)=>{g.querySelectorAll('input')[lesson.questions[i].correctIndex].checked=true;});
  click('check-answers');assert.match(d.getElementById('practice-feedback').textContent,/2 of 2 correct/);
+ groups[0].querySelectorAll('input')[(lesson.questions[0].correctIndex+1)%3].checked=true;
+ click('check-answers');assert.match(d.getElementById('practice-feedback').textContent,/1 of 2 correct/);
  dom.window.close();
 });
 test('Day14 without recording timings cannot advertise working Follow or a dead questions button',async()=>{
