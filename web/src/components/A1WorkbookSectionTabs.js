@@ -224,6 +224,12 @@ const restoreManagedElements = (root = document) => {
 
 export const applyA1WorkbookSectionTabs = (root = document, locationLike = window.location) => {
   if (!isA1WorkbookLessonPath(locationLike?.pathname)) return false;
+  // Independent A1 practice books own their Overview / Workbook / Music tabs.
+  // Never mount the older automatic Teil navigation inside those pages.
+  if (root.querySelector?.('[data-a1-practice-book-layout="true"]')) {
+    restoreManagedElements(root);
+    return false;
+  }
   const practiceLesson = resolveA1SharedPracticeLesson({ pathname: locationLike?.pathname });
   if (practiceLesson?.singlePage) {
     restoreManagedElements(root);
