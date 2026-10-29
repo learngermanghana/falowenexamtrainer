@@ -51,6 +51,19 @@ describe("A1 Day 13 focused self-practice", () => {
     expect(workbook).toContain("Write four original German sentences");
   });
 
+  test("never runs the retired Day 13 source-rewriting patch during startup, build or test", () => {
+    const lifecycle = fs.readFileSync(path.resolve(process.cwd(), "..", "scripts", "patchA1TutorNavigationSelfPracticeSafety.mjs"), "utf8");
+    const obsoletePatch = path.resolve(process.cwd(), "..", "scripts", "patchA1Day13RevisionClarity.mjs");
+    expect(lifecycle).not.toContain('import("./patchA1Day13RevisionClarity.mjs")');
+    expect(fs.existsSync(obsoletePatch)).toBe(false);
+    // These current question sets and sentence task belong to the authored
+    // workbook; build-time patching must not attempt legacy seven-sentence edits.
+    expect(workbook).toContain("const timeReviewItems = [");
+    expect(workbook).toContain('id:"t730"');
+    expect(workbook).toContain('id:"t545"');
+    expect(workbook).toContain("Write four original German sentences");
+  });
+
   test("retains the existing A1 tab layout and avoids tutor-marked assignments", () => {
     expect(app).toContain('withA1PracticeBook(13, "3.5"');
     expect(app).toContain("Check numbers, days, time and prices, then learn to form German statements.");
