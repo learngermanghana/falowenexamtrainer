@@ -104,7 +104,7 @@ const validateCourseAudioKey = ({ level, day, key }) => {
     const curatedDay25 = normalizedDay === 25
       && normalizedKey === "b1/day-25/online-shopping-verbraucherservice.mp3";
     const curatedDay24 = normalizedDay === 24
-      && normalizedKey === "b1/day_24/day-24.mp3";
+      && normalizedKey === "b1/day-24/day-25.mp3";
     if (!normalizedKey.startsWith(legacyFlatStem)
       && !normalizedKey.startsWith(folderPrefix)
       && !curatedDay25 && !curatedDay24) return null;

@@ -37,13 +37,13 @@ describe("B1 Day 24 sustainability workbook", () => {
     expect(text.questions.every((question) => question.options.length === 2)).toBe(true);
   });
 
-  test("embeds the requested Goethe listening video as self-check practice", () => {
+  test("uses the new conversation 2 R2 recording and replaces all obsolete smartphone questions", () => {
     const { listening } = B1_DAY24_KONSUM_NACHHALTIGKEIT_WORKBOOK_CONFIG;
-
-    expect(listening.videoId).toBe("zzPpGxzvJCY");
-    expect(listening.externalUrl).toBe("https://youtu.be/zzPpGxzvJCY");
-    expect(listening.selfCheckText).toContain(
-      "The only parts that will be officially evaluated by the school are Lesen (reading) and Schreiben (writing).",
-    );
+    expect(listening.audioKey).toBe("b1/day-24/day-25.mp3");
+    expect(listening.submitRequired).toBe(false);
+    expect(listening.questions).toHaveLength(5);
+    expect(listening.questions.every(item => item.options.length === 0)).toBe(true);
+    expect(listening.questions[0].stem).toMatch(/Worum geht es in dem Gespräch/);
+    expect(JSON.stringify(listening.questions)).not.toMatch(/Jonas|Lisa|Smartphone/);
   });
 });
