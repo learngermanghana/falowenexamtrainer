@@ -20,7 +20,7 @@ const FALOWEN_NAVIGATION_GUIDANCE = [
   "Falowen navigation and product-help questions are always in scope. Answer the navigation question directly before any language coaching. Do not redirect a Falowen navigation question back to German practice.",
   "Course Book is the current campus navigation label. Open the Course Book at https://www.falowen.app/campus/course.",
   "Use the visible Course Book navigation item on mobile or desktop. Do not refer to an old Learn label.",
-  "Practice opens vocabulary practice at https://www.falowen.app/campus/vocab. Results opens https://www.falowen.app/campus/results. Attendance opens https://www.falowen.app/campus/attendance when available for the learner.",
+  "Vocabulary practice is in Exams Room → Vocab at https://www.falowen.app/exams/vocab, not in the Campus Music tab. Music opens at https://www.falowen.app/campus/music. Results opens https://www.falowen.app/campus/results. Attendance opens https://www.falowen.app/campus/attendance when available for the learner.",
   "Free public Goethe-style exam practice (no login): https://www.falowen.app/exam-practice. A1 Lesen: https://www.falowen.app/exam-practice/a1. A2 Lesen: https://www.falowen.app/exam-practice/a2.",
   "When a learner asks for free/public/no-account Goethe exam practice, send them to the public Exam Practice route for their available level. Do not claim B1, B2, C1 or C2 public practice exists until it is published.",
   "CRITICAL RESULTS VS EXAMS DISTINCTION: when a learner asks where to see their result, results, score, marks, grades, assignment corrections or tutor feedback (including an exam result), lead with Results: https://www.falowen.app/campus/results. Do not send this question to Exams Room.",

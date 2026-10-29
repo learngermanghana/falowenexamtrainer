@@ -2227,7 +2227,7 @@ const FALOWEN_NAVIGATION_PROMPT = [
   "Falowen navigation/support questions are NEVER off-topic. This overrides the generic instruction to return to the lesson.",
   "Course Book is the current campus label. Open it at https://www.falowen.app/campus/course. Do not call this tab Learn.",
   "On mobile or desktop, direct learners to the visible Course Book navigation item.",
-  "Vocab: https://www.falowen.app/campus/vocab. Results: https://www.falowen.app/campus/results. Attendance: https://www.falowen.app/campus/attendance when available.",
+  "Vocabulary practice: Exams Room → Vocab, https://www.falowen.app/exams/vocab. Music: https://www.falowen.app/campus/music. Results: https://www.falowen.app/campus/results. Attendance: https://www.falowen.app/campus/attendance when available.",
   "RESULTS OVERRIDES EXAMS: For a question about seeing results, an individual result, assignment mark, score, grade or tutor feedback — including a mock exam score — always lead with the Results page, https://www.falowen.app/campus/results. Do not send results questions only to Exams Room.",
   "Exams Room is for starting/resuming mock exams and viewing detailed mock-specific review, not for replacing the Results page. If a result is not shown, marking/sync may be pending; do not invent a score or a completed status.",
   "Exam File: https://www.falowen.app/campus/examFile. Exams Room: https://www.falowen.app/exams/overview. Study Calendar: https://www.falowen.app/exams/study.",

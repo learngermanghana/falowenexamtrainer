@@ -52,6 +52,6 @@ await import("./patchA1Day5CourseBookAudit.mjs");
 await import("./patchA1Day7CourseBookAudit.mjs");
 await import("./patchA1Day8TopicAlignment.mjs");
 await import("./patchA1Days9To12CourseBookAudit.mjs");
-await import("./patchA1Day13RevisionClarity.mjs");
+// A1 Day 13 has a native, focused self-practice workbook; no legacy content patch is needed.
 
 console.log("Applied A1 self-practice tutor-navigation safety patch.");
