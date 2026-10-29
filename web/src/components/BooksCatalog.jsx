@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import "./BooksCatalog.css";
 
 const ghs = amount => "GH₵" + Number(amount || 0).toFixed(2);
@@ -82,10 +81,10 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
         const available = title.status === "available";
         const offers = books.filter(book => (title.bookIds || []).includes(book.id));
         return <article key={title.id} className="fb-library-card">
-          {BOOK_PAGES[title.id] && <Link className="fb-library-cover-link" to={bookHref(BOOK_PAGES[title.id])}
+          {BOOK_PAGES[title.id] && <a className="fb-library-cover-link" href={bookHref(BOOK_PAGES[title.id])}
               aria-label={"View " + title.title}>
             <img src={BOOK_PAGES[title.id].cover} alt={title.title + " cover"} loading="lazy" width="190" height="269" />
-          </Link>}
+          </a>}
           <div className="fb-library-cardmeta">
             <span>{(title.levelTags || []).join(" · ")}</span><span>{title.pages} pages</span>
           </div>
@@ -99,7 +98,7 @@ export default function BooksCatalog({ catalogTitles = [], books = [], fxQuote, 
             </div>) : <p className="fb-library-coming">Coming soon · Price to be announced</p>}
           </div>
           {BOOK_PAGES[title.id]
-            ? <Link className="fb-btn fb-btn-soft fb-library-action" to={bookHref(BOOK_PAGES[title.id])}>View Book</Link>
+            ? <a className="fb-btn fb-btn-soft fb-library-action" href={bookHref(BOOK_PAGES[title.id])}>View Book</a>
             : available && offers.length && onSelectBook
               ? <button className="fb-btn fb-btn-soft fb-library-action" type="button"
                   onClick={() => onSelectBook(offers[0].id)}>View Book</button>
