@@ -13,7 +13,7 @@ describe("A1 workbook media regression policy", () => {
     const teacherVideos = resources.filter((resource) => resource.kind === "teacher");
 
     expect(teacherVideos).toHaveLength(1);
-    expect(teacherVideos[0].url).toBe("https://youtu.be/zizS5WdOYs8");
+    expect(teacherVideos[0].url).toBe("https://youtu.be/0aprj_rMWw8");
     expect(resources.map((resource) => resource.url)).not.toContain("https://youtu.be/eqSc_5p5uyQ");
   });
 
