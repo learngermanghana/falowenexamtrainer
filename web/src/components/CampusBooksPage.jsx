@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import BookStoreCheckout from "./BookStoreCheckout";
+import "./CampusBooksPage.css";
 
 /**
  * Render the same existing bookstore inside the signed-in Campus shell.
