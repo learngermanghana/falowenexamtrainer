@@ -84,12 +84,13 @@ import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
 import A1Day1GreetingsWorkbookPage from "./components/A1Day1GreetingsWorkbookPage";
 import A1Day2Kapitel11WorkbookPage from "./components/A1Day2Kapitel11WorkbookPage";
 import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3GermanAlphabetReviewingWorkbookPage";
-import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
+import A1Day3SchreibenSprechenKapitel11WorkbookPage, { A1_DAY3_PRACTICE_VIDEOS } from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
 import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
 import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
 import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
 import A1WorkbookRoutePage from "./components/A1WorkbookRoutePage";
+import A1PracticeBookLayout from "./components/A1PracticeBookLayout";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -277,6 +278,12 @@ const getPreferredSection = (allowedSections, preferred, tabStructure, { allowHi
 
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
+
+const withA1PracticeBook = (day, chapter, title, overview, workbookPage, aiVideo = null) => (
+  <A1PracticeBookLayout day={day} chapter={chapter} title={title} overview={overview} aiVideo={aiVideo}>
+    {workbookPage}
+  </A1PracticeBookLayout>
+);
 
 const withRadioWorkbookGate = (level, day, workbookPage) =>
   getLessonRadioResource(level, day) ? (
@@ -985,7 +992,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook"
-            element={<A1Day13RevisionNumbersTimePricesWorkbookPage />}
+            element={withA1PracticeBook(13, "3.5", "Revision: Numbers, Time and Prices", "Revise numbers, time, years, birthdays, prices and sentence building.", <A1Day13RevisionNumbersTimePricesWorkbookPage />)}
           />
           <Route
             path="/campus/course/a1-day-2-german-alphabet-reviewing-workbook"
@@ -997,7 +1004,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"
-            element={<A1Day3SchreibenSprechenKapitel11WorkbookPage />}
+            element={withA1PracticeBook(3, "1.1", "Personal Information and Questions", "Practise introductions, personal information and basic German questions.", <A1Day3SchreibenSprechenKapitel11WorkbookPage hidePracticeMedia />, A1_DAY3_PRACTICE_VIDEOS[0])}
           />
           <Route
             path="/campus/course/a1-day-3-kapitel-1-2-workbook"
@@ -1009,11 +1016,11 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"
-            element={<A1Day5IntroducingYourselfArticlesWorkbookPage />}
+            element={withA1PracticeBook(5, "1.2", "Personal Information, Articles and W-Questions", "Practise personal information, German articles, adjectives and W-questions.", <A1Day5IntroducingYourselfArticlesWorkbookPage />)}
           />
           <Route
             path="/campus/course/a1-day-6-family-and-hobbies-workbook"
-            element={<A1WorkbookRoutePage />}
+            element={withA1PracticeBook(6, "2.3", "Family and Hobbies", "Practise family vocabulary, languages, questions and hobbies.", <A1WorkbookRoutePage />)}
           />
           <Route
             path="/campus/course/a2-day-1-small-talk-workbook"
@@ -1131,7 +1138,7 @@ const AppShell = ({
             path="/campus/course/a1-day-12-the-24-hour-clock-and-dates"
             element={<A1Day12TwentyFourHourClockDatesPage />}
           />
-          <Route path="/campus/course/modal-verbs-day-14-3-6" element={<A1Day14ModalVerbsWorkbookPage />} />
+          <Route path="/campus/course/modal-verbs-day-14-3-6" element={withA1PracticeBook(14, "3.6", "Modal Verbs with Separable Verbs", "Review modal verbs and complete the existing examples, exercises and knowledge checks.", <A1Day14ModalVerbsWorkbookPage />)} />
           <Route path="/campus/course/food-and-negation-day-16-9-10" element={<A1Day16FoodAndNegationGrammarPage />} />
           <Route
             path="/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook"

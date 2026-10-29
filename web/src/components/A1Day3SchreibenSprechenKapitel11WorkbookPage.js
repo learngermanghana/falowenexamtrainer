@@ -185,7 +185,7 @@ const getClickedQuestionAnswer = (root, target) => {
   return { questionId, option };
 };
 
-export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
+export default function A1Day3SchreibenSprechenKapitel11WorkbookPage({ hidePracticeMedia = false } = {}) {
   const rootRef = useRef(null);
   const [biographyMount, setBiographyMount] = useState(null);
   const [liveResponseMounts, setLiveResponseMounts] = useState({});
@@ -231,18 +231,19 @@ export default function A1Day3SchreibenSprechenKapitel11WorkbookPage() {
 
   return (
     <div ref={rootRef}>
-      <div
-        data-a1-workbook-owned-media="true"
-        data-radio-first-workbook-gate="true"
-        style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}
-      >
-        <SelfLearningSupportingMaterials
-          teacherVideo={A1_DAY3_KAPITEL_11_TEACHER_VIDEO}
-          aiVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
-          description="Watch the teacher lecture and AI lesson, then use the Kapitel 1.1 practice book for personal information, articles, adjectives and W-questions."
-        />
-
-      </div>
+      {!hidePracticeMedia ? (
+        <div
+          data-a1-workbook-owned-media="true"
+          data-radio-first-workbook-gate="true"
+          style={{ width: "min(1120px, calc(100% - 24px))", margin: "16px auto 0" }}
+        >
+          <SelfLearningSupportingMaterials
+            teacherVideo={A1_DAY3_KAPITEL_11_TEACHER_VIDEO}
+            aiVideo={A1_DAY3_PRACTICE_VIDEOS[0]}
+            description="Watch the teacher lecture and AI lesson, then use the Kapitel 1.1 practice book for personal information, articles, adjectives and W-questions."
+          />
+        </div>
+      ) : null}
 
       <A1Day3SchreibenSprechenKapitel11WorkbookPageLegacy />
 
