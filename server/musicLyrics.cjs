@@ -48,11 +48,13 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const recorded = timings.recordings?.find(pack => pack.objectKey === objectKey);
     const checkedRecording = validateLyrics(recorded, objectKey);
     if (checkedRecording) return res.status(200).json(checkedRecording);
-    // Exact-object owner lyrics remain readable before manual timing exists.
-    // A valid uploaded sidecar still takes precedence so reviewed cues can be added later.
+    // Exact-object owner lyrics, including clearly labeled waveform-guided drafts,
+    // remain available when no R2 sidecar exists. A teacher-reviewed R2 .lyrics.json
+    // always wins over an estimated draft; never let a bundled approximation block it.
     const approved = approvedLyrics.recordings?.find(pack => pack.objectKey === objectKey);
-    const fallback = approved && (!approved.cues || !approved.cues.length) ? validateLyrics(approved, objectKey) : null;
-    const sendFallback = () => res.status(200).json({...fallback, source:'owner-supplied', timingStatus:'missing'});
+    const fallback = approved ? validateLyrics(approved, objectKey) : null;
+    const sendFallback = () => res.status(200).json({...fallback,
+      source:'owner-supplied', timingStatus:approved?.timingStatus || 'missing'});
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
