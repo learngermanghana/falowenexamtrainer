@@ -1,0 +1,23 @@
+name: B1 Day 7 current listening key
+on:
+  pull_request:
+    paths:
+      - 'functions/data/answerKeyManifest.json'
+      - 'web/src/data/b1Day7WorkbookData.js'
+      - 'tests/b1-day7-answer-key.test.cjs'
+      - '.github/workflows/b1-day7-answer-key.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'functions/data/answerKeyManifest.json'
+      - 'web/src/data/b1Day7WorkbookData.js'
+      - 'tests/b1-day7-answer-key.test.cjs'
+jobs:
+  current-key:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test tests/b1-day7-answer-key.test.cjs
