@@ -8,7 +8,7 @@ const recordings=read('approved-recording-lyrics.json').recordings;
 const timing=read('timings.json').recordings;
 test('public catalog lists latest approved classroom recordings without older A1 versions',()=>{
   const pins=catalog.tracks.filter(t=>t.approved===true);
-  expect(pins).toHaveLength(10);
+  expect(pins).toHaveLength(11);
   const keys=pins.map(t=>t.objectKey);
   expect(new Set(keys).size).toBe(keys.length);
   expect(keys).not.toContain('music/a1/day-04/welche-nummer-hast-du.mp3');
@@ -96,4 +96,33 @@ test('R2 sidecar lines must match the owner-approved recording before overriding
   expect(sameSungLines('[Chorus]'+String.fromCharCode(10)+'Endlich Urlaub, endlich frei.', 'Endlich Urlaub, endlich frei.')).toBe(true);
   expect(sameSungLines(pack.lyrics,pack.lyrics.replace('Seit Monaten spar ich Geld,','Früher bin ich spät aufgestanden.'))).toBe(false);
   expect(sameSungLines(pack.lyrics,recordings.find(x=>x.assignmentKey==='A2-9.24').lyrics)).toBe(false);
+});
+
+
+test('A2 Day 27 Handys weg is pinned to exact R2 recording, with complete lyrics and no fabricated cues',async()=>{
+  const track=catalog.tracks.find(x=>x.assignmentKey==='A2-10.27');
+  const pack=recordings.find(x=>x.assignmentKey==='A2-10.27');
+  expect(track).toBeDefined();
+  expect(track.id).toBe('r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM');
+  expect(track.objectKey).toBe('music/a2/day-27/Handys weg.mp3');
+  expect(Buffer.from(track.id.split('b64_')[1],'base64url').toString('utf8')).toBe('Handys weg.mp3');
+  expect(pack.trackId).toBe(track.id);
+  expect(pack.lyrics).toBe(lessons[track.id].lyrics);
+  expect(pack.timingStatus).toBe('missing');
+  expect(pack.cues).toEqual([]);
+  expect(lessons[track.id].questions).toHaveLength(3);
+  const lines=pack.lyrics.split('\\n').filter(line=>line.trim()&&!line.startsWith('['));
+  expect(lines).toHaveLength(28);
+  expect(pack.lyrics).toContain('Heute Morgen schreibt mir Mia,');
+  expect(pack.lyrics).toContain('um vier Uhr nachmittags, ganz in der Näh’.');
+  expect(pack.lyrics).not.toContain('Mit Falowen schreibe ich klare Nachrichten');
+  const {createLyricsHandler,sameSungLines}=require('../../../server/musicLyrics.cjs');
+  expect(sameSungLines(pack.lyrics,'[Verse 1]\\nMia schreibt mir eine Nachricht.')).toBe(false);
+  const handler=createLyricsHandler({env:{},fetchImpl:async()=>{throw new Error('No R2 audio sidecar')}});
+  const response={code:200,data:null,setHeader(){return this},status(x){this.code=x;return this},json(x){this.data=x;return this}};
+  await handler({method:'GET',query:{track:track.id}},response);
+  expect(response.code).toBe(200);
+  expect(response.data.lyrics).toBe(pack.lyrics);
+  expect(response.data.cues).toEqual([]);
+  expect(response.data.timingStatus).toBe('missing');
 });
