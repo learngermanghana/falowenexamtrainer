@@ -337,6 +337,17 @@
       "recordingSha256": "84d4697e7c03467ae8bbe2b13e6e8700029f2e3bbb287d1ba9067cea0791fd29",
       "duration": 177.12,
       "timingStatus": "estimated"
+    },
+    {
+      "trackId": "r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM",
+      "objectKey": "music/a2/day-27/Handys weg.mp3",
+      "assignmentKey": "A2-10.27",
+      "title": "Eine Nachricht von Mia",
+      "lyrics": "[Verse 1]\nHeute Morgen schreibt mir Mia,\nsie fragt: „Hast du heute Zeit?“\nDoch ich bin schon auf dem Weg zur Arbeit,\nund mein Handy liegt ganz weit.\nErst am Abend seh’ ich ihre Nachricht,\nich denke: „Oh, das tut mir leid!“\nIch wollte ihr schon früher schreiben,\ndoch der Tag ging viel zu schnell vorbei.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal leg' ich mein Handy weg,\nweil das echte Leben Freude macht.\n\n[Verse 2]\nIch schreibe Mia: „Tut mir leid,\nich hatte heute leider keine Zeit.“\nSie antwortet: „Mach dir keine Sorgen,\nwie wär’s mit einem Treffen morgen?“\nWir verabreden uns im kleinen Café,\num vier Uhr nachmittags, ganz in der Näh’.\nDann legen wir die Handys weg,\nund freuen uns auf unser Treffen.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal leg' ich mein Handy weg,\nweil das echte Leben Freude macht.\n\n[Outro]\nAm nächsten Tag sitz' ich mit Mia,\nwir erzählen uns so viel.\nDie Handys bleiben in den Taschen,\ndenn heute zählt nur unser Gespräch.",
+      "cues": [],
+      "genre": "Electro-Soul",
+      "timingStatus": "missing",
+      "source": "Owner-approved new recording text; no audio available for recording-specific timestamps, pending manual synchronization"
     }
   ]
 }
