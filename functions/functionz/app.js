@@ -31,6 +31,7 @@ const { getA1TutorRequestCard, tutorRequestPrompt, parseA1TutorRequestScore } = 
 const { isReleasedMockHoerenAudio } = require("./publishedMockHoerenAccess");
 const { verifyTeacherApprovedA2Mock3Audio } = require("./a2Mock3PublishedAudio");
 const { verifyA2Mock04Audio } = require("./a2Mock04PublishedAudio");
+const { verifyA2Mock05Audio } = require("./a2Mock05PublishedAudio");
 const { publicB1Mock2Hoeren, markB1Mock2Hoeren } = require("./b1Mock2Hoeren");
 const { PART_KEYS: B1_MOCK2_AUDIO, verifyB1Mock2Audio } = require("./b1Mock2PublishedAudio");
 const { resolveTrialAudioRequest } = require("./freeHoerenTrial");
@@ -1180,8 +1181,10 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const isApprovedMock4Part = validated.mockId === "mock-04" &&
       ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
+    const isApprovedMock5Part = validated.mockId === "mock-05" &&
+      ["teil-1", "teil-2", "teil-3", "teil-4"].includes(validated.part);
     const released = await isReleasedMockHoerenAudio({ db, ...validated });
-    if (!released && !isApprovedMock3Part && !isApprovedMock4Part) {
+    if (!released && !isApprovedMock3Part && !isApprovedMock4Part && !isApprovedMock5Part) {
       return res.status(404).json({ error: "Mock Hören recording is not published." });
     }
     const signed = await createA2MockAudioSignedUrl(validated);
@@ -1194,6 +1197,11 @@ app.get("/course-media/a2/mock-audio-url", async (req, res) => {
       ...validated, signedUrl: signed.url,
     }))) {
       return res.status(404).json({ error: "A2 Mock 04 Hören is unavailable until the approved MP3 is uploaded." });
+    }
+    if (isApprovedMock5Part && !(await verifyA2Mock05Audio({
+      ...validated, signedUrl: signed.url,
+    }))) {
+      return res.status(404).json({ error: "A2 Mock 05 Hören is unavailable until the approved MP3 is uploaded." });
     }
     res.set("Cache-Control", "private, no-store");
     return res.json({
@@ -5643,8 +5651,8 @@ app.post("/a2-mock/attempt/start", async (req, res) => {
         }
       }
 
-      const assessmentVersion = mockId === "a2-mock-04" ? "four-module-v2"
-        : /^a2-mock-0[5-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
+      const assessmentVersion = ["a2-mock-04", "a2-mock-05"].includes(mockId) ? "four-module-v2"
+        : /^a2-mock-0[6-8]$/.test(mockId) ? "three-module-v1" : "four-module-v1";
       const isSecondMock = mockId !== "a2-mock-01";
       const attemptCount = Math.max(0, Number(isSecondMock
         ? userData.attemptCountByMock?.[mockId] || 0 : userData.attemptCount || 0));

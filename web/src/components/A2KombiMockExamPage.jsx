@@ -13,6 +13,7 @@ import "./A2GoetheWritingMockPreview.css";
 
 const LEGACY_ORDER=["lesen","schreiben","sprechen"];
 const FULL_ORDER=["lesen","hoeren","schreiben","sprechen"];
+const HAS_NEW_HOEREN = new Set(["a2-mock-04", "a2-mock-05"]);
 const orderFor=flow=>flow?.attemptInfo?.assessmentVersion==="four-module-v2"?FULL_ORDER:LEGACY_ORDER;
 const LABELS={lesen:"Lesen",hoeren:"Hören",schreiben:"Schreiben",sprechen:"Sprechen"};
 const read=key=>{try{return JSON.parse(localStorage.getItem(key)||"{}")||{};}catch{return {};}};
@@ -81,7 +82,7 @@ function A2KombiAttempt({mockNumber,paper}) {
   const attemptId=flow.attemptInfo?.attemptId;
   const stage=flow.stage||"intro";
   const order=orderFor(flow);
-  const displayOrder=stage==="intro"&&paper.id==="a2-mock-04"?FULL_ORDER:order;
+  const displayOrder=stage==="intro"&&HAS_NEW_HOEREN.has(paper.id)?FULL_ORDER:order;
   const currentTimeState=stage==="lesen"?lesen:stage==="hoeren"?hoeren:stage==="schreiben"?writing:null;
   const msRemaining=currentTimeState?.startedAt?currentTimeState.startedAt+duration[stage]-now:duration[stage]||0;
 
@@ -128,11 +129,11 @@ function A2KombiAttempt({mockNumber,paper}) {
       // teacher-approved R2 recordings to pass server-side SHA-256 verification.
       // This prevents students from starting an exam with missing Hören audio.
       // Existing in-progress /75 attempts resume through reconnect(), not begin().
-      if(paper.id==="a2-mock-04"){
+      if(HAS_NEW_HOEREN.has(paper.id)){
         for(let n=1;n<=4;n++){
           await fetchA2MockAudioPlaybackUrl({
-            mockId:"mock-04",part:`teil-${n}`,
-            key:`a2/mock-hoeren/mock-04/teil-${n}.mp3`,idToken
+            mockId:paper.id.slice(3),part:`teil-${n}`,
+            key:`a2/mock-hoeren/${paper.id.slice(3)}/teil-${n}.mp3`,idToken
           });
         }
       }
@@ -228,8 +229,8 @@ function A2KombiAttempt({mockNumber,paper}) {
     </section>
     {stage==="intro"?<section className="a2-mock2-full-intro">
       <h2>Start A2 Mock {mockNumber}</h2>
-      <p>Complete Lesen, {paper.id==="a2-mock-04"?"Hören, ":""}Schreiben and Sprechen. Your work is saved as you go.</p>
-      <p>The verified score is out of <strong>{paper.id==="a2-mock-04"?100:75} points</strong>.</p>
+      <p>Complete Lesen, {HAS_NEW_HOEREN.has(paper.id)?"Hören, ":""}Schreiben and Sprechen. Your work is saved as you go.</p>
+      <p>The verified score is out of <strong>{HAS_NEW_HOEREN.has(paper.id)?100:75} points</strong>.</p>
       <button type="button" className="a2-mock2-primary" onClick={begin} disabled={connecting||!idToken}>
         {connecting?"Connecting…":"Start mock exam"}
       </button>
@@ -265,7 +266,7 @@ function A2KombiAttempt({mockNumber,paper}) {
         </footer>
       </article>
     </section>:null}
-    {stage==="hoeren"&&paper.id==="a2-mock-04"?<A2Mock04Hoeren idToken={idToken}
+    {stage==="hoeren"&&HAS_NEW_HOEREN.has(paper.id)?<A2Mock04Hoeren mockId={paper.id} idToken={idToken}
       value={hoeren.answers||{}} timeRemaining={asTime(msRemaining)}
       onChange={answers=>setHoeren(old=>({...old,answers}))} onSubmit={submitHoeren}/>:null}
     {stage==="schreiben"?<section className="a2-mock2-shell" lang="de">
