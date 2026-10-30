@@ -120,3 +120,40 @@ test('B1 Day 25 private consumer-service recording uses existing staff-only R2 s
  assert.match(index,/\/course-media\/classroom\/audio-url/);
  assert.match(index,/createClassroomAudioHandler/);
 });
+
+
+test('A2 Day 20 complaint playback signs the exact private object only for verified staff', async () => {
+ const {createClassroomBankAudioHandler,createClassroomAudioHandler}=require('../server/courseMusic.cjs');
+ const key='a2/day-20/reklamation-falsches-hemd.mp3';
+ const staff={localId:'teacher',customAttributes:'{"role":"teacher"}'};
+ const cases=[
+  [null,key,20,401],
+  [{localId:'student',email:'student@example.com'},key,20,403],
+  [staff,key,20,200],
+  [{...staff,disabled:true},key,20,401],
+  [staff,key,19,400],
+  [staff,'a2/day-20/other.mp3',20,400],
+  [staff,'a2/day-20/../private.mp3',20,400],
+  [staff,'a2/day-20/reklamation-falsches-hemd.wav',20,400],
+ ];
+ for(const createHandler of [createClassroomBankAudioHandler,createClassroomAudioHandler]){
+  for(const [account,requested,day,expected] of cases){
+   const res=response();
+   await createHandler({env,fetchImpl:async()=>({ok:true,json:async()=>({users:account?[account]:[]})})})({method:'GET',
+    headers:account?{authorization:'Bearer verified-token',origin:'https://admin.falowen.app'}:{},
+    url:`/?${new URLSearchParams({level:'A2',day:String(day),key:requested})}`},res);
+   assert.equal(res.code,expected,`${day} ${requested}`);
+   assert.equal(Boolean(res.body.url),expected===200);
+   if(expected===200){
+    const url=new URL(res.body.url);
+    assert.equal(url.pathname,'/'+key);
+    assert.equal(url.hostname,`falowen-course-audio.${env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`);
+    assert.equal(url.searchParams.get('X-Amz-Expires'),'3600');
+    assert.match(url.searchParams.get('X-Amz-Signature'),/^[a-f0-9]{64}$/);
+    assert.equal(res.headers['Cache-Control'],'private, no-store');
+    assert.equal(res.headers['Access-Control-Allow-Origin'],'https://admin.falowen.app');
+   }
+  }
+ }
+ assert.throws(()=>signTrack('a2-day20-complaint',env),/Unknown/);
+});
