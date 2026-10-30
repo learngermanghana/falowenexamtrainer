@@ -55,7 +55,7 @@ test('Day 25 cue order is complete and the audio-specific timing remains explici
   const {validateLyrics,createLyricsHandler}=require('../../../server/musicLyrics.cjs');
   const pack=recordings.find(x=>x.assignmentKey==='A2-9.25');
   const day24=recordings.find(x=>x.assignmentKey==='A2-9.24');
-  const lines=pack.lyrics.split(/\\r?\\n/).filter(x=>x.trim()&&!/^\\[.*\\]$/.test(x.trim()));
+  const lines=pack.lyrics.split(String.fromCharCode(10)).filter(x=>x.trim()&&!x.trim().startsWith('['));
   expect(pack.timingStatus).toBe('estimated');
   expect(day24.cues).toEqual([]);
   expect(pack.cues).toHaveLength(49);
