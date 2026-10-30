@@ -30,7 +30,7 @@ test('A2 Day 24 and Day 25 have separate URL and lyrics despite shared filename'
   for(const t of [p24,p25]){
     const pack=recordings.find(x=>x.objectKey===t.objectKey);
     expect(pack.trackId).toBe(t.id);
-    expect(pack.cues).toEqual([]);
+    expect(pack.cues).toHaveLength(t.day === 25 ? 49 : 0);
     expect(lessons[t.id].lyrics).toBe(pack.lyrics);
     expect(lessons[t.id].questions).toHaveLength(3);
   }
@@ -49,4 +49,51 @@ test('retired static timing packs cannot reactivate old learning tracks',()=>{
   const app=fs.readFileSync(path.join(music,'app.js'),'utf8');
   expect(app).toContain('publishedDays.has(track.level+":"+track.day)');
   expect(app).toContain('catalog=[...pinnedTracks,...dynamic.filter(');
+});
+
+test('Day 25 cue order is complete and the audio-specific timing remains explicitly a draft',()=>{
+  const {validateLyrics,createLyricsHandler}=require('../../../server/musicLyrics.cjs');
+  const pack=recordings.find(x=>x.assignmentKey==='A2-9.25');
+  const day24=recordings.find(x=>x.assignmentKey==='A2-9.24');
+  const lines=pack.lyrics.split(String.fromCharCode(10)).filter(x=>x.trim()&&!x.trim().startsWith('['));
+  expect(pack.timingStatus).toBe('estimated');
+  expect(day24.cues).toEqual([]);
+  expect(pack.cues).toHaveLength(49);
+  expect(lines).toHaveLength(49);
+  const validated=validateLyrics(pack,pack.objectKey);
+  expect(validated?.cues).toHaveLength(49);
+  expect(pack.cues[0].start).toBeGreaterThan(10);
+  expect(pack.cues.at(-1).end).toBeLessThanOrEqual(pack.duration);
+  for(let i=0;i<pack.cues.length;i++){
+    expect(pack.cues[i].text).toBe(lines[i].trim());
+    expect(pack.cues[i].end).toBeGreaterThan(pack.cues[i].start);
+    if(i>0)expect(pack.cues[i].start).toBeGreaterThan(pack.cues[i-1].end);
+  }
+  expect(validateLyrics({...pack,objectKey:'music/a2/day-24/Endlich Urlaub.mp3'},pack.objectKey)).toBeNull();
+});
+test('music API offers estimated cues if a reviewed R2 sidecar is not available',async()=>{
+  const {createLyricsHandler}=require('../../../server/musicLyrics.cjs');
+  const pack=recordings.find(x=>x.assignmentKey==='A2-9.25');
+  const handler=createLyricsHandler({env:{},fetchImpl:async()=>{throw new Error('R2 offline')}});
+  const response={code:200,headers:{},data:null,
+    setHeader(k,v){this.headers[k]=v;return this},
+    status(x){this.code=x;return this},
+    json(x){this.data=x;return this}
+  };
+  await handler({method:'GET',query:{track:pack.trackId}},response);
+  expect(response.code).toBe(200);
+  expect(response.data.timingStatus).toBe('estimated');
+  expect(response.data.objectKey).toBe(pack.objectKey);
+  expect(response.data.cues).toHaveLength(49);
+  const app=fs.readFileSync(path.join(music,'app.js'),'utf8');
+  expect(app).toContain('lesson.timingStatus === "estimated"');
+});
+
+test('R2 sidecar lines must match the owner-approved recording before overriding cues',()=>{
+  const {sameSungLines}=require('../../../server/musicLyrics.cjs');
+  const pack=recordings.find(x=>x.assignmentKey==='A2-9.25');
+  expect(sameSungLines(pack.lyrics,pack.lyrics)).toBe(true);
+  expect(sameSungLines('[Chorus]'+String.fromCharCode(10)+'Endlich Urlaub, endlich frei.', 'Endlich Urlaub, endlich frei.')).toBe(true);
+  expect(sameSungLines(pack.lyrics,pack.lyrics.replace('Seit Monaten spar ich Geld,','Früher bin ich spät aufgestanden.'))).toBe(false);
+  expect(sameSungLines(pack.lyrics,recordings.find(x=>x.assignmentKey==='A2-9.24').lyrics)).toBe(false);
 });

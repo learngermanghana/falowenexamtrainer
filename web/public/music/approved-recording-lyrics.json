@@ -85,11 +85,258 @@
       "assignmentKey": "A2-9.25",
       "title": "Endlich Urlaub",
       "lyrics": "[Intro]\nHeya, heya!\nDie Reise geht los.\n\n[Verse 1]\nSeit Monaten spar ich Geld,\nIch möchte endlich etwas sehen.\nMein Traum ist eine Reise nach Hamburg,\nJetzt kann ich wirklich fahren.\nIch suche ein Hotel im Internet,\nEin schönes Zimmer, nicht zu teuer.\nMein Ticket buche ich am Montag,\nAm Samstag geht die Reise los.\n\n[Chorus]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nMein Koffer steht schon längst bereit.\nMein Koffer steht schon längst bereit.\nHeya, heya!\nIch bin bereit.\nHeya, heya!\nEs ist so weit.\nDie Reise geht los.\nDie Reise geht los.\nHamburg, ich freue mich auf dich!\n\n[Post-Chorus]\nIch freue mich auf dich!\n\n[Verse 2]\nAm Freitag packe ich meinen Koffer,\nMein Handy und die Kamera.\nAm Samstag stehe ich früh auf,\nMein Zug fährt schon um acht Uhr ab.\nIch sitze ruhig am Fenster,\nDie Sonne scheint, der Himmel ist blau.\nIch sehe Felder, Häuser, Bäume\nUnd freue mich auf meine Reise.\n\n[Chorus]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nMein Koffer steht schon längst bereit.\nMein Koffer steht schon längst bereit.\nHeya, heya!\nIch bin bereit.\nHeya, heya!\nEs ist so weit.\nDie Reise geht los.\nDie Reise geht los.\nHamburg, ich freue mich auf dich!\n\n[Outro]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nHeya, heya!\nDie Reise geht los.\nHeya, heya!\nDie Reise geht los.\nHmm …\nDie Reise geht los.",
-      "cues": [],
+      "cues": [
+        {
+          "start": 12.45,
+          "end": 15.18,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 15.3,
+          "end": 18.1,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 21.22,
+          "end": 24.42,
+          "text": "Seit Monaten spar ich Geld,"
+        },
+        {
+          "start": 25,
+          "end": 27.91,
+          "text": "Ich möchte endlich etwas sehen."
+        },
+        {
+          "start": 28.03,
+          "end": 31.83,
+          "text": "Mein Traum ist eine Reise nach Hamburg,"
+        },
+        {
+          "start": 32.5,
+          "end": 35.7,
+          "text": "Jetzt kann ich wirklich fahren."
+        },
+        {
+          "start": 38.15,
+          "end": 41.35,
+          "text": "Ich suche ein Hotel im Internet,"
+        },
+        {
+          "start": 41.67,
+          "end": 44.88,
+          "text": "Ein schönes Zimmer, nicht zu teuer."
+        },
+        {
+          "start": 45,
+          "end": 48.2,
+          "text": "Mein Ticket buche ich am Montag,"
+        },
+        {
+          "start": 50.6,
+          "end": 53.8,
+          "text": "Am Samstag geht die Reise los."
+        },
+        {
+          "start": 55.3,
+          "end": 58.43,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 58.55,
+          "end": 61.75,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 63.07,
+          "end": 66.36,
+          "text": "Mein Koffer steht schon längst bereit."
+        },
+        {
+          "start": 66.48,
+          "end": 69.72,
+          "text": "Mein Koffer steht schon längst bereit."
+        },
+        {
+          "start": 69.84,
+          "end": 72.45,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 72.57,
+          "end": 74.8,
+          "text": "Ich bin bereit."
+        },
+        {
+          "start": 74.92,
+          "end": 77.64,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 77.76,
+          "end": 80.56,
+          "text": "Es ist so weit."
+        },
+        {
+          "start": 81.01,
+          "end": 83.81,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 84.93,
+          "end": 86.98,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 87.1,
+          "end": 90.9,
+          "text": "Hamburg, ich freue mich auf dich!"
+        },
+        {
+          "start": 91.9,
+          "end": 95.1,
+          "text": "Ich freue mich auf dich!"
+        },
+        {
+          "start": 98.2,
+          "end": 101.18,
+          "text": "Am Freitag packe ich meinen Koffer,"
+        },
+        {
+          "start": 101.3,
+          "end": 104.5,
+          "text": "Mein Handy und die Kamera."
+        },
+        {
+          "start": 105.1,
+          "end": 108.28,
+          "text": "Am Samstag stehe ich früh auf,"
+        },
+        {
+          "start": 108.4,
+          "end": 110.88,
+          "text": "Mein Zug fährt schon um acht Uhr ab."
+        },
+        {
+          "start": 111,
+          "end": 113.83,
+          "text": "Ich sitze ruhig am Fenster,"
+        },
+        {
+          "start": 113.95,
+          "end": 116.38,
+          "text": "Die Sonne scheint, der Himmel ist blau."
+        },
+        {
+          "start": 116.5,
+          "end": 119.06,
+          "text": "Ich sehe Felder, Häuser, Bäume"
+        },
+        {
+          "start": 119.18,
+          "end": 122.38,
+          "text": "Und freue mich auf meine Reise."
+        },
+        {
+          "start": 123.35,
+          "end": 126.18,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 126.3,
+          "end": 129.5,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 129.7,
+          "end": 132.18,
+          "text": "Mein Koffer steht schon längst bereit."
+        },
+        {
+          "start": 132.3,
+          "end": 135.68,
+          "text": "Mein Koffer steht schon längst bereit."
+        },
+        {
+          "start": 135.8,
+          "end": 137.83,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 137.95,
+          "end": 140.28,
+          "text": "Ich bin bereit."
+        },
+        {
+          "start": 140.4,
+          "end": 142.88,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 143,
+          "end": 145.58,
+          "text": "Es ist so weit."
+        },
+        {
+          "start": 145.7,
+          "end": 148.5,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 148.9,
+          "end": 150.88,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 151,
+          "end": 153.48,
+          "text": "Hamburg, ich freue mich auf dich!"
+        },
+        {
+          "start": 153.6,
+          "end": 156.28,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 156.4,
+          "end": 159.6,
+          "text": "Endlich Urlaub, endlich frei."
+        },
+        {
+          "start": 160,
+          "end": 162.68,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 162.8,
+          "end": 165.6,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 166.9,
+          "end": 169.28,
+          "text": "Heya, heya!"
+        },
+        {
+          "start": 169.4,
+          "end": 171.58,
+          "text": "Die Reise geht los."
+        },
+        {
+          "start": 171.7,
+          "end": 172.88,
+          "text": "Hmm …"
+        },
+        {
+          "start": 173,
+          "end": 175.4,
+          "text": "Die Reise geht los."
+        }
+      ],
       "genre": "Warm Reggae-Pop",
-      "source": "Transcribed from owner-attached MP3; line timestamps and transcription require owner review",
+      "source": "Waveform-guided line-onset draft matched to owner-uploaded MP3 (SHA-256 in recordingSha256); requires manual auditory review before certification. A reviewed R2 lyrics sidecar supersedes this draft.",
       "recordingSha256": "84d4697e7c03467ae8bbe2b13e6e8700029f2e3bbb287d1ba9067cea0791fd29",
-      "duration": 177.12
+      "duration": 177.12,
+      "timingStatus": "estimated"
     }
   ]
 }
