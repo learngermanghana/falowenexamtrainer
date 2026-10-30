@@ -28,8 +28,10 @@ function validateLyrics(data, objectKey) {
   return { objectKey, lyrics, cues };
 }
 function sameSungLines(a,b) {
-  const lines=text => String(text||'').replace(/\\\\n/g,'\\n').split(/\\r?\\n/)
-    .map(s=>s.trim()).filter(s=>s&&!/^\\[.*\\]$/.test(s));
+  const lines=text => String(text||'')
+    .replaceAll(String.fromCharCode(92)+'n',String.fromCharCode(10))
+    .split(String.fromCharCode(10))
+    .map(s=>s.trim()).filter(s=>s&&!(s.startsWith('[')&&s.endsWith(']')));
   return JSON.stringify(lines(a))===JSON.stringify(lines(b));
 }
 async function readBounded(response) {
