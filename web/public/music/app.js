@@ -305,7 +305,12 @@ function renderLyrics(lesson) {
   highlightedLine = -1;
   byId("follow-lyrics").disabled = !renderedCues.length;
   byId("follow-lyrics").checked = followLyrics && renderedCues.length>0;
-  const note = el("p", "detail-note", lesson.referenceOnly ? "COURSE DRAFT — These are the original Music Studio lyrics for this lesson, not verified against this MP3. Words may differ from the recording. Timed highlighting is unavailable until matching lyrics are published." : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it." : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
+  const note = el("p", "detail-note", lesson.referenceOnly
+    ? "COURSE DRAFT — Original studio lyrics, not verified against this MP3. Timed highlighting is unavailable."
+    : lesson.timingStatus === "estimated" && renderedCues.length
+      ? "TIMING DRAFT — The highlighted lines follow waveform-guided cue estimates for this recording. You can tap a line to replay it; exact starts still require a teacher listening review."
+      : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it."
+      : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
   root.append(note);
   let index = 0;
   for (const raw of String(lesson.lyrics || "").replace(/\\n/g, "\n").split(/\r?\n/)) {
