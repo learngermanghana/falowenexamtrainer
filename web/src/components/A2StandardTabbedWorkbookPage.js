@@ -170,9 +170,9 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
   const hoerenAudioKey = String(listeningConfig?.audioKey || "").trim();
   const hoerenAudioUrl = listeningConfig?.audioUrl || "";
   const hoerenQuestions = listeningConfig?.questions || [];
-  // Keep recorded teacher lectures for Days 16–18 available inside their
+  // Keep recorded teacher lectures for Days 16–18 and 20 available inside their
   // direct workbooks as well as the Course Book; AI grammar and Hören are separate.
-  const inlineTeacherLecture = [16, 17, 18].includes(Number(day))
+  const inlineTeacherLecture = [16, 17, 18, 20].includes(Number(day))
     ? getTeacherLectureVideoResources("A2", day)[0] || null
     : null;
   const inlineTeacherVideoId = extractYouTubeId(inlineTeacherLecture?.url);
@@ -233,6 +233,7 @@ const A2StandardTabbedWorkbookPage = ({ day, title, chapter, topicPrompt, workbo
                 data-a2-day16-teacher-lecture={Number(day) === 16 ? "true" : undefined}
                 data-a2-day17-teacher-lecture={Number(day) === 17 ? "true" : undefined}
                 data-a2-day18-teacher-lecture={Number(day) === 18 ? "true" : undefined}
+                 data-a2-day20-teacher-lecture={Number(day) === 20 ? "true" : undefined}
                 style={{
                   border: "1px solid #bfdbfe",
                   borderRadius: 12,

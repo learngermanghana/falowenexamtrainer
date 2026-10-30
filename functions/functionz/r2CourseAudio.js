@@ -115,8 +115,9 @@ const validateCourseAudioKey = ({ level, day, key }) => {
   // permission to sign arbitrary objects from this directory.
   if (normalizedLevel === "A2" && normalizedDay === 18
     && normalizedKey !== "a2/day-18/bank-telefonat.mp3") return null;
+  // Day 20's new pullover complaint recording is the only signed A2 Day 20 asset.
   if (normalizedLevel === "A2" && normalizedDay === 20
-    && normalizedKey !== "a2/day-20/reklamation-falsches-hemd.mp3") return null;
+    && normalizedKey !== "a2/day-20/day-20.mp3") return null;
   if (!isAudioObjectKey(normalizedKey)) return null;
 
   return { level: normalizedLevel, day: normalizedDay, key: normalizedKey };

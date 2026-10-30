@@ -28,7 +28,7 @@ const TEACHER_LECTURE_VIDEO_ENTRIES = {
     17: [{ chapter: "6.17", topic: "In die Apotheke gehen", tutor_lecture_video: "https://youtu.be/5pHPl8onjj0" }],
     18: [{ chapter: "7.18", topic: "Die Bank anrufen", tutor_lecture_video: "https://youtu.be/bPqDeZXwXm4" }],
     19: [{ chapter: "7.19", tutor_lecture_video: "" }],
-    20: [{ chapter: "7.20", tutor_lecture_video: "" }],
+    20: [{ chapter: "7.20", topic: "Typische Reklamationssituationen", tutor_lecture_video: "https://youtu.be/WTSF68FkTqk" }],
     21: [{ chapter: "8.21", tutor_lecture_video: "" }],
     22: [{ chapter: "8.22", tutor_lecture_video: "" }],
     23: [{ chapter: "9.23", tutor_lecture_video: "" }],
