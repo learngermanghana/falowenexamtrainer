@@ -71,9 +71,9 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       const checked=validateLyrics(await readBounded(response),objectKey);
       if(!checked) return fallback ? sendFallback() : res.status(422).json({error:'Lyrics timing does not match this recording'});
       // Never allow a stale R2 sidecar to resurrect earlier lyrics after the
-      // teacher replaces a recording at the same filename. Compare sung lines,
+      // teacher replaces a recording at the same filename, even when no MP3 hash\n      // was supplied. Compare sung lines,
       // ignoring [Verse] headers, against the owner-approved MP3 transcript.
-      if(approved?.recordingSha256 && !sameSungLines(checked.lyrics,approved.lyrics))
+      if(approved && !sameSungLines(checked.lyrics,approved.lyrics))
         return fallback ? sendFallback() : res.status(422).json({error:'Stale lyrics for published recording'});
       return res.status(200).json(checked);
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
