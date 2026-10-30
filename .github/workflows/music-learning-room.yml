@@ -9,6 +9,9 @@ on:
       - 'tests/music-learning-room.test.mjs'
       - 'tests/music-follow-ui.test.mjs'
       - 'tests/music-timed-lyrics.test.mjs'
+      - 'tests/a1-day02-day03-recording-lyrics.test.mjs'
+      - 'server/musicLyrics.cjs'
+      - 'server/musicDiscovery.cjs'
       - 'tests/music-ui/**'
       - '.github/workflows/music-learning-room.yml'
   push:
@@ -20,6 +23,9 @@ on:
       - 'tests/music-learning-room.test.mjs'
       - 'tests/music-follow-ui.test.mjs'
       - 'tests/music-timed-lyrics.test.mjs'
+      - 'tests/a1-day02-day03-recording-lyrics.test.mjs'
+      - 'server/musicLyrics.cjs'
+      - 'server/musicDiscovery.cjs'
       - 'tests/music-ui/**'
 
 jobs:
@@ -40,4 +46,4 @@ jobs:
       - name: Install isolated DOM test dependencies
         run: npm ci --prefix tests/music-ui --ignore-scripts
       - name: Verify published songs, quiz evidence and R2 privacy
-        run: node --test tests/music-learning-room.test.mjs tests/music-timed-lyrics.test.mjs tests/music-follow-ui.test.mjs
+        run: node --test tests/a1-day02-day03-recording-lyrics.test.mjs tests/music-learning-room.test.mjs tests/music-timed-lyrics.test.mjs tests/music-follow-ui.test.mjs

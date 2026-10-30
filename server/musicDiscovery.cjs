@@ -3,6 +3,7 @@
 // exposes the bucket, keys outside that namespace, or storage credentials.
 // Uploading to music/<level>/day-XX/ is intentionally a publication action.
 const crypto = require('node:crypto');
+const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 const { getR2AudioConfig } = require('../functions/functionz/r2CourseAudio');
 const LEVELS = new Set(['A1','A2','B1','B2','C1','C2']);
 const OBJECT_KEY = /^music\/(a1|a2|b1|b2|c1|c2)\/day-(0[1-9]|1[0-9]|2[0-8])\/([^/\\\u0000-\u001f\u007f]{1,150})\.(mp3)$/i;
@@ -35,12 +36,13 @@ function musicTrackFromKey(key) {
   if(suffix.length>225) return null;
   const id = 'r2-' + match[1].toLowerCase() + '-day-' + match[2] + '-' + suffix;
   const name=match[3].replace(/[-_]+/g,' ').replace(/\s+/g,' ').trim();
+  const approved = approvedRecordingLyrics.recordings.find(recording => recording.objectKey === key);
   return {
-    id, title:name.charAt(0).toUpperCase()+name.slice(1), level, day:Number(match[2]),
+    id, title:approved?.title || name.charAt(0).toUpperCase()+name.slice(1), level, day:Number(match[2]),
     topic:'Day '+Number(match[2])+' · German music',
-    type:'Learning story', genre:'', language:'German',
+    type:'Learning story', genre:approved?.genre || '', language:'German',
     audioUrl:'https://www.falowen.app/api/music?track='+id,
-    assignmentKey:'', coursebook:true, autoDiscovered:true,
+    assignmentKey:approved?.assignmentKey || '', coursebook:true, autoDiscovered:true,
     objectKey:key,
   };
 }

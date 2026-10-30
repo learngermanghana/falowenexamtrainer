@@ -3,6 +3,7 @@ const { musicTrackFromKey, musicKeyFromAutoId } = require('./musicDiscovery.cjs'
 const { signObject } = require('./courseMusic.cjs');
 const catalog = require('../web/public/music/catalog.json');
 const builtInTimings = require('../web/public/music/timings.json');
+const approvedRecordingLyrics = require('../web/public/music/approved-recording-lyrics.json');
 function validateLyrics(data, objectKey) {
   if (!data || data.objectKey !== objectKey) return null;
   if (data.cues !== undefined && !Array.isArray(data.cues)) return null;
@@ -33,7 +34,7 @@ async function readBounded(response) {
   finally { await reader.cancel().catch(()=>{}); }
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
 }
-function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTimings}={}) {
+function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTimings,approvedLyrics=approvedRecordingLyrics}={}) {
   return async (req,res) => {
     res.setHeader('Access-Control-Allow-Origin','*');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -47,16 +48,21 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
     const recorded = timings.recordings?.find(pack => pack.objectKey === objectKey);
     const checkedRecording = validateLyrics(recorded, objectKey);
     if (checkedRecording) return res.status(200).json(checkedRecording);
+    // Exact-object owner lyrics remain readable before manual timing exists.
+    // A valid uploaded sidecar still takes precedence so reviewed cues can be added later.
+    const approved = approvedLyrics.recordings?.find(pack => pack.objectKey === objectKey);
+    const fallback = approved && (!approved.cues || !approved.cues.length) ? validateLyrics(approved, objectKey) : null;
+    const sendFallback = () => res.status(200).json({...fallback, source:'owner-supplied', timingStatus:'missing'});
     try {
       const timingKey=objectKey.replace(/\.mp3$/i,'.lyrics.json');
       const signed=signObject({key:timingKey},env);
       const response=await fetchImpl(signed.url,{signal:AbortSignal.timeout(10000)});
-      if(response.status===404) return res.status(404).json({error:'Lyrics not published'});
+      if(response.status===404) return fallback ? sendFallback() : res.status(404).json({error:'Lyrics not published'});
       if(!response.ok) throw Error('Lyrics storage unavailable');
       const checked=validateLyrics(await readBounded(response),objectKey);
-      if(!checked) return res.status(422).json({error:'Lyrics timing does not match this recording'});
+      if(!checked) return fallback ? sendFallback() : res.status(422).json({error:'Lyrics timing does not match this recording'});
       return res.status(200).json(checked);
-    } catch { res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
+    } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
 }
 module.exports={validateLyrics,createLyricsHandler};

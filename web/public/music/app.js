@@ -1,4 +1,4 @@
-import { resolveRecordingLesson } from "./lesson-content.js?v=20261029-follow";
+import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 // Never autoplay on initial load; continue only after a listener starts a song.
