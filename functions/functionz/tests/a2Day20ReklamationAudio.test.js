@@ -3,9 +3,10 @@ const assert = require("node:assert/strict");
 const { validateA2AudioKey, createA2AudioSignedUrl } = require("../r2CourseAudio.js");
 
 test("only the verified A2 Day 20 Reklamation MP3 can be signed", async () => {
-  const key="a2/day-20/reklamation-falsches-hemd.mp3";
+  const key="a2/day-20/day-20.mp3";
   assert.deepEqual(validateA2AudioKey({day:20,key}),{day:20,key});
   for (const invalid of [
+    "a2/day-20/reklamation-falsches-hemd.mp3",
     "a2/day-20/other-file.mp3",
     "a2/day-20/reklamation-falsches-hemd.wav",
     "a2/day-20/subfolder/reklamation-falsches-hemd.mp3",
@@ -25,6 +26,6 @@ test("only the verified A2 Day 20 Reklamation MP3 can be signed", async () => {
   });
   assert.equal(signed.level,"A2");
   assert.equal(signed.key,key);
-  assert.ok(signed.url.includes("a2/day-20/reklamation-falsches-hemd.mp3?"));
+  assert.ok(signed.url.includes("a2/day-20/day-20.mp3?"));
   assert.match(signed.url,/X-Amz-Signature=/);
 });
