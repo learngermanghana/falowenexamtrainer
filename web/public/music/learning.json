@@ -2,134 +2,6 @@
   "version": 1,
   "description": "Public lesson content for already approved song recordings. Draft lyrics and exercises are sourced from the Falowen Admin original songbook; review against final audio before release of any revised MP3.",
   "lessons": {
-    "a1-day-04-numbers": {
-      "assignmentKey": "A1-2",
-      "title": "Welche Nummer hast du?",
-      "summary": "Numbers and introductions",
-      "lyrics": "[Verse 1]\nHallo! Guten Tag!\nIch heiße Ben.\nWie heißt du?\nIch heiße Sam.\n\nWoher kommst du?\nIch komme aus Ghana.\nWo wohnst du?\nIch wohne in Accra.\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Verse 2]\nWie schreibt man Ben?\nB–E–N.\nWie schreibt man Sam?\nS–A–M.\n\nWie alt bist du?\nIch bin zwanzig Jahre alt.\nWie geht es dir?\nGut, danke! Und dir?\n\n[Chorus]\nEins, zwei, drei,\nvier, fünf, sechs.\nSieben, acht, neun, zehn.\nHallo Sam! Hallo Ben!\n\nWie ist deine Nummer?\nVier, fünf, sechs.\nNoch einmal, bitte:\nVier, fünf, sechs.\n\n[Outro]\nHallo! Ich heiße Ben.\nB–E–N.\nEins, zwei, drei — Falowen!\nAuf Wiedersehen!",
-      "vocabulary": [
-        {
-          "de": "Wie heißt du?",
-          "en": "What is your name?"
-        },
-        {
-          "de": "Woher kommst du?",
-          "en": "Where are you from?"
-        },
-        {
-          "de": "Ich wohne in Accra.",
-          "en": "I live in Accra."
-        },
-        {
-          "de": "die Nummer",
-          "en": "number"
-        },
-        {
-          "de": "Noch einmal, bitte.",
-          "en": "One more time, please."
-        },
-        {
-          "de": "Wie alt bist du?",
-          "en": "How old are you?"
-        },
-        {
-          "de": "zwanzig",
-          "en": "twenty"
-        }
-      ],
-      "questions": [
-        {
-          "type": "listening",
-          "prompt": "Welche drei Zahlen werden als Nummer wiederholt?",
-          "answer": "Vier, fünf, sechs.",
-          "options": [
-            "Eins, zwei, drei.",
-            "Vier, fünf, sechs.",
-            "Sieben, acht, neun."
-          ],
-          "correctIndex": 1
-        },
-        {
-          "type": "listening",
-          "prompt": "Wie alt ist die Person im Lied?",
-          "answer": "Zwanzig Jahre alt.",
-          "options": [
-            "Zehn Jahre alt.",
-            "Zwanzig Jahre alt.",
-            "Dreißig Jahre alt."
-          ],
-          "correctIndex": 1
-        },
-        {
-          "type": "speaking",
-          "prompt": "Wie heißt du? Sag eine erfundene Nummer mit drei Ziffern.",
-          "hint": "Say an invented three-digit practice number, never your personal phone number."
-        }
-      ],
-      "courseUrl": "https://www.falowen.app/campus/course/a1-day-4-numbers-for-beginners-workbook"
-    },
-    "a1-day-22-health": {
-      "assignmentKey": "A1-14.1",
-      "title": "Mein Kopf tut weh",
-      "summary": "Health and feeling unwell",
-      "lyrics": "[Verse 1]\nAm Morgen rufe ich Mia an.\nHallo Mia, bist du da?\nJa, ich bin hier. Wie geht's dir?\nNicht so gut. Mein Kopf tut weh.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Verse 2]\nMia fragt: Hast du Fieber?\nNein, aber mein Bauch tut weh.\nSie fragt: Brauchst du Hilfe?\nJa, bitte. Komm zu mir.\n\n[Chorus]\nWie geht's dir? Wie geht's dir?\nHeute geht es mir nicht gut.\nEin Glas Wasser tut mir gut.\n\n[Outro]\nMia bringt mir Wasser und Tee.\nJetzt geht es mir schon besser.\nDanke, Mia! Gute Nacht.\nBei Falowen lerne ich: Gute Besserung!",
-      "vocabulary": [
-        {
-          "de": "Mein Kopf tut weh.",
-          "en": "My head hurts."
-        },
-        {
-          "de": "Wie geht es dir?",
-          "en": "How are you?"
-        },
-        {
-          "de": "das Fieber",
-          "en": "fever"
-        },
-        {
-          "de": "der Bauch",
-          "en": "stomach / belly"
-        },
-        {
-          "de": "Brauchst du Hilfe?",
-          "en": "Do you need help?"
-        },
-        {
-          "de": "Gute Besserung!",
-          "en": "Get well soon!"
-        }
-      ],
-      "questions": [
-        {
-          "type": "listening",
-          "prompt": "Was tut der Person am Morgen weh?",
-          "answer": "Der Kopf.",
-          "options": [
-            "Der Kopf.",
-            "Der Bauch.",
-            "Das Bein."
-          ],
-          "correctIndex": 0
-        },
-        {
-          "type": "listening",
-          "prompt": "Was bringt Mia mit?",
-          "answer": "Wasser und Tee.",
-          "options": [
-            "Brot und Milch.",
-            "Wasser und Tee.",
-            "Saft und Obst."
-          ],
-          "correctIndex": 1
-        },
-        {
-          "type": "speaking",
-          "prompt": "Was sagst du, wenn du krank bist?",
-          "hint": "Answer in one or two simple German sentences."
-        }
-      ],
-      "courseUrl": "https://www.falowen.app/campus/course/a1-day-22-health-and-body-parts-workbook"
-    },
     "a2-day-18-bank": {
       "assignmentKey": "A2-7.18",
       "title": "Die Karte funktioniert nicht",
@@ -195,6 +67,194 @@
         }
       ],
       "courseUrl": "https://www.falowen.app/campus/course/a2-day-18-die-bank-anrufen-workbook"
+    },
+    "r2-a1-day-04-b64_TWVpbmUgTnVtbWVyLCBtZWluZSBBZHJlc3NlLm1wMw": {
+      "assignmentKey": "A1-2",
+      "title": "Meine Nummer, meine Adresse",
+      "summary": "Ben introduces his age, address and telephone number",
+      "lyrics": "[Intro]\nHmm, hmm, hmm …\nOh-oh, eins, zwei, drei!\nHmm, hmm, hier bin ich!\n\n[Verse 1]\nHallo, ich heiße Ben,\nIch komme aus Ghana, aus Accra.\nIch bin vierundzwanzig Jahre alt,\nUnd heute stelle ich mich vor.\n\nIch wohne in der Blumenstraße,\nMeine Hausnummer ist eins zwei drei.\nDie Postleitzahl ist eins zwei drei vier fünf,\nHier bin ich zu Hause, hier bin ich gern.\n\n[Chorus]\nEins, zwei, drei, vier, fünf, sechs,\nSieben, acht, neun und zehn.\nElf, zwölf, dreizehn, vierzehn, fünfzehn,\nSechzehn, siebzehn, achtzehn, neunzehn, zwanzig!\n\nOh-oh, wie alt bist du?\nIch bin vierundzwanzig, und du?\nHmm-hmm, sag es mir,\nWie ist deine Hausnummer hier?\n\n[Verse 2]\nMeine Telefonnummer ist ganz einfach,\nNull, zwei, vier – fünf, sechs, sieben.\nAcht, neun, null – eins, zwei, drei,\nIch sage sie noch einmal langsam.\n\nNull, zwei, vier – fünf, sechs, sieben,\nAcht, neun, null – eins, zwei, drei.\n„Wie ist deine Telefonnummer?“\nJetzt kannst du sie auch sagen!\n\n[Chorus]\nEins, zwei, drei, vier, fünf, sechs,\nSieben, acht, neun und zehn.\nElf, zwölf, dreizehn, vierzehn, fünfzehn,\nSechzehn, siebzehn, achtzehn, neunzehn, zwanzig!\n\nOh-oh, wie alt bist du?\nIch bin vierundzwanzig, und du?\nHmm-hmm, sag es mir,\nWie ist deine Hausnummer hier?\n\n[Outro]\nHmm, hmm, mein Name ist Ben,\nVierundzwanzig Jahre, das bin ich.\nBlumenstraße, eins zwei drei,\nOh-oh, jetzt kennst du mich!",
+      "vocabulary": [
+        {
+          "de": "vierundzwanzig",
+          "en": "24"
+        },
+        {
+          "de": "die Postleitzahl",
+          "en": "postal code"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Wie alt ist Ben?",
+          "answer": "Vierundzwanzig.",
+          "options": [
+            "Zwanzig.",
+            "Vierundzwanzig.",
+            "Dreißig."
+          ],
+          "correctIndex": 1,
+          "evidence": "Ich bin vierundzwanzig Jahre alt"
+        },
+        {
+          "type": "listening",
+          "prompt": "Welche Ziffern kommen zuerst in seiner Telefonnummer?",
+          "answer": "Null, zwei, vier.",
+          "options": [
+            "Null, zwei, vier.",
+            "Null, drei, vier.",
+            "Zwei, vier, null."
+          ],
+          "correctIndex": 0,
+          "evidence": "Null, zwei, vier"
+        },
+        {
+          "type": "speaking",
+          "prompt": "Was hast du aus dem Lied gelernt? Erzähle von deinen eigenen Erfahrungen.",
+          "hint": "Antworte auf Deutsch mit einem Beispiel."
+        }
+      ]
+    },
+    "r2-a2-day-23-b64_RmFocnJhZCB6dXIgU2NodWxlLm1wMw": {
+      "assignmentKey": "A2-9.23",
+      "title": "Fahrrad zur Schule",
+      "summary": "Going to school by bike to help the environment",
+      "lyrics": "[Verse 1]\nJeden Morgen fahre ich zur Schule,\nFrüher bin ich immer Bus gefahren.\nDoch heute nehme ich mein Fahrrad,\nWeil ich die Umwelt schützen will.\nDie Sonne scheint, die Luft ist frisch,\nIch fahre langsam durch den Park.\nIch brauche heute kein Auto,\nUnd komme pünktlich in der Schule an.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Verse 2]\nWenn es regnet, nehme ich den Bus,\nBei Sonne fahre ich lieber Rad.\nManchmal gehe ich auch zu Fuß,\nWeil ich es nicht so weit habe.\nIch sehe Bäume, Blumen und den Park,\nUnd freue mich über die Natur.\nAm Nachmittag fahre ich nach Hause,\nGanz entspannt und ohne Stress.\n\n[Chorus]\nHey-ya, hey-ya, der Morgen ist da,\nIch fahre mit dem Fahrrad, ist doch klar.\nWeniger Autos, die Luft wird rein,\nSo soll mein Weg zur Schule sein.\nIch spare Geld, ich bleibe fit,\nDie frische Luft, die tut mir gut.\nEin schöner Tag, ein gutes Gefühl,\nIch mache etwas für die Umwelt.\n\n[Outro]\nDer Wind ist warm, die Sonne scheint,\nIch fahre langsam nach Haus.\nHeute war ein schöner Tag,\nMorgen fahre ich wieder Rad.",
+      "vocabulary": [
+        {
+          "de": "das Fahrrad",
+          "en": "bicycle"
+        },
+        {
+          "de": "die Umwelt",
+          "en": "environment"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Warum fährt die Person mit dem Fahrrad?",
+          "answer": "Um die Umwelt zu schützen.",
+          "options": [
+            "Um die Umwelt zu schützen.",
+            "Weil sie spät ist.",
+            "Weil kein Bus fährt."
+          ],
+          "correctIndex": 0,
+          "evidence": "Weil ich die Umwelt schützen will"
+        },
+        {
+          "type": "listening",
+          "prompt": "Was nimmt sie bei Regen?",
+          "answer": "Den Bus.",
+          "options": [
+            "Das Auto.",
+            "Den Bus.",
+            "Das Taxi."
+          ],
+          "correctIndex": 1,
+          "evidence": "Wenn es regnet, nehme ich den Bus"
+        },
+        {
+          "type": "speaking",
+          "prompt": "Was hast du aus dem Lied gelernt? Erzähle von deinen eigenen Erfahrungen.",
+          "hint": "Antworte auf Deutsch mit einem Beispiel."
+        }
+      ]
+    },
+    "r2-a2-day-24-b64_RW5kbGljaCBVcmxhdWIubXAz": {
+      "assignmentKey": "A2-9.24",
+      "title": "Endlich Urlaub",
+      "summary": "Planning a holiday in Hamburg",
+      "lyrics": "[Verse 1]\nIch möchte in den Ferien verreisen,\nSchon lange träume ich von Hamburg.\nIch habe jeden Monat Geld gespart,\nJetzt kann ich endlich Urlaub machen.\nIch suche ein Hotel im Internet,\nUnd finde ein Zimmer in der Stadt.\nDann buche ich mein Ticket für Samstag,\nJetzt fehlt nur noch mein Koffer.\n\n[Chorus]\nEndlich Urlaub, endlich frei,\nIch packe meine Sachen ein.\nEin neues Ziel, ein neuer Ort,\nAm Samstag fahre ich endlich fort.\nDoo-doo, doo-doo, do-do,\nHamburg, ich freue mich auf dich!\n\n[Verse 2]\nAm Freitag packe ich meinen Koffer,\nIch nehme Kleidung und mein Handy mit.\nAm Samstag stehe ich früh auf,\nMein Zug fährt schon um acht Uhr ab.\nAm Bahnhof kaufe ich einen Kaffee,\nDann steige ich in meinen Zug ein.\nIch schaue aus dem Fenster und lächle,\nMein Urlaub beginnt, wie schön!\n\n[Chorus]\nEndlich Urlaub, endlich frei,\nIch packe meine Sachen ein.\nEin neues Ziel, ein neuer Ort,\nAm Samstag fahre ich endlich fort.\nDoo-doo, doo-doo, do-do,\nHamburg, ich freue mich auf dich!\n\n[Outro]\nAm Mittag komme ich in Hamburg an,\nIch gehe zum Hotel und checke ein.\nDann mache ich einen Spaziergang,\nMein Urlaub kann jetzt beginnen.\n\n[Outro – Repeat, Softer]\nAm Mittag komme ich in Hamburg an,\nIch gehe zum Hotel und checke ein.\nDann mache ich einen Spaziergang,\nMein Urlaub kann jetzt beginnen.\nDoo-doo, doo-doo, do-do …\nDoo-doo, doo-doo …",
+      "vocabulary": [
+        {
+          "de": "verreisen",
+          "en": "to travel"
+        },
+        {
+          "de": "den Koffer packen",
+          "en": "pack a suitcase"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Wohin fährt die Person?",
+          "answer": "Nach Hamburg.",
+          "options": [
+            "Nach Wien.",
+            "Nach Hamburg.",
+            "Nach Berlin."
+          ],
+          "correctIndex": 1,
+          "evidence": "Schon lange träume ich von Hamburg"
+        },
+        {
+          "type": "listening",
+          "prompt": "Um wie viel Uhr fährt der Zug ab?",
+          "answer": "Um acht Uhr.",
+          "options": [
+            "Um acht Uhr.",
+            "Um neun Uhr.",
+            "Um zehn Uhr."
+          ],
+          "correctIndex": 0,
+          "evidence": "Mein Zug fährt schon um acht Uhr ab"
+        },
+        {
+          "type": "speaking",
+          "prompt": "Was hast du aus dem Lied gelernt? Erzähle von deinen eigenen Erfahrungen.",
+          "hint": "Antworte auf Deutsch mit einem Beispiel."
+        }
+      ]
+    },
+    "r2-a2-day-25-b64_RW5kbGljaCBVcmxhdWIubXAz": {
+      "assignmentKey": "A2-9.25",
+      "title": "Endlich Urlaub",
+      "summary": "Saving for the train journey to Hamburg",
+      "lyrics": "[Intro]\nHeya, heya!\nDie Reise geht los.\n\n[Verse 1]\nSeit Monaten spar ich Geld,\nIch möchte endlich etwas sehen.\nMein Traum ist eine Reise nach Hamburg,\nJetzt kann ich wirklich fahren.\nIch suche ein Hotel im Internet,\nEin schönes Zimmer, nicht zu teuer.\nMein Ticket buche ich am Montag,\nAm Samstag geht die Reise los.\n\n[Chorus]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nMein Koffer steht schon längst bereit.\nMein Koffer steht schon längst bereit.\nHeya, heya!\nIch bin bereit.\nHeya, heya!\nEs ist so weit.\nDie Reise geht los.\nDie Reise geht los.\nHamburg, ich freue mich auf dich!\n\n[Post-Chorus]\nIch freue mich auf dich!\n\n[Verse 2]\nAm Freitag packe ich meinen Koffer,\nMein Handy und die Kamera.\nAm Samstag stehe ich früh auf,\nMein Zug fährt schon um acht Uhr ab.\nIch sitze ruhig am Fenster,\nDie Sonne scheint, der Himmel ist blau.\nIch sehe Felder, Häuser, Bäume\nUnd freue mich auf meine Reise.\n\n[Chorus]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nMein Koffer steht schon längst bereit.\nMein Koffer steht schon längst bereit.\nHeya, heya!\nIch bin bereit.\nHeya, heya!\nEs ist so weit.\nDie Reise geht los.\nDie Reise geht los.\nHamburg, ich freue mich auf dich!\n\n[Outro]\nEndlich Urlaub, endlich frei.\nEndlich Urlaub, endlich frei.\nHeya, heya!\nDie Reise geht los.\nHeya, heya!\nDie Reise geht los.\nHmm …\nDie Reise geht los.",
+      "vocabulary": [
+        {
+          "de": "das Ticket buchen",
+          "en": "book a ticket"
+        },
+        {
+          "de": "der Koffer",
+          "en": "suitcase"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Wohin möchte die Person verreisen?",
+          "answer": "Nach Hamburg.",
+          "options": [
+            "Nach Berlin.",
+            "Nach Hamburg.",
+            "Nach München."
+          ],
+          "correctIndex": 1,
+          "evidence": "Mein Traum ist eine Reise nach Hamburg"
+        },
+        {
+          "type": "listening",
+          "prompt": "Wann fährt der Zug ab?",
+          "answer": "Am Samstag um acht Uhr.",
+          "options": [
+            "Am Freitag um acht Uhr.",
+            "Am Samstag um sechs Uhr.",
+            "Am Samstag um acht Uhr."
+          ],
+          "correctIndex": 2,
+          "evidence": "Mein Zug fährt schon um acht Uhr ab"
+        },
+        {
+          "type": "speaking",
+          "prompt": "Was hast du aus dem Lied gelernt? Erzähle von deinen eigenen Erfahrungen.",
+          "hint": "Antworte auf Deutsch mit einem Beispiel."
+        }
+      ]
     }
   }
 }

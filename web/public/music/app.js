@@ -523,7 +523,16 @@ async function refreshMusic() {
     const dynamic=data.tracks.map(safeTrack).filter(Boolean);
     const pinnedKeys=new Set(pinnedTracks.map(track=>track.objectKey).filter(Boolean));
     const pinnedIds=new Set(pinnedTracks.map(track=>track.id));
-    catalog=[...pinnedTracks,...dynamic.filter(track=>!pinnedIds.has(track.id)&&!pinnedKeys.has(track.objectKey))];
+    // A lesson may have older MP3 versions in R2. Once the owner publishes
+    // a canonical song for a level/day, never reintroduce retired versions
+    // merely because the R2 discovery endpoint still finds their objects.
+    // Day 24 and Day 25 both use Endlich Urlaub.mp3, but their level/day keys
+    // differ and therefore remain distinct playable songs.
+    const publishedDays=new Set(pinnedTracks.filter(t=>t.level!=="ALL"&&t.day)
+      .map(t=>t.level+":"+t.day));
+    catalog=[...pinnedTracks,...dynamic.filter(track=>!pinnedIds.has(track.id)
+      && !pinnedKeys.has(track.objectKey)
+      && !publishedDays.has(track.level+":"+track.day))];
     populateFilters();
     renderCatalog();
     byId("discovery-status").textContent="";
