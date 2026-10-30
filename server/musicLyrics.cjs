@@ -27,6 +27,11 @@ function validateLyrics(data, objectKey) {
   }
   return { objectKey, lyrics, cues };
 }
+function sameSungLines(a,b) {
+  const lines=text => String(text||'').replace(/\\\\n/g,'\\n').split(/\\r?\\n/)
+    .map(s=>s.trim()).filter(s=>s&&!/^\\[.*\\]$/.test(s));
+  return JSON.stringify(lines(a))===JSON.stringify(lines(b));
+}
 async function readBounded(response) {
   if (Number(response.headers.get('content-length')) > 100000) throw Error('Lyrics file too large');
   const reader=response.body.getReader(); const chunks=[]; let size=0;
@@ -63,8 +68,13 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       if(!response.ok) throw Error('Lyrics storage unavailable');
       const checked=validateLyrics(await readBounded(response),objectKey);
       if(!checked) return fallback ? sendFallback() : res.status(422).json({error:'Lyrics timing does not match this recording'});
+      // Never allow a stale R2 sidecar to resurrect earlier lyrics after the
+      // teacher replaces a recording at the same filename. Compare sung lines,
+      // ignoring [Verse] headers, against the owner-approved MP3 transcript.
+      if(approved?.recordingSha256 && !sameSungLines(checked.lyrics,approved.lyrics))
+        return fallback ? sendFallback() : res.status(422).json({error:'Stale lyrics for published recording'});
       return res.status(200).json(checked);
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
 }
-module.exports={validateLyrics,createLyricsHandler};
+module.exports={validateLyrics,sameSungLines,createLyricsHandler};
