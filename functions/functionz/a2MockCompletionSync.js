@@ -3,6 +3,7 @@
 const MOCK_TITLE = "A2 Final Mock Exam";
 const KOMBI_SETS = require("./a2KombiMarkingSets");
 const MOCK_04_LISTENING_KEY = require("./a2Mock04HoerenKeys");
+const MOCK_05_LISTENING_KEY = require("./a2Mock05HoerenKeys");
 const isA2Kombi = id => /^a2-mock-0[4-8]$/.test(String(id || ""));
 const MOCK_ROUTE = "/campus/results";
 
@@ -118,11 +119,11 @@ const {scoreObjectiveAnswers,verifiedSectionScore,buildVerifiedFourSkillScore}=r
 const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = "a2-mock-01" } = {}) => {
   if (isA2Kombi(mockId)) {
     if (state?.mockId && state.mockId !== mockId) throw new Error("Saved A2 Kombiprüfung belongs to another paper.");
-    const isFour = mockId === "a2-mock-04" && state?.assessmentVersion === "four-module-v2";
+    const isFour = ["a2-mock-04", "a2-mock-05"].includes(mockId) && state?.assessmentVersion === "four-module-v2";
     if (state?.assessmentVersion && state.assessmentVersion !== "three-module-v1" && !isFour)
       throw new Error("Unsupported A2 Kombiprüfung version.");
     const lesen = scoreObjectiveAnswers(state?.lesenAnswers || {},KOMBI_SETS[mockId].reading,25);
-    const hoeren = isFour ? scoreObjectiveAnswers(state?.hoerenAnswers || {},MOCK_04_LISTENING_KEY,25) : null;
+    const hoeren = isFour ? scoreObjectiveAnswers(state?.hoerenAnswers || {},mockId === "a2-mock-04" ? MOCK_04_LISTENING_KEY : MOCK_05_LISTENING_KEY,25) : null;
     const schreiben = verifiedSectionScore(verifiedSections,"schreiben",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
     const sprechen = verifiedSectionScore(verifiedSections,"sprechen",{errorCode:"A2_MOCK_SECTION_NOT_VERIFIED"});
     const points = Number((lesen.score + (hoeren?.score || 0) + schreiben + sprechen).toFixed(1));
@@ -298,7 +299,7 @@ const buildA2MockCompletionArtifacts = ({
   const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const isSecond = mockId === "a2-mock-02";
   const isKombi = isA2Kombi(mockId);
-  const isFourKombi = mockId === "a2-mock-04" && overall?.assessmentVersion === "four-module-v2";
+  const isFourKombi = ["a2-mock-04", "a2-mock-05"].includes(mockId) && overall?.assessmentVersion === "four-module-v2";
   const mockTitle = isKombi ? `A2 Mock ${Number(mockId.slice(-2))} · Kombiprüfung` : isSecond ? "A2 Mock 2" : MOCK_TITLE;
   const mockSource = isKombi ? mockId.replace(/-/g,"_") : isSecond ? "a2_mock_02" : "a2_final_mock";
   const mockLink = isKombi ? `/campus/course/a2-kombi-mock-${Number(mockId.slice(-2))}` : isSecond ? "/campus/course/a2-mock-2" : "/campus/course/a2-final-mock-exam";
