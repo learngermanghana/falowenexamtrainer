@@ -88,3 +88,12 @@ test('music API offers estimated cues if a reviewed R2 sidecar is not available'
   const app=fs.readFileSync(path.join(music,'app.js'),'utf8');
   expect(app).toContain('lesson.timingStatus === "estimated"');
 });
+
+test('R2 sidecar lines must match the owner-approved recording before overriding cues',()=>{
+  const {sameSungLines}=require('../../../server/musicLyrics.cjs');
+  const pack=recordings.find(x=>x.assignmentKey==='A2-9.25');
+  expect(sameSungLines(pack.lyrics,pack.lyrics)).toBe(true);
+  expect(sameSungLines('[Chorus]'+String.fromCharCode(10)+'Endlich Urlaub, endlich frei.', 'Endlich Urlaub, endlich frei.')).toBe(true);
+  expect(sameSungLines(pack.lyrics,pack.lyrics.replace('Seit Monaten spar ich Geld,','Früher bin ich spät aufgestanden.'))).toBe(false);
+  expect(sameSungLines(pack.lyrics,recordings.find(x=>x.assignmentKey==='A2-9.24').lyrics)).toBe(false);
+});
