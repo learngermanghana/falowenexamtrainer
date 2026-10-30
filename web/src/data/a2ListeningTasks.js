@@ -258,14 +258,15 @@ export const A2_LISTENING_TASKS = {
   20: {
     chapter: "7.20",
     mode: A2_LISTENING_MODES.GRADED,
-    task: "Hören Sie die Reklamationsdialoge. Achten Sie auf das Problem, den Kaufnachweis und die angebotene Lösung.",
-    audioUrl: "https://youtu.be/pH1X3E7vOao",
+    task: "Hören Sie das Reklamationsgespräch im Geschäft zweimal. Lesen Sie zuerst die fünf Fragen. Wählen Sie zu jeder Frage die richtige Antwort: A, B oder C. Tragen Sie Ihre endgültigen Antwortbuchstaben im Submit-Tab unter Teil 4 ein.",
+    audioKey: "a2/day-20/day-20.mp3",
+    audioUrl: "",
     questions: [
-      { stem: "Warum bringt Laura den Wasserkocher zurück?", options: ["A) Er ist zu teuer", "B) Er funktioniert nicht", "C) Er ist zu groß", "D) Er gefällt ihr nicht"] },
-      { stem: "Was bringt Laura als Kaufnachweis mit?", options: ["A) Eine Rechnung vom Arzt", "B) Eine Kundenkarte", "C) Den Kassenbon", "D) Einen Brief"] },
-      { stem: "Was bietet der Verkäufer Laura an?", options: ["A) Einen Rabatt", "B) Eine Reparatur in einem Jahr", "C) Einen Umtausch oder eine Rückerstattung", "D) Einen Gutschein für Essen"] },
-      { stem: "Welches Problem gibt es mit der Jacke?", options: ["A) Sie hat die falsche Farbe", "B) Sie ist beschädigt", "C) Sie hat die falsche Größe", "D) Sie kommt zu spät"] },
-      { stem: "Was bittet Laura den Kundenservice zu schicken?", options: ["A) Einen Retourenschein", "B) Eine neue Rechnung", "C) Einen Katalog", "D) Einen Rabattcode"] },
+      { stem: "Wann hat der Kunde den Pullover gekauft?", options: ["A) Erst gestern", "B) Vor vier Wochen", "C) Letzte Woche"] },
+      { stem: "Was ist das Problem mit dem Pullover?", options: ["A) Er ist zu klein", "B) Die Naht ist offen", "C) Er hat Flecken"] },
+      { stem: "Was möchte der Kunde zuerst machen?", options: ["A) Ihn sofort waschen", "B) Ihn reparieren lassen", "C) Ihn umtauschen"] },
+      { stem: "Was braucht man für einen Umtausch wegen der Farbe?", options: ["A) Einen Kassenbon", "B) Einen Ausweis", "C) Eine Kreditkarte"] },
+      { stem: "Wie entscheidet sich der Kunde am Ende?", options: ["A) Er möchte das Geld zurück", "B) Er nimmt einen neuen Pullover", "C) Er behält den alten Pullover"] },
     ],
   },
   21: {
