@@ -25,7 +25,7 @@ test("all five A2 Kombiprüfungen have 20 private answer keys and unique task ru
   }
 });
 
-test("A2 Mocks 04–08 score only three verified modules out of 75; Hören is not fabricated",()=>{
+test("Legacy A2 Mocks 04–08 preserve original three-module results out of 75",()=>{
   for(let n=4;n<=8;n++){
     const id=`a2-mock-0${n}`,key=sets[id].reading;
     const verification={schreiben:{verified:true,score:20},sprechen:{verified:true,score:22}};
@@ -94,7 +94,37 @@ test("new A2 Mock 04 Hören is verified as the fourth /25 module without alterin
   assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
   assert.equal(artifacts.scoreDocument.sectionScores.hoeren,25);
   assert.throws(()=>buildVerifiedA2MockScore({
-    mockId:"a2-mock-05",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
+    mockId:"a2-mock-06",state:{assessmentVersion:"four-module-v2",lesenAnswers:reading},
     verifiedSections:verification,
   }),/Unsupported/);
+});
+
+
+test("new A2 Mock 05 uses its distinct private Hören key for four-module /100 scoring",()=>{
+  const listening=require("../a2Mock05HoerenKeys");
+  const reading=sets["a2-mock-05"].reading;
+  assert.deepEqual(Object.keys(listening),Array.from({length:20},(_,i)=>String(i+1)));
+  const verification={schreiben:{verified:true,score:25},sprechen:{verified:true,score:25}};
+  const state={mockId:"a2-mock-05",assessmentVersion:"four-module-v2",lesenAnswers:reading,hoerenAnswers:listening};
+  const scored=buildVerifiedA2MockScore({mockId:"a2-mock-05",state,verifiedSections:verification});
+  assert.equal(scored.overall.points,100);
+  assert.equal(scored.overall.maxPoints,100);
+  assert.equal(scored.overall.assessmentVersion,"four-module-v2");
+  assert.equal(scored.sectionScores.hoeren,25);
+  const artifacts=buildA2MockCompletionArtifacts({
+    mockId:"a2-mock-05",authedUser:{uid:"student-55",email:"student@example.test"},
+    attemptId:"attempt-5-v2",attemptNumber:2,firstAttempt:false,
+    overall:scored.overall,sectionScores:scored.sectionScores,
+    now:new Date("2026-10-30T14:00:00.000Z"),
+  });
+  assert.equal(artifacts.scoreDocument.maxPoints,100);
+  assert.equal(artifacts.scoreDocument.hoerenPending,false);
+  assert.deepEqual(artifacts.scoreDocument.completedSections,["lesen","hoeren","schreiben","sprechen"]);
+  const legacy=buildVerifiedA2MockScore({
+    mockId:"a2-mock-05",
+    state:{mockId:"a2-mock-05",assessmentVersion:"three-module-v1",lesenAnswers:reading},
+    verifiedSections:verification
+  });
+  assert.equal(legacy.overall.maxPoints,75);
+  assert.equal(legacy.sectionScores.hoeren,undefined);
 });
