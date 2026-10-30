@@ -28,7 +28,7 @@ describe("A2 Day 18 · Die Bank anrufen · teacher lecture", () => {
       path.resolve(__dirname, "../components/A2StandardTabbedWorkbookPage.js"),
       "utf8",
     );
-    expect(component).toContain("[16, 17, 18].includes(Number(day))");
+    expect(component).toContain("[16, 17, 18, 20].includes(Number(day))");
     expect(component).toContain("data-a2-day18-teacher-lecture");
     expect(component).toContain("getTeacherLectureVideoResources(\"A2\", day)");
     expect(component).toContain("https://www.youtube-nocookie.com/embed/");
