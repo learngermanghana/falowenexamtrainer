@@ -13,6 +13,26 @@ export function recordingQuestions(lyrics) {
     {type:'listening',prompt:'Wo möchten sie ankommen?',options:['In Hamburg.','In Berlin.','In München.'],correctIndex:1,answer:'In Berlin.',evidence:'wir möchten in Berlin ankommen.'},
     {type:'speaking',prompt:'Wohin möchtest du mit dem Zug fahren? Wo musst du umsteigen?',hint:'Ich möchte nach … fahren. Ich muss in … umsteigen.'}
   ];
+  if(sung.includes('Ihr Deutschkurs beginnt am Montag.“') && sung.some(line=>line.includes('Hallo, ich heiße Bina,')))return [
+    {type:'listening',prompt:'Wie heißt die Person, die bei der Schule anruft?',options:['Bina.','Lena.','Mia.'],correctIndex:0,answer:'Bina.',evidence:'Ich sage: „Hallo, ich heiße Bina,'},
+    {type:'listening',prompt:'Wann beginnt der Deutschkurs?',options:['Am Sonntag.','Am Montag.','Am Freitag.'],correctIndex:1,answer:'Am Montag.',evidence:'Ihr Deutschkurs beginnt am Montag.“'},
+    {type:'speaking',prompt:'Wie buchstabierst du deinen Namen?',hint:'Ich heiße … Meinen Namen schreibt man …'}
+  ];
+  if(sung.includes('Er sagt: „Ich komme aus Berlin.“') && sung.includes('Er sagt: „Ich wohne hier in Bonn.“'))return [
+    {type:'listening',prompt:'Woher kommt Ben?',options:['Aus Bonn.','Aus Accra.','Aus Berlin.'],correctIndex:2,answer:'Aus Berlin.',evidence:'Er sagt: „Ich komme aus Berlin.“'},
+    {type:'listening',prompt:'Wo wohnt Ben jetzt?',options:['In Bonn.','In Berlin.','In Hamburg.'],correctIndex:0,answer:'In Bonn.',evidence:'Er sagt: „Ich wohne hier in Bonn.“'},
+    {type:'speaking',prompt:'Frage deinen Partner nach Name, Herkunft und Wohnort.',hint:'Wie heißt du? Woher kommst du? Wo wohnst du?'}
+  ];
+  if(sung.includes('Die Frau sagt: „Ja, um zehn Uhr.“') && sung.includes('und bleiben Sie heute zu Haus.“'))return [
+    {type:'listening',prompt:'Um wie viel Uhr hat die Person einen Arzttermin?',options:['Um neun Uhr.','Um zehn Uhr.','Um elf Uhr.'],correctIndex:1,answer:'Um zehn Uhr.',evidence:'Die Frau sagt: „Ja, um zehn Uhr.“'},
+    {type:'listening',prompt:'Was empfiehlt der Arzt?',options:['Viel Wasser trinken und heute zu Hause bleiben.','Sport machen und zur Schule gehen.','Nur Tee trinken und sofort arbeiten.'],correctIndex:0,answer:'Viel Wasser trinken und heute zu Hause bleiben.',evidence:'und bleiben Sie heute zu Haus.“'},
+    {type:'speaking',prompt:'Wie beschreibst du deine Beschwerden bei einem Arzt?',hint:'Mein … tut weh. Ich habe … Ich möchte einen Termin.'}
+  ];
+  if(sung.includes('Der Himmel ist grau, es regnet stark.') && sung.includes('Mia schreibt: „Morgen um drei?“'))return [
+    {type:'listening',prompt:'Warum sagt die Person das Treffen mit Mia ab?',options:['Es regnet stark und ist kalt.','Mia muss zur Schule gehen.','Der Bus ist zu spät.'],correctIndex:0,answer:'Es regnet stark und ist kalt.',evidence:'Doch draußen ist es nass und kalt.'},
+    {type:'listening',prompt:'Wann möchten sie sich stattdessen treffen?',options:['Heute um zwei Uhr.','Morgen um drei Uhr.','Am Montag um zehn Uhr.'],correctIndex:1,answer:'Morgen um drei Uhr.',evidence:'Mia schreibt: „Morgen um drei?“'},
+    {type:'speaking',prompt:'Wie sagst du ein Treffen höflich ab?',hint:'Es tut mir leid, heute kann ich leider nicht. Passt dir morgen …?'}
+  ];
   const lines=[...new Set(sung)].filter(line=>line.length>=20 && line.length<=150);
   const chosen=[lines[0],lines[Math.floor(lines.length/2)]].filter(Boolean);
   const questions=chosen.map((line,index)=>{
