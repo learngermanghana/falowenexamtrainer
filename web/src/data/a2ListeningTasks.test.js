@@ -13,6 +13,7 @@ describe("A2 listening tasks", () => {
     [15, "6.15", "a2/day-15/day-15.mp3"],
     [16, "6.16", "a2/day-16/day-16.mp3"],
     [17, "6.17", "a2/day-17/day-17.mp3"],
+    [20, "7.20", "a2/day-20/day-20.mp3"],
     [24, "9.24", "a2/day-24/day-24.mp3"],
     [26, "10.26", "a2/day-26/day-26.mp3"],
     [27, "10.27", "a2/day-27/day-27.mp3"],
@@ -27,6 +28,33 @@ describe("A2 listening tasks", () => {
       audioUrl: "",
     });
     expect(task.questions).toHaveLength(5);
+  });
+
+
+  test("Day 20 replaces YouTube with the supplied pullover Reklamation recording and five aligned A/B/C questions", () => {
+    const task = getA2ListeningTask(20);
+    expect(task.audioKey).toBe("a2/day-20/day-20.mp3");
+    expect(task.audioUrl).toBe("");
+    expect(task.task).toContain("Reklamationsgespräch");
+    expect(task.questions.map((q) => q.stem)).toEqual([
+      "Wann hat der Kunde den Pullover gekauft?",
+      "Was ist das Problem mit dem Pullover?",
+      "Was möchte der Kunde zuerst machen?",
+      "Was braucht man für einen Umtausch wegen der Farbe?",
+      "Wie entscheidet sich der Kunde am Ende?",
+    ]);
+    expect(task.questions.map((q) => q.options)).toEqual([
+      ["A) Erst gestern", "B) Vor vier Wochen", "C) Letzte Woche"],
+      ["A) Er ist zu klein", "B) Die Naht ist offen", "C) Er hat Flecken"],
+      ["A) Ihn sofort waschen", "B) Ihn reparieren lassen", "C) Ihn umtauschen"],
+      ["A) Einen Kassenbon", "B) Einen Ausweis", "C) Eine Kreditkarte"],
+      ["A) Er möchte das Geld zurück", "B) Er nimmt einen neuen Pullover", "C) Er behält den alten Pullover"],
+    ]);
+    // Keep the canonical answer key in test-only code, not the learner-facing bundle.
+    const canonicalAnswerIndexes = [0, 1, 2, 0, 1];
+    expect(task.questions.map((q, index) => q.options[canonicalAnswerIndexes[index]][0])).toEqual([
+      "A", "B", "C", "A", "B",
+    ]);
   });
 
   test("Day 16 five Lena–Max questions match the newly published listening answer choices", () => {
