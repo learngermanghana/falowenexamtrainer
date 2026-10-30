@@ -255,6 +255,74 @@
           "hint": "Antworte auf Deutsch mit einem Beispiel."
         }
       ]
+    },
+    "r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM": {
+      "assignmentKey": "A2-10.27",
+      "title": "Eine Nachricht von Mia",
+      "summary": "A personal story about Mia's message, a late reply and meeting at a café",
+      "lyrics": "[Verse 1]\nHeute Morgen schreibt mir Mia,\nsie fragt: „Hast du heute Zeit?“\nDoch ich bin schon auf dem Weg zur Arbeit,\nund mein Handy liegt ganz weit.\nErst am Abend seh’ ich ihre Nachricht,\nich denke: „Oh, das tut mir leid!“\nIch wollte ihr schon früher schreiben,\ndoch der Tag ging viel zu schnell vorbei.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal leg' ich mein Handy weg,\nweil das echte Leben Freude macht.\n\n[Verse 2]\nIch schreibe Mia: „Tut mir leid,\nich hatte heute leider keine Zeit.“\nSie antwortet: „Mach dir keine Sorgen,\nwie wär’s mit einem Treffen morgen?“\nWir verabreden uns im kleinen Café,\num vier Uhr nachmittags, ganz in der Näh’.\nDann legen wir die Handys weg,\nund freuen uns auf unser Treffen.\n\n[Chorus]\nEine Nachricht, ein kleiner Gruß,\nwir bleiben in Kontakt.\nDoch manchmal leg' ich mein Handy weg,\nweil das echte Leben Freude macht.\n\n[Outro]\nAm nächsten Tag sitz' ich mit Mia,\nwir erzählen uns so viel.\nDie Handys bleiben in den Taschen,\ndenn heute zählt nur unser Gespräch.",
+      "vocabulary": [
+        {
+          "de": "die Nachricht",
+          "en": "message"
+        },
+        {
+          "de": "die späte Antwort",
+          "en": "late reply"
+        },
+        {
+          "de": "unterwegs sein",
+          "en": "to be on the way"
+        },
+        {
+          "de": "Mach dir keine Sorgen",
+          "en": "Don't worry"
+        },
+        {
+          "de": "sich verabreden",
+          "en": "to arrange to meet"
+        },
+        {
+          "de": "um vier Uhr nachmittags",
+          "en": "at 4 p.m."
+        },
+        {
+          "de": "das Gespräch",
+          "en": "conversation"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Warum liest die Person Mias Nachricht erst am Abend?",
+          "answer": "Sie ist auf dem Weg zur Arbeit und sieht die Nachricht zunächst nicht.",
+          "options": [
+            "Sie ist auf dem Weg zur Arbeit und sieht die Nachricht zunächst nicht.",
+            "Das Handy ist kaputt.",
+            "Mia hat die Nachricht erst abends geschickt."
+          ],
+          "correctIndex": 0,
+          "evidence": "Doch ich bin schon auf dem Weg zur Arbeit,"
+        },
+        {
+          "type": "listening",
+          "prompt": "Wann und wo treffen sich die beiden?",
+          "answer": "Morgen um vier Uhr nachmittags im Café.",
+          "options": [
+            "Heute um vier Uhr im Park.",
+            "Morgen um vier Uhr nachmittags im Café.",
+            "Morgen um neun Uhr bei Mia zu Hause."
+          ],
+          "correctIndex": 1,
+          "evidence": "um vier Uhr nachmittags, ganz in der Näh’."
+        },
+        {
+          "type": "speaking",
+          "prompt": "Du antwortest einer Freundin zu spät. Entschuldige dich und schlage ein Treffen vor.",
+          "hint": "Tut mir leid, ich hatte keine Zeit. Wie wär’s mit einem Treffen morgen?"
+        }
+      ],
+      "courseUrl": "https://www.falowen.app/campus"
     }
   }
 }

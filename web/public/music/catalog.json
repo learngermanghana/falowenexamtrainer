@@ -184,6 +184,24 @@
       "approved": true
     },
     {
+      "id": "r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM",
+      "title": "Eine Nachricht von Mia",
+      "level": "A2",
+      "day": 27,
+      "assignmentKey": "A2-10.27",
+      "topic": "Messages, late replies and meeting friends",
+      "type": "Learning story",
+      "genre": "Electro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-27-b64_SGFuZHlzIHdlZy5tcDM",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-27/Handys weg.mp3",
+      "approved": true
+    },
+    {
       "id": "gemeinsam-schaffen-wir-das",
       "title": "Gemeinsam schaffen wir das",
       "level": "ALL",
