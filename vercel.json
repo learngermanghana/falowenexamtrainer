@@ -16,6 +16,19 @@
   },
   "headers": [
     {
+      "source": "/music/analytics-config.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0, must-revalidate"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
+    },
+    {
       "source": "/__falowen-build.json",
       "headers": [
         {
