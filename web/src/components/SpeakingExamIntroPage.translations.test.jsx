@@ -16,7 +16,9 @@ describe("A1 Day 15 · Speaking Exam Intro English support", () => {
     ["Glas Wasser", "glass of water", "bringen", "bring"],
     ["Radio", "radio", "ausmachen", "turn off"],
   ])("keeps %s and the English meaning next to its picture and verb", (object, meaning, verb, translation) => {
-    const card = screen.getAllByRole("img", { name: `${object} picture` })[0].closest("[data-a1-teil3-object-card]");
+    const card = screen.getAllByRole("img", { name: `${object} picture` })
+      .map((picture) => picture.closest("[data-a1-teil3-object-card]"))
+      .find((item) => item?.textContent.includes(verb));
     expect(card).not.toBeNull();
     const englishLabels = [...card.querySelectorAll("[lang=en]")].map((item) => item.textContent);
     expect(englishLabels.some((value) => value.includes(meaning))).toBe(true);
