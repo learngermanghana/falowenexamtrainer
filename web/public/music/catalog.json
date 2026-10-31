@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "updated": "2026-10-30",
+  "version": 6,
+  "updated": "2026-10-31",
   "description": "Teacher-approved published course music. Strictly music/ R2 keys; no private Hören recordings or storage credentials.",
   "tracks": [
     {
@@ -208,6 +208,24 @@
       "audioUrl": "https://admin.falowen.app/Schritt%20f%C3%BCr%20Schritt.mp3",
       "featured": false,
       "attendance": true
+    },
+    {
+      "id": "r2-a2-day-08-b64_RWluIEFiZW5kIHp1IHp3ZWl0Lm1wMw",
+      "title": "Ein Abend zu zweit",
+      "level": "A2",
+      "day": 8,
+      "assignmentKey": "A2-3.8",
+      "topic": "Im Restaurant – bestellen und reagieren",
+      "type": "Learning story",
+      "genre": "Chill Piano Pop",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-08-b64_RWluIEFiZW5kIHp1IHp3ZWl0Lm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-08/Ein Abend zu zweit.mp3",
+      "approved": true
     }
   ]
 }
