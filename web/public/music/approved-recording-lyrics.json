@@ -503,6 +503,19 @@
       "recordingSha256": "4bbc08b4fd39ca347cfb7023d74a73f12bcac767d73f7e99b5316116be5fccd3",
       "duration": 176.04,
       "timingMethod": "waveform-guided alignment against user-supplied 176.04-second MP3; review before marking exact"
+    },
+    {
+      "trackId": "r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw",
+      "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
+      "assignmentKey": "A2-4.11",
+      "title": "Mit dem Rad, mit dem Zug",
+      "lyrics": "[Intro]\nMit dem Rad, mit dem Zug.\n\n[Verse 1]\nAm Morgen fahre ich mit dem Rad,\ndie Sonne scheint auf meine Stadt.\nDer Wind ist frisch, die Luft ist klar,\nich fahre los, wie wunderbar.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an.\n\n[Verse 2]\nAm Nachmittag nehme ich den Zug,\nich habe heute noch nicht genug.\nIch kaufe mir eine Fahrkarte\nund steige ein, bevor ich starte.\nDie Häuser ziehen schnell vorbei,\nich schaue raus und fühle mich frei.\nAm Bahnhof wartest du auf mich,\nich steige aus und freue mich.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an,\nweil ich mit dir die Welt entdecken kann.\n\n[Outro]\nMal fahre ich Rad, mal nehme ich den Zug,\nich bin unterwegs, das gefällt mir gut.\nOb nah, ob fern, ich komme an,\nweil jeder Weg uns verbinden kann.",
+      "cues": [],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "208e3be5013d24a27c17d51b5d5f574fffd9e0df28af6a118a87ec1baef59d1d",
+      "duration": 141.6,
+      "source": "Owner-supplied A2 Day 11 MP3 and matching lyrics; lyric timestamps not reviewed",
+      "genre": "Acoustic Afro-Soul"
     }
   ]
 }
