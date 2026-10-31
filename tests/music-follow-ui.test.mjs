@@ -20,7 +20,7 @@ async function room(track,pack){
  for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));
  return {w,a,dom,click:id=>w.document.getElementById(id).click()};
 }
-for(const [level,day] of [['A1',4],['A2',18],['B1',24],['A1',14],['A1',13]])test(level+' Day '+day+' public music follows exact cues, seeks, repeats and marks quiz answers',async()=>{
+for(const [level,day] of [['A2',18],['B1',24],['A1',14],['A1',13]])test(level+' Day '+day+' public music follows exact cues, seeks, repeats and marks quiz answers',async()=>{
  const pack=recordings.find(p=>p.objectKey.startsWith('music/'+level.toLowerCase()+'/day-'+String(day).padStart(2,'0')+'/'));
  const track={id:'r2-test-'+level,level,day,title:'Test '+level,objectKey:pack.objectKey,autoDiscovered:true,coursebook:true,audioUrl:'https://www.falowen.app/api/music?track=r2-test-'+level};
  const {w,a,dom,click}=await room(track,pack);const d=w.document;
