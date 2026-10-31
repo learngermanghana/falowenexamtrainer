@@ -1,9 +1,10 @@
 import React from "react";
 import { getAllowedWorkbookTabs, getA1WorkbookTabDefinitions } from "./A1SharedAssignmentWorkbookLayout";
 import { __TESTING__ } from "./A1UnifiedTutorWorkbookNavigation";
-import { readFileSync } from "node:fs";
+import { readFileSync } from "fs";
+import path from "path";
 
-const local = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+const local = (file) => readFileSync(path.join(__dirname, file), "utf8");
 const section = [{key:"teil-2",number:2,label:"Reading + Questions"}];
 
 describe("optional A1 tutor Music navigation", () => {
