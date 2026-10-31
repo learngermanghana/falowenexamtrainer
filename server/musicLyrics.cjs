@@ -75,6 +75,10 @@ function createLyricsHandler({env=process.env,fetchImpl=fetch,timings=builtInTim
       // ignoring [Verse] headers, against the owner-approved MP3 transcript.
       if((approved?.recordingSha256 || approved?.strictRecordingLyrics) && !sameSungLines(checked.lyrics,approved.lyrics))
         return fallback ? sendFallback() : res.status(422).json({error:'Stale lyrics for published recording'});
+      // An exact-wording but untimed sidecar must not disable waveform-guided
+      // fallback cues for this fingerprinted recording. Reviewed R2 cues still win.
+      if(fallback?.cues?.length && !checked.cues?.length)
+        return sendFallback();
       return res.status(200).json(checked);
     } catch { if(fallback) return sendFallback(); res.setHeader('Cache-Control','no-store'); return res.status(503).json({error:'Lyrics temporarily unavailable'}); }
   };
