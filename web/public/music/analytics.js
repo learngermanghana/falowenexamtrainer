@@ -44,8 +44,7 @@
   function trackedSong() {
     // app.js controls the current audio, and updates the player title and browser history.
     // Track IDs are embedded in the canonical path when a song is selected.
-    const params = new URLSearchParams(location.search);
-    const id = params.get('track');
+    const id = audio?.dataset?.trackId || new URLSearchParams(location.search).get('track');
     if (id) return { id };
     const path = location.pathname.match(/\/music\/songs\/([^/]+)\.html$/);
     return path ? { id: decodeURIComponent(path[1]) } : null;
