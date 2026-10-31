@@ -88,6 +88,9 @@
     consent = choice;
     try { localStorage.setItem(consentKey, choice); } catch {}
     document.getElementById('music-analytics-consent')?.remove();
+    if (choice === 'declined' && initialized && typeof window.gtag === 'function') {
+      window.gtag('consent', 'update', { analytics_storage: 'denied' });
+    }
     if (choice === 'accepted') initAnalytics();
   }
 
@@ -114,6 +117,13 @@
     document.body.appendChild(banner);
   }
 
+  const settings = document.getElementById('music-analytics-settings');
+  if (settings) {
+    settings.hidden = false;
+    settings.addEventListener('click', () => {
+      if (!document.getElementById('music-analytics-consent')) showConsent();
+    });
+  }
   if (consent === 'accepted') initAnalytics();
   else if (consent !== 'declined') showConsent();
 })();
