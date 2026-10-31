@@ -244,6 +244,24 @@
       "slides": true,
       "objectKey": "music/a2/day-10/Die Welt entdecken.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-a2-day-12-b64_VHLDpHVtZSDDpG5kZXJuIHNpY2gubXAz",
+      "title": "Träume ändern sich",
+      "level": "A2",
+      "day": 12,
+      "assignmentKey": "A2-5.12",
+      "topic": "Mein Traumberuf · Dreams and career paths",
+      "type": "Learning story",
+      "genre": "German Acoustic Pop / Afro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-12-b64_VHLDpHVtZSDDpG5kZXJuIHNpY2gubXAz",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-12/Träume ändern sich.mp3",
+      "approved": true
     }
   ]
 }
