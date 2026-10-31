@@ -244,6 +244,24 @@
       "slides": true,
       "objectKey": "music/a2/day-10/Die Welt entdecken.mp3",
       "approved": true
+    },
+    {
+      "id": "r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw",
+      "title": "Mit dem Rad, mit dem Zug",
+      "level": "A2",
+      "day": 11,
+      "assignmentKey": "A2-4.11",
+      "topic": "Unterwegs · Rad und Zug",
+      "type": "Learning story",
+      "genre": "Acoustic Afro-Soul",
+      "language": "German",
+      "audioUrl": "https://www.falowen.app/api/music?track=r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw",
+      "featured": false,
+      "attendance": true,
+      "coursebook": true,
+      "slides": true,
+      "objectKey": "music/a2/day-11/Mit dem Rad, mit dem Zug.mp3",
+      "approved": true
     }
   ]
 }
