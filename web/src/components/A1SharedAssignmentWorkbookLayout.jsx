@@ -6,6 +6,7 @@ import { styles } from "../styles";
 import { TimedAssignmentPanel } from "./SharedTimedAssignment";
 import { normalizeA1SectionView, replaceLessonView } from "../utils/lessonSectionDeepLinks";
 import WorkbookSectionPdfAction from "./WorkbookSectionPdfAction";
+import "./a1TutorMusicTabs.css";
 import { useA1TimedMockExam } from "./A1TimedMockExam";
 
 export const WorkbookSection = ({ sectionKey, children }) => (
@@ -56,17 +57,18 @@ export const validateWorkbookSections = (assignment, sectionElements) => {
   });
 };
 
-export const getAllowedWorkbookTabs = (sections, hasGrammar = false) => [
+export const getAllowedWorkbookTabs = (sections, hasGrammar = false, hasMusic = false) => [
   sections.length ? "overview" : "assignment",
   ...(hasGrammar ? ["grammar"] : []),
   ...sections.map(({ key }) => key),
+  ...(hasMusic ? ["music"] : []),
   "submit",
 ];
 
-export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false }) => {
+export const useA1WorkbookTabState = ({ assignment, sections = assignment.sections, hasGrammar = false, hasMusic = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar), [hasGrammar, sections]);
+  const allowedTabs = useMemo(() => getAllowedWorkbookTabs(sections, hasGrammar, hasMusic), [hasGrammar, hasMusic, sections]);
   const fallbackTab = sections.length ? "overview" : "assignment";
   const rawSearch = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const requestedTab = rawSearch.get("workbookTab");
@@ -161,17 +163,19 @@ const tabButtonStyle = (selected, submit = false) => ({
   whiteSpace: "normal",
 });
 
-export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false } = {}) =>
+export const getA1WorkbookTabDefinitions = ({ sections = [], hasGrammar = false, hasMusic = false } = {}) =>
   sections.length
     ? [
       { key: "overview", label: "Overview" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
       ...sections,
+      ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       { key: "submit", label: "Review & Submit", submit: true },
     ]
     : [
       { key: "assignment", label: "Assignment" },
       ...(hasGrammar ? [{ key: "grammar", label: "Grammar" }] : []),
+      ...(hasMusic ? [{ key: "music", label: "♫ Music", optional: true }] : []),
       { key: "submit", label: "Review & Submit", submit: true },
     ];
 
@@ -221,11 +225,12 @@ export const A1WorkbookSectionAction = ({ sections = [], sectionKey, onSelect })
   );
 };
 
-export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, assignmentLocked = false, isTabLocked = null }) => {
-  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar });
-  const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.key === activeTab));
-  const activeTabDefinition = tabs[activeIndex] || null;
-  const progressPercent = tabs.length ? Math.round(((activeIndex + 1) / tabs.length) * 100) : 0;
+export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSelect, hasGrammar = false, hasMusic = false, assignmentLocked = false, isTabLocked = null }) => {
+  const tabs = getA1WorkbookTabDefinitions({ sections, hasGrammar, hasMusic });
+  const requiredTabs = tabs.filter((tab) => !tab.optional);
+  const activeIndex = Math.max(0, requiredTabs.findIndex((tab) => tab.key === activeTab));
+  const activeTabDefinition = tabs.find((tab) => tab.key === activeTab) || null;
+  const progressPercent = requiredTabs.length ? Math.round(((activeIndex + 1) / requiredTabs.length) * 100) : 0;
 
   return (
     <div data-a1-workbook-navigation-shell="true" style={{ display: "grid", gap: 8 }}>
@@ -247,7 +252,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         }}
       >
         {tabs.map((tab) => {
-          const locked = typeof isTabLocked === "function"
+          const locked = tab.optional ? false : typeof isTabLocked === "function"
             ? isTabLocked(tab.key)
             : assignmentLocked && !["overview", "assignment", "grammar"].includes(tab.key);
           return (
@@ -255,17 +260,18 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
               key={tab.key}
               type="button"
               role="tab"
+              data-workbook-tab-key={tab.key}
               aria-selected={activeTab === tab.key}
               aria-label={locked ? `${tab.label} (locked until timed mock starts)` : tab.label}
               disabled={locked}
               onClick={() => onSelect(tab.key)}
-              style={{ ...tabButtonStyle(activeTab === tab.key, tab.submit), cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.52 : 1 }}
+              style={{ ...tabButtonStyle(activeTab === tab.key, tab.submit), ...(tab.optional ? { background: activeTab === "music" ? "#16604a" : "#e7f9ee", borderColor: "#86cba6", color: activeTab === "music" ? "#ffffff" : "#16543d" } : {}), cursor: locked ? "not-allowed" : "pointer", opacity: locked ? 0.52 : 1 }}
             >
               {locked ? `🔒 ${tab.label}` : tab.label}
             </button>
           );
         })}
-        <TimedAssignmentPanel studyMode={activeTab === "grammar"} />
+        <TimedAssignmentPanel studyMode={activeTab === "grammar" || activeTab === "music"} />
       </nav>
 
       <div
@@ -273,15 +279,15 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
         style={{ ...styles.card, padding: "10px 12px", display: "grid", gap: 7 }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", color: "#475569", fontSize: 13, fontWeight: 800 }}>
-          <span>Section {activeIndex + 1} of {tabs.length}</span>
+          <span>{activeTab === "music" ? "♫ Optional listening · ungraded" : `Section ${activeIndex + 1} of ${requiredTabs.length}`}</span>
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <span>{progressPercent}%</span>
-            {activeTabDefinition?.key !== "submit" ? (
+            <span>{activeTab === "music" ? "No submission required" : `${progressPercent}%`}</span>
+            {activeTabDefinition?.key !== "submit" && activeTabDefinition?.key !== "music" ? (
               <WorkbookSectionPdfAction sectionLabel={activeTabDefinition?.label || "section"} />
             ) : null}
           </div>
         </div>
-        <div
+        {activeTab !== "music" ? <div
           role="progressbar"
           aria-label="A1 workbook section progress"
           aria-valuemin={0}
@@ -290,7 +296,7 @@ export const A1SharedWorkbookTabBar = ({ assignment, sections, activeTab, onSele
           style={{ height: 7, width: "100%", background: "#dbeafe", borderRadius: 999, overflow: "hidden" }}
         >
           <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb", borderRadius: 999, transition: "width 180ms ease" }} />
-        </div>
+        </div> : null}
       </div>
     </div>
   );
@@ -327,6 +333,7 @@ export default function A1SharedAssignmentWorkbookLayout({
   children,
   grammar,
   overview,
+  music = null,
   renderSubmission,
 }) {
   const assignment = getA1Assignment(assignmentKey);
@@ -344,18 +351,19 @@ export default function A1SharedAssignmentWorkbookLayout({
     ? [{ key: "teil-2", number: 2, label: "Reading + Questions" }]
     : assignment.sections.filter(({ key }) => renderedKeys.has(key));
   const hasGrammar = Boolean(grammar);
-  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar });
+  const hasMusic = Boolean(music);
+  const { activeTab, openTab } = useA1WorkbookTabState({ assignment, sections: availableSections, hasGrammar, hasMusic });
   const { assignmentLocked, isTabLocked } = useA1TimedMockExam();
   const overviewTab = availableSections.length ? "overview" : "assignment";
-  const activeTabAllowedWhileLocked = ["overview", "assignment", "grammar"].includes(activeTab);
-  const visibleActiveTab = isTabLocked(activeTab) && !activeTabAllowedWhileLocked
+  const activeTabAllowedWhileLocked = ["overview", "assignment", "grammar", "music"].includes(activeTab);
+  const visibleActiveTab = !activeTabAllowedWhileLocked && isTabLocked(activeTab)
     ? (hasGrammar ? "grammar" : overviewTab)
     : activeTab;
   const layoutRef = useRef(null);
   const pendingViewportTabRef = useRef("");
 
   useEffect(() => {
-    if (!isTabLocked(activeTab) || ["overview", "assignment", "grammar"].includes(activeTab)) return;
+    if (["overview", "assignment", "grammar", "music"].includes(activeTab) || !isTabLocked(activeTab)) return;
     openTab(hasGrammar ? "grammar" : overviewTab);
   }, [activeTab, hasGrammar, isTabLocked, openTab, overviewTab]);
 
@@ -379,6 +387,7 @@ export default function A1SharedAssignmentWorkbookLayout({
         activeTab={visibleActiveTab}
         onSelect={openTab}
         hasGrammar={hasGrammar}
+        hasMusic={hasMusic}
         assignmentLocked={assignmentLocked}
         isTabLocked={isTabLocked}
       />
@@ -415,6 +424,11 @@ export default function A1SharedAssignmentWorkbookLayout({
             </div>
           ))
         )}
+        {hasMusic ? (
+          <div data-workbook-panel="music" data-a1-tutor-music-panel="true" hidden={visibleActiveTab !== "music"}>
+            {visibleActiveTab === "music" ? music : null}
+          </div>
+        ) : null}
         <div
           data-workbook-panel="submit"
           hidden={visibleActiveTab !== "submit"}

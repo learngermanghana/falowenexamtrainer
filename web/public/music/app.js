@@ -292,6 +292,7 @@ function renderCatalog() {
     const songs = visibleTracks.filter(track => track.level === groupLevel);
     if (!songs.length) continue;
     const section = el("section", "level-section");
+    section.dataset.level = groupLevel.toLowerCase();
     const heading = el("div", "level-heading");
     const title = groupLevel === "ALL" ? "Classroom motivation" : groupLevel + " · German songs";
     heading.append(el("h3", "", title));
@@ -491,6 +492,7 @@ function renderDetail(track) {
   const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
   byId("detail-title").textContent = track.title;
+  byId("song-detail").dataset.level = String(track.level || "all").toLowerCase();
   updateDetailFavorite();
   byId("detail-meta").textContent = [track.topic, track.genre || track.type, track.language].join(" · ");
   byId("listen-prompt").textContent = hasLesson

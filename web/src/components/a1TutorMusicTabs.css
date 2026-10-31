@@ -1,0 +1,33 @@
+/* A1 teacher workbook: small, readable tabs without hiding Submit.
+   CSS only; Music stays outside grading, section counts and time limits. */
+[data-a1-workbook-navigation-shell] [data-workbook-tab-key="music"] {
+  box-shadow: inset 0 0 0 1px rgba(22, 96, 74, 0.10);
+}
+[data-a1-tutor-music-panel="true"] {
+  border-radius: 20px;
+  overflow: hidden;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  [data-a1-workbook-navigation-shell] [data-workbook-navigation="shared"] {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+  }
+  [data-a1-workbook-navigation-shell] [data-workbook-navigation="shared"] button[role="tab"] {
+    min-width: 0;
+    width: 100%;
+    min-height: 52px;
+    font-size: 14px;
+    padding: 10px 8px;
+    overflow-wrap: anywhere;
+  }
+  [data-a1-workbook-navigation-shell] [data-workbook-tab-key="submit"] {
+    grid-column: 1 / -1;
+  }
+  [data-a1-workbook-navigation-shell] [data-workbook-navigation="shared"] > :not(button) {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+}

@@ -5,6 +5,7 @@ import routeConfig from "../data/inAppWorkbookRoutes.json";
 import { styles } from "../styles";
 import { getInlineCourseAssignments, normalizeCourseAssignmentKey } from "../utils/courseLessonAssignments";
 import CourseWorkbookSubmissionTabs from "./CourseWorkbookSubmissionTabs";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import {
   buildA1WorkbookContentGroups,
   findA1WorkbookTeilSections,
@@ -18,6 +19,7 @@ const NATIVE_TABS_HIDDEN_ATTRIBUTE = "data-a1-unified-native-tabs-hidden";
 const NATIVE_TABS_DISPLAY_ATTRIBUTE = "data-a1-unified-native-tabs-display";
 const GROUP_DISPLAY_ATTRIBUTE = "data-a1-unified-group-display";
 const LEGACY_NAV_DISPLAY_ATTRIBUTE = "data-a1-unified-legacy-nav-display";
+const MUSIC_PAGE_DISPLAY_ATTRIBUTE = "data-a1-unified-music-original-display";
 const SHARED_VIEW_PARAM = "workbookTab";
 const A1_TUTOR_MARKED_ASSIGNMENT_KEY_SET = new Set(A1_TUTOR_MARKED_ASSIGNMENT_KEYS);
 
@@ -262,6 +264,17 @@ const restoreLegacyNavigation = (main) => {
   });
 };
 
+const showOrHidePageForMusic = (pageRoot, musicActive) => {
+  if (!pageRoot) return;
+  if (musicActive) {
+    if (!pageRoot.hasAttribute(MUSIC_PAGE_DISPLAY_ATTRIBUTE)) pageRoot.setAttribute(MUSIC_PAGE_DISPLAY_ATTRIBUTE, pageRoot.style.display || "");
+    pageRoot.style.display = "none";
+  } else if (pageRoot.hasAttribute(MUSIC_PAGE_DISPLAY_ATTRIBUTE)) {
+    pageRoot.style.display = pageRoot.getAttribute(MUSIC_PAGE_DISPLAY_ATTRIBUTE) || "";
+    pageRoot.removeAttribute(MUSIC_PAGE_DISPLAY_ATTRIBUTE);
+  }
+};
+
 const findFallbackPageRoot = (main) =>
   Array.from(main?.children || []).find((element) => {
     if (element.hasAttribute?.(NAV_MOUNT_ATTRIBUTE)) return false;
@@ -272,7 +285,7 @@ const findFallbackPageRoot = (main) =>
 
 const getRequestedSharedView = (search = "") => {
   const value = String(new URLSearchParams(search || "").get(SHARED_VIEW_PARAM) || "").trim().toLowerCase();
-  if (value === "submit" || value === "overview" || value === "assignment") return value;
+  if (value === "submit" || value === "overview" || value === "assignment" || value === "music") return value;
   return /^teil-\d+$/.test(value) ? value : "";
 };
 
@@ -358,7 +371,7 @@ export default function A1UnifiedTutorWorkbookNavigation() {
   );
 
   useEffect(() => {
-    if (requestedView === "submit" || requestedView === "overview" || /^teil-\d+$/.test(requestedView)) {
+    if (requestedView === "submit" || requestedView === "overview" || requestedView === "music" || /^teil-\d+$/.test(requestedView)) {
       setActiveView(requestedView);
       return;
     }
@@ -451,6 +464,7 @@ export default function A1UnifiedTutorWorkbookNavigation() {
     return () => {
       disposed = true;
       observer.disconnect();
+      showOrHidePageForMusic(pageRootRef.current, false);
       restoreA1UnifiedWorkbookGroups(pageRootRef.current);
       restoreA1NativeAssignmentTabs(pageRootRef.current);
       const main = document.querySelector("main.layout-main") || document.querySelector("main");
@@ -476,6 +490,7 @@ export default function A1UnifiedTutorWorkbookNavigation() {
       if (activeView !== "submit" && !nextState.pageManaged) {
         applyA1UnifiedWorkbookView({ groups: nextState.groups, activeView });
       }
+      showOrHidePageForMusic(pageRootRef.current, activeView === "music");
       hideA1NativeAssignmentTabs(pageRootRef.current);
       suppressLegacyNavigation(document.querySelector("main.layout-main") || document.querySelector("main"));
       syncLocation(activeView);
@@ -498,6 +513,7 @@ export default function A1UnifiedTutorWorkbookNavigation() {
     ...(hasSections
       ? [{ key: "overview", label: "Overview" }, ...sectionTabs.map((tab) => ({ key: tab.key, label: `Teil ${tab.number}` }))]
       : [{ key: "assignment", label: "Assignment" }]),
+    { key: "music", label: "♫ Music" },
     { key: "submit", label: "Submit", submit: true },
   ];
 
@@ -518,7 +534,8 @@ export default function A1UnifiedTutorWorkbookNavigation() {
       <style>{`
         [data-a1-teil-navigation="true"],
         [aria-label="A1 Day 21 workbook navigation"],
-        [${NATIVE_TABS_HIDDEN_ATTRIBUTE}="true"] { display: none !important; }
+        [${NATIVE_TABS_HIDDEN_ATTRIBUTE}="true"],
+        main:has([data-a1-unified-tutor-workbook-nav="true"]) [data-a1-optional-music="true"] { display: none !important; }
       `}</style>
       <div
         role="tablist"
@@ -574,6 +591,13 @@ export default function A1UnifiedTutorWorkbookNavigation() {
     navMount,
   );
 
+  const musicPanel = activeView === "music" && navMount ? createPortal(
+    <div data-a1-unified-tutor-music-panel="true" style={{ marginBottom: 16 }}>
+      <WorkbookDayMusic level="A1" day={Number(match.day)} learningMode="tutor" hideLegacyNotes />
+    </div>,
+    navMount,
+  ) : null;
+
   const submissionController = ownsSubmissionHost && submissionHost
     ? createPortal(
         <CourseWorkbookSubmissionTabs hostRef={{ current: submissionHost }} match={match} />,
@@ -584,6 +608,7 @@ export default function A1UnifiedTutorWorkbookNavigation() {
   return (
     <>
       {navigation}
+      {musicPanel}
       {submissionController}
     </>
   );

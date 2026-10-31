@@ -103,7 +103,8 @@ describe("A1 optional Music within tutor and self-learning materials", () => {
     const shell = read("A1TutorMarkedWorkbookShell.js");
     const media = read("A1WorkbookMediaPanel.jsx");
     const self = read("A1CoursePracticeAutoMount.js");
-    expect(shell).toContain('<A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />');
+    expect(shell).toContain('<A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} includeMusic={false} />');
+    expect(shell).toContain('music={<WorkbookDayMusic level="A1" day={assignment.day}');
     expect(shell).toContain('<A1TimedMockExam assignment={assignment}>');
     expect(shell).toContain('<A1CanonicalSubmissionPanel');
     expect(media).toContain('<A1OptionalWorkbookMusic day={day} mode={learningMode} />');
@@ -112,6 +113,11 @@ describe("A1 optional Music within tutor and self-learning materials", () => {
     expect(self).toContain('learningMode="self"');
     expect(self).toContain('data-a1-self-learning-workbook-media');
     expect(self).not.toContain('musicComplete');
+  });
+
+  test("tutor shell can suppress duplicate media music card without removing videos", () => {
+    const { container } = render(<A1WorkbookMediaPanel day={5} chapter="2.2" includeMusic={false} />);
+    expect(container.querySelector('[data-a1-optional-music="true"]')).toBeNull();
   });
 
   test("same A1 day only accepts approved music-prefix objects, never Hören audio", () => {

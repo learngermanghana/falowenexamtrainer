@@ -132,3 +132,83 @@
 .category-controls{display:flex;flex-wrap:wrap;gap:9px}
 .track-actions{align-items:center;flex-wrap:wrap}
 @media(max-width:700px){.track-actions{gap:8px}.favorite-button{padding:8px 10px;font-size:12px}.detail-actions{flex-wrap:wrap}.category-controls{gap:7px}.category-controls button{font-size:12px}}
+
+
+/* Falowen Music listening-stage refresh — rhythmic depth, readable lyric sheets,
+   differentiated A1/A2/B1 shelf accents; no imagery, extra requests or animation. */
+html,body { background:#0e1921; }
+.library-section {
+  background:
+    radial-gradient(ellipse 50% 420px at 94% 2%, rgba(90,157,130,.17),transparent 75%),
+    radial-gradient(ellipse 60% 500px at 2% 52%, rgba(71,105,165,.15),transparent 78%),
+    linear-gradient(150deg,#10232a 0%,#0d1b25 48%,#122b2b 100%);
+  min-width:0;
+}
+.level-section {
+  border:1px solid rgba(218,249,228,.12);
+  border-radius:24px;
+  padding:22px clamp(12px,2vw,26px) 26px;
+  background:linear-gradient(125deg,rgba(255,255,255,.058),rgba(255,255,255,.014));
+  box-shadow:0 18px 42px rgba(1,14,19,.15);
+}
+.level-heading h3 { color:#f4fbf5; }
+.level-section[data-level="a1"] { border-top:3px solid #afeb91; }
+.level-section[data-level="a2"] { border-top:3px solid #f0bc7b; }
+.level-section[data-level="b1"] { border-top:3px solid #8ecae4; }
+.level-section[data-level="a1"] .track-art {
+  background:radial-gradient(circle at 24% 18%,#83c0a0,transparent 55%),linear-gradient(145deg,#29644f,#122c2e);
+}
+.level-section[data-level="a2"] .track-art {
+  background:radial-gradient(circle at 26% 18%,#e5b883,transparent 55%),linear-gradient(145deg,#75563f,#312e39);
+}
+.level-section[data-level="b1"] .track-art {
+  background:radial-gradient(circle at 25% 20%,#8ab6cc,transparent 55%),linear-gradient(145deg,#30596b,#1d2c46);
+}
+.level-section .track-card {
+  border:1px solid rgba(228,250,243,.12);
+  background:linear-gradient(155deg,#233638,#16272d);
+  box-shadow:0 12px 26px rgba(0,10,16,.19);
+}
+.level-section .track-card:hover,.level-section .track-card:focus-within {
+  border-color:#9ed6ac;
+  background:linear-gradient(155deg,#29483f,#1c3237);
+}
+.level-section .art-circle { background:rgba(7,24,28,.2);border-color:rgba(4,23,27,.23); }
+.track-body h3 { color:#f7f9ef; }
+.song-detail {
+  background:linear-gradient(120deg,#e9f7f1,#f5f7ec 57%,#e9f2f6);
+  border-color:#cae0d4;
+}
+.song-detail[data-level="a2"] {background:linear-gradient(120deg,#fff2e0,#f5f7ec 55%,#eaf4f1);}
+.song-detail[data-level="b1"] {background:linear-gradient(120deg,#e9f4fb,#f3f7f4 55%,#e8f4ef);}
+.detail-shell { color:#17352f; }
+.detail-panel {
+  background:linear-gradient(145deg,rgba(255,255,255,.98),#fbfff9);
+  border:1px solid rgba(150,189,166,.5);
+  box-shadow:0 12px 34px rgba(28,78,63,.09);
+}
+.detail-heading h2 {color:#152d2e;}
+.detail-heading p:not(.eyebrow) {color:#49685e;}
+.lesson-tabs {border-bottom-color:#b3cabc;}
+.lesson-tabs button {background:rgba(255,255,255,.55);border-color:#b7d1c4;color:#1d473c;}
+.lesson-tabs button[aria-pressed="true"] {background:#153d35;color:#fff;box-shadow:0 6px 15px rgba(15,71,54,.18);}
+.lyrics-text {
+  background:linear-gradient(145deg,#f1f9ef,#f9fcf8);
+  border:1px solid #d8e8d7;
+  padding:14px 12px;
+}
+.lyric-line {color:#254b3f;}
+.lyric-line.is-active {box-shadow:0 5px 14px rgba(73,128,65,.13);}
+.vocab-item {background:#f1f9f3;border-color:#d2e6d5;}
+.player {background:linear-gradient(90deg,#112b2d,#101e2b);border-top:1px solid rgba(204,243,213,.26);}
+.music-embedded {background:#0e1921;}
+@media(max-width:700px){
+  .level-section{border-radius:18px;padding:16px 11px 18px;margin-bottom:18px;}
+  .level-grid{gap:10px;}
+  .level-section .track-card{border-radius:12px;}
+  .detail-panel{box-shadow:0 7px 22px rgba(28,78,63,.08);}
+  .lyrics-text{padding:10px 7px;}
+}
+@media(prefers-reduced-motion:reduce){
+  .level-section .track-card{transition:none;}
+}
