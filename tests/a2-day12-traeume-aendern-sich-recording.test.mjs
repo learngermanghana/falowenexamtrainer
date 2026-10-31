@@ -32,12 +32,12 @@ test('Day 12 public catalog and public draft use the exact owner-approved MP3 an
 });
 
 test('The sung 8/4/8/4/4 lyrics match Day 12 and do not fabricate timings',()=>{
- const sections=[...pack.lyrics.matchAll(/\\[(Verse 1|Verse 2|Chorus|Outro)\\]([\\s\\S]*?)(?=\\[(?:Verse 1|Verse 2|Chorus|Outro)\\]|$)/g)];
+ const sections=[...pack.lyrics.matchAll(/\[(Verse 1|Verse 2|Chorus|Outro)\]([\s\S]*?)(?=\[(?:Verse 1|Verse 2|Chorus|Outro)\]|$)/g)];
  assert.deepEqual(sections.map(x=>x[1]),['Verse 1','Chorus','Verse 2','Chorus','Outro']);
- assert.deepEqual(sections.map(x=>x[2].split(/\\r?\\n/).map(y=>y.trim()).filter(Boolean).length),[8,4,8,4,4]);
+ assert.deepEqual(sections.map(x=>x[2].split(/\r?\n/).map(y=>y.trim()).filter(Boolean).length),[8,4,8,4,4]);
  assert.match(pack.lyrics,/Als Kind wollte ich Pilot werden,/);
  assert.match(pack.lyrics,/Jetzt interessiert mich die Medizin,/);
- assert.match(pack.lyrics,/weil jeder Traum sich ändern kann\\./);
+ assert.match(pack.lyrics,/weil jeder Traum sich ändern kann\./);
  assert.match(pack.lyrics,/Bei Falowen sprechen wir von Träumen,/);
  assert.doesNotMatch(pack.lyrics,/Dein Weg beginnt mit einem kleinen Schritt/);
  assert.equal(pack.timingStatus,'missing');
