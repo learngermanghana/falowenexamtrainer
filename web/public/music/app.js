@@ -2,8 +2,9 @@ import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
 // Never autoplay on initial load; continue only after a listener starts a song.
-// Falowen Music's static listening room. No authentication, tracking, AI calls,
-// Firestore writes or generated media. Only catalog-approved recordings play.
+// Falowen Music's static listening room. No authentication, AI calls,
+// Firestore writes or generated media. Optional consented GA4 usage tracking is
+// isolated in analytics.js on the public music host. Only approved recordings play.
 const byId = id => document.getElementById(id);
 const embedded = new URLSearchParams(location.search).get("embedded") === "1";
 // Embedded pages run on www.falowen.app, same-origin with the student's session.
