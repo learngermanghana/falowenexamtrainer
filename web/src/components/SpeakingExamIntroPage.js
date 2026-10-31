@@ -129,12 +129,12 @@ const SpeakingExamIntroPage = () => (
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
         {examCardVerbs.map(([picture, meaning, verb, translation, request, , reaction], index) => (
-          <div key={verb} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
+          <div key={verb} data-a1-teil3-object-card={picture} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <A1ExamObjectPicture label={picture} />
               <div style={{ display: "grid", gap: 3, minWidth: 0 }}>
-                <strong>{index + 1}. {picture} <span style={{ fontWeight: 400, color: "#64748b" }}>({meaning})</span></strong>
-                <span style={{ color: "#3730a3", fontSize: 14, fontWeight: 800 }}>{verb} <span style={{ fontWeight: 400 }}>· {translation}</span></span>
+                <strong>{index + 1}. {picture} <span lang="en" style={{ fontWeight: 400, color: "#64748b" }}>({meaning})</span></strong>
+                <span style={{ color: "#3730a3", fontSize: 14, fontWeight: 800 }}>{verb} <span lang="en" style={{ fontWeight: 400 }}>· {translation}</span></span>
               </div>
             </div>
             <strong>{request}</strong>
