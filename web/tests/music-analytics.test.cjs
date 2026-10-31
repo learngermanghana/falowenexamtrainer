@@ -65,12 +65,11 @@ test('declining analytics never loads Google and does not send play events', () 
   assert.equal(runtime.globals.window.gtag, undefined);
 });
 
-test('disabled default produces no network or consent popup', () => {
-  const runtime = fakeRuntime('accepted');
-  runtime.globals.window.FALOWEN_MUSIC_GA4_ID = '';
-  // The checked-in default is disabled until configured in the build environment.
+test('public music stream is configured, but GA4 only loads with consent', () => {
   const source = fs.readFileSync(path.join(root, 'public/music/analytics-config.js'), 'utf8');
-  assert.match(source, /FALOWEN_MUSIC_GA4_ID\s*=\s*""/);
+  assert.match(source, /FALOWEN_MUSIC_GA4_ID\s*=\s*"G-Q7BNDTQ68B"/);
+  const denied = fakeRuntime('declined');
+  assert.equal(denied.attached.length, 0);
 });
 
 test('build config generator writes valid JavaScript and validates IDs', () => {
