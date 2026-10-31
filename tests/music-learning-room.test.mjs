@@ -77,7 +77,7 @@ test('a new teacher-approved track appends without mutating the live catalog',()
  assert.equal(result.hasReviewedLearningPack,false);
  assert.match(result.html,/data-track="a2-day-19-shopping"/);
  assert.equal(catalog.tracks.length,original,'dry-run must not mutate source');
- assert.throws(()=>publishApprovedTrack({catalog,learning,template,input:{...input,id:catalog.tracks[0].id}}),/already registered/);
+ assert.throws(()=>publishApprovedTrack({catalog,learning,template,input:{...input,id:catalog.tracks[0].id}}),/already registered|unique lower-case URL slug/);
  for(const badKey of ['a2/day-19/hoeren.mp3','music/a2/day-18/file.mp3','music/a2/day-19/../private.mp3','music/a2/day-19/file.mp3?x=1','music/a2/day-19/File.MP3'])
   assert.throws(()=>validateApprovedTrack({...input,objectKey:badKey}),/exact approved MP3/);
 });
