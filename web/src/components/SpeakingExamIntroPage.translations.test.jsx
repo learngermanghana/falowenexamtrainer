@@ -18,9 +18,10 @@ describe("A1 Day 15 · Speaking Exam Intro English support", () => {
   ])("keeps %s and the English meaning next to its picture and verb", (object, meaning, verb, translation) => {
     const card = screen.getAllByRole("img", { name: `${object} picture` })[0].closest("[data-a1-teil3-object-card]");
     expect(card).not.toBeNull();
-    expect(within(card).getByText(new RegExp(meaning))).toBeInTheDocument();
-    expect(within(card).getByText(verb)).toBeInTheDocument();
-    expect(within(card).getByText(new RegExp(translation))).toBeInTheDocument();
+    const englishLabels = [...card.querySelectorAll("[lang=en]")].map((item) => item.textContent);
+    expect(englishLabels.some((value) => value.includes(meaning))).toBe(true);
+    expect(englishLabels.some((value) => value.includes(translation))).toBe(true);
+    expect(card.textContent).toContain(verb);
   });
 
   test.each([
