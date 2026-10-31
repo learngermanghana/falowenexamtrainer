@@ -355,10 +355,154 @@
       "assignmentKey": "A2-4.10",
       "title": "Die Welt entdecken – The Traveller",
       "genre": "Afro-Fusion",
-      "timingStatus": "missing",
+      "timingStatus": "estimated",
       "lyrics": "[Verse 1]\nMein Koffer steht schon vor der Tür,\nmein Reisepass liegt neben mir.\nMorgen fliege ich nach Nigeria,\nich freue mich, bald bin ich da.\n\nEin Zimmer habe ich reserviert,\ndie ganze Reise gut organisiert.\nIch möchte neue Menschen treffen\nund durch die bunten Straßen gehen.\n\n[Chorus]\nIch möchte nach Amerika reisen,\nnach Nigeria und Kanada.\nIch will die ganze Welt entdecken,\ndoch Ghana bleibt mir immer nah.\n\n[Verse 2]\nIch träume von New York bei Nacht,\nvon Dubai, wo die Sonne lacht.\nIn Tokio möchte ich viel sehen,\nin Paris durch die Straßen gehen.\n\nAuch Island steht auf meinem Plan,\nich schaue mir die schönen Berge an.\nSo viele Länder, so viel zu sehen,\nich möchte immer weitergehen.\n\n[Chorus]\nIch möchte nach Amerika reisen,\nnach Nigeria und Kanada.\nIch will die ganze Welt entdecken,\ndoch Ghana bleibt mir immer nah.\n\n[Outro]\nEgal, wohin die Reise geht,\negal, wo ich am Ende steh'.\nIch denke immer gern an Ghana,\nGott segne mein Heimatland.",
-      "cues": [],
-      "strictRecordingLyrics": true
+      "cues": [
+        {
+          "start": 9.75,
+          "end": 13.1,
+          "text": "Mein Koffer steht schon vor der Tür,"
+        },
+        {
+          "start": 14.25,
+          "end": 17.75,
+          "text": "mein Reisepass liegt neben mir."
+        },
+        {
+          "start": 18.75,
+          "end": 21.95,
+          "text": "Morgen fliege ich nach Nigeria,"
+        },
+        {
+          "start": 22.25,
+          "end": 26.9,
+          "text": "ich freue mich, bald bin ich da."
+        },
+        {
+          "start": 28.5,
+          "end": 31.65,
+          "text": "Ein Zimmer habe ich reserviert,"
+        },
+        {
+          "start": 32.75,
+          "end": 36.2,
+          "text": "die ganze Reise gut organisiert."
+        },
+        {
+          "start": 37.75,
+          "end": 40.8,
+          "text": "Ich möchte neue Menschen treffen"
+        },
+        {
+          "start": 41.4,
+          "end": 44.2,
+          "text": "und durch die bunten Straßen gehen."
+        },
+        {
+          "start": 45.7,
+          "end": 49.35,
+          "text": "Ich möchte nach Amerika reisen,"
+        },
+        {
+          "start": 50.1,
+          "end": 53.65,
+          "text": "nach Nigeria und Kanada."
+        },
+        {
+          "start": 55,
+          "end": 59.4,
+          "text": "Ich will die ganze Welt entdecken,"
+        },
+        {
+          "start": 60.35,
+          "end": 64.95,
+          "text": "doch Ghana bleibt mir immer nah."
+        },
+        {
+          "start": 83.75,
+          "end": 87,
+          "text": "Ich träume von New York bei Nacht,"
+        },
+        {
+          "start": 88,
+          "end": 91.5,
+          "text": "von Dubai, wo die Sonne lacht."
+        },
+        {
+          "start": 92.75,
+          "end": 96.15,
+          "text": "In Tokio möchte ich viel sehen,"
+        },
+        {
+          "start": 97.7,
+          "end": 100.65,
+          "text": "in Paris durch die Straßen gehen."
+        },
+        {
+          "start": 101.25,
+          "end": 105.45,
+          "text": "Auch Island steht auf meinem Plan,"
+        },
+        {
+          "start": 106.25,
+          "end": 110.3,
+          "text": "ich schaue mir die schönen Berge an."
+        },
+        {
+          "start": 111,
+          "end": 114.8,
+          "text": "So viele Länder, so viel zu sehen,"
+        },
+        {
+          "start": 115.75,
+          "end": 118.85,
+          "text": "ich möchte immer weitergehen."
+        },
+        {
+          "start": 119.65,
+          "end": 123.65,
+          "text": "Ich möchte nach Amerika reisen,"
+        },
+        {
+          "start": 124.15,
+          "end": 128.15,
+          "text": "nach Nigeria und Kanada."
+        },
+        {
+          "start": 128.85,
+          "end": 133,
+          "text": "Ich will die ganze Welt entdecken,"
+        },
+        {
+          "start": 133.6,
+          "end": 137.6,
+          "text": "doch Ghana bleibt mir immer nah."
+        },
+        {
+          "start": 138.65,
+          "end": 143.05,
+          "text": "Egal, wohin die Reise geht,"
+        },
+        {
+          "start": 143.65,
+          "end": 148.05,
+          "text": "egal, wo ich am Ende steh'."
+        },
+        {
+          "start": 148.35,
+          "end": 152.2,
+          "text": "Ich denke immer gern an Ghana,"
+        },
+        {
+          "start": 152.55,
+          "end": 159.15,
+          "text": "Gott segne mein Heimatland."
+        }
+      ],
+      "strictRecordingLyrics": true,
+      "recordingSha256": "4bbc08b4fd39ca347cfb7023d74a73f12bcac767d73f7e99b5316116be5fccd3",
+      "duration": 176.04,
+      "timingMethod": "waveform-guided alignment against user-supplied 176.04-second MP3; review before marking exact"
     }
   ]
 }
