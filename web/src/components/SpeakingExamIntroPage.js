@@ -1,5 +1,6 @@
 import React from "react";
 import AppBackButton from "./navigation/AppBackButton";
+import A1ExamObjectPicture from "./A1ExamObjectPicture";
 import { styles } from "../styles";
 
 const card = {
@@ -61,7 +62,7 @@ const SpeakingExamIntroPage = () => (
 
     <Section eyebrow="Teacher lecture" title="Introduction to the speaking exam">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        Watch the teacher lecture first. It introduces the speaking exam before you work through the notes and guided practice below.
+        Watch the teacher lecture first. It introduces the speaking exam before you work through the notes and illustrated picture-card examples below.
       </p>
       <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 14, overflow: "hidden", background: "#0f172a" }}>
         <iframe
@@ -128,10 +129,13 @@ const SpeakingExamIntroPage = () => (
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 10 }}>
         {examCardVerbs.map(([picture, meaning, verb, translation, request, , reaction], index) => (
-          <div key={verb} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
-            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-              <strong>{index + 1}. {picture} <span style={{ fontWeight: 400, color: "#64748b" }}>({meaning})</span></strong>
-              <span style={{ color: "#3730a3", fontWeight: 800 }}>{verb} <span style={{ fontWeight: 400 }}>· {translation}</span></span>
+          <div key={verb} data-a1-teil3-object-card={picture} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, display: "grid", gap: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <A1ExamObjectPicture label={picture} />
+              <div style={{ display: "grid", gap: 3, minWidth: 0 }}>
+                <strong>{index + 1}. {picture} <span lang="en" style={{ fontWeight: 400, color: "#64748b" }}>({meaning})</span></strong>
+                <span style={{ color: "#3730a3", fontSize: 14, fontWeight: 800 }}>{verb} <span lang="en" style={{ fontWeight: 400 }}>· {translation}</span></span>
+              </div>
             </div>
             <strong>{request}</strong>
             <span style={{ color: "#475569", fontSize: 13 }}><strong>Reaction:</strong> {reaction}</span>
@@ -208,41 +212,9 @@ const SpeakingExamIntroPage = () => (
       </div>
     </Section>
 
-    <Section eyebrow="Guided practice" title="Look at the object, make the request, react">
-      <p style={{ margin: 0, color: "#475569" }}>
-        Say your own request before opening the model. Then say the partner's short reaction.
-      </p>
-      <div style={{ display: "grid", gap: 12 }}>
-        {[
-          ["Flasche · bottle", "Ask someone to open it.", "Können Sie bitte die Flasche öffnen?", "Ja, gern."],
-          ["Bleistift · pencil", "Ask someone to give it to you.", "Können Sie mir bitte den Bleistift geben?", "Natürlich, hier bitte."],
-          ["Glas Wasser · water", "Ask someone to bring you water.", "Können Sie mir bitte ein Glas Wasser bringen?", "Ja, natürlich."],
-          ["Tür · door", "Ask someone to close it.", "Können Sie bitte die Tür schließen?", "Ja, gern."],
-          ["Radio · radio", "Ask someone to switch it off.", "Können Sie bitte das Radio ausmachen?", "Ja, natürlich."],
-          ["Stuhl · chair", "Ask someone to fetch one.", "Können Sie bitte einen Stuhl holen?", "Ja, gern."],
-        ].map(([object, situation, model, reaction], index) => (
-          <details key={object} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 14 }}>
-            <summary style={{ cursor: "pointer", fontWeight: 800 }}>{index + 1}. {object} — {situation}</summary>
-            <p style={{ margin: "10px 0 4px" }}><strong>Request:</strong> {model}</p>
-            <p style={{ margin: 0 }}><strong>Reaction:</strong> {reaction}</p>
-          </details>
-        ))}
-      </div>
-    </Section>
-
-    <Section eyebrow="Mini exam" title="Five picture cards — no models">
-      <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8, lineHeight: 1.65 }}>
-        <li><strong>Flasche:</strong> Ask the person to open it.</li>
-        <li><strong>Bleistift:</strong> Ask the person to give it to you.</li>
-        <li><strong>Glas Wasser:</strong> Ask the person to bring it to you.</li>
-        <li><strong>Radio:</strong> Ask the person to turn it off.</li>
-        <li><strong>Stuhl:</strong> Ask the person to get one. Then respond to another person's request with <em>Ja, gern</em> or <em>Tut mir leid, das geht leider nicht</em>.</li>
-      </ol>
-    </Section>
-
     <Section eyebrow="Official practice" title="Continue with Goethe material">
       <p style={{ margin: 0, lineHeight: 1.7 }}>
-        After practising the structures above, use the official Goethe A1 speaking practice and focus on Teil 3 picture prompts.
+        Use the official Goethe A1 speaking practice to try the picture prompts independently, without copying the model sentences above.
       </p>
       <a href="https://bfu.goethe.de/a1_sd1/sprechen.php" target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, width: "fit-content", textDecoration: "none" }}>
         Open official Goethe A1 speaking practice
