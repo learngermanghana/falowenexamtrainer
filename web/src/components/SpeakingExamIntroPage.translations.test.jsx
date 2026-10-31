@@ -16,7 +16,7 @@ describe("A1 Day 15 · Speaking Exam Intro English support", () => {
     ["Glas Wasser", "glass of water", "bringen", "bring"],
     ["Radio", "radio", "ausmachen", "turn off"],
   ])("keeps %s and the English meaning next to its picture and verb", (object, meaning, verb, translation) => {
-    const card = screen.getByRole("img", { name: `${object} picture` }).closest("[data-a1-teil3-object-card]");
+    const card = screen.getAllByRole("img", { name: `${object} picture` })[0].closest("[data-a1-teil3-object-card]");
     expect(card).not.toBeNull();
     expect(within(card).getByText(new RegExp(meaning))).toBeInTheDocument();
     expect(within(card).getByText(verb)).toBeInTheDocument();
