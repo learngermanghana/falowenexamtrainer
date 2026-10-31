@@ -1,6 +1,7 @@
 import { resolveRecordingLesson } from "./lesson-content.js?v=20261030-a1-day02-day03";
 import { buildPlaybackQueue } from "./playback-queue.js?v=20261028-shuffle";
 import { lyricLines, validateCues, activeLyricIndex } from "./lyrics-timing.js?v=20261028-recordings";
+import { approximateScrollTop } from "./follow-lyrics.js?v=20261101";
 // Never autoplay on initial load; continue only after a listener starts a song.
 // Falowen Music's static listening room. No authentication, AI calls,
 // Firestore writes or generated media. Optional consented GA4 usage tracking is
@@ -345,14 +346,17 @@ function renderLyrics(lesson) {
   root.replaceChildren();
   renderedCues = validateCues(lesson.cues, lesson.lyrics);
   highlightedLine = -1;
-  byId("follow-lyrics").disabled = !renderedCues.length;
-  byId("follow-lyrics").checked = followLyrics && renderedCues.length>0;
+  // Every song with lyrics supports following the page. Only exact published
+  // cue packs support per-line highlighting and seeking.
+  byId("follow-lyrics").disabled = false;
+  byId("follow-lyrics").checked = followLyrics;
+  byId("follow-label").textContent = renderedCues.length ? "Follow lyrics" : "Follow lyrics (approximate scroll)";
   const note = el("p", "detail-note", lesson.referenceOnly
-    ? "COURSE DRAFT — Original studio lyrics, not verified against this MP3. Timed highlighting is unavailable."
+    ? "COURSE DRAFT — These lyrics have not been checked against this MP3. Follow lyrics scrolls the page approximately with playback; it does not synchronize individual words or lines."
     : lesson.timingStatus === "estimated" && renderedCues.length
-      ? "TIMING DRAFT — The highlighted lines follow waveform-guided cue estimates for this recording. You can tap a line to replay it; exact starts still require a teacher listening review."
+      ? "TIMING DRAFT — The highlighted lines use estimated cues for this recording. Exact starts still need a listening review."
       : renderedCues.length ? "Follow the highlighted line, or tap a line to replay it."
-      : "Lyrics are available. Timed highlighting will appear when reviewed timings are published.");
+      : "The recording has lyrics but no line timestamps yet. Follow lyrics scrolls approximately with playback; precise line highlighting is unavailable.");
   root.append(note);
   let index = 0;
   for (const raw of String(lesson.lyrics || "").replace(/\\n/g, "\n").split(/\r?\n/)) {
@@ -387,6 +391,14 @@ function renderLyrics(lesson) {
   }
 }
 function updateLyricHighlight() {
+  // An untimed recording still has useful, user-controlled page follow.
+  // Never synthesize line cues or present a course draft as matched lyrics.
+  if (!renderedCues.length && followLyrics && selected?.id === current?.id
+      && !byId("detail-lyrics").hidden) {
+    const root = byId("lyrics-text");
+    const target = approximateScrollTop(audio.currentTime, audio.duration, root.scrollHeight, root.clientHeight);
+    if (target !== null) root.scrollTop = target;
+  }
   const active = selected?.id === current?.id && !audio.ended ? activeLyricIndex(renderedCues, audio.currentTime) : -1;
   if (active === highlightedLine) return;
   highlightedLine = active;
