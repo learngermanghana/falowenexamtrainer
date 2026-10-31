@@ -365,6 +365,69 @@
           "hint": "Antworte mit „Ich möchte nach … reisen, weil …“ oder erzähle von deinem Heimatland."
         }
       ]
+    },
+    "r2-a2-day-11-b64_TWl0IGRlbSBSYWQsIG1pdCBkZW0gWnVnLm1wMw": {
+      "assignmentKey": "A2-4.11",
+      "title": "Mit dem Rad, mit dem Zug",
+      "summary": "A morning bike ride and an afternoon train journey to meet someone at the station",
+      "lyrics": "[Intro]\nMit dem Rad, mit dem Zug.\n\n[Verse 1]\nAm Morgen fahre ich mit dem Rad,\ndie Sonne scheint auf meine Stadt.\nDer Wind ist frisch, die Luft ist klar,\nich fahre los, wie wunderbar.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an.\n\n[Verse 2]\nAm Nachmittag nehme ich den Zug,\nich habe heute noch nicht genug.\nIch kaufe mir eine Fahrkarte\nund steige ein, bevor ich starte.\nDie Häuser ziehen schnell vorbei,\nich schaue raus und fühle mich frei.\nAm Bahnhof wartest du auf mich,\nich steige aus und freue mich.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an,\nweil ich mit dir die Welt entdecken kann.\n\n[Outro]\nMal fahre ich Rad, mal nehme ich den Zug,\nich bin unterwegs, das gefällt mir gut.\nOb nah, ob fern, ich komme an,\nweil jeder Weg uns verbinden kann.",
+      "vocabulary": [
+        {
+          "de": "mit dem Rad fahren",
+          "en": "to ride a bicycle"
+        },
+        {
+          "de": "den Zug nehmen",
+          "en": "to take the train"
+        },
+        {
+          "de": "die Fahrkarte",
+          "en": "ticket"
+        },
+        {
+          "de": "einsteigen",
+          "en": "to get on / board"
+        },
+        {
+          "de": "aussteigen",
+          "en": "to get off"
+        },
+        {
+          "de": "unterwegs sein",
+          "en": "to be on the way"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Womit fährt die Person am Morgen?",
+          "answer": "Mit dem Rad.",
+          "options": [
+            "Mit dem Rad.",
+            "Mit dem Bus.",
+            "Mit dem Zug."
+          ],
+          "correctIndex": 0,
+          "evidence": "Am Morgen fahre ich mit dem Rad,"
+        },
+        {
+          "type": "listening",
+          "prompt": "Womit fährt die Person am Nachmittag?",
+          "answer": "Mit dem Zug.",
+          "options": [
+            "Mit dem Auto.",
+            "Mit dem Zug.",
+            "Zu Fuß."
+          ],
+          "correctIndex": 1,
+          "evidence": "Am Nachmittag nehme ich den Zug,"
+        },
+        {
+          "type": "speaking",
+          "prompt": "Wie kommst du normalerweise zum Deutschkurs? Erzähl von deiner letzten Fahrt.",
+          "hint": "Ich fahre meistens mit dem … / Ich nehme den … / Am Bahnhof steige ich …"
+        }
+      ]
     }
   }
 }
