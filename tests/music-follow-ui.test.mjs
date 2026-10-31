@@ -6,12 +6,13 @@ const {JSDOM}=createRequire(new URL('./music-ui/package.json',import.meta.url))(
 import {buildPlaybackQueue} from '../web/public/music/playback-queue.js';
 import {lyricLines,validateCues,activeLyricIndex} from '../web/public/music/lyrics-timing.js';
 import {resolveRecordingLesson} from '../web/public/music/lesson-content.js';
+import {approximateScrollTop} from '../web/public/music/follow-lyrics.js';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const recordings=JSON.parse(read('web/public/music/timings.json')).recordings;
 async function room(track,pack){
  const dom=new JSDOM(read('web/public/music/index.html'),{url:'https://music.falowen.app/?track='+track.id,runScripts:'outside-only'});
  const w=dom.window;
- Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,
+ Object.assign(w,{buildPlaybackQueue,lyricLines,validateCues,activeLyricIndex,resolveRecordingLesson,approximateScrollTop,
   matchMedia:()=>({matches:true}),fetch:async url=>({ok:!!(!String(url).startsWith('/api/music-lyrics')||pack),json:async()=>String(url).includes('music-lyrics')?pack:String(url).includes('music-library')?{ok:true,tracks:[track]}:String(url).includes('catalog.json')?{tracks:[]}:String(url).includes('studio-drafts')?{tracks:[{...track,lyrics:'Draft lyrics are different'}]}:{lessons:{}}})});
  const a=w.document.getElementById('audio');
  a.play=()=>Promise.resolve(); a.pause=()=>{};a.load=()=>{};Object.defineProperty(a,'readyState',{value:1});
@@ -48,9 +49,21 @@ for(const [level,day] of [['A1',4],['A2',18],['B1',24],['A1',14],['A1',13]])test
  click('check-answers');assert.match(d.getElementById('practice-feedback').textContent,/1 of 2 correct/);
  dom.window.close();
 });
-test('Day14 without recording timings cannot advertise working Follow or a dead questions button',async()=>{
+test('untimed A1 recording still permits approximate page follow without pretending line cues exist',async()=>{
  const track={id:'r2-a1-day-14',title:'Einsteigen',level:'A1',day:14,autoDiscovered:true,coursebook:true,objectKey:'music/a1/day-14/Einsteigen.mp3',audioUrl:'https://www.falowen.app/api/music?track=r2-a1-day-14'};
- const {w,dom}=await room(track,null);const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
- assert.equal(d.getElementById('follow-lyrics').disabled,true);assert.equal(d.getElementById('follow-lyrics').checked,false);
+ const {w,a,dom}=await room(track,null);const d=w.document;d.querySelector('[data-tab="lyrics"]').click();
+ const root=d.getElementById('lyrics-text');
+ Object.defineProperty(root,'scrollHeight',{value:1000,configurable:true});
+ Object.defineProperty(root,'clientHeight',{value:300,configurable:true});
+ Object.defineProperty(a,'duration',{value:140,configurable:true});
+ a.currentTime=70;a.dispatchEvent(new w.Event('timeupdate'));
+ assert.equal(d.getElementById('follow-lyrics').disabled,false);
+ assert.equal(d.getElementById('follow-lyrics').checked,true);
+ assert.match(d.getElementById('follow-label').textContent,/approximate scroll/);
+ assert.ok(root.scrollTop>0,'untimed song auto-scrolls the draft with audio progress');
+ assert.equal(root.querySelector('[aria-current="true"]'),null,'no fake line highlight');
+ const at=root.scrollTop;d.getElementById('follow-lyrics').click();
+ a.currentTime=90;a.dispatchEvent(new w.Event('timeupdate'));
+ assert.equal(root.scrollTop,at,'listener can disable approximate follow');
  assert.equal(d.getElementById('lyrics-next').hidden,true);dom.window.close();
 });
