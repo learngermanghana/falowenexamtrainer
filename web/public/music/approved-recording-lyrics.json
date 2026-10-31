@@ -510,12 +510,291 @@
       "assignmentKey": "A2-4.11",
       "title": "Mit dem Rad, mit dem Zug",
       "lyrics": "[Intro]\nMit dem Rad, mit dem Zug.\n\n[Verse 1]\nAm Morgen fahre ich mit dem Rad,\ndie Sonne scheint auf meine Stadt.\nDer Wind ist frisch, die Luft ist klar,\nich fahre los, wie wunderbar.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an.\n\n[Verse 2]\nAm Nachmittag nehme ich den Zug,\nich habe heute noch nicht genug.\nIch kaufe mir eine Fahrkarte\nund steige ein, bevor ich starte.\nDie Häuser ziehen schnell vorbei,\nich schaue raus und fühle mich frei.\nAm Bahnhof wartest du auf mich,\nich steige aus und freue mich.\n\n[Chorus]\nMit dem Rad, mit dem Zug, ich bin unterwegs,\ndurch die Stadt, durch das Land, ich finde meinen Weg.\nMal schnell, mal langsam, ich komme gut an,\nweil ich mit dir die Welt entdecken kann.\n\n[Outro]\nMal fahre ich Rad, mal nehme ich den Zug,\nich bin unterwegs, das gefällt mir gut.\nOb nah, ob fern, ich komme an,\nweil jeder Weg uns verbinden kann.",
-      "cues": [],
+      "cues": [
+        {
+          "start": 11.42,
+          "end": 13.15,
+          "text": "Mit dem Rad, mit dem Zug."
+        },
+        {
+          "start": 14.66,
+          "end": 18.15,
+          "text": "Am Morgen fahre ich mit dem Rad,"
+        },
+        {
+          "start": 18.4,
+          "end": 22.65,
+          "text": "die Sonne scheint auf meine Stadt."
+        },
+        {
+          "start": 22.9,
+          "end": 26.95,
+          "text": "Der Wind ist frisch, die Luft ist klar,"
+        },
+        {
+          "start": 27.2,
+          "end": 33.85,
+          "text": "ich fahre los, wie wunderbar."
+        },
+        {
+          "start": 37.94,
+          "end": 41.61,
+          "text": "Mit dem Rad, mit dem Zug, ich bin unterwegs,"
+        },
+        {
+          "start": 41.86,
+          "end": 46.12,
+          "text": "durch die Stadt, durch das Land, ich finde meinen Weg."
+        },
+        {
+          "start": 46.37,
+          "end": 50.58,
+          "text": "Mal schnell, mal langsam, ich komme gut an."
+        },
+        {
+          "start": 53.22,
+          "end": 56.52,
+          "text": "Am Nachmittag nehme ich den Zug,"
+        },
+        {
+          "start": 56.77,
+          "end": 60.17,
+          "text": "ich habe heute noch nicht genug."
+        },
+        {
+          "start": 60.42,
+          "end": 63.98,
+          "text": "Ich kaufe mir eine Fahrkarte"
+        },
+        {
+          "start": 64.23,
+          "end": 67.85,
+          "text": "und steige ein, bevor ich starte."
+        },
+        {
+          "start": 68.1,
+          "end": 71.28,
+          "text": "Die Häuser ziehen schnell vorbei,"
+        },
+        {
+          "start": 71.53,
+          "end": 74.97,
+          "text": "ich schaue raus und fühle mich frei."
+        },
+        {
+          "start": 75.22,
+          "end": 78.87,
+          "text": "Am Bahnhof wartest du auf mich,"
+        },
+        {
+          "start": 79.12,
+          "end": 81.65,
+          "text": "ich steige aus und freue mich."
+        },
+        {
+          "start": 84.2,
+          "end": 87.66,
+          "text": "Mit dem Rad, mit dem Zug, ich bin unterwegs,"
+        },
+        {
+          "start": 87.91,
+          "end": 91.6,
+          "text": "durch die Stadt, durch das Land, ich finde meinen Weg."
+        },
+        {
+          "start": 91.85,
+          "end": 95.1,
+          "text": "Mal schnell, mal langsam, ich komme gut an,"
+        },
+        {
+          "start": 95.35,
+          "end": 99.02,
+          "text": "weil ich mit dir die Welt entdecken kann."
+        },
+        {
+          "start": 116.63,
+          "end": 120.15,
+          "text": "Mal fahre ich Rad, mal nehme ich den Zug,"
+        },
+        {
+          "start": 120.4,
+          "end": 124.39,
+          "text": "ich bin unterwegs, das gefällt mir gut."
+        },
+        {
+          "start": 124.64,
+          "end": 128.26,
+          "text": "Ob nah, ob fern, ich komme an,"
+        },
+        {
+          "start": 128.51,
+          "end": 136.2,
+          "text": "weil jeder Weg uns verbinden kann."
+        }
+      ],
       "strictRecordingLyrics": true,
       "recordingSha256": "208e3be5013d24a27c17d51b5d5f574fffd9e0df28af6a118a87ec1baef59d1d",
       "duration": 141.6,
-      "source": "Owner-supplied A2 Day 11 MP3 and matching lyrics; lyric timestamps not reviewed",
-      "genre": "Acoustic Afro-Soul"
+      "source": "Owner-supplied A2 Day 11 MP3 and matching lyrics; waveform-based estimated timing awaiting review",
+      "genre": "Acoustic Afro-Soul",
+      "timingStatus": "estimated",
+      "timingMethod": "Waveform-guided draft line intervals from matching owner-supplied MP3 (SHA-256); not ear-verified. Review against playback before treating as exact. Repeated choruses have separate cues."
+    },
+    {
+      "trackId": "r2-a2-day-12-b64_VHLDpHVtZSDDpG5kZXJuIHNpY2gubXAz",
+      "objectKey": "music/a2/day-12/Träume ändern sich.mp3",
+      "assignmentKey": "A2-5.12",
+      "title": "Träume ändern sich",
+      "genre": "German Acoustic Pop / Afro-Soul",
+      "recordingSha256": "3a0fa44ba3a83261bda42fa23e0759bcda6ba7c518e6af9e35960e80563de281",
+      "strictRecordingLyrics": true,
+      "duration": 113.232,
+      "timingStatus": "estimated",
+      "lyrics": "[Verse 1]\nAls Kind wollte ich Pilot werden,\nden Himmel sehen, frei und weit.\nJetzt interessiert mich die Medizin,\nich nehme mir zum Lernen Zeit.\nIch möchte Menschen Hoffnung geben,\nund jeden Tag etwas Neues sehen.\nVielleicht verändert sich mein Leben,\ndoch ich will meinen Weg weitergehen.\n\n[Chorus]\nWas willst du später machen?\nWas fühlt sich richtig an?\nWir dürfen neue Wege finden,\nweil jeder Traum sich ändern kann.\n\n[Verse 2]\nMeine Freundin will Lehrerin werden,\nein Praktikum hat sie gemacht.\nSie hat den Kindern vorgelesen,\nmit ihnen gelernt und viel gelacht.\nWir reden oft von unseren Plänen,\nund suchen Kurse, die uns passen.\nWir wissen noch nicht, was mal kommt,\ndoch wollen wir uns Zeit dafür lassen.\n\n[Chorus]\nWas willst du später machen?\nWas fühlt sich richtig an?\nWir dürfen neue Wege finden,\nweil jeder Traum sich ändern kann.\n\n[Outro]\nWir wissen noch nicht alles,\ndoch wir lernen jeden Tag.\nBei Falowen sprechen wir von Träumen,\nund davon, was die Zukunft bringen mag.",
+      "cues": [
+        {
+          "start": 9.97,
+          "end": 13.12,
+          "text": "Als Kind wollte ich Pilot werden,"
+        },
+        {
+          "start": 13.37,
+          "end": 16.48,
+          "text": "den Himmel sehen, frei und weit."
+        },
+        {
+          "start": 16.73,
+          "end": 19.86,
+          "text": "Jetzt interessiert mich die Medizin,"
+        },
+        {
+          "start": 20.11,
+          "end": 23.24,
+          "text": "ich nehme mir zum Lernen Zeit."
+        },
+        {
+          "start": 23.49,
+          "end": 26.66,
+          "text": "Ich möchte Menschen Hoffnung geben,"
+        },
+        {
+          "start": 26.91,
+          "end": 29.96,
+          "text": "und jeden Tag etwas Neues sehen."
+        },
+        {
+          "start": 30.21,
+          "end": 33.34,
+          "text": "Vielleicht verändert sich mein Leben,"
+        },
+        {
+          "start": 33.59,
+          "end": 36.62,
+          "text": "doch ich will meinen Weg weitergehen."
+        },
+        {
+          "start": 36.95,
+          "end": 40.06,
+          "text": "Was willst du später machen?"
+        },
+        {
+          "start": 40.31,
+          "end": 43.42,
+          "text": "Was fühlt sich richtig an?"
+        },
+        {
+          "start": 43.67,
+          "end": 46.78,
+          "text": "Wir dürfen neue Wege finden,"
+        },
+        {
+          "start": 47.03,
+          "end": 49.82,
+          "text": "weil jeder Traum sich ändern kann."
+        },
+        {
+          "start": 50.4,
+          "end": 53.42,
+          "text": "Meine Freundin will Lehrerin werden,"
+        },
+        {
+          "start": 53.67,
+          "end": 56.66,
+          "text": "ein Praktikum hat sie gemacht."
+        },
+        {
+          "start": 56.91,
+          "end": 59.95,
+          "text": "Sie hat den Kindern vorgelesen,"
+        },
+        {
+          "start": 60.2,
+          "end": 63.3,
+          "text": "mit ihnen gelernt und viel gelacht."
+        },
+        {
+          "start": 63.55,
+          "end": 66.63,
+          "text": "Wir reden oft von unseren Plänen,"
+        },
+        {
+          "start": 66.88,
+          "end": 69.96,
+          "text": "und suchen Kurse, die uns passen."
+        },
+        {
+          "start": 70.21,
+          "end": 73.3,
+          "text": "Wir wissen noch nicht, was mal kommt,"
+        },
+        {
+          "start": 73.55,
+          "end": 76.53,
+          "text": "doch wollen wir uns Zeit dafür lassen."
+        },
+        {
+          "start": 77,
+          "end": 80.07,
+          "text": "Was willst du später machen?"
+        },
+        {
+          "start": 80.32,
+          "end": 83.42,
+          "text": "Was fühlt sich richtig an?"
+        },
+        {
+          "start": 83.67,
+          "end": 86.74,
+          "text": "Wir dürfen neue Wege finden,"
+        },
+        {
+          "start": 86.99,
+          "end": 89.98,
+          "text": "weil jeder Traum sich ändern kann."
+        },
+        {
+          "start": 92,
+          "end": 96.75,
+          "text": "Wir wissen noch nicht alles,"
+        },
+        {
+          "start": 97,
+          "end": 101.75,
+          "text": "doch wir lernen jeden Tag."
+        },
+        {
+          "start": 102,
+          "end": 106.65,
+          "text": "Bei Falowen sprechen wir von Träumen,"
+        },
+        {
+          "start": 106.9,
+          "end": 110.8,
+          "text": "und davon, was die Zukunft bringen mag."
+        }
+      ],
+      "timingMethod": "Waveform-guided draft line intervals from matching owner-supplied MP3 (SHA-256); not ear-verified. Review against playback before treating as exact. Repeated choruses have separate cues.",
+      "source": "Owner-supplied A2 Day 12 final lyrics and exact recording; waveform-based estimated timing awaiting review"
     }
   ]
 }
