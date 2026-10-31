@@ -8,7 +8,8 @@ const recordings=read('approved-recording-lyrics.json').recordings;
 const timing=read('timings.json').recordings;
 test('public catalog lists latest approved classroom recordings without older A1 versions',()=>{
   const pins=catalog.tracks.filter(t=>t.approved===true);
-  expect(pins).toHaveLength(11);
+  expect(pins).toHaveLength(12);
+  expect(pins.find(t=>t.assignmentKey==='A2-4.10').objectKey).toBe('music/a2/day-10/Die Welt entdecken.mp3');
   expect(pins.find(t=>t.assignmentKey==='A2-3.8').objectKey).toBe('music/a2/day-08/Ein Abend zu zweit.mp3');
   const keys=pins.map(t=>t.objectKey);
   expect(new Set(keys).size).toBe(keys.length);
