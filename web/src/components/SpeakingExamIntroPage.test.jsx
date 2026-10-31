@@ -7,11 +7,12 @@ describe("SpeakingExamIntroPage", () => {
   test("keeps the correct object-specific A1 requests and a compact picture", () => {
     render(<MemoryRouter><SpeakingExamIntroPage /></MemoryRouter>);
 
-    const closeRow = screen.getByText("schließen").closest("tr");
+    const imperativeTable = screen.getAllByRole("table")[1];
+    const closeRow = within(imperativeTable).getByText("schließen").closest("tr");
     expect(closeRow).not.toBeNull();
     expect(within(closeRow).getByText("Können Sie bitte die Tür schließen?")).toBeInTheDocument();
 
-    const switchOffRow = screen.getByText("ausmachen").closest("tr");
+    const switchOffRow = within(imperativeTable).getByText("ausmachen").closest("tr");
     expect(switchOffRow).not.toBeNull();
     expect(within(switchOffRow).getByText("Können Sie bitte das Radio ausmachen?")).toBeInTheDocument();
 
