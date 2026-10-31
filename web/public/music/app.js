@@ -164,18 +164,103 @@ function setShareText(label) {
   byId("share").textContent = label;
   byId("detail-share").textContent = label === "Link copied!" ? "Link copied!" : "Copy song link";
 }
-async function shareCurrent() {
-  if (!current && !selected) return;
-  const url = publicSongUrl(selected || current).href;
-  try {
-    await navigator.clipboard.writeText(url);
-    setShareText("Link copied!");
-  } catch {
-    byId("player-error").textContent = "Copy this song URL: " + url;
-    setShareText("Copy page URL");
-  }
+function shareCurrent() {
+  const track = selected || current;
+  if (!track) return;
+  const url = publicSongUrl(track).href;
+  byId("share-song-label").textContent = track.title + " · " + (track.level === "ALL" ? "Falowen Music" : track.level + " · Day " + track.day);
+  byId("share-whatsapp").href = "https://api.whatsapp.com/send?text=" + encodeURIComponent("Listen to " + track.title + " on Falowen Music: " + url);
+  byId("share-facebook").href = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url);
+  byId("share-telegram").href = "https://t.me/share/url?url=" + encodeURIComponent(url) + "&text=" + encodeURIComponent(track.title + " · Falowen Music");
+  byId("share-feedback").textContent = "";
+  byId("share-native").hidden = typeof navigator.share !== "function";
+  byId("share-dialog").hidden = false;
+  byId("share-close").focus();
 }
-function setPlayer(track, start = false) {
+function closeShare() { byId("share-dialog").hidden = true; }
+byId("share-close").addEventListener("click", closeShare);
+byId("share-dialog").addEventListener("click", e => { if (e.target === byId("share-dialog")) closeShare(); });
+byId("share-native").addEventListener("click", async () => {
+  const track = selected || current;
+  if (!track || typeof navigator.share !== "function") return;
+  try {
+    await navigator.share({title:track.title + " · Falowen Music", text:"Listen to this German learning song on Falowen Music.", url:publicSongUrl(track).href});
+    closeShare();
+  } catch (error) { if (error.name !== "AbortError") byId("share-feedback").textContent = "Sharing unavailable. Try Copy song link."; }
+});
+byId("share-copy").addEventListener("click", async () => {
+  const track = selected || current;
+  if (!track) return;
+  const url = publicSongUrl(track).href;
+  try { await navigator.clipboard.writeText(url); byId("share-feedback").textContent = "Song link copied!"; }
+  catch { byId("share-feedback").textContent = "Copy this URL: " + url; }
+});
+let karaokePreviousFocus = null;
+function renderKaraoke() {
+  const root = byId("karaoke-lines");
+  if (byId("karaoke-modal").hidden) return;
+  root.replaceChildren();
+  const track = selected || current;
+  if (!track) return;
+  const pack = lyricsFor(track);
+  byId("karaoke-title").textContent = track.title;
+  byId("karaoke-meta").textContent = track.level + (track.day ? " · Day " + track.day : "");
+  if (!pack?.lyrics) { byId("karaoke-note").textContent = "Lyrics are not published for this recording yet."; return; }
+  const cues = validateCues(pack.cues, pack.lyrics);
+  byId("karaoke-note").textContent = cues.length ? "Tap a timed line to replay it." : "Follow along while the recording plays. Timed highlighting is unavailable for this song.";
+  let index = 0;
+  for (const raw of String(pack.lyrics).replace(/\\n/g, "\n").split(/\r?\n/)) {
+    const lineText = raw.trim();
+    if (!lineText) continue;
+    if (/^\[.*\]$/.test(lineText)) { root.append(el("h3", "karaoke-section-title", lineText.slice(1, -1))); continue; }
+    const line = el("button", "karaoke-line", lineText);
+    const cue = cues[index++];
+    line.type = "button";
+    line.disabled = !cue;
+    if (cue) line.addEventListener("click", () => {
+      const seek = () => { audio.currentTime = cue.start; audio.play().catch(() => {}); };
+      if (audio.readyState >= 1) seek(); else audio.addEventListener("loadedmetadata", seek, {once:true});
+    });
+    line.dataset.cue = String(index - 1);
+    root.append(line);
+  }
+  updateKaraokeHighlight();
+}
+function updateKaraokeHighlight() {
+  if (byId("karaoke-modal").hidden) return;
+  const pack = lyricsFor(selected || current);
+  const cues = pack ? validateCues(pack.cues, pack.lyrics) : [];
+  const active = selected?.id === current?.id ? activeLyricIndex(cues, audio.currentTime) : -1;
+  byId("karaoke-lines").querySelectorAll(".karaoke-line").forEach(line => {
+    const on = Number(line.dataset.cue) === active && active >= 0;
+    line.classList.toggle("is-active", on);
+    if (on) { line.setAttribute("aria-current","true"); if (line !== karaokeCurrentLine) { karaokeCurrentLine = line; line.scrollIntoView({block:"center",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"}); } }
+    else line.removeAttribute("aria-current");
+  });
+}
+let karaokeCurrentLine = null;
+function openKaraoke() {
+  if (!selected) return;
+  karaokePreviousFocus = document.activeElement;
+  byId("karaoke-modal").hidden = false;
+  document.body.classList.add("karaoke-open");
+  karaokeCurrentLine = null;
+  renderKaraoke();
+  byId("karaoke-close").focus();
+}
+function closeKaraoke() {
+  byId("karaoke-modal").hidden = true;
+  document.body.classList.remove("karaoke-open");
+  karaokePreviousFocus?.focus?.();
+}
+byId("open-karaoke").addEventListener("click", openKaraoke);
+byId("karaoke-close").addEventListener("click", closeKaraoke);
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") { if (!byId("karaoke-modal").hidden) closeKaraoke(); if (!byId("share-dialog").hidden) closeShare(); }
+});
+audio.addEventListener("timeupdate", updateKaraokeHighlight);
+audio.addEventListener("seeked", updateKaraokeHighlight);
+\nfunction setPlayer(track, start = false) {
   if (!track) return;
   if (!current || current.id !== track.id) {
     audio.pause();
@@ -183,6 +268,7 @@ function setPlayer(track, start = false) {
     audio.load();
   }
   current = track;
+  if (!byId("karaoke-modal").hidden) renderKaraoke();
   byId("now-title").textContent = track.title;
   byId("now-meta").textContent = [track.level === "ALL" ? "All levels" : track.level, track.day ? "Day " + track.day : track.type].join(" · ");
   byId("player-error").textContent = "";
@@ -268,6 +354,29 @@ function card(track) {
   article.append(art, body);
   return article;
 }
+function renderDiscovery() {
+  const root = byId("discover-rows");
+  if (!root) return;
+  root.replaceChildren();
+  const recent = listeningHistory.map(id => catalog.find(t => t.id === id)).filter(Boolean).slice(0, 4);
+  const featuredSongs = catalog.filter(t => t.category === "lesson" && ["A1","A2","B1"].includes(t.level)).slice(0, 6);
+  const newest = [...catalog].reverse().slice(0, 4);
+  for (const [title, tracks] of [["Continue listening", recent], ["Explore German songs", featuredSongs], ["More to discover", newest]]) {
+    if (!tracks.length) continue;
+    const section = el("section", "discover-section");
+    section.append(el("h3", "", title));
+    const list = el("div", "discover-grid");
+    tracks.forEach(track => {
+      const button = el("button", "discover-card");
+      button.type = "button";
+      button.append(el("span", "discover-art", "♫"), el("strong", "", track.title), el("small", "", track.level === "ALL" ? track.type : track.level + " · Day " + track.day));
+      button.addEventListener("click", () => showSong(track, false, true));
+      list.append(button);
+    });
+    section.append(list);
+    root.append(section);
+  }
+}
 function renderCatalog() {
   const previousDay = dayInput.value;
   const days = [...new Set(catalog.filter(track => track.category === "lesson" && (!levelInput.value || track.level === levelInput.value)).map(track => track.day).filter(Boolean))].sort((a,b) => a-b);
@@ -307,6 +416,7 @@ function renderCatalog() {
     tracksRoot.append(section);
   }
   if (!visibleTracks.length) tracksRoot.append(el("p", "empty", "No songs here yet. Try another level or clear your filters."));
+  renderDiscovery();
   byId("song-count").textContent = visibleTracks.length + (visibleTracks.length === 1 ? " song" : " songs");
 }
 function moveTrack(direction = 1) {
@@ -499,6 +609,8 @@ function renderDetail(track) {
   }
   renderedCues = []; highlightedLine = -1;
   if (hasLyrics) renderLyrics(hasLesson ? {...lesson, ...lyricPack} : lyricPack);
+  byId("open-karaoke").hidden = !hasLyrics;
+  if (!byId("karaoke-modal").hidden) renderKaraoke();
   loadPublishedLyrics(track);
   byId("song-detail").hidden = false;
   setTab("listen");
@@ -517,6 +629,7 @@ function showSong(track, autoplay = false, navigate = true) {
 }
 function closeDetail(navigate = true) {
   selected = null;
+  if (!byId("karaoke-modal").hidden) closeKaraoke();
   byId("song-detail").hidden = true;
   document.title = "Falowen Music · Learn German through songs";
   if (navigate) history.pushState(null, "", embedded ? "/music/index.html?embedded=1" : "/");
