@@ -306,6 +306,65 @@
           "hint": "Beginne mit „Entschuldigung, das ist nicht mein Essen. Ich habe ... bestellt.“"
         }
       ]
+    },
+    "r2-a2-day-10-b64_RGllIFdlbHQgZW50ZGVja2VuLm1wMw": {
+      "assignmentKey": "A2-4.10",
+      "title": "Die Welt entdecken – The Traveller",
+      "summary": "Travel dreams from Ghana to Nigeria, Canada and farther afield; keeping home close to the heart",
+      "lyrics": "[Verse 1]\nMein Koffer steht schon vor der Tür,\nmein Reisepass liegt neben mir.\nMorgen fliege ich nach Nigeria,\nich freue mich, bald bin ich da.\n\nEin Zimmer habe ich reserviert,\ndie ganze Reise gut organisiert.\nIch möchte neue Menschen treffen\nund durch die bunten Straßen gehen.\n\n[Chorus]\nIch möchte nach Amerika reisen,\nnach Nigeria und Kanada.\nIch will die ganze Welt entdecken,\ndoch Ghana bleibt mir immer nah.\n\n[Verse 2]\nIch träume von New York bei Nacht,\nvon Dubai, wo die Sonne lacht.\nIn Tokio möchte ich viel sehen,\nin Paris durch die Straßen gehen.\n\nAuch Island steht auf meinem Plan,\nich schaue mir die schönen Berge an.\nSo viele Länder, so viel zu sehen,\nich möchte immer weitergehen.\n\n[Chorus]\nIch möchte nach Amerika reisen,\nnach Nigeria und Kanada.\nIch will die ganze Welt entdecken,\ndoch Ghana bleibt mir immer nah.\n\n[Outro]\nEgal, wohin die Reise geht,\negal, wo ich am Ende steh'.\nIch denke immer gern an Ghana,\nGott segne mein Heimatland.",
+      "vocabulary": [
+        {
+          "de": "der Reisepass",
+          "en": "passport"
+        },
+        {
+          "de": "den Koffer packen",
+          "en": "pack a suitcase"
+        },
+        {
+          "de": "reservieren",
+          "en": "reserve / book"
+        },
+        {
+          "de": "die Heimat",
+          "en": "home country"
+        },
+        {
+          "de": "entdecken",
+          "en": "discover"
+        }
+      ],
+      "questions": [
+        {
+          "type": "listening",
+          "prompt": "Wohin fliegt die Person morgen?",
+          "answer": "Nach Nigeria.",
+          "options": [
+            "Nach Kanada.",
+            "Nach Nigeria.",
+            "Nach Island."
+          ],
+          "correctIndex": 1,
+          "evidence": "Morgen fliege ich nach Nigeria"
+        },
+        {
+          "type": "listening",
+          "prompt": "Welches Land bleibt der Person immer nah?",
+          "answer": "Ghana.",
+          "options": [
+            "Ghana.",
+            "Kanada.",
+            "Japan."
+          ],
+          "correctIndex": 0,
+          "evidence": "doch Ghana bleibt mir immer nah."
+        },
+        {
+          "type": "speaking",
+          "prompt": "Welche Länder möchtest du besuchen? Warum?",
+          "hint": "Antworte mit „Ich möchte nach … reisen, weil …“ oder erzähle von deinem Heimatland."
+        }
+      ]
     }
   }
 }
