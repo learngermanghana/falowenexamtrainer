@@ -90,13 +90,16 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
 
   return (
     <section data-workbook-music="true" data-music-level={courseLevel} data-music-day={lessonDay}
-      style={{ ...(compact ? {} : styles.card), display: "grid", gap: 14, padding: compact ? "10px 0 4px" : undefined }}>
+      style={{ ...(compact ? {} : styles.card), display: "grid", gap: 14, padding: compact ? "18px 14px" : undefined, minWidth: 0,
+        border: "1px solid #9bcdb8", borderRadius: 20,
+        background: "radial-gradient(circle at 94% 7%, rgba(194,244,176,.42), transparent 44%), linear-gradient(145deg,#f0fcf4,#f0f6ff 64%,#fffdf1)" }}>
       <div style={{ display: "grid", gap: 5 }}>
         <span style={{ width: "fit-content", borderRadius: 999, background: "#e3f5e7",
           color: "#1c6641", padding: "5px 11px", fontWeight: 800, fontSize: 12 }}>
           OPTIONAL LISTENING · NOT AN ASSIGNMENT
         </span>
         <h2 style={{ margin: 0, fontSize: compact ? "1.12rem" : "1.45rem", color: "#164e36" }}>
+          <span aria-hidden="true" style={{ display: "inline-grid", placeItems: "center", marginRight: 8, width: 32, height: 32, borderRadius: "50%", color: "#eafcf3", background: "#205b4a" }}>♫</span>
           Music · {courseLevel} Day {lessonDay}
         </h2>
         <p style={{ color: "#475569", lineHeight: 1.7, margin: 0 }}>
@@ -122,8 +125,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
         </p>
       ) : null}
       {chosen ? (
-        <div style={{ display: "grid", gap: 11, padding: 16, background: "#f5fbf6",
-          border: "1px solid #cae3d0", borderRadius: 14 }}>
+        <div style={{ display: "grid", gap: 11, padding: 18, background: "rgba(255,255,255,.86)",
+          border: "1px solid #c4e0d4", borderRadius: 16, boxShadow: "0 12px 28px rgba(18,74,61,.07)" }}>
           {songs.length > 1 ? (
             <label style={{ display: "grid", gap: 5, fontWeight: 700, color: "#164e36" }}>
               Choose a song for this day
