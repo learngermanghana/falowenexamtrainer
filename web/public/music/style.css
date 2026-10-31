@@ -123,3 +123,12 @@
 @media(prefers-reduced-motion:reduce){.track-card{transition:none}.track-card:hover{transform:none}}
 /* Lyrics follow the audio clock, including seek, repeat and playback speed. */
 .lyrics-text{position:relative;max-height:52vh;overflow:auto;overscroll-behavior:contain;padding:8px;border-radius:12px;scroll-behavior:auto}.lyric-line{display:block;width:100%;border:1px solid transparent;background:transparent;color:#37544a;text-align:left;border-radius:10px;padding:12px 14px;margin:3px 0;font-size:clamp(17px,2vw,23px);line-height:1.55}.lyric-line:disabled{opacity:1;cursor:text}.lyric-line.is-active{background:#d5f17d;border-color:#81ad4c;color:#173627;font-weight:800}.lyric-heading{margin:22px 12px 8px!important}.follow-control{display:flex;gap:8px;align-items:center;font-size:13px;margin:10px 0;color:#416252}.follow-control input{accent-color:#366c43}
+
+/* Local-only favourites and listening history: no accounts or backend writes. */
+.favorite-button{border:1px solid #b8cabf;background:#fff;color:#214c40;border-radius:999px;padding:9px 12px;font-weight:700;cursor:pointer;white-space:nowrap}
+.favorite-button:hover,.favorite-button:focus-visible{border-color:#326a4c;background:#e8f4dc}
+.favorite-button.is-favorite{background:#e8f4dc;color:#21553f;border-color:#6da481}
+#detail-favorite[aria-pressed="true"]{background:#e8f4dc;color:#21553f;border-color:#6da481}
+.category-controls{display:flex;flex-wrap:wrap;gap:9px}
+.track-actions{align-items:center;flex-wrap:wrap}
+@media(max-width:700px){.track-actions{gap:8px}.favorite-button{padding:8px 10px;font-size:12px}.detail-actions{flex-wrap:wrap}.category-controls{gap:7px}.category-controls button{font-size:12px}}
