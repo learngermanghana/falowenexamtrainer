@@ -1,0 +1,25 @@
+name: Public Music Analytics checks
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'web/public/music/analytics*'
+      - 'web/public/music/app.js'
+      - 'web/public/music/index.html'
+      - 'web/scripts/write-music-analytics-config.mjs'
+      - 'web/tests/music-analytics.test.cjs'
+      - 'web/package.json'
+      - '.github/workflows/public-music-analytics.yml'
+
+jobs:
+  music-tracking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check web/public/music/analytics.js
+      - run: node --check web/public/music/app.js
+      - run: node --test web/tests/music-analytics.test.cjs
