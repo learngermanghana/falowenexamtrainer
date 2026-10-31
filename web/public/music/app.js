@@ -151,6 +151,7 @@ function setPlayer(track, start = false) {
     audio.load();
   }
   current = track;
+  audio.dataset.trackId = track.id;
   byId("now-title").textContent = track.title;
   byId("now-meta").textContent = [track.level === "ALL" ? "All levels" : track.level, track.day ? "Day " + track.day : track.type].join(" · ");
   byId("player-error").textContent = "";
