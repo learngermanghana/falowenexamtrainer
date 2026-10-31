@@ -10,6 +10,7 @@ import A1TutorDraftSectionCapture from "./A1TutorDraftSectionCapture";
 import { A1TutorWorkbookDraftProvider } from "./A1TutorWorkbookDraftContext";
 import A1WorkbookGrammarNotes from "./A1WorkbookGrammarNotes";
 import A1WorkbookMediaPanel from "./A1WorkbookMediaPanel";
+import WorkbookDayMusic from "./WorkbookDayMusic";
 import PublishedHoerenPractice from "./PublishedHoerenPractice";
 import A1TimedMockExam from "./A1TimedMockExam";
 import { A1_ASSIGNMENT_ORDER, getA1Assignment } from "../data/a1AssignmentRegistry";
@@ -201,6 +202,7 @@ const A1TutorMarkedWorkbookShell = ({
       assignmentKey={assignment.assignmentKey}
       grammar={grammar}
       overview={overview}
+      music={<WorkbookDayMusic level="A1" day={assignment.day} learningMode="tutor" hideLegacyNotes />}
       renderSubmission={(canonical) => (
         <A1CanonicalSubmissionPanel
           assignment={canonical}
@@ -279,7 +281,7 @@ const A1TutorMarkedWorkbookShell = ({
         ) : null}
       </header>
 
-      <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} />
+      <A1WorkbookMediaPanel day={assignment.day} chapter={assignment.chapter} includeMusic={false} />
 
       <A1TutorWorkbookDraftProvider assignment={assignment}>
         <A1TimedMockExam assignment={assignment}>
