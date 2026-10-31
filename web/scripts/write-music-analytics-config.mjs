@@ -2,8 +2,9 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 // The music site is a static file in public/. Vite does not interpolate HTML env vars there.
-// Only this public measurement ID is embedded; the GA4 property ID and reporting auth stay server-side.
-const id = String(process.env.MUSIC_GA4_MEASUREMENT_ID || process.env.VITE_MUSIC_GA4_MEASUREMENT_ID || '').trim();
+// Only this public measurement ID is embedded; GA4 reporting auth stays server-side.
+// A known public default prevents a production Vercel build from wiping the verified stream ID.
+const id = String(process.env.MUSIC_GA4_MEASUREMENT_ID || process.env.VITE_MUSIC_GA4_MEASUREMENT_ID || 'G-Q7BNDTQ68B').trim();
 if (id && !/^G-[A-Z0-9]{6,16}$/.test(id)) {
   throw new Error('MUSIC_GA4_MEASUREMENT_ID must be a GA4 Measurement ID such as G-XXXXXXXXXX.');
 }
