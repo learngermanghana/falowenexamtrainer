@@ -62,6 +62,38 @@ byId("shuffle").addEventListener("change", () => {
   if (shuffleEnabled) { byId("repeat").checked = false; audio.loop = false; }
   try { localStorage.setItem("falowen_music_shuffle", shuffleEnabled ? "1" : "0"); } catch {}
 });
+
+const FAV_KEY = "falowen_music_favorites_v1";
+const HISTORY_KEY = "falowen_music_history_v1";
+function readIds(key) {
+  try {
+    const data = JSON.parse(localStorage.getItem(key) || "[]");
+    return Array.isArray(data) ? [...new Set(data.filter(id => typeof id === "string" && id.length < 180))].slice(0, 100) : [];
+  } catch { return []; }
+}
+let favorites = readIds(FAV_KEY);
+let listeningHistory = readIds(HISTORY_KEY);
+function saveIds(key, ids) { try { localStorage.setItem(key, JSON.stringify(ids)); } catch {} }
+function isFavorite(id) { return favorites.includes(id); }
+function toggleFavorite(id) {
+  favorites = isFavorite(id) ? favorites.filter(value => value !== id) : [id, ...favorites].slice(0, 100);
+  saveIds(FAV_KEY, favorites);
+  updateDetailFavorite();
+  renderCatalog();
+}
+function updateDetailFavorite() {
+  const button = byId("detail-favorite");
+  if (!button) return;
+  const saved = Boolean(selected && isFavorite(selected.id));
+  button.textContent = saved ? "♥ Saved" : "♡ Save song";
+  button.setAttribute("aria-pressed", String(saved));
+}
+function rememberPlayed(id) {
+  listeningHistory = [id, ...listeningHistory.filter(value => value !== id)].slice(0, 30);
+  saveIds(HISTORY_KEY, listeningHistory);
+  if (category === "recent") renderCatalog();
+}
+
 let visibleTracks = [];
 const initialParams = new URLSearchParams(location.search);
 const initialId = (document.body.dataset.track || initialParams.get("track") || "").trim();
@@ -162,6 +194,7 @@ function setPlayer(track, start = false) {
   document.body.classList.add("has-player");
   if (start) {
     try { localStorage.setItem("falowen_music_recent", track.id); } catch {}
+    rememberPlayed(track.id);
     audio.play().catch(() => { byId("player-error").textContent = "Tap Play in the audio controls to start listening."; });
   }
 }
@@ -227,7 +260,12 @@ function card(track) {
     event.preventDefault();
     showSong(track, false, true);
   });
-  actions.append(listen, explore);
+  const favorite = el("button", "favorite-button" + (isFavorite(track.id) ? " is-favorite" : ""), isFavorite(track.id) ? "♥ Saved" : "♡ Save");
+  favorite.type = "button";
+  favorite.setAttribute("aria-pressed", String(isFavorite(track.id)));
+  favorite.setAttribute("aria-label", (isFavorite(track.id) ? "Remove " : "Save ") + track.title + (isFavorite(track.id) ? " from favourites" : " to favourites"));
+  favorite.addEventListener("click", () => toggleFavorite(track.id));
+  actions.append(listen, explore, favorite);
   body.append(actions);
   article.append(art, body);
   return article;
@@ -244,8 +282,10 @@ function renderCatalog() {
   const genre = genreInput.value;
   visibleTracks = catalog.filter(track => (!level || track.level === level)
     && (!day || track.day === day) && (!genre || track.genre === genre)
-    && (category === "all" || track.category === category)
+    && (category === "all" || track.category === category || (category === "favorites" && isFavorite(track.id)) || (category === "recent" && listeningHistory.includes(track.id)))
     && (!q || [track.title, track.topic, track.level, track.genre, track.assignmentKey].join(" ").toLocaleLowerCase().includes(q)));
+  if (category === "recent") visibleTracks.sort((a,b) => listeningHistory.indexOf(a.id) - listeningHistory.indexOf(b.id));
+  if (category === "favorites") visibleTracks.sort((a,b) => favorites.indexOf(a.id) - favorites.indexOf(b.id));
   tracksRoot.replaceChildren();
   for (const groupLevel of ["A1", "A2", "B1", "B2", "C1", "C2", "ALL"]) {
     const songs = visibleTracks.filter(track => track.level === groupLevel);
@@ -264,7 +304,7 @@ function renderCatalog() {
     });
     heading.append(view);
     const grid = el("div", "level-grid");
-    (level || q || day || genre || category === "motivation" ? songs : songs.slice(0, 4)).forEach(track => grid.append(card(track)));
+    (level || q || day || genre || ["motivation","favorites","recent"].includes(category) ? songs : songs.slice(0, 4)).forEach(track => grid.append(card(track)));
     section.append(heading, grid);
     tracksRoot.append(section);
   }
@@ -439,6 +479,7 @@ function renderDetail(track) {
   const hasLesson = Boolean(lesson && Array.isArray(lesson.questions) && (!lyricPack || JSON.stringify(lyricLines(lyricPack.lyrics)) === JSON.stringify(lyricLines(lesson.lyrics))));
   byId("detail-eyebrow").textContent = track.level === "ALL" ? "FALOWEN · CLASSROOM MUSIC" : "FALOWEN · " + track.level + " · DAY " + track.day;
   byId("detail-title").textContent = track.title;
+  updateDetailFavorite();
   byId("detail-meta").textContent = [track.topic, track.genre || track.type, track.language].join(" · ");
   byId("listen-prompt").textContent = hasLesson
     ? "First listen without reading. " + lesson.summary + ". Which key words can you hear?"
@@ -508,6 +549,7 @@ byId("lyrics-next").addEventListener("click", () => setTab("practice"));
 byId("check-answers").addEventListener("click", checkAnswers);
 byId("share").addEventListener("click", shareCurrent);
 byId("detail-share").addEventListener("click", shareCurrent);
+byId("detail-favorite").addEventListener("click", () => { if (selected) toggleFavorite(selected.id); });
 byId("follow-lyrics").addEventListener("change", () => { followLyrics=byId("follow-lyrics").checked; highlightedLine = -2; updateLyricHighlight(); });
 byId("speed").addEventListener("change", () => { audio.playbackRate = Number(byId("speed").value) || 1; });
 byId("repeat").addEventListener("change", () => { audio.loop = byId("repeat").checked; });
