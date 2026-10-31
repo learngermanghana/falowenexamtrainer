@@ -9,8 +9,8 @@
   <meta property="og:type" content="website"><meta property="og:title" content="Falowen Music · German songs for every learning day">
   <meta property="og:description" content="Listen to original German-learning songs and practise with lyrics, vocabulary and listening questions.">
   <meta property="og:url" content="https://music.falowen.app/">
-  <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/music/style.css?v=20261028-shuffle">
-  <script src="/music/app.js?v=20261030-day25-cues-v1" type="module"></script>
+  <link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/music/style.css?v=20261031-favorites">
+  <script src="/music/app.js?v=20261031-favorites" type="module"></script>
 </head>
 <body>
   <a class="skip" href="#library">Skip to songs</a>
@@ -25,7 +25,7 @@
         <button id="back-library" type="button" class="detail-back">← Browse all songs</button>
         <div class="detail-heading">
           <div><p id="detail-eyebrow" class="eyebrow dark">FALOWEN MUSIC</p><h2 id="detail-title"></h2><p id="detail-meta"></p></div>
-          <div class="detail-actions"><button id="detail-play" class="play-button" type="button">▶ Play song</button><button id="detail-share" class="outline-button" type="button">Copy song link</button></div>
+          <div class="detail-actions"><button id="detail-play" class="play-button" type="button">▶ Play song</button><button id="detail-favorite" class="outline-button" type="button" aria-pressed="false">♡ Save song</button><button id="detail-share" class="outline-button" type="button">Copy song link</button></div>
         </div>
         <nav class="lesson-tabs" aria-label="Song learning steps">
           <button type="button" data-tab="listen" aria-pressed="true">1 · Listen</button>
@@ -55,6 +55,8 @@
         <button type="button" data-category="all" aria-pressed="true">All songs</button>
         <button type="button" data-category="lesson" aria-pressed="false">German learning</button>
         <button type="button" data-category="motivation" aria-pressed="false">Class motivation</button>
+        <button type="button" data-category="favorites" aria-pressed="false">♥ My favourites</button>
+        <button type="button" data-category="recent" aria-pressed="false">Recently played</button>
       </div>
       <div class="filters"><label class="search-wrap"><span class="visually-hidden">Search songs</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Search a song, topic or lesson…" autocomplete="off"></label>
         <label class="select-wrap"><span>Level</span><select id="level"><option value="">All levels</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
