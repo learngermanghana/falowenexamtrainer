@@ -54,15 +54,15 @@ test('exact approved keys remain music-only while reversible R2 discovery IDs ca
   for(const patch of [{approved:false},{objectKey:'a2/day-19/hoeren.mp3'},{objectKey:'music/a2/day-19/../private.mp3'},{audioUrl:'https://evil.invalid/song.mp3'}]){
    assert.equal(Object.hasOwn(approvedMusicKeys({tracks:[{...t,...patch}]}),t.id),false);
   }
-  const response=response();
-  await handler({method:'GET',query:{track:t.id}},response);
-  assert.equal(response.statusCode,302);
-  assert.match(response.headers.Location,/^https:\/\/signed\.invalid\//);
+  const res=response();
+  await handler({method:'GET',query:{track:t.id}},res);
+  assert.equal(res.statusCode,302);
+  assert.match(res.headers.Location,/^https:\/\/signed\.invalid\//);
  }
  for(const id of ['a2-day-19-shopping','a2/day-19/einkaufen-wo-und-wie.mp3','__proto__']){
-  const response=response();
-  await handler({method:'GET',query:{track:id}},response);
-  assert.equal(response.statusCode,404);
+  const res=response();
+  await handler({method:'GET',query:{track:id}},res);
+  assert.equal(res.statusCode,404);
  }
  assert.ok(signedCalls.every(v=>!v.key || v.key.startsWith('music/')));
 });
