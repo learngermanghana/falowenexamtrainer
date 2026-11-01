@@ -111,8 +111,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const legacyLyrics = chosen && !chosen.autoDiscovered && chosen.assignmentKey
     && packs[chosen.id]?.assignmentKey === chosen.assignmentKey
     ? String(packs[chosen.id]?.lyrics || "").trim() : "";
-  const approvedLyrics = recordingLyrics?.id === chosen?.id &&
-    recordingLyrics?.objectKey === chosen?.objectKey
+  const approvedLyrics = recordingLyrics && chosen &&
+    recordingLyrics.id === chosen.id && recordingLyrics.objectKey === chosen.objectKey
     ? recordingLyrics.lyrics : legacyLyrics;
 
   if (!valid) return null;
