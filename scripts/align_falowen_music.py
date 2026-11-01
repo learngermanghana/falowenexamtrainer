@@ -43,6 +43,46 @@ def tokens(text):
     return TOKEN_PATTERN.findall(value)
 
 
+def monotone_word_matching(expected, observed):
+    """Needleman-Wunsch word alignment, preserving repeated choruses in order.
+    A matched word must be text-identical and its audio position monotonic;
+    substitutions/insertions/deletions do not generate timestamps.
+    """
+    n=len(expected)
+    m=len(observed)
+    if n*m>1500000:
+        raise ValueError("Transcript too large to align safely")
+    previous=[-j for j in range(m+1)]
+    back=[bytearray(m+1) for _ in range(n+1)]
+    for i in range(1,n+1):
+        current=[-i]+[0]*m
+        for j in range(1,m+1):
+            equal=expected[i-1][1]==observed[j-1][0]
+            diagonal=previous[j-1]+(4 if equal else -3)
+            delete=previous[j]-1
+            insert=current[j-1]-1
+            best=max(diagonal,delete,insert)
+            current[j]=best
+            back[i][j]=1 if equal and best==diagonal else (2 if best==delete else 3)
+        previous=current
+    matched=[[] for _ in range(max(line_i for line_i,_ in expected)+1)]
+    i,j=n,m
+    while i>0 and j>0:
+        direction=back[i][j]
+        if direction==1:
+            line_i=expected[i-1][0]
+            matched[line_i].append((observed[j-1][1],observed[j-1][2]))
+            i-=1
+            j-=1
+        elif direction==2:
+            i-=1
+        else:
+            j-=1
+    for line in matched:
+        line.reverse()
+    return matched
+
+
 def match_transcript(lyrics, recognized, duration, minimum_coverage=0.70, minimum_line=0.45):
     """Match Whisper words to ALL written lines in chronological order.
 
@@ -70,6 +110,19 @@ def match_transcript(lyrics, recognized, duration, minimum_coverage=0.70, minimu
     total_ratio = sum(len(row) for row in matched) / len(expected)
     line_counts = [sum(1 for idx, _ in expected if idx == line_i) for line_i in range(len(lines))]
     fractions = [len(row)/count if count else 0 for row, count in zip(matched,line_counts)]
+    if total_ratio < minimum_coverage or min(fractions) < minimum_line:
+        alternative=monotone_word_matching(expected,observed)
+        alt_fraction=[len(row)/count if count else 0 for row,count in zip(alternative,line_counts)]
+        alt_total=sum(len(row) for row in alternative)/len(expected)
+        # The global alignment may recover repeated chorus words that
+        # SequenceMatcher skipped. Never replace a result if its weakest line
+        # or total coverage would be worse.
+        if (min(alt_fraction)>min(fractions) and
+                alt_total>=minimum_coverage and
+                min(alt_fraction)>=minimum_line):
+            matched=alternative
+            total_ratio=alt_total
+            fractions=alt_fraction
     if total_ratio < minimum_coverage or min(fractions) < minimum_line:
         raise ValueError("Low acoustic match: total=%.1f%%, weakest line=%.1f%%" %
                          (100*total_ratio, 100*min(fractions)))
