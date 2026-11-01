@@ -9,6 +9,7 @@ on:
       - "functions/functionz/paymentAwareApp.js"
       - "web/src/components/ChatGPTConnectPage.jsx"
       - "web/src/App.js"
+      - "web/public/.well-known/**"
       - "vercel.json"
       - ".github/workflows/chatgpt-companion.yml"
   workflow_dispatch:
