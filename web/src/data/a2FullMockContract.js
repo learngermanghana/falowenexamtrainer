@@ -25,6 +25,13 @@ export const A2_MOCK_CAPABILITIES = Object.freeze({
     verifiedSpeaking: true,
     completedResultSync: true,
   }),
+  "a2-mock-03": Object.freeze({
+    serverAttempt: true,
+    serverObjectiveScoring: true,
+    verifiedWriting: true,
+    verifiedSpeaking: true,
+    completedResultSync: true,
+  }),
 });
 
 export const missingA2FullMockCapabilities = (mockId) => {

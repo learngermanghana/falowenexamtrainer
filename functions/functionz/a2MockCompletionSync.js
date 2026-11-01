@@ -106,7 +106,9 @@ const MOCK_2_LISTENING_ANSWER_KEY = Object.freeze({
   "19": "nein",
   "20": "ja"
 });
+const MOCK_3_KEYS = require("./a2Mock3MarkingSet");
 const objectiveKeysForMock = (mockId) =>
+  mockId === "a2-mock-03" ? { lesen: MOCK_3_KEYS.lesen, hoeren: MOCK_3_KEYS.hoeren } :
   mockId === "a2-mock-02"
     ? { lesen: MOCK_2_READING_ANSWER_KEY, hoeren: MOCK_2_LISTENING_ANSWER_KEY }
     : { lesen: READING_ANSWER_KEY, hoeren: LISTENING_ANSWER_KEY };
@@ -135,7 +137,7 @@ const buildVerifiedA2MockScore = ({ state = {}, verifiedSections = {}, mockId = 
       objective:isFour?{lesen,hoeren}:{lesen},
     };
   }
-  if (!["a2-mock-01", "a2-mock-02"].includes(mockId)) throw new Error("Unknown A2 mock answer set.");
+  if (!["a2-mock-01", "a2-mock-02", "a2-mock-03"].includes(mockId)) throw new Error("Unknown A2 mock answer set.");
   const keys = objectiveKeysForMock(mockId);
   return buildVerifiedFourSkillScore({
     level:"A2",state,verifiedSections,
@@ -275,6 +277,7 @@ const assignmentIdForAttempt = ({ attemptNumber = 1, firstAttempt = false, mockI
   const number = Math.max(1, Number(attemptNumber) || 1);
   if (isA2Kombi(mockId)) return `A2-MOCK-${mockId.slice(-2)}-ATTEMPT-${number}`;
   if (mockId === "a2-mock-02") return `A2-MOCK-02-ATTEMPT-${number}`;
+  if (mockId === "a2-mock-03") return `A2-MOCK-03-ATTEMPT-${number}`;
   return firstAttempt || number === 1
     ? "A2-FINAL-MOCK"
     : `A2-FINAL-MOCK-PRACTICE-${number}`;
@@ -297,12 +300,13 @@ const buildA2MockCompletionArtifacts = ({
   const { breakdown, strongest, weakest } = deriveMockInsights(sectionScores,mockId,overall?.assessmentVersion);
   const assignmentId = assignmentIdForAttempt({ attemptNumber, firstAttempt, mockId });
   const isSecond = mockId === "a2-mock-02";
+  const isThird = mockId === "a2-mock-03";
   const isKombi = isA2Kombi(mockId);
   const isFourKombi = mockId === "a2-mock-04" && overall?.assessmentVersion === "four-module-v2";
-  const mockTitle = isKombi ? `A2 Mock ${Number(mockId.slice(-2))} · Kombiprüfung` : isSecond ? "A2 Mock 2" : MOCK_TITLE;
-  const mockSource = isKombi ? mockId.replace(/-/g,"_") : isSecond ? "a2_mock_02" : "a2_final_mock";
-  const mockLink = isKombi ? `/campus/course/a2-kombi-mock-${Number(mockId.slice(-2))}` : isSecond ? "/campus/course/a2-mock-2" : "/campus/course/a2-final-mock-exam";
-  const mockDocPrefix = isKombi ? mockId : isSecond ? "a2-mock-02" : "a2-final-mock";
+  const mockTitle = isKombi ? `A2 Mock ${Number(mockId.slice(-2))} · Kombiprüfung` : isThird ? "A2 Mock 3" : isSecond ? "A2 Mock 2" : MOCK_TITLE;
+  const mockSource = isKombi ? mockId.replace(/-/g,"_") : isThird ? "a2_mock_03" : isSecond ? "a2_mock_02" : "a2_final_mock";
+  const mockLink = isKombi ? `/campus/course/a2-kombi-mock-${Number(mockId.slice(-2))}` : isThird ? "/campus/course/a2-mock-3" : isSecond ? "/campus/course/a2-mock-2" : "/campus/course/a2-final-mock-exam";
+  const mockDocPrefix = isKombi ? mockId : isThird ? "a2-mock-03" : isSecond ? "a2-mock-02" : "a2-final-mock";
   const attemptLabel = firstAttempt || Number(attemptNumber) === 1
     ? "First readiness attempt"
     : `Practice attempt ${Math.max(1, Number(attemptNumber) || 1)}`;
@@ -357,7 +361,7 @@ const buildA2MockCompletionArtifacts = ({
     progressionEligible: false,
   };
 
-  const notificationTitle = isKombi ? `Your A2 Mock ${Number(mockId.slice(-2))} result is ready` : isSecond ? "Your A2 Mock 2 result is ready" : firstAttempt
+  const notificationTitle = isKombi ? `Your A2 Mock ${Number(mockId.slice(-2))} result is ready` : isThird ? "Your A2 Mock 3 result is ready" : isSecond ? "Your A2 Mock 2 result is ready" : firstAttempt
     ? "Your A2 Final Mock result is ready"
     : "Your A2 Final Mock practice result is ready";
 
