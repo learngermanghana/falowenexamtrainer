@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const { getAssignmentSummary } = require("./routes/scoresSummaryCoursePlan");
 const { getCurriculumEntriesForLevel } = require("../data/curriculumManifest");
 const { getScoresForStudent } = require("./scoresSheet");
+const { getStudentTimetable } = require("./chatgptClassTimetable");
 
 let GENERATED_COURSE_CONTENT = null;
 try {
@@ -289,6 +290,11 @@ const toolDefinitions = [
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
+    name: "get_my_falowen_next_class",
+    description: "Find my next live German class from my verified Falowen class assignment and the saved Admin timetable. Show the session time, topic, preparation details and enrolled class Zoom link if configured. Do not invent unrecorded sessions or use other cohorts.",
+    inputSchema: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "get_my_falowen_lesson",
     description: "Get my assigned course day's goal and Campus link, plus real learner-facing teaching tasks where they are available. Do not browse the public web to guess Falowen exercises.",
     inputSchema: {
@@ -317,13 +323,16 @@ const toolDefinitions = [
   _meta: { ...(tool._meta || {}) },
 }));
 
-async function callTool(name, args, student) {
+async function callTool(name, args, student, admin) {
   const view = studentView(student);
   if (name === "get_my_falowen_profile") return {
     id: "flw_" + sha256(student.id).slice(0, 32),
     name: view.name,
     nickname: view.level ? "Falowen " + view.level + " student" : "Falowen student",
   };
+  if (name === "get_my_falowen_next_class") {
+    return getStudentTimetable({ db: admin.firestore(), student, now: new Date() });
+  }
   if (name === "get_my_falowen_lesson" || name === "get_my_falowen_lesson_content") {
     if (!Number.isInteger(args?.day) || args.day < 1 || args.day > 50) throw new Error("day must be an integer between 1 and 50");
     if (name === "get_my_falowen_lesson_content") {
@@ -526,7 +535,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. Scores come from officially recorded results only; never disclose other students' records.",
+        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. When a learner asks for live class date, topic, preparation or Zoom details, call get_my_falowen_next_class. Never infer a class from course level, invent a session or expose another cohort's meeting details. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });
@@ -551,7 +560,7 @@ function makeRouter(admin) {
       if (!toolDefinitions.some((tool) => tool.name === name)) {
         return res.json({ jsonrpc: "2.0", id, error: { code: -32602, message: "Unknown tool" } });
       }
-      const result = await callTool(name, message.params?.arguments || {}, student);
+      const result = await callTool(name, message.params?.arguments || {}, student, admin);
       return res.json({ jsonrpc: "2.0", id, result: {
         content: [{ type: "text", text: JSON.stringify(result) }], structuredContent: result,
       } });
