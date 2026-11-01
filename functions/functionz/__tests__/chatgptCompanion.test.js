@@ -169,3 +169,48 @@ describe("Canonical B2 Course Book material in ChatGPT", () => {
     expect(lessonContentResponse("B2", 2, "listening").material).not.toHaveProperty("transcript");
   });
 });
+
+
+describe("B1 original Falowen Course Book reading", () => {
+  test("B1 Day 1 exposes the exact existing five-paragraph Lesen with seven questions", () => {
+    const overview = lessonContentResponse("B1", 1, "overview");
+    expect(overview.available).toBe(true);
+    expect(overview.readingTitle).toBe("Traumdeutung und ihre Bedeutung");
+    expect(overview.availableSections).toContain("reading");
+    expect(overview.studySequence[0]).toMatch(/original Falowen Lesen/);
+
+    const lesen = lessonContentResponse("B1", 1, "reading");
+    expect(lesen.available).toBe(true);
+    expect(lesen.source).toMatch(/Falowen Course Book/);
+    expect(lesen.material.paragraphs).toHaveLength(5);
+    expect(lesen.material.paragraphs[0]).toMatch(/^Träume faszinieren die Menschheit seit Jahrtausenden/);
+    expect(lesen.material.questions).toHaveLength(7);
+    expect(lesen.material.questions[0].question).toBe("Was glaubten die Menschen in der Antike über Träume?");
+    expect(lesen.material.questions[0].options[0]).toMatch(/Göttern gesendet wurden/);
+    expect(lesen.material.questions[6].question).toMatch(/wissenschaftlichen Fortschritte/);
+  });
+
+  test("uses real registered B1 reading for other days and reports missing text honestly", () => {
+    const reading9 = lessonContentResponse("B1", 9, "reading");
+    expect(reading9.available).toBe(true);
+    expect(reading9.material.title).toMatch(/Stress im Alltag/);
+    expect(reading9.material.questions.length).toBeGreaterThan(0);
+    const unsupported = lessonContentResponse("B1", 2, "reading");
+    expect(unsupported.available).toBe(false);
+    expect(unsupported.material).toBeUndefined();
+    expect(unsupported.clarification).toMatch(/not included/);
+  });
+
+  test("keeps submission in Campus and never leaks private answer keys", () => {
+    const lesen = lessonContentResponse("B1", 1, "reading");
+    const q = lesen.material.questions[0];
+    expect(q).toEqual({ question: expect.any(String), options: expect.any(Array) });
+    expect(q).not.toHaveProperty("answer");
+    expect(q).not.toHaveProperty("answerIndex");
+    expect(lesen.lessonUrl).toContain("/campus/course/lesson/B1/1");
+    const raw = fs.readFileSync(path.resolve(__dirname, "../../data/chatgptLessonContent.generated.json"), "utf8");
+    for (const forbidden of ['"answerIndex"', '"sampleAnswer"', '"transcript"', '"teacherNotes"']) {
+      expect(raw).not.toContain(forbidden);
+    }
+  });
+});

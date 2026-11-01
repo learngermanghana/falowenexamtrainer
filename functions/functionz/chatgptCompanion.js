@@ -41,12 +41,14 @@ function lessonContentResponse(level, day, section = "overview") {
     availableSections: VALID_LESSON_SECTIONS.size && [...VALID_LESSON_SECTIONS].filter((key) =>
       key === "overview" || Boolean(content[key])),
     studySequence: [
-      "Read the vocabulary and grammar teaching in Campus.",
-      content.skillFocus === "lesen" ? "Read the lesson passage and answer the reading questions without a solution key."
+      ...(level === "B1" && content.reading
+        ? ["Read the original Falowen Lesen passage and answer its questions. Do not request a key before attempting them."]
+        : ["Read the vocabulary and grammar teaching in Campus."]),
+      (content.skillFocus === "lesen" || (level === "B1" && content.reading)) ? "Read the lesson passage and answer the reading questions without a solution key."
         : content.skillFocus === "hoeren" ? "Listen to the audio in Campus and answer the listening questions."
           : content.skillFocus === "write" ? "Follow the assigned writing prompt in Campus and draft your own response."
             : "Complete the speaking or communication task shown in Campus.",
-      "Review the lesson key points and practise your own sentences.",
+      level === "B1" ? "Finish any required submission in Campus." : "Review the lesson key points and practise your own sentences.",
     ],
     grammarExercise: content.grammar?.task || null,
     readingTitle: content.reading?.title || null,
@@ -296,7 +298,7 @@ const toolDefinitions = [
   },
   {
     name: "get_my_falowen_lesson_content",
-    description: "Read actual student-facing Falowen Course Book material for my enrolled course: vocabulary, grammar explanations and checks, reading passage/questions, listening task details, writing prompt and review. Does not reveal answer keys, model answers, audio transcripts or other students' work. Supported in depth for B2; other levels report unavailable rather than invent exercises.",
+    description: "Read authentic Falowen Course Book content for my enrolled level. B1: original reading passages, comprehension questions and writing prompts where available; B2: vocabulary, grammar, reading, listening, writing and review. Missing content is reported transparently. Never expose answer keys, solutions or private student work.",
     inputSchema: {
       type: "object",
       properties: {
@@ -524,7 +526,7 @@ function makeRouter(admin) {
       return res.json({ jsonrpc: "2.0", id, result: {
         protocolVersion: "2025-06-18", capabilities: { tools: { listChanged: false } },
         serverInfo: { name: "Falowen Learning Companion", version: "1.0.0" },
-        instructions: "Read-only learning companion for connected Falowen students. Tutor-marked assignments must be submitted in Campus; do not claim to submit them here. Scores come from officially recorded results only. Never share other students' records.",
+        instructions: "Read-only Falowen learning companion. For exact exercises and passages, first call get_my_falowen_lesson_content with the correct day and section. Its returned learner-facing content is the source of truth; do not search external websites or add outside images when presenting an official Falowen exercise. If a section is unavailable, say so rather than inventing a workbook passage. Restrict course material to the linked student level. Guide students without giving hidden answer keys, and direct all official tutor submissions to Falowen Campus. Scores come from officially recorded results only; never disclose other students' records.",
       } });
     }
     if (message.method === "ping") return res.json({ jsonrpc: "2.0", id, result: {} });

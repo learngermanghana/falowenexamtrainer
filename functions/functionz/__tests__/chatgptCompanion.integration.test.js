@@ -246,4 +246,24 @@ describe("ChatGPT MCP OAuth integration with fake Firebase store", () => {
     });
   });
 
+  test("B1 authenticated learner receives original Day 1 passage and cannot query B2 material", async () => {
+    await withServer(async (origin) => {
+      const grant = await connectStudent(origin, "student-2", "b1-original-reading");
+      expect(grant.response.status).toBe(200);
+      const call = (params) => postJson(origin + "/api/chatgpt/mcp", {
+        jsonrpc: "2.0", id: 70, method: "tools/call",
+        params: { name: "get_my_falowen_lesson_content", arguments: params },
+      }, grant.tokens.access_token);
+      const lesson = await call({ day: 1, section: "reading" });
+      expect(lesson.data.result.structuredContent.level).toBe("B1");
+      expect(lesson.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+      expect(lesson.data.result.structuredContent.material.paragraphs).toHaveLength(5);
+      expect(lesson.data.result.structuredContent.material.questions).toHaveLength(7);
+      expect(lesson.data.result.structuredContent.material.questions[0]).not.toHaveProperty("answerIndex");
+      const spoofed = await call({ day: 1, section: "reading", level: "B2" });
+      expect(spoofed.data.result.structuredContent.level).toBe("B1");
+      expect(spoofed.data.result.structuredContent.material.title).toBe("Traumdeutung und ihre Bedeutung");
+    });
+  });
+
 });
