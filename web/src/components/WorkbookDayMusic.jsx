@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
+import { recordMusicPractice, flushMusicPractice } from "../services/musicPracticeService";
 import { styles } from "../styles";
 
 // Only approved public music playback IDs; private Hören assets are never read.
@@ -41,6 +42,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [packs, setPacks] = useState({});
   const [selectedId, setSelectedId] = useState("");
   const [state, setState] = useState("loading");
+  useEffect(() => () => { void flushMusicPractice(); }, []);
 
   useEffect(() => {
     if (!valid) return undefined;
@@ -104,7 +106,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
         </h2>
         <p style={{ color: "#475569", lineHeight: 1.7, margin: 0 }}>
           Enjoy the song for this lesson and follow the German lyrics when available.
-          No answers, submission, AI marking, score or music-specific deadline are required.
+          No answers, submission, AI marking, score or music-specific deadline are required. Signed-in listening activity is visible to your tutor.
           {courseLevel === "A1"
             ? (learningMode === "self"
               ? " Self-learning exercises and Radio are separate from Music."
@@ -139,6 +141,8 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
           ) : null}
           <h3 style={{ margin: 0, fontSize: "1.1rem" }}>{chosen.title}</h3>
           <audio key={chosen.id} data-music-audio="true" controls preload="none"
+            onPlay={(event) => { if (event.currentTarget.currentTime >= 1) return; void recordMusicPractice({ event: "play", trackId: chosen.id, title: chosen.title, level: courseLevel, day: lessonDay }); }}
+            onEnded={() => { void recordMusicPractice({ event: "complete", trackId: chosen.id, title: chosen.title, level: courseLevel, day: lessonDay }); }}
             src={chosen.audioUrl} style={{ width: "100%" }}>
             Your browser does not support this audio player.
           </audio>

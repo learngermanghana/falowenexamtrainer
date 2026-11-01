@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { recordMusicPractice, normalizeMusicPracticeEvent, flushMusicPractice } from "../services/musicPracticeService";
 
 /**
  * Reuses the existing Falowen Music app through the SAME ORIGIN.
@@ -10,6 +11,20 @@ import React from "react";
  * Do not duplicate music catalogues, R2 credentials or music API requests.
  */
 export default function CampusMusicPage() {
+  const frameRef = useRef(null);
+  useEffect(() => {
+    function handleMusicActivity(event) {
+      // Only the embedded same-origin player may report activity; never trust
+      // arbitrary postMessage senders or accept credentials from the iframe.
+      if (event.origin !== window.location.origin || event.source !== frameRef.current?.contentWindow) return;
+      if (event.data?.source !== "falowen-music" || event.data?.kind !== "activity") return;
+      const activity = normalizeMusicPracticeEvent(event.data);
+      if (activity) void recordMusicPractice(activity);
+    }
+    window.addEventListener("message", handleMusicActivity);
+    return () => { window.removeEventListener("message", handleMusicActivity); void flushMusicPractice(); };
+  }, []);
+
   return (
     <section aria-label="Falowen Music" data-campus-music="true" style={{ display: "grid", gap: 12 }}>
       <header style={{
@@ -27,7 +42,11 @@ export default function CampusMusicPage() {
           Open public Music site ↗
         </a>
       </header>
+      <p style={{ margin: 0, color: "#526676", fontSize: 12 }}>
+        When signed in, song listening and completed listening exercises are recorded in your Falowen learning activity for your tutor. No answers or recordings are saved here.
+      </p>
       <iframe
+        ref={frameRef}
         title="Falowen Music — German listening room"
         src="/music/index.html?embedded=1"
         loading="eager"
