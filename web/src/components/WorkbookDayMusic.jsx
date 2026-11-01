@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import WorkbookReferenceAnswers from "./WorkbookReferenceAnswers";
-import { recordMusicPractice } from "../services/musicPracticeService";
+import { recordMusicPractice, flushMusicPractice } from "../services/musicPracticeService";
 import { styles } from "../styles";
 
 // Only approved public music playback IDs; private Hören assets are never read.
@@ -42,6 +42,7 @@ export default function WorkbookDayMusic({ level, day, title = "", workbookId = 
   const [packs, setPacks] = useState({});
   const [selectedId, setSelectedId] = useState("");
   const [state, setState] = useState("loading");
+  useEffect(() => () => { void flushMusicPractice(); }, []);
 
   useEffect(() => {
     if (!valid) return undefined;
