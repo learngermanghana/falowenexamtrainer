@@ -164,3 +164,19 @@ test("compact site header is excluded even with long hidden profile-menu text an
     else globalThis.window = priorWin;
   }
 });
+
+
+test("A2 print excludes late fallback workbook navigation and all inline teacher lecture days", () => {
+  const guidance = fs.readFileSync(path.join(dir, "../../web/src/components/A2B1WorkbookGuidance.js"), "utf8");
+  const workbook = fs.readFileSync(path.join(dir, "../../web/src/components/A2StandardTabbedWorkbookPage.js"), "utf8");
+  assert.match(guidance, /data-universal-a2-workbook-tabs="true"/);
+  assert.match(workbook, /data-a2-day18-teacher-lecture/);
+  // Print-only CSS covers React panels mounted AFTER the initial DOM cleanup.
+  for (const selector of ["[data-universal-a2-workbook-tabs]", "[data-a2-day18-teacher-lecture]"]) {
+    assert.ok(renderer.includes(selector), `Missing late-mounted print exclusion: ${selector}`);
+    assert.ok(helpers.includes(selector), `Missing DOM print exclusion: ${selector}`);
+  }
+  assert.match(helpers, /inline-teacher-lecture/);
+  assert.match(renderer, /A2 Day \\${lesson\\.day\\} \\${suffix\\} print contains excluded UI/);
+  assert.match(renderer, /pdftotext/);
+});
