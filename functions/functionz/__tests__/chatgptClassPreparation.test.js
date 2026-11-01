@@ -43,7 +43,9 @@ describe("Falowen ChatGPT next class preparation", () => {
     const r = prepareFromTimetable({ timetable: t, level: "A2", courseContent });
     expect(r.lesson.reading.title).toBe("Neu im Büro");
     expect(r.lesson.reading.sampleText).toContain("Firma Keller");
-    expect(r.lesson.grammar.fullExplanationIncluded).toBe(false);
+    expect(r.lesson.grammar.fullExplanationIncluded).toBe(true);
+    expect(r.lesson.grammar.teaching.length).toBeGreaterThan(0);
+    expect(JSON.stringify(r.lesson.grammar.teaching)).toMatch(/weil|deshalb/i);
     expect(r.practiceQuestions[0].question).toMatch(/Seit wann/);
   });
   test("never guesses a day from a mere curriculum index", () => {
