@@ -5,7 +5,14 @@
 import fs from "node:fs";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const { parse } = require("@babel/parser");
+let parse;
+try {
+  ({ parse } = require("@babel/parser"));
+} catch (error) {
+  if (error.code !== "MODULE_NOT_FOUND") throw error;
+  // Web CI/Vercel install under web/node_modules, unlike backend CI.
+  ({ parse } = createRequire(new URL("../web/package.json", import.meta.url))("@babel/parser"));
+}
 
 const asText = (x, length = 1900) => String(x || "").trim().slice(0, length);
 const prop = (obj, key) => obj?.properties?.find((x) =>
