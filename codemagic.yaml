@@ -1,6 +1,6 @@
 # Falowen's React/Vite site is in web/; this separate iOS wrapper lives in mobile/.
 # Workflows are manual on purpose to preserve free Codemagic build minutes.
-# First, add the six REACT_APP_FIREBASE_* variables in Codemagic app settings.
+# Create a Codemagic environment variable group named falowen_firebase and add\n# the six REACT_APP_FIREBASE_* frontend settings to it. Both workflows import it.
 workflows:
   falowen-ios-simulator:
     name: Falowen iOS - Free unsigned simulator build
@@ -9,6 +9,8 @@ workflows:
     environment:
       node: 22
       xcode: latest
+      groups:
+        - falowen_firebase
       vars:
         REACT_APP_AUTH_CONTINUE_URL: "https://www.falowen.app"
     scripts:
@@ -60,6 +62,7 @@ workflows:
       node: 22
       xcode: latest
       groups:
+        - falowen_firebase
         - appstore_credentials
       vars:
         REACT_APP_AUTH_CONTINUE_URL: "https://www.falowen.app"
