@@ -7,14 +7,18 @@ on:
       - 'web/src/components/A2KombiMockExamPage.jsx'
       - 'web/src/components/A2Mock04Hoeren.jsx'
       - 'web/src/data/a2Mock04Hoeren*'
+      - 'web/src/data/a2Mock06Hoeren*'
       - 'web/src/App.js'
       - 'web/src/data/mockExamCatalog.js'
       - 'web/src/services/mockAssessmentRequest.js'
       - 'functions/functionz/a2KombiMarkingSets.js'
       - 'functions/functionz/a2MockCompletionSync.js'
       - 'functions/functionz/a2Mock04HoerenKeys.js'
+      - 'functions/functionz/a2Mock06HoerenKeys.js'
+      - 'functions/functionz/a2Mock06PublishedAudio.js'
       - 'functions/functionz/a2Mock04PublishedAudio.js'
       - 'functions/functionz/tests/a2Mock04HoerenAudio.test.cjs'
+      - 'functions/functionz/tests/a2Mock06HoerenAudio.test.cjs'
       - 'functions/functionz/assessmentTaskContext.js'
       - 'functions/functionz/a2MockExaminerScore.js'
       - 'functions/functionz/a2MockSpeakingAttemptIdentity.js'
@@ -47,8 +51,9 @@ jobs:
           node --check functions/functionz/a2MockCompletionSync.js
           node --check functions/functionz/a2Mock04HoerenKeys.js
           node --check functions/functionz/a2Mock04PublishedAudio.js
+          node --check functions/functionz/a2Mock06PublishedAudio.js
           node --check functions/functionz/assessmentTaskContext.js
-          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs
+          node --test functions/functionz/tests/a2Kombi04to08.test.cjs functions/functionz/tests/a2Mock04HoerenAudio.test.cjs functions/functionz/tests/a2Mock06HoerenAudio.test.cjs
   web-release:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -65,7 +70,7 @@ jobs:
         working-directory: web
         env:
           CI: true
-        run: npx jest --runInBand --runTestsByPath src/data/a2KombiMockSets.test.js src/data/a2Mock04Hoeren.test.js src/data/a2FullMockContract.test.js src/data/mockExamCatalog.a2Library.test.js
+        run: npx jest --runInBand --runTestsByPath src/data/a2KombiMockSets.test.js src/data/a2Mock04Hoeren.test.js src/data/a2Mock06Hoeren.test.js src/data/a2FullMockContract.test.js src/data/mockExamCatalog.a2Library.test.js
       - name: Verify production web bundle (no preview deployment)
         working-directory: web
         run: npx vite build
